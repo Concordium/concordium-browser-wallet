@@ -1,0 +1,10 @@
+{
+  "name": "concordium-browser-wallet",
+  "version": "0.1.0",
+  "description": "Browser extensions wallet for the Concordium blockchain",
+  "author": "Concordium",
+  "license": "Apache",
+  "dependencies": {
+    "concordium-wallet-message-hub": "0.1.0"
+  }
+}
