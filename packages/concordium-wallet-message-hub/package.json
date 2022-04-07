@@ -1,5 +1,5 @@
 {
-  "name": "concordium-wallet-message-hub",
+  "name": "@concordium/browser-wallet-message-hub",
   "version": "0.1.0",
   "description": "Enables communication between browser contexts for concordium browser wallet and API",
   "main": "index.js",
