@@ -1,16 +1,8 @@
 {
     "extends": "../../tsconfig.json",
     "compilerOptions": {
-        "noEmit": true,
-        "jsx": "react",
         "paths": {
-            "~/*": ["./src/*"],
             "@concordium/wallet-message-hub/*": ["../../packages/concordium-wallet-message-hub/src/*"]
-        }
-    },
-    "ts-node": {
-        "compilerOptions": {
-            "module": "CommonJS"
         }
     },
     "include": ["./src"]

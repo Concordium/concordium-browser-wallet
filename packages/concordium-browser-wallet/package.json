@@ -1,21 +1,23 @@
 {
-  "name": "@concordium/browser-wallet",
-  "version": "0.1.0",
-  "description": "Browser extensions wallet for the Concordium blockchain",
-  "author": "Concordium",
-  "license": "Apache",
-  "dependencies": {
-    "@concordium/browser-wallet-message-hub": "0.1.0",
-    "react": "^18.0.0",
-    "react-dom": "^18.0.0"
-  },
-  "devDependencies": {
-    "@types/chrome": "^0.0.180",
-    "@types/node": "^17.0.23",
-    "@types/react": "^17.0.43",
-    "@types/react-dom": "^17.0.14",
-    "esbuild": "^0.14.31",
-    "ts-node": "^10.7.0",
-    "typescript": "^4.6.3"
-  }
+    "name": "@concordium/browser-wallet",
+    "version": "0.1.0",
+    "description": "Browser extensions wallet for the Concordium blockchain",
+    "author": "Concordium",
+    "license": "Apache",
+    "scripts": {
+        "build:dev": "cross-env NODE_ENV=development node --loader ts-node/esm ./build/dev.ts",
+        "watch": "cross-env WATCH=1 yarn build:dev"
+    },
+    "dependencies": {
+        "@concordium/browser-wallet-message-hub": "0.1.0",
+        "react": "^18.0.0",
+        "react-dom": "^18.0.0"
+    },
+    "devDependencies": {
+        "@types/chrome": "^0.0.180",
+        "@types/react": "^17.0.43",
+        "@types/react-dom": "^17.0.14",
+        "cross-env": "^7.0.3",
+        "esbuild": "^0.14.31"
+    }
 }
