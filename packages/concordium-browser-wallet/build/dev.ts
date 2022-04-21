@@ -11,6 +11,7 @@ const watch = Boolean(process.env.WATCH);
 const popup = 'src/popup/index.tsx';
 const background = 'src/background/index.ts';
 const content = 'src/content/index.ts';
+const inject = 'src/inject/index.ts';
 
 const htmlTemplate = fs.readFileSync('src/popup/index.html').toString();
 const popupHtmlFile = 'popup.html';
@@ -18,9 +19,9 @@ const popupHtmlFile = 'popup.html';
 const manifestTemplate = fs.readFileSync('manifest.json').toString();
 
 const config: BuildOptions = {
-    entryPoints: [popup, background, content],
+    entryPoints: [popup, background, content, inject],
     outbase: 'src',
-    entryNames: '[dir]-[hash]',
+    entryNames: '[dir]',
     bundle: true,
     minify: true,
     metafile: true,
@@ -42,7 +43,7 @@ const config: BuildOptions = {
                 },
             ],
         }),
-        manifestPlugin({ manifestTemplate, backgroundScriptEntryPoint: background, popupHtmlFile }),
+        manifestPlugin({ manifestTemplate, entryPoints: [background, content, inject], popupHtmlFile }),
     ],
 };
 

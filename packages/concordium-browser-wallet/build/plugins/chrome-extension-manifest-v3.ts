@@ -5,19 +5,22 @@ import path from 'path';
 import { promises as fs } from 'fs';
 import packageJson from '../../package.json';
 
+const findOutFile = (outdir: string, metafile: esbuild.Metafile) => (entryPoint: string) =>
+    Object.entries(metafile.outputs)
+        .find(([, value]) => value.entryPoint === entryPoint)?.[0]
+        ?.replace(`${outdir}/`, '');
+
 export type Configuration = {
     manifestTemplate: string;
     popupHtmlFile: string;
-    backgroundScriptEntryPoint: string;
+    entryPoints?: string[];
 };
 
 export const manifestPlugin = ({
     manifestTemplate,
     popupHtmlFile,
-    backgroundScriptEntryPoint,
+    entryPoints = [],
 }: Configuration): esbuild.Plugin => {
-    const manifest = JSON.parse(manifestTemplate);
-
     return {
         name: 'chrome-extension-manifest-v3-plugin',
         setup(build) {
@@ -39,10 +42,10 @@ export const manifestPlugin = ({
                 if (!outdir) {
                     return;
                 }
+                const findFile = findOutFile(outdir, res.metafile);
 
-                const backgroundScript = Object.entries(res.metafile.outputs)
-                    .find(([, value]) => value.entryPoint === backgroundScriptEntryPoint)?.[0]
-                    ?.replace(`${outdir}/`, '');
+                const t = entryPoints.reduce((acc, e) => acc.replace(e, findFile(e) as string), manifestTemplate);
+                const manifest = JSON.parse(t);
 
                 manifest.version = packageJson.version;
                 manifest.description = packageJson.description;
@@ -50,9 +53,6 @@ export const manifestPlugin = ({
 
                 manifest.action = manifest.action ?? {};
                 manifest.action.default_popup = popupHtmlFile;
-
-                manifest.background = manifest.background ?? {};
-                manifest.background.service_worker = backgroundScript;
 
                 const content = JSON.stringify(manifest);
                 const out = path.join(outdir, 'manifest.json');

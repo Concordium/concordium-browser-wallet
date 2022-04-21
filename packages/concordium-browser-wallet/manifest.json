@@ -1,5 +1,33 @@
 {
     "name": "Concordium Wallet",
     "manifest_version": 3,
-    "permissions": ["storage", "activeTab", "scripting"]
+    "content_scripts": [
+        {
+            "all_frames": false,
+            "js": ["src/content/index.ts"],
+            "matches": ["file://*/*", "http://*/*", "https://*/*"],
+            "run_at": "document_idle",
+            "match_origin_as_fallback": true
+        }
+    ],
+    "host_permissions": ["<all_urls>"],
+    "permissions": [
+        "tabs",
+        "activeTab",
+        "storage",
+        "scripting",
+        "notifications"
+    ],
+    "background": {
+        "service_worker": "src/background/index.ts"
+    },
+    "web_accessible_resources": [
+        {
+            "resources": ["src/inject/index.ts"],
+            "matches": ["<all_urls>"]
+        }
+    ],
+    "action": {
+        "default_popup": "src/popup/index.html"
+    }
 }
