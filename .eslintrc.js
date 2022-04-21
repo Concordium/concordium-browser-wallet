@@ -16,6 +16,7 @@ module.exports = {
         node: true,
     },
     rules: {
+        'import/prefer-default-export': 0,
         'prettier/prettier': [
             'error',
             {
