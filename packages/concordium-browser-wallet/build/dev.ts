@@ -3,16 +3,19 @@
 import esbuild, { BuildOptions } from 'esbuild';
 import { htmlPlugin } from '@craftamap/esbuild-plugin-html';
 import { sassPlugin } from 'esbuild-sass-plugin';
-import path from 'path';
 import fs from 'fs';
-import { root } from './utils';
+import { manifestPlugin } from './plugins/chrome-extension-manifest-v3';
 
 const watch = Boolean(process.env.WATCH);
 
 const popup = 'src/popup/index.tsx';
 const background = 'src/background/index.ts';
 const content = 'src/content/index.ts';
+
 const htmlTemplate = fs.readFileSync('src/popup/index.html').toString();
+const popupHtmlFile = 'popup.html';
+
+const manifestTemplate = fs.readFileSync('manifest.json').toString();
 
 const config: BuildOptions = {
     entryPoints: [popup, background, content],
@@ -21,10 +24,10 @@ const config: BuildOptions = {
     bundle: true,
     minify: true,
     metafile: true,
-    logLevel: 'info',
+    logLevel: 'warning',
     sourcemap: process.env.NODE_ENV !== 'production',
     target: ['chrome58', 'firefox57'],
-    outdir: path.resolve(root, './dist'),
+    outdir: 'dist',
     define: {
         'process.env.NODE_ENV': `"${process.env.NODE_ENV}"`,
     },
@@ -34,23 +37,24 @@ const config: BuildOptions = {
             files: [
                 {
                     entryPoints: [popup],
-                    filename: 'popup.html',
+                    filename: popupHtmlFile,
                     htmlTemplate,
                 },
             ],
         }),
+        manifestPlugin({ manifestTemplate, backgroundScriptEntryPoint: background, popupHtmlFile }),
     ],
 };
 
 if (watch) {
     config.watch = {
-        onRebuild(error, result) {
+        onRebuild(error) {
             if (error) {
                 console.error('watch build failed:', error);
                 return;
             }
 
-            console.log('rebuild success:', result);
+            console.log('rebuild successful');
         },
     };
 }

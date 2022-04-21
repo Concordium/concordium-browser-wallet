@@ -1,0 +1,5 @@
+{
+    "name": "Concordium Wallet",
+    "manifest_version": 3,
+    "permissions": ["storage", "activeTab", "scripting"]
+}
