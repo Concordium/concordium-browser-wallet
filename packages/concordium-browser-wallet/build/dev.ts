@@ -1,26 +1,43 @@
 /* eslint-disable no-console */
 /* eslint-disable import/no-extraneous-dependencies */
 import esbuild, { BuildOptions } from 'esbuild';
+import { htmlPlugin } from '@craftamap/esbuild-plugin-html';
 import path from 'path';
+import fs from 'fs';
 import { root } from './utils';
 
 const watch = Boolean(process.env.WATCH);
 
+const popup = 'src/popup/index.tsx';
+const background = 'src/background/index.ts';
+const content = 'src/content/index.ts';
+const htmlTemplate = fs.readFileSync('src/popup/index.html').toString();
+
 const config: BuildOptions = {
-    entryPoints: [
-        // "./src/background.ts",
-        // "./src/content.ts",
-        path.resolve(root, './src/popup.tsx'),
-        // "./src/injected.ts"
-    ],
+    entryPoints: [popup, background, content],
+    outbase: 'src',
+    entryNames: '[dir]', // TODO include hash by doing [dir]-[hash]
     bundle: true,
     minify: true,
+    metafile: true,
+    logLevel: 'debug',
     sourcemap: process.env.NODE_ENV !== 'production',
     target: ['chrome58', 'firefox57'],
     outdir: path.resolve(root, './dist'),
     define: {
         'process.env.NODE_ENV': `"${process.env.NODE_ENV}"`,
     },
+    plugins: [
+        htmlPlugin({
+            files: [
+                {
+                    entryPoints: [popup],
+                    filename: 'popup.html',
+                    htmlTemplate,
+                },
+            ],
+        }),
+    ],
 };
 
 if (watch) {
