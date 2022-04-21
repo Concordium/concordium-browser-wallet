@@ -2,6 +2,7 @@
 /* eslint-disable import/no-extraneous-dependencies */
 import esbuild, { BuildOptions } from 'esbuild';
 import { htmlPlugin } from '@craftamap/esbuild-plugin-html';
+import { sassPlugin } from 'esbuild-sass-plugin';
 import path from 'path';
 import fs from 'fs';
 import { root } from './utils';
@@ -16,11 +17,11 @@ const htmlTemplate = fs.readFileSync('src/popup/index.html').toString();
 const config: BuildOptions = {
     entryPoints: [popup, background, content],
     outbase: 'src',
-    entryNames: '[dir]', // TODO include hash by doing [dir]-[hash]
+    entryNames: '[dir]-[hash]',
     bundle: true,
     minify: true,
     metafile: true,
-    logLevel: 'debug',
+    logLevel: 'info',
     sourcemap: process.env.NODE_ENV !== 'production',
     target: ['chrome58', 'firefox57'],
     outdir: path.resolve(root, './dist'),
@@ -28,6 +29,7 @@ const config: BuildOptions = {
         'process.env.NODE_ENV': `"${process.env.NODE_ENV}"`,
     },
     plugins: [
+        sassPlugin(),
         htmlPlugin({
             files: [
                 {

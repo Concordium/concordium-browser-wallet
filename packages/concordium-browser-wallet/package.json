@@ -19,6 +19,7 @@
         "@types/react": "^17.0.43",
         "@types/react-dom": "^17.0.14",
         "cross-env": "^7.0.3",
-        "esbuild": "^0.14.31"
+        "esbuild": "^0.14.31",
+        "esbuild-sass-plugin": "^2.2.6"
     }
 }
