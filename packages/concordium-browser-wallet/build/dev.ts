@@ -25,7 +25,7 @@ const config: BuildOptions = {
     bundle: true,
     minify: true,
     metafile: true,
-    logLevel: 'warning',
+    logLevel: 'info',
     sourcemap: process.env.NODE_ENV !== 'production',
     target: ['chrome58', 'firefox57'],
     outdir: 'dist',

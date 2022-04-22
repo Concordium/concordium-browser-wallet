@@ -34,7 +34,10 @@ export const manifestPlugin = ({ manifestTemplate, popupHtmlFile }: Configuratio
             throw new Error('outdir must be set');
         }
 
-        const { outdir, entryPoints } = build.initialOptions;
+        const { outdir } = build.initialOptions;
+
+        const log: typeof console.log = (...args) =>
+            ['info', 'debug'].includes(build.initialOptions.logLevel ?? '') && console.log(...args);
 
         const findOutFile = (metafile: esbuild.Metafile, entryPoint: string) =>
             Object.entries(metafile.outputs)
@@ -45,19 +48,20 @@ export const manifestPlugin = ({ manifestTemplate, popupHtmlFile }: Configuratio
             (_, e) => `Could not find bundle file for entrypoint ${e}`
         );
 
-        const eps = Array.isArray(entryPoints) ? entryPoints : Object.values(entryPoints ?? {});
-
         const replaceManifestPlaceholders = (metafile: esbuild.Metafile) =>
-            eps
-                .reduce((acc, e) => acc.replace(`entryPoint!${e}`, findOutFileSafe(metafile, e)), manifestTemplate)
+            manifestTemplate
+                .replace(/"entryPoint!(.+)"/g, (_, p1) => `"${findOutFileSafe(metafile, p1)}"`)
                 .replace('popupHtmlFile!', popupHtmlFile);
 
         build.onEnd(async (res) => {
+            const startTime = Date.now();
+
             if (!res.metafile) {
                 throw new Error('Expected metafile to be present in build result.');
             }
 
-            const manifest = JSON.parse(replaceManifestPlaceholders(res.metafile));
+            const replaced = replaceManifestPlaceholders(res.metafile);
+            const manifest = JSON.parse(replaced);
 
             // Use package information from package.json
             manifest.version = packageJson.version;
@@ -67,6 +71,10 @@ export const manifestPlugin = ({ manifestTemplate, popupHtmlFile }: Configuratio
             const content = JSON.stringify(manifest);
             const out = path.join(outdir, 'manifest.json');
             await fs.writeFile(out, content);
+            const { size } = await fs.stat(out);
+
+            log(`  ${out} - ${size}`);
+            log(`  Manifest plugin done in ${Date.now() - startTime}ms`);
         });
     },
 });
