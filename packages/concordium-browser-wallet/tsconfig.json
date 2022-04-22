@@ -8,7 +8,8 @@
             "@popup/*": ["./src/popup/*"],
             "@background/*": ["./src/background/*"],
             "@content/*": ["./src/content/*"],
-            "@shared/*": ["./src/*"],
+            "@inject/*": ["./src/inject/*"],
+            "@shared/*": ["./src/shared/*"],
             "@root/*": ["./*"],
             "@concordium/wallet-message-hub/*": [
                 "../../packages/concordium-wallet-message-hub/src/*"
