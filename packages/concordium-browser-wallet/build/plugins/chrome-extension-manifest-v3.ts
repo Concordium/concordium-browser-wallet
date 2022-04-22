@@ -50,7 +50,7 @@ export const manifestPlugin = ({ manifestTemplate, popupHtmlFile }: Configuratio
         const replaceManifestPlaceholders = (metafile: esbuild.Metafile) =>
             eps
                 .reduce((acc, e) => acc.replace(`entryPoint!${e}`, findOutFileSafe(metafile, e)), manifestTemplate)
-                .replace('popupHtmlOutFile!', popupHtmlFile);
+                .replace('popupHtmlFile!', popupHtmlFile);
 
         build.onEnd(async (res) => {
             if (!res.metafile) {
