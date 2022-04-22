@@ -25,6 +25,3 @@ window.addEventListener('message', (event: MessageEvent) => {
         });
     }
 });
-
-// To force ESModule. Can safely be removed when any imports are added.
-export {};

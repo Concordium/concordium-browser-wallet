@@ -44,6 +44,3 @@ setInterval(
         }),
     5000
 );
-
-// To force ESModule. Can safely be removed when any imports are added.
-export {};
