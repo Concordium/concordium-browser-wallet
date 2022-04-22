@@ -83,6 +83,7 @@ __metadata:
     "@types/chrome": ^0.0.180
     "@types/react": ^17.0.43
     "@types/react-dom": ^17.0.14
+    clsx: ^1.1.1
     cross-env: ^7.0.3
     esbuild: ^0.14.31
     esbuild-sass-plugin: ^2.2.6
@@ -995,6 +996,13 @@ __metadata:
   dependencies:
     is-regexp: ^2.0.0
   checksum: 3624905a98920ad5c196080f4ea4379fa42b12f3b1d1272d958bb79c194508d2aec85160c25846f0016ca861a064316b213a565cf53b81a513047f89cf877803
+  languageName: node
+  linkType: hard
+
+"clsx@npm:^1.1.1":
+  version: 1.1.1
+  resolution: "clsx@npm:1.1.1"
+  checksum: ff052650329773b9b245177305fc4c4dc3129f7b2be84af4f58dc5defa99538c61d4207be7419405a5f8f3d92007c954f4daba5a7b74e563d5de71c28c830063
   languageName: node
   linkType: hard
 

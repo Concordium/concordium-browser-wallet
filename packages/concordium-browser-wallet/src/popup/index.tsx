@@ -1,6 +1,14 @@
 import React from 'react';
-import { render } from 'react-dom';
+import { createRoot } from 'react-dom/client';
+import Root from './shell/Root';
 
 import './index.scss';
 
-render(<div>test</div>, document.getElementById('root'));
+const container = document.getElementById('root');
+
+if (!container) {
+    throw new Error('Expected container DOM node to be defined');
+}
+
+const root = createRoot(container);
+root.render(<Root />);

@@ -10,6 +10,7 @@
     },
     "dependencies": {
         "@concordium/browser-wallet-message-hub": "0.1.0",
+        "clsx": "^1.1.1",
         "react": "^18.0.0",
         "react-dom": "^18.0.0"
     },

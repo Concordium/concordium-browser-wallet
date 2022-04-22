@@ -25,7 +25,9 @@ chrome.runtime.onMessage.addListener((message, _sender, sendResponse) => {
             chrome.scripting
                 .executeScript({
                     target: { tabId: tab.id },
-                    files: ['./content/inject.js'],
+                    // TODO this is a reference to the output file, expecting to be placed in the root with manifest.json.
+                    // Would be nice if the relative output path could be built from a reference to the entrypoint file instead.
+                    files: ['inject.js'],
                     world: 'MAIN',
                 })
                 .then(() => {
