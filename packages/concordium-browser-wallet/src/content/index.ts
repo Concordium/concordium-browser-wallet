@@ -1,5 +1,6 @@
+import { sendMessage } from '@concordium/browser-wallet-message-hub';
 /* eslint-disable no-console */
-console.log('ContentScript fully loaded and executed');
+sendMessage('ContentScript fully loaded and executed');
 
 // Tell Wallet (BackgroundScript) to inject script into dApp Context
 chrome.runtime.sendMessage('init', (r) => {

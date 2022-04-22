@@ -1,3 +1,5 @@
+import { test } from '@concordium/browser-wallet-api';
+
 /* eslint-disable no-console */
 /* eslint-disable @typescript-eslint/no-explicit-any */
 const promises: Map<string, any> = new Map();
@@ -32,6 +34,7 @@ window.addEventListener('message', (event: MessageEvent) => {
 (window as any).concordium = new WalletApi();
 
 console.log('injectedScript loaded');
+test();
 
 // Let dApp call sendTransaction on a regular basis to see Promise, Postmessage, chrome.runtime.sendMessage work in combination
 setInterval(

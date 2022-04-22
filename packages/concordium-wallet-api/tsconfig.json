@@ -3,8 +3,8 @@
     "compilerOptions": {
         "baseUrl": ".",
         "paths": {
-            "@concordium/wallet-message-hub/*": [
-                "../../packages/concordium-wallet-message-hub/src/*"
+            "@concordium/browser-wallet-message-hub": [
+                "../../packages/concordium-wallet-message-hub/src"
             ]
         }
     },
