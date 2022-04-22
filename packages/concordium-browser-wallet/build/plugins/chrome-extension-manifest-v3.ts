@@ -8,16 +8,17 @@ import packageJson from '@root/package.json';
 import { throwIfUndefined } from '@root/utils/functionHelpers';
 
 export type Configuration = {
+    /**
+     * template for manifest.json file, with placeholders for adding references built from entrypoints.
+     */
     manifestTemplate: string;
+    /**
+     * Path to output popup HTML file
+     */
     popupHtmlFile: string;
-    entryPoints?: string[];
 };
 
-export const manifestPlugin = ({
-    manifestTemplate,
-    popupHtmlFile,
-    entryPoints = [],
-}: Configuration): esbuild.Plugin => ({
+export const manifestPlugin = ({ manifestTemplate, popupHtmlFile }: Configuration): esbuild.Plugin => ({
     name: 'chrome-extension-manifest-v3-plugin',
     setup(build) {
         if (!build.initialOptions.metafile) {
@@ -27,7 +28,7 @@ export const manifestPlugin = ({
             throw new Error('outdir must be set');
         }
 
-        const { outdir } = build.initialOptions;
+        const { outdir, entryPoints } = build.initialOptions;
 
         const findOutFile = (metafile: esbuild.Metafile, entryPoint: string) =>
             Object.entries(metafile.outputs)
@@ -38,10 +39,12 @@ export const manifestPlugin = ({
             (_, e) => `Could not find bundle file for entrypoint ${e}`
         );
 
+        const eps = Array.isArray(entryPoints) ? entryPoints : Object.values(entryPoints ?? {});
+
         const replaceManifestPlaceholders = (metafile: esbuild.Metafile) =>
-            entryPoints
+            eps
                 .reduce((acc, e) => acc.replace(`entryPoint!${e}`, findOutFileSafe(metafile, e)), manifestTemplate)
-                .replace('popupHtmlFile!', popupHtmlFile);
+                .replace('popupHtmlOutFile!', popupHtmlFile);
 
         build.onEnd(async (res) => {
             if (!res.metafile) {

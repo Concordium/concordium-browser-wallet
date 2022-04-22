@@ -13,8 +13,8 @@ const background = 'src/background/index.ts';
 const content = 'src/content/index.ts';
 const inject = 'src/inject/index.ts';
 
-const htmlTemplate = fs.readFileSync('src/popup/index.html').toString();
-const popupHtmlFile = 'popup.html';
+const popupHtmlTemplate = fs.readFileSync('src/popup/index.html').toString();
+const popupHtmlOut = 'popup.html';
 
 const manifestTemplate = fs.readFileSync('manifest.json').toString();
 
@@ -38,12 +38,12 @@ const config: BuildOptions = {
             files: [
                 {
                     entryPoints: [popup],
-                    filename: popupHtmlFile,
-                    htmlTemplate,
+                    filename: popupHtmlOut,
+                    htmlTemplate: popupHtmlTemplate,
                 },
             ],
         }),
-        manifestPlugin({ manifestTemplate, entryPoints: [background, content, inject], popupHtmlFile }),
+        manifestPlugin({ manifestTemplate, popupHtmlFile: popupHtmlOut }),
     ],
 };
 
