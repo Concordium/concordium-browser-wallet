@@ -4,7 +4,7 @@
     "content_scripts": [
         {
             "all_frames": false,
-            "js": ["src/content/index.ts"],
+            "js": ["entryPoint!src/content/index.ts"],
             "matches": ["file://*/*", "http://*/*", "https://*/*"],
             "run_at": "document_idle",
             "match_origin_as_fallback": true
@@ -19,15 +19,15 @@
         "notifications"
     ],
     "background": {
-        "service_worker": "src/background/index.ts"
+        "service_worker": "entryPoint!src/background/index.ts"
     },
     "web_accessible_resources": [
         {
-            "resources": ["src/inject/index.ts"],
+            "resources": ["entryPoint!src/inject/index.ts"],
             "matches": ["<all_urls>"]
         }
     ],
     "action": {
-        "default_popup": "src/popup/index.html"
+        "default_popup": "popupHtmlFile!"
     }
 }

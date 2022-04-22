@@ -3,12 +3,8 @@
 import esbuild from 'esbuild';
 import path from 'path';
 import { promises as fs } from 'fs';
-import packageJson from '../../package.json';
-
-const findOutFile = (outdir: string, metafile: esbuild.Metafile) => (entryPoint: string) =>
-    Object.entries(metafile.outputs)
-        .find(([, value]) => value.entryPoint === entryPoint)?.[0]
-        ?.replace(`${outdir}/`, '');
+import packageJson from '@root/package.json';
+import { throwIfUndefined } from '@root/utils/functionHelpers';
 
 export type Configuration = {
     manifestTemplate: string;
@@ -20,44 +16,47 @@ export const manifestPlugin = ({
     manifestTemplate,
     popupHtmlFile,
     entryPoints = [],
-}: Configuration): esbuild.Plugin => {
-    return {
-        name: 'chrome-extension-manifest-v3-plugin',
-        setup(build) {
-            build.onStart(() => {
-                if (!build.initialOptions.metafile) {
-                    throw new Error('metafile is not enabled');
-                }
-                if (!build.initialOptions.outdir) {
-                    throw new Error('outdir must be set');
-                }
-            });
+}: Configuration): esbuild.Plugin => ({
+    name: 'chrome-extension-manifest-v3-plugin',
+    setup(build) {
+        if (!build.initialOptions.metafile) {
+            throw new Error('metafile is not enabled');
+        }
+        if (!build.initialOptions.outdir) {
+            throw new Error('outdir must be set');
+        }
 
-            build.onEnd(async (res) => {
-                const { outdir } = build.initialOptions;
+        const { outdir } = build.initialOptions;
 
-                if (!res.metafile) {
-                    return;
-                }
-                if (!outdir) {
-                    return;
-                }
-                const findFile = findOutFile(outdir, res.metafile);
+        const findOutFile = (metafile: esbuild.Metafile, entryPoint: string) =>
+            Object.entries(metafile.outputs)
+                .find(([, value]) => value.entryPoint === entryPoint)?.[0]
+                ?.replace(`${outdir}/`, '');
+        const findOutFileSafe = throwIfUndefined(
+            findOutFile,
+            (_, e) => `Could not find bundle file for entrypoint ${e}`
+        );
 
-                const t = entryPoints.reduce((acc, e) => acc.replace(e, findFile(e) as string), manifestTemplate);
-                const manifest = JSON.parse(t);
+        const replaceManifestPlaceholders = (metafile: esbuild.Metafile) =>
+            entryPoints
+                .reduce((acc, e) => acc.replace(`entryPoint!${e}`, findOutFileSafe(metafile, e)), manifestTemplate)
+                .replace('popupHtmlFile!', popupHtmlFile);
 
-                manifest.version = packageJson.version;
-                manifest.description = packageJson.description;
-                manifest.author = packageJson.author;
+        build.onEnd(async (res) => {
+            if (!res.metafile) {
+                throw new Error('Expected metafile to be present in build result.');
+            }
 
-                manifest.action = manifest.action ?? {};
-                manifest.action.default_popup = popupHtmlFile;
+            const manifest = JSON.parse(replaceManifestPlaceholders(res.metafile));
 
-                const content = JSON.stringify(manifest);
-                const out = path.join(outdir, 'manifest.json');
-                await fs.writeFile(out, content);
-            });
-        },
-    };
-};
+            // Use package information from package.json
+            manifest.version = packageJson.version;
+            manifest.description = packageJson.description;
+            manifest.author = packageJson.author;
+
+            const content = JSON.stringify(manifest);
+            const out = path.join(outdir, 'manifest.json');
+            await fs.writeFile(out, content);
+        });
+    },
+});

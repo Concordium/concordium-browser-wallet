@@ -1,12 +1,15 @@
 {
     "extends": "../../tsconfig.json",
     "compilerOptions": {
+        "baseUrl": ".",
         "noEmit": true,
         "jsx": "react",
         "paths": {
             "@popup/*": ["./src/popup/*"],
             "@background/*": ["./src/background/*"],
             "@content/*": ["./src/content/*"],
+            "@shared/*": ["./src/*"],
+            "@root/*": ["./*"],
             "@concordium/wallet-message-hub/*": [
                 "../../packages/concordium-wallet-message-hub/src/*"
             ]
@@ -17,5 +20,5 @@
             "module": "CommonJS"
         }
     },
-    "include": ["./src"]
+    "include": ["./**/*"]
 }
