@@ -1,5 +1,5 @@
 {
-    "name": "concordium-browser-wallet-workspace",
+    "name": "concordium-browser-wallet",
     "version": "0.1.0",
     "description": "chrome extensions wallet for the concordium blockchain",
     "repository": "git@github.com:Concordium/concordium-browser-wallet.git",
@@ -39,6 +39,7 @@
         "eslint-plugin-react": "^7.29.4",
         "eslint-plugin-react-hooks": "^4.4.0",
         "husky": "^7.0.4",
+        "jest": "^27.5.1",
         "lint-staged": "^12.3.8",
         "prettier": "^2.6.2",
         "stylelint": "^14.7.1",

@@ -4,7 +4,7 @@
         "baseUrl": ".",
         "paths": {
             "@concordium/browser-wallet-message-hub": [
-                "../../packages/concordium-wallet-message-hub/src"
+                "../../packages/browser-wallet-message-hub/src"
             ]
         }
     },
