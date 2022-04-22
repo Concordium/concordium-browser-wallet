@@ -5,7 +5,7 @@
     "author": "Concordium",
     "license": "Apache",
     "scripts": {
-        "build:dev": "cross-env NODE_ENV=development node --loader ts-node/esm ./build/dev.ts",
+        "build:dev": "cross-env NODE_ENV=development node --loader ts-node/esm -r tsconfig-paths/register ./build/dev.ts",
         "watch": "cross-env WATCH=1 yarn build:dev"
     },
     "dependencies": {

@@ -3,6 +3,7 @@
 import esbuild from 'esbuild';
 import path from 'path';
 import { promises as fs } from 'fs';
+
 import packageJson from '@root/package.json';
 import { throwIfUndefined } from '@root/utils/functionHelpers';
 
