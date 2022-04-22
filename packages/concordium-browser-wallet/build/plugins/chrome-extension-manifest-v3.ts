@@ -9,15 +9,21 @@ import { throwIfUndefined } from '@root/utils/functionHelpers';
 
 export type Configuration = {
     /**
-     * template for manifest.json file, with placeholders for adding references built from entrypoints.
+     * Template for manifest.json file, with placeholders for adding references built from entrypoints.
      */
     manifestTemplate: string;
     /**
-     * Path to output popup HTML file
+     * Path to popup HTML file to include in manifest. Should be relative to outdir root.
      */
     popupHtmlFile: string;
 };
 
+/**
+ * Plugin for building chrome extension v3 manifest.
+ *
+ * Replaces entry points marked with entryPoint!<path> with respective output bundle
+ * Replaces placeholder for popup HTML file marked with "popupHtmlFile!" with the provided path to the final popup (relative to outdir root).
+ */
 export const manifestPlugin = ({ manifestTemplate, popupHtmlFile }: Configuration): esbuild.Plugin => ({
     name: 'chrome-extension-manifest-v3-plugin',
     setup(build) {
