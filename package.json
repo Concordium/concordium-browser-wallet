@@ -1,0 +1,57 @@
+{
+    "name": "concordium-browser-wallet",
+    "version": "0.1.0",
+    "description": "chrome extensions wallet for the concordium blockchain",
+    "repository": "git@github.com:Concordium/concordium-browser-wallet.git",
+    "author": "Concordium",
+    "license": "Apache",
+    "private": true,
+    "workspaces": ["packages/*"],
+    "packageManager": "yarn@3.2.0",
+    "scripts": {
+        "postinstall": "husky install",
+        "test": "jest"
+    },
+    "lint-staged": {
+        "*.{js,jsx,ts,tsx}": ["eslint --cache --fix"],
+        "{*.json,.{eslintrc,prettierrc,stylelintrc}}": [
+            "prettier --ignore-path .eslintignore --parser json --write"
+        ],
+        "*.{css,scss}": ["stylelint --ignore-path .eslintignore --fix"],
+        "*.{html,md,yml}": [
+            "prettier --ignore-path .eslintignore --single-quote --write"
+        ]
+    },
+    "dependencies": {
+        "@concordium/browser-wallet-api": "workspace:*",
+        "@concordium/browser-wallet-message-hub": "workspace:*"
+    },
+    "devDependencies": {
+        "@types/jest": "^27.4.1",
+        "@types/node": "^17.0.25",
+        "@typescript-eslint/eslint-plugin": "^5.20.0",
+        "@typescript-eslint/parser": "^5.20.0",
+        "eslint": "7",
+        "eslint-config-airbnb": "^19.0.4",
+        "eslint-config-airbnb-typescript": "^17.0.0",
+        "eslint-config-prettier": "^8.5.0",
+        "eslint-plugin-import": "^2.26.0",
+        "eslint-plugin-jsx-a11y": "^6.5.1",
+        "eslint-plugin-prettier": "^4.0.0",
+        "eslint-plugin-react": "^7.29.4",
+        "eslint-plugin-react-hooks": "^4.4.0",
+        "husky": "^7.0.4",
+        "jest": "^27.5.1",
+        "lint-staged": "^12.3.8",
+        "prettier": "^2.6.2",
+        "stylelint": "^14.7.1",
+        "stylelint-config-prettier": "^9.0.3",
+        "stylelint-config-standard-scss": "^3.0.0",
+        "stylelint-prettier": "^2.0.0",
+        "stylelint-scss": "^4.2.0",
+        "ts-jest": "^27.1.4",
+        "ts-node": "^10.7.0",
+        "tsconfig-paths": "^3.14.1",
+        "typescript": "^4.6.3"
+    }
+}

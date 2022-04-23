@@ -1,0 +1,12 @@
+{
+    "extends": "../../tsconfig.json",
+    "compilerOptions": {
+        "baseUrl": ".",
+        "paths": {
+            "@concordium/browser-wallet-message-hub": [
+                "../../packages/browser-wallet-message-hub/src"
+            ]
+        }
+    },
+    "include": ["./src"]
+}

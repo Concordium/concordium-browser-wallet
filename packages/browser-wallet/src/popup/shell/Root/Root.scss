@@ -1,0 +1,11 @@
+.root {
+    font-size: 16px;
+
+    &--emph {
+        font-weight: bold;
+    }
+
+    &__world {
+        font-style: italic;
+    }
+}

@@ -1,0 +1,11 @@
+{
+    "name": "@concordium/browser-wallet-api",
+    "version": "0.1.0",
+    "description": "API for interfacing with the concordium browser wallet",
+    "main": "index.js",
+    "author": "Concordium",
+    "license": "Apache",
+    "dependencies": {
+        "@concordium/browser-wallet-message-hub": "0.1.0"
+    }
+}

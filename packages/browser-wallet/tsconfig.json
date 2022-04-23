@@ -1,0 +1,28 @@
+{
+    "extends": "../../tsconfig.json",
+    "compilerOptions": {
+        "baseUrl": ".",
+        "noEmit": true,
+        "jsx": "react",
+        "paths": {
+            "@popup/*": ["./src/popup/*"],
+            "@background/*": ["./src/background/*"],
+            "@content/*": ["./src/content/*"],
+            "@inject/*": ["./src/inject/*"],
+            "@shared/*": ["./src/shared/*"],
+            "@root/*": ["./*"],
+            "@concordium/browser-wallet-api": [
+                "../../packages/browser-wallet-api/src"
+            ],
+            "@concordium/browser-wallet-message-hub": [
+                "../../packages/browser-wallet-message-hub/src"
+            ]
+        }
+    },
+    "ts-node": {
+        "compilerOptions": {
+            "module": "CommonJS"
+        }
+    },
+    "include": ["./**/*"]
+}
