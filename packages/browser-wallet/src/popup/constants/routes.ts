@@ -16,6 +16,12 @@ export const relativeRoutes = {
             },
         },
     },
+    signMessage: {
+        path: '/sign-message',
+    },
+    sendTransaction: {
+        path: '/send-transaction',
+    },
     setup: {
         path: '/setup',
     },
