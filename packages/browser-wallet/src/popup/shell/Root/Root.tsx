@@ -1,5 +1,7 @@
 import React from 'react';
-import { MemoryRouter, Link, Outlet, Route, Routes } from 'react-router-dom';
+import { MemoryRouter, Link, Outlet, Route, Routes, useParams } from 'react-router-dom';
+
+import { absoluteRoutes, relativeRoutes } from '@popup/constants/routes';
 
 function MainLayout() {
     return (
@@ -8,8 +10,9 @@ function MainLayout() {
                 Hello <span className="root__world">World!</span>
             </main>
             <nav>
-                <Link to="/">Home</Link>
-                <Link to="/setup">Setup</Link>
+                <Link to={absoluteRoutes.home.path}>Home</Link> |{' '}
+                <Link to={absoluteRoutes.home.accounts.path}>Accounts</Link> |{' '}
+                <Link to={absoluteRoutes.setup.path}>Setup</Link>
             </nav>
             <Outlet />
         </>
@@ -20,6 +23,38 @@ function Home() {
     return <>Home</>;
 }
 
+function Accounts() {
+    return (
+        <>
+            <div>Accounts</div>
+            <Outlet />
+        </>
+    );
+}
+
+const buildAccountRoute = (address: string) =>
+    absoluteRoutes.home.accounts.account.path.replace(relativeRoutes.home.accounts.account.path, address);
+
+function SelectAccount() {
+    return (
+        <>
+            <Link to={buildAccountRoute('123')} />
+            <Link to={buildAccountRoute('234')} />
+        </>
+    );
+}
+
+function Account() {
+    const { address } = useParams();
+
+    return (
+        <>
+            <div>Address: {address}</div>
+            <Link to={absoluteRoutes.home.accounts.path} />
+        </>
+    );
+}
+
 function Setup() {
     return <>Setup</>;
 }
@@ -28,10 +63,14 @@ export default function Root() {
     return (
         <MemoryRouter>
             <Routes>
-                <Route path="/" element={<MainLayout />}>
+                <Route path={relativeRoutes.home.path} element={<MainLayout />}>
                     <Route index element={<Home />} />
+                    <Route path={relativeRoutes.home.accounts.path} element={<Accounts />}>
+                        <Route index element={<SelectAccount />} />
+                        <Route path={relativeRoutes.home.accounts.account.path} element={<Account />} />
+                    </Route>
                 </Route>
-                <Route path="/setup" element={<Setup />} />
+                <Route path={relativeRoutes.setup.path} element={<Setup />} />
             </Routes>
         </MemoryRouter>
     );
