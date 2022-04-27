@@ -5,7 +5,7 @@ import LanguageDetector from 'i18next-browser-languagedetector';
 import en from './locales/en';
 import da from './locales/da';
 
-export const defaultNS = 'shared';
+export const defaultNS: keyof typeof en = 'shared';
 const ns: Array<keyof typeof en> = Object.keys(en) as Array<keyof typeof en>;
 
 export const resources = {
