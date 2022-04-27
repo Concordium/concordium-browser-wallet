@@ -1,20 +1,14 @@
-type RouteLeaf = {
+type RoutePath = {
     path: string;
 };
-type RouteNode = RouteChildren & RouteLeaf;
+type RouteNode = RouteChildren & RoutePath;
 type RouteChildren = {
-    [key: string]: RouteNode | RouteLeaf;
+    [key: string]: RouteNode | RoutePath;
 };
 
 export const relativeRoutes = {
     home: {
         path: '/',
-        accounts: {
-            path: 'accounts',
-            account: {
-                path: ':address',
-            },
-        },
     },
     signMessage: {
         path: '/sign-message',
@@ -27,7 +21,7 @@ export const relativeRoutes = {
     },
 };
 
-const buildAbsoluteRoutes = <R extends RouteNode | RouteLeaf | RouteChildren>(route: R, base?: string): R => {
+const buildAbsoluteRoutes = <R extends RouteNode | RoutePath | RouteChildren>(route: R, base?: string): R => {
     const { path, ...rs } = route;
 
     let aPath = path as string | undefined;
