@@ -18,6 +18,8 @@ module.exports = {
     rules: {
         'import/prefer-default-export': 0,
         'no-restricted-exports': 0,
+        'react/jsx-props-no-spreading': 0,
+        'react/require-default-props': 0,
         'prettier/prettier': [
             'error',
             {
