@@ -6,6 +6,7 @@ import {
     UseFormProps,
     UseFormReturn,
     useForm as useFormLib,
+    FormProvider,
 } from 'react-hook-form';
 
 const useFormDefaults: Pick<UseFormProps, 'mode'> = {
@@ -33,5 +34,9 @@ export default function Form<TFormValues extends Record<string, any>>({
     const internal = useForm<TFormValues>({ defaultValues });
     const methods = external ?? internal;
 
-    return <form onSubmit={methods.handleSubmit(onSubmit)}>{children(methods)}</form>;
+    return (
+        <FormProvider {...methods}>
+            <form onSubmit={methods.handleSubmit(onSubmit)}>{children(methods)}</form>
+        </FormProvider>
+    );
 }

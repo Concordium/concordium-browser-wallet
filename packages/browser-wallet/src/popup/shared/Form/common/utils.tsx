@@ -1,5 +1,5 @@
 /* eslint-disable react/function-component-definition */
-import React, { ComponentType } from 'react';
+import React, { ComponentType, ForwardRefExoticComponent } from 'react';
 import {
     Controller,
     ControllerProps,
@@ -37,7 +37,7 @@ export const makeControlled = <TProps extends RequiredControlledFieldProps>(Fiel
 
         return (
             <Controller
-                render={({ field: { ref, ...fieldProps }, fieldState }) => {
+                render={({ field: { ref, ...fieldProps }, fieldState: { error } }) => {
                     const onChange: typeof fieldProps['onChange'] = (...args) => {
                         ownOnChange(...args);
                         return fieldProps.onChange(...args);
@@ -51,9 +51,9 @@ export const makeControlled = <TProps extends RequiredControlledFieldProps>(Fiel
                     const newProps: TProps = {
                         ...ownProps,
                         ...fieldProps,
-                        ...fieldState,
                         onChange,
                         onBlur,
+                        error,
                         // eslint-disable-next-line @typescript-eslint/no-explicit-any
                     } as any;
 
@@ -71,18 +71,17 @@ type MakeUncontrolledProps<TFieldValues extends FieldValues = FieldValues> = {
     register: UseFormRegister<TFieldValues>;
 };
 
-export const makeUncontrolled = <TProps extends RequiredUncontrolledFieldProps>(Field: ComponentType<TProps>) => {
+export const makeUncontrolled = <TProps extends RequiredUncontrolledFieldProps>(
+    Field: ForwardRefExoticComponent<TProps>
+) => {
     type OwnProps = Omit<MakeOptional<TProps, 'onChange' | 'onBlur'>, 'ref' | 'name'>;
     return <TFieldValues extends FieldValues>(props: OwnProps & MakeUncontrolledProps<TFieldValues>) => {
         // Filter away all props required for form registration, leaving the props for the input '<Field />'
         const { name, rules, register, onChange: ownOnChange = noOp, onBlur: ownOnBlur = noOp, ...ownProps } = props;
         const registerProps = register(name, rules);
-        const { errors, dirtyFields, touchedFields } = useFormState<TFieldValues>(name);
+        const { errors } = useFormState<TFieldValues>(name);
 
         const error = errors[name];
-        const invalid = error !== undefined;
-        const isDirty = dirtyFields[name];
-        const isTouched = touchedFields[name];
 
         const onChange: typeof registerProps['onChange'] = (e) => {
             ownOnChange(e);
@@ -100,10 +99,7 @@ export const makeUncontrolled = <TProps extends RequiredUncontrolledFieldProps>(
             ...registerProps,
             onChange,
             onBlur,
-            invalid,
             error,
-            isDirty,
-            isTouched,
             // eslint-disable-next-line @typescript-eslint/no-explicit-any
         } as any;
 
