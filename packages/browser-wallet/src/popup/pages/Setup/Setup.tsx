@@ -6,7 +6,7 @@ import { useNavigate } from 'react-router-dom';
 
 export default function Setup() {
     const navigate = useNavigate();
-    const { t } = useTranslation();
+    const { t } = useTranslation('setup');
 
     return (
         <>

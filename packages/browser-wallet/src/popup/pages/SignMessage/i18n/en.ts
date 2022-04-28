@@ -1,5 +1,5 @@
 const t = {
-    test: 'Testing....',
+    description: 'Sign message',
 };
 
 export default t;

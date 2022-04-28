@@ -1,7 +1,7 @@
 import type en from './en';
 
 const t: typeof en = {
-    test: 'Tester....',
+    description: 'Send transaktion',
 };
 
 export default t;
