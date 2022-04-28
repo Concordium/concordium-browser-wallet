@@ -4,7 +4,7 @@ This directory contains the code for the chrome extension used to interact with 
 
 ## Installing
 
-See [installing](../..#installing) in repository root.
+See [installing](../../#installing) in repository root.
 
 ## Building and development
 
