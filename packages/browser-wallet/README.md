@@ -10,6 +10,7 @@ See [installing](../../README.md#installing) in repository root.
 
 Assuming dependencies have been successfully installed,
 
+-   `cd` into package root
 -   Run `yarn build:(dev|prod)`
 -   To continuously watch for changes, run `yarn watch`
 
