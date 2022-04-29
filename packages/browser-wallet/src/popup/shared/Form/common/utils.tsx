@@ -27,7 +27,7 @@ type MakeControlledProps<TFieldValues extends FieldValues = FieldValues> = Omit<
  * @example
  * type Props = RequiredControlledFieldProps & { test: string };
  * const Field = ({value, onChange, onBlur, test}: Props) => {
- *     return <input {...props} value={value} onChange={(e) => onChange(e.target.value)} onBlur={() => onBlur()} />;
+ *     return <input value={value} onChange={(e) => onChange(e.target.value)} onBlur={() => onBlur()} />;
  * };
 
  * const FormField = makeControlled(Field);
@@ -92,7 +92,7 @@ type MakeUncontrolledProps<TFieldValues extends FieldValues = FieldValues> = {
  *
  * @example
  * type Props = RequiredUncontrolledFieldProps & { test: string };
- * const Field = forwardRef<HTMLInputElement, Props>((props, ref) => {
+ * const Field = forwardRef<HTMLInputElement, Props>(({ test, ...props }, ref) => {
  *     return <input ref={ref} {...props} />;
  * });
 
@@ -134,9 +134,3 @@ export const makeUncontrolled = <TProps extends RequiredUncontrolledFieldProps>(
         return <Field {...newProps} />;
     };
 };
-
-// type CProps = RequiredControlledFieldProps & { another: number };
-// const CTest = (props: CProps) => <>{JSON.stringify(props)}</>;
-
-// const ConTest = makeControlled(CTest);
-// <ConTest<{ test: string }> name="test" another={2} />;
