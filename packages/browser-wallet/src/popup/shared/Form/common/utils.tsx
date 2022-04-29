@@ -19,6 +19,20 @@ type MakeControlledProps<TFieldValues extends FieldValues = FieldValues> = Omit<
     'render'
 >;
 
+/**
+ * @description
+ * Can be used to create form fields for controlled fields, i.e. where field state is kept outside..
+ * It uses the internal ref of elements to update the form state, so components are required to pass a ref to an underlying input.
+ *
+ * @example
+ * type Props = RequiredControlledFieldProps & { test: string };
+ * const Field = ({value, onChange, onBlur, test}: Props) => {
+ *     return <input {...props} value={value} onChange={(e) => onChange(e.target.value)} onBlur={() => onBlur()} />;
+ * };
+
+ * const FormField = makeControlled(Field);
+ * <FormField<{ test: string }> control={control} name="test" test="string" />;
+ */
 export const makeControlled = <TProps extends RequiredControlledFieldProps>(Field: ComponentType<TProps>) => {
     type OwnProps = Omit<MakeOptional<TProps, 'onChange' | 'onBlur'>, 'name' | 'value'>;
     return <TFieldValues extends FieldValues>(props: OwnProps & MakeControlledProps<TFieldValues>) => {
@@ -71,6 +85,20 @@ type MakeUncontrolledProps<TFieldValues extends FieldValues = FieldValues> = {
     register: UseFormRegister<TFieldValues>;
 };
 
+/**
+ * @description
+ * Can be used to create form fields for uncontrolled form elements.
+ * It uses the internal ref of elements to update the form state, so components are required to pass a ref to an underlying input.
+ *
+ * @example
+ * type Props = RequiredUncontrolledFieldProps & { test: string };
+ * const Field = forwardRef<HTMLInputElement, Props>((props, ref) => {
+ *     return <input ref={ref} {...props} />;
+ * });
+
+ * const FormField = makeUncontrolled(Field);
+ * <FormField<{ test: string }> register={register} name="test" test="string" />;
+ */
 export const makeUncontrolled = <TProps extends RequiredUncontrolledFieldProps>(
     Field: ForwardRefExoticComponent<TProps>
 ) => {
@@ -107,15 +135,6 @@ export const makeUncontrolled = <TProps extends RequiredUncontrolledFieldProps>(
     };
 };
 
-// type UProps = RequiredUncontrolledFieldProps & { test: string };
-// const UTest = ({ ref, ...props }: UProps) => {
-//     return <input ref={ref} {...props} />;
-// };
-
-// const UncTest = makeUncontrolled(UTest);
-// <UncTest<{ test: string }> name="test" test="string" />;
-
-// // eslint-disable-next-line react/no-unused-prop-types
 // type CProps = RequiredControlledFieldProps & { another: number };
 // const CTest = (props: CProps) => <>{JSON.stringify(props)}</>;
 
