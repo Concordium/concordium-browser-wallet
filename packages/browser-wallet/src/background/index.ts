@@ -1,47 +1,13 @@
 /* eslint-disable no-console */
+import { BackgroundMessageHandler } from '@concordium/browser-wallet-message-hub/src/message-handlers/background-messagehandler';
+
 console.log('Background loaded');
 
-let isLoaded = false;
+// Create BackgroundHandler which injects script into Dapp when asked.
+const backgroundHandler: BackgroundMessageHandler = new BackgroundMessageHandler();
 
-async function getCurrentTab(): Promise<chrome.tabs.Tab> {
-    const queryOptions = { active: true, currentWindow: true };
-    const [tab] = await chrome.tabs.query(queryOptions);
-    return tab;
-}
-
-chrome.runtime.onMessage.addListener((message, _sender, sendResponse) => {
-    console.log(`BackgroundScript received message:${JSON.stringify(message)}`);
-
-    if (message === 'init' && isLoaded === false) {
-        isLoaded = true;
-
-        // Get the current tab of chrome and execute script in dApp context MAIN world
-        getCurrentTab().then((tab) => {
-            if (!tab.id) {
-                throw new Error('No ID for tab.');
-            }
-
-            console.log('Injecting InjectScript into dApp Context Main world');
-            chrome.scripting
-                .executeScript({
-                    target: { tabId: tab.id },
-                    // TODO this is a reference to the output file, expecting to be placed in the root with manifest.json.
-                    // Would be nice if the relative output path could be built from a reference to the entrypoint file instead.
-                    files: ['inject.js'],
-                    world: 'MAIN',
-                })
-                .then(() => {
-                    sendResponse('InjectScript injected from BackgroundScript');
-                    return true;
-                });
-        });
-
-        return true;
-    }
-
-    sendResponse('Response from Background');
-    return true;
-});
+// Listen for all runtime port messages for the current selected tab
+backgroundHandler.addRuntimePortListenersForCurrentTab();
 
 // To force ESModule. Can safely be removed when any imports are added.
 export {};
