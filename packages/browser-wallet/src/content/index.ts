@@ -1,27 +1,16 @@
-import { sendMessage } from '@concordium/browser-wallet-message-hub';
-/* eslint-disable no-console */
-sendMessage('ContentScript fully loaded and executed');
+import { HandlerTypeEnum, Message, MessageTypeEnum, sendMessage } from '@concordium/browser-wallet-message-hub';
+import { ContentMessageHandler } from '@concordium/browser-wallet-message-hub/src/message-handlers/content-messagehandler';
+
+// Create ContentMessageHandler and initialize ports and add event handlers
+const contentMessageHandler: ContentMessageHandler = new ContentMessageHandler();
+
+// Listen forward all PostMessage sent from Dapp
+contentMessageHandler.addWindowPostMessageEventListener();
+
+// Create a runtime port for communication with runtime port message listeners (Background and popup)
+contentMessageHandler.createPortAndSetupEventListeners();
 
 // Tell Wallet (BackgroundScript) to inject script into dApp Context
-chrome.runtime.sendMessage('init', (r) => {
-    console.log(`Return message received in ContentScript from BackgroundScript: ${r}`);
-});
-
-// Listen for window.postMessage messages coming from the dApp
-// note that we receive all kinds of postMessage events
-window.addEventListener('message', (event: MessageEvent) => {
-    if (window !== event.source && event.data.source && event.data.source !== 'inject') {
-        console.log('postMessage received in ContentScript from thirdparty script --> Just ignore');
-    } else if (event.data && event.data.source && event.data.source !== 'contentScript') {
-        console.log(`ContentScript received:${JSON.stringify(event.data)}`);
-
-        // Send message back to Wallet
-        chrome.runtime.sendMessage(event.data, (responseCb) => {
-            console.log('Response received from Background');
-            console.log(responseCb);
-
-            // Post message back to dApp through InjectedScript
-            window.postMessage({ source: 'contentScript' });
-        });
-    }
-});
+contentMessageHandler.publishMessage(
+    new Message(HandlerTypeEnum.contentScript, HandlerTypeEnum.backgroundScript, MessageTypeEnum.init, {})
+);
