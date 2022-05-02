@@ -46,7 +46,7 @@ export class BackgroundMessageHandler extends AbstractExtensionMessageHandler {
             );
             responseMessage.correlationId = message.correlationId;
 
-            this.publishMessage(responseMessage);
+            await this.publishMessage(responseMessage);
         }
     }
 

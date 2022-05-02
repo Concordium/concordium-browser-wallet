@@ -27,7 +27,7 @@ export class PopupMessageHandler extends AbstractExtensionMessageHandler {
         );
         responseMessage.correlationId = message.correlationId;
 
-        this.publishMessage(responseMessage);
+        await this.publishMessage(responseMessage);
     }
 
     protected handleWindowPostMessageCore(message: Message): Promise<void> {
