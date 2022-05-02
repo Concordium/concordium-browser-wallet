@@ -4,6 +4,10 @@ import { HandlerTypeEnum } from './handlertype-enum';
 import { logger } from './logger';
 
 export class InjectedMessageHandler extends AbstractMessageHandler {
+    protected portDisconnectCore(port: chrome.runtime.Port): void {
+        throw new Error('Method not implemented.');
+    }
+
     public constructor() {
         super(HandlerTypeEnum.injectedScript);
 

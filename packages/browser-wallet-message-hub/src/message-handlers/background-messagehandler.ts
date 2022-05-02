@@ -1,11 +1,11 @@
 import { getCurrentTab } from '../shared/utils/extensionHelpers';
-import { AbstractMessageHandler } from './abstract-messagehandler';
 import { HandlerTypeEnum } from './handlertype-enum';
 import { Message } from './message';
 import { logger } from './logger';
 import { MessageTypeEnum } from './messagetype-enum';
+import { AbstractExtensionMessageHandler } from './extension-messagehandler';
 
-export class BackgroundMessageHandler extends AbstractMessageHandler {
+export class BackgroundMessageHandler extends AbstractExtensionMessageHandler {
     public constructor() {
         super(HandlerTypeEnum.backgroundScript);
     }
@@ -23,32 +23,13 @@ export class BackgroundMessageHandler extends AbstractMessageHandler {
         });
     }
 
-    public publishMessage(message: Message): void {
-        // Publish the message to the currently active tab having a port connected
-        getCurrentTab().then((tab) => {
-            logger.log(`publishMessage: ${JSON.stringify(tab.id)}`);
-
-            if (tab && tab.id && this.tabsDictionary.get(tab.id)) {
-                const port: chrome.runtime.Port | undefined = this.tabsDictionary.get(tab.id);
-                if (!port) {
-                    throw new Error('port is not defined');
-                }
-
-                logger.log(`port name: ${port.name}`);
-                port.postMessage(message);
-            } else {
-                logger.log(`Could not find current tab or Port for message ${JSON.stringify(message)}`);
-            }
-        });
-    }
-
     // Template method implementations
 
     protected canHandleMessageCore(message: Message): boolean {
-        return message.messageType === MessageTypeEnum.init || message.messageType === MessageTypeEnum.sendTransaction; // TODO: Just for testing
+        return message.messageType === MessageTypeEnum.init; // || message.messageType === MessageTypeEnum.sendTransaction; // TODO: Just for testing
     }
 
-    protected async handlePortMessageCore(message: Message, port: chrome.runtime.Port): Promise<void> {
+    protected async handlePortMessageCoreInternal(message: Message, port: chrome.runtime.Port): Promise<void> {
         logger.log(`::BackgroundMessageHandler received ${JSON.stringify(message)}`);
 
         // Init message --> Install Injected script

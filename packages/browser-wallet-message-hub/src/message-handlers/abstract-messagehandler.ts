@@ -13,9 +13,6 @@ export abstract class AbstractMessageHandler extends EventEmitter {
     // Used to filter out messages sent by myself
     private me$: HandlerTypeEnum;
 
-    // Keeps track of known dApps that's "talking" to Concordium Wallet
-    protected tabsDictionary: Map<number, chrome.runtime.Port> = new Map<number, chrome.runtime.Port>();
-
     // Only in play if inheritor wants to be a conversation starter vs being a "listener,responder".
     private publisherPort$?: chrome.runtime.Port;
 
@@ -39,6 +36,7 @@ export abstract class AbstractMessageHandler extends EventEmitter {
         }
     }
 
+    /*
     private onPortDisconnect(port: chrome.runtime.Port): void {
         logger.log(`Port: ${port.name} disconnected`);
 
@@ -46,21 +44,9 @@ export abstract class AbstractMessageHandler extends EventEmitter {
         port.onDisconnect.removeListener(this.onPortDisconnect.bind(this));
         port.onMessage.removeListener(this.onPortMessage.bind(this));
 
-        // Delete port from tabsDictionary
-        let keyToDelete: number | null = null;
-
-        for (const key of this.tabsDictionary.keys()) {
-            if (this.tabsDictionary.get(key)?.name === port.name) {
-                keyToDelete = key;
-                break;
-            }
-        }
-
-        if (keyToDelete) {
-            logger.log(`Deleted key ${keyToDelete} from tabsDictionary`);
-            this.tabsDictionary.delete(keyToDelete);
-        }
+        this.portDisconnectCore(port);
     }
+    */
 
     private onPublisherPortDisconnect(port: chrome.runtime.Port) {
         this.publisherPort$!.onDisconnect.removeListener(this.onPublisherPortDisconnect.bind(this));
@@ -100,25 +86,6 @@ export abstract class AbstractMessageHandler extends EventEmitter {
         return this.canHandleMessageCore(message);
     }
 
-    public addRuntimePortListenersForCurrentTab(): void {
-        logger.log('::hookUpPortSendMessageMessageListener called');
-
-        chrome.runtime.onConnect.addListener((port: chrome.runtime.Port) => {
-            // Subscribe to lifecycle events for the current port
-            port.onDisconnect.addListener(this.onPortDisconnect.bind(this));
-            port.onMessage.addListener(this.onPortMessage.bind(this));
-
-            getCurrentTab().then((tab) => {
-                logger.log(`::hookUpPortSendMessageMessageListener port connected: ${tab.id}`);
-
-                // Only add an entry if this is a valid Tab.
-                if (tab.id) {
-                    this.tabsDictionary.set(tab.id, port);
-                }
-            });
-        });
-    }
-
     public createPortAndSetupEventListeners(): void {
         this.publisherPort$ = chrome.runtime.connect({ name: uuidv4() });
         this.publisherPort$.onDisconnect.addListener(this.onPublisherPortDisconnect.bind(this));
@@ -133,6 +100,7 @@ export abstract class AbstractMessageHandler extends EventEmitter {
     protected abstract canHandleMessageCore(message: Message): boolean;
     protected abstract handleWindowPostMessageCore(message: Message): Promise<void>;
     protected abstract handlePortMessageCore(message: Message, port: chrome.runtime.Port): Promise<void>;
+    protected abstract portDisconnectCore(port: chrome.runtime.Port): void;
 
     protected abstract publishMessage(message: Message): void;
 }
