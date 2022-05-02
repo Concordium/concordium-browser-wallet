@@ -63,8 +63,8 @@ class WalletApi extends EventEmitter implements IWalletApi {
 
         if (message.messageType !== MessageTypeEnum.event) {
             if (!promiseInfo) {
-                return;
-                // throw Error("Message received without corresponding PromiseInfo")
+                // return;
+                throw Error('Message received without corresponding PromiseInfo');
             }
 
             this.promises.delete(message.correlationId);
