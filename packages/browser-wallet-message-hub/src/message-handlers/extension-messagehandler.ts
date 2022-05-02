@@ -88,7 +88,7 @@ export abstract class AbstractExtensionMessageHandler extends AbstractMessageHan
         }
 
         // Pass message down to the inheritor handler
-        this.handlePortMessageCoreInternal(message, port);
+        await this.handlePortMessageCoreInternal(message, port);
     }
 
     protected portDisconnectCore(port: chrome.runtime.Port): void {
