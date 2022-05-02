@@ -5,6 +5,7 @@ import { Message } from './message';
 import { logger } from './logger';
 
 export abstract class AbstractExtensionMessageHandler extends AbstractMessageHandler {
+    // Keep map of Mesages and their associated Tabs
     private correlationIdToTabIdDictionary: Map<string, number> = new Map<string, number>();
 
     // Keeps track of known dApps that's "talking" to Concordium Wallet
@@ -22,7 +23,9 @@ export abstract class AbstractExtensionMessageHandler extends AbstractMessageHan
         port.onDisconnect.removeListener(this.onPortDisconnect.bind(this));
         port.onMessage.removeListener(this.onPortMessage.bind(this));
 
-        this.portDisconnectCore(port);
+        if (port.sender?.tab?.id) {
+            this.tabsDictionary.delete(port.sender.tab.id);
+        }
     }
 
     // Public
@@ -35,22 +38,18 @@ export abstract class AbstractExtensionMessageHandler extends AbstractMessageHan
             port.onDisconnect.addListener(this.onPortDisconnect.bind(this));
             port.onMessage.addListener(this.onPortMessage.bind(this));
 
-            getCurrentTab().then((tab) => {
-                logger.log(`::hookUpPortSendMessageMessageListener port connected: ${tab.id}`);
-
-                // Only add an entry if this is a valid Tab.
-                if (tab.id) {
-                    this.tabsDictionary.set(tab.id, port);
-                }
-            });
+            if (port.sender?.tab?.id) {
+                logger.log(`Added Port and Tab to Dictionary. Port ${port.name}, TabId:${port.sender.tab.id}`);
+                this.tabsDictionary.set(port.sender.tab.id, port);
+            }
         });
     }
 
     public async publishMessage(message: Message) {
+        let foundPort: chrome.runtime.Port | undefined;
+
         // Lookup TabId by correlationId
         let foundTabId: number | undefined = this.correlationIdToTabIdDictionary.get(message.correlationId);
-
-        let foundPort: chrome.runtime.Port | undefined;
 
         if (foundTabId && this.tabsDictionary.get(foundTabId)) {
             // Post the message to the Tab who sended the message in the first place.
@@ -89,12 +88,6 @@ export abstract class AbstractExtensionMessageHandler extends AbstractMessageHan
 
         // Pass message down to the inheritor handler
         await this.handlePortMessageCoreInternal(message, port);
-    }
-
-    protected portDisconnectCore(port: chrome.runtime.Port): void {
-        if (port.sender?.tab?.id) {
-            this.tabsDictionary.delete(port.sender.tab.id);
-        }
     }
 
     // Abstract Template methods
