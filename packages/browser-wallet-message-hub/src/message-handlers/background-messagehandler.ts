@@ -26,7 +26,7 @@ export class BackgroundMessageHandler extends AbstractExtensionMessageHandler {
     // Template method implementations
 
     protected canHandleMessageCore(message: Message): boolean {
-        return message.messageType === MessageTypeEnum.init; // || message.messageType === MessageTypeEnum.sendTransaction; // TODO: Just for testing
+        return message.messageType === MessageTypeEnum.init;
     }
 
     protected async handlePortMessageCoreInternal(message: Message, port: chrome.runtime.Port): Promise<void> {

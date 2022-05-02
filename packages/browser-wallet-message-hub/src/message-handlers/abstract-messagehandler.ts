@@ -88,7 +88,6 @@ export abstract class AbstractMessageHandler extends EventEmitter {
     protected abstract canHandleMessageCore(message: Message): boolean;
     protected abstract handleWindowPostMessageCore(message: Message): Promise<void>;
     protected abstract handlePortMessageCore(message: Message, port: chrome.runtime.Port): Promise<void>;
-    // protected abstract portDisconnectCore(port: chrome.runtime.Port): void;
 
     protected abstract publishMessage(message: Message): void;
 }
