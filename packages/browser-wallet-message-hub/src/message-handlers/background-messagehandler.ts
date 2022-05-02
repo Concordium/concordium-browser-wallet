@@ -6,16 +6,13 @@ import { logger } from './logger';
 import { MessageTypeEnum } from './messagetype-enum';
 
 export class BackgroundMessageHandler extends AbstractMessageHandler {
-    /**
-     *
-     * @private - Keeps references to all connected Ports (dApps)
-     */
     public constructor() {
         super(HandlerTypeEnum.backgroundScript);
     }
 
     private async injectWalletIntoDapp(): Promise<void> {
         const tab: chrome.tabs.Tab = await getCurrentTab();
+
         logger.log('Injecting InjectScript into dApp Context Main world');
         await chrome.scripting.executeScript({
             target: { tabId: tab.id! },
@@ -32,7 +29,10 @@ export class BackgroundMessageHandler extends AbstractMessageHandler {
             logger.log(`publishMessage: ${JSON.stringify(tab.id)}`);
 
             if (tab && tab.id && this.tabsDictionary.get(tab.id)) {
-                const port: chrome.runtime.Port = this.tabsDictionary.get(tab.id)!;
+                const port: chrome.runtime.Port | undefined = this.tabsDictionary.get(tab.id);
+                if (!port) {
+                    throw new Error('port is not defined');
+                }
 
                 logger.log(`port name: ${port.name}`);
                 port.postMessage(message);
@@ -51,9 +51,11 @@ export class BackgroundMessageHandler extends AbstractMessageHandler {
     protected async handlePortMessageCore(message: Message, port: chrome.runtime.Port): Promise<void> {
         logger.log(`::BackgroundMessageHandler received ${JSON.stringify(message)}`);
 
+        // Init message --> Install Injected script
         if (message.messageType === MessageTypeEnum.init) {
             await this.injectWalletIntoDapp();
         } else {
+            // TODO: Just for testing purposes - should be deleted when PopupMessageHandler is implemented
             // Respond with message
             const responseMessage: Message = new Message(
                 HandlerTypeEnum.backgroundScript,
