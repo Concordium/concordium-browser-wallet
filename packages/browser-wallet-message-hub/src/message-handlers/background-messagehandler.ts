@@ -1,4 +1,4 @@
-import { getCurrentTab } from '@concordium/browser-wallet/src/shared/utils/extensionHelpers';
+import { getCurrentTab } from '../shared/utils/extensionHelpers';
 import { AbstractMessageHandler } from './abstract-messagehandler';
 import { HandlerTypeEnum } from './handlertype-enum';
 import { Message } from './message';
