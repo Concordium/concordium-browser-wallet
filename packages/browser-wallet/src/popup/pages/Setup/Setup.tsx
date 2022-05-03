@@ -7,19 +7,37 @@ import Form from '@popup/shared/Form';
 import { SubmitHandler } from 'react-hook-form';
 import FormInput from '@popup/shared/Form/Input';
 import Submit from '@popup/shared/Form/Submit';
+import { atom, useAtom } from 'jotai';
+import { jsonRpcUrlAtom, keysAtom } from '@popup/store/settings';
 
 type FormValues = {
     keys: string;
     url: string;
 };
 
+const separator = ';';
+
+const formValuesAtom = atom(
+    (get) => {
+        const keys = get(keysAtom);
+        const url = get(jsonRpcUrlAtom);
+
+        return { keys: keys.join(separator), url };
+    },
+    (_, set, { keys, url }: FormValues) => {
+        set(keysAtom, keys.split(separator));
+        set(jsonRpcUrlAtom, url);
+    }
+);
+
 export default function Setup() {
     const navigate = useNavigate();
     const { t } = useTranslation('setup');
+    const [values, setValues] = useAtom(formValuesAtom);
 
-    const handleSubmit: SubmitHandler<FormValues> = (values) => {
+    const handleSubmit: SubmitHandler<FormValues> = (vs) => {
         // eslint-disable-next-line no-console
-        console.log(values);
+        setValues(vs);
         navigate(absoluteRoutes.home.path);
     };
 
@@ -28,9 +46,10 @@ export default function Setup() {
             <header>
                 <h4>{t('title')}</h4>
             </header>
-            <Form onSubmit={handleSubmit}>
+            <Form onSubmit={handleSubmit} defaultValues={values}>
                 {({ register }) => (
                     <>
+                        <span>Use &quot;{separator}&quot; to separate keys</span>
                         <FormInput
                             register={register}
                             name="keys"
