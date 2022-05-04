@@ -1,18 +1,20 @@
 import { atom } from 'jotai';
 
-export const atomWithChromeStorage = <V>(key: string, initialValue: V) => {
-    const baseAtom = atom(initialValue);
-    baseAtom.onMount = (setValue) => {
-        chrome.storage.local.get(key, (v) => setValue(v[key] ?? initialValue));
+export const atomWithChromeStorage = <V>(key: string, initial: V) => {
+    const base = atom<V | undefined>(undefined);
+    const getValue = async () => (await chrome.storage.local.get(key))[key] as V;
+
+    base.onMount = (setValue) => {
+        getValue().then(setValue);
     };
 
-    const derivedAtom = atom(
-        (get) => get(baseAtom),
-        (_get, set, next: V) => {
+    const derived = atom(
+        async (get) => get(base) ?? (await getValue()) ?? initial,
+        (_, set, next: V) => {
             chrome.storage.local.set({ [key]: next });
-            set(baseAtom, next);
+            set(base, next);
         }
     );
 
-    return derivedAtom;
+    return derived;
 };

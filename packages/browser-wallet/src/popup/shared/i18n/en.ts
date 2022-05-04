@@ -1,5 +1,7 @@
 const t = {
-    test: 'Testing....',
+    root: {
+        loading: 'Loading user settings...',
+    },
 };
 
 export default t;
