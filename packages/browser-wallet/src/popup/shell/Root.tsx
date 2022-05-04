@@ -13,6 +13,7 @@ export default function Root() {
     return (
         <Provider>
             <MemoryRouter>
+                {/* The Suspense is needed here due to async atoms loading stuff from storage */}
                 <Suspense fallback={t('root.loading')}>
                     <Routes />
                 </Suspense>

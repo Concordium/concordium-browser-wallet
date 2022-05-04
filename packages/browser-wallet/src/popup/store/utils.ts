@@ -1,5 +1,9 @@
 import { atom } from 'jotai';
 
+/**
+ * @description
+ * Create an atom that automatically syncs with chrome local storage.
+ */
 export const atomWithChromeStorage = <V>(key: string, initial: V) => {
     const base = atom<V | undefined>(undefined);
     const getValue = async () => (await chrome.storage.local.get(key))[key] as V;
