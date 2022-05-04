@@ -1,6 +1,11 @@
 const t = {
     title: 'Setup',
     continue: 'Continue',
+    form: {
+        labels: {
+            keys: 'Use "{{separator}}" to separate keys',
+        },
+    },
     validation: {
         keys: {
             required: 'Please specify at least one key',

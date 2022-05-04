@@ -36,7 +36,6 @@ export default function Setup() {
     const [values, setValues] = useAtom(formValuesAtom);
 
     const handleSubmit: SubmitHandler<FormValues> = (vs) => {
-        // eslint-disable-next-line no-console
         setValues(vs);
         navigate(absoluteRoutes.home.path);
     };
@@ -49,7 +48,7 @@ export default function Setup() {
             <Form onSubmit={handleSubmit} defaultValues={values}>
                 {({ register }) => (
                     <>
-                        <span>Use &quot;{separator}&quot; to separate keys</span>
+                        <span>{t('form.labels.keys', { separator })}</span>
                         <FormInput
                             register={register}
                             name="keys"
