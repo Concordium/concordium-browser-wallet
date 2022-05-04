@@ -1,5 +1,5 @@
 import React from 'react';
-import { NavLink, Outlet } from 'react-router-dom';
+import { NavLink, Outlet, Navigate } from 'react-router-dom';
 import { useTranslation } from 'react-i18next';
 import { useAtom, useAtomValue } from 'jotai';
 
@@ -11,6 +11,11 @@ export default function MainLayout() {
     const { t } = useTranslation('mainLayout');
     const accounts = useAtomValue(keysAtom);
     const [selectedAccount, setSelectedAccount] = useAtom(selectedAccountAtom);
+
+    if (accounts.length === 0) {
+        // Force user to go through setup
+        return <Navigate to={absoluteRoutes.setup.path} />;
+    }
 
     return (
         <>
