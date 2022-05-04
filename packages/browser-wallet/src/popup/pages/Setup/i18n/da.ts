@@ -1,11 +1,12 @@
 import type en from './en';
 
 const t: typeof en = {
-    title: 'Opsætning',
+    title: 'Indstillinger',
     continue: 'Fortsæt',
     form: {
         labels: {
-            keys: 'Brug "{{separator}}" til separere nøgler',
+            keys: 'Private nøgler (brug "{{separator}}" til separere nøgler)',
+            url: 'JSON-RPC endpoint',
         },
     },
     validation: {

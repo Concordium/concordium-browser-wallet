@@ -18,6 +18,7 @@ export const Input = forwardRef<HTMLInputElement, InputProps>(
     ({ error, className, type = 'text', label, ...props }, ref) => {
         return (
             <label className={clsx('form-input', error !== undefined && 'form-input--invalid', className)}>
+                {label !== undefined && <div>{label}</div>}
                 <input className={clsx('form-input__field')} type={type} ref={ref} {...props} />
                 <ErrorMessage>{error}</ErrorMessage>
             </label>

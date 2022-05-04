@@ -1,9 +1,10 @@
 const t = {
-    title: 'Setup',
+    title: 'Settings',
     continue: 'Continue',
     form: {
         labels: {
-            keys: 'Use "{{separator}}" to separate keys',
+            keys: 'Private keys (use "{{separator}}" to separate keys)',
+            url: 'JSON-RPC endpoint',
         },
     },
     validation: {

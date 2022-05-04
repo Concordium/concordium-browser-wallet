@@ -48,14 +48,21 @@ export default function Setup() {
             <Form onSubmit={handleSubmit} defaultValues={values}>
                 {({ register }) => (
                     <>
-                        <span>{t('form.labels.keys', { separator })}</span>
                         <FormInput
+                            className="setup__field"
+                            label={t('form.labels.keys', { separator })}
                             register={register}
                             name="keys"
                             rules={{ required: t('validation.keys.required') }}
                         />
-                        <FormInput register={register} name="url" rules={{ required: t('validation.url.required') }} />
-                        <Submit>{t('continue')}</Submit>
+                        <FormInput
+                            className="setup__field"
+                            label={t('form.labels.url')}
+                            register={register}
+                            name="url"
+                            rules={{ required: t('validation.url.required') }}
+                        />
+                        <Submit className="setup__submit">{t('continue')}</Submit>
                     </>
                 )}
             </Form>
