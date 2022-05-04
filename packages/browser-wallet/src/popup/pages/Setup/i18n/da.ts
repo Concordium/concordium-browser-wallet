@@ -5,13 +5,15 @@ const t: typeof en = {
     continue: 'Fortsæt',
     form: {
         labels: {
-            keys: 'Private nøgler (brug "{{separator}}" til separere nøgler)',
+            credentials:
+                'Private nøgler (brug "{{fieldSeparator}}" for at separere værdier, og "{{lineSeparator}}" for at separere par)',
             url: 'JSON-RPC endpoint',
         },
     },
     validation: {
-        keys: {
+        credentials: {
             required: 'Indtast mindst 1 nøgle',
+            format: 'Kan ikke parse CSV par. Indtast venligst "nøgle{{fieldSeparator}}adresse", med "{{lineSeparator}}" til at separere par',
         },
         url: {
             required: 'Indtast JSON-RPC endpoint for node',

@@ -3,13 +3,15 @@ const t = {
     continue: 'Continue',
     form: {
         labels: {
-            keys: 'Private keys (use "{{separator}}" to separate keys)',
+            credentials:
+                'Private keys (use "{{fieldSeparator}}" to separate values, and "{{lineSeparator}}" to separate pairs)',
             url: 'JSON-RPC endpoint',
         },
     },
     validation: {
-        keys: {
+        credentials: {
             required: 'Please specify at least one key',
+            format: 'Cannot parse CSV pairs. Please enter "key{{fieldSeparator}}address", with "{{lineSeparator}}" separating pairs',
         },
         url: {
             required: 'Please specify JSON-RPC endpoint for node',

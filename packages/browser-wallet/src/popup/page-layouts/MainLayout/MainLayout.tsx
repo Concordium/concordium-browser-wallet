@@ -4,12 +4,11 @@ import { useTranslation } from 'react-i18next';
 import { useAtom, useAtomValue } from 'jotai';
 
 import { absoluteRoutes } from '@popup/constants/routes';
-import { keysAtom } from '@popup/store/settings';
-import { selectedAccountAtom } from '@popup/store/account';
+import { selectedAccountAtom, accountsAtom } from '@popup/store/account';
 
 export default function MainLayout() {
     const { t } = useTranslation('mainLayout');
-    const accounts = useAtomValue(keysAtom);
+    const accounts = useAtomValue(accountsAtom);
     const [selectedAccount, setSelectedAccount] = useAtom(selectedAccountAtom);
 
     if (accounts.length === 0) {
