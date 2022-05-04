@@ -19,7 +19,7 @@ export default function MainLayout() {
     return (
         <>
             <header>
-                <h4>{t('title')}</h4>
+                <h3>{t('title')}</h3>
             </header>
             <nav className="main-layout__nav">
                 <NavLink to={absoluteRoutes.home.path}>{t('nav.home')}</NavLink> |{' '}

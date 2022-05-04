@@ -6,4 +6,5 @@ export type RequiredUncontrolledFieldProps = RequiredFormFieldProps & Omit<UseFo
 
 export type CommonFieldProps = {
     label?: string | JSX.Element;
+    note?: string | JSX.Element;
 };

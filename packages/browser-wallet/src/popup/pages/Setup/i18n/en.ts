@@ -3,9 +3,11 @@ const t = {
     continue: 'Continue',
     form: {
         labels: {
-            credentials:
-                'Private keys (use "{{fieldSeparator}}" to separate values, and "{{lineSeparator}}" to separate pairs)',
+            credentials: 'Key, address pairs',
             url: 'JSON-RPC endpoint',
+        },
+        notes: {
+            credentials: 'Use "{{fieldSeparator}}" to separate values, and "{{lineSeparator}}" to separate pairs',
         },
     },
     validation: {

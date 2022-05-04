@@ -71,14 +71,15 @@ export default function Setup() {
     return (
         <>
             <header>
-                <h4>{t('title')}</h4>
+                <h3>{t('title')}</h3>
             </header>
             <Form onSubmit={handleSubmit} defaultValues={values}>
                 {({ register }) => (
                     <>
                         <FormInput
                             className="setup__field"
-                            label={t('form.labels.credentials', { lineSeparator, fieldSeparator })}
+                            label={t('form.labels.credentials')}
+                            note={t('form.notes.credentials', { lineSeparator, fieldSeparator })}
                             register={register}
                             name="credentials"
                             rules={{

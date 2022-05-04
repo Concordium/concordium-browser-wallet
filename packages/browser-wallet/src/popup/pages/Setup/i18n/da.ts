@@ -5,9 +5,12 @@ const t: typeof en = {
     continue: 'Fortsæt',
     form: {
         labels: {
-            credentials:
-                'Private nøgler (brug "{{fieldSeparator}}" for at separere værdier, og "{{lineSeparator}}" for at separere par)',
+            credentials: 'Nøgle,adresse par',
             url: 'JSON-RPC endpoint',
+        },
+        notes: {
+            credentials:
+                'Brug "{{fieldSeparator}}" for at separere værdier, og "{{lineSeparator}}" for at separere par',
         },
     },
     validation: {
