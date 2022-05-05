@@ -1,0 +1,17 @@
+@mixin when-invalid {
+    &--invalid {
+        @content;
+    }
+}
+
+.form-input {
+    @include when-invalid {
+        .form-input__field {
+            border-color: red;
+        }
+    }
+}
+
+.form-error-message {
+    color: red;
+}
