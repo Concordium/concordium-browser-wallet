@@ -23,7 +23,7 @@ export class InjectedMessageHandler extends AbstractMessageHandler {
     }
 
     protected canHandleMessageCore(message: Message): boolean {
-        return message.from === HandlerTypeEnum.backgroundScript || message.from === HandlerTypeEnum.popupScript;
+        return [HandlerTypeEnum.backgroundScript, HandlerTypeEnum.popupScript].includes(message.from);
     }
 
     protected handlePortMessageCore(message: Message, port: chrome.runtime.Port): Promise<void> {
