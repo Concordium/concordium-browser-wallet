@@ -63,7 +63,7 @@ export abstract class AbstractWalletMessageHandler extends AbstractMessageHandle
 
             logger.log(`publishMessage: ${JSON.stringify(tab.id)}`);
 
-            if (tab?.id && this.tabsDictionary.get(tab.id)) {
+            if (tab?.id !== undefined && this.tabsDictionary.get(tab.id)) {
                 foundPort = this.tabsDictionary.get(tab.id);
                 foundTabId = tab.id;
                 if (!foundPort) {
