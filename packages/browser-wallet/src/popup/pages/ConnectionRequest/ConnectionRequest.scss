@@ -1,0 +1,10 @@
+.connection-request {
+    display: block;
+
+    &__actions {
+        display: grid;
+        margin-top: 10px;
+        grid-gap: 10px;
+        grid-template-columns: 1fr 1fr;
+    }
+}

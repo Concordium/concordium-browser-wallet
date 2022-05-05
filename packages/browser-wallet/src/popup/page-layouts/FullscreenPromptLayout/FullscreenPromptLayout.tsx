@@ -5,13 +5,13 @@ import { absoluteRoutes } from '@popup/constants/routes';
 
 export default function FullscreenPromptLayout() {
     return (
-        <>
-            <header>
-                <Link to={absoluteRoutes.home.path}>X</Link>
-            </header>
+        <div className="fullscreen-prompt-layout">
+            <Link className="fullscreen-prompt-layout__close" to={absoluteRoutes.home.path}>
+                X
+            </Link>
             <main>
                 <Outlet />
             </main>
-        </>
+        </div>
     );
 }

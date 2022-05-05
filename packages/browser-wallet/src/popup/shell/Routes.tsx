@@ -1,5 +1,5 @@
 import React, { useEffect, useRef } from 'react';
-import { Route, Routes as ReactRoutes, useNavigate } from 'react-router-dom';
+import { Route, Routes as ReactRoutes, useLocation, useNavigate } from 'react-router-dom';
 
 import { absoluteRoutes, relativeRoutes } from '@popup/constants/routes';
 import MainLayout from '@popup/page-layouts/MainLayout';
@@ -8,18 +8,19 @@ import Account from '@popup/pages/Account';
 import SignMessage from '@popup/pages/SignMessage';
 import SendTransaction from '@popup/pages/SendTransaction';
 import Setup from '@popup/pages/Setup';
-import AllowConnection from '@popup/pages/AllowConnection';
+import ConnectionRequest from '@popup/pages/ConnectionRequest';
 
 export default function Routes() {
     const navigate = useNavigate();
+    const { pathname } = useLocation();
     const connectionEventResponseRef = useRef<(allowed: boolean) => void>();
     const handleConnectionResponse = (allowed: boolean) => () => {
         connectionEventResponseRef.current?.(allowed);
     };
 
     useEffect(() => {
-        // TODO use message hub to subscribe to messages.
-        chrome.runtime.onMessage.addListener((msg) => {
+        // eslint-disable-next-line @typescript-eslint/no-explicit-any
+        const handleMessage = (msg: any) => {
             // TODO resolve route based on incoming message.
             connectionEventResponseRef.current = (allowed: boolean) => {
                 // eslint-disable-next-line no-console
@@ -27,9 +28,19 @@ export default function Routes() {
                 connectionEventResponseRef.current = undefined;
                 navigate(-1);
             };
-            navigate(absoluteRoutes.allowConnection.path, { state: msg });
-        });
-    }, []);
+
+            const replace = pathname === absoluteRoutes.connectionRequest.path;
+            // eslint-disable-next-line no-console
+            console.log(pathname, absoluteRoutes.connectionRequest.path, replace);
+            navigate(absoluteRoutes.connectionRequest.path, { state: msg, replace });
+        };
+        // TODO use message hub to subscribe to messages.
+        chrome.runtime.onMessage.addListener(handleMessage);
+
+        return () => {
+            chrome.runtime.onMessage.removeListener(handleMessage);
+        };
+    }, [pathname]);
 
     return (
         <ReactRoutes>
@@ -40,9 +51,9 @@ export default function Routes() {
                 <Route path={relativeRoutes.signMessage.path} element={<SignMessage />} />
                 <Route path={relativeRoutes.sendTransaction.path} element={<SendTransaction />} />
                 <Route
-                    path={relativeRoutes.allowConnection.path}
+                    path={relativeRoutes.connectionRequest.path}
                     element={
-                        <AllowConnection
+                        <ConnectionRequest
                             onAllow={handleConnectionResponse(true)}
                             onReject={handleConnectionResponse(false)}
                         />

@@ -1,5 +1,6 @@
 const t = {
-    description: 'Allow connection',
+    title: 'Connection request',
+    description: 'Allow connection from dApp',
     actions: {
         allow: 'Allow',
         reject: 'Reject',

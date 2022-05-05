@@ -1,7 +1,8 @@
 import type en from './en';
 
 const t: typeof en = {
-    description: 'Tillad forbindelse',
+    title: 'Forbindelsesforespørgsel',
+    description: 'Tillad forbindelse fra dApp',
     actions: {
         allow: 'Tillad',
         reject: 'Afvis',
