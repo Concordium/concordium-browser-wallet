@@ -32,11 +32,6 @@ class WalletApi extends EventEmitter implements IWalletApi {
         throw new Error('Method not implemented.');
     }
 
-    /**
-     * Sends transaction for signing in Concordium Wallet
-     */
-
-    // TODO: Add generic Transaction type
     public sendTransaction(): Promise<Message> {
         logger.log('WalletApi.sendTransaction called');
 
@@ -58,7 +53,6 @@ class WalletApi extends EventEmitter implements IWalletApi {
     private resolvePromiseOrFireEvent(message: Message): void {
         const promiseInfo = this.promises.get(message.correlationId);
 
-        // logger.log(`inResolvePromise ${JSON.stringify(message.payload.hash)}, PromiseInfo: ${JSON.stringify(promiseInfo)}`);
         logger.log(`Found correlationId:  ${this.promises.has(message.correlationId).toString()}`);
 
         if (message.messageType !== MessageTypeEnum.event) {
