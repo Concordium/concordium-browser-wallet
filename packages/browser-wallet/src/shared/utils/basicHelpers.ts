@@ -8,5 +8,5 @@ export function noOp(): void {}
 
 export async function asyncNoOp(): Promise<void> {
     // eslint-disable-next-line no-promise-executor-return
-    return new Promise((resolve) => resolve());
+    return Promise.resolve();
 }
