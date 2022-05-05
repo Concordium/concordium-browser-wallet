@@ -38,7 +38,7 @@ export abstract class AbstractWalletMessageHandler extends AbstractMessageHandle
             port.onDisconnect.addListener(this.onPortDisconnect.bind(this));
             port.onMessage.addListener(this.onPortMessage.bind(this));
 
-            if (port.sender?.tab?.id) {
+            if (port.sender?.tab?.id !== undefined) {
                 logger.log(`Added Port and Tab to Dictionary. Port ${port.name}, TabId:${port.sender.tab.id}`);
                 this.tabsDictionary.set(port.sender.tab.id, port);
             }
