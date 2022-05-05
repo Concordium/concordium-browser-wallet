@@ -1,1 +1,11 @@
-@import "../shell/Root/Root";
+// Compopnents
+
+// Pages
+@import "../pages/Account/Account";
+@import "../pages/SignMessage/SignMessage";
+@import "../pages/SendTransaction/SendTransaction";
+@import "../pages/Setup/Setup";
+
+// Layouts
+@import "../page-layouts/MainLayout/MainLayout";
+@import "../page-layouts/FullscreenPromptLayout/FullscreenPromptLayout";
