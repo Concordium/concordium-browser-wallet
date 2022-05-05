@@ -13,7 +13,6 @@
         "test": "jest"
     },
     "lint-staged": {
-        "*.{ts,tsx}": ["tsc-files --noEmit --pretty"],
         "*.{js,jsx,ts,tsx}": ["eslint --cache --fix"],
         "{*.json,.{eslintrc,prettierrc,stylelintrc}}": [
             "prettier --ignore-path .eslintignore --parser json --write"
