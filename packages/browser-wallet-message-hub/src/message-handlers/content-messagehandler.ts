@@ -33,7 +33,7 @@ export class ContentMessageHandler extends AbstractMessageHandler {
 
     protected async handleWindowPostMessageCore(message: Message): Promise<void> {
         if (!this.publisherPort) {
-            throw new Error('port is not defined');
+            throw new Error('Publisher port is not defined');
         }
 
         // We have received a message from the dApp -> pass it on to the extension
