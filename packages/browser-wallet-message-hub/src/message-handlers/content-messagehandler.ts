@@ -18,9 +18,9 @@ export class ContentMessageHandler extends AbstractMessageHandler {
     protected canHandleMessageCore(message: Message): boolean {
         return (
             (message.from === HandlerTypeEnum.injectedScript &&
-                (message.to === HandlerTypeEnum.backgroundScript || message.to === HandlerTypeEnum.popupScript)) ||
+                [HandlerTypeEnum.backgroundScript, HandlerTypeEnum.popupScript].includes(message.to)) ||
             (message.to === HandlerTypeEnum.injectedScript &&
-                (message.from === HandlerTypeEnum.backgroundScript || message.from === HandlerTypeEnum.popupScript))
+                [HandlerTypeEnum.backgroundScript, HandlerTypeEnum.popupScript].includes(message.from)) 
         );
     }
 
