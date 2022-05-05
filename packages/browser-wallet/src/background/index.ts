@@ -2,6 +2,7 @@
 import { BackgroundMessageHandler } from '@concordium/browser-wallet-message-hub/src/message-handlers/background-messagehandler';
 import { getCurrentTab } from '@concordium/browser-wallet-message-hub/src/shared/utils/extensionHelpers';
 import { logger } from '@concordium/browser-wallet-message-hub/src/message-handlers/logger';
+import { PopupMessageHandler } from '@concordium/browser-wallet-message-hub/src/message-handlers/popup-messagehandler';
 
 console.log('Background loaded');
 
@@ -23,6 +24,12 @@ backgroundHandler.on('message', async (m) => {
         world: 'MAIN',
     });
 });
+
+// For Zeppelin
+// To be removed - is just for showing how to incorporating PopHandler in the wallet.
+// This is just to show how the popUphandler will listen to events and do a simple response.
+const popUpHandler: PopupMessageHandler = new PopupMessageHandler();
+popUpHandler.addRuntimePortListeners();
 
 // To force ESModule. Can safely be removed when any imports are added.
 export {};
