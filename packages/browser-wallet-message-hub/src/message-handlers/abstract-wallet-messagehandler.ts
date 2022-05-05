@@ -81,7 +81,7 @@ export abstract class AbstractWalletMessageHandler extends AbstractMessageHandle
     // Template method implementations
 
     protected async handlePortMessageCore(message: Message, port: chrome.runtime.Port): Promise<void> {
-        if (port.sender?.tab?.id) {
+        if (port.sender?.tab?.id !== undefined) {
             this.tabsDictionary.set(port.sender.tab.id, port);
             this.correlationIdToTabIdDictionary.set(message.correlationId, port.sender.tab.id);
         }
