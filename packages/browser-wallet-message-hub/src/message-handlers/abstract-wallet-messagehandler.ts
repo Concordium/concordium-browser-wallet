@@ -23,7 +23,7 @@ export abstract class AbstractWalletMessageHandler extends AbstractMessageHandle
         port.onDisconnect.removeListener(this.onPortDisconnect.bind(this));
         port.onMessage.removeListener(this.onPortMessage.bind(this));
 
-        if (port.sender?.tab?.id) {
+        if (port.sender?.tab?.id !== undefined) {
             this.tabsDictionary.delete(port.sender.tab.id);
         }
     }
