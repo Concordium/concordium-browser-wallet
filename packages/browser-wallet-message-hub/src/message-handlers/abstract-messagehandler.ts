@@ -16,7 +16,7 @@ export abstract class AbstractMessageHandler extends EventEmitter {
     // Only in play if inheritor wants to be a conversation starter vs being a "listener,responder".
     private publisherPort$?: chrome.runtime.Port;
 
-    protected constructor(me: HandlerTypeEnum) {
+    protected constructor(private me: HandlerTypeEnum) {
         super();
         this.me$ = me;
     }
