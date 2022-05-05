@@ -31,5 +31,3 @@ backgroundHandler.on('message', async (m) => {
 const popUpHandler: PopupMessageHandler = new PopupMessageHandler();
 popUpHandler.addRuntimePortListeners();
 
-// To force ESModule. Can safely be removed when any imports are added.
-export {};
