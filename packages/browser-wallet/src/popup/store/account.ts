@@ -9,6 +9,7 @@ export const selectedAccountAtom = atom<string | undefined, string>(
     (get) => get(storedAccountAtom) ?? get(credentialsAtom)[0]?.address,
     (_, set, address) => {
         set(storedAccountAtom, address);
+        // TODO propagate event through message handler.
     }
 );
 

@@ -16,6 +16,9 @@ export const relativeRoutes = {
     sendTransaction: {
         path: '/send-transaction',
     },
+    allowConnection: {
+        path: '/allow-connection',
+    },
     setup: {
         path: '/setup',
     },
