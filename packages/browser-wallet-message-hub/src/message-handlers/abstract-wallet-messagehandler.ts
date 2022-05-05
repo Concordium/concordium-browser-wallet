@@ -4,7 +4,7 @@ import { HandlerTypeEnum } from './handlertype-enum';
 import { Message } from './message';
 import { logger } from './logger';
 
-export abstract class AbstractExtensionMessageHandler extends AbstractMessageHandler {
+export abstract class AbstractWalletMessageHandler extends AbstractMessageHandler {
     // Keep map of Mesages and their associated Tabs
     private correlationIdToTabIdDictionary: Map<string, number> = new Map<string, number>();
 
