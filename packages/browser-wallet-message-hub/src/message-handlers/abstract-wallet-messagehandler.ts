@@ -30,7 +30,7 @@ export abstract class AbstractExtensionMessageHandler extends AbstractMessageHan
 
     // Public
 
-    public addRuntimePortListenersForCurrentTab(): void {
+    public addRuntimePortListeners(): void {
         logger.log('::hookUpPortSendMessageMessageListener called');
 
         chrome.runtime.onConnect.addListener((port: chrome.runtime.Port) => {
@@ -91,5 +91,7 @@ export abstract class AbstractExtensionMessageHandler extends AbstractMessageHan
     }
 
     // Abstract Template methods
+
+    // TODO: Having nested levels of template method pattern is not the most pretty design. But it works for the pre-mvp, but should be re-visited later on.
     protected abstract handlePortMessageCoreInternal(message: Message, port: chrome.runtime.Port): Promise<void>;
 }
