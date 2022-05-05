@@ -23,6 +23,6 @@ export class BackgroundMessageHandler extends AbstractWalletMessageHandler {
     }
 
     protected async handleWindowPostMessageCore(message: Message): Promise<void> {
-        // NOOP
+        return Promise.resolve();
     }
 }
