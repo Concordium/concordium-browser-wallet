@@ -51,7 +51,7 @@ export abstract class AbstractWalletMessageHandler extends AbstractMessageHandle
         // Lookup TabId by correlationId
         let foundTabId: number | undefined = this.correlationIdToTabIdDictionary.get(message.correlationId);
 
-        if (foundTabId && this.tabsDictionary.get(foundTabId)) {
+        if (foundTabId !== undefined && this.tabsDictionary.get(foundTabId)) {
             // Post the message to the tab that sent the message in the first place.
             foundPort = this.tabsDictionary.get(foundTabId);
 
