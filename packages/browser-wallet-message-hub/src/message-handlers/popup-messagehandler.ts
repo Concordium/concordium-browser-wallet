@@ -2,9 +2,9 @@ import { HandlerTypeEnum } from './handlertype-enum';
 import { Message } from './message';
 import { logger } from './logger';
 import { MessageTypeEnum } from './messagetype-enum';
-import { AbstractExtensionMessageHandler } from './extension-messagehandler';
+import { AbstractWalletMessageHandler } from './abstract-wallet-messagehandler';
 
-export class PopupMessageHandler extends AbstractExtensionMessageHandler {
+export class PopupMessageHandler extends AbstractWalletMessageHandler {
     public constructor() {
         super(HandlerTypeEnum.popupScript);
     }
