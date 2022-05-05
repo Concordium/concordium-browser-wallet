@@ -52,7 +52,7 @@ export abstract class AbstractWalletMessageHandler extends AbstractMessageHandle
         let foundTabId: number | undefined = this.correlationIdToTabIdDictionary.get(message.correlationId);
 
         if (foundTabId && this.tabsDictionary.get(foundTabId)) {
-            // Post the message to the Tab who sended the message in the first place.
+            // Post the message to the tab that sent the message in the first place.
             foundPort = this.tabsDictionary.get(foundTabId);
 
             // Remove entry from dictionary
