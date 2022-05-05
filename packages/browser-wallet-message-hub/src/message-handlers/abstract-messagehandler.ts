@@ -60,7 +60,7 @@ export abstract class AbstractMessageHandler extends EventEmitter {
 
     protected canHandleMessage(message: Message): boolean {
         // Get rid of messages received from other websites or extensions
-        if (!message || !message.ccFilterMarker || message.ccFilterMarker !== filterMarkerGuid) {
+        if (message?.ccFilterMarker !== filterMarkerGuid) {
             // Ignore the message it doesnt seem to be a Concordium message
             return false;
         }
