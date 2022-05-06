@@ -29,22 +29,6 @@ export abstract class AbstractWalletMessageHandler extends AbstractMessageHandle
     }
 
     // Public
-
-    public addRuntimePortListeners(): void {
-        logger.log('::hookUpPortSendMessageMessageListener called');
-
-        chrome.runtime.onConnect.addListener((port: chrome.runtime.Port) => {
-            // Subscribe to lifecycle events for the current port
-            port.onDisconnect.addListener(this.onPortDisconnect.bind(this));
-            port.onMessage.addListener(this.onPortMessage.bind(this));
-
-            if (port.sender?.tab?.id !== undefined) {
-                logger.log(`Added Port and Tab to Dictionary. Port ${port.name}, TabId:${port.sender.tab.id}`);
-                this.tabsDictionary.set(port.sender.tab.id, port);
-            }
-        });
-    }
-
     public async publishMessage(message: Message) {
         let foundPort: chrome.runtime.Port | undefined;
 
@@ -76,6 +60,21 @@ export abstract class AbstractWalletMessageHandler extends AbstractMessageHandle
 
         foundPort?.postMessage(message);
         logger.log(`Message ${JSON.stringify(message)} sent to Port:${foundPort?.name}, TabId:${foundTabId}`);
+    }
+
+    protected addRuntimePortListeners(): void {
+        logger.log('::hookUpPortSendMessageMessageListener called');
+
+        chrome.runtime.onConnect.addListener((port: chrome.runtime.Port) => {
+            // Subscribe to lifecycle events for the current port
+            port.onDisconnect.addListener(this.onPortDisconnect.bind(this));
+            port.onMessage.addListener(this.onPortMessage.bind(this));
+
+            if (port.sender?.tab?.id !== undefined) {
+                logger.log(`Added Port and Tab to Dictionary. Port ${port.name}, TabId:${port.sender.tab.id}`);
+                this.tabsDictionary.set(port.sender.tab.id, port);
+            }
+        });
     }
 
     // Template method implementations
