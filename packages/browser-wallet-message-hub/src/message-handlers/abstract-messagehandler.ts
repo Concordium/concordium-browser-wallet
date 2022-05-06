@@ -66,14 +66,14 @@ export abstract class AbstractMessageHandler extends EventEmitter {
         return this.canHandleMessageCore(message);
     }
 
-    public createPortAndSetupEventListeners(): void {
+    protected addWindowPostMessageEventListener() {
+        window.addEventListener('message', this.onWindowPostMessage.bind(this));
+    }
+
+    protected createPortAndSetupEventListeners(): void {
         this.publisherPort$ = chrome.runtime.connect({ name: uuidv4() });
         this.publisherPort$.onDisconnect.addListener(this.onPublisherPortDisconnect.bind(this));
         this.publisherPort$.onMessage.addListener(this.onPortMessage.bind(this));
-    }
-
-    public addWindowPostMessageEventListener() {
-        window.addEventListener('message', this.onWindowPostMessage.bind(this));
     }
 
     // Template method operations to be implemented by all inheritors.
