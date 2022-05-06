@@ -1,4 +1,4 @@
-import { HandlerTypeEnum, Message, MessageTypeEnum, sendMessage } from '@concordium/browser-wallet-message-hub';
+import { HandlerTypeEnum, Message, MessageTypeEnum } from '@concordium/browser-wallet-message-hub';
 import { ContentMessageHandler } from '@concordium/browser-wallet-message-hub/src/message-handlers/content-messagehandler';
 
 // Create ContentMessageHandler and initialize ports and add event handlers
@@ -12,5 +12,5 @@ contentMessageHandler.createPortAndSetupEventListeners();
 
 // Tell Wallet (BackgroundScript) to inject script into dApp Context
 contentMessageHandler.publishMessage(
-    new Message(HandlerTypeEnum.contentScript, HandlerTypeEnum.backgroundScript, MessageTypeEnum.init, {})
+    new Message(HandlerTypeEnum.ContentScript, HandlerTypeEnum.BackgroundScript, MessageTypeEnum.init, {})
 );

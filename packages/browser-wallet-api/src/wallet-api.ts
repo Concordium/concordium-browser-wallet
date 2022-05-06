@@ -36,9 +36,9 @@ class WalletApi extends EventEmitter implements IWalletApi {
         logger.log('WalletApi.sendTransaction called');
 
         const message: Message = new Message(
-            HandlerTypeEnum.injectedScript,
-            HandlerTypeEnum.backgroundScript,
-            MessageTypeEnum.sendTransaction,
+            HandlerTypeEnum.InjectedScript,
+            HandlerTypeEnum.BackgroundScript,
+            MessageTypeEnum.SendTransaction,
             {}
         );
 
@@ -55,7 +55,7 @@ class WalletApi extends EventEmitter implements IWalletApi {
 
         logger.log(`Found correlationId:  ${this.promises.has(message.correlationId).toString()}`);
 
-        if (message.messageType !== MessageTypeEnum.event) {
+        if (message.messageType !== MessageTypeEnum.Event) {
             if (!promiseInfo) {
                 // return;
                 throw Error('Message received without corresponding PromiseInfo');
@@ -71,10 +71,3 @@ class WalletApi extends EventEmitter implements IWalletApi {
 }
 
 export const walletApi = new WalletApi(new InjectedMessageHandler());
-
-// TODO: Just remove. Used for testing only
-setInterval(async () => {
-    await walletApi.sendTransaction().then((m) => {
-        logger.log(JSON.stringify(m));
-    });
-}, 5000);

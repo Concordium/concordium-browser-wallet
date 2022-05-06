@@ -1,7 +1,6 @@
 /* eslint-disable no-restricted-syntax */
 import { EventEmitter } from 'eventemitter3';
 import { v4 as uuidv4 } from 'uuid';
-import { getCurrentTab } from '../shared/utils/extensionHelpers';
 import { filterMarkerGuid, Message } from './message';
 import { logger } from './logger';
 import { HandlerTypeEnum } from './handlertype-enum';
@@ -10,15 +9,11 @@ import { HandlerTypeEnum } from './handlertype-enum';
  * Abstract class for message handlers
  */
 export abstract class AbstractMessageHandler extends EventEmitter {
-    // Used to filter out messages sent by myself
-    private me$: HandlerTypeEnum;
-
     // Only in play if inheritor wants to be a conversation starter vs being a "listener,responder".
     private publisherPort$?: chrome.runtime.Port;
 
-    protected constructor(private me: HandlerTypeEnum) {
+    protected constructor(protected me: HandlerTypeEnum) {
         super();
-        this.me$ = me;
     }
 
     // Event listener for port messages
@@ -36,20 +31,17 @@ export abstract class AbstractMessageHandler extends EventEmitter {
         }
     }
 
-    private onPublisherPortDisconnect(port: chrome.runtime.Port) {
-        this.publisherPort$!.onDisconnect.removeListener(this.onPublisherPortDisconnect.bind(this));
-        this.publisherPort$ = undefined;
+    private onPublisherPortDisconnect() {
+        if (this.publisherPort$) {
+            this.publisherPort$.onDisconnect.removeListener(this.onPublisherPortDisconnect.bind(this));
+            this.publisherPort$ = undefined;
+        }
 
         // Create a new Port
         this.createPortAndSetupEventListeners();
     }
 
     // Protected
-
-    protected get me(): HandlerTypeEnum {
-        return this.me$;
-    }
-
     protected get publisherPort(): chrome.runtime.Port {
         if (!this.publisherPort$) {
             throw new Error('MessageHandler has not been configured as Port publisher initiator');

@@ -4,12 +4,8 @@ import { HandlerTypeEnum } from './handlertype-enum';
 import { logger } from './logger';
 
 export class InjectedMessageHandler extends AbstractMessageHandler {
-    protected portDisconnectCore(port: chrome.runtime.Port): void {
-        throw new Error('Method not implemented.');
-    }
-
     public constructor() {
-        super(HandlerTypeEnum.injectedScript);
+        super(HandlerTypeEnum.InjectedScript);
 
         this.addWindowPostMessageEventListener();
     }
@@ -23,11 +19,12 @@ export class InjectedMessageHandler extends AbstractMessageHandler {
     }
 
     protected canHandleMessageCore(message: Message): boolean {
-        return [HandlerTypeEnum.backgroundScript, HandlerTypeEnum.popupScript].includes(message.from);
+        return message.from === HandlerTypeEnum.BackgroundScript || message.from === HandlerTypeEnum.PopupScript;
     }
 
+    // eslint-disable-next-line @typescript-eslint/no-unused-vars
     protected handlePortMessageCore(message: Message, port: chrome.runtime.Port): Promise<void> {
-        throw new Error('Not supported in injected script');
+        return Promise.reject();
     }
 
     protected async handleWindowPostMessageCore(message: Message): Promise<void> {

@@ -1,3 +1,4 @@
+/* eslint-disable no-console */
 class Logger {
     public log(message: string): void {
         console.log(message);

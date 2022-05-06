@@ -5,7 +5,7 @@ import { logger } from './logger';
 
 export class ContentMessageHandler extends AbstractMessageHandler {
     public constructor() {
-        super(HandlerTypeEnum.contentScript);
+        super(HandlerTypeEnum.ContentScript);
     }
 
     public publishMessage(message: Message): void {
@@ -17,13 +17,14 @@ export class ContentMessageHandler extends AbstractMessageHandler {
 
     protected canHandleMessageCore(message: Message): boolean {
         return (
-            (message.from === HandlerTypeEnum.injectedScript &&
-                [HandlerTypeEnum.backgroundScript, HandlerTypeEnum.popupScript].includes(message.to)) ||
-            (message.to === HandlerTypeEnum.injectedScript &&
-                [HandlerTypeEnum.backgroundScript, HandlerTypeEnum.popupScript].includes(message.from)) 
+            (message.from === HandlerTypeEnum.InjectedScript &&
+                (message.to === HandlerTypeEnum.BackgroundScript || message.to === HandlerTypeEnum.PopupScript)) ||
+            (message.to === HandlerTypeEnum.InjectedScript &&
+                (message.from === HandlerTypeEnum.BackgroundScript || message.from === HandlerTypeEnum.PopupScript))
         );
     }
 
+    // eslint-disable-next-line @typescript-eslint/no-unused-vars
     protected async handlePortMessageCore(message: Message, port: chrome.runtime.Port): Promise<void> {
         logger.log(`::ContentMessageHandler.handlePortMessageCore: ${JSON.stringify(message)}`);
 
@@ -37,6 +38,6 @@ export class ContentMessageHandler extends AbstractMessageHandler {
         }
 
         // We have received a message from the dApp -> pass it on to the extension
-        this.publisherPort!.postMessage(message);
+        this.publisherPort.postMessage(message);
     }
 }

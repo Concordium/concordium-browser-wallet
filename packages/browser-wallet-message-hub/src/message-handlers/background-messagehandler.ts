@@ -6,15 +6,16 @@ import { AbstractWalletMessageHandler } from './abstract-wallet-messagehandler';
 
 export class BackgroundMessageHandler extends AbstractWalletMessageHandler {
     public constructor() {
-        super(HandlerTypeEnum.backgroundScript);
+        super(HandlerTypeEnum.BackgroundScript);
     }
 
     // Template method implementations
 
     protected canHandleMessageCore(message: Message): boolean {
-        return message.messageType === MessageTypeEnum.init;
+        return message.messageType === MessageTypeEnum.Init;
     }
 
+    // eslint-disable-next-line @typescript-eslint/no-unused-vars
     protected async handlePortMessageCoreInternal(message: Message, port: chrome.runtime.Port): Promise<void> {
         logger.log(`::BackgroundMessageHandler received ${JSON.stringify(message)}`);
 
@@ -22,6 +23,7 @@ export class BackgroundMessageHandler extends AbstractWalletMessageHandler {
         this.emit('message', message);
     }
 
+    // eslint-disable-next-line @typescript-eslint/no-unused-vars
     protected async handleWindowPostMessageCore(message: Message): Promise<void> {
         return Promise.resolve();
     }

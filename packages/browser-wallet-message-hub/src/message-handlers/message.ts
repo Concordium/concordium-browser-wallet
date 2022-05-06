@@ -13,7 +13,7 @@ export class Message {
         public from: HandlerTypeEnum,
         public to: HandlerTypeEnum,
         public messageType: MessageTypeEnum,
-        public payload?: any
+        public payload?: unknown
     ) {
         this.correlationId = uuidv4();
     }
