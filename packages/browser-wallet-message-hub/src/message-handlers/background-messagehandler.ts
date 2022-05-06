@@ -5,6 +5,9 @@ import { logger } from './logger';
 import { MessageTypeEnum } from './messagetype-enum';
 import { AbstractWalletMessageHandler } from './abstract-wallet-messagehandler';
 
+/**
+ * Only responsibility is to listen for the "init" message and raise corresponding event.
+ */
 export class BackgroundMessageHandler extends AbstractWalletMessageHandler {
     public constructor() {
         super(HandlerTypeEnum.BackgroundScript);

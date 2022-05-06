@@ -17,7 +17,7 @@ export abstract class AbstractMessageHandler extends EventEmitter {
     }
 
     // Event listener for port messages
-    public async onPortMessage(message: Message, port: chrome.runtime.Port): Promise<void> {
+    protected async onPortMessage(message: Message, port: chrome.runtime.Port): Promise<void> {
         logger.log('::PortMessage received');
         if (this.canHandleMessage(message)) {
             await this.handlePortMessageCore(message, port);
@@ -25,7 +25,7 @@ export abstract class AbstractMessageHandler extends EventEmitter {
     }
 
     // Event listener for window messages
-    public async onWindowPostMessage(event: MessageEvent<Message>): Promise<void> {
+    protected async onWindowPostMessage(event: MessageEvent<Message>): Promise<void> {
         if (this.canHandleMessage(event.data)) {
             await this.handleWindowPostMessageCore(event.data);
         }
@@ -62,14 +62,22 @@ export abstract class AbstractMessageHandler extends EventEmitter {
             return false;
         }
 
-        // This is a Concordium message, ask the child if it can handle the message
+        // This is a Concordium message, ask inheritors if are interesting int the message
         return this.canHandleMessageCore(message);
     }
 
+    /**
+     * Adds event listener for window.postmessages
+     * @protected
+     */
     protected addWindowPostMessageEventListener() {
         window.addEventListener('message', this.onWindowPostMessage.bind(this));
     }
 
+    /**
+     * Creates a runtime and configures event listeners
+     * @protected
+     */
     protected createPortAndSetupEventListeners(): void {
         this.publisherPort$ = chrome.runtime.connect({ name: uuidv4() });
         this.publisherPort$.onDisconnect.addListener(this.onPublisherPortDisconnect.bind(this));
@@ -77,9 +85,33 @@ export abstract class AbstractMessageHandler extends EventEmitter {
     }
 
     // Template method operations to be implemented by all inheritors.
+
+    /**
+     * Implemented by all inheritors which determines what messages they are interested in.
+     * @param message
+     * @protected
+     */
     protected abstract canHandleMessageCore(message: Message): boolean;
+
+    /**
+     * Implemented by inheritors who are interested in messages sent using window.postMessage
+     * @param message
+     * @protected
+     */
     protected abstract handleWindowPostMessageCore(message: Message): Promise<void>;
+
+    /**
+     * Implemented by inheritors who are interested in mesages sent using chrome.runtime.sendMessage.
+     * @param message
+     * @param port - The port through which the message arrived
+     * @protected
+     */
     protected abstract handlePortMessageCore(message: Message, port: chrome.runtime.Port): Promise<void>;
 
+    /**
+     * Implemented by inheritors who exposes functionality for publishing messages.
+     * @param message
+     * @protected
+     */
     protected abstract publishMessage(message: Message): void;
 }

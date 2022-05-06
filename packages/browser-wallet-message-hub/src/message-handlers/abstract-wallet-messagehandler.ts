@@ -1,9 +1,13 @@
+import { v4 as uuidv4 } from 'uuid';
 import { getCurrentTab } from '../shared/utils/extensionHelpers';
 import { AbstractMessageHandler } from './abstract-messagehandler';
 import { HandlerTypeEnum } from './handlertype-enum';
 import { Message } from './message';
 import { logger } from './logger';
 
+/**
+ * Only handlers living in the Wallet "background/popup" space are supposed to inherit from this class.
+ */
 export abstract class AbstractWalletMessageHandler extends AbstractMessageHandler {
     // Keep map of Mesages and their associated Tabs
     private correlationIdToTabIdDictionary: Map<string, number> = new Map<string, number>();
@@ -11,7 +15,7 @@ export abstract class AbstractWalletMessageHandler extends AbstractMessageHandle
     // Keeps track of known dApps that's "talking" to Concordium Wallet
     private tabsDictionary: Map<number, chrome.runtime.Port> = new Map<number, chrome.runtime.Port>();
 
-    public constructor(me: HandlerTypeEnum) {
+    protected constructor(me: HandlerTypeEnum) {
         super(me);
     }
 
@@ -29,6 +33,11 @@ export abstract class AbstractWalletMessageHandler extends AbstractMessageHandle
     }
 
     // Public
+
+    /**
+     * The message to publish
+     * @param message
+     */
     public async publishMessage(message: Message) {
         let foundPort: chrome.runtime.Port | undefined;
 
@@ -45,16 +54,16 @@ export abstract class AbstractWalletMessageHandler extends AbstractMessageHandle
             // We could not find any valid tabId for the message - send the message to the current tab
             const tab = await getCurrentTab();
 
-            logger.log(`publishMessage: ${JSON.stringify(tab.id)}`);
-
-            if (tab?.id !== undefined && this.tabsDictionary.get(tab.id)) {
+            if (tab?.id && this.tabsDictionary.get(tab.id)) {
                 foundPort = this.tabsDictionary.get(tab.id);
                 foundTabId = tab.id;
                 if (!foundPort) {
                     throw new Error('port is not defined');
                 }
             } else {
-                logger.log(`Could not find current tab or Port for message ${JSON.stringify(message)}`);
+                logger.log(
+                    `Could not find current tab or Port for message ${JSON.stringify(message)}, I am: ${this.me}`
+                );
             }
         }
 
@@ -62,6 +71,10 @@ export abstract class AbstractWalletMessageHandler extends AbstractMessageHandle
         logger.log(`Message ${JSON.stringify(message)} sent to Port:${foundPort?.name}, TabId:${foundTabId}`);
     }
 
+    /**
+     * Main entry point for picking up Dapps ports.
+     * @protected
+     */
     protected addRuntimePortListeners(): void {
         logger.log('::hookUpPortSendMessageMessageListener called');
 
@@ -71,7 +84,9 @@ export abstract class AbstractWalletMessageHandler extends AbstractMessageHandle
             port.onMessage.addListener(this.onPortMessage.bind(this));
 
             if (port.sender?.tab?.id !== undefined) {
-                logger.log(`Added Port and Tab to Dictionary. Port ${port.name}, TabId:${port.sender.tab.id}`);
+                logger.log(
+                    `Added Port and Tab to Dictionary. Port ${port.name}, TabId:${port.sender.tab.id}, I am: ${this.me}`
+                );
                 this.tabsDictionary.set(port.sender.tab.id, port);
             }
         });

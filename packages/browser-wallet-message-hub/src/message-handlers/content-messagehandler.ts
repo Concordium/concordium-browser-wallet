@@ -15,6 +15,10 @@ export class ContentMessageHandler extends AbstractMessageHandler {
         this.createPortAndSetupEventListeners();
     }
 
+    /**
+     * Publishes a message to the Wallet background/popup space
+     * @param message
+     */
     public publishMessage(message: Message): void {
         logger.log('::contentMessageHandler.publishMessage');
         this.publisherPort.postMessage(message);
@@ -23,6 +27,7 @@ export class ContentMessageHandler extends AbstractMessageHandler {
     // Template method implementations
 
     protected canHandleMessageCore(message: Message): boolean {
+        logger.log('::CanHandleMessageCore');
         return (
             (message.from === HandlerTypeEnum.InjectedScript &&
                 [HandlerTypeEnum.BackgroundScript, HandlerTypeEnum.PopupScript].includes(message.to)) ||
@@ -43,7 +48,6 @@ export class ContentMessageHandler extends AbstractMessageHandler {
         if (!this.publisherPort) {
             throw new Error('Publisher port is not defined');
         }
-
         // We have received a message from the dApp -> pass it on to the extension
         this.publisherPort.postMessage(message);
     }

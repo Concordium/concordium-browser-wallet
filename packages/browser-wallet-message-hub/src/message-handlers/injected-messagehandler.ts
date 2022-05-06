@@ -4,6 +4,9 @@ import { Message } from './message';
 import { HandlerTypeEnum } from './handlertype-enum';
 import { logger } from './logger';
 
+/**
+ * MessageHandler used in inside the injected script. Acts as the bridge between the WalletApi and ContentScript
+ */
 export class InjectedMessageHandler extends AbstractMessageHandler {
     public constructor() {
         super(HandlerTypeEnum.InjectedScript);
