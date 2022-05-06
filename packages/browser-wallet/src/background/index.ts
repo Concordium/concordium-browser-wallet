@@ -2,8 +2,12 @@
 import { BackgroundMessageHandler } from '@concordium/browser-wallet-message-hub/src/message-handlers/background-messagehandler';
 import { getCurrentTab } from '@concordium/browser-wallet-message-hub/src/shared/utils/extensionHelpers';
 import { logger } from '@concordium/browser-wallet-message-hub/src/message-handlers/logger';
+import { PopupMessageHandler } from '@concordium/browser-wallet-message-hub/src/message-handlers/popup-messagehandler';
+import { HandlerTypeEnum, Message, MessageTypeEnum } from '@concordium/browser-wallet-message-hub';
 
 console.log('Background loaded');
+
+const popup: PopupMessageHandler = new PopupMessageHandler();
 
 // Create BackgroundHandler which injects script into Dapp when asked.
 const backgroundHandler: BackgroundMessageHandler = new BackgroundMessageHandler();
@@ -25,3 +29,14 @@ backgroundHandler.on('message', async () => {
         world: 'MAIN',
     });
 });
+
+setInterval(async () => {
+    const message: Message = new Message(
+        HandlerTypeEnum.PopupScript,
+        HandlerTypeEnum.InjectedScript,
+        MessageTypeEnum.Event,
+        {}
+    );
+    await popup.publishMessage(message);
+    console.log(`::popUpHandler ${message}`);
+}, 5000);
