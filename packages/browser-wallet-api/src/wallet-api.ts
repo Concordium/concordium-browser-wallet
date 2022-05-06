@@ -4,9 +4,9 @@ import {
     Message,
     MessageTypeEnum,
 } from '@concordium/browser-wallet-message-hub';
-import { PromiseInfo } from '@concordium/browser-wallet-message-hub/src/message-handlers/promiseInfo';
 import { EventEmitter } from 'eventemitter3';
 import { logger } from '@concordium/browser-wallet-message-hub/src/message-handlers/logger';
+import { PromiseInfo } from './promiseInfo';
 
 export interface IWalletApi {
     sendTransaction(): Promise<Message>;
