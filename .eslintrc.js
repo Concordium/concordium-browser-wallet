@@ -18,14 +18,6 @@ module.exports = {
     rules: {
         'import/prefer-default-export': 0,
         'no-restricted-exports': 0,
-        'prettier/prettier': [
-            'error',
-            {
-                trailingComma: 'es5',
-                singleQuote: true,
-                printWidth: 120,
-                tabWidth: 4,
-            },
-        ],
+        'class-methods-use-this': 0,
     },
 };
