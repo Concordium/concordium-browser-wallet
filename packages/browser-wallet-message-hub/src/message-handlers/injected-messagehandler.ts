@@ -1,3 +1,4 @@
+/* eslint-disable class-methods-use-this */
 import { AbstractMessageHandler } from './abstract-messagehandler';
 import { Message } from './message';
 import { HandlerTypeEnum } from './handlertype-enum';
@@ -19,7 +20,7 @@ export class InjectedMessageHandler extends AbstractMessageHandler {
     }
 
     protected canHandleMessageCore(message: Message): boolean {
-        return message.from === HandlerTypeEnum.BackgroundScript || message.from === HandlerTypeEnum.PopupScript;
+        return [HandlerTypeEnum.BackgroundScript, HandlerTypeEnum.PopupScript].includes(message.from);
     }
 
     // eslint-disable-next-line @typescript-eslint/no-unused-vars

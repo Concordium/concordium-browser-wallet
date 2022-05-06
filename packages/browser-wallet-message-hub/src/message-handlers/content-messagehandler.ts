@@ -1,3 +1,4 @@
+/* eslint-disable class-methods-use-this */
 import { AbstractMessageHandler } from './abstract-messagehandler';
 import { Message } from './message';
 import { HandlerTypeEnum } from './handlertype-enum';
@@ -24,9 +25,9 @@ export class ContentMessageHandler extends AbstractMessageHandler {
     protected canHandleMessageCore(message: Message): boolean {
         return (
             (message.from === HandlerTypeEnum.InjectedScript &&
-                (message.to === HandlerTypeEnum.BackgroundScript || message.to === HandlerTypeEnum.PopupScript)) ||
+                [HandlerTypeEnum.BackgroundScript, HandlerTypeEnum.PopupScript].includes(message.to)) ||
             (message.to === HandlerTypeEnum.InjectedScript &&
-                (message.from === HandlerTypeEnum.BackgroundScript || message.from === HandlerTypeEnum.PopupScript))
+                [HandlerTypeEnum.BackgroundScript, HandlerTypeEnum.PopupScript].includes(message.from))
         );
     }
 

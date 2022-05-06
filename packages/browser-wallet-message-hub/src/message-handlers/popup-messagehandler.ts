@@ -1,3 +1,4 @@
+/* eslint-disable class-methods-use-this */
 import { HandlerTypeEnum } from './handlertype-enum';
 import { Message } from './message';
 import { logger } from './logger';
