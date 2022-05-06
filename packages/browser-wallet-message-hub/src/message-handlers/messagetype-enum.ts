@@ -3,11 +3,11 @@
  */
 export enum MessageTypeEnum {
     // Methods
-    Init = 'init',
-    SendTransaction = 'sendTransaction',
-    SignMessage = 'signMessage',
-    GetAccounts = 'getAccounts',
+    Init = 'Init',
+    SendTransaction = 'SendTransaction',
+    SignMessage = 'SignMessage',
+    GetAccounts = 'GetAccounts',
 
     // Events
-    Event = 'eventMessage',
+    Event = 'EventMessage',
 }
