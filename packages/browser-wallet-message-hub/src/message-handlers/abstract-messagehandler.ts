@@ -75,7 +75,7 @@ export abstract class AbstractMessageHandler extends EventEmitter {
     }
 
     /**
-     * Creates a runtime and configures event listeners
+     * Creates a runtime port and configures event listeners
      * @protected
      */
     protected createPortAndSetupEventListeners(): void {
