@@ -1,4 +1,3 @@
-import { v4 as uuidv4 } from 'uuid';
 import { getCurrentTab } from '../shared/utils/extensionHelpers';
 import { AbstractMessageHandler } from './abstract-messagehandler';
 import { HandlerTypeEnum } from './handlertype-enum';
