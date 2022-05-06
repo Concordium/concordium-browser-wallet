@@ -8,6 +8,7 @@ import { AbstractWalletMessageHandler } from './abstract-wallet-messagehandler';
 export class PopupMessageHandler extends AbstractWalletMessageHandler {
     public constructor() {
         super(HandlerTypeEnum.PopupScript);
+        this.addRuntimePortListeners();
     }
 
     // Template method implementations
@@ -20,16 +21,7 @@ export class PopupMessageHandler extends AbstractWalletMessageHandler {
     protected async handlePortMessageCoreInternal(message: Message, port: chrome.runtime.Port): Promise<void> {
         logger.log(`::PopupMessageHandler received ${JSON.stringify(message)}`);
 
-        // Respond with message
-        const responseMessage: Message = new Message(
-            HandlerTypeEnum.PopupScript,
-            HandlerTypeEnum.InjectedScript,
-            MessageTypeEnum.SendTransaction,
-            {}
-        );
-        responseMessage.correlationId = message.correlationId;
-
-        await this.publishMessage(responseMessage);
+        this.emit('message', message);
     }
 
     // eslint-disable-next-line @typescript-eslint/no-unused-vars
