@@ -14,13 +14,9 @@
     },
     "lint-staged": {
         "*.{js,jsx,ts,tsx}": ["eslint --cache --fix"],
-        "{*.json,.{eslintrc,prettierrc,stylelintrc}}": [
-            "prettier --ignore-path .eslintignore --parser json --write"
-        ],
+        "{*.json,.{eslintrc,prettierrc,stylelintrc}}": ["prettier --ignore-path .eslintignore --parser json --write"],
         "*.{css,scss}": ["stylelint --ignore-path .eslintignore --fix"],
-        "*.{html,md,yml}": [
-            "prettier --ignore-path .eslintignore --single-quote --write"
-        ]
+        "*.{html,md,yml}": ["prettier --ignore-path .eslintignore --single-quote --write"]
     },
     "dependencies": {
         "@concordium/browser-wallet-api": "workspace:*",
@@ -51,6 +47,7 @@
         "stylelint-scss": "^4.2.0",
         "ts-jest": "^27.1.4",
         "ts-node": "^10.7.0",
+        "tsc-files": "^1.1.3",
         "tsconfig-paths": "^3.14.1",
         "typescript": "^4.6.3"
     }
