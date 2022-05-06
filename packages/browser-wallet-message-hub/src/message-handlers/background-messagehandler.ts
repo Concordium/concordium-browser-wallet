@@ -7,6 +7,7 @@ import { AbstractWalletMessageHandler } from './abstract-wallet-messagehandler';
 export class BackgroundMessageHandler extends AbstractWalletMessageHandler {
     public constructor() {
         super(HandlerTypeEnum.BackgroundScript);
+        this.addRuntimePortListeners();
     }
 
     // Template method implementations

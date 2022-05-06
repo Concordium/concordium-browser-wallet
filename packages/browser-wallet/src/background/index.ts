@@ -8,9 +8,6 @@ console.log('Background loaded');
 // Create BackgroundHandler which injects script into Dapp when asked.
 const backgroundHandler: BackgroundMessageHandler = new BackgroundMessageHandler();
 
-// Listen for dApp connections and messages
-backgroundHandler.addRuntimePortListeners();
-
 // Only "init" message will get published
 backgroundHandler.on('message', async () => {
     const tab: chrome.tabs.Tab = await getCurrentTab();

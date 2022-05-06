@@ -6,6 +6,12 @@ import { logger } from './logger';
 export class ContentMessageHandler extends AbstractMessageHandler {
     public constructor() {
         super(HandlerTypeEnum.ContentScript);
+
+        // Listen forward all PostMessage sent from Dapp
+        this.addWindowPostMessageEventListener();
+
+        // Create a runtime port for communication with runtime port message listeners (Background and popup)
+        this.createPortAndSetupEventListeners();
     }
 
     public publishMessage(message: Message): void {
