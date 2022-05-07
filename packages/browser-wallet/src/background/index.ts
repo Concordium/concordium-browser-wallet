@@ -1,17 +1,22 @@
+/* eslint-disable @typescript-eslint/no-explicit-any */
+/* eslint-disable @typescript-eslint/no-unused-vars */
 /* eslint-disable no-console */
-import { BackgroundMessageHandler } from '@concordium/browser-wallet-message-hub/src/message-handlers/background-messagehandler';
 import { getCurrentTab } from '@concordium/browser-wallet-message-hub/src/shared/utils/extensionHelpers';
 import { logger } from '@concordium/browser-wallet-message-hub/src/message-handlers/logger';
-import { PopupMessageHandler } from '@concordium/browser-wallet-message-hub/src/message-handlers/popup-messagehandler';
-import { HandlerTypeEnum, Message, MessageTypeEnum } from '@concordium/browser-wallet-message-hub';
+import { HandlerTypeEnum, MessageTypeEnum } from '@concordium/browser-wallet-message-hub';
+import {
+    IWalletMessageHandler,
+    WalletMessageHandler,
+} from '@concordium/browser-wallet-message-hub/src/message-handlers/wallet-messagehandler';
 
 console.log('Background loaded');
 
 // Create BackgroundHandler which injects script into Dapp when asked.
-const backgroundHandler: BackgroundMessageHandler = new BackgroundMessageHandler();
+const backgroundHandler: IWalletMessageHandler = new WalletMessageHandler(HandlerTypeEnum.BackgroundScript);
 
-// Only "init" message will get published
-backgroundHandler.on('message', async () => {
+async function onInitMessage(payload: any, cb: (pl: any) => void, metadata?: chrome.runtime.MessageSender) {
+    logger.log('Init message received in new eventHandler');
+
     const tab: chrome.tabs.Tab = await getCurrentTab();
 
     if (tab?.id === undefined) {
@@ -26,38 +31,22 @@ backgroundHandler.on('message', async () => {
         files: ['inject.js'],
         world: 'MAIN',
     });
-});
+}
 
-// *********** To Mr. Nazi-reviewer Der Zeppeliner :-) **********************'
+const subscription = backgroundHandler.subscribe(MessageTypeEnum.Init, onInitMessage);
+logger.log(`Subscription received from BackgroundHandler.subscribe: ${JSON.stringify(subscription)}`);
 
-// This section is pure for demonstrating how events flow from Wallet to Dapp
-const popupHandler = new PopupMessageHandler();
+/** ******* Example of how to instantiate an instance of WalletMessageHandler for popup script use ***** */
+async function onSendTransactionMessage(payload: any, cb: (pl: any) => void, metadata?: chrome.runtime.MessageSender) {
+    cb({ data: 'SendTransaction response' });
+}
 
-// Responding on sendTransaction message with correct correlationId
-// To send a transaction from the dapp do the following in the browser:
-// window.concordium.sendTransaction().then(console.log("We got a response"));
-popupHandler.on('message', async (m) => {
-    const response: Message = new Message(
-        HandlerTypeEnum.PopupScript,
-        HandlerTypeEnum.InjectedScript,
-        MessageTypeEnum.SendTransaction,
-        { data: 'sendTransaction' }
-    );
-    response.correlationId = m.correlationId;
+const popupHandler: IWalletMessageHandler = new WalletMessageHandler(HandlerTypeEnum.PopupScript);
+const popupHandlerSubscription = popupHandler.subscribe(MessageTypeEnum.SendTransaction, onSendTransactionMessage);
 
-    await popupHandler.publishMessage(response);
-});
-
-// Raising events (AccountsChanged) to the current active window.
+// publish event every 10 second
+// To listen for the event in the browser:
+// window.concordium.on("event",(e)=>{console.log(JSON.stringify(e))})
 setInterval(async () => {
-    const message: Message = new Message(
-        HandlerTypeEnum.PopupScript,
-        HandlerTypeEnum.InjectedScript,
-        MessageTypeEnum.Event,
-        { payload: 'The data' }
-    );
-    await popupHandler.publishMessage(message);
-
-    // For printing out message in the browser console
-    // window.concordium.on("event", (m)=>{console.log(JSON.stringify(m))});
+    await popupHandler.publishEvent(HandlerTypeEnum.InjectedScript, { event: 'This is the event data' });
 }, 10000);

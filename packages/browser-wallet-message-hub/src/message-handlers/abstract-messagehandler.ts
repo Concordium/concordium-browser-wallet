@@ -1,14 +1,29 @@
+/* eslint-disable @typescript-eslint/no-explicit-any */
 /* eslint-disable no-restricted-syntax */
-import { EventEmitter } from 'eventemitter3';
 import { v4 as uuidv4 } from 'uuid';
+import EventEmitter from 'eventemitter3';
 import { filterMarkerGuid, Message } from './message';
 import { logger } from './logger';
 import { HandlerTypeEnum } from './handlertype-enum';
+import { MessageTypeEnum } from './messagetype-enum';
 
+export interface Subscription {
+    id: string;
+    messageType: MessageTypeEnum;
+}
 /**
  * Abstract class for message handlers
  */
 export abstract class AbstractMessageHandler extends EventEmitter {
+    // Map of all registered event handlers
+    protected mapOfEventHandlers: Map<
+        MessageTypeEnum,
+        Map<string, (payload: any, respond: (payload: any) => void, metadata?: chrome.runtime.MessageSender) => void>
+    > = new Map<
+        MessageTypeEnum,
+        Map<string, (payload: any, respond: (payload: any) => void, metadata?: chrome.runtime.MessageSender) => void>
+    >();
+
     // Only in play if inheritor wants to be a conversation starter vs being a "listener,responder".
     private publisherPort$?: chrome.runtime.Port;
 
@@ -109,9 +124,55 @@ export abstract class AbstractMessageHandler extends EventEmitter {
     protected abstract handlePortMessageCore(message: Message, port: chrome.runtime.Port): Promise<void>;
 
     /**
+     * Adds event handler for the specified messageType
+     * @param messageType - The message type to listen for
+     * @param eventHandler - The event handler that gets executed when the given message arrives
+     */
+    public subscribe(
+        messageType: MessageTypeEnum,
+        eventHandler: (payload: any, respond: (payload: any) => void, metadata?: chrome.runtime.MessageSender) => void
+    ): Subscription {
+        let eventHandlers = this.mapOfEventHandlers.get(messageType);
+        if (eventHandlers === undefined) {
+            eventHandlers = new Map<
+                string,
+                (payload: any, respond: (payload: any) => void, metadata?: chrome.runtime.MessageSender) => void
+            >();
+            this.mapOfEventHandlers.set(messageType, eventHandlers);
+        }
+
+        // Add eventHandler and return subscription
+        const subscription: Subscription = { id: uuidv4(), messageType };
+        eventHandlers.set(subscription.id, eventHandler);
+
+        return subscription;
+    }
+
+    /**
+     * Removes event handler from map of event handlers for the given subscription
+     * @param subscription
+     */
+    public unsubscribe(subscription: Subscription): void {
+        const handlers = this.mapOfEventHandlers.get(subscription.messageType);
+
+        if (handlers !== undefined) {
+            if (handlers.get(subscription.id) !== undefined) {
+                handlers.delete(subscription.id);
+                logger.log(
+                    `successfully delete message handler with subscriptionId ${subscription.id}, and MessageType: ${subscription.messageType}`
+                );
+            }
+        } else {
+            logger.log(
+                `Could not find message handler with subscriptionId ${subscription.id}, and MessageType: ${subscription.messageType} in Handler map`
+            );
+        }
+    }
+
+    /**
      * Implemented by inheritors who exposes functionality for publishing messages.
      * @param message
      * @protected
      */
-    protected abstract publishMessage(message: Message): void;
+    // public abstract publishMessage(message: Message): void;
 }
