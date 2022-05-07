@@ -168,11 +168,4 @@ export abstract class AbstractMessageHandler extends EventEmitter {
             );
         }
     }
-
-    /**
-     * Implemented by inheritors who exposes functionality for publishing messages.
-     * @param message
-     * @protected
-     */
-    // public abstract publishMessage(message: Message): void;
 }
