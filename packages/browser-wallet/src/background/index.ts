@@ -44,7 +44,8 @@ logger.log(`Subscription received from BackgroundHandler.subscribe: ${JSON.strin
 
 /** ******* To Zeppelin: Example of how to instantiate an instance of WalletMessageHandler for popup script***** */
 async function onSendTransactionMessage(payload: any, cb: (pl: any) => void, metadata?: chrome.runtime.MessageSender) {
-    cb({ data: 'SendTransaction response' });
+    // cb({ data: 'SendTransaction response' });
+    cb('someRealTransactionHashGoesHere');
     // To trigger this eventhandler from the browser
     // window.concordium.sendTransaction().then((m)=>{console.log(JSON.stringify(m))});
 }

@@ -11,13 +11,13 @@ import { logger } from '@concordium/browser-wallet-message-hub/src/message-handl
 import { PromiseInfo } from './promiseInfo';
 
 export interface IWalletApi {
-    sendTransaction(): Promise<Message>;
+    sendTransaction(): Promise<string>;
     signMessage(): Promise<Message>;
     getAccounts(): Promise<Message>;
 }
 
 class WalletApi extends EventEmitter implements IWalletApi {
-    private readonly promises: Map<string, PromiseInfo<Message>> = new Map<string, PromiseInfo<Message>>();
+    private readonly promises: Map<string, PromiseInfo<any>> = new Map<string, PromiseInfo<any>>();
 
     public constructor(private injectedMessageHandler: InjectedMessageHandler) {
         super();
@@ -34,14 +34,15 @@ class WalletApi extends EventEmitter implements IWalletApi {
             }
 
             this.promises.delete(message.correlationId);
-            promiseInfo.resolver(message);
+
+            promiseInfo.resolver(message.payload);
         } else {
             // Raise event
             this.emit('event', message.payload);
         }
     }
 
-    private sendMessage(messageType: MessageTypeEnum, payload: any): Promise<Message> {
+    private sendMessage<T>(messageType: MessageTypeEnum, payload: any): Promise<T> {
         logger.log(`Sending message ${messageType}, Payload: ${JSON.stringify(payload)}`);
         const message = new Message(HandlerTypeEnum.InjectedScript, HandlerTypeEnum.PopupScript, messageType, payload);
 
@@ -70,8 +71,8 @@ class WalletApi extends EventEmitter implements IWalletApi {
     /**
      * Sends a transaction to the Concordium Wallet and awaits the users action
      */
-    public sendTransaction(): Promise<Message> {
-        return this.sendMessage(MessageTypeEnum.SendTransaction, {});
+    public sendTransaction(): Promise<string> {
+        return this.sendMessage<string>(MessageTypeEnum.SendTransaction, {});
     }
 }
 
