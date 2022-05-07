@@ -14,6 +14,12 @@ console.log('Background loaded');
 // Create BackgroundHandler which injects script into Dapp when asked.
 const backgroundHandler: IWalletMessageHandler = new WalletMessageHandler(HandlerTypeEnum.BackgroundScript);
 
+/**
+ * Callback method which installs Injected script into Main world of Dapp
+ * @param payload
+ * @param cb - Callback function if response is needed - its not
+ * @param metadata
+ */
 async function onInitMessage(payload: any, cb: (pl: any) => void, metadata?: chrome.runtime.MessageSender) {
     logger.log('Init message received in new eventHandler');
 
@@ -36,9 +42,11 @@ async function onInitMessage(payload: any, cb: (pl: any) => void, metadata?: chr
 const subscription = backgroundHandler.subscribe(MessageTypeEnum.Init, onInitMessage);
 logger.log(`Subscription received from BackgroundHandler.subscribe: ${JSON.stringify(subscription)}`);
 
-/** ******* Example of how to instantiate an instance of WalletMessageHandler for popup script use ***** */
+/** ******* To Zeppelin: Example of how to instantiate an instance of WalletMessageHandler for popup script***** */
 async function onSendTransactionMessage(payload: any, cb: (pl: any) => void, metadata?: chrome.runtime.MessageSender) {
     cb({ data: 'SendTransaction response' });
+    // To trigger this eventhandler from the browser
+    // window.concordium.sendTransaction().then((m)=>{console.log(JSON.stringify(m))});
 }
 
 const popupHandler: IWalletMessageHandler = new WalletMessageHandler(HandlerTypeEnum.PopupScript);
