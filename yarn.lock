@@ -423,16 +423,23 @@ __metadata:
   resolution: "@concordium/browser-wallet-api@workspace:packages/browser-wallet-api"
   dependencies:
     "@concordium/browser-wallet-message-hub": 0.1.0
+    eventemitter3: 3.1.0
   languageName: unknown
   linkType: soft
 
 "@concordium/browser-wallet-message-hub@0.1.0, @concordium/browser-wallet-message-hub@workspace:*, @concordium/browser-wallet-message-hub@workspace:packages/browser-wallet-message-hub":
   version: 0.0.0-use.local
   resolution: "@concordium/browser-wallet-message-hub@workspace:packages/browser-wallet-message-hub"
+  dependencies:
+    "@concordium/browser-wallet": ^0.1.0
+    "@types/chrome": ^0.0.183
+    "@types/uuid": ^8.3.2
+    eventemitter3: ^4.0.7
+    uuid: ^8.3.2
   languageName: unknown
   linkType: soft
 
-"@concordium/browser-wallet@workspace:packages/browser-wallet":
+"@concordium/browser-wallet@^0.1.0, @concordium/browser-wallet@workspace:packages/browser-wallet":
   version: 0.0.0-use.local
   resolution: "@concordium/browser-wallet@workspace:packages/browser-wallet"
   dependencies:
@@ -930,6 +937,16 @@ __metadata:
   languageName: node
   linkType: hard
 
+"@types/chrome@npm:^0.0.183":
+  version: 0.0.183
+  resolution: "@types/chrome@npm:0.0.183"
+  dependencies:
+    "@types/filesystem": "*"
+    "@types/har-format": "*"
+  checksum: fecfd3680c50ed9d27d658496a4fa2f5abdaa892345f88815929cbb64bdcdf7048a642f602aefd5066ed4989ed0911d62ed535ede9c690c9c508e0ea3fac6034
+  languageName: node
+  linkType: hard
+
 "@types/filesystem@npm:*":
   version: 0.0.32
   resolution: "@types/filesystem@npm:0.0.32"
@@ -1084,6 +1101,13 @@ __metadata:
   version: 2.0.1
   resolution: "@types/stack-utils@npm:2.0.1"
   checksum: 205fdbe3326b7046d7eaf5e494d8084f2659086a266f3f9cf00bccc549c8e36e407f88168ad4383c8b07099957ad669f75f2532ed4bc70be2b037330f7bae019
+  languageName: node
+  linkType: hard
+
+"@types/uuid@npm:^8.3.2":
+  version: 8.3.4
+  resolution: "@types/uuid@npm:8.3.4"
+  checksum: 6f11f3ff70f30210edaa8071422d405e9c1d4e53abbe50fdce365150d3c698fe7bbff65c1e71ae080cbfb8fded860dbb5e174da96fdbbdfcaa3fb3daa474d20f
   languageName: node
   linkType: hard
 
@@ -3296,6 +3320,20 @@ __metadata:
   version: 2.0.3
   resolution: "esutils@npm:2.0.3"
   checksum: 22b5b08f74737379a840b8ed2036a5fb35826c709ab000683b092d9054e5c2a82c27818f12604bfc2a9a76b90b6834ef081edbc1c7ae30d1627012e067c6ec87
+  languageName: node
+  linkType: hard
+
+"eventemitter3@npm:3.1.0":
+  version: 3.1.0
+  resolution: "eventemitter3@npm:3.1.0"
+  checksum: e9a7bf3405ee5dc734a9480edc691e78a0f553291a4fe0b2e3e4e2ec52ac43318c0fb8b99798e6e3810abbf85a520234ca86c4029e77aba9b8fcc1ecf910ebfd
+  languageName: node
+  linkType: hard
+
+"eventemitter3@npm:^4.0.7":
+  version: 4.0.7
+  resolution: "eventemitter3@npm:4.0.7"
+  checksum: 1875311c42fcfe9c707b2712c32664a245629b42bb0a5a84439762dd0fd637fc54d078155ea83c2af9e0323c9ac13687e03cfba79b03af9f40c89b4960099374
   languageName: node
   linkType: hard
 
@@ -7484,6 +7522,15 @@ __metadata:
   version: 1.0.2
   resolution: "util-deprecate@npm:1.0.2"
   checksum: 474acf1146cb2701fe3b074892217553dfcf9a031280919ba1b8d651a068c9b15d863b7303cb15bd00a862b498e6cf4ad7b4a08fb134edd5a6f7641681cb54a2
+  languageName: node
+  linkType: hard
+
+"uuid@npm:^8.3.2":
+  version: 8.3.2
+  resolution: "uuid@npm:8.3.2"
+  bin:
+    uuid: dist/bin/uuid
+  checksum: 5575a8a75c13120e2f10e6ddc801b2c7ed7d8f3c8ac22c7ed0c7b2ba6383ec0abda88c905085d630e251719e0777045ae3236f04c812184b7c765f63a70e58df
   languageName: node
   linkType: hard
 

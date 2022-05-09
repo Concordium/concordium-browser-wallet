@@ -4,5 +4,14 @@
     "description": "Enables communication between browser contexts for concordium browser wallet and API",
     "main": "index.js",
     "author": "Concordium",
-    "license": "Apache"
+    "license": "Apache",
+    "dependencies": {
+        "@concordium/browser-wallet": "^0.1.0",
+        "eventemitter3": "^4.0.7",
+        "uuid": "^8.3.2"
+    },
+    "devDependencies": {
+        "@types/chrome": "^0.0.183",
+        "@types/uuid": "^8.3.2"
+    }
 }

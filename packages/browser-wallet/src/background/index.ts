@@ -1,17 +1,29 @@
 import { height, width } from '@popup/constants/dimensions';
-
+/* eslint-disable @typescript-eslint/no-explicit-any */
+/* eslint-disable @typescript-eslint/no-unused-vars */
 /* eslint-disable no-console */
+import { getCurrentTab } from '@concordium/browser-wallet-message-hub/src/shared/utils/extensionHelpers';
+import { logger } from '@concordium/browser-wallet-message-hub/src/message-handlers/logger';
+import { HandlerTypeEnum, MessageTypeEnum } from '@concordium/browser-wallet-message-hub';
+import {
+    IWalletMessageHandler,
+    WalletMessageHandler,
+} from '@concordium/browser-wallet-message-hub/src/message-handlers/wallet-messagehandler';
+
 console.log('Background loaded');
 
+// Create BackgroundHandler which injects script into Dapp when asked.
+const backgroundHandler: IWalletMessageHandler = new WalletMessageHandler(HandlerTypeEnum.BackgroundScript);
+
 let isLoaded = false;
-
-async function getCurrentTab(): Promise<chrome.tabs.Tab> {
-    const queryOptions = { active: true, currentWindow: true };
-    const [tab] = await chrome.tabs.query(queryOptions);
-    return tab;
-}
-
+/**
+ * Callback method which installs Injected script into Main world of Dapp
+ */
 const init = async () => {
+    if (isLoaded) {
+        return;
+    }
+
     isLoaded = true;
 
     // Get the current tab of chrome and execute script in dApp context MAIN world
@@ -32,16 +44,10 @@ const init = async () => {
 };
 
 // eslint-disable-next-line @typescript-eslint/no-explicit-any
-const spawnPopup = async (message: any) => {
-    // eslint-disable-next-line @typescript-eslint/no-explicit-any
-    const handlePopupReady = (m: any) => {
-        if (m === 'popupReady') {
-            chrome.runtime.sendMessage(message);
-            chrome.runtime.onMessage.removeListener(handlePopupReady);
-        }
-    };
-
-    chrome.runtime.onMessage.addListener(handlePopupReady);
+const spawnPopup = async (payload: any) => {
+    backgroundHandler.once(MessageTypeEnum.PopupReady, () =>
+        backgroundHandler.publishEvent(HandlerTypeEnum.PopupScript, payload)
+    );
 
     const lastFocused = await chrome.windows.getLastFocused();
     // Position window in top right corner of lastFocused window.
@@ -58,22 +64,7 @@ const spawnPopup = async (message: any) => {
     });
 };
 
-chrome.runtime.onMessage.addListener(async (message, _sender, sendResponse) => {
-    console.log(`BackgroundScript received message:${JSON.stringify(message)}`);
+const subscription = backgroundHandler.subscribe(MessageTypeEnum.Init, init);
+logger.log(`Subscription received from BackgroundHandler.subscribe: ${JSON.stringify(subscription)}`);
 
-    if (message === 'init' && isLoaded === false) {
-        await init();
-
-        sendResponse('InjectScript injected from BackgroundScript');
-        return true;
-    }
-    if (message.source === 'inject' && message.type === 'triggerPopup') {
-        await spawnPopup(message);
-
-        sendResponse('Opened popup');
-        return true;
-    }
-
-    sendResponse('Response from Background');
-    return true;
-});
+backgroundHandler.subscribe(MessageTypeEnum.SendTransaction, spawnPopup);
