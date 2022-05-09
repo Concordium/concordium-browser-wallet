@@ -14,13 +14,9 @@
     },
     "lint-staged": {
         "*.{js,jsx,ts,tsx}": ["eslint --cache --fix"],
-        "{*.json,.{eslintrc,prettierrc,stylelintrc}}": [
-            "prettier --ignore-path .eslintignore --parser json --write"
-        ],
+        "{*.json,.{eslintrc,prettierrc,stylelintrc}}": ["prettier --ignore-path .eslintignore --parser json --write"],
         "*.{css,scss}": ["stylelint --ignore-path .eslintignore --fix"],
-        "*.{html,md,yml}": [
-            "prettier --ignore-path .eslintignore --single-quote --write"
-        ]
+        "*.{html,md,yml}": ["prettier --ignore-path .eslintignore --single-quote --write"]
     },
     "dependencies": {
         "@concordium/browser-wallet-api": "workspace:*",
