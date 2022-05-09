@@ -1,10 +1,9 @@
-import { atomWithChromeStorage } from './utils';
+import { atomWithChromeStorage, ChromeStorageKey } from './utils';
 
 export type Credential = {
     key: string;
     address: string;
 };
 
-// export const keysAtom = atomWithChromeStorage<string[]>('keys', []);
-export const credentialsAtom = atomWithChromeStorage<Credential[]>('credentials', []);
-export const jsonRpcUrlAtom = atomWithChromeStorage<string | undefined>('url', undefined);
+export const credentialsAtom = atomWithChromeStorage<Credential[]>(ChromeStorageKey.Credentials, []);
+export const jsonRpcUrlAtom = atomWithChromeStorage<string | undefined>(ChromeStorageKey.JsonRpcUrl, undefined);
