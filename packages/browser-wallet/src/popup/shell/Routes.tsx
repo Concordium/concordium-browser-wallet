@@ -36,6 +36,7 @@ export default function Routes() {
         };
         // TODO use message hub to subscribe to messages.
         chrome.runtime.onMessage.addListener(handleMessage);
+        chrome.runtime.sendMessage('popupReady');
 
         return () => {
             chrome.runtime.onMessage.removeListener(handleMessage);

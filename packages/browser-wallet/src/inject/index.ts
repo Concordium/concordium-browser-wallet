@@ -12,7 +12,7 @@ class WalletApi {
         return new Promise<string>((res) => {
             // Add "res" handler to map - will be called later when BackgroundScript has responded through chrome.runtime.sendMessage
             promises.set('someGuid', res);
-            window.postMessage({ source: 'inject' });
+            window.postMessage({ source: 'inject', type: 'triggerPopup' });
         });
     }
 }
