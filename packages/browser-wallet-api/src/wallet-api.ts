@@ -1,5 +1,3 @@
-/* eslint-disable @typescript-eslint/no-explicit-any */
-/* eslint-disable class-methods-use-this */
 import {
     HandlerTypeEnum,
     InjectedMessageHandler,
@@ -8,6 +6,7 @@ import {
 } from '@concordium/browser-wallet-message-hub';
 import { EventEmitter } from 'eventemitter3';
 import { logger } from '@concordium/browser-wallet-message-hub/src/message-handlers/logger';
+import { Payload } from '@concordium/browser-wallet-message-hub/src/message-handlers/types';
 import { PromiseInfo } from './promiseInfo';
 
 export interface IWalletApi {
@@ -17,6 +16,7 @@ export interface IWalletApi {
 }
 
 class WalletApi extends EventEmitter implements IWalletApi {
+    // eslint-disable-next-line @typescript-eslint/no-explicit-any
     private readonly promises: Map<string, PromiseInfo<any>> = new Map<string, PromiseInfo<any>>();
 
     public constructor(private injectedMessageHandler: InjectedMessageHandler) {
@@ -42,15 +42,17 @@ class WalletApi extends EventEmitter implements IWalletApi {
         }
     }
 
-    private sendMessage<T>(messageType: MessageTypeEnum, payload: any): Promise<T> {
+    private sendMessage<T>(messageType: MessageTypeEnum, payload: Payload): Promise<T> {
         logger.log(`Sending message ${messageType}, Payload: ${JSON.stringify(payload)}`);
-        const message = new Message(HandlerTypeEnum.InjectedScript, HandlerTypeEnum.PopupScript, messageType, payload);
 
         return new Promise((resolver, reject) => {
-            this.promises.set(message.correlationId, { resolver, reject });
-
             // publish the message to the wallet extension
-            this.injectedMessageHandler.publishMessage(message);
+            const { correlationId } = this.injectedMessageHandler.publishMessage(
+                HandlerTypeEnum.PopupScript,
+                messageType,
+                payload
+            );
+            this.promises.set(correlationId, { resolver, reject });
         });
     }
 

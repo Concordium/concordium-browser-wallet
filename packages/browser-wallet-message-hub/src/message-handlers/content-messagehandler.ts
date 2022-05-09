@@ -1,8 +1,8 @@
 /* eslint-disable class-methods-use-this */
 import { AbstractMessageHandler } from './abstract-messagehandler';
 import { Message } from './message';
-import { HandlerTypeEnum } from './handlertype-enum';
 import { logger } from './logger';
+import { HandlerTypeEnum, MessageTypeEnum, Payload } from './types';
 
 export class ContentMessageHandler extends AbstractMessageHandler {
     public constructor() {
@@ -17,11 +17,14 @@ export class ContentMessageHandler extends AbstractMessageHandler {
 
     /**
      * Publishes a message to the Wallet background/popup space
-     * @param message
      */
-    public publishMessage(message: Message): void {
+    public publishMessage(to: HandlerTypeEnum, messageType: MessageTypeEnum, payload: Payload): Message {
         logger.log('::contentMessageHandler.publishMessage');
-        this.publisherPort.postMessage(message);
+
+        const m = new Message(this.me, to, messageType, payload);
+        this.publisherPort.postMessage(m);
+
+        return m;
     }
 
     // Template method implementations
@@ -36,8 +39,7 @@ export class ContentMessageHandler extends AbstractMessageHandler {
         );
     }
 
-    // eslint-disable-next-line @typescript-eslint/no-unused-vars
-    protected async handlePortMessageCore(message: Message, port: chrome.runtime.Port): Promise<void> {
+    protected async handlePortMessageCore(message: Message): Promise<void> {
         logger.log(`::ContentMessageHandler.handlePortMessageCore: ${JSON.stringify(message)}`);
 
         // We only expect messages from Backup or Popup sent to Injected script

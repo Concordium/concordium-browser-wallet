@@ -1,26 +1,18 @@
-/* eslint-disable @typescript-eslint/no-explicit-any */
-/* eslint-disable class-methods-use-this */
-/* eslint-disable @typescript-eslint/no-unused-vars */
 import { getCurrentTab } from '../shared/utils/extensionHelpers';
 import { AbstractMessageHandler, Subscription } from './abstract-messagehandler';
-import { HandlerTypeEnum } from './handlertype-enum';
 import { Message } from './message';
 import { logger } from './logger';
-import { MessageTypeEnum } from './messagetype-enum';
+import { EventHandler, HandlerTypeEnum, MessageTypeEnum, Payload } from './types';
 
 /**
  * Only handlers living in the Wallet "background/popup" space are supposed to inherit from this class.
  */
 export interface IWalletMessageHandler {
-    publishEvent(to: HandlerTypeEnum, payload: any): Promise<void>;
-    subscribe(
-        messageType: MessageTypeEnum,
-        eventHandler: (payload: any, respond: (payload: any) => void, metadata?: chrome.runtime.MessageSender) => void
-    ): Subscription;
-    once(
-        messageType: MessageTypeEnum,
-        eventHandler: (payload: any, respond: (payload: any) => void, metadata?: chrome.runtime.MessageSender) => void
-    ): void;
+    publishEvent(to: HandlerTypeEnum, payload: Payload): Promise<void>;
+    publishMessage(message: Message): Promise<void>;
+    publishMessage(to: HandlerTypeEnum, messageType: MessageTypeEnum, payload: Payload): Promise<void>;
+    subscribe(messageType: MessageTypeEnum, eventHandler: EventHandler): Subscription;
+    handleOnce(messageType: MessageTypeEnum, eventHandler: EventHandler): void;
     unsubscribe(subscription: Subscription): void;
 }
 
@@ -71,38 +63,47 @@ export class WalletMessageHandler extends AbstractMessageHandler implements IWal
 
     // Public
 
-    public async publishEvent(to: HandlerTypeEnum, payload: any): Promise<void> {
+    public async publishEvent(to: HandlerTypeEnum, payload: Payload): Promise<void> {
         const event: Message = new Message(this.me, to, MessageTypeEnum.Event, payload);
         await this.publishMessage(event);
     }
 
-    // Protected
-    protected async publishMessage(message: Message): Promise<void> {
-        let foundPort: chrome.runtime.Port | undefined;
-        // We could not find any valid tabId for the message - send the message to the current tab
-        const tab = await getCurrentTab();
+    public async publishMessage(message: Message): Promise<void>;
+    public async publishMessage(to: HandlerTypeEnum, messageType: MessageTypeEnum, payload: Payload): Promise<void>;
+    public async publishMessage(
+        dyn: Message | HandlerTypeEnum,
+        messageType?: MessageTypeEnum,
+        payload?: Payload
+    ): Promise<void> {
+        if (dyn instanceof Message) {
+            let foundPort: chrome.runtime.Port | undefined;
+            // We could not find any valid tabId for the message - send the message to the current tab
+            const tab = await getCurrentTab();
 
-        if (tab?.id && this.tabsDictionary.get(tab.id)) {
-            foundPort = this.tabsDictionary.get(tab.id);
-            if (!foundPort) {
-                throw new Error('port is not defined');
+            if (tab?.id && this.tabsDictionary.get(tab.id)) {
+                foundPort = this.tabsDictionary.get(tab.id);
+                if (!foundPort) {
+                    throw new Error('port is not defined');
+                }
+            } else {
+                logger.log(`Could not find current tab or Port for message ${JSON.stringify(dyn)}, I am: ${this.me}`);
             }
-        } else {
-            logger.log(`Could not find current tab or Port for message ${JSON.stringify(message)}, I am: ${this.me}`);
-        }
 
-        foundPort?.postMessage(message);
-        logger.log(`Message ${JSON.stringify(message)} sent to Port:${foundPort?.name}, TabId:${tab.id}`);
+            foundPort?.postMessage(dyn);
+            logger.log(`Message ${JSON.stringify(dyn)} sent to Port:${foundPort?.name}, TabId:${tab.id}`);
+        } else if (messageType !== undefined) {
+            this.publishMessage(new Message(this.me, dyn, messageType, payload));
+        }
     }
 
-    // Template method implementations
+    // Protected
 
-    protected async handleWindowPostMessageCore(message: Message): Promise<void> {
+    protected async handleWindowPostMessageCore(): Promise<void> {
         // We dont care about messages sent through window.postmessage
         return Promise.resolve();
     }
 
-    protected canHandleMessageCore(message: Message): boolean {
+    protected canHandleMessageCore(): boolean {
         return true;
     }
 
@@ -112,25 +113,8 @@ export class WalletMessageHandler extends AbstractMessageHandler implements IWal
         }
 
         const handlerMap = this.mapOfEventHandlers.get(message.messageType);
-
-        if (handlerMap !== undefined) {
-            // Execute every event handler
-            handlerMap.forEach((c) => {
-                c(
-                    message.payload,
-                    async (pl) => {
-                        try {
-                            const responseMessage = new Message(this.me, message.from, message.messageType, pl);
-                            responseMessage.correlationId = message.correlationId;
-                            port.postMessage(responseMessage);
-                        } catch (e) {
-                            // TODO: Add proper error logging
-                        }
-                        return Promise.resolve();
-                    },
-                    port.sender
-                );
-            });
-        }
+        handlerMap?.forEach((handler) => {
+            handler(message, (pl) => port.postMessage(this.createResponse(message, pl)), port.sender);
+        });
     }
 }

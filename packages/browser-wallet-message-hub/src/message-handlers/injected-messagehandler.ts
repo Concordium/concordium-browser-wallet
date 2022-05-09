@@ -1,8 +1,8 @@
 /* eslint-disable class-methods-use-this */
 import { AbstractMessageHandler } from './abstract-messagehandler';
 import { Message } from './message';
-import { HandlerTypeEnum } from './handlertype-enum';
 import { logger } from './logger';
+import { HandlerTypeEnum, MessageTypeEnum, Payload } from './types';
 
 /**
  * MessageHandler used in inside the injected script. Acts as the bridge between the WalletApi and ContentScript
@@ -16,18 +16,19 @@ export class InjectedMessageHandler extends AbstractMessageHandler {
 
     /**
      * Called by users (WalletAPI) to publish Messages
-     * @param message
      */
-    public publishMessage(message: Message): void {
-        window.postMessage(message);
+    public publishMessage(to: HandlerTypeEnum, messageType: MessageTypeEnum, payload: Payload): Message {
+        const m = new Message(this.me, to, messageType, payload);
+        window.postMessage(m);
+
+        return m;
     }
 
     protected canHandleMessageCore(message: Message): boolean {
         return [HandlerTypeEnum.BackgroundScript, HandlerTypeEnum.PopupScript].includes(message.from);
     }
 
-    // eslint-disable-next-line @typescript-eslint/no-unused-vars
-    protected handlePortMessageCore(message: Message, port: chrome.runtime.Port): Promise<void> {
+    protected handlePortMessageCore(): Promise<void> {
         return Promise.reject();
     }
 

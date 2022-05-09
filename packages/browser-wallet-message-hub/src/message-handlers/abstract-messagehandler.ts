@@ -1,11 +1,8 @@
-/* eslint-disable @typescript-eslint/no-explicit-any */
-/* eslint-disable no-restricted-syntax */
 import { v4 as uuidv4 } from 'uuid';
 import EventEmitter from 'eventemitter3';
 import { filterMarkerGuid, Message } from './message';
 import { logger } from './logger';
-import { HandlerTypeEnum } from './handlertype-enum';
-import { MessageTypeEnum } from './messagetype-enum';
+import { EventHandler, HandlerTypeEnum, MessageTypeEnum, Payload } from './types';
 
 export interface Subscription {
     id: string;
@@ -16,13 +13,7 @@ export interface Subscription {
  */
 export abstract class AbstractMessageHandler extends EventEmitter {
     // Map of all registered event handlers
-    protected mapOfEventHandlers: Map<
-        MessageTypeEnum,
-        Map<string, (payload: any, respond: (payload: any) => void, metadata?: chrome.runtime.MessageSender) => void>
-    > = new Map<
-        MessageTypeEnum,
-        Map<string, (payload: any, respond: (payload: any) => void, metadata?: chrome.runtime.MessageSender) => void>
-    >();
+    protected mapOfEventHandlers: Map<MessageTypeEnum, Map<string, EventHandler>> = new Map();
 
     // Only in play if inheritor wants to be a conversation starter vs being a "listener,responder".
     private publisherPort$?: chrome.runtime.Port;
@@ -99,6 +90,13 @@ export abstract class AbstractMessageHandler extends EventEmitter {
         this.publisherPort$.onMessage.addListener(this.onPortMessage.bind(this));
     }
 
+    protected createResponse(message: Message, payload: Payload): Message {
+        const response = new Message(this.me, message.from, message.messageType, payload);
+        response.correlationId = message.correlationId;
+
+        return response;
+    }
+
     // Template method operations to be implemented by all inheritors.
 
     /**
@@ -128,16 +126,11 @@ export abstract class AbstractMessageHandler extends EventEmitter {
      * @param messageType - The message type to listen for
      * @param eventHandler - The event handler that gets executed when the given message arrives
      */
-    public subscribe(
-        messageType: MessageTypeEnum,
-        eventHandler: (payload: any, respond: (payload: any) => void, metadata?: chrome.runtime.MessageSender) => void
-    ): Subscription {
+    public subscribe(messageType: MessageTypeEnum, eventHandler: EventHandler): Subscription {
         let eventHandlers = this.mapOfEventHandlers.get(messageType);
+
         if (eventHandlers === undefined) {
-            eventHandlers = new Map<
-                string,
-                (payload: any, respond: (payload: any) => void, metadata?: chrome.runtime.MessageSender) => void
-            >();
+            eventHandlers = new Map();
             this.mapOfEventHandlers.set(messageType, eventHandlers);
         }
 
@@ -148,10 +141,7 @@ export abstract class AbstractMessageHandler extends EventEmitter {
         return subscription;
     }
 
-    public once(
-        messageType: MessageTypeEnum,
-        eventHandler: (payload: any, respond: (payload: any) => void, metadata?: chrome.runtime.MessageSender) => void
-    ): void {
+    public handleOnce(messageType: MessageTypeEnum, eventHandler: EventHandler): void {
         const sub = this.subscribe(messageType, (...args) => {
             eventHandler(...args);
             this.unsubscribe(sub);

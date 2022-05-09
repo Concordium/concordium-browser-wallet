@@ -1,6 +1,6 @@
 import { v4 as uuidv4 } from 'uuid';
-import { MessageTypeEnum } from './messagetype-enum';
-import { HandlerTypeEnum } from './handlertype-enum';
+// eslint-disable-next-line import/no-cycle
+import { HandlerTypeEnum, MessageTypeEnum, Payload } from './types';
 
 export const filterMarkerGuid = '5d81f460-d1ba-4a28-b7c1-3cf466f86568';
 
@@ -13,7 +13,7 @@ export class Message {
         public from: HandlerTypeEnum,
         public to: HandlerTypeEnum,
         public messageType: MessageTypeEnum,
-        public payload?: unknown
+        public payload?: Payload
     ) {
         this.correlationId = uuidv4();
     }

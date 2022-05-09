@@ -20,6 +20,7 @@ module.exports = {
         'no-restricted-exports': 0,
         'react/jsx-props-no-spreading': 0,
         'react/require-default-props': 0,
+        'class-methods-use-this': 0,
         'jsx-a11y/label-has-associated-control': [
             'error',
             {

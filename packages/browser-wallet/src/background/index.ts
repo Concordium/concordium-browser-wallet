@@ -1,16 +1,11 @@
 import { height, width } from '@popup/constants/dimensions';
-/* eslint-disable @typescript-eslint/no-explicit-any */
-/* eslint-disable @typescript-eslint/no-unused-vars */
-/* eslint-disable no-console */
 import { getCurrentTab } from '@concordium/browser-wallet-message-hub/src/shared/utils/extensionHelpers';
-import { logger } from '@concordium/browser-wallet-message-hub/src/message-handlers/logger';
 import { HandlerTypeEnum, MessageTypeEnum } from '@concordium/browser-wallet-message-hub';
 import {
     IWalletMessageHandler,
     WalletMessageHandler,
 } from '@concordium/browser-wallet-message-hub/src/message-handlers/wallet-messagehandler';
-
-console.log('Background loaded');
+import { EventHandler } from '@concordium/browser-wallet-message-hub/src/message-handlers/types';
 
 // Create BackgroundHandler which injects script into Dapp when asked.
 const backgroundHandler: IWalletMessageHandler = new WalletMessageHandler(HandlerTypeEnum.BackgroundScript);
@@ -33,7 +28,6 @@ const init = async () => {
         throw new Error('No ID for tab.');
     }
 
-    console.log('Injecting InjectScript into dApp Context Main world');
     await chrome.scripting.executeScript({
         target: { tabId: tab.id },
         // TODO this is a reference to the output file, expecting to be placed in the root with manifest.json.
@@ -43,11 +37,8 @@ const init = async () => {
     });
 };
 
-// eslint-disable-next-line @typescript-eslint/no-explicit-any
-const spawnPopup = async (payload: any) => {
-    backgroundHandler.once(MessageTypeEnum.PopupReady, () =>
-        backgroundHandler.publishEvent(HandlerTypeEnum.PopupScript, payload)
-    );
+const spawnPopup: EventHandler = async (message) => {
+    backgroundHandler.handleOnce(MessageTypeEnum.PopupReady, () => backgroundHandler.publishMessage(message));
 
     const lastFocused = await chrome.windows.getLastFocused();
     // Position window in top right corner of lastFocused window.
@@ -64,7 +55,5 @@ const spawnPopup = async (payload: any) => {
     });
 };
 
-const subscription = backgroundHandler.subscribe(MessageTypeEnum.Init, init);
-logger.log(`Subscription received from BackgroundHandler.subscribe: ${JSON.stringify(subscription)}`);
-
+backgroundHandler.subscribe(MessageTypeEnum.Init, init);
 backgroundHandler.subscribe(MessageTypeEnum.SendTransaction, spawnPopup);
