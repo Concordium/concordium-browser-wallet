@@ -1,7 +1,9 @@
 import type en from './en';
 
 const t: typeof en = {
-    test: 'Tester....',
+    root: {
+        loading: 'Henter brugerindstillinger...',
+    },
 };
 
 export default t;

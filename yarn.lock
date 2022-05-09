@@ -448,6 +448,7 @@ __metadata:
     esbuild-sass-plugin: ^2.2.6
     i18next: ^21.6.16
     i18next-browser-languagedetector: ^6.1.4
+    jotai: ^1.6.5
     react: ^18.0.0
     react-dom: ^18.0.0
     react-hook-form: ^7.30.0
@@ -4813,6 +4814,43 @@ __metadata:
   bin:
     jest: bin/jest.js
   checksum: 96f1d69042b3c6dfc695f2a4e4b0db38af6fb78582ad1a02beaa57cfcd77cbd31567d7d865c1c85709b7c3e176eefa3b2035ffecd646005f15d8ef528eccf205
+  languageName: node
+  linkType: hard
+
+"jotai@npm:^1.6.5":
+  version: 1.6.5
+  resolution: "jotai@npm:1.6.5"
+  peerDependencies:
+    "@babel/core": "*"
+    "@babel/template": "*"
+    "@urql/core": "*"
+    immer: "*"
+    optics-ts: "*"
+    react: ">=16.8"
+    react-query: "*"
+    valtio: "*"
+    wonka: "*"
+    xstate: "*"
+  peerDependenciesMeta:
+    "@babel/core":
+      optional: true
+    "@babel/template":
+      optional: true
+    "@urql/core":
+      optional: true
+    immer:
+      optional: true
+    optics-ts:
+      optional: true
+    react-query:
+      optional: true
+    valtio:
+      optional: true
+    wonka:
+      optional: true
+    xstate:
+      optional: true
+  checksum: 7e130826fb8a9ed28463d233a1d09463e51df5b936fe5c417df2ed38b91509419f8a84d81271a1136933d2e373013b25e64e677e5b6325410698fab1bbd7b59f
   languageName: node
   linkType: hard
 

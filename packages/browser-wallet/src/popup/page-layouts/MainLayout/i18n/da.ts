@@ -4,7 +4,7 @@ const t: typeof en = {
     title: 'Concordium',
     nav: {
         home: 'Hjem',
-        setup: 'Opsætning',
+        setup: 'Indstillinger',
     },
 };
 

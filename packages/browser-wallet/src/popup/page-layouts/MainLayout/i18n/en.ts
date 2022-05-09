@@ -2,7 +2,7 @@ const t = {
     title: 'Concordium',
     nav: {
         home: 'Home',
-        setup: 'Setup',
+        setup: 'Settings',
     },
 };
 
