@@ -1,14 +1,9 @@
+/* eslint-disable no-console */
 import { height, width } from '@popup/constants/dimensions';
 import { getCurrentTab } from '@concordium/browser-wallet-message-hub/src/shared/utils/extensionHelpers';
-import { HandlerType, MessageType } from '@concordium/browser-wallet-message-hub';
-import {
-    IWalletMessageHandler,
-    WalletMessageHandler,
-} from '@concordium/browser-wallet-message-hub/src/message-handlers/wallet-messagehandler';
-import { EventHandler } from '@concordium/browser-wallet-message-hub/src/message-handlers/types';
+import { Message, MessageType } from '@concordium/browser-wallet-message-hub';
 
-// Create BackgroundHandler which injects script into Dapp when asked.
-const backgroundHandler: IWalletMessageHandler = new WalletMessageHandler(HandlerType.BackgroundScript);
+console.log('BG');
 
 let isLoaded = false;
 /**
@@ -28,6 +23,8 @@ const init = async () => {
         throw new Error('No ID for tab.');
     }
 
+    console.log('injecting');
+
     await chrome.scripting.executeScript({
         target: { tabId: tab.id },
         // TODO this is a reference to the output file, expecting to be placed in the root with manifest.json.
@@ -37,11 +34,10 @@ const init = async () => {
     });
 };
 
-const spawnPopup: EventHandler = async (message) => {
-    backgroundHandler.handleOnce(MessageType.PopupReady, () => backgroundHandler.publishMessage(message));
-    chrome.runtime.onMessage.addListener((msg) => {
-        if (msg === 'test-concordium') {
-            console.log('RECEIVE READY EVENT');
+const spawnPopup = async (message: Message) => {
+    chrome.runtime.onMessage.addListener((msg: Message, _sender, respond) => {
+        if (msg?.type === MessageType.PopupReady) {
+            respond(message);
         }
     });
 
@@ -60,5 +56,15 @@ const spawnPopup: EventHandler = async (message) => {
     });
 };
 
-backgroundHandler.subscribe(MessageType.Init, init);
-backgroundHandler.subscribe(MessageType.SendTransaction, spawnPopup);
+chrome.runtime.onMessage.addListener((msg: Message) => {
+    console.log('bg msg', msg);
+    if (msg?.type === MessageType.Init) {
+        init();
+    }
+    if (msg?.type === MessageType.PopupReady) {
+        console.log('popup ready event');
+    }
+    if (msg?.type === MessageType.SendTransaction) {
+        spawnPopup(msg);
+    }
+});

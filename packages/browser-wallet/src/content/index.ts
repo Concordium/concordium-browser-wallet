@@ -1,8 +1,6 @@
-import { HandlerType, MessageType } from '@concordium/browser-wallet-message-hub';
-import { ContentMessageHandler } from '@concordium/browser-wallet-message-hub/src/message-handlers/content-messagehandler';
-
-// Create ContentMessageHandler and initialize ports and add event handlers
-const contentMessageHandler: ContentMessageHandler = new ContentMessageHandler();
+/* eslint-disable no-console */
+import { MessageType } from '@concordium/browser-wallet-message-hub';
 
 // Tell Wallet (BackgroundScript) to inject script into dApp Context
-contentMessageHandler.publishMessage(HandlerType.BackgroundScript, MessageType.Init, undefined);
+chrome.runtime.sendMessage({ type: MessageType.Init });
+console.log('CONTENT');

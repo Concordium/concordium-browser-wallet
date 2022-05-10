@@ -91,7 +91,7 @@ export abstract class AbstractMessageHandler extends EventEmitter {
     }
 
     protected createResponse(message: Message, payload: Payload): Message {
-        const response = new Message(this.me, message.from, message.messageType, payload);
+        const response = new Message(this.me, message.from, message.type, payload);
         response.correlationId = message.correlationId;
 
         return response;
@@ -143,7 +143,6 @@ export abstract class AbstractMessageHandler extends EventEmitter {
 
     public handleOnce(messageType: MessageType, eventHandler: EventHandler): void {
         const sub = this.subscribe(messageType, (...args) => {
-            console.log('handle once', ...args);
             eventHandler(...args);
             this.unsubscribe(sub);
         });

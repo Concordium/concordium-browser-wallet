@@ -57,8 +57,6 @@ export class WalletMessageHandler extends AbstractMessageHandler implements IWal
                     `Added Port and Tab to Dictionary. Port ${port.name}, TabId:${port.sender.tab.id}, I am: ${this.me}`
                 );
                 this.tabsDictionary.set(port.sender.tab.id, port);
-            } else {
-                console.log(port);
             }
         });
     }
@@ -114,7 +112,7 @@ export class WalletMessageHandler extends AbstractMessageHandler implements IWal
             this.tabsDictionary.set(port.sender.tab.id, port);
         }
 
-        const handlerMap = this.mapOfEventHandlers.get(message.messageType);
+        const handlerMap = this.mapOfEventHandlers.get(message.type);
         handlerMap?.forEach((handler) => {
             handler(message, (pl) => port.postMessage(this.createResponse(message, pl)), port.sender);
         });

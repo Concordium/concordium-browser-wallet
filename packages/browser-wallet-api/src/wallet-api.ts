@@ -23,7 +23,7 @@ class WalletApi extends EventEmitter implements IWalletApi {
 
     private resolvePromiseOrFireEvent(message: Message): void {
         const promiseInfo = this.promises.get(message.correlationId);
-        if (message.messageType !== MessageType.Event) {
+        if (message.type !== MessageType.Event) {
             if (!promiseInfo) {
                 throw Error('Message received without corresponding PromiseInfo');
             }
@@ -37,14 +37,14 @@ class WalletApi extends EventEmitter implements IWalletApi {
         }
     }
 
-    private sendMessage<T>(messageType: MessageType, payload: Payload): Promise<T> {
-        logger.log(`Sending message ${messageType}, Payload: ${JSON.stringify(payload)}`);
+    private sendMessage<T>(type: MessageType, payload: Payload): Promise<T> {
+        logger.log(`Sending message ${type}, Payload: ${JSON.stringify(payload)}`);
 
         return new Promise((resolver, reject) => {
             // publish the message to the wallet extension
             const { correlationId } = this.injectedMessageHandler.publishMessage(
                 HandlerType.PopupScript,
-                messageType,
+                type,
                 payload
             );
             this.promises.set(correlationId, { resolver, reject });

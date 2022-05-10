@@ -9,7 +9,12 @@ export class Message {
 
     public readonly ccFilterMarker: string = filterMarkerGuid;
 
-    constructor(public from: HandlerType, public to: HandlerType, public type: MessageType, public payload?: Payload) {
+    constructor(
+        public from: HandlerType,
+        public to: HandlerType,
+        public messageType: MessageType,
+        public payload?: Payload
+    ) {
         this.correlationId = uuidv4();
     }
 }

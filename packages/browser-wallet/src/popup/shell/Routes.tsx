@@ -1,6 +1,6 @@
 import React, { useEffect, useRef } from 'react';
 import { Route, Routes as ReactRoutes, useLocation, useNavigate } from 'react-router-dom';
-import { WalletMessageHandler, HandlerType, MessageType } from '@concordium/browser-wallet-message-hub';
+import { Message, MessageType } from '@concordium/browser-wallet-message-hub';
 
 import { absoluteRoutes, relativeRoutes } from '@popup/constants/routes';
 import MainLayout from '@popup/page-layouts/MainLayout';
@@ -10,8 +10,6 @@ import SignMessage from '@popup/pages/SignMessage';
 import SendTransaction from '@popup/pages/SendTransaction';
 import Setup from '@popup/pages/Setup';
 import ConnectionRequest from '@popup/pages/ConnectionRequest';
-
-const messageHandler = new WalletMessageHandler(HandlerType.PopupScript);
 
 export default function Routes() {
     const navigate = useNavigate();
@@ -23,28 +21,40 @@ export default function Routes() {
 
     useEffect(() => {
         // eslint-disable-next-line @typescript-eslint/no-explicit-any
-        const handleMessage = (msg: any) => {
-            // TODO resolve route based on incoming message.
-            connectionEventResponseRef.current = (allowed: boolean) => {
-                // eslint-disable-next-line no-console
-                console.log(allowed);
-                connectionEventResponseRef.current = undefined;
-                navigate(-1);
-            };
+        const handleMessage = (msg: Message) => {
+            if (msg?.type === undefined) {
+                return;
+            }
 
-            const replace = pathname === absoluteRoutes.connectionRequest.path;
-            // eslint-disable-next-line no-console
-            console.log(pathname, absoluteRoutes.connectionRequest.path, replace);
-            navigate(absoluteRoutes.connectionRequest.path, { state: msg, replace });
+            if (msg.type === MessageType.SendTransaction) {
+                // TODO resolve route based on incoming message.
+                connectionEventResponseRef.current = (allowed: boolean) => {
+                    // eslint-disable-next-line no-console
+                    console.log(allowed);
+                    connectionEventResponseRef.current = undefined;
+                    navigate(-1);
+                };
+
+                const replace = pathname === absoluteRoutes.connectionRequest.path;
+                // eslint-disable-next-line no-console
+                console.log(pathname, absoluteRoutes.connectionRequest.path, replace);
+                navigate(absoluteRoutes.connectionRequest.path, { state: msg, replace });
+            }
         };
 
-        const sub = messageHandler.subscribe(MessageType.SendTransaction, handleMessage);
-        messageHandler.publishMessage(HandlerType.BackgroundScript, MessageType.PopupReady, undefined);
-        console.log(chrome.tabs);
-        chrome.runtime.sendMessage('test-concordium');
+        chrome.runtime.onMessage.addListener(handleMessage);
+
+        // chrome.tabs.query({ active: true, currentWindow: true }).then(([tab]) => {
+        //     console.log('TAB', tab);
+        //     if (tab.id === undefined) {
+        //         return;
+        //     }
+
+        //     chrome.tabs.sendMessage(tab.id, { type: MessageType.PopupReady }, handleMessage);
+        // });
 
         return () => {
-            messageHandler.unsubscribe(sub);
+            chrome.runtime.onMessage.removeListener(handleMessage);
         };
     }, [pathname]);
 
