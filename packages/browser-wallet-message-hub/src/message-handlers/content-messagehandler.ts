@@ -2,11 +2,11 @@
 import { AbstractMessageHandler } from './abstract-messagehandler';
 import { Message } from './message';
 import { logger } from './logger';
-import { HandlerTypeEnum, MessageTypeEnum, Payload } from './types';
+import { HandlerType, MessageType, Payload } from './types';
 
 export class ContentMessageHandler extends AbstractMessageHandler {
     public constructor() {
-        super(HandlerTypeEnum.ContentScript);
+        super(HandlerType.ContentScript);
 
         // Listen forward all PostMessage sent from Dapp
         this.addWindowPostMessageEventListener();
@@ -18,7 +18,7 @@ export class ContentMessageHandler extends AbstractMessageHandler {
     /**
      * Publishes a message to the Wallet background/popup space
      */
-    public publishMessage(to: HandlerTypeEnum, messageType: MessageTypeEnum, payload: Payload): Message {
+    public publishMessage(to: HandlerType, messageType: MessageType, payload: Payload): Message {
         logger.log('::contentMessageHandler.publishMessage');
 
         const m = new Message(this.me, to, messageType, payload);
@@ -32,10 +32,10 @@ export class ContentMessageHandler extends AbstractMessageHandler {
     protected canHandleMessageCore(message: Message): boolean {
         logger.log('::CanHandleMessageCore');
         return (
-            (message.from === HandlerTypeEnum.InjectedScript &&
-                [HandlerTypeEnum.BackgroundScript, HandlerTypeEnum.PopupScript].includes(message.to)) ||
-            (message.to === HandlerTypeEnum.InjectedScript &&
-                [HandlerTypeEnum.BackgroundScript, HandlerTypeEnum.PopupScript].includes(message.from))
+            (message.from === HandlerType.InjectedScript &&
+                [HandlerType.BackgroundScript, HandlerType.PopupScript].includes(message.to)) ||
+            (message.to === HandlerType.InjectedScript &&
+                [HandlerType.BackgroundScript, HandlerType.PopupScript].includes(message.from))
         );
     }
 

@@ -2,23 +2,23 @@ import { v4 as uuidv4 } from 'uuid';
 import EventEmitter from 'eventemitter3';
 import { filterMarkerGuid, Message } from './message';
 import { logger } from './logger';
-import { EventHandler, HandlerTypeEnum, MessageTypeEnum, Payload } from './types';
+import { EventHandler, HandlerType, MessageType, Payload } from './types';
 
 export interface Subscription {
     id: string;
-    messageType: MessageTypeEnum;
+    messageType: MessageType;
 }
 /**
  * Abstract class for message handlers
  */
 export abstract class AbstractMessageHandler extends EventEmitter {
     // Map of all registered event handlers
-    protected mapOfEventHandlers: Map<MessageTypeEnum, Map<string, EventHandler>> = new Map();
+    protected mapOfEventHandlers: Map<MessageType, Map<string, EventHandler>> = new Map();
 
     // Only in play if inheritor wants to be a conversation starter vs being a "listener,responder".
     private publisherPort$?: chrome.runtime.Port;
 
-    protected constructor(protected me: HandlerTypeEnum) {
+    protected constructor(protected me: HandlerType) {
         super();
     }
 
@@ -126,7 +126,7 @@ export abstract class AbstractMessageHandler extends EventEmitter {
      * @param messageType - The message type to listen for
      * @param eventHandler - The event handler that gets executed when the given message arrives
      */
-    public subscribe(messageType: MessageTypeEnum, eventHandler: EventHandler): Subscription {
+    public subscribe(messageType: MessageType, eventHandler: EventHandler): Subscription {
         let eventHandlers = this.mapOfEventHandlers.get(messageType);
 
         if (eventHandlers === undefined) {
@@ -141,8 +141,9 @@ export abstract class AbstractMessageHandler extends EventEmitter {
         return subscription;
     }
 
-    public handleOnce(messageType: MessageTypeEnum, eventHandler: EventHandler): void {
+    public handleOnce(messageType: MessageType, eventHandler: EventHandler): void {
         const sub = this.subscribe(messageType, (...args) => {
+            console.log('handle once', ...args);
             eventHandler(...args);
             this.unsubscribe(sub);
         });

@@ -2,14 +2,14 @@
 import { AbstractMessageHandler } from './abstract-messagehandler';
 import { Message } from './message';
 import { logger } from './logger';
-import { HandlerTypeEnum, MessageTypeEnum, Payload } from './types';
+import { HandlerType, MessageType, Payload } from './types';
 
 /**
  * MessageHandler used in inside the injected script. Acts as the bridge between the WalletApi and ContentScript
  */
 export class InjectedMessageHandler extends AbstractMessageHandler {
     public constructor() {
-        super(HandlerTypeEnum.InjectedScript);
+        super(HandlerType.InjectedScript);
 
         this.addWindowPostMessageEventListener();
     }
@@ -17,7 +17,7 @@ export class InjectedMessageHandler extends AbstractMessageHandler {
     /**
      * Called by users (WalletAPI) to publish Messages
      */
-    public publishMessage(to: HandlerTypeEnum, messageType: MessageTypeEnum, payload: Payload): Message {
+    public publishMessage(to: HandlerType, messageType: MessageType, payload: Payload): Message {
         const m = new Message(this.me, to, messageType, payload);
         window.postMessage(m);
 
@@ -25,7 +25,7 @@ export class InjectedMessageHandler extends AbstractMessageHandler {
     }
 
     protected canHandleMessageCore(message: Message): boolean {
-        return [HandlerTypeEnum.BackgroundScript, HandlerTypeEnum.PopupScript].includes(message.from);
+        return [HandlerType.BackgroundScript, HandlerType.PopupScript].includes(message.from);
     }
 
     protected handlePortMessageCore(): Promise<void> {

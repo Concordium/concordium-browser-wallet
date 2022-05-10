@@ -1,5 +1,6 @@
 import React, { useEffect, useRef } from 'react';
 import { Route, Routes as ReactRoutes, useLocation, useNavigate } from 'react-router-dom';
+import { WalletMessageHandler, HandlerType, MessageType } from '@concordium/browser-wallet-message-hub';
 
 import { absoluteRoutes, relativeRoutes } from '@popup/constants/routes';
 import MainLayout from '@popup/page-layouts/MainLayout';
@@ -9,6 +10,8 @@ import SignMessage from '@popup/pages/SignMessage';
 import SendTransaction from '@popup/pages/SendTransaction';
 import Setup from '@popup/pages/Setup';
 import ConnectionRequest from '@popup/pages/ConnectionRequest';
+
+const messageHandler = new WalletMessageHandler(HandlerType.PopupScript);
 
 export default function Routes() {
     const navigate = useNavigate();
@@ -34,12 +37,14 @@ export default function Routes() {
             console.log(pathname, absoluteRoutes.connectionRequest.path, replace);
             navigate(absoluteRoutes.connectionRequest.path, { state: msg, replace });
         };
-        // TODO use message hub to subscribe to messages.
-        chrome.runtime.onMessage.addListener(handleMessage);
-        chrome.runtime.sendMessage('popupReady');
+
+        const sub = messageHandler.subscribe(MessageType.SendTransaction, handleMessage);
+        messageHandler.publishMessage(HandlerType.BackgroundScript, MessageType.PopupReady, undefined);
+        console.log(chrome.tabs);
+        chrome.runtime.sendMessage('test-concordium');
 
         return () => {
-            chrome.runtime.onMessage.removeListener(handleMessage);
+            messageHandler.unsubscribe(sub);
         };
     }, [pathname]);
 

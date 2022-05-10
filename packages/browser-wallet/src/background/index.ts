@@ -1,6 +1,6 @@
 import { height, width } from '@popup/constants/dimensions';
 import { getCurrentTab } from '@concordium/browser-wallet-message-hub/src/shared/utils/extensionHelpers';
-import { HandlerTypeEnum, MessageTypeEnum } from '@concordium/browser-wallet-message-hub';
+import { HandlerType, MessageType } from '@concordium/browser-wallet-message-hub';
 import {
     IWalletMessageHandler,
     WalletMessageHandler,
@@ -8,7 +8,7 @@ import {
 import { EventHandler } from '@concordium/browser-wallet-message-hub/src/message-handlers/types';
 
 // Create BackgroundHandler which injects script into Dapp when asked.
-const backgroundHandler: IWalletMessageHandler = new WalletMessageHandler(HandlerTypeEnum.BackgroundScript);
+const backgroundHandler: IWalletMessageHandler = new WalletMessageHandler(HandlerType.BackgroundScript);
 
 let isLoaded = false;
 /**
@@ -38,7 +38,12 @@ const init = async () => {
 };
 
 const spawnPopup: EventHandler = async (message) => {
-    backgroundHandler.handleOnce(MessageTypeEnum.PopupReady, () => backgroundHandler.publishMessage(message));
+    backgroundHandler.handleOnce(MessageType.PopupReady, () => backgroundHandler.publishMessage(message));
+    chrome.runtime.onMessage.addListener((msg) => {
+        if (msg === 'test-concordium') {
+            console.log('RECEIVE READY EVENT');
+        }
+    });
 
     const lastFocused = await chrome.windows.getLastFocused();
     // Position window in top right corner of lastFocused window.
@@ -55,5 +60,5 @@ const spawnPopup: EventHandler = async (message) => {
     });
 };
 
-backgroundHandler.subscribe(MessageTypeEnum.Init, init);
-backgroundHandler.subscribe(MessageTypeEnum.SendTransaction, spawnPopup);
+backgroundHandler.subscribe(MessageType.Init, init);
+backgroundHandler.subscribe(MessageType.SendTransaction, spawnPopup);

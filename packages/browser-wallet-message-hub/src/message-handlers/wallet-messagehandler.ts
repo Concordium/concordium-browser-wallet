@@ -2,17 +2,17 @@ import { getCurrentTab } from '../shared/utils/extensionHelpers';
 import { AbstractMessageHandler, Subscription } from './abstract-messagehandler';
 import { Message } from './message';
 import { logger } from './logger';
-import { EventHandler, HandlerTypeEnum, MessageTypeEnum, Payload } from './types';
+import { EventHandler, HandlerType, MessageType, Payload } from './types';
 
 /**
  * Only handlers living in the Wallet "background/popup" space are supposed to inherit from this class.
  */
 export interface IWalletMessageHandler {
-    publishEvent(to: HandlerTypeEnum, payload: Payload): Promise<void>;
+    publishEvent(to: HandlerType, payload: Payload): Promise<void>;
     publishMessage(message: Message): Promise<void>;
-    publishMessage(to: HandlerTypeEnum, messageType: MessageTypeEnum, payload: Payload): Promise<void>;
-    subscribe(messageType: MessageTypeEnum, eventHandler: EventHandler): Subscription;
-    handleOnce(messageType: MessageTypeEnum, eventHandler: EventHandler): void;
+    publishMessage(to: HandlerType, messageType: MessageType, payload: Payload): Promise<void>;
+    subscribe(messageType: MessageType, eventHandler: EventHandler): Subscription;
+    handleOnce(messageType: MessageType, eventHandler: EventHandler): void;
     unsubscribe(subscription: Subscription): void;
 }
 
@@ -20,7 +20,7 @@ export class WalletMessageHandler extends AbstractMessageHandler implements IWal
     // Keeps track of known dApps that's "talking" to Concordium Wallet
     private tabsDictionary: Map<number, chrome.runtime.Port> = new Map<number, chrome.runtime.Port>();
 
-    public constructor(me: HandlerTypeEnum) {
+    public constructor(me: HandlerType) {
         super(me);
 
         // We only listen for messages arriving through the chrome.runtime.port channel.
@@ -57,22 +57,24 @@ export class WalletMessageHandler extends AbstractMessageHandler implements IWal
                     `Added Port and Tab to Dictionary. Port ${port.name}, TabId:${port.sender.tab.id}, I am: ${this.me}`
                 );
                 this.tabsDictionary.set(port.sender.tab.id, port);
+            } else {
+                console.log(port);
             }
         });
     }
 
     // Public
 
-    public async publishEvent(to: HandlerTypeEnum, payload: Payload): Promise<void> {
-        const event: Message = new Message(this.me, to, MessageTypeEnum.Event, payload);
+    public async publishEvent(to: HandlerType, payload: Payload): Promise<void> {
+        const event: Message = new Message(this.me, to, MessageType.Event, payload);
         await this.publishMessage(event);
     }
 
     public async publishMessage(message: Message): Promise<void>;
-    public async publishMessage(to: HandlerTypeEnum, messageType: MessageTypeEnum, payload: Payload): Promise<void>;
+    public async publishMessage(to: HandlerType, messageType: MessageType, payload: Payload): Promise<void>;
     public async publishMessage(
-        dyn: Message | HandlerTypeEnum,
-        messageType?: MessageTypeEnum,
+        dyn: Message | HandlerType,
+        messageType?: MessageType,
         payload?: Payload
     ): Promise<void> {
         if (dyn instanceof Message) {
@@ -85,12 +87,12 @@ export class WalletMessageHandler extends AbstractMessageHandler implements IWal
                 if (!foundPort) {
                     throw new Error('port is not defined');
                 }
+
+                foundPort?.postMessage(dyn);
+                logger.log(`Message ${JSON.stringify(dyn)} sent to Port:${foundPort?.name}, TabId:${tab.id}`);
             } else {
                 logger.log(`Could not find current tab or Port for message ${JSON.stringify(dyn)}, I am: ${this.me}`);
             }
-
-            foundPort?.postMessage(dyn);
-            logger.log(`Message ${JSON.stringify(dyn)} sent to Port:${foundPort?.name}, TabId:${tab.id}`);
         } else if (messageType !== undefined) {
             this.publishMessage(new Message(this.me, dyn, messageType, payload));
         }

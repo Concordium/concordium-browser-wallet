@@ -4,7 +4,7 @@ import { Message } from './message';
 /**
  * Enumeration of the different types of messages that can be sent from the walletApi to the message handlers and vice versa
  */
-export enum MessageTypeEnum {
+export enum MessageType {
     // Methods
     Init = 'Init',
     SendTransaction = 'SendTransaction',
@@ -19,7 +19,7 @@ export enum MessageTypeEnum {
 /**
  * Enumeration of the different types of scripts which are either sending or receiving messages
  */
-export enum HandlerTypeEnum {
+export enum HandlerType {
     InjectedScript = 'InjectedScript',
     ContentScript = 'ContentScript',
     PopupScript = 'PopupScript',
