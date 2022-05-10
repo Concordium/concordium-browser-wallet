@@ -13,3 +13,6 @@ export class Message {
         this.correlationId = uuidv4();
     }
 }
+
+export const isConcordiumMessage = (msg: unknown): msg is Message =>
+    msg instanceof Message && msg.ccFilterMarker === filterMarkerGuid;

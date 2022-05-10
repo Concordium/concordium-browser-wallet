@@ -1,6 +1,6 @@
 /* eslint-disable class-methods-use-this */
 import { AbstractMessageHandler } from './abstract-messagehandler';
-import { Message } from './message';
+import { Message } from '../messaging/message';
 import { logger } from './logger';
 import { HandlerType, MessageType, Payload } from './types';
 

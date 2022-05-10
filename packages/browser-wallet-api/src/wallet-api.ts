@@ -1,5 +1,4 @@
-import { HandlerType, InjectedMessageHandler, Message, MessageType } from '@concordium/browser-wallet-message-hub';
-import { EventEmitter } from 'eventemitter3';
+import { HandlerType, isResponse, Message, MessageResponse, MessageType } from '@concordium/browser-wallet-message-hub';
 import { logger } from '@concordium/browser-wallet-message-hub/src/message-handlers/logger';
 import { Payload } from '@concordium/browser-wallet-message-hub/src/message-handlers/types';
 import { PromiseInfo } from './promiseInfo';
@@ -10,31 +9,30 @@ export interface IWalletApi {
     getAccounts(): Promise<Message>;
 }
 
-class WalletApi extends EventEmitter implements IWalletApi {
+class WalletApi implements IWalletApi {
     // eslint-disable-next-line @typescript-eslint/no-explicit-any
     private readonly promises: Map<string, PromiseInfo<any>> = new Map<string, PromiseInfo<any>>();
 
-    public constructor(private injectedMessageHandler: InjectedMessageHandler) {
-        super();
-
+    public constructor() {
+        window.addEventListener('message', (msg: unknown) => {
+            if (isResponse(msg)) {
+                // eslint-disable-next-line no-console
+                console.log(msg);
+                this.resolvePromiseOrFireEvent(msg);
+            }
+        });
         // Listens for events raised by InjectedScript
-        this.injectedMessageHandler.on('message', this.resolvePromiseOrFireEvent.bind(this));
+        // this.injectedMessageHandler.on('message', this.resolvePromiseOrFireEvent.bind(this));
     }
 
-    private resolvePromiseOrFireEvent(message: Message): void {
-        const promiseInfo = this.promises.get(message.correlationId);
-        if (message.type !== MessageType.Event) {
-            if (!promiseInfo) {
-                throw Error('Message received without corresponding PromiseInfo');
-            }
-
-            this.promises.delete(message.correlationId);
-
-            promiseInfo.resolver(message.payload);
-        } else {
-            // Raise event
-            this.emit('event', message.payload);
+    private resolvePromiseOrFireEvent(response: MessageResponse): void {
+        const promiseInfo = this.promises.get(response.correlationId);
+        if (!promiseInfo) {
+            throw Error('Message received without corresponding PromiseInfo');
         }
+
+        this.promises.delete(response.correlationId);
+        promiseInfo.resolver(response.payload);
     }
 
     private sendMessage<T>(type: MessageType, payload: Payload): Promise<T> {
@@ -42,12 +40,19 @@ class WalletApi extends EventEmitter implements IWalletApi {
 
         return new Promise((resolver, reject) => {
             // publish the message to the wallet extension
-            const { correlationId } = this.injectedMessageHandler.publishMessage(
-                HandlerType.PopupScript,
-                type,
+            // const { correlationId } = this.injectedMessageHandler.publishMessage(
+            //     HandlerType.PopupScript,
+            //     type,
+            //     payload
+            // );
+            const message = new Message(
+                HandlerType.InjectedScript,
+                HandlerType.BackgroundScript,
+                MessageType.SendTransaction,
                 payload
             );
-            this.promises.set(correlationId, { resolver, reject });
+            window.postMessage(message);
+            this.promises.set(message.correlationId, { resolver, reject });
         });
     }
 
@@ -73,4 +78,4 @@ class WalletApi extends EventEmitter implements IWalletApi {
     }
 }
 
-export const walletApi = new WalletApi(new InjectedMessageHandler());
+export const walletApi = new WalletApi();
