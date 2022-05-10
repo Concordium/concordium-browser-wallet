@@ -14,11 +14,9 @@ class WalletApi implements IWalletApi {
     private readonly promises: Map<string, PromiseInfo<any>> = new Map<string, PromiseInfo<any>>();
 
     public constructor() {
-        window.addEventListener('message', (msg: unknown) => {
-            if (isResponse(msg)) {
-                // eslint-disable-next-line no-console
-                console.log(msg);
-                this.resolvePromiseOrFireEvent(msg);
+        window.addEventListener('message', ({ data }) => {
+            if (isResponse(data)) {
+                this.resolvePromiseOrFireEvent(data);
             }
         });
         // Listens for events raised by InjectedScript
@@ -45,12 +43,7 @@ class WalletApi implements IWalletApi {
             //     type,
             //     payload
             // );
-            const message = new Message(
-                HandlerType.InjectedScript,
-                HandlerType.BackgroundScript,
-                MessageType.SendTransaction,
-                payload
-            );
+            const message = new Message(HandlerType.BackgroundScript, MessageType.SendTransaction, payload);
             window.postMessage(message);
             this.promises.set(message.correlationId, { resolver, reject });
         });

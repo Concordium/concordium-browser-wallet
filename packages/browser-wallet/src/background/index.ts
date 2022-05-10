@@ -1,39 +1,14 @@
 /* eslint-disable no-console */
 import { height, width } from '@popup/constants/dimensions';
 import { getCurrentTab } from '@concordium/browser-wallet-message-hub/src/shared/utils/extensionHelpers';
-import { HandlerType, isMessage, Message, MessageType } from '@concordium/browser-wallet-message-hub';
-
-console.log('BG');
-
-type EventHandler = (
-    message: Message,
-    sender: chrome.runtime.MessageSender,
-    // eslint-disable-next-line @typescript-eslint/no-explicit-any
-    respond: (response: any) => void
-) => void | boolean;
-
-const handleMessage = (type: MessageType, handler: EventHandler) => {
-    const wrapper: EventHandler = (msg: unknown, ...args) => {
-        console.log(msg);
-        if (isMessage(msg) && msg.type === type) {
-            return handler(msg, ...args);
-        }
-
-        return false;
-    };
-
-    chrome.runtime.onMessage.addListener(wrapper);
-
-    return () => chrome.runtime.onMessage.removeListener(wrapper);
-};
-
-const handleOnce = (type: MessageType, handler: EventHandler) => {
-    const unsub = handleMessage(type, (...args) => {
-        const r = handler(...args);
-        unsub();
-        return r;
-    });
-};
+import {
+    EventHandler,
+    handleMessage,
+    handleOnce,
+    HandlerType,
+    Message,
+    MessageType,
+} from '@concordium/browser-wallet-message-hub';
 
 let isLoaded = false;
 /**
@@ -70,16 +45,9 @@ const init: EventHandler = () => {
 
 const spawnPopup: EventHandler = (message, _sender, respond) => {
     handleOnce(MessageType.PopupReady, () => {
-        const nextM = new Message(
-            HandlerType.BackgroundScript,
-            HandlerType.PopupScript,
-            MessageType.SignMessage,
-            message.payload
-        );
-        chrome.runtime.sendMessage(nextM, (r) => {
-            console.log('response in bg', r);
-            respond(r);
-        });
+        const nextM = new Message(HandlerType.PopupScript, MessageType.SignMessage, message.payload);
+
+        chrome.runtime.sendMessage(nextM, respond);
 
         return false;
     });

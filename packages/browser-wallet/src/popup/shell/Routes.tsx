@@ -1,6 +1,6 @@
 import React, { useEffect, useRef } from 'react';
 import { Route, Routes as ReactRoutes, useLocation, useNavigate } from 'react-router-dom';
-import { HandlerType, Message, MessageType } from '@concordium/browser-wallet-message-hub';
+import { handleMessage, HandlerType, Message, MessageType, EventHandler } from '@concordium/browser-wallet-message-hub';
 
 import { absoluteRoutes, relativeRoutes } from '@popup/constants/routes';
 import MainLayout from '@popup/page-layouts/MainLayout';
@@ -20,52 +20,26 @@ export default function Routes() {
     };
 
     useEffect(() => {
-        // eslint-disable-next-line @typescript-eslint/no-explicit-any
-        const handleMessage = (msg: Message, _sender: chrome.runtime.MessageSender, respond: (r: any) => void) => {
-            if (msg?.type === undefined) {
-                return false;
-            }
+        const onConnectionRequest: EventHandler = (msg, _sender, respond) => {
+            // TODO resolve route based on incoming message.
+            connectionEventResponseRef.current = (allowed: boolean) => {
+                connectionEventResponseRef.current = undefined;
+                respond(allowed);
+                navigate(-1);
+            };
 
-            if (msg.type === MessageType.SignMessage) {
-                // TODO resolve route based on incoming message.
-                connectionEventResponseRef.current = (allowed: boolean) => {
-                    // eslint-disable-next-line no-console
-                    console.log(allowed);
-                    connectionEventResponseRef.current = undefined;
-                    navigate(-1);
+            const replace = pathname === absoluteRoutes.connectionRequest.path;
+            navigate(absoluteRoutes.connectionRequest.path, { state: msg, replace });
 
-                    respond(allowed);
-                };
-
-                const replace = pathname === absoluteRoutes.connectionRequest.path;
-                // eslint-disable-next-line no-console
-                console.log(pathname, absoluteRoutes.connectionRequest.path, replace);
-                navigate(absoluteRoutes.connectionRequest.path, { state: msg, replace });
-
-                return true;
-            }
-
-            return false;
+            return true;
         };
 
-        chrome.runtime.onMessage.addListener(handleMessage);
+        const unsub = handleMessage(MessageType.SignMessage, onConnectionRequest);
 
-        // chrome.tabs.query({ active: true, currentWindow: true }).then(([tab]) => {
-        //     console.log('TAB', tab);
-        //     if (tab.id === undefined) {
-        //         return;
-        //     }
+        // Let bg script now that I'm ready to handle requests.
+        chrome.runtime.sendMessage(new Message(HandlerType.BackgroundScript, MessageType.PopupReady));
 
-        //     chrome.tabs.sendMessage(tab.id, { type: MessageType.PopupReady }, handleMessage);
-        // });
-
-        chrome.runtime.sendMessage(
-            new Message(HandlerType.PopupScript, HandlerType.BackgroundScript, MessageType.PopupReady)
-        );
-
-        return () => {
-            chrome.runtime.onMessage.removeListener(handleMessage);
-        };
+        return unsub;
     }, [pathname]);
 
     return (

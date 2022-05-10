@@ -27,7 +27,7 @@ export class BaseMessage {
 }
 
 export class Message extends BaseMessage {
-    constructor(public from: HandlerType, public to: HandlerType, public type: MessageType, public payload?: Payload) {
+    constructor(public to: HandlerType, public type: MessageType, public payload?: Payload) {
         super();
     }
 }
