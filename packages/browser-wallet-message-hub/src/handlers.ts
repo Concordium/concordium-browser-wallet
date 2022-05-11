@@ -31,7 +31,7 @@ export type MessageHandler<M extends BaseMessage | unknown> = (
     respond?: (response: any) => void
 ) => void | boolean;
 
-export abstract class BaseMessageHandler<M extends BaseMessage = WalletMessage> {
+abstract class BaseMessageHandler<M extends BaseMessage = WalletMessage> {
     public handleMessage(filter: MessageFilter<M>, handler: MessageHandler<M>): Unsubscribe {
         return this.onAddHandler((msg, ...args) => {
             if (!this.canHandleMessage(msg, filter)) {
