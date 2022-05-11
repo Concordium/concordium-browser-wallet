@@ -17,6 +17,8 @@ export interface IWalletApi {
 class WalletApi implements IWalletApi {
     private messageHandler = new InjectedMessageHandler();
 
+    private connected = false;
+
     private eventHandlerMap: Map<EventType, PostMessageHandler[]> = new Map();
 
     constructor() {
@@ -34,7 +36,7 @@ class WalletApi implements IWalletApi {
      */
     // eslint-disable-next-line @typescript-eslint/no-explicit-any
     public signMessage(): Promise<any> {
-        return this.messageHandler.sendMessage(MessageType.SignMessage, {});
+        return this.sendMessage(MessageType.SignMessage, {});
     }
 
     /**
@@ -43,18 +45,28 @@ class WalletApi implements IWalletApi {
     // TODO use proper account type
     // eslint-disable-next-line @typescript-eslint/no-explicit-any
     public getAccounts(): Promise<any[]> {
-        return this.messageHandler.sendMessage(MessageType.GetAccounts);
+        return this.sendMessage(MessageType.GetAccounts);
     }
 
-    public connect(): Promise<boolean> {
-        return this.messageHandler.sendMessage(MessageType.Connect);
+    public async connect(): Promise<boolean> {
+        this.connected = await this.messageHandler.sendMessage(MessageType.Connect);
+        return this.connected;
     }
 
     /**
      * Sends a transaction to the Concordium Wallet and awaits the users action
      */
     public sendTransaction(): Promise<boolean> {
-        return this.messageHandler.sendMessage(MessageType.SendTransaction, {});
+        return this.sendMessage(MessageType.SendTransaction, {});
+    }
+
+    // eslint-disable-next-line @typescript-eslint/no-explicit-any
+    private async sendMessage(type: MessageType, payload?: any) {
+        if (!this.connected && !(await this.connect())) {
+            throw new Error('Connection not allowed by wallet');
+        }
+
+        return this.messageHandler.sendMessage(type, payload);
     }
 
     private handleEvent(type: EventType) {
