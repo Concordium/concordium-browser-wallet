@@ -12,36 +12,51 @@ import Setup from '@popup/pages/Setup';
 import ConnectionRequest from '@popup/pages/ConnectionRequest';
 import { popupMessageHandler } from '@popup/shared/message-handler';
 
-export default function Routes() {
+function useEventRoute<R>(eventType: EventType, route: string) {
     const navigate = useNavigate();
     const { pathname } = useLocation();
-    const connectionEventResponseRef = useRef<(allowed: boolean) => void>();
-    const handleConnectionResponse = (allowed: boolean) => () => {
-        connectionEventResponseRef.current?.(allowed);
+
+    const eventResponseRef = useRef<(response: R) => void>();
+    const handleResponse = (response: R) => {
+        eventResponseRef.current?.(response);
     };
 
     useEffect(() => {
-        const onConnectionRequest: ExtensionMessageHandler = (msg, _sender, respond) => {
+        const handleEvent: ExtensionMessageHandler = (msg, _sender, respond) => {
             // TODO resolve route based on incoming message.
-            connectionEventResponseRef.current = (allowed: boolean) => {
-                connectionEventResponseRef.current = undefined;
-                respond(allowed);
+            eventResponseRef.current = (res) => {
+                eventResponseRef.current = undefined;
+                respond(res);
                 navigate(-1);
             };
 
-            const replace = pathname === absoluteRoutes.connectionRequest.path;
-            navigate(absoluteRoutes.connectionRequest.path, { state: msg, replace });
+            const replace = pathname === route;
+            navigate(route, { state: msg, replace });
 
             return true;
         };
 
-        const unsub = popupMessageHandler.handleMessage(createEventTypeFilter(EventType.Connect), onConnectionRequest);
+        const unsub = popupMessageHandler.handleMessage(createEventTypeFilter(eventType), handleEvent);
 
         // Let bg script now that I'm ready to handle requests.
         popupMessageHandler.sendInternalEvent(EventType.PopupReady);
 
         return unsub;
     }, [pathname]);
+
+    return handleResponse;
+}
+
+export default function Routes() {
+    const handleConnectionResponse = useEventRoute<boolean>(EventType.Connect, absoluteRoutes.connectionRequest.path);
+    const handleSendTransactionResponse = useEventRoute<void>(
+        EventType.SendTransaction,
+        absoluteRoutes.sendTransaction.path
+    );
+
+    useEffect(() => {
+        popupMessageHandler.sendInternalEvent(EventType.PopupReady);
+    }, []);
 
     return (
         <ReactRoutes>
@@ -50,13 +65,16 @@ export default function Routes() {
             </Route>
             <Route element={<FullscreenPromptLayout />}>
                 <Route path={relativeRoutes.signMessage.path} element={<SignMessage />} />
-                <Route path={relativeRoutes.sendTransaction.path} element={<SendTransaction />} />
+                <Route
+                    path={relativeRoutes.sendTransaction.path}
+                    element={<SendTransaction onSubmit={handleSendTransactionResponse} />}
+                />
                 <Route
                     path={relativeRoutes.connectionRequest.path}
                     element={
                         <ConnectionRequest
-                            onAllow={handleConnectionResponse(true)}
-                            onReject={handleConnectionResponse(false)}
+                            onAllow={() => handleConnectionResponse(true)}
+                            onReject={() => handleConnectionResponse(false)}
                         />
                     }
                 />

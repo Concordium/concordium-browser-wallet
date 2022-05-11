@@ -118,7 +118,7 @@ export class ContentMessageHandler {
             }
         });
 
-        // Propagate messages from extension -> inject
+        // Propagate events from extension -> inject
         chrome.runtime.onMessage.addListener((msg) => {
             if (isEvent(msg)) {
                 window.postMessage(msg);

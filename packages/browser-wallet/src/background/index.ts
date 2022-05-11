@@ -1,4 +1,3 @@
-/* eslint-disable no-console */
 import { height, width } from '@popup/constants/dimensions';
 import {
     createEventTypeFilter,
@@ -36,8 +35,6 @@ const init: ExtensionMessageHandler = () => {
         if (!tab.id) {
             throw new Error('No ID for tab.');
         }
-
-        console.log('injecting');
 
         await chrome.scripting.executeScript({
             target: { tabId: tab.id },
@@ -78,4 +75,10 @@ const spawnPopup: ExtensionMessageHandler = (message, _sender, respond) => {
 };
 
 bgMessageHandler.handleMessage(createEventTypeFilter(EventType.Init), init);
+// TODO this currently assumes no windows are open, and opens a new window regardless.
 bgMessageHandler.handleMessage(createMessageTypeFilter(MessageType.Connect), spawnPopup);
+// TODO this currently assumes a popup is open. Need something that detects if a window is open, and opens one if none are.
+bgMessageHandler.handleMessage(createMessageTypeFilter(MessageType.SendTransaction), (msg, _sender, respond) => {
+    bgMessageHandler.sendInternalEvent(EventType.SendTransaction, msg.payload, respond);
+    return true;
+});
