@@ -3,9 +3,9 @@ import { EventType, isEvent, isMessage, MessageType, WalletEvent, WalletMessage 
 export const createMessageTypeFilter =
     (type: MessageType) =>
     (msg: unknown): msg is WalletMessage =>
-        isMessage(msg) && msg.type === type;
+        isMessage(msg) && msg.messageType === type;
 
 export const createEventTypeFilter =
     (type: EventType) =>
     (msg: unknown): msg is WalletEvent =>
-        isEvent(msg) && msg.type === type;
+        isEvent(msg) && msg.eventType === type;

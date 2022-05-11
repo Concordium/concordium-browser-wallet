@@ -2,9 +2,11 @@ import {
     InjectedMessageHandler,
     createEventTypeFilter,
     EventType,
-    PostMessageHandler,
     MessageType,
 } from '@concordium/browser-wallet-message-hub';
+
+// eslint-disable-next-line @typescript-eslint/no-explicit-any
+type WalletEventHandler<T = any> = (payload: T) => void;
 
 export interface IWalletApi {
     sendTransaction(): Promise<boolean>;
@@ -19,15 +21,14 @@ class WalletApi implements IWalletApi {
 
     private connected = false;
 
-    private eventHandlerMap: Map<EventType, PostMessageHandler[]> = new Map();
+    private eventHandlerMap: Map<EventType, WalletEventHandler[]> = new Map();
 
     constructor() {
+        // set up event listeners
         this.handleEvent(EventType.ChangeAccount);
-        // Listens for events raised by InjectedScript
-        // this.injectedMessageHandler.on('message', this.resolvePromiseOrFireEvent.bind(this));
     }
 
-    public addChangeAccountListener(handler: PostMessageHandler) {
+    public addChangeAccountListener(handler: WalletEventHandler<string>) {
         this.addEventListener(EventType.ChangeAccount, handler);
     }
 
@@ -71,11 +72,11 @@ class WalletApi implements IWalletApi {
 
     private handleEvent(type: EventType) {
         this.messageHandler.handleMessage(createEventTypeFilter(type), (msg) =>
-            this.eventHandlerMap.get(type)?.forEach((eh) => eh(msg))
+            this.eventHandlerMap.get(type)?.forEach((eh) => eh(msg.payload))
         );
     }
 
-    private addEventListener(type: EventType, handler: PostMessageHandler) {
+    private addEventListener(type: EventType, handler: WalletEventHandler) {
         this.eventHandlerMap.set(type, this.eventHandlerMap.get(type) ?? [handler]);
     }
 }

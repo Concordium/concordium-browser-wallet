@@ -60,10 +60,6 @@ export class InjectedMessageHandler extends BaseMessageHandler<WalletResponse | 
         const msg = new WalletMessage(type, payload);
         window.postMessage(msg);
 
-        console.log('INJECTED MSG', msg);
-
-        this.handleOnce(isResponse, (d) => console.log('INJECTED RESPONSE', d));
-
         return new Promise((resolve) => {
             this.handleOnce(
                 (mr) => isResponse(mr) && msg.correlationId === mr.correlationId,
@@ -124,7 +120,7 @@ export class ContentMessageHandler {
 
         // Propagate messages from extension -> inject
         chrome.runtime.onMessage.addListener((msg) => {
-            if (isMessage(msg)) {
+            if (isEvent(msg)) {
                 window.postMessage(msg);
             }
 
@@ -136,7 +132,6 @@ export class ContentMessageHandler {
 export class ExtensionsMessageHandler extends BaseMessageHandler<WalletMessage | WalletEvent> {
     // eslint-disable-next-line @typescript-eslint/no-explicit-any
     public sendInternalEvent(type: EventType, payload?: any, onResponse: (response: any) => void = () => {}): void {
-        console.log('EXTENSION SEND', type, payload);
         chrome.runtime.sendMessage(new WalletEvent(type, payload), onResponse);
     }
 

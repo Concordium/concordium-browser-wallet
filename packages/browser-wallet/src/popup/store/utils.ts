@@ -3,6 +3,7 @@ import { atom } from 'jotai';
 export enum ChromeStorageKey {
     Credentials = 'credentials',
     JsonRpcUrl = 'jsonRpcUrl',
+    SelectedAccount = 'selectedAccont',
 }
 
 /**

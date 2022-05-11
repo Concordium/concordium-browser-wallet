@@ -48,13 +48,13 @@ class CorrelationMessage extends BaseMessage {
 }
 
 export class WalletEvent extends BaseMessage {
-    constructor(public type: EventType, public payload?: Payload) {
+    constructor(public eventType: EventType, public payload?: Payload) {
         super();
     }
 }
 
 export class WalletMessage extends CorrelationMessage {
-    constructor(public type: MessageType, public payload?: Payload) {
+    constructor(public messageType: MessageType, public payload?: Payload) {
         super();
     }
 }
@@ -74,6 +74,7 @@ export const isEvent = (msg: unknown): msg is WalletEvent =>
     isBaseMessage(msg) && (msg as WalletMessage)?.correlationId === undefined;
 
 export const isMessage = (msg: unknown): msg is WalletMessage =>
-    isBaseMessage(msg) && (msg as WalletMessage)?.type !== undefined;
+    isBaseMessage(msg) && (msg as WalletMessage)?.messageType !== undefined;
 
-export const isResponse = (msg: unknown): msg is WalletResponse => isBaseMessage(msg) && !isMessage(msg);
+export const isResponse = (msg: unknown): msg is WalletResponse =>
+    isBaseMessage(msg) && !isMessage(msg) && !isEvent(msg);

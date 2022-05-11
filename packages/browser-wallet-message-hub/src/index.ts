@@ -1,3 +1,3 @@
-export * from './messaging/handlers';
-export * from './messaging/message';
-export * from './messaging/util';
+export * from './handlers';
+export * from './message';
+export * from './util';
