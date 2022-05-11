@@ -20,15 +20,18 @@ import { v4 as uuidv4 } from 'uuid';
  * Enumeration of the different types of messages that can be sent from the walletApi to the message handlers and vice versa
  */
 export enum MessageType {
-    SendTransaction = 'SendTransaction',
-    SignMessage = 'SignMessage',
-    GetAccounts = 'GetAccounts',
+    SendTransaction = 'M_SendTransaction',
+    SignMessage = 'M_SignMessage',
+    GetAccounts = 'M_GetAccounts',
+    Connect = 'M_Connect',
 }
 
 export enum EventType {
-    Init = 'Init',
-    PopupReady = 'PopupReady',
-    ChangeAccount = 'ChangeAccount',
+    Init = 'E_Init',
+    PopupReady = 'E_PopupReady',
+    ChangeAccount = 'E_ChangeAccount',
+    SendTransaction = 'E_SendTransaction',
+    Connect = 'E_Connect',
 }
 
 // eslint-disable-next-line @typescript-eslint/no-explicit-any

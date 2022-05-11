@@ -6,7 +6,6 @@ import {
     EventType,
     ExtensionMessageHandler,
     MessageType,
-    WalletMessage,
 } from '@concordium/browser-wallet-message-hub';
 import { bgMessageHandler } from './message-handler';
 
@@ -53,10 +52,8 @@ const init: ExtensionMessageHandler = () => {
 };
 
 const spawnPopup: ExtensionMessageHandler = (message, _sender, respond) => {
-    bgMessageHandler.handleOnce(createEventTypeFilter(EventType.Init), () => {
-        const nextM = new WalletMessage(MessageType.SignMessage, message.payload);
-
-        chrome.runtime.sendMessage(nextM, respond);
+    bgMessageHandler.handleOnce(createEventTypeFilter(EventType.PopupReady), () => {
+        bgMessageHandler.sendInternalEvent(EventType.Connect, message.payload, respond);
 
         return false;
     });
@@ -81,4 +78,4 @@ const spawnPopup: ExtensionMessageHandler = (message, _sender, respond) => {
 };
 
 bgMessageHandler.handleMessage(createEventTypeFilter(EventType.Init), init);
-bgMessageHandler.handleMessage(createMessageTypeFilter(MessageType.SendTransaction), spawnPopup);
+bgMessageHandler.handleMessage(createMessageTypeFilter(MessageType.Connect), spawnPopup);

@@ -41,14 +41,14 @@ export abstract class BaseMessageHandler<M extends BaseMessage = WalletMessage> 
         });
     }
 
-    public handleOnce: typeof this.handleMessage = (filter, handler) => {
+    public handleOnce(filter: MessageFilter<M>, handler: MessageHandler<M>): Unsubscribe {
         const unsub = this.handleMessage(filter, (...args) => {
             unsub();
             return handler(...args);
         });
 
         return unsub;
-    };
+    }
 
     protected abstract canHandleMessage(msg: unknown, filter: MessageFilter<M>): msg is M;
     protected abstract onAddHandler(handler: MessageHandler<unknown>): Unsubscribe;
@@ -59,6 +59,10 @@ export class InjectedMessageHandler extends BaseMessageHandler<WalletResponse | 
     public sendMessage(type: MessageType, payload?: any): Promise<any> {
         const msg = new WalletMessage(type, payload);
         window.postMessage(msg);
+
+        console.log('INJECTED MSG', msg);
+
+        this.handleOnce(isResponse, (d) => console.log('INJECTED RESPONSE', d));
 
         return new Promise((resolve) => {
             this.handleOnce(
@@ -75,10 +79,12 @@ export class InjectedMessageHandler extends BaseMessageHandler<WalletResponse | 
         return super.handleMessage(filter, handler);
     }
 
-    public override handleOnce = (
+    public override handleOnce(
         filter: MessageFilter<WalletResponse | WalletEvent>,
         handler: PostMessageHandler
-    ): Unsubscribe => super.handleOnce(filter, handler);
+    ): Unsubscribe {
+        return super.handleOnce(filter, handler);
+    }
 
     protected canHandleMessage(
         msg: unknown,
@@ -130,6 +136,7 @@ export class ContentMessageHandler {
 export class ExtensionsMessageHandler extends BaseMessageHandler<WalletMessage | WalletEvent> {
     // eslint-disable-next-line @typescript-eslint/no-explicit-any
     public sendInternalEvent(type: EventType, payload?: any, onResponse: (response: any) => void = () => {}): void {
+        console.log('EXTENSION SEND', type, payload);
         chrome.runtime.sendMessage(new WalletEvent(type, payload), onResponse);
     }
 
@@ -152,10 +159,12 @@ export class ExtensionsMessageHandler extends BaseMessageHandler<WalletMessage |
         return super.handleMessage(filter, this.ensureHandlerArgs(handler));
     }
 
-    public override handleOnce = (
+    public override handleOnce(
         filter: MessageFilter<WalletMessage | WalletEvent>,
         handler: ExtensionMessageHandler
-    ): Unsubscribe => super.handleOnce(filter, this.ensureHandlerArgs(handler));
+    ): Unsubscribe {
+        return super.handleOnce(filter, this.ensureHandlerArgs(handler));
+    }
 
     protected canHandleMessage(
         msg: unknown,
@@ -170,13 +179,13 @@ export class ExtensionsMessageHandler extends BaseMessageHandler<WalletMessage |
         return () => chrome.runtime.onMessage.removeListener(handler);
     }
 
-    private ensureHandlerArgs =
-        (handler: ExtensionMessageHandler): MessageHandler<WalletMessage | WalletEvent> =>
-        (msg, sender, respond) => {
+    private ensureHandlerArgs(handler: ExtensionMessageHandler): MessageHandler<WalletMessage | WalletEvent> {
+        return (msg, sender, respond) => {
             if (sender === undefined || respond === undefined) {
                 throw new Error('Unreachable');
             }
 
             return handler(msg, sender, respond);
         };
+    }
 }

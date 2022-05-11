@@ -1,11 +1,6 @@
 import React, { useEffect, useRef } from 'react';
 import { Route, Routes as ReactRoutes, useLocation, useNavigate } from 'react-router-dom';
-import {
-    MessageType,
-    ExtensionMessageHandler,
-    createMessageTypeFilter,
-    EventType,
-} from '@concordium/browser-wallet-message-hub';
+import { ExtensionMessageHandler, EventType, createEventTypeFilter } from '@concordium/browser-wallet-message-hub';
 
 import { absoluteRoutes, relativeRoutes } from '@popup/constants/routes';
 import MainLayout from '@popup/page-layouts/MainLayout';
@@ -40,10 +35,7 @@ export default function Routes() {
             return true;
         };
 
-        const unsub = popupMessageHandler.handleMessage(
-            createMessageTypeFilter(MessageType.SignMessage),
-            onConnectionRequest
-        );
+        const unsub = popupMessageHandler.handleMessage(createEventTypeFilter(EventType.Connect), onConnectionRequest);
 
         // Let bg script now that I'm ready to handle requests.
         popupMessageHandler.sendInternalEvent(EventType.PopupReady);

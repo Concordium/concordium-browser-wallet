@@ -43,7 +43,11 @@ class WalletApi implements IWalletApi {
     // TODO use proper account type
     // eslint-disable-next-line @typescript-eslint/no-explicit-any
     public getAccounts(): Promise<any[]> {
-        return this.messageHandler.sendMessage(MessageType.GetAccounts, {});
+        return this.messageHandler.sendMessage(MessageType.GetAccounts);
+    }
+
+    public connect(): Promise<boolean> {
+        return this.messageHandler.sendMessage(MessageType.Connect);
     }
 
     /**
