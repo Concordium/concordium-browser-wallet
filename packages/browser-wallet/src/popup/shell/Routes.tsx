@@ -1,6 +1,11 @@
 import React, { useEffect, useRef } from 'react';
 import { Route, Routes as ReactRoutes, useLocation, useNavigate } from 'react-router-dom';
-import { handleMessage, HandlerType, Message, MessageType, EventHandler } from '@concordium/browser-wallet-message-hub';
+import {
+    MessageType,
+    ExtensionMessageHandler,
+    createMessageTypeFilter,
+    EventType,
+} from '@concordium/browser-wallet-message-hub';
 
 import { absoluteRoutes, relativeRoutes } from '@popup/constants/routes';
 import MainLayout from '@popup/page-layouts/MainLayout';
@@ -10,6 +15,7 @@ import SignMessage from '@popup/pages/SignMessage';
 import SendTransaction from '@popup/pages/SendTransaction';
 import Setup from '@popup/pages/Setup';
 import ConnectionRequest from '@popup/pages/ConnectionRequest';
+import { popupMessageHandler } from '@popup/shared/message-handler';
 
 export default function Routes() {
     const navigate = useNavigate();
@@ -20,7 +26,7 @@ export default function Routes() {
     };
 
     useEffect(() => {
-        const onConnectionRequest: EventHandler = (msg, _sender, respond) => {
+        const onConnectionRequest: ExtensionMessageHandler = (msg, _sender, respond) => {
             // TODO resolve route based on incoming message.
             connectionEventResponseRef.current = (allowed: boolean) => {
                 connectionEventResponseRef.current = undefined;
@@ -34,10 +40,13 @@ export default function Routes() {
             return true;
         };
 
-        const unsub = handleMessage(MessageType.SignMessage, onConnectionRequest);
+        const unsub = popupMessageHandler.handleMessage(
+            createMessageTypeFilter(MessageType.SignMessage),
+            onConnectionRequest
+        );
 
         // Let bg script now that I'm ready to handle requests.
-        chrome.runtime.sendMessage(new Message(HandlerType.BackgroundScript, MessageType.PopupReady));
+        popupMessageHandler.sendInternalEvent(EventType.PopupReady);
 
         return unsub;
     }, [pathname]);

@@ -1,6 +1,6 @@
 /* eslint-disable class-methods-use-this */
 import { AbstractMessageHandler } from './abstract-messagehandler';
-import { Message } from '../messaging/message';
+import { WalletMessage } from '../messaging/message';
 import { logger } from './logger';
 import { HandlerType, MessageType, Payload } from './types';
 
@@ -17,14 +17,14 @@ export class InjectedMessageHandler extends AbstractMessageHandler {
     /**
      * Called by users (WalletAPI) to publish Messages
      */
-    public publishMessage(to: HandlerType, messageType: MessageType, payload: Payload): Message {
-        const m = new Message(this.me, to, messageType, payload);
+    public publishMessage(to: HandlerType, messageType: MessageType, payload: Payload): WalletMessage {
+        const m = new WalletMessage(this.me, to, messageType, payload);
         window.postMessage(m);
 
         return m;
     }
 
-    protected canHandleMessageCore(message: Message): boolean {
+    protected canHandleMessageCore(message: WalletMessage): boolean {
         return [HandlerType.BackgroundScript, HandlerType.PopupScript].includes(message.from);
     }
 
@@ -32,7 +32,7 @@ export class InjectedMessageHandler extends AbstractMessageHandler {
         return Promise.reject();
     }
 
-    protected async handleWindowPostMessageCore(message: Message): Promise<void> {
+    protected async handleWindowPostMessageCore(message: WalletMessage): Promise<void> {
         logger.log('::InjectedScript: Message was received from BackgroundScript or PopupScript');
 
         // Fire event to wallet api

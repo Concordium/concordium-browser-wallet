@@ -1,20 +1,29 @@
 /* eslint-disable no-console */
 import { height, width } from '@popup/constants/dimensions';
-import { getCurrentTab } from '@concordium/browser-wallet-message-hub/src/shared/utils/extensionHelpers';
 import {
-    EventHandler,
-    handleMessage,
-    handleOnce,
-    HandlerType,
-    Message,
+    createEventTypeFilter,
+    createMessageTypeFilter,
+    EventType,
+    ExtensionMessageHandler,
     MessageType,
+    WalletMessage,
 } from '@concordium/browser-wallet-message-hub';
+import { bgMessageHandler } from './message-handler';
+
+/**
+ * Returns the current selected tab - if any.
+ */
+async function getCurrentTab(): Promise<chrome.tabs.Tab> {
+    const queryOptions = { active: true, lastFocusedWindow: true };
+    const [tab] = await chrome.tabs.query(queryOptions);
+    return tab;
+}
 
 let isLoaded = false;
 /**
  * Callback method which installs Injected script into Main world of Dapp
  */
-const init: EventHandler = () => {
+const init: ExtensionMessageHandler = () => {
     if (isLoaded) {
         return false;
     }
@@ -43,9 +52,9 @@ const init: EventHandler = () => {
     return false;
 };
 
-const spawnPopup: EventHandler = (message, _sender, respond) => {
-    handleOnce(MessageType.PopupReady, () => {
-        const nextM = new Message(HandlerType.PopupScript, MessageType.SignMessage, message.payload);
+const spawnPopup: ExtensionMessageHandler = (message, _sender, respond) => {
+    bgMessageHandler.handleOnce(createEventTypeFilter(EventType.Init), () => {
+        const nextM = new WalletMessage(MessageType.SignMessage, message.payload);
 
         chrome.runtime.sendMessage(nextM, respond);
 
@@ -71,5 +80,5 @@ const spawnPopup: EventHandler = (message, _sender, respond) => {
     return true;
 };
 
-handleMessage(MessageType.Init, init);
-handleMessage(MessageType.SendTransaction, spawnPopup);
+bgMessageHandler.handleMessage(createEventTypeFilter(EventType.Init), init);
+bgMessageHandler.handleMessage(createMessageTypeFilter(MessageType.SendTransaction), spawnPopup);
