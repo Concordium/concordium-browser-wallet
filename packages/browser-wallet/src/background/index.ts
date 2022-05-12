@@ -4,8 +4,9 @@ import {
     ExtensionMessageHandler,
     MessageType,
 } from '@concordium/browser-wallet-message-hub';
+import { storedUrlWhitelist } from '@shared/storage/access';
 
-import bgMessageHandler, { handlePopupRequest } from './message-handler';
+import bgMessageHandler, { HandleMessage, handlePopupRequest, HandleResponse, RunCondition } from './message-handler';
 
 /**
  * Callback method which installs Injected script into Main world of Dapp
@@ -28,6 +29,39 @@ const injectScript: ExtensionMessageHandler = (_msg, sender) => {
 
 bgMessageHandler.handleMessage(createEventTypeFilter(EventType.Init), injectScript);
 
-handlePopupRequest(MessageType.Connect, EventType.Connect, (_, { url, tab }) => ({ url, title: tab?.title }));
-handlePopupRequest(MessageType.SendTransaction, EventType.SendTransaction, ({ payload }) => payload);
-handlePopupRequest(MessageType.SignMessage, EventType.SignMessage, ({ payload }) => payload);
+const handleConnectMessage: HandleMessage<{ url: string | undefined; title: string | undefined }> = (
+    _,
+    { url, tab }
+) => ({ url, title: tab?.title });
+
+const handleConnectionResponse: HandleResponse<boolean> = async (response: boolean, _msg, sender) => {
+    if (!sender.url) {
+        return response;
+    }
+
+    const whitelist = (await storedUrlWhitelist.get()) ?? [];
+    storedUrlWhitelist.set([...whitelist, sender.url]);
+
+    return response;
+};
+
+const handleConnectCondition: RunCondition<boolean> = async (_msg, sender) => {
+    const whitelist = (await storedUrlWhitelist.get()) ?? [];
+
+    const isWhitelisted = whitelist.some((url) => sender.url === url);
+
+    if (isWhitelisted) {
+        return { run: false, response: true };
+    }
+    return { run: true };
+};
+handlePopupRequest(
+    MessageType.Connect,
+    EventType.Connect,
+    handleConnectMessage,
+    handleConnectionResponse,
+    handleConnectCondition
+);
+
+handlePopupRequest(MessageType.SendTransaction, EventType.SendTransaction);
+handlePopupRequest(MessageType.SignMessage, EventType.SignMessage);

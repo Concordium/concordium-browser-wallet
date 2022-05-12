@@ -1,6 +1,6 @@
-import { ChromeStorageKey } from './types';
+import { ChromeStorageKey, WalletCredential } from './types';
 
-type StorageAccessor<V> = {
+export type StorageAccessor<V> = {
     get(): Promise<V | undefined>;
     set(value: V): Promise<void>;
     remove(): Promise<void>;
@@ -15,15 +15,7 @@ const makeStorageAccessor = <V>(area: chrome.storage.AreaName, key: ChromeStorag
     };
 };
 
-export const storedCredentials = makeStorageAccessor('local', ChromeStorageKey.Credentials);
-export const storedJsonRpcUrl = makeStorageAccessor('local', ChromeStorageKey.JsonRpcUrl);
-export const storedSelectedAccount = makeStorageAccessor('local', ChromeStorageKey.SelectedAccount);
-
-export const accessorMap: Map<ChromeStorageKey, StorageAccessor<unknown>> = new Map([
-    [ChromeStorageKey.Credentials, storedCredentials],
-    [ChromeStorageKey.JsonRpcUrl, storedCredentials],
-    [ChromeStorageKey.SelectedAccount, storedSelectedAccount],
-]);
-
-export const getStorageAccessor = <V>(key: ChromeStorageKey): StorageAccessor<V> =>
-    accessorMap.get(key) as StorageAccessor<V>;
+export const storedCredentials = makeStorageAccessor<WalletCredential[]>('local', ChromeStorageKey.Credentials);
+export const storedJsonRpcUrl = makeStorageAccessor<string>('local', ChromeStorageKey.JsonRpcUrl);
+export const storedSelectedAccount = makeStorageAccessor<string>('local', ChromeStorageKey.SelectedAccount);
+export const storedUrlWhitelist = makeStorageAccessor<string[]>('local', ChromeStorageKey.UrlWhitelist);

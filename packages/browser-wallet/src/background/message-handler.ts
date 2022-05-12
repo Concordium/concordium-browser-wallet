@@ -1,6 +1,7 @@
 import {
     createMessageTypeFilter,
     EventType,
+    ExtensionMessageHandler,
     ExtensionsMessageHandler,
     MessageType,
     WalletEvent,
@@ -14,16 +15,42 @@ const bgMessageHandler = new ExtensionsMessageHandler();
 
 export default bgMessageHandler;
 
-export const handlePopupRequest = <P>(
+type Message = WalletMessage | WalletEvent;
+type Sender = chrome.runtime.MessageSender;
+
+export type HandleMessage<P> = (msg: Message, sender: Sender) => P;
+// eslint-disable-next-line @typescript-eslint/no-explicit-any
+export type HandleResponse<R> = (response: any, msg: Message, sender: Sender) => Promise<R>;
+export type RunCondition<R> = (msg: Message, sender: Sender) => Promise<{ run: true } | { run: false; response: R }>;
+
+export const handlePopupRequest = <P, R>(
     messageType: MessageType,
     eventType: EventType,
-    makePayload: (msg: WalletMessage | WalletEvent, sender: chrome.runtime.MessageSender) => P
+    handleMessage: HandleMessage<P> = (msg) => msg.payload,
+    handleResponse: HandleResponse<R> = (r) => Promise.resolve(r),
+    /**
+     * Will only forward handle request if condition resolves to {run: true}.
+     */
+    runCondition: RunCondition<R> = () => Promise.resolve({ run: true })
 ) => {
-    bgMessageHandler.handleMessage(
-        createMessageTypeFilter(messageType),
-        ensureAvailableWindow((msg, sender, respond) => {
-            bgMessageHandler.sendInternalEvent(eventType, makePayload(msg, sender), respond);
-            return true;
-        })
-    );
+    const handler = ensureAvailableWindow((msg, sender, respond) => {
+        bgMessageHandler.sendInternalEvent(eventType, handleMessage(msg, sender), (r) =>
+            handleResponse(r, msg, sender).then(respond)
+        );
+        return true;
+    });
+
+    const conditionalHandler: ExtensionMessageHandler = (msg, sender, respond) => {
+        runCondition(msg, sender).then((result) => {
+            if (result.run) {
+                handler(msg, sender, respond);
+            } else {
+                respond(result.response);
+            }
+        });
+
+        return true;
+    };
+
+    bgMessageHandler.handleMessage(createMessageTypeFilter(messageType), conditionalHandler);
 };
