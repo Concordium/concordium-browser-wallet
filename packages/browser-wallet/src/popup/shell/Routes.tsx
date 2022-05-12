@@ -1,6 +1,6 @@
 import React, { useEffect, useRef } from 'react';
 import { Route, Routes as ReactRoutes, useLocation, useNavigate } from 'react-router-dom';
-import { ExtensionMessageHandler, EventType, createEventTypeFilter } from '@concordium/browser-wallet-message-hub';
+import { EventType, createEventTypeFilter } from '@concordium/browser-wallet-message-hub';
 
 import { absoluteRoutes, relativeRoutes } from '@popup/constants/routes';
 import MainLayout from '@popup/page-layouts/MainLayout';
@@ -12,7 +12,9 @@ import Setup from '@popup/pages/Setup';
 import ConnectionRequest from '@popup/pages/ConnectionRequest';
 import { popupMessageHandler } from '@popup/shared/message-handler';
 
-function useEventRoute<R>(eventType: EventType, route: string) {
+type PromptKey = keyof Omit<typeof absoluteRoutes['prompt'], 'path'>;
+
+function useEventPrompt<R>(eventType: EventType, promptKey: PromptKey) {
     const navigate = useNavigate();
     const { pathname } = useLocation();
 
@@ -21,38 +23,27 @@ function useEventRoute<R>(eventType: EventType, route: string) {
         eventResponseRef.current?.(response);
     };
 
-    useEffect(() => {
-        const handleEvent: ExtensionMessageHandler = (msg, _sender, respond) => {
-            // TODO resolve route based on incoming message.
-            eventResponseRef.current = (res) => {
-                eventResponseRef.current = undefined;
-                respond(res);
-                navigate(-1);
-            };
+    useEffect(
+        () =>
+            popupMessageHandler.handleMessage(createEventTypeFilter(eventType), (msg, _sender, respond) => {
+                eventResponseRef.current = respond;
 
-            const replace = pathname === route;
-            navigate(route, { state: msg, replace });
+                const replace = pathname.startsWith(absoluteRoutes.prompt.path); // replace existing prompts.
+                const route = absoluteRoutes.prompt[promptKey].path;
 
-            return true;
-        };
-
-        const unsub = popupMessageHandler.handleMessage(createEventTypeFilter(eventType), handleEvent);
-
-        // Let bg script now that I'm ready to handle requests.
-        popupMessageHandler.sendInternalEvent(EventType.PopupReady);
-
-        return unsub;
-    }, [pathname]);
+                navigate(route, { state: msg, replace });
+                return true;
+            }),
+        [pathname]
+    );
 
     return handleResponse;
 }
 
 export default function Routes() {
-    const handleConnectionResponse = useEventRoute<boolean>(EventType.Connect, absoluteRoutes.connectionRequest.path);
-    const handleSendTransactionResponse = useEventRoute<void>(
-        EventType.SendTransaction,
-        absoluteRoutes.sendTransaction.path
-    );
+    const handleConnectionResponse = useEventPrompt<boolean>(EventType.Connect, 'connectionRequest');
+    const handleSendTransactionResponse = useEventPrompt<void>(EventType.SendTransaction, 'sendTransaction');
+    const handleSignMessageResponse = useEventPrompt<void>(EventType.SendTransaction, 'signMessage');
 
     useEffect(() => {
         popupMessageHandler.sendInternalEvent(EventType.PopupReady);
@@ -63,14 +54,17 @@ export default function Routes() {
             <Route path={relativeRoutes.home.path} element={<MainLayout />}>
                 <Route index element={<Account />} />
             </Route>
-            <Route element={<FullscreenPromptLayout />}>
-                <Route path={relativeRoutes.signMessage.path} element={<SignMessage />} />
+            <Route path={relativeRoutes.prompt.path} element={<FullscreenPromptLayout />}>
                 <Route
-                    path={relativeRoutes.sendTransaction.path}
+                    path={relativeRoutes.prompt.signMessage.path}
+                    element={<SignMessage onSubmit={handleSignMessageResponse} />}
+                />
+                <Route
+                    path={relativeRoutes.prompt.sendTransaction.path}
                     element={<SendTransaction onSubmit={handleSendTransactionResponse} />}
                 />
                 <Route
-                    path={relativeRoutes.connectionRequest.path}
+                    path={relativeRoutes.prompt.connectionRequest.path}
                     element={
                         <ConnectionRequest
                             onAllow={() => handleConnectionResponse(true)}

@@ -10,14 +10,17 @@ export const relativeRoutes = {
     home: {
         path: '/',
     },
-    signMessage: {
-        path: '/sign-message',
-    },
-    sendTransaction: {
-        path: '/send-transaction',
-    },
-    connectionRequest: {
-        path: '/connection-request',
+    prompt: {
+        path: '/prompt',
+        connectionRequest: {
+            path: 'connection-request',
+        },
+        signMessage: {
+            path: 'sign-message',
+        },
+        sendTransaction: {
+            path: 'send-transaction',
+        },
     },
     setup: {
         path: '/setup',
