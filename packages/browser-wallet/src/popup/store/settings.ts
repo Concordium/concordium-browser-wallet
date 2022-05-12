@@ -1,4 +1,5 @@
-import { atomWithChromeStorage, ChromeStorageKey } from './utils';
+import { ChromeStorageKey } from '@shared/storage/types';
+import { atomWithChromeStorage } from './utils';
 
 export type Credential = {
     key: string;
