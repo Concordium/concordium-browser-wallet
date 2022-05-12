@@ -1,4 +1,5 @@
-import React from 'react';
+import { fullscreenPromptContext } from '@popup/page-layouts/FullscreenPromptLayout';
+import React, { useContext } from 'react';
 import { useTranslation } from 'react-i18next';
 import { useLocation } from 'react-router-dom';
 
@@ -9,12 +10,13 @@ type Props = {
 export default function SendTransaction({ onSubmit }: Props) {
     const { state } = useLocation();
     const { t } = useTranslation('sendTransaction');
+    const { withClose } = useContext(fullscreenPromptContext);
 
     return (
         <>
             <div>{t('description')}</div>
             {JSON.stringify(state)}
-            <button type="button" onClick={() => onSubmit()}>
+            <button type="button" onClick={withClose(onSubmit)}>
                 Submit
             </button>
         </>

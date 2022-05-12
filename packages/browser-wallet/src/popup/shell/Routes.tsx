@@ -43,7 +43,7 @@ function useEventPrompt<R>(eventType: EventType, promptKey: PromptKey) {
 export default function Routes() {
     const handleConnectionResponse = useEventPrompt<boolean>(EventType.Connect, 'connectionRequest');
     const handleSendTransactionResponse = useEventPrompt<void>(EventType.SendTransaction, 'sendTransaction');
-    const handleSignMessageResponse = useEventPrompt<void>(EventType.SendTransaction, 'signMessage');
+    const handleSignMessageResponse = useEventPrompt<void>(EventType.SignMessage, 'signMessage');
 
     useEffect(() => {
         popupMessageHandler.sendInternalEvent(EventType.PopupReady);

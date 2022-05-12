@@ -1,5 +1,5 @@
 import { fullscreenPromptContext } from '@popup/page-layouts/FullscreenPromptLayout';
-import React, { useCallback, useContext, useEffect } from 'react';
+import React, { useContext, useEffect } from 'react';
 import { useTranslation } from 'react-i18next';
 import { useLocation } from 'react-router-dom';
 
@@ -11,14 +11,7 @@ type Props = {
 export default function ConnectionRequest({ onAllow, onReject }: Props) {
     const { state } = useLocation();
     const { t } = useTranslation('connectionRequest');
-    const { onClose, close } = useContext(fullscreenPromptContext);
-    const withClose = useCallback(
-        (action: () => void) => () => {
-            action();
-            close();
-        },
-        [close]
-    );
+    const { onClose, withClose } = useContext(fullscreenPromptContext);
 
     useEffect(() => onClose(onReject), [onClose, onReject]);
 

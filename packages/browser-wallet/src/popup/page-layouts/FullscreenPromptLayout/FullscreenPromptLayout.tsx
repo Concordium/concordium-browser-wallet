@@ -6,14 +6,20 @@ import { noOp } from '@shared/utils/basicHelpers';
 type OnCloseHandler = () => void;
 type Unsubscribe = () => void;
 
+type OnClose = (handler: OnCloseHandler) => Unsubscribe;
+type WithClose = <F extends (...args: unknown[]) => void>(action: F, ...args: Parameters<F>) => () => void;
+
 type FullscreenPromptContext = {
-    onClose(handler: OnCloseHandler): Unsubscribe;
-    close(): void;
+    onClose: OnClose;
+    /**
+     * Generate an action, that also closes the prompt.
+     */
+    withClose: WithClose;
 };
 
 const defaultContext: FullscreenPromptContext = {
     onClose: () => noOp,
-    close: noOp,
+    withClose: () => noOp,
 };
 
 export const fullscreenPromptContext = createContext<FullscreenPromptContext>(defaultContext);
@@ -32,8 +38,16 @@ export default function FullscreenPromptLayout() {
         closeHandler?.current?.();
         goBack();
     };
+    const withClose: WithClose = useCallback(
+        (action, ...args) =>
+            () => {
+                action(...args);
+                close();
+            },
+        [close]
+    );
 
-    const onClose = useCallback((handler: OnCloseHandler) => {
+    const onClose: OnClose = useCallback((handler) => {
         closeHandler.current = handler;
 
         return () => {
@@ -43,7 +57,7 @@ export default function FullscreenPromptLayout() {
 
     return (
         // eslint-disable-next-line react/jsx-no-constructed-context-values
-        <fullscreenPromptContext.Provider value={{ onClose, close }}>
+        <fullscreenPromptContext.Provider value={{ onClose, withClose }}>
             <div className="fullscreen-prompt-layout">
                 <button className="fullscreen-prompt-layout__close" type="button" onClick={() => close()}>
                     X

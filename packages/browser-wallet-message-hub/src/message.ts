@@ -31,6 +31,7 @@ export enum EventType {
     PopupReady = 'E_PopupReady',
     ChangeAccount = 'E_ChangeAccount',
     SendTransaction = 'E_SendTransaction',
+    SignMessage = 'E_SignMessage',
     Connect = 'E_Connect',
 }
 
