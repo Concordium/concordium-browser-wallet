@@ -22,7 +22,7 @@ export type ExtensionMessageHandler<M extends BaseMessage | unknown = WalletMess
     sender: chrome.runtime.MessageSender,
     // eslint-disable-next-line @typescript-eslint/no-explicit-any
     respond: (response: any) => void
-) => void | boolean;
+) => true | void;
 
 export type MessageHandler<M extends BaseMessage | unknown> = (
     message: M,

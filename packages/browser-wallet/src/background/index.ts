@@ -11,23 +11,46 @@ import bgMessageHandler, { HandleMessage, handlePopupRequest, HandleResponse, Ru
 /**
  * Callback method which installs Injected script into Main world of Dapp
  */
-const injectScript: ExtensionMessageHandler = (_msg, sender) => {
+const injectScript: ExtensionMessageHandler = (_msg, sender, respond) => {
     if (sender.tab?.id === undefined) {
         throw new Error('No ID for tab.');
     }
 
-    chrome.scripting.executeScript({
-        target: { tabId: sender.tab.id },
-        // TODO this is a reference to the output file, expecting to be placed in the root with manifest.json.
-        // Would be nice if the relative output path could be built from a reference to the entrypoint file instead.
-        files: ['inject.js'],
-        world: 'MAIN',
-    });
+    chrome.scripting
+        .executeScript({
+            target: { tabId: sender.tab.id },
+            // TODO this is a reference to the output file, expecting to be placed in the root with manifest.json.
+            // Would be nice if the relative output path could be built from a reference to the entrypoint file instead.
+            files: ['inject.js'],
+            world: 'MAIN',
+        })
+        .then(() => respond(true))
+        .catch(() => respond(false));
 
-    return false;
+    return true;
 };
 
 bgMessageHandler.handleMessage(createEventTypeFilter(EventType.Init), injectScript);
+
+const runIfWhitelisted: RunCondition<false> = async (_msg, sender) => {
+    const whitelist = (await storedUrlWhitelist.get()) ?? [];
+
+    if (sender.url !== undefined && whitelist.includes(sender.url)) {
+        return { run: true };
+    }
+
+    return { run: false, response: false };
+};
+
+const runIfNotWhitelisted: RunCondition<boolean> = async (_msg, sender) => {
+    const whitelist = (await storedUrlWhitelist.get()) ?? [];
+
+    if (sender.url !== undefined && whitelist.includes(sender.url)) {
+        return { run: false, response: true };
+    }
+
+    return { run: true };
+};
 
 const handleConnectMessage: HandleMessage<{ url: string | undefined; title: string | undefined }> = (
     _,
@@ -45,23 +68,12 @@ const handleConnectionResponse: HandleResponse<boolean> = async (response: boole
     return response;
 };
 
-const handleConnectCondition: RunCondition<boolean> = async (_msg, sender) => {
-    const whitelist = (await storedUrlWhitelist.get()) ?? [];
-
-    const isWhitelisted = whitelist.some((url) => sender.url === url);
-
-    if (isWhitelisted) {
-        return { run: false, response: true };
-    }
-    return { run: true };
-};
 handlePopupRequest(
     MessageType.Connect,
     EventType.Connect,
+    runIfNotWhitelisted,
     handleConnectMessage,
-    handleConnectionResponse,
-    handleConnectCondition
+    handleConnectionResponse
 );
-
-handlePopupRequest(MessageType.SendTransaction, EventType.SendTransaction);
-handlePopupRequest(MessageType.SignMessage, EventType.SignMessage);
+handlePopupRequest(MessageType.SendTransaction, EventType.SendTransaction, runIfWhitelisted);
+handlePopupRequest(MessageType.SignMessage, EventType.SignMessage, runIfWhitelisted);

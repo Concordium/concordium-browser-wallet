@@ -10,9 +10,8 @@
                     .addEventListener('click', () => window.concordium.connect().then(alert));
                 document
                     .getElementById('send')
-                    .addEventListener('click', () =>
-                        window.concordium.sendTransaction().then(() => alert('Transaction submitted'))
-                    );
+                    .addEventListener('click', () => window.concordium.sendTransaction().then(alert));
+                window.concordium.addChangeAccountListener(alert);
             }
         </script>
     </head>
