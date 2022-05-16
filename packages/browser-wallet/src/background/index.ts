@@ -32,6 +32,9 @@ const injectScript: ExtensionMessageHandler = (_msg, sender, respond) => {
 
 bgMessageHandler.handleMessage(createEventTypeFilter(EventType.Init), injectScript);
 
+/**
+ * Run condition which looks up url in stored whitelist. Runs handler if url is included in whitelist.
+ */
 const runIfWhitelisted: RunCondition<false> = async (_msg, sender) => {
     const whitelist = (await storedUrlWhitelist.get()) ?? [];
 
@@ -42,6 +45,9 @@ const runIfWhitelisted: RunCondition<false> = async (_msg, sender) => {
     return { run: false, response: false };
 };
 
+/**
+ * Run condition which looks up url in stored whitelist. Runs handler if url is NOT included in whitelist.
+ */
 const runIfNotWhitelisted: RunCondition<boolean> = async (_msg, sender) => {
     const whitelist = (await storedUrlWhitelist.get()) ?? [];
 
