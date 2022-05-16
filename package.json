@@ -9,7 +9,7 @@
     "workspaces": ["packages/*"],
     "packageManager": "yarn@3.2.0",
     "scripts": {
-        "lint": "eslint",
+        "lint": "eslint ./",
         "postinstall": "husky install",
         "test": "jest"
     },

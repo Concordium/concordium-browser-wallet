@@ -12,7 +12,6 @@ import {
 } from './message';
 
 type Unsubscribe = () => void;
-
 type MessageFilter<M extends BaseMessage> = (msg: M) => boolean;
 
 export type PostMessageHandler<M extends BaseMessage | unknown = WalletResponse | WalletEvent> = (message: M) => void;
@@ -29,15 +28,15 @@ export type MessageHandler<M extends BaseMessage | unknown> = (
     sender?: chrome.runtime.MessageSender,
     // eslint-disable-next-line @typescript-eslint/no-explicit-any
     respond?: (response: any) => void
-) => void | boolean;
+) => true | void;
 
 abstract class BaseMessageHandler<M extends BaseMessage = WalletMessage> {
     public handleMessage(filter: MessageFilter<M>, handler: MessageHandler<M>): Unsubscribe {
+        // eslint-disable-next-line consistent-return
         return this.onAddHandler((msg, ...args) => {
-            if (!this.canHandleMessage(msg, filter)) {
-                return false;
+            if (this.canHandleMessage(msg, filter)) {
+                return handler(msg, ...args);
             }
-            return handler(msg, ...args);
         });
     }
 

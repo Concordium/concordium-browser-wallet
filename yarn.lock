@@ -423,7 +423,6 @@ __metadata:
   resolution: "@concordium/browser-wallet-api@workspace:packages/browser-wallet-api"
   dependencies:
     "@concordium/browser-wallet-message-hub": 0.1.0
-    eventemitter3: 3.1.0
   languageName: unknown
   linkType: soft
 
@@ -434,7 +433,6 @@ __metadata:
     "@concordium/browser-wallet": ^0.1.0
     "@types/chrome": ^0.0.183
     "@types/uuid": ^8.3.2
-    eventemitter3: ^4.0.7
     uuid: ^8.3.2
   languageName: unknown
   linkType: soft
@@ -3320,20 +3318,6 @@ __metadata:
   version: 2.0.3
   resolution: "esutils@npm:2.0.3"
   checksum: 22b5b08f74737379a840b8ed2036a5fb35826c709ab000683b092d9054e5c2a82c27818f12604bfc2a9a76b90b6834ef081edbc1c7ae30d1627012e067c6ec87
-  languageName: node
-  linkType: hard
-
-"eventemitter3@npm:3.1.0":
-  version: 3.1.0
-  resolution: "eventemitter3@npm:3.1.0"
-  checksum: e9a7bf3405ee5dc734a9480edc691e78a0f553291a4fe0b2e3e4e2ec52ac43318c0fb8b99798e6e3810abbf85a520234ca86c4029e77aba9b8fcc1ecf910ebfd
-  languageName: node
-  linkType: hard
-
-"eventemitter3@npm:^4.0.7":
-  version: 4.0.7
-  resolution: "eventemitter3@npm:4.0.7"
-  checksum: 1875311c42fcfe9c707b2712c32664a245629b42bb0a5a84439762dd0fd637fc54d078155ea83c2af9e0323c9ac13687e03cfba79b03af9f40c89b4960099374
   languageName: node
   linkType: hard
 
