@@ -1,7 +1,7 @@
-import { EventType, isEvent, isMessage, MessageType, WalletEvent, WalletMessage } from './message';
+import { EventType, InternalMessageType, isEvent, isMessage, MessageType, WalletEvent, WalletMessage } from './message';
 
 export const createMessageTypeFilter =
-    (type: MessageType) =>
+    (type: MessageType | InternalMessageType) =>
     (msg: unknown): msg is WalletMessage =>
         isMessage(msg) && msg.messageType === type;
 

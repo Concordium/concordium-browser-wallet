@@ -1,8 +1,8 @@
 import {
     createMessageTypeFilter,
-    EventType,
     ExtensionMessageHandler,
     ExtensionsMessageHandler,
+    InternalMessageType,
     MessageType,
     WalletEvent,
     WalletMessage,
@@ -31,7 +31,7 @@ export type RunCondition<R> = (msg: Message, sender: Sender) => RunConditionResp
  */
 export const handlePopupRequest = <P, R>(
     messageType: MessageType,
-    eventType: EventType,
+    internalMessageType: InternalMessageType,
     /**
      * Will only forward handle request if condition resolves to {run: true}.
      */
@@ -49,7 +49,7 @@ export const handlePopupRequest = <P, R>(
 ): void => {
     // Wrap handler in helper ensuring a popup window is available and ready to handle incomming messages.
     const handler = ensureAvailableWindow((msg, sender, respond) => {
-        bgMessageHandler.sendInternalEvent(eventType, handleMessage(msg, sender), (r) =>
+        bgMessageHandler.sendInternalMessage(internalMessageType, handleMessage(msg, sender), (r) =>
             handleResponse(r, msg, sender).then(respond)
         );
         return true;

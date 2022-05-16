@@ -1,7 +1,7 @@
 import {
-    createEventTypeFilter,
-    EventType,
+    createMessageTypeFilter,
     ExtensionMessageHandler,
+    InternalMessageType,
     MessageType,
 } from '@concordium/browser-wallet-message-hub';
 import { storedUrlWhitelist } from '@shared/storage/access';
@@ -30,7 +30,7 @@ const injectScript: ExtensionMessageHandler = (_msg, sender, respond) => {
     return true;
 };
 
-bgMessageHandler.handleMessage(createEventTypeFilter(EventType.Init), injectScript);
+bgMessageHandler.handleMessage(createMessageTypeFilter(InternalMessageType.Init), injectScript);
 
 /**
  * Run condition which looks up url in stored whitelist. Runs handler if url is included in whitelist.
@@ -76,10 +76,10 @@ const handleConnectionResponse: HandleResponse<boolean> = async (response: boole
 
 handlePopupRequest(
     MessageType.Connect,
-    EventType.Connect,
+    InternalMessageType.Connect,
     runIfNotWhitelisted,
     handleConnectMessage,
     handleConnectionResponse
 );
-handlePopupRequest(MessageType.SendTransaction, EventType.SendTransaction, runIfWhitelisted);
-handlePopupRequest(MessageType.SignMessage, EventType.SignMessage, runIfWhitelisted);
+handlePopupRequest(MessageType.SendTransaction, InternalMessageType.SendTransaction, runIfWhitelisted);
+handlePopupRequest(MessageType.SignMessage, InternalMessageType.SignMessage, runIfWhitelisted);

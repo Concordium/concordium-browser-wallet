@@ -1,8 +1,8 @@
-import { EventType, ExtensionMessageHandler } from '@concordium/browser-wallet-message-hub';
+import { ExtensionMessageHandler, InternalMessageType } from '@concordium/browser-wallet-message-hub';
 
 import { height, width } from '@popup/constants/dimensions';
 // eslint-disable-next-line import/no-cycle
-import { eventFired } from './event-handling';
+import { onMessage } from './event-handling';
 
 /**
  * Spawns a new popup on screen. Returning promise resolves when it receives a ready event from the popup
@@ -23,7 +23,7 @@ export const spawnPopup = async (): Promise<chrome.windows.Window> => {
     });
 
     // As the react app needs a chance to bootstrap, we need to wait for the ready signal.
-    await eventFired(EventType.PopupReady);
+    await onMessage(InternalMessageType.PopupReady);
 
     return window;
 };

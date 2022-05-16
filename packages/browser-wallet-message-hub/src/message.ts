@@ -17,7 +17,7 @@ import { v4 as uuidv4 } from 'uuid';
 // };
 
 /**
- * Enumeration of the different types of messages that can be sent from the walletApi to the message handlers and vice versa
+ * Enumeration of the different types of messages that can be sent from the wallet API to the extension
  */
 export enum MessageType {
     SendTransaction = 'M_SendTransaction',
@@ -26,13 +26,22 @@ export enum MessageType {
     Connect = 'M_Connect',
 }
 
+/**
+ * Enumeration of the different types of messages that can be sent internally in the extension
+ */
+export enum InternalMessageType {
+    Init = 'I_Init',
+    PopupReady = 'I_PopupReady',
+    SendTransaction = 'I_SendTransaction',
+    SignMessage = 'I_SignMessage',
+    Connect = 'I_Connect',
+}
+
+/**
+ * Enumeration of the different types of events from the extension, that can be handled in the wallet API
+ */
 export enum EventType {
-    Init = 'E_Init',
-    PopupReady = 'E_PopupReady',
     ChangeAccount = 'E_ChangeAccount',
-    SendTransaction = 'E_SendTransaction',
-    SignMessage = 'E_SignMessage',
-    Connect = 'E_Connect',
 }
 
 // eslint-disable-next-line @typescript-eslint/no-explicit-any
@@ -55,7 +64,7 @@ export class WalletEvent extends BaseMessage {
 }
 
 export class WalletMessage extends CorrelationMessage {
-    constructor(public messageType: MessageType, public payload?: Payload) {
+    constructor(public messageType: MessageType | InternalMessageType, public payload?: Payload) {
         super();
     }
 }

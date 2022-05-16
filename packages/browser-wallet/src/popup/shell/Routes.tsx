@@ -1,6 +1,6 @@
 import React, { useEffect, useRef } from 'react';
 import { Route, Routes as ReactRoutes, useLocation, useNavigate } from 'react-router-dom';
-import { EventType, createEventTypeFilter } from '@concordium/browser-wallet-message-hub';
+import { InternalMessageType, MessageType, createMessageTypeFilter } from '@concordium/browser-wallet-message-hub';
 
 import { absoluteRoutes, relativeRoutes } from '@popup/constants/routes';
 import MainLayout from '@popup/page-layouts/MainLayout';
@@ -14,7 +14,7 @@ import { popupMessageHandler } from '@popup/shared/message-handler';
 
 type PromptKey = keyof Omit<typeof absoluteRoutes['prompt'], 'path'>;
 
-function useEventPrompt<R>(eventType: EventType, promptKey: PromptKey) {
+function useMessagePrompt<R>(type: InternalMessageType | MessageType, promptKey: PromptKey) {
     const navigate = useNavigate();
     const { pathname } = useLocation();
 
@@ -25,7 +25,7 @@ function useEventPrompt<R>(eventType: EventType, promptKey: PromptKey) {
 
     useEffect(
         () =>
-            popupMessageHandler.handleMessage(createEventTypeFilter(eventType), (msg, _sender, respond) => {
+            popupMessageHandler.handleMessage(createMessageTypeFilter(type), (msg, _sender, respond) => {
                 eventResponseRef.current = respond;
 
                 const replace = pathname.startsWith(absoluteRoutes.prompt.path); // replace existing prompts.
@@ -41,12 +41,15 @@ function useEventPrompt<R>(eventType: EventType, promptKey: PromptKey) {
 }
 
 export default function Routes() {
-    const handleConnectionResponse = useEventPrompt<boolean>(EventType.Connect, 'connectionRequest');
-    const handleSendTransactionResponse = useEventPrompt<void>(EventType.SendTransaction, 'sendTransaction');
-    const handleSignMessageResponse = useEventPrompt<void>(EventType.SignMessage, 'signMessage');
+    const handleConnectionResponse = useMessagePrompt<boolean>(InternalMessageType.Connect, 'connectionRequest');
+    const handleSendTransactionResponse = useMessagePrompt<void>(
+        InternalMessageType.SendTransaction,
+        'sendTransaction'
+    );
+    const handleSignMessageResponse = useMessagePrompt<void>(InternalMessageType.SignMessage, 'signMessage');
 
     useEffect(() => {
-        popupMessageHandler.sendInternalEvent(EventType.PopupReady);
+        popupMessageHandler.sendInternalMessage(InternalMessageType.PopupReady);
     }, []);
 
     return (

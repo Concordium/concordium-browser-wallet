@@ -9,6 +9,7 @@ import {
     WalletResponse,
     MessageType,
     EventType,
+    InternalMessageType,
 } from './message';
 
 type Unsubscribe = () => void;
@@ -141,7 +142,7 @@ export class ContentMessageHandler {
      * Send content script init event to chrome runtime
      */
     public sendInitEvent() {
-        chrome.runtime.sendMessage(new WalletEvent(EventType.Init));
+        chrome.runtime.sendMessage(new WalletMessage(InternalMessageType.Init));
     }
 
     private setupMessageBridge() {
@@ -160,8 +161,6 @@ export class ContentMessageHandler {
             if (isEvent(msg)) {
                 window.postMessage(msg);
             }
-
-            return false;
         });
     }
 }
@@ -171,13 +170,17 @@ export class ExtensionsMessageHandler extends BaseMessageHandler<WalletMessage |
      * Send event of specific type with optional payload and response handler
      *
      * @example
-     * handler.sendInternalEvent(EventType.Init);
-     * handler.sendInternalEvent(EventType.SignMessage, "Hello world!", handleResponse);
+     * handler.sendInternalMessage(InternalMessageType.SignMessage, "Hello world!", handleResponse);
      */
     // TODO would be nice to make this more type safe.
-    // eslint-disable-next-line @typescript-eslint/no-explicit-any
-    public sendInternalEvent(type: EventType, payload?: any, onResponse: (response: any) => void = () => {}): void {
-        chrome.runtime.sendMessage(new WalletEvent(type, payload), onResponse);
+    public sendInternalMessage(
+        type: InternalMessageType,
+        // eslint-disable-next-line @typescript-eslint/no-explicit-any
+        payload?: any,
+        // eslint-disable-next-line @typescript-eslint/no-explicit-any
+        onResponse: (response: any) => void = () => {}
+    ): void {
+        chrome.runtime.sendMessage(new WalletMessage(type, payload), onResponse);
     }
 
     /**
@@ -217,7 +220,7 @@ export class ExtensionsMessageHandler extends BaseMessageHandler<WalletMessage |
         msg: unknown,
         filter: MessageFilter<WalletMessage | WalletEvent>
     ): msg is WalletMessage | WalletEvent {
-        return (isMessage(msg) || isEvent(msg)) && filter(msg);
+        return isMessage(msg) && filter(msg);
     }
 
     protected onAddHandler(handler: ExtensionMessageHandler<unknown>): Unsubscribe {
