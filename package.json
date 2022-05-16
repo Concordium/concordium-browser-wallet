@@ -9,11 +9,12 @@
     "workspaces": ["packages/*"],
     "packageManager": "yarn@3.2.0",
     "scripts": {
+        "lint": "eslint",
         "postinstall": "husky install",
         "test": "jest"
     },
     "lint-staged": {
-        "*.{js,jsx,ts,tsx}": ["eslint --cache --fix"],
+        "*.{js,jsx,ts,tsx}": ["eslint --cache --fix --max-warnings 0"],
         "{*.json,.{eslintrc,prettierrc,stylelintrc}}": ["prettier --ignore-path .eslintignore --parser json --write"],
         "*.{css,scss}": ["stylelint --ignore-path .eslintignore --fix"],
         "*.{html,md,yml}": ["prettier --ignore-path .eslintignore --single-quote --write"]
