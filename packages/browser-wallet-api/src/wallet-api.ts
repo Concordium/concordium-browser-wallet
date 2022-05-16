@@ -50,7 +50,7 @@ class WalletApi implements IWalletApi {
     }
 
     public async connect(): Promise<boolean> {
-        this.connected = await this.messageHandler.sendMessage(MessageType.Connect);
+        this.connected = await this.messageHandler.sendMessage<boolean>(MessageType.Connect);
         return this.connected;
     }
 
@@ -62,12 +62,12 @@ class WalletApi implements IWalletApi {
     }
 
     // eslint-disable-next-line @typescript-eslint/no-explicit-any
-    private async sendMessage(type: MessageType, payload?: any) {
+    private async sendMessage<R>(type: MessageType, payload?: any): Promise<R> {
         if (!this.connected && !(await this.connect())) {
             throw new Error('Connection not allowed by wallet');
         }
 
-        return this.messageHandler.sendMessage(type, payload);
+        return this.messageHandler.sendMessage<R>(type, payload);
     }
 
     private handleEvent(type: EventType) {

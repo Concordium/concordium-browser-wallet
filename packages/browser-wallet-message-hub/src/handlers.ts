@@ -17,7 +17,7 @@ type MessageFilter<M extends BaseMessage> = (msg: M) => boolean;
 
 export type PostMessageHandler<M extends BaseMessage | unknown = WalletResponse | WalletEvent> = (message: M) => void;
 
-export type ExtensionMessageHandler<M extends BaseMessage | unknown = WalletMessage | WalletEvent> = (
+export type ExtensionMessageHandler<M extends BaseMessage | unknown = WalletMessage> = (
     message: M,
     sender: chrome.runtime.MessageSender,
     // eslint-disable-next-line @typescript-eslint/no-explicit-any
@@ -33,7 +33,7 @@ export type MessageHandler<M extends BaseMessage | unknown> = (
 
 abstract class BaseMessageHandler<M extends BaseMessage = WalletMessage> {
     /**
-     * Handle messages fitlered by the passed "fiter" callback. Usually you'd add 1 handler pr. message.
+     * Handle messages fitlered by the passed "filter" callback. Usually you'd add 1 handler pr. message.
      *
      * @example
      * const unsub = messageHandler.handleMessage((msg) => msg.messageType === MessageType.SendTransaction, (msg, sender, respond) => respond(true));
@@ -50,7 +50,7 @@ abstract class BaseMessageHandler<M extends BaseMessage = WalletMessage> {
     }
 
     /**
-     * Handle first message matching the passed "fiter" callback. Unsubscribes automatically when handled.
+     * Handle first message matching the passed "filter" callback. Unsubscribes automatically when handled.
      *
      * @example
      * const unsub = messageHandler.handleOnce((msg) => msg.eventType === EventType.PopupReady, (msg, sender, respond) => respond(true));
@@ -91,7 +91,7 @@ export class InjectedMessageHandler extends BaseMessageHandler<WalletResponse | 
      */
     // TODO would be nice to make this more type safe.
     // eslint-disable-next-line @typescript-eslint/no-explicit-any
-    public sendMessage(type: MessageType, payload?: any): Promise<any> {
+    public async sendMessage<R>(type: MessageType, payload?: any): Promise<R> {
         const msg = new WalletMessage(type, payload);
         window.postMessage(msg);
 
@@ -141,8 +141,8 @@ export class ContentMessageHandler {
     /**
      * Send content script init event to chrome runtime
      */
-    public sendInitEvent() {
-        chrome.runtime.sendMessage(new WalletMessage(InternalMessageType.Init));
+    public async sendInitEvent() {
+        return chrome.runtime.sendMessage(new WalletMessage(InternalMessageType.Init));
     }
 
     private setupMessageBridge() {
@@ -150,22 +150,25 @@ export class ContentMessageHandler {
         window.addEventListener('message', ({ data }) => {
             if (isMessage(data)) {
                 // eslint-disable-next-line @typescript-eslint/no-explicit-any
-                chrome.runtime.sendMessage(data, (response: any) =>
-                    window.postMessage(new WalletResponse(data, response))
-                );
+                chrome.runtime
+                    .sendMessage(data)
+                    .then((response) => window.postMessage(new WalletResponse(data, response)));
             }
         });
 
         // Propagate events from extension -> inject
-        chrome.runtime.onMessage.addListener((msg) => {
+        chrome.runtime.onMessage.addListener((msg, _, respond) => {
             if (isEvent(msg)) {
                 window.postMessage(msg);
+                respond();
             }
+
+            return false;
         });
     }
 }
 
-export class ExtensionsMessageHandler extends BaseMessageHandler<WalletMessage | WalletEvent> {
+export class ExtensionsMessageHandler extends BaseMessageHandler<WalletMessage> {
     /**
      * Send event of specific type with optional payload and response handler
      *
@@ -173,14 +176,13 @@ export class ExtensionsMessageHandler extends BaseMessageHandler<WalletMessage |
      * handler.sendInternalMessage(InternalMessageType.SignMessage, "Hello world!", handleResponse);
      */
     // TODO would be nice to make this more type safe.
-    public sendInternalMessage(
+    public async sendInternalMessage(
         type: InternalMessageType,
         // eslint-disable-next-line @typescript-eslint/no-explicit-any
-        payload?: any,
+        payload?: any
         // eslint-disable-next-line @typescript-eslint/no-explicit-any
-        onResponse: (response: any) => void = () => {}
-    ): void {
-        chrome.runtime.sendMessage(new WalletMessage(type, payload), onResponse);
+    ) {
+        return chrome.runtime.sendMessage(new WalletMessage(type, payload));
     }
 
     /**
@@ -193,33 +195,30 @@ export class ExtensionsMessageHandler extends BaseMessageHandler<WalletMessage |
     // eslint-disable-next-line @typescript-eslint/no-explicit-any
     public broadcast(type: EventType, payload?: any): void {
         // For now, send the message to all tabs. TODO figure out how to send only to connected tabs.
-        chrome.tabs.query({}, (tabs) =>
+        chrome.tabs.query({}).then((tabs) =>
             tabs
                 .filter((t) => t.id !== undefined)
                 .forEach((t) => {
-                    chrome.tabs.sendMessage(t.id as number, new WalletEvent(type, payload));
+                    (
+                        chrome.tabs.sendMessage(
+                            t.id as number,
+                            new WalletEvent(type, payload)
+                            // type returned from type definition is wrong compared to documentation: https://developer.chrome.com/docs/extensions/reference/tabs/#method-sendMessage
+                        ) as unknown as Promise<void>
+                    ).catch(() => {});
                 })
         );
     }
 
-    public override handleMessage(
-        filter: MessageFilter<WalletMessage | WalletEvent>,
-        handler: ExtensionMessageHandler
-    ): Unsubscribe {
+    public override handleMessage(filter: MessageFilter<WalletMessage>, handler: ExtensionMessageHandler): Unsubscribe {
         return super.handleMessage(filter, this.ensureHandlerArgs(handler));
     }
 
-    public override handleOnce(
-        filter: MessageFilter<WalletMessage | WalletEvent>,
-        handler: ExtensionMessageHandler
-    ): Unsubscribe {
+    public override handleOnce(filter: MessageFilter<WalletMessage>, handler: ExtensionMessageHandler): Unsubscribe {
         return super.handleOnce(filter, this.ensureHandlerArgs(handler));
     }
 
-    protected canHandleMessage(
-        msg: unknown,
-        filter: MessageFilter<WalletMessage | WalletEvent>
-    ): msg is WalletMessage | WalletEvent {
+    protected canHandleMessage(msg: unknown, filter: MessageFilter<WalletMessage>): msg is WalletMessage {
         return isMessage(msg) && filter(msg);
     }
 
@@ -229,7 +228,7 @@ export class ExtensionsMessageHandler extends BaseMessageHandler<WalletMessage |
         return () => chrome.runtime.onMessage.removeListener(handler);
     }
 
-    private ensureHandlerArgs(handler: ExtensionMessageHandler): MessageHandler<WalletMessage | WalletEvent> {
+    private ensureHandlerArgs(handler: ExtensionMessageHandler): MessageHandler<WalletMessage> {
         return (msg, sender, respond) => {
             if (sender === undefined || respond === undefined) {
                 throw new Error('Unreachable');

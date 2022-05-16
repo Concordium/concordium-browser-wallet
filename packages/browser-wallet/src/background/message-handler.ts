@@ -49,9 +49,11 @@ export const handlePopupRequest = <P, R>(
 ): void => {
     // Wrap handler in helper ensuring a popup window is available and ready to handle incomming messages.
     const handler = ensureAvailableWindow((msg, sender, respond) => {
-        bgMessageHandler.sendInternalMessage(internalMessageType, handleMessage(msg, sender), (r) =>
-            handleResponse(r, msg, sender).then(respond)
-        );
+        bgMessageHandler
+            .sendInternalMessage(internalMessageType, handleMessage(msg, sender))
+            .then((r) => handleResponse(r, msg, sender))
+            .then(respond);
+
         return true;
     });
 

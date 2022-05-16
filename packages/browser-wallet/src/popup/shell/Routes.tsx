@@ -11,6 +11,7 @@ import SendTransaction from '@popup/pages/SendTransaction';
 import Setup from '@popup/pages/Setup';
 import ConnectionRequest from '@popup/pages/ConnectionRequest';
 import { popupMessageHandler } from '@popup/shared/message-handler';
+import { noOp } from '@shared/utils/basicHelpers';
 
 type PromptKey = keyof Omit<typeof absoluteRoutes['prompt'], 'path'>;
 
@@ -49,7 +50,7 @@ export default function Routes() {
     const handleSignMessageResponse = useMessagePrompt<void>(InternalMessageType.SignMessage, 'signMessage');
 
     useEffect(() => {
-        popupMessageHandler.sendInternalMessage(InternalMessageType.PopupReady);
+        popupMessageHandler.sendInternalMessage(InternalMessageType.PopupReady).catch(noOp);
     }, []);
 
     return (
