@@ -3,6 +3,7 @@ import mainLayout from '@popup/page-layouts/MainLayout/i18n/en';
 import account from '@popup/pages/Account/i18n/en';
 import setup from '@popup/pages/Setup/i18n/en';
 import sendTransaction from '@popup/pages/SendTransaction/i18n/en';
+import displayTransaction from '@popup/pages/SendTransaction/displayTransaction/i18n/en';
 import signMessage from '@popup/pages/SignMessage/i18n/en';
 
 const t = {
@@ -11,6 +12,7 @@ const t = {
     account,
     setup,
     sendTransaction,
+    displayTransaction,
     signMessage,
 };
 

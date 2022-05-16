@@ -1,5 +1,7 @@
 const t = {
-    description: 'Send transaction',
+    description: 'Transaction overview',
+    sendTransaction: 'Send transaction',
+    sender: 'Sender',
 };
 
 export default t;

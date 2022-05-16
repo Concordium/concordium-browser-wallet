@@ -16,7 +16,7 @@ export default function Routes() {
         // TODO use message hub to subscribe to messages.
         chrome.runtime.onMessage.addListener((msg) => {
             // TODO resolve route based on incoming message.
-            navigate(absoluteRoutes.signMessage.path, { state: msg });
+            navigate(absoluteRoutes.sendMessage.path, { state: msg });
         });
     }, []);
 

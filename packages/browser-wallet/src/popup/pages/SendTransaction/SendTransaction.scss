@@ -1,3 +1,7 @@
 .send-transaction {
     display: block;
+
+    &__address {
+        word-break: break-all;
+    }
 }
