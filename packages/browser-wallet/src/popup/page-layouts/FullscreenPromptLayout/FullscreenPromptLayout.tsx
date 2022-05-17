@@ -1,7 +1,8 @@
 import React, { createContext, useRef, useCallback } from 'react';
 import { Outlet, useNavigate } from 'react-router-dom';
 
-import { noOp } from '@shared/utils/basicHelpers';
+import { noOp } from '@shared/utils/basic-helpers';
+import { isSpawnedWindow } from '@popup/shared/window-helpers';
 
 type OnCloseHandler = () => void;
 type Unsubscribe = () => void;
@@ -36,7 +37,12 @@ export default function FullscreenPromptLayout() {
     const closeHandler = useRef<OnCloseHandler>();
     const close = () => {
         closeHandler?.current?.();
-        goBack();
+
+        if (isSpawnedWindow) {
+            window.close();
+        } else {
+            goBack();
+        }
     };
     const withClose: WithClose = useCallback(
         (action, ...args) =>

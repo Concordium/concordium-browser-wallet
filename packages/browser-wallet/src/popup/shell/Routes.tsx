@@ -11,7 +11,7 @@ import SendTransaction from '@popup/pages/SendTransaction';
 import Setup from '@popup/pages/Setup';
 import ConnectionRequest from '@popup/pages/ConnectionRequest';
 import { popupMessageHandler } from '@popup/shared/message-handler';
-import { noOp } from '@shared/utils/basicHelpers';
+import { noOp } from '@shared/utils/basic-helpers';
 
 type PromptKey = keyof Omit<typeof absoluteRoutes['prompt'], 'path'>;
 

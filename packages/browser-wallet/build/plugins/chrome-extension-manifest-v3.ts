@@ -5,7 +5,7 @@ import path from 'path';
 import { promises as fs } from 'fs';
 
 import packageJson from '@root/package.json';
-import { throwIfUndefined } from '@shared/utils/functionHelpers';
+import { throwIfUndefined } from '@shared/utils/function-helpers';
 
 export type Configuration = {
     /**

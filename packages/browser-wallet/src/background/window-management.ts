@@ -1,6 +1,7 @@
 import { ExtensionMessageHandler, InternalMessageType } from '@concordium/browser-wallet-message-hub';
 
 import { height, width } from '@popup/constants/dimensions';
+import { spawnedPopupUrl } from '@shared/constants/url';
 // eslint-disable-next-line import/no-cycle
 import { onMessage } from './event-handling';
 // eslint-disable-next-line import/no-cycle
@@ -16,7 +17,7 @@ export const spawnPopup = async (): Promise<chrome.windows.Window> => {
     const left = (lastFocused.left ?? 0) + ((lastFocused.width ?? 0) - width);
 
     const window = chrome.windows.create({
-        url: 'popup.html',
+        url: spawnedPopupUrl,
         type: 'popup',
         width,
         height,
@@ -33,11 +34,7 @@ export const spawnPopup = async (): Promise<chrome.windows.Window> => {
 /**
  * Checks if a popup id open and available.
  */
-const testPopupOpen = () =>
-    bgMessageHandler
-        .sendInternalMessage(InternalMessageType.TestPopupOpen)
-        .then(() => true)
-        .catch(() => false);
+const testPopupOpen = () => bgMessageHandler.sendInternalMessage(InternalMessageType.TestPopupOpen).catch(() => false);
 
 let popupId: number | undefined;
 
