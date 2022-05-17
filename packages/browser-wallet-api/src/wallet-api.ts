@@ -9,11 +9,11 @@ import {
 type WalletEventHandler<T = any> = (payload: T) => void;
 
 export interface IWalletApi {
+    addChangeAccountListener(handler: WalletEventHandler<string>): void;
     sendTransaction(): Promise<boolean>;
     // eslint-disable-next-line @typescript-eslint/no-explicit-any
     signMessage(): Promise<any>;
-    // eslint-disable-next-line @typescript-eslint/no-explicit-any
-    getAccounts(): Promise<any[]>;
+    connect(): Promise<string | undefined>;
 }
 
 class WalletApi implements IWalletApi {
@@ -41,17 +41,18 @@ class WalletApi implements IWalletApi {
     }
 
     /**
-     * Requests list of accounts from the current connected network
+     * Requests connection to wallet. Resolves with account address or rejects if rejected in wallet.
      */
-    // TODO use proper account type
-    // eslint-disable-next-line @typescript-eslint/no-explicit-any
-    public getAccounts(): Promise<any[]> {
-        return this.sendMessage(MessageType.GetAccounts);
-    }
+    public async connect(): Promise<string | undefined> {
+        const response = await this.messageHandler.sendMessage<string | undefined | false>(MessageType.Connect);
 
-    public async connect(): Promise<boolean> {
-        this.connected = await this.messageHandler.sendMessage<boolean>(MessageType.Connect);
-        return this.connected;
+        if (response === false) {
+            throw new Error('Connection rejected');
+        }
+
+        this.connected = true;
+
+        return response;
     }
 
     /**

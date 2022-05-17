@@ -7,7 +7,7 @@
             function concordiumReady() {
                 document
                     .getElementById('connect')
-                    .addEventListener('click', () => window.concordium.connect().then(alert));
+                    .addEventListener('click', () => window.concordium.connect().then(alert).catch(alert));
                 document
                     .getElementById('send')
                     .addEventListener('click', () => window.concordium.sendTransaction().then(alert));

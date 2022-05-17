@@ -4,7 +4,7 @@ import {
     InternalMessageType,
     MessageType,
 } from '@concordium/browser-wallet-message-hub';
-import { storedUrlWhitelist } from '@shared/storage/access';
+import { storedSelectedAccount, storedUrlWhitelist } from '@shared/storage/access';
 
 import bgMessageHandler, { HandleMessage, handlePopupRequest, HandleResponse, RunCondition } from './message-handler';
 
@@ -48,11 +48,16 @@ const runIfWhitelisted: RunCondition<false> = async (_msg, sender) => {
 /**
  * Run condition which looks up url in stored whitelist. Runs handler if url is NOT included in whitelist.
  */
-const runIfNotWhitelisted: RunCondition<boolean> = async (_msg, sender) => {
+const runIfNotWhitelisted: RunCondition<string | undefined> = async (_msg, sender) => {
     const whitelist = (await storedUrlWhitelist.get()) ?? [];
 
-    if (sender.url !== undefined && whitelist.includes(sender.url)) {
-        return { run: false, response: true };
+    if (!sender.url) {
+        throw new Error('Expected url to be available for sender.');
+    }
+
+    if (whitelist.includes(sender.url)) {
+        const selectedAccount = await storedSelectedAccount.get();
+        return { run: false, response: selectedAccount };
     }
 
     return { run: true };
@@ -63,13 +68,21 @@ const handleConnectMessage: HandleMessage<{ url: string | undefined; title: stri
     { url, tab }
 ) => ({ url, title: tab?.title });
 
-const handleConnectionResponse: HandleResponse<boolean> = async (response: boolean, _msg, sender) => {
+const handleConnectionResponse: HandleResponse<string | undefined | false> = async (
+    response: boolean,
+    _msg,
+    sender
+) => {
     if (!sender.url) {
-        return response;
+        throw new Error('Expected url to be available for sender.');
     }
 
-    const whitelist = (await storedUrlWhitelist.get()) ?? [];
-    storedUrlWhitelist.set([...whitelist, sender.url]);
+    if (response !== false) {
+        const whitelist = (await storedUrlWhitelist.get()) ?? [];
+        storedUrlWhitelist.set([...whitelist, sender.url]);
+
+        return storedSelectedAccount.get();
+    }
 
     return response;
 };
