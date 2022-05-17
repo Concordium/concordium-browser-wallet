@@ -3,6 +3,8 @@ import { ExtensionMessageHandler, InternalMessageType } from '@concordium/browse
 import { height, width } from '@popup/constants/dimensions';
 // eslint-disable-next-line import/no-cycle
 import { onMessage } from './event-handling';
+// eslint-disable-next-line import/no-cycle
+import bgMessageHandler from './message-handler';
 
 /**
  * Spawns a new popup on screen. Returning promise resolves when it receives a ready event from the popup
@@ -28,13 +30,28 @@ export const spawnPopup = async (): Promise<chrome.windows.Window> => {
     return window;
 };
 
+/**
+ * Checks if a popup id open and available.
+ */
+const testPopupOpen = () =>
+    bgMessageHandler
+        .sendInternalMessage(InternalMessageType.TestPopupOpen)
+        .then(() => true)
+        .catch(() => false);
+
 let popupId: number | undefined;
 
 /**
- * Attempts to get a popup window that has an ID matching the one stored.
+ * Try focusing an existing popup window.
  */
-export const getPopup = (): Promise<chrome.windows.Window | undefined> =>
-    chrome.windows.getAll().then((ws) => ws.find((w) => w.type === 'popup' && w.id === popupId));
+const focusExisting = async () => {
+    try {
+        await chrome.windows.update(popupId as number, { focused: true });
+    } catch {
+        // no popup was found. It's safe to assume the popup with id: "popupId" has been closed.
+        popupId = undefined;
+    }
+};
 
 /**
  * Ensures the handler is executed when a popup window is on screen.
@@ -43,8 +60,14 @@ export const ensureAvailableWindow =
     (handler: ExtensionMessageHandler): ExtensionMessageHandler =>
     (...args) => {
         (async () => {
-            const w = (await getPopup()) ?? (await spawnPopup());
-            popupId = w.id;
+            const isOpen = await testPopupOpen();
+
+            if (!isOpen) {
+                const { id } = await spawnPopup();
+                popupId = id;
+            } else {
+                focusExisting();
+            }
 
             handler(...args);
         })();

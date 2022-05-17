@@ -35,6 +35,7 @@ export enum InternalMessageType {
     SendTransaction = 'I_SendTransaction',
     SignMessage = 'I_SignMessage',
     Connect = 'I_Connect',
+    TestPopupOpen = 'I_TestPopupOpen',
 }
 
 /**

@@ -173,7 +173,7 @@ export class ExtensionsMessageHandler extends BaseMessageHandler<WalletMessage> 
      * Send event of specific type with optional payload and response handler
      *
      * @example
-     * handler.sendInternalMessage(InternalMessageType.SignMessage, "Hello world!", handleResponse);
+     * handler.sendInternalMessage(InternalMessageType.SignMessage, "Hello world!").then(handleResponse);
      */
     // TODO would be nice to make this more type safe.
     public async sendInternalMessage(
