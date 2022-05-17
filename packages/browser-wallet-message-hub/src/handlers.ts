@@ -169,6 +169,10 @@ export class ContentMessageHandler {
 }
 
 export class ExtensionsMessageHandler extends BaseMessageHandler<WalletMessage> {
+    constructor(private whitelistedUrls: { get(): Promise<string[] | undefined> }) {
+        super();
+    }
+
     /**
      * Send event of specific type with optional payload and response handler
      *
@@ -194,20 +198,14 @@ export class ExtensionsMessageHandler extends BaseMessageHandler<WalletMessage> 
     // TODO would be nice to make this more type safe.
     // eslint-disable-next-line @typescript-eslint/no-explicit-any
     public broadcast(type: EventType, payload?: any): void {
-        // For now, send the message to all tabs. TODO figure out how to send only to connected tabs.
-        chrome.tabs.query({}).then((tabs) =>
-            tabs
-                .filter((t) => t.id !== undefined)
-                .forEach((t) => {
-                    (
-                        chrome.tabs.sendMessage(
-                            t.id as number,
-                            new WalletEvent(type, payload)
-                            // type returned from type definition is wrong compared to documentation: https://developer.chrome.com/docs/extensions/reference/tabs/#method-sendMessage
-                        ) as unknown as Promise<void>
-                    ).catch(() => {});
-                })
-        );
+        chrome.tabs
+            .query({}) // get all
+            .then(this.getWhitelistedTabs.bind(this))
+            .then((tabs) =>
+                tabs
+                    .filter(({ id }) => id !== undefined)
+                    .forEach((t) => this.sendEventToTab(t.id as number, new WalletEvent(type, payload)))
+            );
     }
 
     public override handleMessage(filter: MessageFilter<WalletMessage>, handler: ExtensionMessageHandler): Unsubscribe {
@@ -236,5 +234,23 @@ export class ExtensionsMessageHandler extends BaseMessageHandler<WalletMessage> 
 
             return handler(msg, sender, respond);
         };
+    }
+
+    private async getWhitelistedTabs(tabs: chrome.tabs.Tab[]): Promise<chrome.tabs.Tab[]> {
+        const whitelistedUrls = await this.whitelistedUrls.get();
+        return tabs.filter(({ url }) => url !== undefined && whitelistedUrls?.includes(url));
+    }
+
+    private async sendEventToTab(tabId: number, event: WalletEvent) {
+        try {
+            const response = chrome.tabs.sendMessage(
+                tabId,
+                event
+                // type returned from type definition is wrong compared to documentation: https://developer.chrome.com/docs/extensions/reference/tabs/#method-sendMessage
+            ) as unknown as Promise<void>;
+            await response;
+        } catch {
+            // This is expected, as we don't ever expect a response to be sent to events broadcasted from the extension.
+        }
     }
 }

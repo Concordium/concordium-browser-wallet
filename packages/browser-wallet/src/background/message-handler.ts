@@ -7,11 +7,12 @@ import {
     WalletEvent,
     WalletMessage,
 } from '@concordium/browser-wallet-message-hub';
+import { storedUrlWhitelist } from '@shared/storage/access';
 
 // eslint-disable-next-line import/no-cycle
 import { ensureAvailableWindow } from './window-management';
 
-const bgMessageHandler = new ExtensionsMessageHandler();
+const bgMessageHandler = new ExtensionsMessageHandler(storedUrlWhitelist);
 
 export default bgMessageHandler;
 
