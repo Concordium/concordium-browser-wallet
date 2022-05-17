@@ -3,9 +3,7 @@ import { ExtensionMessageHandler, InternalMessageType } from '@concordium/browse
 import { height, width } from '@popup/constants/dimensions';
 import { spawnedPopupUrl } from '@shared/constants/url';
 // eslint-disable-next-line import/no-cycle
-import { onMessage } from './event-handling';
-// eslint-disable-next-line import/no-cycle
-import bgMessageHandler from './message-handler';
+import bgMessageHandler, { onMessage } from './message-handler';
 
 /**
  * Spawns a new popup on screen. Returning promise resolves when it receives a ready event from the popup

@@ -17,7 +17,7 @@ export default function SendTransaction({ onSubmit }: Props) {
             <div>{t('description')}</div>
             {JSON.stringify(state)}
             <button type="button" onClick={withClose(onSubmit)}>
-                Submit
+                {t('submit')}
             </button>
         </>
     );

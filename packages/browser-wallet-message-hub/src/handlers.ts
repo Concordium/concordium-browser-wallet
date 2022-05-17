@@ -157,13 +157,10 @@ export class ContentMessageHandler {
         });
 
         // Propagate events from extension -> inject
-        chrome.runtime.onMessage.addListener((msg, _, respond) => {
+        chrome.runtime.onMessage.addListener((msg) => {
             if (isEvent(msg)) {
                 window.postMessage(msg);
-                respond();
             }
-
-            return false;
         });
     }
 }
@@ -184,7 +181,6 @@ export class ExtensionsMessageHandler extends BaseMessageHandler<WalletMessage> 
         type: InternalMessageType,
         // eslint-disable-next-line @typescript-eslint/no-explicit-any
         payload?: any
-        // eslint-disable-next-line @typescript-eslint/no-explicit-any
     ) {
         return chrome.runtime.sendMessage(new WalletMessage(type, payload));
     }

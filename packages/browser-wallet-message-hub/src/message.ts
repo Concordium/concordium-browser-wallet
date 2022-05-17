@@ -1,21 +1,6 @@
 /* eslint-disable max-classes-per-file */
 import { v4 as uuidv4 } from 'uuid';
 
-// export type IMessage<T extends keyof typeof MessageType = any> = {
-//     type: T;
-//     id: typeof FILTER_MARKER_GUID;
-// };
-
-// export type InitMessage = IMessage<MessageType.Init>;
-
-// export type Transaction = {
-//     payload: unknown;
-// };
-
-// export type SendTransactionMessage = IMessage<MessageType.SendTransaction> & {
-//     transaction: Transaction;
-// };
-
 /**
  * Enumeration of the different types of messages that can be sent from the wallet API to the extension
  */

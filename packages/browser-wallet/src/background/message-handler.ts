@@ -4,6 +4,7 @@ import {
     ExtensionsMessageHandler,
     InternalMessageType,
     MessageType,
+    Payload,
     WalletEvent,
     WalletMessage,
 } from '@concordium/browser-wallet-message-hub';
@@ -73,3 +74,13 @@ export const handlePopupRequest = <P, R>(
 
     bgMessageHandler.handleMessage(createMessageTypeFilter(messageType), conditionalHandler);
 };
+
+/**
+ * Makes a promise that resolves when an internal message is fired, exposing the internal message payload
+ */
+export const onMessage = (type: InternalMessageType): Promise<Payload> =>
+    new Promise((resolve) => {
+        bgMessageHandler.handleOnce(createMessageTypeFilter(type), (msg) => {
+            resolve(msg.payload);
+        });
+    });
