@@ -1,4 +1,4 @@
-import React, { createContext, useRef, useCallback } from 'react';
+import React, { createContext, useRef, useCallback, useMemo } from 'react';
 import { Outlet, useNavigate } from 'react-router-dom';
 
 import { noOp } from '@shared/utils/basic-helpers';
@@ -35,7 +35,7 @@ export default function FullscreenPromptLayout() {
     const goBack = useNavigateBack();
 
     const closeHandler = useRef<OnCloseHandler>();
-    const close = () => {
+    const close = useCallback(() => {
         closeHandler?.current?.();
 
         if (isSpawnedWindow) {
@@ -43,7 +43,8 @@ export default function FullscreenPromptLayout() {
         } else {
             goBack();
         }
-    };
+    }, []);
+
     const withClose: WithClose = useCallback(
         (action, ...args) =>
             () => {
@@ -61,9 +62,10 @@ export default function FullscreenPromptLayout() {
         };
     }, []);
 
+    const contextValue: FullscreenPromptContext = useMemo(() => ({ onClose, withClose }), [onClose, withClose]);
+
     return (
-        // eslint-disable-next-line react/jsx-no-constructed-context-values
-        <fullscreenPromptContext.Provider value={{ onClose, withClose }}>
+        <fullscreenPromptContext.Provider value={contextValue}>
             <div className="fullscreen-prompt-layout">
                 <button className="fullscreen-prompt-layout__close" type="button" onClick={() => close()}>
                     X

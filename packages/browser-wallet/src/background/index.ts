@@ -6,7 +6,8 @@ import {
 } from '@concordium/browser-wallet-message-hub';
 import { storedSelectedAccount, storedUrlWhitelist } from '@shared/storage/access';
 
-import bgMessageHandler, { HandleMessage, handlePopupRequest, HandleResponse, RunCondition } from './message-handler';
+import bgMessageHandler from './message-handler';
+import { forwardToPopup, HandleMessage, HandleResponse, RunCondition } from './window-management';
 
 /**
  * Callback method which installs Injected script into Main world of Dapp
@@ -87,12 +88,12 @@ const handleConnectionResponse: HandleResponse<string | undefined | false> = asy
     return response;
 };
 
-handlePopupRequest(
+forwardToPopup(
     MessageType.Connect,
     InternalMessageType.Connect,
     runIfNotWhitelisted,
     handleConnectMessage,
     handleConnectionResponse
 );
-handlePopupRequest(MessageType.SendTransaction, InternalMessageType.SendTransaction, runIfWhitelisted);
-handlePopupRequest(MessageType.SignMessage, InternalMessageType.SignMessage, runIfWhitelisted);
+forwardToPopup(MessageType.SendTransaction, InternalMessageType.SendTransaction, runIfWhitelisted);
+forwardToPopup(MessageType.SignMessage, InternalMessageType.SignMessage, runIfWhitelisted);

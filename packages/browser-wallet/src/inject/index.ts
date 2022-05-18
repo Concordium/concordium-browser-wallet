@@ -1,4 +1,3 @@
-/* eslint-disable no-console */
 import { IWalletApi, walletApi } from '@concordium/browser-wallet-api';
 
 // Inject WalletAPI to dApp
