@@ -43,20 +43,40 @@ class CorrelationMessage extends BaseMessage {
     public correlationId = uuidv4();
 }
 
+/**
+ * Used for broadcasting from extension to browser tabs (content/inject).
+ */
 export class WalletEvent extends BaseMessage {
     constructor(public eventType: EventType, public payload?: Payload) {
         super();
     }
 }
 
+/**
+ * Used for extension communication, both internal and from content/inject to extension.
+ */
 export class WalletMessage extends CorrelationMessage {
     constructor(public messageType: MessageType | InternalMessageType, public payload?: Payload) {
         super();
     }
 }
 
+/**
+ * Used for responses for WalletMessages.
+ */
 export class WalletResponse extends CorrelationMessage {
     constructor(message: WalletMessage, public payload?: Payload) {
+        super();
+
+        this.correlationId = message.correlationId;
+    }
+}
+
+/**
+ * Can be used to propagate errors across extension contexts.
+ */
+export class WalletError extends CorrelationMessage {
+    constructor(message: WalletMessage, public error: string | null = null) {
         super();
 
         this.correlationId = message.correlationId;
@@ -74,3 +94,6 @@ export const isMessage = (msg: unknown): msg is WalletMessage =>
 
 export const isResponse = (msg: unknown): msg is WalletResponse =>
     isBaseMessage(msg) && !isMessage(msg) && !isEvent(msg);
+
+export const isError = (msg: unknown): msg is WalletError =>
+    isBaseMessage(msg) && (msg as WalletError).error !== undefined;

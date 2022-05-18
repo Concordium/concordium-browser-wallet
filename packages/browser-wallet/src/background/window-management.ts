@@ -3,6 +3,7 @@ import {
     ExtensionMessageHandler,
     InternalMessageType,
     MessageType,
+    WalletError,
     WalletEvent,
     WalletMessage,
 } from '@concordium/browser-wallet-message-hub';
@@ -113,7 +114,8 @@ export const forwardToPopup = <P, R>(
         bgMessageHandler
             .sendInternalMessage(internalMessageType, handleMessage(msg, sender))
             .then((r) => handleResponse(r, msg, sender))
-            .then(respond);
+            .then(respond)
+            .catch((e: Error) => respond(new WalletError(msg, e.message))); // Usually if popup is closed prior to a response being sent.
 
         return true;
     });

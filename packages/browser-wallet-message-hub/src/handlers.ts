@@ -10,6 +10,8 @@ import {
     MessageType,
     EventType,
     InternalMessageType,
+    WalletError,
+    isError,
 } from './message';
 
 type Unsubscribe = () => void;
@@ -80,7 +82,7 @@ abstract class BaseMessageHandler<M extends BaseMessage = WalletMessage> {
     protected abstract onAddHandler(handler: MessageHandler<unknown>): Unsubscribe;
 }
 
-export class InjectedMessageHandler extends BaseMessageHandler<WalletResponse | WalletEvent> {
+export class InjectedMessageHandler extends BaseMessageHandler<WalletResponse | WalletEvent | WalletError> {
     /**
      * Send message of specific type with optional payload
      *
@@ -95,23 +97,23 @@ export class InjectedMessageHandler extends BaseMessageHandler<WalletResponse | 
         const msg = new WalletMessage(type, payload);
         window.postMessage(msg);
 
-        return new Promise((resolve) => {
+        return new Promise((resolve, reject) => {
             this.handleOnce(
-                (mr) => isResponse(mr) && msg.correlationId === mr.correlationId,
-                (mr) => resolve(mr.payload)
+                (mr) => (isResponse(mr) || isError(mr)) && msg.correlationId === mr.correlationId,
+                (mr) => (isError(mr) ? reject(mr.error) : resolve(mr.payload))
             );
         });
     }
 
     public override handleMessage(
-        filter: MessageFilter<WalletResponse | WalletEvent>,
+        filter: MessageFilter<WalletResponse | WalletEvent | WalletError>,
         handler: PostMessageHandler
     ): Unsubscribe {
         return super.handleMessage(filter, handler);
     }
 
     public override handleOnce(
-        filter: MessageFilter<WalletResponse | WalletEvent>,
+        filter: MessageFilter<WalletResponse | WalletEvent | WalletError>,
         handler: PostMessageHandler
     ): Unsubscribe {
         return super.handleOnce(filter, handler);
@@ -119,8 +121,8 @@ export class InjectedMessageHandler extends BaseMessageHandler<WalletResponse | 
 
     protected canHandleMessage(
         msg: unknown,
-        filter: MessageFilter<WalletResponse | WalletEvent>
-    ): msg is WalletResponse | WalletEvent {
+        filter: MessageFilter<WalletResponse | WalletEvent | WalletError>
+    ): msg is WalletResponse | WalletEvent | WalletError {
         return (isResponse(msg) || isEvent(msg)) && filter(msg);
     }
 
@@ -147,12 +149,20 @@ export class ContentMessageHandler {
 
     private setupMessageBridge() {
         // Propagate messages from inject -> extension
-        window.addEventListener('message', ({ data }) => {
-            if (isMessage(data)) {
+        window.addEventListener('message', ({ data: msg }) => {
+            if (isMessage(msg)) {
                 // eslint-disable-next-line @typescript-eslint/no-explicit-any
                 chrome.runtime
-                    .sendMessage(data)
-                    .then((response) => window.postMessage(new WalletResponse(data, response)));
+                    .sendMessage(msg)
+                    .then((response: WalletError | unknown) => {
+                        if (isError(response)) {
+                            // If an error is thrown in the background script, propagate it to inject.
+                            throw new Error(response.error ?? undefined);
+                        }
+
+                        window.postMessage(new WalletResponse(msg, response));
+                    })
+                    .catch((error: Error) => window.postMessage(new WalletError(msg, error.message)));
             }
         });
 
