@@ -424,6 +424,7 @@ __metadata:
   resolution: "@concordium/browser-wallet-api@workspace:packages/browser-wallet-api"
   dependencies:
     "@concordium/browser-wallet-message-hub": 0.1.0
+    "@concordium/web-sdk": "link:../../../concordium-node-sdk-js/packages/web"
   languageName: unknown
   linkType: soft
 
@@ -468,6 +469,12 @@ __metadata:
 "@concordium/web-sdk@link:../../../concordium-node-sdk-js/packages/web::locator=%40concordium%2Fbrowser-wallet%40workspace%3Apackages%2Fbrowser-wallet":
   version: 0.0.0-use.local
   resolution: "@concordium/web-sdk@link:../../../concordium-node-sdk-js/packages/web::locator=%40concordium%2Fbrowser-wallet%40workspace%3Apackages%2Fbrowser-wallet"
+  languageName: node
+  linkType: soft
+
+"@concordium/web-sdk@link:../../../concordium-node-sdk-js/packages/web::locator=%40concordium%2Fbrowser-wallet-api%40workspace%3Apackages%2Fbrowser-wallet-api":
+  version: 0.0.0-use.local
+  resolution: "@concordium/web-sdk@link:../../../concordium-node-sdk-js/packages/web::locator=%40concordium%2Fbrowser-wallet-api%40workspace%3Apackages%2Fbrowser-wallet-api"
   languageName: node
   linkType: soft
 

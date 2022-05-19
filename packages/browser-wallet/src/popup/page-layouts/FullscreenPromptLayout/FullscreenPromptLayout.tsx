@@ -8,7 +8,7 @@ type OnCloseHandler = () => void;
 type Unsubscribe = () => void;
 
 type OnClose = (handler: OnCloseHandler) => Unsubscribe;
-type WithClose = <F extends (...args: unknown[]) => void>(action: F, ...args: Parameters<F>) => () => void;
+type WithClose = <A extends unknown[], F extends (...args: A) => void>(action: F) => (...args: A) => void;
 
 type FullscreenPromptContext = {
     onClose: OnClose;
@@ -46,8 +46,8 @@ export default function FullscreenPromptLayout() {
     }, []);
 
     const withClose: WithClose = useCallback(
-        (action, ...args) =>
-            () => {
+        (action) =>
+            (...args) => {
                 action(...args);
                 close();
             },
