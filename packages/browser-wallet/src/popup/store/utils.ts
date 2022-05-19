@@ -1,26 +1,42 @@
+import {
+    StorageAccessor,
+    storedCredentials,
+    storedJsonRpcUrl,
+    storedSelectedAccount,
+    storedUrlWhitelist,
+} from '@shared/storage/access';
+import { ChromeStorageKey } from '@shared/storage/types';
 import { atom } from 'jotai';
 
-export enum ChromeStorageKey {
-    Credentials = 'credentials',
-    JsonRpcUrl = 'jsonRpcUrl',
-}
+const accessorMap = {
+    [ChromeStorageKey.Credentials]: storedCredentials,
+    [ChromeStorageKey.SelectedAccount]: storedSelectedAccount,
+    [ChromeStorageKey.JsonRpcUrl]: storedJsonRpcUrl,
+    [ChromeStorageKey.UrlWhitelist]: storedUrlWhitelist,
+};
 
 /**
  * @description
  * Create an atom that automatically syncs with chrome local storage.
  */
 export const atomWithChromeStorage = <V>(key: ChromeStorageKey, fallback: V) => {
+    const accessor = accessorMap[key] as unknown as StorageAccessor<V>;
+
+    if (accessor === undefined) {
+        throw new Error(`Could not find storage for key: ${key}`);
+    }
+
+    const { get: getStoredValue, set: setStoredValue } = accessor;
     const base = atom<V | undefined>(undefined);
-    const getValue = async () => (await chrome.storage.local.get(key))[key] as V;
 
     base.onMount = (setValue) => {
-        getValue().then(setValue);
+        getStoredValue().then(setValue);
     };
 
     const derived = atom(
-        async (get) => get(base) ?? (await getValue()) ?? fallback,
+        async (get) => get(base) ?? (await getStoredValue()) ?? fallback,
         (_, set, next: V) => {
-            chrome.storage.local.set({ [key]: next });
+            setStoredValue(next);
             set(base, next);
         }
     );

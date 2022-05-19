@@ -6,17 +6,28 @@
     "author": "Concordium",
     "license": "Apache",
     "private": true,
-    "workspaces": ["packages/*"],
+    "workspaces": [
+        "packages/*"
+    ],
     "packageManager": "yarn@3.2.0",
     "scripts": {
+        "lint": "eslint . --cache --max-warnings 0 --ext .ts,.tsx",
         "postinstall": "husky install",
         "test": "jest"
     },
     "lint-staged": {
-        "*.{js,jsx,ts,tsx}": ["eslint --cache --fix"],
-        "{*.json,.{eslintrc,prettierrc,stylelintrc}}": ["prettier --ignore-path .eslintignore --parser json --write"],
-        "*.{css,scss}": ["stylelint --ignore-path .eslintignore --fix"],
-        "*.{html,md,yml}": ["prettier --ignore-path .eslintignore --single-quote --write"]
+        "*.{js,jsx,ts,tsx}": [
+            "eslint --cache --fix --max-warnings 0"
+        ],
+        "{*.json,.{eslintrc,prettierrc,stylelintrc}}": [
+            "prettier --ignore-path .eslintignore --parser json --write"
+        ],
+        "*.{css,scss}": [
+            "stylelint --ignore-path .eslintignore --fix"
+        ],
+        "*.{html,md,yml}": [
+            "prettier --ignore-path .eslintignore --single-quote --write"
+        ]
     },
     "dependencies": {
         "@concordium/browser-wallet-api": "workspace:*",
