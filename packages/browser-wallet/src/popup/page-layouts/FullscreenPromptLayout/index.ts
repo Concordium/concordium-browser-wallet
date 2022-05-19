@@ -1,1 +1,1 @@
-export { default } from './FullscreenPromptLayout';
+export { default, fullscreenPromptContext } from './FullscreenPromptLayout';

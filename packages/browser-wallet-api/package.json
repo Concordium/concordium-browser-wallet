@@ -6,7 +6,6 @@
     "author": "Concordium",
     "license": "Apache",
     "dependencies": {
-        "@concordium/browser-wallet-message-hub": "0.1.0",
-        "eventemitter3": "3.1.0"
+        "@concordium/browser-wallet-message-hub": "0.1.0"
     }
 }

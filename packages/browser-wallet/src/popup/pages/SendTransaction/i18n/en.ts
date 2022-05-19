@@ -1,7 +1,7 @@
 const t = {
     description: 'Transaction overview',
-    sendTransaction: 'Send transaction',
     sender: 'Sender',
+    submit: 'Send',
 };
 
 export default t;

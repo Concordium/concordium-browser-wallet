@@ -5,6 +5,7 @@ import setup from '@popup/pages/Setup/i18n/en';
 import sendTransaction from '@popup/pages/SendTransaction/i18n/en';
 import displayTransaction from '@popup/pages/SendTransaction/displayTransaction/i18n/en';
 import signMessage from '@popup/pages/SignMessage/i18n/en';
+import connectionRequest from '@popup/pages/ConnectionRequest/i18n/en';
 
 const t = {
     shared,
@@ -14,6 +15,7 @@ const t = {
     sendTransaction,
     displayTransaction,
     signMessage,
+    connectionRequest,
 };
 
 export default t;

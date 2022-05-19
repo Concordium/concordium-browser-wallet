@@ -10,7 +10,7 @@ import {
     useFormState,
 } from 'react-hook-form';
 
-import { noOp } from '@shared/utils/basicHelpers';
+import { noOp } from '@shared/utils/basic-helpers';
 import { MakeOptional, MakeRequired } from '@shared/utils/types';
 import { RequiredControlledFieldProps, RequiredUncontrolledFieldProps } from './types';
 

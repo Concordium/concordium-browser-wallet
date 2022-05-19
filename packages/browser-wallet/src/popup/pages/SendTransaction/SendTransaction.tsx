@@ -1,6 +1,7 @@
-import React, { useCallback } from 'react';
+import React, { useContext, useCallback } from 'react';
 import { Buffer } from 'buffer/';
 import { useAtomValue } from 'jotai';
+import { fullscreenPromptContext } from '@popup/page-layouts/FullscreenPromptLayout';
 import { useTranslation } from 'react-i18next';
 import { useLocation, useNavigate } from 'react-router-dom';
 import {
@@ -43,6 +44,7 @@ export default function SendTransaction() {
     const address = useAtomValue(selectedAccountAtom);
     const creds = useAtomValue(credentialsAtom);
     const url = useAtomValue(jsonRpcUrlAtom);
+    const { withClose } = useContext(fullscreenPromptContext);
 
     const sendTransaction = useCallback(async () => {
         if (!url || !address) {
@@ -111,8 +113,8 @@ export default function SendTransaction() {
             {state.transactionType === AccountTransactionType.UpdateSmartContractInstance && (
                 <DisplayUpdateContract payload={state.transactionPayload} parameter={state.parameter} />
             )}
-            <button type="button" onClick={sendTransaction}>
-                {t('sendTransaction')}
+            <button type="button" onClick={withClose(sendTransaction)}>
+                {t('submit')}
             </button>
         </>
     );

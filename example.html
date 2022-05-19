@@ -1,0 +1,23 @@
+<!DOCTYPE html>
+<html>
+    <head>
+        <title>My cool dapp</title>
+        <meta charset="utf-8" />
+        <script>
+            function concordiumReady() {
+                document
+                    .getElementById('connect')
+                    .addEventListener('click', () => window.concordium.connect().then(alert).catch(alert));
+                document
+                    .getElementById('send')
+                    .addEventListener('click', () => window.concordium.sendTransaction().then(alert).catch(alert));
+                window.concordium.addChangeAccountListener(alert);
+            }
+        </script>
+    </head>
+
+    <body>
+        <button id="connect">Connect</button>
+        <button id="send">Send transaction</button>
+    </body>
+</html>

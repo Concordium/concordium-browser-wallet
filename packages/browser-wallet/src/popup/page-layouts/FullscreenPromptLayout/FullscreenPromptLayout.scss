@@ -1,3 +1,9 @@
 .fullscreen-prompt-layout {
-    display: block;
+    position: relative;
+
+    &__close {
+        position: absolute;
+        top: 1px;
+        right: 0;
+    }
 }

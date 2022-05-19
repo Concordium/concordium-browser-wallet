@@ -5,6 +5,7 @@ import setup from '@popup/pages/Setup/i18n/da';
 import sendTransaction from '@popup/pages/SendTransaction/i18n/da';
 import displayTransaction from '@popup/pages/SendTransaction/displayTransaction/i18n/da';
 import signMessage from '@popup/pages/SignMessage/i18n/da';
+import connectionRequest from '@popup/pages/ConnectionRequest/i18n/da';
 
 import type en from './en';
 
@@ -16,6 +17,7 @@ const t: typeof en = {
     sendTransaction,
     displayTransaction,
     signMessage,
+    connectionRequest,
 };
 
 export default t;
