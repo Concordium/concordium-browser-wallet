@@ -4,7 +4,7 @@ import {
     EventType,
     MessageType,
 } from '@concordium/browser-wallet-message-hub';
-import { AccountTransactionPayload, AccountTransactionType } from '@concordium/web-sdk';
+import { AccountTransactionPayload, AccountTransactionSignature, AccountTransactionType } from '@concordium/web-sdk';
 import { stringify } from './util';
 
 // eslint-disable-next-line @typescript-eslint/no-explicit-any
@@ -21,7 +21,9 @@ export interface IWalletApi {
      * @param schema schema used for the initContract and updateContract transactions to serialize the parameters. Should be base64 encoded.
      */
     sendTransaction(
-        type: AccountTransactionType.UpdateSmartContractInstance | AccountTransactionType.InitializeSmartContractInstance,
+        type:
+            | AccountTransactionType.UpdateSmartContractInstance
+            | AccountTransactionType.InitializeSmartContractInstance,
         payload: AccountTransactionPayload,
         parameters: Record<string, unknown>,
         schema: string
@@ -57,9 +59,16 @@ class WalletApi implements IWalletApi {
     /**
      * Sends a sign request to the Concordium Wallet and awaits the users action
      */
-    // eslint-disable-next-line @typescript-eslint/no-explicit-any
-    public signMessage(): Promise<any> {
-        return this.sendMessage(MessageType.SignMessage, {});
+    public async signMessage(message: string): Promise<AccountTransactionSignature> {
+        const response = await this.sendMessage<AccountTransactionSignature | undefined>(MessageType.SignMessage, {
+            message,
+        });
+
+        if (!response) {
+            throw new Error('Signing rejected');
+        }
+
+        return response;
     }
 
     /**
