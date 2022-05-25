@@ -6,6 +6,7 @@
     "license": "Apache",
     "scripts": {
         "build:dev": "cross-env NODE_ENV=development node --loader ts-node/esm -r tsconfig-paths/register ./build/dev.ts",
+        "type:check": "tsc --noEmit",
         "watch": "cross-env WATCH=1 yarn build:dev"
     },
     "dependencies": {
@@ -30,6 +31,7 @@
         "@types/react-dom": "^18.0.0",
         "cross-env": "^7.0.3",
         "esbuild": "^0.14.31",
-        "esbuild-sass-plugin": "^2.2.6"
+        "esbuild-sass-plugin": "^2.2.6",
+        "typescript": "^4.3.5"
     }
 }

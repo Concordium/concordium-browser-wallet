@@ -1,9 +1,9 @@
 import React from 'react';
 import { useTranslation } from 'react-i18next';
-import { SimpleTransfer } from '@root/../browser-wallet-api/src/types';
+import { SimpleTransferPayload } from '@concordium/web-sdk';
 
 interface Props {
-    payload: SimpleTransfer;
+    payload: SimpleTransferPayload;
 }
 
 /**
@@ -15,9 +15,9 @@ export default function DisplaySimpleTransfer({ payload }: Props) {
     return (
         <>
             <h5>{t('receiver')}:</h5>
-            <p className="display-transaction__address">{payload.toAddress}</p>
+            <p className="display-transaction__address">{payload.toAddress.address}</p>
             <h5>{t('amount')}:</h5>
-            {payload.amount} MicroCCD
+            {payload.amount.microGtuAmount.toString()} MicroCCD
         </>
     );
 }

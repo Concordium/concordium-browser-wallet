@@ -1,5 +1,4 @@
 import React, { useContext, useCallback, useMemo, useState, useEffect } from 'react';
-import { Buffer } from 'buffer/';
 import { useAtomValue } from 'jotai';
 import { fullscreenPromptContext } from '@popup/page-layouts/FullscreenPromptLayout';
 import { useTranslation } from 'react-i18next';
@@ -12,56 +11,22 @@ import {
     buildBasicAccountSigner,
     signTransaction,
     TransactionExpiry,
-    serializeUpdateContractParameters,
-    AccountTransactionPayload,
     getAccountTransactionHash,
-    GtuAmount,
 } from '@concordium/web-sdk';
 import { selectedAccountAtom } from '@popup/store/account';
 import { jsonRpcUrlAtom, credentialsAtom } from '@popup/store/settings';
-import { SimplifiedAccountTransaction } from '@root/../browser-wallet-api/src/types';
 import DisplayUpdateContract from './displayTransaction/DisplayUpdateContract';
 import DisplaySimpleTransfer from './displayTransaction/DisplaySimpleTransfer';
+import { parsePayload, HeadlessTransaction } from './util';
 
 interface Location {
     state: {
         payload: {
-            transaction: SimplifiedAccountTransaction;
+            transaction: HeadlessTransaction;
+            parameters?: Record<string, unknown>;
+            schema?: string;
         };
     };
-}
-
-function transformPayload(transaction: SimplifiedAccountTransaction): AccountTransactionPayload {
-    switch (transaction.type) {
-        case AccountTransactionType.SimpleTransfer:
-            return {
-                amount: new GtuAmount(BigInt(transaction.amount)),
-                toAddress: new AccountAddress(transaction.toAddress),
-            };
-
-        case AccountTransactionType.UpdateSmartContractInstance: {
-            const [contractName, functionName] = transaction.receiveName.split('.');
-            return {
-                amount: new GtuAmount(BigInt(transaction.amount)),
-                contractAddress: {
-                    index: BigInt(transaction.contractAddressIndex),
-                    subindex: BigInt(transaction.contractAddressSubindex),
-                },
-                receiveName: transaction.receiveName,
-                maxContractExecutionEnergy: BigInt(transaction.maxContractExecutionEnergy),
-                parameter: transaction.parameter
-                    ? serializeUpdateContractParameters(
-                          contractName,
-                          functionName,
-                          transaction.parameter,
-                          Buffer.from(transaction.schema, 'base64')
-                      )
-                    : Buffer.alloc(0),
-            };
-        }
-        default:
-            throw new Error('Unsupported transaction type');
-    }
 }
 
 interface Props {
@@ -78,8 +43,10 @@ export default function SendTransaction({ onSubmit, onReject }: Props) {
     const url = useAtomValue(jsonRpcUrlAtom);
     const { withClose, onClose } = useContext(fullscreenPromptContext);
 
-    const rawTransaction = state.payload.transaction;
-    const payload = useMemo(() => transformPayload(rawTransaction), [JSON.stringify(rawTransaction)]);
+    const { type: transactionType, payload } = useMemo(
+        () => parsePayload(state.payload.transaction, state.payload.parameters, state.payload.schema),
+        [JSON.stringify(state.payload)]
+    );
 
     useEffect(() => onClose(onReject), [onClose, onReject]);
 
@@ -107,7 +74,7 @@ export default function SendTransaction({ onSubmit, onReject }: Props) {
             sender,
             nonce: nonce.nonce,
         };
-        const transaction = { payload, header, type: rawTransaction.type };
+        const transaction = { payload, header, type: transactionType };
 
         const signature = await signTransaction(transaction, buildBasicAccountSigner(key));
         const result = await client.sendAccountTransaction(transaction, signature);
@@ -124,11 +91,9 @@ export default function SendTransaction({ onSubmit, onReject }: Props) {
             <div>{t('description')}</div>
             <h5>{t('sender')}:</h5>
             <p className="send-transaction__address">{address}</p>
-            {rawTransaction.type === AccountTransactionType.SimpleTransfer && (
-                <DisplaySimpleTransfer payload={rawTransaction} />
-            )}
-            {rawTransaction.type === AccountTransactionType.UpdateSmartContractInstance && (
-                <DisplayUpdateContract payload={rawTransaction} />
+            {transactionType === AccountTransactionType.SimpleTransfer && <DisplaySimpleTransfer payload={payload} />}
+            {transactionType === AccountTransactionType.UpdateSmartContractInstance && (
+                <DisplayUpdateContract payload={payload} />
             )}
             <br />
             <button

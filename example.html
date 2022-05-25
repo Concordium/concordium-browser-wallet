@@ -2,7 +2,7 @@
 <html>
     <head>
         <title>My cool dapp</title>
-        <script src="../concordium-node-sdk-js/packages/web/lib/concordium.min.js"></script>
+        <script src="./node_modules/@concordium/web-sdk/lib/concordium.min.js"></script>
         <meta charset="utf-8" />
         <script>
             function concordiumReady() {
@@ -13,8 +13,12 @@
                     window.concordium
                         .sendTransaction({
                             type: concordiumSDK.AccountTransactionType.SimpleTransfer,
-                            amount: '1',
-                            toAddress: '39bKAuC7sXCZQfo7DmVQTMbiUuBMQJ5bCfsS7sva1HvDnUXp13',
+                            payload: {
+                                amount: new concordiumSDK.GtuAmount('1'),
+                                toAddress: new concordiumSDK.AccountAddress(
+                                    '39bKAuC7sXCZQfo7DmVQTMbiUuBMQJ5bCfsS7sva1HvDnUXp13'
+                                ),
+                            },
                         })
                         .then(alert)
                         .catch(alert)
@@ -23,29 +27,39 @@
                     window.concordium
                         .sendTransaction({
                             type: concordiumSDK.AccountTransactionType.UpdateSmartContractInstance,
-                            amount: '100',
-                            contractAddressIndex: '11',
-                            contractAddressSubindex: '0',
-                            receiveName: 'two-step-transfer.deposit',
-                            maxContractExecutionEnergy: '30000',
+                            payload: {
+                                amount: new concordiumSDK.GtuAmount('1'),
+                                contractAddress: {
+                                    index: '11',
+                                    subindex: '0',
+                                },
+                                receiveName: 'two-step-transfer.deposit',
+                                maxContractExecutionEnergy: '30000',
+                            },
                         })
                         .then(alert)
                         .catch(alert)
                 );
                 document.getElementById('sendReceive').addEventListener('click', () =>
                     window.concordium
-                        .sendTransaction({
-                            type: concordiumSDK.AccountTransactionType.UpdateSmartContractInstance,
-                            amount: '0',
-                            contractAddressIndex: '11',
-                            contractAddressSubindex: '0',
-                            receiveName: 'two-step-transfer.receive',
-                            maxContractExecutionEnergy: '30000',
-                            parameter: {
+                        .sendTransaction(
+                            {
+                                type: concordiumSDK.AccountTransactionType.UpdateSmartContractInstance,
+                                payload: {
+                                    amount: new concordiumSDK.GtuAmount('1'),
+                                    contractAddress: {
+                                        index: '11',
+                                        subindex: '0',
+                                    },
+                                    receiveName: 'two-step-transfer.receive',
+                                    maxContractExecutionEnergy: '30000',
+                                },
+                            },
+                            {
                                 RequestTransfer: ['1000', '1', '3Y1RLgi5pW3x96xZ7CiDiKsTL9huU92qn6mfxpebwmtkeku8ry'],
                             },
-                            schema: 'AQAAABEAAAB0d28tc3RlcC10cmFuc2ZlcgEUAAIAAAALAAAAaW5pdF9wYXJhbXMUAAMAAAAPAAAAYWNjb3VudF9ob2xkZXJzEQALHAAAAHRyYW5zZmVyX2FncmVlbWVudF90aHJlc2hvbGQCFAAAAHRyYW5zZmVyX3JlcXVlc3RfdHRsDggAAAByZXF1ZXN0cxIBBRQABAAAAA8AAAB0cmFuc2Zlcl9hbW91bnQKDgAAAHRhcmdldF9hY2NvdW50CwwAAAB0aW1lc19vdXRfYXQNCgAAAHN1cHBvcnRlcnMRAgsBFAADAAAADwAAAGFjY291bnRfaG9sZGVycxEACxwAAAB0cmFuc2Zlcl9hZ3JlZW1lbnRfdGhyZXNob2xkAhQAAAB0cmFuc2Zlcl9yZXF1ZXN0X3R0bA4BAAAABwAAAHJlY2VpdmUVAgAAAA8AAABSZXF1ZXN0VHJhbnNmZXIBAwAAAAUKCw8AAABTdXBwb3J0VHJhbnNmZXIBAwAAAAUKCw==',
-                        })
+                            'AQAAABEAAAB0d28tc3RlcC10cmFuc2ZlcgEUAAIAAAALAAAAaW5pdF9wYXJhbXMUAAMAAAAPAAAAYWNjb3VudF9ob2xkZXJzEQALHAAAAHRyYW5zZmVyX2FncmVlbWVudF90aHJlc2hvbGQCFAAAAHRyYW5zZmVyX3JlcXVlc3RfdHRsDggAAAByZXF1ZXN0cxIBBRQABAAAAA8AAAB0cmFuc2Zlcl9hbW91bnQKDgAAAHRhcmdldF9hY2NvdW50CwwAAAB0aW1lc19vdXRfYXQNCgAAAHN1cHBvcnRlcnMRAgsBFAADAAAADwAAAGFjY291bnRfaG9sZGVycxEACxwAAAB0cmFuc2Zlcl9hZ3JlZW1lbnRfdGhyZXNob2xkAhQAAAB0cmFuc2Zlcl9yZXF1ZXN0X3R0bA4BAAAABwAAAHJlY2VpdmUVAgAAAA8AAABSZXF1ZXN0VHJhbnNmZXIBAwAAAAUKCw8AAABTdXBwb3J0VHJhbnNmZXIBAwAAAAUKCw=='
+                        )
                         .then(alert)
                         .catch(alert)
                 );

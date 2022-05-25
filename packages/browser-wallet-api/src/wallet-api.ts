@@ -4,14 +4,30 @@ import {
     EventType,
     MessageType,
 } from '@concordium/browser-wallet-message-hub';
-import { SimplifiedAccountTransaction } from './types';
+import { AccountTransaction } from '@concordium/web-sdk';
+import { bigintToStringAccountTransactionFields } from './util';
 
 // eslint-disable-next-line @typescript-eslint/no-explicit-any
 type WalletEventHandler<T = any> = (payload: T) => void;
 
 export interface IWalletApi {
     addChangeAccountListener(handler: WalletEventHandler<string>): void;
-    sendTransaction(transaction: SimplifiedAccountTransaction): Promise<string | undefined>;
+    /**
+     * Sends a transaction to the Concordium Wallet and awaits the users action
+     * @param transaction the transaction to be signed and sent. Note that the header can be omitted, and will be constructed by the wallet itself.
+     * @param parameters parameters for the initContract and updateContract transactions in JSON-like format.
+     * @param schema schema used for the initContract and updateContract transactions to serialize the parameters. Should be base64 encoded.
+     */
+    sendTransaction(
+        transaction: AccountTransaction,
+        parameters: Record<string, unknown>,
+        schema: string
+    ): Promise<string | undefined>;
+    /**
+     * Sends a transaction to the Concordium Wallet and awaits the users action
+     * @param transaction the transaction to be signed and sent. Note that the header can be omitted, and will be constructed by the wallet itself.
+     */
+    sendTransaction(transaction: AccountTransaction): Promise<string | undefined>;
     // eslint-disable-next-line @typescript-eslint/no-explicit-any
     signMessage(): Promise<any>;
     connect(): Promise<string | undefined>;
@@ -59,8 +75,16 @@ class WalletApi implements IWalletApi {
     /**
      * Sends a transaction to the Concordium Wallet and awaits the users action
      */
-    public sendTransaction(transaction: SimplifiedAccountTransaction): Promise<string | undefined> {
-        return this.sendMessage(MessageType.SendTransaction, { transaction });
+    public sendTransaction(
+        transaction: Omit<AccountTransaction, 'header'>,
+        parameters?: Record<string, unknown>,
+        schema?: string
+    ): Promise<string | undefined> {
+        return this.sendMessage(MessageType.SendTransaction, {
+            transaction: bigintToStringAccountTransactionFields(transaction),
+            parameters,
+            schema,
+        });
     }
 
     // eslint-disable-next-line @typescript-eslint/no-explicit-any
