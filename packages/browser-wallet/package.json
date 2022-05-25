@@ -11,7 +11,7 @@
     "dependencies": {
         "@concordium/browser-wallet-api": "0.1.0",
         "@concordium/browser-wallet-message-hub": "0.1.0",
-        "@concordium/web-sdk": "link:../../../concordium-node-sdk-js/packages/web",
+        "@concordium/web-sdk": "0.1.0",
         "buffer": "^6.0.3",
         "clsx": "^1.1.1",
         "i18next": "^21.6.16",

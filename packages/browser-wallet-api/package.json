@@ -7,6 +7,6 @@
     "license": "Apache",
     "dependencies": {
         "@concordium/browser-wallet-message-hub": "0.1.0",
-        "@concordium/web-sdk": "link:../../../concordium-node-sdk-js/packages/web"
+        "@concordium/web-sdk": "0.1.0"
     }
 }

@@ -4,7 +4,7 @@ const t: typeof en = {
     receiver: 'Modtager',
     amount: 'Mængde',
     sender: 'Afsender',
-    contractIndex: 'Kontrakt Indeks (SubIndeks)',
+    contractIndex: 'Kontrakt Indeks (under indeks)',
     receiveName: 'Kontrakt og funktion navn',
     maxEnergy: 'Max energi tilladt',
     parameter: 'Parameter',
