@@ -1,7 +1,7 @@
 import type en from './en';
 
 const t: typeof en = {
-    description: 'Transaktion oversigt',
+    description: 'Transaktionsoversigt',
     sender: 'Afsender',
     submit: 'Send',
     error: 'Fejl',
