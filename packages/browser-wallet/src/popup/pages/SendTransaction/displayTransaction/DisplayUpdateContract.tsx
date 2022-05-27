@@ -26,13 +26,13 @@ export default function DisplayUpdateContract({ payload, parameters }: Props) {
             {payload.amount.microGtuAmount.toString()} MicroCCD
             <h5>{t('maxEnergy')}:</h5>
             <p>{payload.maxContractExecutionEnergy.toString()} NRG</p>
-            {parameters && (
+            {!!parameters && (
                 <>
                     <h5>{t('parameter')}:</h5>
                     <pre className="display-transaction__parameter">{JSON.stringify(parameters, null, 2)}</pre>
                 </>
             )}
-            {!parameters && payload.parameter.length && (
+            {!parameters && !!payload.parameter.length && (
                 <>
                     <h5>{t('parameter')} (hex):</h5>
                     <pre className="display-transaction__parameter">
