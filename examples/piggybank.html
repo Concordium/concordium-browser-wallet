@@ -1,0 +1,107 @@
+<!DOCTYPE html>
+<html>
+    <head>
+        <title>My cool dapp</title>
+        <script src="../node_modules/@concordium/web-sdk/lib/concordium.min.js"></script>
+        <meta charset="utf-8" />
+        <script>
+            const client = new concordiumSDK.JsonRpcClient(new concordiumSDK.HttpProvider('http://localhost:9095'));
+            let contractState = undefined;
+            function concordiumReady() {
+                document.getElementById('connectContract').addEventListener('click', () => {
+                    console.log('test');
+                    client.getInstanceInfo({ index: index.value, subindex: 0 }).then((result) => {
+                        console.log(result);
+                        contractState = result;
+                        concordiumSDK.AccountAddress.prototype.toJSON = function () {
+                            return this.address;
+                        };
+                        concordiumSDK.ModuleReference.prototype.toJSON = function () {
+                            return this.moduleRef;
+                        };
+
+                        if (!result) {
+                            return (document.getElementById('displayState').innerHTML =
+                                'Chosen index has not been initialized');
+                        }
+
+                        if (result.name != 'init_PiggyBank') {
+                            return (document.getElementById('displayState').innerHTML =
+                                'Chosen contract is not a PiggyBank: ' + res.name.substring(5));
+                        }
+
+                        sendBreak.disabled = account.innerHTML != result.owner.address;
+
+                        try {
+                            const model = concordiumSDK.deserializeContractState(
+                                'PiggyBank',
+                                concordiumSDK.toBuffer(
+                                    'AQAAAAkAAABQaWdneUJhbmsBFQIAAAAGAAAASW50YWN0AgcAAABTbWFzaGVkAgAAAAAA',
+                                    'base64'
+                                ),
+                                result.model
+                            );
+                            sendDeposit.disabled = !model.Intact;
+                            document.getElementById('displayState').innerHTML = `Owner: ${result.owner.address}
+Balance: ${result.amount.microGtuAmount.toString()}
+State: ${model.Intact ? 'Intact' : 'Smashed'}`;
+                        } catch (e) {
+                            console.log(e);
+                        }
+                    });
+                });
+                const connect = () =>
+                    window.concordium
+                        .connect()
+                        .then((address) => {
+                            account.innerHTML = address;
+                            sendBreak.disabled = address != contractState?.owner?.address;
+                        })
+                        .catch(alert);
+                document.getElementById('sendDeposit').addEventListener('click', async () => {
+                    if (!account.value) {
+                        await connect();
+                    }
+
+                    window.concordium
+                        .sendTransaction(concordiumSDK.AccountTransactionType.UpdateSmartContractInstance, {
+                            amount: new concordiumSDK.GtuAmount(BigInt(document.getElementById('depositAmount').value)),
+                            contractAddress: {
+                                index: BigInt(index.value),
+                                subindex: 0n,
+                            },
+                            receiveName: 'PiggyBank.insert',
+                            maxContractExecutionEnergy: 30000n,
+                        })
+                        .then(alert)
+                        .catch(alert);
+                });
+
+                document.getElementById('sendBreak').addEventListener('click', async () => {
+                    if (!account.value) {
+                        await connect();
+                    }
+                    alert('not ready yet');
+                });
+
+                window.concordium.addChangeAccountListener((address) => {
+                    account.innerHTML = address;
+                    sendBreak.disabled = address != contractState?.owner?.address;
+                });
+            }
+        </script>
+    </head>
+
+    <body>
+        Index: <input type="text" id="index" />
+        <button id="connectContract">Connect to contract</button>
+        <div>
+            <pre id="displayState"></pre>
+        </div>
+        Amount: <input type="number" id="depositAmount" />
+        <button disabled id="sendDeposit">Put into Bank</button>
+        <button disabled id="sendBreak">Break Bank</button>
+        <br />
+        Connected Account: <label id="account" />
+    </body>
+</html>
