@@ -17,12 +17,13 @@ import { selectedAccountAtom } from '@popup/store/account';
 import { jsonRpcUrlAtom, credentialsAtom } from '@popup/store/settings';
 import DisplayUpdateContract from './displayTransaction/DisplayUpdateContract';
 import DisplaySimpleTransfer from './displayTransaction/DisplaySimpleTransfer';
-import { parsePayload, HeadlessTransaction } from './util';
+import { parsePayload } from './util';
 
 interface Location {
     state: {
         payload: {
-            transaction: HeadlessTransaction;
+            type: AccountTransactionType;
+            payload: string;
             parameters?: Record<string, unknown>;
             schema?: string;
         };
@@ -44,7 +45,7 @@ export default function SendTransaction({ onSubmit, onReject }: Props) {
     const { withClose, onClose } = useContext(fullscreenPromptContext);
 
     const { type: transactionType, payload } = useMemo(
-        () => parsePayload(state.payload.transaction, state.payload.parameters, state.payload.schema),
+        () => parsePayload(state.payload.type, state.payload.payload, state.payload.parameters, state.payload.schema),
         [JSON.stringify(state.payload)]
     );
 
@@ -93,7 +94,7 @@ export default function SendTransaction({ onSubmit, onReject }: Props) {
             <p className="send-transaction__address">{address}</p>
             {transactionType === AccountTransactionType.SimpleTransfer && <DisplaySimpleTransfer payload={payload} />}
             {transactionType === AccountTransactionType.UpdateSmartContractInstance && (
-                <DisplayUpdateContract payload={payload} />
+                <DisplayUpdateContract payload={payload} parameters={state.payload.parameters} />
             )}
             <br />
             <button

@@ -4,8 +4,8 @@ import {
     EventType,
     MessageType,
 } from '@concordium/browser-wallet-message-hub';
-import { AccountTransaction } from '@concordium/web-sdk';
-import { bigintToStringAccountTransactionFields } from './util';
+import { AccountTransactionPayload, AccountTransactionType } from '@concordium/web-sdk';
+import { stringify } from './util';
 
 // eslint-disable-next-line @typescript-eslint/no-explicit-any
 type WalletEventHandler<T = any> = (payload: T) => void;
@@ -13,21 +13,26 @@ type WalletEventHandler<T = any> = (payload: T) => void;
 export interface IWalletApi {
     addChangeAccountListener(handler: WalletEventHandler<string>): void;
     /**
-     * Sends a transaction to the Concordium Wallet and awaits the users action
-     * @param transaction the transaction to be signed and sent. Note that the header can be omitted, and will be constructed by the wallet itself.
+     * Sends a transaction to the Concordium Wallet and awaits the users action. Note that a header is not sent, and will be constructed by the wallet itself.
+     * Note that if the user rejects signing the transaction, this will throw an error.
+     * @param type the type of transaction that is to be signed and sent.
+     * @param payload the payload of the transaction to be signed and sent.
      * @param parameters parameters for the initContract and updateContract transactions in JSON-like format.
      * @param schema schema used for the initContract and updateContract transactions to serialize the parameters. Should be base64 encoded.
      */
     sendTransaction(
-        transaction: AccountTransaction,
+        type: AccountTransactionType,
+        payload: AccountTransactionPayload,
         parameters: Record<string, unknown>,
         schema: string
-    ): Promise<string | undefined>;
+    ): Promise<string>;
     /**
-     * Sends a transaction to the Concordium Wallet and awaits the users action
-     * @param transaction the transaction to be signed and sent. Note that the header can be omitted, and will be constructed by the wallet itself.
+     * Sends a transaction to the Concordium Wallet and awaits the users action. Note that a header is not sent, and will be constructed by the wallet itself.
+     * Note that if the user rejects signing the transaction, this will throw an error.
+     * @param type the type of transaction that is to be signed and sent.
+     * @param payload the payload of the transaction to be signed and sent.
      */
-    sendTransaction(transaction: AccountTransaction): Promise<string | undefined>;
+    sendTransaction(type: AccountTransactionType, payload: AccountTransactionPayload): Promise<string>;
     // eslint-disable-next-line @typescript-eslint/no-explicit-any
     signMessage(): Promise<any>;
     connect(): Promise<string | undefined>;
@@ -75,16 +80,24 @@ class WalletApi implements IWalletApi {
     /**
      * Sends a transaction to the Concordium Wallet and awaits the users action
      */
-    public sendTransaction(
-        transaction: Omit<AccountTransaction, 'header'>,
+    public async sendTransaction(
+        type: AccountTransactionType,
+        payload: AccountTransactionPayload,
         parameters?: Record<string, unknown>,
         schema?: string
-    ): Promise<string | undefined> {
-        return this.sendMessage(MessageType.SendTransaction, {
-            transaction: bigintToStringAccountTransactionFields(transaction),
+    ): Promise<string> {
+        const response = await this.sendMessage<string | undefined>(MessageType.SendTransaction, {
+            type,
+            payload: stringify(payload),
             parameters,
             schema,
         });
+
+        if (!response) {
+            throw new Error('Signing rejected');
+        }
+
+        return response;
     }
 
     // eslint-disable-next-line @typescript-eslint/no-explicit-any

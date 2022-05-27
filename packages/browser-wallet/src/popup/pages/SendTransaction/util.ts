@@ -1,13 +1,12 @@
 import {
     AccountTransactionType,
-    AccountAddress,
-    GtuAmount,
     SimpleTransferPayload,
     UpdateContractPayload,
     serializeUpdateContractParameters,
     AccountTransactionPayload,
 } from '@concordium/web-sdk';
 import { Buffer } from 'buffer/';
+import { parse } from '@concordium/browser-wallet-api/src/util';
 
 export type HeadlessTransaction =
     | { type: AccountTransactionType.UpdateSmartContractInstance; payload: UpdateContractPayload }
@@ -21,23 +20,16 @@ export type HeadlessTransaction =
       };
 
 export function parsePayload(
-    transaction: HeadlessTransaction,
+    type: AccountTransactionType,
+    stringifiedPayload: string,
     parameters?: Record<string, unknown>,
     schema?: string
 ): HeadlessTransaction {
-    switch (transaction.type) {
-        case AccountTransactionType.SimpleTransfer: {
-            const { payload } = transaction;
-            return {
-                type: transaction.type,
-                payload: {
-                    amount: new GtuAmount(BigInt(payload.amount.microGtuAmount)),
-                    toAddress: new AccountAddress(payload.toAddress.address),
-                },
-            };
-        }
+    const payload = parse(stringifiedPayload);
+
+    switch (type) {
         case AccountTransactionType.UpdateSmartContractInstance: {
-            const [contractName, functionName] = transaction.payload.receiveName.split('.');
+            const [contractName, functionName] = payload.receiveName.split('.');
 
             const parameter =
                 parameters && schema
@@ -48,23 +40,19 @@ export function parsePayload(
                           Buffer.from(schema, 'base64')
                       )
                     : Buffer.alloc(0);
-
-            const { payload } = transaction;
+            // Overwrite whatever parameter has been provided. Ensures that what we show and what is signed is the same.
             return {
-                type: transaction.type,
+                type,
                 payload: {
-                    amount: new GtuAmount(BigInt(payload.amount.microGtuAmount)),
-                    contractAddress: {
-                        index: BigInt(payload.contractAddress.index),
-                        subindex: BigInt(payload.contractAddress.subindex),
-                    },
-                    receiveName: payload.receiveName,
-                    maxContractExecutionEnergy: BigInt(payload.maxContractExecutionEnergy),
+                    ...payload,
                     parameter,
                 },
             };
         }
         default:
-            throw new Error('Unsupported transaction type');
+            return {
+                type,
+                payload,
+            };
     }
 }
