@@ -13,11 +13,13 @@
         "@types/react-dom": "^18.0.5",
         "cross-env": "^7.0.3",
         "esbuild": "^0.14.42",
+        "live-server": "^1.2.2",
         "ts-node": "^10.8.0",
         "typescript": "^4.7.2"
     },
     "scripts": {
         "build": "node --loader ts-node/esm ./esbuild.config.ts",
-        "watch": "cross-env WATCH=1 yarn build"
+        "watch": "cross-env WATCH=1 yarn build",
+        "start": "live-server ./dist"
     }
 }

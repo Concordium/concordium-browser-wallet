@@ -1,6 +1,12 @@
 import React, { useEffect, useState, createContext, useMemo, useContext } from 'react';
 import type { IWalletApi } from '@concordium/browser-wallet-api';
-import { HttpProvider, JsonRpcClient } from '@concordium/web-sdk';
+import {
+    AccountTransactionType,
+    GtuAmount,
+    HttpProvider,
+    JsonRpcClient,
+    UpdateContractPayload,
+} from '@concordium/web-sdk';
 
 declare global {
     interface Window {
@@ -9,8 +15,9 @@ declare global {
     }
 }
 
-const CONTRACT_INDEX = 0n;
+const CONTRACT_INDEX = 0n; // Where can I find a piggy bank contract on testnet?
 const CONTRACT_SUB_INDEX = 0n;
+const CONTRACT_NAME = 'PiggyBank';
 
 const client = new JsonRpcClient(new HttpProvider('http://127.0.0.1:9095'));
 
@@ -25,11 +32,42 @@ type State = {
 
 const state = createContext<State>({ isConnected: false, account: undefined });
 
+const deposit = () => {
+    window.concordium
+        .sendTransaction(AccountTransactionType.UpdateSmartContractInstance, {
+            amount: new GtuAmount(1n),
+            contractAddress: {
+                index: CONTRACT_INDEX,
+                subindex: CONTRACT_SUB_INDEX,
+            },
+            receiveName: `${CONTRACT_NAME}.insert`,
+            maxContractExecutionEnergy: 30000n,
+        } as UpdateContractPayload)
+        .then(alert)
+        .catch(alert);
+};
+
+const smash = () => {
+    window.concordium
+        .sendTransaction(AccountTransactionType.UpdateSmartContractInstance, {
+            amount: new GtuAmount(0n), // This feels weird? Why do I need an amount for a non-payable receive?
+            contractAddress: {
+                index: CONTRACT_INDEX,
+                subindex: CONTRACT_SUB_INDEX,
+            },
+            receiveName: `${CONTRACT_NAME}.smash`,
+            maxContractExecutionEnergy: 30000n,
+        } as UpdateContractPayload)
+        .then(alert)
+        .catch(alert);
+};
+
 function PiggyBank() {
     const { account } = useContext(state);
     const [ownerAccount, setOwnerAccount] = useState<string>();
 
     useEffect(() => {
+        // CORS issue??
         client.getInstanceInfo({ index: CONTRACT_INDEX, subindex: CONTRACT_SUB_INDEX }).then((res) => {
             // eslint-disable-next-line no-console
             console.log(res);
@@ -41,6 +79,12 @@ function PiggyBank() {
         <main>
             <div>Wallet account: {account}</div>
             <div>Contract owner account: {ownerAccount}</div>
+            <button type="button" onClick={() => deposit()}>
+                Deposit 1 microCCD
+            </button>
+            <button type="button" onClick={() => smash()}>
+                Smash
+            </button>
         </main>
     );
 }
