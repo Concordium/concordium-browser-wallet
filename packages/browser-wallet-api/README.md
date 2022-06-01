@@ -83,6 +83,6 @@ window.concordium.addChangeAccountListener((address) => (selectedAccountAddress 
 
 See [installing](../../README.md#installing) in repository root.
 
-### Publishing
+### Building
 
--   Run `yarn build` in the package root, which will output into the folder "lib".
+-   Run `yarn build` in the package root, which will output into the folder "lib". This is only necessary to do when preparing to publish.
