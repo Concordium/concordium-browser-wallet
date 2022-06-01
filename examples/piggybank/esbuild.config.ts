@@ -13,7 +13,7 @@ const htmlOut = 'index.html';
 
 const config: BuildOptions = {
     entryPoints: [main],
-    entryNames: '[name]-[hash]',
+    entryNames: '[name]',
     bundle: true,
     minify: true,
     metafile: true,

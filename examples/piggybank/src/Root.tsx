@@ -1,9 +1,11 @@
-import React, { useEffect, useState, createContext, useMemo, useContext } from 'react';
+/* eslint-disable no-console */
+import React, { useEffect, useState, createContext, useMemo, useContext, useRef } from 'react';
 import type { IWalletApi } from '@concordium/browser-wallet-api';
 import {
     AccountTransactionType,
     GtuAmount,
     HttpProvider,
+    InstanceInfo,
     JsonRpcClient,
     UpdateContractPayload,
 } from '@concordium/web-sdk';
@@ -15,11 +17,12 @@ declare global {
     }
 }
 
-const CONTRACT_INDEX = 0n; // Where can I find a piggy bank contract on testnet?
+// Module reference on testnet: 47ece1d6d52b02f7f91e9b5dd456883785643a357309154403776d8d7f958f9e
+const CONTRACT_INDEX = 5101n;
 const CONTRACT_SUB_INDEX = 0n;
 const CONTRACT_NAME = 'PiggyBank';
 
-const client = new JsonRpcClient(new HttpProvider('http://127.0.0.1:9095'));
+const client = new JsonRpcClient(new HttpProvider('http://localhost:9095'));
 
 const apiReady = new Promise<void>((resolve) => {
     window.concordiumReady = resolve;
@@ -32,10 +35,14 @@ type State = {
 
 const state = createContext<State>({ isConnected: false, account: undefined });
 
-const deposit = () => {
+const deposit = (amount = 0) => {
+    if (!Number.isInteger(amount) || amount <= 0) {
+        return;
+    }
+
     window.concordium
         .sendTransaction(AccountTransactionType.UpdateSmartContractInstance, {
-            amount: new GtuAmount(1n),
+            amount: new GtuAmount(BigInt(amount)),
             contractAddress: {
                 index: CONTRACT_INDEX,
                 subindex: CONTRACT_SUB_INDEX,
@@ -43,7 +50,7 @@ const deposit = () => {
             receiveName: `${CONTRACT_NAME}.insert`,
             maxContractExecutionEnergy: 30000n,
         } as UpdateContractPayload)
-        .then(alert)
+        .then(console.log)
         .catch(alert);
 };
 
@@ -58,32 +65,47 @@ const smash = () => {
             receiveName: `${CONTRACT_NAME}.smash`,
             maxContractExecutionEnergy: 30000n,
         } as UpdateContractPayload)
-        .then(alert)
+        .then(console.log)
         .catch(alert);
 };
 
 function PiggyBank() {
     const { account } = useContext(state);
-    const [ownerAccount, setOwnerAccount] = useState<string>();
+    const [piggybank, setPiggyBank] = useState<InstanceInfo>();
+    const input = useRef<HTMLInputElement>(null);
 
     useEffect(() => {
-        // CORS issue??
-        client.getInstanceInfo({ index: CONTRACT_INDEX, subindex: CONTRACT_SUB_INDEX }).then((res) => {
-            // eslint-disable-next-line no-console
-            console.log(res);
-            setOwnerAccount(res?.owner.address);
-        });
+        client.getInstanceInfo({ index: CONTRACT_INDEX, subindex: CONTRACT_SUB_INDEX }).then(setPiggyBank);
     }, []);
 
     return (
         <main>
             <div>Wallet account: {account}</div>
-            <div>Contract owner account: {ownerAccount}</div>
-            <button type="button" onClick={() => deposit()}>
-                Deposit 1 microCCD
-            </button>
-            <button type="button" onClick={() => smash()}>
-                Smash
+            <br />
+            {piggybank === undefined ? (
+                <div>Loading piggy bank...</div>
+            ) : (
+                <>
+                    <h1>Stored CCD: {Number(piggybank?.amount.microGtuAmount) / 1000000}</h1>
+                    <div>Owner account: {piggybank?.owner.address}</div>
+                </>
+            )}
+            <br />
+            <label>
+                <div>Select amount to deposit (microCCD)</div>
+                <input type="number" defaultValue={1} ref={input} />
+                <button type="button" onClick={() => deposit(input.current?.valueAsNumber)}>
+                    Deposit
+                </button>
+            </label>
+            <br />
+            <br />
+            <button
+                type="button"
+                onClick={() => smash()}
+                disabled={account === undefined || account !== piggybank?.owner.address} // The smash button is only active for the contract owner.
+            >
+                Smash the piggy bank!
             </button>
         </main>
     );
