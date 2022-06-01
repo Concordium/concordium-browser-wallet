@@ -21,7 +21,7 @@ export interface IWalletApi {
      * @param schema schema used for the initContract and updateContract transactions to serialize the parameters. Should be base64 encoded.
      */
     sendTransaction(
-        type: AccountTransactionType,
+        type: AccountTransactionType.UpdateSmartContractInstance | AccountTransactionType.InitializeSmartContractInstance,
         payload: AccountTransactionPayload,
         parameters: Record<string, unknown>,
         schema: string

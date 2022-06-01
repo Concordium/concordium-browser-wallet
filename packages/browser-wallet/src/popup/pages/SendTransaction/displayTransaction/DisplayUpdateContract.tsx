@@ -12,7 +12,7 @@ interface Props {
  * TODO: make nice, use displayAsCcd for amount
  */
 export default function DisplayUpdateContract({ payload, parameters }: Props) {
-    const { t } = useTranslation('displayTransaction');
+    const { t } = useTranslation('sendTransaction');
 
     return (
         <>
@@ -23,9 +23,11 @@ export default function DisplayUpdateContract({ payload, parameters }: Props) {
             <h5>{t('receiveName')}:</h5>
             <p>{payload.receiveName}</p>
             <h5>{t('amount')}:</h5>
-            {payload.amount.microGtuAmount.toString()} MicroCCD
+            {payload.amount.microGtuAmount.toString()} {t('microCCD')}
             <h5>{t('maxEnergy')}:</h5>
-            <p>{payload.maxContractExecutionEnergy.toString()} NRG</p>
+            <p>
+                {payload.maxContractExecutionEnergy.toString()} {t('nrg')}
+            </p>
             {!!parameters && (
                 <>
                     <h5>{t('parameter')}:</h5>
@@ -40,7 +42,7 @@ export default function DisplayUpdateContract({ payload, parameters }: Props) {
                     </pre>
                 </>
             )}
-            {!parameters && !payload.parameter.length && <h5>{t('noParameter')}:</h5>}
+            {!parameters && !payload.parameter.length && <h5>{t('noParameter')}</h5>}
         </>
     );
 }
