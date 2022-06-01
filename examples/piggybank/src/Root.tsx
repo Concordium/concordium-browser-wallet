@@ -18,7 +18,7 @@ declare global {
 }
 
 // Module reference on testnet: 47ece1d6d52b02f7f91e9b5dd456883785643a357309154403776d8d7f958f9e
-const CONTRACT_INDEX = 5101n;
+const CONTRACT_INDEX = 5102n;
 const CONTRACT_SUB_INDEX = 0n;
 const CONTRACT_NAME = 'PiggyBank';
 
@@ -50,7 +50,7 @@ const deposit = (amount = 0) => {
             receiveName: `${CONTRACT_NAME}.insert`,
             maxContractExecutionEnergy: 30000n,
         } as UpdateContractPayload)
-        .then(console.log)
+        .then((txHash) => console.log(`https://testnet.ccdscan.io/?dcount=1&dentity=transaction&dhash=${txHash}`))
         .catch(alert);
 };
 
@@ -65,7 +65,7 @@ const smash = () => {
             receiveName: `${CONTRACT_NAME}.smash`,
             maxContractExecutionEnergy: 30000n,
         } as UpdateContractPayload)
-        .then(console.log)
+        .then((txHash) => console.log(`https://testnet.ccdscan.io/?dcount=1&dentity=transaction&dhash=${txHash}`))
         .catch(alert);
 };
 
