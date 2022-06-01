@@ -1,0 +1,1 @@
+# browser-wallet-api-types

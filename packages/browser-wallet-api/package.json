@@ -6,6 +6,7 @@
     "author": "Concordium",
     "license": "Apache",
     "dependencies": {
+        "@concordium/browser-wallet-api-types": "workspace:^",
         "@concordium/browser-wallet-message-hub": "0.1.0",
         "@concordium/web-sdk": "0.1.0"
     }

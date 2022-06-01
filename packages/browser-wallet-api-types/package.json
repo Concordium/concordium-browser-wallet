@@ -1,0 +1,9 @@
+{
+    "name": "@concordium/browser-wallet-api-types",
+    "packageManager": "yarn@3.2.0",
+    "main": "",
+    "types": "index.d.ts",
+    "dependencies": {
+        "@concordium/web-sdk": "^0.1.0"
+    }
+}

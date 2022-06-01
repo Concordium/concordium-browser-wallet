@@ -419,10 +419,19 @@ __metadata:
   languageName: node
   linkType: hard
 
+"@concordium/browser-wallet-api-types@workspace:*, @concordium/browser-wallet-api-types@workspace:^, @concordium/browser-wallet-api-types@workspace:packages/browser-wallet-api-types":
+  version: 0.0.0-use.local
+  resolution: "@concordium/browser-wallet-api-types@workspace:packages/browser-wallet-api-types"
+  dependencies:
+    "@concordium/web-sdk": ^0.1.0
+  languageName: unknown
+  linkType: soft
+
 "@concordium/browser-wallet-api@0.1.0, @concordium/browser-wallet-api@workspace:*, @concordium/browser-wallet-api@workspace:packages/browser-wallet-api":
   version: 0.0.0-use.local
   resolution: "@concordium/browser-wallet-api@workspace:packages/browser-wallet-api"
   dependencies:
+    "@concordium/browser-wallet-api-types": "workspace:^"
     "@concordium/browser-wallet-message-hub": 0.1.0
     "@concordium/web-sdk": 0.1.0
   languageName: unknown
@@ -487,7 +496,7 @@ __metadata:
   languageName: node
   linkType: hard
 
-"@concordium/web-sdk@npm:0.1.0":
+"@concordium/web-sdk@npm:0.1.0, @concordium/web-sdk@npm:^0.1.0":
   version: 0.1.0
   resolution: "@concordium/web-sdk@npm:0.1.0"
   dependencies:
@@ -2157,6 +2166,7 @@ __metadata:
   resolution: "concordium-browser-wallet@workspace:."
   dependencies:
     "@concordium/browser-wallet-api": "workspace:*"
+    "@concordium/browser-wallet-api-types": "workspace:*"
     "@concordium/browser-wallet-message-hub": "workspace:*"
     "@types/jest": ^27.4.1
     "@types/node": ^17.0.25
