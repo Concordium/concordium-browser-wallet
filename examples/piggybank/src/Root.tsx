@@ -14,7 +14,7 @@ import {
 declare global {
     interface Window {
         concordiumReady(): void;
-        concordium: IWalletApi;
+        concordium: IWalletApi | undefined;
     }
 }
 
@@ -50,6 +50,10 @@ const state = createContext<State>({ isConnected: false, account: undefined });
  * Action for depositing an amount of microCCD to the piggy bank instance
  */
 const deposit = (amount = 0) => {
+    if (window.concordium === undefined) {
+        throw new Error('Concordium wallet API not accessible.');
+    }
+
     if (!Number.isInteger(amount) || amount <= 0) {
         return;
     }
@@ -73,6 +77,10 @@ const deposit = (amount = 0) => {
  * https://github.com/Concordium/concordium-rust-smart-contracts/blob/c4d95504a51c15bdbfec503c9e8bf5e93a42e24d/examples/piggy-bank/part1/src/lib.rs#L64
  */
 const smash = () => {
+    if (window.concordium === undefined) {
+        throw new Error('Concordium wallet API not accessible.');
+    }
+
     window.concordium
         .sendTransaction(AccountTransactionType.UpdateSmartContractInstance, {
             amount: new GtuAmount(0n), // This feels weird? Why do I need an amount for a non-payable receive?
@@ -99,7 +107,7 @@ function PiggyBank() {
 
     return (
         <main>
-            <div>Wallet account: {account}</div>
+            <div>{isConnected ? `Wallet connected: ${account}` : 'No wallet connection'}</div>
             <br />
             {piggybank === undefined ? (
                 <div>Loading piggy bank...</div>
@@ -134,36 +142,26 @@ function PiggyBank() {
  * Connect to wallet, setup application state context, and render children when the wallet API is ready for use.
  */
 export default function Root() {
-    const [hasApi, setHasApi] = useState<boolean>(false);
     const [account, setAccount] = useState<string>();
     const [isConnected, setIsConnected] = useState<boolean>(false);
 
     useEffect(() => {
         apiReady
-            .then(() => {
-                // Promise resolves, meaning we're ready for action.
-                setHasApi(true);
-            })
             // Connect to the wallet.
-            .then(() => window.concordium.connect())
+            .then(() => window.concordium?.connect())
             .then((acc) => {
                 // Connection accepted, set the application state parameters.
                 setAccount(acc);
                 setIsConnected(true);
 
                 // Listen for relevent events from the wallet.
-                window.concordium.addChangeAccountListener(setAccount);
+                window.concordium?.addChangeAccountListener(setAccount);
             })
             // Connection rejected.
             .catch(() => setIsConnected(false));
     }, []);
 
     const stateValue: State = useMemo(() => ({ isConnected, account }), [isConnected, account]);
-
-    // If the wallet API is not accessible, don't render the piggy bank.
-    if (!hasApi) {
-        return <>API not ready...</>;
-    }
 
     return (
         // Setup a globally accessible state with data from the wallet.

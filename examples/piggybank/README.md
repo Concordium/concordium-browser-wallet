@@ -4,13 +4,22 @@ The example project included in this repository, serves as a working example of 
 
 ## Prerequisites
 
--   Web app assumes JSON-RPC server connected to testnet node is accessible at http://127.0.0.1:9095.
-    -   Currently must be built from the branch "add-get-instance-info"
+### Viewing smart contract details
+
+-   [JSON-RPC server](https://github.com/Concordium/concordium-json-rpc/tree/add-get-instance-info) connected to testnet node is accessible at http://127.0.0.1:9095.
+    -   Note that currently the JSON-RPC server must be built from the branch "add-get-instance-info" (link above already targets this branch)
+
+### Submitting transactions
+
 -   Browser wallet extension is installed in google chrome and configured with testnet JSON-RPC.
-    -   Must be running with command line arg --disable-web-security due to CORS restrictions
+    -   Currently, chrome must be running with CORS restrictions disabled.
+
+## Installing
+
+-   Run `yarn` in package root.
 
 ## Running the example
 
--   Run `yarn` in package root.
--   Run `yarn watch`
+-   Run `yarn watch` in a terminal
+-   Run `yarn start` in another terminal
 -   Open URL logged in console (typically http://127.0.0.1:8080)
