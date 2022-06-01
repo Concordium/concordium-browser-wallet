@@ -10,6 +10,7 @@ import {
     UpdateContractPayload,
 } from '@concordium/web-sdk';
 
+// Extend window object with the wallet API and the callback needed by the wallet.
 declare global {
     interface Window {
         concordiumReady(): void;
@@ -18,16 +19,26 @@ declare global {
 }
 
 // Module reference on testnet: 47ece1d6d52b02f7f91e9b5dd456883785643a357309154403776d8d7f958f9e
+/** If you want to test smashing the piggy bank,
+ * it will be necessary to instantiate your own piggy bank using an account available in the browser wallet,
+ * and change this constant to match the index of the instance.
+ */
 const CONTRACT_INDEX = 5102n;
+/** Should match the subindex of the instance targeted. */
 const CONTRACT_SUB_INDEX = 0n;
 const CONTRACT_NAME = 'PiggyBank';
 
+/** This assumes a locally running JSON-RPC server targeting testnet: https://github.com/Concordium/concordium-json-rpc/tree/add-get-instance-info */
 const client = new JsonRpcClient(new HttpProvider('http://localhost:9095'));
 
+/** Promise resolves when callback is called from the extension, letting us know that the wallet API is ready for use. */
 const apiReady = new Promise<void>((resolve) => {
     window.concordiumReady = resolve;
 });
 
+/**
+ * Global application state.
+ */
 type State = {
     isConnected: boolean;
     account: string | undefined;
@@ -35,6 +46,9 @@ type State = {
 
 const state = createContext<State>({ isConnected: false, account: undefined });
 
+/**
+ * Action for depositing an amount of microCCD to the piggy bank instance
+ */
 const deposit = (amount = 0) => {
     if (!Number.isInteger(amount) || amount <= 0) {
         return;
@@ -54,6 +68,10 @@ const deposit = (amount = 0) => {
         .catch(alert);
 };
 
+/**
+ * Action for smashing the piggy bank. This is only possible to do, if the account sending the transaction matches the owner of the piggy bank:
+ * https://github.com/Concordium/concordium-rust-smart-contracts/blob/c4d95504a51c15bdbfec503c9e8bf5e93a42e24d/examples/piggy-bank/part1/src/lib.rs#L64
+ */
 const smash = () => {
     window.concordium
         .sendTransaction(AccountTransactionType.UpdateSmartContractInstance, {
@@ -70,11 +88,12 @@ const smash = () => {
 };
 
 function PiggyBank() {
-    const { account } = useContext(state);
+    const { account, isConnected } = useContext(state);
     const [piggybank, setPiggyBank] = useState<InstanceInfo>();
     const input = useRef<HTMLInputElement>(null);
 
     useEffect(() => {
+        // Get piggy bank data.
         client.getInstanceInfo({ index: CONTRACT_INDEX, subindex: CONTRACT_SUB_INDEX }).then(setPiggyBank);
     }, []);
 
@@ -94,7 +113,7 @@ function PiggyBank() {
             <label>
                 <div>Select amount to deposit (microCCD)</div>
                 <input type="number" defaultValue={1} ref={input} />
-                <button type="button" onClick={() => deposit(input.current?.valueAsNumber)}>
+                <button type="button" onClick={() => deposit(input.current?.valueAsNumber)} disabled={!isConnected}>
                     Deposit
                 </button>
             </label>
@@ -103,7 +122,7 @@ function PiggyBank() {
             <button
                 type="button"
                 onClick={() => smash()}
-                disabled={account === undefined || account !== piggybank?.owner.address} // The smash button is only active for the contract owner.
+                disabled={account === undefined || account !== piggybank?.owner.address || !isConnected} // The smash button is only active for the contract owner.
             >
                 Smash the piggy bank!
             </button>
@@ -111,6 +130,9 @@ function PiggyBank() {
     );
 }
 
+/**
+ * Connect to wallet, setup application state context, and render children when the wallet API is ready for use.
+ */
 export default function Root() {
     const [hasApi, setHasApi] = useState<boolean>(false);
     const [account, setAccount] = useState<string>();
@@ -119,24 +141,32 @@ export default function Root() {
     useEffect(() => {
         apiReady
             .then(() => {
+                // Promise resolves, meaning we're ready for action.
                 setHasApi(true);
             })
+            // Connect to the wallet.
             .then(() => window.concordium.connect())
             .then((acc) => {
+                // Connection accepted, set the application state parameters.
                 setAccount(acc);
                 setIsConnected(true);
 
+                // Listen for relevent events from the wallet.
                 window.concordium.addChangeAccountListener(setAccount);
-            });
+            })
+            // Connection rejected.
+            .catch(() => setIsConnected(false));
     }, []);
 
     const stateValue: State = useMemo(() => ({ isConnected, account }), [isConnected, account]);
 
+    // If the wallet API is not accessible, don't render the piggy bank.
     if (!hasApi) {
         return <>API not ready...</>;
     }
 
     return (
+        // Setup a globally accessible state with data from the wallet.
         <state.Provider value={stateValue}>
             <PiggyBank />
         </state.Provider>
