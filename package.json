@@ -30,9 +30,7 @@
         ]
     },
     "dependencies": {
-        "@concordium/browser-wallet-api": "workspace:*",
-        "@concordium/browser-wallet-api-types": "workspace:*",
-        "@concordium/browser-wallet-message-hub": "workspace:*"
+        "@concordium/browser-wallet-api-types": "workspace:*"
     },
     "devDependencies": {
         "@types/jest": "^27.4.1",

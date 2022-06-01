@@ -427,33 +427,29 @@ __metadata:
   languageName: unknown
   linkType: soft
 
-"@concordium/browser-wallet-api@0.1.0, @concordium/browser-wallet-api@workspace:*, @concordium/browser-wallet-api@workspace:packages/browser-wallet-api":
+"@concordium/browser-wallet-api@workspace:packages/browser-wallet-api":
   version: 0.0.0-use.local
   resolution: "@concordium/browser-wallet-api@workspace:packages/browser-wallet-api"
   dependencies:
     "@concordium/browser-wallet-api-types": "workspace:^"
-    "@concordium/browser-wallet-message-hub": 0.1.0
     "@concordium/web-sdk": 0.1.0
   languageName: unknown
   linkType: soft
 
-"@concordium/browser-wallet-message-hub@0.1.0, @concordium/browser-wallet-message-hub@workspace:*, @concordium/browser-wallet-message-hub@workspace:packages/browser-wallet-message-hub":
+"@concordium/browser-wallet-message-hub@workspace:packages/browser-wallet-message-hub":
   version: 0.0.0-use.local
   resolution: "@concordium/browser-wallet-message-hub@workspace:packages/browser-wallet-message-hub"
   dependencies:
-    "@concordium/browser-wallet": ^0.1.0
     "@types/chrome": ^0.0.183
     "@types/uuid": ^8.3.2
     uuid: ^8.3.2
   languageName: unknown
   linkType: soft
 
-"@concordium/browser-wallet@^0.1.0, @concordium/browser-wallet@workspace:packages/browser-wallet":
+"@concordium/browser-wallet@workspace:packages/browser-wallet":
   version: 0.0.0-use.local
   resolution: "@concordium/browser-wallet@workspace:packages/browser-wallet"
   dependencies:
-    "@concordium/browser-wallet-api": 0.1.0
-    "@concordium/browser-wallet-message-hub": 0.1.0
     "@concordium/web-sdk": 0.1.0
     "@craftamap/esbuild-plugin-html": ^0.3.2
     "@types/chrome": ^0.0.180
@@ -2165,9 +2161,7 @@ __metadata:
   version: 0.0.0-use.local
   resolution: "concordium-browser-wallet@workspace:."
   dependencies:
-    "@concordium/browser-wallet-api": "workspace:*"
     "@concordium/browser-wallet-api-types": "workspace:*"
-    "@concordium/browser-wallet-message-hub": "workspace:*"
     "@types/jest": ^27.4.1
     "@types/node": ^17.0.25
     "@typescript-eslint/eslint-plugin": ^5.20.0
