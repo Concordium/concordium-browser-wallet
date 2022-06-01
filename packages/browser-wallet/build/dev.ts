@@ -27,7 +27,7 @@ const config: BuildOptions = {
     metafile: true,
     logLevel: 'info',
     sourcemap: process.env.NODE_ENV !== 'production' && 'inline',
-    target: ['chrome64'],
+    target: ['chrome67'],
     outdir: 'dist',
     define: {
         'process.env.NODE_ENV': `"${process.env.NODE_ENV}"`,

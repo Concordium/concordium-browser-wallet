@@ -43,7 +43,7 @@ function useMessagePrompt<R>(type: InternalMessageType | MessageType, promptKey:
 
 export default function Routes() {
     const handleConnectionResponse = useMessagePrompt<boolean>(InternalMessageType.Connect, 'connectionRequest');
-    const handleSendTransactionResponse = useMessagePrompt<void>(
+    const handleSendTransactionResponse = useMessagePrompt<string | undefined>(
         InternalMessageType.SendTransaction,
         'sendTransaction'
     );
@@ -65,7 +65,12 @@ export default function Routes() {
                 />
                 <Route
                     path={relativeRoutes.prompt.sendTransaction.path}
-                    element={<SendTransaction onSubmit={handleSendTransactionResponse} />}
+                    element={
+                        <SendTransaction
+                            onSubmit={handleSendTransactionResponse}
+                            onReject={() => handleSendTransactionResponse(undefined)}
+                        />
+                    }
                 />
                 <Route
                     path={relativeRoutes.prompt.connectionRequest.path}

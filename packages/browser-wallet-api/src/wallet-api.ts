@@ -4,13 +4,35 @@ import {
     EventType,
     MessageType,
 } from '@concordium/browser-wallet-message-hub';
+import { AccountTransactionPayload, AccountTransactionType } from '@concordium/web-sdk';
+import { stringify } from './util';
 
 // eslint-disable-next-line @typescript-eslint/no-explicit-any
 type WalletEventHandler<T = any> = (payload: T) => void;
 
 export interface IWalletApi {
     addChangeAccountListener(handler: WalletEventHandler<string>): void;
-    sendTransaction(): Promise<boolean>;
+    /**
+     * Sends a transaction to the Concordium Wallet and awaits the users action. Note that a header is not sent, and will be constructed by the wallet itself.
+     * Note that if the user rejects signing the transaction, this will throw an error.
+     * @param type the type of transaction that is to be signed and sent.
+     * @param payload the payload of the transaction to be signed and sent.
+     * @param parameters parameters for the initContract and updateContract transactions in JSON-like format.
+     * @param schema schema used for the initContract and updateContract transactions to serialize the parameters. Should be base64 encoded.
+     */
+    sendTransaction(
+        type: AccountTransactionType.UpdateSmartContractInstance | AccountTransactionType.InitializeSmartContractInstance,
+        payload: AccountTransactionPayload,
+        parameters: Record<string, unknown>,
+        schema: string
+    ): Promise<string>;
+    /**
+     * Sends a transaction to the Concordium Wallet and awaits the users action. Note that a header is not sent, and will be constructed by the wallet itself.
+     * Note that if the user rejects signing the transaction, this will throw an error.
+     * @param type the type of transaction that is to be signed and sent.
+     * @param payload the payload of the transaction to be signed and sent.
+     */
+    sendTransaction(type: AccountTransactionType, payload: AccountTransactionPayload): Promise<string>;
     // eslint-disable-next-line @typescript-eslint/no-explicit-any
     signMessage(): Promise<any>;
     connect(): Promise<string | undefined>;
@@ -58,8 +80,24 @@ class WalletApi implements IWalletApi {
     /**
      * Sends a transaction to the Concordium Wallet and awaits the users action
      */
-    public sendTransaction(): Promise<boolean> {
-        return this.sendMessage(MessageType.SendTransaction, {});
+    public async sendTransaction(
+        type: AccountTransactionType,
+        payload: AccountTransactionPayload,
+        parameters?: Record<string, unknown>,
+        schema?: string
+    ): Promise<string> {
+        const response = await this.sendMessage<string | undefined>(MessageType.SendTransaction, {
+            type,
+            payload: stringify(payload),
+            parameters,
+            schema,
+        });
+
+        if (!response) {
+            throw new Error('Signing rejected');
+        }
+
+        return response;
     }
 
     // eslint-disable-next-line @typescript-eslint/no-explicit-any
