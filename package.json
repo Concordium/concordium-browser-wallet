@@ -7,7 +7,8 @@
     "license": "Apache",
     "private": true,
     "workspaces": [
-        "packages/*"
+        "packages/*",
+        "examples/*"
     ],
     "packageManager": "yarn@3.2.0",
     "scripts": {

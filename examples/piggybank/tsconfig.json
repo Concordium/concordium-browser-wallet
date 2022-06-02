@@ -1,0 +1,17 @@
+{
+    "extends": "../../tsconfig.json",
+    "compilerOptions": {
+        "baseUrl": ".",
+        "noEmit": true,
+        "jsx": "react",
+        "paths": {
+            "@concordium/browser-wallet-api": ["../../packages/browser-wallet-api/src"]
+        }
+    },
+    "ts-node": {
+        "compilerOptions": {
+            "module": "CommonJS"
+        }
+    },
+    "include": ["./**/*"]
+}
