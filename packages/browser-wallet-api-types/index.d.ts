@@ -8,6 +8,10 @@ import type {
 export type WalletEventHandler<T = any> = (payload: T) => void;
 
 export interface WalletApi {
+    /**
+     * React to changes to the selected account in the Concordium Wallet. Note that to get the initially selected account on load, the "connect" method should be used.
+     * @param handler a handler function called with the account address of the selected account.
+     */
     addChangeAccountListener(handler: WalletEventHandler<string>): void;
     /**
      * Sends a transaction to the Concordium Wallet and awaits the users action. Note that a header is not sent, and will be constructed by the wallet itself.
