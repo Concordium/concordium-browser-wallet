@@ -32,7 +32,11 @@ export interface WalletApi {
      * @param payload the payload of the transaction to be signed and sent.
      */
     sendTransaction(type: AccountTransactionType, payload: AccountTransactionPayload): Promise<string>;
-    // eslint-disable-next-line @typescript-eslint/no-explicit-any
+    /**
+     * Sends a message to the Concordium Wallet and awaits the users action. If the user signs the message, this will resolve to the signature.
+     * Note that if the user rejects signing the message, this will throw an error.
+     * @param message message to be signed. Note that the wallet will prepend some bytes to ensure the message cannot be a transaction
+     */
     signMessage(message: string): Promise<AccountTransactionSignature>;
     connect(): Promise<string | undefined>;
 }
