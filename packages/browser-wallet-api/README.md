@@ -4,7 +4,7 @@ This package is an implementation of an API to be used in web applications for c
 
 ## Using the API
 
-The API is automatically injected into web applications if the Concordium browser wallet extension is installed in the browser. It is made accessible `window.concordium`. A callback (`concordiumReady`), which needs to be defined globally, is called by the injected script to notify applications that the API is ready for use. The following exemplifies how this can be done.
+The API is automatically injected into web applications if the Concordium browser wallet extension is installed in the browser. It is made accessible by `window.concordium`. A callback (`concordiumReady`), which needs to be defined globally, is called by the injected script to notify applications that the API is ready for use. The following exemplifies how this can be done.
 
 ```typescript
 // Should be included as high in head tag of application HTML as possible to ensure the callback is defined before the script is injected.
@@ -28,7 +28,7 @@ const accountAddress = await window.concordium.connect();
 
 To send a transaction, two arguments need to be provided: A transaction type and a corresponding payload. Invoking `sendTransaction` returns a `Promise`, which resolves with the transaction hash for the submitted transaction.
 
-The following exemplifies how to create a simple transfer of funds from one account (selected account in the wallet) to another. Please note that [@concordium/web-sdk](https://github.com/Concordium/concordium-node-sdk-js/tree/main/packages/web) is used to provide the correct formats and types for the transaction payload
+The following exemplifies how to create a simple transfer of funds from one account (selected account in the wallet) to another. Please note that [@concordium/web-sdk](https://github.com/Concordium/concordium-node-sdk-js/tree/main/packages/web) is used to provide the correct formats and types for the transaction payload.
 
 ```typescript
 const txHash = await window.concordium.sendTransaction(concordiumSDK.AccountTransactionType.SimpleTransfer, {
@@ -70,7 +70,7 @@ const signature = await window.concordium.signMessage('This is a message to be s
 
 ### addChangeAccountListener
 
-To react on when the selected account in the wallet changes, a handler function can be assigned through `addChangeAccountListener`. This does **not** return the currently selected account when the handler is initially assigned. This can be obtained by invoking the `connect` method.
+To react when the selected account in the wallet changes, a handler function can be assigned through `addChangeAccountListener`. This does **not** return the currently selected account when the handler is initially assigned. This can be obtained by invoking the `connect` method.
 
 ```typescript
 let selectedAccountAddress: string | undefined = undefined;
