@@ -1,6 +1,8 @@
 const t = {
     description: 'Sign message',
-    submit: 'Sign',
+    sign: 'Sign',
+    deny: 'Deny',
+    error: 'Error',
 };
 
 export default t;

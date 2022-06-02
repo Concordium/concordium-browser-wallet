@@ -12,6 +12,7 @@ import Setup from '@popup/pages/Setup';
 import ConnectionRequest from '@popup/pages/ConnectionRequest';
 import { popupMessageHandler } from '@popup/shared/message-handler';
 import { noOp } from '@shared/utils/basic-helpers';
+import { AccountTransactionSignature } from '@concordium/web-sdk';
 
 type PromptKey = keyof Omit<typeof absoluteRoutes['prompt'], 'path'>;
 
@@ -47,7 +48,10 @@ export default function Routes() {
         InternalMessageType.SendTransaction,
         'sendTransaction'
     );
-    const handleSignMessageResponse = useMessagePrompt<void>(InternalMessageType.SignMessage, 'signMessage');
+    const handleSignMessageResponse = useMessagePrompt<AccountTransactionSignature | undefined>(
+        InternalMessageType.SignMessage,
+        'signMessage'
+    );
 
     useEffect(() => {
         popupMessageHandler.sendInternalMessage(InternalMessageType.PopupReady).catch(noOp);
@@ -61,7 +65,12 @@ export default function Routes() {
             <Route path={relativeRoutes.prompt.path} element={<FullscreenPromptLayout />}>
                 <Route
                     path={relativeRoutes.prompt.signMessage.path}
-                    element={<SignMessage onSubmit={handleSignMessageResponse} />}
+                    element={
+                        <SignMessage
+                            onSubmit={handleSignMessageResponse}
+                            onReject={() => handleSignMessageResponse(undefined)}
+                        />
+                    }
                 />
                 <Route
                     path={relativeRoutes.prompt.sendTransaction.path}
