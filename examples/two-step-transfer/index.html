@@ -20,6 +20,12 @@
                         .then(alert)
                         .catch(alert)
                 );
+                document.getElementById('signMessage').addEventListener('click', () =>
+                    window.concordium
+                        .signMessage(message.value)
+                        .then((sig) => alert(JSON.stringify(sig)))
+                        .catch(alert)
+                );
                 document.getElementById('sendDeposit').addEventListener('click', () =>
                     window.concordium
                         .sendTransaction(concordiumSDK.AccountTransactionType.UpdateSmartContractInstance, {
@@ -65,5 +71,8 @@
         <button id="sendTransfer">Send transfer</button>
         <button id="sendDeposit">deposit in two step transfer</button>
         <button id="sendReceive">Initiate Receive in two step transfer</button>
+        <br />
+        Message: <input type="text" id="message" value="I believe in miracles" />
+        <button id="signMessage">SignMessage</button>
     </body>
 </html>

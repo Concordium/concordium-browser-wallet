@@ -7,7 +7,7 @@
     "license": "Apache",
     "dependencies": {
         "@concordium/browser-wallet-message-hub": "0.1.0",
-        "@concordium/web-sdk": "0.1.0"
+        "@concordium/web-sdk": "^0.1.0"
     },
     "scripts": {
         "build": "tsc"
