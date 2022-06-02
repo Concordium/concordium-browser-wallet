@@ -424,7 +424,7 @@ __metadata:
   resolution: "@concordium/browser-wallet-api@workspace:packages/browser-wallet-api"
   dependencies:
     "@concordium/browser-wallet-message-hub": 0.1.0
-    "@concordium/web-sdk": 0.1.0
+    "@concordium/web-sdk": ^0.1.0
   languageName: unknown
   linkType: soft
 
@@ -445,7 +445,7 @@ __metadata:
   dependencies:
     "@concordium/browser-wallet-api": 0.1.0
     "@concordium/browser-wallet-message-hub": 0.1.0
-    "@concordium/web-sdk": 0.1.0
+    "@concordium/web-sdk": ^0.1.0
     "@craftamap/esbuild-plugin-html": ^0.3.2
     "@types/chrome": ^0.0.180
     "@types/react": ^18.0.7
@@ -487,7 +487,7 @@ __metadata:
   languageName: node
   linkType: hard
 
-"@concordium/web-sdk@npm:0.1.0, @concordium/web-sdk@npm:^0.1.0":
+"@concordium/web-sdk@npm:^0.1.0":
   version: 0.1.0
   resolution: "@concordium/web-sdk@npm:0.1.0"
   dependencies:

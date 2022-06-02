@@ -12,7 +12,6 @@ The example project included in this repository, serves as a working example of 
 ### Submitting transactions
 
 -   Browser wallet extension is installed in google chrome and configured with testnet JSON-RPC.
-    -   Currently, chrome must be running with CORS restrictions disabled.
 
 ## Installing
 
