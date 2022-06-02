@@ -4,7 +4,7 @@ import esbuild from 'esbuild';
 import path from 'path';
 import { promises as fs } from 'fs';
 
-import packageJson from '@root/package.json';
+import packageJson from 'package.json';
 import { throwIfUndefined } from '@shared/utils/function-helpers';
 
 export type Configuration = {

@@ -11,8 +11,7 @@
             "@inject/*": ["./src/inject/*"],
             "@shared/*": ["./src/shared/*"],
             "@concordium/browser-wallet-api": ["../../packages/browser-wallet-api/src"],
-            "@concordium/browser-wallet-message-hub": ["../../packages/browser-wallet-message-hub/src"],
-            "@root/*": ["./*"]
+            "@concordium/browser-wallet-message-hub": ["../../packages/browser-wallet-message-hub/src"]
         }
     },
     "ts-node": {
@@ -20,5 +19,5 @@
             "module": "CommonJS"
         }
     },
-    "include": ["./**/*"]
+    "include": ["./**/*", "../../node_modules/@concordium/browser-wallet-api-types/extend-window.d.ts"]
 }

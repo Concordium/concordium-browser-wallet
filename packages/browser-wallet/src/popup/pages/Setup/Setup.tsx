@@ -8,7 +8,8 @@ import { SubmitHandler, Validate } from 'react-hook-form';
 import FormInput from '@popup/shared/Form/Input';
 import Submit from '@popup/shared/Form/Submit';
 import { atom, useAtom } from 'jotai';
-import { jsonRpcUrlAtom, credentialsAtom, Credential } from '@popup/store/settings';
+import { jsonRpcUrlAtom, credentialsAtom } from '@popup/store/settings';
+import { WalletCredential } from '@shared/storage/types';
 
 type FormValues = {
     credentials: string;
@@ -18,7 +19,7 @@ type FormValues = {
 const fieldSeparator = ',';
 const lineSeparator = ';';
 
-const credFromCsvLine = (cred: string): Credential => {
+const credFromCsvLine = (cred: string): WalletCredential => {
     const [key, address, unexpected] = cred.split(fieldSeparator);
 
     if (!address) {
@@ -30,9 +31,9 @@ const credFromCsvLine = (cred: string): Credential => {
     return { key, address };
 };
 
-const credsFromCsv = (creds: string): Credential[] => creds.split(lineSeparator).map(credFromCsvLine);
+const credsFromCsv = (creds: string): WalletCredential[] => creds.split(lineSeparator).map(credFromCsvLine);
 
-const credToCsvLine = ({ key, address }: Credential): string => `${key}${fieldSeparator}${address}`;
+const credToCsvLine = ({ key, address }: WalletCredential): string => `${key}${fieldSeparator}${address}`;
 
 const formValuesAtom = atom<Partial<FormValues>, FormValues, void>(
     (get) => {

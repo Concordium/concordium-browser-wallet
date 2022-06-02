@@ -30,10 +30,6 @@
             "prettier --ignore-path .eslintignore --single-quote --write"
         ]
     },
-    "dependencies": {
-        "@concordium/browser-wallet-api": "workspace:*",
-        "@concordium/browser-wallet-message-hub": "workspace:*"
-    },
     "devDependencies": {
         "@types/jest": "^27.4.1",
         "@types/node": "^17.0.25",
