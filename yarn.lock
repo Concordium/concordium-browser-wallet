@@ -450,6 +450,7 @@ __metadata:
   version: 0.0.0-use.local
   resolution: "@concordium/browser-wallet@workspace:packages/browser-wallet"
   dependencies:
+    "@concordium/browser-wallet-api-types": "workspace:^"
     "@concordium/web-sdk": 0.1.0
     "@craftamap/esbuild-plugin-html": ^0.3.2
     "@types/chrome": ^0.0.180
