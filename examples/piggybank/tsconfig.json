@@ -3,15 +3,12 @@
     "compilerOptions": {
         "baseUrl": ".",
         "noEmit": true,
-        "jsx": "react",
-        "paths": {
-            "@concordium/browser-wallet-api": ["../../packages/browser-wallet-api/src"]
-        }
+        "jsx": "react"
     },
     "ts-node": {
         "compilerOptions": {
             "module": "CommonJS"
         }
     },
-    "include": ["./**/*"]
+    "include": ["./**/*", "../../node_modules/@concordium/browser-wallet-api-types/extend-window.d.ts"]
 }

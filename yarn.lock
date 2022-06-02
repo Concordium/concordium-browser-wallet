@@ -6991,6 +6991,7 @@ __metadata:
   resolution: "piggybank@workspace:examples/piggybank"
   dependencies:
     "@concordium/browser-wallet-api": "workspace:^"
+    "@concordium/browser-wallet-api-types": "workspace:^"
     "@concordium/web-sdk": ^0.1.0
     "@craftamap/esbuild-plugin-html": ^0.4.0
     "@types/react": ^18.0.9

@@ -1,6 +1,5 @@
 /* eslint-disable no-console */
 import React, { useEffect, useState, createContext, useMemo, useContext, useRef } from 'react';
-import type { IWalletApi } from '@concordium/browser-wallet-api';
 import {
     AccountTransactionType,
     GtuAmount,
@@ -9,14 +8,6 @@ import {
     JsonRpcClient,
     UpdateContractPayload,
 } from '@concordium/web-sdk';
-
-// Extend window object with the wallet API and the callback needed by the wallet.
-declare global {
-    interface Window {
-        concordiumReady(): void;
-        concordium: IWalletApi | undefined;
-    }
-}
 
 // Module reference on testnet: 47ece1d6d52b02f7f91e9b5dd456883785643a357309154403776d8d7f958f9e
 /** If you want to test smashing the piggy bank,
