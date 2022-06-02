@@ -417,7 +417,7 @@ __metadata:
   languageName: node
   linkType: hard
 
-"@concordium/browser-wallet-api-types@workspace:*, @concordium/browser-wallet-api-types@workspace:^, @concordium/browser-wallet-api-types@workspace:packages/browser-wallet-api-types":
+"@concordium/browser-wallet-api-types@workspace:^, @concordium/browser-wallet-api-types@workspace:packages/browser-wallet-api-types":
   version: 0.0.0-use.local
   resolution: "@concordium/browser-wallet-api-types@workspace:packages/browser-wallet-api-types"
   dependencies:
@@ -2410,7 +2410,6 @@ __metadata:
   version: 0.0.0-use.local
   resolution: "concordium-browser-wallet@workspace:."
   dependencies:
-    "@concordium/browser-wallet-api-types": "workspace:*"
     "@types/jest": ^27.4.1
     "@types/node": ^17.0.25
     "@typescript-eslint/eslint-plugin": ^5.20.0

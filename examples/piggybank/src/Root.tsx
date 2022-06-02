@@ -2,22 +2,38 @@
 import React, { useEffect, useState, createContext, useMemo, useContext, useRef } from 'react';
 import {
     AccountTransactionType,
+    deserializeContractState,
     GtuAmount,
     HttpProvider,
-    InstanceInfo,
+    InstanceInfoV0,
+    isInstanceInfoV0,
     JsonRpcClient,
+    toBuffer,
     UpdateContractPayload,
 } from '@concordium/web-sdk';
 
-// Module reference on testnet: 47ece1d6d52b02f7f91e9b5dd456883785643a357309154403776d8d7f958f9e
+// V1 Module reference on testnet: 47ece1d6d52b02f7f91e9b5dd456883785643a357309154403776d8d7f958f9e
+// const CONTRACT_INDEX = 5102n; // V1 instance
+
+// V0 Module reference on testnet: c0e51cd55ccbff4fa8da9bb76c9917e83ae8286d86b47647104bf715b4821c1a
 /** If you want to test smashing the piggy bank,
  * it will be necessary to instantiate your own piggy bank using an account available in the browser wallet,
  * and change this constant to match the index of the instance.
  */
-const CONTRACT_INDEX = 5102n;
+const CONTRACT_INDEX = 5114n; // V0 instance
 /** Should match the subindex of the instance targeted. */
 const CONTRACT_SUB_INDEX = 0n;
 const CONTRACT_NAME = 'PiggyBank';
+const CONTRACT_SCHEMA = toBuffer('AQAAAAkAAABQaWdneUJhbmsBFQIAAAAGAAAASW50YWN0AgcAAABTbWFzaGVkAgAAAAAA', 'base64');
+
+// Rust enums translated to JSON.
+type PiggyBankStateIntact = { Intact: [] };
+type PiggyBankStateSmashed = { Smashed: [] };
+
+type PiggyBankState = PiggyBankStateIntact | PiggyBankStateSmashed;
+
+const isPiggybankSmashed = (state: PiggyBankState): state is PiggyBankStateSmashed =>
+    (state as PiggyBankStateSmashed).Smashed !== undefined;
 
 /** This assumes a locally running JSON-RPC server targeting testnet: https://github.com/Concordium/concordium-json-rpc/tree/add-get-instance-info */
 const client = new JsonRpcClient(new HttpProvider('http://localhost:9095'));
@@ -88,13 +104,36 @@ const smash = () => {
 
 function PiggyBank() {
     const { account, isConnected } = useContext(state);
-    const [piggybank, setPiggyBank] = useState<InstanceInfo>();
+    const [piggybank, setPiggyBank] = useState<InstanceInfoV0>();
     const input = useRef<HTMLInputElement>(null);
 
     useEffect(() => {
         // Get piggy bank data.
-        client.getInstanceInfo({ index: CONTRACT_INDEX, subindex: CONTRACT_SUB_INDEX }).then(setPiggyBank);
+        client.getInstanceInfo({ index: CONTRACT_INDEX, subindex: CONTRACT_SUB_INDEX }).then((info) => {
+            if (info?.name !== `init_${CONTRACT_NAME}`) {
+                // Check that we have the expected instance.
+                throw new Error('Expected instance of PiggyBank');
+            }
+            if (!isInstanceInfoV0(info)) {
+                // Check smart contract version. We expect V0.
+                throw new Error('Expected SC version 0');
+            }
+
+            setPiggyBank(info);
+        });
     }, []);
+
+    // The internal state of the piggy bank, which is either intact or smashed.
+    const piggyBankState: PiggyBankState | undefined = useMemo(
+        () =>
+            piggybank?.model !== undefined
+                ? deserializeContractState(CONTRACT_NAME, CONTRACT_SCHEMA, piggybank.model)
+                : undefined,
+        [piggybank?.model]
+    );
+
+    // Disable use if we're not connected or if piggy bank has already been smashed.
+    const canUse = isConnected && piggyBankState !== undefined && !isPiggybankSmashed(piggyBankState);
 
     return (
         <main>
@@ -106,13 +145,14 @@ function PiggyBank() {
                 <>
                     <h1>Stored CCD: {Number(piggybank?.amount.microGtuAmount) / 1000000}</h1>
                     <div>Owner account: {piggybank?.owner.address}</div>
+                    <div>State: {isPiggybankSmashed(piggyBankState as PiggyBankState) ? 'Smashed' : 'Intact'}</div>
                 </>
             )}
             <br />
             <label>
                 <div>Select amount to deposit (microCCD)</div>
                 <input type="number" defaultValue={1} ref={input} />
-                <button type="button" onClick={() => deposit(input.current?.valueAsNumber)} disabled={!isConnected}>
+                <button type="button" onClick={() => deposit(input.current?.valueAsNumber)} disabled={!canUse}>
                     Deposit
                 </button>
             </label>
@@ -121,7 +161,7 @@ function PiggyBank() {
             <button
                 type="button"
                 onClick={() => smash()}
-                disabled={account === undefined || account !== piggybank?.owner.address || !isConnected} // The smash button is only active for the contract owner.
+                disabled={account === undefined || account !== piggybank?.owner.address || !canUse} // The smash button is only active for the contract owner.
             >
                 Smash the piggy bank!
             </button>
