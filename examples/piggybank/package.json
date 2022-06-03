@@ -2,7 +2,6 @@
     "name": "piggybank",
     "packageManager": "yarn@3.2.0",
     "dependencies": {
-        "@concordium/browser-wallet-api": "workspace:^",
         "@concordium/browser-wallet-api-types": "workspace:^",
         "@concordium/web-sdk": "^0.1.1",
         "react": "^18.1.0",
