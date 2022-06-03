@@ -4,7 +4,7 @@ This package includes the types for the API to be used in web applications for c
 
 This package changes the type of the window object, to include the injected api that is available on `window.concordium`.
 
-Note that this package only contains the types and a description of the API, which is rejected by the Concordium browser wallet.
+Note that this package only contains the types and a description of the API, which is injected by the Concordium browser wallet.
 
 The actual implementation can be found [In the Concordium browser wallet repository.](https://github.com/Concordium/concordium-browser-wallet/tree/main/packages/browser-wallet-api)
 
