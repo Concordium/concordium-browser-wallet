@@ -430,7 +430,7 @@ __metadata:
   resolution: "@concordium/browser-wallet-api@workspace:packages/browser-wallet-api"
   dependencies:
     "@concordium/browser-wallet-api-types": "workspace:^"
-    "@concordium/web-sdk": ^0.1.0
+    "@concordium/web-sdk": ^0.1.1
   languageName: unknown
   linkType: soft
 
@@ -449,7 +449,7 @@ __metadata:
   resolution: "@concordium/browser-wallet@workspace:packages/browser-wallet"
   dependencies:
     "@concordium/browser-wallet-api-types": "workspace:^"
-    "@concordium/web-sdk": ^0.1.0
+    "@concordium/web-sdk": ^0.1.1
     "@craftamap/esbuild-plugin-html": ^0.3.2
     "@types/chrome": ^0.0.180
     "@types/react": ^18.0.7
@@ -471,19 +471,6 @@ __metadata:
   languageName: unknown
   linkType: soft
 
-"@concordium/common-sdk@npm:1.0.0":
-  version: 1.0.0
-  resolution: "@concordium/common-sdk@npm:1.0.0"
-  dependencies:
-    "@concordium/rust-bindings": 0.1.0
-    bs58check: ^2.1.2
-    buffer: ^6.0.3
-    hash.js: ^1.1.7
-    uuid: ^8.3.2
-  checksum: c51e55bbbb794435ff5b44e72403c30e6783c6ed7203eebea130f055213643becfaa288c8394db0b70d668ce7a5a9c80417685a961d596cb583996e0ccff8b66
-  languageName: node
-  linkType: hard
-
 "@concordium/common-sdk@npm:1.0.1":
   version: 1.0.1
   resolution: "@concordium/common-sdk@npm:1.0.1"
@@ -498,27 +485,10 @@ __metadata:
   languageName: node
   linkType: hard
 
-"@concordium/rust-bindings@npm:0.1.0":
-  version: 0.1.0
-  resolution: "@concordium/rust-bindings@npm:0.1.0"
-  checksum: 2367b0517a892043bd9de6a4deff42cb55ec3313ee94d3c69f78c0ee3e71b7ab718fcb43227c02c6e9b4f6243df10fdda0ba176d9a7208b03fcdf7f9d55b1457
-  languageName: node
-  linkType: hard
-
 "@concordium/rust-bindings@npm:0.1.1":
   version: 0.1.1
   resolution: "@concordium/rust-bindings@npm:0.1.1"
   checksum: 9f375fcec85a82698b58273f0d1c347943ae0cde211690a9de2faa7afaceb2b8fa2018a56dddd721815c1769e2950ba12fc61b6675e8af52d50d077d850aea6f
-  languageName: node
-  linkType: hard
-
-"@concordium/web-sdk@npm:^0.1.0":
-  version: 0.1.0
-  resolution: "@concordium/web-sdk@npm:0.1.0"
-  dependencies:
-    "@concordium/common-sdk": 1.0.0
-    process: ^0.11.10
-  checksum: 1c0a0b19cba66b3ee3c72b54e8b898a99172130b8f2e8e1ce53f50379b2ea1ab84dbff4105914560607d9e917286fbcc4dcce8ed11e7107e0daedfe1d194e08c
   languageName: node
   linkType: hard
 
@@ -2063,8 +2033,8 @@ __metadata:
   linkType: hard
 
 "cacache@npm:^16.1.0":
-  version: 16.1.0
-  resolution: "cacache@npm:16.1.0"
+  version: 16.1.1
+  resolution: "cacache@npm:16.1.1"
   dependencies:
     "@npmcli/fs": ^2.1.0
     "@npmcli/move-file": ^2.0.0
@@ -2084,7 +2054,7 @@ __metadata:
     ssri: ^9.0.0
     tar: ^6.1.11
     unique-filename: ^1.1.1
-  checksum: ddfcf92f079f24ccecef4e2ca1e4428443787b61429b921803b020fd0f33d9ac829ac47837b74b40868d8ae4f1b2ed82e164cdaa5508fbd790eee005a9d88469
+  checksum: 488524617008b793f0249b0c4ea2c330c710ca997921376e15650cc2415a8054491ae2dee9f01382c2015602c0641f3f977faf2fa7361aa33d2637dcfb03907a
   languageName: node
   linkType: hard
 
@@ -2603,9 +2573,9 @@ __metadata:
   linkType: hard
 
 "css-functions-list@npm:^3.0.1":
-  version: 3.0.1
-  resolution: "css-functions-list@npm:3.0.1"
-  checksum: 8998406f9c6508180dad621bf91cfbf4649d922a57e2e5dd3fd909a2855e29d2f82cf176bd89a7598237b9e989126f8520e21479f2da51f37b1491a38fe72061
+  version: 3.1.0
+  resolution: "css-functions-list@npm:3.1.0"
+  checksum: 8a7c9d4ae57cb2f01500263e65a21372048d359ca7aa6430a32a736fe2a421decfebe45e579124b9a158ec68aba2eadcd733e568495a7698240d9607d31f681b
   languageName: node
   linkType: hard
 
@@ -4564,11 +4534,11 @@ __metadata:
   linkType: hard
 
 "i18next@npm:^21.6.16":
-  version: 21.8.5
-  resolution: "i18next@npm:21.8.5"
+  version: 21.8.7
+  resolution: "i18next@npm:21.8.7"
   dependencies:
     "@babel/runtime": ^7.17.2
-  checksum: 2652935c3bc0ff376f46bb7a777432d1a5ead2941302248abc3f4f51008dcbbb2459bf37c481095d1e81b83fb226ecacc6acb3a18cf4342a685f9acb498bf948
+  checksum: d647fd0a7381f7a24adef3d1a73000b6020b02570f9078f1cf8e91681d152a6750dffdfdd877aa042e7147a6c24365c1230b6f8919c9596396310c2ce2f7a61a
   languageName: node
   linkType: hard
 
@@ -5635,8 +5605,8 @@ __metadata:
   linkType: hard
 
 "jotai@npm:^1.6.5":
-  version: 1.7.0
-  resolution: "jotai@npm:1.7.0"
+  version: 1.7.1
+  resolution: "jotai@npm:1.7.1"
   peerDependencies:
     "@babel/core": "*"
     "@babel/template": "*"
@@ -5667,7 +5637,7 @@ __metadata:
       optional: true
     xstate:
       optional: true
-  checksum: 463ac19ef81265b9a15095a10997467e00fe799460abd8fd11a03f62137ae0b0e94796ae3e5c7ca147ed260cbc6424000ed897a8b58d1cbb061115d241d73804
+  checksum: 59e5cd76092dab938f6516f4a2d7a20b9c4d13ef97cbdd8a5f17a820bf03ec3ac3a834de214b16ee5443512d00fc977157e16b7236c2d8e04d3e3c016212706e
   languageName: node
   linkType: hard
 
@@ -6146,8 +6116,8 @@ __metadata:
   linkType: hard
 
 "make-fetch-happen@npm:^10.0.3":
-  version: 10.1.6
-  resolution: "make-fetch-happen@npm:10.1.6"
+  version: 10.1.7
+  resolution: "make-fetch-happen@npm:10.1.7"
   dependencies:
     agentkeepalive: ^4.2.1
     cacache: ^16.1.0
@@ -6163,9 +6133,9 @@ __metadata:
     minipass-pipeline: ^1.2.4
     negotiator: ^0.6.3
     promise-retry: ^2.0.1
-    socks-proxy-agent: ^6.1.1
+    socks-proxy-agent: ^7.0.0
     ssri: ^9.0.0
-  checksum: e75fb1209222404a803e0432cabf20dfccf35e78b32340a4f1ac18eb6faf9e42b2e600a3488261d71f455773581af8e1d615a881f50e5bd5d5efc2ae6ec7a8ee
+  checksum: 2b7301256e18a2f825c1c3cad14e11492428531ecdea04d846dc12c2d69658d65832746ce965e67c7f98b0d0506115674cf43676c3322709278620bfc886cf4a
   languageName: node
   linkType: hard
 
@@ -7039,7 +7009,7 @@ __metadata:
   resolution: "piggybank@workspace:examples/piggybank"
   dependencies:
     "@concordium/browser-wallet-api-types": "workspace:^"
-    "@concordium/web-sdk": ^0.1.0
+    "@concordium/web-sdk": ^0.1.1
     "@craftamap/esbuild-plugin-html": ^0.4.0
     "@types/react": ^18.0.9
     "@types/react-dom": ^18.0.5
@@ -7302,8 +7272,8 @@ __metadata:
   linkType: hard
 
 "react-i18next@npm:^11.16.7":
-  version: 11.16.9
-  resolution: "react-i18next@npm:11.16.9"
+  version: 11.16.10
+  resolution: "react-i18next@npm:11.16.10"
   dependencies:
     "@babel/runtime": ^7.14.5
     html-escaper: ^2.0.2
@@ -7316,7 +7286,7 @@ __metadata:
       optional: true
     react-native:
       optional: true
-  checksum: b79606a0c36a822b3d9a1e4f2bb4b44643c121de9425ddfeea7e63e5136fe33d4b0b42f045f14d53592dcdbde1fb43cd7be4555b22747d2e0f6f754d3a60c711
+  checksum: ece072a18169e117a049890c5e5f99dace97eacbf6acf4bcb201df1bc9ae46c03ae7f2ff1e8fd842e7fef749a413c3e0901901bff1377d0cb3a594e3e56937a7
   languageName: node
   linkType: hard
 
@@ -7707,15 +7677,15 @@ __metadata:
   linkType: hard
 
 "sass@npm:^1.49.0":
-  version: 1.52.1
-  resolution: "sass@npm:1.52.1"
+  version: 1.52.2
+  resolution: "sass@npm:1.52.2"
   dependencies:
     chokidar: ">=3.0.0 <4.0.0"
     immutable: ^4.0.0
     source-map-js: ">=0.6.2 <2.0.0"
   bin:
     sass: sass.js
-  checksum: a0508c88b149641202e8fb589f731e0cb09a15650128dfee6d0d1ee4a868cb57f1e71575535ccd72f54c5313b684a8beb208d293402ca8d32084ee1709d9f26d
+  checksum: d5efcbad4bc2efe638cd12665f8aeedc20f4e6b1cd2454624334f9189e9ab8a73708241232f102f6f873ee56fb64d993a67ff23bf669da5c2cf7495412007739
   languageName: node
   linkType: hard
 
@@ -7970,14 +7940,14 @@ __metadata:
   languageName: node
   linkType: hard
 
-"socks-proxy-agent@npm:^6.1.1":
-  version: 6.2.1
-  resolution: "socks-proxy-agent@npm:6.2.1"
+"socks-proxy-agent@npm:^7.0.0":
+  version: 7.0.0
+  resolution: "socks-proxy-agent@npm:7.0.0"
   dependencies:
     agent-base: ^6.0.2
     debug: ^4.3.3
     socks: ^2.6.2
-  checksum: 9ca089d489e5ee84af06741135c4b0d2022977dad27ac8d649478a114cdce87849e8d82b7c22b51501a4116e231241592946fc7fae0afc93b65030ee57084f58
+  checksum: 720554370154cbc979e2e9ce6a6ec6ced205d02757d8f5d93fe95adae454fc187a5cbfc6b022afab850a5ce9b4c7d73e0f98e381879cf45f66317a4895953846
   languageName: node
   linkType: hard
 
