@@ -20,6 +20,16 @@ window.concordiumReady = async () => {
 };
 ```
 
+To include the injected types in the window object's type, one can include this package's `extend-window.d.ts` file when building.
+This can be acheived by adding the following to your project's `tsconfig.json` file:
+
+```json
+{
+    ...
+    "include": [..., "path/to/node_modules/@concordium/browser-wallet-api-types/extend-window.d.ts"]
+}
+```
+
 ## API instance methods
 
 ### connect
