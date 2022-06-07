@@ -3,6 +3,13 @@ body {
     height: 500px;
     margin: 0;
     padding: 10px;
+    background-color: $color-bg;
+
+    &.dark {
+        --color-bg: #{$color-bg-dark};
+        --color-bg-off: #{$color-bg-off-dark};
+        --color-text: #{$color-text-dark};
+    }
 }
 
 * {

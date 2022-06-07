@@ -1,12 +1,27 @@
 // Color definitions
 $color-white: #fff;
 $color-off-white: #fbfbf9;
+$color-black: #000;
 $color-off-black: #181817;
 $color-grey: #979797;
 $color-bright-red: #f00;
 
 // Derived
-$color-text: $color-off-black;
 $color-text-faded: $color-grey;
 $color-danger: $color-bright-red;
 $color-lines: $color-grey;
+
+// Light mode
+$color-bg-light: $color-white;
+$color-bg-off-light: $color-off-white;
+$color-text-light: $color-off-black;
+
+// Dark mode
+$color-bg-dark: $color-black;
+$color-bg-off-dark: $color-off-black;
+$color-text-dark: $color-off-white;
+
+// Theme variables
+$color-bg: var(--color-bg, $color-bg-light); // white/black
+$color-bg-off: var(--color-bg-off, $color-bg-off-light); // off-white/off-black
+$color-text: var(--color-text, $color-text-light); // off-black/off-white
