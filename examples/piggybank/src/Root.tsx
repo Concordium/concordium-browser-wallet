@@ -12,6 +12,9 @@ import {
     UpdateContractPayload,
 } from '@concordium/web-sdk';
 
+import PiggyIcon from './assets/piggy-bank-solid.svg';
+import HammerIcon from './assets/hammer-solid.svg';
+
 // V1 Module reference on testnet: 47ece1d6d52b02f7f91e9b5dd456883785643a357309154403776d8d7f958f9e
 // const CONTRACT_INDEX = 5102n; // V1 instance
 
@@ -20,11 +23,14 @@ import {
  * it will be necessary to instantiate your own piggy bank using an account available in the browser wallet,
  * and change this constant to match the index of the instance.
  */
-const CONTRACT_INDEX = 5114n; // V0 instance
+const CONTRACT_INDEX = 5141n; // V0 instance
 /** Should match the subindex of the instance targeted. */
 const CONTRACT_SUB_INDEX = 0n;
 const CONTRACT_NAME = 'PiggyBank';
 const CONTRACT_SCHEMA = toBuffer('AQAAAAkAAABQaWdneUJhbmsBFQIAAAAGAAAASW50YWN0AgcAAABTbWFzaGVkAgAAAAAA', 'base64');
+
+/** This assumes a locally running JSON-RPC server targeting testnet: https://github.com/Concordium/concordium-json-rpc/tree/add-get-instance-info */
+const JSON_RPC_URL = 'http://localhost:9095';
 
 // Rust enums translated to JSON.
 type PiggyBankStateIntact = { Intact: [] };
@@ -35,12 +41,15 @@ type PiggyBankState = PiggyBankStateIntact | PiggyBankStateSmashed;
 const isPiggybankSmashed = (state: PiggyBankState): state is PiggyBankStateSmashed =>
     (state as PiggyBankStateSmashed).Smashed !== undefined;
 
-/** This assumes a locally running JSON-RPC server targeting testnet: https://github.com/Concordium/concordium-json-rpc/tree/add-get-instance-info */
-const client = new JsonRpcClient(new HttpProvider('http://localhost:9095'));
+const client = new JsonRpcClient(new HttpProvider(JSON_RPC_URL));
 
 /** Promise resolves when callback is called from the extension, letting us know that the wallet API is ready for use. */
 const apiReady = new Promise<void>((resolve) => {
-    window.concordiumReady = resolve;
+    if (window.concordium !== undefined) {
+        resolve();
+    } else {
+        window.concordiumReady = resolve;
+    }
 });
 
 /**
@@ -136,34 +145,48 @@ function PiggyBank() {
     const canUse = isConnected && piggyBankState !== undefined && !isPiggybankSmashed(piggyBankState);
 
     return (
-        <main>
-            <div>{isConnected ? `Wallet connected: ${account}` : 'No wallet connection'}</div>
+        <main className="piggybank">
+            <div className={`connection-banner ${isConnected ? 'connected' : ''}`}>
+                {isConnected ? `Connected: ${account}` : 'No wallet connection'}
+            </div>
             <br />
             {piggybank === undefined ? (
                 <div>Loading piggy bank...</div>
             ) : (
                 <>
-                    <h1>Stored CCD: {Number(piggybank?.amount.microGtuAmount) / 1000000}</h1>
-                    <div>Owner account: {piggybank?.owner.address}</div>
+                    <h1 className="stored">{Number(piggybank?.amount.microGtuAmount) / 1000000} CCD</h1>
+                    <div>
+                        Owned by
+                        <br />
+                        {piggybank?.owner.address}
+                    </div>
+                    <br />
                     <div>State: {isPiggybankSmashed(piggyBankState as PiggyBankState) ? 'Smashed' : 'Intact'}</div>
                 </>
             )}
             <br />
             <label>
-                <div>Select amount to deposit (microCCD)</div>
-                <input type="number" defaultValue={1} ref={input} />
-                <button type="button" onClick={() => deposit(input.current?.valueAsNumber)} disabled={!canUse}>
-                    Deposit
-                </button>
+                <div className="container">
+                    <input className="input" type="number" placeholder="Deposit amount" ref={input} />
+                    <button
+                        className="deposit"
+                        type="button"
+                        onClick={() => deposit(input.current?.valueAsNumber)}
+                        disabled={!canUse}
+                    >
+                        <PiggyIcon height="20" />
+                    </button>
+                </div>
             </label>
             <br />
             <br />
             <button
+                className="smash"
                 type="button"
                 onClick={() => smash()}
                 disabled={account === undefined || account !== piggybank?.owner.address || !canUse} // The smash button is only active for the contract owner.
             >
-                Smash the piggy bank!
+                <HammerIcon width="40" />
             </button>
         </main>
     );
