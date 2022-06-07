@@ -2,6 +2,7 @@
 /* eslint-disable import/no-extraneous-dependencies */
 import esbuild, { BuildOptions } from 'esbuild';
 import { htmlPlugin } from '@craftamap/esbuild-plugin-html';
+import svgrPlugin from 'esbuild-plugin-svgr';
 import fs from 'fs';
 
 const watch = Boolean(process.env.WATCH);
@@ -31,6 +32,7 @@ const config: BuildOptions = {
                 },
             ],
         }),
+        svgrPlugin(),
     ],
 };
 
