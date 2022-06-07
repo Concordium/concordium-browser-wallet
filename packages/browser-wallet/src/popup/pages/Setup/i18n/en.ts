@@ -19,6 +19,9 @@ const t = {
             required: 'Please specify JSON-RPC endpoint for node',
         },
     },
+    themeLabel: 'Theme:',
+    themeLight: 'Light',
+    themeDark: 'Dark',
 };
 
 export default t;

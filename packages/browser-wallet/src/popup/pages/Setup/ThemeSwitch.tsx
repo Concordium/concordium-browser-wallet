@@ -1,9 +1,12 @@
-import { themeAtom } from '@popup/store/settings';
-import { Theme } from '@shared/storage/types';
 import { useAtom } from 'jotai';
 import React, { useEffect } from 'react';
+import { useTranslation } from 'react-i18next';
+
+import { themeAtom } from '@popup/store/settings';
+import { Theme } from '@shared/storage/types';
 
 export default function ThemeSwitch() {
+    const { t } = useTranslation('setup');
     const [theme, setTheme] = useAtom(themeAtom);
 
     useEffect(() => {
@@ -16,9 +19,9 @@ export default function ThemeSwitch() {
 
     return (
         <div className="setup__theme">
-            <b>Theme:</b>{' '}
+            <b>{t('themeLabel')}</b>{' '}
             <button type="button" onClick={() => setTheme(theme === Theme.Light ? Theme.Dark : Theme.Light)}>
-                {theme === Theme.Light ? 'light' : 'dark'}
+                {theme === Theme.Light ? t('themeLight') : t('themeDark')}
             </button>
         </div>
     );
