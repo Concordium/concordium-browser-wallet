@@ -23,7 +23,7 @@ import HammerIcon from './assets/hammer-solid.svg';
  * it will be necessary to instantiate your own piggy bank using an account available in the browser wallet,
  * and change this constant to match the index of the instance.
  */
-const CONTRACT_INDEX = 5122n; // V0 instance
+const CONTRACT_INDEX = 5141n; // V0 instance
 /** Should match the subindex of the instance targeted. */
 const CONTRACT_SUB_INDEX = 0n;
 const CONTRACT_NAME = 'PiggyBank';
