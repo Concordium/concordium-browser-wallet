@@ -1,6 +1,6 @@
 .setup {
     &__theme {
-        margin-bottom: 10px;
+        margin-bottom: rem(10px);
     }
 
     &__field {
@@ -8,13 +8,13 @@
         width: 100%;
 
         &:not(:first-of-type) {
-            margin-top: 10px;
+            margin-top: rem(10px);
         }
     }
 
     &__submit {
         display: block;
         width: 100%;
-        margin-top: 20px;
+        margin-top: rem(20px);
     }
 }
