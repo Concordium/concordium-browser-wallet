@@ -3,6 +3,7 @@ import {
     storedCredentials,
     storedJsonRpcUrl,
     storedSelectedAccount,
+    storedTheme,
     storedUrlWhitelist,
 } from '@shared/storage/access';
 import { ChromeStorageKey } from '@shared/storage/types';
@@ -13,6 +14,7 @@ const accessorMap = {
     [ChromeStorageKey.SelectedAccount]: storedSelectedAccount,
     [ChromeStorageKey.JsonRpcUrl]: storedJsonRpcUrl,
     [ChromeStorageKey.UrlWhitelist]: storedUrlWhitelist,
+    [ChromeStorageKey.Theme]: storedTheme,
 };
 
 /**
