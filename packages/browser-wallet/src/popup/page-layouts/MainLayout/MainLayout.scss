@@ -1,6 +1,6 @@
 .main-layout {
     &__nav {
-        margin-bottom: 10px;
+        margin-bottom: rem(10px);
     }
 
     &__select-account {
@@ -9,6 +9,6 @@
     }
 
     &__content {
-        margin-top: 10px;
+        margin-top: rem(10px);
     }
 }

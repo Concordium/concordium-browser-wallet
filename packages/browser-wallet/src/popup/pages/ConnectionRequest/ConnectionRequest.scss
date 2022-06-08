@@ -3,8 +3,8 @@
 
     &__actions {
         display: grid;
-        margin-top: 10px;
-        grid-gap: 10px;
+        margin-top: rem(10px);
+        grid-gap: rem(10px);
         grid-template-columns: 1fr 1fr;
     }
 

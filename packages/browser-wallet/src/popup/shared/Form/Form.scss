@@ -13,7 +13,7 @@
 
     &__label {
         font-weight: bold;
-        margin-bottom: 5px;
+        margin-bottom: rem(5px);
     }
 
     &__field {
@@ -22,7 +22,7 @@
 
     &__note,
     &__error {
-        margin-top: 5px;
+        margin-top: rem(5px);
     }
 
     &__note {
