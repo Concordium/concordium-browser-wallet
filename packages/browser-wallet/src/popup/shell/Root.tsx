@@ -1,7 +1,7 @@
 import { themeAtom } from '@popup/store/settings';
 import { Theme as ThemeType } from '@shared/storage/types';
 import { Provider, useAtomValue } from 'jotai';
-import React, { PropsWithChildren, Suspense, useEffect } from 'react';
+import React, { ReactElement, Suspense, useEffect } from 'react';
 import { useTranslation } from 'react-i18next';
 import { MemoryRouter } from 'react-router-dom';
 
@@ -9,7 +9,7 @@ import './i18n';
 
 import Routes from './Routes';
 
-function Theme({ children }: PropsWithChildren<unknown>) {
+function Theme({ children }: { children: ReactElement }) {
     const theme = useAtomValue(themeAtom);
 
     useEffect(() => {
@@ -20,8 +20,7 @@ function Theme({ children }: PropsWithChildren<unknown>) {
         }
     }, [theme]);
 
-    // eslint-disable-next-line react/jsx-no-useless-fragment
-    return <>{children}</>;
+    return children;
 }
 
 export default function Root() {
