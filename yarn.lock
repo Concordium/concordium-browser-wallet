@@ -1626,7 +1626,7 @@ __metadata:
   version: 0.0.0-use.local
   resolution: "@concordium/browser-wallet-api-types@workspace:packages/browser-wallet-api-types"
   dependencies:
-    "@concordium/web-sdk": ^0.1.1
+    "@concordium/web-sdk": ^0.1.2
   languageName: unknown
   linkType: soft
 
@@ -1635,7 +1635,7 @@ __metadata:
   resolution: "@concordium/browser-wallet-api@workspace:packages/browser-wallet-api"
   dependencies:
     "@concordium/browser-wallet-api-types": "workspace:^"
-    "@concordium/web-sdk": ^0.1.1
+    "@concordium/web-sdk": ^0.1.2
   languageName: unknown
   linkType: soft
 
@@ -1655,7 +1655,7 @@ __metadata:
   dependencies:
     "@babel/core": ^7.18.2
     "@concordium/browser-wallet-api-types": "workspace:^"
-    "@concordium/web-sdk": ^0.1.1
+    "@concordium/web-sdk": ^0.1.2
     "@craftamap/esbuild-plugin-html": ^0.3.2
     "@mdx-js/react": ^1.6.22
     "@storybook/addon-actions": ^6.5.7
@@ -1716,15 +1716,15 @@ __metadata:
   languageName: node
   linkType: hard
 
-"@concordium/web-sdk@npm:^0.1.1":
-  version: 0.1.1
-  resolution: "@concordium/web-sdk@npm:0.1.1"
+"@concordium/web-sdk@npm:^0.1.2":
+  version: 0.1.2
+  resolution: "@concordium/web-sdk@npm:0.1.2"
   dependencies:
     "@concordium/common-sdk": 1.0.1
     "@concordium/rust-bindings": 0.1.1
     buffer: ^6.0.3
     process: ^0.11.10
-  checksum: c00b04fdb5497557ef42c4b9d2164e2c687ceab638de791f646754be078d3446e91cb7544eccdb0ad100b8350521572202e6f486b86e019a7433a498ed42fccd
+  checksum: f683982d1b70396f6fb8730959d5713ea135c18ac3dd40fb1eac7223079c50ddb43cf332b57c0a9b4274552ca0877c8b8a0f10f7ca1bb44ad641997424d6dd44
   languageName: node
   linkType: hard
 
@@ -14530,7 +14530,7 @@ __metadata:
   resolution: "piggybank@workspace:examples/piggybank"
   dependencies:
     "@concordium/browser-wallet-api-types": "workspace:^"
-    "@concordium/web-sdk": ^0.1.1
+    "@concordium/web-sdk": ^0.1.2
     "@craftamap/esbuild-plugin-html": ^0.4.0
     "@types/react": ^18.0.9
     "@types/react-dom": ^18.0.5
