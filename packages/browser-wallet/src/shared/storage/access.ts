@@ -1,4 +1,4 @@
-import { ChromeStorageKey, WalletCredential } from './types';
+import { ChromeStorageKey, Theme, WalletCredential } from './types';
 
 export type StorageAccessor<V> = {
     get(): Promise<V | undefined>;
@@ -25,3 +25,4 @@ export const storedSelectedAccount = makeStorageAccessor<string>('local', Chrome
     storedCredentials.get().then((cs) => cs?.[0]?.address)
 );
 export const storedUrlWhitelist = makeStorageAccessor<string[]>('local', ChromeStorageKey.UrlWhitelist);
+export const storedTheme = makeStorageAccessor<Theme>('local', ChromeStorageKey.Theme);

@@ -22,6 +22,9 @@ const t: typeof en = {
             required: 'Indtast JSON-RPC endpoint for node',
         },
     },
+    themeLabel: 'Udseende:',
+    themeLight: 'Lys',
+    themeDark: 'Mørk',
 };
 
 export default t;

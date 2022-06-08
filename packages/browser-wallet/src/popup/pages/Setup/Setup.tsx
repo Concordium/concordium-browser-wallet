@@ -1,15 +1,16 @@
 import React from 'react';
 import { useTranslation } from 'react-i18next';
 import { useNavigate } from 'react-router-dom';
+import { SubmitHandler, Validate } from 'react-hook-form';
+import { atom, useAtom } from 'jotai';
 
 import { absoluteRoutes } from '@popup/constants/routes';
 import Form from '@popup/shared/Form';
-import { SubmitHandler, Validate } from 'react-hook-form';
 import FormInput from '@popup/shared/Form/Input';
 import Submit from '@popup/shared/Form/Submit';
-import { atom, useAtom } from 'jotai';
 import { jsonRpcUrlAtom, credentialsAtom } from '@popup/store/settings';
 import { WalletCredential } from '@shared/storage/types';
+import ThemeSwitch from './ThemeSwitch';
 
 type FormValues = {
     credentials: string;
@@ -77,6 +78,7 @@ export default function Setup() {
             <Form onSubmit={handleSubmit} defaultValues={values}>
                 {({ register }) => (
                     <>
+                        <ThemeSwitch />
                         <FormInput
                             className="setup__field"
                             label={t('form.labels.credentials')}
