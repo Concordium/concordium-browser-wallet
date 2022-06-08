@@ -12,14 +12,20 @@ import { Dimensions, small } from '@popup/constants/dimensions';
 import { spawnedPopupUrl } from '@shared/constants/url';
 import bgMessageHandler, { onMessage } from './message-handler';
 
-/**
- * Spawns a new popup on screen. Returning promise resolves when it receives a ready event from the popup
- */
-export const spawnPopup = async (): Promise<chrome.windows.Window> => {
+const getTopLeft = async (): Promise<{ top: number; left: number }> => {
     const lastFocused = await chrome.windows.getLastFocused();
     // Position window in top right corner of lastFocused window.
     const top = lastFocused.top ?? 0;
     const left = (lastFocused.left ?? 0) + ((lastFocused.width ?? 0) - small.width);
+
+    return { top, left };
+};
+
+/**
+ * Spawns a new popup on screen. Returning promise resolves when it receives a ready event from the popup
+ */
+export const spawnPopup = async (): Promise<chrome.windows.Window> => {
+    const { top, left } = await getTopLeft();
 
     const window = chrome.windows.create({
         url: spawnedPopupUrl,
@@ -58,8 +64,13 @@ const focusExisting = async () => {
  * Try focusing an existing popup window.
  */
 export const setPopupSize = async ({ width, height }: Dimensions) => {
+    const { left } = await getTopLeft();
     try {
-        await chrome.windows.update(popupId as number, { width, height: height + 30 });
+        await chrome.windows.update(popupId as number, {
+            width,
+            height: height + 30,
+            left: left - (width - small.width), // Move window according to width difference.
+        });
     } catch {
         // no popup was found. It's safe to assume the popup with id: "popupId" has been closed.
         popupId = undefined;
