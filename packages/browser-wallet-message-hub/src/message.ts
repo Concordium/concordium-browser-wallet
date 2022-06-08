@@ -21,6 +21,7 @@ export enum InternalMessageType {
     SignMessage = 'I_SignMessage',
     Connect = 'I_Connect',
     TestPopupOpen = 'I_TestPopupOpen',
+    SetViewSize = 'I_SetViewSize',
 }
 
 /**

@@ -7,7 +7,7 @@ import {
 import { storedSelectedAccount, storedUrlWhitelist } from '@shared/storage/access';
 
 import bgMessageHandler from './message-handler';
-import { forwardToPopup, HandleMessage, HandleResponse, RunCondition } from './window-management';
+import { forwardToPopup, HandleMessage, HandleResponse, RunCondition, setPopupSize } from './window-management';
 
 /**
  * Callback method which installs Injected script into Main world of Dapp
@@ -32,6 +32,9 @@ const injectScript: ExtensionMessageHandler = (_msg, sender, respond) => {
 };
 
 bgMessageHandler.handleMessage(createMessageTypeFilter(InternalMessageType.Init), injectScript);
+bgMessageHandler.handleMessage(createMessageTypeFilter(InternalMessageType.SetViewSize), ({ payload }) => {
+    setPopupSize(payload);
+});
 
 /**
  * Run condition which looks up url in stored whitelist. Runs handler if url is included in whitelist.
