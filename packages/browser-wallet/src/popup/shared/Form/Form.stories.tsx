@@ -1,5 +1,4 @@
-/* eslint-disable react/function-component-definition */
-/* eslint-disable import/no-extraneous-dependencies */
+/* eslint-disable react/function-component-definition, import/no-extraneous-dependencies */
 import React from 'react';
 import { ComponentMeta, ComponentStory } from '@storybook/react';
 import { noOp } from '@shared/utils/basic-helpers';
@@ -8,7 +7,7 @@ import FormInput from './Input';
 import Submit from './Submit';
 
 export default {
-    title: 'Components/Form',
+    title: 'Shared/Form',
     component: Form,
 } as ComponentMeta<typeof Form>;
 

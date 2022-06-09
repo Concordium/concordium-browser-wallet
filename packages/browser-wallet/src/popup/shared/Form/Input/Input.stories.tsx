@@ -1,11 +1,10 @@
-/* eslint-disable react/function-component-definition */
-/* eslint-disable import/no-extraneous-dependencies */
+/* eslint-disable react/function-component-definition, import/no-extraneous-dependencies */
 import React, { useState } from 'react';
 import { ComponentMeta, ComponentStory } from '@storybook/react';
 import { Input } from './Input';
 
 export default {
-    title: 'Components/Form/Input',
+    title: 'Shared/Form/Input',
     component: Input,
 } as ComponentMeta<typeof Input>;
 
