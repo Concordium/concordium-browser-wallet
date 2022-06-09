@@ -1,10 +1,11 @@
-import { ControllerFieldState, ControllerRenderProps, UseFormRegisterReturn } from 'react-hook-form';
+import { ControllerRenderProps, UseFormRegisterReturn } from 'react-hook-form';
 
-export type RequiredFormFieldProps = Partial<Pick<ControllerFieldState, 'error'>>;
-export type RequiredControlledFieldProps = RequiredFormFieldProps & Omit<ControllerRenderProps, 'ref'>;
-export type RequiredUncontrolledFieldProps = RequiredFormFieldProps & Omit<UseFormRegisterReturn, 'ref'>;
+export type RequiredFormFieldProps = { error?: string };
+export type RequiredControlledFieldProps = RequiredFormFieldProps & Omit<Partial<ControllerRenderProps>, 'ref'>;
+export type RequiredUncontrolledFieldProps = RequiredFormFieldProps &
+    Partial<Pick<UseFormRegisterReturn, 'name' | 'onBlur' | 'onChange' | 'disabled'>>;
 
 export type CommonFieldProps = {
-    label?: string | JSX.Element;
-    note?: string | JSX.Element;
+    label?: string;
+    note?: string;
 };
