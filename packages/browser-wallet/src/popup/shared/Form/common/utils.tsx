@@ -51,7 +51,11 @@ export const makeControlled = <TProps extends RequiredControlledFieldProps>(Fiel
 
         return (
             <Controller
-                render={({ field: { ref, ...fieldProps }, fieldState: { error } }) => {
+                render={({
+                    field: { ref, ...fieldProps },
+                    fieldState: { error, isTouched },
+                    formState: { isSubmitted },
+                }) => {
                     const onChange: typeof fieldProps['onChange'] = (...args) => {
                         ownOnChange(...args);
                         return fieldProps.onChange(...args);
@@ -68,6 +72,7 @@ export const makeControlled = <TProps extends RequiredControlledFieldProps>(Fiel
                         onChange,
                         onBlur,
                         error: error?.message,
+                        valid: !error?.message && (isTouched || isSubmitted) && Object.keys(rules ?? {}).length > 0,
                         // eslint-disable-next-line @typescript-eslint/no-explicit-any
                     } as any;
 
@@ -107,9 +112,10 @@ export const makeUncontrolled = <TProps extends RequiredUncontrolledFieldProps>(
         // Filter away all props required for form registration, leaving the props for the input '<Field />'
         const { name, rules, register, onChange: ownOnChange = noOp, onBlur: ownOnBlur = noOp, ...ownProps } = props;
         const registerProps = register(name, rules);
-        const { errors } = useFormState<TFieldValues>(name);
+        const { errors, touchedFields, isSubmitted } = useFormState<TFieldValues>(name);
 
         const error = errors[name];
+        const isTouched = touchedFields[name];
 
         const onChange: typeof registerProps['onChange'] = (e) => {
             ownOnChange(e);
@@ -128,6 +134,7 @@ export const makeUncontrolled = <TProps extends RequiredUncontrolledFieldProps>(
             onChange,
             onBlur,
             error: error?.message,
+            valid: !error?.message && (isTouched || isSubmitted) && Object.keys(rules ?? {}).length > 0,
             // eslint-disable-next-line @typescript-eslint/no-explicit-any
         } as any;
 

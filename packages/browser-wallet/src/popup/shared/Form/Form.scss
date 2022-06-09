@@ -4,25 +4,56 @@
     }
 }
 
-.form-input {
-    @include when-invalid {
-        .form-input__field {
-            border-color: red;
-        }
+@mixin when-valid {
+    &--valid {
+        @content;
     }
+}
+
+.form-input {
+    position: relative;
+    display: block;
 
     &__label {
-        font-weight: bold;
-        margin-bottom: rem(5px);
+        font-size: rem(6px);
+        font-weight: $font-weight-light;
+        position: absolute;
+        left: rem(6px);
+        top: rem(4px);
     }
 
     &__field {
+        font-size: rem(10px);
+        height: rem(32px);
+        border: rem(1px) solid $color-grey;
+        border-radius: rem(5px);
+        padding: rem(10px) rem(5px) rem(5px);
         width: 100%;
+        outline: none;
+
+        &:focus {
+            border-color: $color-blue;
+        }
+    }
+
+    @include when-invalid {
+        .form-input__field {
+            border-color: $color-error;
+        }
+    }
+
+    @include when-valid {
+        .form-input__field:focus {
+            border-color: $color-success;
+        }
     }
 
     &__note,
     &__error {
-        margin-top: rem(5px);
+        position: relative;
+        left: rem(6px);
+        font-size: rem(6px);
+        margin-top: rem(4px);
     }
 
     &__note {
@@ -31,5 +62,5 @@
 }
 
 .form-error-message {
-    color: red;
+    color: $color-error;
 }

@@ -15,6 +15,29 @@ export type InputProps = Pick<InputHTMLAttributes<HTMLInputElement>, 'className'
  * Use as a normal \<input /\>. Should NOT be used for checkbox or radio.
  */
 export const Input = forwardRef<HTMLInputElement, InputProps>(
+    ({ error, className, type = 'text', label, note, valid, ...props }, ref) => {
+        return (
+            <label
+                className={clsx(
+                    'form-input',
+                    error !== undefined && 'form-input--invalid',
+                    valid && 'form-input--valid',
+                    className
+                )}
+            >
+                {label && <div className="form-input__label">{label}</div>}
+                <input className={clsx('form-input__field')} type={type} ref={ref} {...props} />
+                {error ? (
+                    <ErrorMessage className="form-input__error">{error}</ErrorMessage>
+                ) : (
+                    note && <div className="form-input__note">{note}</div>
+                )}
+            </label>
+        );
+    }
+);
+
+export const OldInput = forwardRef<HTMLInputElement, InputProps>(
     ({ error, className, type = 'text', label, note, ...props }, ref) => {
         return (
             <label className={clsx('form-input', error !== undefined && 'form-input--invalid', className)}>

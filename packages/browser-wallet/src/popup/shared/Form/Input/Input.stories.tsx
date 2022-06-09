@@ -32,3 +32,11 @@ Invalid.args = {
     type: 'text',
     error: 'This is an error',
 };
+
+export const Valid = Template.bind({});
+Valid.args = {
+    label: 'Label',
+    note: 'This is a note',
+    type: 'text',
+    valid: true,
+};
