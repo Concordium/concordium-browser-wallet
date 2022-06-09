@@ -8,7 +8,7 @@ import FormInput from './Input';
 import Submit from './Submit';
 
 export default {
-    title: 'Components/Form/Form',
+    title: 'Components/Form',
     component: Form,
 } as ComponentMeta<typeof Form>;
 
