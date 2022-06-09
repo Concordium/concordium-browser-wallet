@@ -6,7 +6,10 @@ import { CommonFieldProps, RequiredUncontrolledFieldProps } from '../common/type
 import { makeUncontrolled } from '../common/utils';
 import ErrorMessage from '../ErrorMessage';
 
-export type InputProps = Pick<InputHTMLAttributes<HTMLInputElement>, 'className' | 'type' | 'value'> &
+export type InputProps = Pick<
+    InputHTMLAttributes<HTMLInputElement>,
+    'className' | 'type' | 'value' | 'onChange' | 'onBlur'
+> &
     RequiredUncontrolledFieldProps &
     CommonFieldProps;
 
@@ -25,22 +28,6 @@ export const Input = forwardRef<HTMLInputElement, InputProps>(
                     className
                 )}
             >
-                {label && <div className="form-input__label">{label}</div>}
-                <input className={clsx('form-input__field')} type={type} ref={ref} {...props} />
-                {error ? (
-                    <ErrorMessage className="form-input__error">{error}</ErrorMessage>
-                ) : (
-                    note && <div className="form-input__note">{note}</div>
-                )}
-            </label>
-        );
-    }
-);
-
-export const OldInput = forwardRef<HTMLInputElement, InputProps>(
-    ({ error, className, type = 'text', label, note, ...props }, ref) => {
-        return (
-            <label className={clsx('form-input', error !== undefined && 'form-input--invalid', className)}>
                 {label && <div className="form-input__label">{label}</div>}
                 <input className={clsx('form-input__field')} type={type} ref={ref} {...props} />
                 {error ? (

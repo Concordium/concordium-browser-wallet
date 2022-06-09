@@ -1,5 +1,5 @@
 /* eslint-disable react/function-component-definition */
-import React, { ComponentType, ForwardRefExoticComponent } from 'react';
+import React, { ChangeEvent, ComponentType, ForwardRefExoticComponent, FocusEvent } from 'react';
 import {
     Controller,
     ControllerProps,
@@ -117,13 +117,13 @@ export const makeUncontrolled = <TProps extends RequiredUncontrolledFieldProps>(
         const error = errors[name];
         const isTouched = touchedFields[name];
 
-        const onChange: typeof registerProps['onChange'] = (e) => {
+        const onChange = (e: ChangeEvent) => {
             ownOnChange(e);
-            return registerProps.onChange(e);
+            registerProps.onChange(e);
         };
-        const onBlur: typeof registerProps['onBlur'] = (e) => {
+        const onBlur = (e: FocusEvent) => {
             ownOnBlur(e);
-            return registerProps.onBlur(e);
+            registerProps.onBlur(e);
         };
 
         // Mix Fields own props with generated props from field registration

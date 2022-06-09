@@ -61,6 +61,26 @@
     }
 }
 
+.form-password {
+    position: relative;
+
+    &__reveal {
+        position: absolute;
+        top: rem(16px);
+        right: rem(10px);
+        transform: translateY(-50%);
+        background-color: transparent;
+        border: none;
+        cursor: pointer;
+        display: flex;
+        align-items: center;
+
+        svg {
+            width: rem(15px);
+        }
+    }
+}
+
 .form-error-message {
     color: $color-error;
 }
