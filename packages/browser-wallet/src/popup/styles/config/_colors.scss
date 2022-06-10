@@ -36,3 +36,4 @@ $color-text-dark: $color-off-white;
 $color-bg: var(--color-bg, $color-bg-light); // off-white/off-black
 $color-text: var(--color-text, $color-text-light); // off-black/off-white
 $color-cta: var(--color-cta, $color-cta-othernet); // dark-green/blue
+$color-text-inverted: $color-bg;

@@ -5,16 +5,17 @@ import { noOp } from '@shared/utils/basic-helpers';
 import Form from './Form';
 import FormInput from './Input';
 import Submit from './Submit';
+import FormPassword from './Password';
 
 export default {
     title: 'Shared/Form',
     component: Form,
 } as ComponentMeta<typeof Form>;
 
-export const Primary: ComponentStory<typeof Form> = () => {
+export const AllFields: ComponentStory<typeof Form> = () => {
     return (
         <div style={{ width: 300 }}>
-            <Form<{ name: string; age: string }> onSubmit={noOp}>
+            <Form<{ name: string; age: string; password: string }> onSubmit={noOp}>
                 {(f) => (
                     <>
                         <FormInput
@@ -22,7 +23,6 @@ export const Primary: ComponentStory<typeof Form> = () => {
                             name="name"
                             label="Name"
                             note="Both first name and last name"
-                            rules={{ required: 'Must fill' }}
                         />
                         <FormInput
                             register={f.register}
@@ -30,6 +30,12 @@ export const Primary: ComponentStory<typeof Form> = () => {
                             type="number"
                             label="Age"
                             rules={{ required: 'Must fill', min: { value: 18, message: 'Must be at least 18' } }}
+                        />
+                        <FormPassword
+                            control={f.control}
+                            name="password"
+                            label="Password"
+                            rules={{ required: 'Must fill' }}
                         />
                         <Submit>Submit</Submit>
                     </>
