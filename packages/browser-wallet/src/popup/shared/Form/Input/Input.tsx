@@ -6,18 +6,15 @@ import { CommonFieldProps, RequiredUncontrolledFieldProps } from '../common/type
 import { makeUncontrolled } from '../common/utils';
 import ErrorMessage from '../ErrorMessage';
 
-export type InputProps = Pick<
-    InputHTMLAttributes<HTMLInputElement>,
-    'className' | 'type' | 'value' | 'onChange' | 'onBlur'
-> &
-    RequiredUncontrolledFieldProps &
+type Props = Pick<InputHTMLAttributes<HTMLInputElement>, 'className' | 'type' | 'value' | 'onChange' | 'onBlur'> &
+    RequiredUncontrolledFieldProps<HTMLInputElement> &
     CommonFieldProps;
 
 /**
  * @description
  * Use as a normal \<input /\>. Should NOT be used for checkbox or radio.
  */
-export const Input = forwardRef<HTMLInputElement, InputProps>(
+export const Input = forwardRef<HTMLInputElement, Props>(
     ({ error, className, type = 'text', label, note, valid, ...props }, ref) => {
         return (
             <label
@@ -40,6 +37,6 @@ export const Input = forwardRef<HTMLInputElement, InputProps>(
     }
 );
 
-const FormInput = makeUncontrolled(Input);
+const FormInput = makeUncontrolled<HTMLInputElement, Props>(Input);
 
 export default FormInput;

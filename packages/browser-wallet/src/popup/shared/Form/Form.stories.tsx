@@ -14,7 +14,23 @@ export default {
 
 export const AllFields: ComponentStory<typeof Form> = () => {
     return (
-        <div style={{ width: 300 }}>
+        <>
+            <style>
+                {`
+                    form {
+                        width: 300px;
+                    }
+
+                    form > * {
+                        margin-bottom: 10px;
+                    }
+
+                    .submit {
+                        margin: 0 auto;
+                        display: block;
+                    }
+                `}
+            </style>
             <Form<{ name: string; age: string; password: string }> onSubmit={noOp}>
                 {(f) => (
                     <>
@@ -37,10 +53,12 @@ export const AllFields: ComponentStory<typeof Form> = () => {
                             label="Password"
                             rules={{ required: 'Must fill' }}
                         />
-                        <Submit>Submit</Submit>
+                        <Submit className="submit" width="wide">
+                            Submit
+                        </Submit>
                     </>
                 )}
             </Form>
-        </div>
+        </>
     );
 };

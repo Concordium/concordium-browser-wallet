@@ -16,6 +16,7 @@
 
     &__label {
         font-size: rem(6px);
+        color: $color-text;
         font-weight: $font-weight-light;
         position: absolute;
         left: rem(6px);
@@ -23,7 +24,9 @@
     }
 
     &__field {
+        background-color: $color-bg;
         font-size: rem(10px);
+        color: $color-text;
         height: rem(32px);
         border: rem(1px) solid $color-grey;
         border-radius: rem(5px);
@@ -78,6 +81,11 @@
 
         svg {
             width: rem(15px);
+
+            g,
+            path {
+                fill: $color-text;
+            }
         }
     }
 }

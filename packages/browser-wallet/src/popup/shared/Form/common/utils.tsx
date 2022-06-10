@@ -104,10 +104,10 @@ type MakeUncontrolledProps<TFieldValues extends FieldValues = FieldValues> = {
  * const FormField = makeUncontrolled(Field);
  * <FormField<{ test: string }> register={register} name="test" test="string" />;
  */
-export const makeUncontrolled = <TProps extends RequiredUncontrolledFieldProps>(
-    Field: ForwardRefExoticComponent<TProps>
+export const makeUncontrolled = <E, P extends RequiredUncontrolledFieldProps<E>>(
+    Field: ForwardRefExoticComponent<P>
 ) => {
-    type OwnProps = Omit<TProps, 'ref' | 'name'>;
+    type OwnProps = Omit<P, 'ref' | 'name'>;
     return <TFieldValues extends FieldValues>(props: OwnProps & MakeUncontrolledProps<TFieldValues>) => {
         // Filter away all props required for form registration, leaving the props for the input '<Field />'
         const { name, rules, register, onChange: ownOnChange = noOp, onBlur: ownOnBlur = noOp, ...ownProps } = props;
@@ -117,18 +117,18 @@ export const makeUncontrolled = <TProps extends RequiredUncontrolledFieldProps>(
         const error = errors[name];
         const isTouched = touchedFields[name];
 
-        const onChange = (e: ChangeEvent) => {
+        const onChange = (e: ChangeEvent<E>) => {
             ownOnChange(e);
             registerProps.onChange(e);
         };
-        const onBlur = (e: FocusEvent) => {
+        const onBlur = (e: FocusEvent<E>) => {
             ownOnBlur(e);
             registerProps.onBlur(e);
         };
 
         // Mix Fields own props with generated props from field registration
         // eslint-disable-next-line @typescript-eslint/no-explicit-any
-        const newProps: TProps = {
+        const newProps: P = {
             ...ownProps,
             ...registerProps,
             onChange,

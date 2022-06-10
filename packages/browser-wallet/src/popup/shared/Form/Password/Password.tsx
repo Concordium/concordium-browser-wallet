@@ -18,8 +18,17 @@ const strengthTexts: Normalize<typeof en>[] = [
 
 type Props = Pick<InputHTMLAttributes<HTMLInputElement>, 'className'> &
     RequiredControlledFieldProps &
-    CommonFieldProps & { showStrength?: boolean };
+    CommonFieldProps & {
+        /**
+         * Shows strength of the password under the input field.
+         */
+        showStrength?: boolean;
+    };
 
+/**
+ * @description
+ * Password input with reveal button and optional strength check.
+ */
 export function Password({ showStrength = false, value, ...props }: Props) {
     const { t } = useTranslation();
     const [reveal, setReveal] = useState(false);

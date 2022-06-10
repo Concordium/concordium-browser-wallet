@@ -17,8 +17,8 @@ const Template: ComponentStory<typeof Button> = (args) => {
     );
 };
 
-export const Dynamic = Template.bind({});
-Dynamic.args = {
+export const Primary = Template.bind({});
+Primary.args = {
     children: 'Button text',
 };
 

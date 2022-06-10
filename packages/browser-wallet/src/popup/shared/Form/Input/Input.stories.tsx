@@ -13,7 +13,7 @@ const Template: ComponentStory<typeof Input> = (args) => {
 
     return (
         <div style={{ width: 300 }}>
-            <Input {...args} value={value} onChange={async (e) => setValue(e.target.value)} />
+            <Input {...args} value={value} onChange={(e) => setValue(e.target.value)} />
         </div>
     );
 };
@@ -21,14 +21,25 @@ const Template: ComponentStory<typeof Input> = (args) => {
 export const Primary = Template.bind({});
 Primary.args = {
     label: 'Label',
+    type: 'text',
+};
+
+export const WithNote = Template.bind({});
+WithNote.args = {
+    label: 'Label',
     note: 'This is a note',
     type: 'text',
+};
+
+export const Number = Template.bind({});
+Number.args = {
+    label: 'Label',
+    type: 'number',
 };
 
 export const Invalid = Template.bind({});
 Invalid.args = {
     label: 'Label',
-    note: 'This is a note',
     type: 'text',
     error: 'This is an error',
 };
@@ -36,7 +47,6 @@ Invalid.args = {
 export const Valid = Template.bind({});
 Valid.args = {
     label: 'Label',
-    note: 'This is a note',
     type: 'text',
     valid: true,
 };
