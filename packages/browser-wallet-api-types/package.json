@@ -15,6 +15,6 @@
         "url": "https://concordium.com"
     },
     "dependencies": {
-        "@concordium/web-sdk": "^0.1.1"
+        "@concordium/web-sdk": "^0.1.2"
     }
 }

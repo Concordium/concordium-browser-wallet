@@ -11,7 +11,7 @@ import {
 } from 'react-hook-form';
 
 import { noOp } from '@shared/utils/basic-helpers';
-import { MakeOptional, MakeRequired } from '@shared/utils/types';
+import { MakeRequired } from '@shared/utils/types';
 import { RequiredControlledFieldProps, RequiredUncontrolledFieldProps } from './types';
 
 type MakeControlledProps<TFieldValues extends FieldValues = FieldValues> = Omit<
@@ -34,7 +34,7 @@ type MakeControlledProps<TFieldValues extends FieldValues = FieldValues> = Omit<
  * <FormField<{ test: string }> control={control} name="test" test="string" />;
  */
 export const makeControlled = <TProps extends RequiredControlledFieldProps>(Field: ComponentType<TProps>) => {
-    type OwnProps = Omit<MakeOptional<TProps, 'onChange' | 'onBlur'>, 'name' | 'value'>;
+    type OwnProps = Omit<TProps, 'name' | 'value'>;
     return <TFieldValues extends FieldValues>(props: OwnProps & MakeControlledProps<TFieldValues>) => {
         // Filter away all props required for '<Controller />', leaving the props for the input '<Field />'
         const {
@@ -67,7 +67,7 @@ export const makeControlled = <TProps extends RequiredControlledFieldProps>(Fiel
                         ...fieldProps,
                         onChange,
                         onBlur,
-                        error,
+                        error: error?.message,
                         // eslint-disable-next-line @typescript-eslint/no-explicit-any
                     } as any;
 
@@ -102,7 +102,7 @@ type MakeUncontrolledProps<TFieldValues extends FieldValues = FieldValues> = {
 export const makeUncontrolled = <TProps extends RequiredUncontrolledFieldProps>(
     Field: ForwardRefExoticComponent<TProps>
 ) => {
-    type OwnProps = Omit<MakeOptional<TProps, 'onChange' | 'onBlur'>, 'ref' | 'name'>;
+    type OwnProps = Omit<TProps, 'ref' | 'name'>;
     return <TFieldValues extends FieldValues>(props: OwnProps & MakeUncontrolledProps<TFieldValues>) => {
         // Filter away all props required for form registration, leaving the props for the input '<Field />'
         const { name, rules, register, onChange: ownOnChange = noOp, onBlur: ownOnBlur = noOp, ...ownProps } = props;
@@ -127,7 +127,7 @@ export const makeUncontrolled = <TProps extends RequiredUncontrolledFieldProps>(
             ...registerProps,
             onChange,
             onBlur,
-            error,
+            error: error?.message,
             // eslint-disable-next-line @typescript-eslint/no-explicit-any
         } as any;
 

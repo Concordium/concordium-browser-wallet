@@ -17,3 +17,10 @@ Assuming dependencies have been successfully installed,
 When the extension has been successfully built,
 
 -   Load extension (`dist` folder in package root) folder [into chrome](https://developer.chrome.com/docs/extensions/mv3/getstarted/#unpacked)
+
+### Storybook
+
+Storybook is used to document the component library.
+
+-   To run storybook, execute `yarn storybook` in a terminal.
+-   Open `http://localhost:6006` in a browser.
