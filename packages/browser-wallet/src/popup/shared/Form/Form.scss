@@ -14,15 +14,6 @@
     position: relative;
     display: block;
 
-    &__label {
-        font-size: rem(6px);
-        color: $color-text;
-        font-weight: $font-weight-light;
-        position: absolute;
-        left: rem(6px);
-        top: rem(4px);
-    }
-
     &__field {
         background-color: $color-bg;
         font-size: rem(10px);
@@ -37,6 +28,19 @@
 
         &:focus {
             border-color: $color-blue;
+        }
+    }
+
+    &__label {
+        font-size: rem(6px);
+        color: $color-text;
+        font-weight: $font-weight-light;
+        position: absolute;
+        left: rem(6px);
+        top: rem(4px);
+
+        input:-internal-autofill-selected + & {
+            color: $color-text-light;
         }
     }
 

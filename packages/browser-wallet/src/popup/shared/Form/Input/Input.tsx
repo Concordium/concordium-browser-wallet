@@ -25,8 +25,8 @@ export const Input = forwardRef<HTMLInputElement, Props>(
                     className
                 )}
             >
-                {label && <div className="form-input__label">{label}</div>}
                 <input className={clsx('form-input__field')} type={type} ref={ref} {...props} />
+                {label && <div className="form-input__label">{label}</div>}
                 {error ? (
                     <ErrorMessage className="form-input__error">{error}</ErrorMessage>
                 ) : (
