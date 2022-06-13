@@ -3,6 +3,9 @@ import React, { useEffect } from 'react';
 import './global.scss';
 import '../src/popup/shell/i18n';
 
+/**
+ * Switches theme to dark mode when the background in storybook is set to dark.
+ */
 const themeDecorator = (Story, { globals, parameters }) => {
     const darkValue = parameters.backgrounds.values.find((bg) => bg.name === 'dark')?.value;
     const bgValue = globals.backgrounds?.value;

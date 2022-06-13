@@ -40,15 +40,15 @@
         }
     }
 
-    @include when-invalid {
-        .form-input__field {
-            border-color: $color-error;
+    @include when-valid {
+        .form-input__field:where(:focus) {
+            border-color: $color-success;
         }
     }
 
-    @include when-valid {
-        .form-input__field:focus {
-            border-color: $color-success;
+    @include when-invalid {
+        .form-input__field {
+            border-color: $color-error;
         }
     }
 

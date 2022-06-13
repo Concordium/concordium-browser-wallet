@@ -33,7 +33,10 @@ export function Password({ showStrength = false, value, ...props }: Props) {
     const { t } = useTranslation();
     const [reveal, setReveal] = useState(false);
 
-    const strength = useMemo(() => (showStrength ? passwordStrength(value).id : undefined), [showStrength, value]);
+    const strength = useMemo(
+        () => (value && showStrength ? passwordStrength(value).id : undefined),
+        [showStrength, value]
+    );
     const strengthNote = useMemo(() => (strength !== undefined ? t(strengthTexts[strength]) : undefined), [strength]);
 
     return (

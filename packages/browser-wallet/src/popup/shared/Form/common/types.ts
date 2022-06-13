@@ -7,7 +7,7 @@ export type RequiredFormFieldProps = {
      */
     error?: string;
     /**
-     * Sets valid state of the field.
+     * Sets valid state of the field. This has no effect if an error is also set.
      */
     valid?: boolean;
 };
