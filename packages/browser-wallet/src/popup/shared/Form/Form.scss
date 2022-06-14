@@ -69,6 +69,40 @@
     }
 }
 
+.form-inline-input {
+    appearance: textfield;
+    border: none;
+    padding: 0;
+    color: inherit;
+    font-size: inherit;
+    font-family: inherit;
+    font-weight: inherit;
+    line-height: inherit;
+    background: none;
+
+    &::-webkit-outer-spin-button,
+    &::-webkit-inner-spin-button {
+        appearance: none;
+        margin: 0;
+    }
+
+    &:focus {
+        outline: none;
+    }
+
+    &:disabled {
+        color: $color-grey;
+    }
+
+    &:read-only {
+        color: inherit;
+    }
+
+    @include when-invalid {
+        color: $color-error;
+    }
+}
+
 .form-password {
     position: relative;
 
