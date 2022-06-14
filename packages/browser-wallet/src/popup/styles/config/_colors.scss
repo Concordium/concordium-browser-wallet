@@ -4,12 +4,25 @@ $color-off-white: #fbfbf9;
 $color-black: #000;
 $color-off-black: #181817;
 $color-grey: #979797;
+$color-red: #ff4d4d;
 $color-bright-red: #f00;
+$color-green: #4ac29e;
+$color-dark-green: #308274;
+$color-blue: #4486ab;
 
 // Derived
 $color-text-faded: $color-grey;
+$color-success: $color-green;
+$color-error: $color-red;
 $color-danger: $color-bright-red;
 $color-lines: $color-grey;
+$color-passive: $color-grey;
+
+// Mainnet
+$color-cta-mainnet: $color-blue;
+
+// Testnet + others
+$color-cta-othernet: $color-dark-green;
 
 // Light mode
 $color-bg-light: $color-off-white;
@@ -22,3 +35,5 @@ $color-text-dark: $color-off-white;
 // Theme variables
 $color-bg: var(--color-bg, $color-bg-light); // off-white/off-black
 $color-text: var(--color-text, $color-text-light); // off-black/off-white
+$color-cta: var(--color-cta, $color-cta-othernet); // dark-green/blue
+$color-text-inverted: $color-bg;

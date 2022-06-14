@@ -1,5 +1,8 @@
 /* eslint-disable import/no-extraneous-dependencies, @typescript-eslint/no-var-requires, no-param-reassign */
+const path = require('path');
 const TsconfigPathsPlugin = require('tsconfig-paths-webpack-plugin');
+
+const pathToSvgAssets = path.resolve(__dirname, '../src/shared/assets/svg');
 
 module.exports = {
     core: {
@@ -20,7 +23,19 @@ module.exports = {
     ],
     framework: '@storybook/react',
     webpackFinal: async (config) => {
+        const { rules } = config.module;
+
+        const fileLoaderRule = rules.find((rule) => rule.test.test('.svg'));
+        fileLoaderRule.exclude = pathToSvgAssets;
+
+        rules.push({
+            test: /\.svg$/,
+            include: pathToSvgAssets,
+            use: ['@svgr/webpack'],
+        });
+
         config.resolve.plugins = [new TsconfigPathsPlugin()];
+
         return config;
     },
 };

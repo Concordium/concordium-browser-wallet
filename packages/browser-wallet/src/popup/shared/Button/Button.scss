@@ -1,0 +1,64 @@
+.button {
+    position: relative;
+    border: none;
+    font-family: $font-family-roboto;
+    cursor: pointer;
+
+    &:hover,
+    &:focus {
+        outline: none;
+    }
+
+    &:disabled {
+        cursor: default;
+    }
+
+    &[href] {
+        display: inline-flex;
+        align-items: center;
+        justify-content: center;
+        text-decoration: none;
+    }
+
+    &:where(:not(.button--clear)) {
+        height: rem(30px);
+        padding: 0 rem(10px);
+        font-size: rem(12px);
+        font-weight: $font-weight-extra-light;
+        color: $color-off-white;
+        border-radius: rem(5px);
+        background-color: $color-cta;
+        box-shadow: inset 0 0 rem(10px) rem(15px) rgb(255 255 255 / 0%);
+        transition: box-shadow $transition-timing $transition-easing;
+
+        &:hover,
+        &:focus {
+            &:not(:disabled) {
+                box-shadow: inset 0 0 rem(10px) rem(15px) rgb(255 255 255 / 15%);
+            }
+        }
+
+        &:disabled {
+            background-color: $color-passive;
+        }
+    }
+
+    &--faded {
+        box-shadow: inset 0 0 rem(10px) rem(15px) rgb(255 255 255 / 40%);
+    }
+
+    &--narrow {
+        width: rem(120px);
+    }
+
+    &--wide {
+        width: rem(150px);
+    }
+
+    &--clear {
+        font-size: inherit;
+        font-family: inherit;
+        padding: 0;
+        background: transparent;
+    }
+}

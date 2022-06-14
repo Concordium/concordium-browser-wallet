@@ -1,5 +1,6 @@
 html {
-    font-size: 10px;
+    font-size: $html-font-size; // 10px
+    font-family: $font-family-roboto;
 
     &.ui-scale-medium {
         // >=1080
@@ -8,7 +9,7 @@ html {
 
     &.ui-scale-large {
         // >=1440
-        font-size: $html-font-size; // 14px, 140%
+        font-size: 14px; // 140%
     }
 }
 
@@ -25,6 +26,10 @@ body {
 .dark {
     --color-bg: #{$color-bg-dark};
     --color-text: #{$color-text-dark};
+}
+
+.mainnet {
+    --color-cta: #{$color-blue};
 }
 
 * {

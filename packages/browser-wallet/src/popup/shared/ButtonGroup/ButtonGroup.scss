@@ -1,0 +1,6 @@
+.button-group {
+    display: grid;
+    grid-auto-flow: column;
+    grid-auto-columns: 1fr;
+    column-gap: rem(10px);
+}

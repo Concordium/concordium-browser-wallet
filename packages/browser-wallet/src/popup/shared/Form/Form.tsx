@@ -22,9 +22,21 @@ export const useForm = <TFormValues extends FieldValues = FieldValues>(
 ): UseFormReturn<TFormValues> => useFormLib<TFormValues>({ ...useFormDefaults, ...props });
 
 type FormProps<TFormValues> = {
+    /**
+     * Submit handler, receiving the values of the form as arg.
+     */
     onSubmit: SubmitHandler<TFormValues>;
+    /**
+     * Optional form methods from 'react-hook-form' useForm, if form methods need to be accessed outside of the form.
+     */
     formMethods?: UseFormReturn<TFormValues>;
+    /**
+     * Default values of the entire form.
+     */
     defaultValues?: DefaultValues<TFormValues>;
+    /**
+     * Function passing form methods to function body. Should be used to register form components (using register/control) to the form context.
+     */
     children: (methods: UseFormReturn<TFormValues>) => React.ReactNode;
 };
 

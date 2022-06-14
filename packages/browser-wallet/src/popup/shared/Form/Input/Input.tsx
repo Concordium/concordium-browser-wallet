@@ -6,20 +6,27 @@ import { CommonFieldProps, RequiredUncontrolledFieldProps } from '../common/type
 import { makeUncontrolled } from '../common/utils';
 import ErrorMessage from '../ErrorMessage';
 
-export type InputProps = Pick<InputHTMLAttributes<HTMLInputElement>, 'className' | 'type' | 'value'> &
-    RequiredUncontrolledFieldProps &
+type Props = Pick<InputHTMLAttributes<HTMLInputElement>, 'className' | 'type' | 'value' | 'onChange' | 'onBlur'> &
+    RequiredUncontrolledFieldProps<HTMLInputElement> &
     CommonFieldProps;
 
 /**
  * @description
  * Use as a normal \<input /\>. Should NOT be used for checkbox or radio.
  */
-export const Input = forwardRef<HTMLInputElement, InputProps>(
-    ({ error, className, type = 'text', label, note, ...props }, ref) => {
+export const Input = forwardRef<HTMLInputElement, Props>(
+    ({ error, className, type = 'text', label, note, valid, ...props }, ref) => {
         return (
-            <label className={clsx('form-input', error !== undefined && 'form-input--invalid', className)}>
-                {label && <div className="form-input__label">{label}</div>}
+            <label
+                className={clsx(
+                    'form-input',
+                    error !== undefined && 'form-input--invalid',
+                    valid && 'form-input--valid',
+                    className
+                )}
+            >
                 <input className={clsx('form-input__field')} type={type} ref={ref} {...props} />
+                {label && <div className="form-input__label">{label}</div>}
                 {error ? (
                     <ErrorMessage className="form-input__error">{error}</ErrorMessage>
                 ) : (
@@ -30,6 +37,6 @@ export const Input = forwardRef<HTMLInputElement, InputProps>(
     }
 );
 
-const FormInput = makeUncontrolled(Input);
+const FormInput = makeUncontrolled<HTMLInputElement, Props>(Input);
 
 export default FormInput;

@@ -1,19 +1,19 @@
 /* eslint-disable react/function-component-definition, import/no-extraneous-dependencies */
 import React, { useState } from 'react';
 import { ComponentMeta, ComponentStory } from '@storybook/react';
-import { Input } from './Input';
+import { Password } from './Password';
 
 export default {
-    title: 'Shared/Form/Input',
-    component: Input,
-} as ComponentMeta<typeof Input>;
+    title: 'Shared/Form/Password',
+    component: Password,
+} as ComponentMeta<typeof Password>;
 
-const Template: ComponentStory<typeof Input> = (args) => {
+const Template: ComponentStory<typeof Password> = (args) => {
     const [value, setValue] = useState<string>();
 
     return (
         <div style={{ width: 300 }}>
-            <Input {...args} value={value} onChange={(e) => setValue(e.target.value)} />
+            <Password {...args} value={value} onChange={async (e) => setValue(e.target.value)} />
         </div>
     );
 };
@@ -21,32 +21,26 @@ const Template: ComponentStory<typeof Input> = (args) => {
 export const Primary = Template.bind({});
 Primary.args = {
     label: 'Label',
-    type: 'text',
+    note: 'This is a note',
 };
 
-export const WithNote = Template.bind({});
-WithNote.args = {
+export const StrenghCheck = Template.bind({});
+StrenghCheck.args = {
     label: 'Label',
     note: 'This is a note',
-    type: 'text',
-};
-
-export const Number = Template.bind({});
-Number.args = {
-    label: 'Label',
-    type: 'number',
+    showStrength: true,
 };
 
 export const Invalid = Template.bind({});
 Invalid.args = {
     label: 'Label',
-    type: 'text',
+    note: 'This is a note',
     error: 'This is an error',
 };
 
 export const Valid = Template.bind({});
 Valid.args = {
     label: 'Label',
-    type: 'text',
+    note: 'This is a note',
     valid: true,
 };
