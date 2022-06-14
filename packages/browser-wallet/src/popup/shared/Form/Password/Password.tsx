@@ -18,7 +18,7 @@ const strengthTexts: Normalize<typeof en>[] = [
 
 type Props = Pick<InputHTMLAttributes<HTMLInputElement>, 'className'> &
     RequiredControlledFieldProps &
-    CommonFieldProps & {
+    Omit<CommonFieldProps, 'note'> & {
         /**
          * Shows strength of the password under the input field.
          */
