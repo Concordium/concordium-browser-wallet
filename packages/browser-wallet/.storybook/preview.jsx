@@ -1,6 +1,5 @@
 import React, { useEffect } from 'react';
 
-// import './global.scss';
 import '../src/popup/index.scss';
 import '../src/popup/shell/i18n';
 
