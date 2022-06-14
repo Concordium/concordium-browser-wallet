@@ -12,9 +12,9 @@ const Template: ComponentStory<typeof InlineInput> = (args) => {
     const [value, setValue] = useState<string>();
 
     return (
-        <div style={{ width: 300 }}>
+        <>
             I want to pay: <InlineInput {...args} value={value} onChange={(v) => setValue(v)} /> CCD
-        </div>
+        </>
     );
 };
 

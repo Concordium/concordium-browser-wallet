@@ -52,10 +52,17 @@
         .id-card--rejected & {
             background-color: $color-salmon;
         }
+
+        svg {
+            position: absolute;
+            left: rem(5px);
+            width: rem(13px);
+        }
     }
 
     &__name,
-    &__status {
+    &__status,
+    &__stamp {
         z-index: 1;
     }
 
@@ -77,6 +84,11 @@
         justify-content: center;
         font-size: rem(12px);
         font-weight: $font-weight-light;
+
+        .id-card--approved &,
+        .id-card--rejected & {
+            color: $color-grey;
+        }
     }
 
     &__stamp {

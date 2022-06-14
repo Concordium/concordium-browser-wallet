@@ -5,6 +5,8 @@ import VerfifiedIcon from '@assets/svg/verified-stamp.svg';
 import RejectedIcon from '@assets/svg/rejected-stamp.svg';
 import CheckIcon from '@assets/svg/checkmark-blue.svg';
 import EditIcon from '@assets/svg/edit.svg';
+import ConcordiumIcon from '@assets/svg/concordium-small.svg';
+import { useTranslation } from 'react-i18next';
 import Form from '../Form';
 import Submit from '../Form/Submit';
 import Button from '../Button';
@@ -66,29 +68,37 @@ function EditableName({ name, onChange }: EditNameProps) {
 
 type Props = {
     name: string;
-    status: 'pending' | 'verified' | 'rejected';
+    status: 'pending' | 'approved' | 'rejected';
     onNameChange(name: string): void;
     provider: JSX.Element;
 };
 
 export default function IdCard({ name, provider, status, onNameChange }: Props) {
+    const { t } = useTranslation();
+
     return (
         <div
             className={clsx(
                 'id-card',
                 status === 'pending' && 'id-card--pending',
+                status === 'approved' && 'id-card--approved',
                 status === 'rejected' && 'id-card--rejected'
             )}
         >
-            <header className="id-card__header">Concordium identity</header>
+            <header className="id-card__header">
+                <ConcordiumIcon />
+                {t('id.header')}
+            </header>
             <div className="id-card__name">
                 <EditableName name={name} onChange={onNameChange} />
             </div>
             <div className="id-card__status">
-                {status} {provider}
+                {status === 'pending' && t('id.pending')}
+                {status === 'approved' && t('id.approved')}
+                {status === 'rejected' && t('id.rejected')} {provider}
             </div>
             <div className="id-card__stamp">
-                {status === 'verified' && <VerfifiedIcon />}
+                {status === 'approved' && <VerfifiedIcon />}
                 {status === 'rejected' && <RejectedIcon />}
             </div>
         </div>

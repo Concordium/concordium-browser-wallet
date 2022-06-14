@@ -10,6 +10,12 @@ const t = {
             strong: 'Strong',
         },
     },
+    id: {
+        header: 'Concordium identity',
+        pending: 'Pending verification with',
+        approved: 'Verified by',
+        rejected: 'Rejected by',
+    },
 };
 
 export default t;

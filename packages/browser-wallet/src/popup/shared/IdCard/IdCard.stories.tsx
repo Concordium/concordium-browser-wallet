@@ -24,7 +24,7 @@ Pending.args = {
 export const Approved = Template.bind({});
 Approved.args = {
     name: 'Name',
-    status: 'verified',
+    status: 'approved',
     provider: <>DTS</>,
 };
 
