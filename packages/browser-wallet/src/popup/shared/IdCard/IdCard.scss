@@ -1,0 +1,97 @@
+.id-card {
+    position: relative;
+    border-radius: rem(10px);
+    border: rem(1px) solid $color-blue;
+    width: rem(196px);
+    height: rem(117px);
+    overflow: hidden;
+    background-color: $color-bg;
+    color: $color-text;
+    z-index: 0;
+
+    &::after {
+        content: '';
+        display: block;
+        transform: rotate(40deg) translate(30%, -30%);
+        background-color: rgba($color-white, 0.5);
+        height: 200%;
+        width: 100%;
+        position: absolute;
+        top: 0;
+        z-index: 0;
+
+        .dark & {
+            background-color: rgba($color-white, 0.08);
+        }
+    }
+
+    &--pending {
+        border-color: $color-grey;
+    }
+
+    &--rejected {
+        border-color: $color-salmon;
+    }
+
+    &__header {
+        background-color: $color-blue;
+        font-size: rem(12px);
+        text-align: center;
+        color: $color-white;
+        font-weight: $font-weight-light;
+        height: rem(20px);
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        z-index: -1;
+
+        .id-card--pending & {
+            background-color: $color-grey;
+        }
+
+        .id-card--rejected & {
+            background-color: $color-salmon;
+        }
+    }
+
+    &__name,
+    &__status {
+        z-index: 1;
+    }
+
+    &__name {
+        position: relative;
+        font-size: rem(14px);
+        height: calc(100% - rem(30px));
+        display: flex;
+        justify-content: center;
+        align-items: center;
+        margin-bottom: 10px;
+    }
+
+    &__status {
+        position: absolute;
+        bottom: rem(10px);
+        width: 100%;
+        display: flex;
+        justify-content: center;
+        font-size: rem(12px);
+        font-weight: $font-weight-light;
+    }
+
+    &__stamp {
+        position: absolute;
+        bottom: 0;
+        right: 0;
+        width: rem(40px);
+        transform: translate(5%, 10%);
+
+        .id-card--rejected & {
+            bottom: rem(1px);
+        }
+
+        circle {
+            fill: $color-bg;
+        }
+    }
+}
