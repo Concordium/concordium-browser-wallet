@@ -10,6 +10,7 @@
             "@content/*": ["./src/content/*"],
             "@inject/*": ["./src/inject/*"],
             "@shared/*": ["./src/shared/*"],
+            "@assets/*": ["./src/assets/*"],
             "@concordium/browser-wallet-api": ["../../packages/browser-wallet-api/src"],
             "@concordium/browser-wallet-message-hub": ["../../packages/browser-wallet-message-hub/src"]
         }

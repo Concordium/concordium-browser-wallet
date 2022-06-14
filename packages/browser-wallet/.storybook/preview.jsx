@@ -1,7 +1,10 @@
 import React, { useEffect } from 'react';
 
-import './global.scss';
+// import './global.scss';
+import '../src/popup/index.scss';
 import '../src/popup/shell/i18n';
+
+document.getElementsByTagName('html').item(0)?.classList.add('ui-scale-large');
 
 /**
  * Switches theme to dark mode when the background in storybook is set to dark.
