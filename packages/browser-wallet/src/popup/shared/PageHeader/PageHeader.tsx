@@ -1,9 +1,9 @@
 import clsx from 'clsx';
 import React from 'react';
+import { useNavigate } from 'react-router-dom';
 
 import BackIcon from '@assets/svg/back-arrow.svg';
 import Logo from '@assets/svg/concordium.svg';
-import { useNavigate } from 'react-router-dom';
 import Button from '../Button';
 
 type Props = {
