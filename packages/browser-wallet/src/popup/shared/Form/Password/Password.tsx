@@ -2,8 +2,8 @@ import React, { InputHTMLAttributes, useMemo, useState } from 'react';
 import { passwordStrength } from 'check-password-strength';
 import { Normalize, useTranslation } from 'react-i18next';
 
-import HiddenIcon from '@shared/assets/svg/hidden.svg';
-import VisibleIcon from '@shared/assets/svg/visible.svg';
+import HiddenIcon from '@assets/svg/hidden.svg';
+import VisibleIcon from '@assets/svg/visible.svg';
 import { Input } from '../Input';
 import { makeControlled } from '../common/utils';
 import { CommonFieldProps, RequiredControlledFieldProps } from '../common/types';

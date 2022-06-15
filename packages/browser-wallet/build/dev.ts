@@ -32,6 +32,7 @@ const config: BuildOptions = {
     define: {
         'process.env.NODE_ENV': `"${process.env.NODE_ENV}"`,
     },
+    loader: { '.jpg': 'dataurl', '.png': 'dataurl' },
     plugins: [
         sassPlugin(),
         htmlPlugin({

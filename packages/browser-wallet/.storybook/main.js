@@ -2,7 +2,7 @@
 const path = require('path');
 const TsconfigPathsPlugin = require('tsconfig-paths-webpack-plugin');
 
-const pathToSvgAssets = path.resolve(__dirname, '../src/shared/assets/svg');
+const pathToSvgAssets = path.resolve(__dirname, '../src/assets/svg');
 
 module.exports = {
     core: {
