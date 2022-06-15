@@ -34,7 +34,7 @@ function EditableName({ name, onChange }: EditNameProps) {
     if (!isEditing) {
         return (
             <div className="id-card__name-form">
-                name
+                {name}
                 <Button className="id-card__name-edit" clear onClick={() => setIsEditing(true)}>
                     <EditIcon />
                 </Button>

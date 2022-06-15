@@ -1,5 +1,6 @@
+/* eslint-disable react/destructuring-assignment */
 /* eslint-disable react/function-component-definition, import/no-extraneous-dependencies */
-import React, { useState } from 'react';
+import React, { useEffect, useState } from 'react';
 import { ComponentMeta, ComponentStory } from '@storybook/react';
 import IdCard from './IdCard';
 
@@ -32,8 +33,12 @@ export default {
 } as ComponentMeta<typeof IdCard>;
 
 const Template: ComponentStory<typeof IdCard> = (args) => {
-    // eslint-disable-next-line react/destructuring-assignment
     const [name, setName] = useState(args.name);
+
+    useEffect(() => {
+        setName(args.name);
+    }, [args.name]);
+
     return (
         <>
             <style>
