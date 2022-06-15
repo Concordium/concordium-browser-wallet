@@ -1,6 +1,11 @@
 import clsx from 'clsx';
 import React from 'react';
 
+import BackIcon from '@assets/svg/back-arrow.svg';
+import Logo from '@assets/svg/concordium.svg';
+import { useNavigate } from 'react-router-dom';
+import Button from '../Button';
+
 type Props = {
     // eslint-disable-next-line react/no-unused-prop-types
     title: string;
@@ -10,10 +15,10 @@ type Props = {
 
 type FlowProps = Props & {
     steps: number;
-    completedSteps: number;
+    activeStep: number;
 };
 
-function FlowProgress({ steps, completedSteps }: FlowProps) {
+function FlowProgress({ steps, activeStep }: FlowProps) {
     const points = new Array(steps).fill(0).map((_, i) => i + 1);
 
     return (
@@ -22,7 +27,7 @@ function FlowProgress({ steps, completedSteps }: FlowProps) {
                 <div
                     className={clsx(
                         'page-header__progress-bar-point',
-                        completedSteps >= s && 'page-header__progress-bar-point--completed'
+                        activeStep >= s && 'page-header__progress-bar-point--completed'
                     )}
                 />
             ))}
@@ -34,10 +39,19 @@ const isFlow = (props: Props | FlowProps): props is FlowProps => (props as FlowP
 
 export default function PageHeader(props: Props | FlowProps) {
     const { title, canGoBack } = props;
+    const navigate = useNavigate();
 
     return (
         <header className="page-header">
-            <div className="page-header__icon">{canGoBack ? '<' : 'Icon'}</div>
+            <div className="page-header__icon">
+                {canGoBack ? (
+                    <Button className="flex" clear onClick={() => navigate(-1)}>
+                        <BackIcon className="page-header__back-icon" />
+                    </Button>
+                ) : (
+                    <Logo className="page-header__logo" />
+                )}
+            </div>
             <div className="flexColumn justifyCenter flexChildFill">
                 <h1 className="page-header__title">{title}</h1>
                 {isFlow(props) && <FlowProgress {...props} />}

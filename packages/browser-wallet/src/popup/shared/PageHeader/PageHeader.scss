@@ -11,6 +11,18 @@
         align-items: center;
         border-right: 1px solid $color-text;
         margin-right: rem(14px);
+
+        path {
+            fill: $color-text;
+        }
+    }
+
+    &__back-icon {
+        height: rem(16px);
+    }
+
+    &__logo {
+        width: rem(25px);
     }
 
     &__title {
@@ -27,11 +39,12 @@
     }
 
     &__progress-bar-point {
-        height: rem(5px);
-        width: rem(5px);
+        height: rem(6px);
+        width: rem(6px);
         background-color: $color-bg;
         border: 1px solid $color-text;
-        border-radius: rem(2.5px);
+        border-radius: 50%;
+        position: relative;
         transform: translateY(-50%);
 
         &--completed {
