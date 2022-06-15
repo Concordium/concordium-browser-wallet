@@ -67,13 +67,14 @@
     }
 
     &__name {
+        text-align: center;
         position: relative;
         font-size: rem(14px);
         height: calc(100% - rem(30px));
         display: flex;
         justify-content: center;
         align-items: center;
-        margin-bottom: rem(10px);
+        margin: 0 auto rem(10px);
     }
 
     &__status {
@@ -82,10 +83,11 @@
         width: 100%;
         display: flex;
         justify-content: center;
+        align-items: center;
         font-size: rem(12px);
         font-weight: $font-weight-light;
 
-        .id-card--approved &,
+        .id-card--confirmed &,
         .id-card--rejected & {
             color: $color-grey;
         }
@@ -116,6 +118,7 @@
         position: relative;
         display: inline-flex;
         align-items: center;
+        max-width: calc(100% - rem(50px));
     }
 
     &__name-field {
@@ -125,7 +128,7 @@
 
     &__name-edit {
         position: absolute;
-        right: -5px;
+        right: rem(-5px);
         transform: translateX(100%);
         width: auto;
         display: flex;

@@ -13,7 +13,7 @@ const t = {
     id: {
         header: 'Concordium identity',
         pending: 'Pending verification with',
-        approved: 'Verified by',
+        confirmed: 'Verified by',
         rejected: 'Rejected by',
     },
 };

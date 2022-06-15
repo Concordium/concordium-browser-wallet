@@ -31,35 +31,36 @@ function EditableName({ name, onChange }: EditNameProps) {
         setIsEditing(false);
     };
 
+    if (!isEditing) {
+        return (
+            <div className="id-card__name-form">
+                name
+                <Button className="id-card__name-edit" clear onClick={() => setIsEditing(true)}>
+                    <EditIcon />
+                </Button>
+            </div>
+        );
+    }
+
     return (
-        <Form<EditNameForm> onSubmit={handleSubmit} className="id-card__name">
+        <Form<EditNameForm> onSubmit={handleSubmit} className="id-card__name-form">
             {(f) => (
                 <>
-                    {isEditing ? (
-                        <FormInlineInput
-                            name="name"
-                            control={f.control}
-                            className="id-card__name-field"
-                            defaultValue={name}
-                            fallbackValue={name}
-                            autoFocus
-                            rules={{
-                                required: true,
-                                maxLength: IDENTITY_NAME_MAX_LENGTH,
-                            }}
-                        />
-                    ) : (
-                        name
-                    )}
-                    {isEditing ? (
-                        <Submit className="id-card__name-edit" clear>
-                            <CheckIcon />
-                        </Submit>
-                    ) : (
-                        <Button className="id-card__name-edit" clear onClick={() => setIsEditing(true)}>
-                            <EditIcon />
-                        </Button>
-                    )}
+                    <FormInlineInput
+                        name="name"
+                        control={f.control}
+                        className="id-card__name-field"
+                        defaultValue={name}
+                        fallbackValue={name}
+                        autoFocus
+                        rules={{
+                            required: true,
+                            maxLength: IDENTITY_NAME_MAX_LENGTH,
+                        }}
+                    />
+                    <Submit className="id-card__name-edit" clear>
+                        <CheckIcon />
+                    </Submit>
                 </>
             )}
         </Form>
@@ -68,7 +69,7 @@ function EditableName({ name, onChange }: EditNameProps) {
 
 type Props = {
     name: string;
-    status: 'pending' | 'approved' | 'rejected';
+    status: 'pending' | 'confirmed' | 'rejected';
     onNameChange(name: string): void;
     provider: JSX.Element;
 };
@@ -81,7 +82,7 @@ export default function IdCard({ name, provider, status, onNameChange }: Props) 
             className={clsx(
                 'id-card',
                 status === 'pending' && 'id-card--pending',
-                status === 'approved' && 'id-card--approved',
+                status === 'confirmed' && 'id-card--confirmed',
                 status === 'rejected' && 'id-card--rejected'
             )}
         >
@@ -94,11 +95,11 @@ export default function IdCard({ name, provider, status, onNameChange }: Props) 
             </div>
             <div className="id-card__status">
                 {status === 'pending' && t('id.pending')}
-                {status === 'approved' && t('id.approved')}
+                {status === 'confirmed' && t('id.confirmed')}
                 {status === 'rejected' && t('id.rejected')} {provider}
             </div>
             <div className="id-card__stamp">
-                {status === 'approved' && <VerfifiedIcon />}
+                {status === 'confirmed' && <VerfifiedIcon />}
                 {status === 'rejected' && <RejectedIcon />}
             </div>
         </div>
