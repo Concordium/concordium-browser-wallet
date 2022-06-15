@@ -21,26 +21,22 @@ const Template: ComponentStory<typeof Password> = (args) => {
 export const Primary = Template.bind({});
 Primary.args = {
     label: 'Label',
-    note: 'This is a note',
 };
 
 export const StrenghCheck = Template.bind({});
 StrenghCheck.args = {
     label: 'Label',
-    note: 'This is a note',
     showStrength: true,
 };
 
 export const Invalid = Template.bind({});
 Invalid.args = {
     label: 'Label',
-    note: 'This is a note',
     error: 'This is an error',
 };
 
 export const Valid = Template.bind({});
 Valid.args = {
     label: 'Label',
-    note: 'This is a note',
     valid: true,
 };
