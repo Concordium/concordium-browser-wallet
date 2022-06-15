@@ -23,11 +23,14 @@ import HammerIcon from './assets/hammer-solid.svg';
  * it will be necessary to instantiate your own piggy bank using an account available in the browser wallet,
  * and change this constant to match the index of the instance.
  */
-const CONTRACT_INDEX = 5141n; // V0 instance
+const CONTRACT_INDEX = 6n; // V0 instance
 /** Should match the subindex of the instance targeted. */
 const CONTRACT_SUB_INDEX = 0n;
 const CONTRACT_NAME = 'PiggyBank';
-const CONTRACT_SCHEMA = toBuffer('AQAAAAkAAABQaWdneUJhbmsBFQIAAAAGAAAASW50YWN0AgcAAABTbWFzaGVkAgAAAAAA', 'base64');
+const CONTRACT_SCHEMA: number = toBuffer(
+    'AQAAAAkAAABQaWdneUJhbmsBFQIAAAAGAAAASW50YWN0AgcAAABTbWFzaGVkAgAAAAAA',
+    'base64'
+);
 
 /** This assumes a locally running JSON-RPC server targeting testnet: https://github.com/Concordium/concordium-json-rpc/tree/add-get-instance-info */
 const JSON_RPC_URL = 'http://localhost:9095';
@@ -121,7 +124,7 @@ function PiggyBank() {
         client.getInstanceInfo({ index: CONTRACT_INDEX, subindex: CONTRACT_SUB_INDEX }).then((info) => {
             if (info?.name !== `init_${CONTRACT_NAME}`) {
                 // Check that we have the expected instance.
-                throw new Error('Expected instance of PiggyBank');
+                throw new Error(`Expected instance of PiggyBank: ${info?.name}`);
             }
             if (!isInstanceInfoV0(info)) {
                 // Check smart contract version. We expect V0.
