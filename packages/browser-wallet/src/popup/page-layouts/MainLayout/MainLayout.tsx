@@ -5,6 +5,7 @@ import { useAtom, useAtomValue } from 'jotai';
 
 import { absoluteRoutes } from '@popup/constants/routes';
 import { selectedAccountAtom, accountsAtom } from '@popup/store/account';
+import Header from './Header';
 
 export default function MainLayout() {
     const { t } = useTranslation('mainLayout');
@@ -18,9 +19,7 @@ export default function MainLayout() {
 
     return (
         <>
-            <header>
-                <h3>{t('title')}</h3>
-            </header>
+            <Header />
             <nav className="main-layout__nav">
                 <NavLink to={absoluteRoutes.home.path}>{t('nav.home')}</NavLink> |{' '}
                 <NavLink to={absoluteRoutes.setup.path}>{t('nav.setup')}</NavLink>
