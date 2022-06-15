@@ -4,16 +4,31 @@
     width: 100%;
 
     &__icon {
+        position: relative;
         flex: 0 0 rem(50px);
         height: 100%;
         display: flex;
         justify-content: center;
         align-items: center;
-        border-right: 1px solid $color-text;
         margin-right: rem(14px);
 
         path {
             fill: $color-text;
+        }
+
+        &::after {
+            display: block;
+            content: '';
+            width: rem(2px);
+            height: 100%;
+            background: radial-gradient(50% 50% at 50% 50%, #000 0%, rgb(196 196 196 / 0%) 100%);
+            position: absolute;
+            right: 0;
+            transform: translateX(50%);
+
+            .dark & {
+                background: radial-gradient(50% 50% at 50% 50%, #fff 0%, rgb(196 196 196 / 0%) 100%);
+            }
         }
     }
 
