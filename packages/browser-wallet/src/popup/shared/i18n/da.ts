@@ -15,7 +15,7 @@ const t: typeof en = {
     id: {
         header: 'Concordium identitet',
         pending: 'Afventer godkendelse fra',
-        approved: 'Godkendt af',
+        confirmed: 'Godkendt af',
         rejected: 'Afvist af',
     },
 };
