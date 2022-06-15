@@ -12,6 +12,12 @@ const t: typeof en = {
             strong: 'Stærkt',
         },
     },
+    id: {
+        header: 'Concordium identitet',
+        pending: 'Afventer godkendelse fra',
+        confirmed: 'Godkendt af',
+        rejected: 'Afvist af',
+    },
 };
 
 export default t;

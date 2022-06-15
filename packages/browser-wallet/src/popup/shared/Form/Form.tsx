@@ -1,3 +1,4 @@
+import { ClassName } from '@shared/utils/types';
 import React from 'react';
 import {
     DefaultValues,
@@ -21,7 +22,7 @@ export const useForm = <TFormValues extends FieldValues = FieldValues>(
     props?: UseFormProps<TFormValues>
 ): UseFormReturn<TFormValues> => useFormLib<TFormValues>({ ...useFormDefaults, ...props });
 
-type FormProps<TFormValues> = {
+type FormProps<TFormValues> = ClassName & {
     /**
      * Submit handler, receiving the values of the form as arg.
      */
@@ -69,13 +70,16 @@ export default function Form<TFormValues extends Record<string, any>>({
     formMethods: external,
     defaultValues,
     children,
+    className,
 }: FormProps<TFormValues>) {
     const internal = useForm<TFormValues>({ defaultValues });
     const methods = external ?? internal;
 
     return (
         <FormProvider {...methods}>
-            <form onSubmit={methods.handleSubmit(onSubmit)}>{children(methods)}</form>
+            <form className={className} onSubmit={methods.handleSubmit(onSubmit)}>
+                {children(methods)}
+            </form>
         </FormProvider>
     );
 }
