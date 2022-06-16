@@ -10,8 +10,17 @@ export default {
 
 export const Primary: ComponentStory<typeof Header> = () => {
     return (
-        <div style={{ width: 300 }}>
-            <Header />
-        </div>
+        <>
+            <style>
+                {`
+                    body {
+                        padding: 0 !important;
+                    }
+                `}
+            </style>
+            <div style={{ width: 300 }}>
+                <Header />
+            </div>
+        </>
     );
 };

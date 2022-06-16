@@ -4,6 +4,7 @@ import { useTranslation } from 'react-i18next';
 
 import Logo from '@assets/svg/concordium.svg';
 import clsx from 'clsx';
+import NavList from '@popup/shared/NavList';
 
 export default function Header() {
     const { t } = useTranslation('mainLayout');
@@ -17,11 +18,11 @@ export default function Header() {
                 </Button>
                 <h1>{t('title')}</h1>
             </div>
-            <nav className={clsx('main-layout-header__nav', isOpen && 'main-layout-header__nav--open')}>
-                <div>Accounts</div>
-                <div>Identities</div>
-                <div>Settings</div>
-            </nav>
+            <NavList className={clsx('main-layout-header__nav', isOpen && 'main-layout-header__nav--open')}>
+                <div className="main-layout-header__nav-item">Accounts</div>
+                <div className="main-layout-header__nav-item">Identities</div>
+                <div className="main-layout-header__nav-item">Settings</div>
+            </NavList>
         </header>
     );
 }

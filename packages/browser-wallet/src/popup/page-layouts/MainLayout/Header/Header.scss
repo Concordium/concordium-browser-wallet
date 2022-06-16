@@ -41,4 +41,13 @@
             transform: translateY(0);
         }
     }
+
+    &__nav-item {
+        font-size: rem(14px);
+        padding: rem(10px) 0;
+
+        &:not(.main-layout-header__nav-item--active) {
+            font-weight: $font-weight-light;
+        }
+    }
 }
