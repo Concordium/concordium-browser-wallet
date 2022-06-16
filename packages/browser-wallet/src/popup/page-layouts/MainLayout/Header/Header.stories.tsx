@@ -9,5 +9,9 @@ export default {
 } as ComponentMeta<typeof Header>;
 
 export const Primary: ComponentStory<typeof Header> = () => {
-    return <Header />;
+    return (
+        <div style={{ width: 300 }}>
+            <Header />
+        </div>
+    );
 };

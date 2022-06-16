@@ -1,3 +1,18 @@
 .main-layout-header {
     display: flex;
+    justify-content: center;
+    align-items: center;
+    border-bottom: 1px solid $color-petroleum;
+    height: rem(40px);
+    background-color: $color-bg;
+
+    &__logo {
+        position: absolute;
+        left: rem(10px);
+        display: flex;
+
+        svg {
+            width: rem(23px);
+        }
+    }
 }
