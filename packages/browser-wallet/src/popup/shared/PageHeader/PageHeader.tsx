@@ -52,7 +52,7 @@ export default function PageHeader(props: Props | FlowProps) {
                     <Logo className="page-header__logo" />
                 )}
             </div>
-            <div className="flexColumn justifyCenter flexChildFill">
+            <div className="flex-column justify-center flex-child-fill">
                 <h1 className="page-header__title">{title}</h1>
                 {isFlow(props) && <FlowProgress {...props} />}
             </div>

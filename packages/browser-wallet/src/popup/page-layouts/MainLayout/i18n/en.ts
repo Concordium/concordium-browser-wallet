@@ -4,6 +4,11 @@ const t = {
         home: 'Home',
         setup: 'Settings',
     },
+    header: {
+        accounts: 'Accounts',
+        ids: 'ID cards',
+        settings: 'Wallet settings',
+    },
 };
 
 export default t;

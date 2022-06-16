@@ -26,6 +26,11 @@
 
             path {
                 fill: $color-text;
+                transition: fill $transition-timing $transition-easing;
+
+                .main-layout-header--open & {
+                    fill: $color-blue;
+                }
             }
         }
     }
@@ -51,6 +56,17 @@
 
         &:not(.main-layout-header__nav-item--active) {
             font-weight: $font-weight-light;
+        }
+
+        svg {
+            width: rem(11px);
+            transform: translateX(100%);
+            position: absolute;
+            right: rem(-5px);
+
+            path {
+                fill: $color-text;
+            }
         }
     }
 }
