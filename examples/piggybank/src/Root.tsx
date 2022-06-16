@@ -12,6 +12,7 @@ import {
     UpdateContractPayload,
 } from '@concordium/web-sdk';
 
+import { WalletApi } from '@concordium/browser-wallet-api-types';
 import PiggyIcon from './assets/piggy-bank-solid.svg';
 import HammerIcon from './assets/hammer-solid.svg';
 
@@ -23,7 +24,7 @@ import HammerIcon from './assets/hammer-solid.svg';
  * it will be necessary to instantiate your own piggy bank using an account available in the browser wallet,
  * and change this constant to match the index of the instance.
  */
-const CONTRACT_INDEX = 5141n; // V0 instance
+const CONTRACT_INDEX = 6n; // V0 instance
 /** Should match the subindex of the instance targeted. */
 const CONTRACT_SUB_INDEX = 0n;
 const CONTRACT_NAME = 'PiggyBank';
@@ -43,14 +44,39 @@ const isPiggybankSmashed = (state: PiggyBankState): state is PiggyBankStateSmash
 
 const client = new JsonRpcClient(new HttpProvider(JSON_RPC_URL));
 
-/** Promise resolves when callback is called from the extension, letting us know that the wallet API is ready for use. */
-const apiReady = new Promise<void>((resolve) => {
-    if (window.concordium !== undefined) {
-        resolve();
-    } else {
-        window.concordiumReady = resolve;
-    }
-});
+/**
+ * Promise resolves to the Concordium provider when it has been successfully injected into
+ * the window and is ready for use.
+ * @param timeout determines how long to wait before rejecting if the Concordium provider is not available, in milliseconds.
+ * @returns a promise containing the Concordium wallet provider API.
+ */
+// TODO This function should be made available from the web-sdk for ease of use.
+async function detectConcordiumProvider(timeout = 5000): Promise<WalletApi> {
+    return new Promise((resolve, reject) => {
+        let alreadyHandled = false;
+
+        function handleConcordium() {
+            if (alreadyHandled) {
+                return;
+            }
+            alreadyHandled = true;
+
+            if (window.concordium) {
+                resolve(window.concordium);
+            }
+            reject();
+        }
+
+        if (window.concordium) {
+            handleConcordium();
+        } else {
+            window.addEventListener('concordium#initialized', handleConcordium, { once: true });
+            setTimeout(() => {
+                handleConcordium();
+            }, timeout);
+        }
+    });
+}
 
 /**
  * Global application state.
@@ -198,22 +224,30 @@ function PiggyBank() {
 export default function Root() {
     const [account, setAccount] = useState<string>();
     const [isConnected, setIsConnected] = useState<boolean>(false);
+    const [provider, setProvider] = useState<WalletApi>();
 
     useEffect(() => {
-        apiReady
-            // Connect to the wallet.
-            .then(() => window.concordium?.connect())
-            .then((acc) => {
-                // Connection accepted, set the application state parameters.
-                setAccount(acc);
-                setIsConnected(true);
-
-                // Listen for relevent events from the wallet.
-                window.concordium?.addChangeAccountListener(setAccount);
-            })
-            // Connection rejected.
-            .catch(() => setIsConnected(false));
+        detectConcordiumProvider().then(setProvider);
     }, []);
+
+    useEffect(() => {
+        if (provider) {
+            provider
+                .connect()
+                .then((acc) => {
+                    // Connection accepted, set the application state parameters.
+                    setAccount(acc);
+                    setIsConnected(true);
+
+                    // Listen for relevant events from the wallet.
+                    provider.addChangeAccountListener(setAccount);
+                })
+                .catch(() => setIsConnected(false));
+        } else {
+            // Not yet connected to the wallet.
+            setIsConnected(false);
+        }
+    }, [provider]);
 
     const stateValue: State = useMemo(() => ({ isConnected, account }), [isConnected, account]);
 
