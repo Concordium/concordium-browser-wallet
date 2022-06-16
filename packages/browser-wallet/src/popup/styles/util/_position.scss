@@ -21,17 +21,13 @@ $sides: (top, bottom, left, right);
 Generates spacing utility classes based on tuples above:
 
 r-0 = right: 0;
-
-b-10 = bottom: rem(10px);
+b-10 = bottom: 1rem;
+l-neg-20 = left: -2rem;
 */
 @each $space in $spacings {
     @each $side in $sides {
         .#{str-slice($side, 0, 1)}-#{$space} {
-            @if $space == 0 {
-                #{$side}: 0;
-            } @else {
-                #{$side}: rem($space);
-            }
+            #{$side}: rem($space);
         }
         .#{str-slice($side, 0, 1)}-neg-#{$space} {
             #{$side}: -#{rem($space)};

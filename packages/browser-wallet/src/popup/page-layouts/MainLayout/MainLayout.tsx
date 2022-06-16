@@ -21,7 +21,7 @@ export default function MainLayout() {
         <div className="main-layout">
             <Header />
             <main className="main-layout__main">
-                <nav className="main-layout__nav">
+                <nav className="m-b-10">
                     <NavLink to={absoluteRoutes.home.path}>{t('nav.home')}</NavLink> |{' '}
                     <NavLink to={absoluteRoutes.setup.path}>{t('nav.setup')}</NavLink>
                 </nav>
@@ -36,7 +36,7 @@ export default function MainLayout() {
                         </option>
                     ))}
                 </select>
-                <div className="main-layout__content">
+                <div className="m-t-10">
                     <Outlet />
                 </div>
             </main>

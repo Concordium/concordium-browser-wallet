@@ -10,6 +10,7 @@ import FormInput from '@popup/shared/Form/Input';
 import Submit from '@popup/shared/Form/Submit';
 import { jsonRpcUrlAtom, credentialsAtom } from '@popup/store/settings';
 import { WalletCredential } from '@shared/storage/types';
+import PageHeader from '@popup/shared/PageHeader';
 import ThemeSwitch from './ThemeSwitch';
 
 type FormValues = {
@@ -72,10 +73,8 @@ export default function Setup() {
 
     return (
         <>
-            <header>
-                <h3>{t('title')}</h3>
-            </header>
-            <Form onSubmit={handleSubmit} defaultValues={values}>
+            <PageHeader>{t('title')}</PageHeader>
+            <Form onSubmit={handleSubmit} defaultValues={values} className="p-10">
                 {({ register }) => (
                     <>
                         <ThemeSwitch />

@@ -21,25 +21,25 @@ const Template: ComponentStory<typeof PageHeader> = (args) => {
 
 export const Primary = Template.bind({});
 Primary.args = {
-    title: 'Title',
+    children: 'Title',
 };
 
 export const Back = Template.bind({});
 Back.args = {
-    title: 'Title',
+    children: 'Title',
     canGoBack: true,
 };
 
 export const Steps = Template.bind({});
 Steps.args = {
-    title: 'Title',
+    children: 'Title',
     steps: 5,
     activeStep: 0,
 };
 
 export const CompletedSteps = Template.bind({});
 CompletedSteps.args = {
-    title: 'Title',
+    children: 'Title',
     canGoBack: true,
     steps: 5,
     activeStep: 3,

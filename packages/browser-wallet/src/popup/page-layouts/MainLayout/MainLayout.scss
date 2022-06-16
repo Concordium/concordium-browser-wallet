@@ -6,6 +6,7 @@
 
     &__main {
         flex: 1;
+        padding: rem(10px);
         transition: filter $transition-easing $transition-timing;
 
         .main-layout-header--open + & {
@@ -13,16 +14,8 @@
         }
     }
 
-    &__nav {
-        margin-bottom: rem(10px);
-    }
-
     &__select-account {
         display: block;
         width: 100%;
-    }
-
-    &__content {
-        margin-top: rem(10px);
     }
 }
