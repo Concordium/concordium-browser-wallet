@@ -61,6 +61,8 @@ export default function Routes() {
         <ReactRoutes>
             <Route path={relativeRoutes.home.path} element={<MainLayout />}>
                 <Route index element={<Account />} />
+                <Route element={<div>No content yet...</div>} path={relativeRoutes.home.identities.path} />
+                <Route element={<div>No content yet...</div>} path={relativeRoutes.home.settings.path} />
             </Route>
             <Route path={relativeRoutes.prompt.path} element={<FullscreenPromptLayout />}>
                 <Route
