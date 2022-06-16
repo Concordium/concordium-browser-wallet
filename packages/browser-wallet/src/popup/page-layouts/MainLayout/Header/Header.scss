@@ -13,6 +13,10 @@
 
         svg {
             width: rem(23px);
+
+            path {
+                fill: $color-text;
+            }
         }
     }
 }
