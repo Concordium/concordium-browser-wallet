@@ -1,5 +1,5 @@
 import React, { useEffect, useRef } from 'react';
-import { Navigate, Route, Routes as ReactRoutes, useLocation, useNavigate } from 'react-router-dom';
+import { Route, Routes as ReactRoutes, useLocation, useNavigate } from 'react-router-dom';
 import { InternalMessageType, MessageType, createMessageTypeFilter } from '@concordium/browser-wallet-message-hub';
 import { AccountTransactionSignature } from '@concordium/web-sdk';
 
@@ -13,6 +13,7 @@ import Setup from '@popup/pages/Setup';
 import ConnectionRequest from '@popup/pages/ConnectionRequest';
 import { popupMessageHandler } from '@popup/shared/message-handler';
 import { noOp } from '@shared/utils/basic-helpers';
+import Settings from '@popup/pages/Settings';
 
 type PromptKey = keyof Omit<typeof absoluteRoutes['prompt'], 'path'>;
 
@@ -62,10 +63,7 @@ export default function Routes() {
             <Route path={relativeRoutes.home.path} element={<MainLayout />}>
                 <Route index element={<Account />} />
                 <Route element={<div>No content yet...</div>} path={relativeRoutes.home.identities.path} />
-                <Route
-                    element={<Navigate replace to={absoluteRoutes.setup.path} />}
-                    path={relativeRoutes.home.settings.path}
-                />
+                <Route element={<Settings />} path={relativeRoutes.home.settings.path} />
             </Route>
             <Route path={relativeRoutes.prompt.path} element={<FullscreenPromptLayout />}>
                 <Route

@@ -14,6 +14,21 @@ export const relativeRoutes = {
         },
         settings: {
             path: 'settings',
+            passcode: {
+                path: 'passcode',
+            },
+            network: {
+                path: 'network',
+            },
+            visual: {
+                path: 'visual',
+            },
+            support: {
+                path: 'support',
+            },
+            about: {
+                path: 'about',
+            },
         },
     },
     prompt: {

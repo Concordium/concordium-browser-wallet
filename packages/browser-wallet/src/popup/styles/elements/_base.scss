@@ -62,3 +62,17 @@ body {
 #root {
     height: 100%;
 }
+
+a {
+    &,
+    &:visited,
+    &:active,
+    &:hover {
+        color: $color-text;
+        text-decoration: none;
+    }
+
+    &:hover {
+        color: $color-cta;
+    }
+}
