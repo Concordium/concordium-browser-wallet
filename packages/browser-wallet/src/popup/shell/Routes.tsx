@@ -14,6 +14,7 @@ import ConnectionRequest from '@popup/pages/ConnectionRequest';
 import { popupMessageHandler } from '@popup/shared/message-handler';
 import { noOp } from '@shared/utils/basic-helpers';
 import Settings from '@popup/pages/Settings';
+import NetworkSettings from '@popup/pages/NetworkSettings';
 
 type PromptKey = keyof Omit<typeof absoluteRoutes['prompt'], 'path'>;
 
@@ -43,6 +44,10 @@ function useMessagePrompt<R>(type: InternalMessageType | MessageType, promptKey:
     return handleResponse;
 }
 
+function NoContent() {
+    return <>No content yet...</>;
+}
+
 export default function Routes() {
     const handleConnectionResponse = useMessagePrompt<boolean>(InternalMessageType.Connect, 'connectionRequest');
     const handleSendTransactionResponse = useMessagePrompt<string | undefined>(
@@ -62,8 +67,15 @@ export default function Routes() {
         <ReactRoutes>
             <Route path={relativeRoutes.home.path} element={<MainLayout />}>
                 <Route index element={<Account />} />
-                <Route element={<div>No content yet...</div>} path={relativeRoutes.home.identities.path} />
-                <Route element={<Settings />} path={relativeRoutes.home.settings.path} />
+                <Route element={<NoContent />} path={relativeRoutes.home.identities.path} />
+                <Route path={relativeRoutes.home.settings.path}>
+                    <Route index element={<Settings />} />
+                    <Route element={<NoContent />} path={relativeRoutes.home.settings.passcode.path} />
+                    <Route element={<NetworkSettings />} path={relativeRoutes.home.settings.network.path} />
+                    <Route element={<NoContent />} path={relativeRoutes.home.settings.visual.path} />
+                    <Route element={<NoContent />} path={relativeRoutes.home.settings.support.path} />
+                    <Route element={<NoContent />} path={relativeRoutes.home.settings.about.path} />
+                </Route>
             </Route>
             <Route path={relativeRoutes.prompt.path} element={<FullscreenPromptLayout />}>
                 <Route
