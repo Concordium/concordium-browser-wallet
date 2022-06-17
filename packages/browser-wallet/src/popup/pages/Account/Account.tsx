@@ -12,7 +12,7 @@ export default function Account() {
     return (
         <>
             <select
-                className="main-layout__select-account"
+                className="account-page__select-account"
                 value={selectedAccount}
                 onChange={(e) => setSelectedAccount(e.target.value)}
             >
