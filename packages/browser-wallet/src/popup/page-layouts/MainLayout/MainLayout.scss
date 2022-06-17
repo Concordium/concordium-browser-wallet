@@ -8,8 +8,9 @@
         flex: 1;
         padding: rem(10px);
         transition: filter $transition-easing $transition-timing;
+        z-index: -1;
 
-        .main-layout-header--open + & {
+        .main-layout-header--open ~ & {
             filter: blur(5px);
         }
     }
