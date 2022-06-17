@@ -95,7 +95,7 @@ jobs:
 
     type-test-piggybank:
         runs-on: ubuntu-20.04
-        needs: [dependencies]
+        needs: [build-piggybank]
         defaults:
             run:
                 working-directory: examples/piggybank

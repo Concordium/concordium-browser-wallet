@@ -27,10 +27,7 @@ const CONTRACT_INDEX = 6n; // V0 instance
 /** Should match the subindex of the instance targeted. */
 const CONTRACT_SUB_INDEX = 0n;
 const CONTRACT_NAME = 'PiggyBank';
-const CONTRACT_SCHEMA: number = toBuffer(
-    'AQAAAAkAAABQaWdneUJhbmsBFQIAAAAGAAAASW50YWN0AgcAAABTbWFzaGVkAgAAAAAA',
-    'base64'
-);
+const CONTRACT_SCHEMA = toBuffer('AQAAAAkAAABQaWdneUJhbmsBFQIAAAAGAAAASW50YWN0AgcAAABTbWFzaGVkAgAAAAAA', 'base64');
 
 /** This assumes a locally running JSON-RPC server targeting testnet: https://github.com/Concordium/concordium-json-rpc/tree/add-get-instance-info */
 const JSON_RPC_URL = 'http://localhost:9095';
