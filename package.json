@@ -16,11 +16,6 @@
         "postinstall": "husky install",
         "test": "jest"
     },
-    "husky": {
-        "hooks": {
-            "pre-commit": "lint-staged"
-        }
-    },
     "lint-staged": {
         "*.{js,jsx,ts,tsx}": [
             "eslint --cache --fix --max-warnings 0"
