@@ -1,13 +1,14 @@
 import React, { PropsWithChildren, useState } from 'react';
 import { useTranslation } from 'react-i18next';
 import clsx from 'clsx';
-import { NavLink, useLocation } from 'react-router-dom';
+import { NavLink, useLocation, useNavigate } from 'react-router-dom';
 
 import Logo from '@assets/svg/concordium.svg';
 import CheckmarkIcon from '@assets/svg/checkmark-blue.svg';
 import NavList from '@popup/shared/NavList';
 import Button from '@popup/shared/Button';
 import { absoluteRoutes } from '@popup/constants/routes';
+import CloseIcon from '@assets/svg/cross.svg';
 
 type HeaderLinkProps = PropsWithChildren<{
     onClick(): void;
@@ -37,6 +38,7 @@ export default function Header() {
     const { t } = useTranslation('mainLayout');
     const { pathname } = useLocation();
     const [isOpen, setIsOpen] = useState(false);
+    const nav = useNavigate();
 
     // eslint-disable-next-line no-nested-ternary
     const title = pathname.includes(absoluteRoutes.home.identities.path)
@@ -44,6 +46,8 @@ export default function Header() {
         : pathname.includes(absoluteRoutes.home.settings.path)
         ? t('header.settings')
         : t('header.accounts');
+
+    const isHomePage = pathname === absoluteRoutes.home.path;
 
     return (
         <>
@@ -53,6 +57,15 @@ export default function Header() {
                         <Logo />
                     </Button>
                     <h1>{title}</h1>
+                    {isHomePage || (
+                        <Button
+                            className="main-layout-header__close"
+                            onClick={() => nav(absoluteRoutes.home.path)}
+                            clear
+                        >
+                            <CloseIcon />
+                        </Button>
+                    )}
                 </div>
                 <NavList className="main-layout-header__nav">
                     <HeaderLink onClick={() => setIsOpen(false)} to={absoluteRoutes.home.path}>

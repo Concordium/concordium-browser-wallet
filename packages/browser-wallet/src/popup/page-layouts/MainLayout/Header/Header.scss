@@ -35,6 +35,20 @@
         }
     }
 
+    &__close {
+        position: absolute;
+        right: rem(15px);
+        display: flex;
+
+        svg {
+            width: rem(12px);
+
+            path {
+                fill: $color-text;
+            }
+        }
+    }
+
     &__nav {
         padding: 0 rem(10px);
         transform: translateY(-100%);
