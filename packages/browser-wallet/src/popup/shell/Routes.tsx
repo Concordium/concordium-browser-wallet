@@ -15,6 +15,7 @@ import { popupMessageHandler } from '@popup/shared/message-handler';
 import { noOp } from '@shared/utils/basic-helpers';
 import Settings from '@popup/pages/Settings';
 import NetworkSettings from '@popup/pages/NetworkSettings';
+import VisualSettings from '@popup/pages/VisualSettings';
 
 type PromptKey = keyof Omit<typeof absoluteRoutes['prompt'], 'path'>;
 
@@ -72,7 +73,7 @@ export default function Routes() {
                     <Route index element={<Settings />} />
                     <Route element={<NoContent />} path={relativeRoutes.home.settings.passcode.path} />
                     <Route element={<NetworkSettings />} path={relativeRoutes.home.settings.network.path} />
-                    <Route element={<NoContent />} path={relativeRoutes.home.settings.visual.path} />
+                    <Route element={<VisualSettings />} path={relativeRoutes.home.settings.visual.path} />
                     <Route element={<NoContent />} path={relativeRoutes.home.settings.support.path} />
                     <Route element={<NoContent />} path={relativeRoutes.home.settings.about.path} />
                 </Route>
