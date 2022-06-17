@@ -48,32 +48,31 @@ const client = new JsonRpcClient(new HttpProvider(JSON_RPC_URL));
  * Promise resolves to the Concordium provider when it has been successfully injected into
  * the window and is ready for use.
  * @param timeout determines how long to wait before rejecting if the Concordium provider is not available, in milliseconds.
- * @returns a promise containing the Concordium wallet provider API.
+ * @returns a promise containing the Concordium Wallet provider API.
  */
 // TODO This function should be made available from the web-sdk for ease of use.
 async function detectConcordiumProvider(timeout = 5000): Promise<WalletApi> {
     return new Promise((resolve, reject) => {
-        let alreadyHandled = false;
-
-        function handleConcordium() {
-            if (alreadyHandled) {
-                return;
-            }
-            alreadyHandled = true;
-
-            if (window.concordium) {
-                resolve(window.concordium);
-            }
-            reject();
-        }
-
         if (window.concordium) {
-            handleConcordium();
+            resolve(window.concordium);
         } else {
-            window.addEventListener('concordium#initialized', handleConcordium, { once: true });
-            setTimeout(() => {
-                handleConcordium();
+            const t = setTimeout(() => {
+                if (window.concordium) {
+                    resolve(window.concordium);
+                } else {
+                    reject();
+                }
             }, timeout);
+            window.addEventListener(
+                'concordium#initialized',
+                () => {
+                    if (window.concordium) {
+                        clearTimeout(t);
+                        resolve(window.concordium);
+                    }
+                },
+                { once: true }
+            );
         }
     });
 }
@@ -92,26 +91,30 @@ const state = createContext<State>({ isConnected: false, account: undefined });
  * Action for depositing an amount of microCCD to the piggy bank instance
  */
 const deposit = (amount = 0) => {
-    if (window.concordium === undefined) {
-        throw new Error('Concordium wallet API not accessible.');
-    }
-
     if (!Number.isInteger(amount) || amount <= 0) {
         return;
     }
 
-    window.concordium
-        .sendTransaction(AccountTransactionType.UpdateSmartContractInstance, {
-            amount: new GtuAmount(BigInt(amount)),
-            contractAddress: {
-                index: CONTRACT_INDEX,
-                subindex: CONTRACT_SUB_INDEX,
-            },
-            receiveName: `${CONTRACT_NAME}.insert`,
-            maxContractExecutionEnergy: 30000n,
-        } as UpdateContractPayload)
-        .then((txHash) => console.log(`https://testnet.ccdscan.io/?dcount=1&dentity=transaction&dhash=${txHash}`))
-        .catch(alert);
+    detectConcordiumProvider()
+        .then((provider) => {
+            provider
+                .sendTransaction(AccountTransactionType.UpdateSmartContractInstance, {
+                    amount: new GtuAmount(BigInt(amount)),
+                    contractAddress: {
+                        index: CONTRACT_INDEX,
+                        subindex: CONTRACT_SUB_INDEX,
+                    },
+                    receiveName: `${CONTRACT_NAME}.insert`,
+                    maxContractExecutionEnergy: 30000n,
+                } as UpdateContractPayload)
+                .then((txHash) =>
+                    console.log(`https://testnet.ccdscan.io/?dcount=1&dentity=transaction&dhash=${txHash}`)
+                )
+                .catch(alert);
+        })
+        .catch(() => {
+            throw new Error('Concordium Wallet API not accessible');
+        });
 };
 
 /**
@@ -119,22 +122,26 @@ const deposit = (amount = 0) => {
  * https://github.com/Concordium/concordium-rust-smart-contracts/blob/c4d95504a51c15bdbfec503c9e8bf5e93a42e24d/examples/piggy-bank/part1/src/lib.rs#L64
  */
 const smash = () => {
-    if (window.concordium === undefined) {
-        throw new Error('Concordium wallet API not accessible.');
-    }
-
-    window.concordium
-        .sendTransaction(AccountTransactionType.UpdateSmartContractInstance, {
-            amount: new GtuAmount(0n), // This feels weird? Why do I need an amount for a non-payable receive?
-            contractAddress: {
-                index: CONTRACT_INDEX,
-                subindex: CONTRACT_SUB_INDEX,
-            },
-            receiveName: `${CONTRACT_NAME}.smash`,
-            maxContractExecutionEnergy: 30000n,
-        } as UpdateContractPayload)
-        .then((txHash) => console.log(`https://testnet.ccdscan.io/?dcount=1&dentity=transaction&dhash=${txHash}`))
-        .catch(alert);
+    detectConcordiumProvider()
+        .then((provider) => {
+            provider
+                .sendTransaction(AccountTransactionType.UpdateSmartContractInstance, {
+                    amount: new GtuAmount(0n), // This feels weird? Why do I need an amount for a non-payable receive?
+                    contractAddress: {
+                        index: CONTRACT_INDEX,
+                        subindex: CONTRACT_SUB_INDEX,
+                    },
+                    receiveName: `${CONTRACT_NAME}.smash`,
+                    maxContractExecutionEnergy: 30000n,
+                } as UpdateContractPayload)
+                .then((txHash) =>
+                    console.log(`https://testnet.ccdscan.io/?dcount=1&dentity=transaction&dhash=${txHash}`)
+                )
+                .catch(alert);
+        })
+        .catch(() => {
+            throw new Error('Concordium Wallet API not accessible');
+        });
 };
 
 function PiggyBank() {
@@ -224,30 +231,24 @@ function PiggyBank() {
 export default function Root() {
     const [account, setAccount] = useState<string>();
     const [isConnected, setIsConnected] = useState<boolean>(false);
-    const [provider, setProvider] = useState<WalletApi>();
 
     useEffect(() => {
-        detectConcordiumProvider().then(setProvider);
+        detectConcordiumProvider()
+            .then((provider) => {
+                provider
+                    .connect()
+                    .then((acc) => {
+                        // Connection accepted, set the application state parameters.
+                        setAccount(acc);
+                        setIsConnected(true);
+
+                        // Listen for relevant events from the wallet.
+                        provider.addChangeAccountListener(setAccount);
+                    })
+                    .catch(() => setIsConnected(false));
+            })
+            .catch(() => setIsConnected(false));
     }, []);
-
-    useEffect(() => {
-        if (provider) {
-            provider
-                .connect()
-                .then((acc) => {
-                    // Connection accepted, set the application state parameters.
-                    setAccount(acc);
-                    setIsConnected(true);
-
-                    // Listen for relevant events from the wallet.
-                    provider.addChangeAccountListener(setAccount);
-                })
-                .catch(() => setIsConnected(false));
-        } else {
-            // Not yet connected to the wallet.
-            setIsConnected(false);
-        }
-    }, [provider]);
 
     const stateValue: State = useMemo(() => ({ isConnected, account }), [isConnected, account]);
 

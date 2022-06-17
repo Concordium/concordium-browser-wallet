@@ -6,29 +6,28 @@
         <meta charset="utf-8" />
         <script>
             // TODO Use the web-sdk when this function has been added there.
-            function detectConcordiumProvider(timeout = 5000) {
+            async function detectConcordiumProvider(timeout = 5000) {
                 return new Promise((resolve, reject) => {
-                    let alreadyHandled = false;
-
-                    function handleConcordium() {
-                        if (alreadyHandled) {
-                            return;
-                        }
-                        alreadyHandled = true;
-
-                        if (window.concordium) {
-                            resolve(window.concordium);
-                        }
-                        reject();
-                    }
-
                     if (window.concordium) {
-                        handleConcordium();
+                        resolve(window.concordium);
                     } else {
-                        window.addEventListener('concordium#initialized', handleConcordium, { once: true });
-                        setTimeout(() => {
-                            handleConcordium();
+                        const t = setTimeout(() => {
+                            if (window.concordium) {
+                                resolve(window.concordium);
+                            } else {
+                                reject();
+                            }
                         }, timeout);
+                        window.addEventListener(
+                            'concordium#initialized',
+                            () => {
+                                if (window.concordium) {
+                                    clearTimeout(t);
+                                    resolve(window.concordium);
+                                }
+                            },
+                            { once: true }
+                        );
                     }
                 });
             }
