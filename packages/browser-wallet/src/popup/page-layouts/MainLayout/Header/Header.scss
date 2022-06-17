@@ -36,6 +36,7 @@
     }
 
     &__nav {
+        padding: 0 rem(10px);
         transform: translateY(-100%);
         position: relative;
         z-index: -1;
@@ -56,6 +57,12 @@
 
         &:not(.main-layout-header__nav-item--active) {
             font-weight: $font-weight-light;
+        }
+
+        &--active {
+            &:hover {
+                color: $color-text;
+            }
         }
 
         svg {
