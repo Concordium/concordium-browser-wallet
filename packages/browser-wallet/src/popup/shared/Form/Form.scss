@@ -24,7 +24,7 @@
         padding: rem(12px) rem(5px) rem(5px);
         width: 100%;
         outline: none;
-        transition: border-color $transition-timing $transition-easing;
+        @include transition(border-color);
 
         &:focus {
             border-color: $color-blue;

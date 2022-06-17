@@ -64,6 +64,8 @@ body {
 }
 
 a {
+    @include transition(color, 0.1s);
+
     &,
     &:visited,
     &:active,

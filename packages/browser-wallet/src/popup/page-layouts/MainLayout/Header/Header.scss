@@ -26,7 +26,7 @@
 
             path {
                 fill: $color-text;
-                transition: fill $transition-timing $transition-easing;
+                @include transition(fill);
 
                 .main-layout-header--open & {
                     fill: $color-blue;
@@ -40,7 +40,8 @@
         transform: translateY(-100%);
         position: relative;
         z-index: -1;
-        transition: transform $transition-timing $transition-easing;
+        @include transition(transform);
+
         text-align: center;
 
         .main-layout-header--open & {
