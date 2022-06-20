@@ -38,7 +38,7 @@ export default function Account() {
                         ))}
                     </select>
                 ) : (
-                    <div>No accounts in wallet</div>
+                    <div>{t('noAccounts')}</div>
                 )}
                 <button type="button" className="m-l-10" onClick={() => nav(absoluteRoutes.home.account.add.path)}>
                     +
@@ -47,8 +47,8 @@ export default function Account() {
             {selectedAccount !== undefined && (
                 <>
                     <div className="account-page__address">{t('address', { address: selectedAccount })}</div>
-                    <Button faded className="m-t-20" onClick={removeAccount}>
-                        Remove account (local only)
+                    <Button danger className="m-t-20" onClick={removeAccount}>
+                        {t('removeAccount')}
                     </Button>
                 </>
             )}

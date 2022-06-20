@@ -40,6 +40,12 @@ Faded.args = {
     faded: true,
 };
 
+export const Danger = Template.bind({});
+Danger.args = {
+    children: 'Button text',
+    danger: true,
+};
+
 export const Disabled = Template.bind({});
 Disabled.args = {
     children: 'Button text',

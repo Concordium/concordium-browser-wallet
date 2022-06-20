@@ -12,6 +12,10 @@ type Props = Pick<ButtonHTMLAttributes<HTMLButtonElement>, 'type' | 'children' |
      */
     faded?: boolean;
     /**
+     * Renders button in red.
+     */
+    danger?: boolean;
+    /**
      * Defaults to "dynamic", i.e. "width: auto;"
      */
     width?: 'wide' | 'narrow' | 'dynamic';
@@ -29,6 +33,7 @@ export default function Button<A extends ElementType = 'button'>({
     className,
     clear = false,
     faded = false,
+    danger = false,
     width = 'dynamic',
     type = 'button',
     ...props
@@ -43,6 +48,7 @@ export default function Button<A extends ElementType = 'button'>({
                 'button',
                 clear && 'button--clear',
                 faded && 'button--faded',
+                danger && 'button--danger',
                 width === 'narrow' && 'button--narrow',
                 width === 'wide' && 'button--wide',
                 className
