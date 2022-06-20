@@ -46,7 +46,12 @@ The following exemplifies how accessing the API can be done.
 detectConcordiumProvider()
     .then((provider) => {
         // The API is ready for use.
-        const accountAddress = provider.connect();
+        provider
+            .connect()
+            .then((accountAddress) => {
+                // The wallet is connected to the dApp.
+            })
+            .catch(() => console.log('Connection to the Concordium browser wallet was rejected.'));
     })
     .catch(() => console.log('Connection to the Concordium browser wallet timed out.'));
 ```
