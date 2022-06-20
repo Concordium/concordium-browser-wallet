@@ -19,9 +19,6 @@ export default function Settings() {
             <Link className="settings-page__link" to={absoluteRoutes.home.settings.visual.path}>
                 {t('visual')}
             </Link>
-            <Link className="settings-page__link" to={absoluteRoutes.home.settings.support.path}>
-                {t('support')}
-            </Link>
             <Link className="settings-page__link" to={absoluteRoutes.home.settings.about.path}>
                 {t('about')}
             </Link>

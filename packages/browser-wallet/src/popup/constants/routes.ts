@@ -27,9 +27,6 @@ export const relativeRoutes = {
             visual: {
                 path: 'visual',
             },
-            support: {
-                path: 'support',
-            },
             about: {
                 path: 'about',
             },

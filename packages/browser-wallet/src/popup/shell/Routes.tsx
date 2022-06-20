@@ -78,7 +78,6 @@ export default function Routes() {
                     <Route element={<NoContent />} path={relativeRoutes.home.settings.passcode.path} />
                     <Route element={<NetworkSettings />} path={relativeRoutes.home.settings.network.path} />
                     <Route element={<VisualSettings />} path={relativeRoutes.home.settings.visual.path} />
-                    <Route element={<NoContent />} path={relativeRoutes.home.settings.support.path} />
                     <Route element={<NoContent />} path={relativeRoutes.home.settings.about.path} />
                 </Route>
             </Route>
