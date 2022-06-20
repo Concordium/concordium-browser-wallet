@@ -5,12 +5,41 @@
         <script src="../../node_modules/@concordium/web-sdk/lib/concordium.min.js"></script>
         <meta charset="utf-8" />
         <script>
-            function concordiumReady() {
+            // TODO Use the web-sdk when this function has been added there.
+            async function detectConcordiumProvider(timeout = 5000) {
+                return new Promise((resolve, reject) => {
+                    if (window.concordium) {
+                        resolve(window.concordium);
+                    } else {
+                        const t = setTimeout(() => {
+                            if (window.concordium) {
+                                resolve(window.concordium);
+                            } else {
+                                reject();
+                            }
+                        }, timeout);
+                        window.addEventListener(
+                            'concordium#initialized',
+                            () => {
+                                if (window.concordium) {
+                                    clearTimeout(t);
+                                    resolve(window.concordium);
+                                }
+                            },
+                            { once: true }
+                        );
+                    }
+                });
+            }
+
+            async function setupPage() {
+                const provider = await detectConcordiumProvider();
+
                 document
                     .getElementById('connect')
-                    .addEventListener('click', () => window.concordium.connect().then(alert).catch(alert));
+                    .addEventListener('click', () => provider.connect().then(alert).catch(alert));
                 document.getElementById('sendTransfer').addEventListener('click', () =>
-                    window.concordium
+                    provider
                         .sendTransaction(concordiumSDK.AccountTransactionType.SimpleTransfer, {
                             amount: new concordiumSDK.GtuAmount(1n),
                             toAddress: new concordiumSDK.AccountAddress(
@@ -21,13 +50,13 @@
                         .catch(alert)
                 );
                 document.getElementById('signMessage').addEventListener('click', () =>
-                    window.concordium
+                    provider
                         .signMessage(message.value)
                         .then((sig) => alert(JSON.stringify(sig)))
                         .catch(alert)
                 );
                 document.getElementById('sendDeposit').addEventListener('click', () =>
-                    window.concordium
+                    provider
                         .sendTransaction(concordiumSDK.AccountTransactionType.UpdateSmartContractInstance, {
                             amount: new concordiumSDK.GtuAmount(1n),
                             contractAddress: {
@@ -41,7 +70,7 @@
                         .catch(alert)
                 );
                 document.getElementById('sendReceive').addEventListener('click', () =>
-                    window.concordium
+                    provider
                         .sendTransaction(
                             concordiumSDK.AccountTransactionType.UpdateSmartContractInstance,
                             {
@@ -61,8 +90,10 @@
                         .then(alert)
                         .catch(alert)
                 );
-                window.concordium.addChangeAccountListener(alert);
+                provider.addChangeAccountListener(alert);
             }
+
+            setupPage();
         </script>
     </head>
 
