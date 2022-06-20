@@ -10,7 +10,7 @@ The actual implementation can be found [In the Concordium browser wallet reposit
 
 ## Using the API
 
-The API is automatically injected into web applications if the Concordium browser wallet extension is installed in the browser. To get access to the API use the following helper function (this will be implemented in the web-sdk):
+The API is automatically injected into web applications if the Concordium browser wallet extension is installed in the browser. To get access to the API use the following helper function (this will be added to the web-sdk):
 
 ```typescript
 async function detectConcordiumProvider(timeout = 5000): Promise<WalletApi> {
