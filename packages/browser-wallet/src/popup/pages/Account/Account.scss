@@ -1,3 +1,6 @@
-.account {
-    display: block;
+.account-page {
+    &__select-account {
+        display: block;
+        width: 100%;
+    }
 }

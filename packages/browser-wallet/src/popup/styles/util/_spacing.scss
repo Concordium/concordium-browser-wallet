@@ -1,0 +1,62 @@
+$spacings: (0, 5, 10, 20, 30, 40, 50);
+$sides: (top, bottom, left, right);
+
+/*
+Generates spacing utility classes based on tuples above:
+
+m-0 = margin: 0;
+p-0 = padding: 0;
+
+m-b-10 = margin-bottom: 1rem;
+p-t-10 = padding-top: 1rem;
+
+m-v-30 = margin-top: 3rem; margin-bottom: 3rem;
+p-h-50 = padding-left: 5rem; padding-right: 5rem;
+*/
+@each $space in $spacings {
+    .m-#{$space} {
+        margin: #{rem($space)};
+    }
+    .p-#{$space} {
+        padding: #{rem($space)};
+    }
+}
+
+@each $space in $spacings {
+    .m-v-#{$space} {
+        margin-top: #{rem($space)};
+        margin-bottom: #{rem($space)};
+    }
+    .p-v-#{$space} {
+        padding-top: #{rem($space)};
+        padding-bottom: #{rem($space)};
+    }
+    .m-h-#{$space} {
+        margin-left: #{rem($space)};
+        margin-right: #{rem($space)};
+    }
+    .p-h-#{$space} {
+        padding-left: #{rem($space)};
+        padding-right: #{rem($space)};
+    }
+}
+
+@each $space in $spacings {
+    @each $side in $sides {
+        .m-#{str-slice($side, 0, 1)}-#{$space} {
+            @include with-first-last-mods {
+                margin-#{$side}: #{rem($space)};
+            }
+        }
+        .p-#{str-slice($side, 0, 1)}-#{$space} {
+            @include with-first-last-mods {
+                padding-#{$side}: #{rem($space)};
+            }
+        }
+    }
+}
+
+.margin-center {
+    margin-left: auto;
+    margin-right: auto;
+}

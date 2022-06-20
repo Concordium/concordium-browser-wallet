@@ -154,7 +154,7 @@ function PiggyBank() {
         client.getInstanceInfo({ index: CONTRACT_INDEX, subindex: CONTRACT_SUB_INDEX }).then((info) => {
             if (info?.name !== `init_${CONTRACT_NAME}`) {
                 // Check that we have the expected instance.
-                throw new Error('Expected instance of PiggyBank');
+                throw new Error(`Expected instance of PiggyBank: ${info?.name}`);
             }
             if (!isInstanceInfoV0(info)) {
                 // Check smart contract version. We expect V0.

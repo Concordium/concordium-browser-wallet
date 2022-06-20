@@ -1,5 +1,4 @@
-/* eslint-disable react/destructuring-assignment */
-/* eslint-disable react/function-component-definition, import/no-extraneous-dependencies */
+/* eslint-disable react/function-component-definition, import/no-extraneous-dependencies, react/destructuring-assignment */
 import React, { useEffect, useState } from 'react';
 import { ComponentMeta, ComponentStory } from '@storybook/react';
 import IdCard from './IdCard';

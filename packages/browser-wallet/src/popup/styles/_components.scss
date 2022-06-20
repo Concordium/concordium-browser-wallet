@@ -1,9 +1,10 @@
-// Compopnents
+// Components
 @import '../shared/Form/Form';
 @import '../shared/Button/Button';
 @import '../shared/ButtonGroup/ButtonGroup';
 @import '../shared/IdCard/IdCard';
 @import '../shared/PageHeader/PageHeader';
+@import '../shared/NavList/NavList';
 
 // Pages
 @import '../pages/Account/Account';
@@ -15,4 +16,5 @@
 
 // Layouts
 @import '../page-layouts/MainLayout/MainLayout';
+@import '../page-layouts/MainLayout/Header/Header';
 @import '../page-layouts/FullscreenPromptLayout/FullscreenPromptLayout';

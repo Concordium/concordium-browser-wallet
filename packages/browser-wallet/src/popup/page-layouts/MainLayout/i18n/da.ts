@@ -6,6 +6,11 @@ const t: typeof en = {
         home: 'Hjem',
         setup: 'Indstillinger',
     },
+    header: {
+        accounts: 'Konti',
+        ids: 'ID kort',
+        settings: 'Wallet indstillinger',
+    },
 };
 
 export default t;
