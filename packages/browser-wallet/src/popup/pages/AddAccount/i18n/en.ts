@@ -1,13 +1,13 @@
 const t = {
     add: 'Add account',
     key: {
-        label: 'Account private key',
+        label: 'Private key',
         validation: {
             required: 'Private key is required',
         },
     },
     address: {
-        label: 'Account address',
+        label: 'Address',
         validation: {
             required: 'Address is required',
         },
