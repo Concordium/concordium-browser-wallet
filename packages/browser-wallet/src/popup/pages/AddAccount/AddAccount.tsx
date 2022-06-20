@@ -1,23 +1,24 @@
 import React from 'react';
 import { useTranslation } from 'react-i18next';
 import { useNavigate } from 'react-router-dom';
+import { useAtom } from 'jotai';
 
 import Form from '@popup/shared/Form';
 import FormInput from '@popup/shared/Form/Input';
 import Submit from '@popup/shared/Form/Submit';
+import { credentialsAtom } from '@popup/store/settings';
+import { WalletCredential } from '@shared/storage/types';
 
-type FormValues = {
-    key: string;
-    address: string;
-};
+type FormValues = WalletCredential;
 
 export default function AddAccount() {
     const { t } = useTranslation('addAccount');
     const nav = useNavigate();
+    const [creds, setCreds] = useAtom(credentialsAtom);
 
-    const handleSubmit = (vs: FormValues) => {
+    const handleSubmit = (cred: FormValues) => {
         // eslint-disable-next-line no-console
-        console.log(vs);
+        setCreds([...creds, cred]);
         nav(-1);
     };
 
@@ -36,6 +37,7 @@ export default function AddAccount() {
                         register={register}
                         name="address"
                         rules={{ required: t('address.validation.required') }}
+                        className="m-t-10"
                     />
                     <Submit width="wide" className="block m-t-10 margin-center">
                         {t('add')}

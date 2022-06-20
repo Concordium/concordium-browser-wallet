@@ -3,4 +3,9 @@
         display: block;
         width: 100%;
     }
+
+    &__address {
+        margin-top: rem(10px);
+        word-break: break-all;
+    }
 }

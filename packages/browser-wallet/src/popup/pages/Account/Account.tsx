@@ -30,7 +30,7 @@ export default function Account() {
                     +
                 </button>
             </div>
-            <div className="m-t-10">{t('address', { address: selectedAccount })}</div>
+            <div className="account-page__address">{t('address', { address: selectedAccount })}</div>
         </>
     );
 }
