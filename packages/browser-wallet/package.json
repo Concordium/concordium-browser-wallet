@@ -6,7 +6,7 @@
     "license": "Apache",
     "scripts": {
         "build:dev": "cross-env NODE_ENV=development node --loader ts-node/esm -r tsconfig-paths/register ./build/dev.ts",
-        "type:check": "tsc --noEmit",
+        "build": "yarn build:dev",
         "watch": "cross-env WATCH=1 yarn build:dev",
         "storybook": "start-storybook -p 6006",
         "build-storybook": "build-storybook"

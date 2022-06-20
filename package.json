@@ -13,6 +13,8 @@
     "packageManager": "yarn@3.2.0",
     "scripts": {
         "lint": "eslint . --cache --max-warnings 0 --ext .ts,.tsx",
+        "type:check": "yarn workspaces foreach -v -t --no-private run tsc --noEmit",
+        "build:all": "yarn workspaces foreach -v -t --no-private run build",
         "postinstall": "husky install",
         "test": "jest"
     },

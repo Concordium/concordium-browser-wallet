@@ -16,5 +16,8 @@
     },
     "dependencies": {
         "@concordium/web-sdk": "^0.1.2"
+    },
+    "devDependencies": {
+        "typescript": "^4.3.5"
     }
 }
