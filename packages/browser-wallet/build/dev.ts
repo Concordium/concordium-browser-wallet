@@ -3,6 +3,7 @@
 import esbuild, { BuildOptions } from 'esbuild';
 import { htmlPlugin } from '@craftamap/esbuild-plugin-html';
 import { sassPlugin } from 'esbuild-sass-plugin';
+import svgrPlugin from 'esbuild-plugin-svgr';
 import fs from 'fs';
 import { manifestPlugin } from './plugins/chrome-extension-manifest-v3';
 
@@ -34,6 +35,7 @@ const config: BuildOptions = {
     },
     loader: { '.jpg': 'dataurl', '.png': 'dataurl' },
     plugins: [
+        svgrPlugin(),
         sassPlugin(),
         htmlPlugin({
             files: [

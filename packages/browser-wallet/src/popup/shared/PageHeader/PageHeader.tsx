@@ -4,16 +4,17 @@ import { useNavigate } from 'react-router-dom';
 
 import BackIcon from '@assets/svg/back-arrow.svg';
 import Logo from '@assets/svg/concordium.svg';
+import { ClassName } from '@shared/utils/types';
 import Button from '../Button';
 
-type Props = {
+type BaseProps = ClassName & {
     // eslint-disable-next-line react/no-unused-prop-types
-    title: string;
+    children: string;
     // eslint-disable-next-line react/no-unused-prop-types
     canGoBack?: boolean;
 };
 
-type FlowProps = Props & {
+type FlowProps = BaseProps & {
     steps: number;
     activeStep: number;
 };
@@ -35,14 +36,16 @@ function FlowProgress({ steps, activeStep }: FlowProps) {
     );
 }
 
-const isFlow = (props: Props | FlowProps): props is FlowProps => (props as FlowProps).steps !== undefined;
+type Props = BaseProps | FlowProps;
 
-export default function PageHeader(props: Props | FlowProps) {
-    const { title, canGoBack } = props;
+const isFlow = (props: Props): props is FlowProps => (props as FlowProps).steps !== undefined;
+
+export default function PageHeader(props: Props) {
+    const { children, canGoBack, className } = props;
     const navigate = useNavigate();
 
     return (
-        <header className="page-header">
+        <header className={clsx('page-header', className)}>
             <div className="page-header__icon">
                 {canGoBack ? (
                     <Button className="flex" clear onClick={() => navigate(-1)}>
@@ -52,8 +55,8 @@ export default function PageHeader(props: Props | FlowProps) {
                     <Logo className="page-header__logo" />
                 )}
             </div>
-            <div className="flexColumn justifyCenter flexChildFill">
-                <h1 className="page-header__title">{title}</h1>
+            <div className="flex-column justify-center flex-child-fill">
+                <h1 className="page-header__title">{children}</h1>
                 {isFlow(props) && <FlowProgress {...props} />}
             </div>
         </header>

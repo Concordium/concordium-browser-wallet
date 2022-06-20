@@ -2,36 +2,36 @@
     display: flex;
 }
 
-.flexWrap {
+.flex-wrap {
     flex-wrap: wrap;
 }
 
-.inlineFlex {
+.inline-flex {
     display: inline-flex;
 }
 
-.inlineFlexColumn {
+.inline-flex-column {
     display: inline-flex;
     flex-direction: column;
 }
 
-.flexColumn {
+.flex-column {
     display: flex;
     flex-direction: column;
 }
 
-.justifyCenter {
+.justify-center {
     justify-content: center;
 }
 
-.justifySpaceBetween {
+.justify-space-between {
     justify-content: space-between;
 }
 
-.alignCenter {
+.align-center {
     align-items: center;
 }
 
-.flexChildFill {
+.flex-child-fill {
     flex: 1;
 }

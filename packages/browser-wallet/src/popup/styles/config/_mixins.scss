@@ -1,0 +1,9 @@
+@mixin with-first-last-mods() {
+    &,
+    &\:not-first:not(:first-child),
+    &\:not-last:not(:last-child),
+    &\:first:first-child,
+    &\:last:last-child {
+        @content;
+    }
+}

@@ -9,6 +9,12 @@ type RouteChildren = {
 export const relativeRoutes = {
     home: {
         path: '/',
+        identities: {
+            path: 'identities',
+        },
+        settings: {
+            path: 'settings',
+        },
     },
     prompt: {
         path: '/prompt',
