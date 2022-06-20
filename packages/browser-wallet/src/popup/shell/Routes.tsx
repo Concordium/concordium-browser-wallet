@@ -16,6 +16,7 @@ import { noOp } from '@shared/utils/basic-helpers';
 import Settings from '@popup/pages/Settings';
 import NetworkSettings from '@popup/pages/NetworkSettings';
 import VisualSettings from '@popup/pages/VisualSettings';
+import AddAccount from '@popup/pages/AddAccount';
 
 type PromptKey = keyof Omit<typeof absoluteRoutes['prompt'], 'path'>;
 
@@ -68,6 +69,9 @@ export default function Routes() {
         <ReactRoutes>
             <Route path={relativeRoutes.home.path} element={<MainLayout />}>
                 <Route index element={<Account />} />
+                <Route path={relativeRoutes.home.account.path}>
+                    <Route element={<AddAccount />} path={relativeRoutes.home.account.add.path} />
+                </Route>
                 <Route element={<NoContent />} path={relativeRoutes.home.identities.path} />
                 <Route path={relativeRoutes.home.settings.path}>
                     <Route index element={<Settings />} />

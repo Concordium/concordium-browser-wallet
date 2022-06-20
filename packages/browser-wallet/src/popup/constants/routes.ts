@@ -9,6 +9,10 @@ type RouteChildren = {
 export const relativeRoutes = {
     home: {
         path: '/',
+        account: {
+            path: 'account',
+            add: { path: 'add' },
+        },
         identities: {
             path: 'identities',
         },
