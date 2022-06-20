@@ -8,6 +8,7 @@ import FormInput from '@popup/shared/Form/Input';
 import Submit from '@popup/shared/Form/Submit';
 import { credentialsAtom } from '@popup/store/settings';
 import { WalletCredential } from '@shared/storage/types';
+import { selectedAccountAtom } from '@popup/store/account';
 
 type FormValues = WalletCredential;
 
@@ -15,10 +16,13 @@ export default function AddAccount() {
     const { t } = useTranslation('addAccount');
     const nav = useNavigate();
     const [creds, setCreds] = useAtom(credentialsAtom);
+    const [, setSelectedAccount] = useAtom(selectedAccountAtom);
 
     const handleSubmit = (cred: FormValues) => {
         // eslint-disable-next-line no-console
         setCreds([...creds, cred]);
+        setSelectedAccount(cred.address);
+
         nav(-1);
     };
 

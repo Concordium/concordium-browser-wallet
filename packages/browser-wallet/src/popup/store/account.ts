@@ -8,7 +8,7 @@ import { credentialsAtom } from './settings';
 import { atomWithChromeStorage } from './utils';
 
 const storedAccountAtom = atomWithChromeStorage<string | undefined>(ChromeStorageKey.SelectedAccount, undefined);
-export const selectedAccountAtom = atom<string | undefined, string>(
+export const selectedAccountAtom = atom<string | undefined, string | undefined>(
     (get) => get(storedAccountAtom),
     (_, set, address) => {
         set(storedAccountAtom, address);

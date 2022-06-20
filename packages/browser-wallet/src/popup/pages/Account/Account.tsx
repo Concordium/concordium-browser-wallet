@@ -19,33 +19,39 @@ export default function Account() {
         const next = creds.filter((c) => c.address !== selectedAccount);
         setCreds(next);
 
-        if (next.length) {
-            setSelectedAccount(next[0].address);
-        }
+        setSelectedAccount(next[0]?.address);
     }, [creds, selectedAccount]);
 
     return (
         <div className="flex-column justify-center align-center">
             <div className="flex justify-space-between w-full">
-                <select
-                    className="account-page__select-account"
-                    value={selectedAccount}
-                    onChange={(e) => setSelectedAccount(e.target.value)}
-                >
-                    {accounts.map((a) => (
-                        <option key={a} value={a}>
-                            {a}
-                        </option>
-                    ))}
-                </select>
+                {accounts.length > 0 ? (
+                    <select
+                        className="account-page__select-account"
+                        value={selectedAccount}
+                        onChange={(e) => setSelectedAccount(e.target.value)}
+                    >
+                        {accounts.map((a) => (
+                            <option key={a} value={a}>
+                                {a}
+                            </option>
+                        ))}
+                    </select>
+                ) : (
+                    <div>No accounts in wallet</div>
+                )}
                 <button type="button" className="m-l-10" onClick={() => nav(absoluteRoutes.home.account.add.path)}>
                     +
                 </button>
             </div>
-            <div className="account-page__address">{t('address', { address: selectedAccount })}</div>
-            <Button faded className="m-t-20" onClick={removeAccount}>
-                Remove account (local only)
-            </Button>
+            {selectedAccount !== undefined && (
+                <>
+                    <div className="account-page__address">{t('address', { address: selectedAccount })}</div>
+                    <Button faded className="m-t-20" onClick={removeAccount}>
+                        Remove account (local only)
+                    </Button>
+                </>
+            )}
         </div>
     );
 }

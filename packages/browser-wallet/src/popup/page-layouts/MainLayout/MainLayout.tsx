@@ -3,13 +3,13 @@ import { Outlet, Navigate } from 'react-router-dom';
 import { useAtomValue } from 'jotai';
 
 import { absoluteRoutes } from '@popup/constants/routes';
-import { accountsAtom } from '@popup/store/account';
+import { jsonRpcUrlAtom } from '@popup/store/settings';
 import Header from './Header';
 
 export default function MainLayout() {
-    const accounts = useAtomValue(accountsAtom);
+    const jsonRpcUrl = useAtomValue(jsonRpcUrlAtom);
 
-    if (accounts.length === 0) {
+    if (!jsonRpcUrl) {
         // Force user to go through setup
         return <Navigate to={absoluteRoutes.setup.path} />;
     }
