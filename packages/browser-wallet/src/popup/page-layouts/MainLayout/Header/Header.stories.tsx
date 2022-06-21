@@ -5,7 +5,7 @@ import { BrowserRouter } from 'react-router-dom';
 import Header from './Header';
 
 export default {
-    title: 'Page layouts/Main layout/Header',
+    title: 'Page layouts/MainLayout/Header',
     component: Header,
 } as ComponentMeta<typeof Header>;
 

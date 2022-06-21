@@ -25,7 +25,8 @@
         "react-dom": "^18.0.0",
         "react-hook-form": "^7.30.0",
         "react-i18next": "^11.16.7",
-        "react-router-dom": "^6.3.0"
+        "react-router-dom": "^6.3.0",
+        "uuid": "^8.3.2"
     },
     "devDependencies": {
         "@babel/core": "^7.18.2",
