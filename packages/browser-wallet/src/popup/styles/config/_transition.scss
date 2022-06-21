@@ -1,10 +1,10 @@
 $transition-easing: ease-out;
 $transition-timing: 0.2s;
 
-@function transition($property, $timing: $transition-timing, $easing: $transition-easing) {
-    @return $property $timing $easing;
+@function transition($property, $timing: $transition-timing, $easing: $transition-easing, $delay: 0s) {
+    @return $property $timing $easing $delay;
 }
 
-@mixin transition($property, $timing: $transition-timing, $easing: $transition-easing) {
-    transition: transition($property, $timing, $easing);
+@mixin transition($property, $timing: $transition-timing, $easing: $transition-easing, $delay: 0s) {
+    transition: transition($property, $timing, $easing, $delay);
 }

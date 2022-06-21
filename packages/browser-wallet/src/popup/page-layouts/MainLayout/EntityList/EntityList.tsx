@@ -26,7 +26,7 @@ type ItemProps = PropsWithChildren<{
 function EntityItem({ name, value, children, onFocus, onClick, onBlur, checked }: ItemProps) {
     return (
         // eslint-disable-next-line jsx-a11y/click-events-have-key-events, jsx-a11y/no-noninteractive-element-interactions
-        <label onMouseUp={onClick}>
+        <label className="entity-list-item" onMouseUp={onClick}>
             <input
                 name={name}
                 type="radio"
@@ -147,8 +147,9 @@ export default function EntityList<E extends Record<string, unknown>>({
 
     return (
         <div className="entity-list" ref={rootRef}>
-            <div>
+            <div className="entity-list__top">
                 <input
+                    className="entity-list__search"
                     type="search"
                     placeholder="Search"
                     autoFocus
@@ -158,8 +159,9 @@ export default function EntityList<E extends Record<string, unknown>>({
                     onBlur={handleSearchBlur}
                     onFocus={handleSearchFocus}
                 />
-                <Button clear onClick={onNew}>
-                    {newText} +
+                <Button className="entity-list__new-entity" clear onClick={onNew}>
+                    <div className="entity-list__new-entity-text">{newText}</div>
+                    <div className="absolute r-10">+</div>
                 </Button>
             </div>
             <Form<FormValues> onSubmit={handleSubmit} formMethods={formMethods}>

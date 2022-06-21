@@ -13,7 +13,7 @@ type Entity = { id: number; text: string };
 
 const Template: ComponentStory<typeof EntityList> = (args) => {
     return (
-        <>
+        <div style={{ width: 300 }}>
             <style>
                 {`
                 .sb-entity-list-item {
@@ -27,7 +27,7 @@ const Template: ComponentStory<typeof EntityList> = (args) => {
             </style>
             {/* eslint-disable-next-line no-console */}
             <EntityList {...args} onSelect={console.log} />
-        </>
+        </div>
     );
 };
 

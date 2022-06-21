@@ -7,7 +7,10 @@
     &:hover,
     &:focus {
         outline: none;
-        color: $color-off-white;
+
+        &:not(.button--clear) {
+            color: $color-off-white;
+        }
     }
 
     &:disabled {
