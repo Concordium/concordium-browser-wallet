@@ -14608,9 +14608,29 @@ __metadata:
   languageName: node
   linkType: hard
 
-"piggybank@workspace:examples/piggybank":
+"piggybankV0@workspace:examples/piggybank":
   version: 0.0.0-use.local
-  resolution: "piggybank@workspace:examples/piggybank"
+  resolution: "piggybankV0@workspace:examples/piggybank"
+  dependencies:
+    "@concordium/browser-wallet-api-types": "workspace:^"
+    "@concordium/web-sdk": ^0.1.2
+    "@craftamap/esbuild-plugin-html": ^0.4.0
+    "@types/react": ^18.0.9
+    "@types/react-dom": ^18.0.5
+    cross-env: ^7.0.3
+    esbuild: ^0.14.42
+    esbuild-plugin-svgr: ^1.0.1
+    live-server: ^1.2.2
+    react: ^18.1.0
+    react-dom: ^18.1.0
+    ts-node: ^10.8.0
+    typescript: ^4.7.2
+  languageName: unknown
+  linkType: soft
+
+"piggybankV1@workspace:examples/piggybankV1":
+  version: 0.0.0-use.local
+  resolution: "piggybankV1@workspace:examples/piggybankV1"
   dependencies:
     "@concordium/browser-wallet-api-types": "workspace:^"
     "@concordium/web-sdk": ^0.1.2
