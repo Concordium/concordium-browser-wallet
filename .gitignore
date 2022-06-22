@@ -10,6 +10,7 @@ dist
 !.yarn/versions
 
 packages/browser-wallet-api/lib
+packages/browser-wallet-api-helpers/lib
 
 # Mac
 .DS_Store

@@ -1,10 +1,13 @@
 {
-    "name": "@concordium/browser-wallet-api-types",
-    "version": "0.1.1",
+    "name": "@concordium/browser-wallet-api-helpers",
+    "version": "0.1.0",
     "license": "Apache-2.0",
     "packageManager": "yarn@3.2.0",
-    "main": "",
-    "types": "index.d.ts",
+    "main": "lib/index.js",
+    "types": "lib/index.d.ts",
+    "files": [
+        "/lib/**/*"
+    ],
     "repository": {
         "type": "git",
         "url": "https://github.com/Concordium/concordium-browser-wallet"
@@ -19,5 +22,8 @@
     },
     "devDependencies": {
         "typescript": "^4.3.5"
+    },
+    "scripts": {
+        "build": "tsc"
     }
 }

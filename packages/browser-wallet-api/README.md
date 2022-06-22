@@ -2,7 +2,7 @@
 
 This package is an implementation of an API to be used in web applications for communicating with the Concordium browser wallet.
 
-[How to use the API and the instance methods are described in the package exposing the types.](../browser-wallet-api-types/README.md)
+[How to use the API and the instance methods are described in the package exposing the types.](../browser-wallet-api-helpers/README.md)
 
 ## Development
 

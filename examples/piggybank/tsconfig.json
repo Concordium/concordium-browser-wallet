@@ -10,5 +10,5 @@
             "module": "CommonJS"
         }
     },
-    "include": ["./**/*", "../../node_modules/@concordium/browser-wallet-api-types/extend-window.d.ts"]
+    "include": ["./**/*"]
 }

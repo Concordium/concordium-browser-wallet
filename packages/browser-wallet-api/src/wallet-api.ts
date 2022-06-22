@@ -5,7 +5,7 @@ import {
     MessageType,
 } from '@concordium/browser-wallet-message-hub';
 import { AccountTransactionPayload, AccountTransactionSignature, AccountTransactionType } from '@concordium/web-sdk';
-import { WalletApi as IWalletApi, WalletEventHandler } from '@concordium/browser-wallet-api-types';
+import { WalletApi as IWalletApi, WalletEventHandler } from '@concordium/browser-wallet-api-helpers';
 import { stringify } from './util';
 
 class WalletApi implements IWalletApi {

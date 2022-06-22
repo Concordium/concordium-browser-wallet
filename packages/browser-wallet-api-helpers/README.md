@@ -1,46 +1,12 @@
-# browser-wallet-api-types
+# browser-wallet-api-helpers
 
-This package includes the types for the API to be used in web applications for communicating with the Concordium browser wallet.
+This package includes the types for the API to be used in web applications for communicating with the Concordium browser wallet. This package changes the type of the window object to also include the injected API that is available on `window.concordium` when ready.
 
-This package changes the type of the window object, to include the injected API that is available on `window.concordium`.
-
-Note that this package only contains the types and a description of the API, which is injected by the Concordium browser wallet.
-
-The actual implementation can be found [In the Concordium browser wallet repository.](https://github.com/Concordium/concordium-browser-wallet/tree/main/packages/browser-wallet-api)
+The actual implementation of the wallet API can be found in the [in the Concordium browser wallet repository.](https://github.com/Concordium/concordium-browser-wallet/tree/main/packages/browser-wallet-api)
 
 ## Using the API
 
-The API is automatically injected into web applications if the Concordium browser wallet extension is installed in the browser. To get access to the API use the following helper function (this will be added to the web-sdk):
-
-```typescript
-async function detectConcordiumProvider(timeout = 5000): Promise<WalletApi> {
-    return new Promise((resolve, reject) => {
-        if (window.concordium) {
-            resolve(window.concordium);
-        } else {
-            const t = setTimeout(() => {
-                if (window.concordium) {
-                    resolve(window.concordium);
-                } else {
-                    reject();
-                }
-            }, timeout);
-            window.addEventListener(
-                'concordium#initialized',
-                () => {
-                    if (window.concordium) {
-                        clearTimeout(t);
-                        resolve(window.concordium);
-                    }
-                },
-                { once: true }
-            );
-        }
-    });
-}
-```
-
-The following exemplifies how accessing the API can be done.
+The API is automatically injected into web applications if the Concordium browser wallet extension is installed in the browser. To get access to the API a helper function is provided by this package which can be used as follows:
 
 ```typescript
 detectConcordiumProvider()
@@ -54,16 +20,6 @@ detectConcordiumProvider()
             .catch(() => console.log('Connection to the Concordium browser wallet was rejected.'));
     })
     .catch(() => console.log('Connection to the Concordium browser wallet timed out.'));
-```
-
-To include the injected types in the window object's type, one can include this package's `extend-window.d.ts` file when building.
-This can be acheived by adding the following to your project's `tsconfig.json` file:
-
-```json
-{
-    ...
-    "include": [..., "path/to/node_modules/@concordium/browser-wallet-api-types/extend-window.d.ts"]
-}
 ```
 
 ## API instance methods
