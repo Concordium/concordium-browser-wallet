@@ -1,4 +1,6 @@
 .entity-list {
+    border-bottom: 1px solid $color-blue;
+
     &__top {
         position: relative;
         display: grid;
@@ -11,14 +13,12 @@
         &--search-focus {
             grid-template-columns: auto rem(25px);
         }
-
-        > * {
-            height: 100%;
-        }
     }
 
     &__search,
     &__new-entity {
+        height: 100%;
+        width: 100%;
         padding: 0 rem(10px);
         @include transition(box-shadow);
 
@@ -31,10 +31,26 @@
     &__search {
         border: none;
         border-right: 1px solid $color-blue;
+        padding-right: rem(25px);
 
         &:focus {
             outline: none;
         }
+    }
+
+    &__search-icon,
+    &__new-entity-icon {
+        position: absolute;
+        right: rem(12.5px);
+        transform: translateX(50%);
+    }
+
+    &__search-icon {
+        width: rem(13px);
+    }
+
+    &__new-entity-icon {
+        width: rem(11px);
     }
 
     &__new-entity {
@@ -46,15 +62,9 @@
     &__new-entity-text {
         white-space: nowrap;
 
-        .entity-list__search:focus + .entity-list__new-entity & {
+        .entity-list__top--search-focus & {
             display: none;
         }
-    }
-
-    &__new-entity-icon {
-        position: absolute;
-        right: rem(12.5px);
-        transform: translateX(50%);
     }
 
     &__submit {

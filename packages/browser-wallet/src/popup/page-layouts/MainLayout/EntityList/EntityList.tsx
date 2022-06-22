@@ -9,11 +9,13 @@ import React, {
 } from 'react';
 import { v4 as uuidv4 } from 'uuid';
 import { Controller } from 'react-hook-form';
+import clsx from 'clsx';
 
 import Button from '@popup/shared/Button';
 import Form, { useForm } from '@popup/shared/Form';
 import Submit from '@popup/shared/Form/Submit';
-import clsx from 'clsx';
+import SearchIcon from '@assets/svg/search.svg';
+import PlusIcon from '@assets/svg/plus.svg';
 
 type ItemProps = PropsWithChildren<{
     value: number;
@@ -150,19 +152,22 @@ export default function EntityList<E extends Record<string, unknown>>({
     return (
         <div className="entity-list" ref={rootRef}>
             <div className={clsx('entity-list__top', searchFocus && 'entity-list__top--search-focus')}>
-                <input
-                    className="entity-list__search"
-                    type="search"
-                    placeholder="Search"
-                    value={search}
-                    onChange={(e) => setSearch(e.target.value)}
-                    onKeyUp={handleSearchKey}
-                    onBlur={() => setSearchFocus(false)}
-                    onFocus={() => setSearchFocus(true)}
-                />
+                <div className="relative h-full flex align-center">
+                    <input
+                        className="entity-list__search"
+                        type="search"
+                        placeholder="Search"
+                        value={search}
+                        onChange={(e) => setSearch(e.target.value)}
+                        onKeyUp={handleSearchKey}
+                        onBlur={() => setSearchFocus(false)}
+                        onFocus={() => setSearchFocus(true)}
+                    />
+                    <SearchIcon className="entity-list__search-icon" />
+                </div>
                 <Button className="entity-list__new-entity" clear onClick={onNew}>
                     <div className="entity-list__new-entity-text">{newText}</div>
-                    <div className="entity-list__new-entity-icon">+</div>
+                    <PlusIcon className="entity-list__new-entity-icon" />
                 </Button>
             </div>
             <Form<FormValues> onSubmit={handleSubmit} formMethods={formMethods}>
