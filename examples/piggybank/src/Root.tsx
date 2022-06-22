@@ -12,6 +12,7 @@ import {
     UpdateContractPayload,
 } from '@concordium/web-sdk';
 
+import { WalletApi } from '@concordium/browser-wallet-api-types';
 import PiggyIcon from './assets/piggy-bank-solid.svg';
 import HammerIcon from './assets/hammer-solid.svg';
 
@@ -43,14 +44,38 @@ const isPiggybankSmashed = (state: PiggyBankState): state is PiggyBankStateSmash
 
 const client = new JsonRpcClient(new HttpProvider(JSON_RPC_URL));
 
-/** Promise resolves when callback is called from the extension, letting us know that the wallet API is ready for use. */
-const apiReady = new Promise<void>((resolve) => {
-    if (window.concordium !== undefined) {
-        resolve();
-    } else {
-        window.concordiumReady = resolve;
-    }
-});
+/**
+ * Promise resolves to the Concordium provider when it has been successfully injected into
+ * the window and is ready for use.
+ * @param timeout determines how long to wait before rejecting if the Concordium provider is not available, in milliseconds.
+ * @returns a promise containing the Concordium Wallet provider API.
+ */
+// TODO This function should be made available from the web-sdk for ease of use.
+async function detectConcordiumProvider(timeout = 5000): Promise<WalletApi> {
+    return new Promise((resolve, reject) => {
+        if (window.concordium) {
+            resolve(window.concordium);
+        } else {
+            const t = setTimeout(() => {
+                if (window.concordium) {
+                    resolve(window.concordium);
+                } else {
+                    reject();
+                }
+            }, timeout);
+            window.addEventListener(
+                'concordium#initialized',
+                () => {
+                    if (window.concordium) {
+                        clearTimeout(t);
+                        resolve(window.concordium);
+                    }
+                },
+                { once: true }
+            );
+        }
+    });
+}
 
 /**
  * Global application state.
@@ -66,26 +91,30 @@ const state = createContext<State>({ isConnected: false, account: undefined });
  * Action for depositing an amount of microCCD to the piggy bank instance
  */
 const deposit = (amount = 0) => {
-    if (window.concordium === undefined) {
-        throw new Error('Concordium wallet API not accessible.');
-    }
-
     if (!Number.isInteger(amount) || amount <= 0) {
         return;
     }
 
-    window.concordium
-        .sendTransaction(AccountTransactionType.UpdateSmartContractInstance, {
-            amount: new GtuAmount(BigInt(amount)),
-            contractAddress: {
-                index: CONTRACT_INDEX,
-                subindex: CONTRACT_SUB_INDEX,
-            },
-            receiveName: `${CONTRACT_NAME}.insert`,
-            maxContractExecutionEnergy: 30000n,
-        } as UpdateContractPayload)
-        .then((txHash) => console.log(`https://testnet.ccdscan.io/?dcount=1&dentity=transaction&dhash=${txHash}`))
-        .catch(alert);
+    detectConcordiumProvider()
+        .then((provider) => {
+            provider
+                .sendTransaction(AccountTransactionType.UpdateSmartContractInstance, {
+                    amount: new GtuAmount(BigInt(amount)),
+                    contractAddress: {
+                        index: CONTRACT_INDEX,
+                        subindex: CONTRACT_SUB_INDEX,
+                    },
+                    receiveName: `${CONTRACT_NAME}.insert`,
+                    maxContractExecutionEnergy: 30000n,
+                } as UpdateContractPayload)
+                .then((txHash) =>
+                    console.log(`https://testnet.ccdscan.io/?dcount=1&dentity=transaction&dhash=${txHash}`)
+                )
+                .catch(alert);
+        })
+        .catch(() => {
+            throw new Error('Concordium Wallet API not accessible');
+        });
 };
 
 /**
@@ -93,22 +122,26 @@ const deposit = (amount = 0) => {
  * https://github.com/Concordium/concordium-rust-smart-contracts/blob/c4d95504a51c15bdbfec503c9e8bf5e93a42e24d/examples/piggy-bank/part1/src/lib.rs#L64
  */
 const smash = () => {
-    if (window.concordium === undefined) {
-        throw new Error('Concordium wallet API not accessible.');
-    }
-
-    window.concordium
-        .sendTransaction(AccountTransactionType.UpdateSmartContractInstance, {
-            amount: new GtuAmount(0n), // This feels weird? Why do I need an amount for a non-payable receive?
-            contractAddress: {
-                index: CONTRACT_INDEX,
-                subindex: CONTRACT_SUB_INDEX,
-            },
-            receiveName: `${CONTRACT_NAME}.smash`,
-            maxContractExecutionEnergy: 30000n,
-        } as UpdateContractPayload)
-        .then((txHash) => console.log(`https://testnet.ccdscan.io/?dcount=1&dentity=transaction&dhash=${txHash}`))
-        .catch(alert);
+    detectConcordiumProvider()
+        .then((provider) => {
+            provider
+                .sendTransaction(AccountTransactionType.UpdateSmartContractInstance, {
+                    amount: new GtuAmount(0n), // This feels weird? Why do I need an amount for a non-payable receive?
+                    contractAddress: {
+                        index: CONTRACT_INDEX,
+                        subindex: CONTRACT_SUB_INDEX,
+                    },
+                    receiveName: `${CONTRACT_NAME}.smash`,
+                    maxContractExecutionEnergy: 30000n,
+                } as UpdateContractPayload)
+                .then((txHash) =>
+                    console.log(`https://testnet.ccdscan.io/?dcount=1&dentity=transaction&dhash=${txHash}`)
+                )
+                .catch(alert);
+        })
+        .catch(() => {
+            throw new Error('Concordium Wallet API not accessible');
+        });
 };
 
 function PiggyBank() {
@@ -200,18 +233,20 @@ export default function Root() {
     const [isConnected, setIsConnected] = useState<boolean>(false);
 
     useEffect(() => {
-        apiReady
-            // Connect to the wallet.
-            .then(() => window.concordium?.connect())
-            .then((acc) => {
-                // Connection accepted, set the application state parameters.
-                setAccount(acc);
-                setIsConnected(true);
+        detectConcordiumProvider()
+            .then((provider) => {
+                provider
+                    .connect()
+                    .then((acc) => {
+                        // Connection accepted, set the application state parameters.
+                        setAccount(acc);
+                        setIsConnected(true);
 
-                // Listen for relevent events from the wallet.
-                window.concordium?.addChangeAccountListener(setAccount);
+                        // Listen for relevant events from the wallet.
+                        provider.addChangeAccountListener(setAccount);
+                    })
+                    .catch(() => setIsConnected(false));
             })
-            // Connection rejected.
             .catch(() => setIsConnected(false));
     }, []);
 

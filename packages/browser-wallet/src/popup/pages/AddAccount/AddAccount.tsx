@@ -19,7 +19,6 @@ export default function AddAccount() {
     const [, setSelectedAccount] = useAtom(selectedAccountAtom);
 
     const handleSubmit = (cred: FormValues) => {
-        // eslint-disable-next-line no-console
         setCreds([...creds, cred]);
         setSelectedAccount(cred.address);
 
