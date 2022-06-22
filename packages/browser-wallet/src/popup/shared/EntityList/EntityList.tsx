@@ -1,22 +1,16 @@
-import React, {
-    KeyboardEventHandler,
-    PropsWithChildren,
-    useCallback,
-    useEffect,
-    useMemo,
-    useRef,
-    useState,
-} from 'react';
+import React, { KeyboardEventHandler, PropsWithChildren, useCallback, useMemo, useRef, useState } from 'react';
 import { v4 as uuidv4 } from 'uuid';
 import { Controller } from 'react-hook-form';
 import clsx from 'clsx';
+import { useTranslation } from 'react-i18next';
 
 import Button from '@popup/shared/Button';
 import Form, { useForm } from '@popup/shared/Form';
 import Submit from '@popup/shared/Form/Submit';
 import SearchIcon from '@assets/svg/search.svg';
 import PlusIcon from '@assets/svg/plus.svg';
-import { useTranslation } from 'react-i18next';
+import { ClassName } from '@shared/utils/types';
+import { useUpdateEffect } from '../utils/hooks';
 
 type ItemProps = PropsWithChildren<{
     value: number;
@@ -40,7 +34,7 @@ function EntityItem({ name, value, children, onFocus, onClick, onBlur, checked }
                 checked={checked}
                 readOnly
             />
-            {children}
+            <div className="entity-list-item__content">{children}</div>
         </label>
     );
 }
@@ -49,7 +43,7 @@ type FormValues = {
     [key: string]: number;
 };
 
-type Props<E extends Record<string, unknown>> = {
+export type EntityListProps<E extends Record<string, unknown>> = ClassName & {
     /**
      * Entities to render in list
      */
@@ -96,7 +90,8 @@ export default function EntityList<E extends Record<string, unknown>>({
     getKey,
     searchableKeys,
     newText,
-}: Props<E>) {
+    className,
+}: EntityListProps<E>) {
     const { current: id } = useRef(uuidv4());
     const [search, setSearch] = useState('');
     const rootRef = useRef<HTMLDivElement>(null);
@@ -104,21 +99,23 @@ export default function EntityList<E extends Record<string, unknown>>({
     const [searchFocus, setSearchFocus] = useState(false);
     const { t } = useTranslation();
 
-    useEffect(() => {
+    useUpdateEffect(() => {
         formMethods.setValue(id, 0);
     }, [search]);
 
-    useEffect(() => {
-        if (searchFocus) {
-            const currentValue = formMethods.getValues()[id];
+    const handleSearchFocus = () => {
+        setSearchFocus(true);
+        const currentValue = formMethods.getValues()[id];
 
-            if (currentValue === undefined) {
-                formMethods.setValue(id, 0);
-            }
-        } else {
-            formMethods.resetField(id);
+        if (currentValue === undefined) {
+            formMethods.setValue(id, 0);
         }
-    }, [searchFocus]);
+    };
+
+    const handleSearchBlur = () => {
+        setSearchFocus(false);
+        formMethods.resetField(id);
+    };
 
     /** entities filtered by searching through values corresponding to "searchableKeys" */
     const filteredEntities = useMemo(
@@ -146,13 +143,16 @@ export default function EntityList<E extends Record<string, unknown>>({
         [filteredEntities]
     );
 
-    const handleSubmit = (values: FormValues) => {
-        const selected = entities[values[id]];
-        onSelect(selected);
-    };
+    const handleSubmit = useCallback(
+        (values: FormValues) => {
+            const selected = filteredEntities[values[id]];
+            onSelect(selected);
+        },
+        [filteredEntities]
+    );
 
     return (
-        <div className="entity-list" ref={rootRef}>
+        <div className={clsx('entity-list', className)} ref={rootRef}>
             <div className={clsx('entity-list__top', searchFocus && 'entity-list__top--search-focus')}>
                 <div className="relative h-full flex align-center">
                     <input
@@ -162,8 +162,8 @@ export default function EntityList<E extends Record<string, unknown>>({
                         value={search}
                         onChange={(e) => setSearch(e.target.value)}
                         onKeyUp={handleSearchKey}
-                        onBlur={() => setSearchFocus(false)}
-                        onFocus={() => setSearchFocus(true)}
+                        onBlur={handleSearchBlur}
+                        onFocus={handleSearchFocus}
                     />
                     <SearchIcon className="entity-list__search-icon" />
                 </div>

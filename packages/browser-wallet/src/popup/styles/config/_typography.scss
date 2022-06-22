@@ -1,6 +1,10 @@
-@import url('https://fonts.googleapis.com/css2?family=Inter:wght@200;300;400&display=swap');
+@import url('https://fonts.googleapis.com/css2?family=Roboto:wght@200;300;400;500&display=swap');
+@import url('https://fonts.googleapis.com/css2?family=Roboto+Mono:wght@200;300;400;500&display=swap');
+@import url('https://fonts.googleapis.com/css2?family=Inter:wght@200;300;400;500&display=swap');
 
-$font-family-roboto: 'Inter', sans-serif;
+$font-family-roboto: 'Roboto', 'Inter', sans-serif;
+$font-family-mono: 'Roboto Mono', 'Inter', sans-serif;
 $font-weight-extra-light: 200;
 $font-weight-light: 300;
 $font-weight-regular: 400;
+$font-weight-bold: 500;

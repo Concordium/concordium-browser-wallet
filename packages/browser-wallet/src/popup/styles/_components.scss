@@ -5,9 +5,11 @@
 @import '../shared/IdCard/IdCard';
 @import '../shared/PageHeader/PageHeader';
 @import '../shared/NavList/NavList';
+@import '../shared/EntityList/EntityList';
 
 // Pages
 @import '../pages/Account/Account';
+@import '../pages/Account/AccountList/AccountList';
 @import '../pages/SignMessage/SignMessage';
 @import '../pages/SendTransaction/SendTransaction';
 @import '../pages/SendTransaction/displayTransaction/DisplayTransaction';
@@ -18,5 +20,4 @@
 // Layouts
 @import '../page-layouts/MainLayout/MainLayout';
 @import '../page-layouts/MainLayout/Header/Header';
-@import '../page-layouts/MainLayout/EntityList/EntityList';
 @import '../page-layouts/FullscreenPromptLayout/FullscreenPromptLayout';
