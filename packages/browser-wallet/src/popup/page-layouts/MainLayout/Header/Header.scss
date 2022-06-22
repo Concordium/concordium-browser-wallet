@@ -51,16 +51,9 @@
 
     &__nav {
         padding: 0 rem(15px);
-        transform: translateY(-100%);
         position: relative;
         z-index: -1;
-        @include transition(transform);
-
         text-align: center;
-
-        .main-layout-header--open & {
-            transform: translateY(0);
-        }
     }
 
     &__nav-item {

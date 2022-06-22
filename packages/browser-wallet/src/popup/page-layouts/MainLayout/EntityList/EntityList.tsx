@@ -122,7 +122,7 @@ export default function EntityList<E extends Record<string, unknown>>({
             entities.filter((entity) =>
                 Object.entries(entity)
                     .filter(([k]) => (searchableKeys ? searchableKeys.includes(k) : true))
-                    .some(([, v]) => (typeof v === 'string' ? v.includes(search) : false))
+                    .some(([, v]) => (typeof v === 'string' ? v.toLowerCase().includes(search.toLowerCase()) : false))
             ),
         [entities, search]
     );
@@ -154,7 +154,6 @@ export default function EntityList<E extends Record<string, unknown>>({
                     className="entity-list__search"
                     type="search"
                     placeholder="Search"
-                    autoFocus
                     value={search}
                     onChange={(e) => setSearch(e.target.value)}
                     onKeyUp={handleSearchKey}

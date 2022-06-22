@@ -2,6 +2,7 @@ import React, { PropsWithChildren, useState } from 'react';
 import { useTranslation } from 'react-i18next';
 import clsx from 'clsx';
 import { NavLink, useLocation, useNavigate } from 'react-router-dom';
+import { AnimatePresence, motion, Variants } from 'framer-motion';
 
 import Logo from '@assets/svg/concordium.svg';
 import CheckmarkIcon from '@assets/svg/checkmark-blue.svg';
@@ -9,6 +10,9 @@ import NavList from '@popup/shared/NavList';
 import Button from '@popup/shared/Button';
 import { absoluteRoutes } from '@popup/constants/routes';
 import CloseIcon from '@assets/svg/cross.svg';
+import { defaultTransition } from '@shared/constants/transition';
+
+const MotionNavList = motion(NavList);
 
 type HeaderLinkProps = PropsWithChildren<{
     onClick(): void;
@@ -33,6 +37,11 @@ function HeaderLink({ to, children, onClick }: HeaderLinkProps) {
         </NavLink>
     );
 }
+
+const transitionVariants: Variants = {
+    open: { y: 0 },
+    closed: { y: '-100%' },
+};
 
 export default function Header() {
     const { t } = useTranslation('mainLayout');
@@ -67,17 +76,28 @@ export default function Header() {
                         </Button>
                     )}
                 </div>
-                <NavList className="main-layout-header__nav">
-                    <HeaderLink onClick={() => setIsOpen(false)} to={absoluteRoutes.home.path}>
-                        {t('header.accounts')}
-                    </HeaderLink>
-                    <HeaderLink onClick={() => setIsOpen(false)} to={absoluteRoutes.home.identities.path}>
-                        {t('header.ids')}
-                    </HeaderLink>
-                    <HeaderLink onClick={() => setIsOpen(false)} to={absoluteRoutes.home.settings.path}>
-                        {t('header.settings')}
-                    </HeaderLink>
-                </NavList>
+                <AnimatePresence>
+                    {isOpen && (
+                        <MotionNavList
+                            className="main-layout-header__nav"
+                            variants={transitionVariants}
+                            initial="closed"
+                            animate="open"
+                            exit="closed"
+                            transition={defaultTransition}
+                        >
+                            <HeaderLink onClick={() => setIsOpen(false)} to={absoluteRoutes.home.path}>
+                                {t('header.accounts')}
+                            </HeaderLink>
+                            <HeaderLink onClick={() => setIsOpen(false)} to={absoluteRoutes.home.identities.path}>
+                                {t('header.ids')}
+                            </HeaderLink>
+                            <HeaderLink onClick={() => setIsOpen(false)} to={absoluteRoutes.home.settings.path}>
+                                {t('header.settings')}
+                            </HeaderLink>
+                        </MotionNavList>
+                    )}
+                </AnimatePresence>
             </header>
             {/* eslint-disable-next-line jsx-a11y/no-static-element-interactions, jsx-a11y/click-events-have-key-events */}
             {isOpen && <div className="absolute t-0 w-full h-full" onClick={() => setIsOpen(false)} />}

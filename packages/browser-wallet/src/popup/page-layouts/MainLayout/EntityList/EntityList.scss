@@ -45,10 +45,9 @@
 
     &__new-entity-text {
         white-space: nowrap;
-        @include transition(opacity);
 
         .entity-list__search:focus + .entity-list__new-entity & {
-            opacity: 0;
+            display: none;
         }
     }
 
