@@ -1,6 +1,4 @@
 .nav-list {
-    padding: 0 rem(10px);
-
     & > *:not(:last-child) {
         border-bottom: 1px dotted $color-grey;
     }

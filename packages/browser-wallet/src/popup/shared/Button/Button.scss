@@ -7,6 +7,7 @@
     &:hover,
     &:focus {
         outline: none;
+        color: $color-off-white;
     }
 
     &:disabled {
@@ -29,7 +30,7 @@
         border-radius: rem(5px);
         background-color: $color-cta;
         box-shadow: inset 0 0 rem(10px) rem(15px) rgb(255 255 255 / 0%);
-        transition: box-shadow $transition-timing $transition-easing;
+        @include transition(box-shadow);
 
         &:hover,
         &:focus {
@@ -45,6 +46,10 @@
 
     &--faded {
         box-shadow: inset 0 0 rem(10px) rem(15px) rgb(255 255 255 / 40%);
+    }
+
+    &--danger {
+        background-color: $color-danger;
     }
 
     &--narrow {

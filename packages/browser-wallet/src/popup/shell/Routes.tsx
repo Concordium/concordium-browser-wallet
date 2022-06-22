@@ -1,5 +1,5 @@
 import React, { useEffect, useRef } from 'react';
-import { Navigate, Route, Routes as ReactRoutes, useLocation, useNavigate } from 'react-router-dom';
+import { Route, Routes as ReactRoutes, useLocation, useNavigate } from 'react-router-dom';
 import { InternalMessageType, MessageType, createMessageTypeFilter } from '@concordium/browser-wallet-message-hub';
 import { AccountTransactionSignature } from '@concordium/web-sdk';
 
@@ -13,6 +13,10 @@ import Setup from '@popup/pages/Setup';
 import ConnectionRequest from '@popup/pages/ConnectionRequest';
 import { popupMessageHandler } from '@popup/shared/message-handler';
 import { noOp } from '@shared/utils/basic-helpers';
+import Settings from '@popup/pages/Settings';
+import NetworkSettings from '@popup/pages/NetworkSettings';
+import VisualSettings from '@popup/pages/VisualSettings';
+import AddAccount from '@popup/pages/AddAccount';
 
 type PromptKey = keyof Omit<typeof absoluteRoutes['prompt'], 'path'>;
 
@@ -42,6 +46,10 @@ function useMessagePrompt<R>(type: InternalMessageType | MessageType, promptKey:
     return handleResponse;
 }
 
+function NoContent() {
+    return <>No content yet...</>;
+}
+
 export default function Routes() {
     const handleConnectionResponse = useMessagePrompt<boolean>(InternalMessageType.Connect, 'connectionRequest');
     const handleSendTransactionResponse = useMessagePrompt<string | undefined>(
@@ -61,11 +69,17 @@ export default function Routes() {
         <ReactRoutes>
             <Route path={relativeRoutes.home.path} element={<MainLayout />}>
                 <Route index element={<Account />} />
-                <Route element={<div>No content yet...</div>} path={relativeRoutes.home.identities.path} />
-                <Route
-                    element={<Navigate replace to={absoluteRoutes.setup.path} />}
-                    path={relativeRoutes.home.settings.path}
-                />
+                <Route path={relativeRoutes.home.account.path}>
+                    <Route element={<AddAccount />} path={relativeRoutes.home.account.add.path} />
+                </Route>
+                <Route element={<NoContent />} path={relativeRoutes.home.identities.path} />
+                <Route path={relativeRoutes.home.settings.path}>
+                    <Route index element={<Settings />} />
+                    <Route element={<NoContent />} path={relativeRoutes.home.settings.passcode.path} />
+                    <Route element={<NetworkSettings />} path={relativeRoutes.home.settings.network.path} />
+                    <Route element={<VisualSettings />} path={relativeRoutes.home.settings.visual.path} />
+                    <Route element={<NoContent />} path={relativeRoutes.home.settings.about.path} />
+                </Route>
             </Route>
             <Route path={relativeRoutes.prompt.path} element={<FullscreenPromptLayout />}>
                 <Route
