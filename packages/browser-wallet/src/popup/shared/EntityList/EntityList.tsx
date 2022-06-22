@@ -16,6 +16,7 @@ import Form, { useForm } from '@popup/shared/Form';
 import Submit from '@popup/shared/Form/Submit';
 import SearchIcon from '@assets/svg/search.svg';
 import PlusIcon from '@assets/svg/plus.svg';
+import { useTranslation } from 'react-i18next';
 
 type ItemProps = PropsWithChildren<{
     value: number;
@@ -101,6 +102,7 @@ export default function EntityList<E extends Record<string, unknown>>({
     const rootRef = useRef<HTMLDivElement>(null);
     const formMethods = useForm<FormValues>();
     const [searchFocus, setSearchFocus] = useState(false);
+    const { t } = useTranslation();
 
     useEffect(() => {
         formMethods.setValue(id, 0);
@@ -156,7 +158,7 @@ export default function EntityList<E extends Record<string, unknown>>({
                     <input
                         className="entity-list__search"
                         type="search"
-                        placeholder="Search"
+                        placeholder={t('entityList.searchPlaceholder')}
                         value={search}
                         onChange={(e) => setSearch(e.target.value)}
                         onKeyUp={handleSearchKey}
@@ -192,7 +194,7 @@ export default function EntityList<E extends Record<string, unknown>>({
                                 )}
                             />
                         ))}
-                        <Submit className="entity-list__submit">Submit</Submit>
+                        <Submit className="entity-list__submit" />
                     </>
                 )}
             </Form>

@@ -18,6 +18,9 @@ const t: typeof en = {
         confirmed: 'Godkendt af',
         rejected: 'Afvist af',
     },
+    entityList: {
+        searchPlaceholder: 'Søg',
+    },
 };
 
 export default t;

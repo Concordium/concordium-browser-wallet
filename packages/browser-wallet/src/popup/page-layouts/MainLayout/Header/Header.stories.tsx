@@ -2,6 +2,7 @@
 import React from 'react';
 import { ComponentMeta, ComponentStory } from '@storybook/react';
 import { BrowserRouter } from 'react-router-dom';
+import { noOp } from '@shared/utils/basic-helpers';
 import Header from './Header';
 
 export default {
@@ -9,7 +10,7 @@ export default {
     component: Header,
 } as ComponentMeta<typeof Header>;
 
-export const Primary: ComponentStory<typeof Header> = () => {
+const Template: ComponentStory<typeof Header> = (args) => {
     return (
         <BrowserRouter>
             <style>
@@ -20,8 +21,18 @@ export const Primary: ComponentStory<typeof Header> = () => {
                 `}
             </style>
             <div style={{ width: 300 }}>
-                <Header />
+                <Header {...args} />
             </div>
         </BrowserRouter>
     );
+};
+
+export const Primary = Template.bind({});
+Primary.args = {
+    onTogglePageDropdown: undefined,
+};
+
+export const WithDropdownAction = Template.bind({});
+WithDropdownAction.args = {
+    onTogglePageDropdown: noOp,
 };

@@ -5,7 +5,7 @@ import clsx from 'clsx';
 import EntityList from './EntityList';
 
 export default {
-    title: 'Page layouts/MainLayout/EntityList',
+    title: 'Shared/EntityList',
     component: EntityList,
 } as ComponentMeta<typeof EntityList>;
 

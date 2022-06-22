@@ -1,4 +1,4 @@
-import React, { PropsWithChildren, useState } from 'react';
+import React, { PropsWithChildren, useEffect, useState } from 'react';
 import { useTranslation } from 'react-i18next';
 import clsx from 'clsx';
 import { NavLink, useLocation, useNavigate } from 'react-router-dom';
@@ -10,6 +10,7 @@ import NavList from '@popup/shared/NavList';
 import Button from '@popup/shared/Button';
 import { absoluteRoutes } from '@popup/constants/routes';
 import CloseIcon from '@assets/svg/cross.svg';
+import BackIcon from '@assets/svg/back-arrow.svg';
 import { defaultTransition } from '@shared/constants/transition';
 
 const MotionNavList = motion(NavList);
@@ -43,11 +44,26 @@ const transitionVariants: Variants = {
     closed: { y: '-100%' },
 };
 
-export default function Header() {
+type Props = {
+    onTogglePageDropdown?(open: boolean): void;
+};
+
+export default function Header({ onTogglePageDropdown }: Props) {
     const { t } = useTranslation('mainLayout');
+    const [dropdownOpen, setDropdownOpen] = useState(false);
     const { pathname } = useLocation();
-    const [isOpen, setIsOpen] = useState(false);
+    const [navOpen, setNavOpen] = useState(false);
     const nav = useNavigate();
+
+    useEffect(() => {
+        setDropdownOpen(false);
+    }, [onTogglePageDropdown]);
+
+    useEffect(() => {
+        if (onTogglePageDropdown) {
+            onTogglePageDropdown(dropdownOpen);
+        }
+    }, [dropdownOpen]);
 
     // eslint-disable-next-line no-nested-ternary
     const title = pathname.includes(absoluteRoutes.home.identities.path)
@@ -60,12 +76,26 @@ export default function Header() {
 
     return (
         <>
-            <header className={clsx('main-layout-header', isOpen && 'main-layout-header--open')}>
+            <header className={clsx('main-layout-header', navOpen && 'main-layout-header--open')}>
                 <div className="main-layout-header__bar">
-                    <Button className="main-layout-header__logo" clear onClick={() => setIsOpen((o) => !o)}>
+                    <Button className="main-layout-header__logo" clear onClick={() => setNavOpen((o) => !o)}>
                         <Logo />
                     </Button>
-                    <h1>{title}</h1>
+                    <h1 className="relative flex align-center">
+                        {title}
+                        {onTogglePageDropdown !== undefined && (
+                            <Button
+                                clear
+                                className={clsx(
+                                    'main-layout-header__page-dropdown',
+                                    dropdownOpen && 'main-layout-header__page-dropdown--open'
+                                )}
+                                onClick={() => setDropdownOpen((o) => !o)}
+                            >
+                                <BackIcon />
+                            </Button>
+                        )}
+                    </h1>
                     {isHomePage || (
                         <Button
                             className="main-layout-header__close"
@@ -77,7 +107,7 @@ export default function Header() {
                     )}
                 </div>
                 <AnimatePresence>
-                    {isOpen && (
+                    {navOpen && (
                         <MotionNavList
                             className="main-layout-header__nav"
                             variants={transitionVariants}
@@ -86,13 +116,13 @@ export default function Header() {
                             exit="closed"
                             transition={defaultTransition}
                         >
-                            <HeaderLink onClick={() => setIsOpen(false)} to={absoluteRoutes.home.path}>
+                            <HeaderLink onClick={() => setNavOpen(false)} to={absoluteRoutes.home.path}>
                                 {t('header.accounts')}
                             </HeaderLink>
-                            <HeaderLink onClick={() => setIsOpen(false)} to={absoluteRoutes.home.identities.path}>
+                            <HeaderLink onClick={() => setNavOpen(false)} to={absoluteRoutes.home.identities.path}>
                                 {t('header.ids')}
                             </HeaderLink>
-                            <HeaderLink onClick={() => setIsOpen(false)} to={absoluteRoutes.home.settings.path}>
+                            <HeaderLink onClick={() => setNavOpen(false)} to={absoluteRoutes.home.settings.path}>
                                 {t('header.settings')}
                             </HeaderLink>
                         </MotionNavList>
@@ -100,7 +130,7 @@ export default function Header() {
                 </AnimatePresence>
             </header>
             {/* eslint-disable-next-line jsx-a11y/no-static-element-interactions, jsx-a11y/click-events-have-key-events */}
-            {isOpen && <div className="absolute t-0 w-full h-full" onClick={() => setIsOpen(false)} />}
+            {navOpen && <div className="absolute t-0 w-full h-full" onClick={() => setNavOpen(false)} />}
         </>
     );
 }

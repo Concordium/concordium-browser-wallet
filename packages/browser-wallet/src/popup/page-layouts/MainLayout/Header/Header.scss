@@ -35,6 +35,21 @@
         }
     }
 
+    &__page-dropdown {
+        display: flex;
+        position: absolute;
+        right: rem(-5px);
+
+        svg {
+            transform: translate(100%, rem(1px)) rotate(-90deg);
+            width: rem(6px);
+        }
+
+        &--open svg {
+            transform: translate(100%, rem(1px)) rotate(90deg);
+        }
+    }
+
     &__close {
         position: absolute;
         right: rem(15px);

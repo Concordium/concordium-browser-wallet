@@ -1,5 +1,6 @@
 .entity-list {
     border-bottom: 1px solid $color-blue;
+    background-color: $color-bg;
 
     &__top {
         position: relative;
@@ -29,9 +30,11 @@
     }
 
     &__search {
+        background-color: $color-bg;
         border: none;
         border-right: 1px solid $color-blue;
         padding-right: rem(25px);
+        color: $color-text;
 
         &:focus {
             outline: none;
@@ -43,6 +46,10 @@
         position: absolute;
         right: rem(12.5px);
         transform: translateX(50%);
+
+        path {
+            fill: $color-text;
+        }
     }
 
     &__search-icon {
