@@ -1,13 +1,19 @@
 .entity-list {
     &__top {
-        display: flex;
+        position: relative;
+        display: grid;
+        grid-template-columns: 50% 50%;
         align-items: center;
         height: rem(25px);
         border: 1px solid $color-blue;
+        @include transition(grid-template-columns);
+
+        &--search-focus {
+            grid-template-columns: auto rem(25px);
+        }
 
         > * {
             height: 100%;
-            flex: 0 0 50%;
         }
     }
 
@@ -25,11 +31,9 @@
     &__search {
         border: none;
         border-right: 1px solid $color-blue;
-        @include transition(flex-basis);
 
         &:focus {
             outline: none;
-            flex-basis: calc(100% - #{rem(25px)});
         }
     }
 
@@ -37,15 +41,21 @@
         display: flex;
         align-items: center;
         overflow: hidden;
-
-        .entity-list__search:focus + & {
-            flex-shrink: 1;
-        }
     }
 
     &__new-entity-text {
-        position: absolute;
         white-space: nowrap;
+        @include transition(opacity);
+
+        .entity-list__search:focus + .entity-list__new-entity & {
+            opacity: 0;
+        }
+    }
+
+    &__new-entity-icon {
+        position: absolute;
+        right: rem(12.5px);
+        transform: translateX(50%);
     }
 
     &__submit {

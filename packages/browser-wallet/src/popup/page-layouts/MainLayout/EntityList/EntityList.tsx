@@ -13,6 +13,7 @@ import { Controller } from 'react-hook-form';
 import Button from '@popup/shared/Button';
 import Form, { useForm } from '@popup/shared/Form';
 import Submit from '@popup/shared/Form/Submit';
+import clsx from 'clsx';
 
 type ItemProps = PropsWithChildren<{
     value: number;
@@ -97,22 +98,23 @@ export default function EntityList<E extends Record<string, unknown>>({
     const [search, setSearch] = useState('');
     const rootRef = useRef<HTMLDivElement>(null);
     const formMethods = useForm<FormValues>();
+    const [searchFocus, setSearchFocus] = useState(false);
 
     useEffect(() => {
         formMethods.setValue(id, 0);
     }, [search]);
 
-    const handleSearchBlur = useCallback(() => {
-        formMethods.resetField(id);
-    }, [formMethods.resetField]);
+    useEffect(() => {
+        if (searchFocus) {
+            const currentValue = formMethods.getValues()[id];
 
-    const handleSearchFocus = useCallback(() => {
-        const currentValue = formMethods.getValues()[id];
-
-        if (currentValue === undefined) {
-            formMethods.setValue(id, 0);
+            if (currentValue === undefined) {
+                formMethods.setValue(id, 0);
+            }
+        } else {
+            formMethods.resetField(id);
         }
-    }, [formMethods.setValue]);
+    }, [searchFocus]);
 
     /** entities filtered by searching through values corresponding to "searchableKeys" */
     const filteredEntities = useMemo(
@@ -147,7 +149,7 @@ export default function EntityList<E extends Record<string, unknown>>({
 
     return (
         <div className="entity-list" ref={rootRef}>
-            <div className="entity-list__top">
+            <div className={clsx('entity-list__top', searchFocus && 'entity-list__top--search-focus')}>
                 <input
                     className="entity-list__search"
                     type="search"
@@ -156,12 +158,12 @@ export default function EntityList<E extends Record<string, unknown>>({
                     value={search}
                     onChange={(e) => setSearch(e.target.value)}
                     onKeyUp={handleSearchKey}
-                    onBlur={handleSearchBlur}
-                    onFocus={handleSearchFocus}
+                    onBlur={() => setSearchFocus(false)}
+                    onFocus={() => setSearchFocus(true)}
                 />
                 <Button className="entity-list__new-entity" clear onClick={onNew}>
                     <div className="entity-list__new-entity-text">{newText}</div>
-                    <div className="absolute r-10">+</div>
+                    <div className="entity-list__new-entity-icon">+</div>
                 </Button>
             </div>
             <Form<FormValues> onSubmit={handleSubmit} formMethods={formMethods}>
