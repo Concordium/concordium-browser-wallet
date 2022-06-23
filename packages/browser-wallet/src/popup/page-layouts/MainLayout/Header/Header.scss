@@ -28,24 +28,28 @@
                 fill: $color-text;
                 @include transition(fill);
 
-                .main-layout-header--open & {
+                .main-layout-header--nav-open & {
                     fill: $color-blue;
                 }
             }
         }
     }
 
-    &__page-dropdown {
+    &__page-dropdown-button {
         display: flex;
         position: absolute;
         right: rem(-5px);
+        transform: translate(100%, rem(1px)) rotate(-90deg);
 
         svg {
-            transform: translate(100%, rem(1px)) rotate(-90deg);
             width: rem(6px);
+
+            path {
+                fill: $color-text;
+            }
         }
 
-        &--open svg {
+        &--open {
             transform: translate(100%, rem(1px)) rotate(90deg);
         }
     }
@@ -64,10 +68,14 @@
         }
     }
 
+    &__page-dropdown,
     &__nav {
-        padding: 0 rem(15px);
         position: relative;
         z-index: -1;
+    }
+
+    &__nav {
+        padding: 0 rem(15px);
         text-align: center;
     }
 

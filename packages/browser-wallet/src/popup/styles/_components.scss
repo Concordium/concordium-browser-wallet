@@ -11,7 +11,6 @@
 
 // Pages
 @import '../pages/Account/Account';
-@import '../pages/Account/AccountList/AccountList';
 @import '../pages/SignMessage/SignMessage';
 @import '../pages/SendTransaction/SendTransaction';
 @import '../pages/SendTransaction/displayTransaction/DisplayTransaction';
@@ -22,4 +21,5 @@
 // Layouts
 @import '../page-layouts/MainLayout/MainLayout';
 @import '../page-layouts/MainLayout/Header/Header';
+@import '../page-layouts/MainLayout/AccountList/AccountList';
 @import '../page-layouts/FullscreenPromptLayout/FullscreenPromptLayout';

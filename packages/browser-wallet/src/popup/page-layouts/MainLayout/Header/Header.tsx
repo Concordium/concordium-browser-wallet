@@ -12,6 +12,7 @@ import { absoluteRoutes } from '@popup/constants/routes';
 import CloseIcon from '@assets/svg/cross.svg';
 import BackIcon from '@assets/svg/back-arrow.svg';
 import { defaultTransition } from '@shared/constants/transition';
+import AccountList from '../AccountList';
 
 const MotionNavList = motion(NavList);
 
@@ -44,11 +45,17 @@ const transitionVariants: Variants = {
     closed: { y: '-100%' },
 };
 
+enum Section {
+    Account,
+    Id,
+    Settings,
+}
+
 type Props = {
-    onTogglePageDropdown?(open: boolean): void;
+    onToggle(open: boolean): void;
 };
 
-export default function Header({ onTogglePageDropdown }: Props) {
+export default function Header({ onToggle }: Props) {
     const { t } = useTranslation('mainLayout');
     const [dropdownOpen, setDropdownOpen] = useState(false);
     const { pathname } = useLocation();
@@ -56,39 +63,35 @@ export default function Header({ onTogglePageDropdown }: Props) {
     const nav = useNavigate();
 
     useEffect(() => {
-        setDropdownOpen(false);
-    }, [onTogglePageDropdown]);
-
-    useEffect(() => {
-        if (onTogglePageDropdown) {
-            onTogglePageDropdown(dropdownOpen);
-        }
-    }, [dropdownOpen]);
+        onToggle(navOpen || dropdownOpen);
+    }, [navOpen, dropdownOpen, onToggle]);
 
     // eslint-disable-next-line no-nested-ternary
-    const title = pathname.includes(absoluteRoutes.home.identities.path)
-        ? t('header.ids')
+    const section = pathname.includes(absoluteRoutes.home.identities.path)
+        ? Section.Id
         : pathname.includes(absoluteRoutes.home.settings.path)
-        ? t('header.settings')
-        : t('header.accounts');
+        ? Section.Settings
+        : Section.Account;
 
     const isHomePage = pathname === absoluteRoutes.home.path;
 
     return (
         <>
-            <header className={clsx('main-layout-header', navOpen && 'main-layout-header--open')}>
+            <header className={clsx('main-layout-header', navOpen && 'main-layout-header--nav-open')}>
                 <div className="main-layout-header__bar">
                     <Button className="main-layout-header__logo" clear onClick={() => setNavOpen((o) => !o)}>
                         <Logo />
                     </Button>
                     <h1 className="relative flex align-center">
-                        {title}
-                        {onTogglePageDropdown !== undefined && (
+                        {section === Section.Id && t('header.ids')}
+                        {section === Section.Settings && t('header.settings')}
+                        {section === Section.Account && t('header.accounts')}
+                        {[Section.Account, Section.Id].includes(section) && (
                             <Button
                                 clear
                                 className={clsx(
-                                    'main-layout-header__page-dropdown',
-                                    dropdownOpen && 'main-layout-header__page-dropdown--open'
+                                    'main-layout-header__page-dropdown-button',
+                                    dropdownOpen && 'main-layout-header__page-dropdown-button--open'
                                 )}
                                 onClick={() => setDropdownOpen((o) => !o)}
                             >
@@ -126,6 +129,18 @@ export default function Header({ onTogglePageDropdown }: Props) {
                                 {t('header.settings')}
                             </HeaderLink>
                         </MotionNavList>
+                    )}
+                    {dropdownOpen && section === Section.Account && (
+                        <motion.div
+                            className="main-layout-header__page-dropdown"
+                            variants={transitionVariants}
+                            initial="closed"
+                            animate="open"
+                            exit="closed"
+                            transition={defaultTransition}
+                        >
+                            <AccountList onSelect={() => setDropdownOpen(false)} />
+                        </motion.div>
                     )}
                 </AnimatePresence>
             </header>

@@ -1,10 +1,14 @@
 import React from 'react';
 import clsx from 'clsx';
+import { useAtomValue, useAtom } from 'jotai';
+import { useNavigate } from 'react-router-dom';
 
 import EntityList from '@popup/shared/EntityList';
-import { EntityListProps } from '@popup/shared/EntityList/EntityList';
 import CopyButton from '@popup/shared/CopyButton';
 import CheckmarkIcon from '@assets/svg/checkmark-blue.svg';
+import { absoluteRoutes } from '@popup/constants/routes';
+import { accountsAtom, selectedAccountAtom } from '@popup/store/account';
+import { ClassName } from '@shared/utils/types';
 
 export type Account = { address: string };
 
@@ -35,17 +39,28 @@ function AccountListItem({ account: { address }, checked, selected }: ItemProps)
     );
 }
 
-type Props = Pick<EntityListProps<Account>, 'onSelect' | 'onNew' | 'className'> & {
-    accounts: Account[];
-    selected?: Account;
+type Props = ClassName & {
+    onSelect(): void;
 };
 
-export default function AccountList({ accounts, selected, ...props }: Props) {
+export default function AccountList({ className, onSelect }: Props) {
+    const accounts = useAtomValue(accountsAtom).map((a) => ({ address: a }));
+    const [selectedAccount, setSelectedAccount] = useAtom(selectedAccountAtom);
+    const nav = useNavigate();
+
     return (
-        <EntityList<Account> {...props} entities={accounts} getKey={(a) => a.address} newText="Add new">
-            {(a, checked) => (
-                <AccountListItem account={a} checked={checked} selected={a.address === selected?.address} />
-            )}
+        <EntityList<Account>
+            className={className}
+            onSelect={(a) => {
+                setSelectedAccount(a.address);
+                onSelect();
+            }}
+            onNew={() => nav(absoluteRoutes.home.account.add.path)}
+            entities={accounts}
+            getKey={(a) => a.address}
+            newText="Add new"
+        >
+            {(a, checked) => <AccountListItem account={a} checked={checked} selected={a.address === selectedAccount} />}
         </EntityList>
     );
 }
