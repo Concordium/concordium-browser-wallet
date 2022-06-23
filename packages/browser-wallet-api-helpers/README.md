@@ -4,6 +4,16 @@ This package includes the types for the API to be used in web applications for c
 
 The actual implementation of the wallet API can be found in the [in the Concordium browser wallet repository.](https://github.com/Concordium/concordium-browser-wallet/tree/main/packages/browser-wallet-api)
 
+## Development
+
+### Installing
+
+See [installing](../../README.md#installing) in repository root.
+
+### Building
+
+-   Run `yarn build` in the package root, which will output into the folder "lib".
+
 ## Using the API
 
 The API is automatically injected into web applications if the Concordium browser wallet extension is installed in the browser. To get access to the API a helper function is provided by this package which can be used as follows:
