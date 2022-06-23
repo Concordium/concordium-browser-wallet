@@ -4,6 +4,7 @@
     "license": "Apache-2.0",
     "packageManager": "yarn@3.2.0",
     "main": "lib/index.js",
+    "browser": "lib/concordiumHelpers.min.js",
     "types": "lib/index.d.ts",
     "files": [
         "/lib/**/*"
