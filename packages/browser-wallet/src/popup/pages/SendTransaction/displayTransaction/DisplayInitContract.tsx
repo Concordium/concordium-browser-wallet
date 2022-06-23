@@ -1,7 +1,7 @@
 import React from 'react';
 import { useTranslation } from 'react-i18next';
 import { InitContractPayload } from '@concordium/web-sdk';
-import { displayAsCcd } from '@shared/utils/ccd';
+import { displayAsCcd } from 'wallet-common-helpers/lib/utils/ccd';
 
 interface Props {
     payload: InitContractPayload;
