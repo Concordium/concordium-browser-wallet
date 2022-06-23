@@ -1,4 +1,12 @@
-import React, { KeyboardEventHandler, PropsWithChildren, useCallback, useMemo, useRef, useState } from 'react';
+import React, {
+    FocusEventHandler,
+    KeyboardEventHandler,
+    PropsWithChildren,
+    useCallback,
+    useMemo,
+    useRef,
+    useState,
+} from 'react';
 import { v4 as uuidv4 } from 'uuid';
 import { Controller } from 'react-hook-form';
 import clsx from 'clsx';
@@ -14,14 +22,21 @@ import { useUpdateEffect } from '../utils/hooks';
 
 type ItemProps = PropsWithChildren<{
     value: number;
+    /**
+     * Marks the item as checked.
+     */
     checked: boolean;
     onFocus(v: number): void;
-    onBlur(): void;
+    onBlur: FocusEventHandler<HTMLInputElement>;
     onClick(): void;
+    /**
+     * If it's possible to tab to the item.
+     */
+    tabbable: boolean;
     name: string;
 }>;
 
-function EntityItem({ name, value, children, onFocus, onClick, onBlur, checked }: ItemProps) {
+function EntityItem({ name, value, children, onFocus, onClick, onBlur, checked, tabbable }: ItemProps) {
     return (
         // eslint-disable-next-line jsx-a11y/click-events-have-key-events, jsx-a11y/no-noninteractive-element-interactions
         <label className="entity-list-item" onMouseUp={onClick}>
@@ -32,7 +47,8 @@ function EntityItem({ name, value, children, onFocus, onClick, onBlur, checked }
                 onFocus={() => onFocus(value)} // onFocus used for selection to consistently select elements with keyboard.
                 onBlur={onBlur}
                 checked={checked}
-                readOnly
+                readOnly // To silence react-DOM warnings... we know what we're doing!
+                tabIndex={tabbable ? undefined : -1}
             />
             <div className="entity-list-item__content">{children}</div>
         </label>
@@ -114,6 +130,7 @@ export default function EntityList<E extends Record<string, unknown>>({
 
     const handleSearchBlur = () => {
         setSearchFocus(false);
+        formMethods.resetField(id);
     };
 
     /** entities filtered by searching through values corresponding to "searchableKeys" */
@@ -152,6 +169,10 @@ export default function EntityList<E extends Record<string, unknown>>({
         [filteredEntities]
     );
 
+    const handleItemBlur = () => {
+        formMethods.resetField(id);
+    };
+
     return (
         <div className={clsx('entity-list', className)} ref={rootRef}>
             <div className={clsx('entity-list__top', searchFocus && 'entity-list__top--search-focus')}>
@@ -185,9 +206,13 @@ export default function EntityList<E extends Record<string, unknown>>({
                                     <EntityItem
                                         name={field.name}
                                         value={i}
+                                        tabbable={i === 0 || i === field.value} // Browser looses tab order when tabbing away from non-tabbable elements.
                                         checked={field.value === i}
                                         onFocus={field.onChange}
-                                        onBlur={field.onBlur}
+                                        onBlur={() => {
+                                            field.onBlur();
+                                            handleItemBlur();
+                                        }}
                                         onClick={() => onSelect(entity)}
                                     >
                                         {children(entity, field.value === i)}

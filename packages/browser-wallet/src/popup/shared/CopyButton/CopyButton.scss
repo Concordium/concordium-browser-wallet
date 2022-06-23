@@ -1,0 +1,13 @@
+.copy-button {
+    width: rem(18px);
+    height: rem(18px);
+
+    svg {
+        width: auto;
+        height: auto;
+    }
+
+    &__check path {
+        fill: $color-text;
+    }
+}

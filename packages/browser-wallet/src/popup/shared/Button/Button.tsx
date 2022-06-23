@@ -2,9 +2,9 @@ import { PolymorphicComponentProps } from '@shared/utils/types';
 import clsx from 'clsx';
 import React, { ButtonHTMLAttributes, ElementType } from 'react';
 
-type Props = Pick<
+export type ButtonProps = Pick<
     ButtonHTMLAttributes<HTMLButtonElement>,
-    'type' | 'children' | 'disabled' | 'className' | 'onClick' | 'onMouseUp'
+    'type' | 'children' | 'disabled' | 'className' | 'onClick' | 'onMouseUp' | 'tabIndex'
 > & {
     /**
      * Clears all styling from button.
@@ -24,7 +24,7 @@ type Props = Pick<
     width?: 'wide' | 'narrow' | 'dynamic';
 };
 
-type PolymorphicProps<A extends ElementType = 'button'> = PolymorphicComponentProps<A, Props>;
+type PolymorphicProps<A extends ElementType = 'button'> = PolymorphicComponentProps<A, ButtonProps>;
 
 /**
  * @description

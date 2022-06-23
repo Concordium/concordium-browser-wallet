@@ -9,7 +9,6 @@
         align-items: center;
         height: rem(25px);
         border: 1px solid $color-blue;
-        @include transition(grid-template-columns);
 
         &--search-focus {
             grid-template-columns: auto rem(25px);

@@ -1,9 +1,10 @@
-import React, { MouseEventHandler } from 'react';
+import React from 'react';
+import clsx from 'clsx';
 
 import EntityList from '@popup/shared/EntityList';
 import { EntityListProps } from '@popup/shared/EntityList/EntityList';
-import clsx from 'clsx';
-import Button from '@popup/shared/Button';
+import CopyButton from '@popup/shared/CopyButton';
+import CheckmarkIcon from '@assets/svg/checkmark-blue.svg';
 
 export type Account = { address: string };
 
@@ -14,25 +15,22 @@ type ItemProps = {
 };
 
 function AccountListItem({ account: { address }, checked, selected }: ItemProps) {
-    const copy: MouseEventHandler = (e) => {
-        e.stopPropagation();
-    };
-
     return (
-        <div className={clsx('account-list__item', checked && 'account-list__item--checked')}>
-            <div className="account-list__account">
-                <div>
-                    {address.slice(0, 4)}...{address.slice(address.length - 4)} {selected && 'x'}
+        <div className={clsx('account-list-item', checked && 'account-list-item--checked')}>
+            <div className="account-list-item__account">
+                <div className="flex align-center">
+                    {address.slice(0, 4)}...{address.slice(address.length - 4)}{' '}
+                    {selected && <CheckmarkIcon className="account-list-item__check" />}
                 </div>
-                <Button
-                    clear
-                    onMouseUp={copy} // mouseUp event used due to mouseUp being used in EntityListItem, and we need to stop event propagation
-                >
-                    COPY
-                </Button>
+                <CopyButton
+                    className="absolute r-0"
+                    value={address}
+                    onMouseUp={(e) => e.stopPropagation()}
+                    tabIndex={-1}
+                />
             </div>
-            <div className="account-list__identity">Identity 1</div>
-            <div className="account-list__amount">10,000.00 CCD</div>
+            <div className="account-list-item__identity">Identity 1</div>
+            <div className="account-list-item__amount">10,000.00 CCD</div>
         </div>
     );
 }
