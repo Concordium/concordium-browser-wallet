@@ -5,7 +5,7 @@ const webpack = require('webpack');
 module.exports = {
     mode: 'production',
     entry: {
-        concordiumApiHelpers: './lib/index.js',
+        concordiumHelpers: './lib/index.js',
     },
     plugins: [
         new webpack.SourceMapDevToolPlugin({
@@ -43,7 +43,7 @@ module.exports = {
     output: {
         filename: '[name].min.js',
         path: path.resolve(__dirname, 'lib'),
-        library: 'concordiumApiHelpers',
+        library: 'concordiumHelpers',
         libraryTarget: 'umd',
         publicPath: '',
     },

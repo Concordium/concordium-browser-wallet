@@ -1,6 +1,6 @@
 # browser-wallet-api-helpers
 
-This package includes the types for the API to be used in web applications for communicating with the Concordium browser wallet. This package changes the type of the window object to also include the injected API that is available on `window.concordium` when ready.
+This package includes the types for the API to be used in web applications for communicating with the Concordium browser wallet. The API is injected into `window.concordium` when it is ready.
 
 The actual implementation of the wallet API can be found in the [in the Concordium browser wallet repository.](https://github.com/Concordium/concordium-browser-wallet/tree/main/packages/browser-wallet-api)
 
@@ -19,6 +19,8 @@ See [installing](../../README.md#installing) in repository root.
 The API is automatically injected into web applications if the Concordium browser wallet extension is installed in the browser. To get access to the API a helper function is provided by this package which can be used as follows:
 
 ```typescript
+import { detectConcordiumProvider } from '@concordium/browser-wallet-api-helpers';
+
 detectConcordiumProvider()
     .then((provider) => {
         // The API is ready for use.
@@ -30,6 +32,19 @@ detectConcordiumProvider()
             .catch(() => console.log('Connection to the Concordium browser wallet was rejected.'));
     })
     .catch(() => console.log('Connection to the Concordium browser wallet timed out.'));
+```
+
+### Custom method for accessing the API
+
+If you do not wish to use the provided utility function, then it is also possible to access the API directly on `window.concordium`. If you do this, then it is your responsibility to make the necessary checks to determine if the API is ready to use. To get proper typing for this you need to update your global definitions for `Window`.
+
+```typescript
+import { WalletApi } from '@concordium/browser-wallet-api-helpers';
+declare global {
+    interface Window {
+        concordium: WalletApi | undefined;
+    }
+}
 ```
 
 ## API instance methods

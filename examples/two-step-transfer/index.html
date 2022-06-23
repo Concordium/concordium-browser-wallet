@@ -3,11 +3,11 @@
     <head>
         <title>My cool dapp</title>
         <script src="../../node_modules/@concordium/web-sdk/lib/concordium.min.js"></script>
-        <script src="../../packages/browser-wallet-api-helpers/lib/concordiumApiHelpers.min.js"></script>
+        <script src="../../packages/browser-wallet-api-helpers/lib/concordiumHelpers.min.js"></script>
         <meta charset="utf-8" />
         <script>
             async function setupPage() {
-                const provider = await concordiumApiHelpers.detectConcordiumProvider();
+                const provider = await concordiumHelpers.detectConcordiumProvider();
 
                 document
                     .getElementById('connect')

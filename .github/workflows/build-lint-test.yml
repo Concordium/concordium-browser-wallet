@@ -60,7 +60,8 @@ jobs:
                   path: |
                       **/build
                       **/dist
-                  key: ${{ runner.os }}-v3-${{ hashFiles('**/build/', '**/dist/') }}
+                      **/lib
+                  key: ${{ runner.os }}-v3-${{ hashFiles('**/build/', '**/dist/', '**/lib/') }}
 
     lint:
         runs-on: ubuntu-20.04
@@ -85,7 +86,8 @@ jobs:
                   path: |
                       **/build
                       **/dist
-                  key: ${{ runner.os }}-v3-${{ hashFiles('**/build/', '**/dist/') }}
+                      **/lib
+                  key: ${{ runner.os }}-v3-${{ hashFiles('**/build/', '**/dist/', '**/lib/') }}
 
             - name: Lint
               run: yarn lint
@@ -113,7 +115,8 @@ jobs:
                   path: |
                       **/build
                       **/dist
-                  key: ${{ runner.os }}-v3-${{ hashFiles('**/build/', '**/dist/') }}
+                      **/lib
+                  key: ${{ runner.os }}-v3-${{ hashFiles('**/build/', '**/dist/', '**/lib/') }}
 
             - name: TypeCheck
               run: yarn type:check
@@ -141,7 +144,8 @@ jobs:
                   path: |
                       **/build
                       **/dist
-                  key: ${{ runner.os }}-v3-${{ hashFiles('**/build/', '**/dist/') }}
+                      **/lib
+                  key: ${{ runner.os }}-v3-${{ hashFiles('**/build/', '**/dist/', '**/lib/') }}
 
             - name: Test
               run: yarn test
