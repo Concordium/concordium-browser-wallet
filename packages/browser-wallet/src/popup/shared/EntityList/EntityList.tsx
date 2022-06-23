@@ -114,7 +114,6 @@ export default function EntityList<E extends Record<string, unknown>>({
 
     const handleSearchBlur = () => {
         setSearchFocus(false);
-        formMethods.resetField(id);
     };
 
     /** entities filtered by searching through values corresponding to "searchableKeys" */
@@ -135,8 +134,10 @@ export default function EntityList<E extends Record<string, unknown>>({
                 const currentValue = formMethods.getValues()[id];
                 onSelect(filteredEntities[currentValue]);
             } else if (e.key === 'ArrowDown') {
-                // Shift focus to options list
-                const radio = rootRef.current?.querySelector('input[type="radio"]') as HTMLInputElement | undefined;
+                // Shift focus to selected option in list
+                const radio = rootRef.current?.querySelector('input[type="radio"]:checked') as
+                    | HTMLInputElement
+                    | undefined;
                 radio?.focus();
             }
         },

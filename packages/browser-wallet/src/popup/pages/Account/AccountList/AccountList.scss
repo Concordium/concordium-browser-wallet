@@ -4,6 +4,9 @@
     }
 
     &__account {
+        display: flex;
+        justify-content: space-between;
+
         .account-list__item--checked & {
             font-weight: $font-weight-bold;
         }

@@ -2,7 +2,10 @@ import { PolymorphicComponentProps } from '@shared/utils/types';
 import clsx from 'clsx';
 import React, { ButtonHTMLAttributes, ElementType } from 'react';
 
-type Props = Pick<ButtonHTMLAttributes<HTMLButtonElement>, 'type' | 'children' | 'disabled' | 'className'> & {
+type Props = Pick<
+    ButtonHTMLAttributes<HTMLButtonElement>,
+    'type' | 'children' | 'disabled' | 'className' | 'onClick' | 'onMouseUp'
+> & {
     /**
      * Clears all styling from button.
      */
@@ -19,7 +22,6 @@ type Props = Pick<ButtonHTMLAttributes<HTMLButtonElement>, 'type' | 'children' |
      * Defaults to "dynamic", i.e. "width: auto;"
      */
     width?: 'wide' | 'narrow' | 'dynamic';
-    onClick?(): void;
 };
 
 type PolymorphicProps<A extends ElementType = 'button'> = PolymorphicComponentProps<A, Props>;
