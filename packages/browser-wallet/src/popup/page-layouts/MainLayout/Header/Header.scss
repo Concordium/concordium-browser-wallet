@@ -70,8 +70,9 @@
 
     &__page-dropdown,
     &__nav {
-        position: relative;
+        position: absolute;
         z-index: -1;
+        width: 100%;
     }
 
     &__nav {

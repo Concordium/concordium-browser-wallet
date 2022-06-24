@@ -66,6 +66,23 @@ export default function Header({ onToggle }: Props) {
         onToggle(navOpen || dropdownOpen);
     }, [navOpen, dropdownOpen, onToggle]);
 
+    useEffect(() => {
+        setDropdownOpen(false);
+        setNavOpen(false);
+    }, [pathname]);
+
+    useEffect(() => {
+        if (navOpen) {
+            setDropdownOpen(false);
+        }
+    }, [navOpen]);
+
+    useEffect(() => {
+        if (dropdownOpen) {
+            setNavOpen(false);
+        }
+    }, [dropdownOpen]);
+
     // eslint-disable-next-line no-nested-ternary
     const section = pathname.includes(absoluteRoutes.home.identities.path)
         ? Section.Id
@@ -130,6 +147,8 @@ export default function Header({ onToggle }: Props) {
                             </HeaderLink>
                         </MotionNavList>
                     )}
+                </AnimatePresence>
+                <AnimatePresence>
                     {dropdownOpen && section === Section.Account && (
                         <motion.div
                             className="main-layout-header__page-dropdown"

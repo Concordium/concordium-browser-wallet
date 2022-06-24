@@ -98,6 +98,9 @@ export type EntityListProps<E extends Record<string, unknown>> = ClassName & {
     newText: string;
 };
 
+/**
+ * Represent a list of entities in a searchable options list, with an action to create new entities.
+ */
 export default function EntityList<E extends Record<string, unknown>>({
     entities,
     children,
