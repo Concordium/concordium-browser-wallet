@@ -7,8 +7,6 @@ import FormInput from '@popup/shared/Form/Input';
 import Submit from '@popup/shared/Form/Submit';
 import { jsonRpcUrlAtom } from '@popup/store/settings';
 import { useNavigate } from 'react-router-dom';
-import { popupMessageHandler } from '@popup/shared/message-handler';
-import { EventType } from '@concordium/browser-wallet-api-helpers';
 
 type FormValues = {
     url: string;
@@ -22,8 +20,6 @@ export default function NetworkSettings() {
     const handleSubmit = (vs: FormValues) => {
         setUrl(vs.url);
         nav(-1);
-        // TODO The URL should be exchanged with a unique identifier for the chain, e.g. the genesis hash or similar.
-        popupMessageHandler.broadcast(EventType.ChainChanged, vs.url);
     };
 
     return (

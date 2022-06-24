@@ -13,9 +13,7 @@ class WalletApi extends EventEmitter implements IWalletApi {
         super();
 
         // Set up message handlers to emit events.
-        Object.values(EventType).forEach((eventType) => {
-            this.handleEvent(eventType);
-        });
+        Object.values(EventType).forEach((eventType) => this.handleEvent(eventType));
     }
 
     /**

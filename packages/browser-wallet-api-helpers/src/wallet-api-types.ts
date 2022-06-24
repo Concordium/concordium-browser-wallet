@@ -13,15 +13,18 @@ export enum EventType {
 }
 
 // eslint-disable-next-line  @typescript-eslint/no-explicit-any
-interface Listeners<T extends EventType, EventListener extends (...args: any[]) => void> {
-    on(eventName: T | `${T}`, listener: EventListener): this;
-    once(eventName: T | `${T}`, listener: EventListener): this;
-    addListener(eventName: T | `${T}`, listener: EventListener): this;
-    removeListener(eventName: T | `${T}`, listener: EventListener): this;
+type EventListener<Args extends any[]> = (...args: Args) => void;
+
+// eslint-disable-next-line  @typescript-eslint/no-explicit-any
+interface Listeners<T extends EventType, Args extends any[]> {
+    on(eventName: T | `${T}`, listener: EventListener<Args>): this;
+    once(eventName: T | `${T}`, listener: EventListener<Args>): this;
+    addListener(eventName: T | `${T}`, listener: EventListener<Args>): this;
+    removeListener(eventName: T | `${T}`, listener: EventListener<Args>): this;
 }
 
-type EventListeners = Listeners<EventType.AccountChanged, (accountAddress: string) => void> &
-    Listeners<EventType.ChainChanged, (chain: string) => void>;
+type EventListeners = Listeners<EventType.AccountChanged, [accountAddress: string]> &
+    Listeners<EventType.ChainChanged, [chain: string]>;
 
 interface MainWalletApi {
     /**
