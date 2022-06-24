@@ -1,28 +1,26 @@
 import React from 'react';
 import { useTranslation } from 'react-i18next';
-import { UpdateContractPayload } from '@concordium/web-sdk';
+import { InitContractPayload } from '@concordium/web-sdk';
 import { displayAsCcd } from 'wallet-common-helpers/lib/utils/ccd';
 
 interface Props {
-    payload: UpdateContractPayload;
+    payload: InitContractPayload;
     parameters?: Record<string, unknown>;
 }
 
 /**
- * Displays an overview of a update contract transaction.
+ * Displays an overview of a init contract transaction.
  * TODO: make nice
  */
-export default function DisplayUpdateContract({ payload, parameters }: Props) {
+export default function DisplayInitContract({ payload, parameters }: Props) {
     const { t } = useTranslation('sendTransaction');
 
     return (
         <>
-            <h5>{t('contractIndex')}:</h5>
-            <p>
-                {payload.contractAddress.index.toString()} ({payload.contractAddress.subindex.toString()})
-            </p>
-            <h5>{t('receiveName')}:</h5>
-            <p>{payload.receiveName}</p>
+            <h5>{t('moduleReference')}:</h5>
+            <p>{payload.moduleRef.moduleRef}</p>
+            <h5>{t('contractName')}:</h5>
+            <p>{payload.contractName}</p>
             <h5>{t('amount')}:</h5>
             {displayAsCcd(payload.amount.microGtuAmount)}
             <h5>{t('maxEnergy')}:</h5>

@@ -15,6 +15,8 @@ const t: typeof en = {
     noParameter: 'Ingen parametre',
     microCCD: 'mikroCCD',
     nrg: 'NRG',
+    moduleReference: 'Modul reference',
+    contractName: 'Kontrakt navn',
 };
 
 export default t;

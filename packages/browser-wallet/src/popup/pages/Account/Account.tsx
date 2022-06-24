@@ -4,13 +4,14 @@ import { useTranslation } from 'react-i18next';
 
 import { accountsAtom, selectedAccountAtom } from '@popup/store/account';
 import Button from '@popup/shared/Button';
-import { credentialsAtom } from '@popup/store/settings';
+import { credentialsAtom, urlWhitelistAtom } from '@popup/store/settings';
 
 export default function Account() {
     const { t } = useTranslation('account');
     const accounts = useAtomValue(accountsAtom);
     const [selectedAccount, setSelectedAccount] = useAtom(selectedAccountAtom);
     const [creds, setCreds] = useAtom(credentialsAtom);
+    const [whitelist, setWhitelist] = useAtom(urlWhitelistAtom);
 
     const removeAccount = useCallback(() => {
         const next = creds.filter((c) => c.address !== selectedAccount);
@@ -18,6 +19,10 @@ export default function Account() {
 
         setSelectedAccount(next[0]?.address);
     }, [creds, selectedAccount]);
+
+    const removeConnections = useCallback(() => {
+        setWhitelist([]);
+    }, []);
 
     return (
         <div className="flex-column justify-center align-center">
@@ -32,6 +37,9 @@ export default function Account() {
                     </Button>
                 </>
             )}
+            <Button disabled={!whitelist.length} danger className="m-t-20" onClick={removeConnections}>
+                {t('resetConnections')}
+            </Button>
         </div>
     );
 }
