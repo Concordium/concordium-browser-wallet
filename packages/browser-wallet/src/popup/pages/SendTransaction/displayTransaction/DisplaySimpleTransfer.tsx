@@ -1,6 +1,7 @@
 import React from 'react';
 import { useTranslation } from 'react-i18next';
 import { SimpleTransferPayload } from '@concordium/web-sdk';
+import { displayAsCcd } from 'wallet-common-helpers/lib/utils/ccd';
 
 interface Props {
     payload: SimpleTransferPayload;
@@ -8,7 +9,7 @@ interface Props {
 
 /**
  * Displays an overview of a simple transfer.
- * TODO: make nice, use displayAsCcd for amount
+ * TODO: make nice
  */
 export default function DisplaySimpleTransfer({ payload }: Props) {
     const { t } = useTranslation('sendTransaction');
@@ -17,7 +18,7 @@ export default function DisplaySimpleTransfer({ payload }: Props) {
             <h5>{t('receiver')}:</h5>
             <p className="display-transaction__address">{payload.toAddress.address}</p>
             <h5>{t('amount')}:</h5>
-            {payload.amount.microGtuAmount.toString()} {t('microCCD')}
+            {displayAsCcd(payload.amount.microGtuAmount)}
         </>
     );
 }
