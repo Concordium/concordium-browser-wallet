@@ -11,13 +11,7 @@
         }
     ],
     "host_permissions": ["<all_urls>"],
-    "permissions": [
-        "tabs",
-        "activeTab",
-        "storage",
-        "scripting",
-        "notifications"
-    ],
+    "permissions": ["tabs", "activeTab", "storage", "scripting", "notifications"],
     "background": {
         "service_worker": "entryPoint!src/background/index.ts"
     },
@@ -29,5 +23,11 @@
     ],
     "action": {
         "default_popup": "popupHtmlFile!"
+    },
+    "icons": {
+        "16": "resources/icons/16x16.png",
+        "32": "resources/icons/32x32.png",
+        "48": "resources/icons/48x48.png",
+        "128": "resources/icons/128x128.png"
     }
 }
