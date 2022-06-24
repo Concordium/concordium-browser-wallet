@@ -210,7 +210,7 @@ export default function Root() {
                         setIsConnected(true);
 
                         // Listen for relevant events from the wallet.
-                        provider.addChangeAccountListener(setAccount);
+                        provider.on('accountChanged', setAccount);
                     })
                     .catch(() => setIsConnected(false));
             })

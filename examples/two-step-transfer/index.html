@@ -64,7 +64,7 @@
                         .then(alert)
                         .catch(alert)
                 );
-                provider.addChangeAccountListener(alert);
+                provider.on('accountChanged', (accountAddres) => alert(accountAddres));
             }
 
             setupPage();

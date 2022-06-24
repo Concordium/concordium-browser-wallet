@@ -1,4 +1,5 @@
 /* eslint-disable max-classes-per-file */
+import { EventType } from '@concordium/browser-wallet-api-helpers';
 import {
     BaseMessage,
     isEvent,
@@ -8,7 +9,6 @@ import {
     WalletMessage,
     WalletResponse,
     MessageType,
-    EventType,
     InternalMessageType,
     WalletError,
     isError,
