@@ -13,6 +13,8 @@ const t = {
     noParameter: 'No parameters',
     microCCD: 'microCCD',
     nrg: 'NRG',
+    moduleReference: 'Module reference',
+    contractName: 'Contract name',
 };
 
 export default t;
