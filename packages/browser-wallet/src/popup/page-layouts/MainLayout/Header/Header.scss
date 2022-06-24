@@ -83,11 +83,6 @@ $main-layout-header-height: rem(40px);
         text-align: center;
     }
 
-    &__page-dropdown {
-        max-height: calc(100vh - #{$main-layout-header-height});
-        overflow: hidden;
-    }
-
     &__nav-item {
         display: block;
         color: $color-text;

@@ -1,5 +1,5 @@
 /* eslint-disable @typescript-eslint/ban-types */
-import { HTMLAttributes, Ref } from 'react';
+import { HTMLAttributes, RefAttributes } from 'react';
 
 export type ClassName = Pick<HTMLAttributes<HTMLElement>, 'className'>;
 export type Style = Pick<HTMLAttributes<HTMLElement>, 'style'>;
@@ -93,4 +93,4 @@ export type PolymorphicComponentProps<C extends React.ElementType, Props = {}> =
     Props & AsProp<C>
 >;
 
-export type WithRef<P, R> = P & { ref?: Ref<R> };
+export type WithRef<P, R> = P & RefAttributes<R>;

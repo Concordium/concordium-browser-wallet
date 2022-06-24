@@ -1,7 +1,6 @@
 $entity-list-top-height: rem(25px);
 
 .entity-list {
-    border-bottom: 1px solid $color-petroleum;
     background-color: $color-bg;
 
     &__top {
@@ -79,7 +78,9 @@ $entity-list-top-height: rem(25px);
 
     &__options {
         overflow: overlay;
+        position: relative; // This needs to be here, otherwise automatic scroll to focused element doesn't work...
         max-height: calc(100vh - #{$entity-list-top-height} - #{$main-layout-header-height});
+        border-bottom: 1px solid $color-petroleum;
     }
 
     &__submit {
