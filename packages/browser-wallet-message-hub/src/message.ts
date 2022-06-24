@@ -1,4 +1,5 @@
 /* eslint-disable max-classes-per-file */
+import { EventType } from '@concordium/browser-wallet-api-helpers';
 import { v4 as uuidv4 } from 'uuid';
 
 /**
@@ -22,13 +23,6 @@ export enum InternalMessageType {
     Connect = 'I_Connect',
     TestPopupOpen = 'I_TestPopupOpen',
     SetViewSize = 'I_SetViewSize',
-}
-
-/**
- * Enumeration of the different types of events from the extension, that can be handled in the wallet API
- */
-export enum EventType {
-    ChangeAccount = 'E_ChangeAccount',
 }
 
 // eslint-disable-next-line @typescript-eslint/no-explicit-any

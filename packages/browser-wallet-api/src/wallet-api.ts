@@ -1,27 +1,19 @@
-import {
-    InjectedMessageHandler,
-    createEventTypeFilter,
-    EventType,
-    MessageType,
-} from '@concordium/browser-wallet-message-hub';
+import { InjectedMessageHandler, createEventTypeFilter, MessageType } from '@concordium/browser-wallet-message-hub';
 import { AccountTransactionPayload, AccountTransactionSignature, AccountTransactionType } from '@concordium/web-sdk';
-import { WalletApi as IWalletApi, WalletEventHandler } from '@concordium/browser-wallet-api-helpers';
+import { WalletApi as IWalletApi, EventType } from '@concordium/browser-wallet-api-helpers';
+import EventEmitter from 'events';
 import { stringify } from './util';
 
-class WalletApi implements IWalletApi {
+class WalletApi extends EventEmitter implements IWalletApi {
     private messageHandler = new InjectedMessageHandler();
 
     private connected = false;
 
-    private eventHandlerMap: Map<EventType, WalletEventHandler[]> = new Map();
-
     constructor() {
-        // set up event listeners
-        this.handleEvent(EventType.ChangeAccount);
-    }
+        super();
 
-    public addChangeAccountListener(handler: WalletEventHandler<string>) {
-        this.addEventListener(EventType.ChangeAccount, handler);
+        // Set up message handlers to emit events.
+        Object.values(EventType).forEach((eventType) => this.handleEvent(eventType));
     }
 
     /**
@@ -87,13 +79,7 @@ class WalletApi implements IWalletApi {
     }
 
     private handleEvent(type: EventType) {
-        this.messageHandler.handleMessage(createEventTypeFilter(type), (msg) =>
-            this.eventHandlerMap.get(type)?.forEach((eh) => eh(msg.payload))
-        );
-    }
-
-    private addEventListener(type: EventType, handler: WalletEventHandler) {
-        this.eventHandlerMap.set(type, this.eventHandlerMap.get(type) ?? [handler]);
+        this.messageHandler.handleMessage(createEventTypeFilter(type), (msg) => this.emit(type, msg.payload));
     }
 }
 
