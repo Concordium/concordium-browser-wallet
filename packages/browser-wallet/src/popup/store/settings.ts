@@ -8,7 +8,7 @@ export const credentialsAtom = atomWithChromeStorage<WalletCredential[]>(ChromeS
 export const themeAtom = atomWithChromeStorage<Theme>(ChromeStorageKey.Theme, Theme.Light);
 export const urlWhitelistAtom = atomWithChromeStorage<string[]>(ChromeStorageKey.UrlWhitelist, []);
 
-export const storedJsonRpcUrlAtom = atomWithChromeStorage<string | undefined>(ChromeStorageKey.JsonRpcUrl, undefined);
+const storedJsonRpcUrlAtom = atomWithChromeStorage<string | undefined>(ChromeStorageKey.JsonRpcUrl, undefined);
 export const jsonRpcUrlAtom = atom<string | undefined, string | undefined>(
     (get) => get(storedJsonRpcUrlAtom),
     (_, set, jsonRpcUrl) => {
