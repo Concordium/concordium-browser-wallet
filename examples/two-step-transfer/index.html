@@ -65,6 +65,7 @@
                         .catch(alert)
                 );
                 provider.on('accountChanged', (accountAddres) => alert(accountAddres));
+                provider.on('chainChanged', (chain) => alert(chain));
             }
 
             setupPage();

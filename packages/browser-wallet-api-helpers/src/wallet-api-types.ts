@@ -9,6 +9,7 @@ import type {
  */
 export enum EventType {
     AccountChanged = 'accountChanged',
+    ChainChanged = 'chainChanged',
 }
 
 // eslint-disable-next-line  @typescript-eslint/no-explicit-any
@@ -19,7 +20,8 @@ interface Listeners<T extends EventType, EventListener extends (...args: any[]) 
     removeListener(eventName: T | `${T}`, listener: EventListener): this;
 }
 
-type EventListeners = Listeners<EventType.AccountChanged, (accountAddress: string) => void>;
+type EventListeners = Listeners<EventType.AccountChanged, (accountAddress: string) => void> &
+    Listeners<EventType.ChainChanged, (chain: string) => void>;
 
 interface MainWalletApi {
     /**
