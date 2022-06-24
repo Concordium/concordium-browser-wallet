@@ -1,4 +1,4 @@
-import React from 'react';
+import React, { forwardRef } from 'react';
 import clsx from 'clsx';
 import { useAtomValue, useAtom } from 'jotai';
 import { useNavigate } from 'react-router-dom';
@@ -43,7 +43,7 @@ type Props = ClassName & {
     onSelect(): void;
 };
 
-export default function AccountList({ className, onSelect }: Props) {
+const AccountList = forwardRef<HTMLDivElement, Props>(({ className, onSelect }, ref) => {
     const accounts = useAtomValue(accountsAtom).map((a) => ({ address: a }));
     const [selectedAccount, setSelectedAccount] = useAtom(selectedAccountAtom);
     const nav = useNavigate();
@@ -59,8 +59,11 @@ export default function AccountList({ className, onSelect }: Props) {
             entities={accounts}
             getKey={(a) => a.address}
             newText="Add new"
+            ref={ref}
         >
             {(a, checked) => <AccountListItem account={a} checked={checked} selected={a.address === selectedAccount} />}
         </EntityList>
     );
-}
+});
+
+export default AccountList;

@@ -1,6 +1,7 @@
 $entity-list-top-height: rem(25px);
 
 .entity-list {
+    border-bottom: 1px solid $color-petroleum;
     background-color: $color-bg;
 
     &__top {

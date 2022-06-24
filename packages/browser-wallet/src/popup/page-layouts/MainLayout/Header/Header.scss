@@ -6,8 +6,7 @@ $main-layout-header-height: rem(40px);
     z-index: 1;
 
     &__bar,
-    &__nav,
-    &__page-dropdown {
+    &__nav {
         background-color: $color-bg;
         border-bottom: 1px solid $color-petroleum;
     }

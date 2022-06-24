@@ -1,7 +1,9 @@
 import React, {
     FocusEventHandler,
+    forwardRef,
     KeyboardEventHandler,
     PropsWithChildren,
+    Ref,
     useCallback,
     useMemo,
     useRef,
@@ -17,7 +19,7 @@ import Form, { useForm } from '@popup/shared/Form';
 import Submit from '@popup/shared/Form/Submit';
 import SearchIcon from '@assets/svg/search.svg';
 import PlusIcon from '@assets/svg/plus.svg';
-import { ClassName } from '@shared/utils/types';
+import { ClassName, WithRef } from '@shared/utils/types';
 import { useUpdateEffect } from '@popup/shared/utils/hooks';
 
 type ItemProps = PropsWithChildren<{
@@ -101,132 +103,139 @@ export type EntityListProps<E extends Record<string, unknown>> = ClassName & {
 /**
  * Represent a list of entities in a searchable options list, with an action to create new entities.
  */
-export default function EntityList<E extends Record<string, unknown>>({
-    entities,
-    children,
-    onSelect,
-    onNew,
-    getKey,
-    searchableKeys,
-    newText,
-    className,
-}: EntityListProps<E>) {
-    const { current: id } = useRef(uuidv4());
-    const [search, setSearch] = useState('');
-    const rootRef = useRef<HTMLDivElement>(null);
-    const formMethods = useForm<FormValues>();
-    const [searchFocus, setSearchFocus] = useState(false);
-    const { t } = useTranslation();
+const EntityList = forwardRef(
+    <E extends Record<string, unknown>>(
+        { entities, children, onSelect, onNew, getKey, searchableKeys, newText, className }: EntityListProps<E>,
+        ref: Ref<HTMLDivElement>
+    ) => {
+        const { current: id } = useRef(uuidv4());
+        const [search, setSearch] = useState('');
+        const formMethods = useForm<FormValues>();
+        const [searchFocus, setSearchFocus] = useState(false);
+        const { t } = useTranslation();
+        const formRef = useRef<HTMLFormElement>(null);
 
-    useUpdateEffect(() => {
-        formMethods.setValue(id, 0);
-    }, [search]);
-
-    const handleSearchFocus = () => {
-        setSearchFocus(true);
-        const currentValue = formMethods.getValues()[id];
-
-        if (currentValue === undefined) {
+        useUpdateEffect(() => {
             formMethods.setValue(id, 0);
-        }
-    };
+        }, [search]);
 
-    const handleSearchBlur = () => {
-        setSearchFocus(false);
-        formMethods.resetField(id);
-    };
+        const handleSearchFocus = () => {
+            setSearchFocus(true);
+            const currentValue = formMethods.getValues()[id];
 
-    /** entities filtered by searching through values corresponding to "searchableKeys" */
-    const filteredEntities = useMemo(
-        () =>
-            entities.filter((entity) =>
-                Object.entries(entity)
-                    .filter(([k]) => (searchableKeys ? searchableKeys.includes(k) : true))
-                    .some(([, v]) => (typeof v === 'string' ? v.toLowerCase().includes(search.toLowerCase()) : false))
-            ),
-        [entities, search]
-    );
-
-    const handleSearchKey: KeyboardEventHandler<HTMLInputElement> = useCallback(
-        (e) => {
-            if (e.key === 'Enter') {
-                // Propagate selection of the currently checked entity.
-                const currentValue = formMethods.getValues()[id];
-                onSelect(filteredEntities[currentValue]);
-            } else if (e.key === 'ArrowDown') {
-                // Shift focus to selected option in list
-                const radio = rootRef.current?.querySelector('input[type="radio"]:checked') as
-                    | HTMLInputElement
-                    | undefined;
-                radio?.focus();
+            if (currentValue === undefined) {
+                formMethods.setValue(id, 0);
             }
-        },
-        [filteredEntities]
-    );
+        };
 
-    const handleSubmit = useCallback(
-        (values: FormValues) => {
-            const selected = filteredEntities[values[id]];
-            onSelect(selected);
-        },
-        [filteredEntities]
-    );
+        const handleSearchBlur = () => {
+            setSearchFocus(false);
+            formMethods.resetField(id);
+        };
 
-    const handleItemBlur = () => {
-        formMethods.resetField(id);
-    };
+        /** entities filtered by searching through values corresponding to "searchableKeys" */
+        const filteredEntities = useMemo(
+            () =>
+                entities.filter((entity) =>
+                    Object.entries(entity)
+                        .filter(([k]) => (searchableKeys ? searchableKeys.includes(k) : true))
+                        .some(([, v]) =>
+                            typeof v === 'string' ? v.toLowerCase().includes(search.toLowerCase()) : false
+                        )
+                ),
+            [entities, search]
+        );
 
-    return (
-        <div className={clsx('entity-list', className)} ref={rootRef}>
-            <div className={clsx('entity-list__top', searchFocus && 'entity-list__top--search-focus')}>
-                <div className="relative h-full flex align-center">
-                    <input
-                        className="entity-list__search"
-                        type="search"
-                        placeholder={t('entityList.searchPlaceholder')}
-                        value={search}
-                        onChange={(e) => setSearch(e.target.value)}
-                        onKeyUp={handleSearchKey}
-                        onBlur={handleSearchBlur}
-                        onFocus={handleSearchFocus}
-                    />
-                    <SearchIcon className="entity-list__search-icon" />
+        const handleSearchKey: KeyboardEventHandler<HTMLInputElement> = useCallback(
+            (e) => {
+                if (e.key === 'Enter') {
+                    // Propagate selection of the currently checked entity.
+                    const currentValue = formMethods.getValues()[id];
+                    onSelect(filteredEntities[currentValue]);
+                } else if (e.key === 'ArrowDown') {
+                    // Shift focus to selected option in list
+                    const radio = formRef.current?.querySelector('input[type="radio"]:checked') as
+                        | HTMLInputElement
+                        | undefined;
+                    radio?.focus();
+                }
+            },
+            [filteredEntities]
+        );
+
+        const handleSubmit = useCallback(
+            (values: FormValues) => {
+                const selected = filteredEntities[values[id]];
+                onSelect(selected);
+            },
+            [filteredEntities]
+        );
+
+        const handleItemBlur = () => {
+            formMethods.resetField(id);
+        };
+
+        return (
+            <div className={clsx('entity-list', className)} ref={ref}>
+                <div className={clsx('entity-list__top', searchFocus && 'entity-list__top--search-focus')}>
+                    <div className="relative h-full flex align-center">
+                        <input
+                            className="entity-list__search"
+                            type="search"
+                            placeholder={t('entityList.searchPlaceholder')}
+                            value={search}
+                            onChange={(e) => setSearch(e.target.value)}
+                            onKeyUp={handleSearchKey}
+                            onBlur={handleSearchBlur}
+                            onFocus={handleSearchFocus}
+                        />
+                        <SearchIcon className="entity-list__search-icon" />
+                    </div>
+                    <Button className="entity-list__new-entity" clear onClick={onNew}>
+                        <div className="entity-list__new-entity-text">{newText}</div>
+                        <PlusIcon className="entity-list__new-entity-icon" />
+                    </Button>
                 </div>
-                <Button className="entity-list__new-entity" clear onClick={onNew}>
-                    <div className="entity-list__new-entity-text">{newText}</div>
-                    <PlusIcon className="entity-list__new-entity-icon" />
-                </Button>
+                <Form<FormValues>
+                    className="entity-list__options"
+                    onSubmit={handleSubmit}
+                    formMethods={formMethods}
+                    ref={formRef}
+                >
+                    {(f) => (
+                        <>
+                            {filteredEntities.map((entity, i) => (
+                                <Controller
+                                    control={f.control}
+                                    name={id}
+                                    key={getKey(entity)}
+                                    render={({ field }) => (
+                                        <EntityItem
+                                            name={field.name}
+                                            value={i}
+                                            tabbable={i === 0 || i === field.value} // Browser looses tab order when tabbing away from non-tabbable elements.
+                                            checked={field.value === i}
+                                            onFocus={field.onChange}
+                                            onBlur={() => {
+                                                field.onBlur();
+                                                handleItemBlur();
+                                            }}
+                                            onClick={() => onSelect(entity)}
+                                        >
+                                            {children(entity, field.value === i)}
+                                        </EntityItem>
+                                    )}
+                                />
+                            ))}
+                            <Submit className="entity-list__submit" />
+                        </>
+                    )}
+                </Form>
             </div>
-            <Form<FormValues> className="entity-list__options" onSubmit={handleSubmit} formMethods={formMethods}>
-                {(f) => (
-                    <>
-                        {filteredEntities.map((entity, i) => (
-                            <Controller
-                                control={f.control}
-                                name={id}
-                                key={getKey(entity)}
-                                render={({ field }) => (
-                                    <EntityItem
-                                        name={field.name}
-                                        value={i}
-                                        tabbable={i === 0 || i === field.value} // Browser looses tab order when tabbing away from non-tabbable elements.
-                                        checked={field.value === i}
-                                        onFocus={field.onChange}
-                                        onBlur={() => {
-                                            field.onBlur();
-                                            handleItemBlur();
-                                        }}
-                                        onClick={() => onSelect(entity)}
-                                    >
-                                        {children(entity, field.value === i)}
-                                    </EntityItem>
-                                )}
-                            />
-                        ))}
-                        <Submit className="entity-list__submit" />
-                    </>
-                )}
-            </Form>
-        </div>
-    );
-}
+        );
+    }
+);
+
+export default EntityList as <E extends Record<string, unknown>>(
+    props: WithRef<EntityListProps<E>, HTMLDivElement>
+) => JSX.Element;

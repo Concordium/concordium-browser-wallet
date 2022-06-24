@@ -1,5 +1,5 @@
-import { ClassName } from '@shared/utils/types';
-import React from 'react';
+import { ClassName, WithRef } from '@shared/utils/types';
+import React, { forwardRef, Ref } from 'react';
 import {
     DefaultValues,
     FieldValues,
@@ -64,22 +64,24 @@ type FormProps<TFormValues> = ClassName & {
  *      )}
  *  </Form>
  */
-// eslint-disable-next-line @typescript-eslint/no-explicit-any
-export default function Form<TFormValues extends Record<string, any>>({
-    onSubmit,
-    formMethods: external,
-    defaultValues,
-    children,
-    className,
-}: FormProps<TFormValues>) {
-    const internal = useForm<TFormValues>({ defaultValues });
-    const methods = external ?? internal;
+const Form = forwardRef(
+    // eslint-disable-next-line @typescript-eslint/no-explicit-any
+    <V extends Record<string, any>>(
+        { onSubmit, formMethods: external, defaultValues, children, className }: FormProps<V>,
+        ref: Ref<HTMLFormElement>
+    ) => {
+        const internal = useForm<V>({ defaultValues });
+        const methods = external ?? internal;
 
-    return (
-        <FormProvider {...methods}>
-            <form className={className} onSubmit={methods.handleSubmit(onSubmit)}>
-                {children(methods)}
-            </form>
-        </FormProvider>
-    );
-}
+        return (
+            <FormProvider {...methods}>
+                <form className={className} onSubmit={methods.handleSubmit(onSubmit)} ref={ref}>
+                    {children(methods)}
+                </form>
+            </FormProvider>
+        );
+    }
+);
+
+// eslint-disable-next-line @typescript-eslint/no-explicit-any
+export default Form as <V extends Record<string, any>>(props: WithRef<FormProps<V>, HTMLFormElement>) => JSX.Element;

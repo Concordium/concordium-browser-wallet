@@ -15,6 +15,7 @@ import { defaultTransition } from '@shared/constants/transition';
 import AccountList from '../AccountList';
 
 const MotionNavList = motion(NavList);
+const MotionAccountList = motion(AccountList);
 
 type HeaderLinkProps = PropsWithChildren<{
     onClick(): void;
@@ -150,16 +151,15 @@ export default function Header({ onToggle }: Props) {
                 </AnimatePresence>
                 <AnimatePresence>
                     {dropdownOpen && section === Section.Account && (
-                        <motion.div
+                        <MotionAccountList
+                            onSelect={() => setDropdownOpen(false)}
                             className="main-layout-header__page-dropdown"
                             variants={transitionVariants}
                             initial="closed"
                             animate="open"
                             exit="closed"
                             transition={defaultTransition}
-                        >
-                            <AccountList onSelect={() => setDropdownOpen(false)} />
-                        </motion.div>
+                        />
                     )}
                 </AnimatePresence>
             </header>
