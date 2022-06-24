@@ -2,6 +2,7 @@ import React, { forwardRef } from 'react';
 import clsx from 'clsx';
 import { useAtomValue, useAtom } from 'jotai';
 import { useNavigate } from 'react-router-dom';
+import { displayAsCcd, microCcdPerCcd } from 'wallet-common-helpers';
 
 import CopyButton from '@popup/shared/CopyButton';
 import CheckmarkIcon from '@assets/svg/checkmark-blue.svg';
@@ -34,7 +35,7 @@ function AccountListItem({ account: { address }, checked, selected }: ItemProps)
                 />
             </div>
             <div className="account-list-item__identity">Identity 1</div>
-            <div className="account-list-item__amount">10,000.00 CCD</div>
+            <div className="account-list-item__amount">{displayAsCcd(10000n * microCcdPerCcd)}</div>
         </div>
     );
 }
