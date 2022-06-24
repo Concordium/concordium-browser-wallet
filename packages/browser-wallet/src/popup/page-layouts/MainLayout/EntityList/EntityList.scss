@@ -1,5 +1,6 @@
+$entity-list-top-height: rem(25px);
+
 .entity-list {
-    border-bottom: 1px solid $color-petroleum;
     background-color: $color-bg;
 
     &__top {
@@ -7,7 +8,7 @@
         display: grid;
         grid-template-columns: 50% 50%;
         align-items: center;
-        height: rem(25px);
+        height: $entity-list-top-height;
         border: 1px solid $color-petroleum;
         border-top: none;
 
@@ -73,6 +74,11 @@
         .entity-list__top--search-focus & {
             display: none;
         }
+    }
+
+    &__options {
+        overflow: overlay;
+        max-height: calc(100vh - #{$entity-list-top-height} - #{$main-layout-header-height});
     }
 
     &__submit {

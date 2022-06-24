@@ -5,7 +5,6 @@
 @import '../shared/IdCard/IdCard';
 @import '../shared/PageHeader/PageHeader';
 @import '../shared/NavList/NavList';
-@import '../shared/EntityList/EntityList';
 @import '../shared/IconButton/IconButton';
 @import '../shared/CopyButton/CopyButton';
 
@@ -21,5 +20,6 @@
 // Layouts
 @import '../page-layouts/MainLayout/MainLayout';
 @import '../page-layouts/MainLayout/Header/Header';
+@import '../page-layouts/MainLayout/EntityList/EntityList';
 @import '../page-layouts/MainLayout/AccountList/AccountList';
 @import '../page-layouts/FullscreenPromptLayout/FullscreenPromptLayout';

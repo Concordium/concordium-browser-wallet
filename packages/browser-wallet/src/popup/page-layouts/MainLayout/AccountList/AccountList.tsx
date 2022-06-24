@@ -3,12 +3,12 @@ import clsx from 'clsx';
 import { useAtomValue, useAtom } from 'jotai';
 import { useNavigate } from 'react-router-dom';
 
-import EntityList from '@popup/shared/EntityList';
 import CopyButton from '@popup/shared/CopyButton';
 import CheckmarkIcon from '@assets/svg/checkmark-blue.svg';
 import { absoluteRoutes } from '@popup/constants/routes';
 import { accountsAtom, selectedAccountAtom } from '@popup/store/account';
 import { ClassName } from '@shared/utils/types';
+import EntityList from '../EntityList';
 
 export type Account = { address: string };
 

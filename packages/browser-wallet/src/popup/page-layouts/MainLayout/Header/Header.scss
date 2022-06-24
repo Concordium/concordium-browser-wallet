@@ -1,10 +1,13 @@
+$main-layout-header-height: rem(40px);
+
 .main-layout-header {
-    height: rem(40px);
+    height: $main-layout-header-height;
     position: relative;
     z-index: 1;
 
     &__bar,
-    &__nav {
+    &__nav,
+    &__page-dropdown {
         background-color: $color-bg;
         border-bottom: 1px solid $color-petroleum;
     }
@@ -14,6 +17,7 @@
         display: flex;
         align-items: center;
         justify-content: center;
+        overflow: hidden;
     }
 
     &__logo {
@@ -78,6 +82,11 @@
     &__nav {
         padding: 0 rem(15px);
         text-align: center;
+    }
+
+    &__page-dropdown {
+        max-height: calc(100vh - #{$main-layout-header-height});
+        overflow: hidden;
     }
 
     &__nav-item {

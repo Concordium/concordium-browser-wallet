@@ -18,7 +18,7 @@ import Submit from '@popup/shared/Form/Submit';
 import SearchIcon from '@assets/svg/search.svg';
 import PlusIcon from '@assets/svg/plus.svg';
 import { ClassName } from '@shared/utils/types';
-import { useUpdateEffect } from '../utils/hooks';
+import { useUpdateEffect } from '@popup/shared/utils/hooks';
 
 type ItemProps = PropsWithChildren<{
     value: number;
@@ -197,7 +197,7 @@ export default function EntityList<E extends Record<string, unknown>>({
                     <PlusIcon className="entity-list__new-entity-icon" />
                 </Button>
             </div>
-            <Form<FormValues> onSubmit={handleSubmit} formMethods={formMethods}>
+            <Form<FormValues> className="entity-list__options" onSubmit={handleSubmit} formMethods={formMethods}>
                 {(f) => (
                     <>
                         {filteredEntities.map((entity, i) => (
