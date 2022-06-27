@@ -86,6 +86,11 @@ $entity-list-top-height: rem(25px);
     &__submit {
         display: none;
     }
+
+    &__no-matches {
+        padding: rem(7px) rem(15px);
+        border-bottom: 1px solid $color-petroleum;
+    }
 }
 
 .entity-list-item {

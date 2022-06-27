@@ -116,7 +116,7 @@ const EntityList = forwardRef(
         const [search, setSearch] = useState('');
         const formMethods = useForm<FormValues>();
         const [searchFocus, setSearchFocus] = useState(false);
-        const { t } = useTranslation();
+        const { t } = useTranslation('mainLayout');
         const formRef = useRef<HTMLFormElement>(null);
 
         useUpdateEffect(() => {
@@ -200,41 +200,45 @@ const EntityList = forwardRef(
                         <PlusIcon className="entity-list__new-entity-icon" />
                     </Button>
                 </div>
-                <Form<FormValues>
-                    className="entity-list__options"
-                    onSubmit={handleSubmit}
-                    formMethods={formMethods}
-                    ref={formRef}
-                >
-                    {(f) => (
-                        <>
-                            {filteredEntities.map((entity, i) => (
-                                <Controller
-                                    control={f.control}
-                                    name={id}
-                                    key={getKey(entity)}
-                                    render={({ field }) => (
-                                        <EntityItem
-                                            name={field.name}
-                                            value={i}
-                                            tabbable={i === 0 || i === field.value} // Browser looses tab order when tabbing away from non-tabbable elements.
-                                            checked={field.value === i}
-                                            onFocus={field.onChange}
-                                            onBlur={() => {
-                                                field.onBlur();
-                                                handleItemBlur();
-                                            }}
-                                            onClick={() => onSelect(entity)}
-                                        >
-                                            {children(entity, field.value === i)}
-                                        </EntityItem>
-                                    )}
-                                />
-                            ))}
-                            <Submit className="entity-list__submit" />
-                        </>
-                    )}
-                </Form>
+                {filteredEntities.length > 0 ? (
+                    <Form<FormValues>
+                        className="entity-list__options"
+                        onSubmit={handleSubmit}
+                        formMethods={formMethods}
+                        ref={formRef}
+                    >
+                        {(f) => (
+                            <>
+                                {filteredEntities.map((entity, i) => (
+                                    <Controller
+                                        control={f.control}
+                                        name={id}
+                                        key={getKey(entity)}
+                                        render={({ field }) => (
+                                            <EntityItem
+                                                name={field.name}
+                                                value={i}
+                                                tabbable={i === 0 || i === field.value} // Browser looses tab order when tabbing away from non-tabbable elements.
+                                                checked={field.value === i}
+                                                onFocus={field.onChange}
+                                                onBlur={() => {
+                                                    field.onBlur();
+                                                    handleItemBlur();
+                                                }}
+                                                onClick={() => onSelect(entity)}
+                                            >
+                                                {children(entity, field.value === i)}
+                                            </EntityItem>
+                                        )}
+                                    />
+                                ))}
+                                <Submit className="entity-list__submit" />
+                            </>
+                        )}
+                    </Form>
+                ) : (
+                    <div className="entity-list__no-matches">{t('entityList.noMatches')}</div>
+                )}
             </div>
         );
     }

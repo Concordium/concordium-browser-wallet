@@ -16,9 +16,6 @@ const t = {
         confirmed: 'Verified by',
         rejected: 'Rejected by',
     },
-    entityList: {
-        searchPlaceholder: 'Search',
-    },
 };
 
 export default t;
