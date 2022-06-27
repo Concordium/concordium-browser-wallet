@@ -15,3 +15,4 @@
 
 -   Access to initial setup page from account page has been removed.
 -   Updated the event handling in the API to use EventEmitter.
+-   Account selection is done through account list, which is accessible through the header when browsing the account section.
