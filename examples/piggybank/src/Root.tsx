@@ -50,9 +50,10 @@ const client = new JsonRpcClient(new HttpProvider(JSON_RPC_URL));
 type State = {
     isConnected: boolean;
     account: string | undefined;
+    jsonRpcUrl: string | undefined;
 };
 
-const state = createContext<State>({ isConnected: false, account: undefined });
+const state = createContext<State>({ isConnected: false, account: undefined, jsonRpcUrl: undefined });
 
 /**
  * Action for depositing an amount of microCCD to the piggy bank instance
@@ -112,7 +113,7 @@ const smash = () => {
 };
 
 function PiggyBank() {
-    const { account, isConnected } = useContext(state);
+    const { account, isConnected, jsonRpcUrl } = useContext(state);
     const [piggybank, setPiggyBank] = useState<InstanceInfoV0>();
     const input = useRef<HTMLInputElement>(null);
 
@@ -149,6 +150,7 @@ function PiggyBank() {
             <div className={`connection-banner ${isConnected ? 'connected' : ''}`}>
                 {isConnected ? `Connected: ${account}` : 'No wallet connection'}
             </div>
+            <div>{jsonRpcUrl ? `JSON-RPC Url: ${jsonRpcUrl}` : 'No JSON-RPC Url yet'}</div>
             <br />
             {piggybank === undefined ? (
                 <div>Loading piggy bank...</div>
@@ -198,6 +200,7 @@ function PiggyBank() {
 export default function Root() {
     const [account, setAccount] = useState<string>();
     const [isConnected, setIsConnected] = useState<boolean>(false);
+    const [jsonRpcUrl, setJsonRpcUrl] = useState<string>();
 
     useEffect(() => {
         detectConcordiumProvider()
@@ -210,14 +213,15 @@ export default function Root() {
                         setIsConnected(true);
 
                         // Listen for relevant events from the wallet.
-                        provider.addChangeAccountListener(setAccount);
+                        provider.on('accountChanged', setAccount);
+                        provider.on('chainChanged', setJsonRpcUrl);
                     })
                     .catch(() => setIsConnected(false));
             })
             .catch(() => setIsConnected(false));
     }, []);
 
-    const stateValue: State = useMemo(() => ({ isConnected, account }), [isConnected, account]);
+    const stateValue: State = useMemo(() => ({ isConnected, account, jsonRpcUrl }), [isConnected, account, jsonRpcUrl]);
 
     return (
         // Setup a globally accessible state with data from the wallet.

@@ -41,7 +41,10 @@ type ItemProps = PropsWithChildren<{
 function EntityItem({ name, value, children, onFocus, onClick, onBlur, checked, tabbable }: ItemProps) {
     return (
         // eslint-disable-next-line jsx-a11y/click-events-have-key-events, jsx-a11y/no-noninteractive-element-interactions
-        <label className="entity-list-item" onMouseUp={onClick}>
+        <label
+            className="entity-list-item"
+            onMouseUp={onClick} // mouseUp used instead of click, as click is also triggered with keyboard navigation.
+        >
             <input
                 name={name}
                 type="radio"
@@ -49,7 +52,7 @@ function EntityItem({ name, value, children, onFocus, onClick, onBlur, checked, 
                 onFocus={() => onFocus(value)} // onFocus used for selection to consistently select elements with keyboard.
                 onBlur={onBlur}
                 checked={checked}
-                readOnly // To silence react-DOM warnings... we know what we're doing!
+                readOnly // To silence react-DOM warnings about "checked" props being used without onChange... we know what we're doing!
                 tabIndex={tabbable ? undefined : -1}
             />
             <div className="entity-list-item__content">{children}</div>

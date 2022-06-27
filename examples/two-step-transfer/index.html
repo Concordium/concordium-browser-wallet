@@ -89,7 +89,9 @@
                         .then(alert)
                         .catch(alert)
                 );
-                provider.addChangeAccountListener(alert);
+
+                provider.on('accountChanged', (accountAddres) => alert(accountAddres));
+                provider.on('chainChanged', (chain) => alert(chain));
             }
 
             setupPage();

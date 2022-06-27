@@ -1,8 +1,9 @@
-import React, { PropsWithChildren, useEffect, useState } from 'react';
+import React, { ComponentType, PropsWithChildren, useEffect, useState } from 'react';
 import { useTranslation } from 'react-i18next';
 import clsx from 'clsx';
 import { NavLink, useLocation, useNavigate } from 'react-router-dom';
-import { AnimatePresence, motion, Variants } from 'framer-motion';
+import { AnimatePresence, AnimationProps, motion, Variants } from 'framer-motion';
+import { PropsOf } from 'wallet-common-helpers';
 
 import Logo from '@assets/svg/concordium.svg';
 import CheckmarkIcon from '@assets/svg/checkmark-blue.svg';
@@ -14,7 +15,7 @@ import BackIcon from '@assets/svg/back-arrow.svg';
 import { defaultTransition } from '@shared/constants/transition';
 import AccountList from '../AccountList';
 
-const MotionNavList = motion(NavList);
+const MotionNavList = motion(NavList) as ComponentType<PropsOf<typeof NavList> & AnimationProps>; // For some reason, the motion HoC removes children from component props
 const MotionAccountList = motion(AccountList);
 
 type HeaderLinkProps = PropsWithChildren<{
@@ -44,6 +45,14 @@ function HeaderLink({ to, children, onClick }: HeaderLinkProps) {
 const transitionVariants: Variants = {
     open: { y: 0 },
     closed: { y: '-100%' },
+};
+
+const dropdownTransition: AnimationProps = {
+    variants: { transitionVariants },
+    initial: 'closed',
+    animate: 'open',
+    exit: 'closed',
+    transition: { defaultTransition },
 };
 
 enum Section {
@@ -104,7 +113,7 @@ export default function Header({ onToggle }: Props) {
                         {section === Section.Id && t('header.ids')}
                         {section === Section.Settings && t('header.settings')}
                         {section === Section.Account && t('header.accounts')}
-                        {[Section.Account, Section.Id].includes(section) && (
+                        {[Section.Account].includes(section) && (
                             <Button
                                 clear
                                 className={clsx(
@@ -129,14 +138,7 @@ export default function Header({ onToggle }: Props) {
                 </div>
                 <AnimatePresence>
                     {navOpen && (
-                        <MotionNavList
-                            className="main-layout-header__nav"
-                            variants={transitionVariants}
-                            initial="closed"
-                            animate="open"
-                            exit="closed"
-                            transition={defaultTransition}
-                        >
+                        <MotionNavList className="main-layout-header__nav" {...dropdownTransition}>
                             <HeaderLink onClick={() => setNavOpen(false)} to={absoluteRoutes.home.path}>
                                 {t('header.accounts')}
                             </HeaderLink>
@@ -154,11 +156,7 @@ export default function Header({ onToggle }: Props) {
                         <MotionAccountList
                             onSelect={() => setDropdownOpen(false)}
                             className="main-layout-header__page-dropdown"
-                            variants={transitionVariants}
-                            initial="closed"
-                            animate="open"
-                            exit="closed"
-                            transition={defaultTransition}
+                            {...dropdownTransition}
                         />
                     )}
                 </AnimatePresence>

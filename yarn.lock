@@ -1678,6 +1678,7 @@ __metadata:
   version: 0.0.0-use.local
   resolution: "@concordium/browser-wallet-message-hub@workspace:packages/browser-wallet-message-hub"
   dependencies:
+    "@concordium/browser-wallet-api-helpers": "workspace:^"
     "@types/chrome": ^0.0.183
     "@types/uuid": ^8.3.2
     uuid: ^8.3.2
