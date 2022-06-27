@@ -1,6 +1,6 @@
-import { noOp } from '@shared/utils/basic-helpers';
 import clsx from 'clsx';
 import React, { InputHTMLAttributes, useCallback, useLayoutEffect, useRef, useState } from 'react';
+import { noOp } from 'wallet-common-helpers';
 
 import { useUpdateEffect } from '../../utils/hooks';
 import { scaleFieldWidth } from '../../utils/htmlHelpers';

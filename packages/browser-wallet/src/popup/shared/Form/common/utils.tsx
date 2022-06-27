@@ -9,9 +9,8 @@ import {
     UseFormRegister,
     useFormState,
 } from 'react-hook-form';
+import { MakeRequired, noOp } from 'wallet-common-helpers';
 
-import { noOp } from '@shared/utils/basic-helpers';
-import { MakeRequired } from '@shared/utils/types';
 import { RequiredControlledFieldProps, RequiredUncontrolledFieldProps } from './types';
 
 type MakeControlledProps<TFieldValues extends FieldValues = FieldValues> = Omit<

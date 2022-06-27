@@ -2,6 +2,7 @@ import React, { useEffect, useRef } from 'react';
 import { Route, Routes as ReactRoutes, useLocation, useNavigate } from 'react-router-dom';
 import { InternalMessageType, MessageType, createMessageTypeFilter } from '@concordium/browser-wallet-message-hub';
 import { AccountTransactionSignature } from '@concordium/web-sdk';
+import { noOp } from 'wallet-common-helpers';
 
 import { absoluteRoutes, relativeRoutes } from '@popup/constants/routes';
 import MainLayout from '@popup/page-layouts/MainLayout';
@@ -12,7 +13,6 @@ import SendTransaction from '@popup/pages/SendTransaction';
 import Setup from '@popup/pages/Setup';
 import ConnectionRequest from '@popup/pages/ConnectionRequest';
 import { popupMessageHandler } from '@popup/shared/message-handler';
-import { noOp } from '@shared/utils/basic-helpers';
 import Settings from '@popup/pages/Settings';
 import NetworkSettings from '@popup/pages/NetworkSettings';
 import VisualSettings from '@popup/pages/VisualSettings';

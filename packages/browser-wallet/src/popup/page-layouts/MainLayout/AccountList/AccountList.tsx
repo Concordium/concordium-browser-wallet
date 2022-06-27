@@ -2,13 +2,12 @@ import React, { forwardRef } from 'react';
 import clsx from 'clsx';
 import { useAtomValue, useAtom } from 'jotai';
 import { useNavigate } from 'react-router-dom';
-import { displayAsCcd, microCcdPerCcd } from 'wallet-common-helpers';
+import { ClassName, displayAsCcd, microCcdPerCcd } from 'wallet-common-helpers';
 
 import CopyButton from '@popup/shared/CopyButton';
 import CheckmarkIcon from '@assets/svg/checkmark-blue.svg';
 import { absoluteRoutes } from '@popup/constants/routes';
 import { accountsAtom, selectedAccountAtom } from '@popup/store/account';
-import { ClassName } from '@shared/utils/types';
 import { useTranslation } from 'react-i18next';
 import EntityList from '../EntityList';
 

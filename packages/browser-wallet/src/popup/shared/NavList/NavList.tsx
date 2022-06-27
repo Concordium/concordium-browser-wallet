@@ -1,6 +1,6 @@
-import { ClassName } from '@shared/utils/types';
 import clsx from 'clsx';
 import React, { forwardRef, PropsWithChildren } from 'react';
+import { ClassName } from 'wallet-common-helpers';
 
 type Props = PropsWithChildren<ClassName>;
 

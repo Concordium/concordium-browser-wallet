@@ -1,6 +1,6 @@
-import { PolymorphicComponentProps } from '@shared/utils/types';
 import clsx from 'clsx';
 import React, { ButtonHTMLAttributes, ElementType } from 'react';
+import { PolymorphicComponentProps } from 'wallet-common-helpers';
 
 export type ButtonProps = Pick<
     ButtonHTMLAttributes<HTMLButtonElement>,

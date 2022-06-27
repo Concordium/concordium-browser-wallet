@@ -1,4 +1,4 @@
-import { ClassName, WithRef } from '@shared/utils/types';
+import { WithRef } from '@shared/utils/types';
 import React, { forwardRef, Ref } from 'react';
 import {
     DefaultValues,
@@ -9,6 +9,7 @@ import {
     useForm as useFormLib,
     FormProvider,
 } from 'react-hook-form';
+import { ClassName } from 'wallet-common-helpers';
 
 const useFormDefaults: Pick<UseFormProps, 'mode'> = {
     mode: 'onTouched',

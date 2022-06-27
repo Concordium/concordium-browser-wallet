@@ -1,7 +1,7 @@
 /* eslint-disable react/function-component-definition, import/no-extraneous-dependencies */
 import React from 'react';
 import { ComponentMeta, ComponentStory } from '@storybook/react';
-import { noOp } from '@shared/utils/basic-helpers';
+import { noOp } from 'wallet-common-helpers';
 import Form from './Form';
 import FormInput from './Input';
 import Submit from './Submit';

@@ -13,13 +13,14 @@ import { v4 as uuidv4 } from 'uuid';
 import { Controller } from 'react-hook-form';
 import clsx from 'clsx';
 import { useTranslation } from 'react-i18next';
+import { ClassName } from 'wallet-common-helpers';
 
 import Button from '@popup/shared/Button';
 import Form, { useForm } from '@popup/shared/Form';
 import Submit from '@popup/shared/Form/Submit';
 import SearchIcon from '@assets/svg/search.svg';
 import PlusIcon from '@assets/svg/plus.svg';
-import { ClassName, WithRef } from '@shared/utils/types';
+import { WithRef } from '@shared/utils/types';
 import { useUpdateEffect } from '@popup/shared/utils/hooks';
 
 type ItemProps = PropsWithChildren<{
