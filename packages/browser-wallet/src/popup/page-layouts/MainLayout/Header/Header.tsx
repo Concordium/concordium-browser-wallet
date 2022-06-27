@@ -47,14 +47,6 @@ const transitionVariants: Variants = {
     closed: { y: '-100%' },
 };
 
-const dropdownTransition: AnimationProps = {
-    variants: { transitionVariants },
-    initial: 'closed',
-    animate: 'open',
-    exit: 'closed',
-    transition: { defaultTransition },
-};
-
 enum Section {
     Account,
     Id,
@@ -138,7 +130,14 @@ export default function Header({ onToggle }: Props) {
                 </div>
                 <AnimatePresence>
                     {navOpen && (
-                        <MotionNavList className="main-layout-header__nav" {...dropdownTransition}>
+                        <MotionNavList
+                            className="main-layout-header__nav"
+                            variants={transitionVariants}
+                            initial="closed"
+                            animate="open"
+                            exit="closed"
+                            transition={defaultTransition}
+                        >
                             <HeaderLink onClick={() => setNavOpen(false)} to={absoluteRoutes.home.path}>
                                 {t('header.accounts')}
                             </HeaderLink>
@@ -156,7 +155,11 @@ export default function Header({ onToggle }: Props) {
                         <MotionAccountList
                             onSelect={() => setDropdownOpen(false)}
                             className="main-layout-header__page-dropdown"
-                            {...dropdownTransition}
+                            variants={transitionVariants}
+                            initial="closed"
+                            animate="open"
+                            exit="closed"
+                            transition={defaultTransition}
                         />
                     )}
                 </AnimatePresence>
