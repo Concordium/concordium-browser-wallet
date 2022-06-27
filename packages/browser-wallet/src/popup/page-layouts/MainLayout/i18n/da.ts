@@ -11,6 +11,9 @@ const t: typeof en = {
         ids: 'ID kort',
         settings: 'Wallet indstillinger',
     },
+    accountList: {
+        new: 'Tilføj ny',
+    },
 };
 
 export default t;

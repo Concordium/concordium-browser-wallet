@@ -9,6 +9,7 @@ import CheckmarkIcon from '@assets/svg/checkmark-blue.svg';
 import { absoluteRoutes } from '@popup/constants/routes';
 import { accountsAtom, selectedAccountAtom } from '@popup/store/account';
 import { ClassName } from '@shared/utils/types';
+import { useTranslation } from 'react-i18next';
 import EntityList from '../EntityList';
 
 export type Account = { address: string };
@@ -24,6 +25,7 @@ function AccountListItem({ account: { address }, checked, selected }: ItemProps)
         <div className={clsx('account-list-item', checked && 'account-list-item--checked')}>
             <div className="account-list-item__account">
                 <div className="flex align-center">
+                    {/* TODO add account name */}
                     {address.slice(0, 4)}...{address.slice(address.length - 4)}{' '}
                     {selected && <CheckmarkIcon className="account-list-item__check" />}
                 </div>
@@ -34,8 +36,10 @@ function AccountListItem({ account: { address }, checked, selected }: ItemProps)
                     tabIndex={-1}
                 />
             </div>
-            <div className="account-list-item__identity">Identity 1</div>
-            <div className="account-list-item__amount">{displayAsCcd(10000n * microCcdPerCcd)}</div>
+            <div className="account-list-item__identity">Identity 1{/* TODO get from account */}</div>
+            <div className="account-list-item__amount">
+                {displayAsCcd(10000n * microCcdPerCcd) /* TODO get from account */}
+            </div>
         </div>
     );
 }
@@ -48,6 +52,7 @@ const AccountList = forwardRef<HTMLDivElement, Props>(({ className, onSelect }, 
     const accounts = useAtomValue(accountsAtom).map((a) => ({ address: a }));
     const [selectedAccount, setSelectedAccount] = useAtom(selectedAccountAtom);
     const nav = useNavigate();
+    const { t } = useTranslation('mainLayout');
 
     return (
         <EntityList<Account>
@@ -59,7 +64,7 @@ const AccountList = forwardRef<HTMLDivElement, Props>(({ className, onSelect }, 
             onNew={() => nav(absoluteRoutes.home.account.add.path)}
             entities={accounts}
             getKey={(a) => a.address}
-            newText="Add new"
+            newText={t('accountList.new')}
             ref={ref}
         >
             {(a, checked) => <AccountListItem account={a} checked={checked} selected={a.address === selectedAccount} />}

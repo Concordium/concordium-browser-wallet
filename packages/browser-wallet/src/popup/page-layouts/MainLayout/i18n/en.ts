@@ -9,6 +9,9 @@ const t = {
         ids: 'ID cards',
         settings: 'Wallet settings',
     },
+    accountList: {
+        new: 'Add new',
+    },
 };
 
 export default t;
