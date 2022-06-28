@@ -1,4 +1,4 @@
-/* eslint-disable react/function-component-definition, import/no-extraneous-dependencies */
+/* eslint-disable react/function-component-definition */
 import React, { useState } from 'react';
 import { ComponentMeta, ComponentStory } from '@storybook/react';
 import { Password } from './Password';

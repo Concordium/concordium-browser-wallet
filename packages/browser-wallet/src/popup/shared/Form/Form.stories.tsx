@@ -1,4 +1,4 @@
-/* eslint-disable react/function-component-definition, import/no-extraneous-dependencies */
+/* eslint-disable react/function-component-definition */
 import React from 'react';
 import { ComponentMeta, ComponentStory } from '@storybook/react';
 import { noOp } from 'wallet-common-helpers';
