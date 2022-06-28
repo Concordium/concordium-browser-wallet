@@ -8,7 +8,21 @@
     &__left,
     &__right {
         flex: 0 0 rem(36px);
-        color: $color-off-white;
+        display: flex;
+        align-content: center;
+        justify-content: center;
+
+        svg {
+            width: rem(7px);
+
+            path {
+                fill: $color-off-white;
+            }
+        }
+    }
+
+    &__right svg {
+        transform: rotate(180deg);
     }
 
     &__links {
@@ -18,6 +32,7 @@
         flex: 1;
         overflow: overlay;
         height: 100%;
+        scroll-snap-type: x mandatory;
 
         &::-webkit-scrollbar {
             height: 0;
@@ -37,6 +52,8 @@
         align-items: center;
         flex: 0 0 20%;
         height: 100%;
+        scroll-snap-align: start;
+        scroll-snap-stop: normal;
 
         &,
         &:hover,
