@@ -32,7 +32,7 @@ export default function AccountActions() {
     return (
         <nav className="account-page-actions">
             <ActionLinks>
-                <NavLink className="account-page-actions__link" to="">
+                <NavLink className="account-page-actions__link" to="" end>
                     LI
                 </NavLink>
                 <NavLink className="account-page-actions__link" to={accountRoutes.send}>

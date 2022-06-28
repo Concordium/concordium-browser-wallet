@@ -17,6 +17,7 @@
         align-items: center;
         flex: 1;
         overflow: overlay;
+        height: 100%;
 
         &::-webkit-scrollbar {
             height: 0;
@@ -29,15 +30,46 @@
     }
 
     &__link {
+        position: relative;
         display: flex;
+        flex-direction: column;
         justify-content: center;
         align-items: center;
         flex: 0 0 20%;
+        height: 100%;
 
         &,
         &:hover,
         &:focus {
             color: $color-off-white;
+        }
+
+        &::after {
+            display: block;
+            content: '';
+            position: absolute;
+            bottom: rem(5px);
+            width: 60%;
+            height: rem(1px);
+            border-radius: rem(0.5px);
+            background-color: $color-off-white;
+            opacity: 0.6;
+            transform: scaleX(0);
+            transition: transition(transform), transition(opacity);
+        }
+
+        &.active::after {
+            opacity: 1;
+            transform: scaleX(1);
+        }
+
+        &:not(.active) {
+            &:focus,
+            &:hover {
+                &::after {
+                    transform: scaleX(0.6);
+                }
+            }
         }
 
         // If navigation buttons are included (> 5 links), we have less space.
