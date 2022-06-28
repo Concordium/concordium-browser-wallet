@@ -1,4 +1,48 @@
 .account-page-actions {
+    display: flex;
+    align-items: center;
     width: 100%;
     height: rem(36px);
+    background-color: $color-cta;
+
+    &__left,
+    &__right {
+        flex: 0 0 rem(36px);
+        color: $color-off-white;
+    }
+
+    &__links {
+        display: flex;
+        justify-content: center;
+        align-items: center;
+        flex: 1;
+        overflow: overlay;
+
+        &::-webkit-scrollbar {
+            height: 0;
+            width: 0;
+        }
+
+        .account-page-actions__left + & {
+            justify-content: start;
+        }
+    }
+
+    &__link {
+        display: flex;
+        justify-content: center;
+        align-items: center;
+        flex: 0 0 20%;
+
+        &,
+        &:hover,
+        &:focus {
+            color: $color-off-white;
+        }
+
+        // If navigation buttons are included (> 5 links), we have less space.
+        .account-page-actions__left + .account-page-actions__links & {
+            flex: 0 0 25%;
+        }
+    }
 }

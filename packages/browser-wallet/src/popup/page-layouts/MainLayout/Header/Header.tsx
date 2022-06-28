@@ -92,7 +92,7 @@ export default function Header({ onToggle, className }: Props) {
         ? Section.Settings
         : Section.Account;
 
-    const isHomePage = pathname === absoluteRoutes.home.path;
+    const isHomePage = pathname === absoluteRoutes.home.account.path;
 
     return (
         <>
