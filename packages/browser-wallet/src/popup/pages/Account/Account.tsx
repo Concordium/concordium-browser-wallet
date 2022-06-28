@@ -55,10 +55,10 @@ export default function AccountRoutes() {
     return (
         <Routes>
             <Route element={<Account />}>
-                <Route index element={<div>List</div>} />
-                <Route path={accountRoutes.send} element={<div>Send</div>} />
-                <Route path={accountRoutes.receive} element={<div>Receive</div>} />
-                <Route path={accountRoutes.settings} element={<div>Settings</div>} />
+                <Route index element={<div>Transaction log</div>} />
+                <Route path={accountRoutes.send} element={<div>Send CCD</div>} />
+                <Route path={accountRoutes.receive} element={<div>Receive CCD</div>} />
+                <Route path={accountRoutes.settings} element={<div>Account settings</div>} />
             </Route>
         </Routes>
     );

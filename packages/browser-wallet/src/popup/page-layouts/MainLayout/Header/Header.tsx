@@ -129,7 +129,7 @@ export default function Header({ onToggle, className }: Props) {
                     {isHomePage || (
                         <Button
                             className="main-layout-header__close"
-                            onClick={() => nav(absoluteRoutes.home.path)}
+                            onClick={() => nav(absoluteRoutes.home.account.path)}
                             clear
                         >
                             <CloseIcon />

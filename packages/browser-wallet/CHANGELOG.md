@@ -10,6 +10,7 @@
 -   Add single credential functionality accessible from account page
 -   Remove account (from local storage) from account page
 -   An event is emitted when the JSON-RPC configuration is updated.
+-   Navigation on the bottom of the account page to navigate between sections of the page.
 
 ### Changed
 

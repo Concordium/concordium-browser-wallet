@@ -46,6 +46,7 @@
         scroll-snap-type: x mandatory;
 
         &::-webkit-scrollbar {
+            // TODO cross-browser compatibility
             height: 0;
             width: 0;
         }
