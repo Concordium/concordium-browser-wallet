@@ -3,7 +3,7 @@ import { useTranslation } from 'react-i18next';
 import clsx from 'clsx';
 import { NavLink, useLocation, useNavigate } from 'react-router-dom';
 import { AnimatePresence, AnimationProps, motion, Variants } from 'framer-motion';
-import { PropsOf } from 'wallet-common-helpers';
+import { ClassName, PropsOf } from 'wallet-common-helpers';
 
 import Logo from '@assets/svg/concordium.svg';
 import CheckmarkIcon from '@assets/svg/checkmark-blue.svg';
@@ -53,11 +53,11 @@ enum Section {
     Settings,
 }
 
-type Props = {
+type Props = ClassName & {
     onToggle(open: boolean): void;
 };
 
-export default function Header({ onToggle }: Props) {
+export default function Header({ onToggle, className }: Props) {
     const { t } = useTranslation('mainLayout');
     const [dropdownOpen, setDropdownOpen] = useState(false);
     const { pathname } = useLocation();
@@ -86,9 +86,9 @@ export default function Header({ onToggle }: Props) {
     }, [dropdownOpen]);
 
     // eslint-disable-next-line no-nested-ternary
-    const section = pathname.includes(absoluteRoutes.home.identities.path)
+    const section = pathname.startsWith(absoluteRoutes.home.identities.path)
         ? Section.Id
-        : pathname.includes(absoluteRoutes.home.settings.path)
+        : pathname.startsWith(absoluteRoutes.home.settings.path)
         ? Section.Settings
         : Section.Account;
 
@@ -96,7 +96,7 @@ export default function Header({ onToggle }: Props) {
 
     return (
         <>
-            <header className={clsx('main-layout-header', navOpen && 'main-layout-header--nav-open')}>
+            <header className={clsx('main-layout-header', navOpen && 'main-layout-header--nav-open', className)}>
                 <div className="main-layout-header__bar">
                     <Button className="main-layout-header__logo" clear onClick={() => setNavOpen((o) => !o)}>
                         <Logo />
