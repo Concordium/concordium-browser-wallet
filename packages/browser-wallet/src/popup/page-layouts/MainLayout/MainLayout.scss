@@ -11,9 +11,8 @@
         @include transition(filter);
 
         z-index: -1;
-        background-color: $color-bg;
 
-        .main-layout-header--open ~ & {
+        &--blur {
             filter: blur(5px);
         }
     }

@@ -11,6 +11,13 @@ const t: typeof en = {
         ids: 'ID kort',
         settings: 'Wallet indstillinger',
     },
+    entityList: {
+        searchPlaceholder: 'Søg',
+        noMatches: 'Ingen resultater',
+    },
+    accountList: {
+        new: 'Tilføj ny',
+    },
 };
 
 export default t;

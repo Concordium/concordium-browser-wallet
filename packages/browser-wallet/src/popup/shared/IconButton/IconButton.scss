@@ -1,0 +1,13 @@
+.icon-button {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    padding: rem(4px);
+    border-radius: rem(4px);
+    border: 1px solid transparent;
+    @include transition(border-color);
+
+    &:hover:not(:disabled) {
+        border-color: $color-text;
+    }
+}

@@ -1,7 +1,6 @@
 import React from 'react';
-
-import { ClassName } from '@shared/utils/types';
 import clsx from 'clsx';
+import { ClassName } from 'wallet-common-helpers';
 
 type Props = ClassName & {
     children: string | undefined;

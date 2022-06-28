@@ -1,7 +1,7 @@
 import React, { createContext, useRef, useCallback, useMemo } from 'react';
 import { Outlet, useNavigate } from 'react-router-dom';
+import { noOp } from 'wallet-common-helpers';
 
-import { noOp } from '@shared/utils/basic-helpers';
 import { isSpawnedWindow } from '@popup/shared/window-helpers';
 
 type OnCloseHandler = () => void;

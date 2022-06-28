@@ -1,5 +1,7 @@
+$main-layout-header-height: rem(40px);
+
 .main-layout-header {
-    height: rem(40px);
+    height: $main-layout-header-height;
     position: relative;
     z-index: 1;
 
@@ -14,6 +16,7 @@
         display: flex;
         align-items: center;
         justify-content: center;
+        overflow: hidden;
     }
 
     &__logo {
@@ -28,10 +31,37 @@
                 fill: $color-text;
                 @include transition(fill);
 
-                .main-layout-header--open & {
+                .main-layout-header--nav-open & {
                     fill: $color-blue;
                 }
             }
+        }
+    }
+
+    &__title {
+        cursor: default;
+
+        &--has-dropdown {
+            cursor: pointer;
+        }
+    }
+
+    &__page-dropdown-button {
+        display: flex;
+        position: absolute;
+        right: rem(-5px);
+        transform: translate(100%, rem(1px)) rotate(-90deg);
+
+        svg {
+            width: rem(6px);
+
+            path {
+                fill: $color-text;
+            }
+        }
+
+        &--open {
+            transform: translate(100%, rem(1px)) rotate(90deg);
         }
     }
 
@@ -49,18 +79,16 @@
         }
     }
 
+    &__page-dropdown,
     &__nav {
-        padding: 0 rem(10px);
-        transform: translateY(-100%);
-        position: relative;
+        position: absolute;
         z-index: -1;
-        @include transition(transform);
+        width: 100%;
+    }
 
+    &__nav {
+        padding: 0 rem(15px);
         text-align: center;
-
-        .main-layout-header--open & {
-            transform: translateY(0);
-        }
     }
 
     &__nav-item {
