@@ -93,6 +93,7 @@ export default function Header({ onToggle, className }: Props) {
         : Section.Account;
 
     const isHomePage = pathname === absoluteRoutes.home.account.path;
+    const hasDropdown = [Section.Account].includes(section);
 
     return (
         <>
@@ -101,23 +102,30 @@ export default function Header({ onToggle, className }: Props) {
                     <Button className="main-layout-header__logo" clear onClick={() => setNavOpen((o) => !o)}>
                         <Logo />
                     </Button>
-                    <h1 className="relative flex align-center">
-                        {section === Section.Id && t('header.ids')}
-                        {section === Section.Settings && t('header.settings')}
-                        {section === Section.Account && t('header.accounts')}
-                        {[Section.Account].includes(section) && (
-                            <Button
-                                clear
-                                className={clsx(
-                                    'main-layout-header__page-dropdown-button',
-                                    dropdownOpen && 'main-layout-header__page-dropdown-button--open'
-                                )}
-                                onClick={() => setDropdownOpen((o) => !o)}
-                            >
-                                <BackIcon />
-                            </Button>
+                    <label
+                        className={clsx(
+                            'main-layout-header__title',
+                            hasDropdown && 'main-layout-header__title--has-dropdown'
                         )}
-                    </h1>
+                    >
+                        <h1 className="relative flex align-center">
+                            {section === Section.Id && t('header.ids')}
+                            {section === Section.Settings && t('header.settings')}
+                            {section === Section.Account && t('header.accounts')}
+                            {hasDropdown && (
+                                <Button
+                                    clear
+                                    className={clsx(
+                                        'main-layout-header__page-dropdown-button',
+                                        dropdownOpen && 'main-layout-header__page-dropdown-button--open'
+                                    )}
+                                    onClick={() => setDropdownOpen((o) => !o)}
+                                >
+                                    <BackIcon />
+                                </Button>
+                            )}
+                        </h1>
+                    </label>
                     {isHomePage || (
                         <Button
                             className="main-layout-header__close"
@@ -164,8 +172,16 @@ export default function Header({ onToggle, className }: Props) {
                     )}
                 </AnimatePresence>
             </header>
-            {/* eslint-disable-next-line jsx-a11y/no-static-element-interactions, jsx-a11y/click-events-have-key-events */}
-            {navOpen && <div className="absolute t-0 w-full h-full" onClick={() => setNavOpen(false)} />}
+            {(navOpen || dropdownOpen) && (
+                // eslint-disable-next-line jsx-a11y/no-static-element-interactions, jsx-a11y/click-events-have-key-events
+                <div
+                    className="absolute t-0 w-full h-full"
+                    onClick={() => {
+                        setNavOpen(false);
+                        setDropdownOpen(false);
+                    }}
+                />
+            )}
         </>
     );
 }

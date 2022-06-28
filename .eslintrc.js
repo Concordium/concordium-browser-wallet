@@ -22,6 +22,7 @@ module.exports = {
         'react/require-default-props': 0,
         'class-methods-use-this': 0,
         'jsx-a11y/no-autofocus': 0,
+        'import/no-extraneous-dependencies': ['error', { devDependencies: ['**/*.stories.tsx'] }],
         'jsx-a11y/label-has-associated-control': [
             'error',
             {

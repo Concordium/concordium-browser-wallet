@@ -35,6 +35,14 @@
         }
     }
 
+    &__title {
+        cursor: default;
+
+        &--has-dropdown {
+            cursor: pointer;
+        }
+    }
+
     &__page-dropdown-button {
         display: flex;
         position: absolute;
