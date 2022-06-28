@@ -38,6 +38,14 @@ $main-layout-header-height: rem(40px);
         }
     }
 
+    &__title {
+        cursor: default;
+
+        &--has-dropdown {
+            cursor: pointer;
+        }
+    }
+
     &__page-dropdown-button {
         display: flex;
         position: absolute;
