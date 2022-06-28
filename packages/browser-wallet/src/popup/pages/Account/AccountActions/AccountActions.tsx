@@ -1,6 +1,7 @@
 import Button from '@popup/shared/Button';
 import React, { Children, ReactNode, useRef } from 'react';
 import { NavLink } from 'react-router-dom';
+import { useTranslation } from 'react-i18next';
 
 import BackIcon from '@assets/svg/back-arrow.svg';
 import ListIcon from '@assets/svg/list.svg';
@@ -49,19 +50,21 @@ function ActionLinks({ children }: ActionLinksProps) {
 }
 
 export default function AccountActions() {
+    const { t } = useTranslation('account', { keyPrefix: 'actions' });
+
     return (
         <nav className="account-page-actions">
             <ActionLinks>
-                <NavLink className="account-page-actions__link" to="" end title="transaction log">
+                <NavLink className="account-page-actions__link" to="" end title={t('log')}>
                     <ListIcon className="account-page-actions__list-icon" />
                 </NavLink>
-                <NavLink className="account-page-actions__link" to={accountRoutes.send} title="send ccd">
+                <NavLink className="account-page-actions__link" to={accountRoutes.send} title={t('send')}>
                     <SendIcon className="account-page-actions__send-icon" />
                 </NavLink>
-                <NavLink className="account-page-actions__link" to={accountRoutes.receive} title="receive ccd">
+                <NavLink className="account-page-actions__link" to={accountRoutes.receive} title={t('receive')}>
                     <ReceiveIcon className="account-page-actions__receive-icon" />
                 </NavLink>
-                <NavLink className="account-page-actions__link" to={accountRoutes.settings} title="account settings">
+                <NavLink className="account-page-actions__link" to={accountRoutes.settings} title={t('settings')}>
                     <SettingsIcon className="account-page-actions__settings-icon" />
                 </NavLink>
             </ActionLinks>
