@@ -218,7 +218,7 @@ const EntityList = forwardRef(
                                             <EntityItem
                                                 name={field.name}
                                                 value={i}
-                                                tabbable={i === 0 || i === field.value} // Browser looses tab order when tabbing away from non-tabbable elements.
+                                                tabbable={i === 0 || i === field.value} // Browser loses tab order when tabbing away from non-tabbable elements.
                                                 checked={field.value === i}
                                                 onFocus={field.onChange}
                                                 onBlur={() => {
