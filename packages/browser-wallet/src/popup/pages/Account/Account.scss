@@ -25,7 +25,7 @@ $account-page-details-height: var(--details-height, $account-page-details-height
         width: 100%;
         border-bottom: 1px solid $color-petroleum;
 
-        &__expanded {
+        &--expanded {
             --details-height: #{$account-page-details-height-expanded};
         }
     }
