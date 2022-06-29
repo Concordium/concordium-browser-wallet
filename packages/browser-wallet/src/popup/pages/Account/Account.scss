@@ -1,5 +1,7 @@
 $account-page-actions-height: rem(36px);
-$account-page-details-height: rem(135px);
+$account-page-details-height-expanded: rem(135px);
+$account-page-details-height-closed: rem(35px);
+$account-page-details-height: var(--details-height, $account-page-details-height-closed);
 
 .account-page {
     &__content {
@@ -22,6 +24,15 @@ $account-page-details-height: rem(135px);
         text-align: center;
         width: 100%;
         border-bottom: 1px solid $color-petroleum;
+
+        &__expanded {
+            --details-height: #{$account-page-details-height-expanded};
+        }
+    }
+
+    &__hide {
+        position: absolute;
+        left: rem(-5px);
     }
 
     &__routes {

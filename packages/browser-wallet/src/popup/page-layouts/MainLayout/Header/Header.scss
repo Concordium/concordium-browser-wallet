@@ -44,22 +44,8 @@
     }
 
     &__page-dropdown-button {
-        display: flex;
         position: absolute;
         right: rem(-5px);
-        transform: translate(100%, rem(1px)) rotate(-90deg);
-
-        svg {
-            width: rem(6px);
-
-            path {
-                fill: $color-text;
-            }
-        }
-
-        &--open {
-            transform: translate(100%, rem(1px)) rotate(90deg);
-        }
     }
 
     &__close {

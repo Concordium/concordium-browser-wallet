@@ -1,0 +1,16 @@
+.menu-button {
+    display: flex;
+    transform: translate(100%, rem(1px)) rotate(-90deg);
+
+    svg {
+        width: rem(6px);
+
+        path {
+            fill: $color-text;
+        }
+    }
+
+    &--open {
+        transform: translate(100%, rem(1px)) rotate(90deg);
+    }
+}
