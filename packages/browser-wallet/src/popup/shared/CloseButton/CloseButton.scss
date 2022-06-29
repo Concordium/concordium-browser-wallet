@@ -1,0 +1,8 @@
+.close-button {
+    display: flex;
+    width: rem(20px);
+
+    svg path {
+        fill: $color-text;
+    }
+}

@@ -18,7 +18,7 @@ export default function MainLayout() {
 
     return (
         <div className="main-layout">
-            <Header onToggle={setHeaderOpen} />
+            <Header className="main-layout__header" onToggle={setHeaderOpen} />
             <main className={clsx('main-layout__main', headerOpen && 'main-layout__main--blur')}>
                 <Outlet />
             </main>

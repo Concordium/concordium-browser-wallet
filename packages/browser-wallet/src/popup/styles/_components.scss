@@ -7,9 +7,11 @@
 @import '../shared/NavList/NavList';
 @import '../shared/IconButton/IconButton';
 @import '../shared/CopyButton/CopyButton';
+@import '../shared/CloseButton/CloseButton';
 
 // Pages
 @import '../pages/Account/Account';
+@import '../pages/Account/AccountActions/AccountActions';
 @import '../pages/SignMessage/SignMessage';
 @import '../pages/SendTransaction/SendTransaction';
 @import '../pages/SendTransaction/displayTransaction/DisplayTransaction';
