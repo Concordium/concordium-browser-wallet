@@ -1,0 +1,26 @@
+$display-address-copy-left-margin: rem(5px);
+
+.display-address {
+    &__address-qr {
+        height: rem(130px);
+        width: rem(130px);
+    }
+
+    &__address-text {
+        margin-left: calc(rem(18px) + $display-address-copy-left-margin);
+    }
+
+    &__copy {
+        margin-left: $display-address-copy-left-margin;
+    }
+
+    &__container {
+        display: flex;
+        flex-direction: column;
+        align-items: center;
+        justify-content: space-between;
+        width: 100%;
+        padding-top: rem(15px);
+        padding-bottom: rem(15px);
+    }
+}

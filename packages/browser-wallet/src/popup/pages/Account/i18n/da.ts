@@ -4,6 +4,7 @@ const t: typeof en = {
     noAccounts: 'Ingen konti i wallet',
     removeAccount: 'Fjern konto (kun lokalt)',
     resetConnections: 'Fjern forbindelser',
+    accountAddress: 'Konto adresse',
     actions: {
         log: 'transaktionslog',
         send: 'send ccd',
