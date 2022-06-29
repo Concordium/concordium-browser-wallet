@@ -6,6 +6,7 @@ import { Outlet, Route, Routes } from 'react-router-dom';
 import { accountsAtom, selectedAccountAtom } from '@popup/store/account';
 import Button from '@popup/shared/Button';
 import { credentialsAtom, urlWhitelistAtom } from '@popup/store/settings';
+import CloseButton from '@popup/shared/CloseButton';
 import { accountRoutes } from './routes';
 import AccountActions from './AccountActions';
 
@@ -44,6 +45,7 @@ function Account() {
                 </Button>
                 <div className="account-page__routes">
                     <Outlet />
+                    <CloseButton />
                 </div>
             </div>
             <AccountActions />
