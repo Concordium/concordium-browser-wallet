@@ -11,7 +11,11 @@ $carousel-dots-height: rem(40px);
     position: relative;
 
     &__content {
-        height: calc(100% - #{$carousel-content-margin} - #{$carousel-divider-height} - #{$carousel-dots-height});
+        height: calc(
+            100% - #{$carousel-content-margin} - #{$carousel-divider-height} - #{$carousel-dots-height} - #{rem(
+                    $button-height
+                )}
+        );
         margin-bottom: $carousel-content-margin;
         width: 100%;
         position: relative;

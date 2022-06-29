@@ -21,3 +21,13 @@ export const Primary: ComponentStory<typeof Carousel> = () => {
         </div>
     );
 };
+
+export const SingleChild: ComponentStory<typeof Carousel> = () => {
+    return (
+        <div style={{ width: 300, height: 400 }}>
+            <Carousel onContinue={noOp}>
+                <div>First</div>
+            </Carousel>
+        </div>
+    );
+};
