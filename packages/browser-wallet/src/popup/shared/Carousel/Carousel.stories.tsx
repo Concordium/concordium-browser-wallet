@@ -10,7 +10,7 @@ export default {
 
 export const Primary: ComponentStory<typeof Carousel> = () => {
     return (
-        <div style={{ width: 300 }}>
+        <div style={{ width: 300, height: 600 }}>
             <Carousel />
         </div>
     );
