@@ -1,16 +1,80 @@
-import React from 'react';
+import { defaultTransition } from '@shared/constants/transition';
+import clsx from 'clsx';
+import { AnimatePresence, motion, Variants } from 'framer-motion';
+import React, { Children, ReactNode, useMemo, useState } from 'react';
+import { ClassName } from 'wallet-common-helpers';
 import Button from '../Button';
 import ButtonGroup from '../ButtonGroup';
 
-export default function Carousel() {
+type Direction = 'next' | 'prev';
+
+const transitionVariants: Variants = {
+    enter: (direction: Direction) => ({ x: direction === 'next' ? '50%' : '-50%', opacity: 0 }),
+    active: { x: 0, opacity: 1 },
+    exit: (direction: Direction) => ({ x: direction === 'next' ? '-50%' : '50%', opacity: 0 }),
+};
+
+type Props = ClassName & {
+    onContinue(): void;
+    children: ReactNode[];
+};
+
+export default function Carousel({ className, children, onContinue }: Props) {
+    const [[active, direction], setActive] = useState<[number, Direction]>([0, 'next']);
+
+    const pages = useMemo(() => Children.toArray(children), [children]);
+
+    if (!pages?.length) {
+        return null;
+    }
+
+    const isLastPage = active === pages.length - 1;
+
     return (
-        <div className="carousel">
-            <div className="carousel__content">Carousel</div>
+        <div className={clsx('carousel', className)}>
+            <div className="carousel__content">
+                <AnimatePresence initial={false} custom={direction}>
+                    <motion.div
+                        key={active} // We don't expect pages to change...
+                        variants={transitionVariants}
+                        custom={direction}
+                        initial="enter"
+                        animate="active"
+                        exit="exit"
+                        transition={defaultTransition}
+                        className="carousel__page"
+                    >
+                        {pages[active]}
+                    </motion.div>
+                </AnimatePresence>
+            </div>
             <div className="carousel__divider" />
-            <div className="carousel__dots">dots</div>
+            <div className="carousel__dots">
+                {pages.map((_, i) => (
+                    <Button
+                        // eslint-disable-next-line react/no-array-index-key
+                        key={i}
+                        className={clsx('carousel__dot', active === i && 'carousel__dot--active')}
+                        clear
+                        onClick={() => setActive(([a]) => [i, i > a ? 'next' : 'prev'])}
+                    />
+                ))}
+            </div>
             <ButtonGroup className="carousel__actions">
-                <Button faded>Skip</Button>
-                <Button>Next</Button>
+                {active === 0 ? (
+                    <Button faded onClick={onContinue}>
+                        Skip
+                    </Button>
+                ) : (
+                    <Button faded={isLastPage} onClick={() => setActive(([a]) => [a - 1, 'prev'])}>
+                        Back
+                    </Button>
+                )}
+                {isLastPage ? (
+                    <Button onClick={onContinue}>Continue</Button>
+                ) : (
+                    <Button onClick={() => setActive(([a]) => [a + 1, 'next'])}>Next</Button>
+                )}
             </ButtonGroup>
         </div>
     );
