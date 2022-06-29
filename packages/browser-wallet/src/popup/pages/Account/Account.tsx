@@ -10,6 +10,7 @@ import CloseButton from '@popup/shared/CloseButton';
 import { absoluteRoutes } from '@popup/constants/routes';
 import { accountRoutes } from './routes';
 import AccountActions from './AccountActions';
+import DisplayAddress from './DisplayAddress';
 
 function AccountSettings() {
     const { t } = useTranslation('account');
@@ -83,7 +84,7 @@ export default function AccountRoutes() {
             <Route element={<Account />}>
                 <Route index element={<div>Transaction log</div>} />
                 <Route path={accountRoutes.send} element={<div>Send CCD</div>} />
-                <Route path={accountRoutes.receive} element={<div>Receive CCD</div>} />
+                <Route path={accountRoutes.receive} element={<DisplayAddress />} />
                 <Route path={accountRoutes.settings} element={<AccountSettings />} />
             </Route>
         </Routes>
