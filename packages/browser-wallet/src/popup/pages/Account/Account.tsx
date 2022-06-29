@@ -71,7 +71,7 @@ function Account() {
                         <div
                             className={clsx(
                                 'account-page__details',
-                                detailsExpanded && 'account-page__details__expanded'
+                                detailsExpanded && 'account-page__details--expanded'
                             )}
                         >
                             {selectedAccount}
