@@ -10,9 +10,9 @@ import CheckmarkIcon from '@assets/svg/checkmark-blue.svg';
 import NavList from '@popup/shared/NavList';
 import Button from '@popup/shared/Button';
 import { absoluteRoutes } from '@popup/constants/routes';
-import CloseIcon from '@assets/svg/cross.svg';
 import BackIcon from '@assets/svg/back-arrow.svg';
 import { defaultTransition } from '@shared/constants/transition';
+import CloseButton from '@popup/shared/CloseButton';
 import AccountList from '../AccountList';
 
 const MotionNavList = motion(NavList) as ComponentType<PropsOf<typeof NavList> & AnimationProps>; // For some reason, the motion HoC removes children from component props
@@ -92,7 +92,9 @@ export default function Header({ onToggle, className }: Props) {
         ? Section.Settings
         : Section.Account;
 
-    const isHomePage = pathname === absoluteRoutes.home.account.path;
+    const canClose =
+        !pathname.startsWith(absoluteRoutes.home.account.path) ||
+        pathname.startsWith(absoluteRoutes.home.account.add.path);
     const hasDropdown = [Section.Account].includes(section);
 
     return (
@@ -126,14 +128,11 @@ export default function Header({ onToggle, className }: Props) {
                             )}
                         </h1>
                     </label>
-                    {isHomePage || (
-                        <Button
+                    {canClose && (
+                        <CloseButton
                             className="main-layout-header__close"
                             onClick={() => nav(absoluteRoutes.home.account.path)}
-                            clear
-                        >
-                            <CloseIcon />
-                        </Button>
+                        />
                     )}
                 </div>
                 <AnimatePresence>

@@ -9,6 +9,8 @@ import SendIcon from '@assets/svg/paperplane.svg';
 import ReceiveIcon from '@assets/svg/qr.svg';
 import SettingsIcon from '@assets/svg/cog.svg';
 
+import { ClassName } from 'wallet-common-helpers';
+import clsx from 'clsx';
 import { accountRoutes } from '../routes';
 
 const SCROLL_LIMIT = 5;
@@ -49,11 +51,13 @@ function ActionLinks({ children }: ActionLinksProps) {
     );
 }
 
-export default function AccountActions() {
+type Props = ClassName;
+
+export default function AccountActions({ className }: Props) {
     const { t } = useTranslation('account', { keyPrefix: 'actions' });
 
     return (
-        <nav className="account-page-actions">
+        <nav className={clsx('account-page-actions', className)}>
             <ActionLinks>
                 <NavLink className="account-page-actions__link" to="" end title={t('log')}>
                     <ListIcon className="account-page-actions__list-icon" />
