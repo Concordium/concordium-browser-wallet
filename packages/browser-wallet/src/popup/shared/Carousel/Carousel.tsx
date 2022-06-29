@@ -16,7 +16,7 @@ const transitionVariants: Variants = {
 
 type Props = ClassName & {
     onContinue(): void;
-    children: ReactNode[];
+    children: ReactNode | ReactNode[];
 };
 
 export default function Carousel({ className, children, onContinue }: Props) {
@@ -50,32 +50,40 @@ export default function Carousel({ className, children, onContinue }: Props) {
             </div>
             <div className="carousel__divider" />
             <div className="carousel__dots">
-                {pages.map((_, i) => (
-                    <Button
-                        // eslint-disable-next-line react/no-array-index-key
-                        key={i}
-                        className={clsx('carousel__dot', active === i && 'carousel__dot--active')}
-                        clear
-                        onClick={() => setActive(([a]) => [i, i > a ? 'next' : 'prev'])}
-                    />
-                ))}
+                {pages.length > 1 &&
+                    pages.map((_, i) => (
+                        <Button
+                            // eslint-disable-next-line react/no-array-index-key
+                            key={i}
+                            className={clsx('carousel__dot', active === i && 'carousel__dot--active')}
+                            clear
+                            onClick={() => setActive(([a]) => [i, i > a ? 'next' : 'prev'])}
+                        />
+                    ))}
             </div>
-            <ButtonGroup className="carousel__actions">
-                {active === 0 ? (
-                    <Button faded onClick={onContinue}>
-                        Skip
-                    </Button>
-                ) : (
-                    <Button faded={isLastPage} onClick={() => setActive(([a]) => [a - 1, 'prev'])}>
-                        Back
-                    </Button>
-                )}
-                {isLastPage ? (
-                    <Button onClick={onContinue}>Continue</Button>
-                ) : (
-                    <Button onClick={() => setActive(([a]) => [a + 1, 'next'])}>Next</Button>
-                )}
-            </ButtonGroup>
+
+            {pages.length > 1 ? (
+                <ButtonGroup className="carousel__actions">
+                    {active === 0 ? (
+                        <Button faded onClick={onContinue}>
+                            Skip
+                        </Button>
+                    ) : (
+                        <Button faded={isLastPage} onClick={() => setActive(([a]) => [a - 1, 'prev'])}>
+                            Back
+                        </Button>
+                    )}
+                    {isLastPage ? (
+                        <Button onClick={onContinue}>Continue</Button>
+                    ) : (
+                        <Button onClick={() => setActive(([a]) => [a + 1, 'next'])}>Next</Button>
+                    )}
+                </ButtonGroup>
+            ) : (
+                <Button onClick={onContinue} width="narrow">
+                    Continue
+                </Button>
+            )}
         </div>
     );
 }
