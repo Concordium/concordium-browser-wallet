@@ -17,7 +17,7 @@ export interface TransactionHistoryResult {
 }
 
 export interface TransactionElementInput {
-    fromAddress: string;
+    fromAddress: string | undefined;
     toAddress: string | undefined;
     transactionHash: string;
     blockHash: string;
@@ -248,9 +248,10 @@ export function TransactionList({ accountAddress }: TransactionListProps): JSX.E
                 setTransactions(transactions.concat(transactionResult.transactions));
                 setIsNextPageLoading(false);
             })
-            .catch(() => {
+            .catch((e) => {
                 // TODO Handle exception when trying to get transactions.
                 setIsNextPageLoading(false);
+                throw Error(e);
             });
     };
 

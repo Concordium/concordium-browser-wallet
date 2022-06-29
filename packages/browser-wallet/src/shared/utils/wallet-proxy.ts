@@ -83,7 +83,7 @@ export interface WalletProxyTransaction {
  * @param accountAddress the account address used when querying for the supplied transaction
  * @returns the from account address for the provided transaction
  */
-function getFromAddress(transaction: WalletProxyTransaction, accountAddress: string): string {
+function getFromAddress(transaction: WalletProxyTransaction, accountAddress: string): string | undefined {
     const originType = transaction.origin.type;
 
     if (transaction.details.transferSource) {
@@ -94,6 +94,9 @@ function getFromAddress(transaction: WalletProxyTransaction, accountAddress: str
     }
     if (originType === OriginType.Self) {
         return accountAddress;
+    }
+    if (originType === OriginType.Reward) {
+        return undefined;
     }
     throw new Error(
         `The received transaction is malformed. Could not find information to determine from address. ${JSON.stringify(
