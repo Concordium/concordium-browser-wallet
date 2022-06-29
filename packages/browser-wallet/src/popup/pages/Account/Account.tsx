@@ -5,6 +5,7 @@ import { useTranslation } from 'react-i18next';
 import { accountsAtom, selectedAccountAtom } from '@popup/store/account';
 import Button from '@popup/shared/Button';
 import { credentialsAtom, urlWhitelistAtom } from '@popup/store/settings';
+import { TransactionList } from './TransactionElement';
 
 export default function Account() {
     const { t } = useTranslation('account');
@@ -25,21 +26,28 @@ export default function Account() {
     }, []);
 
     return (
-        <div className="flex-column justify-center align-center">
-            <div className="flex justify-space-between w-full">
-                {accounts.length === 0 && <div>{t('noAccounts')}</div>}
+        <>
+            <div className="flex-column justify-center align-center">
+                <div className="flex justify-space-between w-full">
+                    {accounts.length === 0 && <div>{t('noAccounts')}</div>}
+                </div>
+                {selectedAccount !== undefined && (
+                    <>
+                        <div className="account-page__address">{t('address', { address: selectedAccount })}</div>
+                        <Button danger className="m-t-20" onClick={removeAccount}>
+                            {t('removeAccount')}
+                        </Button>
+                    </>
+                )}
+                <Button disabled={!whitelist.length} danger className="m-b-20 m-t-10" onClick={removeConnections}>
+                    {t('resetConnections')}
+                </Button>
             </div>
             {selectedAccount !== undefined && (
-                <>
-                    <div className="account-page__address">{t('address', { address: selectedAccount })}</div>
-                    <Button danger className="m-t-20" onClick={removeAccount}>
-                        {t('removeAccount')}
-                    </Button>
-                </>
+                <div className="account-page__transaction-element-list">
+                    <TransactionList key={selectedAccount} accountAddress={selectedAccount} />
+                </div>
             )}
-            <Button disabled={!whitelist.length} danger className="m-t-20" onClick={removeConnections}>
-                {t('resetConnections')}
-            </Button>
-        </div>
+        </>
     );
 }

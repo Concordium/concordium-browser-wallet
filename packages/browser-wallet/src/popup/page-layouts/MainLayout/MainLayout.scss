@@ -7,7 +7,7 @@
 
     &__main {
         flex: 1;
-        padding: rem(10px);
+        padding: rem(0);
         @include transition(filter);
 
         z-index: -1;

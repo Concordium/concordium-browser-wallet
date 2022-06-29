@@ -1,0 +1,109 @@
+.transaction-element {
+    position: relative;
+    padding: 0 5px 0 10px;
+    display: flex;
+    flex-direction: column;
+    justify-content: center;
+    border-top: 0.5px solid transparent;
+    height: 58px;
+
+    &:focus {
+        outline: none;
+    }
+
+    & + & {
+        border-top-color: grey;
+    }
+
+    &VariableHeight {
+        padding-top: 10px;
+        padding-bottom: 10px;
+    }
+
+    &__no-transactions {
+        display: flex;
+        flex-direction: row;
+        justify-content: center;
+    }
+
+    &__amount {
+        margin: 0;
+    }
+
+    &__text-faded {
+        color: $color-text-faded;
+    }
+
+    &__checkmark {
+        position: relative;
+        top: 1px;
+        margin-left: 5px;
+    }
+}
+
+.clickableElement {
+    cursor: pointer;
+
+    &:focus {
+        box-shadow: 0 0 0 2px blue;
+    }
+}
+
+.failedElement {
+    padding-left: 30px;
+}
+
+.strikedThrough {
+    text-decoration: line-through;
+}
+
+.warning {
+    position: absolute;
+    margin: 5px -25px;
+
+    :global(.warning_svg__boundary) {
+        fill: red;
+    }
+}
+
+.checkmark {
+    position: relative;
+    top: 1px;
+    margin-left: 5px;
+}
+
+.greenText {
+    color: green;
+}
+
+.transactionGroupHeaderPlaceholder {
+    opacity: 0;
+}
+
+.transactionGroupHeader {
+    height: 2;
+    font-size: 10px;
+    line-height: 12px;
+    display: flex;
+    align-items: center;
+    background-color: blue;
+    position: sticky;
+    top: 0;
+    z-index: 1;
+}
+
+.fullMemo {
+    white-space: pre-wrap;
+}
+
+.lineClamp {
+    overflow: hidden;
+    white-space: nowrap;
+    max-width: 100%;
+    text-overflow: ellipsis;
+    line-height: 1.4;
+}
+
+.infinite {
+    overflow: overlay !important;
+}

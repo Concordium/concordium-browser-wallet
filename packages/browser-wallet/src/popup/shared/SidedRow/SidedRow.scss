@@ -1,0 +1,18 @@
+.sided-row {
+    &__row {
+        display: flex;
+        justify-content: space-between;
+    }
+
+    &__left {
+        display: inline-flex;
+        align-items: center;
+        justify-content: flex-start;
+    }
+
+    &__right {
+        display: inline-flex;
+        align-items: center;
+        justify-content: flex-end;
+    }
+}
