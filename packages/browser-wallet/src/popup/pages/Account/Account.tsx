@@ -55,11 +55,11 @@ function Account() {
 
     return (
         <div className="flex-column justify-space-between align-center h-full relative">
-            <div className="flex-column align-center flex-child-fill w-full">
+            <div className="account-page__content">
                 {accounts.length === 0 && <div>{t('noAccounts')}</div>}
                 {selectedAccount !== undefined && (
                     <>
-                        <div className="account-page__address">{selectedAccount}</div>
+                        <div className="account-page__details">{selectedAccount}</div>
                         <div className="account-page__routes">
                             <Outlet />
                             {canClose && (
@@ -81,7 +81,7 @@ export default function AccountRoutes() {
     return (
         <Routes>
             <Route element={<Account />}>
-                <Route index element={<div className="">Transaction log</div>} />
+                <Route index element={<div>Transaction log</div>} />
                 <Route path={accountRoutes.send} element={<div>Send CCD</div>} />
                 <Route path={accountRoutes.receive} element={<div>Receive CCD</div>} />
                 <Route path={accountRoutes.settings} element={<AccountSettings />} />

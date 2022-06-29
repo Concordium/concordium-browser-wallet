@@ -11,6 +11,7 @@ $main-layout-header-height: rem(40px);
 
     &__main {
         height: calc(100% - #{$main-layout-header-height});
+        position: relative;
         z-index: -1;
         @include transition(filter);
 
