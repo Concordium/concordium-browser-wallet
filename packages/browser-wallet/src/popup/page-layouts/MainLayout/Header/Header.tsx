@@ -10,8 +10,8 @@ import CheckmarkIcon from '@assets/svg/checkmark-blue.svg';
 import NavList from '@popup/shared/NavList';
 import Button from '@popup/shared/Button';
 import { absoluteRoutes } from '@popup/constants/routes';
-import BackIcon from '@assets/svg/back-arrow.svg';
 import { defaultTransition } from '@shared/constants/transition';
+import MenuButton from '@popup/shared/MenuButton';
 import CloseButton from '@popup/shared/CloseButton';
 import AccountList from '../AccountList';
 
@@ -115,16 +115,11 @@ export default function Header({ onToggle, className }: Props) {
                             {section === Section.Settings && t('header.settings')}
                             {section === Section.Account && t('header.accounts')}
                             {hasDropdown && (
-                                <Button
-                                    clear
-                                    className={clsx(
-                                        'main-layout-header__page-dropdown-button',
-                                        dropdownOpen && 'main-layout-header__page-dropdown-button--open'
-                                    )}
+                                <MenuButton
+                                    className="main-layout-header__page-dropdown-button"
+                                    open={dropdownOpen}
                                     onClick={() => setDropdownOpen((o) => !o)}
-                                >
-                                    <BackIcon />
-                                </Button>
+                                />
                             )}
                         </h1>
                     </label>
