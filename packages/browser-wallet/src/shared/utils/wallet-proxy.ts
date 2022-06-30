@@ -5,13 +5,12 @@ import {
 } from '@popup/pages/Account/TransactionList/TransactionElement';
 import axios from 'axios';
 import { abs } from 'wallet-common-helpers';
-import transactionKindNames from './transactionKindNames.json';
 
 const walletProxy = axios.create({
     baseURL: 'https://wallet-proxy.testnet.concordium.com',
 });
 
-enum TransactionKindString {
+export enum TransactionKindString {
     DeployModule = 'deployModule',
     InitContract = 'initContract',
     Update = 'update',
@@ -105,7 +104,7 @@ function getFromAddress(transaction: WalletProxyTransaction, accountAddress: str
     );
 }
 
-/** 7
+/**
  * Derives the account address that the transaction was sent to.
  * @param transaction the raw transaction from the wallet proxy
  * @param accountAddress the account address used when querying for the supplied transaction
@@ -151,7 +150,8 @@ function mapTransaction(transaction: WalletProxyTransaction, accountAddress: str
         fromAddress: getFromAddress(transaction, accountAddress),
         toAddress: getToAddress(transaction, accountAddress),
         transactionHash: transaction.transactionHash,
-        type: transactionKindNames[transaction.details.type],
+        // TODO Do not leak the wallet proxy type to the application here.
+        type: transaction.details.type,
         status,
         time: BigInt(Math.round(transaction.blockTime).toString()),
         key: transaction.transactionHash !== undefined ? transaction.transactionHash : transaction.id.toString(),

@@ -2,10 +2,13 @@ import SidedRow from '@popup/shared/SidedRow';
 import React, { CSSProperties } from 'react';
 import DoubleCheckmarkIcon from '@assets/svg/double-grey-checkmark.svg';
 import { displayAsCcd } from 'wallet-common-helpers/lib/utils/ccd';
+import { TransactionKindString } from '@shared/utils/wallet-proxy';
+import transactionKindNames from './transactionKindNames.json';
 
 interface Props {
     transaction: TransactionElementInput;
     style: CSSProperties;
+    accountAddress: string;
 }
 
 export interface TransactionHistoryResult {
@@ -144,25 +147,68 @@ function statusIcon(status: TransactionStatus) {
             throw new Error(`Received an unsupported status: ${status}`);
     }
 }
+
+// TODO This is wallet proxy specific. We should translate the type
+// to a generic Concordium type instead of the strings used here.
+function isTransferTransaction(type: string) {
+    switch (type) {
+        case TransactionKindString.Transfer.toString():
+        case TransactionKindString.TransferWithMemo.toString():
+        case TransactionKindString.TransferToEncrypted.toString():
+        case TransactionKindString.TransferToPublic.toString():
+        case TransactionKindString.TransferWithSchedule.toString():
+        case TransactionKindString.TransferWithScheduleAndMemo.toString():
+        case TransactionKindString.EncryptedAmountTransfer.toString():
+        case TransactionKindString.EncryptedAmountTransferWithMemo.toString():
+            return true;
+        default:
+            return false;
+    }
+}
+
+function isOutgoingTransaction(transaction: TransactionElementInput, accountAddress: string) {
+    return transaction.fromAddress === accountAddress;
+}
+
+function isEncryptedTransfer(transaction: TransactionElementInput) {
+    return [
+        TransactionKindString.EncryptedAmountTransfer,
+        TransactionKindString.EncryptedAmountTransferWithMemo,
+    ].includes(transaction.type as TransactionKindString);
+}
+
 /**
  * Constructs a displayable string of the fee for a transaction.
  * @param cost the transaction cost
+ * @param accountAddress the account to derive the fee string for
+ * @param transaction the transaction to caluclate the fee for
  * @returns a displayable string of the fee for a transaction in CCD.
  */
-function buildFeeString(cost: bigint) {
+function buildFeeString(cost: bigint, accountAddress: string, transaction: TransactionElementInput) {
+    if (isTransferTransaction(transaction.type)) {
+        if (isOutgoingTransaction(transaction, accountAddress)) {
+            if (isEncryptedTransfer(transaction)) {
+                return 'Shielded transaction fee';
+            }
+            if (transaction.type !== TransactionKindString.TransferToPublic) {
+                return `${displayAsCcd(-transaction.amount)} + ${displayAsCcd(cost)} Fee`;
+            }
+            return `${displayAsCcd(-transaction.amount)} + ${displayAsCcd(cost)} Fee`;
+        }
+    }
     return `${displayAsCcd(cost)} Fee`;
 }
 
 /**
  * A transaction element in a TransactionList.
  */
-export default function TransactionElement({ transaction, style }: Props) {
+export default function TransactionElement({ accountAddress, transaction, style }: Props) {
     const transactionTime = onlyTime(dateFromTimeStamp(transaction.time, TimeStampUnit.seconds));
 
     return (
         <div className="transaction-element" style={style} role="button">
             <SidedRow
-                left={transaction.type}
+                left={transactionKindNames[transaction.type as TransactionKindString]}
                 right={
                     <p className="transaction-element__amount">
                         {displayAsCcd(transaction.cost ? transaction.amount - transaction.cost : transaction.amount)}
@@ -176,7 +222,9 @@ export default function TransactionElement({ transaction, style }: Props) {
                         {transactionTime} {statusIcon(transaction.status)}
                     </>
                 }
-                right={transaction.cost !== undefined ? buildFeeString(transaction.cost) : ''}
+                right={
+                    transaction.cost !== undefined ? buildFeeString(transaction.cost, accountAddress, transaction) : ''
+                }
             />
         </div>
     );

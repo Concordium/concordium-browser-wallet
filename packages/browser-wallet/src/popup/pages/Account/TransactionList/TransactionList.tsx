@@ -9,6 +9,7 @@ import { selectedAccountAtom } from '@popup/store/account';
 import TransactionElement, { TransactionElementInput } from './TransactionElement';
 
 interface InfiniteTransactionListProps {
+    accountAddress: string;
     transactions: TransactionElementInput[];
     hasNextPage: boolean;
     isNextPageLoading: boolean;
@@ -20,6 +21,7 @@ interface InfiniteTransactionListProps {
  * triggers loading the next page.
  */
 function InfiniteTransactionList({
+    accountAddress,
     transactions,
     loadNextPage,
     hasNextPage,
@@ -48,6 +50,7 @@ function InfiniteTransactionList({
                                 }
                                 return (
                                     <TransactionElement
+                                        accountAddress={accountAddress}
                                         style={style}
                                         key={transactions[index].key}
                                         transaction={transactions[index]}
@@ -104,6 +107,7 @@ export default function TransactionList() {
             });
     };
 
+    // TODO Fix initial flash of no transactions to show...
     let transactionListComponent;
     if (transactions.length === 0) {
         if (isNextPageLoading) {
@@ -117,6 +121,7 @@ export default function TransactionList() {
         transactionListComponent = (
             <div className="transaction-list__scroll">
                 <InfiniteTransactionList
+                    accountAddress={accountAddress}
                     transactions={transactions}
                     loadNextPage={loadNextPage}
                     hasNextPage={hasNextPage}
