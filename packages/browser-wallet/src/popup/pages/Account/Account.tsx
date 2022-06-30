@@ -1,11 +1,10 @@
 import { useAtom, useAtomValue } from 'jotai';
 import React, { useCallback } from 'react';
 import { useTranslation } from 'react-i18next';
-
 import { accountsAtom, selectedAccountAtom } from '@popup/store/account';
 import Button from '@popup/shared/Button';
 import { credentialsAtom, urlWhitelistAtom } from '@popup/store/settings';
-import { TransactionList } from './TransactionElement';
+import TransactionList from './TransactionList';
 
 export default function Account() {
     const { t } = useTranslation('account');
@@ -44,7 +43,7 @@ export default function Account() {
                 </Button>
             </div>
             {selectedAccount !== undefined && (
-                <div className="account-page__transaction-element-list">
+                <div className="account-page__transaction-list">
                     <TransactionList key={selectedAccount} accountAddress={selectedAccount} />
                 </div>
             )}

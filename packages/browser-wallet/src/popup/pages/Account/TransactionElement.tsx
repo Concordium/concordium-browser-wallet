@@ -1,14 +1,11 @@
 import SidedRow from '@popup/shared/SidedRow';
-import React, { useEffect, useState } from 'react';
+import React, { CSSProperties } from 'react';
 import DoubleCheckmarkIcon from '@assets/svg/double-grey-checkmark.svg';
 import { displayAsCcd } from 'wallet-common-helpers/lib/utils/ccd';
-import InfiniteLoader from 'react-window-infinite-loader';
-import { FixedSizeList } from 'react-window';
-import { getTransactions } from '@shared/utils/wallet-proxy';
-import { noOp } from 'wallet-common-helpers';
 
 interface Props {
     transaction: TransactionElementInput;
+    style: CSSProperties;
 }
 
 export interface TransactionHistoryResult {
@@ -156,18 +153,14 @@ function buildFeeString(cost: bigint) {
     return `${displayAsCcd(cost)} Fee`;
 }
 
-interface TransactionListProps {
-    accountAddress: string;
-}
-
 /**
- * A transaction element to be used in transaction list.
+ * A transaction element in a TransactionList.
  */
-export default function TransactionElement({ transaction }: Props) {
+export default function TransactionElement({ transaction, style }: Props) {
     const transactionTime = onlyTime(dateFromTimeStamp(transaction.time, TimeStampUnit.seconds));
 
     return (
-        <div className="transaction-element" tabIndex={0} role="button">
+        <div className="transaction-element" style={style} role="button">
             <SidedRow
                 left={transaction.type}
                 right={
@@ -184,93 +177,6 @@ export default function TransactionElement({ transaction }: Props) {
                     </>
                 }
                 right={transaction.cost !== undefined ? buildFeeString(transaction.cost) : ''}
-            />
-        </div>
-    );
-}
-
-interface InfiniteTransactionListProps {
-    transactions: TransactionElementInput[];
-    hasNextPage: boolean;
-    isNextPageLoading: boolean;
-    loadNextPage: (startIndex: number, stopIndex: number) => Promise<void>;
-}
-
-function InfiniteTransactionList({
-    transactions,
-    loadNextPage,
-    hasNextPage,
-    isNextPageLoading,
-}: InfiniteTransactionListProps): JSX.Element {
-    const itemCount = hasNextPage ? transactions.length + 1 : transactions.length;
-    const loadMoreItems = isNextPageLoading ? noOp : loadNextPage;
-    const isItemLoaded = (index: number) => !hasNextPage || index < transactions.length;
-
-    return (
-        <InfiniteLoader isItemLoaded={isItemLoaded} itemCount={itemCount} loadMoreItems={loadMoreItems}>
-            {({ onItemsRendered, ref }) => (
-                <FixedSizeList
-                    itemCount={itemCount}
-                    onItemsRendered={onItemsRendered}
-                    ref={ref}
-                    width={354}
-                    height={290}
-                    itemSize={58}
-                >
-                    {({ index }) => {
-                        if (!isItemLoaded(index)) {
-                            return <div>Loading</div>;
-                        }
-                        return <TransactionElement key={transactions[index].key} transaction={transactions[index]} />;
-                    }}
-                </FixedSizeList>
-            )}
-        </InfiniteLoader>
-    );
-}
-
-export function TransactionList({ accountAddress }: TransactionListProps): JSX.Element {
-    const [transactions, setTransactions] = useState<TransactionElementInput[]>([]);
-    const [isNextPageLoading, setIsNextPageLoading] = useState<boolean>(false);
-    const [hasNextPage, setHasNextPage] = useState<boolean>(true);
-
-    // eslint-disable-next-line @typescript-eslint/no-unused-vars
-    const loadNextPage = async (startIndex: number, stopIndex: number) => {
-        setIsNextPageLoading(true);
-        let fromId;
-        if (transactions.length) {
-            fromId = transactions[transactions.length - 1].id;
-        }
-
-        getTransactions(accountAddress, 5, 'descending', fromId)
-            .then((transactionResult) => {
-                setHasNextPage(transactionResult.full);
-                setTransactions(transactions.concat(transactionResult.transactions));
-                setIsNextPageLoading(false);
-            })
-            .catch((e) => {
-                // TODO Handle exception when trying to get transactions.
-                setIsNextPageLoading(false);
-                throw Error(e);
-            });
-    };
-
-    useEffect(() => {
-        loadNextPage(0, 10);
-    }, [accountAddress]);
-
-    // TODO Avoid flashing this text before transactions have been loaded.
-    if (transactions.length === 0) {
-        return <h3 className="transaction-element__no-transactions">No transactions to show for account.</h3>;
-    }
-
-    return (
-        <div className="account-page__transaction-element-list__scroll">
-            <InfiniteTransactionList
-                transactions={transactions}
-                loadNextPage={loadNextPage}
-                hasNextPage={hasNextPage}
-                isNextPageLoading={isNextPageLoading}
             />
         </div>
     );

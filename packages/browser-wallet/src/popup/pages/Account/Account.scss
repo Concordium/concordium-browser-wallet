@@ -1,5 +1,3 @@
-$log-height-max: calc(100vh - 2px);
-
 .account-page {
     &__select-account {
         display: block;
@@ -11,16 +9,9 @@ $log-height-max: calc(100vh - 2px);
         word-break: break-all;
     }
 
-    &__transaction-element-list {
+    &__transaction-list {
         background-color: $color-bg;
         border-top: 1px solid #325d76;
-        height: 291px;
-
-        &__scroll {
-            position: relative;
-            max-height: none;
-            height: 291px;
-            overflow: overlay;
-        }
+        height: 290px;
     }
 }
