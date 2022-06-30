@@ -6,12 +6,15 @@
 @import '../shared/PageHeader/PageHeader';
 @import '../shared/NavList/NavList';
 @import '../shared/IconButton/IconButton';
+@import '../shared/MenuButton/MenuButton';
 @import '../shared/CopyButton/CopyButton';
 @import '../shared/SidedRow/SidedRow';
 
 // Pages
 @import '../pages/Account/Account';
-@import '../pages/Account/TransactionElement';
+@import '../pages/Account/AccountActions/AccountActions';
+@import '../pages/Account/DisplayAddress/DisplayAddress';
+@import '../pages/Account/TransactionList/TransactionElement';
 @import '../pages/SignMessage/SignMessage';
 @import '../pages/SendTransaction/SendTransaction';
 @import '../pages/SendTransaction/displayTransaction/DisplayTransaction';

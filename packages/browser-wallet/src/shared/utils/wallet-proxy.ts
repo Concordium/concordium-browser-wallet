@@ -2,7 +2,7 @@ import {
     TransactionElementInput,
     TransactionHistoryResult,
     TransactionStatus,
-} from '@popup/pages/Account/TransactionElement';
+} from '@popup/pages/Account/TransactionList/TransactionElement';
 import axios from 'axios';
 import { abs } from 'wallet-common-helpers';
 import transactionKindNames from './transactionKindNames.json';

@@ -1,7 +1,4 @@
-$main-layout-header-height: rem(40px);
-
 .main-layout-header {
-    height: $main-layout-header-height;
     position: relative;
     z-index: 1;
 
@@ -47,22 +44,8 @@ $main-layout-header-height: rem(40px);
     }
 
     &__page-dropdown-button {
-        display: flex;
         position: absolute;
-        right: rem(-5px);
-        transform: translate(100%, rem(1px)) rotate(-90deg);
-
-        svg {
-            width: rem(6px);
-
-            path {
-                fill: $color-text;
-            }
-        }
-
-        &--open {
-            transform: translate(100%, rem(1px)) rotate(90deg);
-        }
+        right: 0;
     }
 
     &__close {

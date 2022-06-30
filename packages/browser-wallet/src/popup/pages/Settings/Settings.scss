@@ -1,10 +1,8 @@
 .settings-page {
+    padding: 0 rem(10px);
+
     &__link {
         display: block;
         padding: rem(10px) 0;
-
-        &:first-of-type {
-            padding-top: 0;
-        }
     }
 }

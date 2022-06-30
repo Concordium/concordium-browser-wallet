@@ -4,6 +4,8 @@ import InfiniteLoader from 'react-window-infinite-loader';
 import { FixedSizeList as List } from 'react-window';
 import { noOp } from 'wallet-common-helpers';
 import AutoSizer from 'react-virtualized-auto-sizer';
+import { useAtomValue } from 'jotai';
+import { selectedAccountAtom } from '@popup/store/account';
 import TransactionElement, { TransactionElementInput } from './TransactionElement';
 
 interface InfiniteTransactionListProps {
@@ -22,7 +24,7 @@ function InfiniteTransactionList({
     loadNextPage,
     hasNextPage,
     isNextPageLoading,
-}: InfiniteTransactionListProps): JSX.Element {
+}: InfiniteTransactionListProps) {
     const itemCount = hasNextPage ? transactions.length + 1 : transactions.length;
     const loadMoreItems = isNextPageLoading ? noOp : loadNextPage;
     const isItemLoaded = (index: number) => !hasNextPage || index < transactions.length;
@@ -60,17 +62,27 @@ function InfiniteTransactionList({
     );
 }
 
-interface TransactionListProps {
-    accountAddress: string;
-}
-
 /**
  * Displays a list of transactions from an account's transaction history.
  */
-export default function TransactionList({ accountAddress }: TransactionListProps): JSX.Element {
+export default function TransactionList() {
+    const accountAddress = useAtomValue(selectedAccountAtom);
     const [transactions, setTransactions] = useState<TransactionElementInput[]>([]);
     const [isNextPageLoading, setIsNextPageLoading] = useState<boolean>(false);
     const [hasNextPage, setHasNextPage] = useState<boolean>(true);
+
+    if (!accountAddress) {
+        return null;
+    }
+
+    useEffect(() => {
+        setTransactions([]);
+        getTransactions(accountAddress, 20, 'descending').then((transactionResult) => {
+            setHasNextPage(transactionResult.full);
+            setTransactions(transactionResult.transactions);
+            setIsNextPageLoading(false);
+        });
+    }, [accountAddress]);
 
     const loadNextPage = async () => {
         setIsNextPageLoading(true);
@@ -92,23 +104,27 @@ export default function TransactionList({ accountAddress }: TransactionListProps
             });
     };
 
-    useEffect(() => {
-        loadNextPage();
-    }, [accountAddress]);
-
+    let transactionListComponent;
     if (transactions.length === 0) {
         if (isNextPageLoading) {
-            return <h3>Loading transactions</h3>;
+            transactionListComponent = <h3>Loading transactions</h3>;
+        } else {
+            transactionListComponent = (
+                <h3 className="transaction-element__no-transactions">No transactions to show for account.</h3>
+            );
         }
-        return <h3 className="transaction-element__no-transactions">No transactions to show for account.</h3>;
+    } else {
+        transactionListComponent = (
+            <div className="transaction-list__scroll">
+                <InfiniteTransactionList
+                    transactions={transactions}
+                    loadNextPage={loadNextPage}
+                    hasNextPage={hasNextPage}
+                    isNextPageLoading={isNextPageLoading}
+                />
+            </div>
+        );
     }
 
-    return (
-        <InfiniteTransactionList
-            transactions={transactions}
-            loadNextPage={loadNextPage}
-            hasNextPage={hasNextPage}
-            isNextPageLoading={isNextPageLoading}
-        />
-    );
+    return <div className="transaction-list__container">{transactionListComponent}</div>;
 }

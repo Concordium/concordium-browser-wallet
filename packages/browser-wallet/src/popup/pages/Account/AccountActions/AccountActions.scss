@@ -1,0 +1,128 @@
+.account-page-actions {
+    display: flex;
+    align-items: center;
+    width: 100%;
+    background-color: $color-cta;
+
+    &__left,
+    &__right {
+        flex: 0 0 rem(36px);
+        display: flex;
+        height: 100%;
+        align-items: center;
+        justify-content: center;
+        background-color: $color-cta;
+
+        svg {
+            width: rem(7px);
+
+            path {
+                fill: $color-off-white;
+            }
+        }
+    }
+
+    &__left {
+        border-right: solid 1px rgba($color-off-black, 0.1);
+    }
+
+    &__right {
+        border-left: solid 1px rgba($color-off-black, 0.1);
+        margin-left: -1px;
+
+        svg {
+            transform: rotate(180deg);
+        }
+    }
+
+    &__links {
+        display: flex;
+        justify-content: center;
+        align-items: center;
+        flex: 1;
+        overflow: overlay;
+        height: 100%;
+        scroll-snap-type: x mandatory;
+
+        &::-webkit-scrollbar {
+            // TODO cross-browser compatibility
+            height: 0;
+            width: 0;
+        }
+
+        .account-page-actions__left + & {
+            justify-content: start;
+        }
+    }
+
+    &__link {
+        position: relative;
+        display: flex;
+        flex-direction: column;
+        justify-content: center;
+        align-items: center;
+        flex: 1;
+        height: 100%;
+        scroll-snap-align: start;
+        scroll-snap-stop: normal;
+
+        &:not(:last-of-type) {
+            border-right: solid 1px rgba($color-off-black, 0.1);
+        }
+
+        &,
+        &:hover,
+        &:focus {
+            color: $color-off-white;
+        }
+
+        &::after {
+            display: block;
+            content: '';
+            position: absolute;
+            bottom: rem(5px);
+            width: 60%;
+            height: rem(1px);
+            border-radius: rem(0.5px);
+            background-color: $color-off-white;
+            opacity: 0.6;
+            transform: scaleX(0);
+            transition: transition(transform), transition(opacity);
+        }
+
+        &.active::after {
+            opacity: 1;
+            transform: scaleX(1);
+        }
+
+        &:not(.active) {
+            &:focus,
+            &:hover {
+                &::after {
+                    transform: scaleX(0.6);
+                }
+            }
+        }
+
+        // If navigation buttons are included (> 5 links), we have less space.
+        .account-page-actions__left + .account-page-actions__links & {
+            flex: 0 0 25%;
+        }
+    }
+
+    &__list-icon {
+        height: rem(8px);
+    }
+
+    &__send-icon {
+        height: rem(10px);
+    }
+
+    &__receive-icon {
+        height: rem(11px);
+    }
+
+    &__settings-icon {
+        height: rem(12px);
+    }
+}

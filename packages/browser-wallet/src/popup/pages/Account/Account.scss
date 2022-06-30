@@ -1,17 +1,65 @@
+$account-page-actions-height: rem(36px);
+$account-page-details-height-expanded: rem(135px);
+$account-page-details-height-closed: rem(35px);
+$account-page-details-height: var(--details-height, $account-page-details-height-closed);
+
 .account-page {
-    &__select-account {
-        display: block;
+    &__content {
+        display: flex;
+        flex-direction: column;
+        align-items: center;
         width: 100%;
+        height: calc(100% - #{$account-page-actions-height});
     }
 
-    &__address {
-        margin-top: rem(10px);
+    &__details {
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        height: $account-page-details-height;
+        font-size: rem(10px);
+        font-weight: $font-weight-light;
+        padding: 0 rem(40px);
         word-break: break-all;
+        background-color: $color-bg;
+        text-align: center;
+        width: 100%;
+        border-bottom: 1px solid $color-petroleum;
+
+        &--expanded {
+            --details-height: #{$account-page-details-height-expanded};
+        }
     }
 
-    &__transaction-list {
-        background-color: $color-bg;
-        border-top: 1px solid #325d76;
-        height: 290px;
+    &__hide {
+        position: absolute;
+        left: 0;
+    }
+
+    &__routes {
+        width: 100%;
+        height: calc(100% - #{$account-page-details-height});
+        display: flex;
+        justify-content: center;
+        position: relative;
+        overflow: overlay;
+
+        > div {
+            // TODO remove - only here to make temp content prettier.
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            height: 100%;
+        }
+    }
+
+    &__close {
+        position: absolute;
+        top: rem(10px);
+        right: rem(10px);
+    }
+
+    &__actions {
+        height: $account-page-actions-height;
     }
 }

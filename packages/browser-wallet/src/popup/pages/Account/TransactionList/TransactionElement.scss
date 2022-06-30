@@ -1,3 +1,20 @@
+.transaction-list {
+    &__container {
+        background-color: $color-bg;
+        display: flex;
+        flex-direction: column;
+        width: 100%;
+    }
+
+    &__scroll {
+        position: relative;
+        max-height: none;
+        height: 100%;
+        width: 100%;
+        overflow: overlay;
+    }
+}
+
 .transaction-element {
     position: relative;
     padding: 0 5px 0 10px;

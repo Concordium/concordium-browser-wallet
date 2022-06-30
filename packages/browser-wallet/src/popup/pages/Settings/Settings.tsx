@@ -9,7 +9,7 @@ export default function Settings() {
     const { t } = useTranslation('settings');
 
     return (
-        <NavList>
+        <NavList className="settings-page">
             <Link className="settings-page__link" to={absoluteRoutes.home.settings.passcode.path}>
                 {t('passcode')}
             </Link>
