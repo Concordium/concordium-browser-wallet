@@ -1,8 +1,9 @@
-import { defaultTransition } from '@shared/constants/transition';
 import clsx from 'clsx';
 import { AnimatePresence, motion, Variants } from 'framer-motion';
 import React, { Children, ReactNode, useMemo, useState } from 'react';
 import { ClassName } from 'wallet-common-helpers';
+
+import { defaultTransition } from '@shared/constants/transition';
 import Button from '../Button';
 import ButtonGroup from '../ButtonGroup';
 
@@ -15,10 +16,22 @@ const transitionVariants: Variants = {
 };
 
 type Props = ClassName & {
+    /**
+     * Action called when either "skip" or "continue" button is pressed
+     */
     onContinue(): void;
     children: ReactNode | ReactNode[];
 };
 
+/**
+ * Carousel component for presenting single or multiple pages (passed as children) with information.
+ *
+ * @example
+ *  <Carousel onContinue={() => navigate('/route/to/next')}>
+ *      <div>First page...</div>
+ *      <div>Second page...</div>
+ *  </Carousel>
+ */
 export default function Carousel({ className, children, onContinue }: Props) {
     const [[active, direction], setActive] = useState<[number, Direction]>([0, 'next']);
 
@@ -35,7 +48,7 @@ export default function Carousel({ className, children, onContinue }: Props) {
             <div className="carousel__content">
                 <AnimatePresence initial={false} custom={direction}>
                     <motion.div
-                        key={active} // We don't expect pages to change...
+                        key={active}
                         variants={transitionVariants}
                         custom={direction}
                         initial="enter"
