@@ -54,14 +54,14 @@ export type ModalProps<T extends WithOnClick = WithOnClick> = {
 
 /**
  * @description
- * Opens content in a modal overlay on top of \<MainLayout /\>.
+ * Opens content in a modal overlay on top of the current wallet window.
  *
  * @example
  * <Modal trigger={<button type="button">Click me</button>} open={isOpen} onOpen={() => setIsOpen(true)} onClose={() => setIsOpen(false)}>
  *   This content is shown in a modal!
  * </Modal>
  */
-export default function Modal<TTrigger extends WithOnClick = WithOnClick>({
+export default function Modal<T extends WithOnClick = WithOnClick>({
     trigger,
     disableClose = false,
     open: isOpenOverride,
@@ -69,7 +69,7 @@ export default function Modal<TTrigger extends WithOnClick = WithOnClick>({
     onOpen = noOp,
     onClose = noOp,
     children,
-}: PropsWithChildren<ModalProps<TTrigger>>): JSX.Element | null {
+}: PropsWithChildren<ModalProps<T>>): JSX.Element | null {
     const [{ isOpen, isExiting }, setOpenState] = useState<OpenState>({ isOpen: false, isExiting: false });
 
     const open = useCallback(() => {
