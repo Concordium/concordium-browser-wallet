@@ -1,7 +1,4 @@
 const t = {
-    root: {
-        loading: 'Loading user settings...',
-    },
     form: {
         password: {
             tooWeak: 'Very weak',
