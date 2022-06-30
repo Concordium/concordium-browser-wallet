@@ -6,6 +6,7 @@
 @import '../shared/PageHeader/PageHeader';
 @import '../shared/NavList/NavList';
 @import '../shared/IconButton/IconButton';
+@import '../shared/MenuButton/MenuButton';
 @import '../shared/CopyButton/CopyButton';
 @import '../shared/CloseButton/CloseButton';
 @import '../shared/Carousel/Carousel';
@@ -13,6 +14,7 @@
 // Pages
 @import '../pages/Account/Account';
 @import '../pages/Account/AccountActions/AccountActions';
+@import '../pages/Account/DisplayAddress/DisplayAddress';
 @import '../pages/SignMessage/SignMessage';
 @import '../pages/SendTransaction/SendTransaction';
 @import '../pages/SendTransaction/displayTransaction/DisplayTransaction';

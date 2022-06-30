@@ -1,5 +1,6 @@
+import clsx from 'clsx';
 import { useAtom, useAtomValue } from 'jotai';
-import React, { useCallback } from 'react';
+import React, { useCallback, useState } from 'react';
 import { useTranslation } from 'react-i18next';
 import { Outlet, Route, Routes, useLocation, useNavigate } from 'react-router-dom';
 
@@ -8,8 +9,10 @@ import Button from '@popup/shared/Button';
 import { credentialsAtom, urlWhitelistAtom } from '@popup/store/settings';
 import CloseButton from '@popup/shared/CloseButton';
 import { absoluteRoutes } from '@popup/constants/routes';
+import MenuButton from '@popup/shared/MenuButton';
 import { accountRoutes } from './routes';
 import AccountActions from './AccountActions';
+import DisplayAddress from './DisplayAddress';
 
 function AccountSettings() {
     const { t } = useTranslation('account');
@@ -50,16 +53,29 @@ function Account() {
     const selectedAccount = useAtomValue(selectedAccountAtom);
     const { pathname } = useLocation();
     const nav = useNavigate();
+    const [detailsExpanded, setDetailsExpanded] = useState(true);
 
     const canClose = pathname !== absoluteRoutes.home.account.path;
 
     return (
         <div className="flex-column justify-space-between align-center h-full relative">
+            <MenuButton
+                className="account-page__hide"
+                open={detailsExpanded}
+                onClick={() => setDetailsExpanded((o) => !o)}
+            />
             <div className="account-page__content">
                 {accounts.length === 0 && <div>{t('noAccounts')}</div>}
                 {selectedAccount !== undefined && (
                     <>
-                        <div className="account-page__details">{selectedAccount}</div>
+                        <div
+                            className={clsx(
+                                'account-page__details',
+                                detailsExpanded && 'account-page__details--expanded'
+                            )}
+                        >
+                            {selectedAccount}
+                        </div>
                         <div className="account-page__routes">
                             <Outlet />
                             {canClose && (
@@ -83,7 +99,7 @@ export default function AccountRoutes() {
             <Route element={<Account />}>
                 <Route index element={<div>Transaction log</div>} />
                 <Route path={accountRoutes.send} element={<div>Send CCD</div>} />
-                <Route path={accountRoutes.receive} element={<div>Receive CCD</div>} />
+                <Route path={accountRoutes.receive} element={<DisplayAddress />} />
                 <Route path={accountRoutes.settings} element={<AccountSettings />} />
             </Route>
         </Routes>
