@@ -104,9 +104,9 @@ export default function Modal<T extends WithOnClick = WithOnClick>({
 
     useEffect(() => {
         if (isOpen) {
-            htmlElement?.classList.add('disable-scroll');
+            htmlElement?.classList.add('modal-open');
         } else {
-            htmlElement?.classList.remove('disable-scroll');
+            htmlElement?.classList.remove('modal-open');
         }
     }, [isOpen]);
 
