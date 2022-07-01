@@ -59,16 +59,18 @@ function Account() {
 
     return (
         <div className="flex-column justify-space-between align-center h-full relative">
-            <MenuButton
-                className="account-page__hide"
-                open={detailsExpanded}
-                onClick={() => setDetailsExpanded((o) => !o)}
-            />
             <div className="account-page__content">
                 {accounts.length === 0 && <div>{t('noAccounts')}</div>}
                 {selectedAccount !== undefined && (
                     <>
-                        <AccountDetails expanded={detailsExpanded} account={selectedAccount} />
+                        <div className="account-page__details">
+                            <MenuButton
+                                className="account-page__hide"
+                                open={detailsExpanded}
+                                onClick={() => setDetailsExpanded((o) => !o)}
+                            />
+                            <AccountDetails expanded={detailsExpanded} account={selectedAccount} />
+                        </div>
                         <div className="account-page__routes">
                             <Outlet />
                             {canClose && (

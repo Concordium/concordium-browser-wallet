@@ -1,4 +1,5 @@
 .account-page-details {
+    position: relative;
     display: flex;
     flex-direction: column;
     align-items: center;
@@ -43,7 +44,7 @@
     }
 
     &__amount {
-        margin-top: rem(2px);
+        margin-top: rem(5px);
     }
 
     &__amount-label {
@@ -53,6 +54,28 @@
 
     &__amount-ccd {
         font-family: $font-family-mono;
-        font-size: rem(10px);
+        font-size: rem(12px);
+    }
+
+    &__stamp {
+        position: absolute;
+        left: 50%;
+        top: calc(#{$account-page-details-height-expanded} / 2);
+        transform: translate(-50%, -50%);
+        height: rem(60px);
+        opacity: 0;
+        @include transition(opacity);
+
+        .account-page-details--expanded & {
+            opacity: 0.1;
+
+            .dark & {
+                opacity: 0.5;
+            }
+        }
+
+        circle {
+            fill: $color-bg;
+        }
     }
 }

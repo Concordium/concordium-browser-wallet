@@ -13,28 +13,15 @@ $account-page-details-height: var(--details-height, $account-page-details-height
     }
 
     &__details {
-        display: flex;
-        align-items: center;
-        justify-content: center;
-        height: $account-page-details-height;
-        font-size: rem(10px);
-        font-weight: $font-weight-light;
-        padding: 0 rem(40px);
-        word-break: break-all;
-        background-color: $color-bg;
-        text-align: center;
+        position: relative;
         width: 100%;
-        border-bottom: 1px solid $color-petroleum;
-        @include transition(height);
-
-        &--expanded {
-            --details-height: #{$account-page-details-height-expanded};
-        }
     }
 
     &__hide {
         position: absolute;
         left: 0;
+        top: rem(2px);
+        z-index: 1;
     }
 
     &__routes {

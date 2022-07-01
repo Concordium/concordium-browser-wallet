@@ -1,7 +1,9 @@
-import { displaySplitAddress } from '@popup/shared/utils/account-helpers';
 import clsx from 'clsx';
 import React from 'react';
 import { displayAsCcd } from 'wallet-common-helpers';
+
+import { displaySplitAddress } from '@popup/shared/utils/account-helpers';
+import VerifiedIcon from '@assets/svg/verified-stamp.svg';
 
 type AmountProps = {
     label: string;
@@ -32,6 +34,7 @@ export default function AccountDetails({ expanded, account }: Props) {
                 <Amount label="Public amount at disposal" amount={0n} />
                 <Amount label="Stake / delegation amount" amount={0n} />
             </div>
+            <VerifiedIcon className="account-page-details__stamp" />
         </div>
     );
 }
