@@ -1,6 +1,6 @@
 $account-page-actions-height: rem(36px);
 $account-page-details-height-expanded: rem(135px);
-$account-page-details-height-closed: rem(35px);
+$account-page-details-height-closed: rem(30px);
 $account-page-details-height: var(--details-height, $account-page-details-height-closed);
 
 .account-page {
