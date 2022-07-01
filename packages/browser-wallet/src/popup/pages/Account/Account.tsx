@@ -1,4 +1,3 @@
-import clsx from 'clsx';
 import { useAtom, useAtomValue } from 'jotai';
 import React, { useCallback, useState } from 'react';
 import { useTranslation } from 'react-i18next';
@@ -13,6 +12,7 @@ import MenuButton from '@popup/shared/MenuButton';
 import { accountRoutes } from './routes';
 import AccountActions from './AccountActions';
 import DisplayAddress from './DisplayAddress';
+import AccountDetails from './AccountDetails';
 
 function AccountSettings() {
     const { t } = useTranslation('account');
@@ -68,14 +68,7 @@ function Account() {
                 {accounts.length === 0 && <div>{t('noAccounts')}</div>}
                 {selectedAccount !== undefined && (
                     <>
-                        <div
-                            className={clsx(
-                                'account-page__details',
-                                detailsExpanded && 'account-page__details--expanded'
-                            )}
-                        >
-                            {selectedAccount}
-                        </div>
+                        <AccountDetails expanded={detailsExpanded} account={selectedAccount} />
                         <div className="account-page__routes">
                             <Outlet />
                             {canClose && (

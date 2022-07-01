@@ -25,6 +25,7 @@ $account-page-details-height: var(--details-height, $account-page-details-height
         text-align: center;
         width: 100%;
         border-bottom: 1px solid $color-petroleum;
+        @include transition(height);
 
         &--expanded {
             --details-height: #{$account-page-details-height-expanded};
@@ -43,6 +44,7 @@ $account-page-details-height: var(--details-height, $account-page-details-height
         justify-content: center;
         position: relative;
         overflow: overlay;
+        @include transition(height);
 
         > div {
             // TODO remove - only here to make temp content prettier.
