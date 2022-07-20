@@ -18,7 +18,6 @@ import NetworkSettings from '@popup/pages/NetworkSettings';
 import VisualSettings from '@popup/pages/VisualSettings';
 import AddAccount from '@popup/pages/AddAccount';
 import { IdentityIssuanceEnd, IdentityIssuanceStart } from '@popup/pages/IdentityIssuance';
-import Button from '@popup/shared/Button';
 
 type PromptKey = keyof Omit<typeof absoluteRoutes['prompt'], 'path'>;
 
@@ -50,11 +49,6 @@ function useMessagePrompt<R>(type: InternalMessageType | MessageType, promptKey:
 
 function NoContent() {
     return <>No content yet...</>;
-}
-
-function Id() {
-    const nav = useNavigate();
-    return <Button onClick={() => nav(absoluteRoutes.home.identities.add.path)}>+</Button>;
 }
 
 export default function Routes() {
@@ -113,7 +107,7 @@ export default function Routes() {
                     element={<IdentityIssuanceStart />}
                     path={`${relativeRoutes.home.identities.path}/${relativeRoutes.home.identities.add.path}`}
                 />
-                <Route element={<Id />} path={relativeRoutes.home.identities.path} />
+                <Route element={<NoContent />} path={relativeRoutes.home.identities.path} />
                 <Route path={relativeRoutes.home.settings.path}>
                     <Route index element={<Settings />} />
                     <Route element={<NoContent />} path={relativeRoutes.home.settings.passcode.path} />

@@ -5,6 +5,7 @@ export enum ChromeStorageKey {
     UrlWhitelist = 'urlWhitelist',
     Theme = 'theme',
     PendingIdentities = 'pendingIdentities',
+    SelectedIdentity = 'selectedIdentity',
 }
 
 export enum Theme {
@@ -22,9 +23,13 @@ export type WalletCredential = {
     address: string;
 };
 
-export type PendingIdentity = {
+export type Identity = {
+    name: string;
     index: number;
     network: Network;
+};
+
+export type PendingIdentity = Identity & {
     provider: number;
     location?: string;
 };

@@ -14,9 +14,11 @@ import { defaultTransition } from '@shared/constants/transition';
 import MenuButton from '@popup/shared/MenuButton';
 import CloseButton from '@popup/shared/CloseButton';
 import AccountList from '../AccountList';
+import IdentityList from '../IdentityList';
 
 const MotionNavList = motion(NavList) as ComponentType<PropsOf<typeof NavList> & AnimationProps>; // For some reason, the motion HoC removes children from component props
 const MotionAccountList = motion(AccountList);
+const MotionIdentityList = motion(IdentityList);
 
 type HeaderLinkProps = PropsWithChildren<{
     onClick(): void;
@@ -95,7 +97,7 @@ export default function Header({ onToggle, className }: Props) {
     const canClose =
         !pathname.startsWith(absoluteRoutes.home.account.path) ||
         pathname.startsWith(absoluteRoutes.home.account.add.path);
-    const hasDropdown = [Section.Account].includes(section);
+    const hasDropdown = [Section.Account, Section.Id].includes(section);
 
     return (
         <>
@@ -155,6 +157,17 @@ export default function Header({ onToggle, className }: Props) {
                 <AnimatePresence>
                     {dropdownOpen && section === Section.Account && (
                         <MotionAccountList
+                            onSelect={() => setDropdownOpen(false)}
+                            className="main-layout-header__page-dropdown"
+                            variants={transitionVariants}
+                            initial="closed"
+                            animate="open"
+                            exit="closed"
+                            transition={defaultTransition}
+                        />
+                    )}
+                    {dropdownOpen && section === Section.Id && (
+                        <MotionIdentityList
                             onSelect={() => setDropdownOpen(false)}
                             className="main-layout-header__page-dropdown"
                             variants={transitionVariants}

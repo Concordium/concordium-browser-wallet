@@ -67,6 +67,8 @@ export default function IdentityIssuanceStart() {
         updatePendingIdentities(
             pendingIdentities.concat([
                 {
+                    // TODO Use total identity amount for this
+                    name: `Identity ${pendingIdentities.length}`,
                     index: identityIndex,
                     network: Network[net],
                     provider: provider.ipInfo.ipIdentity,
