@@ -1,4 +1,4 @@
-import { ChromeStorageKey, Theme, WalletCredential } from './types';
+import { ChromeStorageKey, PendingIdentity, Theme, WalletCredential } from './types';
 
 export type StorageAccessor<V> = {
     /**
@@ -30,6 +30,10 @@ const makeStorageAccessor = <V>(area: chrome.storage.AreaName, key: ChromeStorag
     };
 };
 
+export const storedPendingIdentities = makeStorageAccessor<PendingIdentity[]>(
+    'local',
+    ChromeStorageKey.PendingIdentities
+);
 export const storedCredentials = makeStorageAccessor<WalletCredential[]>('local', ChromeStorageKey.Credentials);
 export const storedJsonRpcUrl = makeStorageAccessor<string>('local', ChromeStorageKey.JsonRpcUrl);
 export const storedSelectedAccount = makeStorageAccessor<string>('local', ChromeStorageKey.SelectedAccount);

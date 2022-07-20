@@ -17,6 +17,8 @@ import Settings from '@popup/pages/Settings';
 import NetworkSettings from '@popup/pages/NetworkSettings';
 import VisualSettings from '@popup/pages/VisualSettings';
 import AddAccount from '@popup/pages/AddAccount';
+import { IdentityIssuanceEnd, IdentityIssuanceStart } from '@popup/pages/IdentityIssuance';
+import Button from '@popup/shared/Button';
 
 type PromptKey = keyof Omit<typeof absoluteRoutes['prompt'], 'path'>;
 
@@ -50,6 +52,11 @@ function NoContent() {
     return <>No content yet...</>;
 }
 
+function Id() {
+    const nav = useNavigate();
+    return <Button onClick={() => nav(absoluteRoutes.home.identities.add.path)}>+</Button>;
+}
+
 export default function Routes() {
     const handleConnectionResponse = useMessagePrompt<boolean>(InternalMessageType.Connect, 'connectionRequest');
     const handleSendTransactionResponse = useMessagePrompt<string | undefined>(
@@ -60,6 +67,8 @@ export default function Routes() {
         InternalMessageType.SignMessage,
         'signMessage'
     );
+
+    useMessagePrompt(InternalMessageType.EndIdentityIssuance, 'endIdentityIssuance');
 
     useEffect(() => {
         popupMessageHandler.sendInternalMessage(InternalMessageType.PopupReady).catch(noOp);
@@ -95,11 +104,16 @@ export default function Routes() {
                         />
                     }
                 />
+                <Route path={relativeRoutes.prompt.endIdentityIssuance.path} element={<IdentityIssuanceEnd />} />
             </Route>
             <Route path={relativeRoutes.setup.path} element={<Setup />} />
             <Route path={relativeRoutes.home.path} element={<MainLayout />}>
                 <Route path={`${relativeRoutes.home.account.path}/*`} element={<Account />} />
-                <Route element={<NoContent />} path={relativeRoutes.home.identities.path} />
+                <Route
+                    element={<IdentityIssuanceStart />}
+                    path={`${relativeRoutes.home.identities.path}/${relativeRoutes.home.identities.add.path}`}
+                />
+                <Route element={<Id />} path={relativeRoutes.home.identities.path} />
                 <Route path={relativeRoutes.home.settings.path}>
                     <Route index element={<Settings />} />
                     <Route element={<NoContent />} path={relativeRoutes.home.settings.passcode.path} />

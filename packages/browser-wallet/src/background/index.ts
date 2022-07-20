@@ -7,7 +7,14 @@ import {
 import { storedSelectedAccount, storedUrlWhitelist } from '@shared/storage/access';
 
 import bgMessageHandler from './message-handler';
-import { forwardToPopup, HandleMessage, HandleResponse, RunCondition, setPopupSize } from './window-management';
+import {
+    forwardToPopup,
+    HandleMessage,
+    HandleResponse,
+    RunCondition,
+    setPopupSize,
+    openWindow,
+} from './window-management';
 
 /**
  * Callback method which installs Injected script into Main world of Dapp
@@ -31,6 +38,72 @@ const injectScript: ExtensionMessageHandler = (_msg, sender, respond) => {
     return true;
 };
 
+const redirectUri = 'ConcordiumRedirectToken';
+const codeUriKey = 'code_uri=';
+
+type Response =
+    | {
+          status: 'Success';
+          result: string;
+      }
+    | {
+          status: 'Aborted';
+      };
+
+const identityIssuance: ExtensionMessageHandler = (msg) => {
+    const respond = (response: Response) => {
+        openWindow().then(() =>
+            bgMessageHandler.sendInternalMessage(InternalMessageType.EndIdentityIssuance, response)
+        );
+    };
+
+    chrome.tabs
+        .create({
+            url: msg.payload.url,
+        })
+        .then((tab) => {
+            // TODO: handle the tab being closed.
+            const closedListener = (tabId) => {
+                if (tabId === tab.id) {
+                    respond({
+                        status: 'Aborted',
+                    });
+                }
+            };
+            chrome.tabs.onRemoved.addListener(closedListener);
+
+            const onComplete = new Promise<string>((resolve) => {
+                chrome.webRequest.onBeforeRedirect.addListener(
+                    function redirectListener(details) {
+                        if (details.redirectUrl.includes(redirectUri)) {
+                            chrome.webRequest.onBeforeRequest.removeListener(redirectListener);
+                            resolve(details.redirectUrl);
+                        }
+                    },
+                    { urls: ['<all_urls>'], tabId: tab.id }
+                );
+                chrome.webRequest.onBeforeRequest.addListener(
+                    function requestListener(details) {
+                        if (details.url.includes(redirectUri)) {
+                            chrome.webRequest.onBeforeRequest.removeListener(requestListener);
+                            resolve(details.url);
+                        }
+                    },
+                    { urls: ['<all_urls>'], tabId: tab.id }
+                );
+            });
+            onComplete.then((url) => {
+                chrome.tabs.onRemoved.removeListener(closedListener);
+                chrome.tabs.remove(tab.id);
+                respond({
+                    status: 'Success',
+                    result: url.substring(url.indexOf(codeUriKey) + codeUriKey.length),
+                });
+            });
+        });
+};
+
+bgMessageHandler.handleMessage(createMessageTypeFilter(InternalMessageType.StartIdentityIssuance), identityIssuance);
 bgMessageHandler.handleMessage(createMessageTypeFilter(InternalMessageType.Init), injectScript);
 bgMessageHandler.handleMessage(createMessageTypeFilter(InternalMessageType.SetViewSize), ({ payload }) => {
     setPopupSize(payload);

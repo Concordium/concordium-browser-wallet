@@ -11,9 +11,12 @@
         }
     ],
     "host_permissions": ["<all_urls>"],
-    "permissions": ["tabs", "activeTab", "storage", "scripting", "notifications"],
+    "permissions": ["tabs", "activeTab", "storage", "scripting", "notifications", "webRequest"],
     "background": {
         "service_worker": "entryPoint!src/background/index.ts"
+    },
+    "content_security_policy": {
+        "extension_pages": "script-src 'self' 'wasm-unsafe-eval'; object-src 'self'"
     },
     "web_accessible_resources": [
         {
