@@ -4,7 +4,11 @@ import { EventType } from '@concordium/browser-wallet-api-helpers';
 import { popupMessageHandler } from '@popup/shared/message-handler';
 import { atomWithChromeStorage } from './utils';
 
-export const pendingIdentitiesAtom = atomWithChromeStorage<PendingIdentity[]>(ChromeStorageKey.PendingIdentities, []);
+export const identitiesAtom = atomWithChromeStorage<Identity[]>(ChromeStorageKey.Identities, []);
+export const pendingIdentityAtom = atomWithChromeStorage<Omit<PendingIdentity, 'location'> | undefined>(
+    ChromeStorageKey.PendingIdentity,
+    undefined
+);
 export const selectedIdentityAtom = atomWithChromeStorage<Identity | undefined>(
     ChromeStorageKey.SelectedIdentity,
     undefined

@@ -5,14 +5,16 @@ import {
     storedSelectedAccount,
     storedTheme,
     storedUrlWhitelist,
-    storedPendingIdentities,
+    storedIdentities,
+    storedPendingIdentity,
     storedSelectedIdentity,
 } from '@shared/storage/access';
 import { ChromeStorageKey } from '@shared/storage/types';
 import { atom } from 'jotai';
 
 const accessorMap = {
-    [ChromeStorageKey.PendingIdentities]: storedPendingIdentities,
+    [ChromeStorageKey.Identities]: storedIdentities,
+    [ChromeStorageKey.PendingIdentity]: storedPendingIdentity,
     [ChromeStorageKey.SelectedIdentity]: storedSelectedIdentity,
     [ChromeStorageKey.Credentials]: storedCredentials,
     [ChromeStorageKey.SelectedAccount]: storedSelectedAccount,

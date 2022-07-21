@@ -5,6 +5,7 @@ const t = {
     continue: 'continue',
     startText:
         'It is now time to request your first Concordium identity. By choosing an identity provider below, you will be taken to their third party process to finish the request. \n You will need a national identity document to finish the process.',
+    alreadyPending: 'You are already creating an identity',
 };
 
 export default t;

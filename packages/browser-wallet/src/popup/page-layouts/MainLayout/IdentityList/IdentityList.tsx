@@ -6,7 +6,7 @@ import { ClassName } from 'wallet-common-helpers';
 
 import CheckmarkIcon from '@assets/svg/checkmark-blue.svg';
 import { absoluteRoutes } from '@popup/constants/routes';
-import { pendingIdentitiesAtom, selectedIdentityAtom } from '@popup/store/settings';
+import { identitiesAtom, selectedIdentityAtom } from '@popup/store/settings';
 import { useTranslation } from 'react-i18next';
 import { Identity } from '@shared/storage/types';
 import EntityList from '../EntityList';
@@ -35,7 +35,7 @@ type Props = ClassName & {
 };
 
 const IdentityList = forwardRef<HTMLDivElement, Props>(({ className, onSelect }, ref) => {
-    const identities = useAtomValue(pendingIdentitiesAtom);
+    const identities = useAtomValue(identitiesAtom);
     const [selectedIdentity, setSelectedIdentity] = useAtom(selectedIdentityAtom);
     const nav = useNavigate();
     const { t } = useTranslation('mainLayout');
@@ -49,7 +49,7 @@ const IdentityList = forwardRef<HTMLDivElement, Props>(({ className, onSelect },
             }}
             onNew={() => nav(absoluteRoutes.home.identities.add.path)}
             entities={identities}
-            getKey={(a) => a.index}
+            getKey={(a) => a.id}
             newText={t('accountList.new')}
             ref={ref}
         >

@@ -63,7 +63,7 @@ const identityIssuance: ExtensionMessageHandler = (msg) => {
         })
         .then((tab) => {
             // TODO: handle the tab being closed.
-            const closedListener = (tabId) => {
+            const closedListener = (tabId: number) => {
                 if (tabId === tab.id) {
                     respond({
                         status: 'Aborted',
@@ -76,7 +76,7 @@ const identityIssuance: ExtensionMessageHandler = (msg) => {
                 chrome.webRequest.onBeforeRedirect.addListener(
                     function redirectListener(details) {
                         if (details.redirectUrl.includes(redirectUri)) {
-                            chrome.webRequest.onBeforeRequest.removeListener(redirectListener);
+                            chrome.webRequest.onBeforeRedirect.removeListener(redirectListener);
                             resolve(details.redirectUrl);
                         }
                     },
@@ -94,7 +94,9 @@ const identityIssuance: ExtensionMessageHandler = (msg) => {
             });
             onComplete.then((url) => {
                 chrome.tabs.onRemoved.removeListener(closedListener);
-                chrome.tabs.remove(tab.id);
+                if (tab.id !== undefined) {
+                    chrome.tabs.remove(tab.id);
+                }
                 respond({
                     status: 'Success',
                     result: url.substring(url.indexOf(codeUriKey) + codeUriKey.length),

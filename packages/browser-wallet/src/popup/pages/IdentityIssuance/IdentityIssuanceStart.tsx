@@ -1,22 +1,23 @@
 import React, { useState, useEffect } from 'react';
 import { useAtomValue, useAtom } from 'jotai';
 import { useTranslation } from 'react-i18next';
-import { jsonRpcUrlAtom, pendingIdentitiesAtom } from '@popup/store/settings';
+import { jsonRpcUrlAtom, pendingIdentityAtom, identitiesAtom } from '@popup/store/settings';
 import PageHeader from '@popup/shared/PageHeader';
 import { popupMessageHandler } from '@popup/shared/message-handler';
 import { getIdentityProviders, IdentityProvider } from '@shared/utils/wallet-proxy';
 import { InternalMessageType } from '@concordium/browser-wallet-message-hub';
 import { createIdentityRequest, JsonRpcClient, HttpProvider } from '@concordium/web-sdk';
-import { Network } from '@shared/storage/types';
+import { IdentityStatus, Network } from '@shared/storage/types';
 import Button from '@popup/shared/Button';
 
 const redirectUri = 'ConcordiumRedirectToken';
 
-export default function IdentityIssuanceStart() {
+function IdentityIssuanceStart() {
     const { t } = useTranslation('identityIssuance');
     const [providers, setProviders] = useState<IdentityProvider[]>([]);
     const jsonRrcUrl = useAtomValue(jsonRpcUrlAtom);
-    const [pendingIdentities, updatePendingIdentities] = useAtom(pendingIdentitiesAtom);
+    const [, updatePendingIdentity] = useAtom(pendingIdentityAtom);
+    const identities = useAtomValue(identitiesAtom);
     // const { onClose, withClose } = useContext(fullscreenPromptContext);
 
     useEffect(() => {
@@ -64,17 +65,15 @@ export default function IdentityIssuanceStart() {
             url = `${urlString}?${searchParams.toString()}`;
         }
 
-        updatePendingIdentities(
-            pendingIdentities.concat([
-                {
-                    // TODO Use total identity amount for this
-                    name: `Identity ${pendingIdentities.length}`,
-                    index: identityIndex,
-                    network: Network[net],
-                    provider: provider.ipInfo.ipIdentity,
-                },
-            ])
-        );
+        updatePendingIdentity({
+            id: identities.length,
+            // TODO Find a good way to assign indices
+            status: IdentityStatus.Pending,
+            index: identityIndex,
+            name: `Identity ${identities.length}`,
+            network: Network[net],
+            provider: provider.ipInfo.ipIdentity,
+        });
 
         popupMessageHandler.sendInternalMessage(InternalMessageType.StartIdentityIssuance, { url });
     };
@@ -88,4 +87,19 @@ export default function IdentityIssuanceStart() {
             ))}
         </>
     );
+}
+
+export default function IdentityIssuanceStartGuard() {
+    const { t } = useTranslation('identityIssuance');
+    const [pendingIdentity, setPendingidentity] = useAtom(pendingIdentityAtom);
+
+    if (pendingIdentity) {
+        return (
+            <>
+                <p>{t('alreadyPending')}</p>
+                <Button onClick={() => setPendingidentity(undefined)}>Reset</Button>
+            </>
+        );
+    }
+    return <IdentityIssuanceStart />;
 }
