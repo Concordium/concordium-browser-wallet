@@ -1,10 +1,10 @@
 import React, { useEffect, MouseEventHandler } from 'react';
 import clsx from 'clsx';
+import { useTimeoutState } from 'wallet-common-helpers';
 
 import CopyIcon from '@assets/svg/copy.svg';
 import CheckmarkIcon from '@assets/svg/checkmark-blue.svg';
 import IconButton, { IconButtonProps } from '../IconButton';
-import { useTimeoutState } from '../utils/hooks';
 
 type Props = Omit<IconButtonProps, 'children'> & {
     value: string;
