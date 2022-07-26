@@ -1,5 +1,11 @@
 # Changelog
 
+## 0.2.1
+
+### Fixed
+
+-   Sending V1 contracts updates/initializations with parameters now works.
+
 ## 0.2.0
 
 ### Added

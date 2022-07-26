@@ -66,21 +66,15 @@ const deposit = (amount = 0) => {
     detectConcordiumProvider()
         .then((provider) => {
             provider
-                .sendTransaction(
-                    AccountTransactionType.UpdateSmartContractInstance,
-                    {
-                        amount: new GtuAmount(BigInt(amount)),
-                        contractAddress: {
-                            index: CONTRACT_INDEX,
-                            subindex: CONTRACT_SUB_INDEX,
-                        },
-                        receiveName: `${CONTRACT_NAME}.insert`,
-                        maxContractExecutionEnergy: 30000n,
-                    } as UpdateContractPayload,
-                    undefined,
-                    undefined,
-                    0
-                )
+                .sendTransaction(AccountTransactionType.UpdateSmartContractInstance, {
+                    amount: new GtuAmount(BigInt(amount)),
+                    contractAddress: {
+                        index: CONTRACT_INDEX,
+                        subindex: CONTRACT_SUB_INDEX,
+                    },
+                    receiveName: `${CONTRACT_NAME}.insert`,
+                    maxContractExecutionEnergy: 30000n,
+                } as UpdateContractPayload)
                 .then((txHash) =>
                     console.log(`https://testnet.ccdscan.io/?dcount=1&dentity=transaction&dhash=${txHash}`)
                 )
@@ -99,21 +93,15 @@ const smash = () => {
     detectConcordiumProvider()
         .then((provider) => {
             provider
-                .sendTransaction(
-                    AccountTransactionType.UpdateSmartContractInstance,
-                    {
-                        amount: new GtuAmount(0n), // This feels weird? Why do I need an amount for a non-payable receive?
-                        contractAddress: {
-                            index: CONTRACT_INDEX,
-                            subindex: CONTRACT_SUB_INDEX,
-                        },
-                        receiveName: `${CONTRACT_NAME}.smash`,
-                        maxContractExecutionEnergy: 30000n,
-                    } as UpdateContractPayload,
-                    undefined,
-                    undefined,
-                    0
-                )
+                .sendTransaction(AccountTransactionType.UpdateSmartContractInstance, {
+                    amount: new GtuAmount(0n), // This feels weird? Why do I need an amount for a non-payable receive?
+                    contractAddress: {
+                        index: CONTRACT_INDEX,
+                        subindex: CONTRACT_SUB_INDEX,
+                    },
+                    receiveName: `${CONTRACT_NAME}.smash`,
+                    maxContractExecutionEnergy: 30000n,
+                } as UpdateContractPayload)
                 .then((txHash) =>
                     console.log(`https://testnet.ccdscan.io/?dcount=1&dentity=transaction&dhash=${txHash}`)
                 )

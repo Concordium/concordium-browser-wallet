@@ -37,9 +37,10 @@ const client = new JsonRpcClient(new HttpProvider(JSON_RPC_URL));
 type State = {
     isConnected: boolean;
     account: string | undefined;
+    jsonRpcUrl: string | undefined;
 };
 
-const state = createContext<State>({ isConnected: false, account: undefined });
+const state = createContext<State>({ isConnected: false, account: undefined, jsonRpcUrl: undefined });
 
 /**
  * Action for depositing an amount of microCCD to the piggy bank instance
@@ -52,21 +53,15 @@ const deposit = (amount = 0) => {
     detectConcordiumProvider()
         .then((provider) => {
             provider
-                .sendTransaction(
-                    AccountTransactionType.UpdateSmartContractInstance,
-                    {
-                        amount: new GtuAmount(BigInt(amount)),
-                        contractAddress: {
-                            index: CONTRACT_INDEX,
-                            subindex: CONTRACT_SUB_INDEX,
-                        },
-                        receiveName: `${CONTRACT_NAME}.insert`,
-                        maxContractExecutionEnergy: 30000n,
-                    } as UpdateContractPayload,
-                    undefined,
-                    undefined,
-                    1
-                )
+                .sendTransaction(AccountTransactionType.UpdateSmartContractInstance, {
+                    amount: new GtuAmount(BigInt(amount)),
+                    contractAddress: {
+                        index: CONTRACT_INDEX,
+                        subindex: CONTRACT_SUB_INDEX,
+                    },
+                    receiveName: `${CONTRACT_NAME}.insert`,
+                    maxContractExecutionEnergy: 30000n,
+                } as UpdateContractPayload)
                 .then((txHash) =>
                     console.log(`https://testnet.ccdscan.io/?dcount=1&dentity=transaction&dhash=${txHash}`)
                 )
@@ -85,21 +80,15 @@ const smash = () => {
     detectConcordiumProvider()
         .then((provider) => {
             provider
-                .sendTransaction(
-                    AccountTransactionType.UpdateSmartContractInstance,
-                    {
-                        amount: new GtuAmount(0n), // This feels weird? Why do I need an amount for a non-payable receive?
-                        contractAddress: {
-                            index: CONTRACT_INDEX,
-                            subindex: CONTRACT_SUB_INDEX,
-                        },
-                        receiveName: `${CONTRACT_NAME}.smash`,
-                        maxContractExecutionEnergy: 30000n,
-                    } as UpdateContractPayload,
-                    undefined,
-                    undefined,
-                    1
-                )
+                .sendTransaction(AccountTransactionType.UpdateSmartContractInstance, {
+                    amount: new GtuAmount(0n), // This feels weird? Why do I need an amount for a non-payable receive?
+                    contractAddress: {
+                        index: CONTRACT_INDEX,
+                        subindex: CONTRACT_SUB_INDEX,
+                    },
+                    receiveName: `${CONTRACT_NAME}.smash`,
+                    maxContractExecutionEnergy: 30000n,
+                } as UpdateContractPayload)
                 .then((txHash) =>
                     console.log(`https://testnet.ccdscan.io/?dcount=1&dentity=transaction&dhash=${txHash}`)
                 )
@@ -121,12 +110,12 @@ function updateState(setSmashed: (x: boolean) => void, setAmount: (x: bigint) =>
                 throw new Error(`Expected succesful invocation`);
             }
             setSmashed(!!Number(res.returnValue.substring(0, 2)));
-            setAmount(toBuffer(res.returnValue.substring(2), 'hex').readBigUInt64LE(0));
+            setAmount(toBuffer(res.returnValue.substring(2), 'hex').readBigUInt64LE(0) as bigint);
         });
 }
 
 function PiggyBank() {
-    const { account, isConnected } = useContext(state);
+    const { account, isConnected, jsonRpcUrl } = useContext(state);
     const [owner, setOwner] = useState<string>();
     const [smashed, setSmashed] = useState<boolean>();
     const [amount, setAmount] = useState<bigint>(0n);
@@ -157,6 +146,7 @@ function PiggyBank() {
             <div className={`connection-banner ${isConnected ? 'connected' : ''}`}>
                 {isConnected ? `Connected: ${account}` : 'No wallet connection'}
             </div>
+            <div>{jsonRpcUrl ? `JSON-RPC Url: ${jsonRpcUrl}` : 'No JSON-RPC Url yet'}</div>
             <br />
             {owner === undefined ? (
                 <div>Loading piggy bank...</div>
@@ -209,6 +199,7 @@ function PiggyBank() {
 export default function Root() {
     const [account, setAccount] = useState<string>();
     const [isConnected, setIsConnected] = useState<boolean>(false);
+    const [jsonRpcUrl, setJsonRpcUrl] = useState<string>();
 
     useEffect(() => {
         detectConcordiumProvider()
@@ -221,14 +212,15 @@ export default function Root() {
                         setIsConnected(true);
 
                         // Listen for relevant events from the wallet.
-                        provider.addChangeAccountListener(setAccount);
+                        provider.on('accountChanged', setAccount);
+                        provider.on('chainChanged', setJsonRpcUrl);
                     })
                     .catch(() => setIsConnected(false));
             })
             .catch(() => setIsConnected(false));
     }, []);
 
-    const stateValue: State = useMemo(() => ({ isConnected, account }), [isConnected, account]);
+    const stateValue: State = useMemo(() => ({ isConnected, account, jsonRpcUrl }), [isConnected, account, jsonRpcUrl]);
 
     return (
         // Setup a globally accessible state with data from the wallet.
