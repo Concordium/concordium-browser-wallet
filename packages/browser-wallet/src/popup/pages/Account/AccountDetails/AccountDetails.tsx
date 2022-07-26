@@ -1,6 +1,7 @@
 import clsx from 'clsx';
 import React from 'react';
 import { displayAsCcd } from 'wallet-common-helpers';
+import { useTranslation } from 'react-i18next';
 
 import { displaySplitAddress } from '@popup/shared/utils/account-helpers';
 import VerifiedIcon from '@assets/svg/verified-stamp.svg';
@@ -25,14 +26,15 @@ type Props = {
 };
 
 export default function AccountDetails({ expanded, account }: Props) {
+    const { t } = useTranslation('account', { keyPrefix: 'details' });
     return (
         <div className={clsx('account-page-details', expanded && 'account-page-details--expanded')}>
             <div className="account-page-details__address">{displaySplitAddress(account)}</div>
             <div className="account-page-details__id">Identity 1</div>
             <div className="account-page-details__balance">
-                <Amount label="Public balance total" amount={0n} />
-                <Amount label="Public amount at disposal" amount={0n} />
-                <Amount label="Stake / delegation amount" amount={0n} />
+                <Amount label={t('total')} amount={0n} />
+                <Amount label={t('atDisposal')} amount={0n} />
+                <Amount label={t('stakeAmount')} amount={0n} />
             </div>
             <VerifiedIcon className="account-page-details__stamp" />
         </div>
