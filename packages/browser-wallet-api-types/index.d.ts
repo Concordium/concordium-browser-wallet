@@ -2,6 +2,7 @@ import type {
     AccountTransactionPayload,
     AccountTransactionSignature,
     AccountTransactionType,
+    SchemaVersion,
 } from '@concordium/web-sdk';
 
 // eslint-disable-next-line @typescript-eslint/no-explicit-any
@@ -20,6 +21,7 @@ export interface WalletApi {
      * @param payload the payload of the transaction to be signed and sent.
      * @param parameters parameters for the initContract and updateContract transactions in JSON-like format.
      * @param schema schema used for the initContract and updateContract transactions to serialize the parameters. Should be base64 encoded.
+     * @param schemaVersion version of the schema provided. Must be supplied for schemas that use version 0 or 1, as they don't have the version embedded.
      */
     sendTransaction(
         type:
@@ -27,7 +29,8 @@ export interface WalletApi {
             | AccountTransactionType.InitializeSmartContractInstance,
         payload: AccountTransactionPayload,
         parameters: Record<string, unknown>,
-        schema: string
+        schema: string,
+        schemaVersion?: SchemaVersion
     ): Promise<string>;
     /**
      * Sends a transaction to the Concordium Wallet and awaits the users action. Note that a header is not sent, and will be constructed by the wallet itself.

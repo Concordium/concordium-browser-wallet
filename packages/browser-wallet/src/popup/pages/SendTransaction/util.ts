@@ -4,6 +4,7 @@ import {
     UpdateContractPayload,
     serializeUpdateContractParameters,
     AccountTransactionPayload,
+    SchemaVersion,
 } from '@concordium/web-sdk';
 import { Buffer } from 'buffer/';
 import { parse } from '@concordium/browser-wallet-api/src/util';
@@ -23,7 +24,8 @@ export function parsePayload(
     type: AccountTransactionType,
     stringifiedPayload: string,
     parameters?: Record<string, unknown>,
-    schema?: string
+    schema?: string,
+    schemaVersion?: SchemaVersion
 ): HeadlessTransaction {
     const payload = parse(stringifiedPayload);
 
@@ -37,7 +39,8 @@ export function parsePayload(
                           contractName,
                           functionName,
                           parameters,
-                          Buffer.from(schema, 'base64')
+                          Buffer.from(schema, 'base64'),
+                          schemaVersion || 0
                       )
                     : Buffer.alloc(0);
             // Overwrite whatever parameter has been provided. Ensures that what we show and what is signed is the same.

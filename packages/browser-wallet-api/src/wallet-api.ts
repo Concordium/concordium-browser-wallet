@@ -4,7 +4,12 @@ import {
     EventType,
     MessageType,
 } from '@concordium/browser-wallet-message-hub';
-import { AccountTransactionPayload, AccountTransactionSignature, AccountTransactionType } from '@concordium/web-sdk';
+import {
+    AccountTransactionPayload,
+    AccountTransactionSignature,
+    AccountTransactionType,
+    SchemaVersion,
+} from '@concordium/web-sdk';
 import { WalletApi as IWalletApi, WalletEventHandler } from '@concordium/browser-wallet-api-types';
 import { stringify } from './util';
 
@@ -61,13 +66,15 @@ class WalletApi implements IWalletApi {
         type: AccountTransactionType,
         payload: AccountTransactionPayload,
         parameters?: Record<string, unknown>,
-        schema?: string
+        schema?: string,
+        schemaVersion?: SchemaVersion
     ): Promise<string> {
         const response = await this.sendMessage<string | undefined>(MessageType.SendTransaction, {
             type,
             payload: stringify(payload),
             parameters,
             schema,
+            schemaVersion,
         });
 
         if (!response) {
