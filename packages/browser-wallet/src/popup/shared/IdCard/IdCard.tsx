@@ -1,12 +1,12 @@
 import clsx from 'clsx';
 import React, { useState } from 'react';
+import { useTranslation } from 'react-i18next';
 
 import VerfifiedIcon from '@assets/svg/verified-stamp.svg';
 import RejectedIcon from '@assets/svg/rejected-stamp.svg';
 import CheckIcon from '@assets/svg/checkmark-blue.svg';
 import EditIcon from '@assets/svg/edit.svg';
 import ConcordiumIcon from '@assets/svg/concordium-small.svg';
-import { useTranslation } from 'react-i18next';
 import Form from '../Form';
 import Submit from '../Form/Submit';
 import Button from '../Button';

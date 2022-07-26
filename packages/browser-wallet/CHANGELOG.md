@@ -1,5 +1,11 @@
 # Changelog
 
+## Unreleased
+
+### Added
+
+-   Added display of address as text and qr code in the "receive ccd" section.
+
 ## 0.2.1
 
 ### Fixed

@@ -7,7 +7,7 @@ import {
     storedUrlWhitelist,
 } from '@shared/storage/access';
 import { ChromeStorageKey } from '@shared/storage/types';
-import { atom } from 'jotai';
+import { atom, WritableAtom } from 'jotai';
 
 const accessorMap = {
     [ChromeStorageKey.Credentials]: storedCredentials,
@@ -17,11 +17,27 @@ const accessorMap = {
     [ChromeStorageKey.Theme]: storedTheme,
 };
 
+export type AsyncWrapper<V> = {
+    loading: boolean;
+    value: V;
+};
+
+export function atomWithChromeStorage<V>(
+    key: ChromeStorageKey,
+    fallback: V,
+    withLoading: true
+): WritableAtom<AsyncWrapper<V>, V, void>;
+export function atomWithChromeStorage<V>(
+    key: ChromeStorageKey,
+    fallback: V,
+    withLoading?: false
+): WritableAtom<V, V, void>;
+
 /**
  * @description
  * Create an atom that automatically syncs with chrome local storage.
  */
-export const atomWithChromeStorage = <V>(key: ChromeStorageKey, fallback: V) => {
+export function atomWithChromeStorage<V>(key: ChromeStorageKey, fallback: V, withLoading = false) {
     const accessor = accessorMap[key] as unknown as StorageAccessor<V>;
 
     if (accessor === undefined) {
@@ -29,19 +45,24 @@ export const atomWithChromeStorage = <V>(key: ChromeStorageKey, fallback: V) => 
     }
 
     const { get: getStoredValue, set: setStoredValue } = accessor;
-    const base = atom<V | undefined>(undefined);
+    const base = atom<AsyncWrapper<V>>({ loading: true, value: fallback });
 
     base.onMount = (setValue) => {
-        getStoredValue().then(setValue);
+        getStoredValue().then((value) =>
+            setValue({
+                loading: false,
+                value: value ?? fallback,
+            })
+        );
     };
 
     const derived = atom(
-        async (get) => get(base) ?? (await getStoredValue()) ?? fallback,
+        (get) => (withLoading ? get(base) : get(base).value),
         (_, set, next: V) => {
             setStoredValue(next);
-            set(base, next);
+            set(base, (v) => ({ ...v, value: next }));
         }
     );
 
     return derived;
-};
+}

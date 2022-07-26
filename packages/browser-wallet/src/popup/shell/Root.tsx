@@ -1,6 +1,5 @@
 import { Provider, useAtomValue } from 'jotai';
-import React, { ReactElement, Suspense, useEffect } from 'react';
-import { useTranslation } from 'react-i18next';
+import React, { ReactElement, useEffect } from 'react';
 import { MemoryRouter } from 'react-router-dom';
 import { InternalMessageType } from '@concordium/browser-wallet-message-hub';
 import { noOp } from 'wallet-common-helpers';
@@ -63,18 +62,14 @@ function Theme({ children }: { children: ReactElement }) {
 }
 
 export default function Root() {
-    const { t } = useTranslation();
     useScaling();
 
     return (
         <Provider>
             <MemoryRouter>
-                {/* The Suspense is needed here due to async atoms loading stuff from storage */}
-                <Suspense fallback={t('root.loading')}>
-                    <Theme>
-                        <Routes />
-                    </Theme>
-                </Suspense>
+                <Theme>
+                    <Routes />
+                </Theme>
             </MemoryRouter>
         </Provider>
     );

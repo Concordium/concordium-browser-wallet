@@ -1,8 +1,7 @@
 import clsx from 'clsx';
 import React, { InputHTMLAttributes, useCallback, useLayoutEffect, useRef, useState } from 'react';
-import { noOp } from 'wallet-common-helpers';
+import { noOp, useUpdateEffect } from 'wallet-common-helpers';
 
-import { useUpdateEffect } from '../../utils/hooks';
 import { scaleFieldWidth } from '../../utils/htmlHelpers';
 import { CommonFieldProps, RequiredControlledFieldProps } from '../common/types';
 import { makeControlled } from '../common/utils';

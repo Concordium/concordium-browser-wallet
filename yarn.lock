@@ -1735,7 +1735,7 @@ __metadata:
     tsconfig-paths-webpack-plugin: ^3.5.2
     typescript: ^4.3.5
     uuid: ^8.3.2
-    wallet-common-helpers: "https://github.com/Concordium/wallet-common-helpers.git#089d4451a90c1fbbfe6d539531cbf8f18dbcec75"
+    wallet-common-helpers: "https://github.com/Concordium/concordium-wallet-common-helpers.git#0d9ab94e7f82ed031ac42b002c87d4b9f4bbe20e"
   languageName: unknown
   linkType: soft
 
@@ -15414,6 +15414,15 @@ __metadata:
   languageName: node
   linkType: hard
 
+"qrcode.react@npm:^3.1.0":
+  version: 3.1.0
+  resolution: "qrcode.react@npm:3.1.0"
+  peerDependencies:
+    react: ^16.8.0 || ^17.0.0 || ^18.0.0
+  checksum: 94a2942ecf83f461d869adb20305ae663c6d1abe93ef2c72442b07d756ce70cf6deb6fd588dc5b382b48c6991cfde1dfd5ac9b814c1461e71d5edb2d945e67fc
+  languageName: node
+  linkType: hard
+
 "qs@npm:6.10.3":
   version: 6.10.3
   resolution: "qs@npm:6.10.3"
@@ -18845,15 +18854,20 @@ __metadata:
   languageName: node
   linkType: hard
 
-"wallet-common-helpers@https://github.com/Concordium/wallet-common-helpers.git#089d4451a90c1fbbfe6d539531cbf8f18dbcec75":
+"wallet-common-helpers@https://github.com/Concordium/concordium-wallet-common-helpers.git#0d9ab94e7f82ed031ac42b002c87d4b9f4bbe20e":
   version: 1.5.0
-  resolution: "wallet-common-helpers@https://github.com/Concordium/wallet-common-helpers.git#commit=089d4451a90c1fbbfe6d539531cbf8f18dbcec75"
+  resolution: "wallet-common-helpers@https://github.com/Concordium/concordium-wallet-common-helpers.git#commit=0d9ab94e7f82ed031ac42b002c87d4b9f4bbe20e"
   dependencies:
     "@concordium/common-sdk": ^1.0.1
     buffer: ^6.0.3
     cbor: ^8.0.0
+    clsx: ^1.1.1
+    qrcode.react: ^3.1.0
     typescript: 4
-  checksum: 50ca27a54daf887a30178dabcc08e2ea8f7bcd7e43d0696e8c2b8e5743e56d3e3faae7e871dd558caed081c155ec4873cbaf6ac1b527e291d89575ddb7141b3a
+  peerDependencies:
+    react: ">=16"
+    react-dom: ">=16"
+  checksum: 0b15c07c9849339ea5918430aa6a79f1062268ac0f0871475fd3690eee01f140702c82f45a8241875fc02c6a4607a1b770ce33215a7bf1d159ebe4ffd2c932f5
   languageName: node
   linkType: hard
 
