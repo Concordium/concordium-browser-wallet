@@ -62,3 +62,37 @@ body {
 #root {
     height: 100%;
 }
+
+// Scrollbar section inspired by https://stackoverflow.com/questions/21684101/css-vertical-scrollbar-padding-left-right-in-ul-possible
+::-webkit-scrollbar {
+    // TODO cross-browser compatibility
+    width: rem(12px);
+    height: rem(12px);
+}
+
+::-webkit-scrollbar-thumb {
+    // TODO cross-browser compatibility
+    cursor: pointer;
+    height: rem(30px);
+    border: rem(4px) solid rgb(0 0 0 / 0%);
+    background-clip: padding-box;
+    border-radius: rem(10px);
+    background-color: rgba(#aaa, 0.3);
+    box-shadow: inset -1px -1px 0 rgb(0 0 0 / 5%), inset 1px 1px 0 rgb(0 0 0 / 5%);
+}
+
+a {
+    @include transition(color, 0.1s);
+
+    &,
+    &:visited,
+    &:active,
+    &:hover {
+        color: $color-text;
+        text-decoration: none;
+    }
+
+    &:hover {
+        color: $color-cta;
+    }
+}

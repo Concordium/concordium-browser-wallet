@@ -1,8 +1,11 @@
-import { PolymorphicComponentProps } from '@shared/utils/types';
 import clsx from 'clsx';
 import React, { ButtonHTMLAttributes, ElementType } from 'react';
+import { PolymorphicComponentProps } from 'wallet-common-helpers';
 
-type Props = Pick<ButtonHTMLAttributes<HTMLButtonElement>, 'type' | 'children' | 'disabled' | 'className'> & {
+export type ButtonProps = Pick<
+    ButtonHTMLAttributes<HTMLButtonElement>,
+    'type' | 'children' | 'disabled' | 'className' | 'onClick' | 'onMouseUp' | 'tabIndex'
+> & {
     /**
      * Clears all styling from button.
      */
@@ -12,13 +15,16 @@ type Props = Pick<ButtonHTMLAttributes<HTMLButtonElement>, 'type' | 'children' |
      */
     faded?: boolean;
     /**
+     * Renders button in red.
+     */
+    danger?: boolean;
+    /**
      * Defaults to "dynamic", i.e. "width: auto;"
      */
     width?: 'wide' | 'narrow' | 'dynamic';
-    onClick?(): void;
 };
 
-type PolymorphicProps<A extends ElementType = 'button'> = PolymorphicComponentProps<A, Props>;
+type PolymorphicProps<A extends ElementType = 'button'> = PolymorphicComponentProps<A, ButtonProps>;
 
 /**
  * @description
@@ -29,6 +35,7 @@ export default function Button<A extends ElementType = 'button'>({
     className,
     clear = false,
     faded = false,
+    danger = false,
     width = 'dynamic',
     type = 'button',
     ...props
@@ -43,6 +50,7 @@ export default function Button<A extends ElementType = 'button'>({
                 'button',
                 clear && 'button--clear',
                 faded && 'button--faded',
+                danger && 'button--danger',
                 width === 'narrow' && 'button--narrow',
                 width === 'wide' && 'button--wide',
                 className

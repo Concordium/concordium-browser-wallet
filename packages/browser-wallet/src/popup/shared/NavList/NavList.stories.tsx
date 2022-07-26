@@ -1,4 +1,4 @@
-/* eslint-disable react/function-component-definition, import/no-extraneous-dependencies, react/destructuring-assignment */
+/* eslint-disable react/function-component-definition, react/destructuring-assignment */
 import React from 'react';
 import { ComponentMeta, ComponentStory } from '@storybook/react';
 import NavList from './NavList';

@@ -9,11 +9,27 @@ type RouteChildren = {
 export const relativeRoutes = {
     home: {
         path: '/',
+        account: {
+            path: 'account',
+            add: { path: 'add' },
+        },
         identities: {
             path: 'identities',
         },
         settings: {
             path: 'settings',
+            passcode: {
+                path: 'passcode',
+            },
+            network: {
+                path: 'network',
+            },
+            visual: {
+                path: 'visual',
+            },
+            about: {
+                path: 'about',
+            },
         },
     },
     prompt: {

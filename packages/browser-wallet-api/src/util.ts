@@ -1,11 +1,12 @@
 /* eslint-disable @typescript-eslint/no-explicit-any */
-import { GtuAmount, AccountAddress } from '@concordium/web-sdk';
+import { GtuAmount, AccountAddress, ModuleReference } from '@concordium/web-sdk';
 
 const types = {
     BigInt: 'bigint',
     Date: 'date',
     GtuAmount: 'gtuAmount',
     AccountAddress: 'accountAddress',
+    ModuleReference: 'moduleReference',
 };
 
 function isGtuAmount(cand: any): cand is GtuAmount {
@@ -14,6 +15,10 @@ function isGtuAmount(cand: any): cand is GtuAmount {
 
 function isAccountAddress(cand: any): cand is AccountAddress {
     return cand && typeof cand.address === 'string' && cand.address.length === 50;
+}
+
+function isModuleReference(cand: any): cand is ModuleReference {
+    return cand && typeof cand.moduleRef === 'string' && cand.moduleRef.length === 64;
 }
 
 function replacer(this: any, k: string, v: any) {
@@ -28,6 +33,9 @@ function replacer(this: any, k: string, v: any) {
     }
     if (isAccountAddress(v)) {
         return { '@type': types.AccountAddress, value: v.address };
+    }
+    if (isModuleReference(v)) {
+        return { '@type': types.ModuleReference, value: v.moduleRef };
     }
     return v;
 }
@@ -51,6 +59,8 @@ export function parse(input: string | undefined) {
                     return new GtuAmount(BigInt(v.value));
                 case types.AccountAddress:
                     return new AccountAddress(v.value);
+                case types.ModuleReference:
+                    return new ModuleReference(v.value);
                 default:
                     return v;
             }

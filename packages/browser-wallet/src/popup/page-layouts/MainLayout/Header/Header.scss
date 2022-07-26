@@ -1,5 +1,4 @@
 .main-layout-header {
-    height: rem(40px);
     position: relative;
     z-index: 1;
 
@@ -14,6 +13,7 @@
         display: flex;
         align-items: center;
         justify-content: center;
+        overflow: hidden;
     }
 
     &__logo {
@@ -26,25 +26,66 @@
 
             path {
                 fill: $color-text;
-                transition: fill $transition-timing $transition-easing;
+                @include transition(fill);
 
-                .main-layout-header--open & {
+                .main-layout-header--nav-open & {
                     fill: $color-blue;
                 }
             }
         }
     }
 
-    &__nav {
-        transform: translateY(-100%);
-        position: relative;
-        z-index: -1;
-        transition: transform $transition-timing $transition-easing;
-        text-align: center;
+    &__title {
+        cursor: default;
 
-        .main-layout-header--open & {
-            transform: translateY(0);
+        &--has-dropdown {
+            cursor: pointer;
         }
+    }
+
+    &__page-dropdown-button {
+        display: flex;
+        position: absolute;
+        right: rem(-5px);
+        transform: translate(100%, rem(1px)) rotate(-90deg);
+
+        svg {
+            width: rem(6px);
+
+            path {
+                fill: $color-text;
+            }
+        }
+
+        &--open {
+            transform: translate(100%, rem(1px)) rotate(90deg);
+        }
+    }
+
+    &__close {
+        position: absolute;
+        right: rem(15px);
+        display: flex;
+
+        svg {
+            width: rem(12px);
+
+            path {
+                fill: $color-text;
+            }
+        }
+    }
+
+    &__page-dropdown,
+    &__nav {
+        position: absolute;
+        z-index: -1;
+        width: 100%;
+    }
+
+    &__nav {
+        padding: 0 rem(15px);
+        text-align: center;
     }
 
     &__nav-item {
@@ -56,6 +97,12 @@
 
         &:not(.main-layout-header__nav-item--active) {
             font-weight: $font-weight-light;
+        }
+
+        &--active {
+            &:hover {
+                color: $color-text;
+            }
         }
 
         svg {

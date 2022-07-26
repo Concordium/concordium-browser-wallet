@@ -3,37 +3,11 @@
     <head>
         <title>My cool dapp</title>
         <script src="../../node_modules/@concordium/web-sdk/lib/concordium.min.js"></script>
+        <script src="../../packages/browser-wallet-api-helpers/lib/concordiumHelpers.min.js"></script>
         <meta charset="utf-8" />
         <script>
-            // TODO Use the web-sdk when this function has been added there.
-            async function detectConcordiumProvider(timeout = 5000) {
-                return new Promise((resolve, reject) => {
-                    if (window.concordium) {
-                        resolve(window.concordium);
-                    } else {
-                        const t = setTimeout(() => {
-                            if (window.concordium) {
-                                resolve(window.concordium);
-                            } else {
-                                reject();
-                            }
-                        }, timeout);
-                        window.addEventListener(
-                            'concordium#initialized',
-                            () => {
-                                if (window.concordium) {
-                                    clearTimeout(t);
-                                    resolve(window.concordium);
-                                }
-                            },
-                            { once: true }
-                        );
-                    }
-                });
-            }
-
             async function setupPage() {
-                const provider = await detectConcordiumProvider();
+                const provider = await concordiumHelpers.detectConcordiumProvider();
 
                 document
                     .getElementById('connect')
@@ -60,7 +34,7 @@
                         .sendTransaction(concordiumSDK.AccountTransactionType.UpdateSmartContractInstance, {
                             amount: new concordiumSDK.GtuAmount(1n),
                             contractAddress: {
-                                index: 11n,
+                                index: 98n,
                                 subindex: 0n,
                             },
                             receiveName: 'two-step-transfer.deposit',
@@ -76,7 +50,7 @@
                             {
                                 amount: new concordiumSDK.GtuAmount(1n),
                                 contractAddress: {
-                                    index: 11n,
+                                    index: 98n,
                                     subindex: 0n,
                                 },
                                 receiveName: 'two-step-transfer.receive',
@@ -90,7 +64,34 @@
                         .then(alert)
                         .catch(alert)
                 );
-                provider.addChangeAccountListener(alert);
+                document.getElementById('sendInit').addEventListener('click', () =>
+                    provider
+                        .sendTransaction(
+                            concordiumSDK.AccountTransactionType.InitializeSmartContractInstance,
+                            {
+                                amount: new concordiumSDK.GtuAmount(1n),
+                                moduleRef: new concordiumSDK.ModuleReference(
+                                    '6eab4584bd60b1d82fba3abe16082cde3dbee4c08c9f60b6dc523688bdc421b9'
+                                ),
+                                contractName: 'two-step-transfer',
+                                maxContractExecutionEnergy: 30000n,
+                            },
+                            {
+                                account_holders: [
+                                    '3WsDGXwykn1onhmqVGMknMMVBzvjYYKZ3VGoTczWSnv2MuR7St',
+                                    '3FVMj8WoA13m8Ha5JhZWfChugrCqbSbkjavU47yauu7a5YKNuP',
+                                ],
+                                transfer_agreement_threshold: 2,
+                                transfer_request_ttl: '1h',
+                            },
+                            'AQAAABEAAAB0d28tc3RlcC10cmFuc2ZlcgEUAAIAAAALAAAAaW5pdF9wYXJhbXMUAAMAAAAPAAAAYWNjb3VudF9ob2xkZXJzEQALHAAAAHRyYW5zZmVyX2FncmVlbWVudF90aHJlc2hvbGQCFAAAAHRyYW5zZmVyX3JlcXVlc3RfdHRsDggAAAByZXF1ZXN0cxIBBRQABAAAAA8AAAB0cmFuc2Zlcl9hbW91bnQKDgAAAHRhcmdldF9hY2NvdW50CwwAAAB0aW1lc19vdXRfYXQNCgAAAHN1cHBvcnRlcnMRAgsBFAADAAAADwAAAGFjY291bnRfaG9sZGVycxEACxwAAAB0cmFuc2Zlcl9hZ3JlZW1lbnRfdGhyZXNob2xkAhQAAAB0cmFuc2Zlcl9yZXF1ZXN0X3R0bA4BAAAABwAAAHJlY2VpdmUVAgAAAA8AAABSZXF1ZXN0VHJhbnNmZXIBAwAAAAUKCw8AAABTdXBwb3J0VHJhbnNmZXIBAwAAAAUKCw=='
+                        )
+                        .then(alert)
+                        .catch(alert)
+                );
+
+                provider.on('accountChanged', (accountAddres) => alert(accountAddres));
+                provider.on('chainChanged', (chain) => alert(chain));
             }
 
             setupPage();
@@ -99,6 +100,7 @@
 
     <body>
         <button id="connect">Connect</button>
+        <button id="sendInit">Initiate two step transfer contract</button>
         <button id="sendTransfer">Send transfer</button>
         <button id="sendDeposit">deposit in two step transfer</button>
         <button id="sendReceive">Initiate Receive in two step transfer</button>

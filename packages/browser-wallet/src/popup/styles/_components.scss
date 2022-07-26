@@ -5,16 +5,23 @@
 @import '../shared/IdCard/IdCard';
 @import '../shared/PageHeader/PageHeader';
 @import '../shared/NavList/NavList';
+@import '../shared/IconButton/IconButton';
+@import '../shared/CopyButton/CopyButton';
+@import '../shared/CloseButton/CloseButton';
 
 // Pages
 @import '../pages/Account/Account';
+@import '../pages/Account/AccountActions/AccountActions';
 @import '../pages/SignMessage/SignMessage';
 @import '../pages/SendTransaction/SendTransaction';
 @import '../pages/SendTransaction/displayTransaction/DisplayTransaction';
 @import '../pages/Setup/Setup';
 @import '../pages/ConnectionRequest/ConnectionRequest';
+@import '../pages/Settings/Settings';
 
 // Layouts
 @import '../page-layouts/MainLayout/MainLayout';
 @import '../page-layouts/MainLayout/Header/Header';
+@import '../page-layouts/MainLayout/EntityList/EntityList';
+@import '../page-layouts/MainLayout/AccountList/AccountList';
 @import '../page-layouts/FullscreenPromptLayout/FullscreenPromptLayout';

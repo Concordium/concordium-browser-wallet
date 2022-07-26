@@ -1,0 +1,113 @@
+$entity-list-top-height: rem(25px);
+
+.entity-list {
+    background-color: $color-bg;
+
+    &__top {
+        position: relative;
+        display: grid;
+        grid-template-columns: 50% 50%;
+        align-items: center;
+        height: $entity-list-top-height;
+        border: 1px solid $color-petroleum;
+        border-top: none;
+
+        &--search-focus {
+            grid-template-columns: auto rem(25px);
+        }
+    }
+
+    &__search,
+    &__new-entity {
+        height: 100%;
+        width: 100%;
+        padding: 0 rem(10px);
+        @include transition(box-shadow);
+
+        &:focus {
+            outline: none;
+            box-shadow: inset 0 0 0 1px $color-petroleum;
+        }
+    }
+
+    &__search {
+        background-color: $color-bg;
+        border: none;
+        border-right: 1px solid $color-petroleum;
+        padding-right: rem(25px);
+        color: $color-text;
+
+        &:focus {
+            outline: none;
+        }
+    }
+
+    &__search-icon,
+    &__new-entity-icon {
+        position: absolute;
+        right: rem(12.5px);
+        transform: translateX(50%);
+
+        path {
+            fill: $color-text;
+        }
+    }
+
+    &__search-icon {
+        width: rem(13px);
+    }
+
+    &__new-entity-icon {
+        width: rem(11px);
+    }
+
+    &__new-entity {
+        display: flex;
+        align-items: center;
+        overflow: hidden;
+        color: $color-text;
+    }
+
+    &__new-entity-text {
+        white-space: nowrap;
+
+        .entity-list__top--search-focus & {
+            display: none;
+        }
+    }
+
+    &__options {
+        overflow: overlay;
+        position: relative; // This needs to be here, otherwise automatic scroll to focused element doesn't work...
+        max-height: calc(100vh - #{$entity-list-top-height} - #{$main-layout-header-height});
+        border-bottom: 1px solid $color-petroleum;
+    }
+
+    &__submit {
+        display: none;
+    }
+
+    &__no-matches {
+        padding: rem(7px) rem(15px);
+        border-bottom: 1px solid $color-petroleum;
+    }
+}
+
+.entity-list-item {
+    display: block;
+    cursor: pointer;
+
+    input[type='radio'] {
+        opacity: 0;
+        position: absolute;
+    }
+
+    &__content {
+        margin: 0 rem(15px);
+        padding: rem(7px) 0;
+
+        .entity-list-item:not(:last-of-type) & {
+            border-bottom: 1px dotted $color-petroleum;
+        }
+    }
+}

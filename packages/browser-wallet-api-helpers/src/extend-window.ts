@@ -1,4 +1,4 @@
-import { WalletApi } from '.';
+import { WalletApi } from './wallet-api-types';
 
 declare global {
     interface Window {

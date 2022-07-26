@@ -1,5 +1,4 @@
 /* eslint-disable no-console */
-/* eslint-disable import/no-extraneous-dependencies */
 import esbuild from 'esbuild';
 import path from 'path';
 import { promises as fs } from 'fs';

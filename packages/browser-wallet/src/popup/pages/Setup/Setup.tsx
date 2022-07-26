@@ -11,6 +11,7 @@ import Submit from '@popup/shared/Form/Submit';
 import { jsonRpcUrlAtom, credentialsAtom } from '@popup/store/settings';
 import { WalletCredential } from '@shared/storage/types';
 import PageHeader from '@popup/shared/PageHeader';
+import { selectedAccountAtom } from '@popup/store/account';
 import ThemeSwitch from './ThemeSwitch';
 
 type FormValues = {
@@ -45,7 +46,10 @@ const formValuesAtom = atom<Partial<FormValues>, FormValues, void>(
         return { credentials: creds.map(credToCsvLine).join(lineSeparator), url };
     },
     (_, set, { credentials, url }: FormValues) => {
-        set(credentialsAtom, credsFromCsv(credentials));
+        const creds = credsFromCsv(credentials);
+
+        set(credentialsAtom, creds);
+        set(selectedAccountAtom, creds[0].address);
         set(jsonRpcUrlAtom, url);
     }
 );

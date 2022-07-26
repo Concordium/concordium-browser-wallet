@@ -1,4 +1,5 @@
-import { EventType, InternalMessageType, isEvent, isMessage, MessageType, WalletEvent, WalletMessage } from './message';
+import { EventType } from '@concordium/browser-wallet-api-helpers';
+import { InternalMessageType, isEvent, isMessage, MessageType, WalletEvent, WalletMessage } from './message';
 
 export const createMessageTypeFilter =
     (type: MessageType | InternalMessageType) =>

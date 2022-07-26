@@ -17,6 +17,7 @@ import {
 import { selectedAccountAtom } from '@popup/store/account';
 import { jsonRpcUrlAtom, credentialsAtom } from '@popup/store/settings';
 import DisplayUpdateContract from './displayTransaction/DisplayUpdateContract';
+import DisplayInitContract from './displayTransaction/DisplayInitContract';
 import DisplaySimpleTransfer from './displayTransaction/DisplaySimpleTransfer';
 import { parsePayload } from './util';
 
@@ -104,6 +105,9 @@ export default function SendTransaction({ onSubmit, onReject }: Props) {
             {transactionType === AccountTransactionType.SimpleTransfer && <DisplaySimpleTransfer payload={payload} />}
             {transactionType === AccountTransactionType.UpdateSmartContractInstance && (
                 <DisplayUpdateContract payload={payload} parameters={state.payload.parameters} />
+            )}
+            {transactionType === AccountTransactionType.InitializeSmartContractInstance && (
+                <DisplayInitContract payload={payload} parameters={state.payload.parameters} />
             )}
             <br />
             <button

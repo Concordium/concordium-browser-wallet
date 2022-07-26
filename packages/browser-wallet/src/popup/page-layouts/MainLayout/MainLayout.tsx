@@ -1,23 +1,25 @@
-import React from 'react';
+import React, { useState } from 'react';
 import { Outlet, Navigate } from 'react-router-dom';
 import { useAtomValue } from 'jotai';
+import clsx from 'clsx';
 
 import { absoluteRoutes } from '@popup/constants/routes';
-import { accountsAtom } from '@popup/store/account';
+import { jsonRpcUrlAtom } from '@popup/store/settings';
 import Header from './Header';
 
 export default function MainLayout() {
-    const accounts = useAtomValue(accountsAtom);
+    const jsonRpcUrl = useAtomValue(jsonRpcUrlAtom);
+    const [headerOpen, setHeaderOpen] = useState(false);
 
-    if (accounts.length === 0) {
+    if (!jsonRpcUrl) {
         // Force user to go through setup
         return <Navigate to={absoluteRoutes.setup.path} />;
     }
 
     return (
         <div className="main-layout">
-            <Header />
-            <main className="main-layout__main">
+            <Header className="main-layout__header" onToggle={setHeaderOpen} />
+            <main className={clsx('main-layout__main', headerOpen && 'main-layout__main--blur')}>
                 <Outlet />
             </main>
         </div>

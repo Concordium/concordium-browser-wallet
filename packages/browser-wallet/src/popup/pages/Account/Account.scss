@@ -1,6 +1,53 @@
+$account-page-actions-height: rem(36px);
+$account-page-details-height: rem(135px);
+
 .account-page {
-    &__select-account {
-        display: block;
+    &__content {
+        display: flex;
+        flex-direction: column;
+        align-items: center;
         width: 100%;
+        height: calc(100% - #{$account-page-actions-height});
+    }
+
+    &__details {
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        height: $account-page-details-height;
+        font-size: rem(12px);
+        padding: 0 rem(20px);
+        word-break: break-all;
+        background-color: $color-bg;
+        text-align: center;
+        width: 100%;
+        border-bottom: 1px solid $color-petroleum;
+    }
+
+    &__routes {
+        width: 100%;
+        height: calc(100% - #{$account-page-details-height});
+        display: flex;
+        justify-content: center;
+        position: relative;
+        overflow: overlay;
+
+        > div {
+            // TODO remove - only here to make temp content prettier.
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            height: 100%;
+        }
+    }
+
+    &__close {
+        position: absolute;
+        top: rem(10px);
+        right: rem(10px);
+    }
+
+    &__actions {
+        height: $account-page-actions-height;
     }
 }

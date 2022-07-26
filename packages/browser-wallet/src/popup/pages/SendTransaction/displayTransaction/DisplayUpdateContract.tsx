@@ -1,6 +1,7 @@
 import React from 'react';
 import { useTranslation } from 'react-i18next';
 import { UpdateContractPayload } from '@concordium/web-sdk';
+import { displayAsCcd } from 'wallet-common-helpers/lib/utils/ccd';
 
 interface Props {
     payload: UpdateContractPayload;
@@ -9,7 +10,7 @@ interface Props {
 
 /**
  * Displays an overview of a update contract transaction.
- * TODO: make nice, use displayAsCcd for amount
+ * TODO: make nice
  */
 export default function DisplayUpdateContract({ payload, parameters }: Props) {
     const { t } = useTranslation('sendTransaction');
@@ -23,7 +24,7 @@ export default function DisplayUpdateContract({ payload, parameters }: Props) {
             <h5>{t('receiveName')}:</h5>
             <p>{payload.receiveName}</p>
             <h5>{t('amount')}:</h5>
-            {payload.amount.microGtuAmount.toString()} {t('microCCD')}
+            {displayAsCcd(payload.amount.microGtuAmount)}
             <h5>{t('maxEnergy')}:</h5>
             <p>
                 {payload.maxContractExecutionEnergy.toString()} {t('nrg')}

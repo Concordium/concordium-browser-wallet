@@ -1,6 +1,6 @@
-import { ClassName, PropsOf } from '@shared/utils/types';
 import clsx from 'clsx';
 import React, { ReactElement } from 'react';
+import { ClassName, PropsOf } from 'wallet-common-helpers';
 import Button from '../Button';
 
 type Props = ClassName & {

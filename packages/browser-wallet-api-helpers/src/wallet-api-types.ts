@@ -5,15 +5,29 @@ import type {
     SchemaVersion,
 } from '@concordium/web-sdk';
 
-// eslint-disable-next-line @typescript-eslint/no-explicit-any
-export type WalletEventHandler<T = any> = (payload: T) => void;
+/**
+ * An enumeration of the events that can be emitted by the WalletApi.
+ */
+export enum EventType {
+    AccountChanged = 'accountChanged',
+    ChainChanged = 'chainChanged',
+}
 
-export interface WalletApi {
-    /**
-     * React to changes to the selected account in the Concordium Wallet. Note that to get the initially selected account on load, the "connect" method should be used.
-     * @param handler a handler function called with the account address of the selected account.
-     */
-    addChangeAccountListener(handler: WalletEventHandler<string>): void;
+// eslint-disable-next-line  @typescript-eslint/no-explicit-any
+type EventListener<Args extends any[]> = (...args: Args) => void;
+
+// eslint-disable-next-line  @typescript-eslint/no-explicit-any
+interface Listeners<T extends EventType, Args extends any[]> {
+    on(eventName: T | `${T}`, listener: EventListener<Args>): this;
+    once(eventName: T | `${T}`, listener: EventListener<Args>): this;
+    addListener(eventName: T | `${T}`, listener: EventListener<Args>): this;
+    removeListener(eventName: T | `${T}`, listener: EventListener<Args>): this;
+}
+
+type EventListeners = Listeners<EventType.AccountChanged, [accountAddress: string]> &
+    Listeners<EventType.ChainChanged, [chain: string]>;
+
+interface MainWalletApi {
     /**
      * Sends a transaction to the Concordium Wallet and awaits the users action. Note that a header is not sent, and will be constructed by the wallet itself.
      * Note that if the user rejects signing the transaction, this will throw an error.
@@ -50,4 +64,8 @@ export interface WalletApi {
      * If a connection has already been accepted for the url once the returned promise will resolve without prompting the user.
      */
     connect(): Promise<string | undefined>;
+
+    removeAllListeners(event?: EventType | string | undefined): this;
 }
+
+export type WalletApi = MainWalletApi & EventListeners;

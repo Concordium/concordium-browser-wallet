@@ -1,10 +1,10 @@
 import clsx from 'clsx';
 import React from 'react';
 import { useNavigate } from 'react-router-dom';
+import { ClassName } from 'wallet-common-helpers';
 
 import BackIcon from '@assets/svg/back-arrow.svg';
 import Logo from '@assets/svg/concordium.svg';
-import { ClassName } from '@shared/utils/types';
 import Button from '../Button';
 
 type BaseProps = ClassName & {

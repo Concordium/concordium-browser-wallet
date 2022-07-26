@@ -1,4 +1,4 @@
-/* eslint-disable react/function-component-definition, import/no-extraneous-dependencies */
+/* eslint-disable react/function-component-definition */
 import React from 'react';
 import { BrowserRouter, Link as RouterLink } from 'react-router-dom';
 import { ComponentMeta, ComponentStory } from '@storybook/react';
@@ -38,6 +38,12 @@ export const Faded = Template.bind({});
 Faded.args = {
     children: 'Button text',
     faded: true,
+};
+
+export const Danger = Template.bind({});
+Danger.args = {
+    children: 'Button text',
+    danger: true,
 };
 
 export const Disabled = Template.bind({});

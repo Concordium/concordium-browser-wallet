@@ -12,7 +12,7 @@ import {
     UpdateContractPayload,
 } from '@concordium/web-sdk';
 
-import { WalletApi } from '@concordium/browser-wallet-api-helpers';
+import { detectConcordiumProvider } from '@concordium/browser-wallet-api-helpers';
 import PiggyIcon from './assets/piggy-bank-solid.svg';
 import HammerIcon from './assets/hammer-solid.svg';
 
@@ -45,47 +45,15 @@ const isPiggybankSmashed = (state: PiggyBankState): state is PiggyBankStateSmash
 const client = new JsonRpcClient(new HttpProvider(JSON_RPC_URL));
 
 /**
- * Promise resolves to the Concordium provider when it has been successfully injected into
- * the window and is ready for use.
- * @param timeout determines how long to wait before rejecting if the Concordium provider is not available, in milliseconds.
- * @returns a promise containing the Concordium Wallet provider API.
- */
-// TODO This function should be made available from the web-sdk for ease of use.
-async function detectConcordiumProvider(timeout = 5000): Promise<WalletApi> {
-    return new Promise((resolve, reject) => {
-        if (window.concordium) {
-            resolve(window.concordium);
-        } else {
-            const t = setTimeout(() => {
-                if (window.concordium) {
-                    resolve(window.concordium);
-                } else {
-                    reject();
-                }
-            }, timeout);
-            window.addEventListener(
-                'concordium#initialized',
-                () => {
-                    if (window.concordium) {
-                        clearTimeout(t);
-                        resolve(window.concordium);
-                    }
-                },
-                { once: true }
-            );
-        }
-    });
-}
-
-/**
  * Global application state.
  */
 type State = {
     isConnected: boolean;
     account: string | undefined;
+    jsonRpcUrl: string | undefined;
 };
 
-const state = createContext<State>({ isConnected: false, account: undefined });
+const state = createContext<State>({ isConnected: false, account: undefined, jsonRpcUrl: undefined });
 
 /**
  * Action for depositing an amount of microCCD to the piggy bank instance
@@ -157,7 +125,7 @@ const smash = () => {
 };
 
 function PiggyBank() {
-    const { account, isConnected } = useContext(state);
+    const { account, isConnected, jsonRpcUrl } = useContext(state);
     const [piggybank, setPiggyBank] = useState<InstanceInfoV0>();
     const input = useRef<HTMLInputElement>(null);
 
@@ -194,6 +162,7 @@ function PiggyBank() {
             <div className={`connection-banner ${isConnected ? 'connected' : ''}`}>
                 {isConnected ? `Connected: ${account}` : 'No wallet connection'}
             </div>
+            <div>{jsonRpcUrl ? `JSON-RPC Url: ${jsonRpcUrl}` : 'No JSON-RPC Url yet'}</div>
             <br />
             {piggybank === undefined ? (
                 <div>Loading piggy bank...</div>
@@ -243,6 +212,7 @@ function PiggyBank() {
 export default function Root() {
     const [account, setAccount] = useState<string>();
     const [isConnected, setIsConnected] = useState<boolean>(false);
+    const [jsonRpcUrl, setJsonRpcUrl] = useState<string>();
 
     useEffect(() => {
         detectConcordiumProvider()
@@ -255,14 +225,15 @@ export default function Root() {
                         setIsConnected(true);
 
                         // Listen for relevant events from the wallet.
-                        provider.addChangeAccountListener(setAccount);
+                        provider.on('accountChanged', setAccount);
+                        provider.on('chainChanged', setJsonRpcUrl);
                     })
                     .catch(() => setIsConnected(false));
             })
             .catch(() => setIsConnected(false));
     }, []);
 
-    const stateValue: State = useMemo(() => ({ isConnected, account }), [isConnected, account]);
+    const stateValue: State = useMemo(() => ({ isConnected, account, jsonRpcUrl }), [isConnected, account, jsonRpcUrl]);
 
     return (
         // Setup a globally accessible state with data from the wallet.

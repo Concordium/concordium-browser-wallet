@@ -3,13 +3,13 @@ import React, { ReactElement, Suspense, useEffect } from 'react';
 import { useTranslation } from 'react-i18next';
 import { MemoryRouter } from 'react-router-dom';
 import { InternalMessageType } from '@concordium/browser-wallet-message-hub';
+import { noOp } from 'wallet-common-helpers';
 
 import { Dimensions, large, medium, small } from '@popup/constants/dimensions';
 import { popupMessageHandler } from '@popup/shared/message-handler';
 import { isSpawnedWindow } from '@popup/shared/window-helpers';
 import { themeAtom } from '@popup/store/settings';
 import { Theme as ThemeType } from '@shared/storage/types';
-import { noOp } from '@shared/utils/basic-helpers';
 
 import './i18n';
 
