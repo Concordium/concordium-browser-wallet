@@ -4,12 +4,16 @@ import { useAtomValue } from 'jotai';
 import clsx from 'clsx';
 
 import { absoluteRoutes } from '@popup/constants/routes';
-import { jsonRpcUrlAtom } from '@popup/store/settings';
+import { jsonRpcUrlAtomLoading } from '@popup/store/settings';
 import Header from './Header';
 
 export default function MainLayout() {
-    const jsonRpcUrl = useAtomValue(jsonRpcUrlAtom);
+    const { loading, value: jsonRpcUrl } = useAtomValue(jsonRpcUrlAtomLoading);
     const [headerOpen, setHeaderOpen] = useState(false);
+
+    if (loading) {
+        return null; // This will be near instant, as we're just waiting for the chrome async store
+    }
 
     if (!jsonRpcUrl) {
         // Force user to go through setup
