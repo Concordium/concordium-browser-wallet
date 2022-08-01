@@ -11,6 +11,11 @@ const t: typeof en = {
         receive: 'modtag ccd',
         settings: 'kontoindstillinger',
     },
+    details: {
+        total: 'Offentligt total',
+        atDisposal: 'Offentligt til rådighed',
+        stakeAmount: 'Stake',
+    },
 };
 
 export default t;
