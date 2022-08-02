@@ -17,6 +17,7 @@ import Settings from '@popup/pages/Settings';
 import NetworkSettings from '@popup/pages/NetworkSettings';
 import VisualSettings from '@popup/pages/VisualSettings';
 import AddAccount from '@popup/pages/AddAccount';
+import About from '@popup/pages/About';
 
 type PromptKey = keyof Omit<typeof absoluteRoutes['prompt'], 'path'>;
 
@@ -105,7 +106,7 @@ export default function Routes() {
                     <Route element={<NoContent />} path={relativeRoutes.home.settings.passcode.path} />
                     <Route element={<NetworkSettings />} path={relativeRoutes.home.settings.network.path} />
                     <Route element={<VisualSettings />} path={relativeRoutes.home.settings.visual.path} />
-                    <Route element={<NoContent />} path={relativeRoutes.home.settings.about.path} />
+                    <Route element={<About />} path={relativeRoutes.home.settings.about.path} />
                 </Route>
                 <Route
                     element={<AddAccount />}
