@@ -18,10 +18,12 @@ module.exports = {
     rules: {
         'import/prefer-default-export': 0,
         'no-restricted-exports': 0,
+        'no-restricted-syntax': ['error', 'ForInStatement', 'LabeledStatement', 'WithStatement'],
         'react/jsx-props-no-spreading': 0,
         'react/require-default-props': 0,
         'class-methods-use-this': 0,
         'jsx-a11y/no-autofocus': 0,
+        'no-await-in-loop': 0,
         'import/no-extraneous-dependencies': ['error', { devDependencies: ['**/*.stories.tsx', '**/build/**/*'] }],
         'jsx-a11y/label-has-associated-control': [
             'error',

@@ -1,10 +1,14 @@
 import clsx from 'clsx';
-import React from 'react';
-import { displayAsCcd } from 'wallet-common-helpers';
+import React, { useEffect, useState } from 'react';
+import { displayAsCcd, max } from 'wallet-common-helpers';
 import { useTranslation } from 'react-i18next';
+import { useAtomValue } from 'jotai';
+import { jsonRpcUrlAtom } from '@popup/store/settings';
 
 import { displaySplitAddress } from '@popup/shared/utils/account-helpers';
 import VerifiedIcon from '@assets/svg/verified-stamp.svg';
+import { AccountInfo, AccountInfoBaker, AccountInfoDelegator } from '@concordium/web-sdk';
+import { AccountInfoEmitter } from '../../../shared/account-info-emitter';
 
 type AmountProps = {
     label: string;
@@ -25,16 +29,49 @@ type Props = {
     account: string;
 };
 
+export interface AccountBalances {
+    total: bigint;
+    staked: bigint;
+    atDisposal: bigint;
+}
+
+// TODO Move the function from the desktop wallet to the common helpers.
+function getAccountBalances(accountInfo: AccountInfo): AccountBalances {
+    const total = BigInt(accountInfo.accountAmount);
+    const staked =
+        (accountInfo as AccountInfoBaker).accountBaker?.stakedAmount ??
+        (accountInfo as AccountInfoDelegator).accountDelegation?.stakedAmount ??
+        0n;
+    const scheduled = accountInfo.accountReleaseSchedule ? BigInt(accountInfo.accountReleaseSchedule.total) : 0n;
+    const atDisposal = total - max(scheduled, staked);
+    return { total, staked, atDisposal };
+}
+
 export default function AccountDetails({ expanded, account }: Props) {
     const { t } = useTranslation('account', { keyPrefix: 'details' });
+    const jsonRpcUrl = useAtomValue(jsonRpcUrlAtom);
+    const [balances, setBalances] = useState<AccountBalances>({ total: 0n, staked: 0n, atDisposal: 0n });
+
+    useEffect(() => {
+        const emitter = new AccountInfoEmitter(jsonRpcUrl);
+        emitter.listen([account]);
+        emitter.on('totalchanged', (accountInfo: AccountInfo) => {
+            setBalances(getAccountBalances(accountInfo));
+        });
+        return () => {
+            emitter.removeAllListeners('totalchanged');
+            emitter.stop();
+        };
+    }, [account]);
+
     return (
         <div className={clsx('account-page-details', expanded && 'account-page-details--expanded')}>
             <div className="account-page-details__address">{displaySplitAddress(account)}</div>
             <div className="account-page-details__id">Identity 1</div>
             <div className="account-page-details__balance">
-                <Amount label={t('total')} amount={0n} />
-                <Amount label={t('atDisposal')} amount={0n} />
-                <Amount label={t('stakeAmount')} amount={0n} />
+                <Amount label={t('total')} amount={balances.total} />
+                <Amount label={t('atDisposal')} amount={balances.atDisposal} />
+                <Amount label={t('stakeAmount')} amount={balances.staked} />
             </div>
             <VerifiedIcon className="account-page-details__stamp" />
         </div>
