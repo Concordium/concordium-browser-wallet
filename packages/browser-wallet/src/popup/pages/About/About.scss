@@ -1,0 +1,23 @@
+.about-page {
+    height: 100%;
+    background-color: $color-bg;
+    padding: 0 rem(10px);
+
+    h3 {
+        margin-bottom: rem(5px);
+        margin-top: 0;
+        padding-top: rem(10px);
+    }
+
+    &__support {
+        a {
+            display: block;
+            margin-top: rem(5px);
+        }
+    }
+
+    &__item {
+        display: block;
+        padding: rem(10px) 0;
+    }
+}

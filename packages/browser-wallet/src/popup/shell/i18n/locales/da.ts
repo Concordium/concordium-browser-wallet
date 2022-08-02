@@ -8,6 +8,7 @@ import connectionRequest from '@popup/pages/ConnectionRequest/i18n/da';
 import settings from '@popup/pages/Settings/i18n/da';
 import networkSettings from '@popup/pages/NetworkSettings/i18n/da';
 import visualSettings from '@popup/pages/VisualSettings/i18n/da';
+import about from '@popup/pages/About/i18n/da';
 import addAccount from '@popup/pages/AddAccount/i18n/da';
 
 import type en from './en';
@@ -24,6 +25,7 @@ const t: typeof en = {
     networkSettings,
     visualSettings,
     addAccount,
+    about,
 };
 
 export default t;
