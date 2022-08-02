@@ -1,5 +1,5 @@
 import React, { useEffect, useRef } from 'react';
-import { Navigate, Route, Routes as ReactRoutes, useLocation, useNavigate } from 'react-router-dom';
+import { Route, Routes as ReactRoutes, useLocation, useNavigate } from 'react-router-dom';
 import { InternalMessageType, MessageType, createMessageTypeFilter } from '@concordium/browser-wallet-message-hub';
 import { AccountTransactionSignature } from '@concordium/web-sdk';
 import { noOp } from 'wallet-common-helpers';
@@ -98,7 +98,6 @@ export default function Routes() {
             </Route>
             <Route path={relativeRoutes.setup.path} element={<Setup />} />
             <Route path={relativeRoutes.home.path} element={<MainLayout />}>
-                <Route path={`${relativeRoutes.home.account.path}/*`} element={<Account />} />
                 <Route element={<NoContent />} path={relativeRoutes.home.identities.path} />
                 <Route path={relativeRoutes.home.settings.path}>
                     <Route index element={<Settings />} />
@@ -112,7 +111,6 @@ export default function Routes() {
                     path={`${relativeRoutes.home.account.path}/${relativeRoutes.home.account.add.path}`}
                 />
                 <Route path={`${relativeRoutes.home.account.path}/*`} element={<Account />} />
-                <Route index element={<Navigate to={relativeRoutes.home.account.path} />} />
             </Route>
         </ReactRoutes>
     );

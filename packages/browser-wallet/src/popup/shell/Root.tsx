@@ -9,6 +9,7 @@ import { popupMessageHandler } from '@popup/shared/message-handler';
 import { isSpawnedWindow } from '@popup/shared/window-helpers';
 import { themeAtom } from '@popup/store/settings';
 import { Theme as ThemeType } from '@shared/storage/types';
+import { absoluteRoutes } from '@popup/constants/routes';
 
 import './i18n';
 
@@ -66,7 +67,7 @@ export default function Root() {
 
     return (
         <Provider>
-            <MemoryRouter>
+            <MemoryRouter initialEntries={[absoluteRoutes.home.account.path]}>
                 <Theme>
                     <Routes />
                 </Theme>
