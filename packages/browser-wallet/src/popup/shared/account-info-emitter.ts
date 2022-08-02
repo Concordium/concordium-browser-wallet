@@ -3,11 +3,6 @@ import EventEmitter from 'events';
 
 const accountInfoRetrievalIntervalMs = 15000;
 
-async function getAccountInfo(client: JsonRpcClient, accountAddress: AccountAddress): Promise<AccountInfo | undefined> {
-    const lastFinalizedBlockHash = (await client.getConsensusStatus()).lastFinalizedBlock;
-    return client.getAccountInfo(accountAddress, lastFinalizedBlockHash);
-}
-
 interface AccountInfoEvents {
     totalchanged: (accountInfo: AccountInfo, address: string) => void;
     accountinfo: (accountInfo: AccountInfo, address: string) => void;
@@ -44,11 +39,12 @@ export class AccountInfoEmitter extends EventEmitter {
         // If optimizing this to happen in parallel, then it must be ensured that
         // the server can handle the number of requests received at the same time.
 
+        const lastFinalizedBlockHash = (await this.client.getConsensusStatus()).lastFinalizedBlock;
         for (const accountAddress of accountAddresses) {
             const accountAddressObject = new AccountAddress(accountAddress);
             this.accounts.push(accountAddressObject);
 
-            const accountInfo = await getAccountInfo(this.client, accountAddressObject);
+            const accountInfo = await this.client.getAccountInfo(accountAddressObject, lastFinalizedBlockHash);
             if (accountInfo) {
                 this.emit('accountinfo', accountInfo, accountAddress);
                 this.emit('totalchanged', accountInfo, accountAddress);
@@ -56,8 +52,9 @@ export class AccountInfoEmitter extends EventEmitter {
         }
 
         this.interval = setInterval(async () => {
+            const lfBlockHash = (await this.client.getConsensusStatus()).lastFinalizedBlock;
             for (const address of this.accounts) {
-                const accountInfo = await getAccountInfo(this.client, address);
+                const accountInfo = await this.client.getAccountInfo(address, lfBlockHash);
                 if (accountInfo) {
                     this.emit('accountinfo', accountInfo, address.address);
                     if (accountInfo.accountAmount !== this.previousTotalMap.get(address.address)) {

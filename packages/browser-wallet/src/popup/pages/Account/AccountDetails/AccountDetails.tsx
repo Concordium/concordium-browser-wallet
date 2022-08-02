@@ -1,13 +1,13 @@
 import clsx from 'clsx';
 import React, { useEffect, useState } from 'react';
-import { displayAsCcd, max } from 'wallet-common-helpers';
+import { displayAsCcd, getPublicAccountAmounts, PublicAccountAmounts } from 'wallet-common-helpers';
 import { useTranslation } from 'react-i18next';
 import { useAtomValue } from 'jotai';
 import { jsonRpcUrlAtom } from '@popup/store/settings';
 
 import { displaySplitAddress } from '@popup/shared/utils/account-helpers';
 import VerifiedIcon from '@assets/svg/verified-stamp.svg';
-import { AccountInfo, AccountInfoBaker, AccountInfoDelegator } from '@concordium/web-sdk';
+import { AccountInfo } from '@concordium/web-sdk';
 import { AccountInfoEmitter } from '../../../shared/account-info-emitter';
 
 type AmountProps = {
@@ -29,34 +29,20 @@ type Props = {
     account: string;
 };
 
-export interface AccountBalances {
-    total: bigint;
-    staked: bigint;
-    atDisposal: bigint;
-}
-
-// TODO Move the function from the desktop wallet to the common helpers.
-function getAccountBalances(accountInfo: AccountInfo): AccountBalances {
-    const total = BigInt(accountInfo.accountAmount);
-    const staked =
-        (accountInfo as AccountInfoBaker).accountBaker?.stakedAmount ??
-        (accountInfo as AccountInfoDelegator).accountDelegation?.stakedAmount ??
-        0n;
-    const scheduled = accountInfo.accountReleaseSchedule ? BigInt(accountInfo.accountReleaseSchedule.total) : 0n;
-    const atDisposal = total - max(scheduled, staked);
-    return { total, staked, atDisposal };
-}
-
 export default function AccountDetails({ expanded, account }: Props) {
     const { t } = useTranslation('account', { keyPrefix: 'details' });
     const jsonRpcUrl = useAtomValue(jsonRpcUrlAtom);
-    const [balances, setBalances] = useState<AccountBalances>({ total: 0n, staked: 0n, atDisposal: 0n });
+    const [balances, setBalances] = useState<Omit<PublicAccountAmounts, 'scheduled'>>({
+        total: 0n,
+        staked: 0n,
+        atDisposal: 0n,
+    });
 
     useEffect(() => {
         const emitter = new AccountInfoEmitter(jsonRpcUrl);
         emitter.listen([account]);
         emitter.on('totalchanged', (accountInfo: AccountInfo) => {
-            setBalances(getAccountBalances(accountInfo));
+            setBalances(getPublicAccountAmounts(accountInfo));
         });
         return () => {
             emitter.removeAllListeners('totalchanged');
