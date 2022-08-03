@@ -10,5 +10,5 @@
             "module": "CommonJS"
         }
     },
-    "include": ["./**/*"]
+    "include": ["./**/*", "../shared/types/*"]
 }
