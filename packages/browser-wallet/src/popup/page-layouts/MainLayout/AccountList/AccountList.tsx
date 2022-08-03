@@ -9,6 +9,7 @@ import CheckmarkIcon from '@assets/svg/checkmark-blue.svg';
 import { absoluteRoutes } from '@popup/constants/routes';
 import { accountsAtom, selectedAccountAtom } from '@popup/store/account';
 import { useTranslation } from 'react-i18next';
+import { displaySplitAddress } from '@popup/shared/utils/account-helpers';
 import EntityList from '../EntityList';
 
 export type Account = { address: string };
@@ -25,8 +26,7 @@ function AccountListItem({ account: { address }, checked, selected }: ItemProps)
             <div className="account-list-item__account">
                 <div className="flex align-center">
                     {/* TODO add account name */}
-                    {address.slice(0, 4)}...{address.slice(address.length - 4)}{' '}
-                    {selected && <CheckmarkIcon className="account-list-item__check" />}
+                    {displaySplitAddress(address)} {selected && <CheckmarkIcon className="account-list-item__check" />}
                 </div>
                 <CopyButton
                     className="absolute r-0"

@@ -1,5 +1,5 @@
 import React, { useEffect, useRef } from 'react';
-import { Navigate, Route, Routes as ReactRoutes, useLocation, useNavigate } from 'react-router-dom';
+import { Route, Routes as ReactRoutes, useLocation, useNavigate } from 'react-router-dom';
 import { InternalMessageType, MessageType, createMessageTypeFilter } from '@concordium/browser-wallet-message-hub';
 import { AccountTransactionSignature } from '@concordium/web-sdk';
 import { noOp } from 'wallet-common-helpers';
@@ -17,6 +17,7 @@ import Settings from '@popup/pages/Settings';
 import NetworkSettings from '@popup/pages/NetworkSettings';
 import VisualSettings from '@popup/pages/VisualSettings';
 import AddAccount from '@popup/pages/AddAccount';
+import About from '@popup/pages/About';
 
 type PromptKey = keyof Omit<typeof absoluteRoutes['prompt'], 'path'>;
 
@@ -98,21 +99,19 @@ export default function Routes() {
             </Route>
             <Route path={relativeRoutes.setup.path} element={<Setup />} />
             <Route path={relativeRoutes.home.path} element={<MainLayout />}>
-                <Route path={`${relativeRoutes.home.account.path}/*`} element={<Account />} />
                 <Route element={<NoContent />} path={relativeRoutes.home.identities.path} />
                 <Route path={relativeRoutes.home.settings.path}>
                     <Route index element={<Settings />} />
                     <Route element={<NoContent />} path={relativeRoutes.home.settings.passcode.path} />
                     <Route element={<NetworkSettings />} path={relativeRoutes.home.settings.network.path} />
                     <Route element={<VisualSettings />} path={relativeRoutes.home.settings.visual.path} />
-                    <Route element={<NoContent />} path={relativeRoutes.home.settings.about.path} />
+                    <Route element={<About />} path={relativeRoutes.home.settings.about.path} />
                 </Route>
                 <Route
                     element={<AddAccount />}
                     path={`${relativeRoutes.home.account.path}/${relativeRoutes.home.account.add.path}`}
                 />
                 <Route path={`${relativeRoutes.home.account.path}/*`} element={<Account />} />
-                <Route index element={<Navigate to={relativeRoutes.home.account.path} />} />
             </Route>
         </ReactRoutes>
     );

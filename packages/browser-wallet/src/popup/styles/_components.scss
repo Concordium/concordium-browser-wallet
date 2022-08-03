@@ -13,19 +13,14 @@
 @import '../shared/Modal/Modal';
 
 // Pages
-@import '../pages/Account/Account';
-@import '../pages/Account/AccountActions/AccountActions';
-@import '../pages/Account/DisplayAddress/DisplayAddress';
+@import '../pages/Account';
 @import '../pages/SignMessage/SignMessage';
-@import '../pages/SendTransaction/SendTransaction';
-@import '../pages/SendTransaction/displayTransaction/DisplayTransaction';
+@import '../pages/SendTransaction';
 @import '../pages/Setup/Setup';
 @import '../pages/ConnectionRequest/ConnectionRequest';
 @import '../pages/Settings/Settings';
+@import '../pages/About/About';
 
 // Layouts
-@import '../page-layouts/MainLayout/MainLayout';
-@import '../page-layouts/MainLayout/Header/Header';
-@import '../page-layouts/MainLayout/EntityList/EntityList';
-@import '../page-layouts/MainLayout/AccountList/AccountList';
+@import '../page-layouts/MainLayout';
 @import '../page-layouts/FullscreenPromptLayout/FullscreenPromptLayout';

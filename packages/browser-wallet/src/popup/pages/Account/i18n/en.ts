@@ -9,6 +9,11 @@ const t = {
         receive: 'receive ccd',
         settings: 'account settings',
     },
+    details: {
+        total: 'Public balance total',
+        atDisposal: 'Public amount at disposal',
+        stakeAmount: 'Stake / delegation amount',
+    },
 };
 
 export default t;
