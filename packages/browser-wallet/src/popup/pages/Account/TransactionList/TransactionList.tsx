@@ -1,12 +1,13 @@
 import { getTransactions } from '@shared/utils/wallet-proxy';
-import React, { useEffect, useState } from 'react';
+import React, { createContext, forwardRef, Fragment, useContext, useEffect, useMemo, useState } from 'react';
 import InfiniteLoader from 'react-window-infinite-loader';
-import { FixedSizeList as List } from 'react-window';
-import { noOp } from 'wallet-common-helpers';
+import { VariableSizeList as List } from 'react-window';
+import { noOp, PropsOf } from 'wallet-common-helpers';
 import AutoSizer from 'react-virtualized-auto-sizer';
 import { useAtomValue } from 'jotai';
 import { selectedAccountAtom } from '@popup/store/account';
 import TransactionElement, { TransactionElementInput } from './TransactionElement';
+import useTransactionGroups, { TransactionsByDateTuple } from './useTransactionGroups';
 
 interface InfiniteTransactionListProps {
     accountAddress: string;
@@ -15,6 +16,41 @@ interface InfiniteTransactionListProps {
     isNextPageLoading: boolean;
     loadNextPage: () => Promise<void>;
 }
+
+const isHeader = (item: string | TransactionElementInput): item is string => typeof item === 'string';
+
+interface StickyContextModel {
+    groups: TransactionsByDateTuple[];
+}
+const StickyContext = createContext<StickyContextModel>({ groups: [] });
+
+// eslint-disable-next-line react/display-name
+const ListElement = forwardRef<HTMLDivElement, PropsOf<'div'>>(({ children, ...rest }, ref) => {
+    const { groups } = useContext(StickyContext);
+
+    return (
+        <div ref={ref} {...rest}>
+            {groups.map(([header, transactions]) => (
+                <Fragment key={header}>
+                    <span className="transactionGroupHeader" style={{ height: 15 }}>
+                        {header}
+                    </span>
+                    <div
+                        style={{
+                            width: '100%',
+                            paddingBottom: transactions.length * 58,
+                        }}
+                    />
+                </Fragment>
+            ))}
+            {children}
+        </div>
+    );
+});
+
+const getKey = (item: string | TransactionElementInput) =>
+    // eslint-disable-next-line @typescript-eslint/no-non-null-assertion
+    isHeader(item) ? item : item.transactionHash || item.id!;
 
 /**
  * An infinite scrolling list of transactions. Scrolling towards the bottom of the list
@@ -27,41 +63,59 @@ function InfiniteTransactionList({
     hasNextPage,
     isNextPageLoading,
 }: InfiniteTransactionListProps) {
-    const itemCount = hasNextPage ? transactions.length + 1 : transactions.length;
+    const groups = useTransactionGroups(transactions);
+    const headersAndTransactions = groups.flat(2);
+    const groupsContext = useMemo(() => {
+        return { groups };
+    }, [groups]);
+
+    const itemCount = hasNextPage ? headersAndTransactions.length + 1 : headersAndTransactions.length;
     const loadMoreItems = isNextPageLoading ? noOp : loadNextPage;
-    const isItemLoaded = (index: number) => !hasNextPage || index < transactions.length;
+    const isItemLoaded = (index: number) => !hasNextPage || index < headersAndTransactions.length;
 
     return (
-        <AutoSizer>
-            {({ height, width }) => (
-                <InfiniteLoader isItemLoaded={isItemLoaded} itemCount={itemCount} loadMoreItems={loadMoreItems}>
-                    {({ onItemsRendered, ref }) => (
-                        <List
-                            itemCount={transactions.length}
-                            onItemsRendered={onItemsRendered}
-                            ref={ref}
-                            width={width}
-                            height={height}
-                            itemSize={58}
-                        >
-                            {({ index, style }) => {
-                                if (!isItemLoaded(index)) {
-                                    return <div style={style}>Loading</div>;
-                                }
-                                return (
-                                    <TransactionElement
-                                        accountAddress={accountAddress}
-                                        style={style}
-                                        key={transactions[index].key}
-                                        transaction={transactions[index]}
-                                    />
-                                );
-                            }}
-                        </List>
-                    )}
-                </InfiniteLoader>
-            )}
-        </AutoSizer>
+        <StickyContext.Provider value={groupsContext}>
+            <AutoSizer>
+                {({ height, width }) => (
+                    <InfiniteLoader isItemLoaded={isItemLoaded} itemCount={itemCount} loadMoreItems={loadMoreItems}>
+                        {({ onItemsRendered, ref }) => (
+                            <List
+                                className="infinite"
+                                itemCount={headersAndTransactions.length}
+                                onItemsRendered={onItemsRendered}
+                                ref={ref}
+                                width={width}
+                                height={height}
+                                // TODO The sizes should not be magic variables.
+                                itemSize={(i) => (isHeader(headersAndTransactions[i]) ? 15 : 58)}
+                                itemKey={(i) => getKey(headersAndTransactions[i])}
+                                innerElementType={ListElement}
+                            >
+                                {({ index, style }) => {
+                                    const item = headersAndTransactions[index];
+
+                                    if (!isItemLoaded(index)) {
+                                        return <div style={style}>Loading</div>;
+                                    }
+
+                                    if (isHeader(item)) {
+                                        return <span style={style} className="transactionGroupHeaderPlaceholder" />;
+                                    }
+                                    return (
+                                        <TransactionElement
+                                            accountAddress={accountAddress}
+                                            style={style}
+                                            key={item.key}
+                                            transaction={item}
+                                        />
+                                    );
+                                }}
+                            </List>
+                        )}
+                    </InfiniteLoader>
+                )}
+            </AutoSizer>
+        </StickyContext.Provider>
     );
 }
 

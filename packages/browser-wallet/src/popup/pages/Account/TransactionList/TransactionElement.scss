@@ -11,13 +11,12 @@
         max-height: none;
         height: 100%;
         width: 100%;
-        overflow: overlay;
     }
 }
 
 .transaction-element {
     position: relative;
-    padding: 0 5px 0 10px;
+    padding: 0 20px 0 10px;
     display: flex;
     flex-direction: column;
     justify-content: center;
@@ -49,6 +48,7 @@
 
     &__text-faded {
         color: $color-text-faded;
+        font-size: rem(9px);
     }
 
     &__checkmark {
@@ -98,27 +98,17 @@
 }
 
 .transactionGroupHeader {
-    height: 2;
-    font-size: 10px;
+    height: rem(15px);
+    font-size: rem(8px);
+    color: $color-blue;
+    padding-left: rem(5px);
     line-height: 12px;
     display: flex;
     align-items: center;
-    background-color: blue;
+    background-color: $color-light-blue;
     position: sticky;
     top: 0;
     z-index: 1;
-}
-
-.fullMemo {
-    white-space: pre-wrap;
-}
-
-.lineClamp {
-    overflow: hidden;
-    white-space: nowrap;
-    max-width: 100%;
-    text-overflow: ellipsis;
-    line-height: 1.4;
 }
 
 .infinite {
