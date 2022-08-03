@@ -16,12 +16,10 @@ import HammerIcon from 'concordium-browser-wallet/examples/shared/assets/hammer-
 // V1 Module reference on testnet: 12362dd6f12fabd95959cafa27e512805161467b3156c7ccb043318cd2478838
 const CONTRACT_INDEX = 81n; // V1 instance
 
-// V0 Module reference on testnet: c0e51cd55ccbff4fa8da9bb76c9917e83ae8286d86b47647104bf715b4821c1a
 /** If you want to test smashing the piggy bank,
  * it will be necessary to instantiate your own piggy bank using an account available in the browser wallet,
  * and change this constant to match the index of the instance.
  */
-// const CONTRACT_INDEX = 6n; // V0 instance
 /** Should match the subindex of the instance targeted. */
 const CONTRACT_SUB_INDEX = 0n;
 const CONTRACT_NAME = 'PiggyBank';
@@ -74,7 +72,7 @@ const deposit = (amount = 0) => {
 
 /**
  * Action for smashing the piggy bank. This is only possible to do, if the account sending the transaction matches the owner of the piggy bank:
- * https://github.com/Concordium/concordium-rust-smart-contracts/blob/c4d95504a51c15bdbfec503c9e8bf5e93a42e24d/examples/piggy-bank/part1/src/lib.rs#L64
+ * https://github.com/Concordium/concordium-rust-smart-contracts/blob/main/examples/piggy-bank/part1/src/lib.rs#L64
  */
 const smash = () => {
     detectConcordiumProvider()

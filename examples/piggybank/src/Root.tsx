@@ -16,9 +16,6 @@ import { detectConcordiumProvider } from '@concordium/browser-wallet-api-helpers
 import PiggyIcon from 'concordium-browser-wallet/examples/shared/assets/piggy-bank-solid.svg';
 import HammerIcon from 'concordium-browser-wallet/examples/shared/assets/hammer-solid.svg';
 
-// V1 Module reference on testnet: 47ece1d6d52b02f7f91e9b5dd456883785643a357309154403776d8d7f958f9e
-// const CONTRACT_INDEX = 5102n; // V1 instance
-
 // V0 Module reference on testnet: c0e51cd55ccbff4fa8da9bb76c9917e83ae8286d86b47647104bf715b4821c1a
 /** If you want to test smashing the piggy bank,
  * it will be necessary to instantiate your own piggy bank using an account available in the browser wallet,
