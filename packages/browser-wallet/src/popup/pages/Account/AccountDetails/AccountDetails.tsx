@@ -29,16 +29,20 @@ type Props = {
     account: string;
 };
 
+const zeroBalance: Omit<PublicAccountAmounts, 'scheduled'> = {
+    total: 0n,
+    staked: 0n,
+    atDisposal: 0n,
+};
+
 export default function AccountDetails({ expanded, account }: Props) {
     const { t } = useTranslation('account', { keyPrefix: 'details' });
     const jsonRpcUrl = useAtomValue(jsonRpcUrlAtom);
-    const [balances, setBalances] = useState<Omit<PublicAccountAmounts, 'scheduled'>>({
-        total: 0n,
-        staked: 0n,
-        atDisposal: 0n,
-    });
+    const [balances, setBalances] = useState<Omit<PublicAccountAmounts, 'scheduled'>>(zeroBalance);
 
     useEffect(() => {
+        setBalances(zeroBalance);
+
         const emitter = new AccountInfoEmitter(jsonRpcUrl);
         emitter.listen([account]);
         emitter.on('totalchanged', (accountInfo: AccountInfo) => {

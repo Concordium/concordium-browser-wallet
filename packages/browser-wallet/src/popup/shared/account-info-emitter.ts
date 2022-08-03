@@ -34,34 +34,47 @@ export class AccountInfoEmitter extends EventEmitter {
     async listen(accountAddresses: string[]) {
         this.stop();
 
+        for (const accountAddress of accountAddresses) {
+            const accountAddressObject = new AccountAddress(accountAddress);
+            this.accounts.push(accountAddressObject);
+        }
+
         // Note that the calls to get the account info is intentionally done
         // in serial here (and in the interval) to limit the load on the server.
         // If optimizing this to happen in parallel, then it must be ensured that
         // the server can handle the number of requests received at the same time.
 
-        const lastFinalizedBlockHash = (await this.client.getConsensusStatus()).lastFinalizedBlock;
-        for (const accountAddress of accountAddresses) {
-            const accountAddressObject = new AccountAddress(accountAddress);
-            this.accounts.push(accountAddressObject);
-
-            const accountInfo = await this.client.getAccountInfo(accountAddressObject, lastFinalizedBlockHash);
-            if (accountInfo) {
-                this.emit('accountinfo', accountInfo, accountAddress);
-                this.emit('totalchanged', accountInfo, accountAddress);
+        try {
+            const lastFinalizedBlockHash = (await this.client.getConsensusStatus()).lastFinalizedBlock;
+            for (const accountAddress of accountAddresses) {
+                const accountAddressObject = new AccountAddress(accountAddress);
+                const accountInfo = await this.client.getAccountInfo(accountAddressObject, lastFinalizedBlockHash);
+                if (accountInfo) {
+                    this.emit('accountinfo', accountInfo, accountAddress);
+                    this.emit('totalchanged', accountInfo, accountAddress);
+                }
             }
+        } catch {
+            // TODO Determine how we want to handle connection issues. I expect that we will emit
+            // on an error topic that the UI can handle.
         }
 
         this.interval = setInterval(async () => {
-            const lfBlockHash = (await this.client.getConsensusStatus()).lastFinalizedBlock;
-            for (const address of this.accounts) {
-                const accountInfo = await this.client.getAccountInfo(address, lfBlockHash);
-                if (accountInfo) {
-                    this.emit('accountinfo', accountInfo, address.address);
-                    if (accountInfo.accountAmount !== this.previousTotalMap.get(address.address)) {
-                        this.emit('totalchanged', accountInfo, address.address);
-                        this.previousTotalMap.set(address.address, accountInfo.accountAmount);
+            try {
+                const lfBlockHash = (await this.client.getConsensusStatus()).lastFinalizedBlock;
+                for (const address of this.accounts) {
+                    const accountInfo = await this.client.getAccountInfo(address, lfBlockHash);
+                    if (accountInfo) {
+                        this.emit('accountinfo', accountInfo, address.address);
+                        if (accountInfo.accountAmount !== this.previousTotalMap.get(address.address)) {
+                            this.emit('totalchanged', accountInfo, address.address);
+                            this.previousTotalMap.set(address.address, accountInfo.accountAmount);
+                        }
                     }
                 }
+            } catch {
+                // TODO Determine how we want to handle connection issues. I expect that we will emit
+                // on an error topic that the UI can handle.
             }
         }, accountInfoRetrievalIntervalMs);
     }
