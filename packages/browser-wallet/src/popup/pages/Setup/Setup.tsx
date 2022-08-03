@@ -72,7 +72,7 @@ export default function Setup() {
 
     const handleSubmit: SubmitHandler<FormValues> = (vs) => {
         setValues(vs);
-        navigate(absoluteRoutes.home.path);
+        navigate(absoluteRoutes.home.account.path);
     };
 
     return (

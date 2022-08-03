@@ -104,6 +104,20 @@
             bottom: rem(1px);
         }
 
+        .id-card--confirmed & {
+            width: rem(50px);
+            bottom: rem(-9px);
+            right: rem(-10px);
+
+            svg {
+                opacity: 0.5;
+            }
+
+            path {
+                fill: $color-blue;
+            }
+        }
+
         circle {
             fill: $color-bg;
         }

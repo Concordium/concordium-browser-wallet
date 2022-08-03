@@ -1,6 +1,5 @@
 import { Provider, useAtomValue } from 'jotai';
-import React, { ReactElement, Suspense, useEffect } from 'react';
-import { useTranslation } from 'react-i18next';
+import React, { ReactElement, useEffect } from 'react';
 import { MemoryRouter } from 'react-router-dom';
 import { InternalMessageType } from '@concordium/browser-wallet-message-hub';
 import { noOp } from 'wallet-common-helpers';
@@ -10,6 +9,7 @@ import { popupMessageHandler } from '@popup/shared/message-handler';
 import { isSpawnedWindow } from '@popup/shared/window-helpers';
 import { themeAtom } from '@popup/store/settings';
 import { Theme as ThemeType } from '@shared/storage/types';
+import { absoluteRoutes } from '@popup/constants/routes';
 
 import './i18n';
 
@@ -63,18 +63,14 @@ function Theme({ children }: { children: ReactElement }) {
 }
 
 export default function Root() {
-    const { t } = useTranslation();
     useScaling();
 
     return (
         <Provider>
-            <MemoryRouter>
-                {/* The Suspense is needed here due to async atoms loading stuff from storage */}
-                <Suspense fallback={t('root.loading')}>
-                    <Theme>
-                        <Routes />
-                    </Theme>
-                </Suspense>
+            <MemoryRouter initialEntries={[absoluteRoutes.home.account.path]}>
+                <Theme>
+                    <Routes />
+                </Theme>
             </MemoryRouter>
         </Provider>
     );

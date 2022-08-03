@@ -140,7 +140,7 @@ export default function Header({ onToggle, className }: Props) {
                             exit="closed"
                             transition={defaultTransition}
                         >
-                            <HeaderLink onClick={() => setNavOpen(false)} to={absoluteRoutes.home.path}>
+                            <HeaderLink onClick={() => setNavOpen(false)} to={absoluteRoutes.home.account.path}>
                                 {t('header.accounts')}
                             </HeaderLink>
                             <HeaderLink onClick={() => setNavOpen(false)} to={absoluteRoutes.home.identities.path}>
