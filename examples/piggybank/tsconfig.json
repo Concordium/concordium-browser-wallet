@@ -3,7 +3,10 @@
     "compilerOptions": {
         "baseUrl": ".",
         "noEmit": true,
-        "jsx": "react"
+        "jsx": "react",
+        "paths": {
+            "@assets/*": ["../shared/assets/*"]
+        }
     },
     "ts-node": {
         "compilerOptions": {

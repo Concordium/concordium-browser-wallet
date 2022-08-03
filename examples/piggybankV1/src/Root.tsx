@@ -10,8 +10,8 @@ import {
 } from '@concordium/web-sdk';
 
 import { detectConcordiumProvider } from '@concordium/browser-wallet-api-helpers';
-import PiggyIcon from 'concordium-browser-wallet/examples/shared/assets/piggy-bank-solid.svg';
-import HammerIcon from 'concordium-browser-wallet/examples/shared/assets/hammer-solid.svg';
+import PiggyIcon from '@assets/piggy-bank-solid.svg';
+import HammerIcon from '@assets/hammer-solid.svg';
 
 // V1 Module reference on testnet: 12362dd6f12fabd95959cafa27e512805161467b3156c7ccb043318cd2478838
 const CONTRACT_INDEX = 81n; // V1 instance

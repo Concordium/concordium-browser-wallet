@@ -13,8 +13,8 @@ import {
 } from '@concordium/web-sdk';
 
 import { detectConcordiumProvider } from '@concordium/browser-wallet-api-helpers';
-import PiggyIcon from 'concordium-browser-wallet/examples/shared/assets/piggy-bank-solid.svg';
-import HammerIcon from 'concordium-browser-wallet/examples/shared/assets/hammer-solid.svg';
+import PiggyIcon from '@assets/piggy-bank-solid.svg';
+import HammerIcon from '@assets/hammer-solid.svg';
 
 // V0 Module reference on testnet: c0e51cd55ccbff4fa8da9bb76c9917e83ae8286d86b47647104bf715b4821c1a
 /** If you want to test smashing the piggy bank,
