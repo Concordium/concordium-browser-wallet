@@ -42,7 +42,8 @@ export function parsePayload(
                           contractName,
                           functionName,
                           parameters,
-                          Buffer.from(schema, 'base64')
+                          Buffer.from(schema, 'base64'),
+                          0
                       )
                     : Buffer.alloc(0);
             // Overwrite whatever parameter has been provided. Ensures that what we show and what is signed is the same.
@@ -57,7 +58,12 @@ export function parsePayload(
         case AccountTransactionType.InitializeSmartContractInstance: {
             const parameter =
                 parameters && schema
-                    ? serializeInitContractParameters(payload.contractName, parameters, Buffer.from(schema, 'base64'))
+                    ? serializeInitContractParameters(
+                          payload.contractName,
+                          parameters,
+                          Buffer.from(schema, 'base64'),
+                          0
+                      )
                     : Buffer.alloc(0);
             // Overwrite whatever parameter has been provided. Ensures that what we show and what is signed is the same.
             return {
