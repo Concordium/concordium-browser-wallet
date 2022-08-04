@@ -1,4 +1,4 @@
-import { getTransactions } from '@shared/utils/wallet-proxy';
+import { getTransactions } from '@popup/shared/utils/wallet-proxy';
 import React, { createContext, forwardRef, Fragment, useContext, useEffect, useMemo, useState } from 'react';
 import InfiniteLoader from 'react-window-infinite-loader';
 import { VariableSizeList as List } from 'react-window';
@@ -6,18 +6,21 @@ import { noOp, PropsOf } from 'wallet-common-helpers';
 import AutoSizer from 'react-virtualized-auto-sizer';
 import { useAtomValue } from 'jotai';
 import { selectedAccountAtom } from '@popup/store/account';
-import TransactionElement, { TransactionElementInput } from './TransactionElement';
+import { BrowserWalletTransaction } from '@popup/shared/utils/transaction-history-types';
+import TransactionElement, { transactionElementHeight } from './TransactionElement';
 import useTransactionGroups, { TransactionsByDateTuple } from './useTransactionGroups';
+
+const transactionHeaderHeight = 20;
 
 interface InfiniteTransactionListProps {
     accountAddress: string;
-    transactions: TransactionElementInput[];
+    transactions: BrowserWalletTransaction[];
     hasNextPage: boolean;
     isNextPageLoading: boolean;
     loadNextPage: () => Promise<void>;
 }
 
-const isHeader = (item: string | TransactionElementInput): item is string => typeof item === 'string';
+const isHeader = (item: string | BrowserWalletTransaction): item is string => typeof item === 'string';
 
 interface StickyContextModel {
     groups: TransactionsByDateTuple[];
@@ -32,13 +35,13 @@ const ListElement = forwardRef<HTMLDivElement, PropsOf<'div'>>(({ children, ...r
         <div ref={ref} {...rest}>
             {groups.map(([header, transactions]) => (
                 <Fragment key={header}>
-                    <span className="transactionGroupHeader" style={{ height: 15 }}>
+                    <span className="transactionGroupHeader" style={{ height: transactionHeaderHeight }}>
                         {header}
                     </span>
                     <div
                         style={{
                             width: '100%',
-                            paddingBottom: transactions.length * 58,
+                            paddingBottom: transactions.length * transactionElementHeight,
                         }}
                     />
                 </Fragment>
@@ -48,7 +51,7 @@ const ListElement = forwardRef<HTMLDivElement, PropsOf<'div'>>(({ children, ...r
     );
 });
 
-const getKey = (item: string | TransactionElementInput) =>
+const getKey = (item: string | BrowserWalletTransaction) =>
     // eslint-disable-next-line @typescript-eslint/no-non-null-assertion
     isHeader(item) ? item : item.transactionHash || item.id!;
 
@@ -86,8 +89,11 @@ function InfiniteTransactionList({
                                 ref={ref}
                                 width={width}
                                 height={height}
-                                // TODO The sizes should not be magic variables.
-                                itemSize={(i) => (isHeader(headersAndTransactions[i]) ? 15 : 58)}
+                                itemSize={(i) =>
+                                    isHeader(headersAndTransactions[i])
+                                        ? transactionHeaderHeight
+                                        : transactionElementHeight
+                                }
                                 itemKey={(i) => getKey(headersAndTransactions[i])}
                                 innerElementType={ListElement}
                             >
@@ -105,7 +111,7 @@ function InfiniteTransactionList({
                                         <TransactionElement
                                             accountAddress={accountAddress}
                                             style={style}
-                                            key={item.key}
+                                            key={item.transactionHash ?? item.id}
                                             transaction={item}
                                         />
                                     );
@@ -124,7 +130,7 @@ function InfiniteTransactionList({
  */
 export default function TransactionList() {
     const accountAddress = useAtomValue(selectedAccountAtom);
-    const [transactions, setTransactions] = useState<TransactionElementInput[]>([]);
+    const [transactions, setTransactions] = useState<BrowserWalletTransaction[]>([]);
     const [isNextPageLoading, setIsNextPageLoading] = useState<boolean>(false);
     const [hasNextPage, setHasNextPage] = useState<boolean>(true);
 

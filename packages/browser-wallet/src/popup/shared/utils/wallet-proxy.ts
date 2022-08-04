@@ -1,10 +1,11 @@
-import {
-    TransactionElementInput,
-    TransactionHistoryResult,
-    TransactionStatus,
-} from '@popup/pages/Account/TransactionList/TransactionElement';
 import axios from 'axios';
 import { abs } from 'wallet-common-helpers';
+import {
+    BrowserWalletTransaction,
+    TransactionHistoryResult,
+    TransactionStatus,
+    TransactionType,
+} from './transaction-history-types';
 
 const walletProxy = axios.create({
     baseURL: 'https://wallet-proxy.testnet.concordium.com',
@@ -36,6 +37,63 @@ export enum TransactionKindString {
     ConfigureBaker = 'configureBaker',
     ConfigureDelegation = 'configureDelegation',
     StakingReward = 'paydayAccountReward',
+}
+
+function mapTransactionKindStringToTransactionType(kind: TransactionKindString): TransactionType {
+    switch (kind) {
+        case TransactionKindString.DeployModule:
+            return TransactionType.DeployModule;
+        case TransactionKindString.InitContract:
+            return TransactionType.InitContract;
+        case TransactionKindString.Update:
+            return TransactionType.Update;
+        case TransactionKindString.Transfer:
+            return TransactionType.Transfer;
+        case TransactionKindString.AddBaker:
+            return TransactionType.AddBaker;
+        case TransactionKindString.RemoveBaker:
+            return TransactionType.RemoveBaker;
+        case TransactionKindString.UpdateBakerStake:
+            return TransactionType.UpdateBakerStake;
+        case TransactionKindString.UpdateBakerRestakeEarnings:
+            return TransactionType.UpdateBakerRestakeEarnings;
+        case TransactionKindString.UpdateBakerKeys:
+            return TransactionType.UpdateBakerKeys;
+        case TransactionKindString.UpdateCredentialKeys:
+            return TransactionType.UpdateCredentialKeys;
+        case TransactionKindString.BakingReward:
+            return TransactionType.BakingReward;
+        case TransactionKindString.BlockReward:
+            return TransactionType.BlockReward;
+        case TransactionKindString.FinalizationReward:
+            return TransactionType.FinalizationReward;
+        case TransactionKindString.EncryptedAmountTransfer:
+            return TransactionType.EncryptedAmountTransfer;
+        case TransactionKindString.TransferToEncrypted:
+            return TransactionType.TransferToEncrypted;
+        case TransactionKindString.TransferToPublic:
+            return TransactionType.TransferToPublic;
+        case TransactionKindString.TransferWithSchedule:
+            return TransactionType.TransferWithSchedule;
+        case TransactionKindString.UpdateCredentials:
+            return TransactionType.UpdateCredentials;
+        case TransactionKindString.RegisterData:
+            return TransactionType.RegisterData;
+        case TransactionKindString.TransferWithMemo:
+            return TransactionType.TransferWithMemo;
+        case TransactionKindString.EncryptedAmountTransferWithMemo:
+            return TransactionType.EncryptedAmountTransferWithMemo;
+        case TransactionKindString.TransferWithScheduleAndMemo:
+            return TransactionType.TransferWithScheduleAndMemo;
+        case TransactionKindString.ConfigureBaker:
+            return TransactionType.ConfigureBaker;
+        case TransactionKindString.ConfigureDelegation:
+            return TransactionType.ConfigureDelegation;
+        case TransactionKindString.StakingReward:
+            return TransactionType.StakingReward;
+        default:
+            throw Error(`Unkown transaction kind was encounted: ${kind}`);
+    }
 }
 
 interface WalletProxyAccTransactionsResult {
@@ -139,9 +197,10 @@ function calculateAmount(transaction: WalletProxyTransaction, status: Transactio
     return BigInt(transaction.subtotal);
 }
 
-function mapTransaction(transaction: WalletProxyTransaction, accountAddress: string): TransactionElementInput {
+function mapTransaction(transaction: WalletProxyTransaction, accountAddress: string): BrowserWalletTransaction {
     const success = transaction.details.outcome === 'success';
     const status = success ? TransactionStatus.Finalized : TransactionStatus.Failed;
+    const type = mapTransactionKindStringToTransactionType(transaction.details.type);
 
     return {
         amount: calculateAmount(transaction, status),
@@ -150,11 +209,9 @@ function mapTransaction(transaction: WalletProxyTransaction, accountAddress: str
         fromAddress: getFromAddress(transaction, accountAddress),
         toAddress: getToAddress(transaction, accountAddress),
         transactionHash: transaction.transactionHash,
-        // TODO Do not leak the wallet proxy type to the application here.
-        type: transaction.details.type,
+        type,
         status,
         time: BigInt(Math.round(transaction.blockTime).toString()),
-        key: transaction.transactionHash !== undefined ? transaction.transactionHash : transaction.id.toString(),
         id: transaction.id,
     };
 }

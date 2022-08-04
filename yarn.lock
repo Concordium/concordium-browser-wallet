@@ -1743,7 +1743,7 @@ __metadata:
     tsconfig-paths-webpack-plugin: ^3.5.2
     typescript: ^4.3.5
     uuid: ^8.3.2
-    wallet-common-helpers: "https://github.com/Concordium/concordium-wallet-common-helpers.git#0d9ab94e7f82ed031ac42b002c87d4b9f4bbe20e"
+    wallet-common-helpers: "https://github.com/Concordium/concordium-wallet-common-helpers.git#091af25fe2ced4137860a5f05b54eb6b89e55428"
   languageName: unknown
   linkType: soft
 
@@ -18912,9 +18912,9 @@ __metadata:
   languageName: node
   linkType: hard
 
-"wallet-common-helpers@https://github.com/Concordium/concordium-wallet-common-helpers.git#0d9ab94e7f82ed031ac42b002c87d4b9f4bbe20e":
+"wallet-common-helpers@https://github.com/Concordium/concordium-wallet-common-helpers.git#091af25fe2ced4137860a5f05b54eb6b89e55428":
   version: 1.5.0
-  resolution: "wallet-common-helpers@https://github.com/Concordium/concordium-wallet-common-helpers.git#commit=0d9ab94e7f82ed031ac42b002c87d4b9f4bbe20e"
+  resolution: "wallet-common-helpers@https://github.com/Concordium/concordium-wallet-common-helpers.git#commit=091af25fe2ced4137860a5f05b54eb6b89e55428"
   dependencies:
     "@concordium/common-sdk": ^1.0.1
     buffer: ^6.0.3
@@ -18925,7 +18925,7 @@ __metadata:
   peerDependencies:
     react: ">=16"
     react-dom: ">=16"
-  checksum: 0b15c07c9849339ea5918430aa6a79f1062268ac0f0871475fd3690eee01f140702c82f45a8241875fc02c6a4607a1b770ce33215a7bf1d159ebe4ffd2c932f5
+  checksum: 2c1c4345cd9665f758f5f01c6794a6b66907fdcfef7f59b3649a1df4b1e75693d54c0bf254f229791c4fa40065163970c781c120da2e0dccbbbbc74e0b47f9af
   languageName: node
   linkType: hard
 
