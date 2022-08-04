@@ -8,15 +8,15 @@ export const credentialsAtom = atomWithChromeStorage<WalletCredential[]>(ChromeS
 export const themeAtom = atomWithChromeStorage<Theme>(ChromeStorageKey.Theme, Theme.Light);
 export const urlWhitelistAtom = atomWithChromeStorage<string[]>(ChromeStorageKey.UrlWhitelist, []);
 
-const storedJsonRpcUrlAtom = atomWithChromeStorage<string | undefined>(ChromeStorageKey.JsonRpcUrl, undefined, true);
-export const jsonRpcUrlAtomLoading = atom<AsyncWrapper<string | undefined>, string | undefined>(
+const storedJsonRpcUrlAtom = atomWithChromeStorage<string>(ChromeStorageKey.JsonRpcUrl, '', true);
+export const jsonRpcUrlAtomLoading = atom<AsyncWrapper<string>, string>(
     (get) => get(storedJsonRpcUrlAtom),
     (_, set, jsonRpcUrl) => {
         set(storedJsonRpcUrlAtom, jsonRpcUrl);
         popupMessageHandler.broadcast(EventType.ChainChanged, jsonRpcUrl);
     }
 );
-export const jsonRpcUrlAtom = atom<string | undefined, string | undefined>(
+export const jsonRpcUrlAtom = atom<string, string>(
     (get) => get(jsonRpcUrlAtomLoading).value,
     (_, set, jsonRpcUrl) => {
         set(jsonRpcUrlAtomLoading, jsonRpcUrl);
