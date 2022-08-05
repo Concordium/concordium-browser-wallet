@@ -1,6 +1,7 @@
 # Piggy bank web application
 
 The example project included in this repository, serves as a working example of how to integrate with smart contracts on the Concordium blockchain.
+It both includes a page for a V0 and a V1 version of the piggy bank smart contract.
 
 ## Prerequisites
 

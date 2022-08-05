@@ -1,5 +1,5 @@
 {
-    "name": "piggybankV0",
+    "name": "piggybank",
     "packageManager": "yarn@3.2.0",
     "dependencies": {
         "@concordium/browser-wallet-api-helpers": "workspace:^",
