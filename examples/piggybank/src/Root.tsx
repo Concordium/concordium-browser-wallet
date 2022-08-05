@@ -4,10 +4,8 @@ import {
     AccountTransactionType,
     deserializeContractState,
     GtuAmount,
-    HttpProvider,
     InstanceInfoV0,
     isInstanceInfoV0,
-    JsonRpcClient,
     toBuffer,
     UpdateContractPayload,
 } from '@concordium/web-sdk';
@@ -30,9 +28,6 @@ const CONTRACT_SUB_INDEX = 0n;
 const CONTRACT_NAME = 'PiggyBank';
 const CONTRACT_SCHEMA = toBuffer('AQAAAAkAAABQaWdneUJhbmsBFQIAAAAGAAAASW50YWN0AgcAAABTbWFzaGVkAgAAAAAA', 'base64');
 
-/** This assumes a locally running JSON-RPC server targeting testnet: https://github.com/Concordium/concordium-json-rpc/tree/add-get-instance-info */
-const JSON_RPC_URL = 'http://localhost:9095';
-
 // Rust enums translated to JSON.
 type PiggyBankStateIntact = { Intact: [] };
 type PiggyBankStateSmashed = { Smashed: [] };
@@ -41,8 +36,6 @@ type PiggyBankState = PiggyBankStateIntact | PiggyBankStateSmashed;
 
 const isPiggybankSmashed = (state: PiggyBankState): state is PiggyBankStateSmashed =>
     (state as PiggyBankStateSmashed).Smashed !== undefined;
-
-const client = new JsonRpcClient(new HttpProvider(JSON_RPC_URL));
 
 /**
  * Global application state.
@@ -118,18 +111,23 @@ function PiggyBank() {
     const input = useRef<HTMLInputElement>(null);
 
     useEffect(() => {
-        // Get piggy bank data.
-        client.getInstanceInfo({ index: CONTRACT_INDEX, subindex: CONTRACT_SUB_INDEX }).then((info) => {
-            if (info?.name !== `init_${CONTRACT_NAME}`) {
-                // Check that we have the expected instance.
-                throw new Error(`Expected instance of PiggyBank: ${info?.name}`);
-            }
-            if (!isInstanceInfoV0(info)) {
-                // Check smart contract version. We expect V0.
-                throw new Error('Expected SC version 0');
-            }
+        detectConcordiumProvider().then((provider) => {
+            // Get piggy bank data.
+            provider.node
+                .getInstanceInfo({ index: CONTRACT_INDEX, subindex: CONTRACT_SUB_INDEX })
+                .then((info) => {
+                    if (info?.name !== `init_${CONTRACT_NAME}`) {
+                        // Check that we have the expected instance.
+                        throw new Error(`Expected instance of PiggyBank: ${info?.name}`);
+                    }
+                    if (!isInstanceInfoV0(info)) {
+                        // Check smart contract version. We expect V0.
+                        throw new Error('Expected SC version 0');
+                    }
 
-            setPiggyBank(info);
+                    setPiggyBank(info);
+                })
+                .catch(console.log);
         });
     }, []);
 

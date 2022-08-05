@@ -114,3 +114,12 @@ const provider = await detectConcordiumProvider();
 let selectedAccountAddress: string | undefined = undefined;
 provider.addChangeAccountListener((address) => (selectedAccountAddress = address));
 ```
+
+## Accessing node through JSON-RPC
+
+The wallet api exposes access to a JSON-RPC client. This allows a dApp to communicate with a node using JSON-RPC without knowing a server itself. The client can be accessed using the `node` field.
+
+```typescript
+const provider = await detectConcordiumProvider();
+const accountInfo = await provider.node.getAccountInfo(accountAddress);
+```

@@ -1670,6 +1670,8 @@ __metadata:
   dependencies:
     "@concordium/browser-wallet-api-helpers": "workspace:^"
     "@concordium/web-sdk": ^0.1.2
+    "@types/json-bigint": ^1.0.1
+    json-bigint: ^1.0.0
     typescript: ^4.3.5
   languageName: unknown
   linkType: soft
@@ -4273,6 +4275,13 @@ __metadata:
     jest-matcher-utils: ^27.0.0
     pretty-format: ^27.0.0
   checksum: 7e11c6826aa429ad990dc262e4e4b54aa36573287fddf15773e4137f07d11d3105f0dd9f1baff73252160a057df23f5529bb83b1bf83cd3f45f9460a5ca5c22e
+  languageName: node
+  linkType: hard
+
+"@types/json-bigint@npm:^1.0.1":
+  version: 1.0.1
+  resolution: "@types/json-bigint@npm:1.0.1"
+  checksum: b39e55a811f554bd25f1d991bc4fc70655216dff466f21f97160097573a4bc7b478c1907aa5194c79022c115f509f8e4712083c51f57665e7a2de7412ff7801f
   languageName: node
   linkType: hard
 

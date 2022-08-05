@@ -10,6 +10,7 @@ export enum MessageType {
     SignMessage = 'M_SignMessage',
     GetAccounts = 'M_GetAccounts',
     Connect = 'M_Connect',
+    JsonRpcRequest = 'M_JsonRpcRequest',
 }
 
 /**

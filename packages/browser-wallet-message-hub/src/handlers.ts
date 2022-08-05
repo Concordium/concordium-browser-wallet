@@ -151,7 +151,6 @@ export class ContentMessageHandler {
         // Propagate messages from inject -> extension
         window.addEventListener('message', ({ data: msg }) => {
             if (isMessage(msg)) {
-                // eslint-disable-next-line @typescript-eslint/no-explicit-any
                 chrome.runtime
                     .sendMessage(msg)
                     .then((response: WalletError | unknown) => {

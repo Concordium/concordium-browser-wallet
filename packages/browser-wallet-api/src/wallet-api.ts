@@ -1,7 +1,14 @@
 import { InjectedMessageHandler, createEventTypeFilter, MessageType } from '@concordium/browser-wallet-message-hub';
-import { AccountTransactionPayload, AccountTransactionSignature, AccountTransactionType } from '@concordium/web-sdk';
+import {
+    AccountTransactionPayload,
+    AccountTransactionSignature,
+    AccountTransactionType,
+    JsonRpcClient,
+} from '@concordium/web-sdk';
 import { WalletApi as IWalletApi, EventType } from '@concordium/browser-wallet-api-helpers';
 import EventEmitter from 'events';
+import type { JsonRpcRequest } from '@concordium/common-sdk/lib/providers/provider';
+import JSONBig from 'json-bigint';
 import { stringify } from './util';
 
 class WalletApi extends EventEmitter implements IWalletApi {
@@ -9,8 +16,17 @@ class WalletApi extends EventEmitter implements IWalletApi {
 
     private connected = false;
 
+    public node: JsonRpcClient;
+
     constructor() {
         super();
+        // We pre-serialize the parameters before sending to the background script.
+        const request = (...input: Parameters<JsonRpcRequest>) =>
+            this.sendMessage<string>(MessageType.JsonRpcRequest, {
+                method: input[0],
+                params: JSONBig.stringify(input[1]),
+            });
+        this.node = new JsonRpcClient({ request });
 
         // Set up message handlers to emit events.
         Object.values(EventType).forEach((eventType) => this.handleEvent(eventType));
