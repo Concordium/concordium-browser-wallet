@@ -1,6 +1,7 @@
 import SidedRow from '@popup/shared/SidedRow';
 import React, { CSSProperties } from 'react';
 import DoubleCheckmarkIcon from '@assets/svg/double-grey-checkmark.svg';
+import Warning from '@assets/svg/warning.svg';
 import { displayAsCcd } from 'wallet-common-helpers/lib/utils/ccd';
 import {
     BrowserWalletTransaction,
@@ -8,6 +9,7 @@ import {
     TransactionType,
 } from '@popup/shared/utils/transaction-history-types';
 import { dateFromTimestamp, TimeStampUnit } from 'wallet-common-helpers';
+import clsx from 'clsx';
 
 export const transactionElementHeight = 58;
 
@@ -140,18 +142,43 @@ function mapTypeToText(type: TransactionType): string {
     }
 }
 
+function isGreenAmount(transaction: BrowserWalletTransaction, accountAddress: string) {
+    if (transaction.status === TransactionStatus.Failed) {
+        return false;
+    }
+    if (
+        transaction.type === TransactionType.TransferToPublic &&
+        transaction.cost &&
+        transaction.amount > transaction.cost
+    ) {
+        return true;
+    }
+    return !isOutgoingTransaction(transaction, accountAddress);
+}
+
 /**
  * A transaction element in a TransactionList.
  */
 export default function TransactionElement({ accountAddress, transaction, style }: Props) {
     const transactionTime = onlyTime(dateFromTimestamp(transaction.time, TimeStampUnit.seconds));
+    const failed = transaction.status === TransactionStatus.Failed;
 
     return (
-        <div className="transaction-element" style={style} role="button">
+        <div
+            className={clsx('transaction-element', failed && 'transaction-element__failed')}
+            style={style}
+            role="button"
+        >
+            {failed ? <Warning className="transaction-element__warning" height="20" /> : null}
             <SidedRow
                 left={mapTypeToText(transaction.type)}
                 right={
-                    <p className="transaction-element__amount">
+                    <p
+                        className={clsx(
+                            'transaction-element__amount',
+                            isGreenAmount(transaction, accountAddress) && 'transaction-element__amount__greenText'
+                        )}
+                    >
                         {displayAsCcd(transaction.cost ? transaction.amount - transaction.cost : transaction.amount)}
                     </p>
                 }

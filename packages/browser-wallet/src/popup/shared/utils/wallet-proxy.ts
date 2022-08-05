@@ -37,6 +37,7 @@ export enum TransactionKindString {
     ConfigureBaker = 'configureBaker',
     ConfigureDelegation = 'configureDelegation',
     StakingReward = 'paydayAccountReward',
+    Malformed = 'Malformed account transaction',
 }
 
 function mapTransactionKindStringToTransactionType(kind: TransactionKindString): TransactionType {
@@ -229,7 +230,10 @@ export async function getTransactions(
 
     const response = await walletProxy.get(proxyPath);
     const result: WalletProxyAccTransactionsResult = response.data;
-    const transactions = result.transactions.map((t) => mapTransaction(t, accountAddress));
+    const transactionsWithoutMalformed = result.transactions.filter(
+        (t) => t.details.type !== TransactionKindString.Malformed
+    );
+    const transactions = transactionsWithoutMalformed.map((t) => mapTransaction(t, accountAddress));
     return {
         transactions,
         full: result.limit === result.count,

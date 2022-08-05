@@ -23,17 +23,8 @@
     border-top: 0.5px solid transparent;
     height: 58px;
 
-    &:focus {
-        outline: none;
-    }
-
     & + & {
         border-top-color: grey;
-    }
-
-    &VariableHeight {
-        padding-top: 10px;
-        padding-bottom: 10px;
     }
 
     &__no-transactions {
@@ -44,6 +35,10 @@
 
     &__amount {
         margin: 0;
+
+        &__greenText {
+            color: $color-green;
+        }
     }
 
     &__text-faded {
@@ -56,41 +51,19 @@
         top: 1px;
         margin-left: 5px;
     }
-}
 
-.clickableElement {
-    cursor: pointer;
+    &__warning {
+        position: absolute;
+        margin: 5px -25px;
 
-    &:focus {
-        box-shadow: 0 0 0 2px blue;
+        :global(.warning_svg__boundary) {
+            fill: $color-error;
+        }
     }
-}
 
-.failedElement {
-    padding-left: 30px;
-}
-
-.strikedThrough {
-    text-decoration: line-through;
-}
-
-.warning {
-    position: absolute;
-    margin: 5px -25px;
-
-    :global(.warning_svg__boundary) {
-        fill: red;
+    &__failed {
+        padding-left: 30px;
     }
-}
-
-.checkmark {
-    position: relative;
-    top: 1px;
-    margin-left: 5px;
-}
-
-.greenText {
-    color: green;
 }
 
 .transactionGroupHeaderPlaceholder {
