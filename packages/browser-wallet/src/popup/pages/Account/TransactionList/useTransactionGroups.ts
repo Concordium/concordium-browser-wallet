@@ -1,9 +1,9 @@
 import { useMemo } from 'react';
 import groupBy from 'lodash.groupby';
 import { BrowserWalletTransaction } from '@popup/shared/utils/transaction-history-types';
+import { dateFromTimestamp } from 'wallet-common-helpers';
 
 const dateFormat = Intl.DateTimeFormat(undefined, { dateStyle: 'medium' }).format;
-const dateFromTimeStamp = (timeStamp: bigint): Date => new Date(parseInt(timeStamp.toString(), 10) * 1000);
 
 const getGroupHeader = (d: Date): string => {
     const today = new Date().toDateString();
@@ -23,7 +23,7 @@ export type TransactionsByDateTuple = [string, BrowserWalletTransaction[]];
 
 export default function useTransactionGroups(transactions: BrowserWalletTransaction[]): TransactionsByDateTuple[] {
     const transactionGroups = useMemo(
-        () => Object.entries(groupBy(transactions, (t) => getGroupHeader(dateFromTimeStamp(t.time)))),
+        () => Object.entries(groupBy(transactions, (t) => getGroupHeader(dateFromTimestamp(t.time)))),
         [transactions]
     );
 

@@ -7,6 +7,8 @@ import {
     TransactionType,
 } from './transaction-history-types';
 
+// TODO The wallet proxy URL should be taken from storage when that has been
+// implemented.
 const walletProxy = axios.create({
     baseURL: 'https://wallet-proxy.testnet.concordium.com',
 });
