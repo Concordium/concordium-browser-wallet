@@ -220,7 +220,7 @@ function mapTransaction(transaction: WalletProxyTransaction, accountAddress: str
 export async function getTransactions(
     accountAddress: string,
     resultLimit: number,
-    order: string,
+    order: 'ascending' | 'descending',
     from?: number
 ): Promise<TransactionHistoryResult> {
     let proxyPath = `/v1/accTransactions/${accountAddress}?limit=${resultLimit}&order=${order.toString()}&includeRawRejectReason`;

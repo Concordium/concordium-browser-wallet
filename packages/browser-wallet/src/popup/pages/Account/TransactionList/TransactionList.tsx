@@ -138,26 +138,15 @@ export default function TransactionList() {
         return null;
     }
 
-    useEffect(() => {
-        setTransactions([]);
-        getTransactions(accountAddress, 20, 'descending').then((transactionResult) => {
-            setHasNextPage(transactionResult.full);
-            setTransactions(transactionResult.transactions);
-            setIsNextPageLoading(false);
-        });
-    }, [accountAddress]);
-
-    const loadNextPage = async () => {
+    async function loadTransactionsDescending(address: string, appendTransactions: boolean, fromId?: number) {
         setIsNextPageLoading(true);
-        let fromId;
-        if (transactions.length) {
-            fromId = transactions[transactions.length - 1].id;
-        }
-
-        getTransactions(accountAddress, 20, 'descending', fromId)
+        getTransactions(address, 20, 'descending', fromId)
             .then((transactionResult) => {
                 setHasNextPage(transactionResult.full);
-                setTransactions(transactions.concat(transactionResult.transactions));
+                const updatedTransactions = appendTransactions
+                    ? transactions.concat(transactionResult.transactions)
+                    : transactionResult.transactions;
+                setTransactions(updatedTransactions);
                 setIsNextPageLoading(false);
             })
             .catch((e) => {
@@ -165,13 +154,25 @@ export default function TransactionList() {
                 setIsNextPageLoading(false);
                 throw Error(e);
             });
+    }
+
+    useEffect(() => {
+        setTransactions([]);
+        loadTransactionsDescending(accountAddress, false);
+    }, [accountAddress]);
+
+    const loadNextPage = async () => {
+        let fromId;
+        if (transactions.length) {
+            fromId = transactions[transactions.length - 1].id;
+        }
+        loadTransactionsDescending(accountAddress, true, fromId);
     };
 
-    // TODO Fix initial flash of no transactions to show...
     let transactionListComponent;
     if (transactions.length === 0) {
         if (isNextPageLoading) {
-            transactionListComponent = <h3>Loading transactions</h3>;
+            transactionListComponent = null;
         } else {
             transactionListComponent = (
                 <h3 className="transaction-element__no-transactions">No transactions to show for account.</h3>
