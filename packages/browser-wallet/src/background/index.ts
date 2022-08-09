@@ -4,7 +4,7 @@ import {
     InternalMessageType,
     MessageType,
 } from '@concordium/browser-wallet-message-hub';
-import { storedSelectedAccount, storedUrlWhitelist } from '@shared/storage/access';
+import { storedConnectedSites, storedSelectedAccount } from '@shared/storage/access';
 
 import bgMessageHandler from './message-handler';
 import { forwardToPopup, HandleMessage, HandleResponse, RunCondition, setPopupSize } from './window-management';
@@ -37,12 +37,18 @@ bgMessageHandler.handleMessage(createMessageTypeFilter(InternalMessageType.SetVi
 });
 
 /**
- * Run condition which looks up url in stored whitelist. Runs handler if url is included in whitelist.
+ * Run condition which looks up URL in connected sites for the selected account. Runs handler if URL is included in connected sites.
  */
 const runIfWhitelisted: RunCondition<false> = async (_msg, sender) => {
-    const whitelist = (await storedUrlWhitelist.get()) ?? [];
+    const selectedAccount = await storedSelectedAccount.get();
+    const connectedSites = await storedConnectedSites.get();
 
-    if (sender.url !== undefined && whitelist.includes(sender.url)) {
+    if (selectedAccount === undefined || connectedSites === undefined) {
+        return { run: false, response: false };
+    }
+
+    const accountConnectedSites = connectedSites[selectedAccount];
+    if (sender.url !== undefined && accountConnectedSites.includes(sender.url)) {
         return { run: true };
     }
 
@@ -50,17 +56,21 @@ const runIfWhitelisted: RunCondition<false> = async (_msg, sender) => {
 };
 
 /**
- * Run condition which looks up url in stored whitelist. Runs handler if url is NOT included in whitelist.
+ * Run condition which looks up URL in connected sites for the selected account. Runs handler if URL is NOT included in connected sites.
  */
 const runIfNotWhitelisted: RunCondition<string | undefined> = async (_msg, sender) => {
-    const whitelist = (await storedUrlWhitelist.get()) ?? [];
-
     if (!sender.url) {
-        throw new Error('Expected url to be available for sender.');
+        throw new Error('Expected URL to be available for sender.');
     }
 
-    if (whitelist.includes(sender.url)) {
-        const selectedAccount = await storedSelectedAccount.get();
+    const selectedAccount = await storedSelectedAccount.get();
+    const connectedSites = await storedConnectedSites.get();
+    if (selectedAccount === undefined) {
+        return { run: false, response: undefined };
+    }
+
+    const accountConnectedSites = connectedSites ? connectedSites[selectedAccount] : [];
+    if (accountConnectedSites && accountConnectedSites.includes(sender.url)) {
         return { run: false, response: selectedAccount };
     }
 
@@ -82,9 +92,7 @@ const handleConnectionResponse: HandleResponse<string | undefined | false> = asy
     }
 
     if (response !== false) {
-        const whitelist = (await storedUrlWhitelist.get()) ?? [];
-        storedUrlWhitelist.set([...whitelist, sender.url]);
-
+        // TODO Is this okay?
         return storedSelectedAccount.get();
     }
 

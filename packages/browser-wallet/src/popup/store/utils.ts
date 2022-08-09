@@ -1,5 +1,6 @@
 import {
     StorageAccessor,
+    storedConnectedSites,
     storedCredentials,
     storedJsonRpcUrl,
     storedSelectedAccount,
@@ -10,6 +11,7 @@ import { ChromeStorageKey } from '@shared/storage/types';
 import { atom, WritableAtom } from 'jotai';
 
 const accessorMap = {
+    [ChromeStorageKey.ConnectedSites]: storedConnectedSites,
     [ChromeStorageKey.Credentials]: storedCredentials,
     [ChromeStorageKey.SelectedAccount]: storedSelectedAccount,
     [ChromeStorageKey.JsonRpcUrl]: storedJsonRpcUrl,

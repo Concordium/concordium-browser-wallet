@@ -1,4 +1,5 @@
 .connection-request {
+    background-color: $color-bg;
     display: block;
 
     &__actions {
@@ -11,5 +12,22 @@
     &__url {
         white-space: pre-wrap;
         word-break: break-all;
+    }
+}
+
+.account-list {
+    width: 100%;
+    padding-left: rem(14px);
+    padding-right: rem(14px);
+    background-color: $color-bg;
+    margin-top: 5px;
+
+    &__element {
+        padding-top: rem(10px);
+        padding-bottom: rem(10px);
+    }
+
+    & > *:not(:last-child) {
+        border-bottom: rem(1px) solid $color-petroleum;
     }
 }

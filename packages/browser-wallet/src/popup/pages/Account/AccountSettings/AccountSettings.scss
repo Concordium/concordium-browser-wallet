@@ -23,6 +23,11 @@
         justify-content: space-between;
         padding-top: rem(10px);
         padding-bottom: rem(10px);
+
+        &__disconnect {
+            cursor: pointer;
+            color: $color-blue;
+        }
     }
 
     & > *:not(:last-child) {
