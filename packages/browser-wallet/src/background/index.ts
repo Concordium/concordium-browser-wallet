@@ -56,7 +56,13 @@ const runIfWhitelisted: RunCondition<false> = async (_msg, sender) => {
 };
 
 /**
- * Run condition which looks up URL in connected sites for the selected account. Runs handler if URL is NOT included in connected sites.
+ * Run condition that runs the handler if the wallet is non-empty (an account exists), and no
+ * account in the wallet is connected to the sender URL.
+ *
+ * 1. If no selected account exists (the wallet is empty), then do not run and return undefined.
+ * 1. Else if the selected account is connected to the sender URL, then do not run and return the select account address.
+ * 1. Else if any other account is connected to the sender URL, then do not run and return that account's address.
+ * 1. Else run the handler.
  */
 const runIfNotWhitelisted: RunCondition<string | undefined> = async (_msg, sender) => {
     if (!sender.url) {
@@ -65,15 +71,29 @@ const runIfNotWhitelisted: RunCondition<string | undefined> = async (_msg, sende
 
     const selectedAccount = await storedSelectedAccount.get();
     const connectedSites = await storedConnectedSites.get();
+
+    // No accounts in the wallet.
     if (selectedAccount === undefined) {
         return { run: false, response: undefined };
     }
 
-    const accountConnectedSites = connectedSites ? connectedSites[selectedAccount] : [];
-    if (accountConnectedSites && accountConnectedSites.includes(sender.url)) {
+    // Selected account is connected to the URL, so do not run but returns its address.
+    const selectedAccountConnectedSites = connectedSites ? connectedSites[selectedAccount] : [];
+    if (selectedAccountConnectedSites.includes(sender.url)) {
         return { run: false, response: selectedAccount };
     }
 
+    // Another account in the wallet is connected to the URL, so do not run but return that address.
+    if (connectedSites) {
+        const connectedAccount = Object.entries(connectedSites).find(
+            (item) => sender.url && item[1].includes(sender.url)
+        );
+        if (connectedAccount) {
+            return { run: false, response: connectedAccount[0] };
+        }
+    }
+
+    // No account in the wallet is connected to the URL, so run the handler.
     return { run: true };
 };
 
@@ -92,7 +112,6 @@ const handleConnectionResponse: HandleResponse<string | undefined | false> = asy
     }
 
     if (response !== false) {
-        // TODO Is this okay?
         return storedSelectedAccount.get();
     }
 
