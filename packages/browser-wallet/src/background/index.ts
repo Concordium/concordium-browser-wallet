@@ -37,18 +37,18 @@ bgMessageHandler.handleMessage(createMessageTypeFilter(InternalMessageType.SetVi
 });
 
 /**
- * Run condition which looks up URL in connected sites for the selected account. Runs handler if URL is included in connected sites.
+ * Run condition which looks up URL in connected sites for the provided account. Runs handler if URL is included in connected sites.
  */
-const runIfWhitelisted: RunCondition<false> = async (_msg, sender) => {
-    const selectedAccount = await storedSelectedAccount.get();
+const runIfWhitelisted: RunCondition<false> = async (msg, sender) => {
+    const { accountAddress } = msg.payload;
     const connectedSites = await storedConnectedSites.get();
 
-    if (selectedAccount === undefined || connectedSites === undefined) {
+    if (!accountAddress || connectedSites === undefined) {
         return { run: false, response: false };
     }
 
-    const accountConnectedSites = connectedSites[selectedAccount];
-    if (sender.url !== undefined && accountConnectedSites.includes(sender.url)) {
+    const accountConnectedSites = connectedSites[accountAddress];
+    if (sender.url !== undefined && accountConnectedSites && accountConnectedSites.includes(sender.url)) {
         return { run: true };
     }
 
@@ -79,7 +79,7 @@ const runIfNotWhitelisted: RunCondition<string | undefined> = async (_msg, sende
 
     // Selected account is connected to the URL, so do not run but returns its address.
     const selectedAccountConnectedSites = connectedSites ? connectedSites[selectedAccount] : [];
-    if (selectedAccountConnectedSites.includes(sender.url)) {
+    if (selectedAccountConnectedSites && selectedAccountConnectedSites.includes(sender.url)) {
         return { run: false, response: selectedAccount };
     }
 
@@ -112,7 +112,29 @@ const handleConnectionResponse: HandleResponse<string | undefined | false> = asy
     }
 
     if (response !== false) {
-        return storedSelectedAccount.get();
+        const selectedAccount = await storedSelectedAccount.get();
+        const connectedSites = await storedConnectedSites.get();
+
+        if (selectedAccount && connectedSites) {
+            // Selected account is connected to the URL, so return its address
+            const selectedAccountConnectedSites = connectedSites ? connectedSites[selectedAccount] : [];
+            if (selectedAccountConnectedSites && selectedAccountConnectedSites.includes(sender.url)) {
+                return selectedAccount;
+            }
+
+            // Another account in the wallet is connected to the URL, so do not run but return that address.
+            if (connectedSites) {
+                const connectedAccount = Object.entries(connectedSites).find(
+                    (item) => sender.url && item[1] && item[1].includes(sender.url)
+                );
+                if (connectedAccount) {
+                    return connectedAccount[0];
+                }
+            }
+
+            return undefined;
+        }
+        return undefined;
     }
 
     return response;

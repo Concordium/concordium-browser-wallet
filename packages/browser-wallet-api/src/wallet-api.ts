@@ -19,8 +19,9 @@ class WalletApi extends EventEmitter implements IWalletApi {
     /**
      * Sends a sign request to the Concordium Wallet and awaits the users action
      */
-    public async signMessage(message: string): Promise<AccountTransactionSignature> {
+    public async signMessage(accountAddress: string, message: string): Promise<AccountTransactionSignature> {
         const response = await this.sendMessage<AccountTransactionSignature | undefined>(MessageType.SignMessage, {
+            accountAddress,
             message,
         });
 
@@ -50,12 +51,14 @@ class WalletApi extends EventEmitter implements IWalletApi {
      * Sends a transaction to the Concordium Wallet and awaits the users action
      */
     public async sendTransaction(
+        accountAddress: string,
         type: AccountTransactionType,
         payload: AccountTransactionPayload,
         parameters?: Record<string, unknown>,
         schema?: string
     ): Promise<string> {
         const response = await this.sendMessage<string | undefined>(MessageType.SendTransaction, {
+            accountAddress,
             type,
             payload: stringify(payload),
             parameters,
