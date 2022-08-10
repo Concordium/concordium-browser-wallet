@@ -47,13 +47,43 @@ const runIfWhitelisted: RunCondition<false> = async (msg, sender) => {
         return { run: false, response: false };
     }
 
-    const accountConnectedSites = connectedSites[accountAddress];
-    if (sender.url !== undefined && accountConnectedSites && accountConnectedSites.includes(sender.url)) {
+    const accountConnectedSites = connectedSites[accountAddress] ?? [];
+    if (sender.url !== undefined && accountConnectedSites.includes(sender.url)) {
         return { run: true };
     }
 
     return { run: false, response: false };
 };
+
+/**
+ * Finds the most prioritized account that is connected to the provided site.
+ * The priority is defined as:
+ * 1. If the selected account is connected, then that is returned.
+ * 1. The first account other than the selected account that is connected to the site. The order here
+ * is defined by the order of the entries of the stored connected sites.
+ * @param url the site to find an account that is connected to
+ * @returns the highest priority account address that is connected to the site with the provided URL.
+ */
+async function findPrioritizedAccountConnectedToSite(url: string): Promise<string | undefined> {
+    const selectedAccount = await storedSelectedAccount.get();
+    const connectedSites = await storedConnectedSites.get();
+
+    if (!selectedAccount || !connectedSites) {
+        return undefined;
+    }
+
+    const selectedAccountConnectedSites = connectedSites[selectedAccount] ?? [];
+    if (selectedAccountConnectedSites.includes(url)) {
+        return selectedAccount;
+    }
+
+    const connectedAccount = Object.entries(connectedSites).find((item) => item[1] && item[1].includes(url));
+    if (connectedAccount) {
+        return connectedAccount[0];
+    }
+
+    return undefined;
+}
 
 /**
  * Run condition that runs the handler if the wallet is non-empty (an account exists), and no
@@ -70,27 +100,15 @@ const runIfNotWhitelisted: RunCondition<string | undefined> = async (_msg, sende
     }
 
     const selectedAccount = await storedSelectedAccount.get();
-    const connectedSites = await storedConnectedSites.get();
 
     // No accounts in the wallet.
     if (selectedAccount === undefined) {
         return { run: false, response: undefined };
     }
 
-    // Selected account is connected to the URL, so do not run but returns its address.
-    const selectedAccountConnectedSites = connectedSites ? connectedSites[selectedAccount] : [];
-    if (selectedAccountConnectedSites && selectedAccountConnectedSites.includes(sender.url)) {
-        return { run: false, response: selectedAccount };
-    }
-
-    // Another account in the wallet is connected to the URL, so do not run but return that address.
-    if (connectedSites) {
-        const connectedAccount = Object.entries(connectedSites).find(
-            (item) => sender.url && item[1].includes(sender.url)
-        );
-        if (connectedAccount) {
-            return { run: false, response: connectedAccount[0] };
-        }
+    const accountConnectedToSite = await findPrioritizedAccountConnectedToSite(sender.url);
+    if (accountConnectedToSite) {
+        return { run: false, response: accountConnectedToSite };
     }
 
     // No account in the wallet is connected to the URL, so run the handler.
@@ -112,29 +130,7 @@ const handleConnectionResponse: HandleResponse<string | undefined | false> = asy
     }
 
     if (response !== false) {
-        const selectedAccount = await storedSelectedAccount.get();
-        const connectedSites = await storedConnectedSites.get();
-
-        if (selectedAccount && connectedSites) {
-            // Selected account is connected to the URL, so return its address
-            const selectedAccountConnectedSites = connectedSites ? connectedSites[selectedAccount] : [];
-            if (selectedAccountConnectedSites && selectedAccountConnectedSites.includes(sender.url)) {
-                return selectedAccount;
-            }
-
-            // Another account in the wallet is connected to the URL, so do not run but return that address.
-            if (connectedSites) {
-                const connectedAccount = Object.entries(connectedSites).find(
-                    (item) => sender.url && item[1] && item[1].includes(sender.url)
-                );
-                if (connectedAccount) {
-                    return connectedAccount[0];
-                }
-            }
-
-            return undefined;
-        }
-        return undefined;
+        return findPrioritizedAccountConnectedToSite(sender.url);
     }
 
     return response;

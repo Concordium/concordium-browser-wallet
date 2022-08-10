@@ -9,7 +9,8 @@ import { atomWithChromeStorage } from './utils';
 
 export const storedConnectedSitesAtom = atomWithChromeStorage<Record<string, string[]>>(
     ChromeStorageKey.ConnectedSites,
-    {}
+    {},
+    true
 );
 
 const storedAccountAtom = atomWithChromeStorage<string | undefined>(ChromeStorageKey.SelectedAccount, undefined);

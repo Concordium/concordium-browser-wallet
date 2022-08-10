@@ -15,13 +15,14 @@ export default function ConnectionRequest({ onAllow, onReject }: Props) {
     const { t } = useTranslation('connectionRequest');
     const { onClose, withClose } = useContext(fullscreenPromptContext);
     const selectedAccount = useAtomValue(selectedAccountAtom);
-    const [connectedSites, setConnectedSites] = useAtom(storedConnectedSitesAtom);
-
-    if (!selectedAccount) {
-        return null;
-    }
+    const [connectedSitesLoading, setConnectedSites] = useAtom(storedConnectedSitesAtom);
+    const connectedSites = connectedSitesLoading.value;
 
     useEffect(() => onClose(onReject), [onClose, onReject]);
+
+    if (!selectedAccount || connectedSitesLoading.loading) {
+        return null;
+    }
 
     function connectAccount(account: string, url: string) {
         const updatedConnectedSites = {
@@ -45,7 +46,7 @@ export default function ConnectionRequest({ onAllow, onReject }: Props) {
             </header>
             <pre className="connection-request__url">{title}</pre>
             <pre className="connection-request__url">{url}</pre>
-            <div>{t('description', { selectedAccount })}</div>
+            <div className="connection-request__address">{t('description', { selectedAccount })}</div>
             <div className="connection-request__actions">
                 <button
                     type="button"

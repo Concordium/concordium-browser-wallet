@@ -251,7 +251,7 @@ export class ExtensionsMessageHandler extends BaseMessageHandler<WalletMessage> 
 
         let whitelistedUrls: string[] = [];
         if (selectedAccount && connectedSites) {
-            whitelistedUrls = connectedSites[selectedAccount];
+            whitelistedUrls = connectedSites[selectedAccount] ?? [];
         }
 
         return tabs.filter(({ url }) => url !== undefined && whitelistedUrls?.includes(url));

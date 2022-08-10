@@ -2,20 +2,23 @@ import React from 'react';
 import { useAtom, useAtomValue } from 'jotai';
 import { selectedAccountAtom, storedConnectedSitesAtom } from '@popup/store/account';
 import Button from '@popup/shared/Button';
+import { useTranslation } from 'react-i18next';
 
 export default function ConnectedSites() {
+    const { t } = useTranslation('account', { keyPrefix: 'settings.connectedSites' });
     const selectedAccount = useAtomValue(selectedAccountAtom);
-    const [connectedSites, setConnectedSites] = useAtom(storedConnectedSitesAtom);
+    const [connectedSitesLoading, setConnectedSites] = useAtom(storedConnectedSitesAtom);
+    const connectedSites = connectedSitesLoading.value;
 
     if (!selectedAccount) {
         return null;
     }
 
-    const localSites = connectedSites[selectedAccount];
-    if (!localSites || localSites.length === 0) {
+    const localSites = connectedSites[selectedAccount] ?? [];
+    if (!connectedSitesLoading.loading && localSites.length === 0) {
         return (
             <div className="connected-sites-list">
-                <div className="connected-sites-list__element">The selected account is not connected to any sites.</div>
+                <div className="connected-sites-list__element">{t('noConnected')}</div>
             </div>
         );
     }
@@ -43,7 +46,7 @@ export default function ConnectedSites() {
                             className="connected-sites-list__element__disconnect"
                             onClick={() => removeConnectedSite(site, selectedAccount)}
                         >
-                            Disconnect
+                            {t('disconnect')}
                         </Button>
                     </div>
                 );

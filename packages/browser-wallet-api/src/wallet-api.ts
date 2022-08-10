@@ -38,7 +38,8 @@ class WalletApi extends EventEmitter implements IWalletApi {
     public async connect(): Promise<string | undefined> {
         const response = await this.messageHandler.sendMessage<string | undefined | false>(MessageType.Connect);
 
-        if (response === false) {
+        // TODO Response becomes === null when we would expect it to be undefined. Catching it here is a temporary quick-fix.
+        if (response === false || response === null) {
             throw new Error('Connection rejected');
         }
 

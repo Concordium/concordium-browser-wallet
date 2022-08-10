@@ -37,5 +37,4 @@ export const storedConnectedSites = makeStorageAccessor<Record<string, string[]>
 export const storedCredentials = makeStorageAccessor<WalletCredential[]>('local', ChromeStorageKey.Credentials);
 export const storedJsonRpcUrl = makeStorageAccessor<string>('local', ChromeStorageKey.JsonRpcUrl);
 export const storedSelectedAccount = makeStorageAccessor<string>('local', ChromeStorageKey.SelectedAccount);
-export const storedUrlWhitelist = makeStorageAccessor<string[]>('local', ChromeStorageKey.UrlWhitelist);
 export const storedTheme = makeStorageAccessor<Theme>('local', ChromeStorageKey.Theme);
