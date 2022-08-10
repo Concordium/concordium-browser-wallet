@@ -90,7 +90,7 @@ async function findPrioritizedAccountConnectedToSite(url: string): Promise<strin
  * account in the wallet is connected to the sender URL.
  *
  * 1. If no selected account exists (the wallet is empty), then do not run and return undefined.
- * 1. Else if the selected account is connected to the sender URL, then do not run and return the select account address.
+ * 1. Else if the selected account is connected to the sender URL, then do not run and return the selected account address.
  * 1. Else if any other account is connected to the sender URL, then do not run and return that account's address.
  * 1. Else run the handler.
  */
