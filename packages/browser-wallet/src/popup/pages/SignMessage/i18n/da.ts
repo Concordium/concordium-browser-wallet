@@ -1,7 +1,7 @@
 import type en from './en';
 
 const t: typeof en = {
-    description: 'Signér besked',
+    description: 'Signér besked med konto {{address}}',
     sign: 'Signér',
     deny: 'Afvis',
     error: 'Fejl',

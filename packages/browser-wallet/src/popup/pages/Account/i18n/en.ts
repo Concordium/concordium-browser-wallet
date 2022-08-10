@@ -14,6 +14,14 @@ const t = {
         atDisposal: 'Public amount at disposal',
         stakeAmount: 'Stake / delegation amount',
     },
+    settings: {
+        connectedSites: {
+            title: 'Connected sites',
+            noConnected: 'The selected account is not connected to any sites.',
+            disconnect: 'Disconnect',
+        },
+        exportPrivateKey: 'Export private key',
+    },
 };
 
 export default t;
