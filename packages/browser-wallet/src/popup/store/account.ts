@@ -7,6 +7,12 @@ import { EventType } from '@concordium/browser-wallet-api-helpers';
 import { credentialsAtom } from './settings';
 import { atomWithChromeStorage } from './utils';
 
+export const storedConnectedSitesAtom = atomWithChromeStorage<Record<string, string[]>>(
+    ChromeStorageKey.ConnectedSites,
+    {},
+    true
+);
+
 const storedAccountAtom = atomWithChromeStorage<string | undefined>(ChromeStorageKey.SelectedAccount, undefined);
 export const selectedAccountAtom = atom<string | undefined, string | undefined>(
     (get) => get(storedAccountAtom),

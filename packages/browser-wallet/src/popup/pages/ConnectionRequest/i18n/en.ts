@@ -1,6 +1,6 @@
 const t = {
     title: 'Connection request',
-    description: 'Allow connection from "{{title}}"',
+    description: 'Allow this site to connect to account {{selectedAccount}}',
     actions: {
         allow: 'Allow',
         reject: 'Reject',

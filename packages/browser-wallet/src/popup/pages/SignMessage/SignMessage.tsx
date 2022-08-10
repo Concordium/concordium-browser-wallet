@@ -3,7 +3,6 @@ import React, { useContext, useCallback, useState } from 'react';
 import { useTranslation } from 'react-i18next';
 import { useLocation } from 'react-router-dom';
 import { useAtomValue } from 'jotai';
-import { selectedAccountAtom } from '@popup/store/account';
 import { credentialsAtom } from '@popup/store/settings';
 import { signMessage, buildBasicAccountSigner, AccountTransactionSignature } from '@concordium/web-sdk';
 
@@ -15,6 +14,7 @@ type Props = {
 interface Location {
     state: {
         payload: {
+            accountAddress: string;
             message: string;
         };
     };
@@ -24,9 +24,9 @@ export default function SignMessage({ onSubmit, onReject }: Props) {
     const { state } = useLocation() as Location;
     const [error, setError] = useState();
     const { t } = useTranslation('signMessage');
-    const address = useAtomValue(selectedAccountAtom);
     const creds = useAtomValue(credentialsAtom);
     const { withClose } = useContext(fullscreenPromptContext);
+    const address = state.payload.accountAddress;
 
     const onClick = useCallback(async () => {
         if (!address) {
@@ -37,11 +37,11 @@ export default function SignMessage({ onSubmit, onReject }: Props) {
             throw new Error('Missing key for the chosen address');
         }
         return signMessage(state.payload.message, buildBasicAccountSigner(key));
-    }, [state.payload.message]);
+    }, [state.payload.message, state.payload.accountAddress]);
 
     return (
         <>
-            <div>{t('description')}</div>
+            <div>{t('description', { address })}</div>
             <p>{state.payload.message}</p>
             <button
                 type="button"

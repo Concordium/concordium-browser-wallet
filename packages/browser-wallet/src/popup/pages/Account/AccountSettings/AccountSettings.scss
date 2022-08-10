@@ -1,0 +1,36 @@
+.account-settings-page {
+    height: 100%;
+    width: 100%;
+    background-color: $color-bg;
+    padding: 0 rem(10px);
+    display: block;
+
+    &__link {
+        display: block;
+        padding: rem(10px) 0;
+    }
+}
+
+.connected-sites-list {
+    width: 100%;
+    padding-left: rem(14px);
+    padding-right: rem(14px);
+    background-color: $color-bg;
+
+    &__element {
+        display: flex;
+        flex-direction: row;
+        justify-content: space-between;
+        padding-top: rem(10px);
+        padding-bottom: rem(10px);
+
+        &__disconnect {
+            cursor: pointer;
+            color: $color-blue;
+        }
+    }
+
+    & > *:not(:last-child) {
+        border-bottom: rem(1px) solid $color-petroleum;
+    }
+}

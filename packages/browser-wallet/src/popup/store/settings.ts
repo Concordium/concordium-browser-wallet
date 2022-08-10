@@ -6,7 +6,6 @@ import { atomWithChromeStorage, AsyncWrapper } from './utils';
 
 export const credentialsAtom = atomWithChromeStorage<WalletCredential[]>(ChromeStorageKey.Credentials, []);
 export const themeAtom = atomWithChromeStorage<Theme>(ChromeStorageKey.Theme, Theme.Light);
-export const urlWhitelistAtom = atomWithChromeStorage<string[]>(ChromeStorageKey.UrlWhitelist, []);
 
 const storedJsonRpcUrlAtom = atomWithChromeStorage<string>(ChromeStorageKey.JsonRpcUrl, '', true);
 export const jsonRpcUrlAtomLoading = atom<AsyncWrapper<string>, string>(

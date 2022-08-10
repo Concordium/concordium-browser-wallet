@@ -58,15 +58,15 @@ const state = createContext<State>({ isConnected: false, account: undefined, jso
 /**
  * Action for depositing an amount of microCCD to the piggy bank instance
  */
-const deposit = (amount = 0) => {
-    if (!Number.isInteger(amount) || amount <= 0) {
+const deposit = (account?: string, amount = 0) => {
+    if (!Number.isInteger(amount) || amount <= 0 || !account) {
         return;
     }
 
     detectConcordiumProvider()
         .then((provider) => {
             provider
-                .sendTransaction(AccountTransactionType.UpdateSmartContractInstance, {
+                .sendTransaction(account, AccountTransactionType.UpdateSmartContractInstance, {
                     amount: new GtuAmount(BigInt(amount)),
                     contractAddress: {
                         index: CONTRACT_INDEX,
@@ -89,11 +89,15 @@ const deposit = (amount = 0) => {
  * Action for smashing the piggy bank. This is only possible to do, if the account sending the transaction matches the owner of the piggy bank:
  * https://github.com/Concordium/concordium-rust-smart-contracts/blob/c4d95504a51c15bdbfec503c9e8bf5e93a42e24d/examples/piggy-bank/part1/src/lib.rs#L64
  */
-const smash = () => {
+const smash = (account?: string) => {
+    if (!account) {
+        return;
+    }
+
     detectConcordiumProvider()
         .then((provider) => {
             provider
-                .sendTransaction(AccountTransactionType.UpdateSmartContractInstance, {
+                .sendTransaction(account, AccountTransactionType.UpdateSmartContractInstance, {
                     amount: new GtuAmount(0n), // This feels weird? Why do I need an amount for a non-payable receive?
                     contractAddress: {
                         index: CONTRACT_INDEX,
@@ -173,7 +177,7 @@ function PiggyBank() {
                     <button
                         className="deposit"
                         type="button"
-                        onClick={() => deposit(input.current?.valueAsNumber)}
+                        onClick={() => deposit(account, input.current?.valueAsNumber)}
                         disabled={!canUse}
                     >
                         <PiggyIcon height="20" />
@@ -185,7 +189,7 @@ function PiggyBank() {
             <button
                 className="smash"
                 type="button"
-                onClick={() => smash()}
+                onClick={() => smash(account)}
                 disabled={account === undefined || account !== piggybank?.owner.address || !canUse} // The smash button is only active for the contract owner.
             >
                 <HammerIcon width="40" />
