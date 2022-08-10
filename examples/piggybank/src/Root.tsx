@@ -117,7 +117,8 @@ function PiggyBank() {
     useEffect(() => {
         detectConcordiumProvider().then((provider) => {
             // Get piggy bank data.
-            provider.node
+            provider
+                .getJsonRpcClient()
                 .getInstanceInfo({ index: CONTRACT_INDEX, subindex: CONTRACT_SUB_INDEX })
                 .then((info) => {
                     if (info?.name !== `init_${CONTRACT_NAME}`) {
