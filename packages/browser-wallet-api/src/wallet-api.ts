@@ -16,7 +16,7 @@ class WalletApi extends EventEmitter implements IWalletApi {
 
     private connected = false;
 
-    public node: JsonRpcClient;
+    private jsonRpcClient: JsonRpcClient;
 
     constructor() {
         super();
@@ -26,7 +26,7 @@ class WalletApi extends EventEmitter implements IWalletApi {
                 method: input[0],
                 params: JSONBig.stringify(input[1]),
             });
-        this.node = new JsonRpcClient({ request });
+        this.jsonRpcClient = new JsonRpcClient({ request });
 
         // Set up message handlers to emit events.
         Object.values(EventType).forEach((eventType) => this.handleEvent(eventType));
@@ -96,6 +96,10 @@ class WalletApi extends EventEmitter implements IWalletApi {
 
     private handleEvent(type: EventType) {
         this.messageHandler.handleMessage(createEventTypeFilter(type), (msg) => this.emit(type, msg.payload));
+    }
+
+    public getJsonRpcClient(): JsonRpcClient {
+        return this.jsonRpcClient;
     }
 }
 

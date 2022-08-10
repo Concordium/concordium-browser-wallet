@@ -65,7 +65,7 @@ interface MainWalletApi {
 
     removeAllListeners(event?: EventType | string | undefined): this;
 
-    node: JsonRpcClient;
+    getJsonRpcClient(): JsonRpcClient;
 }
 
 export type WalletApi = MainWalletApi & EventListeners;

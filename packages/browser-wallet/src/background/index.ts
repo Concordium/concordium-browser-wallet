@@ -4,43 +4,12 @@ import {
     InternalMessageType,
     MessageType,
 } from '@concordium/browser-wallet-message-hub';
+import { HttpProvider } from '@concordium/web-sdk';
 import { storedSelectedAccount, storedUrlWhitelist, storedJsonRpcUrl } from '@shared/storage/access';
 
-import { v4 as uuidv4 } from 'uuid';
+import JSONBig from 'json-bigint';
 import bgMessageHandler from './message-handler';
 import { forwardToPopup, HandleMessage, HandleResponse, RunCondition, setPopupSize } from './window-management';
-
-// TODO Replace with concordiumSDK HttpProvider when cross-fetch supports service workers. https://github.com/lquixada/cross-fetch/issues/78
-// eslint-disable-next-line @typescript-eslint/no-explicit-any
-const jsonRpcRequest = async (url: string, method: string, params?: any) => {
-    const paramPlaceholder = '____params____';
-    const request = {
-        method,
-        params: params ? paramPlaceholder : undefined,
-        id: uuidv4(),
-        jsonrpc: '2.0',
-    };
-
-    const options = {
-        method: 'POST',
-        body: JSON.stringify(request).replace(`"${paramPlaceholder}"`, params),
-        headers: {
-            'Content-Type': 'application/json',
-        },
-    };
-
-    const res = await fetch(url, options);
-    if (res.status >= 400) {
-        const json = await res.json();
-        if (json.error) {
-            throw new Error(`${json.error.code}: ${json.error.message} (id: ${json.id})`);
-        } else {
-            throw new Error(`${res.status}: ${res.statusText} (id: ${json.id})`);
-        }
-    }
-
-    return res.text();
-};
 
 /**
  * Callback method which installs Injected script into Main world of Dapp
@@ -74,7 +43,10 @@ bgMessageHandler.handleMessage(createMessageTypeFilter(MessageType.JsonRpcReques
         if (!url) {
             throw new Error('No Json RPC URL available');
         }
-        jsonRpcRequest(url, input.payload.method, input.payload.params).then(respond);
+        const provider = new HttpProvider(url, fetch);
+        provider
+            .request(input.payload.method, input.payload.params && JSONBig.parse(input.payload.params))
+            .then(respond);
     });
     return true;
 });

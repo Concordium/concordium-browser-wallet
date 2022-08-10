@@ -32,6 +32,7 @@ const config: BuildOptions = {
     outdir: 'dist',
     define: {
         'process.env.NODE_ENV': `"${process.env.NODE_ENV}"`,
+        'document.baseURI': '""',
     },
     loader: { '.jpg': 'dataurl', '.png': 'dataurl' },
     plugins: [
