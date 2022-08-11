@@ -1,5 +1,10 @@
 import { InjectedMessageHandler, createEventTypeFilter, MessageType } from '@concordium/browser-wallet-message-hub';
-import { AccountTransactionPayload, AccountTransactionSignature, AccountTransactionType } from '@concordium/web-sdk';
+import {
+    AccountTransactionPayload,
+    AccountTransactionSignature,
+    AccountTransactionType,
+    SchemaVersion,
+} from '@concordium/web-sdk';
 import { WalletApi as IWalletApi, EventType } from '@concordium/browser-wallet-api-helpers';
 import EventEmitter from 'events';
 import { stringify } from './util';
@@ -56,7 +61,8 @@ class WalletApi extends EventEmitter implements IWalletApi {
         type: AccountTransactionType,
         payload: AccountTransactionPayload,
         parameters?: Record<string, unknown>,
-        schema?: string
+        schema?: string,
+        schemaVersion?: SchemaVersion
     ): Promise<string> {
         const response = await this.sendMessage<string | undefined>(MessageType.SendTransaction, {
             accountAddress,
@@ -64,6 +70,7 @@ class WalletApi extends EventEmitter implements IWalletApi {
             payload: stringify(payload),
             parameters,
             schema,
+            schemaVersion,
         });
 
         if (!response) {

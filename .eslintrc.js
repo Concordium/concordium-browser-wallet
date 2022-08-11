@@ -24,7 +24,10 @@ module.exports = {
         'class-methods-use-this': 0,
         'jsx-a11y/no-autofocus': 0,
         'no-await-in-loop': 0,
-        'import/no-extraneous-dependencies': ['error', { devDependencies: ['**/*.stories.tsx', '**/build/**/*'] }],
+        'import/no-extraneous-dependencies': [
+            'error',
+            { devDependencies: ['**/*.stories.tsx', '**/build/**/*', '**/*.config.js'] },
+        ],
         'jsx-a11y/label-has-associated-control': [
             'error',
             {
