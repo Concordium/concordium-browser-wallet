@@ -18,6 +18,7 @@ const t = {
         connectedSites: {
             title: 'Connected sites',
             noConnected: 'The selected account is not connected to any sites.',
+            connect: 'Connect',
             disconnect: 'Disconnect',
         },
         exportPrivateKey: 'Export private key',
