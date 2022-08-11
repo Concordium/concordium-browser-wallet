@@ -10,6 +10,7 @@ import networkSettings from '@popup/pages/NetworkSettings/i18n/en';
 import visualSettings from '@popup/pages/VisualSettings/i18n/en';
 import about from '@popup/pages/About/i18n/en';
 import addAccount from '@popup/pages/AddAccount/i18n/en';
+import identityIssuance from '@popup/pages/IdentityIssuance/i18n/en';
 
 const t = {
     shared,
@@ -23,6 +24,7 @@ const t = {
     networkSettings,
     visualSettings,
     addAccount,
+    identityIssuance,
     about,
 };
 

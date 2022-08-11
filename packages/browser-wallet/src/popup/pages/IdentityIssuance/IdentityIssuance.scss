@@ -1,0 +1,41 @@
+.identity-issuance {
+    &__start {
+        display: flex;
+        flex-direction: column;
+        align-items: center;
+        margin: 0 rem(10px);
+    }
+
+    &__end {
+        display: flex;
+        flex-direction: column;
+        align-items: center;
+    }
+
+    &__card {
+        margin-top: rem(50px);
+    }
+
+    &__text {
+        white-space: pre-line;
+        text-align: center;
+    }
+
+    &__button {
+        margin-top: rem(85px);
+    }
+
+    &__provider-button {
+        color: $color-text;
+        background-color: $color-bg;
+        border: rem(1px) solid $color-cta;
+        margin-top: rem(10px);
+
+        &:hover {
+            &:not(:disabled) {
+                color: $color-text;
+                box-shadow: inset 0 0 rem(10px) rem(15px) rgb($color-hover / 15%);
+            }
+        }
+    }
+}

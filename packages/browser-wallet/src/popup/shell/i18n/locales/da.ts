@@ -10,6 +10,7 @@ import networkSettings from '@popup/pages/NetworkSettings/i18n/da';
 import visualSettings from '@popup/pages/VisualSettings/i18n/da';
 import about from '@popup/pages/About/i18n/da';
 import addAccount from '@popup/pages/AddAccount/i18n/da';
+import identityIssuance from '@popup/pages/IdentityIssuance/i18n/da';
 
 import type en from './en';
 
@@ -25,6 +26,7 @@ const t: typeof en = {
     networkSettings,
     visualSettings,
     addAccount,
+    identityIssuance,
     about,
 };
 

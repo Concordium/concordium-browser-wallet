@@ -10,6 +10,7 @@ $main-layout-header-height: rem(40px);
     }
 
     &__main {
+        overflow: overlay;
         height: calc(100% - #{$main-layout-header-height});
         position: relative;
         z-index: -1;

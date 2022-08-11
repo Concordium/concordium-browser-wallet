@@ -23,6 +23,8 @@ export enum InternalMessageType {
     Connect = 'I_Connect',
     TestPopupOpen = 'I_TestPopupOpen',
     SetViewSize = 'I_SetViewSize',
+    StartIdentityIssuance = 'I_StartIdentityIssuance',
+    EndIdentityIssuance = 'l_EndIdentityIssuance',
 }
 
 // eslint-disable-next-line @typescript-eslint/no-explicit-any

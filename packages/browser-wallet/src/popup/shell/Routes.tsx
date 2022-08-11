@@ -8,6 +8,7 @@ import { absoluteRoutes, relativeRoutes } from '@popup/constants/routes';
 import MainLayout from '@popup/page-layouts/MainLayout';
 import FullscreenPromptLayout from '@popup/page-layouts/FullscreenPromptLayout';
 import Account from '@popup/pages/Account';
+import Identity from '@popup/pages/Identity';
 import SignMessage from '@popup/pages/SignMessage';
 import SendTransaction from '@popup/pages/SendTransaction';
 import Setup from '@popup/pages/Setup';
@@ -17,6 +18,7 @@ import Settings from '@popup/pages/Settings';
 import NetworkSettings from '@popup/pages/NetworkSettings';
 import VisualSettings from '@popup/pages/VisualSettings';
 import AddAccount from '@popup/pages/AddAccount';
+import { IdentityIssuanceEnd, IdentityIssuanceStart } from '@popup/pages/IdentityIssuance';
 import About from '@popup/pages/About';
 
 type PromptKey = keyof Omit<typeof absoluteRoutes['prompt'], 'path'>;
@@ -62,6 +64,11 @@ export default function Routes() {
         'signMessage'
     );
 
+    const handleIdentityIssuanceResponse = useMessagePrompt<void>(
+        InternalMessageType.EndIdentityIssuance,
+        'endIdentityIssuance'
+    );
+
     useEffect(() => {
         popupMessageHandler.sendInternalMessage(InternalMessageType.PopupReady).catch(noOp);
     }, []);
@@ -96,10 +103,18 @@ export default function Routes() {
                         />
                     }
                 />
+                <Route
+                    path={relativeRoutes.prompt.endIdentityIssuance.path}
+                    element={<IdentityIssuanceEnd onFinish={handleIdentityIssuanceResponse} />}
+                />
             </Route>
             <Route path={relativeRoutes.setup.path} element={<Setup />} />
             <Route path={relativeRoutes.home.path} element={<MainLayout />}>
-                <Route element={<NoContent />} path={relativeRoutes.home.identities.path} />
+                <Route
+                    element={<IdentityIssuanceStart />}
+                    path={`${relativeRoutes.home.identities.path}/${relativeRoutes.home.identities.add.path}`}
+                />
+                <Route element={<Identity />} path={relativeRoutes.home.identities.path} />
                 <Route path={relativeRoutes.home.settings.path}>
                     <Route index element={<Settings />} />
                     <Route element={<NoContent />} path={relativeRoutes.home.settings.passcode.path} />

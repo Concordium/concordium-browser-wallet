@@ -7,6 +7,7 @@ const t: typeof en = {
         labels: {
             credentials: 'Nøgle,adresse par',
             url: 'JSON-RPC endpoint',
+            seedPhrase: 'Seed Phrase',
         },
         notes: {
             credentials:
@@ -20,6 +21,10 @@ const t: typeof en = {
         },
         url: {
             required: 'Indtast JSON-RPC endpoint for node',
+        },
+        seedPhrase: {
+            required: 'Indtast et 24 ord BIP 39 seed phrase',
+            length: 'Indtast 24 ord',
         },
     },
     themeLabel: 'Udseende:',

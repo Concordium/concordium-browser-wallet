@@ -28,13 +28,16 @@ $color-cta-othernet: $color-dark-green;
 // Light mode
 $color-bg-light: $color-off-white;
 $color-text-light: $color-off-black;
+$color-hover-light: 0 0 0;
 
 // Dark mode
 $color-bg-dark: $color-off-black;
 $color-text-dark: $color-off-white;
+$color-hover-dark: 255 255 255;
 
 // Theme variables
 $color-bg: var(--color-bg, $color-bg-light); // off-white/off-black
 $color-text: var(--color-text, $color-text-light); // off-black/off-white
+$color-hover: var(--color-hover, $color-hover-light); // black / white, should be used rgb($color-hover / $alpha)
 $color-cta: var(--color-cta, $color-cta-othernet); // dark-green/blue
 $color-text-inverted: $color-bg;

@@ -5,6 +5,7 @@ const t = {
         labels: {
             credentials: 'Key, address pairs',
             url: 'JSON-RPC endpoint',
+            seedPhrase: 'Seed Phrase',
         },
         notes: {
             credentials: 'Use "{{fieldSeparator}}" to separate values, and "{{lineSeparator}}" to separate pairs',
@@ -17,6 +18,10 @@ const t = {
         },
         url: {
             required: 'Please specify JSON-RPC endpoint for node',
+        },
+        seedPhrase: {
+            required: 'Please specify a 24 word BIP 39 seed phrase',
+            length: 'Please enter 24 words',
         },
     },
     themeLabel: 'Theme:',

@@ -5,16 +5,24 @@ import {
     storedJsonRpcUrl,
     storedSelectedAccount,
     storedTheme,
+    storedIdentities,
+    storedPendingIdentity,
+    storedSelectedIdentity,
+    storedSeedPhrase,
 } from '@shared/storage/access';
 import { ChromeStorageKey } from '@shared/storage/types';
 import { atom, WritableAtom } from 'jotai';
 
 const accessorMap = {
+    [ChromeStorageKey.Identities]: storedIdentities,
+    [ChromeStorageKey.PendingIdentity]: storedPendingIdentity,
+    [ChromeStorageKey.SelectedIdentity]: storedSelectedIdentity,
     [ChromeStorageKey.ConnectedSites]: storedConnectedSites,
     [ChromeStorageKey.Credentials]: storedCredentials,
     [ChromeStorageKey.SelectedAccount]: storedSelectedAccount,
     [ChromeStorageKey.JsonRpcUrl]: storedJsonRpcUrl,
     [ChromeStorageKey.Theme]: storedTheme,
+    [ChromeStorageKey.SeedPhrase]: storedSeedPhrase,
 };
 
 export type AsyncWrapper<V> = {

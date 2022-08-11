@@ -4,6 +4,8 @@ import { EventType } from '@concordium/browser-wallet-api-helpers';
 import { popupMessageHandler } from '@popup/shared/message-handler';
 import { atomWithChromeStorage, AsyncWrapper } from './utils';
 
+export const seedPhraseAtom = atomWithChromeStorage<string>(ChromeStorageKey.SeedPhrase, '');
+
 export const credentialsAtom = atomWithChromeStorage<WalletCredential[]>(ChromeStorageKey.Credentials, []);
 export const themeAtom = atomWithChromeStorage<Theme>(ChromeStorageKey.Theme, Theme.Light);
 

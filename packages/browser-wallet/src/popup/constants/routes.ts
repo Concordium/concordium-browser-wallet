@@ -15,6 +15,7 @@ export const relativeRoutes = {
         },
         identities: {
             path: 'identities',
+            add: { path: 'add' },
         },
         settings: {
             path: 'settings',
@@ -42,6 +43,9 @@ export const relativeRoutes = {
         },
         sendTransaction: {
             path: 'send-transaction',
+        },
+        endIdentityIssuance: {
+            path: 'end-identity-issuance',
         },
     },
     setup: {

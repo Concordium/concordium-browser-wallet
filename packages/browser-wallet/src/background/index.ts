@@ -8,6 +8,7 @@ import { storedConnectedSites, storedSelectedAccount } from '@shared/storage/acc
 
 import bgMessageHandler from './message-handler';
 import { forwardToPopup, HandleMessage, HandleResponse, RunCondition, setPopupSize } from './window-management';
+import { identityIssuanceHandler } from './identity-issuance';
 
 /**
  * Callback method which installs Injected script into Main world of Dapp
@@ -31,6 +32,10 @@ const injectScript: ExtensionMessageHandler = (_msg, sender, respond) => {
     return true;
 };
 
+bgMessageHandler.handleMessage(
+    createMessageTypeFilter(InternalMessageType.StartIdentityIssuance),
+    identityIssuanceHandler
+);
 bgMessageHandler.handleMessage(createMessageTypeFilter(InternalMessageType.Init), injectScript);
 bgMessageHandler.handleMessage(createMessageTypeFilter(InternalMessageType.SetViewSize), ({ payload }) => {
     setPopupSize(payload);

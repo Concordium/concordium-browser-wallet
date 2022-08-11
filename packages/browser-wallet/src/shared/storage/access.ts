@@ -1,4 +1,4 @@
-import { ChromeStorageKey, Theme, WalletCredential } from './types';
+import { ChromeStorageKey, Identity, PendingIdentity, Theme, WalletCredential } from './types';
 
 export type StorageAccessor<V> = {
     /**
@@ -29,6 +29,14 @@ const makeStorageAccessor = <V>(area: chrome.storage.AreaName, key: ChromeStorag
         remove: () => store.remove(key),
     };
 };
+
+export const storedPendingIdentity = makeStorageAccessor<Omit<PendingIdentity, 'location'>>(
+    'local',
+    ChromeStorageKey.PendingIdentity
+);
+export const storedIdentities = makeStorageAccessor<Identity[]>('local', ChromeStorageKey.Identities);
+export const storedSelectedIdentity = makeStorageAccessor<string>('local', ChromeStorageKey.SelectedIdentity);
+export const storedSeedPhrase = makeStorageAccessor<string>('local', ChromeStorageKey.SeedPhrase);
 
 export const storedConnectedSites = makeStorageAccessor<Record<string, string[]>>(
     'local',

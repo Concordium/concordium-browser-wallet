@@ -1,0 +1,32 @@
+.identity {
+    &__attributes {
+        margin-top: rem(10px);
+        border-radius: rem(10px);
+        width: rem(196px);
+        border: rem(1px) solid $color-blue;
+        overflow: hidden;
+
+        &-row {
+            display: flex;
+            padding: rem(7px) rem(10px);
+            justify-content: space-between;
+            background: $color-bg;
+
+            &:not(:first-child) {
+                border-top: 1px solid $color-lines;
+            }
+        }
+
+        &-left {
+            display: inline-flex;
+            align-items: center;
+            justify-content: flex-start;
+        }
+
+        &-right {
+            display: inline-flex;
+            align-items: center;
+            justify-content: flex-end;
+        }
+    }
+}

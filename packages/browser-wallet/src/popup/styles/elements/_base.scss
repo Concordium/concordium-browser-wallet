@@ -50,6 +50,7 @@ body {
     &.dark {
         --color-bg: #{$color-bg-dark};
         --color-text: #{$color-text-dark};
+        --color-hover: #{$color-hover-dark};
 
         .bg {
             background-image: url('../assets/images/bg-dark.jpg');
