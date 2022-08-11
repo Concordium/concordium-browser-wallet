@@ -1,22 +1,17 @@
 import {
     createMessageTypeFilter,
-    ExtensionMessageHandler,
     InternalMessageType,
     MessageType,
+    ExtensionMessageHandler,
 } from '@concordium/browser-wallet-message-hub';
 import { HttpProvider } from '@concordium/web-sdk';
-import {
-    storedConnectedSites,
-    storedSelectedAccount,
-    storedJsonRpcUrl,
-    storedCredentials,
-} from '@shared/storage/access';
+import { storedConnectedSites, storedSelectedAccount, storedJsonRpcUrl } from '@shared/storage/access';
 
 import JSONBig from 'json-bigint';
-import { IdentityStatus, WalletCredential } from '@shared/storage/types';
 import bgMessageHandler from './message-handler';
 import { forwardToPopup, HandleMessage, HandleResponse, RunCondition, setPopupSize } from './window-management';
 import { identityIssuanceHandler } from './identity-issuance';
+import { startupHandler } from './startup';
 
 /**
  * Determines whether the given url has been whitelisted by any account.
@@ -81,56 +76,13 @@ const injectScript: ExtensionMessageHandler = (_msg, sender, respond) => {
     return true;
 };
 
-bgMessageHandler.handleMessage(
-    createMessageTypeFilter(InternalMessageType.StartIdentityIssuance),
-    identityIssuanceHandler
-);
-
-/**
- * Continously checks whether pending credentials have been confirmed.
- */
-async function monitorAccountStatus() {
-    const interval = 10000;
-    setTimeout(async function loop() {
-        const url = await storedJsonRpcUrl.get();
-        const creds = await storedCredentials.get();
-        let anyUpdated = false;
-        if (url && creds) {
-            const updatedCreds: WalletCredential[] = await Promise.all(
-                creds.map(async (cred) => {
-                    if (cred.status === IdentityStatus.Pending) {
-                        const { status, deploymentHash, ...info } = cred;
-                        const resp = await new HttpProvider(url, fetch).request('getTransactionStatus', {
-                            transactionHash: cred.deploymentHash,
-                        });
-                        // TODO Improve successful check
-                        if (JSON.parse(resp).result.status === 'finalized' && resp.includes('success')) {
-                            anyUpdated = true;
-                            return { ...info, status: IdentityStatus.Confirmed };
-                        }
-                    }
-                    return cred;
-                })
-            );
-            if (anyUpdated) {
-                await storedCredentials.set(updatedCreds);
-            }
-        }
-        setTimeout(loop, interval);
-    }, 0);
-}
-
-const initHandler: ExtensionMessageHandler = (msg, sender, respond) => {
-    injectScript(msg, sender, respond);
-    monitorAccountStatus();
-    return true;
-};
+chrome.runtime.onStartup.addListener(startupHandler);
 
 bgMessageHandler.handleMessage(
     createMessageTypeFilter(InternalMessageType.StartIdentityIssuance),
     identityIssuanceHandler
 );
-bgMessageHandler.handleMessage(createMessageTypeFilter(InternalMessageType.Init), initHandler);
+bgMessageHandler.handleMessage(createMessageTypeFilter(InternalMessageType.Init), injectScript);
 bgMessageHandler.handleMessage(createMessageTypeFilter(InternalMessageType.SetViewSize), ({ payload }) => {
     setPopupSize(payload);
 });
