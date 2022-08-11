@@ -6,6 +6,7 @@ import { accountsAtom, selectedAccountAtom, storedConnectedSitesAtom } from '@po
 import MenuButton from '@popup/shared/MenuButton';
 import { getCurrentOpenTabUrl } from '@popup/shared/utils/tabs';
 import clsx from 'clsx';
+import { useSelectedCredential } from '@popup/shared/utils/account-helpers';
 import { accountRoutes } from './routes';
 import { accountSettingsRoutes } from './AccountSettings/routes';
 import AccountActions from './AccountActions';
@@ -45,14 +46,17 @@ function ConnectedBox({ setDetailsExpanded }: { setDetailsExpanded: React.Dispat
 function Account() {
     const { t } = useTranslation('account');
     const accounts = useAtomValue(accountsAtom);
-    const selectedAccount = useAtomValue(selectedAccountAtom);
     const [detailsExpanded, setDetailsExpanded] = useState(true);
+
+    const selectedCred = useSelectedCredential();
+
+    const isConfirmed = !selectedCred || selectedCred.status === 'confirmed';
 
     return (
         <div className="flex-column justify-space-between align-center h-full relative">
             <div className="account-page__content">
                 {accounts.length === 0 && <div>{t('noAccounts')}</div>}
-                {selectedAccount !== undefined && (
+                {selectedCred !== undefined && (
                     <>
                         <div className="account-page__details">
                             <MenuButton
@@ -60,16 +64,21 @@ function Account() {
                                 open={detailsExpanded}
                                 onClick={() => setDetailsExpanded((o) => !o)}
                             />
-                            <AccountDetails expanded={detailsExpanded} account={selectedAccount} />
+                            <AccountDetails expanded={detailsExpanded} account={selectedCred.address} />
                             <ConnectedBox setDetailsExpanded={setDetailsExpanded} />
                         </div>
                         <div className="account-page__routes">
-                            <Outlet />
+                            {isConfirmed && <Outlet />}
+                            {!isConfirmed && <div className="account-page__not-finalized">{t('accountPending')}</div>}
                         </div>
                     </>
                 )}
             </div>
-            <AccountActions className="account-page__actions" setDetailsExpanded={setDetailsExpanded} />
+            <AccountActions
+                className="account-page__actions"
+                enabled={isConfirmed}
+                setDetailsExpanded={setDetailsExpanded}
+            />
         </div>
     );
 }

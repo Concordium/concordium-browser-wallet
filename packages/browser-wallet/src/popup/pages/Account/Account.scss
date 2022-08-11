@@ -61,4 +61,15 @@ $account-page-details-height: var(--details-height, $account-page-details-height
         color: $color-text-faded;
         border-color: $color-passive;
     }
+
+    &__not-finalized {
+        color: $color-text-faded;
+        background-color: $color-bg;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        text-align: center;
+        height: 100%;
+        width: 100%;
+    }
 }

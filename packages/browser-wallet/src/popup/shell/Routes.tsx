@@ -126,7 +126,7 @@ export default function Routes() {
                 </Route>
                 <Route
                     element={<AddAccount />}
-                    path={`${relativeRoutes.home.account.path}/${relativeRoutes.home.account.add.path}`}
+                    path={`${relativeRoutes.home.account.path}/${relativeRoutes.home.account.add.path}/*`}
                 />
                 <Route path={`${relativeRoutes.home.account.path}/*`} element={<Account />} />
             </Route>

@@ -27,6 +27,7 @@ const t: typeof en = {
         },
         exportPrivateKey: 'Eksportér privat nøgle',
     },
+    accountPending: 'Denne konto er stadig ved at blive oprettet.',
 };
 
 export default t;

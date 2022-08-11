@@ -15,6 +15,7 @@
         "@concordium/browser-wallet-api": "workspace:^",
         "@concordium/browser-wallet-api-helpers": "workspace:^",
         "@concordium/web-sdk": "^0.4.0",
+        "@scure/bip32": "^1.1.0",
         "@scure/bip39": "^1.1.0",
         "axios": "^0.27.2",
         "buffer": "^6.0.3",

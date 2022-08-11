@@ -27,6 +27,7 @@ function Amount({ label, amount }: AmountProps) {
 type Props = {
     expanded: boolean;
     account: string;
+    className?: string;
 };
 
 const zeroBalance: Omit<PublicAccountAmounts, 'scheduled'> = {
@@ -35,7 +36,7 @@ const zeroBalance: Omit<PublicAccountAmounts, 'scheduled'> = {
     atDisposal: 0n,
 };
 
-export default function AccountDetails({ expanded, account }: Props) {
+export default function AccountDetails({ expanded, account, className }: Props) {
     const { t } = useTranslation('account', { keyPrefix: 'details' });
     const jsonRpcUrl = useAtomValue(jsonRpcUrlAtom);
     const [balances, setBalances] = useState<Omit<PublicAccountAmounts, 'scheduled'>>(zeroBalance);
@@ -55,7 +56,7 @@ export default function AccountDetails({ expanded, account }: Props) {
     }, [account]);
 
     return (
-        <div className={clsx('account-page-details', expanded && 'account-page-details--expanded')}>
+        <div className={clsx('account-page-details', expanded && 'account-page-details--expanded', className)}>
             <div className="account-page-details__address">{displaySplitAddress(account)}</div>
             <div className="account-page-details__id">Identity 1</div>
             <div className="account-page-details__balance">

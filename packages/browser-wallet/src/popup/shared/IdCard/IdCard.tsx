@@ -71,11 +71,13 @@ type Props = {
     name: string;
     status: 'pending' | 'confirmed' | 'rejected';
     onNameChange(name: string): void;
+    onClick?(): void;
     provider: JSX.Element;
     className?: string;
 };
-
-export default function IdCard({ name, provider, status, onNameChange, className }: Props) {
+// TODO: Fix these
+/* eslint-disable jsx-a11y/no-static-element-interactions , jsx-a11y/click-events-have-key-events */
+export default function IdCard({ name, provider, status, onNameChange, className, onClick }: Props) {
     const { t } = useTranslation();
 
     return (
@@ -87,6 +89,11 @@ export default function IdCard({ name, provider, status, onNameChange, className
                 status === 'rejected' && 'id-card--rejected',
                 className
             )}
+            onClick={() => {
+                if (onClick) {
+                    onClick();
+                }
+            }}
         >
             <header className="id-card__header">
                 <ConcordiumIcon />

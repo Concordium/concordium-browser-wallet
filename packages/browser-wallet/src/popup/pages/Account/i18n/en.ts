@@ -25,6 +25,7 @@ const t = {
         },
         exportPrivateKey: 'Export private key',
     },
+    accountPending: 'This account is still pending finalization.',
 };
 
 export default t;

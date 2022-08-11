@@ -14,7 +14,8 @@ import {
     getAccountTransactionHash,
     SchemaVersion,
 } from '@concordium/web-sdk';
-import { jsonRpcUrlAtom, credentialsAtom } from '@popup/store/settings';
+import { usePrivateKey } from '@popup/shared/utils/account-helpers';
+import { jsonRpcUrlAtom } from '@popup/store/settings';
 import DisplayUpdateContract from './displayTransaction/DisplayUpdateContract';
 import DisplayInitContract from './displayTransaction/DisplayInitContract';
 import DisplaySimpleTransfer from './displayTransaction/DisplaySimpleTransfer';
@@ -42,11 +43,12 @@ export default function SendTransaction({ onSubmit, onReject }: Props) {
     const { state } = useLocation() as Location;
     const { t } = useTranslation('sendTransaction');
     const [error, setError] = useState<string>();
-    const creds = useAtomValue(credentialsAtom);
     const url = useAtomValue(jsonRpcUrlAtom);
     const { withClose, onClose } = useContext(fullscreenPromptContext);
 
     const { accountAddress } = state.payload;
+    const key = usePrivateKey(accountAddress);
+
     const { type: transactionType, payload } = useMemo(
         () =>
             parsePayload(
@@ -65,7 +67,6 @@ export default function SendTransaction({ onSubmit, onReject }: Props) {
         if (!url || !accountAddress) {
             throw new Error('Missing url for JsonRpc or account address');
         }
-        const key = creds.find((c) => c.address === accountAddress)?.key;
         if (!key) {
             throw new Error('Missing key for the chosen address');
         }
@@ -95,7 +96,7 @@ export default function SendTransaction({ onSubmit, onReject }: Props) {
         }
 
         return getAccountTransactionHash(transaction, signature);
-    }, [payload]);
+    }, [payload, key]);
 
     return (
         <>

@@ -1,7 +1,7 @@
 .id-card {
     position: relative;
     border-radius: rem(10px);
-    border: rem(1px) solid $color-blue;
+    border: rem(1px) solid $color-cta;
     width: rem(196px);
     height: rem(117px);
     overflow: hidden;
@@ -34,7 +34,7 @@
     }
 
     &__header {
-        background-color: $color-blue;
+        background-color: $color-cta;
         font-size: rem(12px);
         text-align: center;
         color: $color-white;
@@ -114,7 +114,7 @@
             }
 
             path {
-                fill: $color-blue;
+                fill: $color-cta;
             }
         }
 
