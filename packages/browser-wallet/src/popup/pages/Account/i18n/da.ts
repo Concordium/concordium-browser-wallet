@@ -20,6 +20,7 @@ const t: typeof en = {
         connectedSites: {
             title: 'Forbundne hjemmesider',
             noConnected: 'Den valgte konto er ikke forbundet til nogen hjemmeside.',
+            connect: 'Forbind',
             disconnect: 'Fjern',
         },
         exportPrivateKey: 'Eksportér privat nøgle',

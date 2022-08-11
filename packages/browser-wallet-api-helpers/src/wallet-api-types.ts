@@ -10,6 +10,7 @@ import type {
  */
 export enum EventType {
     AccountChanged = 'accountChanged',
+    AccountDisconnected = 'accountDisconnected',
     ChainChanged = 'chainChanged',
 }
 
@@ -25,7 +26,8 @@ interface Listeners<T extends EventType, Args extends any[]> {
 }
 
 type EventListeners = Listeners<EventType.AccountChanged, [accountAddress: string]> &
-    Listeners<EventType.ChainChanged, [chain: string]>;
+    Listeners<EventType.ChainChanged, [chain: string]> &
+    Listeners<EventType.AccountDisconnected, [accountAddress: string]>;
 
 interface MainWalletApi {
     /**

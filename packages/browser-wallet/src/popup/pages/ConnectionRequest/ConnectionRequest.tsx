@@ -38,6 +38,7 @@ export default function ConnectionRequest({ onAllow, onReject }: Props) {
 
     // eslint-disable-next-line @typescript-eslint/no-explicit-any
     const { title, url } = (state as any).payload;
+    const urlOrigin = new URL(url).origin;
 
     return (
         <>
@@ -45,13 +46,13 @@ export default function ConnectionRequest({ onAllow, onReject }: Props) {
                 <h3>{t('title')}</h3>
             </header>
             <pre className="connection-request__url">{title}</pre>
-            <pre className="connection-request__url">{url}</pre>
+            <pre className="connection-request__url">{urlOrigin}</pre>
             <div className="connection-request__address">{t('description', { selectedAccount })}</div>
             <div className="connection-request__actions">
                 <button
                     type="button"
                     onClick={withClose(() => {
-                        connectAccount(selectedAccount, url);
+                        connectAccount(selectedAccount, urlOrigin);
                         onAllow();
                     })}
                 >
