@@ -1,4 +1,6 @@
 import { fullscreenPromptContext } from '@popup/page-layouts/FullscreenPromptLayout';
+import { selectedAccountAtom, storedConnectedSitesAtom } from '@popup/store/account';
+import { useAtom, useAtomValue } from 'jotai';
 import React, { useContext, useEffect } from 'react';
 import { useTranslation } from 'react-i18next';
 import { useLocation } from 'react-router-dom';
@@ -12,8 +14,27 @@ export default function ConnectionRequest({ onAllow, onReject }: Props) {
     const { state } = useLocation();
     const { t } = useTranslation('connectionRequest');
     const { onClose, withClose } = useContext(fullscreenPromptContext);
+    const selectedAccount = useAtomValue(selectedAccountAtom);
+    const [connectedSitesLoading, setConnectedSites] = useAtom(storedConnectedSitesAtom);
+    const connectedSites = connectedSitesLoading.value;
 
     useEffect(() => onClose(onReject), [onClose, onReject]);
+
+    if (!selectedAccount || connectedSitesLoading.loading) {
+        return null;
+    }
+
+    function connectAccount(account: string, url: string) {
+        const updatedConnectedSites = {
+            ...connectedSites,
+        };
+
+        const connectedSitesForAccount = connectedSites[account] ?? [];
+        connectedSitesForAccount.push(url);
+        updatedConnectedSites[account] = connectedSitesForAccount;
+
+        setConnectedSites(updatedConnectedSites);
+    }
 
     // eslint-disable-next-line @typescript-eslint/no-explicit-any
     const { title, url } = (state as any).payload;
@@ -23,10 +44,17 @@ export default function ConnectionRequest({ onAllow, onReject }: Props) {
             <header>
                 <h3>{t('title')}</h3>
             </header>
-            <div>{t('description', { title })}</div>
+            <pre className="connection-request__url">{title}</pre>
             <pre className="connection-request__url">{url}</pre>
+            <div className="connection-request__address">{t('description', { selectedAccount })}</div>
             <div className="connection-request__actions">
-                <button type="button" onClick={withClose(onAllow)}>
+                <button
+                    type="button"
+                    onClick={withClose(() => {
+                        connectAccount(selectedAccount, url);
+                        onAllow();
+                    })}
+                >
                     {t('actions.allow')}
                 </button>
                 <button type="button" onClick={withClose(onReject)}>

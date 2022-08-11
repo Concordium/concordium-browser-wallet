@@ -8,7 +8,7 @@ export const CONTRACT_NAME = 'PiggyBank';
 /**
  * Action for depositing an amount of microCCD to the piggy bank instance
  */
-export const deposit = (index: bigint, subindex = 0n, amount = 0) => {
+export const deposit = (account: string, index: bigint, subindex = 0n, amount = 0) => {
     if (!Number.isInteger(amount) || amount <= 0) {
         return;
     }
@@ -16,7 +16,7 @@ export const deposit = (index: bigint, subindex = 0n, amount = 0) => {
     detectConcordiumProvider()
         .then((provider) => {
             provider
-                .sendTransaction(AccountTransactionType.UpdateSmartContractInstance, {
+                .sendTransaction(account, AccountTransactionType.UpdateSmartContractInstance, {
                     amount: new GtuAmount(BigInt(amount)),
                     contractAddress: {
                         index,
@@ -39,11 +39,11 @@ export const deposit = (index: bigint, subindex = 0n, amount = 0) => {
  * Action for smashing the piggy bank. This is only possible to do, if the account sending the transaction matches the owner of the piggy bank:
  * https://github.com/Concordium/concordium-rust-smart-contracts/blob/c4d95504a51c15bdbfec503c9e8bf5e93a42e24d/examples/piggy-bank/part1/src/lib.rs#L64
  */
-export const smash = (index: bigint, subindex = 0n) => {
+export const smash = (account: string, index: bigint, subindex = 0n) => {
     detectConcordiumProvider()
         .then((provider) => {
             provider
-                .sendTransaction(AccountTransactionType.UpdateSmartContractInstance, {
+                .sendTransaction(account, AccountTransactionType.UpdateSmartContractInstance, {
                     amount: new GtuAmount(0n), // This feels weird? Why do I need an amount for a non-payable receive?
                     contractAddress: {
                         index,

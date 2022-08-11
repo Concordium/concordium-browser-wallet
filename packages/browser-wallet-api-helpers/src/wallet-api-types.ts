@@ -31,6 +31,7 @@ interface MainWalletApi {
     /**
      * Sends a transaction to the Concordium Wallet and awaits the users action. Note that a header is not sent, and will be constructed by the wallet itself.
      * Note that if the user rejects signing the transaction, this will throw an error.
+     * @param accountAddress the address of the account that should sign the transaction
      * @param type the type of transaction that is to be signed and sent.
      * @param payload the payload of the transaction to be signed and sent.
      * @param parameters parameters for the initContract and updateContract transactions in JSON-like format.
@@ -38,6 +39,7 @@ interface MainWalletApi {
      * @param schemaVersion version of the schema provided. Must be supplied for schemas that use version 0 or 1, as they don't have the version embedded.
      */
     sendTransaction(
+        accountAddress: string,
         type:
             | AccountTransactionType.UpdateSmartContractInstance
             | AccountTransactionType.InitializeSmartContractInstance,
@@ -49,16 +51,22 @@ interface MainWalletApi {
     /**
      * Sends a transaction to the Concordium Wallet and awaits the users action. Note that a header is not sent, and will be constructed by the wallet itself.
      * Note that if the user rejects signing the transaction, this will throw an error.
+     * @param accountAddress the address of the account that should sign the transaction
      * @param type the type of transaction that is to be signed and sent.
      * @param payload the payload of the transaction to be signed and sent.
      */
-    sendTransaction(type: AccountTransactionType, payload: AccountTransactionPayload): Promise<string>;
+    sendTransaction(
+        accountAddress: string,
+        type: AccountTransactionType,
+        payload: AccountTransactionPayload
+    ): Promise<string>;
     /**
      * Sends a message to the Concordium Wallet and awaits the users action. If the user signs the message, this will resolve to the signature.
      * Note that if the user rejects signing the message, this will throw an error.
+     * @param accountAddress the address of the account that should sign the message
      * @param message message to be signed. Note that the wallet will prepend some bytes to ensure the message cannot be a transaction
      */
-    signMessage(message: string): Promise<AccountTransactionSignature>;
+    signMessage(accountAddress: string, message: string): Promise<AccountTransactionSignature>;
     /**
      * Requests a connection to the Concordium wallet, prompting the user to either accept or reject the request.
      * If a connection has already been accepted for the url once the returned promise will resolve without prompting the user.

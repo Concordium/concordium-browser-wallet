@@ -14,7 +14,6 @@ import {
     getAccountTransactionHash,
     SchemaVersion,
 } from '@concordium/web-sdk';
-import { selectedAccountAtom } from '@popup/store/account';
 import { jsonRpcUrlAtom, credentialsAtom } from '@popup/store/settings';
 import DisplayUpdateContract from './displayTransaction/DisplayUpdateContract';
 import DisplayInitContract from './displayTransaction/DisplayInitContract';
@@ -24,6 +23,7 @@ import { parsePayload } from './util';
 interface Location {
     state: {
         payload: {
+            accountAddress: string;
             type: AccountTransactionType;
             payload: string;
             parameters?: Record<string, unknown>;
@@ -42,11 +42,11 @@ export default function SendTransaction({ onSubmit, onReject }: Props) {
     const { state } = useLocation() as Location;
     const { t } = useTranslation('sendTransaction');
     const [error, setError] = useState<string>();
-    const address = useAtomValue(selectedAccountAtom);
     const creds = useAtomValue(credentialsAtom);
     const url = useAtomValue(jsonRpcUrlAtom);
     const { withClose, onClose } = useContext(fullscreenPromptContext);
 
+    const { accountAddress } = state.payload;
     const { type: transactionType, payload } = useMemo(
         () =>
             parsePayload(
@@ -62,17 +62,17 @@ export default function SendTransaction({ onSubmit, onReject }: Props) {
     useEffect(() => onClose(onReject), [onClose, onReject]);
 
     const sendTransaction = useCallback(async () => {
-        if (!url || !address) {
+        if (!url || !accountAddress) {
             throw new Error('Missing url for JsonRpc or account address');
         }
-        const key = creds.find((c) => c.address === address)?.key;
+        const key = creds.find((c) => c.address === accountAddress)?.key;
         if (!key) {
             throw new Error('Missing key for the chosen address');
         }
 
         // TODO: Maybe we should not create the client for each transaction sent
         const client = new JsonRpcClient(new HttpProvider(url));
-        const sender = new AccountAddress(address);
+        const sender = new AccountAddress(accountAddress);
         const nonce = await client.getNextAccountNonce(sender);
 
         if (!nonce) {
@@ -101,7 +101,7 @@ export default function SendTransaction({ onSubmit, onReject }: Props) {
         <>
             <div>{t('description')}</div>
             <h5>{t('sender')}:</h5>
-            <p className="send-transaction__address">{address}</p>
+            <p className="send-transaction__address">{accountAddress}</p>
             {transactionType === AccountTransactionType.SimpleTransfer && <DisplaySimpleTransfer payload={payload} />}
             {transactionType === AccountTransactionType.UpdateSmartContractInstance && (
                 <DisplayUpdateContract payload={payload} parameters={state.payload.parameters} />

@@ -176,7 +176,10 @@ export class ContentMessageHandler {
 }
 
 export class ExtensionsMessageHandler extends BaseMessageHandler<WalletMessage> {
-    constructor(private whitelistedUrls: { get(): Promise<string[] | undefined> }) {
+    constructor(
+        private connectedSites: { get(): Promise<Record<string, string[]> | undefined> },
+        private selectedAccount: { get(): Promise<string | undefined> }
+    ) {
         super();
     }
 
@@ -243,7 +246,14 @@ export class ExtensionsMessageHandler extends BaseMessageHandler<WalletMessage> 
     }
 
     private async getWhitelistedTabs(tabs: chrome.tabs.Tab[]): Promise<chrome.tabs.Tab[]> {
-        const whitelistedUrls = await this.whitelistedUrls.get();
+        const connectedSites = await this.connectedSites.get();
+        const selectedAccount = await this.selectedAccount.get();
+
+        let whitelistedUrls: string[] = [];
+        if (selectedAccount && connectedSites) {
+            whitelistedUrls = connectedSites[selectedAccount] ?? [];
+        }
+
         return tabs.filter(({ url }) => url !== undefined && whitelistedUrls?.includes(url));
     }
 

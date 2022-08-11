@@ -32,14 +32,6 @@ $account-page-details-height: var(--details-height, $account-page-details-height
         position: relative;
         overflow: overlay;
         @include transition(height);
-
-        > div {
-            // TODO remove - only here to make temp content prettier.
-            display: flex;
-            align-items: center;
-            justify-content: center;
-            height: 100%;
-        }
     }
 
     &__close {

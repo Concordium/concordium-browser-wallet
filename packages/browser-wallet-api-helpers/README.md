@@ -60,16 +60,20 @@ const accountAddress = await provider.connect();
 
 ### sendTransaction
 
-To send a transaction, two arguments need to be provided: A transaction type and a corresponding payload. Invoking `sendTransaction` returns a `Promise`, which resolves with the transaction hash for the submitted transaction.
+To send a transaction, three arguments need to be provided: The account address for the account in the wallet that should sign the transaction, a transaction type and a corresponding payload. Invoking `sendTransaction` returns a `Promise`, which resolves with the transaction hash for the submitted transaction.
 
-The following exemplifies how to create a simple transfer of funds from one account (selected account in the wallet) to another. Please note that [@concordium/web-sdk](https://github.com/Concordium/concordium-node-sdk-js/tree/main/packages/web) is used to provide the correct formats and types for the transaction payload.
+The following exemplifies how to create a simple transfer of funds from one account to another. Please note that [@concordium/web-sdk](https://github.com/Concordium/concordium-node-sdk-js/tree/main/packages/web) is used to provide the correct formats and types for the transaction payload.
 
 ```typescript
 const provider = await detectConcordiumProvider();
-const txHash = await provider.sendTransaction(concordiumSDK.AccountTransactionType.SimpleTransfer, {
-    amount: new concordiumSDK.GtuAmount(1n),
-    toAddress: new concordiumSDK.AccountAddress('39bKAuC7sXCZQfo7DmVQTMbiUuBMQJ5bCfsS7sva1HvDnUXp13'),
-});
+const txHash = await provider.sendTransaction(
+    '4MyVHYbRkAU6fqQsoSDzni6mrVz1KEvhDJoMVmDmrCgPBD8b7S',
+    concordiumSDK.AccountTransactionType.SimpleTransfer,
+    {
+        amount: new concordiumSDK.GtuAmount(1n),
+        toAddress: new concordiumSDK.AccountAddress('39bKAuC7sXCZQfo7DmVQTMbiUuBMQJ5bCfsS7sva1HvDnUXp13'),
+    }
+);
 ```
 
 In the case of a smart contract init/update, parameters for the specific function, a corresponding schema for serializing the parameters and the version of the schema can be defined.
@@ -77,6 +81,7 @@ In the case of a smart contract init/update, parameters for the specific functio
 ```typescript
 const provider = await detectConcordiumProvider();
 const txHash = await provider.sendTransaction(
+    '4MyVHYbRkAU6fqQsoSDzni6mrVz1KEvhDJoMVmDmrCgPBD8b7S',
     concordiumSDK.AccountTransactionType.UpdateSmartContractInstance,
     {
         amount: new concordiumSDK.GtuAmount(1n),
@@ -97,18 +102,21 @@ const txHash = await provider.sendTransaction(
 
 ### signMessage
 
-It is possible to sign arbitrary messages using the keys for an account stored in the wallet, by invoking the `signMessage` method. This method returns a `Promise` resolving with a signature of the message.
+It is possible to sign arbitrary messages using the keys for an account stored in the wallet, by invoking the `signMessage` method. The first parameter is the account to be used for signing the message. This method returns a `Promise` resolving with a signature of the message.
 
 The following exemplifies requesting a signature of a message:
 
 ```typescript
 const provider = await detectConcordiumProvider();
-const signature = await provider.signMessage('This is a message to be signed');
+const signature = await provider.signMessage(
+    '4MyVHYbRkAU6fqQsoSDzni6mrVz1KEvhDJoMVmDmrCgPBD8b7S',
+    'This is a message to be signed'
+);
 ```
 
 ### addChangeAccountListener
 
-To react when the selected account in the wallet changes, a handler function can be assigned through `addChangeAccountListener`. This does **not** return the currently selected account when the handler is initially assigned. This can be obtained by invoking the `connect` method.
+To react when the selected account in the wallet changes, a handler function can be assigned through `addChangeAccountListener`. This does **not** return the currently selected account when the handler is initially assigned. This can be obtained by invoking the `connect` method. Note that the event will not be received if the user changes to an account in the wallet that is not connected to your dApp.
 
 ```typescript
 const provider = await detectConcordiumProvider();

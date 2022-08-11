@@ -90,8 +90,11 @@ export default function PiggyBankV0({ client }: Props) {
                     <button
                         className="deposit"
                         type="button"
-                        onClick={() => deposit(CONTRACT_INDEX, CONTRACT_SUB_INDEX, input.current?.valueAsNumber)}
-                        disabled={!canUse}
+                        onClick={() =>
+                            account &&
+                            deposit(account, CONTRACT_INDEX, CONTRACT_SUB_INDEX, input.current?.valueAsNumber)
+                        }
+                        disabled={account === undefined || !canUse}
                     >
                         <PiggyIcon height="20" />
                     </button>
@@ -102,7 +105,7 @@ export default function PiggyBankV0({ client }: Props) {
             <button
                 className="smash"
                 type="button"
-                onClick={() => smash(CONTRACT_INDEX, CONTRACT_SUB_INDEX)}
+                onClick={() => account && smash(account, CONTRACT_INDEX, CONTRACT_SUB_INDEX)}
                 disabled={account === undefined || account !== piggybank?.owner.address || !canUse} // The smash button is only active for the contract owner.
             >
                 <HammerIcon width="40" />
