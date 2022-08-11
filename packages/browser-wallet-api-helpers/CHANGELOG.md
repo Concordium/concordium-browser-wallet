@@ -3,6 +3,7 @@
 ## 0.2.0
 
 -   Updated API of sendTransaction and signMessage to require the account address.
+-   Updated API to include an 'accountDisconnected' event.
 
 ## 0.1.0
 

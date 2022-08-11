@@ -113,12 +113,34 @@ const signature = await provider.signMessage(
 );
 ```
 
-### addChangeAccountListener
+### Account changed listener
 
-To react when the selected account in the wallet changes, a handler function can be assigned through `addChangeAccountListener`. This does **not** return the currently selected account when the handler is initially assigned. This can be obtained by invoking the `connect` method. Note that the event will not be received if the user changes to an account in the wallet that is not connected to your dApp.
+An event is emitted when the selected account in the wallet is changed. An event is not emitted by the wallet when initially opening, only when the user
+explicitly switches between accounts. The `connect` method should be used to obtain the currently selected account when starting an interaction with the wallet.
+Note that the event will not be received if the user changes to an account in the wallet that is not connected to your dApp.
 
 ```typescript
 const provider = await detectConcordiumProvider();
 let selectedAccountAddress: string | undefined = undefined;
-provider.addChangeAccountListener((address) => (selectedAccountAddress = address));
+provider.on('accountChanged', (accountAddress) => (selectedAccountAddress = accountAddress);
+```
+
+### Account disconnected listener
+
+An event is emitted when dApp connection is disconnected by the user in the wallet. The disconnect
+event is only emitted to the relevant dApp being disconnected. To either reconnect or get another
+connected account a dApp should use the `connect` method. This can be done either by having the user of the dApp manually press a connect button, or it can be done automatically based on the received disconnect event.
+
+```typescript
+const provider = await detectConcordiumProvider();
+let selectedAccountAddress: string | undefined = undefined;
+provider.on('accountDisconnected', (accountAddress) => {
+    selectedAccountAddress = undefined;
+
+    // To immediately connect to an account in the wallet again.
+    // provider.connect().then((accountAddress) => (selectedAccountAddress = accountAddress));
+});
+
+// Connect to an account in the wallet again triggered elsewhere in the dApp.
+provider.connect().then((accountAddress) => (selectedAccountAddress = accountAddress));
 ```
