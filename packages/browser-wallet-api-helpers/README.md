@@ -113,7 +113,9 @@ const signature = await provider.signMessage(
 );
 ```
 
-### Account changed listener
+## Events
+
+### Account changed
 
 An event is emitted when the selected account in the wallet is changed. An event is not emitted by the wallet when initially opening, only when the user
 explicitly switches between accounts. The `connect` method should be used to obtain the currently selected account when starting an interaction with the wallet.
@@ -125,7 +127,7 @@ let selectedAccountAddress: string | undefined = undefined;
 provider.on('accountChanged', (accountAddress) => (selectedAccountAddress = accountAddress);
 ```
 
-### Account disconnected listener
+### Account disconnected
 
 An event is emitted when dApp connection is disconnected by the user in the wallet. The disconnect
 event is only emitted to the relevant dApp being disconnected. To either reconnect or get another
