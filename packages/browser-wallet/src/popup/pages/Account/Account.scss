@@ -43,4 +43,22 @@ $account-page-details-height: var(--details-height, $account-page-details-height
     &__actions {
         height: $account-page-actions-height;
     }
+
+    &__connection-box {
+        position: absolute;
+        right: 0;
+        top: 0;
+        margin-right: rem(8px);
+        margin-top: rem(5px);
+        border: 1px solid $color-green;
+        border-radius: rem(15px);
+        font-family: $font-family-mono;
+        font-size: rem(8px);
+        padding: rem(2px) rem(5px) rem(2px) rem(5px);
+    }
+
+    &__not-connected {
+        color: $color-grey;
+        border-color: $color-grey;
+    }
 }

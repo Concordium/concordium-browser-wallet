@@ -5,6 +5,7 @@ import Button from '@popup/shared/Button';
 import { useTranslation } from 'react-i18next';
 import { popupMessageHandler } from '@popup/shared/message-handler';
 import { EventType } from '@concordium/browser-wallet-api-helpers';
+import { getCurrentOpenTabUrl } from '@popup/shared/utils/tabs';
 
 export default function ConnectedSites() {
     const { t } = useTranslation('account', { keyPrefix: 'settings.connectedSites' });
@@ -13,20 +14,11 @@ export default function ConnectedSites() {
     const connectedSites = connectedSitesLoading.value;
     const [openTabUrl, setOpenTabUrl] = useState<string>();
 
-    async function getCurrentOpenTabUrl() {
-        const tabs = await chrome.tabs.query({ active: true, lastFocusedWindow: true });
-        const { url } = tabs[0];
-        if (!url) {
-            return undefined;
-        }
-        return new URL(url).origin;
-    }
-
     useEffect(() => {
         getCurrentOpenTabUrl().then(setOpenTabUrl);
     }, []);
 
-    if (!selectedAccount) {
+    if (!selectedAccount || !openTabUrl) {
         return null;
     }
 
