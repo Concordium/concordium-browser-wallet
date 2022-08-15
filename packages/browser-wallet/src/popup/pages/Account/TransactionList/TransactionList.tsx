@@ -35,7 +35,10 @@ const ListElement = forwardRef<HTMLDivElement, PropsOf<'div'>>(({ children, ...r
         <div ref={ref} {...rest}>
             {groups.map(([header, transactions]) => (
                 <Fragment key={header}>
-                    <span className="transactionGroupHeader" style={{ height: transactionHeaderHeight }}>
+                    <span
+                        className="transaction-list__scroll__transaction-group-header"
+                        style={{ height: transactionHeaderHeight }}
+                    >
                         {header}
                     </span>
                     <div
@@ -83,7 +86,7 @@ function InfiniteTransactionList({
                     <InfiniteLoader isItemLoaded={isItemLoaded} itemCount={itemCount} loadMoreItems={loadMoreItems}>
                         {({ onItemsRendered, ref }) => (
                             <List
-                                className="infinite"
+                                className="transaction-list__scroll__infinite"
                                 itemCount={headersAndTransactions.length}
                                 onItemsRendered={onItemsRendered}
                                 ref={ref}
@@ -105,7 +108,12 @@ function InfiniteTransactionList({
                                     }
 
                                     if (isHeader(item)) {
-                                        return <span style={style} className="transactionGroupHeaderPlaceholder" />;
+                                        return (
+                                            <span
+                                                style={style}
+                                                className="transaction-list__scroll__transaction-group-header-placeholder"
+                                            />
+                                        );
                                     }
                                     return (
                                         <TransactionElement

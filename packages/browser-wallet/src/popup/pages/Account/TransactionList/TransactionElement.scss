@@ -11,6 +11,28 @@
         max-height: none;
         height: 100%;
         width: 100%;
+
+        &__infinite {
+            overflow: overlay !important;
+        }
+
+        &__transaction-group-header-placeholder {
+            opacity: 0;
+        }
+
+        &__transaction-group-header {
+            height: rem(20px);
+            font-size: rem(8px);
+            color: $color-blue;
+            padding-left: rem(5px);
+            line-height: 12px;
+            display: flex;
+            align-items: center;
+            background-color: $color-transaction-group-header;
+            position: sticky;
+            top: 0;
+            z-index: 1;
+        }
     }
 }
 
@@ -37,7 +59,7 @@
         margin: 0;
 
         &__greenText {
-            color: $color-green;
+            color: $color-success;
         }
     }
 
@@ -64,26 +86,4 @@
     &__failed {
         padding-left: 30px;
     }
-}
-
-.transactionGroupHeaderPlaceholder {
-    opacity: 0;
-}
-
-.transactionGroupHeader {
-    height: rem(20px);
-    font-size: rem(8px);
-    color: $color-blue;
-    padding-left: rem(5px);
-    line-height: 12px;
-    display: flex;
-    align-items: center;
-    background-color: $color-light-blue;
-    position: sticky;
-    top: 0;
-    z-index: 1;
-}
-
-.infinite {
-    overflow: overlay !important;
 }

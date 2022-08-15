@@ -1,10 +1,11 @@
+import { AccountTransactionType } from '@concordium/web-sdk';
 import axios from 'axios';
 import { abs } from 'wallet-common-helpers';
 import {
     BrowserWalletTransaction,
+    RewardType,
     TransactionHistoryResult,
     TransactionStatus,
-    TransactionType,
 } from './transaction-history-types';
 
 // TODO The wallet proxy URL should be taken from storage when that has been
@@ -42,58 +43,58 @@ export enum TransactionKindString {
     Malformed = 'Malformed account transaction',
 }
 
-function mapTransactionKindStringToTransactionType(kind: TransactionKindString): TransactionType {
+function mapTransactionKindStringToTransactionType(kind: TransactionKindString): AccountTransactionType | RewardType {
     switch (kind) {
         case TransactionKindString.DeployModule:
-            return TransactionType.DeployModule;
+            return AccountTransactionType.DeployModule;
         case TransactionKindString.InitContract:
-            return TransactionType.InitContract;
+            return AccountTransactionType.InitializeSmartContractInstance;
         case TransactionKindString.Update:
-            return TransactionType.Update;
+            return AccountTransactionType.UpdateSmartContractInstance;
         case TransactionKindString.Transfer:
-            return TransactionType.Transfer;
+            return AccountTransactionType.SimpleTransfer;
         case TransactionKindString.AddBaker:
-            return TransactionType.AddBaker;
+            return AccountTransactionType.AddBaker;
         case TransactionKindString.RemoveBaker:
-            return TransactionType.RemoveBaker;
+            return AccountTransactionType.RemoveBaker;
         case TransactionKindString.UpdateBakerStake:
-            return TransactionType.UpdateBakerStake;
+            return AccountTransactionType.UpdateBakerStake;
         case TransactionKindString.UpdateBakerRestakeEarnings:
-            return TransactionType.UpdateBakerRestakeEarnings;
+            return AccountTransactionType.UpdateBakerRestakeEarnings;
         case TransactionKindString.UpdateBakerKeys:
-            return TransactionType.UpdateBakerKeys;
+            return AccountTransactionType.UpdateBakerKeys;
         case TransactionKindString.UpdateCredentialKeys:
-            return TransactionType.UpdateCredentialKeys;
+            return AccountTransactionType.UpdateCredentialKeys;
         case TransactionKindString.BakingReward:
-            return TransactionType.BakingReward;
+            return RewardType.BakingReward;
         case TransactionKindString.BlockReward:
-            return TransactionType.BlockReward;
+            return RewardType.BlockReward;
         case TransactionKindString.FinalizationReward:
-            return TransactionType.FinalizationReward;
+            return RewardType.FinalizationReward;
         case TransactionKindString.EncryptedAmountTransfer:
-            return TransactionType.EncryptedAmountTransfer;
+            return AccountTransactionType.EncryptedTransfer;
         case TransactionKindString.TransferToEncrypted:
-            return TransactionType.TransferToEncrypted;
+            return AccountTransactionType.TransferToEncrypted;
         case TransactionKindString.TransferToPublic:
-            return TransactionType.TransferToPublic;
+            return AccountTransactionType.TransferToPublic;
         case TransactionKindString.TransferWithSchedule:
-            return TransactionType.TransferWithSchedule;
+            return AccountTransactionType.TransferWithSchedule;
         case TransactionKindString.UpdateCredentials:
-            return TransactionType.UpdateCredentials;
+            return AccountTransactionType.UpdateCredentials;
         case TransactionKindString.RegisterData:
-            return TransactionType.RegisterData;
+            return AccountTransactionType.RegisterData;
         case TransactionKindString.TransferWithMemo:
-            return TransactionType.TransferWithMemo;
+            return AccountTransactionType.SimpleTransferWithMemo;
         case TransactionKindString.EncryptedAmountTransferWithMemo:
-            return TransactionType.EncryptedAmountTransferWithMemo;
+            return AccountTransactionType.EncryptedTransferWithMemo;
         case TransactionKindString.TransferWithScheduleAndMemo:
-            return TransactionType.TransferWithScheduleAndMemo;
+            return AccountTransactionType.TransferWithScheduleWithMemo;
         case TransactionKindString.ConfigureBaker:
-            return TransactionType.ConfigureBaker;
+            return AccountTransactionType.ConfigureBaker;
         case TransactionKindString.ConfigureDelegation:
-            return TransactionType.ConfigureDelegation;
+            return AccountTransactionType.ConfigureDelegation;
         case TransactionKindString.StakingReward:
-            return TransactionType.StakingReward;
+            return RewardType.StakingReward;
         default:
             throw Error(`Unkown transaction kind was encounted: ${kind}`);
     }

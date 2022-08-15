@@ -1,3 +1,5 @@
+import { AccountTransactionType } from '@concordium/web-sdk';
+
 /**
  * The interface for the result of a query to get historical transactions for
  * an account, e.g. from the wallet proxy.
@@ -15,32 +17,11 @@ export enum TransactionStatus {
     Finalized = 'finalized',
 }
 
-export enum TransactionType {
-    DeployModule,
-    InitContract,
-    Update,
-    Transfer,
-    AddBaker,
-    RemoveBaker,
-    UpdateBakerStake,
-    UpdateBakerRestakeEarnings,
-    UpdateBakerKeys,
-    UpdateCredentialKeys,
-    BakingReward,
-    BlockReward,
-    FinalizationReward,
-    EncryptedAmountTransfer,
-    TransferToEncrypted,
-    TransferToPublic,
-    TransferWithSchedule,
-    UpdateCredentials,
-    RegisterData,
-    TransferWithMemo,
-    EncryptedAmountTransferWithMemo,
-    TransferWithScheduleAndMemo,
-    ConfigureBaker,
-    ConfigureDelegation,
-    StakingReward,
+export enum RewardType {
+    BakingReward = 'BakingReward',
+    BlockReward = 'BlockReward',
+    FinalizationReward = 'FinalizationReward',
+    StakingReward = 'StakingReward',
 }
 
 /**
@@ -54,8 +35,18 @@ export interface BrowserWalletTransaction {
     blockHash: string;
     amount: bigint;
     cost?: bigint;
-    type: TransactionType;
+    type: AccountTransactionType | RewardType;
     status: TransactionStatus;
     time: bigint;
     id: number;
+}
+
+export interface BrowserWalletAccountTransaction extends BrowserWalletTransaction {
+    type: AccountTransactionType;
+}
+
+export function isAccountTransaction(
+    transaction: BrowserWalletTransaction
+): transaction is BrowserWalletAccountTransaction {
+    return transaction.type in AccountTransactionType;
 }

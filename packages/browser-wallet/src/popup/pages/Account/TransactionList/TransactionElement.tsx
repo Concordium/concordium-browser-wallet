@@ -5,11 +5,13 @@ import Warning from '@assets/svg/warning.svg';
 import { displayAsCcd } from 'wallet-common-helpers/lib/utils/ccd';
 import {
     BrowserWalletTransaction,
+    isAccountTransaction,
+    RewardType,
     TransactionStatus,
-    TransactionType,
 } from '@popup/shared/utils/transaction-history-types';
 import { dateFromTimestamp, TimeStampUnit } from 'wallet-common-helpers';
 import clsx from 'clsx';
+import { AccountTransactionType } from '@concordium/web-sdk';
 
 export const transactionElementHeight = 58;
 
@@ -39,21 +41,24 @@ function isOutgoingTransaction(transaction: BrowserWalletTransaction, accountAdd
 }
 
 function isEncryptedTransfer(transaction: BrowserWalletTransaction) {
-    return [TransactionType.EncryptedAmountTransfer, TransactionType.EncryptedAmountTransferWithMemo].includes(
-        transaction.type
+    return (
+        isAccountTransaction(transaction) &&
+        [AccountTransactionType.EncryptedTransfer, AccountTransactionType.EncryptedTransferWithMemo].includes(
+            transaction.type
+        )
     );
 }
 
-function isTransferTransaction(type: TransactionType) {
+function isTransferTransaction(type: AccountTransactionType) {
     switch (type) {
-        case TransactionType.Transfer:
-        case TransactionType.TransferWithMemo:
-        case TransactionType.TransferToEncrypted:
-        case TransactionType.TransferToPublic:
-        case TransactionType.TransferWithSchedule:
-        case TransactionType.TransferWithScheduleAndMemo:
-        case TransactionType.EncryptedAmountTransfer:
-        case TransactionType.EncryptedAmountTransferWithMemo:
+        case AccountTransactionType.SimpleTransfer:
+        case AccountTransactionType.SimpleTransferWithMemo:
+        case AccountTransactionType.TransferToEncrypted:
+        case AccountTransactionType.TransferToPublic:
+        case AccountTransactionType.TransferWithSchedule:
+        case AccountTransactionType.TransferWithScheduleWithMemo:
+        case AccountTransactionType.EncryptedTransfer:
+        case AccountTransactionType.EncryptedTransferWithMemo:
             return true;
         default:
             return false;
@@ -68,13 +73,10 @@ function isTransferTransaction(type: TransactionType) {
  * @returns a displayable string of the fee for a transaction in CCD.
  */
 function buildFeeString(cost: bigint, accountAddress: string, transaction: BrowserWalletTransaction) {
-    if (isTransferTransaction(transaction.type)) {
+    if (isAccountTransaction(transaction) && isTransferTransaction(transaction.type)) {
         if (isOutgoingTransaction(transaction, accountAddress)) {
             if (isEncryptedTransfer(transaction)) {
                 return 'Shielded transaction fee';
-            }
-            if (transaction.type !== TransactionType.TransferToPublic) {
-                return `${displayAsCcd(-transaction.amount)} + ${displayAsCcd(cost)} Fee`;
             }
             return `${displayAsCcd(-transaction.amount)} + ${displayAsCcd(cost)} Fee`;
         }
@@ -85,57 +87,57 @@ function buildFeeString(cost: bigint, accountAddress: string, transaction: Brows
 /**
  * Maps transaction type to a displayable text string.
  */
-function mapTypeToText(type: TransactionType): string {
+function mapTypeToText(type: AccountTransactionType | RewardType): string {
     switch (type) {
-        case TransactionType.DeployModule:
+        case AccountTransactionType.DeployModule:
             return 'Module deployment';
-        case TransactionType.InitContract:
+        case AccountTransactionType.InitializeSmartContractInstance:
             return 'Contract initiation';
-        case TransactionType.Update:
+        case AccountTransactionType.UpdateSmartContractInstance:
             return 'Update';
-        case TransactionType.Transfer:
+        case AccountTransactionType.SimpleTransfer:
             return 'Transfer';
-        case TransactionType.AddBaker:
+        case AccountTransactionType.AddBaker:
             return 'Add baker';
-        case TransactionType.RemoveBaker:
+        case AccountTransactionType.RemoveBaker:
             return 'Remove baker';
-        case TransactionType.UpdateBakerStake:
+        case AccountTransactionType.UpdateBakerStake:
             return 'Baker stake update';
-        case TransactionType.UpdateBakerRestakeEarnings:
+        case AccountTransactionType.UpdateBakerRestakeEarnings:
             return 'Baker restake earnings update';
-        case TransactionType.UpdateBakerKeys:
+        case AccountTransactionType.UpdateBakerKeys:
             return 'Baker keys update';
-        case TransactionType.UpdateCredentialKeys:
+        case AccountTransactionType.UpdateCredentialKeys:
             return 'Credential keys update';
-        case TransactionType.BakingReward:
+        case RewardType.BakingReward:
             return 'Baking reward';
-        case TransactionType.BlockReward:
+        case RewardType.BlockReward:
             return 'Block reward';
-        case TransactionType.FinalizationReward:
+        case RewardType.FinalizationReward:
             return 'Finalization reward';
-        case TransactionType.EncryptedAmountTransfer:
+        case AccountTransactionType.EncryptedTransfer:
             return 'Shielded transfer';
-        case TransactionType.TransferToEncrypted:
+        case AccountTransactionType.TransferToEncrypted:
             return 'Shielded amount';
-        case TransactionType.TransferToPublic:
+        case AccountTransactionType.TransferToPublic:
             return 'Unshielded amount';
-        case TransactionType.TransferWithSchedule:
+        case AccountTransactionType.TransferWithSchedule:
             return 'Scheduled transfer';
-        case TransactionType.UpdateCredentials:
+        case AccountTransactionType.UpdateCredentials:
             return 'Credentials update';
-        case TransactionType.RegisterData:
+        case AccountTransactionType.RegisterData:
             return 'Data registration';
-        case TransactionType.TransferWithMemo:
+        case AccountTransactionType.SimpleTransferWithMemo:
             return 'Transfer';
-        case TransactionType.EncryptedAmountTransferWithMemo:
+        case AccountTransactionType.EncryptedTransferWithMemo:
             return 'Shielded transfer';
-        case TransactionType.TransferWithScheduleAndMemo:
+        case AccountTransactionType.TransferWithScheduleWithMemo:
             return 'Scheduled transfer';
-        case TransactionType.ConfigureBaker:
+        case AccountTransactionType.ConfigureBaker:
             return 'Configure baker';
-        case TransactionType.ConfigureDelegation:
+        case AccountTransactionType.ConfigureDelegation:
             return 'Configure delegation';
-        case TransactionType.StakingReward:
+        case RewardType.StakingReward:
             return 'Reward payout';
         default:
             return 'Unknown';
@@ -147,7 +149,7 @@ function isGreenAmount(transaction: BrowserWalletTransaction, accountAddress: st
         return false;
     }
     if (
-        transaction.type === TransactionType.TransferToPublic &&
+        transaction.type === AccountTransactionType.TransferToPublic &&
         transaction.cost &&
         transaction.amount > transaction.cost
     ) {

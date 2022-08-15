@@ -29,13 +29,19 @@ $color-cta-othernet: $color-dark-green;
 // Light mode
 $color-bg-light: $color-off-white;
 $color-text-light: $color-off-black;
+$color-transaction-group-header-light: $color-light-blue;
 
 // Dark mode
 $color-bg-dark: $color-off-black;
 $color-text-dark: $color-off-white;
+$color-transaction-group-header-dark: $color-salmon;
 
 // Theme variables
 $color-bg: var(--color-bg, $color-bg-light); // off-white/off-black
 $color-text: var(--color-text, $color-text-light); // off-black/off-white
 $color-cta: var(--color-cta, $color-cta-othernet); // dark-green/blue
+$color-transaction-group-header: var(
+    --color-transaction-group-header,
+    $color-transaction-group-header-light
+); // light-blue/salmon
 $color-text-inverted: $color-bg;
