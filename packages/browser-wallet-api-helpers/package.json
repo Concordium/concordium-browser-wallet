@@ -19,7 +19,7 @@
         "url": "https://concordium.com"
     },
     "dependencies": {
-        "@concordium/web-sdk": "^0.1.2"
+        "@concordium/web-sdk": "^0.3.0"
     },
     "devDependencies": {
         "@babel/core": "^7.17.10",

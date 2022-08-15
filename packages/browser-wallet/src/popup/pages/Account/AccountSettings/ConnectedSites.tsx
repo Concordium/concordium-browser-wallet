@@ -7,6 +7,16 @@ import { popupMessageHandler } from '@popup/shared/message-handler';
 import { EventType } from '@concordium/browser-wallet-api-helpers';
 import { getCurrentOpenTabUrl } from '@popup/shared/utils/tabs';
 
+function displayUrl(url: string) {
+    const { hostname } = new URL(url);
+
+    if (hostname.length < 29) {
+        return hostname;
+    }
+
+    return `${hostname.substring(0, 29)}...`;
+}
+
 export default function ConnectedSites() {
     const { t } = useTranslation('account', { keyPrefix: 'settings.connectedSites' });
     const selectedAccount = useAtomValue(selectedAccountAtom);
@@ -56,16 +66,6 @@ export default function ConnectedSites() {
         const updatedConnectedSitesForAccount = currentConnectedSitesForAccount.filter((v) => v !== site);
         updateConnectedSites(updatedConnectedSitesForAccount, account);
         popupMessageHandler.broadcastToUrl(EventType.AccountDisconnected, site, account);
-    }
-
-    function displayUrl(url: string) {
-        const { hostname } = new URL(url);
-
-        if (hostname.length < 29) {
-            return hostname;
-        }
-
-        return `${hostname.substring(0, 29)}...`;
     }
 
     return (

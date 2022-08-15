@@ -12,6 +12,7 @@ import {
     signTransaction,
     TransactionExpiry,
     getAccountTransactionHash,
+    SchemaVersion,
 } from '@concordium/web-sdk';
 import { jsonRpcUrlAtom, credentialsAtom } from '@popup/store/settings';
 import DisplayUpdateContract from './displayTransaction/DisplayUpdateContract';
@@ -27,6 +28,7 @@ interface Location {
             payload: string;
             parameters?: Record<string, unknown>;
             schema?: string;
+            schemaVersion?: SchemaVersion;
         };
     };
 }
@@ -46,7 +48,14 @@ export default function SendTransaction({ onSubmit, onReject }: Props) {
 
     const { accountAddress } = state.payload;
     const { type: transactionType, payload } = useMemo(
-        () => parsePayload(state.payload.type, state.payload.payload, state.payload.parameters, state.payload.schema),
+        () =>
+            parsePayload(
+                state.payload.type,
+                state.payload.payload,
+                state.payload.parameters,
+                state.payload.schema,
+                state.payload.schemaVersion
+            ),
         [JSON.stringify(state.payload)]
     );
 
