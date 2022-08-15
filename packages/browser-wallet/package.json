@@ -14,7 +14,7 @@
     "dependencies": {
         "@concordium/browser-wallet-api": "workspace:^",
         "@concordium/browser-wallet-api-helpers": "workspace:^",
-        "@concordium/web-sdk": "^0.3.0",
+        "@concordium/web-sdk": "^0.4.0",
         "buffer": "^6.0.3",
         "check-password-strength": "^2.0.5",
         "clsx": "^1.1.1",
