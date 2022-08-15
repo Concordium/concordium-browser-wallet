@@ -12,6 +12,15 @@ import bgMessageHandler from './message-handler';
 import { forwardToPopup, HandleMessage, HandleResponse, RunCondition, setPopupSize } from './window-management';
 
 /**
+ * Determines whether the given url has been whitelisted by any account.
+ */
+async function isWhiteListedForAnyAccount(url: string): Promise<boolean> {
+    const urlOrigin = new URL(url).origin;
+    const connectedSites = await storedConnectedSites.get();
+    return Object.values(connectedSites).some((sites) => sites.includes(urlOrigin));
+}
+
+/**
  * Callback method which installs Injected script into Main world of Dapp
  */
 const injectScript: ExtensionMessageHandler = (_msg, sender, respond) => {
@@ -38,16 +47,20 @@ bgMessageHandler.handleMessage(createMessageTypeFilter(InternalMessageType.SetVi
     setPopupSize(payload);
 });
 
-bgMessageHandler.handleMessage(createMessageTypeFilter(MessageType.JsonRpcRequest), (input, _sender, respond) => {
-    storedJsonRpcUrl.get().then((url) => {
-        if (!url) {
-            throw new Error('No Json RPC URL available');
-        }
-        const provider = new HttpProvider(url, fetch);
-        provider
-            .request(input.payload.method, input.payload.params && JSONBig.parse(input.payload.params))
-            .then(respond);
-    });
+bgMessageHandler.handleMessage(createMessageTypeFilter(MessageType.JsonRpcRequest), (input, sender, respond) => {
+    if (sender.url && isWhiteListedForAnyAccount(sender.url)) {
+        storedJsonRpcUrl.get().then((url) => {
+            if (!url) {
+                throw new Error('No Json RPC URL available');
+            }
+            const provider = new HttpProvider(url, fetch);
+            provider
+                .request(input.payload.method, input.payload.params && JSONBig.parse(input.payload.params))
+                .then(respond);
+        });
+        return true;
+    }
+    respond(undefined);
     return true;
 });
 

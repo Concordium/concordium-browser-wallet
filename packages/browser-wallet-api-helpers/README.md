@@ -151,8 +151,12 @@ provider.connect().then((accountAddress) => (selectedAccountAddress = accountAdd
 ## Accessing node through JSON-RPC
 
 The wallet API exposes access to a JSON-RPC client. This allows a dApp to communicate with the same node as the wallet is connected to, and enables dApps to access the JSON-RPC interface without being connected to a separate server itself. The client is accessed as shown in the example below.
+The dApp does not need to recreate the client again when the wallet changes node or network, the client will always use the wallet's current connected JSON-RPC server.
 
 ```typescript
 const provider = await detectConcordiumProvider();
-const accountInfo = await provider.getJsonRpcClient().getAccountInfo(accountAddress);
+const client: JsonRpcClient = await provider.getJsonRpcClient();
+...
+// The client can then be used to acccess node through JSON-RPC
+const accountInfo = await client.getAccountInfo(accountAddress);
 ```

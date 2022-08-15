@@ -26,6 +26,11 @@ class WalletApi extends EventEmitter implements IWalletApi {
             this.sendMessage<string>(MessageType.JsonRpcRequest, {
                 method: input[0],
                 params: JSONBig.stringify(input[1]),
+            }).then((response) => {
+                if (!response) {
+                    throw new Error('RPC call rejected by wallet');
+                }
+                return response;
             });
         this.jsonRpcClient = new JsonRpcClient({ request });
 
