@@ -4,14 +4,15 @@ import {
     MessageType,
     ExtensionMessageHandler,
 } from '@concordium/browser-wallet-message-hub';
-import { HttpProvider } from '@concordium/web-sdk';
 import { storedConnectedSites, storedSelectedAccount, storedJsonRpcUrl } from '@shared/storage/access';
+import { HttpProvider } from '@concordium/web-sdk';
 
 import JSONBig from 'json-bigint';
 import bgMessageHandler from './message-handler';
 import { forwardToPopup, HandleMessage, HandleResponse, RunCondition, setPopupSize } from './window-management';
 import { identityIssuanceHandler } from './identity-issuance';
 import { startupHandler } from './startup';
+import { sendCredentialHandler } from './credential-deployment';
 
 /**
  * Determines whether the given url has been whitelisted by any account.
@@ -77,6 +78,11 @@ const injectScript: ExtensionMessageHandler = (_msg, sender, respond) => {
 };
 
 chrome.runtime.onStartup.addListener(startupHandler);
+
+bgMessageHandler.handleMessage(
+    createMessageTypeFilter(InternalMessageType.SendCredentialDeployment),
+    sendCredentialHandler
+);
 
 bgMessageHandler.handleMessage(
     createMessageTypeFilter(InternalMessageType.StartIdentityIssuance),

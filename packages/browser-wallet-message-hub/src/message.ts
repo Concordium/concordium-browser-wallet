@@ -27,6 +27,7 @@ export enum InternalMessageType {
     SetViewSize = 'I_SetViewSize',
     StartIdentityIssuance = 'I_StartIdentityIssuance',
     EndIdentityIssuance = 'l_EndIdentityIssuance',
+    SendCredentialDeployment = 'l_SendCredentialDeployment',
 }
 
 // eslint-disable-next-line @typescript-eslint/no-explicit-any

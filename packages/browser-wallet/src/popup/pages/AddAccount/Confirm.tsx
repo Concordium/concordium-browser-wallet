@@ -1,32 +1,28 @@
-import React, { useMemo, useState } from 'react';
+import React, { useState, useMemo } from 'react';
 import { useTranslation } from 'react-i18next';
-import { useAtom, useAtomValue, useSetAtom } from 'jotai';
+import { useAtomValue, useSetAtom } from 'jotai';
 import { useNavigate } from 'react-router-dom';
 import IdCard from '@popup/shared/IdCard';
 import { identityProvidersAtom, selectedIdentityAtom } from '@popup/store/identity';
 import { selectedAccountAtom } from '@popup/store/account';
 import { credentialsAtom, jsonRpcUrlAtom, seedPhraseAtom } from '@popup/store/settings';
 import { CreationStatus, WalletCredential } from '@shared/storage/types';
-import {
-    JsonRpcClient,
-    HttpProvider,
-    createCredentialV1,
-    CredentialInputV1,
-    getAccountAddress,
-    getSignedCredentialDeploymentTransactionHash,
-} from '@concordium/web-sdk';
+import { Network } from '@shared/storage/types';
+import { JsonRpcClient, HttpProvider } from '@concordium/web-sdk';
 import Button from '@popup/shared/Button';
 import ArrowIcon from '@assets/svg/arrow.svg';
 import IdentityProviderIcon from '@popup/shared/IdentityProviderIcon';
 
 import { absoluteRoutes } from '@popup/constants/routes';
+import { InternalMessageType } from '@concordium/browser-wallet-message-hub';
+import { popupMessageHandler } from '@popup/shared/message-handler';
 import AccountDetails from '../Account/AccountDetails';
 
 export default function Confirm() {
     const { t } = useTranslation('addAccount');
     const nav = useNavigate();
     const selectedIdentity = useAtomValue(selectedIdentityAtom);
-    const [credentials, setCredentials] = useAtom(credentialsAtom);
+    const credentials = useAtomValue(credentialsAtom);
     const setSelectedAccount = useSetAtom(selectedAccountAtom);
     const seedPhrase = useAtomValue(seedPhraseAtom);
     const jsonRpcUrl = useAtomValue(jsonRpcUrlAtom);
@@ -60,51 +56,33 @@ export default function Confirm() {
                 throw new Error('no global fetched');
             }
 
-            const provider = providers.find((p) => p.ipInfo.ipIdentity === selectedIdentity.provider);
-
-            if (!provider) {
+            if (!identityProvider) {
                 throw new Error('provider not found');
             }
 
-            // Make request
-            // TODO Get this from settings, when we store the chosen net
-            const net = 'Testnet';
-            const expiry = Math.floor(Date.now() / 1000) + 720;
-            const credsOfCurrentIdentity = credentials.filter((cred) => cred.identityId === selectedIdentity.id);
-            const credNumber = credsOfCurrentIdentity.length
-                ? credsOfCurrentIdentity.reduce((best, cred) => Math.max(best, cred.credNumber), 0) + 1
-                : 0;
-            const credIn: CredentialInputV1 = {
-                globalContext: global.value,
-                ipInfo: provider.ipInfo,
-                arsInfos: provider.arsInfos,
-                seedAsHex: seedPhrase,
-                net,
-                idObject: selectedIdentity.idObject.value,
-                revealedAttributes: [],
-                identityIndex: selectedIdentity.index,
-                credNumber,
-                expiry,
-            };
-            const request = createCredentialV1(credIn);
-            const { credId } = request.cdi;
-            const newCred = {
-                address: getAccountAddress(credId).address,
-                identityId: selectedIdentity.id,
-                credId,
-                credNumber,
-                status: CreationStatus.Pending,
-                deploymentHash: getSignedCredentialDeploymentTransactionHash(request),
-                net: selectedIdentity.network,
-            };
+        // Make request
+        const expiry = Math.floor(Date.now() / 1000) + 720;
+        const credsOfCurrentIdentity = credentials.filter((cred) => cred.identityId === selectedIdentity.id);
+        const credNumber = credsOfCurrentIdentity.length
+            ? credsOfCurrentIdentity.reduce((best, cred) => Math.max(best, cred.credNumber), 0) + 1
+            : 0;
 
-            // Add Pending
-            setCredentials([...credentials, newCred]);
-            // Send Request
-            await client.sendCredentialDeployment(request);
-            // Set selectedAccount
-            setSelectedAccount(newCred.address);
+        const address = await popupMessageHandler.sendInternalMessage(InternalMessageType.SendCredentialDeployment, {
+            globalContext: global.value,
+            ipInfo: identityProvider.ipInfo,
+            arsInfos: identityProvider.arsInfos,
+            seedAsHex: seedPhrase,
+            net: Network[selectedIdentity.network],
+            idObject: selectedIdentity.idObject.value,
+            revealedAttributes: [],
+            identityIndex: selectedIdentity.index,
+            credNumber,
+            expiry,
+            identityId: selectedIdentity.id,
+        });
+            setSelectedAccount(address);
             nav(absoluteRoutes.home.account.path);
+
         } finally {
             setButtonDisabled(false);
         }
