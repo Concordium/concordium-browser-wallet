@@ -3,6 +3,8 @@ const t = {
     removeAccount: 'Remove account (local only)',
     resetConnections: 'Reset connections',
     accountAddress: 'Account address',
+    siteConnected: 'Connected',
+    siteNotConnected: 'Not connected',
     actions: {
         log: 'transaction log',
         send: 'send ccd',
