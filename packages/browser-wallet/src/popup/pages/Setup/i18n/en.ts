@@ -1,8 +1,19 @@
 const t = {
-    title: 'Settings',
+    intro: {
+        welcome: "Welcome to Concordium's official browser extension wallet.",
+        description:
+            'On the following pages you will be guided through the process of optaining a new account or restoring old ones.',
+    },
+    title: 'Setup',
     continue: 'Continue',
     form: {
         labels: {
+            passcodeDescription: 'The first step is to set up a passcode. Please enter one below.',
+            enterPasscode: 'Enter passcode',
+            enterPasscodeAgain: 'Enter passcode again',
+            passcodeRequired: 'A passcode must be entered',
+            passcodeMismatch: 'Passcode does not match',
+            passcodeMinLength: 'Passcode must be at least 6 characters',
             credentials: 'Key, address pairs',
             url: 'JSON-RPC endpoint',
         },

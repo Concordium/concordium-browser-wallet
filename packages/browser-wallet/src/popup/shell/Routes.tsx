@@ -97,7 +97,7 @@ export default function Routes() {
                     }
                 />
             </Route>
-            <Route path={relativeRoutes.setup.path} element={<Setup />} />
+            <Route path={`${relativeRoutes.setup.path}/*`} element={<Setup />} />
             <Route path={relativeRoutes.home.path} element={<MainLayout />}>
                 <Route element={<NoContent />} path={relativeRoutes.home.identities.path} />
                 <Route path={relativeRoutes.home.settings.path}>

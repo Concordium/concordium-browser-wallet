@@ -1,7 +1,7 @@
 .page-header {
     display: flex;
     align-items: center;
-    height: rem(40px);
+    height: rem($page-header-height);
     width: 100%;
     padding-bottom: rem(1px);
 

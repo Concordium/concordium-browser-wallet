@@ -12,7 +12,8 @@ export default function MainLayout() {
     const [headerOpen, setHeaderOpen] = useState(false);
 
     if (loading) {
-        return null; // This will be near instant, as we're just waiting for the chrome async store
+        // This will be near instant, as we're just waiting for the chrome async store
+        return null;
     }
 
     if (!jsonRpcUrl) {

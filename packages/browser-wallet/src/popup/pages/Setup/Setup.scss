@@ -11,10 +11,90 @@
             margin-top: rem(10px);
         }
     }
+}
 
-    &__submit {
-        display: block;
-        width: 100%;
-        margin-top: rem(20px);
+.intro {
+    padding: rem(10px);
+    text-align: center;
+    display: flex;
+    flex-direction: column;
+    justify-content: space-between;
+    height: 100%;
+
+    &__logos {
+        display: flex;
+        flex-direction: row;
+        margin-top: rem(10px);
+        margin-left: rem(22px);
+        margin-right: rem(22px);
+    }
+
+    &__logo {
+        height: rem(50px);
+    }
+
+    &__concordium-letters {
+        margin-left: rem(15px);
+    }
+
+    &__button {
+        margin: 0 auto;
+        margin-bottom: rem(24px);
+    }
+
+    &__create-or-restore {
+        display: flex;
+        flex-direction: column;
+    }
+
+    &__mnemonic {
+        height: rem(110);
+        padding: rem(10px);
+    }
+}
+
+.mnemonic {
+    padding: rem(10px);
+    text-align: center;
+    display: flex;
+    flex-direction: column;
+    justify-content: space-between;
+    height: calc(100% - #{rem($page-header-height)});
+
+    textarea {
+        height: rem(110);
+        padding: rem(10px);
+    }
+}
+
+.choose-passcode {
+    padding: rem(10px);
+    display: flex;
+    flex-direction: column;
+    height: calc(100% - #{rem($page-header-height)} - #{rem(67px)});
+    justify-content: space-between;
+
+    button {
+        margin: 0 auto;
+    }
+}
+
+.choose-network {
+    padding: rem(10px);
+    text-align: center;
+    display: flex;
+    flex-direction: column;
+    height: calc(100% - #{rem($page-header-height)});
+
+    &__mainnet-button {
+        background-color: $color-cta-mainnet;
+        margin: 0 auto;
+        margin-bottom: rem(12px);
+    }
+
+    &__testnet-button {
+        background-color: $color-cta-othernet;
+        margin: 0 auto;
+        margin-bottom: rem(12px);
     }
 }

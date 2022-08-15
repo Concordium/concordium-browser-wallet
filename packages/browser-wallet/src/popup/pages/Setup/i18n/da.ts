@@ -1,11 +1,22 @@
 import type en from './en';
 
 const t: typeof en = {
+    intro: {
+        welcome: "Velkommen til Concordium's officielle browser extension wallet",
+        description:
+            'På de følgende sider vil du blive guidet igennem at oprette en ny konto, eller at genskabe allerede eksisterende konti.',
+    },
     title: 'Indstillinger',
     continue: 'Fortsæt',
     form: {
         labels: {
-            credentials: 'Nøgle,adresse par',
+            passcodeDescription: 'Det første skridt er at vælge et kordeord. Vælg venligst ét kordeord nedenfor.',
+            enterPasscode: 'Indtast kodeord',
+            enterPasscodeAgain: 'Indtast kodeord igen',
+            passcodeRequired: 'Der skal vælges et kodeord',
+            passcodeMismatch: 'Kodeordene er ikke ens',
+            passcodeMinLength: 'Kodeordet skal bestå af mindst 6 tegn',
+            credentials: 'Key, address pairs',
             url: 'JSON-RPC endpoint',
         },
         notes: {
