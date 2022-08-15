@@ -5,6 +5,8 @@ const t: typeof en = {
     removeAccount: 'Fjern konto (kun lokalt)',
     resetConnections: 'Fjern forbindelser',
     accountAddress: 'Konto adresse',
+    siteConnected: 'Forbundet',
+    siteNotConnected: 'Ikke forbundet',
     actions: {
         log: 'transaktionslog',
         send: 'send ccd',
@@ -20,6 +22,7 @@ const t: typeof en = {
         connectedSites: {
             title: 'Forbundne hjemmesider',
             noConnected: 'Den valgte konto er ikke forbundet til nogen hjemmeside.',
+            connect: 'Forbind',
             disconnect: 'Fjern',
         },
         exportPrivateKey: 'Eksportér privat nøgle',

@@ -3,6 +3,8 @@ const t = {
     removeAccount: 'Remove account (local only)',
     resetConnections: 'Reset connections',
     accountAddress: 'Account address',
+    siteConnected: 'Connected',
+    siteNotConnected: 'Not connected',
     actions: {
         log: 'transaction log',
         send: 'send ccd',
@@ -18,6 +20,7 @@ const t = {
         connectedSites: {
             title: 'Connected sites',
             noConnected: 'The selected account is not connected to any sites.',
+            connect: 'Connect',
             disconnect: 'Disconnect',
         },
         exportPrivateKey: 'Export private key',

@@ -24,16 +24,24 @@ export default function Root() {
     useEffect(() => {
         detectConcordiumProvider()
             .then((provider) => {
+                // Listen for relevant events from the wallet.
+                provider.on('accountChanged', setAccount);
+                provider.on('accountDisconnected', () => {
+                    setAccount(undefined);
+                    setIsConnected(false);
+                    provider.connect().then((accountAddress) => {
+                        setAccount(accountAddress);
+                        setIsConnected(true);
+                    });
+                });
+                provider.on('chainChanged', setJsonRpcUrl);
+
                 provider
                     .connect()
                     .then((acc) => {
                         // Connection accepted, set the application state parameters.
                         setAccount(acc);
                         setIsConnected(true);
-
-                        // Listen for relevant events from the wallet.
-                        provider.on('accountChanged', setAccount);
-                        provider.on('chainChanged', setJsonRpcUrl);
                     })
                     .catch(() => setIsConnected(false));
             })

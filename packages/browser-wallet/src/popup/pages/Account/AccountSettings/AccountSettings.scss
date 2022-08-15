@@ -16,6 +16,7 @@
     padding-left: rem(14px);
     padding-right: rem(14px);
     background-color: $color-bg;
+    overflow: overlay;
 
     &__element {
         display: flex;
@@ -23,6 +24,11 @@
         justify-content: space-between;
         padding-top: rem(10px);
         padding-bottom: rem(10px);
+
+        &__connect {
+            cursor: pointer;
+            color: $color-dark-green;
+        }
 
         &__disconnect {
             cursor: pointer;
