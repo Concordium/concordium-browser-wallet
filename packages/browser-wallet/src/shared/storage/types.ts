@@ -62,4 +62,4 @@ export interface ConfirmedIdentity extends BaseIdentity {
     };
 }
 
-export type Identity = Record<string, unknown> & (PendingIdentity | RejectedIdentity | ConfirmedIdentity);
+export type Identity = PendingIdentity | RejectedIdentity | ConfirmedIdentity;

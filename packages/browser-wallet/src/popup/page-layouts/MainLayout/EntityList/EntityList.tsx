@@ -243,6 +243,7 @@ const EntityList = forwardRef(
     }
 );
 
-export default EntityList as <E extends Record<string, unknown>>(
+// eslint-disable-next-line @typescript-eslint/no-explicit-any
+export default EntityList as <E extends Record<string, any>>(
     props: WithRef<EntityListProps<E>, HTMLDivElement>
 ) => JSX.Element;
