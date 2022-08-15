@@ -1,3 +1,5 @@
+import { BackgroundResponseStatus } from './types';
+
 /** The type of the response from the background script during identityIssuance */
 export type IdentityIssuanceBackgroundResponse =
     | {

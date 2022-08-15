@@ -3,6 +3,7 @@ import { storedJsonRpcUrl, storedCredentials, storedIdentities } from '@shared/s
 
 import { Identity, IdentityStatus, WalletCredential } from '@shared/storage/types';
 import { IdentityTokenContainer, IdentityProviderIdentityStatus } from 'wallet-common-helpers/lib/utils/identity/types';
+import { updateIdentities } from './update';
 
 /**
  * Continously checks whether pending credentials have been confirmed.
@@ -43,35 +44,30 @@ async function monitorIdentityStatus() {
     setTimeout(async function loop() {
         const url = await storedJsonRpcUrl.get();
         const identities = await storedIdentities.get();
-        let anyUpdated = false;
+        const toUpdate: Identity[] = [];
         if (url && identities) {
-            const updatedIdentities: Identity[] = await Promise.all(
-                identities.map(async (original) => {
-                    if (original.status === IdentityStatus.Pending) {
-                        const { location, ...identity } = original;
-                        const response = (await (await fetch(location)).json()) as IdentityTokenContainer;
-                        if (response.status === IdentityProviderIdentityStatus.Error) {
-                            anyUpdated = true;
-                            return {
-                                ...identity,
-                                status: IdentityStatus.Rejected,
-                                error: response.detail,
-                            };
-                        }
-                        if (response.status === IdentityProviderIdentityStatus.Done) {
-                            anyUpdated = true;
-                            return {
-                                ...identity,
-                                status: IdentityStatus.Confirmed,
-                                idObject: response.token.identityObject,
-                            };
-                        }
+            for (const current of identities) {
+                if (current.status === IdentityStatus.Pending) {
+                    const { location, ...identity } = current;
+                    const response = (await (await fetch(location)).json()) as IdentityTokenContainer;
+                    if (response.status === IdentityProviderIdentityStatus.Error) {
+                        toUpdate.push({
+                            ...identity,
+                            status: IdentityStatus.Rejected,
+                            error: response.detail,
+                        });
                     }
-                    return original;
-                })
-            );
-            if (anyUpdated) {
-                await storedIdentities.set(updatedIdentities);
+                    if (response.status === IdentityProviderIdentityStatus.Done) {
+                        toUpdate.push({
+                            ...identity,
+                            status: IdentityStatus.Confirmed,
+                            idObject: response.token.identityObject,
+                        });
+                    }
+                }
+            }
+            if (toUpdate.length) {
+                await updateIdentities(toUpdate);
             }
         }
         setTimeout(loop, interval);
