@@ -63,7 +63,7 @@ const runIfWhitelisted: RunCondition<false> = async (msg, sender) => {
     }
 
     const accountConnectedSites = connectedSites[accountAddress] ?? [];
-    if (sender.url !== undefined && accountConnectedSites.includes(sender.url)) {
+    if (sender.url !== undefined && accountConnectedSites.includes(new URL(sender.url).origin)) {
         return { run: true };
     }
 
@@ -80,6 +80,7 @@ const runIfWhitelisted: RunCondition<false> = async (msg, sender) => {
  * @returns the highest priority account address that is connected to the site with the provided URL.
  */
 async function findPrioritizedAccountConnectedToSite(url: string): Promise<string | undefined> {
+    const urlOrigin = new URL(url).origin;
     const selectedAccount = await storedSelectedAccount.get();
     const connectedSites = await storedConnectedSites.get();
 
@@ -88,11 +89,11 @@ async function findPrioritizedAccountConnectedToSite(url: string): Promise<strin
     }
 
     const selectedAccountConnectedSites = connectedSites[selectedAccount] ?? [];
-    if (selectedAccountConnectedSites.includes(url)) {
+    if (selectedAccountConnectedSites.includes(urlOrigin)) {
         return selectedAccount;
     }
 
-    const connectedAccount = Object.entries(connectedSites).find((item) => item[1] && item[1].includes(url));
+    const connectedAccount = Object.entries(connectedSites).find((item) => item[1] && item[1].includes(urlOrigin));
     if (connectedAccount) {
         return connectedAccount[0];
     }
