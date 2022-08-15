@@ -1,5 +1,10 @@
 import { InjectedMessageHandler, createEventTypeFilter, MessageType } from '@concordium/browser-wallet-message-hub';
-import { AccountTransactionPayload, AccountTransactionSignature, AccountTransactionType } from '@concordium/web-sdk';
+import {
+    AccountTransactionPayload,
+    AccountTransactionSignature,
+    AccountTransactionType,
+    SchemaVersion,
+} from '@concordium/web-sdk';
 import { WalletApi as IWalletApi, EventType } from '@concordium/browser-wallet-api-helpers';
 import EventEmitter from 'events';
 import { stringify } from './util';
@@ -19,8 +24,9 @@ class WalletApi extends EventEmitter implements IWalletApi {
     /**
      * Sends a sign request to the Concordium Wallet and awaits the users action
      */
-    public async signMessage(message: string): Promise<AccountTransactionSignature> {
+    public async signMessage(accountAddress: string, message: string): Promise<AccountTransactionSignature> {
         const response = await this.sendMessage<AccountTransactionSignature | undefined>(MessageType.SignMessage, {
+            accountAddress,
             message,
         });
 
@@ -37,7 +43,8 @@ class WalletApi extends EventEmitter implements IWalletApi {
     public async connect(): Promise<string | undefined> {
         const response = await this.messageHandler.sendMessage<string | undefined | false>(MessageType.Connect);
 
-        if (response === false) {
+        // TODO Response becomes === null when we would expect it to be undefined. Catching it here is a temporary quick-fix.
+        if (response === false || response === null) {
             throw new Error('Connection rejected');
         }
 
@@ -50,16 +57,20 @@ class WalletApi extends EventEmitter implements IWalletApi {
      * Sends a transaction to the Concordium Wallet and awaits the users action
      */
     public async sendTransaction(
+        accountAddress: string,
         type: AccountTransactionType,
         payload: AccountTransactionPayload,
         parameters?: Record<string, unknown>,
-        schema?: string
+        schema?: string,
+        schemaVersion?: SchemaVersion
     ): Promise<string> {
         const response = await this.sendMessage<string | undefined>(MessageType.SendTransaction, {
+            accountAddress,
             type,
             payload: stringify(payload),
             parameters,
             schema,
+            schemaVersion,
         });
 
         if (!response) {

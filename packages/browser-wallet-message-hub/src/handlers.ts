@@ -176,7 +176,10 @@ export class ContentMessageHandler {
 }
 
 export class ExtensionsMessageHandler extends BaseMessageHandler<WalletMessage> {
-    constructor(private whitelistedUrls: { get(): Promise<string[] | undefined> }) {
+    constructor(
+        private connectedSites: { get(): Promise<Record<string, string[]> | undefined> },
+        private selectedAccount: { get(): Promise<string | undefined> }
+    ) {
         super();
     }
 
@@ -196,7 +199,8 @@ export class ExtensionsMessageHandler extends BaseMessageHandler<WalletMessage> 
     }
 
     /**
-     * Send event of specific type with optional payload
+     * Broadcast an event of a specific type, with an optional payload, to all currently
+     * open and whitelisted (connected to the selected account) tabs.
      *
      * @example
      * handler.broadcast(EventType.ChangeAccount, "1234");
@@ -212,6 +216,18 @@ export class ExtensionsMessageHandler extends BaseMessageHandler<WalletMessage> 
                     .filter(({ id }) => id !== undefined)
                     .forEach((t) => this.sendEventToTab(t.id as number, new WalletEvent(type, payload)))
             );
+    }
+
+    /**
+     * Broadcast event of a specific type with an optional payload to open tabs with the provided URL.
+     */
+    // eslint-disable-next-line @typescript-eslint/no-explicit-any
+    public async broadcastToUrl(type: EventType, tabUrl: string, payload?: any): Promise<void[]> {
+        const tabsRestrictedToUrl = await chrome.tabs.query({ url: `${tabUrl}/*` });
+        const sendToTabsPromises = tabsRestrictedToUrl
+            .filter((tab) => tab.id !== undefined)
+            .map((t) => this.sendEventToTab(t.id as number, new WalletEvent(type, payload)));
+        return Promise.all(sendToTabsPromises);
     }
 
     public override handleMessage(filter: MessageFilter<WalletMessage>, handler: ExtensionMessageHandler): Unsubscribe {
@@ -243,8 +259,15 @@ export class ExtensionsMessageHandler extends BaseMessageHandler<WalletMessage> 
     }
 
     private async getWhitelistedTabs(tabs: chrome.tabs.Tab[]): Promise<chrome.tabs.Tab[]> {
-        const whitelistedUrls = await this.whitelistedUrls.get();
-        return tabs.filter(({ url }) => url !== undefined && whitelistedUrls?.includes(url));
+        const connectedSites = await this.connectedSites.get();
+        const selectedAccount = await this.selectedAccount.get();
+
+        let whitelistedUrls: string[] = [];
+        if (selectedAccount && connectedSites) {
+            whitelistedUrls = connectedSites[selectedAccount] ?? [];
+        }
+
+        return tabs.filter(({ url }) => url !== undefined && whitelistedUrls?.includes(new URL(url).origin));
     }
 
     private async sendEventToTab(tabId: number, event: WalletEvent) {

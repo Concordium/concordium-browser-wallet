@@ -9,7 +9,6 @@ import SendIcon from '@assets/svg/paperplane.svg';
 import ReceiveIcon from '@assets/svg/qr.svg';
 import SettingsIcon from '@assets/svg/cog.svg';
 
-import { ClassName } from 'wallet-common-helpers';
 import clsx from 'clsx';
 import { accountRoutes } from '../routes';
 
@@ -51,9 +50,12 @@ function ActionLinks({ children }: ActionLinksProps) {
     );
 }
 
-type Props = ClassName;
+interface Props {
+    className: string;
+    setDetailsExpanded: React.Dispatch<React.SetStateAction<boolean>>;
+}
 
-export default function AccountActions({ className }: Props) {
+export default function AccountActions({ className, setDetailsExpanded }: Props) {
     const { t } = useTranslation('account', { keyPrefix: 'actions' });
 
     return (
@@ -68,7 +70,12 @@ export default function AccountActions({ className }: Props) {
                 <NavLink className="account-page-actions__link" to={accountRoutes.receive} title={t('receive')}>
                     <ReceiveIcon className="account-page-actions__receive-icon" />
                 </NavLink>
-                <NavLink className="account-page-actions__link" to={accountRoutes.settings} title={t('settings')}>
+                <NavLink
+                    className="account-page-actions__link"
+                    to={accountRoutes.settings}
+                    title={t('settings')}
+                    onClick={() => setDetailsExpanded(false)}
+                >
                     <SettingsIcon className="account-page-actions__settings-icon" />
                 </NavLink>
             </ActionLinks>

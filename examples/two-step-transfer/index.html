@@ -6,15 +6,20 @@
         <script src="../../packages/browser-wallet-api-helpers/lib/concordiumHelpers.min.js"></script>
         <meta charset="utf-8" />
         <script>
+            let currentAccountAddress = '';
+
             async function setupPage() {
                 const provider = await concordiumHelpers.detectConcordiumProvider();
 
-                document
-                    .getElementById('connect')
-                    .addEventListener('click', () => provider.connect().then(alert).catch(alert));
+                document.getElementById('connect').addEventListener('click', () => {
+                    provider.connect().then((accountAddress) => {
+                        currentAccountAddress = accountAddress;
+                        document.getElementById('accountAddress').innerHTML = accountAddress;
+                    });
+                });
                 document.getElementById('sendTransfer').addEventListener('click', () =>
                     provider
-                        .sendTransaction(concordiumSDK.AccountTransactionType.SimpleTransfer, {
+                        .sendTransaction(currentAccountAddress, concordiumSDK.AccountTransactionType.SimpleTransfer, {
                             amount: new concordiumSDK.GtuAmount(1n),
                             toAddress: new concordiumSDK.AccountAddress(
                                 '39bKAuC7sXCZQfo7DmVQTMbiUuBMQJ5bCfsS7sva1HvDnUXp13'
@@ -25,27 +30,32 @@
                 );
                 document.getElementById('signMessage').addEventListener('click', () =>
                     provider
-                        .signMessage(message.value)
+                        .signMessage(currentAccountAddress, message.value)
                         .then((sig) => alert(JSON.stringify(sig)))
                         .catch(alert)
                 );
                 document.getElementById('sendDeposit').addEventListener('click', () =>
                     provider
-                        .sendTransaction(concordiumSDK.AccountTransactionType.UpdateSmartContractInstance, {
-                            amount: new concordiumSDK.GtuAmount(1n),
-                            contractAddress: {
-                                index: 98n,
-                                subindex: 0n,
-                            },
-                            receiveName: 'two-step-transfer.deposit',
-                            maxContractExecutionEnergy: 30000n,
-                        })
+                        .sendTransaction(
+                            currentAccountAddress,
+                            concordiumSDK.AccountTransactionType.UpdateSmartContractInstance,
+                            {
+                                amount: new concordiumSDK.GtuAmount(1n),
+                                contractAddress: {
+                                    index: 98n,
+                                    subindex: 0n,
+                                },
+                                receiveName: 'two-step-transfer.deposit',
+                                maxContractExecutionEnergy: 30000n,
+                            }
+                        )
                         .then(alert)
                         .catch(alert)
                 );
                 document.getElementById('sendReceive').addEventListener('click', () =>
                     provider
                         .sendTransaction(
+                            currentAccountAddress,
                             concordiumSDK.AccountTransactionType.UpdateSmartContractInstance,
                             {
                                 amount: new concordiumSDK.GtuAmount(1n),
@@ -67,6 +77,7 @@
                 document.getElementById('sendInit').addEventListener('click', () =>
                     provider
                         .sendTransaction(
+                            currentAccountAddress,
                             concordiumSDK.AccountTransactionType.InitializeSmartContractInstance,
                             {
                                 amount: new concordiumSDK.GtuAmount(1n),
@@ -90,7 +101,8 @@
                         .catch(alert)
                 );
 
-                provider.on('accountChanged', (accountAddres) => alert(accountAddres));
+                provider.on('accountDisconnected', (accountAddress) => (currentAccountAddress = undefined));
+                provider.on('accountChanged', (accountAddress) => (currentAccountAddress = accountAddress));
                 provider.on('chainChanged', (chain) => alert(chain));
             }
 
@@ -99,6 +111,9 @@
     </head>
 
     <body>
+        <div>
+            <h3 id="accountAddress">Account address:</h3>
+        </div>
         <button id="connect">Connect</button>
         <button id="sendInit">Initiate two step transfer contract</button>
         <button id="sendTransfer">Send transfer</button>

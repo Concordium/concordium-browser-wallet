@@ -4,6 +4,7 @@ import {
     UpdateContractPayload,
     serializeUpdateContractParameters,
     AccountTransactionPayload,
+    SchemaVersion,
     InitContractPayload,
     serializeInitContractParameters,
 } from '@concordium/web-sdk';
@@ -28,7 +29,8 @@ export function parsePayload(
     type: AccountTransactionType,
     stringifiedPayload: string,
     parameters?: Record<string, unknown>,
-    schema?: string
+    schema?: string,
+    schemaVersion: SchemaVersion = 0
 ): HeadlessTransaction {
     const payload = parse(stringifiedPayload);
 
@@ -43,7 +45,7 @@ export function parsePayload(
                           functionName,
                           parameters,
                           Buffer.from(schema, 'base64'),
-                          0
+                          schemaVersion
                       )
                     : Buffer.alloc(0);
             // Overwrite whatever parameter has been provided. Ensures that what we show and what is signed is the same.
@@ -62,7 +64,7 @@ export function parsePayload(
                           payload.contractName,
                           parameters,
                           Buffer.from(schema, 'base64'),
-                          0
+                          schemaVersion
                       )
                     : Buffer.alloc(0);
             // Overwrite whatever parameter has been provided. Ensures that what we show and what is signed is the same.
