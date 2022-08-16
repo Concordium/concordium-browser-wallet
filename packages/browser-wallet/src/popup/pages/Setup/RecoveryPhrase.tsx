@@ -3,12 +3,13 @@ import React from 'react';
 import { useNavigate } from 'react-router-dom';
 import { absoluteRoutes } from '@popup/constants/routes';
 import TextArea from '@popup/shared/Form/TextArea';
-import { seedPhraseAtom } from '@popup/state';
+import { passcodeAtom, seedPhraseAtom } from '@popup/state';
 import { useAtomValue } from 'jotai';
 import Form from '@popup/shared/Form';
 import { SubmitHandler, Validate } from 'react-hook-form';
 import Submit from '@popup/shared/Form/Submit';
 import { useTranslation } from 'react-i18next';
+// import { encrypt } from '@popup/shared/crypto';
 import { setupRoutes } from './routes';
 
 type FormValues = {
@@ -19,9 +20,17 @@ export function EnterRecoveryPhrase() {
     const navigate = useNavigate();
     const { t } = useTranslation('setup');
     const seedPhrase = useAtomValue(seedPhraseAtom);
+    const passcode = useAtomValue(passcodeAtom);
+
+    if (!passcode) {
+        // This page should not be shown without the passcode in state.
+        return null;
+    }
 
     const handleSubmit: SubmitHandler<FormValues> = () => {
         // TODO Encrypt and store the recovery phrase here.
+
+        // console.log(JSON.stringify(encrypt(vs.seedPhraseInput, passcode)));
         navigate(`${absoluteRoutes.setup.path}/${setupRoutes.chooseNetwork}`);
     };
 
