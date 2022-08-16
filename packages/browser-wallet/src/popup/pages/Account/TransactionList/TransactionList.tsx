@@ -11,6 +11,7 @@ import TransactionElement, { transactionElementHeight } from './TransactionEleme
 import useTransactionGroups, { TransactionsByDateTuple } from './useTransactionGroups';
 
 const transactionHeaderHeight = 20;
+const transactionResultLimit = 20;
 
 interface InfiniteTransactionListProps {
     accountAddress: string;
@@ -148,7 +149,7 @@ export default function TransactionList() {
 
     async function loadTransactionsDescending(address: string, appendTransactions: boolean, fromId?: number) {
         setIsNextPageLoading(true);
-        getTransactions(address, 20, 'descending', fromId)
+        getTransactions(address, transactionResultLimit, 'descending', fromId)
             .then((transactionResult) => {
                 setHasNextPage(transactionResult.full);
                 const updatedTransactions = appendTransactions
