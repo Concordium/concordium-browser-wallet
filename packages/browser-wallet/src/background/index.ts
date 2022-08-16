@@ -27,26 +27,28 @@ async function performRpcCall(
     method: string,
     params: string | undefined,
     senderUrl: string,
-    respond: (response: string | undefined) => void
+    onSuccess: (response: string | undefined) => void,
+    onFailure: (response: string) => void
 ) {
     const isWhiteListed = await isWhiteListedForAnyAccount(senderUrl);
     if (isWhiteListed) {
         const url = await storedJsonRpcUrl.get();
         if (!url) {
-            throw new Error('No Json RPC URL available');
+            onFailure('No JSON-RPC URL available');
+        } else {
+            const provider = new HttpProvider(url, fetch);
+            provider
+                .request(
+                    // We lose the method's typing when sending the message.
+                    // eslint-disable-next-line @typescript-eslint/no-explicit-any
+                    method as any,
+                    params && JSONBig.parse(params)
+                )
+                .then(onSuccess)
+                .catch((e) => onFailure(e.toString()));
         }
-        const provider = new HttpProvider(url, fetch);
-        provider
-            .request(
-                // We lose the method's typing when sending the message.
-                // eslint-disable-next-line @typescript-eslint/no-explicit-any
-                method as any,
-                params && JSONBig.parse(params)
-            )
-            .then(respond)
-            .catch(() => respond(undefined));
     } else {
-        respond(undefined);
+        onFailure('RPC Call can only performed by whitelisted sites');
     }
 }
 
@@ -78,10 +80,12 @@ bgMessageHandler.handleMessage(createMessageTypeFilter(InternalMessageType.SetVi
 });
 
 bgMessageHandler.handleMessage(createMessageTypeFilter(MessageType.JsonRpcRequest), (input, sender, respond) => {
+    const onFailure = (error: string) => respond({ success: false, error });
     if (sender.url) {
-        performRpcCall(input.payload.method, input.payload.params, sender.url, respond);
+        const onSuccess = (response: string | undefined) => respond({ success: true, response });
+        performRpcCall(input.payload.method, input.payload.params, sender.url, onSuccess, onFailure);
     } else {
-        respond(undefined);
+        onFailure('Missing sender URL');
     }
     return true;
 });
