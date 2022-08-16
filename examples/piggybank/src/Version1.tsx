@@ -31,7 +31,7 @@ async function updateState(setSmashed: (x: boolean) => void, setAmount: (x: bigi
 }
 
 export default function PiggyBank() {
-    const { account, isConnected, jsonRpcUrl } = useContext(state);
+    const { account, isConnected } = useContext(state);
     const [owner, setOwner] = useState<string>();
     const [smashed, setSmashed] = useState<boolean>();
     const [amount, setAmount] = useState<bigint>(0n);
@@ -66,12 +66,7 @@ export default function PiggyBank() {
     const canUse = isConnected && smashed !== undefined && !smashed;
 
     return (
-        <main className="piggybank">
-            <div className={`connection-banner ${isConnected ? 'connected' : ''}`}>
-                {isConnected ? `Connected: ${account}` : 'No wallet connection'}
-            </div>
-            <div>{jsonRpcUrl ? `JSON-RPC Url: ${jsonRpcUrl}` : 'No JSON-RPC Url yet'}</div>
-            <br />
+        <>
             {owner === undefined ? (
                 <div>Loading piggy bank...</div>
             ) : (
@@ -116,6 +111,6 @@ export default function PiggyBank() {
             >
                 <HammerIcon width="40" />
             </button>
-        </main>
+        </>
     );
 }

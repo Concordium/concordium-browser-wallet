@@ -187,6 +187,19 @@ const handleConnectionResponse: HandleResponse<string | undefined | false> = asy
     return response;
 };
 
+/**
+ * Callback method which returns the prioritized account's address.
+ */
+const getSelectedAccountHandler: ExtensionMessageHandler = (_msg, sender, respond) => {
+    if (!sender.url) {
+        throw new Error('Expected URL to be available for sender.');
+    }
+    findPrioritizedAccountConnectedToSite(sender.url).then(respond);
+    return true;
+};
+
+bgMessageHandler.handleMessage(createMessageTypeFilter(MessageType.GetSelectedAccount), getSelectedAccountHandler);
+
 forwardToPopup(
     MessageType.Connect,
     InternalMessageType.Connect,

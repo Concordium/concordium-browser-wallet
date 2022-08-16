@@ -21,7 +21,7 @@ const isPiggybankSmashed = (piggyState: PiggyBankState): piggyState is PiggyBank
     (piggyState as PiggyBankStateSmashed).Smashed !== undefined;
 
 export default function PiggyBankV0() {
-    const { account, isConnected, jsonRpcUrl } = useContext(state);
+    const { account, isConnected } = useContext(state);
     const [piggybank, setPiggyBank] = useState<InstanceInfoV0>();
     const input = useRef<HTMLInputElement>(null);
 
@@ -58,12 +58,7 @@ export default function PiggyBankV0() {
     const canUse = isConnected && piggyBankState !== undefined && !isPiggybankSmashed(piggyBankState);
 
     return (
-        <main className="piggybank">
-            <div className={`connection-banner ${isConnected ? 'connected' : ''}`}>
-                {isConnected ? `Connected: ${account}` : 'No wallet connection'}
-            </div>
-            <div>{jsonRpcUrl ? `JSON-RPC Url: ${jsonRpcUrl}` : 'No JSON-RPC Url yet'}</div>
-            <br />
+        <>
             {piggybank === undefined ? (
                 <div>Loading piggy bank...</div>
             ) : (
@@ -105,6 +100,6 @@ export default function PiggyBankV0() {
             >
                 <HammerIcon width="40" />
             </button>
-        </main>
+        </>
     );
 }

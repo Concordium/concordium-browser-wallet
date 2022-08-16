@@ -1,5 +1,5 @@
 /* eslint-disable no-console */
-import React, { useEffect, useState, useMemo } from 'react';
+import React, { useEffect, useState, useMemo, useCallback } from 'react';
 
 import { detectConcordiumProvider } from '@concordium/browser-wallet-api-helpers';
 import PiggyBankV0 from './Version0';
@@ -15,34 +15,33 @@ export default function Root() {
     const [isVersion0, setIsVersion0] = useState<boolean>(false);
     const [jsonRpcUrl, setJsonRpcUrl] = useState<string>();
 
+    const handleGetAccount = useCallback((accountAddress: string | undefined) => {
+        setAccount(accountAddress);
+        setIsConnected(Boolean(accountAddress));
+    }, []);
+
+    const handleOnClick = useCallback(
+        () =>
+            detectConcordiumProvider()
+                .then((provider) => provider.connect())
+                .then(handleGetAccount),
+        []
+    );
+
     useEffect(() => {
         detectConcordiumProvider()
             .then((provider) => {
                 // Listen for relevant events from the wallet.
                 provider.on('accountChanged', setAccount);
-                provider.on('accountDisconnected', () => {
-                    setAccount(undefined);
-                    setIsConnected(false);
-                    provider.connect().then((accountAddress) => {
-                        setAccount(accountAddress);
-                        setIsConnected(true);
-                    });
-                });
+                provider.on('accountDisconnected', () => provider.getSelectedAccount().then(handleGetAccount));
                 provider.on('chainChanged', setJsonRpcUrl);
-
-                provider
-                    .connect()
-                    .then((acc) => {
-                        // Connection accepted, set the application state parameters.
-                        setAccount(acc);
-                        setIsConnected(true);
-                    })
-                    .catch(() => setIsConnected(false));
+                // Check if you are already connected
+                provider.getSelectedAccount().then(handleGetAccount);
             })
             .catch(() => setIsConnected(false));
     }, []);
 
-    const stateValue: State = useMemo(() => ({ isConnected, account, jsonRpcUrl }), [isConnected, account, jsonRpcUrl]);
+    const stateValue: State = useMemo(() => ({ isConnected, account }), [isConnected, account]);
 
     return (
         // Setup a globally accessible state with data from the wallet.
@@ -50,8 +49,23 @@ export default function Root() {
             <button type="button" onClick={() => setIsVersion0((v) => !v)}>
                 Switch to {isVersion0 ? 'V1' : 'V0'}
             </button>
-            {isVersion0 && <PiggyBankV0 />}
-            {!isVersion0 && <PiggyBankV1 />}
+            <main className="piggybank">
+                <div className={`connection-banner ${isConnected ? 'connected' : ''}`}>
+                    {isConnected && `Connected: ${account}`}
+                    {!isConnected && (
+                        <>
+                            <p>No wallet connection</p>
+                            <button type="button" onClick={handleOnClick}>
+                                Connect
+                            </button>
+                        </>
+                    )}
+                </div>
+                <div>{jsonRpcUrl ? `JSON-RPC Url: ${jsonRpcUrl}` : 'No JSON-RPC Url yet'}</div>
+                <br />
+                {isVersion0 && <PiggyBankV0 />}
+                {!isVersion0 && <PiggyBankV1 />}
+            </main>
         </state.Provider>
     );
 }

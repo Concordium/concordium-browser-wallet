@@ -58,6 +58,20 @@ const provider = await detectConcordiumProvider();
 const accountAddress = await provider.connect();
 ```
 
+### getSelectedAccount
+
+To get the currently selected account, or to check whether the wallet is connected without using connect, the `getSelectedAccount` can be invoked. The method returns a `Promise` resolving with the address of the currently selected account in the wallet, or with undefined if there are no connected accounts in the wallet.
+
+```typescript
+const provider = await detectConcordiumProvider();
+const accountAddress = await provider.getSelectedAccount();
+if (accountAddress) {
+    // We are connected to the wallet
+} else {
+    // We are not connected to the wallet
+}
+```
+
 ### sendTransaction
 
 To send a transaction, three arguments need to be provided: The account address for the account in the wallet that should sign the transaction, a transaction type and a corresponding payload. Invoking `sendTransaction` returns a `Promise`, which resolves with the transaction hash for the submitted transaction.
