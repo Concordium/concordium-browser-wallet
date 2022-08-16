@@ -17,7 +17,37 @@ import { forwardToPopup, HandleMessage, HandleResponse, RunCondition, setPopupSi
 async function isWhiteListedForAnyAccount(url: string): Promise<boolean> {
     const urlOrigin = new URL(url).origin;
     const connectedSites = await storedConnectedSites.get();
-    return Object.values(connectedSites).some((sites) => sites.includes(urlOrigin));
+    if (connectedSites) {
+        return Object.values(connectedSites).some((sites) => sites.includes(urlOrigin));
+    }
+    return false;
+}
+
+async function performRpcCall(
+    method: string,
+    params: string | undefined,
+    senderUrl: string,
+    respond: (response: string | undefined) => void
+) {
+    const isWhiteListed = await isWhiteListedForAnyAccount(senderUrl);
+    if (isWhiteListed) {
+        const url = await storedJsonRpcUrl.get();
+        if (!url) {
+            throw new Error('No Json RPC URL available');
+        }
+        const provider = new HttpProvider(url, fetch);
+        provider
+            .request(
+                // We lose the method's typing when sending the message.
+                // eslint-disable-next-line @typescript-eslint/no-explicit-any
+                method as any,
+                params && JSONBig.parse(params)
+            )
+            .then(respond)
+            .catch(() => respond(undefined));
+    } else {
+        respond(undefined);
+    }
 }
 
 /**
@@ -48,19 +78,11 @@ bgMessageHandler.handleMessage(createMessageTypeFilter(InternalMessageType.SetVi
 });
 
 bgMessageHandler.handleMessage(createMessageTypeFilter(MessageType.JsonRpcRequest), (input, sender, respond) => {
-    if (sender.url && isWhiteListedForAnyAccount(sender.url)) {
-        storedJsonRpcUrl.get().then((url) => {
-            if (!url) {
-                throw new Error('No Json RPC URL available');
-            }
-            const provider = new HttpProvider(url, fetch);
-            provider
-                .request(input.payload.method, input.payload.params && JSONBig.parse(input.payload.params))
-                .then(respond);
-        });
-        return true;
+    if (sender.url) {
+        performRpcCall(input.payload.method, input.payload.params, sender.url, respond);
+    } else {
+        respond(undefined);
     }
-    respond(undefined);
     return true;
 });
 

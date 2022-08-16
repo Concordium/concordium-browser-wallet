@@ -17,21 +17,17 @@ const CONTRACT_INDEX = 81n; // V1 instance
 /** Should match the subindex of the instance targeted. */
 const CONTRACT_SUB_INDEX = 0n;
 
-function updateState(setSmashed: (x: boolean) => void, setAmount: (x: bigint) => void) {
-    detectConcordiumProvider()
-        .then((provider) =>
-            provider.getJsonRpcClient().invokeContract({
-                method: `${CONTRACT_NAME}.view`,
-                contract: { index: CONTRACT_INDEX, subindex: CONTRACT_SUB_INDEX },
-            })
-        )
-        .then((res) => {
-            if (!res || res.tag === 'failure' || !res.returnValue) {
-                throw new Error(`Expected succesful invocation`);
-            }
-            setSmashed(!!Number(res.returnValue.substring(0, 2)));
-            setAmount(toBuffer(res.returnValue.substring(2), 'hex').readBigUInt64LE(0) as bigint);
-        });
+async function updateState(setSmashed: (x: boolean) => void, setAmount: (x: bigint) => void): Promise<void> {
+    const provider = await detectConcordiumProvider();
+    const res = await provider.getJsonRpcClient().invokeContract({
+        method: `${CONTRACT_NAME}.view`,
+        contract: { index: CONTRACT_INDEX, subindex: CONTRACT_SUB_INDEX },
+    });
+    if (!res || res.tag === 'failure' || !res.returnValue) {
+        throw new Error(`Expected succesful invocation`);
+    }
+    setSmashed(!!Number(res.returnValue.substring(0, 2)));
+    setAmount(toBuffer(res.returnValue.substring(2), 'hex').readBigUInt64LE(0) as bigint);
 }
 
 export default function PiggyBank() {
@@ -42,25 +38,29 @@ export default function PiggyBank() {
     const input = useRef<HTMLInputElement>(null);
 
     useEffect(() => {
-        // Get piggy bank owner.
-        detectConcordiumProvider()
-            .then((provider) =>
-                provider.getJsonRpcClient().getInstanceInfo({ index: CONTRACT_INDEX, subindex: CONTRACT_SUB_INDEX })
-            )
-            .then((info) => {
-                if (info?.name !== `init_${CONTRACT_NAME}`) {
-                    // Check that we have the expected instance.
-                    throw new Error(`Expected instance of PiggyBank: ${info?.name}`);
-                }
+        if (isConnected) {
+            // Get piggy bank owner.
+            detectConcordiumProvider()
+                .then((provider) =>
+                    provider.getJsonRpcClient().getInstanceInfo({ index: CONTRACT_INDEX, subindex: CONTRACT_SUB_INDEX })
+                )
+                .then((info) => {
+                    if (info?.name !== `init_${CONTRACT_NAME}`) {
+                        // Check that we have the expected instance.
+                        throw new Error(`Expected instance of PiggyBank: ${info?.name}`);
+                    }
 
-                setOwner(info.owner.address);
-            });
-    }, []);
+                    setOwner(info.owner.address);
+                });
+        }
+    }, [isConnected]);
 
     // The internal state of the piggy bank, which is either intact or smashed.
     useEffect(() => {
-        updateState(setSmashed, setAmount);
-    }, []);
+        if (isConnected) {
+            updateState(setSmashed, setAmount);
+        }
+    }, [isConnected]);
 
     // Disable use if we're not connected or if piggy bank has already been smashed.
     const canUse = isConnected && smashed !== undefined && !smashed;
