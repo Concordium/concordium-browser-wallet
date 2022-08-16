@@ -5,6 +5,8 @@ const t: typeof en = {
     removeAccount: 'Fjern konto (kun lokalt)',
     resetConnections: 'Fjern forbindelser',
     accountAddress: 'Konto adresse',
+    siteConnected: 'Forbundet',
+    siteNotConnected: 'Ikke forbundet',
     actions: {
         log: 'transaktionslog',
         send: 'send ccd',
