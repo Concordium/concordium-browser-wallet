@@ -110,4 +110,13 @@ $entity-list-top-height: rem(25px);
             border-bottom: 1px dotted $color-petroleum;
         }
     }
+
+    &__check {
+        margin-left: rem(5px);
+        width: rem(8px);
+
+        path {
+            fill: $color-text;
+        }
+    }
 }

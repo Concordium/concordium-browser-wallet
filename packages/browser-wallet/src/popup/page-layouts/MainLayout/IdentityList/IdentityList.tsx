@@ -8,7 +8,7 @@ import CheckmarkIcon from '@assets/svg/checkmark-blue.svg';
 import { absoluteRoutes } from '@popup/constants/routes';
 import { identitiesAtom, selectedIdentityIdAtom } from '@popup/store/identity';
 import { useTranslation } from 'react-i18next';
-import { Identity } from '@shared/storage/types';
+import { Identity, IdentityStatus } from '@shared/storage/types';
 import EntityList from '../EntityList';
 
 type ItemProps = {
@@ -17,14 +17,32 @@ type ItemProps = {
     selected: boolean;
 };
 
-function IdentityListItem({ identity: { name }, checked, selected }: ItemProps) {
+function getStatusText(identity: Identity): string {
+    switch (identity.status) {
+        case IdentityStatus.Pending:
+            return 'Verification pending';
+        case IdentityStatus.Rejected:
+            return 'Verification failed';
+        case IdentityStatus.Confirmed: {
+            // TODO Find number of accounts
+            const accountCount = 0;
+            return `${accountCount} account${accountCount !== 1 ? 's' : ''}`;
+        }
+        default:
+            // eslint-disable-next-line @typescript-eslint/no-explicit-any
+            throw new Error(`Unexpected identity status: ${(identity as any).status}`);
+    }
+}
+
+function IdentityListItem({ identity, checked, selected }: ItemProps) {
     return (
-        <div className={clsx('account-list-item', checked && 'account-list-item--checked')}>
-            <div className="account-list-item__identity">
+        <div className={clsx('main-layout__header-list-item', checked && 'main-layout__header-list-item--checked')}>
+            <div className="main-layout__header-list-item__primary">
                 <div className="flex align-center">
-                    {name} {selected && <CheckmarkIcon className="account-list-item__check" />}
+                    {identity.name} {selected && <CheckmarkIcon className="main-layout__header-list-item__check" />}
                 </div>
             </div>
+            <div className="main-layout__header-list-item__secondary">{getStatusText(identity)}</div>
         </div>
     );
 }
@@ -49,7 +67,7 @@ const IdentityList = forwardRef<HTMLDivElement, Props>(({ className, onSelect },
             onNew={() => nav(absoluteRoutes.home.identities.add.path)}
             entities={identities}
             getKey={(a) => a.id}
-            newText={t('accountList.new')}
+            newText={t('identityList.new')}
             ref={ref}
             searchableKeys={['name']}
         >
