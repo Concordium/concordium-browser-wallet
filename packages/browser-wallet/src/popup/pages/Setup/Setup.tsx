@@ -1,42 +1,38 @@
 import React from 'react';
-import { useNavigate, Route, Routes } from 'react-router-dom';
-
-import { absoluteRoutes } from '@popup/constants/routes';
-import PageHeader from '@popup/shared/PageHeader';
+import { Route, Routes, useNavigate } from 'react-router-dom';
+import Logo from '@assets/svg/concordium.svg';
+import ConcordiumLetters from '@assets/svg/concordium-letters.svg';
 import Button from '@popup/shared/Button';
-import Intro from './Intro';
+import { useTranslation } from 'react-i18next';
 import { setupRoutes } from './routes';
-import { CreateNewWallet, EnterRecoveryPhrase } from './RecoveryPhrase';
+import { EnterRecoveryPhrase } from './RecoveryPhrase';
 import { ChooseNetwork } from './ChooseNetwork';
 import SetupPasscode from './SetupPasscode';
+import CreateOrRestore from './CreateOrRestore';
+import GenerateRecoveryPhrase from './GenerateSeedPhrase';
 
-function CreateOrRestore() {
+function Intro() {
     const navigate = useNavigate();
+    const { t } = useTranslation('setup');
 
     return (
-        <>
-            <PageHeader>Create or restore</PageHeader>
-            <div className="p-10">
-                <p>You now have the option create a new wallet or restore an existing one.</p>
-                <p>How do you want to proceed?</p>
+        <div className="intro-wrapper">
+            <div className="intro-wrapper__logos">
+                <Logo className="intro-wrapper__logo" />
+                <ConcordiumLetters className="intro-wrapper__concordium-letters" />
             </div>
-            <div className="intro__create-or-restore">
-                <Button
-                    className="intro__button"
-                    width="narrow"
-                    onClick={() => navigate(`${absoluteRoutes.setup.path}/${setupRoutes.createNew}`)}
-                >
-                    Create
-                </Button>
-                <Button
-                    className="intro__button"
-                    width="narrow"
-                    onClick={() => navigate(`${absoluteRoutes.setup.path}/${setupRoutes.restore}`)}
-                >
-                    Restore
-                </Button>
+            <div className="intro-wrapper__description">
+                <p>{t('intro.welcome')}</p>
+                <p>{t('intro.description')}</p>
             </div>
-        </>
+            <Button
+                className="intro-wrapper__continue-button"
+                width="narrow"
+                onClick={() => navigate(setupRoutes.passcode)}
+            >
+                {t('continue')}
+            </Button>
+        </div>
     );
 }
 
@@ -46,7 +42,7 @@ export default function SetupRoutes() {
             <Route index element={<Intro />} />
             <Route path={setupRoutes.passcode} element={<SetupPasscode />} />
             <Route path={setupRoutes.createOrRestore} element={<CreateOrRestore />} />
-            <Route path={setupRoutes.createNew} element={<CreateNewWallet />} />
+            <Route path={setupRoutes.createNew} element={<GenerateRecoveryPhrase />} />
             <Route path={setupRoutes.enterRecoveryPhrase} element={<EnterRecoveryPhrase />} />
             <Route path={setupRoutes.chooseNetwork} element={<ChooseNetwork />} />
             <Route path={setupRoutes.restore} element={<CreateOrRestore />} />

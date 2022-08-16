@@ -1,25 +1,16 @@
-.setup {
-    &__theme {
-        margin-bottom: rem(10px);
-    }
-
-    &__field {
-        display: block;
-        width: 100%;
-
-        &:not(:first-of-type) {
-            margin-top: rem(10px);
-        }
-    }
-}
-
-.intro {
+.intro-wrapper {
     padding: rem(10px);
     text-align: center;
-    display: flex;
-    flex-direction: column;
-    justify-content: space-between;
     height: 100%;
+
+    &__continue-button {
+        position: absolute;
+        bottom: rem(24px);
+        left: 0;
+        right: 0;
+        margin: 0 auto;
+        background-color: $color-cta-mainnet;
+    }
 
     &__logos {
         display: flex;
@@ -37,54 +28,54 @@
         margin-left: rem(15px);
     }
 
-    &__button {
-        margin: 0 auto;
-        margin-bottom: rem(24px);
-    }
-
-    &__create-or-restore {
-        display: flex;
-        flex-direction: column;
-    }
-
-    &__mnemonic {
-        height: rem(110);
-        padding: rem(10px);
+    &__description {
+        margin-top: rem(36px);
     }
 }
 
-.mnemonic {
+.page-with-header {
     padding: rem(10px);
     text-align: center;
-    display: flex;
-    flex-direction: column;
-    justify-content: space-between;
     height: calc(100% - #{rem($page-header-height)});
+
+    &__description {
+        margin-top: rem(25px);
+        margin-bottom: rem(25px);
+    }
+
+    &__choose-passcode {
+        text-align: left;
+        padding: rem(10px);
+
+        &__field {
+            display: block;
+            width: 100%;
+
+            &:not(:first-of-type) {
+                margin-top: rem(10px);
+            }
+        }
+    }
+
+    &__continue-button {
+        position: absolute;
+        bottom: rem(24px);
+        left: 0;
+        right: 0;
+        margin: 0 auto;
+        background-color: $color-cta-mainnet;
+    }
+
+    &__create-restore-button {
+        margin: 0 auto;
+        margin-bottom: rem(12px);
+        background-color: $color-cta-mainnet;
+    }
 
     textarea {
         height: rem(110);
         padding: rem(10px);
     }
-}
-
-.choose-passcode {
-    padding: rem(10px);
-    display: flex;
-    flex-direction: column;
-    height: calc(100% - #{rem($page-header-height)} - #{rem(67px)});
-    justify-content: space-between;
-
-    button {
-        margin: 0 auto;
-    }
-}
-
-.choose-network {
-    padding: rem(10px);
-    text-align: center;
-    display: flex;
-    flex-direction: column;
-    height: calc(100% - #{rem($page-header-height)});
 
     &__mainnet-button {
         background-color: $color-cta-mainnet;

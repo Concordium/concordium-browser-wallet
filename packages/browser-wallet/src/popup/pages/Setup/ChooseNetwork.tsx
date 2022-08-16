@@ -5,6 +5,7 @@ import Button from '@popup/shared/Button';
 import { absoluteRoutes } from '@popup/constants/routes';
 import { useSetAtom } from 'jotai';
 import { jsonRpcUrlAtom } from '@popup/store/settings';
+import { useTranslation } from 'react-i18next';
 
 // TODO The real go-live values must be used here.
 const mainnetJsonRpcUrl = 'http://localhost:9096';
@@ -12,22 +13,22 @@ const testnetJsonRpcUrl = 'http://localhost:9095';
 
 export function ChooseNetwork() {
     const navigate = useNavigate();
+    const { t } = useTranslation('setup');
     const setJsonRpcUrl = useSetAtom(jsonRpcUrlAtom);
 
     return (
         <>
             <PageHeader>Choose a network</PageHeader>
-            <div className="choose-network">
-                <div className="p-10">
+            <div className="page-with-header">
+                <div className="page-with-header__description">
                     <p>
-                        Here you can choose whether to connect to the Concordium Mainnet or Testnet.{' '}
-                        <i>If you are unsure what to choose, choose Concordium Mainnet.</i>
+                        {t('chooseNetwork.descriptionP1')} <i>{t('chooseNetwork.descriptionP2')}</i>
                     </p>
-                    <p>You can choose another network via the Settings menu later.</p>
+                    <p>{t('chooseNetwork.descriptionP3')}</p>
                 </div>
                 <div>
                     <Button
-                        className="choose-network__mainnet-button"
+                        className="page-with-header__mainnet-button"
                         width="wide"
                         onClick={() => {
                             setJsonRpcUrl(mainnetJsonRpcUrl);
@@ -37,7 +38,7 @@ export function ChooseNetwork() {
                         Concordium Mainnet
                     </Button>
                     <Button
-                        className="choose-network__testnet-button"
+                        className="page-with-header__testnet-button"
                         width="wide"
                         onClick={() => {
                             setJsonRpcUrl(testnetJsonRpcUrl);

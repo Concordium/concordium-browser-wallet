@@ -6,36 +6,40 @@ const t: typeof en = {
         description:
             'På de følgende sider vil du blive guidet igennem at oprette en ny konto, eller at genskabe allerede eksisterende konti.',
     },
-    title: 'Indstillinger',
-    continue: 'Fortsæt',
-    form: {
-        labels: {
-            passcodeDescription: 'Det første skridt er at vælge et kordeord. Vælg venligst ét kordeord nedenfor.',
+    setupPasscode: {
+        title: 'Vælg kodeord',
+        description: 'Det første skridt er at vælge et kordeord. Vælg venligst ét kordeord nedenfor.',
+        form: {
             enterPasscode: 'Indtast kodeord',
             enterPasscodeAgain: 'Indtast kodeord igen',
             passcodeRequired: 'Der skal vælges et kodeord',
             passcodeMismatch: 'Kodeordene er ikke ens',
             passcodeMinLength: 'Kodeordet skal bestå af mindst 6 tegn',
-            credentials: 'Key, address pairs',
-            url: 'JSON-RPC endpoint',
-        },
-        notes: {
-            credentials:
-                'Brug "{{fieldSeparator}}" for at separere værdier, og "{{lineSeparator}}" for at separere par',
         },
     },
-    validation: {
-        credentials: {
-            required: 'Indtast mindst 1 nøgle',
-            format: 'Kan ikke parse CSV par. Indtast venligst "nøgle{{fieldSeparator}}adresse", med "{{lineSeparator}}" til at separere par',
-        },
-        url: {
-            required: 'Indtast JSON-RPC endpoint for node',
+    createRestore: {
+        description:
+            'Du har nu muligheden for enten at oprette en ny wallet, eller at genskabe en eksisterende. Hvordan vil du fortsætte?',
+        create: 'Opret',
+        restore: 'Genskab',
+    },
+    recoveryPhrase: {
+        description: 'Skriv de 24 ord fra din recovery phrase ned. Husk at rækkefølgen er ordene er vigtig.',
+    },
+    enterRecoveryPhrase: {
+        description:
+            'Venligst skriv dine 24 ord i den korrekte rækkefølge, adskilt med et mellemrum, for at bekræfte din hemmelige recovery phrase.',
+        form: {
+            required: 'En seed phrase skal indtastes',
+            error: 'Der er en fejl i den valgte recovery phrase',
         },
     },
-    themeLabel: 'Udseende:',
-    themeLight: 'Lys',
-    themeDark: 'Mørk',
+    chooseNetwork: {
+        descriptionP1: 'Her kan du vælge om du vil forbinde til Concordium Mainnet eller Testnet',
+        descriptionP2: 'Hvis du er usikker på hvad du skal vælge, så vælg Concordium Mainnet.',
+        descriptionP3: 'Du kan vælge et andet netværk via Indstillinger på et senere tidspunkt.',
+    },
+    continue: 'Fortsæt',
 };
 
 export default t;

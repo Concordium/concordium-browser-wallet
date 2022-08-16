@@ -1,47 +1,15 @@
 import PageHeader from '@popup/shared/PageHeader';
-import React, { useEffect } from 'react';
+import React from 'react';
 import { useNavigate } from 'react-router-dom';
-import { generateMnemonic } from '@scure/bip39';
-import { wordlist } from '@scure/bip39/wordlists/english';
-import Button from '@popup/shared/Button';
 import { absoluteRoutes } from '@popup/constants/routes';
-import TextArea, { TextArea as ControlledTextArea } from '@popup/shared/Form/TextArea';
+import TextArea from '@popup/shared/Form/TextArea';
 import { seedPhraseAtom } from '@popup/state';
-import { useAtom, useAtomValue } from 'jotai';
+import { useAtomValue } from 'jotai';
 import Form from '@popup/shared/Form';
 import { SubmitHandler, Validate } from 'react-hook-form';
 import Submit from '@popup/shared/Form/Submit';
+import { useTranslation } from 'react-i18next';
 import { setupRoutes } from './routes';
-
-export function CreateNewWallet() {
-    const navigate = useNavigate();
-    const [seedPhrase, setSeedPhrase] = useAtom(seedPhraseAtom);
-
-    useEffect(() => {
-        if (!seedPhrase) {
-            setSeedPhrase(generateMnemonic(wordlist, 256));
-        }
-    }, []);
-
-    return (
-        <>
-            <PageHeader canGoBack>Your secret recovery phrase</PageHeader>
-            <div className="mnemonic">
-                <div className="p-10">
-                    <p>Write down your 24 word recovery phrase. Remember that the order is important.</p>
-                </div>
-                <ControlledTextArea value={seedPhrase} />
-                <Button
-                    className="intro__button"
-                    width="narrow"
-                    onClick={() => navigate(`${absoluteRoutes.setup.path}/${setupRoutes.enterRecoveryPhrase}`)}
-                >
-                    Continue
-                </Button>
-            </div>
-        </>
-    );
-}
 
 type FormValues = {
     seedPhraseInput: string;
@@ -49,6 +17,7 @@ type FormValues = {
 
 export function EnterRecoveryPhrase() {
     const navigate = useNavigate();
+    const { t } = useTranslation('setup');
     const seedPhrase = useAtomValue(seedPhraseAtom);
 
     const handleSubmit: SubmitHandler<FormValues> = () => {
@@ -57,38 +26,35 @@ export function EnterRecoveryPhrase() {
     };
 
     function validateSeedPhrase(): Validate<string> {
-        return (seedPhraseValue) => (seedPhraseValue !== seedPhrase ? 'Incorrect secret recovery phrase' : undefined);
+        return (seedPhraseValue) => (seedPhraseValue !== seedPhrase ? t('enterRecoveryPhrase.form.error') : undefined);
     }
 
     return (
         <>
-            <PageHeader canGoBack>Your secret recovery phrase</PageHeader>
-            <div className="mnemonic">
+            <PageHeader canGoBack>Your recovery phrase</PageHeader>
+            <div className="page-with-header">
+                <div className="page-with-header__description">{t('enterRecoveryPhrase.description')}</div>
                 <div className="p-10">
-                    <p>
-                        Please enter your 24 words in the correct order and separated by spaces, to confirm your secret
-                        recovery phrase.
-                    </p>
+                    <Form<FormValues> onSubmit={handleSubmit}>
+                        {(f) => {
+                            return (
+                                <>
+                                    <TextArea
+                                        register={f.register}
+                                        name="seedPhraseInput"
+                                        rules={{
+                                            required: t('enterRecoveryPhrase.form.required'),
+                                            validate: validateSeedPhrase(),
+                                        }}
+                                    />
+                                    <Submit className="page-with-header__continue-button" width="narrow">
+                                        {t('continue')}
+                                    </Submit>
+                                </>
+                            );
+                        }}
+                    </Form>
                 </div>
-                <Form<FormValues> onSubmit={handleSubmit}>
-                    {(f) => {
-                        return (
-                            <>
-                                <TextArea
-                                    register={f.register}
-                                    name="seedPhraseInput"
-                                    rules={{
-                                        required: 'A seed phrase must be provided',
-                                        validate: validateSeedPhrase(),
-                                    }}
-                                />
-                                <Submit className="intro__button" width="narrow">
-                                    Continue
-                                </Submit>
-                            </>
-                        );
-                    }}
-                </Form>
             </div>
         </>
     );
