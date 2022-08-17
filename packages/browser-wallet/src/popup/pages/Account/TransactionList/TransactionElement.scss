@@ -1,0 +1,89 @@
+.transaction-list {
+    &__container {
+        background-color: $color-bg;
+        display: flex;
+        flex-direction: column;
+        width: 100%;
+    }
+
+    &__scroll {
+        position: relative;
+        max-height: none;
+        height: 100%;
+        width: 100%;
+
+        &__infinite {
+            overflow: overlay !important;
+        }
+
+        &__transaction-group-header-placeholder {
+            opacity: 0;
+        }
+
+        &__transaction-group-header {
+            height: rem(20px);
+            font-size: rem(8px);
+            color: $color-transaction-group-header-text;
+            padding-left: rem(5px);
+            line-height: 12px;
+            display: flex;
+            align-items: center;
+            background-color: $color-transaction-group-header;
+            position: sticky;
+            top: 0;
+            z-index: 1;
+        }
+    }
+}
+
+.transaction-element {
+    position: relative;
+    padding: 0 20px 0 10px;
+    display: flex;
+    flex-direction: column;
+    justify-content: center;
+    border-top: 0.5px solid transparent;
+    height: 58px;
+
+    & + & {
+        border-top-color: grey;
+    }
+
+    &__no-transactions {
+        display: flex;
+        flex-direction: row;
+        justify-content: center;
+    }
+
+    &__amount {
+        margin: 0;
+
+        &__greenText {
+            color: $color-success;
+        }
+    }
+
+    &__text-faded {
+        color: $color-text-faded;
+        font-size: rem(9px);
+    }
+
+    &__checkmark {
+        position: relative;
+        top: 1px;
+        margin-left: 5px;
+    }
+
+    &__warning {
+        position: absolute;
+        margin: 5px -25px;
+
+        :global(.warning_svg__boundary) {
+            fill: $color-error;
+        }
+    }
+
+    &__failed {
+        padding-left: 30px;
+    }
+}

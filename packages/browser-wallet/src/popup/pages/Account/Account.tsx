@@ -10,6 +10,7 @@ import { accountRoutes } from './routes';
 import { accountSettingsRoutes } from './AccountSettings/routes';
 import AccountActions from './AccountActions';
 import DisplayAddress from './DisplayAddress';
+import TransactionList from './TransactionList';
 import AccountDetails from './AccountDetails';
 import AccountSettings from './AccountSettings';
 
@@ -77,7 +78,7 @@ export default function AccountRoutes() {
     return (
         <Routes>
             <Route element={<Account />}>
-                <Route index element={<div>Transaction log</div>} />
+                <Route index element={<TransactionList />} />
                 <Route path={accountRoutes.send} element={<div>Send CCD</div>} />
                 <Route path={accountRoutes.receive} element={<DisplayAddress />} />
                 <Route path={`${accountRoutes.settings}/*`} element={<AccountSettings />} />
