@@ -13,7 +13,10 @@ export default function Identity() {
     const [selectedIdentity, updateSelectedIdentity] = useAtom(selectedIdentityAtom);
     const providers = useAtomValue(identityProvidersAtom);
 
-    const identityProvider = useMemo(() => providers.find((p) => p.ipInfo.ipIdentity === selectedIdentity?.provider));
+    const identityProvider = useMemo(
+        () => providers.find((p) => p.ipInfo.ipIdentity === selectedIdentity?.provider),
+        [providers.length]
+    );
 
     useEffect(() => {
         // TODO: Check identity status in background

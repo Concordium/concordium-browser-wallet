@@ -1,5 +1,5 @@
 import React, { useState, useEffect } from 'react';
-import { useAtomValue, useAtom } from 'jotai';
+import { useAtomValue, useAtom, useSetAtom } from 'jotai';
 import { useTranslation } from 'react-i18next';
 import { jsonRpcUrlAtom, seedPhraseAtom } from '@popup/store/settings';
 import { pendingIdentityAtom, identitiesAtom, identityProvidersAtom } from '@popup/store/identity';
@@ -9,15 +9,20 @@ import { InternalMessageType } from '@concordium/browser-wallet-message-hub';
 import { JsonRpcClient, HttpProvider } from '@concordium/web-sdk';
 import { IdentityStatus, Network } from '@shared/storage/types';
 import Button from '@popup/shared/Button';
+import IdentityProviderIcon from '@popup/shared/IdentityProviderIcon';
+import PendingArrows from '@assets/svg/pending-arrows.svg';
 
-function IdentityIssuanceStart() {
+interface InnerProps {
+    onStart: () => void;
+}
+
+function IdentityIssuanceStart({ onStart }: InnerProps) {
     const { t } = useTranslation('identityIssuance');
     const [providers, setProviders] = useAtom(identityProvidersAtom);
     const jsonRrcUrl = useAtomValue(jsonRpcUrlAtom);
-    const [, updatePendingIdentity] = useAtom(pendingIdentityAtom);
+    const updatePendingIdentity = useSetAtom(pendingIdentityAtom);
     const identities = useAtomValue(identitiesAtom);
     const masterSeed = useAtomValue(seedPhraseAtom);
-    const [started, setStarted] = useState(false);
 
     useEffect(() => {
         // TODO only load once per session?
@@ -45,16 +50,16 @@ function IdentityIssuanceStart() {
         // TODO Get this from settings, when we store the chosen net
         const net = 'Testnet';
 
+        onStart();
+
         updatePendingIdentity({
             id: identities.length,
             status: IdentityStatus.Pending,
             index: identityIndex,
-            name: `Identity ${identities.length}`,
+            name: `Identity ${identityIndex + 1}`,
             network: Network[net],
             provider: provider.ipInfo.ipIdentity,
         });
-
-        setStarted(true);
 
         popupMessageHandler.sendInternalMessage(InternalMessageType.StartIdentityIssuance, {
             globalContext: global.value,
@@ -63,34 +68,27 @@ function IdentityIssuanceStart() {
             seed: masterSeed,
             net,
             identityIndex,
-            arThreshold: 1,
+            arThreshold: Math.min(Object.keys(provider.arsInfos).length - 1, 255),
             baseUrl: provider.metadata.issuanceStart,
         });
     };
 
-    if (started) {
-        // TODO: make nice
-        return (
-            <div className="identity-issuance__start">
-                <p className="identity-issuance__text">{t('startText')}</p>
-                <p className="identity-issuance__text m-t-20">{t('startWaitingText')}</p>
-            </div>
-        );
-    }
-
     return (
         <div className="identity-issuance__start">
-            <p className="identity-issuance__text">{t('startText')}</p>
-            {providers.map((p) => (
-                <Button
-                    className="identity-issuance__provider-button"
-                    width="wide"
-                    key={p.ipInfo.ipIdentity}
-                    onClick={() => startIssuance(p)}
-                >
-                    {p.ipInfo.ipDescription.name}
-                </Button>
-            ))}
+            <p className="identity-issuance__start-text">{t('startText')}</p>
+            <div>
+                {providers.map((p) => (
+                    <Button
+                        className="identity-issuance__provider-button flex justify-space-between align-center"
+                        width="wide"
+                        key={p.ipInfo.ipIdentity + p.ipInfo.ipDescription.name}
+                        onClick={() => startIssuance(p)}
+                    >
+                        <IdentityProviderIcon provider={p} />
+                        {p.ipInfo.ipDescription.name}
+                    </Button>
+                ))}
+            </div>
         </div>
     );
 }
@@ -99,27 +97,38 @@ export default function IdentityIssuanceStartGuard() {
     const { t } = useTranslation('identityIssuance');
     const [pendingIdentity, setPendingidentity] = useAtom(pendingIdentityAtom);
     const [blocked, setBlocked] = useState(false);
+    const [started, setStarted] = useState(false);
 
     useEffect(() => {
-        if (pendingIdentity) {
+        if (pendingIdentity && !started) {
             setBlocked(true);
         }
-    }, []);
+    }, [pendingIdentity]);
 
     if (blocked) {
         return (
             <div className="identity-issuance__start">
-                <p className="identity-issuance__text">{t('alreadyPending')}</p>
+                <p className="identity-issuance__start-text">{t('alreadyPending')}</p>
                 <Button
+                    width="wide"
                     onClick={() => {
                         setPendingidentity(undefined);
                         setBlocked(false);
                     }}
                 >
-                    Reset
+                    {t('reset')}
                 </Button>
             </div>
         );
     }
-    return <IdentityIssuanceStart />;
+    if (started) {
+        return (
+            <div className="identity-issuance__start">
+                <p className="identity-issuance__start-text">{t('startText')}</p>
+                <PendingArrows className="identity-issuance__start__loading-arrows" />
+                <p className="identity-issuance__text m-t-40">{t('startWaitingText')}</p>
+            </div>
+        );
+    }
+    return <IdentityIssuanceStart onStart={() => setStarted(true)} />;
 }

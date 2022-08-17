@@ -1,6 +1,12 @@
 import React, { useEffect, useState, useContext, useMemo } from 'react';
-import { useAtom, useAtomValue } from 'jotai';
-import { identitiesAtom, pendingIdentityAtom, identityProvidersAtom } from '@popup/store/identity';
+import { useAtom, useAtomValue, useSetAtom } from 'jotai';
+import {
+    identitiesAtom,
+    pendingIdentityAtom,
+    identityProvidersAtom,
+    selectedIdentityIdAtom,
+    selectedIdentityAtom,
+} from '@popup/store/identity';
 import { useTranslation } from 'react-i18next';
 import { useLocation } from 'react-router-dom';
 import IdCard from '@popup/shared/IdCard';
@@ -32,9 +38,13 @@ export default function IdentityIssuanceEnd({ onFinish }: Props) {
     const [identities, setIdentities] = useAtom(identitiesAtom);
     const [aborted, setAborted] = useState<boolean>(false);
     const { withClose, onClose } = useContext(fullscreenPromptContext);
+    const setSelectedIdentityId = useSetAtom(selectedIdentityIdAtom);
+    const selectedIdentity = useAtomValue(selectedIdentityAtom);
 
-    const identityProvider = useMemo(() => providers.find((p) => p.ipInfo.ipIdentity === pendingIdentity.provider));
-    const name = useMemo(() => pendingIdentity.name, []);
+    const identityProvider = useMemo(
+        () => providers.find((p) => p.ipInfo.ipIdentity === selectedIdentity?.provider),
+        [selectedIdentity?.provider]
+    );
 
     useEffect(() => onClose(onFinish), [onClose, onFinish]);
 
@@ -48,6 +58,7 @@ export default function IdentityIssuanceEnd({ onFinish }: Props) {
                         location: state.payload.result,
                     })
                 );
+                setSelectedIdentityId(pendingIdentity.id);
             } else {
                 setAborted(true);
             }
@@ -59,13 +70,13 @@ export default function IdentityIssuanceEnd({ onFinish }: Props) {
         <>
             <PageHeader>{t('title')}</PageHeader>
             <div className="identity-issuance__end">
-                {aborted && <p className="identity-issuance__text">{t('abortExplanation')}</p>}
+                {aborted && <p className="identity-issuance__text m-t-40 m-b-60">{t('abortExplanation')}</p>}
                 {!aborted && (
                     <>
                         <p className="identity-issuance__text">{t('successExplanation')}</p>
                         <IdCard
                             className="identity-issuance__card"
-                            name={name}
+                            name={pendingIdentity?.name || selectedIdentity?.name || 'Identity'}
                             provider={<IdentityProviderIcon provider={identityProvider} />}
                             status="pending"
                             onNameChange={noOp}

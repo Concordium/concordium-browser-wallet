@@ -6,14 +6,18 @@ const walletProxy = axios.create({
 
 type Hex = string;
 
-// A description of an entity, used for Identity Provider and Anonymity Revoker
+/**
+ * A description of an entity, used for Identity Provider and Anonymity Revoker
+ */
 export interface Description {
     name: string;
     url: string;
     description: string;
 }
 
-// Identity Provider information
+/**
+ * Identity Provider information
+ */
 export interface IpInfo {
     ipIdentity: number;
     ipDescription: Description;
@@ -21,15 +25,19 @@ export interface IpInfo {
     ipCdiVerifyKey: Hex;
 }
 
-// Structure of the metadata which is provided, about an identityProvider,
-// but is not contained in IpInfo.
+/**
+ * Structure of the metadata which is provided, about an identityProvider,
+ * but is not contained in IpInfo.
+ */
 export interface IdentityProviderMetaData {
     issuanceStart: string;
     icon: string;
     support: string;
 }
 
-// Anonymity Revoker information
+/**
+ * Anonymity Revoker information
+ */
 export interface ArInfo {
     arIdentity: number;
     arDescription: Description;
@@ -37,12 +45,14 @@ export interface ArInfo {
 }
 
 export interface Global {
-    onChainCommitmentKey: string;
-    bulletproofGenerators: string;
+    onChainCommitmentKey: Hex;
+    bulletproofGenerators: Hex;
     genesisString: string;
 }
 
-// Reflects the structure of an Identity Provider.
+/**
+ * Reflects the structure of an Identity Provider.
+ */
 export interface IdentityProvider {
     ipInfo: IpInfo;
     arsInfos: Record<string, ArInfo>; // objects with ArInfo fields (and numbers as field names)

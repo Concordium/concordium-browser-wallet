@@ -2,7 +2,7 @@ import { IdentityProvider } from '@shared/utils/wallet-proxy';
 import React from 'react';
 
 interface Props {
-    provider: IdentityProvider;
+    provider?: IdentityProvider;
 }
 
 export default function IdentityProviderIcon({ provider }: Props) {
@@ -10,7 +10,7 @@ export default function IdentityProviderIcon({ provider }: Props) {
         <img
             className="identity-provider-icon"
             src={`data:image/png;base64, ${provider?.metadata?.icon}`}
-            alt={provider.ipInfo.ipDescription.name || 'Unknown'}
+            alt={provider?.ipInfo?.ipDescription?.name || 'Unknown'}
         />
     );
 }
