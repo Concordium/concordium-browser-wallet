@@ -1,19 +1,5 @@
+import { EncryptedData } from '@shared/storage/types';
 import CryptoJS from 'crypto-js/';
-
-interface EncryptionMetaData {
-    keyLen: number;
-    iterations: number;
-    salt: string;
-    initializationVector: string;
-    encryptionMethod: string;
-    keyDerivationMethod: string;
-    hashAlgorithm: string;
-}
-
-export interface EncryptedData {
-    cipherText: string;
-    metadata: EncryptionMetaData;
-}
 
 const keyLen = 32;
 const iterations = 10000;
