@@ -1,5 +1,4 @@
-import { ChromeStorageKey, Identity, PendingIdentity } from '@shared/storage/types';
-import { IdentityProvider } from '@shared/utils/wallet-proxy';
+import { ChromeStorageKey, Identity, PendingIdentity, IdentityProvider } from '@shared/storage/types';
 import { atom } from 'jotai';
 import { atomWithChromeStorage } from './utils';
 

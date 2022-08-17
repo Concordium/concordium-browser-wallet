@@ -1,5 +1,4 @@
-import { IdentityProvider } from '@shared/utils/wallet-proxy';
-import { ChromeStorageKey, Identity, PendingIdentity, Theme, WalletCredential } from './types';
+import { ChromeStorageKey, Identity, PendingIdentity, Theme, WalletCredential, IdentityProvider } from './types';
 
 export type StorageAccessor<V> = {
     /**

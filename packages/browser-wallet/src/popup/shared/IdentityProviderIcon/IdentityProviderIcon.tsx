@@ -1,4 +1,4 @@
-import { IdentityProvider } from '@shared/utils/wallet-proxy';
+import { IdentityProvider } from '@shared/storage/types';
 import React from 'react';
 
 interface Props {

@@ -1,6 +1,7 @@
 import { AccountTransactionType } from '@concordium/web-sdk';
 import axios from 'axios';
 import { abs } from 'wallet-common-helpers';
+import { IdentityProvider } from '@shared/storage/types';
 import {
     BrowserWalletTransaction,
     RewardType,
@@ -241,4 +242,10 @@ export async function getTransactions(
         transactions,
         full: result.limit === result.count,
     };
+}
+
+export async function getIdentityProviders(): Promise<IdentityProvider[]> {
+    const proxyPath = `/v0/ip_info`;
+    const response = await walletProxy.get(proxyPath);
+    return response.data;
 }
