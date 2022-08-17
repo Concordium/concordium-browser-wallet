@@ -9,6 +9,7 @@ import {
     storedPendingIdentity,
     storedSelectedIdentity,
     storedSeedPhrase,
+    storedIdentityProviders,
 } from '@shared/storage/access';
 import { ChromeStorageKey } from '@shared/storage/types';
 import { atom, WritableAtom } from 'jotai';
@@ -23,6 +24,7 @@ const accessorMap = {
     [ChromeStorageKey.JsonRpcUrl]: storedJsonRpcUrl,
     [ChromeStorageKey.Theme]: storedTheme,
     [ChromeStorageKey.SeedPhrase]: storedSeedPhrase,
+    [ChromeStorageKey.IdentityProviders]: storedIdentityProviders,
 };
 
 export type AsyncWrapper<V> = {

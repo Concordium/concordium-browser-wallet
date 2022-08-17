@@ -1,4 +1,5 @@
 import { ChromeStorageKey, Identity, PendingIdentity } from '@shared/storage/types';
+import { IdentityProvider } from '@shared/utils/wallet-proxy';
 import { atom } from 'jotai';
 import { atomWithChromeStorage } from './utils';
 
@@ -28,3 +29,5 @@ export const selectedIdentityAtom = atom<Identity | undefined, Identity | undefi
         }
     }
 );
+
+export const identityProvidersAtom = atomWithChromeStorage<IdentityProvider[]>(ChromeStorageKey.IdentityProviders, []);

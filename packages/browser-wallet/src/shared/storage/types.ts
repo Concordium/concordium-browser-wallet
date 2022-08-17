@@ -8,6 +8,7 @@ export enum ChromeStorageKey {
     Identities = 'identities',
     SelectedIdentity = 'selectedIdentity',
     SeedPhrase = 'seedPhrase',
+    IdentityProviders = 'identityProviders',
 }
 
 export enum Theme {

@@ -1,6 +1,6 @@
-import React, { useEffect, useState, useContext } from 'react';
-import { useAtom } from 'jotai';
-import { identitiesAtom, pendingIdentityAtom } from '@popup/store/identity';
+import React, { useEffect, useState, useContext, useMemo } from 'react';
+import { useAtom, useAtomValue } from 'jotai';
+import { identitiesAtom, pendingIdentityAtom, identityProvidersAtom } from '@popup/store/identity';
 import { useTranslation } from 'react-i18next';
 import { useLocation } from 'react-router-dom';
 import IdCard from '@popup/shared/IdCard';
@@ -10,6 +10,7 @@ import Button from '@popup/shared/Button';
 import { IdentityStatus } from '@shared/storage/types';
 import { fullscreenPromptContext } from '@popup/page-layouts/FullscreenPromptLayout';
 import { IdentityIssuanceBackgroundResponse } from '@shared/utils/identity-helpers';
+import IdentityProviderIcon from '@popup/shared/IdentityProviderIcon';
 
 interface Location {
     state: {
@@ -26,12 +27,14 @@ interface Props {
 export default function IdentityIssuanceEnd({ onFinish }: Props) {
     const { state } = useLocation() as Location;
     const { t } = useTranslation('identityIssuance');
+    const providers = useAtomValue(identityProvidersAtom);
     const [pendingIdentity, setPendingIdentity] = useAtom(pendingIdentityAtom);
     const [identities, setIdentities] = useAtom(identitiesAtom);
     const [aborted, setAborted] = useState<boolean>(false);
     const { withClose, onClose } = useContext(fullscreenPromptContext);
-    // TODO Get provider icon
-    const providerVisual = <p>Test</p>;
+
+    const identityProvider = useMemo(() => providers.find((p) => p.ipInfo.ipIdentity === pendingIdentity.provider));
+    const name = useMemo(() => pendingIdentity.name, []);
 
     useEffect(() => onClose(onFinish), [onClose, onFinish]);
 
@@ -62,8 +65,8 @@ export default function IdentityIssuanceEnd({ onFinish }: Props) {
                         <p className="identity-issuance__text">{t('successExplanation')}</p>
                         <IdCard
                             className="identity-issuance__card"
-                            name="Identity"
-                            provider={providerVisual}
+                            name={name}
+                            provider={<IdentityProviderIcon provider={identityProvider} />}
                             status="pending"
                             onNameChange={noOp}
                         />

@@ -1,3 +1,4 @@
+import { IdentityProvider } from '@shared/utils/wallet-proxy';
 import { ChromeStorageKey, Identity, PendingIdentity, Theme, WalletCredential } from './types';
 
 export type StorageAccessor<V> = {
@@ -46,3 +47,7 @@ export const storedCredentials = makeStorageAccessor<WalletCredential[]>('local'
 export const storedJsonRpcUrl = makeStorageAccessor<string>('local', ChromeStorageKey.JsonRpcUrl);
 export const storedSelectedAccount = makeStorageAccessor<string>('local', ChromeStorageKey.SelectedAccount);
 export const storedTheme = makeStorageAccessor<Theme>('local', ChromeStorageKey.Theme);
+export const storedIdentityProviders = makeStorageAccessor<IdentityProvider>(
+    'local',
+    ChromeStorageKey.IdentityProviders
+);

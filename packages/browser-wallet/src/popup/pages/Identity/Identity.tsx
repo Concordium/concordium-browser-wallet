@@ -1,15 +1,19 @@
-import React, { useEffect } from 'react';
-import { useAtom } from 'jotai';
-import { selectedIdentityAtom } from '@popup/store/identity';
+import React, { useEffect, useMemo } from 'react';
+import { useAtom, useAtomValue } from 'jotai';
+import { identityProvidersAtom, selectedIdentityAtom } from '@popup/store/identity';
 import IdCard from '@popup/shared/IdCard';
 import { IdentityStatus } from '@shared/storage/types';
 import { AttributeKey } from '@concordium/web-sdk';
 import attributeNames from 'wallet-common-helpers/constants/attributeNames.json';
 import { formatAttributeValue, compareAttributes } from 'wallet-common-helpers';
 import { getIdObject } from '@shared/utils/identity-helpers';
+import IdentityProviderIcon from '@popup/shared/IdentityProviderIcon';
 
 export default function Identity() {
     const [selectedIdentity, updateSelectedIdentity] = useAtom(selectedIdentityAtom);
+    const providers = useAtomValue(identityProvidersAtom);
+
+    const identityProvider = useMemo(() => providers.find((p) => p.ipInfo.ipIdentity === selectedIdentity?.provider));
 
     useEffect(() => {
         // TODO: Check identity status in background
@@ -44,7 +48,7 @@ export default function Identity() {
         <div className="flex-column align-center">
             <IdCard
                 name={selectedIdentity.name}
-                provider={<p>Test</p>}
+                provider={<IdentityProviderIcon provider={identityProvider} />}
                 status={selectedIdentity.status}
                 onNameChange={(name) => updateSelectedIdentity({ ...selectedIdentity, name })}
                 className="m-t-20"

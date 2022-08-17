@@ -2,7 +2,7 @@ import React, { useState, useEffect } from 'react';
 import { useAtomValue, useAtom } from 'jotai';
 import { useTranslation } from 'react-i18next';
 import { jsonRpcUrlAtom, seedPhraseAtom } from '@popup/store/settings';
-import { pendingIdentityAtom, identitiesAtom } from '@popup/store/identity';
+import { pendingIdentityAtom, identitiesAtom, identityProvidersAtom } from '@popup/store/identity';
 import { popupMessageHandler } from '@popup/shared/message-handler';
 import { getIdentityProviders, IdentityProvider } from '@shared/utils/wallet-proxy';
 import { InternalMessageType } from '@concordium/browser-wallet-message-hub';
@@ -12,7 +12,7 @@ import Button from '@popup/shared/Button';
 
 function IdentityIssuanceStart() {
     const { t } = useTranslation('identityIssuance');
-    const [providers, setProviders] = useState<IdentityProvider[]>([]);
+    const [providers, setProviders] = useAtom(identityProvidersAtom);
     const jsonRrcUrl = useAtomValue(jsonRpcUrlAtom);
     const [, updatePendingIdentity] = useAtom(pendingIdentityAtom);
     const identities = useAtomValue(identitiesAtom);
@@ -20,6 +20,7 @@ function IdentityIssuanceStart() {
     const [started, setStarted] = useState(false);
 
     useEffect(() => {
+        // TODO only load once per session?
         getIdentityProviders().then((loadedProviders) => setProviders(loadedProviders));
     }, []);
 
