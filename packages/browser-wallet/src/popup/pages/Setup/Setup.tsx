@@ -9,7 +9,7 @@ import { EnterRecoveryPhrase } from './RecoveryPhrase';
 import { ChooseNetwork } from './ChooseNetwork';
 import SetupPasscode from './SetupPasscode';
 import CreateOrRestore from './CreateOrRestore';
-import GenerateRecoveryPhrase from './GenerateSeedPhrase';
+import GenerateSeedPhrase from './GenerateSeedPhrase';
 
 function Intro() {
     const navigate = useNavigate();
@@ -42,7 +42,7 @@ export default function SetupRoutes() {
             <Route index element={<Intro />} />
             <Route path={setupRoutes.passcode} element={<SetupPasscode />} />
             <Route path={setupRoutes.createOrRestore} element={<CreateOrRestore />} />
-            <Route path={setupRoutes.createNew} element={<GenerateRecoveryPhrase />} />
+            <Route path={setupRoutes.createNew} element={<GenerateSeedPhrase />} />
             <Route path={setupRoutes.enterRecoveryPhrase} element={<EnterRecoveryPhrase />} />
             <Route path={setupRoutes.chooseNetwork} element={<ChooseNetwork />} />
             <Route path={setupRoutes.restore} element={<CreateOrRestore />} />

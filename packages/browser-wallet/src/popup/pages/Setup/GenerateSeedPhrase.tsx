@@ -11,7 +11,7 @@ import { useAtom } from 'jotai';
 import { useTranslation } from 'react-i18next';
 import { setupRoutes } from './routes';
 
-export default function GenerateRecoveryPhrase() {
+export default function GenerateSeedPhrase() {
     const navigate = useNavigate();
     const { t } = useTranslation('setup');
     const [seedPhrase, setSeedPhrase] = useAtom(seedPhraseAtom);
