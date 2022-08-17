@@ -84,7 +84,7 @@ export const identityIssuanceHandler: ExtensionMessageHandler = (msg) => {
                 reason: `Initial location did not redirect as expected, instead it returned code ${response.status}.`,
             });
         } else {
-            handleExternalIssuance(response.url);
+            handleExternalIssuance(response.url, respond);
         }
     });
 };
