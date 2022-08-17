@@ -10,6 +10,7 @@ const t = {
     reset: 'Reset',
     startWaitingText:
         'Your request is being built, please do not close the browser. We will open a tab with the identity provider, please follow their process to create your identity.',
+    error: 'Error',
 };
 
 export default t;

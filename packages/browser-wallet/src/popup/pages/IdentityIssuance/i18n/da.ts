@@ -11,6 +11,7 @@ const t: typeof en = {
     reset: 'Nulstil',
     startWaitingText:
         'Din anmoding er ved at blive lavet, undgå at lukke browseren. Vi åbner en fane hvor du kan gå igennem identitets udbyderen process for at lave din identitet.',
+    error: 'Fejl',
 };
 
 export default t;

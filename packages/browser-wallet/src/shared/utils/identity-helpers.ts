@@ -1,5 +1,6 @@
 import axios from 'axios';
 import {
+    sleep,
     IdentityTokenContainer,
     DoneIdentityTokenContainer,
     ErrorIdentityTokenContainer,
@@ -17,16 +18,6 @@ export interface DoneIdObjectResponse {
 }
 
 export type IdObjectResponse = ErrorIdObjectResponse | DoneIdObjectResponse;
-
-/**
- * Async timeout
- * time: timeout length, in milliseconds.
- */
-export async function sleep(time: number) {
-    return new Promise((resolve) => {
-        setTimeout(resolve, time);
-    });
-}
 
 /**
  * Polls the provided location until a valid identity object

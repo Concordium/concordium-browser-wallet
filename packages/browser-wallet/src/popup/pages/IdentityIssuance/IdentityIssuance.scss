@@ -29,6 +29,10 @@
         }
     }
 
+    &__error {
+        color: $color-error;
+    }
+
     &__end {
         height: 100%;
         display: flex;

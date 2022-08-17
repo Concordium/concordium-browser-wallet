@@ -34,6 +34,7 @@ export const identityIssuanceHandler: ExtensionMessageHandler = (msg) => {
         .then((tab) => {
             const closedListener = (tabId: number) => {
                 if (tabId === tab.id) {
+                    chrome.tabs.onRemoved.removeListener(closedListener);
                     respond({
                         status: 'Aborted',
                     });

@@ -23,6 +23,7 @@ function IdentityIssuanceStart({ onStart }: InnerProps) {
     const updatePendingIdentity = useSetAtom(pendingIdentityAtom);
     const identities = useAtomValue(identitiesAtom);
     const masterSeed = useAtomValue(seedPhraseAtom);
+    const [error, setError] = useState<string>();
 
     useEffect(() => {
         // TODO only load once per session?
@@ -39,6 +40,7 @@ function IdentityIssuanceStart({ onStart }: InnerProps) {
 
         // TODO: Maybe we should not create the client for each page
         const client = new JsonRpcClient(new HttpProvider(jsonRrcUrl));
+
         const global = await client.getCryptographicParameters();
 
         if (!global) {
@@ -82,13 +84,18 @@ function IdentityIssuanceStart({ onStart }: InnerProps) {
                         className="identity-issuance__provider-button flex justify-space-between align-center"
                         width="wide"
                         key={p.ipInfo.ipIdentity + p.ipInfo.ipDescription.name}
-                        onClick={() => startIssuance(p)}
+                        onClick={() => startIssuance(p).catch((e) => setError(e.toString()))}
                     >
                         <IdentityProviderIcon provider={p} />
                         {p.ipInfo.ipDescription.name}
                     </Button>
                 ))}
             </div>
+            {error && (
+                <p className="identity-issuance__error m-t-20">
+                    {t('error')}: {error}
+                </p>
+            )}
         </div>
     );
 }
