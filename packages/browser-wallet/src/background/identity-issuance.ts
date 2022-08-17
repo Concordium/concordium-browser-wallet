@@ -1,6 +1,7 @@
 import { createIdentityRequest } from '@concordium/web-sdk';
 import { IdentityIssuanceBackgroundResponse } from '@shared/utils/identity-helpers';
 import { ExtensionMessageHandler, InternalMessageType } from '@concordium/browser-wallet-message-hub';
+import { BackgroundResponseStatus } from '@shared/utils/types';
 import { openWindow } from './window-management';
 
 import bgMessageHandler from './message-handler';
@@ -8,25 +9,7 @@ import bgMessageHandler from './message-handler';
 const redirectUri = 'ConcordiumRedirectToken';
 const codeUriKey = 'code_uri=';
 
-export const identityIssuanceHandler: ExtensionMessageHandler = (msg) => {
-    const respond = (response: IdentityIssuanceBackgroundResponse) => {
-        openWindow().then(() =>
-            bgMessageHandler.sendInternalMessage(InternalMessageType.EndIdentityIssuance, response)
-        );
-    };
-
-    const { baseUrl, ...identityRequestInputs } = msg.payload;
-    const idObjectRequest = createIdentityRequest(identityRequestInputs);
-
-    const params = {
-        scope: 'identity',
-        response_type: 'code',
-        redirect_uri: redirectUri,
-        state: JSON.stringify({ idObjectRequest }),
-    };
-    const searchParams = new URLSearchParams(params);
-    const url = Object.entries(params).length === 0 ? baseUrl : `${baseUrl}?${searchParams.toString()}`;
-
+function handleExternalIssuance(url: string, respond: (response: IdentityIssuanceBackgroundResponse) => void) {
     chrome.tabs
         .create({
             url,
@@ -36,7 +19,7 @@ export const identityIssuanceHandler: ExtensionMessageHandler = (msg) => {
                 if (tabId === tab.id) {
                     chrome.tabs.onRemoved.removeListener(closedListener);
                     respond({
-                        status: 'Aborted',
+                        status: BackgroundResponseStatus.Aborted,
                     });
                 }
             };
@@ -68,9 +51,40 @@ export const identityIssuanceHandler: ExtensionMessageHandler = (msg) => {
                     chrome.tabs.remove(tab.id);
                 }
                 respond({
-                    status: 'Success',
+                    status: BackgroundResponseStatus.Success,
                     result: redirectUrl.substring(redirectUrl.indexOf(codeUriKey) + codeUriKey.length),
                 });
             });
         });
+}
+
+export const identityIssuanceHandler: ExtensionMessageHandler = (msg) => {
+    const respond = (response: IdentityIssuanceBackgroundResponse) => {
+        openWindow().then(() =>
+            bgMessageHandler.sendInternalMessage(InternalMessageType.EndIdentityIssuance, response)
+        );
+    };
+
+    const { baseUrl, ...identityRequestInputs } = msg.payload;
+    const idObjectRequest = createIdentityRequest(identityRequestInputs);
+
+    const params = {
+        scope: 'identity',
+        response_type: 'code',
+        redirect_uri: redirectUri,
+        state: JSON.stringify({ idObjectRequest }),
+    };
+    const searchParams = new URLSearchParams(params);
+    const url = Object.entries(params).length === 0 ? baseUrl : `${baseUrl}?${searchParams.toString()}`;
+
+    fetch(url).then((response) => {
+        if (!response.redirected) {
+            respond({
+                status: BackgroundResponseStatus.Error,
+                reason: `Initial location did not redirect as expected, instead it returned code ${response.status}.`,
+            });
+        } else {
+            handleExternalIssuance(response.url);
+        }
+    });
 };

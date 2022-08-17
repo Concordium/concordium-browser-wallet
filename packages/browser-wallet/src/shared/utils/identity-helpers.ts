@@ -6,6 +6,7 @@ import {
     ErrorIdentityTokenContainer,
     IdentityProviderIdentityStatus,
 } from 'wallet-common-helpers';
+import { BackgroundResponseStatus } from './types';
 
 export interface ErrorIdObjectResponse {
     error: string;
@@ -65,9 +66,13 @@ export async function getIdObject(location: string): Promise<IdObjectResponse> {
 /** The type of the response from the background script during identityIssuance */
 export type IdentityIssuanceBackgroundResponse =
     | {
-          status: 'Success';
+          status: BackgroundResponseStatus.Success;
           result: string;
       }
     | {
-          status: 'Aborted';
+          status: BackgroundResponseStatus.Aborted;
+      }
+    | {
+          status: BackgroundResponseStatus.Error;
+          reason: string;
       };

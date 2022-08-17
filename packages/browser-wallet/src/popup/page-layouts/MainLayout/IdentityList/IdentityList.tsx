@@ -17,7 +17,7 @@ type ItemProps = {
     selected: boolean;
 };
 
-function getStatusText(identity: Identity): string {
+function getStatusText(identity: Identity, accountCount = 0): string {
     switch (identity.status) {
         case IdentityStatus.Pending:
             return 'Verification pending';
@@ -25,7 +25,6 @@ function getStatusText(identity: Identity): string {
             return 'Verification failed';
         case IdentityStatus.Confirmed: {
             // TODO Find number of accounts
-            const accountCount = 0;
             return `${accountCount} account${accountCount !== 1 ? 's' : ''}`;
         }
         default:

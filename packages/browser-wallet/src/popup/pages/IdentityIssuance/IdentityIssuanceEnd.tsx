@@ -1,4 +1,4 @@
-import React, { useEffect, useState, useContext, useMemo } from 'react';
+import React, { useEffect, useContext, useMemo } from 'react';
 import { useAtom, useAtomValue, useSetAtom } from 'jotai';
 import {
     identitiesAtom,
@@ -17,6 +17,7 @@ import { IdentityStatus } from '@shared/storage/types';
 import { fullscreenPromptContext } from '@popup/page-layouts/FullscreenPromptLayout';
 import { IdentityIssuanceBackgroundResponse } from '@shared/utils/identity-helpers';
 import IdentityProviderIcon from '@popup/shared/IdentityProviderIcon';
+import { BackgroundResponseStatus } from '@shared/utils/types';
 
 interface Location {
     state: {
@@ -36,7 +37,6 @@ export default function IdentityIssuanceEnd({ onFinish }: Props) {
     const providers = useAtomValue(identityProvidersAtom);
     const [pendingIdentity, setPendingIdentity] = useAtom(pendingIdentityAtom);
     const [identities, setIdentities] = useAtom(identitiesAtom);
-    const [aborted, setAborted] = useState<boolean>(false);
     const { withClose, onClose } = useContext(fullscreenPromptContext);
     const setSelectedIdentityId = useSetAtom(selectedIdentityIdAtom);
     const selectedIdentity = useAtomValue(selectedIdentityAtom);
@@ -45,12 +45,11 @@ export default function IdentityIssuanceEnd({ onFinish }: Props) {
         () => providers.find((p) => p.ipInfo.ipIdentity === selectedIdentity?.provider),
         [selectedIdentity?.provider]
     );
-
     useEffect(() => onClose(onFinish), [onClose, onFinish]);
 
     useEffect(() => {
         if (pendingIdentity) {
-            if (state.payload.status === 'Success') {
+            if (state.payload.status === BackgroundResponseStatus.Success) {
                 setIdentities(
                     identities.concat({
                         ...pendingIdentity,
@@ -59,8 +58,6 @@ export default function IdentityIssuanceEnd({ onFinish }: Props) {
                     })
                 );
                 setSelectedIdentityId(pendingIdentity.id);
-            } else {
-                setAborted(true);
             }
             setPendingIdentity(undefined);
         }
@@ -70,8 +67,15 @@ export default function IdentityIssuanceEnd({ onFinish }: Props) {
         <>
             <PageHeader>{t('title')}</PageHeader>
             <div className="identity-issuance__end">
-                {aborted && <p className="identity-issuance__text m-t-40 m-b-60">{t('abortExplanation')}</p>}
-                {!aborted && (
+                {state.payload.status === BackgroundResponseStatus.Aborted && (
+                    <p className="identity-issuance__text m-t-40 m-b-60">{t('abortExplanation')}</p>
+                )}
+                {state.payload.status === BackgroundResponseStatus.Error && (
+                    <p className="identity-issuance__text m-t-40 m-b-60">
+                        {t('errorExplanation', { reason: state.payload.reason })}
+                    </p>
+                )}
+                {state.payload.status === BackgroundResponseStatus.Success && (
                     <>
                         <p className="identity-issuance__text">{t('successExplanation')}</p>
                         <IdCard
