@@ -51,12 +51,30 @@ declare global {
 
 ### connect
 
-To request a connection to the wallet from the user, the `connect` method has to be invoked. The method returns a `Promise` resolving with information related to the currently selected account in the wallet, or rejecting if the request is rejected in the wallet.
+To request a connection to the wallet from the user, the `connect` method has to be invoked. The method returns a `Promise` resolving with information related to the most recently selected account, which has whitelisted the dApp, or rejecting if the request is rejected in the wallet.
 
 ```typescript
 const provider = await detectConcordiumProvider();
 const accountAddress = await provider.connect();
 ```
+
+N.B. In the current version, if the dApp is already whitelisted, but not by the currently selected account, the returned account will not actually be the most recently selected account, but instead the oldest account that has whitelasted the dApp.
+
+### getMostRecentlySelectedAccount
+
+To get the most recently selected account, or to check whether the wallet is connected without using connect, the `getMostRecentlySelectedAccount` can be invoked. The method returns a `Promise` resolving with the address of the most recently selected account in the wallet, or with undefined if there are no connected accounts in the wallet.
+
+```typescript
+const provider = await detectConcordiumProvider();
+const accountAddress = await provider.getMostRecentlySelectedAccount();
+if (accountAddress) {
+    // We are connected to the wallet
+} else {
+    // We are not connected to the wallet
+}
+```
+
+N.B. In the current version, if the currently selected account has not whitelisted the dApp, the returned account will not actually be the most recently selected account, but instead the oldest account that has whitelasted the dApp.
 
 ### sendTransaction
 
