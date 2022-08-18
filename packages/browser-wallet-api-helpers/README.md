@@ -157,7 +157,7 @@ provider.connect().then((accountAddress) => (selectedAccountAddress = accountAdd
 The wallet API exposes access to a JSON-RPC client. This allows a dApp to communicate with the same node as the wallet is connected to, and enables dApps to access the JSON-RPC interface without being connected to a separate server itself. The client is accessed as shown in the example below.
 The dApp does not need to recreate the client again when the wallet changes node or network, the client will always use the wallet's current connected JSON-RPC server.
 
-If you have not connected with the wallet (or previously been whitelisted) or if the user rejects signing the transaction, the commands will not be executed and the method will throw an error.
+If you have not connected with the wallet (or previously been whitelisted), the commands will not be executed and the method will throw an error.
 
 ```typescript
 const provider = await detectConcordiumProvider();
