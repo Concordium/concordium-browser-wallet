@@ -1,18 +1,25 @@
 # Changelog
 
-## Unreleased
+## 0.3.0 2022-8-18
 
 ### Added
 
--   Added display of address as text and qr code in the "receive ccd" section.
+-   Account setting for controlling connected websites that can interact with the wallet.
+-   About page in the settings menu.
+-   Transaction history.
+-   Added display of account address as text and QR code in the "Receive CCD" section.
 
-## 0.2.1
+### Changed
+
+-   Account details view has been updated and retrieves the account balances from the JSON-RPC server.
+
+## 0.2.1 2022-7-26
 
 ### Fixed
 
 -   Sending V1 contracts updates/initializations with parameters now works.
 
-## 0.2.0
+## 0.2.0 2022-6-29
 
 ### Added
 
