@@ -4,6 +4,7 @@ import { Normalize, useTranslation } from 'react-i18next';
 
 import HiddenIcon from '@assets/svg/hidden.svg';
 import VisibleIcon from '@assets/svg/visible.svg';
+import clsx from 'clsx';
 import { Input } from '../Input';
 import { makeControlled } from '../common/utils';
 import { CommonFieldProps, RequiredControlledFieldProps } from '../common/types';
@@ -29,7 +30,7 @@ type Props = Pick<InputHTMLAttributes<HTMLInputElement>, 'className'> &
  * @description
  * Password input with reveal button and optional strength check.
  */
-export function Password({ showStrength = false, value, ...props }: Props) {
+export function Password({ showStrength = false, value, className, ...props }: Props) {
     const { t } = useTranslation();
     const [reveal, setReveal] = useState(false);
 
@@ -40,7 +41,7 @@ export function Password({ showStrength = false, value, ...props }: Props) {
     const strengthNote = useMemo(() => (strength !== undefined ? t(strengthTexts[strength]) : undefined), [strength]);
 
     return (
-        <div className="form-password">
+        <div className={clsx('form-password', className)}>
             <Input {...props} type={reveal ? 'text' : 'password'} note={strengthNote as string} />
             <button className="form-password__reveal" type="button" onClick={() => setReveal(!reveal)}>
                 {reveal ? <VisibleIcon /> : <HiddenIcon />}

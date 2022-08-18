@@ -4,18 +4,19 @@ import { useAtomValue } from 'jotai';
 import clsx from 'clsx';
 
 import { absoluteRoutes } from '@popup/constants/routes';
-import { jsonRpcUrlAtomLoading } from '@popup/store/settings';
+import { encryptedSeedPhraseAtom } from '@popup/store/settings';
 import Header from './Header';
 
 export default function MainLayout() {
-    const { loading, value: jsonRpcUrl } = useAtomValue(jsonRpcUrlAtomLoading);
+    const { loading, value: encryptedSeedPhrase } = useAtomValue(encryptedSeedPhraseAtom);
     const [headerOpen, setHeaderOpen] = useState(false);
 
     if (loading) {
-        return null; // This will be near instant, as we're just waiting for the chrome async store
+        // This will be near instant, as we're just waiting for the Chrome async store
+        return null;
     }
 
-    if (!jsonRpcUrl) {
+    if (!encryptedSeedPhrase) {
         // Force user to go through setup
         return <Navigate to={absoluteRoutes.setup.path} />;
     }

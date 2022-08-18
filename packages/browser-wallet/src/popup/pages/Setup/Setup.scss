@@ -1,20 +1,93 @@
-.setup {
-    &__theme {
-        margin-bottom: rem(10px);
-    }
+.onboarding-setup {
+    &__intro-wrapper {
+        padding: rem(10px);
+        text-align: center;
+        height: 100%;
 
-    &__field {
-        display: block;
-        width: 100%;
+        &__continue-button {
+            position: absolute;
+            bottom: rem(24px);
+            left: 0;
+            right: 0;
+            margin: 0 auto;
+            background-color: $color-cta-mainnet;
+        }
 
-        &:not(:first-of-type) {
+        &__logos {
+            display: flex;
+            flex-direction: row;
             margin-top: rem(10px);
+            margin-left: rem(22px);
+            margin-right: rem(22px);
+        }
+
+        &__logo {
+            height: rem(50px);
+        }
+
+        &__concordium-letters {
+            margin-left: rem(15px);
+        }
+
+        &__description {
+            margin-top: rem(36px);
         }
     }
 
-    &__submit {
-        display: block;
-        width: 100%;
-        margin-top: rem(20px);
+    &__page-with-header {
+        padding: rem(10px);
+        text-align: center;
+        height: calc(100% - #{rem($page-header-height)});
+
+        &__description {
+            margin-top: rem(25px);
+            margin-bottom: rem(25px);
+        }
+
+        &__choose-passcode {
+            text-align: left;
+            padding: rem(10px);
+
+            &__field {
+                display: block;
+                width: 100%;
+
+                &:not(:first-of-type) {
+                    margin-top: rem(10px);
+                }
+            }
+        }
+
+        &__continue-button {
+            position: absolute;
+            bottom: rem(24px);
+            left: 0;
+            right: 0;
+            margin: 0 auto;
+            background-color: $color-cta-mainnet;
+        }
+
+        &__create-restore-button {
+            margin: 0 auto;
+            margin-bottom: rem(12px);
+            background-color: $color-cta-mainnet;
+        }
+
+        textarea {
+            height: rem(110);
+            padding: rem(10px);
+        }
+
+        &__mainnet-button {
+            background-color: $color-cta-mainnet;
+            margin: 0 auto;
+            margin-bottom: rem(12px);
+        }
+
+        &__testnet-button {
+            background-color: $color-cta-othernet;
+            margin: 0 auto;
+            margin-bottom: rem(12px);
+        }
     }
 }
