@@ -5,14 +5,7 @@ It both includes a page for a V0 and a V1 version of the piggy bank smart contra
 
 ## Prerequisites
 
-### Viewing smart contract details
-
--   [JSON-RPC server](https://github.com/Concordium/concordium-json-rpc/tree/add-get-instance-info) connected to testnet node is accessible at http://127.0.0.1:9095.
-    -   Note that currently the JSON-RPC server must be built from the branch "add-get-instance-info" (link above already targets this branch)
-
-### Submitting transactions
-
--   Browser wallet extension is installed in google chrome and configured with testnet JSON-RPC.
+-   Browser wallet extension must be installed in google chrome and configured with testnet JSON-RPC, in order to view smart contract details or submit transactions.
 
 ## Installing
 
