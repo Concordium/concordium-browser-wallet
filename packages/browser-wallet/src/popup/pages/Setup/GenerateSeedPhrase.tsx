@@ -25,13 +25,13 @@ export default function GenerateSeedPhrase() {
     return (
         <>
             <PageHeader canGoBack>Your recovery phrase</PageHeader>
-            <div className="page-with-header">
-                <div className="page-with-header__description">{t('recoveryPhrase.description')}</div>
+            <div className="onboarding-setup__page-with-header">
+                <div className="onboarding-setup__page-with-header__description">{t('recoveryPhrase.description')}</div>
                 <div className="p-10">
                     <ControlledTextArea value={seedPhrase} />
                 </div>
                 <Button
-                    className="page-with-header__continue-button"
+                    className="onboarding-setup__page-with-header__continue-button"
                     width="narrow"
                     onClick={() => navigate(`${absoluteRoutes.setup.path}/${setupRoutes.enterRecoveryPhrase}`)}
                 >

@@ -34,16 +34,16 @@ export default function SetupPasscode() {
     return (
         <>
             <PageHeader>{t('setupPasscode.title')}</PageHeader>
-            <div className="page-with-header">
-                <div className="page-with-header__description">{t('setupPasscode.description')}</div>
-                <Form onSubmit={handleSubmit} className="page-with-header__choose-passcode">
+            <div className="onboarding-setup__page-with-header">
+                <div className="onboarding-setup__page-with-header__description">{t('setupPasscode.description')}</div>
+                <Form onSubmit={handleSubmit} className="onboarding-setup__page-with-header__choose-passcode">
                     {(f) => {
                         return (
                             <>
                                 <div>
                                     <FormPassword
                                         control={f.control}
-                                        className="page-with-header__choose-passcode__field"
+                                        className="onboarding-setup__page-with-header__choose-passcode__field"
                                         showStrength
                                         name="passcode"
                                         label={t('setupPasscode.form.enterPasscode')}
@@ -54,13 +54,13 @@ export default function SetupPasscode() {
                                     />
                                     <FormPassword
                                         control={f.control}
-                                        className="page-with-header__choose-passcode__field"
+                                        className="onboarding-setup__page-with-header__choose-passcode__field"
                                         name="passcodeAgain"
                                         label={t('setupPasscode.form.enterPasscodeAgain')}
                                         rules={{ validate: validatePasscode(f.getValues) }}
                                     />
                                 </div>
-                                <Submit className="page-with-header__continue-button" width="narrow">
+                                <Submit className="onboarding-setup__page-with-header__continue-button" width="narrow">
                                     {t('continue')}
                                 </Submit>
                             </>

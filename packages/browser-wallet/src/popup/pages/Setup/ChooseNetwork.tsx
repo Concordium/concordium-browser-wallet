@@ -19,8 +19,8 @@ export function ChooseNetwork() {
     return (
         <>
             <PageHeader>Choose a network</PageHeader>
-            <div className="page-with-header">
-                <div className="page-with-header__description">
+            <div className="onboarding-setup__page-with-header">
+                <div className="onboarding-setup__page-with-header__description">
                     <p>
                         {t('chooseNetwork.descriptionP1')} <i>{t('chooseNetwork.descriptionP2')}</i>
                     </p>
@@ -28,7 +28,7 @@ export function ChooseNetwork() {
                 </div>
                 <div>
                     <Button
-                        className="page-with-header__mainnet-button"
+                        className="onboarding-setup__page-with-header__mainnet-button"
                         width="wide"
                         onClick={() => {
                             setJsonRpcUrl(mainnetJsonRpcUrl);
@@ -38,7 +38,7 @@ export function ChooseNetwork() {
                         Concordium Mainnet
                     </Button>
                     <Button
-                        className="page-with-header__testnet-button"
+                        className="onboarding-setup__page-with-header__testnet-button"
                         width="wide"
                         onClick={() => {
                             setJsonRpcUrl(testnetJsonRpcUrl);

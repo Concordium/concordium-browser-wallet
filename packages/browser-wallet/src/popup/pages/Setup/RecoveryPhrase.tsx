@@ -42,8 +42,10 @@ export function EnterRecoveryPhrase() {
     return (
         <>
             <PageHeader canGoBack>Your recovery phrase</PageHeader>
-            <div className="page-with-header">
-                <div className="page-with-header__description">{t('enterRecoveryPhrase.description')}</div>
+            <div className="onboarding-setup__page-with-header">
+                <div className="onboarding-setup__page-with-header__description">
+                    {t('enterRecoveryPhrase.description')}
+                </div>
                 <div className="p-10">
                     <Form<FormValues> onSubmit={handleSubmit}>
                         {(f) => {
@@ -57,7 +59,10 @@ export function EnterRecoveryPhrase() {
                                             validate: validateSeedPhrase(),
                                         }}
                                     />
-                                    <Submit className="page-with-header__continue-button" width="narrow">
+                                    <Submit
+                                        className="onboarding-setup__page-with-header__continue-button"
+                                        width="narrow"
+                                    >
                                         {t('continue')}
                                     </Submit>
                                 </>
