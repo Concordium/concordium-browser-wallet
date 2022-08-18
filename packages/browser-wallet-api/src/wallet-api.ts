@@ -3,19 +3,46 @@ import {
     AccountTransactionPayload,
     AccountTransactionSignature,
     AccountTransactionType,
+    JsonRpcClient,
     SchemaVersion,
 } from '@concordium/web-sdk';
 import { WalletApi as IWalletApi, EventType } from '@concordium/browser-wallet-api-helpers';
 import EventEmitter from 'events';
+import type { JsonRpcRequest } from '@concordium/common-sdk/lib/providers/provider';
+import JSONBig from 'json-bigint';
 import { stringify } from './util';
+
+type JsonRpcCallResponse =
+    | {
+          success: true;
+          response: string;
+      }
+    | {
+          success: false;
+          error: string;
+      };
 
 class WalletApi extends EventEmitter implements IWalletApi {
     private messageHandler = new InjectedMessageHandler();
 
-    private connected = false;
+    private jsonRpcClient: JsonRpcClient;
 
     constructor() {
         super();
+        // We pre-serialize the parameters before sending to the background script.
+        const request = (...input: Parameters<JsonRpcRequest>) =>
+            this.messageHandler
+                .sendMessage<JsonRpcCallResponse>(MessageType.JsonRpcRequest, {
+                    method: input[0],
+                    params: JSONBig.stringify(input[1]),
+                })
+                .then((result) => {
+                    if (!result.success) {
+                        throw new Error(result.error);
+                    }
+                    return result.response;
+                });
+        this.jsonRpcClient = new JsonRpcClient({ request });
 
         // Set up message handlers to emit events.
         Object.values(EventType).forEach((eventType) => this.handleEvent(eventType));
@@ -25,10 +52,13 @@ class WalletApi extends EventEmitter implements IWalletApi {
      * Sends a sign request to the Concordium Wallet and awaits the users action
      */
     public async signMessage(accountAddress: string, message: string): Promise<AccountTransactionSignature> {
-        const response = await this.sendMessage<AccountTransactionSignature | undefined>(MessageType.SignMessage, {
-            accountAddress,
-            message,
-        });
+        const response = await this.messageHandler.sendMessage<AccountTransactionSignature | undefined>(
+            MessageType.SignMessage,
+            {
+                accountAddress,
+                message,
+            }
+        );
 
         if (!response) {
             throw new Error('Signing rejected');
@@ -48,8 +78,6 @@ class WalletApi extends EventEmitter implements IWalletApi {
             throw new Error('Connection rejected');
         }
 
-        this.connected = true;
-
         return response;
     }
 
@@ -64,7 +92,7 @@ class WalletApi extends EventEmitter implements IWalletApi {
         schema?: string,
         schemaVersion?: SchemaVersion
     ): Promise<string> {
-        const response = await this.sendMessage<string | undefined>(MessageType.SendTransaction, {
+        const response = await this.messageHandler.sendMessage<string | undefined>(MessageType.SendTransaction, {
             accountAddress,
             type,
             payload: stringify(payload),
@@ -80,17 +108,12 @@ class WalletApi extends EventEmitter implements IWalletApi {
         return response;
     }
 
-    // eslint-disable-next-line @typescript-eslint/no-explicit-any
-    private async sendMessage<R>(type: MessageType, payload?: any): Promise<R> {
-        if (!this.connected && !(await this.connect())) {
-            throw new Error('Connection not allowed by wallet');
-        }
-
-        return this.messageHandler.sendMessage<R>(type, payload);
-    }
-
     private handleEvent(type: EventType) {
         this.messageHandler.handleMessage(createEventTypeFilter(type), (msg) => this.emit(type, msg.payload));
+    }
+
+    public getJsonRpcClient(): JsonRpcClient {
+        return this.jsonRpcClient;
     }
 }
 

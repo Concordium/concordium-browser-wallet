@@ -2,6 +2,7 @@ import type {
     AccountTransactionPayload,
     AccountTransactionSignature,
     AccountTransactionType,
+    JsonRpcClient,
     SchemaVersion,
 } from '@concordium/web-sdk';
 
@@ -76,6 +77,8 @@ interface MainWalletApi {
     connect(): Promise<string | undefined>;
 
     removeAllListeners(event?: EventType | string | undefined): this;
+
+    getJsonRpcClient(): JsonRpcClient;
 }
 
 export type WalletApi = MainWalletApi & EventListeners;
