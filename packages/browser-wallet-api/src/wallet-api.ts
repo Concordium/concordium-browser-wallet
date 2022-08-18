@@ -71,9 +71,9 @@ class WalletApi extends EventEmitter implements IWalletApi {
     }
 
     /**
-     * Returns some connected account, prioritizing the one currently selected. Resolves with account address or undefined if there are no connected account.
+     * Returns some connected account, prioritizing the most recently selected. Resolves with account address or undefined if there are no connected account.
      */
-    public async getSelectedAccount(): Promise<string | undefined> {
+    public async getMostRecentlySelectedAccount(): Promise<string | undefined> {
         const response = await this.messageHandler.sendMessage<string | null>(MessageType.GetSelectedAccount);
 
         // TODO Response becomes === null when we would expect it to be undefined. Catching it here is a temporary quick-fix.

@@ -51,20 +51,25 @@ declare global {
 
 ### connect
 
-To request a connection to the wallet from the user, the `connect` method has to be invoked. The method returns a `Promise` resolving with information related to the currently selected account in the wallet, or rejecting if the request is rejected in the wallet. If this is not called, it will be called as part of any other request (f.x. `sendTransaction` or `signMessage`) made by the API.
+To request a connection to the wallet from the user, the `connect` method has to be invoked. The method returns a `Promise` resolving with information related to the most recently selected account, which has whitelisted the dApp, or rejecting if the request is rejected in the wallet. If this is not called, it will be called as part of any other request (f.x. `sendTransaction` or `signMessage`) made by the API.
+
+N.B. In the current version, if the dApp is already whitelisted, but not by the currently selected account, the returned account will not actually be the most recently selected account, but instead the oldest account that has whitelasted the dApp.
+q
 
 ```typescript
 const provider = await detectConcordiumProvider();
 const accountAddress = await provider.connect();
 ```
 
-### getSelectedAccount
+### getMostRecentlySelectedAccount
 
-To get the currently selected account, or to check whether the wallet is connected without using connect, the `getSelectedAccount` can be invoked. The method returns a `Promise` resolving with the address of the currently selected account in the wallet, or with undefined if there are no connected accounts in the wallet.
+To get the most recently selected account, or to check whether the wallet is connected without using connect, the `getMostRecentlySelectedAccount` can be invoked. The method returns a `Promise` resolving with the address of the most recently selected account in the wallet, or with undefined if there are no connected accounts in the wallet.
+
+N.B. In the current version, if the currently selected account has not whitelisted the dApp, the returned account will not actually be the most recently selected account, but instead the oldest account that has whitelasted the dApp.
 
 ```typescript
 const provider = await detectConcordiumProvider();
-const accountAddress = await provider.getSelectedAccount();
+const accountAddress = await provider.getMostRecentlySelectedAccount();
 if (accountAddress) {
     // We are connected to the wallet
 } else {

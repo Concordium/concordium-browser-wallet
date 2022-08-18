@@ -77,9 +77,9 @@ interface MainWalletApi {
     connect(): Promise<string | undefined>;
 
     /**
-     * Returns some connected account, prioritizing the one currently selected. Resolves with account address or undefined if there are no connected account.
+     * Returns some connected account, prioritizing the most recently selected. Resolves with account address or undefined if there are no connected account.
      */
-    getSelectedAccount(): Promise<string | undefined>;
+    getMostRecentlySelectedAccount(): Promise<string | undefined>;
 
     removeAllListeners(event?: EventType | string | undefined): this;
 

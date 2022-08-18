@@ -33,10 +33,12 @@ export default function Root() {
             .then((provider) => {
                 // Listen for relevant events from the wallet.
                 provider.on('accountChanged', setAccount);
-                provider.on('accountDisconnected', () => provider.getSelectedAccount().then(handleGetAccount));
+                provider.on('accountDisconnected', () =>
+                    provider.getMostRecentlySelectedAccount().then(handleGetAccount)
+                );
                 provider.on('chainChanged', setJsonRpcUrl);
                 // Check if you are already connected
-                provider.getSelectedAccount().then(handleGetAccount);
+                provider.getMostRecentlySelectedAccount().then(handleGetAccount);
             })
             .catch(() => setIsConnected(false));
     }, []);

@@ -105,6 +105,7 @@ const runIfWhitelisted: RunCondition<false> = async (msg, sender) => {
     return { run: false, response: false };
 };
 
+// TODO change this to find most recently selected account
 /**
  * Finds the most prioritized account that is connected to the provided site.
  * The priority is defined as:
@@ -190,7 +191,7 @@ const handleConnectionResponse: HandleResponse<string | undefined | false> = asy
 /**
  * Callback method which returns the prioritized account's address.
  */
-const getSelectedAccountHandler: ExtensionMessageHandler = (_msg, sender, respond) => {
+const getMostRecentlySelectedAccountHandler: ExtensionMessageHandler = (_msg, sender, respond) => {
     if (!sender.url) {
         throw new Error('Expected URL to be available for sender.');
     }
@@ -198,7 +199,10 @@ const getSelectedAccountHandler: ExtensionMessageHandler = (_msg, sender, respon
     return true;
 };
 
-bgMessageHandler.handleMessage(createMessageTypeFilter(MessageType.GetSelectedAccount), getSelectedAccountHandler);
+bgMessageHandler.handleMessage(
+    createMessageTypeFilter(MessageType.GetSelectedAccount),
+    getMostRecentlySelectedAccountHandler
+);
 
 forwardToPopup(
     MessageType.Connect,

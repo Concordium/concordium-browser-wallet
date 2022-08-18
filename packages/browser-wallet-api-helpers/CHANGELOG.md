@@ -5,7 +5,7 @@
 ### Added
 
 -   Expose a JSON-RPC client, using the wallet's current JSON-RPC server.
--   `getSelectedAccount` method, which allows dApps to get the current account with using `connect`.
+-   `getMostRecentlySelectedAccount` method. This method allows dApps to get the most prioritized account without using `connect`.
 
 ### (Breaking) Changed
 
