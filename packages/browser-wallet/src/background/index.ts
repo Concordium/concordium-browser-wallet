@@ -48,7 +48,7 @@ async function performRpcCall(
                 .catch((e) => onFailure(e.toString()));
         }
     } else {
-        onFailure('RPC Call can only performed by whitelisted sites');
+        onFailure('RPC Call can only be performed by whitelisted sites');
     }
 }
 
