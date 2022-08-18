@@ -1,16 +1,10 @@
 /* eslint-disable no-console */
 import React, { useEffect, useState, useMemo } from 'react';
-import { HttpProvider, JsonRpcClient } from '@concordium/web-sdk';
 
 import { detectConcordiumProvider } from '@concordium/browser-wallet-api-helpers';
 import PiggyBankV0 from './Version0';
 import PiggyBankV1 from './Version1';
 import { state, State } from './utils';
-
-/** This assumes a locally running JSON-RPC server targeting testnet: https://github.com/Concordium/concordium-json-rpc/tree/add-get-instance-info */
-const JSON_RPC_URL = 'http://localhost:9095';
-
-const client = new JsonRpcClient(new HttpProvider(JSON_RPC_URL));
 
 /**
  * Connect to wallet, setup application state context, and render children when the wallet API is ready for use.
@@ -56,8 +50,8 @@ export default function Root() {
             <button type="button" onClick={() => setIsVersion0((v) => !v)}>
                 Switch to {isVersion0 ? 'V1' : 'V0'}
             </button>
-            {isVersion0 && <PiggyBankV0 client={client} />}
-            {!isVersion0 && <PiggyBankV1 client={client} />}
+            {isVersion0 && <PiggyBankV0 />}
+            {!isVersion0 && <PiggyBankV1 />}
         </state.Provider>
     );
 }

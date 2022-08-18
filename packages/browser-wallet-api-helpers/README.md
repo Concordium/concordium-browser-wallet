@@ -51,7 +51,7 @@ declare global {
 
 ### connect
 
-To request a connection to the wallet from the user, the `connect` method has to be invoked. The method returns a `Promise` resolving with information related to the currently selected account in the wallet, or rejecting if the request is rejected in the wallet. If this is not called, it will be called as part of any other request (f.x. `sendTransaction` or `signMessage`) made by the API.
+To request a connection to the wallet from the user, the `connect` method has to be invoked. The method returns a `Promise` resolving with information related to the currently selected account in the wallet, or rejecting if the request is rejected in the wallet.
 
 ```typescript
 const provider = await detectConcordiumProvider();
@@ -61,6 +61,8 @@ const accountAddress = await provider.connect();
 ### sendTransaction
 
 To send a transaction, three arguments need to be provided: The account address for the account in the wallet that should sign the transaction, a transaction type and a corresponding payload. Invoking `sendTransaction` returns a `Promise`, which resolves with the transaction hash for the submitted transaction.
+
+If you have not connected with the wallet (or previously been whitelisted) or if the user rejects signing the transaction, the `Promise` will reject.
 
 The following exemplifies how to create a simple transfer of funds from one account to another. Please note that [@concordium/web-sdk](https://github.com/Concordium/concordium-node-sdk-js/tree/main/packages/web) is used to provide the correct formats and types for the transaction payload.
 
@@ -104,6 +106,8 @@ const txHash = await provider.sendTransaction(
 
 It is possible to sign arbitrary messages using the keys for an account stored in the wallet, by invoking the `signMessage` method. The first parameter is the account to be used for signing the message. This method returns a `Promise` resolving with a signature of the message.
 
+If you have not connected with the wallet (or previously been whitelisted) or if the user rejects signing the meesage, the `Promise` will reject.
+
 The following exemplifies requesting a signature of a message:
 
 ```typescript
@@ -146,4 +150,19 @@ provider.on('accountDisconnected', (accountAddress) => {
 
 // Connect to an account in the wallet again triggered elsewhere in the dApp.
 provider.connect().then((accountAddress) => (selectedAccountAddress = accountAddress));
+```
+
+## Accessing node through JSON-RPC
+
+The wallet API exposes access to a JSON-RPC client. This allows a dApp to communicate with the same node as the wallet is connected to, and enables dApps to access the JSON-RPC interface without being connected to a separate server itself. The client is accessed as shown in the example below.
+The dApp does not need to recreate the client again when the wallet changes node or network, the client will always use the wallet's current connected JSON-RPC server.
+
+If you have not connected with the wallet (or previously been whitelisted), the commands will not be executed and the method will throw an error.
+
+```typescript
+const provider = await detectConcordiumProvider();
+const client: JsonRpcClient = await provider.getJsonRpcClient();
+...
+// The client can then be used to acccess node through JSON-RPC
+const accountInfo = await client.getAccountInfo(accountAddress);
 ```

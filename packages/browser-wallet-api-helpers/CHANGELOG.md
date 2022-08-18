@@ -2,6 +2,12 @@
 
 ## 0.2.0
 
+### Added
+
+-   Expose a JSON-RPC client, using the wallet's current JSON-RPC server.
+
+### (Breaking) Changed
+
 -   Updated API of sendTransaction and signMessage to require the account address.
 -   Updated API to include an 'accountDisconnected' event.
 
