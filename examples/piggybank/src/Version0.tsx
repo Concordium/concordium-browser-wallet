@@ -1,12 +1,7 @@
 /* eslint-disable no-console */
 import React, { useEffect, useState, useMemo, useContext, useRef } from 'react';
-import {
-    deserializeContractState,
-    InstanceInfoV0,
-    isInstanceInfoV0,
-    JsonRpcClient,
-    toBuffer,
-} from '@concordium/web-sdk';
+import { deserializeContractState, InstanceInfoV0, isInstanceInfoV0, toBuffer } from '@concordium/web-sdk';
+import { detectConcordiumProvider } from '@concordium/browser-wallet-api-helpers';
 import { smash, deposit, state, CONTRACT_NAME } from './utils';
 
 import PiggyIcon from './assets/piggy-bank-solid.svg';
@@ -25,29 +20,29 @@ type PiggyBankState = PiggyBankStateIntact | PiggyBankStateSmashed;
 const isPiggybankSmashed = (piggyState: PiggyBankState): piggyState is PiggyBankStateSmashed =>
     (piggyState as PiggyBankStateSmashed).Smashed !== undefined;
 
-interface Props {
-    client: JsonRpcClient;
-}
-
-export default function PiggyBankV0({ client }: Props) {
-    const { account, isConnected, jsonRpcUrl } = useContext(state);
+export default function PiggyBankV0() {
+    const { account, isConnected } = useContext(state);
     const [piggybank, setPiggyBank] = useState<InstanceInfoV0>();
     const input = useRef<HTMLInputElement>(null);
 
     useEffect(() => {
         // Get piggy bank data.
-        client.getInstanceInfo({ index: CONTRACT_INDEX, subindex: CONTRACT_SUB_INDEX }).then((info) => {
-            if (info?.name !== `init_${CONTRACT_NAME}`) {
-                // Check that we have the expected instance.
-                throw new Error(`Expected instance of PiggyBank: ${info?.name}`);
-            }
-            if (!isInstanceInfoV0(info)) {
-                // Check smart contract version. We expect V0.
-                throw new Error('Expected SC version 0');
-            }
+        detectConcordiumProvider()
+            .then((provider) =>
+                provider.getJsonRpcClient().getInstanceInfo({ index: CONTRACT_INDEX, subindex: CONTRACT_SUB_INDEX })
+            )
+            .then((info) => {
+                if (info?.name !== `init_${CONTRACT_NAME}`) {
+                    // Check that we have the expected instance.
+                    throw new Error(`Expected instance of PiggyBank: ${info?.name}`);
+                }
+                if (!isInstanceInfoV0(info)) {
+                    // Check smart contract version. We expect V0.
+                    throw new Error('Expected SC version 0');
+                }
 
-            setPiggyBank(info);
-        });
+                setPiggyBank(info);
+            });
     }, []);
 
     // The internal state of the piggy bank, which is either intact or smashed.
@@ -63,12 +58,7 @@ export default function PiggyBankV0({ client }: Props) {
     const canUse = isConnected && piggyBankState !== undefined && !isPiggybankSmashed(piggyBankState);
 
     return (
-        <main className="piggybank">
-            <div className={`connection-banner ${isConnected ? 'connected' : ''}`}>
-                {isConnected ? `Connected: ${account}` : 'No wallet connection'}
-            </div>
-            <div>{jsonRpcUrl ? `JSON-RPC Url: ${jsonRpcUrl}` : 'No JSON-RPC Url yet'}</div>
-            <br />
+        <>
             {piggybank === undefined ? (
                 <div>Loading piggy bank...</div>
             ) : (
@@ -110,6 +100,6 @@ export default function PiggyBankV0({ client }: Props) {
             >
                 <HammerIcon width="40" />
             </button>
-        </main>
+        </>
     );
 }

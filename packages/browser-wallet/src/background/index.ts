@@ -4,11 +4,54 @@ import {
     InternalMessageType,
     MessageType,
 } from '@concordium/browser-wallet-message-hub';
-import { storedConnectedSites, storedSelectedAccount } from '@shared/storage/access';
+import { HttpProvider } from '@concordium/web-sdk';
+import { storedConnectedSites, storedSelectedAccount, storedJsonRpcUrl } from '@shared/storage/access';
 
+import JSONBig from 'json-bigint';
 import bgMessageHandler from './message-handler';
 import { forwardToPopup, HandleMessage, HandleResponse, RunCondition, setPopupSize } from './window-management';
 import { identityIssuanceHandler } from './identity-issuance';
+
+/**
+ * Determines whether the given url has been whitelisted by any account.
+ */
+async function isWhiteListedForAnyAccount(url: string): Promise<boolean> {
+    const urlOrigin = new URL(url).origin;
+    const connectedSites = await storedConnectedSites.get();
+    if (connectedSites) {
+        return Object.values(connectedSites).some((sites) => sites.includes(urlOrigin));
+    }
+    return false;
+}
+
+async function performRpcCall(
+    method: string,
+    params: string | undefined,
+    senderUrl: string,
+    onSuccess: (response: string | undefined) => void,
+    onFailure: (response: string) => void
+) {
+    const isWhiteListed = await isWhiteListedForAnyAccount(senderUrl);
+    if (isWhiteListed) {
+        const url = await storedJsonRpcUrl.get();
+        if (!url) {
+            onFailure('No JSON-RPC URL available');
+        } else {
+            const provider = new HttpProvider(url, fetch);
+            provider
+                .request(
+                    // We lose the method's typing when sending the message.
+                    // eslint-disable-next-line @typescript-eslint/no-explicit-any
+                    method as any,
+                    params && JSONBig.parse(params)
+                )
+                .then(onSuccess)
+                .catch((e) => onFailure(e.toString()));
+        }
+    } else {
+        onFailure('RPC Call can only be performed by whitelisted sites');
+    }
+}
 
 /**
  * Callback method which installs Injected script into Main world of Dapp
@@ -41,6 +84,17 @@ bgMessageHandler.handleMessage(createMessageTypeFilter(InternalMessageType.SetVi
     setPopupSize(payload);
 });
 
+bgMessageHandler.handleMessage(createMessageTypeFilter(MessageType.JsonRpcRequest), (input, sender, respond) => {
+    const onFailure = (error: string) => respond({ success: false, error });
+    if (sender.url) {
+        const onSuccess = (response: string | undefined) => respond({ success: true, response });
+        performRpcCall(input.payload.method, input.payload.params, sender.url, onSuccess, onFailure);
+    } else {
+        onFailure('Missing sender URL');
+    }
+    return true;
+});
+
 /**
  * Run condition which looks up URL in connected sites for the provided account. Runs handler if URL is included in connected sites.
  */
@@ -60,6 +114,7 @@ const runIfWhitelisted: RunCondition<false> = async (msg, sender) => {
     return { run: false, response: false };
 };
 
+// TODO change this to find most recently selected account
 /**
  * Finds the most prioritized account that is connected to the provided site.
  * The priority is defined as:
@@ -141,6 +196,22 @@ const handleConnectionResponse: HandleResponse<string | undefined | false> = asy
 
     return response;
 };
+
+/**
+ * Callback method which returns the prioritized account's address.
+ */
+const getMostRecentlySelectedAccountHandler: ExtensionMessageHandler = (_msg, sender, respond) => {
+    if (!sender.url) {
+        throw new Error('Expected URL to be available for sender.');
+    }
+    findPrioritizedAccountConnectedToSite(sender.url).then(respond);
+    return true;
+};
+
+bgMessageHandler.handleMessage(
+    createMessageTypeFilter(MessageType.GetSelectedAccount),
+    getMostRecentlySelectedAccountHandler
+);
 
 forwardToPopup(
     MessageType.Connect,

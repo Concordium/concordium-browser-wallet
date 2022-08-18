@@ -68,7 +68,6 @@ export const smash = (account: string, index: bigint, subindex = 0n) => {
 export type State = {
     isConnected: boolean;
     account: string | undefined;
-    jsonRpcUrl: string | undefined;
 };
 
-export const state = createContext<State>({ isConnected: false, account: undefined, jsonRpcUrl: undefined });
+export const state = createContext<State>({ isConnected: false, account: undefined });

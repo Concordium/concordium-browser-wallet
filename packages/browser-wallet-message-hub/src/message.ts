@@ -9,7 +9,9 @@ export enum MessageType {
     SendTransaction = 'M_SendTransaction',
     SignMessage = 'M_SignMessage',
     GetAccounts = 'M_GetAccounts',
+    GetSelectedAccount = 'M_GetSelectedAccount',
     Connect = 'M_Connect',
+    JsonRpcRequest = 'M_JsonRpcRequest',
 }
 
 /**
