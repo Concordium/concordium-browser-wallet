@@ -50,7 +50,7 @@ export async function addIdentity(identity: Identity | Identity[]): Promise<void
     return addToList(identityLock, identity, useIndexedStorage(storedIdentities, getGenesisHash));
 }
 
-export async function addCredential(cred: WalletCredential): Promise<void> {
+export async function addCredential(cred: WalletCredential | WalletCredential[]): Promise<void> {
     return addToList(credentialLock, cred, useIndexedStorage(storedCredentials, getGenesisHash));
 }
 

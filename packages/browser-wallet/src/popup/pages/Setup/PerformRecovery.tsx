@@ -1,9 +1,10 @@
 import PageHeader from '@popup/shared/PageHeader';
 import React, { useEffect, useState } from 'react';
 import { useNavigate } from 'react-router-dom';
-import { useAtom, useAtomValue } from 'jotai';
+import { useAtom, useAtomValue, useSetAtom } from 'jotai';
 import { useTranslation } from 'react-i18next';
 import { networkConfigurationAtom, seedPhraseAtom } from '@popup/store/settings';
+import { credentialsAtom, selectedAccountAtom } from '@popup/store/account';
 import { popupMessageHandler } from '@popup/shared/message-handler';
 import { InternalMessageType } from '@concordium/browser-wallet-message-hub';
 import { JsonRpcClient, HttpProvider } from '@concordium/web-sdk';
@@ -13,6 +14,8 @@ import Button from '@popup/shared/Button';
 import { absoluteRoutes } from '@popup/constants/routes';
 import { BackgroundResponseStatus } from '@shared/utils/types';
 import { getIdentityProviders } from '@popup/shared/utils/wallet-proxy';
+import { displayAsCcd } from 'wallet-common-helpers';
+import { displaySplitAddress } from '@popup/shared/utils/account-helpers';
 
 // TODO: improve "error state"
 // TODO: Special handling for no identities found
@@ -21,6 +24,7 @@ function DisplayRecoveryResult() {
     const { t } = useTranslation('setup');
     const navigate = useNavigate();
     const identities = useAtomValue(identitiesAtom);
+    const credentials = useAtomValue(credentialsAtom);
 
     return (
         <>
@@ -29,12 +33,25 @@ function DisplayRecoveryResult() {
             </div>
             <div className="onboarding-setup__recovery__results">
                 {identities.map((identity) => (
-                    <div className="onboarding-setup__recovery__identity">
+                    <div
+                        key={`${identity.index}-${identity.provider}`}
+                        className="onboarding-setup__recovery__identity"
+                    >
                         <p>{identity.name}</p>
+                        {credentials
+                            .filter((cred) => cred.identityIndex === identity.index)
+                            .map((cred) => (
+                                <div className="onboarding-setup__recovery__credential" key={cred.credId}>
+                                    <p>{displaySplitAddress(cred.address)}</p>
+                                    <p>{displayAsCcd(0n)}</p>
+                                </div>
+                            ))}
                     </div>
                 ))}
             </div>
-            <Button onClick={() => navigate(absoluteRoutes.home.account.path)}>{t('continue')}</Button>
+            <Button className="m-t-20" width="wide" onClick={() => navigate(absoluteRoutes.home.account.path)}>
+                {t('continue')}
+            </Button>
         </>
     );
 }
@@ -43,6 +60,8 @@ export default function EnterRecoveryPhrase() {
     const { t } = useTranslation('setup');
     const { jsonRpcUrl } = useAtomValue(networkConfigurationAtom);
     const masterSeed = useAtomValue(seedPhraseAtom);
+    const credentials = useAtomValue(credentialsAtom);
+    const setSelectedAccount = useSetAtom(selectedAccountAtom);
     const [providers, setProviders] = useAtom(identityProvidersAtom);
     const [result, setResult] = useState<BackgroundResponseStatus>();
 
@@ -79,14 +98,17 @@ export default function EnterRecoveryPhrase() {
                     seedAsHex: masterSeed,
                     net,
                 })
-                .then(setResult);
+                .then((response) => {
+                    setSelectedAccount(credentials[0].address);
+                    setResult(response);
+                });
         });
     }, [providers.length]);
 
     return (
         <>
             <PageHeader>{t('performRecovery.title')}</PageHeader>
-            <div className="onboarding-setup__page-with-header">
+            <div className="onboarding-setup__page-with-header onboarding-setup__recovery">
                 {!result && (
                     <>
                         <div className="onboarding-setup__page-with-header__description">

@@ -100,16 +100,30 @@
     }
 
     &__recovery {
+        overflow-y: overlay;
+
         &__results {
             text-align: left;
         }
 
+        &__credential {
+            padding: rem(5px) 0;
+            border-top: rem(1px) dotted $color-petroleum;
+
+            p {
+                margin: rem(5px) 0;
+                font-size: rem(8px);
+            }
+        }
+
         &__identity {
-            padding: 10px 0;
-            margin-top: 10px;
+            & > p {
+                font-weight: $font-weight-bold;
+                padding: 0;
+            }
 
             &:not(:last-child) {
-                border-bottom: 2px solid $color-petroleum;
+                border-bottom: rem(2px) solid $color-petroleum;
             }
         }
     }
