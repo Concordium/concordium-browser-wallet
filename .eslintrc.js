@@ -26,7 +26,7 @@ module.exports = {
         'no-await-in-loop': 0,
         'import/no-extraneous-dependencies': [
             'error',
-            { devDependencies: ['**/*.stories.tsx', '**/build/**/*', '**/*.config.js'] },
+            { devDependencies: ['**/*.stories.tsx', '**/build/**/*', '**/*.config.js', '**/*.config.ts'] },
         ],
         'jsx-a11y/label-has-associated-control': [
             'error',

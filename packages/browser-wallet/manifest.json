@@ -32,5 +32,13 @@
         "32": "resources/icons/32x32.png",
         "48": "resources/icons/48x48.png",
         "128": "resources/icons/128x128.png"
+    },
+    "commands": {
+        "_execute_action": {
+            "suggested_key": {
+                "default": "Shift+Alt+C"
+            },
+            "description": "Start the extension"
+        }
     }
 }

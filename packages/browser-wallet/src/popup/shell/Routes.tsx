@@ -20,6 +20,7 @@ import VisualSettings from '@popup/pages/VisualSettings';
 import AddAccount from '@popup/pages/AddAccount';
 import { IdentityIssuanceEnd, IdentityIssuanceStart } from '@popup/pages/IdentityIssuance';
 import About from '@popup/pages/About';
+import Login from '@popup/pages/Login/Login';
 
 type PromptKey = keyof Omit<typeof absoluteRoutes['prompt'], 'path'>;
 
@@ -108,7 +109,8 @@ export default function Routes() {
                     element={<IdentityIssuanceEnd onFinish={handleIdentityIssuanceResponse} />}
                 />
             </Route>
-            <Route path={relativeRoutes.setup.path} element={<Setup />} />
+            <Route path={`${relativeRoutes.setup.path}/*`} element={<Setup />} />
+            <Route path={relativeRoutes.login.path} element={<Login />} />
             <Route path={relativeRoutes.home.path} element={<MainLayout />}>
                 <Route
                     element={<IdentityIssuanceStart />}

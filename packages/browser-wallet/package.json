@@ -1,6 +1,6 @@
 {
     "name": "@concordium/browser-wallet",
-    "version": "0.2.1",
+    "version": "0.3.0",
     "description": "Browser extensions wallet for the Concordium blockchain",
     "author": "Concordium",
     "license": "Apache",
@@ -15,10 +15,12 @@
         "@concordium/browser-wallet-api": "workspace:^",
         "@concordium/browser-wallet-api-helpers": "workspace:^",
         "@concordium/web-sdk": "^0.4.0",
+        "@scure/bip39": "^1.1.0",
         "axios": "^0.27.2",
         "buffer": "^6.0.3",
         "check-password-strength": "^2.0.5",
         "clsx": "^1.1.1",
+        "crypto-js": "^4.1.1",
         "framer-motion": "^6.3.12",
         "i18next": "^21.6.16",
         "i18next-browser-languagedetector": "^6.1.4",
@@ -52,7 +54,8 @@
         "@storybook/react": "^6.5.7",
         "@storybook/testing-library": "^0.0.11",
         "@svgr/webpack": "^6.2.1",
-        "@types/chrome": "^0.0.183",
+        "@types/chrome": "^0.0.193",
+        "@types/crypto-js": "^4.1.1",
         "@types/lodash.groupby": "^4.6.7",
         "@types/react": "^18.0.7",
         "@types/react-dom": "^18.0.0",
@@ -69,6 +72,7 @@
         "sass-loader": "^13.0.0",
         "storybook": "^6.5.7",
         "style-loader": "^3.3.1",
+        "ts-jest": "^28.0.8",
         "tsconfig-paths-webpack-plugin": "^3.5.2",
         "typescript": "^4.3.5"
     }

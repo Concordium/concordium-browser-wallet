@@ -1,7 +1,9 @@
 import {
+    sessionPasscode,
     StorageAccessor,
     storedConnectedSites,
     storedCredentials,
+    storedEncryptedSeedPhrase,
     storedJsonRpcUrl,
     storedSelectedAccount,
     storedTheme,
@@ -22,9 +24,11 @@ const accessorMap = {
     [ChromeStorageKey.Credentials]: storedCredentials,
     [ChromeStorageKey.SelectedAccount]: storedSelectedAccount,
     [ChromeStorageKey.JsonRpcUrl]: storedJsonRpcUrl,
+    [ChromeStorageKey.SeedPhrase]: storedEncryptedSeedPhrase,
     [ChromeStorageKey.Theme]: storedTheme,
     [ChromeStorageKey.SeedPhrase]: storedSeedPhrase,
     [ChromeStorageKey.IdentityProviders]: storedIdentityProviders,
+    [ChromeStorageKey.Passcode]: sessionPasscode,
 };
 
 export type AsyncWrapper<V> = {

@@ -2,7 +2,9 @@ export enum ChromeStorageKey {
     ConnectedSites = 'connectedSites',
     Credentials = 'credentials',
     JsonRpcUrl = 'jsonRpcUrl',
+    Passcode = 'passcode',
     SelectedAccount = 'selectedAccont',
+    SeedPhrase = 'seedPhrase',
     Theme = 'theme',
     PendingIdentity = 'pendingIdentity',
     Identities = 'identities',
@@ -118,4 +120,19 @@ export interface IdentityProvider {
     ipInfo: IpInfo;
     arsInfos: Record<string, ArInfo>; // objects with ArInfo fields (and numbers as field names)
     metadata: IdentityProviderMetaData;
+}
+
+interface EncryptionMetaData {
+    keyLen: number;
+    iterations: number;
+    salt: string;
+    initializationVector: string;
+    encryptionMethod: string;
+    keyDerivationMethod: string;
+    hashAlgorithm: string;
+}
+
+export interface EncryptedData {
+    cipherText: string;
+    metadata: EncryptionMetaData;
 }

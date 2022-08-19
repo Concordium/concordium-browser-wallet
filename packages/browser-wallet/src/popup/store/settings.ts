@@ -1,4 +1,4 @@
-import { ChromeStorageKey, Theme, WalletCredential } from '@shared/storage/types';
+import { ChromeStorageKey, EncryptedData, Theme, WalletCredential } from '@shared/storage/types';
 import { atom } from 'jotai';
 import { EventType } from '@concordium/browser-wallet-api-helpers';
 import { popupMessageHandler } from '@popup/shared/message-handler';
@@ -7,6 +7,11 @@ import { atomWithChromeStorage, AsyncWrapper } from './utils';
 export const seedPhraseAtom = atomWithChromeStorage<string>(ChromeStorageKey.SeedPhrase, '');
 
 export const credentialsAtom = atomWithChromeStorage<WalletCredential[]>(ChromeStorageKey.Credentials, []);
+export const encryptedSeedPhraseAtom = atomWithChromeStorage<EncryptedData | undefined>(
+    ChromeStorageKey.SeedPhrase,
+    undefined,
+    true
+);
 export const themeAtom = atomWithChromeStorage<Theme>(ChromeStorageKey.Theme, Theme.Light);
 
 const storedJsonRpcUrlAtom = atomWithChromeStorage<string>(ChromeStorageKey.JsonRpcUrl, '', true);
@@ -22,4 +27,10 @@ export const jsonRpcUrlAtom = atom<string, string>(
     (_, set, jsonRpcUrl) => {
         set(jsonRpcUrlAtomLoading, jsonRpcUrl);
     }
+);
+
+export const sessionPasscodeAtom = atomWithChromeStorage<string | undefined>(
+    ChromeStorageKey.Passcode,
+    undefined,
+    true
 );
