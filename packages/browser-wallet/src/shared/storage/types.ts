@@ -9,7 +9,6 @@ export enum ChromeStorageKey {
     PendingIdentity = 'pendingIdentity',
     Identities = 'identities',
     SelectedIdentity = 'selectedIdentity',
-    SeedPhrase = 'seedPhrase',
     IdentityProviders = 'identityProviders',
 }
 
