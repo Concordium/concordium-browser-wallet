@@ -4,21 +4,26 @@ import { useAtomValue } from 'jotai';
 import clsx from 'clsx';
 
 import { absoluteRoutes } from '@popup/constants/routes';
-import { encryptedSeedPhraseAtom } from '@popup/store/settings';
+import { encryptedSeedPhraseAtom, sessionPasscodeAtom } from '@popup/store/settings';
 import Header from './Header';
 
 export default function MainLayout() {
-    const { loading, value: encryptedSeedPhrase } = useAtomValue(encryptedSeedPhraseAtom);
     const [headerOpen, setHeaderOpen] = useState(false);
+    const { loading: loadingEncryptedSeedPhrase, value: encryptedSeedPhrase } = useAtomValue(encryptedSeedPhraseAtom);
+    const { loading: loadingPasscode, value: sessionPasscode } = useAtomValue(sessionPasscodeAtom);
 
-    if (loading) {
+    if (loadingEncryptedSeedPhrase || loadingPasscode) {
         // This will be near instant, as we're just waiting for the Chrome async store
         return null;
     }
 
     if (!encryptedSeedPhrase) {
-        // Force user to go through setup
+        // The user has not been unboarded, and hence have not generated a seed phrase yet.
         return <Navigate to={absoluteRoutes.setup.path} />;
+    }
+
+    if (!sessionPasscode) {
+        return <Navigate to={absoluteRoutes.login.path} />;
     }
 
     return (

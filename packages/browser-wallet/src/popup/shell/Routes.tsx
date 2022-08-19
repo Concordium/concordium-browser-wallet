@@ -18,6 +18,7 @@ import NetworkSettings from '@popup/pages/NetworkSettings';
 import VisualSettings from '@popup/pages/VisualSettings';
 import AddAccount from '@popup/pages/AddAccount';
 import About from '@popup/pages/About';
+import Login from '@popup/pages/Login/Login';
 
 type PromptKey = keyof Omit<typeof absoluteRoutes['prompt'], 'path'>;
 
@@ -98,6 +99,7 @@ export default function Routes() {
                 />
             </Route>
             <Route path={`${relativeRoutes.setup.path}/*`} element={<Setup />} />
+            <Route path={relativeRoutes.login.path} element={<Login />} />
             <Route path={relativeRoutes.home.path} element={<MainLayout />}>
                 <Route element={<NoContent />} path={relativeRoutes.home.identities.path} />
                 <Route path={relativeRoutes.home.settings.path}>

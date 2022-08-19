@@ -1906,7 +1906,7 @@ __metadata:
   resolution: "@concordium/browser-wallet-message-hub@workspace:packages/browser-wallet-message-hub"
   dependencies:
     "@concordium/browser-wallet-api-helpers": "workspace:^"
-    "@types/chrome": ^0.0.183
+    "@types/chrome": ^0.0.193
     "@types/uuid": ^8.3.2
     uuid: ^8.3.2
   languageName: unknown
@@ -1934,7 +1934,7 @@ __metadata:
     "@storybook/react": ^6.5.7
     "@storybook/testing-library": ^0.0.11
     "@svgr/webpack": ^6.2.1
-    "@types/chrome": ^0.0.183
+    "@types/chrome": ^0.0.193
     "@types/crypto-js": ^4.1.1
     "@types/lodash.groupby": ^4.6.7
     "@types/react": ^18.0.7
@@ -4470,13 +4470,13 @@ __metadata:
   languageName: node
   linkType: hard
 
-"@types/chrome@npm:^0.0.183":
-  version: 0.0.183
-  resolution: "@types/chrome@npm:0.0.183"
+"@types/chrome@npm:^0.0.193":
+  version: 0.0.193
+  resolution: "@types/chrome@npm:0.0.193"
   dependencies:
     "@types/filesystem": "*"
     "@types/har-format": "*"
-  checksum: fecfd3680c50ed9d27d658496a4fa2f5abdaa892345f88815929cbb64bdcdf7048a642f602aefd5066ed4989ed0911d62ed535ede9c690c9c508e0ea3fac6034
+  checksum: f01205376becff1a229443473c697b0ab42d87af00dc2a52f7a16bce2ad223875fd95ebee12ab1598f2669eb1af26953863c37aace7e87551f68ff73eaaedba5
   languageName: node
   linkType: hard
 
