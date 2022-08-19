@@ -56,7 +56,7 @@ export default function Login() {
             </div>
             <p className="login__description">{t('description')}</p>
             <Form onSubmit={handleSubmit} className="login__form" formMethods={form}>
-                {() => {
+                {(f) => {
                     return (
                         <>
                             <FormPassword
