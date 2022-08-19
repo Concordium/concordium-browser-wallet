@@ -10,7 +10,7 @@ import { SubmitHandler, Validate } from 'react-hook-form';
 import Submit from '@popup/shared/Form/Submit';
 import { useTranslation } from 'react-i18next';
 import { encrypt } from '@popup/shared/crypto';
-import { encryptedSeedPhraseAtom } from '@popup/store/settings';
+import { encryptedSeedPhraseAtom, sessionPasscodeAtom } from '@popup/store/settings';
 import { setupRoutes } from './routes';
 
 type FormValues = {
@@ -22,6 +22,7 @@ export function EnterRecoveryPhrase() {
     const { t } = useTranslation('setup');
     const seedPhrase = useAtomValue(seedPhraseAtom);
     const setEncryptedSeedPhrase = useSetAtom(encryptedSeedPhraseAtom);
+    const setPasscodeInSession = useSetAtom(sessionPasscodeAtom);
     const passcode = useAtomValue(passcodeAtom);
 
     if (!passcode) {
@@ -32,6 +33,7 @@ export function EnterRecoveryPhrase() {
     const handleSubmit: SubmitHandler<FormValues> = (vs) => {
         const encryptedSeedPhrase = encrypt(vs.seedPhraseInput, passcode);
         setEncryptedSeedPhrase(encryptedSeedPhrase);
+        setPasscodeInSession(passcode);
         navigate(`${absoluteRoutes.setup.path}/${setupRoutes.chooseNetwork}`);
     };
 
