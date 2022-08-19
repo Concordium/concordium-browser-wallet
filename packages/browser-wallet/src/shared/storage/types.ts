@@ -2,6 +2,7 @@ export enum ChromeStorageKey {
     ConnectedSites = 'connectedSites',
     Credentials = 'credentials',
     JsonRpcUrl = 'jsonRpcUrl',
+    Passcode = 'passcode',
     SelectedAccount = 'selectedAccont',
     SeedPhrase = 'seedPhrase',
     Theme = 'theme',

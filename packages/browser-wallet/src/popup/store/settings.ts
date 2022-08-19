@@ -26,3 +26,9 @@ export const jsonRpcUrlAtom = atom<string, string>(
         set(jsonRpcUrlAtomLoading, jsonRpcUrl);
     }
 );
+
+export const sessionPasscodeAtom = atomWithChromeStorage<string | undefined>(
+    ChromeStorageKey.Passcode,
+    undefined,
+    true
+);

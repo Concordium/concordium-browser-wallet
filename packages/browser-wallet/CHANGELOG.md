@@ -1,5 +1,11 @@
 # Changelog
 
+## Unreleased
+
+### Added
+
+-   Login screen.
+
 ## 0.3.0 2022-8-18
 
 ### Added

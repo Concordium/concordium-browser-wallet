@@ -47,6 +47,9 @@ export const relativeRoutes = {
     setup: {
         path: '/setup',
     },
+    login: {
+        path: '/login',
+    },
 };
 
 const buildAbsoluteRoutes = <R extends RouteNode | RoutePath | RouteChildren>(route: R, base?: string): R => {
