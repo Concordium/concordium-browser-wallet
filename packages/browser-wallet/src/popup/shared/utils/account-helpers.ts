@@ -38,7 +38,7 @@ export function usePrivateKey(accountAddress: string): string | undefined {
     const credentials = useAtomValue(credentialsAtom);
     const credential = credentials.find((cred) => cred.address === accountAddress);
 
-    const masterSeed = useAtomValue(seedPhraseAtom);
+    const seedPhrase = useAtomValue(seedPhraseAtom);
     const identity = useIdentityOf(credential);
 
     const privateKey = useMemo(() => {
@@ -46,10 +46,10 @@ export function usePrivateKey(accountAddress: string): string | undefined {
             return undefined;
         }
 
-        return ConcordiumHdWallet.fromHex(masterSeed, Network[credential.net] as NetworkString)
+        return ConcordiumHdWallet.fromHex(seedPhrase, Network[credential.net] as NetworkString)
             .getAccountSigningKey(identity.index, credential.credNumber)
             .toString('hex');
-    }, [credential?.credId, masterSeed, identity?.id]);
+    }, [credential?.credId, seedPhrase, identity?.id]);
 
     return privateKey;
 }

@@ -22,7 +22,7 @@ function IdentityIssuanceStart({ onStart }: InnerProps) {
     const jsonRrcUrl = useAtomValue(jsonRpcUrlAtom);
     const updatePendingIdentity = useSetAtom(pendingIdentityAtom);
     const identities = useAtomValue(identitiesAtom);
-    const masterSeed = useAtomValue(seedPhraseAtom);
+    const seedPhrase = useAtomValue(seedPhraseAtom);
     const [error, setError] = useState<string>();
 
     useEffect(() => {
@@ -34,8 +34,8 @@ function IdentityIssuanceStart({ onStart }: InnerProps) {
         if (!jsonRrcUrl) {
             throw new Error('no json rpc url');
         }
-        if (!masterSeed) {
-            throw new Error('no master seed');
+        if (!seedPhrase) {
+            throw new Error('no seed phrase');
         }
 
         // TODO: Maybe we should not create the client for each page
@@ -67,7 +67,7 @@ function IdentityIssuanceStart({ onStart }: InnerProps) {
             globalContext: global.value,
             ipInfo: provider.ipInfo,
             arsInfos: provider.arsInfos,
-            seed: masterSeed,
+            seed: seedPhrase,
             net,
             identityIndex,
             arThreshold: Math.min(Object.keys(provider.arsInfos).length - 1, 255),

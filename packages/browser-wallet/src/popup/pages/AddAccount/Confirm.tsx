@@ -1,12 +1,12 @@
-import React, { useState, useEffect } from 'react';
+import React, { useMemo } from 'react';
 import { useTranslation } from 'react-i18next';
 import { useAtom, useAtomValue, useSetAtom } from 'jotai';
 import { useNavigate } from 'react-router-dom';
 import IdCard from '@popup/shared/IdCard';
-import { selectedIdentityAtom } from '@popup/store/identity';
+import { identityProvidersAtom, selectedIdentityAtom } from '@popup/store/identity';
 import { selectedAccountAtom } from '@popup/store/account';
 import { credentialsAtom, jsonRpcUrlAtom, seedPhraseAtom } from '@popup/store/settings';
-import { IdentityStatus, IdentityProvider } from '@shared/storage/types';
+import { IdentityStatus, WalletCredential } from '@shared/storage/types';
 import {
     JsonRpcClient,
     HttpProvider,
@@ -15,41 +15,42 @@ import {
     getAccountAddress,
     getSignedCredentialDeploymentTransactionHash,
 } from '@concordium/web-sdk';
-import { getIdentityProviders } from '@popup/shared/utils/wallet-proxy';
 import Button from '@popup/shared/Button';
 import ArrowIcon from '@assets/svg/arrow.svg';
+import IdentityProviderIcon from '@popup/shared/IdentityProviderIcon';
 
 import { absoluteRoutes } from '@popup/constants/routes';
 import AccountDetails from '../Account/AccountDetails';
 
-export default function AddAccount() {
+export default function Confirm() {
     const { t } = useTranslation('addAccount');
     const nav = useNavigate();
     const selectedIdentity = useAtomValue(selectedIdentityAtom);
     const [credentials, setCredentials] = useAtom(credentialsAtom);
     const setSelectedAccount = useSetAtom(selectedAccountAtom);
-    const masterSeed = useAtomValue(seedPhraseAtom);
-    const jsonRrcUrl = useAtomValue(jsonRpcUrlAtom);
-    const [providers, setProviders] = useState<IdentityProvider[]>([]);
+    const seedPhrase = useAtomValue(seedPhraseAtom);
+    const jsonRpcUrl = useAtomValue(jsonRpcUrlAtom);
+    const providers = useAtomValue(identityProvidersAtom);
 
-    useEffect(() => {
-        getIdentityProviders().then((loadedProviders) => setProviders(loadedProviders));
-    }, []);
+    const identityProvider = useMemo(
+        () => providers.find((p) => p.ipInfo.ipIdentity === selectedIdentity?.provider),
+        [selectedIdentity?.provider]
+    );
 
     if (!selectedIdentity || selectedIdentity.status !== IdentityStatus.Confirmed) {
         throw new Error('No selected Identity or selected is not confirmed');
     }
 
     const submit = async () => {
-        if (!jsonRrcUrl) {
+        if (!jsonRpcUrl) {
             throw new Error('no json rpc url');
         }
-        if (!masterSeed) {
-            throw new Error('no master seed');
+        if (!seedPhrase) {
+            throw new Error('no seed phrase');
         }
 
         // TODO: Maybe we should not create the client for each page
-        const client = new JsonRpcClient(new HttpProvider(jsonRrcUrl));
+        const client = new JsonRpcClient(new HttpProvider(jsonRpcUrl));
         const global = await client.getCryptographicParameters();
 
         if (!global) {
@@ -74,7 +75,7 @@ export default function AddAccount() {
             globalContext: global.value,
             ipInfo: provider.ipInfo,
             arsInfos: provider.arsInfos,
-            seedAsHex: masterSeed,
+            seedAsHex: seedPhrase,
             net,
             idObject: selectedIdentity.idObject.value,
             revealedAttributes: [],
@@ -110,7 +111,13 @@ export default function AddAccount() {
                 <AccountDetails
                     className="add-account-page__blur-details"
                     expanded
-                    account={{ address: 'Pending', status: IdentityStatus.Pending, identityId: selectedIdentity.id }}
+                    account={
+                        {
+                            address: 'Pending',
+                            status: IdentityStatus.Pending,
+                            identityId: selectedIdentity.id,
+                        } as WalletCredential
+                    }
                 />
                 <Button className="add-account-page__confirm-button" type="submit" width="wide" onClick={submit}>
                     {t('createAccount')}
@@ -119,7 +126,7 @@ export default function AddAccount() {
             </div>
             <IdCard
                 name={selectedIdentity.name}
-                provider={<p>Test</p>}
+                provider={<IdentityProviderIcon provider={identityProvider} />}
                 status={selectedIdentity.status}
                 onNameChange={() => {}}
                 className="m-t-40"

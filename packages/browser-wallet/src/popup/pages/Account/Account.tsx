@@ -76,7 +76,7 @@ function Account() {
             </div>
             <AccountActions
                 className="account-page__actions"
-                enabled={isConfirmed}
+                disabled={!isConfirmed}
                 setDetailsExpanded={setDetailsExpanded}
             />
         </div>

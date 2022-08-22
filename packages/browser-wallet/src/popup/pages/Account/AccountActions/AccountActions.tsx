@@ -73,29 +73,29 @@ function Action({ children, to, title, disabled = false, end = false, onClick = 
 }
 
 type Props = ClassName & {
-    enabled: boolean;
+    disabled: boolean;
     setDetailsExpanded: React.Dispatch<React.SetStateAction<boolean>>;
 };
 
-export default function AccountActions({ className, enabled = true, setDetailsExpanded }: Props) {
+export default function AccountActions({ className, disabled = false, setDetailsExpanded }: Props) {
     const { t } = useTranslation('account', { keyPrefix: 'actions' });
 
     return (
-        <nav className={clsx('account-page-actions', className, !enabled && 'account-page-actions-disabled')}>
+        <nav className={clsx('account-page-actions', className, disabled && 'account-page-actions-disabled')}>
             <ActionLinks>
-                <Action to="" end title={t('log')} disabled={!enabled}>
+                <Action to="" end title={t('log')} disabled={disabled}>
                     <ListIcon className="account-page-actions__list-icon" />
                 </Action>
-                <Action to={accountRoutes.send} title={t('send')} disabled={!enabled}>
+                <Action to={accountRoutes.send} title={t('send')} disabled={disabled}>
                     <SendIcon className="account-page-actions__send-icon" />
                 </Action>
-                <Action to={accountRoutes.receive} title={t('receive')} disabled={!enabled}>
+                <Action to={accountRoutes.receive} title={t('receive')} disabled={disabled}>
                     <ReceiveIcon className="account-page-actions__receive-icon" />
                 </Action>
                 <Action
                     to={accountRoutes.settings}
                     title={t('settings')}
-                    disabled={!enabled}
+                    disabled={disabled}
                     onClick={() => setDetailsExpanded(false)}
                 >
                     <SettingsIcon className="account-page-actions__settings-icon" />
