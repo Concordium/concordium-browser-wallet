@@ -64,7 +64,7 @@ function Account() {
                                 open={detailsExpanded}
                                 onClick={() => setDetailsExpanded((o) => !o)}
                             />
-                            <AccountDetails expanded={detailsExpanded} account={selectedCred.address} />
+                            <AccountDetails expanded={detailsExpanded} account={selectedCred} />
                             <ConnectedBox setDetailsExpanded={setDetailsExpanded} />
                         </div>
                         <div className="account-page__routes">

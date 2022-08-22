@@ -103,10 +103,15 @@ export default function AddAccount() {
         nav(absoluteRoutes.home.account.path);
     };
 
+    // TODO: Better faking of AccountDetails
     return (
         <div className="flex-column align-center">
             <div className="w-full relative">
-                <AccountDetails className="add-account-page__blur-details" expanded account="Pending" />
+                <AccountDetails
+                    className="add-account-page__blur-details"
+                    expanded
+                    account={{ address: 'Pending', status: IdentityStatus.Pending, identityId: selectedIdentity.id }}
+                />
                 <Button className="add-account-page__confirm-button" type="submit" width="wide" onClick={submit}>
                     {t('createAccount')}
                 </Button>

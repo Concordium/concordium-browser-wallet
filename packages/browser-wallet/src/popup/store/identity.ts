@@ -30,3 +30,8 @@ export const selectedIdentityAtom = atom<Identity | undefined, Identity | undefi
 );
 
 export const identityProvidersAtom = atomWithChromeStorage<IdentityProvider[]>(ChromeStorageKey.IdentityProviders, []);
+
+export const identityNamesAtom = atom<Record<number, string>>((get) => {
+    const identities = get(identitiesAtom);
+    return identities.reduce((map, identity) => map[identity.id] === identity.name, {});
+});
