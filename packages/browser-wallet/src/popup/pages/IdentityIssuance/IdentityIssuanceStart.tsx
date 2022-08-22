@@ -24,6 +24,7 @@ function IdentityIssuanceStart({ onStart }: InnerProps) {
     const identities = useAtomValue(identitiesAtom);
     const masterSeed = useAtomValue(seedPhraseAtom);
     const [error, setError] = useState<string>();
+    const [buttonDisabled, setButtonDisabled] = useState(false);
 
     useEffect(() => {
         // TODO only load once per session?
@@ -31,48 +32,53 @@ function IdentityIssuanceStart({ onStart }: InnerProps) {
     }, []);
 
     const startIssuance = async (provider: IdentityProvider) => {
-        if (!jsonRrcUrl) {
-            throw new Error('no json rpc url');
+        setButtonDisabled(true);
+        try {
+            if (!jsonRrcUrl) {
+                throw new Error('no json rpc url');
+            }
+            if (!masterSeed) {
+                throw new Error('no master seed');
+            }
+
+            // TODO: Maybe we should not create the client for each page
+            const client = new JsonRpcClient(new HttpProvider(jsonRrcUrl));
+
+            const global = await client.getCryptographicParameters();
+
+            if (!global) {
+                throw new Error('no global fetched');
+            }
+
+            // TODO Find a better way to assign indices
+            const identityIndex = identities.length ? identities[identities.length - 1].index + 1 : 0;
+            // TODO Get this from settings, when we store the chosen net
+            const net = 'Testnet';
+
+            onStart();
+
+            updatePendingIdentity({
+                id: identities.length,
+                status: IdentityStatus.Pending,
+                index: identityIndex,
+                name: `Identity ${identityIndex + 1}`,
+                network: Network[net],
+                provider: provider.ipInfo.ipIdentity,
+            });
+
+            popupMessageHandler.sendInternalMessage(InternalMessageType.StartIdentityIssuance, {
+                globalContext: global.value,
+                ipInfo: provider.ipInfo,
+                arsInfos: provider.arsInfos,
+                seed: masterSeed,
+                net,
+                identityIndex,
+                arThreshold: Math.min(Object.keys(provider.arsInfos).length - 1, 255),
+                baseUrl: provider.metadata.issuanceStart,
+            });
+        } finally {
+            setButtonDisabled(false);
         }
-        if (!masterSeed) {
-            throw new Error('no master seed');
-        }
-
-        // TODO: Maybe we should not create the client for each page
-        const client = new JsonRpcClient(new HttpProvider(jsonRrcUrl));
-
-        const global = await client.getCryptographicParameters();
-
-        if (!global) {
-            throw new Error('no global fetched');
-        }
-
-        // TODO Find a better way to assign indices
-        const identityIndex = identities.length ? identities[identities.length - 1].index + 1 : 0;
-        // TODO Get this from settings, when we store the chosen net
-        const net = 'Testnet';
-
-        onStart();
-
-        updatePendingIdentity({
-            id: identities.length,
-            status: IdentityStatus.Pending,
-            index: identityIndex,
-            name: `Identity ${identityIndex + 1}`,
-            network: Network[net],
-            provider: provider.ipInfo.ipIdentity,
-        });
-
-        popupMessageHandler.sendInternalMessage(InternalMessageType.StartIdentityIssuance, {
-            globalContext: global.value,
-            ipInfo: provider.ipInfo,
-            arsInfos: provider.arsInfos,
-            seed: masterSeed,
-            net,
-            identityIndex,
-            arThreshold: Math.min(Object.keys(provider.arsInfos).length - 1, 255),
-            baseUrl: provider.metadata.issuanceStart,
-        });
     };
 
     return (
@@ -83,6 +89,7 @@ function IdentityIssuanceStart({ onStart }: InnerProps) {
                     <Button
                         className="identity-issuance__provider-button flex justify-space-between align-center"
                         width="wide"
+                        disabled={buttonDisabled}
                         key={p.ipInfo.ipIdentity + p.ipInfo.ipDescription.name}
                         onClick={() => startIssuance(p).catch((e) => setError(e.toString()))}
                     >

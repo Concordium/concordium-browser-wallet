@@ -1959,7 +1959,6 @@ __metadata:
     jotai: ^1.6.5
     json-bigint: ^1.0.0
     lodash.groupby: ^4.6.0
-    pbkdf2: ^3.1.2
     react: ^18.0.0
     react-dom: ^18.0.0
     react-hook-form: ^7.30.0
@@ -12742,16 +12741,16 @@ __metadata:
   linkType: hard
 
 "jotai@npm:^1.6.5":
-  version: 1.7.2
-  resolution: "jotai@npm:1.7.2"
+  version: 1.8.0
+  resolution: "jotai@npm:1.8.0"
   peerDependencies:
     "@babel/core": "*"
     "@babel/template": "*"
+    "@tanstack/query-core": "*"
     "@urql/core": "*"
     immer: "*"
     optics-ts: "*"
     react: ">=16.8"
-    react-query: "*"
     valtio: "*"
     wonka: "*"
     xstate: "*"
@@ -12760,13 +12759,13 @@ __metadata:
       optional: true
     "@babel/template":
       optional: true
+    "@tanstack/query-core":
+      optional: true
     "@urql/core":
       optional: true
     immer:
       optional: true
     optics-ts:
-      optional: true
-    react-query:
       optional: true
     valtio:
       optional: true
@@ -12774,7 +12773,7 @@ __metadata:
       optional: true
     xstate:
       optional: true
-  checksum: 681e62005fbe2128e257f86cffe6d72b34b89dd4beaa9401d9ef830a39bd2698240c878fa19d91c9036d27db4ab73189cc234ca5c11985018312940418039d65
+  checksum: bbe8bde9227fb65c201822f0631950034419a1b17f64bd482f6a66f114fe40d0a926814d98f452dc1bff8dd373c05058932bbd878bb3d4480f6ed7c7ec40b97d
   languageName: node
   linkType: hard
 
@@ -15077,7 +15076,7 @@ __metadata:
   languageName: node
   linkType: hard
 
-"pbkdf2@npm:^3.0.3, pbkdf2@npm:^3.1.2":
+"pbkdf2@npm:^3.0.3":
   version: 3.1.2
   resolution: "pbkdf2@npm:3.1.2"
   dependencies:
