@@ -52,6 +52,8 @@ body {
         --color-text: #{$color-text-dark};
         --color-transaction-group-header: #{$color-transaction-group-header-dark};
         --color-transaction-group-header-text: #{$color-transaction-group-header-text-dark};
+        --color-highlight-mainnet: #{$color-highlight-mainnet-dark};
+        --color-highlight-testnet: #{$color-highlight-testnet-dark};
 
         .bg {
             background-image: url('../assets/images/bg-dark.jpg');
@@ -63,6 +65,7 @@ body {
 
     &.mainnet {
         --color-cta: #{$color-blue};
+        --color-highlight: #{$color-highlight-mainnet};
     }
 }
 

@@ -48,9 +48,7 @@
     &__clickable {
         &:hover {
             cursor: pointer;
-
-            // TODO Set a better color.
-            background-color: aquamarine;
+            background-color: $color-highlight;
         }
     }
 
