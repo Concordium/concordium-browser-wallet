@@ -58,7 +58,7 @@ export default function ChangePasscode() {
                             <FormPassword
                                 control={f.control}
                                 name="currentPasscode"
-                                label="Enter current passcode"
+                                label={t('labels.currentPasscode')}
                                 className="m-b-20"
                                 rules={{
                                     required: tSetup('setupPasscode.form.passcodeRequired'),
@@ -68,7 +68,7 @@ export default function ChangePasscode() {
                             <FormPassword
                                 control={f.control}
                                 name="newPasscode"
-                                label="Enter new passcode"
+                                label={t('labels.newPasscode')}
                                 rules={{
                                     required: tSetup('setupPasscode.form.passcodeRequired'),
                                     minLength: { value: 6, message: tSetup('setupPasscode.form.passcodeMinLength') },
@@ -77,7 +77,7 @@ export default function ChangePasscode() {
                             <FormPassword
                                 control={f.control}
                                 name="newPasscodeRepeated"
-                                label="Enter new passcode again"
+                                label={t('labels.newPasscodeRepeated')}
                                 className="m-t-10"
                                 rules={{ validate: validateNewPasscode(f.getValues) }}
                             />
