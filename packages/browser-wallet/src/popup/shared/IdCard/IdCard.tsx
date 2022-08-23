@@ -26,7 +26,7 @@ type EditNameProps = {
 
 function EditableName({ name, onChange }: EditNameProps) {
     const [isEditing, setIsEditing] = useState(false);
-    const methods = useForm();
+    const methods = useForm<EditNameForm>();
 
     useEffect(() => {
         methods.setValue('name', name);
