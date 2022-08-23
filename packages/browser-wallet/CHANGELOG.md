@@ -5,6 +5,7 @@
 ### Added
 
 -   Login screen.
+-   Change passcode settings page.
 
 ## 0.3.0 2022-8-18
 
