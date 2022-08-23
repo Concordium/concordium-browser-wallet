@@ -26,11 +26,12 @@ type ItemProps = {
 
 function AccountListItem({ account: { address }, checked, selected, totalBalance }: ItemProps) {
     return (
-        <div className={clsx('account-list-item', checked && 'account-list-item--checked')}>
-            <div className="account-list-item__account">
+        <div className={clsx('main-layout__header-list-item', checked && 'main-layout__header-list-item--checked')}>
+            <div className="main-layout__header-list-item__primary">
                 <div className="flex align-center">
                     {/* TODO add account name */}
-                    {displaySplitAddress(address)} {selected && <CheckmarkIcon className="account-list-item__check" />}
+                    {displaySplitAddress(address)}{' '}
+                    {selected && <CheckmarkIcon className="main-layout__header-list-item__check" />}
                 </div>
                 <CopyButton
                     className="absolute r-0"
@@ -39,8 +40,8 @@ function AccountListItem({ account: { address }, checked, selected, totalBalance
                     tabIndex={-1}
                 />
             </div>
-            <div className="account-list-item__identity">Identity 1{/* TODO get from account */}</div>
-            <div className="account-list-item__amount">{displayAsCcd(totalBalance)}</div>
+            <div className="main-layout__header-list-item__secondary">Identity 1{/* TODO get from account */}</div>
+            <div className="main-layout__header-list-item__secondary mono">{displayAsCcd(totalBalance)}</div>
         </div>
     );
 }

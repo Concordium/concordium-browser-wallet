@@ -1975,7 +1975,7 @@ __metadata:
     tsconfig-paths-webpack-plugin: ^3.5.2
     typescript: ^4.3.5
     uuid: ^8.3.2
-    wallet-common-helpers: "https://github.com/Concordium/concordium-wallet-common-helpers.git#091af25fe2ced4137860a5f05b54eb6b89e55428"
+    wallet-common-helpers: "https://github.com/Concordium/concordium-wallet-common-helpers.git#1cecd823052a8e6aa83eb5854faa7c1a7316d31b"
   languageName: unknown
   linkType: soft
 
@@ -1996,9 +1996,9 @@ __metadata:
   languageName: node
   linkType: hard
 
-"@concordium/common-sdk@npm:^1.0.1":
-  version: 1.0.1
-  resolution: "@concordium/common-sdk@npm:1.0.1"
+"@concordium/common-sdk@npm:^2.3.2":
+  version: 2.3.2
+  resolution: "@concordium/common-sdk@npm:2.3.2"
   dependencies:
     "@concordium/rust-bindings": 0.1.1
     bs58check: ^2.1.2
@@ -2006,7 +2006,7 @@ __metadata:
     hash.js: ^1.1.7
     json-bigint: ^1.0.0
     uuid: ^8.3.2
-  checksum: a664e0a3d077630ac44410e1cc8c6f18d1fb30e08b14d264ad8a8a37276728ac40767c08f4a54d4b80725f06e076ed9c88c49efd75dd2cb42937fe9fec9ff0da
+  checksum: 6f4dbb6783b1bf6d192d3d82174a3d55c571bf59a1c2a959ec0adc7a08daeb5c7c1369806f4f4f22a9097832a1e1f2a0fbeab724759589f0b80a334a88daa389
   languageName: node
   linkType: hard
 
@@ -4753,6 +4753,15 @@ __metadata:
   version: 5.0.3
   resolution: "@types/parse5@npm:5.0.3"
   checksum: d6b7495cb1850f9f2e9c5e103ede9f2d30a5320669707b105c403868adc9e4bf8d3a7ff314cc23f67826bbbbbc0e6147346ce9062ab429f099dba7a01f463919
+  languageName: node
+  linkType: hard
+
+"@types/pbkdf2@npm:^3.1.0":
+  version: 3.1.0
+  resolution: "@types/pbkdf2@npm:3.1.0"
+  dependencies:
+    "@types/node": "*"
+  checksum: d15024b1957c21cf3b8887329d9bd8dfde754cf13a09d76ae25f1391cfc62bb8b8d7b760773c5dbaa748172fba8b3e0c3dbe962af6ccbd69b76df12a48dfba40
   languageName: node
   linkType: hard
 
@@ -7607,6 +7616,7 @@ __metadata:
   dependencies:
     "@types/jest": ^28.1.7
     "@types/node": ^17.0.25
+    "@types/pbkdf2": ^3.1.0
     "@typescript-eslint/eslint-plugin": ^5.20.0
     "@typescript-eslint/parser": ^5.20.0
     eslint: 7
@@ -12731,16 +12741,16 @@ __metadata:
   linkType: hard
 
 "jotai@npm:^1.6.5":
-  version: 1.7.2
-  resolution: "jotai@npm:1.7.2"
+  version: 1.8.0
+  resolution: "jotai@npm:1.8.0"
   peerDependencies:
     "@babel/core": "*"
     "@babel/template": "*"
+    "@tanstack/query-core": "*"
     "@urql/core": "*"
     immer: "*"
     optics-ts: "*"
     react: ">=16.8"
-    react-query: "*"
     valtio: "*"
     wonka: "*"
     xstate: "*"
@@ -12749,13 +12759,13 @@ __metadata:
       optional: true
     "@babel/template":
       optional: true
+    "@tanstack/query-core":
+      optional: true
     "@urql/core":
       optional: true
     immer:
       optional: true
     optics-ts:
-      optional: true
-    react-query:
       optional: true
     valtio:
       optional: true
@@ -12763,7 +12773,7 @@ __metadata:
       optional: true
     xstate:
       optional: true
-  checksum: 681e62005fbe2128e257f86cffe6d72b34b89dd4beaa9401d9ef830a39bd2698240c878fa19d91c9036d27db4ab73189cc234ca5c11985018312940418039d65
+  checksum: bbe8bde9227fb65c201822f0631950034419a1b17f64bd482f6a66f114fe40d0a926814d98f452dc1bff8dd373c05058932bbd878bb3d4480f6ed7c7ec40b97d
   languageName: node
   linkType: hard
 
@@ -19239,11 +19249,11 @@ __metadata:
   languageName: node
   linkType: hard
 
-"wallet-common-helpers@https://github.com/Concordium/concordium-wallet-common-helpers.git#091af25fe2ced4137860a5f05b54eb6b89e55428":
+"wallet-common-helpers@https://github.com/Concordium/concordium-wallet-common-helpers.git#1cecd823052a8e6aa83eb5854faa7c1a7316d31b":
   version: 1.5.0
-  resolution: "wallet-common-helpers@https://github.com/Concordium/concordium-wallet-common-helpers.git#commit=091af25fe2ced4137860a5f05b54eb6b89e55428"
+  resolution: "wallet-common-helpers@https://github.com/Concordium/concordium-wallet-common-helpers.git#commit=1cecd823052a8e6aa83eb5854faa7c1a7316d31b"
   dependencies:
-    "@concordium/common-sdk": ^1.0.1
+    "@concordium/common-sdk": ^2.3.2
     buffer: ^6.0.3
     cbor: ^8.0.0
     clsx: ^1.1.1
@@ -19252,7 +19262,7 @@ __metadata:
   peerDependencies:
     react: ">=16"
     react-dom: ">=16"
-  checksum: 2c1c4345cd9665f758f5f01c6794a6b66907fdcfef7f59b3649a1df4b1e75693d54c0bf254f229791c4fa40065163970c781c120da2e0dccbbbbc74e0b47f9af
+  checksum: 8d951d7446a08e04fa616240e06f575b95a537560459f57feacf5ef2dd44fb0a5586a049ff232f8f42c581713fd84fab7937336835edd0dc6dc7e64e8c682f62
   languageName: node
   linkType: hard
 

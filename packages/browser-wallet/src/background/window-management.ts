@@ -77,6 +77,17 @@ export const setPopupSize = async ({ width, height }: Dimensions) => {
     }
 };
 
+export const openWindow = async () => {
+    const isOpen = await testPopupOpen();
+
+    if (!isOpen) {
+        const { id } = await spawnPopup();
+        popupId = id;
+    } else {
+        focusExisting();
+    }
+};
+
 /**
  * Ensures the handler is executed when a popup window is on screen.
  */
@@ -84,15 +95,7 @@ const ensureAvailableWindow =
     (handler: ExtensionMessageHandler): ExtensionMessageHandler =>
     (...args) => {
         (async () => {
-            const isOpen = await testPopupOpen();
-
-            if (!isOpen) {
-                const { id } = await spawnPopup();
-                popupId = id;
-            } else {
-                focusExisting();
-            }
-
+            await openWindow();
             handler(...args);
         })();
 

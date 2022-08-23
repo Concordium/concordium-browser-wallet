@@ -31,6 +31,10 @@ const t = {
             required: 'A seed phrase must be provided',
             error: 'Incorrect secret recovery phrase',
         },
+        seedPhrase: {
+            required: 'Please specify a 24 word BIP 39 seed phrase',
+            length: 'Please enter 24 words',
+        },
     },
     chooseNetwork: {
         descriptionP1: 'Here you can choose whether to connect to the Concordium Mainnet or Testnet.',
