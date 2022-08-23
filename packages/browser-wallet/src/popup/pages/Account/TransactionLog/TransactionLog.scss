@@ -38,12 +38,21 @@
 
 .transaction-element {
     position: relative;
-    padding: 0 20px 0 10px;
+    padding: 0 rem(16px) 0 rem(8px);
     display: flex;
     flex-direction: column;
     justify-content: center;
-    border-top: 0.5px solid transparent;
+    border-top: rem(0.5px) solid transparent;
     height: 58px;
+
+    &__clickable {
+        &:hover {
+            cursor: pointer;
+
+            // TODO Set a better color.
+            background-color: aquamarine;
+        }
+    }
 
     & + & {
         border-top-color: grey;
@@ -85,5 +94,56 @@
 
     &__failed {
         padding-left: 30px;
+    }
+}
+
+.transaction-details {
+    background-color: $color-bg;
+    width: 100%;
+    height: 100%;
+    overflow: overlay;
+
+    &__header {
+        height: rem(20px);
+        font-size: rem(8px);
+        color: $color-transaction-group-header-text;
+        padding-left: rem(5px);
+        line-height: rem(12px);
+        display: flex;
+        align-items: center;
+        background-color: $color-transaction-group-header;
+        top: 0;
+        position: sticky;
+        z-index: 1;
+    }
+
+    &__close {
+        top: 0;
+        right: rem(10px);
+        position: absolute;
+    }
+
+    &__dynamic-height-item,
+    &__item {
+        position: relative;
+        padding: 0 rem(16px) 0 rem(8px);
+        display: flex;
+        flex-direction: column;
+        justify-content: center;
+        border-top: 0.5px solid transparent;
+        border-top-color: $color-grey;
+        height: rem(50px);
+        word-break: break-all;
+    }
+
+    &__title {
+        color: $color-text-faded;
+    }
+
+    &__dynamic-height-item {
+        height: auto;
+        padding-top: rem(5px);
+        padding-bottom: rem(5px);
+        min-height: rem(50px);
     }
 }

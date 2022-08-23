@@ -10,7 +10,8 @@ import networkSettings from '@popup/pages/NetworkSettings/i18n/da';
 import visualSettings from '@popup/pages/VisualSettings/i18n/da';
 import about from '@popup/pages/About/i18n/da';
 import addAccount from '@popup/pages/AddAccount/i18n/da';
-import login from '@popup/pages/Login/i18n/en';
+import login from '@popup/pages/Login/i18n/da';
+import transactionLog from '@popup/pages/Account/TransactionLog/i18n/da';
 
 import type en from './en';
 
@@ -28,6 +29,7 @@ const t: typeof en = {
     addAccount,
     about,
     login,
+    transactionLog,
 };
 
 export default t;

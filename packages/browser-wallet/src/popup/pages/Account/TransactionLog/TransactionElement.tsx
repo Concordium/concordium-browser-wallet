@@ -17,8 +17,9 @@ export const transactionElementHeight = 58;
 
 interface Props {
     transaction: BrowserWalletTransaction;
-    style: CSSProperties;
+    style?: CSSProperties;
     accountAddress: string;
+    onClick?: () => void;
 }
 
 const onlyTime = Intl.DateTimeFormat(undefined, {
@@ -161,15 +162,22 @@ function isGreenAmount(transaction: BrowserWalletTransaction, accountAddress: st
 /**
  * A transaction element in a TransactionList.
  */
-export default function TransactionElement({ accountAddress, transaction, style }: Props) {
+export default function TransactionElement({ accountAddress, transaction, style, onClick }: Props) {
     const transactionTime = onlyTime(dateFromTimestamp(transaction.time, TimeStampUnit.seconds));
     const failed = transaction.status === TransactionStatus.Failed;
 
     return (
         <div
-            className={clsx('transaction-element', failed && 'transaction-element__failed')}
+            className={clsx(
+                'transaction-element',
+                failed && 'transaction-element__failed',
+                onClick && 'transaction-element__clickable'
+            )}
             style={style}
             role="button"
+            onClick={onClick}
+            onKeyPress={onClick}
+            tabIndex={0}
         >
             {failed ? <Warning className="transaction-element__warning" height="20" /> : null}
             <SidedRow

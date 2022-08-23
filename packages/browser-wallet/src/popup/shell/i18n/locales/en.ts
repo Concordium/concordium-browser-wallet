@@ -11,6 +11,7 @@ import visualSettings from '@popup/pages/VisualSettings/i18n/en';
 import about from '@popup/pages/About/i18n/en';
 import addAccount from '@popup/pages/AddAccount/i18n/en';
 import login from '@popup/pages/Login/i18n/en';
+import transactionLog from '@popup/pages/Account/TransactionLog/i18n/en';
 
 const t = {
     shared,
@@ -26,6 +27,7 @@ const t = {
     addAccount,
     about,
     login,
+    transactionLog,
 };
 
 export default t;

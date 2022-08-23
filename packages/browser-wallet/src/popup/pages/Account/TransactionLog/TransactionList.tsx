@@ -19,6 +19,7 @@ interface InfiniteTransactionListProps {
     hasNextPage: boolean;
     isNextPageLoading: boolean;
     loadNextPage: () => Promise<void>;
+    onTransactionClick(transaction: BrowserWalletTransaction): void;
 }
 
 const isHeader = (item: string | BrowserWalletTransaction): item is string => typeof item === 'string';
@@ -69,6 +70,7 @@ function InfiniteTransactionList({
     loadNextPage,
     hasNextPage,
     isNextPageLoading,
+    onTransactionClick,
 }: InfiniteTransactionListProps) {
     const groups = useTransactionGroups(transactions);
     const headersAndTransactions = groups.flat(2);
@@ -122,6 +124,7 @@ function InfiniteTransactionList({
                                             style={style}
                                             key={item.transactionHash ?? item.id}
                                             transaction={item}
+                                            onClick={() => onTransactionClick(item)}
                                         />
                                     );
                                 }}
@@ -134,10 +137,14 @@ function InfiniteTransactionList({
     );
 }
 
+export interface TransactionListProps {
+    onTransactionClick(transaction: BrowserWalletTransaction): void;
+}
+
 /**
  * Displays a list of transactions from an account's transaction history.
  */
-export default function TransactionList() {
+export default function TransactionList({ onTransactionClick }: TransactionListProps) {
     const accountAddress = useAtomValue(selectedAccountAtom);
     const [transactions, setTransactions] = useState<BrowserWalletTransaction[]>([]);
     const [isNextPageLoading, setIsNextPageLoading] = useState<boolean>(false);
@@ -196,6 +203,7 @@ export default function TransactionList() {
                     loadNextPage={loadNextPage}
                     hasNextPage={hasNextPage}
                     isNextPageLoading={isNextPageLoading}
+                    onTransactionClick={onTransactionClick}
                 />
             </div>
         );
