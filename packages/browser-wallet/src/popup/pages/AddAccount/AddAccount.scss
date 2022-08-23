@@ -23,4 +23,9 @@
             fill: $color-cta;
         }
     }
+
+    &__no-identity-button {
+        margin-top: auto;
+        margin-bottom: rem(40px);
+    }
 }

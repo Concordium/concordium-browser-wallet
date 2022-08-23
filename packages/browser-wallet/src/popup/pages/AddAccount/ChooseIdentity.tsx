@@ -7,6 +7,8 @@ import IdentityProviderIcon from '@popup/shared/IdentityProviderIcon';
 import IdCard from '@popup/shared/IdCard';
 import { identitiesAtom, selectedIdentityIdAtom, identityProvidersAtom } from '@popup/store/identity';
 import { Identity, CreationStatus } from '@shared/storage/types';
+import { absoluteRoutes } from '@popup/constants/routes';
+import Button from '@popup/shared/Button';
 
 export default function ChooseIdentity() {
     const { t } = useTranslation('addAccount');
@@ -19,6 +21,21 @@ export default function ChooseIdentity() {
         (identity: Identity) => providers.find((p) => p.ipInfo.ipIdentity === identity.provider),
         [providers]
     );
+
+    if (!identities.length) {
+        return (
+            <div className="flex-column align-center h-full">
+                <p className="m-t-20 m-h-40">{t('noIdentities')}</p>
+                <Button
+                    className="add-account-page__no-identity-button"
+                    width="wide"
+                    onClick={() => nav(absoluteRoutes.home.identities.add.path)}
+                >
+                    {t('createIdentity')}
+                </Button>
+            </div>
+        );
+    }
 
     return (
         <div className="flex-column align-center">

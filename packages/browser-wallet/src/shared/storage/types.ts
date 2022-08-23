@@ -122,7 +122,7 @@ export interface BaseCredential {
     credId: string;
     credNumber: number;
     status: CreationStatus;
-    identityId: number; // Remove if indexed under it;
+    identityId: number;
     net: Network;
     // Policy (is in accountInfo)
     // CredentialIndex = 0
