@@ -11,6 +11,7 @@
 @import '../shared/CloseButton/CloseButton';
 @import '../shared/Carousel/Carousel';
 @import '../shared/Modal/Modal';
+@import '../shared/IdentityProviderIcon/IdentityProviderIcon';
 @import '../shared/SidedRow/SidedRow';
 
 // Pages
@@ -20,6 +21,8 @@
 @import '../pages/Setup/Setup';
 @import '../pages/ConnectionRequest/ConnectionRequest';
 @import '../pages/Settings/Settings';
+@import '../pages/Identity/Identity';
+@import '../pages/IdentityIssuance/IdentityIssuance';
 @import '../pages/About/About';
 @import '../pages/Login/Login';
 @import '../pages/NetworkSettings/NetworkSettings';

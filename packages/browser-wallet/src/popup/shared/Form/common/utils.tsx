@@ -71,7 +71,10 @@ export const makeControlled = <TProps extends RequiredControlledFieldProps>(Fiel
                         onChange,
                         onBlur,
                         error: error?.message,
-                        valid: !error?.message && (isTouched || isSubmitted) && Object.keys(rules ?? {}).length > 0,
+                        valid:
+                            !error?.message && (isTouched || isSubmitted) && Object.keys(rules ?? {}).length > 0
+                                ? 1
+                                : 0,
                         // eslint-disable-next-line @typescript-eslint/no-explicit-any
                     } as any;
 

@@ -10,6 +10,7 @@ import { storedConnectedSites, storedSelectedAccount, storedCurrentNetwork } fro
 import JSONBig from 'json-bigint';
 import bgMessageHandler from './message-handler';
 import { forwardToPopup, HandleMessage, HandleResponse, RunCondition, setPopupSize } from './window-management';
+import { identityIssuanceHandler } from './identity-issuance';
 
 /**
  * Determines whether the given url has been whitelisted by any account.
@@ -74,6 +75,10 @@ const injectScript: ExtensionMessageHandler = (_msg, sender, respond) => {
     return true;
 };
 
+bgMessageHandler.handleMessage(
+    createMessageTypeFilter(InternalMessageType.StartIdentityIssuance),
+    identityIssuanceHandler
+);
 bgMessageHandler.handleMessage(createMessageTypeFilter(InternalMessageType.Init), injectScript);
 bgMessageHandler.handleMessage(createMessageTypeFilter(InternalMessageType.SetViewSize), ({ payload }) => {
     setPopupSize(payload);
