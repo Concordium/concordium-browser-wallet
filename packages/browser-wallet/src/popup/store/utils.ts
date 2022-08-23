@@ -1,4 +1,5 @@
 import {
+    sessionPasscode,
     StorageAccessor,
     storedConnectedSites,
     storedCredentials,
@@ -17,6 +18,7 @@ const accessorMap = {
     [ChromeStorageKey.SeedPhrase]: storedEncryptedSeedPhrase,
     [ChromeStorageKey.NetworkConfiguration]: storedCurrentNetwork,
     [ChromeStorageKey.Theme]: storedTheme,
+    [ChromeStorageKey.Passcode]: sessionPasscode,
 };
 
 export type AsyncWrapper<V> = {

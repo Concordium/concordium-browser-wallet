@@ -42,3 +42,4 @@ export const storedCurrentNetwork = makeStorageAccessor<NetworkConfiguration>(
 export const storedSelectedAccount = makeStorageAccessor<string>('local', ChromeStorageKey.SelectedAccount);
 export const storedEncryptedSeedPhrase = makeStorageAccessor<EncryptedData>('local', ChromeStorageKey.SeedPhrase);
 export const storedTheme = makeStorageAccessor<Theme>('local', ChromeStorageKey.Theme);
+export const sessionPasscode = makeStorageAccessor<string>('session', ChromeStorageKey.Passcode);

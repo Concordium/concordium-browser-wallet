@@ -26,3 +26,9 @@ export const networkConfigurationAtom = atom<NetworkConfiguration, NetworkConfig
         popupMessageHandler.broadcast(EventType.ChainChanged, networkConfiguration.genesisHash);
     }
 );
+
+export const sessionPasscodeAtom = atomWithChromeStorage<string | undefined>(
+    ChromeStorageKey.Passcode,
+    undefined,
+    true
+);
