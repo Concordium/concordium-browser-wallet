@@ -1,4 +1,4 @@
-import { ChromeStorageKey, EncryptedData, Theme, WalletCredential } from './types';
+import { ChromeStorageKey, EncryptedData, NetworkConfiguration, Theme, WalletCredential } from './types';
 
 export type StorageAccessor<V> = {
     /**
@@ -35,7 +35,10 @@ export const storedConnectedSites = makeStorageAccessor<Record<string, string[]>
     ChromeStorageKey.ConnectedSites
 );
 export const storedCredentials = makeStorageAccessor<WalletCredential[]>('local', ChromeStorageKey.Credentials);
-export const storedJsonRpcUrl = makeStorageAccessor<string>('local', ChromeStorageKey.JsonRpcUrl);
+export const storedCurrentNetwork = makeStorageAccessor<NetworkConfiguration>(
+    'local',
+    ChromeStorageKey.NetworkConfiguration
+);
 export const storedSelectedAccount = makeStorageAccessor<string>('local', ChromeStorageKey.SelectedAccount);
 export const storedEncryptedSeedPhrase = makeStorageAccessor<EncryptedData>('local', ChromeStorageKey.SeedPhrase);
 export const storedTheme = makeStorageAccessor<Theme>('local', ChromeStorageKey.Theme);

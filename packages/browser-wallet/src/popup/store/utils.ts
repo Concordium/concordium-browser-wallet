@@ -2,8 +2,8 @@ import {
     StorageAccessor,
     storedConnectedSites,
     storedCredentials,
+    storedCurrentNetwork,
     storedEncryptedSeedPhrase,
-    storedJsonRpcUrl,
     storedSelectedAccount,
     storedTheme,
 } from '@shared/storage/access';
@@ -14,8 +14,8 @@ const accessorMap = {
     [ChromeStorageKey.ConnectedSites]: storedConnectedSites,
     [ChromeStorageKey.Credentials]: storedCredentials,
     [ChromeStorageKey.SelectedAccount]: storedSelectedAccount,
-    [ChromeStorageKey.JsonRpcUrl]: storedJsonRpcUrl,
     [ChromeStorageKey.SeedPhrase]: storedEncryptedSeedPhrase,
+    [ChromeStorageKey.NetworkConfiguration]: storedCurrentNetwork,
     [ChromeStorageKey.Theme]: storedTheme,
 };
 

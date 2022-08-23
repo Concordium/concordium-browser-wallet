@@ -5,7 +5,7 @@ import {
     MessageType,
 } from '@concordium/browser-wallet-message-hub';
 import { HttpProvider } from '@concordium/web-sdk';
-import { storedConnectedSites, storedSelectedAccount, storedJsonRpcUrl } from '@shared/storage/access';
+import { storedConnectedSites, storedSelectedAccount, storedCurrentNetwork } from '@shared/storage/access';
 
 import JSONBig from 'json-bigint';
 import bgMessageHandler from './message-handler';
@@ -32,7 +32,7 @@ async function performRpcCall(
 ) {
     const isWhiteListed = await isWhiteListedForAnyAccount(senderUrl);
     if (isWhiteListed) {
-        const url = await storedJsonRpcUrl.get();
+        const url = (await storedCurrentNetwork.get())?.jsonRpcUrl;
         if (!url) {
             onFailure('No JSON-RPC URL available');
         } else {

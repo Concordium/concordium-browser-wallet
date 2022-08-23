@@ -4,17 +4,14 @@ import { useNavigate } from 'react-router-dom';
 import Button from '@popup/shared/Button';
 import { absoluteRoutes } from '@popup/constants/routes';
 import { useSetAtom } from 'jotai';
-import { jsonRpcUrlAtom } from '@popup/store/settings';
 import { useTranslation } from 'react-i18next';
-
-// TODO The real go-live values must be used here.
-const mainnetJsonRpcUrl = 'http://localhost:9096';
-const testnetJsonRpcUrl = 'http://localhost:9095';
+import { networkConfigurationAtom } from '@popup/store/settings';
+import { mainnet, testnet } from '../NetworkSettings/NetworkSettings';
 
 export function ChooseNetwork() {
     const navigate = useNavigate();
     const { t } = useTranslation('setup');
-    const setJsonRpcUrl = useSetAtom(jsonRpcUrlAtom);
+    const setNetworkConfiguration = useSetAtom(networkConfigurationAtom);
 
     return (
         <>
@@ -31,7 +28,7 @@ export function ChooseNetwork() {
                         className="onboarding-setup__page-with-header__mainnet-button"
                         width="wide"
                         onClick={() => {
-                            setJsonRpcUrl(mainnetJsonRpcUrl);
+                            setNetworkConfiguration(mainnet);
                             navigate(absoluteRoutes.home.identities.path);
                         }}
                     >
@@ -41,7 +38,7 @@ export function ChooseNetwork() {
                         className="onboarding-setup__page-with-header__testnet-button"
                         width="wide"
                         onClick={() => {
-                            setJsonRpcUrl(testnetJsonRpcUrl);
+                            setNetworkConfiguration(testnet);
                             navigate(absoluteRoutes.home.identities.path);
                         }}
                     >

@@ -1,7 +1,7 @@
 export enum ChromeStorageKey {
     ConnectedSites = 'connectedSites',
     Credentials = 'credentials',
-    JsonRpcUrl = 'jsonRpcUrl',
+    NetworkConfiguration = 'networkConfiguration',
     SelectedAccount = 'selectedAccont',
     SeedPhrase = 'seedPhrase',
     Theme = 'theme',
@@ -30,4 +30,11 @@ interface EncryptionMetaData {
 export interface EncryptedData {
     cipherText: string;
     metadata: EncryptionMetaData;
+}
+
+export interface NetworkConfiguration {
+    genesisHash: string;
+    name: string;
+    jsonRpcUrl: string;
+    explorerUrl: string;
 }
