@@ -2,12 +2,12 @@ import { useAtom } from 'jotai';
 import React from 'react';
 import { networkConfigurationAtom } from '@popup/store/settings';
 import SidedRow from '@popup/shared/SidedRow';
-import CheckmarkIconMainnet from '@assets/svg/checkmark-blue.svg';
-import CheckmarkIconTestnet from '@assets/svg/checkmark-dark-green.svg';
+import CheckmarkIcon from '@assets/svg/checkmark-blue.svg';
 
 import { NetworkConfiguration } from '@shared/storage/types';
 import Button from '@popup/shared/Button';
 import clsx from 'clsx';
+import { useTranslation } from 'react-i18next';
 
 export const mainnet: NetworkConfiguration = {
     genesisHash: '9dd9ca4d19e9393877d2c44b70f89acbfc0883c2243e5eeaecc0d1cd0503f478',
@@ -36,24 +36,26 @@ function isMainnet(network: NetworkConfiguration) {
 }
 
 function NetworkConfigurationComponent({ networkConfiguration }: { networkConfiguration: NetworkConfiguration }) {
+    const { t } = useTranslation('networkSettings');
     const [currentNetworkConfiguration, setCurrentNetworkConfiguration] = useAtom(networkConfigurationAtom);
+    const isConfigurationMainnet = isMainnet(networkConfiguration);
 
     if (networkConfiguration.genesisHash === currentNetworkConfiguration.genesisHash) {
         return (
             <div className="inline-flex align-center relative">
                 <div
                     className={clsx(
-                        networkConfiguration.genesisHash === mainnet.genesisHash
+                        isConfigurationMainnet
                             ? 'network-settings-page__element-mainnet'
                             : 'network-settings-page__element-testnet'
                     )}
                 >
-                    Connected
+                    {t('connected')}
                 </div>
                 {isMainnet(networkConfiguration) ? (
-                    <CheckmarkIconMainnet className="network-settings-page__icon" />
+                    <CheckmarkIcon className="network-settings-page__icon-mainnet" />
                 ) : (
-                    <CheckmarkIconTestnet className="network-settings-page__icon" />
+                    <CheckmarkIcon className="network-settings-page__icon-testnet" />
                 )}
             </div>
         );
@@ -62,14 +64,14 @@ function NetworkConfigurationComponent({ networkConfiguration }: { networkConfig
     return (
         <Button
             className={clsx(
-                networkConfiguration.genesisHash === mainnet.genesisHash
+                isConfigurationMainnet
                     ? 'network-settings-page__element-mainnet'
                     : 'network-settings-page__element-testnet'
             )}
             clear
             onClick={() => setCurrentNetworkConfiguration(networkConfiguration)}
         >
-            Connect
+            {t('connect')}
         </Button>
     );
 }

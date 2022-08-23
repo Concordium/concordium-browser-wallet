@@ -32,17 +32,24 @@
     }
 
     &__icon {
-        width: rem(8px);
-        height: rem(8px);
-        margin-left: rem(5px);
-        margin-bottom: rem(3px);
+        &-testnet,
+        &-mainnet {
+            width: rem(8px);
+            height: rem(8px);
+            margin-left: rem(5px);
+            margin-bottom: rem(3px);
+        }
 
         &-testnet {
-            fill: $color-cta-othernet;
+            path {
+                fill: $color-cta-othernet;
+            }
         }
 
         &-mainnet {
-            fill: $color-cta-mainnet;
+            path {
+                fill: $color-cta-mainnet;
+            }
         }
     }
 }

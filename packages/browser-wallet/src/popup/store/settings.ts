@@ -21,8 +21,6 @@ export const networkConfigurationAtom = atom<NetworkConfiguration, NetworkConfig
     (get) => get(storedNetworkConfigurationAtom),
     (_, set, networkConfiguration) => {
         set(storedNetworkConfigurationAtom, networkConfiguration);
-
-        // TODO What does it make sense to broadcast with this event? It the event even needed anymore?
         popupMessageHandler.broadcast(EventType.ChainChanged, networkConfiguration.genesisHash);
     }
 );
