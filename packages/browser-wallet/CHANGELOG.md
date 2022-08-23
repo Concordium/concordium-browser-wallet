@@ -5,6 +5,7 @@
 ### Added
 
 -   Login screen.
+-   Transaction details view when clicking a transaction in the transaction list.
 
 ## 0.3.0 2022-8-18
 
