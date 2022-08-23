@@ -3,6 +3,11 @@
     padding: rem(10px);
     height: 100%;
 
+    &__main {
+        overflow: overlay;
+        height: 100%;
+    }
+
     &__close {
         position: absolute;
         top: rem(1px);

@@ -245,7 +245,7 @@ export async function getTransactions(
 }
 
 export async function getIdentityProviders(): Promise<IdentityProvider[]> {
-    const proxyPath = `/v0/ip_info`;
+    const proxyPath = `/v1/ip_info`;
     const response = await walletProxy.get(proxyPath);
     return response.data;
 }

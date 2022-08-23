@@ -24,8 +24,9 @@ export const selectedIdentityAtom = atom<Identity | undefined, Identity | undefi
             if (selectedIdentity.id !== id) {
                 throw new Error('Updating selected identity with new id');
             }
-            identities[index] = selectedIdentity;
-            set(identitiesAtom, identities);
+            const newIdentities = [...identities];
+            newIdentities[index] = selectedIdentity;
+            set(identitiesAtom, newIdentities);
         }
     }
 );

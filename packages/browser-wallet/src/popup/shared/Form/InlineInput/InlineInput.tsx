@@ -8,7 +8,7 @@ import { makeControlled } from '../common/utils';
 type Props = Pick<InputHTMLAttributes<HTMLInputElement>, 'type' | 'className' | 'autoFocus'> &
     RequiredControlledFieldProps &
     CommonFieldProps & {
-        fallbackValue: string;
+        fallbackValue?: string;
     };
 
 export function InlineInput({

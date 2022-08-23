@@ -1922,7 +1922,6 @@ __metadata:
     "@concordium/web-sdk": ^0.4.0
     "@craftamap/esbuild-plugin-html": ^0.3.2
     "@mdx-js/react": ^1.6.22
-    "@scure/bip32": ^1.1.0
     "@scure/bip39": ^1.1.0
     "@storybook/addon-actions": ^6.5.7
     "@storybook/addon-docs": ^6.5.7
@@ -1960,7 +1959,6 @@ __metadata:
     jotai: ^1.6.5
     json-bigint: ^1.0.0
     lodash.groupby: ^4.6.0
-    pbkdf2: ^3.1.2
     react: ^18.0.0
     react-dom: ^18.0.0
     react-hook-form: ^7.30.0
@@ -2679,13 +2677,6 @@ __metadata:
   languageName: node
   linkType: hard
 
-"@noble/secp256k1@npm:~1.6.0":
-  version: 1.6.3
-  resolution: "@noble/secp256k1@npm:1.6.3"
-  checksum: 16eb3242533e645deb64444c771515f66bdc2ee0759894efd42fdeed4ab226ed29827aaaf6caa27d3d95b831452fd4246aa1007cd688aa462ad48fc084ab76e6
-  languageName: node
-  linkType: hard
-
 "@nodelib/fs.scandir@npm:2.1.5":
   version: 2.1.5
   resolution: "@nodelib/fs.scandir@npm:2.1.5"
@@ -2803,17 +2794,6 @@ __metadata:
   version: 1.1.1
   resolution: "@scure/base@npm:1.1.1"
   checksum: b4fc810b492693e7e8d0107313ac74c3646970c198bbe26d7332820886fa4f09441991023ec9aa3a2a51246b74409ab5ebae2e8ef148bbc253da79ac49130309
-  languageName: node
-  linkType: hard
-
-"@scure/bip32@npm:^1.1.0":
-  version: 1.1.0
-  resolution: "@scure/bip32@npm:1.1.0"
-  dependencies:
-    "@noble/hashes": ~1.1.1
-    "@noble/secp256k1": ~1.6.0
-    "@scure/base": ~1.1.0
-  checksum: e6102ab9038896861fca5628b8a97f3c4cb24a073cc9f333c71c747037d82e4423d1d111fd282ba212efaf73cbc5875702567fb4cf13b5f0eb23a5bab402e37e
   languageName: node
   linkType: hard
 
@@ -12761,16 +12741,16 @@ __metadata:
   linkType: hard
 
 "jotai@npm:^1.6.5":
-  version: 1.7.2
-  resolution: "jotai@npm:1.7.2"
+  version: 1.8.0
+  resolution: "jotai@npm:1.8.0"
   peerDependencies:
     "@babel/core": "*"
     "@babel/template": "*"
+    "@tanstack/query-core": "*"
     "@urql/core": "*"
     immer: "*"
     optics-ts: "*"
     react: ">=16.8"
-    react-query: "*"
     valtio: "*"
     wonka: "*"
     xstate: "*"
@@ -12779,13 +12759,13 @@ __metadata:
       optional: true
     "@babel/template":
       optional: true
+    "@tanstack/query-core":
+      optional: true
     "@urql/core":
       optional: true
     immer:
       optional: true
     optics-ts:
-      optional: true
-    react-query:
       optional: true
     valtio:
       optional: true
@@ -12793,7 +12773,7 @@ __metadata:
       optional: true
     xstate:
       optional: true
-  checksum: 681e62005fbe2128e257f86cffe6d72b34b89dd4beaa9401d9ef830a39bd2698240c878fa19d91c9036d27db4ab73189cc234ca5c11985018312940418039d65
+  checksum: bbe8bde9227fb65c201822f0631950034419a1b17f64bd482f6a66f114fe40d0a926814d98f452dc1bff8dd373c05058932bbd878bb3d4480f6ed7c7ec40b97d
   languageName: node
   linkType: hard
 
@@ -15096,7 +15076,7 @@ __metadata:
   languageName: node
   linkType: hard
 
-"pbkdf2@npm:^3.0.3, pbkdf2@npm:^3.1.2":
+"pbkdf2@npm:^3.0.3":
   version: 3.1.2
   resolution: "pbkdf2@npm:3.1.2"
   dependencies:
