@@ -6,7 +6,7 @@ import IdCard from '@popup/shared/IdCard';
 import { identityProvidersAtom, selectedIdentityAtom } from '@popup/store/identity';
 import { selectedAccountAtom } from '@popup/store/account';
 import { credentialsAtom, jsonRpcUrlAtom, seedPhraseAtom } from '@popup/store/settings';
-import { IdentityStatus, WalletCredential } from '@shared/storage/types';
+import { CreationStatus, WalletCredential } from '@shared/storage/types';
 import {
     JsonRpcClient,
     HttpProvider,
@@ -38,7 +38,7 @@ export default function Confirm() {
         [selectedIdentity?.provider]
     );
 
-    if (!selectedIdentity || selectedIdentity.status !== IdentityStatus.Confirmed) {
+    if (!selectedIdentity || selectedIdentity.status !== CreationStatus.Confirmed) {
         throw new Error('No selected Identity or selected is not confirmed');
     }
 
@@ -93,7 +93,7 @@ export default function Confirm() {
                 identityId: selectedIdentity.id,
                 credId,
                 credNumber,
-                status: IdentityStatus.Pending,
+                status: CreationStatus.Pending,
                 deploymentHash: getSignedCredentialDeploymentTransactionHash(request),
                 net: selectedIdentity.network,
             };
@@ -120,7 +120,7 @@ export default function Confirm() {
                     account={
                         {
                             address: 'Pending',
-                            status: IdentityStatus.Pending,
+                            status: CreationStatus.Pending,
                             identityId: selectedIdentity.id,
                         } as WalletCredential
                     }

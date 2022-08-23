@@ -7,7 +7,7 @@ import { popupMessageHandler } from '@popup/shared/message-handler';
 import { getIdentityProviders } from '@popup/shared/utils/wallet-proxy';
 import { InternalMessageType } from '@concordium/browser-wallet-message-hub';
 import { JsonRpcClient, HttpProvider } from '@concordium/web-sdk';
-import { IdentityStatus, Network, IdentityProvider } from '@shared/storage/types';
+import { CreationStatus, Network, IdentityProvider } from '@shared/storage/types';
 import Button from '@popup/shared/Button';
 import IdentityProviderIcon from '@popup/shared/IdentityProviderIcon';
 import PendingArrows from '@assets/svg/pending-arrows.svg';
@@ -56,7 +56,7 @@ function IdentityIssuanceStart({ onStart }: InnerProps) {
 
         updatePendingIdentity({
             id: identities.length,
-            status: IdentityStatus.Pending,
+            status: CreationStatus.Pending,
             index: identityIndex,
             name: `Identity ${identityIndex + 1}`,
             network: Network[net],

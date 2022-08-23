@@ -24,7 +24,10 @@ export enum Network {
     Mainnet = 919,
 }
 
-export enum IdentityStatus {
+/**
+ * Used to describe the status of an identity or a credential
+ */
+export enum CreationStatus {
     Pending = 'pending',
     Confirmed = 'confirmed',
     Rejected = 'rejected',
@@ -32,7 +35,7 @@ export enum IdentityStatus {
 
 export interface BaseIdentity {
     id: number;
-    status: IdentityStatus;
+    status: CreationStatus;
     name: string;
     index: number;
     network: Network;
@@ -40,17 +43,17 @@ export interface BaseIdentity {
 }
 
 export interface PendingIdentity extends BaseIdentity {
-    status: IdentityStatus.Pending;
+    status: CreationStatus.Pending;
     location: string;
 }
 
 export interface RejectedIdentity extends BaseIdentity {
-    status: IdentityStatus.Rejected;
+    status: CreationStatus.Rejected;
     error: string;
 }
 
 export interface ConfirmedIdentity extends BaseIdentity {
-    status: IdentityStatus.Confirmed;
+    status: CreationStatus.Confirmed;
     idObject: {
         v: 0;
         value: IdentityObjectV1;
@@ -118,7 +121,7 @@ export interface BaseCredential {
     address: string;
     credId: string;
     credNumber: number;
-    status: IdentityStatus;
+    status: CreationStatus;
     identityId: number; // Remove if indexed under it;
     net: Network;
     // Policy (is in accountInfo)
@@ -126,14 +129,14 @@ export interface BaseCredential {
 }
 
 export interface PendingWalletCredential extends BaseCredential {
-    status: IdentityStatus.Pending;
+    status: CreationStatus.Pending;
     deploymentHash: string;
 }
 export interface ConfirmedCredential extends BaseCredential {
-    status: IdentityStatus.Confirmed;
+    status: CreationStatus.Confirmed;
 }
 export interface RejectedCredential extends BaseCredential {
-    status: IdentityStatus.Rejected;
+    status: CreationStatus.Rejected;
 }
 
 export type WalletCredential = PendingWalletCredential | ConfirmedCredential | RejectedCredential;

@@ -6,7 +6,7 @@ import IdentityProviderIcon from '@popup/shared/IdentityProviderIcon';
 
 import IdCard from '@popup/shared/IdCard';
 import { identitiesAtom, selectedIdentityIdAtom, identityProvidersAtom } from '@popup/store/identity';
-import { Identity, IdentityStatus } from '@shared/storage/types';
+import { Identity, CreationStatus } from '@shared/storage/types';
 
 export default function ChooseIdentity() {
     const { t } = useTranslation('addAccount');
@@ -24,7 +24,7 @@ export default function ChooseIdentity() {
         <div className="flex-column align-center">
             <p className="m-t-20">{t('chooseIdentity')}</p>
             {identities
-                .filter((identity) => identity.status === IdentityStatus.Confirmed)
+                .filter((identity) => identity.status === CreationStatus.Confirmed)
                 .map((identity) => (
                     <IdCard
                         name={identity.name}

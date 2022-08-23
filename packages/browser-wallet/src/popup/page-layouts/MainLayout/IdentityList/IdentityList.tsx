@@ -8,7 +8,7 @@ import CheckmarkIcon from '@assets/svg/checkmark-blue.svg';
 import { absoluteRoutes } from '@popup/constants/routes';
 import { identitiesAtom, selectedIdentityIdAtom } from '@popup/store/identity';
 import { useTranslation } from 'react-i18next';
-import { Identity, IdentityStatus } from '@shared/storage/types';
+import { Identity, CreationStatus } from '@shared/storage/types';
 import { accountsPerIdentityAtom } from '@popup/store/account';
 import EntityList from '../EntityList';
 
@@ -21,11 +21,11 @@ type ItemProps = {
 
 function getStatusText(identity: Identity, accountCount = 0): string {
     switch (identity.status) {
-        case IdentityStatus.Pending:
+        case CreationStatus.Pending:
             return 'Verification pending';
-        case IdentityStatus.Rejected:
+        case CreationStatus.Rejected:
             return 'Verification failed';
-        case IdentityStatus.Confirmed: {
+        case CreationStatus.Confirmed: {
             return `${accountCount} account${accountCount !== 1 ? 's' : ''}`;
         }
         default:

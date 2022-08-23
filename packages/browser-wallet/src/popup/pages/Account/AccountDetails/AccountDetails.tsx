@@ -10,7 +10,7 @@ import { displaySplitAddress } from '@popup/shared/utils/account-helpers';
 import VerifiedIcon from '@assets/svg/verified-stamp.svg';
 import { AccountInfo } from '@concordium/web-sdk';
 import { AccountInfoEmitter } from '@popup/shared/account-info-emitter';
-import { IdentityStatus, WalletCredential } from '@shared/storage/types';
+import { CreationStatus, WalletCredential } from '@shared/storage/types';
 
 type AmountProps = {
     label: string;
@@ -46,7 +46,7 @@ export default function AccountDetails({ expanded, account, className }: Props) 
 
     useEffect(() => {
         setBalances(zeroBalance);
-        if (account.status === IdentityStatus.Confirmed) {
+        if (account.status === CreationStatus.Confirmed) {
             const emitter = new AccountInfoEmitter(jsonRpcUrl);
             emitter.listen([account.address]);
             emitter.on('totalchanged', (accountInfo: AccountInfo) => {
@@ -69,7 +69,7 @@ export default function AccountDetails({ expanded, account, className }: Props) 
                 <Amount label={t('atDisposal')} amount={balances.atDisposal} />
                 <Amount label={t('stakeAmount')} amount={balances.staked} />
             </div>
-            {account.status === IdentityStatus.Confirmed && <VerifiedIcon className="account-page-details__stamp" />}
+            {account.status === CreationStatus.Confirmed && <VerifiedIcon className="account-page-details__stamp" />}
         </div>
     );
 }
