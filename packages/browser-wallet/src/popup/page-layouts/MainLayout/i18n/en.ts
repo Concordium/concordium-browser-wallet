@@ -16,6 +16,9 @@ const t = {
     accountList: {
         new: 'Add new',
     },
+    identityList: {
+        new: 'Request new',
+    },
 };
 
 export default t;

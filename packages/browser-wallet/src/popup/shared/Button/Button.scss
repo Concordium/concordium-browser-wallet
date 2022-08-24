@@ -6,10 +6,6 @@
     &:hover,
     &:focus {
         outline: none;
-
-        &:not(.button--clear) {
-            color: $color-off-white;
-        }
     }
 
     &:disabled {

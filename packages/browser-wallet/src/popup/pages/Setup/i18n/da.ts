@@ -33,6 +33,10 @@ const t: typeof en = {
             required: 'En seed phrase skal indtastes',
             error: 'Der er en fejl i den valgte recovery phrase',
         },
+        seedPhrase: {
+            required: 'Indtast et 24 ord BIP 39 seed phrase',
+            length: 'Indtast 24 ord',
+        },
     },
     chooseNetwork: {
         descriptionP1: 'Her kan du vælge om du vil forbinde til Concordium Mainnet eller Testnet',

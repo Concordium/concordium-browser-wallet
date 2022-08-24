@@ -7,6 +7,10 @@
 -   Login screen.
 -   Change passcode settings page.
 
+### Changed
+
+-   The network connections page has been updated with new UI.
+
 ## 0.3.0 2022-8-18
 
 ### Added

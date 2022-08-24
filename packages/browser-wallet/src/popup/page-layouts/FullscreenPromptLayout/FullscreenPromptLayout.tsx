@@ -70,7 +70,7 @@ export default function FullscreenPromptLayout() {
                 <button className="fullscreen-prompt-layout__close" type="button" onClick={() => close()}>
                     X
                 </button>
-                <main>
+                <main className="fullscreen-prompt-layout__main">
                     <Outlet />
                 </main>
             </div>
