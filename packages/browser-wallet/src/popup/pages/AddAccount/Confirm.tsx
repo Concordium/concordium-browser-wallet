@@ -5,7 +5,7 @@ import { useNavigate } from 'react-router-dom';
 import IdCard from '@popup/shared/IdCard';
 import { identityProvidersAtom, selectedIdentityAtom } from '@popup/store/identity';
 import { selectedAccountAtom } from '@popup/store/account';
-import { credentialsAtom, jsonRpcUrlAtom, seedPhraseAtom } from '@popup/store/settings';
+import { credentialsAtom, networkConfigurationAtom, seedPhraseAtom } from '@popup/store/settings';
 import { CreationStatus, WalletCredential } from '@shared/storage/types';
 import {
     JsonRpcClient,
@@ -29,7 +29,7 @@ export default function Confirm() {
     const [credentials, setCredentials] = useAtom(credentialsAtom);
     const setSelectedAccount = useSetAtom(selectedAccountAtom);
     const seedPhrase = useAtomValue(seedPhraseAtom);
-    const jsonRpcUrl = useAtomValue(jsonRpcUrlAtom);
+    const { jsonRpcUrl } = useAtomValue(networkConfigurationAtom);
     const providers = useAtomValue(identityProvidersAtom);
     const [buttonDisabled, setButtonDisabled] = useState(false);
 
