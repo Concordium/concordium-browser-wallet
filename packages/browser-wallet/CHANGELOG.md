@@ -5,6 +5,7 @@
 ### Added
 
 -   Login screen.
+-   Change passcode settings page.
 
 ### Changed
 
