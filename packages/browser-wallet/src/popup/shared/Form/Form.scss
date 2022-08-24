@@ -152,7 +152,6 @@
 $switch-height: rem(18px);
 $switch-width: rem(35px);
 $switch-transition: linear 0.05s;
-
 $handle-size: $switch-height;
 $handle-scale: scale(1.02);
 
@@ -212,7 +211,7 @@ $handle-scale: scale(1.02);
         left: 0;
         top: 0;
         transform: translate(0, 0) $handle-scale;
-        box-shadow: 0 0 4px $color-grey;
+        box-shadow: 0 0 rem(2px) $color-grey;
         transition: transform $switch-transition;
 
         input:checked ~ & {
