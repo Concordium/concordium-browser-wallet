@@ -3,7 +3,7 @@ import React, { useEffect, useState } from 'react';
 import { displayAsCcd, getPublicAccountAmounts, PublicAccountAmounts } from 'wallet-common-helpers';
 import { useTranslation } from 'react-i18next';
 import { useAtomValue } from 'jotai';
-import { jsonRpcUrlAtom } from '@popup/store/settings';
+import { networkConfigurationAtom } from '@popup/store/settings';
 
 import { displaySplitAddress } from '@popup/shared/utils/account-helpers';
 import VerifiedIcon from '@assets/svg/verified-stamp.svg';
@@ -37,7 +37,7 @@ const zeroBalance: Omit<PublicAccountAmounts, 'scheduled'> = {
 
 export default function AccountDetails({ expanded, account }: Props) {
     const { t } = useTranslation('account', { keyPrefix: 'details' });
-    const jsonRpcUrl = useAtomValue(jsonRpcUrlAtom);
+    const { jsonRpcUrl } = useAtomValue(networkConfigurationAtom);
     const [balances, setBalances] = useState<Omit<PublicAccountAmounts, 'scheduled'>>(zeroBalance);
 
     useEffect(() => {

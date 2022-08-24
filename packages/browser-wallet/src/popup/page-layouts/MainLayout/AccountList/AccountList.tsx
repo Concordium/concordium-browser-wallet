@@ -11,8 +11,8 @@ import { accountsAtom, selectedAccountAtom } from '@popup/store/account';
 import { useTranslation } from 'react-i18next';
 import { displaySplitAddress } from '@popup/shared/utils/account-helpers';
 import { AccountInfo } from '@concordium/web-sdk';
-import { jsonRpcUrlAtom } from '@popup/store/settings';
 import { AccountInfoEmitter } from '@popup/shared/account-info-emitter';
+import { networkConfigurationAtom } from '@popup/store/settings';
 import EntityList from '../EntityList';
 
 export type Account = { address: string };
@@ -55,7 +55,7 @@ const AccountList = forwardRef<HTMLDivElement, Props>(({ className, onSelect }, 
     const [selectedAccount, setSelectedAccount] = useAtom(selectedAccountAtom);
     const nav = useNavigate();
     const { t } = useTranslation('mainLayout');
-    const jsonRpcUrl = useAtomValue(jsonRpcUrlAtom);
+    const { jsonRpcUrl } = useAtomValue(networkConfigurationAtom);
 
     const [totalBalanceMap, setTotalBalanceMap] = useState<Map<string, bigint>>(new Map());
 

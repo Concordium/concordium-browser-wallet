@@ -13,7 +13,6 @@ export default function Root() {
     const [account, setAccount] = useState<string>();
     const [isConnected, setIsConnected] = useState<boolean>(false);
     const [isVersion0, setIsVersion0] = useState<boolean>(false);
-    const [jsonRpcUrl, setJsonRpcUrl] = useState<string>();
 
     const handleGetAccount = useCallback((accountAddress: string | undefined) => {
         setAccount(accountAddress);
@@ -36,7 +35,7 @@ export default function Root() {
                 provider.on('accountDisconnected', () =>
                     provider.getMostRecentlySelectedAccount().then(handleGetAccount)
                 );
-                provider.on('chainChanged', setJsonRpcUrl);
+                provider.on('chainChanged', (chain) => console.log(chain));
                 // Check if you are already connected
                 provider.getMostRecentlySelectedAccount().then(handleGetAccount);
             })
@@ -63,7 +62,6 @@ export default function Root() {
                         </>
                     )}
                 </div>
-                <div>{jsonRpcUrl ? `JSON-RPC Url: ${jsonRpcUrl}` : 'No JSON-RPC Url yet'}</div>
                 <br />
                 {isVersion0 && <PiggyBankV0 />}
                 {!isVersion0 && <PiggyBankV1 />}
