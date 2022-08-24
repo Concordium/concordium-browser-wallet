@@ -26,6 +26,7 @@ body {
     background-color: $color-bg;
     color: $color-text;
     font-size: 100%;
+    font-family: $font-family-roboto;
 
     .modal-open & {
         overflow: hidden;
@@ -55,6 +56,9 @@ body {
         --color-transaction-group-header: #{$color-transaction-group-header-dark};
         --color-transaction-group-header-text: #{$color-transaction-group-header-text-dark};
         --color-input-bg: #{$color-input-bg-dark};
+        --color-highlight-mainnet: #{$color-highlight-mainnet-dark};
+        --color-highlight-testnet: #{$color-highlight-testnet-dark};
+        --color-main-header: #{$color-main-header-dark};
 
         .bg {
             background-image: url('../assets/images/bg-dark.jpg');
@@ -66,6 +70,7 @@ body {
 
     &.mainnet {
         --color-cta: #{$color-blue};
+        --color-highlight: #{$color-highlight-mainnet};
     }
 }
 
