@@ -1,6 +1,8 @@
 import {
     sessionPasscode,
     StorageAccessor,
+    getGenesisHash,
+    useIndexedStorage,
     storedConnectedSites,
     storedCredentials,
     storedCurrentNetwork,
@@ -18,17 +20,17 @@ import { atom, WritableAtom } from 'jotai';
 import { noOp } from 'wallet-common-helpers/src/utils/basicHelpers';
 
 const accessorMap = {
-    [ChromeStorageKey.Identities]: storedIdentities,
+    [ChromeStorageKey.Identities]: useIndexedStorage(storedIdentities, getGenesisHash),
     [ChromeStorageKey.PendingIdentity]: storedPendingIdentity,
     [ChromeStorageKey.SelectedIdentity]: storedSelectedIdentity,
     [ChromeStorageKey.ConnectedSites]: storedConnectedSites,
-    [ChromeStorageKey.Credentials]: storedCredentials,
+    [ChromeStorageKey.Credentials]: useIndexedStorage(storedCredentials, getGenesisHash),
     [ChromeStorageKey.SelectedAccount]: storedSelectedAccount,
     [ChromeStorageKey.SeedPhrase]: storedEncryptedSeedPhrase,
     [ChromeStorageKey.NetworkConfiguration]: storedCurrentNetwork,
     [ChromeStorageKey.Theme]: storedTheme,
     [ChromeStorageKey.SeedPhrase]: storedSeedPhrase,
-    [ChromeStorageKey.IdentityProviders]: storedIdentityProviders,
+    [ChromeStorageKey.IdentityProviders]: useIndexedStorage(storedIdentityProviders, getGenesisHash),
     [ChromeStorageKey.Passcode]: sessionPasscode,
 };
 

@@ -1,4 +1,10 @@
-import { StorageAccessor, storedCredentials, storedIdentities } from '@shared/storage/access';
+import {
+    getGenesisHash,
+    StorageAccessor,
+    storedCredentials,
+    storedIdentities,
+    useIndexedStorage,
+} from '@shared/storage/access';
 import { Identity, WalletCredential } from '@shared/storage/types';
 
 const identityLock = 'Concordium_identity_lock';
@@ -41,11 +47,11 @@ async function editList<Type>(
 }
 
 export async function addIdentity(identity: Identity): Promise<void> {
-    return addToList(identityLock, identity, storedIdentities);
+    return addToList(identityLock, identity, useIndexedStorage(storedIdentities, getGenesisHash));
 }
 
 export async function addCredential(cred: WalletCredential): Promise<void> {
-    return addToList(credentialLock, cred, storedCredentials);
+    return addToList(credentialLock, cred, useIndexedStorage(storedCredentials, getGenesisHash));
 }
 
 export function updateIdentities(updatedIdentities: Identity[]) {
@@ -53,7 +59,7 @@ export function updateIdentities(updatedIdentities: Identity[]) {
         identityLock,
         updatedIdentities,
         (identity) => (candidate) => identity.id === candidate.id,
-        storedIdentities
+        useIndexedStorage(storedIdentities, getGenesisHash)
     );
 }
 
@@ -62,6 +68,6 @@ export function updateCredentials(updatedCredentials: WalletCredential[]) {
         credentialLock,
         updatedCredentials,
         (cred) => (candidate) => cred.credId === candidate.credId,
-        storedCredentials
+        useIndexedStorage(storedCredentials, getGenesisHash)
     );
 }
