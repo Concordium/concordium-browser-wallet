@@ -26,6 +26,7 @@ body {
     background-color: $color-bg;
     color: $color-text;
     font-size: 100%;
+    font-family: $font-family-roboto;
 
     .modal-open & {
         overflow: hidden;
@@ -57,6 +58,7 @@ body {
         --color-input-bg: #{$color-input-bg-dark};
         --color-highlight-mainnet: #{$color-highlight-mainnet-dark};
         --color-highlight-testnet: #{$color-highlight-testnet-dark};
+        --color-main-header: #{$color-main-header-dark};
 
         .bg {
             background-image: url('../assets/images/bg-dark.jpg');

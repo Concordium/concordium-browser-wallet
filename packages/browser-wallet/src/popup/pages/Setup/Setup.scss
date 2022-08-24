@@ -23,10 +23,18 @@
 
         &__logo {
             height: rem(50px);
+
+            path {
+                fill: $color-text;
+            }
         }
 
         &__concordium-letters {
             margin-left: rem(15px);
+
+            path {
+                fill: $color-text;
+            }
         }
 
         &__description {
