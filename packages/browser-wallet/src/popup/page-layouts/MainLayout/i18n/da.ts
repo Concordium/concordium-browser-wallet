@@ -18,6 +18,9 @@ const t: typeof en = {
     accountList: {
         new: 'Tilføj ny',
     },
+    identityList: {
+        new: 'Anmod ny',
+    },
 };
 
 export default t;

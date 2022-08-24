@@ -1,5 +1,6 @@
 import clsx from 'clsx';
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react';
+import { useForm } from 'react-hook-form';
 import { useTranslation } from 'react-i18next';
 
 import VerfifiedIcon from '@assets/svg/verified-stamp.svg';
@@ -25,6 +26,11 @@ type EditNameProps = {
 
 function EditableName({ name, onChange }: EditNameProps) {
     const [isEditing, setIsEditing] = useState(false);
+    const methods = useForm<EditNameForm>();
+
+    useEffect(() => {
+        methods.setValue('name', name);
+    }, [name]);
 
     const handleSubmit = (f: EditNameForm) => {
         onChange(f.name);
@@ -43,15 +49,13 @@ function EditableName({ name, onChange }: EditNameProps) {
     }
 
     return (
-        <Form<EditNameForm> onSubmit={handleSubmit} className="id-card__name-form">
+        <Form<EditNameForm> formMethods={methods} onSubmit={handleSubmit} className="id-card__name-form">
             {(f) => (
                 <>
                     <FormInlineInput
                         name="name"
                         control={f.control}
                         className="id-card__name-field"
-                        defaultValue={name}
-                        fallbackValue={name}
                         autoFocus
                         rules={{
                             required: true,
@@ -72,9 +76,10 @@ type Props = {
     status: 'pending' | 'confirmed' | 'rejected';
     onNameChange(name: string): void;
     provider: JSX.Element;
+    className?: string;
 };
 
-export default function IdCard({ name, provider, status, onNameChange }: Props) {
+export default function IdCard({ name, provider, status, onNameChange, className }: Props) {
     const { t } = useTranslation();
 
     return (
@@ -83,7 +88,8 @@ export default function IdCard({ name, provider, status, onNameChange }: Props) 
                 'id-card',
                 status === 'pending' && 'id-card--pending',
                 status === 'confirmed' && 'id-card--confirmed',
-                status === 'rejected' && 'id-card--rejected'
+                status === 'rejected' && 'id-card--rejected',
+                className
             )}
         >
             <header className="id-card__header">
@@ -96,7 +102,7 @@ export default function IdCard({ name, provider, status, onNameChange }: Props) 
             <div className="id-card__status">
                 {status === 'pending' && t('id.pending')}
                 {status === 'confirmed' && t('id.confirmed')}
-                {status === 'rejected' && t('id.rejected')} {provider}
+                {status === 'rejected' && t('id.rejected')}&nbsp;{provider}
             </div>
             <div className="id-card__stamp">
                 {status === 'confirmed' && <VerfifiedIcon />}

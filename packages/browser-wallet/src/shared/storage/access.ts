@@ -1,4 +1,13 @@
-import { ChromeStorageKey, EncryptedData, Theme, WalletCredential } from './types';
+import {
+    ChromeStorageKey,
+    EncryptedData,
+    Identity,
+    PendingIdentity,
+    Theme,
+    WalletCredential,
+    IdentityProvider,
+    NetworkConfiguration,
+} from './types';
 
 export type StorageAccessor<V> = {
     /**
@@ -30,13 +39,28 @@ const makeStorageAccessor = <V>(area: chrome.storage.AreaName, key: ChromeStorag
     };
 };
 
+export const storedPendingIdentity = makeStorageAccessor<Omit<PendingIdentity, 'location'>>(
+    'local',
+    ChromeStorageKey.PendingIdentity
+);
+export const storedIdentities = makeStorageAccessor<Identity[]>('local', ChromeStorageKey.Identities);
+export const storedSelectedIdentity = makeStorageAccessor<string>('local', ChromeStorageKey.SelectedIdentity);
+export const storedSeedPhrase = makeStorageAccessor<string>('local', ChromeStorageKey.SeedPhrase);
+
 export const storedConnectedSites = makeStorageAccessor<Record<string, string[]>>(
     'local',
     ChromeStorageKey.ConnectedSites
 );
 export const storedCredentials = makeStorageAccessor<WalletCredential[]>('local', ChromeStorageKey.Credentials);
-export const storedJsonRpcUrl = makeStorageAccessor<string>('local', ChromeStorageKey.JsonRpcUrl);
+export const storedCurrentNetwork = makeStorageAccessor<NetworkConfiguration>(
+    'local',
+    ChromeStorageKey.NetworkConfiguration
+);
 export const storedSelectedAccount = makeStorageAccessor<string>('local', ChromeStorageKey.SelectedAccount);
 export const storedEncryptedSeedPhrase = makeStorageAccessor<EncryptedData>('local', ChromeStorageKey.SeedPhrase);
 export const storedTheme = makeStorageAccessor<Theme>('local', ChromeStorageKey.Theme);
+export const storedIdentityProviders = makeStorageAccessor<IdentityProvider>(
+    'local',
+    ChromeStorageKey.IdentityProviders
+);
 export const sessionPasscode = makeStorageAccessor<string>('session', ChromeStorageKey.Passcode);

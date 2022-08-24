@@ -5,11 +5,12 @@ import {
     MessageType,
 } from '@concordium/browser-wallet-message-hub';
 import { HttpProvider } from '@concordium/web-sdk';
-import { storedConnectedSites, storedSelectedAccount, storedJsonRpcUrl } from '@shared/storage/access';
+import { storedConnectedSites, storedSelectedAccount, storedCurrentNetwork } from '@shared/storage/access';
 
 import JSONBig from 'json-bigint';
 import bgMessageHandler from './message-handler';
 import { forwardToPopup, HandleMessage, HandleResponse, RunCondition, setPopupSize } from './window-management';
+import { identityIssuanceHandler } from './identity-issuance';
 
 /**
  * Determines whether the given url has been whitelisted by any account.
@@ -32,7 +33,7 @@ async function performRpcCall(
 ) {
     const isWhiteListed = await isWhiteListedForAnyAccount(senderUrl);
     if (isWhiteListed) {
-        const url = await storedJsonRpcUrl.get();
+        const url = (await storedCurrentNetwork.get())?.jsonRpcUrl;
         if (!url) {
             onFailure('No JSON-RPC URL available');
         } else {
@@ -74,6 +75,10 @@ const injectScript: ExtensionMessageHandler = (_msg, sender, respond) => {
     return true;
 };
 
+bgMessageHandler.handleMessage(
+    createMessageTypeFilter(InternalMessageType.StartIdentityIssuance),
+    identityIssuanceHandler
+);
 bgMessageHandler.handleMessage(createMessageTypeFilter(InternalMessageType.Init), injectScript);
 bgMessageHandler.handleMessage(createMessageTypeFilter(InternalMessageType.SetViewSize), ({ payload }) => {
     setPopupSize(payload);

@@ -5,7 +5,12 @@
 ### Added
 
 -   Login screen.
+-   Change passcode settings page.
 -   Transaction details view when clicking a transaction in the transaction list.
+
+### Changed
+
+-   The network connections page has been updated with new UI.
 
 ## 0.3.0 2022-8-18
 

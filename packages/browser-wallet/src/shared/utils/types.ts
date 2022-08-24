@@ -10,3 +10,9 @@ import { RefAttributes } from 'react';
 export type MakeOptional<T, K extends keyof T> = Omit<T, K> & Partial<Pick<T, K>>;
 
 export type WithRef<P, R> = P & RefAttributes<R>;
+
+export enum BackgroundResponseStatus {
+    Success = 'Success',
+    Aborted = 'Aborted',
+    Error = 'Error',
+}

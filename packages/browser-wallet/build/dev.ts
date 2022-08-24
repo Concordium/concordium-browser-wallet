@@ -32,6 +32,7 @@ const config: BuildOptions = {
     outdir: 'dist',
     define: {
         'process.env.NODE_ENV': `"${process.env.NODE_ENV}"`,
+        global: 'window',
         // Without this the web-sdk is unable to be used in a web-worker. (Throws because document is undefined)
         'document.baseURI': '""',
     },

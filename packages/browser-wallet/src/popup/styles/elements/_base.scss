@@ -1,4 +1,5 @@
 html {
+    height: 100%;
     font-size: $html-font-size; // 10px
     font-family: $font-family-roboto;
 
@@ -50,8 +51,10 @@ body {
     &.dark {
         --color-bg: #{$color-bg-dark};
         --color-text: #{$color-text-dark};
+        --color-hover: #{$color-hover-dark};
         --color-transaction-group-header: #{$color-transaction-group-header-dark};
         --color-transaction-group-header-text: #{$color-transaction-group-header-text-dark};
+        --color-input-bg: #{$color-input-bg-dark};
         --color-highlight-mainnet: #{$color-highlight-mainnet-dark};
         --color-highlight-testnet: #{$color-highlight-testnet-dark};
 
