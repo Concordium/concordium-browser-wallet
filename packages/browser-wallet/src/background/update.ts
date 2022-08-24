@@ -4,6 +4,9 @@ import { Identity, WalletCredential } from '@shared/storage/types';
 const identityLock = 'Concordium_identity_lock';
 const credentialLock = 'Concordium_credential_lock';
 
+/**
+ * Generic method to add an element to list in storage
+ */
 async function addToList<Type>(lock: string, addition: Type, storage: StorageAccessor<Type[]>): Promise<void> {
     return navigator.locks.request(lock, async () => {
         const list = (await storage.get()) || [];
@@ -11,6 +14,10 @@ async function addToList<Type>(lock: string, addition: Type, storage: StorageAcc
     });
 }
 
+/**
+ * Generic method to edit/update elements in a list in storage
+ * Note that this replaces the element found by the findPredicate with the edit.
+ */
 async function editList<Type>(
     lock: string,
     edits: Type[],
