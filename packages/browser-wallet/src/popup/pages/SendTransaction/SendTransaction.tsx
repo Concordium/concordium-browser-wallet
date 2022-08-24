@@ -15,7 +15,7 @@ import {
     SchemaVersion,
 } from '@concordium/web-sdk';
 import { usePrivateKey } from '@popup/shared/utils/account-helpers';
-import { jsonRpcUrlAtom } from '@popup/store/settings';
+import { networkConfigurationAtom } from '@popup/store/settings';
 import DisplayUpdateContract from './displayTransaction/DisplayUpdateContract';
 import DisplayInitContract from './displayTransaction/DisplayInitContract';
 import DisplaySimpleTransfer from './displayTransaction/DisplaySimpleTransfer';
@@ -43,7 +43,7 @@ export default function SendTransaction({ onSubmit, onReject }: Props) {
     const { state } = useLocation() as Location;
     const { t } = useTranslation('sendTransaction');
     const [error, setError] = useState<string>();
-    const url = useAtomValue(jsonRpcUrlAtom);
+    const { jsonRpcUrl } = useAtomValue(networkConfigurationAtom);
     const { withClose, onClose } = useContext(fullscreenPromptContext);
 
     const { accountAddress } = state.payload;
@@ -64,7 +64,7 @@ export default function SendTransaction({ onSubmit, onReject }: Props) {
     useEffect(() => onClose(onReject), [onClose, onReject]);
 
     const sendTransaction = useCallback(async () => {
-        if (!url || !accountAddress) {
+        if (!jsonRpcUrl || !accountAddress) {
             throw new Error('Missing url for JsonRpc or account address');
         }
         if (!key) {
@@ -72,7 +72,7 @@ export default function SendTransaction({ onSubmit, onReject }: Props) {
         }
 
         // TODO: Maybe we should not create the client for each transaction sent
-        const client = new JsonRpcClient(new HttpProvider(url));
+        const client = new JsonRpcClient(new HttpProvider(jsonRpcUrl));
         const sender = new AccountAddress(accountAddress);
         const nonce = await client.getNextAccountNonce(sender);
 

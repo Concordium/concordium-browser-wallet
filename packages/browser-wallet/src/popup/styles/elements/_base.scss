@@ -54,6 +54,7 @@ body {
         --color-hover: #{$color-hover-dark};
         --color-transaction-group-header: #{$color-transaction-group-header-dark};
         --color-transaction-group-header-text: #{$color-transaction-group-header-text-dark};
+        --color-input-bg: #{$color-input-bg-dark};
 
         .bg {
             background-image: url('../assets/images/bg-dark.jpg');

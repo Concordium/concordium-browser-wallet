@@ -12,6 +12,7 @@ import about from '@popup/pages/About/i18n/da';
 import addAccount from '@popup/pages/AddAccount/i18n/da';
 import identityIssuance from '@popup/pages/IdentityIssuance/i18n/da';
 import login from '@popup/pages/Login/i18n/en';
+import changePasscode from '@popup/pages/ChangePasscode/i18n/en';
 
 import type en from './en';
 
@@ -30,6 +31,7 @@ const t: typeof en = {
     identityIssuance,
     about,
     login,
+    changePasscode,
 };
 
 export default t;

@@ -2,6 +2,7 @@ import { AccountTransactionType } from '@concordium/web-sdk';
 import axios from 'axios';
 import { abs } from 'wallet-common-helpers';
 import { IdentityProvider } from '@shared/storage/types';
+import { storedCurrentNetwork } from '@shared/storage/access';
 import {
     BrowserWalletTransaction,
     RewardType,
@@ -9,11 +10,13 @@ import {
     TransactionStatus,
 } from './transaction-history-types';
 
-// TODO The wallet proxy URL should be taken from storage when that has been
-// implemented.
-const walletProxy = axios.create({
-    baseURL: 'https://wallet-proxy.stagenet.concordium.com',
-});
+async function getWalletProxy() {
+    const currentNetwork = await storedCurrentNetwork.get();
+    if (currentNetwork) {
+        return axios.create({ baseURL: currentNetwork.explorerUrl });
+    }
+    throw new Error('Tried to access wallet proxy without a loaded network.');
+}
 
 export enum TransactionKindString {
     DeployModule = 'deployModule',
@@ -232,7 +235,7 @@ export async function getTransactions(
         proxyPath += `&from=${from}`;
     }
 
-    const response = await walletProxy.get(proxyPath);
+    const response = await (await getWalletProxy()).get(proxyPath);
     const result: WalletProxyAccTransactionsResult = response.data;
     const transactionsWithoutMalformed = result.transactions.filter(
         (t) => t.details.type !== TransactionKindString.Malformed
@@ -246,6 +249,6 @@ export async function getTransactions(
 
 export async function getIdentityProviders(): Promise<IdentityProvider[]> {
     const proxyPath = `/v1/ip_info`;
-    const response = await walletProxy.get(proxyPath);
+    const response = await (await getWalletProxy()).get(proxyPath);
     return response.data;
 }

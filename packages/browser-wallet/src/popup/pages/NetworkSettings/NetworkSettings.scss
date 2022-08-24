@@ -1,0 +1,55 @@
+.network-settings-page {
+    height: 100%;
+    width: 100%;
+    background-color: $color-bg;
+    padding: 0 rem(10px);
+    display: block;
+
+    &__list {
+        width: 100%;
+        background-color: $color-bg;
+        overflow: overlay;
+
+        & > *:not(:last-child) {
+            border-bottom: rem(1px) solid $color-petroleum;
+        }
+    }
+
+    &__element {
+        display: flex;
+        flex-direction: row;
+        justify-content: space-between;
+        padding-top: rem(5px);
+        padding-bottom: rem(5px);
+
+        &-testnet {
+            color: $color-cta-othernet;
+        }
+
+        &-mainnet {
+            color: $color-cta-mainnet;
+        }
+    }
+
+    &__icon {
+        &-testnet,
+        &-mainnet {
+            width: rem(8px);
+            height: rem(8px);
+            margin-left: rem(5px);
+            margin-bottom: rem(3px);
+        }
+
+        &-testnet {
+            path {
+                fill: $color-cta-othernet;
+            }
+        }
+
+        &-mainnet {
+            path {
+                fill: $color-cta-mainnet;
+            }
+        }
+    }
+}

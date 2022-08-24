@@ -15,7 +15,7 @@
     display: block;
 
     &__field {
-        background-color: $color-bg;
+        background-color: $color-input-bg;
         font-size: rem(10px);
         color: $color-text;
         height: rem(32px);
@@ -32,7 +32,7 @@
     }
 
     &__area {
-        background-color: $color-bg;
+        background-color: $color-input-bg;
         font-size: rem(10px);
         color: $color-text;
         height: rem(32px);
