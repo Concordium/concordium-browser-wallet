@@ -1,12 +1,12 @@
 import type en from './en';
 
 const t: typeof en = {
-    changePasscode: 'Opdater kodeord',
-    incorrectPasscode: 'Forkert kodeord',
+    changePasscode: 'Opdater adgangskode',
+    incorrectPasscode: 'Forkert adgangskode',
     labels: {
-        currentPasscode: 'Enter current passcode',
-        newPasscode: 'Enter new passcode',
-        newPasscodeRepeated: 'Enter new passcode again',
+        currentPasscode: 'Indtast nuværende adgangskode',
+        newPasscode: 'Indtast ny adgangskode',
+        newPasscodeRepeated: 'Gentag ny adgangskode',
     },
 };
 

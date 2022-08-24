@@ -4,7 +4,7 @@ const t = {
     labels: {
         currentPasscode: 'Enter current passcode',
         newPasscode: 'Enter new passcode',
-        newPasscodeRepeated: 'Enter new passcode again',
+        newPasscodeRepeated: 'Confirm new passcode',
     },
 };
 
