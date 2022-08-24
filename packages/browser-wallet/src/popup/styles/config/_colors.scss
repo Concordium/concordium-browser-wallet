@@ -35,6 +35,8 @@ $color-transaction-group-header-light: $color-light-blue;
 $color-transaction-group-header-text-light: $color-blue;
 $color-input-bg-light: $color-white;
 $color-main-header-light: #f4f5f5;
+$color-highlight-mainnet-light: #e0e9ed;
+$color-highlight-testnet-light: #dde9e5;
 
 // Dark mode
 $color-bg-dark: $color-off-black;
@@ -44,6 +46,8 @@ $color-transaction-group-header-dark: $color-dark-prussian-blue;
 $color-transaction-group-header-text-dark: $color-light-blue;
 $color-input-bg-dark: $color-black;
 $color-main-header-dark: #111;
+$color-highlight-mainnet-dark: #203e4f;
+$color-highlight-testnet-dark: #1a3d3e;
 
 // Theme variables
 $color-bg: var(--color-bg, $color-bg-light); // off-white/off-black
@@ -61,3 +65,9 @@ $color-transaction-group-header-text: var(
 $color-main-header: var(--color-main-header, $color-main-header-light);
 $color-input-bg: var(--color-input-bg, $color-input-bg-light);
 $color-text-inverted: $color-bg;
+$color-highlight-mainnet: var(--color-highlight-mainnet, $color-highlight-mainnet-light);
+$color-highlight-testnet: var(--color-highlight-testnet, $color-highlight-testnet-light);
+$color-highlight: var(--color-highlight, $color-highlight-testnet);
+$color-highlight-mainnet: var(--color-highlight-mainnet, $color-highlight-mainnet-light);
+$color-highlight-testnet: var(--color-highlight-testnet, $color-highlight-testnet-light);
+$color-highlight: var(--color-highlight, $color-highlight-testnet);

@@ -10,9 +10,9 @@ import { accountRoutes } from './routes';
 import { accountSettingsRoutes } from './AccountSettings/routes';
 import AccountActions from './AccountActions';
 import DisplayAddress from './DisplayAddress';
-import TransactionList from './TransactionList';
 import AccountDetails from './AccountDetails';
 import AccountSettings from './AccountSettings';
+import TransactionLog from './TransactionLog/TransactionLog';
 
 function ConnectedBox({ setDetailsExpanded }: { setDetailsExpanded: React.Dispatch<React.SetStateAction<boolean>> }) {
     const { t } = useTranslation('account');
@@ -42,11 +42,16 @@ function ConnectedBox({ setDetailsExpanded }: { setDetailsExpanded: React.Dispat
     );
 }
 
-function Account() {
+function Account({
+    detailsExpanded,
+    setDetailsExpanded,
+}: {
+    detailsExpanded: boolean;
+    setDetailsExpanded: React.Dispatch<React.SetStateAction<boolean>>;
+}) {
     const { t } = useTranslation('account');
     const accounts = useAtomValue(accountsAtom);
     const selectedAccount = useAtomValue(selectedAccountAtom);
-    const [detailsExpanded, setDetailsExpanded] = useState(true);
 
     return (
         <div className="flex-column justify-space-between align-center h-full relative">
@@ -75,10 +80,12 @@ function Account() {
 }
 
 export default function AccountRoutes() {
+    const [detailsExpanded, setDetailsExpanded] = useState(true);
+
     return (
         <Routes>
-            <Route element={<Account />}>
-                <Route index element={<TransactionList />} />
+            <Route element={<Account detailsExpanded={detailsExpanded} setDetailsExpanded={setDetailsExpanded} />}>
+                <Route index element={<TransactionLog setDetailsExpanded={setDetailsExpanded} />} />
                 <Route path={accountRoutes.send} element={<div>Send CCD</div>} />
                 <Route path={accountRoutes.receive} element={<DisplayAddress />} />
                 <Route path={`${accountRoutes.settings}/*`} element={<AccountSettings />} />

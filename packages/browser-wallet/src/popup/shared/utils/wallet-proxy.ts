@@ -116,6 +116,8 @@ interface Details {
     outcome: string;
     transferSource: string;
     transferDestination: string;
+    events: string[];
+    rejectReason: string;
 }
 
 enum OriginType {
@@ -221,6 +223,8 @@ function mapTransaction(transaction: WalletProxyTransaction, accountAddress: str
         status,
         time: BigInt(Math.round(transaction.blockTime).toString()),
         id: transaction.id,
+        events: transaction.details.events,
+        rejectReason: transaction.details.rejectReason,
     };
 }
 
