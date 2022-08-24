@@ -3,15 +3,27 @@ import React from 'react';
 import { useNavigate } from 'react-router-dom';
 import Button from '@popup/shared/Button';
 import { absoluteRoutes } from '@popup/constants/routes';
-import { useSetAtom } from 'jotai';
+import { useSetAtom, useAtomValue } from 'jotai';
 import { useTranslation } from 'react-i18next';
+import { seedPhraseAtom } from '@popup/state';
 import { networkConfigurationAtom } from '@popup/store/settings';
+import { setupRoutes } from './routes';
 import { mainnet, testnet } from '../NetworkSettings/NetworkSettings';
 
 export function ChooseNetwork() {
     const navigate = useNavigate();
     const { t } = useTranslation('setup');
     const setNetworkConfiguration = useSetAtom(networkConfigurationAtom);
+    // TODO Make a better way to check if we are recovering
+    const isRecovering = !useAtomValue(seedPhraseAtom);
+
+    const goToNext = () => {
+        if (isRecovering) {
+            navigate(`${absoluteRoutes.setup.path}/${setupRoutes.performRecovery}`);
+        } else {
+            navigate(absoluteRoutes.home.identities.path);
+        }
+    };
 
     return (
         <>
@@ -29,7 +41,7 @@ export function ChooseNetwork() {
                         width="wide"
                         onClick={() => {
                             setNetworkConfiguration(mainnet);
-                            navigate(absoluteRoutes.home.identities.path);
+                            goToNext();
                         }}
                     >
                         Concordium Mainnet
@@ -39,7 +51,7 @@ export function ChooseNetwork() {
                         width="wide"
                         onClick={() => {
                             setNetworkConfiguration(testnet);
-                            navigate(absoluteRoutes.home.identities.path);
+                            goToNext();
                         }}
                     >
                         Concordium Testnet

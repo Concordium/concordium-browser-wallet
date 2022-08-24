@@ -7,7 +7,7 @@ const credentialLock = 'Concordium_credential_lock';
 /**
  * Generic method to add an element to list in storage
  */
-async function addToList<Type>(lock: string, addition: Type, storage: StorageAccessor<Type[]>): Promise<void> {
+async function addToList<Type>(lock: string, addition: Type | Type[], storage: StorageAccessor<Type[]>): Promise<void> {
     return navigator.locks.request(lock, async () => {
         const list = (await storage.get()) || [];
         return storage.set(list.concat(addition));
@@ -40,7 +40,7 @@ async function editList<Type>(
     });
 }
 
-export async function addIdentity(identity: Identity): Promise<void> {
+export async function addIdentity(identity: Identity | Identity[]): Promise<void> {
     return addToList(identityLock, identity, storedIdentities);
 }
 

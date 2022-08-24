@@ -28,6 +28,7 @@ export enum InternalMessageType {
     StartIdentityIssuance = 'I_StartIdentityIssuance',
     EndIdentityIssuance = 'l_EndIdentityIssuance',
     SendCredentialDeployment = 'l_SendCredentialDeployment',
+    Recovery = 'I_Recovery',
 }
 
 // eslint-disable-next-line @typescript-eslint/no-explicit-any

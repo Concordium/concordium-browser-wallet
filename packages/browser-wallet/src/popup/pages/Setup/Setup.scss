@@ -98,4 +98,19 @@
             margin-bottom: rem(12px);
         }
     }
+
+    &__recovery {
+        &__results {
+            text-align: left;
+        }
+
+        &__identity {
+            padding: 10px 0;
+            margin-top: 10px;
+
+            &:not(:last-child) {
+                border-bottom: 2px solid $color-petroleum;
+            }
+        }
+    }
 }

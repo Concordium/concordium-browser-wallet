@@ -22,11 +22,21 @@ const t = {
         restore: 'Restore',
     },
     recoveryPhrase: {
+        title: 'Your recovery phrase',
         description: 'Write down your 24 word recovery phrase. Remember that the order is important.',
     },
-    enterRecoveryPhrase: {
+    performRecovery: {
+        title: 'Restoring your wallet',
+        description: {
+            during: 'Searching for your IDs and accounts. Please wait.',
+            after: 'The following identities and accounts were recovered.',
+        },
+    },
+    confirmRecoveryPhrase: {
         description:
             'Please enter your 24 words in the correct order and separated by spaces, to confirm your secret recovery phrase.',
+    },
+    enterRecoveryPhrase: {
         form: {
             required: 'A seed phrase must be provided',
             error: 'Incorrect secret recovery phrase',

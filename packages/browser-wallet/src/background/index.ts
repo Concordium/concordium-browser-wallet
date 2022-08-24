@@ -13,6 +13,7 @@ import { forwardToPopup, HandleMessage, HandleResponse, RunCondition, setPopupSi
 import { identityIssuanceHandler } from './identity-issuance';
 import { startupHandler } from './startup';
 import { sendCredentialHandler } from './credential-deployment';
+import { recoveryHandler } from './recovery';
 
 /**
  * Determines whether the given url has been whitelisted by any account.
@@ -84,6 +85,7 @@ bgMessageHandler.handleMessage(
     sendCredentialHandler
 );
 
+bgMessageHandler.handleMessage(createMessageTypeFilter(InternalMessageType.Recovery), recoveryHandler);
 bgMessageHandler.handleMessage(
     createMessageTypeFilter(InternalMessageType.StartIdentityIssuance),
     identityIssuanceHandler

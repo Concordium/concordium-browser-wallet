@@ -3,7 +3,7 @@ import React from 'react';
 import { useNavigate } from 'react-router-dom';
 import { absoluteRoutes } from '@popup/constants/routes';
 import TextArea from '@popup/shared/Form/TextArea';
-import { passcodeAtom, seedPhraseAtom } from '@popup/state';
+import { passcodeAtom } from '@popup/state';
 import { useAtomValue, useSetAtom } from 'jotai';
 import Form from '@popup/shared/Form';
 import { SubmitHandler, Validate } from 'react-hook-form';
@@ -17,10 +17,14 @@ type FormValues = {
     seedPhraseInput: string;
 };
 
-export function EnterRecoveryPhrase() {
+const validateSeedPhraseLength =
+    (message: string): Validate<string> =>
+    (seedPhrase) =>
+        seedPhrase.split(/\s+/).length !== 24 ? message : true;
+
+export default function EnterRecoveryPhrase() {
     const navigate = useNavigate();
     const { t } = useTranslation('setup');
-    const seedPhrase = useAtomValue(seedPhraseAtom);
     const setEncryptedSeedPhrase = useSetAtom(encryptedSeedPhraseAtom);
     const setPasscodeInSession = useSetAtom(sessionPasscodeAtom);
     const passcode = useAtomValue(passcodeAtom);
@@ -37,13 +41,9 @@ export function EnterRecoveryPhrase() {
         navigate(`${absoluteRoutes.setup.path}/${setupRoutes.chooseNetwork}`);
     };
 
-    function validateSeedPhrase(): Validate<string> {
-        return (seedPhraseValue) => (seedPhraseValue !== seedPhrase ? t('enterRecoveryPhrase.form.error') : undefined);
-    }
-
     return (
         <>
-            <PageHeader canGoBack>{t('recoveryPhrase.title')}</PageHeader>
+            <PageHeader>Restore your wallet</PageHeader>
             <div className="onboarding-setup__page-with-header">
                 <div className="onboarding-setup__page-with-header__description">
                     {t('confirmRecoveryPhrase.description')}
@@ -57,8 +57,12 @@ export function EnterRecoveryPhrase() {
                                         register={f.register}
                                         name="seedPhraseInput"
                                         rules={{
-                                            required: t('enterRecoveryPhrase.form.required'),
-                                            validate: validateSeedPhrase(),
+                                            required: t('enterRecoveryPhrase.seedPhrase.required'),
+                                            validate: {
+                                                checkLength: validateSeedPhraseLength(
+                                                    t('enterRecoveryPhrase.seedPhrase.length')
+                                                ),
+                                            },
                                         }}
                                     />
                                     <Submit

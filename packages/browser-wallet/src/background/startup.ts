@@ -1,6 +1,5 @@
 import { HttpProvider, JsonRpcClient } from '@concordium/web-sdk';
 import { storedCurrentNetwork, storedCredentials, storedIdentities } from '@shared/storage/access';
-
 import {
     Identity,
     CreationStatus,

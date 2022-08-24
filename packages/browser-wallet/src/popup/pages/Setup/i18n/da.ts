@@ -24,11 +24,21 @@ const t: typeof en = {
         restore: 'Genskab',
     },
     recoveryPhrase: {
+        title: 'Dit recovery phrase',
         description: 'Skriv de 24 ord fra din recovery phrase ned. Husk at rækkefølgen er ordene er vigtig.',
     },
-    enterRecoveryPhrase: {
+    performRecovery: {
+        title: 'Genskaber din wallet',
+        description: {
+            during: 'Vent venligt mens der søges efter dine identiteter og konti.',
+            after: 'Følgende identiteter og konti blev fundet.',
+        },
+    },
+    confirmRecoveryPhrase: {
         description:
             'Venligst skriv dine 24 ord i den korrekte rækkefølge, adskilt med et mellemrum, for at bekræfte din hemmelige recovery phrase.',
+    },
+    enterRecoveryPhrase: {
         form: {
             required: 'En seed phrase skal indtastes',
             error: 'Der er en fejl i den valgte recovery phrase',

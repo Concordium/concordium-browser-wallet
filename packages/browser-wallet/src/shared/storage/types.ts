@@ -1,4 +1,4 @@
-import type { IdentityObjectV1 } from '@concordium/web-sdk';
+import type { IdentityObjectV1, Versioned } from '@concordium/web-sdk';
 
 export enum ChromeStorageKey {
     ConnectedSites = 'connectedSites',
@@ -54,10 +54,7 @@ export interface RejectedIdentity extends BaseIdentity {
 
 export interface ConfirmedIdentity extends BaseIdentity {
     status: CreationStatus.Confirmed;
-    idObject: {
-        v: 0;
-        value: IdentityObjectV1;
-    };
+    idObject: Versioned<IdentityObjectV1>;
 }
 
 export type Identity = PendingIdentity | RejectedIdentity | ConfirmedIdentity;
@@ -89,6 +86,7 @@ export interface IpInfo {
  */
 export interface IdentityProviderMetaData {
     issuanceStart: string;
+    recoveryStart: string;
     icon: string;
     support: string;
 }
