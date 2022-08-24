@@ -1,0 +1,20 @@
+.change-passcode-page {
+    background-color: $color-bg;
+    padding: rem(10px);
+    text-align: center;
+    height: 100%;
+
+    &__form {
+        text-align: left;
+        padding: rem(10px);
+    }
+
+    &__button {
+        position: absolute;
+        bottom: rem(24px);
+        left: 0;
+        right: 0;
+        margin: 0 auto;
+        background-color: $color-cta;
+    }
+}

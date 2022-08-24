@@ -33,6 +33,7 @@ $color-text-light: $color-off-black;
 $color-hover-light: 0 0 0;
 $color-transaction-group-header-light: $color-light-blue;
 $color-transaction-group-header-text-light: $color-blue;
+$color-input-bg-light: $color-white;
 
 // Dark mode
 $color-bg-dark: $color-off-black;
@@ -40,6 +41,7 @@ $color-text-dark: $color-off-white;
 $color-hover-dark: 255 255 255;
 $color-transaction-group-header-dark: $color-dark-prussian-blue;
 $color-transaction-group-header-text-dark: $color-light-blue;
+$color-input-bg-dark: $color-black;
 
 // Theme variables
 $color-bg: var(--color-bg, $color-bg-light); // off-white/off-black
@@ -54,5 +56,5 @@ $color-transaction-group-header-text: var(
     --color-transaction-group-header-text,
     $color-transaction-group-header-text-light
 ); // blue/light-blue
-
+$color-input-bg: var(--color-input-bg, $color-input-bg-light);
 $color-text-inverted: $color-bg;
