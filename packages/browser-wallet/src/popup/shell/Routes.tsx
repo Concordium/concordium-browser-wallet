@@ -16,7 +16,6 @@ import ConnectionRequest from '@popup/pages/ConnectionRequest';
 import { popupMessageHandler } from '@popup/shared/message-handler';
 import Settings from '@popup/pages/Settings';
 import NetworkSettings from '@popup/pages/NetworkSettings';
-import VisualSettings from '@popup/pages/VisualSettings';
 import AddAccount from '@popup/pages/AddAccount';
 import { IdentityIssuanceEnd, IdentityIssuanceStart } from '@popup/pages/IdentityIssuance';
 import About from '@popup/pages/About';
@@ -118,7 +117,6 @@ export default function Routes() {
                     <Route index element={<Settings />} />
                     <Route element={<ChangePasscode />} path={relativeRoutes.home.settings.passcode.path} />
                     <Route element={<NetworkSettings />} path={relativeRoutes.home.settings.network.path} />
-                    <Route element={<VisualSettings />} path={relativeRoutes.home.settings.visual.path} />
                     <Route element={<About />} path={relativeRoutes.home.settings.about.path} />
                 </Route>
                 <Route

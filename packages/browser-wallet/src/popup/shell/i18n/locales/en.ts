@@ -7,7 +7,6 @@ import signMessage from '@popup/pages/SignMessage/i18n/en';
 import connectionRequest from '@popup/pages/ConnectionRequest/i18n/en';
 import settings from '@popup/pages/Settings/i18n/en';
 import networkSettings from '@popup/pages/NetworkSettings/i18n/en';
-import visualSettings from '@popup/pages/VisualSettings/i18n/en';
 import about from '@popup/pages/About/i18n/en';
 import addAccount from '@popup/pages/AddAccount/i18n/en';
 import identityIssuance from '@popup/pages/IdentityIssuance/i18n/en';
@@ -25,7 +24,6 @@ const t = {
     connectionRequest,
     settings,
     networkSettings,
-    visualSettings,
     addAccount,
     identityIssuance,
     about,

@@ -7,4 +7,12 @@
         display: block;
         padding: rem(10px) 0;
     }
+
+    &__toggle {
+        position: absolute;
+        width: $switch-width;
+        bottom: rem(8px);
+        left: calc(50% - calc($switch-width / 2));
+        right: 50%;
+    }
 }
