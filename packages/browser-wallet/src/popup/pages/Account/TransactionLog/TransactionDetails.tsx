@@ -36,7 +36,7 @@ export default function TransactionDetails({
                 {t('header')}
                 <CloseButton className="transaction-details__close" onClick={onClose} />
             </div>
-            <TransactionElement accountAddress={accountAddress} transaction={transaction} />
+            <TransactionElement accountAddress={accountAddress} transaction={transaction} withDate />
             {transaction.status === TransactionStatus.Failed && (
                 <div className="transaction-details__dynamic-height-item">
                     <Title title={t('rejectReason')} />
@@ -45,7 +45,9 @@ export default function TransactionDetails({
             )}
             {transaction.fromAddress && <CopyableItem title={t('fromAddress')} value={transaction.fromAddress} />}
             {transaction.toAddress && <CopyableItem title={t('toAddress')} value={transaction.toAddress} />}
-            <CopyableItem title={t('transactionHash')} value={transaction.transactionHash} />
+            {transaction.transactionHash && (
+                <CopyableItem title={t('transactionHash')} value={transaction.transactionHash} />
+            )}
             <CopyableItem title={t('blockHash')} value={transaction.blockHash} />
             {transaction.events && (
                 <div className="transaction-details__dynamic-height-item">

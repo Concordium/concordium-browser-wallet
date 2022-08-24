@@ -20,9 +20,16 @@ interface Props {
     style?: CSSProperties;
     accountAddress: string;
     onClick?: () => void;
+    withDate?: boolean;
 }
 
 const onlyTime = Intl.DateTimeFormat(undefined, {
+    timeStyle: 'medium',
+    hourCycle: 'h23',
+}).format;
+
+const withDateAndTime = Intl.DateTimeFormat(undefined, {
+    dateStyle: 'medium',
     timeStyle: 'medium',
     hourCycle: 'h23',
 }).format;
@@ -162,8 +169,9 @@ function isGreenAmount(transaction: BrowserWalletTransaction, accountAddress: st
 /**
  * A transaction element in a TransactionList.
  */
-export default function TransactionElement({ accountAddress, transaction, style, onClick }: Props) {
-    const transactionTime = onlyTime(dateFromTimestamp(transaction.time, TimeStampUnit.seconds));
+export default function TransactionElement({ accountAddress, transaction, style, onClick, withDate = false }: Props) {
+    const transactionDate = dateFromTimestamp(transaction.time, TimeStampUnit.seconds);
+    const transactionTime = withDate ? withDateAndTime(transactionDate) : onlyTime(transactionDate);
     const failed = transaction.status === TransactionStatus.Failed;
 
     return (
