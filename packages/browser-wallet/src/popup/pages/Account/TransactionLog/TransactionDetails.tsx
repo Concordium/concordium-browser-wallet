@@ -39,7 +39,7 @@ export default function TransactionDetails({
             <TransactionElement accountAddress={accountAddress} transaction={transaction} />
             {transaction.status === TransactionStatus.Failed && (
                 <div className="transaction-details__dynamic-height-item">
-                    <Title title="Reject reason" />
+                    <Title title={t('rejectReason')} />
                     {transaction.rejectReason}
                 </div>
             )}

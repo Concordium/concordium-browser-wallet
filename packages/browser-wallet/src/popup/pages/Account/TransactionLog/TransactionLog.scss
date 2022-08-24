@@ -25,7 +25,7 @@
             font-size: rem(8px);
             color: $color-transaction-group-header-text;
             padding-left: rem(5px);
-            line-height: 12px;
+            line-height: rem(12px);
             display: flex;
             align-items: center;
             background-color: $color-transaction-group-header;
@@ -43,7 +43,7 @@
     flex-direction: column;
     justify-content: center;
     border-top: rem(0.5px) solid transparent;
-    height: 58px;
+    height: rem(42px);
 
     &__clickable {
         &:hover {
@@ -77,13 +77,13 @@
 
     &__checkmark {
         position: relative;
-        top: 1px;
-        margin-left: 5px;
+        top: rem(1px);
+        margin-left: rem(3px);
     }
 
     &__warning {
         position: absolute;
-        margin: 5px -25px;
+        margin: rem(5px) rem(-22px);
 
         :global(.warning_svg__boundary) {
             fill: $color-error;
@@ -91,7 +91,7 @@
     }
 
     &__failed {
-        padding-left: 30px;
+        padding-left: rem(30px);
     }
 }
 
@@ -121,21 +121,23 @@
         position: absolute;
     }
 
+    &__item {
+        height: rem(50px);
+        padding-top: 0;
+        padding-bottom: 0;
+    }
+
     &__dynamic-height-item,
     &__item {
         position: relative;
-        padding: 0 rem(16px) 0 rem(8px);
+        padding-left: rem(8px);
+        padding-right: rem(8px);
         display: flex;
         flex-direction: column;
         justify-content: center;
-        border-top: 0.5px solid transparent;
+        border-top: rem(0.5px) solid transparent;
         border-top-color: $color-grey;
-        height: rem(50px);
         word-break: break-all;
-    }
-
-    &__title {
-        color: $color-text-faded;
     }
 
     &__dynamic-height-item {
@@ -143,5 +145,9 @@
         padding-top: rem(5px);
         padding-bottom: rem(5px);
         min-height: rem(50px);
+    }
+
+    &__title {
+        color: $color-text-faded;
     }
 }

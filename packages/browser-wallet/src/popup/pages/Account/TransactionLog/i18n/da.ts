@@ -7,6 +7,7 @@ const t: typeof en = {
     transactionHash: 'Transaktionens hash',
     blockHash: 'Blok hash ',
     events: 'Hændelser',
+    rejectReason: 'Afvisningsårsag',
 };
 
 export default t;
