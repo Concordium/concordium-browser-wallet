@@ -74,7 +74,7 @@ function EditableName({ name, onChange }: EditNameProps) {
 type Props = {
     name: string;
     status: 'pending' | 'confirmed' | 'rejected';
-    onNameChange(name: string): void;
+    onNameChange?(name: string): void;
     onClick?(): void;
     provider: JSX.Element;
     className?: string;
@@ -104,7 +104,8 @@ export default function IdCard({ name, provider, status, onNameChange, className
                 {t('id.header')}
             </header>
             <div className="id-card__name">
-                <EditableName name={name} onChange={onNameChange} />
+                {!onNameChange && <div className="id-card__name-form">{name}</div>}
+                {onNameChange && <EditableName name={name} onChange={onNameChange} />}
             </div>
             <div className="id-card__status">
                 {status === 'pending' && t('id.pending')}

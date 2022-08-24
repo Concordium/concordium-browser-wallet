@@ -48,7 +48,6 @@ export default function ChooseIdentity() {
                         key={identity.id}
                         provider={<IdentityProviderIcon provider={findProvider(identity)} />}
                         status={identity.status}
-                        onNameChange={() => {}}
                         className="m-t-10"
                         onClick={() => {
                             setSelectedIdentityId(identity.id);

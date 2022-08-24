@@ -77,7 +77,7 @@ type Props = ClassName & {
     setDetailsExpanded: React.Dispatch<React.SetStateAction<boolean>>;
 };
 
-export default function AccountActions({ className, disabled = false, setDetailsExpanded }: Props) {
+export default function AccountActions({ className, disabled, setDetailsExpanded }: Props) {
     const { t } = useTranslation('account', { keyPrefix: 'actions' });
 
     return (

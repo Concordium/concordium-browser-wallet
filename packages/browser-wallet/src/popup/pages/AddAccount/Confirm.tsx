@@ -98,10 +98,10 @@ export default function Confirm() {
                 net: selectedIdentity.network,
             };
 
-            // Add Pending
-            setCredentials([...credentials, newCred]);
             // Send Request
             await client.sendCredentialDeployment(request);
+            // Add Pending
+            setCredentials([...credentials, newCred]);
             // Set selectedAccount
             setSelectedAccount(newCred.address);
             nav(absoluteRoutes.home.account.path);
@@ -140,7 +140,6 @@ export default function Confirm() {
                 name={selectedIdentity.name}
                 provider={<IdentityProviderIcon provider={identityProvider} />}
                 status={selectedIdentity.status}
-                onNameChange={() => {}}
                 className="m-t-40"
             />
         </div>
