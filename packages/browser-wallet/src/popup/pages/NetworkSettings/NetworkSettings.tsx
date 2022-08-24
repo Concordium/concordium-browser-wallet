@@ -6,7 +6,6 @@ import CheckmarkIcon from '@assets/svg/checkmark-blue.svg';
 
 import { NetworkConfiguration } from '@shared/storage/types';
 import Button from '@popup/shared/Button';
-import clsx from 'clsx';
 import { useTranslation } from 'react-i18next';
 
 export const mainnet: NetworkConfiguration = {
@@ -44,30 +43,32 @@ function NetworkConfigurationComponent({ networkConfiguration }: { networkConfig
         return (
             <div className="inline-flex align-center relative">
                 <div
-                    className={clsx(
+                    className={
                         isConfigurationMainnet
                             ? 'network-settings-page__element-mainnet'
                             : 'network-settings-page__element-testnet'
-                    )}
+                    }
                 >
                     {t('connected')}
                 </div>
-                {isMainnet(networkConfiguration) ? (
-                    <CheckmarkIcon className="network-settings-page__icon-mainnet" />
-                ) : (
-                    <CheckmarkIcon className="network-settings-page__icon-testnet" />
-                )}
+                <CheckmarkIcon
+                    className={
+                        isConfigurationMainnet
+                            ? 'network-settings-page__icon-mainnet'
+                            : 'network-settings-page__icon-testnet'
+                    }
+                />
             </div>
         );
     }
 
     return (
         <Button
-            className={clsx(
+            className={
                 isConfigurationMainnet
                     ? 'network-settings-page__element-mainnet'
                     : 'network-settings-page__element-testnet'
-            )}
+            }
             clear
             onClick={() => setCurrentNetworkConfiguration(networkConfiguration)}
         >
