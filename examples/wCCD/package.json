@@ -4,7 +4,7 @@
     "dependencies": {
         "@concordium/browser-wallet-api-helpers": "workspace:^",
         "@concordium/web-sdk": "^0.4.0",
-        "leb128": "^0.0.5",
+        "@thi.ng/leb128": "^2.1.18",
         "react": "^18.1.0",
         "react-dom": "^18.1.0"
     },

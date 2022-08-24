@@ -2,7 +2,7 @@
 import React, { useEffect, useState, useContext, useRef } from 'react';
 import { toBuffer, AccountAddress } from '@concordium/web-sdk';
 import { detectConcordiumProvider } from '@concordium/browser-wallet-api-helpers';
-import leb = require('leb128');
+import * as leb from '@thi.ng/leb128';
 import { wrap, unwrap, state, CONTRACT_NAME_PROXY, CONTRACT_NAME_IMPLEMENTATION, CONTRACT_NAME_STATE } from './utils';
 
 /** If you want to test admin functions of the wCCD contract,
@@ -40,8 +40,7 @@ async function updateStateWCCDBalanceAccount(account: string, setAmountAccount: 
     });
 
     // Adding '00' because enum 0 (an `Account`) was selected instead of enum 1 (an `ContractAddress`).
-    const inputParams = `00${hexString}`;
-
+    const inputParams = toBuffer(`00${hexString}`, 'hex');
     const provider = await detectConcordiumProvider();
     const res = await provider.getJsonRpcClient().invokeContract({
         method: `${CONTRACT_NAME_STATE}.getBalance`,
@@ -51,7 +50,8 @@ async function updateStateWCCDBalanceAccount(account: string, setAmountAccount: 
     if (!res || res.tag === 'failure' || !res.returnValue) {
         throw new Error(`Expected succesful invocation`);
     }
-    setAmountAccount(leb.unsigned.decode(toBuffer(res.returnValue, 'hex')));
+
+    setAmountAccount(BigInt(leb.decodeULEB128(toBuffer(res.returnValue, 'hex'))[0]));
 }
 
 export default function wCCD() {
