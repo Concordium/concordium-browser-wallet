@@ -6801,6 +6801,15 @@ __metadata:
   languageName: node
   linkType: hard
 
+"buffer-pipe@npm:0.0.3":
+  version: 0.0.3
+  resolution: "buffer-pipe@npm:0.0.3"
+  dependencies:
+    safe-buffer: ^5.1.2
+  checksum: 04daf09291f88952078578cc1e6e06ce044c1c0c57b0f5fef6a4d9332d7bd016f4f54331421fae1a322de45df5cfd79ff443aa04dfc51c244809e18b7a404746
+  languageName: node
+  linkType: hard
+
 "buffer-xor@npm:^1.0.3":
   version: 1.0.3
   resolution: "buffer-xor@npm:1.0.3"
@@ -13103,6 +13112,16 @@ __metadata:
   languageName: node
   linkType: hard
 
+"leb128@npm:^0.0.5":
+  version: 0.0.5
+  resolution: "leb128@npm:0.0.5"
+  dependencies:
+    bn.js: ^5.0.0
+    buffer-pipe: 0.0.3
+  checksum: d477f9f5c423401f279a7a9e2afa96d42baf1701a4e2a3d62a08696efa8c536d93a122ece14b9b54037e847108f67426abe6bbb6b4e1327a9bbbc9058ebafe60
+  languageName: node
+  linkType: hard
+
 "leven@npm:^3.1.0":
   version: 3.1.0
   resolution: "leven@npm:3.1.0"
@@ -19311,6 +19330,27 @@ __metadata:
   checksum: 23d4bc58634dbe13b86093e01c6a68d8096028b664ab7139d58f0c37d962d549a940e98f2f201cecdabd6f9c340338dc73ef8bf094a2249ef582f35183d1a131
   languageName: node
   linkType: hard
+
+"wccd@workspace:examples/wCCD":
+  version: 0.0.0-use.local
+  resolution: "wccd@workspace:examples/wCCD"
+  dependencies:
+    "@concordium/browser-wallet-api-helpers": "workspace:^"
+    "@concordium/web-sdk": ^0.4.0
+    "@craftamap/esbuild-plugin-html": ^0.4.0
+    "@types/react": ^18.0.9
+    "@types/react-dom": ^18.0.5
+    cross-env: ^7.0.3
+    esbuild: ^0.14.42
+    esbuild-plugin-svgr: ^1.0.1
+    leb128: ^0.0.5
+    live-server: ^1.2.2
+    react: ^18.1.0
+    react-dom: ^18.1.0
+    ts-node: ^10.8.0
+    typescript: ^4.7.2
+  languageName: unknown
+  linkType: soft
 
 "web-namespaces@npm:^1.0.0":
   version: 1.1.4
