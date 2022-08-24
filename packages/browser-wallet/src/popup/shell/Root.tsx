@@ -7,12 +7,13 @@ import { noOp } from 'wallet-common-helpers';
 import { Dimensions, large, medium, small } from '@popup/constants/dimensions';
 import { popupMessageHandler } from '@popup/shared/message-handler';
 import { isSpawnedWindow } from '@popup/shared/window-helpers';
-import { themeAtom } from '@popup/store/settings';
+import { networkConfigurationAtom, themeAtom } from '@popup/store/settings';
 import { Theme as ThemeType } from '@shared/storage/types';
 import { absoluteRoutes } from '@popup/constants/routes';
 
 import './i18n';
 
+import { mainnet } from '@popup/pages/NetworkSettings/NetworkSettings';
 import Routes from './Routes';
 
 const body = document.getElementsByTagName('body').item(0);
@@ -48,6 +49,20 @@ function useScaling() {
     }, []);
 }
 
+function Network({ children }: { children: ReactElement }) {
+    const network = useAtomValue(networkConfigurationAtom);
+
+    useEffect(() => {
+        if (network.name === mainnet.name) {
+            body?.classList.add('mainnet');
+        } else {
+            body?.classList.remove('mainnet');
+        }
+    }, [network]);
+
+    return children;
+}
+
 function Theme({ children }: { children: ReactElement }) {
     const theme = useAtomValue(themeAtom);
 
@@ -68,9 +83,11 @@ export default function Root() {
     return (
         <Provider>
             <MemoryRouter initialEntries={[absoluteRoutes.home.account.path]}>
-                <Theme>
-                    <Routes />
-                </Theme>
+                <Network>
+                    <Theme>
+                        <Routes />
+                    </Theme>
+                </Network>
             </MemoryRouter>
         </Provider>
     );

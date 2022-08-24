@@ -5,9 +5,8 @@ import { useNavigate } from 'react-router-dom';
 import IdCard from '@popup/shared/IdCard';
 import { identityProvidersAtom, selectedIdentityAtom } from '@popup/store/identity';
 import { selectedAccountAtom } from '@popup/store/account';
-import { credentialsAtom, jsonRpcUrlAtom, seedPhraseAtom } from '@popup/store/settings';
-import { CreationStatus, WalletCredential } from '@shared/storage/types';
-import { Network } from '@shared/storage/types';
+import { credentialsAtom, networkConfigurationAtom, seedPhraseAtom } from '@popup/store/settings';
+import { CreationStatus, WalletCredential, Network } from '@shared/storage/types';
 import { JsonRpcClient, HttpProvider } from '@concordium/web-sdk';
 import Button from '@popup/shared/Button';
 import ArrowIcon from '@assets/svg/arrow.svg';
@@ -16,6 +15,7 @@ import IdentityProviderIcon from '@popup/shared/IdentityProviderIcon';
 import { absoluteRoutes } from '@popup/constants/routes';
 import { InternalMessageType } from '@concordium/browser-wallet-message-hub';
 import { popupMessageHandler } from '@popup/shared/message-handler';
+import { BackgroundResponseStatus } from '@shared/utils/types';
 import AccountDetails from '../Account/AccountDetails';
 
 export default function Confirm() {
@@ -25,7 +25,7 @@ export default function Confirm() {
     const credentials = useAtomValue(credentialsAtom);
     const setSelectedAccount = useSetAtom(selectedAccountAtom);
     const seedPhrase = useAtomValue(seedPhraseAtom);
-    const jsonRpcUrl = useAtomValue(jsonRpcUrlAtom);
+    const { jsonRpcUrl } = useAtomValue(networkConfigurationAtom);
     const providers = useAtomValue(identityProvidersAtom);
     const [buttonDisabled, setButtonDisabled] = useState(false);
 
@@ -60,29 +60,37 @@ export default function Confirm() {
                 throw new Error('provider not found');
             }
 
-        // Make request
-        const expiry = Math.floor(Date.now() / 1000) + 720;
-        const credsOfCurrentIdentity = credentials.filter((cred) => cred.identityId === selectedIdentity.id);
-        const credNumber = credsOfCurrentIdentity.length
-            ? credsOfCurrentIdentity.reduce((best, cred) => Math.max(best, cred.credNumber), 0) + 1
-            : 0;
+            // Make request
+            const expiry = Math.floor(Date.now() / 1000) + 720;
 
-        const address = await popupMessageHandler.sendInternalMessage(InternalMessageType.SendCredentialDeployment, {
-            globalContext: global.value,
-            ipInfo: identityProvider.ipInfo,
-            arsInfos: identityProvider.arsInfos,
-            seedAsHex: seedPhrase,
-            net: Network[selectedIdentity.network],
-            idObject: selectedIdentity.idObject.value,
-            revealedAttributes: [],
-            identityIndex: selectedIdentity.index,
-            credNumber,
-            expiry,
-            identityId: selectedIdentity.id,
-        });
-            setSelectedAccount(address);
-            nav(absoluteRoutes.home.account.path);
+            const credsOfCurrentIdentity = credentials.filter((cred) => cred.identityId === selectedIdentity.id);
+            const credNumber = credsOfCurrentIdentity.length
+                ? credsOfCurrentIdentity.reduce((best, cred) => Math.max(best, cred.credNumber), 0) + 1
+                : 0;
 
+            const response = await popupMessageHandler.sendInternalMessage(
+                InternalMessageType.SendCredentialDeployment,
+                {
+                    globalContext: global.value,
+                    ipInfo: identityProvider.ipInfo,
+                    arsInfos: identityProvider.arsInfos,
+                    seedAsHex: seedPhrase,
+                    net: Network[selectedIdentity.network],
+                    idObject: selectedIdentity.idObject.value,
+                    revealedAttributes: [],
+                    identityIndex: selectedIdentity.index,
+                    credNumber,
+                    expiry,
+                    identityId: selectedIdentity.id,
+                }
+            );
+
+            if (response.status === BackgroundResponseStatus.Success) {
+                setSelectedAccount(response.address);
+                nav(absoluteRoutes.home.account.path);
+            } else {
+                // TODO show error toast
+            }
         } finally {
             setButtonDisabled(false);
         }
@@ -118,7 +126,6 @@ export default function Confirm() {
                 name={selectedIdentity.name}
                 provider={<IdentityProviderIcon provider={identityProvider} />}
                 status={selectedIdentity.status}
-                onNameChange={() => {}}
                 className="m-t-40"
             />
         </div>

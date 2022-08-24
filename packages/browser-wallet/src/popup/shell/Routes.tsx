@@ -21,6 +21,7 @@ import AddAccount from '@popup/pages/AddAccount';
 import { IdentityIssuanceEnd, IdentityIssuanceStart } from '@popup/pages/IdentityIssuance';
 import About from '@popup/pages/About';
 import Login from '@popup/pages/Login/Login';
+import ChangePasscode from '@popup/pages/ChangePasscode/ChangePasscode';
 
 type PromptKey = keyof Omit<typeof absoluteRoutes['prompt'], 'path'>;
 
@@ -48,10 +49,6 @@ function useMessagePrompt<R>(type: InternalMessageType | MessageType, promptKey:
     );
 
     return handleResponse;
-}
-
-function NoContent() {
-    return <>No content yet...</>;
 }
 
 export default function Routes() {
@@ -119,7 +116,7 @@ export default function Routes() {
                 <Route element={<Identity />} path={relativeRoutes.home.identities.path} />
                 <Route path={relativeRoutes.home.settings.path}>
                     <Route index element={<Settings />} />
-                    <Route element={<NoContent />} path={relativeRoutes.home.settings.passcode.path} />
+                    <Route element={<ChangePasscode />} path={relativeRoutes.home.settings.passcode.path} />
                     <Route element={<NetworkSettings />} path={relativeRoutes.home.settings.network.path} />
                     <Route element={<VisualSettings />} path={relativeRoutes.home.settings.visual.path} />
                     <Route element={<About />} path={relativeRoutes.home.settings.about.path} />

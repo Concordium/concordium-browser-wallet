@@ -62,7 +62,6 @@ export default function IdentityIssuanceEnd({ onFinish }: Props) {
                             name={pendingIdentity?.name || selectedIdentity?.name || 'Identity'}
                             provider={<IdentityProviderIcon provider={identityProvider} />}
                             status="pending"
-                            onNameChange={noOp}
                         />
                     </>
                 )}

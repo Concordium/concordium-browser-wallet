@@ -1,9 +1,9 @@
 import { HttpProvider, JsonRpcClient } from '@concordium/web-sdk';
-import { storedJsonRpcUrl, storedCredentials, storedIdentities } from '@shared/storage/access';
+import { storedCurrentNetwork, storedCredentials, storedIdentities } from '@shared/storage/access';
 
 import {
     Identity,
-    IdentityStatus,
+    CreationStatus,
     PendingIdentity,
     PendingWalletCredential,
     WalletCredential,
@@ -12,9 +12,9 @@ import { IdentityTokenContainer, IdentityProviderIdentityStatus } from 'wallet-c
 import { updateCredentials, updateIdentities } from './update';
 
 const isPendingCred = (cred: WalletCredential): cred is PendingWalletCredential =>
-    cred.status === IdentityStatus.Pending;
+    cred.status === CreationStatus.Pending;
 const isPendingIdentity = (identity: Identity): identity is PendingIdentity =>
-    identity.status === IdentityStatus.Pending;
+    identity.status === CreationStatus.Pending;
 const updateInterval = 10000;
 
 /**
@@ -22,7 +22,8 @@ const updateInterval = 10000;
  */
 async function monitorAccountStatus() {
     setTimeout(async function loop() {
-        const url = await storedJsonRpcUrl.get();
+        const network = await storedCurrentNetwork.get();
+        const url = network?.jsonRpcUrl;
         const creds = await storedCredentials.get();
         const toUpdate: WalletCredential[] = [];
         if (url && creds) {
@@ -35,7 +36,7 @@ async function monitorAccountStatus() {
                     );
                     toUpdate.push({
                         ...info,
-                        status: isSuccessful ? IdentityStatus.Confirmed : IdentityStatus.Rejected,
+                        status: isSuccessful ? CreationStatus.Confirmed : CreationStatus.Rejected,
                     });
                 }
             }
@@ -60,14 +61,14 @@ async function monitorIdentityStatus() {
                 if (response.status === IdentityProviderIdentityStatus.Error) {
                     toUpdate.push({
                         ...identity,
-                        status: IdentityStatus.Rejected,
+                        status: CreationStatus.Rejected,
                         error: response.detail,
                     });
                 }
                 if (response.status === IdentityProviderIdentityStatus.Done) {
                     toUpdate.push({
                         ...identity,
-                        status: IdentityStatus.Confirmed,
+                        status: CreationStatus.Confirmed,
                         idObject: response.token.identityObject,
                     });
                 }

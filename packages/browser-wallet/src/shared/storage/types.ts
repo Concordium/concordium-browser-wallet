@@ -3,7 +3,7 @@ import type { IdentityObjectV1 } from '@concordium/web-sdk';
 export enum ChromeStorageKey {
     ConnectedSites = 'connectedSites',
     Credentials = 'credentials',
-    JsonRpcUrl = 'jsonRpcUrl',
+    NetworkConfiguration = 'networkConfiguration',
     Passcode = 'passcode',
     SeedPhrase = 'seedPhrase',
     SelectedAccount = 'selectedAccount',
@@ -154,4 +154,11 @@ interface EncryptionMetaData {
 export interface EncryptedData {
     cipherText: string;
     metadata: EncryptionMetaData;
+}
+
+export interface NetworkConfiguration {
+    genesisHash: string;
+    name: string;
+    jsonRpcUrl: string;
+    explorerUrl: string;
 }

@@ -1,7 +1,7 @@
 import React, { useState, useEffect } from 'react';
 import { useAtomValue, useAtom, useSetAtom } from 'jotai';
 import { useTranslation } from 'react-i18next';
-import { jsonRpcUrlAtom, seedPhraseAtom } from '@popup/store/settings';
+import { networkConfigurationAtom, seedPhraseAtom } from '@popup/store/settings';
 import { pendingIdentityAtom, identitiesAtom, identityProvidersAtom } from '@popup/store/identity';
 import { popupMessageHandler } from '@popup/shared/message-handler';
 import { getIdentityProviders } from '@popup/shared/utils/wallet-proxy';
@@ -19,7 +19,7 @@ interface InnerProps {
 function IdentityIssuanceStart({ onStart }: InnerProps) {
     const { t } = useTranslation('identityIssuance');
     const [providers, setProviders] = useAtom(identityProvidersAtom);
-    const jsonRrcUrl = useAtomValue(jsonRpcUrlAtom);
+    const { jsonRpcUrl } = useAtomValue(networkConfigurationAtom);
     const updatePendingIdentity = useSetAtom(pendingIdentityAtom);
     const identities = useAtomValue(identitiesAtom);
     const seedPhrase = useAtomValue(seedPhraseAtom);
@@ -34,7 +34,7 @@ function IdentityIssuanceStart({ onStart }: InnerProps) {
     const startIssuance = async (provider: IdentityProvider) => {
         setButtonDisabled(true);
         try {
-            if (!jsonRrcUrl) {
+            if (!jsonRpcUrl) {
                 throw new Error('no json rpc url');
             }
             if (!seedPhrase) {
@@ -42,7 +42,7 @@ function IdentityIssuanceStart({ onStart }: InnerProps) {
             }
 
             // TODO: Maybe we should not create the client for each page
-            const client = new JsonRpcClient(new HttpProvider(jsonRrcUrl));
+            const client = new JsonRpcClient(new HttpProvider(jsonRpcUrl));
 
             const global = await client.getCryptographicParameters();
 

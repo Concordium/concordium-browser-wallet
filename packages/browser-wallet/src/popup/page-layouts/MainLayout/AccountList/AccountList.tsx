@@ -7,12 +7,14 @@ import { ClassName, displayAsCcd } from 'wallet-common-helpers';
 import CopyButton from '@popup/shared/CopyButton';
 import CheckmarkIcon from '@assets/svg/checkmark-blue.svg';
 import { absoluteRoutes } from '@popup/constants/routes';
-import { accountsAtom, selectedAccountAtom } from '@popup/store/account';
+import { selectedAccountAtom } from '@popup/store/account';
+import { credentialsAtom, networkConfigurationAtom } from '@popup/store/settings';
+import { identityNamesAtom } from '@popup/store/identity';
 import { useTranslation } from 'react-i18next';
 import { displaySplitAddress } from '@popup/shared/utils/account-helpers';
 import { AccountInfo } from '@concordium/web-sdk';
-import { jsonRpcUrlAtom } from '@popup/store/settings';
 import { AccountInfoEmitter } from '@popup/shared/account-info-emitter';
+import { WalletCredential } from '@shared/storage/types';
 import EntityList from '../EntityList';
 
 export type Account = { address: string };
@@ -22,9 +24,10 @@ type ItemProps = {
     totalBalance: bigint;
     checked: boolean;
     selected: boolean;
+    identityName: string;
 };
 
-function AccountListItem({ account: { address }, checked, selected, totalBalance }: ItemProps) {
+function AccountListItem({ account: { address }, checked, selected, totalBalance, identityName }: ItemProps) {
     return (
         <div className={clsx('main-layout__header-list-item', checked && 'main-layout__header-list-item--checked')}>
             <div className="main-layout__header-list-item__primary">
@@ -40,7 +43,7 @@ function AccountListItem({ account: { address }, checked, selected, totalBalance
                     tabIndex={-1}
                 />
             </div>
-            <div className="main-layout__header-list-item__secondary">Identity 1{/* TODO get from account */}</div>
+            <div className="main-layout__header-list-item__secondary">{identityName}</div>
             <div className="main-layout__header-list-item__secondary mono">{displayAsCcd(totalBalance)}</div>
         </div>
     );
@@ -51,11 +54,12 @@ type Props = ClassName & {
 };
 
 const AccountList = forwardRef<HTMLDivElement, Props>(({ className, onSelect }, ref) => {
-    const accounts = useAtomValue(accountsAtom).map((a) => ({ address: a }));
+    const accounts = useAtomValue(credentialsAtom);
     const [selectedAccount, setSelectedAccount] = useAtom(selectedAccountAtom);
     const nav = useNavigate();
     const { t } = useTranslation('mainLayout');
-    const jsonRpcUrl = useAtomValue(jsonRpcUrlAtom);
+    const { jsonRpcUrl } = useAtomValue(networkConfigurationAtom);
+    const identityNames = useAtomValue(identityNamesAtom);
 
     const [totalBalanceMap, setTotalBalanceMap] = useState<Map<string, bigint>>(new Map());
 
@@ -72,7 +76,7 @@ const AccountList = forwardRef<HTMLDivElement, Props>(({ className, onSelect }, 
     }, [JSON.stringify(accounts)]);
 
     return (
-        <EntityList<Account>
+        <EntityList<WalletCredential>
             className={className}
             onSelect={(a) => {
                 setSelectedAccount(a.address);
@@ -90,6 +94,7 @@ const AccountList = forwardRef<HTMLDivElement, Props>(({ className, onSelect }, 
                     checked={checked}
                     selected={a.address === selectedAccount}
                     totalBalance={totalBalanceMap.get(a.address) ?? 0n}
+                    identityName={identityNames[a.identityId] || 'Unknown'}
                 />
             )}
         </EntityList>
