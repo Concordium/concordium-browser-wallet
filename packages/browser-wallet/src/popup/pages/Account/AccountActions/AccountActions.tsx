@@ -1,15 +1,16 @@
-import Button from '@popup/shared/Button';
-import React, { Children, ReactNode, useRef } from 'react';
+import clsx from 'clsx';
 import { NavLink } from 'react-router-dom';
 import { useTranslation } from 'react-i18next';
+import { ClassName } from 'wallet-common-helpers';
+
+import React, { Children, ReactNode, useRef } from 'react';
+import Button from '@popup/shared/Button';
 
 import BackIcon from '@assets/svg/back-arrow.svg';
 import ListIcon from '@assets/svg/list.svg';
 import SendIcon from '@assets/svg/paperplane.svg';
 import ReceiveIcon from '@assets/svg/qr.svg';
 import SettingsIcon from '@assets/svg/cog.svg';
-
-import clsx from 'clsx';
 import { accountRoutes } from '../routes';
 
 const SCROLL_LIMIT = 5;
@@ -50,34 +51,55 @@ function ActionLinks({ children }: ActionLinksProps) {
     );
 }
 
-interface Props {
-    className: string;
-    setDetailsExpanded: React.Dispatch<React.SetStateAction<boolean>>;
+type ActionProps = {
+    children: ReactNode;
+    to: string;
+    title: string;
+    disabled?: boolean;
+    end?: boolean;
+    onClick?: () => void;
+};
+
+function Action({ children, to, title, disabled = false, end = false, onClick = undefined }: ActionProps) {
+    return disabled ? (
+        <Button className="account-page-actions__link-disabled" disabled title={title}>
+            {children}
+        </Button>
+    ) : (
+        <NavLink className="account-page-actions__link" to={to} end={end} title={title} onClick={onClick}>
+            {children}
+        </NavLink>
+    );
 }
 
-export default function AccountActions({ className, setDetailsExpanded }: Props) {
+type Props = ClassName & {
+    disabled: boolean;
+    setDetailsExpanded: React.Dispatch<React.SetStateAction<boolean>>;
+};
+
+export default function AccountActions({ className, disabled, setDetailsExpanded }: Props) {
     const { t } = useTranslation('account', { keyPrefix: 'actions' });
 
     return (
-        <nav className={clsx('account-page-actions', className)}>
+        <nav className={clsx('account-page-actions', className, disabled && 'account-page-actions-disabled')}>
             <ActionLinks>
-                <NavLink className="account-page-actions__link" to="" end title={t('log')}>
+                <Action to="" end title={t('log')} disabled={disabled}>
                     <ListIcon className="account-page-actions__list-icon" />
-                </NavLink>
-                <NavLink className="account-page-actions__link" to={accountRoutes.send} title={t('send')}>
+                </Action>
+                <Action to={accountRoutes.send} title={t('send')} disabled={disabled}>
                     <SendIcon className="account-page-actions__send-icon" />
-                </NavLink>
-                <NavLink className="account-page-actions__link" to={accountRoutes.receive} title={t('receive')}>
+                </Action>
+                <Action to={accountRoutes.receive} title={t('receive')} disabled={disabled}>
                     <ReceiveIcon className="account-page-actions__receive-icon" />
-                </NavLink>
-                <NavLink
-                    className="account-page-actions__link"
+                </Action>
+                <Action
                     to={accountRoutes.settings}
                     title={t('settings')}
+                    disabled={disabled}
                     onClick={() => setDetailsExpanded(false)}
                 >
                     <SettingsIcon className="account-page-actions__settings-icon" />
-                </NavLink>
+                </Action>
             </ActionLinks>
         </nav>
     );

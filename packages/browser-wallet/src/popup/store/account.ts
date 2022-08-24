@@ -23,3 +23,11 @@ export const selectedAccountAtom = atom<string | undefined, string | undefined>(
 );
 
 export const accountsAtom = selectAtom(credentialsAtom, (cs) => cs.map((c) => c.address));
+
+export const accountsPerIdentityAtom = selectAtom(credentialsAtom, (cs) => {
+    const map = {} as Record<number, string[]>;
+    cs.forEach((cred) => {
+        map[cred.identityId] = (map[cred.identityId] ?? []).concat([cred.address]);
+    });
+    return map;
+});

@@ -1,0 +1,31 @@
+.add-account-page {
+    &__blur-details {
+        position: relative;
+        filter: blur(rem(1px));
+    }
+
+    &__confirm-button {
+        position: absolute;
+        left: 0;
+        right: 0;
+        top: 0;
+        bottom: 0;
+        margin: auto;
+    }
+
+    &__arrow {
+        position: absolute;
+        margin: rem(-40px) auto;
+        left: 0;
+        right: 0;
+
+        path {
+            fill: $color-cta;
+        }
+    }
+
+    &__no-identity-button {
+        margin-top: auto;
+        margin-bottom: rem(40px);
+    }
+}

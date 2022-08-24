@@ -2,7 +2,7 @@ import React, { useEffect, useMemo } from 'react';
 import { useAtom, useAtomValue } from 'jotai';
 import { identityProvidersAtom, selectedIdentityAtom } from '@popup/store/identity';
 import IdCard from '@popup/shared/IdCard';
-import { IdentityStatus } from '@shared/storage/types';
+import { CreationStatus } from '@shared/storage/types';
 import { AttributeKey } from '@concordium/web-sdk';
 import attributeNames from 'wallet-common-helpers/constants/attributeNames.json';
 import { formatAttributeValue, compareAttributes } from 'wallet-common-helpers';
@@ -20,18 +20,18 @@ export default function Identity() {
 
     useEffect(() => {
         // TODO: Check identity status in background
-        if (selectedIdentity?.status === IdentityStatus.Pending) {
+        if (selectedIdentity?.status === CreationStatus.Pending) {
             getIdObject(selectedIdentity.location).then((response) => {
                 if (response.error) {
                     updateSelectedIdentity({
                         ...selectedIdentity,
-                        status: IdentityStatus.Rejected,
+                        status: CreationStatus.Rejected,
                         error: response.error,
                     });
                 } else {
                     updateSelectedIdentity({
                         ...selectedIdentity,
-                        status: IdentityStatus.Confirmed,
+                        status: CreationStatus.Confirmed,
                         idObject: response.token.identityObject,
                     });
                 }
@@ -44,7 +44,7 @@ export default function Identity() {
     }
 
     const attributes =
-        selectedIdentity.status === IdentityStatus.Confirmed &&
+        selectedIdentity.status === CreationStatus.Confirmed &&
         (selectedIdentity.idObject.value.attributeList.chosenAttributes as Record<AttributeKey, string>);
 
     return (

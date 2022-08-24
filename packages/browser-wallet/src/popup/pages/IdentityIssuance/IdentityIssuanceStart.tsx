@@ -7,7 +7,7 @@ import { popupMessageHandler } from '@popup/shared/message-handler';
 import { getIdentityProviders } from '@popup/shared/utils/wallet-proxy';
 import { InternalMessageType } from '@concordium/browser-wallet-message-hub';
 import { JsonRpcClient, HttpProvider } from '@concordium/web-sdk';
-import { IdentityStatus, Network, IdentityProvider } from '@shared/storage/types';
+import { CreationStatus, Network, IdentityProvider } from '@shared/storage/types';
 import Button from '@popup/shared/Button';
 import IdentityProviderIcon from '@popup/shared/IdentityProviderIcon';
 import PendingArrows from '@assets/svg/pending-arrows.svg';
@@ -22,7 +22,7 @@ function IdentityIssuanceStart({ onStart }: InnerProps) {
     const { jsonRpcUrl } = useAtomValue(networkConfigurationAtom);
     const updatePendingIdentity = useSetAtom(pendingIdentityAtom);
     const identities = useAtomValue(identitiesAtom);
-    const masterSeed = useAtomValue(seedPhraseAtom);
+    const seedPhrase = useAtomValue(seedPhraseAtom);
     const [error, setError] = useState<string>();
     const [buttonDisabled, setButtonDisabled] = useState(false);
 
@@ -37,8 +37,8 @@ function IdentityIssuanceStart({ onStart }: InnerProps) {
             if (!jsonRpcUrl) {
                 throw new Error('no json rpc url');
             }
-            if (!masterSeed) {
-                throw new Error('no master seed');
+            if (!seedPhrase) {
+                throw new Error('no seed phrase');
             }
 
             // TODO: Maybe we should not create the client for each page
@@ -59,7 +59,7 @@ function IdentityIssuanceStart({ onStart }: InnerProps) {
 
             updatePendingIdentity({
                 id: identities.length,
-                status: IdentityStatus.Pending,
+                status: CreationStatus.Pending,
                 index: identityIndex,
                 name: `Identity ${identityIndex + 1}`,
                 network: Network[net],
@@ -70,7 +70,7 @@ function IdentityIssuanceStart({ onStart }: InnerProps) {
                 globalContext: global.value,
                 ipInfo: provider.ipInfo,
                 arsInfos: provider.arsInfos,
-                seed: masterSeed,
+                seed: seedPhrase,
                 net,
                 identityIndex,
                 arThreshold: Math.min(Object.keys(provider.arsInfos).length - 1, 255),

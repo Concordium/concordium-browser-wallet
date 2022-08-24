@@ -13,7 +13,7 @@ import IdCard from '@popup/shared/IdCard';
 import PageHeader from '@popup/shared/PageHeader';
 import { noOp } from 'wallet-common-helpers';
 import Button from '@popup/shared/Button';
-import { IdentityStatus } from '@shared/storage/types';
+import { CreationStatus } from '@shared/storage/types';
 import { fullscreenPromptContext } from '@popup/page-layouts/FullscreenPromptLayout';
 import { IdentityIssuanceBackgroundResponse } from '@shared/utils/identity-helpers';
 import IdentityProviderIcon from '@popup/shared/IdentityProviderIcon';
@@ -53,7 +53,7 @@ export default function IdentityIssuanceEnd({ onFinish }: Props) {
                 setIdentities(
                     identities.concat({
                         ...pendingIdentity,
-                        status: IdentityStatus.Pending,
+                        status: CreationStatus.Pending,
                         location: state.payload.result,
                     })
                 );
@@ -83,7 +83,6 @@ export default function IdentityIssuanceEnd({ onFinish }: Props) {
                             name={pendingIdentity?.name || selectedIdentity?.name || 'Identity'}
                             provider={<IdentityProviderIcon provider={identityProvider} />}
                             status="pending"
-                            onNameChange={noOp}
                         />
                     </>
                 )}

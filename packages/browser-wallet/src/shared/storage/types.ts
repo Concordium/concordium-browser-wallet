@@ -1,10 +1,12 @@
+import type { IdentityObjectV1 } from '@concordium/web-sdk';
+
 export enum ChromeStorageKey {
     ConnectedSites = 'connectedSites',
     Credentials = 'credentials',
     NetworkConfiguration = 'networkConfiguration',
     Passcode = 'passcode',
-    SelectedAccount = 'selectedAccont',
     SeedPhrase = 'seedPhrase',
+    SelectedAccount = 'selectedAccount',
     Theme = 'theme',
     PendingIdentity = 'pendingIdentity',
     Identities = 'identities',
@@ -22,12 +24,10 @@ export enum Network {
     Mainnet = 919,
 }
 
-export type WalletCredential = {
-    key: string;
-    address: string;
-};
-
-export enum IdentityStatus {
+/**
+ * Used to describe the status of an identity or a credential
+ */
+export enum CreationStatus {
     Pending = 'pending',
     Confirmed = 'confirmed',
     Rejected = 'rejected',
@@ -35,7 +35,7 @@ export enum IdentityStatus {
 
 export interface BaseIdentity {
     id: number;
-    status: IdentityStatus;
+    status: CreationStatus;
     name: string;
     index: number;
     network: Network;
@@ -43,24 +43,20 @@ export interface BaseIdentity {
 }
 
 export interface PendingIdentity extends BaseIdentity {
-    status: IdentityStatus.Pending;
+    status: CreationStatus.Pending;
     location: string;
 }
 
 export interface RejectedIdentity extends BaseIdentity {
-    status: IdentityStatus.Rejected;
+    status: CreationStatus.Rejected;
     error: string;
 }
 
 export interface ConfirmedIdentity extends BaseIdentity {
-    status: IdentityStatus.Confirmed;
+    status: CreationStatus.Confirmed;
     idObject: {
         v: 0;
-        value: {
-            attributeList: Record<string, unknown>;
-            preIdentityObject: Record<string, unknown>;
-            signature: string;
-        };
+        value: IdentityObjectV1;
     };
 }
 
@@ -120,6 +116,30 @@ export interface IdentityProvider {
     arsInfos: Record<string, ArInfo>; // objects with ArInfo fields (and numbers as field names)
     metadata: IdentityProviderMetaData;
 }
+
+export interface BaseCredential {
+    address: string;
+    credId: string;
+    credNumber: number;
+    status: CreationStatus;
+    identityId: number;
+    net: Network;
+    // Policy (is in accountInfo)
+    // CredentialIndex = 0
+}
+
+export interface PendingWalletCredential extends BaseCredential {
+    status: CreationStatus.Pending;
+    deploymentHash: string;
+}
+export interface ConfirmedCredential extends BaseCredential {
+    status: CreationStatus.Confirmed;
+}
+export interface RejectedCredential extends BaseCredential {
+    status: CreationStatus.Rejected;
+}
+
+export type WalletCredential = PendingWalletCredential | ConfirmedCredential | RejectedCredential;
 
 interface EncryptionMetaData {
     keyLen: number;

@@ -1,19 +1,10 @@
 import type en from './en';
 
 const t: typeof en = {
-    add: 'Tilføj konto',
-    key: {
-        label: 'Privat nøgle',
-        validation: {
-            required: 'Privat nøgle er påkrævet',
-        },
-    },
-    address: {
-        label: 'Adresse',
-        validation: {
-            required: 'Adressen er påkrævet',
-        },
-    },
+    chooseIdentity: 'Hvilken identitet skal bruges til at oprette kontoen?',
+    createAccount: 'Opret konto',
+    noIdentities: 'Du har ingen identiter, men en identitet er nødvendig for at oprette en konto.',
+    createIdentity: 'Opret identitet',
 };
 
 export default t;

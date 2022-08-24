@@ -4,6 +4,10 @@
     width: 100%;
     background-color: $color-cta;
 
+    &-disabled {
+        background-color: $color-passive;
+    }
+
     &__left,
     &__right {
         flex: 0 0 rem(36px);
@@ -55,6 +59,7 @@
         }
     }
 
+    &__link-disabled,
     &__link {
         position: relative;
         display: flex;
@@ -95,18 +100,18 @@
             transform: scaleX(1);
         }
 
-        &:not(.active) {
-            &:focus,
-            &:hover {
-                &::after {
-                    transform: scaleX(0.6);
-                }
-            }
-        }
-
         // If navigation buttons are included (> 5 links), we have less space.
         .account-page-actions__left + .account-page-actions__links & {
             flex: 0 0 25%;
+        }
+    }
+
+    &__link:not(.active) {
+        &:focus,
+        &:hover {
+            &::after {
+                transform: scaleX(0.6);
+            }
         }
     }
 

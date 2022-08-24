@@ -1,5 +1,6 @@
 import { ChromeStorageKey, Identity, PendingIdentity, IdentityProvider } from '@shared/storage/types';
 import { atom } from 'jotai';
+import { selectAtom } from 'jotai/utils';
 import { atomWithChromeStorage } from './utils';
 
 export const identitiesAtom = atomWithChromeStorage<Identity[]>(ChromeStorageKey.Identities, []);
@@ -31,3 +32,11 @@ export const selectedIdentityAtom = atom<Identity | undefined, Identity | undefi
 );
 
 export const identityProvidersAtom = atomWithChromeStorage<IdentityProvider[]>(ChromeStorageKey.IdentityProviders, []);
+
+export const identityNamesAtom = selectAtom(identitiesAtom, (identities) => {
+    const map = {} as Record<number, string>;
+    identities.forEach((identity) => {
+        map[identity.id] = identity.name;
+    });
+    return map;
+});

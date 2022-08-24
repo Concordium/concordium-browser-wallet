@@ -8,23 +8,24 @@ import CheckmarkIcon from '@assets/svg/checkmark-blue.svg';
 import { absoluteRoutes } from '@popup/constants/routes';
 import { identitiesAtom, selectedIdentityIdAtom } from '@popup/store/identity';
 import { useTranslation } from 'react-i18next';
-import { Identity, IdentityStatus } from '@shared/storage/types';
+import { Identity, CreationStatus } from '@shared/storage/types';
+import { accountsPerIdentityAtom } from '@popup/store/account';
 import EntityList from '../EntityList';
 
 type ItemProps = {
     identity: Identity;
     checked: boolean;
     selected: boolean;
+    accountCount: number;
 };
 
 function getStatusText(identity: Identity, accountCount = 0): string {
     switch (identity.status) {
-        case IdentityStatus.Pending:
+        case CreationStatus.Pending:
             return 'Verification pending';
-        case IdentityStatus.Rejected:
+        case CreationStatus.Rejected:
             return 'Verification failed';
-        case IdentityStatus.Confirmed: {
-            // TODO Find number of accounts
+        case CreationStatus.Confirmed: {
             return `${accountCount} account${accountCount !== 1 ? 's' : ''}`;
         }
         default:
@@ -33,7 +34,7 @@ function getStatusText(identity: Identity, accountCount = 0): string {
     }
 }
 
-function IdentityListItem({ identity, checked, selected }: ItemProps) {
+function IdentityListItem({ identity, checked, selected, accountCount }: ItemProps) {
     return (
         <div className={clsx('main-layout__header-list-item', checked && 'main-layout__header-list-item--checked')}>
             <div className="main-layout__header-list-item__primary">
@@ -41,7 +42,7 @@ function IdentityListItem({ identity, checked, selected }: ItemProps) {
                     {identity.name} {selected && <CheckmarkIcon className="main-layout__header-list-item__check" />}
                 </div>
             </div>
-            <div className="main-layout__header-list-item__secondary">{getStatusText(identity)}</div>
+            <div className="main-layout__header-list-item__secondary">{getStatusText(identity, accountCount)}</div>
         </div>
     );
 }
@@ -52,6 +53,7 @@ type Props = ClassName & {
 
 const IdentityList = forwardRef<HTMLDivElement, Props>(({ className, onSelect }, ref) => {
     const identities = useAtomValue(identitiesAtom);
+    const accountsPerIdentity = useAtomValue(accountsPerIdentityAtom);
     const [selectedIdentityId, setSelectedIdentityId] = useAtom(selectedIdentityIdAtom);
     const nav = useNavigate();
     const { t } = useTranslation('mainLayout');
@@ -70,7 +72,14 @@ const IdentityList = forwardRef<HTMLDivElement, Props>(({ className, onSelect },
             ref={ref}
             searchableKeys={['name']}
         >
-            {(a, checked) => <IdentityListItem identity={a} checked={checked} selected={a.id === selectedIdentityId} />}
+            {(a, checked) => (
+                <IdentityListItem
+                    identity={a}
+                    checked={checked}
+                    selected={a.id === selectedIdentityId}
+                    accountCount={accountsPerIdentity[a.id]?.length || 0}
+                />
+            )}
         </EntityList>
     );
 });

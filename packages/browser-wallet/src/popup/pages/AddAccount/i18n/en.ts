@@ -1,17 +1,8 @@
 const t = {
-    add: 'Add account',
-    key: {
-        label: 'Private key',
-        validation: {
-            required: 'Private key is required',
-        },
-    },
-    address: {
-        label: 'Address',
-        validation: {
-            required: 'Address is required',
-        },
-    },
+    chooseIdentity: 'Which identity should create the account?',
+    createAccount: 'Create new account',
+    noIdentities: 'You have no identities, however you need an identity to create an account.',
+    createIdentity: 'Create new identity',
 };
 
 export default t;
