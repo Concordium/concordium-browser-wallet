@@ -7,6 +7,9 @@ import MenuButton from '@popup/shared/MenuButton';
 import { getCurrentOpenTabUrl } from '@popup/shared/utils/tabs';
 import clsx from 'clsx';
 import { useSelectedCredential } from '@popup/shared/utils/account-helpers';
+import { useListenForUpdates } from '@popup/store/utils';
+import { ChromeStorageKey } from '@shared/storage/types';
+import { credentialsAtom } from '@popup/store/settings';
 import { accountRoutes } from './routes';
 import { accountSettingsRoutes } from './AccountSettings/routes';
 import AccountActions from './AccountActions';
@@ -52,6 +55,7 @@ function Account({
 }) {
     const { t } = useTranslation('account');
     const accounts = useAtomValue(accountsAtom);
+    useListenForUpdates(ChromeStorageKey.Credentials, credentialsAtom);
 
     const selectedCred = useSelectedCredential();
 

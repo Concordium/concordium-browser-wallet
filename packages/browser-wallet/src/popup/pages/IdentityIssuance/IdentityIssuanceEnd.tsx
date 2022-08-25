@@ -1,6 +1,11 @@
 import React, { useEffect, useContext, useMemo } from 'react';
 import { useAtom, useAtomValue } from 'jotai';
-import { pendingIdentityAtom, identityProvidersAtom, selectedIdentityAtom } from '@popup/store/identity';
+import {
+    pendingIdentityAtom,
+    identityProvidersAtom,
+    selectedIdentityAtom,
+    identitiesAtom,
+} from '@popup/store/identity';
 import { useTranslation } from 'react-i18next';
 import { useLocation } from 'react-router-dom';
 import IdCard from '@popup/shared/IdCard';
@@ -11,6 +16,8 @@ import { fullscreenPromptContext } from '@popup/page-layouts/FullscreenPromptLay
 import { IdentityIssuanceBackgroundResponse } from '@shared/utils/identity-helpers';
 import IdentityProviderIcon from '@popup/shared/IdentityProviderIcon';
 import { BackgroundResponseStatus } from '@shared/utils/types';
+import { ChromeStorageKey, CreationStatus } from '@shared/storage/types';
+import { useListenForUpdates } from '@popup/store/utils';
 
 interface Location {
     state: {
@@ -31,6 +38,7 @@ export default function IdentityIssuanceEnd({ onFinish }: Props) {
     const [pendingIdentity, setPendingIdentity] = useAtom(pendingIdentityAtom);
     const { withClose, onClose } = useContext(fullscreenPromptContext);
     const selectedIdentity = useAtomValue(selectedIdentityAtom);
+    useListenForUpdates(ChromeStorageKey.Identities, identitiesAtom);
 
     const identityProvider = useMemo(
         () => providers.find((p) => p.ipInfo.ipIdentity === selectedIdentity?.provider),
@@ -61,7 +69,7 @@ export default function IdentityIssuanceEnd({ onFinish }: Props) {
                             className="identity-issuance__card"
                             name={pendingIdentity?.name || selectedIdentity?.name || 'Identity'}
                             provider={<IdentityProviderIcon provider={identityProvider} />}
-                            status="pending"
+                            status={selectedIdentity?.status || CreationStatus.Pending}
                         />
                     </>
                 )}

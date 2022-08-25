@@ -1,6 +1,5 @@
-import { HttpProvider, JsonRpcClient } from '@concordium/web-sdk';
+import { HttpProvider, JsonRpcClient, TransactionStatusEnum } from '@concordium/web-sdk';
 import { storedCurrentNetwork, storedCredentials, storedIdentities } from '@shared/storage/access';
-
 import {
     Identity,
     CreationStatus,
@@ -22,29 +21,37 @@ const updateInterval = 10000;
  */
 async function monitorAccountStatus() {
     setTimeout(async function loop() {
-        const network = await storedCurrentNetwork.get();
-        const url = network?.jsonRpcUrl;
-        const creds = await storedCredentials.get();
-        const toUpdate: WalletCredential[] = [];
-        if (url && creds) {
-            const client = new JsonRpcClient(new HttpProvider(url, fetch));
-            for (const { status, deploymentHash, ...info } of creds.filter(isPendingCred)) {
-                const response = await client.getTransactionStatus(deploymentHash);
-                if (response?.status === 'finalized') {
-                    const isSuccessful = Object.values(response?.outcomes || {}).some(
-                        (outcome) => outcome.result.outcome === 'success'
-                    );
-                    toUpdate.push({
-                        ...info,
-                        status: isSuccessful ? CreationStatus.Confirmed : CreationStatus.Rejected,
-                    });
+        try {
+            const network = await storedCurrentNetwork.get();
+            const url = network?.jsonRpcUrl;
+            const creds = await storedCredentials.get();
+            const toUpdate: WalletCredential[] = [];
+            if (url && creds) {
+                const client = new JsonRpcClient(new HttpProvider(url, fetch));
+                for (const { status, deploymentHash, ...info } of creds.filter(isPendingCred)) {
+                    try {
+                        const response = await client.getTransactionStatus(deploymentHash);
+                        if (response?.status === TransactionStatusEnum.Finalized) {
+                            const isSuccessful = Object.values(response?.outcomes || {}).some(
+                                (outcome) => outcome.result.outcome === 'success'
+                            );
+                            toUpdate.push({
+                                ...info,
+                                status: isSuccessful ? CreationStatus.Confirmed : CreationStatus.Rejected,
+                            });
+                        }
+                    } catch {
+                        // We catch here to allow other pending accounts to resolve
+                        // TODO log this
+                    }
+                    if (toUpdate.length) {
+                        await updateCredentials(toUpdate);
+                    }
                 }
             }
-            if (toUpdate.length) {
-                await updateCredentials(toUpdate);
-            }
+        } finally {
+            setTimeout(loop, updateInterval);
         }
-        setTimeout(loop, updateInterval);
     }, 0);
 }
 
@@ -53,31 +60,39 @@ async function monitorAccountStatus() {
  */
 async function monitorIdentityStatus() {
     setTimeout(async function loop() {
-        const identities = await storedIdentities.get();
-        const toUpdate: Identity[] = [];
-        if (identities) {
-            for (const { location, ...identity } of identities.filter(isPendingIdentity)) {
-                const response = (await (await fetch(location)).json()) as IdentityTokenContainer;
-                if (response.status === IdentityProviderIdentityStatus.Error) {
-                    toUpdate.push({
-                        ...identity,
-                        status: CreationStatus.Rejected,
-                        error: response.detail,
-                    });
+        try {
+            const identities = await storedIdentities.get();
+            const toUpdate: Identity[] = [];
+            if (identities) {
+                for (const { location, ...identity } of identities.filter(isPendingIdentity)) {
+                    try {
+                        const response = (await (await fetch(location)).json()) as IdentityTokenContainer;
+                        if (response.status === IdentityProviderIdentityStatus.Error) {
+                            toUpdate.push({
+                                ...identity,
+                                status: CreationStatus.Rejected,
+                                error: response.detail,
+                            });
+                        }
+                        if (response.status === IdentityProviderIdentityStatus.Done) {
+                            toUpdate.push({
+                                ...identity,
+                                status: CreationStatus.Confirmed,
+                                idObject: response.token.identityObject,
+                            });
+                        }
+                    } catch {
+                        // We catch here to allow other pending identities to resolve
+                        // TODO log this
+                    }
                 }
-                if (response.status === IdentityProviderIdentityStatus.Done) {
-                    toUpdate.push({
-                        ...identity,
-                        status: CreationStatus.Confirmed,
-                        idObject: response.token.identityObject,
-                    });
+                if (toUpdate.length) {
+                    await updateIdentities(toUpdate);
                 }
             }
-            if (toUpdate.length) {
-                await updateIdentities(toUpdate);
-            }
+        } finally {
+            setTimeout(loop, updateInterval);
         }
-        setTimeout(loop, updateInterval);
     }, 0);
 }
 

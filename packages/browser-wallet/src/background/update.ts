@@ -27,7 +27,7 @@ async function editList<Type>(
     return navigator.locks.request(lock, async () => {
         const currentList = await storage.get();
         if (!currentList) {
-            return;
+            throw new Error('Attempt to edit non-existing list.');
         }
         const newList = [...currentList];
         for (const updated of edits) {

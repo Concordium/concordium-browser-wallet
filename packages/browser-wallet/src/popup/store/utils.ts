@@ -16,6 +16,9 @@ import {
 import { ChromeStorageKey } from '@shared/storage/types';
 import { atom, WritableAtom } from 'jotai';
 
+import { useEffect } from 'react';
+import { useUpdateAtom } from 'jotai/utils';
+
 const accessorMap = {
     [ChromeStorageKey.Identities]: storedIdentities,
     [ChromeStorageKey.PendingIdentity]: storedPendingIdentity,
@@ -79,4 +82,20 @@ export function atomWithChromeStorage<V>(key: ChromeStorageKey, fallback: V, wit
     );
 
     return derived;
+}
+
+export function useListenForUpdates<V>(key: ChromeStorageKey, atomToUpdate: WritableAtom<V, V, void>) {
+    const update = useUpdateAtom(atomToUpdate);
+
+    useEffect(() => {
+        function listener(changes: Record<string, chrome.storage.StorageChange>) {
+            if (key in changes) {
+                update(changes[key].newValue);
+            }
+        }
+        chrome.storage.local.onChanged.addListener(listener);
+        return () => chrome.storage.local.onChanged.removeListener(listener);
+    }, []);
+
+    return null;
 }

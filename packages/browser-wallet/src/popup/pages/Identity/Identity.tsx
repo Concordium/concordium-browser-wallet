@@ -1,8 +1,9 @@
 import React, { useMemo } from 'react';
 import { useAtom, useAtomValue } from 'jotai';
-import { identityProvidersAtom, selectedIdentityAtom } from '@popup/store/identity';
+import { identitiesAtom, identityProvidersAtom, selectedIdentityAtom } from '@popup/store/identity';
+import { useListenForUpdates } from '@popup/store/utils';
 import IdCard from '@popup/shared/IdCard';
-import { CreationStatus } from '@shared/storage/types';
+import { ChromeStorageKey, CreationStatus } from '@shared/storage/types';
 import { AttributeKey } from '@concordium/web-sdk';
 import attributeNames from 'wallet-common-helpers/constants/attributeNames.json';
 import { formatAttributeValue, compareAttributes } from 'wallet-common-helpers';
@@ -10,6 +11,7 @@ import IdentityProviderIcon from '@popup/shared/IdentityProviderIcon';
 
 export default function Identity() {
     const [selectedIdentity, updateSelectedIdentity] = useAtom(selectedIdentityAtom);
+    useListenForUpdates(ChromeStorageKey.Identities, identitiesAtom);
     const providers = useAtomValue(identityProvidersAtom);
 
     const identityProvider = useMemo(
