@@ -7,6 +7,7 @@
 -   Login screen.
 -   Change passcode settings page.
 -   Transaction details view when clicking a transaction in the transaction list.
+-   Export private key account settings page.
 
 ### Changed
 
