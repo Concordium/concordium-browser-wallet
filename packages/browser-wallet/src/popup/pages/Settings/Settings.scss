@@ -7,4 +7,13 @@
         display: block;
         padding: rem(10px) 0;
     }
+
+    &__toggle {
+        position: absolute;
+        width: $switch-width;
+        bottom: rem(8px);
+        left: 0;
+        right: 0;
+        margin: 0 auto;
+    }
 }
