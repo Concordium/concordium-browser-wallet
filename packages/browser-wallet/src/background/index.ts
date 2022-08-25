@@ -5,12 +5,23 @@ import {
     MessageType,
 } from '@concordium/browser-wallet-message-hub';
 import { HttpProvider } from '@concordium/web-sdk';
-import { storedConnectedSites, storedSelectedAccount, storedCurrentNetwork } from '@shared/storage/access';
+import {
+    storedConnectedSites,
+    storedSelectedAccount,
+    storedCurrentNetwork,
+    sessionPasscode,
+} from '@shared/storage/access';
 
 import JSONBig from 'json-bigint';
 import bgMessageHandler from './message-handler';
 import { forwardToPopup, HandleMessage, HandleResponse, RunCondition, setPopupSize } from './window-management';
 import { identityIssuanceHandler } from './identity-issuance';
+
+const walletLockedMessage = 'The wallet is locked';
+async function isWalletLocked(): Promise<boolean> {
+    const passcode = await sessionPasscode.get();
+    return !passcode;
+}
 
 /**
  * Determines whether the given url has been whitelisted by any account.
@@ -31,6 +42,11 @@ async function performRpcCall(
     onSuccess: (response: string | undefined) => void,
     onFailure: (response: string) => void
 ) {
+    const locked = await isWalletLocked();
+    if (locked) {
+        onFailure(walletLockedMessage);
+    }
+
     const isWhiteListed = await isWhiteListedForAnyAccount(senderUrl);
     if (isWhiteListed) {
         const url = (await storedCurrentNetwork.get())?.jsonRpcUrl;
@@ -101,8 +117,9 @@ bgMessageHandler.handleMessage(createMessageTypeFilter(MessageType.JsonRpcReques
 const runIfWhitelisted: RunCondition<false> = async (msg, sender) => {
     const { accountAddress } = msg.payload;
     const connectedSites = await storedConnectedSites.get();
+    const locked = await isWalletLocked();
 
-    if (!accountAddress || connectedSites === undefined) {
+    if (!accountAddress || connectedSites === undefined || locked) {
         return { run: false, response: false };
     }
 
@@ -150,6 +167,7 @@ async function findPrioritizedAccountConnectedToSite(url: string): Promise<strin
  * Run condition that runs the handler if the wallet is non-empty (an account exists), and no
  * account in the wallet is connected to the sender URL.
  *
+ * 1. If the wallet is locked, then do run.
  * 1. If no selected account exists (the wallet is empty), then do not run and return undefined.
  * 1. Else if the selected account is connected to the sender URL, then do not run and return the selected account address.
  * 1. Else if any other account is connected to the sender URL, then do not run and return that account's address.
@@ -158,6 +176,11 @@ async function findPrioritizedAccountConnectedToSite(url: string): Promise<strin
 const runIfNotWhitelisted: RunCondition<string | undefined> = async (_msg, sender) => {
     if (!sender.url) {
         throw new Error('Expected URL to be available for sender.');
+    }
+
+    const locked = await isWalletLocked();
+    if (locked) {
+        return { run: true };
     }
 
     const selectedAccount = await storedSelectedAccount.get();
@@ -201,10 +224,16 @@ const handleConnectionResponse: HandleResponse<string | undefined | false> = asy
  * Callback method which returns the prioritized account's address.
  */
 const getMostRecentlySelectedAccountHandler: ExtensionMessageHandler = (_msg, sender, respond) => {
-    if (!sender.url) {
-        throw new Error('Expected URL to be available for sender.');
-    }
-    findPrioritizedAccountConnectedToSite(sender.url).then(respond);
+    isWalletLocked().then((locked) => {
+        if (locked) {
+            respond(undefined);
+        } else {
+            if (!sender.url) {
+                throw new Error('Expected URL to be available for sender.');
+            }
+            findPrioritizedAccountConnectedToSite(sender.url).then(respond);
+        }
+    });
     return true;
 };
 

@@ -6,7 +6,6 @@ import Form from '@popup/shared/Form';
 import Submit from '@popup/shared/Form/Submit';
 import FormPassword from '@popup/shared/Form/Password';
 import { useTranslation } from 'react-i18next';
-import { absoluteRoutes } from '@popup/constants/routes';
 import { useNavigate } from 'react-router-dom';
 import { useAtomValue, useSetAtom } from 'jotai';
 import { decrypt } from '@popup/shared/crypto';
@@ -18,7 +17,7 @@ type FormValues = {
     passcode: string;
 };
 
-export default function Login() {
+export default function Login({ navigateTo }: { navigateTo?: string }) {
     const navigate = useNavigate();
     const setPasscodeInSession = useSetAtom(sessionPasscodeAtom);
     const encryptedSeedPhrase = useAtomValue(encryptedSeedPhraseAtom);
@@ -38,7 +37,9 @@ export default function Login() {
                 // TODO Replace this with an authenticated encryption scheme (AES-GCM). This is a dirty way of validating the decryption.
                 if (validateMnemonic(decryptedSeedPhrase, wordlist)) {
                     setPasscodeInSession(vs.passcode);
-                    navigate(absoluteRoutes.home.account.path);
+                    if (navigateTo) {
+                        navigate(navigateTo);
+                    }
                 } else {
                     form.setError('passcode', { message: t('incorrectPasscode') });
                 }

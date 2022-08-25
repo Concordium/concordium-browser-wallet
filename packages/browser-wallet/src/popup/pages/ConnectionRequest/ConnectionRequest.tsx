@@ -1,9 +1,11 @@
 import { fullscreenPromptContext } from '@popup/page-layouts/FullscreenPromptLayout';
 import { selectedAccountAtom, storedConnectedSitesAtom } from '@popup/store/account';
+import { sessionPasscodeAtom } from '@popup/store/settings';
 import { useAtom, useAtomValue } from 'jotai';
 import React, { useContext, useEffect } from 'react';
 import { useTranslation } from 'react-i18next';
 import { useLocation } from 'react-router-dom';
+import Login from '../Login/Login';
 
 type Props = {
     onAllow(): void;
@@ -17,11 +19,17 @@ export default function ConnectionRequest({ onAllow, onReject }: Props) {
     const selectedAccount = useAtomValue(selectedAccountAtom);
     const [connectedSitesLoading, setConnectedSites] = useAtom(storedConnectedSitesAtom);
     const connectedSites = connectedSitesLoading.value;
+    const passcode = useAtomValue(sessionPasscodeAtom);
 
     useEffect(() => onClose(onReject), [onClose, onReject]);
 
-    if (!selectedAccount || connectedSitesLoading.loading) {
+    if (!selectedAccount || connectedSitesLoading.loading || passcode.loading) {
         return null;
+    }
+
+    // The wallet is locked, so prompt the user to unlock the wallet before connecting.
+    if (!passcode.value) {
+        return <Login />;
     }
 
     function connectAccount(account: string, url: string) {
