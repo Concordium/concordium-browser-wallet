@@ -1,6 +1,11 @@
 import React, { useEffect, useContext, useMemo } from 'react';
-import { useAtom, useAtomValue } from 'jotai';
-import { pendingIdentityAtom, identityProvidersAtom, selectedIdentityAtom } from '@popup/store/identity';
+import { useAtom, useAtomValue, useSetAtom } from 'jotai';
+import {
+    pendingIdentityAtom,
+    identityProvidersAtom,
+    selectedIdentityAtom,
+    selectedIdentityIdAtom,
+} from '@popup/store/identity';
 import { useTranslation } from 'react-i18next';
 import { useLocation } from 'react-router-dom';
 import IdCard from '@popup/shared/IdCard';
@@ -32,6 +37,7 @@ export default function IdentityIssuanceEnd({ onFinish }: Props) {
     const [pendingIdentity, setPendingIdentity] = useAtom(pendingIdentityAtom);
     const { withClose, onClose } = useContext(fullscreenPromptContext);
     const selectedIdentity = useAtomValue(selectedIdentityAtom);
+    const setSelectedIdentityId = useSetAtom(selectedIdentityIdAtom);
 
     const identityProvider = useMemo(
         () => providers.find((p) => p.ipInfo.ipIdentity === selectedIdentity?.provider),
@@ -40,7 +46,10 @@ export default function IdentityIssuanceEnd({ onFinish }: Props) {
     useEffect(() => onClose(onFinish), [onClose, onFinish]);
 
     useEffect(() => {
-        setPendingIdentity(undefined);
+        if (pendingIdentity) {
+            setSelectedIdentityId(pendingIdentity?.id);
+            setPendingIdentity(undefined);
+        }
     }, []);
 
     return (
