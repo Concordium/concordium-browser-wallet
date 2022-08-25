@@ -15,9 +15,7 @@ import {
 } from '@shared/storage/access';
 import { ChromeStorageKey } from '@shared/storage/types';
 import { atom, WritableAtom } from 'jotai';
-
-import { useEffect } from 'react';
-import { useUpdateAtom } from 'jotai/utils';
+import { noOp } from 'wallet-common-helpers/src/utils/basicHelpers';
 
 const accessorMap = {
     [ChromeStorageKey.Identities]: storedIdentities,
@@ -42,19 +40,21 @@ export type AsyncWrapper<V> = {
 export function atomWithChromeStorage<V>(
     key: ChromeStorageKey,
     fallback: V,
-    withLoading: true
+    withLoading: true,
+    withSync?: boolean
 ): WritableAtom<AsyncWrapper<V>, V, void>;
 export function atomWithChromeStorage<V>(
     key: ChromeStorageKey,
     fallback: V,
-    withLoading?: false
+    withLoading?: false,
+    withSync?: boolean
 ): WritableAtom<V, V, void>;
 
 /**
  * @description
  * Create an atom that automatically syncs with chrome local storage.
  */
-export function atomWithChromeStorage<V>(key: ChromeStorageKey, fallback: V, withLoading = false) {
+export function atomWithChromeStorage<V>(key: ChromeStorageKey, fallback: V, withLoading = false, withSync = false) {
     const accessor = accessorMap[key] as unknown as StorageAccessor<V>;
 
     if (accessor === undefined) {
@@ -71,6 +71,21 @@ export function atomWithChromeStorage<V>(key: ChromeStorageKey, fallback: V, wit
                 value: value ?? fallback,
             })
         );
+
+        if (withSync) {
+            const listener = (changes: Record<string, chrome.storage.StorageChange>) =>
+                getStoredValue().then((value) => {
+                    if (key in changes) {
+                        setValue({
+                            loading: false,
+                            value: value ?? fallback,
+                        });
+                    }
+                });
+            chrome.storage.local.onChanged.addListener(listener);
+            return () => chrome.storage.local.onChanged.removeListener(listener);
+        }
+        return noOp;
     };
 
     const derived = atom(
@@ -82,20 +97,4 @@ export function atomWithChromeStorage<V>(key: ChromeStorageKey, fallback: V, wit
     );
 
     return derived;
-}
-
-export function useListenForUpdates<V>(key: ChromeStorageKey, atomToUpdate: WritableAtom<V, V, void>) {
-    const update = useUpdateAtom(atomToUpdate);
-
-    useEffect(() => {
-        function listener(changes: Record<string, chrome.storage.StorageChange>) {
-            if (key in changes) {
-                update(changes[key].newValue);
-            }
-        }
-        chrome.storage.local.onChanged.addListener(listener);
-        return () => chrome.storage.local.onChanged.removeListener(listener);
-    }, []);
-
-    return null;
 }

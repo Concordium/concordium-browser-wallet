@@ -8,7 +8,7 @@ import { mnemonicToSeedSync } from '@scure/bip39';
 import { mainnet } from '@popup/pages/NetworkSettings/NetworkSettings';
 import { atomWithChromeStorage } from './utils';
 
-export const credentialsAtom = atomWithChromeStorage<WalletCredential[]>(ChromeStorageKey.Credentials, []);
+export const credentialsAtom = atomWithChromeStorage<WalletCredential[]>(ChromeStorageKey.Credentials, [], false, true);
 export const encryptedSeedPhraseAtom = atomWithChromeStorage<EncryptedData | undefined>(
     ChromeStorageKey.SeedPhrase,
     undefined,
