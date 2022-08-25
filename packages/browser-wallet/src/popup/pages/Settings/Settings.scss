@@ -12,7 +12,8 @@
         position: absolute;
         width: $switch-width;
         bottom: rem(8px);
-        left: calc(50% - calc($switch-width / 2));
-        right: 50%;
+        left: 0;
+        right: 0;
+        margin: 0 auto;
     }
 }
