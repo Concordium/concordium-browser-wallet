@@ -47,10 +47,10 @@ export default function IdentityIssuanceEnd({ onFinish }: Props) {
 
     useEffect(() => {
         if (pendingIdentity) {
-            setSelectedIdentityId(pendingIdentity?.id);
+            setSelectedIdentityId(pendingIdentity.id);
             setPendingIdentity(undefined);
         }
-    }, []);
+    }, [pendingIdentity]);
 
     return (
         <>
@@ -71,7 +71,7 @@ export default function IdentityIssuanceEnd({ onFinish }: Props) {
                             className="identity-issuance__card"
                             name={pendingIdentity?.name || selectedIdentity?.name || 'Identity'}
                             provider={<IdentityProviderIcon provider={identityProvider} />}
-                            status={selectedIdentity?.status || CreationStatus.Pending}
+                            status={pendingIdentity?.status || selectedIdentity?.status || CreationStatus.Pending}
                         />
                     </>
                 )}
