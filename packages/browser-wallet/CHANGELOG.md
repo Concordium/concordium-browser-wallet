@@ -7,11 +7,16 @@
 -   Login screen.
 -   Change passcode settings page.
 -   Transaction details view when clicking a transaction in the transaction list.
+-   Theme toggle button to the settings page.
 -   Export private key account settings page.
 
 ### Changed
 
 -   The network connections page has been updated with new UI.
+
+### Removed
+
+-   Visual settings page.
 
 ## 0.3.0 2022-8-18
 
