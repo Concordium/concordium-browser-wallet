@@ -26,10 +26,10 @@ const t: typeof en = {
             disconnect: 'Fjern',
         },
         exportPrivateKey: {
-            title: 'Eksportér privat nøgle',
+            title: 'Eksportér privatnøgle',
             description: 'Indtast venligst din adgangskode for at vise din private nøgle.',
             copyDescription: 'Tryk på knappen for at kopiere din private nøgle.',
-            show: 'Vis privat nøgle',
+            show: 'Vis privatnøgle',
             done: 'Færdig',
         },
     },

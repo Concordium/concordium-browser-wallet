@@ -13,7 +13,7 @@ import addAccount from '@popup/pages/AddAccount/i18n/da';
 import identityIssuance from '@popup/pages/IdentityIssuance/i18n/da';
 import login from '@popup/pages/Login/i18n/da';
 import transactionLog from '@popup/pages/Account/TransactionLog/i18n/da';
-import changePasscode from '@popup/pages/ChangePasscode/i18n/en';
+import changePasscode from '@popup/pages/ChangePasscode/i18n/da';
 
 import type en from './en';
 

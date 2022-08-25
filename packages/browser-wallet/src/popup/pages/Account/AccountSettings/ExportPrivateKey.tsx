@@ -44,7 +44,7 @@ export default function ExportPrivateKey() {
         return (
             <div className="export-private-key-page">
                 <div className="export-private-key-page__description">{t('copyDescription')}</div>
-                <div className="export-private-key-page__relative">
+                <div className="relative">
                     <TextArea value={privateKey} />
                     <CopyButton className="export-private-key-page__copy" value={privateKey} />
                 </div>
