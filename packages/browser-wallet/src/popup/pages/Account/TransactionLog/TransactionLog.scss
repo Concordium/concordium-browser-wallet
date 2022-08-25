@@ -57,9 +57,14 @@
     }
 
     &__no-transactions {
+        color: $color-text-faded;
+        background-color: $color-bg;
         display: flex;
-        flex-direction: row;
+        align-items: center;
         justify-content: center;
+        text-align: center;
+        height: 100%;
+        width: 100%;
     }
 
     &__amount {

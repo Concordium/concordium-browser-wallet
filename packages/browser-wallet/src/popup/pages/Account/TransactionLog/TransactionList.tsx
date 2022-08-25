@@ -7,6 +7,7 @@ import AutoSizer from 'react-virtualized-auto-sizer';
 import { useAtomValue } from 'jotai';
 import { selectedAccountAtom } from '@popup/store/account';
 import { BrowserWalletTransaction } from '@popup/shared/utils/transaction-history-types';
+import { useTranslation } from 'react-i18next';
 import TransactionElement, { transactionElementHeight } from './TransactionElement';
 import useTransactionGroups, { TransactionsByDateTuple } from './useTransactionGroups';
 
@@ -149,6 +150,7 @@ export default function TransactionList({ onTransactionClick }: TransactionListP
     const [transactions, setTransactions] = useState<BrowserWalletTransaction[]>([]);
     const [isNextPageLoading, setIsNextPageLoading] = useState<boolean>(false);
     const [hasNextPage, setHasNextPage] = useState<boolean>(true);
+    const { t } = useTranslation('transactionLog');
 
     if (!accountAddress) {
         return null;
@@ -191,7 +193,7 @@ export default function TransactionList({ onTransactionClick }: TransactionListP
             transactionListComponent = null;
         } else {
             transactionListComponent = (
-                <h3 className="transaction-element__no-transactions">No transactions to show for account.</h3>
+                <div className="transaction-element__no-transactions">{t('noTransactions')}</div>
             );
         }
     } else {

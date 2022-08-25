@@ -25,7 +25,13 @@ const t: typeof en = {
             connect: 'Forbind',
             disconnect: 'Fjern',
         },
-        exportPrivateKey: 'Eksportér privat nøgle',
+        exportPrivateKey: {
+            title: 'Eksportér privatnøgle',
+            description: 'Indtast venligst din adgangskode for at vise din private nøgle.',
+            copyDescription: 'Tryk på knappen for at kopiere din private nøgle.',
+            show: 'Vis privatnøgle',
+            done: 'Færdig',
+        },
     },
     accountPending: 'Denne konto er stadig ved at blive oprettet.',
 };

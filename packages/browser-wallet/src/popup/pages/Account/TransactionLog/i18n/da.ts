@@ -8,6 +8,7 @@ const t: typeof en = {
     blockHash: 'Blok hash ',
     events: 'Hændelser',
     rejectReason: 'Afvisningsårsag',
+    noTransactions: 'Denne konto har ingen transakationer endnu.',
 };
 
 export default t;
