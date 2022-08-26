@@ -41,6 +41,10 @@ export type IndexedStorageAccessor<V> = {
      * Removes the key used for creation from the store.
      */
     remove(index: string): Promise<void>;
+    /**
+     * Name of the storage area that this accessor uses.
+     */
+    area: chrome.storage.AreaName;
 };
 
 /**
@@ -84,6 +88,7 @@ const makeIndexedStorageAccessor = <Value>(
             delete updated[index];
             return inner.set(updated);
         },
+        area,
     };
 };
 
@@ -95,6 +100,7 @@ export function useIndexedStorage<V>(
         get: () => getIndex().then((index) => accessor.get(index)),
         set: (value: V) => getIndex().then((index) => accessor.set(index, value)),
         remove: () => getIndex().then((index) => accessor.remove(index)),
+        area: accessor.area,
     };
 }
 
