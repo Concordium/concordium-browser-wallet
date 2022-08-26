@@ -54,9 +54,8 @@ export class AccountInfoEmitter extends EventEmitter {
                     this.emit('totalchanged', accountInfo, accountAddress);
                 }
             }
-        } catch {
-            // TODO Determine how we want to handle connection issues. I expect that we will emit
-            // on an error topic that the UI can handle.
+        } catch (e) {
+            this.emit('error', e);
         }
 
         this.interval = setInterval(async () => {
@@ -72,9 +71,8 @@ export class AccountInfoEmitter extends EventEmitter {
                         }
                     }
                 }
-            } catch {
-                // TODO Determine how we want to handle connection issues. I expect that we will emit
-                // on an error topic that the UI can handle.
+            } catch (e) {
+                this.emit('error', e);
             }
         }, accountInfoRetrievalIntervalMs);
     }

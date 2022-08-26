@@ -6,6 +6,7 @@ const t = {
     blockHash: 'Block hash',
     events: 'Events',
     rejectReason: 'Reject reason',
+    error: 'Unable to retrieve transaction history',
 };
 
 export default t;

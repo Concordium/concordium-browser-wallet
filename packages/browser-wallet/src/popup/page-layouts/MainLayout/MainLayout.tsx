@@ -5,6 +5,7 @@ import clsx from 'clsx';
 
 import { absoluteRoutes } from '@popup/constants/routes';
 import { encryptedSeedPhraseAtom, sessionPasscodeAtom } from '@popup/store/settings';
+import Toast from '@popup/shared/Toast/Toast';
 import Header from './Header';
 
 export default function MainLayout() {
@@ -32,6 +33,7 @@ export default function MainLayout() {
             <main className={clsx('main-layout__main', headerOpen && 'main-layout__main--blur')}>
                 <Outlet />
             </main>
+            <Toast />
         </div>
     );
 }

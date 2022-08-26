@@ -8,6 +8,7 @@ const t: typeof en = {
     blockHash: 'Blok hash ',
     events: 'Hændelser',
     rejectReason: 'Afvisningsårsag',
+    error: 'Fejl ved hentning af transaktionshistorik',
 };
 
 export default t;
