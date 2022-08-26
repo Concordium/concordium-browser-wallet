@@ -22,6 +22,10 @@ export type StorageAccessor<V> = {
      * Removes the key used for creation from the store.
      */
     remove(): Promise<void>;
+    /**
+     * Name of the storage area that this accessor uses.
+     */
+    area: chrome.storage.AreaName;
 };
 
 /**
@@ -36,6 +40,7 @@ const makeStorageAccessor = <V>(area: chrome.storage.AreaName, key: ChromeStorag
         get: (): Promise<V | undefined> => store.get(key).then((s) => s[key]),
         set: (value: V) => (value === undefined ? store.remove(key) : store.set({ [key]: value })),
         remove: () => store.remove(key),
+        area,
     };
 };
 

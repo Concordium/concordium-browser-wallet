@@ -82,8 +82,8 @@ export function atomWithChromeStorage<V>(key: ChromeStorageKey, fallback: V, wit
                         });
                     }
                 });
-            chrome.storage.local.onChanged.addListener(listener);
-            return () => chrome.storage.local.onChanged.removeListener(listener);
+            chrome.storage[accessor.area].onChanged.addListener(listener);
+            return () => chrome.storage[accessor.area].onChanged.removeListener(listener);
         }
         return noOp;
     };
