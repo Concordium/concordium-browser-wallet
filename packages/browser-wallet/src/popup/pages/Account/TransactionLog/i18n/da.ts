@@ -9,6 +9,7 @@ const t: typeof en = {
     events: 'Hændelser',
     rejectReason: 'Afvisningsårsag',
     error: 'Fejl ved hentning af transaktionshistorik',
+    noTransactions: 'Denne konto har ingen transakationer endnu.',
 };
 
 export default t;

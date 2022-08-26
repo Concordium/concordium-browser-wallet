@@ -194,7 +194,7 @@ export default function TransactionList({ onTransactionClick }: TransactionListP
             transactionListComponent = null;
         } else {
             transactionListComponent = (
-                <h3 className="transaction-element__no-transactions">No transactions to show for account.</h3>
+                <div className="transaction-element__no-transactions">{t('noTransactions')}</div>
             );
         }
     } else {

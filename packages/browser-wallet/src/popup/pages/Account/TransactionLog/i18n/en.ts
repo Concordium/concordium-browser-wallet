@@ -6,6 +6,7 @@ const t = {
     blockHash: 'Block hash',
     events: 'Events',
     rejectReason: 'Reject reason',
+    noTransactions: 'This account has no transactions yet.',
     error: 'Unable to retrieve transaction history',
 };
 

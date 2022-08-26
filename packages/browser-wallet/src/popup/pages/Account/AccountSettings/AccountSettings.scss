@@ -40,3 +40,36 @@
         border-bottom: rem(1px) solid $color-petroleum;
     }
 }
+
+.export-private-key-page {
+    width: 100%;
+    padding-left: rem(20px);
+    padding-right: rem(20px);
+    background-color: $color-bg;
+
+    &__description {
+        text-align: center;
+        margin-top: rem(30px);
+    }
+
+    &__button {
+        position: absolute;
+        bottom: rem(24px);
+        left: 0;
+        right: 0;
+        margin: 0 auto;
+        background-color: $color-cta;
+    }
+
+    textarea {
+        margin-top: rem(30px);
+        height: rem(70px);
+        padding: rem(10px);
+    }
+
+    &__copy {
+        position: absolute;
+        bottom: rem(5px);
+        right: rem(5px);
+    }
+}

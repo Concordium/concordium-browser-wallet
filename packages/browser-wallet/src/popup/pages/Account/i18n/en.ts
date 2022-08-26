@@ -24,7 +24,13 @@ const t = {
             connect: 'Connect',
             disconnect: 'Disconnect',
         },
-        exportPrivateKey: 'Export private key',
+        exportPrivateKey: {
+            title: 'Export private key',
+            description: 'Please enter your passcode to show the private key.',
+            copyDescription: 'Press the button to copy your private key.',
+            show: 'Show private key',
+            done: 'Done',
+        },
     },
     accountPending: 'This account is still pending finalization.',
 };

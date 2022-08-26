@@ -8,6 +8,7 @@
 -   Change passcode settings page.
 -   Transaction details view when clicking a transaction in the transaction list.
 -   Theme toggle button to the settings page.
+-   Export private key account settings page.
 -   Toasts for showing errors when failing to retrieve account balance or transaction history.
 
 ### Changed
