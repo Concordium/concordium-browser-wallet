@@ -7,9 +7,10 @@ import CheckmarkIcon from '@assets/svg/checkmark-blue.svg';
 import { NetworkConfiguration } from '@shared/storage/types';
 import Button from '@popup/shared/Button';
 import { useTranslation } from 'react-i18next';
+import { isMainnet, mainnetGenesisHash } from '@shared/utils/network-helpers';
 
 export const mainnet: NetworkConfiguration = {
-    genesisHash: '9dd9ca4d19e9393877d2c44b70f89acbfc0883c2243e5eeaecc0d1cd0503f478',
+    genesisHash: mainnetGenesisHash,
     name: 'Concordium Mainnet',
     jsonRpcUrl: 'https://json-rpc.concordium.software',
     explorerUrl: 'https://wallet-proxy.mainnet.concordium.software',
@@ -29,10 +30,6 @@ export const stagenet: NetworkConfiguration = {
     jsonRpcUrl: 'http://localhost:9095',
     explorerUrl: 'https://wallet-proxy.stagenet.concordium.com',
 };
-
-function isMainnet(network: NetworkConfiguration) {
-    return network.genesisHash === mainnet.genesisHash;
-}
 
 function NetworkConfigurationComponent({ networkConfiguration }: { networkConfiguration: NetworkConfiguration }) {
     const { t } = useTranslation('networkSettings');

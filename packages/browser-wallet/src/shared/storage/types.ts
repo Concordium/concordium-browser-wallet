@@ -34,11 +34,9 @@ export enum CreationStatus {
 }
 
 export interface BaseIdentity {
-    id: number;
     status: CreationStatus;
     name: string;
     index: number;
-    network: Network;
     provider: number;
 }
 
@@ -122,8 +120,7 @@ export interface BaseCredential {
     credId: string;
     credNumber: number;
     status: CreationStatus;
-    identityId: number;
-    net: Network;
+    identityIndex: number;
     // Policy (is in accountInfo)
     // CredentialIndex = 0
 }

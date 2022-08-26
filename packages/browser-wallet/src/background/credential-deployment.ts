@@ -9,35 +9,28 @@ import {
     JsonRpcClient,
 } from '@concordium/web-sdk';
 import { storedCurrentNetwork } from '@shared/storage/access';
-import { CreationStatus, Network, PendingWalletCredential } from '@shared/storage/types';
+import { CreationStatus, PendingWalletCredential } from '@shared/storage/types';
 import { BackgroundResponseStatus, CredentialDeploymentBackgroundResponse } from '@shared/utils/types';
 import { addCredential } from './update';
 
-interface Props extends CredentialInputV1 {
-    identityId: number;
-}
-
-async function createAndSendCredential({
-    identityId,
-    ...credIn
-}: Props): Promise<CredentialDeploymentBackgroundResponse> {
+async function createAndSendCredential(credIn: CredentialInputV1): Promise<CredentialDeploymentBackgroundResponse> {
     const network = await storedCurrentNetwork.get();
     const url = network?.jsonRpcUrl;
     if (!url) {
         throw new Error('No JSON RPC url available');
     }
+
     const request = createCredentialV1(credIn);
     const { credId } = request.cdi;
     const deploymentHash = getSignedCredentialDeploymentTransactionHash(request);
     const { address } = getAccountAddress(credId);
     const newCred: PendingWalletCredential = {
         address,
-        identityId,
+        identityIndex: credIn.identityIndex,
         credId,
         credNumber: credIn.credNumber,
         status: CreationStatus.Pending,
         deploymentHash,
-        net: Network[credIn.net as keyof typeof Network],
     };
 
     // Send Request

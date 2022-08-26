@@ -4,7 +4,7 @@ import {
     pendingIdentityAtom,
     identityProvidersAtom,
     selectedIdentityAtom,
-    selectedIdentityIdAtom,
+    selectedIdentityIndexAtom,
 } from '@popup/store/identity';
 import { useTranslation } from 'react-i18next';
 import { useLocation } from 'react-router-dom';
@@ -37,7 +37,7 @@ export default function IdentityIssuanceEnd({ onFinish }: Props) {
     const [pendingIdentity, setPendingIdentity] = useAtom(pendingIdentityAtom);
     const { withClose, onClose } = useContext(fullscreenPromptContext);
     const selectedIdentity = useAtomValue(selectedIdentityAtom);
-    const setSelectedIdentityId = useSetAtom(selectedIdentityIdAtom);
+    const setSelectedIdentityIndex = useSetAtom(selectedIdentityIndexAtom);
 
     const identityProvider = useMemo(
         () => providers.find((p) => p.ipInfo.ipIdentity === selectedIdentity?.provider),
@@ -47,7 +47,7 @@ export default function IdentityIssuanceEnd({ onFinish }: Props) {
 
     useEffect(() => {
         if (pendingIdentity) {
-            setSelectedIdentityId(pendingIdentity.id);
+            setSelectedIdentityIndex(pendingIdentity.index);
             setPendingIdentity(undefined);
         }
     }, [pendingIdentity]);

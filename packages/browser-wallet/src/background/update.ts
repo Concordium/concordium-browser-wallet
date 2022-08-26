@@ -58,7 +58,7 @@ export function updateIdentities(updatedIdentities: Identity[]) {
     return editList(
         identityLock,
         updatedIdentities,
-        (identity) => (candidate) => identity.id === candidate.id,
+        (identity) => (candidate) => identity.index === candidate.index,
         useIndexedStorage(storedIdentities, getGenesisHash)
     );
 }

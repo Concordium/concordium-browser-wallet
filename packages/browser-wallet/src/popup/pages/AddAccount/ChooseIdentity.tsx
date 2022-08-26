@@ -5,7 +5,7 @@ import { useAtomValue, useSetAtom } from 'jotai';
 import IdentityProviderIcon from '@popup/shared/IdentityProviderIcon';
 
 import IdCard from '@popup/shared/IdCard';
-import { identitiesAtom, selectedIdentityIdAtom, identityProvidersAtom } from '@popup/store/identity';
+import { identitiesAtom, selectedIdentityIndexAtom, identityProvidersAtom } from '@popup/store/identity';
 import { Identity, CreationStatus } from '@shared/storage/types';
 import { absoluteRoutes } from '@popup/constants/routes';
 import Button from '@popup/shared/Button';
@@ -13,7 +13,7 @@ import Button from '@popup/shared/Button';
 export default function ChooseIdentity() {
     const { t } = useTranslation('addAccount');
     const identities = useAtomValue(identitiesAtom);
-    const setSelectedIdentityId = useSetAtom(selectedIdentityIdAtom);
+    const setSelectedIdentityIndex = useSetAtom(selectedIdentityIndexAtom);
     const nav = useNavigate();
     const providers = useAtomValue(identityProvidersAtom);
 
@@ -45,12 +45,12 @@ export default function ChooseIdentity() {
                 .map((identity) => (
                     <IdCard
                         name={identity.name}
-                        key={identity.id}
+                        key={identity.index}
                         provider={<IdentityProviderIcon provider={findProvider(identity)} />}
                         status={identity.status}
                         className="m-t-10"
                         onClick={() => {
-                            setSelectedIdentityId(identity.id);
+                            setSelectedIdentityIndex(identity.index);
                             nav('confirm');
                         }}
                     />
