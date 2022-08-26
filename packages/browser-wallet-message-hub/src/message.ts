@@ -26,7 +26,8 @@ export enum InternalMessageType {
     TestPopupOpen = 'I_TestPopupOpen',
     SetViewSize = 'I_SetViewSize',
     StartIdentityIssuance = 'I_StartIdentityIssuance',
-    EndIdentityIssuance = 'l_EndIdentityIssuance',
+    EndIdentityIssuance = 'I_EndIdentityIssuance',
+    SendCredentialDeployment = 'I_SendCredentialDeployment',
 }
 
 // eslint-disable-next-line @typescript-eslint/no-explicit-any

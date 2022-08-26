@@ -1934,7 +1934,7 @@ __metadata:
     "@storybook/react": ^6.5.7
     "@storybook/testing-library": ^0.0.11
     "@svgr/webpack": ^6.2.1
-    "@types/chrome": ^0.0.193
+    "@types/chrome": ^0.0.195
     "@types/crypto-js": ^4.1.1
     "@types/lodash.groupby": ^4.6.7
     "@types/react": ^18.0.7
@@ -1975,7 +1975,7 @@ __metadata:
     tsconfig-paths-webpack-plugin: ^3.5.2
     typescript: ^4.3.5
     uuid: ^8.3.2
-    wallet-common-helpers: "https://github.com/Concordium/concordium-wallet-common-helpers.git#1cecd823052a8e6aa83eb5854faa7c1a7316d31b"
+    wallet-common-helpers: "https://github.com/Concordium/concordium-wallet-common-helpers.git#fbcc45df74e4762a2f3eef986bc9445ee5d90063"
   languageName: unknown
   linkType: soft
 
@@ -4477,6 +4477,16 @@ __metadata:
     "@types/filesystem": "*"
     "@types/har-format": "*"
   checksum: f01205376becff1a229443473c697b0ab42d87af00dc2a52f7a16bce2ad223875fd95ebee12ab1598f2669eb1af26953863c37aace7e87551f68ff73eaaedba5
+  languageName: node
+  linkType: hard
+
+"@types/chrome@npm:^0.0.195":
+  version: 0.0.195
+  resolution: "@types/chrome@npm:0.0.195"
+  dependencies:
+    "@types/filesystem": "*"
+    "@types/har-format": "*"
+  checksum: 074c8981ae18f1f32ce07f2e153c655bf0a213db6e3b9d67058e3a5c4fd39b0af33e6c2a56384ce2e7d0027db9b63751a719a4af7111fa46c254259f780bb3a5
   languageName: node
   linkType: hard
 
@@ -19249,9 +19259,9 @@ __metadata:
   languageName: node
   linkType: hard
 
-"wallet-common-helpers@https://github.com/Concordium/concordium-wallet-common-helpers.git#1cecd823052a8e6aa83eb5854faa7c1a7316d31b":
+"wallet-common-helpers@https://github.com/Concordium/concordium-wallet-common-helpers.git#fbcc45df74e4762a2f3eef986bc9445ee5d90063":
   version: 1.5.0
-  resolution: "wallet-common-helpers@https://github.com/Concordium/concordium-wallet-common-helpers.git#commit=1cecd823052a8e6aa83eb5854faa7c1a7316d31b"
+  resolution: "wallet-common-helpers@https://github.com/Concordium/concordium-wallet-common-helpers.git#commit=fbcc45df74e4762a2f3eef986bc9445ee5d90063"
   dependencies:
     "@concordium/common-sdk": ^2.3.2
     buffer: ^6.0.3
@@ -19262,7 +19272,7 @@ __metadata:
   peerDependencies:
     react: ">=16"
     react-dom: ">=16"
-  checksum: 8d951d7446a08e04fa616240e06f575b95a537560459f57feacf5ef2dd44fb0a5586a049ff232f8f42c581713fd84fab7937336835edd0dc6dc7e64e8c682f62
+  checksum: a517e283de92235c18e4f2dea3ba9dc9f157c8be4025f17b749a56eeb657b78de5fbd1a702f0b886eddfa659304213c14a3d875dcd31be15d779315465ab3b7e
   languageName: node
   linkType: hard
 

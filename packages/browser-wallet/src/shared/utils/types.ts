@@ -16,3 +16,13 @@ export enum BackgroundResponseStatus {
     Aborted = 'Aborted',
     Error = 'Error',
 }
+
+export type CredentialDeploymentBackgroundResponse =
+    | {
+          status: BackgroundResponseStatus.Success;
+          address: string;
+      }
+    | {
+          status: BackgroundResponseStatus.Error;
+          reason: string;
+      };
