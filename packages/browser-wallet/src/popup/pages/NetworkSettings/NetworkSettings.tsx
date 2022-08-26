@@ -8,6 +8,9 @@ import { NetworkConfiguration } from '@shared/storage/types';
 import Button from '@popup/shared/Button';
 import { useTranslation } from 'react-i18next';
 import { isMainnet, mainnetGenesisHash } from '@shared/utils/network-helpers';
+import { pendingIdentityAtom } from '@popup/store/identity';
+import Modal from '@popup/shared/Modal';
+import { useNavigate } from 'react-router-dom';
 
 export const mainnet: NetworkConfiguration = {
     genesisHash: mainnetGenesisHash,
@@ -75,8 +78,34 @@ function NetworkConfigurationComponent({ networkConfiguration }: { networkConfig
 }
 
 export default function NetworkSettings() {
+    const { t } = useTranslation('networkSettings');
+    const [pendingIdentity, setPendingIdentity] = useAtom(pendingIdentityAtom);
+    const nav = useNavigate();
+
     return (
         <div className="network-settings-page">
+            <Modal disableClose open={Boolean(pendingIdentity)}>
+                <div className="network-settings-page__pending-identity">
+                    <p>{t('pendingIdentity.description')}</p>
+                    <Button
+                        width="narrow"
+                        className="network-settings-page__pending-identity__button"
+                        onClick={() => nav(-1)}
+                    >
+                        {t('pendingIdentity.back')}
+                        go back
+                    </Button>
+                    <Button
+                        faded
+                        width="narrow"
+                        className="network-settings-page__pending-identity__button"
+                        onClick={() => setPendingIdentity(undefined)}
+                    >
+                        {t('pendingIdentity.abort')}
+                        abort issuance
+                    </Button>
+                </div>
+            </Modal>
             <div className="network-settings-page__list">
                 {[mainnet, testnet, stagenet].map((network) => {
                     return (

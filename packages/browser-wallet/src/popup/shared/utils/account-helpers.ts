@@ -1,5 +1,5 @@
-import { selectedAccountAtom } from '@popup/store/account';
-import { credentialsAtom, networkConfigurationAtom, seedPhraseAtom } from '@popup/store/settings';
+import { credentialsAtom, selectedAccountAtom } from '@popup/store/account';
+import { networkConfigurationAtom, seedPhraseAtom } from '@popup/store/settings';
 import { useAtomValue } from 'jotai';
 import { useMemo } from 'react';
 import { identitiesAtom } from '@popup/store/identity';
