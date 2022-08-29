@@ -1,11 +1,10 @@
 import React, { useEffect, useContext, useMemo } from 'react';
 import { useAtom, useAtomValue, useSetAtom } from 'jotai';
 import {
-    identitiesAtom,
     pendingIdentityAtom,
     identityProvidersAtom,
-    selectedIdentityIdAtom,
     selectedIdentityAtom,
+    selectedIdentityIdAtom,
 } from '@popup/store/identity';
 import { useTranslation } from 'react-i18next';
 import { useLocation } from 'react-router-dom';
@@ -13,11 +12,11 @@ import IdCard from '@popup/shared/IdCard';
 import PageHeader from '@popup/shared/PageHeader';
 import { noOp } from 'wallet-common-helpers';
 import Button from '@popup/shared/Button';
-import { CreationStatus } from '@shared/storage/types';
 import { fullscreenPromptContext } from '@popup/page-layouts/FullscreenPromptLayout';
 import { IdentityIssuanceBackgroundResponse } from '@shared/utils/identity-helpers';
 import IdentityProviderIcon from '@popup/shared/IdentityProviderIcon';
 import { BackgroundResponseStatus } from '@shared/utils/types';
+import { CreationStatus } from '@shared/storage/types';
 
 interface Location {
     state: {
@@ -36,10 +35,9 @@ export default function IdentityIssuanceEnd({ onFinish }: Props) {
     const { t } = useTranslation('identityIssuance');
     const providers = useAtomValue(identityProvidersAtom);
     const [pendingIdentity, setPendingIdentity] = useAtom(pendingIdentityAtom);
-    const [identities, setIdentities] = useAtom(identitiesAtom);
     const { withClose, onClose } = useContext(fullscreenPromptContext);
-    const setSelectedIdentityId = useSetAtom(selectedIdentityIdAtom);
     const selectedIdentity = useAtomValue(selectedIdentityAtom);
+    const setSelectedIdentityId = useSetAtom(selectedIdentityIdAtom);
 
     const identityProvider = useMemo(
         () => providers.find((p) => p.ipInfo.ipIdentity === selectedIdentity?.provider),
@@ -49,16 +47,7 @@ export default function IdentityIssuanceEnd({ onFinish }: Props) {
 
     useEffect(() => {
         if (pendingIdentity) {
-            if (state.payload.status === BackgroundResponseStatus.Success) {
-                setIdentities(
-                    identities.concat({
-                        ...pendingIdentity,
-                        status: CreationStatus.Pending,
-                        location: state.payload.result,
-                    })
-                );
-                setSelectedIdentityId(pendingIdentity.id);
-            }
+            setSelectedIdentityId(pendingIdentity.id);
             setPendingIdentity(undefined);
         }
     }, [pendingIdentity]);
@@ -82,7 +71,7 @@ export default function IdentityIssuanceEnd({ onFinish }: Props) {
                             className="identity-issuance__card"
                             name={pendingIdentity?.name || selectedIdentity?.name || 'Identity'}
                             provider={<IdentityProviderIcon provider={identityProvider} />}
-                            status="pending"
+                            status={pendingIdentity?.status || selectedIdentity?.status || CreationStatus.Pending}
                         />
                     </>
                 )}

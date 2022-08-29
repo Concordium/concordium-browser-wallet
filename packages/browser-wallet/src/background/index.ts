@@ -1,8 +1,8 @@
 import {
     createMessageTypeFilter,
-    ExtensionMessageHandler,
     InternalMessageType,
     MessageType,
+    ExtensionMessageHandler,
 } from '@concordium/browser-wallet-message-hub';
 import { HttpProvider } from '@concordium/web-sdk';
 import {
@@ -16,6 +16,8 @@ import JSONBig from 'json-bigint';
 import bgMessageHandler from './message-handler';
 import { forwardToPopup, HandleMessage, HandleResponse, RunCondition, setPopupSize } from './window-management';
 import { identityIssuanceHandler } from './identity-issuance';
+import { startupHandler } from './startup';
+import { sendCredentialHandler } from './credential-deployment';
 
 const walletLockedMessage = 'The wallet is locked';
 async function isWalletLocked(): Promise<boolean> {
@@ -90,6 +92,13 @@ const injectScript: ExtensionMessageHandler = (_msg, sender, respond) => {
 
     return true;
 };
+
+chrome.runtime.onStartup.addListener(startupHandler);
+
+bgMessageHandler.handleMessage(
+    createMessageTypeFilter(InternalMessageType.SendCredentialDeployment),
+    sendCredentialHandler
+);
 
 bgMessageHandler.handleMessage(
     createMessageTypeFilter(InternalMessageType.StartIdentityIssuance),

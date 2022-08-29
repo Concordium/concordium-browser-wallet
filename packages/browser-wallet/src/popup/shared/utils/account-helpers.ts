@@ -29,7 +29,7 @@ export function useSelectedCredential() {
             return undefined;
         }
         return credentials.find((cred) => cred.address === selectedAccount);
-    }, [selectedAccount]);
+    }, [selectedAccount, JSON.stringify(credentials)]);
 
     return selectedCredential;
 }

@@ -1,4 +1,4 @@
-import React, { useEffect, useMemo } from 'react';
+import React, { useMemo } from 'react';
 import { useAtom, useAtomValue } from 'jotai';
 import { identityProvidersAtom, selectedIdentityAtom } from '@popup/store/identity';
 import IdCard from '@popup/shared/IdCard';
@@ -6,7 +6,6 @@ import { CreationStatus } from '@shared/storage/types';
 import { AttributeKey } from '@concordium/web-sdk';
 import attributeNames from 'wallet-common-helpers/constants/attributeNames.json';
 import { formatAttributeValue, compareAttributes } from 'wallet-common-helpers';
-import { getIdObject } from '@shared/utils/identity-helpers';
 import IdentityProviderIcon from '@popup/shared/IdentityProviderIcon';
 
 export default function Identity() {
@@ -17,27 +16,6 @@ export default function Identity() {
         () => providers.find((p) => p.ipInfo.ipIdentity === selectedIdentity?.provider),
         [providers.length]
     );
-
-    useEffect(() => {
-        // TODO: Check identity status in background
-        if (selectedIdentity?.status === CreationStatus.Pending) {
-            getIdObject(selectedIdentity.location).then((response) => {
-                if (response.error) {
-                    updateSelectedIdentity({
-                        ...selectedIdentity,
-                        status: CreationStatus.Rejected,
-                        error: response.error,
-                    });
-                } else {
-                    updateSelectedIdentity({
-                        ...selectedIdentity,
-                        status: CreationStatus.Confirmed,
-                        idObject: response.token.identityObject,
-                    });
-                }
-            });
-        }
-    }, [selectedIdentity?.id]);
 
     if (!selectedIdentity) {
         return null;

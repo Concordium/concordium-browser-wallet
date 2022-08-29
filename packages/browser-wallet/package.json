@@ -36,7 +36,7 @@
         "react-window": "^1.8.7",
         "react-window-infinite-loader": "^1.0.8",
         "uuid": "^8.3.2",
-        "wallet-common-helpers": "https://github.com/Concordium/concordium-wallet-common-helpers.git#1cecd823052a8e6aa83eb5854faa7c1a7316d31b"
+        "wallet-common-helpers": "https://github.com/Concordium/concordium-wallet-common-helpers.git#fbcc45df74e4762a2f3eef986bc9445ee5d90063"
     },
     "devDependencies": {
         "@babel/core": "^7.18.2",
@@ -53,7 +53,7 @@
         "@storybook/react": "^6.5.7",
         "@storybook/testing-library": "^0.0.11",
         "@svgr/webpack": "^6.2.1",
-        "@types/chrome": "^0.0.193",
+        "@types/chrome": "^0.0.195",
         "@types/crypto-js": "^4.1.1",
         "@types/lodash.groupby": "^4.6.7",
         "@types/react": "^18.0.7",

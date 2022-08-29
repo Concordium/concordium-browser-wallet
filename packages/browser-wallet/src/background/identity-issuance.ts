@@ -2,9 +2,12 @@ import { createIdentityRequest } from '@concordium/web-sdk';
 import { IdentityIssuanceBackgroundResponse } from '@shared/utils/identity-helpers';
 import { ExtensionMessageHandler, InternalMessageType } from '@concordium/browser-wallet-message-hub';
 import { BackgroundResponseStatus } from '@shared/utils/types';
+import { storedPendingIdentity } from '@shared/storage/access';
+import { CreationStatus } from '@shared/storage/types';
 import { openWindow } from './window-management';
 
 import bgMessageHandler from './message-handler';
+import { addIdentity } from './update';
 
 const redirectUri = 'ConcordiumRedirectToken';
 const codeUriKey = 'code_uri=';
@@ -59,10 +62,22 @@ function handleExternalIssuance(url: string, respond: (response: IdentityIssuanc
 }
 
 export const identityIssuanceHandler: ExtensionMessageHandler = (msg) => {
-    const respond = (response: IdentityIssuanceBackgroundResponse) => {
-        openWindow().then(() =>
-            bgMessageHandler.sendInternalMessage(InternalMessageType.EndIdentityIssuance, response)
-        );
+    const respond = async (response: IdentityIssuanceBackgroundResponse) => {
+        let { status } = response;
+        if (response.status === BackgroundResponseStatus.Success) {
+            const pending = await storedPendingIdentity.get();
+            if (!pending) {
+                status = BackgroundResponseStatus.Aborted;
+            } else {
+                await addIdentity({
+                    ...pending,
+                    status: CreationStatus.Pending,
+                    location: response.result,
+                });
+            }
+        }
+        await openWindow();
+        bgMessageHandler.sendInternalMessage(InternalMessageType.EndIdentityIssuance, { ...response, status });
     };
 
     const { baseUrl, ...identityRequestInputs } = msg.payload;
