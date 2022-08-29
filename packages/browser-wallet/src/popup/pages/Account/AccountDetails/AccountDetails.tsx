@@ -1,16 +1,14 @@
 import clsx from 'clsx';
-import React, { useEffect, useState } from 'react';
+import React, { useEffect, useState, useContext } from 'react';
 import { displayAsCcd, getPublicAccountAmounts, PublicAccountAmounts } from 'wallet-common-helpers';
 import { useTranslation } from 'react-i18next';
 import { useAtomValue } from 'jotai';
 import { identityNamesAtom } from '@popup/store/identity';
-import { networkConfigurationAtom } from '@popup/store/settings';
 
 import { displaySplitAddress } from '@popup/shared/utils/account-helpers';
 import VerifiedIcon from '@assets/svg/verified-stamp.svg';
-import { AccountInfo } from '@concordium/web-sdk';
-import { AccountInfoEmitter } from '@popup/shared/account-info-emitter';
 import { CreationStatus, WalletCredential } from '@shared/storage/types';
+import { accountContext, AccountContextValues } from '../AccountContext';
 
 type AmountProps = {
     label: string;
@@ -40,25 +38,11 @@ const zeroBalance: Omit<PublicAccountAmounts, 'scheduled'> = {
 
 export default function AccountDetails({ expanded, account, className }: Props) {
     const { t } = useTranslation('account', { keyPrefix: 'details' });
-    const { jsonRpcUrl } = useAtomValue(networkConfigurationAtom);
     const [balances, setBalances] = useState<Omit<PublicAccountAmounts, 'scheduled'>>(zeroBalance);
     const identityNames = useAtomValue(identityNamesAtom);
+    const { accountInfo } = useContext<AccountContextValues>(accountContext);
 
-    useEffect(() => {
-        setBalances(zeroBalance);
-        if (account.status === CreationStatus.Confirmed) {
-            const emitter = new AccountInfoEmitter(jsonRpcUrl);
-            emitter.listen([account.address]);
-            emitter.on('totalchanged', (accountInfo: AccountInfo) => {
-                setBalances(getPublicAccountAmounts(accountInfo));
-            });
-            return () => {
-                emitter.removeAllListeners('totalchanged');
-                emitter.stop();
-            };
-        }
-        return () => {};
-    }, [account.address, account.status]);
+    useEffect(() => setBalances(accountInfo ? getPublicAccountAmounts(accountInfo) : zeroBalance), [accountInfo]);
 
     return (
         <div className={clsx('account-page-details', expanded && 'account-page-details--expanded', className)}>

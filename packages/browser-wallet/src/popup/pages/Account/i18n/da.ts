@@ -33,6 +33,21 @@ const t: typeof en = {
             done: 'Færdig',
         },
     },
+    // TODO: translate
+    sendCcd: {
+        labels: {
+            ccd: 'Enter amount to transfer',
+            recipient: 'Enter recipient address',
+        },
+        buttons: {
+            cancel: 'Cancel',
+            confirm: 'Confirm',
+            finish: 'Finish',
+            continue: 'Continue',
+        },
+        title: 'Send CCD',
+        fee: 'Estimated transaction fee',
+    },
     accountPending: 'Denne konto er stadig ved at blive oprettet.',
 };
 

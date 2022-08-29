@@ -3,19 +3,10 @@ import { useAtomValue } from 'jotai';
 import { fullscreenPromptContext } from '@popup/page-layouts/FullscreenPromptLayout';
 import { useTranslation } from 'react-i18next';
 import { useLocation } from 'react-router-dom';
-import {
-    AccountTransactionType,
-    JsonRpcClient,
-    HttpProvider,
-    AccountAddress,
-    buildBasicAccountSigner,
-    signTransaction,
-    TransactionExpiry,
-    getAccountTransactionHash,
-    SchemaVersion,
-} from '@concordium/web-sdk';
+import { AccountTransactionType, AccountAddress, TransactionExpiry, SchemaVersion } from '@concordium/web-sdk';
 import { usePrivateKey } from '@popup/shared/utils/account-helpers';
-import { networkConfigurationAtom } from '@popup/store/settings';
+import { sendTransaction } from '@popup/shared/utils/transaction-helpers';
+import { jsonRpcClientAtom } from '@popup/store/settings';
 import DisplayUpdateContract from './displayTransaction/DisplayUpdateContract';
 import DisplayInitContract from './displayTransaction/DisplayInitContract';
 import DisplaySimpleTransfer from './displayTransaction/DisplaySimpleTransfer';
@@ -43,7 +34,7 @@ export default function SendTransaction({ onSubmit, onReject }: Props) {
     const { state } = useLocation() as Location;
     const { t } = useTranslation('sendTransaction');
     const [error, setError] = useState<string>();
-    const { jsonRpcUrl } = useAtomValue(networkConfigurationAtom);
+    const client = useAtomValue(jsonRpcClientAtom);
     const { withClose, onClose } = useContext(fullscreenPromptContext);
 
     const { accountAddress } = state.payload;
@@ -63,16 +54,14 @@ export default function SendTransaction({ onSubmit, onReject }: Props) {
 
     useEffect(() => onClose(onReject), [onClose, onReject]);
 
-    const sendTransaction = useCallback(async () => {
-        if (!jsonRpcUrl || !accountAddress) {
-            throw new Error('Missing url for JsonRpc or account address');
+    const handleSubmit = useCallback(async () => {
+        if (!accountAddress) {
+            throw new Error('Missing url account address');
         }
         if (!key) {
             throw new Error('Missing key for the chosen address');
         }
 
-        // TODO: Maybe we should not create the client for each transaction sent
-        const client = new JsonRpcClient(new HttpProvider(jsonRpcUrl));
         const sender = new AccountAddress(accountAddress);
         const nonce = await client.getNextAccountNonce(sender);
 
@@ -88,14 +77,7 @@ export default function SendTransaction({ onSubmit, onReject }: Props) {
         };
         const transaction = { payload, header, type: transactionType };
 
-        const signature = await signTransaction(transaction, buildBasicAccountSigner(key));
-        const result = await client.sendAccountTransaction(transaction, signature);
-
-        if (!result) {
-            throw new Error('transaction was rejected by the node');
-        }
-
-        return getAccountTransactionHash(transaction, signature);
+        return sendTransaction(client, transaction, key);
     }, [payload, key]);
 
     return (
@@ -114,7 +96,7 @@ export default function SendTransaction({ onSubmit, onReject }: Props) {
             <button
                 type="button"
                 onClick={() =>
-                    sendTransaction()
+                    handleSubmit()
                         .then(withClose(onSubmit))
                         .catch((e) => setError(e.message))
                 }

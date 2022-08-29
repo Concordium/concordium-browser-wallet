@@ -34,16 +34,22 @@ export function useSelectedCredential() {
     return selectedCredential;
 }
 
-export function usePrivateKey(accountAddress: string): string | undefined {
+export function usePrivateKey(accountAddress: string): string;
+export function usePrivateKey(accountAddress: undefined): undefined;
+export function usePrivateKey(accountAddress: string | undefined): string | undefined;
+export function usePrivateKey(accountAddress: string | undefined): string | undefined {
     const credentials = useAtomValue(credentialsAtom);
-    const credential = credentials.find((cred) => cred.address === accountAddress);
-
     const seedPhrase = useAtomValue(seedPhraseAtom);
+    const credential = credentials.find((cred) => cred.address === accountAddress);
     const identity = useIdentityOf(credential);
 
     const privateKey = useMemo(() => {
-        if (!credential || !identity) {
+        if (!accountAddress) {
             return undefined;
+        }
+
+        if (!credential || !identity) {
+            throw new Error('No credential or identity found for given account address');
         }
 
         return ConcordiumHdWallet.fromHex(seedPhrase, Network[credential.net] as NetworkString)

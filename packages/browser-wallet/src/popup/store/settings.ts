@@ -6,6 +6,8 @@ import { popupMessageHandler } from '@popup/shared/message-handler';
 import { decrypt } from '@popup/shared/crypto';
 import { mnemonicToSeedSync } from '@scure/bip39';
 import { mainnet } from '@popup/pages/NetworkSettings/NetworkSettings';
+import { selectAtom } from 'jotai/utils';
+import { HttpProvider, JsonRpcClient } from '@concordium/web-sdk';
 import { atomWithChromeStorage } from './utils';
 
 export const credentialsAtom = atomWithChromeStorage<WalletCredential[]>(ChromeStorageKey.Credentials, [], false, true);
@@ -26,6 +28,11 @@ export const networkConfigurationAtom = atom<NetworkConfiguration, NetworkConfig
         set(storedNetworkConfigurationAtom, networkConfiguration);
         popupMessageHandler.broadcast(EventType.ChainChanged, networkConfiguration.genesisHash);
     }
+);
+
+export const jsonRpcClientAtom = selectAtom(
+    networkConfigurationAtom,
+    ({ jsonRpcUrl }) => new JsonRpcClient(new HttpProvider(jsonRpcUrl))
 );
 
 export const sessionPasscodeAtom = atomWithChromeStorage<string | undefined>(

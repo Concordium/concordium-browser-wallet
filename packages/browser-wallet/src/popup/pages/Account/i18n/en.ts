@@ -31,6 +31,20 @@ const t = {
             done: 'Done',
         },
     },
+    sendCcd: {
+        labels: {
+            ccd: 'Enter amount to transfer',
+            recipient: 'Enter recipient address',
+        },
+        buttons: {
+            cancel: 'Cancel',
+            confirm: 'Confirm',
+            finish: 'Finish',
+            continue: 'Continue',
+        },
+        title: 'Send CCD',
+        fee: 'Estimated transaction fee',
+    },
     accountPending: 'This account is still pending finalization.',
 };
 
