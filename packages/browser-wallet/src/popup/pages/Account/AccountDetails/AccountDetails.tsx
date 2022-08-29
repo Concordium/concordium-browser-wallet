@@ -11,7 +11,7 @@ import VerifiedIcon from '@assets/svg/verified-stamp.svg';
 import { AccountInfo } from '@concordium/web-sdk';
 import { AccountInfoEmitter } from '@popup/shared/account-info-emitter';
 import { CreationStatus, WalletCredential } from '@shared/storage/types';
-import { toastAtom } from '@popup/state';
+import { addToastAtom } from '@popup/state';
 
 type AmountProps = {
     label: string;
@@ -44,7 +44,7 @@ export default function AccountDetails({ expanded, account, className }: Props) 
     const { jsonRpcUrl } = useAtomValue(networkConfigurationAtom);
     const [balances, setBalances] = useState<Omit<PublicAccountAmounts, 'scheduled'>>(zeroBalance);
     const identityNames = useAtomValue(identityNamesAtom);
-    const setToast = useSetAtom(toastAtom);
+    const addToast = useSetAtom(addToastAtom);
 
     useEffect(() => {
         setBalances(zeroBalance);
@@ -54,7 +54,7 @@ export default function AccountDetails({ expanded, account, className }: Props) 
                 setBalances(getPublicAccountAmounts(accountInfo));
             });
             emitter.on('error', () => {
-                setToast(t('error'));
+                addToast(t('error'));
             });
             emitter.listen([account.address]);
             return () => {

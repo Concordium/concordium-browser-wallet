@@ -8,7 +8,7 @@ import { useAtomValue, useSetAtom } from 'jotai';
 import { selectedAccountAtom } from '@popup/store/account';
 import { BrowserWalletTransaction } from '@popup/shared/utils/transaction-history-types';
 import { useTranslation } from 'react-i18next';
-import { toastAtom } from '@popup/state';
+import { addToastAtom } from '@popup/state';
 import TransactionElement, { transactionElementHeight } from './TransactionElement';
 import useTransactionGroups, { TransactionsByDateTuple } from './useTransactionGroups';
 
@@ -152,7 +152,7 @@ export default function TransactionList({ onTransactionClick }: TransactionListP
     const [transactions, setTransactions] = useState<BrowserWalletTransaction[]>([]);
     const [isNextPageLoading, setIsNextPageLoading] = useState<boolean>(false);
     const [hasNextPage, setHasNextPage] = useState<boolean>(true);
-    const setToast = useSetAtom(toastAtom);
+    const addToast = useSetAtom(addToastAtom);
 
     if (!accountAddress) {
         return null;
@@ -170,7 +170,7 @@ export default function TransactionList({ onTransactionClick }: TransactionListP
                 setIsNextPageLoading(false);
             })
             .catch(() => {
-                setToast(t('error'));
+                addToast(t('error'));
                 setIsNextPageLoading(false);
             });
     }
