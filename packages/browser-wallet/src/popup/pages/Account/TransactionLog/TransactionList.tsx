@@ -4,10 +4,11 @@ import InfiniteLoader from 'react-window-infinite-loader';
 import { VariableSizeList as List } from 'react-window';
 import { noOp, PropsOf } from 'wallet-common-helpers';
 import AutoSizer from 'react-virtualized-auto-sizer';
-import { useAtomValue } from 'jotai';
+import { useAtomValue, useSetAtom } from 'jotai';
 import { selectedAccountAtom } from '@popup/store/account';
 import { BrowserWalletTransaction } from '@popup/shared/utils/transaction-history-types';
 import { useTranslation } from 'react-i18next';
+import { addToastAtom } from '@popup/state';
 import TransactionElement, { transactionElementHeight } from './TransactionElement';
 import useTransactionGroups, { TransactionsByDateTuple } from './useTransactionGroups';
 
@@ -146,11 +147,12 @@ export interface TransactionListProps {
  * Displays a list of transactions from an account's transaction history.
  */
 export default function TransactionList({ onTransactionClick }: TransactionListProps) {
+    const { t } = useTranslation('transactionLog');
     const accountAddress = useAtomValue(selectedAccountAtom);
     const [transactions, setTransactions] = useState<BrowserWalletTransaction[]>([]);
     const [isNextPageLoading, setIsNextPageLoading] = useState<boolean>(false);
     const [hasNextPage, setHasNextPage] = useState<boolean>(true);
-    const { t } = useTranslation('transactionLog');
+    const addToast = useSetAtom(addToastAtom);
 
     if (!accountAddress) {
         return null;
@@ -167,10 +169,9 @@ export default function TransactionList({ onTransactionClick }: TransactionListP
                 setTransactions(updatedTransactions);
                 setIsNextPageLoading(false);
             })
-            .catch((e) => {
-                // TODO Handle exception when trying to get transactions.
+            .catch(() => {
+                addToast(t('error'));
                 setIsNextPageLoading(false);
-                throw Error(e);
             });
     }
 

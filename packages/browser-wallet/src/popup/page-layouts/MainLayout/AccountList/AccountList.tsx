@@ -2,7 +2,7 @@ import React, { forwardRef, useEffect, useState } from 'react';
 import clsx from 'clsx';
 import { useAtomValue, useAtom } from 'jotai';
 import { useNavigate } from 'react-router-dom';
-import { ClassName, displayAsCcd } from 'wallet-common-helpers';
+import { ClassName, displayAsCcd, noOp } from 'wallet-common-helpers';
 
 import CopyButton from '@popup/shared/CopyButton';
 import CheckmarkIcon from '@assets/svg/checkmark-blue.svg';
@@ -65,10 +65,12 @@ const AccountList = forwardRef<HTMLDivElement, Props>(({ className, onSelect }, 
 
     useEffect(() => {
         const emitter = new AccountInfoEmitter(jsonRpcUrl);
-        emitter.listen(accounts.map((account) => account.address));
         emitter.on('totalchanged', (accountInfo: AccountInfo, address: string) => {
             setTotalBalanceMap(new Map(totalBalanceMap.set(address, accountInfo.accountAmount)));
         });
+        // TODO Log the error instead of gobbling it.
+        emitter.on('error', noOp);
+        emitter.listen(accounts.map((account) => account.address));
         return () => {
             emitter.removeAllListeners('totalchanged');
             emitter.stop();

@@ -2,7 +2,7 @@ import clsx from 'clsx';
 import React, { useEffect, useState } from 'react';
 import { displayAsCcd, getPublicAccountAmounts, PublicAccountAmounts } from 'wallet-common-helpers';
 import { useTranslation } from 'react-i18next';
-import { useAtomValue } from 'jotai';
+import { useAtomValue, useSetAtom } from 'jotai';
 import { identityNamesAtom } from '@popup/store/identity';
 import { networkConfigurationAtom } from '@popup/store/settings';
 
@@ -11,6 +11,7 @@ import VerifiedIcon from '@assets/svg/verified-stamp.svg';
 import { AccountInfo } from '@concordium/web-sdk';
 import { AccountInfoEmitter } from '@popup/shared/account-info-emitter';
 import { CreationStatus, WalletCredential } from '@shared/storage/types';
+import { addToastAtom } from '@popup/state';
 
 type AmountProps = {
     label: string;
@@ -43,15 +44,19 @@ export default function AccountDetails({ expanded, account, className }: Props) 
     const { jsonRpcUrl } = useAtomValue(networkConfigurationAtom);
     const [balances, setBalances] = useState<Omit<PublicAccountAmounts, 'scheduled'>>(zeroBalance);
     const identityNames = useAtomValue(identityNamesAtom);
+    const addToast = useSetAtom(addToastAtom);
 
     useEffect(() => {
         setBalances(zeroBalance);
         if (account.status === CreationStatus.Confirmed) {
             const emitter = new AccountInfoEmitter(jsonRpcUrl);
-            emitter.listen([account.address]);
             emitter.on('totalchanged', (accountInfo: AccountInfo) => {
                 setBalances(getPublicAccountAmounts(accountInfo));
             });
+            emitter.on('error', () => {
+                addToast(t('error'));
+            });
+            emitter.listen([account.address]);
             return () => {
                 emitter.removeAllListeners('totalchanged');
                 emitter.stop();
