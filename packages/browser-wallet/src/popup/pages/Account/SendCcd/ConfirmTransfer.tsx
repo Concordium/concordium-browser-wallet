@@ -7,17 +7,19 @@ import { sendTransaction } from '@popup/shared/utils/transaction-helpers';
 import { jsonRpcClientAtom } from '@popup/store/settings';
 import { usePrivateKey } from '@popup/shared/utils/account-helpers';
 import Button from '@popup/shared/Button';
-import DisplaySimpleTransfer from '@popup/pages/SendTransaction/displayTransaction/DisplaySimpleTransfer';
+import DisplaySimpleTransfer from '@popup/shared/TransactionReceipt/displayPayload/DisplaySimpleTransfer';
 import { useNavigate } from 'react-router-dom';
 import { absoluteRoutes } from '@popup/constants/routes';
+import TransactionReceipt from '@popup/shared/TransactionReceipt/TransactionReceipt';
 import { routes } from './routes';
 
 interface Props {
     payload: SimpleTransferPayload | undefined;
     setDetailsExpanded: (expanded: boolean) => void;
+    cost?: bigint;
 }
 
-export default function ConfirmTransfer({ payload, setDetailsExpanded }: Props) {
+export default function ConfirmTransfer({ payload, setDetailsExpanded, cost }: Props) {
     const { t } = useTranslation('account');
     const [hash, setHash] = useState<string>();
     const address = useAtomValue(selectedAccountAtom);
@@ -51,21 +53,20 @@ export default function ConfirmTransfer({ payload, setDetailsExpanded }: Props) 
         sendTransaction(client, transaction, key).then(setHash);
     };
 
-    if (!payload) {
+    if (!payload || !address) {
         return null;
     }
-
     return (
-        <div className="flex-column justify-space-between align-center">
-            <DisplaySimpleTransfer payload={payload} />
+        <div className="w-full flex-column justify-space-between align-center">
+            <TransactionReceipt title={t('sendCcd.receiptTitle')} sender={address} cost={cost} hash={hash}>
+                <DisplaySimpleTransfer payload={payload} />
+            </TransactionReceipt>
             {!hash && (
-                <div className="flex w-full justify-center m-b-10">
-                    <Button width="narrow" className="m-r-10" onClick={() => nav(`../${routes.create}`)}>
+                <div className="flex justify-center m-b-10 m-h-20">
+                    <Button className="m-r-10" onClick={() => nav(`../${routes.create}`)}>
                         {t('sendCcd.buttons.cancel')}
                     </Button>
-                    <Button width="narrow" onClick={send}>
-                        {t('sendCcd.buttons.confirm')}
-                    </Button>
+                    <Button onClick={send}>{t('sendCcd.buttons.confirm')}</Button>
                 </div>
             )}
             {hash && (

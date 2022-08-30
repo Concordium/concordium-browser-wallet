@@ -15,18 +15,21 @@ const t: typeof en = {
         confirmed: 'Godkendt af',
         rejected: 'Afvist af',
     },
-    // TODO: translate
     utils: {
         address: {
-            required: 'Please enter an address',
-            invalid: 'Invalid address',
+            required: 'Skriv en addresse',
+            invalid: 'Invalid addresse',
         },
         ccdAmount: {
-            required: 'Please enter an amount',
-            invalid: 'Invalid amount',
-            insufficient: 'Insufficient funds',
-            zero: 'Amount may not be zero',
+            required: 'Skriv et beløb',
+            invalid: 'Invalid beløb',
+            insufficient: 'Ikke nok penge',
+            zero: 'Beløbet må ikke være nul',
         },
+    },
+    transactionReceipt: {
+        sender: 'Sendende konti',
+        cost: 'Estimeret transaktions afgift',
     },
 };
 

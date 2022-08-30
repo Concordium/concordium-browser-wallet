@@ -33,19 +33,19 @@ const t: typeof en = {
             done: 'Færdig',
         },
     },
-    // TODO: translate
     sendCcd: {
         labels: {
-            ccd: 'Enter amount to transfer',
-            recipient: 'Enter recipient address',
+            ccd: 'Skriv et beløb at overføre',
+            recipient: 'Skriv modtager addresse',
         },
         buttons: {
-            cancel: 'Cancel',
-            confirm: 'Confirm',
-            finish: 'Finish',
-            continue: 'Continue',
+            cancel: 'Annuller',
+            confirm: 'Bekræft',
+            finish: 'Færdigør',
+            continue: 'Fortsæt',
         },
         title: 'Send CCD',
+        receiptTitle: 'Transaktion: Send CCD',
         fee: 'Estimated transaction fee',
     },
     accountPending: 'Denne konto er stadig ved at blive oprettet.',

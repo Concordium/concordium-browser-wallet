@@ -41,17 +41,17 @@ export function validateTransferAmount(
     estimatedFee: bigint | undefined
 ): string | undefined {
     if (!isValidCcdString(amountToValidate)) {
-        return i18n.t('shared.utils.ccdAmount.invalid');
+        return i18n.t('utils.ccdAmount.invalid');
     }
     const amountToValidateMicroGTU = ccdToMicroCcd(amountToValidate);
     if (
         accountInfo &&
         getPublicAccountAmounts(accountInfo).atDisposal < amountToValidateMicroGTU + (estimatedFee || 0n)
     ) {
-        return i18n.t('shared.utils.ccdAmount.insufficient');
+        return i18n.t('utils.ccdAmount.insufficient');
     }
     if (amountToValidateMicroGTU === 0n) {
-        return i18n.t('shared.utils.ccdAmount.zero');
+        return i18n.t('utils.ccdAmount.zero');
     }
     return undefined;
 }
@@ -62,6 +62,6 @@ export function validateAccountAddress(cand: string): string | undefined {
         new AccountAddress(cand);
         return undefined;
     } catch {
-        return i18n.t('shared.utils.address.invalid');
+        return i18n.t('utils.address.invalid');
     }
 }

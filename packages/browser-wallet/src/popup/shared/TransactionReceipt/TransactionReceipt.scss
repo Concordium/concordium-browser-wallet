@@ -1,0 +1,59 @@
+$transaction-receipt-horizontal-padding: rem(20px);
+
+.transaction-receipt {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    background-color: $color-off-white;
+    border: rem(1px) solid $color-grey;
+    margin: rem(20px);
+    border-radius: rem(10px);
+    padding: rem(10px) $transaction-receipt-horizontal-padding;
+    width: calc(100% - rem(80px));
+
+    h5 {
+        margin-bottom: 0;
+    }
+
+    &__hash,
+    &__title {
+        width: calc(100% + 2 * $transaction-receipt-horizontal-padding);
+        text-align: center;
+        margin: 0;
+    }
+
+    &__title {
+        border-bottom: rem(0.5px) solid $color-grey;
+        padding-bottom: rem(5px);
+    }
+
+    &__address {
+        flex-wrap: wrap;
+        word-break: break-all;
+        font-size: rem(8px);
+    }
+
+    &__cost {
+        margin-top: rem(10px);
+
+        p {
+            color: $color-text-faded;
+            font-size: rem(8px);
+            margin: 0;
+            text-align: center;
+        }
+    }
+
+    &__parameter {
+        word-break: break-all;
+        white-space: pre-wrap;
+    }
+
+    &__hash {
+        color: $color-text-faded;
+        border-top: rem(0.5px) solid $color-grey;
+        padding-top: rem(5px);
+        font-size: rem(8px);
+        margin-top: rem(10px);
+    }
+}

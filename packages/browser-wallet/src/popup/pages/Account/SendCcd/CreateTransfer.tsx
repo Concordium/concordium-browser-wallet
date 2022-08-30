@@ -4,7 +4,7 @@ import { useAtomValue } from 'jotai';
 import { selectedAccountAtom } from '@popup/store/account';
 import Form from '@popup/shared/Form';
 import Input from '@popup/shared/Form/Input';
-import { ccdToMicroCcd, displayAsCcd, microCcdToCcd } from 'wallet-common-helpers';
+import { ccdToMicroCcd, microCcdToCcd } from 'wallet-common-helpers';
 import { SimpleTransferPayload } from '@concordium/web-sdk';
 import { SubmitHandler, Validate } from 'react-hook-form';
 import Submit from '@popup/shared/Form/Submit';
@@ -14,6 +14,7 @@ import {
     validateAccountAddress,
 } from '@popup/shared/utils/transaction-helpers';
 import { useNavigate } from 'react-router-dom';
+import DisplayCost from '@popup/shared/TransactionReceipt/DisplayCost';
 import { routes } from './routes';
 import { accountContext, AccountContextValues } from '../AccountContext';
 
@@ -25,18 +26,17 @@ export type FormValues = {
 interface Props {
     setPayload: (payload: SimpleTransferPayload) => void;
     defaultPayload?: SimpleTransferPayload | undefined;
+    cost?: bigint;
 }
 
-export default function CreateTransaction({ setPayload, defaultPayload }: Props) {
+export default function CreateTransaction({ setPayload, defaultPayload, cost = 0n }: Props) {
     const { t } = useTranslation('account');
     const { t: tShared } = useTranslation('shared');
     const address = useAtomValue(selectedAccountAtom);
     const nav = useNavigate();
     const { accountInfo } = useContext<AccountContextValues>(accountContext);
-    // TODO: fix this;
-    const fee = 1n;
 
-    const validateAmount: Validate<string> = (amount) => validateTransferAmount(amount, accountInfo, fee);
+    const validateAmount: Validate<string> = (amount) => validateTransferAmount(amount, accountInfo, cost);
 
     if (!address) {
         return null;
@@ -49,7 +49,7 @@ export default function CreateTransaction({ setPayload, defaultPayload }: Props)
 
     return (
         <div>
-            <p className="m-t-10 m-b-20 text-center">{t('sendCcd.title')}</p>
+            <p className="m-v-10 text-center">{t('sendCcd.title')}</p>
             <Form
                 className="flex-column justify-space-between align-center"
                 onSubmit={onSubmit}
@@ -64,7 +64,7 @@ export default function CreateTransaction({ setPayload, defaultPayload }: Props)
                             register={f.register}
                             name="ccd"
                             label={t('sendCcd.labels.ccd')}
-                            className="m-b-20 w-full"
+                            className="m-t-10 w-full"
                             rules={{
                                 required: tShared('utils.ccdAmount.required'),
                                 validate: validateAmount,
@@ -74,16 +74,14 @@ export default function CreateTransaction({ setPayload, defaultPayload }: Props)
                             register={f.register}
                             name="recipient"
                             label={t('sendCcd.labels.recipient')}
-                            className="m-b-20 w-full"
+                            className="m-t-10 w-full"
                             rules={{
                                 required: tShared('utils.address.required'),
                                 validate: validateAccountAddress,
                             }}
                         />
-                        <p>
-                            {t('sendCcd.fee')} {displayAsCcd(1n)}
-                        </p>
-                        <Submit className="m-t-10" width="narrow">
+                        <DisplayCost cost={cost} />
+                        <Submit className="m-v-10" width="narrow">
                             {t('sendCcd.buttons.continue')}
                         </Submit>
                     </>

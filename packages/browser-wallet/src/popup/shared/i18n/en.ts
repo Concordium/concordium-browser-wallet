@@ -25,6 +25,10 @@ const t = {
             zero: 'Amount may not be zero',
         },
     },
+    transactionReceipt: {
+        sender: 'Sender account',
+        cost: 'Estimated transaction fee',
+    },
 };
 
 export default t;

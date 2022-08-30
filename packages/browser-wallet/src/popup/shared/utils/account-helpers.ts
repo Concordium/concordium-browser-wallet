@@ -34,9 +34,6 @@ export function useSelectedCredential() {
     return selectedCredential;
 }
 
-export function usePrivateKey(accountAddress: string): string;
-export function usePrivateKey(accountAddress: undefined): undefined;
-export function usePrivateKey(accountAddress: string | undefined): string | undefined;
 export function usePrivateKey(accountAddress: string | undefined): string | undefined {
     const credentials = useAtomValue(credentialsAtom);
     const seedPhrase = useAtomValue(seedPhraseAtom);
@@ -44,12 +41,9 @@ export function usePrivateKey(accountAddress: string | undefined): string | unde
     const identity = useIdentityOf(credential);
 
     const privateKey = useMemo(() => {
-        if (!accountAddress) {
+        // We don't throw errors on missing credentials or identities, as they might just be loading.
+        if (!accountAddress || !credential || !identity) {
             return undefined;
-        }
-
-        if (!credential || !identity) {
-            throw new Error('No credential or identity found for given account address');
         }
 
         return ConcordiumHdWallet.fromHex(seedPhrase, Network[credential.net] as NetworkString)
