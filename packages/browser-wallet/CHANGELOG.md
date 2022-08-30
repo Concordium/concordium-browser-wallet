@@ -1,6 +1,6 @@
 # Changelog
 
-## Unreleased
+## 0.4.0
 
 ### Added
 
@@ -9,6 +9,8 @@
 -   Transaction details view when clicking a transaction in the transaction list.
 -   Theme toggle button to the settings page.
 -   Export private key account settings page.
+-   Identity issuance.
+-   Account creation.
 -   Toasts for showing errors when failing to retrieve account balance or transaction history.
 
 ### Changed
@@ -18,6 +20,7 @@
 ### Removed
 
 -   Visual settings page.
+-   Adding accounts manually with private key
 
 ## 0.3.0 2022-8-18
 
