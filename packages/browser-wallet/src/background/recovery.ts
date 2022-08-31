@@ -17,19 +17,6 @@ const maxEmpty = 3;
 // Milliseconds to wait, if retrievelUrl is still pending
 const sleepInterval = 5000;
 
-// TODO: use dependency for this (https://en.wikipedia.org/wiki/Fisher%E2%80%93Yates_shuffle)
-/**
- * Shuffles the given array in place. (modifying the original reference)
- */
-function shuffle<T>(array: T[]): T[] {
-    for (let i = array.length - 1; i > 0; i -= 1) {
-        const j = Math.floor(Math.random() * (i + 1)); // random index from 0 to i
-        // eslint-disable-next-line no-param-reassign
-        [array[i], array[j]] = [array[j], array[i]];
-    }
-    return array;
-}
-
 export type Payload = {
     providers: IdentityProvider[];
     globalContext: CryptographicParameters;
@@ -69,15 +56,15 @@ async function performRecovery({ providers, ...recoveryInputs }: Payload) {
     // const identities = await storedIdentities.get();
     // let nextId = identities ? identities.length + 1 : 0;
     let nextId = 0;
-    let emptyIndices = 0;
-    let identityIndex = 0;
     const network = NetworkValue[recoveryInputs.net];
     const identitiesToAdd: Identity[] = [];
 
-    while (emptyIndices < maxEmpty) {
-        let found = false;
-        for (const provider of shuffle(providers)) {
+    for (const provider of providers) {
+        let emptyIndices = 0;
+        let identityIndex = 0;
+        while (emptyIndices < maxEmpty) {
             const recoverUrl = getRecoverUrl({ ...recoveryInputs, identityIndex }, provider);
+            identityIndex += 1;
             const recoverResponse = await (await fetch(recoverUrl)).json();
             if (recoverResponse.identityRetrievalUrl) {
                 const idObject = await getIdentityObject(recoverResponse.identityRetrievalUrl);
@@ -92,15 +79,12 @@ async function performRecovery({ providers, ...recoveryInputs }: Payload) {
                         idObject,
                     });
                     nextId += 1;
-                    found = true;
-                    break;
                 }
+                // eslint-disable-next-line no-continue
+                continue;
             }
-        }
-        if (!found) {
             emptyIndices += 1;
         }
-        identityIndex += 1;
     }
     await addIdentity(identitiesToAdd);
 }
