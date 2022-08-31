@@ -15,6 +15,7 @@ const t = {
         total: 'Public balance total',
         atDisposal: 'Public amount at disposal',
         stakeAmount: 'Stake / delegation amount',
+        error: 'Unable to retrieve account balance',
     },
     settings: {
         connectedSites: {

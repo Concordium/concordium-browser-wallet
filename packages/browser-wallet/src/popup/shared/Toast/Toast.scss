@@ -1,0 +1,49 @@
+.toast {
+    visibility: hidden;
+    width: rem(220px);
+    left: 0;
+    right: 0;
+    margin: 0 auto;
+    background-color: $color-darker-grey;
+    color: $color-off-white;
+    text-align: center;
+    border-radius: rem(30px);
+    padding: rem(10px) rem(15px);
+    position: fixed;
+    z-index: 2;
+    bottom: rem(55px);
+
+    &__show {
+        visibility: visible;
+        animation: fadein 0.5s;
+    }
+
+    &__fadeout {
+        visibility: visible;
+        animation: fadeout 0.5s;
+    }
+
+    @keyframes fadein {
+        from {
+            bottom: 0;
+            opacity: 0;
+        }
+
+        to {
+            bottom: rem(55px);
+            opacity: 1;
+        }
+    }
+
+    @keyframes fadeout {
+        from {
+            bottom: rem(55px);
+            opacity: 1;
+        }
+
+        to {
+            bottom: rem(55px);
+            opacity: 0;
+        }
+    }
+}

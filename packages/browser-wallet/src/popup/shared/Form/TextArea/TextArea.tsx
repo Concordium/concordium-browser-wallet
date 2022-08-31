@@ -25,7 +25,14 @@ export const TextArea = forwardRef<HTMLTextAreaElement, Props>(
                     className
                 )}
             >
-                <textarea className={clsx('form-input__area')} style={{ resize: 'none' }} ref={ref} {...props} />
+                <textarea
+                    className={clsx('form-input__area')}
+                    style={{ resize: 'none' }}
+                    ref={ref}
+                    autoComplete="off"
+                    spellCheck="false"
+                    {...props}
+                />
                 {label && <div className="form-input__label">{label}</div>}
                 {error ? (
                     <ErrorMessage className="form-input__error">{error}</ErrorMessage>

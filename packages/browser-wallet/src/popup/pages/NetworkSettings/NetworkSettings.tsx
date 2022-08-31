@@ -30,7 +30,7 @@ export const testnet: NetworkConfiguration = {
 export const stagenet: NetworkConfiguration = {
     genesisHash: '38bf770b4c247f09e1b62982bb71000c516480c5a2c5214dadac6da4b1ad50e5',
     name: 'Concordium Stagenet',
-    jsonRpcUrl: 'http://localhost:9095',
+    jsonRpcUrl: 'https://json-rpc.stagenet.concordium.com/',
     explorerUrl: 'https://wallet-proxy.stagenet.concordium.com',
 };
 
