@@ -94,6 +94,7 @@ const injectScript: ExtensionMessageHandler = (_msg, sender, respond) => {
 };
 
 chrome.runtime.onStartup.addListener(startupHandler);
+chrome.runtime.onInstalled.addListener(startupHandler);
 
 bgMessageHandler.handleMessage(
     createMessageTypeFilter(InternalMessageType.SendCredentialDeployment),
