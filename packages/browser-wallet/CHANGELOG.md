@@ -5,6 +5,7 @@
 ### Fixed
 
 -   Account search now only searches on the account address field.
+-   Identities and accounts statuses are now resolved correctly on first installation of the wallet, without requiring a restart.
 
 ## 0.4.0
 
