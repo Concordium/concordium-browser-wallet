@@ -1,5 +1,11 @@
 # Changelog
 
+## Unreleased
+
+### Fixed
+
+-   Account search now only searches on the account address field.
+
 ## 0.4.0
 
 ### Added

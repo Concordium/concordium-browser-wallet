@@ -89,6 +89,7 @@ const AccountList = forwardRef<HTMLDivElement, Props>(({ className, onSelect }, 
             getKey={(a) => a.address}
             newText={t('accountList.new')}
             ref={ref}
+            searchableKeys={['address']}
         >
             {(a, checked) => (
                 <AccountListItem
