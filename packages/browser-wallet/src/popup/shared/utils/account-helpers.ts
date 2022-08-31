@@ -47,7 +47,7 @@ export function usePrivateKey(accountAddress: string): string | undefined {
         }
 
         return ConcordiumHdWallet.fromHex(seedPhrase, Network[credential.net] as NetworkString)
-            .getAccountSigningKey(identity.index, credential.credNumber)
+            .getAccountSigningKey(identity.provider, identity.index, credential.credNumber)
             .toString('hex');
     }, [credential?.credId, seedPhrase, identity?.id]);
 

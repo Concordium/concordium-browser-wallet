@@ -50,8 +50,13 @@ function IdentityIssuanceStart({ onStart }: InnerProps) {
                 throw new Error('no global fetched');
             }
 
-            // TODO Find a better way to assign indices
-            const identityIndex = identities.length ? identities[identities.length - 1].index + 1 : 0;
+            const providerIndex = provider.ipInfo.ipIdentity;
+
+            const identityIndex = identities.reduce(
+                (maxIndex, identity) =>
+                    identity.provider === providerIndex ? Math.max(maxIndex, identity.index + 1) : maxIndex,
+                0
+            );
             // TODO Get this from settings, when we store the chosen net
             const net = 'Testnet';
 
@@ -63,7 +68,7 @@ function IdentityIssuanceStart({ onStart }: InnerProps) {
                 index: identityIndex,
                 name: `Identity ${identityIndex + 1}`,
                 network: Network[net],
-                provider: provider.ipInfo.ipIdentity,
+                provider: providerIndex,
             });
 
             popupMessageHandler.sendInternalMessage(InternalMessageType.StartIdentityIssuance, {
