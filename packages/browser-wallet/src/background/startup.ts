@@ -24,7 +24,7 @@ async function monitorAccountStatus() {
         try {
             const network = await storedCurrentNetwork.get();
             if (network) {
-                const url = network?.jsonRpcUrl;
+                const url = network.jsonRpcUrl;
                 const creds = await storedCredentials.get(network.genesisHash);
                 if (url && creds) {
                     const toUpdate: WalletCredential[] = [];

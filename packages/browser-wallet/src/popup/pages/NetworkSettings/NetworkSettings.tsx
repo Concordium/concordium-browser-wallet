@@ -93,7 +93,6 @@ export default function NetworkSettings() {
                         onClick={() => nav(-1)}
                     >
                         {t('pendingIdentity.back')}
-                        go back
                     </Button>
                     <Button
                         faded
@@ -102,7 +101,6 @@ export default function NetworkSettings() {
                         onClick={() => setPendingIdentity(undefined)}
                     >
                         {t('pendingIdentity.abort')}
-                        abort issuance
                     </Button>
                 </div>
             </Modal>

@@ -26,8 +26,8 @@ export const networkConfigurationAtom = atom<NetworkConfiguration, NetworkConfig
     (get, set, networkConfiguration) => {
         set(storedNetworkConfigurationAtom, networkConfiguration);
         popupMessageHandler.broadcast(EventType.ChainChanged, networkConfiguration.genesisHash);
-        const accounts = get(accountsAtom);
-        const identities = get(identitiesAtom);
+        const accounts = get(accountsAtom).value;
+        const identities = get(identitiesAtom).value;
         set(selectedAccountAtom, accounts.length ? accounts[0] : undefined);
         set(selectedIdentityIndexAtom, identities.length ? identities[0]?.index : 0);
     }

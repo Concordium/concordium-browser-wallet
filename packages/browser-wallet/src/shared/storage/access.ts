@@ -15,7 +15,7 @@ export type StorageAccessor<V> = {
      */
     get(): Promise<V | undefined>;
     /**
-     * Function for setting the setting the stored value. If called with undefined, the key used for storage is entirely removed.
+     * Function for setting the stored value. If called with undefined, the key used for storage is entirely removed.
      */
     set(value: V): Promise<void>;
     /**
@@ -34,7 +34,7 @@ export type IndexedStorageAccessor<V> = {
      */
     get(index: string): Promise<V | undefined>;
     /**
-     * Function for setting the setting the stored value. If called with undefined, the key used for storage is entirely removed.
+     * Function for setting the stored value. If called with undefined, the key used for storage is entirely removed.
      */
     set(index: string, value: V): Promise<void>;
     /**
@@ -64,9 +64,9 @@ const makeStorageAccessor = <V>(area: chrome.storage.AreaName, key: ChromeStorag
 };
 
 /**
- * Factory function for creating a StorageAccessor from a key.
+ * Factory function for creating an IndexedStorageAccessor from a key.
  *
- * @param area storeage area to store value in
+ * @param area storage area to store value in
  * @param key key used to store value
  */
 const makeIndexedStorageAccessor = <Value>(
