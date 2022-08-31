@@ -8,7 +8,7 @@ import { usePrivateKey } from '@popup/shared/utils/account-helpers';
 import { selectedAccountAtom } from '@popup/store/account';
 import { sessionPasscodeAtom } from '@popup/store/settings';
 import { useAtomValue } from 'jotai';
-import React, { useState } from 'react';
+import React, { useEffect, useState } from 'react';
 import { Validate } from 'react-hook-form';
 import { useTranslation } from 'react-i18next';
 import { useNavigate } from 'react-router-dom';
@@ -31,6 +31,10 @@ export default function ExportPrivateKey() {
     if (!privateKey) {
         return null;
     }
+
+    useEffect(() => {
+        setShowPrivateKey(false);
+    }, [selectedAccountAddress]);
 
     const handleSubmit = () => {
         setShowPrivateKey(true);
