@@ -48,6 +48,8 @@ export function InlineInput({
             onChange={(e) => onChange(e.currentTarget.value)}
             onBlur={handleBlur}
             ref={ref}
+            autoComplete="off"
+            spellCheck="false"
             {...props}
             style={{ width: 6 }} // To prevent initial UI jitter.
         />
