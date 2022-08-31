@@ -76,7 +76,7 @@ export default function IdentityIssuanceEnd({ onFinish }: Props) {
                     </>
                 )}
                 <Button width="wide" onClick={withClose(noOp)} className="identity-issuance__button">
-                    {t('continue')}
+                    {t('done')}
                 </Button>
             </div>
         </>
