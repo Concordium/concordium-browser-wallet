@@ -11,6 +11,8 @@
 -   Export private key account settings page.
 -   Identity issuance.
 -   Account creation.
+-   Toasts for showing errors when failing to retrieve account balance or transaction history.
+-   Send ccd page.
 
 ### Changed
 

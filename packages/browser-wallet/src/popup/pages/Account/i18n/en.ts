@@ -5,6 +5,7 @@ const t = {
     accountAddress: 'Account address',
     siteConnected: 'Connected',
     siteNotConnected: 'Not connected',
+    accountBalanceError: 'Unable to retrieve account balance',
     actions: {
         log: 'transaction log',
         send: 'send ccd',

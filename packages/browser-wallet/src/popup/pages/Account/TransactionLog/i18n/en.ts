@@ -7,6 +7,7 @@ const t = {
     events: 'Events',
     rejectReason: 'Reject reason',
     noTransactions: 'This account has no transactions yet.',
+    error: 'Unable to retrieve transaction history',
 };
 
 export default t;

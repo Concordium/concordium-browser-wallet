@@ -7,6 +7,7 @@ const t: typeof en = {
     accountAddress: 'Konto adresse',
     siteConnected: 'Forbundet',
     siteNotConnected: 'Ikke forbundet',
+    accountBalanceError: 'Fejl ved hentning af kontoens balance',
     actions: {
         log: 'transaktionslog',
         send: 'send ccd',

@@ -1,21 +1,30 @@
-import { useAtomValue } from 'jotai';
+import { useAtomValue, useSetAtom } from 'jotai';
+import { useTranslation } from 'react-i18next';
 import React, { useEffect, useMemo, useState, createContext, ReactElement } from 'react';
 import { CreationStatus, WalletCredential, ConfirmedCredential } from '@shared/storage/types';
 import { AccountInfo } from '@concordium/web-sdk';
 import { networkConfigurationAtom } from '@popup/store/settings';
 import { AccountInfoEmitter } from '@popup/shared/account-info-emitter';
+import { addToastAtom } from '@popup/state';
 
 function useAccountInfo(account?: WalletCredential) {
+    const { t } = useTranslation('account');
+
     const [accountInfo, setAccountInfo] = useState<AccountInfo>();
     const { jsonRpcUrl } = useAtomValue(networkConfigurationAtom);
+    const addToast = useSetAtom(addToastAtom);
 
     useEffect(() => {
         if (account?.status === CreationStatus.Confirmed) {
             const emitter = new AccountInfoEmitter(jsonRpcUrl);
-            emitter.listen([account.address]);
             emitter.on('totalchanged', setAccountInfo);
+            emitter.on('error', () => {
+                addToast(t('accountBalanceError'));
+            });
+            emitter.listen([account.address]);
             return () => {
                 emitter.removeAllListeners('totalchanged');
+                emitter.removeAllListeners('error');
                 emitter.stop();
             };
         }

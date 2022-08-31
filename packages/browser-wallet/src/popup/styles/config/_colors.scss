@@ -3,6 +3,7 @@ $color-white: #fff;
 $color-off-white: #fbfbf9;
 $color-black: #000;
 $color-off-black: #181817;
+$color-darker-grey: #727272;
 $color-grey: #979797;
 $color-red: #ff4d4d;
 $color-green: #4ac29e;
@@ -65,9 +66,6 @@ $color-transaction-group-header-text: var(
 $color-main-header: var(--color-main-header, $color-main-header-light);
 $color-input-bg: var(--color-input-bg, $color-input-bg-light);
 $color-text-inverted: $color-bg;
-$color-highlight-mainnet: var(--color-highlight-mainnet, $color-highlight-mainnet-light);
-$color-highlight-testnet: var(--color-highlight-testnet, $color-highlight-testnet-light);
-$color-highlight: var(--color-highlight, $color-highlight-testnet);
 $color-highlight-mainnet: var(--color-highlight-mainnet, $color-highlight-mainnet-light);
 $color-highlight-testnet: var(--color-highlight-testnet, $color-highlight-testnet-light);
 $color-highlight: var(--color-highlight, $color-highlight-testnet);
