@@ -6,9 +6,10 @@ import { popupMessageHandler } from '@popup/shared/message-handler';
 import { decrypt } from '@popup/shared/crypto';
 import { mnemonicToSeedSync } from '@scure/bip39';
 import { mainnet } from '@popup/pages/NetworkSettings/NetworkSettings';
+import { storedCredentials, storedIdentities } from '@shared/storage/access';
 import { atomWithChromeStorage } from './utils';
-import { accountsAtom, selectedAccountAtom } from './account';
-import { identitiesAtom, selectedIdentityIndexAtom } from './identity';
+import { selectedAccountAtom } from './account';
+import { selectedIdentityIndexAtom } from './identity';
 
 export const encryptedSeedPhraseAtom = atomWithChromeStorage<EncryptedData | undefined>(
     ChromeStorageKey.SeedPhrase,
@@ -26,10 +27,12 @@ export const networkConfigurationAtom = atom<NetworkConfiguration, NetworkConfig
     (get, set, networkConfiguration) => {
         set(storedNetworkConfigurationAtom, networkConfiguration);
         popupMessageHandler.broadcast(EventType.ChainChanged, networkConfiguration.genesisHash);
-        const accounts = get(accountsAtom).value;
-        const identities = get(identitiesAtom).value;
-        set(selectedAccountAtom, accounts.length ? accounts[0] : undefined);
-        set(selectedIdentityIndexAtom, identities.length ? identities[0]?.index : 0);
+        storedIdentities
+            .get(networkConfiguration.genesisHash)
+            .then((identities) => set(selectedIdentityIndexAtom, identities?.length ? identities[0]?.index : 0));
+        storedCredentials
+            .get(networkConfiguration.genesisHash)
+            .then((creds) => set(selectedAccountAtom, creds?.length ? creds[0]?.address : undefined));
     }
 );
 
