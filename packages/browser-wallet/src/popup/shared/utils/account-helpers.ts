@@ -1,10 +1,11 @@
-import { selectedAccountAtom } from '@popup/store/account';
-import { credentialsAtom, seedPhraseAtom } from '@popup/store/settings';
+import { credentialsAtom, selectedAccountAtom } from '@popup/store/account';
+import { networkConfigurationAtom, seedPhraseAtom } from '@popup/store/settings';
 import { useAtomValue } from 'jotai';
 import { useMemo } from 'react';
 import { identitiesAtom } from '@popup/store/identity';
-import { ConcordiumHdWallet, Network as NetworkString } from '@concordium/web-sdk';
-import { Network, WalletCredential } from '@shared/storage/types';
+import { ConcordiumHdWallet } from '@concordium/web-sdk';
+import { WalletCredential } from '@shared/storage/types';
+import { getNet } from '@shared/utils/network-helpers';
 
 export const displaySplitAddress = (address: string) => `${address.slice(0, 4)}...${address.slice(address.length - 4)}`;
 
@@ -15,7 +16,7 @@ export function useIdentityOf(cred?: WalletCredential) {
         if (!cred) {
             return undefined;
         }
-        return identities.find((id) => id.id === cred.identityId && id.network === cred.net);
+        return identities.find((id) => id.index === cred.identityIndex);
     }, [cred, identities.length]);
     return identity;
 }
@@ -37,6 +38,7 @@ export function useSelectedCredential() {
 export function usePrivateKey(accountAddress: string): string | undefined {
     const credentials = useAtomValue(credentialsAtom);
     const credential = credentials.find((cred) => cred.address === accountAddress);
+    const network = useAtomValue(networkConfigurationAtom);
 
     const seedPhrase = useAtomValue(seedPhraseAtom);
     const identity = useIdentityOf(credential);
@@ -46,10 +48,10 @@ export function usePrivateKey(accountAddress: string): string | undefined {
             return undefined;
         }
 
-        return ConcordiumHdWallet.fromHex(seedPhrase, Network[credential.net] as NetworkString)
+        return ConcordiumHdWallet.fromHex(seedPhrase, getNet(network))
             .getAccountSigningKey(identity.index, credential.credNumber)
             .toString('hex');
-    }, [credential?.credId, seedPhrase, identity?.id]);
+    }, [credential?.credId, seedPhrase, identity?.index]);
 
     return privateKey;
 }

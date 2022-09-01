@@ -105,9 +105,9 @@ export default function Modal<T extends WithOnClick = WithOnClick>({
     useEffect(() => {
         if (isOpen) {
             htmlElement?.classList.add('modal-open');
-        } else {
-            htmlElement?.classList.remove('modal-open');
+            return () => htmlElement?.classList.remove('modal-open');
         }
+        return noOp;
     }, [isOpen]);
 
     const onTriggerClick: MouseEventHandler = useCallback(

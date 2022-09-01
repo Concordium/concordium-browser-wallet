@@ -1,14 +1,16 @@
 import { Buffer } from 'buffer/';
-import { ChromeStorageKey, EncryptedData, NetworkConfiguration, Theme, WalletCredential } from '@shared/storage/types';
+import { ChromeStorageKey, EncryptedData, NetworkConfiguration, Theme } from '@shared/storage/types';
 import { atom } from 'jotai';
 import { EventType } from '@concordium/browser-wallet-api-helpers';
 import { popupMessageHandler } from '@popup/shared/message-handler';
 import { decrypt } from '@popup/shared/crypto';
 import { mnemonicToSeedSync } from '@scure/bip39';
 import { mainnet } from '@popup/pages/NetworkSettings/NetworkSettings';
+import { storedCredentials, storedIdentities } from '@shared/storage/access';
 import { atomWithChromeStorage } from './utils';
+import { selectedAccountAtom } from './account';
+import { selectedIdentityIndexAtom } from './identity';
 
-export const credentialsAtom = atomWithChromeStorage<WalletCredential[]>(ChromeStorageKey.Credentials, [], false, true);
 export const encryptedSeedPhraseAtom = atomWithChromeStorage<EncryptedData | undefined>(
     ChromeStorageKey.SeedPhrase,
     undefined,
@@ -22,9 +24,15 @@ const storedNetworkConfigurationAtom = atomWithChromeStorage<NetworkConfiguratio
 );
 export const networkConfigurationAtom = atom<NetworkConfiguration, NetworkConfiguration>(
     (get) => get(storedNetworkConfigurationAtom),
-    (_, set, networkConfiguration) => {
+    (get, set, networkConfiguration) => {
         set(storedNetworkConfigurationAtom, networkConfiguration);
         popupMessageHandler.broadcast(EventType.ChainChanged, networkConfiguration.genesisHash);
+        storedIdentities
+            .get(networkConfiguration.genesisHash)
+            .then((identities) => set(selectedIdentityIndexAtom, identities?.length ? identities[0]?.index : 0));
+        storedCredentials
+            .get(networkConfiguration.genesisHash)
+            .then((creds) => set(selectedAccountAtom, creds?.length ? creds[0]?.address : undefined));
     }
 );
 
