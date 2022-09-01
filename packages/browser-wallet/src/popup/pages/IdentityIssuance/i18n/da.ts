@@ -6,7 +6,7 @@ const t: typeof en = {
     successExplanation:
         'Din anmodning er blevet sendt til identitets udbyderen. Det kan tage et stykke tid at bekræfte din identitiet. \n\n Når din identitet er blevet bekræftet, vil du kunn åbne en konto med den.',
     errorExplanation: 'Identitets udstedelsesen er fejlet på grund af: "{{reason}}"',
-    continue: 'Fortsæt',
+    done: 'Færdig',
     startText: 'Vælg hos hvilken identitets udbyder du ønsker at anmode en identitet.',
     alreadyPending: 'Du er allerede i gang med lave en ny identitet.',
     reset: 'Nulstil',

@@ -5,7 +5,7 @@ const t = {
     successExplanation:
         'Your request has been submitted with the identity provider. It may take a little while for them to confirm your identity. \n\n Once your identity has been verified, you will be able to open an account with it.',
     errorExplanation: 'The identity issuance failed due to: "{{reason}}"',
-    continue: 'Continue',
+    done: 'Done',
     startText: 'Choose which identity provider you wish to request an identity with.',
     alreadyPending: 'You are already creating an identity.',
     reset: 'Reset',
