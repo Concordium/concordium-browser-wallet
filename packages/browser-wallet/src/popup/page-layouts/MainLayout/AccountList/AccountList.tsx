@@ -7,8 +7,8 @@ import { ClassName, displayAsCcd, noOp } from 'wallet-common-helpers';
 import CopyButton from '@popup/shared/CopyButton';
 import CheckmarkIcon from '@assets/svg/checkmark-blue.svg';
 import { absoluteRoutes } from '@popup/constants/routes';
-import { selectedAccountAtom } from '@popup/store/account';
-import { credentialsAtom, networkConfigurationAtom } from '@popup/store/settings';
+import { credentialsAtom, selectedAccountAtom } from '@popup/store/account';
+import { networkConfigurationAtom } from '@popup/store/settings';
 import { identityNamesAtom } from '@popup/store/identity';
 import { useTranslation } from 'react-i18next';
 import { displaySplitAddress } from '@popup/shared/utils/account-helpers';
@@ -97,7 +97,7 @@ const AccountList = forwardRef<HTMLDivElement, Props>(({ className, onSelect }, 
                     checked={checked}
                     selected={a.address === selectedAccount}
                     totalBalance={totalBalanceMap.get(a.address) ?? 0n}
-                    identityName={identityNames[a.identityId] || 'Unknown'}
+                    identityName={identityNames[a.identityIndex] || 'Unknown'}
                 />
             )}
         </EntityList>

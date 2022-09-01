@@ -4,9 +4,9 @@ import { useAtomValue, useSetAtom } from 'jotai';
 import { useNavigate } from 'react-router-dom';
 import IdCard from '@popup/shared/IdCard';
 import { identityProvidersAtom, selectedIdentityAtom } from '@popup/store/identity';
-import { selectedAccountAtom } from '@popup/store/account';
-import { credentialsAtom, networkConfigurationAtom, seedPhraseAtom } from '@popup/store/settings';
-import { CreationStatus, WalletCredential, Network } from '@shared/storage/types';
+import { credentialsAtom, selectedAccountAtom } from '@popup/store/account';
+import { networkConfigurationAtom, seedPhraseAtom } from '@popup/store/settings';
+import { CreationStatus, WalletCredential } from '@shared/storage/types';
 import { JsonRpcClient, HttpProvider } from '@concordium/web-sdk';
 import Button from '@popup/shared/Button';
 import ArrowIcon from '@assets/svg/arrow.svg';
@@ -16,6 +16,7 @@ import { absoluteRoutes } from '@popup/constants/routes';
 import { InternalMessageType } from '@concordium/browser-wallet-message-hub';
 import { popupMessageHandler } from '@popup/shared/message-handler';
 import { BackgroundResponseStatus } from '@shared/utils/types';
+import { getNet } from '@shared/utils/network-helpers';
 import AccountDetails from '../Account/AccountDetails';
 
 export default function Confirm() {
@@ -25,7 +26,7 @@ export default function Confirm() {
     const credentials = useAtomValue(credentialsAtom);
     const setSelectedAccount = useSetAtom(selectedAccountAtom);
     const seedPhrase = useAtomValue(seedPhraseAtom);
-    const { jsonRpcUrl } = useAtomValue(networkConfigurationAtom);
+    const network = useAtomValue(networkConfigurationAtom);
     const providers = useAtomValue(identityProvidersAtom);
     const [buttonDisabled, setButtonDisabled] = useState(false);
 
@@ -41,15 +42,15 @@ export default function Confirm() {
     const submit = async () => {
         setButtonDisabled(true);
         try {
-            if (!jsonRpcUrl) {
-                throw new Error('no json rpc url');
+            if (!network) {
+                throw new Error('Network is not specified');
             }
             if (!seedPhrase) {
                 throw new Error('no seed phrase');
             }
 
             // TODO: Maybe we should not create the client for each page
-            const client = new JsonRpcClient(new HttpProvider(jsonRpcUrl));
+            const client = new JsonRpcClient(new HttpProvider(network.jsonRpcUrl));
             const global = await client.getCryptographicParameters();
 
             if (!global) {
@@ -63,7 +64,7 @@ export default function Confirm() {
             // Make request
             const expiry = Math.floor(Date.now() / 1000) + 720;
 
-            const credsOfCurrentIdentity = credentials.filter((cred) => cred.identityId === selectedIdentity.id);
+            const credsOfCurrentIdentity = credentials.filter((cred) => cred.identityIndex === selectedIdentity.index);
             const credNumber = credsOfCurrentIdentity.length
                 ? credsOfCurrentIdentity.reduce((best, cred) => Math.max(best, cred.credNumber), 0) + 1
                 : 0;
@@ -75,13 +76,12 @@ export default function Confirm() {
                     ipInfo: identityProvider.ipInfo,
                     arsInfos: identityProvider.arsInfos,
                     seedAsHex: seedPhrase,
-                    net: Network[selectedIdentity.network],
+                    net: getNet(network),
                     idObject: selectedIdentity.idObject.value,
                     revealedAttributes: [],
                     identityIndex: selectedIdentity.index,
                     credNumber,
                     expiry,
-                    identityId: selectedIdentity.id,
                 }
             );
 
@@ -107,7 +107,7 @@ export default function Confirm() {
                         {
                             address: 'Pending',
                             status: CreationStatus.Pending,
-                            identityId: selectedIdentity.id,
+                            identityIndex: selectedIdentity.index,
                         } as WalletCredential
                     }
                 />
