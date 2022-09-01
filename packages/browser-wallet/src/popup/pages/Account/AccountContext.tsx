@@ -1,7 +1,7 @@
 import { useAtomValue, useSetAtom } from 'jotai';
 import { useTranslation } from 'react-i18next';
 import React, { useEffect, useMemo, useState, createContext, ReactElement } from 'react';
-import { CreationStatus, WalletCredential, ConfirmedCredential } from '@shared/storage/types';
+import { CreationStatus, WalletCredential } from '@shared/storage/types';
 import { AccountInfo } from '@concordium/web-sdk';
 import { networkConfigurationAtom } from '@popup/store/settings';
 import { AccountInfoEmitter } from '@popup/shared/account-info-emitter';
@@ -41,7 +41,7 @@ export type AccountContextValues = {
 export const accountContext = createContext<AccountContextValues>({ accountInfo: undefined });
 
 interface Props {
-    account: ConfirmedCredential;
+    account: WalletCredential;
     children: ReactElement;
 }
 

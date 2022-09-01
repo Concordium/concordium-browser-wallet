@@ -8,6 +8,7 @@ import {
     JsonRpcClient,
     signTransaction,
     SimpleTransferPayload,
+    TransactionExpiry,
 } from '@concordium/web-sdk';
 import { ccdToMicroCcd, getPublicAccountAmounts, isValidCcdString } from 'wallet-common-helpers';
 
@@ -64,4 +65,9 @@ export function validateAccountAddress(cand: string): string | undefined {
     } catch {
         return i18n.t('utils.address.invalid');
     }
+}
+
+export function getDefaultExpiry(): TransactionExpiry {
+    // TODO: add better default?
+    return new TransactionExpiry(new Date(Date.now() + 3600000));
 }

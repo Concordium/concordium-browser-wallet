@@ -17,19 +17,19 @@ const t: typeof en = {
     },
     utils: {
         address: {
-            required: 'Skriv en addresse',
-            invalid: 'Invalid addresse',
+            required: 'Indtast en addresse',
+            invalid: 'Ugyldig addresse',
         },
         ccdAmount: {
-            required: 'Skriv et beløb',
-            invalid: 'Invalid beløb',
+            required: 'Indtast et beløb',
+            invalid: 'Ugyldigt beløb',
             insufficient: 'Ikke nok penge',
             zero: 'Beløbet må ikke være nul',
         },
     },
     transactionReceipt: {
-        sender: 'Sendende konti',
-        cost: 'Estimeret transaktions afgift',
+        sender: 'Afsender',
+        cost: 'Estimerede transaktionsomkostninger',
     },
 };
 

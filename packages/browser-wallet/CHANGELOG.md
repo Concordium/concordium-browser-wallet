@@ -5,7 +5,7 @@
 ### Added
 
 -   Toasts for showing errors when failing to retrieve account balance or transaction history.
--   Send ccd page.
+-   Send CCD page.
 
 ### Fixed
 

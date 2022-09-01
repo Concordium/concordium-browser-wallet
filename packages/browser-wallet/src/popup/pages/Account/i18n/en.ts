@@ -38,8 +38,8 @@ const t = {
             recipient: 'Enter recipient address',
         },
         buttons: {
-            cancel: 'Cancel',
-            confirm: 'Confirm',
+            back: 'Back',
+            send: 'Send',
             finish: 'Finish',
             continue: 'Continue',
         },

@@ -3,9 +3,9 @@ import { useAtomValue } from 'jotai';
 import { fullscreenPromptContext } from '@popup/page-layouts/FullscreenPromptLayout';
 import { useTranslation } from 'react-i18next';
 import { useLocation } from 'react-router-dom';
-import { AccountTransactionType, AccountAddress, TransactionExpiry, SchemaVersion } from '@concordium/web-sdk';
+import { AccountTransactionType, AccountAddress, SchemaVersion } from '@concordium/web-sdk';
 import { usePrivateKey } from '@popup/shared/utils/account-helpers';
-import { sendTransaction } from '@popup/shared/utils/transaction-helpers';
+import { sendTransaction, getDefaultExpiry } from '@popup/shared/utils/transaction-helpers';
 import { jsonRpcClientAtom } from '@popup/store/settings';
 import TransactionReceipt from '@popup/shared/TransactionReceipt/TransactionReceipt';
 import DisplayUpdateContract from '@popup/shared/TransactionReceipt/displayPayload/DisplayUpdateContract';
@@ -71,8 +71,7 @@ export default function SendTransaction({ onSubmit, onReject }: Props) {
         }
 
         const header = {
-            // TODO: add better default?
-            expiry: new TransactionExpiry(new Date(Date.now() + 3600000)),
+            expiry: getDefaultExpiry(),
             sender,
             nonce: nonce.nonce,
         };
@@ -84,7 +83,7 @@ export default function SendTransaction({ onSubmit, onReject }: Props) {
     return (
         <>
             <div>{t('description')}</div>
-            <TransactionReceipt title="Sign transaction" sender={accountAddress}>
+            <TransactionReceipt title={t('title')} sender={accountAddress}>
                 <>
                     {transactionType === AccountTransactionType.SimpleTransfer && (
                         <DisplaySimpleTransfer payload={payload} />

@@ -1,0 +1,19 @@
+.send-ccd {
+    &__create-transfer {
+        width: 100%;
+
+        &__input {
+            width: calc(100% - rem(50px));
+            margin: rem(5px) rem(25px) rem(13.286px) rem(25px);
+
+            &.form-input--invalid {
+                margin-bottom: 0;
+            }
+        }
+
+        &__button {
+            margin-top: rem(10px);
+            margin-bottom: auto;
+        }
+    }
+}

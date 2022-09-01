@@ -13,7 +13,7 @@ import {
     validateTransferAmount,
     validateAccountAddress,
 } from '@popup/shared/utils/transaction-helpers';
-import { useNavigate } from 'react-router-dom';
+import { useLocation, useNavigate } from 'react-router-dom';
 import DisplayCost from '@popup/shared/TransactionReceipt/DisplayCost';
 import { routes } from './routes';
 import { accountContext, AccountContextValues } from '../AccountContext';
@@ -24,14 +24,18 @@ export type FormValues = {
 };
 
 interface Props {
-    setPayload: (payload: SimpleTransferPayload) => void;
-    defaultPayload?: SimpleTransferPayload | undefined;
     cost?: bigint;
 }
 
-export default function CreateTransaction({ setPayload, defaultPayload, cost = 0n }: Props) {
+interface State {
+    payload: SimpleTransferPayload | undefined;
+}
+
+export default function CreateTransaction({ cost = 0n }: Props) {
     const { t } = useTranslation('account');
     const { t: tShared } = useTranslation('shared');
+    const { state } = useLocation();
+    const defaultPayload = (state as State)?.payload;
     const address = useAtomValue(selectedAccountAtom);
     const nav = useNavigate();
     const { accountInfo } = useContext<AccountContextValues>(accountContext);
@@ -42,13 +46,13 @@ export default function CreateTransaction({ setPayload, defaultPayload, cost = 0
         return null;
     }
 
-    const onSubmit: SubmitHandler<FormValues> = async (vs) => {
-        setPayload(buildSimpleTransferPayload(vs.recipient, ccdToMicroCcd(vs.ccd)));
-        nav(`../${routes.confirm}`);
+    const onSubmit: SubmitHandler<FormValues> = (vs) => {
+        const payload = buildSimpleTransferPayload(vs.recipient, ccdToMicroCcd(vs.ccd));
+        nav(routes.confirm, { state: { payload } });
     };
 
     return (
-        <div>
+        <div className="send-ccd__create-transfer">
             <p className="m-v-10 text-center">{t('sendCcd.title')}</p>
             <Form
                 className="flex-column justify-space-between align-center"
@@ -64,7 +68,7 @@ export default function CreateTransaction({ setPayload, defaultPayload, cost = 0
                             register={f.register}
                             name="ccd"
                             label={t('sendCcd.labels.ccd')}
-                            className="m-t-10 w-full"
+                            className="send-ccd__create-transfer__input"
                             rules={{
                                 required: tShared('utils.ccdAmount.required'),
                                 validate: validateAmount,
@@ -74,14 +78,14 @@ export default function CreateTransaction({ setPayload, defaultPayload, cost = 0
                             register={f.register}
                             name="recipient"
                             label={t('sendCcd.labels.recipient')}
-                            className="m-t-10 w-full"
+                            className="send-ccd__create-transfer__input"
                             rules={{
                                 required: tShared('utils.address.required'),
                                 validate: validateAccountAddress,
                             }}
                         />
                         <DisplayCost cost={cost} />
-                        <Submit className="m-v-10" width="narrow">
+                        <Submit className="send-ccd__create-transfer__button" width="medium">
                             {t('sendCcd.buttons.continue')}
                         </Submit>
                     </>

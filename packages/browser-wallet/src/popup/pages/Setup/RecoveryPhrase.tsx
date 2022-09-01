@@ -63,7 +63,7 @@ export function EnterRecoveryPhrase() {
                                     />
                                     <Submit
                                         className="onboarding-setup__page-with-header__continue-button"
-                                        width="narrow"
+                                        width="medium"
                                     >
                                         {t('continue')}
                                     </Submit>

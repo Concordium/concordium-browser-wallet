@@ -8,7 +8,7 @@ type Props = {
     className?: string;
 };
 
-export default function DisplayAddress({ cost, className }: Props) {
+export default function DisplayCost({ cost, className }: Props) {
     const { t } = useTranslation('shared', { keyPrefix: 'transactionReceipt' });
 
     return (

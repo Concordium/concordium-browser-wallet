@@ -48,7 +48,7 @@ export const CenterWide: ComponentStory<typeof ButtonGroup> = () => {
         <div style={{ width: 300 }}>
             <ButtonGroup>
                 <Button>First</Button>
-                <Button width="narrow">Second</Button>
+                <Button width="medium">Second</Button>
                 <Button>Third</Button>
             </ButtonGroup>
         </div>

@@ -25,7 +25,7 @@ Primary.args = {
 export const Narrow = Template.bind({});
 Narrow.args = {
     children: 'Button text',
-    width: 'narrow',
+    width: 'medium',
 };
 
 export const Wide = Template.bind({});

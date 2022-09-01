@@ -93,7 +93,7 @@ export default function Carousel({ className, children, onContinue }: Props) {
                     )}
                 </ButtonGroup>
             ) : (
-                <Button onClick={onContinue} width="narrow">
+                <Button onClick={onContinue} width="medium">
                     Continue
                 </Button>
             )}

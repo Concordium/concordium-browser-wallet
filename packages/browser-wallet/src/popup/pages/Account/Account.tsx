@@ -65,25 +65,25 @@ function Account({
             <div className="account-page__content">
                 {accounts.length === 0 && <div>{t('noAccounts')}</div>}
                 {selectedCred !== undefined && (
-                    <>
-                        <div className="account-page__details">
-                            <MenuButton
-                                className="account-page__hide"
-                                open={detailsExpanded}
-                                onClick={() => setDetailsExpanded((o) => !o)}
-                            />
-                            <AccountDetails expanded={detailsExpanded} account={selectedCred} />
-                            <ConnectedBox setDetailsExpanded={setDetailsExpanded} />
-                        </div>
-                        <div className="account-page__routes">
-                            {isConfirmed && (
-                                <AccountContext account={selectedCred}>
-                                    <Outlet />
-                                </AccountContext>
-                            )}
-                            {!isConfirmed && <div className="account-page__not-finalized">{t('accountPending')}</div>}
-                        </div>
-                    </>
+                    <AccountContext account={selectedCred}>
+                        <>
+                            <div className="account-page__details">
+                                <MenuButton
+                                    className="account-page__hide"
+                                    open={detailsExpanded}
+                                    onClick={() => setDetailsExpanded((o) => !o)}
+                                />
+                                <AccountDetails expanded={detailsExpanded} account={selectedCred} />
+                                <ConnectedBox setDetailsExpanded={setDetailsExpanded} />
+                            </div>
+                            <div className="account-page__routes">
+                                {isConfirmed && <Outlet />}
+                                {!isConfirmed && (
+                                    <div className="account-page__not-finalized">{t('accountPending')}</div>
+                                )}
+                            </div>
+                        </>
+                    </AccountContext>
                 )}
             </div>
             <AccountActions
