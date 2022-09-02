@@ -3,10 +3,11 @@ import { useTranslation } from 'react-i18next';
 import { useAtomValue } from 'jotai';
 import { selectedAccountAtom } from '@popup/store/account';
 import Form from '@popup/shared/Form';
+import CcdInput from '@popup/shared/Form/CcdInput';
 import Input from '@popup/shared/Form/Input';
-import { ccdToMicroCcd, microCcdToCcd } from 'wallet-common-helpers';
+import { ccdToMicroCcd, getPublicAccountAmounts, microCcdToCcd } from 'wallet-common-helpers';
 import { SimpleTransferPayload } from '@concordium/web-sdk';
-import { SubmitHandler, Validate } from 'react-hook-form';
+import { SubmitHandler, useForm, Validate } from 'react-hook-form';
 import Submit from '@popup/shared/Form/Submit';
 import {
     buildSimpleTransferPayload,
@@ -39,8 +40,10 @@ export default function CreateTransaction({ cost = 0n }: Props) {
     const address = useAtomValue(selectedAccountAtom);
     const nav = useNavigate();
     const { accountInfo } = useContext<AccountContextValues>(accountContext);
+    const form = useForm<FormValues>();
 
     const validateAmount: Validate<string> = (amount) => validateTransferAmount(amount, accountInfo, cost);
+    const maxValue = getPublicAccountAmounts(accountInfo).atDisposal - cost;
 
     if (!address) {
         return null;
@@ -55,6 +58,7 @@ export default function CreateTransaction({ cost = 0n }: Props) {
         <div className="send-ccd__create-transfer">
             <p className="m-v-10 text-center">{t('sendCcd.title')}</p>
             <Form
+                formMethods={form}
                 className="flex-column justify-space-between align-center"
                 onSubmit={onSubmit}
                 defaultValues={{
@@ -64,11 +68,12 @@ export default function CreateTransaction({ cost = 0n }: Props) {
             >
                 {(f) => (
                     <>
-                        <Input
+                        <CcdInput
                             register={f.register}
                             name="ccd"
                             label={t('sendCcd.labels.ccd')}
                             className="send-ccd__create-transfer__input"
+                            onMax={() => form.setValue('ccd', microCcdToCcd(maxValue) || '0')}
                             rules={{
                                 required: tShared('utils.ccdAmount.required'),
                                 validate: validateAmount,
