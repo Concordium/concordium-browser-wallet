@@ -6,7 +6,7 @@ import { ClassName } from 'wallet-common-helpers';
 
 import CheckmarkIcon from '@assets/svg/checkmark-blue.svg';
 import { absoluteRoutes } from '@popup/constants/routes';
-import { identitiesAtom, selectedIdentityIdAtom } from '@popup/store/identity';
+import { identitiesAtom, selectedIdentityIndexAtom } from '@popup/store/identity';
 import { useTranslation } from 'react-i18next';
 import { Identity, CreationStatus } from '@shared/storage/types';
 import { accountsPerIdentityAtom } from '@popup/store/account';
@@ -54,7 +54,7 @@ type Props = ClassName & {
 const IdentityList = forwardRef<HTMLDivElement, Props>(({ className, onSelect }, ref) => {
     const identities = useAtomValue(identitiesAtom);
     const accountsPerIdentity = useAtomValue(accountsPerIdentityAtom);
-    const [selectedIdentityId, setSelectedIdentityId] = useAtom(selectedIdentityIdAtom);
+    const [selectedIdentityIndex, setSelectedIdentityId] = useAtom(selectedIdentityIndexAtom);
     const nav = useNavigate();
     const { t } = useTranslation('mainLayout');
 
@@ -62,12 +62,12 @@ const IdentityList = forwardRef<HTMLDivElement, Props>(({ className, onSelect },
         <EntityList<Identity>
             className={className}
             onSelect={(a) => {
-                setSelectedIdentityId(a.id);
+                setSelectedIdentityId(a.index);
                 onSelect();
             }}
             onNew={() => nav(absoluteRoutes.home.identities.add.path)}
             entities={identities}
-            getKey={(a) => a.id}
+            getKey={(a) => a.index}
             newText={t('identityList.new')}
             ref={ref}
             searchableKeys={['name']}
@@ -76,8 +76,8 @@ const IdentityList = forwardRef<HTMLDivElement, Props>(({ className, onSelect },
                 <IdentityListItem
                     identity={a}
                     checked={checked}
-                    selected={a.id === selectedIdentityId}
-                    accountCount={accountsPerIdentity[a.id]?.length || 0}
+                    selected={a.index === selectedIdentityIndex}
+                    accountCount={accountsPerIdentity[a.index]?.length || 0}
                 />
             )}
         </EntityList>

@@ -2,13 +2,13 @@ import React, { forwardRef, useEffect, useState } from 'react';
 import clsx from 'clsx';
 import { useAtomValue, useAtom } from 'jotai';
 import { useNavigate } from 'react-router-dom';
-import { ClassName, displayAsCcd } from 'wallet-common-helpers';
+import { ClassName, displayAsCcd, noOp } from 'wallet-common-helpers';
 
 import CopyButton from '@popup/shared/CopyButton';
 import CheckmarkIcon from '@assets/svg/checkmark-blue.svg';
 import { absoluteRoutes } from '@popup/constants/routes';
-import { selectedAccountAtom } from '@popup/store/account';
-import { credentialsAtom, networkConfigurationAtom } from '@popup/store/settings';
+import { credentialsAtom, selectedAccountAtom } from '@popup/store/account';
+import { networkConfigurationAtom } from '@popup/store/settings';
 import { identityNamesAtom } from '@popup/store/identity';
 import { useTranslation } from 'react-i18next';
 import { displaySplitAddress } from '@popup/shared/utils/account-helpers';
@@ -65,10 +65,12 @@ const AccountList = forwardRef<HTMLDivElement, Props>(({ className, onSelect }, 
 
     useEffect(() => {
         const emitter = new AccountInfoEmitter(jsonRpcUrl);
-        emitter.listen(accounts.map((account) => account.address));
         emitter.on('totalchanged', (accountInfo: AccountInfo, address: string) => {
             setTotalBalanceMap(new Map(totalBalanceMap.set(address, accountInfo.accountAmount)));
         });
+        // TODO Log the error instead of gobbling it.
+        emitter.on('error', noOp);
+        emitter.listen(accounts.map((account) => account.address));
         return () => {
             emitter.removeAllListeners('totalchanged');
             emitter.stop();
@@ -87,6 +89,7 @@ const AccountList = forwardRef<HTMLDivElement, Props>(({ className, onSelect }, 
             getKey={(a) => a.address}
             newText={t('accountList.new')}
             ref={ref}
+            searchableKeys={['address']}
         >
             {(a, checked) => (
                 <AccountListItem
@@ -94,7 +97,7 @@ const AccountList = forwardRef<HTMLDivElement, Props>(({ className, onSelect }, 
                     checked={checked}
                     selected={a.address === selectedAccount}
                     totalBalance={totalBalanceMap.get(a.address) ?? 0n}
-                    identityName={identityNames[a.identityId] || 'Unknown'}
+                    identityName={identityNames[a.identityIndex] || 'Unknown'}
                 />
             )}
         </EntityList>

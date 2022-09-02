@@ -15,6 +15,7 @@ const t = {
         total: 'Public balance total',
         atDisposal: 'Public amount at disposal',
         stakeAmount: 'Stake / delegation amount',
+        error: 'Unable to retrieve account balance',
     },
     settings: {
         connectedSites: {
@@ -23,7 +24,13 @@ const t = {
             connect: 'Connect',
             disconnect: 'Disconnect',
         },
-        exportPrivateKey: 'Export private key',
+        exportPrivateKey: {
+            title: 'Export private key',
+            description: 'Please enter your passcode to show the private key.',
+            copyDescription: 'Press the button to copy your private key.',
+            show: 'Show private key',
+            done: 'Done',
+        },
     },
     accountPending: 'This account is still pending finalization.',
 };

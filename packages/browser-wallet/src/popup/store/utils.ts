@@ -1,6 +1,8 @@
 import {
     sessionPasscode,
     StorageAccessor,
+    getGenesisHash,
+    useIndexedStorage,
     storedConnectedSites,
     storedCredentials,
     storedCurrentNetwork,
@@ -15,19 +17,20 @@ import {
 } from '@shared/storage/access';
 import { ChromeStorageKey } from '@shared/storage/types';
 import { atom, WritableAtom } from 'jotai';
+import { noOp } from 'wallet-common-helpers/src/utils/basicHelpers';
 
 const accessorMap = {
-    [ChromeStorageKey.Identities]: storedIdentities,
+    [ChromeStorageKey.Identities]: useIndexedStorage(storedIdentities, getGenesisHash),
     [ChromeStorageKey.PendingIdentity]: storedPendingIdentity,
     [ChromeStorageKey.SelectedIdentity]: storedSelectedIdentity,
     [ChromeStorageKey.ConnectedSites]: storedConnectedSites,
-    [ChromeStorageKey.Credentials]: storedCredentials,
+    [ChromeStorageKey.Credentials]: useIndexedStorage(storedCredentials, getGenesisHash),
     [ChromeStorageKey.SelectedAccount]: storedSelectedAccount,
     [ChromeStorageKey.SeedPhrase]: storedEncryptedSeedPhrase,
     [ChromeStorageKey.NetworkConfiguration]: storedCurrentNetwork,
     [ChromeStorageKey.Theme]: storedTheme,
     [ChromeStorageKey.SeedPhrase]: storedSeedPhrase,
-    [ChromeStorageKey.IdentityProviders]: storedIdentityProviders,
+    [ChromeStorageKey.IdentityProviders]: useIndexedStorage(storedIdentityProviders, getGenesisHash),
     [ChromeStorageKey.Passcode]: sessionPasscode,
 };
 
@@ -39,19 +42,21 @@ export type AsyncWrapper<V> = {
 export function atomWithChromeStorage<V>(
     key: ChromeStorageKey,
     fallback: V,
-    withLoading: true
+    withLoading: true,
+    withSync?: boolean
 ): WritableAtom<AsyncWrapper<V>, V, void>;
 export function atomWithChromeStorage<V>(
     key: ChromeStorageKey,
     fallback: V,
-    withLoading?: false
+    withLoading?: false,
+    withSync?: boolean
 ): WritableAtom<V, V, void>;
 
 /**
  * @description
  * Create an atom that automatically syncs with chrome local storage.
  */
-export function atomWithChromeStorage<V>(key: ChromeStorageKey, fallback: V, withLoading = false) {
+export function atomWithChromeStorage<V>(key: ChromeStorageKey, fallback: V, withLoading = false, withSync = false) {
     const accessor = accessorMap[key] as unknown as StorageAccessor<V>;
 
     if (accessor === undefined) {
@@ -68,6 +73,21 @@ export function atomWithChromeStorage<V>(key: ChromeStorageKey, fallback: V, wit
                 value: value ?? fallback,
             })
         );
+
+        if (withSync) {
+            const listener = (changes: Record<string, chrome.storage.StorageChange>) =>
+                getStoredValue().then((value) => {
+                    if (key in changes) {
+                        setValue({
+                            loading: false,
+                            value: value ?? fallback,
+                        });
+                    }
+                });
+            chrome.storage[accessor.area].onChanged.addListener(listener);
+            return () => chrome.storage[accessor.area].onChanged.removeListener(listener);
+        }
+        return noOp;
     };
 
     const derived = atom(

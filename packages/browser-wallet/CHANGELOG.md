@@ -2,15 +2,32 @@
 
 ## Unreleased
 
+### Fixed
+
+-   Account search now only searches on the account address field.
+-   Identities and accounts statuses are now resolved correctly on first installation of the wallet, without requiring a restart.
+
+## 0.4.0
+
 ### Added
 
 -   Login screen.
 -   Change passcode settings page.
 -   Transaction details view when clicking a transaction in the transaction list.
+-   Theme toggle button to the settings page.
+-   Export private key account settings page.
+-   Identity issuance.
+-   Account creation.
+-   Toasts for showing errors when failing to retrieve account balance or transaction history.
 
 ### Changed
 
 -   The network connections page has been updated with new UI.
+
+### Removed
+
+-   Visual settings page.
+-   Adding accounts manually with private key
 
 ## 0.3.0 2022-8-18
 

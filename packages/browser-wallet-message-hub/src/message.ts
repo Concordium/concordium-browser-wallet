@@ -26,8 +26,8 @@ export enum InternalMessageType {
     TestPopupOpen = 'I_TestPopupOpen',
     SetViewSize = 'I_SetViewSize',
     StartIdentityIssuance = 'I_StartIdentityIssuance',
-    EndIdentityIssuance = 'l_EndIdentityIssuance',
-    SendCredentialDeployment = 'l_SendCredentialDeployment',
+    EndIdentityIssuance = 'I_EndIdentityIssuance',
+    SendCredentialDeployment = 'I_SendCredentialDeployment',
     Recovery = 'I_Recovery',
 }
 

@@ -1,6 +1,11 @@
 import React, { useEffect, useContext, useMemo } from 'react';
-import { useAtom, useAtomValue } from 'jotai';
-import { pendingIdentityAtom, identityProvidersAtom, selectedIdentityAtom } from '@popup/store/identity';
+import { useAtom, useAtomValue, useSetAtom } from 'jotai';
+import {
+    pendingIdentityAtom,
+    identityProvidersAtom,
+    selectedIdentityAtom,
+    selectedIdentityIndexAtom,
+} from '@popup/store/identity';
 import { useTranslation } from 'react-i18next';
 import { useLocation } from 'react-router-dom';
 import IdCard from '@popup/shared/IdCard';
@@ -11,6 +16,7 @@ import { fullscreenPromptContext } from '@popup/page-layouts/FullscreenPromptLay
 import { IdentityIssuanceBackgroundResponse } from '@shared/utils/identity-helpers';
 import IdentityProviderIcon from '@popup/shared/IdentityProviderIcon';
 import { BackgroundResponseStatus } from '@shared/utils/types';
+import { CreationStatus } from '@shared/storage/types';
 
 interface Location {
     state: {
@@ -31,6 +37,7 @@ export default function IdentityIssuanceEnd({ onFinish }: Props) {
     const [pendingIdentity, setPendingIdentity] = useAtom(pendingIdentityAtom);
     const { withClose, onClose } = useContext(fullscreenPromptContext);
     const selectedIdentity = useAtomValue(selectedIdentityAtom);
+    const setSelectedIdentityIndex = useSetAtom(selectedIdentityIndexAtom);
 
     const identityProvider = useMemo(
         () => providers.find((p) => p.ipInfo.ipIdentity === selectedIdentity?.provider),
@@ -39,8 +46,11 @@ export default function IdentityIssuanceEnd({ onFinish }: Props) {
     useEffect(() => onClose(onFinish), [onClose, onFinish]);
 
     useEffect(() => {
-        setPendingIdentity(undefined);
-    }, []);
+        if (pendingIdentity) {
+            setSelectedIdentityIndex(pendingIdentity.index);
+            setPendingIdentity(undefined);
+        }
+    }, [pendingIdentity]);
 
     return (
         <>
@@ -61,12 +71,12 @@ export default function IdentityIssuanceEnd({ onFinish }: Props) {
                             className="identity-issuance__card"
                             name={pendingIdentity?.name || selectedIdentity?.name || 'Identity'}
                             provider={<IdentityProviderIcon provider={identityProvider} />}
-                            status="pending"
+                            status={pendingIdentity?.status || selectedIdentity?.status || CreationStatus.Pending}
                         />
                     </>
                 )}
                 <Button width="wide" onClick={withClose(noOp)} className="identity-issuance__button">
-                    {t('continue')}
+                    {t('done')}
                 </Button>
             </div>
         </>

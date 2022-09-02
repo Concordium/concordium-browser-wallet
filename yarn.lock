@@ -1934,7 +1934,7 @@ __metadata:
     "@storybook/react": ^6.5.7
     "@storybook/testing-library": ^0.0.11
     "@svgr/webpack": ^6.2.1
-    "@types/chrome": ^0.0.193
+    "@types/chrome": ^0.0.195
     "@types/crypto-js": ^4.1.1
     "@types/lodash.groupby": ^4.6.7
     "@types/react": ^18.0.7
@@ -4477,6 +4477,16 @@ __metadata:
     "@types/filesystem": "*"
     "@types/har-format": "*"
   checksum: f01205376becff1a229443473c697b0ab42d87af00dc2a52f7a16bce2ad223875fd95ebee12ab1598f2669eb1af26953863c37aace7e87551f68ff73eaaedba5
+  languageName: node
+  linkType: hard
+
+"@types/chrome@npm:^0.0.195":
+  version: 0.0.195
+  resolution: "@types/chrome@npm:0.0.195"
+  dependencies:
+    "@types/filesystem": "*"
+    "@types/har-format": "*"
+  checksum: 074c8981ae18f1f32ce07f2e153c655bf0a213db6e3b9d67058e3a5c4fd39b0af33e6c2a56384ce2e7d0027db9b63751a719a4af7111fa46c254259f780bb3a5
   languageName: node
   linkType: hard
 

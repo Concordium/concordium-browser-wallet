@@ -77,7 +77,7 @@ export const identityIssuanceHandler: ExtensionMessageHandler = (msg) => {
             }
         }
         await openWindow();
-        bgMessageHandler.sendInternalMessage(InternalMessageType.EndIdentityIssuance, status);
+        bgMessageHandler.sendInternalMessage(InternalMessageType.EndIdentityIssuance, { ...response, status });
     };
 
     const { baseUrl, ...identityRequestInputs } = msg.payload;

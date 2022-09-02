@@ -1,6 +1,6 @@
 {
     "name": "@concordium/browser-wallet",
-    "version": "0.3.0",
+    "version": "0.4.0",
     "description": "Browser extensions wallet for the Concordium blockchain",
     "author": "Concordium",
     "license": "Apache",
@@ -53,7 +53,7 @@
         "@storybook/react": "^6.5.7",
         "@storybook/testing-library": "^0.0.11",
         "@svgr/webpack": "^6.2.1",
-        "@types/chrome": "^0.0.193",
+        "@types/chrome": "^0.0.195",
         "@types/crypto-js": "^4.1.1",
         "@types/lodash.groupby": "^4.6.7",
         "@types/react": "^18.0.7",
