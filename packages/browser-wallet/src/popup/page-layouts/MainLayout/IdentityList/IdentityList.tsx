@@ -54,30 +54,30 @@ type Props = ClassName & {
 const IdentityList = forwardRef<HTMLDivElement, Props>(({ className, onSelect }, ref) => {
     const identities = useAtomValue(identitiesAtom);
     const accountsPerIdentity = useAtomValue(accountsPerIdentityAtom);
-    const [selectedIdentityIndex, setSelectedIdentityId] = useAtom(selectedIdentityIndexAtom);
+    const [selectedIdentityIndex, setSelectedIdentityIndex] = useAtom(selectedIdentityIndexAtom);
     const nav = useNavigate();
     const { t } = useTranslation('mainLayout');
 
     return (
         <EntityList<Identity>
             className={className}
-            onSelect={(a) => {
-                setSelectedIdentityId(a.index);
+            onSelect={(_, i) => {
+                setSelectedIdentityIndex(i);
                 onSelect();
             }}
             onNew={() => nav(absoluteRoutes.home.identities.add.path)}
             entities={identities}
-            getKey={(a) => a.index}
+            getKey={(a) => `${a.index}-${a.provider}`}
             newText={t('identityList.new')}
             ref={ref}
             searchableKeys={['name']}
         >
-            {(a, checked) => (
+            {(a, checked, i) => (
                 <IdentityListItem
                     identity={a}
                     checked={checked}
-                    selected={a.index === selectedIdentityIndex}
-                    accountCount={accountsPerIdentity[a.index]?.length || 0}
+                    selected={i === selectedIdentityIndex}
+                    accountCount={accountsPerIdentity[a.provider][a.index]?.length || 0}
                 />
             )}
         </EntityList>

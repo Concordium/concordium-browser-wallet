@@ -27,6 +27,7 @@ async function createAndSendCredential(credIn: CredentialInputV1): Promise<Crede
     const newCred: PendingWalletCredential = {
         address,
         identityIndex: credIn.identityIndex,
+        provider: credIn.ipInfo.ipIdentity,
         credId,
         credNumber: credIn.credNumber,
         status: CreationStatus.Pending,

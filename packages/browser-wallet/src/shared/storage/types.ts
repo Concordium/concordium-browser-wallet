@@ -114,6 +114,7 @@ export interface BaseCredential {
     credNumber: number;
     status: CreationStatus;
     identityIndex: number;
+    provider: number;
     // Policy (is in accountInfo)
     // CredentialIndex = 0
 }

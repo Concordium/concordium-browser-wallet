@@ -42,7 +42,7 @@ export default function ChooseIdentity() {
             <p className="m-t-20">{t('chooseIdentity')}</p>
             {identities
                 .filter((identity) => identity.status === CreationStatus.Confirmed)
-                .map((identity) => (
+                .map((identity, i) => (
                     <IdCard
                         name={identity.name}
                         key={identity.index}
@@ -50,7 +50,7 @@ export default function ChooseIdentity() {
                         status={identity.status}
                         className="m-t-10"
                         onClick={() => {
-                            setSelectedIdentityIndex(identity.index);
+                            setSelectedIdentityIndex(i);
                             nav('confirm');
                         }}
                     />

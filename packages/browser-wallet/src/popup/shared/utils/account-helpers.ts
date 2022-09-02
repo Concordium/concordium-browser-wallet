@@ -16,8 +16,9 @@ export function useIdentityOf(cred?: WalletCredential) {
         if (!cred) {
             return undefined;
         }
-        return identities.find((id) => id.index === cred.identityIndex);
-    }, [cred, identities.length]);
+        return identities.find((id) => id.index === cred.identityIndex && id.provider === cred.provider);
+    }, [JSON.stringify(cred), identities.length]);
+
     return identity;
 }
 

@@ -63,7 +63,7 @@ function IdentityIssuanceStart({ onStart }: InnerProps) {
             updatePendingIdentity({
                 status: CreationStatus.Pending,
                 index: identityIndex,
-                name: `Identity ${identityIndex + 1}`,
+                name: `Identity ${identities.length + 1}`,
                 provider: providerIndex,
             });
 

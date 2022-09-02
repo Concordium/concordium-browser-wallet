@@ -8,24 +8,21 @@ export const pendingIdentityAtom = atomWithChromeStorage<Omit<PendingIdentity, '
     ChromeStorageKey.PendingIdentity,
     undefined
 );
+// The index here refers to the position in the list.
 export const selectedIdentityIndexAtom = atomWithChromeStorage<number>(ChromeStorageKey.SelectedIdentity, 0);
 export const selectedIdentityAtom = atom<Identity | undefined, Identity | undefined>(
     (get) => {
         const identities = get(identitiesAtom);
         const selectedIndex = get(selectedIdentityIndexAtom);
-        return identities.find((a) => a.index === selectedIndex);
+        return identities[selectedIndex];
     },
     (get, set, selectedIdentity) => {
         // Also update the identities atom.
         if (selectedIdentity) {
             const identities = get(identitiesAtom);
             const selectedIndex = get(selectedIdentityIndexAtom);
-            const index = identities.findIndex((i) => i.index === selectedIndex);
-            if (selectedIdentity.index !== selectedIndex) {
-                throw new Error('Updating selected identity with new id');
-            }
             const newIdentities = [...identities];
-            newIdentities[index] = selectedIdentity;
+            newIdentities[selectedIndex] = selectedIdentity;
             set(identitiesAtom, newIdentities);
         }
     }
@@ -34,9 +31,12 @@ export const selectedIdentityAtom = atom<Identity | undefined, Identity | undefi
 export const identityProvidersAtom = atomWithChromeStorage<IdentityProvider[]>(ChromeStorageKey.IdentityProviders, []);
 
 export const identityNamesAtom = selectAtom(identitiesAtom, (identities) => {
-    const map = {} as Record<number, string>;
+    const map = {} as Record<number, Record<number, string>>;
     identities.forEach((identity) => {
-        map[identity.index] = identity.name;
+        if (!map[identity.provider]) {
+            map[identity.provider] = {} as Record<number, string>;
+        }
+        map[identity.provider][identity.index] = identity.name;
     });
     return map;
 });
