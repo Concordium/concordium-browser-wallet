@@ -97,7 +97,7 @@ const AccountList = forwardRef<HTMLDivElement, Props>(({ className, onSelect }, 
                     checked={checked}
                     selected={a.address === selectedAccount}
                     totalBalance={totalBalanceMap.get(a.address) ?? 0n}
-                    identityName={identityNames[a.provider][a.identityIndex] || 'Unknown'}
+                    identityName={identityNames?.[a.provider]?.[a.identityIndex] || 'Unknown'}
                 />
             )}
         </EntityList>

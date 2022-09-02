@@ -77,7 +77,7 @@ const IdentityList = forwardRef<HTMLDivElement, Props>(({ className, onSelect },
                     identity={a}
                     checked={checked}
                     selected={i === selectedIdentityIndex}
-                    accountCount={accountsPerIdentity[a.provider][a.index]?.length || 0}
+                    accountCount={accountsPerIdentity?.[a.provider]?.[a.index]?.length || 0}
                 />
             )}
         </EntityList>
