@@ -41,7 +41,7 @@ const t: typeof en = {
         },
         buttons: {
             back: 'tilbage',
-            confirm: 'Bekræft',
+            send: 'Send',
             finish: 'Færdigør',
             continue: 'Fortsæt',
         },
