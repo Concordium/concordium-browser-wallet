@@ -1,26 +1,12 @@
 import { AccountAddress, AccountInfo, HttpProvider, JsonRpcClient } from '@concordium/web-sdk';
+import { sessionAccountInfoCache, storedCurrentNetwork } from '@shared/storage/access';
 import EventEmitter from 'events';
+import JSONBig from 'json-bigint';
 
 const accountInfoRetrievalIntervalMs = 15000;
 
-interface AccountInfoEvents {
-    totalchanged: (accountInfo: AccountInfo, address: string) => void;
-    accountinfo: (accountInfo: AccountInfo, address: string) => void;
-    error: (err: unknown) => void;
-}
-
-export declare interface AccountInfoEmitter {
-    on<U extends keyof AccountInfoEvents>(event: U, listener: AccountInfoEvents[U]): this;
-
-    removeAllListeners<U extends keyof AccountInfoEvents>(event: U): this;
-
-    emit<U extends keyof AccountInfoEvents>(event: U, ...args: Parameters<AccountInfoEvents[U]>): boolean;
-}
-
 export class AccountInfoEmitter extends EventEmitter {
     private client: JsonRpcClient;
-
-    private previousTotalMap: Map<string, bigint> = new Map();
 
     private interval: NodeJS.Timer | undefined = undefined;
 
@@ -31,43 +17,49 @@ export class AccountInfoEmitter extends EventEmitter {
         this.client = new JsonRpcClient(new HttpProvider(jsonRpcUrl));
     }
 
-    async listen(accountAddresses: string[]) {
-        this.stop();
-
-        for (const accountAddress of accountAddresses) {
-            const accountAddressObject = new AccountAddress(accountAddress);
-            this.accounts.push(accountAddressObject);
+    subscribe(
+        accountAddress: string,
+        listener: (accountInfo: AccountInfo) => void
+    ): (accountInfo: AccountInfo) => void {
+        if (!this.accounts.some((a) => a.address === accountAddress)) {
+            const addressObj = new AccountAddress(accountAddress);
+            this.accounts.push(addressObj);
         }
+        this.on(accountAddress, listener);
+        return listener;
+    }
 
-        // Note that the calls to get the account info is intentionally done
-        // in serial here (and in the interval) to limit the load on the server.
-        // If optimizing this to happen in parallel, then it must be ensured that
-        // the server can handle the number of requests received at the same time.
-
-        try {
-            const lastFinalizedBlockHash = (await this.client.getConsensusStatus()).lastFinalizedBlock;
-            for (const accountAddress of accountAddresses) {
-                const accountAddressObject = new AccountAddress(accountAddress);
-                const accountInfo = await this.client.getAccountInfo(accountAddressObject, lastFinalizedBlockHash);
-                if (accountInfo) {
-                    this.emit('accountinfo', accountInfo, accountAddress);
-                    this.emit('totalchanged', accountInfo, accountAddress);
-                }
-            }
-        } catch (e) {
-            this.emit('error', e);
+    unsubscribe(
+        accountAddress: string,
+        listener: (accountInfo: AccountInfo) => void
+    ): (accountInfo: AccountInfo) => void {
+        this.removeListener(accountAddress, listener);
+        if (this.listenerCount(accountAddress) === 0) {
+            this.accounts = this.accounts.filter((address) => accountAddress !== address.address);
         }
+        return listener;
+    }
 
+    async listen() {
         this.interval = setInterval(async () => {
             try {
-                const lfBlockHash = (await this.client.getConsensusStatus()).lastFinalizedBlock;
-                for (const address of this.accounts) {
-                    const accountInfo = await this.client.getAccountInfo(address, lfBlockHash);
-                    if (accountInfo) {
-                        this.emit('accountinfo', accountInfo, address.address);
-                        if (accountInfo.accountAmount !== this.previousTotalMap.get(address.address)) {
-                            this.emit('totalchanged', accountInfo, address.address);
-                            this.previousTotalMap.set(address.address, accountInfo.accountAmount);
+                if (this.accounts.length > 0) {
+                    const lfBlockHash = (await this.client.getConsensusStatus()).lastFinalizedBlock;
+                    for (const address of this.accounts) {
+                        const accountInfo = await this.client.getAccountInfo(address, lfBlockHash);
+                        if (accountInfo) {
+                            const network = await storedCurrentNetwork.get();
+                            if (network) {
+                                const currentCache = { ...(await sessionAccountInfoCache.get(network.genesisHash)) };
+                                if (currentCache === undefined) {
+                                    const newRecord: Record<string, string> = {};
+                                    newRecord[accountInfo.accountAddress] = JSONBig.stringify(accountInfo);
+                                } else {
+                                    currentCache[accountInfo.accountAddress] = JSONBig.stringify(accountInfo);
+                                }
+                                sessionAccountInfoCache.set(network.genesisHash, currentCache ?? {});
+                            }
+                            this.emit(address.address, accountInfo);
                         }
                     }
                 }

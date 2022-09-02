@@ -1919,7 +1919,7 @@ __metadata:
     "@babel/core": ^7.18.2
     "@concordium/browser-wallet-api": "workspace:^"
     "@concordium/browser-wallet-api-helpers": "workspace:^"
-    "@concordium/web-sdk": ^0.4.0
+    "@concordium/web-sdk": ^1.0.0
     "@craftamap/esbuild-plugin-html": ^0.3.2
     "@mdx-js/react": ^1.6.22
     "@scure/bip39": ^1.1.0
@@ -1996,6 +1996,23 @@ __metadata:
   languageName: node
   linkType: hard
 
+"@concordium/common-sdk@npm:4.0.0":
+  version: 4.0.0
+  resolution: "@concordium/common-sdk@npm:4.0.0"
+  dependencies:
+    "@concordium/rust-bindings": 0.4.0
+    "@noble/ed25519": ^1.6.0
+    "@scure/bip39": ^1.1.0
+    bs58check: ^2.1.2
+    buffer: ^6.0.3
+    cross-fetch: 3.1.5
+    hash.js: ^1.1.7
+    json-bigint: ^1.0.0
+    uuid: ^8.3.2
+  checksum: db0bfefb2cf1df4449a20cba64036f084dc2446aa1b8b14ff1b4fcb0c4ee7a2ba085dff6dcb62cfc68d7387e6d30881d32e68f98a6e9b73b7ce9617d0b66c99e
+  languageName: node
+  linkType: hard
+
 "@concordium/common-sdk@npm:^2.3.2":
   version: 2.3.2
   resolution: "@concordium/common-sdk@npm:2.3.2"
@@ -2024,6 +2041,13 @@ __metadata:
   languageName: node
   linkType: hard
 
+"@concordium/rust-bindings@npm:0.4.0":
+  version: 0.4.0
+  resolution: "@concordium/rust-bindings@npm:0.4.0"
+  checksum: 086927ac406b58fed7f019c5544fb13575f0a24f2c2e4354a44f16e765f34cb80530455e04235115f23cafae5425160d8177a08efa89f0365105b7667e7979ac
+  languageName: node
+  linkType: hard
+
 "@concordium/web-sdk@npm:^0.4.0":
   version: 0.4.0
   resolution: "@concordium/web-sdk@npm:0.4.0"
@@ -2033,6 +2057,18 @@ __metadata:
     buffer: ^6.0.3
     process: ^0.11.10
   checksum: 889fd1eb4b2b78ba272e854e2ccb5541b330036b5f0d5892fa47734f5d6f1f51d2e7bb6e7670a249275a4e560d59b125c2bdb7960812a4d082d7536d695a8268
+  languageName: node
+  linkType: hard
+
+"@concordium/web-sdk@npm:^1.0.0":
+  version: 1.0.0
+  resolution: "@concordium/web-sdk@npm:1.0.0"
+  dependencies:
+    "@concordium/common-sdk": 4.0.0
+    "@concordium/rust-bindings": 0.4.0
+    buffer: ^6.0.3
+    process: ^0.11.10
+  checksum: a130eb8112a6452e5444ac5a8c86d95e221d49da9ffad43520289258f1b0a366dd37f1056f93fbf44609247bd38238e4ea2ed8bcb4f19390525676ae6f832592
   languageName: node
   linkType: hard
 

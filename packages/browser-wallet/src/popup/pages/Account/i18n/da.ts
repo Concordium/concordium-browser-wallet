@@ -17,7 +17,6 @@ const t: typeof en = {
         total: 'Offentligt total',
         atDisposal: 'Offentligt til rådighed',
         stakeAmount: 'Stake',
-        error: 'Fejl ved hentning af kontoens balance',
     },
     settings: {
         connectedSites: {

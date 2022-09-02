@@ -15,6 +15,9 @@ const t: typeof en = {
         confirmed: 'Godkendt af',
         rejected: 'Afvist af',
     },
+    account: {
+        error: 'Fejl ved hentning af kontoens balance',
+    },
 };
 
 export default t;
