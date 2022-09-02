@@ -19,11 +19,6 @@ export enum Theme {
     Dark = 'dark',
 }
 
-export enum Network {
-    Testnet = 1,
-    Mainnet = 919,
-}
-
 /**
  * Used to describe the status of an identity or a credential
  */

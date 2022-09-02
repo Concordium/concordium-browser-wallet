@@ -12,6 +12,7 @@ import Button from '@popup/shared/Button';
 import IdentityProviderIcon from '@popup/shared/IdentityProviderIcon';
 import PendingArrows from '@assets/svg/pending-arrows.svg';
 import { getNet } from '@shared/utils/network-helpers';
+import { addToastAtom } from '@popup/state';
 
 interface InnerProps {
     onStart: () => void;
@@ -24,8 +25,8 @@ function IdentityIssuanceStart({ onStart }: InnerProps) {
     const updatePendingIdentity = useSetAtom(pendingIdentityAtom);
     const identities = useAtomValue(identitiesAtom);
     const seedPhrase = useAtomValue(seedPhraseAtom);
-    const [error, setError] = useState<string>();
     const [buttonDisabled, setButtonDisabled] = useState(false);
+    const addToast = useSetAtom(addToastAtom);
 
     useEffect(() => {
         // TODO only load once per session?
@@ -59,15 +60,14 @@ function IdentityIssuanceStart({ onStart }: InnerProps) {
                 0
             );
 
-            onStart();
-
             updatePendingIdentity({
                 status: CreationStatus.Pending,
                 index: identityIndex,
                 name: `Identity ${identityIndex + 1}`,
-                network: Network[net],
                 provider: providerIndex,
             });
+
+            onStart();
 
             popupMessageHandler.sendInternalMessage(InternalMessageType.StartIdentityIssuance, {
                 globalContext: global.value,
@@ -94,18 +94,13 @@ function IdentityIssuanceStart({ onStart }: InnerProps) {
                         width="wide"
                         disabled={buttonDisabled}
                         key={p.ipInfo.ipIdentity + p.ipInfo.ipDescription.name}
-                        onClick={() => startIssuance(p).catch((e) => setError(e.toString()))}
+                        onClick={() => startIssuance(p).catch((e) => addToast(e.toString()))}
                     >
                         <IdentityProviderIcon provider={p} />
                         {p.ipInfo.ipDescription.name}
                     </Button>
                 ))}
             </div>
-            {error && (
-                <p className="identity-issuance__error m-t-20">
-                    {t('error')}: {error}
-                </p>
-            )}
         </div>
     );
 }

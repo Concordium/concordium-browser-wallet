@@ -8,7 +8,8 @@ import { useTranslation } from 'react-i18next';
 import { seedPhraseAtom } from '@popup/state';
 import { networkConfigurationAtom } from '@popup/store/settings';
 import { setupRoutes } from './routes';
-import { mainnet, testnet } from '../NetworkSettings/NetworkSettings';
+// TODO Remove stagenet
+import { mainnet, testnet, stagenet } from '../NetworkSettings/NetworkSettings';
 
 export function ChooseNetwork() {
     const navigate = useNavigate();
@@ -55,6 +56,16 @@ export function ChooseNetwork() {
                         }}
                     >
                         Concordium Testnet
+                    </Button>
+                    <Button
+                        className="onboarding-setup__page-with-header__testnet-button"
+                        width="wide"
+                        onClick={() => {
+                            setNetworkConfiguration(stagenet);
+                            goToNext();
+                        }}
+                    >
+                        Concordium Stagenet
                     </Button>
                 </div>
             </div>
