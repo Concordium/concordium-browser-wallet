@@ -1882,7 +1882,7 @@ __metadata:
     "@babel/plugin-transform-modules-commonjs": ^7.12.1
     "@babel/plugin-transform-runtime": ^7.12.1
     "@babel/preset-env": ^7.12.1
-    "@concordium/web-sdk": ^0.4.0
+    "@concordium/web-sdk": ^1.0.0
     typescript: ^4.3.5
     webpack: ^5.72.0
     webpack-cli: ^4.9.2
@@ -1894,7 +1894,7 @@ __metadata:
   resolution: "@concordium/browser-wallet-api@workspace:packages/browser-wallet-api"
   dependencies:
     "@concordium/browser-wallet-api-helpers": "workspace:^"
-    "@concordium/web-sdk": ^0.4.0
+    "@concordium/web-sdk": ^1.0.0
     "@types/json-bigint": ^1.0.1
     json-bigint: ^1.0.0
     typescript: ^4.3.5
@@ -1919,7 +1919,7 @@ __metadata:
     "@babel/core": ^7.18.2
     "@concordium/browser-wallet-api": "workspace:^"
     "@concordium/browser-wallet-api-helpers": "workspace:^"
-    "@concordium/web-sdk": ^0.4.0
+    "@concordium/web-sdk": ^1.0.0
     "@craftamap/esbuild-plugin-html": ^0.3.2
     "@mdx-js/react": ^1.6.22
     "@scure/bip39": ^1.1.0
@@ -1979,11 +1979,11 @@ __metadata:
   languageName: unknown
   linkType: soft
 
-"@concordium/common-sdk@npm:2.4.0":
-  version: 2.4.0
-  resolution: "@concordium/common-sdk@npm:2.4.0"
+"@concordium/common-sdk@npm:4.0.0":
+  version: 4.0.0
+  resolution: "@concordium/common-sdk@npm:4.0.0"
   dependencies:
-    "@concordium/rust-bindings": 0.3.0
+    "@concordium/rust-bindings": 0.4.0
     "@noble/ed25519": ^1.6.0
     "@scure/bip39": ^1.1.0
     bs58check: ^2.1.2
@@ -1992,7 +1992,7 @@ __metadata:
     hash.js: ^1.1.7
     json-bigint: ^1.0.0
     uuid: ^8.3.2
-  checksum: 84b6a24008379b0fadd320521db981d1cfc6aafd05ffe472c0b6c727f003256d02a453b15f3fc492a4c401b49d2188a9b5f60f6561f2daa978bb036009b83543
+  checksum: db0bfefb2cf1df4449a20cba64036f084dc2446aa1b8b14ff1b4fcb0c4ee7a2ba085dff6dcb62cfc68d7387e6d30881d32e68f98a6e9b73b7ce9617d0b66c99e
   languageName: node
   linkType: hard
 
@@ -2017,22 +2017,22 @@ __metadata:
   languageName: node
   linkType: hard
 
-"@concordium/rust-bindings@npm:0.3.0":
-  version: 0.3.0
-  resolution: "@concordium/rust-bindings@npm:0.3.0"
-  checksum: 8a3cd091c4edc28081139d980f08bc667e454d045d738cc69a0c54f5ad927d1be9e9d90d8593a5585a1a787a5c427ef2fb7b1e7b16d1aa85e6f46e3f465969e8
+"@concordium/rust-bindings@npm:0.4.0":
+  version: 0.4.0
+  resolution: "@concordium/rust-bindings@npm:0.4.0"
+  checksum: 086927ac406b58fed7f019c5544fb13575f0a24f2c2e4354a44f16e765f34cb80530455e04235115f23cafae5425160d8177a08efa89f0365105b7667e7979ac
   languageName: node
   linkType: hard
 
-"@concordium/web-sdk@npm:^0.4.0":
-  version: 0.4.0
-  resolution: "@concordium/web-sdk@npm:0.4.0"
+"@concordium/web-sdk@npm:^1.0.0":
+  version: 1.0.0
+  resolution: "@concordium/web-sdk@npm:1.0.0"
   dependencies:
-    "@concordium/common-sdk": 2.4.0
-    "@concordium/rust-bindings": 0.3.0
+    "@concordium/common-sdk": 4.0.0
+    "@concordium/rust-bindings": 0.4.0
     buffer: ^6.0.3
     process: ^0.11.10
-  checksum: 889fd1eb4b2b78ba272e854e2ccb5541b330036b5f0d5892fa47734f5d6f1f51d2e7bb6e7670a249275a4e560d59b125c2bdb7960812a4d082d7536d695a8268
+  checksum: a130eb8112a6452e5444ac5a8c86d95e221d49da9ffad43520289258f1b0a366dd37f1056f93fbf44609247bd38238e4ea2ed8bcb4f19390525676ae6f832592
   languageName: node
   linkType: hard
 
@@ -15152,7 +15152,7 @@ __metadata:
   resolution: "piggybank@workspace:examples/piggybank"
   dependencies:
     "@concordium/browser-wallet-api-helpers": "workspace:^"
-    "@concordium/web-sdk": ^0.4.0
+    "@concordium/web-sdk": ^1.0.0
     "@craftamap/esbuild-plugin-html": ^0.4.0
     "@types/react": ^18.0.9
     "@types/react-dom": ^18.0.5
