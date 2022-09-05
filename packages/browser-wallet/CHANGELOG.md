@@ -5,6 +5,7 @@
 ### Added
 
 -   Transaction history is now updated on balance changes, so that the new transactions are retrieved.
+-   Testnet faucet for getting some CCD for testing.
 
 ### Changed
 
