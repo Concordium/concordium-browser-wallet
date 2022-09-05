@@ -8,6 +8,8 @@ import { ChromeStorageKey, CreationStatus, WalletCredential } from '@shared/stor
 import { noOp } from 'wallet-common-helpers';
 import { addToastAtom } from '@popup/state';
 import { useTranslation } from 'react-i18next';
+import { getGenesisHash, sessionAccountInfoCache, useIndexedStorage } from '@shared/storage/access';
+import { accountInfoCacheLock, updateRecord } from '@shared/storage/update';
 import { AccountInfoEmitter } from '../account-info-emitter';
 
 export const accountInfoAtom = atomWithChromeStorage<Record<string, string>>(
@@ -68,7 +70,14 @@ export function useAccountInfo(account: WalletCredential): AccountInfo | undefin
                     client
                         .getAccountInfo(new AccountAddress(address), consensusStatus.lastFinalizedBlock)
                         .then((newAccountInfo) => {
-                            setAccountInfo(newAccountInfo);
+                            if (newAccountInfo) {
+                                updateRecord(
+                                    accountInfoCacheLock,
+                                    useIndexedStorage(sessionAccountInfoCache, getGenesisHash),
+                                    newAccountInfo.accountAddress,
+                                    JSONBig.stringify(newAccountInfo)
+                                );
+                            }
                         })
                         .catch(() => addToast(t('account.error')));
                 })

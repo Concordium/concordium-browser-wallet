@@ -4,11 +4,12 @@ import InfiniteLoader from 'react-window-infinite-loader';
 import { VariableSizeList as List } from 'react-window';
 import { noOp, PropsOf } from 'wallet-common-helpers';
 import AutoSizer from 'react-virtualized-auto-sizer';
-import { useAtomValue, useSetAtom } from 'jotai';
-import { selectedAccountAtom } from '@popup/store/account';
 import { BrowserWalletTransaction } from '@popup/shared/utils/transaction-history-types';
 import { useTranslation } from 'react-i18next';
 import { addToastAtom } from '@popup/state';
+import { useAccountInfo } from '@popup/shared/AccountInfoEmitterContext';
+import { useSelectedCredential } from '@popup/shared/utils/account-helpers';
+import { useSetAtom } from 'jotai';
 import TransactionElement, { transactionElementHeight } from './TransactionElement';
 import useTransactionGroups, { TransactionsByDateTuple } from './useTransactionGroups';
 
@@ -148,14 +149,40 @@ export interface TransactionListProps {
  */
 export default function TransactionList({ onTransactionClick }: TransactionListProps) {
     const { t } = useTranslation('transactionLog');
-    const accountAddress = useAtomValue(selectedAccountAtom);
+    const account = useSelectedCredential();
+    const accountAddress = useMemo(() => account?.address, [account]);
     const [transactions, setTransactions] = useState<BrowserWalletTransaction[]>([]);
     const [isNextPageLoading, setIsNextPageLoading] = useState<boolean>(false);
     const [hasNextPage, setHasNextPage] = useState<boolean>(true);
     const addToast = useSetAtom(addToastAtom);
+    const [amount, setAmount] = useState<bigint>();
 
-    if (!accountAddress) {
+    if (!account || !accountAddress) {
         return null;
+    }
+
+    const accountInfo = useAccountInfo(account);
+
+    async function getNewTransactions() {
+        if (accountAddress) {
+            let more = true;
+            let fromId = transactions.length > 0 ? transactions[0].id : undefined;
+            let newTransactions: BrowserWalletTransaction[] = [];
+            while (more) {
+                try {
+                    const result = await getTransactions(accountAddress, transactionResultLimit, 'ascending', fromId);
+                    newTransactions = [...newTransactions, ...result.transactions];
+                    fromId = newTransactions.length > 0 ? newTransactions[newTransactions.length - 1].id : fromId;
+                    more = result.full;
+                } catch {
+                    addToast(t('error'));
+                    return;
+                }
+            }
+            const newTransactionsDescending = newTransactions.reverse();
+            const updatedTransactions = [...newTransactionsDescending, ...transactions];
+            setTransactions(updatedTransactions);
+        }
     }
 
     async function loadTransactionsDescending(address: string, appendTransactions: boolean, fromId?: number) {
@@ -175,11 +202,6 @@ export default function TransactionList({ onTransactionClick }: TransactionListP
             });
     }
 
-    useEffect(() => {
-        setTransactions([]);
-        loadTransactionsDescending(accountAddress, false);
-    }, [accountAddress]);
-
     const loadNextPage = async () => {
         let fromId;
         if (transactions.length) {
@@ -187,6 +209,19 @@ export default function TransactionList({ onTransactionClick }: TransactionListP
         }
         loadTransactionsDescending(accountAddress, true, fromId);
     };
+
+    useEffect(() => {
+        setTransactions([]);
+        loadTransactionsDescending(accountAddress, false);
+        setAmount(undefined);
+    }, [accountAddress]);
+
+    useEffect(() => {
+        if (amount && accountInfo?.accountAmount !== amount) {
+            getNewTransactions();
+        }
+        setAmount(accountInfo?.accountAmount);
+    }, [accountInfo?.accountAmount]);
 
     let transactionListComponent;
     if (transactions.length === 0) {
@@ -198,9 +233,14 @@ export default function TransactionList({ onTransactionClick }: TransactionListP
             );
         }
     } else {
+        // If the first transaction in the list changes, then we need to reload the entire
+        // list, otherwise the infinite list component bugs out displaying the transactions
+        // correctly.
+        const listKey = transactions[0].id;
         transactionListComponent = (
             <div className="transaction-list__scroll">
                 <InfiniteTransactionList
+                    key={listKey}
                     accountAddress={accountAddress}
                     transactions={transactions}
                     loadNextPage={loadNextPage}

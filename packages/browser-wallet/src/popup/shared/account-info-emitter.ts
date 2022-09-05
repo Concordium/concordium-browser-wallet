@@ -1,5 +1,12 @@
 import { AccountAddress, AccountInfo, HttpProvider, JsonRpcClient } from '@concordium/web-sdk';
-import { sessionAccountInfoCache, storedCurrentNetwork } from '@shared/storage/access';
+import {
+    getGenesisHash,
+    sessionAccountInfoCache,
+    storedCurrentNetwork,
+    useIndexedStorage,
+} from '@shared/storage/access';
+import { accountInfoCacheLock, updateRecord } from '@shared/storage/update';
+
 import EventEmitter from 'events';
 import JSONBig from 'json-bigint';
 
@@ -50,14 +57,12 @@ export class AccountInfoEmitter extends EventEmitter {
                         if (accountInfo) {
                             const network = await storedCurrentNetwork.get();
                             if (network) {
-                                const currentCache = { ...(await sessionAccountInfoCache.get(network.genesisHash)) };
-                                if (currentCache === undefined) {
-                                    const newRecord: Record<string, string> = {};
-                                    newRecord[accountInfo.accountAddress] = JSONBig.stringify(accountInfo);
-                                } else {
-                                    currentCache[accountInfo.accountAddress] = JSONBig.stringify(accountInfo);
-                                }
-                                sessionAccountInfoCache.set(network.genesisHash, currentCache ?? {});
+                                updateRecord(
+                                    accountInfoCacheLock,
+                                    useIndexedStorage(sessionAccountInfoCache, getGenesisHash),
+                                    accountInfo.accountAddress,
+                                    JSONBig.stringify(accountInfo)
+                                );
                             }
                             this.emit(address.address, accountInfo);
                         }
