@@ -17,14 +17,6 @@ export default function Root() {
         setIsConnected(Boolean(accountAddress));
     }, []);
 
-    const handleOnClick = useCallback(
-        () =>
-            detectConcordiumProvider()
-                .then((provider) => provider.connect())
-                .then(handleGetAccount),
-        []
-    );
-
     useEffect(() => {
         detectConcordiumProvider()
             .then((provider) => {
@@ -47,19 +39,8 @@ export default function Root() {
             <script src="../../node_modules/@concordium/web-sdk/lib/concordium.min.js" />
             <script src="../../packages/browser-wallet-api-helpers/lib/concordiumHelpers.min.js" />
             <main className="wccd">
-                <div className={`connection-banner ${isConnected ? 'connected' : ''}`}>
-                    {isConnected && `Connected: ${account}`}
-                    {!isConnected && (
-                        <>
-                            <p>No wallet connection</p>
-                            <button type="button" onClick={handleOnClick}>
-                                Connect
-                            </button>
-                        </>
-                    )}
-                </div>
                 <br />
-                <WCCD />
+                <WCCD handleGetAccount={handleGetAccount} />
             </main>
         </state.Provider>
     );

@@ -1,5 +1,5 @@
 /* eslint-disable no-console */
-import React, { useEffect, useState, useContext, useRef } from 'react';
+import React, { useEffect, useState, useContext, useRef, useCallback } from 'react';
 import { toBuffer, AccountAddress } from '@concordium/web-sdk';
 import { detectConcordiumProvider } from '@concordium/browser-wallet-api-helpers';
 import * as leb from '@thi.ng/leb128';
@@ -17,6 +17,42 @@ const WCCD_IMPLEMENTATION_INDEX = 865n;
 const WCCD_STATE_INDEX = 864n;
 
 const CONTRACT_SUB_INDEX = 0n;
+
+const mystyle = {
+    backgroundColor: 'black',
+    color: 'white',
+    borderRadius: 20,
+    margin: '20px 0px 20px 0px',
+    padding: '10px',
+    border: '1px solid #308274',
+};
+
+const mystyle2 = {
+    backgroundColor: 'black',
+    color: 'white',
+    borderRadius: 20,
+    margin: '20px 0px 20px 0px',
+    padding: '10px',
+    border: '1px solid #308274',
+};
+
+const mystyle3 = {
+    backgroundColor: 'black',
+    color: 'white',
+    borderRadius: 20,
+    margin: '20px 0px 20px 0px',
+    padding: '10px',
+    border: '1px solid #308274',
+};
+
+const mystyle4 = {
+    backgroundColor: 'black',
+    color: 'white',
+    borderRadius: 20,
+    margin: '20px 0px 20px 0px',
+    padding: '10px',
+    border: '1px solid #308274',
+};
 
 async function updateStateViewBalanceProxy(setAmountProxy: (x: bigint) => void) {
     const provider = await detectConcordiumProvider();
@@ -54,7 +90,11 @@ async function updateStateWCCDBalanceAccount(account: string, setAmountAccount: 
     setAmountAccount(BigInt(leb.decodeULEB128(toBuffer(res.returnValue, 'hex'))[0]));
 }
 
-export default function wCCD() {
+interface Props {
+    handleGetAccount: (accountAddress: string | undefined) => void;
+}
+
+export default function wCCD({ handleGetAccount }: Props) {
     const { account, isConnected } = useContext(state);
     const [ownerProxy, setOwnerProxy] = useState<string>();
     const [ownerImplementation, setOwnerImplementation] = useState<string>();
@@ -99,6 +139,7 @@ export default function wCCD() {
                     }
 
                     setOwnerImplementation(info.owner.address);
+                    console.log(ownerImplementation);
                 });
         }
     }, [isConnected]);
@@ -113,43 +154,62 @@ export default function wCCD() {
         }
     }, [isConnected]);
 
+    const handleOnClick = useCallback(
+        () =>
+            detectConcordiumProvider()
+                .then((provider) => provider.connect())
+                .then(handleGetAccount),
+        []
+    );
+
     return (
         <>
-            {ownerProxy === undefined ? (
-                <div>Loading wCCD contract...</div>
-            ) : (
-                <>
-                    <h1 className="stored">The WCCD smart contract</h1>
-                    <div>CCD Balance on wCCD Proxy:</div>
-                    <h1 className="stored">{Number(amountProxy) / 1000000} CCD</h1>
-                    <div>{`wCCD Balance of connected account: ${account}:`}</div>
-                    <h1 className="stored">{Number(amountAccount) / 1000000} WCCD</h1>
+            <h1 className="stored">CCD &lt;-&gt; WCCD Smart Contract</h1>
+            <h2 className="stored">Wrap and unwrap your CCDs and wCCDs on the Concordium Testnet</h2>
+            <div style={mystyle}>
+                <div style={mystyle2}>
                     <div>
-                        Proxy wCCD owned by
-                        <br />
-                        {ownerProxy}
+                        {isConnected && `Connected: ${account}`}
+                        {!isConnected && (
+                            <>
+                                <p>No wallet connection</p>
+                                <button type="button" onClick={handleOnClick}>
+                                    Connect
+                                </button>
+                            </>
+                        )}
                     </div>
-                    <br />
-                    <div>
-                        Implementation wCCD owned by
-                        <br />
-                        {ownerImplementation}
-                    </div>
-                    <br />
-                    <div>Refresh values</div>
-                    <button
-                        type="button"
-                        onClick={() => {
-                            updateStateViewBalanceProxy(setAmountProxy);
-                            if (account) {
-                                updateStateWCCDBalanceAccount(account, setAmountAccount);
-                            }
-                        }}
-                    >
-                        ↻
-                    </button>
-                </>
-            )}
+                </div>
+                <div style={mystyle3}>
+                    <div>Text</div>
+                </div>
+                <div style={mystyle4}>
+                    <div>Text</div>
+                </div>
+                {ownerProxy === undefined ? (
+                    <div>Loading wCCD contract...</div>
+                ) : (
+                    <>
+                        <div>CCD Balance on wCCD Proxy:</div>
+                        <h1 className="stored">{Number(amountProxy) / 1000000} CCD</h1>
+                        <div>{`wCCD Balance of connected account: ${account}:`}</div>
+                        <h1 className="stored">{Number(amountAccount) / 1000000} WCCD</h1>
+                    </>
+                )}
+            </div>
+            <br />
+            <div>Refresh values</div>
+            <button
+                type="button"
+                onClick={() => {
+                    updateStateViewBalanceProxy(setAmountProxy);
+                    if (account) {
+                        updateStateWCCDBalanceAccount(account, setAmountAccount);
+                    }
+                }}
+            >
+                ↻
+            </button>
             <br />
             <label>
                 <div className="container">
