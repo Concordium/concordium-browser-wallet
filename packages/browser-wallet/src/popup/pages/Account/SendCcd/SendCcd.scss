@@ -16,4 +16,9 @@
             margin-bottom: auto;
         }
     }
+
+    &__receipt {
+        margin: rem(20px);
+        width: calc(100% - rem(80px));
+    }
 }

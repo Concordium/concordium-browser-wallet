@@ -26,10 +26,19 @@ const t: typeof en = {
             insufficient: 'Ikke nok penge',
             zero: 'Beløbet må ikke være nul',
         },
+        transaction: {
+            type: {
+                simple: 'Send Ccd',
+                init: 'Opret Smart Contract Instans',
+                update: 'Opdater Smart Contract Instans',
+                unknown: 'Ukendt',
+            },
+        },
     },
     transactionReceipt: {
         sender: 'Afsender',
         cost: 'Estimerede transaktionsomkostninger',
+        title: 'Transaktion: {{ typeName }}',
     },
 };
 

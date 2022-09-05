@@ -61,7 +61,13 @@ export default function ConfirmTransfer({ setDetailsExpanded, cost }: Props) {
 
     return (
         <div className="w-full flex-column justify-space-between align-center">
-            <TransactionReceipt title={t('sendCcd.receiptTitle')} sender={address} cost={cost} hash={hash}>
+            <TransactionReceipt
+                transactionType={AccountTransactionType.SimpleTransfer}
+                sender={address}
+                cost={cost}
+                hash={hash}
+                className="send-ccd__receipt"
+            >
                 <DisplaySimpleTransfer payload={payload} />
             </TransactionReceipt>
             {!hash && (

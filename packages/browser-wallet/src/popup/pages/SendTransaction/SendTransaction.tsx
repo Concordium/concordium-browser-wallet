@@ -4,13 +4,18 @@ import { fullscreenPromptContext } from '@popup/page-layouts/FullscreenPromptLay
 import { useTranslation } from 'react-i18next';
 import { useLocation } from 'react-router-dom';
 import { AccountTransactionType, AccountAddress, SchemaVersion } from '@concordium/web-sdk';
-import { usePrivateKey } from '@popup/shared/utils/account-helpers';
+import { useCredential, usePrivateKey } from '@popup/shared/utils/account-helpers';
 import { sendTransaction, getDefaultExpiry } from '@popup/shared/utils/transaction-helpers';
 import { jsonRpcClientAtom } from '@popup/store/settings';
 import TransactionReceipt from '@popup/shared/TransactionReceipt/TransactionReceipt';
 import DisplayUpdateContract from '@popup/shared/TransactionReceipt/displayPayload/DisplayUpdateContract';
 import DisplayInitContract from '@popup/shared/TransactionReceipt/displayPayload/DisplayInitContract';
 import DisplaySimpleTransfer from '@popup/shared/TransactionReceipt/displayPayload/DisplaySimpleTransfer';
+import Button from '@popup/shared/Button';
+import { displayUrl } from '@popup/shared/utils/string-helpers';
+import { noOp, useAsyncMemo } from 'wallet-common-helpers';
+import { getSimpleTransferCost } from '@popup/shared/utils/wallet-proxy';
+import ConnectedBox from '@popup/pages/Account/ConnectedBox';
 import { parsePayload } from './util';
 
 interface Location {
@@ -22,6 +27,7 @@ interface Location {
             parameters?: Record<string, unknown>;
             schema?: string;
             schemaVersion?: SchemaVersion;
+            url: string;
         };
     };
 }
@@ -37,8 +43,10 @@ export default function SendTransaction({ onSubmit, onReject }: Props) {
     const [error, setError] = useState<string>();
     const client = useAtomValue(jsonRpcClientAtom);
     const { withClose, onClose } = useContext(fullscreenPromptContext);
+    const cost = useAsyncMemo(getSimpleTransferCost, noOp, []);
 
-    const { accountAddress } = state.payload;
+    const { accountAddress, url } = state.payload;
+    const credential = useCredential(accountAddress);
     const key = usePrivateKey(accountAddress);
 
     const { type: transactionType, payload } = useMemo(
@@ -82,39 +90,51 @@ export default function SendTransaction({ onSubmit, onReject }: Props) {
 
     return (
         <>
-            <div>{t('description')}</div>
-            <TransactionReceipt title={t('title')} sender={accountAddress}>
-                <>
-                    {transactionType === AccountTransactionType.SimpleTransfer && (
-                        <DisplaySimpleTransfer payload={payload} />
-                    )}
-                    {transactionType === AccountTransactionType.UpdateSmartContractInstance && (
-                        <DisplayUpdateContract payload={payload} parameters={state.payload.parameters} />
-                    )}
-                    {transactionType === AccountTransactionType.InitializeSmartContractInstance && (
-                        <DisplayInitContract payload={payload} parameters={state.payload.parameters} />
-                    )}
-                </>
-            </TransactionReceipt>
-            <br />
-            <button
-                type="button"
-                onClick={() =>
-                    handleSubmit()
-                        .then(withClose(onSubmit))
-                        .catch((e) => setError(e.message))
-                }
-            >
-                {t('submit')}
-            </button>
-            <button type="button" onClick={withClose(onReject)}>
-                {t('deny')}
-            </button>
-            {error && (
-                <p>
-                    {t('error')}: {error}
-                </p>
+            {credential && (
+                <ConnectedBox accountAddress={credential.address} getUrl={() => Promise.resolve(new URL(url).origin)} />
             )}
+            <div className="h-full flex-column align-center">
+                <div>{t('description', { dApp: displayUrl(url) })}</div>
+                <TransactionReceipt
+                    transactionType={transactionType}
+                    sender={accountAddress}
+                    cost={cost}
+                    className="m-10"
+                >
+                    <>
+                        {transactionType === AccountTransactionType.SimpleTransfer && (
+                            <DisplaySimpleTransfer payload={payload} />
+                        )}
+                        {transactionType === AccountTransactionType.UpdateSmartContractInstance && (
+                            <DisplayUpdateContract payload={payload} parameters={state.payload.parameters} />
+                        )}
+                        {transactionType === AccountTransactionType.InitializeSmartContractInstance && (
+                            <DisplayInitContract payload={payload} parameters={state.payload.parameters} />
+                        )}
+                    </>
+                </TransactionReceipt>
+                <br />
+                <div className="flex p-b-10">
+                    <Button width="narrow" className="m-r-10" onClick={withClose(onReject)}>
+                        {t('deny')}
+                    </Button>
+                    <Button
+                        width="narrow"
+                        onClick={() =>
+                            handleSubmit()
+                                .then(withClose(onSubmit))
+                                .catch((e) => setError(e.message))
+                        }
+                    >
+                        {t('submit')}
+                    </Button>
+                </div>
+                {error && (
+                    <p>
+                        {t('error')}: {error}
+                    </p>
+                )}
+            </div>
         </>
     );
 }

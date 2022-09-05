@@ -6,16 +6,7 @@ import { useTranslation } from 'react-i18next';
 import { popupMessageHandler } from '@popup/shared/message-handler';
 import { EventType } from '@concordium/browser-wallet-api-helpers';
 import { getCurrentOpenTabUrl } from '@popup/shared/utils/tabs';
-
-function displayUrl(url: string) {
-    const { hostname } = new URL(url);
-
-    if (hostname.length < 29) {
-        return hostname;
-    }
-
-    return `${hostname.substring(0, 29)}...`;
-}
+import { displayUrl } from '@popup/shared/utils/string-helpers';
 
 export default function ConnectedSites() {
     const { t } = useTranslation('account', { keyPrefix: 'settings.connectedSites' });

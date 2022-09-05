@@ -10,6 +10,8 @@ const t: typeof en = {
         accounts: 'Konti',
         ids: 'ID kort',
         settings: 'Wallet indstillinger',
+        request: 'Signatur anmodning',
+        connect: 'Ny Forbindelse',
     },
     entityList: {
         searchPlaceholder: 'Søg',

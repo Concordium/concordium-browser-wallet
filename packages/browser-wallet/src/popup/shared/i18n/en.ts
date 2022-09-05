@@ -24,10 +24,19 @@ const t = {
             insufficient: 'Insufficient funds',
             zero: 'Amount may not be zero',
         },
+        transaction: {
+            type: {
+                simple: 'Send Ccd',
+                init: 'Initialize Smart Contract Instance',
+                update: 'Update Smart Contract Instance',
+                unknown: 'Unknown',
+            },
+        },
     },
     transactionReceipt: {
         sender: 'Sender account',
         cost: 'Estimated transaction fee',
+        title: 'Transaction: {{ typeName }}',
     },
 };
 

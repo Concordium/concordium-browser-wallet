@@ -1,5 +1,5 @@
 const t = {
-    description: 'Transaction overview',
+    description: '{{dApp}} suggests a transaction',
     sender: 'Sender',
     submit: 'Send',
     deny: 'Deny',

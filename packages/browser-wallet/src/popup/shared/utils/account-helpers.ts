@@ -21,18 +21,20 @@ export function useIdentityOf(cred?: WalletCredential) {
     return identity;
 }
 
-export function useSelectedCredential() {
-    const selectedAccount = useAtomValue(selectedAccountAtom);
+export function useCredential(accountAddress?: string) {
     const credentials = useAtomValue(credentialsAtom);
 
-    const selectedCredential = useMemo(() => {
-        if (!selectedAccount) {
+    return useMemo(() => {
+        if (!accountAddress) {
             return undefined;
         }
-        return credentials.find((cred) => cred.address === selectedAccount);
-    }, [selectedAccount, JSON.stringify(credentials)]);
+        return credentials.find((cred) => cred.address === accountAddress);
+    }, [accountAddress, JSON.stringify(credentials)]);
+}
 
-    return selectedCredential;
+export function useSelectedCredential() {
+    const selectedAccount = useAtomValue(selectedAccountAtom);
+    return useCredential(selectedAccount);
 }
 
 export function usePrivateKey(accountAddress: string | undefined): string | undefined {
