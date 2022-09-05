@@ -72,7 +72,7 @@ export type EntityListProps<E extends Record<string, unknown>> = ClassName & {
     /**
      * Callback for when an entity has been selected from the list
      */
-    onSelect(entity: E, index: number): void;
+    onSelect(entity: E): void;
     /**
      * Action for creating new entities
      */
@@ -88,7 +88,7 @@ export type EntityListProps<E extends Record<string, unknown>> = ClassName & {
      *      {(e, checked) => <div className={checked ? 'checked' : 'unchecked'}>{e.text}</div>}
      *  </EntityList>
      */
-    children(entity: E, checked: boolean, index: number): JSX.Element;
+    children(entity: E, checked: boolean): JSX.Element;
     /**
      * Callback for getting key of list item corresponding to entity
      */
@@ -154,7 +154,7 @@ const EntityList = forwardRef(
                 if (e.key === 'Enter') {
                     // Propagate selection of the currently checked entity.
                     const currentValue = formMethods.getValues()[id];
-                    onSelect(filteredEntities[currentValue], currentValue);
+                    onSelect(filteredEntities[currentValue]);
                 } else if (e.key === 'ArrowDown') {
                     // Shift focus to selected option in list
                     const radio = formRef.current?.querySelector('input[type="radio"]:checked') as
@@ -169,7 +169,7 @@ const EntityList = forwardRef(
         const handleSubmit = useCallback(
             (values: FormValues) => {
                 const selected = filteredEntities[values[id]];
-                onSelect(selected, values[id]);
+                onSelect(selected);
             },
             [filteredEntities]
         );
@@ -224,9 +224,9 @@ const EntityList = forwardRef(
                                                     field.onBlur();
                                                     handleItemBlur();
                                                 }}
-                                                onClick={() => onSelect(entity, i)}
+                                                onClick={() => onSelect(entity)}
                                             >
-                                                {children(entity, field.value === i, i)}
+                                                {children(entity, field.value === i)}
                                             </EntityItem>
                                         )}
                                     />

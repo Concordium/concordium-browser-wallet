@@ -45,14 +45,15 @@ export default function IdentityIssuanceEnd({ onFinish }: Props) {
         () => providers.find((p) => p.ipInfo.ipIdentity === selectedIdentity?.provider),
         [selectedIdentity?.provider]
     );
+
     useEffect(() => onClose(onFinish), [onClose, onFinish]);
 
     useEffect(() => {
-        if (pendingIdentity) {
+        if (pendingIdentity && identities.length) {
             setSelectedIdentityIndex(identities.length - 1);
             setPendingIdentity(undefined);
         }
-    }, [pendingIdentity]);
+    }, [pendingIdentity, identities.length]);
 
     return (
         <>

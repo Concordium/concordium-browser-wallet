@@ -59,24 +59,24 @@ const IdentityList = forwardRef<HTMLDivElement, Props>(({ className, onSelect },
     const { t } = useTranslation('mainLayout');
 
     return (
-        <EntityList<Identity>
+        <EntityList<Identity & { i: number }>
             className={className}
-            onSelect={(_, i) => {
-                setSelectedIdentityIndex(i);
+            onSelect={(id) => {
+                setSelectedIdentityIndex(id.i);
                 onSelect();
             }}
             onNew={() => nav(absoluteRoutes.home.identities.add.path)}
-            entities={identities}
+            entities={identities.map((id, i) => ({ ...id, i }))}
             getKey={(a) => `${a.index}-${a.provider}`}
             newText={t('identityList.new')}
             ref={ref}
             searchableKeys={['name']}
         >
-            {(a, checked, i) => (
+            {(a, checked) => (
                 <IdentityListItem
                     identity={a}
                     checked={checked}
-                    selected={i === selectedIdentityIndex}
+                    selected={a.i === selectedIdentityIndex}
                     accountCount={accountsPerIdentity?.[a.provider]?.[a.index]?.length || 0}
                 />
             )}
