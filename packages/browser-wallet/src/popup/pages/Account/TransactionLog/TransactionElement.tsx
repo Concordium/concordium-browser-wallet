@@ -1,6 +1,7 @@
 import SidedRow from '@popup/shared/SidedRow';
 import React, { CSSProperties } from 'react';
 import DoubleCheckmarkIcon from '@assets/svg/double-grey-checkmark.svg';
+import PendingIcon from '@assets/svg/clock.svg';
 import Warning from '@assets/svg/warning.svg';
 import { displayAsCcd } from 'wallet-common-helpers/lib/utils/ccd';
 import {
@@ -36,6 +37,8 @@ const withDateAndTime = Intl.DateTimeFormat(undefined, {
 
 function statusIcon(status: TransactionStatus) {
     switch (status) {
+        case TransactionStatus.Pending:
+            return <PendingIcon className="transaction-element__clock" />;
         case TransactionStatus.Failed:
         case TransactionStatus.Finalized:
             return <DoubleCheckmarkIcon className="transaction-element__checkmark" />;

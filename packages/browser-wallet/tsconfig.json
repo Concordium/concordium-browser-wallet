@@ -23,5 +23,5 @@
     },
     "include": ["./**/*"],
     "files": ["../../node_modules/@concordium/browser-wallet-api-helpers/lib/extend-window.d.ts"],
-    "exclude": ["./../../node_modules/**/*"]
+    "exclude": ["./../../node_modules/**/*", "./dist/**/*"]
 }
