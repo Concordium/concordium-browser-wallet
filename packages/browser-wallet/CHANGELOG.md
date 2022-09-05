@@ -2,6 +2,14 @@
 
 ## Unreleased
 
+### Added
+
+-   Transaction history is now updated on balance changes, so that the new transactions are retrieved.
+
+### Changed
+
+-   Account information retrieved from the JSON-RPC server is now cached for better performance, and a more responsive UI.
+
 ### Fixed
 
 -   Account search now only searches on the account address field.
