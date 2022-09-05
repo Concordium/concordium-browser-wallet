@@ -40,7 +40,12 @@ export default function CreateTransaction({ cost = 0n }: Props) {
     const address = useAtomValue(selectedAccountAtom);
     const nav = useNavigate();
     const { accountInfo } = useContext<AccountContextValues>(accountContext);
-    const form = useForm<FormValues>();
+    const form = useForm<FormValues>({
+        defaultValues: {
+            ccd: microCcdToCcd(defaultPayload?.amount.microGtuAmount),
+            recipient: defaultPayload?.toAddress.address,
+        },
+    });
 
     const validateAmount: Validate<string> = (amount) => validateTransferAmount(amount, accountInfo, cost);
     const maxValue = getPublicAccountAmounts(accountInfo).atDisposal - cost;
@@ -55,47 +60,41 @@ export default function CreateTransaction({ cost = 0n }: Props) {
     };
 
     return (
-        <div className="send-ccd__create-transfer">
-            <p className="m-v-10 text-center">{t('sendCcd.title')}</p>
-            <Form
-                formMethods={form}
-                className="flex-column justify-space-between align-center"
-                onSubmit={onSubmit}
-                defaultValues={{
-                    ccd: microCcdToCcd(defaultPayload?.amount.microGtuAmount),
-                    recipient: defaultPayload?.toAddress.address,
-                }}
-            >
-                {(f) => (
-                    <>
-                        <CcdInput
-                            register={f.register}
-                            name="ccd"
-                            label={t('sendCcd.labels.ccd')}
-                            className="send-ccd__create-transfer__input"
-                            onMax={() => form.setValue('ccd', microCcdToCcd(maxValue) || '0')}
-                            rules={{
-                                required: tShared('utils.ccdAmount.required'),
-                                validate: validateAmount,
-                            }}
-                        />
-                        <Input
-                            register={f.register}
-                            name="recipient"
-                            label={t('sendCcd.labels.recipient')}
-                            className="send-ccd__create-transfer__input"
-                            rules={{
-                                required: tShared('utils.address.required'),
-                                validate: validateAccountAddress,
-                            }}
-                        />
-                        <DisplayCost cost={cost} />
-                        <Submit className="send-ccd__create-transfer__button" width="medium">
-                            {t('sendCcd.buttons.continue')}
-                        </Submit>
-                    </>
-                )}
-            </Form>
-        </div>
+        <Form
+            formMethods={form}
+            className="flex-column justify-space-between align-center h-full w-full"
+            onSubmit={onSubmit}
+        >
+            {(f) => (
+                <>
+                    <p className="m-v-10 text-center">{t('sendCcd.title')}</p>
+                    <CcdInput
+                        register={f.register}
+                        name="ccd"
+                        label={t('sendCcd.labels.ccd')}
+                        className="send-ccd__create-transfer__input"
+                        onMax={() => form.setValue('ccd', microCcdToCcd(maxValue) || '0')}
+                        rules={{
+                            required: tShared('utils.ccdAmount.required'),
+                            validate: validateAmount,
+                        }}
+                    />
+                    <Input
+                        register={f.register}
+                        name="recipient"
+                        label={t('sendCcd.labels.recipient')}
+                        className="send-ccd__create-transfer__input"
+                        rules={{
+                            required: tShared('utils.address.required'),
+                            validate: validateAccountAddress,
+                        }}
+                    />
+                    <DisplayCost cost={cost} />
+                    <Submit className="send-ccd__create-transfer__button" width="medium">
+                        {t('sendCcd.buttons.continue')}
+                    </Submit>
+                </>
+            )}
+        </Form>
     );
 }
