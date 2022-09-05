@@ -33,8 +33,8 @@ export default function Confirm() {
     const addToast = useSetAtom(addToastAtom);
 
     const identityProvider = useMemo(
-        () => providers.find((p) => p.ipInfo.ipIdentity === selectedIdentity?.provider),
-        [selectedIdentity?.provider]
+        () => providers.find((p) => p.ipInfo.ipIdentity === selectedIdentity?.providerIndex),
+        [selectedIdentity?.providerIndex]
     );
 
     if (!selectedIdentity || selectedIdentity.status !== CreationStatus.Confirmed) {

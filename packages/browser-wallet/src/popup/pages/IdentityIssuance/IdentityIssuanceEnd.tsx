@@ -42,8 +42,8 @@ export default function IdentityIssuanceEnd({ onFinish }: Props) {
     const setSelectedIdentityIndex = useSetAtom(selectedIdentityIndexAtom);
 
     const identityProvider = useMemo(
-        () => providers.find((p) => p.ipInfo.ipIdentity === selectedIdentity?.provider),
-        [selectedIdentity?.provider]
+        () => providers.find((p) => p.ipInfo.ipIdentity === selectedIdentity?.providerIndex),
+        [selectedIdentity?.providerIndex]
     );
 
     useEffect(() => onClose(onFinish), [onClose, onFinish]);

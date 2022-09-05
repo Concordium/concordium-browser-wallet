@@ -1,5 +1,5 @@
-import PageHeader from '@popup/shared/PageHeader';
 import React, { useEffect, useState } from 'react';
+import PageHeader from '@popup/shared/PageHeader';
 import { useNavigate } from 'react-router-dom';
 import { useAtom, useAtomValue } from 'jotai';
 import { useTranslation } from 'react-i18next';
@@ -13,9 +13,9 @@ import Button from '@popup/shared/Button';
 import { absoluteRoutes } from '@popup/constants/routes';
 import { BackgroundResponseStatus } from '@shared/utils/types';
 import { getIdentityProviders } from '@popup/shared/utils/wallet-proxy';
+import { getNet } from '@shared/utils/network-helpers';
 
 // TODO: improve "error state"
-// TODO: Special handling for no identities found
 
 function DisplayRecoveryResult() {
     const { t } = useTranslation('setup');
@@ -25,7 +25,7 @@ function DisplayRecoveryResult() {
     return (
         <>
             <div className="onboarding-setup__page-with-header__description">
-                {t('performRecovery.description.after')}
+                {t(identities.length ? 'performRecovery.description.after' : 'performRecovery.description.noneFound')}
             </div>
             <div className="onboarding-setup__recovery__results">
                 {identities.map((identity) => (
@@ -34,50 +34,50 @@ function DisplayRecoveryResult() {
                     </div>
                 ))}
             </div>
-            <Button onClick={() => navigate(absoluteRoutes.home.account.path)}>{t('continue')}</Button>
+            <Button
+                width="narrow"
+                className="onboarding-setup__recovery__button"
+                onClick={() => navigate(absoluteRoutes.home.account.path)}
+            >
+                {t('continue')}
+            </Button>
         </>
     );
 }
 
-export default function EnterRecoveryPhrase() {
+export default function PerformRecovery() {
     const { t } = useTranslation('setup');
-    const { jsonRpcUrl } = useAtomValue(networkConfigurationAtom);
-    const masterSeed = useAtomValue(seedPhraseAtom);
+    const network = useAtomValue(networkConfigurationAtom);
+    const seedPhrase = useAtomValue(seedPhraseAtom);
     const [providers, setProviders] = useAtom(identityProvidersAtom);
     const [result, setResult] = useState<BackgroundResponseStatus>();
 
     useEffect(() => {
-        getIdentityProviders().then(setProviders);
+        getIdentityProviders()
+            .then(setProviders)
+            .catch(() => setResult(BackgroundResponseStatus.Error));
     }, []);
 
     useEffect(() => {
         if (!providers.length) {
             return;
         }
-
-        if (!jsonRpcUrl) {
-            throw new Error('no json rpc url');
-        }
-        if (!masterSeed) {
-            throw new Error('no master seed');
+        if (!seedPhrase) {
+            throw new Error('no seed phrase');
         }
 
         // TODO: Maybe we should not create the client for each page
-        const client = new JsonRpcClient(new HttpProvider(jsonRpcUrl));
+        const client = new JsonRpcClient(new HttpProvider(network.jsonRpcUrl));
         client.getCryptographicParameters().then((global) => {
             if (!global) {
                 throw new Error('no global fetched');
             }
-
-            // TODO Get this from settings, when we store the chosen net
-            const net = 'Testnet';
-
             popupMessageHandler
                 .sendInternalMessage(InternalMessageType.Recovery, {
                     providers,
                     globalContext: global.value,
-                    seedAsHex: masterSeed,
-                    net,
+                    seedAsHex: seedPhrase,
+                    net: getNet(network),
                 })
                 .then(setResult);
         });
@@ -86,7 +86,7 @@ export default function EnterRecoveryPhrase() {
     return (
         <>
             <PageHeader>{t('performRecovery.title')}</PageHeader>
-            <div className="onboarding-setup__page-with-header">
+            <div className="onboarding-setup__page-with-header flex-column align-center">
                 {!result && (
                     <>
                         <div className="onboarding-setup__page-with-header__description">

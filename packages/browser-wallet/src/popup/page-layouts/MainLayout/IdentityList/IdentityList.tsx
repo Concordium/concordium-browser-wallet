@@ -67,7 +67,7 @@ const IdentityList = forwardRef<HTMLDivElement, Props>(({ className, onSelect },
             }}
             onNew={() => nav(absoluteRoutes.home.identities.add.path)}
             entities={identities.map((id, i) => ({ ...id, i }))}
-            getKey={(a) => `${a.index}-${a.provider}`}
+            getKey={(a) => `${a.providerIndex}-${a.index}`}
             newText={t('identityList.new')}
             ref={ref}
             searchableKeys={['name']}
@@ -77,7 +77,7 @@ const IdentityList = forwardRef<HTMLDivElement, Props>(({ className, onSelect },
                     identity={a}
                     checked={checked}
                     selected={a.i === selectedIdentityIndex}
-                    accountCount={accountsPerIdentity?.[a.provider]?.[a.index]?.length || 0}
+                    accountCount={accountsPerIdentity?.[a.providerIndex]?.[a.index]?.length || 0}
                 />
             )}
         </EntityList>

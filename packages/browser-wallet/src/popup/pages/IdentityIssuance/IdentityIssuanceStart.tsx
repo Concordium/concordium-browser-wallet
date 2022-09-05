@@ -56,7 +56,7 @@ function IdentityIssuanceStart({ onStart }: InnerProps) {
 
             const identityIndex = identities.reduce(
                 (maxIndex, identity) =>
-                    identity.provider === providerIndex ? Math.max(maxIndex, identity.index + 1) : maxIndex,
+                    identity.providerIndex === providerIndex ? Math.max(maxIndex, identity.index + 1) : maxIndex,
                 0
             );
 
@@ -64,7 +64,7 @@ function IdentityIssuanceStart({ onStart }: InnerProps) {
                 status: CreationStatus.Pending,
                 index: identityIndex,
                 name: `Identity ${identities.length + 1}`,
-                provider: providerIndex,
+                providerIndex,
             });
 
             onStart();

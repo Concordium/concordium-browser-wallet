@@ -18,7 +18,7 @@ export default function ChooseIdentity() {
     const providers = useAtomValue(identityProvidersAtom);
 
     const findProvider = useCallback(
-        (identity: Identity) => providers.find((p) => p.ipInfo.ipIdentity === identity.provider),
+        (identity: Identity) => providers.find((p) => p.ipInfo.ipIdentity === identity.providerIndex),
         [providers]
     );
 

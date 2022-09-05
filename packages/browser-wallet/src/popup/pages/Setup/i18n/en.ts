@@ -25,11 +25,15 @@ const t = {
         title: 'Your recovery phrase',
         description: 'Write down your 24 word recovery phrase. Remember that the order is important.',
     },
+    recoverSeedPhrase: {
+        title: 'Restore your wallet',
+    },
     performRecovery: {
         title: 'Restoring your wallet',
         description: {
             during: 'Searching for your IDs and accounts. Please wait.',
             after: 'The following identities and accounts were recovered.',
+            noneFound: 'No identities were found.',
         },
     },
     confirmRecoveryPhrase: {
@@ -43,13 +47,21 @@ const t = {
         },
         seedPhrase: {
             required: 'Please specify a 24 word BIP 39 seed phrase',
-            length: 'Please enter 24 words',
+            validate: 'Invalid secret recovery phrase',
         },
     },
     chooseNetwork: {
-        descriptionP1: 'Here you can choose whether to connect to the Concordium Mainnet or Testnet.',
-        descriptionP2: 'If you are unsure what to choose, choose Concordium Mainnet.',
-        descriptionP3: 'You can choose another network via the Settings menu later.',
+        create: {
+            descriptionP1: 'Here you can choose whether to connect to the Concordium Mainnet or Testnet.',
+            descriptionP2: 'If you are unsure what to choose, choose Concordium Mainnet.',
+            descriptionP3: 'You can choose another network via the Settings menu later.',
+        },
+        restore: {
+            descriptionP1:
+                'Here you can choose whether to recover your identities and accounts on the Concordium Mainnet or Testnet.',
+            descriptionP2: 'If you are unsure what to choose, choose Concordium Mainnet.',
+            descriptionP3: 'You can use another network via the Settings menu later',
+        },
     },
     continue: 'Continue',
 };

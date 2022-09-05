@@ -33,10 +33,10 @@ export const identityProvidersAtom = atomWithChromeStorage<IdentityProvider[]>(C
 export const identityNamesAtom = selectAtom(identitiesAtom, (identities) => {
     const map = {} as Record<number, Record<number, string>>;
     identities.forEach((identity) => {
-        if (!map[identity.provider]) {
-            map[identity.provider] = {} as Record<number, string>;
+        if (!map[identity.providerIndex]) {
+            map[identity.providerIndex] = {} as Record<number, string>;
         }
-        map[identity.provider][identity.index] = identity.name;
+        map[identity.providerIndex][identity.index] = identity.name;
     });
     return map;
 });
