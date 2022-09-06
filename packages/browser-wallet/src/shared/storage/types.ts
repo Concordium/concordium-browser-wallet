@@ -32,7 +32,7 @@ export interface BaseIdentity {
     status: CreationStatus;
     name: string;
     index: number;
-    provider: number;
+    providerIndex: number;
 }
 
 export interface PendingIdentity extends BaseIdentity {
@@ -114,6 +114,7 @@ export interface BaseCredential {
     credNumber: number;
     status: CreationStatus;
     identityIndex: number;
+    providerIndex: number;
     // Policy (is in accountInfo)
     // CredentialIndex = 0
 }

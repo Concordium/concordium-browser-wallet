@@ -6,7 +6,9 @@ import { popupMessageHandler } from '@popup/shared/message-handler';
 import { decrypt } from '@popup/shared/crypto';
 import { mnemonicToSeedSync } from '@scure/bip39';
 import { mainnet } from '@popup/pages/NetworkSettings/NetworkSettings';
-import { storedCredentials, storedIdentities } from '@shared/storage/access';
+import { selectAtom } from 'jotai/utils';
+import { HttpProvider, JsonRpcClient } from '@concordium/web-sdk';
+import { storedCredentials } from '@shared/storage/access';
 import { atomWithChromeStorage } from './utils';
 import { selectedAccountAtom } from './account';
 import { selectedIdentityIndexAtom } from './identity';
@@ -24,16 +26,19 @@ const storedNetworkConfigurationAtom = atomWithChromeStorage<NetworkConfiguratio
 );
 export const networkConfigurationAtom = atom<NetworkConfiguration, NetworkConfiguration>(
     (get) => get(storedNetworkConfigurationAtom),
-    (get, set, networkConfiguration) => {
+    (_, set, networkConfiguration) => {
         set(storedNetworkConfigurationAtom, networkConfiguration);
         popupMessageHandler.broadcast(EventType.ChainChanged, networkConfiguration.genesisHash);
-        storedIdentities
-            .get(networkConfiguration.genesisHash)
-            .then((identities) => set(selectedIdentityIndexAtom, identities?.length ? identities[0]?.index : 0));
+        set(selectedIdentityIndexAtom, 0);
         storedCredentials
             .get(networkConfiguration.genesisHash)
             .then((creds) => set(selectedAccountAtom, creds?.length ? creds[0]?.address : undefined));
     }
+);
+
+export const jsonRpcClientAtom = selectAtom(
+    networkConfigurationAtom,
+    ({ jsonRpcUrl }) => new JsonRpcClient(new HttpProvider(jsonRpcUrl))
 );
 
 export const sessionPasscodeAtom = atomWithChromeStorage<string | undefined>(

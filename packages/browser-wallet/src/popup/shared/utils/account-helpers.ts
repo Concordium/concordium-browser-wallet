@@ -16,8 +16,9 @@ export function useIdentityOf(cred?: WalletCredential) {
         if (!cred) {
             return undefined;
         }
-        return identities.find((id) => id.index === cred.identityIndex);
-    }, [cred, identities.length]);
+        return identities.find((id) => id.index === cred.identityIndex && id.providerIndex === cred.providerIndex);
+    }, [JSON.stringify(cred), identities.length]);
+
     return identity;
 }
 
@@ -35,7 +36,7 @@ export function useSelectedCredential() {
     return selectedCredential;
 }
 
-export function usePrivateKey(accountAddress: string): string | undefined {
+export function usePrivateKey(accountAddress: string | undefined): string | undefined {
     const credentials = useAtomValue(credentialsAtom);
     const credential = credentials.find((cred) => cred.address === accountAddress);
     const network = useAtomValue(networkConfigurationAtom);
@@ -44,12 +45,13 @@ export function usePrivateKey(accountAddress: string): string | undefined {
     const identity = useIdentityOf(credential);
 
     const privateKey = useMemo(() => {
-        if (!credential || !identity) {
+        // We don't throw errors on missing credentials or identities, as they might just be loading.
+        if (!accountAddress || !credential || !identity) {
             return undefined;
         }
 
         return ConcordiumHdWallet.fromHex(seedPhrase, getNet(network))
-            .getAccountSigningKey(identity.provider, identity.index, credential.credNumber)
+            .getAccountSigningKey(identity.providerIndex, identity.index, credential.credNumber)
             .toString('hex');
     }, [credential?.credId, seedPhrase, identity?.index]);
 

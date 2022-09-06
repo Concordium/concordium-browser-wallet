@@ -10,7 +10,7 @@ import {
     IdentityObjectV1,
     IdentityRecoveryRequestInput,
     JsonRpcClient,
-    Network as NetworkString,
+    Network,
     Versioned,
 } from '@concordium/web-sdk';
 import { ExtensionMessageHandler } from '@concordium/browser-wallet-message-hub';
@@ -23,7 +23,7 @@ import { addCredential, addIdentity } from './update';
 // TODO: increase max empty
 // How many empty identityIndices are allowed before stopping
 const maxEmpty = 3;
-// Milliseconds to wait, if retrievelUrl is still pending
+// Milliseconds to wait, if retrievalUrl is still pending
 const sleepInterval = 5000;
 
 function getAddressFrom(accountInfo: AccountInfo) {
@@ -70,12 +70,13 @@ export type Payload = {
     providers: IdentityProvider[];
     globalContext: CryptographicParameters;
     seedAsHex: string;
-    net: NetworkString;
+    net: Network;
 };
 
 /**
  * Polls the provided location until a valid identity object is available, or that an error is returned.
- * If an error occurs or is returned from the url, this return undefined
+ * If an error is returned from the url, this return undefined.
+ * If the identity provider is not reachable, the promise will reject.
  */
 async function getIdentityObject(url: string): Promise<Versioned<IdentityObjectV1> | undefined> {
     // eslint-disable-next-line no-constant-condition
@@ -102,8 +103,6 @@ function getRecoverUrl(inputs: Omit<IdentityRecoveryRequestInput, 'timestamp' | 
 }
 
 async function performRecovery({ providers, ...recoveryInputs }: Payload) {
-    // const identities = await storedIdentities.get();
-    // let nextId = identities ? identities.length + 1 : 0;
     let nextId = 0;
     const identitiesToAdd: Identity[] = [];
     const credsToAdd: WalletCredential[] = [];
@@ -117,7 +116,7 @@ async function performRecovery({ providers, ...recoveryInputs }: Payload) {
     const getAccountInfo = (credId: string) => client.getAccountInfo(new CredentialRegistrationId(credId), blockHash);
 
     for (const provider of providers) {
-        // TODO: remove this when providers have been fixed
+        // TODO: Is required because some identity providers do not have a recoveryStart value. This is an error and should be fixed in the wallet proxy. At that point this can be safely removed.
         if (!provider.metadata.recoveryStart) {
             // eslint-disable-next-line no-continue
             continue;
@@ -131,9 +130,9 @@ async function performRecovery({ providers, ...recoveryInputs }: Payload) {
                 const idObject = await getIdentityObject(recoverResponse.identityRetrievalUrl);
                 if (idObject) {
                     identitiesToAdd.push({
-                        name: `identity ${nextId + 1}`,
+                        name: `Identity ${nextId + 1}`,
                         index: identityIndex,
-                        provider: provider.ipInfo.ipIdentity,
+                        providerIndex: provider.ipInfo.ipIdentity,
                         status: CreationStatus.Confirmed,
                         idObject,
                     });
@@ -172,7 +171,7 @@ async function performRecovery({ providers, ...recoveryInputs }: Payload) {
 
 export const recoveryHandler: ExtensionMessageHandler = (msg, _sender, respond) => {
     performRecovery(msg.payload)
-        .then(() => respond(BackgroundResponseStatus.Success))
-        .catch(() => respond(BackgroundResponseStatus.Error));
+        .then(() => respond({ status: BackgroundResponseStatus.Success }))
+        .catch((e) => respond({ status: BackgroundResponseStatus.Error, reason: e.toString() }));
     return true;
 };

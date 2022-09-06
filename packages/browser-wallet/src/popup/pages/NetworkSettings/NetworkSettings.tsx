@@ -88,7 +88,7 @@ export default function NetworkSettings() {
                 <div className="network-settings-page__pending-identity">
                     <p>{t('pendingIdentity.description')}</p>
                     <Button
-                        width="narrow"
+                        width="medium"
                         className="network-settings-page__pending-identity__button"
                         onClick={() => nav(-1)}
                     >
@@ -96,7 +96,7 @@ export default function NetworkSettings() {
                     </Button>
                     <Button
                         faded
-                        width="narrow"
+                        width="medium"
                         className="network-settings-page__pending-identity__button"
                         onClick={() => setPendingIdentity(undefined)}
                     >

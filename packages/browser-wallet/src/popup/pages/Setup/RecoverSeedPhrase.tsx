@@ -11,18 +11,20 @@ import Submit from '@popup/shared/Form/Submit';
 import { useTranslation } from 'react-i18next';
 import { encrypt } from '@popup/shared/crypto';
 import { encryptedSeedPhraseAtom, sessionPasscodeAtom } from '@popup/store/settings';
+import { validateMnemonic } from '@scure/bip39';
+import { wordlist } from '@scure/bip39/wordlists/english';
 import { setupRoutes } from './routes';
 
 type FormValues = {
     seedPhraseInput: string;
 };
 
-const validateSeedPhraseLength =
+const validateSeedPhrase =
     (message: string): Validate<string> =>
     (seedPhrase) =>
-        seedPhrase.split(/\s+/).length !== 24 ? message : true;
+        validateMnemonic(seedPhrase, wordlist) ? true : message;
 
-export default function EnterRecoveryPhrase() {
+export default function RecoverSeedPhrase() {
     const navigate = useNavigate();
     const { t } = useTranslation('setup');
     const setEncryptedSeedPhrase = useSetAtom(encryptedSeedPhraseAtom);
@@ -43,7 +45,7 @@ export default function EnterRecoveryPhrase() {
 
     return (
         <>
-            <PageHeader>Restore your wallet</PageHeader>
+            <PageHeader canGoBack>{t('recoverSeedPhrase.title')}</PageHeader>
             <div className="onboarding-setup__page-with-header">
                 <div className="onboarding-setup__page-with-header__description">
                     {t('confirmRecoveryPhrase.description')}
@@ -58,16 +60,12 @@ export default function EnterRecoveryPhrase() {
                                         name="seedPhraseInput"
                                         rules={{
                                             required: t('enterRecoveryPhrase.seedPhrase.required'),
-                                            validate: {
-                                                checkLength: validateSeedPhraseLength(
-                                                    t('enterRecoveryPhrase.seedPhrase.length')
-                                                ),
-                                            },
+                                            validate: validateSeedPhrase(t('enterRecoveryPhrase.seedPhrase.validate')),
                                         }}
                                     />
                                     <Submit
                                         className="onboarding-setup__page-with-header__continue-button"
-                                        width="narrow"
+                                        width="medium"
                                     >
                                         {t('continue')}
                                     </Submit>

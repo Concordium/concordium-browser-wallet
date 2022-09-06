@@ -5,7 +5,7 @@ import Button from '@popup/shared/Button';
 import { absoluteRoutes } from '@popup/constants/routes';
 import { useSetAtom, useAtomValue } from 'jotai';
 import { useTranslation } from 'react-i18next';
-import { seedPhraseAtom } from '@popup/state';
+import { isRecoveringAtom } from '@popup/state';
 import { networkConfigurationAtom } from '@popup/store/settings';
 import { setupRoutes } from './routes';
 // TODO Remove stagenet
@@ -15,8 +15,7 @@ export function ChooseNetwork() {
     const navigate = useNavigate();
     const { t } = useTranslation('setup');
     const setNetworkConfiguration = useSetAtom(networkConfigurationAtom);
-    // TODO Make a better way to check if we are recovering
-    const isRecovering = !useAtomValue(seedPhraseAtom);
+    const isRecovering = useAtomValue(isRecoveringAtom);
 
     const goToNext = () => {
         if (isRecovering) {
@@ -31,10 +30,24 @@ export function ChooseNetwork() {
             <PageHeader>Choose a network</PageHeader>
             <div className="onboarding-setup__page-with-header">
                 <div className="onboarding-setup__page-with-header__description">
-                    <p>
-                        {t('chooseNetwork.descriptionP1')} <i>{t('chooseNetwork.descriptionP2')}</i>
-                    </p>
-                    <p>{t('chooseNetwork.descriptionP3')}</p>
+                    {!isRecovering && (
+                        <>
+                            <p>
+                                {t('chooseNetwork.create.descriptionP1')}{' '}
+                                <i>{t('chooseNetwork.create.descriptionP2')}</i>
+                            </p>
+                            <p>{t('chooseNetwork.create.descriptionP3')}</p>
+                        </>
+                    )}
+                    {isRecovering && (
+                        <>
+                            <p>
+                                {t('chooseNetwork.restore.descriptionP1')}{' '}
+                                <i>{t('chooseNetwork.restore.descriptionP2')}</i>
+                            </p>
+                            <p>{t('chooseNetwork.restore.descriptionP3')}</p>
+                        </>
+                    )}
                 </div>
                 <div>
                     <Button
