@@ -35,6 +35,7 @@ const t: typeof en = {
         description: {
             during: 'Vent venligt mens der søges efter dine identiteter og konti.',
             after: 'Følgende identiteter og konti blev fundet.',
+            noneFound: 'Ingen identiteter blev fundet.',
         },
     },
     confirmRecoveryPhrase: {
