@@ -9,11 +9,15 @@ import PageHeader from '@popup/shared/PageHeader';
 import FormPassword from '@popup/shared/Form/Password';
 import { useSetAtom } from 'jotai';
 import { passcodeAtom } from '@popup/state';
+import FormCheckbox from '@popup/shared/Form/Checkbox';
+import urls from '@popup/constants/urls';
+import ExternalLink from '@popup/shared/ExternalLink';
 import { setupRoutes } from './routes';
 
 type FormValues = {
     passcode: string;
     passcodeAgain: string;
+    termsAndConditionsApproved: boolean;
 };
 
 export default function SetupPasscode() {
@@ -26,7 +30,7 @@ export default function SetupPasscode() {
         navigate(`${absoluteRoutes.setup.path}/${setupRoutes.createOrRestore}`);
     };
 
-    function validatePasscode(getValues: UseFormGetValues<FormValues>): Validate<string> {
+    function validatePasscode(getValues: UseFormGetValues<FormValues>): Validate<string | boolean> {
         return (passcodeAgain) =>
             getValues().passcode !== passcodeAgain ? t('setupPasscode.form.passcodeMismatch') : undefined;
     }
@@ -60,6 +64,21 @@ export default function SetupPasscode() {
                                         rules={{ validate: validatePasscode(f.getValues) }}
                                     />
                                 </div>
+                                <FormCheckbox
+                                    register={f.register}
+                                    name="termsAndConditionsApproved"
+                                    className="m-t-50"
+                                    description={
+                                        <div>
+                                            {t('setupPasscode.form.termsAndConditionsDescription')}
+                                            <ExternalLink
+                                                path={urls.termsAndConditions}
+                                                label={t('setupPasscode.form.termsAndConditionsLinkDescription')}
+                                            />
+                                        </div>
+                                    }
+                                    rules={{ required: t('setupPasscode.form.termsAndConditionsRequired') }}
+                                />
                                 <Submit className="onboarding-setup__page-with-header__continue-button" width="medium">
                                     {t('continue')}
                                 </Submit>

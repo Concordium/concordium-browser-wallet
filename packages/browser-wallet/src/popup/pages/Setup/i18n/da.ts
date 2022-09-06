@@ -15,6 +15,9 @@ const t: typeof en = {
             passcodeRequired: 'Der skal vælges et kodeord',
             passcodeMismatch: 'Kodeordene er ikke ens',
             passcodeMinLength: 'Kodeordet skal bestå af mindst 6 tegn',
+            termsAndConditionsRequired: 'Det er påkrævet at læse og at acceptere vilkår og betingelser',
+            termsAndConditionsDescription: 'Jeg har læst og accepterer ',
+            termsAndConditionsLinkDescription: 'Vilkår og Betingelser',
         },
     },
     createRestore: {

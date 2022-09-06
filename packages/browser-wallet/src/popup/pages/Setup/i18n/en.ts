@@ -13,6 +13,9 @@ const t = {
             passcodeRequired: 'A passcode must be entered',
             passcodeMismatch: 'Passcode does not match',
             passcodeMinLength: 'Passcode must be at least 6 characters',
+            termsAndConditionsRequired: 'You must read and accept the terms and conditions',
+            termsAndConditionsDescription: 'I have read and agree to the ',
+            termsAndConditionsLinkDescription: 'Terms and Conditions',
         },
     },
     createRestore: {

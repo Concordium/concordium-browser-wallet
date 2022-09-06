@@ -64,6 +64,10 @@
                     margin-top: rem(10px);
                 }
             }
+
+            a {
+                text-decoration: underline;
+            }
         }
 
         &__continue-button {
