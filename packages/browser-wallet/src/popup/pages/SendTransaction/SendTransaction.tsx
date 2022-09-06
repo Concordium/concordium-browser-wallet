@@ -4,7 +4,7 @@ import { fullscreenPromptContext } from '@popup/page-layouts/FullscreenPromptLay
 import { useTranslation } from 'react-i18next';
 import { useLocation } from 'react-router-dom';
 import { AccountTransactionType, AccountAddress, SchemaVersion } from '@concordium/web-sdk';
-import { useCredential, usePrivateKey } from '@popup/shared/utils/account-helpers';
+import { usePrivateKey } from '@popup/shared/utils/account-helpers';
 import { sendTransaction, getDefaultExpiry } from '@popup/shared/utils/transaction-helpers';
 import { jsonRpcClientAtom } from '@popup/store/settings';
 import TransactionReceipt from '@popup/shared/TransactionReceipt/TransactionReceipt';
@@ -46,7 +46,6 @@ export default function SendTransaction({ onSubmit, onReject }: Props) {
     const cost = useAsyncMemo(getSimpleTransferCost, noOp, []);
 
     const { accountAddress, url } = state.payload;
-    const credential = useCredential(accountAddress);
     const key = usePrivateKey(accountAddress);
 
     const { type: transactionType, payload } = useMemo(
@@ -90,9 +89,7 @@ export default function SendTransaction({ onSubmit, onReject }: Props) {
 
     return (
         <>
-            {credential && (
-                <ConnectedBox accountAddress={credential.address} getUrl={() => Promise.resolve(new URL(url).origin)} />
-            )}
+            <ConnectedBox accountAddress={accountAddress} getUrl={() => Promise.resolve(new URL(url).origin)} />
             <div className="h-full flex-column align-center">
                 <div>{t('description', { dApp: displayUrl(url) })}</div>
                 <TransactionReceipt
