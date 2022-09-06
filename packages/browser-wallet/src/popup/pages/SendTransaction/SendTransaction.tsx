@@ -99,7 +99,7 @@ export default function SendTransaction({ onSubmit, onReject }: Props) {
                     transactionType={transactionType}
                     sender={accountAddress}
                     cost={cost}
-                    className="m-10"
+                    className="m-v-10"
                 >
                     <>
                         {transactionType === AccountTransactionType.SimpleTransfer && (

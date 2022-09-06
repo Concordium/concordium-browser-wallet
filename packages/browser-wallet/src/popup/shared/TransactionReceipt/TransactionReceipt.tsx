@@ -20,9 +20,7 @@ export default function TransactionReceipt({ transactionType, sender, cost = 0n,
 
     return (
         <div className={clsx('transaction-receipt', className)}>
-            <p className="transaction-receipt__title">
-                {t('title', { typeName: getTransactionTypeName(transactionType) })}
-            </p>
+            <p className="transaction-receipt__title">{getTransactionTypeName(transactionType)}</p>
             <h5>{t('sender')}</h5>
             <DisplayAddress
                 className="transaction-receipt__address"

@@ -36,7 +36,6 @@ const t = {
     transactionReceipt: {
         sender: 'Sender account',
         cost: 'Estimated transaction fee',
-        title: 'Transaction: {{ typeName }}',
     },
 };
 
