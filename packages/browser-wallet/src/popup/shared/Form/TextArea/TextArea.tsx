@@ -26,7 +26,7 @@ export const TextArea = forwardRef<HTMLTextAreaElement, Props>(
                 )}
             >
                 <textarea
-                    className={clsx('form-input__area')}
+                    className="form-input__area"
                     style={{ resize: 'none' }}
                     ref={ref}
                     autoComplete="off"

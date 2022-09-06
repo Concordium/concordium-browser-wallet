@@ -35,10 +35,10 @@
         background-color: $color-input-bg;
         font-size: rem(10px);
         color: $color-text;
-        height: rem(32px);
         border: rem(1px) solid $color-grey;
         border-radius: rem(5px);
         padding: rem(12px) rem(5px) rem(5px);
+        height: 100%;
         width: 100%;
         outline: none;
         @include transition(border-color);

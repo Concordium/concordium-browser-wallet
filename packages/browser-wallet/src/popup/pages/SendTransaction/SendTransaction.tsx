@@ -114,7 +114,7 @@ export default function SendTransaction({ onSubmit, onReject }: Props) {
                     </>
                 </TransactionReceipt>
                 <br />
-                <div className="flex p-b-10">
+                <div className="flex p-b-10 m-t-auto">
                     <Button width="narrow" className="m-r-10" onClick={withClose(onReject)}>
                         {t('deny')}
                     </Button>

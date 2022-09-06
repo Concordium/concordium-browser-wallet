@@ -1,9 +1,13 @@
-import { fullscreenPromptContext } from '@popup/page-layouts/FullscreenPromptLayout';
 import React, { useContext, useCallback, useState } from 'react';
+import { fullscreenPromptContext } from '@popup/page-layouts/FullscreenPromptLayout';
 import { useTranslation } from 'react-i18next';
 import { useLocation } from 'react-router-dom';
 import { signMessage, buildBasicAccountSigner, AccountTransactionSignature } from '@concordium/web-sdk';
 import { usePrivateKey } from '@popup/shared/utils/account-helpers';
+import { displayUrl } from '@popup/shared/utils/string-helpers';
+import { TextArea } from '@popup/shared/Form/TextArea';
+import ConnectedBox from '@popup/pages/Account/ConnectedBox';
+import Button from '@popup/shared/Button';
 
 type Props = {
     onSubmit(signature: AccountTransactionSignature): void;
@@ -15,6 +19,7 @@ interface Location {
         payload: {
             accountAddress: string;
             message: string;
+            url: string;
         };
     };
 }
@@ -24,8 +29,8 @@ export default function SignMessage({ onSubmit, onReject }: Props) {
     const [error, setError] = useState();
     const { t } = useTranslation('signMessage');
     const { withClose } = useContext(fullscreenPromptContext);
-    const address = state.payload.accountAddress;
-    const key = usePrivateKey(address);
+    const { accountAddress, url } = state.payload;
+    const key = usePrivateKey(accountAddress);
 
     const onClick = useCallback(async () => {
         if (!key) {
@@ -36,26 +41,31 @@ export default function SignMessage({ onSubmit, onReject }: Props) {
 
     return (
         <>
-            <div>{t('description', { address })}</div>
-            <p>{state.payload.message}</p>
-            <button
-                type="button"
-                onClick={() =>
-                    onClick()
-                        .then(withClose(onSubmit))
-                        .catch((e) => setError(e))
-                }
-            >
-                {t('sign')}
-            </button>
-            <button type="button" onClick={withClose(onReject)}>
-                {t('deny')}
-            </button>
-            {error && (
-                <p>
-                    {t('error')}: {error}
-                </p>
-            )}
+            <ConnectedBox accountAddress={accountAddress} getUrl={() => Promise.resolve(new URL(url).origin)} />
+            <div className="h-full flex-column align-center">
+                <div>{t('description', { dApp: displayUrl(url) })}</div>
+                <TextArea className="m-v-20 w-full flex-child-fill" value={state.payload.message} />
+                <div className="flex p-b-10  m-t-auto">
+                    <Button width="narrow" className="m-r-10" onClick={withClose(onReject)}>
+                        {t('reject')}
+                    </Button>
+                    <Button
+                        width="narrow"
+                        onClick={() =>
+                            onClick()
+                                .then(withClose(onSubmit))
+                                .catch((e) => setError(e))
+                        }
+                    >
+                        {t('sign')}
+                    </Button>
+                </div>
+                {error && (
+                    <p>
+                        {t('error')}: {error}
+                    </p>
+                )}
+            </div>
         </>
     );
 }
