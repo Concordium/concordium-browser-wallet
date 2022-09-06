@@ -217,7 +217,7 @@ export default function TransactionList({ onTransactionClick }: TransactionListP
     }, [accountAddress]);
 
     useEffect(() => {
-        if (amount && accountInfo?.accountAmount !== amount) {
+        if (amount !== undefined && accountInfo?.accountAmount !== amount) {
             getNewTransactions();
         }
         setAmount(accountInfo?.accountAmount);

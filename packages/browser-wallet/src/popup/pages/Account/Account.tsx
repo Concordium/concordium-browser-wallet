@@ -7,6 +7,7 @@ import MenuButton from '@popup/shared/MenuButton';
 import { getCurrentOpenTabUrl } from '@popup/shared/utils/tabs';
 import clsx from 'clsx';
 import { useSelectedCredential } from '@popup/shared/utils/account-helpers';
+import { CreationStatus } from '@shared/storage/types';
 import { accountRoutes } from './routes';
 import { accountSettingsRoutes } from './AccountSettings/routes';
 import AccountActions from './AccountActions';
@@ -14,6 +15,7 @@ import DisplayAddress from './DisplayAddress';
 import AccountDetails from './AccountDetails';
 import AccountSettings from './AccountSettings';
 import TransactionLog from './TransactionLog/TransactionLog';
+import SendCcd from './SendCcd';
 
 function ConnectedBox({ setDetailsExpanded }: { setDetailsExpanded: React.Dispatch<React.SetStateAction<boolean>> }) {
     const { t } = useTranslation('account');
@@ -55,7 +57,7 @@ function Account({
 
     const selectedCred = useSelectedCredential();
 
-    const isConfirmed = !selectedCred || selectedCred.status === 'confirmed';
+    const isConfirmed = !selectedCred || selectedCred.status === CreationStatus.Confirmed;
 
     return (
         <div className="flex-column justify-space-between align-center h-full relative">
@@ -95,7 +97,7 @@ export default function AccountRoutes() {
         <Routes>
             <Route element={<Account detailsExpanded={detailsExpanded} setDetailsExpanded={setDetailsExpanded} />}>
                 <Route index element={<TransactionLog setDetailsExpanded={setDetailsExpanded} />} />
-                <Route path={accountRoutes.send} element={<div>Send CCD</div>} />
+                <Route path={`${accountRoutes.send}/*`} element={<SendCcd setDetailsExpanded={setDetailsExpanded} />} />
                 <Route path={accountRoutes.receive} element={<DisplayAddress />} />
                 <Route path={`${accountRoutes.settings}/*`} element={<AccountSettings />} />
             </Route>

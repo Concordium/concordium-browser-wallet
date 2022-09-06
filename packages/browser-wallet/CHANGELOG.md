@@ -4,6 +4,8 @@
 
 ### Added
 
+-   Toasts for showing errors when failing to retrieve account balance or transaction history.
+-   Send CCD page.
 -   Transaction history is now updated on balance changes, so that the new transactions are retrieved.
 
 ### Changed
@@ -26,7 +28,6 @@
 -   Export private key account settings page.
 -   Identity issuance.
 -   Account creation.
--   Toasts for showing errors when failing to retrieve account balance or transaction history.
 
 ### Changed
 

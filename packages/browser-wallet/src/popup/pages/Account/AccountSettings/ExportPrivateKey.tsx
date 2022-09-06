@@ -54,7 +54,7 @@ export default function ExportPrivateKey() {
                 </div>
                 <Button
                     className="export-private-key-page__button"
-                    width="narrow"
+                    width="medium"
                     onClick={() => nav(absoluteRoutes.home.account.path)}
                 >
                     {t('done')}
@@ -82,7 +82,7 @@ export default function ExportPrivateKey() {
                             />
                             <Submit
                                 className="export-private-key-page__button"
-                                width="narrow"
+                                width="medium"
                                 disabled={f.formState.isSubmitting}
                             >
                                 {t('show')}

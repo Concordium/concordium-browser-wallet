@@ -219,3 +219,25 @@ $handle-scale: scale(1.02);
         }
     }
 }
+
+.form-ccd-input {
+    &__field {
+        padding-left: rem(12.5px);
+    }
+
+    &__symbol {
+        position: absolute;
+        top: rem(13.1px);
+        margin: 0;
+        left: rem(6px);
+    }
+
+    &__max {
+        position: absolute;
+        top: rem(10px);
+        right: rem(10px);
+        font-size: rem(8px) !important;
+        height: rem(15px) !important;
+        padding: 0 rem(5px) !important;
+    }
+}

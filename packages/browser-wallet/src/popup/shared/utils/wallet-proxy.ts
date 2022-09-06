@@ -256,3 +256,9 @@ export async function getIdentityProviders(): Promise<IdentityProvider[]> {
     const response = await (await getWalletProxy()).get(proxyPath);
     return response.data;
 }
+
+export async function getSimpleTransferCost(): Promise<bigint> {
+    const proxyPath = `/v0/transactionCost?type=simpleTransfer`;
+    const response = await (await getWalletProxy()).get(proxyPath);
+    return BigInt(response.data.cost);
+}
