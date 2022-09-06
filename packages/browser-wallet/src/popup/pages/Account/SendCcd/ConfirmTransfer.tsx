@@ -74,7 +74,7 @@ export default function ConfirmTransfer({ setDetailsExpanded, cost }: Props) {
                 <DisplaySimpleTransfer payload={payload} />
             </TransactionReceipt>
             {!hash && (
-                <div className="flex justify-center m-b-10 m-h-20">
+                <div className="flex justify-center p-b-10 m-h-20">
                     <Button width="narrow" className="m-r-10" onClick={() => nav(`../`, { state: { payload } })}>
                         {t('sendCcd.buttons.back')}
                     </Button>
@@ -84,9 +84,11 @@ export default function ConfirmTransfer({ setDetailsExpanded, cost }: Props) {
                 </div>
             )}
             {hash && (
-                <Button width="medium" className="m-b-10" onClick={() => nav(absoluteRoutes.home.account.path)}>
-                    {t('sendCcd.buttons.finish')}
-                </Button>
+                <div className="p-b-10">
+                    <Button width="medium" className="m-b-10" onClick={() => nav(absoluteRoutes.home.account.path)}>
+                        {t('sendCcd.buttons.finish')}
+                    </Button>
+                </div>
             )}
         </div>
     );
