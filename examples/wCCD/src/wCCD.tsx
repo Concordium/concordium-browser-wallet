@@ -5,6 +5,8 @@ import { detectConcordiumProvider } from '@concordium/browser-wallet-api-helpers
 import * as leb from '@thi.ng/leb128';
 import { wrap, unwrap, state, CONTRACT_NAME_PROXY, CONTRACT_NAME_IMPLEMENTATION, CONTRACT_NAME_STATE } from './utils';
 
+import ArrowIcon from './assets/Arrow.svg';
+
 /** If you want to test admin functions of the wCCD contract,
  * it will be necessary to instantiate your own wCCD contract using an account available in the browser wallet,
  * and change these constants to match the indexes of the instances.
@@ -18,54 +20,36 @@ const WCCD_STATE_INDEX = 864n;
 
 const CONTRACT_SUB_INDEX = 0n;
 
-const mystyle = {
+const blackCardStyle = {
     backgroundColor: 'black',
+    color: 'white',
+    width: '484px',
+    borderRadius: 20,
+    margin: '20px 0px 20px 0px',
+    padding: '29px 18px',
+    border: '1px solid #308274',
+};
+
+const ButtonStyle = {
     color: 'white',
     borderRadius: 20,
     margin: '20px 0px 20px 0px',
     padding: '10px',
-    border: '1px solid #308274',
+    width: '100%',
+    border: '1px solid #26685D',
+    backgroundColor: '#308274',
+    cursor: 'pointer',
 };
 
-const mystyle2 = {
-    backgroundColor: 'black',
+const InputFieldStyle = {
+    backgroundColor: '#181817',
     color: 'white',
     borderRadius: 20,
-    margin: '20px 0px 20px 0px',
-    padding: '10px',
+    width: '100%',
     border: '1px solid #308274',
-};
-
-const mystyle3 = {
-    backgroundColor: 'black',
-    color: 'white',
-    borderRadius: 20,
     margin: '20px 0px 20px 0px',
-    padding: '10px',
-    border: '1px solid #308274',
+    padding: '10px 20px',
 };
-
-const mystyle4 = {
-    backgroundColor: 'black',
-    color: 'white',
-    borderRadius: 20,
-    margin: '20px 0px 20px 0px',
-    padding: '10px',
-    border: '1px solid #308274',
-};
-
-async function updateStateViewBalanceProxy(setAmountProxy: (x: bigint) => void) {
-    const provider = await detectConcordiumProvider();
-    const res = await provider.getJsonRpcClient().invokeContract({
-        method: `${CONTRACT_NAME_PROXY}.viewBalance`,
-        contract: { index: WCCD_PROXY_INDEX, subindex: CONTRACT_SUB_INDEX },
-    });
-
-    if (!res || res.tag === 'failure' || !res.returnValue) {
-        throw new Error(`Expected succesful invocation`);
-    }
-    setAmountProxy(toBuffer(res.returnValue, 'hex').readBigUInt64LE(0) as bigint);
-}
 
 async function updateStateWCCDBalanceAccount(account: string, setAmountAccount: (x: bigint) => void) {
     const accountAddressBytes = new AccountAddress(account).decodedAddress;
@@ -98,14 +82,10 @@ export default function wCCD({ handleGetAccount }: Props) {
     const { account, isConnected } = useContext(state);
     const [ownerProxy, setOwnerProxy] = useState<string>();
     const [ownerImplementation, setOwnerImplementation] = useState<string>();
-    const [hashWrap, setHashWrap] = useState<string>();
-    const [hashTextWrap, setHashTextWrap] = useState<string>();
-    const [hashUnwrap, setHashUnwrap] = useState<string>();
-    const [hashTextUnwrap, setHashTextUnwrap] = useState<string>();
-    const [amountProxy, setAmountProxy] = useState<bigint>(0n);
+    const [isWrapping, setIsWrapping] = useState<boolean>(true);
+    const [hash, setHash] = useState<string>();
     const [amountAccount, setAmountAccount] = useState<bigint>(0n);
-    const inputWrap = useRef<HTMLInputElement>(null);
-    const inputUnwrap = useRef<HTMLInputElement>(null);
+    const inputValue = useRef<HTMLInputElement>(null);
 
     useEffect(() => {
         if (isConnected) {
@@ -142,12 +122,8 @@ export default function wCCD({ handleGetAccount }: Props) {
                     console.log(ownerImplementation);
                 });
         }
-    }, [isConnected]);
 
-    // The internal state of the wCCD smart contract.
-    useEffect(() => {
         if (isConnected) {
-            updateStateViewBalanceProxy(setAmountProxy);
             if (account) {
                 updateStateWCCDBalanceAccount(account, setAmountAccount);
             }
@@ -162,131 +138,137 @@ export default function wCCD({ handleGetAccount }: Props) {
         []
     );
 
+    useEffect(() => {
+        if (account) {
+            updateStateWCCDBalanceAccount(account, setAmountAccount);
+        }
+    }, [account]);
+
     return (
         <>
             <h1 className="stored">CCD &lt;-&gt; WCCD Smart Contract</h1>
             <h2 className="stored">Wrap and unwrap your CCDs and wCCDs on the Concordium Testnet</h2>
-            <div style={mystyle}>
-                <div style={mystyle2}>
-                    <div>
-                        {isConnected && `Connected: ${account}`}
-                        {!isConnected && (
-                            <>
-                                <p>No wallet connection</p>
-                                <button type="button" onClick={handleOnClick}>
-                                    Connect
-                                </button>
-                            </>
-                        )}
-                    </div>
-                </div>
-                <div style={mystyle3}>
-                    <div>Text</div>
-                </div>
-                <div style={mystyle4}>
-                    <div>Text</div>
+            <div style={blackCardStyle}>
+                <div>
+                    {isConnected && (
+                        <>
+                            <div>Connected to</div>
+                            <button
+                                className="link"
+                                type="button"
+                                onClick={() => {
+                                    window.open(
+                                        `https://testnet.ccdscan.io/?dcount=1&dentity=account&daddress=${account}`,
+                                        '_blank',
+                                        'noopener,noreferrer'
+                                    );
+                                }}
+                            >
+                                {' '}
+                                {account}{' '}
+                            </button>
+                        </>
+                    )}
+                    {!isConnected && (
+                        <button style={ButtonStyle} type="button" onClick={handleOnClick}>
+                            Connect Wallet
+                        </button>
+                    )}
                 </div>
                 {ownerProxy === undefined ? (
                     <div>Loading wCCD contract...</div>
                 ) : (
                     <>
-                        <div>CCD Balance on wCCD Proxy:</div>
-                        <h1 className="stored">{Number(amountProxy) / 1000000} CCD</h1>
-                        <div>{`wCCD Balance of connected account: ${account}:`}</div>
+                        <div>wCCD Balance of connected account</div>
                         <h1 className="stored">{Number(amountAccount) / 1000000} WCCD</h1>
                     </>
                 )}
+                <div className="container">
+                    <div>CCD</div>
+                    <button className="switch" type="button" onClick={() => setIsWrapping(!isWrapping)}>
+                        {isWrapping ? (
+                            <ArrowIcon height="25" />
+                        ) : (
+                            <ArrowIcon style={{ transform: 'scaleX(-1)' }} height="25" />
+                        )}
+                    </button>
+                    <div>WCCD</div>
+                </div>
+                <label>
+                    <input
+                        className="input"
+                        style={InputFieldStyle}
+                        type="number"
+                        placeholder="0.00"
+                        ref={inputValue}
+                    />
+                    <button
+                        style={ButtonStyle}
+                        type="button"
+                        disabled={account === undefined}
+                        onClick={() => {
+                            if (account) {
+                                if (isWrapping) {
+                                    wrap(
+                                        account,
+                                        WCCD_PROXY_INDEX,
+                                        setHash,
+                                        CONTRACT_SUB_INDEX,
+                                        inputValue.current?.valueAsNumber
+                                    );
+                                } else {
+                                    unwrap(
+                                        account,
+                                        WCCD_PROXY_INDEX,
+                                        setHash,
+                                        CONTRACT_SUB_INDEX,
+                                        inputValue.current?.valueAsNumber
+                                    );
+                                }
+                            }
+                        }}
+                    >
+                        {isWrapping ? 'Wrap' : 'Unwrap'}
+                    </button>
+                </label>
+                <div>Transaction status (May take a moment to finalize)</div>
+                <button
+                    className="link"
+                    type="button"
+                    onClick={() => {
+                        window.open(
+                            `https://testnet.ccdscan.io/?dcount=1&dentity=transaction&dhash=${hash}`,
+                            '_blank',
+                            'noopener,noreferrer'
+                        );
+                    }}
+                >
+                    {' '}
+                    {hash}{' '}
+                </button>
+                <br />
+                <div style={{ color: 'white' }}>Refresh values</div>
+                <button
+                    type="button"
+                    onClick={() => {
+                        if (account) {
+                            updateStateWCCDBalanceAccount(account, setAmountAccount);
+                        }
+                    }}
+                >
+                    ↻
+                </button>
+                <br />
+                <br />
+                <a
+                    style={{ color: 'white' }}
+                    href="https://developer.concordium.software/en/mainnet/smart-contracts/tutorials/wCCD/index.html"
+                    target="_blank"
+                    rel="noreferrer"
+                >
+                    You can read more about how to make a wrapper like this here.
+                </a>
             </div>
-            <br />
-            <div>Refresh values</div>
-            <button
-                type="button"
-                onClick={() => {
-                    updateStateViewBalanceProxy(setAmountProxy);
-                    if (account) {
-                        updateStateWCCDBalanceAccount(account, setAmountAccount);
-                    }
-                }}
-            >
-                ↻
-            </button>
-            <br />
-            <label>
-                <div className="container">
-                    <input className="input" type="number" placeholder="Wrap amount" ref={inputWrap} />
-                    <button
-                        className="deposit"
-                        type="button"
-                        onClick={() =>
-                            account &&
-                            wrap(
-                                account,
-                                WCCD_PROXY_INDEX,
-                                setHashWrap,
-                                setHashTextWrap,
-                                CONTRACT_SUB_INDEX,
-                                inputWrap.current?.valueAsNumber
-                            )
-                        }
-                        disabled={account === undefined}
-                    >
-                        Click here to wrap
-                    </button>
-                </div>
-                <button
-                    className="link"
-                    type="button"
-                    onClick={() => {
-                        window.open(
-                            `https://testnet.ccdscan.io/?dcount=1&dentity=transaction&dhash=${hashWrap}`,
-                            '_blank',
-                            'noopener,noreferrer'
-                        );
-                    }}
-                >
-                    {' '}
-                    {hashTextWrap}{' '}
-                </button>
-            </label>
-            <label>
-                <div className="container">
-                    <input className="input" type="number" placeholder="Unwrap amount" ref={inputUnwrap} />
-                    <button
-                        className="deposit"
-                        type="button"
-                        onClick={() =>
-                            account &&
-                            unwrap(
-                                account,
-                                WCCD_PROXY_INDEX,
-                                setHashUnwrap,
-                                setHashTextUnwrap,
-                                CONTRACT_SUB_INDEX,
-                                inputUnwrap.current?.valueAsNumber
-                            )
-                        }
-                        disabled={account === undefined}
-                    >
-                        Click here to unwrap
-                    </button>
-                </div>
-                <button
-                    className="link"
-                    type="button"
-                    onClick={() => {
-                        window.open(
-                            `https://testnet.ccdscan.io/?dcount=1&dentity=transaction&dhash=${hashUnwrap}`,
-                            '_blank',
-                            'noopener,noreferrer'
-                        );
-                    }}
-                >
-                    {' '}
-                    {hashTextUnwrap}{' '}
-                </button>
-            </label>
-            <br />
-            <br />
         </>
     );
 }

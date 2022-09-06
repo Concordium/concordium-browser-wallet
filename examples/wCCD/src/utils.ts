@@ -7,21 +7,12 @@ export const CONTRACT_NAME_PROXY = 'CIS2-wCCD-Proxy';
 export const CONTRACT_NAME_IMPLEMENTATION = 'CIS2-wCCD';
 export const CONTRACT_NAME_STATE = 'CIS2-wCCD-State';
 
-const TX_LINK_TEXT =
-    'Click me to see your tx in the block explorer (wait some seconds before clicking to ensure tx is included in the blockchain)';
 /**
  * Action for wrapping some CCD to WCCD in the WCCD smart contract instance
  */
 
-export const wrap = (
-    account: string,
-    index: bigint,
-    setHash: (x: string) => void,
-    setHashText: (x: string) => void,
-    subindex = 0n,
-    amount = 0
-) => {
-    setHashText('');
+export const wrap = (account: string, index: bigint, setHash: (x: string) => void, subindex = 0n, amount = 0) => {
+    setHash('');
 
     if (!Number.isInteger(amount) || amount <= 0) {
         return;
@@ -53,7 +44,6 @@ export const wrap = (
                 )
                 .then((txHash) => {
                     setHash(txHash);
-                    setHashText(TX_LINK_TEXT);
                 })
                 .catch(alert);
         })
@@ -66,15 +56,8 @@ export const wrap = (
  * Action for unwrapping some WCCD to CCD in the WCCD smart contract instance
  */
 
-export const unwrap = (
-    account: string,
-    index: bigint,
-    setHash: (x: string) => void,
-    setHashText: (x: string) => void,
-    subindex = 0n,
-    amount = 0
-) => {
-    setHashText('');
+export const unwrap = (account: string, index: bigint, setHash: (x: string) => void, subindex = 0n, amount = 0) => {
+    setHash('');
 
     if (!Number.isInteger(amount) || amount <= 0) {
         return;
@@ -110,7 +93,6 @@ export const unwrap = (
                 )
                 .then((txHash) => {
                     setHash(txHash);
-                    setHashText(TX_LINK_TEXT);
                 })
                 .catch(alert);
         })

@@ -17,11 +17,21 @@ body {
     color: white;
 }
 
+.input.input {
+    width: 100%;
+    box-sizing: border-box;
+}
+
+.switch {
+    background: #308274;
+    cursor: pointer;
+}
+
 .link {
     background: none !important;
     border: none;
     padding: 0 !important;
-    color: #069;
+    color: #308274;
     text-decoration: underline;
     cursor: pointer;
 }
@@ -34,6 +44,11 @@ body {
 
 .connected {
     color: green;
+}
+
+.container2 {
+    display: flex;
+    justify-content: center;
 }
 
 .container {
