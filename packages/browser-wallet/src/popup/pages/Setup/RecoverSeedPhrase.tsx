@@ -60,16 +60,12 @@ export default function RecoverSeedPhrase() {
                                         name="seedPhraseInput"
                                         rules={{
                                             required: t('enterRecoveryPhrase.seedPhrase.required'),
-                                            validate: {
-                                                checkLength: validateSeedPhrase(
-                                                    t('enterRecoveryPhrase.seedPhrase.validate')
-                                                ),
-                                            },
+                                            validate: validateSeedPhrase(t('enterRecoveryPhrase.seedPhrase.validate')),
                                         }}
                                     />
                                     <Submit
                                         className="onboarding-setup__page-with-header__continue-button"
-                                        width="narrow"
+                                        width="medium"
                                     >
                                         {t('continue')}
                                     </Submit>

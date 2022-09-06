@@ -42,10 +42,10 @@ export function ChooseNetwork() {
                     {isRecovering && (
                         <>
                             <p>
-                                {t('chooseNetwork.create.descriptionP1')}{' '}
-                                <i>{t('chooseNetwork.create.descriptionP2')}</i>
+                                {t('chooseNetwork.restore.descriptionP1')}{' '}
+                                <i>{t('chooseNetwork.restore.descriptionP2')}</i>
                             </p>
-                            <p>{t('chooseNetwork.create.descriptionP3')}</p>
+                            <p>{t('chooseNetwork.restore.descriptionP3')}</p>
                         </>
                     )}
                 </div>
