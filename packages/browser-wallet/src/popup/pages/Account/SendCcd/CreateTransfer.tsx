@@ -16,7 +16,7 @@ import {
 } from '@popup/shared/utils/transaction-helpers';
 import { useLocation, useNavigate } from 'react-router-dom';
 import DisplayCost from '@popup/shared/TransactionReceipt/DisplayCost';
-import { useAccountInfo } from '@popup/shared/AccountInfoEmitterContext';
+import { useAccountInfo } from '@popup/shared/AccountInfoListenerContext';
 import { useSelectedCredential } from '@popup/shared/utils/account-helpers';
 import { routes } from './routes';
 

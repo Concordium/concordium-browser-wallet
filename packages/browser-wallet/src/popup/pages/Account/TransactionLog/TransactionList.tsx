@@ -7,7 +7,7 @@ import AutoSizer from 'react-virtualized-auto-sizer';
 import { BrowserWalletTransaction } from '@popup/shared/utils/transaction-history-types';
 import { useTranslation } from 'react-i18next';
 import { addToastAtom } from '@popup/state';
-import { useAccountInfo } from '@popup/shared/AccountInfoEmitterContext';
+import { useAccountInfo } from '@popup/shared/AccountInfoListenerContext';
 import { useSelectedCredential } from '@popup/shared/utils/account-helpers';
 import { useSetAtom } from 'jotai';
 import TransactionElement, { transactionElementHeight } from './TransactionElement';

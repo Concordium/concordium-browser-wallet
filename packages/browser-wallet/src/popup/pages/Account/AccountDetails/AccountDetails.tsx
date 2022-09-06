@@ -8,7 +8,7 @@ import { identityNamesAtom } from '@popup/store/identity';
 import { displaySplitAddress } from '@popup/shared/utils/account-helpers';
 import VerifiedIcon from '@assets/svg/verified-stamp.svg';
 import { CreationStatus, WalletCredential } from '@shared/storage/types';
-import { useAccountInfo } from '@popup/shared/AccountInfoEmitterContext';
+import { useAccountInfo } from '@popup/shared/AccountInfoListenerContext';
 
 type AmountProps = {
     label: string;

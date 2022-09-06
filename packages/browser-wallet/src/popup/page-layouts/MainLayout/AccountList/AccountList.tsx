@@ -12,7 +12,7 @@ import { useTranslation } from 'react-i18next';
 import { displaySplitAddress } from '@popup/shared/utils/account-helpers';
 import { WalletCredential } from '@shared/storage/types';
 import JSONBig from 'json-bigint';
-import { useAccountInfo } from '@popup/shared/AccountInfoEmitterContext';
+import { useAccountInfo } from '@popup/shared/AccountInfoListenerContext';
 import EntityList from '../EntityList';
 
 export type Account = { address: string };
@@ -61,11 +61,13 @@ const AccountList = forwardRef<HTMLDivElement, Props>(({ className, onSelect }, 
     const accountInfos = accounts.map(useAccountInfo);
 
     useEffect(() => {
+        const updatedTotalBalanceMap = new Map<string, bigint>();
         for (const info of accountInfos) {
             if (info) {
-                setTotalBalanceMap(new Map(totalBalanceMap.set(info.accountAddress, info.accountAmount)));
+                updatedTotalBalanceMap.set(info.accountAddress, info.accountAmount);
             }
         }
+        setTotalBalanceMap(updatedTotalBalanceMap);
     }, [JSONBig.stringify(accountInfos)]);
 
     return (
