@@ -51,6 +51,10 @@
     }
 
     &--narrow {
+        width: rem(75px);
+    }
+
+    &--medium {
         width: rem(120px);
     }
 

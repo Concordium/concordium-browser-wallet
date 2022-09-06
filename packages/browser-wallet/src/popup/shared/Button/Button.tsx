@@ -21,7 +21,7 @@ export type ButtonProps = Pick<
     /**
      * Defaults to "dynamic", i.e. "width: auto;"
      */
-    width?: 'wide' | 'narrow' | 'dynamic';
+    width?: 'wide' | 'medium' | 'narrow' | 'dynamic';
 };
 
 type PolymorphicProps<A extends ElementType = 'button'> = PolymorphicComponentProps<A, ButtonProps>;
@@ -52,6 +52,7 @@ export default function Button<A extends ElementType = 'button'>({
                 faded && 'button--faded',
                 danger && 'button--danger',
                 width === 'narrow' && 'button--narrow',
+                width === 'medium' && 'button--medium',
                 width === 'wide' && 'button--wide',
                 className
             )}

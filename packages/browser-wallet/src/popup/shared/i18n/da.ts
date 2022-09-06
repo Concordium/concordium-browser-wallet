@@ -15,6 +15,22 @@ const t: typeof en = {
         confirmed: 'Godkendt af',
         rejected: 'Afvist af',
     },
+    utils: {
+        address: {
+            required: 'Indtast en addresse',
+            invalid: 'Ugyldig addresse',
+        },
+        ccdAmount: {
+            required: 'Indtast et beløb',
+            invalid: 'Ugyldigt beløb',
+            insufficient: 'Ikke nok penge',
+            zero: 'Beløbet må ikke være nul',
+        },
+    },
+    transactionReceipt: {
+        sender: 'Afsender',
+        cost: 'Estimerede transaktionsomkostninger',
+    },
 };
 
 export default t;

@@ -5,6 +5,7 @@ const t = {
     accountAddress: 'Account address',
     siteConnected: 'Connected',
     siteNotConnected: 'Not connected',
+    accountBalanceError: 'Unable to retrieve account balance',
     actions: {
         log: 'transaction log',
         send: 'send ccd',
@@ -15,7 +16,6 @@ const t = {
         total: 'Public balance total',
         atDisposal: 'Public amount at disposal',
         stakeAmount: 'Stake / delegation amount',
-        error: 'Unable to retrieve account balance',
     },
     settings: {
         connectedSites: {
@@ -31,6 +31,21 @@ const t = {
             show: 'Show private key',
             done: 'Done',
         },
+    },
+    sendCcd: {
+        labels: {
+            ccd: 'Enter amount to transfer',
+            recipient: 'Enter recipient address',
+        },
+        buttons: {
+            back: 'Back',
+            send: 'Send',
+            finish: 'Finish',
+            continue: 'Continue',
+        },
+        title: 'Send CCD',
+        receiptTitle: 'Transaction: Send CCD',
+        fee: 'Estimated transaction fee',
     },
     accountPending: 'This account is still pending finalization.',
 };

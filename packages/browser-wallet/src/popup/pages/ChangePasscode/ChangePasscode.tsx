@@ -83,7 +83,7 @@ export default function ChangePasscode() {
                             />
                             <Submit
                                 className="change-passcode-page__button"
-                                width="narrow"
+                                width="medium"
                                 disabled={f.formState.isSubmitting}
                             >
                                 {t('changePasscode')}

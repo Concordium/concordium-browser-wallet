@@ -29,7 +29,7 @@ function Intro() {
             </div>
             <Button
                 className="onboarding-setup__intro-wrapper__continue-button"
-                width="narrow"
+                width="medium"
                 onClick={() => navigate(setupRoutes.passcode)}
             >
                 {t('continue')}
