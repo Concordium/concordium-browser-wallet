@@ -3,9 +3,10 @@ import type en from './en';
 const t: typeof en = {
     title: 'Forbindelsesforespørgsel',
     description: 'Tillad denne hjemmeside at forbinde til kontoen {{selectedAccount}}',
+    waiting: 'Venter',
     actions: {
-        allow: 'Tillad',
-        reject: 'Afvis',
+        cancel: 'Afvis',
+        connect: 'Forbind',
     },
 };
 
