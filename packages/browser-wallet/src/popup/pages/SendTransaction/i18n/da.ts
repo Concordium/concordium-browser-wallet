@@ -17,6 +17,7 @@ const t: typeof en = {
     nrg: 'NRG',
     moduleReference: 'Modul reference',
     contractName: 'Kontrakt navn',
+    title: 'Underskriv transaktion',
 };
 
 export default t;
