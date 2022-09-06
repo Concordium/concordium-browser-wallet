@@ -67,6 +67,7 @@ const t: typeof en = {
         },
     },
     continue: 'Fortsæt',
+    retry: 'Prøv igen',
 };
 
 export default t;
