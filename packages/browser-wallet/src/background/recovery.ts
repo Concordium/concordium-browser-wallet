@@ -95,7 +95,7 @@ async function performRecovery({ providers, ...recoveryInputs }: Payload) {
 
 export const recoveryHandler: ExtensionMessageHandler = (msg, _sender, respond) => {
     performRecovery(msg.payload)
-        .then(() => respond(BackgroundResponseStatus.Success))
-        .catch(() => respond(BackgroundResponseStatus.Error));
+        .then(() => respond({ status: BackgroundResponseStatus.Success }))
+        .catch((e) => respond({ status: BackgroundResponseStatus.Error, reason: e.toString() }));
     return true;
 };

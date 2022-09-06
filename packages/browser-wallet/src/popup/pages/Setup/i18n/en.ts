@@ -33,6 +33,7 @@ const t = {
         description: {
             during: 'Searching for your IDs and accounts. Please wait.',
             after: 'The following identities and accounts were recovered.',
+            error: 'Recovery has failed. You can try again. \n Reason for failure:',
             noneFound: 'No identities were found.',
         },
     },
@@ -64,6 +65,7 @@ const t = {
         },
     },
     continue: 'Continue',
+    retry: 'Retry',
 };
 
 export default t;

@@ -11,9 +11,10 @@ import { identitiesAtom, identityProvidersAtom } from '@popup/store/identity';
 import PendingArrows from '@assets/svg/pending-arrows.svg';
 import Button from '@popup/shared/Button';
 import { absoluteRoutes } from '@popup/constants/routes';
-import { BackgroundResponseStatus } from '@shared/utils/types';
+import { BackgroundResponseStatus, RecoveryBackgroundResponse } from '@shared/utils/types';
 import { getIdentityProviders } from '@popup/shared/utils/wallet-proxy';
 import { getNet } from '@shared/utils/network-helpers';
+import { IdentityProvider, NetworkConfiguration } from '@shared/storage/types';
 
 // TODO: improve "error state"
 
@@ -35,7 +36,7 @@ function DisplayRecoveryResult() {
                 ))}
             </div>
             <Button
-                width="narrow"
+                width="medium"
                 className="onboarding-setup__recovery__button"
                 onClick={() => navigate(absoluteRoutes.home.account.path)}
             >
@@ -45,43 +46,60 @@ function DisplayRecoveryResult() {
     );
 }
 
+async function recovery(seedPhrase: string, network: NetworkConfiguration, providers: IdentityProvider[]) {
+    let global;
+    try {
+        const client = new JsonRpcClient(new HttpProvider(network.jsonRpcUrl));
+        global = await client.getCryptographicParameters();
+    } catch {
+        return { status: BackgroundResponseStatus.Error, reason: 'Unable fetch global parameters' };
+    }
+    if (!global) {
+        throw new Error('no global fetched');
+    }
+    return popupMessageHandler.sendInternalMessage(InternalMessageType.Recovery, {
+        providers,
+        globalContext: global.value,
+        seedAsHex: seedPhrase,
+        net: getNet(network),
+    });
+}
+
 export default function PerformRecovery() {
     const { t } = useTranslation('setup');
     const network = useAtomValue(networkConfigurationAtom);
     const seedPhrase = useAtomValue(seedPhraseAtom);
     const [providers, setProviders] = useAtom(identityProvidersAtom);
-    const [result, setResult] = useState<BackgroundResponseStatus>();
+    const [result, setResult] = useState<RecoveryBackgroundResponse>();
+    const [runRecovery, setRunRecovery] = useState<boolean>(true);
 
     useEffect(() => {
-        getIdentityProviders()
-            .then(setProviders)
-            .catch(() => setResult(BackgroundResponseStatus.Error));
-    }, []);
-
-    useEffect(() => {
-        if (!providers.length) {
+        if (!runRecovery) {
             return;
         }
+
+        setRunRecovery(false);
+
         if (!seedPhrase) {
-            throw new Error('no seed phrase');
+            setResult({ status: BackgroundResponseStatus.Error, reason: 'No seed phrase found' });
         }
 
-        // TODO: Maybe we should not create the client for each page
-        const client = new JsonRpcClient(new HttpProvider(network.jsonRpcUrl));
-        client.getCryptographicParameters().then((global) => {
-            if (!global) {
-                throw new Error('no global fetched');
-            }
-            popupMessageHandler
-                .sendInternalMessage(InternalMessageType.Recovery, {
-                    providers,
-                    globalContext: global.value,
-                    seedAsHex: seedPhrase,
-                    net: getNet(network),
+        if (!providers.length) {
+            getIdentityProviders()
+                .then((identitityProviders) => {
+                    setProviders(identitityProviders);
+                    recovery(seedPhrase, network, identitityProviders).then(setResult);
                 })
-                .then(setResult);
-        });
-    }, [providers.length]);
+                .catch(() =>
+                    setResult({
+                        status: BackgroundResponseStatus.Error,
+                        reason: 'Unable to get list of identity providers',
+                    })
+                );
+        } else {
+            recovery(seedPhrase, network, providers).then(setResult);
+        }
+    }, [runRecovery]);
 
     return (
         <>
@@ -95,8 +113,23 @@ export default function PerformRecovery() {
                         <PendingArrows className="identity-issuance__start__loading-arrows" />
                     </>
                 )}
-                {result === BackgroundResponseStatus.Success && <DisplayRecoveryResult />}
-                {result === BackgroundResponseStatus.Error && <p>Error!</p>}
+                {result?.status === BackgroundResponseStatus.Success && <DisplayRecoveryResult />}
+                {result?.status === BackgroundResponseStatus.Error && (
+                    <>
+                        <p>{t('performRecovery.description.error')}</p>
+                        <p>{result.reason}</p>
+                        <Button
+                            width="medium"
+                            className="onboarding-setup__recovery__button"
+                            onClick={() => {
+                                setResult(undefined);
+                                setRunRecovery(true);
+                            }}
+                        >
+                            {t('retry')}
+                        </Button>
+                    </>
+                )}
             </div>
         </>
     );
