@@ -26,13 +26,18 @@ interface Props {
 
 export default function AccountInfoEmitterContextProvider({ children }: Props) {
     const network = useAtomValue(networkConfigurationAtom);
+    const addToast = useSetAtom(addToastAtom);
     const [accountInfoEmitter, setAccountInfoEmitter] = useState<AccountInfoEmitter>();
+    const { t } = useTranslation();
 
     useEffect(() => {
         const emitter = new AccountInfoEmitter(network.jsonRpcUrl);
         emitter.listen();
         setAccountInfoEmitter(emitter);
+        const errorListener = () => addToast(t('account.error'));
+        emitter.on('error', errorListener);
         return () => {
+            emitter.removeListener('error', errorListener);
             emitter.stop();
         };
     }, [network]);
@@ -62,7 +67,7 @@ export function useAccountInfo(account: WalletCredential): AccountInfo | undefin
     useEffect(() => {
         if (accountInfoCache && accountInfoCache[address]) {
             setAccountInfo(JSONBig.parse(accountInfoCache[address]));
-        } else {
+        } else if (account.status === CreationStatus.Confirmed) {
             const client = new JsonRpcClient(new HttpProvider(jsonRpcUrl));
             client
                 .getConsensusStatus()
@@ -88,10 +93,7 @@ export function useAccountInfo(account: WalletCredential): AccountInfo | undefin
     useEffect(() => {
         if (account.status === CreationStatus.Confirmed && accountInfoEmitter) {
             const listener = accountInfoEmitter.subscribe(address, noOp);
-            const errorListener = () => addToast(t('account.error'));
-            accountInfoEmitter.on('error', errorListener);
             return () => {
-                accountInfoEmitter.removeListener('error', errorListener);
                 accountInfoEmitter.unsubscribe(address, listener);
             };
         }
