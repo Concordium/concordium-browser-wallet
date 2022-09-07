@@ -4,6 +4,7 @@ import { Outlet, useNavigate, useLocation } from 'react-router-dom';
 import { noOp } from 'wallet-common-helpers';
 import { absoluteRoutes } from '@popup/constants/routes';
 import Logo from '@assets/svg/concordium.svg';
+import Toast from '@popup/shared/Toast/Toast';
 
 import { isSpawnedWindow } from '@popup/shared/window-helpers';
 import { useSelectedCredential } from '@popup/shared/utils/account-helpers';
@@ -109,6 +110,7 @@ export default function FullscreenPromptLayout() {
                     <main className="fullscreen-prompt-layout__main">
                         <Outlet />
                     </main>
+                    <Toast />
                 </AccountContext>
             </div>
         </fullscreenPromptContext.Provider>

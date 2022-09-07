@@ -1,8 +1,8 @@
 const t = {
     description: '{{dApp}} suggests a transaction',
     sender: 'Sender',
-    submit: 'Send',
-    deny: 'Deny',
+    submit: 'Sign & submit',
+    deny: 'Reject',
     error: 'Error',
     receiver: 'Receiver',
     amount: 'Amount',
