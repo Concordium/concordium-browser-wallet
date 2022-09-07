@@ -1,4 +1,4 @@
-import type { IdentityObjectV1 } from '@concordium/web-sdk';
+import type { IdentityObjectV1, Versioned } from '@concordium/web-sdk';
 
 export enum ChromeStorageKey {
     ConnectedSites = 'connectedSites',
@@ -20,11 +20,6 @@ export enum Theme {
     Dark = 'dark',
 }
 
-export enum Network {
-    Testnet = 1,
-    Mainnet = 919,
-}
-
 /**
  * Used to describe the status of an identity or a credential
  */
@@ -38,7 +33,7 @@ export interface BaseIdentity {
     status: CreationStatus;
     name: string;
     index: number;
-    provider: number;
+    providerIndex: number;
 }
 
 export interface PendingIdentity extends BaseIdentity {
@@ -53,10 +48,7 @@ export interface RejectedIdentity extends BaseIdentity {
 
 export interface ConfirmedIdentity extends BaseIdentity {
     status: CreationStatus.Confirmed;
-    idObject: {
-        v: 0;
-        value: IdentityObjectV1;
-    };
+    idObject: Versioned<IdentityObjectV1>;
 }
 
 export type Identity = PendingIdentity | RejectedIdentity | ConfirmedIdentity;
@@ -88,6 +80,7 @@ export interface IpInfo {
  */
 export interface IdentityProviderMetaData {
     issuanceStart: string;
+    recoveryStart: string;
     icon: string;
     support: string;
 }
@@ -122,6 +115,7 @@ export interface BaseCredential {
     credNumber: number;
     status: CreationStatus;
     identityIndex: number;
+    providerIndex: number;
     // Policy (is in accountInfo)
     // CredentialIndex = 0
 }

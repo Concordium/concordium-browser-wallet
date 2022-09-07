@@ -17,6 +17,7 @@ import { InternalMessageType } from '@concordium/browser-wallet-message-hub';
 import { popupMessageHandler } from '@popup/shared/message-handler';
 import { BackgroundResponseStatus } from '@shared/utils/types';
 import { getNet } from '@shared/utils/network-helpers';
+import { addToastAtom } from '@popup/state';
 import AccountDetails from '../Account/AccountDetails';
 
 export default function Confirm() {
@@ -29,10 +30,11 @@ export default function Confirm() {
     const network = useAtomValue(networkConfigurationAtom);
     const providers = useAtomValue(identityProvidersAtom);
     const [buttonDisabled, setButtonDisabled] = useState(false);
+    const addToast = useSetAtom(addToastAtom);
 
     const identityProvider = useMemo(
-        () => providers.find((p) => p.ipInfo.ipIdentity === selectedIdentity?.provider),
-        [selectedIdentity?.provider]
+        () => providers.find((p) => p.ipInfo.ipIdentity === selectedIdentity?.providerIndex),
+        [selectedIdentity?.providerIndex]
     );
 
     if (!selectedIdentity || selectedIdentity.status !== CreationStatus.Confirmed) {
@@ -89,8 +91,10 @@ export default function Confirm() {
                 setSelectedAccount(response.address);
                 nav(absoluteRoutes.home.account.path);
             } else {
-                // TODO show error toast
+                addToast(response.error);
             }
+        } catch (e) {
+            addToast((e as Error).toString());
         } finally {
             setButtonDisabled(false);
         }

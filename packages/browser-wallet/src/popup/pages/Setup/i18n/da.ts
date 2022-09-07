@@ -27,26 +27,50 @@ const t: typeof en = {
         restore: 'Genskab',
     },
     recoveryPhrase: {
+        title: 'Dit recovery phrase',
         description: 'Skriv de 24 ord fra din recovery phrase ned. Husk at rækkefølgen er ordene er vigtig.',
     },
-    enterRecoveryPhrase: {
+    recoverSeedPhrase: {
+        title: 'Genskab din wallet',
+    },
+    performRecovery: {
+        title: 'Genskaber din wallet',
+        description: {
+            during: 'Vent venligt mens der søges efter dine identiteter og konti.',
+            after: 'Følgende identiteter og konti blev fundet.',
+            error: 'Genskabning fejlede. Du kan prøve igen. \n Årsag til fejlen:',
+            noneFound: 'Ingen identiteter blev fundet.',
+        },
+    },
+    confirmRecoveryPhrase: {
         description:
             'Venligst skriv dine 24 ord i den korrekte rækkefølge, adskilt med et mellemrum, for at bekræfte din hemmelige recovery phrase.',
+    },
+    enterRecoveryPhrase: {
         form: {
             required: 'En seed phrase skal indtastes',
             error: 'Der er en fejl i den valgte recovery phrase',
         },
         seedPhrase: {
             required: 'Indtast et 24 ord BIP 39 seed phrase',
-            length: 'Indtast 24 ord',
+            validate: 'Ugyldigt recovery phrase',
         },
     },
     chooseNetwork: {
-        descriptionP1: 'Her kan du vælge om du vil forbinde til Concordium Mainnet eller Testnet',
-        descriptionP2: 'Hvis du er usikker på hvad du skal vælge, så vælg Concordium Mainnet.',
-        descriptionP3: 'Du kan vælge et andet netværk via Indstillinger på et senere tidspunkt.',
+        create: {
+            descriptionP1: 'Her kan du vælge om du vil forbinde til Concordium Mainnet eller Testnet',
+            descriptionP2: 'Hvis du er usikker på hvad du skal vælge, så vælg Concordium Mainnet.',
+            descriptionP3: 'Du kan vælge et andet netværk via Indstillinger på et senere tidspunkt.',
+        },
+        restore: {
+            descriptionP1:
+                'Her kan du vælge om du vil genskabe dine identitier og konti fra Concordium Mainnet eller Testnet',
+            descriptionP2: 'Hvis du er usikker på hvad du skal vælge, så vælg Concordium Mainnet.',
+            descriptionP3: 'Du kan skifte til et andet netværk via Indstillinger på et senere tidspunkt.',
+        },
     },
     continue: 'Fortsæt',
+    retry: 'Prøv igen',
 };
 
 export default t;

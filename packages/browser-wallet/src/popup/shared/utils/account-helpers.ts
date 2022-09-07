@@ -16,8 +16,9 @@ export function useIdentityOf(cred?: WalletCredential) {
         if (!cred) {
             return undefined;
         }
-        return identities.find((id) => id.index === cred.identityIndex);
-    }, [cred, identities.length]);
+        return identities.find((id) => id.index === cred.identityIndex && id.providerIndex === cred.providerIndex);
+    }, [JSON.stringify(cred), identities.length]);
+
     return identity;
 }
 
@@ -50,7 +51,7 @@ export function usePrivateKey(accountAddress: string | undefined): string | unde
         }
 
         return ConcordiumHdWallet.fromHex(seedPhrase, getNet(network))
-            .getAccountSigningKey(0, identity.index, credential.credNumber)
+            .getAccountSigningKey(identity.providerIndex, identity.index, credential.credNumber)
             .toString('hex');
     }, [credential?.credId, seedPhrase, identity?.index]);
 

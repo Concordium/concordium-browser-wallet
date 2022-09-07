@@ -66,7 +66,7 @@ export function useAccountInfo(account: WalletCredential): AccountInfo | undefin
     const [accountInfo, setAccountInfo] = useState<AccountInfo>();
 
     useEffect(() => {
-        if (accountInfoCache && accountInfoCache[address]) {
+        if (accountInfoCache[address]) {
             setAccountInfo(JSONBig.parse(accountInfoCache[address]));
         } else if (account.status === CreationStatus.Confirmed) {
             const client = new JsonRpcClient(new HttpProvider(jsonRpcUrl));
@@ -89,7 +89,7 @@ export function useAccountInfo(account: WalletCredential): AccountInfo | undefin
                 })
                 .catch(() => addToast(t('account.error')));
         }
-    }, [genesisHash, address, accountInfoCache, accountInfoCache[address]]);
+    }, [genesisHash, address, accountInfoCache[address]]);
 
     useEffect(() => {
         if (account.status === CreationStatus.Confirmed && accountInfoEmitter) {
