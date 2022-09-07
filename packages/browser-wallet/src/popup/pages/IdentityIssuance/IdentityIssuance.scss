@@ -29,10 +29,6 @@
         }
     }
 
-    &__error {
-        color: $color-error;
-    }
-
     &__end {
         height: calc(100% - rem($page-header-height));
         display: flex;

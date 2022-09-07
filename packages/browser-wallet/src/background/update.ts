@@ -5,7 +5,7 @@ import { Identity, WalletCredential } from '@shared/storage/types';
 const identityLock = 'concordium_identity_lock';
 const credentialLock = 'concordium_credential_lock';
 
-export async function addIdentity(identity: Identity): Promise<void> {
+export async function addIdentity(identity: Identity | Identity[]): Promise<void> {
     return addToList(identityLock, identity, useIndexedStorage(storedIdentities, getGenesisHash));
 }
 
