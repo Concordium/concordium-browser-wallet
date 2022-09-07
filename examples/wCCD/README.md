@@ -9,9 +9,16 @@ The example project included in this repository serves as a working example of h
 ## Installing
 
 -   Run `yarn` in package root.
+-   Run `yarn build:all` to build the `concordium-helpers` package.
 
-## Running the example
+## Running the wCCD example
 
--   Run `yarn watch` in a terminal
--   Run `yarn start` in another terminal
--   Open URL logged in console (typically http://127.0.0.1:8080)
+-   Run `yarn build` in a terminal in this folder.
+-   Run `yarn start`.
+-   Open URL logged in console (typically http://127.0.0.1:8080).
+
+To have hot-reload (useful for development), do the following instead:
+
+-   Run `yarn watch` in a terminal.
+-   Run `yarn start` in another terminal.
+-   Open URL logged in console (typically http://127.0.0.1:8080).
