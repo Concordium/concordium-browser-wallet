@@ -8,7 +8,7 @@ import { identityNamesAtom } from '@popup/store/identity';
 import { displaySplitAddress } from '@popup/shared/utils/account-helpers';
 import VerifiedIcon from '@assets/svg/verified-stamp.svg';
 import { CreationStatus, WalletCredential } from '@shared/storage/types';
-import { useAccountInfo } from '@popup/shared/AccountInfoEmitterContext';
+import { useAccountInfo } from '@popup/shared/AccountInfoListenerContext';
 
 type AmountProps = {
     label: string;
@@ -53,7 +53,9 @@ export default function AccountDetails({ expanded, account, className }: Props) 
     return (
         <div className={clsx('account-page-details', expanded && 'account-page-details--expanded', className)}>
             <div className="account-page-details__address">{displaySplitAddress(account.address)}</div>
-            <div className="account-page-details__id">{identityNames[account.identityIndex]}</div>
+            <div className="account-page-details__id">
+                {identityNames?.[account.providerIndex]?.[account.identityIndex]}
+            </div>
             <div className="account-page-details__balance">
                 <Amount label={t('total')} amount={balances.total} />
                 <Amount label={t('atDisposal')} amount={balances.atDisposal} />

@@ -88,7 +88,7 @@ export default function NetworkSettings() {
                 <div className="network-settings-page__pending-identity">
                     <p>{t('pendingIdentity.description')}</p>
                     <Button
-                        width="narrow"
+                        width="medium"
                         className="network-settings-page__pending-identity__button"
                         onClick={() => nav(-1)}
                     >
@@ -96,7 +96,7 @@ export default function NetworkSettings() {
                     </Button>
                     <Button
                         faded
-                        width="narrow"
+                        width="medium"
                         className="network-settings-page__pending-identity__button"
                         onClick={() => setPendingIdentity(undefined)}
                     >
@@ -108,6 +108,7 @@ export default function NetworkSettings() {
                 {[mainnet, testnet, stagenet].map((network) => {
                     return (
                         <SidedRow
+                            key={network.genesisHash}
                             className="network-settings-page__element"
                             left={network.name}
                             right={<NetworkConfigurationComponent networkConfiguration={network} />}

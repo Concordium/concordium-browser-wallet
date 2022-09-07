@@ -6,7 +6,7 @@ import clsx from 'clsx';
 import { absoluteRoutes } from '@popup/constants/routes';
 import { encryptedSeedPhraseAtom, sessionPasscodeAtom } from '@popup/store/settings';
 import Toast from '@popup/shared/Toast/Toast';
-import AccountInfoEmitterContext from '@popup/shared/AccountInfoEmitterContext';
+import AccountInfoListenerContext from '@popup/shared/AccountInfoListenerContext';
 import Header from './Header';
 
 export default function MainLayout() {
@@ -30,12 +30,12 @@ export default function MainLayout() {
 
     return (
         <div className="main-layout">
-            <AccountInfoEmitterContext>
+            <AccountInfoListenerContext>
                 <Header className="main-layout__header" onToggle={setHeaderOpen} />
                 <main className={clsx('main-layout__main', headerOpen && 'main-layout__main--blur')}>
                     <Outlet />
                 </main>
-            </AccountInfoEmitterContext>
+            </AccountInfoListenerContext>
             <Toast />
         </div>
     );

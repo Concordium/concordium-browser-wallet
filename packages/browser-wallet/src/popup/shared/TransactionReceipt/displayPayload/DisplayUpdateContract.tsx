@@ -32,13 +32,13 @@ export default function DisplayUpdateContract({ payload, parameters }: Props) {
             {!!parameters && (
                 <>
                     <h5>{t('parameter')}:</h5>
-                    <pre className="display-transaction__parameter">{JSON.stringify(parameters, null, 2)}</pre>
+                    <pre className="transaction-receipt__parameter">{JSON.stringify(parameters, null, 2)}</pre>
                 </>
             )}
             {!parameters && !!payload.parameter.length && (
                 <>
                     <h5>{t('parameter')} (hex):</h5>
-                    <pre className="display-transaction__parameter">
+                    <pre className="transaction-receipt__parameter">
                         {JSON.stringify(payload.parameter.toString('hex'), null, 2)}
                     </pre>
                 </>

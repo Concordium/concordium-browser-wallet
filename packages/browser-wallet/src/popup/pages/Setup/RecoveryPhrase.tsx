@@ -43,10 +43,10 @@ export function EnterRecoveryPhrase() {
 
     return (
         <>
-            <PageHeader canGoBack>Your recovery phrase</PageHeader>
+            <PageHeader canGoBack>{t('recoveryPhrase.title')}</PageHeader>
             <div className="onboarding-setup__page-with-header">
                 <div className="onboarding-setup__page-with-header__description">
-                    {t('enterRecoveryPhrase.description')}
+                    {t('confirmRecoveryPhrase.description')}
                 </div>
                 <div className="p-10">
                     <Form<FormValues> onSubmit={handleSubmit}>
@@ -63,7 +63,7 @@ export function EnterRecoveryPhrase() {
                                     />
                                     <Submit
                                         className="onboarding-setup__page-with-header__continue-button"
-                                        width="narrow"
+                                        width="medium"
                                     >
                                         {t('continue')}
                                     </Submit>

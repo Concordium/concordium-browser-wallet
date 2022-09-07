@@ -5,4 +5,5 @@ export const setupRoutes = {
     enterRecoveryPhrase: 'enter-recovery-phrase',
     chooseNetwork: 'choose-network',
     restore: 'restore',
+    performRecovery: 'perform-recovery',
 };

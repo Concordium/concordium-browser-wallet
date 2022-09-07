@@ -60,7 +60,7 @@ export default function SetupPasscode() {
                                         rules={{ validate: validatePasscode(f.getValues) }}
                                     />
                                 </div>
-                                <Submit className="onboarding-setup__page-with-header__continue-button" width="narrow">
+                                <Submit className="onboarding-setup__page-with-header__continue-button" width="medium">
                                     {t('continue')}
                                 </Submit>
                             </>

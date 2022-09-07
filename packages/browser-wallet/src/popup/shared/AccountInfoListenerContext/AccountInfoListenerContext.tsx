@@ -10,7 +10,7 @@ import { addToastAtom } from '@popup/state';
 import { useTranslation } from 'react-i18next';
 import { getGenesisHash, sessionAccountInfoCache, useIndexedStorage } from '@shared/storage/access';
 import { accountInfoCacheLock, updateRecord } from '@shared/storage/update';
-import { AccountInfoEmitter } from '../account-info-emitter';
+import { AccountInfoListener } from '../account-info-listener';
 
 export const accountInfoAtom = atomWithChromeStorage<Record<string, string>>(
     ChromeStorageKey.AccountInfoCache,
@@ -18,27 +18,34 @@ export const accountInfoAtom = atomWithChromeStorage<Record<string, string>>(
     false,
     true
 );
-export const AccountInfoEmitterContext = createContext<AccountInfoEmitter | undefined>(undefined);
+export const AccountInfoListenerContext = createContext<AccountInfoListener | undefined>(undefined);
 
 interface Props {
     children: ReactElement[];
 }
 
-export default function AccountInfoEmitterContextProvider({ children }: Props) {
+export default function AccountInfoListenerContextProvider({ children }: Props) {
     const network = useAtomValue(networkConfigurationAtom);
-    const [accountInfoEmitter, setAccountInfoEmitter] = useState<AccountInfoEmitter>();
+    const addToast = useSetAtom(addToastAtom);
+    const [accountInfoListener, setAccountInfoListener] = useState<AccountInfoListener>();
+    const { t } = useTranslation();
 
     useEffect(() => {
-        const emitter = new AccountInfoEmitter(network.jsonRpcUrl);
-        emitter.listen();
-        setAccountInfoEmitter(emitter);
+        const listener = new AccountInfoListener(network);
+        listener.listen();
+        setAccountInfoListener(listener);
+        const errorListener = () => addToast(t('account.error'));
+        listener.on('error', errorListener);
         return () => {
-            emitter.stop();
+            listener.removeListener('error', errorListener);
+            listener.stop();
         };
     }, [network]);
 
     return (
-        <AccountInfoEmitterContext.Provider value={accountInfoEmitter}>{children}</AccountInfoEmitterContext.Provider>
+        <AccountInfoListenerContext.Provider value={accountInfoListener}>
+            {children}
+        </AccountInfoListenerContext.Provider>
     );
 }
 
@@ -49,20 +56,19 @@ export default function AccountInfoEmitterContextProvider({ children }: Props) {
  * N.B. has to be used inside an AccountInfoEmitterContext.
  */
 export function useAccountInfo(account: WalletCredential): AccountInfo | undefined {
-    const accountInfoEmitter = useContext<AccountInfoEmitter | undefined>(AccountInfoEmitterContext);
+    const accountInfoEmitter = useContext<AccountInfoListener | undefined>(AccountInfoListenerContext);
     const accountInfoCache = useAtomValue(accountInfoAtom);
     const { genesisHash } = useAtomValue(networkConfigurationAtom);
     const address = useMemo(() => account.address, [account]);
     const addToast = useSetAtom(addToastAtom);
     const { jsonRpcUrl } = useAtomValue(networkConfigurationAtom);
     const { t } = useTranslation();
-
     const [accountInfo, setAccountInfo] = useState<AccountInfo>();
 
     useEffect(() => {
-        if (accountInfoCache && accountInfoCache[address]) {
+        if (accountInfoCache[address]) {
             setAccountInfo(JSONBig.parse(accountInfoCache[address]));
-        } else {
+        } else if (account.status === CreationStatus.Confirmed) {
             const client = new JsonRpcClient(new HttpProvider(jsonRpcUrl));
             client
                 .getConsensusStatus()
@@ -87,15 +93,12 @@ export function useAccountInfo(account: WalletCredential): AccountInfo | undefin
 
     useEffect(() => {
         if (account.status === CreationStatus.Confirmed && accountInfoEmitter) {
-            const listener = accountInfoEmitter.subscribe(address, noOp);
-            const errorListener = () => addToast(t('account.error'));
-            accountInfoEmitter.on('error', errorListener);
+            accountInfoEmitter.subscribe(address);
             return () => {
-                accountInfoEmitter.removeListener('error', errorListener);
-                accountInfoEmitter.unsubscribe(address, listener);
+                accountInfoEmitter.unsubscribe(address);
             };
         }
-        return () => noOp;
+        return noOp;
     }, [account, accountInfoEmitter]);
 
     return accountInfo;

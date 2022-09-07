@@ -7,6 +7,7 @@ const t: typeof en = {
     accountAddress: 'Konto adresse',
     siteConnected: 'Forbundet',
     siteNotConnected: 'Ikke forbundet',
+    accountBalanceError: 'Fejl ved hentning af kontoens balance',
     actions: {
         log: 'transaktionslog',
         send: 'send ccd',
@@ -32,6 +33,21 @@ const t: typeof en = {
             show: 'Vis privatnøgle',
             done: 'Færdig',
         },
+    },
+    sendCcd: {
+        labels: {
+            ccd: 'Indtast et beløb at overføre',
+            recipient: 'Indtast modtager addresse',
+        },
+        buttons: {
+            back: 'tilbage',
+            send: 'Send',
+            finish: 'Færdigør',
+            continue: 'Fortsæt',
+        },
+        title: 'Send CCD',
+        receiptTitle: 'Transaktion: Send CCD',
+        fee: 'Estimerede transaktionsomkostninger',
     },
     accountPending: 'Denne konto er stadig ved at blive oprettet.',
 };

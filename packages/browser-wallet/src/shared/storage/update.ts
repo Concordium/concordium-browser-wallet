@@ -31,7 +31,11 @@ export async function updateRecord<K extends string, V>(
 /**
  * Generic method to add an element to list in storage
  */
-export async function addToList<Type>(lock: string, addition: Type, storage: StorageAccessor<Type[]>): Promise<void> {
+export async function addToList<Type>(
+    lock: string,
+    addition: Type | Type[],
+    storage: StorageAccessor<Type[]>
+): Promise<void> {
     return navigator.locks.request(lock, async () => {
         const list = (await storage.get()) || [];
         return storage.set(list.concat(addition));

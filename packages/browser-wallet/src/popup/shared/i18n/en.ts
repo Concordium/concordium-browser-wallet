@@ -16,6 +16,22 @@ const t = {
     account: {
         error: 'Unable to retrieve account balance',
     },
+    utils: {
+        address: {
+            required: 'Please enter an address',
+            invalid: 'Invalid address',
+        },
+        ccdAmount: {
+            required: 'Please enter an amount',
+            invalid: 'Invalid amount',
+            insufficient: 'Insufficient funds',
+            zero: 'Amount may not be zero',
+        },
+    },
+    transactionReceipt: {
+        sender: 'Sender account',
+        cost: 'Estimated transaction fee',
+    },
 };
 
 export default t;

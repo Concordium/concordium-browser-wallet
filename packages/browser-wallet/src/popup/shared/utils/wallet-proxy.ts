@@ -257,6 +257,12 @@ export async function getIdentityProviders(): Promise<IdentityProvider[]> {
     return response.data;
 }
 
+export async function getSimpleTransferCost(): Promise<bigint> {
+    const proxyPath = `/v0/transactionCost?type=simpleTransfer`;
+    const response = await (await getWalletProxy()).get(proxyPath);
+    return BigInt(response.data.cost);
+}
+
 export async function getCcdDrop(accountAddress: string): Promise<BrowserWalletTransaction> {
     const response = await (await getWalletProxy()).put(`/v0/testnetGTUDrop/${accountAddress}`);
 

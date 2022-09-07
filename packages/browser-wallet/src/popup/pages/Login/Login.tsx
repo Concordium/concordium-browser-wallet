@@ -68,7 +68,7 @@ export default function Login({ navigateTo }: { navigateTo?: string }) {
                                     required: tSetup('setupPasscode.form.passcodeRequired'),
                                 }}
                             />
-                            <Submit className="onboarding-setup__intro-wrapper__continue-button" width="narrow">
+                            <Submit className="onboarding-setup__intro-wrapper__continue-button" width="medium">
                                 {t('unlock')}
                             </Submit>
                         </>

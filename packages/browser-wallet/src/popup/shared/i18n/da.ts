@@ -18,6 +18,22 @@ const t: typeof en = {
     account: {
         error: 'Fejl ved hentning af kontoens balance',
     },
+    utils: {
+        address: {
+            required: 'Indtast en addresse',
+            invalid: 'Ugyldig addresse',
+        },
+        ccdAmount: {
+            required: 'Indtast et beløb',
+            invalid: 'Ugyldigt beløb',
+            insufficient: 'Ikke nok penge',
+            zero: 'Beløbet må ikke være nul',
+        },
+    },
+    transactionReceipt: {
+        sender: 'Afsender',
+        cost: 'Estimerede transaktionsomkostninger',
+    },
 };
 
 export default t;

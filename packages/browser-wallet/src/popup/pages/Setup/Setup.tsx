@@ -10,6 +10,8 @@ import { ChooseNetwork } from './ChooseNetwork';
 import SetupPasscode from './SetupPasscode';
 import CreateOrRestore from './CreateOrRestore';
 import GenerateSeedPhrase from './GenerateSeedPhrase';
+import RestoreRecoveryPhrase from './RecoverSeedPhrase';
+import PerformRecovery from './PerformRecovery';
 
 function Intro() {
     const navigate = useNavigate();
@@ -27,7 +29,7 @@ function Intro() {
             </div>
             <Button
                 className="onboarding-setup__intro-wrapper__continue-button"
-                width="narrow"
+                width="medium"
                 onClick={() => navigate(setupRoutes.passcode)}
             >
                 {t('continue')}
@@ -44,8 +46,9 @@ export default function SetupRoutes() {
             <Route path={setupRoutes.createOrRestore} element={<CreateOrRestore />} />
             <Route path={setupRoutes.createNew} element={<GenerateSeedPhrase />} />
             <Route path={setupRoutes.enterRecoveryPhrase} element={<EnterRecoveryPhrase />} />
+            <Route path={setupRoutes.restore} element={<RestoreRecoveryPhrase />} />
+            <Route path={setupRoutes.performRecovery} element={<PerformRecovery />} />
             <Route path={setupRoutes.chooseNetwork} element={<ChooseNetwork />} />
-            <Route path={setupRoutes.restore} element={<CreateOrRestore />} />
         </Routes>
     );
 }

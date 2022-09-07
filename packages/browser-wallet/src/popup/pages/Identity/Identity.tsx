@@ -13,7 +13,7 @@ export default function Identity() {
     const providers = useAtomValue(identityProvidersAtom);
 
     const identityProvider = useMemo(
-        () => providers.find((p) => p.ipInfo.ipIdentity === selectedIdentity?.provider),
+        () => providers.find((p) => p.ipInfo.ipIdentity === selectedIdentity?.providerIndex),
         [providers.length]
     );
 
