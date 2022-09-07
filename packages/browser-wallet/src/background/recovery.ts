@@ -109,7 +109,7 @@ async function performRecovery({ providers, ...recoveryInputs }: Payload) {
 
     const network = await storedCurrentNetwork.get();
     if (!network) {
-        return;
+        throw new Error('No chosen network could be found');
     }
     const client = new JsonRpcClient(new HttpProvider(network.jsonRpcUrl, fetch));
     const blockHash = (await client.getConsensusStatus()).lastFinalizedBlock;
