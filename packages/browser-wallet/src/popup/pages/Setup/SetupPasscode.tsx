@@ -42,6 +42,7 @@ export default function SetupPasscode() {
                             <>
                                 <div>
                                     <FormPassword
+                                        autoFocus
                                         control={f.control}
                                         className="onboarding-setup__page-with-header__choose-passcode__field"
                                         showStrength

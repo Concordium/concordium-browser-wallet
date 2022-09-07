@@ -28,7 +28,7 @@ export default function GenerateSeedPhrase() {
             <div className="onboarding-setup__page-with-header">
                 <div className="onboarding-setup__page-with-header__description">{t('recoveryPhrase.description')}</div>
                 <div className="p-10">
-                    <ControlledTextArea value={seedPhrase} />
+                    <ControlledTextArea value={seedPhrase} readOnly />
                 </div>
                 <Button
                     className="onboarding-setup__page-with-header__continue-button"
