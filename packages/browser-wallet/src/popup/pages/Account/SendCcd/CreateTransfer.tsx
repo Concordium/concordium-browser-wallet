@@ -1,4 +1,4 @@
-import React, { useContext } from 'react';
+import React from 'react';
 import { useTranslation } from 'react-i18next';
 import { useAtomValue } from 'jotai';
 import { selectedAccountAtom } from '@popup/store/account';
@@ -16,8 +16,9 @@ import {
 } from '@popup/shared/utils/transaction-helpers';
 import { useLocation, useNavigate } from 'react-router-dom';
 import DisplayCost from '@popup/shared/TransactionReceipt/DisplayCost';
+import { useAccountInfo } from '@popup/shared/AccountInfoListenerContext';
+import { useSelectedCredential } from '@popup/shared/utils/account-helpers';
 import { routes } from './routes';
-import { accountContext, AccountContextValues } from '../AccountContext';
 
 export type FormValues = {
     ccd: string;
@@ -38,8 +39,8 @@ export default function CreateTransaction({ cost = 0n }: Props) {
     const { state } = useLocation();
     const defaultPayload = (state as State)?.payload;
     const address = useAtomValue(selectedAccountAtom);
+    const selectedCred = useSelectedCredential();
     const nav = useNavigate();
-    const { accountInfo } = useContext<AccountContextValues>(accountContext);
     const form = useForm<FormValues>({
         defaultValues: {
             ccd: microCcdToCcd(defaultPayload?.amount.microGtuAmount),
@@ -47,12 +48,13 @@ export default function CreateTransaction({ cost = 0n }: Props) {
         },
     });
 
-    const validateAmount: Validate<string> = (amount) => validateTransferAmount(amount, accountInfo, cost);
-    const maxValue = getPublicAccountAmounts(accountInfo).atDisposal - cost;
-
-    if (!address) {
+    if (!address || !selectedCred) {
         return null;
     }
+
+    const accountInfo = useAccountInfo(selectedCred);
+    const validateAmount: Validate<string> = (amount) => validateTransferAmount(amount, accountInfo, cost);
+    const maxValue = getPublicAccountAmounts(accountInfo).atDisposal - cost;
 
     const onSubmit: SubmitHandler<FormValues> = (vs) => {
         const payload = buildSimpleTransferPayload(vs.recipient, ccdToMicroCcd(vs.ccd));

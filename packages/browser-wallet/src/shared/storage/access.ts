@@ -129,6 +129,10 @@ export const storedIdentityProviders = makeIndexedStorageAccessor<IdentityProvid
     ChromeStorageKey.IdentityProviders
 );
 export const sessionPasscode = makeStorageAccessor<string>('session', ChromeStorageKey.Passcode);
+export const sessionAccountInfoCache = makeIndexedStorageAccessor<Record<string, string>>(
+    'session',
+    ChromeStorageKey.AccountInfoCache
+);
 
 export const getGenesisHash = () =>
     storedCurrentNetwork.get().then((network) => {

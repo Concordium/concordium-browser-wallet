@@ -108,6 +108,7 @@ export default function NetworkSettings() {
                 {[mainnet, testnet, stagenet].map((network) => {
                     return (
                         <SidedRow
+                            key={network.genesisHash}
                             className="network-settings-page__element"
                             left={network.name}
                             right={<NetworkConfigurationComponent networkConfiguration={network} />}

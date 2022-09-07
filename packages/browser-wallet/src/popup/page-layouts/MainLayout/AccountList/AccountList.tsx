@@ -2,19 +2,17 @@ import React, { forwardRef, useEffect, useState } from 'react';
 import clsx from 'clsx';
 import { useAtomValue, useAtom } from 'jotai';
 import { useNavigate } from 'react-router-dom';
-import { ClassName, displayAsCcd, noOp } from 'wallet-common-helpers';
-
+import { ClassName, displayAsCcd } from 'wallet-common-helpers';
 import CopyButton from '@popup/shared/CopyButton';
 import CheckmarkIcon from '@assets/svg/checkmark-blue.svg';
 import { absoluteRoutes } from '@popup/constants/routes';
 import { credentialsAtom, selectedAccountAtom } from '@popup/store/account';
-import { networkConfigurationAtom } from '@popup/store/settings';
 import { identityNamesAtom } from '@popup/store/identity';
 import { useTranslation } from 'react-i18next';
 import { displaySplitAddress } from '@popup/shared/utils/account-helpers';
-import { AccountInfo } from '@concordium/web-sdk';
-import { AccountInfoEmitter } from '@popup/shared/account-info-emitter';
 import { WalletCredential } from '@shared/storage/types';
+import JSONBig from 'json-bigint';
+import { useAccountInfo } from '@popup/shared/AccountInfoListenerContext';
 import EntityList from '../EntityList';
 
 export type Account = { address: string };
@@ -58,24 +56,19 @@ const AccountList = forwardRef<HTMLDivElement, Props>(({ className, onSelect }, 
     const [selectedAccount, setSelectedAccount] = useAtom(selectedAccountAtom);
     const nav = useNavigate();
     const { t } = useTranslation('mainLayout');
-    const { jsonRpcUrl } = useAtomValue(networkConfigurationAtom);
     const identityNames = useAtomValue(identityNamesAtom);
-
     const [totalBalanceMap, setTotalBalanceMap] = useState<Map<string, bigint>>(new Map());
+    const accountInfos = accounts.map(useAccountInfo);
 
     useEffect(() => {
-        const emitter = new AccountInfoEmitter(jsonRpcUrl);
-        emitter.on('totalchanged', (accountInfo: AccountInfo, address: string) => {
-            setTotalBalanceMap(new Map(totalBalanceMap.set(address, accountInfo.accountAmount)));
-        });
-        // TODO Log the error instead of gobbling it.
-        emitter.on('error', noOp);
-        emitter.listen(accounts.map((account) => account.address));
-        return () => {
-            emitter.removeAllListeners('totalchanged');
-            emitter.stop();
-        };
-    }, [JSON.stringify(accounts)]);
+        const updatedTotalBalanceMap = new Map<string, bigint>();
+        for (const info of accountInfos) {
+            if (info) {
+                updatedTotalBalanceMap.set(info.accountAddress, info.accountAmount);
+            }
+        }
+        setTotalBalanceMap(updatedTotalBalanceMap);
+    }, [JSONBig.stringify(accountInfos)]);
 
     return (
         <EntityList<WalletCredential>

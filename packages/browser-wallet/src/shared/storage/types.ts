@@ -12,6 +12,7 @@ export enum ChromeStorageKey {
     Identities = 'identities',
     SelectedIdentity = 'selectedIdentity',
     IdentityProviders = 'identityProviders',
+    AccountInfoCache = 'accountInfoCache',
 }
 
 export enum Theme {

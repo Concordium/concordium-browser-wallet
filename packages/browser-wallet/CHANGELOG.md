@@ -6,6 +6,11 @@
 
 -   Toasts for showing errors when failing to retrieve account balance or transaction history.
 -   Send CCD page.
+-   Transaction history is now updated on balance changes, so that the new transactions are retrieved.
+
+### Changed
+
+-   Account information retrieved from the JSON-RPC server is now cached for better performance, and a more responsive UI.
 
 ### Fixed
 
