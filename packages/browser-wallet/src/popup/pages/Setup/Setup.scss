@@ -98,4 +98,25 @@
             margin-bottom: rem(12px);
         }
     }
+
+    &__recovery {
+        &__results {
+            text-align: left;
+        }
+
+        &__button {
+            min-height: rem(30px);
+            margin-top: auto;
+            margin-bottom: rem(10px);
+        }
+
+        &__identity {
+            padding: rem(10px) 0;
+            margin-top: rem(10px);
+
+            &:not(:last-child) {
+                border-bottom: rem(2px) solid $color-petroleum;
+            }
+        }
+    }
 }

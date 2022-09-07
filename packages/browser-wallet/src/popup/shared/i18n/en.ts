@@ -13,6 +13,9 @@ const t = {
         confirmed: 'Verified by',
         rejected: 'Rejected by',
     },
+    account: {
+        error: 'Unable to retrieve account balance',
+    },
     utils: {
         address: {
             required: 'Please enter an address',

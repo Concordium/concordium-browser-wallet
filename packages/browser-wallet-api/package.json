@@ -7,7 +7,7 @@
     "license": "Apache",
     "dependencies": {
         "@concordium/browser-wallet-api-helpers": "workspace:^",
-        "@concordium/web-sdk": "^0.4.0",
+        "@concordium/web-sdk": "^1.0.0",
         "json-bigint": "^1.0.0"
     },
     "devDependencies": {

@@ -1,7 +1,5 @@
 .send-ccd {
     &__create-transfer {
-        width: 100%;
-
         &__input {
             width: calc(100% - rem(50px));
             margin: rem(5px) rem(25px) rem(13.286px) rem(25px);
@@ -12,8 +10,8 @@
         }
 
         &__button {
-            margin-top: rem(10px);
-            margin-bottom: auto;
+            margin-bottom: rem(10px);
+            margin-top: auto;
         }
     }
 

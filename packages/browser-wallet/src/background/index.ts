@@ -18,6 +18,7 @@ import { forwardToPopup, HandleMessage, HandleResponse, RunCondition, setPopupSi
 import { identityIssuanceHandler } from './identity-issuance';
 import { startupHandler } from './startup';
 import { sendCredentialHandler } from './credential-deployment';
+import { recoveryHandler } from './recovery';
 
 const walletLockedMessage = 'The wallet is locked';
 async function isWalletLocked(): Promise<boolean> {
@@ -101,6 +102,7 @@ bgMessageHandler.handleMessage(
     sendCredentialHandler
 );
 
+bgMessageHandler.handleMessage(createMessageTypeFilter(InternalMessageType.Recovery), recoveryHandler);
 bgMessageHandler.handleMessage(
     createMessageTypeFilter(InternalMessageType.StartIdentityIssuance),
     identityIssuanceHandler

@@ -1,10 +1,11 @@
-import React, { useEffect, useState } from 'react';
+import React, { useEffect, useState, useMemo } from 'react';
 import { useTranslation } from 'react-i18next';
-import { useAtomValue } from 'jotai';
+import { useSetAtom, useAtomValue } from 'jotai';
 import { selectedAccountAtom } from '@popup/store/account';
 import { AccountAddress, AccountTransactionType, SimpleTransferPayload } from '@concordium/web-sdk';
 import { getDefaultExpiry, sendTransaction } from '@popup/shared/utils/transaction-helpers';
 import { jsonRpcClientAtom } from '@popup/store/settings';
+import { addToastAtom } from '@popup/state';
 import { usePrivateKey } from '@popup/shared/utils/account-helpers';
 import Button from '@popup/shared/Button';
 import { useLocation, useNavigate } from 'react-router-dom';
@@ -25,10 +26,18 @@ export default function ConfirmTransfer({ setDetailsExpanded, cost }: Props) {
     const { state } = useLocation();
     const { payload } = state as State;
     const [hash, setHash] = useState<string>();
-    const address = useAtomValue(selectedAccountAtom);
+    const selectedAddress = useAtomValue(selectedAccountAtom);
+    const address = useMemo(() => selectedAddress, []);
     const key = usePrivateKey(address);
     const client = useAtomValue(jsonRpcClientAtom);
     const nav = useNavigate();
+    const addToast = useSetAtom(addToastAtom);
+
+    useEffect(() => {
+        if (selectedAddress !== address) {
+            nav('../');
+        }
+    }, [selectedAddress]);
 
     useEffect(() => {
         setDetailsExpanded(false);
@@ -69,19 +78,21 @@ export default function ConfirmTransfer({ setDetailsExpanded, cost }: Props) {
                 className="send-ccd__receipt"
             />
             {!hash && (
-                <div className="flex justify-center m-b-10 m-h-20">
+                <div className="flex justify-center p-b-10 m-h-20">
                     <Button width="narrow" className="m-r-10" onClick={() => nav(`../`, { state: { payload } })}>
                         {t('sendCcd.buttons.back')}
                     </Button>
-                    <Button width="narrow" onClick={send}>
+                    <Button width="narrow" onClick={() => send().catch((e) => addToast(e.toString()))}>
                         {t('sendCcd.buttons.send')}
                     </Button>
                 </div>
             )}
             {hash && (
-                <Button width="medium" className="m-b-10" onClick={() => nav(absoluteRoutes.home.account.path)}>
-                    {t('sendCcd.buttons.finish')}
-                </Button>
+                <div className="p-b-10">
+                    <Button width="medium" className="m-b-10" onClick={() => nav(absoluteRoutes.home.account.path)}>
+                        {t('sendCcd.buttons.finish')}
+                    </Button>
+                </div>
             )}
         </div>
     );
