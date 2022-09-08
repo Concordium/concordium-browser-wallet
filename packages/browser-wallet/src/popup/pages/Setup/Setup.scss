@@ -101,6 +101,9 @@
 
     &__recovery {
         overflow-y: overlay;
+        display: flex;
+        flex-direction: column;
+        align-items: center;
 
         &__results {
             text-align: left;
@@ -118,8 +121,7 @@
 
         &__button {
             min-height: rem(30px);
-            margin-top: auto;
-            margin-bottom: rem(10px);
+            margin: auto auto rem(10px);
         }
 
         &__identity {

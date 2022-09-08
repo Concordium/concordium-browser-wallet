@@ -1,10 +1,10 @@
 import React, { useEffect, useState } from 'react';
 import PageHeader from '@popup/shared/PageHeader';
 import { useNavigate } from 'react-router-dom';
-import { useAtom, useAtomValue } from 'jotai';
+import { useAtom, useAtomValue, useSetAtom } from 'jotai';
 import { useTranslation } from 'react-i18next';
 import { networkConfigurationAtom, seedPhraseAtom } from '@popup/store/settings';
-import { credentialsAtom } from '@popup/store/account';
+import { credentialsAtom, selectedAccountAtom } from '@popup/store/account';
 import { popupMessageHandler } from '@popup/shared/message-handler';
 import { InternalMessageType } from '@concordium/browser-wallet-message-hub';
 import { JsonRpcClient, HttpProvider } from '@concordium/web-sdk';
@@ -26,6 +26,13 @@ function DisplayRecoveryResult() {
     const navigate = useNavigate();
     const identities = useAtomValue(identitiesAtom);
     const credentials = useAtomValue(credentialsAtom);
+    const setSelectedAccount = useSetAtom(selectedAccountAtom);
+
+    useEffect(() => {
+        if (credentials.length) {
+            setSelectedAccount(credentials[0].address);
+        }
+    });
 
     return (
         <>
@@ -132,7 +139,7 @@ export default function PerformRecovery() {
                 {result?.status === BackgroundResponseStatus.Error && (
                     <>
                         <p>{t('performRecovery.description.error')}</p>
-                        <p>{result.reason}</p>
+                        <p>{result?.reason}</p>
                         <Button
                             width="medium"
                             className="onboarding-setup__recovery__button"

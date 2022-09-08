@@ -5,7 +5,6 @@ import {
     CredentialInputV1,
     CredentialRegistrationId,
     CryptographicParameters,
-    getAccountAddress,
     HttpProvider,
     IdentityObjectV1,
     IdentityRecoveryRequestInput,
@@ -20,20 +19,10 @@ import { Identity, CreationStatus, IdentityProvider, WalletCredential } from '@s
 import { storedCurrentNetwork } from '@shared/storage/access';
 import { addCredential, addIdentity } from './update';
 
-// TODO: increase max empty
 // How many empty identityIndices are allowed before stopping
-const maxEmpty = 3;
+const maxEmpty = 10;
 // Milliseconds to wait, if retrievalUrl is still pending
 const sleepInterval = 5000;
-
-function getAddressFrom(accountInfo: AccountInfo) {
-    const firstCredential = accountInfo.accountCredentials[0];
-    const firstCredId =
-        firstCredential.value.type === 'initial'
-            ? firstCredential.value.contents.regId
-            : firstCredential.value.contents.credId;
-    return getAccountAddress(firstCredId);
-}
 
 async function recoverAccounts(
     identityIndex: number,
@@ -51,7 +40,7 @@ async function recoverAccounts(
         const accountInfo = await getAccountInfo(credId);
         if (accountInfo) {
             credsToAdd.push({
-                address: getAddressFrom(accountInfo).address,
+                address: accountInfo.accountAddress,
                 credId,
                 credNumber,
                 status: CreationStatus.Confirmed,
