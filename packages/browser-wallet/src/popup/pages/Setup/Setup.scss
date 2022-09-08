@@ -40,6 +40,16 @@
         &__description {
             margin-top: rem(36px);
         }
+
+        &__terms-and-conditions {
+            margin-top: rem(150px);
+            margin-left: rem(14px);
+            text-align: left;
+
+            a {
+                text-decoration: underline;
+            }
+        }
     }
 
     &__page-with-header {
@@ -63,10 +73,6 @@
                 &:not(:first-of-type) {
                     margin-top: rem(10px);
                 }
-            }
-
-            a {
-                text-decoration: underline;
             }
         }
 
