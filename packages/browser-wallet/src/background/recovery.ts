@@ -6,14 +6,11 @@ import {
     CredentialRegistrationId,
     CryptographicParameters,
     HttpProvider,
-    IdentityObjectV1,
     IdentityRecoveryRequestInput,
     JsonRpcClient,
     Network,
-    Versioned,
 } from '@concordium/web-sdk';
 import { ExtensionMessageHandler } from '@concordium/browser-wallet-message-hub';
-import { IdentityProviderIdentityStatus, IdentityTokenContainer, sleep } from 'wallet-common-helpers';
 import { BackgroundResponseStatus } from '@shared/utils/types';
 import { Identity, CreationStatus, IdentityProvider, WalletCredential } from '@shared/storage/types';
 import { storedCurrentNetwork } from '@shared/storage/access';
@@ -21,8 +18,6 @@ import { addCredential, addIdentity } from './update';
 
 // How many empty identityIndices are allowed before stopping
 const maxEmpty = 10;
-// Milliseconds to wait, if retrievalUrl is still pending
-const sleepInterval = 5000;
 
 async function recoverAccounts(
     identityIndex: number,
@@ -62,25 +57,6 @@ export type Payload = {
     net: Network;
 };
 
-/**
- * Polls the provided location until a valid identity object is available, or that an error is returned.
- * If an error is returned from the url, this return undefined.
- * If the identity provider is not reachable, the promise will reject.
- */
-async function getIdentityObject(url: string): Promise<Versioned<IdentityObjectV1> | undefined> {
-    // eslint-disable-next-line no-constant-condition
-    while (true) {
-        const response = (await (await fetch(url)).json()) as IdentityTokenContainer;
-        if (response.status === IdentityProviderIdentityStatus.Error) {
-            return undefined;
-        }
-        if (response.status === IdentityProviderIdentityStatus.Done) {
-            return response.token.identityObject;
-        }
-        await sleep(sleepInterval);
-    }
-}
-
 function getRecoverUrl(inputs: Omit<IdentityRecoveryRequestInput, 'timestamp' | 'ipInfo'>, provider: IdentityProvider) {
     const timestamp = Math.floor(Date.now() / 1000);
     const idRecoveryRequest = createIdentityRecoveryRequest({ ...inputs, timestamp, ipInfo: provider.ipInfo });
@@ -114,43 +90,39 @@ async function performRecovery({ providers, ...recoveryInputs }: Payload) {
         let identityIndex = 0;
         while (emptyIndices < maxEmpty) {
             const recoverUrl = getRecoverUrl({ ...recoveryInputs, identityIndex }, provider);
-            const recoverResponse = await (await fetch(recoverUrl)).json();
-            if (recoverResponse.identityRetrievalUrl) {
-                const idObject = await getIdentityObject(recoverResponse.identityRetrievalUrl);
-                if (idObject) {
-                    identitiesToAdd.push({
-                        name: `Identity ${nextId + 1}`,
-                        index: identityIndex,
-                        providerIndex: provider.ipInfo.ipIdentity,
-                        status: CreationStatus.Confirmed,
-                        idObject,
-                    });
-                    credsToAdd.push(
-                        ...(await recoverAccounts(
+            const response = await fetch(recoverUrl);
+            if (response.ok) {
+                const idObject = await response.json();
+                identitiesToAdd.push({
+                    name: `Identity ${nextId + 1}`,
+                    index: identityIndex,
+                    providerIndex: provider.ipInfo.ipIdentity,
+                    status: CreationStatus.Confirmed,
+                    idObject,
+                });
+                credsToAdd.push(
+                    ...(await recoverAccounts(
+                        identityIndex,
+                        provider.ipInfo.ipIdentity,
+                        {
                             identityIndex,
-                            provider.ipInfo.ipIdentity,
-                            {
-                                identityIndex,
-                                ipInfo: provider.ipInfo,
-                                arsInfos: provider.arsInfos,
-                                globalContext: recoveryInputs.globalContext,
-                                seedAsHex: recoveryInputs.seedAsHex,
-                                net: recoveryInputs.net,
-                                expiry: Date.now(),
-                                revealedAttributes: [],
-                                idObject: idObject.value,
-                            },
-                            getAccountInfo
-                        ))
-                    );
-                    nextId += 1;
-                    identityIndex += 1;
-                    emptyIndices = 0;
-                    // eslint-disable-next-line no-continue
-                    continue;
-                }
+                            ipInfo: provider.ipInfo,
+                            arsInfos: provider.arsInfos,
+                            globalContext: recoveryInputs.globalContext,
+                            seedAsHex: recoveryInputs.seedAsHex,
+                            net: recoveryInputs.net,
+                            expiry: Date.now(),
+                            revealedAttributes: [],
+                            idObject: idObject.value,
+                        },
+                        getAccountInfo
+                    ))
+                );
+                nextId += 1;
+                emptyIndices = 0;
+            } else {
+                emptyIndices += 1;
             }
-            emptyIndices += 1;
             identityIndex += 1;
         }
     }
