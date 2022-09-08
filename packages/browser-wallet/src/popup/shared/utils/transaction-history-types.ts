@@ -15,6 +15,8 @@ export enum TransactionStatus {
     Failed = 'failed',
     /** On-chain and successful */
     Finalized = 'finalized',
+    /** Sent to node, pending finalization or failure */
+    Pending = 'pending',
 }
 
 export enum RewardType {
@@ -40,7 +42,7 @@ export interface BrowserWalletTransaction {
     time: bigint;
     id: number;
     events: string[];
-    rejectReason: string;
+    rejectReason?: string;
 }
 
 export interface BrowserWalletAccountTransaction extends BrowserWalletTransaction {

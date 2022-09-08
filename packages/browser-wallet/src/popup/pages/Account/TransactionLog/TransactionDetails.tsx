@@ -48,8 +48,8 @@ export default function TransactionDetails({
             {transaction.transactionHash && (
                 <CopyableItem title={t('transactionHash')} value={transaction.transactionHash} />
             )}
-            <CopyableItem title={t('blockHash')} value={transaction.blockHash} />
-            {transaction.events && (
+            {transaction.blockHash && <CopyableItem title={t('blockHash')} value={transaction.blockHash} />}
+            {transaction.events && transaction.events.length > 0 && (
                 <div className="transaction-details__dynamic-height-item">
                     <Title title={t('events')} />
                     {transaction.events}
