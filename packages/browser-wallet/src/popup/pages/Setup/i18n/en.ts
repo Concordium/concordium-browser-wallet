@@ -3,6 +3,11 @@ const t = {
         welcome: "Welcome to Concordium's official browser extension wallet.",
         description:
             'On the following pages you will be guided through the process of optaining a new account or restoring old ones.',
+        form: {
+            termsAndConditionsRequired: 'You must read and accept the terms and conditions',
+            termsAndConditionsDescription: 'I have read and agree to the',
+            termsAndConditionsLinkDescription: 'Terms and Conditions',
+        },
     },
     setupPasscode: {
         title: 'Setup passcode',

@@ -8,6 +8,7 @@
 -   Send CCD page.
 -   Transaction history is now updated on balance changes, so that the new transactions are retrieved.
 -   Testnet faucet for getting some CCD for testing.
+-   Terms and conditions to setup flow and the about page.
 
 ### Changed
 
