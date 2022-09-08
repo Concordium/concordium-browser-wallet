@@ -36,7 +36,7 @@ function DisplayRecoveryResult() {
 
     return (
         <>
-            <div className="onboarding-setup__page-with-header__description">
+            <div className="onboarding-setup__recovery__description">
                 {t(identities.length ? 'performRecovery.description.after' : 'performRecovery.description.noneFound')}
             </div>
             <div className="onboarding-setup__recovery__results">

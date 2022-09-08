@@ -1,3 +1,5 @@
+$description-margin-top: rem(25px);
+
 .onboarding-setup {
     &__intro-wrapper {
         padding: rem(10px);
@@ -48,7 +50,7 @@
         height: calc(100% - #{rem($page-header-height)});
 
         &__description {
-            margin-top: rem(25px);
+            margin-top: $description-margin-top;
             margin-bottom: rem(25px);
         }
 
@@ -111,7 +113,6 @@
         }
 
         &__credential {
-            padding: rem(5px) 0;
             border-top: rem(1px) dotted $color-petroleum;
 
             p {
@@ -126,7 +127,6 @@
         }
 
         &__identity {
-            padding: rem(10px) 0;
             margin-top: rem(10px);
 
             & > p {
@@ -137,6 +137,11 @@
             &:not(:last-child) {
                 border-bottom: rem(2px) solid $color-petroleum;
             }
+        }
+
+        &__description {
+            margin-top: $description-margin-top;
+            margin-bottom: rem(10px);
         }
     }
 }
