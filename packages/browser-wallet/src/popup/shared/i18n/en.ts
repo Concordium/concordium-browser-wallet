@@ -29,7 +29,7 @@ const t = {
         },
         transaction: {
             type: {
-                simple: 'Send Ccd',
+                simple: 'Send CCD',
                 init: 'Initialize Smart Contract Instance',
                 update: 'Update Smart Contract Instance',
                 unknown: 'Unknown',

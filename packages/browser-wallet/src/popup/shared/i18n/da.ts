@@ -31,7 +31,7 @@ const t: typeof en = {
         },
         transaction: {
             type: {
-                simple: 'Send Ccd',
+                simple: 'Send CCD',
                 init: 'Opret Smart Contract Instans',
                 update: 'Opdater Smart Contract Instans',
                 unknown: 'Ukendt',
