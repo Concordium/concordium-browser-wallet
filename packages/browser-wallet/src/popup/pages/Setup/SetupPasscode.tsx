@@ -26,7 +26,7 @@ export default function SetupPasscode() {
         navigate(`${absoluteRoutes.setup.path}/${setupRoutes.createOrRestore}`);
     };
 
-    function validatePasscode(getValues: UseFormGetValues<FormValues>): Validate<string | boolean> {
+    function validatePasscode(getValues: UseFormGetValues<FormValues>): Validate<string> {
         return (passcodeAgain) =>
             getValues().passcode !== passcodeAgain ? t('setupPasscode.form.passcodeMismatch') : undefined;
     }
