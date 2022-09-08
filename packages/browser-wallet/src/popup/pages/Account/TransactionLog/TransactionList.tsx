@@ -2,7 +2,7 @@ import { getCcdDrop, getTransactions } from '@popup/shared/utils/wallet-proxy';
 import React, { createContext, forwardRef, Fragment, useContext, useEffect, useMemo, useState } from 'react';
 import InfiniteLoader from 'react-window-infinite-loader';
 import { VariableSizeList as List } from 'react-window';
-import { noOp, PropsOf } from 'wallet-common-helpers';
+import { noOp, partition, PropsOf } from 'wallet-common-helpers';
 import AutoSizer from 'react-virtualized-auto-sizer';
 import { BrowserWalletTransaction } from '@popup/shared/utils/transaction-history-types';
 import { useTranslation } from 'react-i18next';
@@ -151,15 +151,17 @@ function updateTransactionsWithNewTransactions(
     existingTransactions: BrowserWalletTransaction[],
     newTransactions: BrowserWalletTransaction[]
 ) {
-    const existingHashes = existingTransactions.map((trs) => trs.transactionHash);
+    const existingHashes = existingTransactions
+        .filter((trx) => trx.transactionHash !== undefined)
+        .map((trs) => trs.transactionHash);
     const transactionUpdates: Record<string, BrowserWalletTransaction> = {} as Record<string, BrowserWalletTransaction>;
 
-    // Collect updates to existing transactions.
-    newTransactions
-        .filter((newTrx) => existingHashes.includes(newTrx.transactionHash))
-        .forEach((element) => {
-            transactionUpdates[element.transactionHash] = element;
-        });
+    const [existing, allNew] = partition(newTransactions, (transaction) =>
+        existingHashes.includes(transaction.transactionHash)
+    );
+    existing.forEach((element) => {
+        transactionUpdates[element.transactionHash] = element;
+    });
 
     // Update the existing transactions and save in a new array.
     const updatedExistingTransactions = [...existingTransactions].map((existingTransaction) => {
@@ -169,16 +171,7 @@ function updateTransactionsWithNewTransactions(
         return existingTransaction;
     });
 
-    // Keep all transactions without a hash as they are rewards, which
-    // cannot be created from the wallet.
-    const newTransactionsDescending = newTransactions
-        .filter(
-            (newTransaction) =>
-                newTransaction.transactionHash === undefined || !existingHashes.includes(newTransaction.transactionHash)
-        )
-        .reverse();
-
-    return [...newTransactionsDescending, ...updatedExistingTransactions];
+    return [...allNew.reverse(), ...updatedExistingTransactions];
 }
 
 export interface TransactionListProps {
@@ -261,7 +254,7 @@ export default function TransactionList({ onTransactionClick }: TransactionListP
     }, [accountAddress]);
 
     useEffect(() => {
-        if ((amount || accountInfo?.accountAmount) && accountInfo?.accountAmount !== amount) {
+        if (amount !== undefined && accountInfo?.accountAmount !== undefined && accountInfo?.accountAmount !== amount) {
             getNewTransactions();
         }
         setAmount(accountInfo?.accountAmount);
