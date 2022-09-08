@@ -10,3 +10,4 @@ export const addToastAtom = atom<null, string>(null, (get, set, newToast) => {
     const updatedToasts = [...currentToasts, newToast];
     set(toastsAtom, updatedToasts);
 });
+export const creatingCredentialRequestAtom = atom<boolean>(false);
