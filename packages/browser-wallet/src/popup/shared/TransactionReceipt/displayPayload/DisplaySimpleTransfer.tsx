@@ -10,7 +10,6 @@ interface Props {
 
 /**
  * Displays an overview of a simple transfer.
- * TODO: make nice
  */
 export default function DisplaySimpleTransfer({ payload }: Props) {
     const { t } = useTranslation('sendTransaction');

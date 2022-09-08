@@ -41,6 +41,7 @@ const t: typeof en = {
     transactionReceipt: {
         sender: 'Afsender',
         cost: 'Estimerede transaktionsomkostninger',
+        unknown: 'Ukendt',
     },
 };
 

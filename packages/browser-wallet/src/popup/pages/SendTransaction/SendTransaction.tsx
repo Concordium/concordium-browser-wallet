@@ -41,7 +41,6 @@ export default function SendTransaction({ onSubmit, onReject }: Props) {
     const addToast = useSetAtom(addToastAtom);
     const client = useAtomValue(jsonRpcClientAtom);
     const { withClose, onClose } = useContext(fullscreenPromptContext);
-    const cost = useAsyncMemo(getSimpleTransferCost, noOp, []);
 
     const { accountAddress, url } = state.payload;
     const key = usePrivateKey(accountAddress);
@@ -56,6 +55,13 @@ export default function SendTransaction({ onSubmit, onReject }: Props) {
                 state.payload.schemaVersion
             ),
         [JSON.stringify(state.payload)]
+    );
+    const cost = useAsyncMemo(
+        transactionType === AccountTransactionType.SimpleTransfer
+            ? getSimpleTransferCost
+            : () => Promise.resolve(undefined),
+        noOp,
+        [transactionType]
     );
 
     useEffect(() => onClose(onReject), [onClose, onReject]);
