@@ -61,7 +61,8 @@
         background-color: $color-bg;
         display: flex;
         align-items: center;
-        justify-content: center;
+        justify-content: space-evenly;
+        flex-direction: column;
         text-align: center;
         height: 100%;
         width: 100%;
@@ -84,6 +85,13 @@
         position: relative;
         top: rem(1px);
         margin-left: rem(3px);
+    }
+
+    &__clock {
+        position: relative;
+        top: rem(1px);
+        margin-left: rem(-45px);
+        height: rem(8px);
     }
 
     &__warning {
