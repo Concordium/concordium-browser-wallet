@@ -44,7 +44,6 @@ const t = {
             continue: 'Continue',
         },
         title: 'Send CCD',
-        receiptTitle: 'Transaction: Send CCD',
         fee: 'Estimated transaction fee',
     },
     accountPending: 'This account is still pending finalization.',

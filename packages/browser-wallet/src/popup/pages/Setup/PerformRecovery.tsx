@@ -1,9 +1,10 @@
 import React, { useEffect, useState } from 'react';
 import PageHeader from '@popup/shared/PageHeader';
 import { useNavigate } from 'react-router-dom';
-import { useAtom, useAtomValue } from 'jotai';
+import { useAtom, useAtomValue, useSetAtom } from 'jotai';
 import { useTranslation } from 'react-i18next';
 import { networkConfigurationAtom, seedPhraseAtom } from '@popup/store/settings';
+import { credentialsAtom, selectedAccountAtom } from '@popup/store/account';
 import { popupMessageHandler } from '@popup/shared/message-handler';
 import { InternalMessageType } from '@concordium/browser-wallet-message-hub';
 import { JsonRpcClient, HttpProvider } from '@concordium/web-sdk';
@@ -13,6 +14,8 @@ import Button from '@popup/shared/Button';
 import { absoluteRoutes } from '@popup/constants/routes';
 import { BackgroundResponseStatus, RecoveryBackgroundResponse } from '@shared/utils/types';
 import { getIdentityProviders } from '@popup/shared/utils/wallet-proxy';
+import { displayAsCcd } from 'wallet-common-helpers';
+import { displaySplitAddress } from '@popup/shared/utils/account-helpers';
 import { getNet } from '@shared/utils/network-helpers';
 import { IdentityProvider, NetworkConfiguration } from '@shared/storage/types';
 
@@ -22,16 +25,35 @@ function DisplayRecoveryResult() {
     const { t } = useTranslation('setup');
     const navigate = useNavigate();
     const identities = useAtomValue(identitiesAtom);
+    const credentials = useAtomValue(credentialsAtom);
+    const setSelectedAccount = useSetAtom(selectedAccountAtom);
+
+    useEffect(() => {
+        if (credentials.length) {
+            setSelectedAccount(credentials[0].address);
+        }
+    });
 
     return (
         <>
-            <div className="onboarding-setup__page-with-header__description">
+            <div className="onboarding-setup__recovery__description">
                 {t(identities.length ? 'performRecovery.description.after' : 'performRecovery.description.noneFound')}
             </div>
             <div className="onboarding-setup__recovery__results">
                 {identities.map((identity) => (
-                    <div className="onboarding-setup__recovery__identity">
+                    <div
+                        key={`${identity.providerIndex}-${identity.index}`}
+                        className="onboarding-setup__recovery__identity"
+                    >
                         <p>{identity.name}</p>
+                        {credentials
+                            .filter((cred) => cred.identityIndex === identity.index)
+                            .map((cred) => (
+                                <div className="onboarding-setup__recovery__credential" key={cred.credId}>
+                                    <p>{displaySplitAddress(cred.address)}</p>
+                                    <p>{displayAsCcd(0n)}</p>
+                                </div>
+                            ))}
                     </div>
                 ))}
             </div>
@@ -104,7 +126,7 @@ export default function PerformRecovery() {
     return (
         <>
             <PageHeader>{t('performRecovery.title')}</PageHeader>
-            <div className="onboarding-setup__page-with-header flex-column align-center">
+            <div className="onboarding-setup__page-with-header onboarding-setup__recovery">
                 {!result && (
                     <>
                         <div className="onboarding-setup__page-with-header__description">
@@ -117,7 +139,7 @@ export default function PerformRecovery() {
                 {result?.status === BackgroundResponseStatus.Error && (
                     <>
                         <p>{t('performRecovery.description.error')}</p>
-                        <p>{result.reason}</p>
+                        <p>{result?.reason}</p>
                         <Button
                             width="medium"
                             className="onboarding-setup__recovery__button"

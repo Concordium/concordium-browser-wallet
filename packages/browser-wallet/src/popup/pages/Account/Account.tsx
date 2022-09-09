@@ -1,11 +1,9 @@
 import { useAtomValue } from 'jotai';
-import React, { useMemo, useState } from 'react';
+import React, { useState } from 'react';
 import { useTranslation } from 'react-i18next';
-import { Link, Outlet, Route, Routes } from 'react-router-dom';
-import { accountsAtom, selectedAccountAtom, storedConnectedSitesAtom } from '@popup/store/account';
+import { Outlet, Route, Routes } from 'react-router-dom';
+import { accountsAtom } from '@popup/store/account';
 import MenuButton from '@popup/shared/MenuButton';
-import { getCurrentOpenTabUrl } from '@popup/shared/utils/tabs';
-import clsx from 'clsx';
 import { useSelectedCredential } from '@popup/shared/utils/account-helpers';
 import { CreationStatus } from '@shared/storage/types';
 import { accountRoutes } from './routes';
@@ -16,34 +14,7 @@ import AccountDetails from './AccountDetails';
 import AccountSettings from './AccountSettings';
 import TransactionLog from './TransactionLog/TransactionLog';
 import SendCcd from './SendCcd';
-
-function ConnectedBox({ setDetailsExpanded }: { setDetailsExpanded: React.Dispatch<React.SetStateAction<boolean>> }) {
-    const { t } = useTranslation('account');
-    const connectedSites = useAtomValue(storedConnectedSitesAtom);
-    const selectedAccount = useAtomValue(selectedAccountAtom);
-    const [isConnectedToSite, setIsConnectedToSite] = useState<boolean>();
-
-    useMemo(() => {
-        if (selectedAccount && !connectedSites.loading) {
-            getCurrentOpenTabUrl().then((url) => {
-                if (url) {
-                    const connectedSitesForAccount = connectedSites.value[selectedAccount] ?? [];
-                    setIsConnectedToSite(connectedSitesForAccount.includes(url));
-                }
-            });
-        }
-    }, [selectedAccount, connectedSites]);
-
-    return (
-        <Link
-            className={clsx('account-page__connection-box', !isConnectedToSite && 'account-page__not-connected')}
-            to={`${accountRoutes.settings}/${accountSettingsRoutes.connectedSites}`}
-            onClick={() => setDetailsExpanded(false)}
-        >
-            {isConnectedToSite ? t('siteConnected') : t('siteNotConnected')}
-        </Link>
-    );
-}
+import ConnectedBox from './ConnectedBox';
 
 function Account({
     detailsExpanded,
@@ -72,7 +43,11 @@ function Account({
                                 onClick={() => setDetailsExpanded((o) => !o)}
                             />
                             <AccountDetails expanded={detailsExpanded} account={selectedCred} />
-                            <ConnectedBox setDetailsExpanded={setDetailsExpanded} />
+                            <ConnectedBox
+                                link={`${accountRoutes.settings}/${accountSettingsRoutes.connectedSites}`}
+                                onNavigate={() => setDetailsExpanded(false)}
+                                accountAddress={selectedCred.address}
+                            />
                         </div>
                         <div className="account-page__routes">
                             {isConfirmed && <Outlet />}

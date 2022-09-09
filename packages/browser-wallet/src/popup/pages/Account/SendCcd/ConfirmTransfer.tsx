@@ -8,7 +8,6 @@ import { jsonRpcClientAtom } from '@popup/store/settings';
 import { addToastAtom } from '@popup/state';
 import { usePrivateKey } from '@popup/shared/utils/account-helpers';
 import Button from '@popup/shared/Button';
-import DisplaySimpleTransfer from '@popup/shared/TransactionReceipt/displayPayload/DisplaySimpleTransfer';
 import { useLocation, useNavigate } from 'react-router-dom';
 import { absoluteRoutes } from '@popup/constants/routes';
 import TransactionReceipt from '@popup/shared/TransactionReceipt/TransactionReceipt';
@@ -70,9 +69,14 @@ export default function ConfirmTransfer({ setDetailsExpanded, cost }: Props) {
 
     return (
         <div className="w-full flex-column justify-space-between align-center">
-            <TransactionReceipt title={t('sendCcd.receiptTitle')} sender={address} cost={cost} hash={hash}>
-                <DisplaySimpleTransfer payload={payload} />
-            </TransactionReceipt>
+            <TransactionReceipt
+                transactionType={AccountTransactionType.SimpleTransfer}
+                payload={payload}
+                sender={address}
+                cost={cost}
+                hash={hash}
+                className="send-ccd__receipt"
+            />
             {!hash && (
                 <div className="flex justify-center p-b-10 m-h-20">
                     <Button width="narrow" className="m-r-10" onClick={() => nav(`../`, { state: { payload } })}>

@@ -4,7 +4,7 @@ import { displayAsCcd } from 'wallet-common-helpers';
 import { useTranslation } from 'react-i18next';
 
 type Props = {
-    cost: bigint;
+    cost?: bigint;
     className?: string;
 };
 
@@ -14,7 +14,7 @@ export default function DisplayCost({ cost, className }: Props) {
     return (
         <div className={clsx('transaction-receipt__cost', className)}>
             <p>{t('cost')}</p>
-            <p>{displayAsCcd(cost)}</p>
+            <p>{cost ? displayAsCcd(cost) : t('unknown')}</p>
         </div>
     );
 }

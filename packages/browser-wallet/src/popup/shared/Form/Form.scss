@@ -35,16 +35,35 @@
         background-color: $color-input-bg;
         font-size: rem(10px);
         color: $color-text;
-        height: rem(32px);
         border: rem(1px) solid $color-grey;
         border-radius: rem(5px);
         padding: rem(12px) rem(5px) rem(5px);
+        height: 100%;
         width: 100%;
         outline: none;
         @include transition(border-color);
 
         &:focus {
             border-color: $color-blue;
+        }
+    }
+
+    &__checkbox {
+        display: flex;
+        flex-direction: row;
+        padding: 0 rem(30px);
+
+        label {
+            margin-top: auto;
+            margin-bottom: auto;
+        }
+
+        input {
+            width: rem(20px);
+            height: rem(20px);
+            margin-right: rem(10px);
+            background-color: $color-input-bg;
+            accent-color: $color-cta-mainnet;
         }
     }
 

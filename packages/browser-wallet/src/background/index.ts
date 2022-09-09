@@ -216,6 +216,11 @@ const handleConnectMessage: HandleMessage<{ url: string | undefined; title: stri
     { url, tab }
 ) => ({ url, title: tab?.title });
 
+const appendUrlToPayload: HandleMessage<{ url: string | undefined; title: string | undefined }> = (msg, { url }) => ({
+    ...msg.payload,
+    url,
+});
+
 const handleConnectionResponse: HandleResponse<string | undefined | false> = async (
     response: boolean,
     _msg,
@@ -261,5 +266,5 @@ forwardToPopup(
     handleConnectMessage,
     handleConnectionResponse
 );
-forwardToPopup(MessageType.SendTransaction, InternalMessageType.SendTransaction, runIfWhitelisted);
-forwardToPopup(MessageType.SignMessage, InternalMessageType.SignMessage, runIfWhitelisted);
+forwardToPopup(MessageType.SendTransaction, InternalMessageType.SendTransaction, runIfWhitelisted, appendUrlToPayload);
+forwardToPopup(MessageType.SignMessage, InternalMessageType.SignMessage, runIfWhitelisted, appendUrlToPayload);

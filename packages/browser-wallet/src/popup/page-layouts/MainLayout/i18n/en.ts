@@ -8,6 +8,8 @@ const t = {
         accounts: 'Accounts',
         ids: 'ID cards',
         settings: 'Wallet settings',
+        request: 'Signature Request',
+        connect: 'New connection',
     },
     entityList: {
         searchPlaceholder: 'Search',
