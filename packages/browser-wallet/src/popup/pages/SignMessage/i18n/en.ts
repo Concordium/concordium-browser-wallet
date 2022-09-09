@@ -1,7 +1,7 @@
 const t = {
-    description: 'Sign message with account {{address}}',
+    description: '{{ dApp }} requests a signature on a message',
     sign: 'Sign',
-    deny: 'Deny',
+    reject: 'Reject',
     error: 'Error',
 };
 

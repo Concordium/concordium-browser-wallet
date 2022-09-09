@@ -18797,6 +18797,14 @@ __metadata:
   languageName: node
   linkType: hard
 
+"two-step-transfer@workspace:examples/two-step-transfer":
+  version: 0.0.0-use.local
+  resolution: "two-step-transfer@workspace:examples/two-step-transfer"
+  dependencies:
+    live-server: ^1.2.2
+  languageName: unknown
+  linkType: soft
+
 "type-check@npm:^0.4.0, type-check@npm:~0.4.0":
   version: 0.4.0
   resolution: "type-check@npm:0.4.0"
