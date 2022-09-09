@@ -11,6 +11,7 @@ export const credentialsAtom = atomWithChromeStorage<WalletCredential[]>(ChromeS
 export const storedConnectedSitesAtom = atomWithChromeStorage<Record<string, string[]>>(
     ChromeStorageKey.ConnectedSites,
     {},
+    true,
     true
 );
 

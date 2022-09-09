@@ -6,7 +6,7 @@ import Form from '@popup/shared/Form';
 import Submit from '@popup/shared/Form/Submit';
 import FormPassword from '@popup/shared/Form/Password';
 import { useTranslation } from 'react-i18next';
-import { useNavigate } from 'react-router-dom';
+import { useNavigate, useLocation } from 'react-router-dom';
 import { useAtomValue, useSetAtom } from 'jotai';
 import { decrypt } from '@popup/shared/crypto';
 import { encryptedSeedPhraseAtom, sessionPasscodeAtom } from '@popup/store/settings';
@@ -17,8 +17,19 @@ type FormValues = {
     passcode: string;
 };
 
-export default function Login({ navigateTo }: { navigateTo?: string }) {
+type State = {
+    to: string;
+    // This is actually just any;
+    // eslint-disable-next-line @typescript-eslint/no-explicit-any
+    toState: any;
+};
+
+/**
+ * Will navigate to the to address in the location's state, after unlocking
+ */
+export default function Login() {
     const navigate = useNavigate();
+    const state = useLocation().state as State;
     const setPasscodeInSession = useSetAtom(sessionPasscodeAtom);
     const encryptedSeedPhrase = useAtomValue(encryptedSeedPhraseAtom);
     const { t } = useTranslation('login');
@@ -37,9 +48,7 @@ export default function Login({ navigateTo }: { navigateTo?: string }) {
                 // TODO Replace this with an authenticated encryption scheme (AES-GCM). This is a dirty way of validating the decryption.
                 if (validateMnemonic(decryptedSeedPhrase, wordlist)) {
                     setPasscodeInSession(vs.passcode);
-                    if (navigateTo) {
-                        navigate(navigateTo);
-                    }
+                    navigate(state.to, { state: state.toState });
                 } else {
                     form.setError('passcode', { message: t('incorrectPasscode') });
                 }
@@ -61,6 +70,7 @@ export default function Login({ navigateTo }: { navigateTo?: string }) {
                     return (
                         <>
                             <FormPassword
+                                autoFocus
                                 control={f.control}
                                 name="passcode"
                                 label={tSetup('setupPasscode.form.enterPasscode')}

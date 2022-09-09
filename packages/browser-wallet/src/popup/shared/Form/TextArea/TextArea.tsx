@@ -6,7 +6,10 @@ import { CommonFieldProps, RequiredUncontrolledFieldProps } from '../common/type
 import { makeUncontrolled } from '../common/utils';
 import ErrorMessage from '../ErrorMessage';
 
-type Props = Pick<TextareaHTMLAttributes<HTMLTextAreaElement>, 'className' | 'value' | 'onChange' | 'onBlur'> &
+type Props = Pick<
+    TextareaHTMLAttributes<HTMLTextAreaElement>,
+    'className' | 'value' | 'onChange' | 'onBlur' | 'readOnly'
+> &
     RequiredUncontrolledFieldProps<HTMLTextAreaElement> &
     CommonFieldProps;
 
@@ -15,7 +18,7 @@ type Props = Pick<TextareaHTMLAttributes<HTMLTextAreaElement>, 'className' | 'va
  * Use as a normal \<textarea /\>.
  */
 export const TextArea = forwardRef<HTMLTextAreaElement, Props>(
-    ({ error, className, label, note, valid, ...props }, ref) => {
+    ({ error, className, label, note, valid, readOnly, ...props }, ref) => {
         return (
             <label
                 className={clsx(
@@ -26,11 +29,12 @@ export const TextArea = forwardRef<HTMLTextAreaElement, Props>(
                 )}
             >
                 <textarea
-                    className={clsx('form-input__area')}
+                    className="form-input__area"
                     style={{ resize: 'none' }}
                     ref={ref}
                     autoComplete="off"
                     spellCheck="false"
+                    readOnly={readOnly}
                     {...props}
                 />
                 {label && <div className="form-input__label">{label}</div>}

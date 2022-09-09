@@ -1,7 +1,7 @@
 import { AccountAddress, AccountInfo, HttpProvider, JsonRpcClient } from '@concordium/web-sdk';
 import { networkConfigurationAtom } from '@popup/store/settings';
 import { useAtomValue, useSetAtom } from 'jotai';
-import React, { createContext, ReactElement, useContext, useEffect, useMemo, useState } from 'react';
+import React, { createContext, ReactNode, useContext, useEffect, useMemo, useState } from 'react';
 import JSONBig from 'json-bigint';
 import { atomWithChromeStorage } from '@popup/store/utils';
 import { ChromeStorageKey, CreationStatus, WalletCredential } from '@shared/storage/types';
@@ -21,7 +21,7 @@ export const accountInfoAtom = atomWithChromeStorage<Record<string, string>>(
 export const AccountInfoListenerContext = createContext<AccountInfoListener | undefined>(undefined);
 
 interface Props {
-    children: ReactElement[];
+    children: ReactNode;
 }
 
 export default function AccountInfoListenerContextProvider({ children }: Props) {

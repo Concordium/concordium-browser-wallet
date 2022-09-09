@@ -46,7 +46,6 @@ const t: typeof en = {
             continue: 'Fortsæt',
         },
         title: 'Send CCD',
-        receiptTitle: 'Transaktion: Send CCD',
         fee: 'Estimerede transaktionsomkostninger',
     },
     accountPending: 'Denne konto er stadig ved at blive oprettet.',

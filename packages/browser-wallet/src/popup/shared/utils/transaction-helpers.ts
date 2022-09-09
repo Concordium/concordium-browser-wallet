@@ -2,6 +2,7 @@ import {
     AccountAddress,
     AccountInfo,
     AccountTransaction,
+    AccountTransactionType,
     buildBasicAccountSigner,
     getAccountTransactionHash,
     GtuAmount,
@@ -70,4 +71,21 @@ export function validateAccountAddress(cand: string): string | undefined {
 export function getDefaultExpiry(): TransactionExpiry {
     // TODO: add better default?
     return new TransactionExpiry(new Date(Date.now() + 3600000));
+}
+
+export function getTransactionTypeName(type: AccountTransactionType): string {
+    switch (type) {
+        case AccountTransactionType.SimpleTransfer: {
+            return i18n.t('utils.transaction.type.simple');
+        }
+        case AccountTransactionType.InitializeSmartContractInstance: {
+            return i18n.t('utils.transaction.type.init');
+        }
+        case AccountTransactionType.UpdateSmartContractInstance: {
+            return i18n.t('utils.transaction.type.update');
+        }
+        default: {
+            return i18n.t('utils.transaction.type.unknown');
+        }
+    }
 }

@@ -1,0 +1,41 @@
+import React from 'react';
+import { AccountTransactionPayload, AccountAddress, GtuAmount } from '@concordium/web-sdk';
+import DisplayAddress, { AddressDisplayFormat } from 'wallet-common-helpers/src/components/DisplayAddress';
+import { displayAsCcd } from 'wallet-common-helpers/lib/utils/ccd';
+
+interface Props {
+    payload: AccountTransactionPayload;
+}
+
+// eslint-disable-next-line @typescript-eslint/no-explicit-any
+function displayValue(value: any) {
+    if (value instanceof AccountAddress) {
+        return (
+            <DisplayAddress
+                className="transaction-receipt__address"
+                address={value.address}
+                format={AddressDisplayFormat.DoubleLine}
+            />
+        );
+    }
+    if (value instanceof GtuAmount) {
+        return <p className="m-t-0">{displayAsCcd(value.microGtuAmount)}</p>;
+    }
+    return <p className="m-t-0">{value.toString()}</p>;
+}
+
+/**
+ * Displays an overview of any transaction payload.
+ */
+export default function DisplayGenericPayload({ payload }: Props) {
+    return (
+        <>
+            {Object.entries(payload).map(([key, value]) => (
+                <>
+                    <h5>{key}</h5>
+                    {displayValue(value)}
+                </>
+            ))}
+        </>
+    );
+}

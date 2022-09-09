@@ -107,7 +107,7 @@ export default function Routes() {
                 />
             </Route>
             <Route path={`${relativeRoutes.setup.path}/*`} element={<Setup />} />
-            <Route path={relativeRoutes.login.path} element={<Login navigateTo={absoluteRoutes.home.account.path} />} />
+            <Route path={relativeRoutes.login.path} element={<Login />} />
             <Route path={relativeRoutes.home.path} element={<MainLayout />}>
                 <Route
                     element={<IdentityIssuanceStart />}

@@ -25,7 +25,7 @@ export default function MainLayout() {
     }
 
     if (!sessionPasscode) {
-        return <Navigate to={absoluteRoutes.login.path} />;
+        return <Navigate to={absoluteRoutes.login.path} state={{ to: absoluteRoutes.home.account.path }} />;
     }
 
     return (

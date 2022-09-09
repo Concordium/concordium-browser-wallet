@@ -9,6 +9,8 @@ const t = {
         ids: 'ID cards',
         settings: 'Wallet settings',
         recovery: 'Restoring your wallet',
+        request: 'Signature Request',
+        connect: 'New connection',
     },
     entityList: {
         searchPlaceholder: 'Search',

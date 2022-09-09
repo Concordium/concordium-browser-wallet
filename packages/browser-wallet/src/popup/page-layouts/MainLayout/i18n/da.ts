@@ -11,6 +11,8 @@ const t: typeof en = {
         ids: 'ID kort',
         settings: 'Wallet indstillinger',
         recovery: 'Genskabning af din wallet',
+        request: 'Anmodning om Signatur',
+        connect: 'Ny Forbindelse',
     },
     entityList: {
         searchPlaceholder: 'Søg',
