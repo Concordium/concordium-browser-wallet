@@ -1,11 +1,11 @@
+import { absoluteRoutes } from '@popup/constants/routes';
 import { fullscreenPromptContext } from '@popup/page-layouts/FullscreenPromptLayout';
 import { selectedAccountAtom, storedConnectedSitesAtom } from '@popup/store/account';
 import { sessionPasscodeAtom } from '@popup/store/settings';
 import { useAtom, useAtomValue } from 'jotai';
 import React, { useContext, useEffect } from 'react';
 import { useTranslation } from 'react-i18next';
-import { useLocation } from 'react-router-dom';
-import Login from '../Login/Login';
+import { useLocation, Navigate } from 'react-router-dom';
 
 type Props = {
     onAllow(): void;
@@ -29,7 +29,12 @@ export default function ConnectionRequest({ onAllow, onReject }: Props) {
 
     // The wallet is locked, so prompt the user to unlock the wallet before connecting.
     if (!passcode.value) {
-        return <Login />;
+        return (
+            <Navigate
+                to={absoluteRoutes.login.path}
+                state={{ to: absoluteRoutes.prompt.connectionRequest.path, toState: state }}
+            />
+        );
     }
 
     function connectAccount(account: string, url: string) {

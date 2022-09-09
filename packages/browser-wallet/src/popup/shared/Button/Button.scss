@@ -21,7 +21,7 @@
 
     &:where(:not(.button--clear)) {
         height: rem($button-height);
-        padding: 0 rem(10px);
+        padding: 0 rem(5px);
         font-size: rem(12px);
         font-weight: $font-weight-extra-light;
         color: $color-off-white;
@@ -51,7 +51,7 @@
     }
 
     &--narrow {
-        width: rem(75px);
+        width: rem(85px);
     }
 
     &--medium {

@@ -10,7 +10,6 @@ interface Props {
 
 /**
  * Displays an overview of a update contract transaction.
- * TODO: make nice
  */
 export default function DisplayUpdateContract({ payload, parameters }: Props) {
     const { t } = useTranslation('sendTransaction');

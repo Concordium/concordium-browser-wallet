@@ -1,5 +1,5 @@
-import React, { useContext, useCallback, useMemo, useState, useEffect } from 'react';
-import { useAtomValue } from 'jotai';
+import React, { useContext, useCallback, useMemo, useEffect } from 'react';
+import { useAtomValue, useSetAtom } from 'jotai';
 import { fullscreenPromptContext } from '@popup/page-layouts/FullscreenPromptLayout';
 import { useTranslation } from 'react-i18next';
 import { useLocation } from 'react-router-dom';
@@ -8,9 +8,12 @@ import { usePrivateKey } from '@popup/shared/utils/account-helpers';
 import { sendTransaction, getDefaultExpiry } from '@popup/shared/utils/transaction-helpers';
 import { jsonRpcClientAtom } from '@popup/store/settings';
 import TransactionReceipt from '@popup/shared/TransactionReceipt/TransactionReceipt';
-import DisplayUpdateContract from '@popup/shared/TransactionReceipt/displayPayload/DisplayUpdateContract';
-import DisplayInitContract from '@popup/shared/TransactionReceipt/displayPayload/DisplayInitContract';
-import DisplaySimpleTransfer from '@popup/shared/TransactionReceipt/displayPayload/DisplaySimpleTransfer';
+import Button from '@popup/shared/Button';
+import { displayUrl } from '@popup/shared/utils/string-helpers';
+import { noOp, useAsyncMemo } from 'wallet-common-helpers';
+import { getSimpleTransferCost } from '@popup/shared/utils/wallet-proxy';
+import ConnectedBox from '@popup/pages/Account/ConnectedBox';
+import { addToastAtom } from '@popup/state';
 import { parsePayload } from './util';
 
 interface Location {
@@ -22,6 +25,7 @@ interface Location {
             parameters?: Record<string, unknown>;
             schema?: string;
             schemaVersion?: SchemaVersion;
+            url: string;
         };
     };
 }
@@ -34,11 +38,11 @@ interface Props {
 export default function SendTransaction({ onSubmit, onReject }: Props) {
     const { state } = useLocation() as Location;
     const { t } = useTranslation('sendTransaction');
-    const [error, setError] = useState<string>();
+    const addToast = useSetAtom(addToastAtom);
     const client = useAtomValue(jsonRpcClientAtom);
     const { withClose, onClose } = useContext(fullscreenPromptContext);
 
-    const { accountAddress } = state.payload;
+    const { accountAddress, url } = state.payload;
     const key = usePrivateKey(accountAddress);
 
     const { type: transactionType, payload } = useMemo(
@@ -51,6 +55,13 @@ export default function SendTransaction({ onSubmit, onReject }: Props) {
                 state.payload.schemaVersion
             ),
         [JSON.stringify(state.payload)]
+    );
+    const cost = useAsyncMemo(
+        transactionType === AccountTransactionType.SimpleTransfer
+            ? getSimpleTransferCost
+            : () => Promise.resolve(undefined),
+        noOp,
+        [transactionType]
     );
 
     useEffect(() => onClose(onReject), [onClose, onReject]);
@@ -82,39 +93,34 @@ export default function SendTransaction({ onSubmit, onReject }: Props) {
 
     return (
         <>
-            <div>{t('description')}</div>
-            <TransactionReceipt title={t('title')} sender={accountAddress}>
-                <>
-                    {transactionType === AccountTransactionType.SimpleTransfer && (
-                        <DisplaySimpleTransfer payload={payload} />
-                    )}
-                    {transactionType === AccountTransactionType.UpdateSmartContractInstance && (
-                        <DisplayUpdateContract payload={payload} parameters={state.payload.parameters} />
-                    )}
-                    {transactionType === AccountTransactionType.InitializeSmartContractInstance && (
-                        <DisplayInitContract payload={payload} parameters={state.payload.parameters} />
-                    )}
-                </>
-            </TransactionReceipt>
-            <br />
-            <button
-                type="button"
-                onClick={() =>
-                    handleSubmit()
-                        .then(withClose(onSubmit))
-                        .catch((e) => setError(e.message))
-                }
-            >
-                {t('submit')}
-            </button>
-            <button type="button" onClick={withClose(onReject)}>
-                {t('deny')}
-            </button>
-            {error && (
-                <p>
-                    {t('error')}: {error}
-                </p>
-            )}
+            <ConnectedBox accountAddress={accountAddress} getUrl={() => Promise.resolve(new URL(url).origin)} />
+            <div className="h-full flex-column align-center">
+                <div>{t('description', { dApp: displayUrl(url) })}</div>
+                <TransactionReceipt
+                    transactionType={transactionType}
+                    payload={payload}
+                    parameters={state.payload.parameters}
+                    sender={accountAddress}
+                    cost={cost}
+                    className="m-v-10"
+                />
+                <br />
+                <div className="flex p-b-10">
+                    <Button width="narrow" className="m-r-10" onClick={withClose(onReject)}>
+                        {t('deny')}
+                    </Button>
+                    <Button
+                        width="narrow"
+                        onClick={() =>
+                            handleSubmit()
+                                .then(withClose(onSubmit))
+                                .catch((e) => addToast(e.message))
+                        }
+                    >
+                        {t('submit')}
+                    </Button>
+                </div>
+            </div>
         </>
     );
 }

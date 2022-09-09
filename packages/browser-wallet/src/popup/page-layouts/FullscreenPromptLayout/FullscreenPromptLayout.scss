@@ -1,16 +1,10 @@
 .fullscreen-prompt-layout {
     position: relative;
-    padding: rem(10px);
-    height: 100%;
+    height: calc(100% - $main-layout-header-height);
 
     &__main {
+        padding: rem(10px);
+        height: calc(100% - $account-page-details-height);
         overflow: overlay;
-        height: 100%;
-    }
-
-    &__close {
-        position: absolute;
-        top: rem(1px);
-        right: 0;
     }
 }
