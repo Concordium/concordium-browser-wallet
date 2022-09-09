@@ -7,6 +7,7 @@ import signMessage from '@popup/pages/SignMessage/i18n/da';
 import connectionRequest from '@popup/pages/ConnectionRequest/i18n/da';
 import settings from '@popup/pages/Settings/i18n/da';
 import networkSettings from '@popup/pages/NetworkSettings/i18n/da';
+import recovery from '@popup/pages/Recovery/i18n/da';
 import about from '@popup/pages/About/i18n/da';
 import addAccount from '@popup/pages/AddAccount/i18n/da';
 import identityIssuance from '@popup/pages/IdentityIssuance/i18n/da';
@@ -26,6 +27,7 @@ const t: typeof en = {
     connectionRequest,
     settings,
     networkSettings,
+    recovery,
     addAccount,
     identityIssuance,
     about,

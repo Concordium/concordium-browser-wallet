@@ -1,0 +1,62 @@
+.recovery {
+    &__intro {
+        display: flex;
+        flex-direction: column;
+        align-items: center;
+        height: 100%;
+        background: $color-bg;
+
+        &__description {
+            margin: $description-margin-top rem(20px);
+            white-space: pre-wrap;
+        }
+
+        &__button {
+            margin: auto auto rem(40px);
+        }
+    }
+
+    &__main {
+        overflow-y: overlay;
+        display: flex;
+        flex-direction: column;
+        align-items: center;
+
+        &__results {
+            width: 100%;
+            text-align: left;
+        }
+
+        &__credential {
+            border-top: rem(1px) dotted $color-petroleum;
+
+            p {
+                margin: rem(5px) 0;
+                font-size: rem(8px);
+            }
+        }
+
+        &__button {
+            min-height: rem(30px);
+            margin: auto auto rem(15px);
+        }
+
+        &__identity {
+            margin-top: rem(10px);
+
+            & > p {
+                font-weight: $font-weight-bold;
+                padding: 0;
+            }
+
+            &:not(:last-child) {
+                border-bottom: rem(2px) solid $color-petroleum;
+            }
+        }
+
+        &__description {
+            margin: $description-margin-top rem(20px) 0;
+            margin-bottom: rem(10px);
+        }
+    }
+}

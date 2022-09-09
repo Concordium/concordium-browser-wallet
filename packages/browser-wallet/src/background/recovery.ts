@@ -13,7 +13,7 @@ import {
 import { ExtensionMessageHandler } from '@concordium/browser-wallet-message-hub';
 import { BackgroundResponseStatus } from '@shared/utils/types';
 import { Identity, CreationStatus, IdentityProvider, WalletCredential } from '@shared/storage/types';
-import { storedCurrentNetwork } from '@shared/storage/access';
+import { storedCredentials, storedCurrentNetwork, storedIdentities } from '@shared/storage/access';
 import { addCredential, addIdentity } from './update';
 
 // How many empty identityIndices are allowed before stopping
@@ -23,12 +23,13 @@ async function recoverAccounts(
     identityIndex: number,
     providerIndex: number,
     credentialInput: Omit<CredentialInputV1, 'credNumber'>,
-    getAccountInfo: (credId: string) => Promise<AccountInfo | undefined>
+    getAccountInfo: (credId: string) => Promise<AccountInfo | undefined>,
+    startCredNumber = 0
 ): Promise<WalletCredential[]> {
     const credsToAdd: WalletCredential[] = [];
 
     let emptyIndices = 0;
-    let credNumber = 0;
+    let credNumber = startCredNumber;
     while (emptyIndices < maxEmpty) {
         const request = createCredentialV1({ ...credentialInput, credNumber });
         const { credId } = request.cdi;
@@ -76,6 +77,14 @@ async function performRecovery({ providers, ...recoveryInputs }: Payload) {
     if (!network) {
         throw new Error('No chosen network could be found');
     }
+    const identities = await storedIdentities.get(network.genesisHash);
+    const credentials = await storedCredentials.get(network.genesisHash);
+
+    const getNextCredIndex = ({ index, providerIndex }: Identity) =>
+        (credentials || [])
+            .filter((cred) => cred.identityIndex === index && cred.providerIndex === providerIndex)
+            .reduce((currentNext, cred) => Math.max(currentNext, cred.credNumber + 1), 0);
+
     const client = new JsonRpcClient(new HttpProvider(network.jsonRpcUrl, fetch));
     const blockHash = (await client.getConsensusStatus()).lastFinalizedBlock;
     const getAccountInfo = (credId: string) => client.getAccountInfo(new CredentialRegistrationId(credId), blockHash);
@@ -86,38 +95,52 @@ async function performRecovery({ providers, ...recoveryInputs }: Payload) {
             // eslint-disable-next-line no-continue
             continue;
         }
+        const providerIndex = provider.ipInfo.ipIdentity;
         let emptyIndices = 0;
         let identityIndex = 0;
         while (emptyIndices < maxEmpty) {
-            const recoverUrl = getRecoverUrl({ ...recoveryInputs, identityIndex }, provider);
-            const response = await fetch(recoverUrl);
-            if (response.ok) {
-                const idObject = await response.json();
-                identitiesToAdd.push({
-                    name: `Identity ${nextId + 1}`,
-                    index: identityIndex,
-                    providerIndex: provider.ipInfo.ipIdentity,
-                    status: CreationStatus.Confirmed,
-                    idObject,
-                });
-                credsToAdd.push(
-                    ...(await recoverAccounts(
-                        identityIndex,
-                        provider.ipInfo.ipIdentity,
-                        {
+            // Check if there is already an identity on the current index
+            // eslint-disable-next-line @typescript-eslint/no-loop-func
+            let identity = identities?.find((id) => id.index === identityIndex && id.providerIndex === providerIndex);
+            if (!identity) {
+                // Attempt to recover the identity
+                const recoverUrl = getRecoverUrl({ ...recoveryInputs, identityIndex }, provider);
+                const response = await fetch(recoverUrl);
+                if (response.ok) {
+                    const idObject = await response.json();
+                    identity = {
+                        name: `Identity ${nextId + 1}`,
+                        index: identityIndex,
+                        providerIndex,
+                        status: CreationStatus.Confirmed,
+                        idObject,
+                    };
+                    identitiesToAdd.push(identity);
+                }
+            }
+            if (identity) {
+                // Only recover accounts, if we found an identity
+                if (identity.status === CreationStatus.Confirmed) {
+                    credsToAdd.push(
+                        ...(await recoverAccounts(
                             identityIndex,
-                            ipInfo: provider.ipInfo,
-                            arsInfos: provider.arsInfos,
-                            globalContext: recoveryInputs.globalContext,
-                            seedAsHex: recoveryInputs.seedAsHex,
-                            net: recoveryInputs.net,
-                            expiry: Date.now(),
-                            revealedAttributes: [],
-                            idObject: idObject.value,
-                        },
-                        getAccountInfo
-                    ))
-                );
+                            providerIndex,
+                            {
+                                identityIndex,
+                                ipInfo: provider.ipInfo,
+                                arsInfos: provider.arsInfos,
+                                globalContext: recoveryInputs.globalContext,
+                                seedAsHex: recoveryInputs.seedAsHex,
+                                net: recoveryInputs.net,
+                                expiry: Date.now(),
+                                revealedAttributes: [],
+                                idObject: identity.idObject.value,
+                            },
+                            getAccountInfo,
+                            getNextCredIndex(identity)
+                        ))
+                    );
+                }
                 nextId += 1;
                 emptyIndices = 0;
             } else {

@@ -25,6 +25,9 @@ export const relativeRoutes = {
             network: {
                 path: 'network',
             },
+            recovery: {
+                path: 'recovery',
+            },
             about: {
                 path: 'about',
             },
