@@ -15,6 +15,9 @@ const t: typeof en = {
         confirmed: 'Godkendt af',
         rejected: 'Afvist af',
     },
+    account: {
+        error: 'Fejl ved hentning af kontoens balance',
+    },
     utils: {
         address: {
             required: 'Indtast en addresse',
@@ -28,7 +31,7 @@ const t: typeof en = {
         },
         transaction: {
             type: {
-                simple: 'Send Ccd',
+                simple: 'Send CCD',
                 init: 'Opret Smart Contract Instans',
                 update: 'Opdater Smart Contract Instans',
                 unknown: 'Ukendt',
@@ -38,6 +41,7 @@ const t: typeof en = {
     transactionReceipt: {
         sender: 'Afsender',
         cost: 'Estimerede transaktionsomkostninger',
+        unknown: 'Ukendt',
     },
 };
 

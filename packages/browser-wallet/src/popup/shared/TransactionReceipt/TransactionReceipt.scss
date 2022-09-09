@@ -45,6 +45,11 @@ $transaction-receipt-horizontal-padding: rem(20px);
     &__parameter {
         word-break: break-all;
         white-space: pre-wrap;
+        margin: 0;
+        flex-grow: 1;
+        background-color: $color-input-bg;
+        border: rem(0.5px) solid $color-grey;
+        padding: rem(8px);
     }
 
     &__hash {
@@ -53,5 +58,10 @@ $transaction-receipt-horizontal-padding: rem(20px);
         padding-top: rem(5px);
         font-size: rem(8px);
         margin-top: rem(10px);
+    }
+
+    &__module-ref {
+        width: rem(180px);
+        overflow-wrap: break-word;
     }
 }

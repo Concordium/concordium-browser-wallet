@@ -1,3 +1,5 @@
+$description-margin-top: rem(25px);
+
 .onboarding-setup {
     &__intro-wrapper {
         padding: rem(10px);
@@ -40,6 +42,16 @@
         &__description {
             margin-top: rem(36px);
         }
+
+        &__terms-and-conditions {
+            margin-top: rem(150px);
+            margin-left: rem(14px);
+            text-align: left;
+
+            a {
+                text-decoration: underline;
+            }
+        }
     }
 
     &__page-with-header {
@@ -48,7 +60,7 @@
         height: calc(100% - #{rem($page-header-height)});
 
         &__description {
-            margin-top: rem(25px);
+            margin-top: $description-margin-top;
             margin-bottom: rem(25px);
         }
 
@@ -96,6 +108,50 @@
             background-color: $color-cta-othernet;
             margin: 0 auto;
             margin-bottom: rem(12px);
+        }
+    }
+
+    &__recovery {
+        overflow-y: overlay;
+        display: flex;
+        flex-direction: column;
+        align-items: center;
+
+        &__results {
+            width: 100%;
+            text-align: left;
+        }
+
+        &__credential {
+            border-top: rem(1px) dotted $color-petroleum;
+
+            p {
+                margin: rem(5px) 0;
+                font-size: rem(8px);
+            }
+        }
+
+        &__button {
+            min-height: rem(30px);
+            margin: auto auto rem(10px);
+        }
+
+        &__identity {
+            margin-top: rem(10px);
+
+            & > p {
+                font-weight: $font-weight-bold;
+                padding: 0;
+            }
+
+            &:not(:last-child) {
+                border-bottom: rem(2px) solid $color-petroleum;
+            }
+        }
+
+        &__description {
+            margin-top: $description-margin-top;
+            margin-bottom: rem(10px);
         }
     }
 }

@@ -14,7 +14,6 @@ import AccountDetails from './AccountDetails';
 import AccountSettings from './AccountSettings';
 import TransactionLog from './TransactionLog/TransactionLog';
 import SendCcd from './SendCcd';
-import AccountContext from './AccountContext';
 import ConnectedBox from './ConnectedBox';
 
 function Account({
@@ -36,7 +35,7 @@ function Account({
             <div className="account-page__content">
                 {accounts.length === 0 && <div>{t('noAccounts')}</div>}
                 {selectedCred !== undefined && (
-                    <AccountContext account={selectedCred}>
+                    <>
                         <div className="account-page__details">
                             <MenuButton
                                 className="account-page__hide"
@@ -54,7 +53,7 @@ function Account({
                             {isConfirmed && <Outlet />}
                             {!isConfirmed && <div className="account-page__not-finalized">{t('accountPending')}</div>}
                         </div>
-                    </AccountContext>
+                    </>
                 )}
             </div>
             <AccountActions

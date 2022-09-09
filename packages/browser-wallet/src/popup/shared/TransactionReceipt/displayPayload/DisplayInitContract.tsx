@@ -10,7 +10,6 @@ interface Props {
 
 /**
  * Displays an overview of a init contract transaction.
- * TODO: make nice
  */
 export default function DisplayInitContract({ payload, parameters }: Props) {
     const { t } = useTranslation('sendTransaction');
@@ -18,7 +17,7 @@ export default function DisplayInitContract({ payload, parameters }: Props) {
     return (
         <>
             <h5>{t('moduleReference')}:</h5>
-            <p>{payload.moduleRef.moduleRef}</p>
+            <p className="transaction-receipt__module-ref">{payload.moduleRef.moduleRef}</p>
             <h5>{t('contractName')}:</h5>
             <p>{payload.contractName}</p>
             <h5>{t('amount')}:</h5>
