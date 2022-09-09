@@ -53,20 +53,17 @@ export default function ConnectionRequest({ onAllow, onReject }: Props) {
     }
 
     // eslint-disable-next-line @typescript-eslint/no-explicit-any
-    const { title, url } = (state as any).payload;
-    const urlOrigin = new URL(url).origin;
+    const { url } = (state as any).payload;
     const urlDisplay = displayUrl(url);
 
     return (
         <div className="h-full flex-column align-center">
             <div className="account-page__connection-box connection-request__connection-box">{t('waiting')}</div>
-            <header className="m-t-20 m-b-40">
+            <header className="m-v-20">
                 <h1>{t('title', { dApp: urlDisplay, account: displaySplitAddress(selectedAccount) })}</h1>
             </header>
             <p className="connection-request__description">{t('descriptionP1', { dApp: urlDisplay })}</p>
             <p className="connection-request__description">{t('descriptionP2')}</p>
-            <pre className="connection-request__url">{title}</pre>
-            <pre className="connection-request__url">{urlOrigin}</pre>
             <div className="flex p-b-10  m-t-auto">
                 <Button width="narrow" className="m-r-10" onClick={withClose(onReject)}>
                     {t('actions.cancel')}
@@ -74,7 +71,7 @@ export default function ConnectionRequest({ onAllow, onReject }: Props) {
                 <Button
                     width="narrow"
                     onClick={withClose(() => {
-                        connectAccount(selectedAccount, urlOrigin);
+                        connectAccount(selectedAccount, new URL(url).origin);
                         onAllow();
                     })}
                 >
