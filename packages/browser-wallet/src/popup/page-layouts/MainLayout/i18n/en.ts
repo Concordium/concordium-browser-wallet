@@ -8,6 +8,7 @@ const t = {
         accounts: 'Accounts',
         ids: 'ID cards',
         settings: 'Wallet settings',
+        recovery: 'Restoring your wallet',
     },
     entityList: {
         searchPlaceholder: 'Search',

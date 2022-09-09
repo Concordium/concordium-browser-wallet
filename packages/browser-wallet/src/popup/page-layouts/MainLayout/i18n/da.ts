@@ -10,6 +10,7 @@ const t: typeof en = {
         accounts: 'Konti',
         ids: 'ID kort',
         settings: 'Wallet indstillinger',
+        recovery: 'Genskabning af din wallet',
     },
     entityList: {
         searchPlaceholder: 'Søg',

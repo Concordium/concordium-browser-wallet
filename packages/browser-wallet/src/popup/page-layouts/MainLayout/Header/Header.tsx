@@ -53,6 +53,7 @@ enum Section {
     Account,
     Id,
     Settings,
+    Recovery,
 }
 
 type Props = ClassName & {
@@ -87,11 +88,13 @@ export default function Header({ onToggle, className }: Props) {
         }
     }, [dropdownOpen]);
 
-    // eslint-disable-next-line no-nested-ternary
+    /* eslint-disable no-nested-ternary */
     const section = pathname.startsWith(absoluteRoutes.home.identities.path)
         ? Section.Id
         : pathname.startsWith(absoluteRoutes.home.settings.path)
-        ? Section.Settings
+        ? pathname.startsWith(absoluteRoutes.home.settings.recovery.path)
+            ? Section.Recovery
+            : Section.Settings
         : Section.Account;
 
     const canClose =
@@ -114,6 +117,7 @@ export default function Header({ onToggle, className }: Props) {
                     >
                         <h1 className="relative flex align-center">
                             {section === Section.Id && t('header.ids')}
+                            {section === Section.Recovery && t('header.recovery')}
                             {section === Section.Settings && t('header.settings')}
                             {section === Section.Account && t('header.accounts')}
                             {hasDropdown && (
