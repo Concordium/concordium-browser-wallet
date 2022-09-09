@@ -104,10 +104,6 @@ export function useIndexedStorage<V>(
     };
 }
 
-export const storedPendingIdentity = makeStorageAccessor<Omit<PendingIdentity, 'location'>>(
-    'local',
-    ChromeStorageKey.PendingIdentity
-);
 export const storedIdentities = makeIndexedStorageAccessor<Identity[]>('local', ChromeStorageKey.Identities);
 export const storedSelectedIdentity = makeStorageAccessor<string>('local', ChromeStorageKey.SelectedIdentity);
 export const storedSeedPhrase = makeStorageAccessor<string>('local', ChromeStorageKey.SeedPhrase);
@@ -129,6 +125,11 @@ export const storedIdentityProviders = makeIndexedStorageAccessor<IdentityProvid
     ChromeStorageKey.IdentityProviders
 );
 export const sessionPasscode = makeStorageAccessor<string>('session', ChromeStorageKey.Passcode);
+export const sessionPendingIdentity = makeStorageAccessor<Omit<PendingIdentity, 'location'>>(
+    'session',
+    ChromeStorageKey.PendingIdentity
+);
+export const sessionCreatingCredential = makeStorageAccessor<string>('session', ChromeStorageKey.IsCreatingCredential);
 export const sessionAccountInfoCache = makeIndexedStorageAccessor<Record<string, string>>(
     'session',
     ChromeStorageKey.AccountInfoCache

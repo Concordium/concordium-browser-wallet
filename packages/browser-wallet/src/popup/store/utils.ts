@@ -10,10 +10,11 @@ import {
     storedSelectedAccount,
     storedTheme,
     storedIdentities,
-    storedPendingIdentity,
+    sessionPendingIdentity,
     storedSelectedIdentity,
     storedSeedPhrase,
     storedIdentityProviders,
+    sessionCreatingCredential,
     sessionAccountInfoCache,
 } from '@shared/storage/access';
 import { ChromeStorageKey } from '@shared/storage/types';
@@ -22,7 +23,6 @@ import { noOp } from 'wallet-common-helpers/src/utils/basicHelpers';
 
 const accessorMap = {
     [ChromeStorageKey.Identities]: useIndexedStorage(storedIdentities, getGenesisHash),
-    [ChromeStorageKey.PendingIdentity]: storedPendingIdentity,
     [ChromeStorageKey.SelectedIdentity]: storedSelectedIdentity,
     [ChromeStorageKey.ConnectedSites]: storedConnectedSites,
     [ChromeStorageKey.Credentials]: useIndexedStorage(storedCredentials, getGenesisHash),
@@ -33,6 +33,8 @@ const accessorMap = {
     [ChromeStorageKey.SeedPhrase]: storedSeedPhrase,
     [ChromeStorageKey.IdentityProviders]: useIndexedStorage(storedIdentityProviders, getGenesisHash),
     [ChromeStorageKey.Passcode]: sessionPasscode,
+    [ChromeStorageKey.PendingIdentity]: sessionPendingIdentity,
+    [ChromeStorageKey.IsCreatingCredential]: sessionCreatingCredential,
     [ChromeStorageKey.AccountInfoCache]: useIndexedStorage(sessionAccountInfoCache, getGenesisHash),
 };
 

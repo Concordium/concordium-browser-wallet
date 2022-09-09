@@ -1,4 +1,4 @@
-import React, { forwardRef, useEffect, useState } from 'react';
+import React, { forwardRef, useMemo } from 'react';
 import clsx from 'clsx';
 import { useAtomValue, useAtom } from 'jotai';
 import { useNavigate } from 'react-router-dom';
@@ -11,32 +11,33 @@ import { identityNamesAtom } from '@popup/store/identity';
 import { useTranslation } from 'react-i18next';
 import { displaySplitAddress } from '@popup/shared/utils/account-helpers';
 import { WalletCredential } from '@shared/storage/types';
-import JSONBig from 'json-bigint';
 import { useAccountInfo } from '@popup/shared/AccountInfoListenerContext';
 import EntityList from '../EntityList';
 
 export type Account = { address: string };
 
 type ItemProps = {
-    account: Account;
-    totalBalance: bigint;
+    account: WalletCredential;
     checked: boolean;
     selected: boolean;
     identityName: string;
 };
 
-function AccountListItem({ account: { address }, checked, selected, totalBalance, identityName }: ItemProps) {
+function AccountListItem({ account, checked, selected, identityName }: ItemProps) {
+    const accountInfo = useAccountInfo(account);
+    const totalBalance = useMemo(() => accountInfo?.accountAmount || 0n, [accountInfo?.accountAmount]);
+
     return (
         <div className={clsx('main-layout__header-list-item', checked && 'main-layout__header-list-item--checked')}>
             <div className="main-layout__header-list-item__primary">
                 <div className="flex align-center">
                     {/* TODO add account name */}
-                    {displaySplitAddress(address)}{' '}
+                    {displaySplitAddress(account.address)}{' '}
                     {selected && <CheckmarkIcon className="main-layout__header-list-item__check" />}
                 </div>
                 <CopyButton
                     className="absolute r-0"
-                    value={address}
+                    value={account.address}
                     onMouseUp={(e) => e.stopPropagation()}
                     tabIndex={-1}
                 />
@@ -57,18 +58,6 @@ const AccountList = forwardRef<HTMLDivElement, Props>(({ className, onSelect }, 
     const nav = useNavigate();
     const { t } = useTranslation('mainLayout');
     const identityNames = useAtomValue(identityNamesAtom);
-    const [totalBalanceMap, setTotalBalanceMap] = useState<Map<string, bigint>>(new Map());
-    const accountInfos = accounts.map(useAccountInfo);
-
-    useEffect(() => {
-        const updatedTotalBalanceMap = new Map<string, bigint>();
-        for (const info of accountInfos) {
-            if (info) {
-                updatedTotalBalanceMap.set(info.accountAddress, info.accountAmount);
-            }
-        }
-        setTotalBalanceMap(updatedTotalBalanceMap);
-    }, [JSONBig.stringify(accountInfos)]);
 
     return (
         <EntityList<WalletCredential>
@@ -89,7 +78,6 @@ const AccountList = forwardRef<HTMLDivElement, Props>(({ className, onSelect }, 
                     account={a}
                     checked={checked}
                     selected={a.address === selectedAccount}
-                    totalBalance={totalBalanceMap.get(a.address) ?? 0n}
                     identityName={identityNames?.[a.providerIndex]?.[a.identityIndex] || 'Unknown'}
                 />
             )}
