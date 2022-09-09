@@ -4,7 +4,7 @@ import { useAtom, useAtomValue, useSetAtom } from 'jotai';
 import { useNavigate } from 'react-router-dom';
 import IdCard from '@popup/shared/IdCard';
 import { identityProvidersAtom, selectedIdentityAtom } from '@popup/store/identity';
-import { credentialsAtom, selectedAccountAtom } from '@popup/store/account';
+import { credentialsAtom, selectedAccountAtom, creatingCredentialRequestAtom } from '@popup/store/account';
 import { networkConfigurationAtom, seedPhraseAtom } from '@popup/store/settings';
 import { CreationStatus, WalletCredential } from '@shared/storage/types';
 import { JsonRpcClient, HttpProvider } from '@concordium/web-sdk';
@@ -17,7 +17,7 @@ import { InternalMessageType } from '@concordium/browser-wallet-message-hub';
 import { popupMessageHandler } from '@popup/shared/message-handler';
 import { BackgroundResponseStatus } from '@shared/utils/types';
 import { getNet } from '@shared/utils/network-helpers';
-import { addToastAtom, creatingCredentialRequestAtom } from '@popup/state';
+import { addToastAtom } from '@popup/state';
 import AccountDetails from '../Account/AccountDetails';
 
 export default function Confirm() {
@@ -120,7 +120,7 @@ export default function Confirm() {
                     type="submit"
                     width="wide"
                     onClick={submit}
-                    disabled={creatingCredentialRequest}
+                    disabled={creatingCredentialRequest.loading || creatingCredentialRequest.value}
                 >
                     {t('createAccount')}
                 </Button>

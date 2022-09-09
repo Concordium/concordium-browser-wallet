@@ -2,7 +2,7 @@ import { createIdentityRequest } from '@concordium/web-sdk';
 import { IdentityIssuanceBackgroundResponse } from '@shared/utils/identity-helpers';
 import { ExtensionMessageHandler, InternalMessageType } from '@concordium/browser-wallet-message-hub';
 import { BackgroundResponseStatus } from '@shared/utils/types';
-import { storedPendingIdentity } from '@shared/storage/access';
+import { sessionPendingIdentity } from '@shared/storage/access';
 import { CreationStatus } from '@shared/storage/types';
 import { openWindow } from './window-management';
 
@@ -65,7 +65,7 @@ export const identityIssuanceHandler: ExtensionMessageHandler = (msg) => {
     const respond = async (response: IdentityIssuanceBackgroundResponse) => {
         let { status } = response;
         if (response.status === BackgroundResponseStatus.Success) {
-            const pending = await storedPendingIdentity.get();
+            const pending = await sessionPendingIdentity.get();
             if (!pending) {
                 status = BackgroundResponseStatus.Aborted;
             } else {
