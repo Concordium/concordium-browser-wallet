@@ -1,6 +1,7 @@
-import React, { useContext, useCallback, useState } from 'react';
+import React, { useContext, useCallback } from 'react';
 import { fullscreenPromptContext } from '@popup/page-layouts/FullscreenPromptLayout';
 import { useTranslation } from 'react-i18next';
+import { useSetAtom } from 'jotai';
 import { useLocation } from 'react-router-dom';
 import { signMessage, buildBasicAccountSigner, AccountTransactionSignature } from '@concordium/web-sdk';
 import { usePrivateKey } from '@popup/shared/utils/account-helpers';
@@ -8,6 +9,7 @@ import { displayUrl } from '@popup/shared/utils/string-helpers';
 import { TextArea } from '@popup/shared/Form/TextArea';
 import ConnectedBox from '@popup/pages/Account/ConnectedBox';
 import Button from '@popup/shared/Button';
+import { addToastAtom } from '@popup/state';
 
 type Props = {
     onSubmit(signature: AccountTransactionSignature): void;
@@ -26,18 +28,18 @@ interface Location {
 
 export default function SignMessage({ onSubmit, onReject }: Props) {
     const { state } = useLocation() as Location;
-    const [error, setError] = useState();
     const { t } = useTranslation('signMessage');
     const { withClose } = useContext(fullscreenPromptContext);
     const { accountAddress, url } = state.payload;
     const key = usePrivateKey(accountAddress);
+    const addToast = useSetAtom(addToastAtom);
 
     const onClick = useCallback(async () => {
         if (!key) {
             throw new Error('Missing key for the chosen address');
         }
         return signMessage(state.payload.message, buildBasicAccountSigner(key));
-    }, [state.payload.message, state.payload.accountAddress]);
+    }, [state.payload.message, state.payload.accountAddress, key]);
 
     return (
         <>
@@ -54,17 +56,12 @@ export default function SignMessage({ onSubmit, onReject }: Props) {
                         onClick={() =>
                             onClick()
                                 .then(withClose(onSubmit))
-                                .catch((e) => setError(e))
+                                .catch((e) => addToast(e.message))
                         }
                     >
                         {t('sign')}
                     </Button>
                 </div>
-                {error && (
-                    <p>
-                        {t('error')}: {error}
-                    </p>
-                )}
             </div>
         </>
     );
