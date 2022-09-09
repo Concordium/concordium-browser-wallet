@@ -70,6 +70,7 @@ export default function Login() {
                     return (
                         <>
                             <FormPassword
+                                autoFocus
                                 control={f.control}
                                 name="passcode"
                                 label={tSetup('setupPasscode.form.enterPasscode')}
