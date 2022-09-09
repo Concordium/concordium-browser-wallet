@@ -9,13 +9,14 @@ import clsx from 'clsx';
 type Props = {
     accountAddress?: string;
     getUrl?: () => Promise<string>;
-    link?: string;
-    onNavigate?: () => void;
-};
+} & (
+    | { link: string; onNavigate?: () => void }
+    | {
+          link?: undefined;
+          onNavigate?: undefined;
+      }
+);
 
-/**
- * N.B. It is assumed that onNavigate is only given when the box has a link. If link is not provided, then onNavigate is ignored.
- */
 export default function ConnectedBox({ accountAddress, getUrl = getCurrentOpenTabUrl, link, onNavigate }: Props) {
     const { t } = useTranslation('account');
     const connectedSites = useAtomValue(storedConnectedSitesAtom);

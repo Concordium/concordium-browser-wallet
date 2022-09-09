@@ -4,11 +4,12 @@ import { Outlet, useNavigate, useLocation } from 'react-router-dom';
 import { noOp } from 'wallet-common-helpers';
 import { absoluteRoutes } from '@popup/constants/routes';
 import Logo from '@assets/svg/concordium.svg';
+import Toast from '@popup/shared/Toast/Toast';
 
 import { isSpawnedWindow } from '@popup/shared/window-helpers';
 import { useSelectedCredential } from '@popup/shared/utils/account-helpers';
 import AccountDetails from '@popup/pages/Account/AccountDetails';
-import AccountContext from '@popup/pages/Account/AccountContext';
+import AccountInfoListenerContext from '@popup/shared/AccountInfoListenerContext';
 
 type OnCloseHandler = () => void;
 type Unsubscribe = () => void;
@@ -104,12 +105,13 @@ export default function FullscreenPromptLayout() {
         <fullscreenPromptContext.Provider value={contextValue}>
             <Header />
             <div className="fullscreen-prompt-layout">
-                <AccountContext account={account}>
+                <AccountInfoListenerContext>
                     {account && <AccountDetails expanded={false} account={account} />}
                     <main className="fullscreen-prompt-layout__main">
                         <Outlet />
                     </main>
-                </AccountContext>
+                    <Toast />
+                </AccountInfoListenerContext>
             </div>
         </fullscreenPromptContext.Provider>
     );

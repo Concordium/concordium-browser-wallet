@@ -48,6 +48,25 @@
         }
     }
 
+    &__checkbox {
+        display: flex;
+        flex-direction: row;
+        padding: 0 rem(30px);
+
+        label {
+            margin-top: auto;
+            margin-bottom: auto;
+        }
+
+        input {
+            width: rem(20px);
+            height: rem(20px);
+            margin-right: rem(10px);
+            background-color: $color-input-bg;
+            accent-color: $color-cta-mainnet;
+        }
+    }
+
     &__label {
         font-size: rem(8px);
         color: $color-text;

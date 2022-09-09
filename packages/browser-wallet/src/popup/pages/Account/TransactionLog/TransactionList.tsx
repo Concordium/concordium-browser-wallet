@@ -1,16 +1,20 @@
-import { getTransactions } from '@popup/shared/utils/wallet-proxy';
+import { getCcdDrop, getTransactions } from '@popup/shared/utils/wallet-proxy';
 import React, { createContext, forwardRef, Fragment, useContext, useEffect, useMemo, useState } from 'react';
 import InfiniteLoader from 'react-window-infinite-loader';
 import { VariableSizeList as List } from 'react-window';
-import { noOp, PropsOf } from 'wallet-common-helpers';
+import { noOp, partition, PropsOf } from 'wallet-common-helpers';
 import AutoSizer from 'react-virtualized-auto-sizer';
-import { useAtomValue, useSetAtom } from 'jotai';
-import { selectedAccountAtom } from '@popup/store/account';
 import { BrowserWalletTransaction } from '@popup/shared/utils/transaction-history-types';
 import { useTranslation } from 'react-i18next';
 import { addToastAtom } from '@popup/state';
-import TransactionElement, { transactionElementHeight } from './TransactionElement';
+import { useAccountInfo } from '@popup/shared/AccountInfoListenerContext';
+import { useSelectedCredential } from '@popup/shared/utils/account-helpers';
+import { useAtomValue, useSetAtom } from 'jotai';
+import Button from '@popup/shared/Button';
+import { networkConfigurationAtom } from '@popup/store/settings';
+import { isMainnet } from '@shared/utils/network-helpers';
 import useTransactionGroups, { TransactionsByDateTuple } from './useTransactionGroups';
+import TransactionElement, { transactionElementHeight } from './TransactionElement';
 
 const transactionHeaderHeight = 20;
 const transactionResultLimit = 20;
@@ -139,6 +143,37 @@ function InfiniteTransactionList({
     );
 }
 
+/**
+ * Update an existing list of descending transactions with a new list of ascending transactions,
+ * ensuring that any overlaps are updated with the values from the new list of transactions.
+ */
+function updateTransactionsWithNewTransactions(
+    existingTransactions: BrowserWalletTransaction[],
+    newTransactions: BrowserWalletTransaction[]
+) {
+    const existingHashes = existingTransactions
+        .filter((trx) => trx.transactionHash !== undefined)
+        .map((trs) => trs.transactionHash);
+    const transactionUpdates: Record<string, BrowserWalletTransaction> = {} as Record<string, BrowserWalletTransaction>;
+
+    const [existing, allNew] = partition(newTransactions, (transaction) =>
+        existingHashes.includes(transaction.transactionHash)
+    );
+    existing.forEach((element) => {
+        transactionUpdates[element.transactionHash] = element;
+    });
+
+    // Update the existing transactions and save in a new array.
+    const updatedExistingTransactions = [...existingTransactions].map((existingTransaction) => {
+        if (transactionUpdates[existingTransaction.transactionHash]) {
+            return transactionUpdates[existingTransaction.transactionHash];
+        }
+        return existingTransaction;
+    });
+
+    return [...allNew.reverse(), ...updatedExistingTransactions];
+}
+
 export interface TransactionListProps {
     onTransactionClick(transaction: BrowserWalletTransaction): void;
 }
@@ -148,14 +183,42 @@ export interface TransactionListProps {
  */
 export default function TransactionList({ onTransactionClick }: TransactionListProps) {
     const { t } = useTranslation('transactionLog');
-    const accountAddress = useAtomValue(selectedAccountAtom);
+    const account = useSelectedCredential();
+    const accountAddress = useMemo(() => account?.address, [account]);
     const [transactions, setTransactions] = useState<BrowserWalletTransaction[]>([]);
     const [isNextPageLoading, setIsNextPageLoading] = useState<boolean>(false);
     const [hasNextPage, setHasNextPage] = useState<boolean>(true);
     const addToast = useSetAtom(addToastAtom);
+    const [amount, setAmount] = useState<bigint>();
+    const network = useAtomValue(networkConfigurationAtom);
+    const [disableCcdDropButton, setDisableCcdDropButton] = useState<boolean>(false);
 
-    if (!accountAddress) {
+    if (!account || !accountAddress) {
         return null;
+    }
+
+    const accountInfo = useAccountInfo(account);
+
+    async function getNewTransactions() {
+        if (accountAddress) {
+            let more = true;
+            let fromId = transactions.length > 0 ? transactions[0].id : undefined;
+            let newTransactions: BrowserWalletTransaction[] = [];
+            while (more) {
+                try {
+                    const result = await getTransactions(accountAddress, transactionResultLimit, 'ascending', fromId);
+                    newTransactions = [...newTransactions, ...result.transactions];
+                    fromId = newTransactions.length > 0 ? newTransactions[newTransactions.length - 1].id : fromId;
+                    more = result.full;
+                } catch {
+                    addToast(t('error'));
+                    return;
+                }
+            }
+
+            const updatedTransactions = updateTransactionsWithNewTransactions(transactions, newTransactions);
+            setTransactions(updatedTransactions);
+        }
     }
 
     async function loadTransactionsDescending(address: string, appendTransactions: boolean, fromId?: number) {
@@ -175,11 +238,6 @@ export default function TransactionList({ onTransactionClick }: TransactionListP
             });
     }
 
-    useEffect(() => {
-        setTransactions([]);
-        loadTransactionsDescending(accountAddress, false);
-    }, [accountAddress]);
-
     const loadNextPage = async () => {
         let fromId;
         if (transactions.length) {
@@ -188,19 +246,59 @@ export default function TransactionList({ onTransactionClick }: TransactionListP
         loadTransactionsDescending(accountAddress, true, fromId);
     };
 
+    useEffect(() => {
+        setTransactions([]);
+        loadTransactionsDescending(accountAddress, false);
+        setAmount(undefined);
+        setDisableCcdDropButton(false);
+    }, [accountAddress]);
+
+    useEffect(() => {
+        if (amount !== undefined && accountInfo?.accountAmount !== undefined && accountInfo?.accountAmount !== amount) {
+            getNewTransactions();
+        }
+        setAmount(accountInfo?.accountAmount);
+    }, [accountInfo?.accountAmount]);
+
+    async function ccdDrop(address: string) {
+        getCcdDrop(address).then((dropTransaction) => {
+            setTransactions([dropTransaction]);
+        });
+    }
+
     let transactionListComponent;
     if (transactions.length === 0) {
         if (isNextPageLoading) {
             transactionListComponent = null;
         } else {
+            // If a test network then display button.
             transactionListComponent = (
-                <div className="transaction-element__no-transactions">{t('noTransactions')}</div>
+                <div className="transaction-element__no-transactions">
+                    <p>{t('noTransactions')}</p>
+                    {!isMainnet(network) && (
+                        <Button
+                            width="wide"
+                            disabled={disableCcdDropButton}
+                            onClick={() => {
+                                setDisableCcdDropButton(true);
+                                ccdDrop(accountAddress);
+                            }}
+                        >
+                            Request CCD
+                        </Button>
+                    )}
+                </div>
             );
         }
     } else {
+        // If the first transaction in the list changes, then we need to reload the entire
+        // list, otherwise the infinite list component bugs out displaying the transactions
+        // correctly.
+        const listKey = transactions[0].transactionHash ?? transactions[0].id;
         transactionListComponent = (
             <div className="transaction-list__scroll">
                 <InfiniteTransactionList
+                    key={listKey}
                     accountAddress={accountAddress}
                     transactions={transactions}
                     loadNextPage={loadNextPage}

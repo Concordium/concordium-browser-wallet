@@ -1,21 +1,19 @@
-import React, { useContext, useCallback, useMemo, useState, useEffect } from 'react';
-import { useAtomValue } from 'jotai';
+import React, { useContext, useCallback, useMemo, useEffect } from 'react';
+import { useAtomValue, useSetAtom } from 'jotai';
 import { fullscreenPromptContext } from '@popup/page-layouts/FullscreenPromptLayout';
 import { useTranslation } from 'react-i18next';
 import { useLocation } from 'react-router-dom';
 import { AccountTransactionType, AccountAddress, SchemaVersion } from '@concordium/web-sdk';
-import { useCredential, usePrivateKey } from '@popup/shared/utils/account-helpers';
+import { usePrivateKey } from '@popup/shared/utils/account-helpers';
 import { sendTransaction, getDefaultExpiry } from '@popup/shared/utils/transaction-helpers';
 import { jsonRpcClientAtom } from '@popup/store/settings';
 import TransactionReceipt from '@popup/shared/TransactionReceipt/TransactionReceipt';
-import DisplayUpdateContract from '@popup/shared/TransactionReceipt/displayPayload/DisplayUpdateContract';
-import DisplayInitContract from '@popup/shared/TransactionReceipt/displayPayload/DisplayInitContract';
-import DisplaySimpleTransfer from '@popup/shared/TransactionReceipt/displayPayload/DisplaySimpleTransfer';
 import Button from '@popup/shared/Button';
 import { displayUrl } from '@popup/shared/utils/string-helpers';
 import { noOp, useAsyncMemo } from 'wallet-common-helpers';
 import { getSimpleTransferCost } from '@popup/shared/utils/wallet-proxy';
 import ConnectedBox from '@popup/pages/Account/ConnectedBox';
+import { addToastAtom } from '@popup/state';
 import { parsePayload } from './util';
 
 interface Location {
@@ -40,13 +38,11 @@ interface Props {
 export default function SendTransaction({ onSubmit, onReject }: Props) {
     const { state } = useLocation() as Location;
     const { t } = useTranslation('sendTransaction');
-    const [error, setError] = useState<string>();
+    const addToast = useSetAtom(addToastAtom);
     const client = useAtomValue(jsonRpcClientAtom);
     const { withClose, onClose } = useContext(fullscreenPromptContext);
-    const cost = useAsyncMemo(getSimpleTransferCost, noOp, []);
 
     const { accountAddress, url } = state.payload;
-    const credential = useCredential(accountAddress);
     const key = usePrivateKey(accountAddress);
 
     const { type: transactionType, payload } = useMemo(
@@ -59,6 +55,13 @@ export default function SendTransaction({ onSubmit, onReject }: Props) {
                 state.payload.schemaVersion
             ),
         [JSON.stringify(state.payload)]
+    );
+    const cost = useAsyncMemo(
+        transactionType === AccountTransactionType.SimpleTransfer
+            ? getSimpleTransferCost
+            : () => Promise.resolve(undefined),
+        noOp,
+        [transactionType]
     );
 
     useEffect(() => onClose(onReject), [onClose, onReject]);
@@ -90,29 +93,17 @@ export default function SendTransaction({ onSubmit, onReject }: Props) {
 
     return (
         <>
-            {credential && (
-                <ConnectedBox accountAddress={credential.address} getUrl={() => Promise.resolve(new URL(url).origin)} />
-            )}
+            <ConnectedBox accountAddress={accountAddress} getUrl={() => Promise.resolve(new URL(url).origin)} />
             <div className="h-full flex-column align-center">
                 <div>{t('description', { dApp: displayUrl(url) })}</div>
                 <TransactionReceipt
                     transactionType={transactionType}
+                    payload={payload}
+                    parameters={state.payload.parameters}
                     sender={accountAddress}
                     cost={cost}
                     className="m-v-10"
-                >
-                    <>
-                        {transactionType === AccountTransactionType.SimpleTransfer && (
-                            <DisplaySimpleTransfer payload={payload} />
-                        )}
-                        {transactionType === AccountTransactionType.UpdateSmartContractInstance && (
-                            <DisplayUpdateContract payload={payload} parameters={state.payload.parameters} />
-                        )}
-                        {transactionType === AccountTransactionType.InitializeSmartContractInstance && (
-                            <DisplayInitContract payload={payload} parameters={state.payload.parameters} />
-                        )}
-                    </>
-                </TransactionReceipt>
+                />
                 <br />
                 <div className="flex p-b-10 m-t-auto">
                     <Button width="narrow" className="m-r-10" onClick={withClose(onReject)}>
@@ -123,17 +114,12 @@ export default function SendTransaction({ onSubmit, onReject }: Props) {
                         onClick={() =>
                             handleSubmit()
                                 .then(withClose(onSubmit))
-                                .catch((e) => setError(e.message))
+                                .catch((e) => addToast(e.message))
                         }
                     >
                         {t('submit')}
                     </Button>
                 </div>
-                {error && (
-                    <p>
-                        {t('error')}: {error}
-                    </p>
-                )}
             </div>
         </>
     );

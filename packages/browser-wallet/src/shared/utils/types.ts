@@ -26,3 +26,12 @@ export type CredentialDeploymentBackgroundResponse =
           status: BackgroundResponseStatus.Error;
           reason: string;
       };
+
+export type RecoveryBackgroundResponse =
+    | {
+          status: BackgroundResponseStatus.Success;
+      }
+    | {
+          status: BackgroundResponseStatus.Error;
+          reason: string;
+      };

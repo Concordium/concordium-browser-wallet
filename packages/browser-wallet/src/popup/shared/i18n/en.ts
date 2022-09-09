@@ -13,6 +13,9 @@ const t = {
         confirmed: 'Verified by',
         rejected: 'Rejected by',
     },
+    account: {
+        error: 'Unable to retrieve account balance',
+    },
     utils: {
         address: {
             required: 'Please enter an address',
@@ -26,7 +29,7 @@ const t = {
         },
         transaction: {
             type: {
-                simple: 'Send Ccd',
+                simple: 'Send CCD',
                 init: 'Initialize Smart Contract Instance',
                 update: 'Update Smart Contract Instance',
                 unknown: 'Unknown',
@@ -36,6 +39,7 @@ const t = {
     transactionReceipt: {
         sender: 'Sender account',
         cost: 'Estimated transaction fee',
+        unknown: 'Unknown',
     },
 };
 

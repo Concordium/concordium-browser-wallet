@@ -262,3 +262,22 @@ export async function getSimpleTransferCost(): Promise<bigint> {
     const response = await (await getWalletProxy()).get(proxyPath);
     return BigInt(response.data.cost);
 }
+
+export async function getCcdDrop(accountAddress: string): Promise<BrowserWalletTransaction> {
+    const response = await (await getWalletProxy()).put(`/v0/testnetGTUDrop/${accountAddress}`);
+
+    const ccdDropTransaction: BrowserWalletTransaction = {
+        amount: BigInt(2000000000),
+        blockHash: '',
+        events: [],
+        type: AccountTransactionType.SimpleTransfer,
+        status: TransactionStatus.Pending,
+        time: BigInt(Math.round(Date.now() / 1000)),
+        id: 0,
+        transactionHash: response.data.submissionId,
+        fromAddress: undefined,
+        toAddress: accountAddress,
+    };
+
+    return ccdDropTransaction;
+}
