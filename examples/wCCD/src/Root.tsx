@@ -39,7 +39,6 @@ export default function Root() {
             <script src="../../node_modules/@concordium/web-sdk/lib/concordium.min.js" />
             <script src="../../packages/browser-wallet-api-helpers/lib/concordiumHelpers.min.js" />
             <main className="wccd">
-                <br />
                 <WCCD handleGetAccount={handleGetAccount} />
             </main>
         </state.Provider>

@@ -20,7 +20,7 @@
         "typescript": "^4.7.2"
     },
     "scripts": {
-        "build": "node --loader ts-node/esm ./esbuild.config.ts; cp ./src/assets/Concordium_background.svg ./dist/Concordium_background.svg",
+        "build": "node --loader ts-node/esm ./esbuild.config.ts; cp ./src/assets/* ./dist",
         "watch": "cross-env WATCH=1 yarn build",
         "start": "live-server ./dist"
     }

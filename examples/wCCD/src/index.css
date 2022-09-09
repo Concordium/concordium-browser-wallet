@@ -16,7 +16,6 @@ body {
     flex-direction: column;
     align-items: center;
     justify-content: center;
-    text-align: left;
 }
 
 .largeText {
@@ -24,8 +23,6 @@ body {
     font-weight: 300;
     line-height: 21px;
     letter-spacing: 0;
-    text-align: left;
-    color: white;
 }
 
 .loadingText {
@@ -69,22 +66,12 @@ button.buttonInvisible {
     overflow-wrap: anywhere;
 }
 
-.connection-banner {
-    position: absolute;
-    top: 10px;
-    color: red;
-}
-
-.connected {
-    color: green;
-}
-
 .containerSpaceBetween {
     display: flex;
     justify-content: space-between;
 }
 
-.container {
+.containerSwitch {
     display: flex;
     align-items: center;
     justify-content: center;

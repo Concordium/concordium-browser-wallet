@@ -225,7 +225,7 @@ export default function wCCD({ handleGetAccount }: Props) {
                     </button>
                 </div>
                 <br />
-                <div className="container">
+                <div className="containerSwitch">
                     <div className="largeText">CCD &nbsp; &nbsp; </div>
                     <button className="switch" type="button" onClick={() => setIsWrapping(!isWrapping)}>
                         {isWrapping ? (
@@ -267,7 +267,9 @@ export default function wCCD({ handleGetAccount }: Props) {
                                     inputValue.current?.valueAsNumber === undefined
                                 ) {
                                     /* eslint-disable no-alert */
-                                    window.alert('Input a number into the CCD/wCCD amount field with max 6 digits.');
+                                    window.alert(
+                                        'Input a number into the CCD/wCCD amount field with max 6 decimal places.'
+                                    );
                                     return;
                                 }
 
@@ -277,7 +279,7 @@ export default function wCCD({ handleGetAccount }: Props) {
 
                                 if (!Number.isInteger(amount)) {
                                     window.alert(
-                                        'Input a number into the CCD/wCCD amount field with max 6 digits.'
+                                        'Input a number into the CCD/wCCD amount field with max 6 decimal places.'
                                     ); /* eslint-disable no-alert */
                                 }
 
