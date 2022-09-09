@@ -4,7 +4,7 @@ import { useAtom, useAtomValue, useSetAtom } from 'jotai';
 import { useNavigate } from 'react-router-dom';
 import IdCard from '@popup/shared/IdCard';
 import { identityProvidersAtom, selectedIdentityAtom } from '@popup/store/identity';
-import { credentialsAtom, selectedAccountAtom, creatingCredentialRequestAtom } from '@popup/store/account';
+import { credentialsAtom, creatingCredentialRequestAtom } from '@popup/store/account';
 import { networkConfigurationAtom, seedPhraseAtom } from '@popup/store/settings';
 import { CreationStatus, WalletCredential } from '@shared/storage/types';
 import { JsonRpcClient, HttpProvider } from '@concordium/web-sdk';
@@ -25,7 +25,6 @@ export default function Confirm() {
     const nav = useNavigate();
     const selectedIdentity = useAtomValue(selectedIdentityAtom);
     const credentials = useAtomValue(credentialsAtom);
-    const setSelectedAccount = useSetAtom(selectedAccountAtom);
     const seedPhrase = useAtomValue(seedPhraseAtom);
     const network = useAtomValue(networkConfigurationAtom);
     const providers = useAtomValue(identityProvidersAtom);
@@ -88,7 +87,6 @@ export default function Confirm() {
             );
 
             if (response.status === BackgroundResponseStatus.Success) {
-                setSelectedAccount(response.address);
                 nav(absoluteRoutes.home.account.path);
             } else {
                 addToast(response.error);

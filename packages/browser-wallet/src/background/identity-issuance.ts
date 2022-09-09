@@ -74,6 +74,7 @@ export const identityIssuanceHandler: ExtensionMessageHandler = (msg) => {
                     status: CreationStatus.Pending,
                     location: response.result,
                 });
+                await sessionPendingIdentity.remove();
             }
         }
         await openWindow();

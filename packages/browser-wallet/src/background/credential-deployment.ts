@@ -8,7 +8,7 @@ import {
     getSignedCredentialDeploymentTransactionHash,
     JsonRpcClient,
 } from '@concordium/web-sdk';
-import { storedCurrentNetwork } from '@shared/storage/access';
+import { sessionCreatingCredential, storedCurrentNetwork, storedSelectedAccount } from '@shared/storage/access';
 import { CreationStatus, PendingWalletCredential } from '@shared/storage/types';
 import { BackgroundResponseStatus, CredentialDeploymentBackgroundResponse } from '@shared/utils/types';
 import { addCredential } from './update';
@@ -42,6 +42,10 @@ async function createAndSendCredential(credIn: CredentialInputV1): Promise<Crede
 
     // Add Pending
     await addCredential(newCred);
+    // Set Selected to new account
+    await storedSelectedAccount.set(address);
+    // Remove guard stopping another credential being created
+    await sessionCreatingCredential.set(false);
 
     return {
         status: BackgroundResponseStatus.Success,

@@ -1,7 +1,6 @@
 import React, { useEffect, useContext, useMemo } from 'react';
-import { useAtom, useAtomValue, useSetAtom } from 'jotai';
+import { useAtomValue, useSetAtom } from 'jotai';
 import {
-    pendingIdentityAtom,
     identityProvidersAtom,
     selectedIdentityAtom,
     selectedIdentityIndexAtom,
@@ -35,7 +34,6 @@ export default function IdentityIssuanceEnd({ onFinish }: Props) {
     const { state } = useLocation() as Location;
     const { t } = useTranslation('identityIssuance');
     const providers = useAtomValue(identityProvidersAtom);
-    const [pendingIdentity, setPendingIdentity] = useAtom(pendingIdentityAtom);
     const { withClose, onClose } = useContext(fullscreenPromptContext);
     const selectedIdentity = useAtomValue(selectedIdentityAtom);
     const identities = useAtomValue(identitiesAtom);
@@ -49,11 +47,10 @@ export default function IdentityIssuanceEnd({ onFinish }: Props) {
     useEffect(() => onClose(onFinish), [onClose, onFinish]);
 
     useEffect(() => {
-        if (pendingIdentity && identities.length) {
+        if (identities.length) {
             setSelectedIdentityIndex(identities.length - 1);
-            setPendingIdentity(undefined);
         }
-    }, [pendingIdentity, identities.length]);
+    }, [identities.length]);
 
     return (
         <>
@@ -72,9 +69,9 @@ export default function IdentityIssuanceEnd({ onFinish }: Props) {
                         <p className="identity-issuance__text">{t('successExplanation')}</p>
                         <IdCard
                             className="identity-issuance__card"
-                            name={pendingIdentity?.name || selectedIdentity?.name || 'Identity'}
+                            name={selectedIdentity?.name || 'Identity'}
                             provider={<IdentityProviderIcon provider={identityProvider} />}
-                            status={pendingIdentity?.status || selectedIdentity?.status || CreationStatus.Pending}
+                            status={selectedIdentity?.status || CreationStatus.Pending}
                         />
                     </>
                 )}
