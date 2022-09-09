@@ -60,7 +60,7 @@ export function atomWithChromeStorage<V>(
  * @description
  * Create an atom that automatically syncs with chrome local storage.
  */
-export function atomWithChromeStorage<V>(key: ChromeStorageKey, fallback: V, withLoading = false, withSync = false) {
+export function atomWithChromeStorage<V>(key: ChromeStorageKey, fallback: V, withLoading = false, withSync = true) {
     const accessor = accessorMap[key] as unknown as StorageAccessor<V>;
 
     if (accessor === undefined) {
