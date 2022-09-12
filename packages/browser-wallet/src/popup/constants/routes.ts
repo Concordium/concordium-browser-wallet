@@ -51,6 +51,9 @@ export const relativeRoutes = {
     setup: {
         path: '/setup',
     },
+    recovery: {
+        path: '/recovery',
+    },
     login: {
         path: '/login',
     },

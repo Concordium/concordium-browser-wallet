@@ -8,7 +8,7 @@ import { credentialsAtom, selectedAccountAtom } from '@popup/store/account';
 import { popupMessageHandler } from '@popup/shared/message-handler';
 import { InternalMessageType } from '@concordium/browser-wallet-message-hub';
 import { JsonRpcClient, HttpProvider } from '@concordium/web-sdk';
-import { identitiesAtom, identityProvidersAtom } from '@popup/store/identity';
+import { identitiesAtom, identityProvidersAtom, isRecoveringAtom } from '@popup/store/identity';
 import PendingArrows from '@assets/svg/pending-arrows.svg';
 import Button from '@popup/shared/Button';
 import { absoluteRoutes } from '@popup/constants/routes';
@@ -68,11 +68,11 @@ async function recovery(seedPhrase: string, network: NetworkConfiguration, provi
     try {
         const client = new JsonRpcClient(new HttpProvider(network.jsonRpcUrl));
         global = await client.getCryptographicParameters();
+        if (!global) {
+            return { status: BackgroundResponseStatus.Error, reason: 'no global fetched' };
+        }
     } catch {
         return { status: BackgroundResponseStatus.Error, reason: 'Unable fetch global parameters' };
-    }
-    if (!global) {
-        throw new Error('no global fetched');
     }
     return popupMessageHandler.sendInternalMessage(InternalMessageType.Recovery, {
         providers,
@@ -88,10 +88,24 @@ export default function RecoveryMain({ className }: ClassName) {
     const seedPhrase = useAtomValue(seedPhraseAtom);
     const [providers, setProviders] = useAtom(identityProvidersAtom);
     const [result, setResult] = useState<RecoveryBackgroundResponse>();
+    const [isRecovering, setIsRecovering] = useAtom(isRecoveringAtom);
     const [runRecovery, setRunRecovery] = useState<boolean>(true);
 
     useEffect(() => {
-        if (!runRecovery) {
+        if (runRecovery && !providers.length) {
+            getIdentityProviders()
+                .then(setProviders)
+                .catch(() =>
+                    setResult({
+                        status: BackgroundResponseStatus.Error,
+                        reason: 'Unable to get list of identity providers',
+                    })
+                );
+        }
+    });
+
+    useEffect(() => {
+        if (!runRecovery || isRecovering.loading || isRecovering.value || !providers.length) {
             return;
         }
 
@@ -101,22 +115,14 @@ export default function RecoveryMain({ className }: ClassName) {
             setResult({ status: BackgroundResponseStatus.Error, reason: 'No seed phrase found' });
         }
 
-        if (!providers.length) {
-            getIdentityProviders()
-                .then((identitityProviders) => {
-                    setProviders(identitityProviders);
-                    recovery(seedPhrase, network, identitityProviders).then(setResult);
-                })
-                .catch(() =>
-                    setResult({
-                        status: BackgroundResponseStatus.Error,
-                        reason: 'Unable to get list of identity providers',
-                    })
-                );
-        } else {
-            recovery(seedPhrase, network, providers).then(setResult);
-        }
-    }, [runRecovery]);
+        setIsRecovering(true);
+
+        recovery(seedPhrase, network, providers)
+            .then(setResult)
+            .finally(() => {
+                setIsRecovering(false);
+            });
+    }, [runRecovery, isRecovering.loading, isRecovering.value, providers.length]);
 
     return (
         <div className={clsx('recovery__main', className)}>

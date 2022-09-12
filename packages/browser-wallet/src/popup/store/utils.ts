@@ -15,6 +15,7 @@ import {
     storedSeedPhrase,
     storedIdentityProviders,
     sessionAccountInfoCache,
+    sessionIsRecovering,
 } from '@shared/storage/access';
 import { ChromeStorageKey } from '@shared/storage/types';
 import { atom, WritableAtom } from 'jotai';
@@ -33,6 +34,7 @@ const accessorMap = {
     [ChromeStorageKey.SeedPhrase]: storedSeedPhrase,
     [ChromeStorageKey.IdentityProviders]: useIndexedStorage(storedIdentityProviders, getGenesisHash),
     [ChromeStorageKey.Passcode]: sessionPasscode,
+    [ChromeStorageKey.IsRecovering]: sessionIsRecovering,
     [ChromeStorageKey.AccountInfoCache]: useIndexedStorage(sessionAccountInfoCache, getGenesisHash),
 };
 

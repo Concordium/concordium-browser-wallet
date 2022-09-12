@@ -20,7 +20,8 @@ import AddAccount from '@popup/pages/AddAccount';
 import { IdentityIssuanceEnd, IdentityIssuanceStart } from '@popup/pages/IdentityIssuance';
 import About from '@popup/pages/About';
 import Login from '@popup/pages/Login/Login';
-import Recovery from '@popup/pages/Recovery/Recovery';
+import RecoveryIntro from '@popup/pages/Recovery/RecoveryIntro';
+import RecoveryMain from '@popup/pages/Recovery/RecoveryMain';
 import ChangePasscode from '@popup/pages/ChangePasscode/ChangePasscode';
 
 type PromptKey = keyof Omit<typeof absoluteRoutes['prompt'], 'path'>;
@@ -107,6 +108,7 @@ export default function Routes() {
                 />
             </Route>
             <Route path={`${relativeRoutes.setup.path}/*`} element={<Setup />} />
+            <Route element={<RecoveryMain />} path={relativeRoutes.recovery.path} />
             <Route path={relativeRoutes.login.path} element={<Login />} />
             <Route path={relativeRoutes.home.path} element={<MainLayout />}>
                 <Route
@@ -118,7 +120,7 @@ export default function Routes() {
                     <Route index element={<Settings />} />
                     <Route element={<ChangePasscode />} path={relativeRoutes.home.settings.passcode.path} />
                     <Route element={<NetworkSettings />} path={relativeRoutes.home.settings.network.path} />
-                    <Route element={<Recovery />} path={`${relativeRoutes.home.settings.recovery.path}/*`} />
+                    <Route element={<RecoveryIntro />} path={relativeRoutes.home.settings.recovery.path} />
                     <Route element={<About />} path={relativeRoutes.home.settings.about.path} />
                 </Route>
                 <Route

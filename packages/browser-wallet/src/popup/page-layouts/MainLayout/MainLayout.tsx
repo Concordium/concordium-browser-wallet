@@ -5,6 +5,7 @@ import clsx from 'clsx';
 
 import { absoluteRoutes } from '@popup/constants/routes';
 import { encryptedSeedPhraseAtom, sessionPasscodeAtom } from '@popup/store/settings';
+import { isRecoveringAtom } from '@popup/store/identity';
 import Toast from '@popup/shared/Toast/Toast';
 import AccountInfoListenerContext from '@popup/shared/AccountInfoListenerContext';
 import Header from './Header';
@@ -13,8 +14,9 @@ export default function MainLayout() {
     const [headerOpen, setHeaderOpen] = useState(false);
     const { loading: loadingEncryptedSeedPhrase, value: encryptedSeedPhrase } = useAtomValue(encryptedSeedPhraseAtom);
     const { loading: loadingPasscode, value: sessionPasscode } = useAtomValue(sessionPasscodeAtom);
+    const { loading: loadingIsRecovering, value: sessionIsRecovering } = useAtomValue(isRecoveringAtom);
 
-    if (loadingEncryptedSeedPhrase || loadingPasscode) {
+    if (loadingEncryptedSeedPhrase || loadingPasscode || loadingIsRecovering) {
         // This will be near instant, as we're just waiting for the Chrome async store
         return null;
     }
@@ -26,6 +28,10 @@ export default function MainLayout() {
 
     if (!sessionPasscode) {
         return <Navigate to={absoluteRoutes.login.path} state={{ to: absoluteRoutes.home.account.path }} />;
+    }
+
+    if (sessionIsRecovering) {
+        return <Navigate to={absoluteRoutes.recovery.path} />;
     }
 
     return (
