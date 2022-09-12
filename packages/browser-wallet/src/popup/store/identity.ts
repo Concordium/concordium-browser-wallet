@@ -41,4 +41,4 @@ export const identityNamesAtom = selectAtom(identitiesAtom, (identities) => {
     return map;
 });
 
-export const isRecoveringAtom = atomWithChromeStorage<boolean>(ChromeStorageKey.IsRecovering, false, true);
+export const isRecoveringAtom = atomWithChromeStorage<boolean>(ChromeStorageKey.IsRecovering, false, true, true);

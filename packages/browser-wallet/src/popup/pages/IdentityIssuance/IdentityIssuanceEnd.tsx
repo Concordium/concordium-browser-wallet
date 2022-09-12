@@ -25,18 +25,14 @@ interface Location {
     };
 }
 
-interface Props {
-    onFinish: () => void;
-}
-
 // TODO start checking status on identity
 
-export default function IdentityIssuanceEnd({ onFinish }: Props) {
+export default function IdentityIssuanceEnd() {
     const { state } = useLocation() as Location;
     const { t } = useTranslation('identityIssuance');
     const providers = useAtomValue(identityProvidersAtom);
     const [pendingIdentity, setPendingIdentity] = useAtom(pendingIdentityAtom);
-    const { withClose, onClose } = useContext(fullscreenPromptContext);
+    const { withClose } = useContext(fullscreenPromptContext);
     const selectedIdentity = useAtomValue(selectedIdentityAtom);
     const identities = useAtomValue(identitiesAtom);
     const setSelectedIdentityIndex = useSetAtom(selectedIdentityIndexAtom);
@@ -45,8 +41,6 @@ export default function IdentityIssuanceEnd({ onFinish }: Props) {
         () => providers.find((p) => p.ipInfo.ipIdentity === selectedIdentity?.providerIndex),
         [selectedIdentity?.providerIndex]
     );
-
-    useEffect(() => onClose(onFinish), [onClose, onFinish]);
 
     useEffect(() => {
         if (pendingIdentity && identities.length) {

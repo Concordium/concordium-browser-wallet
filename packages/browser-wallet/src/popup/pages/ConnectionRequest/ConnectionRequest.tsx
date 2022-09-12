@@ -6,6 +6,7 @@ import { useAtom, useAtomValue } from 'jotai';
 import React, { useContext, useEffect } from 'react';
 import { useTranslation } from 'react-i18next';
 import { useLocation, Navigate } from 'react-router-dom';
+import ExternalRequestLayout from '@popup/page-layouts/ExternalRequestLayout';
 
 type Props = {
     onAllow(): void;
@@ -54,7 +55,7 @@ export default function ConnectionRequest({ onAllow, onReject }: Props) {
     const urlOrigin = new URL(url).origin;
 
     return (
-        <>
+        <ExternalRequestLayout>
             <header>
                 <h3>{t('title')}</h3>
             </header>
@@ -75,6 +76,6 @@ export default function ConnectionRequest({ onAllow, onReject }: Props) {
                     {t('actions.reject')}
                 </button>
             </div>
-        </>
+        </ExternalRequestLayout>
     );
 }

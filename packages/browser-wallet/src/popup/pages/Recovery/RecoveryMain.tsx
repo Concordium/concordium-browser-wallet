@@ -1,156 +1,89 @@
-import clsx from 'clsx';
-import React, { useEffect, useState } from 'react';
+import React, { useEffect, useState, useCallback } from 'react';
 import { useNavigate } from 'react-router-dom';
-import { useAtom, useAtomValue, useSetAtom } from 'jotai';
+import { useAtom, useAtomValue } from 'jotai';
 import { useTranslation } from 'react-i18next';
 import { networkConfigurationAtom, seedPhraseAtom } from '@popup/store/settings';
-import { credentialsAtom, selectedAccountAtom } from '@popup/store/account';
 import { popupMessageHandler } from '@popup/shared/message-handler';
 import { InternalMessageType } from '@concordium/browser-wallet-message-hub';
-import { JsonRpcClient, HttpProvider } from '@concordium/web-sdk';
-import { identitiesAtom, identityProvidersAtom, isRecoveringAtom } from '@popup/store/identity';
+import { JsonRpcClient, HttpProvider, CryptographicParameters } from '@concordium/web-sdk';
+import { identityProvidersAtom, isRecoveringAtom } from '@popup/store/identity';
 import PendingArrows from '@assets/svg/pending-arrows.svg';
-import Button from '@popup/shared/Button';
-import { absoluteRoutes } from '@popup/constants/routes';
-import { BackgroundResponseStatus, RecoveryBackgroundResponse } from '@shared/utils/types';
+import { BackgroundResponseStatus } from '@shared/utils/types';
 import { getIdentityProviders } from '@popup/shared/utils/wallet-proxy';
-import { ClassName, displayAsCcd } from 'wallet-common-helpers';
-import { displaySplitAddress } from '@popup/shared/utils/account-helpers';
 import { getNet } from '@shared/utils/network-helpers';
-import { IdentityProvider, NetworkConfiguration } from '@shared/storage/types';
+import { NetworkConfiguration } from '@shared/storage/types';
+import PageHeader from '@popup/shared/PageHeader';
+import { absoluteRoutes } from '@popup/constants/routes';
 
-function DisplayRecoveryResult() {
-    const { t } = useTranslation('setup');
-    const navigate = useNavigate();
-    const identities = useAtomValue(identitiesAtom);
-    const credentials = useAtomValue(credentialsAtom);
-    const setSelectedAccount = useSetAtom(selectedAccountAtom);
-
-    useEffect(() => {
-        if (credentials.length) {
-            setSelectedAccount(credentials[0].address);
-        }
-    });
-
-    return (
-        <>
-            <div className="recovery__main__description">
-                {t(identities.length ? 'performRecovery.description.after' : 'performRecovery.description.noneFound')}
-            </div>
-            <div className="recovery__main__results">
-                {identities.map((identity) => (
-                    <div key={`${identity.providerIndex}-${identity.index}`} className="recovery__main__identity">
-                        <p>{identity.name}</p>
-                        {credentials
-                            .filter((cred) => cred.identityIndex === identity.index)
-                            .map((cred) => (
-                                <div className="recovery__main__credential" key={cred.credId}>
-                                    <p>{displaySplitAddress(cred.address)}</p>
-                                    <p>{displayAsCcd(0n)}</p>
-                                </div>
-                            ))}
-                    </div>
-                ))}
-            </div>
-            <Button
-                width="medium"
-                className="recovery__main__button"
-                onClick={() => navigate(absoluteRoutes.home.account.path)}
-            >
-                {t('continue')}
-            </Button>
-        </>
-    );
-}
-
-async function recovery(seedPhrase: string, network: NetworkConfiguration, providers: IdentityProvider[]) {
-    let global;
-    try {
-        const client = new JsonRpcClient(new HttpProvider(network.jsonRpcUrl));
-        global = await client.getCryptographicParameters();
-        if (!global) {
-            return { status: BackgroundResponseStatus.Error, reason: 'no global fetched' };
-        }
-    } catch {
-        return { status: BackgroundResponseStatus.Error, reason: 'Unable fetch global parameters' };
+async function getGlobal(network: NetworkConfiguration): Promise<CryptographicParameters> {
+    const client = new JsonRpcClient(new HttpProvider(network.jsonRpcUrl));
+    const global = await client.getCryptographicParameters();
+    if (!global) {
+        throw new Error('no global fetched');
     }
-    return popupMessageHandler.sendInternalMessage(InternalMessageType.Recovery, {
-        providers,
-        globalContext: global.value,
-        seedAsHex: seedPhrase,
-        net: getNet(network),
-    });
+    return global.value;
 }
 
-export default function RecoveryMain({ className }: ClassName) {
-    const { t } = useTranslation('setup');
+export default function RecoveryMain() {
+    const { t } = useTranslation('recovery');
     const network = useAtomValue(networkConfigurationAtom);
     const seedPhrase = useAtomValue(seedPhraseAtom);
     const [providers, setProviders] = useAtom(identityProvidersAtom);
-    const [result, setResult] = useState<RecoveryBackgroundResponse>();
     const [isRecovering, setIsRecovering] = useAtom(isRecoveringAtom);
     const [runRecovery, setRunRecovery] = useState<boolean>(true);
+    const navigate = useNavigate();
+
+    const onError = useCallback(
+        (reason: string) =>
+            navigate(absoluteRoutes.prompt.recovery.path, {
+                state: { status: BackgroundResponseStatus.Error, reason },
+            }),
+        []
+    );
 
     useEffect(() => {
         if (runRecovery && !providers.length) {
             getIdentityProviders()
                 .then(setProviders)
-                .catch(() =>
-                    setResult({
-                        status: BackgroundResponseStatus.Error,
-                        reason: 'Unable to get list of identity providers',
-                    })
-                );
+                .catch(() => onError('Unable to get list of identity providers'));
         }
     });
 
     useEffect(() => {
-        if (!runRecovery || isRecovering.loading || isRecovering.value || !providers.length) {
+        if (!runRecovery || isRecovering.loading || !providers.length) {
             return;
         }
 
         setRunRecovery(false);
 
-        if (!seedPhrase) {
-            setResult({ status: BackgroundResponseStatus.Error, reason: 'No seed phrase found' });
+        if (isRecovering.value) {
+            return;
         }
 
-        setIsRecovering(true);
+        if (!seedPhrase) {
+            onError('Unable to get list of identity providers');
+        }
 
-        recovery(seedPhrase, network, providers)
-            .then(setResult)
-            .finally(() => {
-                setIsRecovering(false);
-            });
+        getGlobal(network)
+            .then((global) => {
+                setIsRecovering(true);
+                popupMessageHandler.sendInternalMessage(InternalMessageType.Recovery, {
+                    providers,
+                    globalContext: global,
+                    seedAsHex: seedPhrase,
+                    net: getNet(network),
+                });
+            })
+            .catch((error) => onError(error.message));
     }, [runRecovery, isRecovering.loading, isRecovering.value, providers.length]);
 
     return (
-        <div className={clsx('recovery__main', className)}>
-            {!result && (
-                <>
-                    <div className="onboarding-setup__page-with-header__description">
-                        {t('performRecovery.description.during')}
-                    </div>
-                    <PendingArrows className="identity-issuance__start__loading-arrows" />
-                </>
-            )}
-            {result?.status === BackgroundResponseStatus.Success && <DisplayRecoveryResult />}
-            {result?.status === BackgroundResponseStatus.Error && (
-                <>
-                    <p className="recovery__main__description">{t('performRecovery.description.error')}</p>
-                    <p>{result?.reason}</p>
-                    <Button
-                        width="medium"
-                        className="recovery__main__button"
-                        onClick={() => {
-                            setResult(undefined);
-                            setRunRecovery(true);
-                        }}
-                    >
-                        {t('retry')}
-                    </Button>
-                </>
-            )}
-        </div>
+        <>
+            <PageHeader>{t('main.title')}</PageHeader>
+            <div className="recovery__main onboarding-setup__page-with-header">
+                <div className="onboarding-setup__page-with-header__description">{t('main.description')}</div>
+                <PendingArrows className="identity-issuance__start__loading-arrows" />
+            </div>
+        </>
     );
 }

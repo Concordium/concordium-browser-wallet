@@ -10,11 +10,13 @@ import {
     JsonRpcClient,
     Network,
 } from '@concordium/web-sdk';
-import { ExtensionMessageHandler } from '@concordium/browser-wallet-message-hub';
-import { BackgroundResponseStatus } from '@shared/utils/types';
+import { ExtensionMessageHandler, InternalMessageType } from '@concordium/browser-wallet-message-hub';
+import { BackgroundResponseStatus, RecoveryBackgroundResponse } from '@shared/utils/types';
 import { Identity, CreationStatus, IdentityProvider, WalletCredential } from '@shared/storage/types';
-import { storedCredentials, storedCurrentNetwork, storedIdentities } from '@shared/storage/access';
+import { sessionIsRecovering, storedCredentials, storedCurrentNetwork, storedIdentities } from '@shared/storage/access';
 import { addCredential, addIdentity } from './update';
+import bgMessageHandler from './message-handler';
+import { openWindow } from './window-management';
 
 // How many empty identityIndices are allowed before stopping
 const maxEmpty = 10;
@@ -151,11 +153,15 @@ async function performRecovery({ providers, ...recoveryInputs }: Payload) {
     }
     await addIdentity(identitiesToAdd);
     await addCredential(credsToAdd);
+    await sessionIsRecovering.set(false);
 }
 
-export const recoveryHandler: ExtensionMessageHandler = (msg, _sender, respond) => {
+export const recoveryHandler: ExtensionMessageHandler = (msg) => {
+    const respond = async (result: RecoveryBackgroundResponse) => {
+        await openWindow();
+        bgMessageHandler.sendInternalMessage(InternalMessageType.RecoveryFinished, result);
+    };
     performRecovery(msg.payload)
         .then(() => respond({ status: BackgroundResponseStatus.Success }))
         .catch((e) => respond({ status: BackgroundResponseStatus.Error, reason: e.toString() }));
-    return true;
 };

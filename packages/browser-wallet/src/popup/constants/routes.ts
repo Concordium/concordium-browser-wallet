@@ -47,6 +47,9 @@ export const relativeRoutes = {
         endIdentityIssuance: {
             path: 'end-identity-issuance',
         },
+        recovery: {
+            path: 'recovery',
+        },
     },
     setup: {
         path: '/setup',

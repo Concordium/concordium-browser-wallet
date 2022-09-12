@@ -10,7 +10,7 @@ export default function RecoveryIntro() {
 
     return (
         <div className="recovery__intro">
-            <pre className="recovery__intro__description">{t('description')}</pre>
+            <pre className="recovery__intro__description">{t('intro.description')}</pre>
             <Button width="wide" onClick={() => nav(absoluteRoutes.recovery.path)} className="recovery__intro__button">
                 {t('restore')}
             </Button>

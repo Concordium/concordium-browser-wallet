@@ -1,15 +1,8 @@
-import React, { createContext, useRef, useCallback, useMemo } from 'react';
-import { useTranslation } from 'react-i18next';
-import { Outlet, useNavigate, useLocation } from 'react-router-dom';
+import React, { createContext, useRef, useCallback, useMemo, useState } from 'react';
+import { Outlet, useNavigate, To } from 'react-router-dom';
 import { noOp } from 'wallet-common-helpers';
-import { absoluteRoutes } from '@popup/constants/routes';
-import Logo from '@assets/svg/concordium.svg';
-import Toast from '@popup/shared/Toast/Toast';
 
 import { isSpawnedWindow } from '@popup/shared/window-helpers';
-import { useSelectedCredential } from '@popup/shared/utils/account-helpers';
-import AccountDetails from '@popup/pages/Account/AccountDetails';
-import AccountInfoListenerContext from '@popup/shared/AccountInfoListenerContext';
 
 type OnCloseHandler = () => void;
 type Unsubscribe = () => void;
@@ -23,51 +16,23 @@ type FullscreenPromptContext = {
      * Generate an action, that also closes the prompt.
      */
     withClose: WithClose;
+    /**
+     *
+     */
+    setReturnLocation: (location: To) => void;
 };
 
 const defaultContext: FullscreenPromptContext = {
     onClose: () => noOp,
     withClose: () => noOp,
+    setReturnLocation: noOp,
 };
 
 export const fullscreenPromptContext = createContext<FullscreenPromptContext>(defaultContext);
 
-function useNavigateBack() {
-    const nav = useNavigate();
-
-    return () => nav(-1);
-}
-
-function Header() {
-    const { t } = useTranslation('mainLayout');
-    const { pathname } = useLocation();
-
-    function getHeaderTitle() {
-        if (pathname.startsWith(absoluteRoutes.prompt.endIdentityIssuance.path)) {
-            return t('header.ids');
-        }
-        if (pathname.startsWith(absoluteRoutes.prompt.connectionRequest.path)) {
-            return t('header.connect');
-        }
-        return t('header.request');
-    }
-
-    return (
-        <header className="main-layout-header">
-            <div className="main-layout-header__bar">
-                <div className="main-layout-header__logo">
-                    <Logo />
-                </div>
-                <label className="main-layout-header__title">
-                    <h1 className="relative flex align-center">{getHeaderTitle()}</h1>
-                </label>
-            </div>
-        </header>
-    );
-}
-
 export default function FullscreenPromptLayout() {
-    const goBack = useNavigateBack();
+    const nav = useNavigate();
+    const [returnLocation, setReturnLocation] = useState<To>();
 
     const closeHandler = useRef<OnCloseHandler>();
     const close = useCallback(() => {
@@ -75,10 +40,13 @@ export default function FullscreenPromptLayout() {
 
         if (isSpawnedWindow) {
             window.close();
+        } else if (returnLocation) {
+            nav(returnLocation);
         } else {
-            goBack();
+            // Go back
+            nav(-1);
         }
-    }, []);
+    }, [returnLocation]);
 
     const withClose: WithClose = useCallback(
         (action) =>
@@ -97,22 +65,14 @@ export default function FullscreenPromptLayout() {
         };
     }, []);
 
-    const contextValue: FullscreenPromptContext = useMemo(() => ({ onClose, withClose }), [onClose, withClose]);
-
-    const account = useSelectedCredential();
+    const contextValue: FullscreenPromptContext = useMemo(
+        () => ({ onClose, withClose, setReturnLocation }),
+        [onClose, withClose]
+    );
 
     return (
         <fullscreenPromptContext.Provider value={contextValue}>
-            <Header />
-            <div className="fullscreen-prompt-layout">
-                <AccountInfoListenerContext>
-                    {account && <AccountDetails expanded={false} account={account} />}
-                    <main className="fullscreen-prompt-layout__main">
-                        <Outlet />
-                    </main>
-                    <Toast />
-                </AccountInfoListenerContext>
-            </div>
+            <Outlet />
         </fullscreenPromptContext.Provider>
     );
 }
