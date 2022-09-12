@@ -6,6 +6,7 @@ import { accountsAtom } from '@popup/store/account';
 import MenuButton from '@popup/shared/MenuButton';
 import { useSelectedCredential } from '@popup/shared/utils/account-helpers';
 import { CreationStatus } from '@shared/storage/types';
+import { useCurrentOpenTabUrl } from '@popup/shared/utils/tabs';
 import { accountRoutes } from './routes';
 import { accountSettingsRoutes } from './AccountSettings/routes';
 import AccountActions from './AccountActions';
@@ -25,6 +26,7 @@ function Account({
 }) {
     const { t } = useTranslation('account');
     const accounts = useAtomValue(accountsAtom);
+    const currentUrl = useCurrentOpenTabUrl();
 
     const selectedCred = useSelectedCredential();
 
@@ -44,6 +46,7 @@ function Account({
                             />
                             <AccountDetails expanded={detailsExpanded} account={selectedCred} />
                             <ConnectedBox
+                                url={currentUrl}
                                 link={`${accountRoutes.settings}/${accountSettingsRoutes.connectedSites}`}
                                 onNavigate={() => setDetailsExpanded(false)}
                                 accountAddress={selectedCred.address}

@@ -3,12 +3,11 @@ import React, { useMemo, useState } from 'react';
 import { useTranslation } from 'react-i18next';
 import { Link } from 'react-router-dom';
 import { storedConnectedSitesAtom } from '@popup/store/account';
-import { getCurrentOpenTabUrl } from '@popup/shared/utils/tabs';
 import clsx from 'clsx';
 
 type Props = {
     accountAddress?: string;
-    getUrl?: () => Promise<string>;
+    url?: string;
 } & (
     | { link: string; onNavigate?: () => void }
     | {
@@ -17,21 +16,17 @@ type Props = {
       }
 );
 
-export default function ConnectedBox({ accountAddress, getUrl = getCurrentOpenTabUrl, link, onNavigate }: Props) {
+export default function ConnectedBox({ accountAddress, url, link, onNavigate }: Props) {
     const { t } = useTranslation('account');
     const connectedSites = useAtomValue(storedConnectedSitesAtom);
     const [isConnectedToSite, setIsConnectedToSite] = useState<boolean>();
 
     useMemo(() => {
-        if (accountAddress && !connectedSites.loading) {
-            getUrl().then((url) => {
-                if (url) {
-                    const connectedSitesForAccount = connectedSites.value[accountAddress] ?? [];
-                    setIsConnectedToSite(connectedSitesForAccount.includes(url));
-                }
-            });
+        if (accountAddress && !connectedSites.loading && url) {
+            const connectedSitesForAccount = connectedSites.value[accountAddress] ?? [];
+            setIsConnectedToSite(connectedSitesForAccount.includes(url));
         }
-    }, [accountAddress, connectedSites]);
+    }, [accountAddress, connectedSites, url]);
 
     if (!link) {
         return (

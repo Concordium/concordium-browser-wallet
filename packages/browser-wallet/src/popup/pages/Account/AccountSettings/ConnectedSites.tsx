@@ -1,11 +1,11 @@
-import React, { useEffect, useState } from 'react';
+import React from 'react';
 import { useAtom, useAtomValue } from 'jotai';
 import { selectedAccountAtom, storedConnectedSitesAtom } from '@popup/store/account';
 import Button from '@popup/shared/Button';
 import { useTranslation } from 'react-i18next';
 import { popupMessageHandler } from '@popup/shared/message-handler';
 import { EventType } from '@concordium/browser-wallet-api-helpers';
-import { getCurrentOpenTabUrl } from '@popup/shared/utils/tabs';
+import { useCurrentOpenTabUrl } from '@popup/shared/utils/tabs';
 import { displayUrl } from '@popup/shared/utils/string-helpers';
 
 export default function ConnectedSites() {
@@ -13,11 +13,7 @@ export default function ConnectedSites() {
     const selectedAccount = useAtomValue(selectedAccountAtom);
     const [connectedSitesLoading, setConnectedSites] = useAtom(storedConnectedSitesAtom);
     const connectedSites = connectedSitesLoading.value;
-    const [openTabUrl, setOpenTabUrl] = useState<string>();
-
-    useEffect(() => {
-        getCurrentOpenTabUrl().then(setOpenTabUrl);
-    }, []);
+    const openTabUrl = useCurrentOpenTabUrl();
 
     if (!selectedAccount || !openTabUrl) {
         return null;
