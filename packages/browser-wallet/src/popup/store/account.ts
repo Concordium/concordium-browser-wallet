@@ -38,3 +38,9 @@ export const accountsPerIdentityAtom = selectAtom(credentialsAtom, (cs) => {
     });
     return map;
 });
+
+export const creatingCredentialRequestAtom = atomWithChromeStorage<boolean>(
+    ChromeStorageKey.IsCreatingCredential,
+    false,
+    true
+);

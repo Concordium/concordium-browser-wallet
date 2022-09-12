@@ -1,10 +1,10 @@
-import React, { useState, useMemo } from 'react';
+import React, { useMemo } from 'react';
 import { useTranslation } from 'react-i18next';
-import { useAtomValue, useSetAtom } from 'jotai';
+import { useAtom, useAtomValue, useSetAtom } from 'jotai';
 import { useNavigate } from 'react-router-dom';
 import IdCard from '@popup/shared/IdCard';
 import { identityProvidersAtom, selectedIdentityAtom } from '@popup/store/identity';
-import { credentialsAtom, selectedAccountAtom } from '@popup/store/account';
+import { credentialsAtom, selectedAccountAtom, creatingCredentialRequestAtom } from '@popup/store/account';
 import { networkConfigurationAtom, seedPhraseAtom } from '@popup/store/settings';
 import { CreationStatus, WalletCredential } from '@shared/storage/types';
 import { JsonRpcClient, HttpProvider } from '@concordium/web-sdk';
@@ -29,8 +29,8 @@ export default function Confirm() {
     const seedPhrase = useAtomValue(seedPhraseAtom);
     const network = useAtomValue(networkConfigurationAtom);
     const providers = useAtomValue(identityProvidersAtom);
-    const [buttonDisabled, setButtonDisabled] = useState(false);
     const addToast = useSetAtom(addToastAtom);
+    const [creatingCredentialRequest, setCreatingRequest] = useAtom(creatingCredentialRequestAtom);
 
     const identityProvider = useMemo(
         () => providers.find((p) => p.ipInfo.ipIdentity === selectedIdentity?.providerIndex),
@@ -42,7 +42,7 @@ export default function Confirm() {
     }
 
     const submit = async () => {
-        setButtonDisabled(true);
+        setCreatingRequest(true);
         try {
             if (!network) {
                 throw new Error('Network is not specified');
@@ -96,7 +96,7 @@ export default function Confirm() {
         } catch (e) {
             addToast((e as Error).toString());
         } finally {
-            setButtonDisabled(false);
+            setCreatingRequest(false);
         }
     };
 
@@ -120,7 +120,7 @@ export default function Confirm() {
                     type="submit"
                     width="wide"
                     onClick={submit}
-                    disabled={buttonDisabled}
+                    disabled={creatingCredentialRequest.loading || creatingCredentialRequest.value}
                 >
                     {t('createAccount')}
                 </Button>
