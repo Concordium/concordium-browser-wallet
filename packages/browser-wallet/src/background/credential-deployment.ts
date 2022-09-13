@@ -14,38 +14,42 @@ import { BackgroundResponseStatus, CredentialDeploymentBackgroundResponse } from
 import { addCredential } from './update';
 
 async function createAndSendCredential(credIn: CredentialInputV1): Promise<CredentialDeploymentBackgroundResponse> {
-    const network = await storedCurrentNetwork.get();
-    const url = network?.jsonRpcUrl;
-    if (!url) {
-        throw new Error('No JSON RPC url available');
+    let address: string;
+    try {
+        const network = await storedCurrentNetwork.get();
+        const url = network?.jsonRpcUrl;
+        if (!url) {
+            throw new Error('No JSON RPC url available');
+        }
+
+        const request = createCredentialV1(credIn);
+        const { credId } = request.cdi;
+        const deploymentHash = getSignedCredentialDeploymentTransactionHash(request);
+        address = getAccountAddress(credId).address;
+        const newCred: PendingWalletCredential = {
+            address,
+            identityIndex: credIn.identityIndex,
+            providerIndex: credIn.ipInfo.ipIdentity,
+            credId,
+            credNumber: credIn.credNumber,
+            status: CreationStatus.Pending,
+            deploymentHash,
+        };
+
+        // Send Request
+        const successful = await new JsonRpcClient(new HttpProvider(url, fetch)).sendCredentialDeployment(request);
+        if (!successful) {
+            throw new Error('Credential deployment was rejected');
+        }
+
+        // Add Pending
+        await addCredential(newCred);
+        // Set Selected to new account
+        await storedSelectedAccount.set(address);
+    } finally {
+        // Remove guard stopping another credential being created
+        await sessionCreatingCredential.set(false);
     }
-
-    const request = createCredentialV1(credIn);
-    const { credId } = request.cdi;
-    const deploymentHash = getSignedCredentialDeploymentTransactionHash(request);
-    const { address } = getAccountAddress(credId);
-    const newCred: PendingWalletCredential = {
-        address,
-        identityIndex: credIn.identityIndex,
-        providerIndex: credIn.ipInfo.ipIdentity,
-        credId,
-        credNumber: credIn.credNumber,
-        status: CreationStatus.Pending,
-        deploymentHash,
-    };
-
-    // Send Request
-    const successful = await new JsonRpcClient(new HttpProvider(url, fetch)).sendCredentialDeployment(request);
-    if (!successful) {
-        throw new Error('Credential deployment was rejected');
-    }
-
-    // Add Pending
-    await addCredential(newCred);
-    // Set Selected to new account
-    await storedSelectedAccount.set(address);
-    // Remove guard stopping another credential being created
-    await sessionCreatingCredential.set(false);
 
     return {
         status: BackgroundResponseStatus.Success,
