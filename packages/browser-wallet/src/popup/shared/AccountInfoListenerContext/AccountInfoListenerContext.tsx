@@ -15,8 +15,7 @@ import { AccountInfoListener } from '../account-info-listener';
 export const accountInfoAtom = atomWithChromeStorage<Record<string, string>>(
     ChromeStorageKey.AccountInfoCache,
     {},
-    false,
-    true
+    false
 );
 export const AccountInfoListenerContext = createContext<AccountInfoListener | undefined>(undefined);
 

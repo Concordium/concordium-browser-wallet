@@ -19,7 +19,6 @@ import {
 } from '@shared/storage/access';
 import { ChromeStorageKey } from '@shared/storage/types';
 import { atom, WritableAtom } from 'jotai';
-import { noOp } from 'wallet-common-helpers/src/utils/basicHelpers';
 
 const accessorMap = {
     [ChromeStorageKey.Identities]: useIndexedStorage(storedIdentities, getGenesisHash),
@@ -46,21 +45,19 @@ export type AsyncWrapper<V> = {
 export function atomWithChromeStorage<V>(
     key: ChromeStorageKey,
     fallback: V,
-    withLoading: true,
-    withSync?: boolean
+    withLoading: true
 ): WritableAtom<AsyncWrapper<V>, V, void>;
 export function atomWithChromeStorage<V>(
     key: ChromeStorageKey,
     fallback: V,
-    withLoading?: false,
-    withSync?: boolean
+    withLoading?: false
 ): WritableAtom<V, V, void>;
 
 /**
  * @description
  * Create an atom that automatically syncs with chrome local storage.
  */
-export function atomWithChromeStorage<V>(key: ChromeStorageKey, fallback: V, withLoading = false, withSync = true) {
+export function atomWithChromeStorage<V>(key: ChromeStorageKey, fallback: V, withLoading = false) {
     const accessor = accessorMap[key] as unknown as StorageAccessor<V>;
 
     if (accessor === undefined) {
@@ -78,20 +75,17 @@ export function atomWithChromeStorage<V>(key: ChromeStorageKey, fallback: V, wit
             })
         );
 
-        if (withSync) {
-            const listener = (changes: Record<string, chrome.storage.StorageChange>) =>
-                getStoredValue().then((value) => {
-                    if (key in changes) {
-                        setValue({
-                            loading: false,
-                            value: value ?? fallback,
-                        });
-                    }
-                });
-            chrome.storage[accessor.area].onChanged.addListener(listener);
-            return () => chrome.storage[accessor.area].onChanged.removeListener(listener);
-        }
-        return noOp;
+        const listener = (changes: Record<string, chrome.storage.StorageChange>) =>
+            getStoredValue().then((value) => {
+                if (key in changes) {
+                    setValue({
+                        loading: false,
+                        value: value ?? fallback,
+                    });
+                }
+            });
+        chrome.storage[accessor.area].onChanged.addListener(listener);
+        return () => chrome.storage[accessor.area].onChanged.removeListener(listener);
     };
 
     const derived = atom(
