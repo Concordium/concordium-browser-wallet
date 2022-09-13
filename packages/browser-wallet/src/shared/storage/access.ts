@@ -129,7 +129,7 @@ export const sessionPendingIdentity = makeStorageAccessor<Omit<PendingIdentity, 
     'session',
     ChromeStorageKey.PendingIdentity
 );
-export const sessionCreatingCredential = makeStorageAccessor<string>('session', ChromeStorageKey.IsCreatingCredential);
+export const sessionCreatingCredential = makeStorageAccessor<boolean>('session', ChromeStorageKey.IsCreatingCredential);
 export const sessionAccountInfoCache = makeIndexedStorageAccessor<Record<string, string>>(
     'session',
     ChromeStorageKey.AccountInfoCache
