@@ -4,7 +4,7 @@ import { NetworkConfiguration } from '@shared/storage/types';
 import { accountInfoCacheLock, updateRecord } from '@shared/storage/update';
 
 import EventEmitter from 'events';
-import JSONBig from 'json-bigint';
+import { stringify } from 'wallet-common-helpers';
 
 const accountInfoRetrievalIntervalMs = 15000;
 
@@ -56,7 +56,7 @@ export class AccountInfoListener extends EventEmitter {
                                 accountInfoCacheLock,
                                 useIndexedStorage(sessionAccountInfoCache, async () => this.genesisHash),
                                 accountInfo.accountAddress,
-                                JSONBig.stringify(accountInfo)
+                                stringify(accountInfo)
                             );
                         }
                     }
