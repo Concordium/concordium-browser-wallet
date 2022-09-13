@@ -68,14 +68,12 @@ export function DisplaySuccess({ added }: Props) {
                             {identity.name}
                             {!added.identities.some(identityMatch(identity)) && ' (Already existed)'}
                         </p>
-                        {addedAccounts
-                            .filter((cred) => cred.identityIndex === identity.index)
-                            .map((cred) => (
-                                <div className="recovery__main__credential" key={cred.credId}>
-                                    <p>{displaySplitAddress(cred.address)}</p>
-                                    <p>{displayAsCcd(0n)}</p>
-                                </div>
-                            ))}
+                        {addedAccounts.filter(isIdentityOfCredential(identity)).map((cred) => (
+                            <div className="recovery__main__credential" key={cred.credId}>
+                                <p>{displaySplitAddress(cred.address)}</p>
+                                <p>{displayAsCcd(0n)}</p>
+                            </div>
+                        ))}
                     </div>
                 ))}
             </div>
