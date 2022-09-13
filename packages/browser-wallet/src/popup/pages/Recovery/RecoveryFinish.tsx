@@ -41,6 +41,7 @@ export function DisplaySuccess({ added }: Props) {
         () => credentials.filter((cred) => added.accounts.some((address) => cred.address === address)),
         [credentials.length]
     );
+    // Also includes identities that existed but have had accounts added.
     const addedIdentities = useMemo(
         () =>
             identities.filter(
@@ -65,7 +66,7 @@ export function DisplaySuccess({ added }: Props) {
                     <div key={`${identity.providerIndex}-${identity.index}`} className="recovery__main__identity">
                         <p>
                             {identity.name}
-                            {added.identities.some(identityMatch(identity)) && ' - new!'}
+                            {!added.identities.some(identityMatch(identity)) && ' (Already existed)'}
                         </p>
                         {addedAccounts
                             .filter((cred) => cred.identityIndex === identity.index)
