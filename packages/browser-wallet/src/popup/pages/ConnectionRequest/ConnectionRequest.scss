@@ -2,19 +2,16 @@
     background-color: $color-bg;
     display: block;
 
-    &__actions {
-        display: grid;
-        margin-top: rem(10px);
-        grid-gap: rem(10px);
-        grid-template-columns: 1fr 1fr;
-    }
-
     &__url {
         white-space: pre-wrap;
         word-break: break-all;
     }
 
-    &__address {
-        word-break: break-all;
+    &__description {
+        font-weight: $font-weight-light;
+    }
+
+    &__connection-box {
+        border-color: $color-blue;
     }
 }

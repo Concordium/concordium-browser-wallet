@@ -1,9 +1,12 @@
 const t = {
-    title: 'Connection request',
-    description: 'Allow this site to connect to account {{selectedAccount}}',
+    title: 'Connect {{ account }} to {{dApp}}?',
+    descriptionP1:
+        'This will allow {{dApp}} to see your account address, public balance, transaction history, and suggest transactions to sign.',
+    descriptionP2: 'You should only connect your account to websites and services you trust.',
+    waiting: 'Waiting',
     actions: {
-        allow: 'Allow',
-        reject: 'Reject',
+        cancel: 'Cancel',
+        connect: 'Connect',
     },
 };
 
