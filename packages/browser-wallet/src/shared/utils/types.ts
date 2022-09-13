@@ -17,6 +17,11 @@ export enum BackgroundResponseStatus {
     Error = 'Error',
 }
 
+export interface IdentityIdentifier {
+    index: number;
+    providerIndex: number;
+}
+
 export type CredentialDeploymentBackgroundResponse =
     | {
           status: BackgroundResponseStatus.Success;
@@ -30,6 +35,10 @@ export type CredentialDeploymentBackgroundResponse =
 export type RecoveryBackgroundResponse =
     | {
           status: BackgroundResponseStatus.Success;
+          added: {
+              accounts: string[];
+              identities: IdentityIdentifier[];
+          };
       }
     | {
           status: BackgroundResponseStatus.Error;

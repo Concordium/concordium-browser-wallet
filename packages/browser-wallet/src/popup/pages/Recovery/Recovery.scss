@@ -23,6 +23,8 @@
         align-items: center;
 
         &__results {
+            padding-left: rem(10px);
+            padding-right: rem(10px);
             width: 100%;
             text-align: left;
         }

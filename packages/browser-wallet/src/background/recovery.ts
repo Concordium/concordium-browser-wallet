@@ -72,9 +72,9 @@ function getRecoverUrl(inputs: Omit<IdentityRecoveryRequestInput, 'timestamp' | 
 
 async function performRecovery({ providers, ...recoveryInputs }: Payload) {
     try {
-        let nextId = 0;
         const identitiesToAdd: Identity[] = [];
         const credsToAdd: WalletCredential[] = [];
+        let nextId = 0;
 
         const network = await storedCurrentNetwork.get();
         if (!network) {
@@ -157,6 +157,10 @@ async function performRecovery({ providers, ...recoveryInputs }: Payload) {
         }
         await addIdentity(identitiesToAdd);
         await addCredential(credsToAdd);
+        return {
+            identities: identitiesToAdd.map((id) => ({ index: id.index, providerIndex: id.providerIndex })),
+            accounts: credsToAdd.map((cred) => cred.address),
+        };
     } finally {
         await sessionIsRecovering.set(false);
     }
@@ -168,6 +172,6 @@ export const recoveryHandler: ExtensionMessageHandler = (msg) => {
         bgMessageHandler.sendInternalMessage(InternalMessageType.RecoveryFinished, result);
     };
     performRecovery(msg.payload)
-        .then(() => respond({ status: BackgroundResponseStatus.Success }))
+        .then((added) => respond({ status: BackgroundResponseStatus.Success, added }))
         .catch((e) => respond({ status: BackgroundResponseStatus.Error, reason: e.toString() }));
 };
