@@ -43,7 +43,7 @@ export default function SignMessage({ onSubmit, onReject }: Props) {
 
     return (
         <>
-            <ConnectedBox accountAddress={accountAddress} getUrl={() => Promise.resolve(new URL(url).origin)} />
+            <ConnectedBox accountAddress={accountAddress} url={new URL(url).origin} />
             <div className="h-full flex-column align-center">
                 <div>{t('description', { dApp: displayUrl(url) })}</div>
                 <TextArea className="m-v-20 w-full flex-child-fill" value={state.payload.message} />

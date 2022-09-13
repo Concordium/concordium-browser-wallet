@@ -22,8 +22,8 @@ export function useCurrentOpenTabUrl(): string | undefined {
 
     useEffect(() => {
         const listener = (_tabId: number, _changeInfo: unknown, tab: chrome.tabs.Tab) => {
-            if (tab.active) {
-                setUrl(tab.url && new URL(tab.url).origin);
+            if (tab.active && tab.url) {
+                setUrl(new URL(tab.url).origin);
             }
         };
         chrome.tabs.onUpdated.addListener(listener);
