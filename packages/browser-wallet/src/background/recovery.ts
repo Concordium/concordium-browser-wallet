@@ -71,89 +71,95 @@ function getRecoverUrl(inputs: Omit<IdentityRecoveryRequestInput, 'timestamp' | 
 }
 
 async function performRecovery({ providers, ...recoveryInputs }: Payload) {
-    let nextId = 0;
-    const identitiesToAdd: Identity[] = [];
-    const credsToAdd: WalletCredential[] = [];
+    try {
+        let nextId = 0;
+        const identitiesToAdd: Identity[] = [];
+        const credsToAdd: WalletCredential[] = [];
 
-    const network = await storedCurrentNetwork.get();
-    if (!network) {
-        throw new Error('No chosen network could be found');
-    }
-    const identities = await storedIdentities.get(network.genesisHash);
-    const credentials = await storedCredentials.get(network.genesisHash);
-
-    const getNextCredIndex = ({ index, providerIndex }: Identity) =>
-        (credentials || [])
-            .filter((cred) => cred.identityIndex === index && cred.providerIndex === providerIndex)
-            .reduce((currentNext, cred) => Math.max(currentNext, cred.credNumber + 1), 0);
-
-    const client = new JsonRpcClient(new HttpProvider(network.jsonRpcUrl, fetch));
-    const blockHash = (await client.getConsensusStatus()).lastFinalizedBlock;
-    const getAccountInfo = (credId: string) => client.getAccountInfo(new CredentialRegistrationId(credId), blockHash);
-
-    for (const provider of providers) {
-        // TODO: Is required because some identity providers do not have a recoveryStart value. This is an error and should be fixed in the wallet proxy. At that point this can be safely removed.
-        if (!provider.metadata.recoveryStart) {
-            // eslint-disable-next-line no-continue
-            continue;
+        const network = await storedCurrentNetwork.get();
+        if (!network) {
+            throw new Error('No chosen network could be found');
         }
-        const providerIndex = provider.ipInfo.ipIdentity;
-        let emptyIndices = 0;
-        let identityIndex = 0;
-        while (emptyIndices < maxEmpty) {
-            // Check if there is already an identity on the current index
-            // eslint-disable-next-line @typescript-eslint/no-loop-func
-            let identity = identities?.find((id) => id.index === identityIndex && id.providerIndex === providerIndex);
-            if (!identity) {
-                // Attempt to recover the identity
-                const recoverUrl = getRecoverUrl({ ...recoveryInputs, identityIndex }, provider);
-                const response = await fetch(recoverUrl);
-                if (response.ok) {
-                    const idObject = await response.json();
-                    identity = {
-                        name: `Identity ${nextId + 1}`,
-                        index: identityIndex,
-                        providerIndex,
-                        status: CreationStatus.Confirmed,
-                        idObject,
-                    };
-                    identitiesToAdd.push(identity);
-                }
+        const identities = await storedIdentities.get(network.genesisHash);
+        const credentials = await storedCredentials.get(network.genesisHash);
+
+        const getNextCredNumber = ({ index, providerIndex }: Identity) =>
+            (credentials || [])
+                .filter((cred) => cred.identityIndex === index && cred.providerIndex === providerIndex)
+                .reduce((currentNext, cred) => Math.max(currentNext, cred.credNumber + 1), 0);
+
+        const client = new JsonRpcClient(new HttpProvider(network.jsonRpcUrl, fetch));
+        const blockHash = (await client.getConsensusStatus()).lastFinalizedBlock;
+        const getAccountInfo = (credId: string) =>
+            client.getAccountInfo(new CredentialRegistrationId(credId), blockHash);
+
+        for (const provider of providers) {
+            // TODO: Is required because some identity providers do not have a recoveryStart value. This is an error and should be fixed in the wallet proxy. At that point this can be safely removed.
+            if (!provider.metadata.recoveryStart) {
+                // eslint-disable-next-line no-continue
+                continue;
             }
-            if (identity) {
-                // Only recover accounts, if we found an identity
-                if (identity.status === CreationStatus.Confirmed) {
-                    credsToAdd.push(
-                        ...(await recoverAccounts(
-                            identityIndex,
+            const providerIndex = provider.ipInfo.ipIdentity;
+            let emptyIndices = 0;
+            let identityIndex = 0;
+            while (emptyIndices < maxEmpty) {
+                // Check if there is already an identity on the current index
+                let identity = identities?.find(
+                    // eslint-disable-next-line @typescript-eslint/no-loop-func
+                    (id) => id.index === identityIndex && id.providerIndex === providerIndex
+                );
+                if (!identity) {
+                    // Attempt to recover the identity
+                    const recoverUrl = getRecoverUrl({ ...recoveryInputs, identityIndex }, provider);
+                    const response = await fetch(recoverUrl);
+                    if (response.ok) {
+                        const idObject = await response.json();
+                        identity = {
+                            name: `Identity ${nextId + 1}`,
+                            index: identityIndex,
                             providerIndex,
-                            {
-                                identityIndex,
-                                ipInfo: provider.ipInfo,
-                                arsInfos: provider.arsInfos,
-                                globalContext: recoveryInputs.globalContext,
-                                seedAsHex: recoveryInputs.seedAsHex,
-                                net: recoveryInputs.net,
-                                expiry: Date.now(),
-                                revealedAttributes: [],
-                                idObject: identity.idObject.value,
-                            },
-                            getAccountInfo,
-                            getNextCredIndex(identity)
-                        ))
-                    );
+                            status: CreationStatus.Confirmed,
+                            idObject,
+                        };
+                        identitiesToAdd.push(identity);
+                    }
                 }
-                nextId += 1;
-                emptyIndices = 0;
-            } else {
-                emptyIndices += 1;
+                if (identity) {
+                    // Only recover accounts, if we found an identity
+                    if (identity.status === CreationStatus.Confirmed) {
+                        credsToAdd.push(
+                            ...(await recoverAccounts(
+                                identityIndex,
+                                providerIndex,
+                                {
+                                    identityIndex,
+                                    ipInfo: provider.ipInfo,
+                                    arsInfos: provider.arsInfos,
+                                    globalContext: recoveryInputs.globalContext,
+                                    seedAsHex: recoveryInputs.seedAsHex,
+                                    net: recoveryInputs.net,
+                                    expiry: Date.now(),
+                                    revealedAttributes: [],
+                                    idObject: identity.idObject.value,
+                                },
+                                getAccountInfo,
+                                getNextCredNumber(identity)
+                            ))
+                        );
+                    }
+                    nextId += 1;
+                    emptyIndices = 0;
+                } else {
+                    emptyIndices += 1;
+                }
+                identityIndex += 1;
             }
-            identityIndex += 1;
         }
+        await addIdentity(identitiesToAdd);
+        await addCredential(credsToAdd);
+    } finally {
+        await sessionIsRecovering.set(false);
     }
-    await addIdentity(identitiesToAdd);
-    await addCredential(credsToAdd);
-    await sessionIsRecovering.set(false);
 }
 
 export const recoveryHandler: ExtensionMessageHandler = (msg) => {

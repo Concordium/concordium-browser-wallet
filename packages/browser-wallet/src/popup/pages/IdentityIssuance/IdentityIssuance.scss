@@ -10,11 +10,6 @@
 
 .identity-issuance {
     &__start {
-        display: flex;
-        flex-direction: column;
-        align-items: center;
-        margin: 0 rem(10px);
-
         &-text {
             margin-top: rem(40px);
             margin-bottom: rem(60px);
@@ -29,11 +24,16 @@
         }
     }
 
+    &__start,
     &__end {
-        height: calc(100% - rem($page-header-height));
         display: flex;
         flex-direction: column;
         align-items: center;
+        margin: 0 rem(10px);
+    }
+
+    &__end {
+        height: calc(100% - rem($page-header-height));
     }
 
     &__card {

@@ -53,12 +53,47 @@ enum Section {
     Account,
     Id,
     Settings,
-    Recovery,
 }
 
 type Props = ClassName & {
     onToggle(open: boolean): void;
 };
+
+function getTitle(section: Section, pathname: string) {
+    switch (section) {
+        case Section.Account:
+            return 'header.accounts';
+        case Section.Id:
+            return 'header.ids';
+        case Section.Settings: {
+            if (pathname.startsWith(absoluteRoutes.home.settings.recovery.path)) {
+                return 'header.settings.recovery';
+            }
+            if (pathname.startsWith(absoluteRoutes.home.settings.network.path)) {
+                return 'header.settings.network';
+            }
+            if (pathname.startsWith(absoluteRoutes.home.settings.passcode.path)) {
+                return 'header.settings.passcode';
+            }
+            if (pathname.startsWith(absoluteRoutes.home.settings.about.path)) {
+                return 'header.settings.about';
+            }
+            return 'header.settings.main';
+        }
+        default:
+            throw new Error('Unknown Section');
+    }
+}
+
+function getSection(pathname: string): Section {
+    if (pathname.startsWith(absoluteRoutes.home.identities.path)) {
+        return Section.Id;
+    }
+    if (pathname.startsWith(absoluteRoutes.home.settings.path)) {
+        return Section.Settings;
+    }
+    return Section.Account;
+}
 
 export default function Header({ onToggle, className }: Props) {
     const { t } = useTranslation('mainLayout');
@@ -88,15 +123,7 @@ export default function Header({ onToggle, className }: Props) {
         }
     }, [dropdownOpen]);
 
-    /* eslint-disable no-nested-ternary */
-    const section = pathname.startsWith(absoluteRoutes.home.identities.path)
-        ? Section.Id
-        : pathname.startsWith(absoluteRoutes.home.settings.path)
-        ? pathname.startsWith(absoluteRoutes.home.settings.recovery.path)
-            ? Section.Recovery
-            : Section.Settings
-        : Section.Account;
-
+    const section = getSection(pathname);
     const canClose =
         !pathname.startsWith(absoluteRoutes.home.account.path) ||
         pathname.startsWith(absoluteRoutes.home.account.add.path);
@@ -116,10 +143,7 @@ export default function Header({ onToggle, className }: Props) {
                         )}
                     >
                         <h1 className="relative flex align-center">
-                            {section === Section.Id && t('header.ids')}
-                            {section === Section.Recovery && t('header.recovery')}
-                            {section === Section.Settings && t('header.settings')}
-                            {section === Section.Account && t('header.accounts')}
+                            {t(getTitle(section, pathname))}
                             {hasDropdown && (
                                 <MenuButton
                                     className="main-layout-header__page-dropdown-button"
@@ -153,7 +177,7 @@ export default function Header({ onToggle, className }: Props) {
                                 {t('header.ids')}
                             </HeaderLink>
                             <HeaderLink onClick={() => setNavOpen(false)} to={absoluteRoutes.home.settings.path}>
-                                {t('header.settings')}
+                                {t('header.settings.main')}
                             </HeaderLink>
                         </MotionNavList>
                     )}

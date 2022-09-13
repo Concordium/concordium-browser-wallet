@@ -3,7 +3,7 @@ import type en from './en';
 const t: typeof en = {
     intro: {
         description:
-            'If you are missing some identities or accounts in your wallet, you can try restoring them here.\n\nIf you used your secret recovery phrase to create more identities and accounts in another installation of the Concordium wallet, you can also use this option to add them to this installation.',
+            'Hvis du mangler nogle identiteter eller konti i din wallet, kan du prøve at søge efter dem her \n\n Hvis du har brugt dit hemmelige recovery phrase til at lave flere identiteter og konti i en anden installation af en Concordium wallet, kan du også bruge denne funktion til at tilføje dem her.',
     },
     main: {
         title: 'Genskaber din wallet',

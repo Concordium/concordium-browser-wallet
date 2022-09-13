@@ -6,12 +6,11 @@ import { pendingIdentityAtom, identitiesAtom, identityProvidersAtom } from '@pop
 import { popupMessageHandler } from '@popup/shared/message-handler';
 import { getIdentityProviders } from '@popup/shared/utils/wallet-proxy';
 import { InternalMessageType } from '@concordium/browser-wallet-message-hub';
-import { JsonRpcClient, HttpProvider } from '@concordium/web-sdk';
 import { CreationStatus, IdentityProvider } from '@shared/storage/types';
 import Button from '@popup/shared/Button';
 import IdentityProviderIcon from '@popup/shared/IdentityProviderIcon';
 import PendingArrows from '@assets/svg/pending-arrows.svg';
-import { getNet } from '@shared/utils/network-helpers';
+import { getGlobal, getNet } from '@shared/utils/network-helpers';
 import { addToastAtom } from '@popup/state';
 
 interface InnerProps {
@@ -43,14 +42,7 @@ function IdentityIssuanceStart({ onStart }: InnerProps) {
                 throw new Error('no seed phrase');
             }
 
-            // TODO: Maybe we should not create the client for each page
-            const client = new JsonRpcClient(new HttpProvider(network.jsonRpcUrl));
-
-            const global = await client.getCryptographicParameters();
-
-            if (!global) {
-                throw new Error('no global fetched');
-            }
+            const global = await getGlobal(network);
 
             const providerIndex = provider.ipInfo.ipIdentity;
 
@@ -70,7 +62,7 @@ function IdentityIssuanceStart({ onStart }: InnerProps) {
             onStart();
 
             popupMessageHandler.sendInternalMessage(InternalMessageType.StartIdentityIssuance, {
-                globalContext: global.value,
+                globalContext: global,
                 ipInfo: provider.ipInfo,
                 arsInfos: provider.arsInfos,
                 seed: seedPhrase,
