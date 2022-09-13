@@ -3,7 +3,7 @@ import { atom } from 'jotai';
 import { selectAtom } from 'jotai/utils';
 import { atomWithChromeStorage } from './utils';
 
-export const identitiesAtom = atomWithChromeStorage<Identity[]>(ChromeStorageKey.Identities, [], false, true);
+export const identitiesAtom = atomWithChromeStorage<Identity[]>(ChromeStorageKey.Identities, [], false);
 export const pendingIdentityAtom = atomWithChromeStorage<Omit<PendingIdentity, 'location'> | undefined>(
     ChromeStorageKey.PendingIdentity,
     undefined

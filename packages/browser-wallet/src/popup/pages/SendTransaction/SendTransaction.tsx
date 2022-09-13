@@ -94,7 +94,7 @@ export default function SendTransaction({ onSubmit, onReject }: Props) {
 
     return (
         <ExternalRequestLayout>
-            <ConnectedBox accountAddress={accountAddress} getUrl={() => Promise.resolve(new URL(url).origin)} />
+            <ConnectedBox accountAddress={accountAddress} url={new URL(url).origin} />
             <div className="h-full flex-column align-center">
                 <div>{t('description', { dApp: displayUrl(url) })}</div>
                 <TransactionReceipt
