@@ -45,7 +45,7 @@ export default function ChooseIdentity() {
                 .map((identity, i) => (
                     <IdCard
                         name={identity.name}
-                        key={identity.index}
+                        key={`${identity.providerIndex}-${identity.index}`}
                         provider={<IdentityProviderIcon provider={findProvider(identity)} />}
                         status={identity.status}
                         className="m-t-10"
