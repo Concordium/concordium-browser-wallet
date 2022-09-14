@@ -1,6 +1,7 @@
 import { getGenesisHash, storedCredentials, storedIdentities, useIndexedStorage } from '@shared/storage/access';
 import { addToList, editList } from '@shared/storage/update';
 import { Identity, WalletCredential } from '@shared/storage/types';
+import { identityMatch } from '@shared/utils/identity-helpers';
 
 const identityLock = 'concordium_identity_lock';
 const credentialLock = 'concordium_credential_lock';
@@ -17,7 +18,7 @@ export function updateIdentities(updatedIdentities: Identity[]) {
     return editList(
         identityLock,
         updatedIdentities,
-        (identity) => (candidate) => identity.index === candidate.index,
+        identityMatch,
         useIndexedStorage(storedIdentities, getGenesisHash)
     );
 }

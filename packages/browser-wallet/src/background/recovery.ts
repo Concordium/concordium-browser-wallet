@@ -14,7 +14,7 @@ import { ExtensionMessageHandler, InternalMessageType } from '@concordium/browse
 import { BackgroundResponseStatus, IdentityIdentifier, RecoveryBackgroundResponse } from '@shared/utils/types';
 import { Identity, CreationStatus, IdentityProvider, WalletCredential } from '@shared/storage/types';
 import { sessionIsRecovering, storedCredentials, storedCurrentNetwork, storedIdentities } from '@shared/storage/access';
-import { isIdentityOfCredential } from '@shared/utils/identity-helpers';
+import { identityMatch, isIdentityOfCredential } from '@shared/utils/identity-helpers';
 import { addCredential, addIdentity } from './update';
 import bgMessageHandler from './message-handler';
 import { openWindow } from './window-management';
@@ -105,10 +105,7 @@ async function performRecovery({ providers, ...recoveryInputs }: Payload) {
             let identityIndex = 0;
             while (emptyIndices < maxEmpty) {
                 // Check if there is already an identity on the current index
-                let identity = identities?.find(
-                    // eslint-disable-next-line @typescript-eslint/no-loop-func
-                    (id) => id.index === identityIndex && id.providerIndex === providerIndex
-                );
+                let identity = identities?.find(identityMatch({ index: identityIndex, providerIndex }));
                 if (!identity) {
                     // Attempt to recover the identity
                     const recoverUrl = getRecoverUrl({ ...recoveryInputs, identityIndex }, provider);

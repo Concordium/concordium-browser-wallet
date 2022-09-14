@@ -6,6 +6,7 @@ import { identitiesAtom } from '@popup/store/identity';
 import { ConcordiumHdWallet } from '@concordium/web-sdk';
 import { WalletCredential } from '@shared/storage/types';
 import { getNet } from '@shared/utils/network-helpers';
+import { isIdentityOfCredential } from '@shared/utils/identity-helpers';
 
 export const displaySplitAddress = (address: string) => `${address.slice(0, 4)}...${address.slice(address.length - 4)}`;
 
@@ -16,7 +17,7 @@ export function useIdentityOf(cred?: WalletCredential) {
         if (!cred) {
             return undefined;
         }
-        return identities.find((id) => id.index === cred.identityIndex && id.providerIndex === cred.providerIndex);
+        return identities.find(isIdentityOfCredential(id));
     }, [JSON.stringify(cred), identities.length]);
 
     return identity;
