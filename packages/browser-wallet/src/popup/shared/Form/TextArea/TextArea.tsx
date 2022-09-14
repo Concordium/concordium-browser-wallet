@@ -8,7 +8,7 @@ import ErrorMessage from '../ErrorMessage';
 
 type Props = Pick<
     TextareaHTMLAttributes<HTMLTextAreaElement>,
-    'className' | 'value' | 'onChange' | 'onBlur' | 'readOnly'
+    'className' | 'value' | 'onChange' | 'onBlur' | 'readOnly' | 'onPaste'
 > &
     RequiredUncontrolledFieldProps<HTMLTextAreaElement> &
     CommonFieldProps;
