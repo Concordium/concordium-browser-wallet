@@ -11,10 +11,11 @@ import {
     Network,
 } from '@concordium/web-sdk';
 import { ExtensionMessageHandler, InternalMessageType } from '@concordium/browser-wallet-message-hub';
-import { BackgroundResponseStatus, IdentityIdentifier, RecoveryBackgroundResponse } from '@shared/utils/types';
+import { BackgroundResponseStatus, RecoveryBackgroundResponse } from '@shared/utils/types';
 import { Identity, CreationStatus, IdentityProvider, WalletCredential } from '@shared/storage/types';
 import { sessionIsRecovering, storedCredentials, storedCurrentNetwork, storedIdentities } from '@shared/storage/access';
 import { identityMatch, isIdentityOfCredential } from '@shared/utils/identity-helpers';
+import { getNextEmptyCredNumber } from '@popup/shared/utils/account-helpers';
 import { addCredential, addIdentity } from './update';
 import bgMessageHandler from './message-handler';
 import { openWindow } from './window-management';
@@ -27,27 +28,30 @@ async function recoverAccounts(
     providerIndex: number,
     credentialInput: Omit<CredentialInputV1, 'credNumber'>,
     getAccountInfo: (credId: string) => Promise<AccountInfo | undefined>,
-    startCredNumber = 0
+    existingCredentialsOfIdentity: WalletCredential[]
 ): Promise<WalletCredential[]> {
     const credsToAdd: WalletCredential[] = [];
 
     let emptyIndices = 0;
-    let credNumber = startCredNumber;
+    let credNumber = getNextEmptyCredNumber(existingCredentialsOfIdentity);
     while (emptyIndices < maxEmpty) {
-        const request = createCredentialV1({ ...credentialInput, credNumber });
-        const { credId } = request.cdi;
-        const accountInfo = await getAccountInfo(credId);
-        if (accountInfo) {
-            credsToAdd.push({
-                address: accountInfo.accountAddress,
-                credId,
-                credNumber,
-                status: CreationStatus.Confirmed,
-                identityIndex,
-                providerIndex,
-            });
-        } else {
-            emptyIndices += 1;
+        // eslint-disable-next-line @typescript-eslint/no-loop-func
+        if (!existingCredentialsOfIdentity.some((cred) => cred.credNumber === credNumber)) {
+            const request = createCredentialV1({ ...credentialInput, credNumber });
+            const { credId } = request.cdi;
+            const accountInfo = await getAccountInfo(credId);
+            if (accountInfo) {
+                credsToAdd.push({
+                    address: accountInfo.accountAddress,
+                    credId,
+                    credNumber,
+                    status: CreationStatus.Confirmed,
+                    identityIndex,
+                    providerIndex,
+                });
+            } else {
+                emptyIndices += 1;
+            }
         }
         credNumber += 1;
     }
@@ -83,11 +87,6 @@ async function performRecovery({ providers, ...recoveryInputs }: Payload) {
         }
         const identities = await storedIdentities.get(network.genesisHash);
         const credentials = await storedCredentials.get(network.genesisHash);
-
-        const getNextCredNumber = (id: IdentityIdentifier) =>
-            (credentials || [])
-                .filter(isIdentityOfCredential(id))
-                .reduce((currentNext, cred) => Math.max(currentNext, cred.credNumber + 1), 0);
 
         const client = new JsonRpcClient(new HttpProvider(network.jsonRpcUrl, fetch));
         const blockHash = (await client.getConsensusStatus()).lastFinalizedBlock;
@@ -141,7 +140,7 @@ async function performRecovery({ providers, ...recoveryInputs }: Payload) {
                                     idObject: identity.idObject.value,
                                 },
                                 getAccountInfo,
-                                getNextCredNumber(identity)
+                                (credentials || []).filter(isIdentityOfCredential(identity))
                             ))
                         );
                     }
