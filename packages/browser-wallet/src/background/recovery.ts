@@ -20,7 +20,7 @@ import bgMessageHandler from './message-handler';
 import { openWindow } from './window-management';
 
 // How many empty identityIndices are allowed before stopping
-const maxEmpty = 10;
+const maxEmpty = 20;
 
 async function recoverAccounts(
     identityIndex: number,

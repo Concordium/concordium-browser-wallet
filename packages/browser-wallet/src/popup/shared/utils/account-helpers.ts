@@ -7,6 +7,7 @@ import { ConcordiumHdWallet } from '@concordium/web-sdk';
 import { WalletCredential } from '@shared/storage/types';
 import { getNet } from '@shared/utils/network-helpers';
 import { isIdentityOfCredential } from '@shared/utils/identity-helpers';
+import { getNextUnused } from '@shared/utils/number-helpers';
 
 export const displaySplitAddress = (address: string) => `${address.slice(0, 4)}...${address.slice(address.length - 4)}`;
 
@@ -59,4 +60,8 @@ export function usePrivateKey(accountAddress: string | undefined): string | unde
     }, [credential?.credId, seedPhrase, identity?.index]);
 
     return privateKey;
+}
+
+export function getNextEmptyCredNumber(creds: WalletCredential[]) {
+    return getNextUnused(creds.map((cred) => cred.credNumber));
 }
