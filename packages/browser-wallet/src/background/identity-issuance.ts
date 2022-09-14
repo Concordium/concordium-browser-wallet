@@ -3,11 +3,12 @@ import { IdentityIssuanceBackgroundResponse } from '@shared/utils/identity-helpe
 import { ExtensionMessageHandler, InternalMessageType } from '@concordium/browser-wallet-message-hub';
 import { BackgroundResponseStatus } from '@shared/utils/types';
 import { sessionPendingIdentity } from '@shared/storage/access';
-import { CreationStatus } from '@shared/storage/types';
+import { CreationStatus, PendingIdentity } from '@shared/storage/types';
 import { openWindow } from './window-management';
 
 import bgMessageHandler from './message-handler';
 import { addIdentity } from './update';
+import { confirmIdentity } from './confirmation';
 
 const redirectUri = 'ConcordiumRedirectToken';
 const codeUriKey = 'code_uri=';
@@ -69,11 +70,13 @@ export const identityIssuanceHandler: ExtensionMessageHandler = (msg) => {
             if (!pending) {
                 status = BackgroundResponseStatus.Aborted;
             } else {
-                await addIdentity({
+                const newIdentity: PendingIdentity = {
                     ...pending,
                     status: CreationStatus.Pending,
                     location: response.result,
-                });
+                };
+                await addIdentity(newIdentity);
+                confirmIdentity(newIdentity);
                 await sessionPendingIdentity.remove();
             }
         }
