@@ -1,6 +1,20 @@
 # Changelog
 
-## Unreleased
+## 0.6.0
+
+### Added
+
+-   Recovery from settings.
+
+### Changed
+
+-   Updated external prompt pages UI.
+
+### Fixed
+
+-   Various bugs.
+
+## 0.5.0
 
 ### Added
 
