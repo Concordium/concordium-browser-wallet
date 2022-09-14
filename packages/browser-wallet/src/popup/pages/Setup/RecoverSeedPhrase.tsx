@@ -36,8 +36,8 @@ export default function RecoverSeedPhrase() {
         return null;
     }
 
-    const handleSubmit: SubmitHandler<FormValues> = (vs) => {
-        const encryptedSeedPhrase = encrypt(vs.seedPhraseInput, passcode);
+    const handleSubmit: SubmitHandler<FormValues> = async (vs) => {
+        const encryptedSeedPhrase = await encrypt(vs.seedPhraseInput, passcode);
         setEncryptedSeedPhrase(encryptedSeedPhrase);
         setPasscodeInSession(passcode);
         navigate(`${absoluteRoutes.setup.path}/${setupRoutes.chooseNetwork}`);

@@ -49,11 +49,11 @@ export function usePrivateKey(accountAddress: string | undefined): string | unde
 
     const privateKey = useMemo(() => {
         // We don't throw errors on missing credentials or identities, as they might just be loading.
-        if (!accountAddress || !credential || !identity) {
+        if (!accountAddress || !credential || !identity || seedPhrase.state !== 'hasData') {
             return undefined;
         }
 
-        return ConcordiumHdWallet.fromHex(seedPhrase, getNet(network))
+        return ConcordiumHdWallet.fromHex(seedPhrase.data, getNet(network))
             .getAccountSigningKey(identity.providerIndex, identity.index, credential.credNumber)
             .toString('hex');
     }, [credential?.credId, seedPhrase, identity?.index]);

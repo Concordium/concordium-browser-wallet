@@ -1,55 +1,74 @@
 import { EncryptedData } from '@shared/storage/types';
-import CryptoJS from 'crypto-js/';
+import { Buffer } from 'buffer';
 
 const keyLen = 32;
 const iterations = 10000;
-const method = 'AES-256';
+const method = 'AES-256-GCM';
+const subleCryptoMethodName = 'AES-GCM';
 const hashAlgorithm = 'sha256';
 const keyDerivationMethod = 'PBKDF2WithHmacSHA256';
 
-export function encrypt(data: string, password: string): EncryptedData {
-    const salt = CryptoJS.lib.WordArray.random(16);
-    const key = CryptoJS.PBKDF2(CryptoJS.enc.Utf8.parse(password), salt, {
-        iterations,
-        hasher: CryptoJS.algo.SHA256,
-        keySize: 256 / 32,
-    });
-    const iv = CryptoJS.lib.WordArray.random(16);
+async function deriveKey(password: string, salt: Buffer): Promise<CryptoKey> {
+    const passwordBuffer = Buffer.from(password, 'utf-8');
 
-    const encryptedValue = CryptoJS.AES.encrypt(CryptoJS.enc.Utf8.parse(data), key, {
-        iv,
-        mode: CryptoJS.mode.CBC,
-        padding: CryptoJS.pad.Pkcs7,
-    });
+    const baseKey = await global.crypto.subtle.importKey('raw', passwordBuffer, { name: 'PBKDF2' }, false, [
+        'deriveKey',
+    ]);
+
+    const derivedKey = await global.crypto.subtle.deriveKey(
+        {
+            name: 'PBKDF2',
+            salt,
+            iterations,
+            hash: 'SHA-256',
+        },
+        baseKey,
+        { name: subleCryptoMethodName, length: keyLen * 8 },
+        false,
+        ['encrypt', 'decrypt']
+    );
+
+    return derivedKey;
+}
+
+export async function encrypt(data: string, password: string): Promise<EncryptedData> {
+    const salt = Buffer.from(global.crypto.getRandomValues(new Uint8Array(16)));
+    const key = await deriveKey(password, salt);
+
+    const iv = global.crypto.getRandomValues(new Uint8Array(16));
+    const encrypted = await global.crypto.subtle.encrypt(
+        { name: subleCryptoMethodName, iv },
+        key,
+        Buffer.from(data, 'utf-8')
+    );
 
     return {
-        cipherText: encryptedValue.toString(),
+        cipherText: Buffer.from(encrypted).toString('base64'),
         metadata: {
             keyLen,
             iterations,
             encryptionMethod: method,
-            salt: salt.toString(CryptoJS.enc.Base64),
-            initializationVector: iv.toString(CryptoJS.enc.Base64),
+            salt: salt.toString('base64'),
+            initializationVector: Buffer.from(iv).toString('base64'),
             hashAlgorithm,
             keyDerivationMethod,
         },
     };
 }
 
-export function decrypt(data: EncryptedData, password: string): string {
-    const salt = CryptoJS.enc.Base64.parse(data.metadata.salt);
-    const iv = CryptoJS.enc.Base64.parse(data.metadata.initializationVector);
+export async function decrypt(data: EncryptedData, password: string): Promise<string> {
+    const salt = Buffer.from(data.metadata.salt, 'base64');
+    const iv = Buffer.from(data.metadata.initializationVector, 'base64');
+    const key = await deriveKey(password, salt);
 
-    const key = CryptoJS.PBKDF2(CryptoJS.enc.Utf8.parse(password), salt, {
-        iterations: data.metadata.iterations,
-        hasher: CryptoJS.algo.SHA256,
-        keySize: 256 / data.metadata.keyLen,
-    });
-
-    const decrypted = CryptoJS.AES.decrypt(data.cipherText, key, {
-        iv,
-        mode: CryptoJS.mode.CBC,
-        padding: CryptoJS.pad.Pkcs7,
-    });
-    return decrypted.toString(CryptoJS.enc.Utf8);
+    try {
+        const decrypted = await crypto.subtle.decrypt(
+            { name: subleCryptoMethodName, iv },
+            key,
+            Buffer.from(data.cipherText, 'base64')
+        );
+        return Buffer.from(decrypted).toString('utf-8');
+    } catch (e) {
+        throw new Error('The password was incorrect');
+    }
 }

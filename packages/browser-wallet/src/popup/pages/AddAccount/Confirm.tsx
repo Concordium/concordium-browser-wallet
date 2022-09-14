@@ -46,7 +46,7 @@ export default function Confirm() {
             if (!network) {
                 throw new Error('Network is not specified');
             }
-            if (!seedPhrase) {
+            if (!seedPhrase || seedPhrase.state !== 'hasData') {
                 throw new Error('no seed phrase');
             }
             if (!identityProvider) {
@@ -69,7 +69,7 @@ export default function Confirm() {
                     globalContext: global,
                     ipInfo: identityProvider.ipInfo,
                     arsInfos: identityProvider.arsInfos,
-                    seedAsHex: seedPhrase,
+                    seedAsHex: seedPhrase.data,
                     net: getNet(network),
                     idObject: selectedIdentity.idObject.value,
                     revealedAttributes: [],
