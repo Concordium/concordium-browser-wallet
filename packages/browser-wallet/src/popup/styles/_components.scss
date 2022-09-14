@@ -29,7 +29,8 @@
 @import '../pages/AddAccount/AddAccount';
 @import '../pages/NetworkSettings/NetworkSettings';
 @import '../pages/ChangePasscode/ChangePasscode';
+@import '../pages/Recovery/Recovery';
 
 // Layouts
 @import '../page-layouts/MainLayout';
-@import '../page-layouts/FullscreenPromptLayout/FullscreenPromptLayout';
+@import '../page-layouts/ExternalRequestLayout/ExternalRequestLayout';

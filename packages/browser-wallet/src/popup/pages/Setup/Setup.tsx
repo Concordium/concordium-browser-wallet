@@ -9,6 +9,7 @@ import FormCheckbox from '@popup/shared/Form/Checkbox';
 import ExternalLink from '@popup/shared/ExternalLink';
 import Submit from '@popup/shared/Form/Submit';
 import urls from '@popup/constants/urls';
+import PerformRecovery from '@popup/pages/Recovery/RecoveryMain';
 import { setupRoutes } from './routes';
 import { EnterRecoveryPhrase } from './RecoveryPhrase';
 import { ChooseNetwork } from './ChooseNetwork';
@@ -16,7 +17,6 @@ import SetupPasscode from './SetupPasscode';
 import CreateOrRestore from './CreateOrRestore';
 import GenerateSeedPhrase from './GenerateSeedPhrase';
 import RestoreRecoveryPhrase from './RecoverSeedPhrase';
-import PerformRecovery from './PerformRecovery';
 
 type FormValues = {
     termsAndConditionsApproved: boolean;

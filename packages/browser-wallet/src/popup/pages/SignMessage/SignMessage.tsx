@@ -10,6 +10,7 @@ import { TextArea } from '@popup/shared/Form/TextArea';
 import ConnectedBox from '@popup/pages/Account/ConnectedBox';
 import Button from '@popup/shared/Button';
 import { addToastAtom } from '@popup/state';
+import ExternalRequestLayout from '@popup/page-layouts/ExternalRequestLayout';
 
 type Props = {
     onSubmit(signature: AccountTransactionSignature): void;
@@ -42,7 +43,7 @@ export default function SignMessage({ onSubmit, onReject }: Props) {
     }, [state.payload.message, state.payload.accountAddress, key]);
 
     return (
-        <>
+        <ExternalRequestLayout>
             <ConnectedBox accountAddress={accountAddress} url={new URL(url).origin} />
             <div className="h-full flex-column align-center">
                 <div>{t('description', { dApp: displayUrl(url) })}</div>
@@ -63,6 +64,6 @@ export default function SignMessage({ onSubmit, onReject }: Props) {
                     </Button>
                 </div>
             </div>
-        </>
+        </ExternalRequestLayout>
     );
 }

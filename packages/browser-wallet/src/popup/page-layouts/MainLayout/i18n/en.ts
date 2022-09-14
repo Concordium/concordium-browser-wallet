@@ -7,7 +7,13 @@ const t = {
     header: {
         accounts: 'Accounts',
         ids: 'ID cards',
-        settings: 'Wallet settings',
+        settings: {
+            main: 'Wallet settings',
+            recovery: 'Restoring your wallet',
+            network: 'Network settings',
+            passcode: 'Change passcode',
+            about: 'About',
+        },
         request: 'Signature Request',
         connect: 'New connection',
     },

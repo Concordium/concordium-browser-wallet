@@ -7,7 +7,6 @@ import { identityProvidersAtom, selectedIdentityAtom } from '@popup/store/identi
 import { credentialsAtom, creatingCredentialRequestAtom } from '@popup/store/account';
 import { networkConfigurationAtom, seedPhraseAtom } from '@popup/store/settings';
 import { CreationStatus, WalletCredential } from '@shared/storage/types';
-import { JsonRpcClient, HttpProvider } from '@concordium/web-sdk';
 import Button from '@popup/shared/Button';
 import ArrowIcon from '@assets/svg/arrow.svg';
 import IdentityProviderIcon from '@popup/shared/IdentityProviderIcon';
@@ -16,7 +15,7 @@ import { absoluteRoutes } from '@popup/constants/routes';
 import { InternalMessageType } from '@concordium/browser-wallet-message-hub';
 import { popupMessageHandler } from '@popup/shared/message-handler';
 import { BackgroundResponseStatus } from '@shared/utils/types';
-import { getNet } from '@shared/utils/network-helpers';
+import { getGlobal, getNet } from '@shared/utils/network-helpers';
 import { addToastAtom } from '@popup/state';
 import AccountDetails from '../Account/AccountDetails';
 
@@ -49,18 +48,11 @@ export default function Confirm() {
             if (!seedPhrase) {
                 throw new Error('no seed phrase');
             }
-
-            // TODO: Maybe we should not create the client for each page
-            const client = new JsonRpcClient(new HttpProvider(network.jsonRpcUrl));
-            const global = await client.getCryptographicParameters();
-
-            if (!global) {
-                throw new Error('no global fetched');
-            }
-
             if (!identityProvider) {
                 throw new Error('provider not found');
             }
+
+            const global = await getGlobal(network);
 
             // Make request
             const expiry = Math.floor(Date.now() / 1000) + 720;
@@ -73,7 +65,7 @@ export default function Confirm() {
             const response = await popupMessageHandler.sendInternalMessage(
                 InternalMessageType.SendCredentialDeployment,
                 {
-                    globalContext: global.value,
+                    globalContext: global,
                     ipInfo: identityProvider.ipInfo,
                     arsInfos: identityProvider.arsInfos,
                     seedAsHex: seedPhrase,

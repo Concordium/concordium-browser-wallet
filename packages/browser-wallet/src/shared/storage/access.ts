@@ -134,6 +134,7 @@ export const sessionAccountInfoCache = makeIndexedStorageAccessor<Record<string,
     'session',
     ChromeStorageKey.AccountInfoCache
 );
+export const sessionIsRecovering = makeStorageAccessor<boolean>('session', ChromeStorageKey.IsRecovering);
 
 export const getGenesisHash = () =>
     storedCurrentNetwork.get().then((network) => {

@@ -14,6 +14,7 @@ import { noOp, useAsyncMemo } from 'wallet-common-helpers';
 import { getSimpleTransferCost } from '@popup/shared/utils/wallet-proxy';
 import ConnectedBox from '@popup/pages/Account/ConnectedBox';
 import { addToastAtom } from '@popup/state';
+import ExternalRequestLayout from '@popup/page-layouts/ExternalRequestLayout';
 import { parsePayload } from './util';
 
 interface Location {
@@ -92,7 +93,7 @@ export default function SendTransaction({ onSubmit, onReject }: Props) {
     }, [payload, key]);
 
     return (
-        <>
+        <ExternalRequestLayout>
             <ConnectedBox accountAddress={accountAddress} url={new URL(url).origin} />
             <div className="h-full flex-column align-center">
                 <div>{t('description', { dApp: displayUrl(url) })}</div>
@@ -121,6 +122,6 @@ export default function SendTransaction({ onSubmit, onReject }: Props) {
                     </Button>
                 </div>
             </div>
-        </>
+        </ExternalRequestLayout>
     );
 }

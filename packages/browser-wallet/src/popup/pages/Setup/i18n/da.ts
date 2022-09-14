@@ -35,15 +35,6 @@ const t: typeof en = {
     recoverSeedPhrase: {
         title: 'Genskab din wallet',
     },
-    performRecovery: {
-        title: 'Genskaber din wallet',
-        description: {
-            during: 'Vent venligt mens der søges efter dine identiteter og konti.',
-            after: 'Følgende identiteter og konti blev fundet.',
-            error: 'Genskabning fejlede. Du kan prøve igen. \n Årsag til fejlen:',
-            noneFound: 'Ingen identiteter blev fundet.',
-        },
-    },
     confirmRecoveryPhrase: {
         description:
             'Venligst skriv dine 24 ord i den korrekte rækkefølge, adskilt med et mellemrum, for at bekræfte din hemmelige recovery phrase.',
@@ -72,7 +63,6 @@ const t: typeof en = {
         },
     },
     continue: 'Fortsæt',
-    retry: 'Prøv igen',
 };
 
 export default t;

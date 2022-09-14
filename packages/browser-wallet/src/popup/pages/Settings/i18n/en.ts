@@ -1,7 +1,7 @@
 const t = {
     passcode: 'Change passcode',
     network: 'Network settings',
-    visual: 'Visual settings',
+    recover: 'Restore IDs & accounts',
     about: 'About',
 };
 

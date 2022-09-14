@@ -25,6 +25,9 @@ export const relativeRoutes = {
             network: {
                 path: 'network',
             },
+            recovery: {
+                path: 'recovery',
+            },
             about: {
                 path: 'about',
             },
@@ -44,9 +47,15 @@ export const relativeRoutes = {
         endIdentityIssuance: {
             path: 'end-identity-issuance',
         },
+        recovery: {
+            path: 'recovery',
+        },
     },
     setup: {
         path: '/setup',
+    },
+    recovery: {
+        path: '/recovery',
     },
     login: {
         path: '/login',

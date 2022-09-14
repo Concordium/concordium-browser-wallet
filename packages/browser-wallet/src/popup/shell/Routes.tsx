@@ -20,6 +20,9 @@ import AddAccount from '@popup/pages/AddAccount';
 import { IdentityIssuanceEnd, IdentityIssuanceStart } from '@popup/pages/IdentityIssuance';
 import About from '@popup/pages/About';
 import Login from '@popup/pages/Login/Login';
+import RecoveryIntro from '@popup/pages/Recovery/RecoveryIntro';
+import RecoveryMain from '@popup/pages/Recovery/RecoveryMain';
+import RecoveryFinish from '@popup/pages/Recovery/RecoveryFinish';
 import ChangePasscode from '@popup/pages/ChangePasscode/ChangePasscode';
 
 type PromptKey = keyof Omit<typeof absoluteRoutes['prompt'], 'path'>;
@@ -50,6 +53,25 @@ function useMessagePrompt<R>(type: InternalMessageType | MessageType, promptKey:
     return handleResponse;
 }
 
+/**
+ * Used for internal prompt, which does not return responses to the background script
+ */
+function usePrompt(type: InternalMessageType | MessageType, promptKey: PromptKey) {
+    const navigate = useNavigate();
+    const { pathname } = useLocation();
+
+    useEffect(
+        () =>
+            popupMessageHandler.handleMessage(createMessageTypeFilter(type), (msg) => {
+                const replace = pathname.startsWith(absoluteRoutes.prompt.path); // replace existing prompts.
+                const route = absoluteRoutes.prompt[promptKey].path;
+
+                navigate(route, { state: msg, replace });
+            }),
+        [pathname]
+    );
+}
+
 export default function Routes() {
     const handleConnectionResponse = useMessagePrompt<boolean>(InternalMessageType.Connect, 'connectionRequest');
     const handleSendTransactionResponse = useMessagePrompt<string | undefined>(
@@ -61,10 +83,9 @@ export default function Routes() {
         'signMessage'
     );
 
-    const handleIdentityIssuanceResponse = useMessagePrompt<void>(
-        InternalMessageType.EndIdentityIssuance,
-        'endIdentityIssuance'
-    );
+    usePrompt(InternalMessageType.EndIdentityIssuance, 'endIdentityIssuance');
+
+    usePrompt(InternalMessageType.RecoveryFinished, 'recovery');
 
     useEffect(() => {
         popupMessageHandler.sendInternalMessage(InternalMessageType.PopupReady).catch(noOp);
@@ -100,12 +121,11 @@ export default function Routes() {
                         />
                     }
                 />
-                <Route
-                    path={relativeRoutes.prompt.endIdentityIssuance.path}
-                    element={<IdentityIssuanceEnd onFinish={handleIdentityIssuanceResponse} />}
-                />
+                <Route path={relativeRoutes.prompt.endIdentityIssuance.path} element={<IdentityIssuanceEnd />} />
+                <Route path={relativeRoutes.prompt.recovery.path} element={<RecoveryFinish />} />
             </Route>
             <Route path={`${relativeRoutes.setup.path}/*`} element={<Setup />} />
+            <Route element={<RecoveryMain />} path={relativeRoutes.recovery.path} />
             <Route path={relativeRoutes.login.path} element={<Login />} />
             <Route path={relativeRoutes.home.path} element={<MainLayout />}>
                 <Route
@@ -117,6 +137,7 @@ export default function Routes() {
                     <Route index element={<Settings />} />
                     <Route element={<ChangePasscode />} path={relativeRoutes.home.settings.passcode.path} />
                     <Route element={<NetworkSettings />} path={relativeRoutes.home.settings.network.path} />
+                    <Route element={<RecoveryIntro />} path={relativeRoutes.home.settings.recovery.path} />
                     <Route element={<About />} path={relativeRoutes.home.settings.about.path} />
                 </Route>
                 <Route

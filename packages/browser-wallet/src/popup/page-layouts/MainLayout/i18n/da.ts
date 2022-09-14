@@ -9,7 +9,13 @@ const t: typeof en = {
     header: {
         accounts: 'Konti',
         ids: 'ID kort',
-        settings: 'Wallet indstillinger',
+        settings: {
+            main: 'Wallet indstillinger',
+            recovery: 'Genskabning af din wallet',
+            network: 'Netværksindstillinger',
+            passcode: 'Skift adgangskode',
+            about: 'Om',
+        },
         request: 'Anmodning om Signatur',
         connect: 'Ny Forbindelse',
     },
