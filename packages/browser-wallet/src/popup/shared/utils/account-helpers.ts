@@ -17,7 +17,7 @@ export function useIdentityOf(cred?: WalletCredential) {
         if (!cred) {
             return undefined;
         }
-        return identities.find(isIdentityOfCredential(id));
+        return identities.find((id) => isIdentityOfCredential(id)(cred));
     }, [JSON.stringify(cred), identities.length]);
 
     return identity;
