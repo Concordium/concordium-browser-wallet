@@ -14,7 +14,7 @@ export default function Identity() {
 
     const identityProvider = useMemo(
         () => providers.find((p) => p.ipInfo.ipIdentity === selectedIdentity?.providerIndex),
-        [providers.length]
+        [providers.length, selectedIdentity?.providerIndex]
     );
 
     if (!selectedIdentity) {
