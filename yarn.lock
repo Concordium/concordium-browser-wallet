@@ -1935,7 +1935,6 @@ __metadata:
     "@storybook/testing-library": ^0.0.11
     "@svgr/webpack": ^6.2.1
     "@types/chrome": ^0.0.195
-    "@types/crypto-js": ^4.1.1
     "@types/lodash.groupby": ^4.6.7
     "@types/react": ^18.0.7
     "@types/react-dom": ^18.0.0
@@ -1947,7 +1946,6 @@ __metadata:
     check-password-strength: ^2.0.5
     clsx: ^1.1.1
     cross-env: ^7.0.3
-    crypto-js: ^4.1.1
     css-loader: ^6.7.1
     esbuild: ^0.14.31
     esbuild-plugin-copy: ^1.3.0
@@ -4664,13 +4662,6 @@ __metadata:
     "@types/filesystem": "*"
     "@types/har-format": "*"
   checksum: 074c8981ae18f1f32ce07f2e153c655bf0a213db6e3b9d67058e3a5c4fd39b0af33e6c2a56384ce2e7d0027db9b63751a719a4af7111fa46c254259f780bb3a5
-  languageName: node
-  linkType: hard
-
-"@types/crypto-js@npm:^4.1.1":
-  version: 4.1.1
-  resolution: "@types/crypto-js@npm:4.1.1"
-  checksum: ea3d6a67b69f88baeb6af96004395903d2367a41bd5cd86306da23a44dd96589749495da50974a9b01bb5163c500764c8a33706831eade036bddae016417e3ea
   languageName: node
   linkType: hard
 
@@ -8146,13 +8137,6 @@ __metadata:
     randombytes: ^2.0.0
     randomfill: ^1.0.3
   checksum: c1609af82605474262f3eaa07daa0b2140026bd264ab316d4bf1170272570dbe02f0c49e29407fe0d3634f96c507c27a19a6765fb856fed854a625f9d15618e2
-  languageName: node
-  linkType: hard
-
-"crypto-js@npm:^4.1.1":
-  version: 4.1.1
-  resolution: "crypto-js@npm:4.1.1"
-  checksum: b3747c12ee3a7632fab3b3e171ea50f78b182545f0714f6d3e7e2858385f0f4101a15f2517e033802ce9d12ba50a391575ff4638c9de3dd9b2c4bc47768d5425
   languageName: node
   linkType: hard
 
@@ -19457,7 +19441,7 @@ __metadata:
   peerDependencies:
     react: ">=16"
     react-dom: ">=16"
-  checksum: b737803f80d3635877cffdb68f927e52ce22641b41acfc937b647ac05d697dd5956268178772348dfc38a9072b14f38492144694e8b72209f47236e4e92b3bfa
+  checksum: 3fc6e2d809881ba4bcd452bcacc3ced0f586a3557ded7f3f3ec4bfd6ffb1f59ce27b63e5a08b36425fd6b1ddb03e03b494247f6bdbea2d4c1353ca3126b8b3e6
   languageName: node
   linkType: hard
 
