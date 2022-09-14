@@ -93,21 +93,28 @@ export const identityIssuanceHandler: ExtensionMessageHandler = (msg) => {
     const searchParams = new URLSearchParams(params);
     const url = Object.entries(params).length === 0 ? baseUrl : `${baseUrl}?${searchParams.toString()}`;
 
-    fetch(url).then((response) => {
-        if (!response.ok) {
-            response.json().then((body) =>
+    fetch(url)
+        .then((response) => {
+            if (!response.ok) {
+                response.json().then((body) =>
+                    respond({
+                        status: BackgroundResponseStatus.Error,
+                        reason: body?.message || `Provider returned status code ${response.status}.`,
+                    })
+                );
+            } else if (!response.redirected) {
                 respond({
                     status: BackgroundResponseStatus.Error,
-                    reason: body?.message || `Provider returned status code ${response.status}.`,
-                })
-            );
-        } else if (!response.redirected) {
+                    reason: `Initial location did not redirect as expected.`,
+                });
+            } else {
+                handleExternalIssuance(response.url, respond);
+            }
+        })
+        .catch((e) =>
             respond({
                 status: BackgroundResponseStatus.Error,
-                reason: `Initial location did not redirect as expected.`,
-            });
-        } else {
-            handleExternalIssuance(response.url, respond);
-        }
-    });
+                reason: `Failed to reach identity provider due to: ${e.message}`,
+            })
+        );
 };

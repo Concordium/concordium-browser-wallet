@@ -30,7 +30,9 @@ function IdentityIssuanceStart({ onStart }: InnerProps) {
 
     useEffect(() => {
         // TODO only load once per session?
-        getIdentityProviders().then((loadedProviders) => setProviders(loadedProviders));
+        getIdentityProviders()
+            .then((loadedProviders) => setProviders(loadedProviders))
+            .catch(() => addToast('Unable to update identity provider list'));
     }, []);
 
     const startIssuance = async (provider: IdentityProvider) => {
