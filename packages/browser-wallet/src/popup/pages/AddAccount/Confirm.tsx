@@ -15,6 +15,7 @@ import { absoluteRoutes } from '@popup/constants/routes';
 import { InternalMessageType } from '@concordium/browser-wallet-message-hub';
 import { popupMessageHandler } from '@popup/shared/message-handler';
 import { BackgroundResponseStatus } from '@shared/utils/types';
+import { isIdentityOfCredential } from '@shared/utils/identity-helpers';
 import { getGlobal, getNet } from '@shared/utils/network-helpers';
 import { addToastAtom } from '@popup/state';
 import AccountDetails from '../Account/AccountDetails';
@@ -57,7 +58,7 @@ export default function Confirm() {
             // Make request
             const expiry = Math.floor(Date.now() / 1000) + 720;
 
-            const credsOfCurrentIdentity = credentials.filter((cred) => cred.identityIndex === selectedIdentity.index);
+            const credsOfCurrentIdentity = credentials.filter(isIdentityOfCredential(selectedIdentity));
             const credNumber = credsOfCurrentIdentity.length
                 ? credsOfCurrentIdentity.reduce((best, cred) => Math.max(best, cred.credNumber), 0) + 1
                 : 0;

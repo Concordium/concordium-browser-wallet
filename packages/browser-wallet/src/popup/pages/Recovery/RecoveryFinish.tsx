@@ -11,18 +11,13 @@ import { displaySplitAddress } from '@popup/shared/utils/account-helpers';
 import { IdentityIdentifier, BackgroundResponseStatus, RecoveryBackgroundResponse } from '@shared/utils/types';
 import { fullscreenPromptContext } from '@popup/page-layouts/FullscreenPromptLayout';
 import PageHeader from '@popup/shared/PageHeader';
-import { WalletCredential } from '@shared/storage/types';
+import { identityMatch, isIdentityOfCredential } from '@shared/utils/identity-helpers';
 
 interface Location {
     state: {
         payload: RecoveryBackgroundResponse;
     };
 }
-
-const identityMatch = (target: IdentityIdentifier) => (candidate: IdentityIdentifier) =>
-    target.index === candidate.index && target.providerIndex === candidate.providerIndex;
-const isIdentityOfCredential = (id: IdentityIdentifier) => (cred: WalletCredential) =>
-    id.index === cred.identityIndex && id.providerIndex === cred.providerIndex;
 
 interface Props {
     added: {

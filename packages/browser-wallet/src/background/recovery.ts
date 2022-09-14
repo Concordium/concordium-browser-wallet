@@ -11,9 +11,10 @@ import {
     Network,
 } from '@concordium/web-sdk';
 import { ExtensionMessageHandler, InternalMessageType } from '@concordium/browser-wallet-message-hub';
-import { BackgroundResponseStatus, RecoveryBackgroundResponse } from '@shared/utils/types';
+import { BackgroundResponseStatus, IdentityIdentifier, RecoveryBackgroundResponse } from '@shared/utils/types';
 import { Identity, CreationStatus, IdentityProvider, WalletCredential } from '@shared/storage/types';
 import { sessionIsRecovering, storedCredentials, storedCurrentNetwork, storedIdentities } from '@shared/storage/access';
+import { isIdentityOfCredential } from '@shared/utils/identity-helpers';
 import { addCredential, addIdentity } from './update';
 import bgMessageHandler from './message-handler';
 import { openWindow } from './window-management';
@@ -83,9 +84,9 @@ async function performRecovery({ providers, ...recoveryInputs }: Payload) {
         const identities = await storedIdentities.get(network.genesisHash);
         const credentials = await storedCredentials.get(network.genesisHash);
 
-        const getNextCredNumber = ({ index, providerIndex }: Identity) =>
+        const getNextCredNumber = (id: IdentityIdentifier) =>
             (credentials || [])
-                .filter((cred) => cred.identityIndex === index && cred.providerIndex === providerIndex)
+                .filter(isIdentityOfCredential(id))
                 .reduce((currentNext, cred) => Math.max(currentNext, cred.credNumber + 1), 0);
 
         const client = new JsonRpcClient(new HttpProvider(network.jsonRpcUrl, fetch));
