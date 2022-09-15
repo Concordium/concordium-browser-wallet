@@ -6,7 +6,7 @@ import { absoluteRoutes } from '@popup/constants/routes';
 import { useSetAtom, useAtomValue } from 'jotai';
 import { useTranslation } from 'react-i18next';
 import { isRecoveringAtom } from '@popup/state';
-import { networkConfigurationAtom } from '@popup/store/settings';
+import { hasBeenOnBoardedAtom, networkConfigurationAtom } from '@popup/store/settings';
 import { setupRoutes } from './routes';
 // TODO Remove stagenet
 import { mainnet, testnet, stagenet } from '../NetworkSettings/NetworkSettings';
@@ -16,11 +16,13 @@ export function ChooseNetwork() {
     const { t } = useTranslation('setup');
     const setNetworkConfiguration = useSetAtom(networkConfigurationAtom);
     const isRecovering = useAtomValue(isRecoveringAtom);
+    const setHasBeenOnboarded = useSetAtom(hasBeenOnBoardedAtom);
 
     const goToNext = () => {
         if (isRecovering) {
             navigate(`${absoluteRoutes.setup.path}/${setupRoutes.performRecovery}`);
         } else {
+            setHasBeenOnboarded(true);
             navigate(absoluteRoutes.home.identities.path);
         }
     };

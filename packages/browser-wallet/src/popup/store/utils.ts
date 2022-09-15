@@ -17,6 +17,7 @@ import {
     sessionCreatingCredential,
     sessionAccountInfoCache,
     sessionIsRecovering,
+    storedHasBeenOnboarded,
 } from '@shared/storage/access';
 import { ChromeStorageKey } from '@shared/storage/types';
 import { atom, WritableAtom } from 'jotai';
@@ -32,6 +33,7 @@ const accessorMap = {
     [ChromeStorageKey.Theme]: storedTheme,
     [ChromeStorageKey.SeedPhrase]: storedSeedPhrase,
     [ChromeStorageKey.IdentityProviders]: useIndexedStorage(storedIdentityProviders, getGenesisHash),
+    [ChromeStorageKey.HasBeenOnboarded]: storedHasBeenOnboarded,
     [ChromeStorageKey.Passcode]: sessionPasscode,
     [ChromeStorageKey.IsRecovering]: sessionIsRecovering,
     [ChromeStorageKey.PendingIdentity]: sessionPendingIdentity,

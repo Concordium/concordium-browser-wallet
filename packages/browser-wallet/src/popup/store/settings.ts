@@ -19,6 +19,7 @@ export const encryptedSeedPhraseAtom = atomWithChromeStorage<EncryptedData | und
     true
 );
 export const themeAtom = atomWithChromeStorage<Theme>(ChromeStorageKey.Theme, Theme.Light);
+export const hasBeenOnBoardedAtom = atomWithChromeStorage<boolean>(ChromeStorageKey.HasBeenOnboarded, false, true);
 
 const storedNetworkConfigurationAtom = atomWithChromeStorage<NetworkConfiguration>(
     ChromeStorageKey.NetworkConfiguration,

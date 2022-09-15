@@ -1,6 +1,6 @@
 import React, { useEffect, useContext, useMemo } from 'react';
 import { useNavigate, useLocation } from 'react-router-dom';
-import { useAtomValue, useAtom } from 'jotai';
+import { useAtomValue, useAtom, useSetAtom } from 'jotai';
 import { useTranslation } from 'react-i18next';
 import { credentialsAtom, selectedAccountAtom } from '@popup/store/account';
 import { identitiesAtom } from '@popup/store/identity';
@@ -12,6 +12,7 @@ import { IdentityIdentifier, BackgroundResponseStatus, RecoveryBackgroundRespons
 import { fullscreenPromptContext } from '@popup/page-layouts/FullscreenPromptLayout';
 import PageHeader from '@popup/shared/PageHeader';
 import { identityMatch, isIdentityOfCredential } from '@shared/utils/identity-helpers';
+import { hasBeenOnBoardedAtom } from '@popup/store/settings';
 
 interface Location {
     state: {
@@ -82,8 +83,15 @@ export default function DisplayRecoveryResult() {
     const { setReturnLocation, withClose } = useContext(fullscreenPromptContext);
     const { t } = useTranslation('recovery');
     const navigate = useNavigate();
+    const setHasBeenOnboarded = useSetAtom(hasBeenOnBoardedAtom);
 
     useEffect(() => setReturnLocation(absoluteRoutes.home.account.path), []);
+
+    useEffect(() => {
+        if (payload.status === BackgroundResponseStatus.Success) {
+            setHasBeenOnboarded(true);
+        }
+    }, [payload]);
 
     return (
         <>

@@ -124,6 +124,8 @@ export const storedIdentityProviders = makeIndexedStorageAccessor<IdentityProvid
     'local',
     ChromeStorageKey.IdentityProviders
 );
+export const storedHasBeenOnboarded = makeStorageAccessor<boolean>('local', ChromeStorageKey.HasBeenOnboarded);
+
 export const sessionPasscode = makeStorageAccessor<string>('session', ChromeStorageKey.Passcode);
 export const sessionPendingIdentity = makeStorageAccessor<Omit<PendingIdentity, 'location'>>(
     'session',
