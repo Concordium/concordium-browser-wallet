@@ -28,10 +28,10 @@ export default function ChangePasscode() {
         return null;
     }
 
-    const handleSubmit: SubmitHandler<FormValues> = (vs) => {
+    const handleSubmit: SubmitHandler<FormValues> = async (vs) => {
         if (encryptedSeedPhrase.value && passcode.value) {
-            const decryptedSeedPhrase = decrypt(encryptedSeedPhrase.value, passcode.value);
-            const encryptedSeedPhraseWithNewPasscode = encrypt(decryptedSeedPhrase, vs.newPasscode);
+            const decryptedSeedPhrase = await decrypt(encryptedSeedPhrase.value, passcode.value);
+            const encryptedSeedPhraseWithNewPasscode = await encrypt(decryptedSeedPhrase, vs.newPasscode);
 
             setEncryptedSeedPhrase(encryptedSeedPhraseWithNewPasscode);
             setPasscode(vs.newPasscode);

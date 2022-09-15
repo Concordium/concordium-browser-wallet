@@ -6,7 +6,7 @@ import { popupMessageHandler } from '@popup/shared/message-handler';
 import { decrypt } from '@popup/shared/crypto';
 import { mnemonicToSeedSync } from '@scure/bip39';
 import { mainnet } from '@popup/pages/NetworkSettings/NetworkSettings';
-import { selectAtom } from 'jotai/utils';
+import { loadable, selectAtom } from 'jotai/utils';
 import { HttpProvider, JsonRpcClient } from '@concordium/web-sdk';
 import { storedCredentials } from '@shared/storage/access';
 import { atomWithChromeStorage } from './utils';
@@ -47,13 +47,13 @@ export const sessionPasscodeAtom = atomWithChromeStorage<string | undefined>(
     true
 );
 
-export const seedPhraseAtom = atom<string, never>(
-    (get) => {
+const internalSeedPhraseAtom = atom<Promise<string>, never>(
+    async (get) => {
         const seed = get(encryptedSeedPhraseAtom).value;
         const passcode = get(sessionPasscodeAtom).value;
 
         if (seed && passcode) {
-            return Buffer.from(mnemonicToSeedSync(decrypt(seed, passcode))).toString('hex');
+            return Buffer.from(mnemonicToSeedSync(await decrypt(seed, passcode))).toString('hex');
         }
         throw new Error('SeedPhrase should not be retrieved without unlocking the wallet.');
     },
@@ -61,3 +61,5 @@ export const seedPhraseAtom = atom<string, never>(
         throw new Error('Setting the seedPhrase directly is not supported');
     }
 );
+
+export const seedPhraseAtom = loadable(internalSeedPhraseAtom);

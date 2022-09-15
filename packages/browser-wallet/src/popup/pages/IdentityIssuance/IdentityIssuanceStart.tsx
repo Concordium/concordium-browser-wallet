@@ -40,7 +40,7 @@ function IdentityIssuanceStart({ onStart }: InnerProps) {
             if (!network) {
                 throw new Error('Network is not specified');
             }
-            if (!seedPhrase) {
+            if (!seedPhrase || seedPhrase.state !== 'hasData') {
                 throw new Error('no seed phrase');
             }
 
@@ -67,7 +67,7 @@ function IdentityIssuanceStart({ onStart }: InnerProps) {
                 globalContext: global,
                 ipInfo: provider.ipInfo,
                 arsInfos: provider.arsInfos,
-                seed: seedPhrase,
+                seed: seedPhrase.data,
                 net: getNet(network),
                 identityIndex,
                 arThreshold: Math.min(Object.keys(provider.arsInfos).length - 1, 255),

@@ -10,8 +10,6 @@ import { useNavigate, useLocation } from 'react-router-dom';
 import { useAtomValue, useSetAtom } from 'jotai';
 import { decrypt } from '@popup/shared/crypto';
 import { encryptedSeedPhraseAtom, sessionPasscodeAtom } from '@popup/store/settings';
-import { validateMnemonic } from '@scure/bip39';
-import { wordlist } from '@scure/bip39/wordlists/english';
 
 type FormValues = {
     passcode: string;
@@ -40,18 +38,13 @@ export default function Login() {
         return null;
     }
 
-    const handleSubmit: SubmitHandler<FormValues> = (vs) => {
+    const handleSubmit: SubmitHandler<FormValues> = async (vs) => {
         if (encryptedSeedPhrase.value) {
             try {
-                const decryptedSeedPhrase = decrypt(encryptedSeedPhrase.value, vs.passcode);
-
-                // TODO Replace this with an authenticated encryption scheme (AES-GCM). This is a dirty way of validating the decryption.
-                if (validateMnemonic(decryptedSeedPhrase, wordlist)) {
-                    setPasscodeInSession(vs.passcode);
-                    navigate(state.to, { state: state.toState });
-                } else {
-                    form.setError('passcode', { message: t('incorrectPasscode') });
-                }
+                await decrypt(encryptedSeedPhrase.value, vs.passcode);
+                // If decryption did not throw an error, then the password is correct.
+                setPasscodeInSession(vs.passcode);
+                navigate(state.to, { state: state.toState });
             } catch {
                 form.setError('passcode', { message: t('incorrectPasscode') });
             }

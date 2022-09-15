@@ -49,8 +49,9 @@ export default function RecoveryMain() {
             return;
         }
 
-        if (!seedPhrase) {
-            onError('Unable to get list of identity providers');
+        if (!seedPhrase || seedPhrase.state !== 'hasData') {
+            onError('Seed phrase was not loaded.');
+            return;
         }
 
         getGlobal(network)
@@ -59,7 +60,7 @@ export default function RecoveryMain() {
                 popupMessageHandler.sendInternalMessage(InternalMessageType.Recovery, {
                     providers,
                     globalContext: global,
-                    seedAsHex: seedPhrase,
+                    seedAsHex: seedPhrase.data,
                     net: getNet(network),
                 });
             })
