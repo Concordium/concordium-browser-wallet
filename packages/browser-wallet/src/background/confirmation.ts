@@ -22,8 +22,7 @@ async function monitorCredentialStatus(
     signal: AbortSignal
 ) {
     const client = new JsonRpcClient(new HttpProvider(jsonRpcUrl, fetch));
-
-    setTimeout(async function loop() {
+    async function loop() {
         if (signal.aborted) {
             return;
         }
@@ -47,7 +46,8 @@ async function monitorCredentialStatus(
                 setTimeout(loop, updateInterval);
             }
         }
-    }, 0);
+    }
+    loop();
 }
 
 /**
@@ -68,7 +68,7 @@ async function startMonitoringCredentialStatus(signal: AbortSignal) {
  * Continously checks whether pending identities have been confirmed or rejected.
  */
 async function monitorIdentityStatus({ location, ...identity }: PendingIdentity, signal: AbortSignal) {
-    setTimeout(async function loop() {
+    async function loop() {
         if (signal.aborted) {
             return;
         }
@@ -76,7 +76,7 @@ async function monitorIdentityStatus({ location, ...identity }: PendingIdentity,
         try {
             const response = (await (await fetch(location)).json()) as IdentityTokenContainer;
             if (response.status === IdentityProviderIdentityStatus.Error) {
-                updateIdentities([
+                await updateIdentities([
                     {
                         ...identity,
                         status: CreationStatus.Rejected,
@@ -85,7 +85,7 @@ async function monitorIdentityStatus({ location, ...identity }: PendingIdentity,
                 ]);
                 repeat = false;
             } else if (response.status === IdentityProviderIdentityStatus.Done) {
-                updateIdentities([
+                await updateIdentities([
                     {
                         ...identity,
                         status: CreationStatus.Confirmed,
@@ -99,7 +99,8 @@ async function monitorIdentityStatus({ location, ...identity }: PendingIdentity,
                 setTimeout(loop, updateInterval);
             }
         }
-    }, 0);
+    }
+    loop();
 }
 
 /**
