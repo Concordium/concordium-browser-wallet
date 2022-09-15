@@ -64,6 +64,10 @@ export function useAccountInfo(account: WalletCredential): AccountInfo | undefin
     const [accountInfo, setAccountInfo] = useState<AccountInfo>();
 
     useEffect(() => {
+        setAccountInfo(undefined);
+    }, [genesisHash, address]);
+
+    useEffect(() => {
         if (accountInfoCache[address]) {
             setAccountInfo(parse(accountInfoCache[address]));
         } else if (account.status === CreationStatus.Confirmed) {
@@ -87,7 +91,7 @@ export function useAccountInfo(account: WalletCredential): AccountInfo | undefin
                 })
                 .catch(() => addToast(t('account.error')));
         }
-    }, [genesisHash, address, accountInfoCache[address]]);
+    }, [genesisHash, address, accountInfoCache[address], account.status]);
 
     useEffect(() => {
         if (account.status === CreationStatus.Confirmed && accountInfoEmitter) {
