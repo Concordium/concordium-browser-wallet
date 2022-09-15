@@ -60,6 +60,10 @@ export function EnterRecoveryPhrase() {
                                             required: t('enterRecoveryPhrase.form.required'),
                                             validate: validateSeedPhrase(),
                                         }}
+                                        onPaste={(e) => {
+                                            e.preventDefault();
+                                            return false;
+                                        }}
                                     />
                                     <Submit
                                         className="onboarding-setup__page-with-header__continue-button"
