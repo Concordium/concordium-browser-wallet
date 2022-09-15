@@ -25,21 +25,21 @@ export default function RecoveryMain() {
     const onError = useCallback(
         (reason: string) =>
             navigate(absoluteRoutes.prompt.recovery.path, {
-                state: { status: BackgroundResponseStatus.Error, reason },
+                state: { payload: { status: BackgroundResponseStatus.Error, reason } },
             }),
         []
     );
 
     useEffect(() => {
-        if (runRecovery && !providers.length) {
+        if (runRecovery && !providers.length && seedPhrase.state === 'hasData') {
             getIdentityProviders()
                 .then(setProviders)
                 .catch(() => onError('Unable to get list of identity providers'));
         }
-    });
+    }, [runRecovery, providers.length, seedPhrase.state]);
 
     useEffect(() => {
-        if (!runRecovery || isRecovering.loading || !providers.length) {
+        if (!runRecovery || isRecovering.loading || !providers.length || seedPhrase.state === 'loading') {
             return;
         }
 
@@ -49,7 +49,11 @@ export default function RecoveryMain() {
             return;
         }
 
-        if (!seedPhrase || seedPhrase.state !== 'hasData') {
+        if (seedPhrase.state === 'hasError') {
+            onError('An Error occurred loading the seed phrase');
+            return;
+        }
+        if (!seedPhrase.data) {
             onError('Seed phrase was not loaded.');
             return;
         }
@@ -65,7 +69,7 @@ export default function RecoveryMain() {
                 });
             })
             .catch((error) => onError(error.message));
-    }, [runRecovery, isRecovering.loading, isRecovering.value, providers.length]);
+    }, [runRecovery, isRecovering.loading, isRecovering.value, providers.length, seedPhrase.state]);
 
     return (
         <>
