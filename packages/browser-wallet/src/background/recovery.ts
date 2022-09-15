@@ -49,6 +49,7 @@ async function recoverAccounts(
                     identityIndex,
                     providerIndex,
                 });
+                emptyIndices = 0;
             } else {
                 emptyIndices += 1;
             }
