@@ -27,6 +27,7 @@
             rect {
                 @include transition(fill);
 
+                rx: rem(2px);
                 fill: $color-text;
             }
         }
