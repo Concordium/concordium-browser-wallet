@@ -16,20 +16,51 @@
         overflow: hidden;
     }
 
+    &__back-logo,
     &__logo {
         position: absolute;
         left: rem(10px);
         display: flex;
 
         svg {
-            width: rem(23px);
-
-            path {
-                fill: $color-text;
+            path,
+            rect {
                 @include transition(fill);
 
+                fill: $color-text;
+            }
+        }
+
+        &:hover {
+            svg {
+                path,
+                rect {
+                    fill: $color-cta;
+                }
+            }
+        }
+    }
+
+    &__back-logo {
+        svg {
+            margin-left: rem(5px);
+            width: rem(9px);
+        }
+    }
+
+    &__logo {
+        &-hidden {
+            position: absolute;
+            opacity: 0;
+        }
+
+        svg {
+            width: rem(23px);
+
+            path,
+            rect {
                 .main-layout-header--nav-open & {
-                    fill: $color-blue;
+                    fill: $color-cta;
                 }
             }
         }
