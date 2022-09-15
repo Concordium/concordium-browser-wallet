@@ -4,7 +4,7 @@ import { Buffer } from 'buffer';
 const keyLen = 32;
 const iterations = 10000;
 const method = 'AES-256-GCM';
-const subleCryptoMethodName = 'AES-GCM';
+const subtleCryptoMethodName = 'AES-GCM';
 const hashAlgorithm = 'sha256';
 const keyDerivationMethod = 'PBKDF2WithHmacSHA256';
 
@@ -23,7 +23,7 @@ async function deriveKey(password: string, salt: Buffer): Promise<CryptoKey> {
             hash: 'SHA-256',
         },
         baseKey,
-        { name: subleCryptoMethodName, length: keyLen * 8 },
+        { name: subtleCryptoMethodName, length: keyLen * 8 },
         false,
         ['encrypt', 'decrypt']
     );
@@ -37,7 +37,7 @@ export async function encrypt(data: string, password: string): Promise<Encrypted
 
     const iv = global.crypto.getRandomValues(new Uint8Array(16));
     const encrypted = await global.crypto.subtle.encrypt(
-        { name: subleCryptoMethodName, iv },
+        { name: subtleCryptoMethodName, iv },
         key,
         Buffer.from(data, 'utf-8')
     );
@@ -63,7 +63,7 @@ export async function decrypt(data: EncryptedData, password: string): Promise<st
 
     try {
         const decrypted = await crypto.subtle.decrypt(
-            { name: subleCryptoMethodName, iv },
+            { name: subtleCryptoMethodName, iv },
             key,
             Buffer.from(data.cipherText, 'base64')
         );
