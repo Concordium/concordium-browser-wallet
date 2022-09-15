@@ -61,6 +61,14 @@
         background-color: $color-cta;
     }
 
+    &__export-button {
+        position: absolute;
+        bottom: rem(100px);
+        left: 0;
+        right: 0;
+        margin: 0 auto;
+    }
+
     textarea {
         margin-top: rem(30px);
         height: rem(70px);

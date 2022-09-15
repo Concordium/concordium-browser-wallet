@@ -32,6 +32,7 @@ const t: typeof en = {
             copyDescription: 'Tryk på knappen for at kopiere din private nøgle.',
             show: 'Vis privatnøgle',
             done: 'Færdig',
+            export: 'Eksporter',
         },
     },
     sendCcd: {
