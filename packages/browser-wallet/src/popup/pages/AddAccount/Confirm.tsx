@@ -18,6 +18,7 @@ import { BackgroundResponseStatus } from '@shared/utils/types';
 import { isIdentityOfCredential } from '@shared/utils/identity-helpers';
 import { getGlobal, getNet } from '@shared/utils/network-helpers';
 import { addToastAtom } from '@popup/state';
+import { getNextEmptyCredNumber } from '@popup/shared/utils/account-helpers';
 import AccountDetails from '../Account/AccountDetails';
 
 export default function Confirm() {
@@ -59,9 +60,7 @@ export default function Confirm() {
             const expiry = Math.floor(Date.now() / 1000) + 720;
 
             const credsOfCurrentIdentity = credentials.filter(isIdentityOfCredential(selectedIdentity));
-            const credNumber = credsOfCurrentIdentity.length
-                ? credsOfCurrentIdentity.reduce((best, cred) => Math.max(best, cred.credNumber), 0) + 1
-                : 0;
+            const credNumber = getNextEmptyCredNumber(credsOfCurrentIdentity);
 
             const response = await popupMessageHandler.sendInternalMessage(
                 InternalMessageType.SendCredentialDeployment,
