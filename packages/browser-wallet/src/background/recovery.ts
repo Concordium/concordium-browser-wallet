@@ -15,7 +15,7 @@ import { BackgroundResponseStatus, RecoveryBackgroundResponse } from '@shared/ut
 import { Identity, CreationStatus, IdentityProvider, WalletCredential } from '@shared/storage/types';
 import { sessionIsRecovering, storedCredentials, storedCurrentNetwork, storedIdentities } from '@shared/storage/access';
 import { identityMatch, isIdentityOfCredential } from '@shared/utils/identity-helpers';
-import { getNextEmptyCredNumber } from '@popup/shared/utils/account-helpers';
+import { getNextUnused } from '@shared/utils/number-helpers';
 import { addCredential, addIdentity } from './update';
 import bgMessageHandler from './message-handler';
 import { openWindow } from './window-management';
@@ -28,15 +28,14 @@ async function recoverAccounts(
     providerIndex: number,
     credentialInput: Omit<CredentialInputV1, 'credNumber'>,
     getAccountInfo: (credId: string) => Promise<AccountInfo | undefined>,
-    existingCredentialsOfIdentity: WalletCredential[]
+    usedCredNumbersOfIdentity: number[]
 ): Promise<WalletCredential[]> {
     const credsToAdd: WalletCredential[] = [];
 
     let emptyIndices = 0;
-    let credNumber = getNextEmptyCredNumber(existingCredentialsOfIdentity);
+    let credNumber = getNextUnused(usedCredNumbersOfIdentity);
     while (emptyIndices < maxEmpty) {
-        // eslint-disable-next-line @typescript-eslint/no-loop-func
-        if (!existingCredentialsOfIdentity.some((cred) => cred.credNumber === credNumber)) {
+        if (!usedCredNumbersOfIdentity.includes(credNumber)) {
             const request = createCredentialV1({ ...credentialInput, credNumber });
             const { credId } = request.cdi;
             const accountInfo = await getAccountInfo(credId);
@@ -141,7 +140,9 @@ async function performRecovery({ providers, ...recoveryInputs }: Payload) {
                                     idObject: identity.idObject.value,
                                 },
                                 getAccountInfo,
-                                (credentials || []).filter(isIdentityOfCredential(identity))
+                                (credentials || [])
+                                    .filter(isIdentityOfCredential(identity))
+                                    .map((cred) => cred.credNumber)
                             ))
                         );
                     }
