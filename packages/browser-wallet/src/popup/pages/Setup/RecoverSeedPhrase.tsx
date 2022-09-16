@@ -3,17 +3,17 @@ import React from 'react';
 import { useNavigate } from 'react-router-dom';
 import { absoluteRoutes } from '@popup/constants/routes';
 import TextArea from '@popup/shared/Form/TextArea';
-import { passcodeAtom } from '@popup/state';
-import { useAtomValue, useSetAtom } from 'jotai';
+import { useSetAtom } from 'jotai';
 import Form from '@popup/shared/Form';
 import { SubmitHandler, Validate } from 'react-hook-form';
 import Submit from '@popup/shared/Form/Submit';
 import { useTranslation } from 'react-i18next';
 import { encrypt } from '@popup/shared/crypto';
-import { encryptedSeedPhraseAtom, sessionPasscodeAtom } from '@popup/store/settings';
+import { encryptedSeedPhraseAtom, sessionOnboardingLocationAtom } from '@popup/store/settings';
 import { validateMnemonic } from '@scure/bip39';
 import { wordlist } from '@scure/bip39/wordlists/english';
 import { setupRoutes } from './routes';
+import { usePasscodeInSetup } from './passcode-helper';
 
 type FormValues = {
     seedPhraseInput: string;
@@ -28,8 +28,8 @@ export default function RecoverSeedPhrase() {
     const navigate = useNavigate();
     const { t } = useTranslation('setup');
     const setEncryptedSeedPhrase = useSetAtom(encryptedSeedPhraseAtom);
-    const setPasscodeInSession = useSetAtom(sessionPasscodeAtom);
-    const passcode = useAtomValue(passcodeAtom);
+    const setOnboardingLocation = useSetAtom(sessionOnboardingLocationAtom);
+    const passcode = usePasscodeInSetup();
 
     if (!passcode) {
         // This page should not be shown without the passcode in state.
@@ -39,8 +39,9 @@ export default function RecoverSeedPhrase() {
     const handleSubmit: SubmitHandler<FormValues> = async (vs) => {
         const encryptedSeedPhrase = await encrypt(vs.seedPhraseInput, passcode);
         setEncryptedSeedPhrase(encryptedSeedPhrase);
-        setPasscodeInSession(passcode);
-        navigate(`${absoluteRoutes.setup.path}/${setupRoutes.chooseNetwork}`);
+        const chooseNetworkPathRecovering = `${absoluteRoutes.setup.path}/${setupRoutes.chooseNetwork}/recovering`;
+        setOnboardingLocation(chooseNetworkPathRecovering);
+        navigate(chooseNetworkPathRecovering);
     };
 
     return (

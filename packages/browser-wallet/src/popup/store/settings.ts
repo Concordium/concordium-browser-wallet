@@ -16,6 +16,7 @@ export const encryptedSeedPhraseAtom = atomWithChromeStorage<EncryptedData | und
     true
 );
 export const themeAtom = atomWithChromeStorage<Theme>(ChromeStorageKey.Theme, Theme.Light);
+export const hasBeenOnBoardedAtom = atomWithChromeStorage<boolean>(ChromeStorageKey.HasBeenOnboarded, false, true);
 
 const storedNetworkConfigurationAtom = atomWithChromeStorage<NetworkConfiguration>(
     ChromeStorageKey.NetworkConfiguration,
@@ -40,6 +41,12 @@ export const jsonRpcClientAtom = selectAtom(
 
 export const sessionPasscodeAtom = atomWithChromeStorage<string | undefined>(
     ChromeStorageKey.Passcode,
+    undefined,
+    true
+);
+
+export const sessionOnboardingLocationAtom = atomWithChromeStorage<string | undefined>(
+    ChromeStorageKey.OnboardingLocation,
     undefined,
     true
 );
