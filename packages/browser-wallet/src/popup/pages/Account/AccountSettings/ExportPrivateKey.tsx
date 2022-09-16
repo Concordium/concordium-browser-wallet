@@ -16,6 +16,29 @@ import { absoluteRoutes } from '@popup/constants/routes';
 import { NetworkConfiguration } from '@shared/storage/types';
 import { getNet } from '@shared/utils/network-helpers';
 
+type CredentialKeys = {
+    threshold: number;
+    keys: Record<number, { signKey: string; verifyKey: string }>;
+};
+
+type AccountKeys = {
+    threshold: number;
+    keys: Record<number, CredentialKeys>;
+};
+
+type AccountExport = {
+    accountKeys: AccountKeys;
+    address: string;
+    credentials: Record<string, string>;
+};
+
+type ExportFormat = {
+    type: 'concordium-browser-wallet-account';
+    v: number;
+    environment: string; // 'testnet' or 'mainnet'
+    value: AccountExport;
+};
+
 function createDownload(
     address: string,
     credId: string,
@@ -23,7 +46,7 @@ function createDownload(
     verifyKey: string,
     network: NetworkConfiguration
 ) {
-    const docContent = JSON.stringify({
+    const docContent: ExportFormat = {
         type: 'concordium-browser-wallet-account',
         v: 0,
         environment: getNet(network).toLowerCase(),
@@ -47,8 +70,8 @@ function createDownload(
             },
             address,
         },
-    });
-    return URL.createObjectURL(new Blob([docContent], { type: 'application/octet-binary' }));
+    };
+    return URL.createObjectURL(new Blob([JSON.stringify(docContent)], { type: 'application/octet-binary' }));
 }
 
 export default function ExportPrivateKey() {
