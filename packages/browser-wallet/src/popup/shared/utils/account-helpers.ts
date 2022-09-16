@@ -1,5 +1,5 @@
 import { credentialsAtom, selectedAccountAtom } from '@popup/store/account';
-import { networkConfigurationAtom, seedPhraseAtom } from '@popup/store/settings';
+import { networkConfigurationAtom } from '@popup/store/settings';
 import { useAtomValue } from 'jotai';
 import { useMemo } from 'react';
 import { identitiesAtom } from '@popup/store/identity';
@@ -8,6 +8,7 @@ import { WalletCredential } from '@shared/storage/types';
 import { getNet } from '@shared/utils/network-helpers';
 import { isIdentityOfCredential } from '@shared/utils/identity-helpers';
 import { getNextUnused } from '@shared/utils/number-helpers';
+import { useDecryptedSeedPhrase } from './seedPhrase-helpers';
 
 export const displaySplitAddress = (address: string) => `${address.slice(0, 4)}...${address.slice(address.length - 4)}`;
 
@@ -44,20 +45,19 @@ export function usePrivateKey(accountAddress: string | undefined): string | unde
     const credentials = useAtomValue(credentialsAtom);
     const credential = credentials.find((cred) => cred.address === accountAddress);
     const network = useAtomValue(networkConfigurationAtom);
-
-    const seedPhrase = useAtomValue(seedPhraseAtom);
+    const seedPhrase = useDecryptedSeedPhrase();
     const identity = useIdentityOf(credential);
 
     const privateKey = useMemo(() => {
         // We don't throw errors on missing credentials or identities, as they might just be loading.
-        if (!accountAddress || !credential || !identity || seedPhrase.state !== 'hasData') {
+        if (!accountAddress || !credential || !identity || !seedPhrase) {
             return undefined;
         }
 
-        return ConcordiumHdWallet.fromHex(seedPhrase.data, getNet(network))
+        return ConcordiumHdWallet.fromHex(seedPhrase, getNet(network))
             .getAccountSigningKey(identity.providerIndex, identity.index, credential.credNumber)
             .toString('hex');
-    }, [credential?.credId, seedPhrase.state, identity?.index]);
+    }, [credential?.credId, seedPhrase, identity?.index]);
 
     return privateKey;
 }
