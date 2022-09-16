@@ -1,11 +1,11 @@
-import React, { useMemo } from 'react';
+import React, { useMemo, useCallback } from 'react';
 import { useTranslation } from 'react-i18next';
 import { useAtom, useAtomValue, useSetAtom } from 'jotai';
 import { useNavigate } from 'react-router-dom';
 import IdCard from '@popup/shared/IdCard';
 import { identityProvidersAtom, selectedIdentityAtom } from '@popup/store/identity';
 import { credentialsAtom, creatingCredentialRequestAtom } from '@popup/store/account';
-import { networkConfigurationAtom, seedPhraseAtom } from '@popup/store/settings';
+import { networkConfigurationAtom } from '@popup/store/settings';
 import { CreationStatus, WalletCredential } from '@shared/storage/types';
 import Button from '@popup/shared/Button';
 import ArrowIcon from '@assets/svg/arrow.svg';
@@ -19,6 +19,7 @@ import { isIdentityOfCredential } from '@shared/utils/identity-helpers';
 import { getGlobal, getNet } from '@shared/utils/network-helpers';
 import { addToastAtom } from '@popup/state';
 import { getNextEmptyCredNumber } from '@popup/shared/utils/account-helpers';
+import { useDecryptedSeedPhrase } from '@popup/shared/utils/seedPhrase-helpers';
 import AccountDetails from '../Account/AccountDetails';
 
 export default function Confirm() {
@@ -26,10 +27,10 @@ export default function Confirm() {
     const nav = useNavigate();
     const selectedIdentity = useAtomValue(selectedIdentityAtom);
     const credentials = useAtomValue(credentialsAtom);
-    const seedPhrase = useAtomValue(seedPhraseAtom);
     const network = useAtomValue(networkConfigurationAtom);
     const providers = useAtomValue(identityProvidersAtom);
     const addToast = useSetAtom(addToastAtom);
+    const seedPhrase = useDecryptedSeedPhrase((e) => addToast(e.message));
     const [creatingCredentialRequest, setCreatingRequest] = useAtom(creatingCredentialRequestAtom);
 
     const identityProvider = useMemo(
@@ -41,14 +42,14 @@ export default function Confirm() {
         throw new Error('No selected Identity or selected is not confirmed');
     }
 
-    const submit = async () => {
+    const submit = useCallback(async () => {
         setCreatingRequest(true);
         try {
+            if (!seedPhrase) {
+                return;
+            }
             if (!network) {
                 throw new Error('Network is not specified');
-            }
-            if (!seedPhrase || seedPhrase.state !== 'hasData') {
-                throw new Error('no seed phrase');
             }
             if (!identityProvider) {
                 throw new Error('provider not found');
@@ -68,7 +69,7 @@ export default function Confirm() {
                     globalContext: global,
                     ipInfo: identityProvider.ipInfo,
                     arsInfos: identityProvider.arsInfos,
-                    seedAsHex: seedPhrase.data,
+                    seedAsHex: seedPhrase,
                     net: getNet(network),
                     idObject: selectedIdentity.idObject.value,
                     revealedAttributes: [],
@@ -88,7 +89,7 @@ export default function Confirm() {
         } finally {
             setCreatingRequest(false);
         }
-    };
+    }, [seedPhrase, network, identityProvider, selectedIdentity]);
 
     // TODO: Better faking of AccountDetails
     return (

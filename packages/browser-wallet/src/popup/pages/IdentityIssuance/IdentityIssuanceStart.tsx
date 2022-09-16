@@ -1,7 +1,7 @@
-import React, { useState, useEffect } from 'react';
+import React, { useState, useEffect, useCallback } from 'react';
 import { useAtomValue, useAtom, useSetAtom } from 'jotai';
 import { useTranslation } from 'react-i18next';
-import { networkConfigurationAtom, seedPhraseAtom } from '@popup/store/settings';
+import { networkConfigurationAtom } from '@popup/store/settings';
 import { pendingIdentityAtom, identitiesAtom, identityProvidersAtom } from '@popup/store/identity';
 import { popupMessageHandler } from '@popup/shared/message-handler';
 import { getIdentityProviders } from '@popup/shared/utils/wallet-proxy';
@@ -12,6 +12,7 @@ import IdentityProviderIcon from '@popup/shared/IdentityProviderIcon';
 import PendingArrows from '@assets/svg/pending-arrows.svg';
 import { getGlobal, getNet } from '@shared/utils/network-helpers';
 import { addToastAtom } from '@popup/state';
+import { useDecryptedSeedPhrase } from '@popup/shared/utils/seedPhrase-helpers';
 
 interface InnerProps {
     onStart: () => void;
@@ -23,9 +24,9 @@ function IdentityIssuanceStart({ onStart }: InnerProps) {
     const network = useAtomValue(networkConfigurationAtom);
     const updatePendingIdentity = useSetAtom(pendingIdentityAtom);
     const identities = useAtomValue(identitiesAtom);
-    const seedPhrase = useAtomValue(seedPhraseAtom);
     const [buttonDisabled, setButtonDisabled] = useState(false);
     const addToast = useSetAtom(addToastAtom);
+    const seedPhrase = useDecryptedSeedPhrase((e) => addToast(e.message));
 
     useEffect(() => {
         // TODO only load once per session?
@@ -34,49 +35,52 @@ function IdentityIssuanceStart({ onStart }: InnerProps) {
             .catch(() => addToast('Unable to update identity provider list'));
     }, []);
 
-    const startIssuance = async (provider: IdentityProvider) => {
-        setButtonDisabled(true);
-        try {
-            if (!network) {
-                throw new Error('Network is not specified');
+    const startIssuance = useCallback(
+        async (provider: IdentityProvider) => {
+            setButtonDisabled(true);
+            try {
+                if (!network) {
+                    throw new Error('Network is not specified');
+                }
+                if (!seedPhrase) {
+                    return;
+                }
+
+                const global = await getGlobal(network);
+
+                const providerIndex = provider.ipInfo.ipIdentity;
+
+                const identityIndex = identities.reduce(
+                    (maxIndex, identity) =>
+                        identity.providerIndex === providerIndex ? Math.max(maxIndex, identity.index + 1) : maxIndex,
+                    0
+                );
+
+                updatePendingIdentity({
+                    status: CreationStatus.Pending,
+                    index: identityIndex,
+                    name: `Identity ${identities.length + 1}`,
+                    providerIndex,
+                });
+
+                onStart();
+
+                popupMessageHandler.sendInternalMessage(InternalMessageType.StartIdentityIssuance, {
+                    globalContext: global,
+                    ipInfo: provider.ipInfo,
+                    arsInfos: provider.arsInfos,
+                    seed: seedPhrase,
+                    net: getNet(network),
+                    identityIndex,
+                    arThreshold: Math.min(Object.keys(provider.arsInfos).length - 1, 255),
+                    baseUrl: provider.metadata.issuanceStart,
+                });
+            } finally {
+                setButtonDisabled(false);
             }
-            if (!seedPhrase || seedPhrase.state !== 'hasData') {
-                throw new Error('no seed phrase');
-            }
-
-            const global = await getGlobal(network);
-
-            const providerIndex = provider.ipInfo.ipIdentity;
-
-            const identityIndex = identities.reduce(
-                (maxIndex, identity) =>
-                    identity.providerIndex === providerIndex ? Math.max(maxIndex, identity.index + 1) : maxIndex,
-                0
-            );
-
-            updatePendingIdentity({
-                status: CreationStatus.Pending,
-                index: identityIndex,
-                name: `Identity ${identities.length + 1}`,
-                providerIndex,
-            });
-
-            onStart();
-
-            popupMessageHandler.sendInternalMessage(InternalMessageType.StartIdentityIssuance, {
-                globalContext: global,
-                ipInfo: provider.ipInfo,
-                arsInfos: provider.arsInfos,
-                seed: seedPhrase.data,
-                net: getNet(network),
-                identityIndex,
-                arThreshold: Math.min(Object.keys(provider.arsInfos).length - 1, 255),
-                baseUrl: provider.metadata.issuanceStart,
-            });
-        } finally {
-            setButtonDisabled(false);
-        }
-    };
+        },
+        [network, seedPhrase]
+    );
 
     return (
         <div className="identity-issuance__start">

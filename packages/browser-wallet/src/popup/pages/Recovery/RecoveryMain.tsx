@@ -2,7 +2,7 @@ import React, { useEffect, useState, useCallback } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { useAtom, useAtomValue } from 'jotai';
 import { useTranslation } from 'react-i18next';
-import { networkConfigurationAtom, seedPhraseAtom } from '@popup/store/settings';
+import { networkConfigurationAtom } from '@popup/store/settings';
 import { popupMessageHandler } from '@popup/shared/message-handler';
 import { InternalMessageType } from '@concordium/browser-wallet-message-hub';
 import { identityProvidersAtom, isRecoveringAtom } from '@popup/store/identity';
@@ -12,11 +12,11 @@ import { getIdentityProviders } from '@popup/shared/utils/wallet-proxy';
 import { getGlobal, getNet } from '@shared/utils/network-helpers';
 import PageHeader from '@popup/shared/PageHeader';
 import { absoluteRoutes } from '@popup/constants/routes';
+import { useDecryptedSeedPhrase } from '@popup/shared/utils/seedPhrase-helpers';
 
 export default function RecoveryMain() {
     const { t } = useTranslation('recovery');
     const network = useAtomValue(networkConfigurationAtom);
-    const seedPhrase = useAtomValue(seedPhraseAtom);
     const [providers, setProviders] = useAtom(identityProvidersAtom);
     const [isRecovering, setIsRecovering] = useAtom(isRecoveringAtom);
     const [runRecovery, setRunRecovery] = useState<boolean>(true);
@@ -29,17 +29,18 @@ export default function RecoveryMain() {
             }),
         []
     );
+    const seedPhrase = useDecryptedSeedPhrase((e) => onError(e.message));
 
     useEffect(() => {
-        if (runRecovery && !providers.length && seedPhrase.state === 'hasData') {
+        if (runRecovery && !providers.length) {
             getIdentityProviders()
                 .then(setProviders)
                 .catch(() => onError('Unable to get list of identity providers'));
         }
-    }, [runRecovery, providers.length, seedPhrase.state]);
+    }, [runRecovery, providers.length]);
 
     useEffect(() => {
-        if (!runRecovery || isRecovering.loading || !providers.length || seedPhrase.state === 'loading') {
+        if (!runRecovery || isRecovering.loading || !providers.length || !seedPhrase) {
             return;
         }
 
@@ -49,27 +50,18 @@ export default function RecoveryMain() {
             return;
         }
 
-        if (seedPhrase.state === 'hasError') {
-            onError('An Error occurred loading the seed phrase');
-            return;
-        }
-        if (!seedPhrase.data) {
-            onError('Seed phrase was not loaded.');
-            return;
-        }
-
         getGlobal(network)
             .then((global) => {
                 setIsRecovering(true);
                 popupMessageHandler.sendInternalMessage(InternalMessageType.Recovery, {
                     providers,
                     globalContext: global,
-                    seedAsHex: seedPhrase.data,
+                    seedAsHex: seedPhrase,
                     net: getNet(network),
                 });
             })
             .catch((error) => onError(error.message));
-    }, [runRecovery, isRecovering.loading, isRecovering.value, providers.length, seedPhrase.state]);
+    }, [runRecovery, isRecovering.loading, isRecovering.value, providers.length, seedPhrase]);
 
     return (
         <>
