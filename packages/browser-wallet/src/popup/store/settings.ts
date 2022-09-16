@@ -64,3 +64,9 @@ const internalSeedPhraseAtom = atom<Promise<string>, never>(
 );
 
 export const seedPhraseAtom = loadable(internalSeedPhraseAtom);
+
+export const sessionOnboardingLocationAtom = atomWithChromeStorage<string | undefined>(
+    ChromeStorageKey.OnboardingLocation,
+    undefined,
+    true
+);

@@ -16,6 +16,7 @@ export enum ChromeStorageKey {
     IsRecovering = 'isRecovering',
     IsCreatingCredential = 'IsCreatingCredential',
     HasBeenOnboarded = 'hasBeenOnboarded',
+    OnboardingLocation = 'onboardingLocation',
 }
 
 export enum Theme {
