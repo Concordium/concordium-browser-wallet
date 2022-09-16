@@ -44,7 +44,7 @@ function Account({
                         <Button
                             className="m-b-40 m-t-auto"
                             width="wide"
-                            onClick={() => nav(absoluteRoutes.home.identities.add.path)}
+                            onClick={() => nav(absoluteRoutes.home.account.add.path)}
                         >
                             {t('request')}
                         </Button>
