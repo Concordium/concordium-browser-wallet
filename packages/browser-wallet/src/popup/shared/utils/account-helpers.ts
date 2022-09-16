@@ -83,18 +83,18 @@ export function usePublicKey(accountAddress: string | undefined): string | undef
     const credential = credentials.find((cred) => cred.address === accountAddress);
     const identity = useIdentityOf(credential);
 
-    const privateKey = useMemo(() => {
+    const publicKey = useMemo(() => {
         // We don't throw errors on missing credentials or identities, as they might just be loading.
         if (!wallet || !identity || !credential) {
             return undefined;
         }
 
         return wallet
-            .getAccountSigningKey(identity.providerIndex, identity.index, credential.credNumber)
+            .getAccountPublicKey(identity.providerIndex, identity.index, credential.credNumber)
             .toString('hex');
     }, [credential?.credId, wallet, identity?.index]);
 
-    return privateKey;
+    return publicKey;
 }
 
 export function getNextEmptyCredNumber(creds: WalletCredential[]) {

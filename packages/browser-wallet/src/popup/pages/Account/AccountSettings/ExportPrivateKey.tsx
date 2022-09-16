@@ -97,15 +97,15 @@ export default function ExportPrivateKey() {
                     <TextArea value={privateKey} readOnly />
                     <CopyButton className="export-private-key-page__copy" value={privateKey} />
                 </div>
+                <Button className="export-private-key-page__export-button" width="medium" onClick={handleExport}>
+                    {t('export')}
+                </Button>
                 <Button
                     className="export-private-key-page__button"
                     width="medium"
                     onClick={() => nav(absoluteRoutes.home.account.path)}
                 >
                     {t('done')}
-                </Button>
-                <Button className="export-private-key-page__export-button" width="medium" onClick={handleExport}>
-                    {t('export')}
                 </Button>
             </div>
         );
@@ -114,7 +114,7 @@ export default function ExportPrivateKey() {
     return (
         <div className="export-private-key-page">
             <div className="export-private-key-page__description">{t('description')}</div>
-            <Form onSubmit={handleSubmit}>
+            <Form className="export-private-key-page__form" onSubmit={handleSubmit}>
                 {(f) => {
                     return (
                         <>
@@ -122,7 +122,7 @@ export default function ExportPrivateKey() {
                                 control={f.control}
                                 name="currentPasscode"
                                 label={tPasscode('labels.currentPasscode')}
-                                className="m-t-30"
+                                className="m-t-10"
                                 rules={{
                                     required: tSetup('setupPasscode.form.passcodeRequired'),
                                     validate: validateCurrentPasscode(),
