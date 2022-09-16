@@ -7,8 +7,7 @@ import { useSetAtom } from 'jotai';
 import { useTranslation } from 'react-i18next';
 import { hasBeenOnBoardedAtom, networkConfigurationAtom, sessionPasscodeAtom } from '@popup/store/settings';
 import { setupRoutes } from './routes';
-// TODO Remove stagenet
-import { mainnet, testnet, stagenet } from '../NetworkSettings/NetworkSettings';
+import { mainnet, testnet } from '../NetworkSettings/NetworkSettings';
 import { usePasscodeInSetup } from './passcode-helper';
 
 export function ChooseNetwork() {
@@ -75,16 +74,6 @@ export function ChooseNetwork() {
                         }}
                     >
                         Concordium Testnet
-                    </Button>
-                    <Button
-                        className="onboarding-setup__page-with-header__testnet-button"
-                        width="wide"
-                        onClick={() => {
-                            setNetworkConfiguration(stagenet);
-                            goToNext();
-                        }}
-                    >
-                        Concordium Stagenet
                     </Button>
                 </div>
             </div>

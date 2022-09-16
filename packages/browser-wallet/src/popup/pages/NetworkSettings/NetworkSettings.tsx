@@ -26,14 +26,6 @@ export const testnet: NetworkConfiguration = {
     explorerUrl: 'https://wallet-proxy.testnet.concordium.com',
 };
 
-// TODO Remove before go-live. Used for easy internal testing.
-export const stagenet: NetworkConfiguration = {
-    genesisHash: '38bf770b4c247f09e1b62982bb71000c516480c5a2c5214dadac6da4b1ad50e5',
-    name: 'Concordium Stagenet',
-    jsonRpcUrl: 'https://json-rpc.stagenet.concordium.com/',
-    explorerUrl: 'https://wallet-proxy.stagenet.concordium.com',
-};
-
 function NetworkConfigurationComponent({ networkConfiguration }: { networkConfiguration: NetworkConfiguration }) {
     const { t } = useTranslation('networkSettings');
     const [currentNetworkConfiguration, setCurrentNetworkConfiguration] = useAtom(networkConfigurationAtom);
@@ -105,7 +97,7 @@ export default function NetworkSettings() {
                 </div>
             </Modal>
             <div className="network-settings-page__list">
-                {[mainnet, testnet, stagenet].map((network) => {
+                {[mainnet, testnet].map((network) => {
                     return (
                         <SidedRow
                             key={network.genesisHash}
