@@ -5,10 +5,11 @@ import Button from '@popup/shared/Button';
 import { absoluteRoutes } from '@popup/constants/routes';
 import { useSetAtom } from 'jotai';
 import { useTranslation } from 'react-i18next';
-import { hasBeenOnBoardedAtom, networkConfigurationAtom } from '@popup/store/settings';
+import { hasBeenOnBoardedAtom, networkConfigurationAtom, sessionPasscodeAtom } from '@popup/store/settings';
 import { setupRoutes } from './routes';
 // TODO Remove stagenet
 import { mainnet, testnet, stagenet } from '../NetworkSettings/NetworkSettings';
+import { usePasscodeInSetup } from './passcode-helper';
 
 export function ChooseNetwork() {
     const navigate = useNavigate();
@@ -17,12 +18,15 @@ export function ChooseNetwork() {
     const { t } = useTranslation('setup');
     const setNetworkConfiguration = useSetAtom(networkConfigurationAtom);
     const setHasBeenOnboarded = useSetAtom(hasBeenOnBoardedAtom);
+    const passcode = usePasscodeInSetup();
+    const setPasscodeInSession = useSetAtom(sessionPasscodeAtom);
 
     const goToNext = () => {
+        setPasscodeInSession(passcode);
+        setHasBeenOnboarded(true);
         if (isRecovering) {
             navigate(`${absoluteRoutes.setup.path}/${setupRoutes.performRecovery}`);
         } else {
-            setHasBeenOnboarded(true);
             navigate(absoluteRoutes.home.identities.path);
         }
     };

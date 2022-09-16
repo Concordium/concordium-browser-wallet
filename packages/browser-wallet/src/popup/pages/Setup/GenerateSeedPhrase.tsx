@@ -41,7 +41,9 @@ export default function GenerateSeedPhrase() {
 
     return (
         <>
-            <PageHeader canGoBack>{t('recoveryPhrase.title')}</PageHeader>
+            <PageHeader canGoBack backTo={`${absoluteRoutes.setup.path}/${setupRoutes.createOrRestore}`}>
+                {t('recoveryPhrase.title')}
+            </PageHeader>
             <div className="onboarding-setup__page-with-header">
                 <div className="onboarding-setup__page-with-header__description">{t('recoveryPhrase.description')}</div>
                 <div className="p-10">

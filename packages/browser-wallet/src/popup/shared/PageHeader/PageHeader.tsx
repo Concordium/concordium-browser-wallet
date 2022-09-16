@@ -10,9 +10,18 @@ import Button from '../Button';
 type BaseProps = ClassName & {
     // eslint-disable-next-line react/no-unused-prop-types
     children: string;
-    // eslint-disable-next-line react/no-unused-prop-types
-    canGoBack?: boolean;
-};
+} & (
+        | {
+              // eslint-disable-next-line react/no-unused-prop-types
+              canGoBack?: boolean;
+              backTo?: never;
+          }
+        | {
+              // eslint-disable-next-line react/no-unused-prop-types
+              canGoBack: true;
+              backTo: string;
+          }
+    );
 
 type FlowProps = BaseProps & {
     steps: number;
@@ -41,14 +50,14 @@ type Props = BaseProps | FlowProps;
 const isFlow = (props: Props): props is FlowProps => (props as FlowProps).steps !== undefined;
 
 export default function PageHeader(props: Props) {
-    const { children, canGoBack, className } = props;
+    const { children, canGoBack, backTo, className } = props;
     const navigate = useNavigate();
 
     return (
         <header className={clsx('page-header', className)}>
             <div className="page-header__icon">
                 {canGoBack ? (
-                    <Button className="flex" clear onClick={() => navigate(-1)}>
+                    <Button className="flex" clear onClick={() => (backTo ? navigate(backTo) : navigate(-1))}>
                         <BackIcon className="page-header__back-icon" />
                     </Button>
                 ) : (
