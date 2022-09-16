@@ -82,6 +82,7 @@ export default function SetupRoutes() {
             <Route path={setupRoutes.restore} element={<RestoreRecoveryPhrase />} />
             <Route path={setupRoutes.performRecovery} element={<PerformRecovery />} />
             <Route path={setupRoutes.chooseNetwork} element={<ChooseNetwork />} />
+            <Route path={`${setupRoutes.chooseNetwork}/recovering`} element={<ChooseNetwork />} />
         </Routes>
     );
 }

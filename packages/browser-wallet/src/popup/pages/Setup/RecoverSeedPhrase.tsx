@@ -10,7 +10,7 @@ import { SubmitHandler, Validate } from 'react-hook-form';
 import Submit from '@popup/shared/Form/Submit';
 import { useTranslation } from 'react-i18next';
 import { encrypt } from '@popup/shared/crypto';
-import { encryptedSeedPhraseAtom, sessionPasscodeAtom } from '@popup/store/settings';
+import { encryptedSeedPhraseAtom, sessionOnboardingLocationAtom, sessionPasscodeAtom } from '@popup/store/settings';
 import { validateMnemonic } from '@scure/bip39';
 import { wordlist } from '@scure/bip39/wordlists/english';
 import { setupRoutes } from './routes';
@@ -29,6 +29,7 @@ export default function RecoverSeedPhrase() {
     const { t } = useTranslation('setup');
     const setEncryptedSeedPhrase = useSetAtom(encryptedSeedPhraseAtom);
     const setPasscodeInSession = useSetAtom(sessionPasscodeAtom);
+    const setOnboardingLocation = useSetAtom(sessionOnboardingLocationAtom);
     const passcode = useAtomValue(passcodeAtom);
 
     if (!passcode) {
@@ -40,7 +41,9 @@ export default function RecoverSeedPhrase() {
         const encryptedSeedPhrase = await encrypt(vs.seedPhraseInput, passcode);
         setEncryptedSeedPhrase(encryptedSeedPhrase);
         setPasscodeInSession(passcode);
-        navigate(`${absoluteRoutes.setup.path}/${setupRoutes.chooseNetwork}`);
+        const chooseNetworkPathRecovering = `${absoluteRoutes.setup.path}/${setupRoutes.chooseNetwork}/recovering`;
+        setOnboardingLocation(chooseNetworkPathRecovering);
+        navigate(chooseNetworkPathRecovering);
     };
 
     return (

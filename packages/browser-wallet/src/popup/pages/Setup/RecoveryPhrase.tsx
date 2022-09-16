@@ -1,17 +1,17 @@
 import PageHeader from '@popup/shared/PageHeader';
-import React from 'react';
+import React, { useEffect, useState } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { absoluteRoutes } from '@popup/constants/routes';
 import TextArea from '@popup/shared/Form/TextArea';
-import { passcodeAtom, seedPhraseAtom } from '@popup/state';
 import { useAtomValue, useSetAtom } from 'jotai';
 import Form from '@popup/shared/Form';
 import { SubmitHandler, Validate } from 'react-hook-form';
 import Submit from '@popup/shared/Form/Submit';
 import { useTranslation } from 'react-i18next';
-import { encrypt } from '@popup/shared/crypto';
-import { encryptedSeedPhraseAtom, sessionPasscodeAtom } from '@popup/store/settings';
+import { decrypt } from '@popup/shared/crypto';
+import { encryptedSeedPhraseAtom, sessionOnboardingLocationAtom } from '@popup/store/settings';
 import { setupRoutes } from './routes';
+import { usePasscodeInSetup } from './passcode-helper';
 
 type FormValues = {
     seedPhraseInput: string;
@@ -20,21 +20,26 @@ type FormValues = {
 export function EnterRecoveryPhrase() {
     const navigate = useNavigate();
     const { t } = useTranslation('setup');
-    const seedPhrase = useAtomValue(seedPhraseAtom);
-    const setEncryptedSeedPhrase = useSetAtom(encryptedSeedPhraseAtom);
-    const setPasscodeInSession = useSetAtom(sessionPasscodeAtom);
-    const passcode = useAtomValue(passcodeAtom);
+    const passcode = usePasscodeInSetup();
+    const encryptedSeedPhrase = useAtomValue(encryptedSeedPhraseAtom);
+    const [seedPhrase, setSeedPhrase] = useState<string>();
+    const setOnboardingLocation = useSetAtom(sessionOnboardingLocationAtom);
 
-    if (!passcode) {
-        // This page should not be shown without the passcode in state.
+    useEffect(() => {
+        if (!encryptedSeedPhrase.loading && encryptedSeedPhrase.value && passcode) {
+            decrypt(encryptedSeedPhrase.value, passcode).then(setSeedPhrase);
+        }
+    }, [encryptedSeedPhrase.loading, encryptedSeedPhrase.value, passcode]);
+
+    if (!passcode || encryptedSeedPhrase.loading || !encryptedSeedPhrase.value) {
+        // This page should not be shown without the passcode or encrypted seed phrase in state.
         return null;
     }
 
-    const handleSubmit: SubmitHandler<FormValues> = async (vs) => {
-        const encryptedSeedPhrase = await encrypt(vs.seedPhraseInput, passcode);
-        setEncryptedSeedPhrase(encryptedSeedPhrase);
-        setPasscodeInSession(passcode);
-        navigate(`${absoluteRoutes.setup.path}/${setupRoutes.chooseNetwork}`);
+    const handleSubmit: SubmitHandler<FormValues> = () => {
+        const chooseNetworkPath = `${absoluteRoutes.setup.path}/${setupRoutes.chooseNetwork}`;
+        setOnboardingLocation(chooseNetworkPath);
+        navigate(chooseNetworkPath);
     };
 
     function validateSeedPhrase(): Validate<string> {
