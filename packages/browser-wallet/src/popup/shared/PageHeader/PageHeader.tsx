@@ -1,3 +1,4 @@
+/* eslint-disable react/no-unused-prop-types */
 import clsx from 'clsx';
 import React from 'react';
 import { useNavigate } from 'react-router-dom';
@@ -8,16 +9,13 @@ import Logo from '@assets/svg/concordium.svg';
 import Button from '../Button';
 
 type BaseProps = ClassName & {
-    // eslint-disable-next-line react/no-unused-prop-types
     children: string;
 } & (
         | {
-              // eslint-disable-next-line react/no-unused-prop-types
               canGoBack?: boolean;
               backTo?: never;
           }
         | {
-              // eslint-disable-next-line react/no-unused-prop-types
               canGoBack: true;
               backTo: string;
           }
