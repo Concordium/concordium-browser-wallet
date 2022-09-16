@@ -1,4 +1,6 @@
 import React, { useMemo } from 'react';
+import { useTranslation } from 'react-i18next';
+import { useNavigate } from 'react-router-dom';
 import { useAtom, useAtomValue } from 'jotai';
 import { identityProvidersAtom, selectedIdentityAtom } from '@popup/store/identity';
 import IdCard from '@popup/shared/IdCard';
@@ -7,8 +9,12 @@ import { AttributeKey } from '@concordium/web-sdk';
 import attributeNames from 'wallet-common-helpers/constants/attributeNames.json';
 import { formatAttributeValue, compareAttributes } from 'wallet-common-helpers';
 import IdentityProviderIcon from '@popup/shared/IdentityProviderIcon';
+import Button from '@popup/shared/Button';
+import { absoluteRoutes } from '@popup/constants/routes';
 
 export default function Identity() {
+    const { t } = useTranslation('identity');
+    const nav = useNavigate();
     const [selectedIdentity, updateSelectedIdentity] = useAtom(selectedIdentityAtom);
     const providers = useAtomValue(identityProvidersAtom);
 
@@ -18,7 +24,18 @@ export default function Identity() {
     );
 
     if (!selectedIdentity) {
-        return null;
+        return (
+            <div className="flex-column align-center h-full">
+                <p className="m-t-20 m-h-40">{t('noIdentities')}</p>
+                <Button
+                    className="m-b-40 m-t-auto"
+                    width="wide"
+                    onClick={() => nav(absoluteRoutes.home.identities.add.path)}
+                >
+                    {t('request')}
+                </Button>
+            </div>
+        );
     }
 
     const attributes =

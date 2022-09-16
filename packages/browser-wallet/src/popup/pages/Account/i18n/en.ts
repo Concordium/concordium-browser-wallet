@@ -1,5 +1,5 @@
 const t = {
-    noAccounts: 'No accounts in wallet',
+    noAccounts: 'You have no accounts in your wallet',
     removeAccount: 'Remove account (local only)',
     resetConnections: 'Reset connections',
     accountAddress: 'Account address',
@@ -47,6 +47,7 @@ const t = {
         fee: 'Estimated transaction fee',
     },
     accountPending: 'This account is still pending finalization.',
+    request: 'Create account',
 };
 
 export default t;

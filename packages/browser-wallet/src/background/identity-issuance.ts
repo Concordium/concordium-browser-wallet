@@ -65,11 +65,11 @@ function handleExternalIssuance(url: string, respond: (response: IdentityIssuanc
 export const identityIssuanceHandler: ExtensionMessageHandler = (msg) => {
     const respond = async (response: IdentityIssuanceBackgroundResponse) => {
         let { status } = response;
-        if (response.status === BackgroundResponseStatus.Success) {
-            const pending = await sessionPendingIdentity.get();
-            if (!pending) {
-                status = BackgroundResponseStatus.Aborted;
-            } else {
+        const pending = await sessionPendingIdentity.get();
+        if (!pending) {
+            status = BackgroundResponseStatus.Aborted;
+        } else {
+            if (response.status === BackgroundResponseStatus.Success) {
                 const newIdentity: PendingIdentity = {
                     ...pending,
                     status: CreationStatus.Pending,
@@ -77,8 +77,8 @@ export const identityIssuanceHandler: ExtensionMessageHandler = (msg) => {
                 };
                 await addIdentity(newIdentity);
                 confirmIdentity(newIdentity);
-                await sessionPendingIdentity.remove();
             }
+            await sessionPendingIdentity.remove();
         }
         await openWindow();
         bgMessageHandler.sendInternalMessage(InternalMessageType.EndIdentityIssuance, { ...response, status });
