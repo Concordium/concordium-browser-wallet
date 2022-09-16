@@ -1,7 +1,7 @@
 import type en from './en';
 
 const t: typeof en = {
-    noAccounts: 'Du har ingen konti i wallet.',
+    noAccounts: 'Du har ingen konti i din wallet.',
     removeAccount: 'Fjern konto (kun lokalt)',
     resetConnections: 'Fjern forbindelser',
     accountAddress: 'Konto adresse',
@@ -49,7 +49,7 @@ const t: typeof en = {
         fee: 'Estimerede transaktionsomkostninger',
     },
     accountPending: 'Denne konto er stadig ved at blive oprettet.',
-    request: 'Lav konti',
+    request: 'Opret konto',
 };
 
 export default t;
