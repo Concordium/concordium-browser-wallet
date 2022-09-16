@@ -41,25 +41,60 @@ export function useSelectedCredential() {
     return useCredential(selectedAccount);
 }
 
-export function usePrivateKey(accountAddress: string | undefined): string | undefined {
-    const credentials = useAtomValue(credentialsAtom);
-    const credential = credentials.find((cred) => cred.address === accountAddress);
+export function useHdWallet(): ConcordiumHdWallet | undefined {
     const network = useAtomValue(networkConfigurationAtom);
     const seedPhrase = useDecryptedSeedPhrase();
+
+    const wallet = useMemo(() => {
+        if (!seedPhrase) {
+            return undefined;
+        }
+
+        return ConcordiumHdWallet.fromHex(seedPhrase, getNet(network));
+    }, [seedPhrase]);
+
+    return wallet;
+}
+
+export function usePrivateKey(accountAddress: string | undefined): string | undefined {
+    const wallet = useHdWallet();
+    const credentials = useAtomValue(credentialsAtom);
+    const credential = credentials.find((cred) => cred.address === accountAddress);
+
     const identity = useIdentityOf(credential);
 
     const privateKey = useMemo(() => {
         // We don't throw errors on missing credentials or identities, as they might just be loading.
-        if (!accountAddress || !credential || !identity || !seedPhrase) {
+        if (!wallet || !identity || !credential) {
             return undefined;
         }
 
-        return ConcordiumHdWallet.fromHex(seedPhrase, getNet(network))
+        return wallet
             .getAccountSigningKey(identity.providerIndex, identity.index, credential.credNumber)
             .toString('hex');
-    }, [credential?.credId, seedPhrase, identity?.index]);
+    }, [credential?.credId, wallet, identity?.index]);
 
     return privateKey;
+}
+
+export function usePublicKey(accountAddress: string | undefined): string | undefined {
+    const wallet = useHdWallet();
+    const credentials = useAtomValue(credentialsAtom);
+    const credential = credentials.find((cred) => cred.address === accountAddress);
+    const identity = useIdentityOf(credential);
+
+    const publicKey = useMemo(() => {
+        // We don't throw errors on missing credentials or identities, as they might just be loading.
+        if (!wallet || !identity || !credential) {
+            return undefined;
+        }
+
+        return wallet
+            .getAccountPublicKey(identity.providerIndex, identity.index, credential.credNumber)
+            .toString('hex');
+    }, [credential?.credId, wallet, identity?.index]);
+
+    return publicKey;
 }
 
 export function getNextEmptyCredNumber(creds: WalletCredential[]) {

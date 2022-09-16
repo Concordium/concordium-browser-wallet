@@ -30,6 +30,7 @@ const t = {
             copyDescription: 'Press the button to copy your private key.',
             show: 'Show private key',
             done: 'Done',
+            export: 'Export',
         },
     },
     sendCcd: {
