@@ -11,6 +11,7 @@ import recovery from '@popup/pages/Recovery/i18n/en';
 import about from '@popup/pages/About/i18n/en';
 import addAccount from '@popup/pages/AddAccount/i18n/en';
 import identityIssuance from '@popup/pages/IdentityIssuance/i18n/en';
+import identity from '@popup/pages/Identity/i18n/en';
 import login from '@popup/pages/Login/i18n/en';
 import transactionLog from '@popup/pages/Account/TransactionLog/i18n/en';
 import changePasscode from '@popup/pages/ChangePasscode/i18n/en';
@@ -28,6 +29,7 @@ const t = {
     recovery,
     addAccount,
     identityIssuance,
+    identity,
     about,
     login,
     transactionLog,
