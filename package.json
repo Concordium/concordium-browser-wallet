@@ -3,8 +3,8 @@
     "version": "0.1.0",
     "description": "chrome extensions wallet for the concordium blockchain",
     "repository": "git@github.com:Concordium/concordium-browser-wallet.git",
-    "author": "Concordium",
-    "license": "Apache",
+    "author": "Concordium Software",
+    "license": "Apache-2.0",
     "private": true,
     "workspaces": [
         "packages/*",
@@ -16,7 +16,8 @@
         "type:check": "yarn workspaces foreach -v -t --no-private run tsc --noEmit",
         "build:all": "yarn workspaces foreach -v -t --no-private run build",
         "postinstall": "husky install",
-        "test": "cd ./packages/browser-wallet && jest --config jest.config.ts"
+        "test": "cd ./packages/browser-wallet && jest --config jest.config.ts",
+        "generate-disclaimer": "yarn licenses generate-disclaimer --production > ./disclaimer.txt && node disclaimer.js"
     },
     "lint-staged": {
         "*.{js,jsx,ts,tsx}": [

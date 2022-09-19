@@ -36,7 +36,9 @@ export default function About() {
                     <div className="about-page__item">
                         <ExternalLink path={urls.termsAndConditions} label={t('terms')} />
                     </div>
-                    <div className="about-page__item">{t('license')}</div>
+                    <div className="about-page__item">
+                        <ExternalLink path={urls.licenseAttributions} label={t('license')} />
+                    </div>
                 </NavList>
             </div>
         </div>

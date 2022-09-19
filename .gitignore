@@ -2,6 +2,8 @@
 .yarn/*
 node_modules
 dist
+disclaimer.txt
+disclaimer.rst
 .eslintcache
 !.yarn/patches
 !.yarn/plugins

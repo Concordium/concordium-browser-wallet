@@ -3,8 +3,8 @@
     "version": "0.1.0",
     "description": "API for interfacing with the concordium browser wallet",
     "main": "index.js",
-    "author": "Concordium",
-    "license": "Apache",
+    "author": "Concordium Software",
+    "license": "Apache-2.0",
     "dependencies": {
         "@concordium/browser-wallet-api-helpers": "workspace:^",
         "@concordium/web-sdk": "^1.0.0",
