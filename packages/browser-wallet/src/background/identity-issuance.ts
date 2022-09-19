@@ -3,11 +3,12 @@ import { IdentityIssuanceBackgroundResponse } from '@shared/utils/identity-helpe
 import { ExtensionMessageHandler, InternalMessageType } from '@concordium/browser-wallet-message-hub';
 import { BackgroundResponseStatus } from '@shared/utils/types';
 import { sessionPendingIdentity } from '@shared/storage/access';
-import { CreationStatus } from '@shared/storage/types';
+import { CreationStatus, PendingIdentity } from '@shared/storage/types';
 import { openWindow } from './window-management';
 
 import bgMessageHandler from './message-handler';
 import { addIdentity } from './update';
+import { confirmIdentity } from './confirmation';
 
 const redirectUri = 'ConcordiumRedirectToken';
 const codeUriKey = 'code_uri=';
@@ -64,18 +65,20 @@ function handleExternalIssuance(url: string, respond: (response: IdentityIssuanc
 export const identityIssuanceHandler: ExtensionMessageHandler = (msg) => {
     const respond = async (response: IdentityIssuanceBackgroundResponse) => {
         let { status } = response;
-        if (response.status === BackgroundResponseStatus.Success) {
-            const pending = await sessionPendingIdentity.get();
-            if (!pending) {
-                status = BackgroundResponseStatus.Aborted;
-            } else {
-                await addIdentity({
+        const pending = await sessionPendingIdentity.get();
+        if (!pending) {
+            status = BackgroundResponseStatus.Aborted;
+        } else {
+            if (response.status === BackgroundResponseStatus.Success) {
+                const newIdentity: PendingIdentity = {
                     ...pending,
                     status: CreationStatus.Pending,
                     location: response.result,
-                });
-                await sessionPendingIdentity.remove();
+                };
+                await addIdentity(newIdentity);
+                confirmIdentity(newIdentity);
             }
+            await sessionPendingIdentity.remove();
         }
         await openWindow();
         bgMessageHandler.sendInternalMessage(InternalMessageType.EndIdentityIssuance, { ...response, status });

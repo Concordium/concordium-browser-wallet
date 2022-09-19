@@ -1,12 +1,9 @@
-import { Buffer } from 'buffer/';
 import { ChromeStorageKey, EncryptedData, NetworkConfiguration, Theme } from '@shared/storage/types';
 import { atom } from 'jotai';
 import { EventType } from '@concordium/browser-wallet-api-helpers';
 import { popupMessageHandler } from '@popup/shared/message-handler';
-import { decrypt } from '@popup/shared/crypto';
-import { mnemonicToSeedSync } from '@scure/bip39';
 import { mainnet } from '@popup/pages/NetworkSettings/NetworkSettings';
-import { loadable, selectAtom } from 'jotai/utils';
+import { selectAtom } from 'jotai/utils';
 import { HttpProvider, JsonRpcClient } from '@concordium/web-sdk';
 import { storedCredentials } from '@shared/storage/access';
 import { atomWithChromeStorage } from './utils';
@@ -19,6 +16,7 @@ export const encryptedSeedPhraseAtom = atomWithChromeStorage<EncryptedData | und
     true
 );
 export const themeAtom = atomWithChromeStorage<Theme>(ChromeStorageKey.Theme, Theme.Light);
+export const hasBeenOnBoardedAtom = atomWithChromeStorage<boolean>(ChromeStorageKey.HasBeenOnboarded, false, true);
 
 const storedNetworkConfigurationAtom = atomWithChromeStorage<NetworkConfiguration>(
     ChromeStorageKey.NetworkConfiguration,
@@ -47,19 +45,8 @@ export const sessionPasscodeAtom = atomWithChromeStorage<string | undefined>(
     true
 );
 
-const internalSeedPhraseAtom = atom<Promise<string>, never>(
-    async (get) => {
-        const seed = get(encryptedSeedPhraseAtom).value;
-        const passcode = get(sessionPasscodeAtom).value;
-
-        if (seed && passcode) {
-            return Buffer.from(mnemonicToSeedSync(await decrypt(seed, passcode))).toString('hex');
-        }
-        throw new Error('SeedPhrase should not be retrieved without unlocking the wallet.');
-    },
-    () => {
-        throw new Error('Setting the seedPhrase directly is not supported');
-    }
+export const sessionOnboardingLocationAtom = atomWithChromeStorage<string | undefined>(
+    ChromeStorageKey.OnboardingLocation,
+    undefined,
+    true
 );
-
-export const seedPhraseAtom = loadable(internalSeedPhraseAtom);

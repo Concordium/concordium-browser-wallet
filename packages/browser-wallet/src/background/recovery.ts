@@ -11,43 +11,47 @@ import {
     Network,
 } from '@concordium/web-sdk';
 import { ExtensionMessageHandler, InternalMessageType } from '@concordium/browser-wallet-message-hub';
-import { BackgroundResponseStatus, IdentityIdentifier, RecoveryBackgroundResponse } from '@shared/utils/types';
+import { BackgroundResponseStatus, RecoveryBackgroundResponse } from '@shared/utils/types';
 import { Identity, CreationStatus, IdentityProvider, WalletCredential } from '@shared/storage/types';
 import { sessionIsRecovering, storedCredentials, storedCurrentNetwork, storedIdentities } from '@shared/storage/access';
 import { identityMatch, isIdentityOfCredential } from '@shared/utils/identity-helpers';
+import { getNextUnused } from '@shared/utils/number-helpers';
 import { addCredential, addIdentity } from './update';
 import bgMessageHandler from './message-handler';
 import { openWindow } from './window-management';
 
 // How many empty identityIndices are allowed before stopping
-const maxEmpty = 10;
+const maxEmpty = 20;
 
 async function recoverAccounts(
     identityIndex: number,
     providerIndex: number,
     credentialInput: Omit<CredentialInputV1, 'credNumber'>,
     getAccountInfo: (credId: string) => Promise<AccountInfo | undefined>,
-    startCredNumber = 0
+    usedCredNumbersOfIdentity: number[]
 ): Promise<WalletCredential[]> {
     const credsToAdd: WalletCredential[] = [];
 
     let emptyIndices = 0;
-    let credNumber = startCredNumber;
+    let credNumber = getNextUnused(usedCredNumbersOfIdentity);
     while (emptyIndices < maxEmpty) {
-        const request = createCredentialV1({ ...credentialInput, credNumber });
-        const { credId } = request.cdi;
-        const accountInfo = await getAccountInfo(credId);
-        if (accountInfo) {
-            credsToAdd.push({
-                address: accountInfo.accountAddress,
-                credId,
-                credNumber,
-                status: CreationStatus.Confirmed,
-                identityIndex,
-                providerIndex,
-            });
-        } else {
-            emptyIndices += 1;
+        if (!usedCredNumbersOfIdentity.includes(credNumber)) {
+            const request = createCredentialV1({ ...credentialInput, credNumber });
+            const { credId } = request.cdi;
+            const accountInfo = await getAccountInfo(credId);
+            if (accountInfo) {
+                credsToAdd.push({
+                    address: accountInfo.accountAddress,
+                    credId,
+                    credNumber,
+                    status: CreationStatus.Confirmed,
+                    identityIndex,
+                    providerIndex,
+                });
+                emptyIndices = 0;
+            } else {
+                emptyIndices += 1;
+            }
         }
         credNumber += 1;
     }
@@ -83,11 +87,6 @@ async function performRecovery({ providers, ...recoveryInputs }: Payload) {
         }
         const identities = await storedIdentities.get(network.genesisHash);
         const credentials = await storedCredentials.get(network.genesisHash);
-
-        const getNextCredNumber = (id: IdentityIdentifier) =>
-            (credentials || [])
-                .filter(isIdentityOfCredential(id))
-                .reduce((currentNext, cred) => Math.max(currentNext, cred.credNumber + 1), 0);
 
         const client = new JsonRpcClient(new HttpProvider(network.jsonRpcUrl, fetch));
         const blockHash = (await client.getConsensusStatus()).lastFinalizedBlock;
@@ -141,7 +140,9 @@ async function performRecovery({ providers, ...recoveryInputs }: Payload) {
                                     idObject: identity.idObject.value,
                                 },
                                 getAccountInfo,
-                                getNextCredNumber(identity)
+                                (credentials || [])
+                                    .filter(isIdentityOfCredential(identity))
+                                    .map((cred) => cred.credNumber)
                             ))
                         );
                     }

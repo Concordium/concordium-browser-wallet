@@ -1,7 +1,7 @@
 import type en from './en';
 
 const t: typeof en = {
-    noAccounts: 'Ingen konti i wallet',
+    noAccounts: 'Du har ingen konti i din wallet.',
     removeAccount: 'Fjern konto (kun lokalt)',
     resetConnections: 'Fjern forbindelser',
     accountAddress: 'Konto adresse',
@@ -32,6 +32,7 @@ const t: typeof en = {
             copyDescription: 'Tryk på knappen for at kopiere din private nøgle.',
             show: 'Vis privatnøgle',
             done: 'Færdig',
+            export: 'Eksporter',
         },
     },
     sendCcd: {
@@ -49,6 +50,7 @@ const t: typeof en = {
         fee: 'Estimerede transaktionsomkostninger',
     },
     accountPending: 'Denne konto er stadig ved at blive oprettet.',
+    request: 'Opret konto',
 };
 
 export default t;

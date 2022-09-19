@@ -124,6 +124,8 @@ export const storedIdentityProviders = makeIndexedStorageAccessor<IdentityProvid
     'local',
     ChromeStorageKey.IdentityProviders
 );
+export const storedHasBeenOnboarded = makeStorageAccessor<boolean>('local', ChromeStorageKey.HasBeenOnboarded);
+
 export const sessionPasscode = makeStorageAccessor<string>('session', ChromeStorageKey.Passcode);
 export const sessionPendingIdentity = makeStorageAccessor<Omit<PendingIdentity, 'location'>>(
     'session',
@@ -135,6 +137,7 @@ export const sessionAccountInfoCache = makeIndexedStorageAccessor<Record<string,
     ChromeStorageKey.AccountInfoCache
 );
 export const sessionIsRecovering = makeStorageAccessor<boolean>('session', ChromeStorageKey.IsRecovering);
+export const sessionOnboardingLocation = makeStorageAccessor<string>('session', ChromeStorageKey.OnboardingLocation);
 
 export const getGenesisHash = () =>
     storedCurrentNetwork.get().then((network) => {

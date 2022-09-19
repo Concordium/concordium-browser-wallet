@@ -1,5 +1,15 @@
 # Changelog
 
+## 0.7.0
+
+### Added
+
+-   Export account and it's private key as a file.
+
+### Fixed
+
+-   Various bugs.
+
 ## 0.6.0
 
 ### Added

@@ -1,23 +1,28 @@
 import PageHeader from '@popup/shared/PageHeader';
 import React from 'react';
-import { useNavigate } from 'react-router-dom';
+import { useLocation, useNavigate } from 'react-router-dom';
 import Button from '@popup/shared/Button';
 import { absoluteRoutes } from '@popup/constants/routes';
-import { useSetAtom, useAtomValue } from 'jotai';
+import { useSetAtom } from 'jotai';
 import { useTranslation } from 'react-i18next';
-import { isRecoveringAtom } from '@popup/state';
-import { networkConfigurationAtom } from '@popup/store/settings';
+import { hasBeenOnBoardedAtom, networkConfigurationAtom, sessionPasscodeAtom } from '@popup/store/settings';
 import { setupRoutes } from './routes';
-// TODO Remove stagenet
-import { mainnet, testnet, stagenet } from '../NetworkSettings/NetworkSettings';
+import { mainnet, testnet } from '../NetworkSettings/NetworkSettings';
+import { usePasscodeInSetup } from './passcode-helper';
 
 export function ChooseNetwork() {
     const navigate = useNavigate();
+    const location = useLocation();
+    const isRecovering = location.pathname.endsWith('recovering');
     const { t } = useTranslation('setup');
     const setNetworkConfiguration = useSetAtom(networkConfigurationAtom);
-    const isRecovering = useAtomValue(isRecoveringAtom);
+    const setHasBeenOnboarded = useSetAtom(hasBeenOnBoardedAtom);
+    const passcode = usePasscodeInSetup();
+    const setPasscodeInSession = useSetAtom(sessionPasscodeAtom);
 
     const goToNext = () => {
+        setPasscodeInSession(passcode);
+        setHasBeenOnboarded(true);
         if (isRecovering) {
             navigate(`${absoluteRoutes.setup.path}/${setupRoutes.performRecovery}`);
         } else {
@@ -69,16 +74,6 @@ export function ChooseNetwork() {
                         }}
                     >
                         Concordium Testnet
-                    </Button>
-                    <Button
-                        className="onboarding-setup__page-with-header__testnet-button"
-                        width="wide"
-                        onClick={() => {
-                            setNetworkConfiguration(stagenet);
-                            goToNext();
-                        }}
-                    >
-                        Concordium Stagenet
                     </Button>
                 </div>
             </div>

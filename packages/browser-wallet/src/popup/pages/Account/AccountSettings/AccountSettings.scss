@@ -43,27 +43,33 @@
 
 .export-private-key-page {
     width: 100%;
-    padding-left: rem(20px);
-    padding-right: rem(20px);
+    padding-left: rem(19px);
+    padding-right: rem(19px);
     background-color: $color-bg;
+    display: flex;
+    flex-direction: column;
+    justify-content: space-around;
 
     &__description {
         text-align: center;
-        margin-top: rem(30px);
+        margin-top: rem(10px);
     }
 
     &__button {
-        position: absolute;
-        bottom: rem(24px);
-        left: 0;
-        right: 0;
-        margin: 0 auto;
+        margin: 0 auto rem(24px);
         background-color: $color-cta;
     }
 
+    &__export-button {
+        margin: 0 auto;
+    }
+
+    &__form {
+        display: contents;
+    }
+
     textarea {
-        margin-top: rem(30px);
-        height: rem(70px);
+        height: rem(55px);
         padding: rem(10px);
     }
 
