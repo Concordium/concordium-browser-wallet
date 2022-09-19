@@ -22,7 +22,7 @@ export function useDecryptedSeedPhrase(onError: (e: Error) => void = noOp) {
             throw new Error('SeedPhrase should not be retrieved without unlocking the wallet.');
         },
         onError,
-        []
+        [encryptedSeed.loading, passcode.loading]
     );
 
     return seed;
