@@ -1920,7 +1920,7 @@ __metadata:
     "@concordium/browser-wallet-api": "workspace:^"
     "@concordium/browser-wallet-api-helpers": "workspace:^"
     "@concordium/web-sdk": ^1.0.0
-    "@craftamap/esbuild-plugin-html": ^0.3.2
+    "@craftamap/esbuild-plugin-html": ^0.4.0
     "@mdx-js/react": ^1.6.22
     "@scure/bip39": ^1.1.0
     "@storybook/addon-actions": ^6.5.7
@@ -2067,18 +2067,6 @@ __metadata:
     buffer: ^6.0.3
     process: ^0.11.10
   checksum: a130eb8112a6452e5444ac5a8c86d95e221d49da9ffad43520289258f1b0a366dd37f1056f93fbf44609247bd38238e4ea2ed8bcb4f19390525676ae6f832592
-  languageName: node
-  linkType: hard
-
-"@craftamap/esbuild-plugin-html@npm:^0.3.2":
-  version: 0.3.2
-  resolution: "@craftamap/esbuild-plugin-html@npm:0.3.2"
-  dependencies:
-    jsdom: ^17.0.0
-    lodash.template: ^4.5.0
-  peerDependencies:
-    esbuild: ">=0.12.28"
-  checksum: 7c2b5a04b8e70538805872d7a50cf8806b9378288afdfd3df09d37172517bd87c2ba202bb6f292cc7105fd487a793e0281dec5b5b79ca7fc820aee76cd41973d
   languageName: node
   linkType: hard
 

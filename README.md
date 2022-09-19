@@ -15,3 +15,13 @@ This repository contains the implementation of the Concordium browser wallet, wh
 ## Development and building packages
 
 Documentation for building, running a development workflow, and other processes specific to each package can be found in the README for the respective package.
+
+## Generating license attributions
+
+From the base directory run:
+
+```
+yarn generate-disclaimer
+```
+
+You must manually remove the internal license dependencies before publishing it to the documentation in https://github.com/Concordium/concordium.github.io.
