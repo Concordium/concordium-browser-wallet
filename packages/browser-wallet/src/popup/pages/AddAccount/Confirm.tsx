@@ -38,10 +38,6 @@ export default function Confirm() {
         [selectedIdentity?.providerIndex]
     );
 
-    if (!selectedIdentity || selectedIdentity.status !== CreationStatus.Confirmed) {
-        throw new Error('No selected Identity or selected is not confirmed');
-    }
-
     const submit = useCallback(async () => {
         setCreatingRequest(true);
         try {
@@ -53,6 +49,9 @@ export default function Confirm() {
             }
             if (!identityProvider) {
                 throw new Error('provider not found');
+            }
+            if (selectedIdentity.status !== CreationStatus.Confirmed) {
+                throw new Error('Selected identity is not confirmed');
             }
 
             const global = await getGlobal(network);
@@ -90,6 +89,10 @@ export default function Confirm() {
             setCreatingRequest(false);
         }
     }, [seedPhrase, network, identityProvider, selectedIdentity]);
+
+    if (!selectedIdentity) {
+        return null;
+    }
 
     // TODO: Better faking of AccountDetails
     return (
