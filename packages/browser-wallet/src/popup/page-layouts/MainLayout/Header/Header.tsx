@@ -5,7 +5,9 @@ import { NavLink, useLocation, useNavigate } from 'react-router-dom';
 import { AnimatePresence, AnimationProps, motion, Variants } from 'framer-motion';
 import { ClassName, PropsOf } from 'wallet-common-helpers';
 
-import Logo from '@assets/svg/concordium.svg';
+import Burger from '@assets/svg/burger.svg';
+import SelectedBurger from '@assets/svg/selected_burger.svg';
+import BackIcon from '@assets/svg/back-arrow.svg';
 import CheckmarkIcon from '@assets/svg/checkmark-blue.svg';
 import NavList from '@popup/shared/NavList';
 import Button from '@popup/shared/Button';
@@ -128,14 +130,23 @@ export default function Header({ onToggle, className }: Props) {
         !pathname.startsWith(absoluteRoutes.home.account.path) ||
         pathname.startsWith(absoluteRoutes.home.account.add.path);
     const hasDropdown = [Section.Account, Section.Id].includes(section);
+    const canGoBack = section === Section.Settings && pathname !== absoluteRoutes.home.settings.path;
 
     return (
         <>
             <header className={clsx('main-layout-header', navOpen && 'main-layout-header--nav-open', className)}>
                 <div className="main-layout-header__bar">
-                    <Button className="main-layout-header__logo" clear onClick={() => setNavOpen((o) => !o)}>
-                        <Logo />
-                    </Button>
+                    {canGoBack && (
+                        <Button className="main-layout-header__back-logo" clear onClick={() => nav(-1)}>
+                            <BackIcon />
+                        </Button>
+                    )}
+                    {!canGoBack && (
+                        <Button className="main-layout-header__logo" clear onClick={() => setNavOpen((o) => !o)}>
+                            <SelectedBurger className={clsx(!navOpen && 'main-layout-header__logo-hidden')} />
+                            <Burger className={clsx(navOpen && 'main-layout-header__logo-hidden')} />
+                        </Button>
+                    )}
                     <label
                         className={clsx(
                             'main-layout-header__title',
