@@ -105,6 +105,7 @@ chrome.storage.local.onChanged.addListener((changes) => {
 });
 
 chrome.runtime.onStartup.addListener(startupHandler);
+chrome.runtime.onInstalled.addListener(startupHandler);
 
 bgMessageHandler.handleMessage(
     createMessageTypeFilter(InternalMessageType.SendCredentialDeployment),
