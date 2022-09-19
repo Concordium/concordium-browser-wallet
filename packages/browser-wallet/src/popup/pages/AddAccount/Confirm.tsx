@@ -50,8 +50,8 @@ export default function Confirm() {
             if (!identityProvider) {
                 throw new Error('provider not found');
             }
-            if (selectedIdentity.status !== CreationStatus.Confirmed) {
-                throw new Error('Selected identity is not confirmed');
+            if (!selectedIdentity || selectedIdentity.status !== CreationStatus.Confirmed) {
+                throw new Error('Selected identity is not defined or not confirmed');
             }
 
             const global = await getGlobal(network);
