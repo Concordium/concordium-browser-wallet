@@ -1,5 +1,12 @@
 # Changelog
 
+## 0.7.1
+
+### Fixed
+
+-   Crash when confirming account creation.
+-   Identity creation not starting.
+
 ## 0.7.0
 
 ### Added
