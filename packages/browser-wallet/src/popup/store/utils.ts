@@ -93,7 +93,9 @@ export function atomWithChromeStorage<V>(key: ChromeStorageKey, fallback: V, wit
         chrome.storage[accessor.area].onChanged.addListener(listener);
         return () => {
             chrome.storage[accessor.area].onChanged.removeListener(listener);
-            setValue({ loading: true, value: fallback });
+            if (withLoading) {
+                setValue({ loading: true, value: fallback });
+            }
         };
     };
 
