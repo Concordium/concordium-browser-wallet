@@ -23,19 +23,16 @@
         display: flex;
 
         svg {
-            path,
-            rect {
+            path {
                 @include transition(fill);
 
-                rx: rem(2px);
                 fill: $color-text;
             }
         }
 
         &:hover {
             svg {
-                path,
-                rect {
+                path {
                     fill: $color-cta;
                 }
             }
@@ -58,8 +55,7 @@
         svg {
             width: rem(23px);
 
-            path,
-            rect {
+            path {
                 .main-layout-header--nav-open & {
                     fill: $color-cta;
                 }
