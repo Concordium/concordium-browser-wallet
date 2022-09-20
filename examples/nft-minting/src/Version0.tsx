@@ -5,13 +5,15 @@ import { createCollection, state, mint } from './utils';
 import { RAW_SCHEMA } from './constant';
 import { serializeUpdateContractParameters, toBuffer } from '@concordium/web-sdk';
 
+const MINT_HOST = "http://10.45.255.52:8888";
+
 export default function PiggyBankV0() {
     const { account, isConnected } = useContext(state);
     const [collections, setCollections] = useState<bigint[]>([1087n]);
     const [nfts, setNFTS] = useState<Record<string,string[]>>({});
 
     useEffect(async () => {
-        const response = await fetch("http://10.45.255.52:8888/collections", {
+        const response = await fetch(MINT_HOST + "/collections", {
             headers: new Headers({"Access-Control-Allow-Origin": "*" }),
             mode: 'cors'
         });
@@ -57,7 +59,7 @@ function Collection( { index, account, nfts, addNft }: CollectionProps) {
         <form className="form" onSubmit={async (event: any) => {
         event.preventDefault();
         const id = Math.round((Math.random() * 100000)).toString().padEnd(8, "0");
-        const response = await fetch("http://10.45.255.52:8888/metadata/" + id, {
+            const response = await fetch(MINT_HOST + "/metadata/" + id, {
             method: 'POST',
             body: new FormData(event.target),
             headers: new Headers({"Access-Control-Allow-Origin": "*" }),
