@@ -1,7 +1,7 @@
 /* eslint-disable no-console */
 import React, { useEffect, useState, useContext } from 'react';
 import { detectConcordiumProvider } from '@concordium/browser-wallet-api-helpers';
-import { createCollection, state, mint } from './utils';
+import { createCollection, state, mint, isOwner } from './utils';
 import { RAW_SCHEMA } from './constant';
 import { serializeUpdateContractParameters, toBuffer } from '@concordium/web-sdk';
 
@@ -54,9 +54,18 @@ type CollectionProps = {
 }
 
 function Collection( { index, account, nfts, addNft }: CollectionProps) {
+    const [owning, setOwning] = useState(false);
+
+    useEffect(()=> {
+        isOwner(account, index).then((r)=>setOwning(r))
+    }, [account, index])
+
+
     return (<div className="collection">
         <h3>{index.toString()}</h3>
-        <form className="form" onSubmit={async (event: any) => {
+
+
+        {owning ? ( <form className="form" onSubmit={async (event: any) => {
         event.preventDefault();
         const id = Math.round((Math.random() * 100000)).toString().padEnd(8, "0");
             const response = await fetch(MINT_HOST + "/metadata/" + id, {
@@ -82,8 +91,8 @@ function Collection( { index, account, nfts, addNft }: CollectionProps) {
         <label for="description">Description</label>
         <input name="description" type="string"/>
         <button type="submit">mint</button>
-    </form>
-    <div className="collection-nfts" >
+    </form>)
+         : null}    <div className="collection-nfts" >
             {(nfts || []).map((nft) => <NFT id={nft} index={index}  />)}
     </div>
     </div>

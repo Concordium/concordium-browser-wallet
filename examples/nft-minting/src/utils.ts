@@ -100,6 +100,19 @@ export const mint = (account: string, id: string, url: string, index: bigint, su
     });
 };
 
+export const isOwner = (account: string, index: bigint, subindex = 0n) => {
+    return new Promise<boolean>((resolve, reject) => {
+        detectConcordiumProvider()
+            .then((provider) => {
+                provider.getJsonRpcClient().getInstanceInfo({index, subindex}).then((info) =>{
+                    if (info) {
+                        resolve(info.owner.address === account)
+                    }
+                })
+            })
+    });
+}
+
 /**
  * Global application state.
  */
