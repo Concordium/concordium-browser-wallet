@@ -5638,6 +5638,26 @@ __metadata:
   languageName: node
   linkType: hard
 
+"NFT-Minting@workspace:examples/nft-minting":
+  version: 0.0.0-use.local
+  resolution: "NFT-Minting@workspace:examples/nft-minting"
+  dependencies:
+    "@concordium/browser-wallet-api-helpers": "workspace:^"
+    "@concordium/web-sdk": ^1.0.0
+    "@craftamap/esbuild-plugin-html": ^0.4.0
+    "@types/react": ^18.0.9
+    "@types/react-dom": ^18.0.5
+    cross-env: ^7.0.3
+    esbuild: ^0.14.42
+    esbuild-plugin-svgr: ^1.0.1
+    live-server: ^1.2.2
+    react: ^18.1.0
+    react-dom: ^18.1.0
+    ts-node: ^10.8.0
+    typescript: ^4.7.2
+  languageName: unknown
+  linkType: soft
+
 "abab@npm:^2.0.5, abab@npm:^2.0.6":
   version: 2.0.6
   resolution: "abab@npm:2.0.6"
