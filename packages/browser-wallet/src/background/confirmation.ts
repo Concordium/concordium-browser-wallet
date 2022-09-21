@@ -6,6 +6,7 @@ import {
     PendingIdentity,
     PendingWalletCredential,
     WalletCredential,
+    NetworkConfiguration,
 } from '@shared/storage/types';
 import { IdentityTokenContainer, IdentityProviderIdentityStatus } from 'wallet-common-helpers/lib/utils/identity/types';
 import { updateCredentials, updateIdentities } from './update';
@@ -19,11 +20,13 @@ const updateInterval = 10000;
 async function monitorCredentialStatus(
     jsonRpcUrl: string,
     { deploymentHash, ...info }: PendingWalletCredential,
-    signal: AbortSignal
+    genesisHash: string
 ) {
     const client = new JsonRpcClient(new HttpProvider(jsonRpcUrl, fetch));
     async function loop() {
-        if (signal.aborted) {
+        const network = await storedCurrentNetwork.get();
+        // Stop if the network has changed
+        if (!network || network.genesisHash !== genesisHash) {
             return;
         }
         let repeat = true;
@@ -53,23 +56,23 @@ async function monitorCredentialStatus(
 /**
  * Start checks on all pending credentials on the current network.
  */
-async function startMonitoringCredentialStatus(signal: AbortSignal) {
-    const network = await storedCurrentNetwork.get();
-    if (network) {
-        const url = network.jsonRpcUrl;
-        const creds = await storedCredentials.get(network.genesisHash);
-        if (url && creds) {
-            creds.filter(isPendingCred).forEach((cred) => monitorCredentialStatus(url, cred, signal));
-        }
+async function startMonitoringCredentialStatus(network: NetworkConfiguration) {
+    const creds = await storedCredentials.get(network.genesisHash);
+    if (creds) {
+        creds
+            .filter(isPendingCred)
+            .forEach((cred) => monitorCredentialStatus(network.jsonRpcUrl, cred, network.genesisHash));
     }
 }
 
 /**
  * Continously checks whether pending identities have been confirmed or rejected.
  */
-async function monitorIdentityStatus({ location, ...identity }: PendingIdentity, signal: AbortSignal) {
+async function monitorIdentityStatus({ location, ...identity }: PendingIdentity, genesisHash: string) {
     async function loop() {
-        if (signal.aborted) {
+        const network = await storedCurrentNetwork.get();
+        // Stop if the network has changed
+        if (!network || network.genesisHash !== genesisHash) {
             return;
         }
         let repeat = true;
@@ -106,32 +109,26 @@ async function monitorIdentityStatus({ location, ...identity }: PendingIdentity,
 /**
  * Start checks on all pending identities on the current network.
  */
-async function startMonitoringIdentityStatus(signal: AbortSignal) {
-    const network = await storedCurrentNetwork.get();
-    if (network) {
-        const identities = await storedIdentities.get(network.genesisHash);
-        if (identities) {
-            identities.filter(isPendingIdentity).forEach((id) => monitorIdentityStatus(id, signal));
-        }
+async function startMonitoringIdentityStatus(genesisHash: string) {
+    const identities = await storedIdentities.get(genesisHash);
+    if (identities) {
+        identities.filter(isPendingIdentity).forEach((id) => monitorIdentityStatus(id, genesisHash));
     }
 }
 
-let abortController: AbortController;
 /**
  * Starts jobs on each pending identity and credential on the current network.
  * Also sends an abort signal to currently running jobs.
  */
-export function startMonitoringPendingStatus() {
-    abortController?.abort();
-    abortController = new AbortController();
-    startMonitoringCredentialStatus(abortController.signal);
-    startMonitoringIdentityStatus(abortController.signal);
+export function startMonitoringPendingStatus(network: NetworkConfiguration) {
+    startMonitoringCredentialStatus(network);
+    startMonitoringIdentityStatus(network.genesisHash);
 }
 
-export function confirmIdentity(identity: PendingIdentity) {
-    monitorIdentityStatus(identity, abortController.signal);
+export function confirmIdentity(identity: PendingIdentity, genesisHash: string) {
+    monitorIdentityStatus(identity, genesisHash);
 }
 
-export function confirmCredential(credential: PendingWalletCredential, jsonRpcUrl: string) {
-    monitorCredentialStatus(jsonRpcUrl, credential, abortController.signal);
+export function confirmCredential(credential: PendingWalletCredential, jsonRpcUrl: string, genesisHash: string) {
+    monitorCredentialStatus(jsonRpcUrl, credential, genesisHash);
 }
