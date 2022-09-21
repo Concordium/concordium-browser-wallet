@@ -17,6 +17,9 @@ function Header() {
         if (pathname.startsWith(absoluteRoutes.prompt.connectionRequest.path)) {
             return t('header.connect');
         }
+        if (pathname.startsWith(absoluteRoutes.prompt.generateProof.path)) {
+            return 'Age proof request';
+        }
         return t('header.request');
     }
 

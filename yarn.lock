@@ -1919,7 +1919,7 @@ __metadata:
     "@babel/core": ^7.18.2
     "@concordium/browser-wallet-api": "workspace:^"
     "@concordium/browser-wallet-api-helpers": "workspace:^"
-    "@concordium/web-sdk": ^1.0.0
+    "@concordium/web-sdk": "https://github.com/Concordium/concordium-node-sdk-js.git#age-proofs"
     "@craftamap/esbuild-plugin-html": ^0.4.0
     "@mdx-js/react": ^1.6.22
     "@scure/bip39": ^1.1.0
@@ -2043,6 +2043,13 @@ __metadata:
   version: 0.4.0
   resolution: "@concordium/rust-bindings@npm:0.4.0"
   checksum: 086927ac406b58fed7f019c5544fb13575f0a24f2c2e4354a44f16e765f34cb80530455e04235115f23cafae5425160d8177a08efa89f0365105b7667e7979ac
+  languageName: node
+  linkType: hard
+
+"@concordium/web-sdk@https://github.com/Concordium/concordium-node-sdk-js.git#age-proofs":
+  version: 0.0.0
+  resolution: "@concordium/web-sdk@https://github.com/Concordium/concordium-node-sdk-js.git#commit=9ad0992f5aef974851a14475d5da1e8b3de99347"
+  checksum: df8313e881d2a8fe13ab229962822f20ccf294ee7575adbce922e11f7667eccea58b6b90055da8d93d5275dec196a48630953ff363e723e258355be72f4523b0
   languageName: node
   linkType: hard
 
@@ -10887,6 +10894,26 @@ __metadata:
   checksum: 3f109d70ae123951905d85032ebeae3c2a5a7a997430df00ea30df0e3a6c60cf6689b109654d6fdacd28810a053348c4d14642da1d075049e6be1ba5216218da
   languageName: node
   linkType: hard
+
+"hackathon-webshop@workspace:examples/hackathon-webshop":
+  version: 0.0.0-use.local
+  resolution: "hackathon-webshop@workspace:examples/hackathon-webshop"
+  dependencies:
+    "@concordium/browser-wallet-api-helpers": "workspace:^"
+    "@concordium/web-sdk": "https://github.com/Concordium/concordium-node-sdk-js.git#age-proofs"
+    "@craftamap/esbuild-plugin-html": ^0.4.0
+    "@types/react": ^18.0.9
+    "@types/react-dom": ^18.0.5
+    cross-env: ^7.0.3
+    esbuild: ^0.14.42
+    esbuild-plugin-svgr: ^1.0.1
+    live-server: ^1.2.2
+    react: ^18.1.0
+    react-dom: ^18.1.0
+    ts-node: ^10.8.0
+    typescript: ^4.7.2
+  languageName: unknown
+  linkType: soft
 
 "handlebars@npm:^4.7.7":
   version: 4.7.7

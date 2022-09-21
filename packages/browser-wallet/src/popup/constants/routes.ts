@@ -50,6 +50,9 @@ export const relativeRoutes = {
         recovery: {
             path: 'recovery',
         },
+        generateProof: {
+            path: 'generate-proof',
+        },
     },
     setup: {
         path: '/setup',

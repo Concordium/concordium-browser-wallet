@@ -1,0 +1,26 @@
+{
+    "name": "hackathon-webshop",
+    "packageManager": "yarn@3.2.0",
+    "dependencies": {
+        "@concordium/browser-wallet-api-helpers": "workspace:^",
+        "@concordium/web-sdk": "https://github.com/Concordium/concordium-node-sdk-js.git#age-proofs",
+        "react": "^18.1.0",
+        "react-dom": "^18.1.0"
+    },
+    "devDependencies": {
+        "@craftamap/esbuild-plugin-html": "^0.4.0",
+        "@types/react": "^18.0.9",
+        "@types/react-dom": "^18.0.5",
+        "cross-env": "^7.0.3",
+        "esbuild": "^0.14.42",
+        "esbuild-plugin-svgr": "^1.0.1",
+        "live-server": "^1.2.2",
+        "ts-node": "^10.8.0",
+        "typescript": "^4.7.2"
+    },
+    "scripts": {
+        "build": "node --loader ts-node/esm ./esbuild.config.ts",
+        "watch": "cross-env WATCH=1 yarn build",
+        "start": "live-server ./dist"
+    }
+}

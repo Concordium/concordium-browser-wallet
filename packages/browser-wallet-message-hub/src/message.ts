@@ -12,6 +12,7 @@ export enum MessageType {
     GetSelectedAccount = 'M_GetSelectedAccount',
     Connect = 'M_Connect',
     JsonRpcRequest = 'M_JsonRpcRequest',
+    GenerateProof = 'M_GenerateProof',
 }
 
 /**
@@ -30,6 +31,7 @@ export enum InternalMessageType {
     SendCredentialDeployment = 'I_SendCredentialDeployment',
     Recovery = 'I_Recovery',
     RecoveryFinished = 'I_RecoveryFinished',
+    GenerateProof = 'I_GenerateProof',
 }
 
 // eslint-disable-next-line @typescript-eslint/no-explicit-any

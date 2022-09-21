@@ -24,6 +24,7 @@ import RecoveryIntro from '@popup/pages/Recovery/RecoveryIntro';
 import RecoveryMain from '@popup/pages/Recovery/RecoveryMain';
 import RecoveryFinish from '@popup/pages/Recovery/RecoveryFinish';
 import ChangePasscode from '@popup/pages/ChangePasscode/ChangePasscode';
+import GenerateProof from '@popup/pages/GenerateProof';
 
 type PromptKey = keyof Omit<typeof absoluteRoutes['prompt'], 'path'>;
 
@@ -82,6 +83,10 @@ export default function Routes() {
         InternalMessageType.SignMessage,
         'signMessage'
     );
+    const handleGenerateProofResponse = useMessagePrompt<string | undefined>(
+        InternalMessageType.GenerateProof,
+        'generateProof'
+    );
 
     usePrompt(InternalMessageType.EndIdentityIssuance, 'endIdentityIssuance');
 
@@ -118,6 +123,15 @@ export default function Routes() {
                         <ConnectionRequest
                             onAllow={() => handleConnectionResponse(true)}
                             onReject={() => handleConnectionResponse(false)}
+                        />
+                    }
+                />
+                <Route
+                    path={relativeRoutes.prompt.generateProof.path}
+                    element={
+                        <GenerateProof
+                            onSubmit={handleGenerateProofResponse}
+                            onReject={() => handleGenerateProofResponse(undefined)}
                         />
                     }
                 />

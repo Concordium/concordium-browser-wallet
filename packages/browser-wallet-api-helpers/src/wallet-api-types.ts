@@ -2,6 +2,7 @@ import type {
     AccountTransactionPayload,
     AccountTransactionSignature,
     AccountTransactionType,
+    AgeProofOutput,
     JsonRpcClient,
     SchemaVersion,
 } from '@concordium/web-sdk';
@@ -70,6 +71,9 @@ interface MainWalletApi {
      * @param message message to be signed. Note that the wallet will prepend some bytes to ensure the message cannot be a transaction
      */
     signMessage(accountAddress: string, message: string): Promise<AccountTransactionSignature>;
+
+    generateProof(accountAddress: string): Promise<AgeProofOutput | undefined>;
+
     /**
      * Requests a connection to the Concordium wallet, prompting the user to either accept or reject the request.
      * If a connection has already been accepted for the url once the returned promise will resolve without prompting the user.

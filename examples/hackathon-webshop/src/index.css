@@ -1,0 +1,68 @@
+body {
+    font-family: Arial, Helvetica, sans-serif;
+}
+
+.webshop {
+    height: 100vh;
+    width: 100%;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    text-align: center;
+}
+
+.basket {
+    position: absolute;
+    right: 20px;
+    top: 20px;
+    text-align: left;
+}
+
+.item {
+    padding: 20px;
+    font-size: 30px;
+    margin: 5px;
+    width: 170px;
+}
+
+.stored {
+    margin-top: 0;
+}
+
+.connection-banner {
+    position: absolute;
+    top: 10px;
+    color: red;
+}
+
+.connected {
+    color: green;
+}
+
+.container {
+    display: flex;
+    justify-content: center;
+}
+
+.input,
+.deposit {
+    box-sizing: border-box;
+    height: 30px;
+}
+
+.smash {
+    color: white;
+    background-color: red;
+    border: none;
+    padding: 20px 30px;
+    font-size: 20px;
+}
+
+.smash svg path {
+    fill: white;
+}
+
+.smash:disabled {
+    opacity: 0.5;
+}

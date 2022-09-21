@@ -121,6 +121,16 @@ class WalletApi extends EventEmitter implements IWalletApi {
         return response;
     }
 
+    public generateProof(accountAddress: string): Promise<string | undefined> {
+        const res = this.messageHandler.sendMessage<string | undefined>(MessageType.GenerateProof, { accountAddress });
+
+        if (!res) {
+            throw new Error('Proof request rejected');
+        }
+
+        return res;
+    }
+
     private handleEvent(type: EventType) {
         this.messageHandler.handleMessage(createEventTypeFilter(type), (msg) => this.emit(type, msg.payload));
     }

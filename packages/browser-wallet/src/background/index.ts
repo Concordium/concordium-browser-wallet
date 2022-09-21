@@ -278,3 +278,4 @@ forwardToPopup(
 );
 forwardToPopup(MessageType.SendTransaction, InternalMessageType.SendTransaction, runIfWhitelisted, appendUrlToPayload);
 forwardToPopup(MessageType.SignMessage, InternalMessageType.SignMessage, runIfWhitelisted, appendUrlToPayload);
+forwardToPopup(MessageType.GenerateProof, InternalMessageType.GenerateProof, runIfWhitelisted, appendUrlToPayload);
