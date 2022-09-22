@@ -1,0 +1,4 @@
+[submodule "deps/concordium-node-sdk-js"]
+	path = deps/concordium-node-sdk-js
+	url = https://github.com/Concordium/concordium-node-sdk-js.git
+	branch = age-proofs

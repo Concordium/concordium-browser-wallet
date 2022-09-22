@@ -10,6 +10,8 @@ This repository contains the implementation of the Concordium browser wallet, wh
 ## Installing
 
 -   Clone repository
+-   Install git submodules `git submodule update --init`
+-   Build SDK `cd deps/concordium-node-sdk-js && yarn && yarn build && cd ../..`
 -   Install dependencies by running `yarn install`
 
 ## Development and building packages

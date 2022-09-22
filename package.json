@@ -61,5 +61,10 @@
         "tsc-files": "^1.1.3",
         "tsconfig-paths": "^3.14.1",
         "typescript": "^4.6.3"
+    },
+    "resolutions": {
+        "@concordium/web-sdk": "portal:/Users/sbz/Developer/Concordium/concordium-browser-wallet/deps/concordium-node-sdk-js/packages/web",
+        "@concordium/common-sdk": "portal:/Users/sbz/Developer/Concordium/concordium-browser-wallet/deps/concordium-node-sdk-js/packages/common",
+        "@concordium/rust-bindings": "portal:/Users/sbz/Developer/Concordium/concordium-browser-wallet/deps/concordium-node-sdk-js/packages/rust-bindings"
     }
 }
