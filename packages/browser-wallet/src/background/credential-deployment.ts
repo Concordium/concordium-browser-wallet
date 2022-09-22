@@ -44,8 +44,8 @@ async function createAndSendCredential(credIn: CredentialInputV1): Promise<Crede
         }
 
         // Add Pending
-        await addCredential(newCred);
-        confirmCredential(newCred, url);
+        await addCredential(newCred, network.genesisHash);
+        confirmCredential(newCred, url, network.genesisHash);
         // Set Selected to new account
         await storedSelectedAccount.set(address);
     } finally {

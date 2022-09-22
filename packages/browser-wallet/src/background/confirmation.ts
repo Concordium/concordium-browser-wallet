@@ -36,12 +36,15 @@ async function monitorCredentialStatus(
                 const isSuccessful = Object.values(response?.outcomes || {}).some(
                     (outcome) => outcome.result.outcome === 'success'
                 );
-                await updateCredentials([
-                    {
-                        ...info,
-                        status: isSuccessful ? CreationStatus.Confirmed : CreationStatus.Rejected,
-                    },
-                ]);
+                await updateCredentials(
+                    [
+                        {
+                            ...info,
+                            status: isSuccessful ? CreationStatus.Confirmed : CreationStatus.Rejected,
+                        },
+                    ],
+                    genesisHash
+                );
                 repeat = false;
             }
         } finally {
@@ -79,22 +82,28 @@ async function monitorIdentityStatus({ location, ...identity }: PendingIdentity,
         try {
             const response = (await (await fetch(location)).json()) as IdentityTokenContainer;
             if (response.status === IdentityProviderIdentityStatus.Error) {
-                await updateIdentities([
-                    {
-                        ...identity,
-                        status: CreationStatus.Rejected,
-                        error: response.detail,
-                    },
-                ]);
+                await updateIdentities(
+                    [
+                        {
+                            ...identity,
+                            status: CreationStatus.Rejected,
+                            error: response.detail,
+                        },
+                    ],
+                    genesisHash
+                );
                 repeat = false;
             } else if (response.status === IdentityProviderIdentityStatus.Done) {
-                await updateIdentities([
-                    {
-                        ...identity,
-                        status: CreationStatus.Confirmed,
-                        idObject: response.token.identityObject,
-                    },
-                ]);
+                await updateIdentities(
+                    [
+                        {
+                            ...identity,
+                            status: CreationStatus.Confirmed,
+                            idObject: response.token.identityObject,
+                        },
+                    ],
+                    genesisHash
+                );
                 repeat = false;
             }
         } finally {
