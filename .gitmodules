@@ -2,3 +2,7 @@
 	path = deps/concordium-node-sdk-js
 	url = https://github.com/Concordium/concordium-node-sdk-js.git
 	branch = age-proofs
+[submodule "deps/concordium-use-case-examples"]
+	path = deps/concordium-use-case-examples
+	url = https://github.com/Concordium/concordium-use-case-examples.git
+	branch = webshop
