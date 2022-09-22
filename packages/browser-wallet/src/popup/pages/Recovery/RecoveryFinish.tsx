@@ -34,7 +34,7 @@ export function DisplaySuccess({ added }: Props) {
 
     const addedAccounts = useMemo(
         () => credentials.filter((cred) => added.accounts.some((address) => cred.address === address)),
-        [credentials.length]
+        [credentials.length, added.accounts.length]
     );
     // Also includes identities that existed but have had accounts added.
     const addedIdentities = useMemo(
@@ -42,7 +42,7 @@ export function DisplaySuccess({ added }: Props) {
             identities.filter(
                 (id) => added.identities.some(identityMatch(id)) || addedAccounts.some(isIdentityOfCredential(id))
             ),
-        [identities.length]
+        [identities.length, addedAccounts.length, added.identities.length]
     );
 
     useEffect(() => {
