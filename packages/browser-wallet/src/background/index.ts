@@ -200,16 +200,16 @@ const runIfNotWhitelisted: RunCondition<string | undefined> = async (_msg, sende
         throw new Error('Expected URL to be available for sender.');
     }
 
-    const locked = await isWalletLocked();
-    if (locked) {
-        return { run: true };
-    }
-
     const selectedAccount = await storedSelectedAccount.get();
 
     // No accounts in the wallet.
     if (selectedAccount === undefined) {
         return { run: false, response: undefined };
+    }
+
+    const locked = await isWalletLocked();
+    if (locked) {
+        return { run: true };
     }
 
     const accountConnectedToSite = await findPrioritizedAccountConnectedToSite(sender.url);
