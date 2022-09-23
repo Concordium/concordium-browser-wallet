@@ -104,19 +104,28 @@ export function useIndexedStorage<V>(
     };
 }
 
-export const storedIdentities = makeIndexedStorageAccessor<Identity[]>('local', ChromeStorageKey.Identities);
-export const storedSelectedIdentity = makeStorageAccessor<string>('local', ChromeStorageKey.SelectedIdentity);
-export const storedSeedPhrase = makeStorageAccessor<string>('local', ChromeStorageKey.SeedPhrase);
-
-export const storedConnectedSites = makeStorageAccessor<Record<string, string[]>>(
-    'local',
-    ChromeStorageKey.ConnectedSites
-);
-export const storedCredentials = makeIndexedStorageAccessor<WalletCredential[]>('local', ChromeStorageKey.Credentials);
 export const storedCurrentNetwork = makeStorageAccessor<NetworkConfiguration>(
     'local',
     ChromeStorageKey.NetworkConfiguration
 );
+export const getGenesisHash = () =>
+    storedCurrentNetwork.get().then((network) => {
+        if (!network) {
+            throw new Error('Indexed storage should not be accessed before setting the network');
+        }
+        return network.genesisHash;
+    });
+
+export const storedIdentities = makeIndexedStorageAccessor<Identity[]>('local', ChromeStorageKey.Identities);
+export const storedSelectedIdentity = makeStorageAccessor<string>('local', ChromeStorageKey.SelectedIdentity);
+export const storedSeedPhrase = makeStorageAccessor<string>('local', ChromeStorageKey.SeedPhrase);
+
+const indexedStoredConnectedSites = makeIndexedStorageAccessor<Record<string, string[]>>(
+    'local',
+    ChromeStorageKey.ConnectedSites
+);
+export const storedConnectedSites = useIndexedStorage(indexedStoredConnectedSites, getGenesisHash);
+export const storedCredentials = makeIndexedStorageAccessor<WalletCredential[]>('local', ChromeStorageKey.Credentials);
 export const storedSelectedAccount = makeStorageAccessor<string>('local', ChromeStorageKey.SelectedAccount);
 export const storedEncryptedSeedPhrase = makeStorageAccessor<EncryptedData>('local', ChromeStorageKey.SeedPhrase);
 export const storedTheme = makeStorageAccessor<Theme>('local', ChromeStorageKey.Theme);
@@ -138,11 +147,3 @@ export const sessionAccountInfoCache = makeIndexedStorageAccessor<Record<string,
 );
 export const sessionIsRecovering = makeStorageAccessor<boolean>('session', ChromeStorageKey.IsRecovering);
 export const sessionOnboardingLocation = makeStorageAccessor<string>('session', ChromeStorageKey.OnboardingLocation);
-
-export const getGenesisHash = () =>
-    storedCurrentNetwork.get().then((network) => {
-        if (!network) {
-            throw new Error('Indexed storage should not be accessed before setting the network');
-        }
-        return network.genesisHash;
-    });

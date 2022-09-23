@@ -1,5 +1,11 @@
 # Changelog
 
+## 0.7.2
+
+### Fixed
+
+-   Connected sites are now stored per network.
+
 ## 0.7.1
 
 ### Fixed

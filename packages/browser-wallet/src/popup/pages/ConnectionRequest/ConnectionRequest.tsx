@@ -3,7 +3,7 @@ import { fullscreenPromptContext } from '@popup/page-layouts/FullscreenPromptLay
 import { selectedAccountAtom, storedConnectedSitesAtom } from '@popup/store/account';
 import { sessionPasscodeAtom } from '@popup/store/settings';
 import { useAtom, useAtomValue } from 'jotai';
-import React, { useContext, useEffect } from 'react';
+import React, { useContext, useEffect, useState } from 'react';
 import { useTranslation } from 'react-i18next';
 import { useLocation, Navigate } from 'react-router-dom';
 import ExternalRequestLayout from '@popup/page-layouts/ExternalRequestLayout';
@@ -24,6 +24,7 @@ export default function ConnectionRequest({ onAllow, onReject }: Props) {
     const [connectedSitesLoading, setConnectedSites] = useAtom(storedConnectedSitesAtom);
     const connectedSites = connectedSitesLoading.value;
     const passcode = useAtomValue(sessionPasscodeAtom);
+    const [connectButtonDisabled, setConnectButtonDisabled] = useState<boolean>(false);
 
     useEffect(() => onClose(onReject), [onClose, onReject]);
 
@@ -41,7 +42,7 @@ export default function ConnectionRequest({ onAllow, onReject }: Props) {
         );
     }
 
-    function connectAccount(account: string, url: string) {
+    async function connectAccount(account: string, url: string) {
         const updatedConnectedSites = {
             ...connectedSites,
         };
@@ -50,7 +51,7 @@ export default function ConnectionRequest({ onAllow, onReject }: Props) {
         connectedSitesForAccount.push(url);
         updatedConnectedSites[account] = connectedSitesForAccount;
 
-        setConnectedSites(updatedConnectedSites);
+        await setConnectedSites(updatedConnectedSites);
     }
 
     // eslint-disable-next-line @typescript-eslint/no-explicit-any
@@ -72,10 +73,11 @@ export default function ConnectionRequest({ onAllow, onReject }: Props) {
                     </Button>
                     <Button
                         width="narrow"
-                        onClick={withClose(() => {
-                            connectAccount(selectedAccount, new URL(url).origin);
-                            onAllow();
-                        })}
+                        disabled={connectButtonDisabled}
+                        onClick={() => {
+                            setConnectButtonDisabled(true);
+                            connectAccount(selectedAccount, new URL(url).origin).then(withClose(onAllow));
+                        }}
                     >
                         {t('actions.connect')}
                     </Button>

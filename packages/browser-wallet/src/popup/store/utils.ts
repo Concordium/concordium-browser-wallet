@@ -52,12 +52,12 @@ export function atomWithChromeStorage<V>(
     key: ChromeStorageKey,
     fallback: V,
     withLoading: true
-): WritableAtom<AsyncWrapper<V>, V, void>;
+): WritableAtom<AsyncWrapper<V>, V, Promise<void>>;
 export function atomWithChromeStorage<V>(
     key: ChromeStorageKey,
     fallback: V,
     withLoading?: false
-): WritableAtom<V, V, void>;
+): WritableAtom<V, V, Promise<void>>;
 
 /**
  * @description
@@ -101,8 +101,8 @@ export function atomWithChromeStorage<V>(key: ChromeStorageKey, fallback: V, wit
 
     const derived = atom(
         (get) => (withLoading ? get(base) : get(base).value),
-        (_, set, next: V) => {
-            setStoredValue(next);
+        async (_, set, next: V) => {
+            await setStoredValue(next);
             set(base, (v) => ({ ...v, value: next }));
         }
     );
