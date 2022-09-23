@@ -76,11 +76,7 @@ export default function ConnectionRequest({ onAllow, onReject }: Props) {
                         disabled={connectButtonDisabled}
                         onClick={() => {
                             setConnectButtonDisabled(true);
-                            connectAccount(selectedAccount, new URL(url).origin).then(
-                                withClose(() => {
-                                    onAllow();
-                                })
-                            );
+                            connectAccount(selectedAccount, new URL(url).origin).then(withClose(onAllow));
                         }}
                     >
                         {t('actions.connect')}
