@@ -1,8 +1,8 @@
-import { createIdentityRequest } from '@concordium/web-sdk';
+import { createIdentityRequest, IdentityRequestInput } from '@concordium/web-sdk';
 import { IdentityIssuanceBackgroundResponse } from '@shared/utils/identity-helpers';
 import { ExtensionMessageHandler, InternalMessageType } from '@concordium/browser-wallet-message-hub';
 import { BackgroundResponseStatus } from '@shared/utils/types';
-import { sessionPendingIdentity } from '@shared/storage/access';
+import { sessionPendingIdentity, storedCurrentNetwork } from '@shared/storage/access';
 import { CreationStatus, PendingIdentity } from '@shared/storage/types';
 import { openWindow } from './window-management';
 
@@ -62,7 +62,14 @@ function handleExternalIssuance(url: string, respond: (response: IdentityIssuanc
         });
 }
 
-export const identityIssuanceHandler: ExtensionMessageHandler = (msg) => {
+async function startIdentityIssuance({
+    baseUrl,
+    ...identityRequestInputs
+}: IdentityRequestInput & { baseUrl: string }) {
+    const network = await storedCurrentNetwork.get();
+    if (!network) {
+        return;
+    }
     const respond = async (response: IdentityIssuanceBackgroundResponse) => {
         let { status } = response;
         const pending = await sessionPendingIdentity.get();
@@ -75,8 +82,8 @@ export const identityIssuanceHandler: ExtensionMessageHandler = (msg) => {
                     status: CreationStatus.Pending,
                     location: response.result,
                 };
-                await addIdentity(newIdentity);
-                confirmIdentity(newIdentity);
+                await addIdentity(newIdentity, network.genesisHash);
+                confirmIdentity(newIdentity, network.genesisHash);
             }
             await sessionPendingIdentity.remove();
         }
@@ -84,7 +91,6 @@ export const identityIssuanceHandler: ExtensionMessageHandler = (msg) => {
         bgMessageHandler.sendInternalMessage(InternalMessageType.EndIdentityIssuance, { ...response, status });
     };
 
-    const { baseUrl, ...identityRequestInputs } = msg.payload;
     const idObjectRequest = createIdentityRequest(identityRequestInputs);
 
     const params = {
@@ -120,4 +126,8 @@ export const identityIssuanceHandler: ExtensionMessageHandler = (msg) => {
                 reason: `Failed to reach identity provider due to: ${e.message}`,
             })
         );
+}
+
+export const identityIssuanceHandler: ExtensionMessageHandler = (msg) => {
+    startIdentityIssuance(msg.payload);
 };
