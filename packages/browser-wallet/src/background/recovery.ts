@@ -154,8 +154,8 @@ async function performRecovery({ providers, ...recoveryInputs }: Payload) {
                 identityIndex += 1;
             }
         }
-        await addIdentity(identitiesToAdd);
-        await addCredential(credsToAdd);
+        await addIdentity(identitiesToAdd, network.genesisHash);
+        await addCredential(credsToAdd, network.genesisHash);
         return {
             identities: identitiesToAdd.map((id) => ({ index: id.index, providerIndex: id.providerIndex })),
             accounts: credsToAdd.map((cred) => cred.address),
