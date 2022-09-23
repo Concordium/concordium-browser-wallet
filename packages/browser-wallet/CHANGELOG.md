@@ -4,6 +4,8 @@
 
 ### Fixed
 
+-   Recovered accounts not showing in reocvery results, if the identity was already present.
+-   Popup after Identity creation not appearing.
 -   Connected sites are now stored per network.
 
 ## 0.7.1
