@@ -2,7 +2,7 @@ import { createIdentityRequest, IdentityRequestInput } from '@concordium/web-sdk
 import { IdentityIssuanceBackgroundResponse } from '@shared/utils/identity-helpers';
 import { ExtensionMessageHandler, InternalMessageType } from '@concordium/browser-wallet-message-hub';
 import { BackgroundResponseStatus } from '@shared/utils/types';
-import { sessionPendingIdentity, storedCurrentNetwork } from '@shared/storage/access';
+import { sessionIdpTab, sessionPendingIdentity, storedCurrentNetwork } from '@shared/storage/access';
 import { CreationStatus, PendingIdentity } from '@shared/storage/types';
 import { openWindow } from './window-management';
 
@@ -12,53 +12,102 @@ import { confirmIdentity } from './confirmation';
 
 const redirectUri = 'ConcordiumRedirectToken';
 const codeUriKey = 'code_uri=';
+const IDP_ALARM_NAME = 'idp';
 
-function handleExternalIssuance(url: string, respond: (response: IdentityIssuanceBackgroundResponse) => void) {
+const respond = async (response: IdentityIssuanceBackgroundResponse) => {
+    // TODO this hack is only needed due to a bug in chrome, which prevents chrome.webRequest hooks from waking up the service worker from inactive state.
+    // Bug will be fixed in chrome v107
+    // https://bugs.chromium.org/p/chromium/issues/detail?id=1024211#c73
+    chrome.alarms.clear(IDP_ALARM_NAME);
+
+    const network = await storedCurrentNetwork.get();
+    if (!network) {
+        return;
+    }
+
+    let { status } = response;
+    const pending = await sessionPendingIdentity.get();
+
+    if (!pending) {
+        status = BackgroundResponseStatus.Aborted;
+    } else {
+        if (response.status === BackgroundResponseStatus.Success) {
+            const newIdentity: PendingIdentity = {
+                ...pending,
+                status: CreationStatus.Pending,
+                location: response.result,
+            };
+            await addIdentity(newIdentity, network.genesisHash);
+            confirmIdentity(newIdentity, network.genesisHash);
+        }
+        await sessionPendingIdentity.remove();
+    }
+
+    await openWindow();
+    bgMessageHandler.sendInternalMessage(InternalMessageType.EndIdentityIssuance, { ...response, status });
+};
+
+export function addIdpListeners() {
+    const closedListener = async (tabId: number) => {
+        const idpTabId = await sessionIdpTab.get();
+
+        if (idpTabId !== undefined && tabId === idpTabId) {
+            chrome.tabs.onRemoved.removeListener(closedListener);
+            respond({
+                status: BackgroundResponseStatus.Aborted,
+            });
+        }
+    };
+
+    chrome.tabs.onRemoved.addListener(closedListener);
+
+    const handleIdpRequest = (redirectUrl: string, tabId: number) => {
+        chrome.tabs.onRemoved.removeListener(closedListener);
+
+        if (tabId !== undefined) {
+            chrome.tabs.remove(tabId);
+            sessionIdpTab.remove();
+        }
+
+        respond({
+            status: BackgroundResponseStatus.Success,
+            result: redirectUrl.substring(redirectUrl.indexOf(codeUriKey) + codeUriKey.length),
+        });
+    };
+
+    chrome.webRequest.onBeforeRequest.addListener(
+        (details) => {
+            sessionIdpTab.get().then((idpTabId) => {
+                if (details.url.includes(redirectUri) && details.tabId === idpTabId) {
+                    handleIdpRequest(details.url, idpTabId);
+                }
+            });
+        },
+        { urls: ['<all_urls>'] }
+    );
+
+    // TODO this hack is only needed due to a bug in chrome, which prevents chrome.webRequest hooks from waking up the service worker from inactive state.
+    // Bug will be fixed in chrome v107
+    // https://bugs.chromium.org/p/chromium/issues/detail?id=1024211#c73
+    chrome.alarms.onAlarm.addListener(() => {
+        /* No-op, to keep script alive while IDP session is ongoing */
+    });
+}
+
+function launchExternalIssuance(url: string) {
     chrome.tabs
         .create({
             url,
         })
         .then((tab) => {
-            const closedListener = (tabId: number) => {
-                if (tabId === tab.id) {
-                    chrome.tabs.onRemoved.removeListener(closedListener);
-                    respond({
-                        status: BackgroundResponseStatus.Aborted,
-                    });
-                }
-            };
-            chrome.tabs.onRemoved.addListener(closedListener);
+            // TODO this hack is only needed due to a bug in chrome, which prevents chrome.webRequest hooks from waking up the service worker from inactive state.
+            // Bug will be fixed in chrome v107
+            // https://bugs.chromium.org/p/chromium/issues/detail?id=1024211#c73
+            chrome.alarms.create(IDP_ALARM_NAME, { periodInMinutes: 4.9 });
 
-            const onComplete = new Promise<string>((resolve) => {
-                chrome.webRequest.onBeforeRedirect.addListener(
-                    function redirectListener(details) {
-                        if (details.redirectUrl.includes(redirectUri)) {
-                            chrome.webRequest.onBeforeRedirect.removeListener(redirectListener);
-                            resolve(details.redirectUrl);
-                        }
-                    },
-                    { urls: ['<all_urls>'], tabId: tab.id }
-                );
-                chrome.webRequest.onBeforeRequest.addListener(
-                    function requestListener(details) {
-                        if (details.url.includes(redirectUri)) {
-                            chrome.webRequest.onBeforeRequest.removeListener(requestListener);
-                            resolve(details.url);
-                        }
-                    },
-                    { urls: ['<all_urls>'], tabId: tab.id }
-                );
-            });
-            onComplete.then((redirectUrl) => {
-                chrome.tabs.onRemoved.removeListener(closedListener);
-                if (tab.id !== undefined) {
-                    chrome.tabs.remove(tab.id);
-                }
-                respond({
-                    status: BackgroundResponseStatus.Success,
-                    result: redirectUrl.substring(redirectUrl.indexOf(codeUriKey) + codeUriKey.length),
-                });
-            });
+            if (tab.id !== undefined) {
+                sessionIdpTab.set(tab.id);
+            }
         });
 }
 
@@ -66,31 +115,6 @@ async function startIdentityIssuance({
     baseUrl,
     ...identityRequestInputs
 }: IdentityRequestInput & { baseUrl: string }) {
-    const network = await storedCurrentNetwork.get();
-    if (!network) {
-        return;
-    }
-    const respond = async (response: IdentityIssuanceBackgroundResponse) => {
-        let { status } = response;
-        const pending = await sessionPendingIdentity.get();
-        if (!pending) {
-            status = BackgroundResponseStatus.Aborted;
-        } else {
-            if (response.status === BackgroundResponseStatus.Success) {
-                const newIdentity: PendingIdentity = {
-                    ...pending,
-                    status: CreationStatus.Pending,
-                    location: response.result,
-                };
-                await addIdentity(newIdentity, network.genesisHash);
-                confirmIdentity(newIdentity, network.genesisHash);
-            }
-            await sessionPendingIdentity.remove();
-        }
-        await openWindow();
-        bgMessageHandler.sendInternalMessage(InternalMessageType.EndIdentityIssuance, { ...response, status });
-    };
-
     const idObjectRequest = createIdentityRequest(identityRequestInputs);
 
     const params = {
@@ -117,7 +141,7 @@ async function startIdentityIssuance({
                     reason: `Initial location did not redirect as expected.`,
                 });
             } else {
-                handleExternalIssuance(response.url, respond);
+                launchExternalIssuance(response.url);
             }
         })
         .catch((e) =>
