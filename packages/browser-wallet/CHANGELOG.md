@@ -1,5 +1,11 @@
 # Changelog
 
+## 0.7.3
+
+### Fixed
+
+-   An issue where the wrong identity was selected when choosing an identity during account creation.
+
 ## 0.7.2
 
 ### Fixed
