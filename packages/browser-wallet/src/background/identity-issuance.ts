@@ -111,10 +111,7 @@ function launchExternalIssuance(url: string) {
         });
 }
 
-async function startIdentityIssuance({
-    baseUrl,
-    ...identityRequestInputs
-}: IdentityRequestInput & { baseUrl: string }) {
+function startIdentityIssuance({ baseUrl, ...identityRequestInputs }: IdentityRequestInput & { baseUrl: string }) {
     const idObjectRequest = createIdentityRequest(identityRequestInputs);
 
     const params = {
