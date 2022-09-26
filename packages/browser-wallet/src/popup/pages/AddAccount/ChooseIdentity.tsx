@@ -40,21 +40,24 @@ export default function ChooseIdentity() {
     return (
         <div className="flex-column align-center">
             <p className="m-t-20">{t('chooseIdentity')}</p>
-            {identities
-                .filter((identity) => identity.status === CreationStatus.Confirmed)
-                .map((identity, i) => (
-                    <IdCard
-                        name={identity.name}
-                        key={`${identity.providerIndex}-${identity.index}`}
-                        provider={<IdentityProviderIcon provider={findProvider(identity)} />}
-                        status={identity.status}
-                        className="m-t-10"
-                        onClick={() => {
-                            setSelectedIdentityIndex(i);
-                            nav('confirm');
-                        }}
-                    />
-                ))}
+            {identities.map((identity, i) => {
+                if (identity.status === CreationStatus.Confirmed) {
+                    return (
+                        <IdCard
+                            name={identity.name}
+                            key={`${identity.providerIndex}-${identity.index}`}
+                            provider={<IdentityProviderIcon provider={findProvider(identity)} />}
+                            status={identity.status}
+                            className="m-t-10"
+                            onClick={() => {
+                                setSelectedIdentityIndex(i);
+                                nav('confirm');
+                            }}
+                        />
+                    );
+                }
+                return null;
+            })}
         </div>
     );
 }
