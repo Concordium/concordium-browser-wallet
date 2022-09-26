@@ -1,5 +1,11 @@
 # Changelog
 
+## 0.7.3
+
+### Fixed
+
+-   An issue where identity issuance could not be completed, due to service worker going inactive.
+
 ## 0.7.2
 
 ### Fixed
