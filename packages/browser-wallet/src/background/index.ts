@@ -13,11 +13,10 @@ import {
 } from '@shared/storage/access';
 
 import JSONBig from 'json-bigint';
-import { ChromeStorageKey, NetworkConfiguration } from '@shared/storage/types';
 import bgMessageHandler from './message-handler';
 import { forwardToPopup, HandleMessage, HandleResponse, RunCondition, setPopupSize } from './window-management';
 import { addIdpListeners, identityIssuanceHandler } from './identity-issuance';
-import { startMonitoringPendingStatus } from './confirmation';
+import { addConfirmationListeners } from './confirmation';
 import { sendCredentialHandler } from './credential-deployment';
 import { recoveryHandler } from './recovery';
 
@@ -95,23 +94,7 @@ const injectScript: ExtensionMessageHandler = (_msg, sender, respond) => {
     return true;
 };
 
-const startupHandler = async () => {
-    const network = await storedCurrentNetwork.get();
-    if (network) {
-        startMonitoringPendingStatus(network);
-    }
-};
-const networkChangeHandler = (network: NetworkConfiguration) => startMonitoringPendingStatus(network);
-
-chrome.storage.local.onChanged.addListener((changes) => {
-    if (ChromeStorageKey.NetworkConfiguration in changes) {
-        networkChangeHandler(changes[ChromeStorageKey.NetworkConfiguration].newValue);
-    }
-});
-
-chrome.runtime.onStartup.addListener(startupHandler);
-chrome.runtime.onInstalled.addListener(startupHandler);
-
+addConfirmationListeners();
 addIdpListeners();
 
 bgMessageHandler.handleMessage(

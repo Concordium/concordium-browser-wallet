@@ -8,7 +8,7 @@ import { openWindow } from './window-management';
 
 import bgMessageHandler from './message-handler';
 import { addIdentity } from './update';
-import { confirmIdentity } from './confirmation';
+import { monitorIdentities } from './confirmation';
 
 const redirectUri = 'ConcordiumRedirectToken';
 const codeUriKey = 'code_uri=';
@@ -38,7 +38,7 @@ const respond = async (response: IdentityIssuanceBackgroundResponse) => {
                 location: response.result,
             };
             await addIdentity(newIdentity, network.genesisHash);
-            confirmIdentity(newIdentity, network.genesisHash);
+            monitorIdentities();
         }
         await sessionPendingIdentity.remove();
     }

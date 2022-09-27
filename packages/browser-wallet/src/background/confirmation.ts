@@ -6,7 +6,6 @@ import {
     PendingIdentity,
     PendingWalletCredential,
     WalletCredential,
-    NetworkConfiguration,
 } from '@shared/storage/types';
 import { IdentityTokenContainer, IdentityProviderIdentityStatus } from 'wallet-common-helpers/lib/utils/identity/types';
 import { updateCredentials, updateIdentities } from './update';
@@ -15,129 +14,150 @@ const isPendingCred = (cred: WalletCredential): cred is PendingWalletCredential 
     cred.status === CreationStatus.Pending;
 const isPendingIdentity = (identity: Identity): identity is PendingIdentity =>
     identity.status === CreationStatus.Pending;
-const updateInterval = 10000;
+const updateIntervalSeconds = 10;
 
-async function monitorCredentialStatus(
-    jsonRpcUrl: string,
-    { deploymentHash, ...info }: PendingWalletCredential,
-    genesisHash: string
-) {
-    const client = new JsonRpcClient(new HttpProvider(jsonRpcUrl, fetch));
-    async function loop() {
-        const network = await storedCurrentNetwork.get();
-        // Stop if the network has changed
-        if (!network || network.genesisHash !== genesisHash) {
-            return;
-        }
-        let repeat = true;
-        try {
-            const response = await client.getTransactionStatus(deploymentHash);
-            if (response?.status === TransactionStatusEnum.Finalized) {
-                const isSuccessful = Object.values(response?.outcomes || {}).some(
-                    (outcome) => outcome.result.outcome === 'success'
-                );
-                await updateCredentials(
-                    [
-                        {
-                            ...info,
-                            status: isSuccessful ? CreationStatus.Confirmed : CreationStatus.Rejected,
-                        },
-                    ],
-                    genesisHash
-                );
-                repeat = false;
-            }
-        } finally {
-            if (repeat) {
-                setTimeout(loop, updateInterval);
-            }
-        }
+const ID_ALARM = 'check_id';
+const CRED_ALARM = 'check_cred';
+
+type CheckFun = () => Promise<boolean>;
+
+const checkStatus = (checkFun: CheckFun, alarmId: string) => async () => {
+    const repeat = await checkFun();
+
+    if (!repeat) {
+        chrome.alarms.clear(alarmId);
     }
-    loop();
-}
+};
 
-/**
- * Start checks on all pending credentials on the current network.
- */
-async function startMonitoringCredentialStatus(network: NetworkConfiguration) {
+const shouldRepeatCheck = async (status: Promise<boolean>[]): Promise<boolean> => {
+    const s = await Promise.all(status);
+    return s.includes(true);
+};
+
+const credentialsChecker: CheckFun = async () => {
+    const network = await storedCurrentNetwork.get();
+
+    if (!network) {
+        return false;
+    }
+
     const creds = await storedCredentials.get(network.genesisHash);
-    if (creds) {
-        creds
-            .filter(isPendingCred)
-            .forEach((cred) => monitorCredentialStatus(network.jsonRpcUrl, cred, network.genesisHash));
-    }
-}
+    const pendingCreds = (creds ?? []).filter(isPendingCred);
 
-/**
- * Continously checks whether pending identities have been confirmed or rejected.
- */
-async function monitorIdentityStatus({ location, ...identity }: PendingIdentity, genesisHash: string) {
-    async function loop() {
-        const network = await storedCurrentNetwork.get();
-        // Stop if the network has changed
-        if (!network || network.genesisHash !== genesisHash) {
-            return;
+    if (pendingCreds.length === 0) {
+        return false;
+    }
+
+    const client = new JsonRpcClient(new HttpProvider(network.jsonRpcUrl, fetch));
+
+    const status = pendingCreds.map(async (c) => {
+        const { deploymentHash, ...info }: PendingWalletCredential = c;
+        const response = await client.getTransactionStatus(deploymentHash);
+
+        if (response?.status !== TransactionStatusEnum.Finalized) {
+            return true;
         }
-        let repeat = true;
-        try {
-            const response = (await (await fetch(location)).json()) as IdentityTokenContainer;
-            if (response.status === IdentityProviderIdentityStatus.Error) {
-                await updateIdentities(
-                    [
-                        {
-                            ...identity,
-                            status: CreationStatus.Rejected,
-                            error: response.detail,
-                        },
-                    ],
-                    genesisHash
-                );
-                repeat = false;
-            } else if (response.status === IdentityProviderIdentityStatus.Done) {
-                await updateIdentities(
-                    [
-                        {
-                            ...identity,
-                            status: CreationStatus.Confirmed,
-                            idObject: response.token.identityObject,
-                        },
-                    ],
-                    genesisHash
-                );
-                repeat = false;
-            }
-        } finally {
-            if (repeat) {
-                setTimeout(loop, updateInterval);
-            }
+
+        const isSuccessful = Object.values(response?.outcomes || {}).some(
+            (outcome) => outcome.result.outcome === 'success'
+        );
+        await updateCredentials(
+            [
+                {
+                    ...info,
+                    status: isSuccessful ? CreationStatus.Confirmed : CreationStatus.Rejected,
+                },
+            ],
+            network.genesisHash
+        );
+
+        return false;
+    });
+
+    return shouldRepeatCheck(status);
+};
+
+const identitiesChecker: CheckFun = async () => {
+    const network = await storedCurrentNetwork.get();
+
+    if (!network) {
+        return false;
+    }
+
+    const identities = await storedIdentities.get(network.genesisHash);
+    const pendingIdentities = (identities ?? []).filter(isPendingIdentity);
+
+    if (pendingIdentities.length === 0) {
+        return false;
+    }
+
+    const status = pendingIdentities.map(async (id) => {
+        const { location, ...identity }: PendingIdentity = id;
+
+        const response = (await (await fetch(location)).json()) as IdentityTokenContainer;
+
+        if (![IdentityProviderIdentityStatus.Error, IdentityProviderIdentityStatus.Done].includes(response.status)) {
+            return true;
         }
-    }
-    loop();
+
+        if (response.status === IdentityProviderIdentityStatus.Error) {
+            await updateIdentities(
+                [
+                    {
+                        ...identity,
+                        status: CreationStatus.Rejected,
+                        error: response.detail,
+                    },
+                ],
+                network.genesisHash
+            );
+        } else if (response.status === IdentityProviderIdentityStatus.Done) {
+            await updateIdentities(
+                [
+                    {
+                        ...identity,
+                        status: CreationStatus.Confirmed,
+                        idObject: response.token.identityObject,
+                    },
+                ],
+                network.genesisHash
+            );
+        }
+
+        return false;
+    });
+
+    return shouldRepeatCheck(status);
+};
+
+const checkCredentialStatus = checkStatus(credentialsChecker, CRED_ALARM);
+const checkIdentityStatus = checkStatus(identitiesChecker, ID_ALARM);
+
+const alarmDetails: chrome.alarms.AlarmCreateInfo = { periodInMinutes: updateIntervalSeconds / 60, delayInMinutes: 0 };
+
+export function monitorCredentials() {
+    chrome.alarms.create(CRED_ALARM, alarmDetails);
 }
 
-/**
- * Start checks on all pending identities on the current network.
- */
-async function startMonitoringIdentityStatus(genesisHash: string) {
-    const identities = await storedIdentities.get(genesisHash);
-    if (identities) {
-        identities.filter(isPendingIdentity).forEach((id) => monitorIdentityStatus(id, genesisHash));
-    }
+export function monitorIdentities() {
+    chrome.alarms.create(ID_ALARM, alarmDetails);
 }
 
-/**
- * Starts jobs on each pending identity and credential on the current network.
- * Also sends an abort signal to currently running jobs.
- */
-export function startMonitoringPendingStatus(network: NetworkConfiguration) {
-    startMonitoringCredentialStatus(network);
-    startMonitoringIdentityStatus(network.genesisHash);
+function monitorEntities() {
+    monitorIdentities();
+    monitorCredentials();
 }
 
-export function confirmIdentity(identity: PendingIdentity, genesisHash: string) {
-    monitorIdentityStatus(identity, genesisHash);
-}
+export function addConfirmationListeners() {
+    chrome.alarms.onAlarm.addListener((alarm) => {
+        if (alarm.name === ID_ALARM) {
+            checkIdentityStatus();
+        }
+        if (alarm.name === CRED_ALARM) {
+            checkCredentialStatus();
+        }
+    });
 
-export function confirmCredential(credential: PendingWalletCredential, jsonRpcUrl: string, genesisHash: string) {
-    monitorCredentialStatus(jsonRpcUrl, credential, genesisHash);
+    chrome.runtime.onStartup.addListener(monitorEntities);
+    chrome.runtime.onInstalled.addListener(monitorEntities);
 }

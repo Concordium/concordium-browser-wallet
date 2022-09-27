@@ -11,7 +11,7 @@ import {
 import { sessionCreatingCredential, storedCurrentNetwork, storedSelectedAccount } from '@shared/storage/access';
 import { CreationStatus, PendingWalletCredential } from '@shared/storage/types';
 import { BackgroundResponseStatus, CredentialDeploymentBackgroundResponse } from '@shared/utils/types';
-import { confirmCredential } from './confirmation';
+import { monitorCredentials } from './confirmation';
 import { addCredential } from './update';
 
 async function createAndSendCredential(credIn: CredentialInputV1): Promise<CredentialDeploymentBackgroundResponse> {
@@ -45,7 +45,7 @@ async function createAndSendCredential(credIn: CredentialInputV1): Promise<Crede
 
         // Add Pending
         await addCredential(newCred, network.genesisHash);
-        confirmCredential(newCred, url, network.genesisHash);
+        monitorCredentials();
         // Set Selected to new account
         await storedSelectedAccount.set(address);
     } finally {
