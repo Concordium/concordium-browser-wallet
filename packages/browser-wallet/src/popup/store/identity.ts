@@ -1,4 +1,10 @@
-import { ChromeStorageKey, Identity, PendingIdentity, IdentityProvider } from '@shared/storage/types';
+import {
+    ChromeStorageKey,
+    Identity,
+    PendingIdentity,
+    IdentityProvider,
+    NetworkConfiguration,
+} from '@shared/storage/types';
 import { atom } from 'jotai';
 import { selectAtom } from 'jotai/utils';
 import { atomWithChromeStorage } from './utils';
@@ -6,6 +12,10 @@ import { atomWithChromeStorage } from './utils';
 export const identitiesAtom = atomWithChromeStorage<Identity[]>(ChromeStorageKey.Identities, [], false);
 export const pendingIdentityAtom = atomWithChromeStorage<Omit<PendingIdentity, 'location'> | undefined>(
     ChromeStorageKey.PendingIdentity,
+    undefined
+);
+export const idpNetworkAtom = atomWithChromeStorage<NetworkConfiguration | undefined>(
+    ChromeStorageKey.IdpNetwork,
     undefined
 );
 // The index here refers to the position in the list.

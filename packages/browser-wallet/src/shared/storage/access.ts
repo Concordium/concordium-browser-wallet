@@ -148,3 +148,4 @@ export const sessionAccountInfoCache = makeIndexedStorageAccessor<Record<string,
 export const sessionIsRecovering = makeStorageAccessor<boolean>('session', ChromeStorageKey.IsRecovering);
 export const sessionOnboardingLocation = makeStorageAccessor<string>('session', ChromeStorageKey.OnboardingLocation);
 export const sessionIdpTab = makeStorageAccessor<number>('session', ChromeStorageKey.IdpTab);
+export const sessionIdpNetwork = makeStorageAccessor<NetworkConfiguration>('session', ChromeStorageKey.IdpNetwork);
