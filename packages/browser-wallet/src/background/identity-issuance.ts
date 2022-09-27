@@ -52,6 +52,7 @@ export function addIdpListeners() {
         const idpTabId = await sessionIdpTab.get();
 
         if (idpTabId !== undefined && tabId === idpTabId) {
+            sessionIdpTab.remove();
             respond({
                 status: BackgroundResponseStatus.Aborted,
             });
