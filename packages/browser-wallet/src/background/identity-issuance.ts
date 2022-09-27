@@ -48,26 +48,19 @@ const respond = async (response: IdentityIssuanceBackgroundResponse) => {
 };
 
 export function addIdpListeners() {
-    const closedListener = async (tabId: number) => {
+    chrome.tabs.onRemoved.addListener(async (tabId: number) => {
         const idpTabId = await sessionIdpTab.get();
 
         if (idpTabId !== undefined && tabId === idpTabId) {
-            chrome.tabs.onRemoved.removeListener(closedListener);
             respond({
                 status: BackgroundResponseStatus.Aborted,
             });
         }
-    };
-
-    chrome.tabs.onRemoved.addListener(closedListener);
+    });
 
     const handleIdpRequest = (redirectUrl: string, tabId: number) => {
-        chrome.tabs.onRemoved.removeListener(closedListener);
-
-        if (tabId !== undefined) {
-            chrome.tabs.remove(tabId);
-            sessionIdpTab.remove();
-        }
+        chrome.tabs.remove(tabId);
+        sessionIdpTab.remove();
 
         respond({
             status: BackgroundResponseStatus.Success,
