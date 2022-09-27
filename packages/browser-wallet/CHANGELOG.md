@@ -4,7 +4,7 @@
 
 ### Fixed
 
--   Recovered accounts not showing in reocvery results, if the identity was already present.
+-   Recovered accounts not showing in recovery results when the identity is already present.```
 -   Popup after Identity creation not appearing.
 -   Connected sites are now stored per network.
 
