@@ -20,12 +20,14 @@ import {
 } from '@shared/storage/access';
 import { identityMatch, isIdentityOfCredential } from '@shared/utils/identity-helpers';
 import { getNextUnused } from '@shared/utils/number-helpers';
-import { addCredential, addIdentity } from './update';
+import { partition } from 'wallet-common-helpers';
+import { addCredential, addIdentity, updateCredentials } from './update';
 import bgMessageHandler from './message-handler';
 import { openWindow } from './window-management';
 
 // How many empty identityIndices are allowed before stopping
 const maxEmpty = 20;
+const RECOVERY_ALARM_NAME = 'recoveryAlarm';
 
 async function recoverAccounts(
     status: RecoveryStatus,
@@ -58,6 +60,12 @@ async function recoverAccounts(
             }
         }
         credNumber += 1;
+        await sessionRecoveryStatus.set({
+            ...status,
+            credentialNumber: credNumber,
+            credentialGap: emptyIndices,
+            credentialsToAdd: (status.credentialsToAdd || []).concat(credsToAdd),
+        });
     }
     return credsToAdd;
 }
@@ -74,7 +82,8 @@ function getRecoverUrl(inputs: Omit<IdentityRecoveryRequestInput, 'timestamp' | 
 
 async function performRecovery() {
     try {
-        const status = await sessionRecoveryStatus.get();
+        chrome.alarms.create(RECOVERY_ALARM_NAME, { delayInMinutes: 4.7 });
+        let status = await sessionRecoveryStatus.get();
         if (!status) {
             throw new Error('Recovery was started without a status object.');
         }
@@ -97,6 +106,9 @@ async function performRecovery() {
         const getAccountInfo = (credId: string) =>
             client.getAccountInfo(new CredentialRegistrationId(credId), blockHash);
 
+        let initialGap: number | undefined = status.identityGap || 0;
+        let initialIndex: number | undefined = status.identityIndex || 0;
+
         for (const provider of providers) {
             const providerIndex = provider.ipInfo.ipIdentity;
             if (completedProviders.includes(providerIndex)) {
@@ -108,8 +120,10 @@ async function performRecovery() {
                 // eslint-disable-next-line no-continue
                 continue;
             }
-            let emptyIndices = status.identityGap || 0;
-            let identityIndex = status.identityIndex || 0;
+            let emptyIndices = initialGap || 0;
+            initialGap = undefined;
+            let identityIndex = initialIndex || 0;
+            initialIndex = undefined;
             while (emptyIndices < maxEmpty) {
                 // Check if there is already an identity on the current index
                 let identity = identities?.find(identityMatch({ index: identityIndex, providerIndex }));
@@ -150,7 +164,7 @@ async function performRecovery() {
                             },
                             getAccountInfo,
                             credsToAdd
-                                .concat(credentials || [])
+                                .concat(credentials?.filter((c) => c.status !== CreationStatus.Rejected) || [])
                                 .filter(isIdentityOfCredential(identity))
                                 .map((cred) => cred.credNumber)
                         );
@@ -162,26 +176,47 @@ async function performRecovery() {
                     emptyIndices += 1;
                 }
                 identityIndex += 1;
-                completedProviders.push(providerIndex);
-                await sessionRecoveryStatus.set({
+                status = {
                     payload: status.payload,
-                    identityIndex,
-                    identityGap: emptyIndices,
                     identitiesToAdd,
                     credentialsToAdd: credsToAdd,
                     completedProviders,
                     nextId,
-                });
+                    identityIndex,
+                    identityGap: emptyIndices,
+                };
+                await sessionRecoveryStatus.set(status);
             }
+            completedProviders.push(providerIndex);
+            status = {
+                payload: status.payload,
+                identitiesToAdd,
+                credentialsToAdd: credsToAdd,
+                completedProviders,
+                nextId,
+            };
+            await sessionRecoveryStatus.set(status);
         }
-        await addIdentity(identitiesToAdd, network.genesisHash);
-        await addCredential(credsToAdd, network.genesisHash);
+        if (identitiesToAdd.length) {
+            await addIdentity(identitiesToAdd, network.genesisHash);
+        }
+        const [updates, newCreds] = partition(
+            credsToAdd,
+            (cred) => !!credentials && credentials.some((cand) => cred.credId === cand.credId)
+        );
+        if (updates.length) {
+            await updateCredentials(updates, network.genesisHash);
+        }
+        if (newCreds.length) {
+            await addCredential(newCreds, network.genesisHash);
+        }
         return {
             identities: identitiesToAdd.map((id) => ({ index: id.index, providerIndex: id.providerIndex })),
             accounts: credsToAdd.map((cred) => cred.address),
         };
     } finally {
         await sessionIsRecovering.set(false);
+        chrome.alarms.clear(RECOVERY_ALARM_NAME);
     }
 }
 
@@ -196,4 +231,8 @@ export async function startRecovery() {
             .then((added) => respond({ status: BackgroundResponseStatus.Success, added }))
             .catch((e) => respond({ status: BackgroundResponseStatus.Error, reason: e.toString() }));
     }
+
+    chrome.alarms.onAlarm.addListener(() => {
+        /* No-op, to restart the script while recovery is ongoing */
+    });
 }
