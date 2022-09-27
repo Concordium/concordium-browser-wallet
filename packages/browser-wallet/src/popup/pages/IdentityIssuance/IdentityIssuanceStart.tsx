@@ -2,7 +2,7 @@ import React, { useState, useEffect, useCallback } from 'react';
 import { useAtomValue, useAtom, useSetAtom } from 'jotai';
 import { useTranslation } from 'react-i18next';
 import { networkConfigurationAtom } from '@popup/store/settings';
-import { pendingIdentityAtom, identitiesAtom, identityProvidersAtom } from '@popup/store/identity';
+import { pendingIdentityAtom, identitiesAtom, identityProvidersAtom, idpNetworkAtom } from '@popup/store/identity';
 import { popupMessageHandler } from '@popup/shared/message-handler';
 import { getIdentityProviders } from '@popup/shared/utils/wallet-proxy';
 import { InternalMessageType } from '@concordium/browser-wallet-message-hub';
@@ -106,6 +106,7 @@ function IdentityIssuanceStart({ onStart }: InnerProps) {
 export default function IdentityIssuanceStartGuard() {
     const { t } = useTranslation('identityIssuance');
     const [pendingIdentity, setPendingidentity] = useAtom(pendingIdentityAtom);
+    const setIdpNetwork = useSetAtom(idpNetworkAtom);
     const [blocked, setBlocked] = useState(false);
     const [started, setStarted] = useState(false);
 
@@ -115,17 +116,17 @@ export default function IdentityIssuanceStartGuard() {
         }
     }, [pendingIdentity]);
 
+    const reset = () => {
+        setPendingidentity(undefined);
+        setBlocked(false);
+        setIdpNetwork(undefined);
+    };
+
     if (blocked) {
         return (
             <div className="identity-issuance__start">
                 <p className="identity-issuance__start-text">{t('alreadyPending')}</p>
-                <Button
-                    width="wide"
-                    onClick={() => {
-                        setPendingidentity(undefined);
-                        setBlocked(false);
-                    }}
-                >
+                <Button width="wide" onClick={reset}>
                     {t('reset')}
                 </Button>
             </div>

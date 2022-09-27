@@ -2,7 +2,7 @@ import { createIdentityRequest, IdentityRequestInput } from '@concordium/web-sdk
 import { IdentityIssuanceBackgroundResponse } from '@shared/utils/identity-helpers';
 import { ExtensionMessageHandler, InternalMessageType } from '@concordium/browser-wallet-message-hub';
 import { BackgroundResponseStatus } from '@shared/utils/types';
-import { sessionIdpTab, sessionPendingIdentity, storedCurrentNetwork } from '@shared/storage/access';
+import { sessionIdpNetwork, sessionIdpTab, sessionPendingIdentity, storedCurrentNetwork } from '@shared/storage/access';
 import { CreationStatus, PendingIdentity } from '@shared/storage/types';
 import { openWindow } from './window-management';
 
@@ -20,7 +20,7 @@ const respond = async (response: IdentityIssuanceBackgroundResponse) => {
     // https://bugs.chromium.org/p/chromium/issues/detail?id=1024211#c73
     chrome.alarms.clear(IDP_ALARM_NAME);
 
-    const network = await storedCurrentNetwork.get();
+    const network = await sessionIdpNetwork.get();
     if (!network) {
         return;
     }
@@ -30,18 +30,18 @@ const respond = async (response: IdentityIssuanceBackgroundResponse) => {
 
     if (!pending) {
         status = BackgroundResponseStatus.Aborted;
-    } else {
-        if (response.status === BackgroundResponseStatus.Success) {
-            const newIdentity: PendingIdentity = {
-                ...pending,
-                status: CreationStatus.Pending,
-                location: response.result,
-            };
-            await addIdentity(newIdentity, network.genesisHash);
-            confirmIdentity(newIdentity, network.genesisHash);
-        }
-        await sessionPendingIdentity.remove();
+    } else if (response.status === BackgroundResponseStatus.Success) {
+        const newIdentity: PendingIdentity = {
+            ...pending,
+            status: CreationStatus.Pending,
+            location: response.result,
+        };
+        await addIdentity(newIdentity, network.genesisHash);
+        confirmIdentity(newIdentity, network.genesisHash);
     }
+
+    sessionPendingIdentity.remove();
+    sessionIdpNetwork.remove();
 
     await openWindow();
     bgMessageHandler.sendInternalMessage(InternalMessageType.EndIdentityIssuance, { ...response, status });
@@ -104,7 +104,10 @@ function launchExternalIssuance(url: string) {
         });
 }
 
-function startIdentityIssuance({ baseUrl, ...identityRequestInputs }: IdentityRequestInput & { baseUrl: string }) {
+async function startIdentityIssuance({
+    baseUrl,
+    ...identityRequestInputs
+}: IdentityRequestInput & { baseUrl: string }) {
     const idObjectRequest = createIdentityRequest(identityRequestInputs);
 
     const params = {
@@ -115,31 +118,37 @@ function startIdentityIssuance({ baseUrl, ...identityRequestInputs }: IdentityRe
     };
     const searchParams = new URLSearchParams(params);
     const url = Object.entries(params).length === 0 ? baseUrl : `${baseUrl}?${searchParams.toString()}`;
+    const network = await storedCurrentNetwork.get();
 
-    fetch(url)
-        .then((response) => {
-            if (!response.ok) {
-                response.json().then((body) =>
-                    respond({
-                        status: BackgroundResponseStatus.Error,
-                        reason: body?.message || `Provider returned status code ${response.status}.`,
-                    })
-                );
-            } else if (!response.redirected) {
-                respond({
-                    status: BackgroundResponseStatus.Error,
-                    reason: `Initial location did not redirect as expected.`,
-                });
-            } else {
-                launchExternalIssuance(response.url);
-            }
-        })
-        .catch((e) =>
+    if (!network) {
+        return;
+    }
+
+    await sessionIdpNetwork.set(network);
+
+    try {
+        const response = await fetch(url);
+
+        if (!response.ok) {
             respond({
                 status: BackgroundResponseStatus.Error,
-                reason: `Failed to reach identity provider due to: ${e.message}`,
-            })
-        );
+                reason: (await response.json())?.message || `Provider returned status code ${response.status}.`,
+            });
+        } else if (!response.redirected) {
+            respond({
+                status: BackgroundResponseStatus.Error,
+                reason: `Initial location did not redirect as expected.`,
+            });
+        } else {
+            launchExternalIssuance(response.url);
+        }
+        // eslint-disable-next-line @typescript-eslint/no-explicit-any
+    } catch (e: any) {
+        respond({
+            status: BackgroundResponseStatus.Error,
+            reason: `Failed to reach identity provider due to: ${e.message}`,
+        });
+    }
 }
 
 export const identityIssuanceHandler: ExtensionMessageHandler = (msg) => {
