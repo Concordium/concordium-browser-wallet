@@ -6,6 +6,8 @@ import {
     PendingIdentity,
     PendingWalletCredential,
     WalletCredential,
+    ConfirmedIdentity,
+    RejectedIdentity,
 } from '@shared/storage/types';
 import { IdentityTokenContainer, IdentityProviderIdentityStatus } from 'wallet-common-helpers/lib/utils/identity/types';
 import { updateCredentials, updateIdentities } from './update';
@@ -19,7 +21,8 @@ const updateIntervalSeconds = 10;
 const ID_ALARM = 'check_id';
 const CRED_ALARM = 'check_cred';
 
-type CheckFun = () => Promise<boolean>;
+type ShouldRepeat = boolean;
+type CheckFun = () => Promise<ShouldRepeat>;
 
 const checkStatus = (checkFun: CheckFun, alarmId: string) => async () => {
     const repeat = await checkFun();
@@ -29,7 +32,7 @@ const checkStatus = (checkFun: CheckFun, alarmId: string) => async () => {
     }
 };
 
-const shouldRepeatCheck = async (status: Promise<boolean>[]): Promise<boolean> => {
+const shouldRepeatCheck = async (status: Promise<ShouldRepeat>[]): Promise<ShouldRepeat> => {
     const s = await Promise.all(status);
     return s.includes(true);
 };
@@ -42,7 +45,7 @@ const credentialsChecker: CheckFun = async () => {
     }
 
     const creds = await storedCredentials.get(network.genesisHash);
-    const pendingCreds = (creds ?? []).filter(isPendingCred);
+    const pendingCreds = creds?.filter(isPendingCred) ?? [];
 
     if (pendingCreds.length === 0) {
         return false;
@@ -61,15 +64,11 @@ const credentialsChecker: CheckFun = async () => {
         const isSuccessful = Object.values(response?.outcomes || {}).some(
             (outcome) => outcome.result.outcome === 'success'
         );
-        await updateCredentials(
-            [
-                {
-                    ...info,
-                    status: isSuccessful ? CreationStatus.Confirmed : CreationStatus.Rejected,
-                },
-            ],
-            network.genesisHash
-        );
+        const credential: WalletCredential = {
+            ...info,
+            status: isSuccessful ? CreationStatus.Confirmed : CreationStatus.Rejected,
+        };
+        await updateCredentials([credential], network.genesisHash);
 
         return false;
     });
@@ -85,7 +84,7 @@ const identitiesChecker: CheckFun = async () => {
     }
 
     const identities = await storedIdentities.get(network.genesisHash);
-    const pendingIdentities = (identities ?? []).filter(isPendingIdentity);
+    const pendingIdentities = identities?.filter(isPendingIdentity) ?? [];
 
     if (pendingIdentities.length === 0) {
         return false;
@@ -100,29 +99,16 @@ const identitiesChecker: CheckFun = async () => {
             return true;
         }
 
-        if (response.status === IdentityProviderIdentityStatus.Error) {
-            await updateIdentities(
-                [
-                    {
-                        ...identity,
-                        status: CreationStatus.Rejected,
-                        error: response.detail,
-                    },
-                ],
-                network.genesisHash
-            );
-        } else if (response.status === IdentityProviderIdentityStatus.Done) {
-            await updateIdentities(
-                [
-                    {
-                        ...identity,
-                        status: CreationStatus.Confirmed,
-                        idObject: response.token.identityObject,
-                    },
-                ],
-                network.genesisHash
-            );
-        }
+        type FinalizedIdentityProperties =
+            | Pick<ConfirmedIdentity, 'status' | 'idObject'>
+            | Pick<RejectedIdentity, 'status' | 'error'>;
+
+        const identityDetails: FinalizedIdentityProperties =
+            response.status === IdentityProviderIdentityStatus.Done
+                ? { status: CreationStatus.Confirmed, idObject: response.token.identityObject }
+                : { status: CreationStatus.Rejected, error: response.detail };
+
+        await updateIdentities([{ ...identity, ...identityDetails }], network.genesisHash);
 
         return false;
     });
