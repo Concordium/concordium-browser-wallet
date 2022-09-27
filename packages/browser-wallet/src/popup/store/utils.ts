@@ -19,6 +19,7 @@ import {
     sessionIsRecovering,
     storedHasBeenOnboarded,
     sessionOnboardingLocation,
+    sessionRecoveryStatus,
 } from '@shared/storage/access';
 import { ChromeStorageKey } from '@shared/storage/types';
 import { atom, WritableAtom } from 'jotai';
@@ -41,6 +42,7 @@ const accessorMap = {
     [ChromeStorageKey.IsCreatingCredential]: sessionCreatingCredential,
     [ChromeStorageKey.AccountInfoCache]: useIndexedStorage(sessionAccountInfoCache, getGenesisHash),
     [ChromeStorageKey.OnboardingLocation]: sessionOnboardingLocation,
+    [ChromeStorageKey.RecoveryStatus]: sessionRecoveryStatus,
 };
 
 export type AsyncWrapper<V> = {

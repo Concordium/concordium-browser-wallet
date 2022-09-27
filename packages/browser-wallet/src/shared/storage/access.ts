@@ -7,6 +7,7 @@ import {
     WalletCredential,
     IdentityProvider,
     NetworkConfiguration,
+    RecoveryStatus,
 } from './types';
 
 export type StorageAccessor<V> = {
@@ -146,4 +147,5 @@ export const sessionAccountInfoCache = makeIndexedStorageAccessor<Record<string,
     ChromeStorageKey.AccountInfoCache
 );
 export const sessionIsRecovering = makeStorageAccessor<boolean>('session', ChromeStorageKey.IsRecovering);
+export const sessionRecoveryStatus = makeStorageAccessor<RecoveryStatus>('session', ChromeStorageKey.RecoveryStatus);
 export const sessionOnboardingLocation = makeStorageAccessor<string>('session', ChromeStorageKey.OnboardingLocation);

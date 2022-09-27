@@ -1,11 +1,9 @@
 import React, { useEffect, useState, useCallback } from 'react';
 import { useNavigate } from 'react-router-dom';
-import { useAtom, useAtomValue } from 'jotai';
+import { useAtom, useAtomValue, useSetAtom } from 'jotai';
 import { useTranslation } from 'react-i18next';
 import { networkConfigurationAtom } from '@popup/store/settings';
-import { popupMessageHandler } from '@popup/shared/message-handler';
-import { InternalMessageType } from '@concordium/browser-wallet-message-hub';
-import { identityProvidersAtom, isRecoveringAtom } from '@popup/store/identity';
+import { identityProvidersAtom, isRecoveringAtom, setRecoveryPayloadAtom } from '@popup/store/identity';
 import PendingArrows from '@assets/svg/pending-arrows.svg';
 import { BackgroundResponseStatus } from '@shared/utils/types';
 import { getIdentityProviders } from '@popup/shared/utils/wallet-proxy';
@@ -19,6 +17,7 @@ export default function RecoveryMain() {
     const network = useAtomValue(networkConfigurationAtom);
     const [providers, setProviders] = useAtom(identityProvidersAtom);
     const [isRecovering, setIsRecovering] = useAtom(isRecoveringAtom);
+    const setRecoveryStatus = useSetAtom(setRecoveryPayloadAtom);
     const [runRecovery, setRunRecovery] = useState<boolean>(true);
     const navigate = useNavigate();
 
@@ -51,15 +50,15 @@ export default function RecoveryMain() {
         }
 
         getGlobal(network)
-            .then((global) => {
-                setIsRecovering(true);
-                popupMessageHandler.sendInternalMessage(InternalMessageType.Recovery, {
+            .then((global) =>
+                setRecoveryStatus({
                     providers,
                     globalContext: global,
                     seedAsHex: seedPhrase,
                     net: getNet(network),
-                });
-            })
+                })
+            )
+            .then(() => setIsRecovering(true))
             .catch((error) => onError(error.message));
     }, [runRecovery, isRecovering.loading, isRecovering.value, providers.length, seedPhrase]);
 

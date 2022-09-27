@@ -4,16 +4,20 @@ import {
     createIdentityRecoveryRequest,
     CredentialInputV1,
     CredentialRegistrationId,
-    CryptographicParameters,
     HttpProvider,
     IdentityRecoveryRequestInput,
     JsonRpcClient,
-    Network,
 } from '@concordium/web-sdk';
-import { ExtensionMessageHandler, InternalMessageType } from '@concordium/browser-wallet-message-hub';
+import { InternalMessageType } from '@concordium/browser-wallet-message-hub';
 import { BackgroundResponseStatus, RecoveryBackgroundResponse } from '@shared/utils/types';
-import { Identity, CreationStatus, IdentityProvider, WalletCredential } from '@shared/storage/types';
-import { sessionIsRecovering, storedCredentials, storedCurrentNetwork, storedIdentities } from '@shared/storage/access';
+import { Identity, CreationStatus, IdentityProvider, WalletCredential, RecoveryStatus } from '@shared/storage/types';
+import {
+    sessionIsRecovering,
+    sessionRecoveryStatus,
+    storedCredentials,
+    storedCurrentNetwork,
+    storedIdentities,
+} from '@shared/storage/access';
 import { identityMatch, isIdentityOfCredential } from '@shared/utils/identity-helpers';
 import { getNextUnused } from '@shared/utils/number-helpers';
 import { addCredential, addIdentity } from './update';
@@ -24,7 +28,7 @@ import { openWindow } from './window-management';
 const maxEmpty = 20;
 
 async function recoverAccounts(
-    identityIndex: number,
+    status: RecoveryStatus,
     providerIndex: number,
     credentialInput: Omit<CredentialInputV1, 'credNumber'>,
     getAccountInfo: (credId: string) => Promise<AccountInfo | undefined>,
@@ -32,8 +36,8 @@ async function recoverAccounts(
 ): Promise<WalletCredential[]> {
     const credsToAdd: WalletCredential[] = [];
 
-    let emptyIndices = 0;
-    let credNumber = getNextUnused(usedCredNumbersOfIdentity);
+    let emptyIndices = status.credentialGap || 0;
+    let credNumber = status.credentialNumber || getNextUnused(usedCredNumbersOfIdentity);
     while (emptyIndices < maxEmpty) {
         if (!usedCredNumbersOfIdentity.includes(credNumber)) {
             const request = createCredentialV1({ ...credentialInput, credNumber });
@@ -45,7 +49,7 @@ async function recoverAccounts(
                     credId,
                     credNumber,
                     status: CreationStatus.Confirmed,
-                    identityIndex,
+                    identityIndex: status.identityIndex || 0,
                     providerIndex,
                 });
                 emptyIndices = 0;
@@ -58,13 +62,6 @@ async function recoverAccounts(
     return credsToAdd;
 }
 
-export type Payload = {
-    providers: IdentityProvider[];
-    globalContext: CryptographicParameters;
-    seedAsHex: string;
-    net: Network;
-};
-
 function getRecoverUrl(inputs: Omit<IdentityRecoveryRequestInput, 'timestamp' | 'ipInfo'>, provider: IdentityProvider) {
     const timestamp = Math.floor(Date.now() / 1000);
     const idRecoveryRequest = createIdentityRecoveryRequest({ ...inputs, timestamp, ipInfo: provider.ipInfo });
@@ -75,11 +72,18 @@ function getRecoverUrl(inputs: Omit<IdentityRecoveryRequestInput, 'timestamp' | 
     return `${provider.metadata.recoveryStart}?${searchParams.toString()}`;
 }
 
-async function performRecovery({ providers, ...recoveryInputs }: Payload) {
+async function performRecovery() {
     try {
-        const identitiesToAdd: Identity[] = [];
-        const credsToAdd: WalletCredential[] = [];
-        let nextId = 0;
+        const status = await sessionRecoveryStatus.get();
+        if (!status) {
+            throw new Error('Recovery was started without a status object.');
+        }
+        const { providers, ...recoveryInputs } = status.payload;
+
+        const identitiesToAdd: Identity[] = status.identitiesToAdd || [];
+        const credsToAdd: WalletCredential[] = status.credentialsToAdd || [];
+        const completedProviders = status.completedProviders || [];
+        let nextId = status?.nextId || 0;
 
         const network = await storedCurrentNetwork.get();
         if (!network) {
@@ -94,14 +98,18 @@ async function performRecovery({ providers, ...recoveryInputs }: Payload) {
             client.getAccountInfo(new CredentialRegistrationId(credId), blockHash);
 
         for (const provider of providers) {
+            const providerIndex = provider.ipInfo.ipIdentity;
+            if (completedProviders.includes(providerIndex)) {
+                // eslint-disable-next-line no-continue
+                continue;
+            }
             // TODO: Is required because some identity providers do not have a recoveryStart value. This is an error and should be fixed in the wallet proxy. At that point this can be safely removed.
             if (!provider.metadata.recoveryStart) {
                 // eslint-disable-next-line no-continue
                 continue;
             }
-            const providerIndex = provider.ipInfo.ipIdentity;
-            let emptyIndices = 0;
-            let identityIndex = 0;
+            let emptyIndices = status.identityGap || 0;
+            let identityIndex = status.identityIndex || 0;
             while (emptyIndices < maxEmpty) {
                 // Check if there is already an identity on the current index
                 let identity = identities?.find(identityMatch({ index: identityIndex, providerIndex }));
@@ -119,32 +127,34 @@ async function performRecovery({ providers, ...recoveryInputs }: Payload) {
                             idObject,
                         };
                         identitiesToAdd.push(identity);
+                        status.identitiesToAdd = identitiesToAdd;
+                        await sessionRecoveryStatus.set(status);
                     }
                 }
                 if (identity) {
                     // Only recover accounts, if we found an identity
                     if (identity.status === CreationStatus.Confirmed) {
-                        credsToAdd.push(
-                            ...(await recoverAccounts(
+                        const foundCreds = await recoverAccounts(
+                            status,
+                            providerIndex,
+                            {
                                 identityIndex,
-                                providerIndex,
-                                {
-                                    identityIndex,
-                                    ipInfo: provider.ipInfo,
-                                    arsInfos: provider.arsInfos,
-                                    globalContext: recoveryInputs.globalContext,
-                                    seedAsHex: recoveryInputs.seedAsHex,
-                                    net: recoveryInputs.net,
-                                    expiry: Date.now(),
-                                    revealedAttributes: [],
-                                    idObject: identity.idObject.value,
-                                },
-                                getAccountInfo,
-                                (credentials || [])
-                                    .filter(isIdentityOfCredential(identity))
-                                    .map((cred) => cred.credNumber)
-                            ))
+                                ipInfo: provider.ipInfo,
+                                arsInfos: provider.arsInfos,
+                                globalContext: recoveryInputs.globalContext,
+                                seedAsHex: recoveryInputs.seedAsHex,
+                                net: recoveryInputs.net,
+                                expiry: Date.now(),
+                                revealedAttributes: [],
+                                idObject: identity.idObject.value,
+                            },
+                            getAccountInfo,
+                            credsToAdd
+                                .concat(credentials || [])
+                                .filter(isIdentityOfCredential(identity))
+                                .map((cred) => cred.credNumber)
                         );
+                        credsToAdd.push(...foundCreds);
                     }
                     nextId += 1;
                     emptyIndices = 0;
@@ -152,6 +162,16 @@ async function performRecovery({ providers, ...recoveryInputs }: Payload) {
                     emptyIndices += 1;
                 }
                 identityIndex += 1;
+                completedProviders.push(providerIndex);
+                await sessionRecoveryStatus.set({
+                    payload: status.payload,
+                    identityIndex,
+                    identityGap: emptyIndices,
+                    identitiesToAdd,
+                    credentialsToAdd: credsToAdd,
+                    completedProviders,
+                    nextId,
+                });
             }
         }
         await addIdentity(identitiesToAdd, network.genesisHash);
@@ -165,12 +185,15 @@ async function performRecovery({ providers, ...recoveryInputs }: Payload) {
     }
 }
 
-export const recoveryHandler: ExtensionMessageHandler = (msg) => {
-    const respond = async (result: RecoveryBackgroundResponse) => {
-        await openWindow();
-        bgMessageHandler.sendInternalMessage(InternalMessageType.RecoveryFinished, result);
-    };
-    performRecovery(msg.payload)
-        .then((added) => respond({ status: BackgroundResponseStatus.Success, added }))
-        .catch((e) => respond({ status: BackgroundResponseStatus.Error, reason: e.toString() }));
-};
+export async function startRecovery() {
+    const isRecovering = await sessionIsRecovering.get();
+    if (isRecovering) {
+        const respond = async (result: RecoveryBackgroundResponse) => {
+            await openWindow();
+            bgMessageHandler.sendInternalMessage(InternalMessageType.RecoveryFinished, result);
+        };
+        performRecovery()
+            .then((added) => respond({ status: BackgroundResponseStatus.Success, added }))
+            .catch((e) => respond({ status: BackgroundResponseStatus.Error, reason: e.toString() }));
+    }
+}

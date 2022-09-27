@@ -19,7 +19,7 @@ import { forwardToPopup, HandleMessage, HandleResponse, RunCondition, setPopupSi
 import { identityIssuanceHandler } from './identity-issuance';
 import { startMonitoringPendingStatus } from './confirmation';
 import { sendCredentialHandler } from './credential-deployment';
-import { recoveryHandler } from './recovery';
+import { startRecovery } from './recovery';
 
 const walletLockedMessage = 'The wallet is locked';
 async function isWalletLocked(): Promise<boolean> {
@@ -109,6 +109,13 @@ chrome.storage.local.onChanged.addListener((changes) => {
     }
 });
 
+chrome.storage.session.onChanged.addListener((changes) => {
+    if (ChromeStorageKey.IsRecovering in changes) {
+        startRecovery();
+    }
+});
+
+startRecovery();
 chrome.runtime.onStartup.addListener(startupHandler);
 chrome.runtime.onInstalled.addListener(startupHandler);
 
@@ -117,7 +124,6 @@ bgMessageHandler.handleMessage(
     sendCredentialHandler
 );
 
-bgMessageHandler.handleMessage(createMessageTypeFilter(InternalMessageType.Recovery), recoveryHandler);
 bgMessageHandler.handleMessage(
     createMessageTypeFilter(InternalMessageType.StartIdentityIssuance),
     identityIssuanceHandler
