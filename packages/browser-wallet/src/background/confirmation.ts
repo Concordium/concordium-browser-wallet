@@ -8,6 +8,7 @@ import {
     WalletCredential,
     ConfirmedIdentity,
     RejectedIdentity,
+    ChromeStorageKey,
 } from '@shared/storage/types';
 import { IdentityTokenContainer, IdentityProviderIdentityStatus } from 'wallet-common-helpers/lib/utils/identity/types';
 import { updateCredentials, updateIdentities } from './update';
@@ -146,4 +147,10 @@ export function addConfirmationListeners() {
 
     chrome.runtime.onStartup.addListener(monitorEntities);
     chrome.runtime.onInstalled.addListener(monitorEntities);
+
+    chrome.storage.local.onChanged.addListener((changes) => {
+        if (ChromeStorageKey.NetworkConfiguration in changes) {
+            monitorEntities();
+        }
+    });
 }
