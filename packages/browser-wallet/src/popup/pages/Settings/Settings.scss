@@ -10,10 +10,20 @@
 
     &__toggle {
         position: absolute;
-        width: $switch-width;
-        bottom: rem(8px);
+        width: rem(110px);
+        height: rem(40px);
+        bottom: rem(10px);
         left: 0;
         right: 0;
         margin: 0 auto;
+        display: flex;
+        flex-direction: column;
+        justify-content: space-between;
+        align-items: center;
+    }
+
+    &__button {
+        width: rem(24px);
+        height: rem(24px);
     }
 }
