@@ -2,7 +2,7 @@ const t = {
     intro: {
         welcome: "Welcome to Concordium's official browser extension wallet.",
         description:
-            'On the following pages you will be guided through the process of optaining a new account or restoring old ones.',
+            'On the following pages you will be guided through the process of obtaining a new account or restoring old ones.',
         form: {
             termsAndConditionsRequired: 'You must read and accept the terms and conditions',
             termsAndConditionsDescription: 'I have read and agree to the',
@@ -22,7 +22,7 @@ const t = {
     },
     createRestore: {
         description:
-            'You now have the option create a new wallet or restore an existing one. How do you want to proceed?',
+            'You now have the option to create a new wallet or restore an existing one. How do you want to proceed?',
         create: 'Create',
         restore: 'Restore',
     },
