@@ -49,7 +49,7 @@ export const identityNamesAtom = selectAtom(identitiesAtom, (identities) => {
 });
 
 export const isRecoveringAtom = atomWithChromeStorage<boolean>(ChromeStorageKey.IsRecovering, false, true);
-const recoveryStatusAtom = atomWithChromeStorage<RecoveryStatus | undefined>(
+export const recoveryStatusAtom = atomWithChromeStorage<RecoveryStatus | undefined>(
     ChromeStorageKey.RecoveryStatus,
     undefined,
     true
