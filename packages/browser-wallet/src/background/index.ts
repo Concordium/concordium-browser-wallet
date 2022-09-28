@@ -111,7 +111,9 @@ chrome.storage.local.onChanged.addListener((changes) => {
 
 chrome.storage.session.onChanged.addListener((changes) => {
     if (ChromeStorageKey.IsRecovering in changes) {
-        startRecovery();
+        if (changes[ChromeStorageKey.IsRecovering].newValue) {
+            startRecovery();
+        }
     }
 });
 

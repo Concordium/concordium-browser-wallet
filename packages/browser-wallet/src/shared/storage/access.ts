@@ -119,8 +119,6 @@ export const getGenesisHash = () =>
 
 export const storedIdentities = makeIndexedStorageAccessor<Identity[]>('local', ChromeStorageKey.Identities);
 export const storedSelectedIdentity = makeStorageAccessor<string>('local', ChromeStorageKey.SelectedIdentity);
-export const storedSeedPhrase = makeStorageAccessor<string>('local', ChromeStorageKey.SeedPhrase);
-
 const indexedStoredConnectedSites = makeIndexedStorageAccessor<Record<string, string[]>>(
     'local',
     ChromeStorageKey.ConnectedSites

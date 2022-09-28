@@ -163,7 +163,6 @@ export interface NetworkConfiguration {
 export type RecoveryPayload = {
     providers: IdentityProvider[];
     globalContext: CryptographicParameters;
-    seedAsHex: string;
     net: Network;
 };
 

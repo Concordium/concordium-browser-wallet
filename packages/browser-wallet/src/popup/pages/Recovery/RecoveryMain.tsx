@@ -15,7 +15,6 @@ import { getIdentityProviders } from '@popup/shared/utils/wallet-proxy';
 import { getGlobal, getNet } from '@shared/utils/network-helpers';
 import PageHeader from '@popup/shared/PageHeader';
 import { absoluteRoutes } from '@popup/constants/routes';
-import { useDecryptedSeedPhrase } from '@popup/shared/utils/seedPhrase-helpers';
 
 export default function RecoveryMain() {
     const { t } = useTranslation('recovery');
@@ -34,7 +33,6 @@ export default function RecoveryMain() {
             }),
         []
     );
-    const seedPhrase = useDecryptedSeedPhrase((e) => onError(e.message));
 
     useEffect(() => {
         if (runRecovery && !providers.length) {
@@ -45,7 +43,7 @@ export default function RecoveryMain() {
     }, [runRecovery, providers.length]);
 
     useEffect(() => {
-        if (!runRecovery || isRecovering.loading || !providers.length || !seedPhrase) {
+        if (!runRecovery || isRecovering.loading || !providers.length) {
             return;
         }
 
@@ -56,17 +54,16 @@ export default function RecoveryMain() {
         }
 
         getGlobal(network)
-            .then((global) =>
-                setRecoveryStatus({
+            .then(async (global) => {
+                await setRecoveryStatus({
                     providers,
                     globalContext: global,
-                    seedAsHex: seedPhrase,
                     net: getNet(network),
-                })
-            )
-            .then(() => setIsRecovering(true))
+                });
+                return setIsRecovering(true);
+            })
             .catch((error) => onError(error.message));
-    }, [runRecovery, isRecovering.loading, isRecovering.value, providers.length, seedPhrase]);
+    }, [runRecovery, isRecovering.loading, isRecovering.value, providers.length]);
 
     return (
         <>

@@ -14,13 +14,18 @@ import { Identity, CreationStatus, IdentityProvider, WalletCredential, RecoveryS
 import {
     sessionIsRecovering,
     sessionRecoveryStatus,
+    sessionPasscode,
     storedCredentials,
     storedCurrentNetwork,
     storedIdentities,
+    storedEncryptedSeedPhrase,
 } from '@shared/storage/access';
 import { identityMatch, isIdentityOfCredential } from '@shared/utils/identity-helpers';
 import { getNextUnused } from '@shared/utils/number-helpers';
 import { partition } from 'wallet-common-helpers';
+import { mnemonicToSeedSync } from '@scure/bip39';
+import { decrypt } from '@shared/utils/crypto';
+import { Buffer } from 'buffer/';
 import { addCredential, addIdentity, updateCredentials } from './update';
 import bgMessageHandler from './message-handler';
 import { openWindow } from './window-management';
@@ -28,7 +33,7 @@ import { openWindow } from './window-management';
 // How many empty identityIndices are allowed before stopping
 const maxEmpty = 20;
 const RECOVERY_ALARM_NAME = 'recoveryAlarm';
-const RECOVERY_LOCK = 'recoveryLock';
+const RECOVERY_LOCK = 'concordium_recovery_lock';
 
 async function recoverAccounts(
     status: RecoveryStatus,
@@ -41,6 +46,8 @@ async function recoverAccounts(
 
     let emptyIndices = status.credentialGap || 0;
     let credNumber = status.credentialNumber || getNextUnused(usedCredNumbersOfIdentity);
+    const identityIndex = status.identityIndex || 0;
+
     while (emptyIndices < maxEmpty) {
         if (!usedCredNumbersOfIdentity.includes(credNumber)) {
             const request = createCredentialV1({ ...credentialInput, credNumber });
@@ -52,7 +59,7 @@ async function recoverAccounts(
                     credId,
                     credNumber,
                     status: CreationStatus.Confirmed,
-                    identityIndex: status.identityIndex || 0,
+                    identityIndex,
                     providerIndex,
                 });
                 emptyIndices = 0;
@@ -71,7 +78,9 @@ async function recoverAccounts(
     return credsToAdd;
 }
 
-function getRecoverUrl(inputs: Omit<IdentityRecoveryRequestInput, 'timestamp' | 'ipInfo'>, provider: IdentityProvider) {
+type RecoveryInputs = Omit<IdentityRecoveryRequestInput, 'timestamp' | 'ipInfo'>;
+
+function getRecoverUrl(inputs: RecoveryInputs, provider: IdentityProvider) {
     const timestamp = Math.floor(Date.now() / 1000);
     const idRecoveryRequest = createIdentityRecoveryRequest({ ...inputs, timestamp, ipInfo: provider.ipInfo });
 
@@ -81,13 +90,27 @@ function getRecoverUrl(inputs: Omit<IdentityRecoveryRequestInput, 'timestamp' | 
     return `${provider.metadata.recoveryStart}?${searchParams.toString()}`;
 }
 
+async function getSeed() {
+    const passcode = await sessionPasscode.get();
+    const encryptedSeed = await storedEncryptedSeedPhrase.get();
+    if (!passcode || !encryptedSeed) {
+        return undefined;
+    }
+    return Buffer.from(mnemonicToSeedSync(await decrypt(encryptedSeed, passcode))).toString('hex');
+}
+
 async function performRecovery() {
     try {
         let status = await sessionRecoveryStatus.get();
         if (!status) {
             throw new Error('Recovery was started without a status object.');
         }
-        const { providers, ...recoveryInputs } = status.payload;
+        const { providers, globalContext, net } = status.payload;
+        const seedAsHex = await getSeed();
+        if (!seedAsHex) {
+            throw new Error('Unable to access secret seed.');
+        }
+        const recoveryInputs: Omit<RecoveryInputs, 'identityIndex'> = { globalContext, net, seedAsHex };
 
         const identitiesToAdd: Identity[] = status.identitiesToAdd || [];
         const credsToAdd: WalletCredential[] = status.credentialsToAdd || [];
@@ -220,33 +243,32 @@ async function performRecovery() {
     }
 }
 
-export function startRecovery() {
-    chrome.alarms.create(RECOVERY_ALARM_NAME, { delayInMinutes: 0 });
+export async function startRecovery() {
+    const isRecovering = await sessionIsRecovering.get();
+    if (isRecovering) {
+        // We use a lock to ensure only 1 recovery instance runs
+        navigator.locks.request(RECOVERY_LOCK, { ifAvailable: true }, (lock) => {
+            if (!lock) {
+                // The lock was not granted - get out fast.
+                return Promise.resolve();
+            }
+            chrome.alarms.create(RECOVERY_ALARM_NAME, { delayInMinutes: 5.1, periodInMinutes: 1 });
+            const respond = async (result: RecoveryBackgroundResponse) => {
+                await openWindow();
+                bgMessageHandler.sendInternalMessage(InternalMessageType.RecoveryFinished, result);
+            };
+            return performRecovery()
+                .then((added) => respond({ status: BackgroundResponseStatus.Success, added }))
+                .catch((e) => respond({ status: BackgroundResponseStatus.Error, reason: e.toString() }))
+                .finally(() => chrome.alarms.clear(RECOVERY_ALARM_NAME));
+        });
+    }
 }
 
 export async function setupRecoveryHandler() {
     chrome.alarms.onAlarm.addListener(async (alarm) => {
-        if (alarm.name !== RECOVERY_ALARM_NAME) {
-            return;
-        }
-        const isRecovering = await sessionIsRecovering.get();
-        if (isRecovering) {
-            // We use a lock to ensure only 1 recovery instance runs
-            navigator.locks.request(RECOVERY_LOCK, { ifAvailable: true }, (lock) => {
-                if (!lock) {
-                    // The lock was not granted - get out fast.
-                    return Promise.resolve();
-                }
-                chrome.alarms.create(RECOVERY_ALARM_NAME, { delayInMinutes: 5.1, periodInMinutes: 1 });
-                const respond = async (result: RecoveryBackgroundResponse) => {
-                    await openWindow();
-                    bgMessageHandler.sendInternalMessage(InternalMessageType.RecoveryFinished, result);
-                };
-                return performRecovery()
-                    .then((added) => respond({ status: BackgroundResponseStatus.Success, added }))
-                    .catch((e) => respond({ status: BackgroundResponseStatus.Error, reason: e.toString() }))
-                    .finally(() => chrome.alarms.clear(RECOVERY_ALARM_NAME));
-            });
+        if (alarm.name === RECOVERY_ALARM_NAME) {
+            startRecovery();
         }
     });
     startRecovery();
