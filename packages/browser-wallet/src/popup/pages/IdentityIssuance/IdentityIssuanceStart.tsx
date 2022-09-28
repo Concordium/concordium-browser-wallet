@@ -2,7 +2,7 @@ import React, { useState, useEffect, useCallback } from 'react';
 import { useAtomValue, useAtom, useSetAtom } from 'jotai';
 import { useTranslation } from 'react-i18next';
 import { networkConfigurationAtom } from '@popup/store/settings';
-import { pendingIdentityAtom, identitiesAtom, identityProvidersAtom, idpNetworkAtom } from '@popup/store/identity';
+import { pendingIdentityAtom, identitiesAtom, identityProvidersAtom } from '@popup/store/identity';
 import { popupMessageHandler } from '@popup/shared/message-handler';
 import { getIdentityProviders } from '@popup/shared/utils/wallet-proxy';
 import { InternalMessageType } from '@concordium/browser-wallet-message-hub';
@@ -57,10 +57,13 @@ function IdentityIssuanceStart({ onStart }: InnerProps) {
                 );
 
                 updatePendingIdentity({
-                    status: CreationStatus.Pending,
-                    index: identityIndex,
-                    name: `Identity ${identities.length + 1}`,
-                    providerIndex,
+                    identity: {
+                        status: CreationStatus.Pending,
+                        index: identityIndex,
+                        name: `Identity ${identities.length + 1}`,
+                        providerIndex,
+                    },
+                    network,
                 });
 
                 onStart();
@@ -106,7 +109,6 @@ function IdentityIssuanceStart({ onStart }: InnerProps) {
 export default function IdentityIssuanceStartGuard() {
     const { t } = useTranslation('identityIssuance');
     const [pendingIdentity, setPendingidentity] = useAtom(pendingIdentityAtom);
-    const setIdpNetwork = useSetAtom(idpNetworkAtom);
     const [blocked, setBlocked] = useState(false);
     const [started, setStarted] = useState(false);
 
@@ -119,7 +121,6 @@ export default function IdentityIssuanceStartGuard() {
     const reset = () => {
         setPendingidentity(undefined);
         setBlocked(false);
-        setIdpNetwork(undefined);
     };
 
     if (blocked) {

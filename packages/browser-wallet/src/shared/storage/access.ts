@@ -9,6 +9,11 @@ import {
     NetworkConfiguration,
 } from './types';
 
+export type SessionPendingIdentity = {
+    identity: Omit<PendingIdentity, 'location'>;
+    network: NetworkConfiguration;
+};
+
 export type StorageAccessor<V> = {
     /**
      * Function for getting the stored value.
@@ -136,7 +141,7 @@ export const storedIdentityProviders = makeIndexedStorageAccessor<IdentityProvid
 export const storedHasBeenOnboarded = makeStorageAccessor<boolean>('local', ChromeStorageKey.HasBeenOnboarded);
 
 export const sessionPasscode = makeStorageAccessor<string>('session', ChromeStorageKey.Passcode);
-export const sessionPendingIdentity = makeStorageAccessor<Omit<PendingIdentity, 'location'>>(
+export const sessionPendingIdentity = makeStorageAccessor<SessionPendingIdentity>(
     'session',
     ChromeStorageKey.PendingIdentity
 );
@@ -148,4 +153,3 @@ export const sessionAccountInfoCache = makeIndexedStorageAccessor<Record<string,
 export const sessionIsRecovering = makeStorageAccessor<boolean>('session', ChromeStorageKey.IsRecovering);
 export const sessionOnboardingLocation = makeStorageAccessor<string>('session', ChromeStorageKey.OnboardingLocation);
 export const sessionIdpTab = makeStorageAccessor<number>('session', ChromeStorageKey.IdpTab);
-export const sessionIdpNetwork = makeStorageAccessor<NetworkConfiguration>('session', ChromeStorageKey.IdpNetwork);

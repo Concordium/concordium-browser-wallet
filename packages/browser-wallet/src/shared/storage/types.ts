@@ -18,7 +18,6 @@ export enum ChromeStorageKey {
     HasBeenOnboarded = 'hasBeenOnboarded',
     OnboardingLocation = 'onboardingLocation',
     IdpTab = 'idpTab',
-    IdpNetwork = 'idpNetwork',
 }
 
 export enum Theme {

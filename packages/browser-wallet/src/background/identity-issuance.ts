@@ -2,7 +2,7 @@ import { createIdentityRequest, IdentityRequestInput } from '@concordium/web-sdk
 import { IdentityIssuanceBackgroundResponse } from '@shared/utils/identity-helpers';
 import { ExtensionMessageHandler, InternalMessageType } from '@concordium/browser-wallet-message-hub';
 import { BackgroundResponseStatus } from '@shared/utils/types';
-import { sessionIdpNetwork, sessionIdpTab, sessionPendingIdentity, storedCurrentNetwork } from '@shared/storage/access';
+import { sessionIdpTab, sessionPendingIdentity, storedCurrentNetwork } from '@shared/storage/access';
 import { CreationStatus, PendingIdentity } from '@shared/storage/types';
 import { openWindow } from './window-management';
 
@@ -20,19 +20,18 @@ const respond = async (response: IdentityIssuanceBackgroundResponse) => {
     // https://bugs.chromium.org/p/chromium/issues/detail?id=1024211#c73
     chrome.alarms.clear(IDP_ALARM_NAME);
 
-    const network = await sessionIdpNetwork.get();
+    const { identity, network } = (await sessionPendingIdentity.get()) ?? {};
     if (!network) {
         return;
     }
 
     let { status } = response;
-    const pending = await sessionPendingIdentity.get();
 
-    if (!pending) {
+    if (!identity) {
         status = BackgroundResponseStatus.Aborted;
     } else if (response.status === BackgroundResponseStatus.Success) {
         const newIdentity: PendingIdentity = {
-            ...pending,
+            ...identity,
             status: CreationStatus.Pending,
             location: response.result,
         };
@@ -41,7 +40,6 @@ const respond = async (response: IdentityIssuanceBackgroundResponse) => {
     }
 
     sessionPendingIdentity.remove();
-    sessionIdpNetwork.remove();
 
     await openWindow();
     bgMessageHandler.sendInternalMessage(InternalMessageType.EndIdentityIssuance, { ...response, status });
@@ -124,8 +122,6 @@ async function startIdentityIssuance({
     if (!network) {
         return;
     }
-
-    await sessionIdpNetwork.set(network);
 
     try {
         const response = await fetch(url);
