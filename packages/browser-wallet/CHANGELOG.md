@@ -4,12 +4,15 @@
 
 ### Fixed
 
+-   An issue where the wrong identity was selected when choosing an identity during account creation.
 -   An issue where identity issuance could not be completed, due to service worker going inactive.
 
 ## 0.7.2
 
 ### Fixed
 
+-   Recovered accounts not showing in recovery results when the identity is already present.```
+-   Popup after Identity creation not appearing.
 -   Connected sites are now stored per network.
 
 ## 0.7.1

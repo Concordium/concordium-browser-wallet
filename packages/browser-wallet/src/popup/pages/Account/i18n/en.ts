@@ -7,10 +7,10 @@ const t = {
     siteNotConnected: 'Not connected',
     accountBalanceError: 'Unable to retrieve account balance',
     actions: {
-        log: 'transaction log',
-        send: 'send ccd',
-        receive: 'receive ccd',
-        settings: 'account settings',
+        log: 'Transaction log',
+        send: 'Send CCD',
+        receive: 'Receive CCD',
+        settings: 'Account settings',
     },
     details: {
         total: 'Public balance total',

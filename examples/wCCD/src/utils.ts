@@ -1,7 +1,7 @@
 /* eslint-disable no-console */
 import { createContext } from 'react';
 import { detectConcordiumProvider } from '@concordium/browser-wallet-api-helpers';
-import { AccountTransactionType, GtuAmount, toBuffer } from '@concordium/web-sdk';
+import { AccountTransactionType, GtuAmount } from '@concordium/web-sdk';
 
 export const CONTRACT_NAME_PROXY = 'CIS2-wCCD-Proxy';
 export const CONTRACT_NAME_IMPLEMENTATION = 'CIS2-wCCD';
@@ -39,7 +39,6 @@ export const wrap = (
                         },
                         receiveName: `${CONTRACT_NAME_PROXY}.wrap`,
                         maxContractExecutionEnergy: 30000n,
-                        parameter: toBuffer(''),
                     },
                     {
                         data: '',
@@ -95,7 +94,6 @@ export const unwrap = (
                         },
                         receiveName: `${CONTRACT_NAME_PROXY}.unwrap`,
                         maxContractExecutionEnergy: 30000n,
-                        parameter: toBuffer(''),
                     },
                     {
                         amount: amount.toString(),

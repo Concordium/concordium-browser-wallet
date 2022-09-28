@@ -56,6 +56,11 @@ export interface ConfirmedIdentity extends BaseIdentity {
     idObject: Versioned<IdentityObjectV1>;
 }
 
+export type SessionPendingIdentity = {
+    identity: Omit<PendingIdentity, 'location'>;
+    network: NetworkConfiguration;
+};
+
 export type Identity = PendingIdentity | RejectedIdentity | ConfirmedIdentity;
 
 type Hex = string;

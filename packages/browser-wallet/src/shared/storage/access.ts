@@ -2,17 +2,12 @@ import {
     ChromeStorageKey,
     EncryptedData,
     Identity,
-    PendingIdentity,
     Theme,
     WalletCredential,
     IdentityProvider,
     NetworkConfiguration,
+    SessionPendingIdentity,
 } from './types';
-
-export type SessionPendingIdentity = {
-    identity: Omit<PendingIdentity, 'location'>;
-    network: NetworkConfiguration;
-};
 
 export type StorageAccessor<V> = {
     /**

@@ -1,5 +1,12 @@
 # Changelog
 
+## 1.0.0
+
+### Changed
+
+-   Fixed broken link + typos in README
+-   Removed parameters from smart contract types' payloads, due the wallet ignoring it in favor of separate arguments.
+
 ## 0.2.0
 
 ### Added

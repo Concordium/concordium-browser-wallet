@@ -12,19 +12,18 @@ import { monitorIdentities } from './confirmation';
 
 const redirectUri = 'ConcordiumRedirectToken';
 const codeUriKey = 'code_uri=';
-const IDP_ALARM_NAME = 'idp';
+
+const enum MSG { // using const enum here, as typescript compiler replaces uses with the actual underlying string, which we need, because injected functions do not have access to variables declared in the background context
+    LIFELINE = 'lifeline',
+}
 
 const respond = async (response: IdentityIssuanceBackgroundResponse) => {
-    // TODO this hack is only needed due to a bug in chrome, which prevents chrome.webRequest hooks from waking up the service worker from inactive state.
-    // Bug will be fixed in chrome v107
-    // https://bugs.chromium.org/p/chromium/issues/detail?id=1024211#c73
-    chrome.alarms.clear(IDP_ALARM_NAME);
-
-    const { identity, network } = (await sessionPendingIdentity.get()) ?? {};
-    if (!network) {
+    const pendingIdentity = await sessionPendingIdentity.get();
+    if (!pendingIdentity) {
         return;
     }
 
+    const { identity, network } = pendingIdentity;
     let { status } = response;
 
     if (!identity) {
@@ -78,13 +77,31 @@ export function addIdpListeners() {
         { urls: ['<all_urls>'] }
     );
 
-    // TODO this hack is only needed due to a bug in chrome, which prevents chrome.webRequest hooks from waking up the service worker from inactive state.
-    // Bug will be fixed in chrome v107
-    // https://bugs.chromium.org/p/chromium/issues/detail?id=1024211#c73
-    chrome.alarms.onAlarm.addListener(() => {
-        /* No-op, to keep script alive while IDP session is ongoing */
+    chrome.runtime.onMessage.addListener((msg, _, sendResponse: (isDone: boolean) => void) => {
+        if (msg === MSG.LIFELINE) {
+            setTimeout(async () => {
+                const pendingIdentity = await sessionPendingIdentity.get();
+                sendResponse(pendingIdentity === undefined);
+            }, 250e3);
+
+            return true;
+        }
+
+        return undefined;
     });
 }
+
+const keepAlive = () => {
+    function createLifeline() {
+        chrome.runtime.sendMessage(MSG.LIFELINE).then((isDone: boolean) => {
+            if (!isDone) {
+                createLifeline();
+            }
+        });
+    }
+
+    createLifeline();
+};
 
 function launchExternalIssuance(url: string) {
     chrome.tabs
@@ -92,13 +109,14 @@ function launchExternalIssuance(url: string) {
             url,
         })
         .then((tab) => {
-            // TODO this hack is only needed due to a bug in chrome, which prevents chrome.webRequest hooks from waking up the service worker from inactive state.
-            // Bug will be fixed in chrome v107
-            // https://bugs.chromium.org/p/chromium/issues/detail?id=1024211#c73
-            chrome.alarms.create(IDP_ALARM_NAME, { periodInMinutes: 4.9 });
-
             if (tab.id !== undefined) {
                 sessionIdpTab.set(tab.id);
+
+                // This is a hack to keep the service worker running as long as the identity issuance flow
+                chrome.scripting.executeScript({
+                    target: { tabId: tab.id },
+                    func: keepAlive,
+                });
             }
         });
 }
