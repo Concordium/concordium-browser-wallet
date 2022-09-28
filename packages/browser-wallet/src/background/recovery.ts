@@ -28,6 +28,7 @@ import { openWindow } from './window-management';
 // How many empty identityIndices are allowed before stopping
 const maxEmpty = 20;
 const RECOVERY_ALARM_NAME = 'recoveryAlarm';
+const RECOVERY_LOCK = 'recoveryLock';
 
 async function recoverAccounts(
     status: RecoveryStatus,
@@ -82,7 +83,6 @@ function getRecoverUrl(inputs: Omit<IdentityRecoveryRequestInput, 'timestamp' | 
 
 async function performRecovery() {
     try {
-        chrome.alarms.create(RECOVERY_ALARM_NAME, { delayInMinutes: 4.7 });
         let status = await sessionRecoveryStatus.get();
         if (!status) {
             throw new Error('Recovery was started without a status object.');
@@ -168,6 +168,7 @@ async function performRecovery() {
                                 .filter(isIdentityOfCredential(identity))
                                 .map((cred) => cred.credNumber)
                         );
+
                         credsToAdd.push(...foundCreds);
                     }
                     nextId += 1;
@@ -216,23 +217,37 @@ async function performRecovery() {
         };
     } finally {
         await sessionIsRecovering.set(false);
-        chrome.alarms.clear(RECOVERY_ALARM_NAME);
     }
 }
 
-export async function startRecovery() {
-    const isRecovering = await sessionIsRecovering.get();
-    if (isRecovering) {
-        const respond = async (result: RecoveryBackgroundResponse) => {
-            await openWindow();
-            bgMessageHandler.sendInternalMessage(InternalMessageType.RecoveryFinished, result);
-        };
-        performRecovery()
-            .then((added) => respond({ status: BackgroundResponseStatus.Success, added }))
-            .catch((e) => respond({ status: BackgroundResponseStatus.Error, reason: e.toString() }));
-    }
+export function startRecovery() {
+    chrome.alarms.create(RECOVERY_ALARM_NAME, { delayInMinutes: 0 });
+}
 
-    chrome.alarms.onAlarm.addListener(() => {
-        /* No-op, to restart the script while recovery is ongoing */
+export async function setupRecoveryHandler() {
+    chrome.alarms.onAlarm.addListener(async (alarm) => {
+        if (alarm.name !== RECOVERY_ALARM_NAME) {
+            return;
+        }
+        const isRecovering = await sessionIsRecovering.get();
+        if (isRecovering) {
+            // We use a lock to ensure only 1 recovery instance runs
+            navigator.locks.request(RECOVERY_LOCK, { ifAvailable: true }, (lock) => {
+                if (!lock) {
+                    // The lock was not granted - get out fast.
+                    return Promise.resolve();
+                }
+                chrome.alarms.create(RECOVERY_ALARM_NAME, { delayInMinutes: 5.1, periodInMinutes: 1 });
+                const respond = async (result: RecoveryBackgroundResponse) => {
+                    await openWindow();
+                    bgMessageHandler.sendInternalMessage(InternalMessageType.RecoveryFinished, result);
+                };
+                return performRecovery()
+                    .then((added) => respond({ status: BackgroundResponseStatus.Success, added }))
+                    .catch((e) => respond({ status: BackgroundResponseStatus.Error, reason: e.toString() }))
+                    .finally(() => chrome.alarms.clear(RECOVERY_ALARM_NAME));
+            });
+        }
     });
+    startRecovery();
 }
