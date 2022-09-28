@@ -138,7 +138,7 @@ async function startIdentityIssuance({
     const network = await storedCurrentNetwork.get();
 
     if (!network) {
-        return;
+        throw new Error('Unable to get current network');
     }
 
     try {
@@ -166,6 +166,9 @@ async function startIdentityIssuance({
     }
 }
 
-export const identityIssuanceHandler: ExtensionMessageHandler = (msg) => {
-    startIdentityIssuance(msg.payload);
+export const identityIssuanceHandler: ExtensionMessageHandler = (msg, _sender, respond) => {
+    startIdentityIssuance(msg.payload)
+        .then(() => respond(true))
+        .catch(() => respond(false));
+    return true;
 };
