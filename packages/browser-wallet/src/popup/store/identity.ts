@@ -1,5 +1,4 @@
-import { SessionPendingIdentity } from '@shared/storage/access';
-import { ChromeStorageKey, Identity, IdentityProvider } from '@shared/storage/types';
+import { ChromeStorageKey, Identity, IdentityProvider, SessionPendingIdentity } from '@shared/storage/types';
 import { atom } from 'jotai';
 import { selectAtom } from 'jotai/utils';
 import { atomWithChromeStorage } from './utils';
