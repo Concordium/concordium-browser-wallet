@@ -36,17 +36,22 @@ const loop = async (loopFun: () => Promise<ShouldLoop>) => {
     await run();
 };
 
-let monitoredCredentials: PendingWalletCredential[] = [];
+const monitoredCredentials: Record<string, PendingWalletCredential[] | undefined> = {};
 const isCredEqualTo = (c1: PendingWalletCredential) => (c2: PendingWalletCredential) => c1.credId === c2.credId;
-const isMonitoringCred = (id: PendingWalletCredential): boolean => monitoredCredentials.some(isCredEqualTo(id));
+const isMonitoringCred = (genesisHash: string, id: PendingWalletCredential): boolean =>
+    monitoredCredentials[genesisHash]?.some(isCredEqualTo(id)) ?? false;
 
 async function monitorCredentialStatus(jsonRpcUrl: string, cred: PendingWalletCredential, genesisHash: string) {
     const client = new JsonRpcClient(new HttpProvider(jsonRpcUrl, fetch));
-    if (isMonitoringCred(cred)) {
+    if (isMonitoringCred(genesisHash, cred)) {
         return;
     }
 
-    monitoredCredentials.push(cred);
+    if (monitoredCredentials[genesisHash] === undefined) {
+        monitoredCredentials[genesisHash] = [];
+    }
+
+    monitoredCredentials[genesisHash]?.push(cred);
 
     const { deploymentHash, ...info } = cred;
 
@@ -54,7 +59,6 @@ async function monitorCredentialStatus(jsonRpcUrl: string, cred: PendingWalletCr
         const network = await storedCurrentNetwork.get();
         // Stop if the network has changed
         if (!network || network.genesisHash !== genesisHash) {
-            monitoredCredentials = [];
             return false;
         }
 
@@ -82,7 +86,7 @@ async function monitorCredentialStatus(jsonRpcUrl: string, cred: PendingWalletCr
         }
     });
 
-    monitoredCredentials = monitoredCredentials.filter(not(isCredEqualTo(cred)));
+    monitoredCredentials[genesisHash] = monitoredCredentials[genesisHash]?.filter(not(isCredEqualTo(cred)));
 }
 
 /**
@@ -99,18 +103,23 @@ async function startMonitoringCredentialStatus(network: NetworkConfiguration) {
     }
 }
 
-let monitoredIdentities: PendingIdentity[] = [];
-const isMonitoringIdentity = (id: PendingIdentity): boolean => monitoredIdentities.some(identityMatch(id));
+const monitoredIdentities: Record<string, PendingIdentity[] | undefined> = {};
+const isMonitoringIdentity = (genesisHash: string, id: PendingIdentity): boolean =>
+    monitoredIdentities[genesisHash]?.some(identityMatch(id)) ?? false;
 
 /**
  * Continously checks whether pending identities have been confirmed or rejected.
  */
 async function monitorIdentityStatus(id: PendingIdentity, genesisHash: string) {
-    if (isMonitoringIdentity(id)) {
+    if (isMonitoringIdentity(genesisHash, id)) {
         return;
     }
 
-    monitoredIdentities.push(id);
+    if (monitoredIdentities[genesisHash] === undefined) {
+        monitoredIdentities[genesisHash] = [];
+    }
+
+    monitoredIdentities[genesisHash]?.push(id);
 
     const { location, ...identity } = id;
 
@@ -118,7 +127,6 @@ async function monitorIdentityStatus(id: PendingIdentity, genesisHash: string) {
         const network = await storedCurrentNetwork.get();
         // Stop if the network has changed
         if (!network || network.genesisHash !== genesisHash) {
-            monitoredIdentities = [];
             return false;
         }
 
@@ -148,7 +156,7 @@ async function monitorIdentityStatus(id: PendingIdentity, genesisHash: string) {
         }
     });
 
-    monitoredIdentities = monitoredIdentities.filter(not(identityMatch(id)));
+    monitoredIdentities[genesisHash] = monitoredIdentities[genesisHash]?.filter(not(identityMatch(id)));
 }
 
 /**
