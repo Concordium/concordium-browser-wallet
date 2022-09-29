@@ -57,10 +57,13 @@ function IdentityIssuanceStart({ onStart }: InnerProps) {
                 );
 
                 updatePendingIdentity({
-                    status: CreationStatus.Pending,
-                    index: identityIndex,
-                    name: `Identity ${identities.length + 1}`,
-                    providerIndex,
+                    identity: {
+                        status: CreationStatus.Pending,
+                        index: identityIndex,
+                        name: `Identity ${identities.length + 1}`,
+                        providerIndex,
+                    },
+                    network,
                 });
 
                 onStart();
@@ -115,17 +118,16 @@ export default function IdentityIssuanceStartGuard() {
         }
     }, [pendingIdentity]);
 
+    const reset = () => {
+        setPendingidentity(undefined);
+        setBlocked(false);
+    };
+
     if (blocked) {
         return (
             <div className="identity-issuance__start">
                 <p className="identity-issuance__start-text">{t('alreadyPending')}</p>
-                <Button
-                    width="wide"
-                    onClick={() => {
-                        setPendingidentity(undefined);
-                        setBlocked(false);
-                    }}
-                >
+                <Button width="wide" onClick={reset}>
                     {t('reset')}
                 </Button>
             </div>

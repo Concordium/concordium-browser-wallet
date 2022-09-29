@@ -5,6 +5,7 @@
 ### Fixed
 
 -   An issue where the wrong identity was selected when choosing an identity during account creation.
+-   An issue where identity issuance could not be completed, due to service worker going inactive.
 
 ## 0.7.2
 
