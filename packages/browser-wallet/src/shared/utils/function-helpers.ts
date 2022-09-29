@@ -14,3 +14,8 @@ export function throwIfUndefined<T extends any[], V>(
         return result;
     };
 }
+
+// eslint-disable-next-line @typescript-eslint/no-explicit-any
+export function not<T extends any[]>(predicate: (...inputs: T) => boolean) {
+    return (...inputs: T): boolean => !predicate(...inputs);
+}
