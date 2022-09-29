@@ -3,7 +3,7 @@ import { fullscreenPromptContext } from '@popup/page-layouts/FullscreenPromptLay
 import { useTranslation } from 'react-i18next';
 import { useSetAtom } from 'jotai';
 import { useLocation } from 'react-router-dom';
-import { signMessage, buildBasicAccountSigner, AccountTransactionSignature } from '@concordium/web-sdk';
+import { signMessage, buildBasicAccountSigner, AccountTransactionSignature, AccountAddress } from '@concordium/web-sdk';
 import { usePrivateKey } from '@popup/shared/utils/account-helpers';
 import { displayUrl } from '@popup/shared/utils/string-helpers';
 import { TextArea } from '@popup/shared/Form/TextArea';
@@ -39,7 +39,7 @@ export default function SignMessage({ onSubmit, onReject }: Props) {
         if (!key) {
             throw new Error('Missing key for the chosen address');
         }
-        return signMessage(state.payload.message, buildBasicAccountSigner(key));
+        return signMessage(new AccountAddress(accountAddress), state.payload.message, buildBasicAccountSigner(key));
     }, [state.payload.message, state.payload.accountAddress, key]);
 
     return (
