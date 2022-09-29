@@ -3,12 +3,7 @@ import { useNavigate } from 'react-router-dom';
 import { useAtom, useAtomValue, useSetAtom } from 'jotai';
 import { useTranslation } from 'react-i18next';
 import { networkConfigurationAtom } from '@popup/store/settings';
-import {
-    identityProvidersAtom,
-    isRecoveringAtom,
-    recoveryStatusAtom,
-    setRecoveryPayloadAtom,
-} from '@popup/store/identity';
+import { identityProvidersAtom, isRecoveringAtom, setRecoveryPayloadAtom } from '@popup/store/identity';
 import PendingArrows from '@assets/svg/pending-arrows.svg';
 import { BackgroundResponseStatus } from '@shared/utils/types';
 import { getIdentityProviders } from '@popup/shared/utils/wallet-proxy';
@@ -21,7 +16,6 @@ export default function RecoveryMain() {
     const network = useAtomValue(networkConfigurationAtom);
     const [providers, setProviders] = useAtom(identityProvidersAtom);
     const [isRecovering, setIsRecovering] = useAtom(isRecoveringAtom);
-    const recoveryStatus = useAtomValue(recoveryStatusAtom);
     const setRecoveryStatus = useSetAtom(setRecoveryPayloadAtom);
     const [runRecovery, setRunRecovery] = useState<boolean>(true);
     const navigate = useNavigate();
@@ -71,10 +65,6 @@ export default function RecoveryMain() {
             <div className="recovery__main onboarding-setup__page-with-header">
                 <div className="onboarding-setup__page-with-header__description">{t('main.description')}</div>
                 <PendingArrows className="identity-issuance__start__loading-arrows" />
-                <p>{recoveryStatus.value?.identityIndex}</p>
-                <p>{recoveryStatus.value?.credentialNumber}</p>
-                <p>{recoveryStatus.value?.credentialsToAdd?.length}</p>
-                <p>{recoveryStatus.value?.identitiesToAdd?.length}</p>
             </div>
         </>
     );
