@@ -10,10 +10,17 @@
 
     &__toggle {
         position: absolute;
-        width: $switch-width;
-        bottom: rem(8px);
-        left: 0;
-        right: 0;
-        margin: 0 auto;
+        height: rem(40px);
+        bottom: rem(10px);
+        left: 50%;
+        transform: translateX(-50%);
+        display: flex;
+        flex-direction: column;
+        justify-content: space-between;
+        align-items: center;
+    }
+
+    &__sun-icon * {
+        fill: $color-off-black;
     }
 }

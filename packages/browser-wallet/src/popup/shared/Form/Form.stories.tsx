@@ -1,11 +1,12 @@
+/* eslint-disable no-console */
 /* eslint-disable react/function-component-definition */
 import React from 'react';
 import { ComponentMeta, ComponentStory } from '@storybook/react';
-import { noOp } from 'wallet-common-helpers';
 import Form from './Form';
 import FormInput from './Input';
 import Submit from './Submit';
 import FormPassword from './Password';
+import FormToggleCheckbox from './ToggleCheckbox';
 
 export default {
     title: 'Shared/Form',
@@ -31,7 +32,7 @@ export const AllFields: ComponentStory<typeof Form> = () => {
                     }
                 `}
             </style>
-            <Form<{ name: string; age: string; password: string }> onSubmit={noOp}>
+            <Form<{ name: string; age: string; password: string; switch: boolean }> onSubmit={console.log}>
                 {(f) => (
                     <>
                         <FormInput
@@ -53,6 +54,7 @@ export const AllFields: ComponentStory<typeof Form> = () => {
                             label="Password"
                             rules={{ required: 'Must fill' }}
                         />
+                        <FormToggleCheckbox register={f.register} name="switch" defaultChecked />
                         <Submit className="submit" width="wide">
                             Submit
                         </Submit>
