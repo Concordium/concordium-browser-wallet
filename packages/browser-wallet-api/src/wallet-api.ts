@@ -3,9 +3,9 @@ import {
     AccountTransactionPayload,
     AccountTransactionSignature,
     AccountTransactionType,
-    JsonRpcClient,
     SchemaVersion,
-} from '@concordium/web-sdk';
+} from '@concordium/common-sdk/lib/types';
+import { JsonRpcClient } from '@concordium/common-sdk/lib/JsonRpcClient';
 import { WalletApi as IWalletApi, EventType } from '@concordium/browser-wallet-api-helpers';
 import EventEmitter from 'events';
 import type { JsonRpcRequest } from '@concordium/common-sdk/lib/providers/provider';
