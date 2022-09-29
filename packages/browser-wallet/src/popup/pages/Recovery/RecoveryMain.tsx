@@ -1,24 +1,22 @@
 import React, { useEffect, useState, useCallback } from 'react';
 import { useNavigate } from 'react-router-dom';
-import { useAtom, useAtomValue } from 'jotai';
+import { useAtom, useAtomValue, useSetAtom } from 'jotai';
 import { useTranslation } from 'react-i18next';
 import { networkConfigurationAtom } from '@popup/store/settings';
-import { popupMessageHandler } from '@popup/shared/message-handler';
-import { InternalMessageType } from '@concordium/browser-wallet-message-hub';
-import { identityProvidersAtom, isRecoveringAtom } from '@popup/store/identity';
+import { identityProvidersAtom, isRecoveringAtom, setRecoveryPayloadAtom } from '@popup/store/identity';
 import PendingArrows from '@assets/svg/pending-arrows.svg';
 import { BackgroundResponseStatus } from '@shared/utils/types';
 import { getIdentityProviders } from '@popup/shared/utils/wallet-proxy';
 import { getGlobal, getNet } from '@shared/utils/network-helpers';
 import PageHeader from '@popup/shared/PageHeader';
 import { absoluteRoutes } from '@popup/constants/routes';
-import { useDecryptedSeedPhrase } from '@popup/shared/utils/seedPhrase-helpers';
 
 export default function RecoveryMain() {
     const { t } = useTranslation('recovery');
     const network = useAtomValue(networkConfigurationAtom);
     const [providers, setProviders] = useAtom(identityProvidersAtom);
     const [isRecovering, setIsRecovering] = useAtom(isRecoveringAtom);
+    const setRecoveryStatus = useSetAtom(setRecoveryPayloadAtom);
     const [runRecovery, setRunRecovery] = useState<boolean>(true);
     const navigate = useNavigate();
 
@@ -29,7 +27,6 @@ export default function RecoveryMain() {
             }),
         []
     );
-    const seedPhrase = useDecryptedSeedPhrase((e) => onError(e.message));
 
     useEffect(() => {
         if (runRecovery && !providers.length) {
@@ -40,7 +37,7 @@ export default function RecoveryMain() {
     }, [runRecovery, providers.length]);
 
     useEffect(() => {
-        if (!runRecovery || isRecovering.loading || !providers.length || !seedPhrase) {
+        if (!runRecovery || isRecovering.loading || !providers.length) {
             return;
         }
 
@@ -51,17 +48,16 @@ export default function RecoveryMain() {
         }
 
         getGlobal(network)
-            .then((global) => {
-                setIsRecovering(true);
-                popupMessageHandler.sendInternalMessage(InternalMessageType.Recovery, {
+            .then(async (global) => {
+                await setRecoveryStatus({
                     providers,
                     globalContext: global,
-                    seedAsHex: seedPhrase,
                     net: getNet(network),
                 });
+                return setIsRecovering(true);
             })
             .catch((error) => onError(error.message));
-    }, [runRecovery, isRecovering.loading, isRecovering.value, providers.length, seedPhrase]);
+    }, [runRecovery, isRecovering.loading, isRecovering.value, providers.length]);
 
     return (
         <>

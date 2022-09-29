@@ -1,5 +1,7 @@
 /* eslint-disable @typescript-eslint/no-explicit-any */
-import { GtuAmount, AccountAddress, ModuleReference } from '@concordium/web-sdk';
+import { GtuAmount } from '@concordium/common-sdk/lib/types/gtuAmount';
+import { AccountAddress } from '@concordium/common-sdk/lib/types/accountAddress';
+import { ModuleReference } from '@concordium/common-sdk/lib/types/moduleReference';
 
 const types = {
     BigInt: 'bigint',

@@ -5,6 +5,10 @@ const t: typeof en = {
     network: 'Netværksindstillinger',
     recover: 'Genskab ID & konti',
     about: 'Om',
+    toggle: {
+        dark: 'Skift til mørkt udseende',
+        light: 'Skift til lyst udseende',
+    },
 };
 
 export default t;
