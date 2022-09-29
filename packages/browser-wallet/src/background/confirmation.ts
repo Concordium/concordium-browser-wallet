@@ -7,11 +7,12 @@ import {
     PendingWalletCredential,
     WalletCredential,
     NetworkConfiguration,
-    BaseIdentity,
     ConfirmedIdentity,
     RejectedIdentity,
 } from '@shared/storage/types';
 import { not } from '@shared/utils/function-helpers';
+import { identityMatch } from '@shared/utils/identity-helpers';
+import { sleep } from 'wallet-common-helpers';
 import { IdentityTokenContainer, IdentityProviderIdentityStatus } from 'wallet-common-helpers/lib/utils/identity/types';
 import { updateCredentials, updateIdentities } from './update';
 
@@ -24,31 +25,20 @@ const UPDATE_INTERVAL = 10000;
 type ShouldLoop = boolean;
 
 /**
- * Creates a promise, that resolves after given timeout
- */
-const timer = (timeout: number): Promise<void> =>
-    new Promise((resolve) => {
-        setTimeout(resolve, timeout);
-    });
-
-/**
  * Takes a loopFun, that runs each UPDATE_INTERVAL, for as long as the loopFun resolves to true
  */
 const loop = async (loopFun: () => Promise<ShouldLoop>) => {
     const run = async () => {
         if (await loopFun()) {
-            await timer(UPDATE_INTERVAL).then(run);
+            await sleep(UPDATE_INTERVAL).then(run);
         }
     };
     await run();
 };
 
 let monitoredCredentials: PendingWalletCredential[] = [];
-
 const isCredEqualTo = (c1: PendingWalletCredential) => (c2: PendingWalletCredential) => c1.credId === c2.credId;
-
-const isMonitoringCred = (id: PendingWalletCredential): boolean =>
-    monitoredCredentials.find(isCredEqualTo(id)) !== undefined;
+const isMonitoringCred = (id: PendingWalletCredential): boolean => monitoredCredentials.some(isCredEqualTo(id));
 
 async function monitorCredentialStatus(jsonRpcUrl: string, cred: PendingWalletCredential, genesisHash: string) {
     const client = new JsonRpcClient(new HttpProvider(jsonRpcUrl, fetch));
@@ -110,11 +100,7 @@ async function startMonitoringCredentialStatus(network: NetworkConfiguration) {
 }
 
 let monitoredIdentities: PendingIdentity[] = [];
-
-const isIdEqualTo = (id1: BaseIdentity) => (id2: BaseIdentity) =>
-    id1.index === id2.index && id1.providerIndex === id2.providerIndex;
-
-const isMonitoringIdentity = (id: PendingIdentity): boolean => monitoredIdentities.find(isIdEqualTo(id)) !== undefined;
+const isMonitoringIdentity = (id: PendingIdentity): boolean => monitoredIdentities.some(identityMatch(id));
 
 /**
  * Continously checks whether pending identities have been confirmed or rejected.
@@ -162,7 +148,7 @@ async function monitorIdentityStatus(id: PendingIdentity, genesisHash: string) {
         }
     });
 
-    monitoredIdentities = monitoredIdentities.filter(not(isIdEqualTo(id)));
+    monitoredIdentities = monitoredIdentities.filter(not(identityMatch(id)));
 }
 
 /**

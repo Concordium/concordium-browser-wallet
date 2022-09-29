@@ -111,9 +111,8 @@ chrome.storage.local.onChanged.addListener((changes) => {
 
 chrome.runtime.onStartup.addListener(startupHandler);
 chrome.runtime.onInstalled.addListener(startupHandler);
-bgMessageHandler.handleMessage(createMessageTypeFilter(InternalMessageType.PopupReady), (_i, _s, respond) => {
-    startupHandler().then(respond);
-    return true;
+bgMessageHandler.handleMessage(createMessageTypeFilter(InternalMessageType.PopupReady), () => {
+    startupHandler();
 });
 
 addIdpListeners();
