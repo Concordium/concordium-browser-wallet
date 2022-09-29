@@ -6,9 +6,9 @@ import NavList from '@popup/shared/NavList';
 import { useAtom } from 'jotai';
 import { themeAtom } from '@popup/store/settings';
 import { Theme } from '@shared/storage/types';
-import Button from '@popup/shared/Button';
 import SunIcon from '@assets/svg/sun.svg';
 import MoonIcon from '@assets/svg/moon.svg';
+import { ToggleCheckbox } from '@popup/shared/Form/ToggleCheckbox';
 
 function LightDarkModeToggle() {
     const { t } = useTranslation('settings');
@@ -16,22 +16,12 @@ function LightDarkModeToggle() {
 
     return (
         <div className="settings-page__toggle">
-            {theme === Theme.Light && (
-                <>
-                    <div>{t('toggle.dark')}</div>
-                    <Button clear className="settings-page__button" onClick={() => setTheme(Theme.Dark)}>
-                        <MoonIcon />
-                    </Button>
-                </>
-            )}
-            {theme === Theme.Dark && (
-                <>
-                    <div>{t('toggle.light')}</div>
-                    <Button clear className="settings-page__button" onClick={() => setTheme(Theme.Light)}>
-                        <SunIcon />
-                    </Button>
-                </>
-            )}
+            <div>{theme === Theme.Light ? t('toggle.dark') : t('toggle.light')}</div>
+            <ToggleCheckbox
+                checked={theme === Theme.Dark}
+                onChange={() => (theme === Theme.Light ? setTheme(Theme.Dark) : setTheme(Theme.Light))}
+                icon={theme === Theme.Light ? <MoonIcon /> : <SunIcon className="settings-page__sun-icon" />}
+            />
         </div>
     );
 }
