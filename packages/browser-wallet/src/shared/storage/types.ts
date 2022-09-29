@@ -1,4 +1,4 @@
-import type { IdentityObjectV1, Versioned } from '@concordium/web-sdk';
+import type { CryptographicParameters, IdentityObjectV1, Network, Versioned } from '@concordium/web-sdk';
 
 export enum ChromeStorageKey {
     ConnectedSites = 'connectedSites',
@@ -17,6 +17,7 @@ export enum ChromeStorageKey {
     IsCreatingCredential = 'IsCreatingCredential',
     HasBeenOnboarded = 'hasBeenOnboarded',
     OnboardingLocation = 'onboardingLocation',
+    RecoveryStatus = 'recoveryStatus',
     IdpTab = 'idpTab',
 }
 
@@ -163,4 +164,22 @@ export interface NetworkConfiguration {
     name: string;
     jsonRpcUrl: string;
     explorerUrl: string;
+}
+
+export type RecoveryPayload = {
+    providers: IdentityProvider[];
+    globalContext: CryptographicParameters;
+    net: Network;
+};
+
+export interface RecoveryStatus {
+    payload: RecoveryPayload;
+    identitiesToAdd?: Identity[];
+    credentialsToAdd?: WalletCredential[];
+    completedProviders?: number[];
+    identityIndex?: number;
+    identityGap?: number;
+    credentialNumber?: number;
+    credentialGap?: number;
+    nextId?: number;
 }

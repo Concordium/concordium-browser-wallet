@@ -12,7 +12,7 @@ import IdentityProviderIcon from '@popup/shared/IdentityProviderIcon';
 import PendingArrows from '@assets/svg/pending-arrows.svg';
 import { getGlobal, getNet } from '@shared/utils/network-helpers';
 import { addToastAtom } from '@popup/state';
-import { useDecryptedSeedPhrase } from '@popup/shared/utils/seedPhrase-helpers';
+import { useDecryptedSeedPhrase } from '@popup/shared/utils/seed-phrase-helpers';
 
 interface InnerProps {
     onStart: () => void;

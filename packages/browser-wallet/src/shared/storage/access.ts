@@ -6,6 +6,7 @@ import {
     WalletCredential,
     IdentityProvider,
     NetworkConfiguration,
+    RecoveryStatus,
     SessionPendingIdentity,
 } from './types';
 
@@ -118,8 +119,6 @@ export const getGenesisHash = () =>
 
 export const storedIdentities = makeIndexedStorageAccessor<Identity[]>('local', ChromeStorageKey.Identities);
 export const storedSelectedIdentity = makeStorageAccessor<string>('local', ChromeStorageKey.SelectedIdentity);
-export const storedSeedPhrase = makeStorageAccessor<string>('local', ChromeStorageKey.SeedPhrase);
-
 const indexedStoredConnectedSites = makeIndexedStorageAccessor<Record<string, string[]>>(
     'local',
     ChromeStorageKey.ConnectedSites
@@ -146,5 +145,6 @@ export const sessionAccountInfoCache = makeIndexedStorageAccessor<Record<string,
     ChromeStorageKey.AccountInfoCache
 );
 export const sessionIsRecovering = makeStorageAccessor<boolean>('session', ChromeStorageKey.IsRecovering);
+export const sessionRecoveryStatus = makeStorageAccessor<RecoveryStatus>('session', ChromeStorageKey.RecoveryStatus);
 export const sessionOnboardingLocation = makeStorageAccessor<string>('session', ChromeStorageKey.OnboardingLocation);
 export const sessionIdpTab = makeStorageAccessor<number>('session', ChromeStorageKey.IdpTab);

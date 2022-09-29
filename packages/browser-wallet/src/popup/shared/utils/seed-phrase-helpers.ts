@@ -3,7 +3,7 @@ import { useAtomValue } from 'jotai';
 import { encryptedSeedPhraseAtom, sessionPasscodeAtom } from '@popup/store/settings';
 import { noOp, useAsyncMemo } from 'wallet-common-helpers';
 import { mnemonicToSeedSync } from '@scure/bip39';
-import { decrypt } from '../crypto';
+import { decrypt } from '@shared/utils/crypto';
 
 export function useDecryptedSeedPhrase(onError: (e: Error) => void = noOp) {
     const encryptedSeed = useAtomValue(encryptedSeedPhraseAtom);

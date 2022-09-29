@@ -12,13 +12,13 @@ import {
     storedIdentities,
     sessionPendingIdentity,
     storedSelectedIdentity,
-    storedSeedPhrase,
     storedIdentityProviders,
     sessionCreatingCredential,
     sessionAccountInfoCache,
     sessionIsRecovering,
     storedHasBeenOnboarded,
     sessionOnboardingLocation,
+    sessionRecoveryStatus,
     sessionIdpTab,
 } from '@shared/storage/access';
 import { ChromeStorageKey } from '@shared/storage/types';
@@ -33,7 +33,6 @@ const accessorMap = {
     [ChromeStorageKey.SeedPhrase]: storedEncryptedSeedPhrase,
     [ChromeStorageKey.NetworkConfiguration]: storedCurrentNetwork,
     [ChromeStorageKey.Theme]: storedTheme,
-    [ChromeStorageKey.SeedPhrase]: storedSeedPhrase,
     [ChromeStorageKey.IdentityProviders]: useIndexedStorage(storedIdentityProviders, getGenesisHash),
     [ChromeStorageKey.HasBeenOnboarded]: storedHasBeenOnboarded,
     [ChromeStorageKey.Passcode]: sessionPasscode,
@@ -42,6 +41,7 @@ const accessorMap = {
     [ChromeStorageKey.IsCreatingCredential]: sessionCreatingCredential,
     [ChromeStorageKey.AccountInfoCache]: useIndexedStorage(sessionAccountInfoCache, getGenesisHash),
     [ChromeStorageKey.OnboardingLocation]: sessionOnboardingLocation,
+    [ChromeStorageKey.RecoveryStatus]: sessionRecoveryStatus,
     [ChromeStorageKey.IdpTab]: sessionIdpTab,
 };
 

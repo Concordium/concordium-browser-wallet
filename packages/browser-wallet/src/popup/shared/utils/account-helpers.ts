@@ -8,7 +8,7 @@ import { WalletCredential } from '@shared/storage/types';
 import { getNet } from '@shared/utils/network-helpers';
 import { isIdentityOfCredential } from '@shared/utils/identity-helpers';
 import { getNextUnused } from '@shared/utils/number-helpers';
-import { useDecryptedSeedPhrase } from './seedPhrase-helpers';
+import { useDecryptedSeedPhrase } from './seed-phrase-helpers';
 
 export const displaySplitAddress = (address: string) => `${address.slice(0, 4)}...${address.slice(address.length - 4)}`;
 

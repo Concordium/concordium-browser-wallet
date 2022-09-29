@@ -9,7 +9,7 @@ import { TextArea as ControlledTextArea } from '@popup/shared/Form/TextArea';
 import { useAtom, useSetAtom } from 'jotai';
 import { useTranslation } from 'react-i18next';
 import { encryptedSeedPhraseAtom, sessionOnboardingLocationAtom } from '@popup/store/settings';
-import { decrypt, encrypt } from '@popup/shared/crypto';
+import { decrypt, encrypt } from '@shared/utils/crypto';
 import { setupRoutes } from './routes';
 import { usePasscodeInSetup } from './passcode-helper';
 
