@@ -1,17 +1,17 @@
 import {
     ChromeStorageKey,
     Identity,
-    PendingIdentity,
     IdentityProvider,
     RecoveryPayload,
     RecoveryStatus,
+    SessionPendingIdentity,
 } from '@shared/storage/types';
 import { atom } from 'jotai';
 import { selectAtom } from 'jotai/utils';
 import { atomWithChromeStorage } from './utils';
 
 export const identitiesAtom = atomWithChromeStorage<Identity[]>(ChromeStorageKey.Identities, [], false);
-export const pendingIdentityAtom = atomWithChromeStorage<Omit<PendingIdentity, 'location'> | undefined>(
+export const pendingIdentityAtom = atomWithChromeStorage<SessionPendingIdentity | undefined>(
     ChromeStorageKey.PendingIdentity,
     undefined
 );

@@ -18,6 +18,7 @@ export enum ChromeStorageKey {
     HasBeenOnboarded = 'hasBeenOnboarded',
     OnboardingLocation = 'onboardingLocation',
     RecoveryStatus = 'recoveryStatus',
+    IdpTab = 'idpTab',
 }
 
 export enum Theme {
@@ -55,6 +56,11 @@ export interface ConfirmedIdentity extends BaseIdentity {
     status: CreationStatus.Confirmed;
     idObject: Versioned<IdentityObjectV1>;
 }
+
+export type SessionPendingIdentity = {
+    identity: Omit<PendingIdentity, 'location'>;
+    network: NetworkConfiguration;
+};
 
 export type Identity = PendingIdentity | RejectedIdentity | ConfirmedIdentity;
 

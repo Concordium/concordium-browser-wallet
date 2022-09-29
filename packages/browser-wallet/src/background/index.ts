@@ -16,7 +16,7 @@ import JSONBig from 'json-bigint';
 import { ChromeStorageKey, NetworkConfiguration } from '@shared/storage/types';
 import bgMessageHandler from './message-handler';
 import { forwardToPopup, HandleMessage, HandleResponse, RunCondition, setPopupSize } from './window-management';
-import { identityIssuanceHandler } from './identity-issuance';
+import { addIdpListeners, identityIssuanceHandler } from './identity-issuance';
 import { startMonitoringPendingStatus } from './confirmation';
 import { sendCredentialHandler } from './credential-deployment';
 import { startRecovery, setupRecoveryHandler } from './recovery';
@@ -120,6 +120,8 @@ chrome.storage.session.onChanged.addListener((changes) => {
 setupRecoveryHandler();
 chrome.runtime.onStartup.addListener(startupHandler);
 chrome.runtime.onInstalled.addListener(startupHandler);
+
+addIdpListeners();
 
 bgMessageHandler.handleMessage(
     createMessageTypeFilter(InternalMessageType.SendCredentialDeployment),

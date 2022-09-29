@@ -2,12 +2,12 @@ import {
     ChromeStorageKey,
     EncryptedData,
     Identity,
-    PendingIdentity,
     Theme,
     WalletCredential,
     IdentityProvider,
     NetworkConfiguration,
     RecoveryStatus,
+    SessionPendingIdentity,
 } from './types';
 
 export type StorageAccessor<V> = {
@@ -135,7 +135,7 @@ export const storedIdentityProviders = makeIndexedStorageAccessor<IdentityProvid
 export const storedHasBeenOnboarded = makeStorageAccessor<boolean>('local', ChromeStorageKey.HasBeenOnboarded);
 
 export const sessionPasscode = makeStorageAccessor<string>('session', ChromeStorageKey.Passcode);
-export const sessionPendingIdentity = makeStorageAccessor<Omit<PendingIdentity, 'location'>>(
+export const sessionPendingIdentity = makeStorageAccessor<SessionPendingIdentity>(
     'session',
     ChromeStorageKey.PendingIdentity
 );
@@ -147,3 +147,4 @@ export const sessionAccountInfoCache = makeIndexedStorageAccessor<Record<string,
 export const sessionIsRecovering = makeStorageAccessor<boolean>('session', ChromeStorageKey.IsRecovering);
 export const sessionRecoveryStatus = makeStorageAccessor<RecoveryStatus>('session', ChromeStorageKey.RecoveryStatus);
 export const sessionOnboardingLocation = makeStorageAccessor<string>('session', ChromeStorageKey.OnboardingLocation);
+export const sessionIdpTab = makeStorageAccessor<number>('session', ChromeStorageKey.IdpTab);

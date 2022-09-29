@@ -9,10 +9,10 @@ const t: typeof en = {
     siteNotConnected: 'Ikke forbundet',
     accountBalanceError: 'Fejl ved hentning af kontoens balance',
     actions: {
-        log: 'transaktionslog',
-        send: 'send ccd',
-        receive: 'modtag ccd',
-        settings: 'kontoindstillinger',
+        log: 'Transaktionslog',
+        send: 'Send CCD',
+        receive: 'Modtag CCD',
+        settings: 'Kontoindstillinger',
     },
     details: {
         total: 'Offentligt total',
