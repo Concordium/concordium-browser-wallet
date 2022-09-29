@@ -1,10 +1,17 @@
-import { ChromeStorageKey, Identity, PendingIdentity, IdentityProvider } from '@shared/storage/types';
+import {
+    ChromeStorageKey,
+    Identity,
+    IdentityProvider,
+    RecoveryPayload,
+    RecoveryStatus,
+    SessionPendingIdentity,
+} from '@shared/storage/types';
 import { atom } from 'jotai';
 import { selectAtom } from 'jotai/utils';
 import { atomWithChromeStorage } from './utils';
 
 export const identitiesAtom = atomWithChromeStorage<Identity[]>(ChromeStorageKey.Identities, [], false);
-export const pendingIdentityAtom = atomWithChromeStorage<Omit<PendingIdentity, 'location'> | undefined>(
+export const pendingIdentityAtom = atomWithChromeStorage<SessionPendingIdentity | undefined>(
     ChromeStorageKey.PendingIdentity,
     undefined
 );
@@ -42,3 +49,11 @@ export const identityNamesAtom = selectAtom(identitiesAtom, (identities) => {
 });
 
 export const isRecoveringAtom = atomWithChromeStorage<boolean>(ChromeStorageKey.IsRecovering, false, true);
+const recoveryStatusAtom = atomWithChromeStorage<RecoveryStatus | undefined>(
+    ChromeStorageKey.RecoveryStatus,
+    undefined,
+    true
+);
+export const setRecoveryPayloadAtom = atom<null, RecoveryPayload, Promise<void>>(null, (_, set, payload) =>
+    set(recoveryStatusAtom, { payload })
+);

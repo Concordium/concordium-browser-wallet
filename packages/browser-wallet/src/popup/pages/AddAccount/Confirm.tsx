@@ -19,7 +19,7 @@ import { isIdentityOfCredential } from '@shared/utils/identity-helpers';
 import { getGlobal, getNet } from '@shared/utils/network-helpers';
 import { addToastAtom } from '@popup/state';
 import { getNextEmptyCredNumber } from '@popup/shared/utils/account-helpers';
-import { useDecryptedSeedPhrase } from '@popup/shared/utils/seedPhrase-helpers';
+import { useDecryptedSeedPhrase } from '@popup/shared/utils/seed-phrase-helpers';
 import AccountDetails from '../Account/AccountDetails';
 
 export default function Confirm() {

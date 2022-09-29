@@ -1,4 +1,4 @@
-import { decrypt, encrypt } from '@popup/shared/crypto';
+import { decrypt, encrypt } from '@shared/utils/crypto';
 import Form, { useForm } from '@popup/shared/Form';
 import FormPassword from '@popup/shared/Form/Password';
 import Submit from '@popup/shared/Form/Submit';

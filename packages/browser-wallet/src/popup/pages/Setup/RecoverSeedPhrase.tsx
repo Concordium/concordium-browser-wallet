@@ -8,7 +8,7 @@ import Form from '@popup/shared/Form';
 import { SubmitHandler, Validate } from 'react-hook-form';
 import Submit from '@popup/shared/Form/Submit';
 import { useTranslation } from 'react-i18next';
-import { encrypt } from '@popup/shared/crypto';
+import { encrypt } from '@shared/utils/crypto';
 import { encryptedSeedPhraseAtom, sessionOnboardingLocationAtom } from '@popup/store/settings';
 import { validateMnemonic } from '@scure/bip39';
 import { wordlist } from '@scure/bip39/wordlists/english';

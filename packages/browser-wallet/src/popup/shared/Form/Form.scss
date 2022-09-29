@@ -190,6 +190,7 @@ $handle-scale: scale(1.02);
     }
 
     &__switch {
+        cursor: pointer;
         position: relative;
         width: $switch-width;
         height: $switch-height;
@@ -222,6 +223,9 @@ $handle-scale: scale(1.02);
     }
 
     &__handle {
+        display: flex;
+        justify-content: center;
+        align-items: center;
         background-color: $color-off-white;
         width: $handle-size;
         height: $handle-size;
@@ -235,6 +239,11 @@ $handle-scale: scale(1.02);
 
         input:checked ~ & {
             transform: translate(calc($switch-width - $handle-size), 0) $handle-scale;
+        }
+
+        > * {
+            max-width: 75%;
+            max-height: 75%;
         }
     }
 }
