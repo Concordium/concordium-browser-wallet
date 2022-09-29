@@ -98,7 +98,7 @@ const injectScript: ExtensionMessageHandler = (_msg, sender, respond) => {
 const startupHandler = async () => {
     const network = await storedCurrentNetwork.get();
     if (network) {
-        startMonitoringPendingStatus(network);
+        await startMonitoringPendingStatus(network);
     }
 };
 const networkChangeHandler = (network: NetworkConfiguration) => startMonitoringPendingStatus(network);
@@ -120,6 +120,9 @@ chrome.storage.session.onChanged.addListener((changes) => {
 setupRecoveryHandler();
 chrome.runtime.onStartup.addListener(startupHandler);
 chrome.runtime.onInstalled.addListener(startupHandler);
+bgMessageHandler.handleMessage(createMessageTypeFilter(InternalMessageType.PopupReady), () => {
+    startupHandler();
+});
 
 addIdpListeners();
 
