@@ -1,8 +1,7 @@
 import {
     AccountInfo,
-    createCredentialV1,
+    ConcordiumHdWallet,
     createIdentityRecoveryRequest,
-    CredentialInputV1,
     CredentialRegistrationId,
     HttpProvider,
     IdentityRecoveryRequestInput,
@@ -38,7 +37,7 @@ const RECOVERY_LOCK = 'concordium_recovery_lock';
 async function recoverAccounts(
     status: RecoveryStatus,
     providerIndex: number,
-    credentialInput: Omit<CredentialInputV1, 'credNumber'>,
+    getCredId: (credNumber: number) => string,
     getAccountInfo: (credId: string) => Promise<AccountInfo | undefined>,
     usedCredNumbersOfIdentity: number[]
 ): Promise<WalletCredential[]> {
@@ -50,8 +49,7 @@ async function recoverAccounts(
 
     while (emptyIndices < maxEmpty) {
         if (!usedCredNumbersOfIdentity.includes(credNumber)) {
-            const request = createCredentialV1({ ...credentialInput, credNumber });
-            const { credId } = request.cdi;
+            const credId = getCredId(credNumber);
             const accountInfo = await getAccountInfo(credId);
             if (accountInfo) {
                 credsToAdd.push({
@@ -110,6 +108,7 @@ async function performRecovery() {
         if (!seedAsHex) {
             throw new Error('Unable to access secret seed.');
         }
+        const hdWallet = ConcordiumHdWallet.fromHex(seedAsHex, net);
         const recoveryInputs: Omit<RecoveryInputs, 'identityIndex'> = { globalContext, net, seedAsHex };
 
         const identitiesToAdd: Identity[] = status.identitiesToAdd || [];
@@ -174,17 +173,16 @@ async function performRecovery() {
                         const foundCreds = await recoverAccounts(
                             status,
                             providerIndex,
-                            {
-                                identityIndex,
-                                ipInfo: provider.ipInfo,
-                                arsInfos: provider.arsInfos,
-                                globalContext: recoveryInputs.globalContext,
-                                seedAsHex: recoveryInputs.seedAsHex,
-                                net: recoveryInputs.net,
-                                expiry: Date.now(),
-                                revealedAttributes: [],
-                                idObject: identity.idObject.value,
-                            },
+                            // eslint-disable-next-line @typescript-eslint/no-loop-func
+                            (credNumber) =>
+                                hdWallet
+                                    .getCredentialId(
+                                        providerIndex,
+                                        identityIndex,
+                                        credNumber,
+                                        recoveryInputs.globalContext
+                                    )
+                                    .toString('hex'),
                             getAccountInfo,
                             credsToAdd
                                 .concat(credentials?.filter((c) => c.status !== CreationStatus.Rejected) || [])
