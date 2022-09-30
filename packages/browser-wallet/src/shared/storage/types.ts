@@ -174,7 +174,7 @@ export type RecoveryPayload = {
 
 export interface CredentialBalancePair {
     cred: WalletCredential;
-    balance: bigint;
+    balance: string;
 }
 export interface RecoveryStatus {
     payload: RecoveryPayload;

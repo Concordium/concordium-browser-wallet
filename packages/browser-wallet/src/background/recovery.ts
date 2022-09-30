@@ -67,7 +67,7 @@ async function recoverAccounts(
                         identityIndex,
                         providerIndex,
                     },
-                    balance: accountInfo.accountAmount,
+                    balance: accountInfo.accountAmount.toString(),
                 });
                 emptyIndices = 0;
             } else {
@@ -245,7 +245,7 @@ async function performRecovery() {
         return {
             identities: identitiesToAdd.map((id) => ({ index: id.index, providerIndex: id.providerIndex })),
             accounts: credsToAdd.map((pair) => {
-                return { address: pair.cred.address, balance: pair.balance.toString() };
+                return { address: pair.cred.address, balance: pair.balance };
             }),
         };
     } finally {
