@@ -36,7 +36,7 @@ export type RecoveryBackgroundResponse =
     | {
           status: BackgroundResponseStatus.Success;
           added: {
-              accounts: string[];
+              accounts: { address: string; balance: string }[];
               identities: IdentityIdentifier[];
           };
       }

@@ -9,7 +9,13 @@ import {
 } from '@concordium/web-sdk';
 import { InternalMessageType } from '@concordium/browser-wallet-message-hub';
 import { BackgroundResponseStatus, RecoveryBackgroundResponse } from '@shared/utils/types';
-import { Identity, CreationStatus, IdentityProvider, WalletCredential, RecoveryStatus } from '@shared/storage/types';
+import {
+    Identity,
+    CreationStatus,
+    IdentityProvider,
+    RecoveryStatus,
+    CredentialBalancePair,
+} from '@shared/storage/types';
 import {
     sessionIsRecovering,
     sessionRecoveryStatus,
@@ -40,8 +46,8 @@ async function recoverAccounts(
     getCredId: (credNumber: number) => string,
     getAccountInfo: (credId: string) => Promise<AccountInfo | undefined>,
     usedCredNumbersOfIdentity: number[]
-): Promise<WalletCredential[]> {
-    const credsToAdd: WalletCredential[] = [];
+): Promise<CredentialBalancePair[]> {
+    const credsToAdd: CredentialBalancePair[] = [];
 
     let emptyIndices = status.credentialGap || 0;
     let credNumber = status.credentialNumber || getNextUnused(usedCredNumbersOfIdentity);
@@ -53,12 +59,15 @@ async function recoverAccounts(
             const accountInfo = await getAccountInfo(credId);
             if (accountInfo) {
                 credsToAdd.push({
-                    address: accountInfo.accountAddress,
-                    credId,
-                    credNumber,
-                    status: CreationStatus.Confirmed,
-                    identityIndex,
-                    providerIndex,
+                    cred: {
+                        address: accountInfo.accountAddress,
+                        credId,
+                        credNumber,
+                        status: CreationStatus.Confirmed,
+                        identityIndex,
+                        providerIndex,
+                    },
+                    balance: accountInfo.accountAmount,
                 });
                 emptyIndices = 0;
             } else {
@@ -112,7 +121,7 @@ async function performRecovery() {
         const recoveryInputs: Omit<RecoveryInputs, 'identityIndex'> = { globalContext, net, seedAsHex };
 
         const identitiesToAdd: Identity[] = status.identitiesToAdd || [];
-        const credsToAdd: WalletCredential[] = status.credentialsToAdd || [];
+        const credsToAdd: CredentialBalancePair[] = status.credentialsToAdd || [];
         const completedProviders = status.completedProviders || [];
         let nextId = status?.nextId || 0;
 
@@ -185,6 +194,7 @@ async function performRecovery() {
                                     .toString('hex'),
                             getAccountInfo,
                             credsToAdd
+                                .map((pair) => pair.cred)
                                 .concat(credentials?.filter((c) => c.status !== CreationStatus.Rejected) || [])
                                 .filter(isIdentityOfCredential(identity))
                                 .map((cred) => cred.credNumber)
@@ -223,7 +233,7 @@ async function performRecovery() {
             await addIdentity(identitiesToAdd, network.genesisHash);
         }
         const [updates, newCreds] = partition(
-            credsToAdd,
+            credsToAdd.map((pair) => pair.cred),
             (cred) => !!credentials && credentials.some((cand) => cred.credId === cand.credId)
         );
         if (updates.length) {
@@ -234,7 +244,9 @@ async function performRecovery() {
         }
         return {
             identities: identitiesToAdd.map((id) => ({ index: id.index, providerIndex: id.providerIndex })),
-            accounts: credsToAdd.map((cred) => cred.address),
+            accounts: credsToAdd.map((pair) => {
+                return { address: pair.cred.address, balance: pair.balance.toString() };
+            }),
         };
     } finally {
         await sessionIsRecovering.set(false);
