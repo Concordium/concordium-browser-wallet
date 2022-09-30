@@ -13,6 +13,7 @@ const t: typeof en = {
         success: 'Følgende identiteter og konti blev fundet.',
         error: 'Genskabning fejlede. Du kan prøve igen. \n Årsag til fejlen:',
         noneFound: 'Ingen identiteter blev fundet.',
+        errorAccountInfo: 'Fejl ved hentning af kontoens balance',
     },
     continue: 'Fortsæt',
     retry: 'Prøv igen',

@@ -1,4 +1,4 @@
-import { AccountAddress, AccountInfo, HttpProvider, JsonRpcClient } from '@concordium/web-sdk';
+import { AccountInfo } from '@concordium/web-sdk';
 import { networkConfigurationAtom } from '@popup/store/settings';
 import { useAtomValue, useSetAtom } from 'jotai';
 import React, { createContext, ReactNode, useContext, useEffect, useMemo, useState } from 'react';
@@ -9,6 +9,7 @@ import { addToastAtom } from '@popup/state';
 import { useTranslation } from 'react-i18next';
 import { getGenesisHash, sessionAccountInfoCache, useIndexedStorage } from '@shared/storage/access';
 import { accountInfoCacheLock, updateRecord } from '@shared/storage/update';
+import { getAccountInfo } from '@shared/utils/network-helpers';
 import { AccountInfoListener } from '../account-info-listener';
 
 export const accountInfoAtom = atomWithChromeStorage<Record<string, string>>(
@@ -71,23 +72,16 @@ export function useAccountInfo(account: WalletCredential): AccountInfo | undefin
         if (accountInfoCache[address]) {
             setAccountInfo(parse(accountInfoCache[address]));
         } else if (account.status === CreationStatus.Confirmed) {
-            const client = new JsonRpcClient(new HttpProvider(jsonRpcUrl));
-            client
-                .getConsensusStatus()
-                .then((consensusStatus) => {
-                    client
-                        .getAccountInfo(new AccountAddress(address), consensusStatus.lastFinalizedBlock)
-                        .then((newAccountInfo) => {
-                            if (newAccountInfo) {
-                                updateRecord(
-                                    accountInfoCacheLock,
-                                    useIndexedStorage(sessionAccountInfoCache, getGenesisHash),
-                                    newAccountInfo.accountAddress,
-                                    stringify(newAccountInfo)
-                                );
-                            }
-                        })
-                        .catch(() => addToast(t('account.error')));
+            getAccountInfo(address, jsonRpcUrl)
+                .then((newAccountInfo) => {
+                    if (newAccountInfo) {
+                        updateRecord(
+                            accountInfoCacheLock,
+                            useIndexedStorage(sessionAccountInfoCache, getGenesisHash),
+                            newAccountInfo.accountAddress,
+                            stringify(newAccountInfo)
+                        );
+                    }
                 })
                 .catch(() => addToast(t('account.error')));
         }

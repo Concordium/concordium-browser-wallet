@@ -1,6 +1,6 @@
-import React, { useEffect, useContext, useMemo } from 'react';
+import React, { useEffect, useContext, useMemo, useState } from 'react';
 import { useNavigate, useLocation } from 'react-router-dom';
-import { useAtomValue, useAtom } from 'jotai';
+import { useAtomValue, useAtom, useSetAtom } from 'jotai';
 import { useTranslation } from 'react-i18next';
 import { credentialsAtom, selectedAccountAtom } from '@popup/store/account';
 import { identitiesAtom } from '@popup/store/identity';
@@ -12,6 +12,11 @@ import { IdentityIdentifier, BackgroundResponseStatus, RecoveryBackgroundRespons
 import { fullscreenPromptContext } from '@popup/page-layouts/FullscreenPromptLayout';
 import PageHeader from '@popup/shared/PageHeader';
 import { identityMatch, isIdentityOfCredential } from '@shared/utils/identity-helpers';
+import { WalletCredential } from '@shared/storage/types';
+import { networkConfigurationAtom } from '@popup/store/settings';
+import { getAccountInfo } from '@shared/utils/network-helpers';
+import { AccountInfo } from '@concordium/web-sdk';
+import { addToastAtom } from '@popup/state';
 
 interface Location {
     state: {
@@ -24,6 +29,27 @@ interface Props {
         accounts: string[];
         identities: IdentityIdentifier[];
     };
+}
+
+function RecoveredAccount({ cred }: { cred: WalletCredential }) {
+    const { t } = useTranslation('recovery');
+    const { jsonRpcUrl } = useAtomValue(networkConfigurationAtom);
+    const [accountInfo, setAccountInfo] = useState<AccountInfo>();
+    const addToast = useSetAtom(addToastAtom);
+    const totalBalance = useMemo(() => accountInfo?.accountAmount ?? BigInt(0), [accountInfo]);
+
+    useEffect(() => {
+        getAccountInfo(cred.address, jsonRpcUrl)
+            .then(setAccountInfo)
+            .catch(() => addToast(t('finish.errorAccountInfo')));
+    }, []);
+
+    return (
+        <div className="recovery__main__credential" key={cred.credId}>
+            <p>{displaySplitAddress(cred.address)}</p>
+            <p>{displayAsCcd(totalBalance)}</p>
+        </div>
+    );
 }
 
 export function DisplaySuccess({ added }: Props) {
@@ -64,10 +90,7 @@ export function DisplaySuccess({ added }: Props) {
                             {!added.identities.some(identityMatch(identity)) && ' (Already existed)'}
                         </p>
                         {addedAccounts.filter(isIdentityOfCredential(identity)).map((cred) => (
-                            <div className="recovery__main__credential" key={cred.credId}>
-                                <p>{displaySplitAddress(cred.address)}</p>
-                                <p>{displayAsCcd(0n)}</p>
-                            </div>
+                            <RecoveredAccount key={cred.credId} cred={cred} />
                         ))}
                     </div>
                 ))}
