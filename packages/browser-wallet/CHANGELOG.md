@@ -1,5 +1,11 @@
 # Changelog
 
+## 0.7.4
+
+### Fixed
+
+-   JSON-RPC URL on mainnet.
+
 ## 0.7.3
 
 ### Fixed
