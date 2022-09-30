@@ -15,7 +15,7 @@ import { useNavigate } from 'react-router-dom';
 export const mainnet: NetworkConfiguration = {
     genesisHash: mainnetGenesisHash,
     name: 'Concordium Mainnet',
-    jsonRpcUrl: 'https://json-rpc.concordium.software',
+    jsonRpcUrl: 'https://json-rpc.mainnet.concordium.software/',
     explorerUrl: 'https://wallet-proxy.mainnet.concordium.software',
 };
 
