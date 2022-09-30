@@ -9,7 +9,6 @@ The example project included in this repository serves as a working example of h
 ## Installing
 
 -   Run `yarn` in package root.
--   Run `yarn build:all` to build the `concordium-helpers` package.
 
 ## Running the wCCD example
 

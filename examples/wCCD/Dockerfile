@@ -4,7 +4,6 @@ FROM ${base_image} AS build
 
 WORKDIR /app
 COPY ./package.json ./package.json
-RUN sed -i "s/workspace:^/^0.2.0/g" package.json
 COPY ./tsconfig.json ./tsconfig.json
 COPY ./esbuild.config.ts ./
 COPY ./types ./types
