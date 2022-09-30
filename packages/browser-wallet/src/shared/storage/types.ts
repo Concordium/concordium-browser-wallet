@@ -172,10 +172,14 @@ export type RecoveryPayload = {
     net: Network;
 };
 
+export interface CredentialBalancePair {
+    cred: WalletCredential;
+    balance: string;
+}
 export interface RecoveryStatus {
     payload: RecoveryPayload;
     identitiesToAdd?: Identity[];
-    credentialsToAdd?: WalletCredential[];
+    credentialsToAdd?: CredentialBalancePair[];
     completedProviders?: number[];
     identityIndex?: number;
     identityGap?: number;

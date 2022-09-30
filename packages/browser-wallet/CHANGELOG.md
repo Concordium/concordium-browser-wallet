@@ -1,5 +1,11 @@
 # Changelog
 
+## 0.7.5
+
+### Fixed
+
+-   An issue where the account balance was always shown as 0 on the recovery page.
+
 ## 0.7.4
 
 ### Fixed
