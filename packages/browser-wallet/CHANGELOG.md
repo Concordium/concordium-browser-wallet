@@ -1,5 +1,11 @@
 # Changelog
 
+## 0.8.0
+
+### Added
+
+-   A toast is now shown when the passcode is successfully updated.
+
 ## 0.7.5
 
 ### Fixed
