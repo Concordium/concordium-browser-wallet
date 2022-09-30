@@ -3,8 +3,9 @@ ARG base_image=node:16-slim
 FROM ${base_image} AS build
 
 WORKDIR /app
-COPY ./package_docker.json ./package.json
-COPY ./tsconfig_docker.json ./tsconfig.json
+COPY ./package.json ./package.json
+RUN sed -i "s/workspace:^/^0.2.0/g" package.json
+COPY ./tsconfig.json ./tsconfig.json
 COPY ./esbuild.config.ts ./
 COPY ./types ./types
 COPY ./src ./src
