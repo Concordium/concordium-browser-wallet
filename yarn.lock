@@ -1874,6 +1874,15 @@ __metadata:
   languageName: node
   linkType: hard
 
+"@concordium/browser-wallet-api-helpers@npm:latest":
+  version: 0.2.0
+  resolution: "@concordium/browser-wallet-api-helpers@npm:0.2.0"
+  dependencies:
+    "@concordium/web-sdk": ^0.4.0
+  checksum: 7ddf26115f2e1b7af203bedbf35ae8a6379ed9741931ae04880510bf88021718d856231eb39fefe51c9aae67e3939a29283725f08aca8a1f6d4b7403972c7895
+  languageName: node
+  linkType: hard
+
 "@concordium/browser-wallet-api-helpers@workspace:^, @concordium/browser-wallet-api-helpers@workspace:packages/browser-wallet-api-helpers":
   version: 0.0.0-use.local
   resolution: "@concordium/browser-wallet-api-helpers@workspace:packages/browser-wallet-api-helpers"
@@ -1978,6 +1987,23 @@ __metadata:
   languageName: unknown
   linkType: soft
 
+"@concordium/common-sdk@npm:2.4.0":
+  version: 2.4.0
+  resolution: "@concordium/common-sdk@npm:2.4.0"
+  dependencies:
+    "@concordium/rust-bindings": 0.3.0
+    "@noble/ed25519": ^1.6.0
+    "@scure/bip39": ^1.1.0
+    bs58check: ^2.1.2
+    buffer: ^6.0.3
+    cross-fetch: 3.1.5
+    hash.js: ^1.1.7
+    json-bigint: ^1.0.0
+    uuid: ^8.3.2
+  checksum: 84b6a24008379b0fadd320521db981d1cfc6aafd05ffe472c0b6c727f003256d02a453b15f3fc492a4c401b49d2188a9b5f60f6561f2daa978bb036009b83543
+  languageName: node
+  linkType: hard
+
 "@concordium/common-sdk@npm:5.0.0, @concordium/common-sdk@npm:^5.0.0":
   version: 5.0.0
   resolution: "@concordium/common-sdk@npm:5.0.0"
@@ -2016,10 +2042,29 @@ __metadata:
   languageName: node
   linkType: hard
 
+"@concordium/rust-bindings@npm:0.3.0":
+  version: 0.3.0
+  resolution: "@concordium/rust-bindings@npm:0.3.0"
+  checksum: 8a3cd091c4edc28081139d980f08bc667e454d045d738cc69a0c54f5ad927d1be9e9d90d8593a5585a1a787a5c427ef2fb7b1e7b16d1aa85e6f46e3f465969e8
+  languageName: node
+  linkType: hard
+
 "@concordium/rust-bindings@npm:0.5.0":
   version: 0.5.0
   resolution: "@concordium/rust-bindings@npm:0.5.0"
   checksum: 16e7d071a8bb9c01007a7cd63dd7d882281570d5214c5483c88d25f0e6f654a689c1725f373b3254cbf33bf1910825444f02cca0c2d23ea3b387ffc405041386
+  languageName: node
+  linkType: hard
+
+"@concordium/web-sdk@npm:^0.4.0":
+  version: 0.4.0
+  resolution: "@concordium/web-sdk@npm:0.4.0"
+  dependencies:
+    "@concordium/common-sdk": 2.4.0
+    "@concordium/rust-bindings": 0.3.0
+    buffer: ^6.0.3
+    process: ^0.11.10
+  checksum: 889fd1eb4b2b78ba272e854e2ccb5541b330036b5f0d5892fa47734f5d6f1f51d2e7bb6e7670a249275a4e560d59b125c2bdb7960812a4d082d7536d695a8268
   languageName: node
   linkType: hard
 
@@ -2650,7 +2695,7 @@ __metadata:
   languageName: node
   linkType: hard
 
-"@noble/ed25519@npm:^1.7.1":
+"@noble/ed25519@npm:^1.6.0, @noble/ed25519@npm:^1.7.1":
   version: 1.7.1
   resolution: "@noble/ed25519@npm:1.7.1"
   checksum: b8e50306ac70f5cecc349111997e72e897b47a28d406b96cf95d0ebe7cbdefb8380d26117d7847d94102281db200aa3a494e520f9fc12e2f292e0762cb0fa333
@@ -4856,6 +4901,13 @@ __metadata:
   version: 17.0.45
   resolution: "@types/node@npm:17.0.45"
   checksum: aa04366b9103b7d6cfd6b2ef64182e0eaa7d4462c3f817618486ea0422984c51fc69fd0d436eae6c9e696ddfdbec9ccaa27a917f7c2e8c75c5d57827fe3d95e8
+  languageName: node
+  linkType: hard
+
+"@types/node@npm:^18.7.23":
+  version: 18.7.23
+  resolution: "@types/node@npm:18.7.23"
+  checksum: 2c8df0830d8345e5cd1ca17feb9cf43fa667aae749888e0a068c5c1b35eaedd2f9b24ed987a0758078395edf7a03681e5e0b7790a518ff7afe1ff6d8459f7b4a
   languageName: node
   linkType: hard
 
@@ -10460,6 +10512,13 @@ __metadata:
   version: 1.0.0
   resolution: "fs.realpath@npm:1.0.0"
   checksum: 99ddea01a7e75aa276c250a04eedeffe5662bce66c65c07164ad6264f9de18fb21be9433ead460e54cff20e31721c811f4fb5d70591799df5f85dce6d6746fd0
+  languageName: node
+  linkType: hard
+
+"fs@npm:^0.0.1-security":
+  version: 0.0.1-security
+  resolution: "fs@npm:0.0.1-security"
+  checksum: 53c6230e1faae9fa32c1df82c16a84b51b1243d20f3da2b64bd110bb472b73b9185169b703e008356e3cdc92d155088b617d9d39a63b5227a30b3621baad7f5d
   languageName: node
   linkType: hard
 
@@ -19422,7 +19481,7 @@ __metadata:
   peerDependencies:
     react: ">=16"
     react-dom: ">=16"
-  checksum: 3fc6e2d809881ba4bcd452bcacc3ced0f586a3557ded7f3f3ec4bfd6ffb1f59ce27b63e5a08b36425fd6b1ddb03e03b494247f6bdbea2d4c1353ca3126b8b3e6
+  checksum: b737803f80d3635877cffdb68f927e52ce22641b41acfc937b647ac05d697dd5956268178772348dfc38a9072b14f38492144694e8b72209f47236e4e92b3bfa
   languageName: node
   linkType: hard
 
@@ -19466,16 +19525,19 @@ __metadata:
   version: 0.0.0-use.local
   resolution: "wccd@workspace:examples/wCCD"
   dependencies:
-    "@concordium/browser-wallet-api-helpers": "workspace:^"
+    "@concordium/browser-wallet-api-helpers": latest
     "@concordium/web-sdk": ^2.0.0
     "@craftamap/esbuild-plugin-html": ^0.4.0
     "@thi.ng/leb128": ^2.1.18
+    "@types/node": ^18.7.23
     "@types/react": ^18.0.9
     "@types/react-dom": ^18.0.5
     cross-env: ^7.0.3
     esbuild: ^0.14.42
     esbuild-plugin-svgr: ^1.0.1
+    fs: ^0.0.1-security
     live-server: ^1.2.2
+    process: ^0.11.10
     react: ^18.1.0
     react-dom: ^18.1.0
     ts-node: ^10.8.0
