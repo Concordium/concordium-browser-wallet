@@ -20,8 +20,8 @@ import {
     sessionOnboardingLocation,
     sessionRecoveryStatus,
     sessionIdpTab,
-    pendingTransactions,
 } from '@shared/storage/access';
+import { pendingTransactions } from '@shared/storage/transactions';
 import { ChromeStorageKey } from '@shared/storage/types';
 import { atom, WritableAtom } from 'jotai';
 

@@ -4,6 +4,7 @@ import { abs } from 'wallet-common-helpers';
 import { IdentityProvider } from '@shared/storage/types';
 import { storedCurrentNetwork } from '@shared/storage/access';
 import {
+    BrowserWalletAccountTransaction,
     BrowserWalletTransaction,
     RewardType,
     TransactionHistoryResult,
@@ -263,10 +264,10 @@ export async function getSimpleTransferCost(): Promise<bigint> {
     return BigInt(response.data.cost);
 }
 
-export async function getCcdDrop(accountAddress: string): Promise<BrowserWalletTransaction> {
+export async function getCcdDrop(accountAddress: string): Promise<BrowserWalletAccountTransaction> {
     const response = await (await getWalletProxy()).put(`/v0/testnetGTUDrop/${accountAddress}`);
 
-    const ccdDropTransaction: BrowserWalletTransaction = {
+    const ccdDropTransaction: BrowserWalletAccountTransaction = {
         amount: BigInt(2000000000),
         blockHash: '',
         events: [],

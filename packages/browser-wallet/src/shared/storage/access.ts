@@ -1,4 +1,3 @@
-import { BrowserWalletAccountTransaction } from '@popup/shared/utils/transaction-history-types';
 import {
     ChromeStorageKey,
     EncryptedData,
@@ -55,7 +54,7 @@ export type IndexedStorageAccessor<V> = {
  * @param area storeage area to store value in
  * @param key key used to store value
  */
-const makeStorageAccessor = <V>(area: chrome.storage.AreaName, key: ChromeStorageKey): StorageAccessor<V> => {
+export const makeStorageAccessor = <V>(area: chrome.storage.AreaName, key: ChromeStorageKey): StorageAccessor<V> => {
     const store = chrome.storage[area];
     return {
         get: (): Promise<V | undefined> => store.get(key).then((s) => s[key]),
@@ -149,7 +148,3 @@ export const sessionIsRecovering = makeStorageAccessor<boolean>('session', Chrom
 export const sessionRecoveryStatus = makeStorageAccessor<RecoveryStatus>('session', ChromeStorageKey.RecoveryStatus);
 export const sessionOnboardingLocation = makeStorageAccessor<string>('session', ChromeStorageKey.OnboardingLocation);
 export const sessionIdpTab = makeStorageAccessor<number>('session', ChromeStorageKey.IdpTab);
-export const pendingTransactions = makeStorageAccessor<BrowserWalletAccountTransaction[]>(
-    'local',
-    ChromeStorageKey.PendingTransactions
-);

@@ -13,6 +13,12 @@ import { useAtomValue, useSetAtom } from 'jotai';
 import Button from '@popup/shared/Button';
 import { networkConfigurationAtom } from '@popup/store/settings';
 import { isMainnet } from '@shared/utils/network-helpers';
+import {
+    addPendingTransactionAtom,
+    removePendingTransactionsAtom,
+    selectedPendingTransactionsAtom,
+} from '@popup/store/transactions';
+import { useUpdateAtom } from 'jotai/utils';
 import useTransactionGroups, { TransactionsByDateTuple } from './useTransactionGroups';
 import TransactionElement, { transactionElementHeight } from './TransactionElement';
 
@@ -185,7 +191,19 @@ export default function TransactionList({ onTransactionClick }: TransactionListP
     const { t } = useTranslation('transactionLog');
     const account = useSelectedCredential();
     const accountAddress = useMemo(() => account?.address, [account]);
+    const pendingTransactions = useAtomValue(selectedPendingTransactionsAtom);
+    const addPendingTransaction = useUpdateAtom(addPendingTransactionAtom);
+    const removePendingTransactions = useUpdateAtom(removePendingTransactionsAtom);
     const [transactions, setTransactions] = useState<BrowserWalletTransaction[]>([]);
+    const allTransactions = useMemo(
+        () => [
+            ...transactions,
+            ...pendingTransactions.filter(
+                (ta) => !transactions.some((tb) => ta.transactionHash === tb.transactionHash)
+            ),
+        ],
+        [transactions, pendingTransactions]
+    );
     const [isNextPageLoading, setIsNextPageLoading] = useState<boolean>(false);
     const [hasNextPage, setHasNextPage] = useState<boolean>(true);
     const addToast = useSetAtom(addToastAtom);
@@ -215,6 +233,8 @@ export default function TransactionList({ onTransactionClick }: TransactionListP
                     return;
                 }
             }
+
+            removePendingTransactions(newTransactions);
 
             const updatedTransactions = updateTransactionsWithNewTransactions(transactions, newTransactions);
             setTransactions(updatedTransactions);
@@ -260,14 +280,12 @@ export default function TransactionList({ onTransactionClick }: TransactionListP
         setAmount(accountInfo?.accountAmount);
     }, [accountInfo?.accountAmount]);
 
-    async function ccdDrop(address: string) {
-        getCcdDrop(address).then((dropTransaction) => {
-            setTransactions([dropTransaction]);
-        });
+    function ccdDrop(address: string) {
+        getCcdDrop(address).then(addPendingTransaction);
     }
 
     let transactionListComponent;
-    if (transactions.length === 0) {
+    if (allTransactions.length === 0) {
         if (isNextPageLoading) {
             transactionListComponent = null;
         } else {
@@ -294,13 +312,13 @@ export default function TransactionList({ onTransactionClick }: TransactionListP
         // If the first transaction in the list changes, then we need to reload the entire
         // list, otherwise the infinite list component bugs out displaying the transactions
         // correctly.
-        const listKey = transactions[0].transactionHash ?? transactions[0].id;
+        const listKey = allTransactions[0].transactionHash ?? allTransactions[0].id;
         transactionListComponent = (
             <div className="transaction-list__scroll">
                 <InfiniteTransactionList
                     key={listKey}
                     accountAddress={accountAddress}
-                    transactions={transactions}
+                    transactions={allTransactions}
                     loadNextPage={loadNextPage}
                     hasNextPage={hasNextPage}
                     isNextPageLoading={isNextPageLoading}

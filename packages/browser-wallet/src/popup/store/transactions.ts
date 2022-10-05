@@ -1,14 +1,24 @@
-import { BrowserWalletAccountTransaction } from '@popup/shared/utils/transaction-history-types';
-import { ChromeStorageKey } from '@shared/storage/types';
+import {
+    BrowserWalletAccountTransaction,
+    BrowserWalletTransaction,
+} from '@popup/shared/utils/transaction-history-types';
+import { fromStoredTransaction, toStoredTransaction } from '@shared/storage/transactions';
+import { ChromeStorageKey, StoredBrowserWalletTransaction } from '@shared/storage/types';
 import { atom, WritableAtom } from 'jotai';
 import { atomFamily } from 'jotai/utils';
 import { selectedAccountAtom } from './account';
 import { atomWithChromeStorage } from './utils';
 
-const pendingTransactionsAtom = atomWithChromeStorage<BrowserWalletAccountTransaction[]>(
-    ChromeStorageKey.PendingTransactions,
-    []
-);
+const pendingTransactionsAtom = (() => {
+    const base = atomWithChromeStorage<StoredBrowserWalletTransaction[]>(ChromeStorageKey.PendingTransactions, []);
+
+    return atom<BrowserWalletAccountTransaction[], BrowserWalletAccountTransaction[]>(
+        (get) => get(base).map(fromStoredTransaction),
+        (_, set, update) => {
+            set(base, update.map(toStoredTransaction));
+        }
+    );
+})();
 
 const isForAccount = (address: string) => (transaction: BrowserWalletAccountTransaction) =>
     [transaction.fromAddress, transaction.toAddress].includes(address);
@@ -45,13 +55,15 @@ export const selectedPendingTransactionsAtom = atom<
     }
 );
 
-export const addPendingTransactionAtom = atom<null, BrowserWalletAccountTransaction>(null, (get, set, update) => {
-    set(pendingTransactionsAtom, [...get(pendingTransactionsAtom), update]);
+export const addPendingTransactionAtom = atom<null, BrowserWalletAccountTransaction>(null, (get, set, transaction) => {
+    set(pendingTransactionsAtom, [...get(pendingTransactionsAtom), transaction]);
 });
 
-export const removePendingTransactionAtom = atom<null, BrowserWalletAccountTransaction>(null, (get, set, update) => {
+export const removePendingTransactionsAtom = atom<null, BrowserWalletTransaction[]>(null, (get, set, transactions) => {
     set(
         pendingTransactionsAtom,
-        get(pendingTransactionsAtom).filter((t) => t.transactionHash === update.transactionHash)
+        get(pendingTransactionsAtom).filter(
+            (ta) => !transactions.some((tb) => ta.transactionHash === tb.transactionHash)
+        )
     );
 });
