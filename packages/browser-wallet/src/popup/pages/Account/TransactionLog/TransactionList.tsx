@@ -197,10 +197,10 @@ export default function TransactionList({ onTransactionClick }: TransactionListP
     const [transactions, setTransactions] = useState<BrowserWalletTransaction[]>([]);
     const allTransactions = useMemo(
         () => [
-            ...transactions,
             ...pendingTransactions.filter(
                 (ta) => !transactions.some((tb) => ta.transactionHash === tb.transactionHash)
             ),
+            ...transactions,
         ],
         [transactions, pendingTransactions]
     );
@@ -246,9 +246,12 @@ export default function TransactionList({ onTransactionClick }: TransactionListP
         getTransactions(address, transactionResultLimit, 'descending', fromId)
             .then((transactionResult) => {
                 setHasNextPage(transactionResult.full);
+                removePendingTransactions(transactionResult.transactions);
+
                 const updatedTransactions = appendTransactions
                     ? transactions.concat(transactionResult.transactions)
                     : transactionResult.transactions;
+
                 setTransactions(updatedTransactions);
                 setIsNextPageLoading(false);
             })
@@ -309,10 +312,9 @@ export default function TransactionList({ onTransactionClick }: TransactionListP
             );
         }
     } else {
-        // If the first transaction in the list changes, then we need to reload the entire
-        // list, otherwise the infinite list component bugs out displaying the transactions
-        // correctly.
-        const listKey = allTransactions[0].transactionHash ?? allTransactions[0].id;
+        // Quick and dirty fingerprint of transactions, to ensure transaction list resets properly.
+        const listKey = `${allTransactions.length}${allTransactions.reduce((acc, cur) => (acc + cur.id) % 73, 0)}`;
+
         transactionListComponent = (
             <div className="transaction-list__scroll">
                 <InfiniteTransactionList

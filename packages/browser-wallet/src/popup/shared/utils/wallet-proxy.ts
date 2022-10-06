@@ -10,6 +10,7 @@ import {
     TransactionHistoryResult,
     TransactionStatus,
 } from './transaction-history-types';
+import { createPendingTransaction } from './transaction-helpers';
 
 async function getWalletProxy() {
     const currentNetwork = await storedCurrentNetwork.get();
@@ -267,18 +268,11 @@ export async function getSimpleTransferCost(): Promise<bigint> {
 export async function getCcdDrop(accountAddress: string): Promise<BrowserWalletAccountTransaction> {
     const response = await (await getWalletProxy()).put(`/v0/testnetGTUDrop/${accountAddress}`);
 
-    const ccdDropTransaction: BrowserWalletAccountTransaction = {
-        amount: BigInt(2000000000),
-        blockHash: '',
-        events: [],
-        type: AccountTransactionType.SimpleTransfer,
-        status: TransactionStatus.Pending,
-        time: BigInt(Math.round(Date.now() / 1000)),
-        id: 0,
-        transactionHash: response.data.submissionId,
-        fromAddress: undefined,
-        toAddress: accountAddress,
-    };
-
-    return ccdDropTransaction;
+    return createPendingTransaction(
+        AccountTransactionType.SimpleTransfer,
+        response.data.submissionId,
+        BigInt(2000000000),
+        undefined,
+        accountAddress
+    );
 }

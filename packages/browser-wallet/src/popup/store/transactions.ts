@@ -60,10 +60,10 @@ export const addPendingTransactionAtom = atom<null, BrowserWalletAccountTransact
 });
 
 export const removePendingTransactionsAtom = atom<null, BrowserWalletTransaction[]>(null, (get, set, transactions) => {
-    set(
-        pendingTransactionsAtom,
-        get(pendingTransactionsAtom).filter(
-            (ta) => !transactions.some((tb) => ta.transactionHash === tb.transactionHash)
-        )
-    );
+    const current = get(pendingTransactionsAtom);
+    const next = current.filter((ta) => !transactions.some((tb) => ta.transactionHash === tb.transactionHash));
+
+    if (current.length !== next.length) {
+        set(pendingTransactionsAtom, next);
+    }
 });
