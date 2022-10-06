@@ -1,5 +1,11 @@
 # Changelog
 
+## 0.8.0
+
+### Added
+
+-   Shows submitted transactions in the transaction list.
+
 ## 0.7.5
 
 ### Fixed
