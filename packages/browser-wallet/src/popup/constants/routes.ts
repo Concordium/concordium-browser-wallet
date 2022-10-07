@@ -12,6 +12,10 @@ export const relativeRoutes = {
         account: {
             path: 'account',
             add: { path: 'add' },
+            tokens: {
+                add: { path: 'add' },
+                path: 'tokens'
+            }
         },
         identities: {
             path: 'identities',

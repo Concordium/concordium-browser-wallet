@@ -19,6 +19,7 @@ export enum ChromeStorageKey {
     OnboardingLocation = 'onboardingLocation',
     RecoveryStatus = 'recoveryStatus',
     IdpTab = 'idpTab',
+    Tokens = 'tokens',
 }
 
 export enum Theme {
@@ -187,3 +188,23 @@ export interface RecoveryStatus {
     credentialGap?: number;
     nextId?: number;
 }
+
+export interface MetadataUrl {
+    url: string;
+}
+
+export interface ContractMetadata {
+    name?: string;
+    symbol?: string,
+    decimals?: number;
+    description?: string;
+    thumbnail?: MetadataUrl;
+    display?: MetadataUrl;
+    artifact?: MetadataUrl;
+}
+
+export interface TokenIdAndMetadata {
+    id: string;
+    metadata: ContractMetadata;
+}
+

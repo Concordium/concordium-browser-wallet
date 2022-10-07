@@ -9,6 +9,7 @@ import Button from '@popup/shared/Button';
 import BackIcon from '@assets/svg/back-arrow.svg';
 import ListIcon from '@assets/svg/list.svg';
 import SendIcon from '@assets/svg/paperplane.svg';
+import TokenIcon from '@assets/svg/tokens.svg';
 import ReceiveIcon from '@assets/svg/qr.svg';
 import SettingsIcon from '@assets/svg/cog.svg';
 import { accountRoutes } from '../routes';
@@ -88,6 +89,9 @@ export default function AccountActions({ className, disabled, setDetailsExpanded
                 </Action>
                 <Action to={accountRoutes.send} title={t('send')} disabled={disabled}>
                     <SendIcon className="account-page-actions__send-icon" />
+                </Action>
+                <Action to={accountRoutes.tokens} title={t('tokens')} disabled={disabled}>
+            <TokenIcon className="account-page-actions__list-icon" />
                 </Action>
                 <Action to={accountRoutes.receive} title={t('receive')} disabled={disabled}>
                     <ReceiveIcon className="account-page-actions__receive-icon" />

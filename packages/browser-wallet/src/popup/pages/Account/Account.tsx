@@ -18,6 +18,7 @@ import AccountSettings from './AccountSettings';
 import TransactionLog from './TransactionLog/TransactionLog';
 import SendCcd from './SendCcd';
 import ConnectedBox from './ConnectedBox';
+import TokenOverview from './tokens/TokenOverview';
 
 function Account({
     detailsExpanded,
@@ -91,6 +92,7 @@ export default function AccountRoutes() {
                 <Route index element={<TransactionLog setDetailsExpanded={setDetailsExpanded} />} />
                 <Route path={`${accountRoutes.send}/*`} element={<SendCcd setDetailsExpanded={setDetailsExpanded} />} />
                 <Route path={accountRoutes.receive} element={<DisplayAddress />} />
+                <Route path={`${accountRoutes.tokens}/*`} element={<TokenOverview />} />
                 <Route path={`${accountRoutes.settings}/*`} element={<AccountSettings />} />
             </Route>
         </Routes>

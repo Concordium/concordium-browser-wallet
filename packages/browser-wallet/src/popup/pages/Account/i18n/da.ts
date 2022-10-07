@@ -13,6 +13,7 @@ const t: typeof en = {
         send: 'Send CCD',
         receive: 'Modtag CCD',
         settings: 'Kontoindstillinger',
+        tokens: 'Tokens',
     },
     details: {
         total: 'Offentligt total',

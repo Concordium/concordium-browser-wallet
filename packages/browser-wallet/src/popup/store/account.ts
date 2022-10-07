@@ -2,7 +2,7 @@ import { popupMessageHandler } from '@popup/shared/message-handler';
 import { atom } from 'jotai';
 import { selectAtom } from 'jotai/utils';
 
-import { ChromeStorageKey, WalletCredential } from '@shared/storage/types';
+import { ChromeStorageKey, TokenIdAndMetadata, WalletCredential } from '@shared/storage/types';
 import { EventType } from '@concordium/browser-wallet-api-helpers';
 import { atomWithChromeStorage } from './utils';
 
@@ -43,3 +43,5 @@ export const creatingCredentialRequestAtom = atomWithChromeStorage<boolean>(
     false,
     true
 );
+
+export const tokensAtom = atomWithChromeStorage<Record<string, Record<string, TokenIdAndMetadata[]>>>(ChromeStorageKey.Tokens, {}, true);

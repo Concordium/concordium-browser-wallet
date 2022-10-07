@@ -8,6 +8,7 @@ import { absoluteRoutes, relativeRoutes } from '@popup/constants/routes';
 import MainLayout from '@popup/page-layouts/MainLayout';
 import FullscreenPromptLayout from '@popup/page-layouts/FullscreenPromptLayout';
 import Account from '@popup/pages/Account';
+import AddTokens from '@popup/pages/AddTokens';
 import Identity from '@popup/pages/Identity';
 import SignMessage from '@popup/pages/SignMessage';
 import SendTransaction from '@popup/pages/SendTransaction';
@@ -143,6 +144,10 @@ export default function Routes() {
                 <Route
                     element={<AddAccount />}
                     path={`${relativeRoutes.home.account.path}/${relativeRoutes.home.account.add.path}/*`}
+                />
+                <Route
+                    element={<AddTokens />}
+                    path={`${relativeRoutes.home.account.path}/${relativeRoutes.home.account.tokens.path}/${relativeRoutes.home.account.tokens.add.path}/*`}
                 />
                 <Route path={`${relativeRoutes.home.account.path}/*`} element={<Account />} />
             </Route>
