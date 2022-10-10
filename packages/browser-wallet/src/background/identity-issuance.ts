@@ -44,6 +44,29 @@ const respond = async (response: IdentityIssuanceBackgroundResponse) => {
     bgMessageHandler.sendInternalMessage(InternalMessageType.EndIdentityIssuance, { ...response, status });
 };
 
+function addIdpRequestListener() {
+    const handleIdpRequest = (redirectUrl: string, tabId: number) => {
+        chrome.tabs.remove(tabId);
+        sessionIdpTab.remove();
+
+        respond({
+            status: BackgroundResponseStatus.Success,
+            result: redirectUrl.substring(redirectUrl.indexOf(codeUriKey) + codeUriKey.length),
+        });
+    };
+
+    chrome.webRequest?.onBeforeRequest.addListener(
+        (details) => {
+            sessionIdpTab.get().then((idpTabId) => {
+                if (details.url.includes(redirectUri) && details.tabId === idpTabId) {
+                    handleIdpRequest(details.url, idpTabId);
+                }
+            });
+        },
+        { urls: ['<all_urls>'] }
+    );
+}
+
 export function addIdpListeners() {
     chrome.tabs.onRemoved.addListener(async (tabId: number) => {
         const idpTabId = await sessionIdpTab.get();
@@ -56,26 +79,19 @@ export function addIdpListeners() {
         }
     });
 
-    const handleIdpRequest = (redirectUrl: string, tabId: number) => {
-        chrome.tabs.remove(tabId);
-        sessionIdpTab.remove();
+    addIdpRequestListener();
 
-        respond({
-            status: BackgroundResponseStatus.Success,
-            result: redirectUrl.substring(redirectUrl.indexOf(codeUriKey) + codeUriKey.length),
-        });
-    };
-
-    chrome.webRequest.onBeforeRequest.addListener(
-        (details) => {
-            sessionIdpTab.get().then((idpTabId) => {
-                if (details.url.includes(redirectUri) && details.tabId === idpTabId) {
-                    handleIdpRequest(details.url, idpTabId);
-                }
-            });
-        },
-        { urls: ['<all_urls>'] }
-    );
+    // SAFARI CRASH webrequest API unavailable
+    // chrome.webRequest.onBeforeRequest.addListener(
+    //     (details) => {
+    //         sessionIdpTab.get().then((idpTabId) => {
+    //             if (details.url.includes(redirectUri) && details.tabId === idpTabId) {
+    //                 handleIdpRequest(details.url, idpTabId);
+    //             }
+    //         });
+    //     },
+    //     { urls: ['<all_urls>'] }
+    // );
 
     chrome.runtime.onMessage.addListener((msg, _, sendResponse: (isDone: boolean) => void) => {
         if (msg === MSG.LIFELINE) {

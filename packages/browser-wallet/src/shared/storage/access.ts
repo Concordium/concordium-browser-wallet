@@ -134,17 +134,17 @@ export const storedIdentityProviders = makeIndexedStorageAccessor<IdentityProvid
 );
 export const storedHasBeenOnboarded = makeStorageAccessor<boolean>('local', ChromeStorageKey.HasBeenOnboarded);
 
-export const sessionPasscode = makeStorageAccessor<string>('session', ChromeStorageKey.Passcode);
+export const sessionPasscode = makeStorageAccessor<string>('local', ChromeStorageKey.Passcode);
 export const sessionPendingIdentity = makeStorageAccessor<SessionPendingIdentity>(
-    'session',
+    'local',
     ChromeStorageKey.PendingIdentity
 );
-export const sessionCreatingCredential = makeStorageAccessor<boolean>('session', ChromeStorageKey.IsCreatingCredential);
+export const sessionCreatingCredential = makeStorageAccessor<boolean>('local', ChromeStorageKey.IsCreatingCredential);
 export const sessionAccountInfoCache = makeIndexedStorageAccessor<Record<string, string>>(
-    'session',
+    'local',
     ChromeStorageKey.AccountInfoCache
 );
-export const sessionIsRecovering = makeStorageAccessor<boolean>('session', ChromeStorageKey.IsRecovering);
-export const sessionRecoveryStatus = makeStorageAccessor<RecoveryStatus>('session', ChromeStorageKey.RecoveryStatus);
-export const sessionOnboardingLocation = makeStorageAccessor<string>('session', ChromeStorageKey.OnboardingLocation);
-export const sessionIdpTab = makeStorageAccessor<number>('session', ChromeStorageKey.IdpTab);
+export const sessionIsRecovering = makeStorageAccessor<boolean>('local', ChromeStorageKey.IsRecovering);
+export const sessionRecoveryStatus = makeStorageAccessor<RecoveryStatus>('local', ChromeStorageKey.RecoveryStatus);
+export const sessionOnboardingLocation = makeStorageAccessor<string>('local', ChromeStorageKey.OnboardingLocation);
+export const sessionIdpTab = makeStorageAccessor<number>('local', ChromeStorageKey.IdpTab);

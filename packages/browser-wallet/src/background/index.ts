@@ -107,15 +107,21 @@ chrome.storage.local.onChanged.addListener((changes) => {
     if (ChromeStorageKey.NetworkConfiguration in changes) {
         networkChangeHandler(changes[ChromeStorageKey.NetworkConfiguration].newValue);
     }
-});
-
-chrome.storage.session.onChanged.addListener((changes) => {
     if (ChromeStorageKey.IsRecovering in changes) {
         if (changes[ChromeStorageKey.IsRecovering].newValue) {
             startRecovery();
         }
     }
 });
+
+// SAFARI CRASH
+// chrome.storage.session.onChanged.addListener((changes) => {
+//     if (ChromeStorageKey.IsRecovering in changes) {
+//         if (changes[ChromeStorageKey.IsRecovering].newValue) {
+//             startRecovery();
+//         }
+//     }
+// });
 
 setupRecoveryHandler();
 chrome.runtime.onStartup.addListener(startupHandler);
