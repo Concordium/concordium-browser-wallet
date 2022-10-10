@@ -1,8 +1,8 @@
-import { createIdentityRequest } from '@concordium/web-sdk';
+import { createIdentityRequest, IdentityRequestInput } from '@concordium/web-sdk';
 import { IdentityIssuanceBackgroundResponse } from '@shared/utils/identity-helpers';
 import { ExtensionMessageHandler, InternalMessageType } from '@concordium/browser-wallet-message-hub';
 import { BackgroundResponseStatus } from '@shared/utils/types';
-import { sessionPendingIdentity } from '@shared/storage/access';
+import { sessionIdpTab, sessionPendingIdentity, storedCurrentNetwork } from '@shared/storage/access';
 import { CreationStatus, PendingIdentity } from '@shared/storage/types';
 import { openWindow } from './window-management';
 
@@ -13,78 +13,118 @@ import { confirmIdentity } from './confirmation';
 const redirectUri = 'ConcordiumRedirectToken';
 const codeUriKey = 'code_uri=';
 
-function handleExternalIssuance(url: string, respond: (response: IdentityIssuanceBackgroundResponse) => void) {
+const enum MSG { // using const enum here, as typescript compiler replaces uses with the actual underlying string, which we need, because injected functions do not have access to variables declared in the background context
+    LIFELINE = 'lifeline',
+}
+
+const respond = async (response: IdentityIssuanceBackgroundResponse) => {
+    const pendingIdentity = await sessionPendingIdentity.get();
+    if (!pendingIdentity) {
+        return;
+    }
+
+    const { identity, network } = pendingIdentity;
+    let { status } = response;
+
+    if (!identity) {
+        status = BackgroundResponseStatus.Aborted;
+    } else if (response.status === BackgroundResponseStatus.Success) {
+        const newIdentity: PendingIdentity = {
+            ...identity,
+            status: CreationStatus.Pending,
+            location: response.result,
+        };
+        await addIdentity(newIdentity, network.genesisHash);
+        confirmIdentity(newIdentity, network.genesisHash);
+    }
+
+    sessionPendingIdentity.remove();
+
+    await openWindow();
+    bgMessageHandler.sendInternalMessage(InternalMessageType.EndIdentityIssuance, { ...response, status });
+};
+
+export function addIdpListeners() {
+    chrome.tabs.onRemoved.addListener(async (tabId: number) => {
+        const idpTabId = await sessionIdpTab.get();
+
+        if (idpTabId !== undefined && tabId === idpTabId) {
+            sessionIdpTab.remove();
+            respond({
+                status: BackgroundResponseStatus.Aborted,
+            });
+        }
+    });
+
+    const handleIdpRequest = (redirectUrl: string, tabId: number) => {
+        chrome.tabs.remove(tabId);
+        sessionIdpTab.remove();
+
+        respond({
+            status: BackgroundResponseStatus.Success,
+            result: redirectUrl.substring(redirectUrl.indexOf(codeUriKey) + codeUriKey.length),
+        });
+    };
+
+    chrome.webRequest.onBeforeRequest.addListener(
+        (details) => {
+            sessionIdpTab.get().then((idpTabId) => {
+                if (details.url.includes(redirectUri) && details.tabId === idpTabId) {
+                    handleIdpRequest(details.url, idpTabId);
+                }
+            });
+        },
+        { urls: ['<all_urls>'] }
+    );
+
+    chrome.runtime.onMessage.addListener((msg, _, sendResponse: (isDone: boolean) => void) => {
+        if (msg === MSG.LIFELINE) {
+            setTimeout(async () => {
+                const pendingIdentity = await sessionPendingIdentity.get();
+                sendResponse(pendingIdentity === undefined);
+            }, 250e3);
+
+            return true;
+        }
+
+        return undefined;
+    });
+}
+
+const keepAlive = () => {
+    function createLifeline() {
+        chrome.runtime.sendMessage(MSG.LIFELINE).then((isDone: boolean) => {
+            if (!isDone) {
+                createLifeline();
+            }
+        });
+    }
+
+    createLifeline();
+};
+
+function launchExternalIssuance(url: string) {
     chrome.tabs
         .create({
             url,
         })
         .then((tab) => {
-            const closedListener = (tabId: number) => {
-                if (tabId === tab.id) {
-                    chrome.tabs.onRemoved.removeListener(closedListener);
-                    respond({
-                        status: BackgroundResponseStatus.Aborted,
-                    });
-                }
-            };
-            chrome.tabs.onRemoved.addListener(closedListener);
+            if (tab.id !== undefined) {
+                sessionIdpTab.set(tab.id);
 
-            const onComplete = new Promise<string>((resolve) => {
-                chrome.webRequest.onBeforeRedirect.addListener(
-                    function redirectListener(details) {
-                        if (details.redirectUrl.includes(redirectUri)) {
-                            chrome.webRequest.onBeforeRedirect.removeListener(redirectListener);
-                            resolve(details.redirectUrl);
-                        }
-                    },
-                    { urls: ['<all_urls>'], tabId: tab.id }
-                );
-                chrome.webRequest.onBeforeRequest.addListener(
-                    function requestListener(details) {
-                        if (details.url.includes(redirectUri)) {
-                            chrome.webRequest.onBeforeRequest.removeListener(requestListener);
-                            resolve(details.url);
-                        }
-                    },
-                    { urls: ['<all_urls>'], tabId: tab.id }
-                );
-            });
-            onComplete.then((redirectUrl) => {
-                chrome.tabs.onRemoved.removeListener(closedListener);
-                if (tab.id !== undefined) {
-                    chrome.tabs.remove(tab.id);
-                }
-                respond({
-                    status: BackgroundResponseStatus.Success,
-                    result: redirectUrl.substring(redirectUrl.indexOf(codeUriKey) + codeUriKey.length),
+                // This is a hack to keep the service worker running as long as the identity issuance flow
+                chrome.scripting.executeScript({
+                    target: { tabId: tab.id },
+                    func: keepAlive,
                 });
-            });
+            }
         });
 }
 
-export const identityIssuanceHandler: ExtensionMessageHandler = (msg) => {
-    const respond = async (response: IdentityIssuanceBackgroundResponse) => {
-        let { status } = response;
-        const pending = await sessionPendingIdentity.get();
-        if (!pending) {
-            status = BackgroundResponseStatus.Aborted;
-        } else {
-            if (response.status === BackgroundResponseStatus.Success) {
-                const newIdentity: PendingIdentity = {
-                    ...pending,
-                    status: CreationStatus.Pending,
-                    location: response.result,
-                };
-                await addIdentity(newIdentity);
-                confirmIdentity(newIdentity);
-            }
-            await sessionPendingIdentity.remove();
-        }
-        await openWindow();
-        bgMessageHandler.sendInternalMessage(InternalMessageType.EndIdentityIssuance, { ...response, status });
-    };
-
-    const { baseUrl, ...identityRequestInputs } = msg.payload;
+async function startIdentityIssuance({
+    baseUrl,
+    ...identityRequestInputs
+}: IdentityRequestInput & { baseUrl: string }) {
     const idObjectRequest = createIdentityRequest(identityRequestInputs);
 
     const params = {
@@ -95,29 +135,37 @@ export const identityIssuanceHandler: ExtensionMessageHandler = (msg) => {
     };
     const searchParams = new URLSearchParams(params);
     const url = Object.entries(params).length === 0 ? baseUrl : `${baseUrl}?${searchParams.toString()}`;
+    const network = await storedCurrentNetwork.get();
 
-    fetch(url)
-        .then((response) => {
-            if (!response.ok) {
-                response.json().then((body) =>
-                    respond({
-                        status: BackgroundResponseStatus.Error,
-                        reason: body?.message || `Provider returned status code ${response.status}.`,
-                    })
-                );
-            } else if (!response.redirected) {
-                respond({
-                    status: BackgroundResponseStatus.Error,
-                    reason: `Initial location did not redirect as expected.`,
-                });
-            } else {
-                handleExternalIssuance(response.url, respond);
-            }
-        })
-        .catch((e) =>
+    if (!network) {
+        return;
+    }
+
+    try {
+        const response = await fetch(url);
+
+        if (!response.ok) {
             respond({
                 status: BackgroundResponseStatus.Error,
-                reason: `Failed to reach identity provider due to: ${e.message}`,
-            })
-        );
+                reason: (await response.json())?.message || `Provider returned status code ${response.status}.`,
+            });
+        } else if (!response.redirected) {
+            respond({
+                status: BackgroundResponseStatus.Error,
+                reason: `Initial location did not redirect as expected.`,
+            });
+        } else {
+            launchExternalIssuance(response.url);
+        }
+        // eslint-disable-next-line @typescript-eslint/no-explicit-any
+    } catch (e: any) {
+        respond({
+            status: BackgroundResponseStatus.Error,
+            reason: `Failed to reach identity provider due to: ${e.message}`,
+        });
+    }
+}
+
+export const identityIssuanceHandler: ExtensionMessageHandler = (msg) => {
+    startIdentityIssuance(msg.payload);
 };

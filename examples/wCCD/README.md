@@ -9,7 +9,6 @@ The example project included in this repository serves as a working example of h
 ## Installing
 
 -   Run `yarn` in package root.
--   Run `yarn build:all` to build the `concordium-helpers` package.
 
 ## Running the wCCD example
 
@@ -22,3 +21,19 @@ To have hot-reload (useful for development), do the following instead:
 -   Run `yarn watch` in a terminal.
 -   Run `yarn start` in another terminal.
 -   Open URL logged in console (typically http://127.0.0.1:8080).
+
+## Build and run the Docker image
+
+To build the docker image run the following:
+
+```
+docker build -t wccd_front_end .
+```
+
+To run the docker image run the following:
+
+```
+docker run -it -d -p 8080:80 --name web wccd_front_end
+```
+
+Open http://127.0.0.1:8080 in your browser.

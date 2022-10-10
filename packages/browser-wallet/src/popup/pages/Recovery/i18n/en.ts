@@ -11,6 +11,7 @@ const t = {
         success: 'The following identities and accounts were recovered.',
         error: 'Recovery has failed. You can try again. \n Reason for failure:',
         noneFound: 'No identities were found.',
+        errorAccountInfo: 'Unable to retrieve account balance',
     },
     restore: 'Restore',
     continue: 'Continue',

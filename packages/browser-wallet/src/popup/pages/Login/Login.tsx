@@ -8,7 +8,7 @@ import FormPassword from '@popup/shared/Form/Password';
 import { useTranslation } from 'react-i18next';
 import { useNavigate, useLocation } from 'react-router-dom';
 import { useAtomValue, useSetAtom } from 'jotai';
-import { decrypt } from '@popup/shared/crypto';
+import { decrypt } from '@shared/utils/crypto';
 import { encryptedSeedPhraseAtom, sessionPasscodeAtom } from '@popup/store/settings';
 
 type FormValues = {

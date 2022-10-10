@@ -8,7 +8,7 @@ The actual implementation of the wallet API can be found in the [in the Concordi
 
 ### Installing
 
-See [installing](../../README.md#installing) in repository root.
+See [installing](https://github.com/Concordium/concordium-browser-wallet/blob/main/README.md#installing) in repository root.
 
 ### Building
 
@@ -58,7 +58,7 @@ const provider = await detectConcordiumProvider();
 const accountAddress = await provider.connect();
 ```
 
-N.B. In the current version, if the dApp is already whitelisted, but not by the currently selected account, the returned account will not actually be the most recently selected account, but instead the oldest account that has whitelasted the dApp.
+N.B. In the current version, if the dApp is already whitelisted, but not by the currently selected account, the returned account will not actually be the most recently selected account, but instead the oldest account that has whitelisted the dApp.
 
 ### getMostRecentlySelectedAccount
 
@@ -74,7 +74,7 @@ if (accountAddress) {
 }
 ```
 
-N.B. In the current version, if the currently selected account has not whitelisted the dApp, the returned account will not actually be the most recently selected account, but instead the oldest account that has whitelasted the dApp.
+N.B. In the current version, if the currently selected account has not whitelisted the dApp, the returned account will not actually be the most recently selected account, but instead the oldest account that has whitelisted the dApp.
 
 ### sendTransaction
 

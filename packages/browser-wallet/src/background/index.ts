@@ -13,13 +13,13 @@ import {
 } from '@shared/storage/access';
 
 import JSONBig from 'json-bigint';
-import { ChromeStorageKey } from '@shared/storage/types';
+import { ChromeStorageKey, NetworkConfiguration } from '@shared/storage/types';
 import bgMessageHandler from './message-handler';
 import { forwardToPopup, HandleMessage, HandleResponse, RunCondition, setPopupSize } from './window-management';
-import { identityIssuanceHandler } from './identity-issuance';
+import { addIdpListeners, identityIssuanceHandler } from './identity-issuance';
 import { startMonitoringPendingStatus } from './confirmation';
 import { sendCredentialHandler } from './credential-deployment';
-import { recoveryHandler } from './recovery';
+import { startRecovery, setupRecoveryHandler } from './recovery';
 
 const walletLockedMessage = 'The wallet is locked';
 async function isWalletLocked(): Promise<boolean> {
@@ -95,24 +95,42 @@ const injectScript: ExtensionMessageHandler = (_msg, sender, respond) => {
     return true;
 };
 
-const startupHandler = () => startMonitoringPendingStatus();
-const networkChangeHandler = () => startMonitoringPendingStatus();
+const startupHandler = async () => {
+    const network = await storedCurrentNetwork.get();
+    if (network) {
+        await startMonitoringPendingStatus(network);
+    }
+};
+const networkChangeHandler = (network: NetworkConfiguration) => startMonitoringPendingStatus(network);
 
 chrome.storage.local.onChanged.addListener((changes) => {
     if (ChromeStorageKey.NetworkConfiguration in changes) {
-        networkChangeHandler();
+        networkChangeHandler(changes[ChromeStorageKey.NetworkConfiguration].newValue);
     }
 });
 
+chrome.storage.session.onChanged.addListener((changes) => {
+    if (ChromeStorageKey.IsRecovering in changes) {
+        if (changes[ChromeStorageKey.IsRecovering].newValue) {
+            startRecovery();
+        }
+    }
+});
+
+setupRecoveryHandler();
 chrome.runtime.onStartup.addListener(startupHandler);
 chrome.runtime.onInstalled.addListener(startupHandler);
+bgMessageHandler.handleMessage(createMessageTypeFilter(InternalMessageType.PopupReady), () => {
+    startupHandler();
+});
+
+addIdpListeners();
 
 bgMessageHandler.handleMessage(
     createMessageTypeFilter(InternalMessageType.SendCredentialDeployment),
     sendCredentialHandler
 );
 
-bgMessageHandler.handleMessage(createMessageTypeFilter(InternalMessageType.Recovery), recoveryHandler);
 bgMessageHandler.handleMessage(
     createMessageTypeFilter(InternalMessageType.StartIdentityIssuance),
     identityIssuanceHandler
@@ -200,16 +218,16 @@ const runIfNotWhitelisted: RunCondition<string | undefined> = async (_msg, sende
         throw new Error('Expected URL to be available for sender.');
     }
 
-    const locked = await isWalletLocked();
-    if (locked) {
-        return { run: true };
-    }
-
     const selectedAccount = await storedSelectedAccount.get();
 
     // No accounts in the wallet.
     if (selectedAccount === undefined) {
         return { run: false, response: undefined };
+    }
+
+    const locked = await isWalletLocked();
+    if (locked) {
+        return { run: true };
     }
 
     const accountConnectedToSite = await findPrioritizedAccountConnectedToSite(sender.url);

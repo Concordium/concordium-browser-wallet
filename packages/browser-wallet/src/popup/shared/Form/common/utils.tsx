@@ -109,7 +109,7 @@ type MakeUncontrolledProps<TFieldValues extends FieldValues = FieldValues> = {
 export const makeUncontrolled = <E, P extends RequiredUncontrolledFieldProps<E>>(
     Field: ForwardRefExoticComponent<P>
 ) => {
-    type OwnProps = Omit<P, 'ref' | 'name'>;
+    type OwnProps = Omit<P, 'ref' | 'name' | 'value' | 'checked'>;
     return <TFieldValues extends FieldValues>(props: OwnProps & MakeUncontrolledProps<TFieldValues>) => {
         // Filter away all props required for form registration, leaving the props for the input '<Field />'
         const { name, rules, register, onChange: ownOnChange = noOp, onBlur: ownOnBlur = noOp, ...ownProps } = props;

@@ -21,7 +21,7 @@ interface Location {
 
 interface Props {
     added: {
-        accounts: string[];
+        accounts: { address: string; balance: string }[];
         identities: IdentityIdentifier[];
     };
 }
@@ -33,8 +33,8 @@ export function DisplaySuccess({ added }: Props) {
     const [selectedAccount, setSelectedAccount] = useAtom(selectedAccountAtom);
 
     const addedAccounts = useMemo(
-        () => credentials.filter((cred) => added.accounts.some((address) => cred.address === address)),
-        [credentials.length]
+        () => credentials.filter((cred) => added.accounts.some((pair) => cred.address === pair.address)),
+        [credentials.length, added.accounts.length]
     );
     // Also includes identities that existed but have had accounts added.
     const addedIdentities = useMemo(
@@ -42,7 +42,7 @@ export function DisplaySuccess({ added }: Props) {
             identities.filter(
                 (id) => added.identities.some(identityMatch(id)) || addedAccounts.some(isIdentityOfCredential(id))
             ),
-        [identities.length]
+        [identities.length, addedAccounts.length, added.identities.length]
     );
 
     useEffect(() => {
@@ -66,7 +66,12 @@ export function DisplaySuccess({ added }: Props) {
                         {addedAccounts.filter(isIdentityOfCredential(identity)).map((cred) => (
                             <div className="recovery__main__credential" key={cred.credId}>
                                 <p>{displaySplitAddress(cred.address)}</p>
-                                <p>{displayAsCcd(0n)}</p>
+                                <p>
+                                    {displayAsCcd(
+                                        added.accounts.find((pair) => pair.address === cred.address)?.balance ||
+                                            BigInt(0)
+                                    )}
+                                </p>
                             </div>
                         ))}
                     </div>

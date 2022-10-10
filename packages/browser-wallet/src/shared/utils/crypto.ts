@@ -1,5 +1,5 @@
 import { EncryptedData } from '@shared/storage/types';
-import { Buffer } from 'buffer';
+import { Buffer } from 'buffer/';
 
 const keyLen = 32;
 const iterations = 10000;
@@ -11,11 +11,9 @@ const keyDerivationMethod = 'PBKDF2WithHmacSHA256';
 async function deriveKey(password: string, salt: Buffer): Promise<CryptoKey> {
     const passwordBuffer = Buffer.from(password, 'utf-8');
 
-    const baseKey = await global.crypto.subtle.importKey('raw', passwordBuffer, { name: 'PBKDF2' }, false, [
-        'deriveKey',
-    ]);
+    const baseKey = await crypto.subtle.importKey('raw', passwordBuffer, { name: 'PBKDF2' }, false, ['deriveKey']);
 
-    const derivedKey = await global.crypto.subtle.deriveKey(
+    const derivedKey = await crypto.subtle.deriveKey(
         {
             name: 'PBKDF2',
             salt,
@@ -32,11 +30,11 @@ async function deriveKey(password: string, salt: Buffer): Promise<CryptoKey> {
 }
 
 export async function encrypt(data: string, password: string): Promise<EncryptedData> {
-    const salt = Buffer.from(global.crypto.getRandomValues(new Uint8Array(16)));
+    const salt = Buffer.from(crypto.getRandomValues(new Uint8Array(16)));
     const key = await deriveKey(password, salt);
 
-    const iv = global.crypto.getRandomValues(new Uint8Array(16));
-    const encrypted = await global.crypto.subtle.encrypt(
+    const iv = crypto.getRandomValues(new Uint8Array(16));
+    const encrypted = await crypto.subtle.encrypt(
         { name: subtleCryptoMethodName, iv },
         key,
         Buffer.from(data, 'utf-8')

@@ -1,5 +1,33 @@
 # Changelog
 
+## 0.7.5
+
+### Fixed
+
+-   An issue where the account balance was always shown as 0 on the recovery page.
+
+## 0.7.4
+
+### Fixed
+
+-   JSON-RPC URL on mainnet.
+
+## 0.7.3
+
+### Fixed
+
+-   An issue where the wrong identity was selected when choosing an identity during account creation.
+-   An issue where identity issuance could not be completed, due to service worker going inactive.
+-   Ensure that confirmation of entities is resumed if service worker goes inactive.
+
+## 0.7.2
+
+### Fixed
+
+-   Recovered accounts not showing in recovery results when the identity is already present.
+-   Popup after Identity creation not appearing.
+-   Connected sites are now stored per network.
+
 ## 0.7.1
 
 ### Fixed
