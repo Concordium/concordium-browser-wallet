@@ -26,7 +26,7 @@ function getCIS2Identifier(): Buffer {
 
 function getMetadataParameter(id: string): Buffer {
     const lengths = Buffer.alloc(3);
-    const idBuf = Buffer.from(id, 'ASCII');
+    const idBuf = Buffer.from(id, 'hex');
     lengths.writeInt16LE(1, 0);
     lengths.writeInt8(idBuf.length, 2);
     return Buffer.concat([lengths, idBuf]);
@@ -72,7 +72,8 @@ export const getTokenUrl = (client: JsonRpcClient, id: string, { contractName, i
 }
 
 async function getTokenMetadata(tokenUrl: string): Promise<ContractMetadata> {
-    if (tokenUrl !== "notfake") {
+    // TODO remove this hack, for production, or just when we have a proper collection for testing (with online metadata).
+    if (tokenUrl.includes('example')) {
         return {
             "name": "Wrapped CCD Token",
             "symbol": "wCCD",
@@ -125,17 +126,19 @@ function ChooseContract({ onChoice } : ChooseContractProps) {
 
     return (
         <Form
-        formMethods={form}
-        className="tokens__add__container"
-        onSubmit={onSubmit}
+            formMethods={form}
+            className="tokens__add__container"
+            onSubmit={onSubmit}
         >
-        {(f) => (<><Input register={f.register} label="Contract index" name="contractIndex"
-                       rules={{
-                           required: t('indexRequired')
-                       }}
-                />
-                <Submit>{t('chooseContract')}</Submit>
-            </>)}
+        (f) =>
+            {
+                (<><Input register={f.register} label="Contract index" name="contractIndex"
+                          rules={{
+                              required: t('indexRequired')
+                          }}
+                    />
+                    <Submit>{t('chooseContract')}</Submit>
+                </>)}
         </Form>
     );
 }
