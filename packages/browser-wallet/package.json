@@ -9,7 +9,8 @@
         "build": "yarn build:dev",
         "watch": "cross-env WATCH=1 yarn build:dev",
         "storybook": "start-storybook -p 6006",
-        "build-storybook": "build-storybook"
+        "build-storybook": "build-storybook",
+        "build-safari-project": "xcrun safari-web-extension-converter --macos-only --project-location ./safari --bundle-identifier com.concordium.ConcordiumWallet --force ./dist"
     },
     "browser": {
         "stream": "readable-stream"
