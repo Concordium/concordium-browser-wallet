@@ -5,11 +5,11 @@ import { createCollection, state, mint, isOwner } from './utils';
 import { RAW_SCHEMA } from './constant';
 import { serializeUpdateContractParameters, toBuffer } from '@concordium/web-sdk';
 
-const MINT_HOST = "http://10.45.255.52:8888";
+const MINT_HOST = "http://localhost:8899";
 
 export default function PiggyBankV0() {
     const { account, isConnected } = useContext(state);
-    const [collections, setCollections] = useState<bigint[]>([1087n]);
+    const [collections, setCollections] = useState<bigint[]>([]);
     const [nfts, setNFTS] = useState<Record<string,string[]>>({});
 
     useEffect(async () => {
