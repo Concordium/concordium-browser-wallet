@@ -92,9 +92,10 @@ async function updateStateWCCDBalanceAccount(account: string, setAmountAccount: 
 
 interface Props {
     handleGetAccount: (accountAddress: string | undefined) => void;
+    handleNotConnected: () => void;
 }
 
-export default function wCCD({ handleGetAccount }: Props) {
+export default function wCCD({ handleGetAccount, handleNotConnected }: Props) {
     const { account, isConnected } = useContext(state);
     const [ownerProxy, setOwnerProxy] = useState<string>();
     const [ownerImplementation, setOwnerImplementation] = useState<string>();
@@ -156,8 +157,31 @@ export default function wCCD({ handleGetAccount }: Props) {
             .then(handleGetAccount)
             .then(() => {
                 setWaitForUser(false);
+                detectConcordiumProvider()
+                    // Check if the user is connected to testnet by checking if the testnet genesisBlock exists.
+                    // Throw a warning and disconnect if not. We only want to
+                    // allow users to interact with our testnet smart contracts.
+                    .then((provider) =>
+                        provider
+                            .getJsonRpcClient()
+                            .getCryptographicParameters(
+                                '4221332d34e1694168c2a0c0b3fd0f273809612cb13d000d5c2e00e85f50f796'
+                            )
+                            .then((result) => {
+                                if (result === undefined || result?.value === null) {
+                                    handleNotConnected();
+                                    /* eslint-disable no-alert */
+                                    window.alert(
+                                        'Your JsonRpcClient in the Concordium browser wallet cannot connect. Check if your Concordium browser wallet is connected to testnet!'
+                                    );
+                                }
+                            })
+                    );
             })
             .catch(() => {
+                window.alert(
+                    'Your JsonRpcClient in the Concordium browser wallet cannot connect. Check if your Concordium browser wallet is connected to testnet!'
+                );
                 setWaitForUser(false);
             });
     }, []);

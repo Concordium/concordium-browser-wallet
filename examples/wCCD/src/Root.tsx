@@ -17,10 +17,26 @@ export default function Root() {
         setIsConnected(Boolean(accountAddress));
     }, []);
 
+    const handleNotConnected = useCallback(() => {
+        setAccount('');
+        setIsConnected(false);
+    }, []);
+
     useEffect(() => {
         detectConcordiumProvider()
             .then((provider) => {
                 // Listen for relevant events from the wallet.
+                provider.on('chainChanged', (genesisBlock) => {
+                    // Check if the user is connected to testnet by checking if the genesisBlock is the testnet one.
+                    // Throw a warning and disconnect if wrong chain. We only want to
+                    // allow users to interact with our testnet smart contracts.
+                    if (genesisBlock !== '4221332d34e1694168c2a0c0b3fd0f273809612cb13d000d5c2e00e85f50f796') {
+                        /* eslint-disable no-alert */
+                        window.alert('Check if your Concordium browser wallet is connected to testnet!');
+                        handleNotConnected();
+                    }
+                });
+
                 provider.on('accountChanged', setAccount);
                 provider.on('accountDisconnected', () =>
                     provider.getMostRecentlySelectedAccount().then(handleGetAccount)
@@ -39,7 +55,7 @@ export default function Root() {
             <script src="../../node_modules/@concordium/web-sdk/lib/concordium.min.js" />
             <script src="../../packages/browser-wallet-api-helpers/lib/concordiumHelpers.min.js" />
             <main className="wccd">
-                <WCCD handleGetAccount={handleGetAccount} />
+                <WCCD handleGetAccount={handleGetAccount} handleNotConnected={handleNotConnected} />
             </main>
         </state.Provider>
     );
