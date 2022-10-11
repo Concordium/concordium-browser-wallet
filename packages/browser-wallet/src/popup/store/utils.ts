@@ -21,6 +21,7 @@ import {
     sessionRecoveryStatus,
     sessionIdpTab,
     storedTokens,
+    storedTokenMetadata,
 } from '@shared/storage/access';
 import { ChromeStorageKey } from '@shared/storage/types';
 import { atom, WritableAtom } from 'jotai';
@@ -45,6 +46,7 @@ const accessorMap = {
     [ChromeStorageKey.RecoveryStatus]: sessionRecoveryStatus,
     [ChromeStorageKey.IdpTab]: sessionIdpTab,
     [ChromeStorageKey.Tokens]: useIndexedStorage(storedTokens, getGenesisHash),
+    [ChromeStorageKey.TokenMetadata]: storedTokenMetadata,
 };
 
 export type AsyncWrapper<V> = {

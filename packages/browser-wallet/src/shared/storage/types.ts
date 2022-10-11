@@ -20,6 +20,7 @@ export enum ChromeStorageKey {
     RecoveryStatus = 'recoveryStatus',
     IdpTab = 'idpTab',
     Tokens = 'tokens',
+    TokenMetadata = 'tokenMetadata',
 }
 
 export enum Theme {
@@ -193,9 +194,9 @@ export interface MetadataUrl {
     url: string;
 }
 
-export interface ContractMetadata {
+export interface TokenMetadata {
     name?: string;
-    symbol?: string,
+    symbol?: string;
     decimals?: number;
     description?: string;
     thumbnail?: MetadataUrl;
@@ -205,6 +206,11 @@ export interface ContractMetadata {
 
 export interface TokenIdAndMetadata {
     id: string;
-    metadata: ContractMetadata;
+    metadataLink: string;
+    metadata: TokenMetadata;
 }
 
+export interface TokenStorage {
+    id: string;
+    metadataLink: string;
+}

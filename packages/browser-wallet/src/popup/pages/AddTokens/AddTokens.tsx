@@ -8,12 +8,18 @@ import Input, { Input as UncontrolledInput } from '@popup/shared/Form/Input';
 import { InstanceInfo, JsonRpcClient } from '@concordium/web-sdk';
 import { jsonRpcClientAtom } from '@popup/store/settings';
 import Submit from '@popup/shared/Form/Submit';
-import { ContractMetadata, TokenIdAndMetadata } from '@shared/storage/types';
+import { TokenMetadata } from '@shared/storage/types';
 import Button from '@popup/shared/Button';
 import { addToastAtom } from '@popup/state';
-import { tokensAtom, selectedAccountAtom } from '@popup/store/account';
+import { tokensAtom, selectedAccountAtom, tokenMetadataAtom, storedTokensAtom } from '@popup/store/account';
 import { useNavigate } from 'react-router-dom';
 import { absoluteRoutes } from '@popup/constants/routes';
+
+export interface TokenIdAndMetadata {
+    id: string;
+    metadataLink: string;
+    metadata: TokenMetadata;
+}
 
 function getCIS2Identifier(): Buffer {
     const buf = Buffer.alloc(8);
@@ -93,7 +99,7 @@ export const getTokenUrl = (
     });
 };
 
-async function getTokenMetadata(tokenUrl: string): Promise<ContractMetadata> {
+async function getTokenMetadata(tokenUrl: string): Promise<TokenMetadata> {
     // TODO remove this hack, for production, or just when we have a proper collection for testing (with online metadata).
     if (tokenUrl.includes('example')) {
         return {
@@ -164,7 +170,7 @@ function ChooseContract({ onChoice }: ChooseContractProps) {
     );
 }
 
-function Token({ metadata }: { metadata: ContractMetadata }) {
+function Token({ metadata }: { metadata: TokenMetadata }) {
     return (
         <div className="tokens__add__element" title={metadata.description}>
             {metadata.display?.url && (
@@ -197,7 +203,7 @@ function AddToken({
         }
         const tokenUrl = await getTokenUrl(client, id || '', contractDetails);
         const meta = await getTokenMetadata(tokenUrl);
-        setAccountTokens((tokens) => [...tokens, { id, metadata: meta }]);
+        setAccountTokens((tokens) => [...tokens, { id, metadata: meta, metadataLink: tokenUrl }]);
     };
 
     return (
@@ -224,7 +230,9 @@ function AddToken({
 
 export default function Main() {
     const [contractDetails, setContractDetails] = useState<ContractDetails>();
-    const [tokens, setTokens] = useAtom(tokensAtom);
+    const [tokenMetadata, setTokenMetadata] = useAtom(tokenMetadataAtom);
+    const [tokens, setTokens] = useAtom(storedTokensAtom);
+    const currentTokens = useAtomValue(tokensAtom);
     const account = useAtomValue(selectedAccountAtom);
     const nav = useNavigate();
 
@@ -237,9 +245,17 @@ export default function Main() {
             return;
         }
         const accountCollections = tokens.value[account] || {};
-        accountCollections[contractDetails.index.toString()] = newTokens;
+        accountCollections[contractDetails.index.toString()] = newTokens.map((token) => ({
+            id: token.id,
+            metadataLink: token.metadataLink,
+        }));
         const updatedTokens = { ...tokens.value };
         updatedTokens[account] = accountCollections;
+        const newMetadata = tokenMetadata.value;
+        newTokens.forEach((token) => {
+            newMetadata[token.metadataLink] = token.metadata;
+        });
+        setTokenMetadata(newMetadata);
         setTokens(updatedTokens).then(() => nav(absoluteRoutes.home.account.tokens.path));
     };
 
@@ -247,7 +263,7 @@ export default function Main() {
         if (!account || !contractDetails || tokens.loading || !tokens.value[account]) {
             return [];
         }
-        return tokens.value[account][contractDetails.index.toString()] || [];
+        return currentTokens.value[account][contractDetails.index.toString()] || [];
     }, [account, contractDetails?.index.toString(), tokens.loading]);
 
     if (!account || tokens.loading) {
