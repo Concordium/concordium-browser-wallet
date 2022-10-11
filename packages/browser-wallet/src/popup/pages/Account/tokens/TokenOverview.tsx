@@ -1,20 +1,31 @@
 import React from 'react';
-import { NavLink, Outlet, Route, Routes } from 'react-router-dom';
+import { Outlet, Route, Routes } from 'react-router-dom';
 import { absoluteRoutes } from '@popup/constants/routes';
+import TabBar from '@popup/shared/TabBar';
+import PlusIcon from '@assets/svg/plus.svg';
 import { tokensRoutes } from './routes';
 
 function TokensOverview() {
     return (
-        <>
-            <nav>
-                <NavLink to="">Fungible</NavLink>
-                <NavLink to={tokensRoutes.collectibles}>Collectibles</NavLink>
-                <NavLink to={absoluteRoutes.home.account.tokens.add.path} title="Add new token">
-                    Add new
-                </NavLink>
-            </nav>
-            <Outlet />
-        </>
+        <div className="tokens-overview">
+            <TabBar className="tokens-overview__actions">
+                <TabBar.Item className="tokens-overview__link" to="" end>
+                    Fungible
+                </TabBar.Item>
+                <TabBar.Item className="tokens-overview__link" to={tokensRoutes.collectibles}>
+                    Collectibles
+                </TabBar.Item>
+                <TabBar.Item className="tokens-overview__link" to={absoluteRoutes.home.account.tokens.add.path}>
+                    <div className="tokens-overview__add">
+                        Add new
+                        <PlusIcon />
+                    </div>
+                </TabBar.Item>
+            </TabBar>
+            <div>
+                <Outlet />
+            </div>
+        </div>
     );
 }
 

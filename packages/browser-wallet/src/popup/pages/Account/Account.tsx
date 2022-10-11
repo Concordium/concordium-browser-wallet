@@ -1,7 +1,7 @@
 import { useAtomValue } from 'jotai';
 import React, { useState } from 'react';
 import { useTranslation } from 'react-i18next';
-import { Outlet, Route, Routes, useNavigate } from 'react-router-dom';
+import { Navigate, Outlet, Route, Routes, useNavigate } from 'react-router-dom';
 import { accountsAtom } from '@popup/store/account';
 import MenuButton from '@popup/shared/MenuButton';
 import { useSelectedCredential } from '@popup/shared/utils/account-helpers';
@@ -89,11 +89,15 @@ export default function AccountRoutes() {
     return (
         <Routes>
             <Route element={<Account detailsExpanded={detailsExpanded} setDetailsExpanded={setDetailsExpanded} />}>
-                <Route index element={<TransactionLog setDetailsExpanded={setDetailsExpanded} />} />
+                <Route index element={<Navigate to={accountRoutes.tokens} replace />} />
                 <Route path={`${accountRoutes.send}/*`} element={<SendCcd setDetailsExpanded={setDetailsExpanded} />} />
                 <Route path={accountRoutes.receive} element={<DisplayAddress />} />
-                <Route path={`${accountRoutes.tokens}/*`} element={<TokenOverview />} />
+                <Route
+                    path={`${accountRoutes.log}/*`}
+                    element={<TransactionLog setDetailsExpanded={setDetailsExpanded} />}
+                />
                 <Route path={`${accountRoutes.settings}/*`} element={<AccountSettings />} />
+                <Route path={`${accountRoutes.tokens}/*`} element={<TokenOverview />} />
             </Route>
         </Routes>
     );

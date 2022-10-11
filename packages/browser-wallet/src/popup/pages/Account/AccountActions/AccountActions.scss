@@ -62,10 +62,6 @@
     &__link-disabled,
     &__link {
         position: relative;
-        display: flex;
-        flex-direction: column;
-        justify-content: center;
-        align-items: center;
         flex: 1;
         height: 100%;
         scroll-snap-align: start;
@@ -117,6 +113,10 @@
 
     &__list-icon {
         height: rem(8px);
+    }
+
+    &__tokens-icon {
+        height: rem(12px);
     }
 
     &__send-icon {

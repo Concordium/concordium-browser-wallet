@@ -32,3 +32,36 @@ $display-address-copy-left-margin: rem(5px);
         }
     }
 }
+
+.tokens-overview {
+    width: 100%;
+
+    &__actions {
+        display: grid;
+        width: 100%;
+        grid-template-columns: 1fr 1fr 1fr;
+    }
+
+    &__link {
+        padding: rem(7px);
+
+        &:not(.active) {
+            color: rgba($color: $color-off-white, $alpha: 60%);
+        }
+    }
+
+    &__add {
+        display: flex;
+        justify-content: center;
+        align-items: center;
+
+        > svg {
+            width: rem(10px);
+            margin-left: rem(5px);
+
+            path {
+                fill: rgba($color: $color-off-white, $alpha: 60%);
+            }
+        }
+    }
+}

@@ -1,5 +1,4 @@
 import clsx from 'clsx';
-import { NavLink } from 'react-router-dom';
 import { useTranslation } from 'react-i18next';
 import { ClassName } from 'wallet-common-helpers';
 
@@ -12,6 +11,7 @@ import SendIcon from '@assets/svg/paperplane.svg';
 import TokenIcon from '@assets/svg/tokens.svg';
 import ReceiveIcon from '@assets/svg/qr.svg';
 import SettingsIcon from '@assets/svg/cog.svg';
+import TabBar from '@popup/shared/TabBar';
 import { accountRoutes } from '../routes';
 
 const SCROLL_LIMIT = 5;
@@ -40,9 +40,9 @@ function ActionLinks({ children }: ActionLinksProps) {
                     <BackIcon />
                 </Button>
             )}
-            <div className="account-page-actions__links" ref={linksRef}>
+            <TabBar className="account-page-actions__links" ref={linksRef}>
                 {children}
-            </div>
+            </TabBar>
             {canScroll && (
                 <Button className="account-page-actions__right" clear onClick={scroll('right')}>
                     <BackIcon />
@@ -57,19 +57,18 @@ type ActionProps = {
     to: string;
     title: string;
     disabled?: boolean;
-    end?: boolean;
     onClick?: () => void;
 };
 
-function Action({ children, to, title, disabled = false, end = false, onClick = undefined }: ActionProps) {
+function Action({ children, to, title, disabled = false, onClick = undefined }: ActionProps) {
     return disabled ? (
-        <Button className="account-page-actions__link-disabled" disabled title={title}>
+        <TabBar.Item as={Button} className="account-page-actions__link-disabled" disabled title={title}>
             {children}
-        </Button>
+        </TabBar.Item>
     ) : (
-        <NavLink className="account-page-actions__link" to={to} end={end} title={title} onClick={onClick}>
+        <TabBar.Item className="account-page-actions__link" to={to} title={title} onClick={onClick}>
             {children}
-        </NavLink>
+        </TabBar.Item>
     );
 }
 
@@ -84,14 +83,14 @@ export default function AccountActions({ className, disabled, setDetailsExpanded
     return (
         <nav className={clsx('account-page-actions', className, disabled && 'account-page-actions-disabled')}>
             <ActionLinks>
-                <Action to="" end title={t('log')} disabled={disabled}>
-                    <ListIcon className="account-page-actions__list-icon" />
+                <Action to={accountRoutes.tokens} title={t('tokens')} disabled={disabled}>
+                    <TokenIcon className="account-page-actions__tokens-icon" />
                 </Action>
                 <Action to={accountRoutes.send} title={t('send')} disabled={disabled}>
                     <SendIcon className="account-page-actions__send-icon" />
                 </Action>
-                <Action to={accountRoutes.tokens} title={t('tokens')} disabled={disabled}>
-                    <TokenIcon className="account-page-actions__list-icon" />
+                <Action to={accountRoutes.log} title={t('log')} disabled={disabled}>
+                    <ListIcon className="account-page-actions__list-icon" />
                 </Action>
                 <Action to={accountRoutes.receive} title={t('receive')} disabled={disabled}>
                     <ReceiveIcon className="account-page-actions__receive-icon" />
