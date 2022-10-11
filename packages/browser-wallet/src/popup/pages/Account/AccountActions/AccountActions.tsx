@@ -91,7 +91,7 @@ export default function AccountActions({ className, disabled, setDetailsExpanded
                     <SendIcon className="account-page-actions__send-icon" />
                 </Action>
                 <Action to={accountRoutes.tokens} title={t('tokens')} disabled={disabled}>
-            <TokenIcon className="account-page-actions__list-icon" />
+                    <TokenIcon className="account-page-actions__list-icon" />
                 </Action>
                 <Action to={accountRoutes.receive} title={t('receive')} disabled={disabled}>
                     <ReceiveIcon className="account-page-actions__receive-icon" />
