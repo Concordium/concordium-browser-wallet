@@ -49,13 +49,18 @@ const t = {
         fee: 'Estimated transaction fee',
     },
     tokens: {
+        tabBar: {
+            ft: 'Fungible',
+            nft: 'Collectibles',
+            new: 'Add new',
+        },
         indexRequired: 'Contract index is required',
         chooseContract: 'Choose Contract',
         contractIndex: 'Contract Index',
         contractName: 'Contract name',
         tokenId: 'Token id',
-        addToken: "Add token",
-        duplicateId: 'Token already in the list'
+        addToken: 'Add token',
+        duplicateId: 'Token already in the list',
     },
     accountPending: 'This account is still pending finalization.',
     request: 'Create account',

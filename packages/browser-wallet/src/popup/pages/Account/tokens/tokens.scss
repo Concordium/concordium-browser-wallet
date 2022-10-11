@@ -76,7 +76,16 @@ $tokens-overview-actions-height: rem(26px);
 
 .token-list {
     &__item {
-        height: rem(40px);
-        border-bottom: solid 1px $color-lines;
+        display: flex;
+        width: 100%;
+        height: rem(42px);
+        border-bottom: solid rem(0.5px) $color-lines;
+        padding: 0 rem(16px) 0 rem(8px);
+        align-items: center;
+        justify-content: space-between;
+    }
+
+    &__icon {
+        height: 60%;
     }
 }
