@@ -163,7 +163,7 @@ function ChooseContract({ onChoice }: ChooseContractProps) {
                             required: t('indexRequired'),
                         }}
                     />
-                    <Submit>{t('chooseContract')}</Submit>
+                    <Submit className="tokens__add__submit">{t('chooseContract')}</Submit>
                 </>
             )}
         </Form>
@@ -208,8 +208,18 @@ function AddToken({
 
     return (
         <div className="tokens__add__container">
-            <UncontrolledInput label={t('contractIndex')} value={contractDetails.index.toString()} />
-            <UncontrolledInput label={t('contractName')} value={contractDetails.contractName} />
+            <UncontrolledInput
+                readOnly
+                className="tokens__add__input"
+                label={t('contractIndex')}
+                value={contractDetails.index.toString()}
+            />
+            <UncontrolledInput
+                readOnly
+                className="tokens__add__input"
+                label={t('contractName')}
+                value={contractDetails.contractName}
+            />
             <Form formMethods={form} className="tokens__add__add-token" onSubmit={onSubmit}>
                 {(f) => (
                     <>
@@ -221,8 +231,8 @@ function AddToken({
             {accountTokens.map((token) => (
                 <Token key={token.id} metadata={token.metadata} />
             ))}
-            <Button onClick={() => onFinish(accountTokens)} className="m-t-auto">
-                {t('chooseContract')}
+            <Button onClick={() => onFinish(accountTokens)} className="tokens__add__submit">
+                {t('updateTokens')}
             </Button>
         </div>
     );

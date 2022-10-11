@@ -5,12 +5,12 @@
             flex-direction: column;
             width: 100%;
             height: 100%;
-            padding-top: rem(15px);
-            padding-bottom: rem(15px);
+            padding: rem(15px) rem(10px);
         }
 
         &__element {
-            padding: rem(10px);
+            padding: rem(10px) rem(20px);
+            margin: 0 rem(-10px);
             display: flex;
             border-bottom: rem(1px) solid $color-lines;
 
@@ -20,8 +20,18 @@
             }
         }
 
+        &__input {
+            margin-bottom: rem(10px);
+        }
+
         &__add-token {
             display: flex;
+            justify-content: space-around;
+            margin: 0 rem(-10px) rem(10px);
+        }
+
+        &__submit {
+            margin-top: auto;
         }
 
         &__token-display {

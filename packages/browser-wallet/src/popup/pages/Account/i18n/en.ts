@@ -54,8 +54,9 @@ const t = {
         contractIndex: 'Contract Index',
         contractName: 'Contract name',
         tokenId: 'Token id',
-        addToken: "Add token",
-        duplicateId: 'Token already in the list'
+        addToken: 'Add token',
+        duplicateId: 'Token already in the list',
+        updateTokens: 'Update tokens',
     },
     accountPending: 'This account is still pending finalization.',
     request: 'Create account',
