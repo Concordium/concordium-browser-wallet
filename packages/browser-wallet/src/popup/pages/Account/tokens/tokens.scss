@@ -1,4 +1,5 @@
 $display-address-copy-left-margin: rem(5px);
+$tokens-overview-actions-height: rem(26px);
 
 .tokens {
     &__add {
@@ -35,16 +36,16 @@ $display-address-copy-left-margin: rem(5px);
 
 .tokens-overview {
     width: 100%;
+    height: 100%;
 
     &__actions {
         display: grid;
         width: 100%;
         grid-template-columns: 1fr 1fr 1fr;
+        height: $tokens-overview-actions-height;
     }
 
     &__link {
-        padding: rem(7px);
-
         &:not(.active) {
             color: rgba($color: $color-off-white, $alpha: 60%);
         }
@@ -60,8 +61,22 @@ $display-address-copy-left-margin: rem(5px);
             margin-left: rem(5px);
 
             path {
-                fill: rgba($color: $color-off-white, $alpha: 60%);
+                fill: currentColor;
             }
         }
+    }
+
+    &__scroll {
+        background-color: $color-bg;
+        width: 100%;
+        height: calc(100% - #{$tokens-overview-actions-height});
+        overflow: overlay;
+    }
+}
+
+.token-list {
+    &__item {
+        height: rem(40px);
+        border-bottom: solid 1px $color-lines;
     }
 }

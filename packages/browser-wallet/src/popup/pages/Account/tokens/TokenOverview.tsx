@@ -5,6 +5,19 @@ import TabBar from '@popup/shared/TabBar';
 import PlusIcon from '@assets/svg/plus.svg';
 import { tokensRoutes } from './routes';
 
+function Fungibles() {
+    const items = [1, 2, 3, 4, 5, 6];
+    return (
+        <>
+            {items.map((i) => (
+                <div className="token-list__item" role="button">
+                    {i}
+                </div>
+            ))}
+        </>
+    );
+}
+
 function TokensOverview() {
     return (
         <div className="tokens-overview">
@@ -22,7 +35,7 @@ function TokensOverview() {
                     </div>
                 </TabBar.Item>
             </TabBar>
-            <div>
+            <div className="tokens-overview__scroll">
                 <Outlet />
             </div>
         </div>
@@ -33,8 +46,8 @@ export default function Main() {
     return (
         <Routes>
             <Route element={<TokensOverview />}>
-                <Route index element={<>Fungible</>} />
-                <Route path={tokensRoutes.collectibles} element={<>Collectibles</>} />
+                <Route index element={<Fungibles />} />
+                <Route path={tokensRoutes.collectibles} element={<Fungibles />} />
             </Route>
         </Routes>
     );
