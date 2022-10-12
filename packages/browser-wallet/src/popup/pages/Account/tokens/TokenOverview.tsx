@@ -1,6 +1,6 @@
 import React, { useMemo } from 'react';
 import { useTranslation } from 'react-i18next';
-import { Outlet, Route, Routes } from 'react-router-dom';
+import { Outlet, Route, Routes, useNavigate } from 'react-router-dom';
 import { displayAsCcd, toFraction, addThousandSeparators } from 'wallet-common-helpers';
 import { useAtomValue } from 'jotai';
 
@@ -14,6 +14,7 @@ import { TokenIdAndMetadata, WalletCredential } from '@shared/storage/types';
 import { tokensAtom } from '@popup/store/account';
 import Button from '@popup/shared/Button';
 
+import { ftDetailsRoute, nftDetailsRoute } from '@popup/shared/utils/route-helpers';
 import { tokensRoutes } from './routes';
 
 type FtProps = {
@@ -46,6 +47,8 @@ type ListProps = {
 
 function Fungibles({ account }: ListProps) {
     const accountInfo = useAccountInfo(account);
+    const nav = useNavigate();
+
     const {
         loading,
         value: { [account.address]: tokens },
@@ -62,15 +65,14 @@ function Fungibles({ account }: ListProps) {
         return null;
     }
 
-    const handleClick = (token: TokenIdAndMetadata) => () => {
-        // eslint-disable-next-line no-console
-        console.log(token);
+    const handleClick = (id: string) => () => {
+        nav(ftDetailsRoute(id));
     };
 
     return (
         <>
             <Button clear className="token-list__item">
-                <CcdIcon className="token-list__icon" />
+                <CcdIcon className="token-list__icon token-list__icon--ccd" />
                 <div className="token-list__balance">{displayAsCcd(accountInfo.accountAmount)} CCD</div>
             </Button>
             {items.map((i) => (
@@ -79,7 +81,7 @@ function Fungibles({ account }: ListProps) {
                     accountAddress={account.address}
                     contractAddress={i.address}
                     token={i}
-                    onClick={handleClick(i)}
+                    onClick={handleClick(i.id)}
                 />
             ))}
         </>
@@ -89,10 +91,15 @@ function Fungibles({ account }: ListProps) {
 // FIXME
 function Collectibles() {
     const items = [1, 2, 3, 4];
+    const nav = useNavigate();
+
+    const handleClick = (id: string) => () => {
+        nav(nftDetailsRoute(id));
+    };
     return (
         <>
             {items.map((i) => (
-                <Button clear key={i} className="token-list__item">
+                <Button clear key={i} onClick={handleClick(`${i}`)} className="token-list__item">
                     <img className="token-list__icon" src="/resources/icons/32x32.png" alt="icon" />
                     <div>Example NFT</div>
                 </Button>

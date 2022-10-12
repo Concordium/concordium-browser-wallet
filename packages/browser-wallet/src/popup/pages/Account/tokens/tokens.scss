@@ -87,5 +87,9 @@ $tokens-overview-actions-height: rem(26px);
 
     &__icon {
         height: 60%;
+
+        .dark &--ccd path {
+            fill: $color-off-white;
+        }
     }
 }
