@@ -1,40 +1,6 @@
-$display-address-copy-left-margin: rem(5px);
-$tokens-overview-actions-height: rem(26px);
+$tokens-actions-height: rem(26px);
 
 .tokens {
-    &__add {
-        &__container {
-            display: flex;
-            flex-direction: column;
-            width: 100%;
-            height: 100%;
-            padding-top: rem(15px);
-            padding-bottom: rem(15px);
-        }
-
-        &__element {
-            padding: rem(10px);
-            display: flex;
-            border-bottom: rem(1px) solid $color-lines;
-
-            p {
-                margin: 0;
-                margin-left: rem(10px);
-            }
-        }
-
-        &__add-token {
-            display: flex;
-        }
-
-        &__token-display {
-            max-height: rem(20px);
-            max-width: rem(20px);
-        }
-    }
-}
-
-.tokens-overview {
     width: 100%;
     height: 100%;
 
@@ -42,7 +8,7 @@ $tokens-overview-actions-height: rem(26px);
         display: grid;
         width: 100%;
         grid-template-columns: 1fr 1fr 1fr;
-        height: $tokens-overview-actions-height;
+        height: $tokens-actions-height;
     }
 
     &__link {
@@ -69,7 +35,7 @@ $tokens-overview-actions-height: rem(26px);
     &__scroll {
         background-color: $color-bg;
         width: 100%;
-        height: calc(100% - #{$tokens-overview-actions-height});
+        height: calc(100% - #{$tokens-actions-height});
         overflow: overlay;
     }
 }

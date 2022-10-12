@@ -13,8 +13,8 @@ import { useSelectedCredential } from '@popup/shared/utils/account-helpers';
 import { TokenIdAndMetadata, WalletCredential } from '@shared/storage/types';
 import { tokensAtom } from '@popup/store/account';
 import Button from '@popup/shared/Button';
-
 import { ftDetailsRoute, nftDetailsRoute } from '@popup/shared/utils/route-helpers';
+
 import { tokensRoutes } from './routes';
 
 type FtProps = {
@@ -111,22 +111,22 @@ function Collectibles() {
 function TokensOverview() {
     const { t } = useTranslation('account');
     return (
-        <div className="tokens-overview">
-            <TabBar className="tokens-overview__actions">
-                <TabBar.Item className="tokens-overview__link" to="" end>
+        <div className="tokens">
+            <TabBar className="tokens__actions">
+                <TabBar.Item className="tokens__link" to="" end>
                     {t('tokens.tabBar.ft')}
                 </TabBar.Item>
-                <TabBar.Item className="tokens-overview__link" to={tokensRoutes.collectibles}>
+                <TabBar.Item className="tokens__link" to={tokensRoutes.collectibles}>
                     {t('tokens.tabBar.nft')}
                 </TabBar.Item>
-                <TabBar.Item className="tokens-overview__link" to={absoluteRoutes.home.account.tokens.add.path}>
-                    <div className="tokens-overview__add">
+                <TabBar.Item className="tokens__link" to={absoluteRoutes.home.account.tokens.add.path}>
+                    <div className="tokens__add">
                         {t('tokens.tabBar.new')}
                         <PlusIcon />
                     </div>
                 </TabBar.Item>
             </TabBar>
-            <div className="tokens-overview__scroll">
+            <div className="tokens__scroll">
                 <Outlet />
             </div>
         </div>
