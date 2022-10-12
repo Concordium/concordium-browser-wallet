@@ -4,6 +4,7 @@ import React, { useEffect, useState, useMemo, useCallback } from 'react';
 import { detectConcordiumProvider } from '@concordium/browser-wallet-api-helpers';
 import WCCD from './wCCD';
 import { state, State } from './utils';
+import { TESTNET_GENESIS_BLOCK_HASH } from './constants';
 
 /**
  * Connect to wallet, setup application state context, and render children when the wallet API is ready for use.
@@ -30,7 +31,7 @@ export default function Root() {
                     // Check if the user is connected to testnet by checking if the genesisBlock is the testnet one.
                     // Throw a warning and disconnect if wrong chain. We only want to
                     // allow users to interact with our testnet smart contracts.
-                    if (genesisBlock !== '4221332d34e1694168c2a0c0b3fd0f273809612cb13d000d5c2e00e85f50f796') {
+                    if (genesisBlock !== TESTNET_GENESIS_BLOCK_HASH) {
                         /* eslint-disable no-alert */
                         window.alert('Check if your Concordium browser wallet is connected to testnet!');
                         handleNotConnected();

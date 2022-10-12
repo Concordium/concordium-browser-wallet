@@ -3,23 +3,20 @@ import React, { useEffect, useState, useContext, useRef, useCallback } from 'rea
 import { toBuffer, AccountAddress } from '@concordium/web-sdk';
 import { detectConcordiumProvider } from '@concordium/browser-wallet-api-helpers';
 import * as leb from '@thi.ng/leb128';
-import { wrap, unwrap, state, CONTRACT_NAME_PROXY, CONTRACT_NAME_IMPLEMENTATION, CONTRACT_NAME_STATE } from './utils';
+import { wrap, unwrap, state } from './utils';
+import {
+    TESTNET_GENESIS_BLOCK_HASH,
+    WCCD_PROXY_INDEX,
+    WCCD_IMPLEMENTATION_INDEX,
+    WCCD_STATE_INDEX,
+    CONTRACT_SUB_INDEX,
+    CONTRACT_NAME_PROXY,
+    CONTRACT_NAME_IMPLEMENTATION,
+    CONTRACT_NAME_STATE,
+} from './constants';
 
 import ArrowIcon from './assets/Arrow.svg';
 import RefreshIcon from './assets/Refresh.svg';
-
-/** If you want to test admin functions of the wCCD contract,
- * it will be necessary to instantiate your own wCCD contract using an account available in the browser wallet,
- * and change these constants to match the indexes of the instances.
- *
- * Should match the subindexes of the instances targeted.
- * V1 Module reference on testnet: 2975c0dded52f5f78118c42970785da9227e2bc8173af0b913599df8e3023818
- */
-const WCCD_PROXY_INDEX = 866n;
-const WCCD_IMPLEMENTATION_INDEX = 865n;
-const WCCD_STATE_INDEX = 864n;
-
-const CONTRACT_SUB_INDEX = 0n;
 
 const blackCardStyle = {
     backgroundColor: 'black',
@@ -164,9 +161,7 @@ export default function wCCD({ handleGetAccount, handleNotConnected }: Props) {
                     .then((provider) =>
                         provider
                             .getJsonRpcClient()
-                            .getCryptographicParameters(
-                                '4221332d34e1694168c2a0c0b3fd0f273809612cb13d000d5c2e00e85f50f796'
-                            )
+                            .getCryptographicParameters(TESTNET_GENESIS_BLOCK_HASH.toString())
                             .then((result) => {
                                 if (result === undefined || result?.value === null) {
                                     handleNotConnected();
