@@ -4,4 +4,5 @@
 export const routes = {
     create: 'create',
     confirm: 'confirm',
+    confirmToken: 'confirmToken',
 };

@@ -5,6 +5,7 @@ import { noOp, useAsyncMemo } from 'wallet-common-helpers';
 import CreateTransfer from './CreateTransfer';
 import ConfirmTransfer from './ConfirmTransfer';
 import { routes } from './routes';
+import ConfirmTokenTransfer from './ConfirmTokenTransfer';
 
 interface Props {
     setDetailsExpanded: (expanded: boolean) => void;
@@ -18,6 +19,10 @@ export default function SendCcd({ setDetailsExpanded }: Props) {
             <Route
                 path={routes.confirm}
                 element={<ConfirmTransfer setDetailsExpanded={setDetailsExpanded} cost={cost} />}
+            />
+            <Route
+                path={routes.confirmToken}
+                element={<ConfirmTokenTransfer setDetailsExpanded={setDetailsExpanded} cost={cost} />}
             />
             <Route index element={<CreateTransfer cost={cost} />} />
         </Routes>

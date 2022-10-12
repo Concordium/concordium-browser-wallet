@@ -18,26 +18,29 @@ import { useLocation, useNavigate } from 'react-router-dom';
 import DisplayCost from '@popup/shared/TransactionReceipt/DisplayCost';
 import { useAccountInfo } from '@popup/shared/AccountInfoListenerContext';
 import { useSelectedCredential } from '@popup/shared/utils/account-helpers';
+import Checkbox from '@popup/shared/Form/Checkbox';
 import { routes } from './routes';
 
 export type FormValues = {
     ccd: string;
     recipient: string;
+    native: string;
 };
 
 interface Props {
     cost?: bigint;
 }
 
-interface State {
-    payload: SimpleTransferPayload | undefined;
-}
+type State =
+    | undefined
+    | (SimpleTransferPayload & { contractIndex: undefined })
+    | (SimpleTransferPayload & { contractIndex: string; tokenId: string });
 
 export default function CreateTransaction({ cost = 0n }: Props) {
     const { t } = useTranslation('account');
     const { t: tShared } = useTranslation('shared');
     const { state } = useLocation();
-    const defaultPayload = (state as State)?.payload;
+    const defaultPayload = state as State;
     const address = useAtomValue(selectedAccountAtom);
     const selectedCred = useSelectedCredential();
     const nav = useNavigate();
@@ -45,6 +48,7 @@ export default function CreateTransaction({ cost = 0n }: Props) {
         defaultValues: {
             ccd: microCcdToCcd(defaultPayload?.amount.microGtuAmount),
             recipient: defaultPayload?.toAddress.address,
+            native: defaultPayload?.contractIndex === undefined ? 'true' : undefined,
         },
     });
 
@@ -57,8 +61,14 @@ export default function CreateTransaction({ cost = 0n }: Props) {
     const maxValue = getPublicAccountAmounts(accountInfo).atDisposal - cost;
 
     const onSubmit: SubmitHandler<FormValues> = (vs) => {
-        const payload = buildSimpleTransferPayload(vs.recipient, ccdToMicroCcd(vs.ccd));
-        nav(routes.confirm, { state: { payload } });
+        if (vs.native) {
+            const payload = buildSimpleTransferPayload(vs.recipient, ccdToMicroCcd(vs.ccd));
+            nav(routes.confirm, { state: { ...payload } });
+        } else {
+            // TODO: proper conversion/don't crash on decimals
+            const payload = buildSimpleTransferPayload(vs.recipient, BigInt(vs.ccd));
+            nav(routes.confirmToken, { state: { ...payload, contractIndex: '866', tokenId: '' } });
+        }
     };
 
     return (
@@ -70,6 +80,7 @@ export default function CreateTransaction({ cost = 0n }: Props) {
             {(f) => (
                 <>
                     <p className="m-v-10 text-center">{t('sendCcd.title')}</p>
+                    <Checkbox register={f.register} name="native" />
                     <CcdInput
                         register={f.register}
                         name="ccd"

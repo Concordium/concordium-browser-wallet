@@ -23,14 +23,12 @@ interface Props {
     cost?: bigint;
 }
 
-interface State {
-    payload: SimpleTransferPayload;
-}
+type State = SimpleTransferPayload;
 
 export default function ConfirmTransfer({ setDetailsExpanded, cost }: Props) {
     const { t } = useTranslation('account');
     const { state } = useLocation();
-    const { payload } = state as State;
+    const payload = state as State;
     const [hash, setHash] = useState<string>();
     const selectedAddress = useAtomValue(selectedAccountAtom);
     const address = useMemo(() => selectedAddress, []);
@@ -88,7 +86,7 @@ export default function ConfirmTransfer({ setDetailsExpanded, cost }: Props) {
             />
             {!hash && (
                 <div className="flex justify-center p-b-10 m-h-20">
-                    <Button width="narrow" className="m-r-10" onClick={() => nav(`../`, { state: { payload } })}>
+                    <Button width="narrow" className="m-r-10" onClick={() => nav(`../`, { state: { ...payload } })}>
                         {t('sendCcd.buttons.back')}
                     </Button>
                     <Button width="narrow" onClick={() => send().catch((e) => addToast(e.toString()))}>
