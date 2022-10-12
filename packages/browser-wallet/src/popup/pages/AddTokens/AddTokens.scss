@@ -1,0 +1,42 @@
+.tokens {
+    &__add {
+        &__container {
+            display: flex;
+            flex-direction: column;
+            width: 100%;
+            height: 100%;
+            padding: rem(15px) rem(10px);
+        }
+
+        &__element {
+            padding: rem(10px) rem(20px);
+            margin: 0 rem(-10px);
+            display: flex;
+            border-bottom: rem(1px) solid $color-lines;
+
+            p {
+                margin: 0;
+                margin-left: rem(10px);
+            }
+        }
+
+        &__input {
+            margin-bottom: rem(10px);
+        }
+
+        &__add-token {
+            display: flex;
+            justify-content: space-around;
+            margin: 0 rem(-10px) rem(10px);
+        }
+
+        &__submit {
+            margin-top: auto;
+        }
+
+        &__token-display {
+            max-height: rem(20px);
+            max-width: rem(20px);
+        }
+    }
+}

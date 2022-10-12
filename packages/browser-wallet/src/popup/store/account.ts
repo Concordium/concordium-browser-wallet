@@ -2,9 +2,16 @@ import { popupMessageHandler } from '@popup/shared/message-handler';
 import { atom } from 'jotai';
 import { selectAtom } from 'jotai/utils';
 
-import { ChromeStorageKey, TokenIdAndMetadata, WalletCredential } from '@shared/storage/types';
+import {
+    ChromeStorageKey,
+    TokenIdAndMetadata,
+    TokenMetadata,
+    TokenStorage,
+    WalletCredential,
+} from '@shared/storage/types';
 import { EventType } from '@concordium/browser-wallet-api-helpers';
-import { atomWithChromeStorage } from './utils';
+import { mapRecordValues } from 'wallet-common-helpers/src/utils/basicHelpers';
+import { AsyncWrapper, atomWithChromeStorage } from './utils';
 
 export const credentialsAtom = atomWithChromeStorage<WalletCredential[]>(ChromeStorageKey.Credentials, [], false);
 
@@ -44,4 +51,34 @@ export const creatingCredentialRequestAtom = atomWithChromeStorage<boolean>(
     true
 );
 
-export const tokensAtom = atomWithChromeStorage<Record<string, Record<string, TokenIdAndMetadata[]>>>(ChromeStorageKey.Tokens, {}, true);
+export const storedTokensAtom = atomWithChromeStorage<Record<string, Record<string, TokenStorage[]>>>(
+    ChromeStorageKey.Tokens,
+    {},
+    true
+);
+export const tokenMetadataAtom = atomWithChromeStorage<Record<string, TokenMetadata>>(
+    ChromeStorageKey.TokenMetadata,
+    {},
+    true
+);
+
+export const tokensAtom = atom<AsyncWrapper<Record<string, Record<string, TokenIdAndMetadata[]>>>>((get) => {
+    const tokens = get(storedTokensAtom);
+    const tokenMetadata = get(tokenMetadataAtom);
+    if (tokens.loading || tokenMetadata.loading) {
+        return { loading: true, value: {} as Record<string, Record<string, TokenIdAndMetadata[]>> };
+    }
+    return {
+        loading: false,
+        value: mapRecordValues(tokens.value, (accountTokens) =>
+            mapRecordValues(accountTokens, (collectionTokens) =>
+                collectionTokens.map((token) => {
+                    return {
+                        ...token,
+                        metadata: tokenMetadata.value[token.metadataLink],
+                    };
+                })
+            )
+        ),
+    };
+});

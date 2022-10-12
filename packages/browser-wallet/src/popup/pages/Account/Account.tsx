@@ -18,7 +18,7 @@ import AccountSettings from './AccountSettings';
 import TransactionLog from './TransactionLog/TransactionLog';
 import SendCcd from './SendCcd';
 import ConnectedBox from './ConnectedBox';
-import TokenOverview from './tokens/TokenOverview';
+import TokenOverview from './TokenOverview';
 
 function Account({
     detailsExpanded,

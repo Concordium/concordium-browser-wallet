@@ -50,6 +50,21 @@ const t: typeof en = {
         title: 'Send CCD',
         fee: 'Estimerede transaktionsomkostninger',
     },
+    tokens: {
+        tabBar: {
+            ft: 'Ombyttelige',
+            nft: 'Samlerobjekter',
+            new: 'Tilføj ny',
+        },
+        indexRequired: 'Kontrakt indeks er påkrævet',
+        chooseContract: 'Vælg kontrakt',
+        contractIndex: 'Kontrakt Indeks',
+        contractName: 'Kontrakt navn',
+        tokenId: 'Token id',
+        addToken: 'Tilføj token',
+        duplicateId: 'Token er allerede i listen',
+        updateTokens: 'Opdater tokens',
+    },
     accountPending: 'Denne konto er stadig ved at blive oprettet.',
     request: 'Opret konto',
 };
