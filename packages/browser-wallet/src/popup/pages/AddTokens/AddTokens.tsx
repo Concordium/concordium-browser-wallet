@@ -2,6 +2,7 @@ import React, { useState, useMemo } from 'react';
 import { Buffer } from 'buffer/';
 import { SubmitHandler } from 'react-hook-form';
 import { useTranslation } from 'react-i18next';
+import { useNavigate } from 'react-router-dom';
 import { useAtom, useAtomValue, useSetAtom } from 'jotai';
 import Form, { useForm } from '@popup/shared/Form';
 import Input, { Input as UncontrolledInput } from '@popup/shared/Form/Input';
@@ -11,8 +12,8 @@ import Submit from '@popup/shared/Form/Submit';
 import { TokenMetadata } from '@shared/storage/types';
 import Button from '@popup/shared/Button';
 import { addToastAtom } from '@popup/state';
-import { tokensAtom, selectedAccountAtom, tokenMetadataAtom, storedTokensAtom } from '@popup/store/account';
-import { useNavigate } from 'react-router-dom';
+import { selectedAccountAtom } from '@popup/store/account';
+import { tokensAtom, tokenMetadataAtom, storedTokensAtom } from '@popup/store/token';
 import { absoluteRoutes } from '@popup/constants/routes';
 
 export interface TokenIdAndMetadata {

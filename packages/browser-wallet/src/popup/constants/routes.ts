@@ -17,10 +17,10 @@ export const relativeRoutes = {
                 add: { path: 'add' },
             },
             ft: {
-                path: 'ft/:id',
+                path: 'ft/:contractIndex/:id',
             },
             nft: {
-                path: 'nft/:id',
+                path: 'nft/:contractIndex/:id',
             },
         },
         identities: {
