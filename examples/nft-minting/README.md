@@ -1,11 +1,12 @@
-# Piggy bank web application
+# NFT minting web application
 
-The example project included in this repository, serves as a working example of how to integrate with smart contracts on the Concordium blockchain.
-It both includes a page for a V0 and a V1 version of the piggy bank smart contract.
+The example project included in this repository, serves as a working example of how to make a website that allows no-code minting with smart contracts on the Concordium blockchain.
+
+(Note that this was developed in a day during a hackathon)
 
 ## Prerequisites
 
--   Browser wallet extension must be installed in google chrome and configured with testnet JSON-RPC, in order to view smart contract details or submit transactions.
+-   Browser wallet extension must be installed in google chrome, in order to view collection details or submit transactions.
 
 ## Installing
 
@@ -13,6 +14,12 @@ It both includes a page for a V0 and a V1 version of the piggy bank smart contra
 -   Build concordium helpers by running `yarn build:all`.
 
 ## Running the example
+
+Running the file-server to host metadata:
+
+-   Run `yarn start-file-server` in a terminal
+
+Running the webpage:
 
 -   Run `yarn build` in a terminal
 -   Run `yarn start`
