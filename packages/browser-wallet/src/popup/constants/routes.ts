@@ -14,8 +14,8 @@ export const relativeRoutes = {
             add: { path: 'add' },
             tokens: {
                 add: { path: 'add' },
-                path: 'tokens'
-            }
+                path: 'tokens',
+            },
         },
         identities: {
             path: 'identities',
