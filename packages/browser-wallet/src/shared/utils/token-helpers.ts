@@ -1,7 +1,11 @@
 import { Buffer } from 'buffer/';
-import { AccountAddress, InstanceInfo, JsonRpcClient } from '@concordium/web-sdk';
+import { AccountAddress, InstanceInfo, JsonRpcClient, GtuAmount, serializeUpdateContractParameters } from '@concordium/web-sdk';
 import uleb128 from 'leb128/unsigned';
 import { TokenMetadata } from '@shared/storage/types';
+import { NFT_SCHEMA } from '@popup/constants/schema';
+// TODO: Replace dependency
+import * as leb from '@thi.ng/leb128';
+import { SmartContractParameters } from './types';
 
 export interface ContractDetails {
     contractName: string;
@@ -207,3 +211,86 @@ export const getContractBalances = async (
         {}
     );
 };
+
+export type TokenIdentifier = { contractIndex: string; tokenId: string; metadata: TokenMetadata };
+
+// TODO move to constants or find another solution.
+export const CCD_METADATA: TokenMetadata = {
+    name: 'CCD',
+    decimals: 6,
+};
+
+export async function getTokenBalance(client: JsonRpcClient, account: string, token: TokenIdentifier) {
+    const parameters = [
+        {
+            address: { Account: [account] },
+            token_id: token.tokenId,
+        },
+    ];
+
+    const parameter = serializeUpdateContractParameters(
+        'CIS2-NFT',
+        'balanceOf',
+        parameters,
+        Buffer.from(NFT_SCHEMA, 'base64'),
+        1
+    );
+
+    const contractAddress = { index: BigInt(token.contractIndex), subindex: 0n };
+    const instanceInfo = await client.getInstanceInfo(contractAddress);
+    if (!instanceInfo) {
+        throw new Error(`Unable to get info on contract`);
+    }
+    const contractName = instanceInfo.name.substring(5);
+    const res = await client.invokeContract({
+        contract: contractAddress,
+        parameter,
+        method: `${contractName}.balanceOf`,
+    });
+    if (!res || res.tag === 'failure' || !res.returnValue) {
+        throw new Error(`Expected succesful invocation`);
+    }
+    return BigInt(leb.decodeULEB128(Buffer.from(res.returnValue.substring(4), 'hex'))[0]);
+}
+
+export function getTokenTransferParameters(
+    tokenId: string,
+    amount: bigint,
+    from: string,
+    to: string
+): SmartContractParameters {
+    return [
+        {
+            amount: Buffer.from(leb.encodeULEB128(Number(amount))).toString('hex'),
+            to: { Account: [to] },
+            from: { Account: [from] },
+            data: '',
+            token_id: tokenId,
+        },
+    ];
+}
+
+export function getTokenTransferPayload(
+    parameters: SmartContractParameters,
+    contractName: string,
+    index: bigint,
+    subindex = 0n,
+    maxContractExecutionEnergy = 30000n
+) {
+    const parameter = serializeUpdateContractParameters(
+        'CIS2-NFT',
+        'transfer',
+        parameters,
+        Buffer.from(NFT_SCHEMA, 'base64'),
+        1
+    );
+
+    return {
+        amount: new GtuAmount(0n),
+        contractAddress: { index, subindex },
+        receiveName: `${contractName}.transfer`,
+        parameter,
+        // TODO: use Estimate
+        maxContractExecutionEnergy,
+    };
+}

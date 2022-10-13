@@ -19,6 +19,7 @@
         "@concordium/browser-wallet-api-helpers": "workspace:^",
         "@concordium/web-sdk": "^2.0.0",
         "@scure/bip39": "^1.1.0",
+        "@thi.ng/leb128": "^2.1.22",
         "axios": "^0.27.2",
         "buffer": "^6.0.3",
         "check-password-strength": "^2.0.5",
@@ -40,7 +41,7 @@
         "react-window-infinite-loader": "^1.0.8",
         "readable-stream": "^4.2.0",
         "uuid": "^8.3.2",
-        "wallet-common-helpers": "https://github.com/Concordium/concordium-wallet-common-helpers.git#ec7dbd18f8fc0666087887c15455a834593d9bca"
+        "wallet-common-helpers": "https://github.com/Concordium/concordium-wallet-common-helpers.git#bba27d1bad30375e6302a04631b3429724c8a019"
     },
     "devDependencies": {
         "@babel/core": "^7.18.2",

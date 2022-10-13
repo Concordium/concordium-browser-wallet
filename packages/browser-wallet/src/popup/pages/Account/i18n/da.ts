@@ -48,6 +48,7 @@ const t: typeof en = {
             continue: 'Fortsæt',
         },
         title: 'Send CCD',
+        currentBalance: 'Nuværende balance',
         fee: 'Estimerede transaktionsomkostninger',
     },
     tokens: {

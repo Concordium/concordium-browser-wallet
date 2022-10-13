@@ -1,7 +1,6 @@
 /* eslint-disable react/prop-types */
 import clsx from 'clsx';
 import React, { forwardRef, InputHTMLAttributes } from 'react';
-import { getCcdSymbol } from 'wallet-common-helpers';
 import Button from '@popup/shared/Button';
 
 import { CommonFieldProps, RequiredUncontrolledFieldProps } from './common/types';
@@ -12,14 +11,16 @@ type Props = Pick<InputHTMLAttributes<HTMLInputElement>, 'className' | 'type' | 
     RequiredUncontrolledFieldProps<HTMLInputElement> &
     CommonFieldProps & {
         onMax: () => void;
+        symbol: string;
     };
 
+// TODO: Handle different symbol lengths properly
 /**
  * @description
  * Use as a normal \<input /\>. Should NOT be used for checkbox or radio.
  */
-export const CcdInput = forwardRef<HTMLInputElement, Props>(
-    ({ error, className, type = 'text', label, note, valid, onMax, ...props }, ref) => {
+export const AmountInput = forwardRef<HTMLInputElement, Props>(
+    ({ error, className, type = 'text', label, note, valid, onMax, symbol, ...props }, ref) => {
         return (
             <label
                 className={clsx(
@@ -29,7 +30,7 @@ export const CcdInput = forwardRef<HTMLInputElement, Props>(
                     className
                 )}
             >
-                <p className="form-ccd-input__symbol">{getCcdSymbol()}</p>
+                <p className="form-ccd-input__symbol">{symbol}</p>
                 <input
                     className={clsx('form-ccd-input__field', 'form-input__field')}
                     type={type}
@@ -52,6 +53,6 @@ export const CcdInput = forwardRef<HTMLInputElement, Props>(
     }
 );
 
-const FormCcdInput = makeUncontrolled<HTMLInputElement, Props>(CcdInput);
+const FormAmountInput = makeUncontrolled<HTMLInputElement, Props>(AmountInput);
 
-export default FormCcdInput;
+export default FormAmountInput;

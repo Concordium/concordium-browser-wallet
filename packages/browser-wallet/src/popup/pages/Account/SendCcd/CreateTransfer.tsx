@@ -1,11 +1,19 @@
-import React from 'react';
+import React, { useEffect, useMemo, useState } from 'react';
 import { useTranslation } from 'react-i18next';
 import { useAtomValue } from 'jotai';
-import { selectedAccountAtom } from '@popup/store/account';
+import { selectedAccountAtom, tokensAtom } from '@popup/store/account';
 import Form from '@popup/shared/Form';
-import CcdInput from '@popup/shared/Form/CcdInput';
+import AmountInput from '@popup/shared/Form/CcdInput';
 import Input from '@popup/shared/Form/Input';
-import { ccdToMicroCcd, getPublicAccountAmounts, microCcdToCcd } from 'wallet-common-helpers';
+import {
+    ccdToMicroCcd,
+    getPublicAccountAmounts,
+    microCcdToCcd,
+    fractionalToInteger,
+    getCcdSymbol,
+    useAsyncMemo,
+    integerToFractional,
+} from 'wallet-common-helpers';
 import { SimpleTransferPayload } from '@concordium/web-sdk';
 import { SubmitHandler, useForm, Validate } from 'react-hook-form';
 import Submit from '@popup/shared/Form/Submit';
@@ -18,23 +26,36 @@ import { useLocation, useNavigate } from 'react-router-dom';
 import DisplayCost from '@popup/shared/TransactionReceipt/DisplayCost';
 import { useAccountInfo } from '@popup/shared/AccountInfoListenerContext';
 import { useSelectedCredential } from '@popup/shared/utils/account-helpers';
-import Checkbox from '@popup/shared/Form/Checkbox';
+import Button from '@popup/shared/Button';
+import { TokenMetadata } from '@shared/storage/types';
+import { CCD_METADATA, getTokenBalance, TokenIdentifier } from '@shared/utils/token-helpers';
+import { jsonRpcClientAtom } from '@popup/store/settings';
 import { routes } from './routes';
 
 export type FormValues = {
-    ccd: string;
+    amount: string;
     recipient: string;
-    native: string;
+    token?: TokenIdentifier;
 };
 
 interface Props {
     cost?: bigint;
 }
 
-type State =
-    | undefined
-    | (SimpleTransferPayload & { contractIndex: undefined })
-    | (SimpleTransferPayload & { contractIndex: string; tokenId: string });
+type State = undefined | (SimpleTransferPayload & Partial<TokenIdentifier>);
+
+interface ChooseTokenProps {
+    onChoice: () => void;
+    metadata: TokenMetadata;
+}
+
+function ChooseToken({ onChoice, metadata }: ChooseTokenProps) {
+    return (
+        <Button className="send-ccd__create-transfer__pick-token__element" clear onClick={onChoice}>
+            {metadata.name}
+        </Button>
+    );
+}
 
 export default function CreateTransaction({ cost = 0n }: Props) {
     const { t } = useTranslation('account');
@@ -46,31 +67,117 @@ export default function CreateTransaction({ cost = 0n }: Props) {
     const nav = useNavigate();
     const form = useForm<FormValues>({
         defaultValues: {
-            ccd: microCcdToCcd(defaultPayload?.amount.microGtuAmount),
+            amount: microCcdToCcd(defaultPayload?.amount.microGtuAmount),
             recipient: defaultPayload?.toAddress.address,
-            native: defaultPayload?.contractIndex === undefined ? 'true' : undefined,
+            token:
+                defaultPayload?.contractIndex !== undefined && defaultPayload?.tokenId !== undefined
+                    ? { contractIndex: defaultPayload.contractIndex, tokenId: defaultPayload.tokenId }
+                    : undefined,
         },
     });
+    const client = useAtomValue(jsonRpcClientAtom);
+    const chosenToken = form.watch('token');
+    const tokenMetadata = useMemo(() => chosenToken?.metadata || CCD_METADATA, [chosenToken?.metadata]);
+    const tokens = useAtomValue(tokensAtom);
+    const accountTokens = useMemo(
+        () => (!tokens.loading && address ? Object.entries(tokens.value[address] || []) : undefined),
+        [tokens.loading, address]
+    );
+    const [pickingToken, setPickingToken] = useState<boolean>(false);
 
     if (!address || !selectedCred) {
-        return null;
+        throw new Error('Missing selected accoount');
     }
 
     const accountInfo = useAccountInfo(selectedCred);
-    const validateAmount: Validate<string> = (amount) => validateTransferAmount(amount, accountInfo, cost);
-    const maxValue = getPublicAccountAmounts(accountInfo).atDisposal - cost;
+
+    const currentBalance = useAsyncMemo(
+        () => {
+            if (!chosenToken) {
+                return Promise.resolve(getPublicAccountAmounts(accountInfo).atDisposal - cost);
+            }
+            return getTokenBalance(client, address, chosenToken);
+        },
+        () => {
+            // TODO: toast
+        },
+        [chosenToken, accountInfo?.accountAmount]
+    );
+
+    const validateAmount: Validate<string> = (amount) =>
+        validateTransferAmount(amount, currentBalance, tokenMetadata.decimals, chosenToken ? 0n : cost);
+
+    const maxValue = useMemo(() => {
+        if (currentBalance) {
+            return chosenToken ? currentBalance : currentBalance - cost;
+        }
+        return undefined;
+    }, [Boolean(chosenToken), currentBalance]);
+
+    useEffect(() => {
+        // TODO: change only if new account does not have chosen token/reset to initial token.
+        form.setValue('token', undefined);
+    }, [address]);
+
+    useEffect(() => {
+        form.setValue('amount', '');
+    }, [chosenToken]);
+
+    const displayAmount = integerToFractional(tokenMetadata.decimals || 0);
+
+    const onMax = () => {
+        form.setValue('amount', displayAmount(maxValue) || '0');
+    };
+
+    if (tokens.loading || !maxValue) {
+        return null;
+    }
 
     const onSubmit: SubmitHandler<FormValues> = (vs) => {
-        if (vs.native) {
-            const payload = buildSimpleTransferPayload(vs.recipient, ccdToMicroCcd(vs.ccd));
-            nav(routes.confirm, { state: { ...payload } });
-        } else {
+        if (vs.token) {
             // TODO: proper conversion/don't crash on decimals
-            const payload = buildSimpleTransferPayload(vs.recipient, BigInt(vs.ccd));
-            nav(routes.confirmToken, { state: { ...payload, contractIndex: '866', tokenId: '' } });
+            const metadata = tokens.value[address][vs.token.contractIndex].find(
+                (token) => token.id === vs.token?.tokenId
+            );
+            if (!metadata) {
+                throw new Error('Unable to find metadata for chosen token');
+            }
+            const maxDecimals = metadata.metadata.decimals || 0;
+            const payload = buildSimpleTransferPayload(vs.recipient, fractionalToInteger(vs.amount, maxDecimals));
+            nav(routes.confirmToken, { state: { ...payload, ...vs.token } });
+        } else {
+            const payload = buildSimpleTransferPayload(vs.recipient, ccdToMicroCcd(vs.amount));
+            nav(routes.confirm, { state: { ...payload } });
         }
     };
 
+    if (pickingToken && accountTokens) {
+        return (
+            <div className="send-ccd__create-transfer__pick-token">
+                <ChooseToken
+                    metadata={CCD_METADATA}
+                    onChoice={() => {
+                        setPickingToken(false);
+                        form.setValue('token', undefined);
+                    }}
+                />
+                {accountTokens.map(([contractIndex, collectionTokens]) =>
+                    collectionTokens.map((token) => (
+                        <ChooseToken
+                            key={`${contractIndex}+${token.id}`}
+                            metadata={token.metadata}
+                            onChoice={() => {
+                                setPickingToken(false);
+                                form.setValue('token', { contractIndex, tokenId: token.id, metadata: token.metadata });
+                            }}
+                        />
+                    ))
+                )}
+            </div>
+        );
+    }
+
+    // TODO Fix register/validate type error
     return (
         <Form
             formMethods={form}
@@ -80,13 +187,24 @@ export default function CreateTransaction({ cost = 0n }: Props) {
             {(f) => (
                 <>
                     <p className="m-v-10 text-center">{t('sendCcd.title')}</p>
-                    <Checkbox register={f.register} name="native" />
-                    <CcdInput
+                    <Button
+                        className="send-ccd__create-transfer__token-picker"
+                        clear
+                        disabled={!accountTokens}
+                        onClick={() => setPickingToken(true)}
+                    >
+                        {chosenToken ? chosenToken.metadata.name : CCD_METADATA.name}
+                    </Button>
+                    <p className="m-v-10 text-center">
+                        {`${t('sendCcd.currentBalance')}: ${displayAmount(currentBalance) || '0'}`}
+                    </p>
+                    <AmountInput
                         register={f.register}
-                        name="ccd"
+                        name="amount"
+                        symbol={chosenToken ? chosenToken.metadata.symbol || '' : getCcdSymbol()}
                         label={t('sendCcd.labels.ccd')}
                         className="send-ccd__create-transfer__input"
-                        onMax={() => form.setValue('ccd', microCcdToCcd(maxValue) || '0')}
+                        onMax={onMax}
                         rules={{
                             required: tShared('utils.ccdAmount.required'),
                             validate: validateAmount,
@@ -103,6 +221,7 @@ export default function CreateTransaction({ cost = 0n }: Props) {
                         }}
                     />
                     <DisplayCost cost={cost} />
+
                     <Submit className="send-ccd__create-transfer__button" width="medium">
                         {t('sendCcd.buttons.continue')}
                     </Submit>

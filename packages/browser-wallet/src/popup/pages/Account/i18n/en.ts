@@ -46,6 +46,7 @@ const t = {
             continue: 'Continue',
         },
         title: 'Send CCD',
+        currentBalance: 'Current balance',
         fee: 'Estimated transaction fee',
     },
     tokens: {

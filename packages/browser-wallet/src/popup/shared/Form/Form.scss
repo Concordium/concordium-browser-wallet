@@ -255,7 +255,8 @@ $handle-scale: scale(1.02);
 
 .form-ccd-input {
     &__field {
-        padding-left: rem(12.5px);
+        // padding-left: rem(12.5px);
+        padding-left: rem(50px);
     }
 
     &__symbol {

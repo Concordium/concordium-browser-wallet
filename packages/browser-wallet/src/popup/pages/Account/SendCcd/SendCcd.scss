@@ -1,5 +1,6 @@
 .send-ccd {
     &__create-transfer {
+        &__token-picker,
         &__input {
             width: calc(100% - rem(50px));
             margin: rem(5px) rem(25px) rem(13.286px) rem(25px);
@@ -12,6 +13,22 @@
         &__button {
             margin-bottom: rem(10px);
             margin-top: auto;
+        }
+
+        &__pick-token__element,
+        &__token-picker {
+            border: rem(1px) solid $color-cta;
+            border-radius: rem(5px);
+            padding: rem(10px);
+        }
+
+        &__pick-token {
+            display: flex;
+            flex-direction: column;
+
+            &__element {
+                margin-bottom: rem(10px);
+            }
         }
     }
 

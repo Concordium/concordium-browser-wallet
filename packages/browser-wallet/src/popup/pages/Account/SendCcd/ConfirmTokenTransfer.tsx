@@ -1,4 +1,3 @@
-import { Buffer } from 'buffer/';
 import React, { useEffect, useState, useMemo } from 'react';
 import { useTranslation } from 'react-i18next';
 import { useSetAtom, useAtomValue } from 'jotai';
@@ -6,10 +5,8 @@ import { selectedAccountAtom } from '@popup/store/account';
 import {
     AccountAddress,
     AccountTransactionType,
-    GtuAmount,
     InstanceInfo,
     JsonRpcClient,
-    serializeUpdateContractParameters,
     SimpleTransferPayload,
     UpdateContractPayload,
 } from '@concordium/web-sdk';
@@ -22,7 +19,7 @@ import { useLocation, useNavigate } from 'react-router-dom';
 import { absoluteRoutes } from '@popup/constants/routes';
 import TransactionReceipt from '@popup/shared/TransactionReceipt/TransactionReceipt';
 import { useAsyncMemo } from 'wallet-common-helpers';
-import { NFT_SCHEMA } from '@popup/constants/schema';
+import { getTokenTransferParameters, getTokenTransferPayload } from '@shared/utils/token-helpers';
 
 function getContractName(instanceInfo: InstanceInfo): string | undefined {
     return instanceInfo.name.substring(5);
@@ -60,39 +57,17 @@ export default function ConfirmTokenTransfer({ setDetailsExpanded, cost }: Props
     const addToast = useSetAtom(addToastAtom);
     const contractName = useAsyncMemo(() => fetchContractName(client, BigInt(contractIndex)));
 
-    const parameters = useMemo(() => {
-        return [
-            {
-                amount: amount.microGtuAmount.toString(),
-                to: { Account: [toAddress.address] },
-                from: { Account: [address] },
-                data: '',
-                token_id: tokenId,
-            },
-        ];
-    }, []);
+    const parameters = useMemo(
+        () => address && getTokenTransferParameters(tokenId, amount.microGtuAmount, address, toAddress.address),
+        [address]
+    );
 
     const payload: UpdateContractPayload | undefined = useMemo(() => {
-        if (!contractName) {
+        if (!parameters || !contractName) {
             return undefined;
         }
-
         try {
-            const parameter = serializeUpdateContractParameters(
-                'CIS2-NFT',
-                'transfer',
-                parameters,
-                Buffer.from(NFT_SCHEMA, 'base64'),
-                1
-            );
-
-            return {
-                amount: new GtuAmount(0n),
-                contractAddress: { index: BigInt(contractIndex), subindex: 0n },
-                receiveName: `${contractName}.transfer`,
-                parameter,
-                maxContractExecutionEnergy: 30000n,
-            };
+            return getTokenTransferPayload(parameters, contractName, BigInt(contractIndex));
         } catch (e) {
             addToast((e as Error).message);
         }
