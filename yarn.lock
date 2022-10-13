@@ -1965,6 +1965,7 @@ __metadata:
     i18next-browser-languagedetector: ^6.1.4
     jotai: ^1.6.5
     json-bigint: ^1.0.0
+    leb128: ^0.0.5
     lodash.groupby: ^4.6.0
     react: ^18.0.0
     react-dom: ^18.0.0
@@ -7059,6 +7060,15 @@ __metadata:
   version: 1.1.2
   resolution: "buffer-from@npm:1.1.2"
   checksum: 0448524a562b37d4d7ed9efd91685a5b77a50672c556ea254ac9a6d30e3403a517d8981f10e565db24e8339413b43c97ca2951f10e399c6125a0d8911f5679bb
+  languageName: node
+  linkType: hard
+
+"buffer-pipe@npm:0.0.3":
+  version: 0.0.3
+  resolution: "buffer-pipe@npm:0.0.3"
+  dependencies:
+    safe-buffer: ^5.1.2
+  checksum: 04daf09291f88952078578cc1e6e06ce044c1c0c57b0f5fef6a4d9332d7bd016f4f54331421fae1a322de45df5cfd79ff443aa04dfc51c244809e18b7a404746
   languageName: node
   linkType: hard
 
@@ -13425,6 +13435,16 @@ __metadata:
     dotenv: ^8.0.0
     dotenv-expand: ^5.1.0
   checksum: a80509d8cb40dafcfab5859335920754a21814320aa16115e58c0ae5ef3b1d8bd4daa96349ea548e2833f2f89269ddbb103ebd55be06cfdba00e0af6785b5ba7
+  languageName: node
+  linkType: hard
+
+"leb128@npm:^0.0.5":
+  version: 0.0.5
+  resolution: "leb128@npm:0.0.5"
+  dependencies:
+    bn.js: ^5.0.0
+    buffer-pipe: 0.0.3
+  checksum: d477f9f5c423401f279a7a9e2afa96d42baf1701a4e2a3d62a08696efa8c536d93a122ece14b9b54037e847108f67426abe6bbb6b4e1327a9bbbc9058ebafe60
   languageName: node
   linkType: hard
 

@@ -28,6 +28,7 @@
         "i18next-browser-languagedetector": "^6.1.4",
         "jotai": "^1.6.5",
         "json-bigint": "^1.0.0",
+        "leb128": "^0.0.5",
         "lodash.groupby": "^4.6.0",
         "react": "^18.0.0",
         "react-dom": "^18.0.0",
