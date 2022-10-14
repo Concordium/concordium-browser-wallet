@@ -36,7 +36,7 @@ import bgMessageHandler from './message-handler';
 import { openWindow } from './window-management';
 
 // How many empty identityIndices are allowed before stopping
-const maxEmpty = 1;
+const maxEmpty = 20;
 const RECOVERY_ALARM_NAME = 'recoveryAlarm';
 const RECOVERY_LOCK = 'concordium_recovery_lock';
 

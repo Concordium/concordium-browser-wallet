@@ -1,126 +1,21 @@
 import React, { useState, useMemo } from 'react';
-import { Buffer } from 'buffer/';
 import { SubmitHandler } from 'react-hook-form';
 import { useTranslation } from 'react-i18next';
 import { useNavigate } from 'react-router-dom';
 import { useAtom, useAtomValue, useSetAtom } from 'jotai';
 import Form, { useForm } from '@popup/shared/Form';
 import Input, { Input as UncontrolledInput } from '@popup/shared/Form/Input';
-import { InstanceInfo, JsonRpcClient } from '@concordium/web-sdk';
 import { jsonRpcClientAtom } from '@popup/store/settings';
 import Submit from '@popup/shared/Form/Submit';
-import { TokenMetadata } from '@shared/storage/types';
+import { TokenIdAndMetadata, TokenMetadata } from '@shared/storage/types';
 import Button from '@popup/shared/Button';
 import { addToastAtom } from '@popup/state';
 import { selectedAccountAtom } from '@popup/store/account';
 import { tokensAtom, tokenMetadataAtom, storedTokensAtom } from '@popup/store/token';
 import { absoluteRoutes } from '@popup/constants/routes';
+import { confirmCIS2Contract, ContractDetails, getTokenMetadata, getTokenUrl } from '@shared/utils/token-helpers';
 
-export interface TokenIdAndMetadata {
-    id: string;
-    metadataLink: string;
-    metadata: TokenMetadata;
-}
-
-function getCIS2Identifier(): Buffer {
-    const buf = Buffer.alloc(8);
-    buf.writeInt16LE(1, 0);
-    buf.writeInt8(5, 2);
-    buf.write('CIS-2', 3, 5, 'ASCII');
-    return buf;
-}
-
-function getMetadataParameter(id: string): Buffer {
-    const lengths = Buffer.alloc(3);
-    const idBuf = Buffer.from(id, 'hex');
-    lengths.writeInt16LE(1, 0);
-    lengths.writeInt8(idBuf.length, 2);
-    return Buffer.concat([lengths, idBuf]);
-}
-
-interface ContractDetails {
-    contractName: string;
-    index: bigint;
-    subindex: bigint;
-}
-
-async function confirmCIS2Contract(
-    client: JsonRpcClient,
-    instanceInfo: InstanceInfo,
-    { contractName, index, subindex }: ContractDetails
-): Promise<string | undefined> {
-    if (!instanceInfo.methods.includes(`${contractName}.supports`)) {
-        return 'Chosen contract does not support CIS-0';
-    }
-    if (
-        !(
-            instanceInfo.methods.includes(`${contractName}.balanceOf`) &&
-            instanceInfo.methods.includes(`${contractName}.transfer`) &&
-            instanceInfo.methods.includes(`${contractName}.tokenMetadata`)
-        )
-    ) {
-        return 'Chosen contract does not expose required endpoints';
-    }
-    const supports = await client.invokeContract({
-        contract: { index, subindex },
-        method: `${contractName}.supports`,
-        parameter: getCIS2Identifier(),
-    });
-    if (!supports || supports.tag === 'failure') {
-        return 'Unable to invoke chosen contract result';
-    }
-    if (supports.returnValue !== '010001') {
-        return 'Chosen contract does not support CIS-2';
-    }
-    return undefined;
-}
-
-export const getTokenUrl = (
-    client: JsonRpcClient,
-    id: string,
-    { contractName, index, subindex }: ContractDetails
-): Promise<string> => {
-    return new Promise((resolve) => {
-        client
-            .invokeContract({
-                contract: { index, subindex },
-                method: `${contractName}.tokenMetadata`,
-                parameter: getMetadataParameter(id),
-            })
-            .then((returnValue) => {
-                if (returnValue && returnValue.tag === 'success' && returnValue.returnValue) {
-                    const bufferStream = Buffer.from(returnValue.returnValue, 'hex');
-                    const length = bufferStream.readUInt16LE(2);
-                    const url = bufferStream.slice(4, 4 + length).toString('utf8');
-                    resolve(url);
-                } else {
-                    // Throw an error;
-                }
-            });
-    });
-};
-
-async function getTokenMetadata(tokenUrl: string): Promise<TokenMetadata> {
-    // TODO remove this hack, for production, or just when we have a proper collection for testing (with online metadata).
-    if (tokenUrl.includes('example')) {
-        return {
-            name: 'Wrapped CCD Token',
-            symbol: 'wCCD',
-            decimals: 6,
-            description: 'A CIS2 token wrapping the Concordium native token (CCD)',
-            thumbnail: { url: 'https://proposals.concordium.software/_static/concordium-logo-black.svg' },
-            display: { url: 'https://proposals.concordium.software/_static/concordium-logo-black.svg' },
-            artifact: { url: 'https://proposals.concordium.software/_static/concordium-logo-black.svg' },
-        };
-    }
-    const resp = await fetch(tokenUrl, { headers: new Headers({ 'Access-Control-Allow-Origin': '*' }), mode: 'cors' });
-    if (!resp.ok) {
-        throw new Error(`Something went wrong, status: ${resp.status}`);
-    }
-    return resp.json();
-}
-
-export type FormValues = {
+type FormValues = {
     contractIndex: string;
     id: string;
 };
@@ -129,6 +24,9 @@ interface ChooseContractProps {
     onChoice(details: ContractDetails): void;
 }
 
+/**
+ * Component used to choose the contract index for a CIS-2 compliant smart contract instance.
+ */
 function ChooseContract({ onChoice }: ChooseContractProps) {
     const { t } = useTranslation('account', { keyPrefix: 'tokens' });
     const form = useForm<FormValues>({
@@ -158,7 +56,7 @@ function ChooseContract({ onChoice }: ChooseContractProps) {
                 <>
                     <Input
                         register={f.register}
-                        label="Contract index"
+                        label={t('contractIndex')}
                         name="contractIndex"
                         rules={{
                             required: t('indexRequired'),
@@ -171,7 +69,10 @@ function ChooseContract({ onChoice }: ChooseContractProps) {
     );
 }
 
-function Token({ metadata }: { metadata: TokenMetadata }) {
+/**
+ * Displays a CIS-2 Token
+ */
+function DisplayToken({ metadata }: { metadata: TokenMetadata }) {
     return (
         <div className="tokens__add__element" title={metadata.description}>
             {metadata.display?.url && (
@@ -182,7 +83,10 @@ function Token({ metadata }: { metadata: TokenMetadata }) {
     );
 }
 
-function AddToken({
+/**
+ * Component used to pick token from a CIS-2 compliant smart contract instance.
+ */
+function PickTokens({
     contractDetails,
     onFinish,
     defaultTokens,
@@ -230,7 +134,7 @@ function AddToken({
                 )}
             </Form>
             {accountTokens.map((token) => (
-                <Token key={token.id} metadata={token.metadata} />
+                <DisplayToken key={token.id} metadata={token.metadata} />
             ))}
             <Button onClick={() => onFinish(accountTokens)} className="tokens__add__submit">
                 {t('updateTokens')}
@@ -239,7 +143,7 @@ function AddToken({
     );
 }
 
-export default function Main() {
+export default function AddTokens() {
     const [contractDetails, setContractDetails] = useState<ContractDetails>();
     const [tokenMetadata, setTokenMetadata] = useAtom(tokenMetadataAtom);
     const [tokens, setTokens] = useAtom(storedTokensAtom);
@@ -283,5 +187,5 @@ export default function Main() {
     if (contractDetails === undefined) {
         return <ChooseContract onChoice={setContractDetails} />;
     }
-    return <AddToken contractDetails={contractDetails} onFinish={onFinish} defaultTokens={accountTokens} />;
+    return <PickTokens contractDetails={contractDetails} onFinish={onFinish} defaultTokens={accountTokens} />;
 }
