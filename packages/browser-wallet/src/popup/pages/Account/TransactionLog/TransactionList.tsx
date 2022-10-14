@@ -304,8 +304,8 @@ export default function TransactionList({ onTransactionClick }: TransactionListP
             );
         }
     } else {
-        // Quick and dirty fingerprint of transactions, to ensure transaction list resets properly.
-        const listKey = `${allTransactions.length}${allTransactions.reduce((acc, cur) => (acc + cur.id) % 73, 0)}`;
+        const txKey = transactions[0]?.transactionHash || transactions[0]?.id || '';
+        const listKey = `${accountAddress}${txKey}`;
 
         transactionListComponent = (
             <div className="transaction-list__scroll">
