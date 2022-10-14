@@ -2,9 +2,8 @@
 import React, { useEffect, useState, useMemo, useCallback } from 'react';
 
 import { detectConcordiumProvider } from '@concordium/browser-wallet-api-helpers';
-import WCCD from './wCCD';
+import Minting from './Minting';
 import { state, State } from './utils';
-import { TESTNET_GENESIS_BLOCK_HASH } from './constants';
 
 /**
  * Connect to wallet, setup application state context, and render children when the wallet API is ready for use.
@@ -18,30 +17,23 @@ export default function Root() {
         setIsConnected(Boolean(accountAddress));
     }, []);
 
-    const handleNotConnected = useCallback(() => {
-        setAccount('');
-        setIsConnected(false);
-    }, []);
+    const handleOnClick = useCallback(
+        () =>
+            detectConcordiumProvider()
+                .then((provider) => provider.connect())
+                .then(handleGetAccount),
+        []
+    );
 
     useEffect(() => {
         detectConcordiumProvider()
             .then((provider) => {
                 // Listen for relevant events from the wallet.
-                provider.on('chainChanged', (genesisBlock) => {
-                    // Check if the user is connected to testnet by checking if the genesisBlock is the testnet one.
-                    // Throw a warning and disconnect if wrong chain. We only want to
-                    // allow users to interact with our testnet smart contracts.
-                    if (genesisBlock !== TESTNET_GENESIS_BLOCK_HASH) {
-                        /* eslint-disable no-alert */
-                        window.alert('Check if your Concordium browser wallet is connected to testnet!');
-                        handleNotConnected();
-                    }
-                });
-
                 provider.on('accountChanged', setAccount);
                 provider.on('accountDisconnected', () =>
                     provider.getMostRecentlySelectedAccount().then(handleGetAccount)
                 );
+                provider.on('chainChanged', (chain) => console.log(chain));
                 // Check if you are already connected
                 provider.getMostRecentlySelectedAccount().then(handleGetAccount);
             })
@@ -53,10 +45,20 @@ export default function Root() {
     return (
         // Setup a globally accessible state with data from the wallet.
         <state.Provider value={stateValue}>
-            <script src="../../node_modules/@concordium/web-sdk/lib/concordium.min.js" />
-            <script src="../../packages/browser-wallet-api-helpers/lib/concordiumHelpers.min.js" />
-            <main className="wccd">
-                <WCCD handleGetAccount={handleGetAccount} handleNotConnected={handleNotConnected} />
+            <main className="main">
+                <div className={`connection-banner ${isConnected ? 'connected' : ''}`}>
+                    {isConnected && `Connected: ${account}`}
+                    {!isConnected && (
+                        <>
+                            <p>No wallet connection</p>
+                            <button type="button" onClick={handleOnClick}>
+                                Connect
+                            </button>
+                        </>
+                    )}
+                </div>
+                <br />
+                <Minting />
             </main>
         </state.Provider>
     );

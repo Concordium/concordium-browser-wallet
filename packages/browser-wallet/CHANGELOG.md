@@ -4,6 +4,7 @@
 
 ### Added
 
+-   A toast is now shown when the passcode is successfully updated.
 -   Shows submitted transactions in the transaction list.
 
 ## 0.7.5

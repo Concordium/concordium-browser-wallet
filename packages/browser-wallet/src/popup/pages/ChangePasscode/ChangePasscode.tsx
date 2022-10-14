@@ -3,12 +3,13 @@ import Form, { useForm } from '@popup/shared/Form';
 import FormPassword from '@popup/shared/Form/Password';
 import Submit from '@popup/shared/Form/Submit';
 import { encryptedSeedPhraseAtom, sessionPasscodeAtom } from '@popup/store/settings';
-import { useAtom } from 'jotai';
+import { useAtom, useSetAtom } from 'jotai';
 import React from 'react';
 import { SubmitHandler, UseFormGetValues, Validate } from 'react-hook-form';
 import { useTranslation } from 'react-i18next';
 import { useNavigate } from 'react-router-dom';
 import { absoluteRoutes } from '@popup/constants/routes';
+import { addToastAtom } from '@popup/state';
 
 type FormValues = {
     currentPasscode: string;
@@ -23,6 +24,7 @@ export default function ChangePasscode() {
     const form = useForm<FormValues>();
     const [encryptedSeedPhrase, setEncryptedSeedPhrase] = useAtom(encryptedSeedPhraseAtom);
     const [passcode, setPasscode] = useAtom(sessionPasscodeAtom);
+    const addToast = useSetAtom(addToastAtom);
 
     if (passcode.loading || !passcode.value || encryptedSeedPhrase.loading) {
         return null;
@@ -35,6 +37,7 @@ export default function ChangePasscode() {
 
             setEncryptedSeedPhrase(encryptedSeedPhraseWithNewPasscode);
             setPasscode(vs.newPasscode);
+            addToast(t('passcodeUpdated'));
 
             nav(absoluteRoutes.home.settings.path);
         }
