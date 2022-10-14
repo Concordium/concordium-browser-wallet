@@ -202,6 +202,7 @@ export interface TokenMetadata {
     thumbnail?: MetadataUrl;
     display?: MetadataUrl;
     artifact?: MetadataUrl;
+    unique?: boolean;
 }
 
 export interface TokenIdAndMetadata {

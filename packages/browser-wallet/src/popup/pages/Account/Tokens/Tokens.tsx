@@ -52,14 +52,7 @@ function Ft({ accountAddress, contractIndex: contractAddress, token, onClick }: 
     );
 }
 
-type ListProps = {
-    account: WalletCredential;
-};
-
-function Fungibles({ account }: ListProps) {
-    const accountInfo = useAccountInfo(account);
-    const nav = useNavigate();
-
+function useTokens(account: WalletCredential, unique: boolean) {
     const {
         loading,
         value: { [account.address]: tokens },
@@ -72,7 +65,19 @@ function Fungibles({ account }: ListProps) {
         [tokens, loading]
     );
 
-    if (accountInfo === undefined || loading || tokens === undefined) {
+    return items.filter((t) => (t.metadata.unique ?? false) === unique);
+}
+
+type ListProps = {
+    account: WalletCredential;
+};
+
+function Fungibles({ account }: ListProps) {
+    const accountInfo = useAccountInfo(account);
+    const nav = useNavigate();
+    const tokens = useTokens(account, false);
+
+    if (accountInfo === undefined) {
         return null;
     }
 
@@ -86,33 +91,38 @@ function Fungibles({ account }: ListProps) {
                 <CcdIcon className="token-list__icon token-list__icon--ccd" />
                 <div className="token-list__balance">{displayAsCcd(accountInfo.accountAmount)} CCD</div>
             </Button>
-            {items.map((i) => (
+            {tokens.map((t) => (
                 <Ft
-                    key={`${i.contractIndex}.${i.id}`}
+                    key={`${t.contractIndex}.${t.id}`}
                     accountAddress={account.address}
-                    contractIndex={i.contractIndex}
-                    token={i}
-                    onClick={handleClick(i.contractIndex, i.id)}
+                    contractIndex={t.contractIndex}
+                    token={t}
+                    onClick={handleClick(t.contractIndex, t.id)}
                 />
             ))}
         </>
     );
 }
 
-// FIXME
-function Collectibles() {
-    const items = [1, 2, 3, 4];
+function Collectibles({ account }: ListProps) {
     const nav = useNavigate();
+    const tokens = useTokens(account, true);
 
-    const handleClick = (id: string) => () => {
-        nav(nftDetailsRoute('', id));
+    const handleClick = (contractIndex: string, id: string) => () => {
+        nav(nftDetailsRoute(contractIndex, id));
     };
+
     return (
         <>
-            {items.map((i) => (
-                <Button clear key={i} onClick={handleClick(`${i}`)} className="token-list__item">
-                    <img className="token-list__icon" src="/resources/icons/32x32.png" alt="icon" />
-                    <div>Example NFT</div>
+            {tokens.map((t) => (
+                <Button
+                    clear
+                    key={`${t.contractIndex}.${t.id}`}
+                    onClick={handleClick(t.contractIndex, t.id)}
+                    className="token-list__item"
+                >
+                    <img className="token-list__icon" src={t.metadata.thumbnail?.url ?? ''} alt={t.metadata.name} />
+                    <div>{t.metadata.name}</div>
                 </Button>
             ))}
         </>
@@ -155,7 +165,7 @@ export default function Main() {
         <Routes>
             <Route element={<TokensOverview />}>
                 <Route index element={<Fungibles account={account} />} />
-                <Route path={tokensRoutes.collectibles} element={<Collectibles />} />
+                <Route path={tokensRoutes.collectibles} element={<Collectibles account={account} />} />
             </Route>
         </Routes>
     );
