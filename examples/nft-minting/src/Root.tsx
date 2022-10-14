@@ -2,7 +2,7 @@
 import React, { useEffect, useState, useMemo, useCallback } from 'react';
 
 import { detectConcordiumProvider } from '@concordium/browser-wallet-api-helpers';
-import Minting from './Version0';
+import Minting from './Minting';
 import { state, State } from './utils';
 
 /**
@@ -45,7 +45,7 @@ export default function Root() {
     return (
         // Setup a globally accessible state with data from the wallet.
         <state.Provider value={stateValue}>
-            <main className="piggybank">
+            <main className="main">
                 <div className={`connection-banner ${isConnected ? 'connected' : ''}`}>
                     {isConnected && `Connected: ${account}`}
                     {!isConnected && (
@@ -58,7 +58,7 @@ export default function Root() {
                     )}
                 </div>
                 <br />
-                <Minting/>
+                <Minting />
             </main>
         </state.Provider>
     );
