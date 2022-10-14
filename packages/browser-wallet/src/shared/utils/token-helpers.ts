@@ -1,5 +1,6 @@
 import { Buffer } from 'buffer/';
-import { InstanceInfo, JsonRpcClient } from '@concordium/web-sdk';
+import { AccountAddress, InstanceInfo, JsonRpcClient } from '@concordium/web-sdk';
+import uleb128 from 'leb128/unsigned';
 import { TokenMetadata } from '@shared/storage/types';
 
 export interface TokenIdAndMetadata {
@@ -121,3 +122,57 @@ export async function getTokenMetadata(tokenUrl: string): Promise<TokenMetadata>
     }
     return resp.json();
 }
+
+/**
+ * Serialized based on cis-2 documentation: https://proposals.concordium.software/CIS/cis-2.html#id3
+ */
+const serializeBalanceParameter = (tokenIndex: string, accountAddress: string) => {
+    const queries = Buffer.alloc(2);
+    queries.writeUInt16LE(1, 0); // 1 query
+
+    const token = Buffer.from(tokenIndex, 'hex');
+    const tokenLength = Buffer.alloc(1);
+    tokenLength.writeUInt8(token.length, 0);
+
+    const addressType = Buffer.alloc(1); // Account address type
+    const address = new AccountAddress(accountAddress).decodedAddress;
+
+    return Buffer.concat([queries, tokenLength, token, addressType, address]);
+};
+
+/**
+ * Deserialized based on cis-2 documentation: https://proposals.concordium.software/CIS/cis-2.html#response
+ */
+const deserializeBalanceAmount = (value: string): bigint => {
+    const buf = Buffer.from(value, 'hex');
+    const amount = uleb128.decode(buf.slice(2)); // ignore first 2 bytes as we only expect 1 tokenamount
+
+    return BigInt(amount);
+};
+
+export const getTokenBalance = async (
+    client: JsonRpcClient,
+    contractIndex: string,
+    tokenIndex: string,
+    accountAddress: string
+): Promise<bigint> => {
+    const index = BigInt(contractIndex);
+    const subindex = 0n;
+    const instanceInfo = await client.getInstanceInfo({ index, subindex });
+
+    if (instanceInfo === undefined) {
+        return 0n;
+    }
+
+    const result = await client.invokeContract({
+        contract: { index, subindex },
+        method: `${instanceInfo.name.substring(5)}.balanceOf`,
+        parameter: serializeBalanceParameter(tokenIndex, accountAddress),
+    });
+
+    if (result === undefined || result.tag === 'failure' || result.returnValue === undefined) {
+        return 0n;
+    }
+
+    return deserializeBalanceAmount(result.returnValue);
+};
