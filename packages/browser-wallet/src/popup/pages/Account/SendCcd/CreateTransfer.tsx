@@ -1,6 +1,6 @@
 import React, { useEffect, useMemo, useState } from 'react';
 import { useTranslation } from 'react-i18next';
-import { useAtomValue } from 'jotai';
+import { useAtomValue, useSetAtom } from 'jotai';
 import { selectedAccountAtom, tokensAtom } from '@popup/store/account';
 import Form from '@popup/shared/Form';
 import AmountInput from '@popup/shared/Form/CcdInput';
@@ -30,6 +30,7 @@ import Button from '@popup/shared/Button';
 import { TokenMetadata } from '@shared/storage/types';
 import { CCD_METADATA, getTokenBalance, TokenIdentifier } from '@shared/utils/token-helpers';
 import { jsonRpcClientAtom } from '@popup/store/settings';
+import { addToastAtom } from '@popup/state';
 import { routes } from './routes';
 
 export type FormValues = {
@@ -84,6 +85,7 @@ export default function CreateTransaction({ cost = 0n }: Props) {
         [tokens.loading, address]
     );
     const [pickingToken, setPickingToken] = useState<boolean>(false);
+    const addToast = useSetAtom(addToastAtom);
 
     if (!address || !selectedCred) {
         throw new Error('Missing selected accoount');
@@ -98,8 +100,8 @@ export default function CreateTransaction({ cost = 0n }: Props) {
             }
             return getTokenBalance(client, address, chosenToken);
         },
-        () => {
-            // TODO: toast
+        (e) => {
+            addToast(e.message);
         },
         [chosenToken, accountInfo?.accountAmount]
     );
@@ -115,11 +117,13 @@ export default function CreateTransaction({ cost = 0n }: Props) {
     }, [Boolean(chosenToken), currentBalance]);
 
     useEffect(() => {
+        // Reset chosen token if the current account is changed
         // TODO: change only if new account does not have chosen token/reset to initial token.
         form.setValue('token', undefined);
     }, [address]);
 
     useEffect(() => {
+        // Reset amount if the token is changed
         form.setValue('amount', '');
     }, [chosenToken]);
 
@@ -129,21 +133,16 @@ export default function CreateTransaction({ cost = 0n }: Props) {
         form.setValue('amount', displayAmount(maxValue) || '0');
     };
 
-    if (tokens.loading || !maxValue) {
+    if (tokens.loading || maxValue === undefined) {
         return null;
     }
 
     const onSubmit: SubmitHandler<FormValues> = (vs) => {
         if (vs.token) {
-            // TODO: proper conversion/don't crash on decimals
-            const metadata = tokens.value[address][vs.token.contractIndex].find(
-                (token) => token.id === vs.token?.tokenId
+            const payload = buildSimpleTransferPayload(
+                vs.recipient,
+                fractionalToInteger(vs.amount, vs.token.metadata.decimals || 0)
             );
-            if (!metadata) {
-                throw new Error('Unable to find metadata for chosen token');
-            }
-            const maxDecimals = metadata.metadata.decimals || 0;
-            const payload = buildSimpleTransferPayload(vs.recipient, fractionalToInteger(vs.amount, maxDecimals));
             nav(routes.confirmToken, { state: { ...payload, ...vs.token } });
         } else {
             const payload = buildSimpleTransferPayload(vs.recipient, ccdToMicroCcd(vs.amount));

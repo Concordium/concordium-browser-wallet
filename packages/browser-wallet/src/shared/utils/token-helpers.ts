@@ -2,7 +2,7 @@ import { Buffer } from 'buffer/';
 import { AccountAddress, InstanceInfo, JsonRpcClient, GtuAmount, serializeUpdateContractParameters } from '@concordium/web-sdk';
 import uleb128 from 'leb128/unsigned';
 import { TokenMetadata } from '@shared/storage/types';
-import { NFT_SCHEMA } from '@popup/constants/schema';
+import { CIS2_SCHEMA_CONTRACT_NAME, CIS2_SCHEMA } from '@popup/constants/schema';
 // TODO: Replace dependency
 import * as leb from '@thi.ng/leb128';
 import { SmartContractParameters } from './types';
@@ -229,10 +229,10 @@ export async function getTokenBalance(client: JsonRpcClient, account: string, to
     ];
 
     const parameter = serializeUpdateContractParameters(
-        'CIS2-NFT',
+        CIS2_SCHEMA_CONTRACT_NAME,
         'balanceOf',
         parameters,
-        Buffer.from(NFT_SCHEMA, 'base64'),
+        Buffer.from(CIS2_SCHEMA, 'base64'),
         1
     );
 
@@ -261,7 +261,7 @@ export function getTokenTransferParameters(
 ): SmartContractParameters {
     return [
         {
-            amount: Buffer.from(leb.encodeULEB128(Number(amount))).toString('hex'),
+            amount: amount.toString(),
             to: { Account: [to] },
             from: { Account: [from] },
             data: '',
@@ -278,10 +278,10 @@ export function getTokenTransferPayload(
     maxContractExecutionEnergy = 30000n
 ) {
     const parameter = serializeUpdateContractParameters(
-        'CIS2-NFT',
+        CIS2_SCHEMA_CONTRACT_NAME,
         'transfer',
         parameters,
-        Buffer.from(NFT_SCHEMA, 'base64'),
+        Buffer.from(CIS2_SCHEMA, 'base64'),
         1
     );
 
