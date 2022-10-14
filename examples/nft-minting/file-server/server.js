@@ -59,6 +59,7 @@ app.post('/metadata/:tokenid', (req, res) => {
         thumbnail: {
             url: displayUrl,
         },
+        unique: true,
     };
 
     const jsonFileName = `${req.params.tokenid}.json`;
