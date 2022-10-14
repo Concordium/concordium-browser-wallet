@@ -1,5 +1,4 @@
 import type { CryptographicParameters, IdentityObjectV1, Network, Versioned } from '@concordium/web-sdk';
-import type { BrowserWalletAccountTransaction } from '@popup/shared/utils/transaction-history-types';
 
 export enum ChromeStorageKey {
     ConnectedSites = 'connectedSites',
@@ -189,9 +188,3 @@ export interface RecoveryStatus {
     credentialGap?: number;
     nextId?: number;
 }
-
-export type StoredBrowserWalletTransaction = Omit<BrowserWalletAccountTransaction, 'time' | 'amount' | 'cost'> & {
-    time: string;
-    amount: string;
-    cost?: string;
-};

@@ -13,11 +13,7 @@ import { useAtomValue, useSetAtom } from 'jotai';
 import Button from '@popup/shared/Button';
 import { networkConfigurationAtom } from '@popup/store/settings';
 import { isMainnet } from '@shared/utils/network-helpers';
-import {
-    addPendingTransactionAtom,
-    removePendingTransactionsAtom,
-    selectedPendingTransactionsAtom,
-} from '@popup/store/transactions';
+import { addPendingTransactionAtom, selectedPendingTransactionsAtom } from '@popup/store/transactions';
 import { useUpdateAtom } from 'jotai/utils';
 import useTransactionGroups, { TransactionsByDateTuple } from './useTransactionGroups';
 import TransactionElement, { transactionElementHeight } from './TransactionElement';
@@ -193,7 +189,6 @@ export default function TransactionList({ onTransactionClick }: TransactionListP
     const accountAddress = useMemo(() => account?.address, [account]);
     const pendingTransactions = useAtomValue(selectedPendingTransactionsAtom);
     const addPendingTransaction = useUpdateAtom(addPendingTransactionAtom);
-    const removePendingTransactions = useUpdateAtom(removePendingTransactionsAtom);
     const [transactions, setTransactions] = useState<BrowserWalletTransaction[]>([]);
     const allTransactions = useMemo(
         () => [
@@ -234,8 +229,6 @@ export default function TransactionList({ onTransactionClick }: TransactionListP
                 }
             }
 
-            removePendingTransactions(newTransactions);
-
             const updatedTransactions = updateTransactionsWithNewTransactions(transactions, newTransactions);
             setTransactions(updatedTransactions);
         }
@@ -246,7 +239,6 @@ export default function TransactionList({ onTransactionClick }: TransactionListP
         getTransactions(address, transactionResultLimit, 'descending', fromId)
             .then((transactionResult) => {
                 setHasNextPage(transactionResult.full);
-                removePendingTransactions(transactionResult.transactions);
 
                 const updatedTransactions = appendTransactions
                     ? transactions.concat(transactionResult.transactions)

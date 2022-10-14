@@ -276,3 +276,9 @@ export async function getCcdDrop(accountAddress: string): Promise<BrowserWalletA
         accountAddress
     );
 }
+
+export async function getTransactionStatus(tHash: string): Promise<TransactionStatus | undefined> {
+    const path = `/v0/submissionStatus/${tHash}`;
+    const { data } = await (await getWalletProxy()).get(path);
+    return data.status;
+}
