@@ -10,7 +10,7 @@ export function throwIfUndefined<T extends any[], V>(
 ): (...inputs: T) => V {
     return (...inputs) => {
         const result = func(...inputs);
-        if (!result) {
+        if (result === undefined) {
             throw new Error(getErrorMessage(...inputs));
         }
         return result;
