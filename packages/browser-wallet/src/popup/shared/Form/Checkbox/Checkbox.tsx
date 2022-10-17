@@ -6,14 +6,14 @@ import ErrorMessage from '../ErrorMessage';
 
 type Props = Pick<InputHTMLAttributes<HTMLInputElement>, 'className'> &
     RequiredUncontrolledFieldProps<HTMLInputElement> &
-    CommonFieldProps & { description?: ReactElement };
+    CommonFieldProps & { description?: ReactElement; checked?: boolean; tabIndex?: number };
 
 export const Checkbox = forwardRef<HTMLInputElement, Props>(
     ({ error, note, className, description, ...props }, ref) => {
         return (
             <>
                 <label className={clsx('form-input__checkbox', className)}>
-                    <input type="checkbox" ref={ref} {...props} />
+                    <input className={clsx(description && 'm-r-10')} type="checkbox" ref={ref} {...props} />
                     {description && description}
                 </label>
                 {error ? (

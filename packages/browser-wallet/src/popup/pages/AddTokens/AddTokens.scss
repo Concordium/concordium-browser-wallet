@@ -1,4 +1,5 @@
 $element-border-radius: rem(5px);
+$horizontal-spacing: rem(10px);
 
 .add-tokens {
     &__container {
@@ -13,6 +14,8 @@ $element-border-radius: rem(5px);
         padding: rem(10px);
         display: flex;
         background-color: $color-bg;
+        align-items: center;
+        cursor: pointer;
 
         &:not(:last-of-type) {
             border-bottom: rem(1px) solid $color-lines;
@@ -30,22 +33,33 @@ $element-border-radius: rem(5px);
     }
 
     &__input {
-        margin-bottom: rem(10px);
+        margin-bottom: $horizontal-spacing;
     }
 
     &__add-token {
         display: flex;
         justify-content: space-around;
-        margin: 0 rem(-10px) rem(10px);
+        margin-bottom: $horizontal-spacing;
+
+        .form-input {
+            flex: 1;
+            margin-right: rem(10px);
+        }
     }
 
     &__submit {
         margin-top: auto;
     }
 
+    &__token-display-container {
+        height: rem(20px);
+        width: rem(40px);
+        display: flex;
+    }
+
     &__token-display {
         max-height: rem(20px);
-        max-width: rem(20px);
+        max-width: rem(40px);
     }
 
     &__token-container {
@@ -53,10 +67,16 @@ $element-border-radius: rem(5px);
         flex-direction: column;
         background-color: $color-bg;
         flex-grow: 1;
-        margin-bottom: rem(5px);
         border: rem(1px) solid $color-lines;
         border-radius: $element-border-radius;
         overflow-y: overlay;
         overflow-x: hidden;
+        margin-bottom: $horizontal-spacing;
+    }
+
+    &__checkbox {
+        margin-left: auto;
+        padding: 0;
+        width: rem(20px);
     }
 }

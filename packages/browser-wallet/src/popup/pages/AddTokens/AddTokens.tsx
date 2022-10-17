@@ -1,4 +1,4 @@
-import React, { useState, useMemo } from 'react';
+import React, { useState, useMemo, useEffect } from 'react';
 import { SubmitHandler } from 'react-hook-form';
 import { useTranslation } from 'react-i18next';
 import { useAtom, useAtomValue, useSetAtom } from 'jotai';
@@ -13,6 +13,7 @@ import { selectedAccountAtom, currentAccountTokensAtom } from '@popup/store/acco
 import { useNavigate } from 'react-router-dom';
 import { absoluteRoutes } from '@popup/constants/routes';
 import { confirmCIS2Contract, ContractDetails, getTokenMetadata, getTokenUrl } from '@shared/utils/token-helpers';
+import { Checkbox } from '@popup/shared/Form/Checkbox';
 
 type FormValues = {
     contractIndex: string;
@@ -51,7 +52,7 @@ function ChooseContract({ onChoice }: ChooseContractProps) {
     };
 
     return (
-        <Form formMethods={form} className="add-tokens__container" onSubmit={onSubmit}>
+        <Form formMethods={form} className="add-tokens__add-token" onSubmit={onSubmit}>
             {(f) => (
                 <>
                     <Input
@@ -62,7 +63,7 @@ function ChooseContract({ onChoice }: ChooseContractProps) {
                             required: t('indexRequired'),
                         }}
                     />
-                    <Submit className="add-tokens__submit">{t('chooseContract')}</Submit>
+                    <Submit>{t('chooseContract')}</Submit>
                 </>
             )}
         </Form>
@@ -72,13 +73,31 @@ function ChooseContract({ onChoice }: ChooseContractProps) {
 /**
  * Displays a CIS-2 Token
  */
-function DisplayToken({ metadata }: { metadata: TokenMetadata }) {
+function DisplayToken({
+    chosen,
+    metadata,
+    onClick,
+}: {
+    chosen: boolean;
+    metadata: TokenMetadata;
+    onClick: () => void;
+}) {
     return (
-        <div className="add-tokens__element" title={metadata.description}>
-            {metadata.display?.url && (
-                <img alt={metadata.name} className="add-tokens__token-display" src={metadata.display.url} />
-            )}
+        <div
+            className="add-tokens__element"
+            title={metadata.description}
+            onClick={onClick}
+            role="button"
+            onKeyPress={onClick}
+            tabIndex={0}
+        >
+            <div className="add-tokens__token-display-container">
+                {metadata.display?.url && (
+                    <img alt={metadata.name} className="add-tokens__token-display" src={metadata.display.url} />
+                )}
+            </div>
             <p>{metadata.name}</p>
+            <Checkbox tabIndex={-1} label="test" className="add-tokens__checkbox" checked={chosen} />
         </div>
     );
 }
@@ -97,9 +116,13 @@ function PickTokens({
 }) {
     const { t } = useTranslation('account', { keyPrefix: 'tokens' });
     const client = useAtomValue(jsonRpcClientAtom);
-    const [accountTokens, setAccountTokens] = useState<TokenIdAndMetadata[]>(defaultTokens);
+    const [accountTokens, setAccountTokens] = useState<(TokenIdAndMetadata & { chosen: boolean })[]>([]);
     const addToast = useSetAtom(addToastAtom);
     const form = useForm<FormValues>();
+
+    useEffect(() => {
+        setAccountTokens(defaultTokens.map((token) => ({ ...token, chosen: true })));
+    }, [contractDetails?.index.toString()]);
 
     const onSubmit: SubmitHandler<FormValues> = async ({ id }) => {
         if (accountTokens.some((token) => token.id === id)) {
@@ -108,17 +131,17 @@ function PickTokens({
         }
         const tokenUrl = await getTokenUrl(client, id || '', contractDetails);
         const meta = await getTokenMetadata(tokenUrl);
-        setAccountTokens((tokens) => [...tokens, { id, metadata: meta, metadataLink: tokenUrl }]);
+        setAccountTokens((tokens) => [...tokens, { id, metadata: meta, metadataLink: tokenUrl, chosen: true }]);
+    };
+
+    const chooseToken = (index: number) => {
+        const token = accountTokens[index];
+        accountTokens[index] = { ...token, chosen: !token.chosen };
+        setAccountTokens([...accountTokens]);
     };
 
     return (
-        <div className="add-tokens__container">
-            <UncontrolledInput
-                readOnly
-                className="add-tokens__input"
-                label={t('contractIndex')}
-                value={contractDetails.index.toString()}
-            />
+        <>
             <UncontrolledInput
                 readOnly
                 className="add-tokens__input"
@@ -134,14 +157,24 @@ function PickTokens({
                 )}
             </Form>
             <div className="add-tokens__token-container">
-                {accountTokens.map((token) => (
-                    <DisplayToken key={token.id} metadata={token.metadata} />
+                {accountTokens.map((token, index) => (
+                    <DisplayToken
+                        key={token.id}
+                        chosen={token.chosen}
+                        metadata={token.metadata}
+                        onClick={() => chooseToken(index)}
+                    />
                 ))}
             </div>
-            <Button onClick={() => onFinish(accountTokens)} className="add-tokens__submit">
+            <Button
+                onClick={() =>
+                    onFinish(accountTokens.filter((token) => token.chosen).map(({ chosen, ...token }) => token))
+                }
+                className="add-tokens__submit"
+            >
                 {t('updateTokens')}
             </Button>
-        </div>
+        </>
     );
 }
 
@@ -153,8 +186,7 @@ export default function AddTokens() {
 
     const onFinish = (newTokens: TokenIdAndMetadata[]) => {
         if (!contractDetails) {
-            // Todo: handle this
-            return;
+            throw new Error('This function should not be invoked without a chosen contract');
         }
         setAccountTokens({ contractIndex: contractDetails.index.toString(), newTokens }).then(() =>
             nav(absoluteRoutes.home.account.tokens.path)
@@ -171,8 +203,13 @@ export default function AddTokens() {
     if (!account || accountTokens.loading) {
         return null;
     }
-    if (contractDetails === undefined) {
-        return <ChooseContract onChoice={setContractDetails} />;
-    }
-    return <PickTokens contractDetails={contractDetails} onFinish={onFinish} defaultTokens={currentCollection} />;
+
+    return (
+        <div className="add-tokens__container">
+            <ChooseContract onChoice={setContractDetails} />
+            {contractDetails !== undefined && (
+                <PickTokens contractDetails={contractDetails} onFinish={onFinish} defaultTokens={currentCollection} />
+            )}
+        </div>
+    );
 }
