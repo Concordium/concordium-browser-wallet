@@ -20,6 +20,7 @@
     }
 
     &:where(:not(.button--clear)) {
+        min-height: rem($button-height);
         height: rem($button-height);
         padding: 0 rem(5px);
         font-size: rem(12px);

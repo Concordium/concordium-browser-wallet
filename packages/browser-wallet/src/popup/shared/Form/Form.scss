@@ -92,6 +92,12 @@
         }
     }
 
+    &--read-only .form-input__field {
+        background-color: $color-disabled-input-bg;
+        cursor: default;
+        border-color: $color-grey;
+    }
+
     &__note,
     &__error {
         position: relative;

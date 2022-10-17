@@ -82,3 +82,45 @@ export const tokensAtom = atom<AsyncWrapper<Record<string, Record<string, TokenI
         ),
     };
 });
+
+export const currentAccountTokensAtom = atom<
+    AsyncWrapper<Record<string, TokenIdAndMetadata[]>>,
+    { contractIndex: string; newTokens: TokenIdAndMetadata[] },
+    Promise<void>
+>(
+    (get) => {
+        const tokens = get(tokensAtom);
+        if (tokens.loading) {
+            return { loading: true, value: {} };
+        }
+        const currentAccount = get(selectedAccountAtom);
+        if (!currentAccount) {
+            return { loading: true, value: {} };
+        }
+        return { loading: false, value: tokens.value[currentAccount] };
+    },
+    async (get, set, { contractIndex, newTokens }) => {
+        const tokens = get(storedTokensAtom);
+        const tokenMetadata = get(tokenMetadataAtom);
+        if (tokens.loading || tokenMetadata.loading) {
+            throw new Error('Unable to update tokens while they are loading');
+        }
+        const currentAccount = get(selectedAccountAtom);
+        if (!currentAccount) {
+            throw new Error('Unable to update tokens for an account if there is no chosen account');
+        }
+        const accountCollections: Record<string, TokenStorage[]> = tokens.value[currentAccount] || {};
+        accountCollections[contractIndex] = newTokens.map((token) => ({
+            id: token.id,
+            metadataLink: token.metadataLink,
+        }));
+        const updatedTokens = { ...tokens.value };
+        updatedTokens[currentAccount] = accountCollections;
+        const newMetadata = tokenMetadata.value;
+        newTokens.forEach((token) => {
+            newMetadata[token.metadataLink] = token.metadata;
+        });
+        await set(tokenMetadataAtom, newMetadata);
+        return set(storedTokensAtom, updatedTokens);
+    }
+);
