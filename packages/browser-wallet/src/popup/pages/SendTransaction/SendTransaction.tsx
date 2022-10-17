@@ -8,7 +8,7 @@ import { usePrivateKey } from '@popup/shared/utils/account-helpers';
 import {
     sendTransaction,
     getDefaultExpiry,
-    pendingFromAccountTransaction,
+    createPendingTransactionFromAccountTransaction,
 } from '@popup/shared/utils/transaction-helpers';
 import { jsonRpcClientAtom } from '@popup/store/settings';
 import TransactionReceipt from '@popup/shared/TransactionReceipt/TransactionReceipt';
@@ -97,7 +97,7 @@ export default function SendTransaction({ onSubmit, onReject }: Props) {
         const transaction = { payload, header, type: transactionType };
 
         const hash = await sendTransaction(client, transaction, key);
-        addPendingTransaction(pendingFromAccountTransaction(transaction, hash));
+        addPendingTransaction(createPendingTransactionFromAccountTransaction(transaction, hash));
 
         return hash;
     }, [payload, key]);

@@ -54,7 +54,7 @@ export type IndexedStorageAccessor<V> = {
  * @param area storeage area to store value in
  * @param key key used to store value
  */
-export const makeStorageAccessor = <V>(area: chrome.storage.AreaName, key: ChromeStorageKey): StorageAccessor<V> => {
+const makeStorageAccessor = <V>(area: chrome.storage.AreaName, key: ChromeStorageKey): StorageAccessor<V> => {
     const store = chrome.storage[area];
     return {
         get: (): Promise<V | undefined> => store.get(key).then((s) => s[key]),

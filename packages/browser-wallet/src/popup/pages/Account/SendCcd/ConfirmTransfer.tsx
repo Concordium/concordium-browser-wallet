@@ -5,7 +5,7 @@ import { selectedAccountAtom } from '@popup/store/account';
 import { AccountAddress, AccountTransactionType, SimpleTransferPayload } from '@concordium/web-sdk';
 import {
     getDefaultExpiry,
-    pendingFromAccountTransaction,
+    createPendingTransactionFromAccountTransaction,
     sendTransaction,
 } from '@popup/shared/utils/transaction-helpers';
 import { jsonRpcClientAtom } from '@popup/store/settings';
@@ -68,7 +68,7 @@ export default function ConfirmTransfer({ setDetailsExpanded, cost }: Props) {
         const transaction = { payload, header, type: AccountTransactionType.SimpleTransfer };
         const transactionHash = await sendTransaction(client, transaction, key);
 
-        addPendingTransaction(pendingFromAccountTransaction(transaction, transactionHash, cost));
+        addPendingTransaction(createPendingTransactionFromAccountTransaction(transaction, transactionHash, cost));
         setHash(transactionHash);
     };
 

@@ -10,6 +10,8 @@ import { selectedAccountAtom } from './account';
 import { atomWithChromeStorage } from './utils';
 import { networkConfigurationAtom } from './settings';
 
+const TRANSACTION_CHECK_INTERVAL = 10000;
+
 const monitoredMap: Record<string, string[]> = {};
 const monitorTransactionStatus = (genesisHash: string) => {
     monitoredMap[genesisHash] = monitoredMap[genesisHash] ?? [];
@@ -24,7 +26,7 @@ const monitorTransactionStatus = (genesisHash: string) => {
 
         monitoredMap[genesisHash].push(transactionHash);
 
-        await loop(10000, async () => {
+        await loop(TRANSACTION_CHECK_INTERVAL, async () => {
             const status = await getTransactionStatus(transactionHash);
             const done =
                 status !== undefined && [TransactionStatus.Finalized, TransactionStatus.Finalized].includes(status);

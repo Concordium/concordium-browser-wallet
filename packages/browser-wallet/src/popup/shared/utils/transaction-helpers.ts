@@ -112,7 +112,7 @@ export const createPendingTransaction = (
     toAddress,
 });
 
-export const pendingFromAccountTransaction = (
+export const createPendingTransactionFromAccountTransaction = (
     transaction: AccountTransaction,
     transactionHash: string,
     cost?: bigint
