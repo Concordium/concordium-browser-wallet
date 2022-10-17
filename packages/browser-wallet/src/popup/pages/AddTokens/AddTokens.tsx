@@ -53,7 +53,7 @@ function ChooseContract({ onChoice }: ChooseContractProps) {
     };
 
     return (
-        <Form formMethods={form} className="add-tokens__add-token" onSubmit={onSubmit}>
+        <Form formMethods={form} className="add-tokens__one-line-form" onSubmit={onSubmit}>
             {(f) => (
                 <>
                     <Input
@@ -161,7 +161,7 @@ function PickTokens({
                 label={t('contractName')}
                 value={contractDetails.contractName}
             />
-            <Form formMethods={form} className="add-tokens__add-token" onSubmit={onSubmit}>
+            <Form formMethods={form} className="add-tokens__one-line-form" onSubmit={onSubmit}>
                 {(f) => (
                     <>
                         <Input register={f.register} label={t('tokenId')} rules={{ validate: validateId }} name="id" />
