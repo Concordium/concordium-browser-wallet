@@ -20,6 +20,7 @@ import {
     sessionOnboardingLocation,
     sessionRecoveryStatus,
     sessionIdpTab,
+    sessionPendingTransactions,
 } from '@shared/storage/access';
 import { ChromeStorageKey } from '@shared/storage/types';
 import { atom, WritableAtom } from 'jotai';
@@ -43,6 +44,7 @@ const accessorMap = {
     [ChromeStorageKey.OnboardingLocation]: sessionOnboardingLocation,
     [ChromeStorageKey.RecoveryStatus]: sessionRecoveryStatus,
     [ChromeStorageKey.IdpTab]: sessionIdpTab,
+    [ChromeStorageKey.PendingTransactions]: sessionPendingTransactions,
 };
 
 export type AsyncWrapper<V> = {

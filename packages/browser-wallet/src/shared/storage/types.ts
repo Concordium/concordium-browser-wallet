@@ -19,6 +19,7 @@ export enum ChromeStorageKey {
     OnboardingLocation = 'onboardingLocation',
     RecoveryStatus = 'recoveryStatus',
     IdpTab = 'idpTab',
+    PendingTransactions = 'pendingTransactions',
 }
 
 export enum Theme {

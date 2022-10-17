@@ -4,11 +4,13 @@ import { abs } from 'wallet-common-helpers';
 import { IdentityProvider } from '@shared/storage/types';
 import { storedCurrentNetwork } from '@shared/storage/access';
 import {
+    BrowserWalletAccountTransaction,
     BrowserWalletTransaction,
     RewardType,
     TransactionHistoryResult,
     TransactionStatus,
 } from './transaction-history-types';
+import { createPendingTransaction } from './transaction-helpers';
 
 async function getWalletProxy() {
     const currentNetwork = await storedCurrentNetwork.get();
@@ -263,21 +265,20 @@ export async function getSimpleTransferCost(): Promise<bigint> {
     return BigInt(response.data.cost);
 }
 
-export async function getCcdDrop(accountAddress: string): Promise<BrowserWalletTransaction> {
+export async function getCcdDrop(accountAddress: string): Promise<BrowserWalletAccountTransaction> {
     const response = await (await getWalletProxy()).put(`/v0/testnetGTUDrop/${accountAddress}`);
 
-    const ccdDropTransaction: BrowserWalletTransaction = {
-        amount: BigInt(2000000000),
-        blockHash: '',
-        events: [],
-        type: AccountTransactionType.SimpleTransfer,
-        status: TransactionStatus.Pending,
-        time: BigInt(Math.round(Date.now() / 1000)),
-        id: 0,
-        transactionHash: response.data.submissionId,
-        fromAddress: undefined,
-        toAddress: accountAddress,
-    };
+    return createPendingTransaction(
+        AccountTransactionType.SimpleTransfer,
+        response.data.submissionId,
+        BigInt(2000000000),
+        undefined,
+        accountAddress
+    );
+}
 
-    return ccdDropTransaction;
+export async function getTransactionStatus(tHash: string): Promise<TransactionStatus | undefined> {
+    const path = `/v0/submissionStatus/${tHash}`;
+    const { data } = await (await getWalletProxy()).get(path);
+    return data.status;
 }
