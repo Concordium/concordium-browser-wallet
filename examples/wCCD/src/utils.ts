@@ -2,10 +2,7 @@
 import { createContext } from 'react';
 import { detectConcordiumProvider } from '@concordium/browser-wallet-api-helpers';
 import { AccountTransactionType, GtuAmount, toBuffer } from '@concordium/web-sdk';
-
-export const CONTRACT_NAME_PROXY = 'CIS2-wCCD-Proxy';
-export const CONTRACT_NAME_IMPLEMENTATION = 'CIS2-wCCD';
-export const CONTRACT_NAME_STATE = 'CIS2-wCCD-State';
+import { CONTRACT_NAME_PROXY } from './constants';
 
 /**
  * Action for wrapping some CCD to WCCD in the WCCD smart contract instance
