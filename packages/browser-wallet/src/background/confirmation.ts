@@ -10,9 +10,8 @@ import {
     ConfirmedIdentity,
     RejectedIdentity,
 } from '@shared/storage/types';
-import { not } from '@shared/utils/function-helpers';
+import { loop, not } from '@shared/utils/function-helpers';
 import { identityMatch } from '@shared/utils/identity-helpers';
-import { sleep } from 'wallet-common-helpers';
 import { IdentityTokenContainer, IdentityProviderIdentityStatus } from 'wallet-common-helpers/lib/utils/identity/types';
 import { updateCredentials, updateIdentities } from './update';
 
@@ -21,20 +20,6 @@ const isPendingCred = (cred: WalletCredential): cred is PendingWalletCredential 
 const isPendingIdentity = (identity: Identity): identity is PendingIdentity =>
     identity.status === CreationStatus.Pending;
 const UPDATE_INTERVAL = 10000;
-
-type ShouldLoop = boolean;
-
-/**
- * Takes a loopFun, that runs each UPDATE_INTERVAL, for as long as the loopFun resolves to true
- */
-const loop = async (loopFun: () => Promise<ShouldLoop>) => {
-    const run = async () => {
-        if (await loopFun()) {
-            await sleep(UPDATE_INTERVAL).then(run);
-        }
-    };
-    await run();
-};
 
 const monitoredCredentials: Record<string, PendingWalletCredential[] | undefined> = {};
 const isCredEqualTo = (c1: PendingWalletCredential) => (c2: PendingWalletCredential) => c1.credId === c2.credId;
@@ -55,7 +40,7 @@ async function monitorCredentialStatus(jsonRpcUrl: string, cred: PendingWalletCr
 
     const { deploymentHash, ...info } = cred;
 
-    await loop(async () => {
+    await loop(UPDATE_INTERVAL, async () => {
         const network = await storedCurrentNetwork.get();
         // Stop if the network has changed
         if (!network || network.genesisHash !== genesisHash) {
@@ -123,7 +108,7 @@ async function monitorIdentityStatus(id: PendingIdentity, genesisHash: string) {
 
     const { location, ...identity } = id;
 
-    await loop(async () => {
+    await loop(UPDATE_INTERVAL, async () => {
         const network = await storedCurrentNetwork.get();
         // Stop if the network has changed
         if (!network || network.genesisHash !== genesisHash) {

@@ -4,7 +4,6 @@ import path from 'path';
 import { promises as fs } from 'fs';
 
 import packageJson from 'package.json';
-import { throwIfUndefined } from '@shared/utils/function-helpers';
 
 export type Configuration = {
     /**
@@ -16,6 +15,23 @@ export type Configuration = {
      */
     popupHtmlFile: string;
 };
+
+/**
+ * Takes a function which might return undefined, and throws an error instead.
+ */
+// eslint-disable-next-line @typescript-eslint/no-explicit-any
+function throwIfUndefined<T extends any[], V>(
+    func: (...inputs: T) => V | undefined,
+    getErrorMessage: (...inputs: T) => string
+): (...inputs: T) => V {
+    return (...inputs) => {
+        const result = func(...inputs);
+        if (result === undefined) {
+            throw new Error(getErrorMessage(...inputs));
+        }
+        return result;
+    };
+}
 
 /**
  * Plugin for building chrome extension v3 manifest.

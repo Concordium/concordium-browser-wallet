@@ -3,7 +3,11 @@ import { useTranslation } from 'react-i18next';
 import { useSetAtom, useAtomValue } from 'jotai';
 import { selectedAccountAtom } from '@popup/store/account';
 import { AccountAddress, AccountTransactionType, SimpleTransferPayload } from '@concordium/web-sdk';
-import { getDefaultExpiry, sendTransaction } from '@popup/shared/utils/transaction-helpers';
+import {
+    getDefaultExpiry,
+    createPendingTransactionFromAccountTransaction,
+    sendTransaction,
+} from '@popup/shared/utils/transaction-helpers';
 import { jsonRpcClientAtom } from '@popup/store/settings';
 import { addToastAtom } from '@popup/state';
 import { usePrivateKey } from '@popup/shared/utils/account-helpers';
@@ -11,6 +15,8 @@ import Button from '@popup/shared/Button';
 import { useLocation, useNavigate } from 'react-router-dom';
 import { absoluteRoutes } from '@popup/constants/routes';
 import TransactionReceipt from '@popup/shared/TransactionReceipt/TransactionReceipt';
+import { useUpdateAtom } from 'jotai/utils';
+import { addPendingTransactionAtom } from '@popup/store/transactions';
 
 interface Props {
     setDetailsExpanded: (expanded: boolean) => void;
@@ -32,6 +38,7 @@ export default function ConfirmTransfer({ setDetailsExpanded, cost }: Props) {
     const client = useAtomValue(jsonRpcClientAtom);
     const nav = useNavigate();
     const addToast = useSetAtom(addToastAtom);
+    const addPendingTransaction = useUpdateAtom(addPendingTransactionAtom);
 
     useEffect(() => {
         if (selectedAddress !== address) {
@@ -60,6 +67,8 @@ export default function ConfirmTransfer({ setDetailsExpanded, cost }: Props) {
         };
         const transaction = { payload, header, type: AccountTransactionType.SimpleTransfer };
         const transactionHash = await sendTransaction(client, transaction, key);
+
+        addPendingTransaction(createPendingTransactionFromAccountTransaction(transaction, transactionHash, cost));
         setHash(transactionHash);
     };
 
