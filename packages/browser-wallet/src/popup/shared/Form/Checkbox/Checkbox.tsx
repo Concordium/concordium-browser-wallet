@@ -6,7 +6,7 @@ import ErrorMessage from '../ErrorMessage';
 
 type Props = Pick<InputHTMLAttributes<HTMLInputElement>, 'className'> &
     RequiredUncontrolledFieldProps<HTMLInputElement> &
-    CommonFieldProps & { description?: ReactElement; checked?: boolean; tabIndex?: number };
+    CommonFieldProps & { description?: ReactElement; checked?: boolean; tabIndex?: number; readOnly?: boolean };
 
 export const Checkbox = forwardRef<HTMLInputElement, Props>(
     ({ error, note, className, description, ...props }, ref) => {

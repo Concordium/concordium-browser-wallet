@@ -14,6 +14,7 @@ import { useNavigate } from 'react-router-dom';
 import { absoluteRoutes } from '@popup/constants/routes';
 import { confirmCIS2Contract, ContractDetails, getTokenMetadata, getTokenUrl } from '@shared/utils/token-helpers';
 import { Checkbox } from '@popup/shared/Form/Checkbox';
+import { isHex } from '@concordium/web-sdk';
 
 type FormValues = {
     contractIndex: string;
@@ -97,7 +98,7 @@ function DisplayToken({
                 )}
             </div>
             <p>{metadata.name}</p>
-            <Checkbox tabIndex={-1} label="test" className="add-tokens__checkbox" checked={chosen} />
+            <Checkbox readOnly tabIndex={-1} label="test" className="add-tokens__checkbox" checked={chosen} />
         </div>
     );
 }
@@ -129,15 +130,27 @@ function PickTokens({
             addToast(t('duplicateId'));
             return;
         }
-        const tokenUrl = await getTokenUrl(client, id || '', contractDetails);
-        const meta = await getTokenMetadata(tokenUrl);
-        setAccountTokens((tokens) => [...tokens, { id, metadata: meta, metadataLink: tokenUrl, chosen: true }]);
+        try {
+            const tokenUrl = await getTokenUrl(client, id || '', contractDetails);
+            const meta = await getTokenMetadata(tokenUrl);
+
+            setAccountTokens((tokens) => [...tokens, { id, metadata: meta, metadataLink: tokenUrl, chosen: true }]);
+        } catch (e) {
+            addToast((e as Error).message);
+        }
     };
 
     const chooseToken = (index: number) => {
         const token = accountTokens[index];
         accountTokens[index] = { ...token, chosen: !token.chosen };
         setAccountTokens([...accountTokens]);
+    };
+
+    const validateId = (id: string | undefined) => {
+        if (!id || isHex(id)) {
+            return undefined;
+        }
+        return t('hexId');
     };
 
     return (
@@ -151,7 +164,7 @@ function PickTokens({
             <Form formMethods={form} className="add-tokens__add-token" onSubmit={onSubmit}>
                 {(f) => (
                     <>
-                        <Input register={f.register} label={t('tokenId')} name="id" />
+                        <Input register={f.register} label={t('tokenId')} rules={{ validate: validateId }} name="id" />
                         <Submit>{t('addToken')}</Submit>
                     </>
                 )}

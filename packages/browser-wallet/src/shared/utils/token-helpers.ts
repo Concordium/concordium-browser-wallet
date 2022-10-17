@@ -81,7 +81,7 @@ export function getTokenUrl(
     id: string,
     { contractName, index, subindex }: ContractDetails
 ): Promise<string> {
-    return new Promise((resolve) => {
+    return new Promise((resolve, reject) => {
         client
             .invokeContract({
                 contract: { index, subindex },
@@ -92,7 +92,8 @@ export function getTokenUrl(
                 if (returnValue && returnValue.tag === 'success' && returnValue.returnValue) {
                     resolve(deserializeTokenMetadataReturnValue(returnValue.returnValue));
                 } else {
-                    // Throw an error;
+                    // TODO: perhaps we need to make this error more precise
+                    reject(new Error('Token does not exist in this contract'));
                 }
             });
     });

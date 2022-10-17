@@ -57,6 +57,7 @@ const t = {
         addToken: 'Add token',
         duplicateId: 'Token already in the list',
         updateTokens: 'Update tokens',
+        hexId: 'Id must be HEX encoded',
     },
     accountPending: 'This account is still pending finalization.',
     request: 'Create account',
