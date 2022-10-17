@@ -1,42 +1,82 @@
-.tokens {
-    &__add {
-        &__container {
-            display: flex;
-            flex-direction: column;
-            width: 100%;
-            height: 100%;
-            padding: rem(15px) rem(10px);
-        }
+$element-border-radius: rem(5px);
+$horizontal-spacing: rem(10px);
 
-        &__element {
-            padding: rem(10px) rem(20px);
-            margin: 0 rem(-10px);
-            display: flex;
+.add-tokens {
+    &__container {
+        display: flex;
+        flex-direction: column;
+        width: 100%;
+        height: 100%;
+        padding: rem(15px) rem(10px);
+    }
+
+    &__element {
+        padding: rem(10px);
+        display: flex;
+        background-color: $color-bg;
+        align-items: center;
+        cursor: pointer;
+
+        &:not(:last-of-type) {
             border-bottom: rem(1px) solid $color-lines;
-
-            p {
-                margin: 0;
-                margin-left: rem(10px);
-            }
         }
 
-        &__input {
-            margin-bottom: rem(10px);
+        &:first-child {
+            border-top-left-radius: $element-border-radius;
+            border-top-right-radius: $element-border-radius;
         }
 
-        &__add-token {
-            display: flex;
-            justify-content: space-around;
-            margin: 0 rem(-10px) rem(10px);
+        p {
+            margin: 0;
+            margin-left: rem(10px);
         }
+    }
 
-        &__submit {
-            margin-top: auto;
-        }
+    &__input {
+        margin-bottom: $horizontal-spacing;
+    }
 
-        &__token-display {
-            max-height: rem(20px);
-            max-width: rem(20px);
+    &__one-line-form {
+        display: flex;
+        justify-content: space-around;
+        margin-bottom: $horizontal-spacing;
+
+        .form-input {
+            flex: 1;
+            margin-right: rem(10px);
         }
+    }
+
+    &__submit {
+        margin-top: auto;
+    }
+
+    &__token-display-container {
+        height: rem(20px);
+        width: rem(40px);
+        display: flex;
+    }
+
+    &__token-display {
+        max-height: rem(20px);
+        max-width: rem(40px);
+    }
+
+    &__token-container {
+        display: flex;
+        flex-direction: column;
+        background-color: $color-bg;
+        flex-grow: 1;
+        border: rem(1px) solid $color-lines;
+        border-radius: $element-border-radius;
+        overflow-y: overlay;
+        overflow-x: hidden;
+        margin-bottom: $horizontal-spacing;
+    }
+
+    &__checkbox {
+        margin-left: auto;
+        padding: 0;
+        width: rem(20px);
     }
 }

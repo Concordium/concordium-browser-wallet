@@ -3,12 +3,6 @@ import { AccountAddress, InstanceInfo, JsonRpcClient } from '@concordium/web-sdk
 import uleb128 from 'leb128/unsigned';
 import { TokenMetadata } from '@shared/storage/types';
 
-export interface TokenIdAndMetadata {
-    id: string;
-    metadataLink: string;
-    metadata: TokenMetadata;
-}
-
 export interface ContractDetails {
     contractName: string;
     index: bigint;
@@ -38,6 +32,20 @@ export function getMetadataParameter(id: string): Buffer {
 }
 
 /**
+ * Returns the url for the token metadata.
+ * returnValue is assumed to be a HEX-encoded string.
+ */
+function deserializeTokenMetadataReturnValue(returnValue: string) {
+    const bufferStream = Buffer.from(returnValue, 'hex');
+    const length = bufferStream.readUInt16LE(2);
+    const url = bufferStream.slice(4, 4 + length).toString('utf8');
+    return url;
+}
+
+// Methods in the CIS2 standard.
+const CIS2Methods = ['balanceOf', 'transfer', 'tokenMetadata', 'operatorOf', 'updateOperator'];
+
+/**
  * Confirms that the given smart contract instance is CIS-2 compliant
  */
 export async function confirmCIS2Contract(
@@ -45,21 +53,16 @@ export async function confirmCIS2Contract(
     instanceInfo: InstanceInfo,
     { contractName, index, subindex }: ContractDetails
 ): Promise<string | undefined> {
-    if (!instanceInfo.methods.includes(`${contractName}.supports`)) {
+    const cis0SupportsMethod = `${contractName}.supports`;
+    if (!instanceInfo.methods.includes(cis0SupportsMethod)) {
         return 'Chosen contract does not support CIS-0';
     }
-    if (
-        !(
-            instanceInfo.methods.includes(`${contractName}.balanceOf`) &&
-            instanceInfo.methods.includes(`${contractName}.transfer`) &&
-            instanceInfo.methods.includes(`${contractName}.tokenMetadata`)
-        )
-    ) {
+    if (!CIS2Methods.every((method) => instanceInfo.methods.includes(`${contractName}.${method}`))) {
         return 'Chosen contract does not expose required endpoints';
     }
     const supports = await client.invokeContract({
         contract: { index, subindex },
-        method: `${contractName}.supports`,
+        method: cis0SupportsMethod,
         parameter: getCIS2Identifier(),
     });
     if (!supports || supports.tag === 'failure') {
@@ -79,7 +82,7 @@ export function getTokenUrl(
     id: string,
     { contractName, index, subindex }: ContractDetails
 ): Promise<string> {
-    return new Promise((resolve) => {
+    return new Promise((resolve, reject) => {
         client
             .invokeContract({
                 contract: { index, subindex },
@@ -88,12 +91,10 @@ export function getTokenUrl(
             })
             .then((returnValue) => {
                 if (returnValue && returnValue.tag === 'success' && returnValue.returnValue) {
-                    const bufferStream = Buffer.from(returnValue.returnValue, 'hex');
-                    const length = bufferStream.readUInt16LE(2);
-                    const url = bufferStream.slice(4, 4 + length).toString('utf8');
-                    resolve(url);
+                    resolve(deserializeTokenMetadataReturnValue(returnValue.returnValue));
                 } else {
-                    // Throw an error;
+                    // TODO: perhaps we need to make this error more precise
+                    reject(new Error('Token does not exist in this contract'));
                 }
             });
     });
