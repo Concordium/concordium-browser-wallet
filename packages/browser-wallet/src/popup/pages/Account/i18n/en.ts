@@ -62,6 +62,7 @@ const t = {
         addToken: 'Add token',
         duplicateId: 'Token already in the list',
         updateTokens: 'Update tokens',
+        unownedUnique: 'not owned',
     },
     accountPending: 'This account is still pending finalization.',
     request: 'Create account',

@@ -1,4 +1,4 @@
-import React, { Suspense, useMemo } from 'react';
+import React, { ReactNode, Suspense, useMemo } from 'react';
 import { useTranslation } from 'react-i18next';
 import { Outlet, Route, Routes } from 'react-router-dom';
 import { displayAsCcd, toFraction, addThousandSeparators } from 'wallet-common-helpers';
@@ -19,12 +19,13 @@ import { tokensRoutes } from './routes';
 type BalanceProps = {
     atom: Atom<Promise<bigint>>;
     decimals: number;
+    children?(balance: bigint): ReactNode;
 };
 
-function Balance({ atom, decimals }: BalanceProps) {
+function Balance({ atom, decimals, children }: BalanceProps) {
     const balance = useAtomValue(atom);
     const getFraction = toFraction(10 ** decimals);
-    const renderBalance = (value: bigint) => addThousandSeparators(getFraction(value));
+    const renderBalance = children ?? ((value: bigint) => addThousandSeparators(getFraction(value)));
 
     return <>{renderBalance(balance)}</>;
 }
@@ -42,7 +43,7 @@ function Ft({ accountAddress, contractIndex: contractAddress, token }: FtProps) 
         <Button clear className="token-list__item">
             <img className="token-list__icon" src={token.metadata.thumbnail?.url} alt={token.metadata.name} />
             {/* TODO should only show symbol for FTs, remove name fallback when NFTs work */}
-            <Suspense fallback={<>...</>}>
+            <Suspense fallback="0">
                 <Balance atom={balanceAtom} decimals={token.metadata.decimals ?? 0} />
             </Suspense>{' '}
             {token.metadata.symbol || token.metadata.name || ''}
@@ -98,13 +99,32 @@ function Fungibles({ account }: ListProps) {
 
 function Collectibles({ account }: ListProps) {
     const tokens = useTokens(account, true);
+    const { t } = useTranslation('account', { keyPrefix: 'tokens' });
 
     return (
         <>
-            {tokens.map((t) => (
-                <Button clear key={`${t.contractIndex}.${t.id}`} className="token-list__item">
-                    <img className="token-list__icon" src={t.metadata.thumbnail?.url ?? ''} alt={t.metadata.name} />
-                    <div>{t.metadata.name}</div>
+            {tokens.map((token) => (
+                <Button clear key={`${token.contractIndex}.${token.id}`} className="token-list__item">
+                    <img
+                        className="token-list__icon"
+                        src={token.metadata.thumbnail?.url ?? ''}
+                        alt={token.metadata.name}
+                    />
+                    <div className="token-list__unique-name">
+                        {token.metadata.name}
+                        <Suspense fallback="">
+                            <Balance
+                                atom={tokenBalanceFamily(account.address, token.contractIndex, token.id)}
+                                decimals={token.metadata.decimals ?? 0}
+                            >
+                                {(b) =>
+                                    b === 1n && (
+                                        <div className="token-list__not-owned text-faded">{t('unownedUnique')}</div>
+                                    )
+                                }
+                            </Balance>
+                        </Suspense>{' '}
+                    </div>
                 </Button>
             ))}
         </>
@@ -112,19 +132,19 @@ function Collectibles({ account }: ListProps) {
 }
 
 function TokensOverview() {
-    const { t } = useTranslation('account');
+    const { t } = useTranslation('account', { keyPrefix: 'tokens.tabBar' });
     return (
         <div className="tokens">
             <TabBar className="tokens__actions">
                 <TabBar.Item className="tokens__link" to="" end>
-                    {t('tokens.tabBar.ft')}
+                    {t('ft')}
                 </TabBar.Item>
                 <TabBar.Item className="tokens__link" to={tokensRoutes.collectibles}>
-                    {t('tokens.tabBar.nft')}
+                    {t('nft')}
                 </TabBar.Item>
                 <TabBar.Item className="tokens__link" to={absoluteRoutes.home.account.tokens.add.path}>
                     <div className="tokens__add">
-                        {t('tokens.tabBar.new')}
+                        {t('new')}
                         <PlusIcon />
                     </div>
                 </TabBar.Item>
