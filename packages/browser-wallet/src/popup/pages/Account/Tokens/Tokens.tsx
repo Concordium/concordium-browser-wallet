@@ -1,6 +1,6 @@
 import React, { Suspense, useMemo } from 'react';
 import { useTranslation } from 'react-i18next';
-import { Outlet, Route, Routes, useNavigate } from 'react-router-dom';
+import { Outlet, Route, Routes } from 'react-router-dom';
 import { displayAsCcd, toFraction, addThousandSeparators } from 'wallet-common-helpers';
 import { Atom, useAtomValue } from 'jotai';
 
@@ -13,7 +13,6 @@ import { useSelectedCredential } from '@popup/shared/utils/account-helpers';
 import { TokenIdAndMetadata, WalletCredential } from '@shared/storage/types';
 import { tokenBalanceFamily, tokensAtom } from '@popup/store/token';
 import Button from '@popup/shared/Button';
-import { ftDetailsRoute, nftDetailsRoute } from '@popup/shared/utils/route-helpers';
 
 import { tokensRoutes } from './routes';
 
@@ -34,14 +33,13 @@ type FtProps = {
     accountAddress: string;
     contractIndex: string;
     token: TokenIdAndMetadata;
-    onClick(): void;
 };
 
-function Ft({ accountAddress, contractIndex: contractAddress, token, onClick }: FtProps) {
+function Ft({ accountAddress, contractIndex: contractAddress, token }: FtProps) {
     const balanceAtom = tokenBalanceFamily(accountAddress, contractAddress, token.id);
 
     return (
-        <Button clear className="token-list__item" onClick={onClick}>
+        <Button clear className="token-list__item">
             <img className="token-list__icon" src={token.metadata.thumbnail?.url} alt={token.metadata.name} />
             {/* TODO should only show symbol for FTs, remove name fallback when NFTs work */}
             <Suspense fallback={<>...</>}>
@@ -74,16 +72,11 @@ type ListProps = {
 
 function Fungibles({ account }: ListProps) {
     const accountInfo = useAccountInfo(account);
-    const nav = useNavigate();
     const tokens = useTokens(account, false);
 
     if (accountInfo === undefined) {
         return null;
     }
-
-    const handleClick = (contractIndex: string, id: string) => () => {
-        nav(ftDetailsRoute(contractIndex, id));
-    };
 
     return (
         <>
@@ -97,7 +90,6 @@ function Fungibles({ account }: ListProps) {
                     accountAddress={account.address}
                     contractIndex={t.contractIndex}
                     token={t}
-                    onClick={handleClick(t.contractIndex, t.id)}
                 />
             ))}
         </>
@@ -105,22 +97,12 @@ function Fungibles({ account }: ListProps) {
 }
 
 function Collectibles({ account }: ListProps) {
-    const nav = useNavigate();
     const tokens = useTokens(account, true);
-
-    const handleClick = (contractIndex: string, id: string) => () => {
-        nav(nftDetailsRoute(contractIndex, id));
-    };
 
     return (
         <>
             {tokens.map((t) => (
-                <Button
-                    clear
-                    key={`${t.contractIndex}.${t.id}`}
-                    onClick={handleClick(t.contractIndex, t.id)}
-                    className="token-list__item"
-                >
+                <Button clear key={`${t.contractIndex}.${t.id}`} className="token-list__item">
                     <img className="token-list__icon" src={t.metadata.thumbnail?.url ?? ''} alt={t.metadata.name} />
                     <div>{t.metadata.name}</div>
                 </Button>
