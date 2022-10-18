@@ -127,53 +127,83 @@ export async function getTokenMetadata(tokenUrl: string): Promise<TokenMetadata>
 /**
  * Serialized based on cis-2 documentation: https://proposals.concordium.software/CIS/cis-2.html#id3
  */
-const serializeBalanceParameter = (tokenIndex: string, accountAddress: string) => {
+const serializeBalanceParameter = (tokenIds: string[], accountAddress: string) => {
     const queries = Buffer.alloc(2);
-    queries.writeUInt16LE(1, 0); // 1 query
+    queries.writeUInt16LE(tokenIds.length, 0);
 
-    const token = Buffer.from(tokenIndex, 'hex');
-    const tokenLength = Buffer.alloc(1);
-    tokenLength.writeUInt8(token.length, 0);
+    const tokens = tokenIds.reduce((acc, t) => {
+        const token = Buffer.from(t, 'hex');
+        const tokenLength = Buffer.alloc(1);
+        tokenLength.writeUInt8(token.length, 0);
 
-    const addressType = Buffer.alloc(1); // Account address type
-    const address = new AccountAddress(accountAddress).decodedAddress;
+        const addressType = Buffer.alloc(1); // Account address type
+        const address = new AccountAddress(accountAddress).decodedAddress;
 
-    return Buffer.concat([queries, tokenLength, token, addressType, address]);
+        return Buffer.concat([acc, tokenLength, token, addressType, address]);
+    }, queries);
+
+    return tokens;
 };
 
 /**
  * Deserialized based on cis-2 documentation: https://proposals.concordium.software/CIS/cis-2.html#response
  */
-const deserializeBalanceAmount = (value: string): bigint => {
+const deserializeBalanceAmounts = (value: string): bigint[] => {
     const buf = Buffer.from(value, 'hex');
-    const amount = uleb128.decode(buf.slice(2)); // ignore first 2 bytes as we only expect 1 tokenamount
+    const n = buf.readUInt16LE(0);
+    let cursor = 2; // First 2 bytes hold number of token amounts included in response.
+    const amounts: bigint[] = [];
 
-    return BigInt(amount);
+    // eslint-disable-next-line no-plusplus
+    for (let i = 0; i < n; i++) {
+        const end = buf.slice(cursor).findIndex((b) => b < 2 ** 7) + 1; // Find the first byte with most significant bit not set, signaling the last byte in the leb128 slice.
+
+        const amount = uleb128.decode(buf.slice(cursor, cursor + end));
+        amounts.push(BigInt(amount));
+
+        cursor += end;
+    }
+
+    return amounts;
 };
 
-export const getTokenBalance = async (
+export type ContractBalances = Record<string, bigint>;
+
+export const getContractBalances = async (
     client: JsonRpcClient,
     contractIndex: string,
-    tokenIndex: string,
+    tokenIds: string[],
     accountAddress: string
-): Promise<bigint> => {
+): Promise<ContractBalances> => {
     const index = BigInt(contractIndex);
     const subindex = 0n;
     const instanceInfo = await client.getInstanceInfo({ index, subindex });
 
     if (instanceInfo === undefined) {
-        return 0n;
+        return {};
     }
 
     const result = await client.invokeContract({
         contract: { index, subindex },
         method: `${instanceInfo.name.substring(5)}.balanceOf`,
-        parameter: serializeBalanceParameter(tokenIndex, accountAddress),
+        parameter: serializeBalanceParameter(tokenIds, accountAddress),
     });
 
     if (result === undefined || result.tag === 'failure' || result.returnValue === undefined) {
-        return 0n;
+        return {};
     }
 
-    return deserializeBalanceAmount(result.returnValue);
+    const amounts = deserializeBalanceAmounts(result.returnValue);
+
+    if (amounts.length !== tokenIds.length) {
+        throw new Error('Mismatch between length of requested tokens and token amounts in response.');
+    }
+
+    return tokenIds.reduce<ContractBalances>(
+        (acc, cur, i) => ({
+            ...acc,
+            [cur]: amounts[i],
+        }),
+        {}
+    );
 };

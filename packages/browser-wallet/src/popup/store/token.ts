@@ -3,7 +3,7 @@ import { Atom, atom } from 'jotai';
 import { mapRecordValues } from 'wallet-common-helpers/src/utils/basicHelpers';
 import { atomFamily } from 'jotai/utils';
 import { ChromeStorageKey, TokenIdAndMetadata, TokenMetadata, TokenStorage } from '@shared/storage/types';
-import { getTokenBalance } from '@shared/utils/token-helpers';
+import { ContractBalances, getContractBalances } from '@shared/utils/token-helpers';
 import { AsyncWrapper, atomWithChromeStorage } from './utils';
 import { jsonRpcClientAtom } from './settings';
 import { selectedAccountAtom } from './account';
@@ -22,6 +22,7 @@ export const tokenMetadataAtom = atomWithChromeStorage<Record<string, TokenMetad
 export const tokensAtom = atom<AsyncWrapper<Record<string, Record<string, TokenIdAndMetadata[]>>>>((get) => {
     const tokens = get(storedTokensAtom);
     const tokenMetadata = get(tokenMetadataAtom);
+
     if (tokens.loading || tokenMetadata.loading) {
         return { loading: true, value: {} as Record<string, Record<string, TokenIdAndMetadata[]>> };
     }
@@ -40,21 +41,28 @@ export const tokensAtom = atom<AsyncWrapper<Record<string, Record<string, TokenI
     };
 });
 
+const accountTokensFamily = atomFamily<string, Atom<AsyncWrapper<Record<string, TokenIdAndMetadata[]>>>>(
+    (accountAddress) =>
+        atom((get) => {
+            const tokens = get(tokensAtom);
+            if (tokens.loading) {
+                return { loading: true, value: {} };
+            }
+            return { loading: false, value: tokens.value[accountAddress] };
+        })
+);
+
 export const currentAccountTokensAtom = atom<
     AsyncWrapper<Record<string, TokenIdAndMetadata[]>>,
     { contractIndex: string; newTokens: TokenIdAndMetadata[] },
     Promise<void>
 >(
     (get) => {
-        const tokens = get(tokensAtom);
-        if (tokens.loading) {
-            return { loading: true, value: {} };
-        }
         const currentAccount = get(selectedAccountAtom);
         if (!currentAccount) {
             return { loading: true, value: {} };
         }
-        return { loading: false, value: tokens.value[currentAccount] };
+        return get(accountTokensFamily(currentAccount));
     },
     async (get, set, { contractIndex, newTokens }) => {
         const tokens = get(storedTokensAtom);
@@ -82,20 +90,28 @@ export const currentAccountTokensAtom = atom<
     }
 );
 
-const tbf = atomFamily<string, Atom<Promise<bigint>>>((tokenId: string) => {
-    const parts = tokenId.split('.');
+const cbf = atomFamily<string, Atom<Promise<ContractBalances>>>((identifier: string) => {
+    const parts = identifier.split('.');
 
     if ((parts as (string | undefined)[]).includes(undefined)) {
         throw new Error('Could not get token balance family due to invalid input');
     }
 
-    const [accountAddress, contractIndex, tokenIndex] = parts;
+    const [accountAddress, contractIndex] = parts;
 
-    return atom<Promise<bigint>>((get) => {
+    return atom<Promise<ContractBalances>>(async (get) => {
         const client = get(jsonRpcClientAtom);
-        return getTokenBalance(client, contractIndex, tokenIndex, accountAddress);
+        const tokens = get(accountTokensFamily(accountAddress));
+
+        const tokenIds = tokens.value[contractIndex]?.map((t) => t.id) ?? [];
+
+        if (tokenIds.length === 0) {
+            return {};
+        }
+
+        return getContractBalances(client, contractIndex, tokenIds, accountAddress);
     });
 });
 
-export const tokenBalanceFamily = (accountAddress: string, contractIndex: string, tokenIndex: string) =>
-    tbf(`${accountAddress}.${contractIndex}.${tokenIndex}`);
+export const contractBalancesFamily = (accountAddress: string, contractIndex: string) =>
+    cbf(`${accountAddress}.${contractIndex}`);

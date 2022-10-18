@@ -11,23 +11,25 @@ import CcdIcon from '@assets/svg/concordium.svg';
 import { useAccountInfo } from '@popup/shared/AccountInfoListenerContext';
 import { useSelectedCredential } from '@popup/shared/utils/account-helpers';
 import { TokenIdAndMetadata, WalletCredential } from '@shared/storage/types';
-import { tokenBalanceFamily, tokensAtom } from '@popup/store/token';
+import { contractBalancesFamily, tokensAtom } from '@popup/store/token';
 import Button from '@popup/shared/Button';
+import { ContractBalances } from '@shared/utils/token-helpers';
 
 import { tokensRoutes } from './routes';
 
 type BalanceProps = {
-    atom: Atom<Promise<bigint>>;
+    atom: Atom<Promise<ContractBalances>>;
+    id: string;
     decimals: number;
     children?(balance: bigint): ReactNode;
 };
 
-function Balance({ atom, decimals, children }: BalanceProps) {
-    const balance = useAtomValue(atom);
+function Balance({ atom, decimals, children, id }: BalanceProps) {
+    const balances = useAtomValue(atom);
     const getFraction = toFraction(10 ** decimals);
     const renderBalance = children ?? ((value: bigint) => addThousandSeparators(getFraction(value)));
 
-    return <>{renderBalance(balance)}</>;
+    return <>{renderBalance(balances[id])}</>;
 }
 
 type FtProps = {
@@ -37,14 +39,13 @@ type FtProps = {
 };
 
 function Ft({ accountAddress, contractIndex: contractAddress, token }: FtProps) {
-    const balanceAtom = tokenBalanceFamily(accountAddress, contractAddress, token.id);
+    const balancesAtom = contractBalancesFamily(accountAddress, contractAddress);
 
     return (
         <Button clear className="token-list__item">
             <img className="token-list__icon" src={token.metadata.thumbnail?.url} alt={token.metadata.name} />
-            {/* TODO should only show symbol for FTs, remove name fallback when NFTs work */}
             <Suspense fallback="0">
-                <Balance atom={balanceAtom} decimals={token.metadata.decimals ?? 0} />
+                <Balance atom={balancesAtom} decimals={token.metadata.decimals ?? 0} id={token.id} />
             </Suspense>{' '}
             {token.metadata.symbol || token.metadata.name || ''}
         </Button>
@@ -114,11 +115,12 @@ function Collectibles({ account }: ListProps) {
                         {token.metadata.name}
                         <Suspense fallback="">
                             <Balance
-                                atom={tokenBalanceFamily(account.address, token.contractIndex, token.id)}
+                                atom={contractBalancesFamily(account.address, token.contractIndex)}
                                 decimals={token.metadata.decimals ?? 0}
+                                id={token.id}
                             >
                                 {(b) =>
-                                    b === 1n && (
+                                    b === 0n && (
                                         <div className="token-list__not-owned text-faded">{t('unownedUnique')}</div>
                                     )
                                 }
@@ -158,6 +160,7 @@ function TokensOverview() {
 
 export default function Main() {
     const account = useSelectedCredential();
+    useAtomValue(tokensAtom); // Ensure tokens are kept in memory
 
     if (account === undefined) {
         return null;
