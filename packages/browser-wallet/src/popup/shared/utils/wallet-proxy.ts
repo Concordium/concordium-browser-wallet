@@ -265,6 +265,15 @@ export async function getSimpleTransferCost(): Promise<bigint> {
     return BigInt(response.data.cost);
 }
 
+// TODO: get from node directly
+export async function getEnergyPerCCD(): Promise<number> {
+    const proxyPath = `/v0/transactionCost?type=simpleTransfer`;
+    const response = await (await getWalletProxy()).get(proxyPath);
+    const ccdPrice = Number(response.data.cost);
+    const nrgPrice = Number(response.data.energy);
+    return ccdPrice / nrgPrice;
+}
+
 export async function getCcdDrop(accountAddress: string): Promise<BrowserWalletAccountTransaction> {
     const response = await (await getWalletProxy()).put(`/v0/testnetGTUDrop/${accountAddress}`);
 

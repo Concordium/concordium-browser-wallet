@@ -1,10 +1,17 @@
 import { Buffer } from 'buffer/';
-import { AccountAddress, InstanceInfo, JsonRpcClient, GtuAmount, serializeUpdateContractParameters } from '@concordium/web-sdk';
 import uleb128 from 'leb128/unsigned';
+import {
+    AccountAddress,
+    GtuAmount,
+    InstanceInfo,
+    JsonRpcClient,
+    serializeUpdateContractParameters,
+} from '@concordium/web-sdk';
 import { TokenMetadata } from '@shared/storage/types';
 import { CIS2_SCHEMA_CONTRACT_NAME, CIS2_SCHEMA } from '@popup/constants/schema';
 // TODO: Replace dependency
 import * as leb from '@thi.ng/leb128';
+import { getCcdSymbol } from 'wallet-common-helpers';
 import { SmartContractParameters } from './types';
 
 export interface ContractDetails {
@@ -46,31 +53,20 @@ function deserializeTokenMetadataReturnValue(returnValue: string) {
     return url;
 }
 
-// Methods in the CIS2 standard.
-const CIS2Methods = ['balanceOf', 'transfer', 'tokenMetadata', 'operatorOf', 'updateOperator'];
-
 /**
  * Confirms that the given smart contract instance is CIS-2 compliant
  */
 export async function confirmCIS2Contract(
     client: JsonRpcClient,
-    instanceInfo: InstanceInfo,
     { contractName, index, subindex }: ContractDetails
 ): Promise<string | undefined> {
-    const cis0SupportsMethod = `${contractName}.supports`;
-    if (!instanceInfo.methods.includes(cis0SupportsMethod)) {
-        return 'Chosen contract does not support CIS-0';
-    }
-    if (!CIS2Methods.every((method) => instanceInfo.methods.includes(`${contractName}.${method}`))) {
-        return 'Chosen contract does not expose required endpoints';
-    }
     const supports = await client.invokeContract({
         contract: { index, subindex },
-        method: cis0SupportsMethod,
+        method: `${contractName}.supports`,
         parameter: getCIS2Identifier(),
     });
     if (!supports || supports.tag === 'failure') {
-        return 'Unable to invoke chosen contract result';
+        return 'Chosen contract does not support CIS-0';
     }
     if (supports.returnValue !== '010001') {
         return 'Chosen contract does not support CIS-2';
@@ -218,6 +214,10 @@ export type TokenIdentifier = { contractIndex: string; tokenId: string; metadata
 export const CCD_METADATA: TokenMetadata = {
     name: 'CCD',
     decimals: 6,
+    symbol: getCcdSymbol(),
+    display: {
+        url: "data:image/svg+xml;charset=UTF-8,%3csvg viewBox='0 0 26 26' fill='none' xmlns='http://www.w3.org/2000/svg'%3e%3cpath d='M23.8461 17.8447H19.3916C20.5119 16.3777 21.2054 14.5372 21.2054 12.5366C21.2054 10.5361 20.5119 8.69558 19.3916 7.22852H23.8461C24.593 8.85562 25.0198 10.6428 25.0198 12.5366C25.0198 14.4305 24.6197 16.2176 23.8461 17.8447Z' fill='%23181817' /%3e%3cpath d='M12.5103 17.8184C15.4418 17.8184 17.8184 15.4418 17.8184 12.5103C17.8184 9.57867 15.4418 7.20215 12.5103 7.20215C9.57867 7.20215 7.20215 9.57867 7.20215 12.5103C7.20215 15.4418 9.57867 17.8184 12.5103 17.8184Z' fill='%23181817' /%3e%3cpath d='M3.81437 12.5367C3.81437 17.338 7.70876 21.2591 12.5101 21.2591C13.7904 21.2591 15.0174 20.9657 16.111 20.4589V24.54C14.9641 24.8868 13.7637 25.0735 12.5101 25.0735C5.60152 25.0735 0 19.4453 0 12.5367C0 5.60152 5.60152 0 12.5101 0C13.7637 0 14.9641 0.186717 16.111 0.533478V4.61459C15.0174 4.10778 13.7904 3.81437 12.5101 3.81437C7.70876 3.81437 3.81437 7.70876 3.81437 12.5367Z' fill='%23181817' /%3e%3c/svg%3e",
+    },
 };
 
 export async function getTokenBalance(client: JsonRpcClient, account: string, token: TokenIdentifier) {
@@ -254,10 +254,10 @@ export async function getTokenBalance(client: JsonRpcClient, account: string, to
 }
 
 export function getTokenTransferParameters(
-    tokenId: string,
-    amount: bigint,
     from: string,
-    to: string
+    to: string,
+    tokenId: string,
+    amount: bigint
 ): SmartContractParameters {
     return [
         {
@@ -270,27 +270,96 @@ export function getTokenTransferParameters(
     ];
 }
 
-export function getTokenTransferPayload(
-    parameters: SmartContractParameters,
-    contractName: string,
-    index: bigint,
-    subindex = 0n,
-    maxContractExecutionEnergy = 30000n
-) {
-    const parameter = serializeUpdateContractParameters(
+function serializeTokenTransferParameters(parameters: SmartContractParameters) {
+    return serializeUpdateContractParameters(
         CIS2_SCHEMA_CONTRACT_NAME,
         'transfer',
         parameters,
         Buffer.from(CIS2_SCHEMA, 'base64'),
         1
     );
+}
 
+export function getTokenTransferPayload(
+    parameters: SmartContractParameters,
+    contractName: string,
+    maxContractExecutionEnergy: bigint,
+    index: bigint,
+    subindex = 0n
+) {
     return {
         amount: new GtuAmount(0n),
         contractAddress: { index, subindex },
         receiveName: `${contractName}.transfer`,
-        parameter,
-        // TODO: use Estimate
+        parameter: serializeTokenTransferParameters(parameters),
         maxContractExecutionEnergy,
     };
+}
+
+async function getTokenTransferExecutionEnergyEstimate(
+    client: JsonRpcClient,
+    parameter: Buffer,
+    invoker: AccountAddress,
+    contractName: string,
+    index: bigint,
+    subindex = 0n
+): Promise<bigint> {
+    const contractAddress = { index, subindex };
+    const res = await client.invokeContract({
+        contract: contractAddress,
+        invoker,
+        parameter,
+        method: `${contractName}.transfer`,
+    });
+    if (!res || res.tag === 'failure') {
+        throw new Error(`Expected succesful invocation`);
+    }
+    // TODO: determine the "safety ratio"
+    return (res.usedEnergy * 12n) / 10n;
+}
+
+function getContractName(instanceInfo: InstanceInfo): string | undefined {
+    return instanceInfo.name.substring(5);
+}
+
+export async function fetchContractName(client: JsonRpcClient, index: bigint, subindex = 0n) {
+    const instanceInfo = await client.getInstanceInfo({ index, subindex });
+    if (!instanceInfo) {
+        return undefined;
+    }
+    return getContractName(instanceInfo);
+}
+
+function determineTokenTransferPayloadSize(parameterSize: number, contractName: string) {
+    return 8n + 8n + 8n + 2n + BigInt(parameterSize) + 2n + BigInt(contractName.length + 9);
+}
+
+// TODO: export this from the SDK or add to helpers
+function calculateEnergyCost(signatureCount: bigint, payloadSize: bigint, transactionSpecificCost: bigint): bigint {
+    return 100n * signatureCount + 1n * (BigInt(32 + 8 + 8 + 4 + 8) + payloadSize) + transactionSpecificCost;
+}
+
+export async function getTokenTransferEnergy(
+    client: JsonRpcClient,
+    address: string,
+    recipient: string,
+    tokenId: string,
+    contractIndex: bigint
+) {
+    const parameters = getTokenTransferParameters(address, recipient, tokenId, 1n);
+    const serializedParameters = serializeTokenTransferParameters(parameters);
+    const contractName = (await fetchContractName(client, contractIndex)) || '';
+    const execution = await getTokenTransferExecutionEnergyEstimate(
+        client,
+        serializedParameters,
+        new AccountAddress(address),
+        contractName,
+        contractIndex
+    );
+    const total = calculateEnergyCost(
+        1n,
+        determineTokenTransferPayloadSize(serializedParameters.length, contractName),
+        execution
+    );
+    return { execution, total };
 }

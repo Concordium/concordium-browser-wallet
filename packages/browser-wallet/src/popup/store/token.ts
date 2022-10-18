@@ -21,12 +21,14 @@ export const tokenMetadataAtom = atomWithChromeStorage<Record<string, TokenMetad
     true
 );
 
-export const tokensAtom = atom<AsyncWrapper<Record<string, Record<string, TokenIdAndMetadata[]>>>>((get) => {
+export type AccountTokens = Record<string, TokenIdAndMetadata[]>;
+export type Tokens = Record<string, AccountTokens>;
+export const tokensAtom = atom<AsyncWrapper<Tokens>>((get) => {
     const tokens = get(storedTokensAtom);
     const tokenMetadata = get(tokenMetadataAtom);
 
     if (tokens.loading || tokenMetadata.loading) {
-        return { loading: true, value: {} as Record<string, Record<string, TokenIdAndMetadata[]>> };
+        return { loading: true, value: {} as Tokens };
     }
     return {
         loading: false,
@@ -43,7 +45,7 @@ export const tokensAtom = atom<AsyncWrapper<Record<string, Record<string, TokenI
     };
 });
 
-const accountTokensFamily = atomFamily<string, Atom<AsyncWrapper<Record<string, TokenIdAndMetadata[]>>>>(
+const accountTokensFamily = atomFamily<string, Atom<AsyncWrapper<AccountTokens>>>(
     (accountAddress) =>
         atom((get) => {
             const tokens = get(tokensAtom);
@@ -55,7 +57,7 @@ const accountTokensFamily = atomFamily<string, Atom<AsyncWrapper<Record<string, 
 );
 
 export const currentAccountTokensAtom = atom<
-    AsyncWrapper<Record<string, TokenIdAndMetadata[]>>,
+    AsyncWrapper<AccountTokens>,
     { contractIndex: string; newTokens: TokenIdAndMetadata[] },
     Promise<void>
 >(

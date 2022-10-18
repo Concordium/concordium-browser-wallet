@@ -1,18 +1,17 @@
 import React, { useEffect, useMemo, useState } from 'react';
 import { useTranslation } from 'react-i18next';
 import { useAtomValue, useSetAtom } from 'jotai';
-import { selectedAccountAtom, tokensAtom } from '@popup/store/account';
+import { AccountTokens, selectedAccountAtom, Tokens, tokensAtom } from '@popup/store/account';
 import Form from '@popup/shared/Form';
 import AmountInput from '@popup/shared/Form/CcdInput';
 import Input from '@popup/shared/Form/Input';
 import {
     ccdToMicroCcd,
     getPublicAccountAmounts,
-    microCcdToCcd,
     fractionalToInteger,
-    getCcdSymbol,
     useAsyncMemo,
     integerToFractional,
+    max,
 } from 'wallet-common-helpers';
 import { SimpleTransferPayload } from '@concordium/web-sdk';
 import { SubmitHandler, useForm, Validate } from 'react-hook-form';
@@ -26,64 +25,61 @@ import { useLocation, useNavigate } from 'react-router-dom';
 import DisplayCost from '@popup/shared/TransactionReceipt/DisplayCost';
 import { useAccountInfo } from '@popup/shared/AccountInfoListenerContext';
 import { useSelectedCredential } from '@popup/shared/utils/account-helpers';
-import Button from '@popup/shared/Button';
-import { TokenMetadata } from '@shared/storage/types';
-import { CCD_METADATA, getTokenBalance, TokenIdentifier } from '@shared/utils/token-helpers';
+import { CCD_METADATA, getTokenBalance, getTokenTransferEnergy, TokenIdentifier } from '@shared/utils/token-helpers';
 import { jsonRpcClientAtom } from '@popup/store/settings';
 import { addToastAtom } from '@popup/state';
+import ErrorMessage from '@popup/shared/Form/ErrorMessage';
+import clsx from 'clsx';
 import { routes } from './routes';
+import DisplayToken from './DisplayToken';
+import PickToken from './PickToken';
 
 export type FormValues = {
     amount: string;
     recipient: string;
+    executionEnergy: string;
     token?: TokenIdentifier;
 };
 
 interface Props {
-    cost?: bigint;
+    exchangeRate?: number;
+    setCost: (cost: bigint) => void;
 }
 
 type State = undefined | (SimpleTransferPayload & Partial<TokenIdentifier>);
 
-interface ChooseTokenProps {
-    onChoice: () => void;
-    metadata: TokenMetadata;
+function createDefaultValues(defaultPayload: State, accountTokens?: AccountTokens) {
+    let token;
+    let decimals = 6;
+    if (defaultPayload?.contractIndex) {
+        const metadata = accountTokens?.[defaultPayload.contractIndex]?.find(
+            (t) => t.id === defaultPayload.tokenId
+        )?.metadata;
+        token = { contractIndex: defaultPayload.contractIndex, tokenId: defaultPayload.tokenId, metadata };
+        decimals = metadata?.decimals || 0;
+    }
+    return {
+        amount: integerToFractional(decimals)(defaultPayload?.amount.microGtuAmount),
+        recipient: defaultPayload?.toAddress.address,
+        token,
+    };
 }
 
-function ChooseToken({ onChoice, metadata }: ChooseTokenProps) {
-    return (
-        <Button className="send-ccd__create-transfer__pick-token__element" clear onClick={onChoice}>
-            {metadata.name}
-        </Button>
-    );
-}
-
-export default function CreateTransaction({ cost = 0n }: Props) {
+function CreateTransaction({ exchangeRate, tokens, setCost }: Props & { tokens: Tokens }) {
     const { t } = useTranslation('account');
     const { t: tShared } = useTranslation('shared');
     const { state } = useLocation();
-    const defaultPayload = state as State;
     const address = useAtomValue(selectedAccountAtom);
     const selectedCred = useSelectedCredential();
     const nav = useNavigate();
+    const accountTokens = useMemo(() => (address ? tokens[address] || {} : undefined), [tokens, address]);
     const form = useForm<FormValues>({
-        defaultValues: {
-            amount: microCcdToCcd(defaultPayload?.amount.microGtuAmount),
-            recipient: defaultPayload?.toAddress.address,
-            token:
-                defaultPayload?.contractIndex !== undefined && defaultPayload?.tokenId !== undefined
-                    ? { contractIndex: defaultPayload.contractIndex, tokenId: defaultPayload.tokenId }
-                    : undefined,
-        },
+        defaultValues: createDefaultValues(state as State, accountTokens),
     });
     const client = useAtomValue(jsonRpcClientAtom);
     const chosenToken = form.watch('token');
+    const recipient = form.watch('recipient');
     const tokenMetadata = useMemo(() => chosenToken?.metadata || CCD_METADATA, [chosenToken?.metadata]);
-    const tokens = useAtomValue(tokensAtom);
-    const accountTokens = useMemo(
-        () => (!tokens.loading && address ? Object.entries(tokens.value[address] || []) : undefined),
-        [tokens.loading, address]
-    );
     const [pickingToken, setPickingToken] = useState<boolean>(false);
     const addToast = useSetAtom(addToastAtom);
 
@@ -91,12 +87,45 @@ export default function CreateTransaction({ cost = 0n }: Props) {
         throw new Error('Missing selected accoount');
     }
 
+    const fee = useAsyncMemo(
+        async () => {
+            if (chosenToken) {
+                if (validateAccountAddress(recipient)) {
+                    return undefined;
+                }
+                try {
+                    const energy = await getTokenTransferEnergy(
+                        client,
+                        address,
+                        recipient,
+                        chosenToken.tokenId,
+                        BigInt(chosenToken.contractIndex)
+                    );
+                    form.setValue('executionEnergy', energy.execution.toString());
+                    return energy.total;
+                } catch {
+                    return undefined;
+                }
+            }
+            return 501n;
+        },
+        undefined,
+        [chosenToken?.contractIndex, chosenToken?.tokenId, recipient]
+    );
+
+    const cost = useMemo(() => {
+        const newCost = exchangeRate && fee ? BigInt(Math.ceil(exchangeRate * Number(fee))) : 0n;
+        setCost(newCost);
+        return newCost;
+    }, [fee, exchangeRate]);
+
     const accountInfo = useAccountInfo(selectedCred);
 
+    const ccdBalance = getPublicAccountAmounts(accountInfo).atDisposal;
     const currentBalance = useAsyncMemo(
         () => {
             if (!chosenToken) {
-                return Promise.resolve(getPublicAccountAmounts(accountInfo).atDisposal - cost);
+                return Promise.resolve(ccdBalance);
             }
             return getTokenBalance(client, address, chosenToken);
         },
@@ -110,22 +139,22 @@ export default function CreateTransaction({ cost = 0n }: Props) {
         validateTransferAmount(amount, currentBalance, tokenMetadata.decimals, chosenToken ? 0n : cost);
 
     const maxValue = useMemo(() => {
-        if (currentBalance) {
-            return chosenToken ? currentBalance : currentBalance - cost;
+        if (currentBalance !== undefined) {
+            return chosenToken ? currentBalance : max(0n, currentBalance - cost);
         }
         return undefined;
-    }, [Boolean(chosenToken), currentBalance]);
+    }, [Boolean(chosenToken), currentBalance, cost]);
 
     useEffect(() => {
         // Reset chosen token if the current account is changed
         // TODO: change only if new account does not have chosen token/reset to initial token.
-        form.setValue('token', undefined);
+        return () => form.setValue('token', undefined);
     }, [address]);
 
     useEffect(() => {
         // Reset amount if the token is changed
-        form.setValue('amount', '');
-    }, [chosenToken]);
+        return () => form.setValue('amount', '');
+    }, [chosenToken?.contractIndex, chosenToken?.tokenId]);
 
     const displayAmount = integerToFractional(tokenMetadata.decimals || 0);
 
@@ -133,7 +162,7 @@ export default function CreateTransaction({ cost = 0n }: Props) {
         form.setValue('amount', displayAmount(maxValue) || '0');
     };
 
-    if (tokens.loading || maxValue === undefined) {
+    if (maxValue === undefined) {
         return null;
     }
 
@@ -143,36 +172,25 @@ export default function CreateTransaction({ cost = 0n }: Props) {
                 vs.recipient,
                 fractionalToInteger(vs.amount, vs.token.metadata.decimals || 0)
             );
-            nav(routes.confirmToken, { state: { ...payload, ...vs.token } });
+            nav(routes.confirmToken, { state: { ...payload, ...vs.token, executionEnergy: vs.executionEnergy } });
         } else {
             const payload = buildSimpleTransferPayload(vs.recipient, ccdToMicroCcd(vs.amount));
             nav(routes.confirm, { state: { ...payload } });
         }
     };
 
-    if (pickingToken && accountTokens) {
+    const canCoverCost = ccdBalance - cost > 0;
+
+    if (pickingToken) {
         return (
-            <div className="send-ccd__create-transfer__pick-token">
-                <ChooseToken
-                    metadata={CCD_METADATA}
-                    onChoice={() => {
-                        setPickingToken(false);
-                        form.setValue('token', undefined);
-                    }}
-                />
-                {accountTokens.map(([contractIndex, collectionTokens]) =>
-                    collectionTokens.map((token) => (
-                        <ChooseToken
-                            key={`${contractIndex}+${token.id}`}
-                            metadata={token.metadata}
-                            onChoice={() => {
-                                setPickingToken(false);
-                                form.setValue('token', { contractIndex, tokenId: token.id, metadata: token.metadata });
-                            }}
-                        />
-                    ))
-                )}
-            </div>
+            <PickToken
+                tokens={accountTokens}
+                onClick={(chosen: TokenIdentifier | undefined) => {
+                    setPickingToken(false);
+                    form.setValue('token', chosen);
+                }}
+                ccdBalance={ccdBalance}
+            />
         );
     }
 
@@ -185,47 +203,62 @@ export default function CreateTransaction({ cost = 0n }: Props) {
         >
             {(f) => (
                 <>
-                    <p className="m-v-10 text-center">{t('sendCcd.title')}</p>
-                    <Button
-                        className="send-ccd__create-transfer__token-picker"
-                        clear
-                        disabled={!accountTokens}
-                        onClick={() => setPickingToken(true)}
+                    <div
+                        className={clsx(
+                            'create-transfer__token-picker',
+                            !canCoverCost && 'create-transfer__token-picker-error'
+                        )}
                     >
-                        {chosenToken ? chosenToken.metadata.name : CCD_METADATA.name}
-                    </Button>
-                    <p className="m-v-10 text-center">
-                        {`${t('sendCcd.currentBalance')}: ${displayAmount(currentBalance) || '0'}`}
-                    </p>
+                        <DisplayToken
+                            metadata={tokenMetadata}
+                            balance={currentBalance}
+                            disabled={!accountTokens}
+                            onClick={() => setPickingToken(true)}
+                            className="w-full"
+                        />
+                        {!canCoverCost && (
+                            <ErrorMessage className="form-input__error w-full">
+                                {t('sendCcd.unableToCoverCost')}
+                            </ErrorMessage>
+                        )}
+                    </div>
                     <AmountInput
                         register={f.register}
                         name="amount"
-                        symbol={chosenToken ? chosenToken.metadata.symbol || '' : getCcdSymbol()}
+                        symbol={tokenMetadata.symbol || ''}
                         label={t('sendCcd.labels.ccd')}
-                        className="send-ccd__create-transfer__input"
+                        className="create-transfer__input"
                         onMax={onMax}
                         rules={{
                             required: tShared('utils.ccdAmount.required'),
-                            validate: validateAmount,
+                            validate: validateAmount as Validate<unknown>,
                         }}
                     />
                     <Input
                         register={f.register}
                         name="recipient"
                         label={t('sendCcd.labels.recipient')}
-                        className="send-ccd__create-transfer__input"
+                        className="create-transfer__input"
                         rules={{
                             required: tShared('utils.address.required'),
-                            validate: validateAccountAddress,
+                            validate: validateAccountAddress as Validate<unknown>,
                         }}
                     />
-                    <DisplayCost cost={cost} />
+                    <DisplayCost className="create-transfer__cost" cost={cost} />
 
-                    <Submit className="send-ccd__create-transfer__button" width="medium">
+                    <Submit className="create-transfer__button" width="medium">
                         {t('sendCcd.buttons.continue')}
                     </Submit>
                 </>
             )}
         </Form>
     );
+}
+
+export default function loadingTokensGuard({ ...props }: Props) {
+    const tokens = useAtomValue(tokensAtom);
+    if (tokens.loading) {
+        return null;
+    }
+    return <CreateTransaction tokens={tokens.value} {...props} />;
 }

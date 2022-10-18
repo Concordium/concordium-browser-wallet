@@ -47,6 +47,7 @@ const t = {
         },
         title: 'Send CCD',
         currentBalance: 'Current balance',
+        unableToCoverCost: 'Unable to cover estimated cost',
         fee: 'Estimated transaction fee',
     },
     tokens: {

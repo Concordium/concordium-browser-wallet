@@ -45,7 +45,7 @@ function ChooseContract({ onChoice }: ChooseContractProps) {
         }
         const contractName = instanceInfo.name.substring(5);
         const contractDetails = { contractName, index, subindex: 0n };
-        const error = await confirmCIS2Contract(client, instanceInfo, contractDetails);
+        const error = await confirmCIS2Contract(client, contractDetails);
         if (error) {
             addToast(error);
         } else {

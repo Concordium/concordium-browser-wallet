@@ -1,39 +1,77 @@
+$horizontal-spacing: rem(5px);
+
 .send-ccd {
-    &__create-transfer {
-        &__token-picker,
-        &__input {
-            width: calc(100% - rem(50px));
-            margin: rem(5px) rem(25px) rem(13.286px) rem(25px);
-
-            &.form-input--invalid {
-                margin-bottom: 0;
-            }
-        }
-
-        &__button {
-            margin-bottom: rem(10px);
-            margin-top: auto;
-        }
-
-        &__pick-token__element,
-        &__token-picker {
-            border: rem(1px) solid $color-cta;
-            border-radius: rem(5px);
-            padding: rem(10px);
-        }
-
-        &__pick-token {
-            display: flex;
-            flex-direction: column;
-
-            &__element {
-                margin-bottom: rem(10px);
-            }
-        }
-    }
-
     &__receipt {
         margin: rem(20px);
         width: calc(100% - rem(80px));
     }
+}
+
+.create-transfer {
+    &__pick-token-element,
+    &__token-picker,
+    &__input {
+        width: calc(100% - rem(50px));
+        margin: 0 rem(25px) rem(13.286px) rem(25px);
+
+        &.form-input--invalid {
+            margin-bottom: 0;
+        }
+    }
+
+    &__button {
+        margin-bottom: $horizontal-spacing;
+    }
+
+    &__token-picker {
+        margin-top: rem(5px);
+
+        &-error {
+            margin-bottom: 0;
+        }
+    }
+
+    &__pick-token {
+        display: flex;
+        flex-direction: column;
+        width: 100%;
+        overflow: overlay;
+    }
+
+    &__pick-token-element:last-child {
+        margin-bottom: $horizontal-spacing;
+    }
+
+    &__pick-token-element:first-child {
+        margin-top: $horizontal-spacing;
+    }
+
+    &__cost {
+        margin-bottom: $horizontal-spacing;
+    }
+
+    &__current-balance {
+        margin-top: 0;
+        margin-bottom: $horizontal-spacing;
+        text-align: center;
+    }
+
+    &__token-display-container {
+        display: flex;
+        align-items: center;
+        justify-content: space-between;
+        height: rem(20px);
+    }
+
+    &__token-display {
+        max-height: rem(20px);
+        max-width: rem(40px);
+    }
+}
+
+.display-token {
+    border: rem(1px) solid $color-cta;
+    border-radius: rem(5px);
+    padding: rem(5px);
+    background: $color-bg;
 }
