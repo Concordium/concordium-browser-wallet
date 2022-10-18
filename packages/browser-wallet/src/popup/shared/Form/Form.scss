@@ -61,7 +61,6 @@
         input {
             width: rem(20px);
             height: rem(20px);
-            margin-right: rem(10px);
             background-color: $color-input-bg;
             accent-color: $color-cta-mainnet;
         }
@@ -90,6 +89,12 @@
         .form-input__field {
             border-color: $color-error;
         }
+    }
+
+    &--read-only .form-input__field {
+        background-color: $color-disabled-input-bg;
+        cursor: default;
+        border-color: $color-grey;
     }
 
     &__note,
@@ -266,6 +271,7 @@ $handle-scale: scale(1.02);
         right: rem(10px);
         font-size: rem(8px) !important;
         height: rem(15px) !important;
+        min-height: rem(15px) !important;
         padding: 0 rem(5px) !important;
     }
 }

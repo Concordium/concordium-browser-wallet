@@ -20,6 +20,8 @@ import {
     sessionOnboardingLocation,
     sessionRecoveryStatus,
     sessionIdpTab,
+    storedTokens,
+    storedTokenMetadata,
     sessionPendingTransactions,
 } from '@shared/storage/access';
 import { ChromeStorageKey } from '@shared/storage/types';
@@ -44,6 +46,8 @@ const accessorMap = {
     [ChromeStorageKey.OnboardingLocation]: sessionOnboardingLocation,
     [ChromeStorageKey.RecoveryStatus]: sessionRecoveryStatus,
     [ChromeStorageKey.IdpTab]: sessionIdpTab,
+    [ChromeStorageKey.Tokens]: useIndexedStorage(storedTokens, getGenesisHash),
+    [ChromeStorageKey.TokenMetadata]: storedTokenMetadata,
     [ChromeStorageKey.PendingTransactions]: sessionPendingTransactions,
 };
 

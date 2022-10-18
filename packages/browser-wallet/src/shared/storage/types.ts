@@ -19,6 +19,8 @@ export enum ChromeStorageKey {
     OnboardingLocation = 'onboardingLocation',
     RecoveryStatus = 'recoveryStatus',
     IdpTab = 'idpTab',
+    Tokens = 'tokens',
+    TokenMetadata = 'tokenMetadata',
     PendingTransactions = 'pendingTransactions',
 }
 
@@ -187,4 +189,29 @@ export interface RecoveryStatus {
     credentialNumber?: number;
     credentialGap?: number;
     nextId?: number;
+}
+
+export interface MetadataUrl {
+    url: string;
+}
+
+export interface TokenMetadata {
+    name?: string;
+    symbol?: string;
+    decimals?: number;
+    description?: string;
+    thumbnail?: MetadataUrl;
+    display?: MetadataUrl;
+    artifact?: MetadataUrl;
+}
+
+export interface TokenIdAndMetadata {
+    id: string;
+    metadataLink: string;
+    metadata: TokenMetadata;
+}
+
+export interface TokenStorage {
+    id: string;
+    metadataLink: string;
 }

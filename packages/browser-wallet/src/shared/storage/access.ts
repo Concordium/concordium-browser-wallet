@@ -8,6 +8,8 @@ import {
     NetworkConfiguration,
     RecoveryStatus,
     SessionPendingIdentity,
+    TokenMetadata,
+    TokenStorage,
 } from './types';
 
 export type StorageAccessor<V> = {
@@ -133,6 +135,14 @@ export const storedIdentityProviders = makeIndexedStorageAccessor<IdentityProvid
     ChromeStorageKey.IdentityProviders
 );
 export const storedHasBeenOnboarded = makeStorageAccessor<boolean>('local', ChromeStorageKey.HasBeenOnboarded);
+export const storedTokens = makeIndexedStorageAccessor<Record<string, Record<string, TokenStorage[]>>>(
+    'local',
+    ChromeStorageKey.Tokens
+); // accountAddress -> contractIndex (.toString()) -> id + metadataLink
+export const storedTokenMetadata = makeStorageAccessor<Record<string, TokenMetadata>>(
+    'local',
+    ChromeStorageKey.TokenMetadata
+);
 
 export const sessionPasscode = makeStorageAccessor<string>('session', ChromeStorageKey.Passcode);
 export const sessionPendingIdentity = makeStorageAccessor<SessionPendingIdentity>(

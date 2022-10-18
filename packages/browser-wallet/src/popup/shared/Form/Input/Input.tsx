@@ -8,7 +8,7 @@ import ErrorMessage from '../ErrorMessage';
 
 type Props = Pick<
     InputHTMLAttributes<HTMLInputElement>,
-    'className' | 'type' | 'value' | 'onChange' | 'onBlur' | 'autoFocus'
+    'className' | 'type' | 'value' | 'onChange' | 'onBlur' | 'autoFocus' | 'readOnly'
 > &
     RequiredUncontrolledFieldProps<HTMLInputElement> &
     CommonFieldProps;
@@ -18,13 +18,14 @@ type Props = Pick<
  * Use as a normal \<input /\>. Should NOT be used for checkbox or radio.
  */
 export const Input = forwardRef<HTMLInputElement, Props>(
-    ({ error, className, type = 'text', label, note, valid, autoFocus, ...props }, ref) => {
+    ({ error, className, type = 'text', label, note, valid, readOnly, ...props }, ref) => {
         return (
             <label
                 className={clsx(
                     'form-input',
                     error !== undefined && 'form-input--invalid',
                     valid && 'form-input--valid',
+                    readOnly && 'form-input--read-only',
                     className
                 )}
             >
@@ -34,7 +35,7 @@ export const Input = forwardRef<HTMLInputElement, Props>(
                     ref={ref}
                     autoComplete="off"
                     spellCheck="false"
-                    autoFocus={autoFocus}
+                    readOnly={readOnly}
                     {...props}
                 />
                 {label && <div className="form-input__label">{label}</div>}
