@@ -8,8 +8,8 @@
 
     &__close {
         position: absolute;
-        top: rem(7px);
-        right: rem(7px);
+        top: rem(10px);
+        right: rem(8px);
     }
 
     &__header {
@@ -40,6 +40,6 @@
         display: block;
         margin-top: rem(10px);
         border-top: 1px solid $color-lines;
-        padding: rem(15px) rem(25px) rem(5px);
+        padding: rem(15px) rem(40px) 0;
     }
 }
