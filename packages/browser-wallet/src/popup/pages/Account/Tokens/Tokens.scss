@@ -51,11 +51,19 @@ $tokens-actions-height: rem(26px);
         justify-content: space-between;
     }
 
+    &__unique-name {
+        text-align: right;
+    }
+
     &__icon {
         height: 60%;
 
         .dark &--ccd path {
             fill: $color-off-white;
         }
+    }
+
+    &__not-owned {
+        font-size: 10px;
     }
 }

@@ -1,4 +1,4 @@
-import React, { useState, useMemo } from 'react';
+import React, { useState, useMemo, useEffect } from 'react';
 import { SubmitHandler } from 'react-hook-form';
 import { useTranslation } from 'react-i18next';
 import { useNavigate } from 'react-router-dom';
@@ -10,10 +10,12 @@ import Submit from '@popup/shared/Form/Submit';
 import { TokenIdAndMetadata, TokenMetadata } from '@shared/storage/types';
 import Button from '@popup/shared/Button';
 import { addToastAtom } from '@popup/state';
+import { currentAccountTokensAtom } from '@popup/store/token';
 import { selectedAccountAtom } from '@popup/store/account';
-import { tokensAtom, tokenMetadataAtom, storedTokensAtom } from '@popup/store/token';
 import { absoluteRoutes } from '@popup/constants/routes';
 import { confirmCIS2Contract, ContractDetails, getTokenMetadata, getTokenUrl } from '@shared/utils/token-helpers';
+import { Checkbox } from '@popup/shared/Form/Checkbox';
+import { isHex } from '@concordium/web-sdk';
 
 type FormValues = {
     contractIndex: string;
@@ -29,6 +31,7 @@ interface ChooseContractProps {
  */
 function ChooseContract({ onChoice }: ChooseContractProps) {
     const { t } = useTranslation('account', { keyPrefix: 'tokens' });
+    const addToast = useSetAtom(addToastAtom);
     const form = useForm<FormValues>({
         defaultValues: {},
     });
@@ -44,14 +47,14 @@ function ChooseContract({ onChoice }: ChooseContractProps) {
         const contractDetails = { contractName, index, subindex: 0n };
         const error = await confirmCIS2Contract(client, instanceInfo, contractDetails);
         if (error) {
-            // TODO: Show error
+            addToast(error);
         } else {
             onChoice(contractDetails);
         }
     };
 
     return (
-        <Form formMethods={form} className="tokens__add__container" onSubmit={onSubmit}>
+        <Form formMethods={form} className="add-tokens__one-line-form" onSubmit={onSubmit}>
             {(f) => (
                 <>
                     <Input
@@ -62,7 +65,7 @@ function ChooseContract({ onChoice }: ChooseContractProps) {
                             required: t('indexRequired'),
                         }}
                     />
-                    <Submit className="tokens__add__submit">{t('chooseContract')}</Submit>
+                    <Submit>{t('chooseContract')}</Submit>
                 </>
             )}
         </Form>
@@ -72,13 +75,31 @@ function ChooseContract({ onChoice }: ChooseContractProps) {
 /**
  * Displays a CIS-2 Token
  */
-function DisplayToken({ metadata }: { metadata: TokenMetadata }) {
+function DisplayToken({
+    chosen,
+    metadata,
+    onClick,
+}: {
+    chosen: boolean;
+    metadata: TokenMetadata;
+    onClick: () => void;
+}) {
     return (
-        <div className="tokens__add__element" title={metadata.description}>
-            {metadata.display?.url && (
-                <img alt={metadata.name} className="tokens__add__token-display" src={metadata.display.url} />
-            )}
+        <div
+            className="add-tokens__element"
+            title={metadata.description}
+            onClick={onClick}
+            role="button"
+            onKeyPress={onClick}
+            tabIndex={0}
+        >
+            <div className="add-tokens__token-display-container">
+                {metadata.display?.url && (
+                    <img alt={metadata.name} className="add-tokens__token-display" src={metadata.display.url} />
+                )}
+            </div>
             <p>{metadata.name}</p>
+            <Checkbox readOnly tabIndex={-1} label="test" className="add-tokens__checkbox" checked={chosen} />
         </div>
     );
 }
@@ -97,95 +118,112 @@ function PickTokens({
 }) {
     const { t } = useTranslation('account', { keyPrefix: 'tokens' });
     const client = useAtomValue(jsonRpcClientAtom);
-    const [accountTokens, setAccountTokens] = useState<TokenIdAndMetadata[]>(defaultTokens);
+    const [accountTokens, setAccountTokens] = useState<(TokenIdAndMetadata & { chosen: boolean })[]>([]);
     const addToast = useSetAtom(addToastAtom);
     const form = useForm<FormValues>();
+
+    useEffect(() => {
+        setAccountTokens(defaultTokens.map((token) => ({ ...token, chosen: true })));
+    }, [contractDetails?.index.toString()]);
 
     const onSubmit: SubmitHandler<FormValues> = async ({ id }) => {
         if (accountTokens.some((token) => token.id === id)) {
             addToast(t('duplicateId'));
             return;
         }
-        const tokenUrl = await getTokenUrl(client, id || '', contractDetails);
-        const meta = await getTokenMetadata(tokenUrl);
-        setAccountTokens((tokens) => [...tokens, { id, metadata: meta, metadataLink: tokenUrl }]);
+        try {
+            const tokenUrl = await getTokenUrl(client, id || '', contractDetails);
+            const meta = await getTokenMetadata(tokenUrl);
+
+            setAccountTokens((tokens) => [...tokens, { id, metadata: meta, metadataLink: tokenUrl, chosen: true }]);
+        } catch (e) {
+            addToast((e as Error).message);
+        }
+    };
+
+    const chooseToken = (index: number) => {
+        const token = accountTokens[index];
+        accountTokens[index] = { ...token, chosen: !token.chosen };
+        setAccountTokens([...accountTokens]);
+    };
+
+    const validateId = (id: string | undefined) => {
+        if (!id || isHex(id)) {
+            return undefined;
+        }
+        return t('hexId');
     };
 
     return (
-        <div className="tokens__add__container">
+        <>
             <UncontrolledInput
                 readOnly
-                className="tokens__add__input"
-                label={t('contractIndex')}
-                value={contractDetails.index.toString()}
-            />
-            <UncontrolledInput
-                readOnly
-                className="tokens__add__input"
+                className="add-tokens__input"
                 label={t('contractName')}
                 value={contractDetails.contractName}
             />
-            <Form formMethods={form} className="tokens__add__add-token" onSubmit={onSubmit}>
+            <Form formMethods={form} className="add-tokens__one-line-form" onSubmit={onSubmit}>
                 {(f) => (
                     <>
-                        <Input register={f.register} label={t('tokenId')} name="id" />
+                        <Input register={f.register} label={t('tokenId')} rules={{ validate: validateId }} name="id" />
                         <Submit>{t('addToken')}</Submit>
                     </>
                 )}
             </Form>
-            {accountTokens.map((token) => (
-                <DisplayToken key={token.id} metadata={token.metadata} />
-            ))}
-            <Button onClick={() => onFinish(accountTokens)} className="tokens__add__submit">
+            <div className="add-tokens__token-container">
+                {accountTokens.map((token, index) => (
+                    <DisplayToken
+                        key={token.id}
+                        chosen={token.chosen}
+                        metadata={token.metadata}
+                        onClick={() => chooseToken(index)}
+                    />
+                ))}
+            </div>
+            <Button
+                onClick={() =>
+                    onFinish(accountTokens.filter((token) => token.chosen).map(({ chosen, ...token }) => token))
+                }
+                className="add-tokens__submit"
+            >
                 {t('updateTokens')}
             </Button>
-        </div>
+        </>
     );
 }
 
 export default function AddTokens() {
     const [contractDetails, setContractDetails] = useState<ContractDetails>();
-    const [tokenMetadata, setTokenMetadata] = useAtom(tokenMetadataAtom);
-    const [tokens, setTokens] = useAtom(storedTokensAtom);
-    const currentTokens = useAtomValue(tokensAtom);
+    const [accountTokens, setAccountTokens] = useAtom(currentAccountTokensAtom);
     const account = useAtomValue(selectedAccountAtom);
     const nav = useNavigate();
 
     const onFinish = (newTokens: TokenIdAndMetadata[]) => {
-        if (tokens.loading) {
-            return;
+        if (!contractDetails) {
+            throw new Error('This function should not be invoked without a chosen contract');
         }
-        if (!account || !contractDetails) {
-            // TODO: handle this
-            return;
-        }
-        const accountCollections = tokens.value[account] || {};
-        accountCollections[contractDetails.index.toString()] = newTokens.map((token) => ({
-            id: token.id,
-            metadataLink: token.metadataLink,
-        }));
-        const updatedTokens = { ...tokens.value };
-        updatedTokens[account] = accountCollections;
-        const newMetadata = tokenMetadata.value;
-        newTokens.forEach((token) => {
-            newMetadata[token.metadataLink] = token.metadata;
-        });
-        setTokenMetadata(newMetadata);
-        setTokens(updatedTokens).then(() => nav(absoluteRoutes.home.account.tokens.path));
+        setAccountTokens({ contractIndex: contractDetails.index.toString(), newTokens }).then(() =>
+            nav(absoluteRoutes.home.account.tokens.path)
+        );
     };
 
-    const accountTokens = useMemo(() => {
-        if (!account || !contractDetails || tokens.loading || !tokens.value[account]) {
+    const currentCollection = useMemo(() => {
+        if (!account || !contractDetails || accountTokens.loading || !accountTokens.value) {
             return [];
         }
-        return currentTokens.value[account][contractDetails.index.toString()] || [];
-    }, [account, contractDetails?.index.toString(), tokens.loading]);
+        return accountTokens.value[contractDetails.index.toString()] || [];
+    }, [account, contractDetails?.index.toString(), accountTokens.loading]);
 
-    if (!account || tokens.loading) {
+    if (!account || accountTokens.loading) {
         return null;
     }
-    if (contractDetails === undefined) {
-        return <ChooseContract onChoice={setContractDetails} />;
-    }
-    return <PickTokens contractDetails={contractDetails} onFinish={onFinish} defaultTokens={accountTokens} />;
+
+    return (
+        <div className="add-tokens__container">
+            <ChooseContract onChoice={setContractDetails} />
+            {contractDetails !== undefined && (
+                <PickTokens contractDetails={contractDetails} onFinish={onFinish} defaultTokens={currentCollection} />
+            )}
+        </div>
+    );
 }

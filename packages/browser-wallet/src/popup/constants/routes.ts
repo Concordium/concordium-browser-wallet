@@ -87,3 +87,14 @@ const buildAbsoluteRoutes = <R extends RouteNode | RoutePath | RouteChildren>(ro
 };
 
 export const absoluteRoutes = buildAbsoluteRoutes(relativeRoutes);
+
+/**
+ * Given two absolute routes, returns the relative route between them.
+ * Note: fromPath should be a prefix of toPath.
+ */
+export function relativePath(fromPath: string, toPath: string) {
+    if (!toPath.startsWith(fromPath)) {
+        throw new Error('fromPath is not a prefix of toPath');
+    }
+    return toPath.substring(fromPath.length);
+}

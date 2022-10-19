@@ -14,6 +14,7 @@ import {
 import { ccdToMicroCcd, getPublicAccountAmounts, isValidCcdString } from 'wallet-common-helpers';
 
 import i18n from '@popup/shell/i18n';
+import { BrowserWalletAccountTransaction, TransactionStatus } from './transaction-history-types';
 
 export function buildSimpleTransferPayload(recipient: string, amount: bigint): SimpleTransferPayload {
     return {
@@ -89,3 +90,42 @@ export function getTransactionTypeName(type: AccountTransactionType): string {
         }
     }
 }
+
+export const createPendingTransaction = (
+    type: AccountTransactionType,
+    transactionHash: string,
+    amount: bigint,
+    cost?: bigint,
+    fromAddress?: string,
+    toAddress?: string
+): BrowserWalletAccountTransaction => ({
+    amount,
+    blockHash: '',
+    events: [],
+    type,
+    status: TransactionStatus.Pending,
+    time: BigInt(Math.round(Date.now() / 1000)),
+    id: 0,
+    cost,
+    transactionHash,
+    fromAddress,
+    toAddress,
+});
+
+export const createPendingTransactionFromAccountTransaction = (
+    transaction: AccountTransaction,
+    transactionHash: string,
+    cost?: bigint
+) => {
+    const amount = (transaction.payload as SimpleTransferPayload).amount?.microGtuAmount ?? BigInt(0);
+    const toAddress = (transaction.payload as SimpleTransferPayload).toAddress?.address;
+
+    return createPendingTransaction(
+        transaction.type,
+        transactionHash,
+        amount,
+        cost,
+        transaction.header.sender.address,
+        toAddress
+    );
+};

@@ -5,7 +5,11 @@ import { useTranslation } from 'react-i18next';
 import { useLocation } from 'react-router-dom';
 import { AccountTransactionType, AccountAddress, SchemaVersion } from '@concordium/web-sdk';
 import { usePrivateKey } from '@popup/shared/utils/account-helpers';
-import { sendTransaction, getDefaultExpiry } from '@popup/shared/utils/transaction-helpers';
+import {
+    sendTransaction,
+    getDefaultExpiry,
+    createPendingTransactionFromAccountTransaction,
+} from '@popup/shared/utils/transaction-helpers';
 import { jsonRpcClientAtom } from '@popup/store/settings';
 import TransactionReceipt from '@popup/shared/TransactionReceipt/TransactionReceipt';
 import Button from '@popup/shared/Button';
@@ -15,6 +19,8 @@ import { getSimpleTransferCost } from '@popup/shared/utils/wallet-proxy';
 import ConnectedBox from '@popup/pages/Account/ConnectedBox';
 import { addToastAtom } from '@popup/state';
 import ExternalRequestLayout from '@popup/page-layouts/ExternalRequestLayout';
+import { useUpdateAtom } from 'jotai/utils';
+import { addPendingTransactionAtom } from '@popup/store/transactions';
 import { parsePayload } from './util';
 
 interface Location {
@@ -42,6 +48,7 @@ export default function SendTransaction({ onSubmit, onReject }: Props) {
     const addToast = useSetAtom(addToastAtom);
     const client = useAtomValue(jsonRpcClientAtom);
     const { withClose, onClose } = useContext(fullscreenPromptContext);
+    const addPendingTransaction = useUpdateAtom(addPendingTransactionAtom);
 
     const { accountAddress, url } = state.payload;
     const key = usePrivateKey(accountAddress);
@@ -89,7 +96,10 @@ export default function SendTransaction({ onSubmit, onReject }: Props) {
         };
         const transaction = { payload, header, type: transactionType };
 
-        return sendTransaction(client, transaction, key);
+        const hash = await sendTransaction(client, transaction, key);
+        addPendingTransaction(createPendingTransactionFromAccountTransaction(transaction, hash));
+
+        return hash;
     }, [payload, key]);
 
     return (

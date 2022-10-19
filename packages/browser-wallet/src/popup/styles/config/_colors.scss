@@ -65,6 +65,7 @@ $color-transaction-group-header-text: var(
 ); // blue/light-blue
 $color-main-header: var(--color-main-header, $color-main-header-light);
 $color-input-bg: var(--color-input-bg, $color-input-bg-light);
+$color-disabled-input-bg: var(--color-disabled-input-bg, $color-main-header-light);
 $color-text-inverted: $color-bg;
 $color-highlight-mainnet: var(--color-highlight-mainnet, $color-highlight-mainnet-light);
 $color-highlight-testnet: var(--color-highlight-testnet, $color-highlight-testnet-light);

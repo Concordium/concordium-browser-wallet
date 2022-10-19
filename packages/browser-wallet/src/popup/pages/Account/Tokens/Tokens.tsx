@@ -10,9 +10,10 @@ import CcdIcon from '@assets/svg/concordium.svg';
 import { useAccountInfo } from '@popup/shared/AccountInfoListenerContext';
 import { useSelectedCredential } from '@popup/shared/utils/account-helpers';
 import { TokenIdAndMetadata, WalletCredential } from '@shared/storage/types';
-import { tokenBalanceFamily } from '@popup/store/token';
+import { contractBalancesFamily, tokensAtom } from '@popup/store/token';
 import Button from '@popup/shared/Button';
 
+import { useAtomValue } from 'jotai';
 import { tokensRoutes, detailsRoute } from './routes';
 import TokenDetails from './TokenDetails';
 import { useTokens } from './utils';
@@ -26,13 +27,13 @@ type FtProps = {
 };
 
 function Ft({ accountAddress, contractIndex: contractAddress, token, onClick }: FtProps) {
-    const balanceAtom = tokenBalanceFamily(accountAddress, contractAddress, token.id);
+    const balancesAtom = contractBalancesFamily(accountAddress, contractAddress);
 
     return (
         <Button clear className="token-list__item" onClick={onClick}>
             <img className="token-list__icon" src={token.metadata.thumbnail?.url} alt={token.metadata.name} />
-            <Suspense fallback={<>...</>}>
-                <TokenBalance atom={balanceAtom} decimals={token.metadata.decimals ?? 0} />
+            <Suspense fallback="0">
+                <TokenBalance atom={balancesAtom} decimals={token.metadata.decimals ?? 0} id={token.id} />
             </Suspense>{' '}
             {token.metadata.symbol || token.metadata.name || ''}
         </Button>
@@ -78,18 +79,38 @@ function Fungibles({ account, toDetails }: ListProps) {
 
 function Collectibles({ account, toDetails }: ListProps) {
     const tokens = useFilteredTokens(account, true);
+    const { t } = useTranslation('account', { keyPrefix: 'tokens' });
 
     return (
         <>
-            {tokens.map((t) => (
+            {tokens.map((token) => (
                 <Button
                     clear
-                    key={`${t.contractIndex}.${t.id}`}
-                    onClick={() => toDetails(t.contractIndex, t.id)}
+                    key={`${token.contractIndex}.${token.id}`}
+                    onClick={() => toDetails(token.contractIndex, token.id)}
                     className="token-list__item"
                 >
-                    <img className="token-list__icon" src={t.metadata.thumbnail?.url ?? ''} alt={t.metadata.name} />
-                    <div>{t.metadata.name}</div>
+                    <img
+                        className="token-list__icon"
+                        src={token.metadata.thumbnail?.url ?? ''}
+                        alt={token.metadata.name}
+                    />
+                    <div className="token-list__unique-name">
+                        {token.metadata.name}
+                        <Suspense fallback="">
+                            <TokenBalance
+                                atom={contractBalancesFamily(account.address, token.contractIndex)}
+                                decimals={token.metadata.decimals ?? 0}
+                                id={token.id}
+                            >
+                                {(b) =>
+                                    b === 0n && (
+                                        <div className="token-list__not-owned text-faded">{t('unownedUnique')}</div>
+                                    )
+                                }
+                            </TokenBalance>
+                        </Suspense>{' '}
+                    </div>
                 </Button>
             ))}
         </>
@@ -97,19 +118,19 @@ function Collectibles({ account, toDetails }: ListProps) {
 }
 
 function Tokens() {
-    const { t } = useTranslation('account');
+    const { t } = useTranslation('account', { keyPrefix: 'tokens.tabBar' });
     return (
         <div className="tokens">
             <TabBar className="tokens__actions">
                 <TabBar.Item className="tokens__link" to="" end>
-                    {t('tokens.tabBar.ft')}
+                    {t('ft')}
                 </TabBar.Item>
                 <TabBar.Item className="tokens__link" to={tokensRoutes.collectibles}>
-                    {t('tokens.tabBar.nft')}
+                    {t('nft')}
                 </TabBar.Item>
                 <TabBar.Item className="tokens__link" to={absoluteRoutes.home.account.tokens.add.path}>
                     <div className="tokens__add">
-                        {t('tokens.tabBar.new')}
+                        {t('new')}
                         <PlusIcon />
                     </div>
                 </TabBar.Item>
@@ -128,6 +149,7 @@ type Props = {
 export default function TokensRoutes({ setDetailsExpanded }: Props) {
     const account = useSelectedCredential();
     const nav = useNavigate();
+    useAtomValue(tokensAtom); // Ensure tokens are kept in memory
 
     if (account === undefined) {
         return null;

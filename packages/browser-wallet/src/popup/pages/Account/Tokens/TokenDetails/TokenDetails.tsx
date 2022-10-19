@@ -2,7 +2,7 @@ import React, { Suspense, useEffect, useMemo } from 'react';
 import { useParams } from 'react-router-dom';
 
 import { useSelectedCredential } from '@popup/shared/utils/account-helpers';
-import { tokenBalanceFamily } from '@popup/store/token';
+import { contractBalancesFamily } from '@popup/store/token';
 import TokenBalance from '../TokenBalance';
 import { defaultCis2TokenId } from '../routes';
 import { TokenDetails, useTokens } from '../utils';
@@ -22,11 +22,11 @@ function Nft({ token }: DetailsProps) {
 
 function Ft({ token }: DetailsProps) {
     const account = useSelectedCredential();
-    const balanceAtom = tokenBalanceFamily(account?.address ?? '', token.contractIndex, token.id);
+    const balancesAtom = contractBalancesFamily(account?.address ?? '', token.contractIndex);
 
     return (
         <Suspense fallback={<>...</>}>
-            <TokenBalance atom={balanceAtom} decimals={token.metadata.decimals ?? 0} />
+            <TokenBalance atom={balancesAtom} decimals={token.metadata.decimals ?? 0} id={token.id} />
         </Suspense>
     );
 }
