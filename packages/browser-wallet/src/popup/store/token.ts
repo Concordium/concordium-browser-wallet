@@ -90,6 +90,20 @@ export const currentAccountTokensAtom = atom<
     }
 );
 
+export const removeTokenFromCurrentAccountAtom = atom<null, { contractIndex: string; tokenId: string }>(
+    null,
+    (get, set, { contractIndex, tokenId }) => {
+        const { loading, value } = get(currentAccountTokensAtom);
+        const tokens = value[contractIndex];
+
+        if (loading || tokens === undefined) {
+            throw new Error('Unable to update tokens');
+        }
+
+        set(currentAccountTokensAtom, { contractIndex, newTokens: tokens?.filter((t) => t.id !== tokenId) });
+    }
+);
+
 const cbf = atomFamily<string, Atom<Promise<ContractBalances>>>((identifier: string) => {
     const parts = identifier.split('.');
 
