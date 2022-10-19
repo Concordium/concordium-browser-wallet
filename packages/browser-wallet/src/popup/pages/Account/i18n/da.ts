@@ -64,7 +64,7 @@ const t: typeof en = {
         addToken: 'Tilføj token',
         duplicateId: 'Token er allerede i listen',
         updateTokens: 'Opdater tokens',
-        unownedUnique: 'Ejer ikke',
+        unownedUnique: 'Ikke ejet',
         ownedUnique: 'Ejer',
         hexId: 'Id skal være HEX encodet',
         details: {

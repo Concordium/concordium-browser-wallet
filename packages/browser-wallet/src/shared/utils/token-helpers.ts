@@ -38,7 +38,7 @@ export function getMetadataParameter(id: string): Buffer {
 function deserializeTokenMetadataReturnValue(returnValue: string) {
     const bufferStream = Buffer.from(returnValue, 'hex');
     const length = bufferStream.readUInt16LE(2);
-    const url = bufferStream.slice(4, 4 + length).toString('utf8');
+    const url = Buffer.from(bufferStream.subarray(4, 4 + length)).toString('utf8');
     return url;
 }
 
@@ -156,9 +156,9 @@ const deserializeBalanceAmounts = (value: string): bigint[] => {
 
     // eslint-disable-next-line no-plusplus
     for (let i = 0; i < n; i++) {
-        const end = buf.slice(cursor).findIndex((b) => b < 2 ** 7) + 1; // Find the first byte with most significant bit not set, signaling the last byte in the leb128 slice.
+        const end = buf.subarray(cursor).findIndex((b) => b < 2 ** 7) + 1; // Find the first byte with most significant bit not set, signaling the last byte in the leb128 slice.
 
-        const amount = uleb128.decode(buf.slice(cursor, cursor + end));
+        const amount = uleb128.decode(Buffer.from(buf.subarray(cursor, cursor + end)));
         amounts.push(BigInt(amount));
 
         cursor += end;
