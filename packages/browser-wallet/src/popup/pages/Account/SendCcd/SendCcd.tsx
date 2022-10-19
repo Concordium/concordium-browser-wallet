@@ -3,7 +3,7 @@ import { Route, Routes } from 'react-router-dom';
 import { getEnergyPerCCD } from '@popup/shared/utils/wallet-proxy';
 import { noOp, useAsyncMemo } from 'wallet-common-helpers';
 import CreateTransfer from './CreateTransfer';
-import ConfirmTransfer from './ConfirmTransfer';
+import ConfirmSimpleTransfer from './ConfirmSimpleTransfer';
 import { routes } from './routes';
 import ConfirmTokenTransfer from './ConfirmTokenTransfer';
 
@@ -19,7 +19,7 @@ export default function SendCcd({ setDetailsExpanded }: Props) {
         <Routes>
             <Route
                 path={routes.confirm}
-                element={<ConfirmTransfer setDetailsExpanded={setDetailsExpanded} cost={cost} />}
+                element={<ConfirmSimpleTransfer setDetailsExpanded={setDetailsExpanded} cost={cost} />}
             />
             <Route
                 path={routes.confirmToken}

@@ -49,6 +49,7 @@ const t: typeof en = {
         },
         title: 'Send CCD',
         currentBalance: 'Nuværende balance',
+        unableToCoverCost: 'Utilstrækkelig antal CCD til at dække omkostninger',
         fee: 'Estimerede transaktionsomkostninger',
     },
     tokens: {
