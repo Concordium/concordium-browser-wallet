@@ -64,7 +64,7 @@ const t: typeof en = {
         addToken: 'Tilføj token',
         duplicateId: 'Token er allerede i listen',
         updateTokens: 'Opdater tokens',
-        unownedUnique: 'ejer ikke',
+        unownedUnique: 'Ikke ejet',
         hexId: 'Id skal være HEX encodet',
     },
     accountPending: 'Denne konto er stadig ved at blive oprettet.',
