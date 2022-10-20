@@ -71,6 +71,7 @@ const t: typeof en = {
     },
     accountPending: 'Denne konto er stadig ved at blive oprettet.',
     request: 'Opret konto',
+    unknown: 'Ukendt',
 };
 
 export default t;

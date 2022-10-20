@@ -39,6 +39,7 @@ export type FormValues = {
     amount: string;
     recipient: string;
     executionEnergy: string;
+    cost: string;
     token?: TokenIdentifier;
 };
 
@@ -193,6 +194,7 @@ function CreateTransaction({ exchangeRate, tokens, setCost }: Props & { tokens: 
     if (pickingToken) {
         return (
             <PickToken
+                address={address}
                 tokens={accountTokens}
                 onClick={(chosen: TokenIdentifier | undefined) => {
                     setPickingToken(false);

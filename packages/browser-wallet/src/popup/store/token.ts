@@ -45,15 +45,14 @@ export const tokensAtom = atom<AsyncWrapper<Tokens>>((get) => {
     };
 });
 
-const accountTokensFamily = atomFamily<string, Atom<AsyncWrapper<AccountTokens>>>(
-    (accountAddress) =>
-        atom((get) => {
-            const tokens = get(tokensAtom);
-            if (tokens.loading) {
-                return { loading: true, value: {} };
-            }
-            return { loading: false, value: tokens.value[accountAddress] };
-        })
+const accountTokensFamily = atomFamily<string, Atom<AsyncWrapper<AccountTokens>>>((accountAddress) =>
+    atom((get) => {
+        const tokens = get(tokensAtom);
+        if (tokens.loading) {
+            return { loading: true, value: {} };
+        }
+        return { loading: false, value: tokens.value[accountAddress] };
+    })
 );
 
 export const currentAccountTokensAtom = atom<
@@ -112,6 +111,10 @@ const cbf = atomFamily<string, Atom<ContractBalances>>((identifier: string) => {
         async (get, set) => {
             const client = get(jsonRpcClientAtom);
             const tokens = get(accountTokensFamily(accountAddress));
+
+            if (tokens.loading) {
+                return {};
+            }
 
             const tokenIds = tokens.value[contractIndex]?.map((t) => t.id) ?? [];
 
