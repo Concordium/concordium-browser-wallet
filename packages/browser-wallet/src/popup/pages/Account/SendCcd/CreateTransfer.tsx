@@ -157,6 +157,16 @@ function CreateTransaction({ exchangeRate, tokens, setCost }: Props & { tokens: 
         return () => form.setValue('amount', '');
     }, [chosenToken?.contractIndex, chosenToken?.tokenId]);
 
+    const canCoverCost = ccdBalance - cost > 0;
+
+    useEffect(() => {
+        if (!canCoverCost) {
+            form.setError('cost', { type: 'custom', message: t('sendCcd.unableToCoverCost') });
+        } else {
+            form.clearErrors('cost');
+        }
+    }, [canCoverCost]);
+
     const displayAmount = integerToFractional(tokenMetadata.decimals || 0);
 
     const onMax = () => {
@@ -179,8 +189,6 @@ function CreateTransaction({ exchangeRate, tokens, setCost }: Props & { tokens: 
             nav(routes.confirm, { state: { ...payload } });
         }
     };
-
-    const canCoverCost = ccdBalance - cost > 0;
 
     if (pickingToken) {
         return (

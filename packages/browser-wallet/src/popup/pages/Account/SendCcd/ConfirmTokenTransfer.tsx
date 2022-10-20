@@ -56,7 +56,7 @@ export default function ConfirmTokenTransfer({ setDetailsExpanded, cost }: Props
             setDetailsExpanded={setDetailsExpanded}
             cost={cost}
             payload={payload}
-            returnState={payload}
+            returnState={state}
             transactionType={AccountTransactionType.UpdateSmartContractInstance}
         />
     );
