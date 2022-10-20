@@ -9,8 +9,6 @@ import {
 } from '@concordium/web-sdk';
 import { TokenMetadata } from '@shared/storage/types';
 import { CIS2_SCHEMA_CONTRACT_NAME, CIS2_SCHEMA } from '@popup/constants/schema';
-// TODO: Replace dependency
-import * as leb from '@thi.ng/leb128';
 import { getCcdSymbol } from 'wallet-common-helpers';
 import { SmartContractParameters } from './types';
 
@@ -250,7 +248,7 @@ export async function getTokenBalance(client: JsonRpcClient, account: string, to
     if (!res || res.tag === 'failure' || !res.returnValue) {
         throw new Error(`Expected succesful invocation`);
     }
-    return BigInt(leb.decodeULEB128(Buffer.from(res.returnValue.substring(4), 'hex'))[0]);
+    return BigInt(uleb128.decode(Buffer.from(res.returnValue.substring(4), 'hex'))[0]);
 }
 
 export function getTokenTransferParameters(

@@ -1,7 +1,8 @@
 import React, { useEffect, useMemo, useState } from 'react';
 import { useTranslation } from 'react-i18next';
 import { useAtomValue, useSetAtom } from 'jotai';
-import { AccountTokens, selectedAccountAtom, Tokens, tokensAtom } from '@popup/store/account';
+import { AccountTokens, Tokens, tokensAtom } from '@popup/store/token';
+import { selectedAccountAtom } from '@popup/store/account';
 import Form from '@popup/shared/Form';
 import AmountInput from '@popup/shared/Form/CcdInput';
 import Input from '@popup/shared/Form/Input';

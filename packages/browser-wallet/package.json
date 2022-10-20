@@ -19,7 +19,6 @@
         "@concordium/browser-wallet-api-helpers": "workspace:^",
         "@concordium/web-sdk": "^2.0.0",
         "@scure/bip39": "^1.1.0",
-        "@thi.ng/leb128": "^2.1.22",
         "axios": "^0.27.2",
         "buffer": "^6.0.3",
         "check-password-strength": "^2.0.5",

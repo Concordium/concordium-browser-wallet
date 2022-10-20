@@ -1,4 +1,4 @@
-import { AccountTokens } from '@popup/store/account';
+import { AccountTokens } from '@popup/store/token';
 import { CCD_METADATA, TokenIdentifier } from '@shared/utils/token-helpers';
 import React from 'react';
 import DisplayToken from './DisplayToken';
