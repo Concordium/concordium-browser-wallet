@@ -1,7 +1,8 @@
 import { AccountTokens, contractBalancesFamily } from '@popup/store/token';
 import { TokenIdAndMetadata } from '@shared/storage/types';
 import { CCD_METADATA, ContractBalances, TokenIdentifier } from '@shared/utils/token-helpers';
-import { Atom, useAtomValue } from 'jotai';
+import { atom, Atom } from 'jotai';
+import { selectAtom } from 'jotai/utils';
 import React, { Suspense } from 'react';
 import DisplayToken from './DisplayToken';
 
@@ -13,14 +14,12 @@ interface Props {
 }
 
 interface CollectionProps extends Pick<Props, 'onClick'> {
-    atom: Atom<Promise<ContractBalances>>;
+    balanceAtom: Atom<Promise<ContractBalances>>;
     tokens: TokenIdAndMetadata[];
     contractIndex: string;
 }
 
-function Collection({ atom, onClick, tokens, contractIndex }: CollectionProps) {
-    const balances = useAtomValue(atom);
-
+function Collection({ balanceAtom, onClick, tokens, contractIndex }: CollectionProps) {
     return (
         <>
             {tokens.map((token) => (
@@ -28,7 +27,7 @@ function Collection({ atom, onClick, tokens, contractIndex }: CollectionProps) {
                     className="create-transfer__pick-token-element"
                     key={token.id}
                     metadata={token.metadata}
-                    balance={balances[token.id]}
+                    balanceAtom={selectAtom(balanceAtom, (balances) => balances[token.id])}
                     onClick={() => onClick({ contractIndex, tokenId: token.id, metadata: token.metadata })}
                 />
             ))}
@@ -43,14 +42,14 @@ export default function PickToken({ onClick, tokens, ccdBalance, address }: Prop
                 className="create-transfer__pick-token-element"
                 metadata={CCD_METADATA}
                 onClick={() => onClick(undefined)}
-                balance={ccdBalance}
+                balanceAtom={atom(() => ccdBalance)}
             />
             {Object.entries(tokens || []).map(([contractIndex, collectionTokens]) => (
                 <Suspense fallback="">
                     <Collection
                         key={contractIndex}
                         {...{
-                            atom: contractBalancesFamily(address, contractIndex),
+                            balanceAtom: contractBalancesFamily(address, contractIndex),
                             contractIndex,
                             tokens: collectionTokens,
                             onClick,

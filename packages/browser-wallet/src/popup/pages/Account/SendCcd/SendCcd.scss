@@ -57,6 +57,10 @@ $error-spacing: rem(13.286px);
 
     &__cost-error {
         margin-bottom: 0;
+
+        > p {
+            color: $color-error;
+        }
     }
 
     &__current-balance {

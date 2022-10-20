@@ -1,6 +1,6 @@
 import React, { useEffect, useMemo, useState } from 'react';
 import { useTranslation } from 'react-i18next';
-import { useAtomValue, useSetAtom } from 'jotai';
+import { atom, useAtomValue, useSetAtom } from 'jotai';
 import { AccountTokens, Tokens, tokensAtom } from '@popup/store/token';
 import { selectedAccountAtom } from '@popup/store/account';
 import Form from '@popup/shared/Form';
@@ -217,7 +217,7 @@ function CreateTransaction({ exchangeRate, tokens, setCost }: Props & { tokens: 
                     <div className={clsx('create-transfer__token-picker')}>
                         <DisplayToken
                             metadata={tokenMetadata}
-                            balance={currentBalance}
+                            balanceAtom={atom(() => currentBalance || 0n)}
                             disabled={!accountTokens}
                             onClick={() => setPickingToken(true)}
                             className="w-full"

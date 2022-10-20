@@ -30,18 +30,20 @@ export const AmountInput = forwardRef<HTMLInputElement, Props>(
                     className
                 )}
             >
-                <p className="form-ccd-input__symbol">{symbol}</p>
-                <input
-                    className={clsx('form-ccd-input__field', 'form-input__field')}
-                    type={type}
-                    ref={ref}
-                    autoComplete="off"
-                    spellCheck="false"
-                    {...props}
-                />
-                <Button onClick={onMax} className="form-ccd-input__max">
-                    Max
-                </Button>
+                <div className={clsx('form-amount-input__field', 'form-input__field')}>
+                    <p className="form-amount-input__symbol">{symbol}</p>
+                    <input
+                        className="form-inline-input"
+                        type={type}
+                        ref={ref}
+                        autoComplete="off"
+                        spellCheck="false"
+                        {...props}
+                    />
+                    <Button onClick={onMax} className="form-amount-input__max">
+                        Max
+                    </Button>
+                </div>
                 {label && <div className="form-input__label">{label}</div>}
                 {error ? (
                     <ErrorMessage className="form-input__error">{error}</ErrorMessage>
