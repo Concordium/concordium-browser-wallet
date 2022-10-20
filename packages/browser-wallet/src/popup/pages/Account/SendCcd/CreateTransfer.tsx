@@ -13,6 +13,7 @@ import {
     useAsyncMemo,
     integerToFractional,
     max,
+    displayAsCcd,
 } from 'wallet-common-helpers';
 import { SimpleTransferPayload } from '@concordium/web-sdk';
 import { SubmitHandler, useForm, Validate } from 'react-hook-form';
@@ -23,7 +24,6 @@ import {
     validateAccountAddress,
 } from '@popup/shared/utils/transaction-helpers';
 import { useLocation, useNavigate } from 'react-router-dom';
-import DisplayCost from '@popup/shared/TransactionReceipt/DisplayCost';
 import { useAccountInfo } from '@popup/shared/AccountInfoListenerContext';
 import { useSelectedCredential } from '@popup/shared/utils/account-helpers';
 import { CCD_METADATA, getTokenBalance, getTokenTransferEnergy, TokenIdentifier } from '@shared/utils/token-helpers';
@@ -204,12 +204,7 @@ function CreateTransaction({ exchangeRate, tokens, setCost }: Props & { tokens: 
         >
             {(f) => (
                 <>
-                    <div
-                        className={clsx(
-                            'create-transfer__token-picker',
-                            !canCoverCost && 'create-transfer__token-picker-error'
-                        )}
-                    >
+                    <div className={clsx('create-transfer__token-picker')}>
                         <DisplayToken
                             metadata={tokenMetadata}
                             balance={currentBalance}
@@ -217,11 +212,6 @@ function CreateTransaction({ exchangeRate, tokens, setCost }: Props & { tokens: 
                             onClick={() => setPickingToken(true)}
                             className="w-full"
                         />
-                        {!canCoverCost && (
-                            <ErrorMessage className="form-input__error w-full">
-                                {t('sendCcd.unableToCoverCost')}
-                            </ErrorMessage>
-                        )}
                     </div>
                     <AmountInput
                         register={f.register}
@@ -245,8 +235,14 @@ function CreateTransaction({ exchangeRate, tokens, setCost }: Props & { tokens: 
                             validate: validateAccountAddress as Validate<unknown>,
                         }}
                     />
-                    <DisplayCost className="create-transfer__cost" cost={cost} />
-
+                    <div className={clsx('create-transfer__cost', !canCoverCost && 'create-transfer__cost-error')}>
+                        <p>
+                            {t('sendCcd.fee')}: {cost ? displayAsCcd(cost) : t('unknown')}
+                        </p>
+                        {!canCoverCost && (
+                            <ErrorMessage className="form-input__error">{t('sendCcd.unableToCoverCost')}</ErrorMessage>
+                        )}
+                    </div>
                     <Submit className="create-transfer__button" width="medium">
                         {t('sendCcd.buttons.continue')}
                     </Submit>

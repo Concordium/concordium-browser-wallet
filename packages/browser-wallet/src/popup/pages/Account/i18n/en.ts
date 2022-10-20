@@ -69,6 +69,7 @@ const t = {
     },
     accountPending: 'This account is still pending finalization.',
     request: 'Create account',
+    unknown: 'unknown',
 };
 
 export default t;
