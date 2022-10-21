@@ -7,6 +7,12 @@
     z-index: 1000;
     overflow: auto;
 
+    &--align-bottom {
+        display: flex;
+        flex-direction: column;
+        justify-content: flex-end;
+    }
+
     &__content {
         position: relative;
         width: 90%;
