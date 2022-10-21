@@ -14,7 +14,7 @@ interface Props {
 }
 
 interface CollectionProps extends Pick<Props, 'onClick'> {
-    balanceAtom: Atom<Promise<ContractBalances>>;
+    balanceAtom: Atom<ContractBalances>;
     tokens: TokenIdAndMetadata[];
     contractIndex: string;
 }

@@ -112,10 +112,6 @@ const cbf = atomFamily<string, Atom<ContractBalances>>((identifier: string) => {
             const client = get(jsonRpcClientAtom);
             const tokens = get(accountTokensFamily(accountAddress));
 
-            if (tokens.loading) {
-                return {};
-            }
-
             const tokenIds = tokens.value[contractIndex]?.map((t) => t.id) ?? [];
 
             if (tokenIds.length !== 0) {
