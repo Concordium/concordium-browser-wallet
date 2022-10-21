@@ -4,6 +4,8 @@ import { mapRecordValues } from 'wallet-common-helpers/src/utils/basicHelpers';
 import { atomFamily } from 'jotai/utils';
 import { ChromeStorageKey, TokenIdAndMetadata, TokenMetadata, TokenStorage } from '@shared/storage/types';
 import { ContractBalances, getContractBalances } from '@shared/utils/token-helpers';
+import { JsonRpcClient } from '@concordium/web-sdk';
+import { loop } from '@shared/utils/function-helpers';
 import { AsyncWrapper, atomWithChromeStorage } from './utils';
 import { jsonRpcClientAtom } from './settings';
 import { selectedAccountAtom } from './account';
@@ -104,7 +106,9 @@ export const removeTokenFromCurrentAccountAtom = atom<null, { contractIndex: str
     }
 );
 
-const cbf = atomFamily<string, Atom<Promise<ContractBalances>>>((identifier: string) => {
+const BALANCES_UPDATE_INTERVAL = 1000 * 60; // 1 minute
+
+const cbf = atomFamily<string, Atom<ContractBalances>>((identifier: string) => {
     const parts = identifier.split('.');
 
     if ((parts as (string | undefined)[]).includes(undefined)) {
@@ -113,18 +117,31 @@ const cbf = atomFamily<string, Atom<Promise<ContractBalances>>>((identifier: str
 
     const [accountAddress, contractIndex] = parts;
 
-    return atom<Promise<ContractBalances>>(async (get) => {
-        const client = get(jsonRpcClientAtom);
-        const tokens = get(accountTokensFamily(accountAddress));
+    const baseAtom = atom<ContractBalances>({});
 
-        const tokenIds = tokens.value[contractIndex]?.map((t) => t.id) ?? [];
+    const derivedAtom = atom<ContractBalances, void, Promise<void>>(
+        (get) => get(baseAtom),
+        async (get, set) => {
+            const client = get(jsonRpcClientAtom);
+            const tokens = get(accountTokensFamily(accountAddress));
 
-        if (tokenIds.length === 0) {
-            return {};
+            const tokenIds = tokens.value[contractIndex]?.map((t) => t.id) ?? [];
+
+            if (tokenIds.length !== 0) {
+                const balances = await getContractBalances(client, contractIndex, tokenIds, accountAddress);
+                set(baseAtom, balances);
+            }
         }
+    );
 
-        return getContractBalances(client, contractIndex, tokenIds, accountAddress);
-    });
+    derivedAtom.onMount = (setValue) => {
+        setValue();
+        const i = setInterval(setValue, BALANCES_UPDATE_INTERVAL);
+
+        return () => clearInterval(i);
+    };
+
+    return derivedAtom;
 });
 
 export const contractBalancesFamily = (accountAddress: string, contractIndex: string) =>

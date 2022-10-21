@@ -1,4 +1,4 @@
-import React, { Suspense } from 'react';
+import React from 'react';
 import { useTranslation } from 'react-i18next';
 import { Outlet, Route, Routes, useNavigate } from 'react-router-dom';
 import { displayAsCcd } from 'wallet-common-helpers';
@@ -14,6 +14,7 @@ import { contractBalancesFamily, tokensAtom } from '@popup/store/token';
 import Button from '@popup/shared/Button';
 
 import { useAtomValue } from 'jotai';
+import AtomValue from '@popup/store/AtomValue';
 import { tokensRoutes, detailsRoute } from './routes';
 import TokenDetails from './TokenDetails';
 import { useTokens } from './utils';
@@ -27,14 +28,12 @@ type FtProps = {
 };
 
 function Ft({ accountAddress, contractIndex: contractAddress, token, onClick }: FtProps) {
-    const balancesAtom = contractBalancesFamily(accountAddress, contractAddress);
+    const { [token.id]: balance } = useAtomValue(contractBalancesFamily(accountAddress, contractAddress));
 
     return (
         <Button clear className="token-list__item" onClick={onClick}>
             <img className="token-list__icon" src={token.metadata.thumbnail?.url} alt={token.metadata.name} />
-            <Suspense fallback="0">
-                <TokenBalance atom={balancesAtom} decimals={token.metadata.decimals ?? 0} id={token.id} />
-            </Suspense>{' '}
+            <TokenBalance balance={balance} decimals={token.metadata.decimals ?? 0} />{' '}
             {token.metadata.symbol || token.metadata.name || ''}
         </Button>
     );
@@ -97,19 +96,11 @@ function Collectibles({ account, toDetails }: ListProps) {
                     />
                     <div className="token-list__unique-name">
                         {token.metadata.name}
-                        <Suspense fallback="">
-                            <TokenBalance
-                                atom={contractBalancesFamily(account.address, token.contractIndex)}
-                                decimals={token.metadata.decimals ?? 0}
-                                id={token.id}
-                            >
-                                {(b) =>
-                                    b === 0n && (
-                                        <div className="token-list__not-owned text-faded">{t('unownedUnique')}</div>
-                                    )
-                                }
-                            </TokenBalance>
-                        </Suspense>{' '}
+                        <AtomValue atom={contractBalancesFamily(account.address, token.contractIndex)}>
+                            {({ [token.id]: b }) =>
+                                b === 0n && <div className="token-list__not-owned text-faded">{t('unownedUnique')}</div>
+                            }
+                        </AtomValue>
                     </div>
                 </Button>
             ))}
