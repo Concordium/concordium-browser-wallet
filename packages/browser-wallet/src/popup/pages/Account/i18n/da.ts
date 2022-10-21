@@ -51,6 +51,11 @@ const t: typeof en = {
         fee: 'Estimerede transaktionsomkostninger',
     },
     tokens: {
+        tabBar: {
+            ft: 'Ombyttelige',
+            nft: 'Samlerobjekter',
+            new: 'Tilføj ny',
+        },
         indexRequired: 'Kontrakt indeks er påkrævet',
         chooseContract: 'Vælg kontrakt',
         contractIndex: 'Kontrakt Indeks',
@@ -59,6 +64,7 @@ const t: typeof en = {
         addToken: 'Tilføj token',
         duplicateId: 'Token er allerede i listen',
         updateTokens: 'Opdater tokens',
+        unownedUnique: 'Ikke ejet',
         hexId: 'Id skal være HEX encodet',
     },
     accountPending: 'Denne konto er stadig ved at blive oprettet.',

@@ -1,0 +1,51 @@
+.tab-bar {
+    background-color: $color-cta;
+}
+
+.tab-bar-item {
+    position: relative;
+    height: 100%;
+    text-align: center;
+    display: flex;
+    flex-direction: column;
+    justify-content: center;
+    align-items: center;
+
+    &:not(:last-of-type) {
+        border-right: solid 1px rgba($color-off-black, 0.1);
+    }
+
+    &,
+    &:hover,
+    &:focus {
+        color: $color-off-white;
+    }
+
+    &::after {
+        display: block;
+        content: '';
+        position: absolute;
+        bottom: rem(5px);
+        width: 60%;
+        height: rem(1px);
+        border-radius: rem(0.5px);
+        background-color: $color-off-white;
+        opacity: 0.6;
+        transform: scaleX(0);
+        transition: transition(transform), transition(opacity);
+    }
+
+    &.active::after {
+        opacity: 1;
+        transform: scaleX(0.8);
+    }
+
+    &:not(.active) {
+        &:focus,
+        &:hover {
+            &::after {
+                transform: scaleX(0.6);
+            }
+        }
+    }
+}

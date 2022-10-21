@@ -1,0 +1,69 @@
+$tokens-actions-height: rem(26px);
+
+.tokens {
+    width: 100%;
+    height: 100%;
+
+    &__actions {
+        display: grid;
+        width: 100%;
+        grid-template-columns: 1fr 1fr 1fr;
+        height: $tokens-actions-height;
+    }
+
+    &__link {
+        &:not(.active) {
+            color: rgba($color: $color-off-white, $alpha: 60%);
+        }
+    }
+
+    &__add {
+        display: flex;
+        justify-content: center;
+        align-items: center;
+
+        > svg {
+            width: rem(10px);
+            margin-left: rem(5px);
+
+            path {
+                fill: currentColor;
+            }
+        }
+    }
+
+    &__scroll {
+        background-color: $color-bg;
+        width: 100%;
+        height: calc(100% - #{$tokens-actions-height});
+        overflow: overlay;
+    }
+}
+
+.token-list {
+    &__item {
+        display: flex;
+        width: 100%;
+        height: rem(42px);
+        border-bottom: solid rem(0.5px) $color-lines;
+        padding: 0 rem(16px) 0 rem(8px);
+        align-items: center;
+        justify-content: space-between;
+    }
+
+    &__unique-name {
+        text-align: right;
+    }
+
+    &__icon {
+        height: 60%;
+
+        .dark &--ccd path {
+            fill: $color-off-white;
+        }
+    }
+
+    &__not-owned {
+        font-size: 10px;
+    }
+}

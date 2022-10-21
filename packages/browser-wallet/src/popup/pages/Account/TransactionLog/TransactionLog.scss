@@ -53,7 +53,7 @@
     }
 
     & + & {
-        border-top-color: grey;
+        border-top-color: $color-lines;
     }
 
     &__no-transactions {

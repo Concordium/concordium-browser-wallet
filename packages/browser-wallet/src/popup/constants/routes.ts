@@ -13,8 +13,14 @@ export const relativeRoutes = {
             path: 'account',
             add: { path: 'add' },
             tokens: {
-                add: { path: 'add' },
                 path: 'tokens',
+                add: { path: 'add' },
+            },
+            ft: {
+                path: 'ft/:contractIndex/:id',
+            },
+            nft: {
+                path: 'nft/:contractIndex/:id',
             },
         },
         identities: {
