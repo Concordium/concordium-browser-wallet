@@ -1,8 +1,8 @@
-import React, { ReactNode, Suspense, useMemo } from 'react';
+import React, { ReactNode, useMemo } from 'react';
 import { useTranslation } from 'react-i18next';
 import { Outlet, Route, Routes } from 'react-router-dom';
 import { displayAsCcd, toFraction, addThousandSeparators } from 'wallet-common-helpers';
-import { Atom, useAtomValue } from 'jotai';
+import { useAtomValue } from 'jotai';
 
 import { absoluteRoutes } from '@popup/constants/routes';
 import TabBar from '@popup/shared/TabBar';
@@ -13,23 +13,21 @@ import { useSelectedCredential } from '@popup/shared/utils/account-helpers';
 import { TokenIdAndMetadata, WalletCredential } from '@shared/storage/types';
 import { contractBalancesFamily, tokensAtom } from '@popup/store/token';
 import Button from '@popup/shared/Button';
-import { ContractBalances } from '@shared/utils/token-helpers';
 
+import AtomValue from '@popup/store/AtomValue';
 import { tokensRoutes } from './routes';
 
 type BalanceProps = {
-    atom: Atom<Promise<ContractBalances>>;
-    id: string;
+    balance: bigint;
     decimals: number;
     children?(balance: bigint): ReactNode;
 };
 
-function Balance({ atom, decimals, children, id }: BalanceProps) {
-    const balances = useAtomValue(atom);
+function Balance({ balance, decimals, children }: BalanceProps) {
     const getFraction = toFraction(10 ** decimals);
     const renderBalance = children ?? ((value: bigint) => addThousandSeparators(getFraction(value)));
 
-    return <>{renderBalance(balances[id])}</>;
+    return <>{renderBalance(balance)}</>;
 }
 
 type FtProps = {
@@ -39,14 +37,12 @@ type FtProps = {
 };
 
 function Ft({ accountAddress, contractIndex: contractAddress, token }: FtProps) {
-    const balancesAtom = contractBalancesFamily(accountAddress, contractAddress);
+    const { [token.id]: balance } = useAtomValue(contractBalancesFamily(accountAddress, contractAddress));
 
     return (
         <Button clear className="token-list__item">
             <img className="token-list__icon" src={token.metadata.thumbnail?.url} alt={token.metadata.name} />
-            <Suspense fallback="0">
-                <Balance atom={balancesAtom} decimals={token.metadata.decimals ?? 0} id={token.id} />
-            </Suspense>{' '}
+            <Balance balance={balance} decimals={token.metadata.decimals ?? 0} />{' '}
             {token.metadata.symbol || token.metadata.name || ''}
         </Button>
     );
@@ -113,19 +109,11 @@ function Collectibles({ account }: ListProps) {
                     />
                     <div className="token-list__unique-name">
                         {token.metadata.name}
-                        <Suspense fallback="">
-                            <Balance
-                                atom={contractBalancesFamily(account.address, token.contractIndex)}
-                                decimals={token.metadata.decimals ?? 0}
-                                id={token.id}
-                            >
-                                {(b) =>
-                                    b === 0n && (
-                                        <div className="token-list__not-owned text-faded">{t('unownedUnique')}</div>
-                                    )
-                                }
-                            </Balance>
-                        </Suspense>{' '}
+                        <AtomValue atom={contractBalancesFamily(account.address, token.contractIndex)}>
+                            {({ [token.id]: b }) =>
+                                b === 0n && <div className="token-list__not-owned text-faded">{t('unownedUnique')}</div>
+                            }
+                        </AtomValue>
                     </div>
                 </Button>
             ))}
