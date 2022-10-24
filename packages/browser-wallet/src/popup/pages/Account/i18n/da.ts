@@ -50,6 +50,7 @@ const t: typeof en = {
         title: 'Send CCD',
         currentBalance: 'Nuværende saldo',
         unableToCoverCost: 'Utilstrækkelig antal CCD til at dække omkostninger',
+        transferInvokeFailed: 'Simulering af overførsel fejlede. Det er derfor ikke muligt at estimere omkostninger.',
         fee: 'Estimerede transaktionsomkostninger',
     },
     tokens: {

@@ -1,6 +1,6 @@
 import React, { useEffect, useMemo, useState } from 'react';
 import { useTranslation } from 'react-i18next';
-import { useAtom, useAtomValue } from 'jotai';
+import { useAtom, useAtomValue, useSetAtom } from 'jotai';
 import { AccountTokens, contractBalancesFamily, Tokens, tokensAtom } from '@popup/store/token';
 import { selectedAccountAtom } from '@popup/store/account';
 import Form from '@popup/shared/Form';
@@ -29,6 +29,7 @@ import { useSelectedCredential } from '@popup/shared/utils/account-helpers';
 import { CCD_METADATA, getTokenTransferEnergy, TokenIdentifier } from '@shared/utils/token-helpers';
 import { jsonRpcClientAtom } from '@popup/store/settings';
 import clsx from 'clsx';
+import { addToastAtom } from '@popup/state';
 import { routes } from './routes';
 import DisplayToken from './DisplayToken';
 import PickToken from './PickToken';
@@ -82,6 +83,7 @@ function CreateTransaction({ exchangeRate, tokens, setCost, setDetailsExpanded }
     const recipient = form.watch('recipient');
     const tokenMetadata = useMemo(() => chosenToken?.metadata || CCD_METADATA, [chosenToken?.metadata]);
     const [pickingToken, setPickingToken] = useState<boolean>(false);
+    const addToast = useSetAtom(addToastAtom);
 
     if (!address || !selectedCred) {
         throw new Error('Missing selected accoount');
@@ -106,6 +108,7 @@ function CreateTransaction({ exchangeRate, tokens, setCost, setDetailsExpanded }
                     form.setValue('executionEnergy', energy.execution.toString());
                     return energy.total;
                 } catch {
+                    addToast(t('sendCcd.transferInvokeFailed'));
                     return undefined;
                 }
             }
