@@ -45,11 +45,13 @@
     }
 
     &__image {
-        display: block;
+        width: 100%;
+        display: flex;
+        justify-content: center;
         margin: rem(10px) 0;
         border-top: 1px solid $color-lines;
         border-bottom: 1px solid $color-lines;
-        padding: rem(15px) rem(40px) rem(15px);
+        padding: rem(15px) 0;
     }
 
     &__remove {

@@ -103,7 +103,9 @@ function Nft({ token, balance }: TokenProps) {
             </TokenDetailsLine>
             <TokenDetailsLine header={t('tokenId')}>{token.id}</TokenDetailsLine>
             <ShowRawMetadata metadata={token.metadata} />
-            <img className="token-details__image" src={display?.url} alt={name} />
+            <div className="token-details__image">
+                <img src={display?.url} alt={name} />
+            </div>
         </>
     );
 }
