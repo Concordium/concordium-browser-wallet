@@ -75,6 +75,7 @@ const t: typeof en = {
             decimals: 'Decimaler',
             contractIndex: 'Kontrakt indeks, subindeks',
             removeToken: 'Vis ikke token i wallet',
+            showRawMetadata: 'Vis rå metadata',
             removePrompt: {
                 header: 'Skjul {{ name }} i din wallet',
                 text: 'Er du sikker på at du vil skjule denne token i din wallet? Du kan altid tilføje den igen fra tokenlisten',

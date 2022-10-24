@@ -11,6 +11,7 @@ import { absoluteRoutes } from '@popup/constants/routes';
 import AtomValue from '@popup/store/AtomValue';
 import Modal from '@popup/shared/Modal';
 import ButtonGroup from '@popup/shared/ButtonGroup';
+import { TokenMetadata } from '@shared/storage/types';
 import TokenBalance from '../TokenBalance';
 import { defaultCis2TokenId } from '../routes';
 import { TokenDetails, useFlattenedAccountTokens } from '../utils';
@@ -32,6 +33,36 @@ function TokenDetailsLine({ header, children }: TokenDetailsLineProps) {
             <div className="token-details__line-header">{header}</div>
             <div>{children}</div>
         </div>
+    );
+}
+
+type ShowRawMetadataProps = {
+    metadata: TokenMetadata;
+};
+
+function ShowRawMetadata({ metadata }: ShowRawMetadataProps) {
+    const { t } = useTranslation('account', { keyPrefix: 'tokens.details' });
+    const [showPrompt, setShowPrompt] = useState(false);
+
+    const trigger = (
+        <Button clear className="token-details__show-raw">
+            {t('showRawMetadata')}
+        </Button>
+    );
+
+    return (
+        <Modal
+            trigger={trigger}
+            open={showPrompt}
+            onOpen={() => setShowPrompt(true)}
+            onClose={() => setShowPrompt(false)}
+        >
+            <div className="token-details__raw">
+                {Object.entries(metadata).map(([k, v]) => (
+                    <TokenDetailsLine header={k}>{JSON.stringify(v)}</TokenDetailsLine>
+                ))}
+            </div>
+        </Modal>
     );
 }
 
@@ -58,6 +89,7 @@ function Nft({ token, balance }: TokenProps) {
                 {token.contractIndex}, {SUB_INDEX}
             </TokenDetailsLine>
             <TokenDetailsLine header={t('tokenId')}>{token.id}</TokenDetailsLine>
+            <ShowRawMetadata metadata={token.metadata} />
             <img className="token-details__image" src={display?.url} alt={name} />
         </>
     );
@@ -83,6 +115,7 @@ function Ft({ token, balance }: TokenProps) {
                 {token.contractIndex}, {SUB_INDEX}
             </TokenDetailsLine>
             <TokenDetailsLine header={t('tokenId')}>{token.id}</TokenDetailsLine>
+            <ShowRawMetadata metadata={token.metadata} />
         </>
     );
 }

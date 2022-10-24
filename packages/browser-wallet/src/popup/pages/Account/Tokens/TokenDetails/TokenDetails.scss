@@ -56,4 +56,14 @@
         color: $color-danger;
         font-weight: $font-weight-bold;
     }
+
+    &__show-raw {
+        color: $color-cta;
+        margin-top: rem(10px);
+    }
+
+    &__raw {
+        text-align: left;
+        word-break: break-word;
+    }
 }
