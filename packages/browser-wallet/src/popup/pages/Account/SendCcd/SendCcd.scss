@@ -1,4 +1,4 @@
-$horizontal-spacing: rem(5px);
+$horizontal-spacing: rem(10px);
 $error-spacing: rem(13.286px);
 
 .send-ccd {
@@ -27,7 +27,7 @@ $error-spacing: rem(13.286px);
     }
 
     &__token-picker {
-        margin-top: rem(5px);
+        margin-top: $horizontal-spacing;
     }
 
     &__pick-token {
@@ -53,20 +53,14 @@ $error-spacing: rem(13.286px);
             color: $color-text-faded;
             font-size: rem(8px);
         }
-    }
 
-    &__cost-error {
-        margin-bottom: 0;
+        &--error {
+            margin-bottom: 0;
 
-        > p {
-            color: $color-error;
+            > p {
+                color: $color-error;
+            }
         }
-    }
-
-    &__current-balance {
-        margin-top: 0;
-        margin-bottom: $horizontal-spacing;
-        text-align: center;
     }
 
     &__token-display-container {

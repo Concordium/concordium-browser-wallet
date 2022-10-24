@@ -29,7 +29,6 @@ import { useSelectedCredential } from '@popup/shared/utils/account-helpers';
 import { CCD_METADATA, getTokenBalance, getTokenTransferEnergy, TokenIdentifier } from '@shared/utils/token-helpers';
 import { jsonRpcClientAtom } from '@popup/store/settings';
 import { addToastAtom } from '@popup/state';
-import ErrorMessage from '@popup/shared/Form/ErrorMessage';
 import clsx from 'clsx';
 import { routes } from './routes';
 import DisplayToken from './DisplayToken';
@@ -245,13 +244,11 @@ function CreateTransaction({ exchangeRate, tokens, setCost }: Props & { tokens: 
                             validate: validateAccountAddress as Validate<unknown>,
                         }}
                     />
-                    <div className={clsx('create-transfer__cost', !canCoverCost && 'create-transfer__cost-error')}>
+                    <div className={clsx('create-transfer__cost', !canCoverCost && 'create-transfer__cost--error')}>
                         <p>
                             {t('sendCcd.fee')}: {cost ? displayAsCcd(cost) : t('unknown')}
                         </p>
-                        {!canCoverCost && (
-                            <ErrorMessage className="form-input__error">{t('sendCcd.unableToCoverCost')}</ErrorMessage>
-                        )}
+                        {!canCoverCost && <p className="m-0">{t('sendCcd.unableToCoverCost')}</p>}
                     </div>
                     <Submit className="create-transfer__button" width="medium">
                         {t('sendCcd.buttons.continue')}
