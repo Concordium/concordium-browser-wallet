@@ -142,9 +142,14 @@ function CreateTransaction({ exchangeRate, tokens, setCost, setDetailsExpanded }
     }, [Boolean(chosenToken), currentBalance, cost]);
 
     useEffect(() => {
-        // Reset chosen token if the current account is changed
-        // TODO: change only if new account does not have chosen token/reset to initial token.
-        return () => form.setValue('token', undefined);
+        // Reset chosen token if the current account is changed and the new account does not have the chosen token.
+        if (
+            chosenToken &&
+            (!accountTokens ||
+                !accountTokens[chosenToken.contractIndex]?.some((token) => token.id === chosenToken.tokenId))
+        ) {
+            form.setValue('token', undefined);
+        }
     }, [address]);
 
     useEffect(() => {
