@@ -45,15 +45,27 @@
     }
 
     &__image {
-        display: block;
+        width: 100%;
+        display: flex;
+        justify-content: center;
         margin: rem(10px) 0;
         border-top: 1px solid $color-lines;
         border-bottom: 1px solid $color-lines;
-        padding: rem(15px) rem(40px) rem(15px);
+        padding: rem(15px) 0;
     }
 
     &__remove {
         color: $color-danger;
         font-weight: $font-weight-bold;
+    }
+
+    &__show-raw {
+        color: $color-cta;
+        margin-top: rem(10px);
+    }
+
+    &__raw {
+        text-align: left;
+        word-break: break-word;
     }
 }

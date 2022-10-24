@@ -75,6 +75,7 @@ const t = {
             decimals: 'Decimals',
             contractIndex: 'Contract index, subindex',
             removeToken: "Don't show token in wallet",
+            showRawMetadata: 'Show raw metadata',
             removePrompt: {
                 header: 'Hide {{ name }} in your wallet',
                 text: 'Are you sure you want hide this token in your wallet? You can always add it again from the tokens list.',

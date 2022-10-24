@@ -11,9 +11,10 @@ import { absoluteRoutes } from '@popup/constants/routes';
 import AtomValue from '@popup/store/AtomValue';
 import Modal from '@popup/shared/Modal';
 import ButtonGroup from '@popup/shared/ButtonGroup';
+import { TokenMetadata } from '@shared/storage/types';
 import TokenBalance from '../TokenBalance';
 import { defaultCis2TokenId } from '../routes';
-import { TokenDetails, useTokens } from '../utils';
+import { TokenDetails, useFlattenedAccountTokens } from '../utils';
 
 const SUB_INDEX = 0;
 
@@ -35,13 +36,43 @@ function TokenDetailsLine({ header, children }: TokenDetailsLineProps) {
     );
 }
 
+type ShowRawMetadataProps = {
+    metadata: TokenMetadata;
+};
+
+function ShowRawMetadata({ metadata }: ShowRawMetadataProps) {
+    const { t } = useTranslation('account', { keyPrefix: 'tokens.details' });
+    const [showPrompt, setShowPrompt] = useState(false);
+
+    const trigger = (
+        <Button clear className="token-details__show-raw">
+            {t('showRawMetadata')}
+        </Button>
+    );
+
+    return (
+        <Modal
+            trigger={trigger}
+            open={showPrompt}
+            onOpen={() => setShowPrompt(true)}
+            onClose={() => setShowPrompt(false)}
+        >
+            <div className="token-details__raw">
+                {Object.entries(metadata).map(([k, v]) => (
+                    <TokenDetailsLine header={k}>{JSON.stringify(v)}</TokenDetailsLine>
+                ))}
+            </div>
+        </Modal>
+    );
+}
+
 type TokenProps = {
     token: TokenDetails;
     balance: bigint;
 };
 
 function Nft({ token, balance }: TokenProps) {
-    const { thumbnail, name, description, display } = token.metadata;
+    const { thumbnail, name, description, display, decimals = 0 } = token.metadata;
     const { t } = useTranslation('account', { keyPrefix: 'tokens' });
 
     return (
@@ -51,14 +82,30 @@ function Nft({ token, balance }: TokenProps) {
                 {name}
             </h3>
             <TokenDetailsLine header={t('details.ownership')}>
-                <span className="text-bold">{balance === 0n ? t('unownedUnique') : t('ownedUnique')}</span>
+                <span className="text-bold">{balance === 0n && t('unownedUnique')}</span>
+                <span className="text-bold">
+                    {balance === 0n || (
+                        <>
+                            {t('ownedUnique')}
+                            {balance !== 1n && decimals === 0 && (
+                                <>
+                                    {' '}
+                                    (<TokenBalance balance={balance} decimals={decimals} />)
+                                </>
+                            )}
+                        </>
+                    )}
+                </span>
             </TokenDetailsLine>
             <TokenDetailsLine header={t('details.description')}>{description}</TokenDetailsLine>
             <TokenDetailsLine header={t('details.contractIndex')}>
                 {token.contractIndex}, {SUB_INDEX}
             </TokenDetailsLine>
             <TokenDetailsLine header={t('tokenId')}>{token.id}</TokenDetailsLine>
-            <img className="token-details__image" src={display?.url} alt={name} />
+            <ShowRawMetadata metadata={token.metadata} />
+            <div className="token-details__image">
+                <img src={display?.url} alt={name} />
+            </div>
         </>
     );
 }
@@ -83,6 +130,7 @@ function Ft({ token, balance }: TokenProps) {
                 {token.contractIndex}, {SUB_INDEX}
             </TokenDetailsLine>
             <TokenDetailsLine header={t('tokenId')}>{token.id}</TokenDetailsLine>
+            <ShowRawMetadata metadata={token.metadata} />
         </>
     );
 }
@@ -146,7 +194,7 @@ function useTokenDetails(): TokenDetails | undefined {
     const account = useSelectedCredential();
     const { contractIndex, id } = useParams<TokenDetailsRouteParams>();
     const tokenId = useMemo(() => (id === defaultCis2TokenId ? '' : id), [id]);
-    const tokens = useTokens(account);
+    const tokens = useFlattenedAccountTokens(account);
 
     return tokens.find((t) => t.contractIndex === contractIndex && t.id === tokenId);
 }
