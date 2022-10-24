@@ -50,6 +50,7 @@ export type ModalProps<T extends WithOnClick = WithOnClick> = {
     error?: boolean;
     onOpen?(): void;
     onClose?(): void;
+    bottom?: boolean;
 };
 
 /**
@@ -68,6 +69,7 @@ export default function Modal<T extends WithOnClick = WithOnClick>({
     error = false,
     onOpen = noOp,
     onClose = noOp,
+    bottom = false,
     children,
 }: PropsWithChildren<ModalProps<T>>): JSX.Element | null {
     const [{ isOpen, isExiting }, setOpenState] = useState<OpenState>({ isOpen: false, isExiting: false });
@@ -136,7 +138,7 @@ export default function Modal<T extends WithOnClick = WithOnClick>({
         <>
             {triggerWithOpen}
             {isOpen && (
-                <Portal className="modal">
+                <Portal className={clsx('modal', bottom && 'modal--align-bottom')}>
                     <AnimatePresence onExitComplete={handleExitComplete}>
                         {!isExiting && (
                             <DetectClickOutside

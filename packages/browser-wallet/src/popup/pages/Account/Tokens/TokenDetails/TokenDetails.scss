@@ -1,0 +1,59 @@
+.token-details {
+    display: flex;
+    flex-direction: column;
+    justify-content: space-between;
+    align-items: center;
+    width: 100%;
+    background-color: $color-bg;
+    padding: rem(10px);
+    position: relative;
+    overflow: overlay; // Not having this makes the box only as big as it's parent container. Ideally, this would grow as big as its content
+    min-height: 100%;
+
+    &__content {
+        width: 100%;
+    }
+
+    &__close {
+        position: absolute;
+        top: rem(10px);
+        right: rem(8px);
+    }
+
+    &__header {
+        display: flex;
+        align-items: center;
+        margin-top: 0;
+        padding-right: rem(20px);
+
+        img {
+            max-height: rem(20px);
+            margin-right: rem(5px);
+        }
+    }
+
+    &__line {
+        & + & {
+            margin-top: rem(10px);
+        }
+    }
+
+    &__line-header {
+        font-size: 12px;
+        color: $color-text-faded;
+        margin-bottom: rem(2px);
+    }
+
+    &__image {
+        display: block;
+        margin: rem(10px) 0;
+        border-top: 1px solid $color-lines;
+        border-bottom: 1px solid $color-lines;
+        padding: rem(15px) rem(40px) rem(15px);
+    }
+
+    &__remove {
+        color: $color-danger;
+        font-weight: $font-weight-bold;
+    }
+}

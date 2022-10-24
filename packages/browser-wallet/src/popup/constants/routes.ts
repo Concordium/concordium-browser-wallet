@@ -16,12 +16,6 @@ export const relativeRoutes = {
                 path: 'tokens',
                 add: { path: 'add' },
             },
-            ft: {
-                path: 'ft/:contractIndex/:id',
-            },
-            nft: {
-                path: 'nft/:contractIndex/:id',
-            },
         },
         identities: {
             path: 'identities',

@@ -1,8 +1,7 @@
-import React, { ReactNode, useMemo } from 'react';
+import React from 'react';
 import { useTranslation } from 'react-i18next';
-import { Outlet, Route, Routes } from 'react-router-dom';
-import { displayAsCcd, toFraction, addThousandSeparators } from 'wallet-common-helpers';
-import { useAtomValue } from 'jotai';
+import { Outlet, Route, Routes, useNavigate } from 'react-router-dom';
+import { displayAsCcd } from 'wallet-common-helpers';
 
 import { absoluteRoutes } from '@popup/constants/routes';
 import TabBar from '@popup/shared/TabBar';
@@ -14,63 +13,45 @@ import { TokenIdAndMetadata, WalletCredential } from '@shared/storage/types';
 import { contractBalancesFamily, tokensAtom } from '@popup/store/token';
 import Button from '@popup/shared/Button';
 
+import { useAtomValue } from 'jotai';
 import AtomValue from '@popup/store/AtomValue';
-import { tokensRoutes } from './routes';
-
-type BalanceProps = {
-    balance: bigint;
-    decimals: number;
-    children?(balance: bigint): ReactNode;
-};
-
-function Balance({ balance, decimals, children }: BalanceProps) {
-    const getFraction = toFraction(10 ** decimals);
-    const renderBalance = children ?? ((value: bigint) => addThousandSeparators(getFraction(value)));
-
-    return <>{renderBalance(balance)}</>;
-}
+import { tokensRoutes, detailsRoute } from './routes';
+import TokenDetails from './TokenDetails';
+import { useTokens } from './utils';
+import TokenBalance from './TokenBalance';
 
 type FtProps = {
     accountAddress: string;
     contractIndex: string;
     token: TokenIdAndMetadata;
+    onClick(): void;
 };
 
-function Ft({ accountAddress, contractIndex: contractAddress, token }: FtProps) {
+function Ft({ accountAddress, contractIndex: contractAddress, token, onClick }: FtProps) {
     const { [token.id]: balance } = useAtomValue(contractBalancesFamily(accountAddress, contractAddress));
 
     return (
-        <Button clear className="token-list__item">
+        <Button clear className="token-list__item" onClick={onClick}>
             <img className="token-list__icon" src={token.metadata.thumbnail?.url} alt={token.metadata.name} />
-            <Balance balance={balance} decimals={token.metadata.decimals ?? 0} />{' '}
+            <TokenBalance balance={balance} decimals={token.metadata.decimals ?? 0} />{' '}
             {token.metadata.symbol || token.metadata.name || ''}
         </Button>
     );
 }
 
-function useTokens(account: WalletCredential, unique: boolean) {
-    const {
-        loading,
-        value: { [account.address]: tokens },
-    } = useAtomValue(tokensAtom);
-    const items = useMemo(
-        () =>
-            loading || tokens === undefined
-                ? []
-                : Object.entries(tokens).flatMap(([contractIndex, ts]) => ts.map((t) => ({ contractIndex, ...t }))),
-        [tokens, loading]
-    );
-
-    return items.filter((t) => (t.metadata.unique ?? false) === unique);
+function useFilteredTokens(account: WalletCredential, unique: boolean) {
+    const tokens = useTokens(account);
+    return tokens.filter((t) => (t.metadata.unique ?? false) === unique);
 }
 
 type ListProps = {
     account: WalletCredential;
+    toDetails: (contractIndex: string, id: string) => void;
 };
 
-function Fungibles({ account }: ListProps) {
+function Fungibles({ account, toDetails }: ListProps) {
     const accountInfo = useAccountInfo(account);
-    const tokens = useTokens(account, false);
+    const tokens = useFilteredTokens(account, false);
 
     if (accountInfo === undefined) {
         return null;
@@ -78,30 +59,36 @@ function Fungibles({ account }: ListProps) {
 
     return (
         <>
-            <Button clear className="token-list__item">
+            <div className="token-list__item">
                 <CcdIcon className="token-list__icon token-list__icon--ccd" />
                 <div className="token-list__balance">{displayAsCcd(accountInfo.accountAmount)} CCD</div>
-            </Button>
+            </div>
             {tokens.map((t) => (
                 <Ft
                     key={`${t.contractIndex}.${t.id}`}
                     accountAddress={account.address}
                     contractIndex={t.contractIndex}
                     token={t}
+                    onClick={() => toDetails(t.contractIndex, t.id)}
                 />
             ))}
         </>
     );
 }
 
-function Collectibles({ account }: ListProps) {
-    const tokens = useTokens(account, true);
+function Collectibles({ account, toDetails }: ListProps) {
+    const tokens = useFilteredTokens(account, true);
     const { t } = useTranslation('account', { keyPrefix: 'tokens' });
 
     return (
         <>
             {tokens.map((token) => (
-                <Button clear key={`${token.contractIndex}.${token.id}`} className="token-list__item">
+                <Button
+                    clear
+                    key={`${token.contractIndex}.${token.id}`}
+                    onClick={() => toDetails(token.contractIndex, token.id)}
+                    className="token-list__item"
+                >
                     <img
                         className="token-list__icon"
                         src={token.metadata.thumbnail?.url ?? ''}
@@ -121,7 +108,7 @@ function Collectibles({ account }: ListProps) {
     );
 }
 
-function TokensOverview() {
+function Tokens() {
     const { t } = useTranslation('account', { keyPrefix: 'tokens.tabBar' });
     return (
         <div className="tokens">
@@ -146,19 +133,32 @@ function TokensOverview() {
     );
 }
 
-export default function Main() {
+type Props = {
+    setDetailsExpanded(expanded: boolean): void;
+};
+
+export default function TokensRoutes({ setDetailsExpanded }: Props) {
     const account = useSelectedCredential();
+    const nav = useNavigate();
     useAtomValue(tokensAtom); // Ensure tokens are kept in memory
 
     if (account === undefined) {
         return null;
     }
 
+    const goToDetails = (contractIndex: string, id: string) => {
+        nav(detailsRoute(contractIndex, id));
+    };
+
     return (
         <Routes>
-            <Route element={<TokensOverview />}>
-                <Route index element={<Fungibles account={account} />} />
-                <Route path={tokensRoutes.collectibles} element={<Collectibles account={account} />} />
+            <Route path={tokensRoutes.details} element={<TokenDetails setDetailsExpanded={setDetailsExpanded} />} />
+            <Route element={<Tokens />}>
+                <Route index element={<Fungibles account={account} toDetails={goToDetails} />} />
+                <Route
+                    path={tokensRoutes.collectibles}
+                    element={<Collectibles account={account} toDetails={goToDetails} />}
+                />
             </Route>
         </Routes>
     );
