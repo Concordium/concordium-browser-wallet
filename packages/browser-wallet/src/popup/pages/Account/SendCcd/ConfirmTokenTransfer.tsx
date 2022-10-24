@@ -40,7 +40,7 @@ export default function ConfirmTokenTransfer({ setDetailsExpanded, cost }: Props
             return undefined;
         }
         try {
-            return getTokenTransferPayload(parameters, contractName, executionEnergy, BigInt(contractIndex));
+            return getTokenTransferPayload(parameters, contractName, BigInt(executionEnergy), BigInt(contractIndex));
         } catch (e) {
             addToast((e as Error).message);
         }
@@ -56,6 +56,7 @@ export default function ConfirmTokenTransfer({ setDetailsExpanded, cost }: Props
             setDetailsExpanded={setDetailsExpanded}
             cost={cost}
             payload={payload}
+            parameters={parameters}
             returnState={state}
             transactionType={AccountTransactionType.UpdateSmartContractInstance}
         />
