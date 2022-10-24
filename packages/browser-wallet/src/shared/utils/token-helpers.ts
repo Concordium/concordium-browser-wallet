@@ -218,39 +218,6 @@ export const CCD_METADATA: TokenMetadata = {
     },
 };
 
-export async function getTokenBalance(client: JsonRpcClient, account: string, token: TokenIdentifier) {
-    const parameters = [
-        {
-            address: { Account: [account] },
-            token_id: token.tokenId,
-        },
-    ];
-
-    const parameter = serializeUpdateContractParameters(
-        CIS2_SCHEMA_CONTRACT_NAME,
-        'balanceOf',
-        parameters,
-        Buffer.from(CIS2_SCHEMA, 'base64'),
-        1
-    );
-
-    const contractAddress = { index: BigInt(token.contractIndex), subindex: 0n };
-    const instanceInfo = await client.getInstanceInfo(contractAddress);
-    if (!instanceInfo) {
-        throw new Error(`Unable to get info on contract`);
-    }
-    const contractName = instanceInfo.name.substring(5);
-    const res = await client.invokeContract({
-        contract: contractAddress,
-        parameter,
-        method: `${contractName}.balanceOf`,
-    });
-    if (!res || res.tag === 'failure' || !res.returnValue) {
-        throw new Error(`Expected succesful invocation`);
-    }
-    return BigInt(uleb128.decode(Buffer.from(res.returnValue.substring(4), 'hex'))[0]);
-}
-
 export function getTokenTransferParameters(
     from: string,
     to: string,

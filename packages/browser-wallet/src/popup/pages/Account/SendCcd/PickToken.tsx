@@ -1,9 +1,8 @@
+import React from 'react';
 import { AccountTokens, contractBalancesFamily } from '@popup/store/token';
 import { TokenIdAndMetadata } from '@shared/storage/types';
-import { CCD_METADATA, ContractBalances, TokenIdentifier } from '@shared/utils/token-helpers';
-import { atom, Atom } from 'jotai';
-import { selectAtom } from 'jotai/utils';
-import React, { Suspense } from 'react';
+import { CCD_METADATA, TokenIdentifier } from '@shared/utils/token-helpers';
+import { useAtomValue } from 'jotai';
 import DisplayToken from './DisplayToken';
 
 interface Props {
@@ -13,13 +12,14 @@ interface Props {
     address: string;
 }
 
-interface CollectionProps extends Pick<Props, 'onClick'> {
-    balanceAtom: Atom<ContractBalances>;
+interface CollectionProps extends Pick<Props, 'onClick' | 'address'> {
     tokens: TokenIdAndMetadata[];
     contractIndex: string;
 }
 
-function Collection({ balanceAtom, onClick, tokens, contractIndex }: CollectionProps) {
+function Collection({ onClick, tokens, contractIndex, address }: CollectionProps) {
+    const balances = useAtomValue(contractBalancesFamily(address, contractIndex));
+
     return (
         <>
             {tokens.map((token) => (
@@ -27,7 +27,7 @@ function Collection({ balanceAtom, onClick, tokens, contractIndex }: CollectionP
                     className="create-transfer__pick-token-element"
                     key={token.id}
                     metadata={token.metadata}
-                    balanceAtom={selectAtom(balanceAtom, (balances) => balances[token.id])}
+                    balance={balances[token.id]}
                     onClick={() => onClick({ contractIndex, tokenId: token.id, metadata: token.metadata })}
                 />
             ))}
@@ -42,20 +42,16 @@ export default function PickToken({ onClick, tokens, ccdBalance, address }: Prop
                 className="create-transfer__pick-token-element"
                 metadata={CCD_METADATA}
                 onClick={() => onClick(undefined)}
-                balanceAtom={atom(() => ccdBalance)}
+                balance={ccdBalance}
             />
             {Object.entries(tokens || []).map(([contractIndex, collectionTokens]) => (
-                <Suspense fallback="">
-                    <Collection
-                        key={contractIndex}
-                        {...{
-                            balanceAtom: contractBalancesFamily(address, contractIndex),
-                            contractIndex,
-                            tokens: collectionTokens,
-                            onClick,
-                        }}
-                    />
-                </Suspense>
+                <Collection
+                    key={contractIndex}
+                    address={address}
+                    contractIndex={contractIndex}
+                    tokens={collectionTokens}
+                    onClick={onClick}
+                />
             ))}
         </div>
     );

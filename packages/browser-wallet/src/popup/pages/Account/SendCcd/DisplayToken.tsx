@@ -1,44 +1,23 @@
-import React, { Suspense } from 'react';
+import React from 'react';
 import clsx from 'clsx';
 import Button from '@popup/shared/Button';
 import { TokenMetadata } from '@shared/storage/types';
-import { integerToFractional } from 'wallet-common-helpers';
-import { Atom, useAtomValue } from 'jotai';
+import TokenBalance from '../Tokens/TokenBalance';
 
 interface ChooseTokenProps {
-    balanceAtom: Atom<bigint>;
+    balance: bigint;
     metadata: TokenMetadata;
     onClick: () => void;
     disabled?: boolean;
     className?: string;
 }
 
-interface BalanceProps extends Pick<ChooseTokenProps, 'balanceAtom'> {
-    symbol: string | undefined;
-    display: (amount: bigint) => string | undefined;
-}
-
-function Balance({ balanceAtom, display, symbol }: BalanceProps) {
-    const balance = useAtomValue(balanceAtom);
-
-    return (
-        <p className="m-0">
-            {display(balance) || '0'}
-            {symbol}
-        </p>
-    );
-}
-
-export default function DisplayToken({ metadata, balanceAtom, className, ...props }: ChooseTokenProps) {
-    const displayAmount = integerToFractional(metadata.decimals || 0);
-
+export default function DisplayToken({ metadata, balance, className, ...props }: ChooseTokenProps) {
     return (
         <Button className={clsx('display-token', className)} clear {...props}>
             <div className="create-transfer__token-display-container">
                 <img alt={metadata.name} className="create-transfer__token-display" src={metadata.display?.url} />
-                <Suspense fallback="">
-                    <Balance balanceAtom={balanceAtom} symbol={metadata.symbol} display={displayAmount} />
-                </Suspense>
+                <TokenBalance decimals={metadata.decimals || 0} symbol={metadata.symbol} balance={balance} />
             </div>
         </Button>
     );

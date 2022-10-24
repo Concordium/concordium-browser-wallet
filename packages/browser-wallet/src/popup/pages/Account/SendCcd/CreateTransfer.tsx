@@ -1,10 +1,10 @@
 import React, { useEffect, useMemo, useState } from 'react';
 import { useTranslation } from 'react-i18next';
-import { atom, useAtomValue, useSetAtom } from 'jotai';
-import { AccountTokens, Tokens, tokensAtom } from '@popup/store/token';
+import { useAtom, useAtomValue } from 'jotai';
+import { AccountTokens, contractBalancesFamily, Tokens, tokensAtom } from '@popup/store/token';
 import { selectedAccountAtom } from '@popup/store/account';
 import Form from '@popup/shared/Form';
-import AmountInput from '@popup/shared/Form/CcdInput';
+import AmountInput from '@popup/shared/Form/AmountInput';
 import Input from '@popup/shared/Form/Input';
 import {
     ccdToMicroCcd,
@@ -26,9 +26,8 @@ import {
 import { useLocation, useNavigate } from 'react-router-dom';
 import { useAccountInfo } from '@popup/shared/AccountInfoListenerContext';
 import { useSelectedCredential } from '@popup/shared/utils/account-helpers';
-import { CCD_METADATA, getTokenBalance, getTokenTransferEnergy, TokenIdentifier } from '@shared/utils/token-helpers';
+import { CCD_METADATA, getTokenTransferEnergy, TokenIdentifier } from '@shared/utils/token-helpers';
 import { jsonRpcClientAtom } from '@popup/store/settings';
-import { addToastAtom } from '@popup/state';
 import clsx from 'clsx';
 import { routes } from './routes';
 import DisplayToken from './DisplayToken';
@@ -82,11 +81,12 @@ function CreateTransaction({ exchangeRate, tokens, setCost }: Props & { tokens: 
     const recipient = form.watch('recipient');
     const tokenMetadata = useMemo(() => chosenToken?.metadata || CCD_METADATA, [chosenToken?.metadata]);
     const [pickingToken, setPickingToken] = useState<boolean>(false);
-    const addToast = useSetAtom(addToastAtom);
 
     if (!address || !selectedCred) {
         throw new Error('Missing selected accoount');
     }
+
+    const [contractBalances] = useAtom(contractBalancesFamily(address, chosenToken?.contractIndex || ''));
 
     const fee = useAsyncMemo(
         async () => {
@@ -123,18 +123,12 @@ function CreateTransaction({ exchangeRate, tokens, setCost }: Props & { tokens: 
     const accountInfo = useAccountInfo(selectedCred);
 
     const ccdBalance = getPublicAccountAmounts(accountInfo).atDisposal;
-    const currentBalance = useAsyncMemo(
-        () => {
-            if (!chosenToken) {
-                return Promise.resolve(ccdBalance);
-            }
-            return getTokenBalance(client, address, chosenToken);
-        },
-        (e) => {
-            addToast(e.message);
-        },
-        [chosenToken, accountInfo?.accountAmount]
-    );
+    const currentBalance = useMemo(() => {
+        if (!chosenToken) {
+            return ccdBalance;
+        }
+        return contractBalances[chosenToken.tokenId];
+    }, [chosenToken, ccdBalance]);
 
     const validateAmount: Validate<string> = (amount) =>
         validateTransferAmount(amount, currentBalance, tokenMetadata.decimals, chosenToken ? 0n : cost);
@@ -216,7 +210,7 @@ function CreateTransaction({ exchangeRate, tokens, setCost }: Props & { tokens: 
                     <div className={clsx('create-transfer__token-picker')}>
                         <DisplayToken
                             metadata={tokenMetadata}
-                            balanceAtom={atom(() => currentBalance || 0n)}
+                            balance={currentBalance}
                             disabled={!accountTokens}
                             onClick={() => setPickingToken(true)}
                             className="w-full"
@@ -259,7 +253,7 @@ function CreateTransaction({ exchangeRate, tokens, setCost }: Props & { tokens: 
     );
 }
 
-export default function loadingTokensGuard({ ...props }: Props) {
+export default function LoadingTokensGuard({ ...props }: Props) {
     const tokens = useAtomValue(tokensAtom);
     if (tokens.loading) {
         return null;
