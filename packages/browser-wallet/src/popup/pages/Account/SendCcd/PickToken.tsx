@@ -1,8 +1,9 @@
-import React from 'react';
+import React, { useEffect } from 'react';
 import { AccountTokens, contractBalancesFamily } from '@popup/store/token';
 import { TokenIdAndMetadata } from '@shared/storage/types';
 import { CCD_METADATA, TokenIdentifier } from '@shared/utils/token-helpers';
 import { useAtomValue } from 'jotai';
+import { noOp } from 'wallet-common-helpers';
 import DisplayToken from './DisplayToken';
 
 interface Props {
@@ -10,6 +11,7 @@ interface Props {
     tokens?: AccountTokens;
     ccdBalance: bigint;
     address: string;
+    setDetailsExpanded: (expanded: boolean) => void;
 }
 
 interface CollectionProps extends Pick<Props, 'onClick' | 'address'> {
@@ -35,7 +37,15 @@ function Collection({ onClick, tokens, contractIndex, address }: CollectionProps
     );
 }
 
-export default function PickToken({ onClick, tokens, ccdBalance, address }: Props) {
+export default function PickToken({ onClick, tokens, ccdBalance, address, setDetailsExpanded }: Props) {
+    useEffect(() => {
+        if (Object.values(tokens || []).reduce((tokenCount, collection) => collection.length + tokenCount, 0) > 3) {
+            setDetailsExpanded(false);
+            return () => setDetailsExpanded(true);
+        }
+        return noOp;
+    }, []);
+
     return (
         <div className="create-transfer__pick-token">
             <DisplayToken

@@ -44,6 +44,7 @@ export type FormValues = {
 interface Props {
     exchangeRate?: number;
     setCost: (cost: bigint) => void;
+    setDetailsExpanded: (expanded: boolean) => void;
 }
 
 type State = undefined | (SimpleTransferPayload & Partial<TokenIdentifier>);
@@ -65,7 +66,7 @@ function createDefaultValues(defaultPayload: State, accountTokens?: AccountToken
     };
 }
 
-function CreateTransaction({ exchangeRate, tokens, setCost }: Props & { tokens: Tokens }) {
+function CreateTransaction({ exchangeRate, tokens, setCost, setDetailsExpanded }: Props & { tokens: Tokens }) {
     const { t } = useTranslation('account');
     const { t: tShared } = useTranslation('shared');
     const { state } = useLocation();
@@ -194,6 +195,7 @@ function CreateTransaction({ exchangeRate, tokens, setCost }: Props & { tokens: 
                     form.setValue('token', chosen);
                 }}
                 ccdBalance={ccdBalance}
+                setDetailsExpanded={setDetailsExpanded}
             />
         );
     }

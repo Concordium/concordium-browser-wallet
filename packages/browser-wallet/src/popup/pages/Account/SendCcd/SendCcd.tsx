@@ -25,7 +25,16 @@ export default function SendCcd({ setDetailsExpanded }: Props) {
                 path={routes.confirmToken}
                 element={<ConfirmTokenTransfer setDetailsExpanded={setDetailsExpanded} cost={cost} />}
             />
-            <Route index element={<CreateTransfer exchangeRate={exchangeRate} setCost={setCost} />} />
+            <Route
+                index
+                element={
+                    <CreateTransfer
+                        exchangeRate={exchangeRate}
+                        setCost={setCost}
+                        setDetailsExpanded={setDetailsExpanded}
+                    />
+                }
+            />
         </Routes>
     );
 }
