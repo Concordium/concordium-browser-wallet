@@ -3,7 +3,7 @@
  */
 export const accountRoutes = {
     tokens: 'tokens',
-    tokenDetails: 'tokens/:contractInded/:tokenIndex',
+    tokenDetails: 'tokens/:contractIndex/:tokenIndex',
     send: 'send',
     receive: 'receive',
     settings: 'settings',
