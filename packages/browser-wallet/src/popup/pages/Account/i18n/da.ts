@@ -74,10 +74,10 @@ const t: typeof en = {
             ticker: 'Symbol',
             decimals: 'Decimaler',
             contractIndex: 'Kontrakt indeks, subindeks',
-            removeToken: 'Vis ikke token i pungen',
+            removeToken: 'Vis ikke token i wallet',
             removePrompt: {
-                header: 'Skjul {name} i din pung',
-                text: 'Er du sikker på at du vil skjule denne token i din pung? Du kan altid tilføje den igen fra tokenlisten',
+                header: 'Skjul {{ name }} i din wallet',
+                text: 'Er du sikker på at du vil skjule denne token i din wallet? Du kan altid tilføje den igen fra tokenlisten',
                 cancel: 'Behold token',
                 remove: 'Skjul token',
             },

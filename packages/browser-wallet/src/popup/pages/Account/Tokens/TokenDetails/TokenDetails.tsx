@@ -13,7 +13,7 @@ import Modal from '@popup/shared/Modal';
 import ButtonGroup from '@popup/shared/ButtonGroup';
 import TokenBalance from '../TokenBalance';
 import { defaultCis2TokenId } from '../routes';
-import { TokenDetails, useTokens } from '../utils';
+import { TokenDetails, useFlattenedAccountTokens } from '../utils';
 
 const SUB_INDEX = 0;
 
@@ -146,7 +146,7 @@ function useTokenDetails(): TokenDetails | undefined {
     const account = useSelectedCredential();
     const { contractIndex, id } = useParams<TokenDetailsRouteParams>();
     const tokenId = useMemo(() => (id === defaultCis2TokenId ? '' : id), [id]);
-    const tokens = useTokens(account);
+    const tokens = useFlattenedAccountTokens(account);
 
     return tokens.find((t) => t.contractIndex === contractIndex && t.id === tokenId);
 }

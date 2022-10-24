@@ -17,7 +17,7 @@ import { useAtomValue } from 'jotai';
 import AtomValue from '@popup/store/AtomValue';
 import { tokensRoutes, detailsRoute } from './routes';
 import TokenDetails from './TokenDetails';
-import { useTokens } from './utils';
+import { useFlattenedAccountTokens } from './utils';
 import TokenBalance from './TokenBalance';
 
 type FtProps = {
@@ -40,7 +40,7 @@ function Ft({ accountAddress, contractIndex: contractAddress, token, onClick }: 
 }
 
 function useFilteredTokens(account: WalletCredential, unique: boolean) {
-    const tokens = useTokens(account);
+    const tokens = useFlattenedAccountTokens(account);
     return tokens.filter((t) => (t.metadata.unique ?? false) === unique);
 }
 

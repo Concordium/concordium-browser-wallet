@@ -6,7 +6,7 @@ import { TokenIdAndMetadata, WalletCredential } from '@shared/storage/types';
 
 export type TokenDetails = TokenIdAndMetadata & { contractIndex: string };
 
-export function useTokens(account: WalletCredential | undefined): TokenDetails[] {
+export function useFlattenedAccountTokens(account: WalletCredential | undefined): TokenDetails[] {
     const {
         loading,
         value: { [account?.address ?? '']: tokens },
