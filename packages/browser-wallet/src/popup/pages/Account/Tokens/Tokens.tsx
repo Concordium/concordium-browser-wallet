@@ -97,9 +97,16 @@ function Collectibles({ account, toDetails }: ListProps) {
                     <div className="token-list__unique-name">
                         {token.metadata.name}
                         <AtomValue atom={contractBalancesFamily(account.address, token.contractIndex)}>
-                            {({ [token.id]: b }) =>
-                                b === 0n && <div className="token-list__not-owned text-faded">{t('unownedUnique')}</div>
-                            }
+                            {({ [token.id]: b }) => (
+                                <>
+                                    {b === 0n && <div className="token-list__ownership">{t('unownedUnique')}</div>}
+                                    {b > 1n && !token.metadata.decimals && (
+                                        <div className="token-list__ownership">
+                                            <TokenBalance balance={b} decimals={token.metadata.decimals ?? 0} />
+                                        </div>
+                                    )}
+                                </>
+                            )}
                         </AtomValue>
                     </div>
                 </Button>

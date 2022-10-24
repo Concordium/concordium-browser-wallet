@@ -72,7 +72,7 @@ type TokenProps = {
 };
 
 function Nft({ token, balance }: TokenProps) {
-    const { thumbnail, name, description, display } = token.metadata;
+    const { thumbnail, name, description, display, decimals = 0 } = token.metadata;
     const { t } = useTranslation('account', { keyPrefix: 'tokens' });
 
     return (
@@ -82,7 +82,20 @@ function Nft({ token, balance }: TokenProps) {
                 {name}
             </h3>
             <TokenDetailsLine header={t('details.ownership')}>
-                <span className="text-bold">{balance === 0n ? t('unownedUnique') : t('ownedUnique')}</span>
+                <span className="text-bold">{balance === 0n && t('unownedUnique')}</span>
+                <span className="text-bold">
+                    {balance === 0n || (
+                        <>
+                            {t('ownedUnique')}
+                            {balance !== 1n && decimals === 0 && (
+                                <>
+                                    {' '}
+                                    (<TokenBalance balance={balance} decimals={decimals} />)
+                                </>
+                            )}
+                        </>
+                    )}
+                </span>
             </TokenDetailsLine>
             <TokenDetailsLine header={t('details.description')}>{description}</TokenDetailsLine>
             <TokenDetailsLine header={t('details.contractIndex')}>
