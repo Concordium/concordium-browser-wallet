@@ -159,7 +159,7 @@ export const sessionRecoveryStatus = makeStorageAccessor<RecoveryStatus>('sessio
 export const sessionOnboardingLocation = makeStorageAccessor<string>('session', ChromeStorageKey.OnboardingLocation);
 export const sessionIdpTab = makeStorageAccessor<number>('session', ChromeStorageKey.IdpTab);
 
-export const sessionPendingTransactions = makeStorageAccessor<string[]>( // Underlying type is serialized BrowserWalletAccountTransaction[]
+export const sessionPendingTransactions = makeIndexedStorageAccessor<string[]>( // Underlying type is serialized BrowserWalletAccountTransaction[]
     'session',
     ChromeStorageKey.PendingTransactions
 );

@@ -176,6 +176,8 @@ export default function TransactionElement({ accountAddress, transaction, style,
     const transactionDate = dateFromTimestamp(transaction.time, TimeStampUnit.seconds);
     const transactionTime = withDate ? withDateAndTime(transactionDate) : onlyTime(transactionDate);
     const failed = transaction.status === TransactionStatus.Failed;
+    const isSender = transaction.fromAddress === accountAddress;
+    const amount = isSender && transaction.amount > 0n ? -transaction.amount : transaction.amount;
 
     return (
         <div
@@ -200,7 +202,7 @@ export default function TransactionElement({ accountAddress, transaction, style,
                             isGreenAmount(transaction, accountAddress) && 'transaction-element__amount__greenText'
                         )}
                     >
-                        {displayAsCcd(transaction.cost ? transaction.amount - transaction.cost : transaction.amount)}
+                        {displayAsCcd(transaction.cost && isSender ? amount - transaction.cost : amount)}
                     </p>
                 }
             />
@@ -212,7 +214,9 @@ export default function TransactionElement({ accountAddress, transaction, style,
                     </>
                 }
                 right={
-                    transaction.cost !== undefined ? buildFeeString(transaction.cost, accountAddress, transaction) : ''
+                    transaction.cost !== undefined && isSender
+                        ? buildFeeString(transaction.cost, accountAddress, { ...transaction, amount })
+                        : ''
                 }
             />
         </div>
