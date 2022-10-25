@@ -15,7 +15,7 @@ export const WCCD_METADATA: TokenMetadata = {
     symbol: 'wCCD',
     decimals: 6,
     description: 'A CIS2 token wrapping the Concordium native token (CCD)',
-    thumbnail: { url: 'https://proposals.concordium.software/_static/concordium-logo-black.svg' },
-    display: { url: 'https://proposals.concordium.software/_static/concordium-logo-black.svg' },
-    artifact: { url: 'https://proposals.concordium.software/_static/concordium-logo-black.svg' },
+    thumbnail: { url: 'https://developer.concordium.software/en/mainnet/_images/wCCD.svg' },
+    display: { url: 'https://developer.concordium.software/en/mainnet/_images/wCCD.svg' },
+    artifact: { url: 'https://developer.concordium.software/en/mainnet/_images/wCCD.svg' },
 };

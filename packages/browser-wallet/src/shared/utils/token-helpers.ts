@@ -108,6 +108,13 @@ function confirmMetadataUrl(field?: MetadataUrl) {
     }
 }
 
+// eslint-disable-next-line @typescript-eslint/no-explicit-any
+function confirmString(field?: any) {
+    if (field && !(typeof field === 'string' || field instanceof String)) {
+        throw new Error('string field was present but did no contain a string');
+    }
+}
+
 /**
  * Fetches token metadata from the given url
  */
@@ -136,6 +143,10 @@ export async function getTokenMetadata(tokenUrl: string, network: NetworkConfigu
         localization,
     } = await resp.json();
 
+    confirmString(name);
+    confirmString(symbol);
+    confirmString(description);
+    confirmMetadataUrl(thumbnail);
     if (decimals && Number.isNaN(decimals)) {
         throw new Error('Metadata contains incorrect decimals format');
     }
