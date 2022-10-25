@@ -87,7 +87,7 @@ function Nft({ token, balance }: TokenProps) {
                     {balance === 0n || (
                         <>
                             {t('ownedUnique')}
-                            {balance !== 1n && decimals === 0 && (
+                            {balance / BigInt(10 ** decimals) !== 1n && (
                                 <>
                                     {' '}
                                     (<TokenBalance balance={balance} decimals={decimals} />)

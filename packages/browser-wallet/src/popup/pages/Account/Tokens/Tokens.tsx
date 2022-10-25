@@ -82,27 +82,23 @@ function Collectibles({ account, toDetails }: ListProps) {
 
     return (
         <>
-            {tokens.map((token) => (
+            {tokens.map(({ contractIndex, id, metadata: { thumbnail, name, decimals = 0 } }) => (
                 <Button
                     clear
-                    key={`${token.contractIndex}.${token.id}`}
-                    onClick={() => toDetails(token.contractIndex, token.id)}
+                    key={`${contractIndex}.${id}`}
+                    onClick={() => toDetails(contractIndex, id)}
                     className="token-list__item"
                 >
-                    <img
-                        className="token-list__icon"
-                        src={token.metadata.thumbnail?.url ?? ''}
-                        alt={token.metadata.name}
-                    />
+                    <img className="token-list__icon" src={thumbnail?.url ?? ''} alt={name} />
                     <div className="token-list__unique-name">
-                        {token.metadata.name}
-                        <AtomValue atom={contractBalancesFamily(account.address, token.contractIndex)}>
-                            {({ [token.id]: b }) => (
+                        {name}
+                        <AtomValue atom={contractBalancesFamily(account.address, contractIndex)}>
+                            {({ [id]: b }) => (
                                 <>
                                     {b === 0n && <div className="token-list__ownership">{t('unownedUnique')}</div>}
-                                    {b > 1n && !token.metadata.decimals && (
+                                    {b / BigInt(10 ** decimals) !== 1n && b > 0n && (
                                         <div className="token-list__ownership">
-                                            <TokenBalance balance={b} decimals={token.metadata.decimals ?? 0} />
+                                            <TokenBalance balance={b} decimals={decimals} />
                                         </div>
                                     )}
                                 </>
