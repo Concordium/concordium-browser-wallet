@@ -62,6 +62,18 @@ $error-spacing: rem(13.286px);
             }
         }
     }
+}
+
+.display-token {
+    border: rem(1px) solid $color-cta;
+    border-radius: rem(5px);
+    padding: rem(5px);
+    background: $color-bg;
+
+    &__balance {
+        font-size: 10px;
+        color: $color-text-faded;
+    }
 
     &__token-display-container {
         display: flex;
@@ -74,11 +86,4 @@ $error-spacing: rem(13.286px);
         max-height: rem(20px);
         max-width: rem(40px);
     }
-}
-
-.display-token {
-    border: rem(1px) solid $color-cta;
-    border-radius: rem(5px);
-    padding: rem(5px);
-    background: $color-bg;
 }

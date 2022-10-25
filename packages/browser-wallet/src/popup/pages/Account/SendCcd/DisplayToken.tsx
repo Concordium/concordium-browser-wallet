@@ -15,9 +15,14 @@ interface ChooseTokenProps {
 export default function DisplayToken({ metadata, balance, className, ...props }: ChooseTokenProps) {
     return (
         <Button className={clsx('display-token', className)} clear {...props}>
-            <div className="create-transfer__token-display-container">
-                <img alt={metadata.name} className="create-transfer__token-display" src={metadata.display?.url} />
-                <TokenBalance decimals={metadata.decimals || 0} symbol={metadata.symbol} balance={balance} />
+            <div className="display-token__token-display-container">
+                <img alt={metadata.name} className="display-token__token-display" src={metadata.display?.url} />
+                <div>
+                    {metadata.name}
+                    <div className="display-token__balance">
+                        <TokenBalance decimals={metadata.decimals || 0} symbol={metadata.symbol} balance={balance} />
+                    </div>
+                </div>
             </div>
         </Button>
     );
