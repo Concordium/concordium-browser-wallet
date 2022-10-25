@@ -3,9 +3,8 @@ import { atom } from 'jotai';
 import { EventType } from '@concordium/browser-wallet-api-helpers';
 import { popupMessageHandler } from '@popup/shared/message-handler';
 import { mainnet } from '@popup/pages/NetworkSettings/NetworkSettings';
-import { selectAtom } from 'jotai/utils';
 import { HttpProvider, JsonRpcClient } from '@concordium/web-sdk';
-import { storedCredentials } from '@shared/storage/access';
+import { sessionCookie, storedCredentials } from '@shared/storage/access';
 import { atomWithChromeStorage } from './utils';
 import { selectedAccountAtom } from './account';
 import { selectedIdentityIndexAtom } from './identity';
@@ -34,10 +33,12 @@ export const networkConfigurationAtom = atom<NetworkConfiguration, NetworkConfig
     }
 );
 
-export const jsonRpcClientAtom = selectAtom(
-    networkConfigurationAtom,
-    ({ jsonRpcUrl }) => new JsonRpcClient(new HttpProvider(jsonRpcUrl))
-);
+export const cookieAtom = atomWithChromeStorage<string | undefined>(ChromeStorageKey.Cookie, undefined);
+export const jsonRpcClientAtom = atom<JsonRpcClient>((get) => {
+    const network = get(storedNetworkConfigurationAtom);
+    const cookie = get(cookieAtom);
+    return new JsonRpcClient(new HttpProvider(network.jsonRpcUrl, undefined, sessionCookie.set, cookie));
+});
 
 export const sessionPasscodeAtom = atomWithChromeStorage<string | undefined>(
     ChromeStorageKey.Passcode,

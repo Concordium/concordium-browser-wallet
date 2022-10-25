@@ -23,6 +23,7 @@ import {
     storedTokens,
     storedTokenMetadata,
     sessionPendingTransactions,
+    sessionCookie,
 } from '@shared/storage/access';
 import { ChromeStorageKey } from '@shared/storage/types';
 import { atom, WritableAtom } from 'jotai';
@@ -49,6 +50,7 @@ const accessorMap = {
     [ChromeStorageKey.Tokens]: useIndexedStorage(storedTokens, getGenesisHash),
     [ChromeStorageKey.TokenMetadata]: storedTokenMetadata,
     [ChromeStorageKey.PendingTransactions]: useIndexedStorage(sessionPendingTransactions, getGenesisHash),
+    [ChromeStorageKey.Cookie]: sessionCookie,
 };
 
 export type AsyncWrapper<V> = {

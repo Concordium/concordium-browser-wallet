@@ -1,5 +1,5 @@
-import { AccountAddress, AccountInfo, HttpProvider, JsonRpcClient } from '@concordium/web-sdk';
-import { networkConfigurationAtom } from '@popup/store/settings';
+import { AccountAddress, AccountInfo } from '@concordium/web-sdk';
+import { networkConfigurationAtom, jsonRpcClientAtom, cookieAtom } from '@popup/store/settings';
 import { useAtomValue, useSetAtom } from 'jotai';
 import React, { createContext, ReactNode, useContext, useEffect, useMemo, useState } from 'react';
 import { atomWithChromeStorage } from '@popup/store/utils';
@@ -25,11 +25,12 @@ interface Props {
 export default function AccountInfoListenerContextProvider({ children }: Props) {
     const network = useAtomValue(networkConfigurationAtom);
     const addToast = useSetAtom(addToastAtom);
+    const cookie = useAtomValue(cookieAtom);
     const [accountInfoListener, setAccountInfoListener] = useState<AccountInfoListener>();
     const { t } = useTranslation();
 
     useEffect(() => {
-        const listener = new AccountInfoListener(network);
+        const listener = new AccountInfoListener(network, cookie);
         listener.listen();
         setAccountInfoListener(listener);
         const errorListener = () => addToast(t('account.error'));
@@ -59,7 +60,7 @@ export function useAccountInfo(account: WalletCredential): AccountInfo | undefin
     const { genesisHash } = useAtomValue(networkConfigurationAtom);
     const address = useMemo(() => account.address, [account]);
     const addToast = useSetAtom(addToastAtom);
-    const { jsonRpcUrl } = useAtomValue(networkConfigurationAtom);
+    const client = useAtomValue(jsonRpcClientAtom);
     const { t } = useTranslation();
     const [accountInfo, setAccountInfo] = useState<AccountInfo>();
 
@@ -71,7 +72,6 @@ export function useAccountInfo(account: WalletCredential): AccountInfo | undefin
         if (accountInfoCache[address]) {
             setAccountInfo(parse(accountInfoCache[address]));
         } else if (account.status === CreationStatus.Confirmed) {
-            const client = new JsonRpcClient(new HttpProvider(jsonRpcUrl));
             client
                 .getConsensusStatus()
                 .then((consensusStatus) => {

@@ -17,9 +17,9 @@ export class AccountInfoListener extends EventEmitter {
 
     private accountsMap: Map<string, number> = new Map();
 
-    constructor(network: NetworkConfiguration) {
+    constructor(network: NetworkConfiguration, cookie?: string) {
         super();
-        this.client = new JsonRpcClient(new HttpProvider(network.jsonRpcUrl));
+        this.client = new JsonRpcClient(new HttpProvider(network.jsonRpcUrl, undefined, undefined, cookie));
         this.genesisHash = network.genesisHash;
     }
 
