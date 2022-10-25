@@ -25,15 +25,17 @@ function Collection({ onClick, tokens, contractIndex, address }: CollectionProps
 
     return (
         <>
-            {tokens.map((token) => (
-                <DisplayToken
-                    className="create-transfer__pick-token-element"
-                    key={token.id}
-                    metadata={token.metadata}
-                    balance={balances[token.id]}
-                    onClick={() => onClick({ contractIndex, tokenId: token.id, metadata: token.metadata })}
-                />
-            ))}
+            {tokens
+                .filter((token) => balances[token.id] > 0n)
+                .map((token) => (
+                    <DisplayToken
+                        className="create-transfer__pick-token-element"
+                        key={token.id}
+                        metadata={token.metadata}
+                        balance={balances[token.id]}
+                        onClick={() => onClick({ contractIndex, tokenId: token.id, metadata: token.metadata })}
+                    />
+                ))}
         </>
     );
 }
