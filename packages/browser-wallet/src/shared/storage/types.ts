@@ -193,6 +193,13 @@ export interface RecoveryStatus {
 
 export interface MetadataUrl {
     url: string;
+    hash?: string;
+}
+
+export interface MetadataAttribute {
+    type: string;
+    name: string;
+    value: string;
 }
 
 export interface TokenMetadata {
@@ -203,7 +210,11 @@ export interface TokenMetadata {
     thumbnail?: MetadataUrl;
     display?: MetadataUrl;
     artifact?: MetadataUrl;
+    // eslint-disable-next-line @typescript-eslint/no-explicit-any
+    assets?: any;
+    attributes?: MetadataAttribute[];
     unique?: boolean;
+    localization?: Record<string, MetadataUrl>;
 }
 
 export interface TokenIdAndMetadata {

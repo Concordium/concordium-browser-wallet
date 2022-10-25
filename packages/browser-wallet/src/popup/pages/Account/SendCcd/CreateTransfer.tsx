@@ -26,7 +26,8 @@ import {
 import { useLocation, useNavigate } from 'react-router-dom';
 import { useAccountInfo } from '@popup/shared/AccountInfoListenerContext';
 import { useSelectedCredential } from '@popup/shared/utils/account-helpers';
-import { CCD_METADATA, getTokenTransferEnergy, TokenIdentifier } from '@shared/utils/token-helpers';
+import { CCD_METADATA } from '@shared/constants/token-metadata';
+import { getTokenTransferEnergy, TokenIdentifier } from '@shared/utils/token-helpers';
 import { jsonRpcClientAtom } from '@popup/store/settings';
 import clsx from 'clsx';
 import { addToastAtom } from '@popup/state';

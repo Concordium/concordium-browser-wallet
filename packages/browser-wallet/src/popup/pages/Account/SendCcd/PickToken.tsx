@@ -1,7 +1,8 @@
 import React, { useEffect } from 'react';
 import { AccountTokens, contractBalancesFamily } from '@popup/store/token';
 import { TokenIdAndMetadata } from '@shared/storage/types';
-import { CCD_METADATA, TokenIdentifier } from '@shared/utils/token-helpers';
+import { CCD_METADATA } from '@shared/constants/token-metadata';
+import { TokenIdentifier } from '@shared/utils/token-helpers';
 import { useAtomValue } from 'jotai';
 import { noOp } from 'wallet-common-helpers';
 import DisplayToken from './DisplayToken';

@@ -7,10 +7,11 @@ import {
     JsonRpcClient,
     serializeUpdateContractParameters,
 } from '@concordium/web-sdk';
-import { TokenMetadata } from '@shared/storage/types';
+import { MetadataUrl, NetworkConfiguration, TokenMetadata } from '@shared/storage/types';
 import { CIS2_SCHEMA_CONTRACT_NAME, CIS2_SCHEMA } from '@popup/constants/schema';
-import { getCcdSymbol } from 'wallet-common-helpers';
+import { WCCD_METADATA } from '@shared/constants/token-metadata';
 import { SmartContractParameters } from './types';
+import { isMainnet } from './network-helpers';
 
 export interface ContractDetails {
     contractName: string;
@@ -101,28 +102,60 @@ export function getTokenUrl(
     });
 }
 
+function confirmMetadataUrl(field?: MetadataUrl) {
+    if (field && !field.url) {
+        throw new Error('Url field was present but did no contain an url');
+    }
+}
+
 /**
  * Fetches token metadata from the given url
- * TODO: add/improve validation of metadata structure.
  */
-export async function getTokenMetadata(tokenUrl: string): Promise<TokenMetadata> {
-    // TODO remove this hack, for production, or just when we have a proper collection for testing (with online metadata).
-    if (tokenUrl.includes('example')) {
-        return {
-            name: 'Wrapped CCD Token',
-            symbol: 'wCCD',
-            decimals: 6,
-            description: 'A CIS2 token wrapping the Concordium native token (CCD)',
-            thumbnail: { url: 'https://proposals.concordium.software/_static/concordium-logo-black.svg' },
-            display: { url: 'https://proposals.concordium.software/_static/concordium-logo-black.svg' },
-            artifact: { url: 'https://proposals.concordium.software/_static/concordium-logo-black.svg' },
-        };
+export async function getTokenMetadata(tokenUrl: string, network: NetworkConfiguration): Promise<TokenMetadata> {
+    // TODO remove this hack when we have a proper collection for testing (with online metadata).
+    if (!isMainnet(network) && tokenUrl.includes('https://some.example/token/wccd')) {
+        return WCCD_METADATA;
     }
+
     const resp = await fetch(tokenUrl, { headers: new Headers({ 'Access-Control-Allow-Origin': '*' }), mode: 'cors' });
     if (!resp.ok) {
         throw new Error(`Something went wrong, status: ${resp.status}`);
     }
-    return resp.json();
+
+    const {
+        name,
+        symbol,
+        decimals,
+        unique,
+        description,
+        thumbnail,
+        display,
+        artifact,
+        assets,
+        attributes,
+        localization,
+    } = await resp.json();
+
+    if (decimals && Number.isNaN(decimals)) {
+        throw new Error('Metadata contains incorrect decimals format');
+    }
+    confirmMetadataUrl(thumbnail);
+    confirmMetadataUrl(display);
+    confirmMetadataUrl(artifact);
+
+    return {
+        name,
+        symbol,
+        decimals,
+        unique,
+        description,
+        thumbnail,
+        display,
+        artifact,
+        assets,
+        attributes,
+        localization,
+    };
 }
 
 /**
@@ -210,16 +243,6 @@ export const getContractBalances = async (
 };
 
 export type TokenIdentifier = { contractIndex: string; tokenId: string; metadata: TokenMetadata };
-
-// TODO move to constants or find another solution.
-export const CCD_METADATA: TokenMetadata = {
-    name: 'CCD',
-    decimals: 6,
-    symbol: getCcdSymbol(),
-    display: {
-        url: "data:image/svg+xml;charset=UTF-8,%3csvg viewBox='0 0 26 26' fill='none' xmlns='http://www.w3.org/2000/svg'%3e%3cpath d='M23.8461 17.8447H19.3916C20.5119 16.3777 21.2054 14.5372 21.2054 12.5366C21.2054 10.5361 20.5119 8.69558 19.3916 7.22852H23.8461C24.593 8.85562 25.0198 10.6428 25.0198 12.5366C25.0198 14.4305 24.6197 16.2176 23.8461 17.8447Z' fill='%23181817' /%3e%3cpath d='M12.5103 17.8184C15.4418 17.8184 17.8184 15.4418 17.8184 12.5103C17.8184 9.57867 15.4418 7.20215 12.5103 7.20215C9.57867 7.20215 7.20215 9.57867 7.20215 12.5103C7.20215 15.4418 9.57867 17.8184 12.5103 17.8184Z' fill='%23181817' /%3e%3cpath d='M3.81437 12.5367C3.81437 17.338 7.70876 21.2591 12.5101 21.2591C13.7904 21.2591 15.0174 20.9657 16.111 20.4589V24.54C14.9641 24.8868 13.7637 25.0735 12.5101 25.0735C5.60152 25.0735 0 19.4453 0 12.5367C0 5.60152 5.60152 0 12.5101 0C13.7637 0 14.9641 0.186717 16.111 0.533478V4.61459C15.0174 4.10778 13.7904 3.81437 12.5101 3.81437C7.70876 3.81437 3.81437 7.70876 3.81437 12.5367Z' fill='%23181817' /%3e%3c/svg%3e",
-    },
-};
 
 export function getTokenTransferParameters(
     from: string,
