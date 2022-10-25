@@ -129,44 +129,20 @@ export async function getTokenMetadata(tokenUrl: string, network: NetworkConfigu
         throw new Error(`Something went wrong, status: ${resp.status}`);
     }
 
-    const {
-        name,
-        symbol,
-        decimals,
-        unique,
-        description,
-        thumbnail,
-        display,
-        artifact,
-        assets,
-        attributes,
-        localization,
-    } = await resp.json();
+    const metadata = await resp.json();
 
-    confirmString(name);
-    confirmString(symbol);
-    confirmString(description);
-    confirmMetadataUrl(thumbnail);
-    if (decimals && Number.isNaN(decimals)) {
+    confirmString(metadata.name);
+    confirmString(metadata.symbol);
+    confirmString(metadata.description);
+    confirmMetadataUrl(metadata.thumbnail);
+    if (metadata.decimals && Number.isNaN(metadata.decimals)) {
         throw new Error('Metadata contains incorrect decimals format');
     }
-    confirmMetadataUrl(thumbnail);
-    confirmMetadataUrl(display);
-    confirmMetadataUrl(artifact);
+    confirmMetadataUrl(metadata.thumbnail);
+    confirmMetadataUrl(metadata.display);
+    confirmMetadataUrl(metadata.artifact);
 
-    return {
-        name,
-        symbol,
-        decimals,
-        unique,
-        description,
-        thumbnail,
-        display,
-        artifact,
-        assets,
-        attributes,
-        localization,
-    };
+    return metadata;
 }
 
 /**
