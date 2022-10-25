@@ -97,7 +97,10 @@ export default function AccountRoutes() {
                     element={<TransactionLog setDetailsExpanded={setDetailsExpanded} />}
                 />
                 <Route path={`${accountRoutes.settings}/*`} element={<AccountSettings />} />
-                <Route path={`${accountRoutes.tokens}/*`} element={<Tokens />} />
+                <Route
+                    path={`${accountRoutes.tokens}/*`}
+                    element={<Tokens setDetailsExpanded={setDetailsExpanded} />}
+                />
             </Route>
         </Routes>
     );

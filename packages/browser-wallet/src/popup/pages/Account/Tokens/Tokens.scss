@@ -63,7 +63,8 @@ $tokens-actions-height: rem(26px);
         }
     }
 
-    &__not-owned {
+    &__ownership {
         font-size: 10px;
+        color: $color-text-faded;
     }
 }
