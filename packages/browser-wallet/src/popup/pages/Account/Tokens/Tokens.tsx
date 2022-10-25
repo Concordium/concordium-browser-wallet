@@ -100,7 +100,7 @@ function Collectibles({ account, toDetails }: ListProps) {
                             {({ [token.id]: b }) => (
                                 <>
                                     {b === 0n && <div className="token-list__ownership">{t('unownedUnique')}</div>}
-                                    {b > 1n && !token.metadata.decimals && (
+                                    {(b > 1n || (b > 0n && token.metadata.decimals)) && (
                                         <div className="token-list__ownership">
                                             <TokenBalance balance={b} decimals={token.metadata.decimals ?? 0} />
                                         </div>
