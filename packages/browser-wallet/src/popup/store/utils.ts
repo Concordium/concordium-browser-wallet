@@ -48,7 +48,7 @@ const accessorMap = {
     [ChromeStorageKey.IdpTab]: sessionIdpTab,
     [ChromeStorageKey.Tokens]: useIndexedStorage(storedTokens, getGenesisHash),
     [ChromeStorageKey.TokenMetadata]: storedTokenMetadata,
-    [ChromeStorageKey.PendingTransactions]: sessionPendingTransactions,
+    [ChromeStorageKey.PendingTransactions]: useIndexedStorage(sessionPendingTransactions, getGenesisHash),
 };
 
 export type AsyncWrapper<V> = {
@@ -91,7 +91,7 @@ export function atomWithChromeStorage<V>(key: ChromeStorageKey, fallback: V, wit
 
         const listener = (changes: Record<string, chrome.storage.StorageChange>) =>
             getStoredValue().then((value) => {
-                if (key in changes) {
+                if (key in changes || ChromeStorageKey.NetworkConfiguration in changes) {
                     setValue({
                         loading: false,
                         value: value ?? fallback,
