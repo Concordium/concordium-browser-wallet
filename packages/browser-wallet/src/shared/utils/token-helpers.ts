@@ -1,7 +1,17 @@
 import { Buffer } from 'buffer/';
-import { AccountAddress, InstanceInfo, JsonRpcClient } from '@concordium/web-sdk';
 import uleb128 from 'leb128/unsigned';
-import { TokenMetadata } from '@shared/storage/types';
+import {
+    AccountAddress,
+    GtuAmount,
+    InstanceInfo,
+    JsonRpcClient,
+    serializeUpdateContractParameters,
+} from '@concordium/web-sdk';
+import { MetadataUrl, NetworkConfiguration, TokenMetadata } from '@shared/storage/types';
+import { CIS2_SCHEMA_CONTRACT_NAME, CIS2_SCHEMA } from '@popup/constants/schema';
+import { WCCD_METADATA } from '@shared/constants/token-metadata';
+import { SmartContractParameters } from './types';
+import { isMainnet } from './network-helpers';
 
 export interface ContractDetails {
     contractName: string;
@@ -42,32 +52,24 @@ function deserializeTokenMetadataReturnValue(returnValue: string) {
     return url;
 }
 
-// Methods in the CIS2 standard.
-const CIS2Methods = ['balanceOf', 'transfer', 'tokenMetadata', 'operatorOf', 'updateOperator'];
-
 /**
  * Confirms that the given smart contract instance is CIS-2 compliant
  */
 export async function confirmCIS2Contract(
     client: JsonRpcClient,
-    instanceInfo: InstanceInfo,
     { contractName, index, subindex }: ContractDetails
 ): Promise<string | undefined> {
-    const cis0SupportsMethod = `${contractName}.supports`;
-    if (!instanceInfo.methods.includes(cis0SupportsMethod)) {
-        return 'Chosen contract does not support CIS-0';
-    }
-    if (!CIS2Methods.every((method) => instanceInfo.methods.includes(`${contractName}.${method}`))) {
-        return 'Chosen contract does not expose required endpoints';
-    }
     const supports = await client.invokeContract({
         contract: { index, subindex },
-        method: cis0SupportsMethod,
+        method: `${contractName}.supports`,
         parameter: getCIS2Identifier(),
     });
     if (!supports || supports.tag === 'failure') {
-        return 'Unable to invoke chosen contract result';
+        return 'Chosen contract does not support CIS-0';
     }
+    // Supports return 2 bytes that determine the number of answers. 0100 means there is 1 answer
+    // 01 Means the standard is supported.
+    // TODO: Handle 02 answer properly (https://proposals.concordium.software/CIS/cis-0.html#response)
     if (supports.returnValue !== '010001') {
         return 'Chosen contract does not support CIS-2';
     }
@@ -100,28 +102,47 @@ export function getTokenUrl(
     });
 }
 
+function confirmMetadataUrl(field?: MetadataUrl) {
+    if (field && !field.url) {
+        throw new Error('Url field was present but did no contain an url');
+    }
+}
+
+// eslint-disable-next-line @typescript-eslint/no-explicit-any
+function confirmString(field?: any) {
+    if (field && !(typeof field === 'string' || field instanceof String)) {
+        throw new Error('string field was present but did no contain a string');
+    }
+}
+
 /**
  * Fetches token metadata from the given url
- * TODO: add/improve validation of metadata structure.
  */
-export async function getTokenMetadata(tokenUrl: string): Promise<TokenMetadata> {
-    // TODO remove this hack, for production, or just when we have a proper collection for testing (with online metadata).
-    if (tokenUrl.includes('example')) {
-        return {
-            name: 'Wrapped CCD Token',
-            symbol: 'wCCD',
-            decimals: 6,
-            description: 'A CIS2 token wrapping the Concordium native token (CCD)',
-            thumbnail: { url: 'https://proposals.concordium.software/_static/concordium-logo-black.svg' },
-            display: { url: 'https://proposals.concordium.software/_static/concordium-logo-black.svg' },
-            artifact: { url: 'https://proposals.concordium.software/_static/concordium-logo-black.svg' },
-        };
+export async function getTokenMetadata(tokenUrl: string, network: NetworkConfiguration): Promise<TokenMetadata> {
+    // TODO remove this hack when we have a proper collection for testing (with online metadata).
+    if (!isMainnet(network) && tokenUrl.includes('https://some.example/token/wccd')) {
+        return WCCD_METADATA;
     }
+
     const resp = await fetch(tokenUrl, { headers: new Headers({ 'Access-Control-Allow-Origin': '*' }), mode: 'cors' });
     if (!resp.ok) {
         throw new Error(`Something went wrong, status: ${resp.status}`);
     }
-    return resp.json();
+
+    const metadata = await resp.json();
+
+    confirmString(metadata.name);
+    confirmString(metadata.symbol);
+    confirmString(metadata.description);
+    confirmMetadataUrl(metadata.thumbnail);
+    if (metadata.decimals && Number.isNaN(metadata.decimals)) {
+        throw new Error('Metadata contains incorrect decimals format');
+    }
+    confirmMetadataUrl(metadata.thumbnail);
+    confirmMetadataUrl(metadata.display);
+    confirmMetadataUrl(metadata.artifact);
+
+    return metadata;
 }
 
 /**
@@ -207,3 +228,116 @@ export const getContractBalances = async (
         {}
     );
 };
+
+export type TokenIdentifier = { contractIndex: string; tokenId: string; metadata: TokenMetadata };
+
+export function getTokenTransferParameters(
+    from: string,
+    to: string,
+    tokenId: string,
+    amount: bigint
+): SmartContractParameters {
+    return [
+        {
+            amount: amount.toString(),
+            to: { Account: [to] },
+            from: { Account: [from] },
+            data: '',
+            token_id: tokenId,
+        },
+    ];
+}
+
+function serializeTokenTransferParameters(parameters: SmartContractParameters) {
+    return serializeUpdateContractParameters(
+        CIS2_SCHEMA_CONTRACT_NAME,
+        'transfer',
+        parameters,
+        Buffer.from(CIS2_SCHEMA, 'base64'),
+        1
+    );
+}
+
+export function getTokenTransferPayload(
+    parameters: SmartContractParameters,
+    contractName: string,
+    maxContractExecutionEnergy: bigint,
+    index: bigint,
+    subindex = 0n
+) {
+    return {
+        amount: new GtuAmount(0n),
+        contractAddress: { index, subindex },
+        receiveName: `${contractName}.transfer`,
+        parameter: serializeTokenTransferParameters(parameters),
+        maxContractExecutionEnergy,
+    };
+}
+
+async function getTokenTransferExecutionEnergyEstimate(
+    client: JsonRpcClient,
+    parameter: Buffer,
+    invoker: AccountAddress,
+    contractName: string,
+    index: bigint,
+    subindex = 0n
+): Promise<bigint> {
+    const contractAddress = { index, subindex };
+    const res = await client.invokeContract({
+        contract: contractAddress,
+        invoker,
+        parameter,
+        method: `${contractName}.transfer`,
+    });
+    if (!res || res.tag === 'failure') {
+        throw new Error(`Expected succesful invocation`);
+    }
+    // TODO: determine the "safety ratio"
+    return (res.usedEnergy * 12n) / 10n;
+}
+
+function getContractName(instanceInfo: InstanceInfo): string | undefined {
+    return instanceInfo.name.substring(5);
+}
+
+export async function fetchContractName(client: JsonRpcClient, index: bigint, subindex = 0n) {
+    const instanceInfo = await client.getInstanceInfo({ index, subindex });
+    if (!instanceInfo) {
+        return undefined;
+    }
+    return getContractName(instanceInfo);
+}
+
+function determineTokenTransferPayloadSize(parameterSize: number, contractName: string) {
+    return 8n + 8n + 8n + 2n + BigInt(parameterSize) + 2n + BigInt(contractName.length + 9);
+}
+
+// TODO: export this from the SDK or add to helpers
+function calculateEnergyCost(signatureCount: bigint, payloadSize: bigint, transactionSpecificCost: bigint): bigint {
+    return 100n * signatureCount + 1n * (BigInt(32 + 8 + 8 + 4 + 8) + payloadSize) + transactionSpecificCost;
+}
+
+export async function getTokenTransferEnergy(
+    client: JsonRpcClient,
+    address: string,
+    recipient: string,
+    tokenId: string,
+    contractIndex: bigint
+) {
+    const parameters = getTokenTransferParameters(address, recipient, tokenId, 1n);
+    const serializedParameters = serializeTokenTransferParameters(parameters);
+    const contractName = (await fetchContractName(client, contractIndex)) || '';
+    const execution = await getTokenTransferExecutionEnergyEstimate(
+        client,
+        serializedParameters,
+        new AccountAddress(address),
+        contractName,
+        contractIndex
+    );
+    const total = calculateEnergyCost(
+        1n,
+        determineTokenTransferPayloadSize(serializedParameters.length, contractName),
+        execution
+    );
+    return { execution, total };
+}

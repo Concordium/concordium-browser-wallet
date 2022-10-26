@@ -72,7 +72,7 @@ type TokenProps = {
 };
 
 function Nft({ token, balance }: TokenProps) {
-    const { thumbnail, name, description, display, decimals = 0 } = token.metadata;
+    const { thumbnail, name, description, display, decimals = 0, symbol } = token.metadata;
     const { t } = useTranslation('account', { keyPrefix: 'tokens' });
 
     return (
@@ -90,7 +90,7 @@ function Nft({ token, balance }: TokenProps) {
                             {balance / BigInt(10 ** decimals) !== 1n && (
                                 <>
                                     {' '}
-                                    (<TokenBalance balance={balance} decimals={decimals} />)
+                                    (<TokenBalance balance={balance} decimals={decimals} symbol={symbol} />)
                                 </>
                             )}
                         </>

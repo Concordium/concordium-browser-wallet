@@ -46,6 +46,9 @@ const t = {
             continue: 'Continue',
         },
         title: 'Send CCD',
+        currentBalance: 'Current balance',
+        unableToCoverCost: 'Insufficient CCD to cover estimated cost',
+        transferInvokeFailed: 'Unable to simulate transfer. Therefore cost cannot be estimated.',
         fee: 'Estimated transaction fee',
     },
     tokens: {
@@ -84,6 +87,7 @@ const t = {
     },
     accountPending: 'This account is still pending finalization.',
     request: 'Create account',
+    unknown: 'unknown',
 };
 
 export default t;

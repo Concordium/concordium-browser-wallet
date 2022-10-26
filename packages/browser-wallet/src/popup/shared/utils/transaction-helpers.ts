@@ -1,6 +1,5 @@
 import {
     AccountAddress,
-    AccountInfo,
     AccountTransaction,
     AccountTransactionType,
     buildBasicAccountSigner,
@@ -11,7 +10,7 @@ import {
     SimpleTransferPayload,
     TransactionExpiry,
 } from '@concordium/web-sdk';
-import { ccdToMicroCcd, getPublicAccountAmounts, isValidCcdString } from 'wallet-common-helpers';
+import { fractionalToInteger, isValidCcdString } from 'wallet-common-helpers';
 
 import i18n from '@popup/shell/i18n';
 import { BrowserWalletAccountTransaction, TransactionStatus } from './transaction-history-types';
@@ -38,22 +37,25 @@ export async function sendTransaction(
     return getAccountTransactionHash(transaction, signature);
 }
 
+/**
+ * Validates if the chosen transfer amount can be sent with the current balance at disposal.
+ * @param decimals how many decimals can the transfer amount. This is used to convert it from a fractional string to an integer.
+ * @param estimatedFee additional costs for the transfer.
+ */
 export function validateTransferAmount(
-    amountToValidate: string,
-    accountInfo: AccountInfo | undefined,
-    estimatedFee: bigint | undefined
+    transferAmount: string,
+    atDisposal: bigint | undefined,
+    decimals = 0,
+    estimatedFee = 0n
 ): string | undefined {
-    if (!isValidCcdString(amountToValidate)) {
+    if (!isValidCcdString(transferAmount)) {
         return i18n.t('utils.ccdAmount.invalid');
     }
-    const amountToValidateMicroGTU = ccdToMicroCcd(amountToValidate);
-    if (
-        accountInfo &&
-        getPublicAccountAmounts(accountInfo).atDisposal < amountToValidateMicroGTU + (estimatedFee || 0n)
-    ) {
+    const amountToValidateInteger = fractionalToInteger(transferAmount, decimals);
+    if (atDisposal !== undefined && atDisposal < amountToValidateInteger + estimatedFee) {
         return i18n.t('utils.ccdAmount.insufficient');
     }
-    if (amountToValidateMicroGTU === 0n) {
+    if (amountToValidateInteger === 0n) {
         return i18n.t('utils.ccdAmount.zero');
     }
     return undefined;

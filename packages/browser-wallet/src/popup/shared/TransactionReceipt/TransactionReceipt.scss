@@ -33,13 +33,6 @@ $transaction-receipt-horizontal-padding: rem(20px);
 
     &__cost {
         margin-top: rem(10px);
-
-        p {
-            color: $color-text-faded;
-            font-size: rem(8px);
-            margin: 0;
-            text-align: center;
-        }
     }
 
     &__parameter {
@@ -63,5 +56,14 @@ $transaction-receipt-horizontal-padding: rem(20px);
     &__module-ref {
         width: rem(180px);
         overflow-wrap: break-word;
+    }
+}
+
+.display-cost {
+    p {
+        color: $color-text-faded;
+        font-size: rem(8px);
+        margin: 0;
+        text-align: center;
     }
 }

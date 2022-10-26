@@ -12,7 +12,7 @@ export default function DisplayCost({ cost, className }: Props) {
     const { t } = useTranslation('shared', { keyPrefix: 'transactionReceipt' });
 
     return (
-        <div className={clsx('transaction-receipt__cost', className)}>
+        <div className={clsx('display-cost', className)}>
             <p>{t('cost')}</p>
             <p>{cost ? displayAsCcd(cost) : t('unknown')}</p>
         </div>
