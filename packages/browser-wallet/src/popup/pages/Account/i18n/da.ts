@@ -48,6 +48,9 @@ const t: typeof en = {
             continue: 'Fortsæt',
         },
         title: 'Send CCD',
+        currentBalance: 'Nuværende saldo',
+        unableToCoverCost: 'Utilstrækkelig antal CCD til at dække omkostninger',
+        transferInvokeFailed: 'Simulering af overførsel fejlede. Det er derfor ikke muligt at estimere omkostninger.',
         fee: 'Estimerede transaktionsomkostninger',
     },
     tokens: {
@@ -86,6 +89,7 @@ const t: typeof en = {
     },
     accountPending: 'Denne konto er stadig ved at blive oprettet.',
     request: 'Opret konto',
+    unknown: 'Ukendt',
 };
 
 export default t;

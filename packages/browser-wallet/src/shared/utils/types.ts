@@ -44,3 +44,6 @@ export type RecoveryBackgroundResponse =
           status: BackgroundResponseStatus.Error;
           reason: string;
       };
+
+// eslint-disable-next-line @typescript-eslint/no-explicit-any
+export type SmartContractParameters = Record<string, unknown> | any[] | number | string;

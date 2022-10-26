@@ -82,7 +82,7 @@ function Collectibles({ account, toDetails }: ListProps) {
 
     return (
         <>
-            {tokens.map(({ contractIndex, id, metadata: { thumbnail, name, decimals = 0 } }) => (
+            {tokens.map(({ contractIndex, id, metadata: { thumbnail, name, decimals = 0, symbol } }) => (
                 <Button
                     clear
                     key={`${contractIndex}.${id}`}
@@ -96,9 +96,9 @@ function Collectibles({ account, toDetails }: ListProps) {
                             {({ [id]: b }) => (
                                 <>
                                     {b === 0n && <div className="token-list__ownership">{t('unownedUnique')}</div>}
-                                    {b / BigInt(10 ** decimals) !== 1n && b > 0n && (
+                                    {b && b / BigInt(10 ** decimals) !== 1n && (
                                         <div className="token-list__ownership">
-                                            <TokenBalance balance={b} decimals={decimals} />
+                                            <TokenBalance balance={b} decimals={decimals} symbol={symbol} />
                                         </div>
                                     )}
                                 </>

@@ -11,6 +11,7 @@ import {
     UpdateContractPayload,
     InitContractPayload,
 } from '@concordium/web-sdk';
+import { SmartContractParameters } from '@shared/utils/types';
 import DisplayCost from './DisplayCost';
 import { getTransactionTypeName } from '../utils/transaction-helpers';
 import DisplayUpdateContract from './displayPayload/DisplayUpdateContract';
@@ -22,13 +23,13 @@ type Props = {
     className?: string;
     transactionType: AccountTransactionType;
     payload: AccountTransactionPayload;
-    parameters?: Record<string, unknown>;
+    parameters?: SmartContractParameters;
     sender: string;
     cost?: bigint;
     hash?: string;
 };
 
-function displayPayload({ payload, type }: Omit<AccountTransaction, 'header'>, parameters?: Record<string, unknown>) {
+function displayPayload({ payload, type }: Omit<AccountTransaction, 'header'>, parameters?: SmartContractParameters) {
     switch (type) {
         case AccountTransactionType.SimpleTransfer:
             return <DisplaySimpleTransfer payload={payload as SimpleTransferPayload} />;
@@ -62,11 +63,13 @@ export default function TransactionReceipt({
                 format={AddressDisplayFormat.DoubleLine}
             />
             {displayPayload({ type: transactionType, payload }, parameters)}
-            <DisplayCost cost={cost} />
+            <DisplayCost className="transaction-receipt__cost" cost={cost} />
             {hash && (
                 <div className="transaction-receipt__hash">
                     {chunkString(hash, 32).map((chunk) => (
-                        <p className="m-0">{chunk}</p>
+                        <p key={chunk} className="m-0 mono">
+                            {chunk}
+                        </p>
                     ))}
                 </div>
             )}

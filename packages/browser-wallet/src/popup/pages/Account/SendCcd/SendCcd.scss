@@ -1,22 +1,89 @@
+$horizontal-spacing: rem(10px);
+$error-spacing: rem(13.286px);
+
 .send-ccd {
-    &__create-transfer {
-        &__input {
-            width: calc(100% - rem(50px));
-            margin: rem(5px) rem(25px) rem(13.286px) rem(25px);
-
-            &.form-input--invalid {
-                margin-bottom: 0;
-            }
-        }
-
-        &__button {
-            margin-bottom: rem(10px);
-            margin-top: auto;
-        }
-    }
-
     &__receipt {
         margin: rem(20px);
         width: calc(100% - rem(80px));
+    }
+}
+
+.create-transfer {
+    &__cost,
+    &__pick-token-element,
+    &__token-picker,
+    &__input {
+        width: calc(100% - rem(50px));
+        margin: 0 rem(25px) calc($error-spacing + rem(1px)) rem(25px);
+
+        &.form-input--invalid {
+            margin-bottom: rem(1px);
+        }
+    }
+
+    &__button {
+        margin-top: auto;
+        margin-bottom: $horizontal-spacing;
+    }
+
+    &__token-picker {
+        margin-top: $horizontal-spacing;
+    }
+
+    &__pick-token {
+        display: flex;
+        flex-direction: column;
+        width: 100%;
+        overflow: overlay;
+    }
+
+    &__pick-token-element:last-child {
+        margin-bottom: $horizontal-spacing;
+    }
+
+    &__pick-token-element:first-child {
+        margin-top: $horizontal-spacing;
+    }
+
+    &__cost {
+        margin-bottom: $error-spacing;
+
+        > p {
+            margin: 0 rem(6px);
+            color: $color-text-faded;
+            font-size: rem(8px);
+        }
+
+        &--error {
+            margin-bottom: 0;
+
+            > p {
+                color: $color-error;
+            }
+        }
+    }
+}
+
+.display-token {
+    border: rem(1px) solid $color-cta;
+    border-radius: rem(5px);
+    padding: rem(5px);
+    background: $color-bg;
+
+    &__balance {
+        font-size: 10px;
+        color: $color-text-faded;
+    }
+
+    &__token-display-container {
+        display: flex;
+        align-items: center;
+        justify-content: space-between;
+        height: rem(20px);
+    }
+
+    &__token-display {
+        max-height: rem(20px);
+        max-width: rem(40px);
     }
 }

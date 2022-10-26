@@ -5,7 +5,7 @@ import { useNavigate } from 'react-router-dom';
 import { useAtom, useAtomValue, useSetAtom } from 'jotai';
 import Form, { useForm } from '@popup/shared/Form';
 import Input, { Input as UncontrolledInput } from '@popup/shared/Form/Input';
-import { jsonRpcClientAtom } from '@popup/store/settings';
+import { jsonRpcClientAtom, networkConfigurationAtom } from '@popup/store/settings';
 import Submit from '@popup/shared/Form/Submit';
 import { TokenIdAndMetadata, TokenMetadata } from '@shared/storage/types';
 import Button from '@popup/shared/Button';
@@ -45,7 +45,7 @@ function ChooseContract({ onChoice }: ChooseContractProps) {
         }
         const contractName = instanceInfo.name.substring(5);
         const contractDetails = { contractName, index, subindex: 0n };
-        const error = await confirmCIS2Contract(client, instanceInfo, contractDetails);
+        const error = await confirmCIS2Contract(client, contractDetails);
         if (error) {
             addToast(error);
         } else {
@@ -118,6 +118,7 @@ function PickTokens({
 }) {
     const { t } = useTranslation('account', { keyPrefix: 'tokens' });
     const client = useAtomValue(jsonRpcClientAtom);
+    const network = useAtomValue(networkConfigurationAtom);
     const [accountTokens, setAccountTokens] = useState<(TokenIdAndMetadata & { chosen: boolean })[]>([]);
     const addToast = useSetAtom(addToastAtom);
     const form = useForm<FormValues>();
@@ -133,7 +134,7 @@ function PickTokens({
         }
         try {
             const tokenUrl = await getTokenUrl(client, id || '', contractDetails);
-            const meta = await getTokenMetadata(tokenUrl);
+            const meta = await getTokenMetadata(tokenUrl, network);
 
             setAccountTokens((tokens) => [...tokens, { id, metadata: meta, metadataLink: tokenUrl, chosen: true }]);
         } catch (e) {
