@@ -1,4 +1,4 @@
-import React, { ReactNode, useEffect, useMemo, useState } from 'react';
+import React, { ReactNode, useContext, useEffect, useMemo, useState } from 'react';
 import { useNavigate, useParams } from 'react-router-dom';
 
 import { useSelectedCredential } from '@popup/shared/utils/account-helpers';
@@ -15,6 +15,7 @@ import { TokenMetadata } from '@shared/storage/types';
 import TokenBalance from '../TokenBalance';
 import { defaultCis2TokenId } from '../routes';
 import { TokenDetails, useFlattenedAccountTokens } from '../utils';
+import { accountPageContext } from '../../utils';
 
 const SUB_INDEX = 0;
 
@@ -199,15 +200,12 @@ function useTokenDetails(): TokenDetails | undefined {
     return tokens.find((t) => t.contractIndex === contractIndex && t.id === tokenId);
 }
 
-type Props = {
-    setDetailsExpanded(expanded: boolean): void;
-};
-
-export default function Details({ setDetailsExpanded }: Props) {
+export default function Details() {
     const token = useTokenDetails();
     const account = useSelectedCredential();
     const nav = useNavigate();
     const balancesAtom = contractBalancesFamily(account?.address ?? '', token?.contractIndex ?? '');
+    const { setDetailsExpanded } = useContext(accountPageContext);
 
     useEffect(() => {
         setDetailsExpanded(false);

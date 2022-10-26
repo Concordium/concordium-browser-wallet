@@ -19,6 +19,7 @@ import { tokensRoutes, detailsRoute } from './routes';
 import TokenDetails from './TokenDetails';
 import { useFlattenedAccountTokens } from './utils';
 import TokenBalance from './TokenBalance';
+import { accountRoutes } from '../routes';
 
 type FtProps = {
     accountAddress: string;
@@ -122,7 +123,10 @@ function Tokens() {
                 <TabBar.Item className="tokens__link" to={tokensRoutes.collectibles}>
                     {t('nft')}
                 </TabBar.Item>
-                <TabBar.Item className="tokens__link" to={absoluteRoutes.home.account.tokens.add.path}>
+                <TabBar.Item
+                    className="tokens__link"
+                    to={`${absoluteRoutes.home.account.path}/${accountRoutes.addTokens}`}
+                >
                     <div className="tokens__add">
                         {t('new')}
                         <PlusIcon />
@@ -136,11 +140,7 @@ function Tokens() {
     );
 }
 
-type Props = {
-    setDetailsExpanded(expanded: boolean): void;
-};
-
-export default function TokensRoutes({ setDetailsExpanded }: Props) {
+export default function TokensRoutes() {
     const account = useSelectedCredential();
     const nav = useNavigate();
     useAtomValue(tokensAtom); // Ensure tokens are kept in memory
@@ -155,7 +155,7 @@ export default function TokensRoutes({ setDetailsExpanded }: Props) {
 
     return (
         <Routes>
-            <Route path={tokensRoutes.details} element={<TokenDetails setDetailsExpanded={setDetailsExpanded} />} />
+            <Route path={tokensRoutes.details} element={<TokenDetails />} />
             <Route element={<Tokens />}>
                 <Route index element={<Fungibles account={account} toDetails={goToDetails} />} />
                 <Route
