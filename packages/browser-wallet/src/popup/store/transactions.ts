@@ -72,19 +72,22 @@ const pendingTransactionsAtom = (() => {
                 }
 
                 const networkChanged = network.genesisHash !== currentNetwork.genesisHash;
-                const nextPending = pending.filter((p) => p.transactionHash !== transactionHash);
 
                 if (!networkChanged) {
-                    set(parsed, nextPending);
+                    const next = get(parsed).filter((p) => p.transactionHash !== transactionHash);
+                    set(parsed, next);
                 } else {
-                    const spt = useIndexedStorage(sessionPendingTransactions, async () => currentNetwork.genesisHash);
-                    spt.set(nextPending.map(stringify));
+                    const spt = useIndexedStorage(sessionPendingTransactions, async () => network.genesisHash);
+                    const next = (await spt.get())?.map(parse).filter((p) => p.transactionHash !== transactionHash);
+
+                    spt.set(next?.map(stringify) ?? []);
                 }
             });
         }
     );
 
     derived.onMount = (startMonitoring) => {
+        // setAtom callback starts monitoring a list of transactions + pending transactions currently in store.
         startMonitoring([]);
     };
 
