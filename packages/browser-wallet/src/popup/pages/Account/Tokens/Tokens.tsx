@@ -2,6 +2,7 @@ import React from 'react';
 import { useTranslation } from 'react-i18next';
 import { Outlet, Route, Routes, useNavigate } from 'react-router-dom';
 import { displayAsCcd } from 'wallet-common-helpers';
+import { useAtomValue } from 'jotai';
 
 import { absoluteRoutes } from '@popup/constants/routes';
 import TabBar from '@popup/shared/TabBar';
@@ -12,13 +13,12 @@ import { useSelectedCredential } from '@popup/shared/utils/account-helpers';
 import { TokenIdAndMetadata, WalletCredential } from '@shared/storage/types';
 import { contractBalancesFamily, tokensAtom } from '@popup/store/token';
 import Button from '@popup/shared/Button';
-
-import { useAtomValue } from 'jotai';
+import TokenBalance from '@popup/shared/TokenBalance';
 import AtomValue from '@popup/store/AtomValue';
+
 import { tokensRoutes, detailsRoute } from './routes';
 import TokenDetails from './TokenDetails';
 import { useFlattenedAccountTokens } from './utils';
-import TokenBalance from './TokenBalance';
 import { accountRoutes } from '../routes';
 
 type FtProps = {

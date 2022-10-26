@@ -41,6 +41,25 @@ const t = {
         cost: 'Estimated transaction fee',
         unknown: 'Unknown',
     },
+    tokenDetails: {
+        balance: 'Balance',
+        description: 'Description',
+        ownership: 'Ownership',
+        ticker: 'Ticker',
+        decimals: 'Decimals',
+        contractIndex: 'Contract index, subindex',
+        removeToken: "Don't show token in wallet",
+        showRawMetadata: 'Show raw metadata',
+        unownedUnique: 'Not owned',
+        ownedUnique: 'Owned',
+        tokenId: 'Token ID',
+        removePrompt: {
+            header: 'Hide {{ name }} in your wallet',
+            text: 'Are you sure you want hide this token in your wallet? You can always add it again from the tokens list.',
+            cancel: 'Keep token',
+            remove: 'Remove token',
+        },
+    },
 };
 
 export default t;

@@ -4,9 +4,9 @@ import { useMemo } from 'react';
 import { tokensAtom } from '@popup/store/token';
 import { TokenIdAndMetadata, WalletCredential } from '@shared/storage/types';
 
-export type TokenDetails = TokenIdAndMetadata & { contractIndex: string };
+export type AccountTokenDetails = TokenIdAndMetadata & { contractIndex: string };
 
-export function useFlattenedAccountTokens(account: WalletCredential | undefined): TokenDetails[] {
+export function useFlattenedAccountTokens(account: WalletCredential | undefined): AccountTokenDetails[] {
     const {
         loading,
         value: { [account?.address ?? '']: tokens },

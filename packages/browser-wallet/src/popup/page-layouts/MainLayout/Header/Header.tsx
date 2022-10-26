@@ -128,8 +128,7 @@ export default function Header({ onToggle, className }: Props) {
     const section = getSection(pathname);
     const canClose =
         !pathname.startsWith(absoluteRoutes.home.account.path) ||
-        pathname.startsWith(absoluteRoutes.home.account.add.path) ||
-        pathname.startsWith(absoluteRoutes.home.account.tokens.add.path);
+        pathname.startsWith(absoluteRoutes.home.account.add.path);
     const hasDropdown = [Section.Account, Section.Id].includes(section);
     const canGoBack = section === Section.Settings && pathname !== absoluteRoutes.home.settings.path;
 
