@@ -48,7 +48,7 @@ const accessorMap = {
     [ChromeStorageKey.IdpTab]: sessionIdpTab,
     [ChromeStorageKey.Tokens]: useIndexedStorage(storedTokens, getGenesisHash),
     [ChromeStorageKey.TokenMetadata]: storedTokenMetadata,
-    [ChromeStorageKey.PendingTransactions]: sessionPendingTransactions,
+    [ChromeStorageKey.PendingTransactions]: useIndexedStorage(sessionPendingTransactions, getGenesisHash),
 };
 
 export type AsyncWrapper<V> = {
@@ -82,23 +82,24 @@ export function atomWithChromeStorage<V>(key: ChromeStorageKey, fallback: V, wit
     const base = atom<AsyncWrapper<V>>({ loading: true, value: fallback });
 
     base.onMount = (setValue) => {
-        getStoredValue().then((value) =>
-            setValue({
-                loading: false,
-                value: value ?? fallback,
-            })
-        );
+        const refreshValue = () => {
+            getStoredValue().then((value) =>
+                setValue({
+                    loading: false,
+                    value: value ?? fallback,
+                })
+            );
+        };
 
-        const listener = (changes: Record<string, chrome.storage.StorageChange>) =>
-            getStoredValue().then((value) => {
-                if (key in changes) {
-                    setValue({
-                        loading: false,
-                        value: value ?? fallback,
-                    });
-                }
-            });
+        refreshValue();
+
+        const listener = (changes: Record<string, chrome.storage.StorageChange>) => {
+            if (key in changes || ChromeStorageKey.NetworkConfiguration in changes) {
+                refreshValue();
+            }
+        };
         chrome.storage[accessor.area].onChanged.addListener(listener);
+
         return () => {
             chrome.storage[accessor.area].onChanged.removeListener(listener);
             if (withLoading) {

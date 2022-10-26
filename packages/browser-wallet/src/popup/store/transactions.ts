@@ -5,12 +5,13 @@ import { stringify, parse } from 'wallet-common-helpers';
 import { ChromeStorageKey } from '@shared/storage/types';
 import { loop } from '@shared/utils/function-helpers';
 import { getTransactionStatus } from '@popup/shared/utils/wallet-proxy';
-import { sessionPendingTransactions } from '@shared/storage/access';
+import { ACCOUNT_INFO_RETRIEVAL_INTERVAL_MS } from '@popup/shared/account-info-listener';
+import { sessionPendingTransactions, useIndexedStorage } from '@shared/storage/access';
 import { selectedAccountAtom } from './account';
 import { atomWithChromeStorage } from './utils';
 import { networkConfigurationAtom } from './settings';
 
-const TRANSACTION_CHECK_INTERVAL = 10000;
+const TRANSACTION_CHECK_INTERVAL = ACCOUNT_INFO_RETRIEVAL_INTERVAL_MS;
 
 const monitoredMap: Record<string, string[]> = {};
 const monitorTransactionStatus = (genesisHash: string) => {
@@ -43,28 +44,54 @@ const monitorTransactionStatus = (genesisHash: string) => {
 
 const pendingTransactionsAtom = (() => {
     const base = atomWithChromeStorage<string[]>(ChromeStorageKey.PendingTransactions, []);
-
-    return atom<BrowserWalletAccountTransaction[], BrowserWalletAccountTransaction[]>(
+    const parsed = atom<BrowserWalletAccountTransaction[], BrowserWalletAccountTransaction[]>(
         (get) => {
-            const pendingJson = get(base);
-            const pending: BrowserWalletAccountTransaction[] = pendingJson.map(parse);
-            const network = get(networkConfigurationAtom);
-
-            const monitor = monitorTransactionStatus(network.genesisHash);
-            pending.forEach(async ({ transactionHash }) => {
-                const shouldRemove = await monitor(transactionHash);
-
-                if (shouldRemove) {
-                    sessionPendingTransactions.set(pendingJson.filter((json) => !json.includes(transactionHash)));
-                }
-            });
-
+            const pending: BrowserWalletAccountTransaction[] = get(base).map(parse);
             return pending;
         },
         (_, set, update) => {
             set(base, update.map(stringify));
         }
     );
+
+    const derived = atom<BrowserWalletAccountTransaction[], BrowserWalletAccountTransaction[]>(
+        (get) => get(parsed),
+        (get, set, update) => {
+            const pending = [...get(parsed), ...update];
+            set(parsed, pending);
+
+            const network = get(networkConfigurationAtom);
+            const monitor = monitorTransactionStatus(network.genesisHash);
+
+            pending.forEach(async ({ transactionHash }) => {
+                const shouldRemove = await monitor(transactionHash);
+                const currentNetwork = get(networkConfigurationAtom);
+
+                if (!shouldRemove) {
+                    return;
+                }
+
+                const networkChanged = network.genesisHash !== currentNetwork.genesisHash;
+
+                if (!networkChanged) {
+                    const next = get(parsed).filter((p) => p.transactionHash !== transactionHash);
+                    set(parsed, next);
+                } else {
+                    const spt = useIndexedStorage(sessionPendingTransactions, async () => network.genesisHash);
+                    const next = (await spt.get())?.map(parse).filter((p) => p.transactionHash !== transactionHash);
+
+                    spt.set(next?.map(stringify) ?? []);
+                }
+            });
+        }
+    );
+
+    derived.onMount = (startMonitoring) => {
+        // setAtom callback starts monitoring a list of transactions + pending transactions currently in store.
+        startMonitoring([]);
+    };
+
+    return derived;
 })();
 
 const isForAccount = (address: string) => (transaction: BrowserWalletAccountTransaction) =>
