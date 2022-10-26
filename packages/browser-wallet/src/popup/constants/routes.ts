@@ -51,6 +51,9 @@ export const relativeRoutes = {
         recovery: {
             path: 'recovery',
         },
+        addTokens: {
+            path: 'add-tokens',
+        },
     },
     setup: {
         path: '/setup',

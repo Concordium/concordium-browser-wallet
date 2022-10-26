@@ -24,6 +24,7 @@ import RecoveryIntro from '@popup/pages/Recovery/RecoveryIntro';
 import RecoveryMain from '@popup/pages/Recovery/RecoveryMain';
 import RecoveryFinish from '@popup/pages/Recovery/RecoveryFinish';
 import ChangePasscode from '@popup/pages/ChangePasscode/ChangePasscode';
+import AddTokensPrompt from '@popup/pages/AddTokens/ExternalAddTokens';
 
 type PromptKey = keyof Omit<typeof absoluteRoutes['prompt'], 'path'>;
 
@@ -82,6 +83,7 @@ export default function Routes() {
         InternalMessageType.SignMessage,
         'signMessage'
     );
+    const handleAddTokensResponse = useMessagePrompt<string[]>(InternalMessageType.AddTokens, 'addTokens');
 
     usePrompt(InternalMessageType.EndIdentityIssuance, 'endIdentityIssuance');
 
@@ -94,6 +96,10 @@ export default function Routes() {
     return (
         <ReactRoutes>
             <Route path={relativeRoutes.prompt.path} element={<FullscreenPromptLayout />}>
+                <Route
+                    path={relativeRoutes.prompt.addTokens.path}
+                    element={<AddTokensPrompt respond={handleAddTokensResponse} />}
+                />
                 <Route
                     path={relativeRoutes.prompt.signMessage.path}
                     element={

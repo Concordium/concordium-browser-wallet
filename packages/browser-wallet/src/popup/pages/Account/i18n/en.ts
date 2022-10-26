@@ -52,6 +52,13 @@ const t = {
         fee: 'Estimated transaction fee',
     },
     tokens: {
+        prompt: {
+            description: 'dApp would like to add tokens.',
+            descriptionAllExisting: 'dApp would like at add the following tokens. They are all already added though.',
+            add: 'Add chosen',
+            reject: "Don't add any",
+            finish: 'Finish',
+        },
         tabBar: {
             ft: 'Fungible',
             nft: 'Collectibles',

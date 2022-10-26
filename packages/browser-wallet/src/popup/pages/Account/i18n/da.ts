@@ -54,6 +54,13 @@ const t: typeof en = {
         fee: 'Estimerede transaktionsomkostninger',
     },
     tokens: {
+        prompt: {
+            description: 'dApp vil gerne tilføje tokens.',
+            descriptionAllExisting: 'dApp vil gerne tilføje tokens. De er dog alle allerede i tilføjet.',
+            add: 'Tilføj valgte',
+            reject: 'Tilføj ingen',
+            finish: 'Færdig',
+        },
         tabBar: {
             ft: 'Ombyttelige',
             nft: 'Samlerobjekter',

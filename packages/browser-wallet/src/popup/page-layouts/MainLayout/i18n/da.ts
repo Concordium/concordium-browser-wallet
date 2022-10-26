@@ -16,6 +16,7 @@ const t: typeof en = {
             passcode: 'Skift adgangskode',
             about: 'Om',
         },
+        addTokens: 'Tilføj tokens',
         request: 'Anmodning om Signatur',
         connect: 'Ny Forbindelse',
     },
