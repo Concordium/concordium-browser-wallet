@@ -292,8 +292,17 @@ export async function getTransactionStatus(tHash: string): Promise<TransactionSt
     return data.status;
 }
 
-export async function getCis2Tokens(contractIndex: bigint, subIndex = 0n): Promise<Cis2TokensResponse | undefined> {
-    const path = `/v0/CIS2Tokens/${contractIndex}/${subIndex}`;
+export async function getCis2Tokens(
+    contractIndex: bigint,
+    subIndex: bigint,
+    from?: number,
+    limit = 20
+): Promise<Cis2TokensResponse | undefined> {
+    let path = `/v0/CIS2Tokens/${contractIndex}/${subIndex}?limit=${limit}`;
+    if (from) {
+        path += `&from=${from}`;
+    }
+
     const { data } = await (await getWalletProxy()).get(path);
     return data;
 }

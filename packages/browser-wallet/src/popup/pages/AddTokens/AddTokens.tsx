@@ -133,7 +133,7 @@ function PickTokens({
             return;
         }
         try {
-            const tokenUrl = await getTokenUrl(client, id || '', contractDetails);
+            const tokenUrl = await getTokenUrl(client, [id] || '', contractDetails);
             const meta = await getTokenMetadata(tokenUrl, network);
 
             setAccountTokens((tokens) => [...tokens, { id, metadata: meta, metadataLink: tokenUrl, chosen: true }]);

@@ -129,7 +129,7 @@ const cbf = atomFamily<string, Atom<ContractBalances>>((identifier: string) => {
             const tokenIds = tokens.value[contractIndex]?.map((t) => t.id) ?? [];
 
             if (tokenIds.length !== 0) {
-                const balances = await getContractBalances(client, contractIndex, tokenIds, accountAddress);
+                const balances = await getContractBalances(client, BigInt(contractIndex), 0n, tokenIds, accountAddress);
                 set(baseAtom, balances);
             }
         }

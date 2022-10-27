@@ -1,17 +1,122 @@
-import React, { useContext, useEffect, useState } from 'react';
-import { useAtomValue, useSetAtom } from 'jotai';
+import React, { useContext, useEffect } from 'react';
+import { atom, useAtom, useAtomValue, useSetAtom } from 'jotai';
 import { useForm, SubmitHandler } from 'react-hook-form';
 import { useTranslation } from 'react-i18next';
 import { Navigate, Route, Routes, useLocation, useNavigate, Location } from 'react-router-dom';
+import { isDefined, MakeOptional } from 'wallet-common-helpers';
+import { JsonRpcClient } from '@concordium/web-sdk';
 import Form from '@popup/shared/Form';
 import Input from '@popup/shared/Form/Input';
 import Submit from '@popup/shared/Form/Submit';
 import { addToastAtom } from '@popup/state';
-import { jsonRpcClientAtom } from '@popup/store/settings';
-import { TokenIdAndMetadata } from '@shared/storage/types';
-import { confirmCIS2Contract, ContractDetails } from '@shared/utils/token-helpers';
+import { jsonRpcClientAtom, networkConfigurationAtom } from '@popup/store/settings';
+import { NetworkConfiguration, TokenIdAndMetadata, TokenMetadata } from '@shared/storage/types';
+import {
+    confirmCIS2Contract,
+    ContractDetails,
+    getContractBalances,
+    getTokenMetadata,
+    getTokenUrl,
+} from '@shared/utils/token-helpers';
 import TokenDetails from '@popup/shared/TokenDetails';
+import { getCis2Tokens } from '@popup/shared/utils/wallet-proxy';
+import { selectedAccountAtom } from '@popup/store/account';
+import { ensureDefined } from '@shared/utils/basic-helpers';
 import { accountPageContext } from '../utils';
+
+type TokensAtomAction = 'reset' | 'next';
+type ContractTokenDetails = TokenIdAndMetadata & {
+    balance: bigint;
+};
+
+const TOKENS_PAGE_SIZE = 20;
+
+type TokenWithPageID = MakeOptional<ContractTokenDetails, 'metadata'> & {
+    pageId: number;
+};
+
+const fetchTokensConfigure =
+    (contractDetails: ContractDetails, client: JsonRpcClient, network: NetworkConfiguration, account: string) =>
+    async (from?: number): Promise<TokenWithPageID[]> => {
+        const ts =
+            (await getCis2Tokens(contractDetails.index, contractDetails.subindex, from, TOKENS_PAGE_SIZE))?.tokens ??
+            [];
+        const ids = ts.map((t) => t.token);
+
+        const metadataPromise: Promise<[string[], Array<TokenMetadata | undefined>]> = (async () => {
+            const metadataUrls = await getTokenUrl(client, ids, contractDetails);
+            const metadata = await Promise.all(
+                metadataUrls.map((url) => {
+                    try {
+                        return getTokenMetadata(url, network);
+                    } catch {
+                        return Promise.resolve(undefined);
+                    }
+                })
+            );
+            return [metadataUrls, metadata];
+        })();
+
+        const balancesPromise = getContractBalances(
+            client,
+            contractDetails.index,
+            contractDetails.subindex,
+            ids,
+            account
+        );
+
+        const [[metadataUrls, metadata], balances] = await Promise.all([metadataPromise, balancesPromise]); // Run in parallel.
+
+        return ts.map((t, i) => ({
+            pageId: t.id,
+            id: t.token,
+            metadataLink: metadataUrls[i],
+            metadata: metadata[i],
+            balance: balances[t.token] ?? 0n,
+        }));
+    };
+
+const contractDetailsAtom = atom<ContractDetails | undefined>(undefined);
+const contractTokensAtom = (() => {
+    const base = atom<TokenWithPageID[]>([]);
+
+    const derived = atom<ContractTokenDetails[], TokensAtomAction>(
+        (get) =>
+            get(base)
+                .filter((td) => isDefined(td.metadata))
+                .map(({ pageId, ...td }) => td as ContractTokenDetails),
+        async (get, set, update) => {
+            const contractDetails = ensureDefined(get(contractDetailsAtom), 'Needs contract details');
+            const account = ensureDefined(get(selectedAccountAtom), 'No account has been selected');
+            const client = get(jsonRpcClientAtom);
+            const network = get(networkConfigurationAtom);
+            const fetchTokens = fetchTokensConfigure(contractDetails, client, network, account);
+            let topId: number | undefined;
+
+            switch (update) {
+                case 'reset': {
+                    set(base, []);
+                    break;
+                }
+                case 'next': {
+                    const tokens = get(base);
+                    topId = tokens.reverse()[0]?.pageId;
+
+                    break;
+                }
+                default: {
+                    throw new Error('Unsuported update type');
+                }
+            }
+
+            const next = await fetchTokens(topId);
+
+            set(base, (ts) => [...ts, ...next]);
+        }
+    );
+
+    return derived;
+})();
 
 const routes = {
     update: 'update',
@@ -22,19 +127,15 @@ type FormValues = {
     contractIndex: string;
 };
 
-interface ChooseContractProps {
-    initialContractIndex: bigint | undefined;
-    onChoice(details: ContractDetails): void;
-}
-
 /**
  * Component used to choose the contract index for a CIS-2 compliant smart contract instance.
  */
-function ChooseContract({ onChoice, initialContractIndex }: ChooseContractProps) {
+function ChooseContract() {
     const { t } = useTranslation('account', { keyPrefix: 'tokens.add' });
+    const [contractDetails, setContractDetails] = useAtom(contractDetailsAtom);
     const addToast = useSetAtom(addToastAtom);
     const form = useForm<FormValues>({
-        defaultValues: { contractIndex: initialContractIndex?.toString() },
+        defaultValues: { contractIndex: contractDetails?.index?.toString() },
     });
     const client = useAtomValue(jsonRpcClientAtom);
     const nav = useNavigate();
@@ -46,12 +147,12 @@ function ChooseContract({ onChoice, initialContractIndex }: ChooseContractProps)
             return;
         }
         const contractName = instanceInfo.name.substring(5);
-        const contractDetails = { contractName, index, subindex: 0n };
-        const error = await confirmCIS2Contract(client, contractDetails);
+        const cd: ContractDetails = { contractName, index, subindex: 0n };
+        const error = await confirmCIS2Contract(client, cd);
         if (error) {
             addToast(error);
         } else {
-            onChoice(contractDetails);
+            setContractDetails(cd);
             nav(routes.update);
         }
     };
@@ -82,12 +183,25 @@ function ChooseContract({ onChoice, initialContractIndex }: ChooseContractProps)
     );
 }
 
-type UpdateTokensProps = {
-    contractDetails: ContractDetails;
-};
+function UpdateTokens() {
+    const contractDetails = useAtomValue(contractDetailsAtom);
+    const [contractTokens, updateTokens] = useAtom(contractTokensAtom);
 
-function UpdateTokens({ contractDetails }: UpdateTokensProps) {
-    return <>Contract: {contractDetails.contractName}</>;
+    if (contractDetails === undefined) {
+        return <Navigate to=".." />;
+    }
+
+    useEffect(() => {
+        updateTokens('next');
+    }, []);
+
+    return (
+        <div>
+            Contract: {contractDetails.contractName}
+            <br />
+            Tokens: {contractTokens.length}
+        </div>
+    );
 }
 
 type DetailsLocationState = {
@@ -110,29 +224,24 @@ function Details() {
 
 export default function AddTokens() {
     const { setDetailsExpanded } = useContext(accountPageContext);
-    const [contractDetails, setContractDetails] = useState<ContractDetails>();
+    const contractDetails = useAtomValue(contractDetailsAtom);
+    const updateTokens = useSetAtom(contractTokensAtom);
 
     useEffect(() => {
         setDetailsExpanded(false);
         return () => setDetailsExpanded(true);
     }, []);
 
+    useEffect(() => {
+        if (contractDetails !== undefined) {
+            updateTokens('reset');
+        }
+    }, [contractDetails?.index]);
+
     return (
         <Routes>
-            <Route
-                index
-                element={<ChooseContract initialContractIndex={contractDetails?.index} onChoice={setContractDetails} />}
-            />
-            <Route
-                path={routes.update}
-                element={
-                    contractDetails !== undefined ? (
-                        <UpdateTokens contractDetails={contractDetails} />
-                    ) : (
-                        <Navigate to=".." />
-                    )
-                }
-            />
+            <Route index element={<ChooseContract />} />
+            <Route path={routes.update} element={<UpdateTokens />} />
             <Route path={routes.details} element={<Details />} />
         </Routes>
     );

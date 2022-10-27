@@ -33,23 +33,44 @@ export function getCIS2Identifier(): Buffer {
 /**
  * Returns a buffer containing the parameters used for the CIS-2 view function .tokenMetadata, for the given token id.
  */
-export function getMetadataParameter(id: string): Buffer {
-    const lengths = Buffer.alloc(3);
-    const idBuf = Buffer.from(id, 'hex');
-    lengths.writeInt16LE(1, 0);
-    lengths.writeInt8(idBuf.length, 2);
-    return Buffer.concat([lengths, idBuf]);
+export function getMetadataParameter(ids: string[]): Buffer {
+    const queries = Buffer.alloc(2);
+    queries.writeInt16LE(ids.length, 0);
+
+    const idBufs = ids.map((id) => {
+        const idBuf = Buffer.from(id, 'hex');
+        const length = Buffer.alloc(1);
+        length.writeInt8(idBuf.length, 0);
+
+        return Buffer.concat([length, idBuf]);
+    });
+
+    return Buffer.concat([queries, ...idBufs]);
 }
 
 /**
  * Returns the url for the token metadata.
  * returnValue is assumed to be a HEX-encoded string.
  */
-function deserializeTokenMetadataReturnValue(returnValue: string) {
-    const bufferStream = Buffer.from(returnValue, 'hex');
-    const length = bufferStream.readUInt16LE(2);
-    const url = Buffer.from(bufferStream.subarray(4, 4 + length)).toString('utf8');
-    return url;
+function deserializeTokenMetadataReturnValue(returnValue: string): string[] {
+    const buf = Buffer.from(returnValue, 'hex');
+    const n = buf.readUInt16LE(0);
+    let cursor = 2; // First 2 bytes hold number of token amounts included in response.
+    const urls: string[] = [];
+
+    // eslint-disable-next-line no-plusplus
+    for (let i = 0; i < n; i++) {
+        const length = buf.readUInt16LE(cursor);
+        const urlStart = cursor + 2;
+        const urlEnd = urlStart + length;
+
+        const url = Buffer.from(buf.subarray(urlStart, urlEnd)).toString('utf8');
+        urls.push(url);
+
+        cursor = urlEnd + 1;
+    }
+
+    return urls;
 }
 
 /**
@@ -81,15 +102,15 @@ export async function confirmCIS2Contract(
  */
 export function getTokenUrl(
     client: JsonRpcClient,
-    id: string,
+    ids: string[],
     { contractName, index, subindex }: ContractDetails
-): Promise<string> {
+): Promise<string[]> {
     return new Promise((resolve, reject) => {
         client
             .invokeContract({
                 contract: { index, subindex },
                 method: `${contractName}.tokenMetadata`,
-                parameter: getMetadataParameter(id),
+                parameter: getMetadataParameter(ids),
             })
             .then((returnValue) => {
                 if (returnValue && returnValue.tag === 'success' && returnValue.returnValue) {
@@ -192,12 +213,11 @@ export type ContractBalances = Record<string, bigint>;
 
 export const getContractBalances = async (
     client: JsonRpcClient,
-    contractIndex: string,
+    index: bigint,
+    subindex: bigint,
     tokenIds: string[],
     accountAddress: string
 ): Promise<ContractBalances> => {
-    const index = BigInt(contractIndex);
-    const subindex = 0n;
     const instanceInfo = await client.getInstanceInfo({ index, subindex });
 
     if (instanceInfo === undefined) {
