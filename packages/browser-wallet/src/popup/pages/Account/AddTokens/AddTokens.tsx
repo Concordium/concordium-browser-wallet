@@ -22,6 +22,7 @@ import TokenDetails from '@popup/shared/TokenDetails';
 import { getCis2Tokens } from '@popup/shared/utils/wallet-proxy';
 import { selectedAccountAtom } from '@popup/store/account';
 import { ensureDefined } from '@shared/utils/basic-helpers';
+import Button from '@popup/shared/Button';
 import { accountPageContext } from '../utils';
 
 type TokensAtomAction = 'reset' | 'next';
@@ -35,6 +36,16 @@ type TokenWithPageID = MakeOptional<ContractTokenDetails, 'metadata'> & {
     pageId: number;
 };
 
+const fallbackMetadata = (id: string): TokenMetadata => ({
+    thumbnail: { url: 'https://picsum.photos/40/40' },
+    display: { url: 'https://picsum.photos/200/300' },
+    name: id.substring(0, 8),
+    symbol: id.substring(0, 4),
+    decimals: 0,
+    description: id,
+    unique: true,
+});
+
 const fetchTokensConfigure =
     (contractDetails: ContractDetails, client: JsonRpcClient, network: NetworkConfiguration, account: string) =>
     async (from?: number): Promise<TokenWithPageID[]> => {
@@ -46,12 +57,9 @@ const fetchTokensConfigure =
         const metadataPromise: Promise<[string[], Array<TokenMetadata | undefined>]> = (async () => {
             const metadataUrls = await getTokenUrl(client, ids, contractDetails);
             const metadata = await Promise.all(
-                metadataUrls.map((url) => {
-                    try {
-                        return getTokenMetadata(url, network);
-                    } catch {
-                        return Promise.resolve(undefined);
-                    }
+                metadataUrls.map((url, i) => {
+                    const fallback = fallbackMetadata(ids[i]); // TODO change to undefined, only here for testing purposes.
+                    return getTokenMetadata(url, network).catch(() => Promise.resolve(fallback));
                 })
             );
             return [metadataUrls, metadata];
@@ -100,7 +108,7 @@ const contractTokensAtom = (() => {
                 }
                 case 'next': {
                     const tokens = get(base);
-                    topId = tokens.reverse()[0]?.pageId;
+                    topId = [...tokens].reverse()[0]?.pageId;
 
                     break;
                 }
@@ -110,7 +118,6 @@ const contractTokensAtom = (() => {
             }
 
             const next = await fetchTokens(topId);
-
             set(base, (ts) => [...ts, ...next]);
         }
     );
@@ -121,6 +128,12 @@ const contractTokensAtom = (() => {
 const routes = {
     update: 'update',
     details: 'details',
+};
+
+type DetailsLocationState = {
+    contractIndex: bigint;
+    token: TokenIdAndMetadata;
+    balance: bigint;
 };
 
 type FormValues = {
@@ -186,29 +199,44 @@ function ChooseContract() {
 function UpdateTokens() {
     const contractDetails = useAtomValue(contractDetailsAtom);
     const [contractTokens, updateTokens] = useAtom(contractTokensAtom);
+    const nav = useNavigate();
 
     if (contractDetails === undefined) {
         return <Navigate to=".." />;
     }
 
+    const hasTokens = contractTokens.length !== 0;
+
     useEffect(() => {
-        updateTokens('next');
-    }, []);
+        if (hasTokens) {
+            updateTokens('next');
+        }
+    }, [hasTokens]);
+
+    const showDetails = ({ balance, ...token }: ContractTokenDetails) => {
+        const state: DetailsLocationState = {
+            token,
+            balance,
+            contractIndex: contractDetails.index,
+        };
+        nav(`../${routes.details}`, { state });
+    };
 
     return (
         <div>
             Contract: {contractDetails.contractName}
             <br />
             Tokens: {contractTokens.length}
+            {contractTokens.map((t) => (
+                <div>
+                    <Button clear onClick={() => showDetails(t)}>
+                        {t.metadata.name}
+                    </Button>
+                </div>
+            ))}
         </div>
     );
 }
-
-type DetailsLocationState = {
-    contractIndex: bigint;
-    token: TokenIdAndMetadata;
-    balance: bigint;
-};
 
 function Details() {
     const { state } = useLocation() as Location & { state?: DetailsLocationState };
