@@ -1,12 +1,13 @@
-import React, { useContext, useEffect } from 'react';
+import React, { useContext, useEffect, useMemo } from 'react';
 import { atom, useAtom, useAtomValue, useSetAtom } from 'jotai';
 import { useForm, SubmitHandler } from 'react-hook-form';
 import { useTranslation } from 'react-i18next';
 import { Navigate, Route, Routes, useLocation, useNavigate, Location } from 'react-router-dom';
 import { isDefined, MakeOptional } from 'wallet-common-helpers';
 import { JsonRpcClient } from '@concordium/web-sdk';
+import clsx from 'clsx';
 import Form from '@popup/shared/Form';
-import Input from '@popup/shared/Form/Input';
+import FormInput from '@popup/shared/Form/Input';
 import Submit from '@popup/shared/Form/Submit';
 import { addToastAtom } from '@popup/state';
 import { jsonRpcClientAtom, networkConfigurationAtom } from '@popup/store/settings';
@@ -23,6 +24,10 @@ import { getCis2Tokens } from '@popup/shared/utils/wallet-proxy';
 import { selectedAccountAtom } from '@popup/store/account';
 import { ensureDefined } from '@shared/utils/basic-helpers';
 import Button from '@popup/shared/Button';
+import TokenBalance from '@popup/shared/TokenBalance';
+import { Checkbox } from '@popup/shared/Form/Checkbox';
+import { contractBalancesFamily, currentAccountTokensAtom } from '@popup/store/token';
+import { absoluteRoutes } from '@popup/constants/routes';
 import { accountPageContext } from '../utils';
 
 type TokensAtomAction = 'reset' | 'next';
@@ -40,7 +45,6 @@ const fallbackMetadata = (id: string): TokenMetadata => ({
     thumbnail: { url: 'https://picsum.photos/40/40' },
     display: { url: 'https://picsum.photos/200/300' },
     name: id.substring(0, 8),
-    symbol: id.substring(0, 4),
     decimals: 0,
     description: id,
     unique: true,
@@ -124,6 +128,7 @@ const contractTokensAtom = (() => {
 
     return derived;
 })();
+const checkedTokensAtom = atom<string[]>([]);
 
 const routes = {
     update: 'update',
@@ -180,7 +185,7 @@ function ChooseContract() {
                 <>
                     <div>
                         <p className="m-t-0">{t('chooseContractHeader')}</p>
-                        <Input
+                        <FormInput
                             register={f.register}
                             label={t('contractIndex')}
                             name="contractIndex"
@@ -197,9 +202,27 @@ function ChooseContract() {
 }
 
 function UpdateTokens() {
+    const { t } = useTranslation('account', { keyPrefix: 'tokens.add' });
     const contractDetails = useAtomValue(contractDetailsAtom);
+    const account = ensureDefined(useAtomValue(selectedAccountAtom), 'Assumed account to be available');
     const [contractTokens, updateTokens] = useAtom(contractTokensAtom);
     const nav = useNavigate();
+    const [accountTokens, setAccountTokens] = useAtom(currentAccountTokensAtom);
+    const currentContractTokens = useMemo(
+        () => (contractDetails?.index ? accountTokens.value[contractDetails.index.toString()] ?? [] : []),
+        [contractDetails?.index, accountTokens.value]
+    );
+    const currentContractBalances = useAtomValue(
+        contractBalancesFamily(account, contractDetails?.index.toString() ?? '')
+    );
+    const allContractTokens = useMemo(() => {
+        const mapped: ContractTokenDetails[] = currentContractTokens.map((cct) => ({
+            ...cct,
+            balance: currentContractBalances[cct.id],
+        }));
+        return [...mapped, ...contractTokens.filter((ct) => !mapped.some((mt) => mt.id === ct.id))];
+    }, [currentContractBalances, currentContractTokens, contractTokens]);
+    const [checked, setChecked] = useAtom(checkedTokensAtom);
 
     if (contractDetails === undefined) {
         return <Navigate to=".." />;
@@ -222,18 +245,59 @@ function UpdateTokens() {
         nav(`../${routes.details}`, { state });
     };
 
+    const toggleItem = (id: string) => {
+        if (checked.includes(id)) {
+            setChecked((cs) => cs.filter((c) => c !== id));
+        } else {
+            setChecked((cs) => [...cs, id]);
+        }
+    };
+
+    const storeTokens = () => {
+        const newTokens = contractTokens.filter((ct) => checked.includes(ct.id)).map(({ balance, ...token }) => token);
+        setAccountTokens({ contractIndex: contractDetails.index.toString(), newTokens }).then(() => {
+            nav(absoluteRoutes.home.account.tokens.path);
+        });
+    };
+
     return (
-        <div>
+        <div className="add-tokens-list">
             Contract: {contractDetails.contractName}
-            <br />
-            Tokens: {contractTokens.length}
-            {contractTokens.map((t) => (
-                <div>
-                    <Button clear onClick={() => showDetails(t)}>
-                        {t.metadata.name}
+            <div className="add-tokens-list__tokens">
+                {allContractTokens.map((token) => (
+                    <Button clear className="add-tokens-list__token" onClick={() => showDetails(token)}>
+                        <div className="flex align-center h-full">
+                            <img src={token.metadata.thumbnail?.url} alt={token.metadata.name ?? ''} />
+                            <div>
+                                {token.metadata.name}
+                                <div
+                                    className={clsx(
+                                        'add-tokens-list__token-balance',
+                                        token.balance !== 0n && 'add-tokens-list__token-balance--owns'
+                                    )}
+                                >
+                                    {t('ItemBalancePre')}
+                                    <TokenBalance
+                                        balance={token.balance}
+                                        decimals={token.metadata.decimals ?? 0}
+                                        symbol={token.metadata.symbol}
+                                    />
+                                </div>
+                            </div>
+                        </div>
+                        <Checkbox
+                            onClick={(e) => {
+                                e.stopPropagation();
+                            }}
+                            onChange={() => toggleItem(token.id)}
+                            checked={checked.includes(token.id)}
+                        />
                     </Button>
-                </div>
-            ))}
+                ))}
+            </div>
+            <Button className="w-full" onClick={storeTokens}>
+                {t('updateTokens')}
+            </Button>
         </div>
     );
 }
@@ -254,6 +318,8 @@ export default function AddTokens() {
     const { setDetailsExpanded } = useContext(accountPageContext);
     const contractDetails = useAtomValue(contractDetailsAtom);
     const updateTokens = useSetAtom(contractTokensAtom);
+    const accountTokens = useAtomValue(currentAccountTokensAtom);
+    const setChecked = useSetAtom(checkedTokensAtom);
 
     useEffect(() => {
         setDetailsExpanded(false);
@@ -265,6 +331,14 @@ export default function AddTokens() {
             updateTokens('reset');
         }
     }, [contractDetails?.index]);
+
+    useEffect(() => {
+        if (contractDetails?.index !== undefined) {
+            const currentTokenIds =
+                accountTokens.value[contractDetails.index.toString()]?.map((token) => token.id) ?? [];
+            setChecked(currentTokenIds);
+        }
+    }, [accountTokens.value, contractDetails?.index]);
 
     return (
         <Routes>

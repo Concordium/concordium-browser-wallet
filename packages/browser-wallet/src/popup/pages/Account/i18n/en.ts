@@ -64,6 +64,7 @@ const t = {
             hexId: 'Id must be HEX encoded',
             updateTokens: 'Update tokens',
             chooseContractHeader: 'Enter a contract index to select tokens from.',
+            ItemBalancePre: 'Your balance: ',
         },
         unownedUnique: 'Not owned',
     },

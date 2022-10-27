@@ -66,6 +66,7 @@ const t: typeof en = {
             hexId: 'Id skal være HEX encodet',
             updateTokens: 'Opdater tokens',
             chooseContractHeader: 'Indtast et kontraktindeks til at vælge tokens fra.',
+            ItemBalancePre: 'Din saldo: ',
         },
         unownedUnique: 'Ikke ejet',
     },

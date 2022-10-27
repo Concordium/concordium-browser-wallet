@@ -4,7 +4,7 @@ import { makeUncontrolled } from '../common/utils';
 import { CommonFieldProps, RequiredUncontrolledFieldProps } from '../common/types';
 import ErrorMessage from '../ErrorMessage';
 
-type Props = Pick<InputHTMLAttributes<HTMLInputElement>, 'className'> &
+type Props = Pick<InputHTMLAttributes<HTMLInputElement>, 'className' | 'onClick'> &
     RequiredUncontrolledFieldProps<HTMLInputElement> &
     CommonFieldProps & { description?: ReactElement; checked?: boolean; tabIndex?: number; readOnly?: boolean };
 
