@@ -1,6 +1,6 @@
 import { AccountAddress, AccountInfo } from '@concordium/web-sdk';
 import { networkConfigurationAtom, jsonRpcClientAtom, cookieAtom } from '@popup/store/settings';
-import { useAtomValue, useSetAtom } from 'jotai';
+import { useAtomValue, useSetAtom, useAtom } from 'jotai';
 import React, { createContext, ReactNode, useContext, useEffect, useMemo, useState } from 'react';
 import { atomWithChromeStorage } from '@popup/store/utils';
 import { ChromeStorageKey, CreationStatus, WalletCredential } from '@shared/storage/types';
@@ -25,12 +25,12 @@ interface Props {
 export default function AccountInfoListenerContextProvider({ children }: Props) {
     const network = useAtomValue(networkConfigurationAtom);
     const addToast = useSetAtom(addToastAtom);
-    const cookie = useAtomValue(cookieAtom);
+    const [cookie, setCookie] = useAtom(cookieAtom);
     const [accountInfoListener, setAccountInfoListener] = useState<AccountInfoListener>();
     const { t } = useTranslation();
 
     useEffect(() => {
-        const listener = new AccountInfoListener(network, cookie);
+        const listener = new AccountInfoListener(network, setCookie, cookie);
         listener.listen();
         setAccountInfoListener(listener);
         const errorListener = () => addToast(t('account.error'));

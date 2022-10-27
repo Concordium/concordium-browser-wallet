@@ -158,7 +158,7 @@ export const sessionIsRecovering = makeStorageAccessor<boolean>('session', Chrom
 export const sessionRecoveryStatus = makeStorageAccessor<RecoveryStatus>('session', ChromeStorageKey.RecoveryStatus);
 export const sessionOnboardingLocation = makeStorageAccessor<string>('session', ChromeStorageKey.OnboardingLocation);
 export const sessionIdpTab = makeStorageAccessor<number>('session', ChromeStorageKey.IdpTab);
-export const sessionCookie = makeStorageAccessor<string>('session', ChromeStorageKey.Cookie);
+export const sessionCookie = makeIndexedStorageAccessor<string>('session', ChromeStorageKey.Cookie);
 
 export const sessionPendingTransactions = makeIndexedStorageAccessor<string[]>( // Underlying type is serialized BrowserWalletAccountTransaction[]
     'session',

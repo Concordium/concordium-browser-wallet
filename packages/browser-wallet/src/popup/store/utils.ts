@@ -50,7 +50,7 @@ const accessorMap = {
     [ChromeStorageKey.Tokens]: useIndexedStorage(storedTokens, getGenesisHash),
     [ChromeStorageKey.TokenMetadata]: storedTokenMetadata,
     [ChromeStorageKey.PendingTransactions]: useIndexedStorage(sessionPendingTransactions, getGenesisHash),
-    [ChromeStorageKey.Cookie]: sessionCookie,
+    [ChromeStorageKey.Cookie]: useIndexedStorage(sessionCookie, getGenesisHash),
 };
 
 export type AsyncWrapper<V> = {

@@ -37,7 +37,14 @@ export const cookieAtom = atomWithChromeStorage<string | undefined>(ChromeStorag
 export const jsonRpcClientAtom = atom<JsonRpcClient>((get) => {
     const network = get(storedNetworkConfigurationAtom);
     const cookie = get(cookieAtom);
-    return new JsonRpcClient(new HttpProvider(network.jsonRpcUrl, undefined, sessionCookie.set, cookie));
+    return new JsonRpcClient(
+        new HttpProvider(
+            network.jsonRpcUrl,
+            undefined,
+            (value: string) => sessionCookie.set(network.genesisHash, value),
+            cookie
+        )
+    );
 });
 
 export const sessionPasscodeAtom = atomWithChromeStorage<string | undefined>(
