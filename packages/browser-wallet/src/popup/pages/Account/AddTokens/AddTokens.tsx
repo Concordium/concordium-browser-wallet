@@ -7,7 +7,7 @@ import { isDefined, MakeOptional } from 'wallet-common-helpers';
 import { JsonRpcClient } from '@concordium/web-sdk';
 import clsx from 'clsx';
 import Form from '@popup/shared/Form';
-import FormInput from '@popup/shared/Form/Input';
+import FormInput, { Input } from '@popup/shared/Form/Input';
 import Submit from '@popup/shared/Form/Submit';
 import { addToastAtom } from '@popup/state';
 import { jsonRpcClientAtom, networkConfigurationAtom } from '@popup/store/settings';
@@ -201,20 +201,20 @@ function ChooseContract() {
     );
 }
 
-function UpdateTokens() {
-    const { t } = useTranslation('account', { keyPrefix: 'tokens.add' });
-    const contractDetails = useAtomValue(contractDetailsAtom);
-    const account = ensureDefined(useAtomValue(selectedAccountAtom), 'Assumed account to be available');
-    const [contractTokens, updateTokens] = useAtom(contractTokensAtom);
-    const nav = useNavigate();
-    const [accountTokens, setAccountTokens] = useAtom(currentAccountTokensAtom);
+function useContractTokensWithCurrent(): ContractTokenDetails[] {
+    const contractDetails = ensureDefined(useAtomValue(contractDetailsAtom), 'Assumed contract details to be defined');
+    const account = ensureDefined(useAtomValue(selectedAccountAtom), 'No account selected');
+    const contractTokens = useAtomValue(contractTokensAtom);
+    const accountTokens = useAtomValue(currentAccountTokensAtom);
+
     const currentContractTokens = useMemo(
-        () => (contractDetails?.index ? accountTokens.value[contractDetails.index.toString()] ?? [] : []),
-        [contractDetails?.index, accountTokens.value]
+        () => accountTokens.value[contractDetails.index.toString()] ?? [],
+        [contractDetails.index, accountTokens.value]
     );
     const currentContractBalances = useAtomValue(
         contractBalancesFamily(account, contractDetails?.index.toString() ?? '')
     );
+
     const allContractTokens = useMemo(() => {
         const mapped: ContractTokenDetails[] = currentContractTokens.map((cct) => ({
             ...cct,
@@ -222,19 +222,18 @@ function UpdateTokens() {
         }));
         return [...mapped, ...contractTokens.filter((ct) => !mapped.some((mt) => mt.id === ct.id))];
     }, [currentContractBalances, currentContractTokens, contractTokens]);
+
+    return allContractTokens;
+}
+
+function UpdateTokens() {
+    const { t } = useTranslation('account', { keyPrefix: 'tokens.add' });
+    const contractDetails = ensureDefined(useAtomValue(contractDetailsAtom), 'Assumed contract details to be defined');
+    // const updateTokens = useSetAtom(contractTokensAtom);
+    const nav = useNavigate();
+    const setAccountTokens = useSetAtom(currentAccountTokensAtom);
+    const allContractTokens = useContractTokensWithCurrent();
     const [checked, setChecked] = useAtom(checkedTokensAtom);
-
-    if (contractDetails === undefined) {
-        return <Navigate to=".." />;
-    }
-
-    const hasTokens = contractTokens.length !== 0;
-
-    useEffect(() => {
-        if (hasTokens) {
-            updateTokens('next');
-        }
-    }, [hasTokens]);
 
     const showDetails = ({ balance, ...token }: ContractTokenDetails) => {
         const state: DetailsLocationState = {
@@ -253,16 +252,19 @@ function UpdateTokens() {
         }
     };
 
-    const storeTokens = () => {
-        const newTokens = contractTokens.filter((ct) => checked.includes(ct.id)).map(({ balance, ...token }) => token);
-        setAccountTokens({ contractIndex: contractDetails.index.toString(), newTokens }).then(() => {
-            nav(absoluteRoutes.home.account.tokens.path);
-        });
+    const storeTokens = async () => {
+        const newTokens = allContractTokens
+            .filter((ct) => checked.includes(ct.id))
+            .map(({ balance, ...token }) => token);
+
+        await setAccountTokens({ contractIndex: contractDetails.index.toString(), newTokens });
+        nav(absoluteRoutes.home.account.tokens.path);
     };
 
     return (
         <div className="add-tokens-list">
             Contract: {contractDetails.contractName}
+            <Input className="w-full m-b-10" type="search" />
             <div className="add-tokens-list__tokens">
                 {allContractTokens.map((token) => (
                     <Button clear className="add-tokens-list__token" onClick={() => showDetails(token)}>
