@@ -1,26 +1,21 @@
 import React, { useCallback, useContext, useEffect, useMemo, useState } from 'react';
-import { atom, useAtom, useAtomValue, useSetAtom } from 'jotai';
+import { useAtom, useAtomValue, useSetAtom } from 'jotai';
 import { useForm, SubmitHandler } from 'react-hook-form';
 import { useTranslation } from 'react-i18next';
 import { Navigate, Route, Routes, useLocation, useNavigate, Location } from 'react-router-dom';
-import { isDefined, isHex, MakeOptional, useUpdateEffect } from 'wallet-common-helpers';
+import { isHex, useUpdateEffect } from 'wallet-common-helpers';
 import { JsonRpcClient } from '@concordium/web-sdk';
 import clsx from 'clsx';
+import debounce from 'lodash.debounce';
+
 import Form from '@popup/shared/Form';
 import FormInput, { Input } from '@popup/shared/Form/Input';
 import Submit from '@popup/shared/Form/Submit';
 import { addToastAtom } from '@popup/state';
 import { jsonRpcClientAtom, networkConfigurationAtom } from '@popup/store/settings';
-import { NetworkConfiguration, TokenIdAndMetadata, TokenMetadata } from '@shared/storage/types';
-import {
-    confirmCIS2Contract,
-    ContractDetails,
-    getContractBalances,
-    getTokenMetadata,
-    getTokenUrl,
-} from '@shared/utils/token-helpers';
+import { NetworkConfiguration, TokenIdAndMetadata } from '@shared/storage/types';
+import { confirmCIS2Contract, ContractDetails } from '@shared/utils/token-helpers';
 import TokenDetails from '@popup/shared/TokenDetails';
-import { getCis2Tokens } from '@popup/shared/utils/wallet-proxy';
 import { selectedAccountAtom } from '@popup/store/account';
 import { ensureDefined } from '@shared/utils/basic-helpers';
 import Button from '@popup/shared/Button';
@@ -28,143 +23,9 @@ import TokenBalance from '@popup/shared/TokenBalance';
 import { Checkbox } from '@popup/shared/Form/Checkbox';
 import { contractBalancesFamily, currentAccountTokensAtom } from '@popup/store/token';
 import { absoluteRoutes } from '@popup/constants/routes';
-import debounce from 'lodash.debounce';
 import { accountPageContext } from '../utils';
-
-type TokensAtomAction = 'reset' | 'next';
-type ContractTokenDetails = TokenIdAndMetadata & {
-    balance: bigint;
-};
-
-const TOKENS_PAGE_SIZE = 20;
-
-type TokenWithPageID = MakeOptional<ContractTokenDetails, 'metadata'> & {
-    pageId: number;
-};
-
-const fallbackMetadata = (id: string): TokenMetadata => ({
-    thumbnail: { url: 'https://picsum.photos/40/40' },
-    display: { url: 'https://picsum.photos/200/300' },
-    name: id.substring(0, 8),
-    decimals: 0,
-    description: id,
-    unique: true,
-});
-
-// const isTokenIdAndMetadataList = (
-//     tokens: Array<Cis2TokenResponse | TokenIdAndMetadata>
-// ): tokens is TokenIdAndMetadata[] => (tokens[0] as TokenIdAndMetadata | undefined)?.metadata !== undefined;
-
-// function enrichTokens(tokens: TokenIdAndMetadata[]): ContractTokenDetails[];
-// function enrichTokens(tokens: Cis2TokenResponse[]): ContractTokenDetails[];
-// function enrichTokens(tokens: Array<Cis2TokenResponse | TokenIdAndMetadata>): ContractTokenDetails[] {
-//     if (tokens.length === 0) {
-//         return [];
-//     }
-
-//     let noBalanceTokens: Omit<ContractTokenDetails, 'balance'>[];
-
-//     if (isTokenIdAndMetadataList(tokens)) {
-//         noBalanceTokens = tokens;
-//     } else {
-//         noBalanceTokens =
-//     }
-// }
-
-const getTokens = async (
-    contractDetails: ContractDetails,
-    client: JsonRpcClient,
-    network: NetworkConfiguration,
-    account: string,
-    ids: string[]
-) => {
-    const metadataPromise: Promise<[string[], Array<TokenMetadata | undefined>]> = (async () => {
-        const metadataUrls = await getTokenUrl(client, ids, contractDetails);
-        const metadata = await Promise.all(
-            metadataUrls.map((url, i) => {
-                const fallback = fallbackMetadata(ids[i]); // TODO change to undefined, only here for testing purposes.
-                return getTokenMetadata(url, network).catch(() => Promise.resolve(fallback));
-            })
-        );
-        return [metadataUrls, metadata];
-    })();
-
-    const balancesPromise = getContractBalances(client, contractDetails.index, contractDetails.subindex, ids, account);
-
-    const [[metadataUrls, metadata], balances] = await Promise.all([metadataPromise, balancesPromise]); // Run in parallel.
-
-    return ids.map((id, i) => ({
-        id,
-        metadataLink: metadataUrls[i],
-        metadata: metadata[i],
-        balance: balances[id] ?? 0n,
-    }));
-};
-
-const fetchTokensConfigure =
-    (contractDetails: ContractDetails, client: JsonRpcClient, network: NetworkConfiguration, account: string) =>
-    async (from?: number): Promise<TokenWithPageID[]> => {
-        const cts =
-            (await getCis2Tokens(contractDetails.index, contractDetails.subindex, from, TOKENS_PAGE_SIZE))?.tokens ??
-            [];
-
-        const tokens = await getTokens(
-            contractDetails,
-            client,
-            network,
-            account,
-            cts.map((t) => t.token)
-        );
-
-        return tokens.map((t, i) => ({
-            ...t,
-            pageId: cts[i].id,
-        }));
-    };
-
-const contractDetailsAtom = atom<ContractDetails | undefined>(undefined);
-const contractTokensAtom = (() => {
-    const base = atom<TokenWithPageID[]>([]);
-
-    const derived = atom<ContractTokenDetails[], TokensAtomAction>(
-        (get) =>
-            get(base)
-                .filter((td) => isDefined(td.metadata))
-                .map(({ pageId, ...td }) => td as ContractTokenDetails),
-        async (get, set, update) => {
-            const contractDetails = ensureDefined(get(contractDetailsAtom), 'Needs contract details');
-            const account = ensureDefined(get(selectedAccountAtom), 'No account has been selected');
-            const client = get(jsonRpcClientAtom);
-            const network = get(networkConfigurationAtom);
-            const fetchTokens = fetchTokensConfigure(contractDetails, client, network, account);
-            let topId: number | undefined;
-
-            switch (update) {
-                case 'reset': {
-                    set(base, []);
-                    break;
-                }
-                case 'next': {
-                    const tokens = get(base);
-                    topId = [...tokens].reverse()[0]?.pageId;
-
-                    break;
-                }
-                default: {
-                    throw new Error('Unsuported update type');
-                }
-            }
-
-            const next = await fetchTokens(topId);
-            set(base, (ts) => [...ts, ...next]);
-        }
-    );
-
-    return derived;
-})();
-const checkedTokensAtom = atom<string[]>([]);
-const searchAtom = atom<string>('');
-const searchResultAtom = atom<ContractTokenDetails | undefined>(undefined);
+import { checkedTokensAtom, contractDetailsAtom, contractTokensAtom, searchAtom, searchResultAtom } from './state';
+import { ContractTokenDetails, getTokens } from './utils';
 
 const routes = {
     update: 'update',
@@ -237,6 +98,49 @@ function ChooseContract() {
     );
 }
 
+type ContractTokenLineProps = {
+    token: ContractTokenDetails;
+    onClick(token: ContractTokenDetails): void;
+    onToggleChecked(token: ContractTokenDetails): void;
+    isChecked: boolean;
+};
+
+function ContractTokenLine({ token, onClick, onToggleChecked: toggleChecked, isChecked }: ContractTokenLineProps) {
+    const { t } = useTranslation('account', { keyPrefix: 'tokens.add' });
+
+    return (
+        <Button key={token.id} clear className="add-tokens-list__token" onClick={() => onClick(token)}>
+            <div className="flex align-center h-full">
+                <img src={token.metadata.thumbnail?.url} alt={token.metadata.name ?? ''} />
+                <div>
+                    {token.metadata.name}
+                    <div
+                        className={clsx(
+                            'add-tokens-list__token-balance',
+                            token.balance !== 0n && 'add-tokens-list__token-balance--owns'
+                        )}
+                    >
+                        {t('ItemBalancePre')}
+                        <TokenBalance
+                            balance={token.balance}
+                            decimals={token.metadata.decimals ?? 0}
+                            symbol={token.metadata.symbol}
+                        />
+                    </div>
+                </div>
+            </div>
+            <Checkbox
+                onClick={(e) => {
+                    e.stopPropagation();
+                }}
+                onChange={() => toggleChecked(token)}
+                checked={isChecked}
+                className="add-tokens-list__checkbox"
+            />
+        </Button>
+    );
+}
+
 function useContractTokensWithCurrent(): ContractTokenDetails[] {
     const contractDetails = ensureDefined(useAtomValue(contractDetailsAtom), 'Assumed contract details to be defined');
     const account = ensureDefined(useAtomValue(selectedAccountAtom), 'No account selected');
@@ -286,6 +190,28 @@ const lookupTokenIdConfigure = (
         500
     );
 
+const validateId = (id: string | undefined, message: string) => {
+    if (!id || isHex(id)) {
+        return undefined;
+    }
+    return message;
+};
+
+function useLookupTokenId() {
+    const contractDetails = ensureDefined(useAtomValue(contractDetailsAtom), 'Assumed contract details to be defined');
+    const client = useAtomValue(jsonRpcClientAtom);
+    const network = useAtomValue(networkConfigurationAtom);
+    const account = ensureDefined(useAtomValue(selectedAccountAtom), 'No account selected');
+
+    const lookupTokenId = useCallback(lookupTokenIdConfigure(contractDetails, client, network, account), [
+        client,
+        contractDetails,
+        account,
+    ]);
+
+    return lookupTokenId;
+}
+
 function UpdateTokens() {
     const { t } = useTranslation('account', { keyPrefix: 'tokens.add' });
     const contractDetails = ensureDefined(useAtomValue(contractDetailsAtom), 'Assumed contract details to be defined');
@@ -296,23 +222,9 @@ function UpdateTokens() {
     const [checked, setChecked] = useAtom(checkedTokensAtom);
     const [search, setSearch] = useAtom(searchAtom);
     const [searchResult, setSearchResult] = useAtom(searchResultAtom);
-    const account = ensureDefined(useAtomValue(selectedAccountAtom), 'No account selected');
-    const client = useAtomValue(jsonRpcClientAtom);
-    const network = useAtomValue(networkConfigurationAtom);
     const showToast = useSetAtom(addToastAtom);
     const [searchError, setSearchError] = useState<string | undefined>();
-    const lookupTokenId = useCallback(lookupTokenIdConfigure(contractDetails, client, network, account), [
-        client,
-        contractDetails,
-        account,
-    ]);
-
-    const validateId = (id: string | undefined) => {
-        if (!id || isHex(id)) {
-            return undefined;
-        }
-        return t('hexId');
-    };
+    const lookupTokenId = useLookupTokenId();
 
     const displayTokens = searchResult !== undefined ? [searchResult] : allContractTokens;
 
@@ -325,7 +237,7 @@ function UpdateTokens() {
     }, [search]);
 
     useEffect(() => {
-        setSearchError(validateId(search));
+        setSearchError(validateId(search, t('hexId')));
     }, [search]);
 
     const showDetails = ({ balance, ...token }: ContractTokenDetails) => {
@@ -337,7 +249,7 @@ function UpdateTokens() {
         nav(`../${routes.details}`, { state });
     };
 
-    const toggleItem = (id: string) => {
+    const toggleItem = ({ id }: ContractTokenDetails) => {
         if (checked.includes(id)) {
             setChecked((cs) => cs.filter((c) => c !== id));
         } else {
@@ -365,34 +277,12 @@ function UpdateTokens() {
             />
             <div className="add-tokens-list__tokens">
                 {displayTokens.map((token) => (
-                    <Button key={token.id} clear className="add-tokens-list__token" onClick={() => showDetails(token)}>
-                        <div className="flex align-center h-full">
-                            <img src={token.metadata.thumbnail?.url} alt={token.metadata.name ?? ''} />
-                            <div>
-                                {token.metadata.name}
-                                <div
-                                    className={clsx(
-                                        'add-tokens-list__token-balance',
-                                        token.balance !== 0n && 'add-tokens-list__token-balance--owns'
-                                    )}
-                                >
-                                    {t('ItemBalancePre')}
-                                    <TokenBalance
-                                        balance={token.balance}
-                                        decimals={token.metadata.decimals ?? 0}
-                                        symbol={token.metadata.symbol}
-                                    />
-                                </div>
-                            </div>
-                        </div>
-                        <Checkbox
-                            onClick={(e) => {
-                                e.stopPropagation();
-                            }}
-                            onChange={() => toggleItem(token.id)}
-                            checked={checked.includes(token.id)}
-                        />
-                    </Button>
+                    <ContractTokenLine
+                        token={token}
+                        isChecked={checked.includes(token.id)}
+                        onClick={showDetails}
+                        onToggleChecked={toggleItem}
+                    />
                 ))}
             </div>
             <Button className="w-full" onClick={storeTokens}>

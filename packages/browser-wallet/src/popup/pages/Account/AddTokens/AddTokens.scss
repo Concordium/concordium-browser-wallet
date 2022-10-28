@@ -56,4 +56,8 @@ $horizontal-spacing: rem(10px);
             color: $color-cta;
         }
     }
+
+    &__checkbox {
+        width: rem(14px);
+    }
 }
