@@ -65,6 +65,8 @@ const t = {
             updateTokens: 'Update tokens',
             chooseContractHeader: 'Enter a contract index to select tokens from.',
             ItemBalancePre: 'Your balance: ',
+            searchLabel: 'Search for token ID in {{ contractName }}',
+            noValidTokenError: 'Token either does not exist or cannot be used in wallet',
         },
         unownedUnique: 'Not owned',
     },

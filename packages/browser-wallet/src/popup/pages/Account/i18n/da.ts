@@ -67,6 +67,8 @@ const t: typeof en = {
             updateTokens: 'Opdater tokens',
             chooseContractHeader: 'Indtast et kontraktindeks til at vælge tokens fra.',
             ItemBalancePre: 'Din saldo: ',
+            searchLabel: 'Søg efter token ID i {{ contractName }}',
+            noValidTokenError: 'Token eksisterer enten ikke eller kan ikke vises i wallet',
         },
         unownedUnique: 'Ikke ejet',
     },

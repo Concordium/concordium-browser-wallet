@@ -1944,6 +1944,7 @@ __metadata:
     "@storybook/testing-library": ^0.0.11
     "@svgr/webpack": ^6.2.1
     "@types/chrome": ^0.0.195
+    "@types/lodash.debounce": ^4.0.7
     "@types/lodash.groupby": ^4.6.7
     "@types/react": ^18.0.7
     "@types/react-dom": ^18.0.0
@@ -1966,6 +1967,7 @@ __metadata:
     jotai: ^1.6.5
     json-bigint: ^1.0.0
     leb128: ^0.0.5
+    lodash.debounce: ^4.0.8
     lodash.groupby: ^4.6.0
     react: ^18.0.0
     react-dom: ^18.0.0
@@ -4825,6 +4827,15 @@ __metadata:
   dependencies:
     "@types/node": "*"
   checksum: e009a2bfb50e90ca9b7c6e8f648f8464067271fd99116f881073fa6fa76dc8d0133181dd65e6614d5fb1220d671d67b0124aef7d97dc02d7e342ab143a47779d
+  languageName: node
+  linkType: hard
+
+"@types/lodash.debounce@npm:^4.0.7":
+  version: 4.0.7
+  resolution: "@types/lodash.debounce@npm:4.0.7"
+  dependencies:
+    "@types/lodash": "*"
+  checksum: e873b2d77f89010876baba3437ef826b17221b98948e00b5590828334a481dea1c8f9d28543210e564adc53199584f42c3cb171f8b6c3614fefc0b4e0888679c
   languageName: node
   linkType: hard
 

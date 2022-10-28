@@ -6,7 +6,7 @@ $horizontal-spacing: rem(10px);
     flex-direction: column;
     width: 100%;
     height: 100%;
-    padding: rem(15px) rem(10px);
+    padding: rem(10px) rem(10px);
 
     &__tokens {
         display: flex;
@@ -28,9 +28,10 @@ $horizontal-spacing: rem(10px);
         cursor: pointer;
         height: rem(42px);
         text-align: left;
+        border-bottom: rem(1px) solid $color-lines;
 
-        &:not(:last-of-type) {
-            border-bottom: rem(1px) solid $color-lines;
+        &:last-of-type {
+            border-bottom-color: transparent;
         }
 
         &:first-child {
