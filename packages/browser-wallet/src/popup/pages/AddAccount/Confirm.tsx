@@ -5,7 +5,7 @@ import { useNavigate } from 'react-router-dom';
 import IdCard from '@popup/shared/IdCard';
 import { identityProvidersAtom, selectedIdentityAtom } from '@popup/store/identity';
 import { credentialsAtom, creatingCredentialRequestAtom } from '@popup/store/account';
-import { networkConfigurationAtom } from '@popup/store/settings';
+import { jsonRpcClientAtom, networkConfigurationAtom } from '@popup/store/settings';
 import { CreationStatus, WalletCredential } from '@shared/storage/types';
 import Button from '@popup/shared/Button';
 import ArrowIcon from '@assets/svg/arrow.svg';
@@ -28,6 +28,7 @@ export default function Confirm() {
     const selectedIdentity = useAtomValue(selectedIdentityAtom);
     const credentials = useAtomValue(credentialsAtom);
     const network = useAtomValue(networkConfigurationAtom);
+    const client = useAtomValue(jsonRpcClientAtom);
     const providers = useAtomValue(identityProvidersAtom);
     const addToast = useSetAtom(addToastAtom);
     const seedPhrase = useDecryptedSeedPhrase((e) => addToast(e.message));
@@ -54,7 +55,7 @@ export default function Confirm() {
                 throw new Error('Selected identity is not defined or not confirmed');
             }
 
-            const global = await getGlobal(network);
+            const global = await getGlobal(client);
 
             // Make request
             const expiry = Math.floor(Date.now() / 1000) + 720;
