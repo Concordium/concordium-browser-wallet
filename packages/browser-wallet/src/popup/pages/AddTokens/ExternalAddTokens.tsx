@@ -9,16 +9,16 @@ import { addToastAtom } from '@popup/state';
 import ExternalRequestLayout from '@popup/page-layouts/ExternalRequestLayout';
 import { currentAccountTokensAtom } from '@popup/store/token';
 import { useAsyncMemo } from 'wallet-common-helpers';
-import { TokenIdAndMetadata, TokenMetadata } from '@shared/storage/types';
-import { fetchContractName, getTokenMetadata, getTokenUrl } from '@shared/utils/token-helpers';
+import { NetworkConfiguration, TokenIdAndMetadata, TokenMetadata } from '@shared/storage/types';
+import { ContractDetails, fetchContractName, getTokenMetadata, getTokenUrl } from '@shared/utils/token-helpers';
 import { jsonRpcClientAtom, networkConfigurationAtom } from '@popup/store/settings';
 import { selectedAccountAtom } from '@popup/store/account';
 import { fullscreenPromptContext } from '@popup/page-layouts/FullscreenPromptLayout';
 import { Input as UncontrolledInput } from '@popup/shared/Form/Input';
 import Button from '@popup/shared/Button';
 import { Checkbox } from '@popup/shared/Form/Checkbox';
-import { isHex } from '@concordium/web-sdk';
-import TokenBalance from '../Account/Tokens/TokenBalance';
+import { isHex, JsonRpcClient } from '@concordium/web-sdk';
+import TokenBalance from '@popup/shared/TokenBalance';
 
 enum ChoiceStatus {
     discarded,
@@ -46,7 +46,11 @@ export function DisplayToken({
     return (
         <Button clear className="add-tokens-list__token" title={metadata.description} onClick={onClick}>
             <div className="flex align-center h-full">
-                <img className="add-tokens__token-display" src={metadata.thumbnail?.url} alt={metadata.name ?? ''} />
+                <img
+                    className="add-tokens-prompt__token-display"
+                    src={metadata.thumbnail?.url}
+                    alt={metadata.name ?? ''}
+                />
                 <div>
                     {metadata.name}
                     <div
@@ -66,7 +70,7 @@ export function DisplayToken({
                         e.stopPropagation();
                     }}
                     onChange={updateStatus}
-                    className="add-tokens__checkbox"
+                    className="add-tokens-prompt__checkbox"
                     checked={status === ChoiceStatus.chosen}
                 />
             )}
@@ -83,6 +87,30 @@ type TokenWithChoice = TokenIdAndMetadata & { status: ChoiceStatus };
 
 const getId = (token: TokenIdAndMetadata) => token.id;
 const onlyExisting = (token: TokenWithChoice) => token.status === ChoiceStatus.existing;
+
+async function fetchTokenMetadata(
+    newIds: string[],
+    existingIds: string[],
+    client: JsonRpcClient,
+    network: NetworkConfiguration,
+    contractDetails: ContractDetails
+) {
+    const filteredIds =
+        // Remove duplicates
+        [...new Set(newIds)]
+            // Remove any ids that are not proper hex strings.
+            .filter((id) => isHex(id));
+
+    const metadataLinks = await getTokenUrl(client, filteredIds, contractDetails);
+    return Promise.all(
+        filteredIds.map(async (id, index) => {
+            const metadataLink = metadataLinks[index];
+            const metadata = await getTokenMetadata(metadataLink, network);
+            const status = existingIds?.some((cand) => cand === id) ? ChoiceStatus.existing : ChoiceStatus.chosen;
+            return { id, metadataLink, metadata, status };
+        })
+    );
+}
 
 interface Location {
     state: {
@@ -130,25 +158,10 @@ export default function SignMessage({ respond }: Props) {
         if (!contractDetails || accountTokens.loading) {
             return;
         }
-        const collection = accountTokens.value[contractIndex];
-        Promise.all(
-            // Remove duplicates
-            [...new Set(tokenIds)]
-                // Remove any ids that are not proper hex strings.
-                .filter((id) => isHex(id))
-                .map(async (id) => {
-                    try {
-                        const metadataLink = await getTokenUrl(client, id, contractDetails);
-                        const metadata = await getTokenMetadata(metadataLink, network);
-                        const status = collection?.some((token) => token.id === id)
-                            ? ChoiceStatus.existing
-                            : ChoiceStatus.chosen;
-                        return { id, metadataLink, metadata, status };
-                    } catch {
-                        return undefined;
-                    }
-                })
-        ).then((withIds) => setAddingTokens(withIds.filter((token) => token) as TokenWithChoice[]));
+        const existingIds = (accountTokens.value[contractIndex] || []).map((token) => token.id);
+        fetchTokenMetadata(tokenIds, existingIds, client, network, contractDetails).then((newTokens) =>
+            setAddingTokens(newTokens)
+        );
     }, [contractDetails, accountTokens.loading]);
 
     if (!contractDetails || !addingTokens) {
@@ -173,11 +186,11 @@ export default function SignMessage({ respond }: Props) {
                 </p>
                 <UncontrolledInput
                     readOnly
-                    className="add-tokens__input w-full"
+                    className="add-tokens-prompt__input w-full"
                     label={t('contractName')}
                     value={contractDetails.contractName}
                 />
-                <div className="add-tokens__token-container w-full">
+                <div className="add-tokens-prompt__token-container w-full">
                     {addingTokens.map((token, index) => (
                         <DisplayToken
                             key={token.id}

@@ -75,6 +75,7 @@ const t = {
             searchLabel: 'Search for token ID in {{ contractName }}',
             noValidTokenError: 'Token either does not exist or cannot be used in wallet',
         },
+        contractName: 'Contract name',
         unownedUnique: 'Not owned',
     },
     accountPending: 'This account is still pending finalization.',

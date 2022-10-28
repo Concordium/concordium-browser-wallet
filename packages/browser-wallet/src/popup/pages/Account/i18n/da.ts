@@ -77,6 +77,7 @@ const t: typeof en = {
             searchLabel: 'Søg efter token ID i {{ contractName }}',
             noValidTokenError: 'Token eksisterer enten ikke eller kan ikke vises i wallet',
         },
+        contractName: 'Kontrakt navn',
         unownedUnique: 'Ikke ejet',
     },
     accountPending: 'Denne konto er stadig ved at blive oprettet.',
