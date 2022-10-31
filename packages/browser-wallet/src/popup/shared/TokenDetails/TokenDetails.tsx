@@ -2,6 +2,7 @@ import React, { ReactNode, useState } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { useTranslation } from 'react-i18next';
 import { useUpdateAtom } from 'jotai/utils';
+import { MakeOptional } from 'wallet-common-helpers';
 
 import { removeTokenFromCurrentAccountAtom } from '@popup/store/token';
 import CloseButton from '@popup/shared/CloseButton';
@@ -11,7 +12,6 @@ import Modal from '@popup/shared/Modal';
 import ButtonGroup from '@popup/shared/ButtonGroup';
 import { TokenIdAndMetadata, TokenMetadata } from '@shared/storage/types';
 
-import { MakeOptional } from 'wallet-common-helpers';
 import TokenBalance from '../TokenBalance';
 
 const SUB_INDEX = '0';

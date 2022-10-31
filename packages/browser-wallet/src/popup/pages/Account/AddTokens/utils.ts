@@ -1,6 +1,7 @@
 import { JsonRpcClient } from '@concordium/web-sdk';
 import { getCis2Tokens } from '@popup/shared/utils/wallet-proxy';
 import { NetworkConfiguration, TokenIdAndMetadata, TokenMetadata } from '@shared/storage/types';
+import { isMainnet } from '@shared/utils/network-helpers';
 import { ContractDetails, getContractBalances, getTokenMetadata, getTokenUrl } from '@shared/utils/token-helpers';
 import { MakeOptional } from 'wallet-common-helpers';
 
@@ -48,9 +49,10 @@ export const getTokens = async (
 ) => {
     const metadataPromise: Promise<[string[], Array<TokenMetadata | undefined>]> = (async () => {
         const metadataUrls = await getTokenUrl(client, ids, contractDetails);
+        const isTest = isMainnet(network);
         const metadata = await Promise.all(
             metadataUrls.map((url, i) => {
-                const fallback = fallbackMetadata(ids[i]); // TODO change to undefined, only here for testing purposes.
+                const fallback = isTest ? fallbackMetadata(ids[i]) : undefined;
                 return getTokenMetadata(url, network).catch(() => Promise.resolve(fallback));
             })
         );
