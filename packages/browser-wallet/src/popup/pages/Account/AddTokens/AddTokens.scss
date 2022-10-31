@@ -15,8 +15,7 @@ $horizontal-spacing: rem(10px);
         flex-grow: 1;
         border: rem(1px) solid $color-lines;
         border-radius: $element-border-radius;
-        overflow-y: overlay;
-        overflow-x: hidden;
+        overflow: hidden;
         margin-bottom: $horizontal-spacing;
     }
 
@@ -46,6 +45,10 @@ $horizontal-spacing: rem(10px);
             object-fit: contain;
             margin-right: rem(5px);
         }
+    }
+
+    &__infinite {
+        overflow: overlay !important;
     }
 
     &__token-balance {

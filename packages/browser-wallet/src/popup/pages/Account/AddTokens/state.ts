@@ -21,14 +21,29 @@ function resetOnUnmountAtom<V>(initial: V): PrimitiveAtom<V> {
 
 export const contractDetailsAtom = resetOnUnmountAtom<ContractDetails | undefined>(undefined);
 
-export const contractTokensAtom = (() => {
-    const base = resetOnUnmountAtom<TokenWithPageID[]>([]);
+type ContractTokens = {
+    hasMore: boolean;
+    loading: boolean;
+    tokens: ContractTokenDetails[];
+};
 
-    const derived = atom<ContractTokenDetails[], TokensAtomAction>(
-        (get) =>
-            get(base)
+export const contractTokensAtom = (() => {
+    const listAtom = resetOnUnmountAtom<TokenWithPageID[]>([]);
+    const loadingAtom = resetOnUnmountAtom(false);
+    const hasMoreAtom = resetOnUnmountAtom(true);
+
+    const derived = atom<ContractTokens, TokensAtomAction, Promise<void>>(
+        (get) => {
+            const tokens = get(listAtom)
                 .filter((td) => isDefined(td.metadata))
-                .map(({ pageId, ...td }) => td as ContractTokenDetails),
+                .map(({ pageId, ...td }) => td as ContractTokenDetails);
+
+            return {
+                hasMore: get(hasMoreAtom),
+                loading: get(loadingAtom),
+                tokens,
+            };
+        },
         async (get, set, update) => {
             const contractDetails = ensureDefined(get(contractDetailsAtom), 'Needs contract details');
             const account = ensureDefined(get(selectedAccountAtom), 'No account has been selected');
@@ -37,13 +52,16 @@ export const contractTokensAtom = (() => {
             const fetchTokens = fetchTokensConfigure(contractDetails, client, network, account);
             let topId: number | undefined;
 
+            set(loadingAtom, true);
+
             switch (update) {
                 case 'reset': {
-                    set(base, []);
+                    set(listAtom, []);
+                    set(hasMoreAtom, true);
                     break;
                 }
                 case 'next': {
-                    const tokens = get(base);
+                    const tokens = get(listAtom);
                     topId = [...tokens].reverse()[0]?.pageId;
 
                     break;
@@ -53,8 +71,11 @@ export const contractTokensAtom = (() => {
                 }
             }
 
-            const next = await fetchTokens(topId);
-            set(base, (ts) => [...ts, ...next]);
+            const { hasMore, tokens: next } = await fetchTokens(topId);
+
+            set(hasMoreAtom, hasMore);
+            set(loadingAtom, false);
+            set(listAtom, (ts) => [...ts, ...next]);
         }
     );
 

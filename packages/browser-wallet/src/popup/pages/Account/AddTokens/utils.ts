@@ -14,6 +14,22 @@ type TokenWithPageID = MakeOptional<ContractTokenDetails, 'metadata'> & {
     pageId: number;
 };
 
+type FetchTokensResponse = {
+    hasMore: boolean;
+    tokens: TokenWithPageID[];
+};
+
+export type DetailsLocationState = {
+    contractIndex: bigint;
+    token: TokenIdAndMetadata;
+    balance: bigint;
+};
+
+export const routes = {
+    update: 'update',
+    details: 'details',
+};
+
 const fallbackMetadata = (id: string): TokenMetadata => ({
     thumbnail: { url: 'https://picsum.photos/40/40' },
     display: { url: 'https://picsum.photos/200/300' },
@@ -55,10 +71,17 @@ export const getTokens = async (
 
 export const fetchTokensConfigure =
     (contractDetails: ContractDetails, client: JsonRpcClient, network: NetworkConfiguration, account: string) =>
-    async (from?: number): Promise<TokenWithPageID[]> => {
-        const cts =
-            (await getCis2Tokens(contractDetails.index, contractDetails.subindex, from, TOKENS_PAGE_SIZE))?.tokens ??
-            [];
+    async (from?: number): Promise<FetchTokensResponse> => {
+        const {
+            tokens: cts,
+            count,
+            limit,
+        } = (await getCis2Tokens(contractDetails.index, contractDetails.subindex, from, TOKENS_PAGE_SIZE)) ?? {
+            tokens: [],
+            count: 0,
+            limit: TOKENS_PAGE_SIZE,
+            from,
+        };
 
         const tokens = await getTokens(
             contractDetails,
@@ -68,8 +91,11 @@ export const fetchTokensConfigure =
             cts.map((t) => t.token)
         );
 
-        return tokens.map((t, i) => ({
-            ...t,
-            pageId: cts[i].id,
-        }));
+        return {
+            hasMore: count === limit,
+            tokens: tokens.map((t, i) => ({
+                ...t,
+                pageId: cts[i].id,
+            })),
+        };
     };
