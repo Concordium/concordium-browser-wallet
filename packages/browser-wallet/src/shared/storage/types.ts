@@ -22,6 +22,7 @@ export enum ChromeStorageKey {
     Tokens = 'tokens',
     TokenMetadata = 'tokenMetadata',
     PendingTransactions = 'pendingTransactions',
+    Cookie = 'cookie',
 }
 
 export enum Theme {
