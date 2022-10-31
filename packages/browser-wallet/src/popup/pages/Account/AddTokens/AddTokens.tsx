@@ -306,12 +306,12 @@ function Details() {
 
 export default function AddTokens() {
     const { setDetailsExpanded } = useContext(accountPageContext);
-    const contractDetails = useAtomValue(contractDetailsAtom);
-    const updateTokens = useSetAtom(contractTokensAtom);
     const accountTokens = useAtomValue(currentAccountTokensAtom);
-    const setChecked = useSetAtom(checkedTokensAtom);
 
     // Keep the following in memory while add token flow lives
+    const contractDetails = useAtomValue(contractDetailsAtom);
+    const [, updateTokens] = useAtom(contractTokensAtom);
+    const [, setChecked] = useAtom(checkedTokensAtom);
     useAtom(searchAtom);
     useAtom(searchResultAtom);
 
