@@ -1,4 +1,4 @@
-import React, { useCallback, useContext, useEffect, useMemo, useState } from 'react';
+import React, { useCallback, useContext, useEffect, useState } from 'react';
 import { useAtom, useAtomValue, useSetAtom } from 'jotai';
 import { useForm, SubmitHandler } from 'react-hook-form';
 import { useTranslation } from 'react-i18next';
@@ -24,7 +24,14 @@ import { Checkbox } from '@popup/shared/Form/Checkbox';
 import { contractBalancesFamily, currentAccountTokensAtom } from '@popup/store/token';
 import { absoluteRoutes } from '@popup/constants/routes';
 import { accountPageContext } from '../utils';
-import { checkedTokensAtom, contractDetailsAtom, contractTokensAtom, searchAtom, searchResultAtom } from './state';
+import {
+    checkedTokensAtom,
+    contractDetailsAtom,
+    contractTokensAtom,
+    searchAtom,
+    searchResultAtom,
+    topTokensAtom,
+} from './state';
 import { ContractTokenDetails, getTokens } from './utils';
 
 const routes = {
@@ -141,31 +148,6 @@ function ContractTokenLine({ token, onClick, onToggleChecked: toggleChecked, isC
     );
 }
 
-function useContractTokensWithCurrent(): ContractTokenDetails[] {
-    const contractDetails = ensureDefined(useAtomValue(contractDetailsAtom), 'Assumed contract details to be defined');
-    const account = ensureDefined(useAtomValue(selectedAccountAtom), 'No account selected');
-    const contractTokens = useAtomValue(contractTokensAtom);
-    const accountTokens = useAtomValue(currentAccountTokensAtom);
-
-    const currentContractTokens = useMemo(
-        () => accountTokens.value[contractDetails.index.toString()] ?? [],
-        [contractDetails.index, accountTokens.value]
-    );
-    const currentContractBalances = useAtomValue(
-        contractBalancesFamily(account, contractDetails?.index.toString() ?? '')
-    );
-
-    const allContractTokens = useMemo(() => {
-        const mapped: ContractTokenDetails[] = currentContractTokens.map((cct) => ({
-            ...cct,
-            balance: currentContractBalances[cct.id],
-        }));
-        return [...mapped, ...contractTokens.filter((ct) => !mapped.some((mt) => mt.id === ct.id))];
-    }, [currentContractBalances, currentContractTokens, contractTokens]);
-
-    return allContractTokens;
-}
-
 const lookupTokenIdConfigure = (
     contractDetails: ContractDetails,
     client: JsonRpcClient,
@@ -215,10 +197,10 @@ function useLookupTokenId() {
 function UpdateTokens() {
     const { t } = useTranslation('account', { keyPrefix: 'tokens.add' });
     const contractDetails = ensureDefined(useAtomValue(contractDetailsAtom), 'Assumed contract details to be defined');
-    // const updateTokens = useSetAtom(contractTokensAtom);
+    const [contractTokens] = useAtom(contractTokensAtom);
+    const [topTokens, setTopTokens] = useAtom(topTokensAtom);
     const nav = useNavigate();
     const setAccountTokens = useSetAtom(currentAccountTokensAtom);
-    const allContractTokens = useContractTokensWithCurrent();
     const [checked, setChecked] = useAtom(checkedTokensAtom);
     const [search, setSearch] = useAtom(searchAtom);
     const [searchResult, setSearchResult] = useAtom(searchResultAtom);
@@ -226,7 +208,8 @@ function UpdateTokens() {
     const [searchError, setSearchError] = useState<string | undefined>();
     const lookupTokenId = useLookupTokenId();
 
-    const displayTokens = searchResult !== undefined ? [searchResult] : allContractTokens;
+    const allTokens = [...topTokens, ...contractTokens.filter((ct) => !topTokens.some((tt) => tt.id === ct.id))];
+    const displayTokens = searchResult !== undefined ? [searchResult] : allTokens;
 
     useUpdateEffect(() => {
         if (search) {
@@ -249,20 +232,28 @@ function UpdateTokens() {
         nav(`../${routes.details}`, { state });
     };
 
-    const toggleItem = ({ id }: ContractTokenDetails) => {
-        if (checked.includes(id)) {
-            setChecked((cs) => cs.filter((c) => c !== id));
-        } else {
-            setChecked((cs) => [...cs, id]);
-        }
-    };
+    const isTokenChecked = (token: ContractTokenDetails) => checked.includes(token.id);
+
+    const toggleItem = useCallback(
+        (token: ContractTokenDetails) => {
+            if (isTokenChecked(token)) {
+                setChecked((cs) => cs.filter((c) => c !== token.id));
+                return;
+            }
+
+            setChecked((cs) => [...cs, token.id]);
+
+            if (searchResult !== undefined) {
+                setTopTokens((tts) => [...tts, searchResult]);
+            }
+        },
+        [searchResult, checked, setChecked]
+    );
 
     const storeTokens = async () => {
-        const newTokens = allContractTokens
-            .filter((ct) => checked.includes(ct.id))
-            .map(({ balance, ...token }) => token);
-
+        const newTokens = allTokens.filter((token) => checked.includes(token.id));
         await setAccountTokens({ contractIndex: contractDetails.index.toString(), newTokens });
+
         nav(absoluteRoutes.home.account.tokens.path);
     };
 
@@ -279,7 +270,7 @@ function UpdateTokens() {
                 {displayTokens.map((token) => (
                     <ContractTokenLine
                         token={token}
-                        isChecked={checked.includes(token.id)}
+                        isChecked={isTokenChecked(token)}
                         onClick={showDetails}
                         onToggleChecked={toggleItem}
                     />
@@ -307,11 +298,16 @@ function Details() {
 export default function AddTokens() {
     const { setDetailsExpanded } = useContext(accountPageContext);
     const accountTokens = useAtomValue(currentAccountTokensAtom);
+    const contractDetails = useAtomValue(contractDetailsAtom);
+    const account = ensureDefined(useAtomValue(selectedAccountAtom), 'Expected account to be selected');
+    const currentContractBalances = useAtomValue(
+        contractBalancesFamily(account, contractDetails?.index.toString() ?? '')
+    );
 
     // Keep the following in memory while add token flow lives
-    const contractDetails = useAtomValue(contractDetailsAtom);
     const [, updateTokens] = useAtom(contractTokensAtom);
     const [, setChecked] = useAtom(checkedTokensAtom);
+    const [, setTopTokens] = useAtom(topTokensAtom);
     useAtom(searchAtom);
     useAtom(searchResultAtom);
 
@@ -327,12 +323,17 @@ export default function AddTokens() {
     }, [contractDetails?.index]);
 
     useEffect(() => {
-        if (contractDetails?.index !== undefined) {
-            const currentTokenIds =
-                accountTokens.value[contractDetails.index.toString()]?.map((token) => token.id) ?? [];
-            setChecked(currentTokenIds);
+        if (contractDetails?.index !== undefined && !accountTokens.loading) {
+            const currentChecked: ContractTokenDetails[] =
+                accountTokens.value[contractDetails.index.toString()]?.map((token) => ({
+                    ...token,
+                    balance: currentContractBalances[token.id] ?? 0n,
+                })) ?? [];
+
+            setTopTokens(currentChecked);
+            setChecked(currentChecked.map((t) => t.id));
         }
-    }, [accountTokens.value, contractDetails?.index]);
+    }, [contractDetails?.index, accountTokens.loading]);
 
     return (
         <Routes>

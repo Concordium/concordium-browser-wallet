@@ -60,6 +60,8 @@ export const contractTokensAtom = (() => {
 
     return derived;
 })();
+
+export const topTokensAtom = resetOnUnmountAtom<ContractTokenDetails[]>([]);
 export const checkedTokensAtom = resetOnUnmountAtom<string[]>([]);
 export const searchAtom = resetOnUnmountAtom<string>('');
 export const searchResultAtom = resetOnUnmountAtom<ContractTokenDetails | undefined>(undefined);
