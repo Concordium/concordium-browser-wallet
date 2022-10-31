@@ -65,3 +65,4 @@ export const topTokensAtom = resetOnUnmountAtom<ContractTokenDetails[]>([]);
 export const checkedTokensAtom = resetOnUnmountAtom<string[]>([]);
 export const searchAtom = resetOnUnmountAtom<string>('');
 export const searchResultAtom = resetOnUnmountAtom<ContractTokenDetails | undefined>(undefined);
+export const listScrollPositionAtom = resetOnUnmountAtom<number>(0);

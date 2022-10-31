@@ -1,4 +1,4 @@
-import React, { useCallback, useContext, useEffect, useState } from 'react';
+import React, { useCallback, useContext, useEffect, useRef, useState } from 'react';
 import { useAtom, useAtomValue, useSetAtom } from 'jotai';
 import { useForm, SubmitHandler } from 'react-hook-form';
 import { useTranslation } from 'react-i18next';
@@ -28,6 +28,7 @@ import {
     checkedTokensAtom,
     contractDetailsAtom,
     contractTokensAtom,
+    listScrollPositionAtom,
     searchAtom,
     searchResultAtom,
     topTokensAtom,
@@ -207,9 +208,15 @@ function UpdateTokens() {
     const showToast = useSetAtom(addToastAtom);
     const [searchError, setSearchError] = useState<string | undefined>();
     const lookupTokenId = useLookupTokenId();
+    const listRef = useRef<HTMLDivElement>(null);
+    const [listScroll, setListScroll] = useAtom(listScrollPositionAtom);
 
     const allTokens = [...topTokens, ...contractTokens.filter((ct) => !topTokens.some((tt) => tt.id === ct.id))];
     const displayTokens = searchResult !== undefined ? [searchResult] : allTokens;
+
+    useEffect(() => {
+        listRef.current?.scrollTo({ top: listScroll });
+    }, []);
 
     useUpdateEffect(() => {
         if (search) {
@@ -224,6 +231,8 @@ function UpdateTokens() {
     }, [search]);
 
     const showDetails = ({ balance, ...token }: ContractTokenDetails) => {
+        setListScroll(listRef.current?.scrollTop ?? 0);
+
         const state: DetailsLocationState = {
             token,
             balance,
@@ -266,7 +275,7 @@ function UpdateTokens() {
                 onChange={(e) => setSearch(e.target.value)}
                 error={searchError}
             />
-            <div className="add-tokens-list__tokens">
+            <div className="add-tokens-list__tokens" ref={listRef}>
                 {displayTokens.map((token) => (
                     <ContractTokenLine
                         token={token}
@@ -310,6 +319,7 @@ export default function AddTokens() {
     const [, setTopTokens] = useAtom(topTokensAtom);
     useAtom(searchAtom);
     useAtom(searchResultAtom);
+    useAtom(listScrollPositionAtom);
 
     useEffect(() => {
         setDetailsExpanded(false);
