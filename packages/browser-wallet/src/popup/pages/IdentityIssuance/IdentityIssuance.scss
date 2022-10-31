@@ -14,14 +14,6 @@
             margin-top: rem(40px);
             margin-bottom: rem(60px);
         }
-
-        &__loading-arrows {
-            height: rem(40px);
-            width: rem(40px);
-            transform-origin: center;
-            animation: spin 1s;
-            animation-iteration-count: infinite;
-        }
     }
 
     &__start,

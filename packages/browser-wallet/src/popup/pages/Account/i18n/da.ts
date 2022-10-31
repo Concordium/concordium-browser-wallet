@@ -57,7 +57,7 @@ const t: typeof en = {
         tabBar: {
             ft: 'Ombyttelige',
             nft: 'Samlerobjekter',
-            new: 'Tilføj ny',
+            manage: 'Rediger',
         },
         add: {
             chooseContract: 'Vælg kontrakt',

@@ -93,7 +93,7 @@ export default function AccountRoutes() {
                     <Route path={`${accountRoutes.log}/*`} element={<TransactionLog />} />
                     <Route path={`${accountRoutes.settings}/*`} element={<AccountSettings />} />
                     <Route path={`${accountRoutes.tokens}/*`} element={<Tokens />} />
-                    <Route path={`${accountRoutes.addTokens}/*`} element={<AddTokens />} />
+                    <Route path={`${accountRoutes.manageTokens}/*`} element={<AddTokens />} />
                 </Route>
             </Routes>
         </accountPageContext.Provider>

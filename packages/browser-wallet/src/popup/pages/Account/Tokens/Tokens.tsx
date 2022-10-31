@@ -6,7 +6,6 @@ import { useAtomValue } from 'jotai';
 
 import { absoluteRoutes } from '@popup/constants/routes';
 import TabBar from '@popup/shared/TabBar';
-import PlusIcon from '@assets/svg/plus.svg';
 import CcdIcon from '@assets/svg/concordium.svg';
 import { useAccountInfo } from '@popup/shared/AccountInfoListenerContext';
 import { useSelectedCredential } from '@popup/shared/utils/account-helpers';
@@ -125,12 +124,9 @@ function Tokens() {
                 </TabBar.Item>
                 <TabBar.Item
                     className="tokens__link"
-                    to={`${absoluteRoutes.home.account.path}/${accountRoutes.addTokens}`}
+                    to={`${absoluteRoutes.home.account.path}/${accountRoutes.manageTokens}`}
                 >
-                    <div className="tokens__add">
-                        {t('new')}
-                        <PlusIcon />
-                    </div>
+                    <div className="tokens__add">{t('manage')}</div>
                 </TabBar.Item>
             </TabBar>
             <div className="tokens__scroll">

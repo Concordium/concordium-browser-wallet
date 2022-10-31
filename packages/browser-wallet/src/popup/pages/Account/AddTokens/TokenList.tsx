@@ -11,6 +11,7 @@ import AutoSizer from 'react-virtualized-auto-sizer';
 import { VariableSizeList as List } from 'react-window';
 
 import { absoluteRoutes } from '@popup/constants/routes';
+import PendingArrows from '@assets/svg/pending-arrows.svg';
 import Button from '@popup/shared/Button';
 import { Checkbox } from '@popup/shared/Form/Checkbox';
 import { Input } from '@popup/shared/Form/Input';
@@ -123,7 +124,13 @@ const InfiniteTokenList = forwardRef<HTMLDivElement, InfiniteTokenListProps>(
                                 outerRef={outerRef}
                                 initialScrollOffset={initialScrollOffset}
                             >
-                                {({ index, style }) => <>{children(tokens[index], style)}</>}
+                                {({ index, style }) => {
+                                    if (!isItemLoaded(index)) {
+                                        return <div style={style}>Loading</div>;
+                                    }
+
+                                    return <>{children(tokens[index], style)}</>;
+                                }}
                             </List>
                         )}
                     </InfiniteLoader>
@@ -247,6 +254,7 @@ export default function TokenList() {
     };
 
     const hasNextPage = searchResult === undefined && hasMore;
+    const initialLoading = contractTokens.length === 0 && loading;
 
     return (
         <div className="add-tokens-list">
@@ -258,24 +266,27 @@ export default function TokenList() {
                 error={searchError}
             />
             <div className="add-tokens-list__tokens">
-                <InfiniteTokenList
-                    tokens={displayTokens}
-                    loadNextPage={() => updateTokens('next')}
-                    hasNextPage={hasNextPage}
-                    isNextPageLoading={loading}
-                    ref={listRef}
-                    initialScrollOffset={listScroll}
-                >
-                    {(token, style) => (
-                        <ContractTokenLine
-                            token={token}
-                            isChecked={isTokenChecked(token)}
-                            onClick={showDetails}
-                            onToggleChecked={toggleItem}
-                            style={style}
-                        />
-                    )}
-                </InfiniteTokenList>
+                {initialLoading && <PendingArrows className="loading add-tokens-list__loading" />}
+                {initialLoading || (
+                    <InfiniteTokenList
+                        tokens={displayTokens}
+                        loadNextPage={() => updateTokens('next')}
+                        hasNextPage={hasNextPage}
+                        isNextPageLoading={loading}
+                        ref={listRef}
+                        initialScrollOffset={listScroll}
+                    >
+                        {(token, style) => (
+                            <ContractTokenLine
+                                token={token}
+                                isChecked={isTokenChecked(token)}
+                                onClick={showDetails}
+                                onToggleChecked={toggleItem}
+                                style={style}
+                            />
+                        )}
+                    </InfiniteTokenList>
+                )}
             </div>
             <Button className="w-full" onClick={storeTokens}>
                 {t('updateTokens')}

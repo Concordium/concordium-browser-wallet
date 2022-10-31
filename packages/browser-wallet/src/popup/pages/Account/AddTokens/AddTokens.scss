@@ -17,6 +17,7 @@ $horizontal-spacing: rem(10px);
         border-radius: $element-border-radius;
         overflow: hidden;
         margin-bottom: $horizontal-spacing;
+        position: relative;
     }
 
     &__token {
@@ -62,5 +63,13 @@ $horizontal-spacing: rem(10px);
 
     &__checkbox {
         width: rem(14px);
+    }
+
+    &__loading {
+        position: absolute;
+        width: 40px;
+        height: 40px;
+        top: calc(50% - 20px);
+        left: calc(50% - 20px);
     }
 }

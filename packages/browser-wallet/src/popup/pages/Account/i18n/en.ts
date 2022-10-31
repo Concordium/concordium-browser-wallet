@@ -55,7 +55,7 @@ const t = {
         tabBar: {
             ft: 'Fungible',
             nft: 'Collectibles',
-            new: 'Add new',
+            manage: 'Manage',
         },
         add: {
             chooseContract: 'Choose Contract',

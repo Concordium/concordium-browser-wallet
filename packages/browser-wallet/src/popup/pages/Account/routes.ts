@@ -8,5 +8,5 @@ export const accountRoutes = {
     receive: 'receive',
     settings: 'settings',
     log: 'log',
-    addTokens: 'add-tokens',
+    manageTokens: 'manage-tokens',
 };
