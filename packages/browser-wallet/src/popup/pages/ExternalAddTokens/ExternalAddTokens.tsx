@@ -81,7 +81,7 @@ export default function SignMessage({ respond }: Props) {
             // Remove duplicates
             [...new Set(tokenIds)]
                 // Remove any ids that are not proper hex strings.
-                .filter((id) => isHex(id));
+                .filter((id) => isHex(id) || id === '');
 
         getTokens(contractDetails, client, network, account, filteredIds).then((newTokens) =>
             setAddingTokens(
