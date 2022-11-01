@@ -1,7 +1,6 @@
 import { JsonRpcClient } from '@concordium/web-sdk';
 import { getCis2Tokens } from '@popup/shared/utils/wallet-proxy';
 import { NetworkConfiguration, TokenIdAndMetadata, TokenMetadata } from '@shared/storage/types';
-import { isMainnet } from '@shared/utils/network-helpers';
 import { ContractDetails, getContractBalances, getTokenMetadata, getTokenUrl } from '@shared/utils/token-helpers';
 import { MakeOptional } from 'wallet-common-helpers';
 
@@ -31,15 +30,6 @@ export const routes = {
     details: 'details',
 };
 
-const fallbackMetadata = (id: string): TokenMetadata => ({
-    thumbnail: { url: 'https://picsum.photos/40/40' },
-    display: { url: 'https://picsum.photos/200/300' },
-    name: id.substring(0, 8),
-    decimals: 0,
-    description: id,
-    unique: true,
-});
-
 export const getTokens = async (
     contractDetails: ContractDetails,
     client: JsonRpcClient,
@@ -49,12 +39,8 @@ export const getTokens = async (
 ) => {
     const metadataPromise: Promise<[string[], Array<TokenMetadata | undefined>]> = (async () => {
         const metadataUrls = await getTokenUrl(client, ids, contractDetails);
-        const isTest = isMainnet(network);
         const metadata = await Promise.all(
-            metadataUrls.map((url, i) => {
-                const fallback = isTest ? fallbackMetadata(ids[i]) : undefined;
-                return getTokenMetadata(url, network).catch(() => Promise.resolve(fallback));
-            })
+            metadataUrls.map((url) => getTokenMetadata(url, network).catch(() => Promise.resolve(undefined)))
         );
         return [metadataUrls, metadata];
     })();

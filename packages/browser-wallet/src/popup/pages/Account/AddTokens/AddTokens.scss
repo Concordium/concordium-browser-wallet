@@ -63,6 +63,10 @@ $horizontal-spacing: rem(10px);
 
     &__checkbox {
         width: rem(14px);
+
+        input {
+            margin: 0;
+        }
     }
 
     &__loading {
