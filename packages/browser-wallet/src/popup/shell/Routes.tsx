@@ -24,7 +24,7 @@ import RecoveryIntro from '@popup/pages/Recovery/RecoveryIntro';
 import RecoveryMain from '@popup/pages/Recovery/RecoveryMain';
 import RecoveryFinish from '@popup/pages/Recovery/RecoveryFinish';
 import ChangePasscode from '@popup/pages/ChangePasscode/ChangePasscode';
-import AddTokensPrompt from '@popup/pages/AddTokens/ExternalAddTokens';
+import AddTokensPrompt from '@popup/pages/ExternalAddTokens/ExternalAddTokens';
 
 type PromptKey = keyof Omit<typeof absoluteRoutes['prompt'], 'path'>;
 

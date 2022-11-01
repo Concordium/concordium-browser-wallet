@@ -52,13 +52,6 @@ const t = {
         fee: 'Estimated transaction fee',
     },
     tokens: {
-        prompt: {
-            description: 'dApp would like to add tokens.',
-            descriptionAllExisting: 'dApp would like at add the following tokens. They are all already added though.',
-            add: 'Add chosen',
-            reject: "Don't add any",
-            finish: 'Finish',
-        },
         tabBar: {
             ft: 'Fungible',
             nft: 'Collectibles',
@@ -75,7 +68,6 @@ const t = {
             searchLabel: 'Search for token ID in {{ contractName }}',
             noValidTokenError: 'Token either does not exist or cannot be used in wallet',
         },
-        contractName: 'Contract name',
         unownedUnique: 'Not owned',
     },
     accountPending: 'This account is still pending finalization.',

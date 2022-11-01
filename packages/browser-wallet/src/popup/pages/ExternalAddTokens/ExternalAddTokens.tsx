@@ -27,7 +27,6 @@ type Props = {
 type TokenWithChoice = ContractTokenDetails & { status: ChoiceStatus };
 
 const getId = (token: TokenIdAndMetadata) => token.id;
-const onlyExisting = (token: TokenWithChoice) => token.status === ChoiceStatus.existing;
 
 interface Location {
     state: {
@@ -42,7 +41,7 @@ interface Location {
 
 export default function SignMessage({ respond }: Props) {
     const { state } = useLocation() as Location;
-    const { t } = useTranslation('account', { keyPrefix: 'tokens' });
+    const { t } = useTranslation('externalAddTokens');
     const { withClose, onClose } = useContext(fullscreenPromptContext);
     const { contractIndex, contractSubindex, tokenIds, url } = state.payload;
     const addToast = useSetAtom(addToastAtom);
@@ -64,9 +63,10 @@ export default function SignMessage({ respond }: Props) {
         async () => {
             const name = await fetchContractName(client, BigInt(contractIndex), BigInt(contractSubindex));
             if (!name) {
-                throw new Error('Test');
+                throw new Error('Unable to fetch name for given contract');
+            } else {
+                return { index: BigInt(contractIndex), subindex: BigInt(contractSubindex), contractName: name };
             }
-            return { index: BigInt(contractIndex), subindex: BigInt(contractSubindex), contractName: name };
         },
         (e) => addToast(e.message),
         []
@@ -127,7 +127,7 @@ export default function SignMessage({ respond }: Props) {
             {detailView === undefined && (
                 <div className="h-full flex-column align-center">
                     <p>
-                        {t(allExisting ? 'prompt.descriptionAllExisting' : 'prompt.description', {
+                        {t(allExisting ? 'descriptionAllExisting' : 'description', {
                             dApp: displayUrl(url),
                         })}
                     </p>
@@ -151,12 +151,8 @@ export default function SignMessage({ respond }: Props) {
                     <div className="flex p-b-10  m-t-auto">
                         {allExisting || (
                             <>
-                                <Button
-                                    width="narrow"
-                                    className="m-r-10"
-                                    onClick={withClose(() => respond(addingTokens.filter(onlyExisting).map(getId)))}
-                                >
-                                    {t('prompt.reject')}
+                                <Button width="narrow" className="m-r-10" onClick={withClose(() => respond([]))}>
+                                    {t('reject')}
                                 </Button>
                                 <Button
                                     width="narrow"
@@ -168,13 +164,13 @@ export default function SignMessage({ respond }: Props) {
                                         )
                                     }
                                 >
-                                    {t('prompt.add')}
+                                    {t('add')}
                                 </Button>
                             </>
                         )}
                         {allExisting && (
                             <Button width="wide" onClick={withClose(() => respond(addingTokens.map(getId)))}>
-                                {t('prompt.finish')}
+                                {t('finish')}
                             </Button>
                         )}
                     </div>
