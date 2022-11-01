@@ -104,10 +104,8 @@ async function reportVersion() {
         action_name: 'app-startup',
         dimension1: chrome.runtime.getManifest().version,
     };
-    const response = await fetch(buildURLwithSearchParameters(baseUrl, params));
-    if (!response.ok) {
-        throw new Error(`Analytics returned status code ${response.status}.`);
-    }
+    await fetch(buildURLwithSearchParameters(baseUrl, params));
+    // TODO: log if this fails
 }
 
 const startupHandler = async () => {
