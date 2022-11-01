@@ -1,8 +1,8 @@
 const t = {
     description: '{{dApp}} would like to add tokens.',
     descriptionAllExisting: '{{dApp}} would like at add the following tokens. They are all already added though.',
-    add: 'Add chosen',
-    reject: "Don't add any",
+    add: 'Add selected',
+    reject: 'Cancel',
     finish: 'Finish',
     contractName: 'Contract name',
     filterDuplicate: 'Duplicate token ids have been filtered out.',
