@@ -40,5 +40,9 @@ $element-border-radius: rem(5px);
 
     &__checkbox {
         width: rem(14px);
+
+        input {
+            margin: 0;
+        }
     }
 }

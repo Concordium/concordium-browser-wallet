@@ -148,6 +148,17 @@ export async function getTokenMetadata(tokenUrl: string, network: NetworkConfigu
     if (!isMainnet(network) && tokenUrl.includes('https://some.example/token/wccd')) {
         return WCCD_METADATA;
     }
+    if (!isMainnet(network) && tokenUrl.includes('https://some.example/token/')) {
+        const id = tokenUrl.split('https://some.example/token/')[1]?.toLowerCase() ?? 'fallback';
+        return {
+            thumbnail: { url: 'https://picsum.photos/40/40' },
+            display: { url: 'https://picsum.photos/200/300' },
+            name: id.substring(0, 8),
+            decimals: 0,
+            description: id,
+            unique: true,
+        };
+    }
 
     const resp = await fetch(tokenUrl, { headers: new Headers({ 'Access-Control-Allow-Origin': '*' }), mode: 'cors' });
     if (!resp.ok) {
