@@ -6,6 +6,7 @@
 
 -   A toast is now shown when the passcode is successfully updated.
 -   Shows submitted transactions in the transaction list.
+-   Support for viewing and transferring CIS-2 tokens
 
 ### Changed
 
