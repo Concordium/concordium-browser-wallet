@@ -1,5 +1,5 @@
 import React, { useContext, useEffect, useMemo } from 'react';
-import { useParams } from 'react-router-dom';
+import { useNavigate, useParams } from 'react-router-dom';
 
 import { useSelectedCredential } from '@popup/shared/utils/account-helpers';
 import { contractBalancesFamily } from '@popup/store/token';
@@ -28,6 +28,7 @@ export default function Details() {
     const account = useSelectedCredential();
     const balancesAtom = contractBalancesFamily(account?.address ?? '', token?.contractIndex ?? '');
     const { setDetailsExpanded } = useContext(accountPageContext);
+    const nav = useNavigate();
 
     useEffect(() => {
         setDetailsExpanded(false);
@@ -43,7 +44,13 @@ export default function Details() {
     return (
         <AtomValue atom={balancesAtom}>
             {({ [token.id]: b }) => (
-                <TokenDetails token={tokenDetails} contractIndex={contractIndex} balance={b} canRemove />
+                <TokenDetails
+                    token={tokenDetails}
+                    contractIndex={contractIndex}
+                    balance={b}
+                    onClose={() => nav(-1)}
+                    canRemove
+                />
             )}
         </AtomValue>
     );

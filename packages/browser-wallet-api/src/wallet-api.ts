@@ -128,6 +128,24 @@ class WalletApi extends EventEmitter implements IWalletApi {
     public getJsonRpcClient(): JsonRpcClient {
         return this.jsonRpcClient;
     }
+
+    public async addCIS2Tokens(
+        accountAddress: string,
+        tokenIds: string[],
+        contractIndex: bigint,
+        contractSubindex?: bigint
+    ): Promise<string[]> {
+        const response = await this.messageHandler.sendMessage<string[] | null>(MessageType.AddTokens, {
+            accountAddress,
+            tokenIds,
+            contractIndex,
+            contractSubindex,
+        });
+        if (response === null) {
+            throw new Error('Request rejected');
+        }
+        return response;
+    }
 }
 
 export const walletApi = new WalletApi();

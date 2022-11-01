@@ -17,6 +17,7 @@
 @import '../shared/Toast/Toast';
 @import '../shared/TabBar/TabBar';
 @import '../shared/TokenDetails/TokenDetails';
+@import '../shared/ContractTokenLine/ContractTokenLine';
 
 // Pages
 @import '../pages/Account';
@@ -32,6 +33,7 @@
 @import '../pages/NetworkSettings/NetworkSettings';
 @import '../pages/ChangePasscode/ChangePasscode';
 @import '../pages/Recovery/Recovery';
+@import '../pages/ExternalAddTokens/ExternalAddTokens';
 
 // Layouts
 @import '../page-layouts/MainLayout';

@@ -312,3 +312,4 @@ forwardToPopup(
 );
 forwardToPopup(MessageType.SendTransaction, InternalMessageType.SendTransaction, runIfWhitelisted, appendUrlToPayload);
 forwardToPopup(MessageType.SignMessage, InternalMessageType.SignMessage, runIfWhitelisted, appendUrlToPayload);
+forwardToPopup(MessageType.AddTokens, InternalMessageType.AddTokens, runIfWhitelisted, appendUrlToPayload);

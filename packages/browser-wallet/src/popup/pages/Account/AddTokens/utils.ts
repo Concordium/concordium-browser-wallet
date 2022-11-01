@@ -1,12 +1,14 @@
 import { JsonRpcClient } from '@concordium/web-sdk';
 import { getCis2Tokens } from '@popup/shared/utils/wallet-proxy';
 import { NetworkConfiguration, TokenIdAndMetadata, TokenMetadata } from '@shared/storage/types';
-import { ContractDetails, getContractBalances, getTokenMetadata, getTokenUrl } from '@shared/utils/token-helpers';
+import {
+    ContractDetails,
+    ContractTokenDetails,
+    getContractBalances,
+    getTokenMetadata,
+    getTokenUrl,
+} from '@shared/utils/token-helpers';
 import { MakeOptional } from 'wallet-common-helpers';
-
-export type ContractTokenDetails = TokenIdAndMetadata & {
-    balance: bigint;
-};
 
 export const TOKENS_PAGE_SIZE = 20;
 

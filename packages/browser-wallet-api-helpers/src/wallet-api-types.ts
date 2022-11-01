@@ -91,6 +91,18 @@ interface MainWalletApi {
     removeAllListeners(event?: EventType | string | undefined): this;
 
     getJsonRpcClient(): JsonRpcClient;
+
+    /**
+     * Request that the user adds the specified tokens for a given contract to the wallet.
+     * Returns which of the given tokens the user accepted to add the tokens into the wallet.
+     * Note that this will throw an error if the dApp is not connected with the accountAddress.
+     */
+    addCIS2Tokens(
+        accountAddress: string,
+        tokenIds: string[],
+        contractIndex: bigint,
+        contractSubindex?: bigint
+    ): Promise<string[]>;
 }
 
 export type WalletApi = MainWalletApi & EventListeners;

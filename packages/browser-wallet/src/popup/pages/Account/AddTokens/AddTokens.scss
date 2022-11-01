@@ -1,4 +1,3 @@
-$element-border-radius: rem(5px);
 $horizontal-spacing: rem(10px);
 
 .add-tokens-list {
@@ -14,59 +13,14 @@ $horizontal-spacing: rem(10px);
         background-color: $color-bg;
         flex-grow: 1;
         border: rem(1px) solid $color-lines;
-        border-radius: $element-border-radius;
+        border-radius: rem(5px);
         overflow: hidden;
         margin-bottom: $horizontal-spacing;
         position: relative;
     }
 
-    &__token {
-        padding: rem(5px) rem(10px);
-        display: flex;
-        align-items: center;
-        justify-content: space-between;
-        cursor: pointer;
-        height: rem(42px);
-        text-align: left;
-        border-bottom: rem(1px) solid $color-lines;
-
-        &:last-of-type {
-            border-bottom-color: transparent;
-        }
-
-        &:first-child {
-            border-top-left-radius: $element-border-radius;
-            border-top-right-radius: $element-border-radius;
-        }
-
-        img {
-            max-height: 100%;
-            width: rem(40px);
-            object-position: center;
-            object-fit: contain;
-            margin-right: rem(5px);
-        }
-    }
-
     &__infinite {
         overflow: overlay !important;
-    }
-
-    &__token-balance {
-        font-size: 10px;
-        color: $color-text-faded;
-
-        &--owns {
-            color: $color-cta;
-        }
-    }
-
-    &__checkbox {
-        width: rem(14px);
-
-        input {
-            margin: 0;
-        }
     }
 
     &__loading {

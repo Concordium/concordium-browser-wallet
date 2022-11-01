@@ -14,6 +14,7 @@ const t = {
             passcode: 'Change passcode',
             about: 'About',
         },
+        addTokens: 'Add tokens',
         request: 'Signature Request',
         connect: 'New connection',
     },

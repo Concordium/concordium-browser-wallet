@@ -1,0 +1,28 @@
+.add-tokens-prompt {
+    &__token-display {
+        max-height: rem(20px);
+        max-width: rem(40px);
+    }
+
+    &__token-container {
+        display: flex;
+        flex-direction: column;
+        background-color: $color-bg;
+        flex-grow: 1;
+        border: rem(1px) solid $color-lines;
+        border-radius: rem(5px);
+        overflow-y: overlay;
+        overflow-x: hidden;
+        margin-bottom: rem(10px);
+    }
+
+    &__input {
+        margin-bottom: rem(10px);
+    }
+
+    &__checkbox {
+        margin-left: auto;
+        padding: 0;
+        width: rem(15px);
+    }
+}

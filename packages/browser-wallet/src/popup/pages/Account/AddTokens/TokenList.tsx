@@ -1,28 +1,25 @@
 import React, { CSSProperties, forwardRef, ReactNode, useCallback, useEffect, useRef, useState } from 'react';
 import { useTranslation } from 'react-i18next';
 import { useNavigate } from 'react-router-dom';
-import { ClassNameAndStyle, noOp, useUpdateEffect } from 'wallet-common-helpers';
+import { noOp, useUpdateEffect } from 'wallet-common-helpers';
 import { isHex, JsonRpcClient } from '@concordium/web-sdk';
-import clsx from 'clsx';
 import { useAtom, useAtomValue, useSetAtom } from 'jotai';
 import debounce from 'lodash.debounce';
 import InfiniteLoader from 'react-window-infinite-loader';
 import AutoSizer from 'react-virtualized-auto-sizer';
 import { VariableSizeList as List } from 'react-window';
-
+import { ContractTokenDetails, ContractDetails } from '@shared/utils/token-helpers';
 import { absoluteRoutes } from '@popup/constants/routes';
 import PendingArrows from '@assets/svg/pending-arrows.svg';
 import Button from '@popup/shared/Button';
-import { Checkbox } from '@popup/shared/Form/Checkbox';
 import { Input } from '@popup/shared/Form/Input';
-import TokenBalance from '@popup/shared/TokenBalance';
 import { addToastAtom } from '@popup/state';
 import { selectedAccountAtom } from '@popup/store/account';
 import { jsonRpcClientAtom, networkConfigurationAtom } from '@popup/store/settings';
 import { currentAccountTokensAtom } from '@popup/store/token';
 import { NetworkConfiguration } from '@shared/storage/types';
 import { ensureDefined } from '@shared/utils/basic-helpers';
-import { ContractDetails } from '@shared/utils/token-helpers';
+import ContractTokenLine, { ChoiceStatus } from '@popup/shared/ContractTokenLine';
 import {
     checkedTokensAtom,
     contractDetailsAtom,
@@ -32,63 +29,7 @@ import {
     searchResultAtom,
     topTokensAtom,
 } from './state';
-import { ContractTokenDetails, DetailsLocationState, getTokens, routes } from './utils';
-
-type ContractTokenLineProps = ClassNameAndStyle & {
-    token: ContractTokenDetails;
-    onClick(token: ContractTokenDetails): void;
-    onToggleChecked(token: ContractTokenDetails): void;
-    isChecked: boolean;
-};
-
-function ContractTokenLine({
-    token,
-    onClick,
-    onToggleChecked: toggleChecked,
-    isChecked,
-    className,
-    style,
-}: ContractTokenLineProps) {
-    const { t } = useTranslation('account', { keyPrefix: 'tokens.add' });
-
-    return (
-        <Button
-            key={token.id}
-            clear
-            className={clsx('add-tokens-list__token', className)}
-            style={style}
-            onClick={() => onClick(token)}
-        >
-            <div className="flex align-center h-full">
-                <img src={token.metadata.thumbnail?.url} alt={token.metadata.name ?? ''} />
-                <div>
-                    {token.metadata.name}
-                    <div
-                        className={clsx(
-                            'add-tokens-list__token-balance',
-                            token.balance !== 0n && 'add-tokens-list__token-balance--owns'
-                        )}
-                    >
-                        {t('ItemBalancePre')}
-                        <TokenBalance
-                            balance={token.balance}
-                            decimals={token.metadata.decimals ?? 0}
-                            symbol={token.metadata.symbol}
-                        />
-                    </div>
-                </div>
-            </div>
-            <Checkbox
-                onClick={(e) => {
-                    e.stopPropagation();
-                }}
-                onChange={() => toggleChecked(token)}
-                checked={isChecked}
-                className="add-tokens-list__checkbox"
-            />
-        </Button>
-    );
-}
+import { DetailsLocationState, getTokens, routes } from './utils';
 
 const ELEMENT_HEIGHT = 58;
 
@@ -228,7 +169,8 @@ export default function TokenList() {
         nav(`../${routes.details}`, { state });
     };
 
-    const isTokenChecked = (token: ContractTokenDetails) => checked.includes(token.id);
+    const isTokenChecked = (token: ContractTokenDetails) =>
+        checked.includes(token.id) ? ChoiceStatus.chosen : ChoiceStatus.discarded;
 
     const toggleItem = useCallback(
         (token: ContractTokenDetails) => {
@@ -279,7 +221,7 @@ export default function TokenList() {
                         {(token, style) => (
                             <ContractTokenLine
                                 token={token}
-                                isChecked={isTokenChecked(token)}
+                                status={isTokenChecked(token)}
                                 onClick={showDetails}
                                 onToggleChecked={toggleItem}
                                 style={style}

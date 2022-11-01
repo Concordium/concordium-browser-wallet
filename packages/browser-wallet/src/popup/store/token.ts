@@ -51,7 +51,7 @@ const accountTokensFamily = atomFamily<string, Atom<AsyncWrapper<AccountTokens>>
         if (tokens.loading) {
             return { loading: true, value: {} };
         }
-        return { loading: false, value: tokens.value[accountAddress] };
+        return { loading: false, value: tokens.value[accountAddress] || {} };
     })
 );
 

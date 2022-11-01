@@ -1,5 +1,11 @@
 # Changelog
 
+## 1.1.0
+
+### Added
+
+-   Entrypoint to suggest CIS-2 tokens to be added to the connected account's view.
+
 ## 1.0.0
 
 ### Changed
