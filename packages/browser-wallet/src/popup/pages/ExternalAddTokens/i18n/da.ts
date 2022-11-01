@@ -7,6 +7,9 @@ const t: typeof en = {
     reject: 'Tilføj ingen',
     finish: 'Færdig',
     contractName: 'Kontrakt navn',
+    filterDuplicate: 'Tokens med duplikeret ids er blevet fjernet.',
+    filterInvalid: 'Tokens med ugyldig ids er blevet fjernet.',
+    filterMissingMetadata: 'Tokens, hvis metadata ikke kunne hentes, er blevet fjernet.',
 };
 
 export default t;

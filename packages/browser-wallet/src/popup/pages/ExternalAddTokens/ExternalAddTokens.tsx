@@ -77,27 +77,34 @@ export default function SignMessage({ respond }: Props) {
             return;
         }
         const existingIds = (accountTokens.value[contractIndex] || []).map((token) => token.id);
-        const filteredIds =
-            // Remove duplicates
-            [...new Set(tokenIds)]
-                // Remove any ids that are not proper hex strings.
-                .filter((id) => isHex(id) || id === '');
+        // Remove duplicates
+        const withoutDuplicates = [...new Set(tokenIds)];
+        if (tokenIds.length !== withoutDuplicates.length) {
+            addToast(t('filterDuplicate'));
+        }
+        // Remove any ids that are not proper hex strings.
+        const filteredIds = withoutDuplicates.filter((id) => isHex(id) || id === '');
+        if (withoutDuplicates.length !== filteredIds.length) {
+            addToast(t('filterInvalid'));
+        }
 
-        getTokens(contractDetails, client, network, account, filteredIds).then((newTokens) =>
-            setAddingTokens(
-                newTokens
-                    .filter((token) => token.metadata)
-                    .map(
-                        (token) =>
-                            ({
-                                ...token,
-                                status: existingIds?.some((id) => id === token.id)
-                                    ? ChoiceStatus.existing
-                                    : ChoiceStatus.chosen,
-                            } as TokenWithChoice)
-                    )
-            )
-        );
+        getTokens(contractDetails, client, network, account, filteredIds).then((newTokens) => {
+            const tokensToAdd = newTokens
+                .filter((token) => token.metadata)
+                .map(
+                    (token) =>
+                        ({
+                            ...token,
+                            status: existingIds?.some((id) => id === token.id)
+                                ? ChoiceStatus.existing
+                                : ChoiceStatus.chosen,
+                        } as TokenWithChoice)
+                );
+            if (tokensToAdd.length !== newTokens.length) {
+                addToast(t('filterMissingMetadata'));
+            }
+            setAddingTokens(tokensToAdd);
+        });
     }, [contractDetails, accountTokens.loading, account]);
 
     if (!contractDetails || !addingTokens) {
@@ -126,7 +133,7 @@ export default function SignMessage({ respond }: Props) {
             )}
             {detailView === undefined && (
                 <div className="h-full flex-column align-center">
-                    <p>
+                    <p className="m-t-0 text-center">
                         {t(allExisting ? 'descriptionAllExisting' : 'description', {
                             dApp: displayUrl(url),
                         })}

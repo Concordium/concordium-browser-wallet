@@ -5,6 +5,9 @@ const t = {
     reject: "Don't add any",
     finish: 'Finish',
     contractName: 'Contract name',
+    filterDuplicate: 'Duplicate token ids have been filtered out.',
+    filterInvalid: 'Tokens with invalid ids have been filtered out.',
+    filterMissingMetadata: 'Tokens, which metadata could not be fetched, have been filtered out.',
 };
 
 export default t;

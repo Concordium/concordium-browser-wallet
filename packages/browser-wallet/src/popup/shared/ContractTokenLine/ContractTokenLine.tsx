@@ -29,7 +29,6 @@ export default function ContractTokenLine({
     style,
 }: ContractTokenLineProps) {
     const { t } = useTranslation('account', { keyPrefix: 'tokens.add' });
-    const clickable = status !== ChoiceStatus.existing;
 
     return (
         <Button
@@ -58,17 +57,15 @@ export default function ContractTokenLine({
                     </div>
                 </div>
             </div>
-            {clickable && (
-                <Checkbox
-                    onClick={(e) => {
-                        e.stopPropagation();
-                    }}
-                    onChange={() => toggleChecked(token)}
-                    checked={status === ChoiceStatus.chosen}
-                    className="contract-token-line__checkbox"
-                />
-            )}
-            {clickable || <p className="m-l-auto text-faded">Already Added</p>}
+            <Checkbox
+                onClick={(e) => {
+                    e.stopPropagation();
+                }}
+                onChange={() => toggleChecked(token)}
+                checked={status === ChoiceStatus.chosen || status === ChoiceStatus.existing}
+                className="contract-token-line__checkbox"
+                disabled={status === ChoiceStatus.existing}
+            />
         </Button>
     );
 }
