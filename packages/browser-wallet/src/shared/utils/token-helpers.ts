@@ -7,7 +7,7 @@ import {
     JsonRpcClient,
     serializeUpdateContractParameters,
 } from '@concordium/web-sdk';
-import { MetadataUrl, NetworkConfiguration, TokenMetadata } from '@shared/storage/types';
+import { MetadataUrl, NetworkConfiguration, TokenMetadata, TokenIdAndMetadata } from '@shared/storage/types';
 import { CIS2_SCHEMA_CONTRACT_NAME, CIS2_SCHEMA } from '@popup/constants/schema';
 import { WCCD_METADATA } from '@shared/constants/token-metadata';
 import { SmartContractParameters } from './types';
@@ -18,6 +18,10 @@ export interface ContractDetails {
     index: bigint;
     subindex: bigint;
 }
+
+export type ContractTokenDetails = TokenIdAndMetadata & {
+    balance: bigint;
+};
 
 /**
  * Returns a buffer containing the parameter used to check whether a smart contract is CIS-2 compliant. (Using the CIS-0 view function .supports)

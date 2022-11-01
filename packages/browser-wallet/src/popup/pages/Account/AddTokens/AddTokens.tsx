@@ -9,7 +9,7 @@ import FormInput from '@popup/shared/Form/Input';
 import Submit from '@popup/shared/Form/Submit';
 import { addToastAtom } from '@popup/state';
 import { jsonRpcClientAtom } from '@popup/store/settings';
-import { confirmCIS2Contract, ContractDetails } from '@shared/utils/token-helpers';
+import { confirmCIS2Contract, ContractDetails, ContractTokenDetails } from '@shared/utils/token-helpers';
 import TokenDetails from '@popup/shared/TokenDetails';
 import { selectedAccountAtom } from '@popup/store/account';
 import { ensureDefined } from '@shared/utils/basic-helpers';
@@ -24,7 +24,7 @@ import {
     searchResultAtom,
     topTokensAtom,
 } from './state';
-import { ContractTokenDetails, routes, DetailsLocationState } from './utils';
+import { routes, DetailsLocationState } from './utils';
 import TokenList from './TokenList';
 
 type FormValues = {

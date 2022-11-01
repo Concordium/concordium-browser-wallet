@@ -1,11 +1,11 @@
 import { atom, PrimitiveAtom } from 'jotai';
 import { isDefined, MakeOptional } from 'wallet-common-helpers';
+import { ContractTokenDetails, ContractDetails } from '@shared/utils/token-helpers';
 
 import { selectedAccountAtom } from '@popup/store/account';
 import { jsonRpcClientAtom, networkConfigurationAtom } from '@popup/store/settings';
 import { ensureDefined } from '@shared/utils/basic-helpers';
-import { ContractDetails } from '@shared/utils/token-helpers';
-import { ContractTokenDetails, fetchTokensConfigure } from './utils';
+import { fetchTokensConfigure } from './utils';
 
 type TokensAtomAction = 'reset' | 'next';
 
