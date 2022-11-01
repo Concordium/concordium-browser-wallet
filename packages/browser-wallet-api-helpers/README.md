@@ -136,6 +136,19 @@ const signature = await provider.signMessage(
 );
 ```
 
+### Add CIS-2 Tokens
+
+It is possible to suggest CIS-2 tokens to be added to the connected account's display. sign arbitrary messages using the keys for an account stored in the wallet, by invoking the `signMessage` method. The first parameter is the account to be used for signing the message. This method returns a `Promise` resolving with a signature of the message.
+
+If the wallet is locked, or you have not connected with the wallet (or previously been whitelisted) or if the user rejects signing the meesage, the `Promise` will reject.
+
+The following exemplifies requesting tokens with id AA and BB from the contract on index 1399, and subindex 0 to the account `2za2yAXbFiaB151oYqTteZfqiBzibHXizwjNbpdU8hodq9SfEk`.
+
+```typescript
+const provider = await detectConcordiumProvider();
+await provider.addCIS2Tokens('2za2yAXbFiaB151oYqTteZfqiBzibHXizwjNbpdU8hodq9SfEk', ['AA', 'BB'], '1399', '0');
+```
+
 ## Events
 
 ### Account changed
