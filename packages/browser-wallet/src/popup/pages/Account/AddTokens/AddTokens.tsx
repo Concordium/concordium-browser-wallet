@@ -89,6 +89,7 @@ function ChooseContract() {
 
 function Details() {
     const { state } = useLocation() as Location & { state?: DetailsLocationState };
+    const nav = useNavigate();
 
     if (state === undefined) {
         return <Navigate to=".." />;
@@ -96,7 +97,14 @@ function Details() {
 
     const { contractIndex, token, balance } = state;
 
-    return <TokenDetails contractIndex={contractIndex.toString()} balance={balance} token={token} />;
+    return (
+        <TokenDetails
+            contractIndex={contractIndex.toString()}
+            balance={balance}
+            token={token}
+            onClose={() => nav(-1)}
+        />
+    );
 }
 
 export default function AddTokens() {

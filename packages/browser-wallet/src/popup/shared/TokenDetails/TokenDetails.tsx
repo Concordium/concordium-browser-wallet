@@ -1,5 +1,4 @@
 import React, { ReactNode, useState } from 'react';
-import { useNavigate } from 'react-router-dom';
 import { useTranslation } from 'react-i18next';
 import { useUpdateAtom } from 'jotai/utils';
 import { MakeOptional } from 'wallet-common-helpers';
@@ -12,6 +11,7 @@ import Modal from '@popup/shared/Modal';
 import ButtonGroup from '@popup/shared/ButtonGroup';
 import { TokenIdAndMetadata, TokenMetadata } from '@shared/storage/types';
 
+import { useNavigate } from 'react-router-dom';
 import TokenBalance from '../TokenBalance';
 
 const SUB_INDEX = '0';
@@ -193,20 +193,21 @@ function RemoveToken({
 
 type TokenDetailsComponentProps = MakeOptional<TokenProps, 'subIndex'> & {
     canRemove?: boolean;
+    onClose: () => void;
 };
 
 export default function TokenDetails({
     canRemove = false,
     subIndex = SUB_INDEX,
+    onClose,
     ...tokenProps
 }: TokenDetailsComponentProps) {
     const { token, contractIndex } = tokenProps;
-    const nav = useNavigate();
     const Token = token.metadata.unique ? Nft : Ft;
 
     return (
         <div className="token-details">
-            <CloseButton className="token-details__close" onClick={() => nav(-1)} />
+            <CloseButton className="token-details__close" onClick={onClose} />
             <div className="token-details__content">
                 <Token {...tokenProps} subIndex={subIndex} />
             </div>
