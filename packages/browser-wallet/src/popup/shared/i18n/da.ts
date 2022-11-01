@@ -43,6 +43,25 @@ const t: typeof en = {
         cost: 'Estimerede transaktionsomkostninger',
         unknown: 'Ukendt',
     },
+    tokenDetails: {
+        balance: 'Saldo',
+        description: 'Beskrivelse',
+        ownership: 'Ejerskab',
+        ticker: 'Ticker',
+        decimals: 'Decimaler',
+        contractIndex: 'Kontraktindeks, subindeks',
+        removeToken: 'Vis ikke token i wallet',
+        showRawMetadata: 'Vis rå metadata',
+        unownedUnique: 'Ejer ikke',
+        ownedUnique: 'Ejer',
+        tokenId: 'Token ID',
+        removePrompt: {
+            header: 'Skjul {{ name }} i din wallet',
+            text: 'Er du sikker på at du vil skjule dette token i din wallet? Du kan til enhver tid tilføje det igen fra token listen.',
+            cancel: 'Behold token',
+            remove: 'Fjern token',
+        },
+    },
 };
 
 export default t;

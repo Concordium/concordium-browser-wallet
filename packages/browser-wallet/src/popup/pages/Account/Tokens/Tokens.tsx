@@ -2,23 +2,23 @@ import React from 'react';
 import { useTranslation } from 'react-i18next';
 import { Outlet, Route, Routes, useNavigate } from 'react-router-dom';
 import { displayAsCcd } from 'wallet-common-helpers';
+import { useAtomValue } from 'jotai';
 
 import { absoluteRoutes } from '@popup/constants/routes';
 import TabBar from '@popup/shared/TabBar';
-import PlusIcon from '@assets/svg/plus.svg';
 import CcdIcon from '@assets/svg/concordium.svg';
 import { useAccountInfo } from '@popup/shared/AccountInfoListenerContext';
 import { useSelectedCredential } from '@popup/shared/utils/account-helpers';
 import { TokenIdAndMetadata, WalletCredential } from '@shared/storage/types';
 import { contractBalancesFamily, tokensAtom } from '@popup/store/token';
 import Button from '@popup/shared/Button';
-
-import { useAtomValue } from 'jotai';
+import TokenBalance from '@popup/shared/TokenBalance';
 import AtomValue from '@popup/store/AtomValue';
+
 import { tokensRoutes, detailsRoute } from './routes';
 import TokenDetails from './TokenDetails';
 import { useFlattenedAccountTokens } from './utils';
-import TokenBalance from './TokenBalance';
+import { accountRoutes } from '../routes';
 
 type FtProps = {
     accountAddress: string;
@@ -122,11 +122,11 @@ function Tokens() {
                 <TabBar.Item className="tokens__link" to={tokensRoutes.collectibles}>
                     {t('nft')}
                 </TabBar.Item>
-                <TabBar.Item className="tokens__link" to={absoluteRoutes.home.account.tokens.add.path}>
-                    <div className="tokens__add">
-                        {t('new')}
-                        <PlusIcon />
-                    </div>
+                <TabBar.Item
+                    className="tokens__link"
+                    to={`${absoluteRoutes.home.account.path}/${accountRoutes.manageTokens}`}
+                >
+                    <div className="tokens__add">{t('manage')}</div>
                 </TabBar.Item>
             </TabBar>
             <div className="tokens__scroll">
@@ -136,11 +136,7 @@ function Tokens() {
     );
 }
 
-type Props = {
-    setDetailsExpanded(expanded: boolean): void;
-};
-
-export default function TokensRoutes({ setDetailsExpanded }: Props) {
+export default function TokensRoutes() {
     const account = useSelectedCredential();
     const nav = useNavigate();
     useAtomValue(tokensAtom); // Ensure tokens are kept in memory
@@ -155,7 +151,7 @@ export default function TokensRoutes({ setDetailsExpanded }: Props) {
 
     return (
         <Routes>
-            <Route path={tokensRoutes.details} element={<TokenDetails setDetailsExpanded={setDetailsExpanded} />} />
+            <Route path={tokensRoutes.details} element={<TokenDetails />} />
             <Route element={<Tokens />}>
                 <Route index element={<Fungibles account={account} toDetails={goToDetails} />} />
                 <Route

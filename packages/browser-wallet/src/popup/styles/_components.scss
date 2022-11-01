@@ -16,6 +16,7 @@
 @import '../shared/TransactionReceipt/TransactionReceipt';
 @import '../shared/Toast/Toast';
 @import '../shared/TabBar/TabBar';
+@import '../shared/TokenDetails/TokenDetails';
 
 // Pages
 @import '../pages/Account';
@@ -31,7 +32,6 @@
 @import '../pages/NetworkSettings/NetworkSettings';
 @import '../pages/ChangePasscode/ChangePasscode';
 @import '../pages/Recovery/Recovery';
-@import '../pages/AddTokens/AddTokens';
 
 // Layouts
 @import '../page-layouts/MainLayout';

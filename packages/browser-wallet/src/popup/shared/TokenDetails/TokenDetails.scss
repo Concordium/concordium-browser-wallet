@@ -33,6 +33,8 @@
     }
 
     &__line {
+        word-break: break-word;
+
         & + & {
             margin-top: rem(10px);
         }

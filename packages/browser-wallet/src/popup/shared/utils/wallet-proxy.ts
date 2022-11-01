@@ -1,7 +1,7 @@
 import { AccountTransactionType } from '@concordium/web-sdk';
 import axios from 'axios';
 import { abs } from 'wallet-common-helpers';
-import { IdentityProvider } from '@shared/storage/types';
+import { Cis2TokensResponse, IdentityProvider } from '@shared/storage/types';
 import { storedCurrentNetwork } from '@shared/storage/access';
 import {
     BrowserWalletAccountTransaction,
@@ -290,4 +290,19 @@ export async function getTransactionStatus(tHash: string): Promise<TransactionSt
     const path = `/v0/submissionStatus/${tHash}`;
     const { data } = await (await getWalletProxy()).get(path);
     return data.status;
+}
+
+export async function getCis2Tokens(
+    contractIndex: bigint,
+    subIndex: bigint,
+    from?: number,
+    limit = 20
+): Promise<Cis2TokensResponse | undefined> {
+    let path = `/v0/CIS2Tokens/${contractIndex}/${subIndex}?limit=${limit}`;
+    if (from) {
+        path += `&from=${from}`;
+    }
+
+    const { data } = await (await getWalletProxy()).get(path);
+    return data;
 }

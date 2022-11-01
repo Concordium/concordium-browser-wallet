@@ -228,3 +228,16 @@ export interface TokenStorage {
     id: string;
     metadataLink: string;
 }
+
+export type Cis2TokenResponse = {
+    id: number;
+    token: string;
+    totalSupply: string; // string encoded bigint.
+};
+
+export type Cis2TokensResponse = {
+    count: number;
+    from?: number;
+    limit: number;
+    tokens: Cis2TokenResponse[];
+};

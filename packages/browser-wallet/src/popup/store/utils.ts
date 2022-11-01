@@ -26,7 +26,7 @@ import {
     sessionCookie,
 } from '@shared/storage/access';
 import { ChromeStorageKey } from '@shared/storage/types';
-import { atom, WritableAtom } from 'jotai';
+import { atom, PrimitiveAtom, WritableAtom } from 'jotai';
 
 const accessorMap = {
     [ChromeStorageKey.Identities]: useIndexedStorage(storedIdentities, getGenesisHash),
@@ -52,6 +52,12 @@ const accessorMap = {
     [ChromeStorageKey.PendingTransactions]: useIndexedStorage(sessionPendingTransactions, getGenesisHash),
     [ChromeStorageKey.Cookie]: useIndexedStorage(sessionCookie, getGenesisHash),
 };
+
+export function resetOnUnmountAtom<V>(initial: V): PrimitiveAtom<V> {
+    const a = atom<V>(initial);
+    a.onMount = (set) => () => set(initial);
+    return a;
+}
 
 export type AsyncWrapper<V> = {
     loading: boolean;

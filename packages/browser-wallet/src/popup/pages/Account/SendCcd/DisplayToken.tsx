@@ -2,7 +2,7 @@ import React from 'react';
 import clsx from 'clsx';
 import Button from '@popup/shared/Button';
 import { TokenMetadata } from '@shared/storage/types';
-import TokenBalance from '../Tokens/TokenBalance';
+import TokenBalance from '@popup/shared/TokenBalance';
 
 interface ChooseTokenProps {
     balance: bigint;

@@ -138,7 +138,7 @@ export default function IdentityIssuanceStartGuard() {
         return (
             <div className="identity-issuance__start">
                 <p className="identity-issuance__start-text">{t('startText')}</p>
-                <PendingArrows className="identity-issuance__start__loading-arrows" />
+                <PendingArrows className="loading" />
                 <p className="identity-issuance__text m-t-40">{t('startWaitingText')}</p>
             </div>
         );

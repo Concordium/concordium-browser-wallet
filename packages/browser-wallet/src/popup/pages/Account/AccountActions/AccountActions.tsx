@@ -2,7 +2,7 @@ import clsx from 'clsx';
 import { useTranslation } from 'react-i18next';
 import { ClassName } from 'wallet-common-helpers';
 
-import React, { Children, ReactNode, useRef } from 'react';
+import React, { Children, ReactNode, useContext, useRef } from 'react';
 import Button from '@popup/shared/Button';
 
 import BackIcon from '@assets/svg/back-arrow.svg';
@@ -13,6 +13,7 @@ import ReceiveIcon from '@assets/svg/qr.svg';
 import SettingsIcon from '@assets/svg/cog.svg';
 import TabBar from '@popup/shared/TabBar';
 import { accountRoutes } from '../routes';
+import { accountPageContext } from '../utils';
 
 const SCROLL_LIMIT = 5;
 
@@ -74,11 +75,11 @@ function Action({ children, to, title, disabled = false, onClick = undefined }: 
 
 type Props = ClassName & {
     disabled: boolean;
-    setDetailsExpanded: React.Dispatch<React.SetStateAction<boolean>>;
 };
 
-export default function AccountActions({ className, disabled, setDetailsExpanded }: Props) {
+export default function AccountActions({ className, disabled }: Props) {
     const { t } = useTranslation('account', { keyPrefix: 'actions' });
+    const { setDetailsExpanded } = useContext(accountPageContext);
 
     return (
         <nav className={clsx('account-page-actions', className, disabled && 'account-page-actions-disabled')}>

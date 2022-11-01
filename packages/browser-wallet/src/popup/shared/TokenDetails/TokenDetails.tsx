@@ -1,22 +1,20 @@
-import React, { ReactNode, useEffect, useMemo, useState } from 'react';
-import { useNavigate, useParams } from 'react-router-dom';
-
-import { useSelectedCredential } from '@popup/shared/utils/account-helpers';
-import { contractBalancesFamily, removeTokenFromCurrentAccountAtom } from '@popup/store/token';
-import CloseButton from '@popup/shared/CloseButton';
+import React, { ReactNode, useState } from 'react';
+import { useNavigate } from 'react-router-dom';
 import { useTranslation } from 'react-i18next';
-import Button from '@popup/shared/Button';
 import { useUpdateAtom } from 'jotai/utils';
+import { MakeOptional } from 'wallet-common-helpers';
+
+import { removeTokenFromCurrentAccountAtom } from '@popup/store/token';
+import CloseButton from '@popup/shared/CloseButton';
+import Button from '@popup/shared/Button';
 import { absoluteRoutes } from '@popup/constants/routes';
-import AtomValue from '@popup/store/AtomValue';
 import Modal from '@popup/shared/Modal';
 import ButtonGroup from '@popup/shared/ButtonGroup';
-import { TokenMetadata } from '@shared/storage/types';
-import TokenBalance from '../TokenBalance';
-import { defaultCis2TokenId } from '../routes';
-import { TokenDetails, useFlattenedAccountTokens } from '../utils';
+import { TokenIdAndMetadata, TokenMetadata } from '@shared/storage/types';
 
-const SUB_INDEX = 0;
+import TokenBalance from '../TokenBalance';
+
+const SUB_INDEX = '0';
 
 type TokenDetailsLineProps = {
     header: string;
@@ -41,7 +39,7 @@ type ShowRawMetadataProps = {
 };
 
 function ShowRawMetadata({ metadata }: ShowRawMetadataProps) {
-    const { t } = useTranslation('account', { keyPrefix: 'tokens.details' });
+    const { t } = useTranslation('shared', { keyPrefix: 'tokenDetails' });
     const [showPrompt, setShowPrompt] = useState(false);
 
     const trigger = (
@@ -67,13 +65,15 @@ function ShowRawMetadata({ metadata }: ShowRawMetadataProps) {
 }
 
 type TokenProps = {
-    token: TokenDetails;
+    token: TokenIdAndMetadata;
+    contractIndex: string;
+    subIndex: string;
     balance: bigint;
 };
 
-function Nft({ token, balance }: TokenProps) {
+function Nft({ token, balance, contractIndex, subIndex }: TokenProps) {
     const { thumbnail, name, description, display, decimals = 0, symbol } = token.metadata;
-    const { t } = useTranslation('account', { keyPrefix: 'tokens' });
+    const { t } = useTranslation('shared', { keyPrefix: 'tokenDetails' });
 
     return (
         <>
@@ -81,7 +81,7 @@ function Nft({ token, balance }: TokenProps) {
                 {thumbnail && <img src={thumbnail.url} alt={`${name} thumbnail`} />}
                 {name}
             </h3>
-            <TokenDetailsLine header={t('details.ownership')}>
+            <TokenDetailsLine header={t('ownership')}>
                 <span className="text-bold">{balance === 0n && t('unownedUnique')}</span>
                 <span className="text-bold">
                     {balance === 0n || (
@@ -97,9 +97,11 @@ function Nft({ token, balance }: TokenProps) {
                     )}
                 </span>
             </TokenDetailsLine>
-            <TokenDetailsLine header={t('details.description')}>{description}</TokenDetailsLine>
-            <TokenDetailsLine header={t('details.contractIndex')}>
-                {token.contractIndex}, {SUB_INDEX}
+            <TokenDetailsLine header={t('description')}>{description}</TokenDetailsLine>
+            <TokenDetailsLine header={t('contractIndex')}>
+                <>
+                    {contractIndex}, {subIndex}
+                </>
             </TokenDetailsLine>
             <TokenDetailsLine header={t('tokenId')}>{token.id}</TokenDetailsLine>
             <ShowRawMetadata metadata={token.metadata} />
@@ -110,24 +112,27 @@ function Nft({ token, balance }: TokenProps) {
     );
 }
 
-function Ft({ token, balance }: TokenProps) {
+function Ft({ token, balance, contractIndex, subIndex = SUB_INDEX }: TokenProps) {
     const { thumbnail, name, decimals = 0, description, symbol } = token.metadata;
-    const { t } = useTranslation('account', { keyPrefix: 'tokens' });
+    const { t } = useTranslation('shared', { keyPrefix: 'tokenDetails' });
+
     return (
         <>
             <h3 className="token-details__header">
                 {thumbnail && <img src={thumbnail.url} alt={`${name} thumbnail`} />}
                 {name}
             </h3>
-            <TokenDetailsLine header={t('details.balance')}>
+            <TokenDetailsLine header={t('balance')}>
                 <div className="mono text-bold">
                     <TokenBalance balance={balance} decimals={decimals} /> {symbol}
                 </div>
             </TokenDetailsLine>
-            <TokenDetailsLine header={t('details.description')}>{description}</TokenDetailsLine>
-            <TokenDetailsLine header={t('details.decimals')}>{decimals}</TokenDetailsLine>
-            <TokenDetailsLine header={t('details.contractIndex')}>
-                {token.contractIndex}, {SUB_INDEX}
+            <TokenDetailsLine header={t('description')}>{description}</TokenDetailsLine>
+            <TokenDetailsLine header={t('decimals')}>{decimals}</TokenDetailsLine>
+            <TokenDetailsLine header={t('contractIndex')}>
+                <>
+                    {contractIndex}, {subIndex}
+                </>
             </TokenDetailsLine>
             <TokenDetailsLine header={t('tokenId')}>{token.id}</TokenDetailsLine>
             <ShowRawMetadata metadata={token.metadata} />
@@ -136,19 +141,20 @@ function Ft({ token, balance }: TokenProps) {
 }
 
 type RemoveTokenProps = {
-    token: TokenDetails;
+    contractIndex: string;
+    token: TokenIdAndMetadata;
 };
 
 function RemoveToken({
     token: {
-        contractIndex,
         id,
         metadata: { name },
     },
+    contractIndex,
 }: RemoveTokenProps) {
     const removeToken = useUpdateAtom(removeTokenFromCurrentAccountAtom);
     const nav = useNavigate();
-    const { t } = useTranslation('account', { keyPrefix: 'tokens.details' });
+    const { t } = useTranslation('shared', { keyPrefix: 'tokenDetails' });
     const [showPrompt, setShowPrompt] = useState(false);
 
     const remove = () => {
@@ -185,48 +191,26 @@ function RemoveToken({
     );
 }
 
-type TokenDetailsRouteParams = {
-    contractIndex: string;
-    id: string;
+type TokenDetailsComponentProps = MakeOptional<TokenProps, 'subIndex'> & {
+    canRemove?: boolean;
 };
 
-function useTokenDetails(): TokenDetails | undefined {
-    const account = useSelectedCredential();
-    const { contractIndex, id } = useParams<TokenDetailsRouteParams>();
-    const tokenId = useMemo(() => (id === defaultCis2TokenId ? '' : id), [id]);
-    const tokens = useFlattenedAccountTokens(account);
-
-    return tokens.find((t) => t.contractIndex === contractIndex && t.id === tokenId);
-}
-
-type Props = {
-    setDetailsExpanded(expanded: boolean): void;
-};
-
-export default function Details({ setDetailsExpanded }: Props) {
-    const token = useTokenDetails();
-    const account = useSelectedCredential();
+export default function TokenDetails({
+    canRemove = false,
+    subIndex = SUB_INDEX,
+    ...tokenProps
+}: TokenDetailsComponentProps) {
+    const { token, contractIndex } = tokenProps;
     const nav = useNavigate();
-    const balancesAtom = contractBalancesFamily(account?.address ?? '', token?.contractIndex ?? '');
-
-    useEffect(() => {
-        setDetailsExpanded(false);
-        return () => setDetailsExpanded(true);
-    }, []);
-
-    if (token === undefined) {
-        return null;
-    }
-
     const Token = token.metadata.unique ? Nft : Ft;
 
     return (
         <div className="token-details">
             <CloseButton className="token-details__close" onClick={() => nav(-1)} />
             <div className="token-details__content">
-                <AtomValue atom={balancesAtom}>{({ [token.id]: b }) => <Token token={token} balance={b} />}</AtomValue>
+                <Token {...tokenProps} subIndex={subIndex} />
             </div>
-            <RemoveToken token={token} />
+            {canRemove && <RemoveToken token={token} contractIndex={contractIndex} />}
         </div>
     );
 }

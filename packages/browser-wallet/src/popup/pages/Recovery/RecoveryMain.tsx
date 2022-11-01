@@ -65,7 +65,7 @@ export default function RecoveryMain() {
             <PageHeader>{t('main.title')}</PageHeader>
             <div className="recovery__main onboarding-setup__page-with-header">
                 <div className="onboarding-setup__page-with-header__description">{t('main.description')}</div>
-                <PendingArrows className="identity-issuance__start__loading-arrows" />
+                <PendingArrows className="loading" />
             </div>
         </>
     );

@@ -1,5 +1,5 @@
 import { useAtomValue } from 'jotai';
-import React, { useState } from 'react';
+import React, { useContext, useMemo, useState } from 'react';
 import { useTranslation } from 'react-i18next';
 import { Navigate, Outlet, Route, Routes, useNavigate } from 'react-router-dom';
 import { accountsAtom } from '@popup/store/account';
@@ -19,18 +19,15 @@ import TransactionLog from './TransactionLog/TransactionLog';
 import SendCcd from './SendCcd';
 import ConnectedBox from './ConnectedBox';
 import Tokens from './Tokens';
+import AddTokens from './AddTokens';
+import { AccountPageContext, accountPageContext } from './utils';
 
-function Account({
-    detailsExpanded,
-    setDetailsExpanded,
-}: {
-    detailsExpanded: boolean;
-    setDetailsExpanded: React.Dispatch<React.SetStateAction<boolean>>;
-}) {
+function Account() {
     const { t } = useTranslation('account');
     const accounts = useAtomValue(accountsAtom);
     const currentUrl = useCurrentOpenTabUrl();
     const nav = useNavigate();
+    const { detailsExpanded, setDetailsExpanded } = useContext(accountPageContext);
 
     const selectedCred = useSelectedCredential();
 
@@ -74,34 +71,31 @@ function Account({
                     </>
                 )}
             </div>
-            <AccountActions
-                className="account-page__actions"
-                disabled={!isConfirmed}
-                setDetailsExpanded={setDetailsExpanded}
-            />
+            <AccountActions className="account-page__actions" disabled={!isConfirmed} />
         </div>
     );
 }
 
 export default function AccountRoutes() {
     const [detailsExpanded, setDetailsExpanded] = useState(true);
+    const contextValue: AccountPageContext = useMemo(
+        () => ({ detailsExpanded, setDetailsExpanded }),
+        [setDetailsExpanded, detailsExpanded]
+    );
 
     return (
-        <Routes>
-            <Route element={<Account detailsExpanded={detailsExpanded} setDetailsExpanded={setDetailsExpanded} />}>
-                <Route index element={<Navigate to={accountRoutes.tokens} replace />} />
-                <Route path={`${accountRoutes.send}/*`} element={<SendCcd setDetailsExpanded={setDetailsExpanded} />} />
-                <Route path={accountRoutes.receive} element={<DisplayAddress />} />
-                <Route
-                    path={`${accountRoutes.log}/*`}
-                    element={<TransactionLog setDetailsExpanded={setDetailsExpanded} />}
-                />
-                <Route path={`${accountRoutes.settings}/*`} element={<AccountSettings />} />
-                <Route
-                    path={`${accountRoutes.tokens}/*`}
-                    element={<Tokens setDetailsExpanded={setDetailsExpanded} />}
-                />
-            </Route>
-        </Routes>
+        <accountPageContext.Provider value={contextValue}>
+            <Routes>
+                <Route element={<Account />}>
+                    <Route index element={<Navigate to={accountRoutes.tokens} replace />} />
+                    <Route path={`${accountRoutes.send}/*`} element={<SendCcd />} />
+                    <Route path={accountRoutes.receive} element={<DisplayAddress />} />
+                    <Route path={`${accountRoutes.log}/*`} element={<TransactionLog />} />
+                    <Route path={`${accountRoutes.settings}/*`} element={<AccountSettings />} />
+                    <Route path={`${accountRoutes.tokens}/*`} element={<Tokens />} />
+                    <Route path={`${accountRoutes.manageTokens}/*`} element={<AddTokens />} />
+                </Route>
+            </Routes>
+        </accountPageContext.Provider>
     );
 }
