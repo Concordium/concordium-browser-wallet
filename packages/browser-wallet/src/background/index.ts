@@ -14,6 +14,7 @@ import {
 
 import JSONBig from 'json-bigint';
 import { ChromeStorageKey, NetworkConfiguration } from '@shared/storage/types';
+import { buildURLwithSearchParameters } from '@shared/utils/url-helpers';
 import bgMessageHandler from './message-handler';
 import { forwardToPopup, HandleMessage, HandleResponse, RunCondition, setPopupSize } from './window-management';
 import { addIdpListeners, identityIssuanceHandler } from './identity-issuance';
@@ -95,12 +96,27 @@ const injectScript: ExtensionMessageHandler = (_msg, sender, respond) => {
     return true;
 };
 
+async function reportVersion() {
+    const baseUrl = 'https://concordium.matomo.cloud/matomo.php';
+    const params = {
+        idsite: '3',
+        rec: '1',
+        action_name: 'app-startup',
+        dimension1: chrome.runtime.getManifest().version,
+    };
+    await fetch(buildURLwithSearchParameters(baseUrl, params));
+    // TODO: log if this fails
+}
+
 const startupHandler = async () => {
     const network = await storedCurrentNetwork.get();
     if (network) {
         await startMonitoringPendingStatus(network);
     }
+
+    reportVersion();
 };
+
 const networkChangeHandler = (network: NetworkConfiguration) => startMonitoringPendingStatus(network);
 
 chrome.storage.local.onChanged.addListener((changes) => {

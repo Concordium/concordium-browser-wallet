@@ -4,6 +4,7 @@ import { ExtensionMessageHandler, InternalMessageType } from '@concordium/browse
 import { BackgroundResponseStatus } from '@shared/utils/types';
 import { sessionIdpTab, sessionPendingIdentity, storedCurrentNetwork } from '@shared/storage/access';
 import { CreationStatus, PendingIdentity } from '@shared/storage/types';
+import { buildURLwithSearchParameters } from '@shared/utils/url-helpers';
 import { openWindow } from './window-management';
 
 import bgMessageHandler from './message-handler';
@@ -133,8 +134,7 @@ async function startIdentityIssuance({
         redirect_uri: redirectUri,
         state: JSON.stringify({ idObjectRequest }),
     };
-    const searchParams = new URLSearchParams(params);
-    const url = Object.entries(params).length === 0 ? baseUrl : `${baseUrl}?${searchParams.toString()}`;
+    const url = buildURLwithSearchParameters(baseUrl, params);
     const network = await storedCurrentNetwork.get();
 
     if (!network) {
