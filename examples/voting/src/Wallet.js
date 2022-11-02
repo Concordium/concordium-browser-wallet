@@ -1,3 +1,4 @@
+import React from 'react';
 import { detectConcordiumProvider } from "@concordium/browser-wallet-api-helpers";
 import { Alert, Button } from "react-bootstrap";
 import { AccountTransactionType, GtuAmount, ModuleReference } from "@concordium/web-sdk";
