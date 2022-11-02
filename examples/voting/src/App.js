@@ -1,4 +1,5 @@
 import './App.css';
+import React from 'react';
 import {Navbar} from "react-bootstrap";
 import {Route, BrowserRouter as Router, Routes} from "react-router-dom";
 import CreateElectionPage from "./CreateElectionPage";
