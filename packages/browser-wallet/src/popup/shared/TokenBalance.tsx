@@ -1,5 +1,5 @@
 import React from 'react';
-import { addThousandSeparators, integerToFractional } from 'wallet-common-helpers';
+import { addThousandSeparators, integerToFractional, pipe } from 'wallet-common-helpers';
 
 type BalanceProps = {
     balance: bigint;
@@ -8,8 +8,11 @@ type BalanceProps = {
 };
 
 export default function TokenBalance({ balance, decimals, symbol }: BalanceProps) {
-    const renderBalance = (value: bigint) =>
-        addThousandSeparators(integerToFractional(decimals)(value)) + (symbol || '');
+    const renderBalance = pipe(integerToFractional(decimals), addThousandSeparators);
 
-    return <>{renderBalance(balance)}</>;
+    return (
+        <>
+            {renderBalance(balance)} {symbol ?? ''}
+        </>
+    );
 }
