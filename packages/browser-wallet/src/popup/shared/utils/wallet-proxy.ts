@@ -282,6 +282,7 @@ export async function getCcdDrop(accountAddress: string): Promise<BrowserWalletA
         response.data.submissionId,
         BigInt(2000000000),
         undefined,
+        undefined,
         accountAddress
     );
 }
