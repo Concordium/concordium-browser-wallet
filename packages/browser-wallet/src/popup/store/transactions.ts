@@ -11,7 +11,7 @@ import { selectedAccountAtom } from './account';
 import { atomWithChromeStorage } from './utils';
 import { networkConfigurationAtom } from './settings';
 
-const TRANSACTION_CHECK_INTERVAL = ACCOUNT_INFO_RETRIEVAL_INTERVAL_MS;
+const TRANSACTION_CHECK_INTERVAL = ACCOUNT_INFO_RETRIEVAL_INTERVAL_MS * 2;
 
 const monitoredMap: Record<string, string[]> = {};
 const monitorTransactionStatus = (genesisHash: string) => {

@@ -92,6 +92,10 @@
         top: rem(1px);
         margin-left: rem(-45px);
         height: rem(8px);
+
+        path {
+            fill: $color-text-faded;
+        }
     }
 
     &__warning {
