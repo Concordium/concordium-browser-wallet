@@ -90,7 +90,7 @@ const pendingTransactionsAtom = (() => {
 
     derived.onMount = (startMonitoring) => {
         // setAtom callback starts monitoring a list of transactions + pending transactions currently in store.
-        startMonitoring([]);
+        setTimeout(() => startMonitoring([]), 3000); // Give the base atom a little time to load stored value into memory.
     };
 
     return derived;
