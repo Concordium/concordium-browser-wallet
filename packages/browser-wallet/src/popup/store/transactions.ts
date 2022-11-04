@@ -43,22 +43,24 @@ const monitorTransactionStatus = (genesisHash: string) => {
 };
 
 const pendingTransactionsAtom = (() => {
-    const base = atomWithChromeStorage<string[]>(ChromeStorageKey.PendingTransactions, []);
-    const parsed = atom<BrowserWalletAccountTransaction[], BrowserWalletAccountTransaction[]>(
+    const baseAtom = atomWithChromeStorage<string[]>(ChromeStorageKey.PendingTransactions, []);
+    const parsedAtom = atom<BrowserWalletAccountTransaction[], BrowserWalletAccountTransaction[], Promise<void>>(
         (get) => {
-            const pending: BrowserWalletAccountTransaction[] = get(base).map(parse);
+            const pending: BrowserWalletAccountTransaction[] = get(baseAtom).map(parse);
             return pending;
         },
-        (_, set, update) => {
-            set(base, update.map(stringify));
-        }
+        (_, set, update) => set(baseAtom, update.map(stringify))
     );
 
-    const derived = atom<BrowserWalletAccountTransaction[], BrowserWalletAccountTransaction[]>(
-        (get) => get(parsed),
-        (get, set, update) => {
-            const pending = [...get(parsed), ...update];
-            set(parsed, pending);
+    const derived = atom<BrowserWalletAccountTransaction[], BrowserWalletAccountTransaction[], Promise<void>>(
+        (get) => get(parsedAtom),
+        async (get, set, update) => {
+            const parsed = get(parsedAtom);
+            const pending = update.length > 0 ? [...parsed, ...update] : parsed;
+
+            if (update.length > 0) {
+                await set(parsedAtom, pending);
+            }
 
             const network = get(networkConfigurationAtom);
             const monitor = monitorTransactionStatus(network.genesisHash);
@@ -74,13 +76,13 @@ const pendingTransactionsAtom = (() => {
                 const networkChanged = network.genesisHash !== currentNetwork.genesisHash;
 
                 if (!networkChanged) {
-                    const next = get(parsed).filter((p) => p.transactionHash !== transactionHash);
-                    set(parsed, next);
+                    const next = get(parsedAtom).filter((p) => p.transactionHash !== transactionHash);
+                    await set(parsedAtom, next);
                 } else {
                     const spt = useIndexedStorage(sessionPendingTransactions, async () => network.genesisHash);
                     const next = (await spt.get())?.map(parse).filter((p) => p.transactionHash !== transactionHash);
 
-                    spt.set(next?.map(stringify) ?? []);
+                    await spt.set(next?.map(stringify) ?? []);
                 }
             });
         }
@@ -99,13 +101,11 @@ const isForAccount = (address: string) => (transaction: BrowserWalletAccountTran
 
 const pendingTransactionsFamily = atomFamily<
     string,
-    WritableAtom<BrowserWalletAccountTransaction[], BrowserWalletAccountTransaction[]>
+    WritableAtom<BrowserWalletAccountTransaction[], BrowserWalletAccountTransaction[], Promise<void>>
 >((address) =>
     atom(
         (get) => get(pendingTransactionsAtom).filter(isForAccount(address)),
-        (_, set, arg) => {
-            set(pendingTransactionsAtom, arg);
-        }
+        (_, set, arg) => set(pendingTransactionsAtom, arg)
     )
 );
 
@@ -118,6 +118,7 @@ export const selectedPendingTransactionsAtom = atom<BrowserWalletAccountTransact
     return get(pendingTransactionsFamily(selectedAccount));
 });
 
-export const addPendingTransactionAtom = atom<null, BrowserWalletAccountTransaction>(null, (get, set, transaction) => {
-    set(pendingTransactionsAtom, [...get(pendingTransactionsAtom), transaction]);
-});
+export const addPendingTransactionAtom = atom<null, BrowserWalletAccountTransaction, Promise<void>>(
+    null,
+    (get, set, transaction) => set(pendingTransactionsAtom, [...get(pendingTransactionsAtom), transaction])
+);
