@@ -85,5 +85,11 @@ $error-spacing: rem(13.286px);
     &__token-display {
         max-height: rem(20px);
         max-width: rem(40px);
+        margin-right: rem(5px);
+    }
+
+    &__details {
+        text-align: right;
+        width: calc(100% - #{rem(45px)}); // subtract max-width + margin of &__token-display.
     }
 }

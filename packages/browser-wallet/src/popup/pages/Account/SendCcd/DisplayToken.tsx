@@ -17,8 +17,8 @@ export default function DisplayToken({ metadata, balance, className, ...props }:
         <Button className={clsx('display-token', className)} clear {...props}>
             <div className="display-token__token-display-container">
                 <img alt={metadata.name} className="display-token__token-display" src={metadata.thumbnail?.url} />
-                <div className="text-right">
-                    {metadata.name}
+                <div className="display-token__details">
+                    <div className="clamp-1 w-full">{metadata.name}</div>
                     <div className="display-token__balance">
                         <TokenBalance decimals={metadata.decimals || 0} symbol={metadata.symbol} balance={balance} />
                     </div>
