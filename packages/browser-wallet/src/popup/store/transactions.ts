@@ -56,7 +56,7 @@ const pendingTransactionsAtom = (() => {
         (get) => get(parsedAtom),
         async (get, set, update) => {
             const parsed = get(parsedAtom);
-            const pending = update.length > 0 ? [...parsed, ...update] : parsed;
+            const pending = [...parsed, ...update];
 
             if (update.length > 0) {
                 await set(parsedAtom, pending);
