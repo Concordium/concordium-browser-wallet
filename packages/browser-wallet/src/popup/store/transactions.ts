@@ -12,6 +12,7 @@ import { atomWithChromeStorage } from './utils';
 import { networkConfigurationAtom } from './settings';
 
 const TRANSACTION_CHECK_INTERVAL = ACCOUNT_INFO_RETRIEVAL_INTERVAL_MS * 2;
+const TRANSACTION_MONITOR_START_DELAY = 3000;
 
 const monitoredMap: Record<string, string[]> = {};
 const monitorTransactionStatus = (genesisHash: string) => {
@@ -90,7 +91,7 @@ const pendingTransactionsAtom = (() => {
 
     derived.onMount = (startMonitoring) => {
         // setAtom callback starts monitoring a list of transactions + pending transactions currently in store.
-        setTimeout(() => startMonitoring([]), 3000); // Give the base atom a little time to load stored value into memory.
+        setTimeout(() => startMonitoring([]), TRANSACTION_MONITOR_START_DELAY); // Give the base atom a little time to load stored value into memory.
     };
 
     return derived;
