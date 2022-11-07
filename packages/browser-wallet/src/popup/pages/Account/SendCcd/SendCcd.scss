@@ -37,6 +37,13 @@ $error-spacing: rem(13.286px);
         overflow: overlay;
     }
 
+    &__token-picker,
+    &__pick-token {
+        .ccd-icon {
+            width: rem(20px);
+        }
+    }
+
     &__pick-token-element:last-child {
         margin-bottom: $horizontal-spacing;
     }
