@@ -97,7 +97,8 @@ export default function SendTransaction({ onSubmit, onReject }: Props) {
         const transaction = { payload, header, type: transactionType };
 
         const hash = await sendTransaction(client, transaction, key);
-        addPendingTransaction(createPendingTransactionFromAccountTransaction(transaction, hash));
+        const pending = createPendingTransactionFromAccountTransaction(transaction, hash);
+        await addPendingTransaction(pending);
 
         return hash;
     }, [payload, key]);
