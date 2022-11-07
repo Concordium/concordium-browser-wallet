@@ -20,7 +20,11 @@ export default function DisplayToken({ metadata, balance, className, icon, ...pr
                 {icon ? (
                     <div className="display-token__token-display">{icon}</div>
                 ) : (
-                    <img alt={metadata.name} className="display-token__token-display" src={metadata.thumbnail?.url} />
+                    <img
+                        alt={metadata.name}
+                        className="display-token__token-display"
+                        src={metadata.thumbnail?.url ?? metadata.display?.url}
+                    />
                 )}
                 <div className="display-token__details">
                     <div className="clamp-1 w-full">{metadata.name}</div>
