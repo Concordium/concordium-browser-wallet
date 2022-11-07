@@ -7,6 +7,7 @@ import {
     BrowserWalletAccountTransaction,
     BrowserWalletTransaction,
     RewardType,
+    SpecialTransactionType,
     TransactionHistoryResult,
     TransactionStatus,
 } from './transaction-history-types';
@@ -49,7 +50,9 @@ export enum TransactionKindString {
     Malformed = 'Malformed account transaction',
 }
 
-function mapTransactionKindStringToTransactionType(kind: TransactionKindString): AccountTransactionType | RewardType {
+function mapTransactionKindStringToTransactionType(
+    kind: TransactionKindString
+): AccountTransactionType | RewardType | SpecialTransactionType {
     switch (kind) {
         case TransactionKindString.DeployModule:
             return AccountTransactionType.DeployModule;
@@ -101,6 +104,8 @@ function mapTransactionKindStringToTransactionType(kind: TransactionKindString):
             return AccountTransactionType.ConfigureDelegation;
         case TransactionKindString.StakingReward:
             return RewardType.StakingReward;
+        case TransactionKindString.Malformed:
+            return SpecialTransactionType.Malformed;
         default:
             throw Error(`Unkown transaction kind was encounted: ${kind}`);
     }
@@ -243,10 +248,8 @@ export async function getTransactions(
 
     const response = await (await getWalletProxy()).get(proxyPath);
     const result: WalletProxyAccTransactionsResult = response.data;
-    const transactionsWithoutMalformed = result.transactions.filter(
-        (t) => t.details.type !== TransactionKindString.Malformed
-    );
-    const transactions = transactionsWithoutMalformed.map((t) => mapTransaction(t, accountAddress));
+    const transactions = result.transactions.map((t) => mapTransaction(t, accountAddress));
+
     return {
         transactions,
         full: result.limit === result.count,
