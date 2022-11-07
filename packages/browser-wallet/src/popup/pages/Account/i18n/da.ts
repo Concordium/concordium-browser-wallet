@@ -69,6 +69,8 @@ const t: typeof en = {
             ItemBalancePre: 'Din saldo: ',
             searchLabel: 'Søg efter token ID i {{ contractName }}',
             noValidTokenError: 'Token eksisterer enten ikke eller kan ikke vises i wallet',
+            noTokensChange: 'Ingen opdateringer til tokenliste.',
+            tokensChanged: 'Tokenliste opdateret.',
         },
         unownedUnique: 'Ikke ejet',
     },

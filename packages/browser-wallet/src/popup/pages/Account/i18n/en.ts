@@ -67,6 +67,8 @@ const t = {
             ItemBalancePre: 'Your balance: ',
             searchLabel: 'Search for token ID in {{ contractName }}',
             noValidTokenError: 'Token either does not exist or cannot be used in wallet',
+            noTokensChange: 'No updates made to token list.',
+            tokensChanged: 'Token list updated.',
         },
         unownedUnique: 'Not owned',
     },

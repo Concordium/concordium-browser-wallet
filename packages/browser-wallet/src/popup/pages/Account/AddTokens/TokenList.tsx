@@ -133,7 +133,7 @@ export default function TokenList() {
     const [{ hasMore, loading, tokens: contractTokens }, updateTokens] = useAtom(contractTokensAtom);
     const [topTokens, setTopTokens] = useAtom(topTokensAtom);
     const nav = useNavigate();
-    const setAccountTokens = useSetAtom(currentAccountTokensAtom);
+    const [accountTokens, setAccountTokens] = useAtom(currentAccountTokensAtom);
     const [checked, setChecked] = useAtom(checkedTokensAtom);
     const [search, setSearch] = useAtom(searchAtom);
     const [searchResult, setSearchResult] = useAtom(searchResultAtom);
@@ -142,6 +142,7 @@ export default function TokenList() {
     const lookupTokenId = useLookupTokenId();
     const listRef = useRef<HTMLDivElement>(null);
     const [listScroll, setListScroll] = useAtom(listScrollPositionAtom);
+    const addToast = useSetAtom(addToastAtom);
 
     const allTokens = [...topTokens, ...contractTokens.filter((ct) => !topTokens.some((tt) => tt.id === ct.id))];
     const displayTokens = searchResult !== undefined ? [searchResult] : allTokens;
@@ -188,10 +189,22 @@ export default function TokenList() {
         [searchResult, checked, setChecked]
     );
 
+    const hasChanged = useCallback(
+        (tokens: ContractTokenDetails[]) => {
+            const currentTokens = accountTokens.value[contractDetails.index.toString()]?.map((at) => at.id) ?? [];
+
+            return currentTokens.length !== tokens.length || !tokens.every((token) => currentTokens.includes(token.id));
+        },
+        [accountTokens, contractDetails.index]
+    );
+
     const storeTokens = async () => {
         const newTokens = allTokens.filter((token) => checked.includes(token.id));
         await setAccountTokens({ contractIndex: contractDetails.index.toString(), newTokens });
 
+        const toastText = hasChanged(newTokens) ? t('tokensChanged') : t('noTokensChange');
+
+        addToast(toastText);
         nav(absoluteRoutes.home.account.tokens.path);
     };
 
