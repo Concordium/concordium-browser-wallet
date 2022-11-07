@@ -27,7 +27,7 @@ export type DetailsLocationState = {
     balance: bigint;
 };
 
-export const routes = {
+export const addTokensRoutes = {
     update: 'update',
     details: 'details',
 };

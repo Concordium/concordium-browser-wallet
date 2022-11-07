@@ -24,7 +24,7 @@ import {
     searchResultAtom,
     topTokensAtom,
 } from './state';
-import { routes, DetailsLocationState } from './utils';
+import { addTokensRoutes, DetailsLocationState } from './utils';
 import TokenList from './TokenList';
 
 type FormValues = {
@@ -57,7 +57,7 @@ function ChooseContract() {
             addToast(error);
         } else {
             setContractDetails(cd);
-            nav(routes.update);
+            nav(addTokensRoutes.update, { replace: true });
         }
     };
 
@@ -151,8 +151,8 @@ export default function AddTokens() {
     return (
         <Routes>
             <Route index element={<ChooseContract />} />
-            <Route path={routes.update} element={<TokenList />} />
-            <Route path={routes.details} element={<Details />} />
+            <Route path={addTokensRoutes.update} element={<TokenList />} />
+            <Route path={addTokensRoutes.details} element={<Details />} />
         </Routes>
     );
 }

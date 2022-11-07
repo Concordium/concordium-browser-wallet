@@ -29,7 +29,8 @@ import {
     searchResultAtom,
     topTokensAtom,
 } from './state';
-import { DetailsLocationState, getTokens, routes } from './utils';
+import { DetailsLocationState, getTokens, addTokensRoutes } from './utils';
+import { tokensRoutes } from '../Tokens/routes';
 
 const ELEMENT_HEIGHT = 58;
 
@@ -167,7 +168,7 @@ export default function TokenList() {
             balance,
             contractIndex: contractDetails.index,
         };
-        nav(`../${routes.details}`, { state });
+        nav(`../${addTokensRoutes.details}`, { state });
     };
 
     const isTokenChecked = (token: ContractTokenDetails) =>
@@ -189,7 +190,7 @@ export default function TokenList() {
         [searchResult, checked, setChecked]
     );
 
-    const hasChanged = useCallback(
+    const hasListChanged = useCallback(
         (tokens: ContractTokenDetails[]) => {
             const currentTokens = accountTokens.value[contractDetails.index.toString()]?.map((at) => at.id) ?? [];
 
@@ -202,10 +203,26 @@ export default function TokenList() {
         const newTokens = allTokens.filter((token) => checked.includes(token.id));
         await setAccountTokens({ contractIndex: contractDetails.index.toString(), newTokens });
 
-        const toastText = hasChanged(newTokens) ? t('tokensChanged') : t('noTokensChange');
+        const changed = hasListChanged(newTokens);
+        const toastText = changed ? t('tokensChanged') : t('noTokensChange');
 
         addToast(toastText);
-        nav(absoluteRoutes.home.account.tokens.path);
+
+        if (!changed || newTokens.length === 0) {
+            nav(-1);
+            return;
+        }
+
+        // Try to show the user the page corresponding to the type of token chosen.
+        if (newTokens.every((nt) => nt.metadata.unique)) {
+            // Only collectibles.
+            nav(`${absoluteRoutes.home.account.tokens.path}/${tokensRoutes.collectibles}`);
+        } else if (newTokens.every((nt) => !nt.metadata.unique)) {
+            // Only fungibles
+            nav(absoluteRoutes.home.account.tokens.path);
+        } else {
+            nav(-1);
+        }
     };
 
     const hasNextPage = searchResult === undefined && hasMore;
