@@ -62,6 +62,9 @@ const t: typeof en = {
         add: {
             chooseContract: 'Vælg kontrakt',
             indexRequired: 'Kontrakt indeks er påkrævet',
+            noContractFound: 'Ingen kontrakt fundet på indeks',
+            cis0Error: 'Kontrakten supporterer ikke CIS-0',
+            cis2Error: 'Kontrakten supporterer ikke CIS-2',
             contractIndex: 'Kontrakt indeks',
             hexId: 'Id skal være HEX encodet',
             updateTokens: 'Opdater tokens',

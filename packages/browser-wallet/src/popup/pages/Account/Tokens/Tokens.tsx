@@ -81,14 +81,14 @@ function Collectibles({ account, toDetails }: ListProps) {
 
     return (
         <>
-            {tokens.map(({ contractIndex, id, metadata: { thumbnail, name, decimals = 0, symbol } }) => (
+            {tokens.map(({ contractIndex, id, metadata: { thumbnail, display, name, decimals = 0, symbol } }) => (
                 <Button
                     clear
                     key={`${contractIndex}.${id}`}
                     onClick={() => toDetails(contractIndex, id)}
                     className="token-list__item"
                 >
-                    <img className="token-list__icon" src={thumbnail?.url ?? ''} alt={name} />
+                    <img className="token-list__icon" src={thumbnail?.url ?? display?.url ?? ''} alt={name} />
                     <div className="token-list__unique-name">
                         {name}
                         <AtomValue atom={contractBalancesFamily(account.address, contractIndex)}>

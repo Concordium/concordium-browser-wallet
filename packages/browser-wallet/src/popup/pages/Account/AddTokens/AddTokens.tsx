@@ -1,15 +1,20 @@
-import React, { useContext, useEffect } from 'react';
-import { useAtom, useAtomValue, useSetAtom } from 'jotai';
-import { useForm, SubmitHandler } from 'react-hook-form';
+import React, { useCallback, useContext, useEffect, useRef } from 'react';
+import { useAtom, useAtomValue } from 'jotai';
+import { useForm, SubmitHandler, Validate, ValidateResult } from 'react-hook-form';
 import { useTranslation } from 'react-i18next';
 import { Navigate, Route, Routes, useLocation, useNavigate, Location } from 'react-router-dom';
+import debounce from 'lodash.debounce';
 
 import Form from '@popup/shared/Form';
 import FormInput from '@popup/shared/Form/Input';
 import Submit from '@popup/shared/Form/Submit';
-import { addToastAtom } from '@popup/state';
 import { jsonRpcClientAtom } from '@popup/store/settings';
-import { confirmCIS2Contract, ContractDetails, ContractTokenDetails } from '@shared/utils/token-helpers';
+import {
+    CIS2ConfirmationError,
+    confirmCIS2Contract,
+    ContractDetails,
+    ContractTokenDetails,
+} from '@shared/utils/token-helpers';
 import TokenDetails from '@popup/shared/TokenDetails';
 import { selectedAccountAtom } from '@popup/store/account';
 import { ensureDefined } from '@shared/utils/basic-helpers';
@@ -27,6 +32,23 @@ import {
 import { addTokensRoutes, DetailsLocationState } from './utils';
 import TokenList from './TokenList';
 
+type AsyncValidate<V> = (fieldValue: V) => Promise<ValidateResult>;
+
+function debouncedAsyncValidate<V>(validator: AsyncValidate<V>, ms: number, leading = false): Validate<V> {
+    return async (value) =>
+        new Promise((resolve) => {
+            debounce(
+                async (v: V) => {
+                    validator(v).then(resolve);
+                },
+                ms,
+                { leading }
+            )(value);
+        });
+}
+
+const VALIDATE_INDEX_DELAY_MS = 500;
+
 type FormValues = {
     contractIndex: string;
 };
@@ -37,29 +59,67 @@ type FormValues = {
 function ChooseContract() {
     const { t } = useTranslation('account', { keyPrefix: 'tokens.add' });
     const [contractDetails, setContractDetails] = useAtom(contractDetailsAtom);
-    const addToast = useSetAtom(addToastAtom);
     const form = useForm<FormValues>({
         defaultValues: { contractIndex: contractDetails?.index?.toString() },
     });
+    const contractIndexValue = form.watch('contractIndex');
     const client = useAtomValue(jsonRpcClientAtom);
     const nav = useNavigate();
+    const validContractDetails = useRef<ContractDetails | undefined>();
 
-    const onSubmit: SubmitHandler<FormValues> = async (vs) => {
-        const index = BigInt(vs.contractIndex);
-        const instanceInfo = await client.getInstanceInfo({ index, subindex: 0n });
-        if (!instanceInfo) {
-            return;
+    const onSubmit: SubmitHandler<FormValues> = async () => {
+        if (validContractDetails.current === undefined) {
+            throw new Error('Expected contract details');
         }
-        const contractName = instanceInfo.name.substring(5);
-        const cd: ContractDetails = { contractName, index, subindex: 0n };
-        const error = await confirmCIS2Contract(client, cd);
-        if (error) {
-            addToast(error);
-        } else {
-            setContractDetails(cd);
-            nav(addTokensRoutes.update, { replace: true });
-        }
+
+        setContractDetails(validContractDetails.current);
+        nav(addTokensRoutes.update, { replace: true });
     };
+
+    const cis2ErrorText = useCallback((error: CIS2ConfirmationError) => {
+        switch (error) {
+            case CIS2ConfirmationError.Cis0Error: {
+                return t('cis0Error');
+            }
+            case CIS2ConfirmationError.Cis2Error: {
+                return t('cis2Error');
+            }
+            default: {
+                throw new Error('Unsupported error type.');
+            }
+        }
+    }, []);
+
+    const validateIndex = useCallback(
+        debouncedAsyncValidate<string>(
+            async (value) => {
+                const index = BigInt(value);
+                const instanceInfo = await client.getInstanceInfo({ index, subindex: 0n });
+
+                if (!instanceInfo) {
+                    return t('noContractFound');
+                }
+
+                const contractName = instanceInfo.name.substring(5);
+                const cd: ContractDetails = { contractName, index, subindex: 0n };
+                const error = await confirmCIS2Contract(client, cd);
+
+                if (error !== undefined) {
+                    return cis2ErrorText(error);
+                }
+
+                validContractDetails.current = cd;
+                return true;
+            },
+            VALIDATE_INDEX_DELAY_MS,
+            true
+        ),
+        [client]
+    );
+
+    useEffect(() => {
+        validContractDetails.current = undefined;
+    }, [contractIndexValue]);
 
     return (
         <Form
@@ -77,6 +137,7 @@ function ChooseContract() {
                             name="contractIndex"
                             rules={{
                                 required: t('indexRequired'),
+                                validate: validateIndex,
                             }}
                         />
                     </div>

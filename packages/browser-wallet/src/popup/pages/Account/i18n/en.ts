@@ -60,6 +60,9 @@ const t = {
         add: {
             chooseContract: 'Choose Contract',
             indexRequired: 'Contract index is required',
+            noContractFound: 'No contract found on index',
+            cis0Error: 'Contract does not support CIS-0',
+            cis2Error: 'Contract does not support CIS-2',
             contractIndex: 'Contract index',
             hexId: 'Id must be HEX encoded',
             updateTokens: 'Update tokens',
