@@ -7,6 +7,7 @@
         "@concordium/browser-wallet-api-helpers": "^0.2.0",
         "@concordium/web-sdk": "^1.0.0",
         "bootstrap": "^5.2.1",
+        "cross-env": "^7.0.3",
         "moment": "^2.29.4",
         "react": "^18.2.0",
         "react-bootstrap": "^2.5.0",
@@ -23,7 +24,8 @@
         "ts-node": "^10.8.0"
     },
     "scripts": {
-        "build": "node --loader ts-node/esm ./esbuild.config.ts",
-        "start": "live-server ./dist"
+        "build": "node --loader ts-node/esm ./esbuild.config.ts; cp ./public/static/img/* ./dist",
+        "start": "live-server ./dist",
+        "watch": "cross-env WATCH=1 yarn build"
     }
 }

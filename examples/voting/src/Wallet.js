@@ -1,14 +1,21 @@
+/* eslint-disable no-alert */
+/* eslint-disable no-console */
+/* eslint-disable @typescript-eslint/return-await */
+/* eslint-disable consistent-return */
+/* eslint-disable react/prop-types */
+/* eslint-disable react/jsx-filename-extension */
+/* eslint-disable import/no-unresolved */
 import React from 'react';
-import { detectConcordiumProvider } from "@concordium/browser-wallet-api-helpers";
-import { Alert, Button } from "react-bootstrap";
-import { AccountTransactionType, GtuAmount, ModuleReference } from "@concordium/web-sdk";
-import { RAW_SCHEMA_BASE64, TESTNET_GENESIS_BLOCK_HASH } from "./config";
-import moment from "moment";
+import { detectConcordiumProvider } from '@concordium/browser-wallet-api-helpers';
+import { Alert, Button } from 'react-bootstrap';
+import { AccountTransactionType, GtuAmount, ModuleReference } from '@concordium/web-sdk';
+import moment from 'moment';
+import { RAW_SCHEMA_BASE64, TESTNET_GENESIS_BLOCK_HASH } from './config';
 
 export async function init(setConnectedAccount) {
-    const client = await detectConcordiumProvider()
+    const client = await detectConcordiumProvider();
     // Listen for relevant events from the wallet.
-    client.on('accountChanged', account => {
+    client.on('accountChanged', (account) => {
         console.debug('browserwallet event: accountChange', { account });
         setConnectedAccount(account);
     });
@@ -32,27 +39,31 @@ export async function connect(client, setConnectedAccount) {
 // Check if the user is connected to the testnet chain by checking if the testnet genesisBlock exists.
 // The smart contract voting module is deployed on the testnet chain.
 async function checkConnectedToTestnet(client) {
-    return await client.getJsonRpcClient()
+    return await client
+        .getJsonRpcClient()
         .getCryptographicParameters(TESTNET_GENESIS_BLOCK_HASH.toString())
         .then((result) => {
             if (result === undefined || result?.value === null) {
-                /* eslint-disable no-alert */
-                window.alert(
-                    'Check if your Concordium browser wallet is connected to testnet!'
-                );
+                window.alert('Check if your Concordium browser wallet is connected to testnet!');
                 return false;
-            } else {
-                return true;
             }
-        })
+            return true;
+        });
 }
 
-export async function createElection(client, contractName, description, options, deadlineMinutesInput, moduleRef, senderAddress) {
-
-    let connectedToTestnet = await checkConnectedToTestnet(client);
+export async function createElection(
+    client,
+    contractName,
+    description,
+    options,
+    deadlineMinutesInput,
+    moduleRef,
+    senderAddress
+) {
+    const connectedToTestnet = await checkConnectedToTestnet(client);
 
     if (connectedToTestnet) {
-        const deadlineMinutes = Number.parseInt(deadlineMinutesInput);
+        const deadlineMinutes = Number.parseInt(deadlineMinutesInput, 10);
         const deadlineTimestamp = moment().add(deadlineMinutes, 'm').format();
 
         const parameter = {
@@ -73,24 +84,27 @@ export async function createElection(client, contractName, description, options,
                 maxContractExecutionEnergy: BigInt(30000),
             },
             parameter,
-            RAW_SCHEMA_BASE64,
+            RAW_SCHEMA_BASE64
         );
         console.log({ txHash });
         return txHash;
     }
 }
 
-
 export async function getVotes(client, contractIndex) {
     return client.getJsonRpcClient().invokeContract({
         contract: { index: BigInt(contractIndex), subindex: BigInt(0) },
-        method: "voting.getvotes",
+        method: 'voting.getvotes',
     });
 }
 
 export async function castVote(client, contractIndex, vote, senderAddress) {
+    if (vote === -1) {
+        window.alert('Select one option.');
+        return;
+    }
 
-    let connectedToTestnet = await checkConnectedToTestnet(client);
+    const connectedToTestnet = await checkConnectedToTestnet(client);
 
     if (connectedToTestnet) {
         const txHash = await client.sendTransaction(
@@ -99,11 +113,11 @@ export async function castVote(client, contractIndex, vote, senderAddress) {
             {
                 amount: new GtuAmount(BigInt(0)),
                 contractAddress: { index: BigInt(contractIndex), subindex: BigInt(0) },
-                receiveName: "voting.vote",
+                receiveName: 'voting.vote',
                 maxContractExecutionEnergy: BigInt(30000),
             },
-            { vote: vote },
-            RAW_SCHEMA_BASE64,
+            { vote },
+            RAW_SCHEMA_BASE64
         );
         console.log({ txHash });
         return txHash;
@@ -117,9 +131,7 @@ export default function Wallet(props) {
             {!connectedAccount && (
                 <>
                     <p>No wallet connection</p>
-                    <Button onClick={() => connect(client, setConnectedAccount).catch(console.error)}>
-                        Connect
-                    </Button>
+                    <Button onClick={() => connect(client, setConnectedAccount).catch(console.error)}>Connect</Button>
                 </>
             )}
             {connectedAccount && (
