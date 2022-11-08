@@ -1,0 +1,12 @@
+$line-clamps: (2, 3);
+
+// needs an explicit width.
+.clamp-1 {
+    @include singleline-clamp;
+}
+
+@each $lines in $line-clamps {
+    .clamp-#{$lines} {
+        @include multiline-clamp($lines);
+    }
+}

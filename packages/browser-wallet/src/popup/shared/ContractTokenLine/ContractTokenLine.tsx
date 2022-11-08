@@ -38,10 +38,10 @@ export default function ContractTokenLine({
             style={style}
             onClick={() => onClick(token)}
         >
-            <div className="flex align-center h-full">
+            <div className="flex align-center h-full m-r-5">
                 <img src={token.metadata.thumbnail?.url} alt={token.metadata.name ?? ''} />
                 <div>
-                    {token.metadata.name}
+                    <div className="clamp-2">{token.metadata.name}</div>
                     <div
                         className={clsx(
                             'contract-token-line__token-balance',

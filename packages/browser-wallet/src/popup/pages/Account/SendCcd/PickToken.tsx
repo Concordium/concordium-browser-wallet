@@ -1,10 +1,12 @@
 import React, { useEffect } from 'react';
+import { useAtomValue } from 'jotai';
+import { noOp } from 'wallet-common-helpers';
+
 import { AccountTokens, contractBalancesFamily } from '@popup/store/token';
 import { TokenIdAndMetadata } from '@shared/storage/types';
 import { CCD_METADATA } from '@shared/constants/token-metadata';
 import { TokenIdentifier } from '@shared/utils/token-helpers';
-import { useAtomValue } from 'jotai';
-import { noOp } from 'wallet-common-helpers';
+import CcdIcon from '@assets/svg/concordium.svg';
 import DisplayToken from './DisplayToken';
 
 interface Props {
@@ -56,6 +58,7 @@ export default function PickToken({ onClick, tokens, ccdBalance, address, setDet
                 metadata={CCD_METADATA}
                 onClick={() => onClick(undefined)}
                 balance={ccdBalance}
+                icon={<CcdIcon className="ccd-icon" />}
             />
             {Object.entries(tokens || []).map(([contractIndex, collectionTokens]) => (
                 <Collection

@@ -17,19 +17,21 @@ import {
 } from 'wallet-common-helpers';
 import { SimpleTransferPayload } from '@concordium/web-sdk';
 import { SubmitHandler, useForm, Validate } from 'react-hook-form';
+import clsx from 'clsx';
+import { useLocation, useNavigate } from 'react-router-dom';
+
 import Submit from '@popup/shared/Form/Submit';
 import {
     buildSimpleTransferPayload,
     validateTransferAmount,
     validateAccountAddress,
 } from '@popup/shared/utils/transaction-helpers';
-import { useLocation, useNavigate } from 'react-router-dom';
 import { useAccountInfo } from '@popup/shared/AccountInfoListenerContext';
 import { useSelectedCredential } from '@popup/shared/utils/account-helpers';
 import { CCD_METADATA } from '@shared/constants/token-metadata';
-import { getTokenTransferEnergy, TokenIdentifier } from '@shared/utils/token-helpers';
+import { getTokenTransferEnergy, TokenIdentifier, trunctateSymbol } from '@shared/utils/token-helpers';
 import { jsonRpcClientAtom } from '@popup/store/settings';
-import clsx from 'clsx';
+import CcdIcon from '@assets/svg/concordium.svg';
 import { addToastAtom } from '@popup/state';
 import { routes } from './routes';
 import DisplayToken from './DisplayToken';
@@ -225,12 +227,13 @@ function CreateTransaction({ exchangeRate, tokens, setCost, setDetailsExpanded }
                             disabled={!accountTokens}
                             onClick={() => setPickingToken(true)}
                             className="w-full"
+                            icon={tokenMetadata === CCD_METADATA ? <CcdIcon className="ccd-icon" /> : undefined}
                         />
                     </div>
                     <AmountInput
                         register={f.register}
                         name="amount"
-                        symbol={tokenMetadata.symbol || ''}
+                        symbol={trunctateSymbol(tokenMetadata.symbol || '')}
                         label={t('sendCcd.labels.ccd')}
                         className="create-transfer__input"
                         onMax={onMax}

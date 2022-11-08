@@ -10,19 +10,24 @@ interface ChooseTokenProps {
     onClick: () => void;
     disabled?: boolean;
     className?: string;
+    icon?: JSX.Element;
 }
 
-export default function DisplayToken({ metadata, balance, className, ...props }: ChooseTokenProps) {
+export default function DisplayToken({ metadata, balance, className, icon, ...props }: ChooseTokenProps) {
     return (
         <Button className={clsx('display-token', className)} clear {...props}>
             <div className="display-token__token-display-container">
-                <img
-                    alt={metadata.name}
-                    className="display-token__token-display"
-                    src={metadata.thumbnail?.url ?? metadata.display?.url}
-                />
-                <div className="text-right">
-                    {metadata.name}
+                {icon ? (
+                    <div className="display-token__token-display">{icon}</div>
+                ) : (
+                    <img
+                        alt={metadata.name}
+                        className="display-token__token-display"
+                        src={metadata.thumbnail?.url ?? metadata.display?.url}
+                    />
+                )}
+                <div className="display-token__details">
+                    <div className="clamp-1 w-full">{metadata.name}</div>
                     <div className="display-token__balance">
                         <TokenBalance decimals={metadata.decimals || 0} symbol={metadata.symbol} balance={balance} />
                     </div>

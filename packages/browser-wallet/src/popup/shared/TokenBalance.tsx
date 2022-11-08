@@ -1,3 +1,4 @@
+import { trunctateSymbol } from '@shared/utils/token-helpers';
 import React from 'react';
 import { addThousandSeparators, integerToFractional, pipe } from 'wallet-common-helpers';
 
@@ -7,12 +8,12 @@ type BalanceProps = {
     symbol?: string;
 };
 
-export default function TokenBalance({ balance, decimals, symbol }: BalanceProps) {
+export default function TokenBalance({ balance, decimals, symbol = '' }: BalanceProps) {
     const renderBalance = pipe(integerToFractional(decimals), addThousandSeparators);
 
     return (
         <>
-            {renderBalance(balance)} {symbol ?? ''}
+            {renderBalance(balance)} {trunctateSymbol(symbol)}
         </>
     );
 }

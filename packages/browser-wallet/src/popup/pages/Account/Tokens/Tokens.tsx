@@ -33,8 +33,7 @@ function Ft({ accountAddress, contractIndex: contractAddress, token, onClick }: 
     return (
         <Button clear className="token-list__item" onClick={onClick}>
             <img className="token-list__icon" src={token.metadata.thumbnail?.url} alt={token.metadata.name} />
-            <TokenBalance balance={balance} decimals={token.metadata.decimals ?? 0} />{' '}
-            {token.metadata.symbol || token.metadata.name || ''}
+            <TokenBalance balance={balance} decimals={token.metadata.decimals ?? 0} symbol={token.metadata.symbol} />
         </Button>
     );
 }
