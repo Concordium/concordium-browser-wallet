@@ -8,7 +8,7 @@ import debounce from 'lodash.debounce';
 import Form from '@popup/shared/Form';
 import FormInput from '@popup/shared/Form/Input';
 import Submit from '@popup/shared/Form/Submit';
-import { jsonRpcClientAtom } from '@popup/store/settings';
+import { jsonRpcClientAtom, networkConfigurationAtom } from '@popup/store/settings';
 import {
     CIS2ConfirmationError,
     confirmCIS2Contract,
@@ -29,7 +29,7 @@ import {
     searchResultAtom,
     topTokensAtom,
 } from './state';
-import { addTokensRoutes, DetailsLocationState } from './utils';
+import { addTokensRoutes, DetailsLocationState, fetchTokensConfigure, FetchTokensResponse } from './utils';
 import TokenList from './TokenList';
 
 type AsyncValidate<V> = (fieldValue: V) => Promise<ValidateResult>;
@@ -65,14 +65,19 @@ function ChooseContract() {
     const contractIndexValue = form.watch('contractIndex');
     const client = useAtomValue(jsonRpcClientAtom);
     const nav = useNavigate();
-    const validContractDetails = useRef<ContractDetails | undefined>();
+    const validContract = useRef<{ details: ContractDetails; tokens: FetchTokensResponse } | undefined>();
+    const account = ensureDefined(useAtomValue(selectedAccountAtom), 'No account has been selected');
+    const network = useAtomValue(networkConfigurationAtom);
+    const [, updateTokens] = useAtom(contractTokensAtom);
 
     const onSubmit: SubmitHandler<FormValues> = async () => {
-        if (validContractDetails.current === undefined) {
+        if (validContract.current === undefined) {
             throw new Error('Expected contract details');
         }
 
-        setContractDetails(validContractDetails.current);
+        setContractDetails(validContract.current.details);
+        updateTokens({ type: 'reset', initialTokens: validContract.current.tokens });
+
         nav(addTokensRoutes.update, { replace: true });
     };
 
@@ -108,7 +113,13 @@ function ChooseContract() {
                     return cis2ErrorText(error);
                 }
 
-                validContractDetails.current = cd;
+                const response = await fetchTokensConfigure(cd, client, network, account)();
+
+                if (response.tokens.length === 0) {
+                    return t('noTokensError');
+                }
+
+                validContract.current = { details: cd, tokens: response };
                 return true;
             },
             VALIDATE_INDEX_DELAY_MS,
@@ -118,7 +129,7 @@ function ChooseContract() {
     );
 
     useEffect(() => {
-        validContractDetails.current = undefined;
+        validContract.current = undefined;
     }, [contractIndexValue]);
 
     return (
@@ -178,9 +189,9 @@ export default function AddTokens() {
     );
 
     // Keep the following in memory while add token flow lives
-    const [, updateTokens] = useAtom(contractTokensAtom);
     const [, setChecked] = useAtom(checkedTokensAtom);
     const [, setTopTokens] = useAtom(topTokensAtom);
+    useAtom(contractTokensAtom);
     useAtom(searchAtom);
     useAtom(searchResultAtom);
     useAtom(listScrollPositionAtom);
@@ -189,12 +200,6 @@ export default function AddTokens() {
         setDetailsExpanded(false);
         return () => setDetailsExpanded(true);
     }, []);
-
-    useEffect(() => {
-        if (contractDetails !== undefined) {
-            updateTokens('reset');
-        }
-    }, [contractDetails?.index]);
 
     useEffect(() => {
         if (contractDetails?.index !== undefined && !accountTokens.loading) {

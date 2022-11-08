@@ -242,7 +242,7 @@ export default function TokenList() {
                 {initialLoading || (
                     <InfiniteTokenList
                         tokens={displayTokens}
-                        loadNextPage={() => updateTokens('next')}
+                        loadNextPage={() => updateTokens({ type: 'next' })}
                         hasNextPage={hasNextPage}
                         isNextPageLoading={loading}
                         ref={listRef}

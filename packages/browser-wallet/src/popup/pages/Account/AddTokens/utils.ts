@@ -16,7 +16,7 @@ type TokenWithPageID = MakeOptional<ContractTokenDetails, 'metadata'> & {
     pageId: number;
 };
 
-type FetchTokensResponse = {
+export type FetchTokensResponse = {
     hasMore: boolean;
     tokens: TokenWithPageID[];
 };

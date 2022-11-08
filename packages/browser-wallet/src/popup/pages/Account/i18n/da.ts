@@ -65,6 +65,7 @@ const t: typeof en = {
             noContractFound: 'Ingen kontrakt fundet på indeks',
             cis0Error: 'Kontrakten supporterer ikke CIS-0',
             cis2Error: 'Kontrakten supporterer ikke CIS-2',
+            noTokensError: 'Ingen tokens fundet i kontrakten',
             contractIndex: 'Kontrakt indeks',
             hexId: 'Id skal være HEX encodet',
             updateTokens: 'Opdater tokens',

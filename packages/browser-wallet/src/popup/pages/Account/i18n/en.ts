@@ -63,6 +63,7 @@ const t = {
             noContractFound: 'No contract found on index',
             cis0Error: 'Contract does not support CIS-0',
             cis2Error: 'Contract does not support CIS-2',
+            noTokensError: 'No tokens found in contract',
             contractIndex: 'Contract index',
             hexId: 'Id must be HEX encoded',
             updateTokens: 'Update tokens',

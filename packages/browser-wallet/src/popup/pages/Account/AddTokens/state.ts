@@ -6,9 +6,19 @@ import { jsonRpcClientAtom, networkConfigurationAtom } from '@popup/store/settin
 import { ensureDefined } from '@shared/utils/basic-helpers';
 import { ContractDetails, ContractTokenDetails } from '@shared/utils/token-helpers';
 import { resetOnUnmountAtom } from '@popup/store/utils';
-import { fetchTokensConfigure } from './utils';
+import { fetchTokensConfigure, FetchTokensResponse } from './utils';
 
-type TokensAtomAction = 'reset' | 'next';
+type Action<T extends string | number> = {
+    type: T;
+};
+
+type TokensResetAction = Action<'reset'> & {
+    initialTokens: FetchTokensResponse;
+};
+
+type TokensNextAction = Action<'next'>;
+
+type TokensAtomAction = TokensResetAction | TokensNextAction;
 
 type TokenWithPageID = MakeOptional<ContractTokenDetails, 'metadata'> & {
     pageId: number;
@@ -40,37 +50,37 @@ export const contractTokensAtom = (() => {
             };
         },
         async (get, set, update) => {
-            const contractDetails = ensureDefined(get(contractDetailsAtom), 'Needs contract details');
-            const account = ensureDefined(get(selectedAccountAtom), 'No account has been selected');
-            const client = get(jsonRpcClientAtom);
-            const network = get(networkConfigurationAtom);
-            const fetchTokens = fetchTokensConfigure(contractDetails, client, network, account);
-            let topId: number | undefined;
-
-            set(loadingAtom, true);
-
-            switch (update) {
+            switch (update.type) {
                 case 'reset': {
-                    set(listAtom, []);
-                    set(hasMoreAtom, true);
+                    const { tokens, hasMore } = update.initialTokens;
+                    set(listAtom, tokens);
+                    set(hasMoreAtom, hasMore);
+
                     break;
                 }
                 case 'next': {
-                    const tokens = get(listAtom);
-                    topId = [...tokens].reverse()[0]?.pageId;
+                    const contractDetails = ensureDefined(get(contractDetailsAtom), 'Needs contract details');
+                    const account = ensureDefined(get(selectedAccountAtom), 'No account has been selected');
+                    const client = get(jsonRpcClientAtom);
+                    const network = get(networkConfigurationAtom);
+                    const fetchTokens = fetchTokensConfigure(contractDetails, client, network, account);
 
+                    set(loadingAtom, true);
+
+                    const tokens = get(listAtom);
+                    const topId = [...tokens].reverse()[0]?.pageId;
+
+                    const { hasMore, tokens: next } = await fetchTokens(topId);
+
+                    set(hasMoreAtom, hasMore);
+                    set(loadingAtom, false);
+                    set(listAtom, (ts) => [...ts, ...next]);
                     break;
                 }
                 default: {
                     throw new Error('Unsuported update type');
                 }
             }
-
-            const { hasMore, tokens: next } = await fetchTokens(topId);
-
-            set(hasMoreAtom, hasMore);
-            set(loadingAtom, false);
-            set(listAtom, (ts) => [...ts, ...next]);
         }
     );
 
