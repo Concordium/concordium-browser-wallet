@@ -1,75 +1,26 @@
-# Getting Started with Create React App
+# Voting web application
 
-This project was bootstrapped with [Create React App](https://github.com/facebook/create-react-app).
+The example project serves as a working example of how to integrate with smart contracts on the Concordium blockchain. You can create and customize your own voting smart contract via the front-end and deploy it to the Concordium chain. The front-end also provides pages to conduct the voting and display the voting results.
 
-## Available Scripts
+## Prerequisites
 
-### `yarn install`
+-   The Concordium browser wallet extension must be installed in google chrome and connected to testnet, in order to view smart contract details or submit transactions.
 
-Installs dependencies.
+## Installing
 
-### `yarn start`
+-   Run `yarn` in package root.
 
-Runs the app in the development mode.\
-Open [http://localhost:3000](http://localhost:3000) to view it in your browser.
+## Running the voting example
 
-The page will reload when you make changes.\
-You may also see any lint errors in the console.
+-   Run `yarn build` in a terminal in this folder.
+-   Run `yarn start`.
+-   Open URL logged in console (typically http://127.0.0.1:8080).
 
-### `yarn test`
+To have hot-reload (useful for development), do the following instead:
 
-Launches the test runner in the interactive watch mode.\
-See the section about [running tests](https://facebook.github.io/create-react-app/docs/running-tests) for more information.
-
-### `yarn build`
-
-Installs dependencies and builds the app for production to the `build` folder.\
-It correctly bundles React in production mode and optimizes the build for the best performance.
-
-The build is minified and the filenames include the hashes.\
-Your app is ready to be deployed!
-
-See the section about [deployment](https://facebook.github.io/create-react-app/docs/deployment) for more information.
-
-### `yarn eject`
-
-**Note: this is a one-way operation. Once you `eject`, you can't go back!**
-
-If you aren't satisfied with the build tool and configuration choices, you can `eject` at any time. This command will remove the single build dependency from your project.
-
-Instead, it will copy all the configuration files and the transitive dependencies (webpack, Babel, ESLint, etc) right into your project so you have full control over them. All of the commands except `eject` will still work, but they will point to the copied scripts so you can tweak them. At this point you're on your own.
-
-You don't have to ever use `eject`. The curated feature set is suitable for small and middle deployments, and you shouldn't feel obligated to use this feature. However we understand that this tool wouldn't be useful if you couldn't customize it when you are ready for it.
-
-## Learn More
-
-You can learn more in the [Create React App documentation](https://facebook.github.io/create-react-app/docs/getting-started).
-
-To learn React, check out the [React documentation](https://reactjs.org/).
-
-### Code Splitting
-
-This section has moved here: [https://facebook.github.io/create-react-app/docs/code-splitting](https://facebook.github.io/create-react-app/docs/code-splitting)
-
-### Analyzing the Bundle Size
-
-This section has moved here: [https://facebook.github.io/create-react-app/docs/analyzing-the-bundle-size](https://facebook.github.io/create-react-app/docs/analyzing-the-bundle-size)
-
-### Making a Progressive Web App
-
-This section has moved here: [https://facebook.github.io/create-react-app/docs/making-a-progressive-web-app](https://facebook.github.io/create-react-app/docs/making-a-progressive-web-app)
-
-### Advanced Configuration
-
-This section has moved here: [https://facebook.github.io/create-react-app/docs/advanced-configuration](https://facebook.github.io/create-react-app/docs/advanced-configuration)
-
-### Deployment
-
-This section has moved here: [https://facebook.github.io/create-react-app/docs/deployment](https://facebook.github.io/create-react-app/docs/deployment)
-
-### `npm run build` fails to minify
-
-This section has moved here: [https://facebook.github.io/create-react-app/docs/troubleshooting#npm-run-build-fails-to-minify](https://facebook.github.io/create-react-app/docs/troubleshooting#npm-run-build-fails-to-minify)
+-   Run `yarn watch` in a terminal.
+-   Run `yarn start` in another terminal.
+-   Open URL logged in console (typically http://127.0.0.1:8080).
 
 ## Build and run the Docker image
 
@@ -82,7 +33,7 @@ docker build -t voting_app_image .
 To run the docker image run the following:
 
 ```
-docker run -d --name voting_app -p 8080:80 -d voting_app_image
+docker run -it -d -p 8080:80 --name voting_app voting_app_image
 ```
 
 Open http://127.0.0.1:8080 in your browser.

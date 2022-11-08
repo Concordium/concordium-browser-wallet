@@ -15,7 +15,7 @@ const config: BuildOptions = {
     minify: true,
     metafile: true,
     logLevel: 'info',
-    loader: { '.js': 'jsx'},
+    loader: { '.js': 'jsx' },
     sourcemap: 'inline',
     target: ['chrome67'],
     outdir: 'dist',
