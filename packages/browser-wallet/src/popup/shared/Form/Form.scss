@@ -253,6 +253,8 @@ $handle-scale: scale(1.02);
 }
 
 .form-amount-input {
+    position: relative;
+
     &__field {
         display: flex;
         align-content: center;
@@ -265,9 +267,10 @@ $handle-scale: scale(1.02);
     }
 
     &__max {
-        margin-left: auto;
-        margin-top: rem(-5px);
-        margin-right: rem(5px);
+        position: absolute;
+        right: rem(5px);
+        top: 50%;
+        transform: translateY(-50%);
         font-size: rem(8px) !important;
         height: rem(15px) !important;
         min-height: rem(15px) !important;
