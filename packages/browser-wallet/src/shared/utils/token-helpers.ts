@@ -376,3 +376,8 @@ export async function getTokenTransferEnergy(
     );
     return { execution, total };
 }
+
+const MAX_SYMBOL_LENGTH = 10;
+
+export const trunctateSymbol = (symbol: string): string =>
+    symbol.length > MAX_SYMBOL_LENGTH ? `${symbol.substring(0, MAX_SYMBOL_LENGTH)}...` : symbol;

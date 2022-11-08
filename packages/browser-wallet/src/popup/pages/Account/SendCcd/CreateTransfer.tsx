@@ -29,7 +29,7 @@ import {
 import { useAccountInfo } from '@popup/shared/AccountInfoListenerContext';
 import { useSelectedCredential } from '@popup/shared/utils/account-helpers';
 import { CCD_METADATA } from '@shared/constants/token-metadata';
-import { getTokenTransferEnergy, TokenIdentifier } from '@shared/utils/token-helpers';
+import { getTokenTransferEnergy, TokenIdentifier, trunctateSymbol } from '@shared/utils/token-helpers';
 import { jsonRpcClientAtom } from '@popup/store/settings';
 import CcdIcon from '@assets/svg/concordium.svg';
 import { addToastAtom } from '@popup/state';
@@ -233,7 +233,7 @@ function CreateTransaction({ exchangeRate, tokens, setCost, setDetailsExpanded }
                     <AmountInput
                         register={f.register}
                         name="amount"
-                        symbol={tokenMetadata.symbol || ''}
+                        symbol={trunctateSymbol(tokenMetadata.symbol || '')}
                         label={t('sendCcd.labels.ccd')}
                         className="create-transfer__input"
                         onMax={onMax}
