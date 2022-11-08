@@ -8,6 +8,7 @@ import {
     BrowserWalletTransaction,
     isAccountTransaction,
     RewardType,
+    SpecialTransactionType,
     TransactionStatus,
 } from '@popup/shared/utils/transaction-history-types';
 import { dateFromTimestamp, TimeStampUnit } from 'wallet-common-helpers';
@@ -98,7 +99,7 @@ function buildFeeString(cost: bigint, accountAddress: string, transaction: Brows
 /**
  * Maps transaction type to a displayable text string.
  */
-function mapTypeToText(type: AccountTransactionType | RewardType): string {
+function mapTypeToText(type: AccountTransactionType | RewardType | SpecialTransactionType): string {
     switch (type) {
         case AccountTransactionType.DeployModule:
             return 'Module deployment';
@@ -150,6 +151,8 @@ function mapTypeToText(type: AccountTransactionType | RewardType): string {
             return 'Configure delegation';
         case RewardType.StakingReward:
             return 'Reward payout';
+        case SpecialTransactionType.Malformed:
+            return 'Malformed';
         default:
             return 'Unknown';
     }
