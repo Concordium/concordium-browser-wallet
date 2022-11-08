@@ -1,11 +1,16 @@
-FROM node:16-slim AS build
-WORKDIR /build
-COPY package.json package-lock.json ./
-RUN npm install
-COPY . .
-RUN npm run build
+ARG base_image=node:16-slim
 
-FROM httpd:2-alpine
-# Override config with patched version that enables 'mod_rewrite'.
-COPY ./httpd.conf /usr/local/apache2/conf/httpd.conf
-COPY --from=build /build/build /usr/local/apache2/htdocs
+FROM ${base_image} AS build
+
+WORKDIR /app
+COPY ./package.json ./package.json
+COPY ./tsconfig.json ./tsconfig.json
+COPY ./esbuild.config.ts ./
+COPY ./types ./types
+COPY ./src ./src
+
+RUN yarn && yarn cache clean
+RUN yarn build
+
+FROM nginx
+COPY --from=build ./app/dist ./usr/share/nginx/html
