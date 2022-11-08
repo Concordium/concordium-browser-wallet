@@ -18,7 +18,10 @@ const enum MSG { // using const enum here, as typescript compiler replaces uses 
     LIFELINE = 'lifeline',
 }
 
-const respond = async (response: IdentityIssuanceBackgroundResponse) => {
+/**
+ * Send a response to the popup thread that ends the identity issuance flow.
+ */
+const respondPopup = async (response: IdentityIssuanceBackgroundResponse) => {
     const pendingIdentity = await sessionPendingIdentity.get();
     if (!pendingIdentity) {
         return;
@@ -51,7 +54,7 @@ export function addIdpListeners() {
 
         if (idpTabId !== undefined && tabId === idpTabId) {
             sessionIdpTab.remove();
-            respond({
+            respondPopup({
                 status: BackgroundResponseStatus.Aborted,
             });
         }
@@ -61,7 +64,7 @@ export function addIdpListeners() {
         chrome.tabs.remove(tabId);
         sessionIdpTab.remove();
 
-        respond({
+        respondPopup({
             status: BackgroundResponseStatus.Success,
             result: redirectUrl.substring(redirectUrl.indexOf(codeUriKey) + codeUriKey.length),
         });
@@ -145,12 +148,12 @@ async function startIdentityIssuance({
         const response = await fetch(url);
 
         if (!response.ok) {
-            respond({
+            respondPopup({
                 status: BackgroundResponseStatus.Error,
                 reason: (await response.json())?.message || `Provider returned status code ${response.status}.`,
             });
         } else if (!response.redirected) {
-            respond({
+            respondPopup({
                 status: BackgroundResponseStatus.Error,
                 reason: `Initial location did not redirect as expected.`,
             });
@@ -159,7 +162,7 @@ async function startIdentityIssuance({
         }
         // eslint-disable-next-line @typescript-eslint/no-explicit-any
     } catch (e: any) {
-        respond({
+        respondPopup({
             status: BackgroundResponseStatus.Error,
             reason: `Failed to reach identity provider due to: ${e.message}`,
         });
