@@ -16,9 +16,10 @@ import { useDecryptedSeedPhrase } from '@popup/shared/utils/seed-phrase-helpers'
 
 interface InnerProps {
     onStart: () => void;
+    onError: (errorMessage: string) => void;
 }
 
-function IdentityIssuanceStart({ onStart }: InnerProps) {
+function IdentityIssuanceStart({ onStart, onError }: InnerProps) {
     const { t } = useTranslation('identityIssuance');
     const [providers, setProviders] = useAtom(identityProvidersAtom);
     const network = useAtomValue(networkConfigurationAtom);
@@ -26,14 +27,13 @@ function IdentityIssuanceStart({ onStart }: InnerProps) {
     const updatePendingIdentity = useSetAtom(pendingIdentityAtom);
     const identities = useAtomValue(identitiesAtom);
     const [buttonDisabled, setButtonDisabled] = useState(false);
-    const addToast = useSetAtom(addToastAtom);
-    const seedPhrase = useDecryptedSeedPhrase((e) => addToast(e.message));
+    const seedPhrase = useDecryptedSeedPhrase((e) => onError(e.message));
 
     useEffect(() => {
         // TODO only load once per session?
         getIdentityProviders()
             .then((loadedProviders) => setProviders(loadedProviders))
-            .catch(() => addToast('Unable to update identity provider list'));
+            .catch(() => onError('Unable to update identity provider list'));
     }, []);
 
     const startIssuance = useCallback(
@@ -69,16 +69,22 @@ function IdentityIssuanceStart({ onStart }: InnerProps) {
 
                 onStart();
 
-                popupMessageHandler.sendInternalMessage(InternalMessageType.StartIdentityIssuance, {
-                    globalContext: global,
-                    ipInfo: provider.ipInfo,
-                    arsInfos: provider.arsInfos,
-                    seed: seedPhrase,
-                    net: getNet(network),
-                    identityIndex,
-                    arThreshold: Math.min(Object.keys(provider.arsInfos).length - 1, 255),
-                    baseUrl: provider.metadata.issuanceStart,
-                });
+                const response = await popupMessageHandler.sendInternalMessage(
+                    InternalMessageType.StartIdentityIssuance,
+                    {
+                        globalContext: global,
+                        ipInfo: provider.ipInfo,
+                        arsInfos: provider.arsInfos,
+                        seed: seedPhrase,
+                        net: getNet(network),
+                        identityIndex,
+                        arThreshold: Math.min(Object.keys(provider.arsInfos).length - 1, 255),
+                        baseUrl: provider.metadata.issuanceStart,
+                    }
+                );
+                if (!response) {
+                    throw new Error('Internal error, please try again.');
+                }
             } finally {
                 setButtonDisabled(false);
             }
@@ -96,7 +102,7 @@ function IdentityIssuanceStart({ onStart }: InnerProps) {
                         width="wide"
                         disabled={buttonDisabled}
                         key={p.ipInfo.ipIdentity + p.ipInfo.ipDescription.name}
-                        onClick={() => startIssuance(p).catch((e) => addToast(e.toString()))}
+                        onClick={() => startIssuance(p).catch((e) => onError(e.toString()))}
                     >
                         <IdentityProviderIcon provider={p} />
                         {p.ipInfo.ipDescription.name}
@@ -112,6 +118,7 @@ export default function IdentityIssuanceStartGuard() {
     const [pendingIdentity, setPendingidentity] = useAtom(pendingIdentityAtom);
     const [blocked, setBlocked] = useState(false);
     const [started, setStarted] = useState(false);
+    const addToast = useSetAtom(addToastAtom);
 
     useEffect(() => {
         if (pendingIdentity && !started) {
@@ -119,8 +126,8 @@ export default function IdentityIssuanceStartGuard() {
         }
     }, [pendingIdentity]);
 
-    const reset = () => {
-        setPendingidentity(undefined);
+    const reset = async () => {
+        await setPendingidentity(undefined);
         setBlocked(false);
     };
 
@@ -143,5 +150,14 @@ export default function IdentityIssuanceStartGuard() {
             </div>
         );
     }
-    return <IdentityIssuanceStart onStart={() => setStarted(true)} />;
+    return (
+        <IdentityIssuanceStart
+            onStart={() => setStarted(true)}
+            onError={async (message) => {
+                await reset();
+                setStarted(false);
+                addToast(message);
+            }}
+        />
+    );
 }
