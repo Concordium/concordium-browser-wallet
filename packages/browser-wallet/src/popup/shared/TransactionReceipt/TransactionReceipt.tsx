@@ -62,8 +62,8 @@ export default function TransactionReceipt({
                 address={sender}
                 format={AddressDisplayFormat.DoubleLine}
             />
-            {displayPayload({ type: transactionType, payload }, parameters)}
             <DisplayCost className="transaction-receipt__cost" cost={cost} />
+            {displayPayload({ type: transactionType, payload }, parameters)}
             {hash && (
                 <div className="transaction-receipt__hash">
                     {chunkString(hash, 32).map((chunk) => (
