@@ -13,6 +13,7 @@ import { confirmIdentity } from './confirmation';
 
 const redirectUri = 'ConcordiumRedirectToken';
 const codeUriKey = 'code_uri=';
+const errorKey = 'error=';
 
 const enum MSG { // using const enum here, as typescript compiler replaces uses with the actual underlying string, which we need, because injected functions do not have access to variables declared in the background context
     LIFELINE = 'lifeline',
@@ -60,20 +61,46 @@ export function addIdpListeners() {
         }
     });
 
-    const handleIdpRequest = (redirectUrl: string, tabId: number) => {
-        chrome.tabs.remove(tabId);
-        sessionIdpTab.remove();
+    const handleIdpRequest = (redirectUrl: string, tabId?: number) => {
+        if (tabId !== undefined) {
+            chrome.tabs.remove(tabId);
+            sessionIdpTab.remove();
+        }
 
-        respondPopup({
-            status: BackgroundResponseStatus.Success,
-            result: redirectUrl.substring(redirectUrl.indexOf(codeUriKey) + codeUriKey.length),
-        });
+        if (redirectUrl.includes(codeUriKey)) {
+            respondPopup({
+                status: BackgroundResponseStatus.Success,
+                result: redirectUrl.substring(redirectUrl.indexOf(codeUriKey) + codeUriKey.length),
+            });
+        } else if (redirectUrl.includes(errorKey)) {
+            const error = decodeURIComponent(redirectUrl.substring(redirectUrl.indexOf(errorKey) + errorKey.length));
+            let message;
+            try {
+                message = JSON.parse(error).error.detail;
+            } catch {
+                message = error;
+            }
+
+            respondPopup({
+                status: BackgroundResponseStatus.Error,
+                reason: message,
+            });
+        } else {
+            respondPopup({
+                status: BackgroundResponseStatus.Error,
+                reason: 'Missing location for identity object',
+            });
+        }
     };
 
     chrome.webRequest.onBeforeRequest.addListener(
         (details) => {
             sessionIdpTab.get().then((idpTabId) => {
-                if (details.url.includes(redirectUri) && details.tabId === idpTabId) {
+                if (
+                    (details.url.includes(`${redirectUri}#${codeUriKey}`) ||
+                        details.url.includes(`${redirectUri}#${errorKey}`)) &&
+                    (details.tabId === idpTabId || details.tabId === -1)
+                ) {
                     handleIdpRequest(details.url, idpTabId);
                 }
             });
@@ -145,20 +172,20 @@ async function startIdentityIssuance({
     }
 
     try {
+        chrome.webRequest.onBeforeRedirect.addListener(
+            (response) => {
+                if (!response.redirectUrl.includes(redirectUri)) {
+                    launchExternalIssuance(response.redirectUrl);
+                }
+            },
+            { urls: ['<all_urls>'], tabId: -1 }
+        );
         const response = await fetch(url);
-
-        if (!response.ok) {
-            respondPopup({
-                status: BackgroundResponseStatus.Error,
-                reason: (await response.json())?.message || `Provider returned status code ${response.status}.`,
-            });
-        } else if (!response.redirected) {
+        if (!response.redirected) {
             respondPopup({
                 status: BackgroundResponseStatus.Error,
                 reason: `Initial location did not redirect as expected.`,
             });
-        } else {
-            launchExternalIssuance(response.url);
         }
         // eslint-disable-next-line @typescript-eslint/no-explicit-any
     } catch (e: any) {
