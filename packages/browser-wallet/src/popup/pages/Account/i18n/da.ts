@@ -73,6 +73,7 @@ const t: typeof en = {
         unownedUnique: 'Ikke ejet',
     },
     accountPending: 'Denne konto er stadig ved at blive oprettet.',
+    accountRejected: 'Denne konto kunne ikke blive oprettet.',
     request: 'Opret konto',
     unknown: 'Ukendt',
 };

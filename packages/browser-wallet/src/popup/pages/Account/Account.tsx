@@ -66,7 +66,12 @@ function Account() {
                         </div>
                         <div className="account-page__routes">
                             {isConfirmed && <Outlet />}
-                            {!isConfirmed && <div className="account-page__not-finalized">{t('accountPending')}</div>}
+                            {selectedCred.status === CreationStatus.Pending && (
+                                <div className="account-page__not-finalized">{t('accountPending')}</div>
+                            )}
+                            {selectedCred.status === CreationStatus.Rejected && (
+                                <div className="account-page__rejected">{t('accountRejected')}</div>
+                            )}
                         </div>
                     </>
                 )}

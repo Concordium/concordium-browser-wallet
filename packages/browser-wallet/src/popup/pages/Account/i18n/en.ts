@@ -71,6 +71,7 @@ const t = {
         unownedUnique: 'Not owned',
     },
     accountPending: 'This account is still pending finalization.',
+    accountRejected: 'This account failed to be created.',
     request: 'Create account',
     unknown: 'unknown',
 };
