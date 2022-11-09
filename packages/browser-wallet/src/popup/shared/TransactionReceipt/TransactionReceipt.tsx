@@ -11,15 +11,17 @@ import {
     UpdateContractPayload,
     InitContractPayload,
 } from '@concordium/web-sdk';
-import { SmartContractParameters } from '@shared/utils/types';
+import { Cis2TransferParameters, SmartContractParameters } from '@shared/utils/types';
+import { TokenMetadata } from '@shared/storage/types';
 import DisplayCost from './DisplayCost';
 import { getTransactionTypeName } from '../utils/transaction-helpers';
 import DisplayUpdateContract from './displayPayload/DisplayUpdateContract';
 import DisplayInitContract from './displayPayload/DisplayInitContract';
 import DisplaySimpleTransfer from './displayPayload/DisplaySimpleTransfer';
 import DisplayGenericPayload from './displayPayload/DisplayGenericPayload';
+import TokenBalance from '../TokenBalance';
 
-type Props = {
+export type GenericTransactionReceiptProps = {
     className?: string;
     transactionType: AccountTransactionType;
     payload: AccountTransactionPayload;
@@ -42,7 +44,7 @@ function displayPayload({ payload, type }: Omit<AccountTransaction, 'header'>, p
     }
 }
 
-type TransactionReceiptProps = Omit<Props, 'transactionType' | 'parameters' | 'payload'> & {
+type TransactionReceiptProps = Omit<GenericTransactionReceiptProps, 'transactionType' | 'parameters' | 'payload'> & {
     title: string;
     children: JSX.Element;
 };
@@ -59,8 +61,8 @@ function TransactionReceipt({ className, sender, hash, cost, title, children }: 
                 address={sender}
                 format={AddressDisplayFormat.DoubleLine}
             />
-            <DisplayCost className="transaction-receipt__cost" cost={cost} />
             {children}
+            <DisplayCost className="transaction-receipt__cost" cost={cost} />
             {hash && (
                 <div className="transaction-receipt__hash">
                     {chunkString(hash, 32).map((chunk) => (
@@ -74,7 +76,12 @@ function TransactionReceipt({ className, sender, hash, cost, title, children }: 
     );
 }
 
-export default function GenericTransactionReceipt({ transactionType, parameters, payload, ...props }: Props) {
+export default function GenericTransactionReceipt({
+    transactionType,
+    parameters,
+    payload,
+    ...props
+}: GenericTransactionReceiptProps) {
     return (
         <TransactionReceipt {...props} title={getTransactionTypeName(transactionType)}>
             {displayPayload({ type: transactionType, payload }, parameters)}
@@ -82,8 +89,11 @@ export default function GenericTransactionReceipt({ transactionType, parameters,
     );
 }
 
-type TokenTransferReceiptProps = Props & {
+export type TokenTransferReceiptProps = GenericTransactionReceiptProps & {
     symbol: string;
+    payload: UpdateContractPayload;
+    parameters: Cis2TransferParameters;
+    metadata: TokenMetadata;
 };
 
 export function TokenTransferReceipt({
@@ -91,13 +101,37 @@ export function TokenTransferReceipt({
     parameters,
     payload,
     symbol,
+    metadata,
     ...props
 }: TokenTransferReceiptProps) {
-    const { t } = useTranslation('shared', { keyPrefix: 'transactionReceipt' });
+    const { t } = useTranslation('shared', { keyPrefix: 'transactionReceipt.tokenTransfer' });
+
+    const [
+        {
+            amount,
+            from: {
+                Account: [from],
+            },
+            to: {
+                Account: [to],
+            },
+        },
+    ] = parameters;
 
     return (
-        <TransactionReceipt {...props} title={t('tokenTransfer.title', { symbol })}>
-            <div>test</div>
+        <TransactionReceipt {...props} sender={from} title={t('title', { symbol })}>
+            <>
+                <h5 className="m-b-10">{t('amount')}:</h5>
+                <p className="m-t-0">
+                    <TokenBalance balance={BigInt(amount)} decimals={metadata.decimals ?? 0} symbol={metadata.symbol} />
+                </p>
+                <h5 className="m-b-10">{t('receiver')}:</h5>
+                <DisplayAddress
+                    className="transaction-receipt__address"
+                    address={to}
+                    format={AddressDisplayFormat.DoubleLine}
+                />
+            </>
         </TransactionReceipt>
     );
 }

@@ -42,6 +42,8 @@ const t = {
         unknown: 'Unknown',
         tokenTransfer: {
             title: 'Send {{ symbol }}',
+            amount: 'Amount',
+            receiver: 'Receiver',
         },
     },
     tokenDetails: {

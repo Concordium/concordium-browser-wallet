@@ -1,1 +1,6 @@
-export { default, TokenTransferReceipt } from './TransactionReceipt';
+export {
+    default,
+    TokenTransferReceipt,
+    TokenTransferReceiptProps,
+    GenericTransactionReceiptProps,
+} from './TransactionReceipt';
