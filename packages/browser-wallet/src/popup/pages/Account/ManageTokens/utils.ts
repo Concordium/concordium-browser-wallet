@@ -1,13 +1,7 @@
 import { JsonRpcClient } from '@concordium/web-sdk';
 import { getCis2Tokens } from '@popup/shared/utils/wallet-proxy';
-import { NetworkConfiguration, TokenIdAndMetadata, TokenMetadata } from '@shared/storage/types';
-import {
-    ContractDetails,
-    ContractTokenDetails,
-    getContractBalances,
-    getTokenMetadata,
-    getTokenUrl,
-} from '@shared/utils/token-helpers';
+import { NetworkConfiguration, TokenIdAndMetadata } from '@shared/storage/types';
+import { ContractDetails, ContractTokenDetails, getTokens } from '@shared/utils/token-helpers';
 import { MakeOptional } from 'wallet-common-helpers';
 
 export const TOKENS_PAGE_SIZE = 20;
@@ -27,36 +21,9 @@ export type DetailsLocationState = {
     balance: bigint;
 };
 
-export const addTokensRoutes = {
+export const manageTokensRoutes = {
     update: 'update',
     details: 'details',
-};
-
-export const getTokens = async (
-    contractDetails: ContractDetails,
-    client: JsonRpcClient,
-    network: NetworkConfiguration,
-    account: string,
-    ids: string[]
-) => {
-    const metadataPromise: Promise<[string[], Array<TokenMetadata | undefined>]> = (async () => {
-        const metadataUrls = await getTokenUrl(client, ids, contractDetails);
-        const metadata = await Promise.all(
-            metadataUrls.map((url) => getTokenMetadata(url, network).catch(() => Promise.resolve(undefined)))
-        );
-        return [metadataUrls, metadata];
-    })();
-
-    const balancesPromise = getContractBalances(client, contractDetails.index, contractDetails.subindex, ids, account);
-
-    const [[metadataUrls, metadata], balances] = await Promise.all([metadataPromise, balancesPromise]); // Run in parallel.
-
-    return ids.map((id, i) => ({
-        id,
-        metadataLink: metadataUrls[i],
-        metadata: metadata[i],
-        balance: balances[id] ?? 0n,
-    }));
 };
 
 export const fetchTokensConfigure =

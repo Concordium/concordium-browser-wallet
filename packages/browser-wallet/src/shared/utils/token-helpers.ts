@@ -383,6 +383,33 @@ export async function getTokenTransferEnergy(
     return { execution, total };
 }
 
+export const getTokens = async (
+    contractDetails: ContractDetails,
+    client: JsonRpcClient,
+    network: NetworkConfiguration,
+    account: string,
+    ids: string[]
+) => {
+    const metadataPromise: Promise<[string[], Array<TokenMetadata | undefined>]> = (async () => {
+        const metadataUrls = await getTokenUrl(client, ids, contractDetails);
+        const metadata = await Promise.all(
+            metadataUrls.map((url) => getTokenMetadata(url, network).catch(() => Promise.resolve(undefined)))
+        );
+        return [metadataUrls, metadata];
+    })();
+
+    const balancesPromise = getContractBalances(client, contractDetails.index, contractDetails.subindex, ids, account);
+
+    const [[metadataUrls, metadata], balances] = await Promise.all([metadataPromise, balancesPromise]); // Run in parallel.
+
+    return ids.map((id, i) => ({
+        id,
+        metadataLink: metadataUrls[i],
+        metadata: metadata[i],
+        balance: balances[id] ?? 0n,
+    }));
+};
+
 const MAX_SYMBOL_LENGTH = 10;
 
 export const trunctateSymbol = (symbol: string): string =>

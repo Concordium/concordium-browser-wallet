@@ -8,7 +8,8 @@ import debounce from 'lodash.debounce';
 import InfiniteLoader from 'react-window-infinite-loader';
 import AutoSizer from 'react-virtualized-auto-sizer';
 import { VariableSizeList as List } from 'react-window';
-import { ContractTokenDetails, ContractDetails } from '@shared/utils/token-helpers';
+
+import { ContractTokenDetails, ContractDetails, getTokens } from '@shared/utils/token-helpers';
 import { absoluteRoutes } from '@popup/constants/routes';
 import PendingArrows from '@assets/svg/pending-arrows.svg';
 import Button from '@popup/shared/Button';
@@ -30,7 +31,7 @@ import {
     searchResultAtom,
     topTokensAtom,
 } from './state';
-import { DetailsLocationState, getTokens, addTokensRoutes } from './utils';
+import { DetailsLocationState, manageTokensRoutes } from './utils';
 import { tokensRoutes } from '../Tokens/routes';
 
 const ELEMENT_HEIGHT = 58;
@@ -189,7 +190,7 @@ export default function TokenList() {
             balance,
             contractIndex: contractDetails.index,
         };
-        nav(`../${addTokensRoutes.details}`, { state });
+        nav(`../${manageTokensRoutes.details}`, { state });
     };
 
     const isTokenChecked = (token: ContractTokenDetails) =>

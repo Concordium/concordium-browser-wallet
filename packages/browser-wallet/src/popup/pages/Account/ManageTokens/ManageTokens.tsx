@@ -1,9 +1,8 @@
 import React, { useCallback, useContext, useEffect, useRef } from 'react';
 import { useAtom, useAtomValue } from 'jotai';
-import { useForm, SubmitHandler, Validate, ValidateResult } from 'react-hook-form';
+import { useForm, SubmitHandler } from 'react-hook-form';
 import { useTranslation } from 'react-i18next';
 import { Navigate, Route, Routes, useLocation, useNavigate, Location } from 'react-router-dom';
-import debounce from 'lodash.debounce';
 
 import Form from '@popup/shared/Form';
 import FormInput from '@popup/shared/Form/Input';
@@ -19,6 +18,7 @@ import TokenDetails from '@popup/shared/TokenDetails';
 import { selectedAccountAtom } from '@popup/store/account';
 import { ensureDefined } from '@shared/utils/basic-helpers';
 import { contractBalancesFamily, currentAccountTokensAtom } from '@popup/store/token';
+import { debouncedAsyncValidate } from '@popup/shared/utils/validation-helpers';
 import { accountPageContext } from '../utils';
 import {
     checkedTokensAtom,
@@ -29,23 +29,8 @@ import {
     searchResultAtom,
     topTokensAtom,
 } from './state';
-import { addTokensRoutes, DetailsLocationState, fetchTokensConfigure, FetchTokensResponse } from './utils';
+import { manageTokensRoutes, DetailsLocationState, fetchTokensConfigure, FetchTokensResponse } from './utils';
 import TokenList from './TokenList';
-
-type AsyncValidate<V> = (fieldValue: V) => Promise<ValidateResult>;
-
-function debouncedAsyncValidate<V>(validator: AsyncValidate<V>, ms: number, leading = false): Validate<V> {
-    return async (value) =>
-        new Promise((resolve) => {
-            debounce(
-                async (v: V) => {
-                    validator(v).then(resolve);
-                },
-                ms,
-                { leading }
-            )(value);
-        });
-}
 
 const VALIDATE_INDEX_DELAY_MS = 500;
 
@@ -78,7 +63,7 @@ function ChooseContract() {
         setContractDetails(validContract.current.details);
         updateTokens({ type: 'reset', initialTokens: validContract.current.tokens });
 
-        nav(addTokensRoutes.update, { replace: true });
+        nav(manageTokensRoutes.update, { replace: true });
     };
 
     const cis2ErrorText = useCallback((error: CIS2ConfirmationError) => {
@@ -217,8 +202,8 @@ export default function AddTokens() {
     return (
         <Routes>
             <Route index element={<ChooseContract />} />
-            <Route path={addTokensRoutes.update} element={<TokenList />} />
-            <Route path={addTokensRoutes.details} element={<Details />} />
+            <Route path={manageTokensRoutes.update} element={<TokenList />} />
+            <Route path={manageTokensRoutes.details} element={<Details />} />
         </Routes>
     );
 }
