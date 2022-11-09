@@ -77,26 +77,32 @@ function deserializeTokenMetadataReturnValue(returnValue: string): string[] {
     return urls;
 }
 
+export enum CIS2ConfirmationError {
+    Cis0Error,
+    Cis2Error,
+}
+
 /**
  * Confirms that the given smart contract instance is CIS-2 compliant
  */
 export async function confirmCIS2Contract(
     client: JsonRpcClient,
     { contractName, index, subindex }: ContractDetails
-): Promise<string | undefined> {
+): Promise<CIS2ConfirmationError | undefined> {
     const supports = await client.invokeContract({
         contract: { index, subindex },
         method: `${contractName}.supports`,
         parameter: getCIS2Identifier(),
     });
     if (!supports || supports.tag === 'failure') {
-        return 'Chosen contract does not support CIS-0';
+        return CIS2ConfirmationError.Cis0Error;
     }
+
     // Supports return 2 bytes that determine the number of answers. 0100 means there is 1 answer
     // 01 Means the standard is supported.
     // TODO: Handle 02 answer properly (https://proposals.concordium.software/CIS/cis-0.html#response)
     if (supports.returnValue !== '010001') {
-        return 'Chosen contract does not support CIS-2';
+        return CIS2ConfirmationError.Cis2Error;
     }
     return undefined;
 }
@@ -376,6 +382,33 @@ export async function getTokenTransferEnergy(
     );
     return { execution, total };
 }
+
+export const getTokens = async (
+    contractDetails: ContractDetails,
+    client: JsonRpcClient,
+    network: NetworkConfiguration,
+    account: string,
+    ids: string[]
+) => {
+    const metadataPromise: Promise<[string[], Array<TokenMetadata | undefined>]> = (async () => {
+        const metadataUrls = await getTokenUrl(client, ids, contractDetails);
+        const metadata = await Promise.all(
+            metadataUrls.map((url) => getTokenMetadata(url, network).catch(() => Promise.resolve(undefined)))
+        );
+        return [metadataUrls, metadata];
+    })();
+
+    const balancesPromise = getContractBalances(client, contractDetails.index, contractDetails.subindex, ids, account);
+
+    const [[metadataUrls, metadata], balances] = await Promise.all([metadataPromise, balancesPromise]); // Run in parallel.
+
+    return ids.map((id, i) => ({
+        id,
+        metadataLink: metadataUrls[i],
+        metadata: metadata[i],
+        balance: balances[id] ?? 0n,
+    }));
+};
 
 const MAX_SYMBOL_LENGTH = 10;
 

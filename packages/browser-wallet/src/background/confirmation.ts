@@ -49,6 +49,21 @@ async function monitorCredentialStatus(jsonRpcUrl: string, cred: PendingWalletCr
 
         try {
             const response = await client.getTransactionStatus(deploymentHash);
+            // transaction has been discarded by the node.
+            if (!response) {
+                await updateCredentials(
+                    [
+                        {
+                            ...info,
+                            status: CreationStatus.Rejected,
+                        },
+                    ],
+                    genesisHash
+                );
+                return false;
+            }
+
+            // transaction has not finalized yet
             if (response?.status !== TransactionStatusEnum.Finalized) {
                 return true;
             }

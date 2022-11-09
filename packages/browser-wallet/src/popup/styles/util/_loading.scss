@@ -1,7 +1,33 @@
+@keyframes spin {
+    from {
+        transform: rotate(0deg);
+    }
+
+    from {
+        transform: rotate(359deg);
+    }
+}
+
+@keyframes show {
+    from {
+        opacity: 0;
+    }
+
+    to {
+        opacity: 1;
+    }
+}
+
+$spin: spin 1s infinite;
+
 .loading {
     height: rem(40px);
     width: rem(40px);
     transform-origin: center;
-    animation: spin 1s;
-    animation-iteration-count: infinite;
+    animation: $spin;
+
+    &--delay {
+        opacity: 0;
+        animation: show 0.2s 0.2s, $spin;
+    }
 }

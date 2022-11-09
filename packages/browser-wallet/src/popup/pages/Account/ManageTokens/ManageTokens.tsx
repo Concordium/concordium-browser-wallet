@@ -1,5 +1,5 @@
-import React, { useContext, useEffect } from 'react';
-import { useAtom, useAtomValue, useSetAtom } from 'jotai';
+import React, { useCallback, useContext, useEffect, useRef } from 'react';
+import { useAtom, useAtomValue } from 'jotai';
 import { useForm, SubmitHandler } from 'react-hook-form';
 import { useTranslation } from 'react-i18next';
 import { Navigate, Route, Routes, useLocation, useNavigate, Location } from 'react-router-dom';
@@ -7,13 +7,18 @@ import { Navigate, Route, Routes, useLocation, useNavigate, Location } from 'rea
 import Form from '@popup/shared/Form';
 import FormInput from '@popup/shared/Form/Input';
 import Submit from '@popup/shared/Form/Submit';
-import { addToastAtom } from '@popup/state';
-import { jsonRpcClientAtom } from '@popup/store/settings';
-import { confirmCIS2Contract, ContractDetails, ContractTokenDetails } from '@shared/utils/token-helpers';
+import { jsonRpcClientAtom, networkConfigurationAtom } from '@popup/store/settings';
+import {
+    CIS2ConfirmationError,
+    confirmCIS2Contract,
+    ContractDetails,
+    ContractTokenDetails,
+} from '@shared/utils/token-helpers';
 import TokenDetails from '@popup/shared/TokenDetails';
 import { selectedAccountAtom } from '@popup/store/account';
 import { ensureDefined } from '@shared/utils/basic-helpers';
 import { contractBalancesFamily, currentAccountTokensAtom } from '@popup/store/token';
+import { debouncedAsyncValidate } from '@popup/shared/utils/validation-helpers';
 import { accountPageContext } from '../utils';
 import {
     checkedTokensAtom,
@@ -24,8 +29,10 @@ import {
     searchResultAtom,
     topTokensAtom,
 } from './state';
-import { routes, DetailsLocationState } from './utils';
+import { manageTokensRoutes, DetailsLocationState, fetchTokensConfigure, FetchTokensResponse } from './utils';
 import TokenList from './TokenList';
+
+const VALIDATE_INDEX_DELAY_MS = 500;
 
 type FormValues = {
     contractIndex: string;
@@ -37,29 +44,78 @@ type FormValues = {
 function ChooseContract() {
     const { t } = useTranslation('account', { keyPrefix: 'tokens.add' });
     const [contractDetails, setContractDetails] = useAtom(contractDetailsAtom);
-    const addToast = useSetAtom(addToastAtom);
     const form = useForm<FormValues>({
         defaultValues: { contractIndex: contractDetails?.index?.toString() },
     });
+    const contractIndexValue = form.watch('contractIndex');
     const client = useAtomValue(jsonRpcClientAtom);
     const nav = useNavigate();
+    const validContract = useRef<{ details: ContractDetails; tokens: FetchTokensResponse } | undefined>();
+    const account = ensureDefined(useAtomValue(selectedAccountAtom), 'No account has been selected');
+    const network = useAtomValue(networkConfigurationAtom);
+    const [, updateTokens] = useAtom(contractTokensAtom);
 
-    const onSubmit: SubmitHandler<FormValues> = async (vs) => {
-        const index = BigInt(vs.contractIndex);
-        const instanceInfo = await client.getInstanceInfo({ index, subindex: 0n });
-        if (!instanceInfo) {
-            return;
+    const onSubmit: SubmitHandler<FormValues> = async () => {
+        if (validContract.current === undefined) {
+            throw new Error('Expected contract details');
         }
-        const contractName = instanceInfo.name.substring(5);
-        const cd: ContractDetails = { contractName, index, subindex: 0n };
-        const error = await confirmCIS2Contract(client, cd);
-        if (error) {
-            addToast(error);
-        } else {
-            setContractDetails(cd);
-            nav(routes.update);
-        }
+
+        setContractDetails(validContract.current.details);
+        updateTokens({ type: 'reset', initialTokens: validContract.current.tokens });
+
+        nav(manageTokensRoutes.update, { replace: true });
     };
+
+    const cis2ErrorText = useCallback((error: CIS2ConfirmationError) => {
+        switch (error) {
+            case CIS2ConfirmationError.Cis0Error: {
+                return t('cis0Error');
+            }
+            case CIS2ConfirmationError.Cis2Error: {
+                return t('cis2Error');
+            }
+            default: {
+                throw new Error('Unsupported error type.');
+            }
+        }
+    }, []);
+
+    const validateIndex = useCallback(
+        debouncedAsyncValidate<string>(
+            async (value) => {
+                const index = BigInt(value);
+                const instanceInfo = await client.getInstanceInfo({ index, subindex: 0n });
+
+                if (!instanceInfo) {
+                    return t('noContractFound');
+                }
+
+                const contractName = instanceInfo.name.substring(5);
+                const cd: ContractDetails = { contractName, index, subindex: 0n };
+                const error = await confirmCIS2Contract(client, cd);
+
+                if (error !== undefined) {
+                    return cis2ErrorText(error);
+                }
+
+                const response = await fetchTokensConfigure(cd, client, network, account)();
+
+                if (response.tokens.length === 0) {
+                    return t('noTokensError');
+                }
+
+                validContract.current = { details: cd, tokens: response };
+                return true;
+            },
+            VALIDATE_INDEX_DELAY_MS,
+            true
+        ),
+        [client]
+    );
+
+    useEffect(() => {
+        validContract.current = undefined;
+    }, [contractIndexValue]);
 
     return (
         <Form
@@ -77,6 +133,7 @@ function ChooseContract() {
                             name="contractIndex"
                             rules={{
                                 required: t('indexRequired'),
+                                validate: validateIndex,
                             }}
                         />
                     </div>
@@ -117,9 +174,9 @@ export default function AddTokens() {
     );
 
     // Keep the following in memory while add token flow lives
-    const [, updateTokens] = useAtom(contractTokensAtom);
     const [, setChecked] = useAtom(checkedTokensAtom);
     const [, setTopTokens] = useAtom(topTokensAtom);
+    useAtom(contractTokensAtom);
     useAtom(searchAtom);
     useAtom(searchResultAtom);
     useAtom(listScrollPositionAtom);
@@ -128,12 +185,6 @@ export default function AddTokens() {
         setDetailsExpanded(false);
         return () => setDetailsExpanded(true);
     }, []);
-
-    useEffect(() => {
-        if (contractDetails !== undefined) {
-            updateTokens('reset');
-        }
-    }, [contractDetails?.index]);
 
     useEffect(() => {
         if (contractDetails?.index !== undefined && !accountTokens.loading) {
@@ -151,8 +202,8 @@ export default function AddTokens() {
     return (
         <Routes>
             <Route index element={<ChooseContract />} />
-            <Route path={routes.update} element={<TokenList />} />
-            <Route path={routes.details} element={<Details />} />
+            <Route path={manageTokensRoutes.update} element={<TokenList />} />
+            <Route path={manageTokensRoutes.details} element={<Details />} />
         </Routes>
     );
 }
