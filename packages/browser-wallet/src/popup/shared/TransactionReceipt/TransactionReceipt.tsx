@@ -42,20 +42,17 @@ function displayPayload({ payload, type }: Omit<AccountTransaction, 'header'>, p
     }
 }
 
-export default function TransactionReceipt({
-    transactionType,
-    sender,
-    cost = 0n,
-    hash,
-    className,
-    payload,
-    parameters,
-}: Props) {
+type TransactionReceiptProps = Omit<Props, 'transactionType' | 'parameters' | 'payload'> & {
+    title: string;
+    children: JSX.Element;
+};
+
+function TransactionReceipt({ className, sender, hash, cost, title, children }: TransactionReceiptProps) {
     const { t } = useTranslation('shared', { keyPrefix: 'transactionReceipt' });
 
     return (
         <div className={clsx('transaction-receipt', className)}>
-            <p className="transaction-receipt__title">{getTransactionTypeName(transactionType)}</p>
+            <p className="transaction-receipt__title">{title}</p>
             <h5>{t('sender')}</h5>
             <DisplayAddress
                 className="transaction-receipt__address"
@@ -63,7 +60,7 @@ export default function TransactionReceipt({
                 format={AddressDisplayFormat.DoubleLine}
             />
             <DisplayCost className="transaction-receipt__cost" cost={cost} />
-            {displayPayload({ type: transactionType, payload }, parameters)}
+            {children}
             {hash && (
                 <div className="transaction-receipt__hash">
                     {chunkString(hash, 32).map((chunk) => (
@@ -74,5 +71,33 @@ export default function TransactionReceipt({
                 </div>
             )}
         </div>
+    );
+}
+
+export default function GenericTransactionReceipt({ transactionType, parameters, payload, ...props }: Props) {
+    return (
+        <TransactionReceipt {...props} title={getTransactionTypeName(transactionType)}>
+            {displayPayload({ type: transactionType, payload }, parameters)}
+        </TransactionReceipt>
+    );
+}
+
+type TokenTransferReceiptProps = Props & {
+    symbol: string;
+};
+
+export function TokenTransferReceipt({
+    transactionType,
+    parameters,
+    payload,
+    symbol,
+    ...props
+}: TokenTransferReceiptProps) {
+    const { t } = useTranslation('shared', { keyPrefix: 'transactionReceipt' });
+
+    return (
+        <TransactionReceipt {...props} title={t('tokenTransfer.title', { symbol })}>
+            <div>test</div>
+        </TransactionReceipt>
     );
 }

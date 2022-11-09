@@ -40,6 +40,9 @@ const t = {
         sender: 'Sender account',
         cost: 'Estimated transaction fee',
         unknown: 'Unknown',
+        tokenTransfer: {
+            title: 'Send {{ symbol }}',
+        },
     },
     tokenDetails: {
         balance: 'Balance',

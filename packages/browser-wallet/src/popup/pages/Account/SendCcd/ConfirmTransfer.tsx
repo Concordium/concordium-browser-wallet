@@ -14,20 +14,34 @@ import { usePrivateKey } from '@popup/shared/utils/account-helpers';
 import Button from '@popup/shared/Button';
 import { useNavigate } from 'react-router-dom';
 import { absoluteRoutes } from '@popup/constants/routes';
-import TransactionReceipt from '@popup/shared/TransactionReceipt/TransactionReceipt';
+import GenericTransactionReceipt, { TokenTransferReceipt } from '@popup/shared/TransactionReceipt';
 import { useUpdateAtom } from 'jotai/utils';
 import { addPendingTransactionAtom } from '@popup/store/transactions';
 import { SmartContractParameters } from '@shared/utils/types';
 
-interface Props {
+type BaseProps = {
     setDetailsExpanded: (expanded: boolean) => void;
     cost?: bigint;
-    transactionType: AccountTransactionType;
     payload: AccountTransactionPayload;
-    parameters?: SmartContractParameters;
     // eslint-disable-next-line @typescript-eslint/no-explicit-any
     returnState: any;
-}
+};
+
+type ConfirmTokenTransferProps = BaseProps & {
+    showAsTokenTransfer: true;
+    transactionType: AccountTransactionType.UpdateSmartContractInstance;
+    parameters: SmartContractParameters;
+    symbol: string;
+};
+
+type ConfirmGenericTransferProps = BaseProps & {
+    showAsTokenTransfer?: false;
+    transactionType: AccountTransactionType;
+    parameters?: SmartContractParameters;
+    symbol: undefined;
+};
+
+type Props = ConfirmTokenTransferProps | ConfirmGenericTransferProps;
 
 export default function ConfirmTransfer({
     setDetailsExpanded,
@@ -36,6 +50,8 @@ export default function ConfirmTransfer({
     payload,
     returnState,
     parameters,
+    showAsTokenTransfer = false,
+    symbol,
 }: Props) {
     const { t } = useTranslation('account');
     const [hash, setHash] = useState<string>();
@@ -83,6 +99,8 @@ export default function ConfirmTransfer({
         return null;
     }
 
+    const TransactionReceipt = showAsTokenTransfer ? TokenTransferReceipt : GenericTransactionReceipt;
+
     return (
         <div className="w-full flex-column justify-space-between align-center">
             <TransactionReceipt
@@ -93,6 +111,7 @@ export default function ConfirmTransfer({
                 cost={cost}
                 hash={hash}
                 className="send-ccd__receipt"
+                symbol={symbol ?? ''}
             />
             {!hash && (
                 <div className="flex justify-center p-b-10 m-h-20">
