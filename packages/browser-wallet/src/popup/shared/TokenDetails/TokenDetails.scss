@@ -54,6 +54,10 @@
         border-top: 1px solid $color-lines;
         border-bottom: 1px solid $color-lines;
         padding: rem(15px) 0;
+
+        img {
+            max-width: 100%;
+        }
     }
 
     &__remove {

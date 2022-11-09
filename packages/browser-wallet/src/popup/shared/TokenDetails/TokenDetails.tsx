@@ -57,7 +57,9 @@ function ShowRawMetadata({ metadata }: ShowRawMetadataProps) {
         >
             <div className="token-details__raw">
                 {Object.entries(metadata).map(([k, v]) => (
-                    <TokenDetailsLine header={k}>{JSON.stringify(v)}</TokenDetailsLine>
+                    <TokenDetailsLine header={k} key={k}>
+                        {JSON.stringify(v)}
+                    </TokenDetailsLine>
                 ))}
             </div>
         </Modal>

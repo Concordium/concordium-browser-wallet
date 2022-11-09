@@ -39,7 +39,10 @@ export default function ContractTokenLine({
             onClick={() => onClick(token)}
         >
             <div className="flex align-center h-full m-r-5">
-                <img src={token.metadata.thumbnail?.url} alt={token.metadata.name ?? ''} />
+                <img
+                    src={token.metadata.thumbnail?.url ?? token.metadata.display?.url ?? ''}
+                    alt={token.metadata.name ?? ''}
+                />
                 <div>
                     <div className="clamp-2">{token.metadata.name}</div>
                     <div

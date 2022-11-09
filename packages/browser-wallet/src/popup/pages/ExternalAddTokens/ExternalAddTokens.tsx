@@ -9,7 +9,7 @@ import ExternalRequestLayout from '@popup/page-layouts/ExternalRequestLayout';
 import { currentAccountTokensAtom } from '@popup/store/token';
 import { useAsyncMemo } from 'wallet-common-helpers';
 import { TokenIdAndMetadata } from '@shared/storage/types';
-import { ContractTokenDetails, fetchContractName } from '@shared/utils/token-helpers';
+import { ContractTokenDetails, fetchContractName, getTokens } from '@shared/utils/token-helpers';
 import { jsonRpcClientAtom, networkConfigurationAtom } from '@popup/store/settings';
 import { selectedAccountAtom } from '@popup/store/account';
 import { fullscreenPromptContext } from '@popup/page-layouts/FullscreenPromptLayout';
@@ -18,7 +18,6 @@ import Button from '@popup/shared/Button';
 import { isHex } from '@concordium/web-sdk';
 import ContractTokenLine, { ChoiceStatus } from '@popup/shared/ContractTokenLine';
 import TokenDetails from '@popup/shared/TokenDetails';
-import { getTokens } from '../Account/AddTokens/utils';
 
 type Props = {
     respond(ids: string[]): void;
