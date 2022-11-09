@@ -18,15 +18,15 @@ export default function DisplayInitContract({ payload, parameters }: Props) {
     return (
         <>
             <h5>{t('moduleReference')}:</h5>
-            <p className="transaction-receipt__module-ref">{payload.moduleRef.moduleRef}</p>
+            <div className="transaction-receipt__module-ref">{payload.moduleRef.moduleRef}</div>
             <h5>{t('contractName')}:</h5>
             <p>{payload.contractName}</p>
             <h5>{t('amount')}:</h5>
             {displayAsCcd(payload.amount.microGtuAmount)}
             <h5>{t('maxEnergy')}:</h5>
-            <p>
+            <span>
                 {payload.maxContractExecutionEnergy.toString()} {t('nrg')}
-            </p>
+            </span>
             {!!parameters && (
                 <>
                     <h5>{t('parameter')}:</h5>

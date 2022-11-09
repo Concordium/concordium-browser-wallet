@@ -13,6 +13,7 @@ import {
 } from '@concordium/web-sdk';
 import { Cis2TransferParameters, SmartContractParameters } from '@shared/utils/types';
 import { TokenMetadata } from '@shared/storage/types';
+import { trunctateSymbol } from '@shared/utils/token-helpers';
 import DisplayCost from './DisplayCost';
 import { getTransactionTypeName } from '../utils/transaction-helpers';
 import DisplayUpdateContract from './displayPayload/DisplayUpdateContract';
@@ -119,13 +120,13 @@ export function TokenTransferReceipt({
     ] = parameters;
 
     return (
-        <TransactionReceipt {...props} sender={from} title={t('title', { symbol })}>
+        <TransactionReceipt {...props} sender={from} title={t('title', { symbol: trunctateSymbol(symbol) })}>
             <>
-                <h5 className="m-b-10">{t('amount')}:</h5>
-                <p className="m-t-0">
+                <h5>{t('amount')}:</h5>
+                <div>
                     <TokenBalance balance={BigInt(amount)} decimals={metadata.decimals ?? 0} symbol={metadata.symbol} />
-                </p>
-                <h5 className="m-b-10">{t('receiver')}:</h5>
+                </div>
+                <h5>{t('receiver')}:</h5>
                 <DisplayAddress
                     className="transaction-receipt__address"
                     address={to}

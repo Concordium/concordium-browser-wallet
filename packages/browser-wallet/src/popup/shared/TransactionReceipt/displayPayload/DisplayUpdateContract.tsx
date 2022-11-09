@@ -18,17 +18,17 @@ export default function DisplayUpdateContract({ payload, parameters }: Props) {
     return (
         <>
             <h5>{t('contractIndex')}:</h5>
-            <p>
+            <div>
                 {payload.contractAddress.index.toString()} ({payload.contractAddress.subindex.toString()})
-            </p>
+            </div>
             <h5>{t('receiveName')}:</h5>
             <p>{payload.receiveName}</p>
             <h5>{t('amount')}:</h5>
             {displayAsCcd(payload.amount.microGtuAmount)}
             <h5>{t('maxEnergy')}:</h5>
-            <p>
+            <div>
                 {payload.maxContractExecutionEnergy.toString()} {t('nrg')}
-            </p>
+            </div>
             {!!parameters && (
                 <>
                     <h5>{t('parameter')}:</h5>
