@@ -71,7 +71,8 @@ $error-spacing: rem(13.286px);
     }
 }
 
-.display-token {
+.display-token,
+.token-picker-button {
     border: rem(1px) solid $color-cta;
     border-radius: rem(5px);
     padding: rem(5px);
@@ -94,9 +95,27 @@ $error-spacing: rem(13.286px);
         max-width: rem(40px);
         margin-right: rem(5px);
     }
+}
 
+.display-token {
     &__details {
         text-align: right;
         width: calc(100% - #{rem(45px)}); // subtract max-width + margin of &__token-display.
+    }
+}
+
+.token-picker-button {
+    width: 100%;
+
+    &__search-icon {
+        height: rem(16px);
+
+        path {
+            fill: $color-text;
+        }
+    }
+
+    &__details {
+        text-align: left;
     }
 }

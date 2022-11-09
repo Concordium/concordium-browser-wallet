@@ -33,8 +33,10 @@ import { getTokenTransferEnergy, TokenIdentifier, trunctateSymbol } from '@share
 import { jsonRpcClientAtom } from '@popup/store/settings';
 import CcdIcon from '@assets/svg/concordium.svg';
 import { addToastAtom } from '@popup/state';
+import TokenBalance from '@popup/shared/TokenBalance';
+import Button from '@popup/shared/Button';
+import SearchIcon from '@assets/svg/search.svg';
 import { routes } from './routes';
-import DisplayToken from './DisplayToken';
 import PickToken from './PickToken';
 
 export type FormValues = {
@@ -220,15 +222,35 @@ function CreateTransaction({ exchangeRate, tokens, setCost, setDetailsExpanded }
         >
             {(f) => (
                 <>
-                    <div className={clsx('create-transfer__token-picker')}>
-                        <DisplayToken
-                            metadata={tokenMetadata}
-                            balance={currentBalance}
-                            disabled={!accountTokens}
-                            onClick={() => setPickingToken(true)}
-                            className="w-full"
-                            icon={tokenMetadata === CCD_METADATA ? <CcdIcon className="ccd-icon" /> : undefined}
-                        />
+                    <div className="create-transfer__token-picker">
+                        <Button className="token-picker-button" clear onClick={() => setPickingToken(true)}>
+                            <div className="token-picker-button__token-display-container">
+                                <div className="flex align-center">
+                                    {tokenMetadata === CCD_METADATA ? (
+                                        <div className="token-picker-button__token-display">
+                                            <CcdIcon className="ccd-icon" />
+                                        </div>
+                                    ) : (
+                                        <img
+                                            alt={tokenMetadata.name}
+                                            className="token-picker-button__token-display"
+                                            src={tokenMetadata.thumbnail?.url ?? tokenMetadata.display?.url}
+                                        />
+                                    )}
+                                    <div className="token-picker-button__details">
+                                        <div className="clamp-1 w-full">{tokenMetadata.name}</div>
+                                        <div className="token-picker-button__balance">
+                                            <TokenBalance
+                                                decimals={tokenMetadata.decimals || 0}
+                                                symbol={tokenMetadata.symbol}
+                                                balance={currentBalance}
+                                            />
+                                        </div>
+                                    </div>
+                                </div>
+                                <SearchIcon className="token-picker-button__search-icon" />
+                            </div>
+                        </Button>
                     </div>
                     <AmountInput
                         register={f.register}
