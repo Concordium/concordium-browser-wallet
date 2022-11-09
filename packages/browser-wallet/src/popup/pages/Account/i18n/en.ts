@@ -73,6 +73,8 @@ const t = {
             noValidTokenError: 'Token either does not exist or cannot be used in wallet',
             noTokensChange: 'No updates made to token list.',
             tokensChanged: 'Token list updated.',
+            missingMetadata: 'Tokens could not be shown due to missing metadata.',
+            emptyList: 'No tokens found.',
         },
         unownedUnique: 'Not owned',
     },

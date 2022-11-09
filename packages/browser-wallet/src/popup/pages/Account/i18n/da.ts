@@ -75,6 +75,8 @@ const t: typeof en = {
             noValidTokenError: 'Token eksisterer enten ikke eller kan ikke vises i wallet',
             noTokensChange: 'Ingen opdateringer til tokenliste.',
             tokensChanged: 'Tokenliste opdateret.',
+            missingMetadata: 'Tokens kunne ikke vises på grund af manglende metadata.',
+            emptyList: 'Ingen tokens fundet.',
         },
         unownedUnique: 'Ikke ejet',
     },

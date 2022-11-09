@@ -1,11 +1,11 @@
 import { atom } from 'jotai';
-import { isDefined, MakeOptional } from 'wallet-common-helpers';
+import { MakeOptional } from 'wallet-common-helpers';
 
 import { selectedAccountAtom } from '@popup/store/account';
 import { jsonRpcClientAtom, networkConfigurationAtom } from '@popup/store/settings';
 import { ensureDefined } from '@shared/utils/basic-helpers';
 import { ContractDetails, ContractTokenDetails } from '@shared/utils/token-helpers';
-import { resetOnUnmountAtom } from '@popup/store/utils';
+import { AsyncWrapper, resetOnUnmountAtom } from '@popup/store/utils';
 import { fetchTokensConfigure, FetchTokensResponse } from './utils';
 
 type Action<T extends string | number> = {
@@ -39,9 +39,7 @@ export const contractTokensAtom = (() => {
 
     const derived = atom<ContractTokens, TokensAtomAction, Promise<void>>(
         (get) => {
-            const tokens = get(listAtom)
-                .filter((td) => isDefined(td.metadata))
-                .map(({ pageId, ...td }) => td as ContractTokenDetails);
+            const tokens = get(listAtom).map(({ pageId, ...td }) => td as ContractTokenDetails);
 
             return {
                 hasMore: get(hasMoreAtom),
@@ -90,5 +88,8 @@ export const contractTokensAtom = (() => {
 export const topTokensAtom = resetOnUnmountAtom<ContractTokenDetails[]>([]);
 export const checkedTokensAtom = resetOnUnmountAtom<string[]>([]);
 export const searchAtom = resetOnUnmountAtom<string>('');
-export const searchResultAtom = resetOnUnmountAtom<ContractTokenDetails | undefined>(undefined);
+export const searchResultAtom = resetOnUnmountAtom<AsyncWrapper<ContractTokenDetails[] | undefined>>({
+    loading: false,
+    value: undefined,
+});
 export const listScrollPositionAtom = resetOnUnmountAtom<number>(0);

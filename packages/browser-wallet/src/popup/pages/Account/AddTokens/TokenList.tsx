@@ -1,7 +1,7 @@
 import React, { CSSProperties, forwardRef, ReactNode, useCallback, useEffect, useRef, useState } from 'react';
 import { useTranslation } from 'react-i18next';
 import { useNavigate } from 'react-router-dom';
-import { noOp, useUpdateEffect } from 'wallet-common-helpers';
+import { isDefined, noOp, useUpdateEffect } from 'wallet-common-helpers';
 import { isHex, JsonRpcClient } from '@concordium/web-sdk';
 import { useAtom, useAtomValue, useSetAtom } from 'jotai';
 import debounce from 'lodash.debounce';
@@ -20,6 +20,7 @@ import { currentAccountTokensAtom } from '@popup/store/token';
 import { NetworkConfiguration } from '@shared/storage/types';
 import { ensureDefined } from '@shared/utils/basic-helpers';
 import ContractTokenLine, { ChoiceStatus } from '@popup/shared/ContractTokenLine';
+import { AsyncWrapper } from '@popup/store/utils';
 import {
     checkedTokensAtom,
     contractDetailsAtom,
@@ -82,29 +83,49 @@ const InfiniteTokenList = forwardRef<HTMLDivElement, InfiniteTokenListProps>(
     }
 );
 
+/**
+ * Debounced token ID lookup function.
+ * Sets result.value to empty list on error, list with 1 token on successful lookup, and undefined while loading.
+ * Invoking with empty searchQuery param aborts previous invocations.
+ */
 const lookupTokenIdConfigure = (
     contractDetails: ContractDetails,
     client: JsonRpcClient,
     network: NetworkConfiguration,
     account: string
-) =>
-    debounce(
-        async (q: string, setResult: (ctd: ContractTokenDetails | undefined) => void, onNoValidToken: () => void) => {
-            try {
-                const [token] = await getTokens(contractDetails, client, network, account, [q]);
+) => {
+    let ac: AbortController;
 
-                if (token?.metadata !== undefined) {
-                    setResult(token as ContractTokenDetails);
-                } else {
-                    throw new Error('No valid token found');
-                }
+    return debounce(
+        async (searchQuery: string, setResult: (ctd: AsyncWrapper<ContractTokenDetails[] | undefined>) => void) => {
+            ac?.abort();
+            ac = new AbortController();
+            const { signal } = ac;
+
+            let value: ContractTokenDetails[] | undefined;
+
+            if (!searchQuery) {
+                return;
+            }
+
+            setResult({ loading: true, value: undefined });
+
+            try {
+                const [token] = await getTokens(contractDetails, client, network, account, [searchQuery]);
+
+                value = [token as ContractTokenDetails];
             } catch {
-                onNoValidToken();
-                setResult(undefined);
+                value = [];
+            }
+
+            if (!signal.aborted) {
+                setResult({ loading: false, value });
             }
         },
-        500
+        500,
+        { leading: true }
     );
+};
 
 const validateId = (id: string | undefined, message: string) => {
     if (!id || isHex(id)) {
@@ -138,7 +159,6 @@ export default function TokenList() {
     const [checked, setChecked] = useAtom(checkedTokensAtom);
     const [search, setSearch] = useAtom(searchAtom);
     const [searchResult, setSearchResult] = useAtom(searchResultAtom);
-    const showToast = useSetAtom(addToastAtom);
     const [searchError, setSearchError] = useState<string | undefined>();
     const lookupTokenId = useLookupTokenId();
     const listRef = useRef<HTMLDivElement>(null);
@@ -146,14 +166,15 @@ export default function TokenList() {
     const addToast = useSetAtom(addToastAtom);
 
     const allTokens = [...topTokens, ...contractTokens.filter((ct) => !topTokens.some((tt) => tt.id === ct.id))];
-    const displayTokens = searchResult !== undefined ? [searchResult] : allTokens;
+    const displayTokens = searchResult.value !== undefined ? searchResult.value : allTokens;
+    const filteredDisplayTokens = displayTokens.filter((td) => isDefined(td.metadata));
 
     useUpdateEffect(() => {
-        if (search) {
-            lookupTokenId(search, setSearchResult, () => showToast(t('noValidTokenError')));
-        } else {
-            setSearchResult(undefined);
+        if (!search) {
+            setSearchResult({ loading: false, value: undefined });
         }
+
+        lookupTokenId(search, setSearchResult);
     }, [search]);
 
     useEffect(() => {
@@ -182,12 +203,11 @@ export default function TokenList() {
             }
 
             setChecked((cs) => [...cs, token.id]);
-
-            if (searchResult !== undefined) {
-                setTopTokens((tts) => [...tts, searchResult]);
+            if (searchResult.value !== undefined) {
+                setTopTokens((tts) => [...tts, ...(searchResult.value ?? [])]);
             }
         },
-        [searchResult, checked, setChecked]
+        [searchResult.value, checked, setChecked]
     );
 
     const hasListChanged = useCallback(
@@ -225,8 +245,10 @@ export default function TokenList() {
         }
     };
 
-    const hasNextPage = searchResult === undefined && hasMore;
-    const initialLoading = contractTokens.length === 0 && loading;
+    const hasNextPage = searchResult.value === undefined && hasMore;
+    const listLoading = searchResult.loading;
+    const emptyList = !listLoading && displayTokens.length === 0 && filteredDisplayTokens.length === 0;
+    const missingMetadata = displayTokens.length !== filteredDisplayTokens.length;
 
     return (
         <div className="add-tokens-list">
@@ -238,10 +260,16 @@ export default function TokenList() {
                 error={searchError}
             />
             <div className="add-tokens-list__tokens">
-                {initialLoading && <PendingArrows className="loading add-tokens-list__loading" />}
-                {initialLoading || (
+                {listLoading && <PendingArrows className="loading add-tokens-list__loading loading--delay" />}
+                {(emptyList || missingMetadata) && (
+                    <p className="w-full text-center p-h-20">
+                        {emptyList && t('emptyList')}
+                        {missingMetadata && t('missingMetadata')}
+                    </p>
+                )}
+                {!emptyList && !missingMetadata && !listLoading && (
                     <InfiniteTokenList
-                        tokens={displayTokens}
+                        tokens={filteredDisplayTokens}
                         loadNextPage={() => updateTokens({ type: 'next' })}
                         hasNextPage={hasNextPage}
                         isNextPageLoading={loading}
