@@ -46,6 +46,8 @@ const t: typeof en = {
             title: 'Send {{ symbol }}',
             amount: 'Mængde',
             receiver: 'Modtager',
+            showTransfer: 'Vis overførslesdetaljer',
+            showContract: 'Vis kontraktdetaljer',
         },
     },
     tokenDetails: {

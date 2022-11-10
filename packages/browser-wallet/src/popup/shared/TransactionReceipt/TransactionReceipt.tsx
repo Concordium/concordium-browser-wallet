@@ -1,6 +1,7 @@
+/* eslint-disable react/destructuring-assignment */
 import clsx from 'clsx';
 import { useTranslation } from 'react-i18next';
-import React from 'react';
+import React, { useState } from 'react';
 import DisplayAddress, { AddressDisplayFormat } from 'wallet-common-helpers/src/components/DisplayAddress';
 import { chunkString } from 'wallet-common-helpers';
 import {
@@ -21,6 +22,7 @@ import DisplayInitContract from './displayPayload/DisplayInitContract';
 import DisplaySimpleTransfer from './displayPayload/DisplaySimpleTransfer';
 import DisplayGenericPayload from './displayPayload/DisplayGenericPayload';
 import TokenBalance from '../TokenBalance';
+import Button from '../Button';
 
 export type GenericTransactionReceiptProps = {
     className?: string;
@@ -30,6 +32,23 @@ export type GenericTransactionReceiptProps = {
     sender: string;
     cost?: bigint;
     hash?: string;
+};
+
+type TransactionReceiptProps = GenericTransactionReceiptProps & {
+    onAlternate?(): void;
+    alternateText?: string;
+};
+
+type TransactionReceiptViewProps = Omit<TransactionReceiptProps, 'transactionType' | 'parameters' | 'payload'> & {
+    title: string;
+    children: JSX.Element;
+};
+
+export type TokenTransferReceiptProps = GenericTransactionReceiptProps & {
+    symbol: string;
+    payload: UpdateContractPayload;
+    parameters: Cis2TransferParameters;
+    metadata: TokenMetadata;
 };
 
 function displayPayload({ payload, type }: Omit<AccountTransaction, 'header'>, parameters?: SmartContractParameters) {
@@ -45,12 +64,8 @@ function displayPayload({ payload, type }: Omit<AccountTransaction, 'header'>, p
     }
 }
 
-type TransactionReceiptProps = Omit<GenericTransactionReceiptProps, 'transactionType' | 'parameters' | 'payload'> & {
-    title: string;
-    children: JSX.Element;
-};
-
-function TransactionReceipt({ className, sender, hash, cost, title, children }: TransactionReceiptProps) {
+function TransactionReceiptView(props: TransactionReceiptViewProps) {
+    const { className, sender, hash, cost, title, children, onAlternate, alternateText = '' } = props;
     const { t } = useTranslation('shared', { keyPrefix: 'transactionReceipt' });
 
     return (
@@ -64,6 +79,11 @@ function TransactionReceipt({ className, sender, hash, cost, title, children }: 
             />
             {children}
             <DisplayCost className="transaction-receipt__cost" cost={cost} />
+            {onAlternate !== undefined && (
+                <Button clear onClick={onAlternate} className="m-t-10 color-cta">
+                    {alternateText}
+                </Button>
+            )}
             {hash && (
                 <div className="transaction-receipt__hash">
                     {chunkString(hash, 32).map((chunk) => (
@@ -77,35 +97,21 @@ function TransactionReceipt({ className, sender, hash, cost, title, children }: 
     );
 }
 
-export default function GenericTransactionReceipt({
-    transactionType,
-    parameters,
-    payload,
-    ...props
-}: GenericTransactionReceiptProps) {
+function TransactionReceipt({ transactionType, parameters, payload, ...props }: TransactionReceiptProps) {
     return (
-        <TransactionReceipt {...props} title={getTransactionTypeName(transactionType)}>
+        <TransactionReceiptView {...props} title={getTransactionTypeName(transactionType)}>
             {displayPayload({ type: transactionType, payload }, parameters)}
-        </TransactionReceipt>
+        </TransactionReceiptView>
     );
 }
 
-export type TokenTransferReceiptProps = GenericTransactionReceiptProps & {
-    symbol: string;
-    payload: UpdateContractPayload;
-    parameters: Cis2TransferParameters;
-    metadata: TokenMetadata;
-};
+export default function GenericTransactionReceipt(props: GenericTransactionReceiptProps) {
+    return <TransactionReceipt {...props} />;
+}
 
-export function TokenTransferReceipt({
-    transactionType,
-    parameters,
-    payload,
-    symbol,
-    metadata,
-    ...props
-}: TokenTransferReceiptProps) {
+export function TokenTransferReceipt({ parameters, symbol, metadata, ...props }: TokenTransferReceiptProps) {
     const { t } = useTranslation('shared', { keyPrefix: 'transactionReceipt.tokenTransfer' });
+    const [advanced, setAdvanced] = useState(false);
 
     const [
         {
@@ -119,8 +125,25 @@ export function TokenTransferReceipt({
         },
     ] = parameters;
 
+    if (advanced) {
+        return (
+            <TransactionReceipt
+                {...props}
+                parameters={parameters}
+                onAlternate={() => setAdvanced(false)}
+                alternateText={t('showTransfer')}
+            />
+        );
+    }
+
     return (
-        <TransactionReceipt {...props} sender={from} title={t('title', { symbol: trunctateSymbol(symbol) })}>
+        <TransactionReceiptView
+            {...props}
+            sender={from}
+            title={t('title', { symbol: trunctateSymbol(symbol) })}
+            onAlternate={() => setAdvanced(true)}
+            alternateText={t('showContract')}
+        >
             <>
                 <h5>{t('amount')}:</h5>
                 <div>
@@ -133,6 +156,6 @@ export function TokenTransferReceipt({
                     format={AddressDisplayFormat.DoubleLine}
                 />
             </>
-        </TransactionReceipt>
+        </TransactionReceiptView>
     );
 }

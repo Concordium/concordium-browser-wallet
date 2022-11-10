@@ -7,12 +7,7 @@ $transaction-receipt-horizontal-padding: rem(20px);
     background-color: $color-bg;
     border: rem(1px) solid $color-grey;
     border-radius: rem(10px);
-    padding: rem(5px) $transaction-receipt-horizontal-padding rem(10px);
-
-    h5 {
-        margin-top: rem(10px);
-        margin-bottom: 0;
-    }
+    padding: rem(10px) $transaction-receipt-horizontal-padding;
 
     &__hash,
     &__title {
@@ -23,7 +18,7 @@ $transaction-receipt-horizontal-padding: rem(20px);
 
     &__title {
         border-bottom: rem(0.5px) solid $color-grey;
-        padding-bottom: rem(5px);
+        padding-bottom: rem(10px);
     }
 
     &__address {
@@ -58,6 +53,11 @@ $transaction-receipt-horizontal-padding: rem(20px);
         width: rem(180px);
         overflow-wrap: break-word;
     }
+}
+
+:where(.transaction-receipt) h5 {
+    margin-top: rem(10px);
+    margin-bottom: 0;
 }
 
 .display-cost {

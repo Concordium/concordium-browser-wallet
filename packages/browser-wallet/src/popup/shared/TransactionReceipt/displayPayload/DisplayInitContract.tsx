@@ -20,7 +20,7 @@ export default function DisplayInitContract({ payload, parameters }: Props) {
             <h5>{t('moduleReference')}:</h5>
             <div className="transaction-receipt__module-ref">{payload.moduleRef.moduleRef}</div>
             <h5>{t('contractName')}:</h5>
-            <p>{payload.contractName}</p>
+            <div>{payload.contractName}</div>
             <h5>{t('amount')}:</h5>
             {displayAsCcd(payload.amount.microGtuAmount)}
             <h5>{t('maxEnergy')}:</h5>
@@ -29,13 +29,13 @@ export default function DisplayInitContract({ payload, parameters }: Props) {
             </span>
             {!!parameters && (
                 <>
-                    <h5>{t('parameter')}:</h5>
+                    <h5 className="m-b-5">{t('parameter')}:</h5>
                     <pre className="transaction-receipt__parameter">{JSON.stringify(parameters, null, 2)}</pre>
                 </>
             )}
             {!parameters && !!payload.parameter.length && (
                 <>
-                    <h5>{t('parameter')} (hex):</h5>
+                    <h5 className="m-b-5">{t('parameter')} (hex):</h5>
                     <pre className="transaction-receipt__parameter">
                         {JSON.stringify(payload.parameter.toString('hex'), null, 2)}
                     </pre>

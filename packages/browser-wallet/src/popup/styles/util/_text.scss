@@ -10,3 +10,19 @@ $line-clamps: (2, 3);
         @include multiline-clamp($lines);
     }
 }
+
+.mono {
+    font-family: $font-family-mono;
+}
+
+.text-faded {
+    color: $color-text-faded;
+}
+
+.text-bold {
+    font-weight: $font-weight-bold;
+}
+
+.color-cta {
+    color: $color-cta;
+}

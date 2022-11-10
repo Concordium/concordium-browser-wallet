@@ -44,6 +44,8 @@ const t = {
             title: 'Send {{ symbol }}',
             amount: 'Amount',
             receiver: 'Receiver',
+            showTransfer: 'Show simple details',
+            showContract: 'Show full details',
         },
     },
     tokenDetails: {
