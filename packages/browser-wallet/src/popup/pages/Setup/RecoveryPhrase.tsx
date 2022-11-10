@@ -51,7 +51,7 @@ export function EnterRecoveryPhrase() {
             <PageHeader canGoBack>{t('recoveryPhrase.title')}</PageHeader>
             <div className="onboarding-setup__page-with-header">
                 <div className="onboarding-setup__page-with-header__description">
-                    {t('confirmRecoveryPhrase.description')}
+                    {t('confirmRecoveryPhrase.newPhrase')}
                 </div>
                 <div className="p-10">
                     <Form<FormValues> onSubmit={handleSubmit}>
