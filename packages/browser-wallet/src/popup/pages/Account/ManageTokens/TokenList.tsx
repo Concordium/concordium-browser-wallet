@@ -258,6 +258,7 @@ export default function TokenList() {
                 type="search"
                 label={t('searchLabel', { contractName: contractDetails.contractName })}
                 onChange={(e) => setSearch(e.target.value)}
+                value={search}
                 error={searchError}
             />
             <div className="add-tokens-list__tokens">
