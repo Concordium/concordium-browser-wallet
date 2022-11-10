@@ -24,6 +24,7 @@ import {
     storedTokenMetadata,
     sessionPendingTransactions,
     sessionCookie,
+    sessionOpenPrompt,
 } from '@shared/storage/access';
 import { ChromeStorageKey } from '@shared/storage/types';
 import { atom, PrimitiveAtom, WritableAtom } from 'jotai';
@@ -51,6 +52,7 @@ const accessorMap = {
     [ChromeStorageKey.TokenMetadata]: storedTokenMetadata,
     [ChromeStorageKey.PendingTransactions]: useIndexedStorage(sessionPendingTransactions, getGenesisHash),
     [ChromeStorageKey.Cookie]: useIndexedStorage(sessionCookie, getGenesisHash),
+    [ChromeStorageKey.OpenPrompt]: sessionOpenPrompt,
 };
 
 export function resetOnUnmountAtom<V>(initial: V): PrimitiveAtom<V> {
