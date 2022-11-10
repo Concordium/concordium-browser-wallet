@@ -72,7 +72,7 @@ async function updateStateWCCDBalanceAccount(account: string, setAmountAccount: 
         hexString += `0${(byte & 0xff).toString(16)}`.slice(-2); // eslint-disable-line no-bitwise
     });
 
-    // Adding '00' because enum 0 (an `Account`) was selected instead of enum 1 (an `ContractAddress`).
+    // Adding '00' because enum 0 (an `Account`) was selected instead of enum 1 (a `ContractAddress`).
     const inputParams = toBuffer(`00${hexString}`, 'hex');
     const provider = await detectConcordiumProvider();
     const res = await provider.getJsonRpcClient().invokeContract({
@@ -81,7 +81,7 @@ async function updateStateWCCDBalanceAccount(account: string, setAmountAccount: 
         parameter: inputParams,
     });
     if (!res || res.tag === 'failure' || !res.returnValue) {
-        throw new Error(`Expected succesful invocation`);
+        throw new Error(`Expected successful invocation`);
     }
 
     setAmountAccount(BigInt(leb.decodeULEB128(toBuffer(res.returnValue, 'hex'))[0]));

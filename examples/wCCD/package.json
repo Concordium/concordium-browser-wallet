@@ -6,6 +6,8 @@
         "@concordium/browser-wallet-api-helpers": "latest",
         "@concordium/web-sdk": "^2.0.0",
         "@thi.ng/leb128": "^2.1.18",
+        "@walletconnect/qrcode-modal": "^1.8.0",
+        "@walletconnect/sign-client": "^2.1.1",
         "react": "^18.1.0",
         "react-dom": "^18.1.0"
     },
