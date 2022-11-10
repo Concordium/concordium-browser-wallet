@@ -2,6 +2,10 @@
 
 The example project serves as a working example of how to integrate with smart contracts on the Concordium blockchain. You can create and customize your own voting smart contract via the front-end and deploy it to the Concordium chain. The front-end also provides pages to conduct the voting and display the voting results.
 
+<video controls autoplay>
+  <source src="./video/VotingApplication.webm" type="video/webm">
+</video>
+
 ## Prerequisites
 
 -   The Concordium browser wallet extension must be installed in google chrome and connected to testnet, in order to view smart contract details or submit transactions.
