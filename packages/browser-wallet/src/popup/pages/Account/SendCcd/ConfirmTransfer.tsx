@@ -51,7 +51,6 @@ type ConfirmGenericTransferProps = BaseProps & {
     payload: AccountTransactionPayload;
     transactionType: AccountTransactionType;
     parameters?: SmartContractParameters;
-    symbol: undefined;
 };
 
 type Props = ConfirmTokenTransferProps | ConfirmGenericTransferProps;
