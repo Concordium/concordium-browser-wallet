@@ -75,6 +75,7 @@ function CreateElectionPage() {
                     />
                 </Col>
             </Row>
+            <br />
             <Row>
                 <Col>
                     <h2>Description</h2>
@@ -126,7 +127,7 @@ function CreateElectionPage() {
                         onChange={(e) => setDeadlineMinutesInput(e.target.value)}
                     />
                     <br />
-                    {!submittedTxHash && (
+                    {!submittedTxHash && connectedAccount && (
                         <Button
                             className="w-100"
                             onClick={() => {

@@ -3,10 +3,9 @@ ARG base_image=node:16-slim
 FROM ${base_image} AS build
 
 WORKDIR /app
-COPY ./package.json ./package.json
-COPY ./tsconfig.json ./tsconfig.json
+COPY ./package_docker.json ./package.json
 COPY ./esbuild.config.ts ./
-COPY ./types ./types
+COPY ./public ./public
 COPY ./src ./src
 
 RUN yarn && yarn cache clean
