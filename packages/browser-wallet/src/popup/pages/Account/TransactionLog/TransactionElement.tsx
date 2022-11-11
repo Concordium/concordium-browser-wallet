@@ -186,7 +186,13 @@ export default function TransactionElement({ accountAddress, transaction, style,
     const failed = transaction.status === TransactionStatus.Failed;
     const isSender = transaction.fromAddress === accountAddress;
 
-    const { amount } = transaction;
+    // Flip the amount is selected account is sender, and amount is positive. We expect the transaction list endpoint to sign the amount based on this,
+    // but this is not the case for pending transactions. This seeks to emulate the behaviour of the transaction list endpoint.
+    // TODO: check that this still works when shield, unshield, and encrypted transfers are implemented.
+    const amount =
+        isSender && transaction.status === TransactionStatus.Pending && transaction.amount > 0n
+            ? -transaction.amount
+            : transaction.amount;
 
     return (
         <div
