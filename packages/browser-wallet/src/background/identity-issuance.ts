@@ -19,6 +19,11 @@ const enum MSG { // using const enum here, as typescript compiler replaces uses 
     LIFELINE = 'lifeline',
 }
 
+const isIdpResponse = (details: chrome.webRequest.WebRequestBodyDetails, idpTabId?: number) =>
+    details.url.includes(`${redirectUri}#${codeUriKey}`) && details.tabId === idpTabId;
+const isIdpError = (details: chrome.webRequest.WebRequestBodyDetails) =>
+    details.url.includes(`${redirectUri}#${errorKey}`) && details.tabId === -1;
+
 /**
  * Send a response to the popup thread that ends the identity issuance flow.
  */
@@ -61,47 +66,40 @@ export function addIdpListeners() {
         }
     });
 
-    const handleIdpRequest = (redirectUrl: string, tabId?: number) => {
-        if (tabId !== undefined) {
+    const handleIdpResponse = (redirectUrl: string, tabId?: number) => {
+        if (tabId !== undefined && tabId > -1) {
             chrome.tabs.remove(tabId);
             sessionIdpTab.remove();
         }
 
-        if (redirectUrl.includes(codeUriKey)) {
-            respondPopup({
-                status: BackgroundResponseStatus.Success,
-                result: redirectUrl.substring(redirectUrl.indexOf(codeUriKey) + codeUriKey.length),
-            });
-        } else if (redirectUrl.includes(errorKey)) {
-            const error = decodeURIComponent(redirectUrl.substring(redirectUrl.indexOf(errorKey) + errorKey.length));
-            let message;
-            try {
-                message = JSON.parse(error).error.detail;
-            } catch {
-                message = error;
-            }
+        respondPopup({
+            status: BackgroundResponseStatus.Success,
+            result: redirectUrl.substring(redirectUrl.indexOf(codeUriKey) + codeUriKey.length),
+        });
+    };
 
-            respondPopup({
-                status: BackgroundResponseStatus.Error,
-                reason: message,
-            });
-        } else {
-            respondPopup({
-                status: BackgroundResponseStatus.Error,
-                reason: 'Missing location for identity object',
-            });
+    const handleIdpError = (redirectUrl: string) => {
+        const error = decodeURIComponent(redirectUrl.substring(redirectUrl.indexOf(errorKey) + errorKey.length));
+        let message;
+        try {
+            message = JSON.parse(error).error.detail;
+        } catch {
+            message = error;
         }
+
+        respondPopup({
+            status: BackgroundResponseStatus.Error,
+            reason: message,
+        });
     };
 
     chrome.webRequest.onBeforeRequest.addListener(
         (details) => {
             sessionIdpTab.get().then((idpTabId) => {
-                if (
-                    (details.url.includes(`${redirectUri}#${codeUriKey}`) ||
-                        details.url.includes(`${redirectUri}#${errorKey}`)) &&
-                    (details.tabId === idpTabId || details.tabId === -1)
-                ) {
-                    handleIdpRequest(details.url, idpTabId);
+                if (isIdpResponse(details, idpTabId)) {
+                    handleIdpResponse(details.url, idpTabId);
+                } else if (isIdpError(details)) {
+                    handleIdpError(details.url);
                 }
             });
         },
@@ -172,20 +170,14 @@ async function startIdentityIssuance({
     }
 
     try {
-        chrome.webRequest.onBeforeRedirect.addListener(
-            (response) => {
-                if (!response.redirectUrl.includes(redirectUri)) {
-                    launchExternalIssuance(response.redirectUrl);
-                }
-            },
-            { urls: ['<all_urls>'], tabId: -1 }
-        );
         const response = await fetch(url);
         if (!response.redirected) {
             respondPopup({
                 status: BackgroundResponseStatus.Error,
                 reason: `Initial location did not redirect as expected.`,
             });
+        } else if (!response.url.includes(redirectUri)) {
+            launchExternalIssuance(response.url);
         }
         // eslint-disable-next-line @typescript-eslint/no-explicit-any
     } catch (e: any) {
