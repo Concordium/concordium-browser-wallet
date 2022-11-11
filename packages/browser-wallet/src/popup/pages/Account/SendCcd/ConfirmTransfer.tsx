@@ -18,6 +18,7 @@ import TransactionReceipt from '@popup/shared/TransactionReceipt/TransactionRece
 import { useUpdateAtom } from 'jotai/utils';
 import { addPendingTransactionAtom } from '@popup/store/transactions';
 import { SmartContractParameters } from '@shared/utils/types';
+import { accountRoutes } from '../routes';
 
 interface Props {
     setDetailsExpanded: (expanded: boolean) => void;
@@ -106,7 +107,11 @@ export default function ConfirmTransfer({
             )}
             {hash && (
                 <div className="p-b-10">
-                    <Button width="medium" className="m-b-10" onClick={() => nav(absoluteRoutes.home.account.path)}>
+                    <Button
+                        width="medium"
+                        className="m-b-10"
+                        onClick={() => nav(`${absoluteRoutes.home.account.path}/${accountRoutes.log}`)}
+                    >
                         {t('sendCcd.buttons.finish')}
                     </Button>
                 </div>
