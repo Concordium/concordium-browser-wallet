@@ -3,6 +3,7 @@ import { useAtom, useAtomValue } from 'jotai';
 import { useForm, SubmitHandler } from 'react-hook-form';
 import { useTranslation } from 'react-i18next';
 import { Navigate, Route, Routes, useLocation, useNavigate, Location } from 'react-router-dom';
+import { useUpdateEffect } from 'wallet-common-helpers';
 
 import Form from '@popup/shared/Form';
 import FormInput from '@popup/shared/Form/Input';
@@ -172,6 +173,7 @@ export default function AddTokens() {
     const currentContractBalances = useAtomValue(
         contractBalancesFamily(account, contractDetails?.index.toString() ?? '')
     );
+    const nav = useNavigate();
 
     // Keep the following in memory while add token flow lives
     const [, setChecked] = useAtom(checkedTokensAtom);
@@ -198,6 +200,10 @@ export default function AddTokens() {
             setChecked(currentChecked.map((t) => t.id));
         }
     }, [contractDetails?.index, accountTokens.loading]);
+
+    useUpdateEffect(() => {
+        nav('..');
+    }, [account]);
 
     return (
         <Routes>
