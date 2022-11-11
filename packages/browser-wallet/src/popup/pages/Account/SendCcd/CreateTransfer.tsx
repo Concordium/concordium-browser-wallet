@@ -36,6 +36,7 @@ import { addToastAtom } from '@popup/state';
 import TokenBalance from '@popup/shared/TokenBalance';
 import Button from '@popup/shared/Button';
 import SearchIcon from '@assets/svg/search.svg';
+import { SIMPLE_TRANSFER_ENERGY_TOTAL_COST } from '@shared/utils/energy-helpers';
 import { routes } from './routes';
 import PickToken from './PickToken';
 
@@ -117,7 +118,7 @@ function CreateTransaction({ exchangeRate, tokens, setCost, setDetailsExpanded }
                     return undefined;
                 }
             }
-            return 501n;
+            return SIMPLE_TRANSFER_ENERGY_TOTAL_COST;
         },
         undefined,
         [chosenToken?.contractIndex, chosenToken?.tokenId, recipient]
