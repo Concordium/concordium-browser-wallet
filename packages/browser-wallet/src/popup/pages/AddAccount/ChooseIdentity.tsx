@@ -39,7 +39,7 @@ export default function ChooseIdentity() {
 
     return (
         <div className="flex-column align-center">
-            <p className="m-t-20">{t('chooseIdentity')}</p>
+            <p className="m-t-20 text-center p-h-10">{t('chooseIdentity')}</p>
             {identities.map((identity, i) => {
                 if (identity.status === CreationStatus.Confirmed) {
                     return (
