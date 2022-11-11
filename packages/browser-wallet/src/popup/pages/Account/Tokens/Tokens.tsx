@@ -54,9 +54,16 @@ function AddTokensDescription({ tokens }: AddTokensDescriptionProps) {
         if (tokens.length === 0) {
             return t('listEmpty');
         }
+        if (tokens.length < 3) {
+            return t('listAddMore');
+        }
 
-        return t('listAddMore');
+        return undefined;
     }, [tokens]);
+
+    if (listStateText === undefined) {
+        return null;
+    }
 
     return <div className="token-list__add-more-text">{listStateText}</div>;
 }
