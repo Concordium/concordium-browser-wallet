@@ -67,7 +67,7 @@ const t: typeof en = {
             cis2Error: 'Kontrakten supporterer ikke CIS-2',
             noTokensError: 'Ingen tokens fundet i kontrakten',
             contractIndex: 'Kontrakt indeks',
-            hexId: 'Id skal være HEX encodet',
+            hexId: 'Ugyldigt token ID (skal være HEX encodet)',
             updateTokens: 'Opdater tokens',
             chooseContractHeader: 'Indtast et kontraktindeks til at vælge tokens fra.',
             ItemBalancePre: 'Din saldo: ',
