@@ -18,7 +18,8 @@ $transaction-receipt-horizontal-padding: rem(20px);
 
     &__title {
         border-bottom: rem(0.5px) solid $color-grey;
-        padding-bottom: rem(10px);
+        padding: 0 rem(10px) rem(10px);
+        @include singleline-clamp;
     }
 
     &__address {

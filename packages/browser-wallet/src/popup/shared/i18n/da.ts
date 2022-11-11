@@ -43,7 +43,7 @@ const t: typeof en = {
         cost: 'Estimerede transaktionsomkostninger',
         unknown: 'Ukendt',
         tokenTransfer: {
-            title: 'Send {{ symbol }}',
+            title: 'Send {{ tokenName }}',
             amount: 'Mængde',
             receiver: 'Modtager',
             showTransfer: 'Vis overførslesdetaljer',

@@ -42,7 +42,6 @@ type ConfirmTokenTransferProps = BaseProps & {
     transactionType: AccountTransactionType.UpdateSmartContractInstance;
     payload: UpdateContractPayload;
     parameters: SmartContractParameters;
-    symbol: string;
     metadata: TokenMetadata;
 };
 
@@ -119,7 +118,6 @@ export default function ConfirmTransfer(props: Props) {
             {props.showAsTokenTransfer ? (
                 <TokenTransferReceipt
                     {...commonProps}
-                    symbol={props.symbol}
                     payload={props.payload}
                     metadata={props.metadata}
                     parameters={props.parameters as Cis2TransferParameters}

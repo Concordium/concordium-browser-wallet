@@ -25,7 +25,6 @@ interface State extends SimpleTransferPayload {
 export default function ConfirmTokenTransfer({ setDetailsExpanded, cost }: Props) {
     const { state } = useLocation();
     const { toAddress, amount, contractIndex, tokenId, executionEnergy, metadata } = state as State;
-    const { symbol = 'CIS-2' } = metadata;
     const selectedAddress = useAtomValue(selectedAccountAtom);
     const client = useAtomValue(jsonRpcClientAtom);
     const addToast = useSetAtom(addToastAtom);
@@ -57,7 +56,6 @@ export default function ConfirmTokenTransfer({ setDetailsExpanded, cost }: Props
     return (
         <ConfirmTransfer
             showAsTokenTransfer
-            symbol={symbol}
             metadata={metadata}
             setDetailsExpanded={setDetailsExpanded}
             cost={cost}

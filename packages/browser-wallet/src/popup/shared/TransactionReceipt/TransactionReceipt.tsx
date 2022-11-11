@@ -14,7 +14,6 @@ import {
 } from '@concordium/web-sdk';
 import { Cis2TransferParameters, SmartContractParameters } from '@shared/utils/types';
 import { TokenMetadata } from '@shared/storage/types';
-import { trunctateSymbol } from '@shared/utils/token-helpers';
 import DisplayCost from './DisplayCost';
 import { getTransactionTypeName } from '../utils/transaction-helpers';
 import DisplayUpdateContract from './displayPayload/DisplayUpdateContract';
@@ -45,7 +44,6 @@ type TransactionReceiptViewProps = Omit<TransactionReceiptProps, 'transactionTyp
 };
 
 export type TokenTransferReceiptProps = GenericTransactionReceiptProps & {
-    symbol: string;
     payload: UpdateContractPayload;
     parameters: Cis2TransferParameters;
     metadata: TokenMetadata;
@@ -109,7 +107,7 @@ export default function GenericTransactionReceipt(props: GenericTransactionRecei
     return <TransactionReceipt {...props} />;
 }
 
-export function TokenTransferReceipt({ parameters, symbol, metadata, ...props }: TokenTransferReceiptProps) {
+export function TokenTransferReceipt({ parameters, metadata, ...props }: TokenTransferReceiptProps) {
     const { t } = useTranslation('shared', { keyPrefix: 'transactionReceipt.tokenTransfer' });
     const [advanced, setAdvanced] = useState(false);
 
@@ -136,11 +134,13 @@ export function TokenTransferReceipt({ parameters, symbol, metadata, ...props }:
         );
     }
 
+    const tokenName = metadata.name ?? metadata.symbol ?? 'CIS-2 Token';
+
     return (
         <TransactionReceiptView
             {...props}
             sender={from}
-            title={t('title', { symbol: trunctateSymbol(symbol) })}
+            title={t('title', { tokenName })}
             onAlternate={() => setAdvanced(true)}
             alternateText={t('showContract')}
         >

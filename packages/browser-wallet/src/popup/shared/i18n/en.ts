@@ -41,7 +41,7 @@ const t = {
         cost: 'Estimated transaction fee',
         unknown: 'Unknown',
         tokenTransfer: {
-            title: 'Send {{ symbol }}',
+            title: 'Send {{ tokenName }}',
             amount: 'Amount',
             receiver: 'Receiver',
             showTransfer: 'Show simple details',
