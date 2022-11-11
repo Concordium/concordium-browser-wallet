@@ -80,7 +80,7 @@ function Nft({ token, balance, contractIndex, subIndex }: TokenProps) {
     return (
         <>
             <h3 className="token-details__header">
-                {thumbnail && <img src={thumbnail.url} alt={`${name} thumbnail`} />}
+                {thumbnail && <img src={thumbnail.url} alt={name} />}
                 {name}
             </h3>
             <TokenDetailsLine header={t('ownership')}>
@@ -107,9 +107,11 @@ function Nft({ token, balance, contractIndex, subIndex }: TokenProps) {
             </TokenDetailsLine>
             <TokenDetailsLine header={t('tokenId')}>{token.id}</TokenDetailsLine>
             <ShowRawMetadata metadata={token.metadata} />
-            <div className="token-details__image">
-                <img src={display?.url} alt={name} />
-            </div>
+            {display?.url && (
+                <div className="token-details__image">
+                    <img src={display?.url} alt={name} />
+                </div>
+            )}
         </>
     );
 }
@@ -121,7 +123,7 @@ function Ft({ token, balance, contractIndex, subIndex = SUB_INDEX }: TokenProps)
     return (
         <>
             <h3 className="token-details__header">
-                {thumbnail && <img src={thumbnail.url} alt={`${name} thumbnail`} />}
+                {thumbnail && <img src={thumbnail.url} alt={name} />}
                 {name}
             </h3>
             <TokenDetailsLine header={t('balance')}>

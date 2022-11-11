@@ -1,4 +1,4 @@
-import React from 'react';
+import React, { useMemo } from 'react';
 import { useTranslation } from 'react-i18next';
 import { Outlet, Route, Routes, useNavigate } from 'react-router-dom';
 import { displayAsCcd } from 'wallet-common-helpers';
@@ -17,7 +17,7 @@ import AtomValue from '@popup/store/AtomValue';
 
 import { tokensRoutes, detailsRoute } from './routes';
 import TokenDetails from './TokenDetails';
-import { useFlattenedAccountTokens } from './utils';
+import { AccountTokenDetails, useFlattenedAccountTokens } from './utils';
 import { accountRoutes } from '../routes';
 
 type FtProps = {
@@ -43,6 +43,24 @@ function useFilteredTokens(account: WalletCredential, unique: boolean) {
     return tokens.filter((t) => (t.metadata.unique ?? false) === unique);
 }
 
+type AddTokensDescriptionProps = {
+    tokens: AccountTokenDetails[];
+};
+
+function AddTokensDescription({ tokens }: AddTokensDescriptionProps) {
+    const { t } = useTranslation('account', { keyPrefix: 'tokens' });
+
+    const listStateText = useMemo(() => {
+        if (tokens.length === 0) {
+            return t('listEmpty');
+        }
+
+        return t('listAddMore');
+    }, [tokens]);
+
+    return <div className="token-list__add-more-text">{listStateText}</div>;
+}
+
 type ListProps = {
     account: WalletCredential;
     toDetails: (contractIndex: string, id: string) => void;
@@ -62,15 +80,16 @@ function Fungibles({ account, toDetails }: ListProps) {
                 <CcdIcon className="token-list__icon token-list__icon--ccd" />
                 <div className="token-list__balance">{displayAsCcd(accountInfo.accountAmount)} CCD</div>
             </div>
-            {tokens.map((t) => (
+            {tokens.map((token) => (
                 <Ft
-                    key={`${t.contractIndex}.${t.id}`}
+                    key={`${token.contractIndex}.${token.id}`}
                     accountAddress={account.address}
-                    contractIndex={t.contractIndex}
-                    token={t}
-                    onClick={() => toDetails(t.contractIndex, t.id)}
+                    contractIndex={token.contractIndex}
+                    token={token}
+                    onClick={() => toDetails(token.contractIndex, token.id)}
                 />
             ))}
+            <AddTokensDescription tokens={tokens} />
         </>
     );
 }
@@ -106,6 +125,7 @@ function Collectibles({ account, toDetails }: ListProps) {
                     </div>
                 </Button>
             ))}
+            <AddTokensDescription tokens={tokens} />
         </>
     );
 }

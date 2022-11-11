@@ -79,6 +79,8 @@ const t: typeof en = {
             emptyList: 'Ingen tokens fundet.',
         },
         unownedUnique: 'Ikke ejet',
+        listAddMore: 'Du kan tilføje flere tokens fra Rediger siden.',
+        listEmpty: 'Du kan tilføje tokens fra Rediger siden.',
     },
     accountPending: 'Denne konto er stadig ved at blive oprettet.',
     accountRejected: 'Denne konto kunne ikke blive oprettet.',

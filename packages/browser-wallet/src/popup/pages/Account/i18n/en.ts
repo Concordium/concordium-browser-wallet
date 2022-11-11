@@ -77,6 +77,8 @@ const t = {
             emptyList: 'No tokens found.',
         },
         unownedUnique: 'Not owned',
+        listAddMore: 'You can add more tokens from the Manage page.',
+        listEmpty: 'You can add tokens from the Manage page.',
     },
     accountPending: 'This account is still pending finalization.',
     accountRejected: 'This account failed to be created.',

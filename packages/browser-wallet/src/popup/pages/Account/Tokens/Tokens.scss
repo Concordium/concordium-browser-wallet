@@ -64,7 +64,15 @@ $tokens-actions-height: rem(26px);
     }
 
     &__ownership {
-        font-size: 10px;
+        font-size: rem(8px);
         color: $color-text-faded;
+    }
+
+    &__add-more-text {
+        color: $color-text-faded;
+        text-align: center;
+        font-size: rem(8px);
+        margin: rem(10px) auto;
+        width: 40%;
     }
 }
