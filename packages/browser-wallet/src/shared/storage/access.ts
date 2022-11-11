@@ -144,6 +144,7 @@ export const storedTokenMetadata = makeStorageAccessor<Record<string, TokenMetad
     ChromeStorageKey.TokenMetadata
 );
 
+export const sessionOpenPrompt = makeStorageAccessor<boolean>('session', ChromeStorageKey.OpenPrompt);
 export const sessionPasscode = makeStorageAccessor<string>('session', ChromeStorageKey.Passcode);
 export const sessionPendingIdentity = makeStorageAccessor<SessionPendingIdentity>(
     'session',

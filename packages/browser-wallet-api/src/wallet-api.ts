@@ -1,4 +1,9 @@
-import { InjectedMessageHandler, createEventTypeFilter, MessageType } from '@concordium/browser-wallet-message-hub';
+import {
+    InjectedMessageHandler,
+    createEventTypeFilter,
+    MessageType,
+    MessageStatusWrapper,
+} from '@concordium/browser-wallet-message-hub';
 import {
     AccountTransactionPayload,
     AccountTransactionSignature,
@@ -52,7 +57,7 @@ class WalletApi extends EventEmitter implements IWalletApi {
      * Sends a sign request to the Concordium Wallet and awaits the users action
      */
     public async signMessage(accountAddress: string, message: string): Promise<AccountTransactionSignature> {
-        const response = await this.messageHandler.sendMessage<AccountTransactionSignature | undefined>(
+        const response = await this.messageHandler.sendMessage<MessageStatusWrapper<AccountTransactionSignature>>(
             MessageType.SignMessage,
             {
                 accountAddress,
@@ -60,25 +65,24 @@ class WalletApi extends EventEmitter implements IWalletApi {
             }
         );
 
-        if (!response) {
+        if (!response.success) {
             throw new Error('Signing rejected');
         }
 
-        return response;
+        return response.result;
     }
 
     /**
      * Requests connection to wallet. Resolves with account address or rejects if rejected in wallet.
      */
     public async connect(): Promise<string | undefined> {
-        const response = await this.messageHandler.sendMessage<string | undefined | false>(MessageType.Connect);
+        const response = await this.messageHandler.sendMessage<MessageStatusWrapper<string>>(MessageType.Connect);
 
-        // TODO Response becomes === null when we would expect it to be undefined. Catching it here is a temporary quick-fix.
-        if (response === false || response === null) {
-            throw new Error('Connection rejected');
+        if (!response.success) {
+            throw new Error(response.message);
         }
 
-        return response;
+        return response.result;
     }
 
     /**
@@ -105,20 +109,23 @@ class WalletApi extends EventEmitter implements IWalletApi {
         schema?: string,
         schemaVersion?: SchemaVersion
     ): Promise<string> {
-        const response = await this.messageHandler.sendMessage<string | undefined>(MessageType.SendTransaction, {
-            accountAddress,
-            type,
-            payload: stringify(payload),
-            parameters,
-            schema,
-            schemaVersion,
-        });
+        const response = await this.messageHandler.sendMessage<MessageStatusWrapper<string>>(
+            MessageType.SendTransaction,
+            {
+                accountAddress,
+                type,
+                payload: stringify(payload),
+                parameters,
+                schema,
+                schemaVersion,
+            }
+        );
 
-        if (!response) {
-            throw new Error('Signing rejected');
+        if (!response.success) {
+            throw new Error(response.message);
         }
 
-        return response;
+        return response.result;
     }
 
     private handleEvent(type: EventType) {
