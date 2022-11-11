@@ -18,26 +18,26 @@ export default function DisplayUpdateContract({ payload, parameters }: Props) {
     return (
         <>
             <h5>{t('contractIndex')}:</h5>
-            <p>
+            <div>
                 {payload.contractAddress.index.toString()} ({payload.contractAddress.subindex.toString()})
-            </p>
+            </div>
             <h5>{t('receiveName')}:</h5>
-            <p>{payload.receiveName}</p>
+            <div>{payload.receiveName}</div>
             <h5>{t('amount')}:</h5>
             {displayAsCcd(payload.amount.microGtuAmount)}
             <h5>{t('maxEnergy')}:</h5>
-            <p>
+            <div>
                 {payload.maxContractExecutionEnergy.toString()} {t('nrg')}
-            </p>
+            </div>
             {!!parameters && (
                 <>
-                    <h5>{t('parameter')}:</h5>
+                    <h5 className="m-b-5">{t('parameter')}:</h5>
                     <pre className="transaction-receipt__parameter">{JSON.stringify(parameters, null, 2)}</pre>
                 </>
             )}
             {!parameters && !!payload.parameter.length && (
                 <>
-                    <h5>{t('parameter')} (hex):</h5>
+                    <h5 className="m-b-5">{t('parameter')} (hex):</h5>
                     <pre className="transaction-receipt__parameter">
                         {JSON.stringify(payload.parameter.toString('hex'), null, 2)}
                     </pre>

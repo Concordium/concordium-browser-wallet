@@ -9,12 +9,7 @@ import Form from '@popup/shared/Form';
 import FormInput from '@popup/shared/Form/Input';
 import Submit from '@popup/shared/Form/Submit';
 import { jsonRpcClientAtom, networkConfigurationAtom } from '@popup/store/settings';
-import {
-    CIS2ConfirmationError,
-    confirmCIS2Contract,
-    ContractDetails,
-    ContractTokenDetails,
-} from '@shared/utils/token-helpers';
+import { confirmCIS2Contract, ContractDetails, ContractTokenDetails } from '@shared/utils/token-helpers';
 import TokenDetails from '@popup/shared/TokenDetails';
 import { selectedAccountAtom } from '@popup/store/account';
 import { ensureDefined } from '@shared/utils/basic-helpers';
@@ -67,20 +62,6 @@ function ChooseContract() {
         nav(manageTokensRoutes.update, { replace: true });
     };
 
-    const cis2ErrorText = useCallback((error: CIS2ConfirmationError) => {
-        switch (error) {
-            case CIS2ConfirmationError.Cis0Error: {
-                return t('cis0Error');
-            }
-            case CIS2ConfirmationError.Cis2Error: {
-                return t('cis2Error');
-            }
-            default: {
-                throw new Error('Unsupported error type.');
-            }
-        }
-    }, []);
-
     const validateIndex = useCallback(
         debouncedAsyncValidate<string>(
             async (value) => {
@@ -96,7 +77,7 @@ function ChooseContract() {
                 const error = await confirmCIS2Contract(client, cd);
 
                 if (error !== undefined) {
-                    return cis2ErrorText(error);
+                    return error;
                 }
 
                 const response = await fetchTokensConfigure(cd, client, network, account)();
