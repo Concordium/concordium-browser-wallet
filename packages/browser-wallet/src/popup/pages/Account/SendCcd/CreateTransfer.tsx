@@ -29,7 +29,12 @@ import {
 import { useAccountInfo } from '@popup/shared/AccountInfoListenerContext';
 import { useSelectedCredential } from '@popup/shared/utils/account-helpers';
 import { CCD_METADATA } from '@shared/constants/token-metadata';
-import { getTokenTransferEnergy, TokenIdentifier, trunctateSymbol } from '@shared/utils/token-helpers';
+import {
+    getMetadataDecimals,
+    getTokenTransferEnergy,
+    TokenIdentifier,
+    trunctateSymbol,
+} from '@shared/utils/token-helpers';
 import { jsonRpcClientAtom } from '@popup/store/settings';
 import CcdIcon from '@assets/svg/concordium.svg';
 import { addToastAtom } from '@popup/state';
@@ -63,7 +68,7 @@ function createDefaultValues(defaultPayload: State, accountTokens?: AccountToken
             (t) => t.id === defaultPayload.tokenId
         )?.metadata;
         token = { contractIndex: defaultPayload.contractIndex, tokenId: defaultPayload.tokenId, metadata };
-        decimals = metadata?.decimals || 0;
+        decimals = getMetadataDecimals(metadata ?? {});
     }
     return {
         amount: integerToFractional(decimals)(defaultPayload?.amount.microGtuAmount),
@@ -241,7 +246,7 @@ function CreateTransaction({ exchangeRate, tokens, setCost, setDetailsExpanded }
                                         <div className="clamp-1 w-full">{tokenMetadata.name}</div>
                                         <div className="token-picker-button__balance">
                                             <TokenBalance
-                                                decimals={tokenMetadata.decimals || 0}
+                                                decimals={getMetadataDecimals(tokenMetadata)}
                                                 symbol={tokenMetadata.symbol}
                                                 balance={currentBalance}
                                             />

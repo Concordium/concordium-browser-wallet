@@ -3,6 +3,7 @@ import clsx from 'clsx';
 import Button from '@popup/shared/Button';
 import { TokenMetadata } from '@shared/storage/types';
 import TokenBalance from '@popup/shared/TokenBalance';
+import { getMetadataDecimals } from '@shared/utils/token-helpers';
 
 interface ChooseTokenProps {
     balance: bigint;
@@ -29,7 +30,11 @@ export default function DisplayToken({ metadata, balance, className, icon, ...pr
                 <div className="display-token__details">
                     <div className="clamp-1 w-full">{metadata.name}</div>
                     <div className="display-token__balance">
-                        <TokenBalance decimals={metadata.decimals || 0} symbol={metadata.symbol} balance={balance} />
+                        <TokenBalance
+                            decimals={getMetadataDecimals(metadata)}
+                            symbol={metadata.symbol}
+                            balance={balance}
+                        />
                     </div>
                 </div>
             </div>

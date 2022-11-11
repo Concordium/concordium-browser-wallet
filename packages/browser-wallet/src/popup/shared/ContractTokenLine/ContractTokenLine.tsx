@@ -5,7 +5,7 @@ import { ClassNameAndStyle } from 'wallet-common-helpers';
 import Button from '@popup/shared/Button';
 import { Checkbox } from '@popup/shared/Form/Checkbox';
 import TokenBalance from '@popup/shared/TokenBalance';
-import { ContractTokenDetails } from '@shared/utils/token-helpers';
+import { ContractTokenDetails, getMetadataDecimals } from '@shared/utils/token-helpers';
 
 export enum ChoiceStatus {
     discarded,
@@ -54,7 +54,7 @@ export default function ContractTokenLine({
                         {t('ItemBalancePre')}
                         <TokenBalance
                             balance={token.balance}
-                            decimals={token.metadata.decimals ?? 0}
+                            decimals={getMetadataDecimals(token.metadata)}
                             symbol={token.metadata.symbol}
                         />
                     </div>

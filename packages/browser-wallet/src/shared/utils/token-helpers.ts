@@ -135,16 +135,19 @@ export function getTokenUrl(
 
 function confirmMetadataUrl(field?: MetadataUrl) {
     if (field && !field.url) {
-        throw new Error('Url field was present but did no contain an url');
+        throw new Error('Url field was present but did not contain an url');
     }
 }
 
 // eslint-disable-next-line @typescript-eslint/no-explicit-any
 function confirmString(field?: any) {
     if (field && !(typeof field === 'string' || field instanceof String)) {
-        throw new Error('string field was present but did no contain a string');
+        throw new Error('string field was present but did not contain a string');
     }
 }
+
+export const getMetadataUnique = ({ unique }: TokenMetadata) => Boolean(unique);
+export const getMetadataDecimals = ({ decimals }: TokenMetadata) => Number(decimals ?? 0);
 
 /**
  * Fetches token metadata from the given url
@@ -177,7 +180,7 @@ export async function getTokenMetadata(tokenUrl: string, network: NetworkConfigu
     confirmString(metadata.symbol);
     confirmString(metadata.description);
     confirmMetadataUrl(metadata.thumbnail);
-    if (metadata.decimals && Number.isNaN(metadata.decimals)) {
+    if (metadata.decimals !== undefined && Number.isNaN(getMetadataDecimals(metadata))) {
         throw new Error('Metadata contains incorrect decimals format');
     }
     confirmMetadataUrl(metadata.thumbnail);
