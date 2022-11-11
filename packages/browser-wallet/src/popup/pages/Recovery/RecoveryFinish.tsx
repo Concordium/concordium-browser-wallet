@@ -12,6 +12,10 @@ import { IdentityIdentifier, BackgroundResponseStatus, RecoveryBackgroundRespons
 import { fullscreenPromptContext } from '@popup/page-layouts/FullscreenPromptLayout';
 import PageHeader from '@popup/shared/PageHeader';
 import { identityMatch, isIdentityOfCredential } from '@shared/utils/identity-helpers';
+import CloseButton from '@popup/shared/CloseButton';
+import { isSpawnedWindow } from '@popup/shared/window-helpers';
+
+const RETURN_LOCATION = absoluteRoutes.home.account.path;
 
 interface Location {
     state: {
@@ -88,10 +92,13 @@ export default function DisplayRecoveryResult() {
     const { t } = useTranslation('recovery');
     const navigate = useNavigate();
 
-    useEffect(() => setReturnLocation(absoluteRoutes.home.account.path), []);
+    useEffect(() => setReturnLocation(RETURN_LOCATION), []);
 
     return (
         <>
+            {!isSpawnedWindow && (
+                <CloseButton className="recovery__exit-button" onClick={() => navigate(RETURN_LOCATION)} />
+            )}
             <PageHeader>{t('main.title')}</PageHeader>
             <div className="recovery__main onboarding-setup__page-with-header">
                 {payload.status === BackgroundResponseStatus.Success && (

@@ -61,4 +61,10 @@
             margin-bottom: rem(10px);
         }
     }
+
+    &__exit-button {
+        position: absolute;
+        right: rem(17px);
+        top: rem(17px);
+    }
 }
