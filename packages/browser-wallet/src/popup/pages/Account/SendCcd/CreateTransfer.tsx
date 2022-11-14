@@ -59,6 +59,11 @@ interface Props {
     setDetailsExpanded: (expanded: boolean) => void;
 }
 
+/**
+ * undefined is used to denote "not resolved yet", to align with useAsyncMemo return type
+ */
+type FeeResult = { success: true; value: bigint } | { success: false } | undefined;
+
 type State = undefined | (SimpleTransferPayload & Partial<TokenIdentifier>);
 
 function createDefaultValues(defaultPayload: State, accountTokens?: AccountTokens) {
@@ -102,7 +107,7 @@ function CreateTransaction({ exchangeRate, tokens, setCost, setDetailsExpanded }
 
     const [contractBalances] = useAtom(contractBalancesFamily(address, chosenToken?.contractIndex || ''));
 
-    const fee = useAsyncMemo(
+    const fee = useAsyncMemo<FeeResult>(
         async () => {
             if (chosenToken) {
                 if (validateAccountAddress(recipient)) {
@@ -117,20 +122,20 @@ function CreateTransaction({ exchangeRate, tokens, setCost, setDetailsExpanded }
                         BigInt(chosenToken.contractIndex)
                     );
                     form.setValue('executionEnergy', energy.execution.toString());
-                    return energy.total;
+                    return { success: true, value: energy.total };
                 } catch (e) {
                     addToast(t('sendCcd.transferInvokeFailed', { message: (e as Error).message }));
-                    return false;
+                    return { success: false };
                 }
             }
-            return SIMPLE_TRANSFER_ENERGY_TOTAL_COST;
+            return { success: true, value: SIMPLE_TRANSFER_ENERGY_TOTAL_COST };
         },
         undefined,
         [chosenToken?.contractIndex, chosenToken?.tokenId, recipient]
     );
 
     const cost = useMemo(() => {
-        const newCost = exchangeRate && fee ? BigInt(Math.ceil(exchangeRate * Number(fee))) : 0n;
+        const newCost = exchangeRate && fee?.success ? BigInt(Math.ceil(exchangeRate * Number(fee.value))) : 0n;
         setCost(newCost);
         return newCost;
     }, [fee, exchangeRate]);
@@ -176,7 +181,7 @@ function CreateTransaction({ exchangeRate, tokens, setCost, setDetailsExpanded }
     useEffect(() => {
         if (!canCoverCost) {
             form.setError('cost', { type: 'custom', message: t('sendCcd.unableToCoverCost') });
-        } else if (fee === false) {
+        } else if (fee && !fee.success) {
             form.setError('cost', { type: 'custom', message: t('sendCcd.unableToSendFailedInvoke') });
         } else {
             form.clearErrors('cost');
