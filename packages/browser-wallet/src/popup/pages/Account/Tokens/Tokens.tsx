@@ -43,6 +43,8 @@ function useFilteredTokens(account: WalletCredential, unique: boolean) {
     return tokens.filter((t) => (t.metadata.unique ?? false) === unique);
 }
 
+const MANAGE_MESSAGE_THRESHOLD = 3; // ~ when list goes from static to scrollable.
+
 type AddTokensDescriptionProps = {
     tokens: AccountTokenDetails[];
 };
@@ -54,7 +56,7 @@ function AddTokensDescription({ tokens }: AddTokensDescriptionProps) {
         if (tokens.length === 0) {
             return t('listEmpty');
         }
-        if (tokens.length < 3) {
+        if (tokens.length < MANAGE_MESSAGE_THRESHOLD) {
             return t('listAddMore');
         }
 
