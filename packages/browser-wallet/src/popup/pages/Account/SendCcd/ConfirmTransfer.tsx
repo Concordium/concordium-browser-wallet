@@ -29,6 +29,7 @@ import { useUpdateAtom } from 'jotai/utils';
 import { addPendingTransactionAtom } from '@popup/store/transactions';
 import { Cis2TransferParameters, SmartContractParameters } from '@shared/utils/types';
 import { TokenMetadata } from '@shared/storage/types';
+import { accountRoutes } from '../routes';
 
 type BaseProps = {
     setDetailsExpanded: (expanded: boolean) => void;
@@ -137,7 +138,11 @@ export default function ConfirmTransfer(props: Props) {
             )}
             {hash && (
                 <div className="p-b-10">
-                    <Button width="medium" className="m-b-10" onClick={() => nav(absoluteRoutes.home.account.path)}>
+                    <Button
+                        width="medium"
+                        className="m-b-10"
+                        onClick={() => nav(`${absoluteRoutes.home.account.path}/${accountRoutes.log}`)}
+                    >
                         {t('sendCcd.buttons.finish')}
                     </Button>
                 </div>
