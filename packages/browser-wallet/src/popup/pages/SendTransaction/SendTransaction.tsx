@@ -114,7 +114,7 @@ export default function SendTransaction({ onSubmit, onReject }: Props) {
                     parameters={state.payload.parameters}
                     sender={accountAddress}
                     cost={cost}
-                    className="m-v-10"
+                    className="m-10"
                 />
                 <br />
                 <div className="flex p-b-10 m-t-auto">

@@ -3,6 +3,7 @@ import {
     InternalMessageType,
     MessageType,
     ExtensionMessageHandler,
+    MessageStatusWrapper,
 } from '@concordium/browser-wallet-message-hub';
 import { HttpProvider } from '@concordium/web-sdk';
 import {
@@ -10,13 +11,21 @@ import {
     storedSelectedAccount,
     storedCurrentNetwork,
     sessionPasscode,
+    sessionOpenPrompt,
 } from '@shared/storage/access';
 
 import JSONBig from 'json-bigint';
 import { ChromeStorageKey, NetworkConfiguration } from '@shared/storage/types';
 import { buildURLwithSearchParameters } from '@shared/utils/url-helpers';
 import bgMessageHandler from './message-handler';
-import { forwardToPopup, HandleMessage, HandleResponse, RunCondition, setPopupSize } from './window-management';
+import {
+    forwardToPopup,
+    HandleMessage,
+    HandleResponse,
+    RunCondition,
+    runConditionComposer,
+    setPopupSize,
+} from './window-management';
 import { addIdpListeners, identityIssuanceHandler } from './identity-issuance';
 import { startMonitoringPendingStatus } from './confirmation';
 import { sendCredentialHandler } from './credential-deployment';
@@ -167,16 +176,18 @@ bgMessageHandler.handleMessage(createMessageTypeFilter(MessageType.JsonRpcReques
     return true;
 });
 
+const NOT_WHITELISTED = 'Site is not whitelisted';
+
 /**
  * Run condition which looks up URL in connected sites for the provided account. Runs handler if URL is included in connected sites.
  */
-const runIfWhitelisted: RunCondition<false> = async (msg, sender) => {
+const runIfWhitelisted: RunCondition<MessageStatusWrapper<undefined>> = async (msg, sender) => {
     const { accountAddress } = msg.payload;
     const connectedSites = await storedConnectedSites.get();
     const locked = await isWalletLocked();
 
     if (!accountAddress || connectedSites === undefined || locked) {
-        return { run: false, response: false };
+        return { run: false, response: { success: false, message: NOT_WHITELISTED } };
     }
 
     const accountConnectedSites = connectedSites[accountAddress] ?? [];
@@ -184,7 +195,7 @@ const runIfWhitelisted: RunCondition<false> = async (msg, sender) => {
         return { run: true };
     }
 
-    return { run: false, response: false };
+    return { run: false, response: { success: false, message: NOT_WHITELISTED } };
 };
 
 // TODO change this to find most recently selected account
@@ -229,7 +240,7 @@ async function findPrioritizedAccountConnectedToSite(url: string): Promise<strin
  * 1. Else if any other account is connected to the sender URL, then do not run and return that account's address.
  * 1. Else run the handler.
  */
-const runIfNotWhitelisted: RunCondition<string | undefined> = async (_msg, sender) => {
+const runIfNotWhitelisted: RunCondition<MessageStatusWrapper<string | undefined>> = async (_msg, sender) => {
     if (!sender.url) {
         throw new Error('Expected URL to be available for sender.');
     }
@@ -238,7 +249,7 @@ const runIfNotWhitelisted: RunCondition<string | undefined> = async (_msg, sende
 
     // No accounts in the wallet.
     if (selectedAccount === undefined) {
-        return { run: false, response: undefined };
+        return { run: false, response: { success: false, message: 'No account in the wallet' } };
     }
 
     const locked = await isWalletLocked();
@@ -248,7 +259,7 @@ const runIfNotWhitelisted: RunCondition<string | undefined> = async (_msg, sende
 
     const accountConnectedToSite = await findPrioritizedAccountConnectedToSite(sender.url);
     if (accountConnectedToSite) {
-        return { run: false, response: accountConnectedToSite };
+        return { run: false, response: { success: true, result: accountConnectedToSite } };
     }
 
     // No account in the wallet is connected to the URL, so run the handler.
@@ -265,7 +276,7 @@ const appendUrlToPayload: HandleMessage<{ url: string | undefined; title: string
     url,
 });
 
-const handleConnectionResponse: HandleResponse<string | undefined | false> = async (
+const handleConnectionResponse: HandleResponse<MessageStatusWrapper<string | undefined>> = async (
     response: boolean,
     _msg,
     sender
@@ -275,10 +286,10 @@ const handleConnectionResponse: HandleResponse<string | undefined | false> = asy
     }
 
     if (response !== false) {
-        return findPrioritizedAccountConnectedToSite(sender.url);
+        return { success: true, result: await findPrioritizedAccountConnectedToSite(sender.url) };
     }
 
-    return response;
+    return { success: false, message: 'Connection rejected' };
 };
 
 /**
@@ -303,13 +314,48 @@ bgMessageHandler.handleMessage(
     getMostRecentlySelectedAccountHandler
 );
 
+const withPromptStart: RunCondition<MessageStatusWrapper<string | undefined>> = async () => {
+    const isPromptOpen = await sessionOpenPrompt.get();
+    if (isPromptOpen) {
+        return { run: false, response: { success: false, message: 'Another prompt is already open' } };
+    }
+    sessionOpenPrompt.set(true);
+    return { run: true };
+};
+
+function withPromptEnd() {
+    sessionOpenPrompt.set(false);
+}
+
 forwardToPopup(
     MessageType.Connect,
     InternalMessageType.Connect,
-    runIfNotWhitelisted,
+    runConditionComposer(runIfNotWhitelisted, withPromptStart),
     handleConnectMessage,
-    handleConnectionResponse
+    handleConnectionResponse,
+    withPromptEnd
 );
-forwardToPopup(MessageType.SendTransaction, InternalMessageType.SendTransaction, runIfWhitelisted, appendUrlToPayload);
-forwardToPopup(MessageType.SignMessage, InternalMessageType.SignMessage, runIfWhitelisted, appendUrlToPayload);
-forwardToPopup(MessageType.AddTokens, InternalMessageType.AddTokens, runIfWhitelisted, appendUrlToPayload);
+forwardToPopup(
+    MessageType.SendTransaction,
+    InternalMessageType.SendTransaction,
+    runConditionComposer(runIfWhitelisted, withPromptStart),
+    appendUrlToPayload,
+    undefined,
+    withPromptEnd
+);
+forwardToPopup(
+    MessageType.SignMessage,
+    InternalMessageType.SignMessage,
+    runConditionComposer(runIfWhitelisted, withPromptStart),
+    appendUrlToPayload,
+    undefined,
+    withPromptEnd
+);
+forwardToPopup(
+    MessageType.AddTokens,
+    InternalMessageType.AddTokens,
+    runConditionComposer(runIfWhitelisted, withPromptStart),
+    appendUrlToPayload,
+    undefined,
+    withPromptEnd
+);

@@ -1,5 +1,6 @@
 import React, { useContext, useEffect, useMemo } from 'react';
 import { useNavigate, useParams } from 'react-router-dom';
+import { useUpdateEffect } from 'wallet-common-helpers';
 
 import { useSelectedCredential } from '@popup/shared/utils/account-helpers';
 import { contractBalancesFamily } from '@popup/store/token';
@@ -29,6 +30,10 @@ export default function Details() {
     const balancesAtom = contractBalancesFamily(account?.address ?? '', token?.contractIndex ?? '');
     const { setDetailsExpanded } = useContext(accountPageContext);
     const nav = useNavigate();
+
+    useUpdateEffect(() => {
+        nav('..');
+    }, [account]);
 
     useEffect(() => {
         setDetailsExpanded(false);

@@ -7,7 +7,7 @@ const t: typeof en = {
     },
     main: {
         title: 'Genskaber din wallet',
-        description: 'Vent venligt mens der søges efter dine identiteter og konti.',
+        description: 'Vent venligst mens der søges efter dine identiteter og konti.',
     },
     finish: {
         success: 'Følgende identiteter og konti blev fundet.',

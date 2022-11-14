@@ -10,7 +10,7 @@ import CcdIcon from '@assets/svg/concordium.svg';
 import { useAccountInfo } from '@popup/shared/AccountInfoListenerContext';
 import { useSelectedCredential } from '@popup/shared/utils/account-helpers';
 import { TokenIdAndMetadata, WalletCredential } from '@shared/storage/types';
-import { contractBalancesFamily, tokensAtom } from '@popup/store/token';
+import { contractBalancesFamily } from '@popup/store/token';
 import Button from '@popup/shared/Button';
 import TokenBalance from '@popup/shared/TokenBalance';
 import AtomValue from '@popup/store/AtomValue';
@@ -165,7 +165,6 @@ function Tokens() {
 export default function TokensRoutes() {
     const account = useSelectedCredential();
     const nav = useNavigate();
-    useAtomValue(tokensAtom); // Ensure tokens are kept in memory
 
     if (account === undefined) {
         return null;

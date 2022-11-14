@@ -42,6 +42,13 @@ const t: typeof en = {
         sender: 'Afsender',
         cost: 'Estimerede transaktionsomkostninger',
         unknown: 'Ukendt',
+        tokenTransfer: {
+            title: 'Send {{ tokenName }}',
+            amount: 'Mængde',
+            receiver: 'Modtager',
+            showTransfer: 'Vis overførslesdetaljer',
+            showContract: 'Vis kontraktdetaljer',
+        },
     },
     tokenDetails: {
         balance: 'Saldo',

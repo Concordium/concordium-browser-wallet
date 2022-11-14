@@ -10,6 +10,7 @@ import {
 
 import { Dimensions, small } from '@popup/constants/dimensions';
 import { spawnedPopupUrl } from '@shared/constants/url';
+import { noOp } from 'wallet-common-helpers';
 import bgMessageHandler, { onMessage } from './message-handler';
 
 const getTopLeft = async (): Promise<{ top: number; left: number }> => {
@@ -132,7 +133,11 @@ export const forwardToPopup = <P, R>(
      * Optional async callback for handling responses and mapping received response to new response.
      * Defaults to resolving with received response.
      */
-    handleResponse: HandleResponse<R> = (r) => Promise.resolve(r)
+    handleResponse: HandleResponse<R> = (r) => Promise.resolve(r),
+    /**
+     * Function to run after responding
+     */
+    handleFinally: () => void = noOp
 ): void => {
     // Wrap handler in helper ensuring a popup window is available and ready to handle incomming messages.
     const handler = ensureAvailableWindow((msg, sender, respond) => {
@@ -140,7 +145,8 @@ export const forwardToPopup = <P, R>(
             .sendInternalMessage(internalMessageType, handleMessage(msg, sender))
             .then((r) => handleResponse(r, msg, sender))
             .then(respond)
-            .catch((e: Error) => respond(new WalletError(msg, e.message))); // Usually if popup is closed prior to a response being sent.
+            .catch((e: Error) => respond(new WalletError(msg, e.message))) // Usually if popup is closed prior to a response being sent.
+            .finally(handleFinally);
 
         return true;
     });
@@ -160,3 +166,16 @@ export const forwardToPopup = <P, R>(
 
     bgMessageHandler.handleMessage(createMessageTypeFilter(messageType), conditionalHandler);
 };
+
+export function runConditionComposer<R>(
+    firstHandler: RunCondition<R>,
+    secondHandler: RunCondition<R>
+): RunCondition<R> {
+    return async (msg, sender) => {
+        const first = await firstHandler(msg, sender);
+        if (!first.run) {
+            return first;
+        }
+        return secondHandler(msg, sender);
+    };
+}
