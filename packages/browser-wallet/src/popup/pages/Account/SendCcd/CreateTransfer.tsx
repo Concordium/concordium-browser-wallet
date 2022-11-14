@@ -145,7 +145,7 @@ function CreateTransaction({ exchangeRate, tokens, setCost, setDetailsExpanded }
     }, [chosenToken, ccdBalance]);
 
     const validateAmount: Validate<string> = (amount) =>
-        validateTransferAmount(amount, currentBalance, tokenMetadata.decimals, chosenToken ? 0n : cost);
+        validateTransferAmount(amount, currentBalance, getMetadataDecimals(tokenMetadata), chosenToken ? 0n : cost);
 
     const maxValue = useMemo(() => {
         if (currentBalance !== undefined) {
@@ -180,7 +180,7 @@ function CreateTransaction({ exchangeRate, tokens, setCost, setDetailsExpanded }
         }
     }, [canCoverCost]);
 
-    const displayAmount = integerToFractional(tokenMetadata.decimals || 0);
+    const displayAmount = integerToFractional(getMetadataDecimals(tokenMetadata));
 
     const onMax = () => {
         form.setValue('amount', displayAmount(maxValue) || '0');
@@ -194,7 +194,7 @@ function CreateTransaction({ exchangeRate, tokens, setCost, setDetailsExpanded }
         if (vs.token) {
             const payload = buildSimpleTransferPayload(
                 vs.recipient,
-                fractionalToInteger(vs.amount, vs.token.metadata.decimals || 0)
+                fractionalToInteger(vs.amount, getMetadataDecimals(vs.token.metadata))
             );
             nav(routes.confirmToken, { state: { ...payload, ...vs.token, executionEnergy: vs.executionEnergy } });
         } else {
