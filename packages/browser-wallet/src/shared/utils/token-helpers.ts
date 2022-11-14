@@ -402,10 +402,22 @@ export async function getTokens(
     onError?: (error: string) => void
 ): Promise<GetTokensResult> {
     const metadataPromise: Promise<[string[], Array<TokenMetadata | undefined>]> = (async () => {
-        const metadataUrls = await getTokenUrl(client, ids, contractDetails);
-        const metadata = await Promise.all(
-            metadataUrls.map((url) => getTokenMetadata(url, network).catch(() => Promise.resolve(undefined)))
-        );
+        let metadataUrls;
+        try {
+            metadataUrls = await getTokenUrl(client, ids, contractDetails);
+        } catch (e) {
+            onError?.(`Failed to get metadata urls on index: ${contractDetails.index}`);
+            return [[], []];
+        }
+        let metadata;
+        try {
+            metadata = await Promise.all(
+                metadataUrls.map((url) => getTokenMetadata(url, network).catch(() => Promise.resolve(undefined)))
+            );
+        } catch (e) {
+            onError?.(`Failed to load a metadata file on index: ${contractDetails.index}`);
+            return [[], []];
+        }
         return [metadataUrls, metadata];
     })();
 

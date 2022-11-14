@@ -80,8 +80,14 @@ function ChooseContract() {
                     return error;
                 }
 
-                const response = await fetchTokensConfigure(cd, client, network, account)();
+                let tokenError = false;
+                const response = await fetchTokensConfigure(cd, client, network, account, () => {
+                    tokenError = true;
+                })();
 
+                if (tokenError) {
+                    return t('failedTokensError');
+                }
                 if (response.tokens.length === 0) {
                     return t('noTokensError');
                 }
