@@ -65,7 +65,7 @@ const t = {
             cis2Error: 'Contract does not support CIS-2',
             noTokensError: 'No tokens found in contract',
             contractIndex: 'Contract index',
-            hexId: 'Id must be HEX encoded',
+            hexId: 'Invalid token ID (must be HEX encoded)',
             updateTokens: 'Update tokens',
             chooseContractHeader: 'Enter a contract index to select tokens from.',
             ItemBalancePre: 'Your balance: ',

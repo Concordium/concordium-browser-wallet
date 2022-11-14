@@ -14,6 +14,7 @@ import {
 } from '@concordium/web-sdk';
 import { Cis2TransferParameters, SmartContractParameters } from '@shared/utils/types';
 import { TokenMetadata } from '@shared/storage/types';
+import { getMetadataDecimals } from '@shared/utils/token-helpers';
 import DisplayCost from './DisplayCost';
 import { getTransactionTypeName } from '../utils/transaction-helpers';
 import DisplayUpdateContract from './displayPayload/DisplayUpdateContract';
@@ -147,7 +148,11 @@ export function TokenTransferReceipt({ parameters, metadata, ...props }: TokenTr
             <>
                 <h5>{t('amount')}:</h5>
                 <div>
-                    <TokenBalance balance={BigInt(amount)} decimals={metadata.decimals ?? 0} symbol={metadata.symbol} />
+                    <TokenBalance
+                        balance={BigInt(amount)}
+                        decimals={getMetadataDecimals(metadata)}
+                        symbol={metadata.symbol}
+                    />
                 </div>
                 <h5>{t('receiver')}:</h5>
                 <DisplayAddress

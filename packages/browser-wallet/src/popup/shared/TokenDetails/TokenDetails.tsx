@@ -12,6 +12,7 @@ import ButtonGroup from '@popup/shared/ButtonGroup';
 import { TokenIdAndMetadata, TokenMetadata } from '@shared/storage/types';
 
 import { useNavigate } from 'react-router-dom';
+import { getMetadataDecimals, getMetadataUnique } from '@shared/utils/token-helpers';
 import TokenBalance from '../TokenBalance';
 
 const SUB_INDEX = '0';
@@ -74,7 +75,8 @@ type TokenProps = {
 };
 
 function Nft({ token, balance, contractIndex, subIndex }: TokenProps) {
-    const { thumbnail, name, description, display, decimals = 0, symbol } = token.metadata;
+    const { thumbnail, name, description, display, symbol } = token.metadata;
+    const decimals = getMetadataDecimals(token.metadata);
     const { t } = useTranslation('shared', { keyPrefix: 'tokenDetails' });
 
     return (
@@ -117,7 +119,8 @@ function Nft({ token, balance, contractIndex, subIndex }: TokenProps) {
 }
 
 function Ft({ token, balance, contractIndex, subIndex = SUB_INDEX }: TokenProps) {
-    const { thumbnail, name, decimals = 0, description, symbol } = token.metadata;
+    const { thumbnail, name, description, symbol } = token.metadata;
+    const decimals = getMetadataDecimals(token.metadata);
     const { t } = useTranslation('shared', { keyPrefix: 'tokenDetails' });
 
     return (
@@ -207,7 +210,7 @@ export default function TokenDetails({
     ...tokenProps
 }: TokenDetailsComponentProps) {
     const { token, contractIndex } = tokenProps;
-    const Token = token.metadata.unique ? Nft : Ft;
+    const Token = getMetadataUnique(token.metadata) ? Nft : Ft;
 
     return (
         <div className="token-details">

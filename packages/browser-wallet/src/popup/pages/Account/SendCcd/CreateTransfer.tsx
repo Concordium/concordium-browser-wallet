@@ -29,7 +29,12 @@ import {
 import { useAccountInfo } from '@popup/shared/AccountInfoListenerContext';
 import { useSelectedCredential } from '@popup/shared/utils/account-helpers';
 import { CCD_METADATA } from '@shared/constants/token-metadata';
-import { getTokenTransferEnergy, TokenIdentifier, trunctateSymbol } from '@shared/utils/token-helpers';
+import {
+    getMetadataDecimals,
+    getTokenTransferEnergy,
+    TokenIdentifier,
+    trunctateSymbol,
+} from '@shared/utils/token-helpers';
 import { jsonRpcClientAtom } from '@popup/store/settings';
 import CcdIcon from '@assets/svg/concordium.svg';
 import { addToastAtom } from '@popup/state';
@@ -64,7 +69,7 @@ function createDefaultValues(defaultPayload: State, accountTokens?: AccountToken
             (t) => t.id === defaultPayload.tokenId
         )?.metadata;
         token = { contractIndex: defaultPayload.contractIndex, tokenId: defaultPayload.tokenId, metadata };
-        decimals = metadata?.decimals || 0;
+        decimals = getMetadataDecimals(metadata ?? {});
     }
     return {
         amount: integerToFractional(decimals)(defaultPayload?.amount.microGtuAmount),
@@ -141,7 +146,7 @@ function CreateTransaction({ exchangeRate, tokens, setCost, setDetailsExpanded }
     }, [chosenToken, ccdBalance]);
 
     const validateAmount: Validate<string> = (amount) =>
-        validateTransferAmount(amount, currentBalance, tokenMetadata.decimals, chosenToken ? 0n : cost);
+        validateTransferAmount(amount, currentBalance, getMetadataDecimals(tokenMetadata), chosenToken ? 0n : cost);
 
     const maxValue = useMemo(() => {
         if (currentBalance !== undefined) {
@@ -176,7 +181,7 @@ function CreateTransaction({ exchangeRate, tokens, setCost, setDetailsExpanded }
         }
     }, [canCoverCost]);
 
-    const displayAmount = integerToFractional(tokenMetadata.decimals || 0);
+    const displayAmount = integerToFractional(getMetadataDecimals(tokenMetadata));
 
     const onMax = () => {
         form.setValue('amount', displayAmount(maxValue) || '0');
@@ -190,7 +195,7 @@ function CreateTransaction({ exchangeRate, tokens, setCost, setDetailsExpanded }
         if (vs.token) {
             const payload = buildSimpleTransferPayload(
                 vs.recipient,
-                fractionalToInteger(vs.amount, vs.token.metadata.decimals || 0)
+                fractionalToInteger(vs.amount, getMetadataDecimals(vs.token.metadata))
             );
             nav(routes.confirmToken, { state: { ...payload, ...vs.token, executionEnergy: vs.executionEnergy } });
         } else {
@@ -242,7 +247,7 @@ function CreateTransaction({ exchangeRate, tokens, setCost, setDetailsExpanded }
                                         <div className="clamp-1 w-full">{tokenMetadata.name}</div>
                                         <div className="token-picker-button__balance">
                                             <TokenBalance
-                                                decimals={tokenMetadata.decimals || 0}
+                                                decimals={getMetadataDecimals(tokenMetadata)}
                                                 symbol={tokenMetadata.symbol}
                                                 balance={currentBalance}
                                             />

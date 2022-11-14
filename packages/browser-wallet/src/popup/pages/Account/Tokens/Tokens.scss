@@ -56,7 +56,9 @@ $tokens-actions-height: rem(26px);
     }
 
     &__icon {
-        height: 60%;
+        height: 65%;
+        width: rem(40px);
+        object-fit: contain;
 
         .dark &--ccd path {
             fill: $color-off-white;

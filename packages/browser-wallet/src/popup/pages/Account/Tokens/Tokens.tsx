@@ -15,6 +15,7 @@ import Button from '@popup/shared/Button';
 import TokenBalance from '@popup/shared/TokenBalance';
 import AtomValue from '@popup/store/AtomValue';
 
+import { getMetadataDecimals, getMetadataUnique } from '@shared/utils/token-helpers';
 import { tokensRoutes, detailsRoute } from './routes';
 import TokenDetails from './TokenDetails';
 import { AccountTokenDetails, useFlattenedAccountTokens } from './utils';
@@ -33,14 +34,18 @@ function Ft({ accountAddress, contractIndex: contractAddress, token, onClick }: 
     return (
         <Button clear className="token-list__item" onClick={onClick}>
             <img className="token-list__icon" src={token.metadata.thumbnail?.url} alt={token.metadata.name} />
-            <TokenBalance balance={balance} decimals={token.metadata.decimals ?? 0} symbol={token.metadata.symbol} />
+            <TokenBalance
+                balance={balance}
+                decimals={getMetadataDecimals(token.metadata)}
+                symbol={token.metadata.symbol}
+            />
         </Button>
     );
 }
 
 function useFilteredTokens(account: WalletCredential, unique: boolean) {
     const tokens = useFlattenedAccountTokens(account);
-    return tokens.filter((t) => (t.metadata.unique ?? false) === unique);
+    return tokens.filter((t) => getMetadataUnique(t.metadata) === unique);
 }
 
 const MANAGE_MESSAGE_THRESHOLD = 3; // ~ when list goes from static to scrollable.
@@ -109,23 +114,31 @@ function Collectibles({ account, toDetails }: ListProps) {
 
     return (
         <>
-            {tokens.map(({ contractIndex, id, metadata: { thumbnail, display, name, decimals = 0, symbol } }) => (
+            {tokens.map(({ contractIndex, id, metadata }) => (
                 <Button
                     clear
                     key={`${contractIndex}.${id}`}
                     onClick={() => toDetails(contractIndex, id)}
                     className="token-list__item"
                 >
-                    <img className="token-list__icon" src={thumbnail?.url ?? display?.url ?? ''} alt={name} />
+                    <img
+                        className="token-list__icon"
+                        src={metadata.thumbnail?.url ?? metadata.display?.url ?? ''}
+                        alt={metadata.name}
+                    />
                     <div className="token-list__unique-name">
-                        {name}
+                        {metadata.name}
                         <AtomValue atom={contractBalancesFamily(account.address, contractIndex)}>
                             {({ [id]: b }) => (
                                 <>
                                     {b === 0n && <div className="token-list__ownership">{t('unownedUnique')}</div>}
-                                    {b && b / BigInt(10 ** decimals) !== 1n && (
+                                    {b && b / BigInt(10 ** getMetadataDecimals(metadata)) !== 1n && (
                                         <div className="token-list__ownership">
-                                            <TokenBalance balance={b} decimals={decimals} symbol={symbol} />
+                                            <TokenBalance
+                                                balance={b}
+                                                decimals={getMetadataDecimals(metadata)}
+                                                symbol={metadata.symbol}
+                                            />
                                         </div>
                                     )}
                                 </>

@@ -9,7 +9,7 @@ import InfiniteLoader from 'react-window-infinite-loader';
 import AutoSizer from 'react-virtualized-auto-sizer';
 import { VariableSizeList as List } from 'react-window';
 
-import { ContractTokenDetails, ContractDetails, getTokens } from '@shared/utils/token-helpers';
+import { ContractTokenDetails, ContractDetails, getTokens, getMetadataUnique } from '@shared/utils/token-helpers';
 import { absoluteRoutes } from '@popup/constants/routes';
 import PendingArrows from '@assets/svg/pending-arrows.svg';
 import Button from '@popup/shared/Button';
@@ -235,10 +235,10 @@ export default function TokenList() {
         }
 
         // Try to show the user the page corresponding to the type of token chosen.
-        if (newTokens.every((nt) => nt.metadata.unique)) {
+        if (newTokens.every((nt) => getMetadataUnique(nt.metadata))) {
             // Only collectibles.
             nav(`${absoluteRoutes.home.account.tokens.path}/${tokensRoutes.collectibles}`);
-        } else if (newTokens.every((nt) => !nt.metadata.unique)) {
+        } else if (newTokens.every((nt) => !getMetadataUnique(nt.metadata))) {
             // Only fungibles
             nav(absoluteRoutes.home.account.tokens.path);
         } else {
@@ -263,13 +263,13 @@ export default function TokenList() {
             />
             <div className="add-tokens-list__tokens">
                 {listLoading && <PendingArrows className="loading add-tokens-list__loading loading--delay" />}
-                {(emptyList || missingMetadata) && (
+                {emptyList && (
                     <p className="w-full text-center p-h-20">
-                        {emptyList && t('emptyList')}
+                        {emptyList && !missingMetadata && t('emptyList')}
                         {missingMetadata && t('missingMetadata')}
                     </p>
                 )}
-                {!emptyList && !missingMetadata && !listLoading && (
+                {!emptyList && !listLoading && (
                     <InfiniteTokenList
                         tokens={filteredDisplayTokens}
                         loadNextPage={() => updateTokens({ type: 'next' })}
