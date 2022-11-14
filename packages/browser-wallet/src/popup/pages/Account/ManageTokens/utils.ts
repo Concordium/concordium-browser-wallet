@@ -27,7 +27,13 @@ export const manageTokensRoutes = {
 };
 
 export const fetchTokensConfigure =
-    (contractDetails: ContractDetails, client: JsonRpcClient, network: NetworkConfiguration, account: string) =>
+    (
+        contractDetails: ContractDetails,
+        client: JsonRpcClient,
+        network: NetworkConfiguration,
+        account: string,
+        onError?: (error: string) => void
+    ) =>
     async (from?: number): Promise<FetchTokensResponse> => {
         const {
             tokens: cts,
@@ -45,7 +51,8 @@ export const fetchTokensConfigure =
             client,
             network,
             account,
-            cts.map((t) => t.token)
+            cts.map((t) => t.token),
+            onError
         );
 
         return {

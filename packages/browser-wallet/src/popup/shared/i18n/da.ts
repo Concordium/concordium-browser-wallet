@@ -69,6 +69,9 @@ const t: typeof en = {
             remove: 'Fjern token',
         },
     },
+    tokenBalance: {
+        noBalance: 'Ingen saldo hentet',
+    },
 };
 
 export default t;
