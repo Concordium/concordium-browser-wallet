@@ -386,14 +386,21 @@ export async function getTokenTransferEnergy(
     return { execution, total };
 }
 
-export const getTokens = async (
+type GetTokensResult = {
+    id: string;
+    metadataLink: string;
+    metadata: TokenMetadata | undefined;
+    balance: bigint;
+}[];
+
+export async function getTokens(
     contractDetails: ContractDetails,
     client: JsonRpcClient,
     network: NetworkConfiguration,
     account: string,
     ids: string[],
     onError?: (error: string) => void
-) => {
+): Promise<GetTokensResult> {
     const metadataPromise: Promise<[string[], Array<TokenMetadata | undefined>]> = (async () => {
         const metadataUrls = await getTokenUrl(client, ids, contractDetails);
         const metadata = await Promise.all(
@@ -413,15 +420,22 @@ export const getTokens = async (
 
     const [[metadataUrls, metadata], balances] = await Promise.all([metadataPromise, balancesPromise]); // Run in parallel.
 
-    return ids
-        .filter((id, i) => id in balances && metadata[i])
-        .map((id, i) => ({
-            id,
-            metadataLink: metadataUrls[i],
-            metadata: metadata[i],
-            balance: balances[id] ?? 0n,
-        }));
-};
+    return ids.reduce(
+        (acc, id, i) =>
+            id in balances && metadata[i]
+                ? [
+                      ...acc,
+                      {
+                          id,
+                          metadataLink: metadataUrls[i],
+                          metadata: metadata[i],
+                          balance: balances[id] ?? 0n,
+                      },
+                  ]
+                : acc,
+        [] as GetTokensResult
+    );
+}
 
 const MAX_SYMBOL_LENGTH = 10;
 
