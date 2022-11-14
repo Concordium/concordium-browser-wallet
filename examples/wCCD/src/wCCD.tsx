@@ -17,6 +17,8 @@ import {
 
 import ArrowIcon from './assets/Arrow.svg';
 import RefreshIcon from './assets/Refresh.svg';
+import {WalletConnection, WalletConnector} from './wallet/WalletConnection';
+import {BrowserWalletConnector} from "./wallet/BrowserWallet";
 
 const blackCardStyle = {
     backgroundColor: 'black',
@@ -92,8 +94,18 @@ interface Props {
     handleNotConnected: () => void;
 }
 
-export default function wCCD({ handleGetAccount, handleNotConnected }: Props) {
-    const { account, isConnected } = useContext(state);
+const connector = new BrowserWalletConnector();
+
+export default function wCCD() {
+    const [connector, setConnector] = useState<WalletConnector>();
+
+    useEffect(() => {
+
+    }, [])
+
+
+    const [ walletConnection, setWalletConnection ] = useState<WalletConnection>();
+    // const { account, isConnected } = useContext(state);
     const [ownerProxy, setOwnerProxy] = useState<string>();
     const [ownerImplementation, setOwnerImplementation] = useState<string>();
     const [isWrapping, setIsWrapping] = useState<boolean>(true);
@@ -105,8 +117,9 @@ export default function wCCD({ handleGetAccount, handleNotConnected }: Props) {
     const inputValue = useRef<HTMLInputElement>(null);
 
     useEffect(() => {
-        if (isConnected) {
+        if (walletConnection) {
             // Get wCCD proxy contract owner.
+            walletConnection.
             detectConcordiumProvider()
                 .then((provider) =>
                     provider

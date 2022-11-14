@@ -2,10 +2,11 @@
 
 import { WalletApi } from '@concordium/browser-wallet-api-helpers';
 import { Network, WalletConnection, WalletConnector } from './WalletConnection';
+import { JsonRpcClient } from '@concordium/web-sdk';
 
 export const WALLET_CONNECT_SESSION_NAMESPACE = 'ccd';
 
-class BrowserWalletConnection implements WalletConnection {
+export class BrowserWalletConnection implements WalletConnection {
     readonly client: WalletApi;
 
     readonly network: Network;
@@ -36,6 +37,10 @@ class BrowserWalletConnection implements WalletConnection {
         client.on('accountDisconnected', () => client.getMostRecentlySelectedAccount().then(this.setConnectedAccount));
     }
 
+    getJsonRpcClient(): JsonRpcClient {
+        return this.client.getJsonRpcClient();
+    }
+
     getConnectedAccount(): string | undefined {
         return this.accountAddress;
     }
@@ -53,7 +58,7 @@ class BrowserWalletConnection implements WalletConnection {
     }
 }
 
-class BrowserWalletConnector implements WalletConnector {
+export class BrowserWalletConnector implements WalletConnector {
     client: WalletApi;
 
     constructor(client: WalletApi) {

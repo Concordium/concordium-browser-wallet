@@ -3,6 +3,7 @@ import QRCodeModal from '@walletconnect/qrcode-modal';
 import { SessionTypes } from '@walletconnect/types';
 import { Network, WalletConnection, WalletConnector } from './WalletConnection';
 import { WALLET_CONNECT_SESSION_NAMESPACE } from './BrowserWallet';
+import { HttpProvider, JsonRpcClient } from '@concordium/web-sdk';
 
 async function connect(client: SignClient, chainId: string, setModalOpen: (val: boolean) => void) {
     try {
@@ -32,17 +33,20 @@ async function connect(client: SignClient, chainId: string, setModalOpen: (val: 
     }
 }
 
-class WalletConnectConnection implements WalletConnection {
+export class WalletConnectConnection implements WalletConnection {
     readonly client: SignClient;
 
     readonly sessionNamespace: string;
 
     readonly session: SessionTypes.Struct;
 
-    constructor(client: SignClient, sessionNamespace: string, session: SessionTypes.Struct) {
+    readonly rpcClient: JsonRpcClient;
+
+    constructor(client: SignClient, sessionNamespace: string, session: SessionTypes.Struct, rpcClient: JsonRpcClient) {
         this.client = client;
         this.sessionNamespace = sessionNamespace;
         this.session = session;
+        this.rpcClient = rpcClient;
 
         // Register event handlers (from official docs).
         client.on('session_event', (event) => {
@@ -65,6 +69,10 @@ class WalletConnectConnection implements WalletConnection {
         });
     }
 
+    getJsonRpcClient(): JsonRpcClient {
+        return this.rpcClient;
+    }
+
     getConnectedAccount(): string {
         const fullAddress = this.session.namespaces[this.sessionNamespace].accounts[0];
         const colonIdx = fullAddress.lastIndexOf(':');
@@ -82,6 +90,7 @@ class WalletConnectConnection implements WalletConnection {
     }
 
     async signAndSendTransaction() {
+        throw new Error('not yet implemented');
         return '';
     }
 
@@ -96,7 +105,7 @@ class WalletConnectConnection implements WalletConnection {
     }
 }
 
-class WalletConnectConnector implements WalletConnector {
+export class WalletConnectConnector implements WalletConnector {
     readonly client: SignClient;
 
     isModalOpen = false;
@@ -110,6 +119,7 @@ class WalletConnectConnector implements WalletConnector {
         const session = await connect(this.client, chainId, (v) => {
             this.isModalOpen = v;
         });
-        return new WalletConnectConnection(this.client, WALLET_CONNECT_SESSION_NAMESPACE, session);
+        const rpcClient = new JsonRpcClient(new HttpProvider(network.jsonRpcUrl));
+        return new WalletConnectConnection(this.client, WALLET_CONNECT_SESSION_NAMESPACE, session, rpcClient);
     }
 }

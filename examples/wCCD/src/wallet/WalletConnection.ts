@@ -1,4 +1,9 @@
+import { JsonRpcClient } from '@concordium/web-sdk';
+
 export interface WalletConnection {
+
+    getJsonRpcClient(): JsonRpcClient;
+
     getConnectedAccount(): string | undefined;
 
     signAndSendTransaction(): Promise<string>;
@@ -11,9 +16,12 @@ export class Network {
 
     genesisHash: string;
 
-    constructor(name: string, genesisHash: string) {
+    jsonRpcUrl: string;
+
+    constructor(name: string, genesisHash: string, jsonRpcUrl: string) {
         this.name = name;
         this.genesisHash = genesisHash;
+        this.jsonRpcUrl = jsonRpcUrl;
     }
 }
 
