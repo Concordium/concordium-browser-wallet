@@ -9470,6 +9470,19 @@ __metadata:
   languageName: node
   linkType: hard
 
+"esbuild-plugin-copy@npm:^1.6.0":
+  version: 1.6.0
+  resolution: "esbuild-plugin-copy@npm:1.6.0"
+  dependencies:
+    chalk: ^4.1.2
+    fs-extra: ^10.0.1
+    globby: ^11.0.3
+  peerDependencies:
+    esbuild: ">= 0.14.0"
+  checksum: 814f428db6a645c92b2ec99f5e6c3003777384b72f46765a9904976293ad0b07f3b7039a25f27cfc743f0ac1e3959fc052f7b88fd48b0062e11ccf121ed2140f
+  languageName: node
+  linkType: hard
+
 "esbuild-plugin-svgr@npm:^1.0.1":
   version: 1.0.1
   resolution: "esbuild-plugin-svgr@npm:1.0.1"
@@ -19956,12 +19969,15 @@ __metadata:
   dependencies:
     "@concordium/browser-wallet-api-helpers": ^0.2.0
     "@concordium/web-sdk": ^1.0.0
-    "@craftamap/esbuild-plugin-html": ^0.4.0
+    "@types/node": ^18.7.23
+    "@types/react": ^18.0.9
+    "@types/react-dom": ^18.0.5
     bootstrap: ^5.2.1
     cross-env: ^7.0.3
     esbuild: ^0.14.42
+    esbuild-plugin-copy: ^1.6.0
     esbuild-plugin-svgr: ^1.0.1
-    live-server: ^1.2.2
+    express: ^4.18.1
     moment: ^2.29.4
     react: ^18.2.0
     react-bootstrap: ^2.5.0
@@ -19969,6 +19985,7 @@ __metadata:
     react-qr-code: ^2.0.8
     react-router-dom: ^6.4.0
     ts-node: ^10.8.0
+    typescript: ^4.7.2
     web-vitals: ^2.1.4
   languageName: unknown
   linkType: soft

@@ -18,12 +18,12 @@ const config: BuildOptions = {
     loader: { '.js': 'jsx' },
     sourcemap: 'inline',
     target: ['chrome67'],
-    outdir: 'dist',
+    outdir: 'dist/public',
     plugins: [
         copy({
             assets: {
                 from: ['./public/**/*'],
-                to: ['./'],
+                to: ['../'],
                 keepStructure: true,
             },
         }),
