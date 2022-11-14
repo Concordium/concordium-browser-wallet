@@ -85,12 +85,16 @@ function isTransferTransaction(type: AccountTransactionType) {
  * @returns a displayable string of the fee for a transaction in CCD.
  */
 function buildFeeString(cost: bigint, accountAddress: string, transaction: BrowserWalletTransaction) {
-    if (isAccountTransaction(transaction) && isTransferTransaction(transaction.type)) {
+    if (
+        isAccountTransaction(transaction) &&
+        (isTransferTransaction(transaction.type) ||
+            transaction.type === AccountTransactionType.UpdateSmartContractInstance)
+    ) {
         if (isOutgoingTransaction(transaction, accountAddress)) {
             if (isEncryptedTransfer(transaction)) {
                 return 'Shielded transaction fee';
             }
-            return `${displayAsCcd(-transaction.amount)} + ${displayAsCcd(cost)} Fee`;
+            return `${displayAsCcd(transaction.amount)} - ${displayAsCcd(cost)} Fee`;
         }
     }
     return `${displayAsCcd(cost)} Fee`;
@@ -163,7 +167,8 @@ function isGreenAmount(transaction: BrowserWalletTransaction, accountAddress: st
         return false;
     }
     if (
-        transaction.type === AccountTransactionType.TransferToPublic &&
+        (transaction.type === AccountTransactionType.TransferToPublic ||
+            transaction.type === AccountTransactionType.UpdateSmartContractInstance) &&
         transaction.cost &&
         transaction.amount > transaction.cost
     ) {
@@ -184,7 +189,10 @@ export default function TransactionElement({ accountAddress, transaction, style,
     // Flip the amount is selected account is sender, and amount is positive. We expect the transaction list endpoint to sign the amount based on this,
     // but this is not the case for pending transactions. This seeks to emulate the behaviour of the transaction list endpoint.
     // TODO: check that this still works when shield, unshield, and encrypted transfers are implemented.
-    const amount = isSender && transaction.amount > 0n ? -transaction.amount : transaction.amount;
+    const amount =
+        isSender && transaction.status === TransactionStatus.Pending && transaction.amount > 0n
+            ? -transaction.amount
+            : transaction.amount;
 
     return (
         <div

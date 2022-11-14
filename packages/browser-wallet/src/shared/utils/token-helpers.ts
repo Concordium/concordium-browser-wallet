@@ -13,6 +13,7 @@ import { WCCD_METADATA } from '@shared/constants/token-metadata';
 import i18n from '@popup/shell/i18n';
 import { SmartContractParameters } from './types';
 import { isMainnet } from './network-helpers';
+import { determineUpdatePayloadSize } from './energy-helpers';
 
 export interface ContractDetails {
     contractName: string;
@@ -346,12 +347,12 @@ export async function fetchContractName(client: JsonRpcClient, index: bigint, su
     return getContractName(instanceInfo);
 }
 
-function determineTokenTransferPayloadSize(parameterSize: number, contractName: string) {
-    return 8n + 8n + 8n + 2n + BigInt(parameterSize) + 2n + BigInt(contractName.length + 9);
-}
-
 // TODO: export this from the SDK or add to helpers
-function calculateEnergyCost(signatureCount: bigint, payloadSize: bigint, transactionSpecificCost: bigint): bigint {
+export function calculateEnergyCost(
+    signatureCount: bigint,
+    payloadSize: bigint,
+    transactionSpecificCost: bigint
+): bigint {
     return 100n * signatureCount + 1n * (BigInt(32 + 8 + 8 + 4 + 8) + payloadSize) + transactionSpecificCost;
 }
 
@@ -374,7 +375,7 @@ export async function getTokenTransferEnergy(
     );
     const total = calculateEnergyCost(
         1n,
-        determineTokenTransferPayloadSize(serializedParameters.length, contractName),
+        determineUpdatePayloadSize(serializedParameters.length, `${contractName}.transfer`),
         execution
     );
     return { execution, total };

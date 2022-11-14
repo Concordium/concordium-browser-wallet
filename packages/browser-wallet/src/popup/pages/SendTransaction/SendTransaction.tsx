@@ -15,12 +15,18 @@ import TransactionReceipt from '@popup/shared/TransactionReceipt/TransactionRece
 import Button from '@popup/shared/Button';
 import { displayUrl } from '@popup/shared/utils/string-helpers';
 import { noOp, useAsyncMemo } from 'wallet-common-helpers';
-import { getSimpleTransferCost } from '@popup/shared/utils/wallet-proxy';
+import { getEnergyPerCCD } from '@popup/shared/utils/wallet-proxy';
 import ConnectedBox from '@popup/pages/Account/ConnectedBox';
 import { addToastAtom } from '@popup/state';
 import ExternalRequestLayout from '@popup/page-layouts/ExternalRequestLayout';
 import { useUpdateAtom } from 'jotai/utils';
 import { addPendingTransactionAtom } from '@popup/store/transactions';
+import {
+    determineInitPayloadSize,
+    determineUpdatePayloadSize,
+    SIMPLE_TRANSFER_ENERGY_TOTAL_COST,
+} from '@shared/utils/energy-helpers';
+import { calculateEnergyCost } from '@shared/utils/token-helpers';
 import { parsePayload } from './util';
 
 interface Location {
@@ -64,10 +70,32 @@ export default function SendTransaction({ onSubmit, onReject }: Props) {
             ),
         [JSON.stringify(state.payload)]
     );
+
     const cost = useAsyncMemo(
-        transactionType === AccountTransactionType.SimpleTransfer
-            ? getSimpleTransferCost
-            : () => Promise.resolve(undefined),
+        async () => {
+            const exchangeRate = await getEnergyPerCCD();
+            const getCost = (fee: bigint) => BigInt(Math.ceil(exchangeRate * Number(fee)));
+            if (transactionType === AccountTransactionType.SimpleTransfer) {
+                return getCost(SIMPLE_TRANSFER_ENERGY_TOTAL_COST);
+            }
+            if (AccountTransactionType.UpdateSmartContractInstance === transactionType) {
+                const energy = calculateEnergyCost(
+                    1n,
+                    determineUpdatePayloadSize(payload.parameter.length, payload.receiveName),
+                    payload.maxContractExecutionEnergy
+                );
+                return getCost(energy);
+            }
+            if (AccountTransactionType.InitializeSmartContractInstance === transactionType) {
+                const energy = calculateEnergyCost(
+                    1n,
+                    determineInitPayloadSize(payload.parameter.length, payload.contractName),
+                    payload.maxContractExecutionEnergy
+                );
+                return getCost(energy);
+            }
+            return undefined;
+        },
         noOp,
         [transactionType]
     );
@@ -97,11 +125,11 @@ export default function SendTransaction({ onSubmit, onReject }: Props) {
         const transaction = { payload, header, type: transactionType };
 
         const hash = await sendTransaction(client, transaction, key);
-        const pending = createPendingTransactionFromAccountTransaction(transaction, hash);
+        const pending = createPendingTransactionFromAccountTransaction(transaction, hash, cost);
         await addPendingTransaction(pending);
 
         return hash;
-    }, [payload, key]);
+    }, [payload, key, cost]);
 
     return (
         <ExternalRequestLayout>
