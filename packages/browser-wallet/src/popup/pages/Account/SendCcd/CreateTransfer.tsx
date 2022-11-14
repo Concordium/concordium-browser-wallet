@@ -266,7 +266,7 @@ function CreateTransaction({ exchangeRate, tokens, setCost, setDetailsExpanded }
                         onMax={onMax}
                         rules={{
                             required: tShared('utils.ccdAmount.required'),
-                            validate: validateAmount as Validate<unknown>,
+                            validate: validateAmount,
                         }}
                     />
                     <Input
@@ -276,7 +276,7 @@ function CreateTransaction({ exchangeRate, tokens, setCost, setDetailsExpanded }
                         className="create-transfer__input"
                         rules={{
                             required: tShared('utils.address.required'),
-                            validate: validateAccountAddress as Validate<unknown>,
+                            validate: validateAccountAddress,
                         }}
                     />
                     <div className={clsx('create-transfer__cost', !canCoverCost && 'create-transfer__cost--error')}>

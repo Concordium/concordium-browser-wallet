@@ -7,6 +7,7 @@ import { addToastAtom } from '@popup/state';
 import { useLocation } from 'react-router-dom';
 import { useAsyncMemo } from 'wallet-common-helpers';
 import { fetchContractName, getTokenTransferParameters, getTokenTransferPayload } from '@shared/utils/token-helpers';
+import { TokenMetadata } from '@shared/storage/types';
 import ConfirmTransfer from './ConfirmTransfer';
 
 interface Props {
@@ -17,12 +18,13 @@ interface Props {
 interface State extends SimpleTransferPayload {
     contractIndex: string;
     tokenId: string;
+    metadata: TokenMetadata;
     executionEnergy: bigint;
 }
 
 export default function ConfirmTokenTransfer({ setDetailsExpanded, cost }: Props) {
     const { state } = useLocation();
-    const { toAddress, amount, contractIndex, tokenId, executionEnergy } = state as State;
+    const { toAddress, amount, contractIndex, tokenId, executionEnergy, metadata } = state as State;
     const selectedAddress = useAtomValue(selectedAccountAtom);
     const client = useAtomValue(jsonRpcClientAtom);
     const addToast = useSetAtom(addToastAtom);
@@ -47,12 +49,14 @@ export default function ConfirmTokenTransfer({ setDetailsExpanded, cost }: Props
         return undefined;
     }, [contractName]);
 
-    if (!payload) {
+    if (!payload || !parameters) {
         return null;
     }
 
     return (
         <ConfirmTransfer
+            showAsTokenTransfer
+            metadata={metadata}
             setDetailsExpanded={setDetailsExpanded}
             cost={cost}
             payload={payload}

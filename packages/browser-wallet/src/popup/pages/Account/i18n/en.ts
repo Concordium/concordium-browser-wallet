@@ -1,5 +1,5 @@
 const t = {
-    noAccounts: 'You have no accounts in your wallet',
+    noAccounts: 'You have no accounts in your wallet.',
     removeAccount: 'Remove account (local only)',
     resetConnections: 'Reset connections',
     accountAddress: 'Account address',

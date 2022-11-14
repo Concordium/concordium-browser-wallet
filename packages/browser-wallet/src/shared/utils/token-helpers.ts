@@ -10,6 +10,7 @@ import {
 import { MetadataUrl, NetworkConfiguration, TokenMetadata, TokenIdAndMetadata } from '@shared/storage/types';
 import { CIS2_SCHEMA_CONTRACT_NAME, CIS2_SCHEMA } from '@popup/constants/schema';
 import { WCCD_METADATA } from '@shared/constants/token-metadata';
+import i18n from '@popup/shell/i18n';
 import { SmartContractParameters } from './types';
 import { isMainnet } from './network-helpers';
 
@@ -77,33 +78,29 @@ function deserializeTokenMetadataReturnValue(returnValue: string): string[] {
     return urls;
 }
 
-export enum CIS2ConfirmationError {
-    Cis0Error,
-    Cis2Error,
-}
-
 /**
  * Confirms that the given smart contract instance is CIS-2 compliant
  */
 export async function confirmCIS2Contract(
     client: JsonRpcClient,
     { contractName, index, subindex }: ContractDetails
-): Promise<CIS2ConfirmationError | undefined> {
+): Promise<string | undefined> {
     const supports = await client.invokeContract({
         contract: { index, subindex },
         method: `${contractName}.supports`,
         parameter: getCIS2Identifier(),
     });
     if (!supports || supports.tag === 'failure') {
-        return CIS2ConfirmationError.Cis0Error;
+        return i18n.t('account.tokens.add.cis0Error');
     }
 
     // Supports return 2 bytes that determine the number of answers. 0100 means there is 1 answer
     // 01 Means the standard is supported.
     // TODO: Handle 02 answer properly (https://proposals.concordium.software/CIS/cis-0.html#response)
     if (supports.returnValue !== '010001') {
-        return CIS2ConfirmationError.Cis2Error;
+        return i18n.t('account.tokens.add.cis2Error');
     }
+
     return undefined;
 }
 

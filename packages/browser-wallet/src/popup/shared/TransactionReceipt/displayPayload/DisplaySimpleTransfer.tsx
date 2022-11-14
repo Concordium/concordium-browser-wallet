@@ -15,9 +15,9 @@ export default function DisplaySimpleTransfer({ payload }: Props) {
     const { t } = useTranslation('sendTransaction');
     return (
         <>
-            <h5 className="m-b-10">{t('amount')}:</h5>
-            <p className="m-t-0">{displayAsCcd(payload.amount.microGtuAmount)}</p>
-            <h5 className="m-b-10">{t('receiver')}:</h5>
+            <h5>{t('amount')}:</h5>
+            <div>{displayAsCcd(payload.amount.microGtuAmount)}</div>
+            <h5>{t('receiver')}:</h5>
             <DisplayAddress
                 className="transaction-receipt__address"
                 address={payload.toAddress.address}
