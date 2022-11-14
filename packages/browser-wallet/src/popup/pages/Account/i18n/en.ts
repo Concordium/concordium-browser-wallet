@@ -48,7 +48,9 @@ const t = {
         title: 'Send CCD',
         currentBalance: 'Current balance',
         unableToCoverCost: 'Insufficient CCD to cover estimated cost',
-        transferInvokeFailed: 'Unable to simulate transfer. Therefore cost cannot be estimated.',
+        unableToSendFailedInvoke: 'Simulation of transfer failed, unable to proceed.',
+        transferInvokeFailed: 'Simulation of transfer failed: {{ message }}',
+        unableToCreatePayload: 'Unable to create transaction: {{ message}}',
         fee: 'Estimated transaction fee',
     },
     tokens: {

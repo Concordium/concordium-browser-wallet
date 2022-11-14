@@ -332,7 +332,7 @@ async function getTokenTransferExecutionEnergyEstimate(
         method: `${contractName}.transfer`,
     });
     if (!res || res.tag === 'failure') {
-        throw new Error(`Expected succesful invocation`);
+        throw new Error(res?.reason?.tag || 'no response');
     }
     // TODO: determine the "safety ratio"
     return (res.usedEnergy * 12n) / 10n;
