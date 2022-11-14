@@ -238,7 +238,8 @@ export const getContractBalances = async (
     index: bigint,
     subindex: bigint,
     tokenIds: string[],
-    accountAddress: string
+    accountAddress: string,
+    onError?: (error: string) => void
 ): Promise<ContractBalances> => {
     const instanceInfo = await client.getInstanceInfo({ index, subindex });
 
@@ -253,6 +254,7 @@ export const getContractBalances = async (
     });
 
     if (result === undefined || result.tag === 'failure' || result.returnValue === undefined) {
+        onError?.(`Failed to retrieve balances for index ${index.toString()}`);
         return {};
     }
 
@@ -384,13 +386,21 @@ export async function getTokenTransferEnergy(
     return { execution, total };
 }
 
-export const getTokens = async (
+type GetTokensResult = {
+    id: string;
+    metadataLink: string;
+    metadata: TokenMetadata | undefined;
+    balance: bigint;
+}[];
+
+export async function getTokens(
     contractDetails: ContractDetails,
     client: JsonRpcClient,
     network: NetworkConfiguration,
     account: string,
-    ids: string[]
-) => {
+    ids: string[],
+    onError?: (error: string) => void
+): Promise<GetTokensResult> {
     const metadataPromise: Promise<[string[], Array<TokenMetadata | undefined>]> = (async () => {
         const metadataUrls = await getTokenUrl(client, ids, contractDetails);
         const metadata = await Promise.all(
@@ -399,17 +409,33 @@ export const getTokens = async (
         return [metadataUrls, metadata];
     })();
 
-    const balancesPromise = getContractBalances(client, contractDetails.index, contractDetails.subindex, ids, account);
+    const balancesPromise = getContractBalances(
+        client,
+        contractDetails.index,
+        contractDetails.subindex,
+        ids,
+        account,
+        onError
+    );
 
     const [[metadataUrls, metadata], balances] = await Promise.all([metadataPromise, balancesPromise]); // Run in parallel.
 
-    return ids.map((id, i) => ({
-        id,
-        metadataLink: metadataUrls[i],
-        metadata: metadata[i],
-        balance: balances[id] ?? 0n,
-    }));
-};
+    return ids.reduce(
+        (acc, id, i) =>
+            id in balances && metadata[i]
+                ? [
+                      ...acc,
+                      {
+                          id,
+                          metadataLink: metadataUrls[i],
+                          metadata: metadata[i],
+                          balance: balances[id] ?? 0n,
+                      },
+                  ]
+                : acc,
+        [] as GetTokensResult
+    );
+}
 
 const MAX_SYMBOL_LENGTH = 10;
 

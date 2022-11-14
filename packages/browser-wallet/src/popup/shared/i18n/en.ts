@@ -67,6 +67,9 @@ const t = {
             remove: 'Remove token',
         },
     },
+    tokenBalance: {
+        noBalance: 'Missing balance',
+    },
 };
 
 export default t;

@@ -87,7 +87,7 @@ export default function SignMessage({ respond }: Props) {
             addToast(t('filterInvalid'));
         }
 
-        getTokens(contractDetails, client, network, account, filteredIds).then((newTokens) => {
+        getTokens(contractDetails, client, network, account, filteredIds, addToast).then((newTokens) => {
             const tokensToAdd = newTokens
                 .filter((token) => token.metadata)
                 .map(
