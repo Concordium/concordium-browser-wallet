@@ -1,4 +1,5 @@
 import React, { useMemo } from 'react';
+import { useTranslation } from 'react-i18next';
 import { useSetAtom, useAtomValue } from 'jotai';
 import { selectedAccountAtom } from '@popup/store/account';
 import { AccountTransactionType, SimpleTransferPayload, UpdateContractPayload } from '@concordium/web-sdk';
@@ -23,6 +24,7 @@ interface State extends SimpleTransferPayload {
 }
 
 export default function ConfirmTokenTransfer({ setDetailsExpanded, cost }: Props) {
+    const { t } = useTranslation('account');
     const { state } = useLocation();
     const { toAddress, amount, contractIndex, tokenId, executionEnergy, metadata } = state as State;
     const selectedAddress = useAtomValue(selectedAccountAtom);
@@ -42,9 +44,14 @@ export default function ConfirmTokenTransfer({ setDetailsExpanded, cost }: Props
             return undefined;
         }
         try {
-            return getTokenTransferPayload(parameters, contractName, BigInt(executionEnergy), BigInt(contractIndex));
+            return getTokenTransferPayload(
+                parameters,
+                contractName,
+                BigInt(executionEnergy || 0),
+                BigInt(contractIndex)
+            );
         } catch (e) {
-            addToast((e as Error).message);
+            addToast(t('sendCcd.unableToCreatePayload', { message: (e as Error).message }));
         }
         return undefined;
     }, [contractName]);

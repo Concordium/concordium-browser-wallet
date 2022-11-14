@@ -118,9 +118,9 @@ function CreateTransaction({ exchangeRate, tokens, setCost, setDetailsExpanded }
                     );
                     form.setValue('executionEnergy', energy.execution.toString());
                     return energy.total;
-                } catch {
-                    addToast(t('sendCcd.transferInvokeFailed'));
-                    return undefined;
+                } catch (e) {
+                    addToast(t('sendCcd.transferInvokeFailed', { message: (e as Error).message }));
+                    return false;
                 }
             }
             return SIMPLE_TRANSFER_ENERGY_TOTAL_COST;
@@ -176,10 +176,12 @@ function CreateTransaction({ exchangeRate, tokens, setCost, setDetailsExpanded }
     useEffect(() => {
         if (!canCoverCost) {
             form.setError('cost', { type: 'custom', message: t('sendCcd.unableToCoverCost') });
+        } else if (fee === false) {
+            form.setError('cost', { type: 'custom', message: t('sendCcd.unableToSendFailedInvoke') });
         } else {
             form.clearErrors('cost');
         }
-    }, [canCoverCost]);
+    }, [canCoverCost, fee]);
 
     const displayAmount = integerToFractional(getMetadataDecimals(tokenMetadata));
 
@@ -280,11 +282,16 @@ function CreateTransaction({ exchangeRate, tokens, setCost, setDetailsExpanded }
                             validate: validateAccountAddress,
                         }}
                     />
-                    <div className={clsx('create-transfer__cost', !canCoverCost && 'create-transfer__cost--error')}>
+                    <div
+                        className={clsx(
+                            'create-transfer__cost',
+                            f.formState.errors.cost && 'create-transfer__cost--error'
+                        )}
+                    >
                         <p>
                             {t('sendCcd.fee')}: {cost ? displayAsCcd(cost) : t('unknown')}
                         </p>
-                        {!canCoverCost && <p className="m-0">{t('sendCcd.unableToCoverCost')}</p>}
+                        {f.formState.errors.cost && <p className="m-0">{f.formState.errors.cost.message}</p>}
                     </div>
                     <Submit className="create-transfer__button" width="medium">
                         {t('sendCcd.buttons.continue')}

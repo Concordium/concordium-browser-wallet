@@ -82,7 +82,7 @@ export default function SendTransaction({ onSubmit, onReject }: Props) {
                 const energy = calculateEnergyCost(
                     1n,
                     determineUpdatePayloadSize(payload.parameter.length, payload.receiveName),
-                    payload.maxContractExecutionEnergy
+                    payload.maxContractExecutionEnergy || 0n
                 );
                 return getCost(energy);
             }
@@ -90,7 +90,7 @@ export default function SendTransaction({ onSubmit, onReject }: Props) {
                 const energy = calculateEnergyCost(
                     1n,
                     determineInitPayloadSize(payload.parameter.length, payload.contractName),
-                    payload.maxContractExecutionEnergy
+                    payload.maxContractExecutionEnergy || 0n
                 );
                 return getCost(energy);
             }
