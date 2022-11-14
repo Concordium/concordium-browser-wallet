@@ -1,9 +1,6 @@
 import { JsonRpcClient } from '@concordium/web-sdk';
 
 export interface WalletConnection {
-
-    getJsonRpcClient(): JsonRpcClient;
-
     getConnectedAccount(): string | undefined;
 
     signAndSendTransaction(): Promise<string>;
@@ -25,7 +22,12 @@ export class Network {
     }
 }
 
-
 export interface WalletConnector {
-    connect(network: Network): Promise<WalletConnection>;
+    getJsonRpcClient(): JsonRpcClient;
+
+    connect(): Promise<WalletConnection>;
+}
+
+export async function withJsonRpcClient<T>(wc: WalletConnector, f: (c: JsonRpcClient) => Promise<T>) {
+    return f(wc.getJsonRpcClient());
 }

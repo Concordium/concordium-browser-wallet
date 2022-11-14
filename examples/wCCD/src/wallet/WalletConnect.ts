@@ -1,9 +1,9 @@
 import SignClient from '@walletconnect/sign-client';
 import QRCodeModal from '@walletconnect/qrcode-modal';
 import { SessionTypes } from '@walletconnect/types';
+import { HttpProvider, JsonRpcClient } from '@concordium/web-sdk';
 import { Network, WalletConnection, WalletConnector } from './WalletConnection';
 import { WALLET_CONNECT_SESSION_NAMESPACE } from './BrowserWallet';
-import { HttpProvider, JsonRpcClient } from '@concordium/web-sdk';
 
 async function connect(client: SignClient, chainId: string, setModalOpen: (val: boolean) => void) {
     try {
@@ -40,13 +40,10 @@ export class WalletConnectConnection implements WalletConnection {
 
     readonly session: SessionTypes.Struct;
 
-    readonly rpcClient: JsonRpcClient;
-
-    constructor(client: SignClient, sessionNamespace: string, session: SessionTypes.Struct, rpcClient: JsonRpcClient) {
+    constructor(client: SignClient, sessionNamespace: string, session: SessionTypes.Struct) {
         this.client = client;
         this.sessionNamespace = sessionNamespace;
         this.session = session;
-        this.rpcClient = rpcClient;
 
         // Register event handlers (from official docs).
         client.on('session_event', (event) => {
@@ -69,10 +66,6 @@ export class WalletConnectConnection implements WalletConnection {
         });
     }
 
-    getJsonRpcClient(): JsonRpcClient {
-        return this.rpcClient;
-    }
-
     getConnectedAccount(): string {
         const fullAddress = this.session.namespaces[this.sessionNamespace].accounts[0];
         const colonIdx = fullAddress.lastIndexOf(':');
@@ -88,6 +81,7 @@ export class WalletConnectConnection implements WalletConnection {
         const address = fullAddress.substring(colonIdx + 1);
         return address;
     }
+
 
     async signAndSendTransaction() {
         throw new Error('not yet implemented');
@@ -108,18 +102,28 @@ export class WalletConnectConnection implements WalletConnection {
 export class WalletConnectConnector implements WalletConnector {
     readonly client: SignClient;
 
+    readonly network: Network;
+
+    readonly rpcClient: JsonRpcClient;
+
     isModalOpen = false;
 
-    constructor(client: SignClient) {
+    constructor(client: SignClient, network: Network) {
         this.client = client;
+        this.network = network;
+
+        this.rpcClient = new JsonRpcClient(new HttpProvider(network.jsonRpcUrl));
     }
 
-    async connect(network: Network) {
-        const chainId = `${WALLET_CONNECT_SESSION_NAMESPACE}:${network.name}`;
+    getJsonRpcClient(): JsonRpcClient {
+        return this.rpcClient;
+    }
+
+    async connect() {
+        const chainId = `${WALLET_CONNECT_SESSION_NAMESPACE}:${this.network.name}`;
         const session = await connect(this.client, chainId, (v) => {
             this.isModalOpen = v;
         });
-        const rpcClient = new JsonRpcClient(new HttpProvider(network.jsonRpcUrl));
-        return new WalletConnectConnection(this.client, WALLET_CONNECT_SESSION_NAMESPACE, session, rpcClient);
+        return new WalletConnectConnection(this.client, WALLET_CONNECT_SESSION_NAMESPACE, session);
     }
 }

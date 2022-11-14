@@ -1,8 +1,8 @@
 // eslint-disable-next-line max-classes-per-file
 
-import { WalletApi } from '@concordium/browser-wallet-api-helpers';
-import { Network, WalletConnection, WalletConnector } from './WalletConnection';
+import { detectConcordiumProvider, WalletApi } from '@concordium/browser-wallet-api-helpers';
 import { JsonRpcClient } from '@concordium/web-sdk';
+import { Network, WalletConnection, WalletConnector } from './WalletConnection';
 
 export const WALLET_CONNECT_SESSION_NAMESPACE = 'ccd';
 
@@ -26,7 +26,9 @@ export class BrowserWalletConnection implements WalletConnection {
             // Emit a warning and disconnect if it's the wrong chain.
             if (genesisHash !== this.network.genesisHash) {
                 /* eslint-disable no-alert */
-                window.alert('Check if your Concordium browser wallet is connected to testnet!');
+                window.alert(
+                    `Unexpected genesis hash ${genesisHash}. Expected ${this.network.genesisHash} (network "${this.network.name}").`
+                );
                 this.setConnectedAccount(undefined);
             }
         });
@@ -35,10 +37,6 @@ export class BrowserWalletConnection implements WalletConnection {
             this.accountAddress = a;
         });
         client.on('accountDisconnected', () => client.getMostRecentlySelectedAccount().then(this.setConnectedAccount));
-    }
-
-    getJsonRpcClient(): JsonRpcClient {
-        return this.client.getJsonRpcClient();
     }
 
     getConnectedAccount(): string | undefined {
@@ -59,17 +57,30 @@ export class BrowserWalletConnection implements WalletConnection {
 }
 
 export class BrowserWalletConnector implements WalletConnector {
+    network: Network;
+
     client: WalletApi;
 
-    constructor(client: WalletApi) {
+    constructor(network: Network, client: WalletApi) {
+        this.network = network;
         this.client = client;
     }
 
-    async connect(network: Network) {
+    static async create(network: Network) {
+        const client = await detectConcordiumProvider();
+        return new BrowserWalletConnector(network, client);
+    }
+
+    getJsonRpcClient(): JsonRpcClient {
+        // TODO Fix type conversion hack.
+        return this.client.getJsonRpcClient() as unknown as JsonRpcClient;
+    }
+
+    async connect() {
         const account = await this.client.connect();
         if (!account) {
             throw new Error('connection failed');
         }
-        return new BrowserWalletConnection(this.client, network, account);
+        return new BrowserWalletConnection(this.client, this.network, account);
     }
 }

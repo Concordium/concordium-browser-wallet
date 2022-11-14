@@ -12,13 +12,13 @@ import {
     CONTRACT_SUB_INDEX,
     CONTRACT_NAME_PROXY,
     CONTRACT_NAME_IMPLEMENTATION,
-    CONTRACT_NAME_STATE,
-} from './constants';
+    CONTRACT_NAME_STATE, TESTNET
+} from "./constants";
 
 import ArrowIcon from './assets/Arrow.svg';
 import RefreshIcon from './assets/Refresh.svg';
-import {WalletConnection, WalletConnector} from './wallet/WalletConnection';
-import {BrowserWalletConnector} from "./wallet/BrowserWallet";
+import { WalletConnection, WalletConnector, withJsonRpcClient } from "./wallet/WalletConnection";
+import { BrowserWalletConnector } from './wallet/BrowserWallet';
 
 const blackCardStyle = {
     backgroundColor: 'black',
@@ -89,78 +89,53 @@ async function updateStateWCCDBalanceAccount(account: string, setAmountAccount: 
     setAmountAccount(BigInt(leb.decodeULEB128(toBuffer(res.returnValue, 'hex'))[0]));
 }
 
-interface Props {
-    handleGetAccount: (accountAddress: string | undefined) => void;
-    handleNotConnected: () => void;
-}
-
-const connector = new BrowserWalletConnector();
-
 export default function wCCD() {
     const [connector, setConnector] = useState<WalletConnector>();
-
     useEffect(() => {
+        BrowserWalletConnector.create(TESTNET).then(setConnector).catch(console.error);
+    }, []);
 
-    }, [])
-
-
-    const [ walletConnection, setWalletConnection ] = useState<WalletConnection>();
-    // const { account, isConnected } = useContext(state);
     const [ownerProxy, setOwnerProxy] = useState<string>();
     const [ownerImplementation, setOwnerImplementation] = useState<string>();
-    const [isWrapping, setIsWrapping] = useState<boolean>(true);
-    const [hash, setHash] = useState<string>('');
-    const [error, setError] = useState<string>('');
-    const [flipped, setflipped] = useState<boolean>(false);
-    const [waitForUser, setWaitForUser] = useState<boolean>(false);
-    const [amountAccount, setAmountAccount] = useState<bigint>(0n);
-    const inputValue = useRef<HTMLInputElement>(null);
-
     useEffect(() => {
-        if (walletConnection) {
-            // Get wCCD proxy contract owner.
-            walletConnection.
-            detectConcordiumProvider()
-                .then((provider) =>
-                    provider
-                        .getJsonRpcClient()
-                        .getInstanceInfo({ index: WCCD_PROXY_INDEX, subindex: CONTRACT_SUB_INDEX })
-                )
-                .then((info) => {
-                    if (info?.name !== `init_${CONTRACT_NAME_PROXY}`) {
-                        // Check that we have the expected instance.
-                        throw new Error(`Expected instance of proxy: ${info?.name}`);
-                    }
-
-                    setOwnerProxy(info.owner.address);
+        if (connector) {
+            withJsonRpcClient(connector, async (rpcClient) => {
+                // Get wCCD proxy contract owner.
+                const proxyInfo = await rpcClient.getInstanceInfo({
+                    index: WCCD_PROXY_INDEX,
+                    subindex: CONTRACT_SUB_INDEX,
                 });
 
-            // Get wCCD implementation contract owner.
-            detectConcordiumProvider()
-                .then((provider) =>
-                    provider
-                        .getJsonRpcClient()
-                        .getInstanceInfo({ index: WCCD_IMPLEMENTATION_INDEX, subindex: CONTRACT_SUB_INDEX })
-                )
-                .then((info) => {
-                    if (info?.name !== `init_${CONTRACT_NAME_IMPLEMENTATION}`) {
-                        // Check that we have the expected instance.
-                        throw new Error(`Expected instance of implementation: ${info?.name}`);
-                    }
+                if (proxyInfo?.name !== `init_${CONTRACT_NAME_PROXY}`) {
+                    // Check that we have the expected instance.
+                    throw new Error(`Expected instance of proxy: ${proxyInfo?.name}`);
+                }
 
-                    setOwnerImplementation(info.owner.address);
+                setOwnerProxy(proxyInfo.owner.address);
+
+                // Get wCCD implementation contract owner.
+                const implInfo = await rpcClient.getInstanceInfo({
+                    index: WCCD_IMPLEMENTATION_INDEX,
+                    subindex: CONTRACT_SUB_INDEX,
                 });
-        }
+                if (implInfo?.name !== `init_${CONTRACT_NAME_IMPLEMENTATION}`) {
+                    // Check that we have the expected instance.
+                    throw new Error(`Expected instance of implementation: ${implInfo?.name}`);
+                }
 
-        if (isConnected) {
-            if (account) {
-                updateStateWCCDBalanceAccount(account, setAmountAccount);
-            }
+                setOwnerImplementation(implInfo.owner.address);
+            }).catch(console.error);
         }
-    }, [isConnected]);
+    }, [connector]);
 
+    const [walletConnection, setWalletConnection] = useState<WalletConnection>();
+    const [waitForUser, setWaitForUser] = useState<boolean>(false);
     const handleOnClick = useCallback(() => {
         setWaitForUser(true);
+
+        if (connector) {
+            connector.connect()
+        }
 
         detectConcordiumProvider()
             .then((provider) => provider.connect())
@@ -192,7 +167,15 @@ export default function wCCD() {
                 );
                 setWaitForUser(false);
             });
-    }, []);
+    }, [connector]);
+
+
+    const [isWrapping, setIsWrapping] = useState<boolean>(true);
+    const [hash, setHash] = useState<string>('');
+    const [error, setError] = useState<string>('');
+    const [flipped, setflipped] = useState<boolean>(false);
+    const [amountAccount, setAmountAccount] = useState<bigint>(0n);
+    const inputValue = useRef<HTMLInputElement>(null);
 
     useEffect(() => {
         if (account) {
