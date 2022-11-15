@@ -65,8 +65,6 @@ const t: typeof en = {
             chooseContract: 'Vælg kontrakt',
             indexRequired: 'Kontrakt indeks er påkrævet',
             noContractFound: 'Ingen kontrakt fundet på indeks',
-            cis0Error: 'Kontrakten supporterer ikke CIS-0',
-            cis2Error: 'Kontrakten supporterer ikke CIS-2',
             noTokensError: 'Ingen tokens fundet i kontrakten',
             failedTokensError: 'En fejl skete under tjekket efter tokens',
             contractIndex: 'Kontrakt indeks',

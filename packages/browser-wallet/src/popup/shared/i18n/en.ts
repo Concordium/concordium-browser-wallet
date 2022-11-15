@@ -70,6 +70,10 @@ const t = {
     tokenBalance: {
         noBalance: 'Missing balance',
     },
+    addTokens: {
+        cis0Error: 'Contract does not support CIS-0',
+        cis2Error: 'Contract does not support CIS-2',
+    },
 };
 
 export default t;
