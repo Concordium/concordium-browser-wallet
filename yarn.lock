@@ -1891,7 +1891,7 @@ __metadata:
     "@babel/plugin-transform-modules-commonjs": ^7.12.1
     "@babel/plugin-transform-runtime": ^7.12.1
     "@babel/preset-env": ^7.12.1
-    "@concordium/web-sdk": ^2.1.0
+    "@concordium/web-sdk": ^3.0.0
     typescript: ^4.3.5
     webpack: ^5.72.0
     webpack-cli: ^4.9.2
@@ -1903,7 +1903,7 @@ __metadata:
   resolution: "@concordium/browser-wallet-api@workspace:packages/browser-wallet-api"
   dependencies:
     "@concordium/browser-wallet-api-helpers": "workspace:^"
-    "@concordium/common-sdk": ^5.1.0
+    "@concordium/common-sdk": ^6.0.0
     "@types/json-bigint": ^1.0.1
     json-bigint: ^1.0.0
     typescript: ^4.3.5
@@ -1928,7 +1928,7 @@ __metadata:
     "@babel/core": ^7.18.2
     "@concordium/browser-wallet-api": "workspace:^"
     "@concordium/browser-wallet-api-helpers": "workspace:^"
-    "@concordium/web-sdk": ^2.1.0
+    "@concordium/web-sdk": ^3.0.0
     "@craftamap/esbuild-plugin-html": ^0.4.0
     "@mdx-js/react": ^1.6.22
     "@scure/bip39": ^1.1.0
@@ -2024,11 +2024,11 @@ __metadata:
   languageName: node
   linkType: hard
 
-"@concordium/common-sdk@npm:5.1.0, @concordium/common-sdk@npm:^5.1.0":
-  version: 5.1.0
-  resolution: "@concordium/common-sdk@npm:5.1.0"
+"@concordium/common-sdk@npm:6.0.0, @concordium/common-sdk@npm:^6.0.0":
+  version: 6.0.0
+  resolution: "@concordium/common-sdk@npm:6.0.0"
   dependencies:
-    "@concordium/rust-bindings": 0.5.0
+    "@concordium/rust-bindings": 0.7.0
     "@noble/ed25519": ^1.7.1
     "@scure/bip39": ^1.1.0
     bs58check: ^2.1.2
@@ -2037,7 +2037,7 @@ __metadata:
     hash.js: ^1.1.7
     json-bigint: ^1.0.0
     uuid: ^8.3.2
-  checksum: e457420747fb8ba459c1bf8046ad91505d5023d354493d22a937a831d9bf68ed7506940606585356e082acd229b31a5eea715a87cc7127e4e95494bfa103bd7c
+  checksum: 7d3d02d7713e6f4673994cb7ef1ba0cce5ab8d06ed86454b0f684fc53c69326e2aa89c0755aba3ef4289e7f2bf438752fa9697eeb70e680af78e0b1999eace20
   languageName: node
   linkType: hard
 
@@ -2076,6 +2076,25 @@ __metadata:
   languageName: node
   linkType: hard
 
+"@concordium/rust-bindings@npm:0.7.0":
+  version: 0.7.0
+  resolution: "@concordium/rust-bindings@npm:0.7.0"
+  checksum: b9d7bc1557673f276e002b1bcd6651e77262f496a641ff4ba16eceb0d637df631c2b73ea5de412c42d3ae4c92325f71e9030352bf1cbb7c4412a14f93d2b358d
+  languageName: node
+  linkType: hard
+
+"@concordium/web-sdk@npm:2.0.0":
+  version: 2.0.0
+  resolution: "@concordium/web-sdk@npm:2.0.0"
+  dependencies:
+    "@concordium/common-sdk": 5.0.0
+    "@concordium/rust-bindings": 0.5.0
+    buffer: ^6.0.3
+    process: ^0.11.10
+  checksum: e122cc1a7c1d094989d9a20b855676825af8162856310b350396c26e5fdb2e8f572253e30ab8d7b9f5570c9d4fe501363c608b688001923586fc30a324ab3dcd
+  languageName: node
+  linkType: hard
+
 "@concordium/web-sdk@npm:^0.4.0":
   version: 0.4.0
   resolution: "@concordium/web-sdk@npm:0.4.0"
@@ -2088,27 +2107,15 @@ __metadata:
   languageName: node
   linkType: hard
 
-"@concordium/web-sdk@npm:^2.0.0":
-  version: 2.0.0
-  resolution: "@concordium/web-sdk@npm:2.0.0"
+"@concordium/web-sdk@npm:^3.0.0":
+  version: 3.0.0
+  resolution: "@concordium/web-sdk@npm:3.0.0"
   dependencies:
-    "@concordium/common-sdk": 5.0.0
-    "@concordium/rust-bindings": 0.5.0
+    "@concordium/common-sdk": 6.0.0
+    "@concordium/rust-bindings": 0.7.0
     buffer: ^6.0.3
     process: ^0.11.10
-  checksum: e122cc1a7c1d094989d9a20b855676825af8162856310b350396c26e5fdb2e8f572253e30ab8d7b9f5570c9d4fe501363c608b688001923586fc30a324ab3dcd
-  languageName: node
-  linkType: hard
-
-"@concordium/web-sdk@npm:^2.1.0":
-  version: 2.1.0
-  resolution: "@concordium/web-sdk@npm:2.1.0"
-  dependencies:
-    "@concordium/common-sdk": 5.1.0
-    "@concordium/rust-bindings": 0.5.0
-    buffer: ^6.0.3
-    process: ^0.11.10
-  checksum: 0f9b70c969b0f8e74484d82aaadeb93ad241a03d5bd0f751d1263afa29476cdfd4c7cf02060a408109e8e4724d32721435a060206a2de66f3588bfae6a14a601
+  checksum: 3495bc3d4d10a84c8209902643dd45558a3a6847e26b19948a4401b6186fa38503699e4940dfae3fa88c7e0a2cce2137aa60797d21db4aff8378d195bbfc39a8
   languageName: node
   linkType: hard
 
@@ -5701,7 +5708,7 @@ __metadata:
   resolution: "NFT-Minting@workspace:examples/nft-minting"
   dependencies:
     "@concordium/browser-wallet-api-helpers": "workspace:^"
-    "@concordium/web-sdk": ^2.0.0
+    "@concordium/web-sdk": ^3.0.0
     "@craftamap/esbuild-plugin-html": ^0.4.0
     "@types/react": ^18.0.9
     "@types/react-dom": ^18.0.5
@@ -15511,7 +15518,7 @@ __metadata:
   resolution: "piggybank@workspace:examples/piggybank"
   dependencies:
     "@concordium/browser-wallet-api-helpers": "workspace:^"
-    "@concordium/web-sdk": ^2.0.0
+    "@concordium/web-sdk": ^3.0.0
     "@craftamap/esbuild-plugin-html": ^0.4.0
     "@types/react": ^18.0.9
     "@types/react-dom": ^18.0.5
@@ -19722,7 +19729,7 @@ __metadata:
   resolution: "wccd@workspace:examples/wCCD"
   dependencies:
     "@concordium/browser-wallet-api-helpers": latest
-    "@concordium/web-sdk": ^2.0.0
+    "@concordium/web-sdk": 2.0.0
     "@craftamap/esbuild-plugin-html": ^0.4.0
     "@thi.ng/leb128": ^2.1.18
     "@types/node": ^18.7.23

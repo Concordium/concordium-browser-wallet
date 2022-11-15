@@ -35,7 +35,7 @@ export default function ConfirmTokenTransfer({ setDetailsExpanded, cost }: Props
     const parameters = useMemo(
         () =>
             selectedAddress &&
-            getTokenTransferParameters(selectedAddress, toAddress.address, tokenId, amount.microGtuAmount),
+            getTokenTransferParameters(selectedAddress, toAddress.address, tokenId, amount.microCcdAmount),
         []
     );
 
@@ -69,7 +69,7 @@ export default function ConfirmTokenTransfer({ setDetailsExpanded, cost }: Props
             payload={payload}
             parameters={parameters}
             returnState={state}
-            transactionType={AccountTransactionType.UpdateSmartContractInstance}
+            transactionType={AccountTransactionType.Update}
         />
     );
 }

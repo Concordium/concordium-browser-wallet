@@ -75,21 +75,21 @@ export default function SendTransaction({ onSubmit, onReject }: Props) {
         async () => {
             const exchangeRate = await getEnergyPerCCD();
             const getCost = (fee: bigint) => BigInt(Math.ceil(exchangeRate * Number(fee)));
-            if (transactionType === AccountTransactionType.SimpleTransfer) {
+            if (transactionType === AccountTransactionType.Transfer) {
                 return getCost(SIMPLE_TRANSFER_ENERGY_TOTAL_COST);
             }
-            if (AccountTransactionType.UpdateSmartContractInstance === transactionType) {
+            if (AccountTransactionType.Update === transactionType) {
                 const energy = calculateEnergyCost(
                     1n,
-                    determineUpdatePayloadSize(payload.parameter.length, payload.receiveName),
+                    determineUpdatePayloadSize(payload.message.length, payload.receiveName),
                     payload.maxContractExecutionEnergy || 0n
                 );
                 return getCost(energy);
             }
-            if (AccountTransactionType.InitializeSmartContractInstance === transactionType) {
+            if (AccountTransactionType.InitContract === transactionType) {
                 const energy = calculateEnergyCost(
                     1n,
-                    determineInitPayloadSize(payload.parameter.length, payload.contractName),
+                    determineInitPayloadSize(payload.param.length, payload.initName),
                     payload.maxContractExecutionEnergy || 0n
                 );
                 return getCost(energy);

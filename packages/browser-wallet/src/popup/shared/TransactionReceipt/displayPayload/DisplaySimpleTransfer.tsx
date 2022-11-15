@@ -16,7 +16,7 @@ export default function DisplaySimpleTransfer({ payload }: Props) {
     return (
         <>
             <h5>{t('amount')}:</h5>
-            <div>{displayAsCcd(payload.amount.microGtuAmount)}</div>
+            <div>{displayAsCcd(payload.amount.microCcdAmount)}</div>
             <h5>{t('receiver')}:</h5>
             <DisplayAddress
                 className="transaction-receipt__address"

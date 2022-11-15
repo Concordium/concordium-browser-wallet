@@ -77,7 +77,7 @@ function createDefaultValues(defaultPayload: State, accountTokens?: AccountToken
         decimals = getMetadataDecimals(metadata ?? {});
     }
     return {
-        amount: integerToFractional(decimals)(defaultPayload?.amount.microGtuAmount),
+        amount: integerToFractional(decimals)(defaultPayload?.amount?.microCcdAmount),
         recipient: defaultPayload?.toAddress.address,
         token,
     };

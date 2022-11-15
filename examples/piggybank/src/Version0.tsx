@@ -63,7 +63,7 @@ export default function PiggyBankV0() {
                 <div>Loading piggy bank...</div>
             ) : (
                 <>
-                    <h1 className="stored">{Number(piggybank?.amount.microGtuAmount) / 1000000} CCD</h1>
+                    <h1 className="stored">{Number(piggybank?.amount.microCcdAmount) / 1000000} CCD</h1>
                     <div>
                         Owned by
                         <br />
