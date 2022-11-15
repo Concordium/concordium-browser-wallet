@@ -40,7 +40,7 @@ type BaseProps = {
 
 type ConfirmTokenTransferProps = BaseProps & {
     showAsTokenTransfer: true;
-    transactionType: AccountTransactionType.UpdateSmartContractInstance;
+    transactionType: AccountTransactionType.Update;
     payload: UpdateContractPayload;
     parameters: SmartContractParameters;
     metadata: TokenMetadata;

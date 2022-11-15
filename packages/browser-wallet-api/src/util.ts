@@ -1,18 +1,22 @@
 /* eslint-disable @typescript-eslint/no-explicit-any */
-import { GtuAmount } from '@concordium/common-sdk/lib/types/gtuAmount';
+import { CcdAmount } from '@concordium/common-sdk/lib/types/ccdAmount';
 import { AccountAddress } from '@concordium/common-sdk/lib/types/accountAddress';
 import { ModuleReference } from '@concordium/common-sdk/lib/types/moduleReference';
 
 const types = {
     BigInt: 'bigint',
     Date: 'date',
-    GtuAmount: 'gtuAmount',
+    CcdAmount: 'ccdAmount',
     AccountAddress: 'accountAddress',
     ModuleReference: 'moduleReference',
 };
 
-function isGtuAmount(cand: any): cand is GtuAmount {
+function isGtuAmount(cand: any): cand is { microGtuAmount: bigint } {
     return cand && typeof cand.microGtuAmount === 'bigint';
+}
+
+function isCcdAmount(cand: any): cand is CcdAmount {
+    return cand && typeof cand.microCcdAmount === 'bigint';
 }
 
 function isAccountAddress(cand: any): cand is AccountAddress {
@@ -30,8 +34,12 @@ function replacer(this: any, k: string, v: any) {
     if (this[k] instanceof Date) {
         return { '@type': types.Date, value: v };
     }
+    // Support older versions of the SDK
     if (isGtuAmount(v)) {
-        return { '@type': types.GtuAmount, value: v.microGtuAmount.toString() };
+        return { '@type': types.CcdAmount, value: v.microGtuAmount.toString() };
+    }
+    if (isCcdAmount(v)) {
+        return { '@type': types.CcdAmount, value: v.microCcdAmount.toString() };
     }
     if (isAccountAddress(v)) {
         return { '@type': types.AccountAddress, value: v.address };
@@ -57,8 +65,8 @@ export function parse(input: string | undefined) {
                     return BigInt(v.value);
                 case types.Date:
                     return new Date(v.value);
-                case types.GtuAmount:
-                    return new GtuAmount(BigInt(v.value));
+                case types.CcdAmount:
+                    return new CcdAmount(BigInt(v.value));
                 case types.AccountAddress:
                     return new AccountAddress(v.value);
                 case types.ModuleReference:

@@ -5,7 +5,7 @@ import { createContext } from 'react';
 import { detectConcordiumProvider } from '@concordium/browser-wallet-api-helpers';
 import {
     AccountTransactionType,
-    GtuAmount,
+    CcdAmount,
     ModuleReference,
     TransactionStatusEnum,
     UpdateContractPayload,
@@ -22,12 +22,12 @@ export const createCollection = (address: string) => {
         detectConcordiumProvider()
             .then((provider) => {
                 provider
-                    .sendTransaction(address, AccountTransactionType.InitializeSmartContractInstance, {
-                        amount: new GtuAmount(0n),
+                    .sendTransaction(address, AccountTransactionType.InitContract, {
+                        amount: new CcdAmount(0n),
                         moduleRef: new ModuleReference(
                             '69d48cea644389f65be2cd807df746abc8b97d888dc98ae531030c2a3bffeee0'
                         ),
-                        contractName: 'CIS2-NFT',
+                        initName: 'CIS2-NFT',
                         maxContractExecutionEnergy: 30000n,
                     })
                     .then((txHash) =>
@@ -72,10 +72,10 @@ export const mint = (account: string, id: string, url: string, index: bigint, su
                 provider
                     .sendTransaction(
                         account,
-                        AccountTransactionType.UpdateSmartContractInstance,
+                        AccountTransactionType.Update,
                         {
-                            amount: new GtuAmount(0n),
-                            contractAddress: {
+                            amount: new CcdAmount(0n),
+                            address: {
                                 index,
                                 subindex,
                             },

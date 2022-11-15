@@ -2,10 +2,11 @@ import { Buffer } from 'buffer/';
 import uleb128 from 'leb128/unsigned';
 import {
     AccountAddress,
-    GtuAmount,
+    CcdAmount,
     InstanceInfo,
     JsonRpcClient,
     serializeUpdateContractParameters,
+    UpdateContractPayload,
 } from '@concordium/web-sdk';
 import { MetadataUrl, NetworkConfiguration, TokenMetadata, TokenIdAndMetadata } from '@shared/storage/types';
 import { CIS2_SCHEMA_CONTRACT_NAME, CIS2_SCHEMA } from '@popup/constants/schema';
@@ -308,12 +309,12 @@ export function getTokenTransferPayload(
     maxContractExecutionEnergy: bigint,
     index: bigint,
     subindex = 0n
-) {
+): UpdateContractPayload {
     return {
-        amount: new GtuAmount(0n),
-        contractAddress: { index, subindex },
+        amount: new CcdAmount(0n),
+        address: { index, subindex },
         receiveName: `${contractName}.transfer`,
-        parameter: serializeTokenTransferParameters(parameters),
+        message: serializeTokenTransferParameters(parameters),
         maxContractExecutionEnergy,
     };
 }

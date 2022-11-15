@@ -57,11 +57,11 @@ function mapTransactionKindStringToTransactionType(
         case TransactionKindString.DeployModule:
             return AccountTransactionType.DeployModule;
         case TransactionKindString.InitContract:
-            return AccountTransactionType.InitializeSmartContractInstance;
+            return AccountTransactionType.InitContract;
         case TransactionKindString.Update:
-            return AccountTransactionType.UpdateSmartContractInstance;
+            return AccountTransactionType.Update;
         case TransactionKindString.Transfer:
-            return AccountTransactionType.SimpleTransfer;
+            return AccountTransactionType.Transfer;
         case TransactionKindString.AddBaker:
             return AccountTransactionType.AddBaker;
         case TransactionKindString.RemoveBaker:
@@ -81,7 +81,7 @@ function mapTransactionKindStringToTransactionType(
         case TransactionKindString.FinalizationReward:
             return RewardType.FinalizationReward;
         case TransactionKindString.EncryptedAmountTransfer:
-            return AccountTransactionType.EncryptedTransfer;
+            return AccountTransactionType.EncryptedAmountTransfer;
         case TransactionKindString.TransferToEncrypted:
             return AccountTransactionType.TransferToEncrypted;
         case TransactionKindString.TransferToPublic:
@@ -93,9 +93,9 @@ function mapTransactionKindStringToTransactionType(
         case TransactionKindString.RegisterData:
             return AccountTransactionType.RegisterData;
         case TransactionKindString.TransferWithMemo:
-            return AccountTransactionType.SimpleTransferWithMemo;
+            return AccountTransactionType.TransferWithMemo;
         case TransactionKindString.EncryptedAmountTransferWithMemo:
-            return AccountTransactionType.EncryptedTransferWithMemo;
+            return AccountTransactionType.EncryptedAmountTransferWithMemo;
         case TransactionKindString.TransferWithScheduleAndMemo:
             return AccountTransactionType.TransferWithScheduleWithMemo;
         case TransactionKindString.ConfigureBaker:
@@ -281,7 +281,7 @@ export async function getCcdDrop(accountAddress: string): Promise<BrowserWalletA
     const response = await (await getWalletProxy()).put(`/v0/testnetGTUDrop/${accountAddress}`);
 
     return createPendingTransaction(
-        AccountTransactionType.SimpleTransfer,
+        AccountTransactionType.Transfer,
         response.data.submissionId,
         BigInt(2000000000),
         undefined,

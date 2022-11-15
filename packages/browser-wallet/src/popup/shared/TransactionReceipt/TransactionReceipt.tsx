@@ -52,11 +52,11 @@ export type TokenTransferReceiptProps = GenericTransactionReceiptProps & {
 
 function displayPayload({ payload, type }: Omit<AccountTransaction, 'header'>, parameters?: SmartContractParameters) {
     switch (type) {
-        case AccountTransactionType.SimpleTransfer:
+        case AccountTransactionType.Transfer:
             return <DisplaySimpleTransfer payload={payload as SimpleTransferPayload} />;
-        case AccountTransactionType.UpdateSmartContractInstance:
+        case AccountTransactionType.Update:
             return <DisplayUpdateContract payload={payload as UpdateContractPayload} parameters={parameters} />;
-        case AccountTransactionType.InitializeSmartContractInstance:
+        case AccountTransactionType.InitContract:
             return <DisplayInitContract payload={payload as InitContractPayload} parameters={parameters} />;
         default:
             return <DisplayGenericPayload payload={payload} />;

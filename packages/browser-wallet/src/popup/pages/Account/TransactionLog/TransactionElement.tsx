@@ -55,22 +55,23 @@ function isOutgoingTransaction(transaction: BrowserWalletTransaction, accountAdd
 function isEncryptedTransfer(transaction: BrowserWalletTransaction) {
     return (
         isAccountTransaction(transaction) &&
-        [AccountTransactionType.EncryptedTransfer, AccountTransactionType.EncryptedTransferWithMemo].includes(
-            transaction.type
-        )
+        [
+            AccountTransactionType.EncryptedAmountTransfer,
+            AccountTransactionType.EncryptedAmountTransferWithMemo,
+        ].includes(transaction.type)
     );
 }
 
 function isTransferTransaction(type: AccountTransactionType) {
     switch (type) {
-        case AccountTransactionType.SimpleTransfer:
-        case AccountTransactionType.SimpleTransferWithMemo:
+        case AccountTransactionType.Transfer:
+        case AccountTransactionType.TransferWithMemo:
         case AccountTransactionType.TransferToEncrypted:
         case AccountTransactionType.TransferToPublic:
         case AccountTransactionType.TransferWithSchedule:
         case AccountTransactionType.TransferWithScheduleWithMemo:
-        case AccountTransactionType.EncryptedTransfer:
-        case AccountTransactionType.EncryptedTransferWithMemo:
+        case AccountTransactionType.EncryptedAmountTransfer:
+        case AccountTransactionType.EncryptedAmountTransferWithMemo:
             return true;
         default:
             return false;
@@ -87,8 +88,7 @@ function isTransferTransaction(type: AccountTransactionType) {
 function buildFeeString(cost: bigint, accountAddress: string, transaction: BrowserWalletTransaction) {
     if (
         isAccountTransaction(transaction) &&
-        (isTransferTransaction(transaction.type) ||
-            transaction.type === AccountTransactionType.UpdateSmartContractInstance)
+        (isTransferTransaction(transaction.type) || transaction.type === AccountTransactionType.Update)
     ) {
         if (isOutgoingTransaction(transaction, accountAddress)) {
             if (isEncryptedTransfer(transaction)) {
@@ -107,11 +107,11 @@ function mapTypeToText(type: AccountTransactionType | RewardType | SpecialTransa
     switch (type) {
         case AccountTransactionType.DeployModule:
             return 'Module deployment';
-        case AccountTransactionType.InitializeSmartContractInstance:
+        case AccountTransactionType.InitContract:
             return 'Contract initiation';
-        case AccountTransactionType.UpdateSmartContractInstance:
+        case AccountTransactionType.Update:
             return 'Update';
-        case AccountTransactionType.SimpleTransfer:
+        case AccountTransactionType.Transfer:
             return 'Transfer';
         case AccountTransactionType.AddBaker:
             return 'Add baker';
@@ -131,7 +131,7 @@ function mapTypeToText(type: AccountTransactionType | RewardType | SpecialTransa
             return 'Block reward';
         case RewardType.FinalizationReward:
             return 'Finalization reward';
-        case AccountTransactionType.EncryptedTransfer:
+        case AccountTransactionType.EncryptedAmountTransfer:
             return 'Shielded transfer';
         case AccountTransactionType.TransferToEncrypted:
             return 'Shielded amount';
@@ -143,9 +143,9 @@ function mapTypeToText(type: AccountTransactionType | RewardType | SpecialTransa
             return 'Credentials update';
         case AccountTransactionType.RegisterData:
             return 'Data registration';
-        case AccountTransactionType.SimpleTransferWithMemo:
+        case AccountTransactionType.TransferWithMemo:
             return 'Transfer';
-        case AccountTransactionType.EncryptedTransferWithMemo:
+        case AccountTransactionType.EncryptedAmountTransferWithMemo:
             return 'Shielded transfer';
         case AccountTransactionType.TransferWithScheduleWithMemo:
             return 'Scheduled transfer';
@@ -168,7 +168,7 @@ function isGreenAmount(transaction: BrowserWalletTransaction, accountAddress: st
     }
     if (
         (transaction.type === AccountTransactionType.TransferToPublic ||
-            transaction.type === AccountTransactionType.UpdateSmartContractInstance) &&
+            transaction.type === AccountTransactionType.Update) &&
         transaction.cost &&
         transaction.amount > transaction.cost
     ) {

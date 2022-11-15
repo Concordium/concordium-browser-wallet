@@ -1,5 +1,5 @@
 import React from 'react';
-import { AccountTransactionPayload, AccountAddress, GtuAmount } from '@concordium/web-sdk';
+import { AccountTransactionPayload, AccountAddress, CcdAmount } from '@concordium/web-sdk';
 import DisplayAddress, { AddressDisplayFormat } from 'wallet-common-helpers/src/components/DisplayAddress';
 import { displayAsCcd } from 'wallet-common-helpers/lib/utils/ccd';
 
@@ -18,8 +18,8 @@ function displayValue(value: any) {
             />
         );
     }
-    if (value instanceof GtuAmount) {
-        return <p className="m-t-0">{displayAsCcd(value.microGtuAmount)}</p>;
+    if (value instanceof CcdAmount) {
+        return <p className="m-t-0">{displayAsCcd(value.microCcdAmount)}</p>;
     }
     return <p className="m-t-0">{value.toString()}</p>;
 }

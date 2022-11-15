@@ -4,7 +4,7 @@
     "license": "Apache-2.0",
     "dependencies": {
         "@concordium/browser-wallet-api-helpers": "latest",
-        "@concordium/web-sdk": "^2.0.0",
+        "@concordium/web-sdk": "2.0.0",
         "@thi.ng/leb128": "^2.1.18",
         "react": "^18.1.0",
         "react-dom": "^18.1.0"

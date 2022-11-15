@@ -12,15 +12,13 @@ import { Buffer } from 'buffer/';
 import { parse } from '@concordium/browser-wallet-api/src/util';
 
 export type HeadlessTransaction =
-    | { type: AccountTransactionType.UpdateSmartContractInstance; payload: UpdateContractPayload }
-    | { type: AccountTransactionType.SimpleTransfer; payload: SimpleTransferPayload }
-    | { type: AccountTransactionType.InitializeSmartContractInstance; payload: InitContractPayload }
+    | { type: AccountTransactionType.Update; payload: UpdateContractPayload }
+    | { type: AccountTransactionType.Transfer; payload: SimpleTransferPayload }
+    | { type: AccountTransactionType.InitContract; payload: InitContractPayload }
     | {
           type: Exclude<
               AccountTransactionType,
-              | AccountTransactionType.SimpleTransfer
-              | AccountTransactionType.UpdateSmartContractInstance
-              | AccountTransactionType.InitializeSmartContractInstance
+              AccountTransactionType.Transfer | AccountTransactionType.Update | AccountTransactionType.InitContract
           >;
           payload: AccountTransactionPayload;
       };
@@ -35,7 +33,7 @@ export function parsePayload(
     const payload = parse(stringifiedPayload);
 
     switch (type) {
-        case AccountTransactionType.UpdateSmartContractInstance: {
+        case AccountTransactionType.Update: {
             const [contractName, functionName] = payload.receiveName.split('.');
 
             const parameter =
@@ -57,7 +55,7 @@ export function parsePayload(
                 },
             };
         }
-        case AccountTransactionType.InitializeSmartContractInstance: {
+        case AccountTransactionType.InitContract: {
             const parameter =
                 parameters && schema
                     ? serializeInitContractParameters(
