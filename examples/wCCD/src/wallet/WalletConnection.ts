@@ -1,7 +1,7 @@
 import { JsonRpcClient } from '@concordium/web-sdk';
 
 export interface WalletConnection {
-    getConnectedAccount(): string | undefined;
+    getConnectedAccount(): string | undefined; // TODO should not be able to return undefined?
 
     signAndSendTransaction(): Promise<string>;
 

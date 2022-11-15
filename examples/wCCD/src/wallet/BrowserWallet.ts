@@ -1,5 +1,4 @@
 // eslint-disable-next-line max-classes-per-file
-
 import { detectConcordiumProvider, WalletApi } from '@concordium/browser-wallet-api-helpers';
 import { JsonRpcClient } from '@concordium/web-sdk';
 import { Network, WalletConnection, WalletConnector } from './WalletConnection';

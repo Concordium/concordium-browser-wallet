@@ -1,9 +1,9 @@
 /* eslint-disable no-console */
-import React, { useEffect, useState, useContext, useRef, useCallback } from 'react';
-import { toBuffer, AccountAddress } from '@concordium/web-sdk';
-import { detectConcordiumProvider } from '@concordium/browser-wallet-api-helpers';
+import React, {useEffect, useState, useContext, useRef, useCallback} from 'react';
+import {toBuffer, AccountAddress} from '@concordium/web-sdk';
+import {detectConcordiumProvider} from '@concordium/browser-wallet-api-helpers';
 import * as leb from '@thi.ng/leb128';
-import { wrap, unwrap, state } from './utils';
+import {wrap, unwrap, state} from './utils';
 import {
     TESTNET_GENESIS_BLOCK_HASH,
     WCCD_PROXY_INDEX,
@@ -17,8 +17,8 @@ import {
 
 import ArrowIcon from './assets/Arrow.svg';
 import RefreshIcon from './assets/Refresh.svg';
-import { WalletConnection, WalletConnector, withJsonRpcClient } from "./wallet/WalletConnection";
-import { BrowserWalletConnector } from './wallet/BrowserWallet';
+import {WalletConnection, WalletConnector, withJsonRpcClient} from "./wallet/WalletConnection";
+import {BrowserWalletConnector} from './wallet/BrowserWallet';
 
 const blackCardStyle = {
     backgroundColor: 'black',
@@ -79,7 +79,7 @@ async function updateStateWCCDBalanceAccount(account: string, setAmountAccount: 
     const provider = await detectConcordiumProvider();
     const res = await provider.getJsonRpcClient().invokeContract({
         method: `${CONTRACT_NAME_STATE}.getBalance`,
-        contract: { index: WCCD_STATE_INDEX, subindex: CONTRACT_SUB_INDEX },
+        contract: {index: WCCD_STATE_INDEX, subindex: CONTRACT_SUB_INDEX},
         parameter: inputParams,
     });
     if (!res || res.tag === 'failure' || !res.returnValue) {
@@ -131,44 +131,14 @@ export default function wCCD() {
     const [walletConnection, setWalletConnection] = useState<WalletConnection>();
     const [waitForUser, setWaitForUser] = useState<boolean>(false);
     const handleOnClick = useCallback(() => {
-        setWaitForUser(true);
-
         if (connector) {
-            connector.connect()
+            setWaitForUser(true);
+            connector
+                .connect()
+                .then(setWalletConnection)
+                .finally(() => setWaitForUser(false));
         }
-
-        detectConcordiumProvider()
-            .then((provider) => provider.connect())
-            .then(handleGetAccount)
-            .then(() => {
-                setWaitForUser(false);
-                detectConcordiumProvider()
-                    // Check if the user is connected to testnet by checking if the testnet genesisBlock exists.
-                    // Throw a warning and disconnect if not. We only want to
-                    // allow users to interact with our testnet smart contracts.
-                    .then((provider) =>
-                        provider
-                            .getJsonRpcClient()
-                            .getCryptographicParameters(TESTNET_GENESIS_BLOCK_HASH.toString())
-                            .then((result) => {
-                                if (result === undefined || result?.value === null) {
-                                    handleNotConnected();
-                                    /* eslint-disable no-alert */
-                                    window.alert(
-                                        'Your JsonRpcClient in the Concordium browser wallet cannot connect. Check if your Concordium browser wallet is connected to testnet!'
-                                    );
-                                }
-                            })
-                    );
-            })
-            .catch(() => {
-                window.alert(
-                    'Your JsonRpcClient in the Concordium browser wallet cannot connect. Check if your Concordium browser wallet is connected to testnet!'
-                );
-                setWaitForUser(false);
-            });
     }, [connector]);
-
 
     const [isWrapping, setIsWrapping] = useState<boolean>(true);
     const [hash, setHash] = useState<string>('');
@@ -178,10 +148,14 @@ export default function wCCD() {
     const inputValue = useRef<HTMLInputElement>(null);
 
     useEffect(() => {
-        if (account) {
-            updateStateWCCDBalanceAccount(account, setAmountAccount);
+        if (walletConnection) {
+            const address = walletConnection.getConnectedAccount();
+            if (address) {
+                updateStateWCCDBalanceAccount(address, setAmountAccount)
+                    .catch(console.error);
+            }
         }
-    }, [account]);
+    }, [walletConnection]);
 
     return (
         <>
@@ -189,17 +163,17 @@ export default function wCCD() {
             <h3>Wrap and unwrap your CCDs and wCCDs on the Concordium Testnet</h3>
             <div style={blackCardStyle}>
                 <div>
-                    {!isConnected && waitForUser && (
+                    {!walletConnection && waitForUser && (
                         <button style={ButtonStyleDisabled} type="button" disabled>
                             Waiting for user
                         </button>
                     )}
-                    {!isConnected && !waitForUser && (
+                    {!walletConnection && !waitForUser && (
                         <button style={ButtonStyle} type="button" onClick={handleOnClick}>
                             Connect Wallet
                         </button>
                     )}
-                    {isConnected && (
+                    {walletConnection && (
                         <>
                             <div className="text">Connected to</div>
                             <button
@@ -218,7 +192,7 @@ export default function wCCD() {
                         </>
                     )}
                 </div>
-                <br />
+                <br/>
                 <div className="text">wCCD Balance of connected account</div>
                 <div className="containerSpaceBetween">
                     <div className="largeText">{Number(amountAccount) / 1000000}</div>
@@ -233,25 +207,25 @@ export default function wCCD() {
                         }}
                     >
                         {flipped ? (
-                            <RefreshIcon style={{ transform: 'rotate(90deg)' }} height="20px" width="20px" />
+                            <RefreshIcon style={{transform: 'rotate(90deg)'}} height="20px" width="20px"/>
                         ) : (
-                            <RefreshIcon height="20px" width="20px" />
+                            <RefreshIcon height="20px" width="20px"/>
                         )}
                     </button>
                 </div>
-                <br />
+                <br/>
                 <div className="containerSwitch">
                     <div className="largeText">CCD &nbsp; &nbsp; </div>
                     <button className="switch" type="button" onClick={() => setIsWrapping(!isWrapping)}>
                         {isWrapping ? (
                             <ArrowIcon
-                                style={{ padding: '2px 2px 0px 0px', borderRadius: '5' }}
+                                style={{padding: '2px 2px 0px 0px', borderRadius: '5'}}
                                 height="20px"
                                 width="20px"
                             />
                         ) : (
                             <ArrowIcon
-                                style={{ padding: '2px 2px 0px 0px', borderRadius: '5', transform: 'scaleX(-1)' }}
+                                style={{padding: '2px 2px 0px 0px', borderRadius: '5', transform: 'scaleX(-1)'}}
                                 height="20px"
                                 width="20px"
                             />
@@ -330,10 +304,10 @@ export default function wCCD() {
                         </button>
                     )}
                 </label>
-                <br />
-                <br />
+                <br/>
+                <br/>
                 <div>Transaction status{hash === '' ? '' : ' (May take a moment to finalize)'}</div>
-                {hash === '' && error !== '' && <div style={{ color: 'red' }}>Transaction rejected by wallet.</div>}
+                {hash === '' && error !== '' && <div style={{color: 'red'}}>Transaction rejected by wallet.</div>}
                 {hash === '' && error === '' && <div className="loadingText">Waiting for transaction...</div>}
                 {hash !== '' && (
                     <>
@@ -351,13 +325,13 @@ export default function wCCD() {
                             {' '}
                             {hash}{' '}
                         </button>
-                        <br />
+                        <br/>
                     </>
                 )}
-                <br />
+                <br/>
                 <div>
                     Proxy wCCD owned by
-                    <br />
+                    <br/>
                     {ownerProxy === undefined ? (
                         <div className="loadingText">Loading...</div>
                     ) : (
@@ -379,7 +353,7 @@ export default function wCCD() {
                 </div>
                 <div>
                     Implementation wCCD owned by
-                    <br />
+                    <br/>
                     {ownerImplementation === undefined ? (
                         <div className="loadingText">Loading...</div>
                     ) : (
@@ -399,9 +373,9 @@ export default function wCCD() {
                         </button>
                     )}
                 </div>
-                <br />
+                <br/>
                 <a
-                    style={{ color: 'white' }}
+                    style={{color: 'white'}}
                     href="https://developer.concordium.software/en/mainnet/smart-contracts/tutorials/wCCD/index.html"
                     target="_blank"
                     rel="noreferrer"
