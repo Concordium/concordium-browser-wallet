@@ -116,20 +116,23 @@ class WalletApi extends EventEmitter implements IWalletApi {
         let parsedPayload = payload;
         if (type === AccountTransactionType.InitContract) {
             const initPayload: InitContractPayload = {
-                ...payload,
-                initName: payload.initName || payload.contractName,
+                ...(payload as InitContractPayload),
+                // eslint-disable-next-line @typescript-eslint/no-explicit-any
+                initName: (payload as InitContractPayload).initName || (payload as any).contractName,
             };
             parsedPayload = initPayload;
         } else if (type === AccountTransactionType.Update) {
             const updatePayload: UpdateContractPayload = {
-                ...payload,
-                address: payload.address || payload.contractAddress,
+                ...(payload as UpdateContractPayload),
+                // eslint-disable-next-line @typescript-eslint/no-explicit-any
+                address: (payload as UpdateContractPayload).address || (payload as any).contractAddress,
             };
             parsedPayload = updatePayload;
         } else if (type === AccountTransactionType.DeployModule) {
             const deployPayload: DeployModulePayload = {
-                ...payload,
-                source: payload.source || payload.content,
+                ...(payload as DeployModulePayload),
+                // eslint-disable-next-line @typescript-eslint/no-explicit-any
+                source: (payload as DeployModulePayload).source || (payload as any).content,
             };
             parsedPayload = deployPayload;
         }
