@@ -37,34 +37,11 @@ async function connect(client: SignClient, chainId: string, setModalOpen: (val: 
 export class WalletConnectConnection implements WalletConnection {
     readonly client: SignClient;
 
-    readonly sessionNamespace: string;
-
     readonly session: SessionTypes.Struct;
 
-    constructor(client: SignClient, sessionNamespace: string, session: SessionTypes.Struct, events: Events) {
+    constructor(client: SignClient, sessionNamespace: string, session: SessionTypes.Struct) {
         this.client = client;
-        this.sessionNamespace = sessionNamespace;
         this.session = session;
-
-        // Register event handlers (from official docs).
-        client.on('session_event', (event) => {
-            // Handle session events, such as "chainChanged", "accountsChanged", etc.
-            // eslint-disable-next-line no-console
-            console.debug('Wallet Connect event: session_event', { event });
-        });
-        client.on('session_update', ({ topic, params }) => {
-            const { namespaces } = params;
-            // Overwrite the `namespaces` of the existing session with the incoming one.
-            const updatedSession = { ...session, namespaces };
-            // Integrate the updated session state into your dapp state.
-            // eslint-disable-next-line no-console
-            console.debug('Wallet Connect event: session_update', { updatedSession });
-        });
-        client.on('session_delete', () => {
-            // Session was deleted -> reset the dapp state, clean up from user session, etc.
-            // eslint-disable-next-line no-console
-            console.debug('Wallet Connect event: session_delete');
-        });
     }
 
     async signAndSendTransaction() {
@@ -107,6 +84,25 @@ export class WalletConnectConnector implements WalletConnector {
         const chainId = `${WALLET_CONNECT_SESSION_NAMESPACE}:${this.network.name}`;
         const session = await connect(this.client, chainId, (v) => {
             this.isModalOpen = v;
+        });
+        // Register event handlers (from official docs).
+        this.client.on('session_event', (event) => {
+            // Handle session events, such as "chainChanged", "accountsChanged", etc.
+            // eslint-disable-next-line no-console
+            console.debug('Wallet Connect event: session_event', { event });
+        });
+        this.client.on('session_update', ({ topic, params }) => {
+            const { namespaces } = params;
+            // Overwrite the `namespaces` of the existing session with the incoming one.
+            const updatedSession = { ...session, namespaces };
+            // Integrate the updated session state into your dapp state.
+            // eslint-disable-next-line no-console
+            console.debug('Wallet Connect event: session_update', { updatedSession });
+        });
+        this.client.on('session_delete', () => {
+            // Session was deleted -> reset the dapp state, clean up from user session, etc.
+            // eslint-disable-next-line no-console
+            console.debug('Wallet Connect event: session_delete');
         });
         return new WalletConnectConnection(this.client, WALLET_CONNECT_SESSION_NAMESPACE, session, events);
     }

@@ -93,7 +93,7 @@ async function updateStateWCCDBalanceAccount(account: string, setAmountAccount: 
 export default function wCCD() {
     const [connector, setConnector] = useState<WalletConnector>();
     useEffect(() => {
-        BrowserWalletConnector.create(TESTNET).then(setConnector).catch(console.error);
+        BrowserWalletConnector.create().then(setConnector).catch(console.error);
     }, []);
 
     const [ownerProxy, setOwnerProxy] = useState<string>();
@@ -146,11 +146,10 @@ export default function wCCD() {
     const [error, setError] = useState<string>('');
     const [flipped, setflipped] = useState<boolean>(false);
     const [amountAccount, setAmountAccount] = useState<bigint>(0n);
-    const inputValue = useRef<HTMLInputElement>(null);
+    const inputValue = useRef<HTMLInputElement>();
 
     useEffect(() => {
         if (walletConnection) {
-            const address = walletConnection.getConnectedAccount();
             if (address) {
                 updateStateWCCDBalanceAccount(address, setAmountAccount).catch(console.error);
             }

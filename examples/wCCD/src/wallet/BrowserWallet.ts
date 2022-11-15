@@ -8,31 +8,8 @@ export const WALLET_CONNECT_SESSION_NAMESPACE = 'ccd';
 export class BrowserWalletConnection implements WalletConnection {
     readonly client: WalletApi;
 
-    readonly network: Network;
-
-    constructor(client: WalletApi, network: Network, account: string, events: Events) {
+    constructor(client: WalletApi) {
         this.client = client;
-        this.network = network;
-        this.accountAddress = account;
-
-        client.getMostRecentlySelectedAccount().then(events.onAccountChanged);
-
-        // Listen for relevant events from the wallet.
-        client.on('chainChanged', (genesisHash) => {
-            // // Check if the user is connected to testnet by checking if the genesis hash matches the expected one.
-            // // Emit a warning and disconnect if it's the wrong chain.
-            // if (genesisHash !== this.network.genesisHash) {
-            //     /* eslint-disable no-alert */
-            //     window.alert(
-            //         `Unexpected genesis hash ${genesisHash}. Expected ${this.network.genesisHash} (network "${this.network.name}").`
-            //     );
-            //     this.setConnectedAccount(undefined);
-            // }
-            events.onChainChanged(genesisHash);
-        });
-
-        client.on('accountChanged', (a) => events.onAccountChanged(a));
-        client.on('accountDisconnected', () => client.getMostRecentlySelectedAccount().then(events.onAccountChanged));
     }
 
     async signAndSendTransaction() {
@@ -45,18 +22,15 @@ export class BrowserWalletConnection implements WalletConnection {
 }
 
 export class BrowserWalletConnector implements WalletConnector {
-    network: Network;
-
     client: WalletApi;
 
-    constructor(network: Network, client: WalletApi) {
-        this.network = network;
+    constructor(client: WalletApi) {
         this.client = client;
     }
 
-    static async create(network: Network) {
+    static async create() {
         const client = await detectConcordiumProvider();
-        return new BrowserWalletConnector(network, client);
+        return new BrowserWalletConnector(client);
     }
 
     getJsonRpcClient(): JsonRpcClient {
@@ -69,6 +43,13 @@ export class BrowserWalletConnector implements WalletConnector {
         if (!account) {
             throw new Error('connection failed');
         }
-        return new BrowserWalletConnection(this.client, this.network, account, events);
+        events.onAccountChanged(account);
+
+        // Pass relevant events from wallet onto the handler object.
+        this.client.on('chainChanged', events.onChainChanged);
+        this.client.on('accountChanged', events.onAccountChanged);
+        this.client.on('accountDisconnected', () => client.getMostRecentlySelectedAccount().then(events.onAccountChanged));
+
+        return new BrowserWalletConnection(this.client);
     }
 }
