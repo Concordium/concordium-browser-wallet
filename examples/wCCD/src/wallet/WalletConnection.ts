@@ -1,8 +1,6 @@
 import { JsonRpcClient } from '@concordium/web-sdk';
 
 export interface WalletConnection {
-    getConnectedAccount(): string | undefined; // TODO should not be able to return undefined?
-
     signAndSendTransaction(): Promise<string>;
 
     disconnect(): Promise<void>; // TODO unclear if this belongs here...
@@ -22,10 +20,16 @@ export class Network {
     }
 }
 
+export interface Events {
+    onChainChanged(chain: string): void;
+    onAccountChanged(address: string | undefined): void;
+    onDisconnect(): void;
+}
+
 export interface WalletConnector {
     getJsonRpcClient(): JsonRpcClient;
 
-    connect(): Promise<WalletConnection>;
+    connect(events: Events): Promise<WalletConnection>;
 }
 
 export async function withJsonRpcClient<T>(wc: WalletConnector, f: (c: JsonRpcClient) => Promise<T>) {

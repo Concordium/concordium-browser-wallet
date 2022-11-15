@@ -1,8 +1,9 @@
+// eslint-disable-next-line max-classes-per-file
 import SignClient from '@walletconnect/sign-client';
 import QRCodeModal from '@walletconnect/qrcode-modal';
 import { SessionTypes } from '@walletconnect/types';
 import { HttpProvider, JsonRpcClient } from '@concordium/web-sdk';
-import { Network, WalletConnection, WalletConnector } from './WalletConnection';
+import { Events, Network, WalletConnection, WalletConnector } from './WalletConnection';
 import { WALLET_CONNECT_SESSION_NAMESPACE } from './BrowserWallet';
 
 async function connect(client: SignClient, chainId: string, setModalOpen: (val: boolean) => void) {
@@ -40,7 +41,7 @@ export class WalletConnectConnection implements WalletConnection {
 
     readonly session: SessionTypes.Struct;
 
-    constructor(client: SignClient, sessionNamespace: string, session: SessionTypes.Struct) {
+    constructor(client: SignClient, sessionNamespace: string, session: SessionTypes.Struct, events: Events) {
         this.client = client;
         this.sessionNamespace = sessionNamespace;
         this.session = session;
@@ -65,23 +66,6 @@ export class WalletConnectConnection implements WalletConnection {
             console.debug('Wallet Connect event: session_delete');
         });
     }
-
-    getConnectedAccount(): string {
-        const fullAddress = this.session.namespaces[this.sessionNamespace].accounts[0];
-        const colonIdx = fullAddress.lastIndexOf(':');
-        if (colonIdx < 0) {
-            throw new Error(`invalid format of address '${fullAddress}'`);
-        }
-        const namespace = fullAddress.substring(0, colonIdx);
-        if (namespace !== this.sessionNamespace) {
-            throw new Error(
-                `expected address '${fullAddress}' to have namespace '${this.sessionNamespace}' but it had '${namespace}'`
-            );
-        }
-        const address = fullAddress.substring(colonIdx + 1);
-        return address;
-    }
-
 
     async signAndSendTransaction() {
         throw new Error('not yet implemented');
@@ -119,11 +103,11 @@ export class WalletConnectConnector implements WalletConnector {
         return this.rpcClient;
     }
 
-    async connect() {
+    async connect(events: Events) {
         const chainId = `${WALLET_CONNECT_SESSION_NAMESPACE}:${this.network.name}`;
         const session = await connect(this.client, chainId, (v) => {
             this.isModalOpen = v;
         });
-        return new WalletConnectConnection(this.client, WALLET_CONNECT_SESSION_NAMESPACE, session);
+        return new WalletConnectConnection(this.client, WALLET_CONNECT_SESSION_NAMESPACE, session, events);
     }
 }
