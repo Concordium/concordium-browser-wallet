@@ -8,7 +8,10 @@ import {
     AccountTransactionPayload,
     AccountTransactionSignature,
     AccountTransactionType,
+    DeployModulePayload,
+    InitContractPayload,
     SchemaVersion,
+    UpdateContractPayload,
 } from '@concordium/common-sdk/lib/types';
 import { JsonRpcClient } from '@concordium/common-sdk/lib/JsonRpcClient';
 import { WalletApi as IWalletApi, EventType } from '@concordium/browser-wallet-api-helpers';
@@ -109,12 +112,34 @@ class WalletApi extends EventEmitter implements IWalletApi {
         schema?: string,
         schemaVersion?: SchemaVersion
     ): Promise<string> {
+        // This parsing is to temporarily support older versions of the web-SDK, which has different field names.
+        let parsedPayload = payload;
+        if (type === AccountTransactionType.InitContract) {
+            const initPayload: InitContractPayload = {
+                ...payload,
+                initName: payload.initName || payload.contractName,
+            };
+            parsedPayload = initPayload;
+        } else if (type === AccountTransactionType.Update) {
+            const updatePayload: UpdateContractPayload = {
+                ...payload,
+                address: payload.address || payload.contractAddress,
+            };
+            parsedPayload = updatePayload;
+        } else if (type === AccountTransactionType.DeployModule) {
+            const deployPayload: DeployModulePayload = {
+                ...payload,
+                source: payload.source || payload.content,
+            };
+            parsedPayload = deployPayload;
+        }
+
         const response = await this.messageHandler.sendMessage<MessageStatusWrapper<string>>(
             MessageType.SendTransaction,
             {
                 accountAddress,
                 type,
-                payload: stringify(payload),
+                payload: stringify(parsedPayload),
                 parameters,
                 schema,
                 schemaVersion,
