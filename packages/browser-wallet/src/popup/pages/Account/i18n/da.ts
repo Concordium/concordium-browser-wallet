@@ -68,6 +68,7 @@ const t: typeof en = {
             cis0Error: 'Kontrakten supporterer ikke CIS-0',
             cis2Error: 'Kontrakten supporterer ikke CIS-2',
             noTokensError: 'Ingen tokens fundet i kontrakten',
+            failedTokensError: 'En fejl skete under tjekket efter tokens',
             contractIndex: 'Kontrakt indeks',
             hexId: 'Ugyldigt token ID (skal være HEX encodet)',
             updateTokens: 'Opdater tokens',

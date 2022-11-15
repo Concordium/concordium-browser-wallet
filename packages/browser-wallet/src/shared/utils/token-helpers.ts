@@ -402,7 +402,13 @@ export async function getTokens(
     onError?: (error: string) => void
 ): Promise<GetTokensResult> {
     const metadataPromise: Promise<[string[], Array<TokenMetadata | undefined>]> = (async () => {
-        const metadataUrls = await getTokenUrl(client, ids, contractDetails);
+        let metadataUrls;
+        try {
+            metadataUrls = await getTokenUrl(client, ids, contractDetails);
+        } catch (e) {
+            onError?.(`Failed to get metadata urls on index: ${contractDetails.index}`);
+            return [[], []];
+        }
         const metadata = await Promise.all(
             metadataUrls.map((url) => getTokenMetadata(url, network).catch(() => Promise.resolve(undefined)))
         );
