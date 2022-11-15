@@ -1,5 +1,11 @@
 # Changelog
 
+## 0.8.1
+
+### Fixed
+
+-   Various bugs.
+
 ## 0.8.0
 
 ### Added
