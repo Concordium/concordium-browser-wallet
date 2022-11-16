@@ -15,7 +15,8 @@ import Button from '@popup/shared/Button';
 import TokenBalance from '@popup/shared/TokenBalance';
 import AtomValue from '@popup/store/AtomValue';
 
-import { getMetadataDecimals, getMetadataUnique } from '@shared/utils/token-helpers';
+import { getMetadataDecimals, getMetadataUnique, ownsOne } from '@shared/utils/token-helpers';
+import { CCD_METADATA } from '@shared/constants/token-metadata';
 import { tokensRoutes, detailsRoute } from './routes';
 import TokenDetails from './TokenDetails';
 import { AccountTokenDetails, useFlattenedAccountTokens } from './utils';
@@ -34,11 +35,16 @@ function Ft({ accountAddress, contractIndex: contractAddress, token, onClick }: 
     return (
         <Button clear className="token-list__item" onClick={onClick}>
             <img className="token-list__icon" src={token.metadata.thumbnail?.url} alt={token.metadata.name} />
-            <TokenBalance
-                balance={balance}
-                decimals={getMetadataDecimals(token.metadata)}
-                symbol={token.metadata.symbol}
-            />
+            <div>
+                <div className="token-list__name">{token.metadata.name ?? token.metadata.symbol ?? ''}</div>
+                <div className="token-list__balance">
+                    <TokenBalance
+                        balance={balance}
+                        decimals={getMetadataDecimals(token.metadata)}
+                        symbol={token.metadata.symbol}
+                    />
+                </div>
+            </div>
         </Button>
     );
 }
@@ -90,9 +96,12 @@ function Fungibles({ account, toDetails }: ListProps) {
 
     return (
         <>
-            <div className="token-list__item">
+            <div className="token-list__item token-list__item--nft">
                 <CcdIcon className="token-list__icon token-list__icon--ccd" />
-                <div className="token-list__balance">{displayAsCcd(accountInfo.accountAmount)} CCD</div>
+                <div>
+                    <div className="token-list__name">{CCD_METADATA.name}</div>
+                    <div className="token-list__balance">{displayAsCcd(accountInfo.accountAmount)} CCD</div>
+                </div>
             </div>
             {tokens.map((token) => (
                 <Ft
@@ -126,14 +135,14 @@ function Collectibles({ account, toDetails }: ListProps) {
                         src={metadata.thumbnail?.url ?? metadata.display?.url ?? ''}
                         alt={metadata.name}
                     />
-                    <div className="token-list__unique-name">
-                        {metadata.name}
+                    <div>
+                        <div className="token-list__name">{metadata.name}</div>
                         <AtomValue atom={contractBalancesFamily(account.address, contractIndex)}>
                             {({ [id]: b }) => (
                                 <>
-                                    {b === 0n && <div className="token-list__ownership">{t('unownedUnique')}</div>}
-                                    {b && b / BigInt(10 ** getMetadataDecimals(metadata)) !== 1n && (
-                                        <div className="token-list__ownership">
+                                    {b === 0n && <div className="token-list__balance">{t('unownedUnique')}</div>}
+                                    {b && !ownsOne(b, getMetadataDecimals(metadata)) && (
+                                        <div className="token-list__balance">
                                             <TokenBalance
                                                 balance={b}
                                                 decimals={getMetadataDecimals(metadata)}

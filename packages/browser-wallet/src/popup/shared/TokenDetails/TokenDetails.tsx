@@ -12,7 +12,7 @@ import ButtonGroup from '@popup/shared/ButtonGroup';
 import { TokenIdAndMetadata, TokenMetadata } from '@shared/storage/types';
 
 import { useNavigate } from 'react-router-dom';
-import { getMetadataDecimals, getMetadataUnique } from '@shared/utils/token-helpers';
+import { getMetadataDecimals, getMetadataUnique, ownsOne } from '@shared/utils/token-helpers';
 import TokenBalance from '../TokenBalance';
 
 const SUB_INDEX = '0';
@@ -91,7 +91,7 @@ function Nft({ token, balance, contractIndex, subIndex }: TokenProps) {
                     {balance === 0n || (
                         <>
                             {t('ownedUnique')}
-                            {balance / BigInt(10 ** decimals) !== 1n && (
+                            {!ownsOne(balance, decimals) && (
                                 <>
                                     {' '}
                                     (<TokenBalance balance={balance} decimals={decimals} symbol={symbol} />)

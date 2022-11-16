@@ -238,7 +238,7 @@ function CreateTransaction({ exchangeRate, tokens, setCost, setDetailsExpanded }
                     <div className="create-transfer__token-picker">
                         <Button className="token-picker-button" clear onClick={() => setPickingToken(true)}>
                             <div className="token-picker-button__token-display-container">
-                                <div className="flex align-center">
+                                <div className="flex align-center w-full">
                                     {tokenMetadata === CCD_METADATA ? (
                                         <div className="token-picker-button__token-display">
                                             <CcdIcon className="ccd-icon" />
