@@ -1,9 +1,9 @@
 import React, { useCallback, useEffect } from 'react';
 import { useTranslation } from 'react-i18next';
 import { useNavigate } from 'react-router-dom';
-import { SubmitHandler, useForm, Validate } from 'react-hook-form';
+import { SubmitHandler, Validate } from 'react-hook-form';
 import { absoluteRoutes } from '@popup/constants/routes';
-import Form from '@popup/shared/Form';
+import Form, { useForm } from '@popup/shared/Form';
 import Submit from '@popup/shared/Form/Submit';
 import PageHeader from '@popup/shared/PageHeader';
 import FormPassword from '@popup/shared/Form/Password';
