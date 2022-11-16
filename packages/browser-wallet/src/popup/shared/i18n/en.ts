@@ -60,6 +60,7 @@ const t = {
         unownedUnique: 'Not owned',
         ownedUnique: 'Owned',
         tokenId: 'Token ID',
+        tokenRemoved: 'Token removed from wallet',
         removePrompt: {
             header: 'Hide {{ name }} in your wallet',
             text: 'Are you sure you want hide this token in your wallet? You can always add it again from the tokens list.',

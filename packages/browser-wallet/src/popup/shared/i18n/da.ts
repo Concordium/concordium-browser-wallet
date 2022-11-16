@@ -62,6 +62,7 @@ const t: typeof en = {
         unownedUnique: 'Ejer ikke',
         ownedUnique: 'Ejer',
         tokenId: 'Token ID',
+        tokenRemoved: 'Token fjernet fra wallet',
         removePrompt: {
             header: 'Skjul {{ name }} i din wallet',
             text: 'Er du sikker på at du vil skjule dette token i din wallet? Du kan til enhver tid tilføje det igen fra token listen.',
