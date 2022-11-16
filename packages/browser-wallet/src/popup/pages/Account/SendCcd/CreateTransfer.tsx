@@ -42,6 +42,7 @@ import TokenBalance from '@popup/shared/TokenBalance';
 import Button from '@popup/shared/Button';
 import SearchIcon from '@assets/svg/search.svg';
 import { SIMPLE_TRANSFER_ENERGY_TOTAL_COST } from '@shared/utils/energy-helpers';
+import Img from '@popup/shared/Img';
 import { routes } from './routes';
 import PickToken from './PickToken';
 
@@ -243,10 +244,11 @@ function CreateTransaction({ exchangeRate, tokens, setCost, setDetailsExpanded, 
                                             <CcdIcon className="ccd-icon" />
                                         </div>
                                     ) : (
-                                        <img
+                                        <Img
                                             alt={tokenMetadata.name}
                                             className="token-picker-button__token-display"
                                             src={tokenMetadata.thumbnail?.url ?? tokenMetadata.display?.url}
+                                            withDefaults
                                         />
                                     )}
                                     <div className="token-picker-button__details">

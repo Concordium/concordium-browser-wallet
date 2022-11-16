@@ -14,9 +14,9 @@ import { contractBalancesFamily } from '@popup/store/token';
 import Button from '@popup/shared/Button';
 import TokenBalance from '@popup/shared/TokenBalance';
 import AtomValue from '@popup/store/AtomValue';
-
 import { getMetadataDecimals, getMetadataUnique, ownsOne } from '@shared/utils/token-helpers';
 import { CCD_METADATA } from '@shared/constants/token-metadata';
+import Img from '@popup/shared/Img';
 import { tokensRoutes, detailsRoute } from './routes';
 import TokenDetails from './TokenDetails';
 import { AccountTokenDetails, useFlattenedAccountTokens } from './utils';
@@ -34,7 +34,12 @@ function Ft({ accountAddress, contractIndex: contractAddress, token, onClick }: 
 
     return (
         <Button clear className="token-list__item" onClick={onClick}>
-            <img className="token-list__icon" src={token.metadata.thumbnail?.url} alt={token.metadata.name} />
+            <Img
+                className="token-list__icon"
+                src={token.metadata.thumbnail?.url}
+                alt={token.metadata.name}
+                withDefaults
+            />
             <div>
                 <div className="token-list__name">{token.metadata.name ?? token.metadata.symbol ?? ''}</div>
                 <div className="token-list__balance">
@@ -130,10 +135,11 @@ function Collectibles({ account, toDetails }: ListProps) {
                     onClick={() => toDetails(contractIndex, id)}
                     className="token-list__item"
                 >
-                    <img
+                    <Img
                         className="token-list__icon"
-                        src={metadata.thumbnail?.url ?? metadata.display?.url ?? ''}
+                        src={metadata.thumbnail?.url ?? metadata.display?.url}
                         alt={metadata.name}
+                        withDefaults
                     />
                     <div>
                         <div className="token-list__name">{metadata.name}</div>
