@@ -72,6 +72,10 @@ const t: typeof en = {
     tokenBalance: {
         noBalance: 'Ingen saldo hentet',
     },
+    addTokens: {
+        cis0Error: 'Kontrakten supporterer ikke CIS-0',
+        cis2Error: 'Kontrakten supporterer ikke CIS-2',
+    },
 };
 
 export default t;
