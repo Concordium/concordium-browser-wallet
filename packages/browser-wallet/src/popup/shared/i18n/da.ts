@@ -44,7 +44,7 @@ const t: typeof en = {
         unknown: 'Ukendt',
         tokenTransfer: {
             title: 'Send {{ tokenName }}',
-            amount: 'Mængde',
+            amount: 'Token mængde',
             receiver: 'Modtager',
             showTransfer: 'Vis overførslesdetaljer',
             showContract: 'Vis kontraktdetaljer',
