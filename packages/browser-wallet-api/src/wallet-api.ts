@@ -8,7 +8,10 @@ import {
     AccountTransactionPayload,
     AccountTransactionSignature,
     AccountTransactionType,
+    DeployModulePayload,
+    InitContractPayload,
     SchemaVersion,
+    UpdateContractPayload,
 } from '@concordium/common-sdk/lib/types';
 import { JsonRpcClient } from '@concordium/common-sdk/lib/JsonRpcClient';
 import { WalletApi as IWalletApi, EventType } from '@concordium/browser-wallet-api-helpers';
@@ -109,12 +112,37 @@ class WalletApi extends EventEmitter implements IWalletApi {
         schema?: string,
         schemaVersion?: SchemaVersion
     ): Promise<string> {
+        // This parsing is to temporarily support older versions of the web-SDK, which has different field names.
+        let parsedPayload = payload;
+        if (type === AccountTransactionType.InitContract) {
+            const initPayload: InitContractPayload = {
+                ...(payload as InitContractPayload),
+                // eslint-disable-next-line @typescript-eslint/no-explicit-any
+                initName: (payload as InitContractPayload).initName || (payload as any).contractName,
+            };
+            parsedPayload = initPayload;
+        } else if (type === AccountTransactionType.Update) {
+            const updatePayload: UpdateContractPayload = {
+                ...(payload as UpdateContractPayload),
+                // eslint-disable-next-line @typescript-eslint/no-explicit-any
+                address: (payload as UpdateContractPayload).address || (payload as any).contractAddress,
+            };
+            parsedPayload = updatePayload;
+        } else if (type === AccountTransactionType.DeployModule) {
+            const deployPayload: DeployModulePayload = {
+                ...(payload as DeployModulePayload),
+                // eslint-disable-next-line @typescript-eslint/no-explicit-any
+                source: (payload as DeployModulePayload).source || (payload as any).content,
+            };
+            parsedPayload = deployPayload;
+        }
+
         const response = await this.messageHandler.sendMessage<MessageStatusWrapper<string>>(
             MessageType.SendTransaction,
             {
                 accountAddress,
                 type,
-                payload: stringify(payload),
+                payload: stringify(parsedPayload),
                 parameters,
                 schema,
                 schemaVersion,
