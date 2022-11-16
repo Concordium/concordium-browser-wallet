@@ -59,11 +59,18 @@ const config: BuildOptions = {
         }),
         manifestPlugin({ manifestTemplate, popupHtmlFile: popupHtmlOut }),
         copy({
-            assets: {
-                from: ['./resources/**/*'],
-                to: ['./resources/'],
-                keepStructure: true,
-            },
+            assets: [
+                {
+                    from: ['./resources/**/*'],
+                    to: ['./resources/'],
+                    keepStructure: true,
+                },
+                {
+                    from: ['./src/assets/svg/**/*'],
+                    to: ['./assets/svg'],
+                    keepStructure: true,
+                },
+            ],
         }),
         streamPlugin,
     ],
