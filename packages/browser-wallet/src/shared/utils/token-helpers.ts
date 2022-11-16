@@ -93,14 +93,14 @@ export async function confirmCIS2Contract(
         parameter: getCIS2Identifier(),
     });
     if (!supports || supports.tag === 'failure') {
-        return i18n.t('account.tokens.add.cis0Error');
+        return i18n.t('addTokens.cis0Error');
     }
 
     // Supports return 2 bytes that determine the number of answers. 0100 means there is 1 answer
     // 01 Means the standard is supported.
     // TODO: Handle 02 answer properly (https://proposals.concordium.software/CIS/cis-0.html#response)
     if (supports.returnValue !== '010001') {
-        return i18n.t('account.tokens.add.cis2Error');
+        return i18n.t('addTokens.cis2Error');
     }
 
     return undefined;

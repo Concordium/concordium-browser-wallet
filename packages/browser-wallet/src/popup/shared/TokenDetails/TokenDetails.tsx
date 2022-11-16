@@ -13,6 +13,8 @@ import { TokenIdAndMetadata, TokenMetadata } from '@shared/storage/types';
 
 import { useNavigate } from 'react-router-dom';
 import { getMetadataDecimals, getMetadataUnique, ownsOne } from '@shared/utils/token-helpers';
+import { useSetAtom } from 'jotai';
+import { addToastAtom } from '@popup/state';
 import TokenBalance from '../TokenBalance';
 
 const SUB_INDEX = '0';
@@ -163,10 +165,12 @@ function RemoveToken({
     const nav = useNavigate();
     const { t } = useTranslation('shared', { keyPrefix: 'tokenDetails' });
     const [showPrompt, setShowPrompt] = useState(false);
+    const addToast = useSetAtom(addToastAtom);
 
     const remove = () => {
         setShowPrompt(false);
         removeToken({ contractIndex, tokenId: id });
+        addToast(t('tokenRemoved'));
         nav(absoluteRoutes.home.account.path);
     };
 

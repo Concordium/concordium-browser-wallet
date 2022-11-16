@@ -55,6 +55,7 @@ export type FormValues = {
 
 interface Props {
     exchangeRate?: number;
+    cost: bigint;
     setCost: (cost: bigint) => void;
     setDetailsExpanded: (expanded: boolean) => void;
 }
@@ -83,7 +84,7 @@ function createDefaultValues(defaultPayload: State, accountTokens?: AccountToken
     };
 }
 
-function CreateTransaction({ exchangeRate, tokens, setCost, setDetailsExpanded }: Props & { tokens: Tokens }) {
+function CreateTransaction({ exchangeRate, tokens, setCost, setDetailsExpanded, cost }: Props & { tokens: Tokens }) {
     const { t } = useTranslation('account');
     const { t: tShared } = useTranslation('shared');
     const { state } = useLocation();
@@ -134,10 +135,8 @@ function CreateTransaction({ exchangeRate, tokens, setCost, setDetailsExpanded }
         [chosenToken?.contractIndex, chosenToken?.tokenId, recipient]
     );
 
-    const cost = useMemo(() => {
-        const newCost = exchangeRate && fee?.success ? BigInt(Math.ceil(exchangeRate * Number(fee.value))) : 0n;
-        setCost(newCost);
-        return newCost;
+    useEffect(() => {
+        setCost(exchangeRate && fee?.success ? BigInt(Math.ceil(exchangeRate * Number(fee.value))) : 0n);
     }, [fee, exchangeRate]);
 
     const accountInfo = useAccountInfo(selectedCred);

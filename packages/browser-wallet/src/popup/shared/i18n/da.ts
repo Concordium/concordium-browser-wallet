@@ -44,7 +44,7 @@ const t: typeof en = {
         unknown: 'Ukendt',
         tokenTransfer: {
             title: 'Send {{ tokenName }}',
-            amount: 'Mængde',
+            amount: 'Token mængde',
             receiver: 'Modtager',
             showTransfer: 'Vis overførslesdetaljer',
             showContract: 'Vis kontraktdetaljer',
@@ -62,6 +62,7 @@ const t: typeof en = {
         unownedUnique: 'Ejer ikke',
         ownedUnique: 'Ejer',
         tokenId: 'Token ID',
+        tokenRemoved: 'Token fjernet fra wallet',
         removePrompt: {
             header: 'Skjul {{ name }} i din wallet',
             text: 'Er du sikker på at du vil skjule dette token i din wallet? Du kan til enhver tid tilføje det igen fra token listen.',
@@ -71,6 +72,10 @@ const t: typeof en = {
     },
     tokenBalance: {
         noBalance: 'Ingen saldo hentet',
+    },
+    addTokens: {
+        cis0Error: 'Kontrakten supporterer ikke CIS-0',
+        cis2Error: 'Kontrakten supporterer ikke CIS-2',
     },
 };
 
