@@ -60,7 +60,7 @@ const t = {
             manage: 'Manage',
         },
         add: {
-            chooseContract: 'Choose Contract',
+            lookupTokens: 'Look for tokens',
             indexRequired: 'Contract index is required',
             noContractFound: 'No contract found on index',
             noTokensError: 'No tokens found in contract',
