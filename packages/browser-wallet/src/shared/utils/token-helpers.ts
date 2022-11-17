@@ -232,7 +232,7 @@ const deserializeBalanceAmounts = (value: string): bigint[] => {
     return amounts;
 };
 
-export type ContractBalances = Record<string, bigint>;
+export type ContractBalances = Record<string, bigint | undefined>;
 
 export const getContractBalances = async (
     client: JsonRpcClient,
