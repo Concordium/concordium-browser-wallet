@@ -5,7 +5,7 @@ import { displayAsCcd } from 'wallet-common-helpers/lib/utils/ccd';
 import { SmartContractParameters } from '@shared/utils/types';
 
 interface Props {
-    payload: UpdateContractPayload;
+    payload: Omit<UpdateContractPayload, 'message'>;
     parameters?: SmartContractParameters;
 }
 
@@ -35,15 +35,7 @@ export default function DisplayUpdateContract({ payload, parameters }: Props) {
                     <pre className="transaction-receipt__parameter">{JSON.stringify(parameters, null, 2)}</pre>
                 </>
             )}
-            {!parameters && !!payload.message.length && (
-                <>
-                    <h5 className="m-b-5">{t('parameter')} (hex):</h5>
-                    <pre className="transaction-receipt__parameter">
-                        {JSON.stringify(payload.message.toString('hex'), null, 2)}
-                    </pre>
-                </>
-            )}
-            {!parameters && !payload.message.length && <h5>{t('noParameter')}</h5>}
+            {!parameters && <h5>{t('noParameter')}</h5>}
         </>
     );
 }

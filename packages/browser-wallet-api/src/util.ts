@@ -27,27 +27,28 @@ function isModuleReference(cand: any): cand is ModuleReference {
     return cand && typeof cand.moduleRef === 'string' && cand.moduleRef.length === 64;
 }
 
-function replacer(this: any, k: string, v: any) {
-    if (typeof v === types.BigInt) {
-        return { '@type': types.BigInt, value: v.toString() };
+function replacer(this: any, k: string, value: any) {
+    if (typeof value === types.BigInt) {
+        return { '@type': types.BigInt, value: value.toString() };
     }
-    if (this[k] instanceof Date) {
-        return { '@type': types.Date, value: v };
+    const rawValue = this[k];
+    if (rawValue instanceof Date) {
+        return { '@type': types.Date, value };
     }
     // Support older versions of the SDK
-    if (isGtuAmount(v)) {
-        return { '@type': types.CcdAmount, value: v.microGtuAmount.toString() };
+    if (isGtuAmount(rawValue)) {
+        return { '@type': types.CcdAmount, value: rawValue.microGtuAmount.toString() };
     }
-    if (isCcdAmount(v)) {
-        return { '@type': types.CcdAmount, value: v.microCcdAmount.toString() };
+    if (isCcdAmount(rawValue)) {
+        return { '@type': types.CcdAmount, value: rawValue.microCcdAmount.toString() };
     }
-    if (isAccountAddress(v)) {
-        return { '@type': types.AccountAddress, value: v.address };
+    if (isAccountAddress(rawValue)) {
+        return { '@type': types.AccountAddress, value: rawValue.address };
     }
-    if (isModuleReference(v)) {
-        return { '@type': types.ModuleReference, value: v.moduleRef };
+    if (isModuleReference(rawValue)) {
+        return { '@type': types.ModuleReference, value: rawValue.moduleRef };
     }
-    return v;
+    return value;
 }
 
 export function stringify(input: any) {
