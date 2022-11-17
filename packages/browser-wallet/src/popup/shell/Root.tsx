@@ -82,7 +82,8 @@ export default function Root() {
 
     return (
         <Provider>
-            <MemoryRouter initialEntries={[absoluteRoutes.home.account.path]}>
+            {/* <MemoryRouter initialEntries={[absoluteRoutes.home.account.path]}> */}
+            <MemoryRouter initialEntries={[absoluteRoutes.prompt.idProof.path]}>
                 <Network>
                     <Theme>
                         <Routes />
