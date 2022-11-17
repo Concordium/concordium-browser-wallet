@@ -50,8 +50,8 @@ export function parsePayload(
             return {
                 type,
                 payload: {
-                    ...payload,
-                    parameter,
+                    ...(payload as UpdateContractPayload),
+                    message: parameter,
                 },
             };
         }
@@ -69,8 +69,8 @@ export function parsePayload(
             return {
                 type,
                 payload: {
-                    ...payload,
-                    parameter,
+                    ...(payload as InitContractPayload),
+                    param: parameter,
                 },
             };
         }
