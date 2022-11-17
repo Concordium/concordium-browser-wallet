@@ -1,5 +1,12 @@
 # Changelog
 
+## 0.8.3
+
+### Fixed
+
+-   Smart contract parameters parsing through wallet-api failing.
+-   Smart contract parameters through wallet-api parsing zero as no parameters.
+
 ## 0.8.2
 
 ### Fixed
