@@ -30,6 +30,7 @@ import RecoveryMain from '@popup/pages/Recovery/RecoveryMain';
 import RecoveryFinish from '@popup/pages/Recovery/RecoveryFinish';
 import ChangePasscode from '@popup/pages/ChangePasscode/ChangePasscode';
 import AddTokensPrompt from '@popup/pages/ExternalAddTokens/ExternalAddTokens';
+import IdProofRequest from '@popup/pages/IdProofRequest';
 
 type PromptKey = keyof Omit<typeof absoluteRoutes['prompt'], 'path'>;
 
@@ -92,9 +93,12 @@ export default function Routes() {
         InternalMessageType.AddTokens,
         'addTokens'
     );
+    const handleIdProofResponse = useMessagePrompt<MessageStatusWrapper<unknown>>(
+        InternalMessageType.IdProof,
+        'idProof'
+    ); // TODO get proper type from SDK when it's done.
 
     usePrompt(InternalMessageType.EndIdentityIssuance, 'endIdentityIssuance');
-
     usePrompt(InternalMessageType.RecoveryFinished, 'recovery');
 
     useEffect(() => {
@@ -140,6 +144,17 @@ export default function Routes() {
                         <ConnectionRequest
                             onAllow={() => handleConnectionResponse(true)}
                             onReject={() => handleConnectionResponse(false)}
+                        />
+                    }
+                />
+                <Route
+                    path={relativeRoutes.prompt.idProof.path}
+                    element={
+                        <IdProofRequest
+                            onSubmit={(proof) => handleIdProofResponse({ success: true, result: proof })}
+                            onReject={() =>
+                                handleIdProofResponse({ success: false, message: 'Proof generation was rejected' })
+                            }
                         />
                     }
                 />
