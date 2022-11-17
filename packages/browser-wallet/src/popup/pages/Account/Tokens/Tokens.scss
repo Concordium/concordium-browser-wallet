@@ -58,6 +58,7 @@ $tokens-actions-height: rem(26px);
     &__icon {
         height: rem(25px);
         width: rem(40px);
+        flex: 0 0 rem(40px);
         object-fit: contain;
         margin-right: rem(5px);
 
