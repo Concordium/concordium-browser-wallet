@@ -23,6 +23,7 @@ $element-border-radius: rem(5px);
         img {
             max-height: 100%;
             width: rem(40px);
+            flex: 0 0 rem(40px);
             object-position: center;
             object-fit: contain;
             margin-right: rem(5px);
