@@ -125,7 +125,7 @@ function ChooseContract() {
                             }}
                         />
                     </div>
-                    <Submit>{t('chooseContract')}</Submit>
+                    <Submit>{t('lookupTokens')}</Submit>
                 </>
             )}
         </Form>

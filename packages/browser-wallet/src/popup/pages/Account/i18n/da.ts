@@ -62,7 +62,7 @@ const t: typeof en = {
             manage: 'Rediger',
         },
         add: {
-            chooseContract: 'Vælg kontrakt',
+            lookupTokens: 'Søg efter tokens',
             indexRequired: 'Kontrakt indeks er påkrævet',
             noContractFound: 'Ingen kontrakt fundet på indeks',
             noTokensError: 'Ingen tokens fundet i kontrakten',

@@ -103,7 +103,7 @@ const lookupTokenIdConfigure = (
             ac = new AbortController();
             const { signal } = ac;
 
-            let value: ContractTokenDetails[] | undefined;
+            let value: ContractTokenDetails[] = [];
 
             if (!searchQuery) {
                 return;
@@ -113,8 +113,9 @@ const lookupTokenIdConfigure = (
 
             try {
                 const [token] = await getTokens(contractDetails, client, network, account, [searchQuery]);
-
-                value = [token as ContractTokenDetails];
+                if (token && token.metadata) {
+                    value = [token as ContractTokenDetails];
+                }
             } catch {
                 value = [];
             }
