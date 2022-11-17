@@ -86,36 +86,37 @@ $error-spacing: rem(13.286px);
     &__token-display-container {
         display: flex;
         align-items: center;
-        justify-content: space-between;
         height: rem(20px);
+        position: relative;
     }
 
     &__token-display {
-        max-height: rem(20px);
-        max-width: rem(40px);
+        height: rem(20px);
+        width: rem(30px);
         margin-right: rem(5px);
+        object-fit: contain;
     }
-}
 
-.display-token {
     &__details {
-        text-align: right;
-        width: calc(100% - #{rem(45px)}); // subtract max-width + margin of &__token-display.
+        width: calc(100% - #{rem(35px)}); // subtract max-width + margin of &__token-display.
+        text-align: left;
     }
 }
 
 .token-picker-button {
     width: 100%;
 
+    &__details {
+        width: calc(100% - #{rem(60px)}); // additional room for search icon.
+    }
+
     &__search-icon {
         height: rem(16px);
+        position: absolute;
+        right: 0;
 
         path {
             fill: $color-text;
         }
-    }
-
-    &__details {
-        text-align: left;
     }
 }

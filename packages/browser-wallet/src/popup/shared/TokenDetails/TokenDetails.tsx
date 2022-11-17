@@ -12,10 +12,11 @@ import ButtonGroup from '@popup/shared/ButtonGroup';
 import { TokenIdAndMetadata, TokenMetadata } from '@shared/storage/types';
 
 import { useNavigate } from 'react-router-dom';
-import { getMetadataDecimals, getMetadataUnique } from '@shared/utils/token-helpers';
+import { getMetadataDecimals, getMetadataUnique, ownsOne } from '@shared/utils/token-helpers';
 import { useSetAtom } from 'jotai';
 import { addToastAtom } from '@popup/state';
 import TokenBalance from '../TokenBalance';
+import Img from '../Img';
 
 const SUB_INDEX = '0';
 
@@ -84,7 +85,7 @@ function Nft({ token, balance, contractIndex, subIndex }: TokenProps) {
     return (
         <>
             <h3 className="token-details__header">
-                {thumbnail && <img src={thumbnail.url} alt={name} />}
+                {thumbnail && <Img src={thumbnail.url} alt={name} withDefaults />}
                 {name}
             </h3>
             <TokenDetailsLine header={t('ownership')}>
@@ -93,7 +94,7 @@ function Nft({ token, balance, contractIndex, subIndex }: TokenProps) {
                     {balance === 0n || (
                         <>
                             {t('ownedUnique')}
-                            {balance / BigInt(10 ** decimals) !== 1n && (
+                            {!ownsOne(balance, decimals) && (
                                 <>
                                     {' '}
                                     (<TokenBalance balance={balance} decimals={decimals} symbol={symbol} />)
@@ -128,7 +129,7 @@ function Ft({ token, balance, contractIndex, subIndex = SUB_INDEX }: TokenProps)
     return (
         <>
             <h3 className="token-details__header">
-                {thumbnail && <img src={thumbnail.url} alt={name} />}
+                {thumbnail && <Img src={thumbnail.url} alt={name} withDefaults />}
                 {name}
             </h3>
             <TokenDetailsLine header={t('balance')}>

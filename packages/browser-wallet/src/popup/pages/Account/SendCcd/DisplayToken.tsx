@@ -4,6 +4,7 @@ import Button from '@popup/shared/Button';
 import { TokenMetadata } from '@shared/storage/types';
 import TokenBalance from '@popup/shared/TokenBalance';
 import { getMetadataDecimals } from '@shared/utils/token-helpers';
+import Img from '@popup/shared/Img';
 
 interface ChooseTokenProps {
     balance: bigint;
@@ -21,10 +22,11 @@ export default function DisplayToken({ metadata, balance, className, icon, ...pr
                 {icon ? (
                     <div className="display-token__token-display">{icon}</div>
                 ) : (
-                    <img
+                    <Img
                         alt={metadata.name}
                         className="display-token__token-display"
                         src={metadata.thumbnail?.url ?? metadata.display?.url}
+                        withDefaults
                     />
                 )}
                 <div className="display-token__details">

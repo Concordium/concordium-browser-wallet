@@ -448,3 +448,5 @@ const MAX_SYMBOL_LENGTH = 10;
 
 export const trunctateSymbol = (symbol: string): string =>
     symbol.length > MAX_SYMBOL_LENGTH ? `${symbol.substring(0, MAX_SYMBOL_LENGTH)}...` : symbol;
+
+export const ownsOne = (balance: bigint, decimals: number) => balance === BigInt(10 ** decimals);

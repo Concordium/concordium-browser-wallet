@@ -6,6 +6,7 @@ import Button from '@popup/shared/Button';
 import { Checkbox } from '@popup/shared/Form/Checkbox';
 import TokenBalance from '@popup/shared/TokenBalance';
 import { ContractTokenDetails, getMetadataDecimals } from '@shared/utils/token-helpers';
+import Img from '../Img';
 
 export enum ChoiceStatus {
     discarded,
@@ -39,9 +40,10 @@ export default function ContractTokenLine({
             onClick={() => onClick(token)}
         >
             <div className="flex align-center h-full m-r-5">
-                <img
+                <Img
                     src={token.metadata.thumbnail?.url ?? token.metadata.display?.url ?? ''}
                     alt={token.metadata.name ?? ''}
+                    withDefaults
                 />
                 <div>
                     <div className="clamp-2">{token.metadata.name}</div>

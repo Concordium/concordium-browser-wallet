@@ -48,24 +48,25 @@ $tokens-actions-height: rem(26px);
         border-bottom: solid rem(0.5px) $color-lines;
         padding: 0 rem(16px) 0 rem(8px);
         align-items: center;
-        justify-content: space-between;
+        text-align: left;
     }
 
-    &__unique-name {
-        text-align: right;
+    &__name {
+        @include multiline-clamp(2);
     }
 
     &__icon {
-        height: 65%;
+        height: rem(25px);
         width: rem(40px);
         object-fit: contain;
+        margin-right: rem(5px);
 
         .dark &--ccd path {
             fill: $color-off-white;
         }
     }
 
-    &__ownership {
+    &__balance {
         font-size: rem(8px);
         color: $color-text-faded;
     }
