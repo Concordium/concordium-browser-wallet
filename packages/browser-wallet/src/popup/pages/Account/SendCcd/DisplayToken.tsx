@@ -7,7 +7,7 @@ import { getMetadataDecimals } from '@shared/utils/token-helpers';
 import Img from '@popup/shared/Img';
 
 interface ChooseTokenProps {
-    balance: bigint;
+    balance?: bigint;
     metadata: TokenMetadata;
     onClick: () => void;
     disabled?: boolean;

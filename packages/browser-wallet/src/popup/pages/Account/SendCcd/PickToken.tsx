@@ -28,7 +28,7 @@ function Collection({ onClick, tokens, contractIndex, address }: CollectionProps
     return (
         <>
             {tokens
-                .filter((token) => balances[token.id] > 0n)
+                .filter((token) => (balances[token.id] || 0n) > 0n)
                 .map((token) => (
                     <DisplayToken
                         className="create-transfer__pick-token-element"
