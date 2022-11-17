@@ -105,13 +105,14 @@ const injectScript: ExtensionMessageHandler = (_msg, sender, respond) => {
     return true;
 };
 
-async function reportVersion() {
+async function reportVersion(network?: NetworkConfiguration) {
     const baseUrl = 'https://concordium.matomo.cloud/matomo.php';
     const params = {
         idsite: '3',
         rec: '1',
         action_name: 'app-startup',
         dimension1: chrome.runtime.getManifest().version,
+        dimension2: network?.name ?? 'none',
     };
     await fetch(buildURLwithSearchParameters(baseUrl, params));
     // TODO: log if this fails
@@ -123,7 +124,7 @@ const startupHandler = async () => {
         await startMonitoringPendingStatus(network);
     }
 
-    reportVersion();
+    reportVersion(network);
 };
 
 const networkChangeHandler = (network: NetworkConfiguration) => startMonitoringPendingStatus(network);

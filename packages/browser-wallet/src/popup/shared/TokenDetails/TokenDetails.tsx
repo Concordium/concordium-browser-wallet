@@ -74,7 +74,7 @@ type TokenProps = {
     token: TokenIdAndMetadata;
     contractIndex: string;
     subIndex: string;
-    balance: bigint;
+    balance: bigint | undefined;
 };
 
 function Nft({ token, balance, contractIndex, subIndex }: TokenProps) {
@@ -94,7 +94,7 @@ function Nft({ token, balance, contractIndex, subIndex }: TokenProps) {
                     {balance === 0n || (
                         <>
                             {t('ownedUnique')}
-                            {!ownsOne(balance, decimals) && (
+                            {balance && !ownsOne(balance, decimals) && (
                                 <>
                                     {' '}
                                     (<TokenBalance balance={balance} decimals={decimals} symbol={symbol} />)
