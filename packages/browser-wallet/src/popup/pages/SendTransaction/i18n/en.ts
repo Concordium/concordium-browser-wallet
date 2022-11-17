@@ -9,8 +9,6 @@ const t = {
     contractIndex: 'Contract index (subindex)',
     receiveName: 'Contract and function name',
     maxEnergy: 'Max energy allowed',
-    parameter: 'Parameter',
-    noParameter: 'No parameters',
     microCCD: 'microCCD',
     nrg: 'NRG',
     moduleReference: 'Module reference',

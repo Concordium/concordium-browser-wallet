@@ -10,6 +10,7 @@ import {
 } from '@concordium/web-sdk';
 import { Buffer } from 'buffer/';
 import { parse } from '@concordium/browser-wallet-api/src/util';
+import { SmartContractParameters } from '@shared/utils/types';
 
 export type HeadlessTransaction =
     | { type: AccountTransactionType.Update; payload: UpdateContractPayload }
@@ -26,7 +27,7 @@ export type HeadlessTransaction =
 export function parsePayload(
     type: AccountTransactionType,
     stringifiedPayload: string,
-    parameters?: Record<string, unknown>,
+    parameters?: SmartContractParameters,
     schema?: string,
     schemaVersion: SchemaVersion = 0
 ): HeadlessTransaction {
@@ -36,16 +37,19 @@ export function parsePayload(
         case AccountTransactionType.Update: {
             const [contractName, functionName] = payload.receiveName.split('.');
 
-            const parameter =
-                parameters && schema
-                    ? serializeUpdateContractParameters(
-                          contractName,
-                          functionName,
-                          parameters,
-                          Buffer.from(schema, 'base64'),
-                          schemaVersion
-                      )
-                    : Buffer.alloc(0);
+            let parameter: Buffer;
+            if (parameters === undefined || parameters === null || !schema) {
+                parameter = Buffer.alloc(0);
+            } else {
+                parameter = serializeUpdateContractParameters(
+                    contractName,
+                    functionName,
+                    parameters,
+                    Buffer.from(schema, 'base64'),
+                    schemaVersion
+                );
+            }
+
             // Overwrite whatever parameter has been provided. Ensures that what we show and what is signed is the same.
             return {
                 type,
@@ -56,15 +60,18 @@ export function parsePayload(
             };
         }
         case AccountTransactionType.InitContract: {
-            const parameter =
-                parameters && schema
-                    ? serializeInitContractParameters(
-                          payload.contractName,
-                          parameters,
-                          Buffer.from(schema, 'base64'),
-                          schemaVersion
-                      )
-                    : Buffer.alloc(0);
+            let parameter: Buffer;
+            if (parameters === undefined || parameters === null || !schema) {
+                parameter = Buffer.alloc(0);
+            } else {
+                parameter = serializeInitContractParameters(
+                    payload.contractName,
+                    parameters,
+                    Buffer.from(schema, 'base64'),
+                    schemaVersion
+                );
+            }
+
             // Overwrite whatever parameter has been provided. Ensures that what we show and what is signed is the same.
             return {
                 type,

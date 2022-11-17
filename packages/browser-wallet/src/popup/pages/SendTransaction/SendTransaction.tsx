@@ -27,6 +27,7 @@ import {
     SIMPLE_TRANSFER_ENERGY_TOTAL_COST,
 } from '@shared/utils/energy-helpers';
 import { calculateEnergyCost } from '@shared/utils/token-helpers';
+import { SmartContractParameters } from '@shared/utils/types';
 import { parsePayload } from './util';
 
 interface Location {
@@ -35,7 +36,7 @@ interface Location {
             accountAddress: string;
             type: AccountTransactionType;
             payload: string;
-            parameters?: Record<string, unknown>;
+            parameters?: SmartContractParameters;
             schema?: string;
             schemaVersion?: SchemaVersion;
             url: string;
