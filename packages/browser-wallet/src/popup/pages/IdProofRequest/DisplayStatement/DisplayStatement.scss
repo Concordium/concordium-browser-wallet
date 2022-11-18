@@ -1,3 +1,19 @@
 .display-statement {
     display: block;
+
+    &__line {
+        display: flex;
+        width: 100%;
+        align-items: baseline;
+
+        > * {
+            flex: 0 0 auto;
+        }
+    }
+
+    &__line-separator {
+        flex: 1;
+        border-bottom: dotted $color-grey 1px;
+        margin: 0 rem(5px);
+    }
 }
