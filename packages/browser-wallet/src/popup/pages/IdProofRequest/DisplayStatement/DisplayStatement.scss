@@ -1,5 +1,27 @@
+$display-statement-color-success: $color-cta;
+$display-statement-color-invalid: $color-grey;
+
 .display-statement {
     display: block;
+    border: 1px solid $display-statement-color-success;
+    border-radius: rem(5px);
+
+    &--invalid {
+        border-color: $display-statement-color-invalid;
+    }
+
+    &__header {
+        padding: rem(5px);
+        border-radius: rem(4px) rem(4px) 0 0;
+        background-color: $display-statement-color-success;
+        color: $color-off-white;
+        display: flex;
+        justify-content: space-between;
+
+        .display-statement--invalid & {
+            background-color: $display-statement-color-invalid;
+        }
+    }
 
     &__line {
         display: flex;
@@ -15,5 +37,10 @@
         flex: 1;
         border-bottom: dotted $color-grey 1px;
         margin: 0 rem(5px);
+    }
+
+    &__reveal-description {
+        font-size: rem(8px);
+        padding: 0 rem(5px) rem(5px);
     }
 }
