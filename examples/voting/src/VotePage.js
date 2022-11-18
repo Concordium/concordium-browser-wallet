@@ -4,8 +4,8 @@
 import React, { useEffect, useMemo, useState } from 'react';
 import { useParams, Link } from 'react-router-dom';
 import { Button, Col, Container, Form, Row } from 'react-bootstrap';
-import Wallet, { castVote, getVotes, init } from './Wallet';
-import { decodeVotingView } from './buffer';
+import Wallet, { castVote, init, getView } from './Wallet';
+import { decodeView } from './buffer';
 
 function VotePage() {
     const params = useParams();
@@ -13,7 +13,7 @@ function VotePage() {
 
     const [client, setClient] = useState();
     const [connectedAccount, setConnectedAccount] = useState();
-    const [getvotesResult, setGetvotesResult] = useState();
+    const [view, setView] = useState();
 
     const [selectedOption, setSelectionOption] = useState();
 
@@ -22,18 +22,19 @@ function VotePage() {
         init(setConnectedAccount).then(setClient).catch(console.error);
     }, []);
 
-    // Fetch votes from contract.
+    // Attempt to get general information about the election.
     useEffect(() => {
         if (client) {
-            getVotes(client, electionId).then(setGetvotesResult).catch(console.error);
+            getView(client, electionId).then(setView).catch(console.error);
         }
     }, [client, electionId]);
 
-    const votes = useMemo(() => {
-        if (getvotesResult) {
-            return decodeVotingView(getvotesResult.returnValue);
+    // Decode general information about the election.
+    const viewResult = useMemo(() => {
+        if (view) {
+            return decodeView(view.returnValue);
         }
-    }, [getvotesResult]);
+    }, [view]);
 
     return (
         <Container>
@@ -53,14 +54,14 @@ function VotePage() {
             </Row>
             <Row>
                 <Col>
-                    <h2>{votes?.descriptionText}</h2>
+                    <h2>{viewResult?.descriptionText}</h2>
                 </Col>
             </Row>
             <Row>
                 <Col>
                     <Form>
                         <div className="mb-3">
-                            {votes?.opts.map((v) => (
+                            {viewResult?.opts.map((v) => (
                                 <Form.Check key={v} type="radio" id={`default-radio-${v}`}>
                                     <Form.Check.Input
                                         className="btn-check"
@@ -75,7 +76,7 @@ function VotePage() {
                         <Button
                             className="w-100"
                             onClick={() =>
-                                castVote(client, electionId, votes?.opts.indexOf(selectedOption), connectedAccount)
+                                castVote(client, electionId, viewResult?.opts.indexOf(selectedOption), connectedAccount)
                             }
                         >
                             <strong>Cast Vote!</strong>
