@@ -1,17 +1,17 @@
 /* eslint-disable react/function-component-definition */
 import React from 'react';
 import { ComponentMeta, ComponentStory } from '@storybook/react';
-import DisplayStatement from './DisplayStatement';
+import { DisplayStatementView } from './DisplayStatement';
 
 export default {
     title: 'Pages/IdProofRequest/DisplayStatement',
-    component: DisplayStatement,
-} as ComponentMeta<typeof DisplayStatement>;
+    component: DisplayStatementView,
+} as ComponentMeta<typeof DisplayStatementView>;
 
-const Template: ComponentStory<typeof DisplayStatement> = (args) => {
+const Template: ComponentStory<typeof DisplayStatementView> = (args) => {
     return (
-        <div style={{ width: 300 }}>
-            <DisplayStatement className="w-full" {...args} />
+        <div style={{ width: 330 }}>
+            <DisplayStatementView className="w-full" {...args} />
         </div>
     );
 };
@@ -19,16 +19,20 @@ const Template: ComponentStory<typeof DisplayStatement> = (args) => {
 export const RevealAttributes = Template.bind({});
 RevealAttributes.args = {
     dappName: 'Test dApp',
+    header: 'Information to reveal',
     reveal: true,
     lines: [
-        { attribute: 'Attribute', value: 'A valid value', isRequirementMet: true },
-        { attribute: 'Another attribute', value: 'Value', isRequirementMet: false },
+        { attribute: 'First name', value: 'John', isRequirementMet: true },
+        { attribute: 'Last name', value: 'Johnson', isRequirementMet: false },
+        { attribute: 'ID document type', value: 'Passport', isRequirementMet: false },
     ],
 };
 
-export const Secret = Template.bind({});
-Secret.args = {
+export const AgeMinProof = Template.bind({});
+AgeMinProof.args = {
     dappName: 'Test dApp',
+    header: 'Secret proof of age',
     reveal: false,
-    lines: [{ attribute: 'Attribute', value: 'A valid value', isRequirementMet: true }],
+    description: 'You date of birth is before YYYY-MM-DD.',
+    lines: [{ attribute: 'Age', value: 'More than X years old', isRequirementMet: true }],
 };

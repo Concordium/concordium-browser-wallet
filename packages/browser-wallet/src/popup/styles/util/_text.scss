@@ -23,6 +23,18 @@ $line-clamps: (2, 3);
     font-weight: $font-weight-bold;
 }
 
+.text-center {
+    text-align: center;
+}
+
+.text-right {
+    text-align: right;
+}
+
 .color-cta {
     color: $color-cta;
+}
+
+.white-space-break {
+    white-space: break-spaces;
 }

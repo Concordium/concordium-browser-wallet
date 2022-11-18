@@ -17,10 +17,15 @@ $display-statement-color-invalid: $color-grey;
         color: $color-off-white;
         display: flex;
         justify-content: space-between;
+        font-size: rem(8px);
 
         .display-statement--invalid & {
             background-color: $display-statement-color-invalid;
         }
+    }
+
+    &__header-icon {
+        height: rem(15px);
     }
 
     &__line {
@@ -42,5 +47,9 @@ $display-statement-color-invalid: $color-grey;
     &__reveal-description {
         font-size: rem(8px);
         padding: 0 rem(5px) rem(5px);
+    }
+
+    &__tooltip-icon {
+        height: rem(10px);
     }
 }
