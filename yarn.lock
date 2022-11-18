@@ -2116,19 +2116,7 @@ __metadata:
   languageName: node
   linkType: hard
 
-"@concordium/web-sdk@npm:^1.0.0":
-  version: 1.0.0
-  resolution: "@concordium/web-sdk@npm:1.0.0"
-  dependencies:
-    "@concordium/common-sdk": 4.0.0
-    "@concordium/rust-bindings": 0.4.0
-    buffer: ^6.0.3
-    process: ^0.11.10
-  checksum: a130eb8112a6452e5444ac5a8c86d95e221d49da9ffad43520289258f1b0a366dd37f1056f93fbf44609247bd38238e4ea2ed8bcb4f19390525676ae6f832592
-  languageName: node
-  linkType: hard
-
-"@concordium/web-sdk@npm:^2.0.0":
+"@concordium/web-sdk@npm:2.0.0":
   version: 2.0.0
   resolution: "@concordium/web-sdk@npm:2.0.0"
   dependencies:
@@ -2149,6 +2137,18 @@ __metadata:
     buffer: ^6.0.3
     process: ^0.11.10
   checksum: 889fd1eb4b2b78ba272e854e2ccb5541b330036b5f0d5892fa47734f5d6f1f51d2e7bb6e7670a249275a4e560d59b125c2bdb7960812a4d082d7536d695a8268
+  languageName: node
+  linkType: hard
+
+"@concordium/web-sdk@npm:^1.0.0":
+  version: 1.0.0
+  resolution: "@concordium/web-sdk@npm:1.0.0"
+  dependencies:
+    "@concordium/common-sdk": 4.0.0
+    "@concordium/rust-bindings": 0.4.0
+    buffer: ^6.0.3
+    process: ^0.11.10
+  checksum: a130eb8112a6452e5444ac5a8c86d95e221d49da9ffad43520289258f1b0a366dd37f1056f93fbf44609247bd38238e4ea2ed8bcb4f19390525676ae6f832592
   languageName: node
   linkType: hard
 

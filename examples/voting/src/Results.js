@@ -9,8 +9,8 @@ import ListGroup from 'react-bootstrap/ListGroup';
 import { Link, useParams } from 'react-router-dom';
 import moment from 'moment';
 import { detectConcordiumProvider } from '@concordium/browser-wallet-api-helpers';
-import { decodeVotingView } from './buffer';
-import { getVotes } from './Wallet';
+import { decodeView, decodeVotes } from './buffer';
+import { getView, getVotes } from './Wallet';
 import { REFRESH_INTERVAL } from './config';
 
 function VoteLink(props) {
@@ -46,19 +46,8 @@ function Results() {
     const { electionId } = params;
 
     const [client, setClient] = useState();
-
-    // Attempt to initialize Browser Wallet Client.
-    useEffect(() => {
-        detectConcordiumProvider().then(setClient).catch(console.error);
-    }, []);
-
-    const [getvotesResult, setGetvotesResult] = useState();
-    // Decode raw result (which is fetched below).
-    const votes = useMemo(() => {
-        if (getvotesResult) {
-            return decodeVotingView(getvotesResult.returnValue);
-        }
-    }, [getvotesResult]);
+    const [view, setView] = useState();
+    const [votes, setVotes] = useState();
 
     // Refresh time to deadline each second.
     const [now, setNow] = useState(moment());
@@ -66,31 +55,60 @@ function Results() {
         const interval = setInterval(() => setNow(moment()), moment.duration(1, 'second').asMilliseconds());
         return () => clearInterval(interval);
     }, []);
-    const endsInMillis = votes?.endTime.diff(now);
 
-    // Fetch tally once client is initialized.
+    // Attempt to initialize Browser Wallet Client.
+    useEffect(() => {
+        detectConcordiumProvider().then(setClient).catch(console.error);
+    }, []);
+
+    // Attempt to get general information about the election.
     useEffect(() => {
         if (client) {
-            getVotes(client, electionId).then(setGetvotesResult).catch(console.error);
+            getView(client, electionId).then(setView).catch(console.error);
         }
     }, [client, electionId]);
+
+    // Decode general information about the election.
+    const viewResult = useMemo(() => {
+        if (view) {
+            return decodeView(view.returnValue);
+        }
+    }, [view]);
+
+    // Attempt to get the voting results.
+    useMemo(() => {
+        if (viewResult && client && electionId) {
+            getVotes(client, electionId, viewResult?.numOptions).then(setVotes).catch(console.error);
+        }
+    }, [viewResult, client, electionId]);
+
+    // Decode voting results.
+    const votesResult = useMemo(() => {
+        if (votes) {
+            return decodeVotes(votes);
+        }
+    }, [votes]);
+
+    const endsInMillis = viewResult?.endTime.diff(now);
+
     // Refresh tally periodically until deadline.
     useEffect(() => {
-        if (client && votes?.endTime.isAfter()) {
+        if (client && viewResult?.endTime.isAfter()) {
             const interval = setInterval(() => {
                 console.log('refreshing');
-                setGetvotesResult(undefined);
-                getVotes(client, electionId).then(setGetvotesResult).catch(console.error);
+                setView(undefined);
+                getView(client, electionId).then(setView).catch(console.error);
             }, REFRESH_INTERVAL.asMilliseconds());
             return () => clearInterval(interval);
         }
-    }, [client, electionId, votes]);
+    }, [client, electionId, viewResult]);
 
+    // Calculate the max vote count.
     const maxVoteCount = useMemo(() => {
-        if (votes) {
-            return Math.max(...Object.values(votes.tally));
+        if (votesResult) {
+            return Math.max(...Object.values(votesResult));
         }
-    }, [votes]);
+    }, [votesResult]);
 
     return (
         <Container>
@@ -101,15 +119,16 @@ function Results() {
             </Row>
             <Row>
                 <Col>
-                    <h2>{votes?.descriptionText}</h2>
+                    <h2>{viewResult?.descriptionText}</h2>
                 </Col>
             </Row>
             <Row>
                 <Col>
                     <ListGroup numbered className="mb-3">
-                        {!votes && <Spinner animation="border" />}
-                        {votes &&
-                            Object.entries(votes.tally).map(([name, count]) => (
+                        {!viewResult && <Spinner animation="border" />}
+                        {votesResult &&
+                            viewResult &&
+                            Object.entries(votesResult).map(([index, count]) => (
                                 <ListGroup.Item
                                     className="d-flex justify-content-between align-items-start"
                                     style={{
@@ -117,9 +136,9 @@ function Results() {
                                             (100 * count) / maxVoteCount
                                         }%, rgba(0,0,0,0) ${(100 * count) / maxVoteCount}%)`,
                                     }}
-                                    key={name}
+                                    key={viewResult.opts[index]}
                                 >
-                                    <div className="ms-2 me-auto">{name}</div>
+                                    <div className="ms-2 me-auto">{viewResult.opts[index]}</div>
                                     <Badge bg="primary" pill>
                                         {count}
                                     </Badge>

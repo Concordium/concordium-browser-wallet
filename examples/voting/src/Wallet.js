@@ -1,14 +1,20 @@
 /* eslint-disable no-alert */
 /* eslint-disable no-console */
-/* eslint-disable @typescript-eslint/return-await */
 /* eslint-disable consistent-return */
 /* eslint-disable react/prop-types */
 /* eslint-disable react/jsx-filename-extension */
 /* eslint-disable import/no-unresolved */
+/* eslint-disable no-plusplus */
 import React from 'react';
 import { detectConcordiumProvider } from '@concordium/browser-wallet-api-helpers';
 import { Alert, Button } from 'react-bootstrap';
-import { AccountTransactionType, GtuAmount, ModuleReference } from '@concordium/web-sdk';
+import {
+    AccountTransactionType,
+    GtuAmount,
+    ModuleReference,
+    serializeUpdateContractParameters,
+    toBuffer,
+} from '@concordium/web-sdk';
 import moment from 'moment';
 import { RAW_SCHEMA_BASE64, TESTNET_GENESIS_BLOCK_HASH } from './config';
 
@@ -39,7 +45,7 @@ export async function connect(client, setConnectedAccount) {
 // Check if the user is connected to the testnet chain by checking if the testnet genesisBlock exists.
 // The smart contract voting module is deployed on the testnet chain.
 async function checkConnectedToTestnet(client) {
-    return await client
+    return client
         .getJsonRpcClient()
         .getCryptographicParameters(TESTNET_GENESIS_BLOCK_HASH.toString())
         .then((result) => {
@@ -67,10 +73,8 @@ export async function createElection(
         const deadlineTimestamp = moment().add(deadlineMinutes, 'm').format();
 
         const parameter = {
-            description: {
-                description_text: description,
-                options,
-            },
+            description,
+            options,
             end_time: deadlineTimestamp,
         };
 
@@ -91,11 +95,36 @@ export async function createElection(
     }
 }
 
-export async function getVotes(client, contractIndex) {
+export async function getView(client, contractIndex) {
     return client.getJsonRpcClient().invokeContract({
         contract: { index: BigInt(contractIndex), subindex: BigInt(0) },
-        method: 'voting.getvotes',
+        method: 'voting.view',
     });
+}
+
+export async function getVotes(client, contractIndex, numOptions) {
+    const promises = [];
+
+    for (let i = 0; i < numOptions; i++) {
+        const param = serializeUpdateContractParameters(
+            'voting',
+            'getNumberOfVotes',
+            {
+                vote_index: i,
+            },
+            toBuffer(RAW_SCHEMA_BASE64, 'base64')
+        );
+
+        const promise = client.getJsonRpcClient().invokeContract({
+            contract: { index: BigInt(contractIndex), subindex: BigInt(0) },
+            method: 'voting.getNumberOfVotes',
+            parameter: param,
+        });
+
+        promises.push(promise);
+    }
+
+    return Promise.all(promises);
 }
 
 export async function castVote(client, contractIndex, vote, senderAddress) {
@@ -105,7 +134,6 @@ export async function castVote(client, contractIndex, vote, senderAddress) {
     }
 
     const connectedToTestnet = await checkConnectedToTestnet(client);
-
     if (connectedToTestnet) {
         const txHash = await client.sendTransaction(
             senderAddress,
@@ -116,7 +144,7 @@ export async function castVote(client, contractIndex, vote, senderAddress) {
                 receiveName: 'voting.vote',
                 maxContractExecutionEnergy: BigInt(30000),
             },
-            { vote },
+            { vote_index: vote },
             RAW_SCHEMA_BASE64
         );
         console.log({ txHash });
