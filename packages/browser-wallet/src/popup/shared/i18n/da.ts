@@ -49,6 +49,8 @@ const t: typeof en = {
             showTransfer: 'Vis overførslesdetaljer',
             showContract: 'Vis kontraktdetaljer',
         },
+        parameter: 'Parameter',
+        noParameter: 'Ingen parametre',
     },
     tokenDetails: {
         balance: 'Saldo',

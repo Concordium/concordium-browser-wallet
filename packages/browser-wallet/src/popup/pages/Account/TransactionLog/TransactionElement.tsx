@@ -88,7 +88,8 @@ function isTransferTransaction(type: AccountTransactionType) {
 function buildFeeString(cost: bigint, accountAddress: string, transaction: BrowserWalletTransaction) {
     if (
         isAccountTransaction(transaction) &&
-        (isTransferTransaction(transaction.type) || transaction.type === AccountTransactionType.Update)
+        (isTransferTransaction(transaction.type) ||
+            (transaction.type === AccountTransactionType.Update && transaction.amount !== 0n))
     ) {
         if (isOutgoingTransaction(transaction, accountAddress)) {
             if (isEncryptedTransfer(transaction)) {

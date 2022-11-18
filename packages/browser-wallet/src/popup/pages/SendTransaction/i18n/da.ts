@@ -11,8 +11,6 @@ const t: typeof en = {
     contractIndex: 'Kontrakt indeks (under indeks)',
     receiveName: 'Kontrakt og funktions navn',
     maxEnergy: 'Max energi tilladt',
-    parameter: 'Parameter',
-    noParameter: 'Ingen parametre',
     microCCD: 'mikroCCD',
     nrg: 'NRG',
     moduleReference: 'Modul reference',

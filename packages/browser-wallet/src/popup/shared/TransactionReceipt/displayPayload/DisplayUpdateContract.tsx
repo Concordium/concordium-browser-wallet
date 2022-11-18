@@ -3,6 +3,7 @@ import { useTranslation } from 'react-i18next';
 import { UpdateContractPayload } from '@concordium/web-sdk';
 import { displayAsCcd } from 'wallet-common-helpers/lib/utils/ccd';
 import { SmartContractParameters } from '@shared/utils/types';
+import DisplayParameters from '../DisplayParameters';
 
 interface Props {
     payload: Omit<UpdateContractPayload, 'message'>;
@@ -29,13 +30,7 @@ export default function DisplayUpdateContract({ payload, parameters }: Props) {
             <div>
                 {payload.maxContractExecutionEnergy.toString()} {t('nrg')}
             </div>
-            {!!parameters && (
-                <>
-                    <h5 className="m-b-5">{t('parameter')}:</h5>
-                    <pre className="transaction-receipt__parameter">{JSON.stringify(parameters, null, 2)}</pre>
-                </>
-            )}
-            {!parameters && <h5>{t('noParameter')}</h5>}
+            <DisplayParameters parameters={parameters} />
         </>
     );
 }

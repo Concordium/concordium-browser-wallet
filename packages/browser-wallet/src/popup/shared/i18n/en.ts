@@ -47,6 +47,8 @@ const t = {
             showTransfer: 'Show simple details',
             showContract: 'Show full details',
         },
+        parameter: 'Parameter',
+        noParameter: 'No parameters',
     },
     tokenDetails: {
         balance: 'Balance',
