@@ -6,12 +6,10 @@ import { MakeOptional } from 'wallet-common-helpers';
 import { removeTokenFromCurrentAccountAtom } from '@popup/store/token';
 import CloseButton from '@popup/shared/CloseButton';
 import Button from '@popup/shared/Button';
-import { absoluteRoutes } from '@popup/constants/routes';
 import Modal from '@popup/shared/Modal';
 import ButtonGroup from '@popup/shared/ButtonGroup';
 import { TokenIdAndMetadata, TokenMetadata } from '@shared/storage/types';
 
-import { useNavigate } from 'react-router-dom';
 import { getMetadataDecimals, getMetadataUnique, ownsOne } from '@shared/utils/token-helpers';
 import { useSetAtom } from 'jotai';
 import { addToastAtom } from '@popup/state';
@@ -153,6 +151,7 @@ function Ft({ token, balance, contractIndex, subIndex = SUB_INDEX }: TokenProps)
 type RemoveTokenProps = {
     contractIndex: string;
     token: TokenIdAndMetadata;
+    onRemove(): void;
 };
 
 function RemoveToken({
@@ -161,9 +160,9 @@ function RemoveToken({
         metadata: { name },
     },
     contractIndex,
+    onRemove,
 }: RemoveTokenProps) {
     const removeToken = useUpdateAtom(removeTokenFromCurrentAccountAtom);
-    const nav = useNavigate();
     const { t } = useTranslation('shared', { keyPrefix: 'tokenDetails' });
     const [showPrompt, setShowPrompt] = useState(false);
     const addToast = useSetAtom(addToastAtom);
@@ -172,7 +171,7 @@ function RemoveToken({
         setShowPrompt(false);
         removeToken({ contractIndex, tokenId: id });
         addToast(t('tokenRemoved'));
-        nav(absoluteRoutes.home.account.path);
+        onRemove();
     };
 
     const trigger = (
@@ -223,7 +222,7 @@ export default function TokenDetails({
             <div className="token-details__content">
                 <Token {...tokenProps} subIndex={subIndex} />
             </div>
-            {canRemove && <RemoveToken token={token} contractIndex={contractIndex} />}
+            {canRemove && <RemoveToken token={token} contractIndex={contractIndex} onRemove={onClose} />}
         </div>
     );
 }
