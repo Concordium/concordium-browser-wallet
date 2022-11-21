@@ -44,6 +44,23 @@ $display-statement-color-invalid: $color-grey;
         margin: 0 rem(5px);
     }
 
+    &__line-check,
+    &__line-cross,
+    &__requirements-icon {
+        height: rem(7px);
+        margin-left: rem(5px);
+    }
+
+    &__line-cross path {
+        fill: $color-error;
+    }
+
+    &__line-check path {
+        .display-statement--invalid & {
+            fill: $color-grey;
+        }
+    }
+
     &__reveal-description {
         font-size: rem(8px);
         padding: 0 rem(5px) rem(5px);
@@ -51,5 +68,9 @@ $display-statement-color-invalid: $color-grey;
 
     &__tooltip-icon {
         height: rem(10px);
+    }
+
+    &__requirements-icon path {
+        fill: $color-off-white;
     }
 }
