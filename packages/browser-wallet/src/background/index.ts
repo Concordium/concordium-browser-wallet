@@ -360,3 +360,11 @@ forwardToPopup(
     undefined,
     withPromptEnd
 );
+forwardToPopup(
+    MessageType.IdProof,
+    InternalMessageType.IdProof,
+    runConditionComposer(runIfWhitelisted, withPromptStart),
+    appendUrlToPayload,
+    undefined,
+    withPromptEnd
+);

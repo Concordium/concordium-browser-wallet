@@ -80,10 +80,11 @@ function Theme({ children }: { children: ReactElement }) {
 export default function Root() {
     useScaling();
 
+    // <MemoryRouter initialEntries={[absoluteRoutes.prompt.idProof.path]}>
+
     return (
         <Provider>
-            {/* <MemoryRouter initialEntries={[absoluteRoutes.home.account.path]}> */}
-            <MemoryRouter initialEntries={[absoluteRoutes.prompt.idProof.path]}>
+            <MemoryRouter initialEntries={[absoluteRoutes.home.account.path]}>
                 <Network>
                     <Theme>
                         <Routes />

@@ -6,6 +6,8 @@ import type {
     JsonRpcClient,
     SchemaVersion,
     UpdateContractPayload,
+    IdProof,
+    IdStatement,
 } from '@concordium/web-sdk';
 
 type SendTransactionPayload =
@@ -101,6 +103,8 @@ interface MainWalletApi {
         contractIndex: bigint,
         contractSubindex?: bigint
     ): Promise<string[]>;
+
+    requestIdProof(accountAddress: string, statement: IdStatement, challenge: string): Promise<IdProof>;
 }
 
 export type WalletApi = MainWalletApi & EventListeners;
