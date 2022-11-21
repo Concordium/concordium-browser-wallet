@@ -84,6 +84,10 @@ const InfiniteTokenList = forwardRef<HTMLDivElement, InfiniteTokenListProps>(
     }
 );
 
+function isEven(i: number) {
+    return i % 2 === 0;
+}
+
 /**
  * Debounced token ID lookup function.
  * Sets result.value to empty list on error, list with 1 token on successful lookup, and undefined while loading.
@@ -105,7 +109,7 @@ const lookupTokenIdConfigure = (
 
             let value: ContractTokenDetails[] = [];
 
-            if (!searchQuery) {
+            if (!searchQuery || !isHex(searchQuery) || !isEven(searchQuery.length)) {
                 return;
             }
 
@@ -130,7 +134,7 @@ const lookupTokenIdConfigure = (
 };
 
 const validateId = (id: string | undefined, message: string) => {
-    if (!id || isHex(id)) {
+    if (!id || (isHex(id) && isEven(id.length))) {
         return undefined;
     }
     return message;
