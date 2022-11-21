@@ -61,9 +61,10 @@ $display-statement-color-invalid: $color-grey;
         }
     }
 
-    &__reveal-description {
+    &__description {
         font-size: rem(8px);
         padding: 0 rem(5px) rem(5px);
+        white-space: break-spaces;
     }
 
     &__tooltip-icon {

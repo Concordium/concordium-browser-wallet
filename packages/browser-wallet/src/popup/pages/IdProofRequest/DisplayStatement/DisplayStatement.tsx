@@ -134,7 +134,7 @@ export function DisplayStatementView({ className, lines, dappName, header, ...pr
                 ))}
             </ul>
             {(props.reveal || props.description) && (
-                <div className="display-statement__reveal-description">
+                <div className="display-statement__description">
                     {props.reveal ? (
                         <Trans
                             ns="idProofRequest"

@@ -16,23 +16,44 @@ const Template: ComponentStory<typeof DisplayStatementView> = (args) => {
     );
 };
 
-export const RevealAttributes = Template.bind({});
-RevealAttributes.args = {
+export const ValidRevealAttributes = Template.bind({});
+ValidRevealAttributes.args = {
     dappName: 'Test dApp',
     header: 'Information to reveal',
     reveal: true,
     lines: [
         { attribute: 'First name', value: 'John', isRequirementMet: true },
-        { attribute: 'Last name', value: 'Johnson', isRequirementMet: false },
+        { attribute: 'Last name', value: 'Johnson', isRequirementMet: true },
+    ],
+};
+
+export const InvalidRevealAttributes = Template.bind({});
+InvalidRevealAttributes.args = {
+    dappName: 'Test dApp',
+    header: 'Information to reveal',
+    reveal: true,
+    lines: [
+        { attribute: 'First name', value: 'John', isRequirementMet: true },
+        { attribute: 'Last name', value: 'Johnson', isRequirementMet: true },
         { attribute: 'ID document type', value: 'Passport', isRequirementMet: false },
     ],
 };
 
-export const AgeMinProof = Template.bind({});
-AgeMinProof.args = {
+export const ValidSecretProof = Template.bind({});
+ValidSecretProof.args = {
     dappName: 'Test dApp',
     header: 'Secret proof of age',
     reveal: false,
     description: 'You date of birth is before YYYY-MM-DD.',
     lines: [{ attribute: 'Age', value: 'More than X years old', isRequirementMet: true }],
+};
+
+export const InvalidSecretProof = Template.bind({});
+InvalidSecretProof.args = {
+    dappName: 'Test dApp',
+    header: 'Secret proof of identity document issuer',
+    reveal: false,
+    description:
+        'Your identity document issuer is one of the following:\nAndorra, United Arab Emirates, Afghanistan, Antigua and Barbuda, Anguilla, Albania, Benin, Brazil, Bahamas, Bhutan, Belize, Canada, Chile, Spain, Finland, Fiji, Ghana, Hong Kong, Indonesia, Korea, Mali, Malta, Malawi, Mexico, Mozambique, Namibia, Nigeria, Nicaragua, Panama, Peru',
+    lines: [{ attribute: 'Document issuer', value: '1 of 30 issuers', isRequirementMet: false }],
 };
