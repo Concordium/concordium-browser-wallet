@@ -1,8 +1,8 @@
 import React, { CSSProperties, forwardRef, ReactNode, useCallback, useEffect, useRef, useState } from 'react';
 import { useTranslation } from 'react-i18next';
 import { useNavigate } from 'react-router-dom';
-import { isDefined, noOp, useUpdateEffect } from 'wallet-common-helpers';
-import { isHex, JsonRpcClient } from '@concordium/web-sdk';
+import { isHex, isDefined, noOp, useUpdateEffect } from 'wallet-common-helpers';
+import { JsonRpcClient } from '@concordium/web-sdk';
 import { useAtom, useAtomValue, useSetAtom } from 'jotai';
 import debounce from 'lodash.debounce';
 import InfiniteLoader from 'react-window-infinite-loader';
@@ -84,10 +84,6 @@ const InfiniteTokenList = forwardRef<HTMLDivElement, InfiniteTokenListProps>(
     }
 );
 
-function isEven(i: number) {
-    return i % 2 === 0;
-}
-
 /**
  * Debounced token ID lookup function.
  * Sets result.value to empty list on error, list with 1 token on successful lookup, and undefined while loading.
@@ -109,7 +105,8 @@ const lookupTokenIdConfigure = (
 
             let value: ContractTokenDetails[] = [];
 
-            if (!searchQuery || !isHex(searchQuery) || !isEven(searchQuery.length)) {
+            if (!searchQuery || !isHex(searchQuery)) {
+                setResult({ loading: false, value: undefined });
                 return;
             }
 
@@ -134,7 +131,7 @@ const lookupTokenIdConfigure = (
 };
 
 const validateId = (id: string | undefined, message: string) => {
-    if (!id || (isHex(id) && isEven(id.length))) {
+    if (!id || isHex(id)) {
         return undefined;
     }
     return message;
@@ -176,10 +173,6 @@ export default function TokenList() {
     const filteredDisplayTokens = displayTokens.filter((td) => isDefined(td.metadata));
 
     useUpdateEffect(() => {
-        if (!search) {
-            setSearchResult({ loading: false, value: undefined });
-        }
-
         lookupTokenId(search, setSearchResult);
     }, [search]);
 
