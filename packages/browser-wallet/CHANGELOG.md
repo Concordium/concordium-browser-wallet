@@ -1,5 +1,12 @@
 # Changelog
 
+## 0.8.4
+
+### Fixed
+
+-   Incorrect id on token being displayed in manage tokens, when searching.
+-   Spelling errors and incomplete sentences.
+
 ## 0.8.3
 
 ### Fixed
