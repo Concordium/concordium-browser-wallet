@@ -2,6 +2,7 @@ import clsx from 'clsx';
 import React, { useState } from 'react';
 import { Trans, useTranslation } from 'react-i18next';
 import { ClassName } from 'wallet-common-helpers';
+import { RevealStatement } from '@popup/shared/idProofTypes'; // TODO: get from SDK, remove file after
 
 import SecretIcon from '@assets/svg/id-secret.svg';
 import RevealIcon from '@assets/svg/id-reveal.svg';
@@ -12,6 +13,7 @@ import CrossIcon from '@assets/svg/cross.svg';
 
 import Button from '@popup/shared/Button';
 import Modal from '@popup/shared/Modal';
+import { SecretStatement, useStatementDescription, useStatementHeader } from './utils';
 
 type StatementLine = {
     attribute: string;
@@ -77,24 +79,24 @@ function StatementTooltip({ reveal }: StatementTooltipProps) {
     );
 }
 
-type BaseProps = ClassName & {
+type BaseViewProps = ClassName & {
     header: string;
     lines: StatementLine[];
     dappName: string;
 };
 
-type RevealProps = BaseProps & {
+type RevealViewProps = BaseViewProps & {
     reveal: true;
 };
 
-type SecretProps = BaseProps & {
+type SecretViewProps = BaseViewProps & {
     reveal?: false;
     description?: string;
 };
 
-type Props = RevealProps | SecretProps;
+type ViewProps = RevealViewProps | SecretViewProps;
 
-export function DisplayStatementView({ className, lines, dappName, header, ...props }: Props) {
+export function DisplayStatementView({ className, lines, dappName, header, ...props }: ViewProps) {
     const isValid = lines.every((l) => l.isRequirementMet);
     const { t } = useTranslation('idProofRequest', { keyPrefix: 'displayStatement' });
 
@@ -151,4 +153,52 @@ export function DisplayStatementView({ className, lines, dappName, header, ...pr
     );
 }
 
-export default DisplayStatementView;
+type DisplayRevealStatementProps = {
+    dappName: string;
+    statements: RevealStatement[];
+};
+
+function DisplayRevealStatement({ dappName, statements }: DisplayRevealStatementProps) {
+    const header = 'Reveal header';
+    const lines: StatementLine[] = statements.map((s) => ({
+        attribute: s.attributeTag,
+        value: 'value', // TODO: from ID.
+        isRequirementMet: true, // TODO: is attribute on ID.
+    }));
+
+    return <DisplayStatementView reveal lines={lines} dappName={dappName} header={header} />;
+}
+
+type DisplaySecretStatementProps = {
+    dappName: string;
+    statement: SecretStatement;
+};
+
+function DisplaySecretStatement({ dappName, statement }: DisplaySecretStatementProps) {
+    const header = useStatementHeader(statement);
+    const description = useStatementDescription(statement);
+    const lines: StatementLine[] = [
+        {
+            attribute: statement.attributeTag,
+            value: 'value', // TODO: depending on attribute type
+            isRequirementMet: true, // TODO local match on identity
+        },
+    ];
+
+    return <DisplayStatementView lines={lines} dappName={dappName} header={header} description={description} />;
+}
+
+type Props = {
+    dappName: string;
+    statement: SecretStatement | RevealStatement[]; // Aggregate reveal statements into one view.
+};
+
+export default function DisplayStatement({ statement, dappName }: Props) {
+    const reveal = Array.isArray(statement);
+
+    if (reveal) {
+        return <DisplayRevealStatement dappName={dappName} statements={statement} />;
+    }
+
+    return <DisplaySecretStatement dappName={dappName} statement={statement} />;
+}
