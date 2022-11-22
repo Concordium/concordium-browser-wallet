@@ -24,9 +24,9 @@ type StatementLineProps = StatementLine;
 function DisplayStatementLine({ attribute, value, isRequirementMet }: StatementLineProps) {
     return (
         <li className="display-statement__line">
-            <div>{attribute}:</div>
+            <div className="display-statement__line-attribute">{attribute}:</div>
             <div className="display-statement__line-separator" />
-            <div className="flex align-center">
+            <div className="display-statement__line-value">
                 {value}
                 {isRequirementMet ? (
                     <CheckmarkIcon className="display-statement__line-check" />
