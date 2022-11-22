@@ -6,14 +6,15 @@ import { identityProvidersAtom, selectedIdentityAtom } from '@popup/store/identi
 import IdCard from '@popup/shared/IdCard';
 import { CreationStatus } from '@shared/storage/types';
 import { AttributeKey } from '@concordium/web-sdk';
-import attributeNames from 'wallet-common-helpers/constants/attributeNames.json';
 import { formatAttributeValue, compareAttributes } from 'wallet-common-helpers';
 import IdentityProviderIcon from '@popup/shared/IdentityProviderIcon';
 import Button from '@popup/shared/Button';
 import { absoluteRoutes } from '@popup/constants/routes';
+import sharedTranslations from '@popup/shared/i18n/en';
 
 export default function Identity() {
     const { t } = useTranslation('identity');
+    const { t: sharedT } = useTranslation();
     const nav = useNavigate();
     const [selectedIdentity, updateSelectedIdentity] = useAtom(selectedIdentityAtom);
     const providers = useAtomValue(identityProvidersAtom);
@@ -59,7 +60,9 @@ export default function Identity() {
                         .map((attributeKey: AttributeKey) => (
                             <div key={attributeKey} className="identity__attributes-row">
                                 <div className="identity__attributes-left">
-                                    {attributeNames[attributeKey] || attributeKey}
+                                    {attributeKey in sharedTranslations.idAttributes
+                                        ? sharedT(`idAttributes.${attributeKey}`)
+                                        : attributeKey}
                                 </div>
                                 <div className="identity__attributes-right">
                                     {formatAttributeValue(attributeKey, attributes[attributeKey])}
