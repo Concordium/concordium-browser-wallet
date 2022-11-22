@@ -25,6 +25,7 @@ import AddAccount from '@popup/pages/AddAccount';
 import { IdentityIssuanceEnd, IdentityIssuanceStart } from '@popup/pages/IdentityIssuance';
 import About from '@popup/pages/About';
 import Login from '@popup/pages/Login/Login';
+import TermsAndConditions from '@popup/pages/TermsAndConditions/TermsAndConditions';
 import RecoveryIntro from '@popup/pages/Recovery/RecoveryIntro';
 import RecoveryMain from '@popup/pages/Recovery/RecoveryMain';
 import RecoveryFinish from '@popup/pages/Recovery/RecoveryFinish';
@@ -163,6 +164,7 @@ export default function Routes() {
             </Route>
             <Route path={`${relativeRoutes.setup.path}/*`} element={<Setup />} />
             <Route element={<RecoveryMain />} path={relativeRoutes.recovery.path} />
+            <Route path={relativeRoutes.termsAndConditions.path} element={<TermsAndConditions />} />
             <Route path={relativeRoutes.login.path} element={<Login />} />
             <Route path={relativeRoutes.home.path} element={<MainLayout />}>
                 <Route

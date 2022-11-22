@@ -12,11 +12,13 @@ import {
     storedCurrentNetwork,
     sessionPasscode,
     sessionOpenPrompt,
+    storedAcceptedTerms,
 } from '@shared/storage/access';
 
 import JSONBig from 'json-bigint';
 import { ChromeStorageKey, NetworkConfiguration } from '@shared/storage/types';
 import { buildURLwithSearchParameters } from '@shared/utils/url-helpers';
+import { getTermsAndConditionHash } from '@shared/utils/network-helpers';
 import bgMessageHandler from './message-handler';
 import {
     forwardToPopup,
@@ -119,11 +121,24 @@ async function reportVersion(network?: NetworkConfiguration) {
     // TODO: log if this fails
 }
 
+async function checkForNewTermsAndConditions() {
+    const current = await storedAcceptedTerms.get();
+    try {
+        const newTerms = await getTermsAndConditionHash();
+        if (!current || current.value !== newTerms) {
+            storedAcceptedTerms.set({ accepted: false, value: newTerms });
+        }
+    } catch {
+        // TODO: log this
+    }
+}
+
 const startupHandler = async () => {
     const network = await storedCurrentNetwork.get();
     if (network) {
         await startMonitoringPendingStatus(network);
     }
+    checkForNewTermsAndConditions();
 
     reportVersion(network);
 };

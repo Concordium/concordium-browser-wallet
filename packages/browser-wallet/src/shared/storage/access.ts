@@ -10,6 +10,7 @@ import {
     SessionPendingIdentity,
     TokenMetadata,
     TokenStorage,
+    AcceptedTermsState,
 } from './types';
 
 export type StorageAccessor<V> = {
@@ -143,6 +144,7 @@ export const storedTokenMetadata = makeStorageAccessor<Record<string, TokenMetad
     'local',
     ChromeStorageKey.TokenMetadata
 );
+export const storedAcceptedTerms = makeStorageAccessor<AcceptedTermsState>('local', ChromeStorageKey.AcceptedTerms);
 
 export const sessionOpenPrompt = makeStorageAccessor<boolean>('session', ChromeStorageKey.OpenPrompt);
 export const sessionPasscode = makeStorageAccessor<string>('session', ChromeStorageKey.Passcode);
