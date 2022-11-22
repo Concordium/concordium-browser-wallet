@@ -16,6 +16,7 @@ import login from '@popup/pages/Login/i18n/en';
 import transactionLog from '@popup/pages/Account/TransactionLog/i18n/en';
 import changePasscode from '@popup/pages/ChangePasscode/i18n/en';
 import externalAddTokens from '@popup/pages/ExternalAddTokens/i18n/en';
+import termsAndConditions from '@popup/pages/TermsAndConditions/i18n/en';
 
 const t = {
     shared,
@@ -36,6 +37,7 @@ const t = {
     transactionLog,
     changePasscode,
     externalAddTokens,
+    termsAndConditions,
 };
 
 export default t;
