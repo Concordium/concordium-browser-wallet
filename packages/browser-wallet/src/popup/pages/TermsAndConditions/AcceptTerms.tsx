@@ -39,21 +39,21 @@ export default function AcceptTerms({ children, onSubmit }: Props) {
     }
 
     return (
-        <div className="onboarding-setup__intro-wrapper">
-            <div className="onboarding-setup__intro-wrapper__logos">
-                <Logo className="onboarding-setup__intro-wrapper__logo" />
-                <ConcordiumLetters className="onboarding-setup__intro-wrapper__concordium-letters" />
+        <div className="terms-and-conditions">
+            <div className="terms-and-conditions__logos">
+                <Logo className="terms-and-conditions__logo" />
+                <ConcordiumLetters className="terms-and-conditions__concordium-letters" />
             </div>
-            <div className="onboarding-setup__intro-wrapper__description">{children}</div>
+            <div className="terms-and-conditions__description">{children}</div>
 
-            <Form onSubmit={handleSubmit}>
+            <Form className="terms-and-conditions__form" onSubmit={handleSubmit}>
                 {(f) => {
                     return (
                         <>
                             <FormCheckbox
                                 register={f.register}
                                 name="termsAndConditionsApproved"
-                                className="onboarding-setup__intro-wrapper__terms-and-conditions"
+                                className="terms-and-conditions__terms-and-conditions"
                                 description={
                                     <div>
                                         {t('form.termsAndConditionsDescription')}{' '}
@@ -65,7 +65,7 @@ export default function AcceptTerms({ children, onSubmit }: Props) {
                                 }
                                 rules={{ required: t('form.termsAndConditionsRequired') }}
                             />
-                            <Submit className="onboarding-setup__intro-wrapper__continue-button" width="medium">
+                            <Submit className="terms-and-conditions__continue-button" width="medium">
                                 {t('continue')}
                             </Submit>
                         </>
