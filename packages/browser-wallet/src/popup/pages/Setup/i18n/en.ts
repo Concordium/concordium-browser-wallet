@@ -3,11 +3,6 @@ const t = {
         welcome: 'Welcome to the Concordium Wallet for web.',
         description:
             'On the following pages, you will be guided through the process of setting up a new wallet or restoring an existing one.',
-        form: {
-            termsAndConditionsRequired: 'You must read and accept the terms and conditions',
-            termsAndConditionsDescription: 'I have read and agree to the',
-            termsAndConditionsLinkDescription: 'Terms and Conditions',
-        },
     },
     setupPasscode: {
         title: 'Setup passcode',

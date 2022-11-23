@@ -24,6 +24,7 @@ export enum ChromeStorageKey {
     PendingTransactions = 'pendingTransactions',
     Cookie = 'cookie',
     OpenPrompt = 'openPrompt',
+    AcceptedTerms = 'acceptedTerms',
 }
 
 export enum Theme {
@@ -241,4 +242,9 @@ export type Cis2TokensResponse = {
     from?: number;
     limit: number;
     tokens: Cis2TokenResponse[];
+};
+
+export type AcceptedTermsState = {
+    accepted: boolean;
+    value: string;
 };

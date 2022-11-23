@@ -7,6 +7,10 @@
 -   Incorrect id on token being displayed in manage tokens, when searching.
 -   Spelling errors and incomplete sentences.
 
+### Added
+
+-   Prompt user to accept terms and conditions, if they change.
+
 ## 0.8.3
 
 ### Fixed

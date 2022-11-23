@@ -5,11 +5,6 @@ const t: typeof en = {
         welcome: 'Velkommen til Concordium Wallet for web.',
         description:
             'På de følgende sider vil du blive guidet igennem at oprette en ny wallet, eller at genskabe en allerede eksisterende wallet.',
-        form: {
-            termsAndConditionsRequired: 'Det er påkrævet at læse og at acceptere vilkår og betingelser',
-            termsAndConditionsDescription: 'Jeg har læst og accepteret Vilkår og Betingelser',
-            termsAndConditionsLinkDescription: 'Vilkår og Betingelser',
-        },
     },
     setupPasscode: {
         title: 'Vælg kodeord',
