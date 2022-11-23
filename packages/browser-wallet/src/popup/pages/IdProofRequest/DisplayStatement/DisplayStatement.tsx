@@ -1,7 +1,8 @@
 import clsx from 'clsx';
 import React, { useState } from 'react';
 import { Trans, useTranslation } from 'react-i18next';
-import { ClassName } from 'wallet-common-helpers';
+import { ClassName, formatAttributeValue } from 'wallet-common-helpers';
+import { useAtomValue } from 'jotai';
 import { RevealStatement } from '@popup/shared/idProofTypes'; // TODO: get from SDK, remove file after
 
 import SecretIcon from '@assets/svg/id-secret.svg';
@@ -13,6 +14,9 @@ import CrossIcon from '@assets/svg/cross.svg';
 
 import Button from '@popup/shared/Button';
 import Modal from '@popup/shared/Modal';
+import { identityByAddressAtomFamily } from '@popup/store/identity';
+import sharedTranslations from '@popup/shared/i18n/en';
+import { ensureDefined } from '@shared/utils/basic-helpers';
 import { SecretStatement, useStatementDescription, useStatementHeader } from './utils';
 
 type StatementLine = {
@@ -155,16 +159,27 @@ export function DisplayStatementView({ className, lines, dappName, header, ...pr
 
 type DisplayRevealStatementProps = {
     dappName: string;
+    account: string;
     statements: RevealStatement[];
 };
 
-function DisplayRevealStatement({ dappName, statements }: DisplayRevealStatementProps) {
-    const header = 'Reveal header';
-    const lines: StatementLine[] = statements.map((s) => ({
-        attribute: s.attributeTag,
-        value: 'value', // TODO: from ID.
-        isRequirementMet: true, // TODO: is attribute on ID.
-    }));
+function DisplayRevealStatement({ dappName, statements, account }: DisplayRevealStatementProps) {
+    const { t } = useTranslation('idProofRequest', { keyPrefix: 'displayStatement' });
+    const { t: sharedT } = useTranslation('shared', { keyPrefix: 'idAttributes' });
+    const identity = ensureDefined(useAtomValue(identityByAddressAtomFamily(account)), 'Expected identity to be found');
+    const attributes = identity?.idObject.value.attributeList.chosenAttributes;
+    const header = t('headers.reveal');
+
+    const lines: StatementLine[] = statements.map((s) => {
+        const attribute = s.attributeTag in sharedTranslations.idAttributes ? sharedT(s.attributeTag) : s.attributeTag;
+        const value = formatAttributeValue(s.attributeTag, attributes[s.attributeTag]);
+
+        return {
+            attribute,
+            value,
+            isRequirementMet: value !== undefined,
+        };
+    });
 
     return <DisplayStatementView reveal lines={lines} dappName={dappName} header={header} />;
 }
@@ -190,14 +205,15 @@ function DisplaySecretStatement({ dappName, statement }: DisplaySecretStatementP
 
 type Props = {
     dappName: string;
+    account: string;
     statement: SecretStatement | RevealStatement[]; // Aggregate reveal statements into one view.
 };
 
-export default function DisplayStatement({ statement, dappName }: Props) {
+export default function DisplayStatement({ statement, dappName, account }: Props) {
     const reveal = Array.isArray(statement);
 
     if (reveal) {
-        return <DisplayRevealStatement dappName={dappName} statements={statement} />;
+        return <DisplayRevealStatement dappName={dappName} statements={statement} account={account} />;
     }
 
     return <DisplaySecretStatement dappName={dappName} statement={statement} />;

@@ -1,13 +1,17 @@
 import {
     ChromeStorageKey,
+    ConfirmedIdentity,
+    CreationStatus,
     Identity,
     IdentityProvider,
     RecoveryPayload,
     RecoveryStatus,
     SessionPendingIdentity,
 } from '@shared/storage/types';
-import { atom } from 'jotai';
+import { Atom, atom } from 'jotai';
 import { selectAtom } from 'jotai/utils';
+import { atomFamily, AtomFamily } from 'jotai/utils/atomFamily';
+import { credentialsAtom } from './account';
 import { atomWithChromeStorage } from './utils';
 
 export const identitiesAtom = atomWithChromeStorage<Identity[]>(ChromeStorageKey.Identities, [], false);
@@ -56,4 +60,16 @@ const recoveryStatusAtom = atomWithChromeStorage<RecoveryStatus | undefined>(
 );
 export const setRecoveryPayloadAtom = atom<null, RecoveryPayload, Promise<void>>(null, (_, set, payload) =>
     set(recoveryStatusAtom, { payload })
+);
+
+export const identityByAddressAtomFamily: AtomFamily<string, Atom<ConfirmedIdentity | undefined>> = atomFamily(
+    (address) =>
+        atom((get) => {
+            const cred = get(credentialsAtom).find((c) => c.address === address);
+            return get(identitiesAtom)
+                .filter((i) => i.status === CreationStatus.Confirmed)
+                .find((i) => i.providerIndex === cred?.providerIndex && i.index === cred.identityIndex) as
+                | ConfirmedIdentity
+                | undefined;
+        })
 );

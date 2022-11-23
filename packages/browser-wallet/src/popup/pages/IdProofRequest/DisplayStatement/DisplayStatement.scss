@@ -33,15 +33,6 @@ $display-statement-color-invalid: $color-grey;
         display: flex;
         width: 100%;
         align-items: flex-end;
-
-        > * {
-            flex: 0 0 auto;
-        }
-    }
-
-    &__line-value,
-    &__line-attribute {
-        max-width: 45%;
     }
 
     &__line-value {
