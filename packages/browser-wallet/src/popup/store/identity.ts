@@ -9,8 +9,7 @@ import {
     SessionPendingIdentity,
 } from '@shared/storage/types';
 import { Atom, atom } from 'jotai';
-import { selectAtom } from 'jotai/utils';
-import { atomFamily, AtomFamily } from 'jotai/utils/atomFamily';
+import { atomFamily, selectAtom } from 'jotai/utils';
 import { credentialsAtom } from './account';
 import { atomWithChromeStorage } from './utils';
 
@@ -62,14 +61,13 @@ export const setRecoveryPayloadAtom = atom<null, RecoveryPayload, Promise<void>>
     set(recoveryStatusAtom, { payload })
 );
 
-export const identityByAddressAtomFamily: AtomFamily<string, Atom<ConfirmedIdentity | undefined>> = atomFamily(
-    (address) =>
-        atom((get) => {
-            const cred = get(credentialsAtom).find((c) => c.address === address);
-            return get(identitiesAtom)
-                .filter((i) => i.status === CreationStatus.Confirmed)
-                .find((i) => i.providerIndex === cred?.providerIndex && i.index === cred.identityIndex) as
-                | ConfirmedIdentity
-                | undefined;
-        })
+export const identityByAddressAtomFamily = atomFamily<string, Atom<ConfirmedIdentity | undefined>>((address) =>
+    atom((get) => {
+        const cred = get(credentialsAtom).find((c) => c.address === address);
+        return get(identitiesAtom)
+            .filter((i) => i.status === CreationStatus.Confirmed)
+            .find((i) => i.providerIndex === cred?.providerIndex && i.index === cred.identityIndex) as
+            | ConfirmedIdentity
+            | undefined;
+    })
 );
