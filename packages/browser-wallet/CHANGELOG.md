@@ -1,5 +1,11 @@
 # Changelog
 
+## 0.8.4
+
+### Added
+
+-   Prompt user to accept terms and conditions, if they change.
+
 ## 0.8.3
 
 ### Fixed
