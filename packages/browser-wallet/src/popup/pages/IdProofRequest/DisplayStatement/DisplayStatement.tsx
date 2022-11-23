@@ -1,5 +1,6 @@
+/* eslint-disable react/prop-types */
 import clsx from 'clsx';
-import React, { useState } from 'react';
+import React, { ComponentType, useState } from 'react';
 import { Trans, useTranslation } from 'react-i18next';
 import { ClassName, formatAttributeValue } from 'wallet-common-helpers';
 import { useAtomValue } from 'jotai';
@@ -15,7 +16,9 @@ import CrossIcon from '@assets/svg/cross.svg';
 import Button from '@popup/shared/Button';
 import Modal from '@popup/shared/Modal';
 import { identityByAddressAtomFamily } from '@popup/store/identity';
-import sharedTranslations from '@popup/shared/i18n/en';
+import { useGetAttributeName } from '@popup/shared/utils/identity-helpers';
+import { AttributeList } from '@concordium/web-sdk';
+import { ConfirmedIdentity } from '@shared/storage/types';
 import { ensureDefined } from '@shared/utils/basic-helpers';
 import { SecretStatement, useStatementDescription, useStatementHeader } from './utils';
 
@@ -157,64 +160,84 @@ export function DisplayStatementView({ className, lines, dappName, header, ...pr
     );
 }
 
-type DisplayRevealStatementProps = {
+function withIdentityFromAccount<PropsWithIdentity extends { identity: ConfirmedIdentity }>(
+    C: ComponentType<PropsWithIdentity>
+): ComponentType<Omit<PropsWithIdentity, 'identity'> & { account: string }> {
+    // eslint-disable-next-line react/function-component-definition
+    return ({ account, ...rest }) => {
+        const { loading, value } = useAtomValue(identityByAddressAtomFamily(account));
+
+        if (loading) {
+            return null;
+        }
+
+        const props: PropsWithIdentity = {
+            identity: ensureDefined(value, 'Expected identity to be defined'),
+            ...rest,
+        } as unknown as PropsWithIdentity;
+
+        return <C {...props} />;
+    };
+}
+
+type BaseProps = ClassName & {
+    identity: ConfirmedIdentity;
     dappName: string;
-    account: string;
+};
+
+type DisplayRevealStatementProps = BaseProps & {
     statements: RevealStatement[];
 };
 
-function DisplayRevealStatement({ dappName, statements, account }: DisplayRevealStatementProps) {
-    const { t } = useTranslation('idProofRequest', { keyPrefix: 'displayStatement' });
-    const { t: sharedT } = useTranslation('shared', { keyPrefix: 'idAttributes' });
-    const identity = ensureDefined(useAtomValue(identityByAddressAtomFamily(account)), 'Expected identity to be found');
-    const attributes = identity?.idObject.value.attributeList.chosenAttributes;
-    const header = t('headers.reveal');
+export const DisplayRevealStatement = withIdentityFromAccount<DisplayRevealStatementProps>(
+    ({ dappName, statements, identity, className }) => {
+        const { t } = useTranslation('idProofRequest', { keyPrefix: 'displayStatement' });
+        const getAttributeName = useGetAttributeName();
+        const attributes =
+            identity.idObject.value.attributeList.chosenAttributes ?? ({} as AttributeList['chosenAttributes']);
+        const header = t('headers.reveal');
 
-    const lines: StatementLine[] = statements.map((s) => {
-        const attribute = s.attributeTag in sharedTranslations.idAttributes ? sharedT(s.attributeTag) : s.attributeTag;
-        const value = formatAttributeValue(s.attributeTag, attributes[s.attributeTag]);
+        const lines: StatementLine[] = statements.map((s) => {
+            const value = formatAttributeValue(s.attributeTag, attributes[s.attributeTag]);
 
-        return {
-            attribute,
-            value,
-            isRequirementMet: value !== undefined,
-        };
-    });
+            return {
+                attribute: getAttributeName(s.attributeTag),
+                value,
+                isRequirementMet: value !== undefined,
+            };
+        });
 
-    return <DisplayStatementView reveal lines={lines} dappName={dappName} header={header} />;
-}
+        return <DisplayStatementView reveal lines={lines} dappName={dappName} header={header} className={className} />;
+    }
+);
 
-type DisplaySecretStatementProps = {
-    dappName: string;
+type DisplaySecretStatementProps = BaseProps & {
     statement: SecretStatement;
 };
 
-function DisplaySecretStatement({ dappName, statement }: DisplaySecretStatementProps) {
-    const header = useStatementHeader(statement);
-    const description = useStatementDescription(statement);
-    const lines: StatementLine[] = [
-        {
-            attribute: statement.attributeTag,
-            value: 'value', // TODO: depending on attribute type
-            isRequirementMet: true, // TODO local match on identity
-        },
-    ];
+export const DisplaySecretStatement = withIdentityFromAccount(
+    // eslint-disable-next-line @typescript-eslint/no-unused-vars
+    ({ dappName, statement, identity, className }: DisplaySecretStatementProps) => {
+        const header = useStatementHeader(statement);
+        const description = useStatementDescription(statement);
+        const getAttributeName = useGetAttributeName();
 
-    return <DisplayStatementView lines={lines} dappName={dappName} header={header} description={description} />;
-}
+        const lines: StatementLine[] = [
+            {
+                attribute: getAttributeName(statement.attributeTag),
+                value: 'value', // TODO: depending on attribute type
+                isRequirementMet: true, // TODO local match on identity
+            },
+        ];
 
-type Props = {
-    dappName: string;
-    account: string;
-    statement: SecretStatement | RevealStatement[]; // Aggregate reveal statements into one view.
-};
-
-export default function DisplayStatement({ statement, dappName, account }: Props) {
-    const reveal = Array.isArray(statement);
-
-    if (reveal) {
-        return <DisplayRevealStatement dappName={dappName} statements={statement} account={account} />;
+        return (
+            <DisplayStatementView
+                lines={lines}
+                dappName={dappName}
+                header={header}
+                description={description}
+                className={className}
+            />
+        );
     }
-
-    return <DisplaySecretStatement dappName={dappName} statement={statement} />;
-}
+);
