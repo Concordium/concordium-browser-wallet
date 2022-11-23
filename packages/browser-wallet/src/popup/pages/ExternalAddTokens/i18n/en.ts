@@ -1,6 +1,6 @@
 const t = {
-    description: '{{dApp}} would like to add tokens.',
-    descriptionAllExisting: '{{dApp}} would like at add the following tokens. They are all already added though.',
+    description: '{{dApp}} would like to add the selected tokens to your wallet.',
+    descriptionAllExisting: '{{dApp}} would like to add the following tokens. They are all already added though.',
     add: 'Add selected',
     reject: 'Cancel',
     finish: 'Finish',
