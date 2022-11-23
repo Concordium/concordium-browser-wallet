@@ -2,6 +2,11 @@
 
 ## 0.8.4
 
+### Fixed
+
+-   Incorrect id on token being displayed in manage tokens, when searching.
+-   Spelling errors and incomplete sentences.
+
 ### Added
 
 -   Prompt user to accept terms and conditions, if they change.
