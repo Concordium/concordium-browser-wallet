@@ -95,39 +95,6 @@ export default function wCCD() {
         BrowserWalletConnector.create().then(setConnector).catch(console.error);
     }, []);
 
-    const [ownerProxy, setOwnerProxy] = useState<string>();
-    const [ownerImplementation, setOwnerImplementation] = useState<string>();
-    useEffect(() => {
-        if (connector) {
-            withJsonRpcClient(connector, async (rpcClient) => {
-                // Get wCCD proxy contract owner.
-                const proxyInfo = await rpcClient.getInstanceInfo({
-                    index: WCCD_PROXY_INDEX,
-                    subindex: CONTRACT_SUB_INDEX,
-                });
-
-                if (proxyInfo?.name !== `init_${CONTRACT_NAME_PROXY}`) {
-                    // Check that we have the expected instance.
-                    throw new Error(`Expected instance of proxy: ${proxyInfo?.name}`);
-                }
-
-                setOwnerProxy(proxyInfo.owner.address);
-
-                // Get wCCD implementation contract owner.
-                const implInfo = await rpcClient.getInstanceInfo({
-                    index: WCCD_IMPLEMENTATION_INDEX,
-                    subindex: CONTRACT_SUB_INDEX,
-                });
-                if (implInfo?.name !== `init_${CONTRACT_NAME_IMPLEMENTATION}`) {
-                    // Check that we have the expected instance.
-                    throw new Error(`Expected instance of implementation: ${implInfo?.name}`);
-                }
-
-                setOwnerImplementation(implInfo.owner.address);
-            }).catch(console.error);
-        }
-    }, [connector]);
-
     const [walletConnection, setWalletConnection] = useState<WalletConnection>();
     const [waitForUser, setWaitForUser] = useState<boolean>(false);
     const [connectedAccount, setConnectedAccount] = useState<string>();
@@ -161,6 +128,39 @@ export default function wCCD() {
                 .finally(() => setWaitForUser(false));
         }
     }, [connector]);
+
+    const [ownerProxy, setOwnerProxy] = useState<string>();
+    const [ownerImplementation, setOwnerImplementation] = useState<string>();
+    useEffect(() => {
+        if (connectedAccount && connector) {
+            withJsonRpcClient(connector, async (rpcClient) => {
+                // Get wCCD proxy contract owner.
+                const proxyInfo = await rpcClient.getInstanceInfo({
+                    index: WCCD_PROXY_INDEX,
+                    subindex: CONTRACT_SUB_INDEX,
+                });
+
+                if (proxyInfo?.name !== `init_${CONTRACT_NAME_PROXY}`) {
+                    // Check that we have the expected instance.
+                    throw new Error(`Expected instance of proxy: ${proxyInfo?.name}`);
+                }
+
+                setOwnerProxy(proxyInfo.owner.address);
+
+                // Get wCCD implementation contract owner.
+                const implInfo = await rpcClient.getInstanceInfo({
+                    index: WCCD_IMPLEMENTATION_INDEX,
+                    subindex: CONTRACT_SUB_INDEX,
+                });
+                if (implInfo?.name !== `init_${CONTRACT_NAME_IMPLEMENTATION}`) {
+                    // Check that we have the expected instance.
+                    throw new Error(`Expected instance of implementation: ${implInfo?.name}`);
+                }
+
+                setOwnerImplementation(implInfo.owner.address);
+            }).catch(console.error);
+        }
+    }, [connector, !!connectedAccount]);
 
     const [isWrapping, setIsWrapping] = useState<boolean>(true);
     const [hash, setHash] = useState<string>('');
