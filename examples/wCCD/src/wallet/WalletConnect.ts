@@ -104,6 +104,6 @@ export class WalletConnectConnector implements WalletConnector {
             // eslint-disable-next-line no-console
             console.debug('Wallet Connect event: session_delete');
         });
-        return new WalletConnectConnection(this.client, WALLET_CONNECT_SESSION_NAMESPACE, session, events);
+        return new WalletConnectConnection(this.client, WALLET_CONNECT_SESSION_NAMESPACE, session);
     }
 }

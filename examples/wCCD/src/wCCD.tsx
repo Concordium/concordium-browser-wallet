@@ -1,11 +1,10 @@
 /* eslint-disable no-console */
-import React, { useEffect, useState, useContext, useRef, useCallback } from 'react';
+import React, { useEffect, useState, useRef, useCallback } from 'react';
 import { toBuffer, AccountAddress } from '@concordium/web-sdk';
 import { detectConcordiumProvider } from '@concordium/browser-wallet-api-helpers';
 import * as leb from '@thi.ng/leb128';
-import { wrap, unwrap, state } from './utils';
+import { wrap, unwrap } from './utils';
 import {
-    TESTNET_GENESIS_BLOCK_HASH,
     WCCD_PROXY_INDEX,
     WCCD_IMPLEMENTATION_INDEX,
     WCCD_STATE_INDEX,
@@ -131,11 +130,33 @@ export default function wCCD() {
 
     const [walletConnection, setWalletConnection] = useState<WalletConnection>();
     const [waitForUser, setWaitForUser] = useState<boolean>(false);
+    const [connectedAccount, setConnectedAccount] = useState<string>();
+    const network = TESTNET;
     const handleOnClick = useCallback(() => {
         if (connector) {
             setWaitForUser(true);
             connector
-                .connect()
+                .connect({
+                    onAccountChanged(address: string | undefined) {
+                        setConnectedAccount(address);
+                    },
+                    onChainChanged(genesisHash: string) {
+                        // Check if the user is connected to testnet by checking if the genesis hash matches the expected one.
+                        // Emit a warning and disconnect if it's the wrong chain.
+                        if (genesisHash !== network.genesisHash) {
+                            // eslint-disable-next-line no-alert
+                            window.alert(
+                                `Unexpected genesis hash ${genesisHash}. Expected ${network.genesisHash} (network "${network.name}").`
+                            );
+                            this.onDisconnect();
+                        }
+                    },
+                    onDisconnect() {
+                        walletConnection?.disconnect().catch(console.error);
+                        setWalletConnection(undefined);
+                        setConnectedAccount(undefined);
+                    },
+                })
                 .then(setWalletConnection)
                 .finally(() => setWaitForUser(false));
         }
@@ -144,15 +165,13 @@ export default function wCCD() {
     const [isWrapping, setIsWrapping] = useState<boolean>(true);
     const [hash, setHash] = useState<string>('');
     const [error, setError] = useState<string>('');
-    const [flipped, setflipped] = useState<boolean>(false);
+    const [flipped, setFlipped] = useState<boolean>(false);
     const [amountAccount, setAmountAccount] = useState<bigint>(0n);
-    const inputValue = useRef<HTMLInputElement>();
+    const inputValue = useRef<HTMLInputElement>(null);
 
     useEffect(() => {
-        if (walletConnection) {
-            if (address) {
-                updateStateWCCDBalanceAccount(address, setAmountAccount).catch(console.error);
-            }
+        if (walletConnection && connectedAccount) {
+            updateStateWCCDBalanceAccount(connectedAccount, setAmountAccount).catch(console.error);
         }
     }, [walletConnection]);
 
@@ -180,13 +199,13 @@ export default function wCCD() {
                                 type="button"
                                 onClick={() => {
                                     window.open(
-                                        `https://testnet.ccdscan.io/?dcount=1&dentity=account&daddress=${walletConnection.getConnectedAccount()}`,
+                                        `https://testnet.ccdscan.io/?dcount=1&dentity=account&daddress=${connectedAccount}`,
                                         '_blank',
                                         'noopener,noreferrer'
                                     );
                                 }}
                             >
-                                {walletConnection.getConnectedAccount()}{' '}
+                                {connectedAccount}{' '}
                             </button>
                         </>
                     )}
@@ -199,15 +218,9 @@ export default function wCCD() {
                         className="buttonInvisible"
                         type="button"
                         onClick={() => {
-                            setflipped(!flipped);
-                            if (walletConnection && walletConnection.getConnectedAccount()) {
-                                const account = walletConnection.getConnectedAccount();
-                                if (account) {
-                                    updateStateWCCDBalanceAccount(
-                                        account,
-                                        setAmountAccount
-                                    ).catch(console.error);
-                                }
+                            setFlipped(!flipped);
+                            if (walletConnection && connectedAccount) {
+                                updateStateWCCDBalanceAccount(connectedAccount, setAmountAccount).catch(console.error);
                             }
                         }}
                     >
@@ -254,7 +267,7 @@ export default function wCCD() {
                         <button
                             style={ButtonStyle}
                             type="button"
-                            disabled={account === undefined}
+                            disabled={connectedAccount === undefined}
                             onClick={() => {
                                 if (
                                     inputValue.current === undefined ||
@@ -277,13 +290,13 @@ export default function wCCD() {
                                     ); /* eslint-disable no-alert */
                                 }
 
-                                if (account) {
+                                if (connectedAccount) {
                                     setHash('');
                                     setError('');
                                     setWaitForUser(true);
                                     if (isWrapping) {
                                         wrap(
-                                            account,
+                                            connectedAccount,
                                             WCCD_PROXY_INDEX,
                                             setHash,
                                             setError,
@@ -293,7 +306,7 @@ export default function wCCD() {
                                         );
                                     } else {
                                         unwrap(
-                                            account,
+                                            connectedAccount,
                                             WCCD_PROXY_INDEX,
                                             setHash,
                                             setError,

@@ -1,7 +1,7 @@
 // eslint-disable-next-line max-classes-per-file
 import { detectConcordiumProvider, WalletApi } from '@concordium/browser-wallet-api-helpers';
 import { JsonRpcClient } from '@concordium/web-sdk';
-import { Events, Network, WalletConnection, WalletConnector } from './WalletConnection';
+import { Events, WalletConnection, WalletConnector } from './WalletConnection';
 
 export const WALLET_CONNECT_SESSION_NAMESPACE = 'ccd';
 
@@ -48,7 +48,9 @@ export class BrowserWalletConnector implements WalletConnector {
         // Pass relevant events from wallet onto the handler object.
         this.client.on('chainChanged', events.onChainChanged);
         this.client.on('accountChanged', events.onAccountChanged);
-        this.client.on('accountDisconnected', () => client.getMostRecentlySelectedAccount().then(events.onAccountChanged));
+        this.client.on('accountDisconnected', () =>
+            this.client.getMostRecentlySelectedAccount().then(events.onAccountChanged)
+        );
 
         return new BrowserWalletConnection(this.client);
     }
