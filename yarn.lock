@@ -1762,6 +1762,15 @@ __metadata:
   languageName: node
   linkType: hard
 
+"@babel/runtime@npm:^7.20.1":
+  version: 7.20.1
+  resolution: "@babel/runtime@npm:7.20.1"
+  dependencies:
+    regenerator-runtime: ^0.13.10
+  checksum: 00567a333d3357925742a6f5e39394dcc0af6e6029103fe188158bf7ae8b0b3ee3c6c0f68fccc217f0a6cfa455f6be252298baf56b3f5ff37b34313b170cd9f6
+  languageName: node
+  linkType: hard
+
 "@babel/runtime@npm:~7.5.4":
   version: 7.5.5
   resolution: "@babel/runtime@npm:7.5.5"
@@ -1883,21 +1892,21 @@ __metadata:
   languageName: node
   linkType: hard
 
-"@concordium/browser-wallet-api-helpers@npm:2.0.0":
-  version: 2.0.0
-  resolution: "@concordium/browser-wallet-api-helpers@npm:2.0.0"
-  dependencies:
-    "@concordium/web-sdk": ^3.0.0
-  checksum: 8d28d2db32e86ed738055a0683e6270d28cefdbf8fc62711b72842a1f21a67f2822c5460c730f2d2f9fe2bb5343d68301e5718249c69cc6e0de2a0847ac24754
-  languageName: node
-  linkType: hard
-
 "@concordium/browser-wallet-api-helpers@npm:^0.2.0":
   version: 0.2.0
   resolution: "@concordium/browser-wallet-api-helpers@npm:0.2.0"
   dependencies:
     "@concordium/web-sdk": ^0.4.0
   checksum: 7ddf26115f2e1b7af203bedbf35ae8a6379ed9741931ae04880510bf88021718d856231eb39fefe51c9aae67e3939a29283725f08aca8a1f6d4b7403972c7895
+  languageName: node
+  linkType: hard
+
+"@concordium/browser-wallet-api-helpers@npm:^2.0.0":
+  version: 2.0.0
+  resolution: "@concordium/browser-wallet-api-helpers@npm:2.0.0"
+  dependencies:
+    "@concordium/web-sdk": ^3.0.0
+  checksum: 8d28d2db32e86ed738055a0683e6270d28cefdbf8fc62711b72842a1f21a67f2822c5460c730f2d2f9fe2bb5343d68301e5718249c69cc6e0de2a0847ac24754
   languageName: node
   linkType: hard
 
@@ -7978,6 +7987,13 @@ __metadata:
   languageName: node
   linkType: hard
 
+"complex.js@npm:^2.1.1":
+  version: 2.1.1
+  resolution: "complex.js@npm:2.1.1"
+  checksum: a0802cc3f0eb7703088edfc3fe209ae7be5ce93c0e710a0f288be2e29ee31b3530a8c0d3330d7c2a668410dfe4293a4038554d66c7f1f1165997941bdc1092aa
+  languageName: node
+  linkType: hard
+
 "component-emitter@npm:^1.2.1":
   version: 1.3.0
   resolution: "component-emitter@npm:1.3.0"
@@ -8618,6 +8634,13 @@ __metadata:
   version: 10.3.1
   resolution: "decimal.js@npm:10.3.1"
   checksum: 0351ac9f05fe050f23227aa6a4573bee2d58fa7378fcf28d969a8c789525032effb488a90320fd3fe86a66e17b4bc507d811b15eada5b7f0e7ec5d2af4c24a59
+  languageName: node
+  linkType: hard
+
+"decimal.js@npm:^10.4.2":
+  version: 10.4.2
+  resolution: "decimal.js@npm:10.4.2"
+  checksum: 536cd6816a3197f2e1aa3da4860856cb5a2db73f6fafe8cb3b924ccc63f9b7d78296acc13dccbd419bd958ccc6357921fb15467f883b37cab04bfba7044cada2
   languageName: node
   linkType: hard
 
@@ -9592,6 +9615,13 @@ __metadata:
   version: 1.0.3
   resolution: "escape-html@npm:1.0.3"
   checksum: 6213ca9ae00d0ab8bccb6d8d4e0a98e76237b2410302cf7df70aaa6591d509a2a37ce8998008cbecae8fc8ffaadf3fb0229535e6a145f3ce0b211d060decbb24
+  languageName: node
+  linkType: hard
+
+"escape-latex@npm:^1.2.0":
+  version: 1.2.0
+  resolution: "escape-latex@npm:1.2.0"
+  checksum: 73a787319f0965ecb8244bb38bf3a3cba872f0b9a5d3da8821140e9f39fe977045dc953a62b1a2bed4d12bfccbe75a7d8ec786412bf00739eaa2f627d0a8e0d6
   languageName: node
   linkType: hard
 
@@ -10696,6 +10726,13 @@ __metadata:
   version: 0.2.0
   resolution: "forwarded@npm:0.2.0"
   checksum: fd27e2394d8887ebd16a66ffc889dc983fbbd797d5d3f01087c020283c0f019a7d05ee85669383d8e0d216b116d720fc0cef2f6e9b7eb9f4c90c6e0bc7fd28e6
+  languageName: node
+  linkType: hard
+
+"fraction.js@npm:^4.2.0":
+  version: 4.2.0
+  resolution: "fraction.js@npm:4.2.0"
+  checksum: 8c76a6e21dedea87109d6171a0ac77afa14205794a565d71cb10d2925f629a3922da61bf45ea52dbc30bce4d8636dc0a27213a88cbd600eab047d82f9a3a94c5
   languageName: node
   linkType: hard
 
@@ -12725,6 +12762,13 @@ __metadata:
   languageName: node
   linkType: hard
 
+"javascript-natural-sort@npm:^0.7.1":
+  version: 0.7.1
+  resolution: "javascript-natural-sort@npm:0.7.1"
+  checksum: 161e2c512cc7884bc055a582c6645d9032cab88497a76123d73cb23bfb03d97a04cf7772ecdb8bd3366fc07192c2f996366f479f725c23ef073fffe03d6a586a
+  languageName: node
+  linkType: hard
+
 "jest-changed-files@npm:^28.1.3":
   version: 28.1.3
   resolution: "jest-changed-files@npm:28.1.3"
@@ -14102,6 +14146,25 @@ __metadata:
   version: 1.0.4
   resolution: "markdown-escapes@npm:1.0.4"
   checksum: 6833a93d72d3f70a500658872312c6fa8015c20cc835a85ae6901fa232683fbc6ed7118ebe920fea7c80039a560f339c026597d96eee0e9de602a36921804997
+  languageName: node
+  linkType: hard
+
+"mathjs@npm:^11.4.0":
+  version: 11.4.0
+  resolution: "mathjs@npm:11.4.0"
+  dependencies:
+    "@babel/runtime": ^7.20.1
+    complex.js: ^2.1.1
+    decimal.js: ^10.4.2
+    escape-latex: ^1.2.0
+    fraction.js: ^4.2.0
+    javascript-natural-sort: ^0.7.1
+    seedrandom: ^3.0.5
+    tiny-emitter: ^2.1.0
+    typed-function: ^4.1.0
+  bin:
+    mathjs: bin/cli.js
+  checksum: 7c5d9bdca22bc299a8f0f19195a8873c45b7175a14f87f9283260fb6b9c29cc9e989568ac4424da86f356fc18ed974a58bbadae5fbd97562408732f3b53d6889
   languageName: node
   linkType: hard
 
@@ -17586,6 +17649,13 @@ __metadata:
   languageName: node
   linkType: hard
 
+"seedrandom@npm:^3.0.5":
+  version: 3.0.5
+  resolution: "seedrandom@npm:3.0.5"
+  checksum: 728b56bc3bc1b9ddeabd381e449b51cb31bdc0aa86e27fcd0190cea8c44613d5bcb2f6bb63ed79f78180cbe791c20b8ec31a9627f7b7fc7f476fd2bdb7e2da9f
+  languageName: node
+  linkType: hard
+
 "semver-diff@npm:^3.1.1":
   version: 3.1.1
   resolution: "semver-diff@npm:3.1.1"
@@ -18982,6 +19052,13 @@ __metadata:
   languageName: node
   linkType: hard
 
+"tiny-emitter@npm:^2.1.0":
+  version: 2.1.0
+  resolution: "tiny-emitter@npm:2.1.0"
+  checksum: fbcfb5145751a0e3b109507a828eb6d6d4501352ab7bb33eccef46e22e9d9ad3953158870a6966a59e57ab7c3f9cfac7cab8521db4de6a5e757012f4677df2dd
+  languageName: node
+  linkType: hard
+
 "tmpl@npm:1.0.5":
   version: 1.0.5
   resolution: "tmpl@npm:1.0.5"
@@ -19357,6 +19434,13 @@ __metadata:
     media-typer: 0.3.0
     mime-types: ~2.1.24
   checksum: 2c8e47675d55f8b4e404bcf529abdf5036c537a04c2b20177bcf78c9e3c1da69da3942b1346e6edb09e823228c0ee656ef0e033765ec39a70d496ef601a0c657
+  languageName: node
+  linkType: hard
+
+"typed-function@npm:^4.1.0":
+  version: 4.1.0
+  resolution: "typed-function@npm:4.1.0"
+  checksum: 5d512a13501028abbf8676299b4f92209cb4a90fb9b002330494bfd2451b1f9ecde866dbd51b2e599f9ff3521349489b173df050528521d28a38cc071b8d5b8f
   languageName: node
   linkType: hard
 
@@ -20056,7 +20140,7 @@ __metadata:
   version: 0.0.0-use.local
   resolution: "wccd@workspace:examples/wCCD"
   dependencies:
-    "@concordium/browser-wallet-api-helpers": 2.0.0
+    "@concordium/browser-wallet-api-helpers": ^2.0.0
     "@concordium/web-sdk": ^3.0.0
     "@craftamap/esbuild-plugin-html": ^0.4.0
     "@thi.ng/leb128": ^2.1.18
@@ -20068,6 +20152,7 @@ __metadata:
     esbuild-plugin-svgr: ^1.0.1
     fs: ^0.0.1-security
     live-server: ^1.2.2
+    mathjs: ^11.4.0
     process: ^0.11.10
     react: ^18.1.0
     react-dom: ^18.1.0
