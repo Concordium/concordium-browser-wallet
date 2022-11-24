@@ -1883,6 +1883,15 @@ __metadata:
   languageName: node
   linkType: hard
 
+"@concordium/browser-wallet-api-helpers@npm:2.0.0":
+  version: 2.0.0
+  resolution: "@concordium/browser-wallet-api-helpers@npm:2.0.0"
+  dependencies:
+    "@concordium/web-sdk": ^3.0.0
+  checksum: 8d28d2db32e86ed738055a0683e6270d28cefdbf8fc62711b72842a1f21a67f2822c5460c730f2d2f9fe2bb5343d68301e5718249c69cc6e0de2a0847ac24754
+  languageName: node
+  linkType: hard
+
 "@concordium/browser-wallet-api-helpers@npm:^0.2.0":
   version: 0.2.0
   resolution: "@concordium/browser-wallet-api-helpers@npm:0.2.0"
@@ -20047,7 +20056,7 @@ __metadata:
   version: 0.0.0-use.local
   resolution: "wccd@workspace:examples/wCCD"
   dependencies:
-    "@concordium/browser-wallet-api-helpers": "workspace:^"
+    "@concordium/browser-wallet-api-helpers": 2.0.0
     "@concordium/web-sdk": ^3.0.0
     "@craftamap/esbuild-plugin-html": ^0.4.0
     "@thi.ng/leb128": ^2.1.18
