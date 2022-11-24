@@ -10,7 +10,7 @@ import { detectConcordiumProvider } from '@concordium/browser-wallet-api-helpers
 import { Alert, Button } from 'react-bootstrap';
 import {
     AccountTransactionType,
-    GtuAmount,
+    CcdAmount,
     ModuleReference,
     serializeUpdateContractParameters,
     toBuffer,
@@ -80,11 +80,11 @@ export async function createElection(
 
         const txHash = await client.sendTransaction(
             senderAddress,
-            AccountTransactionType.InitializeSmartContractInstance,
+            AccountTransactionType.InitContract,
             {
-                amount: new GtuAmount(BigInt(0)),
+                amount: new CcdAmount(BigInt(0)),
                 moduleRef: new ModuleReference(moduleRef),
-                contractName,
+                initName: contractName,
                 maxContractExecutionEnergy: BigInt(30000),
             },
             parameter,
@@ -137,10 +137,10 @@ export async function castVote(client, contractIndex, vote, senderAddress) {
     if (connectedToTestnet) {
         const txHash = await client.sendTransaction(
             senderAddress,
-            AccountTransactionType.UpdateSmartContractInstance,
+            AccountTransactionType.Update,
             {
-                amount: new GtuAmount(BigInt(0)),
-                contractAddress: { index: BigInt(contractIndex), subindex: BigInt(0) },
+                amount: new CcdAmount(BigInt(0)),
+                address: { index: BigInt(contractIndex), subindex: BigInt(0) },
                 receiveName: 'voting.vote',
                 maxContractExecutionEnergy: BigInt(30000),
             },
