@@ -1,8 +1,8 @@
 /* eslint-disable no-console */
 import { createContext } from 'react';
 import { detectConcordiumProvider } from '@concordium/browser-wallet-api-helpers';
-import { AccountTransactionType, GtuAmount, toBuffer } from '@concordium/web-sdk';
-import { CONTRACT_NAME_PROXY } from './constants';
+import { AccountTransactionType, UpdateContractPayload, CcdAmount } from '@concordium/web-sdk';
+import { CONTRACT_NAME } from './constants';
 
 /**
  * Action for wrapping some CCD to WCCD in the WCCD smart contract instance
@@ -27,24 +27,23 @@ export const wrap = (
             provider
                 .sendTransaction(
                     account,
-                    AccountTransactionType.UpdateSmartContractInstance,
+                    AccountTransactionType.Update,
                     {
-                        amount: new GtuAmount(BigInt(amount)),
-                        contractAddress: {
+                        amount: new CcdAmount(BigInt(amount)),
+                        address: {
                             index,
                             subindex,
                         },
-                        receiveName: `${CONTRACT_NAME_PROXY}.wrap`,
+                        receiveName: `${CONTRACT_NAME}.wrap`,
                         maxContractExecutionEnergy: 30000n,
-                        parameter: toBuffer(''),
-                    },
+                    } as UpdateContractPayload,
                     {
                         data: '',
                         to: {
                             Account: [account],
                         },
                     },
-                    '//8BAQAAAA8AAABDSVMyLXdDQ0QtUHJveHkBABQAAgAAABYAAABpbXBsZW1lbnRhdGlvbl9hZGRyZXNzDA0AAABzdGF0ZV9hZGRyZXNzDAEAAAAEAAAAd3JhcAAUAAIAAAACAAAAdG8VAgAAAAcAAABBY2NvdW50AQEAAAALCAAAAENvbnRyYWN0AQIAAAAMFgEEAAAAZGF0YR0B'
+                    '//8CAQAAAAkAAABjaXMyX3dDQ0QBABQAAgAAAAMAAAB1cmwWAgQAAABoYXNoFQIAAAAEAAAATm9uZQIEAAAAU29tZQEBAAAAEyAAAAACAQAAAAQAAAB3cmFwBBQAAgAAAAIAAAB0bxUCAAAABwAAAEFjY291bnQBAQAAAAsIAAAAQ29udHJhY3QBAgAAAAwWAQQAAABkYXRhHQEVBAAAAA4AAABJbnZhbGlkVG9rZW5JZAIRAAAASW5zdWZmaWNpZW50RnVuZHMCDAAAAFVuYXV0aG9yaXplZAIGAAAAQ3VzdG9tAQEAAAAVCQAAAAsAAABQYXJzZVBhcmFtcwIHAAAATG9nRnVsbAIMAAAATG9nTWFsZm9ybWVkAg4AAABDb250cmFjdFBhdXNlZAITAAAASW52b2tlQ29udHJhY3RFcnJvcgITAAAASW52b2tlVHJhbnNmZXJFcnJvcgIaAAAARmFpbGVkVXBncmFkZU1pc3NpbmdNb2R1bGUCHAAAAEZhaWxlZFVwZ3JhZGVNaXNzaW5nQ29udHJhY3QCJQAAAEZhaWxlZFVwZ3JhZGVVbnN1cHBvcnRlZE1vZHVsZVZlcnNpb24C'
                 )
                 .then((txHash) => {
                     setHash(txHash);
@@ -83,16 +82,15 @@ export const unwrap = (
             provider
                 .sendTransaction(
                     account,
-                    AccountTransactionType.UpdateSmartContractInstance,
+                    AccountTransactionType.Update,
                     {
-                        amount: new GtuAmount(BigInt(0)),
-                        contractAddress: {
+                        amount: new CcdAmount(BigInt(0)),
+                        address: {
                             index,
                             subindex,
                         },
-                        receiveName: `${CONTRACT_NAME_PROXY}.unwrap`,
+                        receiveName: `${CONTRACT_NAME}.unwrap`,
                         maxContractExecutionEnergy: 30000n,
-                        parameter: toBuffer(''),
                     },
                     {
                         amount: amount.toString(),
@@ -104,7 +102,7 @@ export const unwrap = (
                             Account: [account],
                         },
                     },
-                    '//8BAQAAAA8AAABDSVMyLXdDQ0QtUHJveHkBABQAAgAAABYAAABpbXBsZW1lbnRhdGlvbl9hZGRyZXNzDA0AAABzdGF0ZV9hZGRyZXNzDAEAAAAGAAAAdW53cmFwABQABAAAAAYAAABhbW91bnQbJQAAAAUAAABvd25lchUCAAAABwAAAEFjY291bnQBAQAAAAsIAAAAQ29udHJhY3QBAQAAAAwIAAAAcmVjZWl2ZXIVAgAAAAcAAABBY2NvdW50AQEAAAALCAAAAENvbnRyYWN0AQIAAAAMFgEEAAAAZGF0YR0B'
+                    '//8CAQAAAAkAAABjaXMyX3dDQ0QBABQAAgAAAAMAAAB1cmwWAgQAAABoYXNoFQIAAAAEAAAATm9uZQIEAAAAU29tZQEBAAAAEyAAAAACAQAAAAYAAAB1bndyYXAEFAAEAAAABgAAAGFtb3VudBslAAAABQAAAG93bmVyFQIAAAAHAAAAQWNjb3VudAEBAAAACwgAAABDb250cmFjdAEBAAAADAgAAAByZWNlaXZlchUCAAAABwAAAEFjY291bnQBAQAAAAsIAAAAQ29udHJhY3QBAgAAAAwWAQQAAABkYXRhHQEVBAAAAA4AAABJbnZhbGlkVG9rZW5JZAIRAAAASW5zdWZmaWNpZW50RnVuZHMCDAAAAFVuYXV0aG9yaXplZAIGAAAAQ3VzdG9tAQEAAAAVCQAAAAsAAABQYXJzZVBhcmFtcwIHAAAATG9nRnVsbAIMAAAATG9nTWFsZm9ybWVkAg4AAABDb250cmFjdFBhdXNlZAITAAAASW52b2tlQ29udHJhY3RFcnJvcgITAAAASW52b2tlVHJhbnNmZXJFcnJvcgIaAAAARmFpbGVkVXBncmFkZU1pc3NpbmdNb2R1bGUCHAAAAEZhaWxlZFVwZ3JhZGVNaXNzaW5nQ29udHJhY3QCJQAAAEZhaWxlZFVwZ3JhZGVVbnN1cHBvcnRlZE1vZHVsZVZlcnNpb24C'
                 )
                 .then((txHash) => {
                     setHash(txHash);
