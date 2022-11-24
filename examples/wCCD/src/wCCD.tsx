@@ -3,8 +3,17 @@ import React, { useEffect, useState, useContext, useRef, useCallback } from 'rea
 import { toBuffer, deserializeReceiveReturnValue, serializeUpdateContractParameters } from '@concordium/web-sdk';
 import { detectConcordiumProvider } from '@concordium/browser-wallet-api-helpers';
 import * as leb from '@thi.ng/leb128';
+import { multiply, round } from 'mathjs';
+
 import { wrap, unwrap, state } from './utils';
-import { TESTNET_GENESIS_BLOCK_HASH, WCCD_CONTRACT_INDEX, CONTRACT_SUB_INDEX, CONTRACT_NAME } from './constants';
+import {
+    TESTNET_GENESIS_BLOCK_HASH,
+    WCCD_CONTRACT_INDEX,
+    CONTRACT_SUB_INDEX,
+    CONTRACT_NAME,
+    VIEW_FUNCTION_RAW_SCHEMA,
+    BALANCEOF_FUNCTION_RAW_SCHEMA,
+} from './constants';
 
 import ArrowIcon from './assets/Arrow.svg';
 import RefreshIcon from './assets/Refresh.svg';
@@ -68,10 +77,7 @@ async function viewAdmin(setAdmin: (x: string) => void) {
 
     const returnValues = deserializeReceiveReturnValue(
         toBuffer(res.returnValue, 'hex'),
-        toBuffer(
-            '//8CAQAAAAkAAABjaXMyX3dDQ0QBABQAAgAAAAMAAAB1cmwWAgQAAABoYXNoFQIAAAAEAAAATm9uZQIEAAAAU29tZQEBAAAAEyAAAAACAQAAAAQAAAB2aWV3BRQAAwAAAAUAAABhZG1pbhUCAAAABwAAAEFjY291bnQBAQAAAAsIAAAAQ29udHJhY3QBAQAAAAwGAAAAcGF1c2VkAQwAAABtZXRhZGF0YV91cmwUAAIAAAADAAAAdXJsFgEEAAAAaGFzaBUCAAAABAAAAE5vbmUCBAAAAFNvbWUBAQAAABMgAAAAAhUEAAAADgAAAEludmFsaWRUb2tlbklkAhEAAABJbnN1ZmZpY2llbnRGdW5kcwIMAAAAVW5hdXRob3JpemVkAgYAAABDdXN0b20BAQAAABUJAAAACwAAAFBhcnNlUGFyYW1zAgcAAABMb2dGdWxsAgwAAABMb2dNYWxmb3JtZWQCDgAAAENvbnRyYWN0UGF1c2VkAhMAAABJbnZva2VDb250cmFjdEVycm9yAhMAAABJbnZva2VUcmFuc2ZlckVycm9yAhoAAABGYWlsZWRVcGdyYWRlTWlzc2luZ01vZHVsZQIcAAAARmFpbGVkVXBncmFkZU1pc3NpbmdDb250cmFjdAIlAAAARmFpbGVkVXBncmFkZVVuc3VwcG9ydGVkTW9kdWxlVmVyc2lvbgI=',
-            'base64'
-        ),
+        toBuffer(VIEW_FUNCTION_RAW_SCHEMA, 'base64'),
         CONTRACT_NAME,
         'view',
         2
@@ -92,10 +98,7 @@ async function updateWCCDBalanceAccount(account: string, setAmountAccount: (x: b
                 token_id: '',
             },
         ],
-        toBuffer(
-            '//8CAQAAAAkAAABjaXMyX3dDQ0QBABQAAgAAAAMAAAB1cmwWAgQAAABoYXNoFQIAAAAEAAAATm9uZQIEAAAAU29tZQEBAAAAEyAAAAACAQAAAAkAAABiYWxhbmNlT2YGEAEUAAIAAAAIAAAAdG9rZW5faWQdAAcAAABhZGRyZXNzFQIAAAAHAAAAQWNjb3VudAEBAAAACwgAAABDb250cmFjdAEBAAAADBABGyUAAAAVBAAAAA4AAABJbnZhbGlkVG9rZW5JZAIRAAAASW5zdWZmaWNpZW50RnVuZHMCDAAAAFVuYXV0aG9yaXplZAIGAAAAQ3VzdG9tAQEAAAAVCQAAAAsAAABQYXJzZVBhcmFtcwIHAAAATG9nRnVsbAIMAAAATG9nTWFsZm9ybWVkAg4AAABDb250cmFjdFBhdXNlZAITAAAASW52b2tlQ29udHJhY3RFcnJvcgITAAAASW52b2tlVHJhbnNmZXJFcnJvcgIaAAAARmFpbGVkVXBncmFkZU1pc3NpbmdNb2R1bGUCHAAAAEZhaWxlZFVwZ3JhZGVNaXNzaW5nQ29udHJhY3QCJQAAAEZhaWxlZFVwZ3JhZGVVbnN1cHBvcnRlZE1vZHVsZVZlcnNpb24C',
-            'base64'
-        )
+        toBuffer(BALANCEOF_FUNCTION_RAW_SCHEMA, 'base64')
     );
 
     const provider = await detectConcordiumProvider();
@@ -262,7 +265,7 @@ export default function wCCD({ handleGetAccount, handleNotConnected }: Props) {
                         className="input"
                         style={InputFieldStyle}
                         type="number"
-                        placeholder="0.00"
+                        placeholder="0.000000"
                         ref={inputValue}
                     />
                     {waitForUser || !isConnected ? (
@@ -288,13 +291,7 @@ export default function wCCD({ handleGetAccount, handleNotConnected }: Props) {
 
                                 const input = inputValue.current?.valueAsNumber;
                                 // Amount needs to be in WEI
-                                const amount = input * 1000000;
-
-                                if (!Number.isInteger(amount)) {
-                                    window.alert(
-                                        'Input a number into the CCD/wCCD amount field with max 6 decimal places.'
-                                    ); /* eslint-disable no-alert */
-                                }
+                                const amount = round(multiply(input, 1000000));
 
                                 if (account) {
                                     setHash('');
