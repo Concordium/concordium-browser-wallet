@@ -4,7 +4,7 @@ import React, { ComponentType, useState } from 'react';
 import { Trans, useTranslation } from 'react-i18next';
 import { ClassName, formatAttributeValue } from 'wallet-common-helpers';
 import { useAtomValue } from 'jotai';
-import { RevealStatement, StatementTypes } from '@popup/shared/idProofTypes'; // TODO: get from SDK, remove file after
+import { RevealStatement } from '@popup/shared/idProofTypes'; // TODO: get from SDK, remove file after
 
 import SecretIcon from '@assets/svg/id-secret.svg';
 import RevealIcon from '@assets/svg/id-reveal.svg';
@@ -20,7 +20,13 @@ import { useGetAttributeName } from '@popup/shared/utils/identity-helpers';
 import { AttributeList } from '@concordium/web-sdk';
 import { ConfirmedIdentity } from '@shared/storage/types';
 import { ensureDefined } from '@shared/utils/basic-helpers';
-import { SecretStatement, useStatementDescription, useStatementHeader } from './utils';
+import {
+    SecretStatement,
+    canProoveStatement,
+    useStatementDescription,
+    useStatementHeader,
+    useStatementValue,
+} from './utils';
 
 type StatementLine = {
     attribute: string;
@@ -199,12 +205,13 @@ export const DisplayRevealStatement = withIdentityFromAccount<DisplayRevealState
         const header = t('headers.reveal');
 
         const lines: StatementLine[] = statements.map((s) => {
+            const raw = attributes[s.attributeTag];
             const value = formatAttributeValue(s.attributeTag, attributes[s.attributeTag]);
 
             return {
                 attribute: getAttributeName(s.attributeTag),
                 value,
-                isRequirementMet: value !== undefined,
+                isRequirementMet: raw !== undefined,
             };
         });
 
@@ -224,18 +231,20 @@ export const DisplaySecretStatement = withIdentityFromAccount(
     // eslint-disable-next-line @typescript-eslint/no-unused-vars
     ({ dappName, statement, identity, className, onInvalid }: DisplaySecretStatementProps) => {
         const header = useStatementHeader(statement);
+        const value = useStatementValue(statement);
         const description = useStatementDescription(statement);
         const getAttributeName = useGetAttributeName();
+        const isRequirementMet = canProoveStatement(statement, identity);
 
         const lines: StatementLine[] = [
             {
                 attribute: getAttributeName(statement.attributeTag),
-                value: 'value', // TODO: depending on attribute type
-                isRequirementMet: statement.type === StatementTypes.AttributeInSet, // TODO local match on identity
+                value,
+                isRequirementMet,
             },
         ];
 
-        if (lines.some((l) => !l.isRequirementMet)) {
+        if (!isRequirementMet) {
             onInvalid();
         }
 

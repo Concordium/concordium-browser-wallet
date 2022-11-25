@@ -24,7 +24,7 @@ export default {
             idDocType: 'Secret proof of identity document type',
             idDocIssuer: 'Secret proof of identity document issuer',
         },
-        statementNames: {
+        names: {
             age: 'Age',
             idValidTo: 'ID valid until at least',
             idValidFrom: 'ID valid from',
@@ -33,7 +33,7 @@ export default {
             docType: 'Document type',
             docIssuer: 'Document issuer',
         },
-        statementValues: {
+        proofs: {
             ageMin: 'More than {{age}} years old',
             ageMax: 'Less than {{age}} years old',
             ageBetween: 'Between {{ageMin}} and {{ageMax}} years old',
@@ -47,7 +47,7 @@ export default {
             docIssuer: '1 of {{n}} issuers',
             notDocIssuer: 'None of {{n}} issuers',
         },
-        statementDescriptions: {
+        descriptions: {
             ageMin: 'Your date of birth is before {{dateString}}',
             ageMax: 'Your date of birth is after {{dateString}}',
             ageBetween: 'Your date of birth is between {{minDateString}} and {{maxDateString}}',

@@ -15,18 +15,49 @@ const mock: IdStatement = [
     {
         type: StatementTypes.AttributeInRange,
         attributeTag: 'dob',
-        lower: new Date().toISOString(),
-        upper: new Date().toISOString(),
+        lower: '00000101',
+        upper: '19820101',
     },
     {
         type: StatementTypes.AttributeInRange,
         attributeTag: 'idDocExpiresAt',
-        lower: new Date().toISOString(),
-        upper: new Date().toISOString(),
+        lower: '20230601',
+        upper: '30000101',
+    },
+    {
+        type: StatementTypes.AttributeInRange,
+        attributeTag: 'idDocIssuedAt',
+        lower: '00000101',
+        upper: '20230101',
     },
     {
         type: StatementTypes.AttributeInSet,
         attributeTag: 'nationality',
+        set: ['DK', 'SE', 'NO', 'FI'],
+    },
+    {
+        type: StatementTypes.AttributeNotInSet,
+        attributeTag: 'nationality',
+        set: ['DK', 'SE', 'NO', 'FI'],
+    },
+    {
+        type: StatementTypes.AttributeInSet,
+        attributeTag: 'idDocType',
+        set: ['1', '3'],
+    },
+    {
+        type: StatementTypes.AttributeNotInSet,
+        attributeTag: 'idDocType',
+        set: ['0', '4'],
+    },
+    {
+        type: StatementTypes.AttributeInSet,
+        attributeTag: 'idDocIssuer',
+        set: ['DK', 'SE', 'NO', 'FI'],
+    },
+    {
+        type: StatementTypes.AttributeNotInSet,
+        attributeTag: 'idDocIssuer',
         set: ['DK', 'SE', 'NO', 'FI'],
     },
     {
@@ -36,6 +67,10 @@ const mock: IdStatement = [
     {
         type: StatementTypes.RevealAttribute,
         attributeTag: 'lastName',
+    },
+    {
+        type: StatementTypes.RevealAttribute,
+        attributeTag: 'idDocIssuedAt',
     },
 ];
 

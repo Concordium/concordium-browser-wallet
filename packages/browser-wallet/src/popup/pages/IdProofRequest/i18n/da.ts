@@ -28,7 +28,7 @@ const da: typeof en = {
             idDocType: 'Hemmeligt bevis for identitetsdokumenttype',
             idDocIssuer: 'Hemmeligt bevis for identitetsdokumentudsteder',
         },
-        statementNames: {
+        names: {
             age: 'Alder',
             idValidTo: 'ID gyldigt indtil tidligst',
             idValidFrom: 'ID gyldigt fra',
@@ -37,7 +37,7 @@ const da: typeof en = {
             docType: 'Dokumenttype',
             docIssuer: 'Dokumentudsteder',
         },
-        statementValues: {
+        proofs: {
             ageMin: 'Mere end {{age}} år gammel',
             ageMax: 'Mindre end {{age}} år gammel',
             ageBetween: 'Mellem {{ageMin}} og {{ageMax}} år gammel',
@@ -51,7 +51,7 @@ const da: typeof en = {
             docIssuer: '1 af {{n}} udstedere',
             notDocIssuer: 'Ingen af {{n}} udstedere',
         },
-        statementDescriptions: {
+        descriptions: {
             ageMin: 'Din fødselsdato er før {{dateString}}',
             ageMax: 'Din fødselsdato er efter {{dateString}}',
             ageBetween: 'Din fødselsdato er mellem {{minDateString}} og {{maxDateString}}',
