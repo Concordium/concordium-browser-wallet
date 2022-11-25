@@ -1,10 +1,14 @@
 # Changelog
 
-## 1.1.0
+## 2.0.0
 
 ### Added
 
 -   Entrypoint to suggest CIS-2 tokens to be added to the connected account's view.
+
+### (Breaking) Changed
+
+-   Updated web-sdk to version 3, which changes field names in some transaction payloads for sendTransaction entrypoint.
 
 ## 1.0.0
 
