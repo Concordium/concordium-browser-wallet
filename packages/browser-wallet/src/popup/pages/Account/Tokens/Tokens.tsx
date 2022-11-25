@@ -1,4 +1,4 @@
-import React from 'react';
+import React, { useMemo } from 'react';
 import { useTranslation } from 'react-i18next';
 import { Outlet, Route, Routes, useNavigate } from 'react-router-dom';
 import { displayAsCcd } from 'wallet-common-helpers';
@@ -10,14 +10,16 @@ import CcdIcon from '@assets/svg/concordium.svg';
 import { useAccountInfo } from '@popup/shared/AccountInfoListenerContext';
 import { useSelectedCredential } from '@popup/shared/utils/account-helpers';
 import { TokenIdAndMetadata, WalletCredential } from '@shared/storage/types';
-import { contractBalancesFamily, tokensAtom } from '@popup/store/token';
+import { contractBalancesFamily } from '@popup/store/token';
 import Button from '@popup/shared/Button';
 import TokenBalance from '@popup/shared/TokenBalance';
 import AtomValue from '@popup/store/AtomValue';
-
+import { getMetadataDecimals, getMetadataUnique, ownsOne } from '@shared/utils/token-helpers';
+import { CCD_METADATA } from '@shared/constants/token-metadata';
+import Img from '@popup/shared/Img';
 import { tokensRoutes, detailsRoute } from './routes';
 import TokenDetails from './TokenDetails';
-import { useFlattenedAccountTokens } from './utils';
+import { AccountTokenDetails, useFlattenedAccountTokens } from './utils';
 import { accountRoutes } from '../routes';
 
 type FtProps = {
@@ -32,16 +34,56 @@ function Ft({ accountAddress, contractIndex: contractAddress, token, onClick }: 
 
     return (
         <Button clear className="token-list__item" onClick={onClick}>
-            <img className="token-list__icon" src={token.metadata.thumbnail?.url} alt={token.metadata.name} />
-            <TokenBalance balance={balance} decimals={token.metadata.decimals ?? 0} />{' '}
-            {token.metadata.symbol || token.metadata.name || ''}
+            <Img
+                className="token-list__icon"
+                src={token.metadata.thumbnail?.url}
+                alt={token.metadata.name}
+                withDefaults
+            />
+            <div>
+                <div className="token-list__name">{token.metadata.name ?? token.metadata.symbol ?? ''}</div>
+                <div className="token-list__balance">
+                    <TokenBalance
+                        balance={balance}
+                        decimals={getMetadataDecimals(token.metadata)}
+                        symbol={token.metadata.symbol}
+                    />
+                </div>
+            </div>
         </Button>
     );
 }
 
 function useFilteredTokens(account: WalletCredential, unique: boolean) {
     const tokens = useFlattenedAccountTokens(account);
-    return tokens.filter((t) => (t.metadata.unique ?? false) === unique);
+    return tokens.filter((t) => getMetadataUnique(t.metadata) === unique);
+}
+
+const MANAGE_MESSAGE_THRESHOLD = 3; // ~ when list goes from static to scrollable.
+
+type AddTokensDescriptionProps = {
+    tokens: AccountTokenDetails[];
+};
+
+function AddTokensDescription({ tokens }: AddTokensDescriptionProps) {
+    const { t } = useTranslation('account', { keyPrefix: 'tokens' });
+
+    const listStateText = useMemo(() => {
+        if (tokens.length === 0) {
+            return t('listEmpty');
+        }
+        if (tokens.length < MANAGE_MESSAGE_THRESHOLD) {
+            return t('listAddMore');
+        }
+
+        return undefined;
+    }, [tokens]);
+
+    if (listStateText === undefined) {
+        return null;
+    }
+
+    return <div className="token-list__add-more-text">{listStateText}</div>;
 }
 
 type ListProps = {
@@ -59,19 +101,23 @@ function Fungibles({ account, toDetails }: ListProps) {
 
     return (
         <>
-            <div className="token-list__item">
+            <div className="token-list__item token-list__item--nft">
                 <CcdIcon className="token-list__icon token-list__icon--ccd" />
-                <div className="token-list__balance">{displayAsCcd(accountInfo.accountAmount)} CCD</div>
+                <div>
+                    <div className="token-list__name">{CCD_METADATA.name}</div>
+                    <div className="token-list__balance">{displayAsCcd(accountInfo.accountAmount)} CCD</div>
+                </div>
             </div>
-            {tokens.map((t) => (
+            {tokens.map((token) => (
                 <Ft
-                    key={`${t.contractIndex}.${t.id}`}
+                    key={`${token.contractIndex}.${token.id}`}
                     accountAddress={account.address}
-                    contractIndex={t.contractIndex}
-                    token={t}
-                    onClick={() => toDetails(t.contractIndex, t.id)}
+                    contractIndex={token.contractIndex}
+                    token={token}
+                    onClick={() => toDetails(token.contractIndex, token.id)}
                 />
             ))}
+            <AddTokensDescription tokens={tokens} />
         </>
     );
 }
@@ -82,23 +128,32 @@ function Collectibles({ account, toDetails }: ListProps) {
 
     return (
         <>
-            {tokens.map(({ contractIndex, id, metadata: { thumbnail, name, decimals = 0, symbol } }) => (
+            {tokens.map(({ contractIndex, id, metadata }) => (
                 <Button
                     clear
                     key={`${contractIndex}.${id}`}
                     onClick={() => toDetails(contractIndex, id)}
                     className="token-list__item"
                 >
-                    <img className="token-list__icon" src={thumbnail?.url ?? ''} alt={name} />
-                    <div className="token-list__unique-name">
-                        {name}
+                    <Img
+                        className="token-list__icon"
+                        src={metadata.thumbnail?.url ?? metadata.display?.url}
+                        alt={metadata.name}
+                        withDefaults
+                    />
+                    <div>
+                        <div className="token-list__name">{metadata.name}</div>
                         <AtomValue atom={contractBalancesFamily(account.address, contractIndex)}>
                             {({ [id]: b }) => (
                                 <>
-                                    {b === 0n && <div className="token-list__ownership">{t('unownedUnique')}</div>}
-                                    {b && b / BigInt(10 ** decimals) !== 1n && (
-                                        <div className="token-list__ownership">
-                                            <TokenBalance balance={b} decimals={decimals} symbol={symbol} />
+                                    {b === 0n && <div className="token-list__balance">{t('unownedUnique')}</div>}
+                                    {b && !ownsOne(b, getMetadataDecimals(metadata)) && (
+                                        <div className="token-list__balance">
+                                            <TokenBalance
+                                                balance={b}
+                                                decimals={getMetadataDecimals(metadata)}
+                                                symbol={metadata.symbol}
+                                            />
                                         </div>
                                     )}
                                 </>
@@ -107,6 +162,7 @@ function Collectibles({ account, toDetails }: ListProps) {
                     </div>
                 </Button>
             ))}
+            <AddTokensDescription tokens={tokens} />
         </>
     );
 }
@@ -139,7 +195,6 @@ function Tokens() {
 export default function TokensRoutes() {
     const account = useSelectedCredential();
     const nav = useNavigate();
-    useAtomValue(tokensAtom); // Ensure tokens are kept in memory
 
     if (account === undefined) {
         return null;

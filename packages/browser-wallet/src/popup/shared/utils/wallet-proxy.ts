@@ -7,6 +7,7 @@ import {
     BrowserWalletAccountTransaction,
     BrowserWalletTransaction,
     RewardType,
+    SpecialTransactionType,
     TransactionHistoryResult,
     TransactionStatus,
 } from './transaction-history-types';
@@ -49,16 +50,18 @@ export enum TransactionKindString {
     Malformed = 'Malformed account transaction',
 }
 
-function mapTransactionKindStringToTransactionType(kind: TransactionKindString): AccountTransactionType | RewardType {
+function mapTransactionKindStringToTransactionType(
+    kind: TransactionKindString
+): AccountTransactionType | RewardType | SpecialTransactionType {
     switch (kind) {
         case TransactionKindString.DeployModule:
             return AccountTransactionType.DeployModule;
         case TransactionKindString.InitContract:
-            return AccountTransactionType.InitializeSmartContractInstance;
+            return AccountTransactionType.InitContract;
         case TransactionKindString.Update:
-            return AccountTransactionType.UpdateSmartContractInstance;
+            return AccountTransactionType.Update;
         case TransactionKindString.Transfer:
-            return AccountTransactionType.SimpleTransfer;
+            return AccountTransactionType.Transfer;
         case TransactionKindString.AddBaker:
             return AccountTransactionType.AddBaker;
         case TransactionKindString.RemoveBaker:
@@ -78,7 +81,7 @@ function mapTransactionKindStringToTransactionType(kind: TransactionKindString):
         case TransactionKindString.FinalizationReward:
             return RewardType.FinalizationReward;
         case TransactionKindString.EncryptedAmountTransfer:
-            return AccountTransactionType.EncryptedTransfer;
+            return AccountTransactionType.EncryptedAmountTransfer;
         case TransactionKindString.TransferToEncrypted:
             return AccountTransactionType.TransferToEncrypted;
         case TransactionKindString.TransferToPublic:
@@ -90,9 +93,9 @@ function mapTransactionKindStringToTransactionType(kind: TransactionKindString):
         case TransactionKindString.RegisterData:
             return AccountTransactionType.RegisterData;
         case TransactionKindString.TransferWithMemo:
-            return AccountTransactionType.SimpleTransferWithMemo;
+            return AccountTransactionType.TransferWithMemo;
         case TransactionKindString.EncryptedAmountTransferWithMemo:
-            return AccountTransactionType.EncryptedTransferWithMemo;
+            return AccountTransactionType.EncryptedAmountTransferWithMemo;
         case TransactionKindString.TransferWithScheduleAndMemo:
             return AccountTransactionType.TransferWithScheduleWithMemo;
         case TransactionKindString.ConfigureBaker:
@@ -101,6 +104,8 @@ function mapTransactionKindStringToTransactionType(kind: TransactionKindString):
             return AccountTransactionType.ConfigureDelegation;
         case TransactionKindString.StakingReward:
             return RewardType.StakingReward;
+        case TransactionKindString.Malformed:
+            return SpecialTransactionType.Malformed;
         default:
             throw Error(`Unkown transaction kind was encounted: ${kind}`);
     }
@@ -243,10 +248,8 @@ export async function getTransactions(
 
     const response = await (await getWalletProxy()).get(proxyPath);
     const result: WalletProxyAccTransactionsResult = response.data;
-    const transactionsWithoutMalformed = result.transactions.filter(
-        (t) => t.details.type !== TransactionKindString.Malformed
-    );
-    const transactions = transactionsWithoutMalformed.map((t) => mapTransaction(t, accountAddress));
+    const transactions = result.transactions.map((t) => mapTransaction(t, accountAddress));
+
     return {
         transactions,
         full: result.limit === result.count,
@@ -278,7 +281,7 @@ export async function getCcdDrop(accountAddress: string): Promise<BrowserWalletA
     const response = await (await getWalletProxy()).put(`/v0/testnetGTUDrop/${accountAddress}`);
 
     return createPendingTransaction(
-        AccountTransactionType.SimpleTransfer,
+        AccountTransactionType.Transfer,
         response.data.submissionId,
         BigInt(2000000000),
         undefined,

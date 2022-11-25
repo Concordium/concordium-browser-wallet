@@ -40,6 +40,15 @@ const t = {
         sender: 'Sender account',
         cost: 'Estimated transaction fee',
         unknown: 'Unknown',
+        tokenTransfer: {
+            title: 'Send {{ tokenName }}',
+            amount: 'Token amount',
+            receiver: 'Receiver',
+            showTransfer: 'Show simple details',
+            showContract: 'Show full details',
+        },
+        parameter: 'Parameter',
+        noParameter: 'No parameters',
     },
     tokenDetails: {
         balance: 'Balance',
@@ -53,12 +62,20 @@ const t = {
         unownedUnique: 'Not owned',
         ownedUnique: 'Owned',
         tokenId: 'Token ID',
+        tokenRemoved: 'Token removed from wallet',
         removePrompt: {
             header: 'Hide {{ name }} in your wallet',
             text: 'Are you sure you want hide this token in your wallet? You can always add it again from the tokens list.',
             cancel: 'Keep token',
             remove: 'Remove token',
         },
+    },
+    tokenBalance: {
+        noBalance: 'Missing balance',
+    },
+    addTokens: {
+        cis0Error: 'Contract does not support CIS-0',
+        cis2Error: 'Contract does not support CIS-2',
     },
 };
 

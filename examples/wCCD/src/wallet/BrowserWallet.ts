@@ -12,6 +12,11 @@ export class BrowserWalletConnection implements WalletConnection {
         this.client = client;
     }
 
+    getJsonRpcClient(): JsonRpcClient {
+        // TODO Fix type conversion hack.
+        return this.client.getJsonRpcClient() as JsonRpcClient;
+    }
+
     async signAndSendTransaction() {
         return '';
     }
@@ -31,11 +36,6 @@ export class BrowserWalletConnector implements WalletConnector {
     static async create() {
         const client = await detectConcordiumProvider();
         return new BrowserWalletConnector(client);
-    }
-
-    getJsonRpcClient(): JsonRpcClient {
-        // TODO Fix type conversion hack.
-        return this.client.getJsonRpcClient() as unknown as JsonRpcClient;
     }
 
     async connect(events: Events) {

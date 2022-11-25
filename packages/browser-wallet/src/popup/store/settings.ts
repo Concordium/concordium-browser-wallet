@@ -1,4 +1,10 @@
-import { ChromeStorageKey, EncryptedData, NetworkConfiguration, Theme } from '@shared/storage/types';
+import {
+    AcceptedTermsState,
+    ChromeStorageKey,
+    EncryptedData,
+    NetworkConfiguration,
+    Theme,
+} from '@shared/storage/types';
 import { atom } from 'jotai';
 import { EventType } from '@concordium/browser-wallet-api-helpers';
 import { popupMessageHandler } from '@popup/shared/message-handler';
@@ -46,6 +52,12 @@ export const jsonRpcClientAtom = atom<JsonRpcClient>((get) => {
         )
     );
 });
+
+export const acceptedTermsAtom = atomWithChromeStorage<AcceptedTermsState | undefined>(
+    ChromeStorageKey.AcceptedTerms,
+    undefined,
+    true
+);
 
 export const sessionPasscodeAtom = atomWithChromeStorage<string | undefined>(
     ChromeStorageKey.Passcode,

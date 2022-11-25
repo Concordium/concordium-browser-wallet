@@ -1,7 +1,7 @@
 /* eslint-disable no-console */
 import { createContext } from 'react';
 import { detectConcordiumProvider } from '@concordium/browser-wallet-api-helpers';
-import { AccountTransactionType, GtuAmount, UpdateContractPayload } from '@concordium/web-sdk';
+import { AccountTransactionType, CcdAmount, UpdateContractPayload } from '@concordium/web-sdk';
 
 export const CONTRACT_NAME = 'PiggyBank';
 
@@ -16,9 +16,9 @@ export const deposit = (account: string, index: bigint, subindex = 0n, amount = 
     detectConcordiumProvider()
         .then((provider) => {
             provider
-                .sendTransaction(account, AccountTransactionType.UpdateSmartContractInstance, {
-                    amount: new GtuAmount(BigInt(amount)),
-                    contractAddress: {
+                .sendTransaction(account, AccountTransactionType.Update, {
+                    amount: new CcdAmount(BigInt(amount)),
+                    address: {
                         index,
                         subindex,
                     },
@@ -43,9 +43,9 @@ export const smash = (account: string, index: bigint, subindex = 0n) => {
     detectConcordiumProvider()
         .then((provider) => {
             provider
-                .sendTransaction(account, AccountTransactionType.UpdateSmartContractInstance, {
-                    amount: new GtuAmount(0n), // This feels weird? Why do I need an amount for a non-payable receive?
-                    contractAddress: {
+                .sendTransaction(account, AccountTransactionType.Update, {
+                    amount: new CcdAmount(0n), // This feels weird? Why do I need an amount for a non-payable receive?
+                    address: {
                         index,
                         subindex,
                     },

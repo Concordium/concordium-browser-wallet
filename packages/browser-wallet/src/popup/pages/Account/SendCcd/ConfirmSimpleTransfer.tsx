@@ -19,7 +19,7 @@ export default function ConfirmSimpleTransfer({ setDetailsExpanded, cost }: Prop
             cost={cost}
             payload={payload}
             returnState={payload}
-            transactionType={AccountTransactionType.SimpleTransfer}
+            transactionType={AccountTransactionType.Transfer}
         />
     );
 }

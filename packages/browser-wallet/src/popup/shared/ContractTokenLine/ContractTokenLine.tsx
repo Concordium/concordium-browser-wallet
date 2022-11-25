@@ -5,7 +5,8 @@ import { ClassNameAndStyle } from 'wallet-common-helpers';
 import Button from '@popup/shared/Button';
 import { Checkbox } from '@popup/shared/Form/Checkbox';
 import TokenBalance from '@popup/shared/TokenBalance';
-import { ContractTokenDetails } from '@shared/utils/token-helpers';
+import { ContractTokenDetails, getMetadataDecimals } from '@shared/utils/token-helpers';
+import Img from '../Img';
 
 export enum ChoiceStatus {
     discarded,
@@ -38,10 +39,14 @@ export default function ContractTokenLine({
             style={style}
             onClick={() => onClick(token)}
         >
-            <div className="flex align-center h-full">
-                <img src={token.metadata.thumbnail?.url} alt={token.metadata.name ?? ''} />
+            <div className="flex align-center h-full m-r-5">
+                <Img
+                    src={token.metadata.thumbnail?.url ?? token.metadata.display?.url ?? ''}
+                    alt={token.metadata.name ?? ''}
+                    withDefaults
+                />
                 <div>
-                    {token.metadata.name}
+                    <div className="clamp-2">{token.metadata.name}</div>
                     <div
                         className={clsx(
                             'contract-token-line__token-balance',
@@ -51,7 +56,7 @@ export default function ContractTokenLine({
                         {t('ItemBalancePre')}
                         <TokenBalance
                             balance={token.balance}
-                            decimals={token.metadata.decimals ?? 0}
+                            decimals={getMetadataDecimals(token.metadata)}
                             symbol={token.metadata.symbol}
                         />
                     </div>

@@ -19,10 +19,10 @@
                 });
                 document.getElementById('sendTransfer').addEventListener('click', () =>
                     provider
-                        .sendTransaction(currentAccountAddress, concordiumSDK.AccountTransactionType.SimpleTransfer, {
-                            amount: new concordiumSDK.GtuAmount(1n),
+                        .sendTransaction(currentAccountAddress, concordiumSDK.AccountTransactionType.Transfer, {
+                            amount: new concordiumSDK.CcdAmount(1n),
                             toAddress: new concordiumSDK.AccountAddress(
-                                '39bKAuC7sXCZQfo7DmVQTMbiUuBMQJ5bCfsS7sva1HvDnUXp13'
+                                '3kBx2h5Y2veb4hZgAJWPrr8RyQESKm5TjzF3ti1QQ4VSYLwK1G'
                             ),
                         })
                         .then(alert)
@@ -36,19 +36,15 @@
                 );
                 document.getElementById('sendDeposit').addEventListener('click', () =>
                     provider
-                        .sendTransaction(
-                            currentAccountAddress,
-                            concordiumSDK.AccountTransactionType.UpdateSmartContractInstance,
-                            {
-                                amount: new concordiumSDK.GtuAmount(1n),
-                                contractAddress: {
-                                    index: 98n,
-                                    subindex: 0n,
-                                },
-                                receiveName: 'two-step-transfer.deposit',
-                                maxContractExecutionEnergy: 30000n,
-                            }
-                        )
+                        .sendTransaction(currentAccountAddress, concordiumSDK.AccountTransactionType.Update, {
+                            amount: new concordiumSDK.CcdAmount(1n),
+                            contractAddress: {
+                                index: 98n,
+                                subindex: 0n,
+                            },
+                            receiveName: 'two-step-transfer.deposit',
+                            maxContractExecutionEnergy: 30000n,
+                        })
                         .then(alert)
                         .catch(alert)
                 );
@@ -56,9 +52,9 @@
                     provider
                         .sendTransaction(
                             currentAccountAddress,
-                            concordiumSDK.AccountTransactionType.UpdateSmartContractInstance,
+                            concordiumSDK.AccountTransactionType.Update,
                             {
-                                amount: new concordiumSDK.GtuAmount(1n),
+                                amount: new concordiumSDK.CcdAmount(1n),
                                 contractAddress: {
                                     index: 98n,
                                     subindex: 0n,
@@ -78,9 +74,9 @@
                     provider
                         .sendTransaction(
                             currentAccountAddress,
-                            concordiumSDK.AccountTransactionType.InitializeSmartContractInstance,
+                            concordiumSDK.AccountTransactionType.InitContract,
                             {
-                                amount: new concordiumSDK.GtuAmount(1n),
+                                amount: new concordiumSDK.CcdAmount(1n),
                                 moduleRef: new concordiumSDK.ModuleReference(
                                     '6eab4584bd60b1d82fba3abe16082cde3dbee4c08c9f60b6dc523688bdc421b9'
                                 ),

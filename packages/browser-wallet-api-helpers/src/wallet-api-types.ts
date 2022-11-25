@@ -10,8 +10,8 @@ import type {
 
 type SendTransactionPayload =
     | Exclude<AccountTransactionPayload, UpdateContractPayload | InitContractPayload>
-    | Omit<UpdateContractPayload, 'parameter'>
-    | Omit<InitContractPayload, 'parameter'>;
+    | Omit<UpdateContractPayload, 'message'>
+    | Omit<InitContractPayload, 'param'>;
 
 /**
  * An enumeration of the events that can be emitted by the WalletApi.
@@ -43,16 +43,14 @@ interface MainWalletApi {
      * Note that if the user rejects signing the transaction, this will throw an error.
      * @param accountAddress the address of the account that should sign the transaction
      * @param type the type of transaction that is to be signed and sent.
-     * @param payload the payload of the transaction to be signed and sent. Note that for smart contract transactions, the payload should not contain the parameters, those should instead be provided in the subsequent argument instead.
+     * @param payload the payload of the transaction to be signed and sent. Note that for smart contract transactions, the payload should not contain the params/message fields, those should instead be provided in the subsequent argument instead.
      * @param parameters parameters for the initContract and updateContract transactions in JSON-like format.
      * @param schema schema used for the initContract and updateContract transactions to serialize the parameters. Should be base64 encoded.
      * @param schemaVersion version of the schema provided. Must be supplied for schemas that use version 0 or 1, as they don't have the version embedded.
      */
     sendTransaction(
         accountAddress: string,
-        type:
-            | AccountTransactionType.UpdateSmartContractInstance
-            | AccountTransactionType.InitializeSmartContractInstance,
+        type: AccountTransactionType.Update | AccountTransactionType.InitContract,
         payload: SendTransactionPayload,
         parameters: Record<string, unknown>,
         schema: string,

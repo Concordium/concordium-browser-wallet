@@ -49,7 +49,7 @@ export default function RecoverSeedPhrase() {
             <PageHeader canGoBack>{t('recoverSeedPhrase.title')}</PageHeader>
             <div className="onboarding-setup__page-with-header">
                 <div className="onboarding-setup__page-with-header__description">
-                    {t('confirmRecoveryPhrase.description')}
+                    {t('confirmRecoveryPhrase.existingPhrase')}
                 </div>
                 <div className="p-10">
                     <Form<FormValues> onSubmit={handleSubmit}>

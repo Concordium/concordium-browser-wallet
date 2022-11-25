@@ -6,13 +6,15 @@ import { MakeOptional } from 'wallet-common-helpers';
 import { removeTokenFromCurrentAccountAtom } from '@popup/store/token';
 import CloseButton from '@popup/shared/CloseButton';
 import Button from '@popup/shared/Button';
-import { absoluteRoutes } from '@popup/constants/routes';
 import Modal from '@popup/shared/Modal';
 import ButtonGroup from '@popup/shared/ButtonGroup';
 import { TokenIdAndMetadata, TokenMetadata } from '@shared/storage/types';
 
-import { useNavigate } from 'react-router-dom';
+import { getMetadataDecimals, getMetadataUnique, ownsOne } from '@shared/utils/token-helpers';
+import { useSetAtom } from 'jotai';
+import { addToastAtom } from '@popup/state';
 import TokenBalance from '../TokenBalance';
+import Img from '../Img';
 
 const SUB_INDEX = '0';
 
@@ -57,7 +59,9 @@ function ShowRawMetadata({ metadata }: ShowRawMetadataProps) {
         >
             <div className="token-details__raw">
                 {Object.entries(metadata).map(([k, v]) => (
-                    <TokenDetailsLine header={k}>{JSON.stringify(v)}</TokenDetailsLine>
+                    <TokenDetailsLine header={k} key={k}>
+                        {JSON.stringify(v)}
+                    </TokenDetailsLine>
                 ))}
             </div>
         </Modal>
@@ -68,17 +72,18 @@ type TokenProps = {
     token: TokenIdAndMetadata;
     contractIndex: string;
     subIndex: string;
-    balance: bigint;
+    balance: bigint | undefined;
 };
 
 function Nft({ token, balance, contractIndex, subIndex }: TokenProps) {
-    const { thumbnail, name, description, display, decimals = 0, symbol } = token.metadata;
+    const { thumbnail, name, description, display, symbol } = token.metadata;
+    const decimals = getMetadataDecimals(token.metadata);
     const { t } = useTranslation('shared', { keyPrefix: 'tokenDetails' });
 
     return (
         <>
             <h3 className="token-details__header">
-                {thumbnail && <img src={thumbnail.url} alt={`${name} thumbnail`} />}
+                {thumbnail && <Img src={thumbnail.url} alt={name} withDefaults />}
                 {name}
             </h3>
             <TokenDetailsLine header={t('ownership')}>
@@ -87,7 +92,7 @@ function Nft({ token, balance, contractIndex, subIndex }: TokenProps) {
                     {balance === 0n || (
                         <>
                             {t('ownedUnique')}
-                            {balance / BigInt(10 ** decimals) !== 1n && (
+                            {balance && !ownsOne(balance, decimals) && (
                                 <>
                                     {' '}
                                     (<TokenBalance balance={balance} decimals={decimals} symbol={symbol} />)
@@ -105,21 +110,24 @@ function Nft({ token, balance, contractIndex, subIndex }: TokenProps) {
             </TokenDetailsLine>
             <TokenDetailsLine header={t('tokenId')}>{token.id}</TokenDetailsLine>
             <ShowRawMetadata metadata={token.metadata} />
-            <div className="token-details__image">
-                <img src={display?.url} alt={name} />
-            </div>
+            {display?.url && (
+                <div className="token-details__image">
+                    <img src={display?.url} alt={name} />
+                </div>
+            )}
         </>
     );
 }
 
 function Ft({ token, balance, contractIndex, subIndex = SUB_INDEX }: TokenProps) {
-    const { thumbnail, name, decimals = 0, description, symbol } = token.metadata;
+    const { thumbnail, name, description, symbol } = token.metadata;
+    const decimals = getMetadataDecimals(token.metadata);
     const { t } = useTranslation('shared', { keyPrefix: 'tokenDetails' });
 
     return (
         <>
             <h3 className="token-details__header">
-                {thumbnail && <img src={thumbnail.url} alt={`${name} thumbnail`} />}
+                {thumbnail && <Img src={thumbnail.url} alt={name} withDefaults />}
                 {name}
             </h3>
             <TokenDetailsLine header={t('balance')}>
@@ -143,6 +151,7 @@ function Ft({ token, balance, contractIndex, subIndex = SUB_INDEX }: TokenProps)
 type RemoveTokenProps = {
     contractIndex: string;
     token: TokenIdAndMetadata;
+    onRemove(): void;
 };
 
 function RemoveToken({
@@ -151,16 +160,18 @@ function RemoveToken({
         metadata: { name },
     },
     contractIndex,
+    onRemove,
 }: RemoveTokenProps) {
     const removeToken = useUpdateAtom(removeTokenFromCurrentAccountAtom);
-    const nav = useNavigate();
     const { t } = useTranslation('shared', { keyPrefix: 'tokenDetails' });
     const [showPrompt, setShowPrompt] = useState(false);
+    const addToast = useSetAtom(addToastAtom);
 
     const remove = () => {
         setShowPrompt(false);
         removeToken({ contractIndex, tokenId: id });
-        nav(absoluteRoutes.home.account.path);
+        addToast(t('tokenRemoved'));
+        onRemove();
     };
 
     const trigger = (
@@ -203,7 +214,7 @@ export default function TokenDetails({
     ...tokenProps
 }: TokenDetailsComponentProps) {
     const { token, contractIndex } = tokenProps;
-    const Token = token.metadata.unique ? Nft : Ft;
+    const Token = getMetadataUnique(token.metadata) ? Nft : Ft;
 
     return (
         <div className="token-details">
@@ -211,7 +222,7 @@ export default function TokenDetails({
             <div className="token-details__content">
                 <Token {...tokenProps} subIndex={subIndex} />
             </div>
-            {canRemove && <RemoveToken token={token} contractIndex={contractIndex} />}
+            {canRemove && <RemoveToken token={token} contractIndex={contractIndex} onRemove={onClose} />}
         </div>
     );
 }

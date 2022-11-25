@@ -8,6 +8,7 @@ import {
     BrowserWalletTransaction,
     isAccountTransaction,
     RewardType,
+    SpecialTransactionType,
     TransactionStatus,
 } from '@popup/shared/utils/transaction-history-types';
 import { dateFromTimestamp, TimeStampUnit } from 'wallet-common-helpers';
@@ -54,22 +55,23 @@ function isOutgoingTransaction(transaction: BrowserWalletTransaction, accountAdd
 function isEncryptedTransfer(transaction: BrowserWalletTransaction) {
     return (
         isAccountTransaction(transaction) &&
-        [AccountTransactionType.EncryptedTransfer, AccountTransactionType.EncryptedTransferWithMemo].includes(
-            transaction.type
-        )
+        [
+            AccountTransactionType.EncryptedAmountTransfer,
+            AccountTransactionType.EncryptedAmountTransferWithMemo,
+        ].includes(transaction.type)
     );
 }
 
 function isTransferTransaction(type: AccountTransactionType) {
     switch (type) {
-        case AccountTransactionType.SimpleTransfer:
-        case AccountTransactionType.SimpleTransferWithMemo:
+        case AccountTransactionType.Transfer:
+        case AccountTransactionType.TransferWithMemo:
         case AccountTransactionType.TransferToEncrypted:
         case AccountTransactionType.TransferToPublic:
         case AccountTransactionType.TransferWithSchedule:
         case AccountTransactionType.TransferWithScheduleWithMemo:
-        case AccountTransactionType.EncryptedTransfer:
-        case AccountTransactionType.EncryptedTransferWithMemo:
+        case AccountTransactionType.EncryptedAmountTransfer:
+        case AccountTransactionType.EncryptedAmountTransferWithMemo:
             return true;
         default:
             return false;
@@ -84,12 +86,16 @@ function isTransferTransaction(type: AccountTransactionType) {
  * @returns a displayable string of the fee for a transaction in CCD.
  */
 function buildFeeString(cost: bigint, accountAddress: string, transaction: BrowserWalletTransaction) {
-    if (isAccountTransaction(transaction) && isTransferTransaction(transaction.type)) {
+    if (
+        isAccountTransaction(transaction) &&
+        (isTransferTransaction(transaction.type) ||
+            (transaction.type === AccountTransactionType.Update && transaction.amount !== 0n))
+    ) {
         if (isOutgoingTransaction(transaction, accountAddress)) {
             if (isEncryptedTransfer(transaction)) {
                 return 'Shielded transaction fee';
             }
-            return `${displayAsCcd(-transaction.amount)} + ${displayAsCcd(cost)} Fee`;
+            return `${displayAsCcd(transaction.amount)} - ${displayAsCcd(cost)} Fee`;
         }
     }
     return `${displayAsCcd(cost)} Fee`;
@@ -98,15 +104,15 @@ function buildFeeString(cost: bigint, accountAddress: string, transaction: Brows
 /**
  * Maps transaction type to a displayable text string.
  */
-function mapTypeToText(type: AccountTransactionType | RewardType): string {
+function mapTypeToText(type: AccountTransactionType | RewardType | SpecialTransactionType): string {
     switch (type) {
         case AccountTransactionType.DeployModule:
             return 'Module deployment';
-        case AccountTransactionType.InitializeSmartContractInstance:
+        case AccountTransactionType.InitContract:
             return 'Contract initiation';
-        case AccountTransactionType.UpdateSmartContractInstance:
+        case AccountTransactionType.Update:
             return 'Update';
-        case AccountTransactionType.SimpleTransfer:
+        case AccountTransactionType.Transfer:
             return 'Transfer';
         case AccountTransactionType.AddBaker:
             return 'Add baker';
@@ -126,7 +132,7 @@ function mapTypeToText(type: AccountTransactionType | RewardType): string {
             return 'Block reward';
         case RewardType.FinalizationReward:
             return 'Finalization reward';
-        case AccountTransactionType.EncryptedTransfer:
+        case AccountTransactionType.EncryptedAmountTransfer:
             return 'Shielded transfer';
         case AccountTransactionType.TransferToEncrypted:
             return 'Shielded amount';
@@ -138,9 +144,9 @@ function mapTypeToText(type: AccountTransactionType | RewardType): string {
             return 'Credentials update';
         case AccountTransactionType.RegisterData:
             return 'Data registration';
-        case AccountTransactionType.SimpleTransferWithMemo:
+        case AccountTransactionType.TransferWithMemo:
             return 'Transfer';
-        case AccountTransactionType.EncryptedTransferWithMemo:
+        case AccountTransactionType.EncryptedAmountTransferWithMemo:
             return 'Shielded transfer';
         case AccountTransactionType.TransferWithScheduleWithMemo:
             return 'Scheduled transfer';
@@ -150,6 +156,8 @@ function mapTypeToText(type: AccountTransactionType | RewardType): string {
             return 'Configure delegation';
         case RewardType.StakingReward:
             return 'Reward payout';
+        case SpecialTransactionType.Malformed:
+            return 'Malformed';
         default:
             return 'Unknown';
     }
@@ -160,7 +168,8 @@ function isGreenAmount(transaction: BrowserWalletTransaction, accountAddress: st
         return false;
     }
     if (
-        transaction.type === AccountTransactionType.TransferToPublic &&
+        (transaction.type === AccountTransactionType.TransferToPublic ||
+            transaction.type === AccountTransactionType.Update) &&
         transaction.cost &&
         transaction.amount > transaction.cost
     ) {
@@ -181,7 +190,10 @@ export default function TransactionElement({ accountAddress, transaction, style,
     // Flip the amount is selected account is sender, and amount is positive. We expect the transaction list endpoint to sign the amount based on this,
     // but this is not the case for pending transactions. This seeks to emulate the behaviour of the transaction list endpoint.
     // TODO: check that this still works when shield, unshield, and encrypted transfers are implemented.
-    const amount = isSender && transaction.amount > 0n ? -transaction.amount : transaction.amount;
+    const amount =
+        isSender && transaction.status === TransactionStatus.Pending && transaction.amount > 0n
+            ? -transaction.amount
+            : transaction.amount;
 
     return (
         <div

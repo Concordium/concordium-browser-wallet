@@ -22,10 +22,10 @@
         align-items: center;
         padding: rem(20px);
         margin: rem(30px) auto;
-        background-color: $color-off-white;
         border: 1px solid $color-cta;
         border-radius: rem(5px);
         text-align: center;
+        background-color: $color-bg;
 
         &--error {
             border-color: $color-error;

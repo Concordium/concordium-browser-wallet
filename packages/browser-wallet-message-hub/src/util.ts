@@ -10,3 +10,5 @@ export const createEventTypeFilter =
     (type: EventType) =>
     (msg: unknown): msg is WalletEvent =>
         isEvent(msg) && msg.eventType === type;
+
+export type MessageStatusWrapper<T> = { success: false; message: string } | { success: true; result: T };

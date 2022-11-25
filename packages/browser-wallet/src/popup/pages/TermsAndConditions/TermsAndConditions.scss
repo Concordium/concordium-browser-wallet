@@ -1,0 +1,58 @@
+.terms-and-conditions {
+    padding: rem(10px);
+    text-align: center;
+    height: 100%;
+    max-height: calc(100% - rem(20px));
+    display: flex;
+    flex-direction: column;
+
+    &__continue-button {
+        margin: rem(20px) auto 0;
+        background-color: $color-cta-mainnet;
+    }
+
+    &__logos {
+        display: flex;
+        flex-direction: row;
+        margin-top: rem(10px);
+        margin-left: rem(22px);
+        margin-right: rem(22px);
+    }
+
+    &__logo {
+        height: rem(50px);
+
+        path {
+            fill: $color-text;
+        }
+    }
+
+    &__concordium-letters {
+        margin-left: rem(15px);
+
+        path {
+            fill: $color-text;
+        }
+    }
+
+    &__description {
+        margin-top: rem(36px);
+    }
+
+    &__form {
+        display: flex;
+        flex-direction: column;
+        margin-top: auto;
+    }
+
+    &__terms-and-conditions {
+        margin-top: auto;
+        margin-left: rem(14px);
+        text-align: left;
+        padding: 0 rem(30px);
+
+        a {
+            text-decoration: underline;
+        }
+    }
+}

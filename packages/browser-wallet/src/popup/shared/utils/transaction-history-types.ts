@@ -26,6 +26,10 @@ export enum RewardType {
     StakingReward = 'StakingReward',
 }
 
+export enum SpecialTransactionType {
+    Malformed = 'Malformed',
+}
+
 /**
  * Internal model for transactions that have been fetched externally to be mapped into. Used for keeping
  * a consistent internal model for the display of transactions.
@@ -37,7 +41,7 @@ export interface BrowserWalletTransaction {
     blockHash: string;
     amount: bigint;
     cost?: bigint;
-    type: AccountTransactionType | RewardType;
+    type: AccountTransactionType | RewardType | SpecialTransactionType;
     status: TransactionStatus;
     time: bigint;
     id: number;

@@ -1,6 +1,11 @@
 import React, { useEffect, useRef } from 'react';
 import { Route, Routes as ReactRoutes, useLocation, useNavigate } from 'react-router-dom';
-import { InternalMessageType, MessageType, createMessageTypeFilter } from '@concordium/browser-wallet-message-hub';
+import {
+    InternalMessageType,
+    MessageType,
+    createMessageTypeFilter,
+    MessageStatusWrapper,
+} from '@concordium/browser-wallet-message-hub';
 import { AccountTransactionSignature } from '@concordium/web-sdk';
 import { noOp } from 'wallet-common-helpers';
 
@@ -20,6 +25,7 @@ import AddAccount from '@popup/pages/AddAccount';
 import { IdentityIssuanceEnd, IdentityIssuanceStart } from '@popup/pages/IdentityIssuance';
 import About from '@popup/pages/About';
 import Login from '@popup/pages/Login/Login';
+import TermsAndConditions from '@popup/pages/TermsAndConditions/TermsAndConditions';
 import RecoveryIntro from '@popup/pages/Recovery/RecoveryIntro';
 import RecoveryMain from '@popup/pages/Recovery/RecoveryMain';
 import RecoveryFinish from '@popup/pages/Recovery/RecoveryFinish';
@@ -75,15 +81,18 @@ function usePrompt(type: InternalMessageType | MessageType, promptKey: PromptKey
 
 export default function Routes() {
     const handleConnectionResponse = useMessagePrompt<boolean>(InternalMessageType.Connect, 'connectionRequest');
-    const handleSendTransactionResponse = useMessagePrompt<string | undefined>(
+    const handleSendTransactionResponse = useMessagePrompt<MessageStatusWrapper<string>>(
         InternalMessageType.SendTransaction,
         'sendTransaction'
     );
-    const handleSignMessageResponse = useMessagePrompt<AccountTransactionSignature | undefined>(
+    const handleSignMessageResponse = useMessagePrompt<MessageStatusWrapper<AccountTransactionSignature>>(
         InternalMessageType.SignMessage,
         'signMessage'
     );
-    const handleAddTokensResponse = useMessagePrompt<string[]>(InternalMessageType.AddTokens, 'addTokens');
+    const handleAddTokensResponse = useMessagePrompt<MessageStatusWrapper<string[]>>(
+        InternalMessageType.AddTokens,
+        'addTokens'
+    );
 
     usePrompt(InternalMessageType.EndIdentityIssuance, 'endIdentityIssuance');
 
@@ -98,14 +107,20 @@ export default function Routes() {
             <Route path={relativeRoutes.prompt.path} element={<FullscreenPromptLayout />}>
                 <Route
                     path={relativeRoutes.prompt.addTokens.path}
-                    element={<AddTokensPrompt respond={handleAddTokensResponse} />}
+                    element={
+                        <AddTokensPrompt
+                            respond={(response) => handleAddTokensResponse({ success: true, result: response })}
+                        />
+                    }
                 />
                 <Route
                     path={relativeRoutes.prompt.signMessage.path}
                     element={
                         <SignMessage
-                            onSubmit={handleSignMessageResponse}
-                            onReject={() => handleSignMessageResponse(undefined)}
+                            onSubmit={(signature) => handleSignMessageResponse({ success: true, result: signature })}
+                            onReject={() =>
+                                handleSignMessageResponse({ success: false, message: 'Signing was rejected' })
+                            }
                         />
                     }
                 />
@@ -113,8 +128,10 @@ export default function Routes() {
                     path={relativeRoutes.prompt.sendTransaction.path}
                     element={
                         <SendTransaction
-                            onSubmit={handleSendTransactionResponse}
-                            onReject={() => handleSendTransactionResponse(undefined)}
+                            onSubmit={(hash) => handleSendTransactionResponse({ success: true, result: hash })}
+                            onReject={() =>
+                                handleSendTransactionResponse({ success: false, message: 'Signing was rejected' })
+                            }
                         />
                     }
                 />
@@ -132,6 +149,7 @@ export default function Routes() {
             </Route>
             <Route path={`${relativeRoutes.setup.path}/*`} element={<Setup />} />
             <Route element={<RecoveryMain />} path={relativeRoutes.recovery.path} />
+            <Route path={relativeRoutes.termsAndConditions.path} element={<TermsAndConditions />} />
             <Route path={relativeRoutes.login.path} element={<Login />} />
             <Route path={relativeRoutes.home.path} element={<MainLayout />}>
                 <Route

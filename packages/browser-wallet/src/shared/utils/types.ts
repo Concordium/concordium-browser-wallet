@@ -45,5 +45,23 @@ export type RecoveryBackgroundResponse =
           reason: string;
       };
 
-// eslint-disable-next-line @typescript-eslint/no-explicit-any
-export type SmartContractParameters = Record<string, unknown> | any[] | number | string;
+export type SmartContractParameters =
+    | { [key: string]: SmartContractParameters }
+    | SmartContractParameters[]
+    | number
+    | string
+    | boolean;
+
+export type Cis2TransferParametersAccount = {
+    Account: [string];
+};
+
+export type Cis2TransferParameters = [
+    {
+        data: string;
+        token_id: string;
+        amount: string; // bigint
+        from: Cis2TransferParametersAccount;
+        to: Cis2TransferParametersAccount;
+    }
+];

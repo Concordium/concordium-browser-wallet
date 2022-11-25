@@ -1,17 +1,21 @@
 /* eslint-disable no-console */
 import React, { useEffect, useState, useRef, useCallback } from 'react';
-import { toBuffer, AccountAddress } from '@concordium/web-sdk';
-import { detectConcordiumProvider } from '@concordium/browser-wallet-api-helpers';
+import {
+    toBuffer,
+    deserializeReceiveReturnValue,
+    serializeUpdateContractParameters,
+    JsonRpcClient,
+} from '@concordium/web-sdk';
 import * as leb from '@thi.ng/leb128';
+import { multiply, round } from 'mathjs';
+
 import { wrap, unwrap } from './utils';
 import {
-    WCCD_PROXY_INDEX,
-    WCCD_IMPLEMENTATION_INDEX,
-    WCCD_STATE_INDEX,
+    WCCD_CONTRACT_INDEX,
     CONTRACT_SUB_INDEX,
-    CONTRACT_NAME_PROXY,
-    CONTRACT_NAME_IMPLEMENTATION,
-    CONTRACT_NAME_STATE,
+    CONTRACT_NAME,
+    VIEW_FUNCTION_RAW_SCHEMA,
+    BALANCEOF_FUNCTION_RAW_SCHEMA,
     TESTNET,
 } from './constants';
 
@@ -66,27 +70,57 @@ const InputFieldStyle = {
     padding: '10px 20px',
 };
 
-async function updateStateWCCDBalanceAccount(account: string, setAmountAccount: (x: bigint) => void) {
-    const accountAddressBytes = new AccountAddress(account).decodedAddress;
-
-    let hexString = '';
-    accountAddressBytes.forEach((byte) => {
-        hexString += `0${(byte & 0xff).toString(16)}`.slice(-2); // eslint-disable-line no-bitwise
-    });
-
-    // Adding '00' because enum 0 (an `Account`) was selected instead of enum 1 (a `ContractAddress`).
-    const inputParams = toBuffer(`00${hexString}`, 'hex');
-    const provider = await detectConcordiumProvider();
-    const res = await provider.getJsonRpcClient().invokeContract({
-        method: `${CONTRACT_NAME_STATE}.getBalance`,
-        contract: { index: WCCD_STATE_INDEX, subindex: CONTRACT_SUB_INDEX },
-        parameter: inputParams,
+async function viewAdmin(rpcClient: JsonRpcClient, setAdmin: (x: string) => void) {
+    const res = await rpcClient.invokeContract({
+        method: `${CONTRACT_NAME}.view`,
+        contract: { index: WCCD_CONTRACT_INDEX, subindex: CONTRACT_SUB_INDEX },
+        parameter: toBuffer(''),
     });
     if (!res || res.tag === 'failure' || !res.returnValue) {
         throw new Error(`Expected successful invocation`);
     }
 
-    setAmountAccount(BigInt(leb.decodeULEB128(toBuffer(res.returnValue, 'hex'))[0]));
+    const returnValues = deserializeReceiveReturnValue(
+        toBuffer(res.returnValue, 'hex'),
+        toBuffer(VIEW_FUNCTION_RAW_SCHEMA, 'base64'),
+        CONTRACT_NAME,
+        'view',
+        2
+    );
+
+    setAdmin(returnValues.admin.Account[0]);
+}
+
+async function updateWCCDBalanceAccount(
+    rpcClient: JsonRpcClient,
+    account: string,
+    setAmountAccount: (x: bigint) => void
+) {
+    const param = serializeUpdateContractParameters(
+        CONTRACT_NAME,
+        'balanceOf',
+        [
+            {
+                address: {
+                    Account: [account],
+                },
+                token_id: '',
+            },
+        ],
+        toBuffer(BALANCEOF_FUNCTION_RAW_SCHEMA, 'base64')
+    );
+
+    const res = await rpcClient.invokeContract({
+        method: `${CONTRACT_NAME}.balanceOf`,
+        contract: { index: WCCD_CONTRACT_INDEX, subindex: CONTRACT_SUB_INDEX },
+        parameter: param,
+    });
+    if (!res || res.tag === 'failure' || !res.returnValue) {
+        throw new Error(`Expected successful invocation`);
+    }
+
+    // The return value is an array. The value stored in the array starts at position 4 of the return value.
+    setAmountAccount(BigInt(leb.decodeULEB128(toBuffer(res.returnValue.slice(4), 'hex'))[0]));
 }
 
 export default function wCCD() {
@@ -129,51 +163,32 @@ export default function wCCD() {
         }
     }, [connector]);
 
-    const [ownerProxy, setOwnerProxy] = useState<string>();
-    const [ownerImplementation, setOwnerImplementation] = useState<string>();
+    const [admin, setAdmin] = useState<string>();
+
     useEffect(() => {
-        if (connectedAccount && connector) {
-            withJsonRpcClient(connector, async (rpcClient) => {
-                // Get wCCD proxy contract owner.
-                const proxyInfo = await rpcClient.getInstanceInfo({
-                    index: WCCD_PROXY_INDEX,
-                    subindex: CONTRACT_SUB_INDEX,
-                });
-
-                if (proxyInfo?.name !== `init_${CONTRACT_NAME_PROXY}`) {
-                    // Check that we have the expected instance.
-                    throw new Error(`Expected instance of proxy: ${proxyInfo?.name}`);
-                }
-
-                setOwnerProxy(proxyInfo.owner.address);
-
-                // Get wCCD implementation contract owner.
-                const implInfo = await rpcClient.getInstanceInfo({
-                    index: WCCD_IMPLEMENTATION_INDEX,
-                    subindex: CONTRACT_SUB_INDEX,
-                });
-                if (implInfo?.name !== `init_${CONTRACT_NAME_IMPLEMENTATION}`) {
-                    // Check that we have the expected instance.
-                    throw new Error(`Expected instance of implementation: ${implInfo?.name}`);
-                }
-
-                setOwnerImplementation(implInfo.owner.address);
-            }).catch(console.error);
+        if (walletConnection) {
+            withJsonRpcClient(walletConnection, async (rpcClient) => viewAdmin(rpcClient, setAdmin)).catch(
+                console.error
+            );
         }
-    }, [connector, !!connectedAccount]);
+    }, [walletConnection]);
 
     const [isWrapping, setIsWrapping] = useState<boolean>(true);
     const [hash, setHash] = useState<string>('');
     const [error, setError] = useState<string>('');
     const [flipped, setFlipped] = useState<boolean>(false);
-    const [amountAccount, setAmountAccount] = useState<bigint>(0n);
+    const [amountAccount, setAmountAccount] = useState<bigint>();
     const inputValue = useRef<HTMLInputElement>(null);
 
     useEffect(() => {
         if (walletConnection && connectedAccount) {
-            updateStateWCCDBalanceAccount(connectedAccount, setAmountAccount).catch(console.error);
+            withJsonRpcClient(walletConnection, async (rpcClient) =>
+                updateWCCDBalanceAccount(rpcClient, connectedAccount, setAmountAccount)
+            ).catch(console.error);
+        } else {
+            setAmountAccount(undefined);
         }
-    }, [walletConnection]);
+    }, [walletConnection, connectedAccount, flipped]);
 
     return (
         <>
@@ -213,17 +228,10 @@ export default function wCCD() {
                 <br />
                 <div className="text">wCCD Balance of connected account</div>
                 <div className="containerSpaceBetween">
-                    <div className="largeText">{Number(amountAccount) / 1000000}</div>
-                    <button
-                        className="buttonInvisible"
-                        type="button"
-                        onClick={() => {
-                            setFlipped(!flipped);
-                            if (walletConnection && connectedAccount) {
-                                updateStateWCCDBalanceAccount(connectedAccount, setAmountAccount).catch(console.error);
-                            }
-                        }}
-                    >
+                    <div className="largeText">
+                        {amountAccount === undefined ? <i>N/A</i> : Number(amountAccount) / 1000000}
+                    </div>
+                    <button className="buttonInvisible" type="button" onClick={() => setFlipped(!flipped)}>
                         {flipped ? (
                             <RefreshIcon style={{ transform: 'rotate(90deg)' }} height="20px" width="20px" />
                         ) : (
@@ -256,7 +264,7 @@ export default function wCCD() {
                         className="input"
                         style={InputFieldStyle}
                         type="number"
-                        placeholder="0.00"
+                        placeholder="0.000000"
                         ref={inputValue}
                     />
                     {waitForUser || !walletConnection ? (
@@ -282,13 +290,7 @@ export default function wCCD() {
 
                                 const input = inputValue.current?.valueAsNumber;
                                 // Amount needs to be in WEI
-                                const amount = input * 1000000;
-
-                                if (!Number.isInteger(amount)) {
-                                    window.alert(
-                                        'Input a number into the CCD/wCCD amount field with max 6 decimal places.'
-                                    ); /* eslint-disable no-alert */
-                                }
+                                const amount = round(multiply(input, 1000000));
 
                                 if (connectedAccount) {
                                     setHash('');
@@ -297,7 +299,7 @@ export default function wCCD() {
                                     if (isWrapping) {
                                         wrap(
                                             connectedAccount,
-                                            WCCD_PROXY_INDEX,
+                                            WCCD_CONTRACT_INDEX,
                                             setHash,
                                             setError,
                                             setWaitForUser,
@@ -307,7 +309,7 @@ export default function wCCD() {
                                     } else {
                                         unwrap(
                                             connectedAccount,
-                                            WCCD_PROXY_INDEX,
+                                            WCCD_CONTRACT_INDEX,
                                             setHash,
                                             setError,
                                             setWaitForUser,
@@ -348,9 +350,9 @@ export default function wCCD() {
                 )}
                 <br />
                 <div>
-                    Proxy wCCD owned by
+                    The admin of the wCCD smart contract instance is
                     <br />
-                    {ownerProxy === undefined ? (
+                    {admin === undefined ? (
                         <div className="loadingText">Loading...</div>
                     ) : (
                         <button
@@ -358,36 +360,14 @@ export default function wCCD() {
                             type="button"
                             onClick={() => {
                                 window.open(
-                                    `https://testnet.ccdscan.io/?dcount=1&dentity=account&daddress=${ownerProxy}`,
+                                    `https://testnet.ccdscan.io/?dcount=1&dentity=account&daddress=${admin}`,
                                     '_blank',
                                     'noopener,noreferrer'
                                 );
                             }}
                         >
                             {' '}
-                            {ownerProxy}{' '}
-                        </button>
-                    )}
-                </div>
-                <div>
-                    Implementation wCCD owned by
-                    <br />
-                    {ownerImplementation === undefined ? (
-                        <div className="loadingText">Loading...</div>
-                    ) : (
-                        <button
-                            className="link"
-                            type="button"
-                            onClick={() => {
-                                window.open(
-                                    `https://testnet.ccdscan.io/?dcount=1&dentity=account&daddress=${ownerImplementation}`,
-                                    '_blank',
-                                    'noopener,noreferrer'
-                                );
-                            }}
-                        >
-                            {' '}
-                            {ownerImplementation}{' '}
+                            {admin}{' '}
                         </button>
                     )}
                 </div>

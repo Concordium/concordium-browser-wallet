@@ -1,5 +1,35 @@
 # Changelog
 
+## 0.8.4
+
+### Fixed
+
+-   Incorrect id on token being displayed in manage tokens, when searching.
+-   Spelling errors and incomplete sentences.
+
+### Added
+
+-   Prompt user to accept terms and conditions, if they change.
+
+## 0.8.3
+
+### Fixed
+
+-   Smart contract parameters parsing through wallet-api failing.
+-   Smart contract parameters through wallet-api parsing zero as no parameters.
+
+## 0.8.2
+
+### Fixed
+
+-   Various bugs.
+
+## 0.8.1
+
+### Fixed
+
+-   Various bugs.
+
 ## 0.8.0
 
 ### Added

@@ -13,12 +13,21 @@ import { confirmIdentity } from './confirmation';
 
 const redirectUri = 'ConcordiumRedirectToken';
 const codeUriKey = 'code_uri=';
+const errorKey = 'error=';
 
 const enum MSG { // using const enum here, as typescript compiler replaces uses with the actual underlying string, which we need, because injected functions do not have access to variables declared in the background context
     LIFELINE = 'lifeline',
 }
 
-const respond = async (response: IdentityIssuanceBackgroundResponse) => {
+const isIdpResponse = (details: chrome.webRequest.WebRequestBodyDetails, idpTabId?: number) =>
+    details.url.includes(`${redirectUri}#${codeUriKey}`) && details.tabId === idpTabId;
+const isIdpError = (details: chrome.webRequest.WebRequestBodyDetails) =>
+    details.url.includes(`${redirectUri}#${errorKey}`) && details.tabId === -1;
+
+/**
+ * Send a response to the popup thread that ends the identity issuance flow.
+ */
+const respondPopup = async (response: IdentityIssuanceBackgroundResponse) => {
     const pendingIdentity = await sessionPendingIdentity.get();
     if (!pendingIdentity) {
         return;
@@ -51,27 +60,46 @@ export function addIdpListeners() {
 
         if (idpTabId !== undefined && tabId === idpTabId) {
             sessionIdpTab.remove();
-            respond({
+            respondPopup({
                 status: BackgroundResponseStatus.Aborted,
             });
         }
     });
 
-    const handleIdpRequest = (redirectUrl: string, tabId: number) => {
-        chrome.tabs.remove(tabId);
-        sessionIdpTab.remove();
+    const handleIdpResponse = (redirectUrl: string, tabId?: number) => {
+        if (tabId !== undefined && tabId > -1) {
+            chrome.tabs.remove(tabId);
+            sessionIdpTab.remove();
+        }
 
-        respond({
+        respondPopup({
             status: BackgroundResponseStatus.Success,
             result: redirectUrl.substring(redirectUrl.indexOf(codeUriKey) + codeUriKey.length),
+        });
+    };
+
+    const handleIdpError = (redirectUrl: string) => {
+        const error = decodeURIComponent(redirectUrl.substring(redirectUrl.indexOf(errorKey) + errorKey.length));
+        let message;
+        try {
+            message = JSON.parse(error).error.detail;
+        } catch {
+            message = error;
+        }
+
+        respondPopup({
+            status: BackgroundResponseStatus.Error,
+            reason: message,
         });
     };
 
     chrome.webRequest.onBeforeRequest.addListener(
         (details) => {
             sessionIdpTab.get().then((idpTabId) => {
-                if (details.url.includes(redirectUri) && details.tabId === idpTabId) {
-                    handleIdpRequest(details.url, idpTabId);
+                if (isIdpResponse(details, idpTabId)) {
+                    handleIdpResponse(details.url, idpTabId);
+                } else if (isIdpError(details)) {
+                    handleIdpError(details.url);
                 }
             });
         },
@@ -138,34 +166,31 @@ async function startIdentityIssuance({
     const network = await storedCurrentNetwork.get();
 
     if (!network) {
-        return;
+        throw new Error('Unable to get current network');
     }
 
     try {
         const response = await fetch(url);
-
-        if (!response.ok) {
-            respond({
-                status: BackgroundResponseStatus.Error,
-                reason: (await response.json())?.message || `Provider returned status code ${response.status}.`,
-            });
-        } else if (!response.redirected) {
-            respond({
+        if (!response.redirected) {
+            respondPopup({
                 status: BackgroundResponseStatus.Error,
                 reason: `Initial location did not redirect as expected.`,
             });
-        } else {
+        } else if (!response.url.includes(redirectUri)) {
             launchExternalIssuance(response.url);
         }
         // eslint-disable-next-line @typescript-eslint/no-explicit-any
     } catch (e: any) {
-        respond({
+        respondPopup({
             status: BackgroundResponseStatus.Error,
             reason: `Failed to reach identity provider due to: ${e.message}`,
         });
     }
 }
 
-export const identityIssuanceHandler: ExtensionMessageHandler = (msg) => {
-    startIdentityIssuance(msg.payload);
+export const identityIssuanceHandler: ExtensionMessageHandler = (msg, _sender, respond) => {
+    startIdentityIssuance(msg.payload)
+        .then(() => respond(true))
+        .catch(() => respond(false));
+    return true;
 };

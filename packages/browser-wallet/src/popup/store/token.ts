@@ -4,8 +4,7 @@ import { mapRecordValues } from 'wallet-common-helpers/src/utils/basicHelpers';
 import { atomFamily } from 'jotai/utils';
 import { ChromeStorageKey, TokenIdAndMetadata, TokenMetadata, TokenStorage } from '@shared/storage/types';
 import { ContractBalances, getContractBalances } from '@shared/utils/token-helpers';
-import { JsonRpcClient } from '@concordium/web-sdk';
-import { loop } from '@shared/utils/function-helpers';
+import { addToastAtom } from '@popup/state';
 import { AsyncWrapper, atomWithChromeStorage } from './utils';
 import { jsonRpcClientAtom } from './settings';
 import { selectedAccountAtom } from './account';
@@ -129,7 +128,14 @@ const cbf = atomFamily<string, Atom<ContractBalances>>((identifier: string) => {
             const tokenIds = tokens.value[contractIndex]?.map((t) => t.id) ?? [];
 
             if (tokenIds.length !== 0) {
-                const balances = await getContractBalances(client, BigInt(contractIndex), 0n, tokenIds, accountAddress);
+                const balances = await getContractBalances(
+                    client,
+                    BigInt(contractIndex),
+                    0n,
+                    tokenIds,
+                    accountAddress,
+                    (error) => set(addToastAtom, error)
+                );
                 set(baseAtom, balances);
             }
         }

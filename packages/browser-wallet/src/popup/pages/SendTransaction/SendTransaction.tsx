@@ -15,12 +15,19 @@ import TransactionReceipt from '@popup/shared/TransactionReceipt/TransactionRece
 import Button from '@popup/shared/Button';
 import { displayUrl } from '@popup/shared/utils/string-helpers';
 import { noOp, useAsyncMemo } from 'wallet-common-helpers';
-import { getSimpleTransferCost } from '@popup/shared/utils/wallet-proxy';
+import { getEnergyPerCCD } from '@popup/shared/utils/wallet-proxy';
 import ConnectedBox from '@popup/pages/Account/ConnectedBox';
 import { addToastAtom } from '@popup/state';
 import ExternalRequestLayout from '@popup/page-layouts/ExternalRequestLayout';
 import { useUpdateAtom } from 'jotai/utils';
 import { addPendingTransactionAtom } from '@popup/store/transactions';
+import {
+    determineInitPayloadSize,
+    determineUpdatePayloadSize,
+    SIMPLE_TRANSFER_ENERGY_TOTAL_COST,
+} from '@shared/utils/energy-helpers';
+import { calculateEnergyCost } from '@shared/utils/token-helpers';
+import { SmartContractParameters } from '@shared/utils/types';
 import { parsePayload } from './util';
 
 interface Location {
@@ -29,7 +36,7 @@ interface Location {
             accountAddress: string;
             type: AccountTransactionType;
             payload: string;
-            parameters?: Record<string, unknown>;
+            parameters?: SmartContractParameters;
             schema?: string;
             schemaVersion?: SchemaVersion;
             url: string;
@@ -64,10 +71,32 @@ export default function SendTransaction({ onSubmit, onReject }: Props) {
             ),
         [JSON.stringify(state.payload)]
     );
+
     const cost = useAsyncMemo(
-        transactionType === AccountTransactionType.SimpleTransfer
-            ? getSimpleTransferCost
-            : () => Promise.resolve(undefined),
+        async () => {
+            const exchangeRate = await getEnergyPerCCD();
+            const getCost = (fee: bigint) => BigInt(Math.ceil(exchangeRate * Number(fee)));
+            if (transactionType === AccountTransactionType.Transfer) {
+                return getCost(SIMPLE_TRANSFER_ENERGY_TOTAL_COST);
+            }
+            if (AccountTransactionType.Update === transactionType) {
+                const energy = calculateEnergyCost(
+                    1n,
+                    determineUpdatePayloadSize(payload.message.length, payload.receiveName),
+                    payload.maxContractExecutionEnergy || 0n
+                );
+                return getCost(energy);
+            }
+            if (AccountTransactionType.InitContract === transactionType) {
+                const energy = calculateEnergyCost(
+                    1n,
+                    determineInitPayloadSize(payload.param.length, payload.initName),
+                    payload.maxContractExecutionEnergy || 0n
+                );
+                return getCost(energy);
+            }
+            return undefined;
+        },
         noOp,
         [transactionType]
     );
@@ -97,10 +126,11 @@ export default function SendTransaction({ onSubmit, onReject }: Props) {
         const transaction = { payload, header, type: transactionType };
 
         const hash = await sendTransaction(client, transaction, key);
-        addPendingTransaction(createPendingTransactionFromAccountTransaction(transaction, hash));
+        const pending = createPendingTransactionFromAccountTransaction(transaction, hash, cost);
+        await addPendingTransaction(pending);
 
         return hash;
-    }, [payload, key]);
+    }, [payload, key, cost]);
 
     return (
         <ExternalRequestLayout>
@@ -113,7 +143,7 @@ export default function SendTransaction({ onSubmit, onReject }: Props) {
                     parameters={state.payload.parameters}
                     sender={accountAddress}
                     cost={cost}
-                    className="m-v-10"
+                    className="m-10"
                 />
                 <br />
                 <div className="flex p-b-10 m-t-auto">

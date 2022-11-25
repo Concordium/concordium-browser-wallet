@@ -4,7 +4,7 @@ import {
     AccountTransactionType,
     buildBasicAccountSigner,
     getAccountTransactionHash,
-    GtuAmount,
+    CcdAmount,
     JsonRpcClient,
     signTransaction,
     SimpleTransferPayload,
@@ -18,7 +18,7 @@ import { BrowserWalletAccountTransaction, TransactionStatus } from './transactio
 export function buildSimpleTransferPayload(recipient: string, amount: bigint): SimpleTransferPayload {
     return {
         toAddress: new AccountAddress(recipient),
-        amount: new GtuAmount(amount),
+        amount: new CcdAmount(amount),
     };
 }
 
@@ -78,13 +78,13 @@ export function getDefaultExpiry(): TransactionExpiry {
 
 export function getTransactionTypeName(type: AccountTransactionType): string {
     switch (type) {
-        case AccountTransactionType.SimpleTransfer: {
+        case AccountTransactionType.Transfer: {
             return i18n.t('utils.transaction.type.simple');
         }
-        case AccountTransactionType.InitializeSmartContractInstance: {
+        case AccountTransactionType.InitContract: {
             return i18n.t('utils.transaction.type.init');
         }
-        case AccountTransactionType.UpdateSmartContractInstance: {
+        case AccountTransactionType.Update: {
             return i18n.t('utils.transaction.type.update');
         }
         default: {
@@ -119,7 +119,7 @@ export const createPendingTransactionFromAccountTransaction = (
     transactionHash: string,
     cost?: bigint
 ) => {
-    const amount = (transaction.payload as SimpleTransferPayload).amount?.microGtuAmount ?? BigInt(0);
+    const amount = (transaction.payload as SimpleTransferPayload).amount?.microCcdAmount ?? BigInt(0);
     const toAddress = (transaction.payload as SimpleTransferPayload).toAddress?.address;
 
     return createPendingTransaction(

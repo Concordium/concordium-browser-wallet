@@ -1,9 +1,12 @@
 import { JsonRpcClient } from '@concordium/web-sdk';
 
 export interface WalletConnection {
+    // Must be in connection as the browser wallet's client won't work until there is a connection.
+    getJsonRpcClient(): JsonRpcClient;
+
     signAndSendTransaction(): Promise<string>;
 
-    disconnect(): Promise<void>; // TODO unclear if this belongs here...
+    disconnect(): Promise<void>;
 }
 
 export class Network {
@@ -27,11 +30,9 @@ export interface Events {
 }
 
 export interface WalletConnector {
-    getJsonRpcClient(): JsonRpcClient;
-
     connect(events: Events): Promise<WalletConnection>;
 }
 
-export async function withJsonRpcClient<T>(wc: WalletConnector, f: (c: JsonRpcClient) => Promise<T>) {
+export async function withJsonRpcClient<T>(wc: WalletConnection, f: (c: JsonRpcClient) => Promise<T>) {
     return f(wc.getJsonRpcClient());
 }

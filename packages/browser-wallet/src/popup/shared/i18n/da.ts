@@ -42,6 +42,15 @@ const t: typeof en = {
         sender: 'Afsender',
         cost: 'Estimerede transaktionsomkostninger',
         unknown: 'Ukendt',
+        tokenTransfer: {
+            title: 'Send {{ tokenName }}',
+            amount: 'Token mængde',
+            receiver: 'Modtager',
+            showTransfer: 'Vis overførslesdetaljer',
+            showContract: 'Vis kontraktdetaljer',
+        },
+        parameter: 'Parameter',
+        noParameter: 'Ingen parametre',
     },
     tokenDetails: {
         balance: 'Saldo',
@@ -55,12 +64,20 @@ const t: typeof en = {
         unownedUnique: 'Ejer ikke',
         ownedUnique: 'Ejer',
         tokenId: 'Token ID',
+        tokenRemoved: 'Token fjernet fra wallet',
         removePrompt: {
             header: 'Skjul {{ name }} i din wallet',
             text: 'Er du sikker på at du vil skjule dette token i din wallet? Du kan til enhver tid tilføje det igen fra token listen.',
             cancel: 'Behold token',
             remove: 'Fjern token',
         },
+    },
+    tokenBalance: {
+        noBalance: 'Ingen saldo hentet',
+    },
+    addTokens: {
+        cis0Error: 'Kontrakten supporterer ikke CIS-0',
+        cis2Error: 'Kontrakten supporterer ikke CIS-2',
     },
 };
 

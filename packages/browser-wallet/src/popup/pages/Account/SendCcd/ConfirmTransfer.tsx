@@ -1,8 +1,14 @@
+/* eslint-disable react/destructuring-assignment */
 import React, { useEffect, useState, useMemo } from 'react';
 import { useTranslation } from 'react-i18next';
 import { useSetAtom, useAtomValue } from 'jotai';
 import { selectedAccountAtom } from '@popup/store/account';
-import { AccountAddress, AccountTransactionPayload, AccountTransactionType } from '@concordium/web-sdk';
+import {
+    AccountAddress,
+    AccountTransactionPayload,
+    AccountTransactionType,
+    UpdateContractPayload,
+} from '@concordium/web-sdk';
 import {
     getDefaultExpiry,
     createPendingTransactionFromAccountTransaction,
@@ -14,29 +20,43 @@ import { usePrivateKey } from '@popup/shared/utils/account-helpers';
 import Button from '@popup/shared/Button';
 import { useNavigate } from 'react-router-dom';
 import { absoluteRoutes } from '@popup/constants/routes';
-import TransactionReceipt from '@popup/shared/TransactionReceipt/TransactionReceipt';
+import GenericTransactionReceipt, {
+    TokenTransferReceipt,
+    GenericTransactionReceiptProps,
+    TokenTransferReceiptProps,
+} from '@popup/shared/TransactionReceipt';
 import { useUpdateAtom } from 'jotai/utils';
 import { addPendingTransactionAtom } from '@popup/store/transactions';
-import { SmartContractParameters } from '@shared/utils/types';
+import { Cis2TransferParameters, SmartContractParameters } from '@shared/utils/types';
+import { TokenMetadata } from '@shared/storage/types';
+import { accountRoutes } from '../routes';
 
-interface Props {
+type BaseProps = {
     setDetailsExpanded: (expanded: boolean) => void;
     cost?: bigint;
-    transactionType: AccountTransactionType;
-    payload: AccountTransactionPayload;
-    parameters?: SmartContractParameters;
     // eslint-disable-next-line @typescript-eslint/no-explicit-any
     returnState: any;
-}
+};
 
-export default function ConfirmTransfer({
-    setDetailsExpanded,
-    cost,
-    transactionType,
-    payload,
-    returnState,
-    parameters,
-}: Props) {
+type ConfirmTokenTransferProps = BaseProps & {
+    showAsTokenTransfer: true;
+    transactionType: AccountTransactionType.Update;
+    payload: UpdateContractPayload;
+    parameters: SmartContractParameters;
+    metadata: TokenMetadata;
+};
+
+type ConfirmGenericTransferProps = BaseProps & {
+    showAsTokenTransfer?: false;
+    payload: AccountTransactionPayload;
+    transactionType: AccountTransactionType;
+    parameters?: SmartContractParameters;
+};
+
+type Props = ConfirmTokenTransferProps | ConfirmGenericTransferProps;
+
+export default function ConfirmTransfer(props: Props) {
+    const { setDetailsExpanded, cost, transactionType, payload, returnState, parameters } = props;
     const { t } = useTranslation('account');
     const [hash, setHash] = useState<string>();
     const selectedAddress = useAtomValue(selectedAccountAtom);
@@ -83,17 +103,29 @@ export default function ConfirmTransfer({
         return null;
     }
 
+    type CommonProps = GenericTransactionReceiptProps | TokenTransferReceiptProps;
+    const commonProps: CommonProps = {
+        transactionType,
+        sender: address,
+        parameters,
+        payload,
+        cost,
+        hash,
+        className: 'send-ccd__receipt',
+    };
+
     return (
         <div className="w-full flex-column justify-space-between align-center">
-            <TransactionReceipt
-                transactionType={transactionType}
-                payload={payload}
-                sender={address}
-                parameters={parameters}
-                cost={cost}
-                hash={hash}
-                className="send-ccd__receipt"
-            />
+            {props.showAsTokenTransfer ? (
+                <TokenTransferReceipt
+                    {...commonProps}
+                    payload={props.payload}
+                    metadata={props.metadata}
+                    parameters={props.parameters as Cis2TransferParameters}
+                />
+            ) : (
+                <GenericTransactionReceipt {...commonProps} />
+            )}
             {!hash && (
                 <div className="flex justify-center p-b-10 m-h-20">
                     <Button width="narrow" className="m-r-10" onClick={() => nav(`../`, { state: returnState })}>
@@ -106,7 +138,11 @@ export default function ConfirmTransfer({
             )}
             {hash && (
                 <div className="p-b-10">
-                    <Button width="medium" className="m-b-10" onClick={() => nav(absoluteRoutes.home.account.path)}>
+                    <Button
+                        width="medium"
+                        className="m-b-10"
+                        onClick={() => nav(`${absoluteRoutes.home.account.path}/${accountRoutes.log}`)}
+                    >
                         {t('sendCcd.buttons.finish')}
                     </Button>
                 </div>

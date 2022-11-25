@@ -29,6 +29,7 @@ export default function SendCcd() {
                     <CreateTransfer
                         exchangeRate={exchangeRate}
                         setCost={setCost}
+                        cost={cost}
                         setDetailsExpanded={setDetailsExpanded}
                     />
                 }

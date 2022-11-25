@@ -1,7 +1,7 @@
 import NavList from '@popup/shared/NavList';
 import React from 'react';
 import { useTranslation } from 'react-i18next';
-import urls from '@popup/constants/urls';
+import urls from '@shared/constants/url';
 import ExternalLink from '@popup/shared/ExternalLink';
 import packageJson from '../../../../package.json';
 

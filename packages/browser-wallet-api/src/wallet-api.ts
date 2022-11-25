@@ -1,9 +1,17 @@
-import { InjectedMessageHandler, createEventTypeFilter, MessageType } from '@concordium/browser-wallet-message-hub';
+import {
+    InjectedMessageHandler,
+    createEventTypeFilter,
+    MessageType,
+    MessageStatusWrapper,
+} from '@concordium/browser-wallet-message-hub';
 import {
     AccountTransactionPayload,
     AccountTransactionSignature,
     AccountTransactionType,
+    DeployModulePayload,
+    InitContractPayload,
     SchemaVersion,
+    UpdateContractPayload,
 } from '@concordium/common-sdk/lib/types';
 import { JsonRpcClient } from '@concordium/common-sdk/lib/JsonRpcClient';
 import { WalletApi as IWalletApi, EventType } from '@concordium/browser-wallet-api-helpers';
@@ -52,7 +60,7 @@ class WalletApi extends EventEmitter implements IWalletApi {
      * Sends a sign request to the Concordium Wallet and awaits the users action
      */
     public async signMessage(accountAddress: string, message: string): Promise<AccountTransactionSignature> {
-        const response = await this.messageHandler.sendMessage<AccountTransactionSignature | undefined>(
+        const response = await this.messageHandler.sendMessage<MessageStatusWrapper<AccountTransactionSignature>>(
             MessageType.SignMessage,
             {
                 accountAddress,
@@ -60,25 +68,24 @@ class WalletApi extends EventEmitter implements IWalletApi {
             }
         );
 
-        if (!response) {
+        if (!response.success) {
             throw new Error('Signing rejected');
         }
 
-        return response;
+        return response.result;
     }
 
     /**
      * Requests connection to wallet. Resolves with account address or rejects if rejected in wallet.
      */
     public async connect(): Promise<string | undefined> {
-        const response = await this.messageHandler.sendMessage<string | undefined | false>(MessageType.Connect);
+        const response = await this.messageHandler.sendMessage<MessageStatusWrapper<string>>(MessageType.Connect);
 
-        // TODO Response becomes === null when we would expect it to be undefined. Catching it here is a temporary quick-fix.
-        if (response === false || response === null) {
-            throw new Error('Connection rejected');
+        if (!response.success) {
+            throw new Error(response.message);
         }
 
-        return response;
+        return response.result;
     }
 
     /**
@@ -105,20 +112,48 @@ class WalletApi extends EventEmitter implements IWalletApi {
         schema?: string,
         schemaVersion?: SchemaVersion
     ): Promise<string> {
-        const response = await this.messageHandler.sendMessage<string | undefined>(MessageType.SendTransaction, {
-            accountAddress,
-            type,
-            payload: stringify(payload),
-            parameters,
-            schema,
-            schemaVersion,
-        });
-
-        if (!response) {
-            throw new Error('Signing rejected');
+        // This parsing is to temporarily support older versions of the web-SDK, which has different field names.
+        let parsedPayload = payload;
+        if (type === AccountTransactionType.InitContract) {
+            const initPayload: InitContractPayload = {
+                ...(payload as InitContractPayload),
+                // eslint-disable-next-line @typescript-eslint/no-explicit-any
+                initName: (payload as InitContractPayload).initName || (payload as any).contractName,
+            };
+            parsedPayload = initPayload;
+        } else if (type === AccountTransactionType.Update) {
+            const updatePayload: UpdateContractPayload = {
+                ...(payload as UpdateContractPayload),
+                // eslint-disable-next-line @typescript-eslint/no-explicit-any
+                address: (payload as UpdateContractPayload).address || (payload as any).contractAddress,
+            };
+            parsedPayload = updatePayload;
+        } else if (type === AccountTransactionType.DeployModule) {
+            const deployPayload: DeployModulePayload = {
+                ...(payload as DeployModulePayload),
+                // eslint-disable-next-line @typescript-eslint/no-explicit-any
+                source: (payload as DeployModulePayload).source || (payload as any).content,
+            };
+            parsedPayload = deployPayload;
         }
 
-        return response;
+        const response = await this.messageHandler.sendMessage<MessageStatusWrapper<string>>(
+            MessageType.SendTransaction,
+            {
+                accountAddress,
+                type,
+                payload: stringify(parsedPayload),
+                parameters,
+                schema,
+                schemaVersion,
+            }
+        );
+
+        if (!response.success) {
+            throw new Error(response.message);
+        }
+
+        return response.result;
     }
 
     private handleEvent(type: EventType) {

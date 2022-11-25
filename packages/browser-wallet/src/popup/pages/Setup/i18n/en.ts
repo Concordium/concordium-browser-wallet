@@ -1,17 +1,13 @@
 const t = {
     intro: {
-        welcome: "Welcome to Concordium's official browser extension wallet.",
+        welcome: 'Welcome to the Concordium Wallet for web.',
         description:
-            'On the following pages you will be guided through the process of obtaining a new account or restoring old ones.',
-        form: {
-            termsAndConditionsRequired: 'You must read and accept the terms and conditions',
-            termsAndConditionsDescription: 'I have read and agree to the',
-            termsAndConditionsLinkDescription: 'Terms and Conditions',
-        },
+            'On the following pages, you will be guided through the process of setting up a new wallet or restoring an existing one.',
     },
     setupPasscode: {
         title: 'Setup passcode',
-        description: 'The first step is to set up a passcode. Please enter one below.',
+        description:
+            'The first step is to set up a passcode. Enter a passcode below. It must contain at least 6 characters.',
         form: {
             enterPasscode: 'Enter passcode',
             enterPasscodeAgain: 'Enter passcode again',
@@ -34,30 +30,32 @@ const t = {
         title: 'Restore your wallet',
     },
     confirmRecoveryPhrase: {
-        description:
-            'Please enter your 24 words in the correct order and separated by spaces, to confirm your secret recovery phrase.',
+        newPhrase:
+            'Please enter your 24-word recovery phrase in the correct order, separated by spaces, to confirm your secret recovery phrase.',
+        existingPhrase:
+            'Please enter your 24-word secret recovery phrase in the correct order and separated by spaces to restore your identities and accounts.',
     },
     enterRecoveryPhrase: {
         form: {
-            required: 'A seed phrase must be provided',
+            required: 'A secret recovery phrase must be provided',
             error: 'Incorrect secret recovery phrase',
         },
         seedPhrase: {
-            required: 'Please specify a 24 word BIP 39 seed phrase',
+            required: 'Please specify a 24-word BIP 39 recovery phrase',
             validate: 'Invalid secret recovery phrase',
         },
     },
     chooseNetwork: {
         create: {
-            descriptionP1: 'Here you can choose whether to connect to the Concordium Mainnet or Testnet.',
-            descriptionP2: 'If you are unsure what to choose, choose Concordium Mainnet.',
-            descriptionP3: 'You can choose another network via the Settings menu later.',
+            descriptionP1: 'Choose whether to connect to the Concordium Mainnet or Testnet.',
+            descriptionP2: 'If you are unsure what to choose, select Concordium Mainnet.',
+            descriptionP3: 'You can choose another network later in the Settings menu.',
         },
         restore: {
             descriptionP1:
-                'Here you can choose whether to recover your identities and accounts on the Concordium Mainnet or Testnet.',
-            descriptionP2: 'If you are unsure what to choose, choose Concordium Mainnet.',
-            descriptionP3: 'You can use another network via the Settings menu later',
+                'Choose whether to recover your identities and accounts on the Concordium Mainnet or Testnet.',
+            descriptionP2: 'If you are unsure what to choose, select Concordium Mainnet.',
+            descriptionP3: 'You can choose another network later in the Settings menu.',
         },
     },
     continue: 'Continue',

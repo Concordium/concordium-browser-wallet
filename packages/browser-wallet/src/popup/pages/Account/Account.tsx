@@ -19,7 +19,7 @@ import TransactionLog from './TransactionLog/TransactionLog';
 import SendCcd from './SendCcd';
 import ConnectedBox from './ConnectedBox';
 import Tokens from './Tokens';
-import AddTokens from './AddTokens';
+import ManageTokens from './ManageTokens';
 import { AccountPageContext, accountPageContext } from './utils';
 
 function Account() {
@@ -66,7 +66,12 @@ function Account() {
                         </div>
                         <div className="account-page__routes">
                             {isConfirmed && <Outlet />}
-                            {!isConfirmed && <div className="account-page__not-finalized">{t('accountPending')}</div>}
+                            {selectedCred.status === CreationStatus.Pending && (
+                                <div className="account-page__not-finalized">{t('accountPending')}</div>
+                            )}
+                            {selectedCred.status === CreationStatus.Rejected && (
+                                <div className="account-page__rejected">{t('accountRejected')}</div>
+                            )}
                         </div>
                     </>
                 )}
@@ -93,7 +98,7 @@ export default function AccountRoutes() {
                     <Route path={`${accountRoutes.log}/*`} element={<TransactionLog />} />
                     <Route path={`${accountRoutes.settings}/*`} element={<AccountSettings />} />
                     <Route path={`${accountRoutes.tokens}/*`} element={<Tokens />} />
-                    <Route path={`${accountRoutes.manageTokens}/*`} element={<AddTokens />} />
+                    <Route path={`${accountRoutes.manageTokens}/*`} element={<ManageTokens />} />
                 </Route>
             </Routes>
         </accountPageContext.Provider>

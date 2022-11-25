@@ -2,16 +2,19 @@ import { Buffer } from 'buffer/';
 import uleb128 from 'leb128/unsigned';
 import {
     AccountAddress,
-    GtuAmount,
+    CcdAmount,
     InstanceInfo,
     JsonRpcClient,
     serializeUpdateContractParameters,
+    UpdateContractPayload,
 } from '@concordium/web-sdk';
 import { MetadataUrl, NetworkConfiguration, TokenMetadata, TokenIdAndMetadata } from '@shared/storage/types';
 import { CIS2_SCHEMA_CONTRACT_NAME, CIS2_SCHEMA } from '@popup/constants/schema';
 import { WCCD_METADATA } from '@shared/constants/token-metadata';
+import i18n from '@popup/shell/i18n';
 import { SmartContractParameters } from './types';
 import { isMainnet } from './network-helpers';
+import { determineUpdatePayloadSize } from './energy-helpers';
 
 export interface ContractDetails {
     contractName: string;
@@ -90,14 +93,16 @@ export async function confirmCIS2Contract(
         parameter: getCIS2Identifier(),
     });
     if (!supports || supports.tag === 'failure') {
-        return 'Chosen contract does not support CIS-0';
+        return i18n.t('addTokens.cis0Error');
     }
+
     // Supports return 2 bytes that determine the number of answers. 0100 means there is 1 answer
     // 01 Means the standard is supported.
     // TODO: Handle 02 answer properly (https://proposals.concordium.software/CIS/cis-0.html#response)
     if (supports.returnValue !== '010001') {
-        return 'Chosen contract does not support CIS-2';
+        return i18n.t('addTokens.cis2Error');
     }
+
     return undefined;
 }
 
@@ -129,16 +134,19 @@ export function getTokenUrl(
 
 function confirmMetadataUrl(field?: MetadataUrl) {
     if (field && !field.url) {
-        throw new Error('Url field was present but did no contain an url');
+        throw new Error('Url field was present but did not contain an url');
     }
 }
 
 // eslint-disable-next-line @typescript-eslint/no-explicit-any
 function confirmString(field?: any) {
     if (field && !(typeof field === 'string' || field instanceof String)) {
-        throw new Error('string field was present but did no contain a string');
+        throw new Error('string field was present but did not contain a string');
     }
 }
+
+export const getMetadataUnique = ({ unique }: TokenMetadata) => Boolean(unique);
+export const getMetadataDecimals = ({ decimals }: TokenMetadata) => Number(decimals ?? 0);
 
 /**
  * Fetches token metadata from the given url
@@ -171,7 +179,7 @@ export async function getTokenMetadata(tokenUrl: string, network: NetworkConfigu
     confirmString(metadata.symbol);
     confirmString(metadata.description);
     confirmMetadataUrl(metadata.thumbnail);
-    if (metadata.decimals && Number.isNaN(metadata.decimals)) {
+    if (metadata.decimals !== undefined && Number.isNaN(getMetadataDecimals(metadata))) {
         throw new Error('Metadata contains incorrect decimals format');
     }
     confirmMetadataUrl(metadata.thumbnail);
@@ -224,14 +232,15 @@ const deserializeBalanceAmounts = (value: string): bigint[] => {
     return amounts;
 };
 
-export type ContractBalances = Record<string, bigint>;
+export type ContractBalances = Record<string, bigint | undefined>;
 
 export const getContractBalances = async (
     client: JsonRpcClient,
     index: bigint,
     subindex: bigint,
     tokenIds: string[],
-    accountAddress: string
+    accountAddress: string,
+    onError?: (error: string) => void
 ): Promise<ContractBalances> => {
     const instanceInfo = await client.getInstanceInfo({ index, subindex });
 
@@ -246,6 +255,7 @@ export const getContractBalances = async (
     });
 
     if (result === undefined || result.tag === 'failure' || result.returnValue === undefined) {
+        onError?.(`Failed to retrieve balances for index ${index.toString()}`);
         return {};
     }
 
@@ -299,12 +309,12 @@ export function getTokenTransferPayload(
     maxContractExecutionEnergy: bigint,
     index: bigint,
     subindex = 0n
-) {
+): UpdateContractPayload {
     return {
-        amount: new GtuAmount(0n),
-        contractAddress: { index, subindex },
+        amount: new CcdAmount(0n),
+        address: { index, subindex },
         receiveName: `${contractName}.transfer`,
-        parameter: serializeTokenTransferParameters(parameters),
+        message: serializeTokenTransferParameters(parameters),
         maxContractExecutionEnergy,
     };
 }
@@ -325,7 +335,7 @@ async function getTokenTransferExecutionEnergyEstimate(
         method: `${contractName}.transfer`,
     });
     if (!res || res.tag === 'failure') {
-        throw new Error(`Expected succesful invocation`);
+        throw new Error(res?.reason?.tag || 'no response');
     }
     // TODO: determine the "safety ratio"
     return (res.usedEnergy * 12n) / 10n;
@@ -343,12 +353,12 @@ export async function fetchContractName(client: JsonRpcClient, index: bigint, su
     return getContractName(instanceInfo);
 }
 
-function determineTokenTransferPayloadSize(parameterSize: number, contractName: string) {
-    return 8n + 8n + 8n + 2n + BigInt(parameterSize) + 2n + BigInt(contractName.length + 9);
-}
-
 // TODO: export this from the SDK or add to helpers
-function calculateEnergyCost(signatureCount: bigint, payloadSize: bigint, transactionSpecificCost: bigint): bigint {
+export function calculateEnergyCost(
+    signatureCount: bigint,
+    payloadSize: bigint,
+    transactionSpecificCost: bigint
+): bigint {
     return 100n * signatureCount + 1n * (BigInt(32 + 8 + 8 + 4 + 8) + payloadSize) + transactionSpecificCost;
 }
 
@@ -371,8 +381,72 @@ export async function getTokenTransferEnergy(
     );
     const total = calculateEnergyCost(
         1n,
-        determineTokenTransferPayloadSize(serializedParameters.length, contractName),
+        determineUpdatePayloadSize(serializedParameters.length, `${contractName}.transfer`),
         execution
     );
     return { execution, total };
 }
+
+type GetTokensResult = {
+    id: string;
+    metadataLink: string;
+    metadata: TokenMetadata | undefined;
+    balance: bigint;
+}[];
+
+export async function getTokens(
+    contractDetails: ContractDetails,
+    client: JsonRpcClient,
+    network: NetworkConfiguration,
+    account: string,
+    ids: string[],
+    onError?: (error: string) => void
+): Promise<GetTokensResult> {
+    const metadataPromise: Promise<[string[], Array<TokenMetadata | undefined>]> = (async () => {
+        let metadataUrls;
+        try {
+            metadataUrls = await getTokenUrl(client, ids, contractDetails);
+        } catch (e) {
+            onError?.(`Failed to get metadata urls on index: ${contractDetails.index}`);
+            return [[], []];
+        }
+        const metadata = await Promise.all(
+            metadataUrls.map((url) => getTokenMetadata(url, network).catch(() => Promise.resolve(undefined)))
+        );
+        return [metadataUrls, metadata];
+    })();
+
+    const balancesPromise = getContractBalances(
+        client,
+        contractDetails.index,
+        contractDetails.subindex,
+        ids,
+        account,
+        onError
+    );
+
+    const [[metadataUrls, metadata], balances] = await Promise.all([metadataPromise, balancesPromise]); // Run in parallel.
+
+    return ids.reduce(
+        (acc, id, i) =>
+            id in balances && metadata[i]
+                ? [
+                      ...acc,
+                      {
+                          id,
+                          metadataLink: metadataUrls[i],
+                          metadata: metadata[i],
+                          balance: balances[id] ?? 0n,
+                      },
+                  ]
+                : acc,
+        [] as GetTokensResult
+    );
+}
+
+const MAX_SYMBOL_LENGTH = 10;
+
+export const trunctateSymbol = (symbol: string): string =>
+    symbol.length > MAX_SYMBOL_LENGTH ? `${symbol.substring(0, MAX_SYMBOL_LENGTH)}...` : symbol;
+
+export const ownsOne = (balance: bigint, decimals: number) => balance === BigInt(10 ** decimals);
