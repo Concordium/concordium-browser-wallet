@@ -87,7 +87,6 @@ export class WalletConnectConnector implements WalletConnector {
         this.client.on('session_event', ({ topic, params: { chainId, event }, id }) => {
             // Handle session events, such as "chainChanged", "accountsChanged", etc.
             // eslint-disable-next-line no-console
-            // eslint-disable-next-line no-console
             console.debug('Wallet Connect event: session_event', { topic, id, chainId, event });
             switch (event.name) {
                 case 'chanChanged':

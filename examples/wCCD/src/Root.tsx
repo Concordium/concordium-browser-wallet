@@ -8,8 +8,8 @@ import WCCD from './wCCD';
 export default function Root() {
     return (
         <div>
-            <script src="../../node_modules/@concordium/web-sdk/lib/concordium.min.js"/>
-            <script src="../../packages/browser-wallet-api-helpers/lib/concordiumHelpers.min.js"/>
+            <script src="../../node_modules/@concordium/web-sdk/lib/concordium.min.js" />
+            <script src="../../packages/browser-wallet-api-helpers/lib/concordiumHelpers.min.js" />
             <main className="wccd">
                 <WCCD />
             </main>
