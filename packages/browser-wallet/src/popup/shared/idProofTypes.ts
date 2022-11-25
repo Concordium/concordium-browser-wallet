@@ -1,5 +1,44 @@
 import type { AttributeKey, CryptographicParameters, IdentityObjectV1, Network } from '@concordium/web-sdk';
 
+export const MIN_DATE = '00000101';
+export const MAX_DATE = '99991231';
+export const EU_MEMBERS = [
+    'AT',
+    'BE',
+    'BG',
+    'CY',
+    'CZ',
+    'DK',
+    'EE',
+    'FI',
+    'FR',
+    'DE',
+    'GR',
+    'HU',
+    'IE',
+    'IT',
+    'LV',
+    'LT',
+    'LU',
+    'MT',
+    'NL',
+    'PL',
+    'PT',
+    'RO',
+    'SK',
+    'SI',
+    'ES',
+    'SE',
+    'HR',
+];
+export enum DocTypes {
+    NA = '0',
+    Passport = '1',
+    NationalId = '2',
+    DriversLicense = '3',
+    ImmigrationCard = '4',
+}
+
 export enum StatementTypes {
     RevealAttribute = 'RevealAttribute',
     AttributeInSet = 'AttributeInSet',

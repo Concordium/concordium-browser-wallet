@@ -3,7 +3,15 @@ import React, { useCallback, useContext, useEffect, useState } from 'react';
 import ExternalRequestLayout from '@popup/page-layouts/ExternalRequestLayout';
 import { fullscreenPromptContext } from '@popup/page-layouts/FullscreenPromptLayout';
 import Button from '@popup/shared/Button';
-import { IdStatement, RevealStatement, StatementTypes } from '@popup/shared/idProofTypes';
+import {
+    DocTypes,
+    EU_MEMBERS,
+    IdStatement,
+    MAX_DATE,
+    MIN_DATE,
+    RevealStatement,
+    StatementTypes,
+} from '@popup/shared/idProofTypes';
 import { useAtomValue } from 'jotai';
 import { selectedAccountAtom } from '@popup/store/account';
 import { useTranslation } from 'react-i18next';
@@ -15,25 +23,25 @@ const mock: IdStatement = [
     {
         type: StatementTypes.AttributeInRange,
         attributeTag: 'dob',
-        lower: '00000101',
+        lower: MIN_DATE,
         upper: '19820101',
     },
     {
         type: StatementTypes.AttributeInRange,
         attributeTag: 'idDocExpiresAt',
         lower: '20230601',
-        upper: '30000101',
+        upper: MAX_DATE,
     },
     {
         type: StatementTypes.AttributeInRange,
         attributeTag: 'idDocIssuedAt',
-        lower: '00000101',
+        lower: MIN_DATE,
         upper: '20230101',
     },
     {
         type: StatementTypes.AttributeInSet,
         attributeTag: 'nationality',
-        set: ['DK', 'SE', 'NO', 'FI'],
+        set: EU_MEMBERS,
     },
     {
         type: StatementTypes.AttributeNotInSet,
@@ -43,12 +51,12 @@ const mock: IdStatement = [
     {
         type: StatementTypes.AttributeInSet,
         attributeTag: 'idDocType',
-        set: ['1', '3'],
+        set: [DocTypes.Passport, DocTypes.DriversLicense],
     },
     {
         type: StatementTypes.AttributeNotInSet,
         attributeTag: 'idDocType',
-        set: ['0', '4'],
+        set: [DocTypes.NA, DocTypes.ImmigrationCard],
     },
     {
         type: StatementTypes.AttributeInSet,

@@ -1,6 +1,16 @@
-import { AtomicStatement, RevealStatement, StatementTypes } from '@popup/shared/idProofTypes'; // TODO: get from SDK, remove file after
+/* eslint-disable default-case */
+/* eslint-disable @typescript-eslint/no-explicit-any */
+import {
+    AtomicStatement,
+    EU_MEMBERS,
+    MembershipStatement,
+    NonMembershipStatement,
+    RevealStatement,
+    StatementTypes,
+} from '@popup/shared/idProofTypes'; // TODO: get from SDK, remove file after
 import { ConfirmedIdentity } from '@shared/storage/types';
 import { useTranslation } from 'react-i18next';
+import { formatAttributeValue } from 'wallet-common-helpers';
 
 export type SecretStatement = Exclude<AtomicStatement, RevealStatement>;
 
@@ -26,7 +36,38 @@ export function useStatementHeader(statement: SecretStatement): string {
     }
 }
 
+const isEuCountrySet = (countries: string[]) =>
+    countries.length === EU_MEMBERS.length && countries.every((n) => EU_MEMBERS.includes(n));
+
+const getTextForSet =
+    <T extends (...args: any) => any>(t: T, statement: MembershipStatement | NonMembershipStatement) =>
+    (inSet: Parameters<T>[0], notInSet: Parameters<T>[0], options?: Record<string, string>) =>
+        t(statement.type === StatementTypes.AttributeInSet ? inSet : notInSet, options);
+
 export function useStatementValue(statement: SecretStatement): string {
+    const { t } = useTranslation('idProofRequest', { keyPrefix: 'displayStatement.proofs' });
+
+    if (statement.type === StatementTypes.AttributeInRange) {
+        switch (statement.attributeTag) {
+            case 'dob':
+                // TODO: support ageMin and ageMax
+                return t('ageBetween');
+        }
+    } else {
+        const text = getTextForSet(t, statement as MembershipStatement);
+
+        switch (statement.attributeTag) {
+            case 'nationality':
+                if (isEuCountrySet(statement.set)) {
+                    return text('nationalityEU', 'nationalityNotEU');
+                }
+
+                return text('nationality', 'notNationality', {
+                    n: statement.set.length.toString(),
+                });
+        }
+    }
+
     return statement.attributeTag;
 }
 
@@ -38,39 +79,38 @@ export function useStatementDescription(statement: SecretStatement): string | un
             case 'dob':
                 // TODO: support ageMin and ageMax
                 return t('ageBetween');
-            default:
-                return undefined;
+        }
+    } else {
+        const text = getTextForSet(t, statement);
+
+        switch (statement.attributeTag) {
+            // TODO: map set to readable values
+            case 'countryOfResidence':
+                return text('residence', 'notResidence', {
+                    countryNamesString: statement.set.join(', '),
+                });
+            case 'nationality':
+                if (isEuCountrySet(statement.set)) {
+                    return text('nationalityEU', 'nationalityNotEU');
+                }
+
+                return text('nationality', 'notNationality', {
+                    countryNamesString: statement.set.join(', '),
+                });
+            case 'idDocIssuer':
+                return text('docIssuer', 'notDocIssuer', {
+                    issuerNamesString: statement.set.join(', '),
+                });
+            case 'idDocType':
+                return text('docType', 'notDocType', {
+                    typeNamesString: statement.set
+                        .map((type) => formatAttributeValue(statement.attributeTag, type))
+                        .join(', '),
+                });
         }
     }
 
-    const getTextForSet = <S extends Parameters<typeof t>[0]>(
-        inSet: S,
-        notInSet: S,
-        options?: Record<string, string>
-    ) => t(statement.type === StatementTypes.AttributeInSet ? inSet : notInSet, options);
-
-    switch (statement.attributeTag) {
-        // TODO: map set to readable values
-        case 'countryOfResidence':
-            return getTextForSet('residence', 'notResidence', {
-                countryNamesString: statement.set.join(', '),
-            });
-        case 'nationality':
-            // TODO: support EU/notEU
-            return getTextForSet('nationality', 'notNationality', {
-                countryNamesString: statement.set.join(', '),
-            });
-        case 'idDocIssuer':
-            return getTextForSet('docIssuer', 'notDocIssuer', {
-                issuerNamesString: statement.set.join(', '),
-            });
-        case 'idDocType':
-            return getTextForSet('docType', 'notDocType', {
-                typeNamesString: statement.set.join(', '),
-            });
-        default:
-            return undefined;
-    }
+    return undefined;
 }
 
 export function canProoveStatement(statement: SecretStatement, identity: ConfirmedIdentity) {
