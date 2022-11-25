@@ -1,3 +1,9 @@
 .id-proof-request {
-    display: block;
+    display: flex;
+    flex-direction: column;
+    min-height: 100%;
+
+    &__actions {
+        margin: rem(15px) rem(20px) 0;
+    }
 }

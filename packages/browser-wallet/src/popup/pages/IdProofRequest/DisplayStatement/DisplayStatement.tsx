@@ -4,7 +4,7 @@ import React, { ComponentType, useState } from 'react';
 import { Trans, useTranslation } from 'react-i18next';
 import { ClassName, formatAttributeValue } from 'wallet-common-helpers';
 import { useAtomValue } from 'jotai';
-import { RevealStatement } from '@popup/shared/idProofTypes'; // TODO: get from SDK, remove file after
+import { RevealStatement, StatementTypes } from '@popup/shared/idProofTypes'; // TODO: get from SDK, remove file after
 
 import SecretIcon from '@assets/svg/id-secret.svg';
 import RevealIcon from '@assets/svg/id-reveal.svg';
@@ -183,6 +183,7 @@ function withIdentityFromAccount<PropsWithIdentity extends { identity: Confirmed
 type BaseProps = ClassName & {
     identity: ConfirmedIdentity;
     dappName: string;
+    onInvalid(): void;
 };
 
 type DisplayRevealStatementProps = BaseProps & {
@@ -190,7 +191,7 @@ type DisplayRevealStatementProps = BaseProps & {
 };
 
 export const DisplayRevealStatement = withIdentityFromAccount<DisplayRevealStatementProps>(
-    ({ dappName, statements, identity, className }) => {
+    ({ dappName, statements, identity, className, onInvalid }) => {
         const { t } = useTranslation('idProofRequest', { keyPrefix: 'displayStatement' });
         const getAttributeName = useGetAttributeName();
         const attributes =
@@ -207,6 +208,10 @@ export const DisplayRevealStatement = withIdentityFromAccount<DisplayRevealState
             };
         });
 
+        if (lines.some((l) => !l.isRequirementMet)) {
+            onInvalid();
+        }
+
         return <DisplayStatementView reveal lines={lines} dappName={dappName} header={header} className={className} />;
     }
 );
@@ -217,7 +222,7 @@ type DisplaySecretStatementProps = BaseProps & {
 
 export const DisplaySecretStatement = withIdentityFromAccount(
     // eslint-disable-next-line @typescript-eslint/no-unused-vars
-    ({ dappName, statement, identity, className }: DisplaySecretStatementProps) => {
+    ({ dappName, statement, identity, className, onInvalid }: DisplaySecretStatementProps) => {
         const header = useStatementHeader(statement);
         const description = useStatementDescription(statement);
         const getAttributeName = useGetAttributeName();
@@ -226,9 +231,13 @@ export const DisplaySecretStatement = withIdentityFromAccount(
             {
                 attribute: getAttributeName(statement.attributeTag),
                 value: 'value', // TODO: depending on attribute type
-                isRequirementMet: true, // TODO local match on identity
+                isRequirementMet: statement.type === StatementTypes.AttributeInSet, // TODO local match on identity
             },
         ];
+
+        if (lines.some((l) => !l.isRequirementMet)) {
+            onInvalid();
+        }
 
         return (
             <DisplayStatementView

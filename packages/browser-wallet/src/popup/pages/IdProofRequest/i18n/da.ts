@@ -1,6 +1,9 @@
 import en from './en';
 
 const da: typeof en = {
+    header: '{{dappName}} anmoder om følgende information om dig:',
+    accept: 'Godkend',
+    reject: 'Afvis',
     displayStatement: {
         requirementsMet: 'Du opfylder kravet',
         requirementsNotMet: 'Du opfylder ikke kravet',
