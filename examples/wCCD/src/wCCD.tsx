@@ -17,6 +17,7 @@ import {
     VIEW_FUNCTION_RAW_SCHEMA,
     BALANCEOF_FUNCTION_RAW_SCHEMA,
     TESTNET,
+    WALLET_CONNECT_PROJECT_ID,
 } from './constants';
 
 import ArrowIcon from './assets/Arrow.svg';
@@ -152,7 +153,20 @@ export default function wCCD() {
                     BrowserWalletConnector.create().then(setConnector).catch(console.error);
                     break;
                 case 'WalletConnect':
-                    WalletConnectConnector.create(network).then(setConnector).catch(console.error);
+                    WalletConnectConnector.create(
+                        {
+                            projectId: WALLET_CONNECT_PROJECT_ID,
+                            metadata: {
+                                name: 'wCCD',
+                                description: 'Example dApp for the wCCD token.',
+                                url: '#',
+                                icons: ['https://walletconnect.com/walletconnect-logo.png'],
+                            },
+                        },
+                        network
+                    )
+                        .then(setConnector)
+                        .catch(console.error);
                     break;
                 default:
                     throw new Error(`invalid connector type '${connectorType}'`);

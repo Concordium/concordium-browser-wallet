@@ -1,10 +1,39 @@
-import { JsonRpcClient } from '@concordium/web-sdk';
+import {
+    AccountTransactionPayload,
+    AccountTransactionSignature,
+    AccountTransactionType,
+    InitContractPayload,
+    JsonRpcClient,
+    SchemaVersion,
+    UpdateContractPayload,
+} from '@concordium/web-sdk';
+
+// Copied from 'wallet-api-types.ts'.
+type SendTransactionPayload =
+    | Exclude<AccountTransactionPayload, UpdateContractPayload | InitContractPayload>
+    | Omit<UpdateContractPayload, 'message'>
+    | Omit<InitContractPayload, 'param'>;
 
 export interface WalletConnection {
-    // Must be in connection as the browser wallet's client won't work until there is a connection.
+    // Should not be in 'WalletConnector' as the browser wallet's client doesn't work until there is a connection.
     getJsonRpcClient(): JsonRpcClient;
 
-    signAndSendTransaction(): Promise<string>;
+    signAndSendTransaction(
+        accountAddress: string,
+        type: AccountTransactionType.Update | AccountTransactionType.InitContract,
+        payload: SendTransactionPayload,
+        parameters: Record<string, unknown>,
+        schema: string,
+        schemaVersion?: SchemaVersion
+    ): Promise<string>;
+
+    signAndSendTransaction(
+        accountAddress: string,
+        type: AccountTransactionType,
+        payload: SendTransactionPayload
+    ): Promise<string>;
+
+    signMessage(accountAddress: string, message: string): Promise<AccountTransactionSignature>;
 
     disconnect(): Promise<void>;
 }

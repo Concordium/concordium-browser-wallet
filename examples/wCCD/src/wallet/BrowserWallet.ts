@@ -1,6 +1,12 @@
 // eslint-disable-next-line max-classes-per-file
 import { detectConcordiumProvider, WalletApi } from '@concordium/browser-wallet-api-helpers';
-import { JsonRpcClient } from '@concordium/web-sdk';
+import {
+    AccountTransactionPayload,
+    AccountTransactionSignature,
+    AccountTransactionType,
+    JsonRpcClient,
+    SchemaVersion,
+} from '@concordium/web-sdk';
 import { Events, WalletConnection, WalletConnector } from './WalletConnection';
 
 export class BrowserWalletConnection implements WalletConnection {
@@ -11,16 +17,33 @@ export class BrowserWalletConnection implements WalletConnection {
     }
 
     getJsonRpcClient(): JsonRpcClient {
-        // TODO Fix type conversion hack.
-        return this.client.getJsonRpcClient() as JsonRpcClient;
-    }
-
-    async signAndSendTransaction() {
-        return '';
+        return this.client.getJsonRpcClient();
     }
 
     async disconnect() {
         return undefined;
+    }
+
+    async signAndSendTransaction(
+        accountAddress: string,
+        type: AccountTransactionType,
+        payload: AccountTransactionPayload,
+        parameters?: Record<string, unknown>,
+        schema?: string,
+        schemaVersion?: SchemaVersion
+    ): Promise<string> {
+        if (
+            (type === AccountTransactionType.InitContract || type === AccountTransactionType.Update) &&
+            parameters !== undefined &&
+            schema !== undefined
+        ) {
+            return this.client.sendTransaction(accountAddress, type, payload, parameters, schema, schemaVersion);
+        }
+        return this.client.sendTransaction(accountAddress, type, payload);
+    }
+
+    async signMessage(accountAddress: string, message: string): Promise<AccountTransactionSignature> {
+        return this.client.signMessage(accountAddress, message);
     }
 }
 

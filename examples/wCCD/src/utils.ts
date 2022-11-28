@@ -3,6 +3,7 @@ import { createContext } from 'react';
 import { detectConcordiumProvider } from '@concordium/browser-wallet-api-helpers';
 import { AccountTransactionType, UpdateContractPayload, CcdAmount } from '@concordium/web-sdk';
 import { CONTRACT_NAME, WRAP_FUNCTION_RAW_SCHEMA, UNWRAP_FUNCTION_RAW_SCHEMA } from './constants';
+import { WalletConnection } from "./wallet/WalletConnection";
 
 /**
  * Action for wrapping some CCD to WCCD in the WCCD smart contract instance
@@ -63,7 +64,8 @@ export const wrap = (
  * Action for unwrapping some WCCD to CCD in the WCCD smart contract instance
  */
 
-export const unwrap = (
+export async function unwrap(
+    connection: WalletConnection,
     account: string,
     index: bigint,
     setHash: (x: string) => void,
@@ -71,38 +73,41 @@ export const unwrap = (
     setWaitForUser: (x: boolean) => void,
     subindex = 0n,
     amount = 0
-) => {
+) {
     if (!Number.isInteger(amount) || amount <= 0) {
         setWaitForUser(false);
         return;
     }
 
+    connection.signAndSendTransaction(
+        account,
+        AccountTransactionType.Update,
+        {
+            amount: new CcdAmount(BigInt(0)),
+            address: {
+                index,
+                subindex,
+            },
+            receiveName: `${CONTRACT_NAME}.unwrap`,
+            maxContractExecutionEnergy: 30000n,
+        },
+        {
+            amount: amount.toString(),
+            data: '',
+            owner: {
+                Account: [account],
+            },
+            receiver: {
+                Account: [account],
+            },
+        },
+        UNWRAP_FUNCTION_RAW_SCHEMA
+    )
+
     detectConcordiumProvider()
         .then((provider) => {
             provider
                 .sendTransaction(
-                    account,
-                    AccountTransactionType.Update,
-                    {
-                        amount: new CcdAmount(BigInt(0)),
-                        address: {
-                            index,
-                            subindex,
-                        },
-                        receiveName: `${CONTRACT_NAME}.unwrap`,
-                        maxContractExecutionEnergy: 30000n,
-                    },
-                    {
-                        amount: amount.toString(),
-                        data: '',
-                        owner: {
-                            Account: [account],
-                        },
-                        receiver: {
-                            Account: [account],
-                        },
-                    },
-                    UNWRAP_FUNCTION_RAW_SCHEMA
                 )
                 .then((txHash) => {
                     setHash(txHash);

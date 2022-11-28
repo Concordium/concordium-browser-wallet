@@ -1,10 +1,20 @@
 // eslint-disable-next-line max-classes-per-file
 import SignClient from '@walletconnect/sign-client';
 import QRCodeModal from '@walletconnect/qrcode-modal';
-import { SessionTypes } from '@walletconnect/types';
-import { HttpProvider, JsonRpcClient } from '@concordium/web-sdk';
+import { SessionTypes, SignClientTypes } from '@walletconnect/types';
+import {
+    AccountTransactionPayload,
+    AccountTransactionType,
+    CcdAmount,
+    HttpProvider, InitContractPayload,
+    JsonRpcClient,
+    SchemaVersion, serializeInitContractParameters, serializeUpdateContractParameters,
+    toBuffer,
+    UpdateContractPayload
+} from "@concordium/web-sdk";
 import { Events, Network, WalletConnection, WalletConnector } from './WalletConnection';
 import { WALLET_CONNECT_PROJECT_ID } from '../constants';
+import { serializeParameters } from "@concordium/common-sdk/lib/serializationHelpers";
 
 const WALLET_CONNECT_SESSION_NAMESPACE = 'ccd';
 
@@ -36,16 +46,32 @@ async function connect(client: SignClient, chainId: string, setModalOpen: (val: 
     }
 }
 
+interface SignAndSendTransactionResult {
+    hash: string;
+}
+
+interface SignAndSendTransactionError {
+    code: number;
+    message: string;
+}
+
+function isSignAndSendTransactionError(obj: any): obj is SignAndSendTransactionError {
+    return 'code' in obj && 'message' in obj;
+}
+
 export class WalletConnectConnection implements WalletConnection {
     readonly client: SignClient;
 
     readonly rpcClient: JsonRpcClient;
 
+    readonly chainId: string;
+
     readonly session: SessionTypes.Struct;
 
-    constructor(client: SignClient, rpcClient: JsonRpcClient, sessionNamespace: string, session: SessionTypes.Struct) {
+    constructor(client: SignClient, rpcClient: JsonRpcClient, chainId: string, session: SessionTypes.Struct) {
         this.client = client;
         this.rpcClient = rpcClient;
+        this.chainId = chainId;
         this.session = session;
     }
 
@@ -53,9 +79,80 @@ export class WalletConnectConnection implements WalletConnection {
         return this.rpcClient;
     }
 
-    async signAndSendTransaction() {
-        throw new Error('not yet implemented');
-        return '';
+    private accountTransactionPayloadToJson(data: AccountTransactionPayload) {
+        return JSON.stringify(data, (key, value) => {
+            if (value instanceof CcdAmount) {
+                return value.microCcdAmount.toString();
+            }
+            if (value?.type === 'Buffer') {
+                // Buffer has already been transformed by its 'toJSON' method.
+                return toBuffer(value.data).toString('hex');
+            }
+            if (typeof value === 'bigint') {
+                return Number(value);
+            }
+            return value;
+        });
+    }
+
+    async signAndSendTransaction(
+        accountAddress: string,
+        type: AccountTransactionType,
+        payload: AccountTransactionPayload,
+        parameters?: Record<string, unknown>,
+        schema?: string,
+        schemaVersion?: SchemaVersion
+    ) {
+        const params = {
+            type,
+            sender: accountAddress,
+            payload,
+            schema,
+        };
+        if (type === AccountTransactionType.InitContract && parameters !== undefined && schema !== undefined) {
+            // Encode parameters.
+            const initContractPayload = payload as InitContractPayload;
+            params.payload = {
+                ...payload,
+                message: serializeInitContractParameters(
+                    initContractPayload.initName,
+                    parameters,
+                    toBuffer(schema, 'base64'),
+                    schemaVersion
+                ),
+            };
+        }
+        if (type === AccountTransactionType.Update && parameters !== undefined && schema !== undefined) {
+            // Encode parameters.
+            const updateContractPayload = payload as UpdateContractPayload;
+            const [contractName, receiveName] = updateContractPayload.receiveName.split('.');
+            params.payload = {
+                ...payload,
+                message: serializeUpdateContractParameters(
+                    contractName,
+                    receiveName,
+                    parameters,
+                    toBuffer(schema, 'base64'),
+                    schemaVersion
+                ),
+            };
+        }
+        try {
+            const { hash } = (await this.client.request({
+                topic: this.session.topic,
+                request: {
+                    method: 'sign_and_send_transaction',
+                    params,
+                },
+                chainId: this.chainId,
+            })) as SignAndSendTransactionResult;
+            return hash;
+        } catch (e) {
+            if (isSignAndSendTransactionError(e) && e.code === 500) {
+                throw new Error('transaction rejected in wallet');
+            }
+            throw e;
+        }
     }
 
     async disconnect() {
@@ -86,30 +183,23 @@ export class WalletConnectConnector implements WalletConnector {
         this.network = network;
     }
 
-    static async create(network: Network) {
-        const client = await SignClient.init({
-            projectId: WALLET_CONNECT_PROJECT_ID,
-            metadata: {
-                name: 'wCCD',
-                description: 'Example dApp for the wCCD token.',
-                url: '#',
-                icons: ['https://walletconnect.com/walletconnect-logo.png'],
-            },
-        });
+    static async create(signClientInitOpts: SignClientTypes.Options, network: Network) {
+        const client = await SignClient.init(signClientInitOpts);
         return new WalletConnectConnector(client, network);
     }
 
     async connect(events: Events) {
-        const session = await connect(this.client, `${WALLET_CONNECT_SESSION_NAMESPACE}:${this.network.name}`, (v) => {
+        const chainId = `${WALLET_CONNECT_SESSION_NAMESPACE}:${this.network.name}`;
+        const session = await connect(this.client, chainId, (v) => {
             this.isModalOpen = v;
         });
         events.onAccountChanged(resolveAccount(session));
 
         // Register event handlers (from official docs).
-        this.client.on('session_event', ({ topic, params: { chainId, event }, id }) => {
+        this.client.on('session_event', ({ topic, params: { chainId: cid, event }, id }) => {
             // Handle session events, such as "chainChanged", "accountsChanged", etc.
             // eslint-disable-next-line no-console
-            console.debug('Wallet Connect event: session_event', { topic, id, chainId, event });
+            console.debug('Wallet Connect event: session_event', { topic, id, chainId: cid, event });
             switch (event.name) {
                 case 'chanChanged':
                     events.onChainChanged(event.data); // TODO implement correctly
@@ -138,6 +228,6 @@ export class WalletConnectConnector implements WalletConnector {
         });
 
         const rpcClient = new JsonRpcClient(new HttpProvider(this.network.jsonRpcUrl));
-        return new WalletConnectConnection(this.client, rpcClient, WALLET_CONNECT_SESSION_NAMESPACE, session);
+        return new WalletConnectConnection(this.client, rpcClient, chainId, session);
     }
 }
