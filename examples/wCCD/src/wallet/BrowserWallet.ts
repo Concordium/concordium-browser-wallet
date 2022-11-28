@@ -3,8 +3,6 @@ import { detectConcordiumProvider, WalletApi } from '@concordium/browser-wallet-
 import { JsonRpcClient } from '@concordium/web-sdk';
 import { Events, WalletConnection, WalletConnector } from './WalletConnection';
 
-export const WALLET_CONNECT_SESSION_NAMESPACE = 'ccd';
-
 export class BrowserWalletConnection implements WalletConnection {
     readonly client: WalletApi;
 

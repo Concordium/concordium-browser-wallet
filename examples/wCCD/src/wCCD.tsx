@@ -23,6 +23,7 @@ import ArrowIcon from './assets/Arrow.svg';
 import RefreshIcon from './assets/Refresh.svg';
 import { WalletConnection, WalletConnector, withJsonRpcClient } from './wallet/WalletConnection';
 import { BrowserWalletConnector } from './wallet/BrowserWallet';
+import { WalletConnectConnector } from './wallet/WalletConnect';
 
 const blackCardStyle = {
     backgroundColor: 'black',
@@ -69,6 +70,16 @@ const InputFieldStyle = {
     margin: '7px 0px 7px 0px',
     padding: '10px 20px',
 };
+
+function connectorTypeStyle(selected: boolean) {
+    // eslint-disable-next-line @typescript-eslint/no-explicit-any
+    const style = { ...ButtonStyle, width: '50%' } as any;
+    if (selected) {
+        style.backgroundColor = '#174039';
+        style.border = '1px solid #0c221f';
+    }
+    return style;
+}
 
 async function viewAdmin(rpcClient: JsonRpcClient, setAdmin: (x: string) => void) {
     const res = await rpcClient.invokeContract({
@@ -123,19 +134,37 @@ async function updateWCCDBalanceAccount(
     setAmountAccount(BigInt(leb.decodeULEB128(toBuffer(res.returnValue.slice(4), 'hex'))[0]));
 }
 
-export default function wCCD() {
-    const [connector, setConnector] = useState<WalletConnector>();
-    useEffect(() => {
-        BrowserWalletConnector.create().then(setConnector).catch(console.error);
-    }, []);
+const network = TESTNET;
 
+type ConnectorType = 'BrowserWallet' | 'WalletConnect';
+
+export default function wCCD() {
+    const [connectorType, setConnectorType] = useState<ConnectorType>();
+    const [connector, setConnector] = useState<WalletConnector>();
     const [walletConnection, setWalletConnection] = useState<WalletConnection>();
-    const [waitForUser, setWaitForUser] = useState<boolean>(false);
+    useEffect(() => {
+        if (walletConnection) {
+            walletConnection.disconnect().catch(console.error);
+        }
+        if (connectorType) {
+            switch (connectorType) {
+                case 'BrowserWallet':
+                    BrowserWalletConnector.create().then(setConnector).catch(console.error);
+                    break;
+                case 'WalletConnect':
+                    WalletConnectConnector.create(network).then(setConnector).catch(console.error);
+                    break;
+                default:
+                    throw new Error(`invalid connector type '${connectorType}'`);
+            }
+        }
+    }, [connectorType]);
+
+    const [waitingForUser, setWaitingForUser] = useState<boolean>(false);
     const [connectedAccount, setConnectedAccount] = useState<string>();
-    const network = TESTNET;
-    const handleOnClick = useCallback(() => {
+    const connectWallet = useCallback(() => {
         if (connector) {
-            setWaitForUser(true);
+            setWaitingForUser(true);
             connector
                 .connect({
                     onAccountChanged(address: string | undefined) {
@@ -147,7 +176,7 @@ export default function wCCD() {
                         if (genesisHash !== network.genesisHash) {
                             // eslint-disable-next-line no-alert
                             window.alert(
-                                `Unexpected genesis hash ${genesisHash}. Expected ${network.genesisHash} (network "${network.name}").`
+                                `Unexpected genesis hash '${genesisHash}'. Expected ${network.genesisHash} (network "${network.name}").`
                             );
                             this.onDisconnect();
                         }
@@ -159,7 +188,8 @@ export default function wCCD() {
                     },
                 })
                 .then(setWalletConnection)
-                .finally(() => setWaitForUser(false));
+                .catch(console.error)
+                .finally(() => setWaitingForUser(false));
         }
     }, [connector]);
 
@@ -196,17 +226,34 @@ export default function wCCD() {
             <h3>Wrap and unwrap your CCDs and wCCDs on the Concordium Testnet</h3>
             <div style={blackCardStyle}>
                 <div>
-                    {!walletConnection && waitForUser && (
+                    <button
+                        style={connectorTypeStyle(connectorType === 'BrowserWallet')}
+                        type="button"
+                        onClick={() => setConnectorType('BrowserWallet')}
+                    >
+                        Use Browser Wallet
+                    </button>
+                    <button
+                        style={connectorTypeStyle(connectorType === 'WalletConnect')}
+                        type="button"
+                        onClick={() => setConnectorType('WalletConnect')}
+                    >
+                        Use Wallet Connect
+                    </button>
+                </div>
+                <div>
+                    {!walletConnection && waitingForUser && (
                         <button style={ButtonStyleDisabled} type="button" disabled>
                             Waiting for user
                         </button>
                     )}
-                    {!walletConnection && !waitForUser && (
-                        <button style={ButtonStyle} type="button" onClick={handleOnClick}>
-                            Connect Wallet
+                    {!walletConnection && !waitingForUser && connectorType && (
+                        <button style={ButtonStyle} type="button" onClick={connectWallet}>
+                            {connectorType === 'BrowserWallet' && 'Connect Browser Wallet'}
+                            {connectorType === 'WalletConnect' && 'Connect Mobile Wallet'}
                         </button>
                     )}
-                    {walletConnection && (
+                    {connectedAccount && (
                         <>
                             <div className="text">Connected to</div>
                             <button
@@ -220,26 +267,33 @@ export default function wCCD() {
                                     );
                                 }}
                             >
-                                {connectedAccount}{' '}
+                                {connectedAccount}
                             </button>
+                            <div className="text">wCCD Balance of connected account</div>
+                            <div className="containerSpaceBetween">
+                                <div className="largeText">
+                                    {amountAccount === undefined ? <i>N/A</i> : Number(amountAccount) / 1000000}
+                                </div>
+                                <button className="buttonInvisible" type="button" onClick={() => setFlipped(!flipped)}>
+                                    {flipped ? (
+                                        <RefreshIcon
+                                            style={{ transform: 'rotate(90deg)' }}
+                                            height="20px"
+                                            width="20px"
+                                        />
+                                    ) : (
+                                        <RefreshIcon height="20px" width="20px" />
+                                    )}
+                                </button>
+                            </div>
                         </>
                     )}
+                    {!connectedAccount && (
+                        <div className="text">
+                            <i>Please connect a wallet.</i>
+                        </div>
+                    )}
                 </div>
-                <br />
-                <div className="text">wCCD Balance of connected account</div>
-                <div className="containerSpaceBetween">
-                    <div className="largeText">
-                        {amountAccount === undefined ? <i>N/A</i> : Number(amountAccount) / 1000000}
-                    </div>
-                    <button className="buttonInvisible" type="button" onClick={() => setFlipped(!flipped)}>
-                        {flipped ? (
-                            <RefreshIcon style={{ transform: 'rotate(90deg)' }} height="20px" width="20px" />
-                        ) : (
-                            <RefreshIcon height="20px" width="20px" />
-                        )}
-                    </button>
-                </div>
-                <br />
                 <div className="containerSwitch">
                     <div className="largeText">CCD &nbsp; &nbsp; </div>
                     <button className="switch" type="button" onClick={() => setIsWrapping(!isWrapping)}>
@@ -267,7 +321,7 @@ export default function wCCD() {
                         placeholder="0.000000"
                         ref={inputValue}
                     />
-                    {waitForUser || !walletConnection ? (
+                    {waitingForUser || !walletConnection ? (
                         <button style={ButtonStyleDisabled} type="button" disabled>
                             Waiting for user
                         </button>
@@ -295,14 +349,14 @@ export default function wCCD() {
                                 if (connectedAccount) {
                                     setHash('');
                                     setError('');
-                                    setWaitForUser(true);
+                                    setWaitingForUser(true);
                                     if (isWrapping) {
                                         wrap(
                                             connectedAccount,
                                             WCCD_CONTRACT_INDEX,
                                             setHash,
                                             setError,
-                                            setWaitForUser,
+                                            setWaitingForUser,
                                             CONTRACT_SUB_INDEX,
                                             amount
                                         );
@@ -312,7 +366,7 @@ export default function wCCD() {
                                             WCCD_CONTRACT_INDEX,
                                             setHash,
                                             setError,
-                                            setWaitForUser,
+                                            setWaitingForUser,
                                             CONTRACT_SUB_INDEX,
                                             amount
                                         );
