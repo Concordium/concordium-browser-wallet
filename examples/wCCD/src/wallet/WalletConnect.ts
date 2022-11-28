@@ -4,17 +4,19 @@ import QRCodeModal from '@walletconnect/qrcode-modal';
 import { SessionTypes, SignClientTypes } from '@walletconnect/types';
 import {
     AccountTransactionPayload,
+    AccountTransactionSignature,
     AccountTransactionType,
     CcdAmount,
-    HttpProvider, InitContractPayload,
+    HttpProvider,
+    InitContractPayload,
     JsonRpcClient,
-    SchemaVersion, serializeInitContractParameters, serializeUpdateContractParameters,
+    SchemaVersion,
+    serializeInitContractParameters,
+    serializeUpdateContractParameters,
     toBuffer,
-    UpdateContractPayload
-} from "@concordium/web-sdk";
+    UpdateContractPayload,
+} from '@concordium/web-sdk';
 import { Events, Network, WalletConnection, WalletConnector } from './WalletConnection';
-import { WALLET_CONNECT_PROJECT_ID } from '../constants';
-import { serializeParameters } from "@concordium/common-sdk/lib/serializationHelpers";
 
 const WALLET_CONNECT_SESSION_NAMESPACE = 'ccd';
 
@@ -55,8 +57,25 @@ interface SignAndSendTransactionError {
     message: string;
 }
 
+// eslint-disable-next-line @typescript-eslint/no-explicit-any
 function isSignAndSendTransactionError(obj: any): obj is SignAndSendTransactionError {
     return 'code' in obj && 'message' in obj;
+}
+
+function accountTransactionPayloadToJson(data: AccountTransactionPayload) {
+    return JSON.stringify(data, (key, value) => {
+        if (value instanceof CcdAmount) {
+            return value.microCcdAmount.toString();
+        }
+        if (value?.type === 'Buffer') {
+            // Buffer has already been transformed by its 'toJSON' method.
+            return toBuffer(value.data).toString('hex');
+        }
+        if (typeof value === 'bigint') {
+            return Number(value);
+        }
+        return value;
+    });
 }
 
 export class WalletConnectConnection implements WalletConnection {
@@ -79,22 +98,6 @@ export class WalletConnectConnection implements WalletConnection {
         return this.rpcClient;
     }
 
-    private accountTransactionPayloadToJson(data: AccountTransactionPayload) {
-        return JSON.stringify(data, (key, value) => {
-            if (value instanceof CcdAmount) {
-                return value.microCcdAmount.toString();
-            }
-            if (value?.type === 'Buffer') {
-                // Buffer has already been transformed by its 'toJSON' method.
-                return toBuffer(value.data).toString('hex');
-            }
-            if (typeof value === 'bigint') {
-                return Number(value);
-            }
-            return value;
-        });
-    }
-
     async signAndSendTransaction(
         accountAddress: string,
         type: AccountTransactionType,
@@ -103,18 +106,22 @@ export class WalletConnectConnection implements WalletConnection {
         schema?: string,
         schemaVersion?: SchemaVersion
     ) {
-        const params = {
-            type,
-            sender: accountAddress,
-            payload,
-            schema,
-        };
-        if (type === AccountTransactionType.InitContract && parameters !== undefined && schema !== undefined) {
-            // Encode parameters.
+        if (type === AccountTransactionType.InitContract) {
+            if (parameters === undefined) {
+                throw new Error(`parameters provided for 'InitContract' transaction must be not undefined`);
+            }
+            if (schema === undefined) {
+                throw new Error(`schema provided for 'InitContract' transaction must be not undefined`);
+            }
+            // Encode parameters into 'payload.param' which must be not already present.
             const initContractPayload = payload as InitContractPayload;
-            params.payload = {
+            if (initContractPayload.param !== undefined) {
+                throw new Error(`'param' field of 'InitContract' parameters must be undefined`);
+            }
+            // eslint-disable-next-line no-param-reassign
+            payload = {
                 ...payload,
-                message: serializeInitContractParameters(
+                param: serializeInitContractParameters(
                     initContractPayload.initName,
                     parameters,
                     toBuffer(schema, 'base64'),
@@ -122,11 +129,21 @@ export class WalletConnectConnection implements WalletConnection {
                 ),
             };
         }
-        if (type === AccountTransactionType.Update && parameters !== undefined && schema !== undefined) {
-            // Encode parameters.
+        if (type === AccountTransactionType.Update) {
+            if (parameters === undefined) {
+                throw new Error(`parameters provided for 'Update' transaction must be not undefined`);
+            }
+            if (schema === undefined) {
+                throw new Error(`schema provided for 'Update' transaction must be not undefined`);
+            }
+            // Encode parameters into 'payload.message' which must be not already present.
             const updateContractPayload = payload as UpdateContractPayload;
+            if (updateContractPayload.message !== undefined) {
+                throw new Error(`'param' field of 'Update' parameters must be undefined`);
+            }
             const [contractName, receiveName] = updateContractPayload.receiveName.split('.');
-            params.payload = {
+            // eslint-disable-next-line no-param-reassign
+            payload = {
                 ...payload,
                 message: serializeUpdateContractParameters(
                     contractName,
@@ -137,6 +154,12 @@ export class WalletConnectConnection implements WalletConnection {
                 ),
             };
         }
+        const params = {
+            type,
+            sender: accountAddress,
+            payload: accountTransactionPayloadToJson(payload),
+            schema,
+        };
         try {
             const { hash } = (await this.client.request({
                 topic: this.session.topic,
@@ -153,6 +176,10 @@ export class WalletConnectConnection implements WalletConnection {
             }
             throw e;
         }
+    }
+
+    signMessage(accountAddress: string, message: string): Promise<AccountTransactionSignature> {
+        throw new Error('not yet implemented');
     }
 
     async disconnect() {
