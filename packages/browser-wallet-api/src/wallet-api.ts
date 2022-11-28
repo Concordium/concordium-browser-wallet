@@ -18,7 +18,7 @@ import { WalletApi as IWalletApi, EventType } from '@concordium/browser-wallet-a
 import EventEmitter from 'events';
 import type { JsonRpcRequest } from '@concordium/common-sdk/lib/providers/provider';
 import JSONBig from 'json-bigint';
-import { IdProof } from '@concordium/common-sdk';
+import { IdProof, IdStatement } from '@concordium/common-sdk';
 import { stringify } from './util';
 
 type JsonRpcCallResponse =

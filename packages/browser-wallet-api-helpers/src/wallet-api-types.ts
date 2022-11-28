@@ -104,6 +104,12 @@ interface MainWalletApi {
         contractSubindex?: bigint
     ): Promise<string[]>;
 
+    /**
+     * Request that the user provides a proof for the given statement.
+     * @param accountAddress the address of the account that should prove the statement.
+     * @param statement the id statement that should be proven.
+     * @param challenge bytes chosen by the verifier.
+     */
     requestIdProof(accountAddress: string, statement: IdStatement, challenge: string): Promise<IdProof>;
 }
 

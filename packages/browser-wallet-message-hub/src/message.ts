@@ -34,6 +34,7 @@ export enum InternalMessageType {
     RecoveryFinished = 'I_RecoveryFinished',
     AddTokens = 'I_AddTokens',
     IdProof = 'I_IdProof',
+    CreateIdProof = 'I_CreateIdProof',
 }
 
 // eslint-disable-next-line @typescript-eslint/no-explicit-any

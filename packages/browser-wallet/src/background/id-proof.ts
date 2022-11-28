@@ -1,0 +1,34 @@
+import { getIdProof, IdProofInput, verifyIdstatement } from '@concordium/web-sdk';
+import { BackgroundResponseStatus, IdProofBackgroundResponse } from '@shared/utils/types';
+import { ExtensionMessageHandler, MessageStatusWrapper } from '@concordium/browser-wallet-message-hub';
+import { RunCondition } from './window-management';
+
+async function createIdProof(input: IdProofInput): Promise<IdProofBackgroundResponse> {
+    const proof = getIdProof(input);
+    return {
+        status: BackgroundResponseStatus.Success,
+        proof,
+    };
+}
+
+export const createIdProofHandler: ExtensionMessageHandler = (msg, _sender, respond) => {
+    createIdProof(msg.payload)
+        .then(respond)
+        .catch((e) => respond({ status: BackgroundResponseStatus.Error, error: e.toString() }));
+    return true;
+};
+
+/**
+ * Run condition which looks up URL in connected sites for the provided account. Runs handler if URL is included in connected sites.
+ */
+export const runIfValidProof: RunCondition<MessageStatusWrapper<undefined>> = async (msg) => {
+    try {
+        verifyIdstatement(msg.payload.statement);
+        return { run: true };
+    } catch (e) {
+        return {
+            run: false,
+            response: { success: false, message: `Id statement is not well-formed: ${(e as Error).message}` },
+        };
+    }
+};

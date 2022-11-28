@@ -1,9 +1,10 @@
 import React, { useCallback, useContext, useEffect } from 'react';
-
+import { InternalMessageType } from '@concordium/browser-wallet-message-hub';
+import { popupMessageHandler } from '@popup/shared/message-handler';
 import ExternalRequestLayout from '@popup/page-layouts/ExternalRequestLayout';
 import { fullscreenPromptContext } from '@popup/page-layouts/FullscreenPromptLayout';
 import Button from '@popup/shared/Button';
-import { getIdProof, IdStatement } from '@concordium/web-sdk';
+import { IdStatement } from '@concordium/web-sdk';
 import { useLocation } from 'react-router-dom';
 import { useAtomValue, useSetAtom } from 'jotai';
 import { selectedIdentityAtom } from '@popup/store/identity';
@@ -39,29 +40,37 @@ export default function IdProofRequest({ onReject, onSubmit }: Props) {
     const network = useAtomValue(networkConfigurationAtom);
     const client = useAtomValue(jsonRpcClientAtom);
     const addToast = useSetAtom(addToastAtom);
-    const seedPhrase = useDecryptedSeedPhrase((e) => addToast(e.message));
+    const recoveryPhrase = useDecryptedSeedPhrase((e) => addToast(e.message));
 
     const handleSubmit = useCallback(async () => {
-        const global = await getGlobal(client);
+        if (!recoveryPhrase) {
+            throw new Error('Missing recovery phrase');
+        }
+        if (!network) {
+            throw new Error('Network is not specified');
+        }
 
         if (!credential) {
             throw new Error('no crd');
         }
-        if (!seedPhrase) {
+        if (!recoveryPhrase) {
             throw new Error('no seed phrase');
         }
-        return getIdProof({
+
+        const global = await getGlobal(client);
+
+        return popupMessageHandler.sendInternalMessage(InternalMessageType.CreateIdProof, {
             identityIndex: credential.identityIndex,
             identityProviderIndex: credential.providerIndex,
             credNumber: credential.credNumber,
             idObject: (identity as ConfirmedIdentity).idObject.value,
-            seedAsHex: seedPhrase,
+            seedAsHex: recoveryPhrase,
             net: getNet(network),
             globalContext: global,
             statement,
             challenge,
         });
-    }, [credential, identity, seedPhrase, network]);
+    }, [credential, identity, recoveryPhrase, network]);
 
     useEffect(() => onClose(onReject), [onClose, onReject]);
 
