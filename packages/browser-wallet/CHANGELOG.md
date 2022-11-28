@@ -1,5 +1,11 @@
 # Changelog
 
+## 0.8.5
+
+### Fixed
+
+-   Blank prompt when requesting an `initContract` transaction with parameters.
+
 ## 0.8.4
 
 ### Fixed
