@@ -4,7 +4,6 @@ import QRCodeModal from '@walletconnect/qrcode-modal';
 import { SessionTypes, SignClientTypes } from '@walletconnect/types';
 import {
     AccountTransactionPayload,
-    AccountTransactionSignature,
     AccountTransactionType,
     CcdAmount,
     HttpProvider,
@@ -209,8 +208,17 @@ export class WalletConnectConnection implements WalletConnection {
         }
     }
 
-    signMessage(accountAddress: string, message: string): Promise<AccountTransactionSignature> {
-        throw new Error('not yet implemented');
+    async signMessage(accountAddress: string, message: string) {
+        const params = { message };
+        const signature = await this.client.request({
+            topic: this.session.topic,
+            request: {
+                method: 'sign_message',
+                params,
+            },
+            chainId: this.chainId,
+        });
+        return JSON.stringify(signature);
     }
 
     async disconnect() {
