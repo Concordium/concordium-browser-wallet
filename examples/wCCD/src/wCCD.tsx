@@ -220,7 +220,7 @@ export default function wCCD() {
     const [isWrapping, setIsWrapping] = useState<boolean>(true);
     const [hash, setHash] = useState<string>('');
     const [error, setError] = useState<string>('');
-    const [flipped, setFlipped] = useState<boolean>(false);
+    const [isFlipped, setIsFlipped] = useState<boolean>(false);
     const [amountAccount, setAmountAccount] = useState<bigint>();
     const inputValue = useRef<HTMLInputElement>(null);
 
@@ -232,7 +232,7 @@ export default function wCCD() {
         } else {
             setAmountAccount(undefined);
         }
-    }, [walletConnection, connectedAccount, flipped]);
+    }, [walletConnection, connectedAccount, isFlipped]);
 
     return (
         <>
@@ -288,8 +288,12 @@ export default function wCCD() {
                                 <div className="largeText">
                                     {amountAccount === undefined ? <i>N/A</i> : Number(amountAccount) / 1000000}
                                 </div>
-                                <button className="buttonInvisible" type="button" onClick={() => setFlipped(!flipped)}>
-                                    {flipped ? (
+                                <button
+                                    className="buttonInvisible"
+                                    type="button"
+                                    onClick={() => setIsFlipped(!isFlipped)}
+                                >
+                                    {isFlipped ? (
                                         <RefreshIcon
                                             style={{ transform: 'rotate(90deg)' }}
                                             height="20px"
