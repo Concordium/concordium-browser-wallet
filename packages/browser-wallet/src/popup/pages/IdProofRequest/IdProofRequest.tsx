@@ -14,6 +14,7 @@ import { addToastAtom } from '@popup/state';
 import { useDecryptedSeedPhrase } from '@popup/shared/utils/seed-phrase-helpers';
 import { getGlobal, getNet } from '@shared/utils/network-helpers';
 import { ConfirmedIdentity } from '@shared/storage/types';
+import { BackgroundResponseStatus, IdProofBackgroundResponse } from '@shared/utils/types';
 
 type Props = {
     onSubmit(proof: unknown): void;
@@ -49,27 +50,31 @@ export default function IdProofRequest({ onReject, onSubmit }: Props) {
         if (!network) {
             throw new Error('Network is not specified');
         }
-
         if (!credential) {
-            throw new Error('no crd');
-        }
-        if (!recoveryPhrase) {
-            throw new Error('no seed phrase');
+            throw new Error('Missing credential');
         }
 
         const global = await getGlobal(client);
 
-        return popupMessageHandler.sendInternalMessage(InternalMessageType.CreateIdProof, {
-            identityIndex: credential.identityIndex,
-            identityProviderIndex: credential.providerIndex,
-            credNumber: credential.credNumber,
-            idObject: (identity as ConfirmedIdentity).idObject.value,
-            seedAsHex: recoveryPhrase,
-            net: getNet(network),
-            globalContext: global,
-            statement,
-            challenge,
-        });
+        const idProofResult: IdProofBackgroundResponse = await popupMessageHandler.sendInternalMessage(
+            InternalMessageType.CreateIdProof,
+            {
+                identityIndex: credential.identityIndex,
+                identityProviderIndex: credential.providerIndex,
+                credNumber: credential.credNumber,
+                idObject: (identity as ConfirmedIdentity).idObject.value,
+                seedAsHex: recoveryPhrase,
+                net: getNet(network),
+                globalContext: global,
+                statement,
+                challenge,
+            }
+        );
+
+        if (idProofResult.status !== BackgroundResponseStatus.Success) {
+            throw new Error(idProofResult.reason);
+        }
+        return idProofResult.proof;
     }, [credential, identity, recoveryPhrase, network]);
 
     useEffect(() => onClose(onReject), [onClose, onReject]);

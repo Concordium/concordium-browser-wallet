@@ -184,17 +184,17 @@ class WalletApi extends EventEmitter implements IWalletApi {
     }
 
     public async requestIdProof(accountAddress: string, statement: IdStatement, challenge: string): Promise<IdProof> {
-        const res = await this.messageHandler.sendMessage<IdProof | undefined>(MessageType.IdProof, {
+        const res = await this.messageHandler.sendMessage<MessageStatusWrapper<IdProof>>(MessageType.IdProof, {
             accountAddress,
             statement,
             challenge,
         });
 
-        if (!res) {
-            throw new Error('Proof request rejected');
+        if (!res.success) {
+            throw new Error(res.message);
         }
 
-        return res;
+        return res.result;
     }
 }
 
