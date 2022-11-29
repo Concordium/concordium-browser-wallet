@@ -18,7 +18,7 @@ import { WalletApi as IWalletApi, EventType } from '@concordium/browser-wallet-a
 import EventEmitter from 'events';
 import type { JsonRpcRequest } from '@concordium/common-sdk/lib/providers/provider';
 import JSONBig from 'json-bigint';
-import { IdProof, IdStatement } from '@concordium/common-sdk';
+import { IdProofOutput, IdStatement } from '@concordium/common-sdk';
 import { stringify } from './util';
 
 type JsonRpcCallResponse =
@@ -183,8 +183,12 @@ class WalletApi extends EventEmitter implements IWalletApi {
         return response;
     }
 
-    public async requestIdProof(accountAddress: string, statement: IdStatement, challenge: string): Promise<IdProof> {
-        const res = await this.messageHandler.sendMessage<MessageStatusWrapper<IdProof>>(MessageType.IdProof, {
+    public async requestIdProof(
+        accountAddress: string,
+        statement: IdStatement,
+        challenge: string
+    ): Promise<IdProofOutput> {
+        const res = await this.messageHandler.sendMessage<MessageStatusWrapper<IdProofOutput>>(MessageType.IdProof, {
             accountAddress,
             statement,
             challenge,
