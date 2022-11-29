@@ -1,4 +1,4 @@
-import React, { useCallback, useContext, useEffect } from 'react';
+import React, { useCallback, useContext, useEffect, useState } from 'react';
 import { InternalMessageType } from '@concordium/browser-wallet-message-hub';
 import { popupMessageHandler } from '@popup/shared/message-handler';
 import ExternalRequestLayout from '@popup/page-layouts/ExternalRequestLayout';
@@ -16,6 +16,7 @@ import { getGlobal, getNet } from '@shared/utils/network-helpers';
 import { ConfirmedIdentity } from '@shared/storage/types';
 import { BackgroundResponseStatus, IdProofBackgroundResponse } from '@shared/utils/types';
 import { useTranslation } from 'react-i18next';
+import PendingArrows from '@assets/svg/pending-arrows.svg';
 
 type Props = {
     onSubmit(proof: IdProofOutput): void;
@@ -44,6 +45,7 @@ export default function IdProofRequest({ onReject, onSubmit }: Props) {
     const client = useAtomValue(jsonRpcClientAtom);
     const addToast = useSetAtom(addToastAtom);
     const recoveryPhrase = useDecryptedSeedPhrase((e) => addToast(e.message));
+    const [creatingProof, setCreatingProof] = useState<boolean>(false);
 
     const handleSubmit = useCallback(async () => {
         if (!recoveryPhrase) {
@@ -83,15 +85,21 @@ export default function IdProofRequest({ onReject, onSubmit }: Props) {
 
     return (
         <ExternalRequestLayout>
-            <pre>{JSON.stringify(statement, undefined, 2)}</pre>
+            {creatingProof && <PendingArrows className="loading" />}
+            {!creatingProof && <pre>{JSON.stringify(statement, undefined, 2)}</pre>}
             <br />
             <Button onClick={withClose(onReject)}>reject</Button>
             <Button
-                onClick={() =>
+                disabled={creatingProof}
+                onClick={() => {
+                    setCreatingProof(true);
                     handleSubmit()
                         .then(withClose(onSubmit))
-                        .catch((e) => addToast(t('failedProof', { reason: e.message })))
-                }
+                        .catch((e) => {
+                            setCreatingProof(false);
+                            addToast(t('failedProof', { reason: e.message }));
+                        });
+                }}
             >
                 Submit
             </Button>
