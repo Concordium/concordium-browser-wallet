@@ -80,8 +80,6 @@ function Theme({ children }: { children: ReactElement }) {
 export default function Root() {
     useScaling();
 
-    // <MemoryRouter initialEntries={[absoluteRoutes.prompt.idProof.path]}>
-
     return (
         <Provider>
             <MemoryRouter initialEntries={[absoluteRoutes.home.account.path]}>

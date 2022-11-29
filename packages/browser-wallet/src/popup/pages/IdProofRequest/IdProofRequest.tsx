@@ -4,7 +4,7 @@ import { popupMessageHandler } from '@popup/shared/message-handler';
 import ExternalRequestLayout from '@popup/page-layouts/ExternalRequestLayout';
 import { fullscreenPromptContext } from '@popup/page-layouts/FullscreenPromptLayout';
 import Button from '@popup/shared/Button';
-import { IdStatement } from '@concordium/web-sdk';
+import { IdProofOutput, IdStatement } from '@concordium/web-sdk';
 import { useLocation } from 'react-router-dom';
 import { useAtomValue, useSetAtom } from 'jotai';
 import { selectedIdentityAtom } from '@popup/store/identity';
@@ -15,9 +15,10 @@ import { useDecryptedSeedPhrase } from '@popup/shared/utils/seed-phrase-helpers'
 import { getGlobal, getNet } from '@shared/utils/network-helpers';
 import { ConfirmedIdentity } from '@shared/storage/types';
 import { BackgroundResponseStatus, IdProofBackgroundResponse } from '@shared/utils/types';
+import { useTranslation } from 'react-i18next';
 
 type Props = {
-    onSubmit(proof: unknown): void;
+    onSubmit(proof: IdProofOutput): void;
     onReject(): void;
 };
 
@@ -36,6 +37,7 @@ export default function IdProofRequest({ onReject, onSubmit }: Props) {
     const { state } = useLocation() as Location;
     const { statement, challenge } = state.payload;
     const { onClose, withClose } = useContext(fullscreenPromptContext);
+    const { t } = useTranslation('idProofRequest');
     const identity = useAtomValue(selectedIdentityAtom);
     const credential = useSelectedCredential();
     const network = useAtomValue(networkConfigurationAtom);
@@ -88,7 +90,7 @@ export default function IdProofRequest({ onReject, onSubmit }: Props) {
                 onClick={() =>
                     handleSubmit()
                         .then(withClose(onSubmit))
-                        .catch((e) => addToast(e.message))
+                        .catch((e) => addToast(t('failedProof', { reason: e.message })))
                 }
             >
                 Submit

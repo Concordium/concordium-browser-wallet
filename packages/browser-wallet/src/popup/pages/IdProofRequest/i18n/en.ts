@@ -13,4 +13,5 @@ export default {
             body: 'Secret proofs are a way of proving something to a service or dApp without revealing the exact personal information. One example can be that you prove that you are over 18 years old without revealing your exact date of birth. Another example could be that you live in one of a range of countries without revealing exactly which country you live in.\n\nYou can read more on\n\n developer.concordium.software',
         },
     },
+    failedProof: 'Unable to create proof due to: {{ reason }}',
 };
