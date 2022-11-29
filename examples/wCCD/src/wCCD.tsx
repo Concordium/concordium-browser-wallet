@@ -384,7 +384,7 @@ export default function wCCD() {
                                               amount
                                           );
                                     tx.then(setHash)
-                                        .catch(setError)
+                                        .catch((err) => setError((err as Error).message))
                                         .finally(() => setWaitingForUser(false));
                                 }
                             }}
@@ -396,7 +396,7 @@ export default function wCCD() {
                 <br />
                 <br />
                 <div>Transaction status{hash === '' ? '' : ' (May take a moment to finalize)'}</div>
-                {hash === '' && error !== '' && <div style={{ color: 'red' }}>Transaction rejected by wallet.</div>}
+                {hash === '' && error !== '' && <div style={{ color: 'red' }}>{error}</div>}
                 {hash === '' && error === '' && <div className="loadingText">Waiting for transaction...</div>}
                 {hash !== '' && (
                     <>
