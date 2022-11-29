@@ -368,27 +368,24 @@ export default function wCCD() {
                                     setHash('');
                                     setError('');
                                     setWaitingForUser(true);
-                                    if (isWrapping) {
-                                        wrap(
-                                            connectedAccount,
-                                            WCCD_CONTRACT_INDEX,
-                                            setHash,
-                                            setError,
-                                            setWaitingForUser,
-                                            CONTRACT_SUB_INDEX,
-                                            amount
-                                        );
-                                    } else {
-                                        unwrap(
-                                            connectedAccount,
-                                            WCCD_CONTRACT_INDEX,
-                                            setHash,
-                                            setError,
-                                            setWaitingForUser,
-                                            CONTRACT_SUB_INDEX,
-                                            amount
-                                        );
-                                    }
+                                    const tx = isWrapping
+                                        ? wrap(
+                                              walletConnection,
+                                              connectedAccount,
+                                              WCCD_CONTRACT_INDEX,
+                                              CONTRACT_SUB_INDEX,
+                                              amount
+                                          )
+                                        : unwrap(
+                                              walletConnection,
+                                              connectedAccount,
+                                              WCCD_CONTRACT_INDEX,
+                                              CONTRACT_SUB_INDEX,
+                                              amount
+                                          );
+                                    tx.then(setHash)
+                                        .catch(setError)
+                                        .finally(() => setWaitingForUser(false));
                                 }
                             }}
                         >

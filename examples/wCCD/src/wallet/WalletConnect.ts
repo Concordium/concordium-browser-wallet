@@ -78,6 +78,83 @@ function accountTransactionPayloadToJson(data: AccountTransactionPayload) {
     });
 }
 
+/**
+ * Encode parameters into appropriate payload field ('payload.param' for 'InitContract' and 'payload.message' for 'Update').
+ * The 'parameters' and 'schema' parameters must be not undefined for these transaction types.
+ * The payload field must be not already set as that would indicate that the caller thought that was the right way to pass them.
+ * @param type Type identifier of the transaction.
+ * @param payload Payload of the transaction. Must not include the fields 'param' and 'message' for transaction types 'InitContract' and 'Update', respectively.
+ * @param parameters Contract invocation parameters. Must be provided for 'InitContract' or 'Update' transactions and omitted otherwise.
+ * @param schema Schema for the contract invocation parameters. Must be provided for 'InitContract' or 'Update' transactions and omitted otherwise.
+ * @param schemaVersion Version of the provided schema.
+ */
+function encodePayloadParameters(
+    type: AccountTransactionType,
+    payload: AccountTransactionPayload,
+    parameters?: Record<string, unknown>,
+    schema?: string,
+    schemaVersion?: SchemaVersion
+) {
+    switch (type) {
+        case AccountTransactionType.InitContract: {
+            if (parameters === undefined) {
+                throw new Error(`parameters provided for 'InitContract' transaction must be not undefined`);
+            }
+            if (schema === undefined) {
+                throw new Error(`schema provided for 'InitContract' transaction must be not undefined`);
+            }
+            const initContractPayload = payload as InitContractPayload;
+            if (initContractPayload.param !== undefined) {
+                throw new Error(`'param' field of 'InitContract' parameters must be undefined`);
+            }
+            return {
+                ...payload,
+                param: serializeInitContractParameters(
+                    initContractPayload.initName,
+                    parameters,
+                    toBuffer(schema, 'base64'),
+                    schemaVersion
+                ),
+            };
+        }
+        case AccountTransactionType.Update: {
+            if (parameters === undefined) {
+                throw new Error(`parameters provided for 'Update' transaction must be not undefined`);
+            }
+            if (schema === undefined) {
+                throw new Error(`schema provided for 'Update' transaction must be not undefined`);
+            }
+            const updateContractPayload = payload as UpdateContractPayload;
+            if (updateContractPayload.message !== undefined) {
+                throw new Error(`'param' field of 'Update' parameters must be undefined`);
+            }
+            const [contractName, receiveName] = updateContractPayload.receiveName.split('.');
+            return {
+                ...payload,
+                message: serializeUpdateContractParameters(
+                    contractName,
+                    receiveName,
+                    parameters,
+                    toBuffer(schema, 'base64'),
+                    schemaVersion
+                ),
+            };
+        }
+        default: {
+            if (parameters !== undefined) {
+                throw new Error(`parameters provided for '${type}' transaction must be undefined`);
+            }
+            if (schema !== undefined) {
+                throw new Error(`schema provided for '${type}' transaction must be undefined`);
+            }
+            if (schemaVersion !== undefined) {
+                throw new Error(`schema version provided for '${type}' transaction must be undefined`);
+            }
+            return payload;
+        }
+    }
+}
+
 export class WalletConnectConnection implements WalletConnection {
     readonly client: SignClient;
 
@@ -106,58 +183,12 @@ export class WalletConnectConnection implements WalletConnection {
         schema?: string,
         schemaVersion?: SchemaVersion
     ) {
-        if (type === AccountTransactionType.InitContract) {
-            if (parameters === undefined) {
-                throw new Error(`parameters provided for 'InitContract' transaction must be not undefined`);
-            }
-            if (schema === undefined) {
-                throw new Error(`schema provided for 'InitContract' transaction must be not undefined`);
-            }
-            // Encode parameters into 'payload.param' which must be not already present.
-            const initContractPayload = payload as InitContractPayload;
-            if (initContractPayload.param !== undefined) {
-                throw new Error(`'param' field of 'InitContract' parameters must be undefined`);
-            }
-            // eslint-disable-next-line no-param-reassign
-            payload = {
-                ...payload,
-                param: serializeInitContractParameters(
-                    initContractPayload.initName,
-                    parameters,
-                    toBuffer(schema, 'base64'),
-                    schemaVersion
-                ),
-            };
-        }
-        if (type === AccountTransactionType.Update) {
-            if (parameters === undefined) {
-                throw new Error(`parameters provided for 'Update' transaction must be not undefined`);
-            }
-            if (schema === undefined) {
-                throw new Error(`schema provided for 'Update' transaction must be not undefined`);
-            }
-            // Encode parameters into 'payload.message' which must be not already present.
-            const updateContractPayload = payload as UpdateContractPayload;
-            if (updateContractPayload.message !== undefined) {
-                throw new Error(`'param' field of 'Update' parameters must be undefined`);
-            }
-            const [contractName, receiveName] = updateContractPayload.receiveName.split('.');
-            // eslint-disable-next-line no-param-reassign
-            payload = {
-                ...payload,
-                message: serializeUpdateContractParameters(
-                    contractName,
-                    receiveName,
-                    parameters,
-                    toBuffer(schema, 'base64'),
-                    schemaVersion
-                ),
-            };
-        }
         const params = {
             type,
             sender: accountAddress,
-            payload: accountTransactionPayloadToJson(payload),
+            payload: accountTransactionPayloadToJson(
+                encodePayloadParameters(type, payload, parameters, schema, schemaVersion)
+            ),
             schema,
         };
         try {
