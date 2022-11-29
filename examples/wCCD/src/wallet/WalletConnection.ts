@@ -8,7 +8,7 @@ import {
     UpdateContractPayload,
 } from '@concordium/web-sdk';
 
-// Copied from 'wallet-api-types.ts'.
+// Copied from 'wallet-api-types.ts' in 'browser-wallet-api-helpers' as it isn't exported.
 type SendTransactionPayload =
     | Exclude<AccountTransactionPayload, UpdateContractPayload | InitContractPayload>
     | Omit<UpdateContractPayload, 'message'>
