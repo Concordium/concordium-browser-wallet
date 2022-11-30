@@ -222,7 +222,7 @@ export default function wCCD() {
     const [error, setError] = useState<string>('');
     const [isFlipped, setIsFlipped] = useState<boolean>(false);
     const [amountAccount, setAmountAccount] = useState<bigint>();
-    const inputValue = useRef<HTMLInputElement>(null);
+    const inputValue = useRef<HTMLInputElement | null>(null);
 
     useEffect(() => {
         if (walletConnection && connectedAccount) {
@@ -364,7 +364,7 @@ export default function wCCD() {
                                 // Amount needs to be in WEI
                                 const amount = round(multiply(input, 1000000));
 
-                                if (connectedAccount) {
+                                if (walletConnection && connectedAccount) {
                                     setHash('');
                                     setError('');
                                     setWaitingForUser(true);

@@ -4,8 +4,8 @@ import QRCodeModal from '@walletconnect/qrcode-modal';
 import { SessionTypes, SignClientTypes } from '@walletconnect/types';
 import {
     AccountTransactionPayload,
+    AccountTransactionSignature,
     AccountTransactionType,
-    CcdAmount,
     HttpProvider,
     InitContractPayload,
     JsonRpcClient,
@@ -63,9 +63,6 @@ function isSignAndSendTransactionError(obj: any): obj is SignAndSendTransactionE
 
 function accountTransactionPayloadToJson(data: AccountTransactionPayload) {
     return JSON.stringify(data, (key, value) => {
-        if (value instanceof CcdAmount) {
-            return value.microCcdAmount.toString();
-        }
         if (value?.type === 'Buffer') {
             // Buffer has already been transformed by its 'toJSON' method.
             return toBuffer(value.data).toString('hex');
@@ -103,8 +100,8 @@ function encodePayloadParameters(
                 throw new Error(`schema provided for 'InitContract' transaction must be not undefined`);
             }
             const initContractPayload = payload as InitContractPayload;
-            if (initContractPayload.param !== undefined) {
-                throw new Error(`'param' field of 'InitContract' parameters must be undefined`);
+            if (initContractPayload.param) {
+                throw new Error(`'param' field of 'InitContract' parameters must be empty`);
             }
             return {
                 ...payload,
@@ -114,7 +111,7 @@ function encodePayloadParameters(
                     toBuffer(schema, 'base64'),
                     schemaVersion
                 ),
-            };
+            } as InitContractPayload;
         }
         case AccountTransactionType.Update: {
             if (parameters === undefined) {
@@ -124,8 +121,8 @@ function encodePayloadParameters(
                 throw new Error(`schema provided for 'Update' transaction must be not undefined`);
             }
             const updateContractPayload = payload as UpdateContractPayload;
-            if (updateContractPayload.message !== undefined) {
-                throw new Error(`'param' field of 'Update' parameters must be undefined`);
+            if (updateContractPayload.message) {
+                throw new Error(`'message' field of 'Update' parameters must be empty`);
             }
             const [contractName, receiveName] = updateContractPayload.receiveName.split('.');
             return {
@@ -137,7 +134,7 @@ function encodePayloadParameters(
                     toBuffer(schema, 'base64'),
                     schemaVersion
                 ),
-            };
+            } as UpdateContractPayload;
         }
         default: {
             if (parameters !== undefined) {
@@ -183,7 +180,7 @@ export class WalletConnectConnection implements WalletConnection {
         schemaVersion?: SchemaVersion
     ) {
         const params = {
-            type,
+            type: AccountTransactionType[type],
             sender: accountAddress,
             payload: accountTransactionPayloadToJson(
                 encodePayloadParameters(type, payload, parameters, schema, schemaVersion)
@@ -218,7 +215,7 @@ export class WalletConnectConnection implements WalletConnection {
             },
             chainId: this.chainId,
         });
-        return JSON.stringify(signature);
+        return JSON.stringify(signature) as AccountTransactionSignature;
     }
 
     async disconnect() {
