@@ -1,6 +1,7 @@
 import { getIdProof, IdProofInput, verifyIdstatement } from '@concordium/web-sdk';
 import { BackgroundResponseStatus, IdProofBackgroundResponse } from '@shared/utils/types';
 import { ExtensionMessageHandler, MessageStatusWrapper } from '@concordium/browser-wallet-message-hub';
+import { isHex } from 'wallet-common-helpers';
 import { RunCondition } from './window-management';
 
 async function createIdProof(input: IdProofInput): Promise<IdProofBackgroundResponse> {
@@ -22,6 +23,12 @@ export const createIdProofHandler: ExtensionMessageHandler = (msg, _sender, resp
  * Run condition which looks up URL in connected sites for the provided account. Runs handler if URL is included in connected sites.
  */
 export const runIfValidProof: RunCondition<MessageStatusWrapper<undefined>> = async (msg) => {
+    if (!isHex(msg.payload.challenge)) {
+        return {
+            run: false,
+            response: { success: false, message: `Challenge is invalid, it should be a HEX encoded string` },
+        };
+    }
     try {
         verifyIdstatement(msg.payload.statement);
         return { run: true };
