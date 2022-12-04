@@ -28,4 +28,13 @@
         margin-top: auto;
         margin-bottom: rem(40px);
     }
+
+    &__disabled-identity-card {
+        filter: brightness(75%);
+    }
+
+    &__error-message {
+        max-width: 75%;
+        text-align: center;
+    }
 }

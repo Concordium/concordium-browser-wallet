@@ -1,4 +1,4 @@
-import { WalletCredential } from '@shared/storage/types';
+import { ConfirmedIdentity, WalletCredential } from '@shared/storage/types';
 import { BackgroundResponseStatus, IdentityIdentifier } from './types';
 
 /** The type of the response from the background script during identityIssuance */
@@ -26,3 +26,10 @@ export const identityMatch = (target: IdentityIdentifier) => (candidate: Identit
  */
 export const isIdentityOfCredential = (id: IdentityIdentifier) => (cred: WalletCredential) =>
     id.index === cred.identityIndex && id.providerIndex === cred.providerIndex;
+
+export function getMaxAccountsForIdentity(identity: ConfirmedIdentity) {
+    if (identity.idObject.v !== 0) {
+        throw new Error('unsupported identity object version');
+    }
+    return identity.idObject.value.attributeList.maxAccounts;
+}

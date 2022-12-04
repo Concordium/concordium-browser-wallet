@@ -1,4 +1,4 @@
-import React, { useCallback } from 'react';
+import React, { Fragment, useCallback } from 'react';
 import { useTranslation } from 'react-i18next';
 import { useNavigate } from 'react-router-dom';
 import { useAtomValue, useSetAtom } from 'jotai';
@@ -9,6 +9,10 @@ import { identitiesAtom, selectedIdentityIndexAtom, identityProvidersAtom } from
 import { Identity, CreationStatus } from '@shared/storage/types';
 import { absoluteRoutes } from '@popup/constants/routes';
 import Button from '@popup/shared/Button';
+import { credentialsAtom } from '@popup/store/account';
+import { getMaxAccountsForIdentity, isIdentityOfCredential } from '@shared/utils/identity-helpers';
+import ErrorMessage from '@popup/shared/Form/ErrorMessage';
+import { getNextEmptyCredNumber } from '@popup/shared/utils/account-helpers';
 
 export default function ChooseIdentity() {
     const { t } = useTranslation('addAccount');
@@ -16,6 +20,7 @@ export default function ChooseIdentity() {
     const setSelectedIdentityIndex = useSetAtom(selectedIdentityIndexAtom);
     const nav = useNavigate();
     const providers = useAtomValue(identityProvidersAtom);
+    const credentials = useAtomValue(credentialsAtom);
 
     const findProvider = useCallback(
         (identity: Identity) => providers.find((p) => p.ipInfo.ipIdentity === identity.providerIndex),
@@ -41,7 +46,12 @@ export default function ChooseIdentity() {
         <div className="flex-column align-center">
             <p className="m-t-20 text-center p-h-10">{t('chooseIdentity')}</p>
             {identities.map((identity, i) => {
-                if (identity.status === CreationStatus.Confirmed) {
+                if (identity.status !== CreationStatus.Confirmed) {
+                    return null;
+                }
+                const credsOfCurrentIdentity = credentials.filter(isIdentityOfCredential(identity));
+                const nextCredNumber = getNextEmptyCredNumber(credsOfCurrentIdentity);
+                if (nextCredNumber < getMaxAccountsForIdentity(identity)) {
                     return (
                         <IdCard
                             name={identity.name}
@@ -56,7 +66,19 @@ export default function ChooseIdentity() {
                         />
                     );
                 }
-                return null;
+                return (
+                    <Fragment key={`${identity.providerIndex}-${identity.index}`}>
+                        <IdCard
+                            name={identity.name}
+                            provider={<IdentityProviderIcon provider={findProvider(identity)} />}
+                            status={identity.status}
+                            className="m-t-10 add-account-page__disabled-identity-card"
+                        />
+                        <ErrorMessage className="m-t-10 add-account-page__error-message">
+                            {t('maxAccountsReached')}
+                        </ErrorMessage>
+                    </Fragment>
+                );
             })}
         </div>
     );
