@@ -40,7 +40,6 @@ const t = {
     externalAddTokens,
     termsAndConditions,
     idProofRequest,
-    termsAndConditions,
 };
 
 export default t;

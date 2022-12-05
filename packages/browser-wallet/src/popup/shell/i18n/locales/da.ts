@@ -42,7 +42,6 @@ const t: typeof en = {
     externalAddTokens,
     termsAndConditions,
     idProofRequest,
-    termsAndConditions,
 };
 
 export default t;
