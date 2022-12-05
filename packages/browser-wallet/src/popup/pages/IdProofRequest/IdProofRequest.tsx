@@ -1,103 +1,95 @@
 import React, { useCallback, useContext, useEffect, useState } from 'react';
-
+import { InternalMessageType } from '@concordium/browser-wallet-message-hub';
+import { popupMessageHandler } from '@popup/shared/message-handler';
+import { IdProofOutput, IdStatement, RevealStatement, StatementTypes } from '@concordium/web-sdk';
+import { useLocation } from 'react-router-dom';
+import { useAtomValue, useSetAtom } from 'jotai';
+import { selectedIdentityAtom } from '@popup/store/identity';
+import { useSelectedCredential } from '@popup/shared/utils/account-helpers';
+import { jsonRpcClientAtom, networkConfigurationAtom } from '@popup/store/settings';
+import { addToastAtom } from '@popup/state';
+import { useDecryptedSeedPhrase } from '@popup/shared/utils/seed-phrase-helpers';
+import { getGlobal, getNet } from '@shared/utils/network-helpers';
+import { ConfirmedIdentity } from '@shared/storage/types';
+import { BackgroundResponseStatus, IdProofBackgroundResponse } from '@shared/utils/types';
+import { useTranslation } from 'react-i18next';
+import PendingArrows from '@assets/svg/pending-arrows.svg';
 import ExternalRequestLayout from '@popup/page-layouts/ExternalRequestLayout';
 import { fullscreenPromptContext } from '@popup/page-layouts/FullscreenPromptLayout';
 import Button from '@popup/shared/Button';
-import {
-    DocTypes,
-    EU_MEMBERS,
-    IdStatement,
-    MAX_DATE,
-    MIN_DATE,
-    RevealStatement,
-    StatementTypes,
-} from '@popup/shared/idProofTypes';
-import { useAtomValue } from 'jotai';
-import { selectedAccountAtom } from '@popup/store/account';
-import { useTranslation } from 'react-i18next';
 import ButtonGroup from '@popup/shared/ButtonGroup';
+import { displayUrl } from '@popup/shared/utils/string-helpers';
 import { DisplayRevealStatement, DisplaySecretStatement } from './DisplayStatement';
 import { SecretStatement } from './DisplayStatement/utils';
 
-const mock: IdStatement = [
-    {
-        type: StatementTypes.AttributeInRange,
-        attributeTag: 'dob',
-        lower: MIN_DATE,
-        upper: '19820101',
-    },
-    {
-        type: StatementTypes.AttributeInRange,
-        attributeTag: 'idDocExpiresAt',
-        lower: '20230601',
-        upper: MAX_DATE,
-    },
-    {
-        type: StatementTypes.AttributeInRange,
-        attributeTag: 'idDocIssuedAt',
-        lower: MIN_DATE,
-        upper: '20230101',
-    },
-    {
-        type: StatementTypes.AttributeInSet,
-        attributeTag: 'nationality',
-        set: EU_MEMBERS,
-    },
-    {
-        type: StatementTypes.AttributeNotInSet,
-        attributeTag: 'nationality',
-        set: ['DK', 'SE', 'NO', 'FI'],
-    },
-    {
-        type: StatementTypes.AttributeInSet,
-        attributeTag: 'idDocType',
-        set: [DocTypes.Passport, DocTypes.DriversLicense],
-    },
-    {
-        type: StatementTypes.AttributeNotInSet,
-        attributeTag: 'idDocType',
-        set: [DocTypes.NA, DocTypes.ImmigrationCard],
-    },
-    {
-        type: StatementTypes.AttributeInSet,
-        attributeTag: 'idDocIssuer',
-        set: ['DK', 'SE', 'NO', 'FI'],
-    },
-    {
-        type: StatementTypes.AttributeNotInSet,
-        attributeTag: 'idDocIssuer',
-        set: ['DK', 'SE', 'NO', 'FI'],
-    },
-    {
-        type: StatementTypes.RevealAttribute,
-        attributeTag: 'firstName',
-    },
-    {
-        type: StatementTypes.RevealAttribute,
-        attributeTag: 'lastName',
-    },
-    {
-        type: StatementTypes.RevealAttribute,
-        attributeTag: 'idDocIssuedAt',
-    },
-];
-
 type Props = {
-    onSubmit(proof: unknown): void;
+    onSubmit(proof: IdProofOutput): void;
     onReject(): void;
 };
 
+interface Location {
+    state: {
+        payload: {
+            accountAddress: string;
+            statement: IdStatement;
+            challenge: string;
+            url: string;
+        };
+    };
+}
+
 export default function IdProofRequest({ onReject, onSubmit }: Props) {
+    const { state } = useLocation() as Location;
+    const { statement, challenge, url, accountAddress: account } = state.payload;
     const { onClose, withClose } = useContext(fullscreenPromptContext);
-    const hasStatements = mock.length > 0;
-    const [canProove, setCanProove] = useState(hasStatements);
     const { t } = useTranslation('idProofRequest');
+    const identity = useAtomValue(selectedIdentityAtom);
+    const credential = useSelectedCredential();
+    const network = useAtomValue(networkConfigurationAtom);
+    const client = useAtomValue(jsonRpcClientAtom);
+    const addToast = useSetAtom(addToastAtom);
+    const recoveryPhrase = useDecryptedSeedPhrase((e) => addToast(e.message));
+    const dappName = displayUrl(url);
 
-    const account = useAtomValue(selectedAccountAtom); // TODO: change to account included in request.
+    const [creatingProof, setCreatingProof] = useState<boolean>(false);
+    const [canProove, setCanProove] = useState(statement.length > 0);
 
-    const reveals = mock.filter((s) => s.type === StatementTypes.RevealAttribute) as RevealStatement[];
-    const secrets = mock.filter((s) => s.type !== StatementTypes.RevealAttribute) as SecretStatement[];
-    const dappName = 'Example dapp'; // TODO: get from chrome API.
+    const reveals = statement.filter((s) => s.type === StatementTypes.RevealAttribute) as RevealStatement[];
+    const secrets = statement.filter((s) => s.type !== StatementTypes.RevealAttribute) as SecretStatement[];
+
+    const handleSubmit = useCallback(async () => {
+        if (!recoveryPhrase) {
+            throw new Error('Missing recovery phrase');
+        }
+        if (!network) {
+            throw new Error('Network is not specified');
+        }
+        if (!credential) {
+            throw new Error('Missing credential');
+        }
+
+        const global = await getGlobal(client);
+
+        const idProofResult: IdProofBackgroundResponse = await popupMessageHandler.sendInternalMessage(
+            InternalMessageType.CreateIdProof,
+            {
+                identityIndex: credential.identityIndex,
+                identityProviderIndex: credential.providerIndex,
+                credNumber: credential.credNumber,
+                idObject: (identity as ConfirmedIdentity).idObject.value,
+                seedAsHex: recoveryPhrase,
+                net: getNet(network),
+                globalContext: global,
+                statement,
+                challenge,
+            }
+        );
+
+        if (idProofResult.status !== BackgroundResponseStatus.Success) {
+            throw new Error(idProofResult.reason);
+        }
+        return idProofResult.proof;
+    }, [credential, identity, recoveryPhrase, network]);
 
     useEffect(() => onClose(onReject), [onClose, onReject]);
 
@@ -137,9 +129,21 @@ export default function IdProofRequest({ onReject, onSubmit }: Props) {
                         />
                     ))}
                 </div>
+                {creatingProof && <PendingArrows className="loading" />}
                 <ButtonGroup className="id-proof-request__actions">
                     <Button onClick={withClose(onReject)}>{t('reject')}</Button>
-                    <Button onClick={withClose(onSubmit)} disabled={!canProove}>
+                    <Button
+                        onClick={() => {
+                            setCreatingProof(true);
+                            handleSubmit()
+                                .then(withClose(onSubmit))
+                                .catch((e) => {
+                                    setCreatingProof(false);
+                                    addToast(t('failedProof', { reason: e.message }));
+                                });
+                        }}
+                        disabled={!canProove || creatingProof}
+                    >
                         {t('accept')}
                     </Button>
                 </ButtonGroup>

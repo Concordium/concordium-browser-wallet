@@ -67,6 +67,7 @@ const da: typeof en = {
             notDocIssuer: 'Udstederen af dit identitetsdokument er IKKE en af følgende:\n{{issuerNamesString}}',
         },
     },
+    failedProof: 'Bevis kunne ikke oprettes: {{ reason }}',
 };
 
 export default da;
