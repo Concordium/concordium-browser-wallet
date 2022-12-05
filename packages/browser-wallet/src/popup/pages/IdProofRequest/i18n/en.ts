@@ -18,6 +18,7 @@ export default {
         headers: {
             reveal: 'Information to reveal',
             age: 'Secret proof of age',
+            dob: 'Secret proof of date of birth',
             idValidity: 'Secret proof of ID validity',
             nationality: 'Secret proof of nationality',
             residence: 'Secret proof of country of residence',
@@ -26,6 +27,7 @@ export default {
         },
         names: {
             age: 'Age',
+            dob: 'D.O.B',
             idValidTo: 'ID valid until at least',
             idValidFrom: 'ID valid from',
             nationality: 'Nationality',
@@ -37,6 +39,9 @@ export default {
             ageMin: 'More than {{age}} years old',
             ageMax: 'Less than {{age}} years old',
             ageBetween: 'Between {{ageMin}} and {{ageMax}} years old',
+            dobMin: 'After {{dobString}}',
+            dobMax: 'Before {{dobString}}',
+            dobBetween: 'Between {{minDobString}} and {{maxDobString}}',
             idValidity: '{{dateString}}',
             nationalityEU: 'EU',
             nationalityNotEU: 'Outside EU',

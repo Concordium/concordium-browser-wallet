@@ -24,6 +24,7 @@
         "check-password-strength": "^2.0.5",
         "clsx": "^1.1.1",
         "framer-motion": "^6.3.12",
+        "i18n-iso-countries": "^7.5.0",
         "i18next": "^21.6.16",
         "i18next-browser-languagedetector": "^6.1.4",
         "jotai": "^1.6.5",

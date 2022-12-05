@@ -1,30 +1,42 @@
 import React, { useCallback, useContext, useEffect, useState } from 'react';
+import { useAtomValue } from 'jotai';
+import { useTranslation } from 'react-i18next';
+import {
+    IdStatement,
+    StatementTypes,
+    IdDocType,
+    MIN_DATE,
+    MAX_DATE,
+    EU_MEMBERS,
+    RevealStatement,
+} from '@concordium/web-sdk';
 
 import ExternalRequestLayout from '@popup/page-layouts/ExternalRequestLayout';
 import { fullscreenPromptContext } from '@popup/page-layouts/FullscreenPromptLayout';
 import Button from '@popup/shared/Button';
-import {
-    DocTypes,
-    EU_MEMBERS,
-    IdStatement,
-    MAX_DATE,
-    MIN_DATE,
-    RevealStatement,
-    StatementTypes,
-} from '@popup/shared/idProofTypes';
-import { useAtomValue } from 'jotai';
 import { selectedAccountAtom } from '@popup/store/account';
-import { useTranslation } from 'react-i18next';
 import ButtonGroup from '@popup/shared/ButtonGroup';
 import { DisplayRevealStatement, DisplaySecretStatement } from './DisplayStatement';
-import { SecretStatement } from './DisplayStatement/utils';
+import { getPastDate, SecretStatement } from './DisplayStatement/utils';
 
 const mock: IdStatement = [
     {
         type: StatementTypes.AttributeInRange,
         attributeTag: 'dob',
         lower: MIN_DATE,
-        upper: '19820101',
+        upper: getPastDate(34),
+    },
+    {
+        type: StatementTypes.AttributeInRange,
+        attributeTag: 'dob',
+        lower: '19820101',
+        upper: MAX_DATE,
+    },
+    {
+        type: StatementTypes.AttributeInRange,
+        attributeTag: 'dob',
+        lower: '19820101',
+        upper: '19920101',
     },
     {
         type: StatementTypes.AttributeInRange,
@@ -51,12 +63,12 @@ const mock: IdStatement = [
     {
         type: StatementTypes.AttributeInSet,
         attributeTag: 'idDocType',
-        set: [DocTypes.Passport, DocTypes.DriversLicense],
+        set: [IdDocType.Passport, IdDocType.DriversLicense],
     },
     {
         type: StatementTypes.AttributeNotInSet,
         attributeTag: 'idDocType',
-        set: [DocTypes.NA, DocTypes.ImmigrationCard],
+        set: [IdDocType.NA, IdDocType.ImmigrationCard],
     },
     {
         type: StatementTypes.AttributeInSet,
@@ -67,6 +79,10 @@ const mock: IdStatement = [
         type: StatementTypes.AttributeNotInSet,
         attributeTag: 'idDocIssuer',
         set: ['DK', 'SE', 'NO', 'FI'],
+    },
+    {
+        type: StatementTypes.RevealAttribute,
+        attributeTag: 'dob',
     },
     {
         type: StatementTypes.RevealAttribute,

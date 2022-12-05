@@ -1971,6 +1971,7 @@ __metadata:
     esbuild-plugin-svgr: ^1.0.1
     esbuild-sass-plugin: ^2.2.6
     framer-motion: ^6.3.12
+    i18n-iso-countries: ^7.5.0
     i18next: ^21.6.16
     i18next-browser-languagedetector: ^6.1.4
     jotai: ^1.6.5
@@ -8753,6 +8754,13 @@ __metadata:
   languageName: node
   linkType: hard
 
+"diacritics@npm:1.3.0":
+  version: 1.3.0
+  resolution: "diacritics@npm:1.3.0"
+  checksum: ef7552c36e221879be22bc977281d1ae644f0eb94a24b380d654bf3aeae76c8096e533059732980bb3b5cb77ce7de4178f038f79415ee715f6d3eea7025cadea
+  languageName: node
+  linkType: hard
+
 "diff-sequences@npm:^28.1.1":
   version: 28.1.1
   resolution: "diff-sequences@npm:28.1.1"
@@ -11729,6 +11737,15 @@ __metadata:
   bin:
     husky: lib/bin.js
   checksum: c6ec4af63da2c9522da8674a20ad9b48362cc92704896cc8a58c6a2a39d797feb2b806f93fbd83a6d653fbdceb2c3b6e0b602c6b2e8565206ffc2882ef7db9e9
+  languageName: node
+  linkType: hard
+
+"i18n-iso-countries@npm:^7.5.0":
+  version: 7.5.0
+  resolution: "i18n-iso-countries@npm:7.5.0"
+  dependencies:
+    diacritics: 1.3.0
+  checksum: bec3260ea28d4734cd6ed64d3fbead932744b523f5466cfd0ea0af4730b14711f189502e452aaa8c5f49c41c4e973a95e532c380ecd00dc17b347d2f11549df9
   languageName: node
   linkType: hard
 

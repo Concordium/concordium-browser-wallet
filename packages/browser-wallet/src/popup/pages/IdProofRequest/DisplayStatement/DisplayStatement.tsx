@@ -1,10 +1,10 @@
 /* eslint-disable react/prop-types */
 import clsx from 'clsx';
-import React, { ComponentType, useState } from 'react';
+import React, { ComponentType, useEffect, useState } from 'react';
 import { Trans, useTranslation } from 'react-i18next';
 import { ClassName, formatAttributeValue } from 'wallet-common-helpers';
 import { useAtomValue } from 'jotai';
-import { RevealStatement } from '@popup/shared/idProofTypes'; // TODO: get from SDK, remove file after
+import { RevealStatement, AttributeList } from '@concordium/web-sdk';
 
 import SecretIcon from '@assets/svg/id-secret.svg';
 import RevealIcon from '@assets/svg/id-reveal.svg';
@@ -17,7 +17,6 @@ import Button from '@popup/shared/Button';
 import Modal from '@popup/shared/Modal';
 import { identityByAddressAtomFamily } from '@popup/store/identity';
 import { useGetAttributeName } from '@popup/shared/utils/identity-helpers';
-import { AttributeList } from '@concordium/web-sdk';
 import { ConfirmedIdentity } from '@shared/storage/types';
 import { ensureDefined } from '@shared/utils/basic-helpers';
 import {
@@ -26,6 +25,7 @@ import {
     useStatementDescription,
     useStatementHeader,
     useStatementValue,
+    useStatementName,
 } from './utils';
 
 type StatementLine = {
@@ -215,9 +215,13 @@ export const DisplayRevealStatement = withIdentityFromAccount<DisplayRevealState
             };
         });
 
-        if (lines.some((l) => !l.isRequirementMet)) {
-            onInvalid();
-        }
+        const isInvalid = lines.some((l) => !l.isRequirementMet);
+
+        useEffect(() => {
+            if (lines.some((l) => !l.isRequirementMet)) {
+                onInvalid();
+            }
+        }, [isInvalid]);
 
         return <DisplayStatementView reveal lines={lines} dappName={dappName} header={header} className={className} />;
     }
@@ -233,20 +237,22 @@ export const DisplaySecretStatement = withIdentityFromAccount(
         const header = useStatementHeader(statement);
         const value = useStatementValue(statement);
         const description = useStatementDescription(statement);
-        const getAttributeName = useGetAttributeName();
+        const attribute = useStatementName(statement);
         const isRequirementMet = canProoveStatement(statement, identity);
 
         const lines: StatementLine[] = [
             {
-                attribute: getAttributeName(statement.attributeTag),
+                attribute,
                 value,
                 isRequirementMet,
             },
         ];
 
-        if (!isRequirementMet) {
-            onInvalid();
-        }
+        useEffect(() => {
+            if (!isRequirementMet) {
+                onInvalid();
+            }
+        }, [isRequirementMet]);
 
         return (
             <DisplayStatementView

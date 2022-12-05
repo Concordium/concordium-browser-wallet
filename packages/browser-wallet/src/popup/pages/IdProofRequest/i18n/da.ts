@@ -22,6 +22,7 @@ const da: typeof en = {
         headers: {
             reveal: 'Information der afsløres',
             age: 'Hemmeligt bevis for alder',
+            dob: 'Hemmeligt bevis for fødselsdato',
             idValidity: 'Hemmeligt bevis for ID validitet',
             nationality: 'Hemmeligt bevis for nationalitet',
             residence: 'Hemmeligt bevis for bopælsland',
@@ -30,6 +31,7 @@ const da: typeof en = {
         },
         names: {
             age: 'Alder',
+            dob: 'F.D',
             idValidTo: 'ID gyldigt indtil tidligst',
             idValidFrom: 'ID gyldigt fra',
             nationality: 'Nationalitet',
@@ -41,6 +43,9 @@ const da: typeof en = {
             ageMin: 'Mere end {{age}} år gammel',
             ageMax: 'Mindre end {{age}} år gammel',
             ageBetween: 'Mellem {{ageMin}} og {{ageMax}} år gammel',
+            dobMin: 'Efter {{dobString}}',
+            dobMax: 'Før {{dobString}}',
+            dobBetween: 'Mellem {{minDobString}} og {{maxDobString}}',
             idValidity: '{{dateString}}',
             nationalityEU: 'EU',
             nationalityNotEU: 'Udenfor EU',
