@@ -1,1 +1,1 @@
-export { default } from './DisplayStatement';
+export { DisplayRevealStatement, DisplaySecretStatement } from './DisplayStatement';

@@ -1,10 +1,7 @@
 import React, { useCallback, useContext, useEffect, useState } from 'react';
 import { InternalMessageType } from '@concordium/browser-wallet-message-hub';
 import { popupMessageHandler } from '@popup/shared/message-handler';
-import ExternalRequestLayout from '@popup/page-layouts/ExternalRequestLayout';
-import { fullscreenPromptContext } from '@popup/page-layouts/FullscreenPromptLayout';
-import Button from '@popup/shared/Button';
-import { IdProofOutput, IdStatement } from '@concordium/web-sdk';
+import { IdProofOutput, IdStatement, RevealStatement, StatementTypes } from '@concordium/web-sdk';
 import { useLocation } from 'react-router-dom';
 import { useAtomValue, useSetAtom } from 'jotai';
 import { selectedIdentityAtom } from '@popup/store/identity';
@@ -17,6 +14,13 @@ import { ConfirmedIdentity } from '@shared/storage/types';
 import { BackgroundResponseStatus, IdProofBackgroundResponse } from '@shared/utils/types';
 import { useTranslation } from 'react-i18next';
 import PendingArrows from '@assets/svg/pending-arrows.svg';
+import ExternalRequestLayout from '@popup/page-layouts/ExternalRequestLayout';
+import { fullscreenPromptContext } from '@popup/page-layouts/FullscreenPromptLayout';
+import Button from '@popup/shared/Button';
+import ButtonGroup from '@popup/shared/ButtonGroup';
+import { displayUrl } from '@popup/shared/utils/string-helpers';
+import { DisplayRevealStatement, DisplaySecretStatement } from './DisplayStatement';
+import { SecretStatement } from './DisplayStatement/utils';
 
 type Props = {
     onSubmit(proof: IdProofOutput): void;
@@ -36,7 +40,7 @@ interface Location {
 
 export default function IdProofRequest({ onReject, onSubmit }: Props) {
     const { state } = useLocation() as Location;
-    const { statement, challenge } = state.payload;
+    const { statement, challenge, url, accountAddress: account } = state.payload;
     const { onClose, withClose } = useContext(fullscreenPromptContext);
     const { t } = useTranslation('idProofRequest');
     const identity = useAtomValue(selectedIdentityAtom);
@@ -45,7 +49,13 @@ export default function IdProofRequest({ onReject, onSubmit }: Props) {
     const client = useAtomValue(jsonRpcClientAtom);
     const addToast = useSetAtom(addToastAtom);
     const recoveryPhrase = useDecryptedSeedPhrase((e) => addToast(e.message));
+    const dappName = displayUrl(url);
+
     const [creatingProof, setCreatingProof] = useState<boolean>(false);
+    const [canProove, setCanProove] = useState(statement.length > 0);
+
+    const reveals = statement.filter((s) => s.type === StatementTypes.RevealAttribute) as RevealStatement[];
+    const secrets = statement.filter((s) => s.type !== StatementTypes.RevealAttribute) as SecretStatement[];
 
     const handleSubmit = useCallback(async () => {
         if (!recoveryPhrase) {
@@ -83,26 +93,61 @@ export default function IdProofRequest({ onReject, onSubmit }: Props) {
 
     useEffect(() => onClose(onReject), [onClose, onReject]);
 
+    const handleInvalidStatement = useCallback(() => {
+        if (canProove) {
+            setCanProove(false);
+        }
+    }, [canProove]);
+
+    if (!account) {
+        return null;
+    }
+
     return (
         <ExternalRequestLayout>
-            {creatingProof && <PendingArrows className="loading" />}
-            {!creatingProof && <pre>{JSON.stringify(statement, undefined, 2)}</pre>}
-            <br />
-            <Button onClick={withClose(onReject)}>reject</Button>
-            <Button
-                disabled={creatingProof}
-                onClick={() => {
-                    setCreatingProof(true);
-                    handleSubmit()
-                        .then(withClose(onSubmit))
-                        .catch((e) => {
-                            setCreatingProof(false);
-                            addToast(t('failedProof', { reason: e.message }));
-                        });
-                }}
-            >
-                Submit
-            </Button>
+            <div className="id-proof-request">
+                <div>
+                    <h1 className="m-t-0 text-center">{t('header', { dappName })}</h1>
+                    {reveals.length !== 0 && (
+                        <DisplayRevealStatement
+                            className="m-t-10:not-first"
+                            dappName={dappName}
+                            account={account}
+                            statements={reveals}
+                            onInvalid={handleInvalidStatement}
+                        />
+                    )}
+                    {secrets.map((s, i) => (
+                        <DisplaySecretStatement
+                            // eslint-disable-next-line react/no-array-index-key
+                            key={i} // Allow this, as we don't expect these to ever change.
+                            className="m-t-10:not-first"
+                            dappName={dappName}
+                            account={account}
+                            statement={s}
+                            onInvalid={handleInvalidStatement}
+                        />
+                    ))}
+                </div>
+                {creatingProof && <PendingArrows className="loading" />}
+                <ButtonGroup className="id-proof-request__actions">
+                    <Button onClick={withClose(onReject)}>{t('reject')}</Button>
+                    <Button
+                        onClick={() => {
+                            setCreatingProof(true);
+                            handleSubmit()
+                                .then(withClose(onSubmit))
+                                .catch((e) => {
+                                    setCreatingProof(false);
+                                    addToast(t('failedProof', { reason: e.message }));
+                                });
+                        }}
+                        disabled={!canProove || creatingProof}
+                    >
+                        {t('accept')}
+                    </Button>
+                </ButtonGroup>
+            </div>
         </ExternalRequestLayout>
     );
 }

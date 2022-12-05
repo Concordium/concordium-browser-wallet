@@ -16,8 +16,8 @@ import login from '@popup/pages/Login/i18n/da';
 import transactionLog from '@popup/pages/Account/TransactionLog/i18n/da';
 import changePasscode from '@popup/pages/ChangePasscode/i18n/da';
 import externalAddTokens from '@popup/pages/ExternalAddTokens/i18n/da';
-import idProofRequest from '@popup/pages/IdProofRequest/i18n/da';
 import termsAndConditions from '@popup/pages/TermsAndConditions/i18n/da';
+import idProofRequest from '@popup/pages/IdProofRequest/i18n/da';
 
 import type en from './en';
 
@@ -40,6 +40,7 @@ const t: typeof en = {
     transactionLog,
     changePasscode,
     externalAddTokens,
+    termsAndConditions,
     idProofRequest,
     termsAndConditions,
 };

@@ -1,7 +1,10 @@
+/* eslint-disable react/prop-types */
 import clsx from 'clsx';
-import React, { useState } from 'react';
+import React, { ComponentType, useState } from 'react';
 import { Trans, useTranslation } from 'react-i18next';
-import { ClassName } from 'wallet-common-helpers';
+import { ClassName, formatAttributeValue } from 'wallet-common-helpers';
+import { useAtomValue } from 'jotai';
+import { RevealStatement } from '@popup/shared/idProofTypes'; // TODO: get from SDK, remove file after
 
 import SecretIcon from '@assets/svg/id-secret.svg';
 import RevealIcon from '@assets/svg/id-reveal.svg';
@@ -12,6 +15,18 @@ import CrossIcon from '@assets/svg/cross.svg';
 
 import Button from '@popup/shared/Button';
 import Modal from '@popup/shared/Modal';
+import { identityByAddressAtomFamily } from '@popup/store/identity';
+import { useGetAttributeName } from '@popup/shared/utils/identity-helpers';
+import { AttributeList } from '@concordium/web-sdk';
+import { ConfirmedIdentity } from '@shared/storage/types';
+import { ensureDefined } from '@shared/utils/basic-helpers';
+import {
+    SecretStatement,
+    canProoveStatement,
+    useStatementDescription,
+    useStatementHeader,
+    useStatementValue,
+} from './utils';
 
 type StatementLine = {
     attribute: string;
@@ -24,9 +39,9 @@ type StatementLineProps = StatementLine;
 function DisplayStatementLine({ attribute, value, isRequirementMet }: StatementLineProps) {
     return (
         <li className="display-statement__line">
-            <div>{attribute}:</div>
+            <div className="display-statement__line-attribute">{attribute}:</div>
             <div className="display-statement__line-separator" />
-            <div className="flex align-center">
+            <div className="display-statement__line-value">
                 {value}
                 {isRequirementMet ? (
                     <CheckmarkIcon className="display-statement__line-check" />
@@ -77,24 +92,24 @@ function StatementTooltip({ reveal }: StatementTooltipProps) {
     );
 }
 
-type BaseProps = ClassName & {
+type BaseViewProps = ClassName & {
     header: string;
     lines: StatementLine[];
     dappName: string;
 };
 
-type RevealProps = BaseProps & {
+type RevealViewProps = BaseViewProps & {
     reveal: true;
 };
 
-type SecretProps = BaseProps & {
+type SecretViewProps = BaseViewProps & {
     reveal?: false;
     description?: string;
 };
 
-type Props = RevealProps | SecretProps;
+type ViewProps = RevealViewProps | SecretViewProps;
 
-export function DisplayStatementView({ className, lines, dappName, header, ...props }: Props) {
+export function DisplayStatementView({ className, lines, dappName, header, ...props }: ViewProps) {
     const isValid = lines.every((l) => l.isRequirementMet);
     const { t } = useTranslation('idProofRequest', { keyPrefix: 'displayStatement' });
 
@@ -151,4 +166,96 @@ export function DisplayStatementView({ className, lines, dappName, header, ...pr
     );
 }
 
-export default DisplayStatementView;
+function withIdentityFromAccount<PropsWithIdentity extends { identity: ConfirmedIdentity }>(
+    C: ComponentType<PropsWithIdentity>
+): ComponentType<Omit<PropsWithIdentity, 'identity'> & { account: string }> {
+    // eslint-disable-next-line react/function-component-definition
+    return ({ account, ...rest }) => {
+        const { loading, value } = useAtomValue(identityByAddressAtomFamily(account));
+
+        if (loading) {
+            return null;
+        }
+
+        const props: PropsWithIdentity = {
+            identity: ensureDefined(value, 'Expected identity to be defined'),
+            ...rest,
+        } as unknown as PropsWithIdentity;
+
+        return <C {...props} />;
+    };
+}
+
+type BaseProps = ClassName & {
+    identity: ConfirmedIdentity;
+    dappName: string;
+    onInvalid(): void;
+};
+
+type DisplayRevealStatementProps = BaseProps & {
+    statements: RevealStatement[];
+};
+
+export const DisplayRevealStatement = withIdentityFromAccount<DisplayRevealStatementProps>(
+    ({ dappName, statements, identity, className, onInvalid }) => {
+        const { t } = useTranslation('idProofRequest', { keyPrefix: 'displayStatement' });
+        const getAttributeName = useGetAttributeName();
+        const attributes =
+            identity.idObject.value.attributeList.chosenAttributes ?? ({} as AttributeList['chosenAttributes']);
+        const header = t('headers.reveal');
+
+        const lines: StatementLine[] = statements.map((s) => {
+            const raw = attributes[s.attributeTag];
+            const value = formatAttributeValue(s.attributeTag, attributes[s.attributeTag]);
+
+            return {
+                attribute: getAttributeName(s.attributeTag),
+                value,
+                isRequirementMet: raw !== undefined,
+            };
+        });
+
+        if (lines.some((l) => !l.isRequirementMet)) {
+            onInvalid();
+        }
+
+        return <DisplayStatementView reveal lines={lines} dappName={dappName} header={header} className={className} />;
+    }
+);
+
+type DisplaySecretStatementProps = BaseProps & {
+    statement: SecretStatement;
+};
+
+export const DisplaySecretStatement = withIdentityFromAccount(
+    // eslint-disable-next-line @typescript-eslint/no-unused-vars
+    ({ dappName, statement, identity, className, onInvalid }: DisplaySecretStatementProps) => {
+        const header = useStatementHeader(statement);
+        const value = useStatementValue(statement);
+        const description = useStatementDescription(statement);
+        const getAttributeName = useGetAttributeName();
+        const isRequirementMet = canProoveStatement(statement, identity);
+
+        const lines: StatementLine[] = [
+            {
+                attribute: getAttributeName(statement.attributeTag),
+                value,
+                isRequirementMet,
+            },
+        ];
+
+        if (!isRequirementMet) {
+            onInvalid();
+        }
+
+        return (
+            <DisplayStatementView
+                lines={lines}
+                dappName={dappName}
+                header={header}
+                description={description}
+                className={className}
+            />
+        );
+    }
+);

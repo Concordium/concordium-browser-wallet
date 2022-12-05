@@ -26,22 +26,27 @@ $display-statement-color-invalid: $color-grey;
 
     &__header-icon {
         height: rem(15px);
+        flex: 0 0 auto;
     }
 
     &__line {
         display: flex;
         width: 100%;
-        align-items: baseline;
+        align-items: flex-end;
+    }
 
-        > * {
-            flex: 0 0 auto;
-        }
+    &__line-value {
+        display: flex;
+        align-items: center;
+        text-align: right;
     }
 
     &__line-separator {
         flex: 1;
         border-bottom: dotted $color-grey 1px;
         margin: 0 rem(5px);
+        position: relative;
+        bottom: rem(2px);
     }
 
     &__line-check,

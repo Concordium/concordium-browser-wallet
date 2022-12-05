@@ -1,16 +1,23 @@
 import {
     ChromeStorageKey,
+    ConfirmedIdentity,
+    CreationStatus,
     Identity,
     IdentityProvider,
     RecoveryPayload,
     RecoveryStatus,
     SessionPendingIdentity,
 } from '@shared/storage/types';
-import { atom } from 'jotai';
-import { selectAtom } from 'jotai/utils';
-import { atomWithChromeStorage } from './utils';
+import { Atom, atom, WritableAtom } from 'jotai';
+import { atomFamily, selectAtom } from 'jotai/utils';
+import { credentialsAtomWithLoading } from './account';
+import { AsyncWrapper, atomWithChromeStorage } from './utils';
 
-export const identitiesAtom = atomWithChromeStorage<Identity[]>(ChromeStorageKey.Identities, [], false);
+export const identitiesAtomWithLoading = atomWithChromeStorage<Identity[]>(ChromeStorageKey.Identities, [], true);
+export const identitiesAtom: WritableAtom<Identity[], Identity[], Promise<void>> = atom(
+    (get) => get(identitiesAtomWithLoading).value,
+    (_, set, update) => set(identitiesAtomWithLoading, update)
+);
 export const pendingIdentityAtom = atomWithChromeStorage<SessionPendingIdentity | undefined>(
     ChromeStorageKey.PendingIdentity,
     undefined
@@ -56,4 +63,28 @@ const recoveryStatusAtom = atomWithChromeStorage<RecoveryStatus | undefined>(
 );
 export const setRecoveryPayloadAtom = atom<null, RecoveryPayload, Promise<void>>(null, (_, set, payload) =>
     set(recoveryStatusAtom, { payload })
+);
+
+export const identityByAddressAtomFamily = atomFamily<string, Atom<AsyncWrapper<ConfirmedIdentity | undefined>>>(
+    (address) =>
+        atom((get) => {
+            const creds = get(credentialsAtomWithLoading);
+            const ids = get(identitiesAtomWithLoading);
+
+            if (creds.loading || ids.loading) {
+                return { loading: true, value: undefined };
+            }
+
+            const cred = creds.value.find((c) => c.address === address);
+            const identities = ids.value;
+
+            return {
+                loading: false,
+                value: identities
+                    .filter((i) => i.status === CreationStatus.Confirmed)
+                    .find((i) => i.providerIndex === cred?.providerIndex && i.index === cred.identityIndex) as
+                    | ConfirmedIdentity
+                    | undefined,
+            };
+        })
 );

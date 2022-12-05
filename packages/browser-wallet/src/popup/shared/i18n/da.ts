@@ -15,6 +15,22 @@ const t: typeof en = {
         confirmed: 'Godkendt af',
         rejected: 'Afvist af',
     },
+    idAttributes: {
+        countryOfResidence: 'Bopælsland',
+        firstName: 'Fornavn',
+        idDocExpiresAt: 'ID gyldigt indtil',
+        idDocIssuedAt: 'ID gyldigt fra',
+        idDocIssuer: 'Identitetsdokumentudsteder',
+        idDocType: 'Identitetsdokumenttype',
+        idDocNo: ' Identitetsdokumentnummer',
+        lastName: 'Efternavn',
+        taxIdNo: 'Skatte-ID-nummer',
+        nationalIdNo: 'Personnummer',
+        nationality: 'Nationalitet',
+        sex: 'Køn',
+        dob: 'Fødselsdato',
+    },
+
     account: {
         error: 'Fejl ved hentning af kontoens balance',
     },
