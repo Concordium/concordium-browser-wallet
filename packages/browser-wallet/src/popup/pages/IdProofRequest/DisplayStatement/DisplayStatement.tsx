@@ -236,7 +236,7 @@ export const DisplaySecretStatement = withIdentityFromAccount(
     ({ dappName, statement, identity, className, onInvalid }: DisplaySecretStatementProps) => {
         const header = useStatementHeader(statement);
         const value = useStatementValue(statement);
-        const description = useStatementDescription(statement);
+        const description = useStatementDescription(statement, identity);
         const attribute = useStatementName(statement);
         const isRequirementMet = canProoveStatement(statement, identity);
 

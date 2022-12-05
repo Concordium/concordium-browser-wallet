@@ -169,8 +169,13 @@ export function useStatementValue(statement: SecretStatement): string {
 
 const isoToCountryName = (locale: string) => (isoCode: string) => countryTranslations.getName(isoCode, locale);
 
-export function useStatementDescription(statement: SecretStatement): string | undefined {
+export function useStatementDescription(statement: SecretStatement, identity: ConfirmedIdentity): string | undefined {
     const { t, i18n } = useTranslation('idProofRequest', { keyPrefix: 'displayStatement.descriptions' });
+    const hasAttribute = identity.idObject.value.attributeList.chosenAttributes[statement.attributeTag] !== undefined;
+
+    if (!hasAttribute) {
+        return t('missingAttribute', { identityName: identity.name });
+    }
 
     if (statement.type === StatementTypes.AttributeInRange) {
         switch (statement.attributeTag) {

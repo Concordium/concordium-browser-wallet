@@ -66,6 +66,7 @@ export default {
             notDocType: 'Your identity document type is NOT one of the following:\n{{typeNamesString}}',
             docIssuer: 'Your identity document issuer is one of the following:\n{{issuerNamesString}}',
             notDocIssuer: 'Your identity document issuer is NOT one of the following:\n{{issuerNamesString}}',
+            missingAttribute: 'The attribute requested for proof cannot be found on the identity "{{identityName}}"',
         },
     },
     failedProof: 'Unable to create proof due to: {{ reason }}',

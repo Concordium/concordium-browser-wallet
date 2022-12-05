@@ -70,6 +70,8 @@ const da: typeof en = {
             notDocType: 'Typen af dit identitetsdokument er IKKE en af følgende:\n{{typeNamesString}}',
             docIssuer: 'Udstederen af dit identitetsdokument er en af følgende:\n{{issuerNamesString}}',
             notDocIssuer: 'Udstederen af dit identitetsdokument er IKKE en af følgende:\n{{issuerNamesString}}',
+            missingAttribute:
+                'Attributten der anmodes om til beviset kan ikke findes på identiteten "{{identityName}}"',
         },
     },
     failedProof: 'Bevis kunne ikke oprettes: {{ reason }}',
