@@ -232,7 +232,6 @@ type DisplaySecretStatementProps = BaseProps & {
 };
 
 export const DisplaySecretStatement = withIdentityFromAccount(
-    // eslint-disable-next-line @typescript-eslint/no-unused-vars
     ({ dappName, statement, identity, className, onInvalid }: DisplaySecretStatementProps) => {
         const header = useStatementHeader(statement);
         const value = useStatementValue(statement);

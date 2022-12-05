@@ -11,13 +11,11 @@ const da: typeof en = {
             '<1>Vigtigt:</1> {{dappName}} får adgang til alt information der står ovenfor. Du skal kun acceptere at afsløre informationen, hvis du har tillid til servicen og hvis du er bekendt med deres privathedspolitik.',
         revealTooltip: {
             header: 'Afslører information <1 />',
-            // TODO: translate
-            body: 'When you reveal information for a third party, you effectlively hand over the information to them. This means that you should only do this if you have absolute trust in them, and if you are familiar with their data usage and protection procedures.\n\nYou can read more in on\n\ndeveleoper.concordium.software',
+            body: 'Når du afslører information til en tredjepart, kan de beholde denne information. Dette betyder, at du kun bør afsløre information til dem hvis du stoler på dem, og er bekendt med deres databrugs- samt databeskyttelses-procedurer.\n\n Du kan læse mere på\n\ndeveloper.concordium.software',
         },
         secretTooltip: {
             header: 'Hemmelige beviser',
-            // TODO: translate
-            body: 'Secret proofs are a way of proving something to a service or dApp without revealing the exact personal information. One example can be that you prove that you are over 18 years old without revealing your exact date of birth. Another example could be that you live in one of a range of countries without revealing exactly which country you live in.\n\nYou can read more on\n\n developer.concordium.software',
+            body: 'Hemmelige beviser er en måde at bevise noget overfor en service eller dApp, uden at afsløre den underliggende personlige information. Et eksempel kan være, at du beviser at du er over 18 år gammel, uden at bevise din specifikke fødselsdato. Et andet eksemple kan være, at du bor i ét ud af en række lande, uden at afsløre hvilket bestemt land du bor i.\n\nDu kan læse mere på\n\ndeveloper.concordum.software',
         },
         headers: {
             reveal: 'Information der afsløres',

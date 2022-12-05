@@ -2,17 +2,6 @@ import React, { useCallback, useContext, useEffect, useState } from 'react';
 import { useLocation } from 'react-router-dom';
 import { useAtomValue, useSetAtom } from 'jotai';
 import { useTranslation } from 'react-i18next';
-// import {
-//     IdStatement,
-//     StatementTypes,
-//     IdDocType,
-//     MIN_DATE,
-//     MAX_DATE,
-//     EU_MEMBERS,
-//     RevealStatement,
-//     IdProofOutput,
-//     getPastDate,
-// } from '@concordium/web-sdk';
 import { IdStatement, StatementTypes, RevealStatement, IdProofOutput } from '@concordium/web-sdk';
 import { InternalMessageType } from '@concordium/browser-wallet-message-hub';
 
@@ -33,85 +22,6 @@ import ButtonGroup from '@popup/shared/ButtonGroup';
 import { displayUrl } from '@popup/shared/utils/string-helpers';
 import { DisplayRevealStatement, DisplaySecretStatement } from './DisplayStatement';
 import { SecretStatement } from './DisplayStatement/utils';
-
-// const mock: IdStatement = [
-//     {
-//         type: StatementTypes.AttributeInRange,
-//         attributeTag: 'dob',
-//         lower: MIN_DATE,
-//         upper: getPastDate(34),
-//     },
-//     {
-//         type: StatementTypes.AttributeInRange,
-//         attributeTag: 'dob',
-//         lower: '19820101',
-//         upper: MAX_DATE,
-//     },
-//     {
-//         type: StatementTypes.AttributeInRange,
-//         attributeTag: 'dob',
-//         lower: '19820101',
-//         upper: '19920101',
-//     },
-//     {
-//         type: StatementTypes.AttributeInRange,
-//         attributeTag: 'idDocExpiresAt',
-//         lower: '20230601',
-//         upper: MAX_DATE,
-//     },
-//     {
-//         type: StatementTypes.AttributeInRange,
-//         attributeTag: 'idDocIssuedAt',
-//         lower: MIN_DATE,
-//         upper: '20230101',
-//     },
-//     {
-//         type: StatementTypes.AttributeInSet,
-//         attributeTag: 'nationality',
-//         set: EU_MEMBERS,
-//     },
-//     {
-//         type: StatementTypes.AttributeNotInSet,
-//         attributeTag: 'nationality',
-//         set: ['DK', 'SE', 'NO', 'FI'],
-//     },
-//     {
-//         type: StatementTypes.AttributeInSet,
-//         attributeTag: 'idDocType',
-//         set: [IdDocType.Passport, IdDocType.DriversLicense],
-//     },
-//     {
-//         type: StatementTypes.AttributeNotInSet,
-//         attributeTag: 'idDocType',
-//         set: [IdDocType.NA, IdDocType.ImmigrationCard],
-//     },
-//     {
-//         type: StatementTypes.AttributeInSet,
-//         attributeTag: 'idDocIssuer',
-//         set: ['DK', 'SE', 'NO', 'FI'],
-//     },
-//     {
-//         type: StatementTypes.AttributeNotInSet,
-//         attributeTag: 'idDocIssuer',
-//         set: ['DK', 'SE', 'NO', 'FI'],
-//     },
-//     {
-//         type: StatementTypes.RevealAttribute,
-//         attributeTag: 'dob',
-//     },
-//     {
-//         type: StatementTypes.RevealAttribute,
-//         attributeTag: 'firstName',
-//     },
-//     {
-//         type: StatementTypes.RevealAttribute,
-//         attributeTag: 'lastName',
-//     },
-//     {
-//         type: StatementTypes.RevealAttribute,
-//         attributeTag: 'idDocIssuedAt',
-//     },
-// ];
 
 type Props = {
     onSubmit(proof: IdProofOutput): void;
