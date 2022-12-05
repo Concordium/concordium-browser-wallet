@@ -149,6 +149,7 @@ export function useStatementValue(statement: SecretStatement): string {
 
         switch (statement.attributeTag) {
             case 'nationality':
+            case 'countryOfResidence':
                 if (isEuCountrySet(statement.set)) {
                     return text('nationalityEU', 'nationalityNotEU');
                 }
@@ -197,7 +198,6 @@ export function useStatementDescription(statement: SecretStatement): string | un
         const getCountryName = isoToCountryName(i18n.resolvedLanguage);
 
         switch (statement.attributeTag) {
-            // TODO: map set to readable values
             case 'countryOfResidence':
                 return text('residence', 'notResidence', {
                     countryNamesString: statement.set.map(getCountryName).join(', '),
