@@ -122,7 +122,7 @@ export function canProoveStatement(statement: SecretStatement, identity: Confirm
         case StatementTypes.AttributeNotInSet:
             return !statement.set.includes(attribute);
         case StatementTypes.AttributeInRange:
-            return statement.upper > attribute && attribute > statement.lower;
+            return statement.upper > attribute && attribute >= statement.lower;
         default:
             throw new Error(`Statement type not supported in ${JSON.stringify(statement)}`);
     }
