@@ -68,4 +68,5 @@ export default {
             notDocIssuer: 'Your identity document issuer is NOT one of the following:\n{{issuerNamesString}}',
         },
     },
+    failedProof: 'Unable to create proof due to: {{ reason }}',
 };

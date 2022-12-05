@@ -8,22 +8,16 @@ import {
     NonMembershipStatement,
     RevealStatement,
     StatementTypes,
+    getPastDate,
 } from '@concordium/web-sdk';
 import { useTranslation } from 'react-i18next';
 import { formatAttributeValue } from 'wallet-common-helpers';
 import countryTranslations from 'i18n-iso-countries';
+
 import { useGetAttributeName } from '@popup/shared/utils/identity-helpers';
 import { ConfirmedIdentity } from '@shared/storage/types';
 
 export type SecretStatement = Exclude<AtomicStatement, RevealStatement>;
-
-export function getPastDate(yearsAgo: number) {
-    const date = new Date();
-    const month = (date.getMonth() + 1).toString().padStart(2, '0');
-    const day = date.getDate().toString().padStart(2, '0');
-    const year = (date.getFullYear() - yearsAgo).toString();
-    return year + month + day;
-}
 
 const isAgeStatement = (statement: SecretStatement): boolean => {
     if (statement.type !== StatementTypes.AttributeInRange) {

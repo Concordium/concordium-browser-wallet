@@ -167,15 +167,18 @@ export const forwardToPopup = <P, R>(
     bgMessageHandler.handleMessage(createMessageTypeFilter(messageType), conditionalHandler);
 };
 
-export function runConditionComposer<R>(
-    firstHandler: RunCondition<R>,
-    secondHandler: RunCondition<R>
-): RunCondition<R> {
+/**
+ * Checks all given runConditions in order, and stops when one returns !run, and returns the result of that condition.
+ * if all conditions say run, return {run: true}.
+ */
+export function runConditionComposer<R>(...handlers: RunCondition<R>[]): RunCondition<R> {
     return async (msg, sender) => {
-        const first = await firstHandler(msg, sender);
-        if (!first.run) {
-            return first;
+        for (const handler of handlers) {
+            const result = await handler(msg, sender);
+            if (!result.run) {
+                return result;
+            }
         }
-        return secondHandler(msg, sender);
+        return { run: true };
     };
 }

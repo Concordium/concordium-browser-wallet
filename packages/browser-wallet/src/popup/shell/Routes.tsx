@@ -6,7 +6,7 @@ import {
     createMessageTypeFilter,
     MessageStatusWrapper,
 } from '@concordium/browser-wallet-message-hub';
-import { AccountTransactionSignature } from '@concordium/web-sdk';
+import { AccountTransactionSignature, IdProofOutput } from '@concordium/web-sdk';
 import { noOp } from 'wallet-common-helpers';
 
 import { absoluteRoutes, relativeRoutes, relativePath } from '@popup/constants/routes';
@@ -94,10 +94,10 @@ export default function Routes() {
         InternalMessageType.AddTokens,
         'addTokens'
     );
-    const handleIdProofResponse = useMessagePrompt<MessageStatusWrapper<unknown>>(
+    const handleIdProofResponse = useMessagePrompt<MessageStatusWrapper<IdProofOutput>>(
         InternalMessageType.IdProof,
         'idProof'
-    ); // TODO get proper type from SDK when it's done.
+    );
 
     usePrompt(InternalMessageType.EndIdentityIssuance, 'endIdentityIssuance');
     usePrompt(InternalMessageType.RecoveryFinished, 'recovery');
