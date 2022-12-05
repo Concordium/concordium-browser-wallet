@@ -1,5 +1,11 @@
 # Changelog
 
+## Unreleased
+
+### Added
+
+-   Entrypoint to request zero knowledge proof for a list of statements.
+
 ## 2.0.0
 
 ### Added

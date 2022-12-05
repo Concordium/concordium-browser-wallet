@@ -1,5 +1,11 @@
 # Changelog
 
+## Unreleased
+
+### Added
+
+-   Support for generating zero knowledge proofs requested from web applications.
+
 ## 0.8.5
 
 ### Fixed
