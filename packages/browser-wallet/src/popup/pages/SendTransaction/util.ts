@@ -65,7 +65,7 @@ export function parsePayload(
                 parameter = Buffer.alloc(0);
             } else {
                 parameter = serializeInitContractParameters(
-                    payload.contractName,
+                    payload.initName,
                     parameters,
                     Buffer.from(schema, 'base64'),
                     schemaVersion
