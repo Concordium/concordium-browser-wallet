@@ -1,3 +1,5 @@
+/* eslint-disable no-console */
+
 // eslint-disable-next-line max-classes-per-file
 import SignClient from '@walletconnect/sign-client';
 import QRCodeModal from '@walletconnect/qrcode-modal';
@@ -261,31 +263,17 @@ export class WalletConnectConnector implements WalletConnector {
         // Register event handlers (from official docs).
         this.client.on('session_event', ({ topic, params: { chainId: cid, event }, id }) => {
             // Handle session events, such as "chainChanged", "accountsChanged", etc.
-            // eslint-disable-next-line no-console
             console.debug('Wallet Connect event: session_event', { topic, id, chainId: cid, event });
-            switch (event.name) {
-                case 'chanChanged':
-                    events.onChainChanged(event.data); // TODO implement correctly
-                    break;
-                case 'accountsChanged':
-                    events.onAccountChanged(event.data); // TODO implement correctly
-                    break;
-                default:
-                    // eslint-disable-next-line no-console
-                    console.error(`Unsupported event: ${event.name}`);
-            }
         });
-        // this.client.on('session_update', ({ topic, params }) => {
-        //     const { namespaces } = params;
-        //     // Overwrite the `namespaces` of the existing session with the incoming one.
-        //     const updatedSession = { ...session, namespaces };
-        //     // Integrate the updated session state into your dapp state.
-        //     // eslint-disable-next-line no-console
-        //     console.debug('Wallet Connect event: session_update', { topic, updatedSession });
-        // });
+        this.client.on('session_update', ({ topic, params }) => {
+            const { namespaces } = params;
+            // Overwrite the namespaces of the existing session with the incoming one.
+            const updatedSession = { ...session, namespaces };
+            // Integrate the updated session state into your dapp state.
+            console.debug('Wallet Connect event: session_update', { topic, updatedSession });
+        });
         this.client.on('session_delete', () => {
             // Session was deleted -> reset the dapp state, clean up from user session, etc.
-            // eslint-disable-next-line no-console
             console.debug('Wallet Connect event: session_delete');
             events.onDisconnect();
         });
