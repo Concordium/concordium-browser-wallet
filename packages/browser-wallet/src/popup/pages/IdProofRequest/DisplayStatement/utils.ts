@@ -25,17 +25,17 @@ const isAgeStatement = (statement: SecretStatement): boolean => {
     }
 
     const today = getPastDate(0);
-    const upperInYears = statement.upper.substring(4) === today.substring(4);
-    const lowerInYears = statement.lower.substring(4) === today.substring(4);
+    const isYearOffsetUpper = statement.upper.substring(4) === today.substring(4);
+    const isYearOffsetLower = statement.lower.substring(4) === today.substring(4);
 
     if (statement.lower === MIN_DATE) {
-        return upperInYears;
+        return isYearOffsetUpper;
     }
     if (statement.upper > today) {
-        return lowerInYears;
+        return isYearOffsetLower;
     }
 
-    return upperInYears && lowerInYears;
+    return isYearOffsetUpper && isYearOffsetLower;
 };
 
 export function useStatementHeader(statement: SecretStatement): string {
@@ -83,17 +83,12 @@ export function useStatementName(statement: SecretStatement): string {
     } else {
         switch (statement.attributeTag) {
             case 'idDocIssuedAt':
-                return t('idValidFrom');
             case 'idDocExpiresAt':
-                return t('idValidTo');
             case 'idDocIssuer':
-                return t('docIssuer');
             case 'idDocType':
-                return t('docType');
             case 'countryOfResidence':
-                return t('residence');
             case 'nationality':
-                return t('nationality');
+                return t(statement.attributeTag);
         }
     }
 
@@ -235,7 +230,7 @@ export function useStatementDescription(statement: SecretStatement, identity: Co
     return undefined;
 }
 
-export function canProoveStatement(statement: SecretStatement, identity: ConfirmedIdentity) {
+export function canProveStatement(statement: SecretStatement, identity: ConfirmedIdentity) {
     const attribute = identity.idObject.value.attributeList.chosenAttributes[statement.attributeTag];
 
     switch (statement.type) {

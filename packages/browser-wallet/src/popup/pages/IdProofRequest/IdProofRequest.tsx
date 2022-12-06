@@ -53,7 +53,7 @@ export default function IdProofRequest({ onReject, onSubmit }: Props) {
     const dappName = displayUrl(url);
 
     const [creatingProof, setCreatingProof] = useState<boolean>(false);
-    const [canProove, setCanProove] = useState(statement.length > 0);
+    const [canProve, setCanProve] = useState(statement.length > 0);
 
     const reveals = statement.filter((s) => s.type === StatementTypes.RevealAttribute) as RevealStatement[];
     const secrets = statement.filter((s) => s.type !== StatementTypes.RevealAttribute) as SecretStatement[];
@@ -95,10 +95,10 @@ export default function IdProofRequest({ onReject, onSubmit }: Props) {
     useEffect(() => onClose(onReject), [onClose, onReject]);
 
     const handleInvalidStatement = useCallback(() => {
-        if (canProove) {
-            setCanProove(false);
+        if (canProve) {
+            setCanProve(false);
         }
-    }, [canProove]);
+    }, [canProve]);
 
     if (!account) {
         return null;
@@ -143,7 +143,7 @@ export default function IdProofRequest({ onReject, onSubmit }: Props) {
                                     addToast(t('failedProof', { reason: e.message }));
                                 });
                         }}
-                        disabled={!canProove || creatingProof}
+                        disabled={!canProve || creatingProof}
                     >
                         {t('accept')}
                     </Button>

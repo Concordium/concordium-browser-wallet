@@ -28,12 +28,12 @@ export default {
         names: {
             age: 'Age',
             dob: 'D.O.B',
-            idValidTo: 'ID valid until at least',
-            idValidFrom: 'ID valid from',
+            idDocExpiresAt: 'ID valid until at least',
+            idDocIssuedAt: 'ID valid from',
             nationality: 'Nationality',
-            residence: 'Country of residence',
-            docType: 'Document type',
-            docIssuer: 'Document issuer',
+            countryOfResidence: 'Country of residence',
+            idDocType: 'Document type',
+            idDocIssuer: 'Document issuer',
         },
         proofs: {
             ageMin: 'More than {{age}} years old',

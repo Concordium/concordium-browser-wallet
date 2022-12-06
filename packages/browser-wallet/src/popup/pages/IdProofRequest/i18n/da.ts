@@ -30,12 +30,12 @@ const da: typeof en = {
         names: {
             age: 'Alder',
             dob: 'F.D',
-            idValidTo: 'ID gyldigt indtil tidligst',
-            idValidFrom: 'ID gyldigt fra',
+            idDocExpiresAt: 'ID gyldigt indtil tidligst',
+            idDocIssuedAt: 'ID gyldigt fra',
             nationality: 'Nationalitet',
-            residence: 'Bopælsland',
-            docType: 'Dokumenttype',
-            docIssuer: 'Dokumentudsteder',
+            countryOfResidence: 'Bopælsland',
+            idDocType: 'Dokumenttype',
+            idDocIssuer: 'Dokumentudsteder',
         },
         proofs: {
             ageMin: 'Mere end {{age}} år gammel',

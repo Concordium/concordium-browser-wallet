@@ -21,7 +21,7 @@ import { ConfirmedIdentity } from '@shared/storage/types';
 import { ensureDefined } from '@shared/utils/basic-helpers';
 import {
     SecretStatement,
-    canProoveStatement,
+    canProveStatement,
     useStatementDescription,
     useStatementHeader,
     useStatementValue,
@@ -237,7 +237,7 @@ export const DisplaySecretStatement = withIdentityFromAccount(
         const value = useStatementValue(statement);
         const description = useStatementDescription(statement, identity);
         const attribute = useStatementName(statement);
-        const isRequirementMet = canProoveStatement(statement, identity);
+        const isRequirementMet = canProveStatement(statement, identity);
 
         const lines: StatementLine[] = [
             {
