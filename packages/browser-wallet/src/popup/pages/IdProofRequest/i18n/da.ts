@@ -29,7 +29,7 @@ const da: typeof en = {
         },
         names: {
             age: 'Alder',
-            dob: 'F.D',
+            dob: 'F.D.',
             idDocExpiresAt: 'ID gyldigt indtil tidligst',
             idDocIssuedAt: 'ID gyldigt fra',
             nationality: 'Nationalitet',
