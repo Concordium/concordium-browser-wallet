@@ -27,7 +27,7 @@ export default {
         },
         names: {
             age: 'Age',
-            dob: 'D.O.B',
+            dob: 'D.O.B.',
             idValidTo: 'ID valid until at least',
             idValidFrom: 'ID valid from',
             nationality: 'Nationality',
