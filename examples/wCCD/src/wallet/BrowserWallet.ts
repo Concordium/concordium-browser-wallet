@@ -7,7 +7,7 @@ import {
     JsonRpcClient,
     SchemaVersion,
 } from '@concordium/web-sdk';
-import { Events, WalletConnection, WalletConnector } from './WalletConnection';
+import { ConnectionDelegate, WalletConnection, WalletConnector } from './WalletConnection';
 
 export class BrowserWalletConnection implements WalletConnection {
     readonly client: WalletApi;
@@ -59,18 +59,18 @@ export class BrowserWalletConnector implements WalletConnector {
         return new BrowserWalletConnector(client);
     }
 
-    async connect(events: Events) {
+    async connect(delegate: ConnectionDelegate) {
         const account = await this.client.connect();
         if (!account) {
             throw new Error('connection failed');
         }
-        events.onAccountChanged(account);
+        delegate.onAccountChanged(account);
 
         // Pass relevant events from wallet onto the handler object.
-        this.client.on('chainChanged', events.onChainChanged);
-        this.client.on('accountChanged', events.onAccountChanged);
+        this.client.on('chainChanged', delegate.onChainChanged);
+        this.client.on('accountChanged', delegate.onAccountChanged);
         this.client.on('accountDisconnected', () =>
-            this.client.getMostRecentlySelectedAccount().then(events.onAccountChanged)
+            this.client.getMostRecentlySelectedAccount().then(delegate.onAccountChanged)
         );
 
         return new BrowserWalletConnection(this.client);

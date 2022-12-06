@@ -52,14 +52,14 @@ export class Network {
     }
 }
 
-export interface Events {
+export interface ConnectionDelegate {
     onChainChanged(chain: string): void;
     onAccountChanged(address: string | undefined): void;
     onDisconnect(): void;
 }
 
 export interface WalletConnector {
-    connect(events: Events): Promise<WalletConnection>;
+    connect(delegate: ConnectionDelegate): Promise<WalletConnection>;
 }
 
 export async function withJsonRpcClient<T>(wc: WalletConnection, f: (c: JsonRpcClient) => Promise<T>) {

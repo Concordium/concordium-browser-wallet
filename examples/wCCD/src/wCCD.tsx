@@ -146,7 +146,10 @@ export default function wCCD() {
     const [walletConnection, setWalletConnection] = useState<WalletConnection>();
     useEffect(() => {
         if (walletConnection) {
-            walletConnection.disconnect().catch(console.error);
+            walletConnection
+                .disconnect()
+                .then(() => setWalletConnection(undefined))
+                .catch(console.error);
         }
         if (connectorType) {
             switch (connectorType) {
@@ -197,9 +200,7 @@ export default function wCCD() {
                         }
                     },
                     onDisconnect() {
-                        walletConnection?.disconnect().catch(console.error);
-                        setWalletConnection(undefined);
-                        setConnectedAccount(undefined);
+                        setWalletConnection(undefined); // triggers clearing of connected account
                     },
                 })
                 .then(setWalletConnection)
@@ -211,10 +212,13 @@ export default function wCCD() {
     const [admin, setAdmin] = useState<string>();
 
     useEffect(() => {
+        // Clear 'connectedAccount' when 'walletConnection' is.
+        if (!walletConnection) {
+            setConnectedAccount(undefined);
+        }
+        // Update admin contract.
         if (walletConnection) {
-            withJsonRpcClient(walletConnection, async (rpcClient) => viewAdmin(rpcClient, setAdmin)).catch(
-                console.error
-            );
+            withJsonRpcClient(walletConnection, (rpcClient) => viewAdmin(rpcClient, setAdmin)).catch(console.error);
         }
     }, [walletConnection]);
 
@@ -227,7 +231,7 @@ export default function wCCD() {
 
     useEffect(() => {
         if (walletConnection && connectedAccount) {
-            withJsonRpcClient(walletConnection, async (rpcClient) =>
+            withJsonRpcClient(walletConnection, (rpcClient) =>
                 updateWCCDBalanceAccount(rpcClient, connectedAccount, setAmountAccount)
             ).catch(console.error);
         } else {

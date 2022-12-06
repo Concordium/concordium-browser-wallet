@@ -17,7 +17,7 @@ import {
     toBuffer,
     UpdateContractPayload,
 } from '@concordium/web-sdk';
-import { Events, Network, WalletConnection, WalletConnector } from './WalletConnection';
+import { ConnectionDelegate, Network, WalletConnection, WalletConnector } from './WalletConnection';
 
 const WALLET_CONNECT_SESSION_NAMESPACE = 'ccd';
 
@@ -162,11 +162,20 @@ export class WalletConnectConnection implements WalletConnection {
 
     readonly session: SessionTypes.Struct;
 
-    constructor(client: SignClient, rpcClient: JsonRpcClient, chainId: string, session: SessionTypes.Struct) {
+    readonly delegate: ConnectionDelegate;
+
+    constructor(
+        client: SignClient,
+        rpcClient: JsonRpcClient,
+        chainId: string,
+        session: SessionTypes.Struct,
+        delegate: ConnectionDelegate
+    ) {
         this.client = client;
         this.rpcClient = rpcClient;
         this.chainId = chainId;
         this.session = session;
+        this.delegate = delegate;
     }
 
     getJsonRpcClient(): JsonRpcClient {
@@ -221,13 +230,14 @@ export class WalletConnectConnection implements WalletConnection {
     }
 
     async disconnect() {
-        return this.client.disconnect({
+        await this.client.disconnect({
             topic: this.session.topic,
             reason: {
                 code: 1,
                 message: 'user disconnecting',
             },
         });
+        this.delegate.onDisconnect();
     }
 }
 
@@ -241,24 +251,14 @@ export class WalletConnectConnector implements WalletConnector {
 
     readonly network: Network;
 
+    readonly delegate: ConnectionDelegate;
+
     isModalOpen = false;
 
-    constructor(client: SignClient, network: Network) {
+    constructor(client: SignClient, network: Network, delegate: ConnectionDelegate) {
         this.client = client;
         this.network = network;
-    }
-
-    static async create(signClientInitOpts: SignClientTypes.Options, network: Network) {
-        const client = await SignClient.init(signClientInitOpts);
-        return new WalletConnectConnector(client, network);
-    }
-
-    async connect(events: Events) {
-        const chainId = `${WALLET_CONNECT_SESSION_NAMESPACE}:${this.network.name}`;
-        const session = await connect(this.client, chainId, (v) => {
-            this.isModalOpen = v;
-        });
-        events.onAccountChanged(resolveAccount(session));
+        this.delegate = delegate;
 
         // Register event handlers (from official docs).
         this.client.on('session_event', ({ topic, params: { chainId: cid, event }, id }) => {
@@ -273,12 +273,25 @@ export class WalletConnectConnector implements WalletConnector {
             console.debug('Wallet Connect event: session_update', { topic, updatedSession });
         });
         this.client.on('session_delete', () => {
-            // Session was deleted -> reset the dapp state, clean up from user session, etc.
+            // Session was deleted: Reset the dApp state, clean up user session, etc.
             console.debug('Wallet Connect event: session_delete');
-            events.onDisconnect();
+            delegate.onDisconnect();
         });
+    }
+
+    static async create(signClientInitOpts: SignClientTypes.Options, network: Network) {
+        const client = await SignClient.init(signClientInitOpts);
+        return new WalletConnectConnector(client, network);
+    }
+
+    async connect(delegate: ConnectionDelegate) {
+        const chainId = `${WALLET_CONNECT_SESSION_NAMESPACE}:${this.network.name}`;
+        const session = await connect(this.client, chainId, (v) => {
+            this.isModalOpen = v;
+        });
+        delegate.onAccountChanged(resolveAccount(session));
 
         const rpcClient = new JsonRpcClient(new HttpProvider(this.network.jsonRpcUrl));
-        return new WalletConnectConnection(this.client, rpcClient, chainId, session);
+        return new WalletConnectConnection(this.client, rpcClient, chainId, session, delegate);
     }
 }
