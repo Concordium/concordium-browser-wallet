@@ -1,7 +1,9 @@
 /* eslint-disable @typescript-eslint/no-explicit-any */
+import { Buffer } from 'buffer/';
 import { CcdAmount } from '@concordium/common-sdk/lib/types/ccdAmount';
 import { AccountAddress } from '@concordium/common-sdk/lib/types/accountAddress';
 import { ModuleReference } from '@concordium/common-sdk/lib/types/moduleReference';
+import { DataBlob } from '@concordium/common-sdk';
 
 const types = {
     BigInt: 'bigint',
@@ -9,6 +11,7 @@ const types = {
     CcdAmount: 'ccdAmount',
     AccountAddress: 'accountAddress',
     ModuleReference: 'moduleReference',
+    DataBlob: 'dataBlob',
 };
 
 function isGtuAmount(cand: any): cand is { microGtuAmount: bigint } {
@@ -25,6 +28,10 @@ function isAccountAddress(cand: any): cand is AccountAddress {
 
 function isModuleReference(cand: any): cand is ModuleReference {
     return cand && typeof cand.moduleRef === 'string' && cand.moduleRef.length === 64;
+}
+
+function isDataBlob(cand: any): cand is DataBlob {
+    return cand && cand.data && Buffer.isBuffer(cand.data);
 }
 
 function replacer(this: any, k: string, value: any) {
@@ -47,6 +54,9 @@ function replacer(this: any, k: string, value: any) {
     }
     if (isModuleReference(rawValue)) {
         return { '@type': types.ModuleReference, value: rawValue.moduleRef };
+    }
+    if (isDataBlob(rawValue)) {
+        return { '@type': types.DataBlob, value: rawValue.data.toString('hex') };
     }
     return value;
 }
@@ -72,6 +82,8 @@ export function parse(input: string | undefined) {
                     return new AccountAddress(v.value);
                 case types.ModuleReference:
                     return new ModuleReference(v.value);
+                case types.DataBlob:
+                    return new DataBlob(Buffer.from(v.value, 'hex'));
                 default:
                     return v;
             }

@@ -96,6 +96,14 @@
                         .then(alert)
                         .catch(alert)
                 );
+                document.getElementById('registerData').addEventListener('click', () =>
+                    provider
+                        .sendTransaction(currentAccountAddress, concordiumSDK.AccountTransactionType.RegisterData, {
+                            data: new concordiumSDK.DataBlob(concordiumSDK.toBuffer(message.value, 'utf8')),
+                        })
+                        .then(alert)
+                        .catch(alert)
+                );
 
                 provider.on('accountDisconnected', (accountAddress) => (currentAccountAddress = undefined));
                 provider.on('accountChanged', (accountAddress) => (currentAccountAddress = accountAddress));
@@ -131,9 +139,10 @@
         <button id="sendTransfer">Send transfer</button>
         <button id="sendDeposit">deposit in two step transfer</button>
         <button id="sendReceive">Initiate Receive in two step transfer</button>
+        <button id="idProof">Request an ID Proof</button>
         <br />
         Message: <input type="text" id="message" value="I believe in miracles" />
         <button id="signMessage">SignMessage</button>
-        <button id="idProof">Request an ID Proof</button>
+        <button id="registerData">Register message</button>
     </body>
 </html>

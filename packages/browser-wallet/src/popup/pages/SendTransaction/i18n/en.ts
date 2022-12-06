@@ -14,6 +14,7 @@ const t = {
     moduleReference: 'Module reference',
     contractName: 'Contract name',
     title: 'Sign transaction',
+    data: 'Data',
 };
 
 export default t;
