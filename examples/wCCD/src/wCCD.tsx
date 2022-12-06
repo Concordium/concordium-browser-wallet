@@ -369,21 +369,13 @@ export default function wCCD() {
                                     setHash('');
                                     setError('');
                                     setWaitingForUser(true);
-                                    const tx = isWrapping
-                                        ? wrap(
-                                              walletConnection,
-                                              connectedAccount,
-                                              WCCD_CONTRACT_INDEX,
-                                              CONTRACT_SUB_INDEX,
-                                              amount
-                                          )
-                                        : unwrap(
-                                              walletConnection,
-                                              connectedAccount,
-                                              WCCD_CONTRACT_INDEX,
-                                              CONTRACT_SUB_INDEX,
-                                              amount
-                                          );
+                                    const tx = (isWrapping ? wrap : unwrap)(
+                                        walletConnection,
+                                        connectedAccount,
+                                        WCCD_CONTRACT_INDEX,
+                                        CONTRACT_SUB_INDEX,
+                                        amount
+                                    );
                                     tx.then(setHash)
                                         .catch((err) => setError((err as Error).message))
                                         .finally(() => setWaitingForUser(false));
