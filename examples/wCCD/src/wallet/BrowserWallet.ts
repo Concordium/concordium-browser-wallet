@@ -1,3 +1,5 @@
+/* eslint-disable no-console */
+
 // eslint-disable-next-line max-classes-per-file
 import { detectConcordiumProvider, WalletApi } from '@concordium/browser-wallet-api-helpers';
 import {
@@ -9,11 +11,47 @@ import {
 } from '@concordium/web-sdk';
 import { ConnectionDelegate, WalletConnection, WalletConnector } from './WalletConnection';
 
-export class BrowserWalletConnection implements WalletConnection {
+export class BrowserWalletConnector implements WalletConnector, WalletConnection {
     readonly client: WalletApi;
 
-    constructor(client: WalletApi) {
+    constructor(client: WalletApi, delegate: ConnectionDelegate) {
         this.client = client;
+
+        this.client.on('chainChanged', (c) => delegate.onChainChanged(this, c));
+        this.client.on('accountChanged', (a) => delegate.onAccountChanged(this, a));
+        this.client.on('accountDisconnected', () =>
+            this.client
+                .getMostRecentlySelectedAccount()
+                .then((a) => delegate.onAccountChanged(this, a))
+                .catch(console.error)
+        );
+    }
+
+    static async create(delegate: ConnectionDelegate) {
+        const client = await detectConcordiumProvider();
+        return new BrowserWalletConnector(client, delegate);
+    }
+
+    async connect() {
+        const account = await this.client.connect();
+        if (!account) {
+            throw new Error('connection failed');
+        }
+        return this;
+    }
+
+    async getConnections() {
+        // Defining "connection" as a connected account.
+        const account = await this.getConnectedAccount();
+        return account ? [this] : [];
+    }
+
+    getConnector(): WalletConnector {
+        return this;
+    }
+
+    async getConnectedAccount() {
+        return this.client.getMostRecentlySelectedAccount();
     }
 
     getJsonRpcClient(): JsonRpcClient {
@@ -21,6 +59,7 @@ export class BrowserWalletConnection implements WalletConnection {
     }
 
     async disconnect() {
+        // Only the wallet can initiate a disconnect.
         return undefined;
     }
 
@@ -44,35 +83,5 @@ export class BrowserWalletConnection implements WalletConnection {
 
     async signMessage(accountAddress: string, message: string): Promise<AccountTransactionSignature> {
         return this.client.signMessage(accountAddress, message);
-    }
-}
-
-export class BrowserWalletConnector implements WalletConnector {
-    client: WalletApi;
-
-    constructor(client: WalletApi) {
-        this.client = client;
-    }
-
-    static async create() {
-        const client = await detectConcordiumProvider();
-        return new BrowserWalletConnector(client);
-    }
-
-    async connect(delegate: ConnectionDelegate) {
-        const account = await this.client.connect();
-        if (!account) {
-            throw new Error('connection failed');
-        }
-        delegate.onAccountChanged(account);
-
-        // Pass relevant events from wallet onto the handler object.
-        this.client.on('chainChanged', delegate.onChainChanged);
-        this.client.on('accountChanged', delegate.onAccountChanged);
-        this.client.on('accountDisconnected', () =>
-            this.client.getMostRecentlySelectedAccount().then(delegate.onAccountChanged)
-        );
-
-        return new BrowserWalletConnection(this.client);
     }
 }

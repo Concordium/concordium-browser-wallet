@@ -15,7 +15,11 @@ type SendTransactionPayload =
     | Omit<InitContractPayload, 'param'>;
 
 export interface WalletConnection {
-    // Should not be in 'WalletConnector' as the browser wallet's client doesn't work until there is a connection.
+    getConnector(): WalletConnector;
+
+    getConnectedAccount(): Promise<string | undefined>;
+
+    // Cannot be in 'WalletConnector' as the browser wallet's client doesn't work until there is a connection.
     getJsonRpcClient(): JsonRpcClient;
 
     signAndSendTransaction(
@@ -53,15 +57,21 @@ export class Network {
 }
 
 export interface ConnectionDelegate {
-    onChainChanged(chain: string): void;
-    onAccountChanged(address: string | undefined): void;
-    onDisconnect(): void;
+    onChainChanged(connection: WalletConnection, chain: string): void;
+    onAccountChanged(connection: WalletConnection, address: string | undefined): void;
+    onDisconnect(connection: WalletConnection): void;
 }
 
 export interface WalletConnector {
-    connect(delegate: ConnectionDelegate): Promise<WalletConnection>;
+    connect(): Promise<WalletConnection>;
+    getConnections(): Promise<WalletConnection[]>;
 }
 
 export async function withJsonRpcClient<T>(wc: WalletConnection, f: (c: JsonRpcClient) => Promise<T>) {
     return f(wc.getJsonRpcClient());
+}
+
+export async function destroy(connector: WalletConnector) {
+    const connections = await connector.getConnections();
+    return Promise.all(connections.map((c) => c.disconnect())).then((vs) => vs.length);
 }

@@ -154,28 +154,34 @@ function encodePayloadParameters(
 }
 
 export class WalletConnectConnection implements WalletConnection {
-    readonly client: SignClient;
+    readonly connector: WalletConnectConnector;
 
     readonly rpcClient: JsonRpcClient;
 
     readonly chainId: string;
 
-    readonly session: SessionTypes.Struct;
-
-    readonly delegate: ConnectionDelegate;
+    session: SessionTypes.Struct;
 
     constructor(
-        client: SignClient,
+        connector: WalletConnectConnector,
         rpcClient: JsonRpcClient,
         chainId: string,
-        session: SessionTypes.Struct,
-        delegate: ConnectionDelegate
+        session: SessionTypes.Struct
     ) {
-        this.client = client;
+        this.connector = connector;
         this.rpcClient = rpcClient;
         this.chainId = chainId;
         this.session = session;
-        this.delegate = delegate;
+    }
+
+    getConnector(): WalletConnector {
+        return this.connector;
+    }
+
+    async getConnectedAccount() {
+        // We're only expecting a single account to be connected.
+        const fullAddress = this.session.namespaces[WALLET_CONNECT_SESSION_NAMESPACE].accounts[0];
+        return fullAddress.substring(fullAddress.lastIndexOf(':') + 1);
     }
 
     getJsonRpcClient(): JsonRpcClient {
@@ -199,7 +205,7 @@ export class WalletConnectConnection implements WalletConnection {
             schema,
         };
         try {
-            const { hash } = (await this.client.request({
+            const { hash } = (await this.connector.client.request({
                 topic: this.session.topic,
                 request: {
                     method: 'sign_and_send_transaction',
@@ -218,7 +224,7 @@ export class WalletConnectConnection implements WalletConnection {
 
     async signMessage(accountAddress: string, message: string) {
         const params = { message };
-        const signature = await this.client.request({
+        const signature = await this.connector.client.request({
             topic: this.session.topic,
             request: {
                 method: 'sign_message',
@@ -230,20 +236,15 @@ export class WalletConnectConnection implements WalletConnection {
     }
 
     async disconnect() {
-        await this.client.disconnect({
+        await this.connector.client.disconnect({
             topic: this.session.topic,
             reason: {
                 code: 1,
                 message: 'user disconnecting',
             },
         });
-        this.delegate.onDisconnect();
+        this.connector.onDisconnect(this);
     }
-}
-
-function resolveAccount(session: SessionTypes.Struct) {
-    const fullAddress = session.namespaces[WALLET_CONNECT_SESSION_NAMESPACE].accounts[0];
-    return fullAddress.substring(fullAddress.lastIndexOf(':') + 1);
 }
 
 export class WalletConnectConnector implements WalletConnector {
@@ -253,6 +254,8 @@ export class WalletConnectConnector implements WalletConnector {
 
     readonly delegate: ConnectionDelegate;
 
+    readonly connections = new Map<string, WalletConnectConnection>();
+
     isModalOpen = false;
 
     constructor(client: SignClient, network: Network, delegate: ConnectionDelegate) {
@@ -260,38 +263,58 @@ export class WalletConnectConnector implements WalletConnector {
         this.network = network;
         this.delegate = delegate;
 
-        // Register event handlers (from official docs).
         this.client.on('session_event', ({ topic, params: { chainId: cid, event }, id }) => {
-            // Handle session events, such as "chainChanged", "accountsChanged", etc.
             console.debug('Wallet Connect event: session_event', { topic, id, chainId: cid, event });
         });
         this.client.on('session_update', ({ topic, params }) => {
+            console.debug('Wallet Connect event: session_update', { topic, params });
+
+            const connection = this.connections.get(topic);
+            if (!connection) {
+                console.error(`Wallet Connect event 'session_update' received for unknown topic '${topic}'.`);
+                return;
+            }
             const { namespaces } = params;
-            // Overwrite the namespaces of the existing session with the incoming one.
-            const updatedSession = { ...session, namespaces };
-            // Integrate the updated session state into your dapp state.
-            console.debug('Wallet Connect event: session_update', { topic, updatedSession });
+            // Overwrite session.
+            connection.session = { ...connection.session, namespaces };
+            connection
+                .getConnectedAccount()
+                .then((a) => delegate.onAccountChanged(connection, a))
+                .catch(console.error);
         });
-        this.client.on('session_delete', () => {
+        this.client.on('session_delete', ({ topic }) => {
             // Session was deleted: Reset the dApp state, clean up user session, etc.
             console.debug('Wallet Connect event: session_delete');
-            delegate.onDisconnect();
+            const connection = this.connections.get(topic);
+            if (!connection) {
+                console.error(`Wallet Connect event 'session_delete' received for unknown topic '${topic}'.`);
+                return;
+            }
+            this.connections.delete(topic);
+            delegate.onDisconnect(connection);
         });
     }
 
-    static async create(signClientInitOpts: SignClientTypes.Options, network: Network) {
+    static async create(signClientInitOpts: SignClientTypes.Options, network: Network, delegate: ConnectionDelegate) {
         const client = await SignClient.init(signClientInitOpts);
-        return new WalletConnectConnector(client, network);
+        return new WalletConnectConnector(client, network, delegate);
     }
 
-    async connect(delegate: ConnectionDelegate) {
+    async connect() {
         const chainId = `${WALLET_CONNECT_SESSION_NAMESPACE}:${this.network.name}`;
         const session = await connect(this.client, chainId, (v) => {
             this.isModalOpen = v;
         });
-        delegate.onAccountChanged(resolveAccount(session));
-
         const rpcClient = new JsonRpcClient(new HttpProvider(this.network.jsonRpcUrl));
-        return new WalletConnectConnection(this.client, rpcClient, chainId, session, delegate);
+        return new WalletConnectConnection(this, rpcClient, chainId, session);
+    }
+
+    onDisconnect(connection: WalletConnectConnection) {
+        this.connections.delete(connection.session.topic);
+        this.delegate.onDisconnect(connection);
+    }
+
+    async getConnections() {
+        return Array.from(this.connections.values());
     }
 }

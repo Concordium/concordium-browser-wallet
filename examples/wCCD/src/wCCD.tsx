@@ -1,6 +1,6 @@
 /* eslint-disable no-console */
 
-import React, { useEffect, useState, useRef, useCallback } from 'react';
+import React, { useEffect, useState, useRef, useCallback, useMemo } from 'react';
 import {
     toBuffer,
     deserializeReceiveReturnValue,
@@ -23,7 +23,13 @@ import {
 
 import ArrowIcon from './assets/Arrow.svg';
 import RefreshIcon from './assets/Refresh.svg';
-import { WalletConnection, WalletConnector, withJsonRpcClient } from './wallet/WalletConnection';
+import {
+    ConnectionDelegate,
+    destroy,
+    WalletConnection,
+    WalletConnector,
+    withJsonRpcClient,
+} from './wallet/WalletConnection';
 import { BrowserWalletConnector } from './wallet/BrowserWallet';
 import { WalletConnectConnector } from './wallet/WalletConnect';
 
@@ -144,17 +150,43 @@ export default function wCCD() {
     const [connectorType, setConnectorType] = useState<ConnectorType>();
     const [connector, setConnector] = useState<WalletConnector>();
     const [walletConnection, setWalletConnection] = useState<WalletConnection>();
+
+    // TODO Captured walletConnection becomes stale within the closures (staying 'undefined')! Must change to class component (and let the class implement delegate)?
+    const [connectedAccount, setConnectedAccount] = useState<string>();
+    const delegate = useMemo<ConnectionDelegate>(
+        () => ({
+            onAccountChanged(connection: WalletConnection, address: string | undefined) {
+                console.log('account changed', { connection, address, walletConnection });
+                if (connection === walletConnection) {
+                    console.log('setting account');
+                    setConnectedAccount(address);
+                }
+            },
+            onChainChanged(connection: WalletConnection, genesisHash: string) {
+                // Check if the user is connected to testnet by checking if the genesis hash matches the expected one.
+                // Emit a warning and disconnect if it's the wrong chain.
+                if (genesisHash !== network.genesisHash) {
+                    // eslint-disable-next-line no-alert
+                    window.alert(
+                        `Unexpected genesis hash '${genesisHash}'. Expected ${network.genesisHash} (network "${network.name}").`
+                    );
+                    connection.disconnect().catch(console.error);
+                }
+            },
+            onDisconnect(connection: WalletConnection) {
+                if (connection === walletConnection) {
+                    console.log('clearing wallet connection');
+                    setWalletConnection(undefined); // triggers clearing of connected account
+                }
+            },
+        }),
+        []
+    );
     useEffect(() => {
-        if (walletConnection) {
-            walletConnection
-                .disconnect()
-                .then(() => setWalletConnection(undefined))
-                .catch(console.error);
-        }
         if (connectorType) {
             switch (connectorType) {
                 case 'BrowserWallet':
-                    BrowserWalletConnector.create().then(setConnector).catch(console.error);
+                    BrowserWalletConnector.create(delegate).then(setConnector).catch(console.error);
                     break;
                 case 'WalletConnect':
                     WalletConnectConnector.create(
@@ -167,7 +199,8 @@ export default function wCCD() {
                                 icons: ['https://walletconnect.com/walletconnect-logo.png'],
                             },
                         },
-                        network
+                        network,
+                        delegate
                     )
                         .then(setConnector)
                         .catch(console.error);
@@ -176,34 +209,23 @@ export default function wCCD() {
                     throw new Error(`invalid connector type '${connectorType}'`);
             }
         }
+        return () => {
+            if (connector) destroy(connector).catch(console.error);
+        };
     }, [connectorType]);
 
     const [waitingForUser, setWaitingForUser] = useState<boolean>(false);
-    const [connectedAccount, setConnectedAccount] = useState<string>();
     const connectWallet = useCallback(() => {
         if (connector) {
             setWaitingForUser(true);
             connector
-                .connect({
-                    onAccountChanged(address: string | undefined) {
-                        setConnectedAccount(address);
-                    },
-                    onChainChanged(genesisHash: string) {
-                        // Check if the user is connected to testnet by checking if the genesis hash matches the expected one.
-                        // Emit a warning and disconnect if it's the wrong chain.
-                        if (genesisHash !== network.genesisHash) {
-                            // eslint-disable-next-line no-alert
-                            window.alert(
-                                `Unexpected genesis hash '${genesisHash}'. Expected ${network.genesisHash} (network "${network.name}").`
-                            );
-                            this.onDisconnect();
-                        }
-                    },
-                    onDisconnect() {
-                        setWalletConnection(undefined); // triggers clearing of connected account
-                    },
+                .connect(delegate)
+                .then((c) => {
+                    console.log('setting wallet connection', c);
+                    setWalletConnection(c);
+                    return c.getConnectedAccount();
                 })
-                .then(setWalletConnection)
+                .then(setConnectedAccount)
                 .catch(console.error)
                 .finally(() => setWaitingForUser(false));
         }
@@ -212,14 +234,16 @@ export default function wCCD() {
     const [admin, setAdmin] = useState<string>();
 
     useEffect(() => {
-        // Clear 'connectedAccount' when 'walletConnection' is.
-        if (!walletConnection) {
-            setConnectedAccount(undefined);
-        }
+        // // Clear 'connectedAccount' when 'walletConnection' is.
+        // if (!walletConnection) {
+        //     setConnectedAccount(undefined);
+        // }
         // Update admin contract.
         if (walletConnection) {
             withJsonRpcClient(walletConnection, (rpcClient) => viewAdmin(rpcClient, setAdmin)).catch(console.error);
         }
+
+        return () => setConnectedAccount(undefined);
     }, [walletConnection]);
 
     const [isWrapping, setIsWrapping] = useState<boolean>(true);
