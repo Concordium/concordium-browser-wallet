@@ -1937,7 +1937,7 @@ __metadata:
     "@babel/core": ^7.18.2
     "@concordium/browser-wallet-api": "workspace:^"
     "@concordium/browser-wallet-api-helpers": "workspace:^"
-    "@concordium/web-sdk": ^3.1.0-beta
+    "@concordium/web-sdk": ^3.1.0-beta.1
     "@craftamap/esbuild-plugin-html": ^0.4.0
     "@mdx-js/react": ^1.6.22
     "@scure/bip39": ^1.1.0
@@ -2035,6 +2035,24 @@ __metadata:
   languageName: node
   linkType: hard
 
+"@concordium/common-sdk@npm:6.1.0-beta.1":
+  version: 6.1.0-beta.1
+  resolution: "@concordium/common-sdk@npm:6.1.0-beta.1"
+  dependencies:
+    "@concordium/rust-bindings": 0.8.0
+    "@noble/ed25519": ^1.7.1
+    "@scure/bip39": ^1.1.0
+    bs58check: ^2.1.2
+    buffer: ^6.0.3
+    cross-fetch: 3.1.5
+    hash.js: ^1.1.7
+    iso-3166-1: ^2.1.1
+    json-bigint: ^1.0.0
+    uuid: ^8.3.2
+  checksum: 17939383ebc825b4c69448e63c6977cb4542af041d103a99cb8354ae12bcfab114ee0653ec86165e3e3d9fe1a41f50e5594bbd39ce062081dc16876a2ed54ba5
+  languageName: node
+  linkType: hard
+
 "@concordium/common-sdk@npm:^2.3.2":
   version: 2.3.2
   resolution: "@concordium/common-sdk@npm:2.3.2"
@@ -2091,6 +2109,18 @@ __metadata:
     buffer: ^6.0.3
     process: ^0.11.10
   checksum: 37163553fa249fb39e4c464074216d22f6439509ee912f5b1fee76b5694104e57173ee4cf7eed5d3d106a337b4b9529c8a373f2051fd4021008d9f51e0cd9794
+  languageName: node
+  linkType: hard
+
+"@concordium/web-sdk@npm:^3.1.0-beta.1":
+  version: 3.1.0-beta.1
+  resolution: "@concordium/web-sdk@npm:3.1.0-beta.1"
+  dependencies:
+    "@concordium/common-sdk": 6.1.0-beta.1
+    "@concordium/rust-bindings": 0.8.0
+    buffer: ^6.0.3
+    process: ^0.11.10
+  checksum: 219426ee7dfd2a0ce4293746477fa92d2d62174275902ac636b4e52072a0d91d4afb99f103d0d374da4c8b7d26c218b2289eb7f4855394c19b4c27d093762035
   languageName: node
   linkType: hard
 
@@ -19334,7 +19364,7 @@ __metadata:
   version: 0.0.0-use.local
   resolution: "two-step-transfer@workspace:examples/two-step-transfer"
   dependencies:
-    "@concordium/web-sdk": ^3.1.0-beta
+    "@concordium/web-sdk": ^3.1.0-beta.1
     live-server: ^1.2.2
   languageName: unknown
   linkType: soft
