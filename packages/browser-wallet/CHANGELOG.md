@@ -6,6 +6,10 @@
 
 -   Support for generating zero knowledge proofs requested from web applications.
 
+### Changed
+
+-   Arranged the image of a collectible at the top of the collectible details page.
+
 ## 0.8.5
 
 ### Fixed

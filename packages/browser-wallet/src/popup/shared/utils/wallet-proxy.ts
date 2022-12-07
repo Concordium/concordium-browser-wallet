@@ -290,10 +290,19 @@ export async function getCcdDrop(accountAddress: string): Promise<BrowserWalletA
     );
 }
 
-export async function getTransactionStatus(tHash: string): Promise<TransactionStatus | undefined> {
+export async function getTransactionStatus(
+    tHash: string
+): Promise<{ status: TransactionStatus; cost: string } | undefined> {
     const path = `/v0/submissionStatus/${tHash}`;
-    const { data } = await (await getWalletProxy()).get(path);
-    return data.status;
+    const {
+        data: { status, cost },
+    } = await (await getWalletProxy()).get(path);
+
+    if ([status, cost].includes(undefined)) {
+        return undefined;
+    }
+
+    return { status, cost };
 }
 
 export async function getCis2Tokens(

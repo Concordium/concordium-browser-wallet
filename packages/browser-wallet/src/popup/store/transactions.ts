@@ -19,27 +19,39 @@ const monitorTransactionStatus = (genesisHash: string) => {
     monitoredMap[genesisHash] = monitoredMap[genesisHash] ?? [];
 
     /**
-     * Resolves with true if monitoring has started with this function invocation and false if transaction is already being monitored.
+     * Resolves with {status: TransactionStatus; cost: bigint} if monitoring has started with this function invocation and false if transaction is already being monitored.
      */
-    return async (transactionHash: string): Promise<boolean> => {
+    type R = false | { status: TransactionStatus; cost: bigint };
+    return async (transactionHash: string): Promise<R> => {
         if (monitoredMap[genesisHash].some((th) => th === transactionHash)) {
             return false;
         }
 
         monitoredMap[genesisHash].push(transactionHash);
 
-        await loop(TRANSACTION_CHECK_INTERVAL, async () => {
-            const status = await getTransactionStatus(transactionHash);
-            const done =
-                status !== undefined && [TransactionStatus.Finalized, TransactionStatus.Finalized].includes(status);
+        let status: TransactionStatus | undefined;
+        let cost: bigint | undefined;
 
-            if (done) {
+        await loop(TRANSACTION_CHECK_INTERVAL, async () => {
+            const response = await getTransactionStatus(transactionHash);
+            const done =
+                response !== undefined &&
+                [TransactionStatus.Finalized, TransactionStatus.Failed].includes(response.status);
+
+            if (done && response !== undefined) {
                 monitoredMap[genesisHash] = monitoredMap[genesisHash].filter((th) => th !== transactionHash);
+                status = response.status;
+                cost = BigInt(response.cost);
             }
 
             return !done;
         });
-        return true;
+
+        if (cost === undefined || status === undefined) {
+            throw new Error('Unreachable'); // Unreachable block, validates variable types.
+        }
+
+        return { status, cost };
     };
 };
 
@@ -66,26 +78,31 @@ const pendingTransactionsAtom = (() => {
             const network = get(networkConfigurationAtom);
             const monitor = monitorTransactionStatus(network.genesisHash);
 
-            pending.forEach(async ({ transactionHash }) => {
-                const shouldRemove = await monitor(transactionHash);
-                const currentNetwork = get(networkConfigurationAtom);
+            pending
+                .filter((p) => p.status === TransactionStatus.Pending)
+                .forEach(async ({ transactionHash }) => {
+                    const result = await monitor(transactionHash);
+                    const currentNetwork = get(networkConfigurationAtom);
 
-                if (!shouldRemove) {
-                    return;
-                }
+                    if (!result) {
+                        return;
+                    }
 
-                const networkChanged = network.genesisHash !== currentNetwork.genesisHash;
+                    const networkChanged = network.genesisHash !== currentNetwork.genesisHash;
 
-                if (!networkChanged) {
-                    const next = get(parsedAtom).filter((p) => p.transactionHash !== transactionHash);
-                    await set(parsedAtom, next);
-                } else {
-                    const spt = useIndexedStorage(sessionPendingTransactions, async () => network.genesisHash);
-                    const next = (await spt.get())?.map(parse).filter((p) => p.transactionHash !== transactionHash);
+                    const mapIfMatch = (p: BrowserWalletAccountTransaction) =>
+                        p.transactionHash !== transactionHash ? p : { ...p, ...result };
 
-                    await spt.set(next?.map(stringify) ?? []);
-                }
-            });
+                    if (!networkChanged) {
+                        const next = get(parsedAtom).map(mapIfMatch);
+                        await set(parsedAtom, next);
+                    } else {
+                        const spt = useIndexedStorage(sessionPendingTransactions, async () => network.genesisHash);
+                        const next = (await spt.get())?.map(parse).map(mapIfMatch);
+
+                        await spt.set(next?.map(stringify) ?? []);
+                    }
+                });
         }
     );
 
