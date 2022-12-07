@@ -23,7 +23,30 @@ export class AccountInfoListener extends EventEmitter {
         this.genesisHash = network.genesisHash;
     }
 
+    private async update(accountAddress: string, blockHash?: string) {
+        try {
+            if (this.accountsMap.size > 0) {
+                const bh = blockHash ?? (await this.client.getConsensusStatus()).lastFinalizedBlock;
+                const address = new AccountAddress(accountAddress);
+                const accountInfo = await this.client.getAccountInfo(address, bh);
+
+                if (accountInfo) {
+                    updateRecord(
+                        accountInfoCacheLock,
+                        useIndexedStorage(sessionAccountInfoCache, async () => this.genesisHash),
+                        accountInfo.accountAddress,
+                        stringify(accountInfo)
+                    );
+                }
+            }
+        } catch (e) {
+            this.emit('error', e);
+        }
+    }
+
     subscribe(accountAddress: string) {
+        this.update(accountAddress);
+
         const existingSubscriptions = this.accountsMap.get(accountAddress);
         if (existingSubscriptions !== undefined) {
             this.accountsMap.set(accountAddress, existingSubscriptions + 1);
@@ -45,24 +68,10 @@ export class AccountInfoListener extends EventEmitter {
 
     async listen() {
         this.interval = setInterval(async () => {
-            try {
-                if (this.accountsMap.size > 0) {
-                    const lfBlockHash = (await this.client.getConsensusStatus()).lastFinalizedBlock;
-                    for (const accountAddress of this.accountsMap.keys()) {
-                        const address = new AccountAddress(accountAddress);
-                        const accountInfo = await this.client.getAccountInfo(address, lfBlockHash);
-                        if (accountInfo) {
-                            updateRecord(
-                                accountInfoCacheLock,
-                                useIndexedStorage(sessionAccountInfoCache, async () => this.genesisHash),
-                                accountInfo.accountAddress,
-                                stringify(accountInfo)
-                            );
-                        }
-                    }
-                }
-            } catch (e) {
-                this.emit('error', e);
+            const lfBlockHash = (await this.client.getConsensusStatus()).lastFinalizedBlock;
+
+            for (const accountAddress of this.accountsMap.keys()) {
+                this.update(accountAddress, lfBlockHash);
             }
         }, ACCOUNT_INFO_RETRIEVAL_INTERVAL_MS);
     }
