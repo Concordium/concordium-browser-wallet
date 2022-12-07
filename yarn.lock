@@ -19334,6 +19334,7 @@ __metadata:
   version: 0.0.0-use.local
   resolution: "two-step-transfer@workspace:examples/two-step-transfer"
   dependencies:
+    "@concordium/web-sdk": ^3.1.0-beta
     live-server: ^1.2.2
   languageName: unknown
   linkType: soft

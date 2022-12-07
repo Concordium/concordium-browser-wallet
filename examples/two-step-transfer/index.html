@@ -103,6 +103,8 @@
                 document.getElementById('idProof').addEventListener('click', () => {
                     const statement = new concordiumSDK.IdStatementBuilder()
                         .addMinimumAge(18)
+                        .documentExpiryNoEarlierThan('20230101')
+                        .addRange(9, '20100101', '20200101')
                         .addEUResidency()
                         .getStatement();
                     const challenge = 'AAAAAAAA';

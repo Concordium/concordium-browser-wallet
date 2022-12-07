@@ -9,6 +9,7 @@ import {
     RevealStatement,
     StatementTypes,
     getPastDate,
+    MAX_DATE,
 } from '@concordium/web-sdk';
 import { useTranslation } from 'react-i18next';
 import { formatAttributeValue } from 'wallet-common-helpers';
@@ -79,11 +80,12 @@ export function useStatementName(statement: SecretStatement): string {
         switch (statement.attributeTag) {
             case 'dob':
                 return isAgeStatement(statement) ? t('age') : t('dob');
+            case 'idDocIssuedAt':
+            case 'idDocExpiresAt':
+                return t(statement.attributeTag);
         }
     } else {
         switch (statement.attributeTag) {
-            case 'idDocIssuedAt':
-            case 'idDocExpiresAt':
             case 'idDocIssuer':
             case 'idDocType':
             case 'countryOfResidence':
@@ -124,19 +126,30 @@ export function useStatementValue(statement: SecretStatement): string {
                 const maxDobString = formatDateString(upper);
 
                 if (statement.lower === MIN_DATE) {
-                    return t('dobMin', { dobString: minDobString });
+                    return t('dateAfter', { dobString: maxDobString });
                 }
 
                 if (statement.upper > today) {
-                    return t('dobMin', { dobString: minDobString });
+                    return t('dateBefore', { dobString: minDobString });
                 }
 
-                return t('dobBetween', { minDobString, maxDobString });
+                return t('dateBetween', { minDobString, maxDobString });
             }
             case 'idDocIssuedAt':
-                return t('idValidity', { dateString: formatDateString(statement.upper) });
-            case 'idDocExpiresAt':
-                return t('idValidity', { dateString: formatDateString(statement.lower) });
+            case 'idDocExpiresAt': {
+                const minDateString = formatDateString(statement.lower);
+                const maxDateString = formatDateString(statement.upper);
+
+                if (statement.lower === MIN_DATE) {
+                    return t('dateAfter', { dateString: maxDateString });
+                }
+
+                if (statement.upper === MAX_DATE) {
+                    return t('dateBefore', { dateString: minDateString });
+                }
+
+                return t('dateBetween', { minDateString, maxDateString });
+            }
         }
     } else {
         const text = getTextForSet(t, statement as MembershipStatement);
