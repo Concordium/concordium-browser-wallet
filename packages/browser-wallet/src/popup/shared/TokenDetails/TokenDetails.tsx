@@ -86,6 +86,11 @@ function Nft({ token, balance, contractIndex, subIndex }: TokenProps) {
                 {thumbnail && <Img src={thumbnail.url} alt={name} withDefaults />}
                 {name}
             </h3>
+            {display?.url && (
+                <div className="token-details__image">
+                    <img src={display?.url} alt={name} />
+                </div>
+            )}
             <TokenDetailsLine header={t('ownership')}>
                 <span className="text-bold">{balance === 0n && t('unownedUnique')}</span>
                 <span className="text-bold">
@@ -110,11 +115,6 @@ function Nft({ token, balance, contractIndex, subIndex }: TokenProps) {
             </TokenDetailsLine>
             <TokenDetailsLine header={t('tokenId')}>{token.id}</TokenDetailsLine>
             <ShowRawMetadata metadata={token.metadata} />
-            {display?.url && (
-                <div className="token-details__image">
-                    <img src={display?.url} alt={name} />
-                </div>
-            )}
         </>
     );
 }
@@ -222,7 +222,11 @@ export default function TokenDetails({
             <div className="token-details__content">
                 <Token {...tokenProps} subIndex={subIndex} />
             </div>
-            {canRemove && <RemoveToken token={token} contractIndex={contractIndex} onRemove={onClose} />}
+            {canRemove && (
+                <div className="token-details__remove-wrapper">
+                    <RemoveToken token={token} contractIndex={contractIndex} onRemove={onClose} />
+                </div>
+            )}
         </div>
     );
 }
