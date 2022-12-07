@@ -122,18 +122,18 @@ export function useStatementValue(statement: SecretStatement): string {
                     return t('ageBetween', { ageMin, ageMax });
                 }
 
-                const minDobString = formatDateString(statement.lower);
-                const maxDobString = formatDateString(upper);
+                const minDateString = formatDateString(statement.lower);
+                const maxDateString = formatDateString(upper);
 
                 if (statement.lower === MIN_DATE) {
-                    return t('dateAfter', { dobString: maxDobString });
+                    return t('dateAfter', { dateString: maxDateString });
                 }
 
                 if (statement.upper > today) {
-                    return t('dateBefore', { dobString: minDobString });
+                    return t('dateBefore', { dateString: minDateString });
                 }
 
-                return t('dateBetween', { minDobString, maxDobString });
+                return t('dateBetween', { minDateString, maxDateString });
             }
             case 'idDocIssuedAt':
             case 'idDocExpiresAt': {
