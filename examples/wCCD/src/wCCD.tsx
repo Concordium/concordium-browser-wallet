@@ -219,7 +219,7 @@ export default function wCCD() {
         if (connector) {
             setWaitingForUser(true);
             connector
-                .connect(delegate)
+                .connect()
                 .then((c) => {
                     console.log('setting wallet connection', c);
                     setWalletConnection(c);
