@@ -19,7 +19,7 @@ const monitorTransactionStatus = (genesisHash: string) => {
     monitoredMap[genesisHash] = monitoredMap[genesisHash] ?? [];
 
     /**
-     * Resolves with {status: TransactionCost; cost: bigint} if monitoring has started with this function invocation and false if transaction is already being monitored.
+     * Resolves with {status: TransactionStatus; cost: bigint} if monitoring has started with this function invocation and false if transaction is already being monitored.
      */
     type R = false | { status: TransactionStatus; cost: bigint };
     return async (transactionHash: string): Promise<R> => {
