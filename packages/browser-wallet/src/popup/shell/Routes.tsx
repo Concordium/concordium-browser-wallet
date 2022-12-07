@@ -6,7 +6,7 @@ import {
     createMessageTypeFilter,
     MessageStatusWrapper,
 } from '@concordium/browser-wallet-message-hub';
-import { AccountTransactionSignature } from '@concordium/web-sdk';
+import { AccountTransactionSignature, IdProofOutput } from '@concordium/web-sdk';
 import { noOp } from 'wallet-common-helpers';
 
 import { absoluteRoutes, relativeRoutes, relativePath } from '@popup/constants/routes';
@@ -31,6 +31,7 @@ import RecoveryMain from '@popup/pages/Recovery/RecoveryMain';
 import RecoveryFinish from '@popup/pages/Recovery/RecoveryFinish';
 import ChangePasscode from '@popup/pages/ChangePasscode/ChangePasscode';
 import AddTokensPrompt from '@popup/pages/ExternalAddTokens/ExternalAddTokens';
+import IdProofRequest from '@popup/pages/IdProofRequest';
 
 type PromptKey = keyof Omit<typeof absoluteRoutes['prompt'], 'path'>;
 
@@ -93,9 +94,12 @@ export default function Routes() {
         InternalMessageType.AddTokens,
         'addTokens'
     );
+    const handleIdProofResponse = useMessagePrompt<MessageStatusWrapper<IdProofOutput>>(
+        InternalMessageType.IdProof,
+        'idProof'
+    );
 
     usePrompt(InternalMessageType.EndIdentityIssuance, 'endIdentityIssuance');
-
     usePrompt(InternalMessageType.RecoveryFinished, 'recovery');
 
     useEffect(() => {
@@ -141,6 +145,17 @@ export default function Routes() {
                         <ConnectionRequest
                             onAllow={() => handleConnectionResponse(true)}
                             onReject={() => handleConnectionResponse(false)}
+                        />
+                    }
+                />
+                <Route
+                    path={relativeRoutes.prompt.idProof.path}
+                    element={
+                        <IdProofRequest
+                            onSubmit={(proof) => handleIdProofResponse({ success: true, result: proof })}
+                            onReject={() =>
+                                handleIdProofResponse({ success: false, message: 'Proof generation was rejected' })
+                            }
                         />
                     }
                 />

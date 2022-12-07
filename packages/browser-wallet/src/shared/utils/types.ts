@@ -1,4 +1,5 @@
 /* eslint-disable @typescript-eslint/ban-types */
+import { IdProofOutput } from '@concordium/web-sdk';
 import { RefAttributes } from 'react';
 /**
  * @description
@@ -26,6 +27,16 @@ export type CredentialDeploymentBackgroundResponse =
     | {
           status: BackgroundResponseStatus.Success;
           address: string;
+      }
+    | {
+          status: BackgroundResponseStatus.Error;
+          reason: string;
+      };
+
+export type IdProofBackgroundResponse =
+    | {
+          status: BackgroundResponseStatus.Success;
+          proof: IdProofOutput;
       }
     | {
           status: BackgroundResponseStatus.Error;

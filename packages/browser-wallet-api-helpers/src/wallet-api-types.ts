@@ -6,6 +6,8 @@ import type {
     JsonRpcClient,
     SchemaVersion,
     UpdateContractPayload,
+    IdStatement,
+    IdProofOutput,
 } from '@concordium/web-sdk';
 
 type SendTransactionPayload =
@@ -101,6 +103,15 @@ interface MainWalletApi {
         contractIndex: bigint,
         contractSubindex?: bigint
     ): Promise<string[]>;
+
+    /**
+     * Request that the user provides a proof for the given statement.
+     * @param accountAddress the address of the account that should prove the statement.
+     * @param statement the id statement that should be proven.
+     * @param challenge bytes chosen by the verifier. Should be HEX encoded.
+     * @returns The id proof and the id of the credential used to prove it.
+     */
+    requestIdProof(accountAddress: string, statement: IdStatement, challenge: string): Promise<IdProofOutput>;
 }
 
 export type WalletApi = MainWalletApi & EventListeners;

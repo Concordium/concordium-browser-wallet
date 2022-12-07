@@ -1,3 +1,5 @@
+import { attributeNamesMap } from 'wallet-common-helpers';
+
 const t = {
     form: {
         password: {
@@ -13,6 +15,21 @@ const t = {
         confirmed: 'Verified by',
         rejected: 'Rejected by',
     },
+    idAttributes: {
+        countryOfResidence: 'Country of residence',
+        firstName: 'First name',
+        idDocExpiresAt: 'ID valid to',
+        idDocIssuedAt: 'ID valid from',
+        idDocIssuer: ' Identity document issuer',
+        idDocType: 'Identity document type',
+        idDocNo: ' Identity document number',
+        lastName: 'Last name',
+        taxIdNo: 'Tax ID number',
+        nationalIdNo: 'National ID number',
+        nationality: 'Country of nationality',
+        sex: 'Sex',
+        dob: 'Date of birth',
+    } as typeof attributeNamesMap,
     account: {
         error: 'Unable to retrieve account balance',
     },
