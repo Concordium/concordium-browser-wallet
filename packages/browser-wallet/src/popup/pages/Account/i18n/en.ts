@@ -51,6 +51,7 @@ const t = {
         unableToSendFailedInvoke: 'Simulation of transfer failed, unable to proceed.',
         transferInvokeFailed: 'Simulation of transfer failed: {{ message }}',
         unableToCreatePayload: 'Unable to create transaction: {{ message}}',
+        nonexistingAccount: 'The recipient is not registered on the chain',
         fee: 'Estimated transaction fee',
     },
     tokens: {

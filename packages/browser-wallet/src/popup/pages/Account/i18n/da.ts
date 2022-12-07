@@ -53,6 +53,7 @@ const t: typeof en = {
         unableToSendFailedInvoke: 'Simulering af overførsel fejlede, overførslen er ikke mulig.',
         transferInvokeFailed: 'Simulering af overførsel fejlede: {{ message }}',
         unableToCreatePayload: 'Konstruktion af transaktion fejlede: {{ message}}',
+        nonexistingAccount: 'Modtager findes ikke på kæden',
         fee: 'Estimerede transaktionsomkostninger',
     },
     tokens: {
