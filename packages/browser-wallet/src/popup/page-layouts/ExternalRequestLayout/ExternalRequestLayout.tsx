@@ -20,6 +20,9 @@ function Header() {
         if (pathname.startsWith(absoluteRoutes.prompt.addTokens.path)) {
             return t('header.addTokens');
         }
+        if (pathname.startsWith(absoluteRoutes.prompt.idProof.path)) {
+            return t('header.idProof');
+        }
         return t('header.request');
     }
 
