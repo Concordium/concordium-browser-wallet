@@ -15,6 +15,7 @@ const t = {
     contractName: 'Contract name',
     title: 'Sign transaction',
     data: 'Data',
+    rawData: '(Unable to be decoded)',
 };
 
 export default t;
