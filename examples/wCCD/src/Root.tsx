@@ -1,11 +1,19 @@
 import React from 'react';
+import { SignClientTypes } from '@walletconnect/types';
 import WCCD from './wCCD';
-import {WithWalletConnection} from "./wallet/WithWalletConnection";
-import {TESTNET} from "./constants";
+import { WithWalletConnection } from './wallet/WithWalletConnection';
+import { TESTNET, WALLET_CONNECT_PROJECT_ID } from './constants';
+import { Network } from './wallet/WalletConnection';
 
-const network = TESTNET;
-const walletConnectOpts = {
-
+const network: Network = TESTNET;
+const walletConnectOpts: SignClientTypes.Options = {
+    projectId: WALLET_CONNECT_PROJECT_ID,
+    metadata: {
+        name: 'wCCD',
+        description: 'Example dApp for the wCCD token.',
+        url: '#',
+        icons: ['https://walletconnect.com/walletconnect-logo.png'],
+    },
 };
 
 /**
@@ -18,11 +26,7 @@ export default function Root() {
             <script src="../../packages/browser-wallet-api-helpers/lib/concordiumHelpers.min.js" />
             <main className="wccd">
                 <WithWalletConnection network={network} walletConnectOpts={walletConnectOpts}>
-                    {
-                        (activeConnection, ) =>
-                            <WCCD activeConnection={} />
-                    }
-
+                    {(props) => <WCCD {...props} />}
                 </WithWalletConnection>
             </main>
         </div>

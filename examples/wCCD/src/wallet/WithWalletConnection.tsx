@@ -1,5 +1,6 @@
 /* eslint-disable no-console */
 /* eslint-disable react/sort-comp */
+/* eslint-disable react/no-unused-class-component-methods */
 
 import React from 'react';
 import { SignClientTypes } from '@walletconnect/types';
@@ -21,15 +22,15 @@ interface State {
     connectedAccount: string | undefined;
 }
 
-export interface ChildrenProps extends State {
-    setConnectorType: (t: ConnectorType | undefined) => void;
-    setActiveConnection: (c: WalletConnection | undefined) => void;
+interface Props {
+    network: Network; // not expected to change
+    walletConnectOpts: SignClientTypes.Options; // not expected to change
+    children: (props: WalletConnectionProps) => React.ReactNode;
 }
 
-interface Props {
-    network: Network;
-    walletConnectOpts: SignClientTypes.Options;
-    children: (props: ChildrenProps) => React.ReactNode;
+export interface WalletConnectionProps extends State {
+    setConnectorType: (t: ConnectorType | undefined) => void;
+    setActiveConnection: (c: WalletConnection | undefined) => void;
 }
 
 type ConnectorType = 'BrowserWallet' | 'WalletConnect';
@@ -46,22 +47,31 @@ export class WithWalletConnection extends React.Component<Props, State> implemen
         };
     }
 
-    setConnectorType(type: ConnectorType | undefined) {
+    setConnectorType = (type: ConnectorType | undefined) => {
         const { network } = this.props;
         const { connectorType, connector } = this.state;
         if (type !== connectorType) {
             if (connector) {
                 destroy(connector).catch(console.error);
             }
-            this.createConnector(connectorType, network).then(this.setConnector, console.error);
+            this.setState((state) => ({
+                ...state,
+                connectorType: type,
+                connector: undefined,
+                activeConnection: undefined,
+                connectedAccount: undefined,
+            }));
+            if (type) {
+                this.createConnector(type, network).then(this.setConnector).catch(console.error);
+            }
         }
-    }
+    };
 
-    private setConnector(connector: WalletConnector) {
+    private setConnector = (connector: WalletConnector) => {
         return this.setState((state) => ({ ...state, connector }));
-    }
+    };
 
-    setActiveConnection(connection: WalletConnection | undefined) {
+    setActiveConnection = (connection: WalletConnection | undefined) => {
         connectedAccountOf(connection).then((connectedAccount) => {
             this.setState((state) => ({
                 ...state,
@@ -69,9 +79,9 @@ export class WithWalletConnection extends React.Component<Props, State> implemen
                 connectedAccount,
             }));
         });
-    }
+    };
 
-    private createConnector(connectorType: string | undefined, network: Network): Promise<WalletConnector> {
+    private createConnector = (connectorType: string | undefined, network: Network): Promise<WalletConnector> => {
         const { walletConnectOpts } = this.props;
         switch (connectorType) {
             case 'BrowserWallet':
@@ -81,18 +91,18 @@ export class WithWalletConnection extends React.Component<Props, State> implemen
             default:
                 throw new Error(`invalid connector type '${connectorType}'`);
         }
-    }
+    };
 
-    onAccountChanged(connection: WalletConnection, address: string | undefined) {
+    onAccountChanged = (connection: WalletConnection, address: string | undefined) => {
         const { activeConnection } = this.state;
         console.log('account changed', { connection, address, activeConnection });
         if (connection === activeConnection) {
             console.log('setting account');
             this.setState((state) => ({ ...state, connectedAccount: address }));
         }
-    }
+    };
 
-    onChainChanged(connection: WalletConnection, genesisHash: string) {
+    onChainChanged = (connection: WalletConnection, genesisHash: string) => {
         const { network } = this.props;
         // Check if the user is connected to testnet by checking if the genesis hash matches the expected one.
         // Emit a warning and disconnect if it's the wrong chain.
@@ -103,15 +113,15 @@ export class WithWalletConnection extends React.Component<Props, State> implemen
             );
             connection.disconnect().catch(console.error);
         }
-    }
+    };
 
-    onDisconnect(connection: WalletConnection) {
+    onDisconnect = (connection: WalletConnection) => {
         const { activeConnection } = this.state;
         if (connection === activeConnection) {
             console.log('clearing wallet connection');
             this.setState((state) => ({ ...state, activeConnection: undefined, connectedAccount: undefined }));
         }
-    }
+    };
 
     render() {
         const { children } = this.props;

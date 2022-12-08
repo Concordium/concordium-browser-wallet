@@ -17,13 +17,12 @@ import {
     CONTRACT_NAME,
     VIEW_FUNCTION_RAW_SCHEMA,
     BALANCEOF_FUNCTION_RAW_SCHEMA,
-    TESTNET,
 } from './constants';
 
 import ArrowIcon from './assets/Arrow.svg';
 import RefreshIcon from './assets/Refresh.svg';
 import { withJsonRpcClient } from './wallet/WalletConnection';
-import { ChildrenProps } from './wallet/WithWalletConnection';
+import { WalletConnectionProps } from './wallet/WithWalletConnection';
 
 const blackCardStyle = {
     backgroundColor: 'black',
@@ -134,75 +133,9 @@ async function updateWCCDBalanceAccount(
     setAmountAccount(BigInt(leb.decodeULEB128(toBuffer(res.returnValue.slice(4), 'hex'))[0]));
 }
 
-export default function wCCD(props: ChildrenProps) {
+export default function wCCD(props: WalletConnectionProps) {
     const { connectorType, setConnectorType, connector, activeConnection, setActiveConnection, connectedAccount } =
         props;
-    // const [connectorType, setConnectorType] = useState<ConnectorType>();
-    // const [connector, setConnector] = useState<WalletConnector>();
-    // const [walletConnection, setWalletConnection] = useState<WalletConnection>();
-
-    // const [connectedAccount, setConnectedAccount] = useState<string>();
-    // const delegate = useMemo<ConnectionDelegate>(() => {
-    //     onAccountChanged(connection: WalletConnection, address: string | undefined) {
-    //         console.log('account changed', { connection, address, walletConnection });
-    //         if (connection === walletConnection) {
-    //             console.log('setting account');
-    //             setConnectedAccount(address);
-    //         }
-    //     },
-    //     onChainChanged(connection: WalletConnection, genesisHash: string) {
-    //         // Check if the user is connected to testnet by checking if the genesis hash matches the expected one.
-    //         // Emit a warning and disconnect if it's the wrong chain.
-    //         if (genesisHash !== network.genesisHash) {
-    //             // eslint-disable-next-line no-alert
-    //             window.alert(
-    //                 `Unexpected genesis hash '${genesisHash}'. Expected ${network.genesisHash} (network "${network.name}").`
-    //             );
-    //             connection.disconnect().catch(console.error);
-    //         }
-    //     },
-    //     onDisconnect(connection: WalletConnection) {
-    //         console.log('disconnecting', { connection, walletConnection });
-    //         if (connection === walletConnection) {
-    //             console.log('clearing wallet connection');
-    //             setWalletConnection(undefined); // triggers clearing of connected account
-    //         }
-    //     },
-    // });
-    // useEffect(() => {
-    //     if (connectorType) {
-    //         switch (connectorType) {
-    //             case 'BrowserWallet':
-    //                 BrowserWalletConnector.create(delegate)
-    //                     .then(setConnector)
-    //                     .catch(console.error);
-    //                 break;
-    //             case 'WalletConnect':
-    //                 WalletConnectConnector.create(
-    //                     {
-    //                         projectId: WALLET_CONNECT_PROJECT_ID,
-    //                         metadata: {
-    //                             name: 'wCCD',
-    //                             description: 'Example dApp for the wCCD token.',
-    //                             url: '#',
-    //                             icons: ['https://walletconnect.com/walletconnect-logo.png'],
-    //                         },
-    //                     },
-    //                     network,
-    //                     delegate.current
-    //                 )
-    //                     .then(setConnector)
-    //                     .catch(console.error);
-    //                 break;
-    //             default:
-    //                 throw new Error(`invalid connector type '${connectorType}'`);
-    //         }
-    //     }
-    //     return () => {
-    //         if (connector) destroy(connector).catch(console.error);
-    //     };
-    // }, [connectorType]);
-
     const [waitingForUser, setWaitingForUser] = useState<boolean>(false);
     const connectWallet = useCallback(() => {
         if (connector) {
