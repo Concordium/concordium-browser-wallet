@@ -35,6 +35,9 @@ const t: typeof en = {
             done: 'Færdig',
             export: 'Eksporter',
         },
+        accountStatement: {
+            title: 'Eksportér transaktionslog',
+        },
     },
     sendCcd: {
         labels: {

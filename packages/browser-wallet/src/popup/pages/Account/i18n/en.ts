@@ -33,6 +33,9 @@ const t = {
             done: 'Done',
             export: 'Export',
         },
+        accountStatement: {
+            title: 'Export transaction log',
+        },
     },
     sendCcd: {
         labels: {
