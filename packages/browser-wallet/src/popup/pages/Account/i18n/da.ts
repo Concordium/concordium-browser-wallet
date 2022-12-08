@@ -37,6 +37,9 @@ const t: typeof en = {
         },
         accountStatement: {
             title: 'Eksportér transaktionslog',
+            description:
+                'Transaktionslogs for en konto kan genereres og hentes fra CCDScan.io.\n\nCCDScan er en Concordium block explorer, og ved at trykke på knappen nedenfor åbnes et denne side i din browser.',
+            link: 'Gå til CCDScan.io',
         },
     },
     sendCcd: {
