@@ -187,7 +187,7 @@ export function DisplayRevealStatement({
 
     const lines: StatementLine[] = statements.map((s) => {
         const raw = attributes[s.attributeTag];
-        const value = formatAttributeValue(s.attributeTag, attributes[s.attributeTag]);
+        const value = formatAttributeValue(s.attributeTag, attributes[s.attributeTag] ?? 'Unavailable');
 
         return {
             attribute: getAttributeName(s.attributeTag),

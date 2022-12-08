@@ -132,11 +132,11 @@ export default function SignMessage({ respond }: Props) {
             )}
             {detailView === undefined && (
                 <div className="h-full flex-column align-center">
-                    <p className="m-t-0 text-center">
+                    <h3 className="m-t-0 text-center">
                         {t(allExisting ? 'descriptionAllExisting' : 'description', {
                             dApp: displayUrl(url),
                         })}
-                    </p>
+                    </h3>
                     <UncontrolledInput
                         readOnly
                         className="add-tokens-prompt__input w-full"

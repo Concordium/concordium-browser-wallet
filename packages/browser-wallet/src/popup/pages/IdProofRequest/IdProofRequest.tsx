@@ -108,7 +108,7 @@ export default function IdProofRequest({ onReject, onSubmit }: Props) {
         <ExternalRequestLayout>
             <div className="id-proof-request">
                 <div>
-                    <h1 className="m-t-0 text-center">{t('header', { dappName })}</h1>
+                    <h3 className="m-t-0 text-center">{t('header', { dappName })}</h3>
                     {reveals.length !== 0 && (
                         <DisplayRevealStatement
                             className="m-t-10:not-first"
