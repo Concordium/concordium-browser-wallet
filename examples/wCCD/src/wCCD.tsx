@@ -17,15 +17,12 @@ import {
     CONTRACT_NAME,
     VIEW_FUNCTION_RAW_SCHEMA,
     BALANCEOF_FUNCTION_RAW_SCHEMA,
-    TESTNET,
-    WALLET_CONNECT_PROJECT_ID,
 } from './constants';
 
 import ArrowIcon from './assets/Arrow.svg';
 import RefreshIcon from './assets/Refresh.svg';
-import { WalletConnection, WalletConnector, withJsonRpcClient } from './wallet/WalletConnection';
-import { BrowserWalletConnector } from './wallet/BrowserWallet';
-import { WalletConnectConnector } from './wallet/WalletConnect';
+import { withJsonRpcClient } from './wallet/WalletConnection';
+import { WalletConnectionProps } from './wallet/WithWalletConnection';
 
 const blackCardStyle = {
     backgroundColor: 'black',
@@ -136,73 +133,19 @@ async function updateWCCDBalanceAccount(
     setAmountAccount(BigInt(leb.decodeULEB128(toBuffer(res.returnValue.slice(4), 'hex'))[0]));
 }
 
-const network = TESTNET;
-
-type ConnectorType = 'BrowserWallet' | 'WalletConnect';
-
-export default function wCCD() {
-    const [connectorType, setConnectorType] = useState<ConnectorType>();
-    const [connector, setConnector] = useState<WalletConnector>();
-    const [walletConnection, setWalletConnection] = useState<WalletConnection>();
-    useEffect(() => {
-        if (walletConnection) {
-            walletConnection.disconnect().catch(console.error);
-        }
-        if (connectorType) {
-            switch (connectorType) {
-                case 'BrowserWallet':
-                    BrowserWalletConnector.create().then(setConnector).catch(console.error);
-                    break;
-                case 'WalletConnect':
-                    WalletConnectConnector.create(
-                        {
-                            projectId: WALLET_CONNECT_PROJECT_ID,
-                            metadata: {
-                                name: 'wCCD',
-                                description: 'Example dApp for the wCCD token.',
-                                url: '#',
-                                icons: ['https://walletconnect.com/walletconnect-logo.png'],
-                            },
-                        },
-                        network
-                    )
-                        .then(setConnector)
-                        .catch(console.error);
-                    break;
-                default:
-                    throw new Error(`invalid connector type '${connectorType}'`);
-            }
-        }
-    }, [connectorType]);
-
+export default function wCCD(props: WalletConnectionProps) {
+    const { connectorType, setConnectorType, connector, activeConnection, setActiveConnection, connectedAccount } =
+        props;
     const [waitingForUser, setWaitingForUser] = useState<boolean>(false);
-    const [connectedAccount, setConnectedAccount] = useState<string>();
     const connectWallet = useCallback(() => {
         if (connector) {
             setWaitingForUser(true);
             connector
-                .connect({
-                    onAccountChanged(address: string | undefined) {
-                        setConnectedAccount(address);
-                    },
-                    onChainChanged(genesisHash: string) {
-                        // Check if the user is connected to testnet by checking if the genesis hash matches the expected one.
-                        // Emit a warning and disconnect if it's the wrong chain.
-                        if (genesisHash !== network.genesisHash) {
-                            // eslint-disable-next-line no-alert
-                            window.alert(
-                                `Unexpected genesis hash '${genesisHash}'. Expected ${network.genesisHash} (network "${network.name}").`
-                            );
-                            this.onDisconnect();
-                        }
-                    },
-                    onDisconnect() {
-                        walletConnection?.disconnect().catch(console.error);
-                        setWalletConnection(undefined);
-                        setConnectedAccount(undefined);
-                    },
+                .connect()
+                .then((c) => {
+                    console.log('setting wallet connection', c);
+                    setActiveConnection(c);
                 })
-                .then(setWalletConnection)
                 .catch(console.error)
                 .finally(() => setWaitingForUser(false));
         }
@@ -211,10 +154,11 @@ export default function wCCD() {
     const [admin, setAdmin] = useState<string>();
 
     useEffect(() => {
-        if (walletConnection) {
-            withJsonRpcClient(walletConnection, (rpcClient) => viewAdmin(rpcClient, setAdmin)).catch(console.error);
+        // Update admin contract.
+        if (activeConnection) {
+            withJsonRpcClient(activeConnection, (rpcClient) => viewAdmin(rpcClient, setAdmin)).catch(console.error);
         }
-    }, [walletConnection]);
+    }, [activeConnection]);
 
     const [isWrapping, setIsWrapping] = useState<boolean>(true);
     const [hash, setHash] = useState<string>('');
@@ -224,14 +168,14 @@ export default function wCCD() {
     const inputValue = useRef<HTMLInputElement | null>(null);
 
     useEffect(() => {
-        if (walletConnection && connectedAccount) {
-            withJsonRpcClient(walletConnection, (rpcClient) =>
+        if (activeConnection && connectedAccount) {
+            withJsonRpcClient(activeConnection, (rpcClient) =>
                 updateWCCDBalanceAccount(rpcClient, connectedAccount, setAmountAccount)
             ).catch(console.error);
         } else {
             setAmountAccount(undefined);
         }
-    }, [walletConnection, connectedAccount, isFlipped]);
+    }, [activeConnection, connectedAccount, isFlipped]);
 
     return (
         <>
@@ -255,12 +199,12 @@ export default function wCCD() {
                     </button>
                 </div>
                 <div>
-                    {!walletConnection && waitingForUser && (
+                    {!activeConnection && waitingForUser && (
                         <button style={ButtonStyleDisabled} type="button" disabled>
                             Waiting for user
                         </button>
                     )}
-                    {!walletConnection && !waitingForUser && connectorType && (
+                    {!activeConnection && !waitingForUser && connectorType && (
                         <button style={ButtonStyle} type="button" onClick={connectWallet}>
                             {connectorType === 'BrowserWallet' && 'Connect Browser Wallet'}
                             {connectorType === 'WalletConnect' && 'Connect Mobile Wallet'}
@@ -338,7 +282,7 @@ export default function wCCD() {
                         placeholder="0.000000"
                         ref={inputValue}
                     />
-                    {waitingForUser || !walletConnection ? (
+                    {waitingForUser || !activeConnection ? (
                         <button style={ButtonStyleDisabled} type="button" disabled>
                             Waiting for user
                         </button>
@@ -363,12 +307,12 @@ export default function wCCD() {
                                 // Amount needs to be in WEI
                                 const amount = round(multiply(input, 1000000));
 
-                                if (walletConnection && connectedAccount) {
+                                if (activeConnection && connectedAccount) {
                                     setHash('');
                                     setError('');
                                     setWaitingForUser(true);
                                     const tx = (isWrapping ? wrap : unwrap)(
-                                        walletConnection,
+                                        activeConnection,
                                         connectedAccount,
                                         WCCD_CONTRACT_INDEX,
                                         CONTRACT_SUB_INDEX,
