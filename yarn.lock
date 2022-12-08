@@ -2030,34 +2030,10 @@ __metadata:
   languageName: node
   linkType: hard
 
-"@concordium/common-sdk@npm:^5.2.0":
-  version: 5.2.0
-  resolution: "@concordium/common-sdk@npm:5.2.0"
-  dependencies:
-    "@concordium/rust-bindings": 0.6.0
-    "@noble/ed25519": ^1.7.1
-    "@scure/bip39": ^1.1.0
-    bs58check: ^2.1.2
-    buffer: ^6.0.3
-    cross-fetch: 3.1.5
-    hash.js: ^1.1.7
-    json-bigint: ^1.0.0
-    uuid: ^8.3.2
-  checksum: 34f810aaa733b6695745e289d4942050f3f64a5b28d0098123237f3d957609a5172ea4569675901782f2d6f00ad9ba5759087f9629c026366fd381cd53e66e41
-  languageName: node
-  linkType: hard
-
 "@concordium/rust-bindings@npm:0.1.1":
   version: 0.1.1
   resolution: "@concordium/rust-bindings@npm:0.1.1"
   checksum: 9f375fcec85a82698b58273f0d1c347943ae0cde211690a9de2faa7afaceb2b8fa2018a56dddd721815c1769e2950ba12fc61b6675e8af52d50d077d850aea6f
-  languageName: node
-  linkType: hard
-
-"@concordium/rust-bindings@npm:0.6.0":
-  version: 0.6.0
-  resolution: "@concordium/rust-bindings@npm:0.6.0"
-  checksum: 36b0a2ac4673cdeb5184df67b75890cf27eab5fb0a91ada63abb53d698be3285d542f15971da898aba94ddf2a6a34dd8459126977cdcafbb91f8420d53bfb098
   languageName: node
   linkType: hard
 
@@ -20923,7 +20899,6 @@ __metadata:
   resolution: "wccd@workspace:examples/wCCD"
   dependencies:
     "@concordium/browser-wallet-api-helpers": ^2.0.0
-    "@concordium/common-sdk": ^5.2.0
     "@concordium/web-sdk": ^3.0.0
     "@craftamap/esbuild-plugin-html": ^0.4.0
     "@thi.ng/leb128": ^2.1.18

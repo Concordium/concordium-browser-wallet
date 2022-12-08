@@ -4,7 +4,6 @@
     "license": "Apache-2.0",
     "dependencies": {
         "@concordium/browser-wallet-api-helpers": "^2.0.0",
-        "@concordium/common-sdk": "^5.2.0",
         "@concordium/web-sdk": "^3.0.0",
         "@thi.ng/leb128": "^2.1.18",
         "@walletconnect/qrcode-modal": "^1.8.0",
