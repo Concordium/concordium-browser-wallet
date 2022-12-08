@@ -5,7 +5,7 @@ import { absoluteRoutes } from '@popup/constants/routes';
 import Logo from '@assets/svg/concordium.svg';
 import Toast from '@popup/shared/Toast/Toast';
 
-import { useSelectedCredential } from '@popup/shared/utils/account-helpers';
+import { useCredential } from '@popup/shared/utils/account-helpers';
 import AccountDetails from '@popup/pages/Account/AccountDetails';
 import AccountInfoListenerContext from '@popup/shared/AccountInfoListenerContext';
 
@@ -40,12 +40,21 @@ function Header() {
     );
 }
 
+interface Location {
+    state: {
+        payload: {
+            accountAddress: string;
+        };
+    };
+}
+
 interface Props {
     children: ReactNode;
 }
 
 export default function ExternalRequestLayout({ children }: Props) {
-    const account = useSelectedCredential();
+    const { state } = useLocation() as Location;
+    const account = useCredential(state.payload.accountAddress);
 
     return (
         <>

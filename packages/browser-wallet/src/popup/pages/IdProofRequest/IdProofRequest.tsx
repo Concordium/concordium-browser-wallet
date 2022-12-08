@@ -6,13 +6,12 @@ import { IdStatement, StatementTypes, RevealStatement, IdProofOutput } from '@co
 import { InternalMessageType } from '@concordium/browser-wallet-message-hub';
 
 import { popupMessageHandler } from '@popup/shared/message-handler';
-import { selectedIdentityAtom } from '@popup/store/identity';
-import { useSelectedCredential } from '@popup/shared/utils/account-helpers';
+import { identityByAddressAtomFamily } from '@popup/store/identity';
+import { useCredential } from '@popup/shared/utils/account-helpers';
 import { jsonRpcClientAtom, networkConfigurationAtom } from '@popup/store/settings';
 import { addToastAtom } from '@popup/state';
 import { useDecryptedSeedPhrase } from '@popup/shared/utils/seed-phrase-helpers';
 import { getGlobal, getNet } from '@shared/utils/network-helpers';
-import { ConfirmedIdentity } from '@shared/storage/types';
 import { BackgroundResponseStatus, IdProofBackgroundResponse } from '@shared/utils/types';
 import PendingArrows from '@assets/svg/pending-arrows.svg';
 import ExternalRequestLayout from '@popup/page-layouts/ExternalRequestLayout';
@@ -44,21 +43,22 @@ export default function IdProofRequest({ onReject, onSubmit }: Props) {
     const { statement, challenge, url, accountAddress: account } = state.payload;
     const { onClose, withClose } = useContext(fullscreenPromptContext);
     const { t } = useTranslation('idProofRequest');
-    const identity = useAtomValue(selectedIdentityAtom);
-    const credential = useSelectedCredential();
+    const { loading: identityLoading, value: identity } = useAtomValue(identityByAddressAtomFamily(account));
+    const credential = useCredential(account);
     const network = useAtomValue(networkConfigurationAtom);
     const client = useAtomValue(jsonRpcClientAtom);
     const addToast = useSetAtom(addToastAtom);
     const recoveryPhrase = useDecryptedSeedPhrase((e) => addToast(e.message));
     const dappName = displayUrl(url);
-
     const [creatingProof, setCreatingProof] = useState<boolean>(false);
     const [canProve, setCanProve] = useState(statement.length > 0);
-
     const reveals = statement.filter((s) => s.type === StatementTypes.RevealAttribute) as RevealStatement[];
     const secrets = statement.filter((s) => s.type !== StatementTypes.RevealAttribute) as SecretStatement[];
 
     const handleSubmit = useCallback(async () => {
+        if (!identity) {
+            throw new Error('Missing identity');
+        }
         if (!recoveryPhrase) {
             throw new Error('Missing recovery phrase');
         }
@@ -77,7 +77,7 @@ export default function IdProofRequest({ onReject, onSubmit }: Props) {
                 identityIndex: credential.identityIndex,
                 identityProviderIndex: credential.providerIndex,
                 credNumber: credential.credNumber,
-                idObject: (identity as ConfirmedIdentity).idObject.value,
+                idObject: identity.idObject.value,
                 seedAsHex: recoveryPhrase,
                 net: getNet(network),
                 globalContext: global,
@@ -100,7 +100,7 @@ export default function IdProofRequest({ onReject, onSubmit }: Props) {
         }
     }, [canProve]);
 
-    if (!account) {
+    if (identityLoading || !identity) {
         return null;
     }
 
@@ -113,7 +113,7 @@ export default function IdProofRequest({ onReject, onSubmit }: Props) {
                         <DisplayRevealStatement
                             className="m-t-10:not-first"
                             dappName={dappName}
-                            account={account}
+                            identity={identity}
                             statements={reveals}
                             onInvalid={handleInvalidStatement}
                         />
@@ -124,7 +124,7 @@ export default function IdProofRequest({ onReject, onSubmit }: Props) {
                             key={i} // Allow this, as we don't expect these to ever change.
                             className="m-t-10:not-first"
                             dappName={dappName}
-                            account={account}
+                            identity={identity}
                             statement={s}
                             onInvalid={handleInvalidStatement}
                         />
