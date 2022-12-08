@@ -40,7 +40,6 @@ function DisplayStatementLine({ attribute, value, isRequirementMet }: StatementL
     return (
         <li className="display-statement__line">
             <div className="display-statement__line-attribute">{attribute}:</div>
-            <div className="display-statement__line-separator" />
             <div className="display-statement__line-value">
                 {value}
                 {isRequirementMet ? (
