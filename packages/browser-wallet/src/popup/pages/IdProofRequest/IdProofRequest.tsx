@@ -130,10 +130,12 @@ export default function IdProofRequest({ onReject, onSubmit }: Props) {
                         />
                     ))}
                 </div>
-                {creatingProof && <PendingArrows className="loading" />}
                 <ButtonGroup className="id-proof-request__actions">
-                    <Button onClick={withClose(onReject)}>{t('reject')}</Button>
+                    <Button disabled={creatingProof} onClick={withClose(onReject)}>
+                        {t('reject')}
+                    </Button>
                     <Button
+                        className="flex-center"
                         onClick={() => {
                             setCreatingProof(true);
                             handleSubmit()
@@ -145,7 +147,11 @@ export default function IdProofRequest({ onReject, onSubmit }: Props) {
                         }}
                         disabled={!canProve || creatingProof}
                     >
-                        {t('accept')}
+                        {creatingProof ? (
+                            <PendingArrows className="loading svg-white id-proof-request__loading-icon" />
+                        ) : (
+                            t('accept')
+                        )}
                     </Button>
                 </ButtonGroup>
             </div>
