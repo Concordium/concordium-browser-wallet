@@ -1,5 +1,21 @@
 # Changelog
 
+## 0.9.0
+
+### Added
+
+-   Support for generating zero knowledge proofs requested from web applications.
+
+### Changed
+
+-   Arranged the image of a collectible at the top of the collectible details page.
+
+## 0.8.5
+
+### Fixed
+
+-   Blank prompt when requesting an `initContract` transaction with parameters.
+
 ## 0.8.4
 
 ### Fixed

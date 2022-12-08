@@ -1,4 +1,4 @@
-import React, { useEffect, useMemo, useState } from 'react';
+import React, { useCallback, useEffect, useMemo, useState } from 'react';
 import { useTranslation } from 'react-i18next';
 import { useAtom, useAtomValue, useSetAtom } from 'jotai';
 import { AccountTokens, contractBalancesFamily, Tokens, tokensAtom } from '@popup/store/token';
@@ -15,7 +15,7 @@ import {
     max,
     displayAsCcd,
 } from 'wallet-common-helpers';
-import { SimpleTransferPayload } from '@concordium/web-sdk';
+import { AccountAddress, SimpleTransferPayload } from '@concordium/web-sdk';
 import { SubmitHandler, useForm, Validate } from 'react-hook-form';
 import clsx from 'clsx';
 import { useLocation, useNavigate } from 'react-router-dom';
@@ -188,6 +188,21 @@ function CreateTransaction({ exchangeRate, tokens, setCost, setDetailsExpanded, 
         }
     }, [canCoverCost, fee]);
 
+    const validateRecipient = useCallback<Validate<string>>(async (recipientAddress: string) => {
+        if (!recipientAddress) {
+            return undefined;
+        }
+        const validateAddress = validateAccountAddress(recipientAddress);
+        if (validateAddress) {
+            return validateAddress;
+        }
+        const info = await client.getAccountInfo(new AccountAddress(recipientAddress));
+        if (!info) {
+            return t('sendCcd.nonexistingAccount');
+        }
+        return undefined;
+    }, []);
+
     const displayAmount = integerToFractional(getMetadataDecimals(tokenMetadata));
 
     const onMax = () => {
@@ -226,7 +241,6 @@ function CreateTransaction({ exchangeRate, tokens, setCost, setDetailsExpanded, 
         );
     }
 
-    // TODO Fix register/validate type error
     return (
         <Form
             formMethods={form}
@@ -285,7 +299,7 @@ function CreateTransaction({ exchangeRate, tokens, setCost, setDetailsExpanded, 
                         className="create-transfer__input"
                         rules={{
                             required: tShared('utils.address.required'),
-                            validate: validateAccountAddress,
+                            validate: validateRecipient,
                         }}
                     />
                     <div

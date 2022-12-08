@@ -28,7 +28,7 @@ export default function Img({ src, alt, className, ...props }: Props) {
         : props;
 
     const [loaded, setLoaded] = useState(false);
-    const [failed, setFailed] = useState(false);
+    const [failed, setFailed] = useState(!src);
 
     const shouldHide = (!loaded && loadingImage) || (failed && failedImage);
 
@@ -43,7 +43,10 @@ export default function Img({ src, alt, className, ...props }: Props) {
                 className={clsx(shouldHide && 'd-none', className)}
                 src={src}
                 alt={alt}
-                onLoad={() => setLoaded(true)}
+                onLoad={() => {
+                    setLoaded(true);
+                    setFailed(false);
+                }}
                 onError={handleError}
             />
             {shouldHide && <img className={className} src={failed ? failedImage : loadingImage} alt={alt} />}

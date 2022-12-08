@@ -54,6 +54,9 @@ export const relativeRoutes = {
         addTokens: {
             path: 'add-tokens',
         },
+        idProof: {
+            path: 'id-proof',
+        },
     },
     setup: {
         path: '/setup',

@@ -100,6 +100,22 @@
                 provider.on('accountDisconnected', (accountAddress) => (currentAccountAddress = undefined));
                 provider.on('accountChanged', (accountAddress) => (currentAccountAddress = accountAddress));
                 provider.on('chainChanged', (chain) => alert(chain));
+                document.getElementById('idProof').addEventListener('click', () => {
+                    const statement = new concordiumSDK.IdStatementBuilder()
+                        .addMinimumAge(18)
+                        .documentExpiryNoEarlierThan('20230101')
+                        .addRange(9, '20100101', '20200101')
+                        .addEUResidency()
+                        .getStatement();
+                    const challenge = 'AAAAAAAA';
+                    provider
+                        .requestIdProof(currentAccountAddress, statement, challenge)
+                        .then((proof) => {
+                            console.log(proof);
+                            alert('Proof received! (check the console)');
+                        })
+                        .catch(alert);
+                });
             }
 
             setupPage();
@@ -118,5 +134,6 @@
         <br />
         Message: <input type="text" id="message" value="I believe in miracles" />
         <button id="signMessage">SignMessage</button>
+        <button id="idProof">Request an ID Proof</button>
     </body>
 </html>

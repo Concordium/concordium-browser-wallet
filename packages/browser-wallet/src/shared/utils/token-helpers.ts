@@ -10,7 +10,6 @@ import {
 } from '@concordium/web-sdk';
 import { MetadataUrl, NetworkConfiguration, TokenMetadata, TokenIdAndMetadata } from '@shared/storage/types';
 import { CIS2_SCHEMA_CONTRACT_NAME, CIS2_SCHEMA } from '@popup/constants/schema';
-import { WCCD_METADATA } from '@shared/constants/token-metadata';
 import i18n from '@popup/shell/i18n';
 import { SmartContractParameters } from './types';
 import { isMainnet } from './network-helpers';
@@ -152,10 +151,6 @@ export const getMetadataDecimals = ({ decimals }: TokenMetadata) => Number(decim
  * Fetches token metadata from the given url
  */
 export async function getTokenMetadata(tokenUrl: string, network: NetworkConfiguration): Promise<TokenMetadata> {
-    // TODO remove this hack when we have a proper collection for testing (with online metadata).
-    if (!isMainnet(network) && tokenUrl.includes('https://some.example/token/wccd')) {
-        return WCCD_METADATA;
-    }
     if (!isMainnet(network) && tokenUrl.includes('https://some.example/token/')) {
         const id = tokenUrl.split('https://some.example/token/')[1]?.toLowerCase() ?? 'fallback';
         return {

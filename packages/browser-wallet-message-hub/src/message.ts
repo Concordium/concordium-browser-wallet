@@ -13,6 +13,7 @@ export enum MessageType {
     Connect = 'M_Connect',
     JsonRpcRequest = 'M_JsonRpcRequest',
     AddTokens = 'M_AddTokens',
+    IdProof = 'M_IdProof',
 }
 
 /**
@@ -32,6 +33,8 @@ export enum InternalMessageType {
     Recovery = 'I_Recovery',
     RecoveryFinished = 'I_RecoveryFinished',
     AddTokens = 'I_AddTokens',
+    IdProof = 'I_IdProof',
+    CreateIdProof = 'I_CreateIdProof',
 }
 
 // eslint-disable-next-line @typescript-eslint/no-explicit-any

@@ -6,17 +6,18 @@ import { identityProvidersAtom, selectedIdentityAtom } from '@popup/store/identi
 import IdCard from '@popup/shared/IdCard';
 import { CreationStatus } from '@shared/storage/types';
 import { AttributeKey } from '@concordium/web-sdk';
-import attributeNames from 'wallet-common-helpers/constants/attributeNames.json';
 import { formatAttributeValue, compareAttributes } from 'wallet-common-helpers';
 import IdentityProviderIcon from '@popup/shared/IdentityProviderIcon';
 import Button from '@popup/shared/Button';
 import { absoluteRoutes } from '@popup/constants/routes';
+import { useGetAttributeName } from '@popup/shared/utils/identity-helpers';
 
 export default function Identity() {
     const { t } = useTranslation('identity');
     const nav = useNavigate();
     const [selectedIdentity, updateSelectedIdentity] = useAtom(selectedIdentityAtom);
     const providers = useAtomValue(identityProvidersAtom);
+    const getAttributeName = useGetAttributeName();
 
     const identityProvider = useMemo(
         () => providers.find((p) => p.ipInfo.ipIdentity === selectedIdentity?.providerIndex),
@@ -58,9 +59,7 @@ export default function Identity() {
                         .sort(compareAttributes)
                         .map((attributeKey: AttributeKey) => (
                             <div key={attributeKey} className="identity__attributes-row">
-                                <div className="identity__attributes-left">
-                                    {attributeNames[attributeKey] || attributeKey}
-                                </div>
+                                <div className="identity__attributes-left">{getAttributeName(attributeKey)}</div>
                                 <div className="identity__attributes-right">
                                     {formatAttributeValue(attributeKey, attributes[attributeKey])}
                                 </div>

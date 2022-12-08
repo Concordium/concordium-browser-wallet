@@ -32,6 +32,7 @@ import { addIdpListeners, identityIssuanceHandler } from './identity-issuance';
 import { startMonitoringPendingStatus } from './confirmation';
 import { sendCredentialHandler } from './credential-deployment';
 import { startRecovery, setupRecoveryHandler } from './recovery';
+import { createIdProofHandler, runIfValidProof } from './id-proof';
 
 const walletLockedMessage = 'The wallet is locked';
 async function isWalletLocked(): Promise<boolean> {
@@ -191,6 +192,8 @@ bgMessageHandler.handleMessage(createMessageTypeFilter(MessageType.JsonRpcReques
     }
     return true;
 });
+
+bgMessageHandler.handleMessage(createMessageTypeFilter(InternalMessageType.CreateIdProof), createIdProofHandler);
 
 const NOT_WHITELISTED = 'Site is not whitelisted';
 
@@ -371,6 +374,14 @@ forwardToPopup(
     MessageType.AddTokens,
     InternalMessageType.AddTokens,
     runConditionComposer(runIfWhitelisted, withPromptStart),
+    appendUrlToPayload,
+    undefined,
+    withPromptEnd
+);
+forwardToPopup(
+    MessageType.IdProof,
+    InternalMessageType.IdProof,
+    runConditionComposer(runIfWhitelisted, runIfValidProof, withPromptStart),
     appendUrlToPayload,
     undefined,
     withPromptEnd
