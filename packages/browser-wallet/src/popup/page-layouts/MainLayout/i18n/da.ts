@@ -17,6 +17,7 @@ const t: typeof en = {
             about: 'Om',
         },
         addTokens: 'Tilføj tokens',
+        idProof: 'Bevis for identitet',
         request: 'Anmodning om Signatur',
         connect: 'Ny Forbindelse',
     },
