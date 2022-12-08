@@ -69,3 +69,7 @@ export async function destroy(connector: WalletConnector) {
     const connections = await connector.getConnections();
     return Promise.all(connections.map((c) => c.disconnect())).then((vs) => vs.length);
 }
+
+export async function connectedAccountOf(connection: WalletConnection | undefined) {
+    return connection ? connection.getConnectedAccount() : undefined;
+}

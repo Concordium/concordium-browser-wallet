@@ -3,7 +3,14 @@
 
 import React from 'react';
 import { SignClientTypes } from '@walletconnect/types';
-import { ConnectionDelegate, destroy, Network, WalletConnection, WalletConnector } from './WalletConnection';
+import {
+    connectedAccountOf,
+    ConnectionDelegate,
+    destroy,
+    Network,
+    WalletConnection,
+    WalletConnector,
+} from './WalletConnection';
 import { BrowserWalletConnector } from './BrowserWallet';
 import { WalletConnectConnector } from './WalletConnect';
 
@@ -14,8 +21,9 @@ interface State {
     connectedAccount: string | undefined;
 }
 
-interface ChildrenProps extends State {
+export interface ChildrenProps extends State {
     setConnectorType: (t: ConnectorType | undefined) => void;
+    setActiveConnection: (c: WalletConnection | undefined) => void;
 }
 
 interface Props {
@@ -45,11 +53,22 @@ export class WithWalletConnection extends React.Component<Props, State> implemen
             if (connector) {
                 destroy(connector).catch(console.error);
             }
-            this.createConnector(connectorType, network).then(
-                (c) => this.setState((state) => ({ ...state, connector: c })),
-                console.error
-            );
+            this.createConnector(connectorType, network).then(this.setConnector, console.error);
         }
+    }
+
+    private setConnector(connector: WalletConnector) {
+        return this.setState((state) => ({ ...state, connector }));
+    }
+
+    setActiveConnection(connection: WalletConnection | undefined) {
+        connectedAccountOf(connection).then((connectedAccount) => {
+            this.setState((state) => ({
+                ...state,
+                activeConnection: connection,
+                connectedAccount,
+            }));
+        });
     }
 
     private createConnector(connectorType: string | undefined, network: Network): Promise<WalletConnector> {
@@ -99,6 +118,7 @@ export class WithWalletConnection extends React.Component<Props, State> implemen
         return children({
             ...this.state,
             setConnectorType: this.setConnectorType,
+            setActiveConnection: this.setActiveConnection,
         });
     }
 }
