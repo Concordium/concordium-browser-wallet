@@ -153,40 +153,40 @@ export default function wCCD() {
 
     // TODO Captured walletConnection becomes stale within the closures (staying 'undefined')! Must change to class component (and let the class implement delegate)?
     const [connectedAccount, setConnectedAccount] = useState<string>();
-    const delegate = useMemo<ConnectionDelegate>(
-        () => ({
-            onAccountChanged(connection: WalletConnection, address: string | undefined) {
-                console.log('account changed', { connection, address, walletConnection });
-                if (connection === walletConnection) {
-                    console.log('setting account');
-                    setConnectedAccount(address);
-                }
-            },
-            onChainChanged(connection: WalletConnection, genesisHash: string) {
-                // Check if the user is connected to testnet by checking if the genesis hash matches the expected one.
-                // Emit a warning and disconnect if it's the wrong chain.
-                if (genesisHash !== network.genesisHash) {
-                    // eslint-disable-next-line no-alert
-                    window.alert(
-                        `Unexpected genesis hash '${genesisHash}'. Expected ${network.genesisHash} (network "${network.name}").`
-                    );
-                    connection.disconnect().catch(console.error);
-                }
-            },
-            onDisconnect(connection: WalletConnection) {
-                if (connection === walletConnection) {
-                    console.log('clearing wallet connection');
-                    setWalletConnection(undefined); // triggers clearing of connected account
-                }
-            },
-        }),
-        []
-    );
+    const delegate = usMemo<ConnectionDelegate>(() => {
+        onAccountChanged(connection: WalletConnection, address: string | undefined) {
+            console.log('account changed', { connection, address, walletConnection });
+            if (connection === walletConnection) {
+                console.log('setting account');
+                setConnectedAccount(address);
+            }
+        },
+        onChainChanged(connection: WalletConnection, genesisHash: string) {
+            // Check if the user is connected to testnet by checking if the genesis hash matches the expected one.
+            // Emit a warning and disconnect if it's the wrong chain.
+            if (genesisHash !== network.genesisHash) {
+                // eslint-disable-next-line no-alert
+                window.alert(
+                    `Unexpected genesis hash '${genesisHash}'. Expected ${network.genesisHash} (network "${network.name}").`
+                );
+                connection.disconnect().catch(console.error);
+            }
+        },
+        onDisconnect(connection: WalletConnection) {
+            console.log('disconnecting', { connection, walletConnection });
+            if (connection === walletConnection) {
+                console.log('clearing wallet connection');
+                setWalletConnection(undefined); // triggers clearing of connected account
+            }
+        },
+    });
     useEffect(() => {
         if (connectorType) {
             switch (connectorType) {
                 case 'BrowserWallet':
-                    BrowserWalletConnector.create(delegate).then(setConnector).catch(console.error);
+                    BrowserWalletConnector.create(delegate)
+                        .then(setConnector)
+                        .catch(console.error);
                     break;
                 case 'WalletConnect':
                     WalletConnectConnector.create(
@@ -200,7 +200,7 @@ export default function wCCD() {
                             },
                         },
                         network,
-                        delegate
+                        delegate.current
                     )
                         .then(setConnector)
                         .catch(console.error);

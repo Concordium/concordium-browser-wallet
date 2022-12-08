@@ -42,18 +42,12 @@ export interface WalletConnection {
     disconnect(): Promise<void>;
 }
 
-export class Network {
+export interface Network {
     name: string;
 
     genesisHash: string;
 
     jsonRpcUrl: string;
-
-    constructor(name: string, genesisHash: string, jsonRpcUrl: string) {
-        this.name = name;
-        this.genesisHash = genesisHash;
-        this.jsonRpcUrl = jsonRpcUrl;
-    }
 }
 
 export interface ConnectionDelegate {
