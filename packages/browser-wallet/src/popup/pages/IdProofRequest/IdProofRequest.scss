@@ -1,9 +1,14 @@
 .id-proof-request {
     display: flex;
     flex-direction: column;
+    justify-content: space-between;
     min-height: 100%;
 
     &__actions {
         margin: rem(15px) rem(20px) 0;
+    }
+
+    &__loading-icon {
+        max-height: rem(20px);
     }
 }

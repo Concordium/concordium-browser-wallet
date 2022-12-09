@@ -15,6 +15,7 @@ const t = {
             about: 'About',
         },
         addTokens: 'Add tokens',
+        idProof: 'Proof of identity',
         request: 'Signature Request',
         connect: 'New connection',
     },

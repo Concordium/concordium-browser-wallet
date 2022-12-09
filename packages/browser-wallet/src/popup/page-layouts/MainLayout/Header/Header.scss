@@ -1,6 +1,7 @@
 .main-layout-header {
     position: relative;
     z-index: 1;
+    height: $main-layout-header-height;
 
     &__bar,
     &__nav {
