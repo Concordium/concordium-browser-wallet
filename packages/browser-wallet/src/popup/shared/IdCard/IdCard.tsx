@@ -2,6 +2,7 @@ import clsx from 'clsx';
 import React, { useState, useEffect } from 'react';
 import { useForm } from 'react-hook-form';
 import { useTranslation } from 'react-i18next';
+import { noOp } from 'wallet-common-helpers';
 
 import VerfifiedIcon from '@assets/svg/verified-stamp.svg';
 import RejectedIcon from '@assets/svg/rejected-stamp.svg';
@@ -21,11 +22,11 @@ type EditNameForm = {
 
 type EditNameProps = {
     name: string;
-    onChange(name: string): void;
+    onChange?(name: string): void;
+    isEditing: boolean;
 };
 
-function EditableName({ name, onChange }: EditNameProps) {
-    const [isEditing, setIsEditing] = useState(false);
+function EditableName({ name, onChange = noOp, isEditing }: EditNameProps) {
     const methods = useForm<EditNameForm>();
 
     useEffect(() => {
@@ -34,18 +35,10 @@ function EditableName({ name, onChange }: EditNameProps) {
 
     const handleSubmit = (f: EditNameForm) => {
         onChange(f.name);
-        setIsEditing(false);
     };
 
     if (!isEditing) {
-        return (
-            <div className="id-card__name-form">
-                {name}
-                <Button className="id-card__name-edit" clear onClick={() => setIsEditing(true)}>
-                    <EditIcon />
-                </Button>
-            </div>
-        );
+        return <div className="id-card__name-form">{name}</div>;
     }
 
     return (
@@ -83,6 +76,12 @@ type Props = {
 /* eslint-disable jsx-a11y/no-static-element-interactions , jsx-a11y/click-events-have-key-events */
 export default function IdCard({ name, provider, status, onNameChange, className, onClick }: Props) {
     const { t } = useTranslation();
+    const [isEditing, setIsEditing] = useState(false);
+
+    const handleNameChange = (newName: string) => {
+        onNameChange?.(newName);
+        setIsEditing(false);
+    };
 
     return (
         <div
@@ -100,12 +99,21 @@ export default function IdCard({ name, provider, status, onNameChange, className
             }}
         >
             <header className="id-card__header">
-                <ConcordiumIcon />
+                <ConcordiumIcon /> {/* TODO: change this to proper icon, which changes with the status */}
                 {t('id.header')}
+                {onNameChange && (
+                    <Button
+                        disabled={isEditing}
+                        clear
+                        className="id-card__edit-button"
+                        onClick={() => setIsEditing(true)}
+                    >
+                        <EditIcon />
+                    </Button>
+                )}
             </header>
             <div className="id-card__name">
-                {!onNameChange && <div className="id-card__name-form">{name}</div>}
-                {onNameChange && <EditableName name={name} onChange={onNameChange} />}
+                <EditableName name={name} onChange={handleNameChange} isEditing={isEditing} />
             </div>
             <div className="id-card__status">
                 {status === 'pending' && t('id.pending')}

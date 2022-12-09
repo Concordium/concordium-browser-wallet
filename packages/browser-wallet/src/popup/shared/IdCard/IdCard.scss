@@ -7,23 +7,6 @@
     overflow: hidden;
     background-color: $color-bg;
     color: $color-text;
-    z-index: 0;
-
-    &::after {
-        content: '';
-        display: block;
-        transform: rotate(40deg) translate(30%, -30%);
-        background-color: rgba($color-white, 0.5);
-        height: 200%;
-        width: 100%;
-        position: absolute;
-        top: 0;
-        z-index: 0;
-
-        .dark & {
-            background-color: rgba($color-white, 0.08);
-        }
-    }
 
     &--pending {
         border-color: $color-grey;
@@ -38,12 +21,10 @@
         font-size: rem(12px);
         text-align: center;
         color: $color-white;
-        font-weight: $font-weight-light;
-        height: rem(20px);
+        height: rem(30px);
         display: flex;
         align-items: center;
         justify-content: center;
-        z-index: -1;
 
         .id-card--pending & {
             background-color: $color-grey;
@@ -53,10 +34,30 @@
             background-color: $color-salmon;
         }
 
-        svg {
+        > svg {
             position: absolute;
             left: rem(5px);
-            width: rem(13px);
+            height: rem(20px);
+        }
+    }
+
+    &__edit-button {
+        position: absolute;
+        right: rem(10px);
+        margin-top: rem(2px);
+
+        svg {
+            height: rem(12px);
+
+            path {
+                fill: $color-off-white;
+            }
+        }
+
+        &:disabled {
+            svg {
+                opacity: 0.3;
+            }
         }
     }
 
@@ -152,7 +153,7 @@
 
             &,
             & * {
-                fill: $color-grey;
+                fill: $color-cta;
             }
         }
     }
