@@ -20,8 +20,11 @@ export default function AccountStatement() {
     );
 
     return (
-        <div className="flex-column align-center white-space-break justify-space-between m-10 text-center">
-            <div>{t('description')}</div>
+        <div className="account-statement-page">
+            <div>
+                <h3 className="m-t-0">{t('title')}</h3>
+                <div>{t('description')}</div>
+            </div>
             <Button width="wide" as={ExternalLink} path={url}>
                 {t('link')}
             </Button>
