@@ -50,7 +50,7 @@ export interface Network {
     jsonRpcUrl: string;
 }
 
-export interface ConnectionDelegate {
+export interface WalletConnectionDelegate {
     onChainChanged(connection: WalletConnection, chain: string): void;
     onAccountChanged(connection: WalletConnection, address: string | undefined): void;
     onDisconnect(connection: WalletConnection): void;

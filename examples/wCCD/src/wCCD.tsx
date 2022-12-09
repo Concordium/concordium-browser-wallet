@@ -1,4 +1,5 @@
 /* eslint-disable no-console */
+/* eslint-disable no-alert */
 
 import React, { useEffect, useState, useRef, useCallback } from 'react';
 import {
@@ -136,7 +137,7 @@ async function updateWCCDBalanceAccount(
 export default function wCCD(props: WalletConnectionProps) {
     const { connectorType, setConnectorType, connector, activeConnection, setActiveConnection, connectedAccount } =
         props;
-    const [waitingForUser, setWaitingForUser] = useState<boolean>(false);
+    const [isWaitingForUser, setWaitingForUser] = useState<boolean>(false);
     const connectWallet = useCallback(() => {
         if (connector) {
             setWaitingForUser(true);
@@ -199,12 +200,12 @@ export default function wCCD(props: WalletConnectionProps) {
                     </button>
                 </div>
                 <div>
-                    {!activeConnection && waitingForUser && (
+                    {!activeConnection && isWaitingForUser && (
                         <button style={ButtonStyleDisabled} type="button" disabled>
                             Waiting for user
                         </button>
                     )}
-                    {!activeConnection && !waitingForUser && connectorType && (
+                    {!activeConnection && !isWaitingForUser && connectorType && (
                         <button style={ButtonStyle} type="button" onClick={connectWallet}>
                             {connectorType === 'BrowserWallet' && 'Connect Browser Wallet'}
                             {connectorType === 'WalletConnect' && 'Connect Mobile Wallet'}
@@ -282,7 +283,7 @@ export default function wCCD(props: WalletConnectionProps) {
                         placeholder="0.000000"
                         ref={inputValue}
                     />
-                    {waitingForUser || !activeConnection ? (
+                    {isWaitingForUser || !activeConnection ? (
                         <button style={ButtonStyleDisabled} type="button" disabled>
                             Waiting for user
                         </button>
@@ -296,7 +297,6 @@ export default function wCCD(props: WalletConnectionProps) {
                                     inputValue.current === undefined ||
                                     inputValue.current?.valueAsNumber === undefined
                                 ) {
-                                    /* eslint-disable no-alert */
                                     window.alert(
                                         'Input a number into the CCD/wCCD amount field with max 6 decimal places.'
                                     );

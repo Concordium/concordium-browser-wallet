@@ -9,12 +9,12 @@ import {
     JsonRpcClient,
     SchemaVersion,
 } from '@concordium/web-sdk';
-import { ConnectionDelegate, WalletConnection, WalletConnector } from './WalletConnection';
+import { WalletConnectionDelegate, WalletConnection, WalletConnector } from './WalletConnection';
 
 export class BrowserWalletConnector implements WalletConnector, WalletConnection {
     readonly client: WalletApi;
 
-    constructor(client: WalletApi, delegate: ConnectionDelegate) {
+    constructor(client: WalletApi, delegate: WalletConnectionDelegate) {
         this.client = client;
 
         this.client.on('chainChanged', (c) => delegate.onChainChanged(this, c));
@@ -27,7 +27,7 @@ export class BrowserWalletConnector implements WalletConnector, WalletConnection
         );
     }
 
-    static async create(delegate: ConnectionDelegate) {
+    static async create(delegate: WalletConnectionDelegate) {
         const client = await detectConcordiumProvider();
         return new BrowserWalletConnector(client, delegate);
     }

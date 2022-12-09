@@ -17,7 +17,7 @@ import {
     toBuffer,
     UpdateContractPayload,
 } from '@concordium/web-sdk';
-import { ConnectionDelegate, Network, WalletConnection, WalletConnector } from './WalletConnection';
+import { WalletConnectionDelegate, Network, WalletConnection, WalletConnector } from './WalletConnection';
 
 const WALLET_CONNECT_SESSION_NAMESPACE = 'ccd';
 
@@ -252,13 +252,13 @@ export class WalletConnectConnector implements WalletConnector {
 
     readonly network: Network;
 
-    readonly delegate: ConnectionDelegate;
+    readonly delegate: WalletConnectionDelegate;
 
     readonly connections = new Map<string, WalletConnectConnection>();
 
     isModalOpen = false;
 
-    constructor(client: SignClient, network: Network, delegate: ConnectionDelegate) {
+    constructor(client: SignClient, network: Network, delegate: WalletConnectionDelegate) {
         this.client = client;
         this.network = network;
         this.delegate = delegate;
@@ -295,7 +295,11 @@ export class WalletConnectConnector implements WalletConnector {
         });
     }
 
-    static async create(signClientInitOpts: SignClientTypes.Options, network: Network, delegate: ConnectionDelegate) {
+    static async create(
+        signClientInitOpts: SignClientTypes.Options,
+        network: Network,
+        delegate: WalletConnectionDelegate
+    ) {
         const client = await SignClient.init(signClientInitOpts);
         return new WalletConnectConnector(client, network, delegate);
     }
