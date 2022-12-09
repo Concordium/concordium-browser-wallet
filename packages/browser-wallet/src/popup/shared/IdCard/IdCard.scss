@@ -18,7 +18,7 @@
 
     &__header {
         background-color: $color-cta;
-        font-size: rem(12px);
+        font-size: rem(11px);
         text-align: center;
         color: $color-white;
         height: rem(30px);
@@ -33,11 +33,25 @@
         .id-card--rejected & {
             background-color: $color-salmon;
         }
+    }
 
-        > svg {
-            position: absolute;
-            left: rem(5px);
-            height: rem(20px);
+    &__header-status-icon {
+        position: absolute;
+        left: rem(7px);
+        display: flex;
+
+        svg {
+            &:first-child {
+                height: rem(15px);
+            }
+
+            &:last-child {
+                position: absolute;
+                right: 0;
+                top: 50%;
+                transform: translate(50%, -50%);
+                width: rem(10px);
+            }
         }
     }
 
@@ -47,7 +61,7 @@
         margin-top: rem(2px);
 
         svg {
-            height: rem(12px);
+            height: rem(10px);
 
             path {
                 fill: $color-off-white;

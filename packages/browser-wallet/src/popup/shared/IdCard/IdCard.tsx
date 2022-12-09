@@ -8,7 +8,11 @@ import VerfifiedIcon from '@assets/svg/verified-stamp.svg';
 import RejectedIcon from '@assets/svg/rejected-stamp.svg';
 import CheckIcon from '@assets/svg/checkmark-blue.svg';
 import EditIcon from '@assets/svg/edit.svg';
-import ConcordiumIcon from '@assets/svg/concordium-small.svg';
+import IdentityIcon from '@assets/svg/identity.svg';
+import SuccessIcon from '@assets/svg/rounded-success.svg';
+import WarningIcon from '@assets/svg/rounded-warning.svg';
+import PendingIcon from '@assets/svg/rounded-pending.svg';
+
 import Form from '../Form';
 import Submit from '../Form/Submit';
 import Button from '../Button';
@@ -64,9 +68,27 @@ function EditableName({ name, onChange = noOp, isEditing }: EditNameProps) {
     );
 }
 
+type IdentityStatus = 'pending' | 'confirmed' | 'rejected';
+
+function IdentityStatusIcon({ status }: { status: IdentityStatus }) {
+    let StatusIcon = PendingIcon;
+    if (status === 'rejected') {
+        StatusIcon = WarningIcon;
+    } else if (status === 'confirmed') {
+        StatusIcon = SuccessIcon;
+    }
+
+    return (
+        <div className="id-card__header-status-icon">
+            <IdentityIcon />
+            <StatusIcon />
+        </div>
+    );
+}
+
 type Props = {
     name: string;
-    status: 'pending' | 'confirmed' | 'rejected';
+    status: IdentityStatus;
     onNameChange?(name: string): void;
     onClick?(): void;
     provider: JSX.Element;
@@ -99,7 +121,7 @@ export default function IdCard({ name, provider, status, onNameChange, className
             }}
         >
             <header className="id-card__header">
-                <ConcordiumIcon /> {/* TODO: change this to proper icon, which changes with the status */}
+                <IdentityStatusIcon status={status} />
                 {t('id.header')}
                 {onNameChange && (
                     <Button
