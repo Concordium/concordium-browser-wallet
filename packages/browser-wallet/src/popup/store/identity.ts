@@ -65,26 +65,28 @@ export const setRecoveryPayloadAtom = atom<null, RecoveryPayload, Promise<void>>
     set(recoveryStatusAtom, { payload })
 );
 
-export const identityByAddressAtomFamily = atomFamily<string, Atom<AsyncWrapper<ConfirmedIdentity | undefined>>>(
-    (address) =>
-        atom((get) => {
-            const creds = get(credentialsAtomWithLoading);
-            const ids = get(identitiesAtomWithLoading);
+export const identityByAddressAtomFamily = atomFamily<
+    string | undefined,
+    Atom<AsyncWrapper<ConfirmedIdentity | undefined>>
+>((address) =>
+    atom((get) => {
+        const creds = get(credentialsAtomWithLoading);
+        const ids = get(identitiesAtomWithLoading);
 
-            if (creds.loading || ids.loading) {
-                return { loading: true, value: undefined };
-            }
+        if (creds.loading || ids.loading) {
+            return { loading: true, value: undefined };
+        }
 
-            const cred = creds.value.find((c) => c.address === address);
-            const identities = ids.value;
+        const cred = creds.value.find((c) => c.address === address);
+        const identities = ids.value;
 
-            return {
-                loading: false,
-                value: identities
-                    .filter((i) => i.status === CreationStatus.Confirmed)
-                    .find((i) => i.providerIndex === cred?.providerIndex && i.index === cred.identityIndex) as
-                    | ConfirmedIdentity
-                    | undefined,
-            };
-        })
+        return {
+            loading: false,
+            value: identities
+                .filter((i) => i.status === CreationStatus.Confirmed)
+                .find((i) => i.providerIndex === cred?.providerIndex && i.index === cred.identityIndex) as
+                | ConfirmedIdentity
+                | undefined,
+        };
+    })
 );

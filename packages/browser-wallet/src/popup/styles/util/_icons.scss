@@ -1,5 +1,9 @@
 .ccd-icon {
     .dark & path {
-        fill: white;
+        fill: $color-white;
     }
+}
+
+.svg-white path {
+    fill: $color-off-white;
 }

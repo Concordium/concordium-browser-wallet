@@ -16,6 +16,8 @@ const t: typeof en = {
     moduleReference: 'Modul reference',
     contractName: 'Kontrakt navn',
     title: 'Underskriv transaktion',
+    data: 'Data',
+    rawData: '(Kunne ikke afkodes)',
 };
 
 export default t;

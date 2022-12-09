@@ -1,9 +1,8 @@
 /* eslint-disable react/prop-types */
 import clsx from 'clsx';
-import React, { ComponentType, useEffect, useState } from 'react';
+import React, { useEffect, useState } from 'react';
 import { Trans, useTranslation } from 'react-i18next';
 import { ClassName, formatAttributeValue } from 'wallet-common-helpers';
-import { useAtomValue } from 'jotai';
 import { RevealStatement, AttributeList } from '@concordium/web-sdk';
 
 import SecretIcon from '@assets/svg/id-secret.svg';
@@ -15,10 +14,8 @@ import CrossIcon from '@assets/svg/cross.svg';
 
 import Button from '@popup/shared/Button';
 import Modal from '@popup/shared/Modal';
-import { identityByAddressAtomFamily } from '@popup/store/identity';
 import { useGetAttributeName } from '@popup/shared/utils/identity-helpers';
 import { ConfirmedIdentity } from '@shared/storage/types';
-import { ensureDefined } from '@shared/utils/basic-helpers';
 import {
     SecretStatement,
     canProveStatement,
@@ -40,7 +37,6 @@ function DisplayStatementLine({ attribute, value, isRequirementMet }: StatementL
     return (
         <li className="display-statement__line">
             <div className="display-statement__line-attribute">{attribute}:</div>
-            <div className="display-statement__line-separator" />
             <div className="display-statement__line-value">
                 {value}
                 {isRequirementMet ? (
@@ -166,26 +162,6 @@ export function DisplayStatementView({ className, lines, dappName, header, ...pr
     );
 }
 
-function withIdentityFromAccount<PropsWithIdentity extends { identity: ConfirmedIdentity }>(
-    C: ComponentType<PropsWithIdentity>
-): ComponentType<Omit<PropsWithIdentity, 'identity'> & { account: string }> {
-    // eslint-disable-next-line react/function-component-definition
-    return ({ account, ...rest }) => {
-        const { loading, value } = useAtomValue(identityByAddressAtomFamily(account));
-
-        if (loading) {
-            return null;
-        }
-
-        const props: PropsWithIdentity = {
-            identity: ensureDefined(value, 'Expected identity to be defined'),
-            ...rest,
-        } as unknown as PropsWithIdentity;
-
-        return <C {...props} />;
-    };
-}
-
 type BaseProps = ClassName & {
     identity: ConfirmedIdentity;
     dappName: string;
@@ -196,71 +172,79 @@ type DisplayRevealStatementProps = BaseProps & {
     statements: RevealStatement[];
 };
 
-export const DisplayRevealStatement = withIdentityFromAccount<DisplayRevealStatementProps>(
-    ({ dappName, statements, identity, className, onInvalid }) => {
-        const { t } = useTranslation('idProofRequest', { keyPrefix: 'displayStatement' });
-        const getAttributeName = useGetAttributeName();
-        const attributes =
-            identity.idObject.value.attributeList.chosenAttributes ?? ({} as AttributeList['chosenAttributes']);
-        const header = t('headers.reveal');
+export function DisplayRevealStatement({
+    dappName,
+    statements,
+    identity,
+    className,
+    onInvalid,
+}: DisplayRevealStatementProps) {
+    const { t } = useTranslation('idProofRequest', { keyPrefix: 'displayStatement' });
+    const getAttributeName = useGetAttributeName();
+    const attributes =
+        identity.idObject.value.attributeList.chosenAttributes ?? ({} as AttributeList['chosenAttributes']);
+    const header = t('headers.reveal');
 
-        const lines: StatementLine[] = statements.map((s) => {
-            const raw = attributes[s.attributeTag];
-            const value = formatAttributeValue(s.attributeTag, attributes[s.attributeTag]);
+    const lines: StatementLine[] = statements.map((s) => {
+        const raw = attributes[s.attributeTag];
+        const value = formatAttributeValue(s.attributeTag, attributes[s.attributeTag] ?? 'Unavailable');
 
-            return {
-                attribute: getAttributeName(s.attributeTag),
-                value,
-                isRequirementMet: raw !== undefined,
-            };
-        });
+        return {
+            attribute: getAttributeName(s.attributeTag),
+            value,
+            isRequirementMet: raw !== undefined,
+        };
+    });
 
-        const isInvalid = lines.some((l) => !l.isRequirementMet);
+    const isInvalid = lines.some((l) => !l.isRequirementMet);
 
-        useEffect(() => {
-            if (lines.some((l) => !l.isRequirementMet)) {
-                onInvalid();
-            }
-        }, [isInvalid]);
+    useEffect(() => {
+        if (lines.some((l) => !l.isRequirementMet)) {
+            onInvalid();
+        }
+    }, [isInvalid]);
 
-        return <DisplayStatementView reveal lines={lines} dappName={dappName} header={header} className={className} />;
-    }
-);
+    return <DisplayStatementView reveal lines={lines} dappName={dappName} header={header} className={className} />;
+}
 
 type DisplaySecretStatementProps = BaseProps & {
     statement: SecretStatement;
 };
 
-export const DisplaySecretStatement = withIdentityFromAccount(
-    ({ dappName, statement, identity, className, onInvalid }: DisplaySecretStatementProps) => {
-        const header = useStatementHeader(statement);
-        const value = useStatementValue(statement);
-        const description = useStatementDescription(statement, identity);
-        const attribute = useStatementName(statement);
-        const isRequirementMet = canProveStatement(statement, identity);
+export function DisplaySecretStatement({
+    dappName,
+    statement,
+    identity,
+    className,
+    onInvalid,
+}: DisplaySecretStatementProps) {
+    const header = useStatementHeader(statement);
+    const value = useStatementValue(statement);
+    const description = useStatementDescription(statement, identity);
+    const attribute = useStatementName(statement);
+    const isRequirementMet = canProveStatement(statement, identity);
 
-        const lines: StatementLine[] = [
-            {
-                attribute,
-                value,
-                isRequirementMet,
-            },
-        ];
+    const lines: StatementLine[] = [
+        {
+            attribute,
+            value,
+            isRequirementMet,
+        },
+    ];
 
-        useEffect(() => {
-            if (!isRequirementMet) {
-                onInvalid();
-            }
-        }, [isRequirementMet]);
+    useEffect(() => {
+        if (!isRequirementMet) {
+            onInvalid();
+        }
+    }, [isRequirementMet]);
 
-        return (
-            <DisplayStatementView
-                lines={lines}
-                dappName={dappName}
-                header={header}
-                description={description}
-                className={className}
-            />
-        );
-    }
-);
+    return (
+        <DisplayStatementView
+            lines={lines}
+            dappName={dappName}
+            header={header}
+            description={description}
+            className={className}
+        />
+    );
+}

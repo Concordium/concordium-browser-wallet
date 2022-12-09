@@ -49,7 +49,7 @@ const t = {
                 simple: 'Send CCD',
                 init: 'Initialize Smart Contract Instance',
                 update: 'Update Smart Contract Instance',
-                unknown: 'Unknown',
+                registerData: 'Register data',
             },
         },
     },

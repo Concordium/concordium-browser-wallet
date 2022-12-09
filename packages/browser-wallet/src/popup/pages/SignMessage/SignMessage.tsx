@@ -46,7 +46,7 @@ export default function SignMessage({ onSubmit, onReject }: Props) {
         <ExternalRequestLayout>
             <ConnectedBox accountAddress={accountAddress} url={new URL(url).origin} />
             <div className="h-full flex-column align-center">
-                <div>{t('description', { dApp: displayUrl(url) })}</div>
+                <h3 className="m-t-0 text-center">{t('description', { dApp: displayUrl(url) })}</h3>
                 <TextArea className="m-v-20 w-full flex-child-fill" value={state.payload.message} />
                 <div className="flex p-b-10  m-t-auto">
                     <Button width="narrow" className="m-r-10" onClick={withClose(onReject)}>
