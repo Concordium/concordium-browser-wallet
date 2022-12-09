@@ -11,6 +11,7 @@ import {
     SimpleTransferPayload,
     UpdateContractPayload,
     InitContractPayload,
+    RegisterDataPayload,
 } from '@concordium/web-sdk';
 import { Cis2TransferParameters, SmartContractParameters } from '@shared/utils/types';
 import { TokenMetadata } from '@shared/storage/types';
@@ -23,6 +24,7 @@ import DisplaySimpleTransfer from './displayPayload/DisplaySimpleTransfer';
 import DisplayGenericPayload from './displayPayload/DisplayGenericPayload';
 import TokenBalance from '../TokenBalance';
 import Button from '../Button';
+import DisplayRegisterData from './displayPayload/DisplayRegisterData';
 
 export type GenericTransactionReceiptProps = {
     className?: string;
@@ -58,6 +60,8 @@ function displayPayload({ payload, type }: Omit<AccountTransaction, 'header'>, p
             return <DisplayUpdateContract payload={payload as UpdateContractPayload} parameters={parameters} />;
         case AccountTransactionType.InitContract:
             return <DisplayInitContract payload={payload as InitContractPayload} parameters={parameters} />;
+        case AccountTransactionType.RegisterData:
+            return <DisplayRegisterData payload={payload as RegisterDataPayload} />;
         default:
             return <DisplayGenericPayload payload={payload} />;
     }

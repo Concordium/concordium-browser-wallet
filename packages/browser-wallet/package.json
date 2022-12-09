@@ -21,6 +21,7 @@
         "@scure/bip39": "^1.1.0",
         "axios": "^0.27.2",
         "buffer": "^6.0.3",
+        "cbor": "^8.1.0",
         "check-password-strength": "^2.0.5",
         "clsx": "^1.1.1",
         "framer-motion": "^6.3.12",

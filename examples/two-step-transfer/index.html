@@ -4,6 +4,7 @@
         <title>My cool dapp</title>
         <script src="/sdk.js"></script>
         <script src="/helpers.js"></script>
+        <script src="https://unpkg.com/cbor-web"></script>
         <meta charset="utf-8" />
         <script>
             let currentAccountAddress = '';
@@ -96,6 +97,22 @@
                         .then(alert)
                         .catch(alert)
                 );
+                document.getElementById('registerData').addEventListener('click', () =>
+                    provider
+                        .sendTransaction(currentAccountAddress, concordiumSDK.AccountTransactionType.RegisterData, {
+                            data: new concordiumSDK.DataBlob(concordiumSDK.toBuffer(message.value, 'hex')),
+                        })
+                        .then(alert)
+                        .catch(alert)
+                );
+                document.getElementById('registerDataCBOR').addEventListener('click', () =>
+                    provider
+                        .sendTransaction(currentAccountAddress, concordiumSDK.AccountTransactionType.RegisterData, {
+                            data: new concordiumSDK.DataBlob(cbor.encode(message.value)),
+                        })
+                        .then(alert)
+                        .catch(alert)
+                );
 
                 provider.on('accountDisconnected', (accountAddress) => (currentAccountAddress = undefined));
                 provider.on('accountChanged', (accountAddress) => (currentAccountAddress = accountAddress));
@@ -131,9 +148,11 @@
         <button id="sendTransfer">Send transfer</button>
         <button id="sendDeposit">deposit in two step transfer</button>
         <button id="sendReceive">Initiate Receive in two step transfer</button>
+        <button id="idProof">Request an ID Proof</button>
         <br />
         Message: <input type="text" id="message" value="I believe in miracles" />
         <button id="signMessage">SignMessage</button>
-        <button id="idProof">Request an ID Proof</button>
+        <button id="registerData">Register message (HEX encoded) (must be a hex string)</button>
+        <button id="registerDataCBOR">Register message (CBOR encoded)</button>
     </body>
 </html>

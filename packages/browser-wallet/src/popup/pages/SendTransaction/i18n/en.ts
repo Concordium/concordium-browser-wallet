@@ -14,6 +14,8 @@ const t = {
     moduleReference: 'Module reference',
     contractName: 'Contract name',
     title: 'Sign transaction',
+    data: 'Data',
+    rawData: '(Unable to be decoded)',
 };
 
 export default t;

@@ -87,8 +87,11 @@ export function getTransactionTypeName(type: AccountTransactionType): string {
         case AccountTransactionType.Update: {
             return i18n.t('utils.transaction.type.update');
         }
+        case AccountTransactionType.RegisterData: {
+            return i18n.t('utils.transaction.type.registerData');
+        }
         default: {
-            return i18n.t('utils.transaction.type.unknown');
+            return AccountTransactionType[type];
         }
     }
 }
