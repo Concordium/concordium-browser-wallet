@@ -25,19 +25,19 @@ export default function About() {
                 <h3>Links</h3>
                 <NavList>
                     <div className="about-page__item">
-                        <ExternalLink path={urls.documentationWebsite} label={t('documentation')} />
+                        <ExternalLink path={urls.documentationWebsite}>{t('documentation')}</ExternalLink>
                     </div>
                     <div className="about-page__item">
-                        <ExternalLink path={urls.supportWebsite} label={t('support')} />
+                        <ExternalLink path={urls.supportWebsite}>{t('support')}</ExternalLink>
                     </div>
                     <div className="about-page__item">
-                        <ExternalLink path={urls.website} label={t('website')} />
+                        <ExternalLink path={urls.website}>{t('website')}</ExternalLink>
                     </div>
                     <div className="about-page__item">
-                        <ExternalLink path={urls.termsAndConditions} label={t('terms')} />
+                        <ExternalLink path={urls.termsAndConditions}>{t('terms')}</ExternalLink>
                     </div>
                     <div className="about-page__item">
-                        <ExternalLink path={urls.licenseAttributions} label={t('license')} />
+                        <ExternalLink path={urls.licenseAttributions}>{t('license')}</ExternalLink>
                     </div>
                 </NavList>
             </div>

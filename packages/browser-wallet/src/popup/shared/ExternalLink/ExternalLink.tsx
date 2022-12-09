@@ -1,9 +1,13 @@
+import clsx from 'clsx';
 import React from 'react';
+import { ClassName } from 'wallet-common-helpers';
 
-export default function ExternalLink({ path, label }: { path: string; label: string }) {
+type Props = ClassName & { path: string; children: string };
+
+export default function ExternalLink({ path, children, className }: Props) {
     return (
-        <a href={`${path}`} target="_blank" rel="noreferrer">
-            {label}
+        <a className={clsx(className)} href={`${path}`} target="_blank" rel="noreferrer">
+            {children}
         </a>
     );
 }

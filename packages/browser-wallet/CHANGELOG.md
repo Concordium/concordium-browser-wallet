@@ -2,6 +2,10 @@
 
 ## 0.9.1
 
+### Added
+
+-   Page linking to ccdscan for exporting an account statement for any given account. This feature is available under account settings.
+
 ### Fixed
 
 -   Various bugs.

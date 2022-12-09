@@ -33,6 +33,12 @@ const t = {
             done: 'Done',
             export: 'Export',
         },
+        accountStatement: {
+            title: 'Export transaction log',
+            description:
+                'Transaction logs of an account can be generated and downloaded from CCDScan.io.\n\nCCDScan is a Concordium block explorer, and pressing the button below will open the website in your browser.',
+            link: 'Go to CCDScan.io',
+        },
     },
     sendCcd: {
         labels: {

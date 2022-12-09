@@ -32,7 +32,10 @@
         @include transition(box-shadow);
 
         &:hover,
+        &:visited,
         &:focus {
+            color: $color-off-white;
+
             &:not(:disabled) {
                 box-shadow: inset 0 0 rem(10px) rem(15px) rgb(255 255 255 / 15%);
             }

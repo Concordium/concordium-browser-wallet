@@ -57,10 +57,9 @@ export default function AcceptTerms({ children, onSubmit }: Props) {
                                 description={
                                     <div>
                                         {t('form.termsAndConditionsDescription')}{' '}
-                                        <ExternalLink
-                                            path={urls.termsAndConditions}
-                                            label={t('form.termsAndConditionsLinkDescription')}
-                                        />
+                                        <ExternalLink path={urls.termsAndConditions}>
+                                            {t('form.termsAndConditionsLinkDescription')}
+                                        </ExternalLink>
                                     </div>
                                 }
                                 rules={{ required: t('form.termsAndConditionsRequired') }}
