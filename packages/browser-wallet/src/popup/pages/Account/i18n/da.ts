@@ -12,6 +12,7 @@ const t: typeof en = {
         log: 'Transaktionslog',
         send: 'Send CCD',
         receive: 'Modtag CCD',
+        earn: 'Optjen CCD',
         settings: 'Kontoindstillinger',
         tokens: 'Tokens',
     },
