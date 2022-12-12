@@ -10,6 +10,7 @@ const t = {
         log: 'Transaction log',
         send: 'Send CCD',
         receive: 'Receive CCD',
+        earn: 'Earn CCD',
         settings: 'Account settings',
         tokens: 'Tokens',
     },

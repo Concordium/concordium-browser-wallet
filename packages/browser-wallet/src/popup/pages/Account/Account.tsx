@@ -95,6 +95,7 @@ export default function AccountRoutes() {
                     <Route index element={<Navigate to={accountRoutes.tokens} replace />} />
                     <Route path={`${accountRoutes.send}/*`} element={<SendCcd />} />
                     <Route path={accountRoutes.receive} element={<DisplayAddress />} />
+                    <Route path={accountRoutes.earn} element={<>Earn</>} />
                     <Route path={`${accountRoutes.log}/*`} element={<TransactionLog />} />
                     <Route path={`${accountRoutes.settings}/*`} element={<AccountSettings />} />
                     <Route path={`${accountRoutes.tokens}/*`} element={<Tokens />} />

@@ -11,6 +11,7 @@ import SendIcon from '@assets/svg/paperplane.svg';
 import TokenIcon from '@assets/svg/tokens.svg';
 import ReceiveIcon from '@assets/svg/qr.svg';
 import SettingsIcon from '@assets/svg/cog.svg';
+import EarnIcon from '@assets/svg/earn.svg';
 import TabBar from '@popup/shared/TabBar';
 import { accountRoutes } from '../routes';
 import { accountPageContext } from '../utils';
@@ -95,6 +96,9 @@ export default function AccountActions({ className, disabled }: Props) {
                 </Action>
                 <Action to={accountRoutes.receive} title={t('receive')} disabled={disabled}>
                     <ReceiveIcon className="account-page-actions__receive-icon" />
+                </Action>
+                <Action to={accountRoutes.earn} title={t('earn')} disabled={disabled}>
+                    <EarnIcon className="account-page-actions__earn-icon" />
                 </Action>
                 <Action
                     to={accountRoutes.settings}
