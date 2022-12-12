@@ -53,13 +53,12 @@ export class WithWalletConnection extends React.Component<Props, State> implemen
         if (type === activeConnectorType) {
             return; // ensure idempotency
         }
-        this.setState((state) => ({
-            ...state,
+        this.setState({
             activeConnectorType: type,
             activeConnector: undefined,
             activeConnection: undefined,
             activeConnectedAccount: undefined,
-        }));
+        });
         if (type) {
             this.createConnector(type, network).then(this.setActiveConnector).catch(console.error);
         }
@@ -67,7 +66,7 @@ export class WithWalletConnection extends React.Component<Props, State> implemen
 
     private setActiveConnector = (connector: WalletConnector) => {
         console.log('WithWalletConnection: updating connector state', { connector, state: this.state });
-        this.setState((state) => ({ ...state, activeConnector: connector }));
+        this.setState({ activeConnector: connector });
     };
 
     setActiveConnection = (connection: WalletConnection | undefined) => {
@@ -80,11 +79,10 @@ export class WithWalletConnection extends React.Component<Props, State> implemen
                 connection,
                 connectedAccount,
             });
-            this.setState((state) => ({
-                ...state,
+            this.setState({
                 activeConnection: connection,
                 activeConnectedAccount: connectedAccount,
-            }));
+            });
         });
     };
 
@@ -109,7 +107,7 @@ export class WithWalletConnection extends React.Component<Props, State> implemen
         // Ignore event on connections other than the active one.
         if (connection === activeConnection) {
             console.log('WithWalletConnection: updating connected account state', { address });
-            this.setState((state) => ({ ...state, activeConnectedAccount: address }));
+            this.setState({ activeConnectedAccount: address });
         }
     };
 
@@ -132,7 +130,7 @@ export class WithWalletConnection extends React.Component<Props, State> implemen
         // Ignore event on connections other than the active one.
         if (connection === activeConnection) {
             console.log('WithWalletConnection: clearing wallet connection and connected account state');
-            this.setState((state) => ({ ...state, activeConnection: undefined, activeConnectedAccount: undefined }));
+            this.setState({ activeConnection: undefined, activeConnectedAccount: undefined });
         }
     };
 
