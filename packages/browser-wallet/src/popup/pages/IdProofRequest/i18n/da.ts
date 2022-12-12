@@ -15,7 +15,7 @@ const da: typeof en = {
         },
         secretTooltip: {
             header: 'Zero Knowledge beviser',
-            body: 'Zero Knowledge beviser er en måde at bevise noget overfor en service eller dApp, uden at afsløre den underliggende personlige information. Et eksempel kan være, at du beviser at du er over 18 år gammel, uden at bevise din specifikke fødselsdato. Et andet eksemple kan være, at du bor i ét ud af en række lande, uden at afsløre hvilket bestemt land du bor i.\n\nDu kan læse mere på\n\ndeveloper.concordum.software',
+            body: 'Zero Knowledge beviser er en måde at bevise noget overfor en service eller dApp, uden at afsløre den underliggende personlige information. Et eksempel kan være, at du beviser at du er over 18 år gammel, uden at bevise din specifikke fødselsdato. Et andet eksempel kan være, at du bor i ét ud af en række lande, uden at afsløre hvilken af disse lande du bor i.\n\nDu kan læse mere på\n\ndeveloper.concordum.software',
         },
         headers: {
             reveal: 'Information der afsløres',
