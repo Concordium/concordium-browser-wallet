@@ -1,5 +1,11 @@
 # Changelog
 
+## 0.9.2
+
+### Fixed
+
+-   Small UI bug.
+
 ## 0.9.1
 
 ### Added
