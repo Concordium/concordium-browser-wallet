@@ -27,6 +27,7 @@ import {
     RunCondition,
     runConditionComposer,
     setPopupSize,
+    testPopupOpen,
 } from './window-management';
 import { addIdpListeners, identityIssuanceHandler } from './identity-issuance';
 import { startMonitoringPendingStatus } from './confirmation';
@@ -335,7 +336,8 @@ bgMessageHandler.handleMessage(
 
 const withPromptStart: RunCondition<MessageStatusWrapper<string | undefined>> = async () => {
     const isPromptOpen = await sessionOpenPrompt.get();
-    if (isPromptOpen) {
+    const isOpen = await testPopupOpen();
+    if (isPromptOpen && isOpen) {
         return { run: false, response: { success: false, message: 'Another prompt is already open' } };
     }
     sessionOpenPrompt.set(true);
