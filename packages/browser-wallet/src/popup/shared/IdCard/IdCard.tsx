@@ -1,5 +1,5 @@
 import clsx from 'clsx';
-import React, { useState, useEffect } from 'react';
+import React, { useState, useEffect, forwardRef, useRef } from 'react';
 import { useForm } from 'react-hook-form';
 import { useTranslation } from 'react-i18next';
 import { noOp } from 'wallet-common-helpers';
@@ -30,7 +30,7 @@ type EditNameProps = {
     isEditing: boolean;
 };
 
-function EditableName({ name, onChange = noOp, isEditing }: EditNameProps) {
+const EditableName = forwardRef<HTMLFormElement, EditNameProps>(({ name, onChange = noOp, isEditing }, ref) => {
     const methods = useForm<EditNameForm>();
 
     useEffect(() => {
@@ -46,7 +46,7 @@ function EditableName({ name, onChange = noOp, isEditing }: EditNameProps) {
     }
 
     return (
-        <Form<EditNameForm> formMethods={methods} onSubmit={handleSubmit} className="id-card__name-form">
+        <Form<EditNameForm> formMethods={methods} onSubmit={handleSubmit} className="id-card__name-form" ref={ref}>
             {(f) => (
                 <>
                     <FormInlineInput
@@ -59,14 +59,12 @@ function EditableName({ name, onChange = noOp, isEditing }: EditNameProps) {
                             maxLength: IDENTITY_NAME_MAX_LENGTH,
                         }}
                     />
-                    <Submit className="id-card__name-edit" clear>
-                        <CheckIcon />
-                    </Submit>
+                    <Submit className="id-card__name-edit" clear />
                 </>
             )}
         </Form>
     );
-}
+});
 
 type IdentityStatus = 'pending' | 'confirmed' | 'rejected';
 
@@ -99,6 +97,7 @@ type Props = {
 export default function IdCard({ name, provider, status, onNameChange, className, onClick }: Props) {
     const { t } = useTranslation();
     const [isEditing, setIsEditing] = useState(false);
+    const editNameRef = useRef<HTMLFormElement>(null);
 
     const handleNameChange = (newName: string) => {
         onNameChange?.(newName);
@@ -123,19 +122,19 @@ export default function IdCard({ name, provider, status, onNameChange, className
             <header className="id-card__header">
                 <IdentityStatusIcon status={status} />
                 {t('id.header')}
-                {onNameChange && (
-                    <Button
-                        disabled={isEditing}
-                        clear
-                        className="id-card__edit-button"
-                        onClick={() => setIsEditing(true)}
-                    >
+                {onNameChange && !isEditing && (
+                    <Button clear className="id-card__edit-button" onClick={() => setIsEditing(true)}>
                         <EditIcon />
+                    </Button>
+                )}
+                {onNameChange && isEditing && (
+                    <Button clear className="id-card__edit-button" onClick={() => editNameRef.current?.requestSubmit()}>
+                        <CheckIcon />
                     </Button>
                 )}
             </header>
             <div className="id-card__name">
-                <EditableName name={name} onChange={handleNameChange} isEditing={isEditing} />
+                <EditableName name={name} onChange={handleNameChange} isEditing={isEditing} ref={editNameRef} />
             </div>
             <div className="id-card__status">
                 {status === 'pending' && t('id.pending')}
