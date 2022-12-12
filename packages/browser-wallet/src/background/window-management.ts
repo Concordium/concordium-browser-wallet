@@ -45,7 +45,8 @@ export const spawnPopup = async (): Promise<chrome.windows.Window> => {
 /**
  * Checks if a popup id open and available.
  */
-const testPopupOpen = () => bgMessageHandler.sendInternalMessage(InternalMessageType.TestPopupOpen).catch(() => false);
+export const testPopupOpen = () =>
+    bgMessageHandler.sendInternalMessage(InternalMessageType.TestPopupOpen).catch(() => false);
 
 let popupId: number | undefined;
 
