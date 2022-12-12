@@ -2,11 +2,13 @@ import React, { useMemo } from 'react';
 import { useTranslation } from 'react-i18next';
 import { useNavigate } from 'react-router-dom';
 import { useAtom, useAtomValue } from 'jotai';
+import { AttributeKey } from '@concordium/web-sdk';
+import { formatAttributeValue, compareAttributes } from 'wallet-common-helpers';
+
+import FingerprintIcon from '@assets/svg/fingerprint.svg';
 import { identityProvidersAtom, selectedIdentityAtom } from '@popup/store/identity';
 import IdCard from '@popup/shared/IdCard';
 import { CreationStatus } from '@shared/storage/types';
-import { AttributeKey } from '@concordium/web-sdk';
-import { formatAttributeValue, compareAttributes } from 'wallet-common-helpers';
 import IdentityProviderIcon from '@popup/shared/IdentityProviderIcon';
 import Button from '@popup/shared/Button';
 import { absoluteRoutes } from '@popup/constants/routes';
@@ -54,6 +56,12 @@ export default function Identity() {
             />
             {attributes && (
                 <div className="identity__attributes">
+                    <div className="identity__attributes-row p-v-5">
+                        <div className="identity__attributes-left">
+                            <FingerprintIcon className="identity__fingerprint-icon" />
+                            <div className="m-l-5">Identity attributes</div>
+                        </div>
+                    </div>
                     {Object.keys(attributes)
                         .map((k) => k as AttributeKey)
                         .sort(compareAttributes)

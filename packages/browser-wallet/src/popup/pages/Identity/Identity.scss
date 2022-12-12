@@ -4,7 +4,7 @@
         margin-bottom: rem(10px);
         border-radius: rem(10px);
         width: rem(196px);
-        border: rem(1px) solid $color-blue;
+        border: rem(1px) solid $color-cta;
         overflow: hidden;
 
         &-row {
@@ -29,5 +29,9 @@
             align-items: center;
             justify-content: flex-end;
         }
+    }
+
+    &__fingerprint-icon {
+        height: rem(15px);
     }
 }
