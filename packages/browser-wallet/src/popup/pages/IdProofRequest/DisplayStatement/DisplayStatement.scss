@@ -5,6 +5,7 @@ $display-statement-color-invalid: $color-grey;
     display: block;
     border: 1px solid $display-statement-color-success;
     border-radius: rem(5px);
+    background-color: $color-bg;
 
     &--invalid {
         border-color: $display-statement-color-invalid;
