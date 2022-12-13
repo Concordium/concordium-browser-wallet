@@ -30,9 +30,8 @@ export default function AcceptTerms({ children, onSubmit }: Props) {
 
     const handleSubmit: SubmitHandler<FormValues> = async () => {
         const version = config?.version || acceptedTerms?.version;
-        if (version) {
-            setAcceptedTerms({ accepted: true, version });
-        }
+        // If we didn't find a version, put in an empty version
+        setAcceptedTerms({ accepted: true, version: version || '' });
         onSubmit();
     };
 
