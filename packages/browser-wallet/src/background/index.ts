@@ -127,7 +127,7 @@ async function checkForNewTermsAndConditions() {
     const network = await storedCurrentNetwork.get();
     try {
         const config = await getTermsAndConditionsConfig(network?.explorerUrl);
-        if (config && (!current || current.version !== config.version)) {
+        if (config?.version && (!current || current.version !== config.version)) {
             storedAcceptedTerms.set({ accepted: false, version: config.version });
         }
     } catch {

@@ -1,5 +1,12 @@
 # Changelog
 
+## 0.9.3
+
+### Fixed
+
+-   Wording and missing links in id proofs info boxes.
+-   Prompt at accept Terms and conditions appearing when T&C had not been updated.
+
 ## 0.9.2
 
 ### Fixed
