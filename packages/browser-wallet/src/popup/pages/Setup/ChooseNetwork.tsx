@@ -6,8 +6,8 @@ import { absoluteRoutes } from '@popup/constants/routes';
 import { useSetAtom } from 'jotai';
 import { useTranslation } from 'react-i18next';
 import { hasBeenOnBoardedAtom, networkConfigurationAtom, sessionPasscodeAtom } from '@popup/store/settings';
+import { mainnet, testnet } from '@shared/constants/networkConfiguration';
 import { setupRoutes } from './routes';
-import { mainnet, testnet } from '../NetworkSettings/NetworkSettings';
 import { usePasscodeInSetup } from './passcode-helper';
 
 export function ChooseNetwork() {

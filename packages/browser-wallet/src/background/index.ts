@@ -18,7 +18,7 @@ import {
 import JSONBig from 'json-bigint';
 import { ChromeStorageKey, NetworkConfiguration } from '@shared/storage/types';
 import { buildURLwithSearchParameters } from '@shared/utils/url-helpers';
-import { getTermsAndConditionHash } from '@shared/utils/network-helpers';
+import { getTermsAndConditionsConfig } from '@shared/utils/network-helpers';
 import bgMessageHandler from './message-handler';
 import {
     forwardToPopup,
@@ -124,10 +124,11 @@ async function reportVersion(network?: NetworkConfiguration) {
 
 async function checkForNewTermsAndConditions() {
     const current = await storedAcceptedTerms.get();
+    const network = await storedCurrentNetwork.get();
     try {
-        const newTerms = await getTermsAndConditionHash();
-        if (!current || current.value !== newTerms) {
-            storedAcceptedTerms.set({ accepted: false, value: newTerms });
+        const config = await getTermsAndConditionsConfig(network?.explorerUrl);
+        if (config && (!current || current.version !== config.version)) {
+            storedAcceptedTerms.set({ accepted: false, version: config.version });
         }
     } catch {
         // TODO: log this

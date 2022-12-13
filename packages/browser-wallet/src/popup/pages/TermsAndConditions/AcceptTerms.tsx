@@ -8,9 +8,10 @@ import FormCheckbox from '@popup/shared/Form/Checkbox';
 import ExternalLink from '@popup/shared/ExternalLink';
 import urls from '@shared/constants/url';
 import Submit from '@popup/shared/Form/Submit';
-import { useAtom } from 'jotai';
-import { acceptedTermsAtom } from '@popup/store/settings';
-import { getTermsAndConditionHash } from '@shared/utils/network-helpers';
+import { useAtom, useAtomValue } from 'jotai';
+import { acceptedTermsAtom, networkConfigurationAtom } from '@popup/store/settings';
+import { getTermsAndConditionsConfig } from '@shared/utils/network-helpers';
+import { useAsyncMemo } from 'wallet-common-helpers';
 
 type FormValues = {
     termsAndConditionsApproved: boolean;
@@ -24,13 +25,14 @@ type Props = {
 export default function AcceptTerms({ children, onSubmit }: Props) {
     const { t } = useTranslation('termsAndConditions');
     const [{ loading, value: acceptedTerms }, setAcceptedTerms] = useAtom(acceptedTermsAtom);
+    const network = useAtomValue(networkConfigurationAtom);
+    const config = useAsyncMemo(() => getTermsAndConditionsConfig(network.explorerUrl), undefined, []);
 
     const handleSubmit: SubmitHandler<FormValues> = async () => {
-        let value = acceptedTerms?.value;
-        if (!value) {
-            value = await getTermsAndConditionHash();
+        const version = config?.version || acceptedTerms?.version;
+        if (version) {
+            setAcceptedTerms({ accepted: true, version });
         }
-        setAcceptedTerms({ accepted: true, value });
         onSubmit();
     };
 
@@ -57,7 +59,7 @@ export default function AcceptTerms({ children, onSubmit }: Props) {
                                 description={
                                     <div>
                                         {t('form.termsAndConditionsDescription')}{' '}
-                                        <ExternalLink path={urls.termsAndConditions}>
+                                        <ExternalLink path={config?.url || urls.termsAndConditions}>
                                             {t('form.termsAndConditionsLinkDescription')}
                                         </ExternalLink>
                                     </div>
