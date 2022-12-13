@@ -16,6 +16,8 @@ import Button from '@popup/shared/Button';
 import Modal from '@popup/shared/Modal';
 import { useGetAttributeName } from '@popup/shared/utils/identity-helpers';
 import { ConfirmedIdentity } from '@shared/storage/types';
+import ExternalLink from '@popup/shared/ExternalLink';
+import urls from '@shared/constants/url';
 import {
     SecretStatement,
     canProveStatement,
@@ -56,16 +58,6 @@ type StatementTooltipProps = {
 function StatementTooltip({ reveal }: StatementTooltipProps) {
     const [open, setOpen] = useState(false);
     const { t } = useTranslation('idProofRequest', { keyPrefix: 'displayStatement' });
-    const body = reveal ? t('revealTooltip.body') : t('secretTooltip.body');
-    const header = reveal ? (
-        <Trans
-            ns="idProofRequest"
-            i18nKey="displayStatement.revealTooltip.header"
-            components={{ 1: <WarningTooltipIcon className="display-statement__tooltip-icon" /> }}
-        />
-    ) : (
-        t('secretTooltip.header')
-    );
 
     return (
         <Modal
@@ -82,8 +74,24 @@ function StatementTooltip({ reveal }: StatementTooltipProps) {
                 </Button>
             }
         >
-            <h3>{header}</h3>
-            <div className="white-space-break">{body}</div>
+            <h3>
+                {reveal ? (
+                    <Trans
+                        ns="idProofRequest"
+                        i18nKey="displayStatement.revealTooltip.header"
+                        components={{ 1: <WarningTooltipIcon className="display-statement__tooltip-icon" /> }}
+                    />
+                ) : (
+                    t('secretTooltip.header')
+                )}
+            </h3>
+            <div className="white-space-break">
+                <Trans
+                    ns="idProofRequest"
+                    i18nKey={reveal ? 'displayStatement.revealTooltip.body' : 'displayStatement.secretTooltip.body'}
+                    components={{ 1: <ExternalLink path={urls.zkpDocumentation} /> }}
+                />
+            </div>
         </Modal>
     );
 }
