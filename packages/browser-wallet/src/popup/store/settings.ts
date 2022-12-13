@@ -8,9 +8,9 @@ import {
 import { atom } from 'jotai';
 import { EventType } from '@concordium/browser-wallet-api-helpers';
 import { popupMessageHandler } from '@popup/shared/message-handler';
-import { mainnet } from '@popup/pages/NetworkSettings/NetworkSettings';
 import { HttpProvider, JsonRpcClient } from '@concordium/web-sdk';
 import { sessionCookie, storedCredentials } from '@shared/storage/access';
+import { mainnet } from '@shared/constants/networkConfiguration';
 import { atomWithChromeStorage } from './utils';
 import { selectedAccountAtom } from './account';
 import { selectedIdentityIndexAtom } from './identity';

@@ -148,8 +148,12 @@ export function DisplayStatementView({ className, lines, dappName, header, ...pr
                 <StatementTooltip reveal={props.reveal} />
             </header>
             <ul className="list-clear p-5 m-0">
-                {lines.map((l) => (
-                    <DisplayStatementLine {...l} />
+                {lines.map((l, i) => (
+                    <DisplayStatementLine
+                        // eslint-disable-next-line react/no-array-index-key
+                        key={i} // Allow this, as we don't expect these to ever change.
+                        {...l}
+                    />
                 ))}
             </ul>
             {(props.reveal || props.description) && (
