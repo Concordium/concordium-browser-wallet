@@ -1,8 +1,10 @@
-import Button from '@popup/shared/Button';
 import React, { useContext, useEffect } from 'react';
 import { useTranslation } from 'react-i18next';
 import { Link, Route, Routes } from 'react-router-dom';
+
+import Button from '@popup/shared/Button';
 import { accountPageContext } from '../utils';
+import Delegate from './Delegate';
 
 const routes = {
     delegate: 'delegate',
@@ -20,7 +22,7 @@ function Earn() {
                 <p className="white-space-break">
                     <strong>{t('bakingHeader')}</strong>
                     <br />
-                    {t('bakingDescription')}
+                    {t('bakingDescription', { minAmount: '14000' })} {/* TODO: get from chain parameters */}
                 </p>
                 <p className="white-space-break">
                     <strong>{t('delegateHeader')}</strong>
@@ -45,10 +47,13 @@ export default function EarnRoutes() {
         return () => setDetailsExpanded(true);
     }, []);
 
+    // TODO: figure out if account is already delegator, and go to delegate route if so.
+    // TODO: do something temp with baker accounts imported from mobile wallets?
+
     return (
         <Routes>
             <Route index element={<Earn />} />
-            <Route path={routes.delegate} element={<>Delegate</>} />
+            <Route path={routes.delegate} element={<Delegate />} />
             {/* <Route path={routes.baking} element={<>Baking</>} /> */}
         </Routes>
     );
