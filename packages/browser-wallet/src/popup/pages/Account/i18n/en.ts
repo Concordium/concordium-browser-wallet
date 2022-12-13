@@ -89,6 +89,17 @@ const t = {
         listAddMore: 'You can add more tokens from the Manage page.',
         listEmpty: 'You can add tokens from the Manage page.',
     },
+    earn: {
+        title: 'Earning rewards',
+        description: 'There are two options for earning rewards on Concordium: Baking and delegation.',
+        bakingHeader: 'Baking (coming soon)',
+        bakingDescription:
+            'As a baker you participate in the network by baking blocks on the Concordium network. This requires a minimum of {{ minAmount }} CCD and access to a dedicated node.',
+        delegateHeader: 'Delegation',
+        delegateDescription:
+            "If you don't have access to your own node you may delegate your stake to one of the other bakers. There is no minimum amount of CCD required when delegating\n\nChoose the option that suits you below to learn more.\n\nNOTE: A single account cannot both be a baker and delegator, but it is possible to stop one and change to the other.",
+        delegateCta: 'Continue to delegation setup',
+    },
     accountPending: 'This account is still pending finalization.',
     accountRejected: 'This account failed to be created.',
     request: 'Create account',

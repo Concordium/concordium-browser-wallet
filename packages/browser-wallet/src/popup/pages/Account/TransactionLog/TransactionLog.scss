@@ -1,5 +1,6 @@
 .transaction-list {
     &__container {
+        height: 100%;
         background-color: $color-bg;
         display: flex;
         flex-direction: column;
