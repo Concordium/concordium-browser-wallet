@@ -86,19 +86,11 @@ function StatementTooltip({ reveal }: StatementTooltipProps) {
                 )}
             </h3>
             <div className="white-space-break">
-                {reveal ? (
                     <Trans
                         ns="idProofRequest"
-                        i18nKey="displayStatement.revealTooltip.body"
+                        i18nKey={reveal ? 'displayStatement.revealTooltip.body' : 'displayStatement.secretTooltip.body'}
                         components={{ 1: <ExternalLink path={urls.zkpDocumentation} /> }}
                     />
-                ) : (
-                    <Trans
-                        ns="idProofRequest"
-                        i18nKey="displayStatement.secretTooltip.body"
-                        components={{ 1: <ExternalLink path={urls.zkpDocumentation} /> }}
-                    />
-                )}
             </div>
         </Modal>
     );
