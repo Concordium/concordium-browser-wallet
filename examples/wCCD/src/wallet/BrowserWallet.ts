@@ -12,6 +12,8 @@ import {
 import { WalletConnectionDelegate, WalletConnection, WalletConnector } from './WalletConnection';
 
 export class BrowserWalletConnector implements WalletConnector, WalletConnection {
+    static instances: WeakMap<WalletConnectionDelegate, BrowserWalletConnector> = new WeakMap();
+
     readonly client: WalletApi;
 
     constructor(client: WalletApi, delegate: WalletConnectionDelegate) {
@@ -28,6 +30,15 @@ export class BrowserWalletConnector implements WalletConnector, WalletConnection
     }
 
     static async create(delegate: WalletConnectionDelegate) {
+        // let instance = BrowserWalletConnector.instances.get(delegate);
+        // console.log('cached instance:', instance);
+        // if (!instance) {
+        //     console.log('creating new one');
+        //     const client = await detectConcordiumProvider();
+        //     instance = new BrowserWalletConnector(client, delegate);
+        //     BrowserWalletConnector.instances.set(delegate, instance);
+        // }
+        // return instance;
         const client = await detectConcordiumProvider();
         return new BrowserWalletConnector(client, delegate);
     }
@@ -59,6 +70,10 @@ export class BrowserWalletConnector implements WalletConnector, WalletConnection
     }
 
     async disconnect() {
+        // // Only the wallet can initiate disconnecting individual accounts.
+        // // The connection itself cannot actually be disconnected with the client being cleared from global state.
+        // // This "disconnect" only ensures that we stop interacting with the client and that it doesn't interfere with a future reconnection.
+        // this.client.removeAllListeners();
         // Only the wallet can initiate a disconnect.
         return undefined;
     }

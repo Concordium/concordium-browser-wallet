@@ -120,7 +120,7 @@ export class WithWalletConnection extends React.Component<Props, State> implemen
             window.alert(
                 `Unexpected genesis hash '${genesisHash}'. Expected '${network.genesisHash}' (network '${network.name}').`
             );
-            connection.disconnect().catch(console.error);
+            connection.getConnector().disconnect().catch(console.error);
         }
     };
 
