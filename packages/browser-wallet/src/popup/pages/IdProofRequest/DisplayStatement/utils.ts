@@ -126,11 +126,11 @@ export function useStatementValue(statement: SecretStatement): string {
                 const maxDateString = formatDateString(upper);
 
                 if (statement.lower === MIN_DATE) {
-                    return t('dateAfter', { dateString: maxDateString });
+                    return t('dateBefore', { dateString: maxDateString });
                 }
 
                 if (statement.upper > today) {
-                    return t('dateBefore', { dateString: minDateString });
+                    return t('dateAfter', { dateString: minDateString });
                 }
 
                 return t('dateBetween', { minDateString, maxDateString });
@@ -141,11 +141,11 @@ export function useStatementValue(statement: SecretStatement): string {
                 const maxDateString = formatDateString(statement.upper);
 
                 if (statement.lower === MIN_DATE) {
-                    return t('dateAfter', { dateString: maxDateString });
+                    return t('dateAfter', { dateString: maxDateString }); // "Before" for expires, "Not after" for issuedAt
                 }
 
                 if (statement.upper === MAX_DATE) {
-                    return t('dateBefore', { dateString: minDateString });
+                    return t('dateBefore', { dateString: minDateString }); // "Not before" for expires, "After" for issuedAt
                 }
 
                 return t('dateBetween', { minDateString, maxDateString });
