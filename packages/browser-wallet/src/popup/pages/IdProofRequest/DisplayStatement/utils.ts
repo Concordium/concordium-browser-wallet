@@ -175,7 +175,7 @@ export function useStatementValue(statement: SecretStatement): string {
     return statement.attributeTag;
 }
 
-const isoToCountryName = (locale: string) => (isoCode: string) => countryTranslations.getName(isoCode, locale);
+export const isoToCountryName = (locale: string) => (isoCode: string) => countryTranslations.getName(isoCode, locale);
 
 export function useStatementDescription(statement: SecretStatement, identity: ConfirmedIdentity): string | undefined {
     const { t, i18n } = useTranslation('idProofRequest', { keyPrefix: 'displayStatement.descriptions' });
