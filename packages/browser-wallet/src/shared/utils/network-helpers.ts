@@ -18,9 +18,10 @@ export async function getGlobal(client: JsonRpcClient): Promise<CryptographicPar
     return global.value;
 }
 
-export async function getTermsAndConditionsConfig(
-    explorerUrl: string = mainnet.explorerUrl
-): Promise<{ version: string; url: string } | undefined> {
-    const response = await fetch(`${explorerUrl}/v0/termsAndConditionsVersion`);
+/**
+ * Fetches the current terms and condition version (and url) from the mainnet wallet proxy.
+ */
+export async function getTermsAndConditionsConfig(): Promise<{ version: string; url: string } | undefined> {
+    const response = await fetch(`${mainnet.explorerUrl}/v0/termsAndConditionsVersion`);
     return response.json();
 }
