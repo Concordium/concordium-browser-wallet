@@ -9,7 +9,7 @@ function connectorTypeStyle(baseStyle: any, isSelected: boolean, isConnected: bo
     const style = { ...baseStyle, width: '50%' };
     if (isConnected) {
         style.backgroundColor = '#823030';
-        style.border = '1px solid #0c221f';
+        style.border = '1px solid #520C0C';
     } else if (isSelected) {
         style.backgroundColor = '#174039';
         style.border = '1px solid #0c221f';

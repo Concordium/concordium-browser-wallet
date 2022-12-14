@@ -55,7 +55,7 @@ const ButtonStyleDisabled = {
     margin: '7px 0px 7px 0px',
     padding: '10px',
     width: '100%',
-    border: '1px solid #308274',
+    border: '1px solid #4B4A4A',
     backgroundColor: '#979797',
     cursor: 'pointer',
     fontWeight: 300,
