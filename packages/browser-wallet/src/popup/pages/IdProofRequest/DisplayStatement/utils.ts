@@ -192,16 +192,8 @@ export function useStatementDescription(statement: SecretStatement, identity: Co
                     return undefined;
                 }
 
-                const today = getPastDate(0);
                 const minDateString = formatDateString(statement.lower);
                 const maxDateString = formatDateString(statement.upper);
-
-                if (statement.lower === MIN_DATE) {
-                    return t('ageMin', { dateString: maxDateString });
-                }
-                if (statement.upper > today) {
-                    return t('ageMax', { dateString: minDateString });
-                }
 
                 return t('ageBetween', { minDateString, maxDateString });
             }
