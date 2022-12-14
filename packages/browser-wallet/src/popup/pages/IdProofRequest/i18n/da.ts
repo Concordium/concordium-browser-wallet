@@ -39,10 +39,10 @@ const da: typeof en = {
         },
         proofs: {
             ageMin: 'Mere end {{age}} år gammel',
-            ageMax: 'Mindre end {{age}} år gammel',
+            ageMax: '{{age}} år gammel eller mindre',
             ageExact: '{{ age }} år gammel',
             ageBetween: 'Mellem {{ageMin}} og {{ageMax}} år gammel',
-            dateAfter: 'Efter {{dateString}}',
+            dateAfterIncl: '{{dateString}} eller senere',
             dateBefore: 'Før {{dateString}}',
             dateBetween: 'Mellem {{minDateString}} og {{maxDateString}}',
             nationalityEU: 'EU',
@@ -55,9 +55,11 @@ const da: typeof en = {
             notDocIssuer: 'Ingen af {{n}} udstedere',
         },
         descriptions: {
-            ageMin: 'Dette vil bevise at din fødselsdato er før {{dateString}}',
-            ageMax: 'Dette vil bevise at din fødselsdato er efter {{dateString}}',
-            ageBetween: 'Dette vil bevise at din fødselsdato er mellem {{minDateString}} og {{maxDateString}}',
+            dob: 'Dette vil bevise at din fødselsdato er mellem {{minDateString}} og (eksklusiv) {{maxDateString}}',
+            idDocIssuedAt:
+                'Dette vil bevise at dit ID er udstedt mellem {{minDateString}} og (eksklusiv) {{maxDateString}}',
+            idDocExpiresAt:
+                'Dette vil bevise at dit ID udløber mellem {{minDateString}} og (eksklusiv) {{maxDateString}}',
             nationalityEU: 'Dette vil bevise at du er statsborger i et EU land',
             nationalityNotEU: 'Dette vil bevise at du er IKKE statsborger i et EU land',
             nationality: 'Dette vil bevise at du er statsborger i et af følgende lande:\n{{countryNamesString}}',

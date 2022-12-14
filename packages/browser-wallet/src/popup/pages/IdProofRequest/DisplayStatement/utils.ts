@@ -160,7 +160,7 @@ export function useStatementValue(statement: SecretStatement): string {
                 }
 
                 if (statement.upper > today) {
-                    return t('dateAfter', { dateString: minDateString });
+                    return t('dateAfterIncl', { dateString: minDateString });
                 }
 
                 return t('dateBetween', { minDateString, maxDateString });
@@ -171,11 +171,11 @@ export function useStatementValue(statement: SecretStatement): string {
                 const maxDateString = formatDateString(statement.upper);
 
                 if (statement.lower === MIN_DATE) {
-                    return t('dateAfter', { dateString: maxDateString }); // "Before" for expires, "Not after" for issuedAt
+                    return t('dateBefore', { dateString: maxDateString });
                 }
 
                 if (statement.upper === MAX_DATE) {
-                    return t('dateBefore', { dateString: minDateString }); // "Not before" for expires, "After" for issuedAt
+                    return t('dateAfterIncl', { dateString: minDateString });
                 }
 
                 return t('dateBetween', { minDateString, maxDateString });
@@ -217,15 +217,13 @@ export function useStatementDescription(statement: SecretStatement, identity: Co
 
     if (statement.type === StatementTypes.AttributeInRange) {
         switch (statement.attributeTag) {
-            case 'dob': {
-                if (!isAgeStatement(statement)) {
-                    return undefined;
-                }
-
+            case 'dob':
+            case 'idDocIssuedAt':
+            case 'idDocExpiresAt': {
                 const minDateString = formatDateString(statement.lower);
                 const maxDateString = formatDateString(statement.upper);
 
-                return t('ageBetween', { minDateString, maxDateString });
+                return t(statement.attributeTag, { minDateString, maxDateString });
             }
         }
     } else {

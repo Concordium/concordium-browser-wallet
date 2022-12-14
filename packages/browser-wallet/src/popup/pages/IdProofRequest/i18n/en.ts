@@ -37,10 +37,10 @@ export default {
         },
         proofs: {
             ageMin: 'More than {{age}} years old',
-            ageMax: 'Less than {{age}} years old',
+            ageMax: '{{age}} years old or less',
             ageBetween: '{{ageMin}} to {{ageMax}} years old',
             ageExact: '{{ age }} years old',
-            dateAfter: 'At or after {{dateString}}',
+            dateAfterIncl: '{{dateString}} or later',
             dateBefore: 'Before {{dateString}}',
             dateBetween: '{{minDateString}} to {{maxDateString}}',
             nationalityEU: 'EU',
@@ -53,9 +53,11 @@ export default {
             notDocIssuer: 'None of {{n}} issuers',
         },
         descriptions: {
-            ageMin: 'This will prove that your date of birth is before {{dateString}}',
-            ageMax: 'This will prove that your date of birth is after {{dateString}}',
-            ageBetween: 'This will prove that your date of birth is between {{minDateString}} and {{maxDateString}}',
+            dob: 'This will prove that your date of birth is between {{minDateString}} and (excluding) {{maxDateString}}',
+            idDocIssuedAt:
+                'This will prove that your ID document was issued between {{minDateString}} and (excluding) {{maxDateString}}',
+            idDocExpiresAt:
+                'This will prove that your ID document expires between {{minDateString}} and (excluding) {{maxDateString}}',
             nationalityEU: 'This will prove that you are a national of an EU country',
             nationalityNotEU: 'This will prove that you are NOT a national of an EU country',
             nationality: 'This will prove that you are a national of one of these countries:\n{{countryNamesString}}',
