@@ -9,11 +9,11 @@ export default {
             '<1>Important:</1> {{dappName}} will be given all the information above. You should only accept, if you have absolute trust in the service, and if you are familiar with their privacy policy.',
         revealTooltip: {
             header: 'Revealing information <1 />',
-            body: 'When you reveal information to a third party, you effectively hand over the information to them. This means that you should only do this if you have absolute trust in them, and if you are familiar with their data usage and protection procedures.\n\nYou can read more in on\n\n<1>develeoper.concordium.software</1>',
+            body: 'When you reveal information to a third party, you effectively hand over the information to them. This means you should only do this if you agree to their data usage and protection policies..\n\nYou can read more in\n\n<1>our developer documentation</1>',
         },
         secretTooltip: {
             header: 'Zero Knowledge proofs',
-            body: 'Zero Knowledge proofs are a way of proving something to a service or dApp without revealing the exact personal information. One example can be that you prove that you are over 18 years old without revealing your exact age. Another example could be proving your residency is within a given set of countries without revealing which of those countries you reside within.\n\nYou can read more on\n\n<1>developer.concordium.software</1>',
+            body: 'Zero Knowledge proofs are a way of proving something to a service or dApp without revealing the exact personal information. One example can be that you prove that you are over 18 years old without revealing your exact age. Another example could be proving your residency is within a given set of countries without revealing which of those countries you reside within.\n\nYou can read more in\n\n<1>our developer documentation</1>',
         },
         headers: {
             reveal: 'Information to reveal',
@@ -37,10 +37,10 @@ export default {
         },
         proofs: {
             ageMin: 'More than {{age}} years old',
-            ageMax: 'Less than {{age}} years old',
+            ageMax: '{{age}} years old or less',
             ageBetween: '{{ageMin}} to {{ageMax}} years old',
             ageExact: '{{ age }} years old',
-            dateAfter: 'After {{dateString}}',
+            dateAfterIncl: '{{dateString}} or later',
             dateBefore: 'Before {{dateString}}',
             dateBetween: '{{minDateString}} to {{maxDateString}}',
             nationalityEU: 'EU',
@@ -53,9 +53,11 @@ export default {
             notDocIssuer: 'None of {{n}} issuers',
         },
         descriptions: {
-            ageMin: 'This will prove that your date of birth is before {{dateString}}',
-            ageMax: 'This will prove that your date of birth is after {{dateString}}',
-            ageBetween: 'This will prove that your date of birth is between {{minDateString}} and {{maxDateString}}',
+            dob: 'This will prove that your date of birth is between {{minDateString}} and (excluding) {{maxDateString}}',
+            idDocIssuedAt:
+                'This will prove that your ID document was issued between {{minDateString}} and (excluding) {{maxDateString}}',
+            idDocExpiresAt:
+                'This will prove that your ID document expires between {{minDateString}} and (excluding) {{maxDateString}}',
             nationalityEU: 'This will prove that you are a national of an EU country',
             nationalityNotEU: 'This will prove that you are NOT a national of an EU country',
             nationality: 'This will prove that you are a national of one of these countries:\n{{countryNamesString}}',
@@ -77,5 +79,6 @@ export default {
             missingAttribute: 'The attribute cannot be found on the identity "{{identityName}}"',
         },
     },
-    failedProof: 'Unable to create proof due to: {{ reason }}',
+    failedProof: 'Unable to create proof',
+    failedProofReason: 'Unable to create proof due to: {{ reason }}',
 };

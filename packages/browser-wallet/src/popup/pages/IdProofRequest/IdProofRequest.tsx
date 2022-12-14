@@ -142,7 +142,9 @@ export default function IdProofRequest({ onReject, onSubmit }: Props) {
                                 .then(withClose(onSubmit))
                                 .catch((e) => {
                                     setCreatingProof(false);
-                                    addToast(t('failedProof', { reason: e.message }));
+                                    addToast(
+                                        e.message ? t('failedProofReason', { reason: e.message }) : t('failedProof')
+                                    );
                                 });
                         }}
                         disabled={!canProve || creatingProof}
