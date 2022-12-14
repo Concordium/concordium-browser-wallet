@@ -1,13 +1,18 @@
 /* eslint-disable no-console */
-import React, { useEffect, useState, useContext, useRef, useCallback } from 'react';
-import { toBuffer, deserializeReceiveReturnValue, serializeUpdateContractParameters } from '@concordium/web-sdk';
-import { detectConcordiumProvider } from '@concordium/browser-wallet-api-helpers';
+/* eslint-disable no-alert */
+
+import React, { useEffect, useState, useRef, useCallback } from 'react';
+import {
+    toBuffer,
+    deserializeReceiveReturnValue,
+    serializeUpdateContractParameters,
+    JsonRpcClient,
+} from '@concordium/web-sdk';
 import * as leb from '@thi.ng/leb128';
 import { multiply, round } from 'mathjs';
 
-import { wrap, unwrap, state } from './utils';
+import { wrap, unwrap } from './utils';
 import {
-    TESTNET_GENESIS_BLOCK_HASH,
     WCCD_CONTRACT_INDEX,
     CONTRACT_SUB_INDEX,
     CONTRACT_NAME,
@@ -17,6 +22,9 @@ import {
 
 import ArrowIcon from './assets/Arrow.svg';
 import RefreshIcon from './assets/Refresh.svg';
+import { withJsonRpcClient } from './wallet/WalletConnection';
+import { WalletConnectionProps } from './wallet/WithWalletConnection';
+import { WalletConnectionTypeButton } from './WalletConnectorTypeButton';
 
 const blackCardStyle = {
     backgroundColor: 'black',
@@ -47,7 +55,7 @@ const ButtonStyleDisabled = {
     margin: '7px 0px 7px 0px',
     padding: '10px',
     width: '100%',
-    border: '1px solid #308274',
+    border: '1px solid #4B4A4A',
     backgroundColor: '#979797',
     cursor: 'pointer',
     fontWeight: 300,
@@ -64,15 +72,14 @@ const InputFieldStyle = {
     padding: '10px 20px',
 };
 
-async function viewAdmin(setAdmin: (x: string) => void) {
-    const provider = await detectConcordiumProvider();
-    const res = await provider.getJsonRpcClient().invokeContract({
+async function viewAdmin(rpcClient: JsonRpcClient, setAdmin: (x: string) => void) {
+    const res = await rpcClient.invokeContract({
         method: `${CONTRACT_NAME}.view`,
         contract: { index: WCCD_CONTRACT_INDEX, subindex: CONTRACT_SUB_INDEX },
         parameter: toBuffer(''),
     });
     if (!res || res.tag === 'failure' || !res.returnValue) {
-        throw new Error(`Expected succesful invocation`);
+        throw new Error(`Expected successful invocation`);
     }
 
     const returnValues = deserializeReceiveReturnValue(
@@ -86,7 +93,11 @@ async function viewAdmin(setAdmin: (x: string) => void) {
     setAdmin(returnValues.admin.Account[0]);
 }
 
-async function updateWCCDBalanceAccount(account: string, setAmountAccount: (x: bigint) => void) {
+async function updateWCCDBalanceAccount(
+    rpcClient: JsonRpcClient,
+    account: string,
+    setAmountAccount: (x: bigint) => void
+) {
     const param = serializeUpdateContractParameters(
         CONTRACT_NAME,
         'balanceOf',
@@ -101,88 +112,62 @@ async function updateWCCDBalanceAccount(account: string, setAmountAccount: (x: b
         toBuffer(BALANCEOF_FUNCTION_RAW_SCHEMA, 'base64')
     );
 
-    const provider = await detectConcordiumProvider();
-    const res = await provider.getJsonRpcClient().invokeContract({
+    const res = await rpcClient.invokeContract({
         method: `${CONTRACT_NAME}.balanceOf`,
         contract: { index: WCCD_CONTRACT_INDEX, subindex: CONTRACT_SUB_INDEX },
         parameter: param,
     });
     if (!res || res.tag === 'failure' || !res.returnValue) {
-        throw new Error(`Expected succesful invocation`);
+        throw new Error(`Expected successful invocation`);
     }
 
     // The return value is an array. The value stored in the array starts at position 4 of the return value.
     setAmountAccount(BigInt(leb.decodeULEB128(toBuffer(res.returnValue.slice(4), 'hex'))[0]));
 }
 
-interface Props {
-    handleGetAccount: (accountAddress: string | undefined) => void;
-    handleNotConnected: () => void;
-}
+export default function wCCD(props: WalletConnectionProps) {
+    const { activeConnectorType, activeConnector, activeConnection, setActiveConnection, activeConnectedAccount } =
+        props;
+    const [isWaitingForUser, setWaitingForUser] = useState<boolean>(false);
+    const connectWallet = useCallback(() => {
+        if (activeConnector) {
+            setWaitingForUser(true);
+            activeConnector
+                .connect()
+                .then((c) => {
+                    console.log('setting wallet connection', c);
+                    setActiveConnection(c);
+                })
+                .catch(console.error)
+                .finally(() => setWaitingForUser(false));
+        }
+    }, [activeConnector]);
 
-export default function wCCD({ handleGetAccount, handleNotConnected }: Props) {
-    const { account, isConnected } = useContext(state);
     const [admin, setAdmin] = useState<string>();
+
+    useEffect(() => {
+        // Update admin contract.
+        if (activeConnection) {
+            withJsonRpcClient(activeConnection, (rpcClient) => viewAdmin(rpcClient, setAdmin)).catch(console.error);
+        }
+    }, [activeConnection]);
+
     const [isWrapping, setIsWrapping] = useState<boolean>(true);
     const [hash, setHash] = useState<string>('');
     const [error, setError] = useState<string>('');
-    const [flipped, setflipped] = useState<boolean>(false);
-    const [waitForUser, setWaitForUser] = useState<boolean>(false);
-    const [amountAccount, setAmountAccount] = useState<bigint>(0n);
-    const inputValue = useRef<HTMLInputElement>(null);
+    const [isFlipped, setIsFlipped] = useState<boolean>(false);
+    const [amountAccount, setAmountAccount] = useState<bigint>();
+    const inputValue = useRef<HTMLInputElement | null>(null);
 
     useEffect(() => {
-        if (isConnected) {
-            viewAdmin(setAdmin);
+        if (activeConnection && activeConnectedAccount) {
+            withJsonRpcClient(activeConnection, (rpcClient) =>
+                updateWCCDBalanceAccount(rpcClient, activeConnectedAccount, setAmountAccount)
+            ).catch(console.error);
+        } else {
+            setAmountAccount(undefined);
         }
-
-        if (isConnected) {
-            if (account) {
-                updateWCCDBalanceAccount(account, setAmountAccount);
-            }
-        }
-    }, [isConnected]);
-
-    const handleOnClick = useCallback(() => {
-        setWaitForUser(true);
-
-        detectConcordiumProvider()
-            .then((provider) => provider.connect())
-            .then(handleGetAccount)
-            .then(() => {
-                setWaitForUser(false);
-                detectConcordiumProvider()
-                    // Check if the user is connected to testnet by checking if the testnet genesisBlock exists.
-                    // Throw a warning and disconnect if not. We only want to
-                    // allow users to interact with our testnet smart contracts.
-                    .then((provider) =>
-                        provider
-                            .getJsonRpcClient()
-                            .getCryptographicParameters(TESTNET_GENESIS_BLOCK_HASH.toString())
-                            .then((result) => {
-                                if (result === undefined || result?.value === null) {
-                                    handleNotConnected();
-                                    /* eslint-disable no-alert */
-                                    window.alert(
-                                        'Your JsonRpcClient in the Concordium browser wallet cannot connect. Check if your Concordium browser wallet is connected to testnet!'
-                                    );
-                                }
-                            })
-                    );
-            })
-            .catch(() => {
-                window.alert(
-                    'Your JsonRpcClient in the Concordium browser wallet cannot connect. Check if your Concordium browser wallet is connected to testnet!'
-                );
-                setWaitForUser(false);
-            });
-    }, []);
-
-    useEffect(() => {
-        if (account) {
-            updateWCCDBalanceAccount(account, setAmountAccount);
-        }
-    }, [account]);
+    }, [activeConnection, activeConnectedAccount, isFlipped]);
 
     return (
         <>
@@ -190,17 +175,36 @@ export default function wCCD({ handleGetAccount, handleNotConnected }: Props) {
             <h3>Wrap and unwrap your CCDs and wCCDs on the Concordium Testnet</h3>
             <div style={blackCardStyle}>
                 <div>
-                    {!isConnected && waitForUser && (
+                    <WalletConnectionTypeButton
+                        buttonStyle={ButtonStyle}
+                        disabledButtonStyle={ButtonStyleDisabled}
+                        connectorType="BrowserWallet"
+                        connectorName="Browser Wallet"
+                        setWaitingForUser={setWaitingForUser}
+                        {...props}
+                    />
+                    <WalletConnectionTypeButton
+                        buttonStyle={ButtonStyle}
+                        disabledButtonStyle={ButtonStyleDisabled}
+                        connectorType="WalletConnect"
+                        connectorName="Wallet Connect"
+                        setWaitingForUser={setWaitingForUser}
+                        {...props}
+                    />
+                </div>
+                <div>
+                    {!activeConnection && isWaitingForUser && (
                         <button style={ButtonStyleDisabled} type="button" disabled>
                             Waiting for user
                         </button>
                     )}
-                    {!isConnected && !waitForUser && (
-                        <button style={ButtonStyle} type="button" onClick={handleOnClick}>
-                            Connect Wallet
+                    {!activeConnection && !isWaitingForUser && activeConnectorType && (
+                        <button style={ButtonStyle} type="button" onClick={connectWallet}>
+                            {activeConnectorType === 'BrowserWallet' && 'Connect Browser Wallet'}
+                            {activeConnectorType === 'WalletConnect' && 'Connect Mobile Wallet'}
                         </button>
                     )}
-                    {isConnected && (
+                    {activeConnectedAccount && (
                         <>
                             <div className="text">Connected to</div>
                             <button
@@ -208,39 +212,43 @@ export default function wCCD({ handleGetAccount, handleNotConnected }: Props) {
                                 type="button"
                                 onClick={() => {
                                     window.open(
-                                        `https://testnet.ccdscan.io/?dcount=1&dentity=account&daddress=${account}`,
+                                        `https://testnet.ccdscan.io/?dcount=1&dentity=account&daddress=${activeConnectedAccount}`,
                                         '_blank',
                                         'noopener,noreferrer'
                                     );
                                 }}
                             >
-                                {account}{' '}
+                                {activeConnectedAccount}
                             </button>
+                            <div className="text">wCCD Balance of connected account</div>
+                            <div className="containerSpaceBetween">
+                                <div className="largeText">
+                                    {amountAccount === undefined ? <i>N/A</i> : Number(amountAccount) / 1000000}
+                                </div>
+                                <button
+                                    className="buttonInvisible"
+                                    type="button"
+                                    onClick={() => setIsFlipped(!isFlipped)}
+                                >
+                                    {isFlipped ? (
+                                        <RefreshIcon
+                                            style={{ transform: 'rotate(90deg)' }}
+                                            height="20px"
+                                            width="20px"
+                                        />
+                                    ) : (
+                                        <RefreshIcon height="20px" width="20px" />
+                                    )}
+                                </button>
+                            </div>
                         </>
                     )}
+                    {!activeConnectedAccount && (
+                        <div className="text">
+                            <i>Please connect a wallet.</i>
+                        </div>
+                    )}
                 </div>
-                <br />
-                <div className="text">wCCD Balance of connected account</div>
-                <div className="containerSpaceBetween">
-                    <div className="largeText">{Number(amountAccount) / 1000000}</div>
-                    <button
-                        className="buttonInvisible"
-                        type="button"
-                        onClick={() => {
-                            setflipped(!flipped);
-                            if (account) {
-                                updateWCCDBalanceAccount(account, setAmountAccount);
-                            }
-                        }}
-                    >
-                        {flipped ? (
-                            <RefreshIcon style={{ transform: 'rotate(90deg)' }} height="20px" width="20px" />
-                        ) : (
-                            <RefreshIcon height="20px" width="20px" />
-                        )}
-                    </button>
-                </div>
-                <br />
                 <div className="containerSwitch">
                     <div className="largeText">CCD &nbsp; &nbsp; </div>
                     <button className="switch" type="button" onClick={() => setIsWrapping(!isWrapping)}>
@@ -268,21 +276,20 @@ export default function wCCD({ handleGetAccount, handleNotConnected }: Props) {
                         placeholder="0.000000"
                         ref={inputValue}
                     />
-                    {waitForUser || !isConnected ? (
+                    {isWaitingForUser || !activeConnection ? (
                         <button style={ButtonStyleDisabled} type="button" disabled>
                             Waiting for user
                         </button>
                     ) : (
                         <button
-                            style={ButtonStyle}
+                            style={activeConnectedAccount === undefined ? ButtonStyleDisabled : ButtonStyle}
                             type="button"
-                            disabled={account === undefined}
+                            disabled={activeConnectedAccount === undefined}
                             onClick={() => {
                                 if (
                                     inputValue.current === undefined ||
                                     inputValue.current?.valueAsNumber === undefined
                                 ) {
-                                    /* eslint-disable no-alert */
                                     window.alert(
                                         'Input a number into the CCD/wCCD amount field with max 6 decimal places.'
                                     );
@@ -293,31 +300,20 @@ export default function wCCD({ handleGetAccount, handleNotConnected }: Props) {
                                 // Amount needs to be in WEI
                                 const amount = round(multiply(input, 1000000));
 
-                                if (account) {
+                                if (activeConnection && activeConnectedAccount) {
                                     setHash('');
                                     setError('');
-                                    setWaitForUser(true);
-                                    if (isWrapping) {
-                                        wrap(
-                                            account,
-                                            WCCD_CONTRACT_INDEX,
-                                            setHash,
-                                            setError,
-                                            setWaitForUser,
-                                            CONTRACT_SUB_INDEX,
-                                            amount
-                                        );
-                                    } else {
-                                        unwrap(
-                                            account,
-                                            WCCD_CONTRACT_INDEX,
-                                            setHash,
-                                            setError,
-                                            setWaitForUser,
-                                            CONTRACT_SUB_INDEX,
-                                            amount
-                                        );
-                                    }
+                                    setWaitingForUser(true);
+                                    const tx = (isWrapping ? wrap : unwrap)(
+                                        activeConnection,
+                                        activeConnectedAccount,
+                                        WCCD_CONTRACT_INDEX,
+                                        CONTRACT_SUB_INDEX,
+                                        amount
+                                    );
+                                    tx.then(setHash)
+                                        .catch((err) => setError((err as Error).message))
+                                        .finally(() => setWaitingForUser(false));
                                 }
                             }}
                         >
@@ -328,7 +324,7 @@ export default function wCCD({ handleGetAccount, handleNotConnected }: Props) {
                 <br />
                 <br />
                 <div>Transaction status{hash === '' ? '' : ' (May take a moment to finalize)'}</div>
-                {hash === '' && error !== '' && <div style={{ color: 'red' }}>Transaction rejected by wallet.</div>}
+                {hash === '' && error !== '' && <div style={{ color: 'red' }}>{error}</div>}
                 {hash === '' && error === '' && <div className="loadingText">Waiting for transaction...</div>}
                 {hash !== '' && (
                     <>
