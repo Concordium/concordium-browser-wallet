@@ -25,7 +25,7 @@ type Props = {
 export default function AcceptTerms({ children, onSubmit }: Props) {
     const { t } = useTranslation('termsAndConditions');
     const [{ loading, value: acceptedTerms }, setAcceptedTerms] = useAtom(acceptedTermsAtom);
-    const config = useAsyncMemo(() => getTermsAndConditionsConfig(), undefined, []);
+    const config = useAsyncMemo(getTermsAndConditionsConfig, undefined, []);
 
     const handleSubmit: SubmitHandler<FormValues> = async () => {
         const version = config?.version || acceptedTerms?.version;
