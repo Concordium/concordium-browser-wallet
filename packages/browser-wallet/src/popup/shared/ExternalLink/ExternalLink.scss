@@ -1,0 +1,12 @@
+.external-link {
+    &,
+    &:hover,
+    &:visited,
+    &:active {
+        color: $color-cta;
+    }
+
+    &:hover {
+        text-decoration: underline;
+    }
+}
