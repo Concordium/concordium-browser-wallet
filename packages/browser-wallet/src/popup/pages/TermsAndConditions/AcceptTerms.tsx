@@ -8,8 +8,8 @@ import FormCheckbox from '@popup/shared/Form/Checkbox';
 import ExternalLink from '@popup/shared/ExternalLink';
 import urls from '@shared/constants/url';
 import Submit from '@popup/shared/Form/Submit';
-import { useAtom, useAtomValue } from 'jotai';
-import { acceptedTermsAtom, networkConfigurationAtom } from '@popup/store/settings';
+import { useAtom } from 'jotai';
+import { acceptedTermsAtom } from '@popup/store/settings';
 import { getTermsAndConditionsConfig } from '@shared/utils/network-helpers';
 import { useAsyncMemo } from 'wallet-common-helpers';
 
@@ -25,8 +25,7 @@ type Props = {
 export default function AcceptTerms({ children, onSubmit }: Props) {
     const { t } = useTranslation('termsAndConditions');
     const [{ loading, value: acceptedTerms }, setAcceptedTerms] = useAtom(acceptedTermsAtom);
-    const network = useAtomValue(networkConfigurationAtom);
-    const config = useAsyncMemo(() => getTermsAndConditionsConfig(network.explorerUrl), undefined, []);
+    const config = useAsyncMemo(() => getTermsAndConditionsConfig(), undefined, []);
 
     const handleSubmit: SubmitHandler<FormValues> = async () => {
         const version = config?.version || acceptedTerms?.version;
