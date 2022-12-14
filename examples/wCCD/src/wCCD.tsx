@@ -282,7 +282,7 @@ export default function wCCD(props: WalletConnectionProps) {
                         </button>
                     ) : (
                         <button
-                            style={ButtonStyle}
+                            style={activeConnectedAccount === undefined ? ButtonStyleDisabled : ButtonStyle}
                             type="button"
                             disabled={activeConnectedAccount === undefined}
                             onClick={() => {
