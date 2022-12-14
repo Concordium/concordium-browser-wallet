@@ -39,6 +39,7 @@ export default {
             ageMin: 'More than {{age}} years old',
             ageMax: 'Less than {{age}} years old',
             ageBetween: '{{ageMin}} to {{ageMax}} years old',
+            ageExact: '{{ age }} years old',
             dateAfter: 'After {{dateString}}',
             dateBefore: 'Before {{dateString}}',
             dateBetween: '{{minDateString}} to {{maxDateString}}',

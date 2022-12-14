@@ -40,6 +40,7 @@ const da: typeof en = {
         proofs: {
             ageMin: 'Mere end {{age}} år gammel',
             ageMax: 'Mindre end {{age}} år gammel',
+            ageExact: '{{ age }} år gammel',
             ageBetween: 'Mellem {{ageMin}} og {{ageMax}} år gammel',
             dateAfter: 'Efter {{dateString}}',
             dateBefore: 'Før {{dateString}}',
