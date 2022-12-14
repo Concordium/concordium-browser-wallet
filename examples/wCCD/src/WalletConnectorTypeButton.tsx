@@ -5,9 +5,12 @@ import React from 'react';
 import { destroy } from './wallet/WalletConnection';
 import { WalletConnectionProps } from './wallet/WithWalletConnection';
 
-function connectorTypeStyle(baseStyle: any, selected: boolean) {
+function connectorTypeStyle(baseStyle: any, isSelected: boolean, isConnected: boolean) {
     const style = { ...baseStyle, width: '50%' };
-    if (selected) {
+    if (isConnected) {
+        style.backgroundColor = '#823030';
+        style.border = '1px solid #0c221f';
+    } else if (isSelected) {
         style.backgroundColor = '#174039';
         style.border = '1px solid #0c221f';
     }
@@ -34,13 +37,14 @@ export function WalletConnectionTypeButton(props: Props) {
         setActiveConnectorType,
         setWaitingForUser,
     } = props;
-    const isAlreadyConnected = Boolean(activeConnectorType === connectorType && activeConnection);
+    const isConnected = Boolean(activeConnectorType === connectorType && activeConnection);
     const disabled = Boolean(activeConnectorType && activeConnectorType !== connectorType && activeConnection);
     return (
         <button
             style={connectorTypeStyle(
                 disabled ? disabledButtonStyle : buttonStyle,
-                activeConnectorType === connectorType
+                activeConnectorType === connectorType,
+                isConnected
             )}
             disabled={disabled}
             type="button"
@@ -56,7 +60,7 @@ export function WalletConnectionTypeButton(props: Props) {
                 }
             }}
         >
-            {isAlreadyConnected ? 'Disconnect' : `Use ${connectorName}`}
+            {isConnected ? `Disconnect ${connectorName}` : `Use ${connectorName}`}
         </button>
     );
 }
