@@ -20,6 +20,43 @@ import { ConfirmedIdentity } from '@shared/storage/types';
 
 export type SecretStatement = Exclude<AtomicStatement, RevealStatement>;
 
+const getYearFromDateString = (ds: string): number => Number(ds.substring(0, 4));
+const formatDateString = (ds: string): string => `${ds.substring(0, 4)}-${ds.substring(4, 6)}-${ds.substring(6)}`;
+
+const isEuCountrySet = (countries: string[]) =>
+    countries.length === EU_MEMBERS.length && countries.every((n) => EU_MEMBERS.includes(n));
+
+const getTextForSet =
+    <T extends (...args: any) => any>(t: T, statement: MembershipStatement | NonMembershipStatement) =>
+    (inSet: Parameters<T>[0], notInSet: Parameters<T>[0], options?: Record<string, string>) =>
+        t(statement.type === StatementTypes.AttributeInSet ? inSet : notInSet, options);
+
+/**
+ * Turns a YYYYMMDD string into a date object
+ */
+function dateStringToDate(date: string): Date {
+    return new Date(Date.parse(formatDateString(date)));
+}
+
+/**
+ * Turns a date object into a YYYYMMDD string
+ */
+function dateToDateString(date: Date): string {
+    const month = (date.getMonth() + 1).toString().padStart(2, '0');
+    const day = date.getDate().toString().padStart(2, '0');
+    const year = date.getFullYear().toString();
+    return year + month + day;
+}
+
+/**
+ * Given YYYYMMDD return YYYYMMDD + x day(s).
+ */
+function addDays(date: string, days: number): string {
+    const d = dateStringToDate(date);
+    d.setDate(d.getDate() + days);
+    return dateToDateString(d);
+}
+
 const isAgeStatement = (statement: SecretStatement): boolean => {
     if (statement.type !== StatementTypes.AttributeInRange) {
         return false;
@@ -27,7 +64,7 @@ const isAgeStatement = (statement: SecretStatement): boolean => {
 
     const today = getPastDate(0);
     const isYearOffsetUpper = statement.upper.substring(4) === today.substring(4);
-    const isYearOffsetLower = statement.lower.substring(4) === today.substring(4);
+    const isYearOffsetLower = addDays(statement.lower, -1).substring(4) === today.substring(4);
 
     if (statement.lower === MIN_DATE) {
         return isYearOffsetUpper;
@@ -60,17 +97,6 @@ export function useStatementHeader(statement: SecretStatement): string {
             throw new Error(`Unsupported attribute tag: ${statement.attributeTag}`);
     }
 }
-
-const getYearFromDateString = (ds: string): number => Number(ds.substring(0, 4));
-const formatDateString = (ds: string): string => `${ds.substring(0, 4)}-${ds.substring(4, 6)}-${ds.substring(6)}`;
-
-const isEuCountrySet = (countries: string[]) =>
-    countries.length === EU_MEMBERS.length && countries.every((n) => EU_MEMBERS.includes(n));
-
-const getTextForSet =
-    <T extends (...args: any) => any>(t: T, statement: MembershipStatement | NonMembershipStatement) =>
-    (inSet: Parameters<T>[0], notInSet: Parameters<T>[0], options?: Record<string, string>) =>
-        t(statement.type === StatementTypes.AttributeInSet ? inSet : notInSet, options);
 
 export function useStatementName(statement: SecretStatement): string {
     const { t } = useTranslation('idProofRequest', { keyPrefix: 'displayStatement.names' });
@@ -105,11 +131,11 @@ export function useStatementValue(statement: SecretStatement): string {
             case 'dob': {
                 const today = getPastDate(0);
                 const upper = today < statement.upper ? today : statement.upper;
-                const isAge = isAgeStatement(statement);
 
-                if (isAge) {
+                if (isAgeStatement(statement)) {
                     const ageMin = getYearFromDateString(today) - getYearFromDateString(upper);
-                    const ageMax = getYearFromDateString(today) - getYearFromDateString(statement.lower);
+                    const ageMax =
+                        getYearFromDateString(today) - getYearFromDateString(addDays(statement.lower, -1)) - 1;
 
                     if (statement.lower === MIN_DATE) {
                         return t('ageMin', { age: ageMin });
@@ -117,6 +143,10 @@ export function useStatementValue(statement: SecretStatement): string {
 
                     if (statement.upper > today) {
                         return t('ageMax', { age: ageMax });
+                    }
+
+                    if (ageMin === ageMax) {
+                        return t('ageExact', { age: ageMin });
                     }
 
                     return t('ageBetween', { ageMin, ageMax });
