@@ -76,7 +76,8 @@ const da: typeof en = {
             missingAttribute: 'Denne Attribut kan ikke findes på identiteten "{{identityName}}"',
         },
     },
-    failedProof: 'Bevis kunne ikke oprettes: {{ reason }}',
+    failedProof: 'Bevis kunne ikke oprettes',
+    failedProofReason: 'Bevis kunne ikke oprettes: {{ reason }}',
 };
 
 export default da;

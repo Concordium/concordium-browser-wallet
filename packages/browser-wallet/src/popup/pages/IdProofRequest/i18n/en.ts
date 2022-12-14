@@ -76,5 +76,6 @@ export default {
             missingAttribute: 'The attribute cannot be found on the identity "{{identityName}}"',
         },
     },
-    failedProof: 'Unable to create proof due to: {{ reason }}',
+    failedProof: 'Unable to create proof',
+    failedProofReason: 'Unable to create proof due to: {{ reason }}',
 };
