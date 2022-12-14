@@ -1,6 +1,7 @@
 {
     "name": "wccd",
     "packageManager": "yarn@3.2.0",
+    "version": "3.0.0",
     "license": "Apache-2.0",
     "dependencies": {
         "@concordium/browser-wallet-api-helpers": "^2.0.0",

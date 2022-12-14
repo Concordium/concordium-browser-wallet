@@ -27,13 +27,25 @@ To have hot-reload (useful for development), do the following instead:
 To build the docker image run the following:
 
 ```
-docker build -t wccd_front_end .
+docker build -t wccd_front_end:$PROJECT_VERSION .
+```
+
+e.g.
+
+```
+docker build -t wccd_front_end:3.0.0 .
 ```
 
 To run the docker image run the following:
 
 ```
-docker run -it -d -p 8080:80 --name web wccd_front_end
+docker run -it -d -p 8080:80 --name web wccd_front_end:$PROJECT_VERSION
+```
+
+e.g.
+
+```
+docker run -it -d -p 8080:80 --name web wccd_front_end:3.0.0
 ```
 
 Open http://127.0.0.1:8080 in your browser.
