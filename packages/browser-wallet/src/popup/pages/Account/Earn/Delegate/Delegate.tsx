@@ -13,10 +13,6 @@ const routes = {
 };
 
 export default function Delegate() {
-    /**
-     * If account is delegating, show delegation overview
-     * If not delegating, go to register delegation route.
-     */
     const accountInfo = ensureDefined(useSelectedAccountInfo(), 'Expected to find account info for selected account');
 
     return (

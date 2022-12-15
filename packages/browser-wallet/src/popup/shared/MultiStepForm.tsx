@@ -2,6 +2,8 @@ import React, { Dispatch, SetStateAction, useCallback, useEffect, useMemo, useSt
 import { Routes, useNavigate, Route, useLocation } from 'react-router-dom';
 import { isDefined, noOp, useUpdateEffect } from 'wallet-common-helpers';
 
+const INDEX_ROUTE = '.';
+
 export interface MultiStepFormPageProps<V, F = unknown> {
     /**
      * Function to be triggered on page submission. Will take user to next page in the flow.
@@ -23,7 +25,7 @@ const makeFormPageObjects = <F extends Record<string, unknown>>(children: FormCh
     return keyPagePairs.map(([k, c]: [keyof F, FormChild<F>], i) => ({
         substate: k,
         render: c.render,
-        route: i === 0 ? '.' : `${i}`,
+        route: i === 0 ? INDEX_ROUTE : `${i}`,
     }));
 };
 
@@ -134,7 +136,7 @@ export default function MultiStepForm<
         if (currentIndex === -1) {
             // Could not find current page. Should not happen.
             // TODO: Log error.
-            nav('.', { replace: true });
+            nav(INDEX_ROUTE, { replace: true });
         } else if (currentIndex !== newPages.length - 1) {
             // From any page that isn't the last, to the next in line.
             const { route } = newPages[currentIndex + 1] ?? {};
@@ -154,11 +156,13 @@ export default function MultiStepForm<
 
     return (
         <Routes>
-            {pages.map(({ render, route, substate }) => (
-                <Route path={route} key={route}>
-                    {render(values[substate], handleNext(substate), values)}
-                </Route>
-            ))}
+            {pages.map(({ render, route, substate }) =>
+                route === INDEX_ROUTE ? (
+                    <Route index key="index" element={render(values[substate], handleNext(substate), values)} />
+                ) : (
+                    <Route path={route} key={route} element={render(values[substate], handleNext(substate), values)} />
+                )
+            )}
         </Routes>
     );
 }
