@@ -1,28 +1,33 @@
 import React from 'react';
-import { useNavigate } from 'react-router-dom';
+import { Navigate, Route, Routes } from 'react-router-dom';
+import { isDelegatorAccount } from '@concordium/web-sdk';
 
-import Carousel from '@popup/shared/Carousel';
+import { useSelectedAccountInfo } from '@popup/shared/AccountInfoListenerContext/AccountInfoListenerContext';
+import { ensureDefined } from '@shared/utils/basic-helpers';
+import RegisterDelegation from './RegisterDelegation';
 
 const routes = {
-    intro: 'intro',
     register: 'register',
-    preUdpate: 'pre-update',
     update: 'update',
-    preRemove: 'pre-remove',
     remove: 'remove',
 };
 
-function Intro() {
-    const nav = useNavigate();
-    return (
-        <Carousel onContinue={() => nav(routes.register)}>
-            <div>First</div>
-            <div>Second</div>
-            <div>Third</div>
-        </Carousel>
-    );
-}
-
 export default function Delegate() {
-    return <Intro />;
+    /**
+     * If account is delegating, show delegation overview
+     * If not delegating, go to register delegation route.
+     */
+    const accountInfo = ensureDefined(useSelectedAccountInfo(), 'Expected to find account info for selected account');
+
+    return (
+        <Routes>
+            <Route
+                index
+                element={
+                    isDelegatorAccount(accountInfo) ? <>Delegation view</> : <Navigate replace to={routes.register} />
+                }
+            />
+            <Route path={`${routes.register}/*`} element={<RegisterDelegation />} />
+        </Routes>
+    );
 }
