@@ -38,8 +38,8 @@ const da: typeof en = {
             idDocIssuer: 'Dokumentudsteder',
         },
         proofs: {
-            ageMin: 'Mere end {{age}} år gammel',
-            ageMax: '{{age}} år gammel eller mindre',
+            ageMin: '{{age}} år gammel eller ældre',
+            ageMax: '{{age}} år gammel eller yngre',
             ageExact: '{{ age }} år gammel',
             ageBetween: 'Mellem {{ageMin}} og {{ageMax}} år gammel',
             dateAfterIncl: '{{dateString}} eller senere',
