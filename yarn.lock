@@ -1900,7 +1900,7 @@ __metadata:
     "@babel/plugin-transform-modules-commonjs": ^7.12.1
     "@babel/plugin-transform-runtime": ^7.12.1
     "@babel/preset-env": ^7.12.1
-    "@concordium/web-sdk": ^3.1.0-beta
+    "@concordium/web-sdk": ^3.1.0
     typescript: ^4.3.5
     webpack: ^5.72.0
     webpack-cli: ^4.9.2
@@ -1912,7 +1912,7 @@ __metadata:
   resolution: "@concordium/browser-wallet-api@workspace:packages/browser-wallet-api"
   dependencies:
     "@concordium/browser-wallet-api-helpers": "workspace:^"
-    "@concordium/common-sdk": ^6.1.0-beta
+    "@concordium/common-sdk": ^6.1.0
     "@types/json-bigint": ^1.0.1
     buffer: ^6.0.3
     json-bigint: ^1.0.0
@@ -1938,7 +1938,7 @@ __metadata:
     "@babel/core": ^7.18.2
     "@concordium/browser-wallet-api": "workspace:^"
     "@concordium/browser-wallet-api-helpers": "workspace:^"
-    "@concordium/web-sdk": ^3.1.0-beta.1
+    "@concordium/web-sdk": ^3.1.0
     "@craftamap/esbuild-plugin-html": ^0.4.0
     "@mdx-js/react": ^1.6.22
     "@scure/bip39": ^1.1.0
@@ -2019,7 +2019,25 @@ __metadata:
   languageName: node
   linkType: hard
 
-"@concordium/common-sdk@npm:6.1.0-beta, @concordium/common-sdk@npm:^6.1.0-beta":
+"@concordium/common-sdk@npm:6.1.0, @concordium/common-sdk@npm:^6.1.0":
+  version: 6.1.0
+  resolution: "@concordium/common-sdk@npm:6.1.0"
+  dependencies:
+    "@concordium/rust-bindings": 0.8.0
+    "@noble/ed25519": ^1.7.1
+    "@scure/bip39": ^1.1.0
+    bs58check: ^2.1.2
+    buffer: ^6.0.3
+    cross-fetch: 3.1.5
+    hash.js: ^1.1.7
+    iso-3166-1: ^2.1.1
+    json-bigint: ^1.0.0
+    uuid: ^8.3.2
+  checksum: 015efdaa157f235f159aa3c6869dc49cfba5db9efd642f649a061e50e1193bd18b27b7b567af0ba3baae8a0bb424eb3dc5b7861c7c80ea7f6c03a6bd50a703ba
+  languageName: node
+  linkType: hard
+
+"@concordium/common-sdk@npm:6.1.0-beta":
   version: 6.1.0-beta
   resolution: "@concordium/common-sdk@npm:6.1.0-beta"
   dependencies:
@@ -2034,24 +2052,6 @@ __metadata:
     json-bigint: ^1.0.0
     uuid: ^8.3.2
   checksum: 5c53cad4c205acae5f0f7bfc245a75c29cfa976ab2c1b1654ed91164d274e86cdcec346ff7e59d6c3706c1a27211cd52d4c4e99a9d4fb7eca1c4c38a4615bbae
-  languageName: node
-  linkType: hard
-
-"@concordium/common-sdk@npm:6.1.0-beta.1":
-  version: 6.1.0-beta.1
-  resolution: "@concordium/common-sdk@npm:6.1.0-beta.1"
-  dependencies:
-    "@concordium/rust-bindings": 0.8.0
-    "@noble/ed25519": ^1.7.1
-    "@scure/bip39": ^1.1.0
-    bs58check: ^2.1.2
-    buffer: ^6.0.3
-    cross-fetch: 3.1.5
-    hash.js: ^1.1.7
-    iso-3166-1: ^2.1.1
-    json-bigint: ^1.0.0
-    uuid: ^8.3.2
-  checksum: 17939383ebc825b4c69448e63c6977cb4542af041d103a99cb8354ae12bcfab114ee0653ec86165e3e3d9fe1a41f50e5594bbd39ce062081dc16876a2ed54ba5
   languageName: node
   linkType: hard
 
@@ -2102,6 +2102,18 @@ __metadata:
   languageName: node
   linkType: hard
 
+"@concordium/web-sdk@npm:^3.1.0":
+  version: 3.1.0
+  resolution: "@concordium/web-sdk@npm:3.1.0"
+  dependencies:
+    "@concordium/common-sdk": 6.1.0
+    "@concordium/rust-bindings": 0.8.0
+    buffer: ^6.0.3
+    process: ^0.11.10
+  checksum: 3b6816da2f01ba8f07ff9a9aa36b591bb616e6228015dec5c6ca98b2ed6fe5420a0a86023e6606772485e8fbbaf477807af212c1cb7e9b0a12ea048b12b90600
+  languageName: node
+  linkType: hard
+
 "@concordium/web-sdk@npm:^3.1.0-beta":
   version: 3.1.0-beta
   resolution: "@concordium/web-sdk@npm:3.1.0-beta"
@@ -2111,18 +2123,6 @@ __metadata:
     buffer: ^6.0.3
     process: ^0.11.10
   checksum: 37163553fa249fb39e4c464074216d22f6439509ee912f5b1fee76b5694104e57173ee4cf7eed5d3d106a337b4b9529c8a373f2051fd4021008d9f51e0cd9794
-  languageName: node
-  linkType: hard
-
-"@concordium/web-sdk@npm:^3.1.0-beta.1":
-  version: 3.1.0-beta.1
-  resolution: "@concordium/web-sdk@npm:3.1.0-beta.1"
-  dependencies:
-    "@concordium/common-sdk": 6.1.0-beta.1
-    "@concordium/rust-bindings": 0.8.0
-    buffer: ^6.0.3
-    process: ^0.11.10
-  checksum: 219426ee7dfd2a0ce4293746477fa92d2d62174275902ac636b4e52072a0d91d4afb99f103d0d374da4c8b7d26c218b2289eb7f4855394c19b4c27d093762035
   languageName: node
   linkType: hard
 
@@ -20196,7 +20196,7 @@ __metadata:
   version: 0.0.0-use.local
   resolution: "two-step-transfer@workspace:examples/two-step-transfer"
   dependencies:
-    "@concordium/web-sdk": ^3.1.0-beta.1
+    "@concordium/web-sdk": ^3.1.0
     live-server: ^1.2.2
   languageName: unknown
   linkType: soft
