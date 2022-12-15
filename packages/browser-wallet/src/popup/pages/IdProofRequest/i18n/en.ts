@@ -58,8 +58,6 @@ export default {
                 'This will prove that your ID document was issued between {{minDateString}} and (excluding) {{maxDateString}}',
             idDocExpiresAt:
                 'This will prove that your ID document expires between {{minDateString}} and (excluding) {{maxDateString}}',
-            nationalityEU: 'This will prove that you are a national of an EU country',
-            nationalityNotEU: 'This will prove that you are NOT a national of an EU country',
             nationality: 'This will prove that you are a national of one of these countries:\n{{countryNamesString}}',
             notNationality:
                 'This will prove that you are NOT a national of one of these countries:\n{{countryNamesString}}',
@@ -67,8 +65,6 @@ export default {
                 'This will prove that your country of residence is one of the following:\n{{countryNamesString}}',
             notResidence:
                 'This will prove that your country of residence is NOT one of the following:\n{{countryNamesString}}',
-            residenceEU: 'This will prove that your country of residence is an EU country',
-            residenceNotEU: 'This will prove that your country of residence is NOT an EU country',
             docType: 'This will prove that your identity document type is one of the following:\n{{typeNamesString}}',
             notDocType:
                 'This will prove that your identity document type is NOT one of the following:\n{{typeNamesString}}',

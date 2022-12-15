@@ -232,18 +232,10 @@ export function useStatementDescription(statement: SecretStatement, identity: Co
 
         switch (statement.attributeTag) {
             case 'countryOfResidence':
-                if (isEuCountrySet(statement.set)) {
-                    return text('residenceEU', 'residenceNotEU');
-                }
-
                 return text('residence', 'notResidence', {
                     countryNamesString: statement.set.map(getCountryName).join(', '),
                 });
             case 'nationality':
-                if (isEuCountrySet(statement.set)) {
-                    return text('nationalityEU', 'nationalityNotEU');
-                }
-
                 return text('nationality', 'notNationality', {
                     countryNamesString: statement.set.map(getCountryName).join(', '),
                 });
