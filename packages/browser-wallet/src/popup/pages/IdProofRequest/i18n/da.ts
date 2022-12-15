@@ -60,15 +60,11 @@ const da: typeof en = {
                 'Dette vil bevise at dit ID er udstedt mellem {{minDateString}} og (eksklusiv) {{maxDateString}}',
             idDocExpiresAt:
                 'Dette vil bevise at dit ID udløber mellem {{minDateString}} og (eksklusiv) {{maxDateString}}',
-            nationalityEU: 'Dette vil bevise at du er statsborger i et EU land',
-            nationalityNotEU: 'Dette vil bevise at du er IKKE statsborger i et EU land',
             nationality: 'Dette vil bevise at du er statsborger i et af følgende lande:\n{{countryNamesString}}',
             notNationality:
                 'Dette vil bevise at du er IKKE statsborger i et af følgende lande:\n{{countryNamesString}}',
             residence: 'Dette vil bevise at dit bopælsland er et af følgende:\n{{countryNamesString}}',
             notResidence: 'Dette vil bevise at dit bopælsland er IKKE et af følgende:\n{{countryNamesString}}',
-            residenceEU: 'Dette vil bevise at dit bopælsland er er EU land',
-            residenceNotEU: 'Dette vil bevise at dit bopælsland er IKKE et EU land',
             docType: 'Dette vil bevise at Typen af dit identitetsdokument er en af følgende:\n{{typeNamesString}}',
             notDocType:
                 'Dette vil bevise at Typen af dit identitetsdokument er IKKE en af følgende:\n{{typeNamesString}}',
