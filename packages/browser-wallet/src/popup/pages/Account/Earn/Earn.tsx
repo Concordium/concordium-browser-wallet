@@ -53,7 +53,7 @@ export default function EarnRoutes() {
     return (
         <Routes>
             <Route index element={<Earn />} />
-            <Route path={routes.delegate} element={<Delegate />} />
+            <Route path={`${routes.delegate}/*`} element={<Delegate />} />
             {/* <Route path={routes.baking} element={<>Baking</>} /> */}
         </Routes>
     );

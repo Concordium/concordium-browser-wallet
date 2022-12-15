@@ -10,6 +10,7 @@ import { useTranslation } from 'react-i18next';
 import { getGenesisHash, sessionAccountInfoCache, useIndexedStorage } from '@shared/storage/access';
 import { accountInfoCacheLock, updateRecord } from '@shared/storage/update';
 import { AccountInfoListener } from '../account-info-listener';
+import { useSelectedCredential } from '../utils/account-helpers';
 
 export const accountInfoAtom = atomWithChromeStorage<Record<string, string>>(
     ChromeStorageKey.AccountInfoCache,
@@ -62,16 +63,13 @@ export function useAccountInfo(account: WalletCredential): AccountInfo | undefin
     const addToast = useSetAtom(addToastAtom);
     const client = useAtomValue(jsonRpcClientAtom);
     const { t } = useTranslation();
-    const [accountInfo, setAccountInfo] = useState<AccountInfo>();
+    const accountInfo = useMemo(
+        () => (accountInfoCache[address] !== undefined ? parse(accountInfoCache[address]) : undefined),
+        [accountInfoCache, address]
+    );
 
     useEffect(() => {
-        setAccountInfo(undefined);
-    }, [genesisHash, address]);
-
-    useEffect(() => {
-        if (accountInfoCache[address]) {
-            setAccountInfo(parse(accountInfoCache[address]));
-        } else if (account.status === CreationStatus.Confirmed) {
+        if (!accountInfoCache[address] && account.status === CreationStatus.Confirmed) {
             client
                 .getConsensusStatus()
                 .then((consensusStatus) => {
@@ -104,4 +102,14 @@ export function useAccountInfo(account: WalletCredential): AccountInfo | undefin
     }, [account, accountInfoEmitter]);
 
     return accountInfo;
+}
+
+export function useSelectedAccountInfo() {
+    const cred = useSelectedCredential();
+
+    if (cred === undefined) {
+        return undefined;
+    }
+
+    return useAccountInfo(cred);
 }
