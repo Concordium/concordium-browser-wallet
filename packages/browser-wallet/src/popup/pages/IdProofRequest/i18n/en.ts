@@ -6,7 +6,7 @@ export default {
         requirementsMet: 'You meet this requirement',
         requirementsNotMet: "You don't meet this requirement",
         revealDescription:
-            '<1>Important:</1> {{dappName}} will be given all the information above. You should only accept, if you have absolute trust in the service, and if you are familiar with their privacy policy.',
+            '<1>Important:</1> {{dappName}} will be given all the information above. You should only accept, if you trust the service, and you are familiar with their privacy policy.',
         revealTooltip: {
             header: 'Revealing information <1 />',
             body: 'When you reveal information to a third party, you effectively hand over the information to them. This means you should only do this if you agree to their data usage and protection policies.\n\nYou can read more in\n<1>the developer documentation</1>.',
