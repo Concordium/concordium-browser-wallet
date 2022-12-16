@@ -30,7 +30,17 @@ export default function Root() {
                 <WithWalletConnection network={network} walletConnectOpts={walletConnectOpts}>
                     {(props) => <WCCD {...props} />}
                 </WithWalletConnection>
-                <div>Version: {version}</div>
+                <div>
+                    <a
+                        style={{ color: 'white' }}
+                        href="https://developer.concordium.software/en/mainnet/smart-contracts/tutorials/wCCD/index.html"
+                        target="_blank"
+                        rel="noreferrer"
+                    >
+                        Learn how to make a wrapper like this
+                    </a>{' '}
+                    | Version: {version}
+                </div>
             </main>
         </div>
     );
