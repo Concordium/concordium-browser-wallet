@@ -209,15 +209,11 @@ export default function wCCD(props: WalletConnectionProps) {
                         </p>
                     )}
                     {connectorError && <p style={{ color: 'red' }}>{connectorError}.</p>}
-                    {!activeConnection &&
-                        !isWaitingForUser &&
-                        activeConnectorType &&
-                        !activeConnector &&
-                        !connectorError && (
-                            <p>
-                                <i>Loading connector...</i>
-                            </p>
-                        )}
+                    {!isWaitingForUser && activeConnectorType && !activeConnector && !connectorError && (
+                        <p>
+                            <i>Loading connector...</i>
+                        </p>
+                    )}
                     {!activeConnection && !isWaitingForUser && activeConnectorType && activeConnector && (
                         <p>
                             <button style={ButtonStyle} type="button" onClick={connectWallet}>
