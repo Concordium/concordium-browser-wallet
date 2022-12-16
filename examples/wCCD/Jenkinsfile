@@ -26,7 +26,7 @@ pipeline {
                       --label build_image="${build_image}" \
                       --tag="${image_name}" \
                       --pull \
-                      .
+                      ./examples/wCCD
                     docker push "${image_name}"
                 '''.stripIndent()
             }
