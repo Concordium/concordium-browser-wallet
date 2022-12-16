@@ -5,4 +5,17 @@
     width: 100%;
     justify-content: space-between;
     background-color: $color-bg;
+    min-height: 100%;
+
+    &__header {
+        position: relative;
+        display: flex;
+        justify-content: center;
+        align-items: center;
+    }
+
+    &__back {
+        position: absolute;
+        left: 0;
+    }
 }

@@ -1,0 +1,8 @@
+.back-button {
+    display: inline-flex;
+    width: rem(18px);
+
+    svg path {
+        fill: $color-text;
+    }
+}
