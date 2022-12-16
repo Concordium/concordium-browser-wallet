@@ -10,4 +10,5 @@ export const accountRoutes = {
     settings: 'settings',
     log: 'log',
     manageTokens: 'manage-tokens',
+    confirmTransfer: 'confirm-transfer',
 };

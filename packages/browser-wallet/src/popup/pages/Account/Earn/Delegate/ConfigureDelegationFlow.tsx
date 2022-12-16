@@ -1,8 +1,10 @@
 import React, { useCallback } from 'react';
+import { AccountTransactionType } from '@concordium/web-sdk';
 
 import Button from '@popup/shared/Button';
 import { ensureDefined } from '@shared/utils/basic-helpers';
 import { useSelectedAccountInfo } from '@popup/shared/AccountInfoListenerContext/AccountInfoListenerContext';
+
 import AccountTransactionFlow from '../../AccountTransactionFlow';
 import { configureDelegationChangesPayload, ConfigureDelegationFlowState } from './utils';
 
@@ -16,7 +18,11 @@ export default function ConfigureDelegationFlow(props: Props) {
     const valuesToPayload = useCallback(configureDelegationChangesPayload(accountInfo), [accountInfo]);
 
     return (
-        <AccountTransactionFlow<ConfigureDelegationFlowState> {...props} convert={valuesToPayload}>
+        <AccountTransactionFlow<ConfigureDelegationFlowState>
+            {...props}
+            convert={valuesToPayload}
+            transactionType={AccountTransactionType.ConfigureDelegation}
+        >
             {{
                 pool: {
                     render: (_, onNext) => (

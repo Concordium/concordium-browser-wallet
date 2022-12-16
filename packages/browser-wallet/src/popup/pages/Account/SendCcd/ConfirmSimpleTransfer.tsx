@@ -1,7 +1,7 @@
 import React from 'react';
 import { AccountTransactionType, SimpleTransferPayload } from '@concordium/web-sdk';
 import { useLocation } from 'react-router-dom';
-import ConfirmTransfer from './ConfirmTransfer';
+import ConfirmTransfer from '../ConfirmTransfer';
 
 interface Props {
     setDetailsExpanded: (expanded: boolean) => void;

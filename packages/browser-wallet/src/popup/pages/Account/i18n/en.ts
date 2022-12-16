@@ -41,15 +41,19 @@ const t = {
             link: 'Go to CCDScan.io',
         },
     },
+    confirmTransfer: {
+        buttons: {
+            back: 'Back',
+            send: 'Send',
+            finish: 'Finish',
+        },
+    },
     sendCcd: {
         labels: {
             ccd: 'Enter amount to transfer',
             recipient: 'Enter recipient address',
         },
         buttons: {
-            back: 'Back',
-            send: 'Send',
-            finish: 'Finish',
             continue: 'Continue',
         },
         title: 'Send CCD',

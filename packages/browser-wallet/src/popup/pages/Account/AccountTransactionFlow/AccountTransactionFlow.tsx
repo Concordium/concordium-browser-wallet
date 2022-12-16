@@ -1,8 +1,12 @@
-import React, { useState } from 'react';
+import React, { useCallback, useState } from 'react';
 
 import BackButton from '@popup/shared/BackButton';
 import MultiStepForm, { FormChildren, MultiStepFormProps, OrRenderValues } from '@popup/shared/MultiStepForm';
-import { AccountTransactionPayload } from '@concordium/web-sdk';
+import { AccountTransactionPayload, AccountTransactionType } from '@concordium/web-sdk';
+import { useLocation, useNavigate } from 'react-router-dom';
+import { absoluteRoutes } from '@popup/constants/routes';
+import { accountRoutes } from '../routes';
+import { ConfirmGenericTransferState } from '../ConfirmGenericTransfer';
 
 interface Props<F extends Record<string, unknown>>
     extends Omit<MultiStepFormProps<F>, 'onDone' | 'initialValues' | 'valueStore'> {
@@ -23,6 +27,7 @@ interface Props<F extends Record<string, unknown>>
      * Declaration order defines the order the pages are shown.
      */
     children: OrRenderValues<F, FormChildren<F>>;
+    transactionType: AccountTransactionType;
 }
 
 export default function AccountTransactionFlow<F extends Record<string, unknown>>({
@@ -30,8 +35,11 @@ export default function AccountTransactionFlow<F extends Record<string, unknown>
     firstPageBack = false,
     convert,
     children,
+    transactionType,
 }: Props<F>) {
+    const { state: initialValues, pathname } = useLocation();
     const [isFirstPage, setIsFirstPage] = useState(true);
+    const nav = useNavigate();
 
     const handlePageActive = (step: keyof F, values: F) => {
         const flowChildren = typeof children === 'function' ? children(values) : children;
@@ -40,19 +48,34 @@ export default function AccountTransactionFlow<F extends Record<string, unknown>
         setIsFirstPage(isFirst);
     };
 
-    const handleDone = (values: F) => {
-        const payload = convert(values);
-        // eslint-disable-next-line no-console
-        console.log(values, payload);
-    };
+    const handleDone = useCallback(
+        (values: F) => {
+            const payload = convert(values);
+            // eslint-disable-next-line no-console
+            console.log(values, payload);
+            nav(pathname, { replace: true, state: values }); // Override current router entry with stateful version
+
+            const confirmTransferState: ConfirmGenericTransferState = {
+                payload,
+                type: transactionType,
+            };
+            nav(`${absoluteRoutes.home.account.path}/${accountRoutes.confirmTransfer}`, {
+                state: confirmTransferState,
+            });
+        },
+        [pathname]
+    );
     return (
         <div className="account-transaction-flow">
             <header className="account-transaction-flow__header">
                 {(!isFirstPage || firstPageBack) && <BackButton className="account-transaction-flow__back" />}
                 <h3 className="m-0">{title}</h3>
             </header>
-            {/* eslint-disable-next-line no-console */}
-            <MultiStepForm<F> onDone={handleDone} onPageActive={handlePageActive}>
+            <MultiStepForm<F>
+                initialValues={initialValues as F | undefined}
+                onDone={handleDone}
+                onPageActive={handlePageActive}
+            >
                 {children}
             </MultiStepForm>
         </div>
