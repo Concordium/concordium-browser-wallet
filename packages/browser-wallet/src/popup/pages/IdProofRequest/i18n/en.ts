@@ -36,8 +36,8 @@ export default {
             idDocIssuer: 'Document issuer',
         },
         proofs: {
-            ageMin: '{{age}} years old or more',
-            ageMax: '{{age}} years old or less',
+            ageMin: '{{age}} years or older',
+            ageMax: '{{age}} years or younger',
             ageBetween: '{{ageMin}} to {{ageMax}} years old',
             ageExact: '{{ age }} years old',
             dateAfterIncl: '{{dateString}} or later',
