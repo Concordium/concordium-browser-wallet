@@ -11,6 +11,8 @@ import {
 } from '@concordium/web-sdk';
 import { WalletConnectionDelegate, WalletConnection, WalletConnector } from './WalletConnection';
 
+const BROWSER_WALLET_DETECT_TIMEOUT = 2000;
+
 export class BrowserWalletConnector implements WalletConnector, WalletConnection {
     readonly client: WalletApi;
 
@@ -31,23 +33,19 @@ export class BrowserWalletConnector implements WalletConnector, WalletConnection
     }
 
     static async create(delegate: WalletConnectionDelegate) {
-        // let instance = BrowserWalletConnector.instances.get(delegate);
-        // console.log('cached instance:', instance);
-        // if (!instance) {
-        //     console.log('creating new one');
-        //     const client = await detectConcordiumProvider();
-        //     instance = new BrowserWalletConnector(client, delegate);
-        //     BrowserWalletConnector.instances.set(delegate, instance);
-        // }
-        // return instance;
-        const client = await detectConcordiumProvider();
-        return new BrowserWalletConnector(client, delegate);
+        try {
+            const client = await detectConcordiumProvider(BROWSER_WALLET_DETECT_TIMEOUT);
+            return new BrowserWalletConnector(client, delegate);
+        } catch (e) {
+            // Provider detector throws 'undefined' when rejecting!
+            throw new Error('Browser Wallet: Browser extension not detected');
+        }
     }
 
     async connect() {
         const account = await this.client.connect();
         if (!account) {
-            throw new Error('connection failed');
+            throw new Error('Browser Wallet: Connection failed');
         }
         return this;
     }

@@ -134,7 +134,7 @@ export default function wCCD(props: WalletConnectionProps) {
         setActiveConnection,
         activeConnectionGenesisHash,
         activeConnectedAccount,
-        connectionError,
+        connectorError,
     } = props;
     const [isWaitingForUser, setWaitingForUser] = useState<boolean>(false);
     const connectWallet = useCallback(() => {
@@ -200,17 +200,31 @@ export default function wCCD(props: WalletConnectionProps) {
                         {...props}
                     />
                 </div>
-                <div>
+                <p>
                     {!activeConnection && isWaitingForUser && (
-                        <button style={ButtonStyleDisabled} type="button" disabled>
-                            Waiting for user
-                        </button>
+                        <p>
+                            <button style={ButtonStyleDisabled} type="button" disabled>
+                                Waiting for user
+                            </button>
+                        </p>
                     )}
-                    {!activeConnection && !isWaitingForUser && activeConnectorType && (
-                        <button style={ButtonStyle} type="button" onClick={connectWallet}>
-                            {activeConnectorType === 'BrowserWallet' && 'Connect Browser Wallet'}
-                            {activeConnectorType === 'WalletConnect' && 'Connect Mobile Wallet'}
-                        </button>
+                    {connectorError && <p style={{ color: 'red' }}>{connectorError}.</p>}
+                    {!activeConnection &&
+                        !isWaitingForUser &&
+                        activeConnectorType &&
+                        !activeConnector &&
+                        !connectorError && (
+                            <p>
+                                <i>Loading connector...</i>
+                            </p>
+                        )}
+                    {!activeConnection && !isWaitingForUser && activeConnectorType && activeConnector && (
+                        <p>
+                            <button style={ButtonStyle} type="button" onClick={connectWallet}>
+                                {activeConnectorType === 'BrowserWallet' && 'Connect Browser Wallet'}
+                                {activeConnectorType === 'WalletConnect' && 'Connect Mobile Wallet'}
+                            </button>
+                        </p>
                     )}
                     {activeConnectedAccount && (
                         <>
@@ -251,19 +265,13 @@ export default function wCCD(props: WalletConnectionProps) {
                             </div>
                         </>
                     )}
-                    {!activeConnectedAccount && (
-                        <div className="text">
-                            <i>Please connect a wallet.</i>
-                        </div>
-                    )}
                     {activeConnectionGenesisHash && activeConnectionGenesisHash !== network.genesisHash && (
                         <p style={{ color: 'red' }}>
                             Unexpected genesis hash: Please ensure that your wallet is connected to network{' '}
                             <code>{network.name}</code>.
                         </p>
                     )}
-                    {connectionError && <p style={{ color: 'red' }}>{connectionError}</p>}
-                </div>
+                </p>
                 <div className="containerSwitch">
                     <div className="largeText">CCD &nbsp; &nbsp; </div>
                     <button className="switch" type="button" onClick={() => setIsWrapping(!isWrapping)}>
