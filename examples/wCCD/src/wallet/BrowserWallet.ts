@@ -12,12 +12,13 @@ import {
 import { WalletConnectionDelegate, WalletConnection, WalletConnector } from './WalletConnection';
 
 export class BrowserWalletConnector implements WalletConnector, WalletConnection {
-    static instances: WeakMap<WalletConnectionDelegate, BrowserWalletConnector> = new WeakMap();
-
     readonly client: WalletApi;
+
+    readonly delegate: WalletConnectionDelegate;
 
     constructor(client: WalletApi, delegate: WalletConnectionDelegate) {
         this.client = client;
+        this.delegate = delegate;
 
         this.client.on('chainChanged', (c) => delegate.onChainChanged(this, c));
         this.client.on('accountChanged', (a) => delegate.onAccountChanged(this, a));
@@ -70,12 +71,13 @@ export class BrowserWalletConnector implements WalletConnector, WalletConnection
     }
 
     async disconnect() {
-        // // Only the wallet can initiate disconnecting individual accounts.
-        // // The connection itself cannot actually be disconnected with the client being cleared from global state.
-        // // This "disconnect" only ensures that we stop interacting with the client and that it doesn't interfere with a future reconnection.
-        // this.client.removeAllListeners();
-        // Only the wallet can initiate a disconnect.
-        return undefined;
+        // The connection itself cannot actually be disconnected by the dApp as
+        // only the wallet can initiate disconnecting individual accounts.
+        // This "disconnect" only ensures that we stop interacting with the client
+        // (which stays in the browser window's global state)
+        // such that it doesn't interfere with a future reconnection.
+        this.client.removeAllListeners();
+        this.delegate.onDisconnect(this);
     }
 
     async signAndSendTransaction(

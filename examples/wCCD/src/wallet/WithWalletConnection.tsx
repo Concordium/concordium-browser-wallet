@@ -1,5 +1,4 @@
 /* eslint-disable no-console */
-/* eslint-disable no-alert */
 /* eslint-disable react/sort-comp */
 /* eslint-disable react/no-unused-class-component-methods */
 
@@ -19,7 +18,9 @@ interface State {
     activeConnectorType: string | undefined;
     activeConnector: WalletConnector | undefined;
     activeConnection: WalletConnection | undefined;
+    activeConnectionGenesisHash: string | undefined;
     activeConnectedAccount: string | undefined;
+    connectionError: string;
 }
 
 // TODO React appropriately if 'network' changes.
@@ -30,11 +31,13 @@ interface Props {
 }
 
 export interface WalletConnectionProps extends State {
+    network: Network;
+    activeConnectionGenesisHash: string | undefined;
     setActiveConnectorType: (t: string | undefined) => void;
     setActiveConnection: (c: WalletConnection | undefined) => void;
+    connectionError: string;
 }
 
-// TODO Expose error to child component instead of logging to 'console.error'.
 // eslint-disable-next-line react/prefer-stateless-function
 export class WithWalletConnection extends React.Component<Props, State> implements WalletConnectionDelegate {
     constructor(props: Props) {
@@ -43,9 +46,13 @@ export class WithWalletConnection extends React.Component<Props, State> implemen
             activeConnectorType: undefined,
             activeConnector: undefined,
             activeConnection: undefined,
+            activeConnectionGenesisHash: undefined,
             activeConnectedAccount: undefined,
+            connectionError: '',
         };
     }
+
+    private setConnectionError = (err: unknown) => this.setState({ connectionError: (err as Error).message });
 
     setActiveConnectorType = (type: string | undefined) => {
         const { network } = this.props;
@@ -57,20 +64,22 @@ export class WithWalletConnection extends React.Component<Props, State> implemen
             activeConnectorType: type,
             activeConnector: undefined,
             activeConnection: undefined,
+            activeConnectionGenesisHash: undefined,
             activeConnectedAccount: undefined,
+            connectionError: '',
         });
         if (type) {
-            this.createConnector(type, network).then(this.setActiveConnector).catch(console.error);
+            this.createConnector(type, network).then(this.setActiveConnector).catch(this.setConnectionError);
         }
     };
 
     private setActiveConnector = (connector: WalletConnector) => {
-        console.log('WithWalletConnection: updating connector state', { connector, state: this.state });
-        this.setState({ activeConnector: connector });
+        console.log('WithWalletConnection: updating active connector state', { connector, state: this.state });
+        this.setState({ activeConnector: connector, connectionError: '' });
     };
 
     setActiveConnection = (connection: WalletConnection | undefined) => {
-        console.debug('WithWalletConnection: setActiveConnection called', { connection, state: this.state });
+        console.debug("WithWalletConnection: calling 'setActiveConnection'", { connection, state: this.state });
         // Not setting the active connector to that of the connection
         // as it isn't obvious that one would always want that.
         // The app can just do it explicitly.
@@ -82,12 +91,13 @@ export class WithWalletConnection extends React.Component<Props, State> implemen
             this.setState({
                 activeConnection: connection,
                 activeConnectedAccount: connectedAccount,
+                connectionError: '',
             });
         });
     };
 
     private createConnector = (connectorType: string, network: Network): Promise<WalletConnector> => {
-        console.debug('WithWalletConnection: createConnector called', { connectorType, network, state: this.state });
+        console.debug("WithWalletConnection: calling 'createConnector'", { connectorType, network, state: this.state });
         const { walletConnectOpts } = this.props;
         switch (connectorType) {
             case 'BrowserWallet':
@@ -102,42 +112,38 @@ export class WithWalletConnection extends React.Component<Props, State> implemen
     };
 
     onAccountChanged = (connection: WalletConnection, address: string | undefined) => {
-        console.debug('WithWalletConnection: onAccountChanged called', { connection, address, state: this.state });
+        console.debug("WithWalletConnection: calling 'onAccountChanged'", { connection, address, state: this.state });
         const { activeConnection } = this.state;
         // Ignore event on connections other than the active one.
         if (connection === activeConnection) {
             console.log('WithWalletConnection: updating connected account state', { address });
-            this.setState({ activeConnectedAccount: address });
+            this.setState({ activeConnectedAccount: address, connectionError: '' });
         }
     };
 
     onChainChanged = (connection: WalletConnection, genesisHash: string) => {
-        console.debug('WithWalletConnection: onChainChanged called', { connection, genesisHash, state: this.state });
-        const { network } = this.props;
-        // Check if the user is connected to expected network by checking if the genesis hash matches the expected one.
-        // Emit a warning and disconnect if it's the wrong chain.
-        if (genesisHash !== network.genesisHash) {
-            window.alert(
-                `Unexpected genesis hash '${genesisHash}'. Expected '${network.genesisHash}' (network '${network.name}').`
-            );
-            connection.getConnector().disconnect().catch(console.error);
+        console.debug("WithWalletConnection: calling 'onChainChanged'", { connection, genesisHash, state: this.state });
+        const { activeConnection } = this.state;
+        if (connection === activeConnection) {
+            this.setState({ activeConnectionGenesisHash: genesisHash });
         }
     };
 
     onDisconnect = (connection: WalletConnection) => {
-        console.debug('WithWalletConnection: onDisconnect called', { connection, state: this.state });
+        console.debug("WithWalletConnection: calling 'onDisconnect'", { connection, state: this.state });
         const { activeConnection } = this.state;
         // Ignore event on connections other than the active one.
         if (connection === activeConnection) {
             console.log('WithWalletConnection: clearing wallet connection and connected account state');
-            this.setState({ activeConnection: undefined, activeConnectedAccount: undefined });
+            this.setState({ activeConnection: undefined, activeConnectedAccount: undefined, connectionError: '' });
         }
     };
 
     render() {
-        const { children } = this.props;
+        const { children, network } = this.props;
         return children({
             ...this.state,
+            network,
             setActiveConnectorType: this.setActiveConnectorType,
             setActiveConnection: this.setActiveConnection,
         });

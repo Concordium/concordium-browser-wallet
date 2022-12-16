@@ -126,8 +126,16 @@ async function updateWCCDBalanceAccount(
 }
 
 export default function wCCD(props: WalletConnectionProps) {
-    const { activeConnectorType, activeConnector, activeConnection, setActiveConnection, activeConnectedAccount } =
-        props;
+    const {
+        network,
+        activeConnectorType,
+        activeConnector,
+        activeConnection,
+        setActiveConnection,
+        activeConnectionGenesisHash,
+        activeConnectedAccount,
+        connectionError,
+    } = props;
     const [isWaitingForUser, setWaitingForUser] = useState<boolean>(false);
     const connectWallet = useCallback(() => {
         if (activeConnector) {
@@ -248,6 +256,13 @@ export default function wCCD(props: WalletConnectionProps) {
                             <i>Please connect a wallet.</i>
                         </div>
                     )}
+                    {activeConnectionGenesisHash && activeConnectionGenesisHash !== network.genesisHash && (
+                        <p style={{ color: 'red' }}>
+                            Unexpected genesis hash: Please ensure that your wallet is connected to network{' '}
+                            <code>{network.name}</code>.
+                        </p>
+                    )}
+                    {connectionError && <p style={{ color: 'red' }}>{connectionError}</p>}
                 </div>
                 <div className="containerSwitch">
                     <div className="largeText">CCD &nbsp; &nbsp; </div>
@@ -339,8 +354,7 @@ export default function wCCD(props: WalletConnectionProps) {
                                 );
                             }}
                         >
-                            {' '}
-                            {hash}{' '}
+                            {hash}
                         </button>
                         <br />
                     </>
@@ -363,8 +377,7 @@ export default function wCCD(props: WalletConnectionProps) {
                                 );
                             }}
                         >
-                            {' '}
-                            {admin}{' '}
+                            {admin}
                         </button>
                     )}
                 </div>
