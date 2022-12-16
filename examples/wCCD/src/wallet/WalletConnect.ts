@@ -310,7 +310,9 @@ export class WalletConnectConnector implements WalletConnector {
             this.isModalOpen = v;
         });
         const rpcClient = new JsonRpcClient(new HttpProvider(this.network.jsonRpcUrl));
-        return new WalletConnectConnection(this, rpcClient, chainId, session);
+        const connection = new WalletConnectConnection(this, rpcClient, chainId, session);
+        this.connections.set(session.topic, connection);
+        return connection;
     }
 
     onDisconnect(connection: WalletConnectConnection) {
