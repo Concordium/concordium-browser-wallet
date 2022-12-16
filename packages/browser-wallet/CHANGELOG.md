@@ -1,5 +1,12 @@
 # Changelog
 
+## 0.9.5
+
+### Fixed
+
+-   Wording in id proofs popup.
+-   Age display now includes birthday. So it now happens and display for 18 years old or more instead of more than 18 years.
+
 ## 0.9.4
 
 ### Fixed
