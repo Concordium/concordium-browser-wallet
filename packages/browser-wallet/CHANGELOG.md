@@ -1,5 +1,12 @@
 # Changelog
 
+## 0.9.4
+
+### Fixed
+
+-   Various wording and display errors in id proofs popup.
+-   Add missing details when displaying some id statements.
+
 ## 0.9.3
 
 ### Fixed

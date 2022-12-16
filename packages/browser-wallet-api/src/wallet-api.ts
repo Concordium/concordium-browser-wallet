@@ -174,8 +174,8 @@ class WalletApi extends EventEmitter implements IWalletApi {
         const response = await this.messageHandler.sendMessage<string[] | null>(MessageType.AddTokens, {
             accountAddress,
             tokenIds,
-            contractIndex,
-            contractSubindex,
+            contractIndex: contractIndex.toString(),
+            contractSubindex: contractSubindex?.toString(),
         });
         if (response === null) {
             throw new Error('Request rejected');

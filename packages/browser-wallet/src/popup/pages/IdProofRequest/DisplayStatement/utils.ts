@@ -63,7 +63,7 @@ const isAgeStatement = (statement: SecretStatement): boolean => {
     }
 
     const today = getPastDate(0);
-    const isYearOffsetUpper = statement.upper.substring(4) === today.substring(4);
+    const isYearOffsetUpper = addDays(statement.upper, -1).substring(4) === today.substring(4);
     const isYearOffsetLower = addDays(statement.lower, -1).substring(4) === today.substring(4);
 
     if (statement.lower === MIN_DATE) {
@@ -133,7 +133,7 @@ export function useStatementValue(statement: SecretStatement): string {
                 const upper = today < statement.upper ? today : statement.upper;
 
                 if (isAgeStatement(statement)) {
-                    const ageMin = getYearFromDateString(today) - getYearFromDateString(upper);
+                    const ageMin = getYearFromDateString(today) - getYearFromDateString(addDays(statement.upper, -1));
                     const ageMax =
                         getYearFromDateString(today) - getYearFromDateString(addDays(statement.lower, -1)) - 1;
 
@@ -156,11 +156,11 @@ export function useStatementValue(statement: SecretStatement): string {
                 const maxDateString = formatDateString(upper);
 
                 if (statement.lower === MIN_DATE) {
-                    return t('dateAfter', { dateString: maxDateString });
+                    return t('dateBefore', { dateString: maxDateString });
                 }
 
                 if (statement.upper > today) {
-                    return t('dateBefore', { dateString: minDateString });
+                    return t('dateAfterIncl', { dateString: minDateString });
                 }
 
                 return t('dateBetween', { minDateString, maxDateString });
@@ -171,11 +171,11 @@ export function useStatementValue(statement: SecretStatement): string {
                 const maxDateString = formatDateString(statement.upper);
 
                 if (statement.lower === MIN_DATE) {
-                    return t('dateAfter', { dateString: maxDateString });
+                    return t('dateBefore', { dateString: maxDateString });
                 }
 
                 if (statement.upper === MAX_DATE) {
-                    return t('dateBefore', { dateString: minDateString });
+                    return t('dateAfterIncl', { dateString: minDateString });
                 }
 
                 return t('dateBetween', { minDateString, maxDateString });
@@ -205,7 +205,7 @@ export function useStatementValue(statement: SecretStatement): string {
     return statement.attributeTag;
 }
 
-const isoToCountryName = (locale: string) => (isoCode: string) => countryTranslations.getName(isoCode, locale);
+export const isoToCountryName = (locale: string) => (isoCode: string) => countryTranslations.getName(isoCode, locale);
 
 export function useStatementDescription(statement: SecretStatement, identity: ConfirmedIdentity): string | undefined {
     const { t, i18n } = useTranslation('idProofRequest', { keyPrefix: 'displayStatement.descriptions' });
@@ -217,23 +217,13 @@ export function useStatementDescription(statement: SecretStatement, identity: Co
 
     if (statement.type === StatementTypes.AttributeInRange) {
         switch (statement.attributeTag) {
-            case 'dob': {
-                if (!isAgeStatement(statement)) {
-                    return undefined;
-                }
-
-                const today = getPastDate(0);
+            case 'dob':
+            case 'idDocIssuedAt':
+            case 'idDocExpiresAt': {
                 const minDateString = formatDateString(statement.lower);
                 const maxDateString = formatDateString(statement.upper);
 
-                if (statement.lower === MIN_DATE) {
-                    return t('ageMin', { dateString: maxDateString });
-                }
-                if (statement.upper > today) {
-                    return t('ageMax', { dateString: minDateString });
-                }
-
-                return t('ageBetween', { minDateString, maxDateString });
+                return t(statement.attributeTag, { minDateString, maxDateString });
             }
         }
     } else {
@@ -242,18 +232,10 @@ export function useStatementDescription(statement: SecretStatement, identity: Co
 
         switch (statement.attributeTag) {
             case 'countryOfResidence':
-                if (isEuCountrySet(statement.set)) {
-                    return text('residenceEU', 'residenceNotEU');
-                }
-
                 return text('residence', 'notResidence', {
                     countryNamesString: statement.set.map(getCountryName).join(', '),
                 });
             case 'nationality':
-                if (isEuCountrySet(statement.set)) {
-                    return text('nationalityEU', 'nationalityNotEU');
-                }
-
                 return text('nationality', 'notNationality', {
                     countryNamesString: statement.set.map(getCountryName).join(', '),
                 });

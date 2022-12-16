@@ -25,6 +25,7 @@ import {
     useStatementHeader,
     useStatementValue,
     useStatementName,
+    isoToCountryName,
 } from './utils';
 
 type StatementLine = {
@@ -191,7 +192,7 @@ export function DisplayRevealStatement({
     className,
     onInvalid,
 }: DisplayRevealStatementProps) {
-    const { t } = useTranslation('idProofRequest', { keyPrefix: 'displayStatement' });
+    const { t, i18n } = useTranslation('idProofRequest', { keyPrefix: 'displayStatement' });
     const getAttributeName = useGetAttributeName();
     const attributes =
         identity.idObject.value.attributeList.chosenAttributes ?? ({} as AttributeList['chosenAttributes']);
@@ -199,11 +200,15 @@ export function DisplayRevealStatement({
 
     const lines: StatementLine[] = statements.map((s) => {
         const raw = attributes[s.attributeTag];
-        const value = formatAttributeValue(s.attributeTag, attributes[s.attributeTag] ?? 'Unavailable');
+        let value = formatAttributeValue(s.attributeTag, attributes[s.attributeTag] ?? '');
+
+        if (value && ['countryOfResidence', 'nationality', 'idDocIssuer'].includes(s.attributeTag)) {
+            value = isoToCountryName(i18n.resolvedLanguage)(value);
+        }
 
         return {
             attribute: getAttributeName(s.attributeTag),
-            value,
+            value: value ?? 'Unavailable',
             isRequirementMet: raw !== undefined,
         };
     });

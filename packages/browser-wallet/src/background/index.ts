@@ -124,9 +124,8 @@ async function reportVersion(network?: NetworkConfiguration) {
 
 async function checkForNewTermsAndConditions() {
     const current = await storedAcceptedTerms.get();
-    const network = await storedCurrentNetwork.get();
     try {
-        const config = await getTermsAndConditionsConfig(network?.explorerUrl);
+        const config = await getTermsAndConditionsConfig();
         if (config?.version && (!current || current.version !== config.version)) {
             storedAcceptedTerms.set({ accepted: false, version: config.version });
         }

@@ -1,5 +1,7 @@
 import React from 'react';
 import { SignClientTypes } from '@walletconnect/types';
+import { version } from '../package.json';
+
 import WCCD from './wCCD';
 import { WithWalletConnection } from './wallet/WithWalletConnection';
 import { TESTNET, WALLET_CONNECT_PROJECT_ID } from './constants';
@@ -28,6 +30,7 @@ export default function Root() {
                 <WithWalletConnection network={network} walletConnectOpts={walletConnectOpts}>
                     {(props) => <WCCD {...props} />}
                 </WithWalletConnection>
+                <div>Version: {version}</div>
             </main>
         </div>
     );
