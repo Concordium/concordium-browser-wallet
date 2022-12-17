@@ -32,7 +32,6 @@ async function connect(client: SignClient, chainId: string, setModalOpen: (val: 
                 },
             },
         });
-
         // Open QRCode modal if a URI was returned (i.e. we're not connecting an existing pairing).
         if (uri) {
             setModalOpen(true);
@@ -40,7 +39,6 @@ async function connect(client: SignClient, chainId: string, setModalOpen: (val: 
                 setModalOpen(false);
             });
         }
-
         // Await session approval from the wallet.
         return await approval();
     } finally {
@@ -256,8 +254,6 @@ export class WalletConnectConnector implements WalletConnector {
 
     readonly connections = new Map<string, WalletConnectConnection>();
 
-    isModalOpen = false;
-
     constructor(client: SignClient, network: Network, delegate: WalletConnectionDelegate) {
         this.client = client;
         this.network = network;
@@ -306,9 +302,18 @@ export class WalletConnectConnector implements WalletConnector {
 
     async connect() {
         const chainId = `${WALLET_CONNECT_SESSION_NAMESPACE}:${this.network.name}`;
-        const session = await connect(this.client, chainId, (v) => {
-            this.isModalOpen = v;
+        const session = await new Promise<SessionTypes.Struct | undefined>((resolve) => {
+            connect(this.client, chainId, (isModalOpen) => {
+                if (!isModalOpen) {
+                    // Closing modal cancels connect.
+                    resolve(undefined);
+                }
+            }).then(resolve);
         });
+        if (!session) {
+            // Connect was cancelled.
+            return undefined;
+        }
         const rpcClient = new JsonRpcClient(new HttpProvider(this.network.jsonRpcUrl));
         const connection = new WalletConnectConnection(this, rpcClient, chainId, session);
         this.connections.set(session.topic, connection);

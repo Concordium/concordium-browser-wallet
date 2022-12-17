@@ -57,7 +57,7 @@ export interface WalletConnectionDelegate {
 }
 
 export interface WalletConnector {
-    connect(): Promise<WalletConnection>;
+    connect(): Promise<WalletConnection | undefined>;
     getConnections(): Promise<WalletConnection[]>;
     disconnect(): Promise<void>;
 }

@@ -18,8 +18,8 @@ interface State {
     activeConnectorType: string | undefined;
     activeConnector: WalletConnector | undefined;
     activeConnectorError: string;
+    isActiveConnectorWaitingForUser: boolean;
     activeConnection: WalletConnection | undefined;
-    // activeConnectionError: string | undefined;
     activeConnectionGenesisHash: string | undefined;
     activeConnectedAccount: string | undefined;
 }
@@ -36,6 +36,7 @@ export interface WalletConnectionProps extends State {
     activeConnectionGenesisHash: string | undefined;
     setActiveConnectorType: (t: string | undefined) => void;
     setActiveConnection: (c: WalletConnection | undefined) => void;
+    connect: () => void;
 }
 
 // eslint-disable-next-line react/prefer-stateless-function
@@ -46,8 +47,8 @@ export class WithWalletConnection extends React.Component<Props, State> implemen
             activeConnectorType: undefined,
             activeConnector: undefined,
             activeConnectorError: '',
+            isActiveConnectorWaitingForUser: false,
             activeConnection: undefined,
-            // activeConnectionError: '',
             activeConnectionGenesisHash: undefined,
             activeConnectedAccount: undefined,
         };
@@ -63,9 +64,10 @@ export class WithWalletConnection extends React.Component<Props, State> implemen
             activeConnectorType: type,
             activeConnector: undefined,
             activeConnection: undefined,
+            activeConnectorError: '',
+            isActiveConnectorWaitingForUser: false,
             activeConnectionGenesisHash: undefined,
             activeConnectedAccount: undefined,
-            activeConnectorError: '',
         });
         if (type) {
             this.createConnector(type, network)
@@ -146,6 +148,28 @@ export class WithWalletConnection extends React.Component<Props, State> implemen
         }
     };
 
+    connect = () => {
+        const { activeConnector } = this.state;
+        if (activeConnector) {
+            this.setState({ isActiveConnectorWaitingForUser: true });
+            activeConnector
+                .connect()
+                .then(this.setActiveConnection)
+                .catch((err) => {
+                    // eslint-disable-next-line react/destructuring-assignment
+                    if (this.state.activeConnector === activeConnector) {
+                        this.setState({ activeConnectorError: (err as Error).message });
+                    }
+                })
+                .finally(() => {
+                    // eslint-disable-next-line react/destructuring-assignment
+                    if (this.state.activeConnector === activeConnector) {
+                        this.setState({ isActiveConnectorWaitingForUser: false });
+                    }
+                });
+        }
+    };
+
     render() {
         const { children, network } = this.props;
         return children({
@@ -153,6 +177,7 @@ export class WithWalletConnection extends React.Component<Props, State> implemen
             network,
             setActiveConnectorType: this.setActiveConnectorType,
             setActiveConnection: this.setActiveConnection,
+            connect: this.connect,
         });
     }
 }

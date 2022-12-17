@@ -1,7 +1,7 @@
 /* eslint-disable no-console */
 /* eslint-disable no-alert */
 
-import React, { useEffect, useState, useRef, useCallback } from 'react';
+import React, { useEffect, useState, useRef } from 'react';
 import {
     toBuffer,
     deserializeReceiveReturnValue,
@@ -127,34 +127,19 @@ export default function wCCD(props: WalletConnectionProps) {
         network,
         activeConnectorType,
         activeConnector,
+        isActiveConnectorWaitingForUser,
         activeConnection,
-        setActiveConnection,
         activeConnectionGenesisHash,
         activeConnectedAccount,
         activeConnectorError,
+        connect,
     } = props;
-    const [isWaitingForUser, setWaitingForUser] = useState(false);
-    // TODO Expose 'connectWallet' function in 'WalletConnectionProps'? And 'connectionError'. And 'isWaitingForUser'?
-    const [connectionError, setConnectionError] = useState('');
-    const connectWallet = useCallback(() => {
-        setConnectionError('');
-        if (activeConnector) {
-            setWaitingForUser(true);
-            activeConnector
-                .connect()
-                .then(setActiveConnection)
-                .catch((err) => setConnectionError((err as Error).message))
-                .finally(() => setWaitingForUser(false));
-        }
-    }, [activeConnector]);
-    useEffect(() => setConnectionError(''), [activeConnector]);
-
     const [admin, setAdmin] = useState<string>();
     const [adminError, setAdminError] = useState('');
 
     useEffect(() => {
         // Update admin contract.
-        if (activeConnection) {
+        if (activeConnection && activeConnectedAccount) {
             withJsonRpcClient(activeConnection, (rpcClient) => viewAdmin(rpcClient))
                 .then((a) => {
                     setAdmin(a);
@@ -162,7 +147,7 @@ export default function wCCD(props: WalletConnectionProps) {
                 })
                 .catch((e) => setAdminError((e as Error).message));
         }
-    }, [activeConnection]);
+    }, [activeConnection, activeConnectedAccount]);
 
     const [isWrapping, setIsWrapping] = useState(true);
     const [hash, setHash] = useState('');
@@ -184,7 +169,6 @@ export default function wCCD(props: WalletConnectionProps) {
                 .catch((e) => setAmountAccountError((e as Error).message));
         } else {
             // No active connection or it doesn't have an associated account: Reset all transactions and RPC results.
-            setConnectionError('');
             setAmountAccount(undefined);
             setAmountAccountError('');
             setAdmin(undefined);
@@ -194,6 +178,7 @@ export default function wCCD(props: WalletConnectionProps) {
         }
     }, [activeConnection, activeConnectedAccount, isFlipped]);
 
+    const [isWaitingForUser, setWaitingForUser] = useState(false);
     return (
         <>
             <h1 className="header">CCD &lt;-&gt; WCCD Smart Contract</h1>
@@ -233,13 +218,18 @@ export default function wCCD(props: WalletConnectionProps) {
                     )}
                     {!activeConnection && !isWaitingForUser && activeConnectorType && activeConnector && (
                         <p>
-                            <button style={ButtonStyle} type="button" onClick={connectWallet}>
-                                {activeConnectorType === 'BrowserWallet' && 'Connect Browser Wallet'}
-                                {activeConnectorType === 'WalletConnect' && 'Connect Mobile Wallet'}
+                            <button style={ButtonStyle} type="button" onClick={connect}>
+                                {isActiveConnectorWaitingForUser && 'Connecting...'}
+                                {!isActiveConnectorWaitingForUser &&
+                                    activeConnectorType === 'BrowserWallet' &&
+                                    'Connect Browser Wallet'}
+                                {!isActiveConnectorWaitingForUser &&
+                                    activeConnectorType === 'WalletConnect' &&
+                                    'Connect Mobile Wallet'}
                             </button>
                         </p>
                     )}
-                    {connectionError && <p style={{ color: 'red' }}>Connection Error: {connectionError}.</p>}
+                    {/* {connectionError && <p style={{ color: 'red' }}>Connection Error: {connectionError}.</p>} */}
                     {activeConnectedAccount && (
                         <>
                             <div className="text">Connected to</div>
@@ -258,8 +248,8 @@ export default function wCCD(props: WalletConnectionProps) {
                             </button>
                             <div className="text">wCCD Balance of connected account</div>
                             <div className="containerSpaceBetween">
+                                {amountAccountError && <div style={{ color: 'red' }}>{amountAccountError}.</div>}
                                 <div className="largeText">
-                                    {amountAccountError && <div style={{ color: 'red' }}>{amountAccountError}.</div>}
                                     {!amountAccountError && amountAccount === undefined && <i>N/A</i>}
                                     {!amountAccountError &&
                                         amountAccount !== undefined &&
