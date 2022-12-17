@@ -38,14 +38,14 @@ export class BrowserWalletConnector implements WalletConnector, WalletConnection
             return new BrowserWalletConnector(client, delegate);
         } catch (e) {
             // Provider detector throws 'undefined' when rejecting!
-            throw new Error('Browser Wallet: Browser extension not detected');
+            throw new Error('Browser Wallet extension not detected');
         }
     }
 
     async connect() {
         const account = await this.client.connect();
         if (!account) {
-            throw new Error('Browser Wallet: Connection failed');
+            throw new Error('Browser Wallet connection failed');
         }
         return this;
     }

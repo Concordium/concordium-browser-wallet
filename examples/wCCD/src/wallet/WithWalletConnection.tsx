@@ -17,10 +17,11 @@ import { WalletConnectConnector } from './WalletConnect';
 interface State {
     activeConnectorType: string | undefined;
     activeConnector: WalletConnector | undefined;
+    activeConnectorError: string;
     activeConnection: WalletConnection | undefined;
+    // activeConnectionError: string | undefined;
     activeConnectionGenesisHash: string | undefined;
     activeConnectedAccount: string | undefined;
-    connectorError: string;
 }
 
 // TODO React appropriately if 'network' changes.
@@ -35,7 +36,6 @@ export interface WalletConnectionProps extends State {
     activeConnectionGenesisHash: string | undefined;
     setActiveConnectorType: (t: string | undefined) => void;
     setActiveConnection: (c: WalletConnection | undefined) => void;
-    connectorError: string;
 }
 
 // eslint-disable-next-line react/prefer-stateless-function
@@ -45,10 +45,11 @@ export class WithWalletConnection extends React.Component<Props, State> implemen
         this.state = {
             activeConnectorType: undefined,
             activeConnector: undefined,
+            activeConnectorError: '',
             activeConnection: undefined,
+            // activeConnectionError: '',
             activeConnectionGenesisHash: undefined,
             activeConnectedAccount: undefined,
-            connectorError: '',
         };
     }
 
@@ -64,17 +65,17 @@ export class WithWalletConnection extends React.Component<Props, State> implemen
             activeConnection: undefined,
             activeConnectionGenesisHash: undefined,
             activeConnectedAccount: undefined,
-            connectorError: '',
+            activeConnectorError: '',
         });
         if (type) {
             this.createConnector(type, network)
                 .then(this.setActiveConnector)
-                .catch((err: unknown) => {
+                .catch((err) => {
                     // eslint-disable-next-line react/destructuring-assignment
                     if (this.state.activeConnectorType === type) {
                         // Don't set error if user switched connector type since initializing this connector.
                         // It's OK to show it if the user switched away and back...
-                        this.setState({ connectorError: (err as Error).message });
+                        this.setState({ activeConnectorError: (err as Error).message });
                     }
                 });
         }
@@ -82,7 +83,7 @@ export class WithWalletConnection extends React.Component<Props, State> implemen
 
     private setActiveConnector = (connector: WalletConnector) => {
         console.log('WithWalletConnection: updating active connector state', { connector, state: this.state });
-        this.setState({ activeConnector: connector, connectorError: '' });
+        this.setState({ activeConnector: connector, activeConnectorError: '' });
     };
 
     setActiveConnection = (connection: WalletConnection | undefined) => {

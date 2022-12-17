@@ -31,6 +31,7 @@ export default function Root() {
                     {(props) => <WCCD {...props} />}
                 </WithWalletConnection>
                 <div>
+                    Version: {version} |{' '}
                     <a
                         style={{ color: 'white' }}
                         href="https://developer.concordium.software/en/mainnet/smart-contracts/tutorials/wCCD/index.html"
@@ -38,8 +39,7 @@ export default function Root() {
                         rel="noreferrer"
                     >
                         Learn how to make a wrapper like this
-                    </a>{' '}
-                    | Version: {version}
+                    </a>
                 </div>
             </main>
         </div>

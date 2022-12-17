@@ -118,7 +118,6 @@ async function updateWCCDBalanceAccount(rpcClient: JsonRpcClient, account: strin
             `RPC call 'invokeContract' on method '${CONTRACT_NAME}.balanceOf' of contract '${WCCD_CONTRACT_INDEX}' failed`
         );
     }
-
     // The return value is an array. The value stored in the array starts at position 4 of the return value.
     return BigInt(leb.decodeULEB128(toBuffer(res.returnValue.slice(4), 'hex'))[0]);
 }
@@ -132,22 +131,23 @@ export default function wCCD(props: WalletConnectionProps) {
         setActiveConnection,
         activeConnectionGenesisHash,
         activeConnectedAccount,
-        connectorError,
+        activeConnectorError,
     } = props;
-    const [isWaitingForUser, setWaitingForUser] = useState<boolean>(false);
+    const [isWaitingForUser, setWaitingForUser] = useState(false);
+    // TODO Expose 'connectWallet' function in 'WalletConnectionProps'? And 'connectionError'. And 'isWaitingForUser'?
+    const [connectionError, setConnectionError] = useState('');
     const connectWallet = useCallback(() => {
+        setConnectionError('');
         if (activeConnector) {
             setWaitingForUser(true);
             activeConnector
                 .connect()
-                .then((c) => {
-                    console.log('setting wallet connection', c);
-                    setActiveConnection(c);
-                })
-                .catch(console.error) // TODO present properly
+                .then(setActiveConnection)
+                .catch((err) => setConnectionError((err as Error).message))
                 .finally(() => setWaitingForUser(false));
         }
     }, [activeConnector]);
+    useEffect(() => setConnectionError(''), [activeConnector]);
 
     const [admin, setAdmin] = useState<string>();
     const [adminError, setAdminError] = useState('');
@@ -183,7 +183,8 @@ export default function wCCD(props: WalletConnectionProps) {
                 })
                 .catch((e) => setAmountAccountError((e as Error).message));
         } else {
-            // No active connection or it doesn't have an associated account: Clear all transactions and RPC results.
+            // No active connection or it doesn't have an associated account: Reset all transactions and RPC results.
+            setConnectionError('');
             setAmountAccount(undefined);
             setAmountAccountError('');
             setAdmin(undefined);
@@ -216,7 +217,7 @@ export default function wCCD(props: WalletConnectionProps) {
                         {...props}
                     />
                 </div>
-                <p>
+                <div>
                     {!activeConnection && isWaitingForUser && (
                         <p>
                             <button style={ButtonStyleDisabled} type="button" disabled>
@@ -224,8 +225,8 @@ export default function wCCD(props: WalletConnectionProps) {
                             </button>
                         </p>
                     )}
-                    {connectorError && <p style={{ color: 'red' }}>{connectorError}.</p>}
-                    {!connectorError && !isWaitingForUser && activeConnectorType && !activeConnector && (
+                    {activeConnectorError && <p style={{ color: 'red' }}>Connector Error: {activeConnectorError}.</p>}
+                    {!activeConnectorError && !isWaitingForUser && activeConnectorType && !activeConnector && (
                         <p>
                             <i>Loading connector...</i>
                         </p>
@@ -238,6 +239,7 @@ export default function wCCD(props: WalletConnectionProps) {
                             </button>
                         </p>
                     )}
+                    {connectionError && <p style={{ color: 'red' }}>Connection Error: {connectionError}.</p>}
                     {activeConnectedAccount && (
                         <>
                             <div className="text">Connected to</div>
@@ -287,7 +289,7 @@ export default function wCCD(props: WalletConnectionProps) {
                             <code>{network.name}</code>.
                         </p>
                     )}
-                </p>
+                </div>
                 <div className="containerSwitch">
                     <div className="largeText">CCD &nbsp; &nbsp; </div>
                     <button className="switch" type="button" onClick={() => setIsWrapping(!isWrapping)}>
