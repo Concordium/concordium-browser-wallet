@@ -51,7 +51,8 @@ export class BrowserWalletConnector implements WalletConnector, WalletConnection
     }
 
     async getConnections() {
-        // Defining "connection" as a connected account.
+        // Defining "connected" as the presence of a connected account.
+        // TODO Would be more stable to base on availability of RPC client?
         const account = await this.getConnectedAccount();
         return account ? [this] : [];
     }

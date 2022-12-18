@@ -229,7 +229,6 @@ export default function wCCD(props: WalletConnectionProps) {
                             </button>
                         </p>
                     )}
-                    {/* {connectionError && <p style={{ color: 'red' }}>Connection Error: {connectionError}.</p>} */}
                     {activeConnectedAccount && (
                         <>
                             <div className="text">Connected to</div>
