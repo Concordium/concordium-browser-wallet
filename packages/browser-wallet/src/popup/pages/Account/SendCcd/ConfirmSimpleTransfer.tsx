@@ -8,11 +8,11 @@ interface Props {
     cost?: bigint;
 }
 
-type State = SimpleTransferPayload;
+export type ConfirmSimpleTransferState = SimpleTransferPayload;
 
 export default function ConfirmSimpleTransfer({ setDetailsExpanded, cost }: Props) {
     const { state } = useLocation();
-    const payload = state as State;
+    const payload = state as ConfirmSimpleTransferState;
     return (
         <ConfirmTransfer
             setDetailsExpanded={setDetailsExpanded}

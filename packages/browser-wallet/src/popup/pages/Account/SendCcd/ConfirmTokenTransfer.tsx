@@ -16,17 +16,17 @@ interface Props {
     cost?: bigint;
 }
 
-interface State extends SimpleTransferPayload {
+export interface ConfirmTokenTransferState extends SimpleTransferPayload {
     contractIndex: string;
     tokenId: string;
     metadata: TokenMetadata;
-    executionEnergy: bigint;
+    executionEnergy: string;
 }
 
 export default function ConfirmTokenTransfer({ setDetailsExpanded, cost }: Props) {
     const { t } = useTranslation('account');
     const { state } = useLocation();
-    const { toAddress, amount, contractIndex, tokenId, executionEnergy, metadata } = state as State;
+    const { toAddress, amount, contractIndex, tokenId, executionEnergy, metadata } = state as ConfirmTokenTransferState;
     const selectedAddress = useAtomValue(selectedAccountAtom);
     const client = useAtomValue(jsonRpcClientAtom);
     const addToast = useSetAtom(addToastAtom);

@@ -34,8 +34,6 @@ import { accountRoutes } from '../routes';
 type BaseProps = {
     setDetailsExpanded: (expanded: boolean) => void;
     cost?: bigint;
-    // eslint-disable-next-line @typescript-eslint/no-explicit-any
-    returnState: any;
 };
 
 type ConfirmTokenTransferProps = BaseProps & {
@@ -56,7 +54,7 @@ type ConfirmGenericTransferProps = BaseProps & {
 type Props = ConfirmTokenTransferProps | ConfirmGenericTransferProps;
 
 export default function ConfirmTransfer(props: Props) {
-    const { setDetailsExpanded, cost, transactionType, payload, returnState, parameters } = props;
+    const { setDetailsExpanded, cost, transactionType, payload, parameters } = props;
     const { t } = useTranslation('account');
     const [hash, setHash] = useState<string>();
     const selectedAddress = useAtomValue(selectedAccountAtom);
@@ -129,7 +127,7 @@ export default function ConfirmTransfer(props: Props) {
             {!hash && (
                 <div className="flex justify-center p-b-10 m-h-20">
                     {/* TODO make this work with -1 instead of ../ */}
-                    <Button width="narrow" className="m-r-10" onClick={() => nav(`../`, { state: returnState })}>
+                    <Button width="narrow" className="m-r-10" onClick={() => nav(-1)}>
                         {t('confirmTransfer.buttons.back')}
                     </Button>
                     <Button width="narrow" onClick={() => send().catch((e) => addToast(e.toString()))}>
