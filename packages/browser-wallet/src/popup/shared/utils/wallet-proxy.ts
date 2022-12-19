@@ -189,7 +189,7 @@ function getToAddress(transaction: WalletProxyTransaction, accountAddress: strin
     if (transaction.details.transferDestination) {
         return transaction.details.transferDestination;
     }
-    if (transaction.origin.type === OriginType.Reward) {
+    if ([OriginType.Reward, OriginType.Account].includes(transaction.origin.type)) {
         return accountAddress;
     }
     if (transaction.origin.type === OriginType.Self) {
