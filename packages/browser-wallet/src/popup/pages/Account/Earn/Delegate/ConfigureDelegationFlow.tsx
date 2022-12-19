@@ -10,7 +10,7 @@ import { configureDelegationChangesPayload, ConfigureDelegationFlowState } from 
 
 type Props = {
     title: string;
-    firstPageBack: boolean;
+    firstPageBack?: boolean;
 };
 
 export default function ConfigureDelegationFlow(props: Props) {

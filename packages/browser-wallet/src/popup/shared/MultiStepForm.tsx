@@ -112,9 +112,8 @@ export default function MultiStepForm<
         [children]
     );
 
-    const pages = useMemo(() => makeFormPageObjects(getChildren(values)).reverse(), [getChildren, values]);
-
-    const currentPage = pages.find((p) => pathname.startsWith(p.route));
+    const pages = useMemo(() => makeFormPageObjects(getChildren(values)), [getChildren, values]);
+    const currentPage = pages.find((p) => pathname.endsWith(p.route)) ?? pages[0];
 
     useEffect(() => {
         if (currentPage?.substate) {
