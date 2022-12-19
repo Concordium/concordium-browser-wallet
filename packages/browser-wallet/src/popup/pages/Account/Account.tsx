@@ -22,6 +22,7 @@ import Tokens from './Tokens';
 import ManageTokens from './ManageTokens';
 import { AccountPageContext, accountPageContext } from './utils';
 import Earn from './Earn';
+import ConfirmGenericTransfer from './ConfirmGenericTransfer';
 
 function Account() {
     const { t } = useTranslation('account');
@@ -101,6 +102,7 @@ export default function AccountRoutes() {
                     <Route path={`${accountRoutes.settings}/*`} element={<AccountSettings />} />
                     <Route path={`${accountRoutes.tokens}/*`} element={<Tokens />} />
                     <Route path={`${accountRoutes.manageTokens}/*`} element={<ManageTokens />} />
+                    <Route path={accountRoutes.confirmTransfer} element={<ConfirmGenericTransfer />} />
                 </Route>
             </Routes>
         </accountPageContext.Provider>

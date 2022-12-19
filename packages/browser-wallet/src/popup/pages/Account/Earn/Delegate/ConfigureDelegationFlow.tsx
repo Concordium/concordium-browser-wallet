@@ -1,46 +1,48 @@
-import Button from '@popup/shared/Button';
-import MultiStepForm from '@popup/shared/MultiStepForm';
-import React from 'react';
+import React, { useCallback } from 'react';
+import { AccountTransactionType } from '@concordium/web-sdk';
 
-type Form = {
-    pool: string | null;
-    settings: {
-        amount: bigint;
-        redelegate: boolean;
-    };
-};
+import Button from '@popup/shared/Button';
+import { ensureDefined } from '@shared/utils/basic-helpers';
+import { useSelectedAccountInfo } from '@popup/shared/AccountInfoListenerContext/AccountInfoListenerContext';
+
+import AccountTransactionFlow from '../../AccountTransactionFlow';
+import { configureDelegationChangesPayload, ConfigureDelegationFlowState } from './utils';
 
 type Props = {
     title: string;
+    firstPageBack: boolean;
 };
 
-export default function ConfigureDelegationFlow({ title }: Props) {
+export default function ConfigureDelegationFlow(props: Props) {
+    const accountInfo = ensureDefined(useSelectedAccountInfo(), 'Assumed account info to be available');
+    const valuesToPayload = useCallback(configureDelegationChangesPayload(accountInfo), [accountInfo]);
+
     return (
-        <>
-            <div>{title}</div>
-            {/* eslint-disable-next-line no-console */}
-            <MultiStepForm<Form> onDone={console.log}>
-                {{
-                    pool: {
-                        render: (_, onNext) => (
-                            <div>
-                                Pool
-                                <br />
-                                <Button onClick={() => onNext(null)}>Next</Button>
-                            </div>
-                        ),
-                    },
-                    settings: {
-                        render: (_, onNext) => (
-                            <div>
-                                Settings
-                                <br />
-                                <Button onClick={() => onNext({ amount: BigInt(1), redelegate: true })}>Next</Button>
-                            </div>
-                        ),
-                    },
-                }}
-            </MultiStepForm>
-        </>
+        <AccountTransactionFlow<ConfigureDelegationFlowState>
+            {...props}
+            convert={valuesToPayload}
+            transactionType={AccountTransactionType.ConfigureDelegation}
+        >
+            {{
+                pool: {
+                    render: (_, onNext) => (
+                        <div>
+                            Pool
+                            <br />
+                            <Button onClick={() => onNext(null)}>Next</Button>
+                        </div>
+                    ),
+                },
+                settings: {
+                    render: (_, onNext) => (
+                        <div>
+                            Settings
+                            <br />
+                            <Button onClick={() => onNext({ amount: '1', redelegate: true })}>Next</Button>
+                        </div>
+                    ),
+                },
+            }}
+        </AccountTransactionFlow>
     );
 }

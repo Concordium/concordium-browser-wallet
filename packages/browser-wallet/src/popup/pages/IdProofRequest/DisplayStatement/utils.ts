@@ -63,7 +63,7 @@ const isAgeStatement = (statement: SecretStatement): boolean => {
     }
 
     const today = getPastDate(0);
-    const isYearOffsetUpper = statement.upper.substring(4) === today.substring(4);
+    const isYearOffsetUpper = addDays(statement.upper, -1).substring(4) === today.substring(4);
     const isYearOffsetLower = addDays(statement.lower, -1).substring(4) === today.substring(4);
 
     if (statement.lower === MIN_DATE) {
@@ -133,7 +133,7 @@ export function useStatementValue(statement: SecretStatement): string {
                 const upper = today < statement.upper ? today : statement.upper;
 
                 if (isAgeStatement(statement)) {
-                    const ageMin = getYearFromDateString(today) - getYearFromDateString(upper);
+                    const ageMin = getYearFromDateString(today) - getYearFromDateString(addDays(statement.upper, -1));
                     const ageMax =
                         getYearFromDateString(today) - getYearFromDateString(addDays(statement.lower, -1)) - 1;
 
@@ -232,18 +232,10 @@ export function useStatementDescription(statement: SecretStatement, identity: Co
 
         switch (statement.attributeTag) {
             case 'countryOfResidence':
-                if (isEuCountrySet(statement.set)) {
-                    return text('residenceEU', 'residenceNotEU');
-                }
-
                 return text('residence', 'notResidence', {
                     countryNamesString: statement.set.map(getCountryName).join(', '),
                 });
             case 'nationality':
-                if (isEuCountrySet(statement.set)) {
-                    return text('nationalityEU', 'nationalityNotEU');
-                }
-
                 return text('nationality', 'notNationality', {
                     countryNamesString: statement.set.map(getCountryName).join(', '),
                 });

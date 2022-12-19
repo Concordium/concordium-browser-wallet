@@ -111,7 +111,7 @@ export default function ConfirmTransfer(props: Props) {
         payload,
         cost,
         hash,
-        className: 'send-ccd__receipt',
+        className: 'confirm-transfer__receipt',
     };
 
     return (
@@ -128,11 +128,12 @@ export default function ConfirmTransfer(props: Props) {
             )}
             {!hash && (
                 <div className="flex justify-center p-b-10 m-h-20">
+                    {/* TODO make this work with -1 instead of ../ */}
                     <Button width="narrow" className="m-r-10" onClick={() => nav(`../`, { state: returnState })}>
-                        {t('sendCcd.buttons.back')}
+                        {t('confirmTransfer.buttons.back')}
                     </Button>
                     <Button width="narrow" onClick={() => send().catch((e) => addToast(e.toString()))}>
-                        {t('sendCcd.buttons.send')}
+                        {t('confirmTransfer.buttons.send')}
                     </Button>
                 </div>
             )}
@@ -143,7 +144,7 @@ export default function ConfirmTransfer(props: Props) {
                         className="m-b-10"
                         onClick={() => nav(`${absoluteRoutes.home.account.path}/${accountRoutes.log}`)}
                     >
-                        {t('sendCcd.buttons.finish')}
+                        {t('confirmTransfer.buttons.finish')}
                     </Button>
                 </div>
             )}

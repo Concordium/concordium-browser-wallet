@@ -9,11 +9,11 @@ export default {
             '<1>Important:</1> {{dappName}} will be given all the information above. You should only accept, if you have absolute trust in the service, and if you are familiar with their privacy policy.',
         revealTooltip: {
             header: 'Revealing information <1 />',
-            body: 'When you reveal information to a third party, you effectively hand over the information to them. This means you should only do this if you agree to their data usage and protection policies..\n\nYou can read more in\n\n<1>our developer documentation</1>',
+            body: 'When you reveal information to a third party, you effectively hand over the information to them. This means you should only do this if you agree to their data usage and protection policies.\n\nYou can read more in\n<1>the developer documentation</1>.',
         },
         secretTooltip: {
             header: 'Zero Knowledge proofs',
-            body: 'Zero Knowledge proofs are a way of proving something to a service or dApp without revealing the exact personal information. One example can be that you prove that you are over 18 years old without revealing your exact age. Another example could be proving your residency is within a given set of countries without revealing which of those countries you reside within.\n\nYou can read more in\n\n<1>our developer documentation</1>',
+            body: 'Zero Knowledge proofs are a way of proving something to a service or dApp without revealing the exact personal information. One example can be that you prove that you are over 18 years old without revealing your exact age. Another example could be proving your residency is within a given set of countries without revealing which of those countries you reside within.\n\nYou can read more in\n<1>the developer documentation</1>.',
         },
         headers: {
             reveal: 'Information to reveal',
@@ -36,7 +36,7 @@ export default {
             idDocIssuer: 'Document issuer',
         },
         proofs: {
-            ageMin: 'More than {{age}} years old',
+            ageMin: '{{age}} years old or more',
             ageMax: '{{age}} years old or less',
             ageBetween: '{{ageMin}} to {{ageMax}} years old',
             ageExact: '{{ age }} years old',
@@ -58,8 +58,6 @@ export default {
                 'This will prove that your ID document was issued between {{minDateString}} and (excluding) {{maxDateString}}',
             idDocExpiresAt:
                 'This will prove that your ID document expires between {{minDateString}} and (excluding) {{maxDateString}}',
-            nationalityEU: 'This will prove that you are a national of an EU country',
-            nationalityNotEU: 'This will prove that you are NOT a national of an EU country',
             nationality: 'This will prove that you are a national of one of these countries:\n{{countryNamesString}}',
             notNationality:
                 'This will prove that you are NOT a national of one of these countries:\n{{countryNamesString}}',
@@ -67,8 +65,6 @@ export default {
                 'This will prove that your country of residence is one of the following:\n{{countryNamesString}}',
             notResidence:
                 'This will prove that your country of residence is NOT one of the following:\n{{countryNamesString}}',
-            residenceEU: 'This will prove that your country of residence is an EU country',
-            residenceNotEU: 'This will prove that your country of residence is NOT an EU country',
             docType: 'This will prove that your identity document type is one of the following:\n{{typeNamesString}}',
             notDocType:
                 'This will prove that your identity document type is NOT one of the following:\n{{typeNamesString}}',

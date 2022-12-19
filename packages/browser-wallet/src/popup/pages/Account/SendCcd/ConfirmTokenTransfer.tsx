@@ -9,7 +9,7 @@ import { useLocation } from 'react-router-dom';
 import { useAsyncMemo } from 'wallet-common-helpers';
 import { fetchContractName, getTokenTransferParameters, getTokenTransferPayload } from '@shared/utils/token-helpers';
 import { TokenMetadata } from '@shared/storage/types';
-import ConfirmTransfer from './ConfirmTransfer';
+import ConfirmTransfer from '../ConfirmTransfer';
 
 interface Props {
     setDetailsExpanded: (expanded: boolean) => void;
