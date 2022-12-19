@@ -151,7 +151,7 @@ export class WithWalletConnection extends React.Component<Props, State> implemen
     connect = () => {
         const { activeConnector } = this.state;
         if (activeConnector) {
-            this.setState({ isActiveConnectorWaitingForUser: true });
+            this.setState({ isActiveConnectorWaitingForUser: true, activeConnectorError: '' });
             activeConnector
                 .connect()
                 .then(this.setActiveConnection)

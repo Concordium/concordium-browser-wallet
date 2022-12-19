@@ -178,10 +178,10 @@ export default function wCCD(props: WalletConnectionProps) {
         }
     }, [activeConnection, activeConnectedAccount, isFlipped]);
 
-    const [isWaitingForUser, setWaitingForUser] = useState(false);
+    const [isWaitingForTransaction, setWaitingForUser] = useState(false);
     return (
         <>
-            <h1 className="header">CCD &lt;-&gt; WCCD Smart Contract</h1>
+            <h1 className="header">CCD &#8644; wCCD Smart Contract</h1>
             <h3>Wrap and unwrap your CCDs and wCCDs on the Concordium Testnet</h3>
             <div style={blackCardStyle}>
                 <div>
@@ -203,20 +203,13 @@ export default function wCCD(props: WalletConnectionProps) {
                     />
                 </div>
                 <div>
-                    {!activeConnection && isWaitingForUser && (
-                        <p>
-                            <button style={ButtonStyleDisabled} type="button" disabled>
-                                Waiting for user
-                            </button>
-                        </p>
-                    )}
                     {activeConnectorError && <p style={{ color: 'red' }}>Connector Error: {activeConnectorError}.</p>}
-                    {!activeConnectorError && !isWaitingForUser && activeConnectorType && !activeConnector && (
+                    {!activeConnectorError && !isWaitingForTransaction && activeConnectorType && !activeConnector && (
                         <p>
                             <i>Loading connector...</i>
                         </p>
                     )}
-                    {!activeConnection && !isWaitingForUser && activeConnectorType && activeConnector && (
+                    {!activeConnection && !isWaitingForTransaction && activeConnectorType && activeConnector && (
                         <p>
                             <button style={ButtonStyle} type="button" onClick={connect}>
                                 {isActiveConnectorWaitingForUser && 'Connecting...'}
@@ -306,9 +299,9 @@ export default function wCCD(props: WalletConnectionProps) {
                         placeholder="0.000000"
                         ref={inputValue}
                     />
-                    {isWaitingForUser || !activeConnection ? (
+                    {!activeConnection ? (
                         <button style={ButtonStyleDisabled} type="button" disabled>
-                            Waiting for user
+                            Waiting for connection...
                         </button>
                     ) : (
                         <button
@@ -355,10 +348,10 @@ export default function wCCD(props: WalletConnectionProps) {
                     <>
                         <p>
                             <div>Transaction status{hash === '' ? '' : ' (May take a moment to finalize)'}</div>
-                            {!hash && transactionError && <div style={{ color: 'red' }}>{transactionError}.</div>}
-                            {!hash && !transactionError && (
-                                <div className="loadingText">Waiting for transaction...</div>
+                            {!hash && transactionError && (
+                                <div style={{ color: 'red' }}>Error: {transactionError}.</div>
                             )}
+                            {!hash && !transactionError && <div className="loadingText">None</div>}
                             {hash && (
                                 <>
                                     <button

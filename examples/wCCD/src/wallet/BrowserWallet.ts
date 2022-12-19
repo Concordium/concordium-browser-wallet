@@ -1,6 +1,3 @@
-/* eslint-disable no-console */
-
-// eslint-disable-next-line max-classes-per-file
 import { detectConcordiumProvider, WalletApi } from '@concordium/browser-wallet-api-helpers';
 import {
     AccountTransactionPayload,
@@ -28,6 +25,7 @@ export class BrowserWalletConnector implements WalletConnector, WalletConnection
             this.client
                 .getMostRecentlySelectedAccount()
                 .then((a) => delegate.onAccountChanged(this, a))
+                // eslint-disable-next-line no-console
                 .catch(console.error)
         );
     }
