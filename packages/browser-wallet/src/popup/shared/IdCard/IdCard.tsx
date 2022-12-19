@@ -111,6 +111,7 @@ export default function IdCard({ name, provider, status, onNameChange, className
                 status === 'pending' && 'id-card--pending',
                 status === 'confirmed' && 'id-card--confirmed',
                 status === 'rejected' && 'id-card--rejected',
+                onClick !== undefined && 'id-card--clickable',
                 className
             )}
             onClick={() => {
