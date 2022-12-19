@@ -7,6 +7,7 @@ import FormInput from './Input';
 import Submit from './Submit';
 import FormPassword from './Password';
 import FormToggleCheckbox from './ToggleCheckbox';
+import { FormRadios } from './Radios/Radios';
 
 export default {
     title: 'Shared/Form',
@@ -32,7 +33,9 @@ export const AllFields: ComponentStory<typeof Form> = () => {
                     }
                 `}
             </style>
-            <Form<{ name: string; age: string; password: string; switch: boolean }> onSubmit={console.log}>
+            <Form<{ name: string; age: string; password: string; switch: boolean; gender: number }>
+                onSubmit={console.log}
+            >
                 {(f) => (
                     <>
                         <FormInput
@@ -55,6 +58,16 @@ export const AllFields: ComponentStory<typeof Form> = () => {
                             rules={{ required: 'Must fill' }}
                         />
                         <FormToggleCheckbox register={f.register} name="switch" defaultChecked />
+                        <FormRadios
+                            control={f.control}
+                            options={[
+                                { value: 1, label: 'Male' },
+                                { value: 2, label: 'Female' },
+                            ]}
+                            name="gender"
+                            label="Select gender"
+                            rules={{ required: 'Must select one' }}
+                        />
                         <Submit className="submit" width="wide">
                             Submit
                         </Submit>
