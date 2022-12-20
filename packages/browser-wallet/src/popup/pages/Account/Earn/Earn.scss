@@ -1,10 +1,14 @@
+.earn-carousel,
 .earn-page {
     padding: rem(10px);
+    background-color: $color-bg;
+}
+
+.earn-page {
     display: flex;
     flex-direction: column;
     width: 100%;
     justify-content: space-between;
-    background-color: $color-bg;
     min-height: 100%;
 
     &__header {

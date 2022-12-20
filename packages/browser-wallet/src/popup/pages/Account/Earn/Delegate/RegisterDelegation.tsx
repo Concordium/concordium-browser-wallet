@@ -16,7 +16,7 @@ function Intro() {
     };
 
     return (
-        <Carousel onContinue={goToRegister}>
+        <Carousel className="earn-carousel" onContinue={goToRegister}>
             <div>First</div>
             <div>Second</div>
             <div>Third</div>
