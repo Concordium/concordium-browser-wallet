@@ -6,7 +6,14 @@ import { WalletConnection } from './wallet/WalletConnection';
 /**
  * Action for wrapping some CCD to WCCD in the WCCD smart contract instance
  */
-export async function wrap(connection: WalletConnection, account: string, index: bigint, subindex = 0n, amount = 0) {
+export async function wrap(
+    connection: WalletConnection,
+    account: string,
+    index: bigint,
+    subindex = 0n,
+    amount = 0,
+    receiver = account
+) {
     if (!Number.isInteger(amount) || amount <= 0) {
         throw new Error('invalid amount');
     }
@@ -26,7 +33,7 @@ export async function wrap(connection: WalletConnection, account: string, index:
         {
             data: '',
             to: {
-                Account: [account],
+                Account: [receiver],
             },
         },
         WRAP_FUNCTION_RAW_SCHEMA
@@ -36,7 +43,14 @@ export async function wrap(connection: WalletConnection, account: string, index:
 /**
  * Action for unwrapping some WCCD to CCD in the WCCD smart contract instance
  */
-export async function unwrap(connection: WalletConnection, account: string, index: bigint, subindex = 0n, amount = 0) {
+export async function unwrap(
+    connection: WalletConnection,
+    account: string,
+    index: bigint,
+    subindex = 0n,
+    amount = 0,
+    receiver = account
+) {
     if (!Number.isInteger(amount) || amount <= 0) {
         throw new Error('invalid amount');
     }
@@ -60,7 +74,7 @@ export async function unwrap(connection: WalletConnection, account: string, inde
                 Account: [account],
             },
             receiver: {
-                Account: [account],
+                Account: [receiver],
             },
         },
         UNWRAP_FUNCTION_RAW_SCHEMA

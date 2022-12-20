@@ -158,6 +158,14 @@ export default function wCCD(props: WalletConnectionProps) {
     const [isFlipped, setIsFlipped] = useState<boolean>(false);
     const [amountAccount, setAmountAccount] = useState<bigint>();
     const inputValue = useRef<HTMLInputElement | null>(null);
+    const [receiver, setReceiver] = useState(activeConnectedAccount);
+
+    // Sync connected account to receiver input
+    useEffect(() => {
+        if (activeConnectedAccount !== undefined) {
+            setReceiver(activeConnectedAccount);
+        }
+    }, [activeConnectedAccount]);
 
     useEffect(() => {
         if (activeConnection && activeConnectedAccount) {
@@ -276,6 +284,14 @@ export default function wCCD(props: WalletConnectionProps) {
                         placeholder="0.000000"
                         ref={inputValue}
                     />
+                    <input
+                        className="input"
+                        style={InputFieldStyle}
+                        type="text"
+                        placeholder="Receiving account address"
+                        value={receiver}
+                        onChange={(e) => setReceiver(e.target.value)}
+                    />
                     {isWaitingForUser || !activeConnection ? (
                         <button style={ButtonStyleDisabled} type="button" disabled>
                             Waiting for user
@@ -309,7 +325,8 @@ export default function wCCD(props: WalletConnectionProps) {
                                         activeConnectedAccount,
                                         WCCD_CONTRACT_INDEX,
                                         CONTRACT_SUB_INDEX,
-                                        amount
+                                        amount,
+                                        receiver
                                     );
                                     tx.then(setHash)
                                         .catch((err) => setError((err as Error).message))
