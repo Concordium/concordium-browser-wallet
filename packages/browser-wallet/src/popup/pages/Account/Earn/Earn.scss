@@ -1,6 +1,6 @@
 .earn-carousel,
 .earn-page {
-    padding: rem(10px);
+    padding: rem(10px) rem(15px);
     background-color: $color-bg;
 }
 
@@ -22,4 +22,8 @@
         position: absolute;
         left: 0;
     }
+}
+
+.earn-carousel {
+    white-space: break-spaces;
 }
