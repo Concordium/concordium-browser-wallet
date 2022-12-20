@@ -135,6 +135,24 @@ const t = {
                 body: 'After starting a delegatoin, you will be able to see its current status on the status screen.\n\nFrom there, you can also make updates to your delegation, or stop it again.',
             },
         },
+        register: {
+            title: 'Register delegation',
+        },
+        configure: {
+            pool: {
+                description1:
+                    'You can delegate to an open pool of your choice, or you can stake using passive delegation',
+                optionBaker: 'Baker',
+                optionPassive: 'Passive',
+                descriptionBaker:
+                    "If you don't already know which baker pool you want to delegate an amount to, you can read more about finding one by visiting our <1>documentation website</1>",
+                descriptionPassive:
+                    'Passive delegation is an alternative to delegation to a specific baker pool that has lower rewards. With passive delegation you do not have to worry about the uptime or quality of a baker node.\n\nFor more info, you can visit our <1>documentation website</1>',
+                bakerIdLabel: 'Baker ID',
+                bakerIdRequired: 'You must specify a baker ID',
+            },
+            continueButton: 'Continue',
+        },
     },
     accountPending: 'This account is still pending finalization.',
     accountRejected: 'This account failed to be created.',

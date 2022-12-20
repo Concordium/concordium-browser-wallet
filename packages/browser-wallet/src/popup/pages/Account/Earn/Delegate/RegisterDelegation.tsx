@@ -87,10 +87,12 @@ function Intro() {
 }
 
 export default function RegisterDelegation() {
+    const { t } = useTranslation('account', { keyPrefix: 'delegate.register' });
+
     return (
         <Routes>
             <Route index element={<Intro />} />
-            <Route path={`${routes.configure}/*`} element={<ConfigureDelegationFlow title="Register delegation" />} />
+            <Route path={`${routes.configure}/*`} element={<ConfigureDelegationFlow title={t('title')} />} />
         </Routes>
     );
 }

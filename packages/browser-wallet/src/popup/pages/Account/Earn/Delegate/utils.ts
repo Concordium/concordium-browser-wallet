@@ -10,7 +10,7 @@ import { ccdToMicroCcd, DeepPartial, isDefined, MakeRequired, microCcdToCcd, Not
 
 export type ConfigureDelegationFlowState = {
     pool: string | null;
-    settings: {
+    amount: {
         amount: string; // in CCD.
         redelegate: boolean;
     };
@@ -26,7 +26,7 @@ export const getExistingDelegationValues = (
     const { delegationTarget, stakedAmount, restakeEarnings } = accountInfo.accountDelegation;
 
     return {
-        settings: {
+        amount: {
             amount: microCcdToCcd(stakedAmount) ?? '0.00',
             redelegate: restakeEarnings,
         },
@@ -34,29 +34,29 @@ export const getExistingDelegationValues = (
     };
 };
 
-export type ConfigureDelegationFlowStateChanges = MakeRequired<DeepPartial<ConfigureDelegationFlowState>, 'settings'>;
+export type ConfigureDelegationFlowStateChanges = MakeRequired<DeepPartial<ConfigureDelegationFlowState>, 'amount'>;
 
 export const getDelegationFlowChanges = (
     existingValues: ConfigureDelegationFlowState,
     newValues: ConfigureDelegationFlowState
 ): ConfigureDelegationFlowStateChanges => {
     const changes: ConfigureDelegationFlowStateChanges = {
-        settings: {},
+        amount: {},
     };
 
     try {
         if (
-            existingValues.settings?.amount === undefined ||
-            newValues.settings?.amount === undefined ||
-            ccdToMicroCcd(existingValues.settings?.amount) !== ccdToMicroCcd(newValues.settings?.amount)
+            existingValues.amount?.amount === undefined ||
+            newValues.amount?.amount === undefined ||
+            ccdToMicroCcd(existingValues.amount?.amount) !== ccdToMicroCcd(newValues.amount?.amount)
         ) {
-            changes.settings.amount = newValues.settings?.amount;
+            changes.amount.amount = newValues.amount?.amount;
         }
     } catch {
         // Nothing...
     }
-    if (existingValues.settings?.redelegate !== newValues.settings?.redelegate) {
-        changes.settings.redelegate = newValues.settings?.redelegate;
+    if (existingValues.amount?.redelegate !== newValues.amount?.redelegate) {
+        changes.amount.redelegate = newValues.amount?.redelegate;
     }
 
     if (existingValues.pool !== newValues.pool) {
@@ -67,8 +67,8 @@ export const getDelegationFlowChanges = (
 };
 
 const toPayload = (values: DeepPartial<ConfigureDelegationFlowState>): ConfigureDelegationPayload => ({
-    stake: values?.settings?.amount ? new CcdAmount(ccdToMicroCcd(values.settings.amount)) : undefined,
-    restakeEarnings: values?.settings?.redelegate,
+    stake: values?.amount?.amount ? new CcdAmount(ccdToMicroCcd(values.amount.amount)) : undefined,
+    restakeEarnings: values?.amount?.redelegate,
     delegationTarget:
         values.pool != null
             ? { delegateType: DelegationTargetType.Baker, bakerId: BigInt(values.pool) }
@@ -84,7 +84,7 @@ export const configureDelegationChangesPayload =
     (accountInfo?: AccountInfo) => (values: ConfigureDelegationFlowState) => {
         const existing = accountInfo !== undefined ? getExistingDelegationValues(accountInfo) : undefined;
         const changes = existing !== undefined ? getDelegationFlowChanges(existing, values) : values;
-        const { settings, ...topLevelChanges } = changes;
+        const { amount: settings, ...topLevelChanges } = changes;
 
         if (Object.values({ ...settings, ...topLevelChanges }).every(not(isDefined))) {
             throw new Error(
