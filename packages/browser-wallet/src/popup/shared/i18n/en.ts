@@ -18,7 +18,7 @@ const t = {
     idAttributes: {
         countryOfResidence: 'Country of residence',
         firstName: 'First name',
-        idDocExpiresAt: 'ID valid to',
+        idDocExpiresAt: 'ID valid until',
         idDocIssuedAt: 'ID valid from',
         idDocIssuer: ' Identity document issuer',
         idDocType: 'Identity document type',

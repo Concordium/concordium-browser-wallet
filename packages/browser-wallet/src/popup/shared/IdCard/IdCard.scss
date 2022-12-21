@@ -16,6 +16,10 @@
         border-color: $color-salmon;
     }
 
+    &--clickable {
+        cursor: pointer;
+    }
+
     &__header {
         background-color: $color-cta;
         font-size: rem(11px);

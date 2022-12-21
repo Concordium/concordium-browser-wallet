@@ -1,5 +1,14 @@
 # Changelog
 
+## 0.9.5
+
+### Fixed
+
+-   Wording in id proofs popup.
+-   Age display now includes birthday. So it now happens and display for 18 years or older instead of more than 18 years.
+-   ID cards now appear clickable when creating an account
+-   Transaction log now properly displays incoming transactions from smart contracts.
+
 ## 0.9.4
 
 ### Fixed

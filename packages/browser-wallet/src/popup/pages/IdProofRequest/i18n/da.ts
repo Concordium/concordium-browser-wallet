@@ -11,7 +11,7 @@ const da: typeof en = {
             '<1>Vigtigt:</1> {{dappName}} får adgang til alt information der står ovenfor. Du skal kun acceptere at afsløre informationen, hvis du har tillid til servicen og hvis du er bekendt med deres privathedspolitik.',
         revealTooltip: {
             header: 'Afslører information <1 />',
-            body: 'Når du afslører information til en tredjepart, kan de beholde denne information. Dette betyder, at du kun bør afsløre information til dem hvis du er enig med deres databrugs- samt databeskyttelses-politik.\n\nDu kan læse mere i\n<1>udvikler dokumentationen</1>.',
+            body: 'Når du afslører information til en tredjepart, kan de beholde denne information. Dette betyder, at du kun bør afsløre information til dem hvis du er bekendt med deres databrugs- samt databeskyttelses-politik.\n\nDu kan læse mere i\n<1>udvikler dokumentationen</1>.',
         },
         secretTooltip: {
             header: 'Zero Knowledge beviser',
