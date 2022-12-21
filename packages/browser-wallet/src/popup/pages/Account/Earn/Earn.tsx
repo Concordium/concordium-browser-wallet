@@ -1,10 +1,13 @@
 import React, { useContext, useEffect } from 'react';
 import { useTranslation } from 'react-i18next';
-import { Link, Route, Routes } from 'react-router-dom';
+import { Link, Route, Routes, useNavigate } from 'react-router-dom';
+import { isBakerAccount, isDelegatorAccount } from '@concordium/web-sdk';
 
 import Button from '@popup/shared/Button';
-import { accountPageContext } from '../utils';
+import { ensureDefined } from '@shared/utils/basic-helpers';
+import { useSelectedAccountInfo } from '@popup/shared/AccountInfoListenerContext/AccountInfoListenerContext';
 import Delegate from './Delegate';
+import { accountPageContext } from '../utils';
 
 const routes = {
     delegate: 'delegate',
@@ -41,20 +44,27 @@ function Earn() {
 
 export default function EarnRoutes() {
     const { setDetailsExpanded } = useContext(accountPageContext);
+    const accountInfo = ensureDefined(useSelectedAccountInfo(), 'Expected to find account info for selected account');
+    const nav = useNavigate();
 
     useEffect(() => {
         setDetailsExpanded(false);
         return () => setDetailsExpanded(true);
     }, []);
 
-    // TODO: figure out if account is already delegator, and go to delegate route if so.
-    // TODO: do something temp with baker accounts imported from mobile wallets?
+    useEffect(() => {
+        if (isDelegatorAccount(accountInfo)) {
+            nav(routes.delegate);
+        } else if (isBakerAccount(accountInfo)) {
+            nav(routes.baking);
+        }
+    }, [accountInfo]);
 
     return (
         <Routes>
             <Route index element={<Earn />} />
             <Route path={`${routes.delegate}/*`} element={<Delegate />} />
-            {/* <Route path={routes.baking} element={<>Baking</>} /> */}
+            <Route path={routes.baking} element={<>Baking details coming...</>} />
         </Routes>
     );
 }

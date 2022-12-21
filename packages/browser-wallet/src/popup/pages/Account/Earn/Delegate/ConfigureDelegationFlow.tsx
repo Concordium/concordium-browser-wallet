@@ -1,19 +1,18 @@
 import React, { useCallback, useMemo } from 'react';
 import { AccountTransactionType } from '@concordium/web-sdk';
+import { Trans, useTranslation } from 'react-i18next';
+import { getCcdSymbol, useUpdateEffect } from 'wallet-common-helpers';
+import { Validate } from 'react-hook-form';
 
 import { ensureDefined } from '@shared/utils/basic-helpers';
 import { useSelectedAccountInfo } from '@popup/shared/AccountInfoListenerContext/AccountInfoListenerContext';
-
-import { Trans, useTranslation } from 'react-i18next';
 import Form, { useForm } from '@popup/shared/Form';
 import { MultiStepFormPageProps } from '@popup/shared/MultiStepForm';
 import Submit from '@popup/shared/Form/Submit';
 import { FormRadios } from '@popup/shared/Form/Radios/Radios';
 import FormInput from '@popup/shared/Form/Input';
 import ExternalLink from '@popup/shared/ExternalLink';
-import { Validate } from 'react-hook-form';
 import FormAmountInput from '@popup/shared/Form/AmountInput';
-import { getCcdSymbol, useUpdateEffect } from 'wallet-common-helpers';
 import { configureDelegationChangesPayload, ConfigureDelegationFlowState } from './utils';
 import AccountTransactionFlow from '../../AccountTransactionFlow';
 
@@ -159,7 +158,7 @@ function AmountPage({ initial, onNext }: AmountPageProps) {
                             register={f.register}
                             symbol={getCcdSymbol()}
                             name="amount"
-                            rules={{ required: t('amount.amountRequired') }}
+                            rules={{ required: t('amount.amountRequired') }} // TODO validate amount
                         />
                         {/* TODO: display current stake in pool + max stake */}
                         <div className="m-t-20">{t('amount.descriptionRedelegate')}</div>
