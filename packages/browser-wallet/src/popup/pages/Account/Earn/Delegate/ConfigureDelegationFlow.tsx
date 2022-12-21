@@ -1,7 +1,6 @@
-import React, { useCallback } from 'react';
+import React, { useCallback, useMemo } from 'react';
 import { AccountTransactionType } from '@concordium/web-sdk';
 
-import Button from '@popup/shared/Button';
 import { ensureDefined } from '@shared/utils/basic-helpers';
 import { useSelectedAccountInfo } from '@popup/shared/AccountInfoListenerContext/AccountInfoListenerContext';
 
@@ -12,8 +11,11 @@ import Submit from '@popup/shared/Form/Submit';
 import { FormRadios } from '@popup/shared/Form/Radios/Radios';
 import FormInput from '@popup/shared/Form/Input';
 import ExternalLink from '@popup/shared/ExternalLink';
-import AccountTransactionFlow from '../../AccountTransactionFlow';
+import { Validate } from 'react-hook-form';
+import FormAmountInput from '@popup/shared/Form/AmountInput';
+import { getCcdSymbol } from 'wallet-common-helpers';
 import { configureDelegationChangesPayload, ConfigureDelegationFlowState } from './utils';
+import AccountTransactionFlow from '../../AccountTransactionFlow';
 
 type PoolPageForm =
     | {
@@ -31,11 +33,37 @@ type PoolPageProps = Omit<
 
 function PoolPage({ onNext, initial }: PoolPageProps) {
     const { t } = useTranslation('account', { keyPrefix: 'delegate.configure' });
+    // const rpc = useAtomValue(jsonRpcClientAtom);
     const form = useForm<PoolPageForm>({
         defaultValues:
             initial === null || initial === undefined ? { isBaker: false } : { isBaker: true, bakerId: initial },
     });
     const isBakerValue = form.watch('isBaker');
+
+    const validateBakerId: Validate<string | boolean> = async (value) => {
+        try {
+            const bakerId = BigInt(value);
+            // eslint-disable-next-line no-console
+            console.log(bakerId);
+            // const poolStatus = await rpc.getPoolStatus(bakerId); // TODO: Doesn't exist yet...
+
+            // if (poolStatus.poolInfo.openStatus !== OpenStatusText.OpenForAll) {
+            //     return 'Targeted baker does not allow new delegators'; // TODO: translate
+            // }
+
+            // if (
+            //     isDelegatorAccount(accountInfo) &&
+            //     poolStatus.delegatedCapitalCap - poolStatus.delegatedCapital <
+            //         accountInfo.accountDelegation.stakedAmount
+            // ) {
+            //     return "Your current stake would violate the targeted baker's cap"; // TODO: translate
+            // }
+
+            return true;
+        } catch {
+            return "Supplied baker ID doesn't match an active baker.";
+        }
+    };
 
     const onSubmit = (vs: PoolPageForm) => {
         if (vs.isBaker) {
@@ -59,7 +87,6 @@ function PoolPage({ onNext, initial }: PoolPageProps) {
                                 { value: true, label: t('pool.optionBaker') },
                                 { value: false, label: t('pool.optionPassive') },
                             ]}
-                            rules={{ required: true }}
                         />
                         <div className="m-t-10">
                             {isBakerValue ? (
@@ -68,7 +95,7 @@ function PoolPage({ onNext, initial }: PoolPageProps) {
                                         register={f.register}
                                         name="bakerId"
                                         label={t('pool.bakerIdLabel')}
-                                        rules={{ required: t('pool.bakerIdRequired') }} // TODO validate baker ID exists.
+                                        rules={{ required: t('pool.bakerIdRequired'), validate: validateBakerId }}
                                     />
                                     <br />
                                     <Trans
@@ -94,7 +121,49 @@ function PoolPage({ onNext, initial }: PoolPageProps) {
                             )}
                         </div>
                     </div>
-                    <Submit>{t('continueButton')}</Submit>
+                    <Submit className="m-t-20">{t('continueButton')}</Submit>
+                </>
+            )}
+        </Form>
+    );
+}
+
+type AmountPageForm = {
+    amount: string;
+    redelegate: boolean;
+};
+
+type AmountPageProps = MultiStepFormPageProps<ConfigureDelegationFlowState['amount'], ConfigureDelegationFlowState>;
+
+function AmountPage({ initial, onNext }: AmountPageProps) {
+    const { t } = useTranslation('account', { keyPrefix: 'delegate.configure' });
+    const defaultValues: AmountPageForm = useMemo(() => initial ?? { amount: '0', redelegate: true }, [initial]);
+
+    return (
+        <Form<AmountPageForm> className="configure-flow-form" defaultValues={defaultValues} onSubmit={onNext}>
+            {(f) => (
+                <>
+                    <div>
+                        <FormAmountInput
+                            label={t('amount.amountLabel')}
+                            register={f.register}
+                            symbol={getCcdSymbol()}
+                            name="amount"
+                            rules={{ required: t('amount.amountRequired') }}
+                        />
+                        {/* TODO: display current stake in pool + max stake */}
+                        <FormRadios
+                            className="m-t-10 w-full"
+                            control={f.control}
+                            name="redelegate"
+                            options={[
+                                { value: true, label: t('amount.optionRedelegate') },
+                                { value: false, label: t('amount.optionNoRedelegate') },
+                            ]}
+                            rules={{ required: true }}
+                        />
+                    </div>
+                    <Submit className="m-t-20">{t('continueButton')}</Submit>
                 </>
             )}
         </Form>
@@ -121,12 +190,8 @@ export default function ConfigureDelegationFlow(props: Props) {
                     render: (initial, onNext) => <PoolPage initial={initial} onNext={onNext} />,
                 },
                 amount: {
-                    render: (_, onNext) => (
-                        <div>
-                            Settings
-                            <br />
-                            <Button onClick={() => onNext({ amount: '1', redelegate: true })}>Next</Button>
-                        </div>
+                    render: (initial, onNext, formValues) => (
+                        <AmountPage initial={initial} onNext={onNext} formValues={formValues} />
                     ),
                 },
             }}

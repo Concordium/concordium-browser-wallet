@@ -151,6 +151,12 @@ const t = {
                 bakerIdLabel: 'Baker ID',
                 bakerIdRequired: 'You must specify a baker ID',
             },
+            amount: {
+                optionRedelegate: 'Yes, restake',
+                optionNoRedelegate: "No, don't restake",
+                amountLabel: 'Amount to delegate',
+                amountRequired: 'You must specify an amount to delegate',
+            },
             continueButton: 'Continue',
         },
     },
