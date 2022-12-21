@@ -7,7 +7,10 @@ import { CommonFieldProps, RequiredUncontrolledFieldProps } from './common/types
 import { makeUncontrolled } from './common/utils';
 import ErrorMessage from './ErrorMessage';
 
-type Props = Pick<InputHTMLAttributes<HTMLInputElement>, 'className' | 'type' | 'value' | 'onChange' | 'onBlur'> &
+type Props = Pick<
+    InputHTMLAttributes<HTMLInputElement>,
+    'className' | 'type' | 'value' | 'onChange' | 'onBlur' | 'autoFocus'
+> &
     RequiredUncontrolledFieldProps<HTMLInputElement> &
     CommonFieldProps & {
         onMax?: () => void;

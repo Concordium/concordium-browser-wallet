@@ -152,10 +152,12 @@ const t = {
                 bakerIdRequired: 'You must specify a baker ID',
             },
             amount: {
-                optionRedelegate: 'Yes, restake',
-                optionNoRedelegate: "No, don't restake",
                 amountLabel: 'Amount to delegate',
                 amountRequired: 'You must specify an amount to delegate',
+                optionRedelegate: 'Yes, restake',
+                optionNoRedelegate: "No, don't restake",
+                descriptionRedelegate:
+                    'Do you want ot automatically add your delegation rewards to your delegated amount?\n\nIf you choose to not restake your rewardds, the amounts will be at disposal on your account balance at each pay day.',
             },
             continueButton: 'Continue',
         },

@@ -13,7 +13,7 @@ import FormInput from '@popup/shared/Form/Input';
 import ExternalLink from '@popup/shared/ExternalLink';
 import { Validate } from 'react-hook-form';
 import FormAmountInput from '@popup/shared/Form/AmountInput';
-import { getCcdSymbol } from 'wallet-common-helpers';
+import { getCcdSymbol, useUpdateEffect } from 'wallet-common-helpers';
 import { configureDelegationChangesPayload, ConfigureDelegationFlowState } from './utils';
 import AccountTransactionFlow from '../../AccountTransactionFlow';
 
@@ -65,6 +65,12 @@ function PoolPage({ onNext, initial }: PoolPageProps) {
         }
     };
 
+    useUpdateEffect(() => {
+        if (!isBakerValue) {
+            form.resetField('bakerId');
+        }
+    }, [isBakerValue]);
+
     const onSubmit = (vs: PoolPageForm) => {
         if (vs.isBaker) {
             onNext(vs.bakerId);
@@ -80,7 +86,7 @@ function PoolPage({ onNext, initial }: PoolPageProps) {
                     <div>
                         {t('pool.description1')}
                         <FormRadios
-                            className="m-t-10 w-full"
+                            className="m-t-20 w-full"
                             control={f.control}
                             name="isBaker"
                             options={[
@@ -88,16 +94,17 @@ function PoolPage({ onNext, initial }: PoolPageProps) {
                                 { value: false, label: t('pool.optionPassive') },
                             ]}
                         />
-                        <div className="m-t-10">
-                            {isBakerValue ? (
-                                <>
-                                    <FormInput
-                                        register={f.register}
-                                        name="bakerId"
-                                        label={t('pool.bakerIdLabel')}
-                                        rules={{ required: t('pool.bakerIdRequired'), validate: validateBakerId }}
-                                    />
-                                    <br />
+                        {isBakerValue ? (
+                            <>
+                                <FormInput
+                                    className="m-t-10"
+                                    register={f.register}
+                                    name="bakerId"
+                                    label={t('pool.bakerIdLabel')}
+                                    autoFocus
+                                    rules={{ required: t('pool.bakerIdRequired'), validate: validateBakerId }}
+                                />
+                                <div className="m-t-20">
                                     <Trans
                                         ns="account"
                                         i18nKey="delegate.configure.pool.descriptionBaker"
@@ -107,8 +114,10 @@ function PoolPage({ onNext, initial }: PoolPageProps) {
                                             ),
                                         }}
                                     />
-                                </>
-                            ) : (
+                                </div>
+                            </>
+                        ) : (
+                            <div className="m-t-20">
                                 <Trans
                                     ns="account"
                                     i18nKey="delegate.configure.pool.descriptionPassive"
@@ -118,8 +127,8 @@ function PoolPage({ onNext, initial }: PoolPageProps) {
                                         ),
                                     }}
                                 />
-                            )}
-                        </div>
+                            </div>
+                        )}
                     </div>
                     <Submit className="m-t-20">{t('continueButton')}</Submit>
                 </>
@@ -137,7 +146,7 @@ type AmountPageProps = MultiStepFormPageProps<ConfigureDelegationFlowState['amou
 
 function AmountPage({ initial, onNext }: AmountPageProps) {
     const { t } = useTranslation('account', { keyPrefix: 'delegate.configure' });
-    const defaultValues: AmountPageForm = useMemo(() => initial ?? { amount: '0', redelegate: true }, [initial]);
+    const defaultValues: Partial<AmountPageForm> = useMemo(() => initial ?? { redelegate: true }, [initial]);
 
     return (
         <Form<AmountPageForm> className="configure-flow-form" defaultValues={defaultValues} onSubmit={onNext}>
@@ -146,21 +155,22 @@ function AmountPage({ initial, onNext }: AmountPageProps) {
                     <div>
                         <FormAmountInput
                             label={t('amount.amountLabel')}
+                            autoFocus
                             register={f.register}
                             symbol={getCcdSymbol()}
                             name="amount"
                             rules={{ required: t('amount.amountRequired') }}
                         />
                         {/* TODO: display current stake in pool + max stake */}
+                        <div className="m-t-20">{t('amount.descriptionRedelegate')}</div>
                         <FormRadios
-                            className="m-t-10 w-full"
+                            className="m-t-20 w-full"
                             control={f.control}
                             name="redelegate"
                             options={[
                                 { value: true, label: t('amount.optionRedelegate') },
                                 { value: false, label: t('amount.optionNoRedelegate') },
                             ]}
-                            rules={{ required: true }}
                         />
                     </div>
                     <Submit className="m-t-20">{t('continueButton')}</Submit>

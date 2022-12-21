@@ -16,15 +16,9 @@ export default function ConfirmGenericTransfer() {
     const { setDetailsExpanded } = useContext(accountPageContext);
 
     const handler = useMemo(() => getAccountTransactionHandler(type), [type]);
-    const cost = useMemo(() => handler.getBaseEnergyCost(payload), [handler, payload]); // TODO calculate cost properly.
+    const cost = useMemo(() => handler.getBaseEnergyCost(payload), [handler, payload]); // TODO: calculate cost properly.
 
     return (
-        <ConfirmTransfer
-            setDetailsExpanded={setDetailsExpanded}
-            cost={cost}
-            payload={payload}
-            returnState={payload}
-            transactionType={type}
-        />
+        <ConfirmTransfer setDetailsExpanded={setDetailsExpanded} cost={cost} payload={payload} transactionType={type} />
     );
 }
