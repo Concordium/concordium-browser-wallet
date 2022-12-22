@@ -97,9 +97,9 @@ function DelegationDetails({ accountInfo }: DelegationDetailsProps) {
 
 export default function Delegate() {
     const accountInfo = ensureDefined(useSelectedAccountInfo(), 'Expected to find account info for selected account');
-    const delegateTransaction = useAtomValue(selectedPendingTransactionsAtom).find(
-        (t) => t.type === AccountTransactionType.ConfigureDelegation
-    );
+    const delegateTransaction = [...useAtomValue(selectedPendingTransactionsAtom)]
+        .reverse()
+        .find((t) => t.type === AccountTransactionType.ConfigureDelegation);
 
     let details;
     if (isDelegatorAccount(accountInfo)) {
