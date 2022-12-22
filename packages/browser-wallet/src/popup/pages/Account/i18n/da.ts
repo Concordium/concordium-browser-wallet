@@ -77,7 +77,7 @@ const t: typeof en = {
         delegateHeader: 'Delegation',
         delegateDescription:
             "If you don't have access to your own node you may delegate your stake to one of the other bakers. There is no minimum amount of CCD required when delegating\n\nChoose the option that suits you below to learn more.\n\nNOTE: A single account cannot both be a baker and delegator, but it is possible to stop one and change to the other.",
-        delegateCta: 'Continue to delegation setup',
+        delegateCta: 'Opsæt delegering',
     },
     // TODO translate
     delegate: {

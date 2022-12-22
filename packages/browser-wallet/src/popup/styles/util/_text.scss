@@ -46,3 +46,12 @@ $line-clamps: (2, 3);
 .word-break-all {
     word-break: break-all;
 }
+
+.label {
+    font-size: rem(8px);
+    margin-bottom: rem(2px);
+
+    &--faded {
+        color: $color-text-faded;
+    }
+}

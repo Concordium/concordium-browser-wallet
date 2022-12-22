@@ -1,7 +1,7 @@
 .earn-carousel,
 .earn-page,
 .earn-details {
-    padding: rem(10px) rem(15px);
+    padding: rem(10px) rem(10px);
     background-color: $color-bg;
     white-space: break-spaces;
 }
@@ -13,12 +13,6 @@
     width: 100%;
     justify-content: space-between;
     min-height: 100%;
-}
-
-.earn-details {
-    &__heading {
-        margin-bottom: rem(5px);
-    }
 }
 
 .earn-page {

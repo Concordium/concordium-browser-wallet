@@ -38,9 +38,9 @@ function DelegationDetails({ accountInfo }: DelegationDetailsProps) {
     return (
         <div className="earn-details">
             <div>
-                <h3 className="m-t-0 earn-details__heading">{sharedT('amount')}</h3>
+                <div className="label label--faded">{sharedT('amount')}</div>
                 <div className="text-mono">{displayAsCcd(accountInfo.accountDelegation.stakedAmount)}</div>
-                <h3 className="earn-details__heading">{sharedT('target')}</h3>
+                <div className="label label--faded m-t-10">{sharedT('target')}</div>
                 <div>
                     {accountInfo.accountDelegation.delegationTarget.delegateType === DelegationTargetType.Baker
                         ? sharedT('targetBaker', {
@@ -48,7 +48,7 @@ function DelegationDetails({ accountInfo }: DelegationDetailsProps) {
                           })
                         : sharedT('targetPassive')}
                 </div>
-                <h3 className="earn-details__heading">{sharedT('redelegate')}</h3>
+                <div className="label label--faded m-t-10">{sharedT('redelegate')}</div>
                 <div>
                     {accountInfo.accountDelegation.restakeEarnings
                         ? sharedT('redelegateOption')
