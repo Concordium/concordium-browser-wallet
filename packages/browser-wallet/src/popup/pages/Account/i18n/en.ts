@@ -146,6 +146,7 @@ const t = {
             updateDelegation: 'Update current delegation',
             stopDelegation: 'Stop delegation',
             pending: 'Waiting for transaction to finalize',
+            failed: 'Transaction failed',
         },
         register: {
             title: 'Register delegation',

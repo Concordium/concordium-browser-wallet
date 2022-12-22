@@ -78,7 +78,7 @@ function TransactionReceiptView(props: TransactionReceiptViewProps) {
     return (
         <div className={clsx('transaction-receipt', className)}>
             <p className="transaction-receipt__title">{title}</p>
-            <h5>{t('sender')}</h5>
+            <h5>{t('sender')}:</h5>
             <DisplayAddress
                 className="transaction-receipt__address"
                 address={sender}

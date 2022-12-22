@@ -33,7 +33,7 @@ function Earn() {
                     {t('delegateDescription')}
                 </p>
             </div>
-            <div>
+            <div className="text-center">
                 <Button className="m-t-20" width="wide" as={Link} to={routes.delegate}>
                     {t('delegateCta')}
                 </Button>

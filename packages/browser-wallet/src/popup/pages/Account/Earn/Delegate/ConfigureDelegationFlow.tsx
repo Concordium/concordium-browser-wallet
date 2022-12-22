@@ -129,7 +129,9 @@ function PoolPage({ onNext, initial }: PoolPageProps) {
                             </div>
                         )}
                     </div>
-                    <Submit className="m-t-20">{t('continueButton')}</Submit>
+                    <Submit className="m-t-20" width="wide">
+                        {t('continueButton')}
+                    </Submit>
                 </>
             )}
         </Form>
@@ -172,7 +174,9 @@ function AmountPage({ initial, onNext }: AmountPageProps) {
                             ]}
                         />
                     </div>
-                    <Submit className="m-t-20">{t('continueButton')}</Submit>
+                    <Submit className="m-t-20" width="wide">
+                        {t('continueButton')}
+                    </Submit>
                 </>
             )}
         </Form>
