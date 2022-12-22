@@ -1,5 +1,5 @@
 import { getCcdDrop, getTransactions } from '@popup/shared/utils/wallet-proxy';
-import React, { createContext, forwardRef, Fragment, useContext, useEffect, useMemo, useState } from 'react';
+import React, { createContext, forwardRef, Fragment, useContext, useEffect, useMemo, useRef, useState } from 'react';
 import InfiniteLoader from 'react-window-infinite-loader';
 import { VariableSizeList as List } from 'react-window';
 import { noOp, partition, PropsOf } from 'wallet-common-helpers';
@@ -205,6 +205,7 @@ export default function TransactionList({ onTransactionClick }: TransactionListP
     const [amount, setAmount] = useState<bigint>();
     const network = useAtomValue(networkConfigurationAtom);
     const [disableCcdDropButton, setDisableCcdDropButton] = useState<boolean>(false);
+    const accountChanged = useRef(true);
 
     if (!account || !accountAddress) {
         return null;
@@ -236,7 +237,7 @@ export default function TransactionList({ onTransactionClick }: TransactionListP
 
     async function loadTransactionsDescending(address: string, appendTransactions: boolean, fromId?: number) {
         setIsNextPageLoading(true);
-        getTransactions(address, transactionResultLimit, 'descending', fromId)
+        return getTransactions(address, transactionResultLimit, 'descending', fromId)
             .then((transactionResult) => {
                 setHasNextPage(transactionResult.full);
 
@@ -263,13 +264,22 @@ export default function TransactionList({ onTransactionClick }: TransactionListP
 
     useEffect(() => {
         setTransactions([]);
-        loadTransactionsDescending(accountAddress, false);
         setAmount(undefined);
         setDisableCcdDropButton(false);
+
+        accountChanged.current = true;
+        loadTransactionsDescending(accountAddress, false).then(() => {
+            accountChanged.current = false;
+        });
     }, [accountAddress]);
 
     useEffect(() => {
-        if (amount !== undefined && accountInfo?.accountAmount !== undefined && accountInfo?.accountAmount !== amount) {
+        if (
+            !accountChanged.current &&
+            amount !== undefined &&
+            accountInfo?.accountAmount !== undefined &&
+            accountInfo?.accountAmount !== amount
+        ) {
             getNewTransactions();
         }
         setAmount(accountInfo?.accountAmount);

@@ -1,16 +1,16 @@
-import { AccountAddress, AccountInfo } from '@concordium/web-sdk';
-import { networkConfigurationAtom, jsonRpcClientAtom, cookieAtom } from '@popup/store/settings';
 import { useAtomValue, useSetAtom, useAtom, atom, WritableAtom } from 'jotai';
 import React, { createContext, ReactNode, useContext, useEffect, useMemo, useState } from 'react';
-import { atomWithChromeStorage } from '@popup/store/utils';
-import { ChromeStorageKey, CreationStatus, WalletCredential } from '@shared/storage/types';
-import { noOp, parse, stringify } from 'wallet-common-helpers';
-import { addToastAtom } from '@popup/state';
+import { AccountAddress, AccountInfo } from '@concordium/web-sdk';
 import { useTranslation } from 'react-i18next';
-import { getGenesisHash, sessionAccountInfoCache, useIndexedStorage } from '@shared/storage/access';
-import { accountInfoCacheLock, updateRecord } from '@shared/storage/update';
 import i18next from 'i18next';
 import { atomFamily } from 'jotai/utils';
+import { noOp, parse, stringify } from 'wallet-common-helpers';
+import { networkConfigurationAtom, jsonRpcClientAtom, cookieAtom } from '@popup/store/settings';
+import { atomWithChromeStorage } from '@popup/store/utils';
+import { ChromeStorageKey, CreationStatus, WalletCredential } from '@shared/storage/types';
+import { addToastAtom } from '@popup/state';
+import { getGenesisHash, sessionAccountInfoCache, useIndexedStorage } from '@shared/storage/access';
+import { accountInfoCacheLock, updateRecord } from '@shared/storage/update';
 import { AccountInfoListener } from '../account-info-listener';
 
 const accountInfoBaseAtom = atomWithChromeStorage<Record<string, string>>(ChromeStorageKey.AccountInfoCache, {}, false);
@@ -112,7 +112,7 @@ export function useAccountInfo(account: WalletCredential): AccountInfo | undefin
         if (!accountInfo && account.status === CreationStatus.Confirmed) {
             refreshAccountInfo();
         }
-    }, [genesisHash, address, accountInfo, account.status]);
+    }, [genesisHash, accountInfo, account.status]);
 
     useEffect(() => {
         if (account.status === CreationStatus.Confirmed && accountInfoEmitter) {
