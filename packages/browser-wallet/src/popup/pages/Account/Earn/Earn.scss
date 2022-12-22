@@ -1,17 +1,27 @@
 .earn-carousel,
-.earn-page {
+.earn-page,
+.earn-details {
     padding: rem(10px) rem(15px);
     background-color: $color-bg;
     white-space: break-spaces;
 }
 
-.earn-page {
+.earn-page,
+.earn-details {
     display: flex;
     flex-direction: column;
     width: 100%;
     justify-content: space-between;
     min-height: 100%;
+}
 
+.earn-details {
+    &__heading {
+        margin-bottom: rem(5px);
+    }
+}
+
+.earn-page {
     &__header {
         position: relative;
         display: flex;

@@ -31,6 +31,10 @@ $line-clamps: (2, 3);
     text-align: right;
 }
 
+.text-mono {
+    font-family: $font-family-mono;
+}
+
 .color-cta {
     color: $color-cta;
 }

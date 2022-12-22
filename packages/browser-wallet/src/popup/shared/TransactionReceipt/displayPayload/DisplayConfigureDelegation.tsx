@@ -10,22 +10,22 @@ type Props = {
 };
 
 export default function DisplayConfigureDelegation({ payload }: Props) {
-    const { t } = useTranslation('shared', { keyPrefix: 'transactionReceipt' });
+    const { t } = useTranslation('shared', { keyPrefix: 'delegation' });
 
     return (
         <>
-            <OptionalField title={t('configureDelegation.target')} value={payload.delegationTarget}>
+            <OptionalField title={t('target')} value={payload.delegationTarget}>
                 {(f) =>
                     f.delegateType === DelegationTargetType.Baker
-                        ? f.bakerId.toString()
-                        : t('configureDelegation.passiveDelegation')
+                        ? t('targetBaker', { bakerId: f.bakerId.toString() })
+                        : t('targetPassive')
                 }
             </OptionalField>
             <OptionalField title={t('amount')} value={payload.stake}>
                 {(f) => displayAsCcd(f.microCcdAmount)}
             </OptionalField>
-            <OptionalField title={t('configureDelegation.redelegate')} value={payload.restakeEarnings}>
-                {(f) => (f ? t('configureDelegation.redelegateOption') : t('configureDelegation.noRedelegateOption'))}
+            <OptionalField title={t('redelegate')} value={payload.restakeEarnings}>
+                {(f) => (f ? t('redelegateOption') : t('noRedelegateOption'))}
             </OptionalField>
         </>
     );

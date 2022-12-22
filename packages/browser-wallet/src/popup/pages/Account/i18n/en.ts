@@ -135,6 +135,18 @@ const t = {
                 body: 'After starting a delegatoin, you will be able to see its current status on the status screen.\n\nFrom there, you can also make updates to your delegation, or stop it again.',
             },
         },
+        details: {
+            amount: 'Delegation amount',
+            target: 'Target',
+            targetPassive: 'Passive delegation',
+            targetBaker: 'Baker {{bakerId}}',
+            restake: 'Rewards will be',
+            optionRestake: 'Added to delegation amount',
+            optionNoRestake: 'Added to public balance',
+            updateDelegation: 'Update current delegation',
+            stopDelegation: 'Stop delegation',
+            pending: 'Waiting for transaction to finalize',
+        },
         register: {
             title: 'Register delegation',
         },

@@ -34,7 +34,7 @@ function Earn() {
                 </p>
             </div>
             <div>
-                <Button className="w-full m-t-20" as={Link} to={routes.delegate}>
+                <Button className="m-t-20" width="wide" as={Link} to={routes.delegate}>
                     {t('delegateCta')}
                 </Button>
             </div>
