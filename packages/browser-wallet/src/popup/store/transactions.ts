@@ -151,10 +151,3 @@ export const addPendingTransactionAtom = atom<null, BrowserWalletAccountTransact
     null,
     (get, set, transaction) => set(pendingTransactionsAtom, [...get(pendingTransactionsAtom), transaction])
 );
-
-export const removePendingTransactionAtom = atom<null, string, Promise<void>>(null, (get, set, transactionHash) =>
-    set(
-        pendingTransactionsAtom,
-        get(pendingTransactionsAtom).filter((t) => t.transactionHash === transactionHash)
-    )
-);
