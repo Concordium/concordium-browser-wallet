@@ -1,11 +1,12 @@
 import React, { useContext, useEffect } from 'react';
 import { useTranslation } from 'react-i18next';
 import { Link, Route, Routes, useNavigate } from 'react-router-dom';
-import { isBakerAccount, isDelegatorAccount } from '@concordium/web-sdk';
+import { AccountTransactionType, isBakerAccount, isDelegatorAccount } from '@concordium/web-sdk';
 
 import Button from '@popup/shared/Button';
 import { ensureDefined } from '@shared/utils/basic-helpers';
 import { useSelectedAccountInfo } from '@popup/shared/AccountInfoListenerContext/AccountInfoListenerContext';
+import { useHasPendingTransaction } from '@popup/shared/utils/transaction-helpers';
 import Delegate from './Delegate';
 import { accountPageContext } from '../utils';
 
@@ -46,6 +47,8 @@ export default function EarnRoutes() {
     const { setDetailsExpanded } = useContext(accountPageContext);
     const accountInfo = ensureDefined(useSelectedAccountInfo(), 'Expected to find account info for selected account');
     const nav = useNavigate();
+    const hasPendingDelegationTransaction = useHasPendingTransaction(AccountTransactionType.ConfigureDelegation);
+    const hasPendingBakerTransaction = useHasPendingTransaction(AccountTransactionType.ConfigureBaker);
 
     useEffect(() => {
         setDetailsExpanded(false);
@@ -53,9 +56,9 @@ export default function EarnRoutes() {
     }, []);
 
     useEffect(() => {
-        if (isDelegatorAccount(accountInfo)) {
+        if (isDelegatorAccount(accountInfo) || hasPendingDelegationTransaction) {
             nav(routes.delegate);
-        } else if (isBakerAccount(accountInfo)) {
+        } else if (isBakerAccount(accountInfo) || hasPendingBakerTransaction) {
             nav(routes.baking);
         }
     }, [accountInfo]);

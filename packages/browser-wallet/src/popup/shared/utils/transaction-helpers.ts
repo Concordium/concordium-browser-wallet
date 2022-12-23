@@ -13,6 +13,8 @@ import {
 import { fractionalToInteger, isValidCcdString } from 'wallet-common-helpers';
 
 import i18n from '@popup/shell/i18n';
+import { useAtomValue } from 'jotai';
+import { selectedPendingTransactionsAtom } from '@popup/store/transactions';
 import { BrowserWalletAccountTransaction, TransactionStatus } from './transaction-history-types';
 
 export function buildSimpleTransferPayload(recipient: string, amount: bigint): SimpleTransferPayload {
@@ -134,3 +136,7 @@ export const createPendingTransactionFromAccountTransaction = (
         toAddress
     );
 };
+
+export function useHasPendingTransaction(transactionType: AccountTransactionType): boolean {
+    return useAtomValue(selectedPendingTransactionsAtom).some((t) => t.type === transactionType);
+}
