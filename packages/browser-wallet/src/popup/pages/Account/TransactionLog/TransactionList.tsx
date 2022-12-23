@@ -275,7 +275,7 @@ export default function TransactionList({ onTransactionClick }: TransactionListP
 
     useEffect(() => {
         if (
-            !accountChanged &&
+            !accountChanged.current &&
             amount !== undefined &&
             accountInfo?.accountAmount !== undefined &&
             accountInfo?.accountAmount !== amount
