@@ -17,6 +17,7 @@ import Button from '@popup/shared/Button';
 import { selectedPendingTransactionsAtom } from '@popup/store/transactions';
 import LoadingIcon from '@assets/svg/pending-arrows.svg';
 import { BrowserWalletAccountTransaction, TransactionStatus } from '@popup/shared/utils/transaction-history-types';
+import ButtonGroup from '@popup/shared/ButtonGroup';
 import RegisterDelegation from './RegisterDelegation';
 
 const routes = {
@@ -53,6 +54,7 @@ function DelegationDetails({ accountInfo }: DelegationDetailsProps) {
     return (
         <div className="earn-details">
             <div>
+                <h3 className="m-t-0">{t('heading')}</h3>
                 <div className="label label--faded">{sharedT('amount')}</div>
                 <div className="text-mono">{displayAsCcd(accountInfo.accountDelegation.stakedAmount)}</div>
                 <div className="label label--faded m-t-10">{sharedT('target')}</div>
@@ -71,13 +73,11 @@ function DelegationDetails({ accountInfo }: DelegationDetailsProps) {
                 </div>
                 {/* TODO #delegation: display pending changes */}
             </div>
-            <div className="m-t-20 text-center">
-                <Button danger width="wide">
-                    {t('stopDelegation')}
-                </Button>
-                <Button className="m-t-10" width="wide">
-                    {t('updateDelegation')}
-                </Button>
+            <div className="m-20 m-b-0 text-center">
+                <ButtonGroup>
+                    <Button danger>{t('stopDelegation')}</Button>
+                    <Button>{t('updateDelegation')}</Button>
+                </ButtonGroup>
             </div>
         </div>
     );

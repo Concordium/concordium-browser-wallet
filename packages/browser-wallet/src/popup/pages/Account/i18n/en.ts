@@ -136,6 +136,7 @@ const t = {
             },
         },
         details: {
+            heading: 'Delegation status',
             amount: 'Delegation amount',
             target: 'Target',
             targetPassive: 'Passive delegation',
@@ -143,8 +144,8 @@ const t = {
             restake: 'Rewards will be',
             optionRestake: 'Added to delegation amount',
             optionNoRestake: 'Added to public balance',
-            updateDelegation: 'Update current delegation',
-            stopDelegation: 'Stop delegation',
+            updateDelegation: 'Update',
+            stopDelegation: 'Stop',
             pending: 'Waiting for transaction to finalize',
             failed: 'Transaction failed',
         },
