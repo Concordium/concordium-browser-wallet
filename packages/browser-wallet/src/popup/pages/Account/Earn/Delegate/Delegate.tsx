@@ -69,7 +69,7 @@ function DelegationDetails({ accountInfo }: DelegationDetailsProps) {
                         ? sharedT('redelegateOption')
                         : sharedT('noRedelegateOption')}
                 </div>
-                {/* TODO: display pending changes */}
+                {/* TODO #delegation: display pending changes */}
             </div>
             <div className="m-t-20 text-center">
                 <Button danger width="wide">

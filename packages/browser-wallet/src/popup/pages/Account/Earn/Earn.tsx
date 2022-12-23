@@ -26,7 +26,7 @@ function Earn() {
                 <p className="white-space-break">
                     <strong>{t('bakingHeader')}</strong>
                     <br />
-                    {t('bakingDescription', { minAmount: '14000' })} {/* TODO: get from chain parameters */}
+                    {t('bakingDescription', { minAmount: '14000' })} {/* TODO #delegation: get from chain parameters */}
                 </p>
                 <p className="white-space-break">
                     <strong>{t('delegateHeader')}</strong>
