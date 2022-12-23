@@ -1,5 +1,5 @@
 /* eslint-disable react/destructuring-assignment */
-import React, { useEffect } from 'react';
+import React, { useMemo } from 'react';
 import { Navigate, Route, Routes } from 'react-router-dom';
 import {
     AccountInfoDelegator,
@@ -7,14 +7,14 @@ import {
     DelegationTargetType,
     isDelegatorAccount,
 } from '@concordium/web-sdk';
-import { displayAsCcd, noOp } from 'wallet-common-helpers';
+import { displayAsCcd, useIsSubsequentRender } from 'wallet-common-helpers';
 import { useTranslation } from 'react-i18next';
-import { useAtomValue, useSetAtom } from 'jotai';
+import { useAtomValue } from 'jotai';
 
 import { useSelectedAccountInfo } from '@popup/shared/AccountInfoListenerContext/AccountInfoListenerContext';
 import { ensureDefined } from '@shared/utils/basic-helpers';
 import Button from '@popup/shared/Button';
-import { removePendingTransactionAtom, selectedPendingTransactionsAtom } from '@popup/store/transactions';
+import { selectedPendingTransactionsAtom } from '@popup/store/transactions';
 import LoadingIcon from '@assets/svg/pending-arrows.svg';
 import { BrowserWalletAccountTransaction, TransactionStatus } from '@popup/shared/utils/transaction-history-types';
 import RegisterDelegation from './RegisterDelegation';
@@ -31,24 +31,12 @@ type PendingDelegationProps = {
 
 function PendingDelegation({ transaction }: PendingDelegationProps): JSX.Element {
     const { t } = useTranslation('account', { keyPrefix: 'delegate.details' });
-    const removePendingTransaction = useSetAtom(removePendingTransactionAtom);
-
-    useEffect(() => {
-        if (transaction.status === TransactionStatus.Failed) {
-            return () => {
-                removePendingTransaction(transaction.transactionHash);
-            };
-        }
-
-        return noOp;
-    }, [transaction.status]);
 
     return (
         <div className="flex-column align-center justify-center h-full">
-            {transaction.status === TransactionStatus.Pending && <LoadingIcon className="loading" />}
+            {transaction.status !== TransactionStatus.Failed && <LoadingIcon className="loading" />}
             <h3 className="m-t-5 m-b-0 m-h-30 text-center">
-                {transaction.status === TransactionStatus.Pending && t('pending')}
-                {transaction.status === TransactionStatus.Failed && t('failed')}
+                {t(transaction.status === TransactionStatus.Failed ? 'failed' : 'pending')}
             </h3>
         </div>
     );
@@ -97,15 +85,23 @@ function DelegationDetails({ accountInfo }: DelegationDetailsProps) {
 
 export default function Delegate() {
     const accountInfo = ensureDefined(useSelectedAccountInfo(), 'Expected to find account info for selected account');
-    const delegateTransaction = [...useAtomValue(selectedPendingTransactionsAtom)]
+    const transaction = [...useAtomValue(selectedPendingTransactionsAtom)]
         .reverse()
         .find((t) => t.type === AccountTransactionType.ConfigureDelegation);
+    const isFirstRender = !useIsSubsequentRender();
+    const transactionStatusUpdate = useMemo(
+        () => (isFirstRender ? undefined : transaction?.status),
+        [transaction?.status]
+    );
 
     let details;
     if (isDelegatorAccount(accountInfo)) {
         details = <DelegationDetails accountInfo={accountInfo} />;
-    } else if (delegateTransaction !== undefined) {
-        details = <PendingDelegation transaction={delegateTransaction} />;
+    } else if (
+        transaction !== undefined &&
+        (transaction?.status === TransactionStatus.Pending || transactionStatusUpdate !== undefined)
+    ) {
+        details = <PendingDelegation transaction={transaction} />;
     }
 
     return (

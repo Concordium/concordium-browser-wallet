@@ -12,7 +12,7 @@ import { accountsAtom, selectedAccountAtom } from './account';
 import { atomWithChromeStorage } from './utils';
 import { networkConfigurationAtom } from './settings';
 
-const TRANSACTION_CHECK_INTERVAL = ACCOUNT_INFO_RETRIEVAL_INTERVAL_MS * 2;
+const TRANSACTION_CHECK_INTERVAL = ACCOUNT_INFO_RETRIEVAL_INTERVAL_MS;
 const TRANSACTION_MONITOR_START_DELAY = 3000;
 
 const monitoredMap: Record<string, string[]> = {};
@@ -56,18 +56,6 @@ const monitorTransactionStatus = (genesisHash: string) => {
     };
 };
 
-type AddTransactionAction = {
-    type: 'add';
-    transactions: BrowserWalletAccountTransaction[];
-};
-
-type RemoveTransactionAction = {
-    type: 'remove';
-    transactionHash: string;
-};
-
-type PendingTransactionsUpdate = AddTransactionAction | RemoveTransactionAction;
-
 const pendingTransactionsAtom = (() => {
     const baseAtom = atomWithChromeStorage<string[]>(ChromeStorageKey.PendingTransactions, []);
     const parsedAtom = atom<BrowserWalletAccountTransaction[], BrowserWalletAccountTransaction[], Promise<void>>(
@@ -78,22 +66,13 @@ const pendingTransactionsAtom = (() => {
         (_, set, update) => set(baseAtom, update.map(stringify))
     );
 
-    const derived = atom<BrowserWalletAccountTransaction[], PendingTransactionsUpdate, Promise<void>>(
+    const derived = atom<BrowserWalletAccountTransaction[], BrowserWalletAccountTransaction[], Promise<void>>(
         (get) => get(parsedAtom),
-        async (get, set, update) => {
-            if (update.type === 'remove') {
-                set(
-                    parsedAtom,
-                    get(parsedAtom).filter((t) => t.transactionHash !== update.transactionHash)
-                );
-
-                return;
-            }
-
+        async (get, set, transactions) => {
             const parsed = get(parsedAtom);
-            const pending = [...parsed, ...update.transactions];
+            const pending = [...parsed, ...transactions];
 
-            if (update.transactions.length > 0) {
+            if (transactions.length > 0) {
                 await set(parsedAtom, pending);
             }
 
@@ -140,7 +119,7 @@ const pendingTransactionsAtom = (() => {
 
     derived.onMount = (startMonitoring) => {
         // setAtom callback starts monitoring a list of transactions + pending transactions currently in store.
-        setTimeout(() => startMonitoring({ type: 'add', transactions: [] }), TRANSACTION_MONITOR_START_DELAY); // Give the base atom a little time to load stored value into memory.
+        setTimeout(() => startMonitoring([]), TRANSACTION_MONITOR_START_DELAY); // Give the base atom a little time to load stored value into memory.
     };
 
     return derived;
@@ -155,7 +134,7 @@ const pendingTransactionsFamily = atomFamily<
 >((address) =>
     atom(
         (get) => get(pendingTransactionsAtom).filter(isForAccount(address)),
-        (_, set, transactions) => set(pendingTransactionsAtom, { type: 'add', transactions })
+        (_, set, transactions) => set(pendingTransactionsAtom, transactions)
     )
 );
 
@@ -170,9 +149,5 @@ export const selectedPendingTransactionsAtom = atom<BrowserWalletAccountTransact
 
 export const addPendingTransactionAtom = atom<null, BrowserWalletAccountTransaction, Promise<void>>(
     null,
-    (_, set, transaction) => set(pendingTransactionsAtom, { type: 'add', transactions: [transaction] })
-);
-
-export const removePendingTransactionAtom = atom<null, string, Promise<void>>(null, (_, set, transactionHash) =>
-    set(pendingTransactionsAtom, { type: 'remove', transactionHash })
+    (_, set, transaction) => set(pendingTransactionsAtom, [transaction])
 );
