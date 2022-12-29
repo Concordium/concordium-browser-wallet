@@ -1,7 +1,7 @@
 /* eslint-disable no-console */
 /* eslint-disable no-alert */
 
-import React, { useEffect, useState, useRef, useCallback } from 'react';
+import React, { useEffect, useState, useRef } from 'react';
 import {
     toBuffer,
     deserializeReceiveReturnValue,
@@ -72,16 +72,17 @@ const InputFieldStyle = {
     padding: '10px 20px',
 };
 
-async function viewAdmin(rpcClient: JsonRpcClient, setAdmin: (x: string) => void) {
+async function viewAdmin(rpcClient: JsonRpcClient) {
     const res = await rpcClient.invokeContract({
         method: `${CONTRACT_NAME}.view`,
         contract: { index: WCCD_CONTRACT_INDEX, subindex: CONTRACT_SUB_INDEX },
         parameter: toBuffer(''),
     });
     if (!res || res.tag === 'failure' || !res.returnValue) {
-        throw new Error(`Expected successful invocation`);
+        throw new Error(
+            `RPC call 'invokeContract' on method '${CONTRACT_NAME}.view' of contract '${WCCD_CONTRACT_INDEX}' failed`
+        );
     }
-
     const returnValues = deserializeReceiveReturnValue(
         toBuffer(res.returnValue, 'hex'),
         toBuffer(VIEW_FUNCTION_RAW_SCHEMA, 'base64'),
@@ -89,15 +90,10 @@ async function viewAdmin(rpcClient: JsonRpcClient, setAdmin: (x: string) => void
         'view',
         2
     );
-
-    setAdmin(returnValues.admin.Account[0]);
+    return returnValues.admin.Account[0];
 }
 
-async function updateWCCDBalanceAccount(
-    rpcClient: JsonRpcClient,
-    account: string,
-    setAmountAccount: (x: bigint) => void
-) {
+async function updateWCCDBalanceAccount(rpcClient: JsonRpcClient, account: string) {
     const param = serializeUpdateContractParameters(
         CONTRACT_NAME,
         'balanceOf',
@@ -118,60 +114,74 @@ async function updateWCCDBalanceAccount(
         parameter: param,
     });
     if (!res || res.tag === 'failure' || !res.returnValue) {
-        throw new Error(`Expected successful invocation`);
+        throw new Error(
+            `RPC call 'invokeContract' on method '${CONTRACT_NAME}.balanceOf' of contract '${WCCD_CONTRACT_INDEX}' failed`
+        );
     }
-
     // The return value is an array. The value stored in the array starts at position 4 of the return value.
-    setAmountAccount(BigInt(leb.decodeULEB128(toBuffer(res.returnValue.slice(4), 'hex'))[0]));
+    return BigInt(leb.decodeULEB128(toBuffer(res.returnValue.slice(4), 'hex'))[0]);
 }
 
 export default function wCCD(props: WalletConnectionProps) {
-    const { activeConnectorType, activeConnector, activeConnection, setActiveConnection, activeConnectedAccount } =
-        props;
-    const [isWaitingForUser, setWaitingForUser] = useState<boolean>(false);
-    const connectWallet = useCallback(() => {
-        if (activeConnector) {
-            setWaitingForUser(true);
-            activeConnector
-                .connect()
-                .then((c) => {
-                    console.log('setting wallet connection', c);
-                    setActiveConnection(c);
-                })
-                .catch(console.error)
-                .finally(() => setWaitingForUser(false));
-        }
-    }, [activeConnector]);
-
+    const {
+        network,
+        activeConnectorType,
+        activeConnector,
+        isActiveConnectorWaitingForUser,
+        activeConnection,
+        activeConnectionGenesisHash,
+        activeConnectedAccount,
+        activeConnectorError,
+        connect,
+    } = props;
     const [admin, setAdmin] = useState<string>();
+    const [adminError, setAdminError] = useState('');
 
     useEffect(() => {
         // Update admin contract.
-        if (activeConnection) {
-            withJsonRpcClient(activeConnection, (rpcClient) => viewAdmin(rpcClient, setAdmin)).catch(console.error);
+        if (activeConnection && activeConnectedAccount) {
+            withJsonRpcClient(activeConnection, (rpcClient) => viewAdmin(rpcClient))
+                .then((a) => {
+                    setAdmin(a);
+                    setAdminError('');
+                })
+                .catch((e) => setAdminError((e as Error).message));
         }
-    }, [activeConnection]);
+    }, [activeConnection, activeConnectedAccount]);
 
-    const [isWrapping, setIsWrapping] = useState<boolean>(true);
-    const [hash, setHash] = useState<string>('');
-    const [error, setError] = useState<string>('');
-    const [isFlipped, setIsFlipped] = useState<boolean>(false);
+    const [isWrapping, setIsWrapping] = useState(true);
+    const [hash, setHash] = useState('');
+    const [transactionError, setTransactionError] = useState('');
+    const [isFlipped, setIsFlipped] = useState(false);
     const [amountAccount, setAmountAccount] = useState<bigint>();
+    const [amountAccountError, setAmountAccountError] = useState('');
     const inputValue = useRef<HTMLInputElement | null>(null);
 
     useEffect(() => {
         if (activeConnection && activeConnectedAccount) {
             withJsonRpcClient(activeConnection, (rpcClient) =>
-                updateWCCDBalanceAccount(rpcClient, activeConnectedAccount, setAmountAccount)
-            ).catch(console.error);
+                updateWCCDBalanceAccount(rpcClient, activeConnectedAccount)
+            )
+                .then((a) => {
+                    setAmountAccount(a);
+                    setAmountAccountError('');
+                })
+                .catch((e) => setAmountAccountError((e as Error).message));
         } else {
+            // No active connection or it doesn't have an associated account: Reset all transactions and RPC results.
             setAmountAccount(undefined);
+            setAmountAccountError('');
+            setAdmin(undefined);
+            setAdminError('');
+            setHash('');
+            setTransactionError('');
         }
     }, [activeConnection, activeConnectedAccount, isFlipped]);
 
+    const [isWaitingForTransaction, setWaitingForUser] = useState(false);
     return (
         <>
-            <h1 className="header">CCD &lt;-&gt; WCCD Smart Contract</h1>
+            <h1 className="header">CCD &#8644; wCCD Smart Contract</h1>
             <h3>Wrap and unwrap your CCDs and wCCDs on the Concordium Testnet</h3>
             <div style={blackCardStyle}>
                 <div>
@@ -193,16 +203,24 @@ export default function wCCD(props: WalletConnectionProps) {
                     />
                 </div>
                 <div>
-                    {!activeConnection && isWaitingForUser && (
-                        <button style={ButtonStyleDisabled} type="button" disabled>
-                            Waiting for user
-                        </button>
+                    {activeConnectorError && <p style={{ color: 'red' }}>Connector Error: {activeConnectorError}.</p>}
+                    {!activeConnectorError && !isWaitingForTransaction && activeConnectorType && !activeConnector && (
+                        <p>
+                            <i>Loading connector...</i>
+                        </p>
                     )}
-                    {!activeConnection && !isWaitingForUser && activeConnectorType && (
-                        <button style={ButtonStyle} type="button" onClick={connectWallet}>
-                            {activeConnectorType === 'BrowserWallet' && 'Connect Browser Wallet'}
-                            {activeConnectorType === 'WalletConnect' && 'Connect Mobile Wallet'}
-                        </button>
+                    {!activeConnection && !isWaitingForTransaction && activeConnectorType && activeConnector && (
+                        <p>
+                            <button style={ButtonStyle} type="button" onClick={connect}>
+                                {isActiveConnectorWaitingForUser && 'Connecting...'}
+                                {!isActiveConnectorWaitingForUser &&
+                                    activeConnectorType === 'BrowserWallet' &&
+                                    'Connect Browser Wallet'}
+                                {!isActiveConnectorWaitingForUser &&
+                                    activeConnectorType === 'WalletConnect' &&
+                                    'Connect Mobile Wallet'}
+                            </button>
+                        </p>
                     )}
                     {activeConnectedAccount && (
                         <>
@@ -222,8 +240,12 @@ export default function wCCD(props: WalletConnectionProps) {
                             </button>
                             <div className="text">wCCD Balance of connected account</div>
                             <div className="containerSpaceBetween">
+                                {amountAccountError && <div style={{ color: 'red' }}>{amountAccountError}.</div>}
                                 <div className="largeText">
-                                    {amountAccount === undefined ? <i>N/A</i> : Number(amountAccount) / 1000000}
+                                    {!amountAccountError && amountAccount === undefined && <i>N/A</i>}
+                                    {!amountAccountError &&
+                                        amountAccount !== undefined &&
+                                        Number(amountAccount) / 1000000}
                                 </div>
                                 <button
                                     className="buttonInvisible"
@@ -243,10 +265,11 @@ export default function wCCD(props: WalletConnectionProps) {
                             </div>
                         </>
                     )}
-                    {!activeConnectedAccount && (
-                        <div className="text">
-                            <i>Please connect a wallet.</i>
-                        </div>
+                    {activeConnectionGenesisHash && activeConnectionGenesisHash !== network.genesisHash && (
+                        <p style={{ color: 'red' }}>
+                            Unexpected genesis hash: Please ensure that your wallet is connected to network{' '}
+                            <code>{network.name}</code>.
+                        </p>
                     )}
                 </div>
                 <div className="containerSwitch">
@@ -276,9 +299,9 @@ export default function wCCD(props: WalletConnectionProps) {
                         placeholder="0.000000"
                         ref={inputValue}
                     />
-                    {isWaitingForUser || !activeConnection ? (
+                    {!activeConnection ? (
                         <button style={ButtonStyleDisabled} type="button" disabled>
-                            Waiting for user
+                            Waiting for connection...
                         </button>
                     ) : (
                         <button
@@ -302,7 +325,7 @@ export default function wCCD(props: WalletConnectionProps) {
 
                                 if (activeConnection && activeConnectedAccount) {
                                     setHash('');
-                                    setError('');
+                                    setTransactionError('');
                                     setWaitingForUser(true);
                                     const tx = (isWrapping ? wrap : unwrap)(
                                         activeConnection,
@@ -312,7 +335,7 @@ export default function wCCD(props: WalletConnectionProps) {
                                         amount
                                     );
                                     tx.then(setHash)
-                                        .catch((err) => setError((err as Error).message))
+                                        .catch((err) => setTransactionError((err as Error).message))
                                         .finally(() => setWaitingForUser(false));
                                 }
                             }}
@@ -321,62 +344,56 @@ export default function wCCD(props: WalletConnectionProps) {
                         </button>
                     )}
                 </label>
-                <br />
-                <br />
-                <div>Transaction status{hash === '' ? '' : ' (May take a moment to finalize)'}</div>
-                {hash === '' && error !== '' && <div style={{ color: 'red' }}>{error}</div>}
-                {hash === '' && error === '' && <div className="loadingText">Waiting for transaction...</div>}
-                {hash !== '' && (
+                {activeConnection && (
                     <>
-                        <button
-                            className="link"
-                            type="button"
-                            onClick={() => {
-                                window.open(
-                                    `https://testnet.ccdscan.io/?dcount=1&dentity=transaction&dhash=${hash}`,
-                                    '_blank',
-                                    'noopener,noreferrer'
-                                );
-                            }}
-                        >
-                            {' '}
-                            {hash}{' '}
-                        </button>
-                        <br />
+                        <p>
+                            <div>Transaction status{hash === '' ? '' : ' (May take a moment to finalize)'}</div>
+                            {!hash && transactionError && (
+                                <div style={{ color: 'red' }}>Error: {transactionError}.</div>
+                            )}
+                            {!hash && !transactionError && <div className="loadingText">None</div>}
+                            {hash && (
+                                <>
+                                    <button
+                                        className="link"
+                                        type="button"
+                                        onClick={() => {
+                                            window.open(
+                                                `https://testnet.ccdscan.io/?dcount=1&dentity=transaction&dhash=${hash}`,
+                                                '_blank',
+                                                'noopener,noreferrer'
+                                            );
+                                        }}
+                                    >
+                                        {hash}
+                                    </button>
+                                    <br />
+                                </>
+                            )}
+                        </p>
+                        <p>
+                            The admin of the wCCD smart contract instance is
+                            <br />
+                            {adminError && <div style={{ color: 'red' }}>{adminError}.</div>}
+                            {!adminError && admin === undefined && <div className="loadingText">Loading...</div>}
+                            {!adminError && admin !== undefined && (
+                                <button
+                                    className="link"
+                                    type="button"
+                                    onClick={() => {
+                                        window.open(
+                                            `https://testnet.ccdscan.io/?dcount=1&dentity=account&daddress=${admin}`,
+                                            '_blank',
+                                            'noopener,noreferrer'
+                                        );
+                                    }}
+                                >
+                                    {admin}
+                                </button>
+                            )}
+                        </p>
                     </>
                 )}
-                <br />
-                <div>
-                    The admin of the wCCD smart contract instance is
-                    <br />
-                    {admin === undefined ? (
-                        <div className="loadingText">Loading...</div>
-                    ) : (
-                        <button
-                            className="link"
-                            type="button"
-                            onClick={() => {
-                                window.open(
-                                    `https://testnet.ccdscan.io/?dcount=1&dentity=account&daddress=${admin}`,
-                                    '_blank',
-                                    'noopener,noreferrer'
-                                );
-                            }}
-                        >
-                            {' '}
-                            {admin}{' '}
-                        </button>
-                    )}
-                </div>
-                <br />
-                <a
-                    style={{ color: 'white' }}
-                    href="https://developer.concordium.software/en/mainnet/smart-contracts/tutorials/wCCD/index.html"
-                    target="_blank"
-                    rel="noreferrer"
-                >
-                    You can read more about how to make a wrapper like this here.
-                </a>
             </div>
         </>
     );
