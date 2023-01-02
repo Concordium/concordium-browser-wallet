@@ -57,17 +57,13 @@ export interface WalletConnectionDelegate {
 }
 
 export interface WalletConnector {
-    connect(): Promise<WalletConnection>;
+    connect(): Promise<WalletConnection | undefined>;
     getConnections(): Promise<WalletConnection[]>;
+    disconnect(): Promise<void>;
 }
 
 export async function withJsonRpcClient<T>(wc: WalletConnection, f: (c: JsonRpcClient) => Promise<T>) {
     return f(wc.getJsonRpcClient());
-}
-
-export async function destroy(connector: WalletConnector) {
-    const connections = await connector.getConnections();
-    return Promise.all(connections.map((c) => c.disconnect())).then((vs) => vs.length);
 }
 
 export async function connectedAccountOf(connection: WalletConnection | undefined) {

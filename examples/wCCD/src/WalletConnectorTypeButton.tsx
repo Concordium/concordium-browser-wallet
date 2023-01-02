@@ -2,7 +2,6 @@
 /* eslint-disable @typescript-eslint/no-explicit-any */
 
 import React from 'react';
-import { destroy } from './wallet/WalletConnection';
 import { WalletConnectionProps } from './wallet/WithWalletConnection';
 
 function connectorTypeStyle(baseStyle: any, isSelected: boolean, isConnected: boolean) {
@@ -51,7 +50,7 @@ export function WalletConnectionTypeButton(props: Props) {
             onClick={() => {
                 setWaitingForUser(false);
                 if (activeConnector) {
-                    destroy(activeConnector).catch(console.error);
+                    activeConnector.disconnect().catch(console.error);
                 }
                 if (activeConnectorType === connectorType) {
                     setActiveConnectorType(undefined);
