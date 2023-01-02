@@ -96,6 +96,11 @@ interface MainWalletApi {
      * Request that the user adds the specified tokens for a given contract to the wallet.
      * Returns which of the given tokens the user accepted to add the tokens into the wallet.
      * Note that this will throw an error if the dApp is not connected with the accountAddress.
+     * @param accountAddress the address of the account whose display the tokens should be added to.
+     * @param tokenIds the list of ids, for the tokens that should be added.
+     * @param contractIndex the index of the CIS-2 contract which the tokens are in.
+     * @param contractSubindex the subindex of the CIS-2 contract which the tokens are in.
+     * @returns a list containing the ids of the tokens that was added to the wallet.
      */
     addCIS2Tokens(
         accountAddress: string,

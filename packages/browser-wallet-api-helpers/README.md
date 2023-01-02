@@ -138,7 +138,7 @@ const signature = await provider.signMessage(
 
 ### Add CIS-2 Tokens
 
-It is possible to suggest CIS-2 tokens to be added to the connected account's display.
+It is possible to suggest CIS-2 tokens to be added to an account's display. This method returns a `Promise` resolving with a list containing the ids of the tokens that were added.
 
 If the wallet is locked, or you have not connected with the wallet (or previously been whitelisted) or if the user rejects signing the meesage, the `Promise` will reject.
 
