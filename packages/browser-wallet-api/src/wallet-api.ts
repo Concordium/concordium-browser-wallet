@@ -14,7 +14,12 @@ import {
     UpdateContractPayload,
 } from '@concordium/common-sdk/lib/types';
 import { JsonRpcClient } from '@concordium/common-sdk/lib/JsonRpcClient';
-import { WalletApi as IWalletApi, EventType } from '@concordium/browser-wallet-api-helpers';
+import {
+    WalletApi as IWalletApi,
+    EventType,
+    SchemaWithContext,
+    SchemaType,
+} from '@concordium/browser-wallet-api-helpers';
 import EventEmitter from 'events';
 import type { JsonRpcRequest } from '@concordium/common-sdk/lib/providers/provider';
 import JSONBig from 'json-bigint';
@@ -110,7 +115,7 @@ class WalletApi extends EventEmitter implements IWalletApi {
         type: AccountTransactionType,
         payload: AccountTransactionPayload,
         parameters?: Record<string, unknown>,
-        schema?: string,
+        schema?: string | SchemaWithContext,
         schemaVersion?: SchemaVersion
     ): Promise<string> {
         // This parsing is to temporarily support older versions of the web-SDK, which has different field names.
@@ -137,7 +142,15 @@ class WalletApi extends EventEmitter implements IWalletApi {
             };
             parsedPayload = deployPayload;
         }
-
+        let parsedSchema: SchemaWithContext | undefined;
+        if (typeof schema === 'string' || schema instanceof String) {
+            parsedSchema = {
+                type: SchemaType.Module,
+                value: schema,
+            };
+        } else {
+            parsedSchema = schema;
+        }
         const response = await this.messageHandler.sendMessage<MessageStatusWrapper<string>>(
             MessageType.SendTransaction,
             {
@@ -145,7 +158,7 @@ class WalletApi extends EventEmitter implements IWalletApi {
                 type,
                 payload: stringify(parsedPayload),
                 parameters,
-                schema,
+                schema: parsedSchema,
                 schemaVersion,
             }
         );

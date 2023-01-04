@@ -78,7 +78,6 @@ export default function Confirm() {
                     expiry,
                 }
             );
-
             if (response.status === BackgroundResponseStatus.Success) {
                 nav(absoluteRoutes.home.account.path);
             } else {
