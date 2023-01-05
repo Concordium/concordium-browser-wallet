@@ -8,8 +8,26 @@
         <meta charset="utf-8" />
         <script>
             let currentAccountAddress = '';
+            function getSchema(moduleSchema, parameterSchema) {
+                switch (schemaType.value) {
+                    case 'parameter':
+                        return {
+                            type: 'parameter',
+                            value: parameterSchema,
+                        };
+                    case 'module':
+                        return {
+                            type: 'module',
+                            value: moduleSchema,
+                        };
+                    default:
+                        return moduleSchema;
+                }
+            }
 
             async function setupPage() {
+                const twoStepTransferSchema =
+                    'AQAAABEAAAB0d28tc3RlcC10cmFuc2ZlcgEUAAIAAAALAAAAaW5pdF9wYXJhbXMUAAMAAAAPAAAAYWNjb3VudF9ob2xkZXJzEQALHAAAAHRyYW5zZmVyX2FncmVlbWVudF90aHJlc2hvbGQCFAAAAHRyYW5zZmVyX3JlcXVlc3RfdHRsDggAAAByZXF1ZXN0cxIBBRQABAAAAA8AAAB0cmFuc2Zlcl9hbW91bnQKDgAAAHRhcmdldF9hY2NvdW50CwwAAAB0aW1lc19vdXRfYXQNCgAAAHN1cHBvcnRlcnMRAgsBFAADAAAADwAAAGFjY291bnRfaG9sZGVycxEACxwAAAB0cmFuc2Zlcl9hZ3JlZW1lbnRfdGhyZXNob2xkAhQAAAB0cmFuc2Zlcl9yZXF1ZXN0X3R0bA4BAAAABwAAAHJlY2VpdmUVAgAAAA8AAABSZXF1ZXN0VHJhbnNmZXIBAwAAAAUKCw8AAABTdXBwb3J0VHJhbnNmZXIBAwAAAAUKCw==';
                 const provider = await concordiumHelpers.detectConcordiumProvider();
 
                 document.getElementById('connect').addEventListener('click', () => {
@@ -66,7 +84,10 @@
                             {
                                 RequestTransfer: ['1000', '1', '3Y1RLgi5pW3x96xZ7CiDiKsTL9huU92qn6mfxpebwmtkeku8ry'],
                             },
-                            'AQAAABEAAAB0d28tc3RlcC10cmFuc2ZlcgEUAAIAAAALAAAAaW5pdF9wYXJhbXMUAAMAAAAPAAAAYWNjb3VudF9ob2xkZXJzEQALHAAAAHRyYW5zZmVyX2FncmVlbWVudF90aHJlc2hvbGQCFAAAAHRyYW5zZmVyX3JlcXVlc3RfdHRsDggAAAByZXF1ZXN0cxIBBRQABAAAAA8AAAB0cmFuc2Zlcl9hbW91bnQKDgAAAHRhcmdldF9hY2NvdW50CwwAAAB0aW1lc19vdXRfYXQNCgAAAHN1cHBvcnRlcnMRAgsBFAADAAAADwAAAGFjY291bnRfaG9sZGVycxEACxwAAAB0cmFuc2Zlcl9hZ3JlZW1lbnRfdGhyZXNob2xkAhQAAAB0cmFuc2Zlcl9yZXF1ZXN0X3R0bA4BAAAABwAAAHJlY2VpdmUVAgAAAA8AAABSZXF1ZXN0VHJhbnNmZXIBAwAAAAUKCw8AAABTdXBwb3J0VHJhbnNmZXIBAwAAAAUKCw=='
+                            getSchema(
+                                twoStepTransferSchema,
+                                'FQIAAAAPAAAAUmVxdWVzdFRyYW5zZmVyAQMAAAAFCgsPAAAAU3VwcG9ydFRyYW5zZmVyAQMAAAAFCgs='
+                            )
                         )
                         .then(alert)
                         .catch(alert)
@@ -92,7 +113,10 @@
                                 transfer_agreement_threshold: 2,
                                 transfer_request_ttl: '1h',
                             },
-                            'AQAAABEAAAB0d28tc3RlcC10cmFuc2ZlcgEUAAIAAAALAAAAaW5pdF9wYXJhbXMUAAMAAAAPAAAAYWNjb3VudF9ob2xkZXJzEQALHAAAAHRyYW5zZmVyX2FncmVlbWVudF90aHJlc2hvbGQCFAAAAHRyYW5zZmVyX3JlcXVlc3RfdHRsDggAAAByZXF1ZXN0cxIBBRQABAAAAA8AAAB0cmFuc2Zlcl9hbW91bnQKDgAAAHRhcmdldF9hY2NvdW50CwwAAAB0aW1lc19vdXRfYXQNCgAAAHN1cHBvcnRlcnMRAgsBFAADAAAADwAAAGFjY291bnRfaG9sZGVycxEACxwAAAB0cmFuc2Zlcl9hZ3JlZW1lbnRfdGhyZXNob2xkAhQAAAB0cmFuc2Zlcl9yZXF1ZXN0X3R0bA4BAAAABwAAAHJlY2VpdmUVAgAAAA8AAABSZXF1ZXN0VHJhbnNmZXIBAwAAAAUKCw8AAABTdXBwb3J0VHJhbnNmZXIBAwAAAAUKCw=='
+                            getSchema(
+                                twoStepTransferSchema,
+                                'FAADAAAADwAAAGFjY291bnRfaG9sZGVycxEACxwAAAB0cmFuc2Zlcl9hZ3JlZW1lbnRfdGhyZXNob2xkAhQAAAB0cmFuc2Zlcl9yZXF1ZXN0X3R0bA4='
+                            )
                         )
                         .then(alert)
                         .catch(alert)
@@ -149,6 +173,11 @@
         <button id="sendTransfer">Send transfer</button>
         <button id="sendDeposit">deposit in two step transfer</button>
         <button id="sendReceive">Initiate Receive in two step transfer</button>
+        <select id="schemaType">
+            <option value="legacy">Legacy</option>
+            <option value="module">Module</option>
+            <option value="parameter">Parameter</option>
+        </select>
         <button id="idProof">Request an ID Proof</button>
         <br />
         Message: <input type="text" id="message" value="I believe in miracles" />

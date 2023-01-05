@@ -1,5 +1,11 @@
 # Changelog
 
+## 2.2.0
+
+### Added
+
+-   SendTransaction for smart contract transactions can receive schemas that are for the specific parameter. If the raw schema is given directly, it is assumed to be the schema of the module, like previously.
+
 ## 2.1.0
 
 ### Added

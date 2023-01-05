@@ -1,5 +1,11 @@
 # Changelog
 
+## 0.9.6
+
+### Added
+
+-   SendTransaction for smart contract transactions can receive schemas that are for the specific parameter.
+
 ## 0.9.5
 
 ### Fixed
