@@ -146,7 +146,7 @@ class WalletApi extends EventEmitter implements IWalletApi {
         if (typeof schema === 'string' || schema instanceof String) {
             parsedSchema = {
                 type: SchemaType.Module,
-                value: schema,
+                value: schema.toString(),
             };
         } else {
             parsedSchema = schema;
