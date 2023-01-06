@@ -24,6 +24,16 @@ export enum EventType {
     ChainChanged = 'chainChanged',
 }
 
+export enum SchemaType {
+    Module = 'module',
+    Parameter = 'parameter',
+}
+
+export type SchemaWithContext = {
+    type: SchemaType;
+    value: string;
+};
+
 // eslint-disable-next-line  @typescript-eslint/no-explicit-any
 type EventListener<Args extends any[]> = (...args: Args) => void;
 
@@ -55,7 +65,7 @@ interface MainWalletApi {
         type: AccountTransactionType.Update | AccountTransactionType.InitContract,
         payload: SendTransactionPayload,
         parameters: Record<string, unknown>,
-        schema: string,
+        schema: string | SchemaWithContext,
         schemaVersion?: SchemaVersion
     ): Promise<string>;
     /**

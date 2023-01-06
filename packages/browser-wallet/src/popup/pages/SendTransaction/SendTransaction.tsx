@@ -28,6 +28,7 @@ import {
 } from '@shared/utils/energy-helpers';
 import { calculateEnergyCost } from '@shared/utils/token-helpers';
 import { SmartContractParameters } from '@shared/utils/types';
+import { SchemaWithContext } from '@concordium/browser-wallet-api-helpers';
 import { parsePayload } from './util';
 
 interface Location {
@@ -37,7 +38,7 @@ interface Location {
             type: AccountTransactionType;
             payload: string;
             parameters?: SmartContractParameters;
-            schema?: string;
+            schema?: SchemaWithContext;
             schemaVersion?: SchemaVersion;
             url: string;
         };
