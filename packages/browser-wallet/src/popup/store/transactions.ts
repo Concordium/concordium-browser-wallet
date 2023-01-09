@@ -7,7 +7,8 @@ import { loop } from '@shared/utils/function-helpers';
 import { getTransactionStatus } from '@popup/shared/utils/wallet-proxy';
 import { ACCOUNT_INFO_RETRIEVAL_INTERVAL_MS } from '@popup/shared/account-info-listener';
 import { sessionPendingTransactions, useIndexedStorage } from '@shared/storage/access';
-import { selectedAccountAtom } from './account';
+import { accountInfoFamily } from '@popup/shared/AccountInfoListenerContext/AccountInfoListenerContext';
+import { accountsAtom, selectedAccountAtom } from './account';
 import { atomWithChromeStorage } from './utils';
 import { networkConfigurationAtom } from './settings';
 
@@ -80,7 +81,7 @@ const pendingTransactionsAtom = (() => {
 
             pending
                 .filter((p) => p.status === TransactionStatus.Pending)
-                .forEach(async ({ transactionHash }) => {
+                .forEach(async ({ transactionHash, toAddress, fromAddress }) => {
                     const result = await monitor(transactionHash);
                     const currentNetwork = get(networkConfigurationAtom);
 
@@ -96,6 +97,16 @@ const pendingTransactionsAtom = (() => {
                     if (!networkChanged) {
                         const next = get(parsedAtom).map(mapIfMatch);
                         await set(parsedAtom, next);
+
+                        const addresses = get(accountsAtom);
+
+                        const refreshAccountInfo = (address: string | undefined) =>
+                            address !== undefined && addresses.includes(address) && set(accountInfoFamily(address)); // Refresh account info for the selected account.
+
+                        refreshAccountInfo(fromAddress);
+                        if (result.status === TransactionStatus.Finalized) {
+                            refreshAccountInfo(toAddress);
+                        }
                     } else {
                         const spt = useIndexedStorage(sessionPendingTransactions, async () => network.genesisHash);
                         const next = (await spt.get())?.map(parse).map(mapIfMatch);

@@ -1,20 +1,68 @@
-import { AccountAddress, AccountInfo } from '@concordium/web-sdk';
-import { networkConfigurationAtom, jsonRpcClientAtom, cookieAtom } from '@popup/store/settings';
-import { useAtomValue, useSetAtom, useAtom } from 'jotai';
+import { useAtomValue, useSetAtom, useAtom, atom, WritableAtom } from 'jotai';
 import React, { createContext, ReactNode, useContext, useEffect, useMemo, useState } from 'react';
+import { AccountAddress, AccountInfo } from '@concordium/web-sdk';
+import { useTranslation } from 'react-i18next';
+import i18next from 'i18next';
+import { atomFamily } from 'jotai/utils';
+import { noOp, parse, stringify } from 'wallet-common-helpers';
+import { networkConfigurationAtom, jsonRpcClientAtom, cookieAtom } from '@popup/store/settings';
 import { atomWithChromeStorage } from '@popup/store/utils';
 import { ChromeStorageKey, CreationStatus, WalletCredential } from '@shared/storage/types';
-import { noOp, parse, stringify } from 'wallet-common-helpers';
 import { addToastAtom } from '@popup/state';
-import { useTranslation } from 'react-i18next';
 import { getGenesisHash, sessionAccountInfoCache, useIndexedStorage } from '@shared/storage/access';
 import { accountInfoCacheLock, updateRecord } from '@shared/storage/update';
 import { AccountInfoListener } from '../account-info-listener';
 
-export const accountInfoAtom = atomWithChromeStorage<Record<string, string>>(
-    ChromeStorageKey.AccountInfoCache,
-    {},
-    false
+const accountInfoBaseAtom = atomWithChromeStorage<Record<string, string>>(ChromeStorageKey.AccountInfoCache, {}, false);
+
+type RefreshAction = {
+    type: 'refresh';
+    address: string;
+};
+
+type AccountInfoAction = RefreshAction;
+
+export const accountInfoAtom = atom<Record<string, AccountInfo>, AccountInfoAction, Promise<void>>(
+    (get) =>
+        Object.entries(get(accountInfoBaseAtom)).reduce(
+            (acc, [address, info]) => ({
+                ...acc,
+                [address]: info === undefined ? undefined : parse(info),
+            }),
+            {}
+        ),
+    async (get, set, update) => {
+        const client = get(jsonRpcClientAtom);
+        const addToast = (v: string) => set(addToastAtom, v);
+
+        try {
+            const consensusStatus = await client.getConsensusStatus();
+            const newAccountInfo = await client.getAccountInfo(
+                new AccountAddress(update.address),
+                consensusStatus.lastFinalizedBlock
+            );
+
+            if (newAccountInfo) {
+                updateRecord(
+                    accountInfoCacheLock,
+                    useIndexedStorage(sessionAccountInfoCache, getGenesisHash),
+                    newAccountInfo.accountAddress,
+                    stringify(newAccountInfo)
+                );
+            }
+        } catch {
+            addToast(i18next.t('account.error'));
+        }
+    }
+);
+
+export const accountInfoFamily = atomFamily<string, WritableAtom<AccountInfo | undefined, void>>((address) =>
+    atom(
+        (get) => get(accountInfoAtom)[address],
+        (_, set) => {
+            set(accountInfoAtom, { type: 'refresh', address });
+        }
+    )
 );
 export const AccountInfoListenerContext = createContext<AccountInfoListener | undefined>(undefined);
 
@@ -56,42 +104,15 @@ export default function AccountInfoListenerContextProvider({ children }: Props) 
  */
 export function useAccountInfo(account: WalletCredential): AccountInfo | undefined {
     const accountInfoEmitter = useContext<AccountInfoListener | undefined>(AccountInfoListenerContext);
-    const accountInfoCache = useAtomValue(accountInfoAtom);
+    const [accountInfo, refreshAccountInfo] = useAtom(accountInfoFamily(account.address));
     const { genesisHash } = useAtomValue(networkConfigurationAtom);
     const address = useMemo(() => account.address, [account]);
-    const addToast = useSetAtom(addToastAtom);
-    const client = useAtomValue(jsonRpcClientAtom);
-    const { t } = useTranslation();
-    const [accountInfo, setAccountInfo] = useState<AccountInfo>();
 
     useEffect(() => {
-        setAccountInfo(undefined);
-    }, [genesisHash, address]);
-
-    useEffect(() => {
-        if (accountInfoCache[address]) {
-            setAccountInfo(parse(accountInfoCache[address]));
-        } else if (account.status === CreationStatus.Confirmed) {
-            client
-                .getConsensusStatus()
-                .then((consensusStatus) => {
-                    client
-                        .getAccountInfo(new AccountAddress(address), consensusStatus.lastFinalizedBlock)
-                        .then((newAccountInfo) => {
-                            if (newAccountInfo) {
-                                updateRecord(
-                                    accountInfoCacheLock,
-                                    useIndexedStorage(sessionAccountInfoCache, getGenesisHash),
-                                    newAccountInfo.accountAddress,
-                                    stringify(newAccountInfo)
-                                );
-                            }
-                        })
-                        .catch(() => addToast(t('account.error')));
-                })
-                .catch(() => addToast(t('account.error')));
+        if (!accountInfo && account.status === CreationStatus.Confirmed) {
+            refreshAccountInfo();
         }
-    }, [genesisHash, address, accountInfoCache[address], account.status]);
+    }, [genesisHash, accountInfo, account.status]);
 
     useEffect(() => {
         if (account.status === CreationStatus.Confirmed && accountInfoEmitter) {
