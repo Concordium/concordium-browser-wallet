@@ -1,4 +1,5 @@
-import { HttpProvider, JsonRpcClient, TransactionStatusEnum } from '@concordium/web-sdk';
+import { createConcordiumClient, TransactionStatusEnum } from '@concordium/web-sdk';
+import { GRPCTIMEOUT } from '@shared/constants/networkConfiguration';
 import { storedCurrentNetwork, storedCredentials, storedIdentities } from '@shared/storage/access';
 import {
     Identity,
@@ -26,8 +27,9 @@ const isCredEqualTo = (c1: PendingWalletCredential) => (c2: PendingWalletCredent
 const isMonitoringCred = (genesisHash: string, id: PendingWalletCredential): boolean =>
     monitoredCredentials[genesisHash]?.some(isCredEqualTo(id)) ?? false;
 
-async function monitorCredentialStatus(jsonRpcUrl: string, cred: PendingWalletCredential, genesisHash: string) {
-    const client = new JsonRpcClient(new HttpProvider(jsonRpcUrl, fetch));
+async function monitorCredentialStatus(initialNetwork: NetworkConfiguration, cred: PendingWalletCredential) {
+    const { genesisHash } = initialNetwork;
+    const client = createConcordiumClient(initialNetwork.grpcUrl, initialNetwork.grpcPort, GRPCTIMEOUT);
     if (isMonitoringCred(genesisHash, cred)) {
         return;
     }
@@ -48,7 +50,7 @@ async function monitorCredentialStatus(jsonRpcUrl: string, cred: PendingWalletCr
         }
 
         try {
-            const response = await client.getTransactionStatus(deploymentHash);
+            const response = await client.getBlockItemStatus(deploymentHash);
             // transaction has been discarded by the node.
             if (!response) {
                 await updateCredentials(
@@ -68,14 +70,11 @@ async function monitorCredentialStatus(jsonRpcUrl: string, cred: PendingWalletCr
                 return true;
             }
 
-            const isSuccessful = Object.values(response?.outcomes || {}).some(
-                (outcome) => outcome.result.outcome === 'success'
-            );
             await updateCredentials(
                 [
                     {
                         ...info,
-                        status: isSuccessful ? CreationStatus.Confirmed : CreationStatus.Rejected,
+                        status: CreationStatus.Confirmed,
                     },
                 ],
                 genesisHash
@@ -95,11 +94,7 @@ async function monitorCredentialStatus(jsonRpcUrl: string, cred: PendingWalletCr
 async function startMonitoringCredentialStatus(network: NetworkConfiguration) {
     const creds = await storedCredentials.get(network.genesisHash);
     if (creds) {
-        await Promise.all([
-            creds
-                .filter(isPendingCred)
-                .map((cred) => monitorCredentialStatus(network.jsonRpcUrl, cred, network.genesisHash)),
-        ]);
+        await Promise.all([creds.filter(isPendingCred).map((cred) => monitorCredentialStatus(network, cred))]);
     }
 }
 
@@ -180,6 +175,6 @@ export function confirmIdentity(identity: PendingIdentity, genesisHash: string) 
     monitorIdentityStatus(identity, genesisHash);
 }
 
-export function confirmCredential(credential: PendingWalletCredential, jsonRpcUrl: string, genesisHash: string) {
-    monitorCredentialStatus(jsonRpcUrl, credential, genesisHash);
+export function confirmCredential(credential: PendingWalletCredential, network: NetworkConfiguration) {
+    monitorCredentialStatus(network, credential);
 }

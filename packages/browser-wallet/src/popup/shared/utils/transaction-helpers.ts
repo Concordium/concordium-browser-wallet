@@ -5,7 +5,7 @@ import {
     buildBasicAccountSigner,
     getAccountTransactionHash,
     CcdAmount,
-    JsonRpcClient,
+    ConcordiumGRPCClient,
     signTransaction,
     SimpleTransferPayload,
     TransactionExpiry,
@@ -23,7 +23,7 @@ export function buildSimpleTransferPayload(recipient: string, amount: bigint): S
 }
 
 export async function sendTransaction(
-    client: JsonRpcClient,
+    client: ConcordiumGRPCClient,
     transaction: AccountTransaction,
     signingKey: string
 ): Promise<string> {

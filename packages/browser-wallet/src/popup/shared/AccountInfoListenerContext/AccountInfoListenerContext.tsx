@@ -5,7 +5,7 @@ import { useTranslation } from 'react-i18next';
 import i18next from 'i18next';
 import { atomFamily } from 'jotai/utils';
 import { noOp, parse, stringify } from 'wallet-common-helpers';
-import { networkConfigurationAtom, jsonRpcClientAtom, cookieAtom } from '@popup/store/settings';
+import { networkConfigurationAtom, grpcClientAtom, cookieAtom } from '@popup/store/settings';
 import { atomWithChromeStorage } from '@popup/store/utils';
 import { ChromeStorageKey, CreationStatus, WalletCredential } from '@shared/storage/types';
 import { addToastAtom } from '@popup/state';
@@ -32,7 +32,7 @@ export const accountInfoAtom = atom<Record<string, AccountInfo>, AccountInfoActi
             {}
         ),
     async (get, set, update) => {
-        const client = get(jsonRpcClientAtom);
+        const client = get(grpcClientAtom);
         const addToast = (v: string) => set(addToastAtom, v);
 
         try {

@@ -35,7 +35,7 @@ import {
     TokenIdentifier,
     trunctateSymbol,
 } from '@shared/utils/token-helpers';
-import { jsonRpcClientAtom } from '@popup/store/settings';
+import { grpcClientAtom } from '@popup/store/settings';
 import CcdIcon from '@assets/svg/concordium.svg';
 import { addToastAtom } from '@popup/state';
 import TokenBalance from '@popup/shared/TokenBalance';
@@ -96,7 +96,7 @@ function CreateTransaction({ exchangeRate, tokens, setCost, setDetailsExpanded, 
     const form = useForm<FormValues>({
         defaultValues: createDefaultValues(state as State, accountTokens),
     });
-    const client = useAtomValue(jsonRpcClientAtom);
+    const client = useAtomValue(grpcClientAtom);
     const chosenToken = form.watch('token');
     const recipient = form.watch('recipient');
     const tokenMetadata = useMemo(() => chosenToken?.metadata || CCD_METADATA, [chosenToken?.metadata]);

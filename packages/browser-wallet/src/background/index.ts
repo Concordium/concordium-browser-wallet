@@ -19,6 +19,7 @@ import JSONBig from 'json-bigint';
 import { ChromeStorageKey, NetworkConfiguration } from '@shared/storage/types';
 import { buildURLwithSearchParameters } from '@shared/utils/url-helpers';
 import { getTermsAndConditionsConfig } from '@shared/utils/network-helpers';
+import { mainnet, testnet } from '@shared/constants/networkConfiguration';
 import bgMessageHandler from './message-handler';
 import {
     forwardToPopup,
@@ -134,9 +135,16 @@ async function checkForNewTermsAndConditions() {
     }
 }
 
+async function migrateNetwork(network: NetworkConfiguration) {
+    if (network.genesisHash && (!network.grpcUrl || !network.grpcPort)) {
+        await storedCurrentNetwork.set(network.genesisHash === mainnet.genesisHash ? mainnet : testnet);
+    }
+}
+
 const startupHandler = async () => {
     const network = await storedCurrentNetwork.get();
     if (network) {
+        await migrateNetwork(network);
         await startMonitoringPendingStatus(network);
     }
     checkForNewTermsAndConditions();

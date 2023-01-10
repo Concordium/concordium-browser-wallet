@@ -3,7 +3,7 @@ import { useTranslation } from 'react-i18next';
 import { useSetAtom, useAtomValue } from 'jotai';
 import { selectedAccountAtom } from '@popup/store/account';
 import { AccountTransactionType, SimpleTransferPayload, UpdateContractPayload } from '@concordium/web-sdk';
-import { jsonRpcClientAtom } from '@popup/store/settings';
+import { grpcClientAtom } from '@popup/store/settings';
 import { addToastAtom } from '@popup/state';
 import { useLocation } from 'react-router-dom';
 import { useAsyncMemo } from 'wallet-common-helpers';
@@ -28,7 +28,7 @@ export default function ConfirmTokenTransfer({ setDetailsExpanded, cost }: Props
     const { state } = useLocation();
     const { toAddress, amount, contractIndex, tokenId, executionEnergy, metadata } = state as State;
     const selectedAddress = useAtomValue(selectedAccountAtom);
-    const client = useAtomValue(jsonRpcClientAtom);
+    const client = useAtomValue(grpcClientAtom);
     const addToast = useSetAtom(addToastAtom);
     const contractName = useAsyncMemo(() => fetchContractName(client, BigInt(contractIndex)), undefined, []);
 

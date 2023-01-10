@@ -10,7 +10,7 @@ import {
     getDefaultExpiry,
     createPendingTransactionFromAccountTransaction,
 } from '@popup/shared/utils/transaction-helpers';
-import { jsonRpcClientAtom } from '@popup/store/settings';
+import { grpcClientAtom } from '@popup/store/settings';
 import TransactionReceipt from '@popup/shared/TransactionReceipt/TransactionReceipt';
 import Button from '@popup/shared/Button';
 import { displayUrl } from '@popup/shared/utils/string-helpers';
@@ -53,7 +53,7 @@ export default function SendTransaction({ onSubmit, onReject }: Props) {
     const { state } = useLocation() as Location;
     const { t } = useTranslation('sendTransaction');
     const addToast = useSetAtom(addToastAtom);
-    const client = useAtomValue(jsonRpcClientAtom);
+    const client = useAtomValue(grpcClientAtom);
     const { withClose, onClose } = useContext(fullscreenPromptContext);
     const addPendingTransaction = useUpdateAtom(addPendingTransactionAtom);
 

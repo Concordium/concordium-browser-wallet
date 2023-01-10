@@ -3,9 +3,8 @@ import {
     ConcordiumHdWallet,
     createIdentityRecoveryRequest,
     CredentialRegistrationId,
-    HttpProvider,
     IdentityRecoveryRequestInput,
-    JsonRpcClient,
+    createConcordiumClient,
 } from '@concordium/web-sdk';
 import { InternalMessageType } from '@concordium/browser-wallet-message-hub';
 import { BackgroundResponseStatus, RecoveryBackgroundResponse } from '@shared/utils/types';
@@ -31,6 +30,7 @@ import { partition } from 'wallet-common-helpers';
 import { mnemonicToSeedSync } from '@scure/bip39';
 import { decrypt } from '@shared/utils/crypto';
 import { Buffer } from 'buffer/';
+import { GRPCTIMEOUT } from '@shared/constants/networkConfiguration';
 import { addCredential, addIdentity, updateCredentials } from './update';
 import bgMessageHandler from './message-handler';
 import { openWindow } from './window-management';
@@ -132,10 +132,8 @@ async function performRecovery() {
         const identities = await storedIdentities.get(network.genesisHash);
         const credentials = await storedCredentials.get(network.genesisHash);
 
-        const client = new JsonRpcClient(new HttpProvider(network.jsonRpcUrl, fetch));
-        const blockHash = (await client.getConsensusStatus()).lastFinalizedBlock;
-        const getAccountInfo = (credId: string) =>
-            client.getAccountInfo(new CredentialRegistrationId(credId), blockHash);
+        const client = createConcordiumClient(network.grpcUrl, network.grpcPort, GRPCTIMEOUT);
+        const getAccountInfo = (credId: string) => client.getAccountInfo(new CredentialRegistrationId(credId));
 
         let initialGap: number | undefined = status.identityGap || 0;
         let initialIndex: number | undefined = status.identityIndex || 0;
