@@ -109,9 +109,9 @@ function mapTypeToText(type: AccountTransactionType | RewardType | SpecialTransa
         case AccountTransactionType.DeployModule:
             return 'Module deployment';
         case AccountTransactionType.InitContract:
-            return 'Contract initiation';
+            return 'Contract initialization';
         case AccountTransactionType.Update:
-            return 'Update';
+            return 'Contract update';
         case AccountTransactionType.Transfer:
             return 'Transfer';
         case AccountTransactionType.AddBaker:
