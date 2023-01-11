@@ -165,6 +165,22 @@ const provider = await detectConcordiumProvider();
 await provider.addCIS2Tokens('2za2yAXbFiaB151oYqTteZfqiBzibHXizwjNbpdU8hodq9SfEk', ['AA', 'BB'], '1399', '0');
 ```
 
+### Prove ID statement
+
+It is possible to request a proof for a given ID statement on a specific account. The function takes 3 arguments. The statement to be proved, a challenge to ensure that the proof was not generated for a different context, and the account that should prove that statement.
+This method returns a `Promise` resolving with an object containing the proof and the credential id (field name: credential) of the credential used to prove the statement.
+
+If the wallet is locked, or you have not connected with the wallet (or previously been whitelisted) or if the user rejects proving the statement, the `Promise` will reject.
+
+The following exemplifies requesting a proof for a statement name myIdStatement (To see how to create a statement check out [our documentation](https://developer.concordium.software/en/mainnet/net/guides/create-proofs.html)) with a challenge of "12346789ABCD" id, for the account `2za2yAXbFiaB151oYqTteZfqiBzibHXizwjNbpdU8hodq9SfEk`.
+
+```typescript
+const statement = myIdStatement;
+const challenge = '12346789ABCD';
+const provider = await detectConcordiumProvider();
+await provider.requestIdProof('2za2yAXbFiaB151oYqTteZfqiBzibHXizwjNbpdU8hodq9SfEk', ['AA', 'BB'], '1399', '0');
+```
+
 ## Events
 
 ### Account changed
