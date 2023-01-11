@@ -184,16 +184,16 @@ class WalletApi extends EventEmitter implements IWalletApi {
         contractIndex: bigint,
         contractSubindex?: bigint
     ): Promise<string[]> {
-        const response = await this.messageHandler.sendMessage<string[] | null>(MessageType.AddTokens, {
+        const response = await this.messageHandler.sendMessage<MessageStatusWrapper<string[]>>(MessageType.AddTokens, {
             accountAddress,
             tokenIds,
             contractIndex: contractIndex.toString(),
             contractSubindex: contractSubindex?.toString(),
         });
-        if (response === null) {
-            throw new Error('Request rejected');
+        if (!response.success) {
+            throw new Error(response.message);
         }
-        return response;
+        return response.result;
     }
 
     public async requestIdProof(
