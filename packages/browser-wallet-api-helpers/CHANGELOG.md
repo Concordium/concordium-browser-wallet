@@ -1,5 +1,11 @@
 # Changelog
 
+## Unreleased
+
+### Added
+
+-   Added section for `requestIdProof` to README.
+
 ## 2.2.0
 
 ### Added
