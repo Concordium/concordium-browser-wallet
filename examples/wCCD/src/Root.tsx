@@ -1,11 +1,10 @@
 import React from 'react';
 import { SignClientTypes } from '@walletconnect/types';
+import { Network, WithWalletConnector } from '@concordium/react-components';
 import { version } from '../package.json';
 
 import WCCD from './wCCD';
-import { WithWalletConnection } from './wallet/WithWalletConnection';
 import { TESTNET, WALLET_CONNECT_PROJECT_ID } from './constants';
-import { Network } from './wallet/WalletConnection';
 
 const network: Network = TESTNET;
 const walletConnectOpts: SignClientTypes.Options = {
@@ -27,9 +26,9 @@ export default function Root() {
             <script src="../../node_modules/@concordium/web-sdk/lib/concordium.min.js" />
             <script src="../../packages/browser-wallet-api-helpers/lib/concordiumHelpers.min.js" />
             <main className="wccd">
-                <WithWalletConnection network={network} walletConnectOpts={walletConnectOpts}>
+                <WithWalletConnector network={network} walletConnectOpts={walletConnectOpts}>
                     {(props) => <WCCD {...props} />}
-                </WithWalletConnection>
+                </WithWalletConnector>
                 <div>
                     Version: {version} |{' '}
                     <a
