@@ -1,8 +1,8 @@
 /* eslint-disable no-console */
 /* eslint-disable @typescript-eslint/no-explicit-any */
 
-import React from 'react';
-import { WalletConnectionProps } from './wallet/WithWalletConnection';
+import React, { useCallback } from 'react';
+import { ConnectorType, useWalletConnectorSelector, WalletConnectionProps } from '@concordium/react-components';
 
 function connectorTypeStyle(baseStyle: any, isSelected: boolean, isConnected: boolean) {
     const style = { ...baseStyle, width: '50%' };
@@ -19,45 +19,24 @@ function connectorTypeStyle(baseStyle: any, isSelected: boolean, isConnected: bo
 interface Props extends WalletConnectionProps {
     buttonStyle: any;
     disabledButtonStyle: any;
-    connectorType: string;
+    connectorType: ConnectorType;
     connectorName: string;
     setWaitingForUser: (v: boolean) => void;
 }
 
 export function WalletConnectionTypeButton(props: Props) {
-    const {
-        buttonStyle,
-        disabledButtonStyle,
-        connectorType,
-        connectorName,
-        activeConnectorType,
-        activeConnector,
-        activeConnection,
-        setActiveConnectorType,
-        setWaitingForUser,
-    } = props;
-    const isConnected = Boolean(activeConnectorType === connectorType && activeConnection);
-    const disabled = Boolean(activeConnectorType && activeConnectorType !== connectorType && activeConnection);
+    const { buttonStyle, disabledButtonStyle, connectorType, connectorName, setWaitingForUser } = props;
+    const { isSelected, isConnected, isDisabled, select } = useWalletConnectorSelector(connectorType, props);
+    const onClick = useCallback(() => {
+        setWaitingForUser(false);
+        select();
+    }, [select]);
     return (
         <button
-            style={connectorTypeStyle(
-                disabled ? disabledButtonStyle : buttonStyle,
-                activeConnectorType === connectorType,
-                isConnected
-            )}
-            disabled={disabled}
+            style={connectorTypeStyle(isDisabled ? disabledButtonStyle : buttonStyle, isSelected, isConnected)}
+            disabled={isDisabled}
             type="button"
-            onClick={() => {
-                setWaitingForUser(false);
-                if (activeConnector) {
-                    activeConnector.disconnect().catch(console.error);
-                }
-                if (activeConnectorType === connectorType) {
-                    setActiveConnectorType(undefined);
-                } else {
-                    setActiveConnectorType(connectorType);
-                }
-            }}
+            onClick={onClick}
         >
             {isConnected ? `Disconnect ${connectorName}` : `Use ${connectorName}`}
         </button>
