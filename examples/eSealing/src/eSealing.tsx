@@ -79,16 +79,19 @@ async function viewFile(rpcClient: JsonRpcClient, fileHash: string) {
         fileHashByteArray,
         toBuffer(E_SEALING_RAW_SCHEMA, 'base64')
     );
+
     const res = await rpcClient.invokeContract({
         method: `${E_SEALING_CONTRACT_NAME}.getFile`,
         contract: { index: E_SEALING_CONTRACT_INDEX, subindex: CONTRACT_SUB_INDEX },
         parameter: param,
     });
+
     if (!res || res.tag === 'failure' || !res.returnValue) {
         throw new Error(
             `RPC call 'invokeContract' on method '${E_SEALING_CONTRACT_NAME}.view' of contract '${E_SEALING_CONTRACT_INDEX}' failed`
         );
     }
+
     const returnValues = deserializeReceiveReturnValue(
         toBuffer(res.returnValue, 'hex'),
         toBuffer(E_SEALING_RAW_SCHEMA, 'base64'),
@@ -96,11 +99,11 @@ async function viewFile(rpcClient: JsonRpcClient, fileHash: string) {
         'getFile',
         2
     );
-    console.log(`TODO: display values at front-end${returnValues}`);
+
     if (returnValues.Some !== undefined) {
         return returnValues.Some[0];
     }
-    return { timestamp: 'Not registered on-chain', witness: 'Not registered on-chain' };
+    return { timestamp: 'Not registered', witness: 'Not registered' };
 }
 
 export default function SEALING(props: WalletConnectionProps) {
@@ -116,13 +119,16 @@ export default function SEALING(props: WalletConnectionProps) {
         connect,
     } = props;
 
+    const [loading, setLoading] = useState('');
+
     const [getFileError, setGetFileError] = useState('');
     const [fileHash, setFileHash] = useState('');
     const [fileHashHex, setFileHashHex] = useState('');
 
     const [selectedFile, setSelectedFile] = useState<File>();
-    const [witness, setWitness] = useState('Loading');
-    const [timestamp, setTimestamp] = useState('Loading');
+
+    const [witness, setWitness] = useState('');
+    const [timestamp, setTimestamp] = useState('');
 
     const changeHandler = (event: ChangeEvent) => {
         const test = event.target as HTMLInputElement;
@@ -137,10 +143,7 @@ export default function SEALING(props: WalletConnectionProps) {
         if (activeConnection && activeConnectedAccount) {
             withJsonRpcClient(activeConnection, (rpcClient) => viewFile(rpcClient, fileHash))
                 .then((record) => {
-                    console.log(`TODO:${record}`);
-                    console.log(`TODO display this value somewhere:${getFileError}`);
-                    //   setAdmin(a);
-                    //  setAdminError('');
+                    setGetFileError('');
                     setTimestamp(record.timestamp);
                     setWitness(record.witness);
                 })
@@ -224,12 +227,24 @@ export default function SEALING(props: WalletConnectionProps) {
                                 disabled={activeConnectedAccount === undefined}
                                 onClick={() => {
                                     setIsRegisterFilePage(true);
+                                    setFileHash('');
+                                    setFileHashHex('');
+                                    setWitness('');
+                                    setTimestamp('');
+                                    setHash('');
                                 }}
                             >
                                 Register File Hash
                             </button>
                             <Switch
-                                onChange={() => setIsRegisterFilePage(!isRegisterFilePage)}
+                                onChange={() => {
+                                    setIsRegisterFilePage(!isRegisterFilePage);
+                                    setFileHash('');
+                                    setFileHashHex('');
+                                    setWitness('');
+                                    setTimestamp('');
+                                    setHash('');
+                                }}
                                 onColor="#979797"
                                 offColor="#979797"
                                 onHandleColor="#308274"
@@ -248,6 +263,11 @@ export default function SEALING(props: WalletConnectionProps) {
                                 disabled={activeConnectedAccount === undefined}
                                 onClick={() => {
                                     setIsRegisterFilePage(false);
+                                    setFileHash('');
+                                    setFileHashHex('');
+                                    setWitness('');
+                                    setTimestamp('');
+                                    setHash('');
                                 }}
                             >
                                 Display File Hash Record
@@ -279,12 +299,15 @@ export default function SEALING(props: WalletConnectionProps) {
                             type="button"
                             onClick={async () => {
                                 if (selectedFile !== undefined) {
+                                    setFileHashHex('');
+                                    setLoading('Loading');
                                     const arrayBuffer = await selectedFile.arrayBuffer();
                                     const byteArray = new Uint8Array(arrayBuffer as ArrayBuffer);
                                     const newFileHash = sha256(byteArray.toString(), { asBytes: true });
                                     const newFileHashHex = sha256(byteArray.toString());
                                     setFileHash(newFileHash.toString());
                                     setFileHashHex(newFileHashHex);
+                                    setLoading('');
                                 } else {
                                     alert('Choose a file before uploading');
                                 }
@@ -293,6 +316,7 @@ export default function SEALING(props: WalletConnectionProps) {
                             Upload File
                         </button>
                         <p style={{ marginBottom: 0 }}>File hash of uploaded file:</p>
+                        {loading === 'Loading' && <div className="loadingText">Loading...</div>}
                         {fileHashHex !== '' && <div className="loadingText">0x{fileHashHex}</div>}
                         <br />
                     </>
@@ -361,8 +385,9 @@ export default function SEALING(props: WalletConnectionProps) {
                             )}
                         </>
                     )}
-                    {!isRegisterFilePage && witness !== 'Loading' && (
+                    {!isRegisterFilePage && witness !== '' && (
                         <>
+                            {getFileError && <div style={{ color: 'red' }}>Error: {getFileError}.</div>}
                             <div>On-chain Record:</div>
                             <div className="loadingText">{witness} (witness)</div>
                             <div className="loadingText">{timestamp} (timestamp)</div>
