@@ -11,8 +11,7 @@ import {
 } from '@concordium/web-sdk';
 import { Buffer } from 'buffer/';
 import { parse } from '@concordium/browser-wallet-api/src/util';
-import { SmartContractParameters } from '@shared/utils/types';
-import { SchemaType, SchemaWithContext } from '@concordium/browser-wallet-api-helpers';
+import { SmartContractParameters, SchemaType, SchemaWithContext } from '@concordium/browser-wallet-api-helpers';
 
 export type HeadlessTransaction =
     | { type: AccountTransactionType.Update; payload: UpdateContractPayload }

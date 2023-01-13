@@ -27,7 +27,8 @@ import GenericTransactionReceipt, {
 } from '@popup/shared/TransactionReceipt';
 import { useUpdateAtom } from 'jotai/utils';
 import { addPendingTransactionAtom } from '@popup/store/transactions';
-import { Cis2TransferParameters, SmartContractParameters } from '@shared/utils/types';
+import { Cis2TransferParameters } from '@shared/utils/types';
+import { SmartContractParameters } from '@concordium/browser-wallet-api-helpers';
 import { TokenMetadata } from '@shared/storage/types';
 import { accountRoutes } from '../routes';
 

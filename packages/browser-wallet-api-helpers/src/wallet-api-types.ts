@@ -10,10 +10,17 @@ import type {
     IdProofOutput,
 } from '@concordium/web-sdk';
 
-type SendTransactionPayload =
+export type SendTransactionPayload =
     | Exclude<AccountTransactionPayload, UpdateContractPayload | InitContractPayload>
     | Omit<UpdateContractPayload, 'message'>
     | Omit<InitContractPayload, 'param'>;
+
+export type SmartContractParameters =
+    | { [key: string]: SmartContractParameters }
+    | SmartContractParameters[]
+    | number
+    | string
+    | boolean;
 
 /**
  * An enumeration of the events that can be emitted by the WalletApi.
@@ -64,7 +71,7 @@ interface MainWalletApi {
         accountAddress: string,
         type: AccountTransactionType.Update | AccountTransactionType.InitContract,
         payload: SendTransactionPayload,
-        parameters: Record<string, unknown>,
+        parameters: SmartContractParameters,
         schema: string | SchemaWithContext,
         schemaVersion?: SchemaVersion
     ): Promise<string>;

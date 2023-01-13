@@ -27,8 +27,7 @@ import {
     SIMPLE_TRANSFER_ENERGY_TOTAL_COST,
 } from '@shared/utils/energy-helpers';
 import { calculateEnergyCost } from '@shared/utils/token-helpers';
-import { SmartContractParameters } from '@shared/utils/types';
-import { SchemaWithContext } from '@concordium/browser-wallet-api-helpers';
+import { SmartContractParameters, SchemaWithContext } from '@concordium/browser-wallet-api-helpers';
 import { parsePayload } from './util';
 
 interface Location {

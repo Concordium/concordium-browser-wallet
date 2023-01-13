@@ -13,7 +13,8 @@ import {
     InitContractPayload,
     RegisterDataPayload,
 } from '@concordium/web-sdk';
-import { Cis2TransferParameters, SmartContractParameters } from '@shared/utils/types';
+import { Cis2TransferParameters } from '@shared/utils/types';
+import { SmartContractParameters } from '@concordium/browser-wallet-api-helpers';
 import { TokenMetadata } from '@shared/storage/types';
 import { getMetadataDecimals } from '@shared/utils/token-helpers';
 import DisplayCost from './DisplayCost';
