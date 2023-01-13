@@ -27,9 +27,8 @@ export async function register(
             receiveName: `${E_SEALING_CONTRACT_NAME}.registerFile`,
             maxContractExecutionEnergy: 30000n,
         } as UpdateContractPayload,
-        // eslint-disable-next-line @typescript-eslint/ban-ts-comment
-        // @ts-ignore
-        fileHashHex,
+        // eslint-disable-next-line @typescript-eslint/no-explicit-any
+        fileHashHex as any,
         E_SEALING_RAW_SCHEMA
     );
 }
