@@ -34,10 +34,10 @@ To build the docker image run the following command:
 docker build -t e_sealing_front_end:$PROJECT_VERSION .
 ```
 
-You can get the PROJECT_VERSION by running the following command:
+e.g.
 
 ```
-jq -r .version package.json
+docker build -t e_sealing_front_end:3.0.0 .
 ```
 
 To run the docker image run the following command:
@@ -46,4 +46,22 @@ To run the docker image run the following command:
 docker run -it -d -p 8080:80 --name web e_sealing_front_end:$PROJECT_VERSION
 ```
 
+e.g.
+
+```
+docker run -it -d -p 8080:80 --name web e_sealing_front_end:3.0.0
+```
+
 Open http://127.0.0.1:8080 in your browser.
+
+Note: You can get the PROJECT_VERSION from the `package.json` file or with one of the following commands:
+
+```
+npm pkg get version
+```
+
+or
+
+```
+jq -r .version package.json
+```
