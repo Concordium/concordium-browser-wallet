@@ -127,7 +127,7 @@ async function viewFile(rpcClient: JsonRpcClient, fileHashHex: string) {
     if (returnValues.Some !== undefined) {
         return returnValues.Some[0];
     }
-    return { timestamp: 'Not registered', witness: 'Not registered' };
+    return { timestamp: null, witness: null };
 }
 
 export default function SEALING(props: WalletConnectionProps) {
@@ -163,7 +163,7 @@ export default function SEALING(props: WalletConnectionProps) {
 
     useEffect(() => {
         // View file record.
-        if (activeConnection && activeConnectedAccount) {
+        if (activeConnection && activeConnectedAccount && fileHashHex !== '') {
             withJsonRpcClient(activeConnection, (rpcClient) => viewFile(rpcClient, fileHashHex))
                 .then((record) => {
                     setGetFileError('');
@@ -351,7 +351,7 @@ export default function SEALING(props: WalletConnectionProps) {
                         type="button"
                         disabled={fileHashHex === ''}
                         onClick={() => {
-                            if (witness !== 'Not registered') {
+                            if (witness !== null) {
                                 alert(
                                     `This file hash is already registered \n${witness} (withness) \n${timestamp} (timestamp)`
                                 );
@@ -405,12 +405,14 @@ export default function SEALING(props: WalletConnectionProps) {
                             )}
                         </>
                     )}
+                    {getFileError && <div style={{ color: 'red' }}>Error: {getFileError}.</div>}
                     {!isRegisterFilePage && witness !== '' && (
                         <>
-                            {getFileError && <div style={{ color: 'red' }}>Error: {getFileError}.</div>}
                             <div>On-chain Record:</div>
-                            <div className="loadingText">{witness} (witness)</div>
-                            <div className="loadingText">{timestamp} (timestamp)</div>
+                            <div className="loadingText">{witness === null ? 'Not registered' : witness} (witness)</div>
+                            <div className="loadingText">
+                                {timestamp === null ? 'Not registered' : timestamp} (timestamp)
+                            </div>
                         </>
                     )}
                 </p>
