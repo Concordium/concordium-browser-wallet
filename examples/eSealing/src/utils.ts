@@ -11,12 +11,10 @@ import { WalletConnection } from './wallet/WalletConnection';
 export async function register(
     connection: WalletConnection,
     account: string,
-    fileHash: string,
+    fileHashHex: string,
     index: bigint,
     subindex = 0n
 ) {
-    const fileHashByteArray = fileHash.split(',').map((s) => parseInt(s, 10));
-
     return connection.signAndSendTransaction(
         account,
         AccountTransactionType.Update,
@@ -31,7 +29,7 @@ export async function register(
         } as UpdateContractPayload,
         // eslint-disable-next-line @typescript-eslint/ban-ts-comment
         // @ts-ignore
-        fileHashByteArray,
+        fileHashHex,
         E_SEALING_RAW_SCHEMA
     );
 }

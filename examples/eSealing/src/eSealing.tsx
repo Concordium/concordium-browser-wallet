@@ -60,6 +60,32 @@ const ButtonStyleDisabled = {
     fontSize: '14px',
 };
 
+const ButtonStyleSelected = {
+    color: 'white',
+    borderRadius: 10,
+    margin: '7px 0px 7px 0px',
+    padding: '10px',
+    width: '100%',
+    border: '0px solid',
+    backgroundColor: '#174039',
+    cursor: 'pointer',
+    fontWeight: 300,
+    fontSize: '14px',
+};
+
+const ButtonStyleNotSelected = {
+    color: 'white',
+    borderRadius: 10,
+    margin: '7px 0px 7px 0px',
+    padding: '10px',
+    width: '100%',
+    border: '0px solid',
+    backgroundColor: '#308274',
+    cursor: 'pointer',
+    fontWeight: 300,
+    fontSize: '14px',
+};
+
 const InputFieldStyle = {
     backgroundColor: '#181817',
     color: 'white',
@@ -70,13 +96,11 @@ const InputFieldStyle = {
     padding: '10px 20px',
 };
 
-async function viewFile(rpcClient: JsonRpcClient, fileHash: string) {
-    const fileHashByteArray = fileHash.split(',').map((s) => parseInt(s, 10));
-
+async function viewFile(rpcClient: JsonRpcClient, fileHashHex: string) {
     const param = serializeUpdateContractParameters(
         E_SEALING_CONTRACT_NAME,
         'getFile',
-        fileHashByteArray,
+        fileHashHex,
         toBuffer(E_SEALING_RAW_SCHEMA, 'base64')
     );
 
@@ -119,10 +143,9 @@ export default function SEALING(props: WalletConnectionProps) {
         connect,
     } = props;
 
-    const [loading, setLoading] = useState('');
+    const [isLoading, setLoading] = useState<boolean>(false);
 
     const [getFileError, setGetFileError] = useState('');
-    const [fileHash, setFileHash] = useState('');
     const [fileHashHex, setFileHashHex] = useState('');
 
     const [selectedFile, setSelectedFile] = useState<File>();
@@ -141,19 +164,25 @@ export default function SEALING(props: WalletConnectionProps) {
     useEffect(() => {
         // View file record.
         if (activeConnection && activeConnectedAccount) {
-            withJsonRpcClient(activeConnection, (rpcClient) => viewFile(rpcClient, fileHash))
+            withJsonRpcClient(activeConnection, (rpcClient) => viewFile(rpcClient, fileHashHex))
                 .then((record) => {
                     setGetFileError('');
                     setTimestamp(record.timestamp);
                     setWitness(record.witness);
                 })
-                .catch((e) => setGetFileError((e as Error).message));
+                .catch((e) => {
+                    setGetFileError((e as Error).message);
+                    setTimestamp('');
+                    setWitness('');
+                });
         }
-    }, [activeConnection, activeConnectedAccount, fileHash]);
+    }, [activeConnection, activeConnectedAccount, fileHashHex]);
 
     const [isRegisterFilePage, setIsRegisterFilePage] = useState(true);
     const [hash, setHash] = useState('');
     const [transactionError, setTransactionError] = useState('');
+    const [loadingError, setLoadingError] = useState('');
+
     const file = useRef<HTMLInputElement | null>(null);
 
     const [isWaitingForTransaction, setWaitingForUser] = useState(false);
@@ -218,59 +247,46 @@ export default function SEALING(props: WalletConnectionProps) {
                         <br />
                         <div className="containerSpaceBetween">
                             <button
-                                style={
-                                    activeConnectedAccount === undefined || isRegisterFilePage === false
-                                        ? ButtonStyleDisabled
-                                        : ButtonStyle
-                                }
+                                style={!isRegisterFilePage ? ButtonStyleNotSelected : ButtonStyleSelected}
                                 type="button"
-                                disabled={activeConnectedAccount === undefined}
                                 onClick={() => {
                                     setIsRegisterFilePage(true);
-                                    setFileHash('');
                                     setFileHashHex('');
                                     setWitness('');
                                     setTimestamp('');
                                     setHash('');
                                 }}
                             >
-                                Register File Hash
+                                Registration Tab
                             </button>
                             <Switch
                                 onChange={() => {
                                     setIsRegisterFilePage(!isRegisterFilePage);
-                                    setFileHash('');
                                     setFileHashHex('');
                                     setWitness('');
                                     setTimestamp('');
                                     setHash('');
                                 }}
-                                onColor="#979797"
-                                offColor="#979797"
-                                onHandleColor="#308274"
-                                offHandleColor="#308274"
+                                onColor="#308274"
+                                offColor="#308274"
+                                onHandleColor="#174039"
+                                offHandleColor="#174039"
                                 checked={!isRegisterFilePage}
                                 checkedIcon={false}
                                 uncheckedIcon={false}
                             />
                             <button
-                                style={
-                                    activeConnectedAccount === undefined || isRegisterFilePage === true
-                                        ? ButtonStyleDisabled
-                                        : ButtonStyle
-                                }
+                                style={isRegisterFilePage ? ButtonStyleNotSelected : ButtonStyleSelected}
                                 type="button"
-                                disabled={activeConnectedAccount === undefined}
                                 onClick={() => {
                                     setIsRegisterFilePage(false);
-                                    setFileHash('');
                                     setFileHashHex('');
                                     setWitness('');
                                     setTimestamp('');
                                     setHash('');
                                 }}
                             >
-                                Display File Hash Record
+                                Display Tab
                             </button>
                         </div>
                     </>
@@ -286,7 +302,7 @@ export default function SEALING(props: WalletConnectionProps) {
             <label>
                 {activeConnectedAccount !== undefined && (
                     <>
-                        <p style={{ marginBottom: 0 }}>Upload a file:</p>
+                        <p style={{ marginBottom: 0 }}>Select a file:</p>
                         <input
                             className="input"
                             style={InputFieldStyle}
@@ -298,25 +314,28 @@ export default function SEALING(props: WalletConnectionProps) {
                             style={ButtonStyle}
                             type="button"
                             onClick={async () => {
-                                if (selectedFile !== undefined) {
-                                    setFileHashHex('');
-                                    setLoading('Loading');
-                                    const arrayBuffer = await selectedFile.arrayBuffer();
-                                    const byteArray = new Uint8Array(arrayBuffer as ArrayBuffer);
-                                    const newFileHash = sha256(byteArray.toString(), { asBytes: true });
-                                    const newFileHashHex = sha256(byteArray.toString());
-                                    setFileHash(newFileHash.toString());
-                                    setFileHashHex(newFileHashHex);
-                                    setLoading('');
-                                } else {
-                                    alert('Choose a file before uploading');
+                                try {
+                                    if (selectedFile !== undefined) {
+                                        setFileHashHex('');
+                                        setLoading(true);
+                                        const arrayBuffer = await selectedFile.arrayBuffer();
+                                        const byteArray = new Uint8Array(arrayBuffer as ArrayBuffer);
+                                        const newFileHashHex = sha256(byteArray.toString());
+                                        setFileHashHex(newFileHashHex);
+                                        setLoading(false);
+                                    } else {
+                                        alert('Choose a file to compute the file hash');
+                                    }
+                                } catch (err) {
+                                    console.error(setLoadingError((err as Error).message));
                                 }
                             }}
                         >
-                            Upload File
+                            Compute File Hash
                         </button>
-                        <p style={{ marginBottom: 0 }}>File hash of uploaded file:</p>
-                        {loading === 'Loading' && <div className="loadingText">Loading...</div>}
+                        <p style={{ marginBottom: 0 }}>File hash of selected file:</p>
+                        {loadingError && <div style={{ color: 'red' }}>Error: {loadingError}.</div>}
+                        {isLoading && <div className="loadingText">Loading...</div>}
                         {fileHashHex !== '' && <div className="loadingText">0x{fileHashHex}</div>}
                         <br />
                     </>
@@ -326,23 +345,24 @@ export default function SEALING(props: WalletConnectionProps) {
                         Waiting for connection...
                     </button>
                 )}
-
-                {activeConnection && isRegisterFilePage && (
+                {activeConnection && isRegisterFilePage && activeConnectedAccount && (
                     <button
-                        style={
-                            activeConnectedAccount === undefined || fileHash === '' ? ButtonStyleDisabled : ButtonStyle
-                        }
+                        style={fileHashHex === '' ? ButtonStyleDisabled : ButtonStyle}
                         type="button"
-                        disabled={activeConnectedAccount === undefined || fileHash === ''}
+                        disabled={fileHashHex === ''}
                         onClick={() => {
-                            if (activeConnection && activeConnectedAccount) {
+                            if (witness !== 'Not registered') {
+                                alert(
+                                    `This file hash is already registered \n${witness} (withness) \n${timestamp} (timestamp)`
+                                );
+                            } else {
                                 setHash('');
                                 setTransactionError('');
                                 setWaitingForUser(true);
                                 const tx = (isRegisterFilePage ? register : register)(
                                     activeConnection,
                                     activeConnectedAccount,
-                                    fileHash,
+                                    fileHashHex,
                                     E_SEALING_CONTRACT_INDEX,
                                     CONTRACT_SUB_INDEX
                                 );
@@ -356,7 +376,7 @@ export default function SEALING(props: WalletConnectionProps) {
                     </button>
                 )}
             </label>
-            {activeConnection && (
+            {activeConnection && activeConnectedAccount && (
                 <p>
                     {isRegisterFilePage && (
                         <>
