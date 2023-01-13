@@ -1,5 +1,15 @@
 # Changelog
 
+## Unreleased
+
+### Added
+
+-   Added section for `requestIdProof` to README.
+
+### Fixed
+
+-   Type for smart contract parameters in sendTransaction.
+
 ## 2.2.0
 
 ### Added

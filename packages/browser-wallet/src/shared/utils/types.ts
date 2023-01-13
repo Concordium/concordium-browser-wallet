@@ -56,13 +56,6 @@ export type RecoveryBackgroundResponse =
           reason: string;
       };
 
-export type SmartContractParameters =
-    | { [key: string]: SmartContractParameters }
-    | SmartContractParameters[]
-    | number
-    | string
-    | boolean;
-
 export type Cis2TransferParametersAccount = {
     Account: [string];
 };

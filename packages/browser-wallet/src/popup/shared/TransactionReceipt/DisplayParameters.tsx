@@ -1,6 +1,6 @@
 import React from 'react';
 import { useTranslation } from 'react-i18next';
-import { SmartContractParameters } from '@shared/utils/types';
+import { SmartContractParameters } from '@concordium/browser-wallet-api-helpers';
 
 type Props = {
     parameters?: SmartContractParameters;

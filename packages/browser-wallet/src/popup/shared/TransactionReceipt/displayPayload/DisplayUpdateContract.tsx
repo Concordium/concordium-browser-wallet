@@ -2,7 +2,7 @@ import React from 'react';
 import { useTranslation } from 'react-i18next';
 import { UpdateContractPayload } from '@concordium/web-sdk';
 import { displayAsCcd } from 'wallet-common-helpers/lib/utils/ccd';
-import { SmartContractParameters } from '@shared/utils/types';
+import { SmartContractParameters } from '@concordium/browser-wallet-api-helpers';
 import DisplayParameters from '../DisplayParameters';
 
 interface Props {

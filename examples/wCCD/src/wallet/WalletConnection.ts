@@ -1,3 +1,4 @@
+import { SmartContractParameters } from '@concordium/browser-wallet-api-helpers';
 import {
     AccountTransactionPayload,
     AccountTransactionSignature,
@@ -26,7 +27,7 @@ export interface WalletConnection {
         accountAddress: string,
         type: AccountTransactionType.Update | AccountTransactionType.InitContract,
         payload: SendTransactionPayload,
-        parameters: Record<string, unknown>,
+        parameters: SmartContractParameters,
         schema: string,
         schemaVersion?: SchemaVersion
     ): Promise<string>;

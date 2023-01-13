@@ -11,7 +11,7 @@ import {
 import { MetadataUrl, NetworkConfiguration, TokenMetadata, TokenIdAndMetadata } from '@shared/storage/types';
 import { CIS2_SCHEMA_CONTRACT_NAME, CIS2_SCHEMA } from '@popup/constants/schema';
 import i18n from '@popup/shell/i18n';
-import { SmartContractParameters } from './types';
+import { SmartContractParameters } from '@concordium/browser-wallet-api-helpers';
 import { isMainnet } from './network-helpers';
 import { determineUpdatePayloadSize } from './energy-helpers';
 
