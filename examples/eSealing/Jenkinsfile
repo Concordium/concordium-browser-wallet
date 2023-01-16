@@ -4,7 +4,7 @@
 pipeline {
     agent any
     environment {
-        image_repo = "concordium/dapp-eSealing"
+        image_repo = "concordium/dapp-esealing"
         image_name = "${image_repo}:${image_tag}"
     }
     stages {
