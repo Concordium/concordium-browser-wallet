@@ -1,4 +1,3 @@
-/* eslint-disable no-console */
 /* eslint-disable no-alert */
 
 import React, { useEffect, useState, useRef, ChangeEvent } from 'react';
@@ -143,7 +142,7 @@ export default function SEALING(props: WalletConnectionProps) {
         connect,
     } = props;
 
-    const [isLoading, setLoading] = useState<boolean>(false);
+    const [isLoading, setLoading] = useState(false);
 
     const [getFileError, setGetFileError] = useState('');
     const [fileHashHex, setFileHashHex] = useState('');
@@ -327,7 +326,7 @@ export default function SEALING(props: WalletConnectionProps) {
                                         alert('Choose a file to compute the file hash');
                                     }
                                 } catch (err) {
-                                    console.error(setLoadingError((err as Error).message));
+                                    setLoadingError((err as Error).message);
                                 }
                             }}
                         >
@@ -422,11 +421,11 @@ export default function SEALING(props: WalletConnectionProps) {
                 Version: {version} |{' '}
                 <a
                     style={{ color: 'white' }}
-                    href="https://developer.concordium.software/en/mainnet/smart-contracts/tutorials/wCCD/index.html"
+                    href="https://developer.concordium.software/en/mainnet/smart-contracts/tutorials/eSealing/index.html"
                     target="_blank"
                     rel="noreferrer"
                 >
-                    Learn how to make a wrapper like this
+                    Learn more about the eSealing service here
                 </a>
                 <br />
             </div>

@@ -1,5 +1,4 @@
 /* @typescript-eslint/ban-ts-comment */
-
 import { createContext } from 'react';
 import { AccountTransactionType, UpdateContractPayload, CcdAmount } from '@concordium/web-sdk';
 import { E_SEALING_CONTRACT_NAME, E_SEALING_RAW_SCHEMA } from './constants';
@@ -27,8 +26,9 @@ export async function register(
             receiveName: `${E_SEALING_CONTRACT_NAME}.registerFile`,
             maxContractExecutionEnergy: 30000n,
         } as UpdateContractPayload,
-        // eslint-disable-next-line @typescript-eslint/no-explicit-any
-        fileHashHex as any,
+        // eslint-disable-next-line @typescript-eslint/ban-ts-comment
+        // @ts-ignore
+        fileHashHex,
         E_SEALING_RAW_SCHEMA
     );
 }
