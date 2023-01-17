@@ -1,4 +1,4 @@
-import { detectConcordiumProvider, WalletApi } from '@concordium/browser-wallet-api-helpers';
+import { detectConcordiumProvider, SmartContractParameters, WalletApi } from '@concordium/browser-wallet-api-helpers';
 import {
     AccountTransactionPayload,
     AccountTransactionSignature,
@@ -81,7 +81,7 @@ export class BrowserWalletConnector implements WalletConnector, WalletConnection
         accountAddress: string,
         type: AccountTransactionType,
         payload: AccountTransactionPayload,
-        parameters?: Record<string, unknown>,
+        parameters?: SmartContractParameters,
         schema?: string,
         schemaVersion?: SchemaVersion
     ): Promise<string> {
