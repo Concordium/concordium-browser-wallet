@@ -1892,7 +1892,7 @@ __metadata:
   languageName: node
   linkType: hard
 
-"@concordium/browser-wallet-api-helpers@^2.0.0, @concordium/browser-wallet-api-helpers@^2.1.0, @concordium/browser-wallet-api-helpers@workspace:^, @concordium/browser-wallet-api-helpers@workspace:packages/browser-wallet-api-helpers":
+"@concordium/browser-wallet-api-helpers@^2.0.0, @concordium/browser-wallet-api-helpers@workspace:^, @concordium/browser-wallet-api-helpers@workspace:packages/browser-wallet-api-helpers":
   version: 0.0.0-use.local
   resolution: "@concordium/browser-wallet-api-helpers@workspace:packages/browser-wallet-api-helpers"
   dependencies:
@@ -5765,7 +5765,7 @@ __metadata:
   languageName: node
   linkType: hard
 
-"@walletconnect/sign-client@npm:^2.1.1, @walletconnect/sign-client@npm:^2.1.4":
+"@walletconnect/sign-client@npm:^2.1.4":
   version: 2.2.1
   resolution: "@walletconnect/sign-client@npm:2.2.1"
   dependencies:
@@ -5793,7 +5793,7 @@ __metadata:
   languageName: node
   linkType: hard
 
-"@walletconnect/types@npm:2.2.1":
+"@walletconnect/types@npm:2.2.1, @walletconnect/types@npm:^2.1.4":
   version: 2.2.1
   resolution: "@walletconnect/types@npm:2.2.1"
   dependencies:
@@ -9628,7 +9628,7 @@ __metadata:
   version: 0.0.0-use.local
   resolution: "e_sealing@workspace:examples/eSealing"
   dependencies:
-    "@concordium/browser-wallet-api-helpers": ^2.1.0
+    "@concordium/react-components": ^0.1.0
     "@concordium/web-sdk": ^3.2.0
     "@craftamap/esbuild-plugin-html": ^0.4.0
     "@thi.ng/leb128": ^2.1.18
@@ -9636,9 +9636,7 @@ __metadata:
     "@types/react": ^18.0.9
     "@types/react-dom": ^18.0.5
     "@types/sha256": ^0.2.0
-    "@walletconnect/qrcode-modal": ^1.8.0
-    "@walletconnect/sign-client": ^2.1.1
-    "@walletconnect/types": ^2.1.2
+    "@walletconnect/types": ^2.1.4
     cross-env: ^7.0.3
     esbuild: ^0.14.42
     esbuild-plugin-svgr: ^1.0.1

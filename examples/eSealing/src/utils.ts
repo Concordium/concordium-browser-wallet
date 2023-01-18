@@ -1,8 +1,8 @@
 /* @typescript-eslint/ban-ts-comment */
 import { createContext } from 'react';
-import { AccountTransactionType, UpdateContractPayload, CcdAmount } from '@concordium/web-sdk';
+import { AccountTransactionType, CcdAmount, UpdateContractPayload } from '@concordium/web-sdk';
+import { WalletConnection } from '@concordium/react-components';
 import { E_SEALING_CONTRACT_NAME, E_SEALING_RAW_SCHEMA } from './constants';
-import { WalletConnection } from './wallet/WalletConnection';
 
 /**
  * Action for registering a new file has in the eSealing smart contract instance

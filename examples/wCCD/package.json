@@ -7,7 +7,7 @@
         "@concordium/react-components": "^0.1.0",
         "@concordium/web-sdk": "^3.2.0",
         "@thi.ng/leb128": "^2.1.18",
-        "@walletconnect/types": "^2.1.2",
+        "@walletconnect/types": "^2.1.4",
         "mathjs": "^11.4.0",
         "react": "^18.1.0",
         "react-dom": "^18.1.0"

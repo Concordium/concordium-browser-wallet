@@ -9,6 +9,7 @@ import {
     JsonRpcClient,
 } from '@concordium/web-sdk';
 import sha256 from 'sha256';
+import { withJsonRpcClient, WalletConnectionProps } from '@concordium/react-components';
 import { version } from '../package.json';
 
 import { register } from './utils';
@@ -19,8 +20,6 @@ import {
     CONTRACT_SUB_INDEX,
 } from './constants';
 
-import { withJsonRpcClient } from './wallet/WalletConnection';
-import { WalletConnectionProps } from './wallet/WithWalletConnection';
 import { WalletConnectionTypeButton } from './WalletConnectorTypeButton';
 
 const blackCardStyle = {
@@ -134,12 +133,12 @@ export default function SEALING(props: WalletConnectionProps) {
         network,
         activeConnectorType,
         activeConnector,
-        isActiveConnectorWaitingForUser,
+        isConnecting,
         activeConnection,
         activeConnectionGenesisHash,
         activeConnectedAccount,
         activeConnectorError,
-        connect,
+        connectActive,
     } = props;
 
     const [isLoading, setLoading] = useState(false);
@@ -215,14 +214,10 @@ export default function SEALING(props: WalletConnectionProps) {
                 )}
                 {!activeConnection && !isWaitingForTransaction && activeConnectorType && activeConnector && (
                     <p>
-                        <button style={ButtonStyle} type="button" onClick={connect}>
-                            {isActiveConnectorWaitingForUser && 'Connecting...'}
-                            {!isActiveConnectorWaitingForUser &&
-                                activeConnectorType === 'BrowserWallet' &&
-                                'Connect Browser Wallet'}
-                            {!isActiveConnectorWaitingForUser &&
-                                activeConnectorType === 'WalletConnect' &&
-                                'Connect Mobile Wallet'}
+                        <button style={ButtonStyle} type="button" onClick={connectActive}>
+                            {isConnecting && 'Connecting...'}
+                            {!isConnecting && activeConnectorType === 'BrowserWallet' && 'Connect Browser Wallet'}
+                            {!isConnecting && activeConnectorType === 'WalletConnect' && 'Connect Mobile Wallet'}
                         </button>
                     </p>
                 )}
