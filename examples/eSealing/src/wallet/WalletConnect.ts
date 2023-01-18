@@ -17,6 +17,7 @@ import {
     toBuffer,
     UpdateContractPayload,
 } from '@concordium/web-sdk';
+import { SmartContractParameters } from '@concordium/browser-wallet-api-helpers';
 import { WalletConnectionDelegate, Network, WalletConnection, WalletConnector } from './WalletConnection';
 
 const WALLET_CONNECT_SESSION_NAMESPACE = 'ccd';
@@ -87,7 +88,7 @@ function accountTransactionPayloadToJson(data: AccountTransactionPayload) {
 function encodePayloadParameters(
     type: AccountTransactionType,
     payload: AccountTransactionPayload,
-    parameters?: Record<string, unknown>,
+    parameters?: SmartContractParameters,
     schema?: string,
     schemaVersion?: SchemaVersion
 ) {
@@ -190,7 +191,7 @@ export class WalletConnectConnection implements WalletConnection {
         accountAddress: string,
         type: AccountTransactionType,
         payload: AccountTransactionPayload,
-        parameters?: Record<string, unknown>,
+        parameters?: SmartContractParameters,
         schema?: string,
         schemaVersion?: SchemaVersion
     ) {
