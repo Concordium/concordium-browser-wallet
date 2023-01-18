@@ -1,5 +1,13 @@
 # Changelog
 
+## Unreleased
+
+### Fixed
+
+-   Init contract transaction now displays as "Contract initialization".
+-   Update contract transaction now displays as "Contract update".
+-   `addCIS2Tokens` now returns the list of added tokens without an internal wrapper.
+
 ## 0.9.6
 
 ### Added
