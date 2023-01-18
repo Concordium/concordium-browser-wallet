@@ -5814,20 +5814,6 @@ __metadata:
   languageName: node
   linkType: hard
 
-"@walletconnect/types@npm:^2.1.2":
-  version: 2.1.4
-  resolution: "@walletconnect/types@npm:2.1.4"
-  dependencies:
-    "@walletconnect/events": ^1.0.1
-    "@walletconnect/heartbeat": ^1.0.1
-    "@walletconnect/jsonrpc-types": ^1.0.2
-    "@walletconnect/keyvaluestorage": ^1.0.2
-    "@walletconnect/logger": ^2.0.1
-    events: ^3.3.0
-  checksum: 7bc351753ec7e4be1622bc7e570fd29289e67d37aed9748978a677e4ba181559d4dc920b49da972585717eb6afbb296fcf45caeef7a63992105e28ecc1756454
-  languageName: node
-  linkType: hard
-
 "@walletconnect/utils@npm:2.2.1":
   version: 2.2.1
   resolution: "@walletconnect/utils@npm:2.2.1"
@@ -21059,7 +21045,7 @@ __metadata:
     "@types/node": ^18.7.23
     "@types/react": ^18.0.9
     "@types/react-dom": ^18.0.5
-    "@walletconnect/types": ^2.1.2
+    "@walletconnect/types": ^2.1.4
     cross-env: ^7.0.3
     esbuild: ^0.14.42
     esbuild-plugin-svgr: ^1.0.1
