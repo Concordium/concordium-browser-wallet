@@ -10,6 +10,10 @@ on:
     # Allows us to run the workflow manually from the Actions tab
     workflow_dispatch:
 
+env:
+    dummy: 1 # change to force cache invalidation
+    node_version: 14.16.0
+
 jobs:
     dependencies:
         runs-on: ubuntu-20.04
@@ -23,12 +27,12 @@ jobs:
               with:
                   path: |
                       **/node_modules
-                  key: ${{ runner.os }}-v3-${{ hashFiles('**/yarn.lock') }}
+                  key: ${{ runner.os }}-${{ env.dummy }}-${{ hashFiles('**/package.json', '**/yarn.lock') }}
 
             - uses: actions/setup-node@v2
               if: steps.fetch-dependencies.outputs.cache-hit != 'true'
               with:
-                  node-version: '14.16.0'
+                  node-version: '${{ env.node_version }}'
 
             - name: Download dependencies
               if: steps.fetch-dependencies.outputs.cache-hit != 'true'
@@ -42,14 +46,14 @@ jobs:
             - uses: actions/checkout@v2
             - uses: actions/setup-node@v2
               with:
-                  node-version: '14.16.0'
+                  node-version: '${{ env.node_version }}'
 
             - name: Get cached dependencies
               uses: actions/cache@v2
               with:
                   path: |
                       **/node_modules
-                  key: ${{ runner.os }}-v3-${{ hashFiles('**/yarn.lock') }}
+                  key: ${{ runner.os }}-${{ env.dummy }}-${{ hashFiles('**/package.json', '**/yarn.lock') }}
 
             - name: Build
               run: yarn build:all
@@ -65,14 +69,14 @@ jobs:
             - uses: actions/checkout@v2
             - uses: actions/setup-node@v2
               with:
-                  node-version: '14.16.0'
+                  node-version: '${{ env.node_version }}'
 
             - name: Get cached dependencies
               uses: actions/cache@v2
               with:
                   path: |
                       **/node_modules
-                  key: ${{ runner.os }}-v3-${{ hashFiles('**/yarn.lock') }}
+                  key: ${{ runner.os }}-${{ env.dummy }}-${{ hashFiles('**/package.json', '**/yarn.lock') }}
 
             - name: Lint
               run: yarn lint
@@ -85,14 +89,14 @@ jobs:
             - uses: actions/checkout@v2
             - uses: actions/setup-node@v2
               with:
-                  node-version: '14.16.0'
+                  node-version: '${{ env.node_version }}'
 
             - name: Get cached dependencies
               uses: actions/cache@v2
               with:
                   path: |
                       **/node_modules
-                  key: ${{ runner.os }}-v3-${{ hashFiles('**/yarn.lock') }}
+                  key: ${{ runner.os }}-${{ env.dummy }}-${{ hashFiles('**/package.json', '**/yarn.lock') }}
 
             - name: Test
               run: yarn test
