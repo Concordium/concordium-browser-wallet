@@ -11,6 +11,7 @@ import {
 import * as leb from '@thi.ng/leb128';
 import { multiply, round } from 'mathjs';
 
+import { withJsonRpcClient, WalletConnectionProps } from '@concordium/react-components';
 import { wrap, unwrap } from './utils';
 import {
     WCCD_CONTRACT_INDEX,
@@ -22,8 +23,6 @@ import {
 
 import ArrowIcon from './assets/Arrow.svg';
 import RefreshIcon from './assets/Refresh.svg';
-import { withJsonRpcClient } from './wallet/WalletConnection';
-import { WalletConnectionProps } from './wallet/WithWalletConnection';
 import { WalletConnectionTypeButton } from './WalletConnectorTypeButton';
 
 const blackCardStyle = {
@@ -127,12 +126,12 @@ export default function wCCD(props: WalletConnectionProps) {
         network,
         activeConnectorType,
         activeConnector,
-        isActiveConnectorWaitingForUser,
+        isConnecting,
         activeConnection,
         activeConnectionGenesisHash,
         activeConnectedAccount,
         activeConnectorError,
-        connect,
+        connectActive,
     } = props;
     const [admin, setAdmin] = useState<string>();
     const [adminError, setAdminError] = useState('');
@@ -219,14 +218,10 @@ export default function wCCD(props: WalletConnectionProps) {
                     )}
                     {!activeConnection && !isWaitingForTransaction && activeConnectorType && activeConnector && (
                         <p>
-                            <button style={ButtonStyle} type="button" onClick={connect}>
-                                {isActiveConnectorWaitingForUser && 'Connecting...'}
-                                {!isActiveConnectorWaitingForUser &&
-                                    activeConnectorType === 'BrowserWallet' &&
-                                    'Connect Browser Wallet'}
-                                {!isActiveConnectorWaitingForUser &&
-                                    activeConnectorType === 'WalletConnect' &&
-                                    'Connect Mobile Wallet'}
+                            <button style={ButtonStyle} type="button" onClick={connectActive}>
+                                {isConnecting && 'Connecting...'}
+                                {!isConnecting && activeConnectorType === 'BrowserWallet' && 'Connect Browser Wallet'}
+                                {!isConnecting && activeConnectorType === 'WalletConnect' && 'Connect Mobile Wallet'}
                             </button>
                         </p>
                     )}

@@ -1,7 +1,7 @@
 import { createContext } from 'react';
 import { AccountTransactionType, UpdateContractPayload, CcdAmount } from '@concordium/web-sdk';
+import { WalletConnection } from '@concordium/react-components';
 import { CONTRACT_NAME, WRAP_FUNCTION_RAW_SCHEMA, UNWRAP_FUNCTION_RAW_SCHEMA } from './constants';
-import { WalletConnection } from './wallet/WalletConnection';
 
 /**
  * Action for wrapping some CCD to WCCD in the WCCD smart contract instance
