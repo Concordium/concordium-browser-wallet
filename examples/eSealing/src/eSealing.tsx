@@ -293,9 +293,9 @@ export default function SEALING(props: WalletConnectionProps) {
                 )}
             </div>
 
-            <label>
-                {activeConnectedAccount !== undefined && (
-                    <>
+            {activeConnectedAccount !== undefined && (
+                <>
+                    <label>
                         <p style={{ marginBottom: 0 }}>Select a file:</p>
                         <input
                             className="input"
@@ -304,72 +304,73 @@ export default function SEALING(props: WalletConnectionProps) {
                             onChange={changeHandler}
                             ref={file}
                         />
-                        <button
-                            style={ButtonStyle}
-                            type="button"
-                            onClick={async () => {
-                                try {
-                                    if (selectedFile !== undefined) {
-                                        setFileHashHex('');
-                                        setLoading(true);
-                                        const arrayBuffer = await selectedFile.arrayBuffer();
-                                        const byteArray = new Uint8Array(arrayBuffer as ArrayBuffer);
-                                        const newFileHashHex = sha256(byteArray.toString());
-                                        setFileHashHex(newFileHashHex);
-                                        setLoading(false);
-                                    } else {
-                                        alert('Choose a file to compute the file hash');
-                                    }
-                                } catch (err) {
-                                    setLoadingError((err as Error).message);
-                                }
-                            }}
-                        >
-                            Compute File Hash
-                        </button>
-                        <p style={{ marginBottom: 0 }}>File hash of selected file:</p>
-                        {loadingError && <div style={{ color: 'red' }}>Error: {loadingError}.</div>}
-                        {isLoading && <div className="loadingText">Loading...</div>}
-                        {fileHashHex !== '' && <div className="loadingText">0x{fileHashHex}</div>}
-                        <br />
-                    </>
-                )}
-                {!activeConnection && (
-                    <button style={ButtonStyleDisabled} type="button" disabled>
-                        Waiting for connection...
-                    </button>
-                )}
-                {activeConnection && isRegisterFilePage && activeConnectedAccount && (
+                    </label>
                     <button
-                        style={fileHashHex === '' ? ButtonStyleDisabled : ButtonStyle}
+                        style={ButtonStyle}
                         type="button"
-                        disabled={fileHashHex === ''}
-                        onClick={() => {
-                            if (witness !== null) {
-                                alert(
-                                    `This file hash is already registered \n${witness} (withness) \n${timestamp} (timestamp)`
-                                );
-                            } else {
-                                setHash('');
-                                setTransactionError('');
-                                setWaitingForUser(true);
-                                const tx = (isRegisterFilePage ? register : register)(
-                                    activeConnection,
-                                    activeConnectedAccount,
-                                    fileHashHex,
-                                    E_SEALING_CONTRACT_INDEX,
-                                    CONTRACT_SUB_INDEX
-                                );
-                                tx.then(setHash)
-                                    .catch((err) => setTransactionError((err as Error).message))
-                                    .finally(() => setWaitingForUser(false));
+                        onClick={async () => {
+                            try {
+                                if (selectedFile !== undefined) {
+                                    setFileHashHex('');
+                                    setLoading(true);
+                                    const arrayBuffer = await selectedFile.arrayBuffer();
+                                    const byteArray = new Uint8Array(arrayBuffer as ArrayBuffer);
+                                    const newFileHashHex = sha256(byteArray.toString());
+                                    setFileHashHex(newFileHashHex);
+                                    setLoadingError('');
+                                    setLoading(false);
+                                } else {
+                                    alert('Choose a file to compute the file hash');
+                                }
+                            } catch (err) {
+                                setLoadingError((err as Error).message);
                             }
                         }}
                     >
-                        Register File Hash
+                        Compute File Hash
                     </button>
-                )}
-            </label>
+                    <p style={{ marginBottom: 0 }}>File hash of selected file:</p>
+                    {loadingError && <div style={{ color: 'red' }}>Error: {loadingError}.</div>}
+                    {isLoading && <div className="loadingText">Loading...</div>}
+                    {fileHashHex !== '' && <div className="loadingText">0x{fileHashHex}</div>}
+                    <br />
+                </>
+            )}
+            {!activeConnection && (
+                <button style={ButtonStyleDisabled} type="button" disabled>
+                    Waiting for connection...
+                </button>
+            )}
+            {activeConnection && isRegisterFilePage && activeConnectedAccount && (
+                <button
+                    style={fileHashHex === '' ? ButtonStyleDisabled : ButtonStyle}
+                    type="button"
+                    disabled={fileHashHex === ''}
+                    onClick={() => {
+                        if (witness !== null) {
+                            alert(
+                                `This file hash is already registered \n${witness} (withness) \n${timestamp} (timestamp)`
+                            );
+                        } else {
+                            setHash('');
+                            setTransactionError('');
+                            setWaitingForUser(true);
+                            const tx = (isRegisterFilePage ? register : register)(
+                                activeConnection,
+                                activeConnectedAccount,
+                                fileHashHex,
+                                E_SEALING_CONTRACT_INDEX,
+                                CONTRACT_SUB_INDEX
+                            );
+                            tx.then(setHash)
+                                .catch((err) => setTransactionError((err as Error).message))
+                                .finally(() => setWaitingForUser(false));
+                        }
+                    }}
+                >
+                    Register File Hash
+                </button>
+            )}
             {activeConnection && activeConnectedAccount && (
                 <p>
                     {isRegisterFilePage && (
