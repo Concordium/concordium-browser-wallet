@@ -1,5 +1,10 @@
 // The TESTNET_GENESIS_BLOCK_HASH is used to check that the user has its browser wallet connected to testnet and not to mainnet.
-import { Network } from '@concordium/react-components';
+import {
+    ephemeralConnectorType,
+    BrowserWalletConnector,
+    Network,
+    WalletConnectConnector,
+} from '@concordium/react-components';
 
 export const TESTNET_GENESIS_BLOCK_HASH = '4221332d34e1694168c2a0c0b3fd0f273809612cb13d000d5c2e00e85f50f796';
 
@@ -26,9 +31,22 @@ export const BALANCEOF_FUNCTION_RAW_SCHEMA =
     '//8CAQAAAAkAAABjaXMyX3dDQ0QBABQAAgAAAAMAAAB1cmwWAgQAAABoYXNoFQIAAAAEAAAATm9uZQIEAAAAU29tZQEBAAAAEyAAAAACAQAAAAkAAABiYWxhbmNlT2YGEAEUAAIAAAAIAAAAdG9rZW5faWQdAAcAAABhZGRyZXNzFQIAAAAHAAAAQWNjb3VudAEBAAAACwgAAABDb250cmFjdAEBAAAADBABGyUAAAAVBAAAAA4AAABJbnZhbGlkVG9rZW5JZAIRAAAASW5zdWZmaWNpZW50RnVuZHMCDAAAAFVuYXV0aG9yaXplZAIGAAAAQ3VzdG9tAQEAAAAVCQAAAAsAAABQYXJzZVBhcmFtcwIHAAAATG9nRnVsbAIMAAAATG9nTWFsZm9ybWVkAg4AAABDb250cmFjdFBhdXNlZAITAAAASW52b2tlQ29udHJhY3RFcnJvcgITAAAASW52b2tlVHJhbnNmZXJFcnJvcgIaAAAARmFpbGVkVXBncmFkZU1pc3NpbmdNb2R1bGUCHAAAAEZhaWxlZFVwZ3JhZGVNaXNzaW5nQ29udHJhY3QCJQAAAEZhaWxlZFVwZ3JhZGVVbnN1cHBvcnRlZE1vZHVsZVZlcnNpb24C';
 
 export const WALLET_CONNECT_PROJECT_ID = '76324905a70fe5c388bab46d3e0564dc';
+const WALLET_CONNECT_OPTS = {
+    projectId: WALLET_CONNECT_PROJECT_ID,
+    metadata: {
+        name: 'wCCD',
+        description: 'Example dApp for the wCCD token.',
+        url: '#',
+        icons: ['https://walletconnect.com/walletconnect-logo.png'],
+    },
+};
 export const TESTNET: Network = {
     name: 'testnet',
     genesisHash: TESTNET_GENESIS_BLOCK_HASH,
     jsonRpcUrl: 'https://json-rpc.testnet.concordium.com',
     ccdScanBaseUrl: 'https://testnet.ccdscan.io',
 };
+export const BROWSER_WALLET = ephemeralConnectorType(BrowserWalletConnector.create);
+export const WALLET_CONNECT = ephemeralConnectorType(
+    WalletConnectConnector.create.bind(undefined, WALLET_CONNECT_OPTS)
+);

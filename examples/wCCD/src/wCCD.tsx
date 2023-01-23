@@ -19,6 +19,8 @@ import {
     CONTRACT_NAME,
     VIEW_FUNCTION_RAW_SCHEMA,
     BALANCEOF_FUNCTION_RAW_SCHEMA,
+    BROWSER_WALLET,
+    WALLET_CONNECT,
 } from './constants';
 
 import ArrowIcon from './assets/Arrow.svg';
@@ -195,7 +197,7 @@ export default function wCCD(props: WalletConnectionProps) {
                     <WalletConnectionTypeButton
                         buttonStyle={ButtonStyle}
                         disabledButtonStyle={ButtonStyleDisabled}
-                        connectorType="BrowserWallet"
+                        connectorType={BROWSER_WALLET}
                         connectorName="Browser Wallet"
                         setWaitingForUser={setWaitingForUser}
                         {...props}
@@ -203,7 +205,7 @@ export default function wCCD(props: WalletConnectionProps) {
                     <WalletConnectionTypeButton
                         buttonStyle={ButtonStyle}
                         disabledButtonStyle={ButtonStyleDisabled}
-                        connectorType="WalletConnect"
+                        connectorType={WALLET_CONNECT}
                         connectorName="Wallet Connect"
                         setWaitingForUser={setWaitingForUser}
                         {...props}
@@ -220,8 +222,8 @@ export default function wCCD(props: WalletConnectionProps) {
                         <p>
                             <button style={ButtonStyle} type="button" onClick={connectActive}>
                                 {isConnecting && 'Connecting...'}
-                                {!isConnecting && activeConnectorType === 'BrowserWallet' && 'Connect Browser Wallet'}
-                                {!isConnecting && activeConnectorType === 'WalletConnect' && 'Connect Mobile Wallet'}
+                                {!isConnecting && activeConnectorType === BROWSER_WALLET && 'Connect Browser Wallet'}
+                                {!isConnecting && activeConnectorType === WALLET_CONNECT && 'Connect Mobile Wallet'}
                             </button>
                         </p>
                     )}
