@@ -16,7 +16,7 @@ const config: BuildOptions = {
     entryPoints: [main],
     entryNames: '[name]',
     bundle: true,
-    minify: true,
+    minify: false,
     metafile: true,
     logLevel: 'info',
     sourcemap: 'inline',
