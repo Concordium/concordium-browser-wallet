@@ -1,8 +1,12 @@
-/* eslint-disable no-console */
 /* eslint-disable @typescript-eslint/no-explicit-any */
 
 import React, { useCallback } from 'react';
-import { ConnectorType, useWalletConnectorSelector, WalletConnectionProps } from '@concordium/react-components';
+import {
+    ConnectorType,
+    useWalletConnectorSelector,
+    WalletConnection,
+    WalletConnectionProps,
+} from '@concordium/react-components';
 
 function connectorTypeStyle(baseStyle: any, isSelected: boolean, isConnected: boolean) {
     const style = { ...baseStyle, width: '50%' };
@@ -22,11 +26,16 @@ interface Props extends WalletConnectionProps {
     connectorType: ConnectorType;
     connectorName: string;
     setWaitingForUser: (v: boolean) => void;
+    connection: WalletConnection | undefined;
 }
 
 export function WalletConnectionTypeButton(props: Props) {
-    const { buttonStyle, disabledButtonStyle, connectorType, connectorName, setWaitingForUser } = props;
-    const { isSelected, isConnected, isDisabled, select } = useWalletConnectorSelector(connectorType, props);
+    const { buttonStyle, disabledButtonStyle, connectorType, connectorName, setWaitingForUser, connection } = props;
+    const { isSelected, isConnected, isDisabled, select } = useWalletConnectorSelector(
+        connectorType,
+        connection,
+        props
+    );
     const onClick = useCallback(() => {
         setWaitingForUser(false);
         select();
