@@ -1,4 +1,3 @@
-/* @typescript-eslint/ban-ts-comment */
 import { createContext } from 'react';
 import { AccountTransactionType, CcdAmount, UpdateContractPayload } from '@concordium/web-sdk';
 import { WalletConnection } from '@concordium/react-components';

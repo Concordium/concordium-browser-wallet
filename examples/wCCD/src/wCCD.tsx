@@ -11,7 +11,7 @@ import {
 import * as leb from '@thi.ng/leb128';
 import { multiply, round } from 'mathjs';
 
-import { withJsonRpcClient, WalletConnectionProps } from '@concordium/react-components';
+import { withJsonRpcClient, WalletConnectionProps, useConnect, useConnection } from '@concordium/react-components';
 import { wrap, unwrap } from './utils';
 import {
     WCCD_CONTRACT_INDEX,
@@ -19,6 +19,8 @@ import {
     CONTRACT_NAME,
     VIEW_FUNCTION_RAW_SCHEMA,
     BALANCEOF_FUNCTION_RAW_SCHEMA,
+    BROWSER_WALLET,
+    WALLET_CONNECT,
 } from './constants';
 
 import ArrowIcon from './assets/Arrow.svg';
@@ -122,31 +124,25 @@ async function updateWCCDBalanceAccount(rpcClient: JsonRpcClient, account: strin
 }
 
 export default function wCCD(props: WalletConnectionProps) {
-    const {
-        network,
-        activeConnectorType,
-        activeConnector,
-        isConnecting,
-        activeConnection,
-        activeConnectionGenesisHash,
-        activeConnectedAccount,
-        activeConnectorError,
-        connectActive,
-    } = props;
+    const { network, activeConnectorType, activeConnector, activeConnectorError, connectedAccounts, genesisHashes } =
+        props;
+    const { connection, setConnection, account, genesisHash } = useConnection(connectedAccounts, genesisHashes);
+    const { connect, isConnecting, connectError } = useConnect(activeConnector, setConnection);
+
     const [admin, setAdmin] = useState<string>();
     const [adminError, setAdminError] = useState('');
 
     useEffect(() => {
         // Update admin contract.
-        if (activeConnection && activeConnectedAccount) {
-            withJsonRpcClient(activeConnection, (rpcClient) => viewAdmin(rpcClient))
+        if (connection && account) {
+            withJsonRpcClient(connection, (rpcClient) => viewAdmin(rpcClient))
                 .then((a) => {
                     setAdmin(a);
                     setAdminError('');
                 })
                 .catch((e) => setAdminError((e as Error).message));
         }
-    }, [activeConnection, activeConnectedAccount]);
+    }, [connection, account]);
 
     const [isWrapping, setIsWrapping] = useState(true);
     const [hash, setHash] = useState('');
@@ -155,20 +151,18 @@ export default function wCCD(props: WalletConnectionProps) {
     const [amountAccount, setAmountAccount] = useState<bigint>();
     const [amountAccountError, setAmountAccountError] = useState('');
     const inputValue = useRef<HTMLInputElement | null>(null);
-    const [receiver, setReceiver] = useState(activeConnectedAccount);
+    const [receiver, setReceiver] = useState(account);
 
     // Sync connected account to receiver input
     useEffect(() => {
-        if (activeConnectedAccount !== undefined) {
-            setReceiver(activeConnectedAccount);
+        if (account !== undefined) {
+            setReceiver(account);
         }
-    }, [activeConnectedAccount]);
+    }, [account]);
 
     useEffect(() => {
-        if (activeConnection && activeConnectedAccount) {
-            withJsonRpcClient(activeConnection, (rpcClient) =>
-                updateWCCDBalanceAccount(rpcClient, activeConnectedAccount)
-            )
+        if (connection && account) {
+            withJsonRpcClient(connection, (rpcClient) => updateWCCDBalanceAccount(rpcClient, account))
                 .then((a) => {
                     setAmountAccount(a);
                     setAmountAccountError('');
@@ -183,7 +177,7 @@ export default function wCCD(props: WalletConnectionProps) {
             setHash('');
             setTransactionError('');
         }
-    }, [activeConnection, activeConnectedAccount, isFlipped]);
+    }, [connection, account, isFlipped]);
 
     const [isWaitingForTransaction, setWaitingForUser] = useState(false);
     return (
@@ -195,17 +189,19 @@ export default function wCCD(props: WalletConnectionProps) {
                     <WalletConnectionTypeButton
                         buttonStyle={ButtonStyle}
                         disabledButtonStyle={ButtonStyleDisabled}
-                        connectorType="BrowserWallet"
+                        connectorType={BROWSER_WALLET}
                         connectorName="Browser Wallet"
                         setWaitingForUser={setWaitingForUser}
+                        connection={connection}
                         {...props}
                     />
                     <WalletConnectionTypeButton
                         buttonStyle={ButtonStyle}
                         disabledButtonStyle={ButtonStyleDisabled}
-                        connectorType="WalletConnect"
+                        connectorType={WALLET_CONNECT}
                         connectorName="Wallet Connect"
                         setWaitingForUser={setWaitingForUser}
+                        connection={connection}
                         {...props}
                     />
                 </div>
@@ -216,16 +212,17 @@ export default function wCCD(props: WalletConnectionProps) {
                             <i>Loading connector...</i>
                         </p>
                     )}
-                    {!activeConnection && !isWaitingForTransaction && activeConnectorType && activeConnector && (
+                    {connectError && <p style={{ color: 'red' }}>Connect Error: {connectError}.</p>}
+                    {!connection && !isWaitingForTransaction && activeConnectorType && activeConnector && (
                         <p>
-                            <button style={ButtonStyle} type="button" onClick={connectActive}>
+                            <button style={ButtonStyle} type="button" onClick={connect}>
                                 {isConnecting && 'Connecting...'}
-                                {!isConnecting && activeConnectorType === 'BrowserWallet' && 'Connect Browser Wallet'}
-                                {!isConnecting && activeConnectorType === 'WalletConnect' && 'Connect Mobile Wallet'}
+                                {!isConnecting && activeConnectorType === BROWSER_WALLET && 'Connect Browser Wallet'}
+                                {!isConnecting && activeConnectorType === WALLET_CONNECT && 'Connect Mobile Wallet'}
                             </button>
                         </p>
                     )}
-                    {activeConnectedAccount && (
+                    {account && (
                         <>
                             <div className="text">Connected to</div>
                             <button
@@ -233,13 +230,13 @@ export default function wCCD(props: WalletConnectionProps) {
                                 type="button"
                                 onClick={() => {
                                     window.open(
-                                        `https://testnet.ccdscan.io/?dcount=1&dentity=account&daddress=${activeConnectedAccount}`,
+                                        `https://testnet.ccdscan.io/?dcount=1&dentity=account&daddress=${account}`,
                                         '_blank',
                                         'noopener,noreferrer'
                                     );
                                 }}
                             >
-                                {activeConnectedAccount}
+                                {account}
                             </button>
                             <div className="text">wCCD Balance of connected account</div>
                             <div className="containerSpaceBetween">
@@ -268,7 +265,7 @@ export default function wCCD(props: WalletConnectionProps) {
                             </div>
                         </>
                     )}
-                    {activeConnectionGenesisHash && activeConnectionGenesisHash !== network.genesisHash && (
+                    {genesisHash && genesisHash !== network.genesisHash && (
                         <p style={{ color: 'red' }}>
                             Unexpected genesis hash: Please ensure that your wallet is connected to network{' '}
                             <code>{network.name}</code>.
@@ -302,7 +299,7 @@ export default function wCCD(props: WalletConnectionProps) {
                         placeholder="0.000000"
                         ref={inputValue}
                     />
-                    {activeConnectedAccount !== undefined && (
+                    {account !== undefined && (
                         <>
                             <p style={{ marginBottom: 0 }}>
                                 Account receiving the {isWrapping ? 'wrapped' : 'unwrapped'} CCD
@@ -317,15 +314,15 @@ export default function wCCD(props: WalletConnectionProps) {
                             />
                         </>
                     )}
-                    {!activeConnection ? (
+                    {!connection ? (
                         <button style={ButtonStyleDisabled} type="button" disabled>
                             Waiting for connection...
                         </button>
                     ) : (
                         <button
-                            style={activeConnectedAccount === undefined ? ButtonStyleDisabled : ButtonStyle}
+                            style={account === undefined ? ButtonStyleDisabled : ButtonStyle}
                             type="button"
-                            disabled={activeConnectedAccount === undefined}
+                            disabled={account === undefined}
                             onClick={() => {
                                 if (
                                     inputValue.current === undefined ||
@@ -341,13 +338,13 @@ export default function wCCD(props: WalletConnectionProps) {
                                 // Amount needs to be in WEI
                                 const amount = round(multiply(input, 1000000));
 
-                                if (activeConnection && activeConnectedAccount) {
+                                if (connection && account) {
                                     setHash('');
                                     setTransactionError('');
                                     setWaitingForUser(true);
                                     const tx = (isWrapping ? wrap : unwrap)(
-                                        activeConnection,
-                                        activeConnectedAccount,
+                                        connection,
+                                        account,
                                         WCCD_CONTRACT_INDEX,
                                         CONTRACT_SUB_INDEX,
                                         amount,
@@ -363,7 +360,7 @@ export default function wCCD(props: WalletConnectionProps) {
                         </button>
                     )}
                 </label>
-                {activeConnection && (
+                {connection && (
                     <>
                         <p>
                             <div>Transaction status{hash === '' ? '' : ' (May take a moment to finalize)'}</div>

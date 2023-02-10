@@ -2037,14 +2037,14 @@ __metadata:
   languageName: node
   linkType: hard
 
-"@concordium/react-components@npm:^0.1.0":
-  version: 0.1.0
-  resolution: "@concordium/react-components@npm:0.1.0"
+"@concordium/react-components@npm:^0.2.0":
+  version: 0.2.0
+  resolution: "@concordium/react-components@npm:0.2.0"
   dependencies:
-    "@concordium/wallet-connectors": 0.1.0
+    "@concordium/wallet-connectors": 0.2.0
   peerDependencies:
     react: ^18
-  checksum: 49b066aa720e9db94bbf4e5550974972649903d81f3b78d3ff84f83757d65b9965ad49be39ace047f076719bc461df938f52ca3b12bc107a33b4a6f1eef92b73
+  checksum: b4141037d2f38d289362ca124369d7d61b9ec5260ca895d57bf6d5823027c901e96943f27261b2813ccdfaae9dbeecaf35a1a37492e146ea6d32fc358486f4be
   languageName: node
   linkType: hard
 
@@ -2062,14 +2062,14 @@ __metadata:
   languageName: node
   linkType: hard
 
-"@concordium/wallet-connectors@npm:0.1.0":
-  version: 0.1.0
-  resolution: "@concordium/wallet-connectors@npm:0.1.0"
+"@concordium/wallet-connectors@npm:0.2.0":
+  version: 0.2.0
+  resolution: "@concordium/wallet-connectors@npm:0.2.0"
   dependencies:
     "@concordium/browser-wallet-api-helpers": ^2.0.0
     "@walletconnect/qrcode-modal": ^1.8.0
     "@walletconnect/sign-client": ^2.1.4
-  checksum: 3fc7e86fd1b136d19ec475545ef448eea338e0cba94d4a870f44e6b152ed0f95c33280ced5bcf90a152e92316d89412502ab191da4527e073e23c099c19f664b
+  checksum: 262af06d5d09e452d307022c66a1d303d8aad1c21f6bfeb6bc24acb4f102bc5deb492de7e093612b05a6f67a9031f6801089f6aec671d0ae7eb26d7ead9cf528
   languageName: node
   linkType: hard
 
@@ -9614,7 +9614,7 @@ __metadata:
   version: 0.0.0-use.local
   resolution: "e_sealing@workspace:examples/eSealing"
   dependencies:
-    "@concordium/react-components": ^0.1.0
+    "@concordium/react-components": ^0.2.0
     "@concordium/web-sdk": ^3.2.0
     "@craftamap/esbuild-plugin-html": ^0.4.0
     "@thi.ng/leb128": ^2.1.18
@@ -21038,7 +21038,7 @@ __metadata:
   version: 0.0.0-use.local
   resolution: "wccd@workspace:examples/wCCD"
   dependencies:
-    "@concordium/react-components": ^0.1.0
+    "@concordium/react-components": ^0.2.0
     "@concordium/web-sdk": ^3.2.0
     "@craftamap/esbuild-plugin-html": ^0.4.0
     "@thi.ng/leb128": ^2.1.18

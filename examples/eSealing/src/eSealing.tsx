@@ -1,5 +1,3 @@
-/* eslint-disable no-alert */
-
 import React, { useEffect, useState, useRef, ChangeEvent } from 'react';
 import Switch from 'react-switch';
 import {
@@ -9,7 +7,7 @@ import {
     JsonRpcClient,
 } from '@concordium/web-sdk';
 import sha256 from 'sha256';
-import { withJsonRpcClient, WalletConnectionProps } from '@concordium/react-components';
+import { withJsonRpcClient, WalletConnectionProps, useConnection, useConnect } from '@concordium/react-components';
 import { version } from '../package.json';
 
 import { register } from './utils';
@@ -18,6 +16,8 @@ import {
     E_SEALING_CONTRACT_INDEX,
     E_SEALING_RAW_SCHEMA,
     CONTRACT_SUB_INDEX,
+    BROWSER_WALLET,
+    WALLET_CONNECT,
 } from './constants';
 
 import { WalletConnectionTypeButton } from './WalletConnectorTypeButton';
@@ -129,17 +129,11 @@ async function viewFile(rpcClient: JsonRpcClient, fileHashHex: string) {
 }
 
 export default function SEALING(props: WalletConnectionProps) {
-    const {
-        network,
-        activeConnectorType,
-        activeConnector,
-        isConnecting,
-        activeConnection,
-        activeConnectionGenesisHash,
-        activeConnectedAccount,
-        activeConnectorError,
-        connectActive,
-    } = props;
+    const { network, activeConnectorType, activeConnector, activeConnectorError, connectedAccounts, genesisHashes } =
+        props;
+
+    const { connection, setConnection, account, genesisHash } = useConnection(connectedAccounts, genesisHashes);
+    const { connect, isConnecting, connectError } = useConnect(activeConnector, setConnection);
 
     const [isLoading, setLoading] = useState(false);
 
@@ -161,8 +155,8 @@ export default function SEALING(props: WalletConnectionProps) {
 
     useEffect(() => {
         // View file record.
-        if (activeConnection && activeConnectedAccount && fileHashHex !== '') {
-            withJsonRpcClient(activeConnection, (rpcClient) => viewFile(rpcClient, fileHashHex))
+        if (connection && account && fileHashHex !== '') {
+            withJsonRpcClient(connection, (rpcClient) => viewFile(rpcClient, fileHashHex))
                 .then((record) => {
                     setGetFileError('');
                     setTimestamp(record.timestamp);
@@ -174,7 +168,7 @@ export default function SEALING(props: WalletConnectionProps) {
                     setWitness('');
                 });
         }
-    }, [activeConnection, activeConnectedAccount, fileHashHex]);
+    }, [connection, account, fileHashHex]);
 
     const [isRegisterFilePage, setIsRegisterFilePage] = useState(true);
     const [hash, setHash] = useState('');
@@ -191,17 +185,19 @@ export default function SEALING(props: WalletConnectionProps) {
                 <WalletConnectionTypeButton
                     buttonStyle={ButtonStyle}
                     disabledButtonStyle={ButtonStyleDisabled}
-                    connectorType="BrowserWallet"
+                    connectorType={BROWSER_WALLET}
                     connectorName="Browser Wallet"
                     setWaitingForUser={setWaitingForUser}
+                    connection={connection}
                     {...props}
                 />
                 <WalletConnectionTypeButton
                     buttonStyle={ButtonStyle}
                     disabledButtonStyle={ButtonStyleDisabled}
-                    connectorType="WalletConnect"
+                    connectorType={WALLET_CONNECT}
                     connectorName="Wallet Connect"
                     setWaitingForUser={setWaitingForUser}
+                    connection={connection}
                     {...props}
                 />
             </div>
@@ -212,16 +208,17 @@ export default function SEALING(props: WalletConnectionProps) {
                         <i>Loading connector...</i>
                     </p>
                 )}
-                {!activeConnection && !isWaitingForTransaction && activeConnectorType && activeConnector && (
+                {connectError && <p style={{ color: 'red' }}>Connect Error: {connectError}.</p>}
+                {!connection && !isWaitingForTransaction && activeConnectorType && activeConnector && (
                     <p>
-                        <button style={ButtonStyle} type="button" onClick={connectActive}>
+                        <button style={ButtonStyle} type="button" onClick={connect}>
                             {isConnecting && 'Connecting...'}
-                            {!isConnecting && activeConnectorType === 'BrowserWallet' && 'Connect Browser Wallet'}
-                            {!isConnecting && activeConnectorType === 'WalletConnect' && 'Connect Mobile Wallet'}
+                            {!isConnecting && activeConnectorType === BROWSER_WALLET && 'Connect Browser Wallet'}
+                            {!isConnecting && activeConnectorType === WALLET_CONNECT && 'Connect Mobile Wallet'}
                         </button>
                     </p>
                 )}
-                {activeConnectedAccount && (
+                {account && (
                     <>
                         <div className="text">Connected to</div>
                         <button
@@ -229,13 +226,13 @@ export default function SEALING(props: WalletConnectionProps) {
                             type="button"
                             onClick={() => {
                                 window.open(
-                                    `https://testnet.ccdscan.io/?dcount=1&dentity=account&daddress=${activeConnectedAccount}`,
+                                    `https://testnet.ccdscan.io/?dcount=1&dentity=account&daddress=${account}`,
                                     '_blank',
                                     'noopener,noreferrer'
                                 );
                             }}
                         >
-                            {activeConnectedAccount}
+                            {account}
                         </button>
                         <br />
                         <br />
@@ -285,7 +282,7 @@ export default function SEALING(props: WalletConnectionProps) {
                         </div>
                     </>
                 )}
-                {activeConnectionGenesisHash && activeConnectionGenesisHash !== network.genesisHash && (
+                {genesisHash && genesisHash !== network.genesisHash && (
                     <p style={{ color: 'red' }}>
                         Unexpected genesis hash: Please ensure that your wallet is connected to network{' '}
                         <code>{network.name}</code>.
@@ -293,7 +290,7 @@ export default function SEALING(props: WalletConnectionProps) {
                 )}
             </div>
 
-            {activeConnectedAccount !== undefined && (
+            {account !== undefined && (
                 <>
                     <label>
                         <p style={{ marginBottom: 0 }}>Select a file:</p>
@@ -320,6 +317,7 @@ export default function SEALING(props: WalletConnectionProps) {
                                     setLoadingError('');
                                     setLoading(false);
                                 } else {
+                                    // eslint-disable-next-line no-alert
                                     alert('Choose a file to compute the file hash');
                                 }
                             } catch (err) {
@@ -336,18 +334,19 @@ export default function SEALING(props: WalletConnectionProps) {
                     <br />
                 </>
             )}
-            {!activeConnection && (
+            {!connection && (
                 <button style={ButtonStyleDisabled} type="button" disabled>
                     Waiting for connection...
                 </button>
             )}
-            {activeConnection && isRegisterFilePage && activeConnectedAccount && (
+            {connection && isRegisterFilePage && account && (
                 <button
                     style={fileHashHex === '' ? ButtonStyleDisabled : ButtonStyle}
                     type="button"
                     disabled={fileHashHex === ''}
                     onClick={() => {
                         if (witness !== null) {
+                            // eslint-disable-next-line no-alert
                             alert(
                                 `This file hash is already registered \n${witness} (withness) \n${timestamp} (timestamp)`
                             );
@@ -356,8 +355,8 @@ export default function SEALING(props: WalletConnectionProps) {
                             setTransactionError('');
                             setWaitingForUser(true);
                             const tx = (isRegisterFilePage ? register : register)(
-                                activeConnection,
-                                activeConnectedAccount,
+                                connection,
+                                account,
                                 fileHashHex,
                                 E_SEALING_CONTRACT_INDEX,
                                 CONTRACT_SUB_INDEX
@@ -371,7 +370,7 @@ export default function SEALING(props: WalletConnectionProps) {
                     Register File Hash
                 </button>
             )}
-            {activeConnection && activeConnectedAccount && (
+            {connection && account && (
                 <p>
                     {isRegisterFilePage && (
                         <>
