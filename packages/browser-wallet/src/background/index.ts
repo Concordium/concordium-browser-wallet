@@ -88,6 +88,22 @@ async function performRpcCall(
     }
 }
 
+async function handleGrpcRequest(
+    senderUrl: string,
+    onSuccess: (response: string | undefined) => void,
+    onFailure: (response: string) => void
+): Promise<void> {
+    const isWhiteListed = await isWhiteListedForAnyAccount(senderUrl);
+    if (!isWhiteListed) {
+        return onFailure('No JSON-RPC URL available');
+    }
+    const network = await storedCurrentNetwork.get();
+    if (!network || !network.grpcUrl || !network.grpcPort) {
+        return onFailure('No gRPC URL available');
+    }
+    return onSuccess(`${network.grpcUrl}:${network.grpcPort}`);
+}
+
 /**
  * Callback method which installs Injected script into Main world of Dapp
  */
@@ -194,11 +210,21 @@ bgMessageHandler.handleMessage(createMessageTypeFilter(InternalMessageType.SetVi
 bgMessageHandler.handleMessage(createMessageTypeFilter(MessageType.JsonRpcRequest), (input, sender, respond) => {
     const onFailure = (error: string) => respond({ success: false, error });
     if (sender.url) {
-        const onSuccess = (response: string | undefined) => respond({ success: true, response });
+        const onSuccess = (result: string | undefined) => respond({ success: true, result });
         performRpcCall(input.payload.method, input.payload.params, sender.url, onSuccess, onFailure);
     } else {
         onFailure('Missing sender URL');
     }
+    return true;
+});
+
+bgMessageHandler.handleMessage(createMessageTypeFilter(MessageType.GrpcRequest), (_input, sender, respond) => {
+    const onFailure = (error: string) => respond({ success: false, error });
+    const onSuccess = (result: string | undefined) => respond({ success: true, result });
+    if (!sender.url) {
+        return onFailure('Missing sender URL');
+    }
+    handleGrpcRequest(sender.url, onSuccess, onFailure);
     return true;
 });
 

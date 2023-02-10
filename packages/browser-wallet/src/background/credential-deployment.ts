@@ -28,7 +28,8 @@ async function createAndSendCredential(credIn: CredentialInput): Promise<Credent
         const { identityIndex, credNumber } = credIn;
         const providerIndex = credIn.ipInfo.ipIdentity;
 
-        const request = createCredentialTransaction(credIn, new TransactionExpiry(new Date(Date.now() + 720000)));
+        const expiry = new TransactionExpiry(new Date(Date.now() + 720000));
+        const request = createCredentialTransaction(credIn, expiry);
         const signingKey = ConcordiumHdWallet.fromHex(credIn.seedAsHex, credIn.net)
             .getAccountSigningKey(providerIndex, identityIndex, credNumber)
             .toString('hex');
@@ -47,11 +48,9 @@ async function createAndSendCredential(credIn: CredentialInput): Promise<Credent
         };
 
         // Send Request
-        const successful = createConcordiumClient(
-            network.grpcUrl,
-            network.grpcPort,
-            GRPCTIMEOUT
-        ).sendCredentialDeploymentTransaction(request, [signature]);
+        const successful = createConcordiumClient(network.grpcUrl, network.grpcPort, {
+            timeout: GRPCTIMEOUT,
+        }).sendCredentialDeploymentTransaction(request, [signature]);
         if (!successful) {
             throw new Error('Credential deployment was rejected');
         }

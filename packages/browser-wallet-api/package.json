@@ -8,6 +8,8 @@
     "dependencies": {
         "@concordium/browser-wallet-api-helpers": "workspace:^",
         "@concordium/common-sdk": "^6.2.0",
+        "@protobuf-ts/grpcweb-transport": "^2.8.2",
+        "@protobuf-ts/runtime-rpc": "^2.8.2",
         "buffer": "^6.0.3",
         "json-bigint": "^1.0.0"
     },

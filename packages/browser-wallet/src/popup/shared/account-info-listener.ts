@@ -21,7 +21,7 @@ export class AccountInfoListener extends EventEmitter {
     // eslint-disable-next-line @typescript-eslint/no-unused-vars
     constructor(network: NetworkConfiguration, _onSetCookie: (cookie: string) => void, _cookie?: string) {
         super();
-        this.client = createConcordiumClient(network.grpcUrl, network.grpcPort, GRPCTIMEOUT); // TODO cookie?
+        this.client = createConcordiumClient(network.grpcUrl, network.grpcPort, { timeout: GRPCTIMEOUT });
         this.genesisHash = network.genesisHash;
     }
 

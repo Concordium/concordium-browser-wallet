@@ -56,7 +56,7 @@ export const jsonRpcClientAtom = atom<JsonRpcClient>((get) => {
 export const grpcClientAtom = atom<ConcordiumGRPCClient>((get) => {
     const network = get(storedNetworkConfigurationAtom);
 
-    return createConcordiumClient(network.grpcUrl, network.grpcPort, GRPCTIMEOUT); // TODO cookies?
+    return createConcordiumClient(network.grpcUrl, network.grpcPort, { timeout: GRPCTIMEOUT });
 });
 
 export const acceptedTermsAtom = atomWithChromeStorage<AcceptedTermsState | undefined>(

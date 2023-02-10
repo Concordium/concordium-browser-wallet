@@ -29,7 +29,7 @@ const isMonitoringCred = (genesisHash: string, id: PendingWalletCredential): boo
 
 async function monitorCredentialStatus(initialNetwork: NetworkConfiguration, cred: PendingWalletCredential) {
     const { genesisHash } = initialNetwork;
-    const client = createConcordiumClient(initialNetwork.grpcUrl, initialNetwork.grpcPort, GRPCTIMEOUT);
+    const client = createConcordiumClient(initialNetwork.grpcUrl, initialNetwork.grpcPort, { timeout: GRPCTIMEOUT });
     if (isMonitoringCred(genesisHash, cred)) {
         return;
     }

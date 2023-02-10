@@ -1913,6 +1913,8 @@ __metadata:
   dependencies:
     "@concordium/browser-wallet-api-helpers": "workspace:^"
     "@concordium/common-sdk": ^6.2.0
+    "@protobuf-ts/grpcweb-transport": ^2.8.2
+    "@protobuf-ts/runtime-rpc": ^2.8.2
     "@types/json-bigint": ^1.0.1
     buffer: ^6.0.3
     json-bigint: ^1.0.0
@@ -2843,6 +2845,32 @@ __metadata:
   version: 2.11.6
   resolution: "@popperjs/core@npm:2.11.6"
   checksum: 47fb328cec1924559d759b48235c78574f2d71a8a6c4c03edb6de5d7074078371633b91e39bbf3f901b32aa8af9b9d8f82834856d2f5737a23475036b16817f0
+  languageName: node
+  linkType: hard
+
+"@protobuf-ts/grpcweb-transport@npm:^2.8.2":
+  version: 2.8.2
+  resolution: "@protobuf-ts/grpcweb-transport@npm:2.8.2"
+  dependencies:
+    "@protobuf-ts/runtime": ^2.8.2
+    "@protobuf-ts/runtime-rpc": ^2.8.2
+  checksum: c579ab87c5d20ae815fcd8ad59326fd36337cd35118dbecdfada8951efa9eeffffbc54052d4132b98615dd9c23c860b90f210ad538ab7b228b484645f7121ee9
+  languageName: node
+  linkType: hard
+
+"@protobuf-ts/runtime-rpc@npm:^2.8.2":
+  version: 2.8.2
+  resolution: "@protobuf-ts/runtime-rpc@npm:2.8.2"
+  dependencies:
+    "@protobuf-ts/runtime": ^2.8.2
+  checksum: a75847f34e93f3d3d17558797a3cfa7b3aa96207f88b00943fdf3e661c5c3b67f112f307b2b0c3e4bb3d40d435fdb41458dde492436befa738677e1e3d8d369d
+  languageName: node
+  linkType: hard
+
+"@protobuf-ts/runtime@npm:^2.8.2":
+  version: 2.8.2
+  resolution: "@protobuf-ts/runtime@npm:2.8.2"
+  checksum: ab322e832bfb347b271a8862b8ef3db27ffa380f9c49f94acb410534586a282ebd8af96d4459f959ad0fe5fbf34183f3f4fe512e50c9a4331b742a7445b16c92
   languageName: node
   linkType: hard
 

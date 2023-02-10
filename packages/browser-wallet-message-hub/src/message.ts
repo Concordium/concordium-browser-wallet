@@ -12,6 +12,7 @@ export enum MessageType {
     GetSelectedAccount = 'M_GetSelectedAccount',
     Connect = 'M_Connect',
     JsonRpcRequest = 'M_JsonRpcRequest',
+    GrpcRequest = 'M_GrpcRequest',
     AddTokens = 'M_AddTokens',
     IdProof = 'M_IdProof',
 }
