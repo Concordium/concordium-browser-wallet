@@ -3,6 +3,7 @@ import uleb128 from 'leb128/unsigned';
 import {
     AccountAddress,
     CcdAmount,
+    HexString,
     InstanceInfo,
     JsonRpcClient,
     serializeUpdateContractParameters,
@@ -54,15 +55,20 @@ export function getMetadataParameter(ids: string[]): Buffer {
     return Buffer.concat([queries, ...idBufs]);
 }
 
+export interface TokenMetadataUrl {
+    url: string;
+    checksum?: HexString;
+}
+
 /**
  * Returns the url for the token metadata.
  * returnValue is assumed to be a HEX-encoded string.
  */
-function deserializeTokenMetadataReturnValue(returnValue: string): string[] {
+function deserializeTokenMetadataReturnValue(returnValue: string): TokenMetadataUrl[] {
     const buf = Buffer.from(returnValue, 'hex');
     const n = buf.readUInt16LE(0);
     let cursor = 2; // First 2 bytes hold number of token amounts included in response.
-    const urls: string[] = [];
+    const urls: TokenMetadataUrl[] = [];
 
     // eslint-disable-next-line no-plusplus
     for (let i = 0; i < n; i++) {
@@ -71,9 +77,19 @@ function deserializeTokenMetadataReturnValue(returnValue: string): string[] {
         const urlEnd = urlStart + length;
 
         const url = Buffer.from(buf.subarray(urlStart, urlEnd)).toString('utf8');
-        urls.push(url);
 
-        cursor = urlEnd + 1;
+        cursor = urlEnd;
+
+        const hasChecksum = buf.readUInt8(cursor);
+        cursor += 1;
+
+        if (hasChecksum) {
+            const checksum = Buffer.from(buf.subarray(cursor, cursor + 32)).toString('hex');
+            cursor += 32;
+            urls.push({ url, checksum });
+        } else {
+            urls.push({ url });
+        }
     }
 
     return urls;
@@ -112,7 +128,7 @@ export function getTokenUrl(
     client: JsonRpcClient,
     ids: string[],
     { contractName, index, subindex }: ContractDetails
-): Promise<string[]> {
+): Promise<TokenMetadataUrl[]> {
     return new Promise((resolve, reject) => {
         client
             .invokeContract({
@@ -397,7 +413,7 @@ export async function getTokens(
     ids: string[],
     onError?: (error: string) => void
 ): Promise<GetTokensResult> {
-    const metadataPromise: Promise<[string[], Array<TokenMetadata | undefined>]> = (async () => {
+    const metadataPromise: Promise<[TokenMetadataUrl[], Array<TokenMetadata | undefined>]> = (async () => {
         let metadataUrls;
         try {
             metadataUrls = await getTokenUrl(client, ids, contractDetails);
@@ -406,7 +422,7 @@ export async function getTokens(
             return [[], []];
         }
         const metadata = await Promise.all(
-            metadataUrls.map((url) => getTokenMetadata(url, network).catch(() => Promise.resolve(undefined)))
+            metadataUrls.map(({ url }) => getTokenMetadata(url, network).catch(() => Promise.resolve(undefined)))
         );
         return [metadataUrls, metadata];
     })();
@@ -422,6 +438,8 @@ export async function getTokens(
 
     const [[metadataUrls, metadata], balances] = await Promise.all([metadataPromise, balancesPromise]); // Run in parallel.
 
+    // TODO verify that metadata fits with checksum from metadataUrl
+
     return ids.reduce(
         (acc, id, i) =>
             id in balances && metadata[i]
@@ -429,7 +447,7 @@ export async function getTokens(
                       ...acc,
                       {
                           id,
-                          metadataLink: metadataUrls[i],
+                          metadataLink: metadataUrls[i].url,
                           metadata: metadata[i],
                           balance: balances[id] ?? 0n,
                       },
