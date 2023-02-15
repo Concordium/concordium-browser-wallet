@@ -73,7 +73,12 @@ function deserializeTokenMetadataReturnValue(returnValue: string): string[] {
         const url = Buffer.from(buf.subarray(urlStart, urlEnd)).toString('utf8');
         urls.push(url);
 
-        cursor = urlEnd + 1;
+        if (buf[urlEnd] === 0) {
+            cursor = urlEnd + 1;
+        } else {
+            // Skip the metadata Hash.
+            cursor = urlEnd + 1 + 32;
+        }
     }
 
     return urls;
