@@ -83,12 +83,14 @@ function deserializeTokenMetadataReturnValue(returnValue: string): TokenMetadata
         const hasChecksum = buf.readUInt8(cursor);
         cursor += 1;
 
-        if (hasChecksum) {
+        if (hasChecksum === 1) {
             const checksum = Buffer.from(buf.subarray(cursor, cursor + 32)).toString('hex');
             cursor += 32;
             urls.push({ url, checksum });
-        } else {
+        } else if (hasChecksum === 0) {
             urls.push({ url });
+        } else {
+            throw new Error('Deserialization failed: boolean value had an unexpected value');
         }
     }
 
@@ -138,7 +140,11 @@ export function getTokenUrl(
             })
             .then((returnValue) => {
                 if (returnValue && returnValue.tag === 'success' && returnValue.returnValue) {
-                    resolve(deserializeTokenMetadataReturnValue(returnValue.returnValue));
+                    try {
+                        resolve(deserializeTokenMetadataReturnValue(returnValue.returnValue));
+                    } catch (e) {
+                        reject(e);
+                    }
                 } else {
                     // TODO: perhaps we need to make this error more precise
                     reject(new Error('Token does not exist in this contract'));
