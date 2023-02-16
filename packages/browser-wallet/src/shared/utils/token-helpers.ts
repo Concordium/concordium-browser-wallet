@@ -3,11 +3,11 @@ import uleb128 from 'leb128/unsigned';
 import {
     AccountAddress,
     CcdAmount,
-    HexString,
     InstanceInfo,
     JsonRpcClient,
     serializeUpdateContractParameters,
     UpdateContractPayload,
+    sha256,
 } from '@concordium/web-sdk';
 import { MetadataUrl, NetworkConfiguration, TokenMetadata, TokenIdAndMetadata } from '@shared/storage/types';
 import { CIS2_SCHEMA_CONTRACT_NAME, CIS2_SCHEMA } from '@popup/constants/schema';
@@ -55,20 +55,15 @@ export function getMetadataParameter(ids: string[]): Buffer {
     return Buffer.concat([queries, ...idBufs]);
 }
 
-export interface TokenMetadataUrl {
-    url: string;
-    checksum?: HexString;
-}
-
 /**
  * Returns the url for the token metadata.
  * returnValue is assumed to be a HEX-encoded string.
  */
-function deserializeTokenMetadataReturnValue(returnValue: string): TokenMetadataUrl[] {
+function deserializeTokenMetadataReturnValue(returnValue: string): MetadataUrl[] {
     const buf = Buffer.from(returnValue, 'hex');
     const n = buf.readUInt16LE(0);
     let cursor = 2; // First 2 bytes hold number of token amounts included in response.
-    const urls: TokenMetadataUrl[] = [];
+    const urls: MetadataUrl[] = [];
 
     // eslint-disable-next-line no-plusplus
     for (let i = 0; i < n; i++) {
@@ -84,9 +79,9 @@ function deserializeTokenMetadataReturnValue(returnValue: string): TokenMetadata
         cursor += 1;
 
         if (hasChecksum === 1) {
-            const checksum = Buffer.from(buf.subarray(cursor, cursor + 32)).toString('hex');
+            const hash = Buffer.from(buf.subarray(cursor, cursor + 32)).toString('hex');
             cursor += 32;
-            urls.push({ url, checksum });
+            urls.push({ url, hash });
         } else if (hasChecksum === 0) {
             urls.push({ url });
         } else {
@@ -130,7 +125,7 @@ export function getTokenUrl(
     client: JsonRpcClient,
     ids: string[],
     { contractName, index, subindex }: ContractDetails
-): Promise<TokenMetadataUrl[]> {
+): Promise<MetadataUrl[]> {
     return new Promise((resolve, reject) => {
         client
             .invokeContract({
@@ -170,11 +165,22 @@ export const getMetadataUnique = ({ unique }: TokenMetadata) => Boolean(unique);
 export const getMetadataDecimals = ({ decimals }: TokenMetadata) => Number(decimals ?? 0);
 
 /**
+ * Given a fetch response, return the hex-encoded sha256 hash of the body.
+ */
+async function getHashOfResponse(resp: Response): Promise<string> {
+    const rawBody = [new Uint8Array(await resp.arrayBuffer())];
+    return sha256(rawBody).toString('hex');
+}
+
+/**
  * Fetches token metadata from the given url
  */
-export async function getTokenMetadata(tokenUrl: string, network: NetworkConfiguration): Promise<TokenMetadata> {
-    if (!isMainnet(network) && tokenUrl.includes('https://some.example/token/')) {
-        const id = tokenUrl.split('https://some.example/token/')[1]?.toLowerCase() ?? 'fallback';
+export async function getTokenMetadata(
+    { url, hash: checksumHash }: MetadataUrl,
+    network: NetworkConfiguration
+): Promise<TokenMetadata> {
+    if (!isMainnet(network) && url.includes('https://some.example/token/')) {
+        const id = url.split('https://some.example/token/')[1]?.toLowerCase() ?? 'fallback';
         return {
             thumbnail: { url: 'https://picsum.photos/40/40' },
             display: { url: 'https://picsum.photos/200/300' },
@@ -185,9 +191,13 @@ export async function getTokenMetadata(tokenUrl: string, network: NetworkConfigu
         };
     }
 
-    const resp = await fetch(tokenUrl, { headers: new Headers({ 'Access-Control-Allow-Origin': '*' }), mode: 'cors' });
+    const resp = await fetch(url, { headers: new Headers({ 'Access-Control-Allow-Origin': '*' }), mode: 'cors' });
     if (!resp.ok) {
         throw new Error(`Something went wrong, status: ${resp.status}`);
+    }
+
+    if (checksumHash && (await getHashOfResponse(resp)) !== checksumHash) {
+        throw new Error('Metadata does not match checksum provided with url');
     }
 
     const metadata = await resp.json();
@@ -419,7 +429,7 @@ export async function getTokens(
     ids: string[],
     onError?: (error: string) => void
 ): Promise<GetTokensResult> {
-    const metadataPromise: Promise<[TokenMetadataUrl[], Array<TokenMetadata | undefined>]> = (async () => {
+    const metadataPromise: Promise<[MetadataUrl[], Array<TokenMetadata | undefined>]> = (async () => {
         let metadataUrls;
         try {
             metadataUrls = await getTokenUrl(client, ids, contractDetails);
@@ -428,8 +438,9 @@ export async function getTokens(
             return [[], []];
         }
         const metadata = await Promise.all(
-            metadataUrls.map(({ url }) => getTokenMetadata(url, network).catch(() => Promise.resolve(undefined)))
+            metadataUrls.map((url) => getTokenMetadata(url, network).catch(() => Promise.resolve(undefined)))
         );
+
         return [metadataUrls, metadata];
     })();
 
@@ -443,8 +454,6 @@ export async function getTokens(
     );
 
     const [[metadataUrls, metadata], balances] = await Promise.all([metadataPromise, balancesPromise]); // Run in parallel.
-
-    // TODO verify that metadata fits with checksum from metadataUrl
 
     return ids.reduce(
         (acc, id, i) =>

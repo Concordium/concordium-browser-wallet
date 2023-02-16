@@ -1,4 +1,4 @@
-import type { CryptographicParameters, IdentityObjectV1, Network, Versioned } from '@concordium/web-sdk';
+import type { CryptographicParameters, HexString, IdentityObjectV1, Network, Versioned } from '@concordium/web-sdk';
 
 export enum ChromeStorageKey {
     ConnectedSites = 'connectedSites',
@@ -196,7 +196,7 @@ export interface RecoveryStatus {
 
 export interface MetadataUrl {
     url: string;
-    hash?: string;
+    hash?: HexString;
 }
 
 export interface MetadataAttribute {
