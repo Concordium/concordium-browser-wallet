@@ -16,9 +16,8 @@ import Button from '@popup/shared/Button';
 import { Input } from '@popup/shared/Form/Input';
 import { addToastAtom } from '@popup/state';
 import { selectedAccountAtom } from '@popup/store/account';
-import { jsonRpcClientAtom, networkConfigurationAtom } from '@popup/store/settings';
+import { jsonRpcClientAtom } from '@popup/store/settings';
 import { currentAccountTokensAtom } from '@popup/store/token';
-import { NetworkConfiguration } from '@shared/storage/types';
 import { ensureDefined } from '@shared/utils/basic-helpers';
 import ContractTokenLine, { ChoiceStatus } from '@popup/shared/ContractTokenLine';
 import { AsyncWrapper } from '@popup/store/utils';
@@ -89,12 +88,7 @@ const InfiniteTokenList = forwardRef<HTMLDivElement, InfiniteTokenListProps>(
  * Sets result.value to empty list on error, list with 1 token on successful lookup, and undefined while loading.
  * Invoking with empty searchQuery param aborts previous invocations.
  */
-const lookupTokenIdConfigure = (
-    contractDetails: ContractDetails,
-    client: JsonRpcClient,
-    network: NetworkConfiguration,
-    account: string
-) => {
+const lookupTokenIdConfigure = (contractDetails: ContractDetails, client: JsonRpcClient, account: string) => {
     let ac: AbortController;
 
     return debounce(
@@ -113,7 +107,7 @@ const lookupTokenIdConfigure = (
             setResult({ loading: true, value: undefined });
 
             try {
-                const [token] = await getTokens(contractDetails, client, network, account, [searchQuery]);
+                const [token] = await getTokens(contractDetails, client, account, [searchQuery]);
                 if (token && token.metadata) {
                     value = [token as ContractTokenDetails];
                 }
@@ -140,10 +134,9 @@ const validateId = (id: string | undefined, message: string) => {
 function useLookupTokenId() {
     const contractDetails = ensureDefined(useAtomValue(contractDetailsAtom), 'Assumed contract details to be defined');
     const client = useAtomValue(jsonRpcClientAtom);
-    const network = useAtomValue(networkConfigurationAtom);
     const account = ensureDefined(useAtomValue(selectedAccountAtom), 'No account selected');
 
-    const lookupTokenId = useCallback(lookupTokenIdConfigure(contractDetails, client, network, account), [
+    const lookupTokenId = useCallback(lookupTokenIdConfigure(contractDetails, client, account), [
         client,
         contractDetails,
         account,

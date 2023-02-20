@@ -9,11 +9,10 @@ import {
     UpdateContractPayload,
     sha256,
 } from '@concordium/web-sdk';
-import { MetadataUrl, NetworkConfiguration, TokenMetadata, TokenIdAndMetadata } from '@shared/storage/types';
+import { MetadataUrl, TokenMetadata, TokenIdAndMetadata } from '@shared/storage/types';
 import { CIS2_SCHEMA_CONTRACT_NAME, CIS2_SCHEMA } from '@popup/constants/schema';
 import i18n from '@popup/shell/i18n';
 import { SmartContractParameters } from '@concordium/browser-wallet-api-helpers';
-import { isMainnet } from './network-helpers';
 import { determineUpdatePayloadSize } from './energy-helpers';
 
 export interface ContractDetails {
@@ -175,22 +174,7 @@ async function getHashOfResponse(resp: Response): Promise<string> {
 /**
  * Fetches token metadata from the given url
  */
-export async function getTokenMetadata(
-    { url, hash: checksumHash }: MetadataUrl,
-    network: NetworkConfiguration
-): Promise<TokenMetadata> {
-    if (!isMainnet(network) && url.includes('https://some.example/token/')) {
-        const id = url.split('https://some.example/token/')[1]?.toLowerCase() ?? 'fallback';
-        return {
-            thumbnail: { url: 'https://picsum.photos/40/40' },
-            display: { url: 'https://picsum.photos/200/300' },
-            name: id.substring(0, 8),
-            decimals: 0,
-            description: id,
-            unique: true,
-        };
-    }
-
+export async function getTokenMetadata({ url, hash: checksumHash }: MetadataUrl): Promise<TokenMetadata> {
     const resp = await fetch(url, { headers: new Headers({ 'Access-Control-Allow-Origin': '*' }), mode: 'cors' });
     if (!resp.ok) {
         throw new Error(`Something went wrong, status: ${resp.status}`);
@@ -424,7 +408,6 @@ type GetTokensResult = {
 export async function getTokens(
     contractDetails: ContractDetails,
     client: JsonRpcClient,
-    network: NetworkConfiguration,
     account: string,
     ids: string[],
     onError?: (error: string) => void
@@ -438,7 +421,7 @@ export async function getTokens(
             return [[], []];
         }
         const metadata = await Promise.all(
-            metadataUrls.map((url) => getTokenMetadata(url, network).catch(() => Promise.resolve(undefined)))
+            metadataUrls.map((url) => getTokenMetadata(url).catch(() => Promise.resolve(undefined)))
         );
 
         return [metadataUrls, metadata];

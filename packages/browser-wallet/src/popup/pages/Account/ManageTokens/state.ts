@@ -2,7 +2,7 @@ import { atom } from 'jotai';
 import { MakeOptional } from 'wallet-common-helpers';
 
 import { selectedAccountAtom } from '@popup/store/account';
-import { jsonRpcClientAtom, networkConfigurationAtom } from '@popup/store/settings';
+import { jsonRpcClientAtom } from '@popup/store/settings';
 import { ensureDefined } from '@shared/utils/basic-helpers';
 import { ContractDetails, ContractTokenDetails } from '@shared/utils/token-helpers';
 import { AsyncWrapper, resetOnUnmountAtom } from '@popup/store/utils';
@@ -60,8 +60,7 @@ export const contractTokensAtom = (() => {
                     const contractDetails = ensureDefined(get(contractDetailsAtom), 'Needs contract details');
                     const account = ensureDefined(get(selectedAccountAtom), 'No account has been selected');
                     const client = get(jsonRpcClientAtom);
-                    const network = get(networkConfigurationAtom);
-                    const fetchTokens = fetchTokensConfigure(contractDetails, client, network, account);
+                    const fetchTokens = fetchTokensConfigure(contractDetails, client, account);
 
                     set(loadingAtom, true);
 
