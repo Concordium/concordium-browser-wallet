@@ -7,12 +7,12 @@ import {
     JsonRpcClient,
     serializeUpdateContractParameters,
     UpdateContractPayload,
+    sha256,
 } from '@concordium/web-sdk';
-import { MetadataUrl, NetworkConfiguration, TokenMetadata, TokenIdAndMetadata } from '@shared/storage/types';
+import { MetadataUrl, TokenMetadata, TokenIdAndMetadata } from '@shared/storage/types';
 import { CIS2_SCHEMA_CONTRACT_NAME, CIS2_SCHEMA } from '@popup/constants/schema';
 import i18n from '@popup/shell/i18n';
 import { SmartContractParameters } from '@concordium/browser-wallet-api-helpers';
-import { isMainnet } from './network-helpers';
 import { determineUpdatePayloadSize } from './energy-helpers';
 
 export interface ContractDetails {
@@ -58,11 +58,11 @@ export function getMetadataParameter(ids: string[]): Buffer {
  * Returns the url for the token metadata.
  * returnValue is assumed to be a HEX-encoded string.
  */
-function deserializeTokenMetadataReturnValue(returnValue: string): string[] {
+function deserializeTokenMetadataReturnValue(returnValue: string): MetadataUrl[] {
     const buf = Buffer.from(returnValue, 'hex');
     const n = buf.readUInt16LE(0);
     let cursor = 2; // First 2 bytes hold number of token amounts included in response.
-    const urls: string[] = [];
+    const urls: MetadataUrl[] = [];
 
     // eslint-disable-next-line no-plusplus
     for (let i = 0; i < n; i++) {
@@ -71,9 +71,21 @@ function deserializeTokenMetadataReturnValue(returnValue: string): string[] {
         const urlEnd = urlStart + length;
 
         const url = Buffer.from(buf.subarray(urlStart, urlEnd)).toString('utf8');
-        urls.push(url);
 
-        cursor = urlEnd + 1;
+        cursor = urlEnd;
+
+        const hasChecksum = buf.readUInt8(cursor);
+        cursor += 1;
+
+        if (hasChecksum === 1) {
+            const hash = Buffer.from(buf.subarray(cursor, cursor + 32)).toString('hex');
+            cursor += 32;
+            urls.push({ url, hash });
+        } else if (hasChecksum === 0) {
+            urls.push({ url });
+        } else {
+            throw new Error('Deserialization failed: boolean value had an unexpected value');
+        }
     }
 
     return urls;
@@ -112,7 +124,7 @@ export function getTokenUrl(
     client: JsonRpcClient,
     ids: string[],
     { contractName, index, subindex }: ContractDetails
-): Promise<string[]> {
+): Promise<MetadataUrl[]> {
     return new Promise((resolve, reject) => {
         client
             .invokeContract({
@@ -122,7 +134,11 @@ export function getTokenUrl(
             })
             .then((returnValue) => {
                 if (returnValue && returnValue.tag === 'success' && returnValue.returnValue) {
-                    resolve(deserializeTokenMetadataReturnValue(returnValue.returnValue));
+                    try {
+                        resolve(deserializeTokenMetadataReturnValue(returnValue.returnValue));
+                    } catch (e) {
+                        reject(e);
+                    }
                 } else {
                     // TODO: perhaps we need to make this error more precise
                     reject(new Error('Token does not exist in this contract'));
@@ -148,24 +164,24 @@ export const getMetadataUnique = ({ unique }: TokenMetadata) => Boolean(unique);
 export const getMetadataDecimals = ({ decimals }: TokenMetadata) => Number(decimals ?? 0);
 
 /**
+ * Given a fetch response, return the hex-encoded sha256 hash of the body.
+ */
+async function getHashOfResponse(resp: Response): Promise<string> {
+    const rawBody = [new Uint8Array(await resp.arrayBuffer())];
+    return sha256(rawBody).toString('hex');
+}
+
+/**
  * Fetches token metadata from the given url
  */
-export async function getTokenMetadata(tokenUrl: string, network: NetworkConfiguration): Promise<TokenMetadata> {
-    if (!isMainnet(network) && tokenUrl.includes('https://some.example/token/')) {
-        const id = tokenUrl.split('https://some.example/token/')[1]?.toLowerCase() ?? 'fallback';
-        return {
-            thumbnail: { url: 'https://picsum.photos/40/40' },
-            display: { url: 'https://picsum.photos/200/300' },
-            name: id.substring(0, 8),
-            decimals: 0,
-            description: id,
-            unique: true,
-        };
-    }
-
-    const resp = await fetch(tokenUrl, { headers: new Headers({ 'Access-Control-Allow-Origin': '*' }), mode: 'cors' });
+export async function getTokenMetadata({ url, hash: checksumHash }: MetadataUrl): Promise<TokenMetadata> {
+    const resp = await fetch(url, { headers: new Headers({ 'Access-Control-Allow-Origin': '*' }), mode: 'cors' });
     if (!resp.ok) {
         throw new Error(`Something went wrong, status: ${resp.status}`);
+    }
+
+    if (checksumHash && (await getHashOfResponse(resp)) !== checksumHash) {
+        throw new Error('Metadata does not match checksum provided with url');
     }
 
     const metadata = await resp.json();
@@ -392,12 +408,11 @@ type GetTokensResult = {
 export async function getTokens(
     contractDetails: ContractDetails,
     client: JsonRpcClient,
-    network: NetworkConfiguration,
     account: string,
     ids: string[],
     onError?: (error: string) => void
 ): Promise<GetTokensResult> {
-    const metadataPromise: Promise<[string[], Array<TokenMetadata | undefined>]> = (async () => {
+    const metadataPromise: Promise<[MetadataUrl[], Array<TokenMetadata | undefined>]> = (async () => {
         let metadataUrls;
         try {
             metadataUrls = await getTokenUrl(client, ids, contractDetails);
@@ -406,8 +421,9 @@ export async function getTokens(
             return [[], []];
         }
         const metadata = await Promise.all(
-            metadataUrls.map((url) => getTokenMetadata(url, network).catch(() => Promise.resolve(undefined)))
+            metadataUrls.map((url) => getTokenMetadata(url).catch(() => Promise.resolve(undefined)))
         );
+
         return [metadataUrls, metadata];
     })();
 
@@ -429,7 +445,7 @@ export async function getTokens(
                       ...acc,
                       {
                           id,
-                          metadataLink: metadataUrls[i],
+                          metadataLink: metadataUrls[i].url,
                           metadata: metadata[i],
                           balance: balances[id] ?? 0n,
                       },

@@ -1,9 +1,10 @@
 # Changelog
 
-## Unreleased
+## 0.9.7
 
 ### Fixed
 
+-   Incorrect CIS-2 token metadata url serialization for tokens with checksums, causing those to be unable to be added.
 -   Init contract transaction now displays as "Contract initialization".
 -   Update contract transaction now displays as "Contract update".
 -   `addCIS2Tokens` now returns the list of added tokens without an internal wrapper.

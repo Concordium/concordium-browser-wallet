@@ -8,7 +8,7 @@ import { useUpdateEffect } from 'wallet-common-helpers';
 import Form from '@popup/shared/Form';
 import FormInput from '@popup/shared/Form/Input';
 import Submit from '@popup/shared/Form/Submit';
-import { jsonRpcClientAtom, networkConfigurationAtom } from '@popup/store/settings';
+import { jsonRpcClientAtom } from '@popup/store/settings';
 import { confirmCIS2Contract, ContractDetails, ContractTokenDetails } from '@shared/utils/token-helpers';
 import TokenDetails from '@popup/shared/TokenDetails';
 import { selectedAccountAtom } from '@popup/store/account';
@@ -48,7 +48,6 @@ function ChooseContract() {
     const nav = useNavigate();
     const validContract = useRef<{ details: ContractDetails; tokens: FetchTokensResponse } | undefined>();
     const account = ensureDefined(useAtomValue(selectedAccountAtom), 'No account has been selected');
-    const network = useAtomValue(networkConfigurationAtom);
     const [, updateTokens] = useAtom(contractTokensAtom);
 
     const onSubmit: SubmitHandler<FormValues> = async () => {
@@ -81,7 +80,7 @@ function ChooseContract() {
                 }
 
                 let tokenError = false;
-                const response = await fetchTokensConfigure(cd, client, network, account, () => {
+                const response = await fetchTokensConfigure(cd, client, account, () => {
                     tokenError = true;
                 })();
 

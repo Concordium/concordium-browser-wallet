@@ -10,7 +10,7 @@ import { currentAccountTokensAtom } from '@popup/store/token';
 import { useAsyncMemo } from 'wallet-common-helpers';
 import { TokenIdAndMetadata } from '@shared/storage/types';
 import { ContractTokenDetails, fetchContractName, getTokens } from '@shared/utils/token-helpers';
-import { jsonRpcClientAtom, networkConfigurationAtom } from '@popup/store/settings';
+import { jsonRpcClientAtom } from '@popup/store/settings';
 import { selectedAccountAtom } from '@popup/store/account';
 import { fullscreenPromptContext } from '@popup/page-layouts/FullscreenPromptLayout';
 import { Input as UncontrolledInput } from '@popup/shared/Form/Input';
@@ -45,7 +45,6 @@ export default function SignMessage({ respond }: Props) {
     const { contractIndex, contractSubindex, tokenIds, url } = state.payload;
     const addToast = useSetAtom(addToastAtom);
     const client = useAtomValue(jsonRpcClientAtom);
-    const network = useAtomValue(networkConfigurationAtom);
     const account = useAtomValue(selectedAccountAtom);
     const [accountTokens, setAccountTokens] = useAtom(currentAccountTokensAtom);
     const [addingTokens, setAddingTokens] = useState<TokenWithChoice[]>();
@@ -87,7 +86,7 @@ export default function SignMessage({ respond }: Props) {
             addToast(t('filterInvalid'));
         }
 
-        getTokens(contractDetails, client, network, account, filteredIds, addToast).then((newTokens) => {
+        getTokens(contractDetails, client, account, filteredIds, addToast).then((newTokens) => {
             const tokensToAdd = newTokens
                 .filter((token) => token.metadata)
                 .map(
