@@ -15,18 +15,12 @@ import TransactionReceipt from '@popup/shared/TransactionReceipt/TransactionRece
 import Button from '@popup/shared/Button';
 import { displayUrl } from '@popup/shared/utils/string-helpers';
 import { noOp, useAsyncMemo } from 'wallet-common-helpers';
-import { getEnergyPerCCD } from '@popup/shared/utils/wallet-proxy';
 import ConnectedBox from '@popup/pages/Account/ConnectedBox';
 import { addToastAtom } from '@popup/state';
 import ExternalRequestLayout from '@popup/page-layouts/ExternalRequestLayout';
 import { useUpdateAtom } from 'jotai/utils';
 import { addPendingTransactionAtom } from '@popup/store/transactions';
-import {
-    determineInitPayloadSize,
-    determineUpdatePayloadSize,
-    SIMPLE_TRANSFER_ENERGY_TOTAL_COST,
-} from '@shared/utils/energy-helpers';
-import { calculateEnergyCost } from '@shared/utils/token-helpers';
+import { convertEnergyToMicroCcd, getEnergyCost } from '@shared/utils/energy-helpers';
 import { SmartContractParameters, SchemaWithContext } from '@concordium/browser-wallet-api-helpers';
 import { parsePayload } from './util';
 
@@ -74,28 +68,9 @@ export default function SendTransaction({ onSubmit, onReject }: Props) {
 
     const cost = useAsyncMemo(
         async () => {
-            const exchangeRate = await getEnergyPerCCD();
-            const getCost = (fee: bigint) => BigInt(Math.ceil(exchangeRate * Number(fee)));
-            if (transactionType === AccountTransactionType.Transfer) {
-                return getCost(SIMPLE_TRANSFER_ENERGY_TOTAL_COST);
-            }
-            if (AccountTransactionType.Update === transactionType) {
-                const energy = calculateEnergyCost(
-                    1n,
-                    determineUpdatePayloadSize(payload.message.length, payload.receiveName),
-                    payload.maxContractExecutionEnergy || 0n
-                );
-                return getCost(energy);
-            }
-            if (AccountTransactionType.InitContract === transactionType) {
-                const energy = calculateEnergyCost(
-                    1n,
-                    determineInitPayloadSize(payload.param.length, payload.initName),
-                    payload.maxContractExecutionEnergy || 0n
-                );
-                return getCost(energy);
-            }
-            return undefined;
+            const parameters = await client.getBlockChainParameters();
+            const energy = getEnergyCost(transactionType, payload);
+            return convertEnergyToMicroCcd(energy, parameters);
         },
         noOp,
         [transactionType]

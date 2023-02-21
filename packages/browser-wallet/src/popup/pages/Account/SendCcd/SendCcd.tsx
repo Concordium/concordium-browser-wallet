@@ -1,7 +1,5 @@
 import React, { useContext, useState } from 'react';
 import { Route, Routes } from 'react-router-dom';
-import { getEnergyPerCCD } from '@popup/shared/utils/wallet-proxy';
-import { noOp, useAsyncMemo } from 'wallet-common-helpers';
 import CreateTransfer from './CreateTransfer';
 import ConfirmSimpleTransfer from './ConfirmSimpleTransfer';
 import { routes } from './routes';
@@ -9,7 +7,6 @@ import ConfirmTokenTransfer from './ConfirmTokenTransfer';
 import { accountPageContext } from '../utils';
 
 export default function SendCcd() {
-    const exchangeRate = useAsyncMemo(getEnergyPerCCD, noOp, []);
     const [cost, setCost] = useState(0n);
     const { setDetailsExpanded } = useContext(accountPageContext);
 
@@ -25,14 +22,7 @@ export default function SendCcd() {
             />
             <Route
                 index
-                element={
-                    <CreateTransfer
-                        exchangeRate={exchangeRate}
-                        setCost={setCost}
-                        cost={cost}
-                        setDetailsExpanded={setDetailsExpanded}
-                    />
-                }
+                element={<CreateTransfer setCost={setCost} cost={cost} setDetailsExpanded={setDetailsExpanded} />}
             />
         </Routes>
     );
