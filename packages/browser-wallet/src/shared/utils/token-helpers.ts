@@ -164,14 +164,6 @@ export const getMetadataUnique = ({ unique }: TokenMetadata) => Boolean(unique);
 export const getMetadataDecimals = ({ decimals }: TokenMetadata) => Number(decimals ?? 0);
 
 /**
- * Given a fetch response, return the hex-encoded sha256 hash of the body.
- */
-async function getHashOfResponse(resp: Response): Promise<string> {
-    const rawBody = [new Uint8Array(await resp.arrayBuffer())];
-    return sha256(rawBody).toString('hex');
-}
-
-/**
  * Fetches token metadata from the given url
  */
 export async function getTokenMetadata({ url, hash: checksumHash }: MetadataUrl): Promise<TokenMetadata> {
@@ -180,11 +172,12 @@ export async function getTokenMetadata({ url, hash: checksumHash }: MetadataUrl)
         throw new Error(`Something went wrong, status: ${resp.status}`);
     }
 
-    if (checksumHash && (await getHashOfResponse(resp)) !== checksumHash) {
+    const body = Buffer.from(await resp.arrayBuffer());
+    if (checksumHash && sha256([body]).toString('hex') !== checksumHash) {
         throw new Error('Metadata does not match checksum provided with url');
     }
 
-    const metadata = await resp.json();
+    const metadata = JSON.parse(body.toString());
 
     confirmString(metadata.name);
     confirmString(metadata.symbol);
