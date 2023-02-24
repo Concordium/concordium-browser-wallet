@@ -36,11 +36,7 @@ export const accountInfoAtom = atom<Record<string, AccountInfo>, AccountInfoActi
         const addToast = (v: string) => set(addToastAtom, v);
 
         try {
-            const consensusStatus = await client.getConsensusStatus();
-            const newAccountInfo = await client.getAccountInfo(
-                new AccountAddress(update.address),
-                consensusStatus.lastFinalizedBlock
-            );
+            const newAccountInfo = await client.getAccountInfo(new AccountAddress(update.address));
 
             if (newAccountInfo) {
                 updateRecord(
