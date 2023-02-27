@@ -39,7 +39,7 @@ export const networkConfigurationAtom = atom<NetworkConfiguration, NetworkConfig
     }
 );
 
-export const cookieAtom = atomWithChromeStorage<string | undefined>(ChromeStorageKey.Cookie, undefined);
+const cookieAtom = atomWithChromeStorage<string | undefined>(ChromeStorageKey.Cookie, undefined);
 export const jsonRpcClientAtom = atom<JsonRpcClient>((get) => {
     const network = get(storedNetworkConfigurationAtom);
     const cookie = get(cookieAtom);

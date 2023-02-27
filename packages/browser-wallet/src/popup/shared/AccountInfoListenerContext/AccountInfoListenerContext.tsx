@@ -5,7 +5,7 @@ import { useTranslation } from 'react-i18next';
 import i18next from 'i18next';
 import { atomFamily } from 'jotai/utils';
 import { noOp, parse, stringify } from 'wallet-common-helpers';
-import { networkConfigurationAtom, grpcClientAtom, cookieAtom } from '@popup/store/settings';
+import { networkConfigurationAtom, grpcClientAtom } from '@popup/store/settings';
 import { atomWithChromeStorage } from '@popup/store/utils';
 import { ChromeStorageKey, CreationStatus, WalletCredential } from '@shared/storage/types';
 import { addToastAtom } from '@popup/state';
@@ -69,12 +69,11 @@ interface Props {
 export default function AccountInfoListenerContextProvider({ children }: Props) {
     const network = useAtomValue(networkConfigurationAtom);
     const addToast = useSetAtom(addToastAtom);
-    const [cookie, setCookie] = useAtom(cookieAtom);
     const [accountInfoListener, setAccountInfoListener] = useState<AccountInfoListener>();
     const { t } = useTranslation();
 
     useEffect(() => {
-        const listener = new AccountInfoListener(network, setCookie, cookie);
+        const listener = new AccountInfoListener(network);
         listener.listen();
         setAccountInfoListener(listener);
         const errorListener = () => addToast(t('account.error'));

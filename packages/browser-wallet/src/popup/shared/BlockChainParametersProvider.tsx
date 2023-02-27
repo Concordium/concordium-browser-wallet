@@ -10,15 +10,19 @@ interface Props {
     children: ReactNode;
 }
 
+/**
+ * Context for enabling the useBlockChainParameters hook.
+ * Caches the parameter values to avoid unnecessary calls to the node.
+ */
 export default function BlockChainParametersContext({ children }: Props) {
-    const chainParameters = useRef<ChainParameters | undefined>(undefined);
+    const chainParameters = useRef<Promise<ChainParameters> | undefined>(undefined);
     const client = useAtomValue(grpcClientAtom);
 
-    const getBlockChainParameters = useCallback(async () => {
+    const getBlockChainParameters = useCallback(() => {
         if (chainParameters.current) {
             return chainParameters.current;
         }
-        const params = await client.getBlockChainParameters();
+        const params = client.getBlockChainParameters();
         chainParameters.current = params;
         return params;
     }, []);
@@ -30,6 +34,9 @@ export default function BlockChainParametersContext({ children }: Props) {
     );
 }
 
+/**
+ * Hook for getting the blockchain parameters.
+ */
 export function useBlockChainParameters() {
     const getBlockChainParameters = useContext(blockChainParametersContext);
     return useAsyncMemo(getBlockChainParameters, undefined, []);

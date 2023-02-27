@@ -18,8 +18,7 @@ export class AccountInfoListener extends EventEmitter {
 
     private accountsMap: Map<string, number> = new Map();
 
-    // eslint-disable-next-line @typescript-eslint/no-unused-vars
-    constructor(network: NetworkConfiguration, _onSetCookie: (cookie: string) => void, _cookie?: string) {
+    constructor(network: NetworkConfiguration) {
         super();
         this.client = createConcordiumClient(network.grpcUrl, network.grpcPort, { timeout: GRPCTIMEOUT });
         this.genesisHash = network.genesisHash;
