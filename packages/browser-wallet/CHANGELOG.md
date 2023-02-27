@@ -1,5 +1,11 @@
 # Changelog
 
+## 0.9.8
+
+### Fixed
+
+-   Bug in bugfix for CIS-2 token metadata url serialization for tokens with checksums.
+
 ## 0.9.7
 
 ### Fixed
