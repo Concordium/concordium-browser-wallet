@@ -15,11 +15,6 @@ export function determineUpdatePayloadSize(parameterSize: number, receiveName: s
     return 8n + 8n + 8n + 2n + BigInt(parameterSize) + 2n + BigInt(receiveName.length);
 }
 
-// TODO: replace this with helpers from SDK
-export function determineInitPayloadSize(parameterSize: number, contractName: string) {
-    return 8n + 64n + 2n + BigInt(parameterSize) + 2n + BigInt(contractName.length + 5);
-}
-
 /**
  * Given a transaction type and the payload of that transaction type, return the corresponding energy cost.
  */
