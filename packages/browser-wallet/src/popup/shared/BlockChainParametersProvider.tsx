@@ -1,7 +1,7 @@
 import { ChainParameters } from '@concordium/web-sdk';
-import { grpcClientAtom } from '@popup/store/settings';
+import { grpcClientAtom, networkConfigurationAtom } from '@popup/store/settings';
 import { useAtomValue } from 'jotai';
-import React, { createContext, ReactNode, useCallback, useContext, useRef } from 'react';
+import React, { createContext, ReactNode, useCallback, useContext, useEffect, useRef } from 'react';
 import { useAsyncMemo } from 'wallet-common-helpers';
 
 export const blockChainParametersContext = createContext<() => Promise<ChainParameters>>(() => Promise.reject());
@@ -16,7 +16,12 @@ interface Props {
  */
 export default function BlockChainParametersContext({ children }: Props) {
     const chainParameters = useRef<Promise<ChainParameters> | undefined>(undefined);
+    const currentNetwork = useAtomValue(networkConfigurationAtom);
     const client = useAtomValue(grpcClientAtom);
+
+    useEffect(() => {
+        chainParameters.current = undefined;
+    }, [currentNetwork.genesisHash]);
 
     const getBlockChainParameters = useCallback(() => {
         if (chainParameters.current) {
@@ -25,7 +30,7 @@ export default function BlockChainParametersContext({ children }: Props) {
         const params = client.getBlockChainParameters();
         chainParameters.current = params;
         return params;
-    }, []);
+    }, [client]);
 
     return (
         <blockChainParametersContext.Provider value={getBlockChainParameters}>
