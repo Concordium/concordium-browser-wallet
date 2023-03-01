@@ -8,6 +8,7 @@
     background-color: $color-bg;
     color: $color-text;
 
+    &--disabled,
     &--pending {
         border-color: $color-grey;
     }
@@ -30,6 +31,7 @@
         align-items: center;
         justify-content: center;
 
+        .id-card--disabled &,
         .id-card--pending & {
             background-color: $color-grey;
         }
@@ -55,6 +57,10 @@
                 top: 50%;
                 transform: translate(50%, -50%);
                 width: rem(10px);
+
+                .id-card--disabled & {
+                    fill: $color-grey;
+                }
             }
         }
     }
@@ -137,6 +143,12 @@
             }
         }
 
+        .id-card--disabled & {
+            path {
+                fill: $color-grey;
+            }
+        }
+
         circle {
             fill: $color-bg;
         }
@@ -174,9 +186,5 @@
                 fill: $color-cta;
             }
         }
-    }
-
-    &--clickable {
-        cursor: pointer;
     }
 }
