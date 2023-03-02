@@ -414,7 +414,12 @@ export async function getTokens(
             return [[], []];
         }
         const metadata = await Promise.all(
-            metadataUrls.map((url) => getTokenMetadata(url).catch(() => Promise.resolve(undefined)))
+            metadataUrls.map((url, index) =>
+                getTokenMetadata(url).catch((error) => {
+                    onError?.(`id: "${ids[index]}": ${error.message}`);
+                    return Promise.resolve(undefined);
+                })
+            )
         );
 
         return [metadataUrls, metadata];

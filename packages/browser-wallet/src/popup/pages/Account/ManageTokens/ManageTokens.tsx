@@ -1,4 +1,4 @@
-import React, { useCallback, useContext, useEffect, useRef } from 'react';
+import React, { useCallback, useEffect, useRef } from 'react';
 import { useAtom, useAtomValue } from 'jotai';
 import { useForm, SubmitHandler } from 'react-hook-form';
 import { useTranslation } from 'react-i18next';
@@ -15,7 +15,6 @@ import { selectedAccountAtom } from '@popup/store/account';
 import { ensureDefined } from '@shared/utils/basic-helpers';
 import { contractBalancesFamily, currentAccountTokensAtom } from '@popup/store/token';
 import { debouncedAsyncValidate } from '@popup/shared/utils/validation-helpers';
-import { accountPageContext } from '../utils';
 import {
     checkedTokensAtom,
     contractDetailsAtom,
@@ -79,13 +78,14 @@ function ChooseContract() {
                     return error;
                 }
 
-                let tokenError = false;
-                const response = await fetchTokensConfigure(cd, client, account, () => {
-                    tokenError = true;
+                const fetchErrors: string[] = [];
+
+                const response = await fetchTokensConfigure(cd, client, account, (e) => {
+                    fetchErrors.push(e);
                 })();
 
-                if (tokenError) {
-                    return t('failedTokensError');
+                if (fetchErrors.length > 0) {
+                    return t('failedTokensError', { errors: fetchErrors.join('\n') });
                 }
                 if (response.tokens.length === 0) {
                     return t('noTokensError');
@@ -124,6 +124,7 @@ function ChooseContract() {
                             }}
                         />
                     </div>
+
                     <Submit>{t('lookupTokens')}</Submit>
                 </>
             )}
@@ -152,7 +153,6 @@ function Details() {
 }
 
 export default function AddTokens() {
-    const { setDetailsExpanded } = useContext(accountPageContext);
     const accountTokens = useAtomValue(currentAccountTokensAtom);
     const contractDetails = useAtomValue(contractDetailsAtom);
     const account = ensureDefined(useAtomValue(selectedAccountAtom), 'Expected account to be selected');
@@ -168,11 +168,6 @@ export default function AddTokens() {
     useAtom(searchAtom);
     useAtom(searchResultAtom);
     useAtom(listScrollPositionAtom);
-
-    useEffect(() => {
-        setDetailsExpanded(false);
-        return () => setDetailsExpanded(true);
-    }, []);
 
     useEffect(() => {
         if (contractDetails?.index !== undefined && !accountTokens.loading) {

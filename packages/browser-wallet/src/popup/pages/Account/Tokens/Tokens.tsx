@@ -4,7 +4,6 @@ import { Outlet, Route, Routes, useNavigate } from 'react-router-dom';
 import { displayAsCcd } from 'wallet-common-helpers';
 import { useAtomValue } from 'jotai';
 
-import { absoluteRoutes } from '@popup/constants/routes';
 import TabBar from '@popup/shared/TabBar';
 import CcdIcon from '@assets/svg/concordium.svg';
 import { useAccountInfo } from '@popup/shared/AccountInfoListenerContext';
@@ -20,7 +19,7 @@ import Img from '@popup/shared/Img';
 import { tokensRoutes, detailsRoute } from './routes';
 import TokenDetails from './TokenDetails';
 import { AccountTokenDetails, useFlattenedAccountTokens } from './utils';
-import { accountRoutes } from '../routes';
+import ManageTokens from '../ManageTokens';
 
 type FtProps = {
     accountAddress: string;
@@ -178,10 +177,7 @@ function Tokens() {
                 <TabBar.Item className="tokens__link" to={tokensRoutes.collectibles}>
                     {t('nft')}
                 </TabBar.Item>
-                <TabBar.Item
-                    className="tokens__link"
-                    to={`${absoluteRoutes.home.account.path}/${accountRoutes.manageTokens}`}
-                >
+                <TabBar.Item className="tokens__link" to={tokensRoutes.manage}>
                     <div className="tokens__add">{t('manage')}</div>
                 </TabBar.Item>
             </TabBar>
@@ -213,6 +209,7 @@ export default function TokensRoutes() {
                     path={tokensRoutes.collectibles}
                     element={<Collectibles account={account} toDetails={goToDetails} />}
                 />
+                <Route path={`${tokensRoutes.manage}/*`} element={<ManageTokens />} />
             </Route>
         </Routes>
     );

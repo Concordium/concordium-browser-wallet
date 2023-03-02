@@ -19,7 +19,6 @@ import TransactionLog from './TransactionLog/TransactionLog';
 import SendCcd from './SendCcd';
 import ConnectedBox from './ConnectedBox';
 import Tokens from './Tokens';
-import ManageTokens from './ManageTokens';
 import { AccountPageContext, accountPageContext } from './utils';
 
 function Account() {
@@ -98,7 +97,6 @@ export default function AccountRoutes() {
                     <Route path={`${accountRoutes.log}/*`} element={<TransactionLog />} />
                     <Route path={`${accountRoutes.settings}/*`} element={<AccountSettings />} />
                     <Route path={`${accountRoutes.tokens}/*`} element={<Tokens />} />
-                    <Route path={`${accountRoutes.manageTokens}/*`} element={<ManageTokens />} />
                 </Route>
             </Routes>
         </accountPageContext.Provider>
