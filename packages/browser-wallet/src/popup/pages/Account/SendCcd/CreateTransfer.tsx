@@ -197,11 +197,12 @@ function CreateTransaction({ tokens, setCost, setDetailsExpanded, cost }: Props 
         if (validateAddress) {
             return validateAddress;
         }
-        const info = await client.getAccountInfo(new AccountAddress(recipientAddress));
-        if (!info) {
+        try {
+            await client.getAccountInfo(new AccountAddress(recipientAddress));
+            return undefined;
+        } catch {
             return t('sendCcd.nonexistingAccount');
         }
-        return undefined;
     }, []);
 
     const displayAmount = integerToFractional(getMetadataDecimals(tokenMetadata));

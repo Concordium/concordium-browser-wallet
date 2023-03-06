@@ -133,7 +133,10 @@ async function performRecovery() {
         const credentials = await storedCredentials.get(network.genesisHash);
 
         const client = createConcordiumClient(network.grpcUrl, network.grpcPort, { timeout: GRPCTIMEOUT });
-        const getAccountInfo = (credId: string) => client.getAccountInfo(new CredentialRegistrationId(credId));
+        const getAccountInfo = (credId: string) =>
+            client.getAccountInfo(new CredentialRegistrationId(credId)).catch(() => {
+                return undefined;
+            });
 
         let initialGap: number | undefined = status.identityGap || 0;
         let initialIndex: number | undefined = status.identityIndex || 0;
