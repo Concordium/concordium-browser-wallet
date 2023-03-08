@@ -12,7 +12,8 @@ The example project included in this repository serves as a working example of h
 ## Installing
 
 -   Run `yarn` in package root.
--   Run `yarn build:all` in package root.
+-   Run `yarn build:all` in package root. (You will see an `[ERROR] Could not resolve "@concordium/browser-wallet-api-helpers`.)
+-   Run `yarn build:all` in package root. (The command needs to be run twice because the above package that this project depends on will be built during the first run.)
 
 ## Running the eSealing example
 
