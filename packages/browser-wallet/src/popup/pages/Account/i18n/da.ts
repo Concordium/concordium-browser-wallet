@@ -164,7 +164,6 @@ const t: typeof en = {
         },
         details: {
             heading: 'Din delegation er registreret',
-            amount: 'Delegation saldo',
             target: 'Target',
             targetPassive: 'Passiv delegation',
             targetBaker: 'Baker {{bakerId}}',
@@ -219,6 +218,8 @@ const t: typeof en = {
             warning: 'Advarsel',
         },
     },
+    // TODO translate
+    baking: en.baking,
     accountPending: 'Denne konto er stadig ved at blive oprettet.',
     accountRejected: 'Denne konto kunne ikke blive oprettet.',
     request: 'Opret konto',

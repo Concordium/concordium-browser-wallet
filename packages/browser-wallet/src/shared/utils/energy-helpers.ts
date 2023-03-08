@@ -2,7 +2,7 @@ import {
     AccountTransactionPayload,
     AccountTransactionType,
     calculateEnergyCost,
-    ConfigureDelegationPayload,
+    ConfigureBakerPayload,
     ChainParameters,
     getAccountTransactionHandler,
     Ratio,
@@ -28,6 +28,14 @@ export function getEnergyCost(transactionType: AccountTransactionType, payload: 
     return calculateEnergyCost(1n, BigInt(size), handler.getBaseEnergyCost(payload));
 }
 
+export function getConfigureDelegationMaxEnergyCost(): bigint {
+    return calculateEnergyCost(1n, CONFIGURE_DELEGATION_MAX_PAYLOAD_SIZE, CONFIGURE_DELEGATION_BASE_COST);
+}
+
+export function getConfigureBakerEnergyCost(payload: ConfigureBakerPayload): bigint {
+    return getEnergyCost(AccountTransactionType.ConfigureBaker, payload);
+}
+
 // TODO: Replace this with helpers from SDK
 /**
  * Given the current blockchain parameters, return the microCCD per NRG exchange rate of the chain.
@@ -46,12 +54,4 @@ export function getExchangeRate({ euroPerEnergy, microGTUPerEuro }: ChainParamet
 export function convertEnergyToMicroCcd(cost: bigint, chainParameters: ChainParameters): bigint {
     const rate = getExchangeRate(chainParameters);
     return collapseRatio(multiplyRatio(rate, cost));
-}
-
-export function getConfigureDelegationEnergyCost(payload: ConfigureDelegationPayload): bigint {
-    return getEnergyCost(AccountTransactionType.ConfigureDelegation, payload);
-}
-
-export function getConfigureDelegationMaxEnergyCost(): bigint {
-    return calculateEnergyCost(1n, CONFIGURE_DELEGATION_MAX_PAYLOAD_SIZE, CONFIGURE_DELEGATION_BASE_COST);
 }

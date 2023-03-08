@@ -31,7 +31,7 @@ import Button from '@popup/shared/Button';
 import { configureDelegationChangesPayload, ConfigureDelegationFlowState } from './utils';
 import AccountTransactionFlow from '../../AccountTransactionFlow';
 import { accountPageContext } from '../../utils';
-import { STAKE_WARNING_THRESHOLD } from '../utils';
+import { isAboveStakeWarningThreshold, STAKE_WARNING_THRESHOLD } from '../utils';
 
 type PoolPageForm =
     | {
@@ -213,7 +213,11 @@ function AmountPage({ initial, onNext, formValues, accountInfo }: AmountPageProp
     }, []);
 
     const onSubmit = (vs: AmountPageForm) => {
-        if (ccdToMicroCcd(vs.amount) * 100n > accountInfo.accountAmount * STAKE_WARNING_THRESHOLD) {
+        // If the default value i.e. current stake or previosly chosen stake is already above the threshold, do not display the warning
+        if (
+            !(initial && isAboveStakeWarningThreshold(ccdToMicroCcd(initial), accountInfo)) &&
+            isAboveStakeWarningThreshold(ccdToMicroCcd(vs.amount), accountInfo)
+        ) {
             setOpenWarning(true);
         } else {
             onNext(vs.amount);
@@ -227,7 +231,7 @@ function AmountPage({ initial, onNext, formValues, accountInfo }: AmountPageProp
         <Form<AmountPageForm> className="configure-flow-form" defaultValues={defaultValues} onSubmit={onSubmit}>
             {(f) => (
                 <>
-                    <div>
+                    <div className="w-full">
                         <Modal open={openWarning} onClose={() => setOpenWarning(false)}>
                             <div>
                                 <h3 className="m-t-0">{t('warning')}</h3>
@@ -248,7 +252,7 @@ function AmountPage({ initial, onNext, formValues, accountInfo }: AmountPageProp
                                 </Button>
                             </div>
                         </Modal>
-                        <p className="m-t-0">{t('amount.description')}</p>
+                        <p className="m-t-0 text-center">{t('amount.description')}</p>
                         {pendingChange && (
                             <DisabledAmountInput
                                 className="delegation__amount-input"
@@ -262,7 +266,7 @@ function AmountPage({ initial, onNext, formValues, accountInfo }: AmountPageProp
                                 autoFocus
                                 register={f.register}
                                 symbol={getCcdSymbol()}
-                                className="delegation__amount-input"
+                                className="earn__amount-input"
                                 name="amount"
                                 rules={{
                                     required: t('amount.amountRequired'),
@@ -336,8 +340,8 @@ export default function ConfigureDelegationFlow({ onConvertError, ...props }: Pr
     return (
         <AccountTransactionFlow<ConfigureDelegationFlowState>
             {...props}
-            convert={valuesToPayload}
             firstPageBack
+            convert={valuesToPayload}
             transactionType={AccountTransactionType.ConfigureDelegation}
             handleDoneError={onConvertError}
         >

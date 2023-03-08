@@ -1,4 +1,5 @@
 import React, { ReactNode } from 'react';
+import { ClassName } from 'wallet-common-helpers';
 
 /* eslint-disable react/destructuring-assignment */
 type OptionalFieldBaseProps = {
@@ -20,7 +21,7 @@ function hasChildren<T>(props: OptionalFieldProps<T>): props is OptionalNonRende
     return (props as OptionalNonRenderableFieldProps<T>).children !== undefined;
 }
 
-export default function OptionalField<T>(props: OptionalFieldProps<T>) {
+export default function OptionalField<T>({ className, ...props }: OptionalFieldProps<T> & ClassName) {
     if (props.value === undefined) {
         return null;
     }
@@ -28,7 +29,7 @@ export default function OptionalField<T>(props: OptionalFieldProps<T>) {
     return (
         <>
             <h5>{props.title}:</h5>
-            <div>{hasChildren(props) ? props.children(props.value) : props.value}</div>
+            <div className={className}>{hasChildren(props) ? props.children(props.value) : props.value}</div>
         </>
     );
 }

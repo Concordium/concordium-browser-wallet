@@ -1,4 +1,4 @@
-import type en from './en';
+import en from './en';
 
 const t: typeof en = {
     form: {
@@ -44,6 +44,7 @@ const t: typeof en = {
             invalid: 'Ugyldigt beløb',
             insufficient: 'Ikke nok penge',
             zero: 'Beløbet må ikke være nul',
+            belowBakerThreshold: 'Indsat mængde er under grænsen {{ threshold }} for bagning',
             exceedingDelegationCap: "delegeret mængde må ikke gå over valgt bager gruppe's loft på {{ max }}.",
         },
         transaction: {
@@ -52,6 +53,7 @@ const t: typeof en = {
                 init: 'Opret Smart Contract Instans',
                 update: 'Opdater Smart Contract Instans',
                 registerData: 'Registrer data',
+                configureBaker: 'Konfigurer  bager',
                 configureDelegation: 'Konfigurer delegering',
             },
         },
@@ -83,6 +85,8 @@ const t: typeof en = {
         pendingRemove: 'Delegeringen vil stoppe og den delegeret mængde vil blive frigjort til den offentlige balance.',
         pendingChange: 'Ny delegeret mængde',
     },
+    // TODO: translate
+    baking: en.baking,
     tokenDetails: {
         balance: 'Saldo',
         description: 'Beskrivelse',

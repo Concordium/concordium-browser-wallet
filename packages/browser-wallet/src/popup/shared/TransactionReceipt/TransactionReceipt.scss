@@ -25,7 +25,6 @@ $transaction-receipt-horizontal-padding: rem(20px);
     &__address {
         flex-wrap: wrap;
         word-break: break-all;
-        font-size: rem(8px);
     }
 
     &__cost {
@@ -42,17 +41,28 @@ $transaction-receipt-horizontal-padding: rem(20px);
         padding: rem(8px);
     }
 
+    &__address,
+    &__hash,
+    &__key {
+        font-size: rem(8px);
+    }
+
     &__hash {
         color: $color-text-faded;
         border-top: rem(0.5px) solid $color-grey;
         padding-top: rem(5px);
-        font-size: rem(8px);
         margin-top: rem(10px);
     }
 
     &__module-ref {
         width: rem(180px);
         overflow-wrap: break-word;
+    }
+
+    &__scrollable-field {
+        width: 100%;
+        overflow: scroll;
+        text-align: center;
     }
 }
 

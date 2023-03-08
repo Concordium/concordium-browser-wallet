@@ -16,11 +16,16 @@ import { useSelectedAccountInfo } from '@popup/shared/AccountInfoListenerContext
 import { useHasPendingTransaction } from '@popup/shared/utils/transaction-helpers';
 import { useAtomValue } from 'jotai';
 import { grpcClientAtom } from '@popup/store/settings';
-import { displayAsCcd, useAsyncMemo } from 'wallet-common-helpers';
+import { displayAsCcd, useAsyncMemo, useUpdateEffect } from 'wallet-common-helpers';
 import ButtonGroup from '@popup/shared/ButtonGroup';
-import { accountPageContext } from '../utils';
+import { selectedAccountAtom } from '@popup/store/account';
+import { absoluteRoutes } from '@popup/constants/routes';
+import { useBlockChainParameters } from '@popup/shared/BlockChainParametersProvider';
+import Baking from './Baking';
 import Delegate from './Delegate';
+import { accountPageContext } from '../utils';
 import { filterType, EarnPageContext, earnPageContext } from './utils';
+import { accountRoutes } from '../routes';
 
 const routes = {
     delegate: 'delegate',
@@ -83,13 +88,17 @@ function Earn({ chainParameters }: EarnProps) {
 
 export default function EarnRoutes() {
     const { setDetailsExpanded } = useContext(accountPageContext);
+    const account = useAtomValue(selectedAccountAtom);
+    const nav = useNavigate();
+
+    useUpdateEffect(() => {
+        nav(`${absoluteRoutes.home.account.path}/${accountRoutes.earn}`);
+    }, [account]);
 
     const client = useAtomValue(grpcClientAtom);
-    const chainParameters = useAsyncMemo(
-        () => client.getBlockChainParameters().then(filterType(isChainParametersV1)),
-        undefined,
-        []
-    );
+    const chainParameters = useBlockChainParameters();
+    const ParametersV1 = chainParameters ? filterType(isChainParametersV1)(chainParameters) : undefined;
+
     const consensusStatus = useAsyncMemo(() => client.getConsensusStatus(), undefined, []);
     const tokenomicsInfo = useAsyncMemo(
         () => client.getTokenomicsInfo().then(filterType(isRewardStatusV1)),
@@ -103,16 +112,16 @@ export default function EarnRoutes() {
     }, []);
 
     const context = useMemo<EarnPageContext>(
-        () => ({ chainParameters, consensusStatus, tokenomicsInfo }),
+        () => ({ chainParameters: ParametersV1, consensusStatus, tokenomicsInfo }),
         [consensusStatus, tokenomicsInfo, chainParameters]
     );
 
     return (
         <earnPageContext.Provider value={context}>
             <Routes>
-                <Route index element={<Earn chainParameters={chainParameters} />} />
+                <Route index element={<Earn chainParameters={ParametersV1} />} />
                 <Route path={`${routes.delegate}/*`} element={<Delegate />} />
-                <Route path={routes.baking} element={<>Baking details coming...</>} />
+                <Route path={`${routes.baking}/*`} element={<Baking />} />
             </Routes>
         </earnPageContext.Provider>
     );

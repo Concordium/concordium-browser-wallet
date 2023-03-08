@@ -9,8 +9,9 @@ import {
     signTransaction,
     SimpleTransferPayload,
     TransactionExpiry,
-    BakerPoolStatusDetails,
     AccountInfo,
+    ChainParametersV1,
+    BakerPoolStatusDetails,
 } from '@concordium/web-sdk';
 import { ccdToMicroCcd, displayAsCcd, fractionalToInteger, isValidCcdString } from 'wallet-common-helpers';
 
@@ -63,6 +64,27 @@ export function validateTransferAmount(
     if (amountToValidateInteger === 0n) {
         return i18n.t('utils.ccdAmount.zero');
     }
+    return undefined;
+}
+
+export function validateBakerStake(
+    amountToValidate: string,
+    chainParameters?: ChainParametersV1,
+    accountInfo?: AccountInfo,
+    estimatedFee?: bigint
+): string | undefined {
+    if (!isValidCcdString(amountToValidate)) {
+        return i18n.t('utils.ccdAmount.invalid');
+    }
+    const bakerStakeThreshold = chainParameters?.minimumEquityCapital || 0n;
+    const amount = ccdToMicroCcd(amountToValidate);
+    if (bakerStakeThreshold > amount) {
+        return i18n.t('utils.ccdAmount.belowBakerThreshold', { threshold: displayAsCcd(bakerStakeThreshold) });
+    }
+    if (accountInfo && BigInt(accountInfo.accountAmount) < amount + (estimatedFee || 0n)) {
+        return i18n.t('utils.ccdAmount.insufficient');
+    }
+
     return undefined;
 }
 
@@ -124,6 +146,9 @@ export function getTransactionTypeName(type: AccountTransactionType): string {
         }
         case AccountTransactionType.ConfigureDelegation: {
             return i18n.t('utils.transaction.type.configureDelegation');
+        }
+        case AccountTransactionType.ConfigureBaker: {
+            return i18n.t('utils.transaction.type.configureBaker');
         }
         default: {
             return AccountTransactionType[type];

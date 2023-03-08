@@ -2,10 +2,10 @@
 import React, { useContext, useEffect, useMemo } from 'react';
 import { Link, Route, Routes, useNavigate } from 'react-router-dom';
 import {
-    AccountInfoDelegator,
+    AccountInfoBakerV1,
     AccountTransactionType,
-    DelegationTargetType,
-    isDelegatorAccount,
+    isBakerAccountV1,
+    StakePendingChange,
     StakePendingChangeType,
     StakePendingChangeV1,
 } from '@concordium/web-sdk';
@@ -21,14 +21,16 @@ import { useAtomValue } from 'jotai';
 import { useSelectedAccountInfo } from '@popup/shared/AccountInfoListenerContext/AccountInfoListenerContext';
 import { ensureDefined } from '@shared/utils/basic-helpers';
 import Button from '@popup/shared/Button';
-import { selectedPendingTransactionsAtom } from '@popup/store/transactions';
-import PendingIcon from '@assets/svg/logo-pending.svg';
 import CheckmarkIcon from '@assets/svg/logo-checkmark.svg';
+import { selectedPendingTransactionsAtom } from '@popup/store/transactions';
+import LoadingIcon from '@assets/svg/pending-arrows.svg';
 import { BrowserWalletAccountTransaction, TransactionStatus } from '@popup/shared/utils/transaction-history-types';
 import ButtonGroup from '@popup/shared/ButtonGroup';
-import RegisterDelegation from './RegisterDelegation';
-import UpdateDelegation from './UpdateDelegation';
-import RemoveDelegation from './RemoveDelegation';
+import { openStatusToDisplay } from '@popup/shared/utils/baking-helpers';
+import DisplayPartialString from '@popup/shared/DisplayPartialString';
+import RegisterBaking from './RegisterBaking';
+import RemoveBaking from './RemoveBaking';
+import UpdateBaking from './UpdateBaking';
 import { earnPageContext } from '../utils';
 
 const routes = {
@@ -37,16 +39,16 @@ const routes = {
     remove: 'remove',
 };
 
-type PendingDelegationProps = {
+type PendingBakingProps = {
     transaction: BrowserWalletAccountTransaction;
 };
 
-function PendingDelegation({ transaction }: PendingDelegationProps): JSX.Element {
-    const { t } = useTranslation('account', { keyPrefix: 'delegate.details' });
+function PendingBaking({ transaction }: PendingBakingProps): JSX.Element {
+    const { t } = useTranslation('account', { keyPrefix: 'baking.details' });
 
     return (
         <div className="flex-column align-center justify-center h-full">
-            {transaction.status !== TransactionStatus.Failed && <PendingIcon className="earn-details__logo" />}
+            {transaction.status !== TransactionStatus.Failed && <LoadingIcon className="loading" />}
             <h3 className="m-t-5 m-b-0 m-h-30 text-center">
                 {t(transaction.status === TransactionStatus.Failed ? 'failed' : 'pending')}
             </h3>
@@ -55,10 +57,11 @@ function PendingDelegation({ transaction }: PendingDelegationProps): JSX.Element
 }
 
 type DisplayPendingChangeProps = {
-    pendingChange?: StakePendingChangeV1;
+    pendingChange?: StakePendingChange;
 };
 
 function DisplayPendingChange({ pendingChange }: DisplayPendingChangeProps) {
+    const { t: sharedT } = useTranslation('shared', { keyPrefix: 'baking' });
     const { consensusStatus, tokenomicsInfo, chainParameters } = useContext(earnPageContext);
 
     const effectiveTime = useMemo(() => {
@@ -69,9 +72,13 @@ function DisplayPendingChange({ pendingChange }: DisplayPendingChangeProps) {
             }
         }
         return undefined;
-    }, [pendingChange?.effectiveTime?.toString(), consensusStatus, tokenomicsInfo, chainParameters]);
+    }, [
+        (pendingChange as StakePendingChangeV1)?.effectiveTime?.toString?.(),
+        consensusStatus,
+        tokenomicsInfo,
+        chainParameters,
+    ]);
 
-    const { t: sharedT } = useTranslation('shared', { keyPrefix: 'delegation' });
     if (pendingChange?.change === StakePendingChangeType.ReduceStake) {
         return (
             <>
@@ -92,13 +99,14 @@ function DisplayPendingChange({ pendingChange }: DisplayPendingChangeProps) {
     return null;
 }
 
-type DelegationDetailsProps = {
-    accountInfo: AccountInfoDelegator;
+type BakingDetailsProps = {
+    accountInfo: AccountInfoBakerV1;
 };
 
-function DelegationDetails({ accountInfo }: DelegationDetailsProps) {
-    const { t } = useTranslation('account', { keyPrefix: 'delegate.details' });
-    const { t: sharedT } = useTranslation('shared', { keyPrefix: 'delegation' });
+function BakingDetails({ accountInfo }: BakingDetailsProps) {
+    const { t } = useTranslation('account', { keyPrefix: 'baking.details' });
+    const { t: sharedT } = useTranslation('shared', { keyPrefix: 'baking' });
+    const { metadataUrl } = accountInfo.accountBaker.bakerPoolInfo;
 
     return (
         <div className="earn-details">
@@ -108,34 +116,36 @@ function DelegationDetails({ accountInfo }: DelegationDetailsProps) {
                     <h3 className="earn-details__title m-v-0 m-r-20">{t('heading')}</h3>
                 </div>
                 <div className="earn-details__header">{sharedT('amount')}</div>
-                <div className="earn-details__value">{displayAsCcd(accountInfo.accountDelegation.stakedAmount)}</div>
-                <div className="earn-details__header">{sharedT('target')}</div>
+                <div className="earn-details__value">{displayAsCcd(accountInfo.accountBaker.stakedAmount)}</div>
+                <div className="earn-details__header">{sharedT('bakerId')}</div>
+                <div className="earn-details__value">{accountInfo.accountBaker.bakerId.toString()}</div>
+                <div className="earn-details__header">{sharedT('restake')}</div>
                 <div className="earn-details__value">
-                    {accountInfo.accountDelegation.delegationTarget.delegateType === DelegationTargetType.Baker
-                        ? sharedT('targetBaker', {
-                              bakerId: accountInfo.accountDelegation.delegationTarget.bakerId.toString(),
-                          })
-                        : sharedT('targetPassive')}
+                    {accountInfo.accountBaker.restakeEarnings ? sharedT('restakeOption') : sharedT('noRestakeOption')}
                 </div>
-                <div className="earn-details__header">{sharedT('redelegate')}</div>
+                <div className="earn-details__header">{sharedT('openForDelegation')}</div>
                 <div className="earn-details__value">
-                    {accountInfo.accountDelegation.restakeEarnings
-                        ? sharedT('redelegateOption')
-                        : sharedT('noRedelegateOption')}
+                    {openStatusToDisplay(accountInfo.accountBaker.bakerPoolInfo.openStatus)}
                 </div>
-                <DisplayPendingChange pendingChange={accountInfo.accountDelegation.pendingChange} />
+                {metadataUrl && (
+                    <>
+                        <div className="earn-details__header">{sharedT('metadataUrl')}</div>
+                        <DisplayPartialString className="earn-details__value word-break-all" value={metadataUrl} />
+                    </>
+                )}
+                <DisplayPendingChange pendingChange={accountInfo.accountBaker.pendingChange} />
             </div>
             <div className="m-10 m-b-0 text-center">
                 <ButtonGroup>
-                    {accountInfo.accountDelegation.pendingChange !== undefined ? (
-                        <Button disabled>{t('stopDelegation')}</Button>
+                    {accountInfo.accountBaker.pendingChange !== undefined ? (
+                        <Button disabled>{t('stop')}</Button>
                     ) : (
                         <Button danger as={Link} to={routes.remove}>
-                            {t('stopDelegation')}
+                            {t('stop')}
                         </Button>
                     )}
                     <Button as={Link} to={routes.update}>
-                        {t('updateDelegation')}
+                        {t('update')}
                     </Button>
                 </ButtonGroup>
             </div>
@@ -143,11 +153,11 @@ function DelegationDetails({ accountInfo }: DelegationDetailsProps) {
     );
 }
 
-function DelegationStatus() {
+function BakingStatus() {
     const accountInfo = ensureDefined(useSelectedAccountInfo(), 'Expected to find account info for selected account');
     const transaction = [...useAtomValue(selectedPendingTransactionsAtom)]
         .reverse()
-        .find((t) => t.type === AccountTransactionType.ConfigureDelegation);
+        .find((t) => t.type === AccountTransactionType.ConfigureBaker);
     const isFirstRender = !useIsSubsequentRender();
     const transactionStatusUpdate = useMemo(
         () => (isFirstRender ? undefined : transaction?.status),
@@ -163,27 +173,27 @@ function DelegationStatus() {
     );
 
     useEffect(() => {
-        if (!isDelegatorAccount(accountInfo) && !hasUpdate && isFirstRender) {
+        if (!isBakerAccountV1(accountInfo) && !hasUpdate && isFirstRender) {
             nav(routes.register, { replace: true });
         }
     }, []);
 
-    if (isDelegatorAccount(accountInfo)) {
-        return <DelegationDetails accountInfo={accountInfo} />;
+    if (isBakerAccountV1(accountInfo)) {
+        return <BakingDetails accountInfo={accountInfo} />;
     }
     if (hasUpdate && transaction) {
-        return <PendingDelegation transaction={transaction} />;
+        return <PendingBaking transaction={transaction} />;
     }
     return null;
 }
 
-export default function Delegate() {
+export default function Baking() {
     return (
         <Routes>
-            <Route index element={<DelegationStatus />} />
-            <Route path={`${routes.register}/*`} element={<RegisterDelegation />} />
-            <Route path={`${routes.remove}/*`} element={<RemoveDelegation />} />
-            <Route path={`${routes.update}/*`} element={<UpdateDelegation />} />
+            <Route index element={<BakingStatus />} />
+            <Route path={`${routes.register}/*`} element={<RegisterBaking />} />
+            <Route path={`${routes.remove}/*`} element={<RemoveBaking />} />
+            <Route path={`${routes.update}/*`} element={<UpdateBaking />} />
         </Routes>
     );
 }
