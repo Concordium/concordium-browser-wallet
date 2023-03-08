@@ -1,0 +1,23 @@
+.account-transaction-flow {
+    padding: rem(10px) rem(15px);
+    display: flex;
+    flex-direction: column;
+    width: 100%;
+    justify-content: space-between;
+    background-color: $color-bg;
+    min-height: 100%;
+    white-space: break-spaces;
+
+    &__header {
+        position: relative;
+        display: flex;
+        justify-content: center;
+        align-items: center;
+        margin-bottom: rem(20px);
+    }
+
+    &__back {
+        position: absolute;
+        left: 0;
+    }
+}

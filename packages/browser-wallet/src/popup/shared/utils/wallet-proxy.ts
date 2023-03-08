@@ -214,9 +214,11 @@ function calculateAmount(transaction: WalletProxyTransaction, status: Transactio
     return BigInt(transaction.subtotal);
 }
 
+const getTransactionStatusFromOutcome = (transactionOutcome: string): TransactionStatus =>
+    transactionOutcome === 'success' ? TransactionStatus.Finalized : TransactionStatus.Failed;
+
 function mapTransaction(transaction: WalletProxyTransaction, accountAddress: string): BrowserWalletTransaction {
-    const success = transaction.details.outcome === 'success';
-    const status = success ? TransactionStatus.Finalized : TransactionStatus.Failed;
+    const status = getTransactionStatusFromOutcome(transaction.details.outcome);
     const type = mapTransactionKindStringToTransactionType(transaction.details.type);
 
     return {
@@ -280,8 +282,9 @@ export async function getTransactionStatus(
 ): Promise<{ status: TransactionStatus; cost: string } | undefined> {
     const path = `/v0/submissionStatus/${tHash}`;
     const {
-        data: { status, cost },
+        data: { cost, outcome },
     } = await (await getWalletProxy()).get(path);
+    const status = getTransactionStatusFromOutcome(outcome);
 
     if ([status, cost].includes(undefined)) {
         return undefined;

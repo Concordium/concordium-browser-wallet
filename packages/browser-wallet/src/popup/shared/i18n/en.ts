@@ -53,6 +53,15 @@ const t = {
             },
         },
     },
+    delegation: {
+        amount: 'Delegation amount',
+        target: 'Target',
+        targetPassive: 'Passive delegation',
+        targetBaker: 'Baker {{bakerId}}',
+        redelegate: 'Rewards will be',
+        redelegateOption: 'Added to delegation amount',
+        noRedelegateOption: 'Added to public balance',
+    },
     transactionReceipt: {
         sender: 'Sender account',
         cost: 'Estimated transaction fee',
@@ -64,6 +73,7 @@ const t = {
             showTransfer: 'Show simple details',
             showContract: 'Show full details',
         },
+        amount: 'Amount',
         parameter: 'Parameter',
         noParameter: 'No parameters',
     },

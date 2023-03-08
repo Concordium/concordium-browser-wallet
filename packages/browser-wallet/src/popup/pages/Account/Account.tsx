@@ -21,6 +21,8 @@ import ConnectedBox from './ConnectedBox';
 import Tokens from './Tokens';
 import ManageTokens from './ManageTokens';
 import { AccountPageContext, accountPageContext } from './utils';
+import Earn from './Earn';
+import ConfirmGenericTransfer from './ConfirmGenericTransfer';
 
 function Account() {
     const { t } = useTranslation('account');
@@ -96,10 +98,12 @@ export default function AccountRoutes() {
                     <Route index element={<Navigate to={accountRoutes.tokens} replace />} />
                     <Route path={`${accountRoutes.send}/*`} element={<SendCcd />} />
                     <Route path={accountRoutes.receive} element={<DisplayAddress />} />
+                    <Route path={`${accountRoutes.earn}/*`} element={<Earn />} />
                     <Route path={`${accountRoutes.log}/*`} element={<TransactionLog />} />
                     <Route path={`${accountRoutes.settings}/*`} element={<AccountSettings />} />
                     <Route path={`${accountRoutes.tokens}/*`} element={<Tokens />} />
                     <Route path={`${accountRoutes.manageTokens}/*`} element={<ManageTokens />} />
+                    <Route path={accountRoutes.confirmTransfer} element={<ConfirmGenericTransfer />} />
                 </Route>
             </Routes>
         </accountPageContext.Provider>

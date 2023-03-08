@@ -12,6 +12,7 @@ import { addToastAtom } from '@popup/state';
 import { getGenesisHash, sessionAccountInfoCache, useIndexedStorage } from '@shared/storage/access';
 import { accountInfoCacheLock, updateRecord } from '@shared/storage/update';
 import { AccountInfoListener } from '../account-info-listener';
+import { useSelectedCredential } from '../utils/account-helpers';
 
 const accountInfoBaseAtom = atomWithChromeStorage<Record<string, string>>(ChromeStorageKey.AccountInfoCache, {}, false);
 
@@ -120,4 +121,14 @@ export function useAccountInfo(account: WalletCredential): AccountInfo | undefin
     }, [account, accountInfoEmitter]);
 
     return accountInfo;
+}
+
+export function useSelectedAccountInfo() {
+    const cred = useSelectedCredential();
+
+    if (cred === undefined) {
+        return undefined;
+    }
+
+    return useAccountInfo(cred);
 }
