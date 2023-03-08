@@ -43,7 +43,16 @@ export type RadiosProps<T = unknown> = Omit<RequiredControlledFieldProps, 'onCha
  *
  *  <Radios options={options} value={val} onChange={setVal} />
  */
-function Radios<T>({ options, value, error, valid, label, className, onChange = noOp, ...inputProps }: RadiosProps<T>) {
+export function Radios<T>({
+    options,
+    value,
+    error,
+    valid,
+    label,
+    className,
+    onChange = noOp,
+    ...inputProps
+}: RadiosProps<T>) {
     return (
         <div className={clsx('form-radios', className)}>
             {label && <div className="text-center m-b-5">{label}</div>}

@@ -43,6 +43,7 @@ const t = {
             invalid: 'Invalid amount',
             insufficient: 'Insufficient funds',
             zero: 'Amount may not be zero',
+            exceedingDelegationCap: "Amount may not exceed the target pool's cap of {{ max }}.",
         },
         transaction: {
             type: {
@@ -50,6 +51,7 @@ const t = {
                 init: 'Initialize Smart Contract Instance',
                 update: 'Update Smart Contract Instance',
                 registerData: 'Register data',
+                configureDelegation: 'Configure delegation',
             },
         },
     },
@@ -61,6 +63,10 @@ const t = {
         redelegate: 'Rewards will be',
         redelegateOption: 'Added to delegation amount',
         noRedelegateOption: 'Added to public balance',
+        changesTakesEffectOn: 'The following changes will take effect on\n{{ effectiveTime }}',
+        pendingRemove:
+            'The delegation will be stopped, and the delegation amount will be unlocked on the public balance of the account.',
+        pendingChange: 'New delegation amount',
     },
     transactionReceipt: {
         sender: 'Sender account',

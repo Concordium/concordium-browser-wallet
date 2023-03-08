@@ -1,27 +1,15 @@
-import React, { PropsWithChildren } from 'react';
+import React from 'react';
 import { Route, Routes, useNavigate } from 'react-router-dom';
 
 import Carousel from '@popup/shared/Carousel';
 import { Trans, useTranslation } from 'react-i18next';
 import ExternalLink from '@popup/shared/ExternalLink';
 import ConfigureDelegationFlow from './ConfigureDelegationFlow';
+import IntroPage from '../IntroPage';
 
 const routes = {
     configure: 'configure',
 };
-
-type IntroPageProps = PropsWithChildren<{
-    title: string;
-}>;
-
-function IntroPage({ title, children }: IntroPageProps) {
-    return (
-        <>
-            <h3 className="text-center m-t-0">{title}</h3>
-            {children}
-        </>
-    );
-}
 
 function Intro() {
     const nav = useNavigate();
@@ -32,7 +20,7 @@ function Intro() {
     };
 
     return (
-        <Carousel className="earn-carousel" onContinue={goToRegister}>
+        <Carousel withBackButton className="earn-carousel" onContinue={goToRegister}>
             <IntroPage title={t('1.title')}>
                 <Trans
                     ns="account"

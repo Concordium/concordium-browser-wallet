@@ -12,13 +12,11 @@ export type ConfirmSimpleTransferState = SimpleTransferPayload;
 
 export default function ConfirmSimpleTransfer({ setDetailsExpanded, cost }: Props) {
     const { state } = useLocation();
-    const payload = state as ConfirmSimpleTransferState;
     return (
         <ConfirmTransfer
             setDetailsExpanded={setDetailsExpanded}
             cost={cost}
-            payload={payload}
-            returnState={payload}
+            payload={state as ConfirmSimpleTransferState}
             transactionType={AccountTransactionType.Transfer}
         />
     );

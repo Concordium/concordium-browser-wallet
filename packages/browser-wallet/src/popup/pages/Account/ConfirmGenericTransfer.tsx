@@ -1,7 +1,9 @@
 import React, { useContext, useMemo } from 'react';
-import { AccountTransactionPayload, AccountTransactionType, getAccountTransactionHandler } from '@concordium/web-sdk';
+import { AccountTransactionPayload, AccountTransactionType } from '@concordium/web-sdk';
 import { useLocation } from 'react-router-dom';
 
+import { convertEnergyToMicroCcd, getEnergyCost } from '@shared/utils/energy-helpers';
+import { useBlockChainParameters } from '@popup/shared/BlockChainParametersProvider';
 import ConfirmTransfer from './ConfirmTransfer';
 import { accountPageContext } from './utils';
 
@@ -15,8 +17,12 @@ export default function ConfirmGenericTransfer() {
     const { payload, type } = state as ConfirmGenericTransferState;
     const { setDetailsExpanded } = useContext(accountPageContext);
 
-    const handler = useMemo(() => getAccountTransactionHandler(type), [type]);
-    const cost = useMemo(() => handler.getBaseEnergyCost(payload), [handler, payload]); // TODO #delegation: calculate cost properly.
+    const energyCost = useMemo(() => getEnergyCost(type, payload), [type, payload]);
+    const chainParameters = useBlockChainParameters();
+    const cost = useMemo(
+        () => (energyCost && chainParameters ? convertEnergyToMicroCcd(energyCost, chainParameters) : undefined),
+        [energyCost, Boolean(chainParameters)]
+    );
 
     return (
         <ConfirmTransfer setDetailsExpanded={setDetailsExpanded} cost={cost} payload={payload} transactionType={type} />

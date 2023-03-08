@@ -5,6 +5,7 @@ import MultiStepForm, { FormChildren, MultiStepFormProps, OrRenderValues } from 
 import { AccountTransactionPayload, AccountTransactionType } from '@concordium/web-sdk';
 import { useLocation, useNavigate } from 'react-router-dom';
 import { absoluteRoutes } from '@popup/constants/routes';
+import { noOp } from 'wallet-common-helpers';
 import { accountRoutes } from '../routes';
 import { ConfirmGenericTransferState } from '../ConfirmGenericTransfer';
 
@@ -18,6 +19,10 @@ interface Props<F extends Record<string, unknown>>
      * Function to convert flow values into an account transaction.
      */
     convert(values: F): AccountTransactionPayload;
+    /**
+     * Function that is triggered if an error is thrown in the done handler.
+     */
+    handleDoneError?: (error: Error) => void;
     /**
      * Whether to include a back button on the first page or not.
      */
@@ -36,6 +41,7 @@ export default function AccountTransactionFlow<F extends Record<string, unknown>
     convert,
     children,
     transactionType,
+    handleDoneError = noOp,
 }: Props<F>) {
     const { state: initialValues, pathname } = useLocation();
     const [isFirstPage, setIsFirstPage] = useState(true);
@@ -50,18 +56,21 @@ export default function AccountTransactionFlow<F extends Record<string, unknown>
 
     const handleDone = useCallback(
         (values: F) => {
-            const payload = convert(values);
-            // eslint-disable-next-line no-console
-            console.log(values, payload);
-            nav(pathname, { replace: true, state: values }); // Override current router entry with stateful version
+            let payload: AccountTransactionPayload;
+            try {
+                payload = convert(values);
+                nav(pathname, { replace: true, state: values }); // Override current router entry with stateful version
 
-            const confirmTransferState: ConfirmGenericTransferState = {
-                payload,
-                type: transactionType,
-            };
-            nav(`${absoluteRoutes.home.account.path}/${accountRoutes.confirmTransfer}`, {
-                state: confirmTransferState,
-            });
+                const confirmTransferState: ConfirmGenericTransferState = {
+                    payload,
+                    type: transactionType,
+                };
+                nav(`${absoluteRoutes.home.account.path}/${accountRoutes.confirmTransfer}`, {
+                    state: confirmTransferState,
+                });
+            } catch (e) {
+                handleDoneError(e as Error);
+            }
         },
         [pathname]
     );

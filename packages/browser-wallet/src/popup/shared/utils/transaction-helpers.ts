@@ -9,8 +9,10 @@ import {
     signTransaction,
     SimpleTransferPayload,
     TransactionExpiry,
+    BakerPoolStatusDetails,
+    AccountInfo,
 } from '@concordium/web-sdk';
-import { fractionalToInteger, isValidCcdString } from 'wallet-common-helpers';
+import { ccdToMicroCcd, displayAsCcd, fractionalToInteger, isValidCcdString } from 'wallet-common-helpers';
 
 import i18n from '@popup/shell/i18n';
 import { useAtomValue } from 'jotai';
@@ -73,6 +75,34 @@ export function validateAccountAddress(cand: string): string | undefined {
     }
 }
 
+export function validateDelegationAmount(
+    delegatedAmount: string,
+    accountInfo: AccountInfo,
+    estimatedFee: bigint,
+    targetStatus?: BakerPoolStatusDetails
+): string | undefined {
+    if (!isValidCcdString(delegatedAmount)) {
+        return i18n.t('utils.ccdAmount.invalid');
+    }
+
+    const amount = ccdToMicroCcd(delegatedAmount);
+
+    if (amount === 0n) {
+        return i18n.t('utils.ccdAmount.zero');
+    }
+
+    const max = targetStatus ? targetStatus.delegatedCapitalCap - targetStatus.delegatedCapital : undefined;
+    if (max !== undefined && amount > max) {
+        return i18n.t('utils.ccdAmount.exceedingDelegationCap', { max: displayAsCcd(max) });
+    }
+
+    if (BigInt(accountInfo.accountAmount) < amount + estimatedFee) {
+        return i18n.t('utils.ccdAmount.insufficient');
+    }
+
+    return undefined;
+}
+
 export function getDefaultExpiry(): TransactionExpiry {
     // TODO: add better default?
     return new TransactionExpiry(new Date(Date.now() + 3600000));
@@ -91,6 +121,9 @@ export function getTransactionTypeName(type: AccountTransactionType): string {
         }
         case AccountTransactionType.RegisterData: {
             return i18n.t('utils.transaction.type.registerData');
+        }
+        case AccountTransactionType.ConfigureDelegation: {
+            return i18n.t('utils.transaction.type.configureDelegation');
         }
         default: {
             return AccountTransactionType[type];

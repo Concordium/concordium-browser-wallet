@@ -2,18 +2,17 @@ import {
     AccountInfo,
     CcdAmount,
     ConfigureDelegationPayload,
+    DelegationTarget,
     DelegationTargetType,
     isDelegatorAccount,
 } from '@concordium/web-sdk';
 import { not } from '@shared/utils/function-helpers';
-import { ccdToMicroCcd, DeepPartial, isDefined, MakeRequired, microCcdToCcd, NotOptional } from 'wallet-common-helpers';
+import { ccdToMicroCcd, DeepPartial, isDefined, microCcdToCcd, NotOptional } from 'wallet-common-helpers';
 
 export type ConfigureDelegationFlowState = {
     pool: string | null;
-    amount: {
-        amount: string; // in CCD.
-        redelegate: boolean;
-    };
+    redelegate: boolean;
+    amount: string; // in CCD
 };
 
 export const getExistingDelegationValues = (
@@ -26,37 +25,33 @@ export const getExistingDelegationValues = (
     const { delegationTarget, stakedAmount, restakeEarnings } = accountInfo.accountDelegation;
 
     return {
-        amount: {
-            amount: microCcdToCcd(stakedAmount) ?? '0.00',
-            redelegate: restakeEarnings,
-        },
+        amount: microCcdToCcd(stakedAmount) ?? '0.00',
+        redelegate: restakeEarnings,
         pool: delegationTarget.delegateType === DelegationTargetType.Baker ? delegationTarget.bakerId.toString() : null,
     };
 };
 
-export type ConfigureDelegationFlowStateChanges = MakeRequired<DeepPartial<ConfigureDelegationFlowState>, 'amount'>;
+export type ConfigureDelegationFlowStateChanges = Partial<ConfigureDelegationFlowState>;
 
 export const getDelegationFlowChanges = (
     existingValues: ConfigureDelegationFlowState,
     newValues: ConfigureDelegationFlowState
 ): ConfigureDelegationFlowStateChanges => {
-    const changes: ConfigureDelegationFlowStateChanges = {
-        amount: {},
-    };
+    const changes: ConfigureDelegationFlowStateChanges = {};
 
     try {
         if (
-            existingValues.amount?.amount === undefined ||
-            newValues.amount?.amount === undefined ||
-            ccdToMicroCcd(existingValues.amount?.amount) !== ccdToMicroCcd(newValues.amount?.amount)
+            existingValues.amount === undefined ||
+            newValues.amount === undefined ||
+            ccdToMicroCcd(existingValues.amount) !== ccdToMicroCcd(newValues.amount)
         ) {
-            changes.amount.amount = newValues.amount?.amount;
+            changes.amount = newValues.amount;
         }
     } catch {
         // Nothing...
     }
-    if (existingValues.amount?.redelegate !== newValues.amount?.redelegate) {
-        changes.amount.redelegate = newValues.amount?.redelegate;
+    if (existingValues.redelegate !== newValues.redelegate) {
+        changes.redelegate = newValues.redelegate;
     }
 
     if (existingValues.pool !== newValues.pool) {
@@ -66,27 +61,32 @@ export const getDelegationFlowChanges = (
     return changes;
 };
 
-const toPayload = (values: DeepPartial<ConfigureDelegationFlowState>): ConfigureDelegationPayload => ({
-    stake: values?.amount?.amount ? new CcdAmount(ccdToMicroCcd(values.amount.amount)) : undefined,
-    restakeEarnings: values?.amount?.redelegate,
-    delegationTarget:
-        values.pool != null
-            ? { delegateType: DelegationTargetType.Baker, bakerId: BigInt(values.pool) }
-            : { delegateType: DelegationTargetType.PassiveDelegation },
-});
+function toPayload(values: DeepPartial<ConfigureDelegationFlowState>): ConfigureDelegationPayload {
+    let delegationTarget: DelegationTarget | undefined;
+    if (values.pool == null) {
+        delegationTarget = { delegateType: DelegationTargetType.PassiveDelegation };
+    } else if (values.pool !== undefined) {
+        delegationTarget = { delegateType: DelegationTargetType.Baker, bakerId: BigInt(values.pool) };
+    }
+    return {
+        stake: values?.amount ? new CcdAmount(ccdToMicroCcd(values.amount)) : undefined,
+        restakeEarnings: values?.redelegate,
+        delegationTarget,
+    };
+}
 
 /**
  * Converts values of flow to a configure delegation payload.
  *
- * Throws if no changes to existing values have been made.
+ * @param allowEmpty If allowEmpty is set to false, then this throws if no changes to existing values have been made.
  */
 export const configureDelegationChangesPayload =
-    (accountInfo?: AccountInfo) => (values: ConfigureDelegationFlowState) => {
+    (accountInfo?: AccountInfo, allowEmpty = true) =>
+    (values: ConfigureDelegationFlowState) => {
         const existing = accountInfo !== undefined ? getExistingDelegationValues(accountInfo) : undefined;
         const changes = existing !== undefined ? getDelegationFlowChanges(existing, values) : values;
-        const { amount: settings, ...topLevelChanges } = changes;
 
-        if (Object.values({ ...settings, ...topLevelChanges }).every(not(isDefined))) {
+        if (!allowEmpty && Object.values(changes).every(not(isDefined))) {
             throw new Error(
                 'Trying to submit a transaction without any changes to the existing delegation configuration of an account.'
             );

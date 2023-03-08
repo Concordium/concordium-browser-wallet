@@ -1,8 +1,15 @@
-import React, { useCallback, useMemo } from 'react';
-import { AccountTransactionType } from '@concordium/web-sdk';
+import React, { useCallback, useContext, useEffect, useMemo, useState } from 'react';
+import {
+    AccountInfo,
+    AccountTransactionType,
+    BakerPoolStatus,
+    isDelegatorAccount,
+    OpenStatusText,
+} from '@concordium/web-sdk';
 import { Trans, useTranslation } from 'react-i18next';
-import { getCcdSymbol, getPublicAccountAmounts, useUpdateEffect } from 'wallet-common-helpers';
+import { ccdToMicroCcd, displayAsCcd, getCcdSymbol, useAsyncMemo, useUpdateEffect } from 'wallet-common-helpers';
 import { Validate } from 'react-hook-form';
+import SidedRow from '@popup/shared/SidedRow';
 
 import { ensureDefined } from '@shared/utils/basic-helpers';
 import { useSelectedAccountInfo } from '@popup/shared/AccountInfoListenerContext/AccountInfoListenerContext';
@@ -13,10 +20,18 @@ import { FormRadios } from '@popup/shared/Form/Radios/Radios';
 import FormInput from '@popup/shared/Form/Input';
 import ExternalLink from '@popup/shared/ExternalLink';
 import FormAmountInput from '@popup/shared/Form/AmountInput';
-import { validateTransferAmount } from '@popup/shared/utils/transaction-helpers';
-import { CCD_METADATA } from '@shared/constants/token-metadata';
+import { validateDelegationAmount } from '@popup/shared/utils/transaction-helpers';
+import { convertEnergyToMicroCcd, getConfigureDelegationMaxEnergyCost } from '@shared/utils/energy-helpers';
+import { useAtomValue } from 'jotai';
+import { grpcClientAtom } from '@popup/store/settings';
+import DisabledAmountInput from '@popup/shared/DisabledAmountInput/DisabledAmountInput';
+import { useBlockChainParameters } from '@popup/shared/BlockChainParametersProvider';
+import Modal from '@popup/shared/Modal';
+import Button from '@popup/shared/Button';
 import { configureDelegationChangesPayload, ConfigureDelegationFlowState } from './utils';
 import AccountTransactionFlow from '../../AccountTransactionFlow';
+import { accountPageContext } from '../../utils';
+import { STAKE_WARNING_THRESHOLD } from '../utils';
 
 type PoolPageForm =
     | {
@@ -27,14 +42,19 @@ type PoolPageForm =
           bakerId: string;
       };
 
+type WithAccountInfo = {
+    accountInfo: AccountInfo;
+};
+
 type PoolPageProps = Omit<
     MultiStepFormPageProps<ConfigureDelegationFlowState['pool'], ConfigureDelegationFlowState>,
     'formValues'
->;
+> &
+    WithAccountInfo;
 
-function PoolPage({ onNext, initial }: PoolPageProps) {
+function PoolPage({ onNext, initial, accountInfo }: PoolPageProps) {
     const { t } = useTranslation('account', { keyPrefix: 'delegate.configure' });
-    // const rpc = useAtomValue(jsonRpcClientAtom);
+    const client = useAtomValue(grpcClientAtom);
     const form = useForm<PoolPageForm>({
         defaultValues:
             initial === null || initial === undefined ? { isBaker: false } : { isBaker: true, bakerId: initial },
@@ -44,25 +64,22 @@ function PoolPage({ onNext, initial }: PoolPageProps) {
     const validateBakerId: Validate<string> = async (value) => {
         try {
             const bakerId = BigInt(value);
-            // eslint-disable-next-line no-console
-            console.log(bakerId);
-            // const poolStatus = await rpc.getPoolStatus(bakerId); // TODO #delegation: Doesn't exist yet...
+            const poolStatus = await client.getPoolInfo(bakerId);
 
-            // if (poolStatus.poolInfo.openStatus !== OpenStatusText.OpenForAll) {
-            //     return 'Targeted baker does not allow new delegators'; // TODO #delegation: translate
-            // }
+            if (poolStatus.poolInfo.openStatus !== OpenStatusText.OpenForAll) {
+                return t('pool.targetNotOpenForAll');
+            }
 
-            // if (
-            //     isDelegatorAccount(accountInfo) &&
-            //     poolStatus.delegatedCapitalCap - poolStatus.delegatedCapital <
-            //         accountInfo.accountDelegation.stakedAmount
-            // ) {
-            //     return "Your current stake would violate the targeted baker's cap"; // TODO #delegation: translate
-            // }
-
+            if (
+                isDelegatorAccount(accountInfo) &&
+                poolStatus.delegatedCapitalCap - poolStatus.delegatedCapital <
+                    accountInfo.accountDelegation.stakedAmount
+            ) {
+                return t('pool.currentStakeExceedsCap');
+            }
             return true;
         } catch {
-            return "Supplied baker ID doesn't match an active baker.";
+            return t('pool.notABaker');
         }
     };
 
@@ -140,38 +157,149 @@ function PoolPage({ onNext, initial }: PoolPageProps) {
     );
 }
 
+interface DisplayPoolStatusProps {
+    status: BakerPoolStatus;
+}
+
+function DisplayPoolStatus({ status }: DisplayPoolStatusProps) {
+    return (
+        <div className="delegation__pool-status">
+            <SidedRow className="m-t-5" left="Current pool:" right={displayAsCcd(status.delegatedCapital).toString()} />
+            <SidedRow
+                className="m-t-5"
+                left="Pool limit:"
+                right={displayAsCcd(status.delegatedCapitalCap).toString()}
+            />
+        </div>
+    );
+}
+
 type AmountPageForm = {
     amount: string;
-    redelegate: boolean;
 };
 
-type AmountPageProps = MultiStepFormPageProps<ConfigureDelegationFlowState['amount'], ConfigureDelegationFlowState>;
+type AmountPageProps = MultiStepFormPageProps<ConfigureDelegationFlowState['amount'], ConfigureDelegationFlowState> &
+    WithAccountInfo;
 
-function AmountPage({ initial, onNext }: AmountPageProps) {
+function AmountPage({ initial, onNext, formValues, accountInfo }: AmountPageProps) {
     const { t } = useTranslation('account', { keyPrefix: 'delegate.configure' });
-    const defaultValues: Partial<AmountPageForm> = useMemo(() => initial ?? { redelegate: true }, [initial]);
-    const accountInfo = useSelectedAccountInfo();
-    const ccdBalance = getPublicAccountAmounts(accountInfo).atDisposal;
-    const cost = 0n; // TODO #delegation: calculate the cost.
+    const { setDetailsExpanded } = useContext(accountPageContext);
+    const [openWarning, setOpenWarning] = useState(false);
+    const chainParameters = useBlockChainParameters();
 
-    const validateAmount: Validate<string> = (amount) =>
-        validateTransferAmount(amount, ccdBalance, CCD_METADATA.decimals, cost);
+    const defaultValues: Partial<AmountPageForm> = useMemo(
+        () => (initial === undefined ? {} : { amount: initial }),
+        [initial]
+    );
+    const client = useAtomValue(grpcClientAtom);
+
+    const cost = useMemo(
+        () => (chainParameters ? convertEnergyToMicroCcd(getConfigureDelegationMaxEnergyCost(), chainParameters) : 0n),
+        [chainParameters]
+    );
+
+    const poolStatus = useAsyncMemo(
+        async () => (formValues.pool ? client.getPoolInfo(BigInt(formValues.pool)) : undefined),
+        undefined,
+        []
+    );
+
+    const validateAmount: Validate<string> = (amountToValidate) =>
+        validateDelegationAmount(amountToValidate, accountInfo, cost, poolStatus);
+
+    useEffect(() => {
+        setDetailsExpanded(true);
+        return () => setDetailsExpanded(false);
+    }, []);
+
+    const onSubmit = (vs: AmountPageForm) => {
+        if (ccdToMicroCcd(vs.amount) * 100n > accountInfo.accountAmount * STAKE_WARNING_THRESHOLD) {
+            setOpenWarning(true);
+        } else {
+            onNext(vs.amount);
+        }
+    };
+
+    const pendingChange =
+        isDelegatorAccount(accountInfo) && accountInfo.accountDelegation.pendingChange?.change !== undefined;
 
     return (
-        <Form<AmountPageForm> className="configure-flow-form" defaultValues={defaultValues} onSubmit={onNext}>
+        <Form<AmountPageForm> className="configure-flow-form" defaultValues={defaultValues} onSubmit={onSubmit}>
             {(f) => (
                 <>
                     <div>
-                        <FormAmountInput
-                            label={t('amount.amountLabel')}
-                            autoFocus
-                            register={f.register}
-                            symbol={getCcdSymbol()}
-                            name="amount"
-                            rules={{ required: t('amount.amountRequired'), validate: validateAmount }}
-                        />
-                        {/* TODO #delegation: display current stake in pool + max stake */}
-                        <div className="m-t-20">{t('amount.descriptionRedelegate')}</div>
+                        <Modal open={openWarning} onClose={() => setOpenWarning(false)}>
+                            <div>
+                                <h3 className="m-t-0">{t('warning')}</h3>
+                                <p className="white-space-break ">
+                                    {t('amount.overStakeThresholdWarning', {
+                                        threshold: STAKE_WARNING_THRESHOLD.toString(),
+                                    })}
+                                </p>
+                                <Button
+                                    className="m-t-10"
+                                    width="wide"
+                                    onClick={f.handleSubmit((vs) => onNext(vs.amount))}
+                                >
+                                    {t('continueButton')}
+                                </Button>
+                                <Button className="m-t-10" onClick={() => setOpenWarning(false)}>
+                                    {t('amount.enterNewStake')}
+                                </Button>
+                            </div>
+                        </Modal>
+                        <p className="m-t-0">{t('amount.description')}</p>
+                        {pendingChange && (
+                            <DisabledAmountInput label={t('amount.locked')} note={t('amount.lockedNote')} />
+                        )}
+                        {!pendingChange && (
+                            <FormAmountInput
+                                label={t('amount.amountLabel')}
+                                autoFocus
+                                register={f.register}
+                                symbol={getCcdSymbol()}
+                                className="delegation__amount-input"
+                                name="amount"
+                                rules={{
+                                    required: t('amount.amountRequired'),
+                                    validate: validateAmount,
+                                }}
+                            />
+                        )}
+                    </div>
+                    {poolStatus && <DisplayPoolStatus status={poolStatus} />}
+                    <Submit className="m-t-20" width="wide">
+                        {t('continueButton')}
+                    </Submit>
+                </>
+            )}
+        </Form>
+    );
+}
+
+type RestakePageForm = {
+    redelegate: boolean;
+};
+
+type RestakePageProps = MultiStepFormPageProps<
+    ConfigureDelegationFlowState['redelegate'],
+    ConfigureDelegationFlowState
+>;
+
+function RestakePage({ initial, onNext }: RestakePageProps) {
+    const { t } = useTranslation('account', { keyPrefix: 'delegate.configure' });
+    const defaultValues: Partial<RestakePageForm> = useMemo(
+        () => (initial === undefined ? { redelegate: false } : { redelegate: initial }),
+        [initial]
+    );
+    const onSubmit = (vs: RestakePageForm) => onNext(vs.redelegate);
+
+    return (
+        <Form<RestakePageForm> className="configure-flow-form" defaultValues={defaultValues} onSubmit={onSubmit}>
+            {(f) => (
+                <>
+                    <div>
+                        <div className="m-t-0">{t('amount.descriptionRedelegate')}</div>
                         <FormRadios
                             className="m-t-20 w-full"
                             control={f.control}
@@ -194,25 +322,40 @@ function AmountPage({ initial, onNext }: AmountPageProps) {
 type Props = {
     title: string;
     firstPageBack?: boolean;
+    onConvertError?: (e: Error) => void;
 };
 
-export default function ConfigureDelegationFlow(props: Props) {
+export default function ConfigureDelegationFlow({ onConvertError, ...props }: Props) {
     const accountInfo = ensureDefined(useSelectedAccountInfo(), 'Assumed account info to be available');
-    const valuesToPayload = useCallback(configureDelegationChangesPayload(accountInfo), [accountInfo]);
+    const valuesToPayload = useCallback(configureDelegationChangesPayload(accountInfo, false), [accountInfo]);
 
     return (
         <AccountTransactionFlow<ConfigureDelegationFlowState>
             {...props}
             convert={valuesToPayload}
+            firstPageBack
             transactionType={AccountTransactionType.ConfigureDelegation}
+            handleDoneError={onConvertError}
         >
             {{
                 pool: {
-                    render: (initial, onNext) => <PoolPage initial={initial} onNext={onNext} />,
+                    render: (initial, onNext) => (
+                        <PoolPage initial={initial} onNext={onNext} accountInfo={accountInfo} />
+                    ),
+                },
+                redelegate: {
+                    render: (initial, onNext, formValues) => (
+                        <RestakePage initial={initial} onNext={onNext} formValues={formValues} />
+                    ),
                 },
                 amount: {
                     render: (initial, onNext, formValues) => (
-                        <AmountPage initial={initial} onNext={onNext} formValues={formValues} />
+                        <AmountPage
+                            initial={initial}
+                            onNext={onNext}
+                            formValues={formValues}
+                            accountInfo={accountInfo}
+                        />
                     ),
                 },
             }}

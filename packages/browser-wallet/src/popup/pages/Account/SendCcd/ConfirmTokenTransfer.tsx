@@ -68,7 +68,6 @@ export default function ConfirmTokenTransfer({ setDetailsExpanded, cost }: Props
             cost={cost}
             payload={payload}
             parameters={parameters}
-            returnState={state}
             transactionType={AccountTransactionType.Update}
         />
     );

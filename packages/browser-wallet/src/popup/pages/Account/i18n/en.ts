@@ -96,13 +96,14 @@ const t = {
     earn: {
         title: 'Earning rewards',
         description: 'There are two options for earning rewards on Concordium: Baking and delegation.',
-        bakingHeader: 'Baking (coming soon)',
+        bakingHeader: 'Baking',
         bakingDescription:
             'As a baker you participate in the network by baking blocks on the Concordium network. This requires a minimum of {{ minAmount }} CCD and access to a dedicated node.',
         delegateHeader: 'Delegation',
         delegateDescription:
             "If you don't have access to your own node you may delegate your stake to one of the other bakers. There is no minimum amount of CCD required when delegating\n\nChoose the option that suits you below to learn more.\n\nNOTE: A single account cannot both be a baker and delegator, but it is possible to stop one and change to the other.",
         delegateCta: 'Setup delegation',
+        bakingCta: 'Setup baking',
     },
     delegate: {
         registerIntro: {
@@ -135,8 +136,32 @@ const t = {
                 body: 'After starting a delegatoin, you will be able to see its current status on the status screen.\n\nFrom there, you can also make updates to your delegation, or stop it again.',
             },
         },
+        updateIntro: {
+            '1': {
+                title: 'Updating your delegation',
+                body: 'When you update your delegation, you can choose to increase or decrease your stake, change target pool, and/or change whether rewards are restaked or not.\n\nThe different parameters are optional, so you can choose to not update all settings.\n\nOn the next few pages we will go through the different options and a few reminders on the delegation concepts.',
+            },
+            '2': {
+                title: 'Pay day updates',
+                body: 'If you increase your delegation amount, change your target baker pool, or change whether you want to restake your rewards or not, these changes will take effect from the next pay day.\n\nThis will typically be within a period of 24 hours, but in some cases it can take up to 25 hours. ',
+            },
+            '3': {
+                title: 'Updates with longer cool-downs',
+                body: 'If you decrease your stake, the change will take effect after a cool-down period.\n\nWhile in this cool-down period, the stake is locked and cannot be changed, and you will not be able to stop your delegation.\n\nYour delegation continues earning rewards during the cool-down period. While in the cool-down period you can update other delegation settings, but not the amount\n\n.If you made any other changes to your delegation while also decreasing your delegation amount, the other changes will take effect from the next pay day as described on the previous page.',
+            },
+        },
+        removeIntro: {
+            '1': {
+                title: 'Stop your delegation',
+                body: 'If you decide to stop your delegation, there is a longer cool-down period.\n\nWhile in the cool-down period your delegation continues to earn rewards.\n\nAt the end of the cool-down period, the delegated amount is unlocked on your public balance, and the funds will be at disposal again.',
+            },
+            '2': {
+                title: 'Update during the cool-down period',
+                body: 'Only the delegation amount is locked during the cool-down period.\n\nThis means that you can still change restake status and target baker pool during the cool-down.',
+            },
+        },
         details: {
-            heading: 'Delegation status',
+            heading: 'Your delegation is registered',
             amount: 'Delegation amount',
             target: 'Target',
             targetPassive: 'Passive delegation',
@@ -152,6 +177,10 @@ const t = {
         register: {
             title: 'Register delegation',
         },
+        update: {
+            title: 'Update delegation',
+            noChanges: 'Transaction includes no changes to existing delegation configuration for account.',
+        },
         configure: {
             pool: {
                 description1:
@@ -164,16 +193,27 @@ const t = {
                     'Passive delegation is an alternative to delegation to a specific baker pool that has lower rewards. With passive delegation you do not have to worry about the uptime or quality of a baker node.\n\nFor more info, you can visit our <1>documentation website</1>',
                 bakerIdLabel: 'Baker ID',
                 bakerIdRequired: 'You must specify a baker ID',
+                targetNotOpenForAll: 'Targeted baker does not allow new delegators',
+                currentStakeExceedsCap: "Your current stake would violate the targeted baker's cap",
+                chosenStakeExceedsCap: "Chosen stake would violate baker's cap",
+                notABaker: "Supplied baker ID doesn't match an active baker.",
             },
             amount: {
+                description: 'Enter the amount you want to delegate',
                 amountLabel: 'Amount to delegate',
                 amountRequired: 'You must specify an amount to delegate',
                 optionRedelegate: 'Yes, restake',
                 optionNoRedelegate: "No, don't restake",
                 descriptionRedelegate:
-                    'Do you want ot automatically add your delegation rewards to your delegated amount?\n\nIf you choose to not restake your rewardds, the amounts will be at disposal on your account balance at each pay day.',
+                    'Do you want to automatically add your delegation rewards to your delegated amount?\n\nIf you choose to not restake your rewards, the amounts will be at disposal on your account balance at each pay day.',
+                locked: 'Amount locked',
+                lockedNote: 'You are unable to change the amount while there is a pending change',
+                overStakeThresholdWarning:
+                    'You are about to lock more than {{ threshold }}% of your total balance in a delegation stake.\n\nIf you don’t have enough unlocked CCD at your disposal, you might not be able to pay future transaction fees.',
+                enterNewStake: 'Enter new delegation stake',
             },
             continueButton: 'Continue',
+            warning: 'Warning',
         },
     },
     accountPending: 'This account is still pending finalization.',

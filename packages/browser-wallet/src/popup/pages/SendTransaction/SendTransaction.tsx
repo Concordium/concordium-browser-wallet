@@ -14,7 +14,6 @@ import { grpcClientAtom } from '@popup/store/settings';
 import TransactionReceipt from '@popup/shared/TransactionReceipt/TransactionReceipt';
 import Button from '@popup/shared/Button';
 import { displayUrl } from '@popup/shared/utils/string-helpers';
-import { noOp, useAsyncMemo } from 'wallet-common-helpers';
 import ConnectedBox from '@popup/pages/Account/ConnectedBox';
 import { addToastAtom } from '@popup/state';
 import ExternalRequestLayout from '@popup/page-layouts/ExternalRequestLayout';
@@ -22,6 +21,7 @@ import { useUpdateAtom } from 'jotai/utils';
 import { addPendingTransactionAtom } from '@popup/store/transactions';
 import { convertEnergyToMicroCcd, getEnergyCost } from '@shared/utils/energy-helpers';
 import { SmartContractParameters, SchemaWithContext } from '@concordium/browser-wallet-api-helpers';
+import { useBlockChainParameters } from '@popup/shared/BlockChainParametersProvider';
 import { parsePayload } from './util';
 
 interface Location {
@@ -50,6 +50,7 @@ export default function SendTransaction({ onSubmit, onReject }: Props) {
     const client = useAtomValue(grpcClientAtom);
     const { withClose, onClose } = useContext(fullscreenPromptContext);
     const addPendingTransaction = useUpdateAtom(addPendingTransactionAtom);
+    const chainParameters = useBlockChainParameters();
 
     const { accountAddress, url } = state.payload;
     const key = usePrivateKey(accountAddress);
@@ -66,15 +67,13 @@ export default function SendTransaction({ onSubmit, onReject }: Props) {
         [JSON.stringify(state.payload)]
     );
 
-    const cost = useAsyncMemo(
-        async () => {
-            const parameters = await client.getBlockChainParameters();
+    const cost = useMemo(() => {
+        if (chainParameters) {
             const energy = getEnergyCost(transactionType, payload);
-            return convertEnergyToMicroCcd(energy, parameters);
-        },
-        noOp,
-        [transactionType]
-    );
+            return convertEnergyToMicroCcd(energy, chainParameters);
+        }
+        return undefined;
+    }, [transactionType, chainParameters]);
 
     useEffect(() => onClose(onReject), [onClose, onReject]);
 
