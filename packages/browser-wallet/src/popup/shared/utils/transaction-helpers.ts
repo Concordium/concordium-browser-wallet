@@ -13,6 +13,7 @@ import {
 import { fractionalToInteger, isValidCcdString } from 'wallet-common-helpers';
 
 import i18n from '@popup/shell/i18n';
+import { DEFAULT_TRANSACTION_EXPIRY } from '@shared/constants/time';
 import { BrowserWalletAccountTransaction, TransactionStatus } from './transaction-history-types';
 
 export function buildSimpleTransferPayload(recipient: string, amount: bigint): SimpleTransferPayload {
@@ -72,8 +73,7 @@ export function validateAccountAddress(cand: string): string | undefined {
 }
 
 export function getDefaultExpiry(): TransactionExpiry {
-    // TODO: add better default?
-    return new TransactionExpiry(new Date(Date.now() + 3600000));
+    return new TransactionExpiry(new Date(Date.now() + DEFAULT_TRANSACTION_EXPIRY));
 }
 
 export function getTransactionTypeName(type: AccountTransactionType): string {

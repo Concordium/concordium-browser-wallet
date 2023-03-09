@@ -36,6 +36,7 @@ import { sendCredentialHandler } from './credential-deployment';
 import { startRecovery, setupRecoveryHandler } from './recovery';
 import { createIdProofHandler, runIfValidProof } from './id-proof';
 
+const rpcCallNotAllowedMessage = 'RPC Call can only be performed by whitelisted sites';
 const walletLockedMessage = 'The wallet is locked';
 async function isWalletLocked(): Promise<boolean> {
     const passcode = await sessionPasscode.get();
@@ -84,18 +85,21 @@ async function performRpcCall(
                 .catch((e) => onFailure(e.toString()));
         }
     } else {
-        onFailure('RPC Call can only be performed by whitelisted sites');
+        onFailure(rpcCallNotAllowedMessage);
     }
 }
 
-async function handleGrpcRequest(
-    senderUrl: string,
+/**
+ * Returns the url/port of the current node's gRPC endpoint, if the caller is allowed to perform gRPC calls.
+ */
+async function exportGRPCLocation(
+    callerUrl: string,
     onSuccess: (response: string | undefined) => void,
     onFailure: (response: string) => void
 ): Promise<void> {
-    const isWhiteListed = await isWhiteListedForAnyAccount(senderUrl);
+    const isWhiteListed = await isWhiteListedForAnyAccount(callerUrl);
     if (!isWhiteListed) {
-        return onFailure('No JSON-RPC URL available');
+        return onFailure(rpcCallNotAllowedMessage);
     }
     const network = await storedCurrentNetwork.get();
     if (!network || !network.grpcUrl || !network.grpcPort) {
@@ -224,7 +228,7 @@ bgMessageHandler.handleMessage(createMessageTypeFilter(MessageType.GrpcRequest),
     if (!sender.url) {
         return onFailure('Missing sender URL');
     }
-    handleGrpcRequest(sender.url, onSuccess, onFailure);
+    exportGRPCLocation(sender.url, onSuccess, onFailure);
     return true;
 });
 

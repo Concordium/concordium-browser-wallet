@@ -11,6 +11,7 @@ import {
     getCredentialDeploymentTransactionHash,
 } from '@concordium/web-sdk';
 import { GRPCTIMEOUT } from '@shared/constants/networkConfiguration';
+import { DEFAULT_TRANSACTION_EXPIRY } from '@shared/constants/time';
 import { sessionCreatingCredential, storedCurrentNetwork, storedSelectedAccount } from '@shared/storage/access';
 import { CreationStatus, PendingWalletCredential } from '@shared/storage/types';
 import { BackgroundResponseStatus, CredentialDeploymentBackgroundResponse } from '@shared/utils/types';
@@ -28,7 +29,7 @@ async function createAndSendCredential(credIn: CredentialInput): Promise<Credent
         const { identityIndex, credNumber } = credIn;
         const providerIndex = credIn.ipInfo.ipIdentity;
 
-        const expiry = new TransactionExpiry(new Date(Date.now() + 720000));
+        const expiry = new TransactionExpiry(new Date(Date.now() + DEFAULT_TRANSACTION_EXPIRY));
         const request = createCredentialTransaction(credIn, expiry);
         const signingKey = ConcordiumHdWallet.fromHex(credIn.seedAsHex, credIn.net)
             .getAccountSigningKey(providerIndex, identityIndex, credNumber)

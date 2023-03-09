@@ -12,8 +12,6 @@ import {
 } from '@popup/store/settings';
 import { isRecoveringAtom } from '@popup/store/identity';
 import Toast from '@popup/shared/Toast/Toast';
-import AccountInfoListenerContext from '@popup/shared/AccountInfoListenerContext';
-import BlockChainParametersContext from '@popup/shared/BlockChainParametersProvider';
 import Header from './Header';
 
 export default function MainLayout() {
@@ -57,14 +55,10 @@ export default function MainLayout() {
 
     return (
         <div className="main-layout">
-            <AccountInfoListenerContext>
-                <BlockChainParametersContext>
-                    <Header onToggle={setHeaderOpen} />
-                    <main className={clsx('main-layout__main', headerOpen && 'main-layout__main--blur')}>
-                        <Outlet />
-                    </main>
-                </BlockChainParametersContext>
-            </AccountInfoListenerContext>
+            <Header onToggle={setHeaderOpen} />
+            <main className={clsx('main-layout__main', headerOpen && 'main-layout__main--blur')}>
+                <Outlet />
+            </main>
             <Toast />
         </div>
     );

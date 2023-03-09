@@ -15,6 +15,7 @@ export function determineUpdatePayloadSize(parameterSize: number, receiveName: s
     return 8n + 8n + 8n + 2n + BigInt(parameterSize) + 2n + BigInt(receiveName.length);
 }
 
+// TODO: Replace this with helpers from SDK
 /**
  * Given a transaction type and the payload of that transaction type, return the corresponding energy cost.
  */
@@ -24,6 +25,7 @@ export function getEnergyCost(transactionType: AccountTransactionType, payload: 
     return calculateEnergyCost(1n, BigInt(size), handler.getBaseEnergyCost(payload));
 }
 
+// TODO: Replace this with helpers from SDK
 /**
  * Given the current blockchain parameters, return the microCCD per NRG exchange rate of the chain.
  * @returns the microCCD per NRG exchange rate as a ratio.
@@ -34,6 +36,7 @@ export function getExchangeRate({ euroPerEnergy, microGTUPerEuro }: ChainParamet
     return { numerator, denominator };
 }
 
+// TODO: Replace this with helpers from SDK
 /**
  * Given an NRG amount and the current blockchain parameters, this returns the corresponding amount in microCcd.
  */
