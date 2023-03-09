@@ -89,12 +89,13 @@ type Props = {
     status: IdentityStatus;
     onNameChange?(name: string): void;
     onClick?(): void;
+    disabled?: boolean;
     provider: JSX.Element;
     className?: string;
 };
 // TODO: Fix these
 /* eslint-disable jsx-a11y/no-static-element-interactions , jsx-a11y/click-events-have-key-events */
-export default function IdCard({ name, provider, status, onNameChange, className, onClick }: Props) {
+export default function IdCard({ name, provider, disabled, status, onNameChange, className, onClick }: Props) {
     const { t } = useTranslation();
     const [isEditing, setIsEditing] = useState(false);
     const editNameRef = useRef<HTMLFormElement>(null);
@@ -111,6 +112,7 @@ export default function IdCard({ name, provider, status, onNameChange, className
                 status === 'pending' && 'id-card--pending',
                 status === 'confirmed' && 'id-card--confirmed',
                 status === 'rejected' && 'id-card--rejected',
+                disabled && 'id-card--disabled',
                 onClick !== undefined && 'id-card--clickable',
                 className
             )}

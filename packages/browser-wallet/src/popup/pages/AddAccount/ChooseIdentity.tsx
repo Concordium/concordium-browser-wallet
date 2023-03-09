@@ -1,4 +1,4 @@
-import React, { useCallback } from 'react';
+import React, { useCallback, useState } from 'react';
 import { useTranslation } from 'react-i18next';
 import { useNavigate } from 'react-router-dom';
 import { useAtomValue, useSetAtom } from 'jotai';
@@ -6,9 +6,22 @@ import IdentityProviderIcon from '@popup/shared/IdentityProviderIcon';
 
 import IdCard from '@popup/shared/IdCard';
 import { identitiesAtom, selectedIdentityIndexAtom, identityProvidersAtom } from '@popup/store/identity';
-import { Identity, CreationStatus } from '@shared/storage/types';
+import { Identity, CreationStatus, WalletCredential, ConfirmedIdentity } from '@shared/storage/types';
 import { absoluteRoutes } from '@popup/constants/routes';
 import Button from '@popup/shared/Button';
+import { credentialsAtom } from '@popup/store/account';
+import { getMaxAccountsForIdentity, isIdentityOfCredential } from '@shared/utils/identity-helpers';
+import { getNextEmptyCredNumber } from '@popup/shared/utils/account-helpers';
+import Modal from '@popup/shared/Modal';
+import i18n from '@popup/shell/i18n';
+
+function validateValidForAccountCreation(identity: ConfirmedIdentity, creds: WalletCredential[]): string | undefined {
+    const nextCredNumber = getNextEmptyCredNumber(creds);
+    if (nextCredNumber >= getMaxAccountsForIdentity(identity)) {
+        return i18n.t('maxAccountsReached', { ns: 'addAccount' });
+    }
+    return undefined;
+}
 
 export default function ChooseIdentity() {
     const { t } = useTranslation('addAccount');
@@ -16,6 +29,8 @@ export default function ChooseIdentity() {
     const setSelectedIdentityIndex = useSetAtom(selectedIdentityIndexAtom);
     const nav = useNavigate();
     const providers = useAtomValue(identityProvidersAtom);
+    const credentials = useAtomValue(credentialsAtom);
+    const [modalMessage, setModalMessage] = useState<string>();
 
     const findProvider = useCallback(
         (identity: Identity) => providers.find((p) => p.ipInfo.ipIdentity === identity.providerIndex),
@@ -39,24 +54,35 @@ export default function ChooseIdentity() {
 
     return (
         <div className="flex-column align-center">
+            <Modal open={Boolean(modalMessage)} onClose={() => setModalMessage(undefined)}>
+                {modalMessage}
+            </Modal>
             <p className="m-t-20 text-center p-h-10">{t('chooseIdentity')}</p>
             {identities.map((identity, i) => {
-                if (identity.status === CreationStatus.Confirmed) {
-                    return (
-                        <IdCard
-                            name={identity.name}
-                            key={`${identity.providerIndex}-${identity.index}`}
-                            provider={<IdentityProviderIcon provider={findProvider(identity)} />}
-                            status={identity.status}
-                            className="m-t-10"
-                            onClick={() => {
-                                setSelectedIdentityIndex(i);
-                                nav('confirm');
-                            }}
-                        />
-                    );
+                if (identity.status !== CreationStatus.Confirmed) {
+                    return null;
                 }
-                return null;
+                const credsOfCurrentIdentity = credentials.filter(isIdentityOfCredential(identity));
+                const reason = validateValidForAccountCreation(identity, credsOfCurrentIdentity);
+
+                return (
+                    <IdCard
+                        name={identity.name}
+                        key={`${identity.providerIndex}-${identity.index}`}
+                        provider={<IdentityProviderIcon provider={findProvider(identity)} />}
+                        status={identity.status}
+                        disabled={Boolean(reason)}
+                        className="m-t-10"
+                        onClick={
+                            reason
+                                ? () => setModalMessage(reason)
+                                : () => {
+                                      setSelectedIdentityIndex(i);
+                                      nav('confirm');
+                                  }
+                        }
+                    />
+                );
             })}
         </div>
     );
