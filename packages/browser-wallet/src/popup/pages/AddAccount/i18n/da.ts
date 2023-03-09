@@ -5,6 +5,7 @@ const t: typeof en = {
     createAccount: 'Opret konto',
     noIdentities: 'Du har ingen identiter, men en identitet er nødvendig for at oprette en konto.',
     createIdentity: 'Opret identitet',
+    maxAccountsReached: 'Denne identitet har allerede lavet alle tilladte konti',
 };
 
 export default t;

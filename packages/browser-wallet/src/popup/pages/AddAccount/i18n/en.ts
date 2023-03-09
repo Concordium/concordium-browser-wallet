@@ -3,6 +3,7 @@ const t = {
     createAccount: 'Create new account',
     noIdentities: 'You have no identities, however you need an identity to create an account.',
     createIdentity: 'Create new identity',
+    maxAccountsReached: 'This identity has already reached its account creation limit',
 };
 
 export default t;
