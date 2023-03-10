@@ -6,7 +6,7 @@ export const mainnet: NetworkConfiguration = {
     jsonRpcUrl: 'https://json-rpc.mainnet.concordium.software/',
     explorerUrl: 'https://wallet-proxy.mainnet.concordium.software',
     grpcPort: 20000,
-    grpcUrl: 'https://grpc.mainnet.concordium.com',
+    grpcUrl: 'https://grpc.mainnet.concordium.software',
 };
 
 export const testnet: NetworkConfiguration = {

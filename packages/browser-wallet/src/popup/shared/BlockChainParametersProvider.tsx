@@ -4,7 +4,7 @@ import { useAtomValue } from 'jotai';
 import React, { createContext, ReactNode, useCallback, useContext, useEffect, useRef } from 'react';
 import { useAsyncMemo } from 'wallet-common-helpers';
 
-export const blockChainParametersContext = createContext<() => Promise<ChainParameters>>(() => Promise.reject());
+const blockChainParametersContext = createContext<() => Promise<ChainParameters>>(() => Promise.reject());
 
 interface Props {
     children: ReactNode;

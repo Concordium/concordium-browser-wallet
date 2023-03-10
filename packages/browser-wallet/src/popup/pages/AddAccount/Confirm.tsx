@@ -58,8 +58,6 @@ export default function Confirm() {
             const global = await getGlobal(client);
 
             // Make request
-            const expiry = Math.floor(Date.now() / 1000) + 720;
-
             const credsOfCurrentIdentity = credentials.filter(isIdentityOfCredential(selectedIdentity));
             const credNumber = getNextEmptyCredNumber(credsOfCurrentIdentity);
 
@@ -75,7 +73,6 @@ export default function Confirm() {
                     revealedAttributes: [],
                     identityIndex: selectedIdentity.index,
                     credNumber,
-                    expiry,
                 }
             );
             if (response.status === BackgroundResponseStatus.Success) {

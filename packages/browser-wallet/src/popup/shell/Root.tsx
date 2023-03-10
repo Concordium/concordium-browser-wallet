@@ -10,6 +10,8 @@ import { isSpawnedWindow } from '@popup/shared/window-helpers';
 import { networkConfigurationAtom, themeAtom } from '@popup/store/settings';
 import { Theme as ThemeType } from '@shared/storage/types';
 import { absoluteRoutes } from '@popup/constants/routes';
+import BlockChainParametersContext from '@popup/shared/BlockChainParametersProvider';
+import AccountInfoListenerContext from '@popup/shared/AccountInfoListenerContext';
 
 import './i18n';
 
@@ -85,7 +87,11 @@ export default function Root() {
             <MemoryRouter initialEntries={[absoluteRoutes.home.account.path]}>
                 <Network>
                     <Theme>
-                        <Routes />
+                        <AccountInfoListenerContext>
+                            <BlockChainParametersContext>
+                                <Routes />
+                            </BlockChainParametersContext>
+                        </AccountInfoListenerContext>
                     </Theme>
                 </Network>
             </MemoryRouter>
