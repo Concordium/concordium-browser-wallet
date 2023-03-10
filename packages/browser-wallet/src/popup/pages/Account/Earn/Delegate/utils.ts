@@ -12,7 +12,8 @@ import { ccdToMicroCcd, DeepPartial, isDefined, microCcdToCcd, NotOptional } fro
 export type ConfigureDelegationFlowState = {
     pool: string | null;
     redelegate: boolean;
-    amount: string; // in CCD
+    /** In CCD */
+    amount: string;
 };
 
 export const getExistingDelegationValues = (

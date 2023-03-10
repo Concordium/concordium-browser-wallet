@@ -11,7 +11,7 @@ export type EarnPageContext = {
 export const STAKE_WARNING_THRESHOLD = 95n;
 
 /**
- * Given a type predicate, return a function that only returns elements that satisfies the predicate, otherwise it return undefined.
+ * Given a type predicate, return a function that only returns elements that satisfies the predicate, otherwise it returns undefined.
  */
 export function filterType<A, B extends A>(predicate: (x: A) => x is B): (x: A) => B | undefined {
     return (x: A) => {

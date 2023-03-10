@@ -95,10 +95,130 @@ const t: typeof en = {
         listAddMore: 'Du kan tilføje flere tokens fra Rediger siden.',
         listEmpty: 'Du kan tilføje tokens fra Rediger siden.',
     },
-    // TODO translate
-    earn: en.earn,
-    // TODO translate
-    delegate: en.delegate,
+    earn: {
+        title: 'Fortjenester',
+        description: 'Der are to måder at få fortjenester på Concordium: Baking and delegation.',
+        bakingHeader: 'Baking',
+        bakingDescription:
+            'Som en baker deltager i netværket ved at bage blocks på Concordium netværket. Dette kræver som minimum {{ minAmount }} CCD og adgang til en dedikeret node.',
+        delegateHeader: 'Delegation',
+        delegateDescription:
+            'Hvis du ikke har adgang til din egen node kan du delegere dit stake til en anden baker. Det kræver ikke noget minimumsbeløb af CCD for at delegere\n\nVælg muligheden der passer dig bedst nedenfor for at lære mere.\n\nNOTE: Én konto kan ikke både være baker og delegator, men det er muligt at skifte ved at stoppe den nuværende rolle.',
+        delegateCta: 'Opsæt delegation',
+        bakingCta: 'Opsæt baking',
+    },
+    delegate: {
+        registerIntro: {
+            '1': {
+                title: 'Delegation',
+                body: 'Delegation tillader brugere af Concordium blockchain at få fortjenester uden at være baker eller køre en node.\n\nVed at indsætte CCD på din delegation saldo kan du få fortjenester.\n\nPå de næste sider, vil vi gå igennem de basale delegation koncepter. Hvis du vil lære mere, kan du besøge vores <1>dokumentation side</1>.',
+            },
+            '2': {
+                title: 'Delegation modeller',
+                body: 'Der er to modeller man kan være til delegation. <2><3>Delegating til en specifik pulje</3><3>Passiv delegation</3></2>En baker pulje administreres af en individuel baker, som kører en node, så fortjenesterne afhænger af bakerens ydeevne/stabilitet.\n\nPassiv delegation går ikke til en specifik pulje, hvilket gør at det mitigerer risikoen for problemer med en baker, men fortjenesterne er lavere.\n\nFor at læse mere, besøg vores <1>dokumentation side</1>.',
+            },
+            '3': {
+                title: 'Baker puljer',
+                body: 'En baker pulje administreres af en individuel baker.\n\nAt have en pulje kan give bakeren en større stake og øge deres chance for at blive valgt til at bake en block.\n\nBakerer tjener provision fra deres delegators når de baker en block.\n\nDelegering til en pulge har normalt højere fortjeneste end passiv delegation, men der er en risiko for at tabe fortjenester hvis bakeren ikke er stabil eller oplever problemer. Det er derfor en god ide at holde øje med bakerens velbefindende.\n\nDu kan læse mere om dette på vores <1>dokumentation side</1>.',
+            },
+            '4': {
+                title: 'Passiv delegation',
+                body: 'For CCD indehavere som ikke ønske at holde øje med deres valgte puljes velbefindende, men bare vil have stabile fortjenester, så er passiv delegation et lav-risiko, lav-fortjeneste alternative.\n\nDenne strategi er ikke forbundet med en specfic baker, så der er ingen risiko ved en baker dårlige velbefindende.\n\nPassiv delegation tilbyder dog lavere fortjenester end hvad du ville kunne forvente hvis du valgt en bestemt pulje.',
+            },
+            '5': {
+                title: 'Pay days',
+                body: 'Uanset om du har valgt en bestemt baker pulje eller passiv delegation, så bliver fortjenester betalt ud ved en pay day. Fortjenesterne er distribureret ud til alle i puljen forholdsmæssigt til deres delegation saldo, og en provision er udbetalt til bakers af alle delegators.\n\nHvis du senere ændrer dine delegation indstillinger, så vil de fleste af dem træde i kraft ved den efterfølgende pay day.\n\nFor at læse mere om en pay day, kan du besøge vores <1>dokumentation side</1>.',
+            },
+            '6': {
+                title: 'Lock-in og cool-downs',
+                body: 'Når du laver delegation, bliver din delegation saldo låst til din konto.\n\nDette betyder at du ikke kan bruge CCD fra denne saldo mens det bliver brugt til delegation.\n\nHvis du formindsker din delegation saldo eller helt stopper for delegation, vil denne saldo forblive låst i en cool-down periode. I løbet af denne cool-down periode, vil den fulde delegation saldo stadig yde fortjenester.\n\nDa transaktioner har omkostninger er det vigtigt at huske på at man behøver nogle ulåste CCD, udenfor delegation saldoen, som kan bruges til at betale omkostningerne for at frigøre delegation saldoen igen.',
+            },
+            '7': {
+                title: 'Status siden',
+                body: 'Efter at du er startet på delegation, kan du se den nuværende status på status siden.\n\nDerfra kan du også opdatere dine delegation indstillinger eller stoppe delegation igen.',
+            },
+        },
+        updateIntro: {
+            '1': {
+                title: 'Updating your delegation',
+                body: 'Når du opdaterer din delegation, kan du vælge at øge eller formindske din delegation saldo, ændre hvilken pulje du delegerer til og/eller hvorvidt fortjenester indsættes som delegation saldo.\n\nDu vælger selv hvor mange af parametrene du ændrer på.\n\nPå de næste sider vil vi gå igennem nogle af delegation koncepterne.',
+            },
+            '2': {
+                title: 'Pay day opdateringer',
+                body: 'Hvis du vælger at øge din delegation saldo, ændre hvilken pulje du delegerer til og/eller hvorvidt fortjenester indsættes som delegation saldo, så vil disse ændringerne tage effekt fra den næste pay day.\n\nDette vil typisk være indenfor 24 timer, men kan tage op til 25 timer.',
+            },
+            '3': {
+                title: 'Opdateringer med længere cool-downs',
+                body: 'Hvis du vælger at formindske din delegation saldo, så vil ændringen træde i kraft efter en cool-down periode.\n\nI løbet af denne cool-down periode, vil delegation saldoen være låst og kan ikke ændres, og du vil ikke kunne stoppe delegation.\n\nDu vil stadig få fortjenester i cool-down perioden, og du vil stadig kunne ændre andre delegation indstillinger.n\n.Hvis du laver andre ændringer samtidigt med at du formindsker delegation saldoen, vil disse ændringer træde i kraft ved den næste pay day, som beskrevet på sidste side.',
+            },
+        },
+        removeIntro: {
+            '1': {
+                title: 'Stop delegation',
+                body: 'Hvis du vælger at stoppe delegation, så er der en længere cool-down periode.\n\nMens man er i en  cool-down periode fortsætter man må at gå fortjenester.\n\nI slutningen af cool-down perioden bliver det delegeret CCD låst op på din offentlige saldo, og kan bruges igen.',
+            },
+            '2': {
+                title: 'Update during the cool-down period',
+                body: 'Only the delegation amount is locked during the cool-down period.\n\nThis means that you can still change restake status and target baker pool during the cool-down.',
+            },
+        },
+        details: {
+            heading: 'Din delegation er registreret',
+            amount: 'Delegation saldo',
+            target: 'Target',
+            targetPassive: 'Passiv delegation',
+            targetBaker: 'Baker {{bakerId}}',
+            restake: 'Fortjenester vil blive ',
+            optionRestake: 'Lagt til delegation saldo',
+            optionNoRestake: 'Lagt til din offentligte saldo',
+            updateDelegation: 'Opdater',
+            stopDelegation: 'Stop',
+            pending: 'Der ventes på at transaktionen bliver finalized',
+            failed: 'Transaktionen fejlede',
+        },
+        register: {
+            title: 'Registrer delegation',
+        },
+        update: {
+            title: 'Opdater delegation',
+            noChanges:
+                'Transaktionen indeholder ikke nogen ændringer i for hold til de nuværende delegation indstillinger.',
+        },
+        configure: {
+            pool: {
+                description1:
+                    'Du kan delegere til en vilkårlig åben baker pulje, eller du kan delegere med Passiv delegation',
+                optionBaker: 'Baker',
+                optionPassive: 'Passiv',
+                descriptionBaker:
+                    'Hvis du ikke allerede ved hvilke baker pulje du vil delegere til, kan du læse mere på vores <1>dokumentation side</1>',
+                descriptionPassive:
+                    'Passiv delegation er et alternativ til delegation til en specifik bager pulje, men har lavere fortjenester. Med passiv delegation behøver du ikke bekymre om dig om oppetiden eller kvaliteten af baker noden.\n\nFor mere info, kan du besøge vores <1>dokumentation side</1>',
+                bakerIdLabel: 'Baker ID',
+                bakerIdRequired: 'Du skal specificere et baker ID',
+                targetNotOpenForAll: 'Valgt baker tillader ikke nye delegators',
+                currentStakeExceedsCap: 'Din nuværende delegation saldo overtræder den valgte bakers loft',
+                chosenStakeExceedsCap: 'Den valgte delegation saldo  overtræder bakerens loft',
+                notABaker: 'Det medgivne baker ID svarer ikke til en aktiv baker',
+            },
+            amount: {
+                description: 'Indtast din ønskede delegation saldo',
+                amountLabel: 'Delegation saldo',
+                amountRequired: 'Du skal specificere en delegation saldo',
+                optionRedelegate: 'Ja, indsæt',
+                optionNoRedelegate: 'Nej, indsæt ikke',
+                descriptionRedelegate:
+                    'Vil du gerne automatisk indsætte dine fortjenester på din delegation saldo?\n\nHvis du vælger ikke at indsætte dine fortjenester, vil de blive tilføjet til din offentlige saldo hver pay day.',
+                locked: 'Saldo låst',
+                lockedNote: 'Du kan ikke ændre saldoen mens der er en ændring kommende ændring',
+                overStakeThresholdWarning:
+                    'Du er ved at låse mere end {{ threshold }}% af din totale saldo som diun delegation saldo.\n\nHvis du ikke har nok ulåste CCD, vil du ikke kunne betale for transaktion omkostninger.',
+                enterNewStake: 'Indtast ny delegation saldo',
+            },
+            continueButton: 'Fortsæt',
+            warning: 'Advarsel',
+        },
+    },
     accountPending: 'Denne konto er stadig ved at blive oprettet.',
     accountRejected: 'Denne konto kunne ikke blive oprettet.',
     request: 'Opret konto',

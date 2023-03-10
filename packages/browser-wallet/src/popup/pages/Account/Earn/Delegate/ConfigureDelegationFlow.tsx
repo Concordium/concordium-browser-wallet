@@ -250,7 +250,11 @@ function AmountPage({ initial, onNext, formValues, accountInfo }: AmountPageProp
                         </Modal>
                         <p className="m-t-0">{t('amount.description')}</p>
                         {pendingChange && (
-                            <DisabledAmountInput label={t('amount.locked')} note={t('amount.lockedNote')} />
+                            <DisabledAmountInput
+                                className="delegation__amount-input"
+                                label={t('amount.locked')}
+                                note={t('amount.lockedNote')}
+                            />
                         )}
                         {!pendingChange && (
                             <FormAmountInput

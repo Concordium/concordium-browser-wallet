@@ -117,15 +117,15 @@ const t = {
             },
             '3': {
                 title: 'Baker pools',
-                body: "A baker pool is managed by an individual baker.\n\nRunning a pool allows a baker to attract more stake and thus increate chances of being selectd to bake a block.\n\nBakers earn a commision from the delegators upon baking a block.\n\nDelegating to a baker pool is usually more profitable that passive delegation, but there is also a risk of losingout on rewards if the baker is not running properly. It is therefore a good idea to keep an eye on the baker's performance.\n\nYou can read morea bout how to investigate a baker's performance on our <1>documentation website</1>.",
+                body: "A baker pool is managed by an individual baker.\n\nRunning a pool allows a baker to attract more stake and thus increate chances of being selected to bake a block.\n\nBakers earn a commision from the delegators upon baking a block.\n\nDelegating to a baker pool is usually more profitable that passive delegation, but there is also a risk of losing out on rewards if the baker is not running properly. It is therefore a good idea to keep an eye on the baker's performance.\n\nYou can read more about how to investigate a baker's performance on our <1>documentation website</1>.",
             },
             '4': {
                 title: 'Passive delegation',
-                body: 'For CCD holders who do not want to regularly check the performance of a chosen pool, but just want a stable way of earning rewards, passive delegation offers a low-risk, low-reward alternative.\n\nThis staking strategy is not associated with a specific baker, so there is no risk of poor baker health.\n\nThe trade off when choosing passive delegation is that the return on your stake will be less than what you may receive, when delegatin gto a specific baker pool.',
+                body: 'For CCD holders who do not want to regularly check the performance of a chosen pool, but just want a stable way of earning rewards, passive delegation offers a low-risk, low-reward alternative.\n\nThis staking strategy is not associated with a specific baker, so there is no risk of poor baker health.\n\nThe trade off when choosing passive delegation is that the return on your stake will be less than what you may receive, when delegating to a specific baker pool.',
             },
             '5': {
                 title: 'Pay days',
-                body: 'Whether you choose an individual baking pool or passive delegation, rewards are paid out at what is called the pay day. Rewards are distribured to everyone in the pool proportioned to their stake, and a commission is paid to the baker by all delegators.\n\nIf you make updates to your ddelegation at a later point, most o fthese will also take effect from the next pay day.\n\nTo read more about the pay day, you can visit our <1>documentation website</1>.',
+                body: 'Whether you choose an individual baking pool or passive delegation, rewards are paid out at what is called the pay day. Rewards are distributed to everyone in the pool proportioned to their stake, and a commission is paid to the baker by all delegators.\n\nIf you make updates to your delegation at a later point, most o fthese will also take effect from the next pay day.\n\nTo read more about the pay day, you can visit our <1>documentation website</1>.',
             },
             '6': {
                 title: 'Lock-in and cool-downs',
