@@ -11,7 +11,7 @@ import sha256 from 'sha256';
 import { withJsonRpcClient, WalletConnectionProps, useConnection, useConnect } from '@concordium/react-components';
 import { version } from '../package.json';
 
-import { register } from './utils';
+import { register, submitUpdateOperatorSponsoredTx, submitTransferSponsoredTx } from './utils';
 import {
     SPONSORED_TX_CONTRACT_NAME,
     SPONSORED_TX_CONTRACT_INDEX,
@@ -95,7 +95,59 @@ const InputFieldStyle = {
     padding: '10px 20px',
 };
 
-async function calculateMessageHash(rpcClient: JsonRpcClient, operator: string, addOperator: boolean) {
+// TODO: deploy a new smart contract so `calcualteMessageHash` can be used.
+
+async function calculateTransferMessageHash(rpcClient: JsonRpcClient, amount: string, from: string, to: string) {
+    const message = {
+        contract_address: {
+            index: Number(SPONSORED_TX_CONTRACT_INDEX),
+            subindex: 0,
+        },
+        entry_point: 'contract_transfer',
+        nonce: 1,
+        payload: {
+            Transfer: [
+                [
+                    {
+                        amount, // TODO: amount should always be 1 when using NFT but rather pass the tokenID
+                        data: '',
+                        from: {
+                            Account: [from],
+                        },
+                        to: {
+                            Account: [to],
+                        },
+                        token_id: '00000006', // TODO: this has to be input via a field
+                    },
+                ],
+            ],
+        },
+        timestamp: '2030-08-08T05:15:00Z',
+    };
+
+    const param = serializeUpdateContractParameters(
+        SPONSORED_TX_CONTRACT_NAME,
+        'calculateHash',
+        message,
+        toBuffer(SPONSORED_TX_RAW_SCHEMA, 'base64')
+    );
+
+    const res = await rpcClient.invokeContract({
+        method: `${SPONSORED_TX_CONTRACT_NAME}.calculateHash`,
+        contract: { index: SPONSORED_TX_CONTRACT_INDEX, subindex: CONTRACT_SUB_INDEX },
+        parameter: param,
+    });
+
+    if (!res || res.tag === 'failure' || !res.returnValue) {
+        throw new Error(
+            `RPC call 'invokeContract' on method '${SPONSORED_TX_CONTRACT_NAME}.calculateHash' of contract '${SPONSORED_TX_CONTRACT_INDEX}' failed`
+        );
+    }
+
+    return res.returnValue;
+}
+
+async function calculateUpdateOperatorMessageHash(rpcClient: JsonRpcClient, operator: string, addOperator: boolean) {
     const operatorAction = addOperator
         ? {
               Add: [],
@@ -214,12 +266,14 @@ export default function SPONSOREDTXS(props: WalletConnectionProps) {
     // TODO: remove
     console.log(setSelectedFile);
 
+    const [isPermitUpdateOperator, setPermitUpdateOperator] = useState<boolean>(true);
+
     const [publicKey, setPublicKey] = useState('');
     const [operator, setOperator] = useState('4HoVMVsj6TwJr6B5krP5fW9qM4pbo6crVyrr7N95t2UQDrv1fq');
     const [messageHash, setMessageHash] = useState('');
     const [signature, setSignature] = useState('');
-    // TODO: remove
-    console.log(signature);
+    const [amount, setAmount] = useState('1');
+    const [to, setTo] = useState('4HoVMVsj6TwJr6B5krP5fW9qM4pbo6crVyrr7N95t2UQDrv1fq');
 
     const [addOperator, setAddOperator] = useState<boolean>(true);
 
@@ -239,6 +293,16 @@ export default function SPONSOREDTXS(props: WalletConnectionProps) {
     const changeHandler3 = (event: ChangeEvent) => {
         const target = event.target as HTMLTextAreaElement;
         setSignature(target.value);
+    };
+
+    const changeHandler4 = (event: ChangeEvent) => {
+        const target = event.target as HTMLTextAreaElement;
+        setAmount(target.value);
+    };
+
+    const changeHandler5 = (event: ChangeEvent) => {
+        const target = event.target as HTMLTextAreaElement;
+        setTo(target.value);
     };
 
     useEffect(() => {
@@ -412,13 +476,7 @@ export default function SPONSOREDTXS(props: WalletConnectionProps) {
                                 setHash('');
                                 setTransactionError('');
                                 setWaitingForUser(true);
-                                const tx = (isRegisterPublicKeyPage ? register : register)(
-                                    connection,
-                                    account,
-                                    publicKey,
-                                    SPONSORED_TX_CONTRACT_INDEX,
-                                    CONTRACT_SUB_INDEX
-                                );
+                                const tx = register(connection, account, publicKey);
                                 console.log(tx);
                                 // tx.then(setHash)
                                 //     .catch((err: Error) => setTransactionError((err as Error).message))
@@ -427,13 +485,7 @@ export default function SPONSOREDTXS(props: WalletConnectionProps) {
                                 setHash('');
                                 setTransactionError('');
                                 setWaitingForUser(true);
-                                const tx = (isRegisterPublicKeyPage ? register : register)(
-                                    connection,
-                                    account,
-                                    publicKey,
-                                    SPONSORED_TX_CONTRACT_INDEX,
-                                    CONTRACT_SUB_INDEX
-                                );
+                                const tx = register(connection, account, publicKey);
                                 console.log(tx);
                                 // tx.then(setHash)
                                 //     .catch((err: Error) => setTransactionError((err as Error).message))
@@ -455,33 +507,76 @@ export default function SPONSOREDTXS(props: WalletConnectionProps) {
             )}
             {connection && !isRegisterPublicKeyPage && account !== undefined && (
                 <>
-                    <h2 style={{ marginBottom: 0 }}>Update Operator via a sponsored transaction:</h2>
-                    <label>
-                        <p style={{ marginBottom: 0 }}>Insert Operator Address:</p>
-                        <input
-                            className="input"
-                            style={InputFieldStyle}
-                            type="text"
-                            placeholder="4HoVMVsj6TwJr6B5krP5fW9qM4pbo6crVyrr7N95t2UQDrv1fq"
-                            onChange={changeHandler2}
-                        />
-                    </label>
                     <div className="containerSpaceBetween">
-                        <p>Add operator</p>
+                        <p>Update Operator via a sponsored transaction</p>
                         <Switch
                             onChange={() => {
-                                setAddOperator(!addOperator);
+                                setPermitUpdateOperator(!isPermitUpdateOperator);
                             }}
                             onColor="#308274"
                             offColor="#308274"
                             onHandleColor="#174039"
                             offHandleColor="#174039"
-                            checked={!addOperator}
+                            checked={!isPermitUpdateOperator}
                             checkedIcon={false}
                             uncheckedIcon={false}
                         />
-                        <p>Remove operator</p>
+                        <p>Transfer via a sponsored transaction</p>
                     </div>
+                    {isPermitUpdateOperator && (
+                        <>
+                            <label>
+                                <p style={{ marginBottom: 0 }}>Insert Operator Address:</p>
+                                <input
+                                    className="input"
+                                    style={InputFieldStyle}
+                                    type="text"
+                                    placeholder="4HoVMVsj6TwJr6B5krP5fW9qM4pbo6crVyrr7N95t2UQDrv1fq"
+                                    onChange={changeHandler2}
+                                />
+                            </label>
+                            <div className="containerSpaceBetween">
+                                <p>Add operator</p>
+                                <Switch
+                                    onChange={() => {
+                                        setAddOperator(!addOperator);
+                                    }}
+                                    onColor="#308274"
+                                    offColor="#308274"
+                                    onHandleColor="#174039"
+                                    offHandleColor="#174039"
+                                    checked={!addOperator}
+                                    checkedIcon={false}
+                                    uncheckedIcon={false}
+                                />
+                                <p>Remove operator</p>
+                            </div>
+                        </>
+                    )}
+                    {!isPermitUpdateOperator && (
+                        <>
+                            <label>
+                                <p style={{ marginBottom: 0 }}>Insert Amount:</p>
+                                <input
+                                    className="input"
+                                    style={InputFieldStyle}
+                                    type="text"
+                                    placeholder="1"
+                                    onChange={changeHandler4}
+                                />
+                            </label>
+                            <label>
+                                <p style={{ marginBottom: 0 }}>Insert To:</p>
+                                <input
+                                    className="input"
+                                    style={InputFieldStyle}
+                                    type="text"
+                                    placeholder="4HoVMVsj6TwJr6B5krP5fW9qM4pbo6crVyrr7N95t2UQDrv1fq"
+                                    onChange={changeHandler5}
+                                />
+                            </label>
+                        </>
+                    )}
                     <button
                         style={ButtonStyle}
                         type="button"
@@ -497,9 +592,11 @@ export default function SPONSOREDTXS(props: WalletConnectionProps) {
                                     setLoadingError('');
                                     setLoading(false);
                                 } else {
-                                    withJsonRpcClient(connection, (rpcClient) =>
-                                        calculateMessageHash(rpcClient, operator, addOperator)
-                                    ).then((res) => setMessageHash(res));
+                                    withJsonRpcClient(connection, (rpcClient) => {
+                                        return isPermitUpdateOperator
+                                            ? calculateUpdateOperatorMessageHash(rpcClient, operator, addOperator)
+                                            : calculateTransferMessageHash(rpcClient, amount, account, to);
+                                    }).then((res) => setMessageHash(res));
                                 }
                             } catch (err) {
                                 setLoadingError((err as Error).message);
@@ -515,23 +612,27 @@ export default function SPONSOREDTXS(props: WalletConnectionProps) {
                             className="input"
                             style={InputFieldStyle}
                             type="text"
-                            placeholder="4HoVMVsj6TwJr6B5krP5fW9qM4pbo6crVyrr7N95t2UQDrv1fq"
+                            placeholder="E34407940B2996979118A2A94DBCE9C56F26E7B8F557F27BBA49E3B7536F0B1495203563E4E272CFCDECE545BE8EA96A1BEE55B1111DA780DE98CCD6F3C59909"
                             onChange={changeHandler3}
                         />
                     </label>
+                    <p> Your registered public key is: </p>
+                    {publicKey !== '' && <div className="loadingText">{publicKey}</div>}
+                    <p>
+                        {' '}
+                        Note: To generate the signature for testing, copy your above public key to (e.g.,
+                        https://cyphr.me/ed25519_applet/ed.html) and insert the above-computed hash without the `0x`
+                        into the message field in (e.g., https://cyphr.me/ed25519_applet/ed.html). Select `hex` for the
+                        `Msg Encoding` in (e.g., https://cyphr.me/ed25519_applet/ed.html). Click the `Sign` button on
+                        (e.g., https://cyphr.me/ed25519_applet/ed.html). Copy the generated signature from (e.g.,
+                        https://cyphr.me/ed25519_applet/ed.html) to this website into the above input field on this
+                        website. Remove the `0x` of the signature before clicking the `Submit Sponsored Transaction`
+                        button.
+                    </p>
                     <button
                         style={ButtonStyle}
                         type="button"
                         onClick={async () => {
-                            // TODO: submit sponsored tx to chain
-                        }}
-                    >
-                        Submit Sponsored Transaction
-                    </button>
-                    <button
-                        style={ButtonStyle}
-                        type="button"
-                        onClick={() => {
                             if (witness !== null) {
                                 // eslint-disable-next-line no-alert
                                 // alert(
@@ -541,13 +642,16 @@ export default function SPONSOREDTXS(props: WalletConnectionProps) {
                                 setHash('');
                                 setTransactionError('');
                                 setWaitingForUser(true);
-                                const tx = (isRegisterPublicKeyPage ? register : register)(
-                                    connection,
-                                    account,
-                                    publicKey,
-                                    SPONSORED_TX_CONTRACT_INDEX,
-                                    CONTRACT_SUB_INDEX
-                                );
+                                const tx = isPermitUpdateOperator
+                                    ? submitUpdateOperatorSponsoredTx(
+                                          connection,
+                                          account,
+                                          signature,
+                                          operator,
+                                          addOperator
+                                      )
+                                    : submitTransferSponsoredTx(connection, account, signature, amount, account, to);
+
                                 console.log(tx);
                                 // tx.then(setHash)
                                 //     .catch((err: Error) => setTransactionError((err as Error).message))
@@ -556,12 +660,12 @@ export default function SPONSOREDTXS(props: WalletConnectionProps) {
                                 setHash('');
                                 setTransactionError('');
                                 setWaitingForUser(true);
-                                const tx = (isRegisterPublicKeyPage ? register : register)(
+                                const tx = submitUpdateOperatorSponsoredTx(
                                     connection,
                                     account,
-                                    publicKey,
-                                    SPONSORED_TX_CONTRACT_INDEX,
-                                    CONTRACT_SUB_INDEX
+                                    signature,
+                                    operator,
+                                    addOperator
                                 );
                                 console.log(tx);
                                 // tx.then(setHash)
@@ -570,14 +674,8 @@ export default function SPONSOREDTXS(props: WalletConnectionProps) {
                             }
                         }}
                     >
-                        Insert a public key
+                        Submit Sponsored Transaction
                     </button>
-                    <p> Note: The public key you insert above needs to be a lowercase hex value.</p>
-                    <p>
-                        {' '}
-                        For testing, generate a public key (e.g., https://cyphr.me/ed25519_applet/ed.html) and convert
-                        it to a lowercase value (e.g., https://www.convertstring.com/StringFunction/ToLowerCase).
-                    </p>
                 </>
             )}
             {!connection && (
