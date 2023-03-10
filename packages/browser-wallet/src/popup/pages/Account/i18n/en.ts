@@ -125,7 +125,7 @@ const t = {
             },
             '5': {
                 title: 'Pay days',
-                body: 'Whether you choose an individual baking pool or passive delegation, rewards are paid out at what is called the pay day. Rewards are distributed to everyone in the pool proportioned to their stake, and a commission is paid to the baker by all delegators.\n\nIf you make updates to your delegation at a later point, most o fthese will also take effect from the next pay day.\n\nTo read more about the pay day, you can visit our <1>documentation website</1>.',
+                body: 'Whether you choose an individual baking pool or passive delegation, rewards are paid out at what is called the pay day. Rewards are distributed to everyone in the pool proportioned to their stake, and a commission is paid to the baker by all delegators.\n\nIf you make updates to your delegation at a later point, most of these will also take effect from the next pay day.\n\nTo read more about the pay day, you can visit our <1>documentation website</1>.',
             },
             '6': {
                 title: 'Lock-in and cool-downs',
@@ -133,7 +133,7 @@ const t = {
             },
             '7': {
                 title: 'The status page',
-                body: 'After starting a delegatoin, you will be able to see its current status on the status screen.\n\nFrom there, you can also make updates to your delegation, or stop it again.',
+                body: 'After starting a delegation, you will be able to see its current status on the status screen.\n\nFrom there, you can also make updates to your delegation, or stop it again.',
             },
         },
         updateIntro: {
