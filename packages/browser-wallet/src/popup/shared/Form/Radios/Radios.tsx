@@ -43,7 +43,7 @@ export type RadiosProps<T = unknown> = Omit<RequiredControlledFieldProps, 'onCha
  *
  *  <Radios options={options} value={val} onChange={setVal} />
  */
-export function Radios<T>({
+export default function Radios<T>({
     options,
     value,
     error,
@@ -74,4 +74,3 @@ export function Radios<T>({
 }
 
 export const FormRadios = makeControlled(Radios);
-export default Radios;
