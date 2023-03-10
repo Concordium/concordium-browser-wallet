@@ -2,7 +2,7 @@ import React, { useEffect, useState, useCallback } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { useAtom, useAtomValue, useSetAtom } from 'jotai';
 import { useTranslation } from 'react-i18next';
-import { jsonRpcClientAtom, networkConfigurationAtom } from '@popup/store/settings';
+import { grpcClientAtom, networkConfigurationAtom } from '@popup/store/settings';
 import { identityProvidersAtom, isRecoveringAtom, setRecoveryPayloadAtom } from '@popup/store/identity';
 import PendingArrows from '@assets/svg/pending-arrows.svg';
 import { BackgroundResponseStatus } from '@shared/utils/types';
@@ -14,7 +14,7 @@ import { absoluteRoutes } from '@popup/constants/routes';
 export default function RecoveryMain() {
     const { t } = useTranslation('recovery');
     const network = useAtomValue(networkConfigurationAtom);
-    const client = useAtomValue(jsonRpcClientAtom);
+    const client = useAtomValue(grpcClientAtom);
     const [providers, setProviders] = useAtom(identityProvidersAtom);
     const [isRecovering, setIsRecovering] = useAtom(isRecoveringAtom);
     const setRecoveryStatus = useSetAtom(setRecoveryPayloadAtom);

@@ -83,6 +83,7 @@ function Account() {
 
 export default function AccountRoutes() {
     const [detailsExpanded, setDetailsExpanded] = useState(true);
+
     const contextValue: AccountPageContext = useMemo(
         () => ({ detailsExpanded, setDetailsExpanded }),
         [setDetailsExpanded, detailsExpanded]

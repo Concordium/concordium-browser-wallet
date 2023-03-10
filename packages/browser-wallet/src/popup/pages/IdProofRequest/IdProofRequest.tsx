@@ -8,7 +8,7 @@ import { InternalMessageType } from '@concordium/browser-wallet-message-hub';
 import { popupMessageHandler } from '@popup/shared/message-handler';
 import { identityByAddressAtomFamily } from '@popup/store/identity';
 import { useCredential } from '@popup/shared/utils/account-helpers';
-import { jsonRpcClientAtom, networkConfigurationAtom } from '@popup/store/settings';
+import { grpcClientAtom, networkConfigurationAtom } from '@popup/store/settings';
 import { addToastAtom } from '@popup/state';
 import { useDecryptedSeedPhrase } from '@popup/shared/utils/seed-phrase-helpers';
 import { getGlobal, getNet } from '@shared/utils/network-helpers';
@@ -46,7 +46,7 @@ export default function IdProofRequest({ onReject, onSubmit }: Props) {
     const { loading: identityLoading, value: identity } = useAtomValue(identityByAddressAtomFamily(account));
     const credential = useCredential(account);
     const network = useAtomValue(networkConfigurationAtom);
-    const client = useAtomValue(jsonRpcClientAtom);
+    const client = useAtomValue(grpcClientAtom);
     const addToast = useSetAtom(addToastAtom);
     const recoveryPhrase = useDecryptedSeedPhrase((e) => addToast(e.message));
     const dappName = displayUrl(url);

@@ -5,6 +5,8 @@ export const mainnet: NetworkConfiguration = {
     name: 'Concordium Mainnet',
     jsonRpcUrl: 'https://json-rpc.mainnet.concordium.software/',
     explorerUrl: 'https://wallet-proxy.mainnet.concordium.software',
+    grpcPort: 20000,
+    grpcUrl: 'https://grpc.mainnet.concordium.software',
 };
 
 export const testnet: NetworkConfiguration = {
@@ -12,4 +14,8 @@ export const testnet: NetworkConfiguration = {
     name: 'Concordium Testnet',
     jsonRpcUrl: 'https://json-rpc.testnet.concordium.com/',
     explorerUrl: 'https://wallet-proxy.testnet.concordium.com',
+    grpcPort: 20000,
+    grpcUrl: 'https://grpc.testnet.concordium.com',
 };
+
+export const GRPCTIMEOUT = 15000;

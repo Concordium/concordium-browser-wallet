@@ -1,4 +1,4 @@
-import { JsonRpcClient } from '@concordium/web-sdk';
+import { ConcordiumGRPCClient } from '@concordium/web-sdk';
 import { getCis2Tokens } from '@popup/shared/utils/wallet-proxy';
 import { TokenIdAndMetadata } from '@shared/storage/types';
 import { ContractDetails, ContractTokenDetails, getTokens } from '@shared/utils/token-helpers';
@@ -27,7 +27,12 @@ export const manageTokensRoutes = {
 };
 
 export const fetchTokensConfigure =
-    (contractDetails: ContractDetails, client: JsonRpcClient, account: string, onError?: (error: string) => void) =>
+    (
+        contractDetails: ContractDetails,
+        client: ConcordiumGRPCClient,
+        account: string,
+        onError?: (error: string) => void
+    ) =>
     async (from?: number): Promise<FetchTokensResponse> => {
         const {
             tokens: cts,

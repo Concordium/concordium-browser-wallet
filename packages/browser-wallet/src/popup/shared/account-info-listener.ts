@@ -1,4 +1,5 @@
-import { AccountAddress, HttpProvider, JsonRpcClient } from '@concordium/web-sdk';
+import { AccountAddress, ConcordiumGRPCClient, createConcordiumClient } from '@concordium/web-sdk';
+import { GRPCTIMEOUT } from '@shared/constants/networkConfiguration';
 import { sessionAccountInfoCache, useIndexedStorage } from '@shared/storage/access';
 import { NetworkConfiguration } from '@shared/storage/types';
 import { accountInfoCacheLock, updateRecord } from '@shared/storage/update';
@@ -9,7 +10,7 @@ import { stringify } from 'wallet-common-helpers';
 export const ACCOUNT_INFO_RETRIEVAL_INTERVAL_MS = 15000;
 
 export class AccountInfoListener extends EventEmitter {
-    private client: JsonRpcClient;
+    private client: ConcordiumGRPCClient;
 
     private genesisHash: string;
 
@@ -17,9 +18,9 @@ export class AccountInfoListener extends EventEmitter {
 
     private accountsMap: Map<string, number> = new Map();
 
-    constructor(network: NetworkConfiguration, onSetCookie: (cookie: string) => void, cookie?: string) {
+    constructor(network: NetworkConfiguration) {
         super();
-        this.client = new JsonRpcClient(new HttpProvider(network.jsonRpcUrl, undefined, onSetCookie, cookie));
+        this.client = createConcordiumClient(network.grpcUrl, network.grpcPort, { timeout: GRPCTIMEOUT });
         this.genesisHash = network.genesisHash;
     }
 
@@ -47,10 +48,9 @@ export class AccountInfoListener extends EventEmitter {
         this.interval = setInterval(async () => {
             try {
                 if (this.accountsMap.size > 0) {
-                    const lfBlockHash = (await this.client.getConsensusStatus()).lastFinalizedBlock;
                     for (const accountAddress of this.accountsMap.keys()) {
                         const address = new AccountAddress(accountAddress);
-                        const accountInfo = await this.client.getAccountInfo(address, lfBlockHash);
+                        const accountInfo = await this.client.getAccountInfo(address);
                         if (accountInfo) {
                             updateRecord(
                                 accountInfoCacheLock,

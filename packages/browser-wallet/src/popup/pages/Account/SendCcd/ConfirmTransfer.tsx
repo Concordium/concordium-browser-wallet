@@ -14,7 +14,7 @@ import {
     createPendingTransactionFromAccountTransaction,
     sendTransaction,
 } from '@popup/shared/utils/transaction-helpers';
-import { jsonRpcClientAtom } from '@popup/store/settings';
+import { grpcClientAtom } from '@popup/store/settings';
 import { addToastAtom } from '@popup/state';
 import { usePrivateKey } from '@popup/shared/utils/account-helpers';
 import Button from '@popup/shared/Button';
@@ -63,7 +63,7 @@ export default function ConfirmTransfer(props: Props) {
     const selectedAddress = useAtomValue(selectedAccountAtom);
     const address = useMemo(() => selectedAddress, []);
     const key = usePrivateKey(address);
-    const client = useAtomValue(jsonRpcClientAtom);
+    const client = useAtomValue(grpcClientAtom);
     const nav = useNavigate();
     const addToast = useSetAtom(addToastAtom);
     const addPendingTransaction = useUpdateAtom(addPendingTransactionAtom);
