@@ -7,11 +7,10 @@ import {
     serializeUpdateContractParameters,
     JsonRpcClient,
 } from '@concordium/web-sdk';
-import sha256 from 'sha256';
 import { withJsonRpcClient, WalletConnectionProps, useConnection, useConnect } from '@concordium/react-components';
 import { version } from '../package.json';
 
-import { register, submitUpdateOperatorSponsoredTx, submitTransferSponsoredTx } from './utils';
+import { register, mint, submitUpdateOperatorSponsoredTx, submitTransferSponsoredTx } from './utils';
 import {
     SPONSORED_TX_CONTRACT_NAME,
     SPONSORED_TX_CONTRACT_INDEX,
@@ -19,6 +18,7 @@ import {
     CONTRACT_SUB_INDEX,
     BROWSER_WALLET,
     WALLET_CONNECT,
+    EXPIRY_TIME_SIGNATURE,
 } from './constants';
 
 import { WalletConnectionTypeButton } from './WalletConnectorTypeButton';
@@ -97,19 +97,25 @@ const InputFieldStyle = {
 
 // TODO: deploy a new smart contract so `calcualteMessageHash` can be used.
 
-async function calculateTransferMessageHash(rpcClient: JsonRpcClient, amount: string, from: string, to: string) {
+async function calculateTransferMessageHash(
+    rpcClient: JsonRpcClient,
+    nonce: number,
+    tokenID: string,
+    from: string,
+    to: string
+) {
     const message = {
         contract_address: {
             index: Number(SPONSORED_TX_CONTRACT_INDEX),
             subindex: 0,
         },
         entry_point: 'contract_transfer',
-        nonce: 1,
+        nonce,
         payload: {
             Transfer: [
                 [
                     {
-                        amount, // TODO: amount should always be 1 when using NFT but rather pass the tokenID
+                        amount: '1',
                         data: '',
                         from: {
                             Account: [from],
@@ -117,37 +123,42 @@ async function calculateTransferMessageHash(rpcClient: JsonRpcClient, amount: st
                         to: {
                             Account: [to],
                         },
-                        token_id: '00000006', // TODO: this has to be input via a field
+                        token_id: tokenID,
                     },
                 ],
             ],
         },
-        timestamp: '2030-08-08T05:15:00Z',
+        timestamp: EXPIRY_TIME_SIGNATURE,
     };
 
     const param = serializeUpdateContractParameters(
         SPONSORED_TX_CONTRACT_NAME,
-        'calculateHash',
+        'calculateMessageHash',
         message,
         toBuffer(SPONSORED_TX_RAW_SCHEMA, 'base64')
     );
 
     const res = await rpcClient.invokeContract({
-        method: `${SPONSORED_TX_CONTRACT_NAME}.calculateHash`,
+        method: `${SPONSORED_TX_CONTRACT_NAME}.calculateMessageHash`,
         contract: { index: SPONSORED_TX_CONTRACT_INDEX, subindex: CONTRACT_SUB_INDEX },
         parameter: param,
     });
 
     if (!res || res.tag === 'failure' || !res.returnValue) {
         throw new Error(
-            `RPC call 'invokeContract' on method '${SPONSORED_TX_CONTRACT_NAME}.calculateHash' of contract '${SPONSORED_TX_CONTRACT_INDEX}' failed`
+            `RPC call 'invokeContract' on method '${SPONSORED_TX_CONTRACT_NAME}.calculateMessageHash' of contract '${SPONSORED_TX_CONTRACT_INDEX}' failed`
         );
     }
 
     return res.returnValue;
 }
 
-async function calculateUpdateOperatorMessageHash(rpcClient: JsonRpcClient, operator: string, addOperator: boolean) {
+async function calculateUpdateOperatorMessageHash(
+    rpcClient: JsonRpcClient,
+    nonce: number,
+    operator: string,
+    addOperator: boolean
+) {
     const operatorAction = addOperator
         ? {
               Add: [],
@@ -162,7 +173,7 @@ async function calculateUpdateOperatorMessageHash(rpcClient: JsonRpcClient, oper
             subindex: 0,
         },
         entry_point: 'contract_update_operator',
-        nonce: 1,
+        nonce,
         payload: {
             UpdateOperator: [
                 [
@@ -175,25 +186,25 @@ async function calculateUpdateOperatorMessageHash(rpcClient: JsonRpcClient, oper
                 ],
             ],
         },
-        timestamp: '2030-08-08T05:15:00Z',
+        timestamp: EXPIRY_TIME_SIGNATURE,
     };
 
     const param = serializeUpdateContractParameters(
         SPONSORED_TX_CONTRACT_NAME,
-        'calculateHash',
+        'calculateMessageHash',
         message,
         toBuffer(SPONSORED_TX_RAW_SCHEMA, 'base64')
     );
 
     const res = await rpcClient.invokeContract({
-        method: `${SPONSORED_TX_CONTRACT_NAME}.calculateHash`,
+        method: `${SPONSORED_TX_CONTRACT_NAME}.calculateMessageHash`,
         contract: { index: SPONSORED_TX_CONTRACT_INDEX, subindex: CONTRACT_SUB_INDEX },
         parameter: param,
     });
 
     if (!res || res.tag === 'failure' || !res.returnValue) {
         throw new Error(
-            `RPC call 'invokeContract' on method '${SPONSORED_TX_CONTRACT_NAME}.calculateHash' of contract '${SPONSORED_TX_CONTRACT_INDEX}' failed`
+            `RPC call 'invokeContract' on method '${SPONSORED_TX_CONTRACT_NAME}.calculateMessageHash' of contract '${SPONSORED_TX_CONTRACT_INDEX}' failed`
         );
     }
 
@@ -235,11 +246,13 @@ async function viewPublicKey(rpcClient: JsonRpcClient, account: string) {
     );
 
     if (returnValues === undefined || returnValues[0][0]?.None !== undefined) {
-        return 'No Public Key Registered';
+        // [public key, nonce]
+        return ['', 0];
     }
 
     if (returnValues[0][0]?.Some[0][0] !== undefined) {
-        return `0x${returnValues[0][0].Some[0][0]}`;
+        // [public key, nonce]
+        return [`0x${returnValues[0][0].Some[0][0]}`, returnValues[0][0].Some[0][1]];
     }
 
     return 'Error';
@@ -255,12 +268,14 @@ export default function SPONSOREDTXS(props: WalletConnectionProps) {
     const [isLoading, setLoading] = useState(false);
     // TODO: remove
     console.log(isLoading);
+    console.log(setLoading);
 
-    const [getFileError, setGetFileError] = useState('');
+    const [publicKeyError, setPublicKeyError] = useState('');
 
     const [fileHashHex, setFileHashHex] = useState('');
     // TODO: remove
     console.log(fileHashHex);
+    console.log(setFileHashHex);
 
     const [selectedFile, setSelectedFile] = useState<File>();
     // TODO: remove
@@ -268,21 +283,24 @@ export default function SPONSOREDTXS(props: WalletConnectionProps) {
 
     const [isPermitUpdateOperator, setPermitUpdateOperator] = useState<boolean>(true);
 
+    const [userInputPublicKey, setUserInputPublicKey] = useState('');
     const [publicKey, setPublicKey] = useState('');
+    const [nextNonce, setNextNonce] = useState<number>(0);
     const [operator, setOperator] = useState('4HoVMVsj6TwJr6B5krP5fW9qM4pbo6crVyrr7N95t2UQDrv1fq');
     const [messageHash, setMessageHash] = useState('');
     const [signature, setSignature] = useState('');
-    const [amount, setAmount] = useState('1');
+    const [tokenID, setTokenID] = useState('1');
     const [to, setTo] = useState('4HoVMVsj6TwJr6B5krP5fW9qM4pbo6crVyrr7N95t2UQDrv1fq');
 
     const [addOperator, setAddOperator] = useState<boolean>(true);
 
     const [witness, setWitness] = useState('');
-    const [timestamp, setTimestamp] = useState('');
+    // TODO: remove
+    console.log(setWitness);
 
     const changeHandler = (event: ChangeEvent) => {
         const target = event.target as HTMLTextAreaElement;
-        setPublicKey(target.value);
+        setUserInputPublicKey(target.value);
     };
 
     const changeHandler2 = (event: ChangeEvent) => {
@@ -297,7 +315,7 @@ export default function SPONSOREDTXS(props: WalletConnectionProps) {
 
     const changeHandler4 = (event: ChangeEvent) => {
         const target = event.target as HTMLTextAreaElement;
-        setAmount(target.value);
+        setTokenID(target.value);
     };
 
     const changeHandler5 = (event: ChangeEvent) => {
@@ -309,26 +327,23 @@ export default function SPONSOREDTXS(props: WalletConnectionProps) {
         // View file record.
         if (connection && account) {
             withJsonRpcClient(connection, (rpcClient) => viewPublicKey(rpcClient, account))
-                .then(
-                    (record) => {
-                        if (record !== undefined) {
-                            setPublicKey(record);
-                        }
+                .then((record) => {
+                    if (record !== undefined) {
+                        setPublicKey(record[0]);
+                        setNextNonce(record[1] + 1);
                     }
-                    //  setGetFileError('');
-                    // setTimestamp(record.timestamp);
-                    // setWitness(record.witness);
-                )
+                    setPublicKeyError('');
+                })
                 .catch((e) => {
-                    setGetFileError((e as Error).message);
-                    setTimestamp('');
-                    setWitness('');
+                    setPublicKeyError((e as Error).message);
+                    setPublicKey('');
+                    setNextNonce(0);
                 });
         }
     }, [connection, account]);
 
-    const [isRegisterPublicKeyPage, setRegisterPublicKeyPage] = useState(true);
-    const [hash, setHash] = useState('');
+    const [isRegisterPublicKeyPage, setIsRegisterPublicKeyPage] = useState(true);
+    const [txHash, setTxHash] = useState('');
     const [transactionError, setTransactionError] = useState('');
 
     const [loadingError, setLoadingError] = useState('');
@@ -403,22 +418,18 @@ export default function SPONSOREDTXS(props: WalletConnectionProps) {
                                 style={!isRegisterPublicKeyPage ? ButtonStyleNotSelected : ButtonStyleSelected}
                                 type="button"
                                 onClick={() => {
-                                    setRegisterPublicKeyPage(true);
-                                    setFileHashHex('');
-                                    setWitness('');
-                                    setTimestamp('');
-                                    setHash('');
+                                    setIsRegisterPublicKeyPage(true);
+                                    setMessageHash('');
+                                    setTxHash('');
                                 }}
                             >
                                 Register Public Key
                             </button>
                             <Switch
                                 onChange={() => {
-                                    setRegisterPublicKeyPage(!isRegisterPublicKeyPage);
-                                    setFileHashHex('');
-                                    setWitness('');
-                                    setTimestamp('');
-                                    setHash('');
+                                    setIsRegisterPublicKeyPage(!isRegisterPublicKeyPage);
+                                    setMessageHash('');
+                                    setTxHash('');
                                 }}
                                 onColor="#308274"
                                 offColor="#308274"
@@ -432,11 +443,9 @@ export default function SPONSOREDTXS(props: WalletConnectionProps) {
                                 style={isRegisterPublicKeyPage ? ButtonStyleNotSelected : ButtonStyleSelected}
                                 type="button"
                                 onClick={() => {
-                                    setRegisterPublicKeyPage(false);
-                                    setFileHashHex('');
-                                    setWitness('');
-                                    setTimestamp('');
-                                    setHash('');
+                                    setIsRegisterPublicKeyPage(false);
+                                    setMessageHash('');
+                                    setTxHash('');
                                 }}
                             >
                                 Submit Sponsored Tx
@@ -453,56 +462,46 @@ export default function SPONSOREDTXS(props: WalletConnectionProps) {
             </div>
             {connection && isRegisterPublicKeyPage && account !== undefined && (
                 <>
-                    <label>
-                        <p style={{ marginBottom: 0 }}>Insert your public key:</p>
-                        <input
-                            className="input"
-                            style={InputFieldStyle}
-                            type="text"
-                            placeholder="14fe0aed941aa0a0be1119d7b7dd70bfca475310c531f1b5a179b336c075db65"
-                            onChange={changeHandler}
-                        />
-                    </label>
-                    <button
-                        style={ButtonStyle}
-                        type="button"
-                        onClick={() => {
-                            if (witness !== null) {
-                                // eslint-disable-next-line no-alert
-                                // alert(
-                                //     `This file hash is already registered \n${witness} (withness) \n${timestamp} (timestamp)`
-                                // );
-                                // TODO: remove this below again
-                                setHash('');
-                                setTransactionError('');
-                                setWaitingForUser(true);
-                                const tx = register(connection, account, publicKey);
-                                console.log(tx);
-                                // tx.then(setHash)
-                                //     .catch((err: Error) => setTransactionError((err as Error).message))
-                                //     .finally(() => setWaitingForUser(false));
-                            } else {
-                                setHash('');
-                                setTransactionError('');
-                                setWaitingForUser(true);
-                                const tx = register(connection, account, publicKey);
-                                console.log(tx);
-                                // tx.then(setHash)
-                                //     .catch((err: Error) => setTransactionError((err as Error).message))
-                                //     .finally(() => setWaitingForUser(false));
-                            }
-                        }}
-                    >
-                        Insert a public key
-                    </button>
-                    <p> Note: The public key you insert above needs to be a lowercase hex value.</p>
-                    <p>
-                        {' '}
-                        For testing, generate a public key (e.g., https://cyphr.me/ed25519_applet/ed.html) and convert
-                        it to a lowercase value (e.g., https://www.convertstring.com/StringFunction/ToLowerCase).
-                    </p>
-                    <p> Your registered public key is: </p>
+                    {!publicKey && (
+                        <>
+                            <label>
+                                <p style={{ marginBottom: 0 }}>Insert your public key:</p>
+                                <input
+                                    className="input"
+                                    style={InputFieldStyle}
+                                    type="text"
+                                    placeholder="14fe0aed941aa0a0be1119d7b7dd70bfca475310c531f1b5a179b336c075db65"
+                                    onChange={changeHandler}
+                                />
+                            </label>
+                            <button
+                                style={ButtonStyle}
+                                type="button"
+                                onClick={() => {
+                                    setTxHash('');
+                                    setTransactionError('');
+                                    setWaitingForUser(true);
+                                    const tx = register(connection, account, userInputPublicKey);
+                                    tx.then(setTxHash)
+                                        .catch((err: Error) => setTransactionError((err as Error).message))
+                                        .finally(() => setWaitingForUser(false));
+                                }}
+                            >
+                                Insert a public key
+                            </button>
+                            <p> Note: The public key you insert above needs to be a lowercase hex value.</p>
+                            <p>
+                                {' '}
+                                For testing, generate a public key (e.g., https://cyphr.me/ed25519_applet/ed.html) and
+                                convert it to a lowercase value (e.g.,
+                                https://www.convertstring.com/StringFunction/ToLowerCase).
+                            </p>
+                        </>
+                    )}
+                    <br />
+                    <div> Your registered public key is: </div>
                     {publicKey !== '' && <div className="loadingText">{publicKey}</div>}
+                    {publicKey === '' && !publicKeyError && <div className="loadingText">None</div>}
                 </>
             )}
             {connection && !isRegisterPublicKeyPage && account !== undefined && (
@@ -512,6 +511,8 @@ export default function SPONSOREDTXS(props: WalletConnectionProps) {
                         <Switch
                             onChange={() => {
                                 setPermitUpdateOperator(!isPermitUpdateOperator);
+                                setMessageHash('');
+                                setTxHash('');
                             }}
                             onColor="#308274"
                             offColor="#308274"
@@ -526,7 +527,7 @@ export default function SPONSOREDTXS(props: WalletConnectionProps) {
                     {isPermitUpdateOperator && (
                         <>
                             <label>
-                                <p style={{ marginBottom: 0 }}>Insert Operator Address:</p>
+                                <p style={{ marginBottom: 0 }}>Operator Address:</p>
                                 <input
                                     className="input"
                                     style={InputFieldStyle}
@@ -555,18 +556,34 @@ export default function SPONSOREDTXS(props: WalletConnectionProps) {
                     )}
                     {!isPermitUpdateOperator && (
                         <>
+                            <div>Mint a token to your account first:</div>
+                            <button
+                                style={ButtonStyle}
+                                type="button"
+                                onClick={async () => {
+                                    setTxHash('');
+                                    setTransactionError('');
+                                    setWaitingForUser(true);
+                                    const tx = mint(connection, account);
+                                    tx.then(setTxHash)
+                                        .catch((err: Error) => setTransactionError((err as Error).message))
+                                        .finally(() => setWaitingForUser(false));
+                                }}
+                            >
+                                Mint a NFT token
+                            </button>
                             <label>
-                                <p style={{ marginBottom: 0 }}>Insert Amount:</p>
+                                <p style={{ marginBottom: 0 }}>Token ID:</p>
                                 <input
                                     className="input"
                                     style={InputFieldStyle}
                                     type="text"
-                                    placeholder="1"
+                                    placeholder="00000006"
                                     onChange={changeHandler4}
                                 />
                             </label>
                             <label>
-                                <p style={{ marginBottom: 0 }}>Insert To:</p>
+                                <p style={{ marginBottom: 0 }}>To Address:</p>
                                 <input
                                     className="input"
                                     style={InputFieldStyle}
@@ -583,19 +600,24 @@ export default function SPONSOREDTXS(props: WalletConnectionProps) {
                         onClick={async () => {
                             try {
                                 if (selectedFile !== undefined) {
-                                    setFileHashHex('');
-                                    setLoading(true);
-                                    const arrayBuffer = await selectedFile.arrayBuffer();
-                                    const byteArray = new Uint8Array(arrayBuffer as ArrayBuffer);
-                                    const newFileHashHex = sha256(byteArray.toString());
-                                    setFileHashHex(newFileHashHex);
-                                    setLoadingError('');
-                                    setLoading(false);
+                                    // setFileHashHex('');
+                                    // setLoading(true);
+                                    // const arrayBuffer = await selectedFile.arrayBuffer();
+                                    // const byteArray = new Uint8Array(arrayBuffer as ArrayBuffer);
+                                    // const newFileHashHex = sha256(byteArray.toString());
+                                    // setFileHashHex(newFileHashHex);
+                                    // setLoadingError('');
+                                    // setLoading(false);
                                 } else {
                                     withJsonRpcClient(connection, (rpcClient) => {
                                         return isPermitUpdateOperator
-                                            ? calculateUpdateOperatorMessageHash(rpcClient, operator, addOperator)
-                                            : calculateTransferMessageHash(rpcClient, amount, account, to);
+                                            ? calculateUpdateOperatorMessageHash(
+                                                  rpcClient,
+                                                  nextNonce,
+                                                  operator,
+                                                  addOperator
+                                              )
+                                            : calculateTransferMessageHash(rpcClient, nextNonce, tokenID, account, to);
                                     }).then((res) => setMessageHash(res));
                                 }
                             } catch (err) {
@@ -616,8 +638,11 @@ export default function SPONSOREDTXS(props: WalletConnectionProps) {
                             onChange={changeHandler3}
                         />
                     </label>
-                    <p> Your registered public key is: </p>
+                    <br />
+                    <br />
+                    <div> Your registered public key is: </div>
                     {publicKey !== '' && <div className="loadingText">{publicKey}</div>}
+                    {publicKey === '' && !publicKeyError && <div className="loadingText">None</div>}
                     <p>
                         {' '}
                         Note: To generate the signature for testing, copy your above public key to (e.g.,
@@ -639,38 +664,45 @@ export default function SPONSOREDTXS(props: WalletConnectionProps) {
                                 //     `This file hash is already registered \n${witness} (withness) \n${timestamp} (timestamp)`
                                 // );
                                 // TODO: remove this below again and move to else {} claus once this checking can be done
-                                setHash('');
+                                setTxHash('');
                                 setTransactionError('');
                                 setWaitingForUser(true);
                                 const tx = isPermitUpdateOperator
                                     ? submitUpdateOperatorSponsoredTx(
                                           connection,
                                           account,
+                                          nextNonce,
                                           signature,
                                           operator,
                                           addOperator
                                       )
-                                    : submitTransferSponsoredTx(connection, account, signature, amount, account, to);
-
-                                console.log(tx);
-                                // tx.then(setHash)
-                                //     .catch((err: Error) => setTransactionError((err as Error).message))
-                                //     .finally(() => setWaitingForUser(false));
+                                    : submitTransferSponsoredTx(
+                                          connection,
+                                          account,
+                                          nextNonce,
+                                          signature,
+                                          tokenID,
+                                          account,
+                                          to
+                                      );
+                                tx.then(setTxHash)
+                                    .catch((err: Error) => setTransactionError((err as Error).message))
+                                    .finally(() => setWaitingForUser(false));
                             } else {
-                                setHash('');
+                                setTxHash('');
                                 setTransactionError('');
                                 setWaitingForUser(true);
                                 const tx = submitUpdateOperatorSponsoredTx(
                                     connection,
                                     account,
+                                    nextNonce,
                                     signature,
                                     operator,
                                     addOperator
                                 );
-                                console.log(tx);
-                                // tx.then(setHash)
-                                //     .catch((err: Error) => setTransactionError((err as Error).message))
-                                //     .finally(() => setWaitingForUser(false));
+                                tx.then(setTxHash)
+                                    .catch((err: Error) => setTransactionError((err as Error).message))
+                                    .finally(() => setWaitingForUser(false));
                             }
                         }}
                     >
@@ -685,43 +717,61 @@ export default function SPONSOREDTXS(props: WalletConnectionProps) {
             )}
             {connection && account && (
                 <p>
-                    {isRegisterPublicKeyPage && (
+                    {isRegisterPublicKeyPage && !publicKey && (
                         <>
-                            <div>Transaction status{hash === '' ? '' : ' (May take a moment to finalize)'}</div>
-                            {!hash && transactionError && (
+                            <div>Transaction status{txHash === '' ? '' : ' (May take a moment to finalize)'}</div>
+                            {!txHash && transactionError && (
                                 <div style={{ color: 'red' }}>Error: {transactionError}.</div>
                             )}
-                            {!hash && !transactionError && <div className="loadingText">None</div>}
-                            {hash && (
+                            {!txHash && !transactionError && <div className="loadingText">None</div>}
+                            {txHash && (
                                 <>
                                     <button
                                         className="link"
                                         type="button"
                                         onClick={() => {
                                             window.open(
-                                                `https://testnet.ccdscan.io/?dcount=1&dentity=transaction&dhash=${hash}`,
+                                                `https://testnet.ccdscan.io/?dcount=1&dentity=transaction&dhash=${txHash}`,
                                                 '_blank',
                                                 'noopener,noreferrer'
                                             );
                                         }}
                                     >
-                                        {hash}
+                                        {txHash}
                                     </button>
                                     <br />
                                 </>
                             )}
                         </>
                     )}
-                    {getFileError && <div style={{ color: 'red' }}>Error: {getFileError}.</div>}
-                    {!isRegisterPublicKeyPage && witness !== '' && (
+                    {!isRegisterPublicKeyPage && publicKey && (
                         <>
-                            <div>On-chain Record:</div>
-                            <div className="loadingText">{witness === null ? 'Not registered' : witness} (witness)</div>
-                            <div className="loadingText">
-                                {timestamp === null ? 'Not registered' : timestamp} (timestamp)
-                            </div>
+                            <div>Transaction status{txHash === '' ? '' : ' (May take a moment to finalize)'}</div>
+                            {!txHash && transactionError && (
+                                <div style={{ color: 'red' }}>Error: {transactionError}.</div>
+                            )}
+                            {!txHash && !transactionError && <div className="loadingText">None</div>}
+                            {txHash && (
+                                <>
+                                    <button
+                                        className="link"
+                                        type="button"
+                                        onClick={() => {
+                                            window.open(
+                                                `https://testnet.ccdscan.io/?dcount=1&dentity=transaction&dhash=${txHash}`,
+                                                '_blank',
+                                                'noopener,noreferrer'
+                                            );
+                                        }}
+                                    >
+                                        {txHash}
+                                    </button>
+                                    <br />
+                                </>
+                            )}
                         </>
                     )}
+                    {publicKeyError && <div style={{ color: 'red' }}>Error: {publicKeyError}.</div>}
                 </p>
             )}
             <div>

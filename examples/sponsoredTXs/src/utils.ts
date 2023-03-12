@@ -7,7 +7,35 @@ import {
     SPONSORED_TX_CONTRACT_INDEX,
     CONTRACT_SUB_INDEX,
     SPONSORED_TX_RAW_SCHEMA,
+    EXPIRY_TIME_SIGNATURE,
 } from './constants';
+
+/**
+ * Action for minting a token to the user's account.
+ */
+export async function mint(connection: WalletConnection, account: string) {
+    const test = connection.signAndSendTransaction(
+        account,
+        AccountTransactionType.Update,
+        {
+            amount: new CcdAmount(BigInt(0n)),
+            address: {
+                index: SPONSORED_TX_CONTRACT_INDEX,
+                subindex: CONTRACT_SUB_INDEX,
+            },
+            receiveName: `${SPONSORED_TX_CONTRACT_NAME}.mint`,
+            maxContractExecutionEnergy: 30000n,
+        } as unknown as UpdateContractPayload,
+        // eslint-disable-next-line @typescript-eslint/ban-ts-comment
+        // @ts-ignore
+        {
+            owner: { Account: [account] },
+        },
+        SPONSORED_TX_RAW_SCHEMA
+    );
+
+    return test;
+}
 
 /**
  * Action for submitting an transfer sponsored transaction to the cis3_nft smart contract instance.
@@ -16,23 +44,65 @@ import {
 export async function submitTransferSponsoredTx(
     connection: WalletConnection,
     account: string,
+    nonce: number,
     signature: string,
-    amount: string,
+    tokenID: string,
     from: string,
     to: string
 ) {
+    if (nonce === undefined) {
+        // eslint-disable-next-line no-alert
+        alert('Your account needs to have a nonce. Register a public key to your account.');
+        return '';
+    }
+
+    if (tokenID === undefined) {
+        // eslint-disable-next-line no-alert
+        alert('Insert a tokenID.');
+        return '';
+    }
+
+    if (tokenID.length !== 8) {
+        // eslint-disable-next-line no-alert
+        alert('TokenID needs to have 8 digits.');
+        return '';
+    }
+
+    if (signature === undefined || signature === '') {
+        // eslint-disable-next-line no-alert
+        alert('Insert a signature.');
+        return '';
+    }
+
+    if (signature.length !== 128) {
+        // eslint-disable-next-line no-alert
+        alert('Signature needs to have 128 digits.');
+        return '';
+    }
+
+    if (to === undefined || to === '') {
+        // eslint-disable-next-line no-alert
+        alert('Insert an `to` address.');
+        return '';
+    }
+
+    if (from.length !== 50) {
+        // eslint-disable-next-line no-alert
+        alert('`To` address needs to have 50 digits.');
+        return '';
+    }
     const message = {
         contract_address: {
             index: Number(SPONSORED_TX_CONTRACT_INDEX),
             subindex: 0,
         },
         entry_point: 'contract_transfer',
-        nonce: 1,
+        nonce,
         payload: {
             Transfer: [
                 [
                     {
-                        amount,
+                        amount: '1',
                         data: '',
                         from: {
                             Account: [from],
@@ -40,12 +110,12 @@ export async function submitTransferSponsoredTx(
                         to: {
                             Account: [to],
                         },
-                        token_id: '00000006', // TODO: this has to be input via a input field
+                        token_id: tokenID,
                     },
                 ],
             ],
         },
-        timestamp: '2030-08-08T05:15:00Z',
+        timestamp: EXPIRY_TIME_SIGNATURE,
     };
 
     const param = {
@@ -53,18 +123,6 @@ export async function submitTransferSponsoredTx(
         signature: [[0, [[0, signature]]]],
         signer: account,
     };
-
-    // if (publicKey === undefined || publicKey === '') {
-    //     // eslint-disable-next-line no-alert
-    //     alert('Insert a public key.');
-    //     return;
-    // }
-
-    // if (publicKey.length !== 64) {
-    //     // eslint-disable-next-line no-alert
-    //     alert('Public key needs to have 64 digits.');
-    //     return;
-    // }
 
     return connection.signAndSendTransaction(
         account,
@@ -92,10 +150,41 @@ export async function submitTransferSponsoredTx(
 export async function submitUpdateOperatorSponsoredTx(
     connection: WalletConnection,
     account: string,
+    nonce: number,
     signature: string,
     operator: string,
     addOperator: boolean
 ) {
+    if (nonce === undefined) {
+        // eslint-disable-next-line no-alert
+        alert('Your account needs to have a nonce. Register a public key to your account.');
+        return '';
+    }
+
+    if (signature === undefined || signature === '') {
+        // eslint-disable-next-line no-alert
+        alert('Insert a signature.');
+        return '';
+    }
+
+    if (signature.length !== 128) {
+        // eslint-disable-next-line no-alert
+        alert('Signature needs to have 128 digits.');
+        return '';
+    }
+
+    if (operator === undefined || operator === '') {
+        // eslint-disable-next-line no-alert
+        alert('Insert an operator address.');
+        return '';
+    }
+
+    if (operator.length !== 50) {
+        // eslint-disable-next-line no-alert
+        alert('Operator address needs to have 50 digits.');
+        return '';
+    }
+
     const operatorAction = addOperator
         ? {
               Add: [],
@@ -110,7 +199,7 @@ export async function submitUpdateOperatorSponsoredTx(
             subindex: 0,
         },
         entry_point: 'contract_update_operator',
-        nonce: 1, // TODO: get the up to date nonce
+        nonce,
         payload: {
             UpdateOperator: [
                 [
@@ -123,7 +212,7 @@ export async function submitUpdateOperatorSponsoredTx(
                 ],
             ],
         },
-        timestamp: '2030-08-08T05:15:00Z', // TODO make this a constant variable
+        timestamp: EXPIRY_TIME_SIGNATURE,
     };
 
     const param = {
@@ -131,18 +220,6 @@ export async function submitUpdateOperatorSponsoredTx(
         signature: [[0, [[0, signature]]]],
         signer: account,
     };
-
-    // if (publicKey === undefined || publicKey === '') {
-    //     // eslint-disable-next-line no-alert
-    //     alert('Insert a public key.');
-    //     return;
-    // }
-
-    // if (publicKey.length !== 64) {
-    //     // eslint-disable-next-line no-alert
-    //     alert('Public key needs to have 64 digits.');
-    //     return;
-    // }
 
     return connection.signAndSendTransaction(
         account,
@@ -170,13 +247,13 @@ export async function register(connection: WalletConnection, account: string, pu
     if (publicKey === undefined || publicKey === '') {
         // eslint-disable-next-line no-alert
         alert('Insert a public key.');
-        return;
+        return '';
     }
 
     if (publicKey.length !== 64) {
         // eslint-disable-next-line no-alert
         alert('Public key needs to have 64 digits.');
-        return;
+        return '';
     }
 
     return connection.signAndSendTransaction(
@@ -190,7 +267,7 @@ export async function register(connection: WalletConnection, account: string, pu
             },
             receiveName: `${SPONSORED_TX_CONTRACT_NAME}.registerPublicKeys`,
             maxContractExecutionEnergy: 30000n,
-        } as UpdateContractPayload,
+        } as unknown as UpdateContractPayload,
         // eslint-disable-next-line @typescript-eslint/ban-ts-comment
         // @ts-ignore
         [
