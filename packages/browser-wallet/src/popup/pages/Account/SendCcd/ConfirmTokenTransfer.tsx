@@ -8,21 +8,12 @@ import { addToastAtom } from '@popup/state';
 import { useLocation } from 'react-router-dom';
 import { useAsyncMemo } from 'wallet-common-helpers';
 import { fetchContractName, getTokenTransferParameters, getTokenTransferPayload } from '@shared/utils/token-helpers';
-import { TokenMetadata } from '@shared/storage/types';
 import ConfirmTransfer from './ConfirmTransfer';
+import { ConfirmTokenTransferState } from './util';
 
 interface Props {
     setDetailsExpanded: (expanded: boolean) => void;
     cost?: bigint;
-}
-
-export interface ConfirmTokenTransferState {
-    amount: bigint;
-    toAddress: string;
-    contractIndex: string;
-    tokenId: string;
-    metadata: TokenMetadata;
-    executionEnergy: bigint;
 }
 
 export default function ConfirmTokenTransfer({ setDetailsExpanded, cost }: Props) {
