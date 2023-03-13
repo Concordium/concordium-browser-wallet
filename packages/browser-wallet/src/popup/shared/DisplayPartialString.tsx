@@ -5,7 +5,7 @@ import clsx from 'clsx';
 const DEFAULT_MAX_LENGTH = 64;
 
 interface Props {
-    maxLength?: string;
+    maxLength?: number;
     className?: string;
     value: string;
 }
