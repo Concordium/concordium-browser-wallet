@@ -7,7 +7,7 @@ import Form from '@popup/shared/Form';
 import AmountInput from '@popup/shared/Form/AmountInput';
 import Input from '@popup/shared/Form/Input';
 import { getPublicAccountAmounts, useAsyncMemo, integerToFractional, max, displayAsCcd } from 'wallet-common-helpers';
-import { AccountAddress, SimpleTransferPayload } from '@concordium/web-sdk';
+import { AccountAddress } from '@concordium/web-sdk';
 import { SubmitHandler, useForm, Validate } from 'react-hook-form';
 import clsx from 'clsx';
 import { useLocation, useNavigate } from 'react-router-dom';
@@ -33,7 +33,7 @@ import { SIMPLE_TRANSFER_ENERGY_TOTAL_COST } from '@shared/utils/energy-helpers'
 import Img from '@popup/shared/Img';
 import { routes } from './routes';
 import PickToken from './PickToken';
-import { buildConfirmState, CreateTransferFormValues } from './util';
+import { buildConfirmState, ConfirmTransferState, CreateTransferFormValues } from './util';
 
 interface Props {
     exchangeRate?: number;
@@ -54,7 +54,7 @@ const getNextRoute = (token?: TokenIdentifier) => {
  */
 type FeeResult = { success: true; value: bigint } | { success: false } | undefined;
 
-type State = undefined | (SimpleTransferPayload & Partial<TokenIdentifier>);
+type State = undefined | ConfirmTransferState;
 
 function createDefaultValues(defaultPayload: State, accountTokens?: AccountTokens) {
     let token;
@@ -67,8 +67,8 @@ function createDefaultValues(defaultPayload: State, accountTokens?: AccountToken
         decimals = getMetadataDecimals(metadata ?? {});
     }
     return {
-        amount: integerToFractional(decimals)(defaultPayload?.amount?.microCcdAmount),
-        recipient: defaultPayload?.toAddress.address,
+        amount: integerToFractional(decimals)(defaultPayload?.amount),
+        recipient: defaultPayload?.toAddress,
         token,
     };
 }

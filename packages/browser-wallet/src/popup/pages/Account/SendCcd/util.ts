@@ -1,8 +1,6 @@
-import { buildSimpleTransferPayload } from '@popup/shared/utils/transaction-helpers';
+import { TokenMetadata } from '@shared/storage/types';
 import { getMetadataDecimals, TokenIdentifier } from '@shared/utils/token-helpers';
 import { ccdToMicroCcd, fractionalToInteger } from 'wallet-common-helpers';
-import { ConfirmSimpleTransferState } from './ConfirmSimpleTransfer';
-import { ConfirmTokenTransferState } from './ConfirmTokenTransfer';
 
 export type CreateTransferFormValues = {
     amount: string;
@@ -22,8 +20,24 @@ export const buildConfirmState = (vs: CreateTransferFormValues) => {
             executionEnergy: vs.executionEnergy,
         };
     } else {
-        currentState = buildSimpleTransferPayload(vs.recipient, ccdToMicroCcd(vs.amount));
+        currentState = {
+            toAddress: vs.recipient,
+            amount: ccdToMicroCcd(vs.amount),
+        };
     }
-
     return currentState;
 };
+
+export interface ConfirmSimpleTransferState {
+    amount: bigint;
+    toAddress: string;
+}
+
+export interface ConfirmTokenTransferState extends ConfirmSimpleTransferState {
+    contractIndex: string;
+    tokenId: string;
+    metadata: TokenMetadata;
+    executionEnergy: string;
+}
+
+export type ConfirmTransferState = ConfirmTokenTransferState | ConfirmTokenTransferState;
