@@ -10,6 +10,10 @@ export type CreateTransferFormValues = {
     token?: TokenIdentifier;
 };
 
+/**
+ * Helper for createTransfer to build the state that should be set for the confirmation page.
+ * @returns a { @link ConfirmSimpleTransferState } if there is no chosen token, and otherwise it builds a { @link ConfirmTokenTransferState }.
+ */
 export const buildConfirmState = (vs: CreateTransferFormValues) => {
     let currentState: ConfirmTokenTransferState | ConfirmSimpleTransferState;
     if (vs.token) {
