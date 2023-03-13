@@ -15,13 +15,9 @@ export type CreateTransferFormValues = {
 export const buildConfirmState = (vs: CreateTransferFormValues) => {
     let currentState: ConfirmTokenTransferState | ConfirmSimpleTransferState;
     if (vs.token) {
-        const payload = buildSimpleTransferPayload(
-            vs.recipient,
-            fractionalToInteger(vs.amount, getMetadataDecimals(vs.token.metadata))
-        );
-
         currentState = {
-            ...payload,
+            toAddress: vs.recipient,
+            amount: fractionalToInteger(vs.amount, getMetadataDecimals(vs.token.metadata)),
             ...vs.token,
             executionEnergy: vs.executionEnergy,
         };
