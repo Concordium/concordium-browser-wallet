@@ -86,11 +86,12 @@ export async function submitTransferSponsoredTx(
         return '';
     }
 
-    if (from.length !== 50) {
+    if (to.length !== 50) {
         // eslint-disable-next-line no-alert
         alert('`To` address needs to have 50 digits.');
         return '';
     }
+
     const message = {
         contract_address: {
             index: Number(SPONSORED_TX_CONTRACT_INDEX),
@@ -256,6 +257,8 @@ export async function register(connection: WalletConnection, account: string, pu
         return '';
     }
 
+    const publicKeyLowerCase = publicKey.toLowerCase();
+
     return connection.signAndSendTransaction(
         account,
         AccountTransactionType.Update,
@@ -274,7 +277,7 @@ export async function register(connection: WalletConnection, account: string, pu
             [
                 {
                     account,
-                    public_key: publicKey,
+                    public_key: publicKeyLowerCase,
                 },
             ],
         ],

@@ -1,5 +1,5 @@
 /* eslint-disable no-console */
-import React, { useEffect, useState, useRef, ChangeEvent } from 'react';
+import React, { useEffect, useState, ChangeEvent } from 'react';
 import Switch from 'react-switch';
 import {
     toBuffer,
@@ -96,8 +96,6 @@ const InputFieldStyle = {
     padding: '10px 20px',
 };
 
-// TODO: deploy a new smart contract so `calcualteMessageHash` can be used.
-
 async function calculateTransferMessageHash(
     rpcClient: JsonRpcClient,
     nonce: number,
@@ -105,6 +103,36 @@ async function calculateTransferMessageHash(
     from: string,
     to: string
 ) {
+    if (nonce === undefined) {
+        // eslint-disable-next-line no-alert
+        alert('Your account needs to have a nonce. Register a public key to your account.');
+        return '';
+    }
+
+    if (tokenID === undefined) {
+        // eslint-disable-next-line no-alert
+        alert('Insert a tokenID.');
+        return '';
+    }
+
+    if (tokenID.length !== 8) {
+        // eslint-disable-next-line no-alert
+        alert('TokenID needs to have 8 digits.');
+        return '';
+    }
+
+    if (to === undefined || to === '') {
+        // eslint-disable-next-line no-alert
+        alert('Insert an `to` address.');
+        return '';
+    }
+
+    if (to.length !== 50) {
+        // eslint-disable-next-line no-alert
+        alert('`To` address needs to have 50 digits.');
+        return '';
+    }
+
     const message = {
         contract_address: {
             index: Number(SPONSORED_TX_CONTRACT_INDEX),
@@ -160,6 +188,24 @@ async function calculateUpdateOperatorMessageHash(
     operator: string,
     addOperator: boolean
 ) {
+    if (nonce === undefined) {
+        // eslint-disable-next-line no-alert
+        alert('Your account needs to have a nonce. Register a public key to your account.');
+        return '';
+    }
+
+    if (operator === undefined || operator === '') {
+        // eslint-disable-next-line no-alert
+        alert('Insert an operator address.');
+        return '';
+    }
+
+    if (operator.length !== 50) {
+        // eslint-disable-next-line no-alert
+        alert('Operator address needs to have 50 digits.');
+        return '';
+    }
+
     const operatorAction = addOperator
         ? {
               Add: [],
@@ -259,6 +305,20 @@ async function viewPublicKey(rpcClient: JsonRpcClient, account: string) {
     return 'Error';
 }
 
+function clearInputFields() {
+    const signature = document.getElementById('signature') as HTMLTextAreaElement;
+    signature.value = '';
+
+    const operator = document.getElementById('operator') as HTMLTextAreaElement;
+    operator.value = '';
+
+    const to = document.getElementById('to') as HTMLTextAreaElement;
+    to.value = '';
+
+    const tokenID = document.getElementById('tokenID') as HTMLTextAreaElement;
+    tokenID.value = '';
+}
+
 export default function SPONSOREDTXS(props: WalletConnectionProps) {
     const { network, activeConnectorType, activeConnector, activeConnectorError, connectedAccounts, genesisHashes } =
         props;
@@ -266,21 +326,7 @@ export default function SPONSOREDTXS(props: WalletConnectionProps) {
     const { connection, setConnection, account, genesisHash } = useConnection(connectedAccounts, genesisHashes);
     const { connect, isConnecting, connectError } = useConnect(activeConnector, setConnection);
 
-    const [isLoading, setLoading] = useState(false);
-    // TODO: remove
-    console.log(isLoading);
-    console.log(setLoading);
-
     const [publicKeyError, setPublicKeyError] = useState('');
-
-    const [fileHashHex, setFileHashHex] = useState('');
-    // TODO: remove
-    console.log(fileHashHex);
-    console.log(setFileHashHex);
-
-    const [selectedFile, setSelectedFile] = useState<File>();
-    // TODO: remove
-    console.log(setSelectedFile);
 
     const [isPermitUpdateOperator, setPermitUpdateOperator] = useState<boolean>(true);
 
@@ -290,36 +336,32 @@ export default function SPONSOREDTXS(props: WalletConnectionProps) {
     const [operator, setOperator] = useState('4HoVMVsj6TwJr6B5krP5fW9qM4pbo6crVyrr7N95t2UQDrv1fq');
     const [messageHash, setMessageHash] = useState('');
     const [signature, setSignature] = useState('');
-    const [tokenID, setTokenID] = useState('1');
+    const [tokenID, setTokenID] = useState('00000006');
     const [to, setTo] = useState('4HoVMVsj6TwJr6B5krP5fW9qM4pbo6crVyrr7N95t2UQDrv1fq');
 
     const [addOperator, setAddOperator] = useState<boolean>(true);
 
-    const [witness, setWitness] = useState('');
-    // TODO: remove
-    console.log(setWitness);
-
-    const changeHandler = (event: ChangeEvent) => {
+    const changeUserInputPublicKeyHandler = (event: ChangeEvent) => {
         const target = event.target as HTMLTextAreaElement;
         setUserInputPublicKey(target.value);
     };
 
-    const changeHandler2 = (event: ChangeEvent) => {
+    const changeOperatorHandler = (event: ChangeEvent) => {
         const target = event.target as HTMLTextAreaElement;
         setOperator(target.value);
     };
 
-    const changeHandler3 = (event: ChangeEvent) => {
+    const changeSignatureHandler = (event: ChangeEvent) => {
         const target = event.target as HTMLTextAreaElement;
         setSignature(target.value);
     };
 
-    const changeHandler4 = (event: ChangeEvent) => {
+    const changeTokenIDHandler = (event: ChangeEvent) => {
         const target = event.target as HTMLTextAreaElement;
         setTokenID(target.value);
     };
 
-    const changeHandler5 = (event: ChangeEvent) => {
+    const changeToHandler = (event: ChangeEvent) => {
         const target = event.target as HTMLTextAreaElement;
         setTo(target.value);
     };
@@ -349,7 +391,7 @@ export default function SPONSOREDTXS(props: WalletConnectionProps) {
     }, [connection, account, viewPublicKey]);
 
     useEffect(() => {
-        // View file record.
+        // View publicKey record.
         if (connection && account) {
             withJsonRpcClient(connection, (rpcClient) => viewPublicKey(rpcClient, account))
                 .then((record) => {
@@ -370,14 +412,6 @@ export default function SPONSOREDTXS(props: WalletConnectionProps) {
     const [isRegisterPublicKeyPage, setIsRegisterPublicKeyPage] = useState(true);
     const [txHash, setTxHash] = useState('');
     const [transactionError, setTransactionError] = useState('');
-
-    const [loadingError, setLoadingError] = useState('');
-    // TODO: remove
-    console.log(loadingError);
-
-    const file = useRef<HTMLInputElement | null>(null);
-    // TODO: remove
-    console.log(file);
 
     const [isWaitingForTransaction, setWaitingForUser] = useState(false);
     return (
@@ -496,7 +530,7 @@ export default function SPONSOREDTXS(props: WalletConnectionProps) {
                                     style={InputFieldStyle}
                                     type="text"
                                     placeholder="14fe0aed941aa0a0be1119d7b7dd70bfca475310c531f1b5a179b336c075db65"
-                                    onChange={changeHandler}
+                                    onChange={changeUserInputPublicKeyHandler}
                                 />
                             </label>
                             <button
@@ -514,12 +548,11 @@ export default function SPONSOREDTXS(props: WalletConnectionProps) {
                             >
                                 Insert a public key
                             </button>
-                            <p> Note: The public key you insert above needs to be a lowercase hex value.</p>
                             <p>
                                 {' '}
-                                For testing, generate a public key (e.g., https://cyphr.me/ed25519_applet/ed.html) and
-                                convert it to a lowercase value (e.g.,
-                                https://www.convertstring.com/StringFunction/ToLowerCase).
+                                For testing, generate a private/public key pair (e.g.,
+                                https://cyphr.me/ed25519_applet/ed.html). Insert the public key above. Keep your private
+                                key since you will need it for signing later.
                             </p>
                         </>
                     )}
@@ -554,16 +587,17 @@ export default function SPONSOREDTXS(props: WalletConnectionProps) {
                         />
                         <p>Transfer via a sponsored transaction</p>
                     </div>
-                    {isPermitUpdateOperator && (
+                    {isPermitUpdateOperator && publicKey !== '' && (
                         <>
                             <label>
                                 <p style={{ marginBottom: 0 }}>Operator Address:</p>
                                 <input
                                     className="input"
                                     style={InputFieldStyle}
+                                    id="operator"
                                     type="text"
                                     placeholder="4HoVMVsj6TwJr6B5krP5fW9qM4pbo6crVyrr7N95t2UQDrv1fq"
-                                    onChange={changeHandler2}
+                                    onChange={changeOperatorHandler}
                                 />
                             </label>
                             <div className="containerSpaceBetween">
@@ -584,7 +618,7 @@ export default function SPONSOREDTXS(props: WalletConnectionProps) {
                             </div>
                         </>
                     )}
-                    {!isPermitUpdateOperator && (
+                    {!isPermitUpdateOperator && publicKey !== '' && (
                         <>
                             <div>Mint a token to your account first:</div>
                             <button
@@ -607,9 +641,10 @@ export default function SPONSOREDTXS(props: WalletConnectionProps) {
                                 <input
                                     className="input"
                                     style={InputFieldStyle}
+                                    id="tokenID"
                                     type="text"
                                     placeholder="00000006"
-                                    onChange={changeHandler4}
+                                    onChange={changeTokenIDHandler}
                                 />
                             </label>
                             <label>
@@ -617,28 +652,21 @@ export default function SPONSOREDTXS(props: WalletConnectionProps) {
                                 <input
                                     className="input"
                                     style={InputFieldStyle}
+                                    id="to"
                                     type="text"
                                     placeholder="4HoVMVsj6TwJr6B5krP5fW9qM4pbo6crVyrr7N95t2UQDrv1fq"
-                                    onChange={changeHandler5}
+                                    onChange={changeToHandler}
                                 />
                             </label>
                         </>
                     )}
-                    <button
-                        style={ButtonStyle}
-                        type="button"
-                        onClick={async () => {
-                            try {
-                                if (selectedFile !== undefined) {
-                                    // setFileHashHex('');
-                                    // setLoading(true);
-                                    // const arrayBuffer = await selectedFile.arrayBuffer();
-                                    // const byteArray = new Uint8Array(arrayBuffer as ArrayBuffer);
-                                    // const newFileHashHex = sha256(byteArray.toString());
-                                    // setFileHashHex(newFileHashHex);
-                                    // setLoadingError('');
-                                    // setLoading(false);
-                                } else {
+                    {publicKey === '' && <div style={{ color: 'red' }}>Register a public key first.</div>}
+                    {publicKey !== '' && (
+                        <>
+                            <button
+                                style={ButtonStyle}
+                                type="button"
+                                onClick={async () => {
                                     withJsonRpcClient(connection, (rpcClient) => {
                                         return isPermitUpdateOperator
                                             ? calculateUpdateOperatorMessageHash(
@@ -649,100 +677,91 @@ export default function SPONSOREDTXS(props: WalletConnectionProps) {
                                               )
                                             : calculateTransferMessageHash(rpcClient, nextNonce, tokenID, account, to);
                                     }).then((res) => setMessageHash(res));
-                                }
-                            } catch (err) {
-                                setLoadingError((err as Error).message);
-                            }
-                        }}
-                    >
-                        Compute Hash
-                    </button>
-                    {messageHash !== '' && <div className="loadingText">0x{messageHash}</div>}
-                    <label>
-                        <p style={{ marginBottom: 0 }}>Insert Signature:</p>
-                        <input
-                            className="input"
-                            style={InputFieldStyle}
-                            type="text"
-                            placeholder="E34407940B2996979118A2A94DBCE9C56F26E7B8F557F27BBA49E3B7536F0B1495203563E4E272CFCDECE545BE8EA96A1BEE55B1111DA780DE98CCD6F3C59909"
-                            onChange={changeHandler3}
-                        />
-                    </label>
-                    <br />
-                    <br />
-                    {publicKey !== '' && (
-                        <>
-                            <div> Your registered public key is: </div>
-                            <div className="loadingText">{publicKey}</div>
-                            <div> Your next nonce is: </div>
-                            <div className="loadingText">{nextNonce}</div>
+                                }}
+                            >
+                                Compute Hash
+                            </button>
+                            {messageHash !== '' && <div className="loadingText">0x{messageHash}</div>}
+                            <label>
+                                <p style={{ marginBottom: 0 }}>Insert Signature:</p>
+                                <input
+                                    className="input"
+                                    style={InputFieldStyle}
+                                    id="signature"
+                                    type="text"
+                                    placeholder="E34407940B2996979118A2A94DBCE9C56F26E7B8F557F27BBA49E3B7536F0B1495203563E4E272CFCDECE545BE8EA96A1BEE55B1111DA780DE98CCD6F3C59909"
+                                    onChange={changeSignatureHandler}
+                                />
+                            </label>
+                            <br />
+                            <br />
+                            {publicKey !== '' && (
+                                <>
+                                    <div> Your registered public key is: </div>
+                                    <div className="loadingText">{publicKey}</div>
+                                    <div> Your next nonce is: </div>
+                                    <div className="loadingText">{nextNonce}</div>
+                                </>
+                            )}
+                            <p>
+                                {' '}
+                                Note: To generate the signature for testing, copy the associated private key to the
+                                above public key to (e.g., https://cyphr.me/ed25519_applet/ed.html) and insert the
+                                above-computed hash without the `0x` into the message field in
+                                (https://cyphr.me/ed25519_applet/ed.html). `hex` for the `Msg Encoding` in
+                                (https://cyphr.me/ed25519_applet/ed.html). Click the `Sign` button on
+                                (https://cyphr.me/ed25519_applet/ed.html). Copy the generated signature from signature
+                                from (https://cyphr.me/ed25519_applet/ed.html) to this website into the above input
+                                field. Remove the `0x` of the signature before clicking the `Submit Sponsored
+                                Transaction` button.
+                            </p>
+                            <button
+                                style={messageHash === '' ? ButtonStyleDisabled : ButtonStyle}
+                                disabled={messageHash === ''}
+                                type="button"
+                                onClick={async () => {
+                                    setTxHash('');
+                                    setTransactionError('');
+                                    setWaitingForUser(true);
+                                    const tx = isPermitUpdateOperator
+                                        ? submitUpdateOperatorSponsoredTx(
+                                              connection,
+                                              account,
+                                              nextNonce,
+                                              signature,
+                                              operator,
+                                              addOperator
+                                          )
+                                        : submitTransferSponsoredTx(
+                                              connection,
+                                              account,
+                                              nextNonce,
+                                              signature,
+                                              tokenID,
+                                              account,
+                                              to
+                                          );
+                                    tx.then((txHashReturned) => {
+                                        setTxHash(txHashReturned);
+                                        if (txHashReturned !== '') {
+                                            setMessageHash('');
+                                            setSignature('');
+                                            setTokenID('');
+                                            setTo('');
+                                            setOperator('');
+                                            clearInputFields();
+                                        }
+                                    })
+                                        .catch((err: Error) => setTransactionError((err as Error).message))
+                                        .finally(() => {
+                                            setWaitingForUser(false);
+                                        });
+                                }}
+                            >
+                                Submit Sponsored Transaction
+                            </button>
                         </>
                     )}
-                    <p>
-                        {' '}
-                        Note: To generate the signature for testing, copy your the associated private key to the above
-                        public key to (e.g., https://cyphr.me/ed25519_applet/ed.html) and insert the above-computed hash
-                        without the `0x` into the message field in (e.g., https://cyphr.me/ed25519_applet/ed.html).
-                        Select `hex` for the `Msg Encoding` in (e.g., https://cyphr.me/ed25519_applet/ed.html). Click
-                        the `Sign` button on (e.g., https://cyphr.me/ed25519_applet/ed.html). Copy the generated
-                        signature from (e.g., https://cyphr.me/ed25519_applet/ed.html) to this website into the above
-                        input field. Remove the `0x` of the signature before clicking the `Submit Sponsored Transaction`
-                        button.
-                    </p>
-                    <button
-                        style={ButtonStyle}
-                        type="button"
-                        onClick={async () => {
-                            if (witness !== null) {
-                                // eslint-disable-next-line no-alert
-                                // alert(
-                                //     `This file hash is already registered \n${witness} (withness) \n${timestamp} (timestamp)`
-                                // );
-                                // TODO: remove this below again and move to else {} claus once this checking can be done
-                                setTxHash('');
-                                setTransactionError('');
-                                setWaitingForUser(true);
-                                const tx = isPermitUpdateOperator
-                                    ? submitUpdateOperatorSponsoredTx(
-                                          connection,
-                                          account,
-                                          nextNonce,
-                                          signature,
-                                          operator,
-                                          addOperator
-                                      )
-                                    : submitTransferSponsoredTx(
-                                          connection,
-                                          account,
-                                          nextNonce,
-                                          signature,
-                                          tokenID,
-                                          account,
-                                          to
-                                      );
-                                tx.then(setTxHash)
-                                    .catch((err: Error) => setTransactionError((err as Error).message))
-                                    .finally(() => setWaitingForUser(false));
-                            } else {
-                                setTxHash('');
-                                setTransactionError('');
-                                setWaitingForUser(true);
-                                const tx = submitUpdateOperatorSponsoredTx(
-                                    connection,
-                                    account,
-                                    nextNonce,
-                                    signature,
-                                    operator,
-                                    addOperator
-                                );
-                                tx.then(setTxHash)
-                                    .catch((err: Error) => setTransactionError((err as Error).message))
-                                    .finally(() => setWaitingForUser(false));
-                            }
-                        }}
-                    >
-                        Submit Sponsored Transaction
-                    </button>
                 </>
             )}
             {!connection && (
