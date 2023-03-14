@@ -479,6 +479,7 @@ export default function SPONSOREDTXS(props: WalletConnectionProps) {
                                 onClick={() => {
                                     setIsRegisterPublicKeyPage(true);
                                     setMessageHash('');
+                                    setTransactionError('');
                                     setTxHash('');
                                 }}
                             >
@@ -488,6 +489,7 @@ export default function SPONSOREDTXS(props: WalletConnectionProps) {
                                 onChange={() => {
                                     setIsRegisterPublicKeyPage(!isRegisterPublicKeyPage);
                                     setMessageHash('');
+                                    setTransactionError('');
                                     setTxHash('');
                                 }}
                                 onColor="#308274"
@@ -504,6 +506,7 @@ export default function SPONSOREDTXS(props: WalletConnectionProps) {
                                 onClick={() => {
                                     setIsRegisterPublicKeyPage(false);
                                     setMessageHash('');
+                                    setTransactionError('');
                                     setTxHash('');
                                 }}
                             >
@@ -576,6 +579,7 @@ export default function SPONSOREDTXS(props: WalletConnectionProps) {
                                 setPermitUpdateOperator(!isPermitUpdateOperator);
                                 setMessageHash('');
                                 setTxHash('');
+                                setTransactionError('');
                             }}
                             onColor="#308274"
                             offColor="#308274"
