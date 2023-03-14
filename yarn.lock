@@ -2053,7 +2053,7 @@ __metadata:
   languageName: node
   linkType: hard
 
-"@concordium/web-sdk@npm:^3.3.1":
+"@concordium/web-sdk@npm:^3.2.0, @concordium/web-sdk@npm:^3.3.1":
   version: 3.3.1
   resolution: "@concordium/web-sdk@npm:3.3.1"
   dependencies:
@@ -19170,6 +19170,7 @@ __metadata:
     fs: ^0.0.1-security
     live-server: ^1.2.2
     mathjs: ^11.4.0
+    moment: ^2.29.4
     process: ^0.11.10
     react: ^18.1.0
     react-dom: ^18.1.0

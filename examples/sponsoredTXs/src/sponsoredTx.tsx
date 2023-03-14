@@ -19,6 +19,7 @@ import {
     BROWSER_WALLET,
     WALLET_CONNECT,
     EXPIRY_TIME_SIGNATURE,
+    REFRESH_INTERVAL,
 } from './constants';
 
 import { WalletConnectionTypeButton } from './WalletConnectorTypeButton';
@@ -323,6 +324,30 @@ export default function SPONSOREDTXS(props: WalletConnectionProps) {
         setTo(target.value);
     };
 
+    // Refresh publicKey/nonce periodically.
+    // eslint-disable-next-line consistent-return
+    useEffect(() => {
+        if (connection && account) {
+            const interval = setInterval(() => {
+                console.log('refreshing');
+                withJsonRpcClient(connection, (rpcClient) => viewPublicKey(rpcClient, account))
+                    .then((record) => {
+                        if (record !== undefined) {
+                            setPublicKey(record[0]);
+                            setNextNonce(record[1] + 1);
+                        }
+                        setPublicKeyError('');
+                    })
+                    .catch((e) => {
+                        setPublicKeyError((e as Error).message);
+                        setPublicKey('');
+                        setNextNonce(0);
+                    });
+            }, REFRESH_INTERVAL.asMilliseconds());
+            return () => clearInterval(interval);
+        }
+    }, [connection, account, viewPublicKey]);
+
     useEffect(() => {
         // View file record.
         if (connection && account) {
@@ -357,7 +382,7 @@ export default function SPONSOREDTXS(props: WalletConnectionProps) {
     const [isWaitingForTransaction, setWaitingForUser] = useState(false);
     return (
         <div style={blackCardStyle}>
-            <h1 className="header">Explore sponsored transactions</h1>
+            <h1 className="header">Explore Sponsored Transactions</h1>
             <div className="containerSpaceBetween">
                 <WalletConnectionTypeButton
                     buttonStyle={ButtonStyle}
@@ -499,9 +524,14 @@ export default function SPONSOREDTXS(props: WalletConnectionProps) {
                         </>
                     )}
                     <br />
-                    <div> Your registered public key is: </div>
-                    {publicKey !== '' && <div className="loadingText">{publicKey}</div>}
-                    {publicKey === '' && !publicKeyError && <div className="loadingText">None</div>}
+                    {publicKey !== '' && (
+                        <>
+                            <div> Your registered public key is: </div>
+                            <div className="loadingText">{publicKey}</div>
+                            <div> Your next nonce is: </div>
+                            <div className="loadingText">{nextNonce}</div>
+                        </>
+                    )}
                 </>
             )}
             {connection && !isRegisterPublicKeyPage && account !== undefined && (
@@ -640,18 +670,23 @@ export default function SPONSOREDTXS(props: WalletConnectionProps) {
                     </label>
                     <br />
                     <br />
-                    <div> Your registered public key is: </div>
-                    {publicKey !== '' && <div className="loadingText">{publicKey}</div>}
-                    {publicKey === '' && !publicKeyError && <div className="loadingText">None</div>}
+                    {publicKey !== '' && (
+                        <>
+                            <div> Your registered public key is: </div>
+                            <div className="loadingText">{publicKey}</div>
+                            <div> Your next nonce is: </div>
+                            <div className="loadingText">{nextNonce}</div>
+                        </>
+                    )}
                     <p>
                         {' '}
-                        Note: To generate the signature for testing, copy your above public key to (e.g.,
-                        https://cyphr.me/ed25519_applet/ed.html) and insert the above-computed hash without the `0x`
-                        into the message field in (e.g., https://cyphr.me/ed25519_applet/ed.html). Select `hex` for the
-                        `Msg Encoding` in (e.g., https://cyphr.me/ed25519_applet/ed.html). Click the `Sign` button on
-                        (e.g., https://cyphr.me/ed25519_applet/ed.html). Copy the generated signature from (e.g.,
-                        https://cyphr.me/ed25519_applet/ed.html) to this website into the above input field on this
-                        website. Remove the `0x` of the signature before clicking the `Submit Sponsored Transaction`
+                        Note: To generate the signature for testing, copy your the associated private key to the above
+                        public key to (e.g., https://cyphr.me/ed25519_applet/ed.html) and insert the above-computed hash
+                        without the `0x` into the message field in (e.g., https://cyphr.me/ed25519_applet/ed.html).
+                        Select `hex` for the `Msg Encoding` in (e.g., https://cyphr.me/ed25519_applet/ed.html). Click
+                        the `Sign` button on (e.g., https://cyphr.me/ed25519_applet/ed.html). Copy the generated
+                        signature from (e.g., https://cyphr.me/ed25519_applet/ed.html) to this website into the above
+                        input field. Remove the `0x` of the signature before clicking the `Submit Sponsored Transaction`
                         button.
                     </p>
                     <button

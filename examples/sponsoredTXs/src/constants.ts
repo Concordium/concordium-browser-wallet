@@ -6,15 +6,15 @@ import {
     WalletConnectConnector,
 } from '@concordium/react-components';
 import { SignClientTypes } from '@walletconnect/types';
+import moment from 'moment';
+
+export const REFRESH_INTERVAL = moment.duration(10, 'seconds');
 
 export const TESTNET_GENESIS_BLOCK_HASH = '4221332d34e1694168c2a0c0b3fd0f273809612cb13d000d5c2e00e85f50f796';
 
 export const SPONSORED_TX_CONTRACT_NAME = 'cis3_nft';
 
-export const SPONSORED_TX_CONTRACT_INDEX = 3843n;
-
-// 3842n
-// 3814n;
+export const SPONSORED_TX_CONTRACT_INDEX = 3853n;
 
 export const EXPIRY_TIME_SIGNATURE = '2030-08-08T05:15:00Z';
 

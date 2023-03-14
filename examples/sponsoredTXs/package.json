@@ -10,6 +10,7 @@
         "@types/sha256": "^0.2.0",
         "@walletconnect/types": "^2.1.4",
         "mathjs": "^11.4.0",
+        "moment": "^2.29.4",
         "react": "^18.1.0",
         "react-dom": "^18.1.0",
         "react-switch": "^7.0.0",
