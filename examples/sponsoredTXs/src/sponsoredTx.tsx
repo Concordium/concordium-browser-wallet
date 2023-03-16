@@ -96,7 +96,7 @@ const InputFieldStyle = {
     padding: '10px 20px',
 };
 
-async function calculateTransferMessageHash(
+async function calculateTransferMessage(
     rpcClient: JsonRpcClient,
     nonce: number,
     tokenID: string,
@@ -162,27 +162,20 @@ async function calculateTransferMessageHash(
 
     const param = serializeUpdateContractParameters(
         SPONSORED_TX_CONTRACT_NAME,
-        'calculateMessageHash',
+        'serializationHelper',
         message,
         toBuffer(SPONSORED_TX_RAW_SCHEMA, 'base64')
     );
 
-    const res = await rpcClient.invokeContract({
-        method: `${SPONSORED_TX_CONTRACT_NAME}.calculateMessageHash`,
-        contract: { index: SPONSORED_TX_CONTRACT_INDEX, subindex: CONTRACT_SUB_INDEX },
-        parameter: param,
-    });
+    const hexMessage = Array.from(param, function convertToHex(byte) {
+        /* eslint-disable no-bitwise */
+        return `0${(byte & 0xff).toString(16)}`.slice(-2);
+    }).join('');
 
-    if (!res || res.tag === 'failure' || !res.returnValue) {
-        throw new Error(
-            `RPC call 'invokeContract' on method '${SPONSORED_TX_CONTRACT_NAME}.calculateMessageHash' of contract '${SPONSORED_TX_CONTRACT_INDEX}' failed`
-        );
-    }
-
-    return res.returnValue;
+    return hexMessage;
 }
 
-async function calculateUpdateOperatorMessageHash(
+async function calculateUpdateOperatorMessage(
     rpcClient: JsonRpcClient,
     nonce: number,
     operator: string,
@@ -238,24 +231,17 @@ async function calculateUpdateOperatorMessageHash(
 
     const param = serializeUpdateContractParameters(
         SPONSORED_TX_CONTRACT_NAME,
-        'calculateMessageHash',
+        'serializationHelper',
         message,
         toBuffer(SPONSORED_TX_RAW_SCHEMA, 'base64')
     );
 
-    const res = await rpcClient.invokeContract({
-        method: `${SPONSORED_TX_CONTRACT_NAME}.calculateMessageHash`,
-        contract: { index: SPONSORED_TX_CONTRACT_INDEX, subindex: CONTRACT_SUB_INDEX },
-        parameter: param,
-    });
+    const hexMessage = Array.from(param, function convertToHex(byte) {
+        /* eslint-disable no-bitwise */
+        return `0${(byte & 0xff).toString(16)}`.slice(-2);
+    }).join('');
 
-    if (!res || res.tag === 'failure' || !res.returnValue) {
-        throw new Error(
-            `RPC call 'invokeContract' on method '${SPONSORED_TX_CONTRACT_NAME}.calculateMessageHash' of contract '${SPONSORED_TX_CONTRACT_INDEX}' failed`
-        );
-    }
-
-    return res.returnValue;
+    return hexMessage;
 }
 
 async function viewPublicKey(rpcClient: JsonRpcClient, account: string) {
@@ -302,21 +288,24 @@ async function viewPublicKey(rpcClient: JsonRpcClient, account: string) {
         return [`0x${returnValues[0][0].Some[0][0]}`, returnValues[0][0].Some[0][1]];
     }
 
-    return 'Error';
+    return ['PublicKeyError', 0];
 }
 
 function clearInputFields() {
-    const signature = document.getElementById('signature') as HTMLTextAreaElement;
-    signature.value = '';
-
     const operator = document.getElementById('operator') as HTMLTextAreaElement;
-    operator.value = '';
+    if (operator !== null) {
+        operator.value = '';
+    }
 
     const to = document.getElementById('to') as HTMLTextAreaElement;
-    to.value = '';
+    if (to !== null) {
+        to.value = '';
+    }
 
     const tokenID = document.getElementById('tokenID') as HTMLTextAreaElement;
-    tokenID.value = '';
+    if (tokenID !== null) {
+        tokenID.value = '';
+    }
 }
 
 export default function SPONSOREDTXS(props: WalletConnectionProps) {
@@ -330,16 +319,16 @@ export default function SPONSOREDTXS(props: WalletConnectionProps) {
 
     const [isPermitUpdateOperator, setPermitUpdateOperator] = useState<boolean>(true);
 
-    const [userInputPublicKey, setUserInputPublicKey] = useState('');
     const [publicKey, setPublicKey] = useState('');
     const [nextNonce, setNextNonce] = useState<number>(0);
-    const [operator, setOperator] = useState('4HoVMVsj6TwJr6B5krP5fW9qM4pbo6crVyrr7N95t2UQDrv1fq');
-    const [messageHash, setMessageHash] = useState('');
-    const [signature, setSignature] = useState('');
-    const [tokenID, setTokenID] = useState('00000006');
-    const [to, setTo] = useState('4HoVMVsj6TwJr6B5krP5fW9qM4pbo6crVyrr7N95t2UQDrv1fq');
 
+    const [userInputPublicKey, setUserInputPublicKey] = useState('');
+    const [operator, setOperator] = useState('');
     const [addOperator, setAddOperator] = useState<boolean>(true);
+    const [tokenID, setTokenID] = useState('');
+    const [to, setTo] = useState('');
+
+    const [signature, setSignature] = useState('');
 
     const changeUserInputPublicKeyHandler = (event: ChangeEvent) => {
         const target = event.target as HTMLTextAreaElement;
@@ -349,11 +338,6 @@ export default function SPONSOREDTXS(props: WalletConnectionProps) {
     const changeOperatorHandler = (event: ChangeEvent) => {
         const target = event.target as HTMLTextAreaElement;
         setOperator(target.value);
-    };
-
-    const changeSignatureHandler = (event: ChangeEvent) => {
-        const target = event.target as HTMLTextAreaElement;
-        setSignature(target.value);
     };
 
     const changeTokenIDHandler = (event: ChangeEvent) => {
@@ -478,9 +462,13 @@ export default function SPONSOREDTXS(props: WalletConnectionProps) {
                                 type="button"
                                 onClick={() => {
                                     setIsRegisterPublicKeyPage(true);
-                                    setMessageHash('');
+                                    setSignature('');
+                                    setTokenID('');
+                                    setTo('');
+                                    setOperator('');
                                     setTransactionError('');
                                     setTxHash('');
+                                    clearInputFields();
                                 }}
                             >
                                 Register Public Key
@@ -488,9 +476,13 @@ export default function SPONSOREDTXS(props: WalletConnectionProps) {
                             <Switch
                                 onChange={() => {
                                     setIsRegisterPublicKeyPage(!isRegisterPublicKeyPage);
-                                    setMessageHash('');
+                                    setSignature('');
+                                    setTokenID('');
+                                    setTo('');
+                                    setOperator('');
                                     setTransactionError('');
                                     setTxHash('');
+                                    clearInputFields();
                                 }}
                                 onColor="#308274"
                                 offColor="#308274"
@@ -505,9 +497,13 @@ export default function SPONSOREDTXS(props: WalletConnectionProps) {
                                 type="button"
                                 onClick={() => {
                                     setIsRegisterPublicKeyPage(false);
-                                    setMessageHash('');
+                                    setSignature('');
+                                    setTokenID('');
+                                    setTo('');
+                                    setOperator('');
                                     setTransactionError('');
                                     setTxHash('');
+                                    clearInputFields();
                                 }}
                             >
                                 Submit Sponsored Tx
@@ -553,9 +549,9 @@ export default function SPONSOREDTXS(props: WalletConnectionProps) {
                             </button>
                             <p>
                                 {' '}
-                                For testing, generate a private/public key pair (e.g.,
-                                https://cyphr.me/ed25519_applet/ed.html). Insert the public key above. Keep your private
-                                key since you will need it for signing later.
+                                For testing, go to the `export private key` tab in the Concordium browser wallet and
+                                click the `Export` button to download your keyfile. You find a `verifyKey` (your public
+                                key) in the exported file. Insert the public key above.
                             </p>
                         </>
                     )}
@@ -577,7 +573,7 @@ export default function SPONSOREDTXS(props: WalletConnectionProps) {
                         <Switch
                             onChange={() => {
                                 setPermitUpdateOperator(!isPermitUpdateOperator);
-                                setMessageHash('');
+                                setSignature('');
                                 setTxHash('');
                                 setTransactionError('');
                             }}
@@ -673,31 +669,30 @@ export default function SPONSOREDTXS(props: WalletConnectionProps) {
                                 onClick={async () => {
                                     withJsonRpcClient(connection, (rpcClient) => {
                                         return isPermitUpdateOperator
-                                            ? calculateUpdateOperatorMessageHash(
+                                            ? calculateUpdateOperatorMessage(
                                                   rpcClient,
                                                   nextNonce,
                                                   operator,
                                                   addOperator
                                               )
-                                            : calculateTransferMessageHash(rpcClient, nextNonce, tokenID, account, to);
-                                    }).then((res) => setMessageHash(res));
+                                            : calculateTransferMessage(rpcClient, nextNonce, tokenID, account, to);
+                                    }).then(async (message) => {
+                                        if (message !== '') {
+                                            const permitSignature = await connection.signMessage(account, message);
+                                            setSignature(permitSignature[0][0]);
+                                        }
+                                    });
                                 }}
                             >
-                                Compute Hash
+                                Generate Signature
                             </button>
-                            {messageHash !== '' && <div className="loadingText">0x{messageHash}</div>}
-                            <label>
-                                <p style={{ marginBottom: 0 }}>Insert Signature:</p>
-                                <input
-                                    className="input"
-                                    style={InputFieldStyle}
-                                    id="signature"
-                                    type="text"
-                                    placeholder="E34407940B2996979118A2A94DBCE9C56F26E7B8F557F27BBA49E3B7536F0B1495203563E4E272CFCDECE545BE8EA96A1BEE55B1111DA780DE98CCD6F3C59909"
-                                    onChange={changeSignatureHandler}
-                                />
-                            </label>
                             <br />
+                            {signature !== '' && (
+                                <>
+                                    <div> Your generated signature is: </div>
+                                    <div className="loadingText">{signature}</div>
+                                </>
+                            )}
                             <br />
                             {publicKey !== '' && (
                                 <>
@@ -707,21 +702,9 @@ export default function SPONSOREDTXS(props: WalletConnectionProps) {
                                     <div className="loadingText">{nextNonce}</div>
                                 </>
                             )}
-                            <p>
-                                {' '}
-                                Note: To generate the signature for testing, copy the associated private key to the
-                                above public key to (e.g., https://cyphr.me/ed25519_applet/ed.html) and insert the
-                                above-computed hash without the `0x` into the message field in
-                                (https://cyphr.me/ed25519_applet/ed.html). `hex` for the `Msg Encoding` in
-                                (https://cyphr.me/ed25519_applet/ed.html). Click the `Sign` button on
-                                (https://cyphr.me/ed25519_applet/ed.html). Copy the generated signature from signature
-                                from (https://cyphr.me/ed25519_applet/ed.html) to this website into the above input
-                                field. Remove the `0x` of the signature before clicking the `Submit Sponsored
-                                Transaction` button.
-                            </p>
                             <button
-                                style={messageHash === '' ? ButtonStyleDisabled : ButtonStyle}
-                                disabled={messageHash === ''}
+                                style={signature === '' ? ButtonStyleDisabled : ButtonStyle}
+                                disabled={signature === ''}
                                 type="button"
                                 onClick={async () => {
                                     setTxHash('');
@@ -748,7 +731,6 @@ export default function SPONSOREDTXS(props: WalletConnectionProps) {
                                     tx.then((txHashReturned) => {
                                         setTxHash(txHashReturned);
                                         if (txHashReturned !== '') {
-                                            setMessageHash('');
                                             setSignature('');
                                             setTokenID('');
                                             setTo('');
