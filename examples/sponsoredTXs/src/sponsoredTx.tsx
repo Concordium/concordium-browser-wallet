@@ -98,14 +98,21 @@ const InputFieldStyle = {
 
 async function calculateTransferMessage(
     rpcClient: JsonRpcClient,
-    nonce: number,
+    nonce: string,
     tokenID: string,
     from: string,
     to: string
 ) {
     if (nonce === undefined) {
         // eslint-disable-next-line no-alert
-        alert('Your account needs to have a nonce. Register a public key to your account.');
+        alert('Insert a nonce.');
+        return '';
+    }
+
+    // eslint-disable-next-line no-restricted-globals
+    if (isNaN(Number(nonce))) {
+        // eslint-disable-next-line no-alert
+        alert('Your nonce needs to be a number.');
         return '';
     }
 
@@ -133,13 +140,25 @@ async function calculateTransferMessage(
         return '';
     }
 
+    if (from === undefined || from === '') {
+        // eslint-disable-next-line no-alert
+        alert('Insert an `from` address.');
+        return '';
+    }
+
+    if (from.length !== 50) {
+        // eslint-disable-next-line no-alert
+        alert('`From` address needs to have 50 digits.');
+        return '';
+    }
+
     const message = {
         contract_address: {
             index: Number(SPONSORED_TX_CONTRACT_INDEX),
             subindex: 0,
         },
         entry_point: 'contract_transfer',
-        nonce,
+        nonce: Number(nonce),
         payload: {
             Transfer: [
                 [
@@ -177,13 +196,20 @@ async function calculateTransferMessage(
 
 async function calculateUpdateOperatorMessage(
     rpcClient: JsonRpcClient,
-    nonce: number,
+    nonce: string,
     operator: string,
     addOperator: boolean
 ) {
     if (nonce === undefined) {
         // eslint-disable-next-line no-alert
-        alert('Your account needs to have a nonce. Register a public key to your account.');
+        alert('Insert a nonce.');
+        return '';
+    }
+
+    // eslint-disable-next-line no-restricted-globals
+    if (isNaN(Number(nonce))) {
+        // eslint-disable-next-line no-alert
+        alert('Your nonce needs to be a number.');
         return '';
     }
 
@@ -213,7 +239,7 @@ async function calculateUpdateOperatorMessage(
             subindex: 0,
         },
         entry_point: 'contract_update_operator',
-        nonce,
+        nonce: Number(nonce),
         payload: {
             UpdateOperator: [
                 [
@@ -297,6 +323,11 @@ function clearInputFields() {
         operator.value = '';
     }
 
+    const from = document.getElementById('from') as HTMLTextAreaElement;
+    if (from !== null) {
+        from.value = '';
+    }
+
     const to = document.getElementById('to') as HTMLTextAreaElement;
     if (to !== null) {
         to.value = '';
@@ -305,6 +336,16 @@ function clearInputFields() {
     const tokenID = document.getElementById('tokenID') as HTMLTextAreaElement;
     if (tokenID !== null) {
         tokenID.value = '';
+    }
+
+    const nonce = document.getElementById('nonce') as HTMLTextAreaElement;
+    if (nonce !== null) {
+        nonce.value = '';
+    }
+
+    const signer = document.getElementById('signer') as HTMLTextAreaElement;
+    if (signer !== null) {
+        signer.value = '';
     }
 }
 
@@ -327,6 +368,9 @@ export default function SPONSOREDTXS(props: WalletConnectionProps) {
     const [addOperator, setAddOperator] = useState<boolean>(true);
     const [tokenID, setTokenID] = useState('');
     const [to, setTo] = useState('');
+    const [nonce, setNonce] = useState('');
+    const [from, setFrom] = useState('');
+    const [signer, setSigner] = useState('');
 
     const [signature, setSignature] = useState('');
 
@@ -348,6 +392,21 @@ export default function SPONSOREDTXS(props: WalletConnectionProps) {
     const changeToHandler = (event: ChangeEvent) => {
         const target = event.target as HTMLTextAreaElement;
         setTo(target.value);
+    };
+
+    const changeFromHandler = (event: ChangeEvent) => {
+        const target = event.target as HTMLTextAreaElement;
+        setFrom(target.value);
+    };
+
+    const changeNonceHandler = (event: ChangeEvent) => {
+        const target = event.target as HTMLTextAreaElement;
+        setNonce(target.value);
+    };
+
+    const changeSignerHandler = (event: ChangeEvent) => {
+        const target = event.target as HTMLTextAreaElement;
+        setSigner(target.value);
     };
 
     // Refresh publicKey/nonce periodically.
@@ -464,8 +523,11 @@ export default function SPONSOREDTXS(props: WalletConnectionProps) {
                                     setIsRegisterPublicKeyPage(true);
                                     setSignature('');
                                     setTokenID('');
+                                    setFrom('');
                                     setTo('');
                                     setOperator('');
+                                    setNonce('');
+                                    setSigner('');
                                     setTransactionError('');
                                     setTxHash('');
                                     clearInputFields();
@@ -478,8 +540,11 @@ export default function SPONSOREDTXS(props: WalletConnectionProps) {
                                     setIsRegisterPublicKeyPage(!isRegisterPublicKeyPage);
                                     setSignature('');
                                     setTokenID('');
+                                    setFrom('');
                                     setTo('');
                                     setOperator('');
+                                    setNonce('');
+                                    setSigner('');
                                     setTransactionError('');
                                     setTxHash('');
                                     clearInputFields();
@@ -499,8 +564,11 @@ export default function SPONSOREDTXS(props: WalletConnectionProps) {
                                     setIsRegisterPublicKeyPage(false);
                                     setSignature('');
                                     setTokenID('');
+                                    setFrom('');
                                     setTo('');
                                     setOperator('');
+                                    setNonce('');
+                                    setSigner('');
                                     setTransactionError('');
                                     setTxHash('');
                                     clearInputFields();
@@ -648,6 +716,17 @@ export default function SPONSOREDTXS(props: WalletConnectionProps) {
                                 />
                             </label>
                             <label>
+                                <p style={{ marginBottom: 0 }}>From Address:</p>
+                                <input
+                                    className="input"
+                                    style={InputFieldStyle}
+                                    id="from"
+                                    type="text"
+                                    placeholder="4HoVMVsj6TwJr6B5krP5fW9qM4pbo6crVyrr7N95t2UQDrv1fq"
+                                    onChange={changeFromHandler}
+                                />
+                            </label>
+                            <label>
                                 <p style={{ marginBottom: 0 }}>To Address:</p>
                                 <input
                                     className="input"
@@ -660,6 +739,17 @@ export default function SPONSOREDTXS(props: WalletConnectionProps) {
                             </label>
                         </>
                     )}
+                    <label>
+                        <p style={{ marginBottom: 0 }}>Nonce:</p>
+                        <input
+                            className="input"
+                            style={InputFieldStyle}
+                            id="nonce"
+                            type="text"
+                            placeholder="5"
+                            onChange={changeNonceHandler}
+                        />
+                    </label>
                     {publicKey === '' && <div style={{ color: 'red' }}>Register a public key first.</div>}
                     {publicKey !== '' && (
                         <>
@@ -669,13 +759,8 @@ export default function SPONSOREDTXS(props: WalletConnectionProps) {
                                 onClick={async () => {
                                     withJsonRpcClient(connection, (rpcClient) => {
                                         return isPermitUpdateOperator
-                                            ? calculateUpdateOperatorMessage(
-                                                  rpcClient,
-                                                  nextNonce,
-                                                  operator,
-                                                  addOperator
-                                              )
-                                            : calculateTransferMessage(rpcClient, nextNonce, tokenID, account, to);
+                                            ? calculateUpdateOperatorMessage(rpcClient, nonce, operator, addOperator)
+                                            : calculateTransferMessage(rpcClient, nonce, tokenID, from, to);
                                     }).then(async (message) => {
                                         if (message !== '') {
                                             const permitSignature = await connection.signMessage(account, message);
@@ -702,6 +787,17 @@ export default function SPONSOREDTXS(props: WalletConnectionProps) {
                                     <div className="loadingText">{nextNonce}</div>
                                 </>
                             )}
+                            <label>
+                                <p style={{ marginBottom: 0 }}>Signer:</p>
+                                <input
+                                    className="input"
+                                    style={InputFieldStyle}
+                                    id="signer"
+                                    type="text"
+                                    placeholder="4HoVMVsj6TwJr6B5krP5fW9qM4pbo6crVyrr7N95t2UQDrv1fq"
+                                    onChange={changeSignerHandler}
+                                />
+                            </label>
                             <button
                                 style={signature === '' ? ButtonStyleDisabled : ButtonStyle}
                                 disabled={signature === ''}
@@ -714,7 +810,8 @@ export default function SPONSOREDTXS(props: WalletConnectionProps) {
                                         ? submitUpdateOperatorSponsoredTx(
                                               connection,
                                               account,
-                                              nextNonce,
+                                              signer,
+                                              nonce,
                                               signature,
                                               operator,
                                               addOperator
@@ -722,10 +819,11 @@ export default function SPONSOREDTXS(props: WalletConnectionProps) {
                                         : submitTransferSponsoredTx(
                                               connection,
                                               account,
-                                              nextNonce,
+                                              signer,
+                                              nonce,
                                               signature,
                                               tokenID,
-                                              account,
+                                              from,
                                               to
                                           );
                                     tx.then((txHashReturned) => {
@@ -733,8 +831,11 @@ export default function SPONSOREDTXS(props: WalletConnectionProps) {
                                         if (txHashReturned !== '') {
                                             setSignature('');
                                             setTokenID('');
+                                            setFrom('');
                                             setTo('');
                                             setOperator('');
+                                            setNonce('');
+                                            setSigner('');
                                             clearInputFields();
                                         }
                                     })

@@ -44,7 +44,8 @@ export async function mint(connection: WalletConnection, account: string) {
 export async function submitTransferSponsoredTx(
     connection: WalletConnection,
     account: string,
-    nonce: number,
+    signer: string,
+    nonce: string,
     signature: string,
     tokenID: string,
     from: string,
@@ -52,7 +53,14 @@ export async function submitTransferSponsoredTx(
 ) {
     if (nonce === undefined) {
         // eslint-disable-next-line no-alert
-        alert('Your account needs to have a nonce. Register a public key to your account.');
+        alert('Insert a nonce.');
+        return '';
+    }
+
+    // eslint-disable-next-line no-restricted-globals
+    if (isNaN(Number(nonce))) {
+        // eslint-disable-next-line no-alert
+        alert('Your nonce needs to be a number.');
         return '';
     }
 
@@ -92,13 +100,25 @@ export async function submitTransferSponsoredTx(
         return '';
     }
 
+    if (from === undefined || from === '') {
+        // eslint-disable-next-line no-alert
+        alert('Insert an `from` address.');
+        return '';
+    }
+
+    if (from.length !== 50) {
+        // eslint-disable-next-line no-alert
+        alert('`From` address needs to have 50 digits.');
+        return '';
+    }
+
     const message = {
         contract_address: {
             index: Number(SPONSORED_TX_CONTRACT_INDEX),
             subindex: 0,
         },
         entry_point: 'contract_transfer',
-        nonce,
+        nonce: Number(nonce),
         payload: {
             Transfer: [
                 [
@@ -122,7 +142,7 @@ export async function submitTransferSponsoredTx(
     const param = {
         message,
         signature: [[0, [[0, signature]]]],
-        signer: account,
+        signer,
     };
 
     return connection.signAndSendTransaction(
@@ -151,14 +171,22 @@ export async function submitTransferSponsoredTx(
 export async function submitUpdateOperatorSponsoredTx(
     connection: WalletConnection,
     account: string,
-    nonce: number,
+    signer: string,
+    nonce: string,
     signature: string,
     operator: string,
     addOperator: boolean
 ) {
     if (nonce === undefined) {
         // eslint-disable-next-line no-alert
-        alert('Your account needs to have a nonce. Register a public key to your account.');
+        alert('Insert a nonce.');
+        return '';
+    }
+
+    // eslint-disable-next-line no-restricted-globals
+    if (isNaN(Number(nonce))) {
+        // eslint-disable-next-line no-alert
+        alert('Your nonce needs to be a number.');
         return '';
     }
 
@@ -200,7 +228,7 @@ export async function submitUpdateOperatorSponsoredTx(
             subindex: 0,
         },
         entry_point: 'contract_update_operator',
-        nonce,
+        nonce: Number(nonce),
         payload: {
             UpdateOperator: [
                 [
@@ -219,7 +247,7 @@ export async function submitUpdateOperatorSponsoredTx(
     const param = {
         message,
         signature: [[0, [[0, signature]]]],
-        signer: account,
+        signer,
     };
 
     return connection.signAndSendTransaction(
