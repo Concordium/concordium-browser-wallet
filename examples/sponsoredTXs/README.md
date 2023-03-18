@@ -2,11 +2,11 @@
 
 The example project included in this repository serves as a working example of how to integrate sponsored transactions with smart contracts on the Concordium blockchain. This web app supports the following flows with the browser wallet (or wallet connect):
 
--   Register a public key in the smart contract.
--   Compute the messageHash of a sponsored updateOperator transaction => Submit the signed sponsored transaction to the smart contract.
--   Mint an NFT to your wallet => Compute the messageHash of a sponsored transfer transaction => Submit the signed sponsored transaction to the smart contract.
+-   Register a public key (associated with the account from your wallet) in the smart contract.
+-   Compute the message of a sponsored updateOperator transaction => Sign it with the wallet => Submit the signed sponsored transaction to the smart contract.
+-   Mint an NFT to your wallet => Compute the message of a sponsored transfer transaction => Sign it with the wallet => Submit the signed sponsored transaction to the smart contract.
 
-The front-end interacts with the smart contract {index: 3853, subindex: 0} that has a similar logic to [this contract](https://github.com/Concordium/concordium-rust-smart-contracts/tree/main/examples/cis3-nft-sponsored-txs).
+The front-end interacts with the smart contract {index: 3903, subindex: 0} that has a similar logic to [this contract](https://github.com/Concordium/concordium-rust-smart-contracts/tree/main/examples/cis3-nft-sponsored-txs).
 
 ## Prerequisites
 

@@ -96,14 +96,8 @@ const InputFieldStyle = {
     padding: '10px 20px',
 };
 
-async function calculateTransferMessage(
-    rpcClient: JsonRpcClient,
-    nonce: string,
-    tokenID: string,
-    from: string,
-    to: string
-) {
-    if (nonce === undefined) {
+async function calculateTransferMessage(nonce: string, tokenID: string, from: string, to: string) {
+    if (nonce === undefined || nonce === '') {
         // eslint-disable-next-line no-alert
         alert('Insert a nonce.');
         return '';
@@ -116,7 +110,7 @@ async function calculateTransferMessage(
         return '';
     }
 
-    if (tokenID === undefined) {
+    if (tokenID === undefined || tokenID === '') {
         // eslint-disable-next-line no-alert
         alert('Insert a tokenID.');
         return '';
@@ -194,13 +188,8 @@ async function calculateTransferMessage(
     return hexMessage;
 }
 
-async function calculateUpdateOperatorMessage(
-    rpcClient: JsonRpcClient,
-    nonce: string,
-    operator: string,
-    addOperator: boolean
-) {
-    if (nonce === undefined) {
+async function calculateUpdateOperatorMessage(nonce: string, operator: string, addOperator: boolean) {
+    if (nonce === undefined || nonce === '') {
         // eslint-disable-next-line no-alert
         alert('Insert a nonce.');
         return '';
@@ -347,6 +336,11 @@ function clearInputFields() {
     if (signer !== null) {
         signer.value = '';
     }
+
+    const userInputPublicKey = document.getElementById('userInputPublicKey') as HTMLTextAreaElement;
+    if (userInputPublicKey !== null) {
+        userInputPublicKey.value = '';
+    }
 }
 
 export default function SPONSOREDTXS(props: WalletConnectionProps) {
@@ -373,6 +367,7 @@ export default function SPONSOREDTXS(props: WalletConnectionProps) {
     const [signer, setSigner] = useState('');
 
     const [signature, setSignature] = useState('');
+    const [signingError, setSigningError] = useState('');
 
     const changeUserInputPublicKeyHandler = (event: ChangeEvent) => {
         const target = event.target as HTMLTextAreaElement;
@@ -522,6 +517,7 @@ export default function SPONSOREDTXS(props: WalletConnectionProps) {
                                 onClick={() => {
                                     setIsRegisterPublicKeyPage(true);
                                     setSignature('');
+                                    setSigningError('');
                                     setTokenID('');
                                     setFrom('');
                                     setTo('');
@@ -530,6 +526,7 @@ export default function SPONSOREDTXS(props: WalletConnectionProps) {
                                     setSigner('');
                                     setTransactionError('');
                                     setTxHash('');
+                                    setUserInputPublicKey('');
                                     clearInputFields();
                                 }}
                             >
@@ -539,6 +536,7 @@ export default function SPONSOREDTXS(props: WalletConnectionProps) {
                                 onChange={() => {
                                     setIsRegisterPublicKeyPage(!isRegisterPublicKeyPage);
                                     setSignature('');
+                                    setSigningError('');
                                     setTokenID('');
                                     setFrom('');
                                     setTo('');
@@ -547,6 +545,7 @@ export default function SPONSOREDTXS(props: WalletConnectionProps) {
                                     setSigner('');
                                     setTransactionError('');
                                     setTxHash('');
+                                    setUserInputPublicKey('');
                                     clearInputFields();
                                 }}
                                 onColor="#308274"
@@ -563,6 +562,7 @@ export default function SPONSOREDTXS(props: WalletConnectionProps) {
                                 onClick={() => {
                                     setIsRegisterPublicKeyPage(false);
                                     setSignature('');
+                                    setSigningError('');
                                     setTokenID('');
                                     setFrom('');
                                     setTo('');
@@ -571,6 +571,7 @@ export default function SPONSOREDTXS(props: WalletConnectionProps) {
                                     setSigner('');
                                     setTransactionError('');
                                     setTxHash('');
+                                    setUserInputPublicKey('');
                                     clearInputFields();
                                 }}
                             >
@@ -595,6 +596,7 @@ export default function SPONSOREDTXS(props: WalletConnectionProps) {
                                 <input
                                     className="input"
                                     style={InputFieldStyle}
+                                    id="userInputPublicKey"
                                     type="text"
                                     placeholder="14fe0aed941aa0a0be1119d7b7dd70bfca475310c531f1b5a179b336c075db65"
                                     onChange={changeUserInputPublicKeyHandler}
@@ -637,13 +639,21 @@ export default function SPONSOREDTXS(props: WalletConnectionProps) {
             {connection && !isRegisterPublicKeyPage && account !== undefined && (
                 <>
                     <div className="containerSpaceBetween">
-                        <p>Update Operator via a sponsored transaction</p>
+                        <p>Update operator via a sponsored transaction</p>
                         <Switch
                             onChange={() => {
                                 setPermitUpdateOperator(!isPermitUpdateOperator);
                                 setSignature('');
+                                setSigningError('');
                                 setTxHash('');
                                 setTransactionError('');
+                                setNonce('');
+                                setSigner('');
+                                setTokenID('');
+                                setFrom('');
+                                setTo('');
+                                setOperator('');
+                                clearInputFields();
                             }}
                             onColor="#308274"
                             offColor="#308274"
@@ -655,6 +665,7 @@ export default function SPONSOREDTXS(props: WalletConnectionProps) {
                         />
                         <p>Transfer via a sponsored transaction</p>
                     </div>
+                    {publicKey === '' && <div style={{ color: 'red' }}>Register a public key first.</div>}
                     {isPermitUpdateOperator && publicKey !== '' && (
                         <>
                             <label>
@@ -739,39 +750,44 @@ export default function SPONSOREDTXS(props: WalletConnectionProps) {
                             </label>
                         </>
                     )}
-                    <label>
-                        <p style={{ marginBottom: 0 }}>Nonce:</p>
-                        <input
-                            className="input"
-                            style={InputFieldStyle}
-                            id="nonce"
-                            type="text"
-                            placeholder="5"
-                            onChange={changeNonceHandler}
-                        />
-                    </label>
-                    {publicKey === '' && <div style={{ color: 'red' }}>Register a public key first.</div>}
                     {publicKey !== '' && (
                         <>
+                            <label>
+                                <p style={{ marginBottom: 0 }}>Nonce:</p>
+                                <input
+                                    className="input"
+                                    style={InputFieldStyle}
+                                    id="nonce"
+                                    type="text"
+                                    placeholder="5"
+                                    onChange={changeNonceHandler}
+                                />
+                            </label>
                             <button
                                 style={ButtonStyle}
                                 type="button"
                                 onClick={async () => {
-                                    withJsonRpcClient(connection, (rpcClient) => {
-                                        return isPermitUpdateOperator
-                                            ? calculateUpdateOperatorMessage(rpcClient, nonce, operator, addOperator)
-                                            : calculateTransferMessage(rpcClient, nonce, tokenID, from, to);
-                                    }).then(async (message) => {
-                                        if (message !== '') {
-                                            const permitSignature = await connection.signMessage(account, message);
-                                            setSignature(permitSignature[0][0]);
-                                        }
-                                    });
+                                    setSigningError('');
+                                    setSignature('');
+                                    const message = isPermitUpdateOperator
+                                        ? await calculateUpdateOperatorMessage(nonce, operator, addOperator)
+                                        : await calculateTransferMessage(nonce, tokenID, from, to);
+                                    if (message !== '') {
+                                        const promise = connection.signMessage(account, message);
+                                        promise
+                                            .then((permitSignature) => {
+                                                setSignature(permitSignature[0][0]);
+                                            })
+                                            .catch((err: Error) => setSigningError((err as Error).message));
+                                    } else {
+                                        setSigningError('Serialization Error');
+                                    }
                                 }}
                             >
                                 Generate Signature
                             </button>
                             <br />
+                            {signingError && <div style={{ color: 'red' }}>Error: {signingError}.</div>}
                             {signature !== '' && (
                                 <>
                                     <div> Your generated signature is: </div>

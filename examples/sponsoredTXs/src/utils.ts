@@ -14,7 +14,7 @@ import {
  * Action for minting a token to the user's account.
  */
 export async function mint(connection: WalletConnection, account: string) {
-    const test = connection.signAndSendTransaction(
+    return connection.signAndSendTransaction(
         account,
         AccountTransactionType.Update,
         {
@@ -33,8 +33,6 @@ export async function mint(connection: WalletConnection, account: string) {
         },
         SPONSORED_TX_RAW_SCHEMA
     );
-
-    return test;
 }
 
 /**
@@ -51,7 +49,7 @@ export async function submitTransferSponsoredTx(
     from: string,
     to: string
 ) {
-    if (nonce === undefined) {
+    if (nonce === undefined || nonce === '') {
         // eslint-disable-next-line no-alert
         alert('Insert a nonce.');
         return '';
@@ -64,7 +62,7 @@ export async function submitTransferSponsoredTx(
         return '';
     }
 
-    if (tokenID === undefined) {
+    if (tokenID === undefined || tokenID === '') {
         // eslint-disable-next-line no-alert
         alert('Insert a tokenID.');
         return '';
@@ -109,6 +107,18 @@ export async function submitTransferSponsoredTx(
     if (from.length !== 50) {
         // eslint-disable-next-line no-alert
         alert('`From` address needs to have 50 digits.');
+        return '';
+    }
+
+    if (signer === undefined || signer === '') {
+        // eslint-disable-next-line no-alert
+        alert('Insert an signer address.');
+        return '';
+    }
+
+    if (signer.length !== 50) {
+        // eslint-disable-next-line no-alert
+        alert('Signer address needs to have 50 digits.');
         return '';
     }
 
@@ -177,7 +187,7 @@ export async function submitUpdateOperatorSponsoredTx(
     operator: string,
     addOperator: boolean
 ) {
-    if (nonce === undefined) {
+    if (nonce === undefined || nonce === '') {
         // eslint-disable-next-line no-alert
         alert('Insert a nonce.');
         return '';
@@ -211,6 +221,18 @@ export async function submitUpdateOperatorSponsoredTx(
     if (operator.length !== 50) {
         // eslint-disable-next-line no-alert
         alert('Operator address needs to have 50 digits.');
+        return '';
+    }
+
+    if (signer === undefined || signer === '') {
+        // eslint-disable-next-line no-alert
+        alert('Insert an signer address.');
+        return '';
+    }
+
+    if (signer.length !== 50) {
+        // eslint-disable-next-line no-alert
+        alert('Signer address needs to have 50 digits.');
         return '';
     }
 
