@@ -125,7 +125,7 @@ function mapTypeToText(type: AccountTransactionType | RewardType | SpecialTransa
         case AccountTransactionType.UpdateBakerKeys:
             return 'Baker keys update';
         case AccountTransactionType.UpdateCredentialKeys:
-            return 'Credential keys update';
+            return 'Account keys update';
         case RewardType.BakingReward:
             return 'Baking reward';
         case RewardType.BlockReward:

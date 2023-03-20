@@ -31,7 +31,7 @@ export enum TransactionKindString {
     UpdateBakerStake = 'updateBakerStake',
     UpdateBakerRestakeEarnings = 'updateBakerRestakeEarnings',
     UpdateBakerKeys = 'updateBakerKeys',
-    UpdateCredentialKeys = 'updateCredentialKeys',
+    UpdateCredentialKeys = 'updateAccountKeys',
     BakingReward = 'bakingReward',
     BlockReward = 'blockReward',
     FinalizationReward = 'finalizationReward',
