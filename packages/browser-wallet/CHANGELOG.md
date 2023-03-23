@@ -2,6 +2,10 @@
 
 ## 0.9.9
 
+### Added
+
+-   Support for signing arbitrary data with signMessage.
+
 ### Fixed
 
 -   Bug for transferring tokens where validation was hardcoded to assume 6 decimals.
