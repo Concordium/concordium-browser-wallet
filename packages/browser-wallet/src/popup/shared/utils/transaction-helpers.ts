@@ -10,7 +10,7 @@ import {
     SimpleTransferPayload,
     TransactionExpiry,
 } from '@concordium/web-sdk';
-import { fractionalToInteger, isValidCcdString } from 'wallet-common-helpers';
+import { fractionalToInteger, isValidResolutionString } from 'wallet-common-helpers';
 
 import i18n from '@popup/shell/i18n';
 import { BrowserWalletAccountTransaction, TransactionStatus } from './transaction-history-types';
@@ -48,7 +48,7 @@ export function validateTransferAmount(
     decimals = 0,
     estimatedFee = 0n
 ): string | undefined {
-    if (!isValidCcdString(transferAmount)) {
+    if (!isValidResolutionString(10n ** BigInt(decimals), false, false, false)(transferAmount)) {
         return i18n.t('utils.ccdAmount.invalid');
     }
     const amountToValidateInteger = fractionalToInteger(transferAmount, decimals);

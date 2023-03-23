@@ -2,40 +2,31 @@ import React, { useMemo } from 'react';
 import { useTranslation } from 'react-i18next';
 import { useSetAtom, useAtomValue } from 'jotai';
 import { selectedAccountAtom } from '@popup/store/account';
-import { AccountTransactionType, SimpleTransferPayload, UpdateContractPayload } from '@concordium/web-sdk';
 import { jsonRpcClientAtom } from '@popup/store/settings';
+import { AccountTransactionType, UpdateContractPayload } from '@concordium/web-sdk';
 import { addToastAtom } from '@popup/state';
 import { useLocation } from 'react-router-dom';
 import { useAsyncMemo } from 'wallet-common-helpers';
 import { fetchContractName, getTokenTransferParameters, getTokenTransferPayload } from '@shared/utils/token-helpers';
-import { TokenMetadata } from '@shared/storage/types';
 import ConfirmTransfer from './ConfirmTransfer';
+import { ConfirmTokenTransferState } from './util';
 
 interface Props {
     setDetailsExpanded: (expanded: boolean) => void;
     cost?: bigint;
 }
 
-interface State extends SimpleTransferPayload {
-    contractIndex: string;
-    tokenId: string;
-    metadata: TokenMetadata;
-    executionEnergy: bigint;
-}
-
 export default function ConfirmTokenTransfer({ setDetailsExpanded, cost }: Props) {
     const { t } = useTranslation('account');
     const { state } = useLocation();
-    const { toAddress, amount, contractIndex, tokenId, executionEnergy, metadata } = state as State;
+    const { toAddress, amount, contractIndex, tokenId, executionEnergy, metadata } = state as ConfirmTokenTransferState;
     const selectedAddress = useAtomValue(selectedAccountAtom);
     const client = useAtomValue(jsonRpcClientAtom);
     const addToast = useSetAtom(addToastAtom);
     const contractName = useAsyncMemo(() => fetchContractName(client, BigInt(contractIndex)), undefined, []);
 
     const parameters = useMemo(
-        () =>
-            selectedAddress &&
-            getTokenTransferParameters(selectedAddress, toAddress.address, tokenId, amount.microCcdAmount),
+        () => selectedAddress && getTokenTransferParameters(selectedAddress, toAddress, tokenId, amount),
         []
     );
 
