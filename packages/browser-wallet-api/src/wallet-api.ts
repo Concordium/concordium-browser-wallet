@@ -19,6 +19,7 @@ import {
     EventType,
     SchemaWithContext,
     SchemaType,
+    SignMessageObject,
     SmartContractParameters,
 } from '@concordium/browser-wallet-api-helpers';
 import EventEmitter from 'events';
@@ -66,7 +67,10 @@ class WalletApi extends EventEmitter implements IWalletApi {
     /**
      * Sends a sign request to the Concordium Wallet and awaits the users action
      */
-    public async signMessage(accountAddress: string, message: string): Promise<AccountTransactionSignature> {
+    public async signMessage(
+        accountAddress: string,
+        message: string | SignMessageObject
+    ): Promise<AccountTransactionSignature> {
         const response = await this.messageHandler.sendMessage<MessageStatusWrapper<AccountTransactionSignature>>(
             MessageType.SignMessage,
             {
@@ -76,7 +80,7 @@ class WalletApi extends EventEmitter implements IWalletApi {
         );
 
         if (!response.success) {
-            throw new Error('Signing rejected');
+            throw new Error(response.message);
         }
 
         return response.result;

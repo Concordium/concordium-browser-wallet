@@ -1,5 +1,11 @@
 # Changelog
 
+## 0.9.9
+
+### Added
+
+-   Support for signing arbitrary data with signMessage.
+
 ## 0.9.8
 
 ### Fixed

@@ -3,7 +3,7 @@ import { ExtensionMessageHandler } from '@concordium/browser-wallet-message-hub'
 import {
     HttpProvider,
     createCredentialV1,
-    CredentialInputV1,
+    CredentialInput,
     getAccountAddress,
     getSignedCredentialDeploymentTransactionHash,
     JsonRpcClient,
@@ -14,7 +14,9 @@ import { BackgroundResponseStatus, CredentialDeploymentBackgroundResponse } from
 import { confirmCredential } from './confirmation';
 import { addCredential } from './update';
 
-async function createAndSendCredential(credIn: CredentialInputV1): Promise<CredentialDeploymentBackgroundResponse> {
+async function createAndSendCredential(
+    credIn: CredentialInput & { expiry: number }
+): Promise<CredentialDeploymentBackgroundResponse> {
     let address: string;
     try {
         const network = await storedCurrentNetwork.get();

@@ -142,7 +142,12 @@ It is possible to sign arbitrary messages using the keys for an account stored i
 
 If the wallet is locked, or you have not connected with the wallet (or previously been whitelisted) or if the user rejects signing the meesage, the `Promise` will reject.
 
-The following exemplifies requesting a signature of a message:
+The message should either utf8 string or an object with the following fields:
+
+-   data: A hex string representing the bytes that should be signed.
+-   schema: A base64 string that represents a schema for the data field, and which can be used to deserialize the data into a JSON format.
+
+The following exemplifies requesting a signature of a message, where the message is a utf8 string:
 
 ```typescript
 const provider = await detectConcordiumProvider();
@@ -150,6 +155,31 @@ const signature = await provider.signMessage(
     '4MyVHYbRkAU6fqQsoSDzni6mrVz1KEvhDJoMVmDmrCgPBD8b7S',
     'This is a message to be signed'
 );
+```
+
+The following exemplifies requesting a signature of a message, where the message is an object:
+
+```typescript
+const provider = await detectConcordiumProvider();
+const signature = await provider.signMessage('4MyVHYbRkAU6fqQsoSDzni6mrVz1KEvhDJoMVmDmrCgPBD8b7S', {
+    data: '00000b0000004120676f6f64206974656d00a4fbca84010000',
+    schema: 'FAAEAAAADQAAAGF1Y3Rpb25fc3RhdGUVAgAAAAoAAABOb3RTb2xkWWV0AgQAAABTb2xkAQEAAAALDgAAAGhpZ2hlc3RfYmlkZGVyFQIAAAAEAAAATm9uZQIEAAAAU29tZQEBAAAACwQAAABpdGVtFgIDAAAAZW5kDQ',
+});
+```
+
+In this example the user will be shown:
+
+```JSON
+{
+  "auction_state": {
+    "NotSoldYet": []
+  },
+  "end": "2022-12-01T00:00:00+00:00",
+  "highest_bidder": {
+    "None": []
+  },
+  "item": "A good item"
+}
 ```
 
 ### Add CIS-2 Tokens
