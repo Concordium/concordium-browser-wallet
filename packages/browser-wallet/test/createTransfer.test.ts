@@ -1,5 +1,4 @@
-import { ConfirmTokenTransferState } from '../src/popup/pages/Account/SendCcd/ConfirmTokenTransfer';
-import { buildConfirmState } from '../src/popup/pages/Account/SendCcd/util';
+import { buildConfirmState, ConfirmTokenTransferState } from '../src/popup/pages/Account/SendCcd/util';
 
 test('buildConfirmState converts input to ConfirmTokenTransferState state if token is defined', () => {
     const metadata = {
