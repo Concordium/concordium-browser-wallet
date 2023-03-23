@@ -1,5 +1,11 @@
 # Changelog
 
+## 2.4.0
+
+### Added
+
+-   signMessage is now able to receive a SignMessageObject as the message in addition to a utf8 string.
+
 ## 2.3.0
 
 ### Added
