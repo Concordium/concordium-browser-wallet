@@ -174,6 +174,12 @@ export class ContentMessageHandler {
     }
 }
 
+type BroadcastOptions = {
+    requireWhitelist?: boolean;
+    orElse?(tab: chrome.tabs.Tab): void;
+};
+const defaultBroadcastOptions: BroadcastOptions = { requireWhitelist: true };
+
 export class ExtensionsMessageHandler extends BaseMessageHandler<WalletMessage> {
     constructor(
         private connectedSites: { get(): Promise<Record<string, string[]> | undefined> },
@@ -206,11 +212,12 @@ export class ExtensionsMessageHandler extends BaseMessageHandler<WalletMessage> 
      */
     // TODO would be nice to make this more type safe.
     // eslint-disable-next-line @typescript-eslint/no-explicit-any
-    public broadcast(type: EventType, payload?: any, options = { requireWhitelist: true }): void {
+    public broadcast(type: EventType, payload?: any, options: BroadcastOptions = {}): void {
+        const optionsWithDefaults = { ...defaultBroadcastOptions, ...options };
         chrome.tabs
             .query({}) // get all
             .then((ts) => {
-                if (!options.requireWhitelist) {
+                if (!optionsWithDefaults.requireWhitelist) {
                     return { valid: ts, invalid: [] };
                 }
 
@@ -219,10 +226,14 @@ export class ExtensionsMessageHandler extends BaseMessageHandler<WalletMessage> 
                     invalid: ts.filter((t) => !wl.some((w) => w.id === t.id)),
                 }));
             })
-            .then(({ valid: tabs }) => {
-                tabs.filter(({ id }) => id !== undefined).forEach((t) =>
-                    this.sendEventToTab(t.id as number, new WalletEvent(type, payload))
-                );
+            .then(({ valid, invalid }) => {
+                valid
+                    .filter(({ id }) => id !== undefined)
+                    .forEach((t) => this.sendEventToTab(t.id as number, new WalletEvent(type, payload)));
+
+                if (optionsWithDefaults.orElse !== undefined) {
+                    invalid.forEach(optionsWithDefaults.orElse);
+                }
             });
     }
 
