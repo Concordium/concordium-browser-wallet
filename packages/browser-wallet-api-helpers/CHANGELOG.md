@@ -5,6 +5,7 @@
 ### Added
 
 -   Added `getGrpcClient` entrypoint to access grpc-web client.
+-   Added `getSelectedChain` entrypoint to get the genesis hash of the chain selected in the wallet.
 
 ### Deprecated
 
