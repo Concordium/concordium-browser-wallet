@@ -176,7 +176,7 @@ export class ContentMessageHandler {
 
 type BroadcastOptions = {
     requireWhitelist?: boolean;
-    orElse?(tab: chrome.tabs.Tab): void;
+    nonWhitelistedTabCallback?(tab: chrome.tabs.Tab): void;
 };
 const defaultBroadcastOptions: BroadcastOptions = { requireWhitelist: true };
 
@@ -206,9 +206,14 @@ export class ExtensionsMessageHandler extends BaseMessageHandler<WalletMessage> 
     /**
      * Broadcast an event of a specific type, with an optional payload, to all currently
      * open and whitelisted (connected to the selected account) tabs.
+     * By specifying options, it's possible to disable the whitelist by `{requireWhitelist: false}`
+     * and also declare a callback to be called for tabs not included in the whitelist through `{nonWhitelistedTabCallback: (t: chrome.tabs.Tab) => ...}`
+     * Default options are {requireWhitelist: true}
      *
      * @example
      * handler.broadcast(EventType.ChangeAccount, "1234");
+     * handler.broadcast(EventType.ChainChanged, undefined, {requireWhitelist: false});
+     * handler.broadcast(EventType.ChangeAccount, "1234", {nonWhitelistedTabCallback: handlerFunction});
      */
     // TODO would be nice to make this more type safe.
     // eslint-disable-next-line @typescript-eslint/no-explicit-any
@@ -231,8 +236,8 @@ export class ExtensionsMessageHandler extends BaseMessageHandler<WalletMessage> 
                     .filter(({ id }) => id !== undefined)
                     .forEach((t) => this.sendEventToTab(t.id as number, new WalletEvent(type, payload)));
 
-                if (optionsWithDefaults.orElse !== undefined) {
-                    invalid.forEach(optionsWithDefaults.orElse);
+                if (optionsWithDefaults.nonWhitelistedTabCallback !== undefined) {
+                    invalid.forEach(optionsWithDefaults.nonWhitelistedTabCallback);
                 }
             });
     }

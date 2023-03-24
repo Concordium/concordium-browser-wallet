@@ -25,7 +25,7 @@ export const selectedAccountAtom = atom<string | undefined, string | undefined>(
     (_, set, address) => {
         set(storedAccountAtom, address);
         popupMessageHandler.broadcast(EventType.AccountChanged, address, {
-            orElse: (tab: chrome.tabs.Tab) => {
+            nonWhitelistedTabCallback: (tab: chrome.tabs.Tab) => {
                 if (tab.url) {
                     popupMessageHandler.broadcastToUrl(EventType.AccountDisconnected, tab.url);
                 }
