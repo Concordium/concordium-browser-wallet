@@ -6,6 +6,11 @@
 
 -   Use gRPC-web instead of json-RPC.
 
+### Fixed
+
+-   `chainChanged` event is correctly propagated to all (not just whitelisted) dapps listening for events through the wallet API.
+-   When changing the selected chain internally in the wallet, dapps now receive `accountDisconnected` event if the account selected on the new chain is not whitelisted for the dapp.
+
 ## 0.9.8
 
 ### Fixed
