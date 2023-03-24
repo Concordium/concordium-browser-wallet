@@ -211,16 +211,19 @@ export class ExtensionsMessageHandler extends BaseMessageHandler<WalletMessage> 
             .query({}) // get all
             .then((ts) => {
                 if (!options.requireWhitelist) {
-                    return ts;
+                    return { valid: ts, invalid: [] };
                 }
 
-                return this.getWhitelistedTabs(ts);
+                return this.getWhitelistedTabs(ts).then((wl) => ({
+                    valid: wl,
+                    invalid: ts.filter((t) => !wl.some((w) => w.id === t.id)),
+                }));
             })
-            .then((tabs) =>
-                tabs
-                    .filter(({ id }) => id !== undefined)
-                    .forEach((t) => this.sendEventToTab(t.id as number, new WalletEvent(type, payload)))
-            );
+            .then(({ valid: tabs }) => {
+                tabs.filter(({ id }) => id !== undefined).forEach((t) =>
+                    this.sendEventToTab(t.id as number, new WalletEvent(type, payload))
+                );
+            });
     }
 
     /**
