@@ -31,7 +31,9 @@ export const networkConfigurationAtom = atom<NetworkConfiguration, NetworkConfig
     (get) => get(storedNetworkConfigurationAtom),
     (_, set, networkConfiguration) => {
         set(storedNetworkConfigurationAtom, networkConfiguration);
-        popupMessageHandler.broadcast(EventType.ChainChanged, networkConfiguration.genesisHash);
+        popupMessageHandler.broadcast(EventType.ChainChanged, networkConfiguration.genesisHash, {
+            requireWhitelist: false,
+        });
         set(selectedIdentityIndexAtom, 0);
         storedCredentials
             .get(networkConfiguration.genesisHash)

@@ -206,10 +206,16 @@ export class ExtensionsMessageHandler extends BaseMessageHandler<WalletMessage> 
      */
     // TODO would be nice to make this more type safe.
     // eslint-disable-next-line @typescript-eslint/no-explicit-any
-    public broadcast(type: EventType, payload?: any): void {
+    public broadcast(type: EventType, payload?: any, options = { requireWhitelist: true }): void {
         chrome.tabs
             .query({}) // get all
-            .then(this.getWhitelistedTabs.bind(this))
+            .then((ts) => {
+                if (!options.requireWhitelist) {
+                    return ts;
+                }
+
+                return this.getWhitelistedTabs(ts);
+            })
             .then((tabs) =>
                 tabs
                     .filter(({ id }) => id !== undefined)

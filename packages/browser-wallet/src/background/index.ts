@@ -13,6 +13,7 @@ import {
     sessionPasscode,
     sessionOpenPrompt,
     storedAcceptedTerms,
+    getGenesisHash,
 } from '@shared/storage/access';
 
 import JSONBig from 'json-bigint';
@@ -371,6 +372,25 @@ bgMessageHandler.handleMessage(
     createMessageTypeFilter(MessageType.GetSelectedAccount),
     getMostRecentlySelectedAccountHandler
 );
+
+const getSelectedChainHandler: ExtensionMessageHandler = (_msg, sender, respond) => {
+    isWalletLocked().then((locked) => {
+        if (locked) {
+            respond(undefined);
+        } else {
+            if (!sender.url) {
+                throw new Error('Expected URL to be available for sender.');
+            }
+
+            getGenesisHash()
+                .then(respond)
+                .catch(() => respond(undefined));
+        }
+    });
+    return true;
+};
+
+bgMessageHandler.handleMessage(createMessageTypeFilter(MessageType.GetSelectedChain), getSelectedChainHandler);
 
 const withPromptStart: RunCondition<MessageStatusWrapper<string | undefined>> = async () => {
     const isPromptOpen = await sessionOpenPrompt.get();

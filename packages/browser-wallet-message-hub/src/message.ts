@@ -10,6 +10,7 @@ export enum MessageType {
     SignMessage = 'M_SignMessage',
     GetAccounts = 'M_GetAccounts',
     GetSelectedAccount = 'M_GetSelectedAccount',
+    GetSelectedChain = 'M_GetSelectedChain',
     Connect = 'M_Connect',
     JsonRpcRequest = 'M_JsonRpcRequest',
     GrpcRequest = 'M_GrpcRequest',

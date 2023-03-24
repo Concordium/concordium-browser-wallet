@@ -177,6 +177,16 @@ class WalletApi extends EventEmitter implements IWalletApi {
         return this.grpcClient;
     }
 
+    public async getSelectedChain(): Promise<string | undefined> {
+        const response = await this.messageHandler.sendMessage<string | null>(MessageType.GetSelectedChain);
+
+        // TODO Response becomes === null when we would expect it to be undefined. Catching it here is a temporary quick-fix.
+        if (response === null) {
+            return undefined;
+        }
+        return response;
+    }
+
     public async addCIS2Tokens(
         accountAddress: string,
         tokenIds: string[],
