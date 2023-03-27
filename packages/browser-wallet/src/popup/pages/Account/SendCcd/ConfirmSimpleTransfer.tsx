@@ -20,7 +20,7 @@ export default function ConfirmSimpleTransfer({ setDetailsExpanded, cost }: Prop
             setDetailsExpanded={setDetailsExpanded}
             cost={cost}
             payload={payload}
-            returnState={payload}
+            returnState={state}
             transactionType={AccountTransactionType.Transfer}
         />
     );
