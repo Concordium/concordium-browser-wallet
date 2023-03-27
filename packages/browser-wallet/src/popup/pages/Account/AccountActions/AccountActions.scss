@@ -17,6 +17,10 @@
         justify-content: center;
         background-color: $color-cta;
 
+        &:disabled {
+            background-color: $color-passive;
+        }
+
         svg {
             width: rem(7px);
 
@@ -126,6 +130,10 @@
 
     &__receive-icon {
         height: rem(11px);
+    }
+
+    &__earn-icon {
+        height: rem(16px);
     }
 
     &__settings-icon {

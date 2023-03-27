@@ -1,0 +1,106 @@
+.earn-carousel,
+.earn-page,
+.earn-details {
+    padding: rem(10px) rem(10px);
+    background-color: $color-bg;
+    white-space: break-spaces;
+}
+
+.earn-page,
+.earn-details {
+    display: flex;
+    flex-direction: column;
+    width: 100%;
+    justify-content: space-between;
+    height: 100%;
+}
+
+.earn-page {
+    &__header {
+        position: relative;
+        display: flex;
+        justify-content: center;
+        align-items: center;
+    }
+
+    &__back {
+        position: absolute;
+        left: 0;
+    }
+}
+
+.configure-flow-form {
+    flex: 1;
+    display: flex;
+    flex-direction: column;
+    justify-content: space-between;
+    align-items: center;
+    width: 100%;
+}
+
+.earn-details {
+    &__card {
+        background-color: $color-status-box;
+        border: rem(2px) solid $color-cta;
+        border-radius: rem(10px);
+        text-align: center;
+        padding: rem(10px) rem(5px);
+        flex-grow: 1;
+        overflow: overlay;
+    }
+
+    &__header {
+        margin-top: rem(15px);
+        color: $color-off-white;
+    }
+
+    &__title,
+    &__value {
+        color: $color-cta;
+    }
+
+    &__value {
+        margin-top: rem(5px);
+        font-family: $font-family-mono;
+    }
+
+    &__logo {
+        height: rem(30px);
+        width: rem(30px);
+
+        path {
+            fill: $color-cta;
+        }
+    }
+}
+
+.delegation {
+    &__pool-status {
+        margin-bottom: auto;
+        width: 75%;
+    }
+
+    &__amount-input {
+        margin: 0 rem(25px) calc($error-spacing + rem(1px)) rem(25px);
+
+        &.form-input--invalid {
+            margin-bottom: rem(1px);
+        }
+    }
+}
+
+.earn-carousel {
+    &__title {
+        position: relative;
+        display: flex;
+        justify-content: center;
+        align-items: center;
+        padding: 0 rem(5px);
+        margin-bottom: rem(20px);
+    }
+
+    &__back {
+        position: fixed;
+        left: rem(15px);
+    }
+}

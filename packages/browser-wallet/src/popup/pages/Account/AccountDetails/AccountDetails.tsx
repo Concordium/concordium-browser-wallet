@@ -18,7 +18,7 @@ type AmountProps = {
 function Amount({ label, amount }: AmountProps) {
     return (
         <div className="account-page-details__amount">
-            <div className="account-page-details__amount-label">{label}</div>
+            <div className="label label--faded">{label}</div>
             <div className="account-page-details__amount-ccd">{displayAsCcd(amount)}</div>
         </div>
     );

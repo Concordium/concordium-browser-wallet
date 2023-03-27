@@ -2,6 +2,7 @@ import {
     AccountTransactionPayload,
     AccountTransactionType,
     calculateEnergyCost,
+    ConfigureDelegationPayload,
     ChainParameters,
     getAccountTransactionHandler,
     Ratio,
@@ -9,6 +10,8 @@ import {
 import { collapseRatio, multiplyRatio } from './number-helpers';
 
 export const SIMPLE_TRANSFER_ENERGY_TOTAL_COST = 501n;
+const CONFIGURE_DELEGATION_BASE_COST = 300n;
+const CONFIGURE_DELEGATION_MAX_PAYLOAD_SIZE = 20n; // (2 + 8 + 1 + 1 + 8);
 
 // TODO: replace this with helpers from SDK
 export function determineUpdatePayloadSize(parameterSize: number, receiveName: string) {
@@ -43,4 +46,12 @@ export function getExchangeRate({ euroPerEnergy, microGTUPerEuro }: ChainParamet
 export function convertEnergyToMicroCcd(cost: bigint, chainParameters: ChainParameters): bigint {
     const rate = getExchangeRate(chainParameters);
     return collapseRatio(multiplyRatio(rate, cost));
+}
+
+export function getConfigureDelegationEnergyCost(payload: ConfigureDelegationPayload): bigint {
+    return getEnergyCost(AccountTransactionType.ConfigureDelegation, payload);
+}
+
+export function getConfigureDelegationMaxEnergyCost(): bigint {
+    return calculateEnergyCost(1n, CONFIGURE_DELEGATION_MAX_PAYLOAD_SIZE, CONFIGURE_DELEGATION_BASE_COST);
 }

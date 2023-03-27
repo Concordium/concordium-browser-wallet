@@ -27,8 +27,6 @@ $account-page-details-height: var(--details-height, $account-page-details-height
     &__routes {
         width: 100%;
         height: calc(100% - #{$account-page-details-height});
-        display: flex;
-        justify-content: center;
         position: relative;
         overflow: overlay;
         @include transition(height);
