@@ -1,5 +1,16 @@
 # Changelog
 
+## 0.9.10
+
+### Changed
+
+-   Updated text when signing arbitrary data with signMessage.
+
+### Fixed
+
+-   Duplicate key error when sending multiple transactions.
+-   Crash when going back in transfer flow. (introduced in 0.9.9)
+
 ## 0.9.9
 
 ### Added

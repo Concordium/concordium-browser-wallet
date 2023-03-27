@@ -149,5 +149,5 @@ export const selectedPendingTransactionsAtom = atom<BrowserWalletAccountTransact
 
 export const addPendingTransactionAtom = atom<null, BrowserWalletAccountTransaction, Promise<void>>(
     null,
-    (get, set, transaction) => set(pendingTransactionsAtom, [...get(pendingTransactionsAtom), transaction])
+    (_, set, transaction) => set(pendingTransactionsAtom, [transaction])
 );
