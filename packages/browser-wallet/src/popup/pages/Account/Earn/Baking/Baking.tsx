@@ -79,24 +79,24 @@ function DisplayPendingChange({ pendingChange }: DisplayPendingChangeProps) {
         chainParameters,
     ]);
 
-    if (pendingChange?.change === StakePendingChangeType.ReduceStake) {
-        return (
-            <>
-                <div className="earn-details__header">{sharedT('changesTakesEffectOn', { effectiveTime })}</div>
-                <div className="earn-details__header">{sharedT('pendingChange')}</div>
-                <div className="earn-details__value">{displayAsCcd(pendingChange.newStake)} </div>
-            </>
-        );
+    if (!pendingChange?.change) {
+        return null;
     }
-    if (pendingChange?.change === StakePendingChangeType.RemoveStakeV1) {
-        return (
-            <>
-                <div className="earn-details__header">{sharedT('changesTakesEffectOn', { effectiveTime })}</div>
+
+    return (
+        <>
+            <div className="earn-details__header">{sharedT('changesTakesEffectOn', { effectiveTime })}</div>
+            {pendingChange?.change === StakePendingChangeType.ReduceStake && (
+                <>
+                    <div className="earn-details__header">{sharedT('pendingChange')}</div>
+                    <div className="earn-details__value">{displayAsCcd(pendingChange.newStake)} </div>
+                </>
+            )}
+            {pendingChange?.change === StakePendingChangeType.RemoveStakeV1 && (
                 <div className="earn-details__value">{sharedT('pendingRemove')}</div>
-            </>
-        );
-    }
-    return null;
+            )}
+        </>
+    );
 }
 
 type BakingDetailsProps = {

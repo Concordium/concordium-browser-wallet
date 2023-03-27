@@ -109,15 +109,15 @@ const t = {
         registerIntro: {
             '1': {
                 title: 'Become a baker',
-                body: 'A baker is a node that participates in the network by baking (creating) new blocks that are added to the chain. Each baker has a set of cryptographic keys called baker keys that the node needs to bake blocks. You generate the baker keys in the Mobile Wallet when you add a baker account. Once the baker node has been restarted with the baker keys, it will start baking two epochs after the transaction has been approved.',
+                body: 'A baker is a node that participates in the network by baking (creating) new blocks that are added to the chain.\n\nEach baker has a set of cryptographic keys called baker keys that the node needs to bake blocksYou generate the baker keys when you add a baker account.\n\nOnce the baker node has been restarted with the baker keys, it will start baking two epochs after the transaction has been approved.',
             },
             '2': {
                 title: 'The node',
-                body: 'To become a baker you must run a node on the Concordium blockchain. Make sure that you have a setup where the node can operate around the clock. You can run the node yourself or use a third-party provider. Make sure your account in the Concordium Mobile Wallet has the required amount of CCD to become a baker.',
+                body: 'To become a baker you must run a node on the Concordium blockchain.Make sure that you have a setup where the node can operate around the clock.\n\nYou can run the node yourself or use a third-party provider. Make sure your account in the wallet has the required amount of CCD to become a baker.',
             },
             '3': {
                 title: 'Opening a pool',
-                body: 'You have the option when adding a baker to open a baker pool or not. A baker pool allows others who want to earn rewards to do so without the need to run a node or become a baker themselves. To do this they delegate an amount to your baker pool which then increases your total stake and your chances of winning the lottery to bake a block. At each pay day the rewards will be distributed to you and your delegators. You can also choose not to open a pool, in which case only your own stake applies toward the lottery. You can always open or close a pool later.',
+                body: 'You have the option when adding a baker to open a baker pool or not. A baker pool allows others who want to earn rewards to do so without the need to run a node or become a baker themselves.\n\nTo do this they delegate an amount to your baker pool which then increases your total stake and your chances of winning the lottery to bake a block. At each pay day the rewards will be distributed to you and your delegators.\n\nYou can also choose not to open a pool, in which case only your own stake applies toward the lottery. You can always open or close a pool later.',
             },
         },
         removeIntro: {
@@ -127,25 +127,21 @@ const t = {
             },
         },
         updateIntro: {
-            '1': {
-                title: 'Updating baker settings',
-                body: 'When you have registered a baker, you can make the following updates:\n\n  • Update baker stake\n  • Update pool settings\n  • Update baker keys\n\nThis guide explains each of the different types of update. If you are already familiar with them, you can skip the guide below.',
-            },
             '2': {
                 title: 'Update baker stake',
                 body: 'When updating your baker stake you can choose to increase or decrease your stake. If you increase your stake, this is most often effective from the next pay day. If the transaction occurs too close to the next pay day, the update will be effective from the following pay day.\n\nIf you decrease your stake, there is a longer cool-down period. During the cool-down period, the staked amount continues to bake and earn rewards.\n\nYou can also adjust whether you want rewards restaked or not. If the transaction is not made too close to the next pay day, it will take effect then; otherwise it will be effective at the next pay day over.',
             },
             '3': {
-                title: 'Update pool settings (1/2)',
-                body: 'If you choose to update pool settings, you have the following things to adjust. Changes to the individual parameters are optional, so you don’t have to change them all.\n\nPool status:\n  • Open pool: open a pool for a previously closed baker\n  • Closed for new: close the pool to new delegators. Existing delegators are not affected.\n  • Close pool: close a pool for all delegators.\n\nMetadata URL:\n  • The metadata URL can be changed, removed, or left the same.',
+                title: 'Update pool settings',
+                body: 'If you choose to update pool settings, you have the following things to adjust. Changes to the individual parameters are optional, so you don’t have to change them all.\n\n<strong>Pool status</strong>:\n  • Open pool: open a pool for\n     a previously closed baker\n  • Closed for new: close the pool to new delegators.\n     Existing delegators are not affected.\n  • Close pool: close a pool for all delegators.\n\n<strong>Metadata URL</strong>:\n  • The metadata URL can be changed, removed,\n     or left the same.',
             },
             '4': {
-                title: 'Update pool settings (2/2)',
-                body: 'There is a cool-down period if you choose to close a pool. During this time, all delegators continue in the pool, and the pool continues to earn rewards if it bakes.\n\nAfter the cool-down, the delegators are removed and the pool will be closed. The baker will keep baking with your own stake afterwards.\n\nChanges to the metadata URL take effect from the next pay unless the transaction is made too close to the pay day. In that case, it will take effect from the next pay day over.',
+                title: 'Update pool settings',
+                body: 'There is a cool-down period if you choose to close a pool. During this time, all delegators continue in the pool, and the pool continues to earn rewards if it bakes.\n\nAfter the cool-down, the delegators are removed and the pool will be closed. The baker will keep baking with your own stake afterwards.\n\nChanges to the metadata URL take effect from the next pay day unless the transaction is made too close to the pay day. In that case, it will take effect from the next pay day over.',
             },
             '5': {
                 title: 'Update baker keys',
-                body: 'If you believe your baker keys have been compromised or lost, you can generate and submit a new set of keys. It is important to remember to restart your node with the new set of keys after registering them on the chain. As the update takes effect on chain from the next pay day, it is preferable to restart the node with the new keys as close to the next pay day as possible to prevent the baker from having down time.',
+                body: 'If you believe your baker keys have been compromised or lost, you can generate and submit a new set of keys. It is important to remember to restart your node with the new set of keys after registering them on the chain.\n\nAs the update takes effect on chain from the next pay day, it is preferable to restart the node with the new keys as close to the next pay day as possible to prevent the baker from having down time.',
             },
         },
         register: {

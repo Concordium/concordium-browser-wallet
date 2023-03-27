@@ -114,6 +114,10 @@
 }
 
 .earn-carousel {
+    strong {
+        font-weight: $font-weight-bold;
+    }
+
     &__title {
         position: relative;
         display: flex;

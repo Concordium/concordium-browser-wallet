@@ -42,11 +42,7 @@ export default function DisplayConfigureBaker({ payload }: Props) {
             <OptionalField title={t('finalizationCommission')} value={payload.finalizationRewardCommission}>
                 {displayFractionCommissionRate}
             </OptionalField>
-            <OptionalField
-                title={t('metadataUrl')}
-                value={payload.metadataUrl}
-                className="transaction-receipt__scrollable-field"
-            >
+            <OptionalField title={t('metadataUrl')} value={payload.metadataUrl}>
                 {(url) => (url === '' ? t('noUrl') : <DisplayPartialString className="word-break-all" value={url} />)}
             </OptionalField>
             <OptionalField title={t('electionKey')} value={payload.keys?.electionVerifyKey}>

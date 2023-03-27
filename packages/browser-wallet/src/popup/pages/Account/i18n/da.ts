@@ -1,4 +1,4 @@
-import en from './en';
+import type en from './en';
 
 const t: typeof en = {
     noAccounts: 'Du har ingen konti i din wallet.',
@@ -181,7 +181,7 @@ const t: typeof en = {
         update: {
             title: 'Opdater delegation',
             noChanges:
-                'Transaktionen indeholder ikke nogen ændringer i for hold til de nuværende delegation indstillinger.',
+                'Transaktionen indeholder ikke nogen ændringer i forhold til de nuværende delegation indstillinger.',
         },
         configure: {
             pool: {
@@ -209,17 +209,117 @@ const t: typeof en = {
                 descriptionRedelegate:
                     'Vil du gerne automatisk indsætte dine fortjenester på din delegation saldo?\n\nHvis du vælger ikke at indsætte dine fortjenester, vil de blive tilføjet til din offentlige saldo hver pay day.',
                 locked: 'Saldo låst',
-                lockedNote: 'Du kan ikke ændre saldoen mens der er en ændring kommende ændring',
+                lockedNote: 'Du kan ikke ændre saldoen mens der er en kommende ændring',
                 overStakeThresholdWarning:
-                    'Du er ved at låse mere end {{ threshold }}% af din totale saldo som diun delegation saldo.\n\nHvis du ikke har nok ulåste CCD, vil du ikke kunne betale for transaktion omkostninger.',
+                    'Du er ved at låse mere end {{ threshold }}% af din totale saldo som din delegation saldo.\n\nHvis du ikke har nok ulåste CCD, vil du ikke kunne betale for transaktion omkostninger.',
                 enterNewStake: 'Indtast ny delegation saldo',
             },
             continueButton: 'Fortsæt',
             warning: 'Advarsel',
         },
     },
-    // TODO translate
-    baking: en.baking,
+    baking: {
+        registerIntro: {
+            '1': {
+                title: 'Opret en baker',
+                body: 'En baker er en node som deltager i netværket ved at bake (lave) nye blocks som bliver tilføjet til kæden. Hver baker har et nogle kryptogragiske nøgler, som refereres til som "baker keys", som noden bruger når den baker blocks. Du genererer baker nøgler når du tilføjer en baker konto. Når baker noden er blevet genstartet med baker keys, så den starte med at bake, to epochs efter transaktionen er blevet godkendt.',
+            },
+            '2': {
+                title: 'Noden',
+                body: 'For at blive en baker skal du køre en node på Concordium blockchain. Det er vigtigt at have det sat op så noden kan køre døgnet rundt.\n\nDu kan køre noden selv eller bruger en third-party provider. Sørg for at din konto i din wallet har den nødvendige mængde CCD for at blive en baker.',
+            },
+            '3': {
+                title: 'Baker pulje',
+                body: 'Når du opretter en baker kan du vælge at åbne en baker pulje. En baker pulje gør det muligt for andre at får fortjenester uden at køre en node eller selv blive baker.\n\n For at gøre dette, så delegerer de CCD til din baker pulje, som øger din totale stake og din change for at vinde lotteriet om at bake en block. Ved hver pay day bliver fortjenesterne fordelt mellem dig og dine delegators.\n\nDu kan også vælge ikke at åbne en pulje, og så vil det kun være din egen stake som tæller med til lotteriet. Du kan altid åbne eller lukke en pulje senere.',
+            },
+        },
+        removeIntro: {
+            '1': {
+                title: 'Stop baking',
+                body: 'Hvis du ønsker ikke at bake på en konto, kan du stoppe baking. Der er en cool-down period, hvor din baker stake stadig vil blive brugt til baking og få fortjenester. Efter denne cool-down periode, bliver din baker stake låst op på din offentlige saldo, og kan bruges igen.\n\nHvis du pulje har delegators, vil de automatisk blive flyttet til passiv delegation.\n\nHvis du afmelder din konto som baker, så husk at dette ikke lukker din node ned. Du skal stadig lukke din node ned separat, hvis du ikke længere ønske at køre en node Concordium blockchain.',
+            },
+        },
+        updateIntro: {
+            '2': {
+                title: 'Opdater baker stake',
+                body: 'Når du opdaterer din baker stake, kan du vælge at øge eller formindske din stake, så vil ændringen som regel tage effekt fra den næste pay day. Hvis det er for tæt på den næste pay day, så vil ændringen tage i kraft den efterfølgende pay day.\n\n Hvis du formindsker din stake så er der en cool-down periode. I denne periode vil din stake stadig blive brugt til baking og få fortjenester\n\nDu kan også ændre hvorvidt dine fortjenester til tilføjet til din stake eller ej.',
+            },
+            '3': {
+                title: 'Opdater pulje indstillinger',
+                body: 'Du kan ændre de følgende indstillinger i forbindelse med baker puljen. Hver af de individuelle indstillinger er frivillige, så du behøver ikke ændre dem alle.\n\nPulje status:\n  • Åben pulje: åben en pulje for en tidligere lukket baker\n  • Lukket for nye: luk en pulje for nye delegators. Nuværende delegators vil ikke blive påvirket.\n  • Luk pulje: luk en pulje for alle delegators.\n\nMetadata URL:\n  • metadata URLen kan ændres, fjernes eller forblive den samme.',
+            },
+            '4': {
+                title: 'Opdater pulje indstillinger',
+                body: 'Der er en cool-down periode hvis du vælger at lukke en pulje. I løbet af denne periode vil alle delegators blive i puljen, og får fortjenester hvis bakeren baker blocks.\n\nEfter cool-down perioden bliver alle delegators fjernet og puljen lukkes. Bagefter vil bakeren blive ved med at bake med kontoens egen stake.\n\nÆndringerne til metadata URLen tager kraft ved næste pay day medmindre det er for tæt på den næste pay day og i så fald vil ændringen tage i kraft den efterfølgende pay day.',
+            },
+            '5': {
+                title: 'Opdater baker keys',
+                body: 'Hvis du har tabt dine baker keys eller de er blevet kompromitteret, så kan du generere og registrere nye baker keys keys. Det er vigtigt at genstarte din node med de nye nøgler efter de er blevet registreret på kæden. Da ændringen tager kraft ved næste pay day, er det bedst at genstarte noden med de nye nøgler så tæt på den næste pay day som muligt, for at minimere tiden hvor din baker ikke baker.',
+            },
+        },
+        register: {
+            title: 'Opret a baker',
+        },
+        update: {
+            title: {
+                stake: 'Opdater baker stake',
+                pool: ' Opdater pulje indstillinger',
+                keys: 'Opdater baker keys',
+            },
+            noChanges: 'Transaktionen indeholder ikke nogen ændringer i forhold til de nuværende pulje indstillinger.',
+        },
+        details: {
+            heading: 'Din baker er registreret.',
+            amount: 'Baker stake',
+            restake: 'Fortjenester vil blive',
+            update: 'Opdater',
+            stop: 'Stop',
+            pending: 'Der ventes på at transaktionen bliver finalized',
+            failed: 'Transaktionen fejlede',
+        },
+        configure: {
+            restake: {
+                description:
+                    'Vil du gerne automatisk tilføje dine fortjenester som din baker stake?\n\nHvis du vælger ikke at indsætte dine fortjenester, vil de blive tilføjet til din offentlige saldo hver pay day.',
+                optionRestake: 'Ja, indsæt',
+                optionNoRestake: 'Nej, indsæt ikke',
+            },
+            amount: {
+                description: 'Indtast din ønskede delegation saldo',
+                amountLabel: 'Delegation saldo',
+                amountRequired: 'Du skal specificere en delegation saldo',
+                locked: 'Saldo låst',
+                lockedNote: 'Du kan ikke ændre saldoen mens der er en kommende ændring',
+                overStakeThresholdWarning:
+                    'Du er ved at låse mere end {{ threshold }}% af din totale saldo som din baker stake.\n\nHvis du ikke har nok ulåste CCD, vil du ikke kunne betale for transaktion omkostninger.',
+                enterNewStake: 'Indtast ny baker stake',
+            },
+            openForDelegation: {
+                description:
+                    'Du kan åbne en pulje for din baker, så andre kan delegere CCD til dig\n\nHvis du åbner en pulje, så vil andre kunne delegere CCD til din baker pulje\n\nDu kan også vælge ikke at åbne en pulje, hvis du kun ønsker at dine egne CCD bliver brugt til din baker',
+            },
+            commission: {
+                description:
+                    'Når du åbner en baker pulje, vil du tjene provision fra CCD som bliver delegated til din pulje fra andre konti:',
+            },
+            keys: {
+                save: 'Eksporter baker keys',
+                description:
+                    'Dine nye baker keys er blevet genereret. For at kunne fortsætte skal du eksportere og gemme dem. Nøglerne skal derefter tilføjes til baker noden.\n\nBEMÆRK: Udover at eksportere nøglerne sal du færdiggøre og indsende denne transaktion for at din konto bliver registreret som en baker.',
+                downloadedTitle: 'Bemærk',
+                downloaded:
+                    'Dine nøgler er blevet downloaded som "{{ fileName}}", du kan nu fortsætte og færdiggøre transaktionen',
+            },
+            metadataUrl: {
+                description:
+                    'Du kan tilføje en URL med metadata om din baker. Du kan efterlade den blank, hvis du ikke vil tilføje noget.',
+                label: 'Indtast metadata URL',
+                maxLength: 'MetadataUrl længde må ikke være mere end {{ maxLength }}',
+            },
+            warning: 'Advarsel',
+            continueButton: 'Fortsæt',
+        },
+    },
     accountPending: 'Denne konto er stadig ved at blive oprettet.',
     accountRejected: 'Denne konto kunne ikke blive oprettet.',
     request: 'Opret konto',

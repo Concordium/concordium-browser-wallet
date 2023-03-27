@@ -58,12 +58,6 @@ $transaction-receipt-horizontal-padding: rem(20px);
         width: rem(180px);
         overflow-wrap: break-word;
     }
-
-    &__scrollable-field {
-        width: 100%;
-        overflow: scroll;
-        text-align: center;
-    }
 }
 
 :where(.transaction-receipt) h5 {

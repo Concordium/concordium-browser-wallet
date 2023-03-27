@@ -14,7 +14,8 @@ import { ccdToMicroCcd, isDefined, microCcdToCcd, NotOptional } from 'wallet-com
 
 export type ConfigureBakerFlowState = {
     restake: boolean;
-    amount: string; // in CCD
+    /** In CCD */
+    amount: string;
     openForDelegation: OpenStatus;
     metadataUrl: string;
     commissionRates: Partial<CommissionRates>;

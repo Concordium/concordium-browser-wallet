@@ -2,7 +2,7 @@ import React, { ReactNode, useState } from 'react';
 import { Link, Route, Routes, useNavigate } from 'react-router-dom';
 
 import Carousel from '@popup/shared/Carousel';
-import { useTranslation } from 'react-i18next';
+import { Trans, useTranslation } from 'react-i18next';
 import Modal from '@popup/shared/Modal';
 import { ensureDefined } from '@shared/utils/basic-helpers';
 import { useSelectedAccountInfo } from '@popup/shared/AccountInfoListenerContext/AccountInfoListenerContext';
@@ -58,7 +58,9 @@ function PoolIntro() {
     const { t } = useTranslation('account', { keyPrefix: 'baking.updateIntro' });
     return (
         <Intro route={routes.pool}>
-            <IntroPage title={t('3.title')}>{t('3.body')}</IntroPage>
+            <IntroPage title={t('3.title')}>
+                <Trans>{t('3.body')}</Trans>
+            </IntroPage>
             <IntroPage title={t('4.title')}>{t('4.body')}</IntroPage>
         </Intro>
     );

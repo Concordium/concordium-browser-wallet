@@ -1,4 +1,4 @@
-import en from './en';
+import type en from './en';
 
 const t: typeof en = {
     form: {
@@ -80,13 +80,35 @@ const t: typeof en = {
         targetBaker: 'Bager {{bakerId}}',
         redelegate: 'Afkast vil blive',
         redelegateOption: 'tilføjet til delegeret mængde',
-        noRedelegateOption: 'tilføjet til offentligt balance',
+        noRedelegateOption: 'tilføjet til offentlig balance',
         changesTakesEffectOn: 'De følgende ændringer tager effekt d.\n{{ effectiveTime }}',
         pendingRemove: 'Delegeringen vil stoppe og den delegeret mængde vil blive frigjort til den offentlige balance.',
         pendingChange: 'Ny delegeret mængde',
     },
-    // TODO: translate
-    baking: en.baking,
+    baking: {
+        amount: 'Baker stake',
+        restake: 'Fortjenester vil blive',
+        restakeOption: 'Tilføjet til baker stake',
+        noRestakeOption: 'Tilføjet til offentlig balance',
+        openForDelegation: 'Pulje status',
+        openForAll: 'Åben for delegation',
+        closedForNew: 'Lukket for nye delegators',
+        closedForAll: 'Lukket for delegation',
+        electionKey: 'Election verify key',
+        signatureKey: 'Signature verify key',
+        aggregationKey: 'Aggregation verify key',
+        metadataUrl: 'Metadata URL',
+        noUrl: 'Ingen URL',
+        transactionCommission: 'Transaktionomkostning provision',
+        bakingCommission: 'Baking fortjeneste provision',
+        finalizationCommission: 'Finalization fortjeneste provision',
+        bakerId: 'Baker ID',
+        changesTakesEffectOn: 'De følgende ændringer tager effekt d.\n{{ effectiveTime }}',
+        pendingRemove:
+            'Denne konto vil blive fjernet som baker, og dens baker stake vil blive frigjort til den offentlige balance',
+        pendingChange: 'Baker stake vil blive reduceret til',
+        showKeys: 'Vis baker keys',
+    },
     tokenDetails: {
         balance: 'Saldo',
         description: 'Beskrivelse',
