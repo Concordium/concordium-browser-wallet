@@ -9,7 +9,7 @@ import { atom } from 'jotai';
 import { EventType } from '@concordium/browser-wallet-api-helpers';
 import { popupMessageHandler } from '@popup/shared/message-handler';
 import { HttpProvider, JsonRpcClient, ConcordiumGRPCClient, createConcordiumClient } from '@concordium/web-sdk';
-import { sessionCookie, storedCredentials } from '@shared/storage/access';
+import { sessionCookie, storedConnectedSites, storedCredentials } from '@shared/storage/access';
 import { GRPCTIMEOUT, mainnet } from '@shared/constants/networkConfiguration';
 import { atomWithChromeStorage } from './utils';
 import { selectedAccountAtom } from './account';
@@ -27,17 +27,49 @@ const storedNetworkConfigurationAtom = atomWithChromeStorage<NetworkConfiguratio
     ChromeStorageKey.NetworkConfiguration,
     mainnet
 );
-export const networkConfigurationAtom = atom<NetworkConfiguration, NetworkConfiguration>(
+export const networkConfigurationAtom = atom<NetworkConfiguration, NetworkConfiguration, Promise<void>>(
     (get) => get(storedNetworkConfigurationAtom),
-    (_, set, networkConfiguration) => {
-        set(storedNetworkConfigurationAtom, networkConfiguration);
+    async (_, set, networkConfiguration) => {
+        const credentials = await storedCredentials.get(networkConfiguration.genesisHash);
+
+        const networkPromise = set(storedNetworkConfigurationAtom, networkConfiguration);
+        const identityPromise = set(selectedIdentityIndexAtom, 0);
+
+        const selectedAccount = credentials?.length ? credentials[0]?.address : undefined;
+        const accountPromise = set(selectedAccountAtom, selectedAccount);
+
+        // Wait for all the derived state of a network change to be done before broadcasting
+        await Promise.all([networkPromise, identityPromise, accountPromise]);
+
+        const connectedSites = await storedConnectedSites.get();
+        const sortedConnectedSites = connectedSites
+            ? Object.entries(connectedSites).sort(([accountA], [accountB]) => {
+                  if (credentials === undefined) {
+                      return 0;
+                  }
+                  return (
+                      credentials.findIndex((c) => c.address === accountA) -
+                      credentials.findIndex((c) => c.address === accountB)
+                  );
+              })
+            : undefined;
+
         popupMessageHandler.broadcast(EventType.ChainChanged, networkConfiguration.genesisHash, {
             requireWhitelist: false,
+            nonWhitelistedTabCallback: (tab) => {
+                if (!tab.url) {
+                    return;
+                }
+
+                // If tab has any account connected, send account changed event, otherwise account disconnected.
+                const [firstConnectedAccount] = sortedConnectedSites?.[0] ?? [];
+                if (firstConnectedAccount) {
+                    popupMessageHandler.broadcastToUrl(EventType.AccountChanged, tab.url, firstConnectedAccount);
+                } else {
+                    popupMessageHandler.broadcastToUrl(EventType.AccountDisconnected, tab.url);
+                }
+            },
         });
-        set(selectedIdentityIndexAtom, 0);
-        storedCredentials
-            .get(networkConfiguration.genesisHash)
-            .then((creds) => set(selectedAccountAtom, creds?.length ? creds[0]?.address : undefined));
     }
 );
 

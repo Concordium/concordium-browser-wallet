@@ -175,7 +175,19 @@ export class ContentMessageHandler {
 }
 
 type BroadcastOptions = {
+    /**
+     * Disable whitelist requirement for broadcast method
+     *
+     * @example
+     * handler.broadcast(EventType.ChainChanged, undefined, {requireWhitelist: false});
+     */
     requireWhitelist?: boolean;
+    /**
+     * Callback to be run for each non-whitelisted tab. This runs even if whitelist is disabled.
+     *
+     * @example
+     * handler.broadcast(EventType.ChangeAccount, "1234", {nonWhitelistedTabCallback: (tab: chrome.tabs.Tab) => ...});
+     */
     nonWhitelistedTabCallback?(tab: chrome.tabs.Tab): void;
 };
 const defaultBroadcastOptions: BroadcastOptions = { requireWhitelist: true };
@@ -221,16 +233,12 @@ export class ExtensionsMessageHandler extends BaseMessageHandler<WalletMessage> 
         const optionsWithDefaults = { ...defaultBroadcastOptions, ...options };
         chrome.tabs
             .query({}) // get all
-            .then((ts) => {
-                if (!optionsWithDefaults.requireWhitelist) {
-                    return { valid: ts, invalid: [] };
-                }
-
-                return this.getWhitelistedTabs(ts).then((wl) => ({
-                    valid: wl,
+            .then((ts) =>
+                this.getWhitelistedTabs(ts).then((wl) => ({
+                    valid: optionsWithDefaults.requireWhitelist ? wl : ts,
                     invalid: ts.filter((t) => !wl.some((w) => w.id === t.id)),
-                }));
-            })
+                }))
+            )
             .then(({ valid, invalid }) => {
                 valid
                     .filter(({ id }) => id !== undefined)

@@ -20,17 +20,11 @@ export const storedConnectedSitesAtom = atomWithChromeStorage<Record<string, str
 );
 
 const storedAccountAtom = atomWithChromeStorage<string | undefined>(ChromeStorageKey.SelectedAccount, undefined);
-export const selectedAccountAtom = atom<string | undefined, string | undefined>(
+export const selectedAccountAtom = atom<string | undefined, string | undefined, Promise<void>>(
     (get) => get(storedAccountAtom),
-    (_, set, address) => {
-        set(storedAccountAtom, address);
-        popupMessageHandler.broadcast(EventType.AccountChanged, address, {
-            nonWhitelistedTabCallback: (tab: chrome.tabs.Tab) => {
-                if (tab.url) {
-                    popupMessageHandler.broadcastToUrl(EventType.AccountDisconnected, tab.url);
-                }
-            },
-        });
+    async (_, set, address) => {
+        await set(storedAccountAtom, address);
+        popupMessageHandler.broadcast(EventType.AccountChanged, address);
     }
 );
 
