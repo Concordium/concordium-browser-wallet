@@ -20,6 +20,8 @@ import { ChromeStorageKey, NetworkConfiguration } from '@shared/storage/types';
 import { buildURLwithSearchParameters } from '@shared/utils/url-helpers';
 import { getTermsAndConditionsConfig } from '@shared/utils/network-helpers';
 import { Buffer } from 'buffer/';
+import { BackgroundSendTransactionPayload } from '@shared/utils/types';
+import { parsePayload } from '@shared/utils/payload-helpers';
 import bgMessageHandler from './message-handler';
 import {
     forwardToPopup,
@@ -244,6 +246,21 @@ const ensureMessageWithSchemaParse: RunCondition<MessageStatusWrapper<undefined>
     }
 };
 
+/**
+ * Run condition for signMessage, which ensures the message is either a string,
+ * or a messageObject and in that case that the schema can be used to deserialize the message data.
+ */
+const ensureTransactionPayloadParse: RunCondition<MessageStatusWrapper<undefined>> = async (msg) => {
+    const payload = msg.payload as BackgroundSendTransactionPayload;
+
+    try {
+        parsePayload(payload.type, payload.payload, payload.parameters, payload.schema, payload.schemaVersion);
+    } catch (e) {
+        return { run: false, response: { success: false, message: `The given transaction is not valid due to: ${e}` } };
+    }
+    return { run: true };
+};
+
 // TODO change this to find most recently selected account
 /**
  * Finds the most prioritized account that is connected to the provided site.
@@ -385,7 +402,7 @@ forwardToPopup(
 forwardToPopup(
     MessageType.SendTransaction,
     InternalMessageType.SendTransaction,
-    runConditionComposer(runIfWhitelisted, withPromptStart),
+    runConditionComposer(runIfWhitelisted, ensureTransactionPayloadParse, withPromptStart),
     appendUrlToPayload,
     undefined,
     withPromptEnd

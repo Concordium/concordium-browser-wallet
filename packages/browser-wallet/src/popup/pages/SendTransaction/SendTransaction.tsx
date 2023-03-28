@@ -28,7 +28,7 @@ import {
 } from '@shared/utils/energy-helpers';
 import { calculateEnergyCost } from '@shared/utils/token-helpers';
 import { SmartContractParameters, SchemaWithContext } from '@concordium/browser-wallet-api-helpers';
-import { parsePayload } from './util';
+import { parsePayload } from '@shared/utils/payload-helpers';
 
 interface Location {
     state: {
