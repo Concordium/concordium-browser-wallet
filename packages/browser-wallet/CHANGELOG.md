@@ -1,5 +1,11 @@
 # Changelog
 
+## 0.9.11
+
+### Fixed
+
+-   No longer crashes when opening modals (Like token raw metadata)
+
 ## 0.9.10
 
 ### Changed

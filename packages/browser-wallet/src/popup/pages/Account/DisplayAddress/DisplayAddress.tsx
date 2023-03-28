@@ -1,8 +1,7 @@
 import CopyButton from '@popup/shared/CopyButton';
 import React from 'react';
 import { useTranslation } from 'react-i18next';
-import DisplayAsQR from 'wallet-common-helpers/src/components/DisplayAsQR';
-import DisplayAccountAddress, { AddressDisplayFormat } from 'wallet-common-helpers/src/components/DisplayAddress';
+import { DisplayAsQR, DisplayAddress as DisplayAccountAddress, AddressDisplayFormat } from 'wallet-common-helpers';
 import { useAtomValue } from 'jotai';
 import { selectedAccountAtom } from '@popup/store/account';
 
