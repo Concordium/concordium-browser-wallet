@@ -4,6 +4,7 @@
 
 ### Fixed
 
+-   Wallet crashing if sendTransaction contained parameters that could not be serialized. (The request is rejected instead)
 -   No longer crashes when opening modals (Like token raw metadata)
 
 ## 0.9.10
