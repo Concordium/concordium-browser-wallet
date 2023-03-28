@@ -76,7 +76,7 @@ if (accountAddress) {
 
 ### getSelectedChain
 
-Can be invoked to get the genesis hash of the chain selected in the wallet. The method returns a `Promise`, resolving with the genesis hash (as a hex string) of the selected chain, or undefined if the wallet is locked has not been set up by the user.
+This can be invoked to get the genesis hash of the chain selected in the wallet. The method returns a `Promise`, resolving with the genesis hash (as a hex string) of the selected chain, or undefined if the wallet is locked or has not been set up by the user.
 
 ```typescript
 const provider = await detectConcordiumProvider();
