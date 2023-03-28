@@ -9,7 +9,7 @@
 ### Fixed
 
 -   `chainChanged` event is correctly propagated to all (not just whitelisted) dapps listening for events through the wallet API.
--   When changing the selected chain internally in the wallet, dapps now receive `accountDisconnected` event if the account selected on the new chain is not whitelisted for the dapp.
+-   When changing the selected chain internally in the wallet, dapps now receive `accountChanged` event if an account on the new network has the dapp whitelisted, or `accountDisconnected` event if no account on the new network has the dapp whitelisted.
 
 ## 0.9.8
 
