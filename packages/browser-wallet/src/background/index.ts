@@ -247,8 +247,7 @@ const ensureMessageWithSchemaParse: RunCondition<MessageStatusWrapper<undefined>
 };
 
 /**
- * Run condition for signMessage, which ensures the message is either a string,
- * or a messageObject and in that case that the schema can be used to deserialize the message data.
+ * Run condition for sendTransaction, which ensures that the transaction can be parsed (including that parameters can be serialized).
  */
 const ensureTransactionPayloadParse: RunCondition<MessageStatusWrapper<undefined>> = async (msg) => {
     const payload = msg.payload as BackgroundSendTransactionPayload;
