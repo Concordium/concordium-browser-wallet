@@ -30,11 +30,10 @@ const storedNetworkConfigurationAtom = atomWithChromeStorage<NetworkConfiguratio
 export const networkConfigurationAtom = atom<NetworkConfiguration, NetworkConfiguration, Promise<void>>(
     (get) => get(storedNetworkConfigurationAtom),
     async (_, set, networkConfiguration) => {
-        const credentials = await storedCredentials.get(networkConfiguration.genesisHash);
-
         const networkPromise = set(storedNetworkConfigurationAtom, networkConfiguration);
         const identityPromise = set(selectedIdentityIndexAtom, 0);
 
+        const credentials = await storedCredentials.get(networkConfiguration.genesisHash);
         const selectedAccount = credentials?.length ? credentials[0]?.address : undefined;
         const accountPromise = set(selectedAccountAtom, selectedAccount);
 
