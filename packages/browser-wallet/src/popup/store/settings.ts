@@ -56,17 +56,18 @@ export const networkConfigurationAtom = atom<NetworkConfiguration, NetworkConfig
 
         popupMessageHandler.broadcast(EventType.ChainChanged, networkConfiguration.genesisHash, {
             requireWhitelist: false,
-            nonWhitelistedTabCallback: (tab) => {
-                if (!tab.url) {
+            nonWhitelistedTabCallback: ({ url }) => {
+                if (!url) {
                     return;
                 }
 
                 // If tab has any account connected, send account changed event, otherwise account disconnected.
-                const [firstConnectedAccount] = sortedConnectedSites?.[0] ?? [];
+                const [[firstConnectedAccount]] =
+                    sortedConnectedSites?.filter(([, sites]) => sites.includes(url)) ?? [];
                 if (firstConnectedAccount) {
-                    popupMessageHandler.broadcastToUrl(EventType.AccountChanged, tab.url, firstConnectedAccount);
+                    popupMessageHandler.broadcastToUrl(EventType.AccountChanged, url, firstConnectedAccount);
                 } else {
-                    popupMessageHandler.broadcastToUrl(EventType.AccountDisconnected, tab.url);
+                    popupMessageHandler.broadcastToUrl(EventType.AccountDisconnected, url);
                 }
             },
         });
