@@ -1,6 +1,6 @@
 /* eslint-disable @typescript-eslint/no-unused-vars */
 import { Atom, atom } from 'jotai';
-import { mapRecordValues } from 'wallet-common-helpers/src/utils/basicHelpers';
+import { mapRecordValues } from 'wallet-common-helpers';
 import { atomFamily } from 'jotai/utils';
 import { ChromeStorageKey, TokenIdAndMetadata, TokenMetadata, TokenStorage } from '@shared/storage/types';
 import { ContractBalances, getContractBalances } from '@shared/utils/token-helpers';

@@ -1,7 +1,6 @@
 import React from 'react';
 import { AccountTransactionPayload, AccountAddress, CcdAmount } from '@concordium/web-sdk';
-import DisplayAddress, { AddressDisplayFormat } from 'wallet-common-helpers/src/components/DisplayAddress';
-import { displayAsCcd } from 'wallet-common-helpers/lib/utils/ccd';
+import { displayAsCcd, DisplayAddress, AddressDisplayFormat } from 'wallet-common-helpers';
 
 interface Props {
     payload: AccountTransactionPayload;

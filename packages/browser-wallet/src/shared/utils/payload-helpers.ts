@@ -8,10 +8,14 @@ import {
     InitContractPayload,
     serializeInitContractParameters,
     serializeTypeValue,
+    DataBlob,
+    CcdAmount,
+    AccountAddress,
+    ModuleReference,
 } from '@concordium/web-sdk';
 import { Buffer } from 'buffer/';
-import { parse } from '@concordium/browser-wallet-api/src/util';
 import { SmartContractParameters, SchemaType, SchemaWithContext } from '@concordium/browser-wallet-api-helpers';
+import { serializationTypes } from '@concordium/browser-wallet-api/src/constants';
 
 export type HeadlessTransaction =
     | { type: AccountTransactionType.Update; payload: UpdateContractPayload }
@@ -25,6 +29,36 @@ export type HeadlessTransaction =
           payload: AccountTransactionPayload;
       };
 
+/**
+ * Parse that acts as an inverse for stringify from browser-wallet-api/utils
+ */
+export function parse(input: string | undefined) {
+    if (!input) {
+        return undefined;
+    }
+    return JSON.parse(input, (_, v) => {
+        if (v) {
+            switch (v['@type']) {
+                case serializationTypes.BigInt:
+                    return BigInt(v.value);
+                case serializationTypes.Date:
+                    return new Date(v.value);
+                case serializationTypes.CcdAmount:
+                    return new CcdAmount(BigInt(v.value));
+                case serializationTypes.AccountAddress:
+                    return new AccountAddress(v.value);
+                case serializationTypes.ModuleReference:
+                    return new ModuleReference(v.value);
+                case serializationTypes.DataBlob:
+                    return new DataBlob(Buffer.from(v.value, 'hex'));
+                default:
+                    return v;
+            }
+        }
+        return v;
+    });
+}
+
 export function parsePayload(
     type: AccountTransactionType,
     stringifiedPayload: string,
@@ -36,7 +70,8 @@ export function parsePayload(
 
     switch (type) {
         case AccountTransactionType.Update: {
-            const [contractName, functionName] = payload.receiveName.split('.');
+            const updatePayload = payload as UpdateContractPayload;
+            const [contractName, functionName] = updatePayload.receiveName.split('.');
 
             let parameter: Buffer;
             if (parameters === undefined || parameters === null || !schema) {
@@ -57,18 +92,19 @@ export function parsePayload(
             return {
                 type,
                 payload: {
-                    ...(payload as UpdateContractPayload),
+                    ...updatePayload,
                     message: parameter,
                 },
             };
         }
         case AccountTransactionType.InitContract: {
+            const initPayload = payload as InitContractPayload;
             let parameter: Buffer;
             if (parameters === undefined || parameters === null || !schema) {
                 parameter = Buffer.alloc(0);
             } else if (schema.type === SchemaType.Module) {
                 parameter = serializeInitContractParameters(
-                    payload.initName,
+                    initPayload.initName,
                     parameters,
                     Buffer.from(schema.value, 'base64'),
                     schemaVersion
@@ -81,7 +117,7 @@ export function parsePayload(
             return {
                 type,
                 payload: {
-                    ...(payload as InitContractPayload),
+                    ...initPayload,
                     param: parameter,
                 },
             };

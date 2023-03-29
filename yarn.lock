@@ -2018,7 +2018,7 @@ __metadata:
     tsconfig-paths-webpack-plugin: ^3.5.2
     typescript: ^4.3.5
     uuid: ^8.3.2
-    wallet-common-helpers: "https://github.com/Concordium/concordium-wallet-common-helpers.git#33f65c96e30baf165dd005bc58d261cfbf71118e"
+    wallet-common-helpers: "https://github.com/Concordium/concordium-wallet-common-helpers.git#744f6914608b61b884b84203de774111ff0178e1"
   languageName: unknown
   linkType: soft
 
@@ -2039,7 +2039,7 @@ __metadata:
   languageName: node
   linkType: hard
 
-"@concordium/common-sdk@npm:6.2.0, @concordium/common-sdk@npm:^6.2.0":
+"@concordium/common-sdk@npm:6.2.0":
   version: 6.2.0
   resolution: "@concordium/common-sdk@npm:6.2.0"
   dependencies:
@@ -2057,7 +2057,7 @@ __metadata:
   languageName: node
   linkType: hard
 
-"@concordium/common-sdk@npm:6.4.0, @concordium/common-sdk@npm:^6.4.0":
+"@concordium/common-sdk@npm:6.4.0, @concordium/common-sdk@npm:^6.3.0, @concordium/common-sdk@npm:^6.4.0":
   version: 6.4.0
   resolution: "@concordium/common-sdk@npm:6.4.0"
   dependencies:
@@ -22251,11 +22251,11 @@ __metadata:
   languageName: node
   linkType: hard
 
-"wallet-common-helpers@https://github.com/Concordium/concordium-wallet-common-helpers.git#33f65c96e30baf165dd005bc58d261cfbf71118e":
+"wallet-common-helpers@https://github.com/Concordium/concordium-wallet-common-helpers.git#744f6914608b61b884b84203de774111ff0178e1":
   version: 1.5.0
-  resolution: "wallet-common-helpers@https://github.com/Concordium/concordium-wallet-common-helpers.git#commit=33f65c96e30baf165dd005bc58d261cfbf71118e"
+  resolution: "wallet-common-helpers@https://github.com/Concordium/concordium-wallet-common-helpers.git#commit=744f6914608b61b884b84203de774111ff0178e1"
   dependencies:
-    "@concordium/common-sdk": ^6.2.0
+    "@concordium/common-sdk": ^6.3.0
     buffer: ^6.0.3
     cbor: ^8.0.0
     clsx: ^1.1.1
@@ -22264,7 +22264,7 @@ __metadata:
   peerDependencies:
     react: ">=16"
     react-dom: ">=16"
-  checksum: d382487092aca3a07102d4d3e2306b0ba1f4df9298a3dbdbe4b75b6bf87003c4f5cc68c5c540e78b35468ab90442f75fbd837da2c6046ff6a8357baa4965ebb8
+  checksum: c70afe4a8908e566cfea405d0755267d8a4a96a0cc92bfed0d1121b4d8c2a4f193a1fdf95c429fa4f3fdef6cb52ae5c62f55a2ed60ba20c2f27cc7cbac42bfda
   languageName: node
   linkType: hard
 

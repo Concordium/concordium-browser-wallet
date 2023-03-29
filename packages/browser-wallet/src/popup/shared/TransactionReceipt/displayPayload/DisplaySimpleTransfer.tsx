@@ -1,8 +1,7 @@
 import React from 'react';
 import { useTranslation } from 'react-i18next';
 import { SimpleTransferPayload } from '@concordium/web-sdk';
-import { displayAsCcd } from 'wallet-common-helpers/lib/utils/ccd';
-import DisplayAddress, { AddressDisplayFormat } from 'wallet-common-helpers/src/components/DisplayAddress';
+import { displayAsCcd, DisplayAddress, AddressDisplayFormat } from 'wallet-common-helpers';
 
 interface Props {
     payload: SimpleTransferPayload;

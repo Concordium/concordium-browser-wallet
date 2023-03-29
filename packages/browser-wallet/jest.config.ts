@@ -9,7 +9,6 @@ const config: Config.InitialOptions = {
         ...pathsToModuleNameMapper(tsconfig.compilerOptions.paths, { prefix: '<rootDir>/' }),
         '@concordium/web-sdk': '@concordium/common-sdk',
         '^uuid$': 'uuid',
-        'wallet-common-helpers': '<rootDir>/../../node_modules/wallet-common-helpers/lib/index.js',
     },
     transformIgnorePatterns: ['/node_modules/(?!@concordium/common-sdk)'],
     modulePaths: ['<rootDir>/../../node_modules', '<rootDir>/node_modules'],

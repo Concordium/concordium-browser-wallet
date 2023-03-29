@@ -3,7 +3,7 @@ import { useAtomValue, useSetAtom } from 'jotai';
 import { fullscreenPromptContext } from '@popup/page-layouts/FullscreenPromptLayout';
 import { useTranslation } from 'react-i18next';
 import { useLocation } from 'react-router-dom';
-import { AccountTransactionType, AccountAddress, SchemaVersion } from '@concordium/web-sdk';
+import { AccountTransactionType, AccountAddress } from '@concordium/web-sdk';
 import { usePrivateKey } from '@popup/shared/utils/account-helpers';
 import {
     sendTransaction,
@@ -27,20 +27,12 @@ import {
     SIMPLE_TRANSFER_ENERGY_TOTAL_COST,
 } from '@shared/utils/energy-helpers';
 import { calculateEnergyCost } from '@shared/utils/token-helpers';
-import { SmartContractParameters, SchemaWithContext } from '@concordium/browser-wallet-api-helpers';
-import { parsePayload } from './util';
+import { parsePayload } from '@shared/utils/payload-helpers';
+import { BackgroundSendTransactionPayload } from '@shared/utils/types';
 
 interface Location {
     state: {
-        payload: {
-            accountAddress: string;
-            type: AccountTransactionType;
-            payload: string;
-            parameters?: SmartContractParameters;
-            schema?: SchemaWithContext;
-            schemaVersion?: SchemaVersion;
-            url: string;
-        };
+        payload: BackgroundSendTransactionPayload;
     };
 }
 
