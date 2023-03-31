@@ -15,6 +15,7 @@ import { useNavigate } from 'react-router-dom';
 import { absoluteRoutes } from '@popup/constants/routes';
 import { NetworkConfiguration } from '@shared/storage/types';
 import { getNet } from '@shared/utils/network-helpers';
+import { saveData } from '@popup/shared/utils/file-helpers';
 
 type CredentialKeys = {
     threshold: number;
@@ -39,7 +40,7 @@ type ExportFormat = {
     value: AccountExport;
 };
 
-function createDownload(
+function createExport(
     address: string,
     credId: string,
     signKey: string,
@@ -71,7 +72,8 @@ function createDownload(
             address,
         },
     };
-    return URL.createObjectURL(new Blob([JSON.stringify(docContent)], { type: 'application/octet-binary' }));
+
+    return docContent;
 }
 
 export default function ExportPrivateKey() {
@@ -100,12 +102,8 @@ export default function ExportPrivateKey() {
     };
 
     const handleExport = () => {
-        chrome.downloads.download({
-            url: createDownload(selectedAccountAddress, credential.credId, privateKey, publicKey, network),
-            filename: `${selectedAccountAddress}.export`,
-            conflictAction: 'overwrite',
-            saveAs: true,
-        });
+        const data = createExport(selectedAccountAddress, credential.credId, privateKey, publicKey, network);
+        saveData(data, `${selectedAccountAddress}.export`);
     };
 
     function validateCurrentPasscode(): Validate<string> {

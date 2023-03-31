@@ -46,7 +46,7 @@
         text-align: center;
         padding: rem(10px) rem(5px);
         flex-grow: 1;
-        overflow: overlay;
+        overflow-y: overlay;
     }
 
     &__header {
@@ -79,17 +79,45 @@
         margin-bottom: auto;
         width: 75%;
     }
+}
 
-    &__amount-input {
-        margin: 0 rem(25px) calc($error-spacing + rem(1px)) rem(25px);
+.baking {
+    &__commissionField-slider {
+        margin-top: rem(10px);
+    }
 
-        &.form-input--invalid {
-            margin-bottom: rem(1px);
-        }
+    &__commissionField-label {
+        font-size: rem(8px);
+        color: $color-text;
+        font-weight: $font-weight-bold;
+        text-align: center;
+    }
+
+    &__commissionField-value {
+        color: $color-text-faded;
+        text-align: center;
+        margin-top: rem(5px);
+    }
+}
+
+.baking-update-menu {
+    min-height: 100%;
+    width: 100%;
+    background-color: $color-bg;
+    padding: 0 rem(10px);
+    display: block;
+
+    &__link {
+        display: block;
+        padding: rem(10px) 0;
     }
 }
 
 .earn-carousel {
+    strong {
+        font-weight: $font-weight-bold;
+    }
+
     &__title {
         position: relative;
         display: flex;
@@ -102,5 +130,15 @@
     &__back {
         position: fixed;
         left: rem(15px);
+    }
+}
+
+.earn {
+    &__amount-input {
+        margin: 0 rem(25px) calc($error-spacing + rem(1px)) rem(25px);
+
+        &.form-input--invalid {
+            margin-bottom: rem(1px);
+        }
     }
 }

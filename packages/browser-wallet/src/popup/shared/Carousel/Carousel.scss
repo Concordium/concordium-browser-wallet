@@ -19,14 +19,14 @@ $carousel-dots-height: rem(30px);
         margin-bottom: $carousel-content-margin;
         width: 100%;
         position: relative;
-        overflow: hidden;
+        overflow: visible;
     }
 
     &__page {
         position: absolute;
         height: 100%;
         width: 100%;
-        overflow: auto;
+        overflow: visible;
     }
 
     &__divider {
