@@ -61,8 +61,8 @@ export const networkConfigurationAtom = atom<NetworkConfiguration, NetworkConfig
                 }
 
                 // If tab has any account connected, send account changed event, otherwise account disconnected.
-                const [[firstConnectedAccount]] =
-                    sortedConnectedSites?.filter(([, sites]) => sites.includes(url)) ?? [];
+                const filtered = sortedConnectedSites?.filter(([, sites]) => sites.some((s) => url.startsWith(s)));
+                const firstConnectedAccount = filtered?.[0]?.[0];
                 if (firstConnectedAccount) {
                     popupMessageHandler.broadcastToUrl(EventType.AccountChanged, url, firstConnectedAccount);
                 } else {
