@@ -44,6 +44,7 @@ const t: typeof en = {
             invalid: 'Ugyldigt beløb',
             insufficient: 'Ikke nok penge',
             zero: 'Beløbet må ikke være nul',
+            exceedingDelegationCap: "delegeret mængde må ikke gå over valgt bager gruppe's loft på {{ max }}.",
         },
         transaction: {
             type: {
@@ -51,6 +52,7 @@ const t: typeof en = {
                 init: 'Opret Smart Contract Instans',
                 update: 'Opdater Smart Contract Instans',
                 registerData: 'Registrer data',
+                configureDelegation: 'Konfigurer delegering',
             },
         },
     },
@@ -65,8 +67,21 @@ const t: typeof en = {
             showTransfer: 'Vis overførslesdetaljer',
             showContract: 'Vis kontraktdetaljer',
         },
+        amount: 'Beløb',
         parameter: 'Parameter',
         noParameter: 'Ingen parametre',
+    },
+    delegation: {
+        amount: 'Delegeret mængde',
+        target: 'Mål',
+        targetPassive: 'Passiv delegering',
+        targetBaker: 'Bager {{bakerId}}',
+        redelegate: 'Afkast vil blive',
+        redelegateOption: 'tilføjet til delegeret mængde',
+        noRedelegateOption: 'tilføjet til offentligt balance',
+        changesTakesEffectOn: 'De følgende ændringer tager effekt d.\n{{ effectiveTime }}',
+        pendingRemove: 'Delegeringen vil stoppe og den delegeret mængde vil blive frigjort til den offentlige balance.',
+        pendingChange: 'Ny delegeret mængde',
     },
     tokenDetails: {
         balance: 'Saldo',

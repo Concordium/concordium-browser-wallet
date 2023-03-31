@@ -7,10 +7,13 @@ import { CommonFieldProps, RequiredUncontrolledFieldProps } from './common/types
 import { makeUncontrolled } from './common/utils';
 import ErrorMessage from './ErrorMessage';
 
-type Props = Pick<InputHTMLAttributes<HTMLInputElement>, 'className' | 'type' | 'value' | 'onChange' | 'onBlur'> &
+type Props = Pick<
+    InputHTMLAttributes<HTMLInputElement>,
+    'className' | 'type' | 'value' | 'onChange' | 'onBlur' | 'autoFocus'
+> &
     RequiredUncontrolledFieldProps<HTMLInputElement> &
     CommonFieldProps & {
-        onMax: () => void;
+        onMax?: () => void;
         symbol: string;
     };
 
@@ -40,9 +43,11 @@ export const AmountInput = forwardRef<HTMLInputElement, Props>(
                         spellCheck="false"
                         {...props}
                     />
-                    <Button onClick={onMax} className="form-amount-input__max">
-                        Max
-                    </Button>
+                    {onMax !== undefined && (
+                        <Button onClick={onMax} className="form-amount-input__max">
+                            Max
+                        </Button>
+                    )}
                 </div>
                 {label && <div className="form-input__label">{label}</div>}
                 {error ? (

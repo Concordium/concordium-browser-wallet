@@ -1,0 +1,10 @@
+.disabled-amount-input {
+    &__field {
+        text-align: center;
+        padding: 0.5rem;
+        color: $color-text-faded;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+    }
+}

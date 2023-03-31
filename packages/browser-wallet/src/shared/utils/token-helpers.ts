@@ -2,6 +2,7 @@ import { Buffer } from 'buffer/';
 import uleb128 from 'leb128/unsigned';
 import {
     AccountAddress,
+    calculateEnergyCost,
     CcdAmount,
     InstanceInfo,
     ConcordiumGRPCClient,
@@ -355,15 +356,6 @@ export async function fetchContractName(client: ConcordiumGRPCClient, index: big
         return undefined;
     }
     return getContractName(instanceInfo);
-}
-
-// TODO: export this from the SDK or add to helpers
-export function calculateEnergyCost(
-    signatureCount: bigint,
-    payloadSize: bigint,
-    transactionSpecificCost: bigint
-): bigint {
-    return 100n * signatureCount + 1n * (BigInt(32 + 8 + 8 + 4 + 8) + payloadSize) + transactionSpecificCost;
 }
 
 export async function getTokenTransferEnergy(

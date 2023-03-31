@@ -9,24 +9,24 @@ import { useLocation } from 'react-router-dom';
 import { useAsyncMemo } from 'wallet-common-helpers';
 import { fetchContractName, getTokenTransferParameters, getTokenTransferPayload } from '@shared/utils/token-helpers';
 import { TokenMetadata } from '@shared/storage/types';
-import ConfirmTransfer from './ConfirmTransfer';
+import ConfirmTransfer from '../ConfirmTransfer';
 
 interface Props {
     setDetailsExpanded: (expanded: boolean) => void;
     cost?: bigint;
 }
 
-interface State extends SimpleTransferPayload {
+export interface ConfirmTokenTransferState extends SimpleTransferPayload {
     contractIndex: string;
     tokenId: string;
     metadata: TokenMetadata;
-    executionEnergy: bigint;
+    executionEnergy: string;
 }
 
 export default function ConfirmTokenTransfer({ setDetailsExpanded, cost }: Props) {
     const { t } = useTranslation('account');
     const { state } = useLocation();
-    const { toAddress, amount, contractIndex, tokenId, executionEnergy, metadata } = state as State;
+    const { toAddress, amount, contractIndex, tokenId, executionEnergy, metadata } = state as ConfirmTokenTransferState;
     const selectedAddress = useAtomValue(selectedAccountAtom);
     const client = useAtomValue(grpcClientAtom);
     const addToast = useSetAtom(addToastAtom);
@@ -68,7 +68,6 @@ export default function ConfirmTokenTransfer({ setDetailsExpanded, cost }: Props
             cost={cost}
             payload={payload}
             parameters={parameters}
-            returnState={state}
             transactionType={AccountTransactionType.Update}
         />
     );

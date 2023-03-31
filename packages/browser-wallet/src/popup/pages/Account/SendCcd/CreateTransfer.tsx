@@ -46,6 +46,8 @@ import Img from '@popup/shared/Img';
 import { useBlockChainParameters } from '@popup/shared/BlockChainParametersProvider';
 import { routes } from './routes';
 import PickToken from './PickToken';
+import { ConfirmTokenTransferState } from './ConfirmTokenTransfer';
+import { ConfirmSimpleTransferState } from './ConfirmSimpleTransfer';
 
 export type FormValues = {
     amount: string;
@@ -88,7 +90,7 @@ function createDefaultValues(defaultPayload: State, accountTokens?: AccountToken
 function CreateTransaction({ tokens, setCost, setDetailsExpanded, cost }: Props & { tokens: Tokens }) {
     const { t } = useTranslation('account');
     const { t: tShared } = useTranslation('shared');
-    const { state } = useLocation();
+    const { state, pathname } = useLocation();
     const address = useAtomValue(selectedAccountAtom);
     const selectedCred = useSelectedCredential();
     const nav = useNavigate();
@@ -216,16 +218,28 @@ function CreateTransaction({ tokens, setCost, setDetailsExpanded, cost }: Props 
     }
 
     const onSubmit: SubmitHandler<FormValues> = (vs) => {
+        let nextRoute: string;
+        let currentState: ConfirmTokenTransferState | ConfirmSimpleTransferState;
+
         if (vs.token) {
             const payload = buildSimpleTransferPayload(
                 vs.recipient,
                 fractionalToInteger(vs.amount, getMetadataDecimals(vs.token.metadata))
             );
-            nav(routes.confirmToken, { state: { ...payload, ...vs.token, executionEnergy: vs.executionEnergy } });
+
+            currentState = {
+                ...payload,
+                ...vs.token,
+                executionEnergy: vs.executionEnergy,
+            };
+            nextRoute = routes.confirmToken;
         } else {
-            const payload = buildSimpleTransferPayload(vs.recipient, ccdToMicroCcd(vs.amount));
-            nav(routes.confirm, { state: { ...payload } });
+            currentState = buildSimpleTransferPayload(vs.recipient, ccdToMicroCcd(vs.amount));
+            nextRoute = routes.confirm;
         }
+
+        nav(pathname, { state: currentState, replace: true }); // Ensures next route can move back to UI with previous values.
+        nav(nextRoute, { state: currentState });
     };
 
     if (pickingToken) {

@@ -1,6 +1,6 @@
-$carousel-content-margin: rem(20px);
+$carousel-content-margin: rem(10px);
 $carousel-divider-height: rem(1px);
-$carousel-dots-height: rem(40px);
+$carousel-dots-height: rem(30px);
 
 .carousel {
     display: flex;
@@ -19,6 +19,7 @@ $carousel-dots-height: rem(40px);
         margin-bottom: $carousel-content-margin;
         width: 100%;
         position: relative;
+        overflow: hidden;
     }
 
     &__page {
@@ -62,5 +63,11 @@ $carousel-dots-height: rem(40px);
     &__actions {
         width: 100%;
         padding: 0 rem(20px);
+    }
+
+    &__back {
+        position: absolute;
+        left: rem(5px);
+        top: rem(-5px);
     }
 }

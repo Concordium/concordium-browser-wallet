@@ -261,8 +261,7 @@ $handle-scale: scale(1.02);
     }
 
     &__symbol {
-        margin-bottom: 0;
-        margin-top: rem(1px);
+        margin: 0;
         margin-right: rem(2px);
     }
 
@@ -275,5 +274,57 @@ $handle-scale: scale(1.02);
         height: rem(15px) !important;
         min-height: rem(15px) !important;
         padding: 0 rem(5px) !important;
+    }
+}
+
+.form-radios {
+    display: flex;
+    flex-direction: column;
+
+    &__options {
+        display: flex;
+        flex-direction: row;
+        border-radius: rem(5px);
+        box-shadow: 0 0 0 1px $color-grey inset;
+        padding: rem(2px);
+    }
+
+    @include when-invalid {
+        .form-radios__options & {
+            box-shadow: 0 0 0 2px $color-error inset;
+            color: $color-error;
+        }
+    }
+
+    &__radio {
+        flex: 1;
+        box-shadow: none !important;
+        text-align: center;
+        display: inline-block;
+        width: 100%;
+        cursor: pointer;
+
+        div {
+            padding: rem(4px) rem(2px);
+        }
+
+        input {
+            @include hide-input;
+
+            &:checked + div {
+                background-color: $color-cta;
+                color: $color-white;
+            }
+        }
+
+        &:first-child div {
+            border-top-left-radius: rem(4px);
+            border-bottom-left-radius: rem(4px);
+        }
+
+        &:last-child div {
+            border-top-right-radius: rem(4px);
+            border-bottom-right-radius: rem(4px);
+        }
     }
 }

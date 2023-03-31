@@ -1,13 +1,6 @@
 $horizontal-spacing: rem(10px);
 $error-spacing: rem(13.286px);
 
-.send-ccd {
-    &__receipt {
-        margin: rem(20px);
-        width: calc(100% - rem(60px));
-    }
-}
-
 .create-transfer {
     &__cost,
     &__pick-token-element,

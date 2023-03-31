@@ -65,6 +65,7 @@ body {
         --color-highlight-testnet: #{$color-highlight-testnet-dark};
         --color-main-header: #{$color-main-header-dark};
         --color-disabled-input-bg: #{$color-main-header-dark};
+        --color-status-box: #{$color-status-box-dark};
 
         .bg {
             background-image: url('../assets/images/bg-dark.jpg');
