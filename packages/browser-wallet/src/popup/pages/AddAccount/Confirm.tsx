@@ -5,7 +5,7 @@ import { useNavigate } from 'react-router-dom';
 import IdCard from '@popup/shared/IdCard';
 import { identityProvidersAtom, selectedIdentityAtom } from '@popup/store/identity';
 import { credentialsAtom, creatingCredentialRequestAtom } from '@popup/store/account';
-import { jsonRpcClientAtom, networkConfigurationAtom } from '@popup/store/settings';
+import { grpcClientAtom, networkConfigurationAtom } from '@popup/store/settings';
 import { CreationStatus, WalletCredential } from '@shared/storage/types';
 import Button from '@popup/shared/Button';
 import ArrowIcon from '@assets/svg/arrow.svg';
@@ -28,7 +28,7 @@ export default function Confirm() {
     const selectedIdentity = useAtomValue(selectedIdentityAtom);
     const credentials = useAtomValue(credentialsAtom);
     const network = useAtomValue(networkConfigurationAtom);
-    const client = useAtomValue(jsonRpcClientAtom);
+    const client = useAtomValue(grpcClientAtom);
     const providers = useAtomValue(identityProvidersAtom);
     const addToast = useSetAtom(addToastAtom);
     const seedPhrase = useDecryptedSeedPhrase((e) => addToast(e.message));
@@ -58,8 +58,6 @@ export default function Confirm() {
             const global = await getGlobal(client);
 
             // Make request
-            const expiry = Math.floor(Date.now() / 1000) + 720;
-
             const credsOfCurrentIdentity = credentials.filter(isIdentityOfCredential(selectedIdentity));
             const credNumber = getNextEmptyCredNumber(credsOfCurrentIdentity);
 
@@ -75,7 +73,6 @@ export default function Confirm() {
                     revealedAttributes: [],
                     identityIndex: selectedIdentity.index,
                     credNumber,
-                    expiry,
                 }
             );
             if (response.status === BackgroundResponseStatus.Success) {

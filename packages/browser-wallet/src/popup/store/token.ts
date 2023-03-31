@@ -6,7 +6,7 @@ import { ChromeStorageKey, TokenIdAndMetadata, TokenMetadata, TokenStorage } fro
 import { ContractBalances, getContractBalances } from '@shared/utils/token-helpers';
 import { addToastAtom } from '@popup/state';
 import { AsyncWrapper, atomWithChromeStorage } from './utils';
-import { jsonRpcClientAtom } from './settings';
+import { grpcClientAtom } from './settings';
 import { selectedAccountAtom } from './account';
 
 export const storedTokensAtom = atomWithChromeStorage<Record<string, Record<string, TokenStorage[]>>>(
@@ -122,7 +122,7 @@ const cbf = atomFamily<string, Atom<ContractBalances>>((identifier: string) => {
     const derivedAtom = atom<ContractBalances, void, Promise<void>>(
         (get) => get(baseAtom),
         async (get, set) => {
-            const client = get(jsonRpcClientAtom);
+            const client = get(grpcClientAtom);
             const tokens = get(accountTokensFamily(accountAddress));
 
             const tokenIds = tokens.value[contractIndex]?.map((t) => t.id) ?? [];

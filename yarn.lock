@@ -1931,6 +1931,8 @@ __metadata:
   dependencies:
     "@concordium/browser-wallet-api-helpers": "workspace:^"
     "@concordium/common-sdk": ^6.4.0
+    "@protobuf-ts/grpcweb-transport": ^2.8.2
+    "@protobuf-ts/runtime-rpc": ^2.8.2
     "@types/json-bigint": ^1.0.1
     buffer: ^6.0.3
     json-bigint: ^1.0.0
@@ -2022,29 +2024,14 @@ __metadata:
   languageName: unknown
   linkType: soft
 
-"@concordium/common-sdk@npm:6.0.0":
-  version: 6.0.0
-  resolution: "@concordium/common-sdk@npm:6.0.0"
+"@concordium/common-sdk@npm:6.3.0":
+  version: 6.3.0
+  resolution: "@concordium/common-sdk@npm:6.3.0"
   dependencies:
-    "@concordium/rust-bindings": 0.7.0
+    "@concordium/rust-bindings": 0.10.0
+    "@grpc/grpc-js": ^1.3.4
     "@noble/ed25519": ^1.7.1
-    "@scure/bip39": ^1.1.0
-    bs58check: ^2.1.2
-    buffer: ^6.0.3
-    cross-fetch: 3.1.5
-    hash.js: ^1.1.7
-    json-bigint: ^1.0.0
-    uuid: ^8.3.2
-  checksum: 7d3d02d7713e6f4673994cb7ef1ba0cce5ab8d06ed86454b0f684fc53c69326e2aa89c0755aba3ef4289e7f2bf438752fa9697eeb70e680af78e0b1999eace20
-  languageName: node
-  linkType: hard
-
-"@concordium/common-sdk@npm:6.2.0":
-  version: 6.2.0
-  resolution: "@concordium/common-sdk@npm:6.2.0"
-  dependencies:
-    "@concordium/rust-bindings": 0.9.0
-    "@noble/ed25519": ^1.7.1
+    "@protobuf-ts/runtime-rpc": ^2.8.2
     "@scure/bip39": ^1.1.0
     bs58check: ^2.1.2
     buffer: ^6.0.3
@@ -2053,7 +2040,7 @@ __metadata:
     iso-3166-1: ^2.1.1
     json-bigint: ^1.0.0
     uuid: ^8.3.2
-  checksum: be2b3b10d05349dd0df1ab78e19addd9da8b2e0bfaa482beaaa54eafab8e656c9cc393cd2f52eaba7aa4c53d21b48332ef6fa4625acb411111cfb59a5c515832
+  checksum: 6ce6e130bce8f3011b00a37e7429a5e19d4b21c21918e3ba8fb0438af841ec9a78d9de5eb9aa277d42154d6784dd182aed9198f92826b3b124fc59dbf5d30078
   languageName: node
   linkType: hard
 
@@ -2088,24 +2075,17 @@ __metadata:
   languageName: node
   linkType: hard
 
+"@concordium/rust-bindings@npm:0.10.0":
+  version: 0.10.0
+  resolution: "@concordium/rust-bindings@npm:0.10.0"
+  checksum: f09c754080fe7e026308342e0139e18de72e68ced8228d80c34d873c065a93e2774015da33ee3f970f33f97916526a43f54a410e42451137cffa3ccbe7e660a3
+  languageName: node
+  linkType: hard
+
 "@concordium/rust-bindings@npm:0.11.0":
   version: 0.11.0
   resolution: "@concordium/rust-bindings@npm:0.11.0"
   checksum: a6c437cb782b7b2e9f217215dd4dbed9ffb8b3ef46fa307952aca3ae8f166cb96687de64efd18490aec7e86d58712dccb7d1a8bf63c151e3ed2a0170f066cd6d
-  languageName: node
-  linkType: hard
-
-"@concordium/rust-bindings@npm:0.7.0":
-  version: 0.7.0
-  resolution: "@concordium/rust-bindings@npm:0.7.0"
-  checksum: b9d7bc1557673f276e002b1bcd6651e77262f496a641ff4ba16eceb0d637df631c2b73ea5de412c42d3ae4c92325f71e9030352bf1cbb7c4412a14f93d2b358d
-  languageName: node
-  linkType: hard
-
-"@concordium/rust-bindings@npm:0.9.0":
-  version: 0.9.0
-  resolution: "@concordium/rust-bindings@npm:0.9.0"
-  checksum: d69b264819a718e7073961a1c68da6a766e2360cfb7ea3b988cf7e854f79a3cda4fda70ceed2e4651ed1af127bc817a345f6d7397d648278930eb95f6309626a
   languageName: node
   linkType: hard
 
@@ -2120,27 +2100,17 @@ __metadata:
   languageName: node
   linkType: hard
 
-"@concordium/web-sdk@npm:^3.0.0":
-  version: 3.0.0
-  resolution: "@concordium/web-sdk@npm:3.0.0"
+"@concordium/web-sdk@npm:^3.3.1":
+  version: 3.3.1
+  resolution: "@concordium/web-sdk@npm:3.3.1"
   dependencies:
-    "@concordium/common-sdk": 6.0.0
-    "@concordium/rust-bindings": 0.7.0
+    "@concordium/common-sdk": 6.3.0
+    "@concordium/rust-bindings": 0.10.0
+    "@grpc/grpc-js": ^1.3.4
+    "@protobuf-ts/grpcweb-transport": ^2.8.2
     buffer: ^6.0.3
     process: ^0.11.10
-  checksum: 3495bc3d4d10a84c8209902643dd45558a3a6847e26b19948a4401b6186fa38503699e4940dfae3fa88c7e0a2cce2137aa60797d21db4aff8378d195bbfc39a8
-  languageName: node
-  linkType: hard
-
-"@concordium/web-sdk@npm:^3.2.0":
-  version: 3.2.0
-  resolution: "@concordium/web-sdk@npm:3.2.0"
-  dependencies:
-    "@concordium/common-sdk": 6.2.0
-    "@concordium/rust-bindings": 0.9.0
-    buffer: ^6.0.3
-    process: ^0.11.10
-  checksum: e61bbfcca07e7d63035667324395d1f6bec2a7c17a0a2bab85d12b9ed3bf3203155ba9c0aa3df2fdf0c57e036d9fa1479ffa8399d7b08daf0edb4f14c9a5cb37
+  checksum: a7be99af72d605ecbb874a7098b5cea2b5bd42b51899bc9a02ef6c95c4fd184898a19ed6b4745a8ea92deea41b998e529a0e1e83ade7c290fd697e4f7dc618b6
   languageName: node
   linkType: hard
 
@@ -2303,12 +2273,12 @@ __metadata:
   linkType: hard
 
 "@grpc/grpc-js@npm:^1.3.4":
-  version: 1.8.12
-  resolution: "@grpc/grpc-js@npm:1.8.12"
+  version: 1.8.11
+  resolution: "@grpc/grpc-js@npm:1.8.11"
   dependencies:
     "@grpc/proto-loader": ^0.7.0
     "@types/node": ">=12.12.47"
-  checksum: bf6135f8c87d6008f42452a7234b9bfa4bb558dd553a77dcd90cd2fbc9c8f01585504788e479a2805e4ab5f0d4e6d3480f7096324b3ab5db9e492e674b8c375a
+  checksum: b2ff645ac3a10f8f6ae380945dff2ef2faf2be118b3e7870efecaf2b9a601ab8a4f00d297c3e3f83665a4c5584a9948da336a9df81debb73e5172683bc674c3c
   languageName: node
   linkType: hard
 
@@ -3187,21 +3157,28 @@ __metadata:
   linkType: hard
 
 "@protobuf-ts/grpcweb-transport@npm:^2.8.2":
-  version: 2.8.3
-  resolution: "@protobuf-ts/grpcweb-transport@npm:2.8.3"
+  version: 2.8.2
+  resolution: "@protobuf-ts/grpcweb-transport@npm:2.8.2"
   dependencies:
-    "@protobuf-ts/runtime": ^2.8.3
-    "@protobuf-ts/runtime-rpc": ^2.8.3
-  checksum: 22b748e6e4f218bc86023bd9a180279ed7fbccc1169c93ab382a94b22868cbfc823eecb84e38213930206f2e78eb2913d4b7e2fabc479388496db7f00112c602
+    "@protobuf-ts/runtime": ^2.8.2
+    "@protobuf-ts/runtime-rpc": ^2.8.2
+  checksum: c579ab87c5d20ae815fcd8ad59326fd36337cd35118dbecdfada8951efa9eeffffbc54052d4132b98615dd9c23c860b90f210ad538ab7b228b484645f7121ee9
   languageName: node
   linkType: hard
 
-"@protobuf-ts/runtime-rpc@npm:^2.8.2, @protobuf-ts/runtime-rpc@npm:^2.8.3":
+"@protobuf-ts/runtime-rpc@npm:^2.8.2":
   version: 2.8.3
   resolution: "@protobuf-ts/runtime-rpc@npm:2.8.3"
   dependencies:
     "@protobuf-ts/runtime": ^2.8.3
   checksum: 9b6124abde33669ba87f15f921d6fcc60d09cfd2ffcbdda257e791edbd5be0c66f682ac207843f5841ba829354ec86664c627a4c2cdce3525f4cf9e3db8fdbdf
+  languageName: node
+  linkType: hard
+
+"@protobuf-ts/runtime@npm:^2.8.2":
+  version: 2.8.2
+  resolution: "@protobuf-ts/runtime@npm:2.8.2"
+  checksum: ab322e832bfb347b271a8862b8ef3db27ffa380f9c49f94acb410534586a282ebd8af96d4459f959ad0fe5fbf34183f3f4fe512e50c9a4331b742a7445b16c92
   languageName: node
   linkType: hard
 
@@ -5635,9 +5612,9 @@ __metadata:
   linkType: hard
 
 "@types/node@npm:>=12.12.47, @types/node@npm:>=13.7.0":
-  version: 18.15.5
-  resolution: "@types/node@npm:18.15.5"
-  checksum: 5fbf3453bd5ce1402bb2964e55d928fc8a8a7de5451b1b0fe66587fecb8a3eb86854ca9cefa5076a5971e2cff00e1773ceeb5d872a54f6c6ddfbbc1064b4e91a
+  version: 18.14.2
+  resolution: "@types/node@npm:18.14.2"
+  checksum: 53c07e721f6ae33de71306f6a0b75dae6066a4f55bd5484c93bd59ff25f0c5f004ceafeef509a4d0cb9e24a247efc34d50489bcc1b05a53ecc68e2fc088e65cb
   languageName: node
   linkType: hard
 
@@ -6762,7 +6739,7 @@ __metadata:
   resolution: "NFT-Minting@workspace:examples/nft-minting"
   dependencies:
     "@concordium/browser-wallet-api-helpers": "workspace:^"
-    "@concordium/web-sdk": ^3.0.0
+    "@concordium/web-sdk": ^3.3.1
     "@craftamap/esbuild-plugin-html": ^0.4.0
     "@types/react": ^18.0.9
     "@types/react-dom": ^18.0.5
@@ -10205,7 +10182,7 @@ __metadata:
   resolution: "e_sealing@workspace:examples/eSealing"
   dependencies:
     "@concordium/react-components": ^0.2.0
-    "@concordium/web-sdk": ^3.2.0
+    "@concordium/web-sdk": ^3.3.1
     "@craftamap/esbuild-plugin-html": ^0.4.0
     "@thi.ng/leb128": ^2.1.18
     "@types/node": ^18.7.23
@@ -17578,7 +17555,7 @@ __metadata:
   resolution: "piggybank@workspace:examples/piggybank"
   dependencies:
     "@concordium/browser-wallet-api-helpers": "workspace:^"
-    "@concordium/web-sdk": ^3.0.0
+    "@concordium/web-sdk": ^3.3.1
     "@craftamap/esbuild-plugin-html": ^0.4.0
     "@types/react": ^18.0.9
     "@types/react-dom": ^18.0.5
@@ -21495,7 +21472,7 @@ __metadata:
   version: 0.0.0-use.local
   resolution: "two-step-transfer@workspace:examples/two-step-transfer"
   dependencies:
-    "@concordium/web-sdk": ^3.2.0
+    "@concordium/web-sdk": ^3.3.1
     live-server: ^1.2.2
   languageName: unknown
   linkType: soft
@@ -22193,7 +22170,7 @@ __metadata:
   resolution: "voting@workspace:examples/voting"
   dependencies:
     "@concordium/browser-wallet-api-helpers": ^2.0.0
-    "@concordium/web-sdk": ^3.0.0
+    "@concordium/web-sdk": ^3.3.1
     "@types/node": ^18.7.23
     "@types/react": ^18.0.9
     "@types/react-dom": ^18.0.5
@@ -22318,7 +22295,7 @@ __metadata:
   resolution: "wccd@workspace:examples/wCCD"
   dependencies:
     "@concordium/react-components": ^0.2.0
-    "@concordium/web-sdk": ^3.2.0
+    "@concordium/web-sdk": ^3.3.1
     "@craftamap/esbuild-plugin-html": ^0.4.0
     "@thi.ng/leb128": ^2.1.18
     "@types/node": ^18.7.23

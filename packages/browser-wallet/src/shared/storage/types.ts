@@ -166,6 +166,8 @@ export interface EncryptedData {
 }
 
 export interface NetworkConfiguration {
+    grpcUrl: string;
+    grpcPort: number;
     genesisHash: string;
     name: string;
     jsonRpcUrl: string;

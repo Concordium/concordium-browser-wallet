@@ -8,6 +8,7 @@ import type {
     UpdateContractPayload,
     IdStatement,
     IdProofOutput,
+    ConcordiumGRPCClient,
 } from '@concordium/web-sdk';
 
 export type SendTransactionPayload =
@@ -114,7 +115,16 @@ interface MainWalletApi {
 
     removeAllListeners(event?: EventType | string | undefined): this;
 
+    /**
+     * @deprecated use { @link getGrpcClient} instead
+     */
     getJsonRpcClient(): JsonRpcClient;
+
+    /**
+     * Returns a gRPC client that is connected to the node that the wallet is.
+     * Note that any calls will throw an error, if the site is not connected with the wallet.
+     */
+    getGrpcClient(): ConcordiumGRPCClient;
 
     /**
      * Request that the user adds the specified tokens for a given contract to the wallet.

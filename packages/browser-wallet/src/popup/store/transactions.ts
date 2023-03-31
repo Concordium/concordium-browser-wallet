@@ -12,7 +12,7 @@ import { accountsAtom, selectedAccountAtom } from './account';
 import { atomWithChromeStorage } from './utils';
 import { networkConfigurationAtom } from './settings';
 
-const TRANSACTION_CHECK_INTERVAL = ACCOUNT_INFO_RETRIEVAL_INTERVAL_MS * 2;
+const TRANSACTION_CHECK_INTERVAL = ACCOUNT_INFO_RETRIEVAL_INTERVAL_MS;
 const TRANSACTION_MONITOR_START_DELAY = 3000;
 
 const monitoredMap: Record<string, string[]> = {};
@@ -68,11 +68,11 @@ const pendingTransactionsAtom = (() => {
 
     const derived = atom<BrowserWalletAccountTransaction[], BrowserWalletAccountTransaction[], Promise<void>>(
         (get) => get(parsedAtom),
-        async (get, set, update) => {
+        async (get, set, transactions) => {
             const parsed = get(parsedAtom);
-            const pending = [...parsed, ...update];
+            const pending = [...parsed, ...transactions];
 
-            if (update.length > 0) {
+            if (transactions.length > 0) {
                 await set(parsedAtom, pending);
             }
 
@@ -134,7 +134,7 @@ const pendingTransactionsFamily = atomFamily<
 >((address) =>
     atom(
         (get) => get(pendingTransactionsAtom).filter(isForAccount(address)),
-        (_, set, arg) => set(pendingTransactionsAtom, arg)
+        (_, set, transactions) => set(pendingTransactionsAtom, transactions)
     )
 );
 

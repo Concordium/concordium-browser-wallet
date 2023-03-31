@@ -3,7 +3,7 @@ import { networkConfigurationAtom } from '@popup/store/settings';
 import { useAtomValue } from 'jotai';
 import { useMemo } from 'react';
 import { identitiesAtom } from '@popup/store/identity';
-import { ConcordiumHdWallet } from '@concordium/web-sdk';
+import { AccountInfo, ConcordiumHdWallet } from '@concordium/web-sdk';
 import { WalletCredential } from '@shared/storage/types';
 import { getNet } from '@shared/utils/network-helpers';
 import { isIdentityOfCredential } from '@shared/utils/identity-helpers';
@@ -100,3 +100,7 @@ export function usePublicKey(accountAddress: string | undefined): string | undef
 export function getNextEmptyCredNumber(creds: WalletCredential[]) {
     return getNextUnused(creds.map((cred) => cred.credNumber));
 }
+
+export type WithAccountInfo = {
+    accountInfo: AccountInfo;
+};

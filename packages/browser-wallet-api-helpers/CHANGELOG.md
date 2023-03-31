@@ -1,5 +1,15 @@
 # Changelog
 
+## Unreleased
+
+### Added
+
+-   Added `getGrpcClient` entrypoint to access grpc-web client.
+
+### Deprecated
+
+-   `getJsonRpcClient` in favor of the new `getGrpcClient`.
+
 ## 2.4.0
 
 ### Added

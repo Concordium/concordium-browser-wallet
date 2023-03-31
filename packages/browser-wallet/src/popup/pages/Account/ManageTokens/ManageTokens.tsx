@@ -8,7 +8,7 @@ import { useUpdateEffect } from 'wallet-common-helpers';
 import Form from '@popup/shared/Form';
 import FormInput from '@popup/shared/Form/Input';
 import Submit from '@popup/shared/Form/Submit';
-import { jsonRpcClientAtom } from '@popup/store/settings';
+import { grpcClientAtom } from '@popup/store/settings';
 import { confirmCIS2Contract, ContractDetails, ContractTokenDetails } from '@shared/utils/token-helpers';
 import TokenDetails from '@popup/shared/TokenDetails';
 import { selectedAccountAtom } from '@popup/store/account';
@@ -44,7 +44,7 @@ function ChooseContract() {
         defaultValues: { contractIndex: contractDetails?.index?.toString() },
     });
     const contractIndexValue = form.watch('contractIndex');
-    const client = useAtomValue(jsonRpcClientAtom);
+    const client = useAtomValue(grpcClientAtom);
     const nav = useNavigate();
     const validContract = useRef<{ details: ContractDetails; tokens: FetchTokensResponse } | undefined>();
     const account = ensureDefined(useAtomValue(selectedAccountAtom), 'No account has been selected');

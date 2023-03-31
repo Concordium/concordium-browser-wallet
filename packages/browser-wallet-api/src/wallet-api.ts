@@ -24,41 +24,36 @@ import {
 } from '@concordium/browser-wallet-api-helpers';
 import EventEmitter from 'events';
 import type { JsonRpcRequest } from '@concordium/common-sdk/lib/providers/provider';
+import { IdProofOutput, IdStatement } from '@concordium/common-sdk/lib/idProofTypes';
+import ConcordiumGRPCClient from '@concordium/common-sdk/lib/GRPCClient';
 import JSONBig from 'json-bigint';
-import { IdProofOutput, IdStatement } from '@concordium/common-sdk';
 import { stringify } from './util';
-
-type JsonRpcCallResponse =
-    | {
-          success: true;
-          response: string;
-      }
-    | {
-          success: false;
-          error: string;
-      };
+import { BWGRPCTransport } from './gRPC-transport';
 
 class WalletApi extends EventEmitter implements IWalletApi {
     private messageHandler = new InjectedMessageHandler();
 
     private jsonRpcClient: JsonRpcClient;
 
+    private grpcClient: ConcordiumGRPCClient;
+
     constructor() {
         super();
         // We pre-serialize the parameters before sending to the background script.
         const request = (...input: Parameters<JsonRpcRequest>) =>
             this.messageHandler
-                .sendMessage<JsonRpcCallResponse>(MessageType.JsonRpcRequest, {
+                .sendMessage<MessageStatusWrapper<string>>(MessageType.JsonRpcRequest, {
                     method: input[0],
                     params: JSONBig.stringify(input[1]),
                 })
                 .then((result) => {
                     if (!result.success) {
-                        throw new Error(result.error);
+                        throw new Error(result.message);
                     }
-                    return result.response;
+                    return result.result;
                 });
         this.jsonRpcClient = new JsonRpcClient({ request });
+        this.grpcClient = new ConcordiumGRPCClient(new BWGRPCTransport(this.messageHandler));
 
         // Set up message handlers to emit events.
         Object.values(EventType).forEach((eventType) => this.handleEvent(eventType));
@@ -181,6 +176,10 @@ class WalletApi extends EventEmitter implements IWalletApi {
 
     public getJsonRpcClient(): JsonRpcClient {
         return this.jsonRpcClient;
+    }
+
+    public getGrpcClient(): ConcordiumGRPCClient {
+        return this.grpcClient;
     }
 
     public async addCIS2Tokens(

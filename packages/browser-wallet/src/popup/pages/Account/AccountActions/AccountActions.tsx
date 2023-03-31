@@ -11,6 +11,7 @@ import SendIcon from '@assets/svg/paperplane.svg';
 import TokenIcon from '@assets/svg/tokens.svg';
 import ReceiveIcon from '@assets/svg/qr.svg';
 import SettingsIcon from '@assets/svg/cog.svg';
+import EarnIcon from '@assets/svg/earn.svg';
 import TabBar from '@popup/shared/TabBar';
 import { accountRoutes } from '../routes';
 import { accountPageContext } from '../utils';
@@ -19,9 +20,10 @@ const SCROLL_LIMIT = 5;
 
 type ActionLinksProps = {
     children: ReactNode[];
+    disabled: boolean;
 };
 
-function ActionLinks({ children }: ActionLinksProps) {
+function ActionLinks({ children, disabled }: ActionLinksProps) {
     const linksRef = useRef<HTMLDivElement>(null);
     const links = Children.count(children);
     const canScroll = links > SCROLL_LIMIT;
@@ -37,7 +39,7 @@ function ActionLinks({ children }: ActionLinksProps) {
     return (
         <>
             {canScroll && (
-                <Button className="account-page-actions__left" clear onClick={scroll('left')}>
+                <Button className="account-page-actions__left" clear onClick={scroll('left')} disabled={disabled}>
                     <BackIcon />
                 </Button>
             )}
@@ -45,7 +47,7 @@ function ActionLinks({ children }: ActionLinksProps) {
                 {children}
             </TabBar>
             {canScroll && (
-                <Button className="account-page-actions__right" clear onClick={scroll('right')}>
+                <Button className="account-page-actions__right" clear onClick={scroll('right')} disabled={disabled}>
                     <BackIcon />
                 </Button>
             )}
@@ -83,7 +85,7 @@ export default function AccountActions({ className, disabled }: Props) {
 
     return (
         <nav className={clsx('account-page-actions', className, disabled && 'account-page-actions-disabled')}>
-            <ActionLinks>
+            <ActionLinks disabled={disabled}>
                 <Action to={accountRoutes.tokens} title={t('tokens')} disabled={disabled}>
                     <TokenIcon className="account-page-actions__tokens-icon" />
                 </Action>
@@ -95,6 +97,9 @@ export default function AccountActions({ className, disabled }: Props) {
                 </Action>
                 <Action to={accountRoutes.receive} title={t('receive')} disabled={disabled}>
                     <ReceiveIcon className="account-page-actions__receive-icon" />
+                </Action>
+                <Action to={accountRoutes.earn} title={t('earn')} disabled={disabled}>
+                    <EarnIcon className="account-page-actions__earn-icon" />
                 </Action>
                 <Action
                     to={accountRoutes.settings}

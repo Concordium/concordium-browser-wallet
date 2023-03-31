@@ -14,7 +14,7 @@ import {
     createPendingTransactionFromAccountTransaction,
     sendTransaction,
 } from '@popup/shared/utils/transaction-helpers';
-import { jsonRpcClientAtom } from '@popup/store/settings';
+import { grpcClientAtom } from '@popup/store/settings';
 import { addToastAtom } from '@popup/state';
 import { usePrivateKey } from '@popup/shared/utils/account-helpers';
 import Button from '@popup/shared/Button';
@@ -35,8 +35,6 @@ import { accountRoutes } from '../routes';
 type BaseProps = {
     setDetailsExpanded: (expanded: boolean) => void;
     cost?: bigint;
-    // eslint-disable-next-line @typescript-eslint/no-explicit-any
-    returnState: any;
 };
 
 type ConfirmTokenTransferProps = BaseProps & {
@@ -57,13 +55,13 @@ type ConfirmGenericTransferProps = BaseProps & {
 type Props = ConfirmTokenTransferProps | ConfirmGenericTransferProps;
 
 export default function ConfirmTransfer(props: Props) {
-    const { setDetailsExpanded, cost, transactionType, payload, returnState, parameters } = props;
+    const { setDetailsExpanded, cost, transactionType, payload, parameters } = props;
     const { t } = useTranslation('account');
     const [hash, setHash] = useState<string>();
     const selectedAddress = useAtomValue(selectedAccountAtom);
     const address = useMemo(() => selectedAddress, []);
     const key = usePrivateKey(address);
-    const client = useAtomValue(jsonRpcClientAtom);
+    const client = useAtomValue(grpcClientAtom);
     const nav = useNavigate();
     const addToast = useSetAtom(addToastAtom);
     const addPendingTransaction = useUpdateAtom(addPendingTransactionAtom);
@@ -112,7 +110,7 @@ export default function ConfirmTransfer(props: Props) {
         payload,
         cost,
         hash,
-        className: 'send-ccd__receipt',
+        className: 'confirm-transfer__receipt',
     };
 
     return (
@@ -129,11 +127,11 @@ export default function ConfirmTransfer(props: Props) {
             )}
             {!hash && (
                 <div className="flex justify-center p-b-10 m-h-20">
-                    <Button width="narrow" className="m-r-10" onClick={() => nav(`../`, { state: returnState })}>
-                        {t('sendCcd.buttons.back')}
+                    <Button width="narrow" className="m-r-10" onClick={() => nav(-1)}>
+                        {t('confirmTransfer.buttons.back')}
                     </Button>
                     <Button width="narrow" onClick={() => send().catch((e) => addToast(e.toString()))}>
-                        {t('sendCcd.buttons.send')}
+                        {t('confirmTransfer.buttons.send')}
                     </Button>
                 </div>
             )}
@@ -144,7 +142,7 @@ export default function ConfirmTransfer(props: Props) {
                         className="m-b-10"
                         onClick={() => nav(`${absoluteRoutes.home.account.path}/${accountRoutes.log}`)}
                     >
-                        {t('sendCcd.buttons.finish')}
+                        {t('confirmTransfer.buttons.finish')}
                     </Button>
                 </div>
             )}

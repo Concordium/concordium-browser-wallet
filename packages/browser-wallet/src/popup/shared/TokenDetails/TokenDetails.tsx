@@ -30,7 +30,7 @@ function TokenDetailsLine({ header, children }: TokenDetailsLineProps) {
 
     return (
         <div className="token-details__line">
-            <div className="token-details__line-header">{header}</div>
+            <div className="label label--header">{header}</div>
             <div>{children}</div>
         </div>
     );

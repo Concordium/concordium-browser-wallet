@@ -3,8 +3,8 @@ import React, { ChangeEvent, ComponentType, ForwardRefExoticComponent, FocusEven
 import {
     Controller,
     ControllerProps,
-    FieldPath,
     FieldValues,
+    Path,
     RegisterOptions,
     UseFormRegister,
     useFormState,
@@ -13,10 +13,10 @@ import { MakeRequired, noOp } from 'wallet-common-helpers';
 
 import { RequiredControlledFieldProps, RequiredUncontrolledFieldProps } from './types';
 
-type MakeControlledProps<TFieldValues extends FieldValues = FieldValues> = Omit<
-    MakeRequired<ControllerProps<TFieldValues>, 'control'>,
-    'render'
->;
+type MakeControlledProps<
+    TFieldValues extends FieldValues = FieldValues,
+    TName extends Path<TFieldValues> = Path<TFieldValues>
+> = Omit<MakeRequired<ControllerProps<TFieldValues, TName>, 'control'>, 'render'>;
 
 /**
  * @description
@@ -34,7 +34,9 @@ type MakeControlledProps<TFieldValues extends FieldValues = FieldValues> = Omit<
  */
 export const makeControlled = <TProps extends RequiredControlledFieldProps>(Field: ComponentType<TProps>) => {
     type OwnProps = Omit<TProps, 'name' | 'value'>;
-    return <TFieldValues extends FieldValues>(props: OwnProps & MakeControlledProps<TFieldValues>) => {
+    return <TFieldValues extends FieldValues, TName extends Path<TFieldValues>>(
+        props: OwnProps & MakeControlledProps<TFieldValues, TName>
+    ) => {
         // Filter away all props required for '<Controller />', leaving the props for the input '<Field />'
         const {
             name,
@@ -86,9 +88,12 @@ export const makeControlled = <TProps extends RequiredControlledFieldProps>(Fiel
     };
 };
 
-type MakeUncontrolledProps<TFieldValues extends FieldValues = FieldValues> = {
-    name: FieldPath<TFieldValues>;
-    rules?: RegisterOptions<TFieldValues>;
+type MakeUncontrolledProps<
+    TFieldValues extends FieldValues = FieldValues,
+    TName extends Path<TFieldValues> = Path<TFieldValues>
+> = {
+    name: TName;
+    rules?: RegisterOptions<TFieldValues, TName>;
     register: UseFormRegister<TFieldValues>;
 };
 
@@ -110,7 +115,9 @@ export const makeUncontrolled = <E, P extends RequiredUncontrolledFieldProps<E>>
     Field: ForwardRefExoticComponent<P>
 ) => {
     type OwnProps = Omit<P, 'ref' | 'name' | 'value' | 'checked'>;
-    return <TFieldValues extends FieldValues>(props: OwnProps & MakeUncontrolledProps<TFieldValues>) => {
+    return <TFieldValues extends FieldValues, TName extends Path<TFieldValues>>(
+        props: OwnProps & MakeUncontrolledProps<TFieldValues, TName>
+    ) => {
         // Filter away all props required for form registration, leaving the props for the input '<Field />'
         const { name, rules, register, onChange: ownOnChange = noOp, onBlur: ownOnBlur = noOp, ...ownProps } = props;
         const registerProps = register(name, rules);

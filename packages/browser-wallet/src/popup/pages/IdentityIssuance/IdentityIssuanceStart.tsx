@@ -1,7 +1,7 @@
 import React, { useState, useEffect, useCallback } from 'react';
 import { useAtomValue, useAtom, useSetAtom } from 'jotai';
 import { useTranslation } from 'react-i18next';
-import { jsonRpcClientAtom, networkConfigurationAtom } from '@popup/store/settings';
+import { grpcClientAtom, networkConfigurationAtom } from '@popup/store/settings';
 import { pendingIdentityAtom, identitiesAtom, identityProvidersAtom } from '@popup/store/identity';
 import { popupMessageHandler } from '@popup/shared/message-handler';
 import { getIdentityProviders } from '@popup/shared/utils/wallet-proxy';
@@ -23,7 +23,7 @@ function IdentityIssuanceStart({ onStart, onError }: InnerProps) {
     const { t } = useTranslation('identityIssuance');
     const [providers, setProviders] = useAtom(identityProvidersAtom);
     const network = useAtomValue(networkConfigurationAtom);
-    const client = useAtomValue(jsonRpcClientAtom);
+    const client = useAtomValue(grpcClientAtom);
     const updatePendingIdentity = useSetAtom(pendingIdentityAtom);
     const identities = useAtomValue(identitiesAtom);
     const [buttonDisabled, setButtonDisabled] = useState(false);

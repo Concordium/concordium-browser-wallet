@@ -7,7 +7,6 @@ import Toast from '@popup/shared/Toast/Toast';
 
 import { useCredential } from '@popup/shared/utils/account-helpers';
 import AccountDetails from '@popup/pages/Account/AccountDetails';
-import AccountInfoListenerContext from '@popup/shared/AccountInfoListenerContext';
 
 function Header() {
     const { t } = useTranslation('mainLayout');
@@ -60,11 +59,9 @@ export default function ExternalRequestLayout({ children }: Props) {
         <>
             <Header />
             <div className="external-request-layout">
-                <AccountInfoListenerContext>
-                    {account && <AccountDetails expanded={false} account={account} />}
-                    <main className="external-request-layout__main">{children}</main>
-                    <Toast />
-                </AccountInfoListenerContext>
+                {account && <AccountDetails expanded={false} account={account} />}
+                <main className="external-request-layout__main">{children}</main>
+                <Toast />
             </div>
         </>
     );

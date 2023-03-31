@@ -2,8 +2,8 @@ import React, { useMemo } from 'react';
 import { AccountTransactionType } from '@concordium/web-sdk';
 import { useLocation } from 'react-router-dom';
 import { buildSimpleTransferPayload } from '@popup/shared/utils/transaction-helpers';
-import ConfirmTransfer from './ConfirmTransfer';
 import { ConfirmSimpleTransferState } from './util';
+import ConfirmTransfer from '../ConfirmTransfer';
 
 interface Props {
     setDetailsExpanded: (expanded: boolean) => void;
@@ -20,7 +20,6 @@ export default function ConfirmSimpleTransfer({ setDetailsExpanded, cost }: Prop
             setDetailsExpanded={setDetailsExpanded}
             cost={cost}
             payload={payload}
-            returnState={state}
             transactionType={AccountTransactionType.Transfer}
         />
     );
