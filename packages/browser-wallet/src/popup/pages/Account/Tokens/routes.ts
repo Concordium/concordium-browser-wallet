@@ -4,6 +4,7 @@
 export const tokensRoutes = {
     collectibles: 'collectibles',
     details: 'details/:contractIndex/:id/',
+    chooseContract: 'chooseContract',
     manage: 'manage',
 };
 

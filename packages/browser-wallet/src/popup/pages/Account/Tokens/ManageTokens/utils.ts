@@ -22,7 +22,6 @@ export type DetailsLocationState = {
 };
 
 export const manageTokensRoutes = {
-    update: 'update',
     details: 'details',
 };
 
