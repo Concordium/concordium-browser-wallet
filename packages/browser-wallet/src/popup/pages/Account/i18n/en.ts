@@ -74,6 +74,9 @@ const t = {
         add: {
             lookupTokens: 'Look for tokens',
             indexRequired: 'Contract index is required',
+            negativeIndex: 'Contract index may not be negative',
+            invalidIndex: 'Contract index must be a integer',
+            indexMax: 'Contract index can not exceed 18446744073709551615',
             noContractFound: 'No contract found on index',
             noTokensError: 'No tokens found in contract',
             failedTokensError:

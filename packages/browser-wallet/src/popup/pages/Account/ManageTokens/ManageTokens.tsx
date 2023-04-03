@@ -63,10 +63,25 @@ function ChooseContract() {
     const validateIndex = useCallback(
         debouncedAsyncValidate<string>(
             async (value) => {
-                const index = BigInt(value);
-                const instanceInfo = await client.getInstanceInfo({ index, subindex: 0n });
+                let index;
+                try {
+                    index = BigInt(value);
+                } catch {
+                    return t('invalidIndex');
+                }
 
-                if (!instanceInfo) {
+                if (index < 0n) {
+                    return t('negativeIndex');
+                }
+
+                if (index >= 2n ** 64n) {
+                    return t('indexMax');
+                }
+
+                let instanceInfo;
+                try {
+                    instanceInfo = await client.getInstanceInfo({ index, subindex: 0n });
+                } catch {
                     return t('noContractFound');
                 }
 

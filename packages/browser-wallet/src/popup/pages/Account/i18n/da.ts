@@ -76,6 +76,9 @@ const t: typeof en = {
         add: {
             lookupTokens: 'Søg efter tokens',
             indexRequired: 'Kontrakt indeks er påkrævet',
+            negativeIndex: 'Kontrakt indeks kan ikke være et negativt tal',
+            indexMax: 'Kontrakt indeks må højst være 18446744073709551615',
+            invalidIndex: 'Kontrakt indeks skal være et heltal',
             noContractFound: 'Ingen kontrakt fundet på indeks',
             noTokensError: 'Ingen tokens fundet i kontrakten',
             failedTokensError: 'En fejl skete under tjekket efter tokens',

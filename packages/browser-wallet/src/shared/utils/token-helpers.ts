@@ -178,7 +178,12 @@ export async function getTokenMetadata({ url, hash: checksumHash }: MetadataUrl)
         throw new Error('Metadata does not match checksum provided with url');
     }
 
-    const metadata = JSON.parse(body.toString());
+    let metadata;
+    try {
+        metadata = JSON.parse(body.toString());
+    } catch (e) {
+        throw new Error('Metadata url did not return valid JSON.');
+    }
 
     confirmString(metadata.name);
     confirmString(metadata.symbol);
