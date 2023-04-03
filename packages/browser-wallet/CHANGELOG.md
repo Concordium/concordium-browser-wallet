@@ -5,6 +5,7 @@
 ### Changed
 
 -   Use gRPC-web instead of json-RPC.
+-   The initial view in the manage token flow now retains the token page header, doesn't collapse account balances and the error messages for looking up a contract have been improved.
 
 ## 0.9.8
 
