@@ -19,7 +19,7 @@ import Img from '@popup/shared/Img';
 import { tokensRoutes, detailsRoute } from './routes';
 import TokenDetails from './TokenDetails';
 import { AccountTokenDetails, useFlattenedAccountTokens } from './utils';
-import ManageTokens from '../ManageTokens';
+import ManageTokens from './ManageTokens';
 
 type FtProps = {
     accountAddress: string;
