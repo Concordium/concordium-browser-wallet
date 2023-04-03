@@ -17,7 +17,7 @@
     "dependencies": {
         "@concordium/browser-wallet-api": "workspace:^",
         "@concordium/browser-wallet-api-helpers": "workspace:^",
-        "@concordium/web-sdk": "^3.2.0",
+        "@concordium/web-sdk": "^3.3.1",
         "@scure/bip39": "^1.1.0",
         "axios": "^0.27.2",
         "buffer": "^6.0.3",
@@ -43,7 +43,7 @@
         "react-window-infinite-loader": "^1.0.8",
         "readable-stream": "^4.2.0",
         "uuid": "^8.3.2",
-        "wallet-common-helpers": "https://github.com/Concordium/concordium-wallet-common-helpers.git#cde2bfb682cae08c9f0338d4a0567abecaeb2a26"
+        "wallet-common-helpers": "https://github.com/Concordium/concordium-wallet-common-helpers.git#280339fa6c51922944094bc631d097d245e1e08f"
     },
     "devDependencies": {
         "@babel/core": "^7.18.2",

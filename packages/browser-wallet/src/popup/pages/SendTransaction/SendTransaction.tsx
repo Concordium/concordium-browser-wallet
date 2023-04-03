@@ -10,24 +10,18 @@ import {
     getDefaultExpiry,
     createPendingTransactionFromAccountTransaction,
 } from '@popup/shared/utils/transaction-helpers';
-import { jsonRpcClientAtom } from '@popup/store/settings';
+import { grpcClientAtom } from '@popup/store/settings';
 import TransactionReceipt from '@popup/shared/TransactionReceipt/TransactionReceipt';
 import Button from '@popup/shared/Button';
 import { displayUrl } from '@popup/shared/utils/string-helpers';
-import { noOp, useAsyncMemo } from 'wallet-common-helpers';
-import { getEnergyPerCCD } from '@popup/shared/utils/wallet-proxy';
 import ConnectedBox from '@popup/pages/Account/ConnectedBox';
 import { addToastAtom } from '@popup/state';
 import ExternalRequestLayout from '@popup/page-layouts/ExternalRequestLayout';
 import { useUpdateAtom } from 'jotai/utils';
 import { addPendingTransactionAtom } from '@popup/store/transactions';
-import {
-    determineInitPayloadSize,
-    determineUpdatePayloadSize,
-    SIMPLE_TRANSFER_ENERGY_TOTAL_COST,
-} from '@shared/utils/energy-helpers';
-import { calculateEnergyCost } from '@shared/utils/token-helpers';
+import { convertEnergyToMicroCcd, getEnergyCost } from '@shared/utils/energy-helpers';
 import { SmartContractParameters, SchemaWithContext } from '@concordium/browser-wallet-api-helpers';
+import { useBlockChainParameters } from '@popup/shared/BlockChainParametersProvider';
 import { parsePayload } from './util';
 
 interface Location {
@@ -53,9 +47,10 @@ export default function SendTransaction({ onSubmit, onReject }: Props) {
     const { state } = useLocation() as Location;
     const { t } = useTranslation('sendTransaction');
     const addToast = useSetAtom(addToastAtom);
-    const client = useAtomValue(jsonRpcClientAtom);
+    const client = useAtomValue(grpcClientAtom);
     const { withClose, onClose } = useContext(fullscreenPromptContext);
     const addPendingTransaction = useUpdateAtom(addPendingTransactionAtom);
+    const chainParameters = useBlockChainParameters();
 
     const { accountAddress, url } = state.payload;
     const key = usePrivateKey(accountAddress);
@@ -72,34 +67,13 @@ export default function SendTransaction({ onSubmit, onReject }: Props) {
         [JSON.stringify(state.payload)]
     );
 
-    const cost = useAsyncMemo(
-        async () => {
-            const exchangeRate = await getEnergyPerCCD();
-            const getCost = (fee: bigint) => BigInt(Math.ceil(exchangeRate * Number(fee)));
-            if (transactionType === AccountTransactionType.Transfer) {
-                return getCost(SIMPLE_TRANSFER_ENERGY_TOTAL_COST);
-            }
-            if (AccountTransactionType.Update === transactionType) {
-                const energy = calculateEnergyCost(
-                    1n,
-                    determineUpdatePayloadSize(payload.message.length, payload.receiveName),
-                    payload.maxContractExecutionEnergy || 0n
-                );
-                return getCost(energy);
-            }
-            if (AccountTransactionType.InitContract === transactionType) {
-                const energy = calculateEnergyCost(
-                    1n,
-                    determineInitPayloadSize(payload.param.length, payload.initName),
-                    payload.maxContractExecutionEnergy || 0n
-                );
-                return getCost(energy);
-            }
-            return undefined;
-        },
-        noOp,
-        [transactionType]
-    );
+    const cost = useMemo(() => {
+        if (chainParameters) {
+            const energy = getEnergyCost(transactionType, payload);
+            return convertEnergyToMicroCcd(energy, chainParameters);
+        }
+        return undefined;
+    }, [transactionType, chainParameters]);
 
     useEffect(() => onClose(onReject), [onClose, onReject]);
 

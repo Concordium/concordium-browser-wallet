@@ -35,16 +35,19 @@ import {
     TokenIdentifier,
     trunctateSymbol,
 } from '@shared/utils/token-helpers';
-import { jsonRpcClientAtom } from '@popup/store/settings';
+import { grpcClientAtom } from '@popup/store/settings';
 import CcdIcon from '@assets/svg/concordium.svg';
 import { addToastAtom } from '@popup/state';
 import TokenBalance from '@popup/shared/TokenBalance';
 import Button from '@popup/shared/Button';
 import SearchIcon from '@assets/svg/search.svg';
-import { SIMPLE_TRANSFER_ENERGY_TOTAL_COST } from '@shared/utils/energy-helpers';
+import { convertEnergyToMicroCcd, SIMPLE_TRANSFER_ENERGY_TOTAL_COST } from '@shared/utils/energy-helpers';
 import Img from '@popup/shared/Img';
+import { useBlockChainParameters } from '@popup/shared/BlockChainParametersProvider';
 import { routes } from './routes';
 import PickToken from './PickToken';
+import { ConfirmTokenTransferState } from './ConfirmTokenTransfer';
+import { ConfirmSimpleTransferState } from './ConfirmSimpleTransfer';
 
 export type FormValues = {
     amount: string;
@@ -55,7 +58,6 @@ export type FormValues = {
 };
 
 interface Props {
-    exchangeRate?: number;
     cost: bigint;
     setCost: (cost: bigint) => void;
     setDetailsExpanded: (expanded: boolean) => void;
@@ -85,10 +87,10 @@ function createDefaultValues(defaultPayload: State, accountTokens?: AccountToken
     };
 }
 
-function CreateTransaction({ exchangeRate, tokens, setCost, setDetailsExpanded, cost }: Props & { tokens: Tokens }) {
+function CreateTransaction({ tokens, setCost, setDetailsExpanded, cost }: Props & { tokens: Tokens }) {
     const { t } = useTranslation('account');
     const { t: tShared } = useTranslation('shared');
-    const { state } = useLocation();
+    const { state, pathname } = useLocation();
     const address = useAtomValue(selectedAccountAtom);
     const selectedCred = useSelectedCredential();
     const nav = useNavigate();
@@ -96,12 +98,13 @@ function CreateTransaction({ exchangeRate, tokens, setCost, setDetailsExpanded, 
     const form = useForm<FormValues>({
         defaultValues: createDefaultValues(state as State, accountTokens),
     });
-    const client = useAtomValue(jsonRpcClientAtom);
+    const client = useAtomValue(grpcClientAtom);
     const chosenToken = form.watch('token');
     const recipient = form.watch('recipient');
     const tokenMetadata = useMemo(() => chosenToken?.metadata || CCD_METADATA, [chosenToken?.metadata]);
     const [pickingToken, setPickingToken] = useState<boolean>(false);
     const addToast = useSetAtom(addToastAtom);
+    const chainParameters = useBlockChainParameters();
 
     if (!address || !selectedCred) {
         throw new Error('Missing selected accoount');
@@ -137,8 +140,8 @@ function CreateTransaction({ exchangeRate, tokens, setCost, setDetailsExpanded, 
     );
 
     useEffect(() => {
-        setCost(exchangeRate && fee?.success ? BigInt(Math.ceil(exchangeRate * Number(fee.value))) : 0n);
-    }, [fee, exchangeRate]);
+        setCost(chainParameters && fee?.success ? convertEnergyToMicroCcd(fee.value, chainParameters) : 0n);
+    }, [fee, chainParameters]);
 
     const accountInfo = useAccountInfo(selectedCred);
 
@@ -196,11 +199,12 @@ function CreateTransaction({ exchangeRate, tokens, setCost, setDetailsExpanded, 
         if (validateAddress) {
             return validateAddress;
         }
-        const info = await client.getAccountInfo(new AccountAddress(recipientAddress));
-        if (!info) {
+        try {
+            await client.getAccountInfo(new AccountAddress(recipientAddress));
+            return undefined;
+        } catch {
             return t('sendCcd.nonexistingAccount');
         }
-        return undefined;
     }, []);
 
     const displayAmount = integerToFractional(getMetadataDecimals(tokenMetadata));
@@ -214,16 +218,28 @@ function CreateTransaction({ exchangeRate, tokens, setCost, setDetailsExpanded, 
     }
 
     const onSubmit: SubmitHandler<FormValues> = (vs) => {
+        let nextRoute: string;
+        let currentState: ConfirmTokenTransferState | ConfirmSimpleTransferState;
+
         if (vs.token) {
             const payload = buildSimpleTransferPayload(
                 vs.recipient,
                 fractionalToInteger(vs.amount, getMetadataDecimals(vs.token.metadata))
             );
-            nav(routes.confirmToken, { state: { ...payload, ...vs.token, executionEnergy: vs.executionEnergy } });
+
+            currentState = {
+                ...payload,
+                ...vs.token,
+                executionEnergy: vs.executionEnergy,
+            };
+            nextRoute = routes.confirmToken;
         } else {
-            const payload = buildSimpleTransferPayload(vs.recipient, ccdToMicroCcd(vs.amount));
-            nav(routes.confirm, { state: { ...payload } });
+            currentState = buildSimpleTransferPayload(vs.recipient, ccdToMicroCcd(vs.amount));
+            nextRoute = routes.confirm;
         }
+
+        nav(pathname, { state: currentState, replace: true }); // Ensures next route can move back to UI with previous values.
+        nav(nextRoute, { state: currentState });
     };
 
     if (pickingToken) {

@@ -2,9 +2,10 @@ import { Buffer } from 'buffer/';
 import uleb128 from 'leb128/unsigned';
 import {
     AccountAddress,
+    calculateEnergyCost,
     CcdAmount,
     InstanceInfo,
-    JsonRpcClient,
+    ConcordiumGRPCClient,
     serializeUpdateContractParameters,
     UpdateContractPayload,
     sha256,
@@ -95,7 +96,7 @@ function deserializeTokenMetadataReturnValue(returnValue: string): MetadataUrl[]
  * Confirms that the given smart contract instance is CIS-2 compliant
  */
 export async function confirmCIS2Contract(
-    client: JsonRpcClient,
+    client: ConcordiumGRPCClient,
     { contractName, index, subindex }: ContractDetails
 ): Promise<string | undefined> {
     const supports = await client.invokeContract({
@@ -121,7 +122,7 @@ export async function confirmCIS2Contract(
  * Determines the metadata url for the given token.
  */
 export function getTokenUrl(
-    client: JsonRpcClient,
+    client: ConcordiumGRPCClient,
     ids: string[],
     { contractName, index, subindex }: ContractDetails
 ): Promise<MetadataUrl[]> {
@@ -239,7 +240,7 @@ const deserializeBalanceAmounts = (value: string): bigint[] => {
 export type ContractBalances = Record<string, bigint | undefined>;
 
 export const getContractBalances = async (
-    client: JsonRpcClient,
+    client: ConcordiumGRPCClient,
     index: bigint,
     subindex: bigint,
     tokenIds: string[],
@@ -324,7 +325,7 @@ export function getTokenTransferPayload(
 }
 
 async function getTokenTransferExecutionEnergyEstimate(
-    client: JsonRpcClient,
+    client: ConcordiumGRPCClient,
     parameter: Buffer,
     invoker: AccountAddress,
     contractName: string,
@@ -349,7 +350,7 @@ function getContractName(instanceInfo: InstanceInfo): string | undefined {
     return instanceInfo.name.substring(5);
 }
 
-export async function fetchContractName(client: JsonRpcClient, index: bigint, subindex = 0n) {
+export async function fetchContractName(client: ConcordiumGRPCClient, index: bigint, subindex = 0n) {
     const instanceInfo = await client.getInstanceInfo({ index, subindex });
     if (!instanceInfo) {
         return undefined;
@@ -357,17 +358,8 @@ export async function fetchContractName(client: JsonRpcClient, index: bigint, su
     return getContractName(instanceInfo);
 }
 
-// TODO: export this from the SDK or add to helpers
-export function calculateEnergyCost(
-    signatureCount: bigint,
-    payloadSize: bigint,
-    transactionSpecificCost: bigint
-): bigint {
-    return 100n * signatureCount + 1n * (BigInt(32 + 8 + 8 + 4 + 8) + payloadSize) + transactionSpecificCost;
-}
-
 export async function getTokenTransferEnergy(
-    client: JsonRpcClient,
+    client: ConcordiumGRPCClient,
     address: string,
     recipient: string,
     tokenId: string,
@@ -400,7 +392,7 @@ type GetTokensResult = {
 
 export async function getTokens(
     contractDetails: ContractDetails,
-    client: JsonRpcClient,
+    client: ConcordiumGRPCClient,
     account: string,
     ids: string[],
     onError?: (error: string) => void

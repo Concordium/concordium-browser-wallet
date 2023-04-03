@@ -19,6 +19,7 @@ import JSONBig from 'json-bigint';
 import { ChromeStorageKey, NetworkConfiguration } from '@shared/storage/types';
 import { buildURLwithSearchParameters } from '@shared/utils/url-helpers';
 import { getTermsAndConditionsConfig } from '@shared/utils/network-helpers';
+import { mainnet, testnet } from '@shared/constants/networkConfiguration';
 import bgMessageHandler from './message-handler';
 import {
     forwardToPopup,
@@ -35,6 +36,7 @@ import { sendCredentialHandler } from './credential-deployment';
 import { startRecovery, setupRecoveryHandler } from './recovery';
 import { createIdProofHandler, runIfValidProof } from './id-proof';
 
+const rpcCallNotAllowedMessage = 'RPC Call can only be performed by whitelisted sites';
 const walletLockedMessage = 'The wallet is locked';
 async function isWalletLocked(): Promise<boolean> {
     const passcode = await sessionPasscode.get();
@@ -83,8 +85,27 @@ async function performRpcCall(
                 .catch((e) => onFailure(e.toString()));
         }
     } else {
-        onFailure('RPC Call can only be performed by whitelisted sites');
+        onFailure(rpcCallNotAllowedMessage);
     }
+}
+
+/**
+ * Returns the url/port of the current node's gRPC endpoint, if the caller is allowed to perform gRPC calls.
+ */
+async function exportGRPCLocation(
+    callerUrl: string,
+    onSuccess: (response: string | undefined) => void,
+    onFailure: (response: string) => void
+): Promise<void> {
+    const isWhiteListed = await isWhiteListedForAnyAccount(callerUrl);
+    if (!isWhiteListed) {
+        return onFailure(rpcCallNotAllowedMessage);
+    }
+    const network = await storedCurrentNetwork.get();
+    if (!network || !network.grpcUrl || !network.grpcPort) {
+        return onFailure('No gRPC URL available');
+    }
+    return onSuccess(`${network.grpcUrl}:${network.grpcPort}`);
 }
 
 /**
@@ -134,9 +155,16 @@ async function checkForNewTermsAndConditions() {
     }
 }
 
+async function migrateNetwork(network: NetworkConfiguration) {
+    if (network.genesisHash && (!network.grpcUrl || !network.grpcPort)) {
+        await storedCurrentNetwork.set(network.genesisHash === mainnet.genesisHash ? mainnet : testnet);
+    }
+}
+
 const startupHandler = async () => {
     const network = await storedCurrentNetwork.get();
     if (network) {
+        await migrateNetwork(network);
         await startMonitoringPendingStatus(network);
     }
     checkForNewTermsAndConditions();
@@ -186,11 +214,21 @@ bgMessageHandler.handleMessage(createMessageTypeFilter(InternalMessageType.SetVi
 bgMessageHandler.handleMessage(createMessageTypeFilter(MessageType.JsonRpcRequest), (input, sender, respond) => {
     const onFailure = (error: string) => respond({ success: false, error });
     if (sender.url) {
-        const onSuccess = (response: string | undefined) => respond({ success: true, response });
+        const onSuccess = (result: string | undefined) => respond({ success: true, result });
         performRpcCall(input.payload.method, input.payload.params, sender.url, onSuccess, onFailure);
     } else {
         onFailure('Missing sender URL');
     }
+    return true;
+});
+
+bgMessageHandler.handleMessage(createMessageTypeFilter(MessageType.GrpcRequest), (_input, sender, respond) => {
+    const onFailure = (error: string) => respond({ success: false, error });
+    const onSuccess = (result: string | undefined) => respond({ success: true, result });
+    if (!sender.url) {
+        return onFailure('Missing sender URL');
+    }
+    exportGRPCLocation(sender.url, onSuccess, onFailure);
     return true;
 });
 

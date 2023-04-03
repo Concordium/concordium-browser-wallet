@@ -2,6 +2,8 @@
 .connected-sites-list,
 .export-private-key-page,
 .account-statement-page {
+    min-height: 100%;
+    width: 100%;
     background-color: $color-bg;
 }
 
@@ -16,8 +18,6 @@
 }
 
 .account-settings-page {
-    height: 100%;
-    width: 100%;
     padding: 0 rem(10px);
     display: block;
 
@@ -28,7 +28,6 @@
 }
 
 .connected-sites-list {
-    width: 100%;
     padding-left: rem(14px);
     padding-right: rem(14px);
     overflow: overlay;
@@ -57,7 +56,6 @@
 }
 
 .export-private-key-page {
-    width: 100%;
     padding-left: rem(19px);
     padding-right: rem(19px);
     display: flex;

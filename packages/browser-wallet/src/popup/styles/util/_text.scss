@@ -31,6 +31,10 @@ $line-clamps: (2, 3);
     text-align: right;
 }
 
+.text-mono {
+    font-family: $font-family-mono;
+}
+
 .color-cta {
     color: $color-cta;
 }
@@ -41,4 +45,13 @@ $line-clamps: (2, 3);
 
 .word-break-all {
     word-break: break-all;
+}
+
+.label {
+    font-size: rem(8px);
+    margin-bottom: rem(2px);
+
+    &--faded {
+        color: $color-text-faded;
+    }
 }

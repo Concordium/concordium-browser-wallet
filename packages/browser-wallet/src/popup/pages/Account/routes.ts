@@ -6,6 +6,8 @@ export const accountRoutes = {
     tokenDetails: 'tokens/:contractIndex/:tokenIndex',
     send: 'send',
     receive: 'receive',
+    earn: 'earn',
     settings: 'settings',
     log: 'log',
+    confirmTransfer: 'confirm-transfer',
 };

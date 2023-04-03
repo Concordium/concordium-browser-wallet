@@ -1,5 +1,11 @@
 # Changelog
 
+## 1.0.0
+
+### Changed
+
+-   Use gRPC-web instead of json-RPC.
+
 ## 0.9.8
 
 ### Fixed

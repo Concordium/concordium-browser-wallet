@@ -5,13 +5,14 @@ import { useTranslation } from 'react-i18next';
 import i18next from 'i18next';
 import { atomFamily } from 'jotai/utils';
 import { noOp, parse, stringify } from 'wallet-common-helpers';
-import { networkConfigurationAtom, jsonRpcClientAtom, cookieAtom } from '@popup/store/settings';
+import { networkConfigurationAtom, grpcClientAtom } from '@popup/store/settings';
 import { atomWithChromeStorage } from '@popup/store/utils';
 import { ChromeStorageKey, CreationStatus, WalletCredential } from '@shared/storage/types';
 import { addToastAtom } from '@popup/state';
 import { getGenesisHash, sessionAccountInfoCache, useIndexedStorage } from '@shared/storage/access';
 import { accountInfoCacheLock, updateRecord } from '@shared/storage/update';
 import { AccountInfoListener } from '../account-info-listener';
+import { useSelectedCredential } from '../utils/account-helpers';
 
 const accountInfoBaseAtom = atomWithChromeStorage<Record<string, string>>(ChromeStorageKey.AccountInfoCache, {}, false);
 
@@ -32,15 +33,11 @@ export const accountInfoAtom = atom<Record<string, AccountInfo>, AccountInfoActi
             {}
         ),
     async (get, set, update) => {
-        const client = get(jsonRpcClientAtom);
+        const client = get(grpcClientAtom);
         const addToast = (v: string) => set(addToastAtom, v);
 
         try {
-            const consensusStatus = await client.getConsensusStatus();
-            const newAccountInfo = await client.getAccountInfo(
-                new AccountAddress(update.address),
-                consensusStatus.lastFinalizedBlock
-            );
+            const newAccountInfo = await client.getAccountInfo(new AccountAddress(update.address));
 
             if (newAccountInfo) {
                 updateRecord(
@@ -73,12 +70,11 @@ interface Props {
 export default function AccountInfoListenerContextProvider({ children }: Props) {
     const network = useAtomValue(networkConfigurationAtom);
     const addToast = useSetAtom(addToastAtom);
-    const [cookie, setCookie] = useAtom(cookieAtom);
     const [accountInfoListener, setAccountInfoListener] = useState<AccountInfoListener>();
     const { t } = useTranslation();
 
     useEffect(() => {
-        const listener = new AccountInfoListener(network, setCookie, cookie);
+        const listener = new AccountInfoListener(network);
         listener.listen();
         setAccountInfoListener(listener);
         const errorListener = () => addToast(t('account.error'));
@@ -125,4 +121,14 @@ export function useAccountInfo(account: WalletCredential): AccountInfo | undefin
     }, [account, accountInfoEmitter]);
 
     return accountInfo;
+}
+
+export function useSelectedAccountInfo() {
+    const cred = useSelectedCredential();
+
+    if (cred === undefined) {
+        return undefined;
+    }
+
+    return useAccountInfo(cred);
 }

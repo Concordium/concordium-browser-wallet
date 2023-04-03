@@ -32,7 +32,7 @@ export default function DisplayGenericPayload({ payload }: Props) {
         <>
             {Object.entries(payload).map(([key, value]) => (
                 <>
-                    <h5>{key}</h5>
+                    <h5>{key}:</h5>
                     {displayValue(value)}
                 </>
             ))}

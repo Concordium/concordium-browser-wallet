@@ -8,6 +8,6 @@
         "start": "live-server ../two-step-transfer/index.html --mount=/sdk.js:./node_modules/@concordium/web-sdk/lib/concordium.min.js --mount=/helpers.js:../../packages/browser-wallet-api-helpers/lib/concordiumHelpers.min.js"
     },
     "dependencies": {
-        "@concordium/web-sdk": "^3.2.0"
+        "@concordium/web-sdk": "^3.3.1"
     }
 }

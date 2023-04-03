@@ -2,7 +2,7 @@ import React, { CSSProperties, forwardRef, ReactNode, useCallback, useEffect, us
 import { useTranslation } from 'react-i18next';
 import { useNavigate } from 'react-router-dom';
 import { isHex, isDefined, noOp, useUpdateEffect } from 'wallet-common-helpers';
-import { JsonRpcClient } from '@concordium/web-sdk';
+import { ConcordiumGRPCClient } from '@concordium/web-sdk';
 import { useAtom, useAtomValue, useSetAtom } from 'jotai';
 import debounce from 'lodash.debounce';
 import InfiniteLoader from 'react-window-infinite-loader';
@@ -16,7 +16,7 @@ import Button from '@popup/shared/Button';
 import { Input } from '@popup/shared/Form/Input';
 import { addToastAtom } from '@popup/state';
 import { selectedAccountAtom } from '@popup/store/account';
-import { jsonRpcClientAtom } from '@popup/store/settings';
+import { grpcClientAtom } from '@popup/store/settings';
 import { currentAccountTokensAtom } from '@popup/store/token';
 import { ensureDefined } from '@shared/utils/basic-helpers';
 import ContractTokenLine, { ChoiceStatus } from '@popup/shared/ContractTokenLine';
@@ -88,7 +88,7 @@ const InfiniteTokenList = forwardRef<HTMLDivElement, InfiniteTokenListProps>(
  * Sets result.value to empty list on error, list with 1 token on successful lookup, and undefined while loading.
  * Invoking with empty searchQuery param aborts previous invocations.
  */
-const lookupTokenIdConfigure = (contractDetails: ContractDetails, client: JsonRpcClient, account: string) => {
+const lookupTokenIdConfigure = (contractDetails: ContractDetails, client: ConcordiumGRPCClient, account: string) => {
     let ac: AbortController;
 
     return debounce(
@@ -133,7 +133,7 @@ const validateId = (id: string | undefined, message: string) => {
 
 function useLookupTokenId() {
     const contractDetails = ensureDefined(useAtomValue(contractDetailsAtom), 'Assumed contract details to be defined');
-    const client = useAtomValue(jsonRpcClientAtom);
+    const client = useAtomValue(grpcClientAtom);
     const account = ensureDefined(useAtomValue(selectedAccountAtom), 'No account selected');
 
     const lookupTokenId = useCallback(lookupTokenIdConfigure(contractDetails, client, account), [

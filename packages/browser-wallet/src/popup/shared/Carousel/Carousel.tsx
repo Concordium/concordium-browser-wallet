@@ -6,6 +6,7 @@ import { ClassName } from 'wallet-common-helpers';
 import { defaultTransition } from '@shared/constants/transition';
 import Button from '../Button';
 import ButtonGroup from '../ButtonGroup';
+import BackButton from '../BackButton';
 
 type Direction = 'next' | 'prev';
 
@@ -20,9 +21,16 @@ type Props = ClassName & {
      * Action called when either "skip" or "continue" button is pressed
      */
     onContinue(): void;
+    /**
+     *
+     */
+    withBackButton?: boolean;
+    /**
+     * If given, the carousel will start at the given index.
+     */
+    startIndex?: number;
     children: ReactNode | ReactNode[];
 };
-
 /**
  * Carousel component for presenting single or multiple pages (passed as children) with information.
  *
@@ -32,8 +40,8 @@ type Props = ClassName & {
  *      <div>Second page...</div>
  *  </Carousel>
  */
-export default function Carousel({ className, children, onContinue }: Props) {
-    const [[active, direction], setActive] = useState<[number, Direction]>([0, 'next']);
+export default function Carousel({ className, withBackButton = false, children, onContinue, startIndex }: Props) {
+    const [[active, direction], setActive] = useState<[number, Direction]>([startIndex || 0, 'next']);
 
     const pages = useMemo(() => Children.toArray(children), [children]);
 
@@ -42,6 +50,7 @@ export default function Carousel({ className, children, onContinue }: Props) {
     }
 
     const isLastPage = active === pages.length - 1;
+    const isFirstPage = active === 0;
 
     return (
         <div className={clsx('carousel', className)}>
@@ -57,6 +66,7 @@ export default function Carousel({ className, children, onContinue }: Props) {
                         transition={defaultTransition}
                         className="carousel__page"
                     >
+                        {withBackButton && isFirstPage && <BackButton className="carousel__back" />}
                         {pages[active]}
                     </motion.div>
                 </AnimatePresence>
@@ -77,7 +87,7 @@ export default function Carousel({ className, children, onContinue }: Props) {
 
             {pages.length > 1 ? (
                 <ButtonGroup className="carousel__actions">
-                    {active === 0 ? (
+                    {isFirstPage ? (
                         <Button faded onClick={onContinue}>
                             Skip
                         </Button>
