@@ -14,9 +14,8 @@ import {
     createPendingTransactionFromAccountTransaction,
     sendTransaction,
 } from '@popup/shared/utils/transaction-helpers';
-import { grpcClientAtom } from '@popup/store/settings';
+import { grpcClientAtom, networkConfigurationAtom } from '@popup/store/settings';
 import { addToastAtom } from '@popup/state';
-import { usePrivateKey } from '@popup/shared/utils/account-helpers';
 import Button from '@popup/shared/Button';
 import { useNavigate } from 'react-router-dom';
 import { absoluteRoutes } from '@popup/constants/routes';
@@ -30,6 +29,9 @@ import { addPendingTransactionAtom } from '@popup/store/transactions';
 import { Cis2TransferParameters } from '@shared/utils/types';
 import { SmartContractParameters } from '@concordium/browser-wallet-api-helpers';
 import { TokenMetadata } from '@shared/storage/types';
+import { useSelectedCredential } from '@popup/shared/utils/account-helpers';
+import { getNet } from '@shared/utils/network-helpers';
+import { useLedger } from '@concordium/ledger-bindings/react/LedgerProvider';
 import { accountRoutes } from '../routes';
 
 type BaseProps = {
@@ -60,11 +62,36 @@ export default function ConfirmTransfer(props: Props) {
     const [hash, setHash] = useState<string>();
     const selectedAddress = useAtomValue(selectedAccountAtom);
     const address = useMemo(() => selectedAddress, []);
-    const key = usePrivateKey(address);
     const client = useAtomValue(grpcClientAtom);
     const nav = useNavigate();
     const addToast = useSetAtom(addToastAtom);
     const addPendingTransaction = useUpdateAtom(addPendingTransactionAtom);
+    const cred = useSelectedCredential();
+    const network = useAtomValue(networkConfigurationAtom);
+
+    const { submitHandler } = useLedger(
+        async (ledgerClient) => {
+            if (!address || !cred) {
+                throw new Error('Missing address or credential for selected account');
+            }
+            const sender = new AccountAddress(address);
+            const nonce = await client.getNextAccountNonce(sender);
+            if (!nonce) {
+                throw new Error('No nonce found for sender');
+            }
+            const header = {
+                expiry: getDefaultExpiry(),
+                sender,
+                nonce: nonce.nonce,
+            };
+            const transaction = { payload, header, type: transactionType };
+            const transactionHash = await sendTransaction(client, transaction, cred, ledgerClient, getNet(network));
+
+            addPendingTransaction(createPendingTransactionFromAccountTransaction(transaction, transactionHash, cost));
+            setHash(transactionHash);
+        },
+        (e) => addToast(e.toString())
+    );
 
     useEffect(() => {
         if (selectedAddress !== address) {
@@ -76,27 +103,6 @@ export default function ConfirmTransfer(props: Props) {
         setDetailsExpanded(false);
         return () => setDetailsExpanded(true);
     }, []);
-
-    const send = async () => {
-        if (!address || !key) {
-            throw new Error('Missing address or key for selected account');
-        }
-        const sender = new AccountAddress(address);
-        const nonce = await client.getNextAccountNonce(sender);
-        if (!nonce) {
-            throw new Error('No nonce found for sender');
-        }
-        const header = {
-            expiry: getDefaultExpiry(),
-            sender,
-            nonce: nonce.nonce,
-        };
-        const transaction = { payload, header, type: transactionType };
-        const transactionHash = await sendTransaction(client, transaction, key);
-
-        addPendingTransaction(createPendingTransactionFromAccountTransaction(transaction, transactionHash, cost));
-        setHash(transactionHash);
-    };
 
     if (!address) {
         return null;
@@ -130,7 +136,7 @@ export default function ConfirmTransfer(props: Props) {
                     <Button width="narrow" className="m-r-10" onClick={() => nav(-1)}>
                         {t('confirmTransfer.buttons.back')}
                     </Button>
-                    <Button width="narrow" onClick={() => send().catch((e) => addToast(e.toString()))}>
+                    <Button width="narrow" onClick={submitHandler}>
                         {t('confirmTransfer.buttons.send')}
                     </Button>
                 </div>

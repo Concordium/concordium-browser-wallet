@@ -16,6 +16,7 @@ import AccountInfoListenerContext from '@popup/shared/AccountInfoListenerContext
 import './i18n';
 
 import { mainnet } from '@shared/constants/networkConfiguration';
+import LedgerContext from '@concordium/ledger-bindings/react/LedgerProvider';
 import Routes from './Routes';
 
 const body = document.getElementsByTagName('body').item(0);
@@ -89,7 +90,9 @@ export default function Root() {
                     <Theme>
                         <AccountInfoListenerContext>
                             <BlockChainParametersContext>
-                                <Routes />
+                                <LedgerContext>
+                                    <Routes />
+                                </LedgerContext>
                             </BlockChainParametersContext>
                         </AccountInfoListenerContext>
                     </Theme>

@@ -4,13 +4,13 @@ import { fullscreenPromptContext } from '@popup/page-layouts/FullscreenPromptLay
 import { useTranslation } from 'react-i18next';
 import { useLocation } from 'react-router-dom';
 import { AccountTransactionType, AccountAddress, SchemaVersion } from '@concordium/web-sdk';
-import { usePrivateKey } from '@popup/shared/utils/account-helpers';
+import { useCredential } from '@popup/shared/utils/account-helpers';
 import {
     sendTransaction,
     getDefaultExpiry,
     createPendingTransactionFromAccountTransaction,
 } from '@popup/shared/utils/transaction-helpers';
-import { grpcClientAtom } from '@popup/store/settings';
+import { grpcClientAtom, networkConfigurationAtom } from '@popup/store/settings';
 import TransactionReceipt from '@popup/shared/TransactionReceipt/TransactionReceipt';
 import Button from '@popup/shared/Button';
 import { displayUrl } from '@popup/shared/utils/string-helpers';
@@ -22,6 +22,9 @@ import { addPendingTransactionAtom } from '@popup/store/transactions';
 import { convertEnergyToMicroCcd, getEnergyCost } from '@shared/utils/energy-helpers';
 import { SmartContractParameters, SchemaWithContext } from '@concordium/browser-wallet-api-helpers';
 import { useBlockChainParameters } from '@popup/shared/BlockChainParametersProvider';
+import { getNet } from '@shared/utils/network-helpers';
+import { useLedger } from '@concordium/ledger-bindings/react/LedgerProvider';
+import { ConcordiumLedgerClient } from '@concordium/ledger-bindings';
 import { parsePayload } from './util';
 
 interface Location {
@@ -51,9 +54,9 @@ export default function SendTransaction({ onSubmit, onReject }: Props) {
     const { withClose, onClose } = useContext(fullscreenPromptContext);
     const addPendingTransaction = useUpdateAtom(addPendingTransactionAtom);
     const chainParameters = useBlockChainParameters();
-
     const { accountAddress, url } = state.payload;
-    const key = usePrivateKey(accountAddress);
+    const cred = useCredential(accountAddress);
+    const network = useAtomValue(networkConfigurationAtom);
 
     const { type: transactionType, payload } = useMemo(
         () =>
@@ -77,34 +80,38 @@ export default function SendTransaction({ onSubmit, onReject }: Props) {
 
     useEffect(() => onClose(onReject), [onClose, onReject]);
 
-    const handleSubmit = useCallback(async () => {
-        if (!accountAddress) {
-            throw new Error('Missing url account address');
-        }
-        if (!key) {
-            throw new Error('Missing key for the chosen address');
-        }
+    const handleSubmit = useCallback(
+        async (ledgerClient: ConcordiumLedgerClient) => {
+            if (!accountAddress) {
+                throw new Error('Missing url account address');
+            }
+            if (!cred) {
+                throw new Error('Missing credential for the chosen address');
+            }
 
-        const sender = new AccountAddress(accountAddress);
-        const nonce = await client.getNextAccountNonce(sender);
+            const sender = new AccountAddress(accountAddress);
+            const nonce = await client.getNextAccountNonce(sender);
 
-        if (!nonce) {
-            throw new Error('No nonce was found for the chosen account');
-        }
+            if (!nonce) {
+                throw new Error('No nonce was found for the chosen account');
+            }
 
-        const header = {
-            expiry: getDefaultExpiry(),
-            sender,
-            nonce: nonce.nonce,
-        };
-        const transaction = { payload, header, type: transactionType };
+            const header = {
+                expiry: getDefaultExpiry(),
+                sender,
+                nonce: nonce.nonce,
+            };
+            const transaction = { payload, header, type: transactionType };
+            const hash = await sendTransaction(client, transaction, cred, ledgerClient, getNet(network));
+            const pending = createPendingTransactionFromAccountTransaction(transaction, hash, cost);
+            await addPendingTransaction(pending);
 
-        const hash = await sendTransaction(client, transaction, key);
-        const pending = createPendingTransactionFromAccountTransaction(transaction, hash, cost);
-        await addPendingTransaction(pending);
+            onSubmit(hash);
+        },
+        [payload, cred, cost]
+    );
 
-        return hash;
-    }, [payload, key, cost]);
+    const { submitHandler } = useLedger(handleSubmit, (e) => addToast(e.message));
 
     return (
         <ExternalRequestLayout>
@@ -124,14 +131,7 @@ export default function SendTransaction({ onSubmit, onReject }: Props) {
                     <Button width="narrow" className="m-r-10" onClick={withClose(onReject)}>
                         {t('deny')}
                     </Button>
-                    <Button
-                        width="narrow"
-                        onClick={() =>
-                            handleSubmit()
-                                .then(withClose(onSubmit))
-                                .catch((e) => addToast(e.message))
-                        }
-                    >
+                    <Button width="narrow" onClick={withClose(submitHandler)}>
                         {t('submit')}
                     </Button>
                 </div>

@@ -2,16 +2,15 @@ import {
     AccountAddress,
     AccountTransaction,
     AccountTransactionType,
-    buildBasicAccountSigner,
     getAccountTransactionHash,
     CcdAmount,
     ConcordiumGRPCClient,
-    signTransaction,
     SimpleTransferPayload,
     TransactionExpiry,
     AccountInfo,
     ChainParametersV1,
     BakerPoolStatusDetails,
+    Network,
 } from '@concordium/web-sdk';
 import { ccdToMicroCcd, displayAsCcd, fractionalToInteger, isValidCcdString } from 'wallet-common-helpers';
 
@@ -19,6 +18,8 @@ import i18n from '@popup/shell/i18n';
 import { useAtomValue } from 'jotai';
 import { selectedPendingTransactionsAtom } from '@popup/store/transactions';
 import { DEFAULT_TRANSACTION_EXPIRY } from '@shared/constants/time';
+import { ConcordiumLedgerClient, getAccountPath } from '@concordium/ledger-bindings';
+import { WalletCredential } from '@shared/storage/types';
 import { BrowserWalletAccountTransaction, TransactionStatus } from './transaction-history-types';
 
 export function buildSimpleTransferPayload(recipient: string, amount: bigint): SimpleTransferPayload {
@@ -31,16 +32,27 @@ export function buildSimpleTransferPayload(recipient: string, amount: bigint): S
 export async function sendTransaction(
     client: ConcordiumGRPCClient,
     transaction: AccountTransaction,
-    signingKey: string
+    cred: WalletCredential,
+    ledger: ConcordiumLedgerClient | undefined,
+    net: Network
 ): Promise<string> {
-    const signature = await signTransaction(transaction, buildBasicAccountSigner(signingKey));
-    const result = await client.sendAccountTransaction(transaction, signature);
+    if (!ledger) {
+        throw new Error('No ledger available');
+    }
+
+    const path = getAccountPath(
+        { identityProviderIndex: cred.providerIndex, identityIndex: cred.identityIndex, accountIndex: cred.credNumber },
+        net
+    );
+    const rawSignature = (await ledger.signTransfer(transaction, path)).toString('hex');
+    const transactionSignature = { 0: { 0: rawSignature } };
+    const result = await client.sendAccountTransaction(transaction, transactionSignature);
 
     if (!result) {
         throw new Error('transaction was rejected by the node');
     }
 
-    return getAccountTransactionHash(transaction, signature);
+    return getAccountTransactionHash(transaction, transactionSignature);
 }
 
 /**
