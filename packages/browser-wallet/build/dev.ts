@@ -35,6 +35,7 @@ const config: BuildOptions = {
     metafile: true,
     logLevel: 'info',
     sourcemap: process.env.NODE_ENV !== 'production' && 'inline',
+    inject: ['./build/inject.js'],
     target: ['chrome67'],
     outdir: 'dist',
     define: {

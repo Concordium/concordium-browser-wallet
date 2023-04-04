@@ -13,7 +13,9 @@
             "@assets/*": ["./src/assets/*"],
             "@concordium/browser-wallet-api": ["../browser-wallet-api/src"],
             "@concordium/browser-wallet-message-hub": ["../browser-wallet-message-hub/src"],
-            "@concordium/browser-wallet-api-helpers": ["../browser-wallet-api-helpers/src"]
+            "@concordium/browser-wallet-api-helpers": ["../browser-wallet-api-helpers/src"],
+            "@concordium/ledger-bindings": ["../ledger-bindings/src"],
+            "@concordium/ledger-bindings/*": ["../ledger-bindings/src/*"]
         }
     },
     "ts-node": {

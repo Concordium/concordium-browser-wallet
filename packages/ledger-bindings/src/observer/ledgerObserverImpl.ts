@@ -44,8 +44,7 @@ export default class LedgerObserverImpl implements LedgerObserver {
     }
 
     /**
-     * Creates an observer for events happening on the Ledger. The events will be sent using
-     * IPC to the window provided.
+     * Creates an observer for events happening on the Ledger. The events will be sent using the provided emitter.
      * @param eventEmitter the emitter that should receive events from the observer
      */
     createLedgerObserver(eventEmitter: EventEmitter): Observer<DescriptorEvent<HIDDevice>> {
