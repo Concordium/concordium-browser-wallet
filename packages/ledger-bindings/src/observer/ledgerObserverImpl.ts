@@ -3,7 +3,7 @@ import type { Observer, DescriptorEvent, Subscription } from '@ledgerhq/hw-trans
 import EventEmitter from 'events';
 import ConcordiumLedgerClient from '../ledger/ConcordiumLedgerClient';
 import { LedgerObserver } from './ledgerObserver';
-import { isConcordiumApp, isOutdated, LedgerIpcCommands, LedgerSubscriptionAction } from './ledgerObserverHelper';
+import { emitterEvent, isConcordiumApp, isOutdated, LedgerSubscriptionAction } from './ledgerObserverHelper';
 
 export default class LedgerObserverImpl implements LedgerObserver {
     concordiumClient: ConcordiumLedgerClient | undefined;
@@ -53,7 +53,7 @@ export default class LedgerObserverImpl implements LedgerObserver {
                 // This is expected to never trigger.
             },
             error: () => {
-                eventEmitter.emit(LedgerIpcCommands.listenChannel, LedgerSubscriptionAction.ERROR_SUBSCRIPTION);
+                eventEmitter.emit(emitterEvent, LedgerSubscriptionAction.ERROR_SUBSCRIPTION);
             },
             // eslint-disable-next-line @typescript-eslint/no-explicit-any
             next: async (event: any) => {
@@ -81,12 +81,12 @@ export default class LedgerObserverImpl implements LedgerObserver {
                     } else {
                         action = LedgerSubscriptionAction.CONNECTED_SUBSCRIPTION;
                     }
-                    eventEmitter.emit(LedgerIpcCommands.listenChannel, action, deviceName);
+                    eventEmitter.emit(emitterEvent, action, deviceName);
                 } else if (event.type === 'remove') {
                     if (this.concordiumClient) {
                         this.concordiumClient.closeTransport();
                     }
-                    eventEmitter.emit(LedgerIpcCommands.listenChannel, LedgerSubscriptionAction.RESET);
+                    eventEmitter.emit(emitterEvent, LedgerSubscriptionAction.RESET);
                 }
             },
         };

@@ -21,8 +21,6 @@ import verifyAddress from './verifyAddress';
 /**
  * Concordium Ledger API.
  *
- * This MUST be called from the main thread.
- *
  * @example
  * import ConcordiumLedgerClient from "..."
  * const client = new ConcordiumLedgerClient(transport);

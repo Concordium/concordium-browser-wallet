@@ -3,7 +3,7 @@ import EventEmitter from 'events';
 import { sleep } from '../utils/basicHelpers';
 import ConcordiumLedgerClient from '../ledger/ConcordiumLedgerClient';
 import { LedgerObserver } from './ledgerObserver';
-import { isConcordiumApp, LedgerIpcCommands, LedgerSubscriptionAction } from './ledgerObserverHelper';
+import { emitterEvent, isConcordiumApp, LedgerSubscriptionAction } from './ledgerObserverHelper';
 
 export default class LedgerEmulatorObserverImpl implements LedgerObserver {
     concordiumClient: ConcordiumLedgerClient | undefined;
@@ -51,13 +51,13 @@ export default class LedgerEmulatorObserverImpl implements LedgerObserver {
                     }
                     if (!appAndVersion) {
                         // We could not extract the version information.
-                        eventEmitter.emit(LedgerIpcCommands.listenChannel, LedgerSubscriptionAction.RESET);
+                        eventEmitter.emit(emitterEvent, LedgerSubscriptionAction.RESET);
                         return;
                     }
 
                     if (isConcordiumApp(appAndVersion)) {
                         eventEmitter.emit(
-                            LedgerIpcCommands.listenChannel,
+                            emitterEvent,
                             LedgerSubscriptionAction.CONNECTED_SUBSCRIPTION,
                             'Ledger Emulator'
                         );
@@ -71,7 +71,7 @@ export default class LedgerEmulatorObserverImpl implements LedgerObserver {
                     if (this.concordiumClient) {
                         this.concordiumClient.closeTransport();
                     }
-                    eventEmitter.emit(LedgerIpcCommands.listenChannel, LedgerSubscriptionAction.RESET);
+                    eventEmitter.emit(emitterEvent, LedgerSubscriptionAction.RESET);
                 }
             }
 
@@ -85,7 +85,7 @@ export default class LedgerEmulatorObserverImpl implements LedgerObserver {
         }
     }
 
-    async resetTransport(mainWindow: EventEmitter) {
-        throw new Error(`Not implemented for the emulator: ${mainWindow}`);
+    async resetTransport(eventEmitter: EventEmitter) {
+        throw new Error(`Reset transport not implemented for the emulator: ${eventEmitter}`);
     }
 }

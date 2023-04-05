@@ -16,7 +16,7 @@ import AccountInfoListenerContext from '@popup/shared/AccountInfoListenerContext
 import './i18n';
 
 import { mainnet } from '@shared/constants/networkConfiguration';
-import LedgerContext from '@concordium/ledger-bindings/react/LedgerProvider';
+import { LedgerContext } from '@concordium/ledger-bindings/react';
 import Routes from './Routes';
 
 const body = document.getElementsByTagName('body').item(0);

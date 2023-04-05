@@ -19,8 +19,9 @@ import ledgerReducer, {
     outdatedAction,
     loadingAction,
     connectedAction,
+    LedgerActionType,
 } from './ledgerReducer';
-import { LedgerIpcCommands, LedgerSubscriptionAction } from '../observer/ledgerObserverHelper';
+import { emitterEvent, LedgerSubscriptionAction } from '../observer/ledgerObserverHelper';
 
 export type LedgerCallback<ReturnType = void> = (
     client: ConcordiumLedgerClient,
@@ -42,22 +43,10 @@ interface Props {
     children: ReactNode;
 }
 
-enum LedgerActionType {
-    PENDING,
-    CONNECTED,
-    ERROR,
-    LOADING,
-    DISCONNECT,
-    SET_STATUS_TEXT,
-    FINISHED,
-    CLEANUP,
-    OUTDATED,
-}
-
 /**
  * Context for enabling the useLedger hook.
  */
-export default function LedgerContext({ children }: Props) {
+export function LedgerContext({ children }: Props) {
     const ledgerObserver = useMemo(() => new LedgerObserverImpl(), []);
     const [state, setState] = useState<LedgerReducerState>(getInitialState());
 
@@ -72,32 +61,29 @@ export default function LedgerContext({ children }: Props) {
     }, []);
 
     useEffect(() => {
-        context?.eventsEmitter.on(
-            LedgerIpcCommands.listenChannel,
-            (action: LedgerSubscriptionAction, deviceName: string) => {
-                switch (action) {
-                    case LedgerSubscriptionAction.ERROR_SUBSCRIPTION:
-                        dispatch(errorAction());
-                        return;
-                    case LedgerSubscriptionAction.PENDING:
-                        dispatch(pendingAction(LedgerStatusType.OPEN_APP, deviceName));
-                        return;
-                    case LedgerSubscriptionAction.OUTDATED:
-                        dispatch(outdatedAction(deviceName));
-                        return;
-                    case LedgerSubscriptionAction.RESET:
-                        dispatch(loadingAction());
-                        return;
-                    case LedgerSubscriptionAction.CONNECTED_SUBSCRIPTION:
-                        dispatch(connectedAction(deviceName, new ConcordiumLedgerClient()));
-                        return;
-                    default:
-                        throw new Error(`Received an unknown action ${action}`);
-                }
+        context?.eventsEmitter.on(emitterEvent, (action: LedgerSubscriptionAction, deviceName: string) => {
+            switch (action) {
+                case LedgerSubscriptionAction.ERROR_SUBSCRIPTION:
+                    dispatch(errorAction());
+                    return;
+                case LedgerSubscriptionAction.PENDING:
+                    dispatch(pendingAction(LedgerStatusType.OPEN_APP, deviceName));
+                    return;
+                case LedgerSubscriptionAction.OUTDATED:
+                    dispatch(outdatedAction(deviceName));
+                    return;
+                case LedgerSubscriptionAction.RESET:
+                    dispatch(loadingAction());
+                    return;
+                case LedgerSubscriptionAction.CONNECTED_SUBSCRIPTION:
+                    dispatch(connectedAction(deviceName, new ConcordiumLedgerClient()));
+                    return;
+                default:
+                    throw new Error(`Received an unknown action ${action}`);
             }
-        );
+        });
         return () => {
-            context?.eventsEmitter.removeAllListeners(LedgerIpcCommands.listenChannel);
+            context?.eventsEmitter.removeAllListeners(emitterEvent);
         };
     }, []);
 

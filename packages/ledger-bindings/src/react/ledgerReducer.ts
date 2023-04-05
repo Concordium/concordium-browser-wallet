@@ -1,12 +1,5 @@
 import ConcordiumLedgerClient from '../ledger/ConcordiumLedgerClient';
 
-// eslint-disable-next-line @typescript-eslint/no-explicit-any
-export interface Action<T = any> {
-    type: T;
-}
-
-export type Reducer<S, A extends Action> = (state: S | undefined, action: A) => S;
-
 export enum LedgerStatusType {
     DISCONNECTED,
     ERROR,
@@ -17,14 +10,12 @@ export enum LedgerStatusType {
     AWAITING_USER_INPUT,
 }
 
-export interface LedgerReducerState {
-    text: string | JSX.Element;
-    status: LedgerStatusType;
-    deviceName?: string;
-    client?: ConcordiumLedgerClient;
+// eslint-disable-next-line @typescript-eslint/no-explicit-any
+export interface Action<T = any> {
+    type: T;
 }
 
-enum LedgerActionType {
+export enum LedgerActionType {
     PENDING,
     CONNECTED,
     ERROR,
@@ -34,6 +25,13 @@ enum LedgerActionType {
     FINISHED,
     CLEANUP,
     OUTDATED,
+}
+export type Reducer<S, A extends Action> = (state: S | undefined, action: A) => S;
+export interface LedgerReducerState {
+    text: string | JSX.Element;
+    status: LedgerStatusType;
+    deviceName?: string;
+    client?: ConcordiumLedgerClient;
 }
 
 interface PendingAction extends Action<LedgerActionType.PENDING> {
