@@ -142,10 +142,10 @@ It is possible to sign arbitrary messages using the keys for an account stored i
 
 If the wallet is locked, or you have not connected with the wallet (or previously been whitelisted) or if the user rejects signing the meesage, the `Promise` will reject.
 
-The message should either utf8 string or an object with the following fields:
+The message should be either a utf8 string or an object with the following fields:
 
 -   data: A hex string representing the bytes that should be signed.
--   schema: A base64 string that represents a schema for the data field, and which can be used to deserialize the data into a JSON format.
+-   schema: A base64 string that represents a schema for the data field, and which can be used to deserialize the data into a JSON format. (For reference, the type of schema used here is the same that is used for smart contract types)
 
 The following exemplifies requesting a signature of a message, where the message is a utf8 string:
 
