@@ -6,6 +6,10 @@
 
 -   Use gRPC-web instead of json-RPC.
 
+### Fixed
+
+-   Handling of UpdateAccountKey transactions from wallet-proxy.
+
 ## 0.9.8
 
 ### Fixed
