@@ -80,7 +80,7 @@ const t = {
             noContractFound: 'No contract found on index',
             noTokensError: 'No tokens found in contract',
             failedTokensError:
-                'The following errors was encountered while checking for tokens in the contract: \n{{ errors }}',
+                'The following errors were encountered while checking for tokens in the contract: \n{{ errors }}',
             contractIndex: 'Contract index',
             hexId: 'Invalid token ID (must be HEX encoded)',
             updateTokens: 'Update tokens',

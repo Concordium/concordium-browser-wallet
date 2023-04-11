@@ -135,6 +135,14 @@ const t = {
     addTokens: {
         cis0Error: 'Contract does not support CIS-0',
         cis2Error: 'Contract does not support CIS-2',
+        metadata: {
+            fetchError: 'Something went wrong, status: {{ status }}',
+            incorrectChecksum: 'Metadata does not match checksum provided with url',
+            invalidJSON: 'Metadata url did not return valid JSON',
+            incorrectDecimalFormat: 'Metadata contains incorrect decimals format',
+            incorrectStringField: 'string field was present but did not contain a string',
+            incorrectUrlField: 'Url field was present but did not contain an url',
+        },
     },
 };
 
