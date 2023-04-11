@@ -6,26 +6,14 @@ import { selectedAccountAtom } from '@popup/store/account';
 import Form from '@popup/shared/Form';
 import AmountInput from '@popup/shared/Form/AmountInput';
 import Input from '@popup/shared/Form/Input';
-import {
-    ccdToMicroCcd,
-    getPublicAccountAmounts,
-    fractionalToInteger,
-    useAsyncMemo,
-    integerToFractional,
-    max,
-    displayAsCcd,
-} from 'wallet-common-helpers';
-import { AccountAddress, SimpleTransferPayload } from '@concordium/web-sdk';
+import { getPublicAccountAmounts, useAsyncMemo, integerToFractional, max, displayAsCcd } from 'wallet-common-helpers';
+import { AccountAddress } from '@concordium/web-sdk';
 import { SubmitHandler, useForm, Validate } from 'react-hook-form';
 import clsx from 'clsx';
 import { useLocation, useNavigate } from 'react-router-dom';
 
 import Submit from '@popup/shared/Form/Submit';
-import {
-    buildSimpleTransferPayload,
-    validateTransferAmount,
-    validateAccountAddress,
-} from '@popup/shared/utils/transaction-helpers';
+import { validateTransferAmount, validateAccountAddress } from '@popup/shared/utils/transaction-helpers';
 import { useAccountInfo } from '@popup/shared/AccountInfoListenerContext';
 import { useSelectedCredential } from '@popup/shared/utils/account-helpers';
 import { CCD_METADATA } from '@shared/constants/token-metadata';
@@ -46,16 +34,7 @@ import Img from '@popup/shared/Img';
 import { useBlockChainParameters } from '@popup/shared/BlockChainParametersProvider';
 import { routes } from './routes';
 import PickToken from './PickToken';
-import { ConfirmTokenTransferState } from './ConfirmTokenTransfer';
-import { ConfirmSimpleTransferState } from './ConfirmSimpleTransfer';
-
-export type FormValues = {
-    amount: string;
-    recipient: string;
-    executionEnergy: string;
-    cost: string;
-    token?: TokenIdentifier;
-};
+import { buildConfirmState, ConfirmTransferState, CreateTransferFormValues } from './util';
 
 interface Props {
     cost: bigint;
@@ -63,12 +42,19 @@ interface Props {
     setDetailsExpanded: (expanded: boolean) => void;
 }
 
+const getNextRoute = (token?: TokenIdentifier) => {
+    if (token) {
+        return routes.confirmToken;
+    }
+    return routes.confirm;
+};
+
 /**
  * undefined is used to denote "not resolved yet", to align with useAsyncMemo return type
  */
 type FeeResult = { success: true; value: bigint } | { success: false } | undefined;
 
-type State = undefined | (SimpleTransferPayload & Partial<TokenIdentifier>);
+type State = undefined | ConfirmTransferState;
 
 function createDefaultValues(defaultPayload: State, accountTokens?: AccountTokens) {
     let token;
@@ -81,8 +67,8 @@ function createDefaultValues(defaultPayload: State, accountTokens?: AccountToken
         decimals = getMetadataDecimals(metadata ?? {});
     }
     return {
-        amount: integerToFractional(decimals)(defaultPayload?.amount?.microCcdAmount),
-        recipient: defaultPayload?.toAddress.address,
+        amount: integerToFractional(decimals)(defaultPayload?.amount),
+        recipient: defaultPayload?.toAddress,
         token,
     };
 }
@@ -95,7 +81,7 @@ function CreateTransaction({ tokens, setCost, setDetailsExpanded, cost }: Props 
     const selectedCred = useSelectedCredential();
     const nav = useNavigate();
     const accountTokens = useMemo(() => (address ? tokens[address] || {} : undefined), [tokens, address]);
-    const form = useForm<FormValues>({
+    const form = useForm<CreateTransferFormValues>({
         defaultValues: createDefaultValues(state as State, accountTokens),
     });
     const client = useAtomValue(grpcClientAtom);
@@ -217,26 +203,9 @@ function CreateTransaction({ tokens, setCost, setDetailsExpanded, cost }: Props 
         return null;
     }
 
-    const onSubmit: SubmitHandler<FormValues> = (vs) => {
-        let nextRoute: string;
-        let currentState: ConfirmTokenTransferState | ConfirmSimpleTransferState;
-
-        if (vs.token) {
-            const payload = buildSimpleTransferPayload(
-                vs.recipient,
-                fractionalToInteger(vs.amount, getMetadataDecimals(vs.token.metadata))
-            );
-
-            currentState = {
-                ...payload,
-                ...vs.token,
-                executionEnergy: vs.executionEnergy,
-            };
-            nextRoute = routes.confirmToken;
-        } else {
-            currentState = buildSimpleTransferPayload(vs.recipient, ccdToMicroCcd(vs.amount));
-            nextRoute = routes.confirm;
-        }
+    const onSubmit: SubmitHandler<CreateTransferFormValues> = (vs) => {
+        const nextRoute = getNextRoute(vs.token);
+        const currentState = buildConfirmState(vs);
 
         nav(pathname, { state: currentState, replace: true }); // Ensures next route can move back to UI with previous values.
         nav(nextRoute, { state: currentState });

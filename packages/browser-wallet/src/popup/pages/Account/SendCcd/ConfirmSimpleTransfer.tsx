@@ -1,6 +1,8 @@
-import React from 'react';
-import { AccountTransactionType, SimpleTransferPayload } from '@concordium/web-sdk';
+import React, { useMemo } from 'react';
+import { AccountTransactionType } from '@concordium/web-sdk';
 import { useLocation } from 'react-router-dom';
+import { buildSimpleTransferPayload } from '@popup/shared/utils/transaction-helpers';
+import { ConfirmSimpleTransferState } from './util';
 import ConfirmTransfer from '../ConfirmTransfer';
 
 interface Props {
@@ -8,15 +10,16 @@ interface Props {
     cost?: bigint;
 }
 
-export type ConfirmSimpleTransferState = SimpleTransferPayload;
-
 export default function ConfirmSimpleTransfer({ setDetailsExpanded, cost }: Props) {
-    const { state } = useLocation();
+    const { state } = useLocation() as { state: ConfirmSimpleTransferState };
+
+    const payload = useMemo(() => buildSimpleTransferPayload(state.toAddress, state.amount), [state]);
+
     return (
         <ConfirmTransfer
             setDetailsExpanded={setDetailsExpanded}
             cost={cost}
-            payload={state as ConfirmSimpleTransferState}
+            payload={payload}
             transactionType={AccountTransactionType.Transfer}
         />
     );

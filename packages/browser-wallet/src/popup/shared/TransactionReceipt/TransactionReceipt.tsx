@@ -2,8 +2,6 @@
 import clsx from 'clsx';
 import { useTranslation } from 'react-i18next';
 import React, { useState } from 'react';
-import DisplayAddress, { AddressDisplayFormat } from 'wallet-common-helpers/src/components/DisplayAddress';
-import { chunkString } from 'wallet-common-helpers';
 import {
     AccountTransactionType,
     AccountTransaction,
@@ -19,6 +17,7 @@ import { Cis2TransferParameters } from '@shared/utils/types';
 import { SmartContractParameters } from '@concordium/browser-wallet-api-helpers';
 import { TokenMetadata } from '@shared/storage/types';
 import { getMetadataDecimals } from '@shared/utils/token-helpers';
+import { chunkString, DisplayAddress, AddressDisplayFormat } from 'wallet-common-helpers';
 import DisplayCost from './DisplayCost';
 import { getTransactionTypeName } from '../utils/transaction-helpers';
 import DisplayUpdateContract from './displayPayload/DisplayUpdateContract';

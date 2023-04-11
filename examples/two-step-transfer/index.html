@@ -53,6 +53,47 @@
                         .then((sig) => alert(JSON.stringify(sig)))
                         .catch(alert)
                 );
+                document.getElementById('signMessageBinary').addEventListener('click', () => {
+                    const SERIALIZATION_HELPER_SCHEMA =
+                        'FAAFAAAAEAAAAGNvbnRyYWN0X2FkZHJlc3MMCwAAAGVudHJ5X3BvaW50FgEFAAAAbm9uY2UFCQAAAHRpbWVzdGFtcA0HAAAAcGF5bG9hZBUCAAAACAAAAFRyYW5zZmVyAQEAAAAQARQABQAAAAgAAAB0b2tlbl9pZB0ABgAAAGFtb3VudBslAAAABAAAAGZyb20VAgAAAAcAAABBY2NvdW50AQEAAAALCAAAAENvbnRyYWN0AQEAAAAMAgAAAHRvFQIAAAAHAAAAQWNjb3VudAEBAAAACwgAAABDb250cmFjdAECAAAADBYBBAAAAGRhdGEdAQ4AAABVcGRhdGVPcGVyYXRvcgEBAAAAEAEUAAIAAAAGAAAAdXBkYXRlFQIAAAAGAAAAUmVtb3ZlAgMAAABBZGQCCAAAAG9wZXJhdG9yFQIAAAAHAAAAQWNjb3VudAEBAAAACwgAAABDb250cmFjdAEBAAAADA';
+                    const sponsoredMessage = {
+                        contract_address: {
+                            index: 0,
+                            subindex: 0,
+                        },
+                        entry_point: 'contract_transfer',
+                        nonce: 1,
+                        payload: {
+                            Transfer: [
+                                [
+                                    {
+                                        amount: '1',
+                                        data: '',
+                                        from: {
+                                            Account: [currentAccountAddress],
+                                        },
+                                        to: {
+                                            Account: [currentAccountAddress],
+                                        },
+                                        token_id: '11111111',
+                                    },
+                                ],
+                            ],
+                        },
+                        timestamp: '2030-08-08T05:15:00Z',
+                    };
+                    const serializedMessage = concordiumSDK.serializeTypeValue(
+                        sponsoredMessage,
+                        concordiumSDK.toBuffer(SERIALIZATION_HELPER_SCHEMA, 'base64')
+                    );
+                    provider
+                        .signMessage(currentAccountAddress, {
+                            data: serializedMessage.toString('hex'),
+                            schema: SERIALIZATION_HELPER_SCHEMA,
+                        })
+                        .then((sig) => alert(JSON.stringify(sig)))
+                        .catch(alert);
+                });
                 document.getElementById('sendDeposit').addEventListener('click', () =>
                     provider
                         .sendTransaction(currentAccountAddress, concordiumSDK.AccountTransactionType.Update, {
@@ -82,7 +123,7 @@
                                 maxContractExecutionEnergy: 30000n,
                             },
                             {
-                                RequestTransfer: ['1000', '1', '3Y1RLgi5pW3x96xZ7CiDiKsTL9huU92qn6mfxpebwmtkeku8ry'],
+                                RequestTransfer: [1000, '1', '3Y1RLgi5pW3x96xZ7CiDiKsTL9huU92qn6mfxpebwmtkeku8ry'],
                             },
                             getSchema(
                                 twoStepTransferSchema,
@@ -182,6 +223,7 @@
         <br />
         Message: <input type="text" id="message" value="I believe in miracles" />
         <button id="signMessage">SignMessage</button>
+        <button id="signMessageBinary">SignSponsoredTransactionLikeMessage</button>
         <button id="registerData">Register message (HEX encoded) (must be a hex string)</button>
         <button id="registerDataCBOR">Register message (CBOR encoded)</button>
     </body>

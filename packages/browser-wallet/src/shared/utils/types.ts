@@ -1,5 +1,9 @@
 /* eslint-disable @typescript-eslint/ban-types */
-import { IdProofOutput } from '@concordium/web-sdk';
+import {
+    SchemaWithContext,
+    SmartContractParameters,
+} from '@concordium/browser-wallet-api-helpers/lib/wallet-api-types';
+import type { IdProofOutput, SchemaVersion, AccountTransactionType } from '@concordium/web-sdk';
 import { RefAttributes } from 'react';
 /**
  * @description
@@ -69,3 +73,13 @@ export type Cis2TransferParameters = [
         to: Cis2TransferParametersAccount;
     }
 ];
+
+export type BackgroundSendTransactionPayload = {
+    accountAddress: string;
+    type: AccountTransactionType;
+    payload: string;
+    parameters?: SmartContractParameters;
+    schema?: SchemaWithContext;
+    schemaVersion?: SchemaVersion;
+    url: string;
+};

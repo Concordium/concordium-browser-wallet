@@ -13,7 +13,7 @@ import {
 } from '@shared/storage/types';
 import { loop, not } from '@shared/utils/function-helpers';
 import { identityMatch } from '@shared/utils/identity-helpers';
-import { IdentityTokenContainer, IdentityProviderIdentityStatus } from 'wallet-common-helpers/lib/utils/identity/types';
+import { IdentityTokenContainer, IdentityProviderIdentityStatus } from 'wallet-common-helpers';
 import { updateCredentials, updateIdentities } from './update';
 
 const isPendingCred = (cred: WalletCredential): cred is PendingWalletCredential =>

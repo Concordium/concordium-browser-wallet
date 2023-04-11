@@ -5,7 +5,7 @@ import {
     ExtensionMessageHandler,
     MessageStatusWrapper,
 } from '@concordium/browser-wallet-message-hub';
-import { HttpProvider } from '@concordium/web-sdk';
+import { deserializeTypeValue, HttpProvider } from '@concordium/web-sdk';
 import {
     storedConnectedSites,
     storedSelectedAccount,
@@ -20,6 +20,9 @@ import JSONBig from 'json-bigint';
 import { ChromeStorageKey, NetworkConfiguration } from '@shared/storage/types';
 import { buildURLwithSearchParameters } from '@shared/utils/url-helpers';
 import { getTermsAndConditionsConfig } from '@shared/utils/network-helpers';
+import { Buffer } from 'buffer/';
+import { BackgroundSendTransactionPayload } from '@shared/utils/types';
+import { parsePayload } from '@shared/utils/payload-helpers';
 import { mainnet, testnet } from '@shared/constants/networkConfiguration';
 import bgMessageHandler from './message-handler';
 import {
@@ -257,6 +260,45 @@ const runIfWhitelisted: RunCondition<MessageStatusWrapper<undefined>> = async (m
     return { run: false, response: { success: false, message: NOT_WHITELISTED } };
 };
 
+const INCORRECT_SIGN_MESSAGE_FORMAT = 'The given message does not have correct format.';
+const UNABLE_TO_PARSE_SIGN_MESSAGE_OBJECT =
+    'The given message data could not be deserialized using the provided schema';
+
+/**
+ * Run condition for signMessage, which ensures the message is either a string,
+ * or a messageObject and in that case that the schema can be used to deserialize the message data.
+ */
+const ensureMessageWithSchemaParse: RunCondition<MessageStatusWrapper<undefined>> = async (msg) => {
+    const { message } = msg.payload;
+    if (typeof message === 'string') {
+        return { run: true };
+    }
+
+    if (!message.schema || !message.data) {
+        return { run: false, response: { success: false, message: INCORRECT_SIGN_MESSAGE_FORMAT } };
+    }
+    try {
+        deserializeTypeValue(Buffer.from(message.data, 'hex'), Buffer.from(message.schema, 'base64'));
+        return { run: true };
+    } catch {
+        return { run: false, response: { success: false, message: UNABLE_TO_PARSE_SIGN_MESSAGE_OBJECT } };
+    }
+};
+
+/**
+ * Run condition for sendTransaction, which ensures that the transaction can be parsed (including that parameters can be serialized).
+ */
+const ensureTransactionPayloadParse: RunCondition<MessageStatusWrapper<undefined>> = async (msg) => {
+    const payload = msg.payload as BackgroundSendTransactionPayload;
+
+    try {
+        parsePayload(payload.type, payload.payload, payload.parameters, payload.schema, payload.schemaVersion);
+    } catch (e) {
+        return { run: false, response: { success: false, message: `The given transaction is not valid due to: ${e}` } };
+    }
+    return { run: true };
+};
+
 // TODO change this to find most recently selected account
 /**
  * Finds the most prioritized account that is connected to the provided site.
@@ -417,7 +459,7 @@ forwardToPopup(
 forwardToPopup(
     MessageType.SendTransaction,
     InternalMessageType.SendTransaction,
-    runConditionComposer(runIfWhitelisted, withPromptStart),
+    runConditionComposer(runIfWhitelisted, ensureTransactionPayloadParse, withPromptStart),
     appendUrlToPayload,
     undefined,
     withPromptEnd
@@ -425,7 +467,7 @@ forwardToPopup(
 forwardToPopup(
     MessageType.SignMessage,
     InternalMessageType.SignMessage,
-    runConditionComposer(runIfWhitelisted, withPromptStart),
+    runConditionComposer(runIfWhitelisted, ensureMessageWithSchemaParse, withPromptStart),
     appendUrlToPayload,
     undefined,
     withPromptEnd

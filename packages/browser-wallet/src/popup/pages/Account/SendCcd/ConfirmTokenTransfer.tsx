@@ -2,25 +2,18 @@ import React, { useMemo } from 'react';
 import { useTranslation } from 'react-i18next';
 import { useSetAtom, useAtomValue } from 'jotai';
 import { selectedAccountAtom } from '@popup/store/account';
-import { AccountTransactionType, SimpleTransferPayload, UpdateContractPayload } from '@concordium/web-sdk';
+import { AccountTransactionType, UpdateContractPayload } from '@concordium/web-sdk';
 import { grpcClientAtom } from '@popup/store/settings';
 import { addToastAtom } from '@popup/state';
 import { useLocation } from 'react-router-dom';
 import { useAsyncMemo } from 'wallet-common-helpers';
 import { fetchContractName, getTokenTransferParameters, getTokenTransferPayload } from '@shared/utils/token-helpers';
-import { TokenMetadata } from '@shared/storage/types';
 import ConfirmTransfer from '../ConfirmTransfer';
+import { ConfirmTokenTransferState } from './util';
 
 interface Props {
     setDetailsExpanded: (expanded: boolean) => void;
     cost?: bigint;
-}
-
-export interface ConfirmTokenTransferState extends SimpleTransferPayload {
-    contractIndex: string;
-    tokenId: string;
-    metadata: TokenMetadata;
-    executionEnergy: string;
 }
 
 export default function ConfirmTokenTransfer({ setDetailsExpanded, cost }: Props) {
@@ -33,9 +26,7 @@ export default function ConfirmTokenTransfer({ setDetailsExpanded, cost }: Props
     const contractName = useAsyncMemo(() => fetchContractName(client, BigInt(contractIndex)), undefined, []);
 
     const parameters = useMemo(
-        () =>
-            selectedAddress &&
-            getTokenTransferParameters(selectedAddress, toAddress.address, tokenId, amount.microCcdAmount),
+        () => selectedAddress && getTokenTransferParameters(selectedAddress, toAddress, tokenId, amount),
         []
     );
 

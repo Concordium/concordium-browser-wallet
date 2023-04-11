@@ -13,7 +13,13 @@ import {
     ChainParametersV1,
     BakerPoolStatusDetails,
 } from '@concordium/web-sdk';
-import { ccdToMicroCcd, displayAsCcd, fractionalToInteger, isValidCcdString } from 'wallet-common-helpers';
+import {
+    isValidResolutionString,
+    ccdToMicroCcd,
+    displayAsCcd,
+    fractionalToInteger,
+    isValidCcdString,
+} from 'wallet-common-helpers';
 
 import i18n from '@popup/shell/i18n';
 import { useAtomValue } from 'jotai';
@@ -54,7 +60,7 @@ export function validateTransferAmount(
     decimals = 0,
     estimatedFee = 0n
 ): string | undefined {
-    if (!isValidCcdString(transferAmount)) {
+    if (!isValidResolutionString(10n ** BigInt(decimals), false, false, false)(transferAmount)) {
         return i18n.t('utils.ccdAmount.invalid');
     }
     const amountToValidateInteger = fractionalToInteger(transferAmount, decimals);

@@ -1,3 +1,27 @@
+$actions-height: rem(26px);
+
 .sign-message {
     display: block;
+
+    &__view-actions {
+        display: grid;
+        width: 100%;
+        grid-template-columns: 1fr 1fr;
+        height: $actions-height;
+        border-top-left-radius: rem(5px);
+        border-top-right-radius: rem(5px);
+    }
+
+    &__binary-text-area textarea {
+        border-top-left-radius: 0;
+        border-top-right-radius: 0;
+        font-family: $font-family-mono;
+        padding: rem(10px);
+    }
+
+    &__link {
+        &:not(.active) {
+            color: rgba($color: $color-off-white, $alpha: 60%);
+        }
+    }
 }

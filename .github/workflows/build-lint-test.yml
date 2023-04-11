@@ -98,5 +98,7 @@ jobs:
                       **/node_modules
                   key: ${{ runner.os }}-${{ env.dummy }}-${{ hashFiles('**/package.json', '**/yarn.lock') }}
 
+            - name: build api-helpers
+              run: yarn build:api-helpers
             - name: Test
               run: yarn test

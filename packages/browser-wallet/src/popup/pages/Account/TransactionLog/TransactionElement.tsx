@@ -3,7 +3,7 @@ import React, { CSSProperties } from 'react';
 import DoubleCheckmarkIcon from '@assets/svg/double-grey-checkmark.svg';
 import PendingIcon from '@assets/svg/clock.svg';
 import Warning from '@assets/svg/warning.svg';
-import { displayAsCcd } from 'wallet-common-helpers/lib/utils/ccd';
+import { displayAsCcd, dateFromTimestamp, TimeStampUnit } from 'wallet-common-helpers';
 import {
     BrowserWalletTransaction,
     isAccountTransaction,
@@ -11,7 +11,6 @@ import {
     SpecialTransactionType,
     TransactionStatus,
 } from '@popup/shared/utils/transaction-history-types';
-import { dateFromTimestamp, TimeStampUnit } from 'wallet-common-helpers';
 import clsx from 'clsx';
 import { AccountTransactionType } from '@concordium/web-sdk';
 

@@ -3,7 +3,7 @@ import { useAtomValue, useSetAtom } from 'jotai';
 import { fullscreenPromptContext } from '@popup/page-layouts/FullscreenPromptLayout';
 import { useTranslation } from 'react-i18next';
 import { useLocation } from 'react-router-dom';
-import { AccountTransactionType, AccountAddress, SchemaVersion } from '@concordium/web-sdk';
+import { AccountAddress } from '@concordium/web-sdk';
 import { usePrivateKey } from '@popup/shared/utils/account-helpers';
 import {
     sendTransaction,
@@ -19,22 +19,14 @@ import { addToastAtom } from '@popup/state';
 import ExternalRequestLayout from '@popup/page-layouts/ExternalRequestLayout';
 import { useUpdateAtom } from 'jotai/utils';
 import { addPendingTransactionAtom } from '@popup/store/transactions';
+import { parsePayload } from '@shared/utils/payload-helpers';
+import { BackgroundSendTransactionPayload } from '@shared/utils/types';
 import { convertEnergyToMicroCcd, getEnergyCost } from '@shared/utils/energy-helpers';
-import { SmartContractParameters, SchemaWithContext } from '@concordium/browser-wallet-api-helpers';
 import { useBlockChainParameters } from '@popup/shared/BlockChainParametersProvider';
-import { parsePayload } from './util';
 
 interface Location {
     state: {
-        payload: {
-            accountAddress: string;
-            type: AccountTransactionType;
-            payload: string;
-            parameters?: SmartContractParameters;
-            schema?: SchemaWithContext;
-            schemaVersion?: SchemaVersion;
-            url: string;
-        };
+        payload: BackgroundSendTransactionPayload;
     };
 }
 

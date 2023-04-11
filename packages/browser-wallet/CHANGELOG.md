@@ -16,6 +16,35 @@
 -   `chainChanged` event is correctly propagated to all (not just whitelisted) dapps listening for events through the wallet API.
 -   When changing the selected chain internally in the wallet, dapps now receive `accountChanged` event if an account on the new network has the dapp whitelisted, or `accountDisconnected` event if no account on the new network has the dapp whitelisted.
 
+## 0.9.11
+
+### Fixed
+
+-   Wallet crashing if sendTransaction contained parameters that could not be serialized. (The request is rejected instead)
+-   No longer crashes when opening modals (Like token raw metadata)
+
+## 0.9.10
+
+### Changed
+
+-   Updated text when signing arbitrary data with signMessage.
+
+### Fixed
+
+-   Duplicate key error when sending multiple transactions.
+-   Crash when going back in transfer flow. (introduced in 0.9.9)
+
+## 0.9.9
+
+### Added
+
+-   Support for signing arbitrary data with signMessage.
+
+### Fixed
+
+-   Bug for transferring tokens where validation was hardcoded to assume 6 decimals.
+-   Bug for transferring tokens where tokens with integer value above 64 bits caused a crash.
+
 ## 0.9.8
 
 ### Fixed
