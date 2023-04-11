@@ -58,8 +58,8 @@ export function ChooseNetwork() {
                     <Button
                         className="onboarding-setup__page-with-header__mainnet-button"
                         width="wide"
-                        onClick={() => {
-                            setNetworkConfiguration(mainnet);
+                        onClick={async () => {
+                            await setNetworkConfiguration(mainnet);
                             goToNext();
                         }}
                     >
@@ -68,8 +68,8 @@ export function ChooseNetwork() {
                     <Button
                         className="onboarding-setup__page-with-header__testnet-button"
                         width="wide"
-                        onClick={() => {
-                            setNetworkConfiguration(testnet);
+                        onClick={async () => {
+                            await setNetworkConfiguration(testnet);
                             goToNext();
                         }}
                     >
