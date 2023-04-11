@@ -31,7 +31,7 @@ import {
     topTokensAtom,
 } from './state';
 import { DetailsLocationState, manageTokensRoutes } from './utils';
-import { tokensRoutes } from '../Tokens/routes';
+import { tokensRoutes } from '../routes';
 
 const ELEMENT_HEIGHT = 58;
 

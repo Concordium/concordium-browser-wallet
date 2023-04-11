@@ -19,7 +19,6 @@ import TransactionLog from './TransactionLog/TransactionLog';
 import SendCcd from './SendCcd';
 import ConnectedBox from './ConnectedBox';
 import Tokens from './Tokens';
-import ManageTokens from './ManageTokens';
 import { AccountPageContext, accountPageContext } from './utils';
 import Earn from './Earn';
 import ConfirmGenericTransfer from './ConfirmGenericTransfer';
@@ -102,7 +101,6 @@ export default function AccountRoutes() {
                     <Route path={`${accountRoutes.log}/*`} element={<TransactionLog />} />
                     <Route path={`${accountRoutes.settings}/*`} element={<AccountSettings />} />
                     <Route path={`${accountRoutes.tokens}/*`} element={<Tokens />} />
-                    <Route path={`${accountRoutes.manageTokens}/*`} element={<ManageTokens />} />
                     <Route path={accountRoutes.confirmTransfer} element={<ConfirmGenericTransfer />} />
                 </Route>
             </Routes>

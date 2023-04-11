@@ -4,6 +4,8 @@
 export const tokensRoutes = {
     collectibles: 'collectibles',
     details: 'details/:contractIndex/:id/',
+    chooseContract: 'chooseContract',
+    manage: 'manage',
 };
 
 export const defaultCis2TokenId = '__default__';

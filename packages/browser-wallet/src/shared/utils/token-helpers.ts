@@ -150,14 +150,14 @@ export function getTokenUrl(
 
 function confirmMetadataUrl(field?: MetadataUrl) {
     if (field && !field.url) {
-        throw new Error('Url field was present but did not contain an url');
+        throw new Error(i18n.t('addTokens.metadata.incorrectUrlField'));
     }
 }
 
 // eslint-disable-next-line @typescript-eslint/no-explicit-any
 function confirmString(field?: any) {
     if (field && !(typeof field === 'string' || field instanceof String)) {
-        throw new Error('string field was present but did not contain a string');
+        throw new Error(i18n.t('addTokens.metadata.incorrectStringField'));
     }
 }
 
@@ -170,22 +170,27 @@ export const getMetadataDecimals = ({ decimals }: TokenMetadata) => Number(decim
 export async function getTokenMetadata({ url, hash: checksumHash }: MetadataUrl): Promise<TokenMetadata> {
     const resp = await fetch(url, { headers: new Headers({ 'Access-Control-Allow-Origin': '*' }), mode: 'cors' });
     if (!resp.ok) {
-        throw new Error(`Something went wrong, status: ${resp.status}`);
+        throw new Error(i18n.t('addTokens.metadata.fetchError', { status: resp.status }));
     }
 
     const body = Buffer.from(await resp.arrayBuffer());
     if (checksumHash && sha256([body]).toString('hex') !== checksumHash) {
-        throw new Error('Metadata does not match checksum provided with url');
+        throw new Error(i18n.t('addTokens.metadata.incorrectChecksum'));
     }
 
-    const metadata = JSON.parse(body.toString());
+    let metadata;
+    try {
+        metadata = JSON.parse(body.toString());
+    } catch (e) {
+        throw new Error(i18n.t('addTokens.metadata.invalidJSON'));
+    }
 
     confirmString(metadata.name);
     confirmString(metadata.symbol);
     confirmString(metadata.description);
     confirmMetadataUrl(metadata.thumbnail);
     if (metadata.decimals !== undefined && Number.isNaN(getMetadataDecimals(metadata))) {
-        throw new Error('Metadata contains incorrect decimals format');
+        throw new Error(i18n.t('addTokens.metadata.incorrectDecimalFormat'));
     }
     confirmMetadataUrl(metadata.thumbnail);
     confirmMetadataUrl(metadata.display);
@@ -406,7 +411,12 @@ export async function getTokens(
             return [[], []];
         }
         const metadata = await Promise.all(
-            metadataUrls.map((url) => getTokenMetadata(url).catch(() => Promise.resolve(undefined)))
+            metadataUrls.map((url, index) =>
+                getTokenMetadata(url).catch((error) => {
+                    onError?.(`id: "${ids[index]}": ${error.message}`);
+                    return Promise.resolve(undefined);
+                })
+            )
         );
 
         return [metadataUrls, metadata];

@@ -135,6 +135,14 @@ const t: typeof en = {
     addTokens: {
         cis0Error: 'Kontrakten supporterer ikke CIS-0',
         cis2Error: 'Kontrakten supporterer ikke CIS-2',
+        metadata: {
+            fetchError: 'Noget gik galt, status: {{ status }}',
+            incorrectChecksum: 'Metadata har ikke den samme checksum som er angivet i kontrakten',
+            invalidJSON: 'Metadata url returnerede ikke et valid JSON objekt',
+            incorrectDecimalFormat: 'Metadata indeholder et ukorrekt decimal format',
+            incorrectStringField: 'Et streng felt var angivet, men indeholdte ikke en streng',
+            incorrectUrlField: 'Url field was present but did not contain an url',
+        },
     },
 };
 

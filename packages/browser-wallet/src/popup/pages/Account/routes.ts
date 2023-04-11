@@ -9,6 +9,5 @@ export const accountRoutes = {
     earn: 'earn',
     settings: 'settings',
     log: 'log',
-    manageTokens: 'manage-tokens',
     confirmTransfer: 'confirm-transfer',
 };

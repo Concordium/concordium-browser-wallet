@@ -2,9 +2,8 @@ import React, { useMemo } from 'react';
 import { useTranslation } from 'react-i18next';
 import { Outlet, Route, Routes, useNavigate } from 'react-router-dom';
 import { displayAsCcd } from 'wallet-common-helpers';
-import { useAtomValue } from 'jotai';
+import { useAtom, useAtomValue } from 'jotai';
 
-import { absoluteRoutes } from '@popup/constants/routes';
 import TabBar from '@popup/shared/TabBar';
 import CcdIcon from '@assets/svg/concordium.svg';
 import { useAccountInfo } from '@popup/shared/AccountInfoListenerContext';
@@ -20,7 +19,9 @@ import Img from '@popup/shared/Img';
 import { tokensRoutes, detailsRoute } from './routes';
 import TokenDetails from './TokenDetails';
 import { AccountTokenDetails, useFlattenedAccountTokens } from './utils';
-import { accountRoutes } from '../routes';
+import ManageTokens from './ManageTokens';
+import ChooseContract from './ManageTokens/ChooseContract';
+import { contractDetailsAtom, contractTokensAtom } from './ManageTokens/state';
 
 type FtProps = {
     accountAddress: string;
@@ -178,10 +179,7 @@ function Tokens() {
                 <TabBar.Item className="tokens__link" to={tokensRoutes.collectibles}>
                     {t('nft')}
                 </TabBar.Item>
-                <TabBar.Item
-                    className="tokens__link"
-                    to={`${absoluteRoutes.home.account.path}/${accountRoutes.manageTokens}`}
-                >
+                <TabBar.Item className="tokens__link" to={tokensRoutes.chooseContract}>
                     <div className="tokens__add">{t('manage')}</div>
                 </TabBar.Item>
             </TabBar>
@@ -204,15 +202,21 @@ export default function TokensRoutes() {
         nav(detailsRoute(contractIndex, id));
     };
 
+    // Keep the following in memory while add token flow lives
+    useAtom(contractTokensAtom);
+    useAtom(contractDetailsAtom);
+
     return (
         <Routes>
             <Route path={tokensRoutes.details} element={<TokenDetails />} />
+            <Route path={`${tokensRoutes.manage}/*`} element={<ManageTokens />} />
             <Route element={<Tokens />}>
                 <Route index element={<Fungibles account={account} toDetails={goToDetails} />} />
                 <Route
                     path={tokensRoutes.collectibles}
                     element={<Collectibles account={account} toDetails={goToDetails} />}
                 />
+                <Route path={tokensRoutes.chooseContract} element={<ChooseContract />} />
             </Route>
         </Routes>
     );
