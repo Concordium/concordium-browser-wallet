@@ -2,6 +2,11 @@
 
 ## 1.0.0
 
+### Added
+
+-   Flows for starting, updating and stopping baking.
+-   Flows for starting, updating and stopping delegation.
+
 ### Changed
 
 -   Use gRPC-web instead of json-RPC.
