@@ -5,7 +5,8 @@ const t: typeof en = {
     createAccount: 'Opret konto',
     noIdentities: 'Du har ingen identiter, men en identitet er nødvendig for at oprette en konto.',
     createIdentity: 'Opret identitet',
-    maxAccountsReached: 'Denne identitet har allerede lavet alle tilladte konti',
+    maxAccountsReached:
+        'Denne identitet har lavet alle tilladte konti. For at lave flere konti skal du bruge en anden Concordium identitet.',
 };
 
 export default t;
