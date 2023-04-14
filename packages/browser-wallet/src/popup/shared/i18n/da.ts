@@ -30,7 +30,23 @@ const t: typeof en = {
         sex: 'Køn',
         dob: 'Fødselsdato',
     },
-
+    idAttributeValues: {
+        sex: {
+            NotKnown: 'Ukendt',
+            Male: 'Mand',
+            Female: 'Kvinde',
+            NA: 'N/A',
+            Unavailable: 'Ikke tilgængelig',
+        },
+        documentType: {
+            NA: 'N/A',
+            NationalIdCard: 'Nationalt ID Kort',
+            Passport: 'Pas',
+            DriversLicense: 'Kørekort',
+            ImmigrationCard: 'Immigrations ID Kort',
+            Unavailable: 'Ikke tilgængelig',
+        },
+    },
     account: {
         error: 'Fejl ved hentning af kontoens balance',
     },

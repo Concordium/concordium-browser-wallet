@@ -30,6 +30,23 @@ const t = {
         sex: 'Sex',
         dob: 'Date of birth',
     } as typeof attributeNamesMap,
+    idAttributeValues: {
+        sex: {
+            NotKnown: 'Not known',
+            Male: 'Male',
+            Female: 'Female',
+            NA: 'N/A',
+            Unavailable: 'Unavailable',
+        },
+        documentType: {
+            NA: 'N/A',
+            NationalIdCard: 'National ID card',
+            Passport: 'Passport',
+            DriversLicense: 'Drivers license',
+            ImmigrationCard: 'Immigration card',
+            Unavailable: 'Unavailable',
+        },
+    },
     account: {
         error: 'Unable to retrieve account balance',
     },

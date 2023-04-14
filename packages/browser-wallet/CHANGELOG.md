@@ -1,5 +1,15 @@
 # Changelog
 
+## 1.1.0
+
+### Added
+
+-   Support for eID (Criipto) identity document types.
+
+### Fixed
+
+-   Missing translations for some identity attributes.
+
 ## 1.0.0
 
 ### Added
