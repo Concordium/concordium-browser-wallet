@@ -1,4 +1,5 @@
 import { TFunction, useTranslation } from 'react-i18next';
+import { formatDate } from 'wallet-common-helpers';
 import sharedTranslations from '../i18n/en';
 
 export function useGetAttributeName() {
@@ -7,21 +8,6 @@ export function useGetAttributeName() {
     return (attributeKey: keyof typeof sharedTranslations.idAttributes) => {
         return attributeKey in sharedTranslations.idAttributes ? t(attributeKey) : attributeKey;
     };
-}
-
-function formatDate(date: string, locale: string) {
-    const y = date.slice(0, 4);
-    const m = date.slice(4, 6);
-    const d = date.slice(6, 8);
-
-    const dtFormat = new Intl.DateTimeFormat(locale, {
-        day: d ? 'numeric' : undefined,
-        month: 'long',
-        year: 'numeric',
-        timeZone: 'UTC',
-    });
-
-    return dtFormat.format(new Date(`${y}-${m}${d ? `-${d}` : ''}`));
 }
 
 enum Sex {
