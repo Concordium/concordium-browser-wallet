@@ -56,6 +56,7 @@ enum DocumentType {
 
 function formatDocumentType(value: string, t: TFunction<'shared', 'idAttributeValues'>) {
     const type = parseInt(value, 10);
+
     switch (type) {
         case DocumentType.NA:
             return t('documentType.NA');
@@ -68,7 +69,7 @@ function formatDocumentType(value: string, t: TFunction<'shared', 'idAttributeVa
         case DocumentType.ImmigrationCard:
             return t('documentType.ImmigrationCard');
         default:
-            return t('documentType.Unavailable');
+            return value;
     }
 }
 

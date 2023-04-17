@@ -22,7 +22,7 @@ const t: typeof en = {
         idDocIssuedAt: 'ID gyldigt fra',
         idDocIssuer: 'Identitetsdokumentudsteder',
         idDocType: 'Identitetsdokumenttype',
-        idDocNo: ' Identitetsdokumentnummer',
+        idDocNo: 'Identitetsdokumentnummer',
         lastName: 'Efternavn',
         taxIdNo: 'Skatte-ID-nummer',
         nationalIdNo: 'Personnummer',
