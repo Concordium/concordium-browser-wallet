@@ -249,4 +249,5 @@ export type Cis2TokensResponse = {
 export type AcceptedTermsState = {
     accepted: boolean;
     version: string;
+    url?: string;
 };
