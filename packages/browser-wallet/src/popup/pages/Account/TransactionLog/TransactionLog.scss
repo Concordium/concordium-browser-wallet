@@ -164,6 +164,14 @@
         padding-top: rem(5px);
         padding-bottom: rem(5px);
         min-height: rem(50px);
+
+        ul {
+            padding: 0 rem(14px);
+        }
+
+        li:not(:last-child) {
+            margin-bottom: rem(5px);
+        }
     }
 
     &__title {
