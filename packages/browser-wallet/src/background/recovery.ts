@@ -123,7 +123,6 @@ async function performRecovery() {
         const identitiesToAdd: Identity[] = status.identitiesToAdd || [];
         const credsToAdd: CredentialBalancePair[] = status.credentialsToAdd || [];
         const completedProviders = status.completedProviders || [];
-        let nextId = status?.nextId || 0;
 
         const network = await storedCurrentNetwork.get();
         if (!network) {
@@ -131,6 +130,8 @@ async function performRecovery() {
         }
         const identities = await storedIdentities.get(network.genesisHash);
         const credentials = await storedCredentials.get(network.genesisHash);
+        // Either use the saved nextId, otherwise start from after the existing identities
+        let nextId = status?.nextId || identities?.length || 0;
 
         const client = createConcordiumClient(network.grpcUrl, network.grpcPort, { timeout: GRPCTIMEOUT });
         const getAccountInfo = (credId: string) =>
@@ -172,6 +173,7 @@ async function performRecovery() {
                             status: CreationStatus.Confirmed,
                             idObject,
                         };
+                        nextId += 1;
                         identitiesToAdd.push(identity);
                         status.identitiesToAdd = identitiesToAdd;
                         await sessionRecoveryStatus.set(status);
@@ -203,7 +205,6 @@ async function performRecovery() {
 
                         credsToAdd.push(...foundCreds);
                     }
-                    nextId += 1;
                     emptyIndices = 0;
                 } else {
                     emptyIndices += 1;

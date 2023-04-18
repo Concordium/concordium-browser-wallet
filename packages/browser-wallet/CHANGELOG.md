@@ -11,6 +11,10 @@
 
 -   In the manage page for adding CIS-2 tokens, the contract index is now always initially empty.
 
+### Fixed
+
+-   Recovery no longer assigns duplicate names to identities when new identities are visited earlier than existing ones during the recovery process.
+
 ## 1.0.0
 
 ### Added
