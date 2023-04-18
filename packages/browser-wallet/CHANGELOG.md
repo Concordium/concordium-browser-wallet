@@ -5,6 +5,7 @@
 ### Changed
 
 -   Improved readability of events in transaction details.
+-   When choosing baker stake amount, the minimumEquityCapital is no longer the default value for non bakers.
 
 ## 1.0.0
 
