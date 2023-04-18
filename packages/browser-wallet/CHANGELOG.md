@@ -6,6 +6,10 @@
 
 -   Improved readability of events in transaction details.
 
+### Fixed
+
+-   In the manage page for adding CIS-2 tokens, the contract index is now always initially empty.
+
 ## 1.0.0
 
 ### Added
