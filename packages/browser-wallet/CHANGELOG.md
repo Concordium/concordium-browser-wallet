@@ -6,6 +6,10 @@
 
 -   Improved readability of events in transaction details.
 
+### Fixed
+
+-   Recovery no longer assigns duplicate names to identities when new identities are visited earlier than existing ones during the recovery process.
+
 ## 1.0.0
 
 ### Added
