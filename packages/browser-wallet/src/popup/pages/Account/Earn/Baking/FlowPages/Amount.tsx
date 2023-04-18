@@ -1,7 +1,7 @@
 import React, { useContext, useEffect, useMemo, useState } from 'react';
 import { AccountInfo, isBakerAccount, OpenStatus } from '@concordium/web-sdk';
 import { useTranslation } from 'react-i18next';
-import { microCcdToCcd, getCcdSymbol, isValidCcdString, ccdToMicroCcd } from 'wallet-common-helpers';
+import { getCcdSymbol, isValidCcdString, ccdToMicroCcd } from 'wallet-common-helpers';
 import { Validate } from 'react-hook-form';
 
 import Form, { useForm } from '@popup/shared/Form';
@@ -48,10 +48,7 @@ export default function AmountPage({ initial, onNext, formValues, accountInfo }:
     const { setDetailsExpanded } = useContext(accountPageContext);
 
     const form = useForm<AmountPageForm>({
-        defaultValues:
-            initial === undefined
-                ? { amount: microCcdToCcd(chainParameters?.minimumEquityCapital) }
-                : { amount: initial },
+        defaultValues: initial === undefined ? { amount: '' } : { amount: initial },
     });
     const amount = form.watch('amount');
 
