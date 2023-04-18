@@ -6,6 +6,10 @@
 
 -   Improved readability of events in transaction details.
 
+### Fixed
+
+-   A bug that caused an identity to not be recovered if there was a rejected one present in the same index.
+
 ## 1.0.0
 
 ### Added
