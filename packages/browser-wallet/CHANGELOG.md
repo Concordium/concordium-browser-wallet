@@ -10,6 +10,7 @@
 ### Fixed
 
 -   In the manage page for adding CIS-2 tokens, the contract index is now always initially empty.
+-   Incorrect navigation flow on the "earn" page when switching between accounts.
 
 ### Fixed
 
