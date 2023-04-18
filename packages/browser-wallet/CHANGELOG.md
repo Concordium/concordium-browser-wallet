@@ -7,6 +7,10 @@
 -   Improved readability of events in transaction details.
 -   Baker transactions no longer display a minimum of 3 decimals when confirming the transaction.
 
+### Fixed
+
+-   In the manage page for adding CIS-2 tokens, the contract index is now always initially empty.
+
 ## 1.0.0
 
 ### Added
