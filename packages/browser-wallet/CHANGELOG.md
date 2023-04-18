@@ -1,5 +1,11 @@
 # Changelog
 
+## 1.0.1
+
+### Changed
+
+-   Improved readability of events in transaction details.
+
 ## 1.0.0
 
 ### Added

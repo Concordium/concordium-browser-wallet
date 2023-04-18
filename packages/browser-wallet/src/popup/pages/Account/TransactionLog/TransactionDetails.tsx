@@ -52,7 +52,11 @@ export default function TransactionDetails({
             {transaction.events && transaction.events.length > 0 && (
                 <div className="transaction-details__dynamic-height-item">
                     <Title title={t('events')} />
-                    {transaction.events}
+                    <ul>
+                        {transaction.events.map((event) => {
+                            return <li>{event}</li>;
+                        })}
+                    </ul>
                 </div>
             )}
         </div>
