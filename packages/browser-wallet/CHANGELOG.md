@@ -5,6 +5,7 @@
 ### Changed
 
 -   Improved readability of events in transaction details.
+-   Baker transactions no longer display a minimum of 3 decimals when confirming the transaction.
 
 ## 1.0.0
 
