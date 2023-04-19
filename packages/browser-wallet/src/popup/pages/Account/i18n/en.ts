@@ -53,9 +53,6 @@ const t = {
             ccd: 'Enter amount to transfer',
             recipient: 'Enter recipient address',
         },
-        buttons: {
-            continue: 'Continue',
-        },
         title: 'Send CCD',
         currentBalance: 'Current balance',
         unableToCoverCost: 'Insufficient CCD to cover estimated cost',
@@ -208,7 +205,6 @@ const t = {
                 maxLength: 'MetadataUrl length may not exceed {{ maxLength }}',
             },
             warning: 'Warning',
-            continueButton: 'Continue',
         },
     },
     delegate: {
@@ -319,15 +315,14 @@ const t = {
                     'Reducing the delegation amount will lock the total delegation amount for a cool-down period. No changes can be made to the amount during this period, and the withdrawal will not take effect before the cool-down period is over.',
                 enterNewStake: 'Enter new delegation stake',
             },
-            continueButton: 'Continue',
-            important: 'Important',
-            warning: 'Warning',
         },
     },
     accountPending: 'This account is still pending finalization.',
     accountRejected: 'This account failed to be created.',
     request: 'Create account',
     unknown: 'unknown',
+    important: 'Important',
+    warning: 'Warning',
 };
 
 export default t;

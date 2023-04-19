@@ -15,6 +15,7 @@ type RestakePageProps = MultiStepFormPageProps<ConfigureBakerFlowState['restake'
 
 export default function RestakePage({ initial, onNext }: RestakePageProps) {
     const { t } = useTranslation('account', { keyPrefix: 'baking.configure' });
+    const { t: tShared } = useTranslation('shared');
     const defaultValues: Partial<RestakePageForm> = useMemo(
         () => (initial === undefined ? { restake: false } : { restake: initial }),
         [initial]
@@ -38,7 +39,7 @@ export default function RestakePage({ initial, onNext }: RestakePageProps) {
                         />
                     </div>
                     <Submit className="m-t-20" width="wide">
-                        {t('continueButton')}
+                        {tShared('continue')}
                     </Submit>
                 </>
             )}

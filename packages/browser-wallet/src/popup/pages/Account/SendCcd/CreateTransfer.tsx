@@ -299,7 +299,7 @@ function CreateTransaction({ tokens, setCost, setDetailsExpanded, cost }: Props 
                         {f.formState.errors.cost && <p className="m-0">{f.formState.errors.cost.message}</p>}
                     </div>
                     <Submit className="create-transfer__button" width="medium">
-                        {t('sendCcd.buttons.continue')}
+                        {tShared('continue')}
                     </Submit>
                 </>
             )}

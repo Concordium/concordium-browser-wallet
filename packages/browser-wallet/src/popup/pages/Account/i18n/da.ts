@@ -55,9 +55,6 @@ const t: typeof en = {
             ccd: 'Indtast et beløb at overføre',
             recipient: 'Indtast modtager addresse',
         },
-        buttons: {
-            continue: 'Fortsæt',
-        },
         title: 'Send CCD',
         currentBalance: 'Nuværende saldo',
         unableToCoverCost: 'Utilstrækkelig antal CCD til at dække omkostninger',
@@ -219,9 +216,6 @@ const t: typeof en = {
                     'At formindske din delegation saldo låser hele delegation saldoen i en cool-down periode. Det er ikke muligt at ændre mængden i denne periode og flytningen af CCD træder ikke i kraft indtil cool-down perioden er afsluttet.',
                 enterNewStake: 'Indtast ny delegation saldo',
             },
-            important: 'Vigtigt',
-            continueButton: 'Fortsæt',
-            warning: 'Advarsel',
         },
     },
     baking: {
@@ -323,13 +317,14 @@ const t: typeof en = {
                 maxLength: 'MetadataUrl længde må ikke være mere end {{ maxLength }}',
             },
             warning: 'Advarsel',
-            continueButton: 'Fortsæt',
         },
     },
     accountPending: 'Denne konto er stadig ved at blive oprettet.',
     accountRejected: 'Denne konto kunne ikke blive oprettet.',
     request: 'Opret konto',
     unknown: 'Ukendt',
+    warning: 'Advarsel',
+    important: 'Vigtigt',
 };
 
 export default t;

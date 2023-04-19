@@ -45,6 +45,7 @@ export default function AmountPage({ initial, onNext, formValues, accountInfo }:
     const { chainParameters } = useContext(earnPageContext);
     const [openWarning, setOpenWarning] = useState(false);
     const { t } = useTranslation('account', { keyPrefix: 'baking.configure' });
+    const { t: tShared } = useTranslation('shared');
     const { setDetailsExpanded } = useContext(accountPageContext);
 
     const form = useForm<AmountPageForm>({
@@ -94,7 +95,7 @@ export default function AmountPage({ initial, onNext, formValues, accountInfo }:
                                     width="wide"
                                     onClick={f.handleSubmit((vs) => onNext(vs.amount))}
                                 >
-                                    {t('continueButton')}
+                                    {tShared('continue')}
                                 </Button>
                                 <Button className="m-t-10" width="wide" onClick={() => setOpenWarning(false)}>
                                     {t('amount.enterNewStake')}
@@ -122,7 +123,7 @@ export default function AmountPage({ initial, onNext, formValues, accountInfo }:
                         )}
                     </div>
                     <Submit className="m-t-20" width="wide">
-                        {t('continueButton')}
+                        {tShared('continue')}
                     </Submit>
                 </>
             )}
