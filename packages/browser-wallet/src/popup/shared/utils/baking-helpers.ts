@@ -26,7 +26,7 @@ export function openStatusToDisplay(status: OpenStatus | OpenStatusText): string
     }
 }
 
-const formatCommission = toFixed(3);
+const formatCommission = toFixed(0);
 
 export const displayDecimalCommissionRate = (value: number) => formatCommission((value * 100).toString());
 export const displayFractionCommissionRate = (value: number) =>
