@@ -2,6 +2,10 @@
 
 ## 1.0.1
 
+### Added
+
+-   SendTransaction now validates that an account has sufficient funds before sending a transaction (requested though the api).
+
 ### Changed
 
 -   Improved readability of events in transaction details.

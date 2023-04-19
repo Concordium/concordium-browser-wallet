@@ -2,6 +2,7 @@ import {
     AccountAddress,
     AccountTransaction,
     AccountTransactionType,
+    AccountTransactionPayload,
     buildBasicAccountSigner,
     getAccountTransactionHash,
     CcdAmount,
@@ -12,6 +13,9 @@ import {
     AccountInfo,
     ChainParametersV1,
     BakerPoolStatusDetails,
+    InitContractPayload,
+    UpdateContractPayload,
+    SimpleTransferWithMemoPayload,
 } from '@concordium/web-sdk';
 import {
     isValidResolutionString,
@@ -203,4 +207,23 @@ export const createPendingTransactionFromAccountTransaction = (
 
 export function useHasPendingTransaction(transactionType: AccountTransactionType): boolean {
     return useAtomValue(selectedPendingTransactionsAtom).some((t) => t.type === transactionType);
+}
+
+/**
+ * Extract the microCCD amount related for the transaction, excluding the cost.
+ * Note that for many transactions there is no related amount, in which case this returns 0.
+ */
+export function getTransactionAmount(type: AccountTransactionType, payload: AccountTransactionPayload): bigint {
+    switch (type) {
+        case AccountTransactionType.InitContract:
+            return (payload as InitContractPayload).amount.microCcdAmount;
+        case AccountTransactionType.Update:
+            return (payload as UpdateContractPayload).amount.microCcdAmount;
+        case AccountTransactionType.Transfer:
+            return (payload as SimpleTransferPayload).amount.microCcdAmount;
+        case AccountTransactionType.TransferWithMemo:
+            return (payload as SimpleTransferWithMemoPayload).amount.microCcdAmount;
+        default:
+            return 0n;
+    }
 }
