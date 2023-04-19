@@ -199,6 +199,12 @@
                         })
                         .catch(alert);
                 });
+                document.getElementById('addWCCD').addEventListener('click', () => {
+                    provider
+                        .addCIS2Tokens(currentAccountAddress, [''], 2059n, 0n)
+                        .then((added) => alert('Added tokens: ' + added.map((id) => '"' + id + '"')))
+                        .catch(alert);
+                });
             }
 
             setupPage();
@@ -226,5 +232,6 @@
         <button id="signMessageBinary">SignSponsoredTransactionLikeMessage</button>
         <button id="registerData">Register message (HEX encoded) (must be a hex string)</button>
         <button id="registerDataCBOR">Register message (CBOR encoded)</button>
+        <button id="addWCCD">Add WCCD view</button>
     </body>
 </html>

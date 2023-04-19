@@ -6,12 +6,11 @@ import { displayUrl } from '@popup/shared/utils/string-helpers';
 import ConnectedBox from '@popup/pages/Account/ConnectedBox';
 import { addToastAtom } from '@popup/state';
 import ExternalRequestLayout from '@popup/page-layouts/ExternalRequestLayout';
-import { currentAccountTokensAtom } from '@popup/store/token';
+import { accountTokensFamily } from '@popup/store/token';
 import { useAsyncMemo } from 'wallet-common-helpers';
 import { TokenIdAndMetadata } from '@shared/storage/types';
 import { ContractTokenDetails, fetchContractName, getTokens } from '@shared/utils/token-helpers';
 import { grpcClientAtom } from '@popup/store/settings';
-import { selectedAccountAtom } from '@popup/store/account';
 import { fullscreenPromptContext } from '@popup/page-layouts/FullscreenPromptLayout';
 import { Input as UncontrolledInput } from '@popup/shared/Form/Input';
 import Button from '@popup/shared/Button';
@@ -30,6 +29,7 @@ const getId = (token: TokenIdAndMetadata) => token.id;
 interface Location {
     state: {
         payload: {
+            accountAddress: string;
             contractIndex: string;
             contractSubindex: string;
             tokenIds: string[];
@@ -42,11 +42,10 @@ export default function SignMessage({ respond }: Props) {
     const { state } = useLocation() as Location;
     const { t } = useTranslation('externalAddTokens');
     const { withClose, onClose } = useContext(fullscreenPromptContext);
-    const { contractIndex, contractSubindex, tokenIds, url } = state.payload;
+    const { accountAddress, contractIndex, contractSubindex, tokenIds, url } = state.payload;
     const addToast = useSetAtom(addToastAtom);
     const client = useAtomValue(grpcClientAtom);
-    const account = useAtomValue(selectedAccountAtom);
-    const [accountTokens, setAccountTokens] = useAtom(currentAccountTokensAtom);
+    const [accountTokens, setAccountTokens] = useAtom(accountTokensFamily(accountAddress));
     const [addingTokens, setAddingTokens] = useState<TokenWithChoice[]>();
     const [detailView, setDetailView] = useState<number>();
 
@@ -71,7 +70,7 @@ export default function SignMessage({ respond }: Props) {
     );
 
     useEffect(() => {
-        if (!contractDetails || accountTokens.loading || !account) {
+        if (!contractDetails || accountTokens.loading) {
             return;
         }
         const existingIds = (accountTokens.value[contractIndex] || []).map((token) => token.id);
@@ -86,7 +85,7 @@ export default function SignMessage({ respond }: Props) {
             addToast(t('filterInvalid'));
         }
 
-        getTokens(contractDetails, client, account, filteredIds, addToast).then((newTokens) => {
+        getTokens(contractDetails, client, accountAddress, filteredIds, addToast).then((newTokens) => {
             const tokensToAdd = newTokens
                 .filter((token) => token.metadata)
                 .map(
@@ -103,7 +102,7 @@ export default function SignMessage({ respond }: Props) {
             }
             setAddingTokens(tokensToAdd);
         });
-    }, [contractDetails, accountTokens.loading, account]);
+    }, [contractDetails, accountTokens.loading, accountAddress]);
 
     if (!contractDetails || !addingTokens) {
         return null;
@@ -120,7 +119,7 @@ export default function SignMessage({ respond }: Props) {
 
     return (
         <ExternalRequestLayout>
-            <ConnectedBox accountAddress={account} url={new URL(url).origin} />
+            <ConnectedBox accountAddress={accountAddress} url={new URL(url).origin} />
             {detailView !== undefined && (
                 <TokenDetails
                     contractIndex={contractIndex}

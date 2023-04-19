@@ -13,6 +13,7 @@
 -   In the manage page for adding CIS-2 tokens, the contract index is now always initially empty.
 -   Incorrect navigation flow on the "earn" page when switching between accounts.
 -   Recovery no longer assigns duplicate names to identities when new identities are visited earlier than existing ones during the recovery process.
+-   AddCIS2Tokens through API now adds tokens to the given account, instead of the currently selected one.
 
 ## 1.0.0
 
