@@ -5,15 +5,13 @@
 ### Changed
 
 -   Improved readability of events in transaction details.
+-   When choosing baker stake amount, the minimumEquityCapital is no longer the default value for non bakers.
 -   Baker transactions no longer display a minimum of 3 decimals when confirming the transaction.
 
 ### Fixed
 
 -   In the manage page for adding CIS-2 tokens, the contract index is now always initially empty.
 -   Incorrect navigation flow on the "earn" page when switching between accounts.
-
-### Fixed
-
 -   Recovery no longer assigns duplicate names to identities when new identities are visited earlier than existing ones during the recovery process.
 
 ## 1.0.0
