@@ -285,13 +285,15 @@ const t: typeof en = {
                 optionNoRestake: 'Nej, indsæt ikke',
             },
             amount: {
-                description: 'Indtast din ønskede delegation saldo',
-                amountLabel: 'Delegation saldo',
-                amountRequired: 'Du skal specificere en delegation saldo',
-                locked: 'Saldo låst',
+                description: 'Indtast din ønskede baker stake',
+                amountLabel: 'Baker stake',
+                amountRequired: 'Du skal specificere en baker stake',
+                locked: 'Baker stake låst',
                 lockedNote: 'Du kan ikke ændre saldoen mens der er en kommende ændring',
                 overStakeThresholdWarning:
                     'Du er ved at låse mere end {{ threshold }}% af din totale saldo som din baker stake.\n\nHvis du ikke har nok ulåste CCD, vil du ikke kunne betale for transaktionsomkostninger.',
+                decreaseWarning:
+                    'At formindske din baker stake låser hele din baker stake i en cool-down periode. Det er ikke muligt at ændre mængden i denne periode og flytningen af CCD træder ikke i kraft indtil cool-down perioden er afsluttet.',
                 enterNewStake: 'Indtast ny baker stake',
             },
             openForDelegation: {

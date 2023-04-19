@@ -180,6 +180,8 @@ const t = {
                 lockedNote: 'You are unable to change the amount while there is a pending change',
                 overStakeThresholdWarning:
                     'You are about to lock more than {{ threshold }}% of your total balance in a baker stake.\n\nIf you don’t have enough unlocked CCD at your disposal, you might not be able to pay future transaction fees.',
+                decreaseWarning:
+                    'Reducing the baker stake will lock the total baker stake for a cool-down period. No changes can be made to the amount during this period, and the withdrawal will not take effect before the cool-down period is over.',
                 enterNewStake: 'Enter new baker stake',
             },
             openForDelegation: {
