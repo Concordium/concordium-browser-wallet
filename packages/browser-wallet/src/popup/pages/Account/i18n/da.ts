@@ -215,8 +215,11 @@ const t: typeof en = {
                 lockedNote: 'Du kan ikke ændre saldoen mens der er en kommende ændring',
                 overStakeThresholdWarning:
                     'Du er ved at låse mere end {{ threshold }}% af din totale saldo som din delegation saldo.\n\nHvis du ikke har nok ulåste CCD, vil du ikke kunne betale for transaktionsomkostninger.',
+                decreaseWarning:
+                    'At formindske din delegation saldo låser hele delegation saldoen i en cool-down periode. Det er ikke muligt at ændre mængden i denne periode og flytningen af CCD træder ikke i kraft indtil cool-down perioden er afsluttet.',
                 enterNewStake: 'Indtast ny delegation saldo',
             },
+            important: 'Vigtigt',
             continueButton: 'Fortsæt',
             warning: 'Advarsel',
         },

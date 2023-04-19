@@ -181,10 +181,16 @@ type AmountPageForm = {
 type AmountPageProps = MultiStepFormPageProps<ConfigureDelegationFlowState['amount'], ConfigureDelegationFlowState> &
     WithAccountInfo;
 
+enum AmountWarning {
+    None,
+    AboveThreshold,
+    Decrease,
+}
+
 function AmountPage({ initial, onNext, formValues, accountInfo }: AmountPageProps) {
     const { t } = useTranslation('account', { keyPrefix: 'delegate.configure' });
     const { setDetailsExpanded } = useContext(accountPageContext);
-    const [openWarning, setOpenWarning] = useState(false);
+    const [openWarning, setOpenWarning] = useState<AmountWarning>(AmountWarning.None);
     const chainParameters = useBlockChainParameters();
 
     const defaultValues: Partial<AmountPageForm> = useMemo(
@@ -213,12 +219,15 @@ function AmountPage({ initial, onNext, formValues, accountInfo }: AmountPageProp
     }, []);
 
     const onSubmit = (vs: AmountPageForm) => {
+        const amount = ccdToMicroCcd(vs.amount);
         // If the default value i.e. current stake or previosly chosen stake is already above the threshold, do not display the warning
         if (
             !(initial && isAboveStakeWarningThreshold(ccdToMicroCcd(initial), accountInfo)) &&
-            isAboveStakeWarningThreshold(ccdToMicroCcd(vs.amount), accountInfo)
+            isAboveStakeWarningThreshold(amount, accountInfo)
         ) {
-            setOpenWarning(true);
+            setOpenWarning(AmountWarning.AboveThreshold);
+        } else if (isDelegatorAccount(accountInfo) && accountInfo.accountDelegation.stakedAmount > amount) {
+            setOpenWarning(AmountWarning.Decrease);
         } else {
             onNext(vs.amount);
         }
@@ -232,14 +241,27 @@ function AmountPage({ initial, onNext, formValues, accountInfo }: AmountPageProp
             {(f) => (
                 <>
                     <div className="w-full">
-                        <Modal open={openWarning} onClose={() => setOpenWarning(false)}>
+                        <Modal
+                            open={openWarning !== AmountWarning.None}
+                            onClose={() => setOpenWarning(AmountWarning.None)}
+                        >
                             <div>
-                                <h3 className="m-t-0">{t('warning')}</h3>
-                                <p className="white-space-break ">
-                                    {t('amount.overStakeThresholdWarning', {
-                                        threshold: STAKE_WARNING_THRESHOLD.toString(),
-                                    })}
-                                </p>
+                                {openWarning === AmountWarning.AboveThreshold && (
+                                    <>
+                                        <h3 className="m-t-0">{t('warning')}</h3>
+                                        <p className="white-space-break ">
+                                            {t('amount.overStakeThresholdWarning', {
+                                                threshold: STAKE_WARNING_THRESHOLD.toString(),
+                                            })}
+                                        </p>
+                                    </>
+                                )}
+                                {openWarning === AmountWarning.Decrease && (
+                                    <>
+                                        <h3 className="m-t-0">{t('important')}</h3>
+                                        <p className="white-space-break ">{t('amount.decreaseWarning')}</p>
+                                    </>
+                                )}
                                 <Button
                                     className="m-t-10"
                                     width="wide"
@@ -247,7 +269,7 @@ function AmountPage({ initial, onNext, formValues, accountInfo }: AmountPageProp
                                 >
                                     {t('continueButton')}
                                 </Button>
-                                <Button className="m-t-10" onClick={() => setOpenWarning(false)}>
+                                <Button className="m-t-10" onClick={() => setOpenWarning(AmountWarning.None)}>
                                     {t('amount.enterNewStake')}
                                 </Button>
                             </div>
