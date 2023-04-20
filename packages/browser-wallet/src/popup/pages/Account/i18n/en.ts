@@ -324,7 +324,7 @@ const t = {
             registerBaker:
                 'You are about to submit a register baker transaction that locks some of your funds in a stake. If you want to unlock the stake again, there will be a cool-down period.',
             lowerBakerStake:
-                'You are about to submit a transaction that lowers your baker stake. Lowering your stake has a cool-down period, meaning it will not take affact immediately.\n\nThe baker cannot be removed and the stake cannot be changed until the cool-down is over.',
+                'You are about to submit a transaction that lowers your baker stake. Lowering your stake has a cool-down period, meaning it will not take effect immediately.\n\nThe baker cannot be removed and the stake cannot be changed until the cool-down is over.',
             removeBaker: 'Are you sure you want to make the following transaction to stop baking?',
         },
         configureDelegation: {
@@ -332,7 +332,7 @@ const t = {
                 'This will lock your delegation amount for at least {{ cooldownPeriod}} from the time you remove or decrease your delegation.',
             lowerDelegationStake:
                 'You are about to submit a delegation transaction that lowers your delegation amount. It will take effect after {{ cooldownPeriod }} and the delegation amount cannot be changed during this period of time.',
-            remove: 'Are you sure you want to remove you delegation?',
+            remove: 'Are you sure you want to remove your delegation?',
         },
     },
     accountPending: 'This account is still pending finalization.',
