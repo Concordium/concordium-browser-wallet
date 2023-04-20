@@ -5,6 +5,7 @@
 ### Added
 
 -   Support for eID (Criipto) identity document types.
+-   When creating an account that already exist, it will now be added to the wallet.
 
 ### Changed
 

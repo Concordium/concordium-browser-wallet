@@ -9,6 +9,7 @@ import {
     ConcordiumHdWallet,
     TransactionExpiry,
     getCredentialDeploymentTransactionHash,
+    CredentialRegistrationId,
 } from '@concordium/web-sdk';
 import { GRPCTIMEOUT } from '@shared/constants/networkConfiguration';
 import { DEFAULT_TRANSACTION_EXPIRY } from '@shared/constants/time';
@@ -48,10 +49,35 @@ async function createAndSendCredential(credIn: CredentialInput): Promise<Credent
             deploymentHash,
         };
 
-        // Send Request
-        const successful = await createConcordiumClient(network.grpcUrl, network.grpcPort, {
+        const client = createConcordiumClient(network.grpcUrl, network.grpcPort, {
             timeout: GRPCTIMEOUT,
-        }).sendCredentialDeploymentTransaction(request, [signature]);
+        });
+
+        // Check that the credential has not already been deployed:
+        try {
+            const accountInfo = await client.getAccountInfo(new CredentialRegistrationId(credId));
+            await addCredential(
+                {
+                    identityIndex,
+                    providerIndex,
+                    credId,
+                    credNumber,
+                    address: accountInfo.accountAddress,
+                    status: CreationStatus.Confirmed,
+                },
+                network.genesisHash
+            );
+
+            return {
+                status: BackgroundResponseStatus.Aborted,
+                address,
+            };
+        } catch {
+            // If an error is thrown, we assume this is because the credential has not been deployed yet.
+        }
+
+        // Send Request
+        const successful = await client.sendCredentialDeploymentTransaction(request, [signature]);
         if (!successful) {
             throw new Error('Credential deployment was rejected');
         }
