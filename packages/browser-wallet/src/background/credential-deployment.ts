@@ -49,7 +49,7 @@ async function createAndSendCredential(credIn: CredentialInput): Promise<Credent
         };
 
         // Send Request
-        const successful = createConcordiumClient(network.grpcUrl, network.grpcPort, {
+        const successful = await createConcordiumClient(network.grpcUrl, network.grpcPort, {
             timeout: GRPCTIMEOUT,
         }).sendCredentialDeploymentTransaction(request, [signature]);
         if (!successful) {
