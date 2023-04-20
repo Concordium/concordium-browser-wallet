@@ -1,5 +1,5 @@
 import React, { useCallback, useEffect, useRef } from 'react';
-import { useAtom, useAtomValue } from 'jotai';
+import { useAtom, useAtomValue, useSetAtom } from 'jotai';
 import { useForm, SubmitHandler } from 'react-hook-form';
 import { useTranslation } from 'react-i18next';
 import { useNavigate } from 'react-router-dom';
@@ -27,9 +27,9 @@ type FormValues = {
  */
 export default function ChooseContract() {
     const { t } = useTranslation('account', { keyPrefix: 'tokens.add' });
-    const [contractDetails, setContractDetails] = useAtom(contractDetailsAtom);
+    const setContractDetails = useSetAtom(contractDetailsAtom);
     const form = useForm<FormValues>({
-        defaultValues: { contractIndex: contractDetails?.index?.toString() },
+        defaultValues: { contractIndex: '' },
     });
     const contractIndexValue = form.watch('contractIndex');
     const client = useAtomValue(grpcClientAtom);
@@ -119,6 +119,7 @@ export default function ChooseContract() {
                     <div>
                         <p className="m-t-0">{t('chooseContractHeader')}</p>
                         <FormInput
+                            autoFocus
                             register={f.register}
                             label={t('contractIndex')}
                             name="contractIndex"
