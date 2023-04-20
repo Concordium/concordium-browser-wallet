@@ -7,6 +7,7 @@
 -   Improved readability of events in transaction details.
 -   When choosing baker stake amount, the minimumEquityCapital is no longer the default value for non bakers.
 -   Baker transactions no longer display a minimum of 3 decimals when confirming the transaction.
+-   Changed header while registering a baker to `Register baker`.
 -   When registering as a baker, restaking and being open for delegation are now the default options.
 -   When registering for delegation, restaking and targeting a baker are now the default options.
 
