@@ -67,7 +67,8 @@ export default function KeysPage({ initial, onNext, accountInfo }: KeysProps) {
     const keys = form.watch();
 
     const saveKeys = () => {
-        saveData(keys, KEYS_FILENAME);
+        // TODO Fix faulty conversion in case max account index approaches 2^53
+        saveData({ bakerId: Number(accountInfo.accountIndex), ...keys }, KEYS_FILENAME);
         setShowPrompt(true);
     };
 
