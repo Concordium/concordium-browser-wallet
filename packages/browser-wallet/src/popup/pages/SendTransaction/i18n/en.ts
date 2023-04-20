@@ -16,6 +16,12 @@ const t = {
     title: 'Sign transaction',
     data: 'Data',
     rawData: '(Unable to be decoded)',
+    errors: {
+        missingAccount: 'Missing account address',
+        missingKey: 'Missing key for the chosen address',
+        insufficientFunds: 'Account has insufficient funds for the transaction',
+        missingNonce: 'No nonce was found for the chosen account',
+    },
 };
 
 export default t;

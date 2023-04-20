@@ -24,7 +24,7 @@ export function determineUpdatePayloadSize(parameterSize: number, receiveName: s
  */
 export function getEnergyCost(transactionType: AccountTransactionType, payload: AccountTransactionPayload): bigint {
     const handler = getAccountTransactionHandler(transactionType);
-    const size = handler.serialize(payload).length;
+    const size = handler.serialize(payload).length + 1;
     return calculateEnergyCost(1n, BigInt(size), handler.getBaseEnergyCost(payload));
 }
 

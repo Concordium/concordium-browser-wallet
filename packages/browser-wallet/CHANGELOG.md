@@ -4,6 +4,7 @@
 
 ### Added
 
+-   SendTransaction now validates that an account has sufficient funds before sending a transaction (requested though the api).
 -   Support for eID (Criipto) identity document types.
 
 ### Changed
