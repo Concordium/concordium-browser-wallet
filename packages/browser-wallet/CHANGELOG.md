@@ -21,6 +21,7 @@
 -   Incorrect navigation flow on the "earn" page when switching between accounts.
 -   Recovery no longer assigns duplicate names to identities when new identities are visited earlier than existing ones during the recovery process.
 -   Missing translations for some identity attributes.
+-   Removed double unit on CCD in token overview.
 
 ### Fixed
 
