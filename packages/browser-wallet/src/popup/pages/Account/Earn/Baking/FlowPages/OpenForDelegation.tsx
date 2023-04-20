@@ -23,7 +23,7 @@ export default function OpenForDelegationPage({ initial, onNext, accountInfo }: 
     const { t: tShared } = useTranslation('shared');
     const { t } = useTranslation('account', { keyPrefix: 'baking.configure' });
     const defaultValues: Partial<OpenForDelegationForm> = useMemo(
-        () => (initial === undefined ? { openForDelegation: OpenStatus.ClosedForAll } : { openForDelegation: initial }),
+        () => (initial === undefined ? { openForDelegation: OpenStatus.OpenForAll } : { openForDelegation: initial }),
         [initial]
     );
     const onSubmit = (vs: OpenForDelegationForm) => onNext(vs.openForDelegation);

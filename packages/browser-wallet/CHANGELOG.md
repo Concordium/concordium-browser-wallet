@@ -9,6 +9,8 @@
 -   Baker transactions no longer display a minimum of 3 decimals when confirming the transaction.
 -   Added warning when decreasing stake.
 -   Added info when confirming transactions, for registering/lowering stake/removing baker and delegation.
+-   When registering as a baker, restaking and being open for delegation are now the default options.
+-   When registering for delegation, restaking and targeting a baker are now the default options.
 
 ### Fixed
 

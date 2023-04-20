@@ -57,7 +57,7 @@ function PoolPage({ onNext, initial, accountInfo }: PoolPageProps) {
     const client = useAtomValue(grpcClientAtom);
     const form = useForm<PoolPageForm>({
         defaultValues:
-            initial === null || initial === undefined ? { isBaker: false } : { isBaker: true, bakerId: initial },
+            initial === null || initial === undefined ? { isBaker: true } : { isBaker: true, bakerId: initial },
     });
     const isBakerValue = form.watch('isBaker');
 
@@ -291,7 +291,7 @@ function RestakePage({ initial, onNext }: RestakePageProps) {
     const { t } = useTranslation('account', { keyPrefix: 'delegate.configure' });
     const { t: tShared } = useTranslation('shared');
     const defaultValues: Partial<RestakePageForm> = useMemo(
-        () => (initial === undefined ? { redelegate: false } : { redelegate: initial }),
+        () => (initial === undefined ? { redelegate: true } : { redelegate: initial }),
         [initial]
     );
     const onSubmit = (vs: RestakePageForm) => onNext(vs.redelegate);
