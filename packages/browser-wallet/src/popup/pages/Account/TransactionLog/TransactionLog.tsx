@@ -1,7 +1,7 @@
 import { BrowserWalletTransaction } from '@popup/shared/utils/transaction-history-types';
 import { selectedAccountAtom } from '@popup/store/account';
 import { useAtomValue } from 'jotai';
-import React, { useContext, useState } from 'react';
+import React, { useContext, useEffect, useState } from 'react';
 import { useUpdateEffect } from 'wallet-common-helpers';
 import { ensureDefined } from '@shared/utils/basic-helpers';
 import TransactionList from './TransactionList';
@@ -15,8 +15,11 @@ export default function TransactionLog() {
 
     const showList = () => {
         setSelectedTransaction(undefined);
-        setDetailsExpanded(true);
     };
+
+    useEffect(() => {
+        setDetailsExpanded(true);
+    }, []);
 
     useUpdateEffect(showList, [accountAddress]);
 

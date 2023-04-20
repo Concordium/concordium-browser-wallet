@@ -177,6 +177,10 @@ function CreateTransaction({ tokens, setCost, setDetailsExpanded, cost }: Props 
         }
     }, [canCoverCost, fee]);
 
+    useEffect(() => {
+        setDetailsExpanded(true);
+    }, []);
+
     const validateRecipient = useCallback<Validate<string>>(async (recipientAddress: string) => {
         if (!recipientAddress) {
             return undefined;
