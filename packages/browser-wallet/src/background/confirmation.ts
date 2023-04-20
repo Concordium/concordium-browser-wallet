@@ -51,20 +51,6 @@ async function monitorCredentialStatus(initialNetwork: NetworkConfiguration, cre
 
         try {
             const response = await client.getBlockItemStatus(deploymentHash);
-            // transaction has been discarded by the node.
-            if (!response) {
-                await updateCredentials(
-                    [
-                        {
-                            ...info,
-                            status: CreationStatus.Rejected,
-                        },
-                    ],
-                    genesisHash
-                );
-                return false;
-            }
-
             // transaction has not finalized yet
             if (response?.status !== TransactionStatusEnum.Finalized) {
                 return true;
@@ -80,7 +66,20 @@ async function monitorCredentialStatus(initialNetwork: NetworkConfiguration, cre
                 genesisHash
             );
             return false;
-        } catch {
+        } catch (e) {
+            // transaction has been discarded by the node.
+            if ((e as Error).message.includes('transaction%20not%20found')) {
+                await updateCredentials(
+                    [
+                        {
+                            ...info,
+                            status: CreationStatus.Rejected,
+                        },
+                    ],
+                    genesisHash
+                );
+                return false;
+            }
             return true;
         }
     });
