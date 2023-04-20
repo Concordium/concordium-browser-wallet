@@ -22,6 +22,10 @@
 -   Recovery no longer assigns duplicate names to identities when new identities are visited earlier than existing ones during the recovery process.
 -   Missing translations for some identity attributes.
 
+### Fixed
+
+-   A bug that caused an identity to not be recovered if there was a rejected one present in the same index.
+
 ## 1.0.0
 
 ### Added
