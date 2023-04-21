@@ -7,8 +7,12 @@ import {
     isDelegatorAccount,
     ConfigureBakerPayload,
     ConfigureDelegationPayload,
+    isChainParametersV1,
 } from '@concordium/web-sdk';
 import { useSelectedAccountInfo } from '@popup/shared/AccountInfoListenerContext/AccountInfoListenerContext';
+import { useBlockChainParameters } from '@popup/shared/BlockChainParametersProvider';
+import { secondsToDaysRoundedDown } from '@shared/utils/time-helpers';
+import { filterType } from '../Earn/utils';
 
 interface Props {
     payload: AccountTransactionPayload;
@@ -18,6 +22,8 @@ interface Props {
 export function TransactionMessage({ transactionType, payload }: Props) {
     const { t } = useTranslation('account', { keyPrefix: 'transactionMessage' });
     const accountInfo = useSelectedAccountInfo();
+    const chainParameters = useBlockChainParameters();
+    const parametersV1 = chainParameters ? filterType(isChainParametersV1)(chainParameters) : undefined;
 
     const message = useMemo(() => {
         if (!accountInfo) {
@@ -49,10 +55,14 @@ export function TransactionMessage({ transactionType, payload }: Props) {
                         return undefined;
                     }
                     if (accountInfo.accountDelegation.stakedAmount > newStake) {
-                        return t('configureDelegation.lowerDelegationStake');
+                        return t('configureDelegation.lowerDelegationStake', {
+                            cooldownPeriod: secondsToDaysRoundedDown(parametersV1?.delegatorCooldown),
+                        });
                     }
                     if (newStake === 0n) {
-                        return t('configureDelegation.remove');
+                        return t('configureDelegation.remove', {
+                            cooldownPeriod: secondsToDaysRoundedDown(parametersV1?.delegatorCooldown),
+                        });
                     }
                 } else {
                     return t('configureDelegation.register');
@@ -63,7 +73,7 @@ export function TransactionMessage({ transactionType, payload }: Props) {
                 break;
         }
         return undefined;
-    }, []);
+    }, [parametersV1?.delegatorCooldown]);
 
     if (!message) {
         return null;

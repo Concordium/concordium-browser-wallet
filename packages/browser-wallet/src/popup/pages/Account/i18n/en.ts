@@ -329,9 +329,9 @@ const t = {
         },
         configureDelegation: {
             register:
-                'This will lock your delegation amount for at least {{ cooldownPeriod}} from the time you remove or decrease your delegation.',
+                'This will lock your delegation amount for at least {{ cooldownPeriod}} days from the time you remove or decrease your delegation.',
             lowerDelegationStake:
-                'You are about to submit a delegation transaction that lowers your delegation amount. It will take effect after {{ cooldownPeriod }} and the delegation amount cannot be changed during this period of time.',
+                'You are about to submit a delegation transaction that lowers your delegation amount. It will take effect after {{ cooldownPeriod }} days and the delegation amount cannot be changed during this period of time.',
             remove: 'Are you sure you want to remove your delegation?',
         },
     },

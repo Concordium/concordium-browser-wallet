@@ -331,9 +331,9 @@ const t: typeof en = {
         },
         configureDelegation: {
             register:
-                'Du er ved at indsende en transaktion som registrer dig som en delegator, hvillket som låser nogle af dine CCD som delegation stake. Hvis du vil frigøre din stake, vil der være en cool-down periode på {{ cooldownPeriod }}.',
+                'Du er ved at indsende en transaktion som registrer dig som en delegator, hvillket som låser nogle af dine CCD som delegation stake. Hvis du vil frigøre din stake, vil der være en cool-down periode på {{ cooldownPeriod }} dage.',
             lowerDelegationStake:
-                'Du er ved at indsende en transaktion som formindkser din delegation stake. Det vil træde i kraft efter {{ cooldownPeriod }} og din delegation saldo kan ikke ændres i denne periode.',
+                'Du er ved at indsende en transaktion som formindkser din delegation stake. Det vil træde i kraft efter {{ cooldownPeriod }} dage og din delegation saldo kan ikke ændres i denne periode.',
             remove: 'Er du sikker du vil fjerne din delegation?',
         },
     },
