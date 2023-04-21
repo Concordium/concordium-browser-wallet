@@ -22,11 +22,9 @@
 -   Incorrect navigation flow on the "earn" page when switching between accounts.
 -   Issues with the expansion of the account balance details view when navigating through different flows.
 -   Recovery no longer assigns duplicate names to identities when new identities are visited earlier than existing ones during the recovery process.
+-   AddCIS2Tokens through API now adds tokens to the given account, instead of the currently selected one.
 -   Missing translations for some identity attributes.
 -   Removed double unit on CCD in token overview.
-
-### Fixed
-
 -   A bug that caused an identity to not be recovered if there was a rejected one present in the same index.
 
 ## 1.0.0
