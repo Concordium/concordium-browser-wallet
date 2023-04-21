@@ -21,7 +21,7 @@
 -   Incorrect navigation flow on the "earn" page when switching between accounts.
 -   Recovery no longer assigns duplicate names to identities when new identities are visited earlier than existing ones during the recovery process.
 -   Missing translations for some identity attributes.
--   `bakerId` is now included in bakerKeys export.
+-   The bakerKey export is now the correct format that the node expects. (It now includes `bakerId` and the private keys)
 
 ### Fixed
 
