@@ -35,6 +35,11 @@ export type CredentialDeploymentBackgroundResponse =
     | {
           status: BackgroundResponseStatus.Error;
           reason: string;
+      }
+    | {
+          // Used to indicate that the credential has already been deployed, with the address supplied being the address of the associated account
+          status: BackgroundResponseStatus.Aborted;
+          address: string;
       };
 
 export type IdProofBackgroundResponse =
