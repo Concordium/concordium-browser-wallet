@@ -14,6 +14,7 @@ import {
 import { loop, not } from '@shared/utils/function-helpers';
 import { identityMatch } from '@shared/utils/identity-helpers';
 import { IdentityTokenContainer, IdentityProviderIdentityStatus } from 'wallet-common-helpers';
+import type { RpcError } from '@protobuf-ts/runtime-rpc';
 import { updateCredentials, updateIdentities } from './update';
 
 const isPendingCred = (cred: WalletCredential): cred is PendingWalletCredential =>
@@ -68,7 +69,7 @@ async function monitorCredentialStatus(initialNetwork: NetworkConfiguration, cre
             return false;
         } catch (e) {
             // transaction has been discarded by the node.
-            if ((e as Error).message.includes('transaction%20not%20found')) {
+            if ((e as RpcError).code === 'NOT_FOUND') {
                 await updateCredentials(
                     [
                         {
