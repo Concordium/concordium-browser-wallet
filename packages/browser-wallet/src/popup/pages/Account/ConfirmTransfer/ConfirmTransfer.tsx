@@ -75,7 +75,6 @@ export default function ConfirmTransfer(props: Props) {
 
     useEffect(() => {
         setDetailsExpanded(false);
-        return () => setDetailsExpanded(true);
     }, []);
 
     const send = async () => {

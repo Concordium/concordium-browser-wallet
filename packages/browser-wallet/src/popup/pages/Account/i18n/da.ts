@@ -258,7 +258,7 @@ const t: typeof en = {
             },
         },
         register: {
-            title: 'Opret en baker',
+            title: 'Registrer baker',
         },
         update: {
             title: {

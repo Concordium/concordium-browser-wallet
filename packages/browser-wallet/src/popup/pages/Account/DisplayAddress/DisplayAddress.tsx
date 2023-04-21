@@ -1,13 +1,19 @@
 import CopyButton from '@popup/shared/CopyButton';
-import React from 'react';
+import React, { useContext, useEffect } from 'react';
 import { useTranslation } from 'react-i18next';
 import { DisplayAsQR, DisplayAddress as DisplayAccountAddress, AddressDisplayFormat } from 'wallet-common-helpers';
 import { useAtomValue } from 'jotai';
 import { selectedAccountAtom } from '@popup/store/account';
+import { accountPageContext } from '../utils';
 
 export default function DisplayAddress() {
     const { t } = useTranslation('account');
     const address = useAtomValue(selectedAccountAtom);
+    const { setDetailsExpanded } = useContext(accountPageContext);
+
+    useEffect(() => {
+        setDetailsExpanded(true);
+    }, []);
 
     if (!address) {
         return null;
