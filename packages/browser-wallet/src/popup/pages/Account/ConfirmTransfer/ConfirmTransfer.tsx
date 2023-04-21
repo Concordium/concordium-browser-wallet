@@ -31,6 +31,7 @@ import { Cis2TransferParameters } from '@shared/utils/types';
 import { SmartContractParameters } from '@concordium/browser-wallet-api-helpers';
 import { TokenMetadata } from '@shared/storage/types';
 import { accountRoutes } from '../routes';
+import { TransactionMessage } from './TransactionMessage';
 
 type BaseProps = {
     setDetailsExpanded: (expanded: boolean) => void;
@@ -114,6 +115,7 @@ export default function ConfirmTransfer(props: Props) {
 
     return (
         <div className="w-full flex-column justify-space-between align-center">
+            <TransactionMessage transactionType={transactionType} payload={payload} />
             {props.showAsTokenTransfer ? (
                 <TokenTransferReceipt
                     {...commonProps}

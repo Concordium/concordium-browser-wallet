@@ -13,10 +13,9 @@ import { getConfigureBakerEnergyCost } from '@shared/utils/energy-helpers';
 import { WithAccountInfo } from '@popup/shared/utils/account-helpers';
 import { accountPageContext } from '@popup/pages/Account/utils';
 import DisabledAmountInput from '@popup/shared/DisabledAmountInput';
-import Modal from '@popup/shared/Modal';
-import Button from '@popup/shared/Button';
 import { earnPageContext, isAboveStakeWarningThreshold, STAKE_WARNING_THRESHOLD } from '../../utils';
 import { configureBakerChangesPayload, ConfigureBakerFlowState } from '../utils';
+import { AmountWarning, WarningModal } from '../../Warning';
 
 function getCost(accountInfo: AccountInfo, formValues: Partial<ConfigureBakerFlowState>, amount: string) {
     const formValuesFull = {
@@ -43,8 +42,9 @@ type AmountPageProps = MultiStepFormPageProps<ConfigureBakerFlowState['amount'],
 
 export default function AmountPage({ initial, onNext, formValues, accountInfo }: AmountPageProps) {
     const { chainParameters } = useContext(earnPageContext);
-    const [openWarning, setOpenWarning] = useState(false);
+    const [openWarning, setOpenWarning] = useState<AmountWarning>(AmountWarning.None);
     const { t } = useTranslation('account', { keyPrefix: 'baking.configure' });
+    const { t: tShared } = useTranslation('shared');
     const { setDetailsExpanded } = useContext(accountPageContext);
 
     const form = useForm<AmountPageForm>({
@@ -65,12 +65,15 @@ export default function AmountPage({ initial, onNext, formValues, accountInfo }:
     const pendingChange = isBakerAccount(accountInfo) && accountInfo.accountBaker.pendingChange?.change !== undefined;
 
     const onSubmit = (vs: AmountPageForm) => {
+        const stake = ccdToMicroCcd(vs.amount);
         // If the default value i.e. current stake or previosly chosen stake is already above the threshold, do not display the warning
         if (
             !(initial && isAboveStakeWarningThreshold(ccdToMicroCcd(initial), accountInfo)) &&
-            isAboveStakeWarningThreshold(ccdToMicroCcd(vs.amount), accountInfo)
+            isAboveStakeWarningThreshold(stake, accountInfo)
         ) {
-            setOpenWarning(true);
+            setOpenWarning(AmountWarning.AboveThreshold);
+        } else if (isBakerAccount(accountInfo) && accountInfo.accountBaker.stakedAmount > stake) {
+            setOpenWarning(AmountWarning.Decrease);
         } else {
             onNext(vs.amount);
         }
@@ -81,27 +84,16 @@ export default function AmountPage({ initial, onNext, formValues, accountInfo }:
             {(f) => (
                 <>
                     <div className="w-full">
-                        <Modal open={openWarning} onClose={() => setOpenWarning(false)}>
-                            <div>
-                                <h3 className="m-t-0">{t('warning')}</h3>
-                                <p className="white-space-break ">
-                                    {t('amount.overStakeThresholdWarning', {
-                                        threshold: STAKE_WARNING_THRESHOLD.toString(),
-                                    })}
-                                </p>
-                                <Button
-                                    className="m-t-10"
-                                    width="wide"
-                                    onClick={f.handleSubmit((vs) => onNext(vs.amount))}
-                                >
-                                    {t('continueButton')}
-                                </Button>
-                                <Button className="m-t-10" width="wide" onClick={() => setOpenWarning(false)}>
-                                    {t('amount.enterNewStake')}
-                                </Button>
-                            </div>
-                        </Modal>
-
+                        <WarningModal
+                            onCancel={() => setOpenWarning(AmountWarning.None)}
+                            onContinue={f.handleSubmit((vs) => onNext(vs.amount))}
+                            thresholdWarning={t('amount.overStakeThresholdWarning', {
+                                threshold: STAKE_WARNING_THRESHOLD.toString(),
+                            })}
+                            decreaseWarning={t('amount.decreaseWarning')}
+                            cancelText={t('amount.enterNewStake')}
+                            warningState={openWarning}
+                        />
                         <p className="m-t-0 text-center">{t('amount.description')}</p>
                         {pendingChange && (
                             <DisabledAmountInput label={t('amount.locked')} note={t('amount.lockedNote')} />
@@ -122,7 +114,7 @@ export default function AmountPage({ initial, onNext, formValues, accountInfo }:
                         )}
                     </div>
                     <Submit className="m-t-20" width="wide">
-                        {t('continueButton')}
+                        {tShared('continue')}
                     </Submit>
                 </>
             )}

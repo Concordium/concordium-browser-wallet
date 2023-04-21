@@ -53,9 +53,6 @@ const t = {
             ccd: 'Enter amount to transfer',
             recipient: 'Enter recipient address',
         },
-        buttons: {
-            continue: 'Continue',
-        },
         title: 'Send CCD',
         currentBalance: 'Current balance',
         unableToCoverCost: 'Insufficient CCD to cover estimated cost',
@@ -183,6 +180,8 @@ const t = {
                 lockedNote: 'You are unable to change the amount while there is a pending change',
                 overStakeThresholdWarning:
                     'You are about to lock more than {{ threshold }}% of your total balance in a baker stake.\n\nIf you don’t have enough unlocked CCD at your disposal, you might not be able to pay future transaction fees.',
+                decreaseWarning:
+                    'Reducing the baker stake will lock the total baker stake for a cool-down period. No changes can be made to the amount during this period, and the withdrawal will not take effect before the cool-down period is over.',
                 enterNewStake: 'Enter new baker stake',
             },
             openForDelegation: {
@@ -208,7 +207,6 @@ const t = {
                 maxLength: 'MetadataUrl length may not exceed {{ maxLength }}',
             },
             warning: 'Warning',
-            continueButton: 'Continue',
         },
     },
     delegate: {
@@ -315,16 +313,34 @@ const t = {
                 lockedNote: 'You are unable to change the amount while there is a pending change',
                 overStakeThresholdWarning:
                     'You are about to lock more than {{ threshold }}% of your total balance in a delegation stake.\n\nIf you don’t have enough unlocked CCD at your disposal, you might not be able to pay future transaction fees.',
+                decreaseWarning:
+                    'Reducing the delegation amount will lock the total delegation amount for a cool-down period. No changes can be made to the amount during this period, and the withdrawal will not take effect before the cool-down period is over.',
                 enterNewStake: 'Enter new delegation stake',
             },
-            continueButton: 'Continue',
-            warning: 'Warning',
+        },
+    },
+    transactionMessage: {
+        configureBaker: {
+            registerBaker:
+                'You are about to submit a register baker transaction that locks some of your funds in a stake. If you want to unlock the stake again, there will be a cool-down period.',
+            lowerBakerStake:
+                'You are about to submit a transaction that lowers your baker stake. Lowering your stake has a cool-down period, meaning it will not take effect immediately.\n\nThe baker cannot be removed and the stake cannot be changed until the cool-down is over.',
+            removeBaker: 'Are you sure you want to make the following transaction to stop baking?',
+        },
+        configureDelegation: {
+            register:
+                'This will lock your delegation amount for at least {{ cooldownPeriod}} days from the time you remove or decrease your delegation.',
+            lowerDelegationStake:
+                'You are about to submit a delegation transaction that lowers your delegation amount. It will take effect after {{ cooldownPeriod }} days and the delegation amount cannot be changed during this period of time.',
+            remove: 'Are you sure you want to remove your delegation?',
         },
     },
     accountPending: 'This account is still pending finalization.',
     accountRejected: 'This account failed to be created.',
     request: 'Create account',
     unknown: 'unknown',
+    important: 'Important',
+    warning: 'Warning',
 };
 
 export default t;

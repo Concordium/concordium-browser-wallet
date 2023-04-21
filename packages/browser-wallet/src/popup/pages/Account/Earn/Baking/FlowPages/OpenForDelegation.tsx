@@ -20,7 +20,7 @@ type OpenForDelegationProps = MultiStepFormPageProps<
     WithAccountInfo;
 
 export default function OpenForDelegationPage({ initial, onNext, accountInfo }: OpenForDelegationProps) {
-    const { t: tShared } = useTranslation('shared', { keyPrefix: 'baking' });
+    const { t: tShared } = useTranslation('shared');
     const { t } = useTranslation('account', { keyPrefix: 'baking.configure' });
     const defaultValues: Partial<OpenForDelegationForm> = useMemo(
         () => (initial === undefined ? { openForDelegation: OpenStatus.OpenForAll } : { openForDelegation: initial }),
@@ -30,11 +30,11 @@ export default function OpenForDelegationPage({ initial, onNext, accountInfo }: 
 
     const options = useMemo(
         () => [
-            { value: OpenStatus.OpenForAll, label: tShared('openForAll') },
+            { value: OpenStatus.OpenForAll, label: tShared('baking.openForAll') },
             ...(isBakerAccount(accountInfo)
-                ? [{ value: OpenStatus.ClosedForNew, label: tShared('closedForNew') }]
+                ? [{ value: OpenStatus.ClosedForNew, label: tShared('baking.closedForNew') }]
                 : []),
-            { value: OpenStatus.ClosedForAll, label: tShared('closedForAll') },
+            { value: OpenStatus.ClosedForAll, label: tShared('baking.closedForAll') },
         ],
         []
     );
@@ -53,7 +53,7 @@ export default function OpenForDelegationPage({ initial, onNext, accountInfo }: 
                         />
                     </div>
                     <Submit className="m-t-20" width="wide">
-                        {t('continueButton')}
+                        {tShared('continue')}
                     </Submit>
                 </>
             )}

@@ -26,12 +26,11 @@ import { useAtomValue } from 'jotai';
 import { grpcClientAtom } from '@popup/store/settings';
 import DisabledAmountInput from '@popup/shared/DisabledAmountInput/DisabledAmountInput';
 import { useBlockChainParameters } from '@popup/shared/BlockChainParametersProvider';
-import Modal from '@popup/shared/Modal';
-import Button from '@popup/shared/Button';
 import { configureDelegationChangesPayload, ConfigureDelegationFlowState } from './utils';
 import AccountTransactionFlow from '../../AccountTransactionFlow';
 import { accountPageContext } from '../../utils';
 import { isAboveStakeWarningThreshold, STAKE_WARNING_THRESHOLD } from '../utils';
+import { AmountWarning, WarningModal } from '../Warning';
 
 type PoolPageForm =
     | {
@@ -54,6 +53,7 @@ type PoolPageProps = Omit<
 
 function PoolPage({ onNext, initial, accountInfo }: PoolPageProps) {
     const { t } = useTranslation('account', { keyPrefix: 'delegate.configure' });
+    const { t: tShared } = useTranslation('shared');
     const client = useAtomValue(grpcClientAtom);
     const form = useForm<PoolPageForm>({
         defaultValues:
@@ -149,7 +149,7 @@ function PoolPage({ onNext, initial, accountInfo }: PoolPageProps) {
                         )}
                     </div>
                     <Submit className="m-t-20" width="wide">
-                        {t('continueButton')}
+                        {tShared('continue')}
                     </Submit>
                 </>
             )}
@@ -180,11 +180,11 @@ type AmountPageForm = {
 
 type AmountPageProps = MultiStepFormPageProps<ConfigureDelegationFlowState['amount'], ConfigureDelegationFlowState> &
     WithAccountInfo;
-
 function AmountPage({ initial, onNext, formValues, accountInfo }: AmountPageProps) {
     const { t } = useTranslation('account', { keyPrefix: 'delegate.configure' });
+    const { t: tShared } = useTranslation('shared');
     const { setDetailsExpanded } = useContext(accountPageContext);
-    const [openWarning, setOpenWarning] = useState(false);
+    const [openWarning, setOpenWarning] = useState<AmountWarning>(AmountWarning.None);
     const chainParameters = useBlockChainParameters();
 
     const defaultValues: Partial<AmountPageForm> = useMemo(
@@ -213,12 +213,15 @@ function AmountPage({ initial, onNext, formValues, accountInfo }: AmountPageProp
     }, []);
 
     const onSubmit = (vs: AmountPageForm) => {
+        const amount = ccdToMicroCcd(vs.amount);
         // If the default value i.e. current stake or previosly chosen stake is already above the threshold, do not display the warning
         if (
             !(initial && isAboveStakeWarningThreshold(ccdToMicroCcd(initial), accountInfo)) &&
-            isAboveStakeWarningThreshold(ccdToMicroCcd(vs.amount), accountInfo)
+            isAboveStakeWarningThreshold(amount, accountInfo)
         ) {
-            setOpenWarning(true);
+            setOpenWarning(AmountWarning.AboveThreshold);
+        } else if (isDelegatorAccount(accountInfo) && accountInfo.accountDelegation.stakedAmount > amount) {
+            setOpenWarning(AmountWarning.Decrease);
         } else {
             onNext(vs.amount);
         }
@@ -231,27 +234,17 @@ function AmountPage({ initial, onNext, formValues, accountInfo }: AmountPageProp
         <Form<AmountPageForm> className="configure-flow-form" defaultValues={defaultValues} onSubmit={onSubmit}>
             {(f) => (
                 <>
+                    <WarningModal
+                        onCancel={() => setOpenWarning(AmountWarning.None)}
+                        onContinue={f.handleSubmit((vs) => onNext(vs.amount))}
+                        thresholdWarning={t('amount.overStakeThresholdWarning', {
+                            threshold: STAKE_WARNING_THRESHOLD.toString(),
+                        })}
+                        decreaseWarning={t('amount.decreaseWarning')}
+                        cancelText={t('amount.enterNewStake')}
+                        warningState={openWarning}
+                    />
                     <div className="w-full">
-                        <Modal open={openWarning} onClose={() => setOpenWarning(false)}>
-                            <div>
-                                <h3 className="m-t-0">{t('warning')}</h3>
-                                <p className="white-space-break ">
-                                    {t('amount.overStakeThresholdWarning', {
-                                        threshold: STAKE_WARNING_THRESHOLD.toString(),
-                                    })}
-                                </p>
-                                <Button
-                                    className="m-t-10"
-                                    width="wide"
-                                    onClick={f.handleSubmit((vs) => onNext(vs.amount))}
-                                >
-                                    {t('continueButton')}
-                                </Button>
-                                <Button className="m-t-10" onClick={() => setOpenWarning(false)}>
-                                    {t('amount.enterNewStake')}
-                                </Button>
-                            </div>
-                        </Modal>
                         <p className="m-t-0 text-center">{t('amount.description')}</p>
                         {pendingChange && (
                             <DisabledAmountInput
@@ -277,7 +270,7 @@ function AmountPage({ initial, onNext, formValues, accountInfo }: AmountPageProp
                     </div>
                     {poolStatus && <DisplayPoolStatus status={poolStatus} />}
                     <Submit className="m-t-20" width="wide">
-                        {t('continueButton')}
+                        {tShared('continue')}
                     </Submit>
                 </>
             )}
@@ -296,6 +289,7 @@ type RestakePageProps = MultiStepFormPageProps<
 
 function RestakePage({ initial, onNext }: RestakePageProps) {
     const { t } = useTranslation('account', { keyPrefix: 'delegate.configure' });
+    const { t: tShared } = useTranslation('shared');
     const defaultValues: Partial<RestakePageForm> = useMemo(
         () => (initial === undefined ? { redelegate: true } : { redelegate: initial }),
         [initial]
@@ -319,7 +313,7 @@ function RestakePage({ initial, onNext }: RestakePageProps) {
                         />
                     </div>
                     <Submit className="m-t-20" width="wide">
-                        {t('continueButton')}
+                        {tShared('continue')}
                     </Submit>
                 </>
             )}

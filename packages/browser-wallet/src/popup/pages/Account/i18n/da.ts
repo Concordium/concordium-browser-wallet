@@ -55,9 +55,6 @@ const t: typeof en = {
             ccd: 'Indtast et beløb at overføre',
             recipient: 'Indtast modtager addresse',
         },
-        buttons: {
-            continue: 'Fortsæt',
-        },
         title: 'Send CCD',
         currentBalance: 'Nuværende saldo',
         unableToCoverCost: 'Utilstrækkelig antal CCD til at dække omkostninger',
@@ -215,10 +212,10 @@ const t: typeof en = {
                 lockedNote: 'Du kan ikke ændre saldoen mens der er en kommende ændring',
                 overStakeThresholdWarning:
                     'Du er ved at låse mere end {{ threshold }}% af din totale saldo som din delegation saldo.\n\nHvis du ikke har nok ulåste CCD, vil du ikke kunne betale for transaktionsomkostninger.',
+                decreaseWarning:
+                    'At formindske din delegation saldo låser hele delegation saldoen i en cool-down periode. Det er ikke muligt at ændre mængden i denne periode og flytningen af CCD træder ikke i kraft indtil cool-down perioden er afsluttet.',
                 enterNewStake: 'Indtast ny delegation saldo',
             },
-            continueButton: 'Fortsæt',
-            warning: 'Advarsel',
         },
     },
     baking: {
@@ -288,13 +285,15 @@ const t: typeof en = {
                 optionNoRestake: 'Nej, indsæt ikke',
             },
             amount: {
-                description: 'Indtast din ønskede delegation saldo',
-                amountLabel: 'Delegation saldo',
-                amountRequired: 'Du skal specificere en delegation saldo',
-                locked: 'Saldo låst',
+                description: 'Indtast din ønskede baker stake',
+                amountLabel: 'Baker stake',
+                amountRequired: 'Du skal specificere en baker stake',
+                locked: 'Baker stake låst',
                 lockedNote: 'Du kan ikke ændre saldoen mens der er en kommende ændring',
                 overStakeThresholdWarning:
                     'Du er ved at låse mere end {{ threshold }}% af din totale saldo som din baker stake.\n\nHvis du ikke har nok ulåste CCD, vil du ikke kunne betale for transaktionsomkostninger.',
+                decreaseWarning:
+                    'At formindske din baker stake låser hele din baker stake i en cool-down periode. Det er ikke muligt at ændre mængden i denne periode og flytningen af CCD træder ikke i kraft indtil cool-down perioden er afsluttet.',
                 enterNewStake: 'Indtast ny baker stake',
             },
             openForDelegation: {
@@ -320,13 +319,30 @@ const t: typeof en = {
                 maxLength: 'MetadataUrl længde må ikke være mere end {{ maxLength }}',
             },
             warning: 'Advarsel',
-            continueButton: 'Fortsæt',
+        },
+    },
+    transactionMessage: {
+        configureBaker: {
+            registerBaker:
+                'Du er ved at indsende en transaktion som registrerer dig som en baker, hvillket som låser nogle af dine CCD som baker stake. Hvis du vil frigøre din stake, vil der være en cool-down periode.',
+            lowerBakerStake:
+                'Du er ved at indsende en transaktion som formindsker din baker stake. At formindske din baker stake har en cool-down periode, hvilket betyder at ændringen ikke træder i kraft med det samme.\n\nBakeren kan ikke fjernes og din baker stake kan ikke ændres indtil cool-down perioden er overstået.',
+            removeBaker: 'Er du sikker du vil lave denne transaktion som stopper baking?',
+        },
+        configureDelegation: {
+            register:
+                'Du er ved at indsende en transaktion som registrerer dig som en delegator, hvillket som låser nogle af dine CCD som delegation stake. Hvis du vil frigøre din stake, vil der være en cool-down periode på {{ cooldownPeriod }} dage.',
+            lowerDelegationStake:
+                'Du er ved at indsende en transaktion som formindkser din delegation stake. Det vil træde i kraft efter {{ cooldownPeriod }} dage og din delegation saldo kan ikke ændres i denne periode.',
+            remove: 'Er du sikker du vil fjerne din delegation?',
         },
     },
     accountPending: 'Denne konto er stadig ved at blive oprettet.',
     accountRejected: 'Denne konto kunne ikke blive oprettet.',
     request: 'Opret konto',
     unknown: 'Ukendt',
+    warning: 'Advarsel',
+    important: 'Vigtigt',
 };
 
 export default t;
