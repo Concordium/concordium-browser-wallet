@@ -18,6 +18,9 @@ const t = {
         total: 'Public balance total',
         atDisposal: 'Public amount at disposal',
         stakeAmount: 'Stake / delegation amount',
+        stakeWithBaker: 'Stake with baker {{ bakerId }}',
+        delegationWithBaker: 'Delegation with baker pool {{ bakerId }}',
+        passiveDelegation: 'Passive delegation',
     },
     settings: {
         connectedSites: {

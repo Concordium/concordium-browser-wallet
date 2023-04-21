@@ -20,6 +20,9 @@ const t: typeof en = {
         total: 'Offentligt total',
         atDisposal: 'Offentligt til rådighed',
         stakeAmount: 'Stake',
+        stakeWithBaker: 'Stake ved baker {{ bakerId }}',
+        delegationWithBaker: 'Delegation ved baker pool {{ bakerId }}',
+        passiveDelegation: 'Passiv delegation',
     },
     settings: {
         connectedSites: {

@@ -9,6 +9,7 @@ import { displaySplitAddress } from '@popup/shared/utils/account-helpers';
 import VerifiedIcon from '@assets/svg/verified-stamp.svg';
 import { CreationStatus, WalletCredential } from '@shared/storage/types';
 import { useAccountInfo } from '@popup/shared/AccountInfoListenerContext';
+import { isDelegatorAccount, isBakerAccount, DelegationTargetType } from '@concordium/web-sdk';
 
 type AmountProps = {
     label: string;
@@ -50,6 +51,24 @@ export default function AccountDetails({ expanded, account, className }: Props) 
         }
     }, [accountInfo]);
 
+    function stakeLabel() {
+        if (!accountInfo) {
+            return t('stakeAmount');
+        }
+
+        if (isBakerAccount(accountInfo)) {
+            return t('stakeWithBaker', { bakerId: accountInfo.accountBaker.bakerId });
+        }
+        if (isDelegatorAccount(accountInfo)) {
+            if (accountInfo.accountDelegation.delegationTarget.delegateType === DelegationTargetType.Baker) {
+                return t('delegationWithBaker', { bakerId: accountInfo.accountDelegation.delegationTarget.bakerId });
+            }
+            return t('passiveDelegation');
+        }
+
+        return t('stakeAmount');
+    }
+
     return (
         <div className={clsx('account-page-details', expanded && 'account-page-details--expanded', className)}>
             <div className="account-page-details__address">{displaySplitAddress(account.address)}</div>
@@ -59,7 +78,7 @@ export default function AccountDetails({ expanded, account, className }: Props) 
             <div className="account-page-details__balance">
                 <Amount label={t('total')} amount={balances.total} />
                 <Amount label={t('atDisposal')} amount={balances.atDisposal} />
-                <Amount label={t('stakeAmount')} amount={balances.staked} />
+                <Amount label={stakeLabel()} amount={balances.staked} />
             </div>
             {account.status === CreationStatus.Confirmed && <VerifiedIcon className="account-page-details__stamp" />}
         </div>

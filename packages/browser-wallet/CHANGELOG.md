@@ -6,6 +6,8 @@
 
 -   SendTransaction now validates that an account has sufficient funds before sending a transaction (requested though the api).
 -   Support for eID (Criipto) identity document types.
+-   An icon is now shown in the account list if an account is either baking or delegating.
+-   The stake label in the account balance view now shows whether the user is baking, delegating or doing neither.
 -   When creating an account that already exist, it will now be added to the wallet.
 
 ### Changed
