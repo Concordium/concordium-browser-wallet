@@ -1,5 +1,5 @@
 import React, { useState } from 'react';
-import { AccountAddress, BakerKeysWithProofs, generateBakerKeys } from '@concordium/web-sdk';
+import { AccountAddress, BakerKeysWithProofs, generateBakerKeys, GenerateBakerKeysOutput } from '@concordium/web-sdk';
 import { useTranslation } from 'react-i18next';
 
 import Form from '@popup/shared/Form';
@@ -13,7 +13,7 @@ import { DisplayKey } from '@popup/shared/TransactionReceipt/displayPayload/Disp
 import { getBakerKeyExport } from '@popup/shared/utils/baking-helpers';
 import { ConfigureBakerFlowState } from '../utils';
 
-type KeysForm = BakerKeysWithProofs;
+type KeysForm = GenerateBakerKeysOutput;
 
 type KeysProps = MultiStepFormPageProps<ConfigureBakerFlowState['keys'], ConfigureBakerFlowState> & WithAccountInfo;
 
