@@ -10,6 +10,7 @@ import Modal from '@popup/shared/Modal';
 import { WithAccountInfo } from '@popup/shared/utils/account-helpers';
 import { useForm } from 'react-hook-form';
 import { DisplayKey } from '@popup/shared/TransactionReceipt/displayPayload/DisplayConfigureBaker';
+import { getBakerKeyExport } from '@popup/shared/utils/baking-helpers';
 import { ConfigureBakerFlowState } from '../utils';
 
 type KeysForm = BakerKeysWithProofs;
@@ -67,8 +68,7 @@ export default function KeysPage({ initial, onNext, accountInfo }: KeysProps) {
     const keys = form.watch();
 
     const saveKeys = () => {
-        // TODO Fix faulty conversion in case max account index approaches 2^53
-        saveData({ bakerId: Number(accountInfo.accountIndex), ...keys }, KEYS_FILENAME);
+        saveData(getBakerKeyExport(keys, accountInfo), KEYS_FILENAME);
         setShowPrompt(true);
     };
 
