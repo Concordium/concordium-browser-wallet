@@ -1,5 +1,5 @@
 /* eslint-disable @typescript-eslint/no-unused-vars */
-import { Atom, atom } from 'jotai';
+import { Atom, atom, WritableAtom } from 'jotai';
 import { mapRecordValues } from 'wallet-common-helpers';
 import { atomFamily } from 'jotai/utils';
 import { ChromeStorageKey, TokenIdAndMetadata, TokenMetadata, TokenStorage } from '@shared/storage/types';
@@ -44,14 +44,39 @@ export const tokensAtom = atom<AsyncWrapper<Tokens>>((get) => {
     };
 });
 
-const accountTokensFamily = atomFamily<string, Atom<AsyncWrapper<AccountTokens>>>((accountAddress) =>
-    atom((get) => {
-        const tokens = get(tokensAtom);
-        if (tokens.loading) {
-            return { loading: true, value: {} };
+export const accountTokensFamily = atomFamily<
+    string,
+    WritableAtom<AsyncWrapper<AccountTokens>, { contractIndex: string; newTokens: TokenIdAndMetadata[] }, Promise<void>>
+>((accountAddress) =>
+    atom(
+        (get) => {
+            const tokens = get(tokensAtom);
+            if (tokens.loading) {
+                return { loading: true, value: {} };
+            }
+            return { loading: false, value: tokens.value[accountAddress] || {} };
+        },
+        async (get, set, { contractIndex, newTokens }) => {
+            const tokens = get(storedTokensAtom);
+            const tokenMetadata = get(tokenMetadataAtom);
+            if (tokens.loading || tokenMetadata.loading) {
+                throw new Error('Unable to update tokens while they are loading');
+            }
+            const accountCollections: Record<string, TokenStorage[]> = tokens.value[accountAddress] || {};
+            accountCollections[contractIndex] = newTokens.map((token) => ({
+                id: token.id,
+                metadataLink: token.metadataLink,
+            }));
+            const updatedTokens = { ...tokens.value };
+            updatedTokens[accountAddress] = accountCollections;
+            const newMetadata = tokenMetadata.value;
+            newTokens.forEach((token) => {
+                newMetadata[token.metadataLink] = token.metadata;
+            });
+            await set(tokenMetadataAtom, newMetadata);
+            return set(storedTokensAtom, updatedTokens);
         }
-        return { loading: false, value: tokens.value[accountAddress] || {} };
-    })
+    )
 );
 
 export const currentAccountTokensAtom = atom<
@@ -66,29 +91,12 @@ export const currentAccountTokensAtom = atom<
         }
         return get(accountTokensFamily(currentAccount));
     },
-    async (get, set, { contractIndex, newTokens }) => {
-        const tokens = get(storedTokensAtom);
-        const tokenMetadata = get(tokenMetadataAtom);
-        if (tokens.loading || tokenMetadata.loading) {
-            throw new Error('Unable to update tokens while they are loading');
-        }
+    async (get, set, update) => {
         const currentAccount = get(selectedAccountAtom);
         if (!currentAccount) {
             throw new Error('Unable to update tokens for an account if there is no chosen account');
         }
-        const accountCollections: Record<string, TokenStorage[]> = tokens.value[currentAccount] || {};
-        accountCollections[contractIndex] = newTokens.map((token) => ({
-            id: token.id,
-            metadataLink: token.metadataLink,
-        }));
-        const updatedTokens = { ...tokens.value };
-        updatedTokens[currentAccount] = accountCollections;
-        const newMetadata = tokenMetadata.value;
-        newTokens.forEach((token) => {
-            newMetadata[token.metadataLink] = token.metadata;
-        });
-        await set(tokenMetadataAtom, newMetadata);
-        return set(storedTokensAtom, updatedTokens);
+        return set(accountTokensFamily(currentAccount), update);
     }
 );
 

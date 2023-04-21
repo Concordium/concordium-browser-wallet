@@ -18,6 +18,12 @@ const t: typeof en = {
     title: 'Underskriv transaktion',
     data: 'Data',
     rawData: '(Kunne ikke afkodes)',
+    errors: {
+        missingAccount: 'Afsender addresse mangler',
+        missingKey: 'Nøgler til afsender addresse mangler',
+        insufficientFunds: 'Utilstrækkelig CCD til at kunne sende transaktionen',
+        missingNonce: 'Vi var ikke i stand til at finde den næste nonce for afsenderen',
+    },
 };
 
 export default t;

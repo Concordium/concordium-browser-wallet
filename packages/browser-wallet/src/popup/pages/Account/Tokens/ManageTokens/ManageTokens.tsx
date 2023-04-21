@@ -51,7 +51,6 @@ export default function AddTokens() {
 
     useEffect(() => {
         setDetailsExpanded(false);
-        return () => setDetailsExpanded(true);
     }, []);
 
     const setChecked = useSetAtom(checkedTokensAtom);

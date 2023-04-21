@@ -1,6 +1,6 @@
 import React, { useContext, useEffect, useMemo } from 'react';
 import { useTranslation } from 'react-i18next';
-import { Link, Route, Routes, useNavigate } from 'react-router-dom';
+import { Link, Route, Routes, useLocation, useNavigate } from 'react-router-dom';
 import {
     AccountTransactionType,
     ChainParametersV1,
@@ -16,7 +16,7 @@ import { useSelectedAccountInfo } from '@popup/shared/AccountInfoListenerContext
 import { useHasPendingTransaction } from '@popup/shared/utils/transaction-helpers';
 import { useAtomValue } from 'jotai';
 import { grpcClientAtom } from '@popup/store/settings';
-import { displayAsCcd, useAsyncMemo } from 'wallet-common-helpers';
+import { displayAsCcd, useAsyncMemo, useUpdateEffect } from 'wallet-common-helpers';
 import ButtonGroup from '@popup/shared/ButtonGroup';
 import { absoluteRoutes } from '@popup/constants/routes';
 import { useBlockChainParameters } from '@popup/shared/BlockChainParametersProvider';
@@ -79,7 +79,20 @@ export default function EarnRoutes() {
     const hasPendingDelegationTransaction = useHasPendingTransaction(AccountTransactionType.ConfigureDelegation);
     const hasPendingBakerTransaction = useHasPendingTransaction(AccountTransactionType.ConfigureBaker);
 
+    const location = useLocation();
+
     useEffect(() => {
+        if (location.pathname === `${absoluteRoutes.home.account.path}/${accountRoutes.earn}`) {
+            setDetailsExpanded(false);
+            if (isDelegatorAccount(accountInfo) || hasPendingDelegationTransaction) {
+                nav(routes.delegate);
+            } else if (isBakerAccount(accountInfo) || hasPendingBakerTransaction) {
+                nav(routes.baking);
+            }
+        }
+    }, [location.pathname]);
+
+    useUpdateEffect(() => {
         if (isDelegatorAccount(accountInfo) || hasPendingDelegationTransaction) {
             nav(routes.delegate);
         } else if (isBakerAccount(accountInfo) || hasPendingBakerTransaction) {
@@ -99,12 +112,6 @@ export default function EarnRoutes() {
         undefined,
         []
     );
-
-    useEffect(() => {
-        setDetailsExpanded(false);
-        return () => setDetailsExpanded(true);
-    }, []);
-
     const context = useMemo<EarnPageContext>(
         () => ({ chainParameters: ParametersV1, consensusStatus, tokenomicsInfo }),
         [consensusStatus, tokenomicsInfo, chainParameters]

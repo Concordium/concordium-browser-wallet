@@ -9,6 +9,7 @@ import {
     sendTransaction,
     getDefaultExpiry,
     createPendingTransactionFromAccountTransaction,
+    getTransactionAmount,
 } from '@popup/shared/utils/transaction-helpers';
 import { grpcClientAtom } from '@popup/store/settings';
 import TransactionReceipt from '@popup/shared/TransactionReceipt/TransactionReceipt';
@@ -23,6 +24,7 @@ import { parsePayload } from '@shared/utils/payload-helpers';
 import { BackgroundSendTransactionPayload } from '@shared/utils/types';
 import { convertEnergyToMicroCcd, getEnergyCost } from '@shared/utils/energy-helpers';
 import { useBlockChainParameters } from '@popup/shared/BlockChainParametersProvider';
+import { getPublicAccountAmounts } from 'wallet-common-helpers';
 
 interface Location {
     state: {
@@ -71,17 +73,26 @@ export default function SendTransaction({ onSubmit, onReject }: Props) {
 
     const handleSubmit = useCallback(async () => {
         if (!accountAddress) {
-            throw new Error('Missing url account address');
+            throw new Error(t('errors.missingAccount'));
         }
         if (!key) {
-            throw new Error('Missing key for the chosen address');
+            throw new Error(t('errors.missingKey'));
         }
 
         const sender = new AccountAddress(accountAddress);
+
+        const accountInfo = await client.getAccountInfo(sender);
+        if (
+            getPublicAccountAmounts(accountInfo).atDisposal <
+            getTransactionAmount(transactionType, payload) + (cost || 0n)
+        ) {
+            throw new Error(t('errors.insufficientFunds'));
+        }
+
         const nonce = await client.getNextAccountNonce(sender);
 
         if (!nonce) {
-            throw new Error('No nonce was found for the chosen account');
+            throw new Error(t('errors.missingNonce'));
         }
 
         const header = {
