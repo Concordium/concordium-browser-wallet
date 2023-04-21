@@ -78,7 +78,7 @@ export default function AccountDetails({ expanded, account, className }: Props) 
             <div className="account-page-details__balance">
                 <Amount label={t('total')} amount={balances.total} />
                 <Amount label={t('atDisposal')} amount={balances.atDisposal} />
-                <Amount label={stakeLabel(accountInfo)} amount={balances.staked} />
+                <Amount label={stakeLabel()} amount={balances.staked} />
             </div>
             {account.status === CreationStatus.Confirmed && <VerifiedIcon className="account-page-details__stamp" />}
         </div>
