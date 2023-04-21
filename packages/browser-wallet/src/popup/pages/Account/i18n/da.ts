@@ -324,14 +324,14 @@ const t: typeof en = {
     transactionMessage: {
         configureBaker: {
             registerBaker:
-                'Du er ved at indsende en transaktion som registrer dig som en baker, hvillket som låser nogle af dine CCD som baker stake. Hvis du vil frigøre din stake, vil der være en cool-down periode.',
+                'Du er ved at indsende en transaktion som registrerer dig som en baker, hvillket som låser nogle af dine CCD som baker stake. Hvis du vil frigøre din stake, vil der være en cool-down periode.',
             lowerBakerStake:
                 'Du er ved at indsende en transaktion som formindsker din baker stake. At formindske din baker stake har en cool-down periode, hvilket betyder at ændringen ikke træder i kraft med det samme.\n\nBakeren kan ikke fjernes og din baker stake kan ikke ændres indtil cool-down perioden er overstået.',
             removeBaker: 'Er du sikker du vil lave denne transaktion som stopper baking?',
         },
         configureDelegation: {
             register:
-                'Du er ved at indsende en transaktion som registrer dig som en delegator, hvillket som låser nogle af dine CCD som delegation stake. Hvis du vil frigøre din stake, vil der være en cool-down periode på {{ cooldownPeriod }} dage.',
+                'Du er ved at indsende en transaktion som registrerer dig som en delegator, hvillket som låser nogle af dine CCD som delegation stake. Hvis du vil frigøre din stake, vil der være en cool-down periode på {{ cooldownPeriod }} dage.',
             lowerDelegationStake:
                 'Du er ved at indsende en transaktion som formindkser din delegation stake. Det vil træde i kraft efter {{ cooldownPeriod }} dage og din delegation saldo kan ikke ændres i denne periode.',
             remove: 'Er du sikker du vil fjerne din delegation?',

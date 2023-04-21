@@ -47,7 +47,7 @@ export function WarningModal({
                 <Button className="m-t-10" width="wide" onClick={onContinue}>
                     {tShared('continue')}
                 </Button>
-                <Button className="m-t-10" onClick={onCancel}>
+                <Button className="m-t-10" width="wide" onClick={onCancel}>
                     {cancelText}
                 </Button>
             </div>
