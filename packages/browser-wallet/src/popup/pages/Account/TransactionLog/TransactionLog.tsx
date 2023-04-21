@@ -15,13 +15,18 @@ export default function TransactionLog() {
 
     const showList = () => {
         setSelectedTransaction(undefined);
+        setDetailsExpanded(true);
     };
 
     useEffect(() => {
         setDetailsExpanded(true);
     }, []);
 
-    useUpdateEffect(showList, [accountAddress]);
+    useUpdateEffect(() => {
+        if (selectedTransaction) {
+            showList();
+        }
+    }, [accountAddress]);
 
     if (selectedTransaction) {
         return (

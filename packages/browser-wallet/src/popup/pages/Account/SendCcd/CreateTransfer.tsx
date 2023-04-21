@@ -150,6 +150,9 @@ function CreateTransaction({ tokens, setCost, setDetailsExpanded, cost }: Props 
     }, [Boolean(chosenToken), currentBalance, cost]);
 
     useEffect(() => {
+        // When switching account reset whether or not the user is picking a token.
+        setPickingToken(false);
+
         // Reset chosen token if the current account is changed and the new account does not have the chosen token.
         if (
             chosenToken &&

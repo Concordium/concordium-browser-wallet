@@ -46,6 +46,7 @@ export default function PickToken({ onClick, tokens, ccdBalance, address, setDet
     useEffect(() => {
         if (Object.values(tokens || []).reduce((tokenCount, collection) => collection.length + tokenCount, 0) > 3) {
             setDetailsExpanded(false);
+            return () => setDetailsExpanded(true);
         }
         return noOp;
     }, []);
