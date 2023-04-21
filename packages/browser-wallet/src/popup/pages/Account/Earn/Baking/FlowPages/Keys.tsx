@@ -1,5 +1,5 @@
 import React, { useState } from 'react';
-import { AccountAddress, BakerKeysWithProofs, generateBakerKeys } from '@concordium/web-sdk';
+import { AccountAddress, BakerKeysWithProofs, generateBakerKeys, GenerateBakerKeysOutput } from '@concordium/web-sdk';
 import { useTranslation } from 'react-i18next';
 
 import Form from '@popup/shared/Form';
@@ -10,9 +10,10 @@ import Modal from '@popup/shared/Modal';
 import { WithAccountInfo } from '@popup/shared/utils/account-helpers';
 import { useForm } from 'react-hook-form';
 import { DisplayKey } from '@popup/shared/TransactionReceipt/displayPayload/DisplayConfigureBaker';
+import { getBakerKeyExport } from '@popup/shared/utils/baking-helpers';
 import { ConfigureBakerFlowState } from '../utils';
 
-type KeysForm = BakerKeysWithProofs;
+type KeysForm = GenerateBakerKeysOutput;
 
 type KeysProps = MultiStepFormPageProps<ConfigureBakerFlowState['keys'], ConfigureBakerFlowState> & WithAccountInfo;
 
@@ -68,7 +69,7 @@ export default function KeysPage({ initial, onNext, accountInfo }: KeysProps) {
     const keys = form.watch();
 
     const saveKeys = () => {
-        saveData(keys, KEYS_FILENAME);
+        saveData(getBakerKeyExport(keys, accountInfo), KEYS_FILENAME);
         setShowPrompt(true);
     };
 

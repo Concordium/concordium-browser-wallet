@@ -27,6 +27,7 @@
 -   Recovery no longer assigns duplicate names to identities when new identities are visited earlier than existing ones during the recovery process.
 -   AddCIS2Tokens through API now adds tokens to the given account, instead of the currently selected one.
 -   Missing translations for some identity attributes.
+-   The bakerKey export is now the correct format that the node expects. (It now includes `bakerId` and the private keys)
 -   Removed double unit on CCD in token overview.
 -   A bug that caused an identity to not be recovered if there was a rejected one present in the same index.
 
