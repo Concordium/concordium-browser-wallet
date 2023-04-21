@@ -18,6 +18,7 @@
         "@concordium/browser-wallet-api": "workspace:^",
         "@concordium/browser-wallet-api-helpers": "workspace:^",
         "@concordium/web-sdk": "^3.4.2",
+        "@protobuf-ts/runtime-rpc": "^2.8.2",
         "@scure/bip39": "^1.1.0",
         "axios": "^0.27.2",
         "buffer": "^6.0.3",

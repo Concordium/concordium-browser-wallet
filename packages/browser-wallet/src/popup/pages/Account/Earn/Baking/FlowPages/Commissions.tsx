@@ -14,7 +14,7 @@ type CommissionsForm = CommissionRates;
 type CommissionsProps = MultiStepFormPageProps<ConfigureBakerFlowState['commissionRates'], ConfigureBakerFlowState>;
 
 export default function CommissionsPage({ initial, onNext }: CommissionsProps) {
-    const { t: tShared } = useTranslation('shared', { keyPrefix: 'baking' });
+    const { t: tShared } = useTranslation('shared');
     const { t } = useTranslation('account', { keyPrefix: 'baking.configure' });
     const defaultValues: Partial<CommissionsForm> = useMemo(() => (initial === undefined ? {} : initial), [initial]);
     const onSubmit = (vs: CommissionsForm) => onNext(vs);
@@ -32,21 +32,21 @@ export default function CommissionsPage({ initial, onNext }: CommissionsProps) {
                     <div>
                         <div className="m-t-0">{t('commission.description')}</div>
                         <CommissionField
-                            label={tShared('transactionCommission')}
+                            label={tShared('baking.transactionCommission')}
                             name="transactionCommission"
                             min={chainParameters.transactionCommissionRange.min}
                             max={chainParameters.transactionCommissionRange.max}
                             register={f.register}
                         />
                         <CommissionField
-                            label={tShared('bakingCommission')}
+                            label={tShared('baking.bakingCommission')}
                             name="bakingCommission"
                             min={chainParameters.bakingCommissionRange.min}
                             register={f.register}
                             max={chainParameters.bakingCommissionRange.max}
                         />
                         <CommissionField
-                            label={tShared('finalizationCommission')}
+                            label={tShared('baking.finalizationCommission')}
                             name="finalizationCommission"
                             min={chainParameters.finalizationCommissionRange.min}
                             register={f.register}
@@ -54,7 +54,7 @@ export default function CommissionsPage({ initial, onNext }: CommissionsProps) {
                         />
                     </div>
                     <Submit className="m-t-20" width="wide">
-                        {t('continueButton')}
+                        {tShared('continue')}
                     </Submit>
                 </>
             )}

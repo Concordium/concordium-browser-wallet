@@ -60,6 +60,7 @@ function ShowKeys({ keys }: ShowKeysProp) {
 
 export default function KeysPage({ initial, onNext, accountInfo }: KeysProps) {
     const { t } = useTranslation('account', { keyPrefix: 'baking.configure' });
+    const { t: tShared } = useTranslation('shared');
     const [showPrompt, setShowPrompt] = useState(false);
     const form = useForm<KeysForm>({
         // TODO #delegation: test this on a slow computer, does it need to be moved to background script?
@@ -81,7 +82,7 @@ export default function KeysPage({ initial, onNext, accountInfo }: KeysProps) {
                             <h3 className="m-t-0">{t('keys.downloadedTitle')}</h3>
                             <div> {t('keys.downloaded', { fileName: KEYS_FILENAME })} </div>
                             <Button className="m-t-20" width="wide" onClick={f.handleSubmit(onNext)}>
-                                {t('continueButton')}
+                                {tShared('continue')}
                             </Button>
                         </div>
                     </Modal>

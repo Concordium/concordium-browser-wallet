@@ -1,4 +1,4 @@
-import React, { useMemo, useCallback } from 'react';
+import React, { useMemo, useCallback, useState } from 'react';
 import { useTranslation } from 'react-i18next';
 import { useAtom, useAtomValue, useSetAtom } from 'jotai';
 import { useNavigate } from 'react-router-dom';
@@ -20,6 +20,7 @@ import { getGlobal, getNet } from '@shared/utils/network-helpers';
 import { addToastAtom } from '@popup/state';
 import { getNextEmptyCredNumber } from '@popup/shared/utils/account-helpers';
 import { useDecryptedSeedPhrase } from '@popup/shared/utils/seed-phrase-helpers';
+import Modal from '@popup/shared/Modal';
 import AccountDetails from '../Account/AccountDetails';
 
 export default function Confirm() {
@@ -33,6 +34,7 @@ export default function Confirm() {
     const addToast = useSetAtom(addToastAtom);
     const seedPhrase = useDecryptedSeedPhrase((e) => addToast(e.message));
     const [creatingCredentialRequest, setCreatingRequest] = useAtom(creatingCredentialRequestAtom);
+    const [accountRecovered, setAccountRecovered] = useState(false);
 
     const identityProvider = useMemo(
         () => providers.find((p) => p.ipInfo.ipIdentity === selectedIdentity?.providerIndex),
@@ -77,6 +79,8 @@ export default function Confirm() {
             );
             if (response.status === BackgroundResponseStatus.Success) {
                 nav(absoluteRoutes.home.account.path);
+            } else if (response.status === BackgroundResponseStatus.Aborted) {
+                setAccountRecovered(true);
             } else {
                 addToast(response.error);
             }
@@ -94,6 +98,12 @@ export default function Confirm() {
     // TODO: Better faking of AccountDetails
     return (
         <div className="flex-column align-center">
+            <Modal open={Boolean(accountRecovered)} disableClose>
+                <p>{t('accountRecovered')}</p>
+                <Button width="wide" onClick={() => nav(absoluteRoutes.home.account.path)}>
+                    {t('goToAccount')}
+                </Button>
+            </Modal>
             <div className="w-full relative">
                 <AccountDetails
                     className="add-account-page__blur-details"

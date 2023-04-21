@@ -14,6 +14,7 @@ import {
 import { loop, not } from '@shared/utils/function-helpers';
 import { identityMatch } from '@shared/utils/identity-helpers';
 import { IdentityTokenContainer, IdentityProviderIdentityStatus } from 'wallet-common-helpers';
+import type { RpcError } from '@protobuf-ts/runtime-rpc';
 import { updateCredentials, updateIdentities } from './update';
 
 const isPendingCred = (cred: WalletCredential): cred is PendingWalletCredential =>
@@ -51,20 +52,6 @@ async function monitorCredentialStatus(initialNetwork: NetworkConfiguration, cre
 
         try {
             const response = await client.getBlockItemStatus(deploymentHash);
-            // transaction has been discarded by the node.
-            if (!response) {
-                await updateCredentials(
-                    [
-                        {
-                            ...info,
-                            status: CreationStatus.Rejected,
-                        },
-                    ],
-                    genesisHash
-                );
-                return false;
-            }
-
             // transaction has not finalized yet
             if (response?.status !== TransactionStatusEnum.Finalized) {
                 return true;
@@ -80,7 +67,20 @@ async function monitorCredentialStatus(initialNetwork: NetworkConfiguration, cre
                 genesisHash
             );
             return false;
-        } catch {
+        } catch (e) {
+            // transaction has been discarded by the node.
+            if ((e as RpcError).code === 'NOT_FOUND') {
+                await updateCredentials(
+                    [
+                        {
+                            ...info,
+                            status: CreationStatus.Rejected,
+                        },
+                    ],
+                    genesisHash
+                );
+                return false;
+            }
             return true;
         }
     });
