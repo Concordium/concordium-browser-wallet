@@ -149,7 +149,7 @@ const t = {
             },
         },
         register: {
-            title: 'Become a baker',
+            title: 'Register baker',
         },
         update: {
             title: {

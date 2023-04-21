@@ -3,7 +3,7 @@ import { useTranslation } from 'react-i18next';
 import { useNavigate } from 'react-router-dom';
 import { useAtom, useAtomValue } from 'jotai';
 import { AttributeKey } from '@concordium/web-sdk';
-import { formatAttributeValue, compareAttributes } from 'wallet-common-helpers';
+import { compareAttributes } from 'wallet-common-helpers';
 
 import FingerprintIcon from '@assets/svg/fingerprint.svg';
 import { identityProvidersAtom, selectedIdentityAtom } from '@popup/store/identity';
@@ -12,10 +12,11 @@ import { CreationStatus } from '@shared/storage/types';
 import IdentityProviderIcon from '@popup/shared/IdentityProviderIcon';
 import Button from '@popup/shared/Button';
 import { absoluteRoutes } from '@popup/constants/routes';
-import { useGetAttributeName } from '@popup/shared/utils/identity-helpers';
+import { useDisplayAttributeValue, useGetAttributeName } from '@popup/shared/utils/identity-helpers';
 
 export default function Identity() {
     const { t } = useTranslation('identity');
+    const displayAttribute = useDisplayAttributeValue();
     const nav = useNavigate();
     const [selectedIdentity, updateSelectedIdentity] = useAtom(selectedIdentityAtom);
     const providers = useAtomValue(identityProvidersAtom);
@@ -69,7 +70,7 @@ export default function Identity() {
                             <div key={attributeKey} className="identity__attributes-row">
                                 <div className="identity__attributes-left">{getAttributeName(attributeKey)}</div>
                                 <div className="identity__attributes-right">
-                                    {formatAttributeValue(attributeKey, attributes[attributeKey])}
+                                    {displayAttribute(attributeKey, attributes[attributeKey])}
                                 </div>
                             </div>
                         ))}

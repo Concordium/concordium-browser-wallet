@@ -20,14 +20,14 @@
 
         &-left {
             display: inline-flex;
-            align-items: center;
             justify-content: flex-start;
         }
 
         &-right {
             display: inline-flex;
-            align-items: center;
             justify-content: flex-end;
+            overflow-wrap: anywhere;
+            margin-left: rem(8px);
         }
     }
 

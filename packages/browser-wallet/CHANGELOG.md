@@ -2,11 +2,19 @@
 
 ## 1.0.1
 
+### Added
+
+-   SendTransaction now validates that an account has sufficient funds before sending a transaction (requested though the api).
+-   Support for eID (Criipto) identity document types.
+
 ### Changed
 
 -   Improved readability of events in transaction details.
 -   When choosing baker stake amount, the minimumEquityCapital is no longer the default value for non bakers.
 -   Baker transactions no longer display a minimum of 3 decimals when confirming the transaction.
+-   Changed header while registering a baker to `Register baker`.
+-   When registering as a baker, restaking and being open for delegation are now the default options.
+-   When registering for delegation, restaking and targeting a baker are now the default options.
 
 ### Fixed
 
@@ -14,6 +22,9 @@
 -   Incorrect navigation flow on the "earn" page when switching between accounts.
 -   Recovery no longer assigns duplicate names to identities when new identities are visited earlier than existing ones during the recovery process.
 -   AddCIS2Tokens through API now adds tokens to the given account, instead of the currently selected one.
+-   Missing translations for some identity attributes.
+-   Removed double unit on CCD in token overview.
+-   A bug that caused an identity to not be recovered if there was a rejected one present in the same index.
 
 ## 1.0.0
 

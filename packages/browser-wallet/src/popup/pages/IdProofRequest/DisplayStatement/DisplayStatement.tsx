@@ -2,7 +2,7 @@
 import clsx from 'clsx';
 import React, { useEffect, useState } from 'react';
 import { Trans, useTranslation } from 'react-i18next';
-import { ClassName, formatAttributeValue } from 'wallet-common-helpers';
+import { ClassName } from 'wallet-common-helpers';
 import { RevealStatement, AttributeList } from '@concordium/web-sdk';
 
 import SecretIcon from '@assets/svg/id-secret.svg';
@@ -14,7 +14,7 @@ import CrossIcon from '@assets/svg/cross.svg';
 
 import Button from '@popup/shared/Button';
 import Modal from '@popup/shared/Modal';
-import { useGetAttributeName } from '@popup/shared/utils/identity-helpers';
+import { useDisplayAttributeValue, useGetAttributeName } from '@popup/shared/utils/identity-helpers';
 import { ConfirmedIdentity } from '@shared/storage/types';
 import ExternalLink from '@popup/shared/ExternalLink';
 import urls from '@shared/constants/url';
@@ -194,13 +194,14 @@ export function DisplayRevealStatement({
 }: DisplayRevealStatementProps) {
     const { t, i18n } = useTranslation('idProofRequest', { keyPrefix: 'displayStatement' });
     const getAttributeName = useGetAttributeName();
+    const displayAttribute = useDisplayAttributeValue();
     const attributes =
         identity.idObject.value.attributeList.chosenAttributes ?? ({} as AttributeList['chosenAttributes']);
     const header = t('headers.reveal');
 
     const lines: StatementLine[] = statements.map((s) => {
         const raw = attributes[s.attributeTag];
-        let value = formatAttributeValue(s.attributeTag, attributes[s.attributeTag] ?? '');
+        let value = displayAttribute(s.attributeTag, attributes[s.attributeTag] ?? '');
 
         if (value && ['countryOfResidence', 'nationality', 'idDocIssuer'].includes(s.attributeTag)) {
             value = isoToCountryName(i18n.resolvedLanguage)(value);
