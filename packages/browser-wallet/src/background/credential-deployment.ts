@@ -56,21 +56,25 @@ async function createAndSendCredential(credIn: CredentialInput): Promise<Credent
         // Check that the credential has not already been deployed:
         try {
             const accountInfo = await client.getAccountInfo(new CredentialRegistrationId(credId));
+            const existingAddress = accountInfo.accountAddress;
             await addCredential(
                 {
                     identityIndex,
                     providerIndex,
                     credId,
                     credNumber,
-                    address: accountInfo.accountAddress,
+                    address: existingAddress,
                     status: CreationStatus.Confirmed,
                 },
                 network.genesisHash
             );
 
+            // Set Selected to new account
+            await storedSelectedAccount.set(existingAddress);
+
             return {
                 status: BackgroundResponseStatus.Aborted,
-                address,
+                address: existingAddress,
             };
         } catch {
             // If an error is thrown, we assume this is because the credential has not been deployed yet.
