@@ -1,5 +1,11 @@
 # Changelog
 
+## 1.0.2
+
+### Fixed
+
+-   Some issues in the baking and delegation text.
+
 ## 1.0.1
 
 ### Added
