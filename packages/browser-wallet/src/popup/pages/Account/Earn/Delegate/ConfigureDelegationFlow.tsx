@@ -56,8 +56,7 @@ function PoolPage({ onNext, initial, accountInfo }: PoolPageProps) {
     const { t: tShared } = useTranslation('shared');
     const client = useAtomValue(grpcClientAtom);
     const form = useForm<PoolPageForm>({
-        defaultValues:
-            initial === null || initial === undefined ? { isBaker: true } : { isBaker: true, bakerId: initial },
+        defaultValues: initial === null ? { isBaker: false } : { isBaker: true, bakerId: initial },
     });
     const isBakerValue = form.watch('isBaker');
 
