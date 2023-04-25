@@ -7,6 +7,7 @@
 -   Some issues in the baking and delegation text.
 -   Added missing key to events in the list of events inside the transaction details.
 -   Baking and delegation icons now also work in dark mode.
+-   An application crash when attempting to update the baker stake.
 
 ## 1.0.1
 
