@@ -1,7 +1,7 @@
 import React, { useContext, useEffect, useMemo, useState } from 'react';
-import { AccountInfo, isBakerAccount, OpenStatus } from '@concordium/web-sdk';
+import { isBakerAccount } from '@concordium/web-sdk';
 import { useTranslation } from 'react-i18next';
-import { getCcdSymbol, isValidCcdString, ccdToMicroCcd } from 'wallet-common-helpers';
+import { getCcdSymbol, ccdToMicroCcd } from 'wallet-common-helpers';
 import { Validate } from 'react-hook-form';
 
 import Form, { useForm } from '@popup/shared/Form';
@@ -9,29 +9,12 @@ import { MultiStepFormPageProps } from '@popup/shared/MultiStepForm';
 import Submit from '@popup/shared/Form/Submit';
 import FormAmountInput from '@popup/shared/Form/AmountInput';
 import { validateBakerStake } from '@popup/shared/utils/transaction-helpers';
-import { getConfigureBakerEnergyCost } from '@shared/utils/energy-helpers';
 import { WithAccountInfo } from '@popup/shared/utils/account-helpers';
 import { accountPageContext } from '@popup/pages/Account/utils';
 import DisabledAmountInput from '@popup/shared/DisabledAmountInput';
 import { earnPageContext, isAboveStakeWarningThreshold, STAKE_WARNING_THRESHOLD } from '../../utils';
-import { configureBakerChangesPayload, ConfigureBakerFlowState } from '../utils';
+import { ConfigureBakerFlowState, getCost } from '../utils';
 import { AmountWarning, WarningModal } from '../../Warning';
-
-function getCost(accountInfo: AccountInfo, formValues: Partial<ConfigureBakerFlowState>, amount: string) {
-    const formValuesFull = {
-        restake: formValues.restake || true,
-        openForDelegation: formValues.openForDelegation || OpenStatus.ClosedForAll,
-        metadataUrl: formValues.metadataUrl || '',
-        commissionRates: formValues.commissionRates || {
-            transactionCommission: 0,
-            bakingCommission: 0,
-            finalizationCommission: 0,
-        },
-        keys: formValues.keys || null,
-        amount: isValidCcdString(amount) ? amount : '0',
-    };
-    return getConfigureBakerEnergyCost(configureBakerChangesPayload(accountInfo)(formValuesFull));
-}
 
 type AmountPageForm = {
     amount: string;
