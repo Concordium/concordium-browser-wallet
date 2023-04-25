@@ -113,11 +113,11 @@ const t = {
         registerIntro: {
             '1': {
                 title: 'Become a baker',
-                body: 'A baker is a node that participates in the network by baking (creating) new blocks that are added to the chain.\n\nEach baker has a set of cryptographic keys called baker keys that the node needs to bake blocksYou generate the baker keys when you add a baker account.\n\nOnce the baker node has been restarted with the baker keys, it will start baking two epochs after the transaction has been approved.',
+                body: 'A baker is a node that participates in the network by baking (creating) new blocks that are added to the chain.\n\nEach baker has a set of cryptographic keys called baker keys that the node needs to bake blocks. You generate the baker keys when you add a baker account.\n\nOnce the baker node has been restarted with the baker keys, it will start baking two epochs after the transaction has been approved.',
             },
             '2': {
                 title: 'The node',
-                body: 'To become a baker you must run a node on the Concordium blockchain.Make sure that you have a setup where the node can operate around the clock.\n\nYou can run the node yourself or use a third-party provider. Make sure your account in the wallet has the required amount of CCD to become a baker.',
+                body: 'To become a baker you must run a node on the Concordium blockchain. Make sure that you have a setup where the node can operate around the clock.\n\nYou can run the node yourself or use a third-party provider. Make sure your account in the wallet has the required amount of CCD to become a baker.',
             },
             '3': {
                 title: 'Opening a pool',
@@ -254,7 +254,7 @@ const t = {
             },
             '3': {
                 title: 'Updates with longer cool-downs',
-                body: 'If you decrease your stake, the change will take effect after a cool-down period.\n\nWhile in this cool-down period, the stake is locked and cannot be changed, and you will not be able to stop your delegation.\n\nYour delegation continues earning rewards during the cool-down period. While in the cool-down period you can update other delegation settings, but not the amount\n\n.If you made any other changes to your delegation while also decreasing your delegation amount, the other changes will take effect from the next pay day as described on the previous page.',
+                body: 'If you decrease your stake, the change will take effect after a cool-down period.\n\nWhile in this cool-down period, the stake is locked and cannot be changed, and you will not be able to stop your delegation.\n\nYour delegation continues earning rewards during the cool-down period. While in the cool-down period you can update other delegation settings, but not the amount.\n\nIf you made any other changes to your delegation while also decreasing your delegation amount, the other changes will take effect from the next pay day as described on the previous page.',
             },
         },
         removeIntro: {
