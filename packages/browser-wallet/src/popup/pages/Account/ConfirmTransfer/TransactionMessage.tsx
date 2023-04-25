@@ -32,40 +32,44 @@ export function TransactionMessage({ transactionType, payload }: Props) {
 
         switch (transactionType) {
             case AccountTransactionType.ConfigureBaker: {
+                const cooldownPeriod = secondsToDaysRoundedDown(parametersV1?.poolOwnerCooldown);
                 if (isBakerAccount(accountInfo)) {
                     const newStake = (payload as ConfigureBakerPayload).stake?.microCcdAmount;
                     if (newStake === undefined) {
                         return undefined;
                     }
-                    if (accountInfo.accountBaker.stakedAmount > newStake) {
-                        return t('configureBaker.lowerBakerStake');
-                    }
                     if (newStake === 0n) {
-                        return t('configureBaker.removeBaker');
+                        return t('configureBaker.removeBaker', { cooldownPeriod });
+                    }
+                    if (accountInfo.accountBaker.stakedAmount > newStake) {
+                        return t('configureBaker.lowerBakerStake', { cooldownPeriod });
                     }
                 } else {
-                    return t('configureBaker.registerBaker');
+                    return t('configureBaker.registerBaker', { cooldownPeriod });
                 }
                 break;
             }
             case AccountTransactionType.ConfigureDelegation: {
+                const cooldownPeriod = secondsToDaysRoundedDown(parametersV1?.delegatorCooldown);
                 if (isDelegatorAccount(accountInfo)) {
                     const newStake = (payload as ConfigureDelegationPayload).stake?.microCcdAmount;
                     if (newStake === undefined) {
                         return undefined;
                     }
-                    if (accountInfo.accountDelegation.stakedAmount > newStake) {
-                        return t('configureDelegation.lowerDelegationStake', {
-                            cooldownPeriod: secondsToDaysRoundedDown(parametersV1?.delegatorCooldown),
-                        });
-                    }
                     if (newStake === 0n) {
                         return t('configureDelegation.remove', {
-                            cooldownPeriod: secondsToDaysRoundedDown(parametersV1?.delegatorCooldown),
+                            cooldownPeriod,
+                        });
+                    }
+                    if (accountInfo.accountDelegation.stakedAmount > newStake) {
+                        return t('configureDelegation.lowerDelegationStake', {
+                            cooldownPeriod,
                         });
                     }
                 } else {
-                    return t('configureDelegation.register');
+                    return t('configureDelegation.register', {
+                        cooldownPeriod,
+                    });
                 }
                 break;
             }
