@@ -1,5 +1,13 @@
 # Changelog
 
+## 1.0.2
+
+### Fixed
+
+-   Some issues in the baking and delegation text.
+-   Added missing key to events in the list of events inside the transaction details.
+-   Baking and delegation icons now also work in dark mode.
+
 ## 1.0.1
 
 ### Added

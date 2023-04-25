@@ -36,10 +36,10 @@ function BakerOrDelegatorIcon({
     className: string;
 }) {
     if (isDelegatorAccount(accountInfo)) {
-        return <DelegationIcon width={width} className={`${className} delegationImage`} />;
+        return <DelegationIcon width={width} className={`${className} delegationBakingImage`} />;
     }
     if (isBakerAccount(accountInfo)) {
-        return <BakerIcon width={width} className={className} />;
+        return <BakerIcon width={width} className={`${className} delegationBakingImage`} />;
     }
     return null;
 }
