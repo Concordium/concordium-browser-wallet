@@ -1,5 +1,11 @@
 # Changelog
 
+## 1.0.2
+
+### Fixed
+
+-   Added missing key to events in the list of events inside the transaction details.
+
 ## 1.0.1
 
 ### Added
