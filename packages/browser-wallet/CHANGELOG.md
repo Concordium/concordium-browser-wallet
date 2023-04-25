@@ -1,5 +1,11 @@
 # Changelog
 
+## 1.0.2
+
+### Fixed
+
+-   Baking and delegation icons now also work in dark mode.
+
 ## 1.0.1
 
 ### Added
