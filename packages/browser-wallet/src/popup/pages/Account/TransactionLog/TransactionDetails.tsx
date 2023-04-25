@@ -54,7 +54,7 @@ export default function TransactionDetails({
                     <Title title={t('events')} />
                     <ul>
                         {transaction.events.map((event) => {
-                            return <li>{event}</li>;
+                            return <li key={event}>{event}</li>;
                         })}
                     </ul>
                 </div>
