@@ -4,6 +4,7 @@
 
 ### Fixed
 
+-   Added missing key to events in the list of events inside the transaction details.
 -   Baking and delegation icons now also work in dark mode.
 
 ## 1.0.1
