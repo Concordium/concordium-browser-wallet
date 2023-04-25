@@ -12,6 +12,7 @@ import { validateBakerStake } from '@popup/shared/utils/transaction-helpers';
 import { WithAccountInfo } from '@popup/shared/utils/account-helpers';
 import { accountPageContext } from '@popup/pages/Account/utils';
 import DisabledAmountInput from '@popup/shared/DisabledAmountInput';
+import { convertEnergyToMicroCcd } from '@shared/utils/energy-helpers';
 import { earnPageContext, isAboveStakeWarningThreshold, STAKE_WARNING_THRESHOLD } from '../../utils';
 import { ConfigureBakerFlowState, getCost } from '../utils';
 import { AmountWarning, WarningModal } from '../../Warning';
@@ -35,7 +36,11 @@ export default function AmountPage({ initial, onNext, formValues, accountInfo }:
     });
     const amount = form.watch('amount');
 
-    const cost = useMemo(() => getCost(accountInfo, formValues, amount), [amount]);
+    const cost = useMemo(
+        () =>
+            chainParameters ? convertEnergyToMicroCcd(getCost(accountInfo, formValues, amount), chainParameters) : 0n,
+        [chainParameters, amount]
+    );
 
     const validateAmount: Validate<string> = (amountToValidate) =>
         validateBakerStake(amountToValidate, chainParameters, accountInfo, cost);

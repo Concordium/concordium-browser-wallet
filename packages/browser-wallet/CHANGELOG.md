@@ -9,6 +9,7 @@
 -   Baking and delegation icons now also work in dark mode.
 -   An application crash when attempting to update the baker stake.
 -   Delegation target always defaulting to baker, even if current target was a passive delegation.
+-   Fixed incorrect cost used to validate baker stake.
 
 ## 1.0.1
 
