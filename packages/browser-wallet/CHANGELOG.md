@@ -2,6 +2,10 @@
 
 ## 1.0.2
 
+### Changed
+
+-   Updated messages when confirming baker/delegation transactions.
+
 ### Fixed
 
 -   Some issues in the baking and delegation text.
