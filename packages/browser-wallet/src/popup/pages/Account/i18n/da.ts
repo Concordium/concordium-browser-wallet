@@ -332,10 +332,10 @@ const t: typeof en = {
                 'Du er ved at indsende en transaktion som formindsker din baker stake. At formindske din baker stake har en cool-down periode, hvilket betyder at ændringen ikke træder i kraft med det samme.\n\nBakeren kan ikke fjernes og din baker stake kan ikke ændres indtil cool-down perioden er overstået.',
             removeBaker: 'Er du sikker du vil lave denne transaktion som stopper baking?',
             notice: {
-                start: 'Når din transaktion er blevet finalized, vil baker registringen starte fra den efterfølgende pay day.\n\nHusk at genstarte din node med de nye baker keys',
+                start: 'Når din transaktion er finalized, vil baker registreringen starte fra den efterfølgende pay day.\n\nHusk at genstarte din node med de nye baker keys',
                 update: 'Når din transaktion er blevet finalized, vil baker opdateringen træde i kraft fra den efterfølgende pay day.',
                 updateKeys:
-                    'Når din transaktion er blevet finalized, vil de nye baker keys blive valide fra den efterfølgende pay day.\n\nDu burde derfor genstarte din node med de nye baker keys så tæt på den næste pay day som muligt.',
+                    'Når din transaktion er finalized, vil de nye baker keys blive gyldige fra den efterfølgende pay day.\n\nDu bør derfor genstarte din node med de nye baker keys så tæt på den næste pay day som muligt.',
             },
         },
         configureDelegation: {
