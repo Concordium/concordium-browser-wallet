@@ -66,6 +66,7 @@ export default function ConfirmTransfer(props: Props) {
     const nav = useNavigate();
     const addToast = useSetAtom(addToastAtom);
     const addPendingTransaction = useUpdateAtom(addPendingTransactionAtom);
+    const [showNotice, setShowNotice] = useState(false);
 
     useEffect(() => {
         if (selectedAddress !== address) {
@@ -96,6 +97,7 @@ export default function ConfirmTransfer(props: Props) {
 
         addPendingTransaction(createPendingTransactionFromAccountTransaction(transaction, transactionHash, cost));
         setHash(transactionHash);
+        setShowNotice(true);
     };
 
     if (!address) {
@@ -115,7 +117,12 @@ export default function ConfirmTransfer(props: Props) {
 
     return (
         <div className="w-full flex-column justify-space-between align-center">
-            <TransactionMessage transactionType={transactionType} payload={payload} />
+            <TransactionMessage
+                transactionType={transactionType}
+                payload={payload}
+                showNotice={showNotice}
+                setShowNotice={setShowNotice}
+            />
             {props.showAsTokenTransfer ? (
                 <TokenTransferReceipt
                     {...commonProps}

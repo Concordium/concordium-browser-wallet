@@ -336,6 +336,12 @@ const t = {
                 'You are about to submit a baker transaction that lowers your  baker stake. It will take effect after {{ cooldownPeriod }} days and the baker stake cannot be changed during this period of time.',
             removeBaker:
                 'Are you sure you want to make the following transaction to stop baking? It will take effect after {{ cooldownPeriod }} days and the baker stake cannot be changed during this period of time.',
+            notice: {
+                start: 'Once your transaction has successfully finalized, the baker registration will take effect from the next pay day.\n\nRemember to restart your node with the baker keys.',
+                update: 'Once your transaction has successfully finalized, the baker update will take effect from the next pay day.',
+                updateKeys:
+                    'Once your transaction has successfully finalized, the new baker keys will take effect from the next pay day.\n\nThis means the node should be restarted with the new keys, as close to the next pay day as possible.',
+            },
         },
         configureDelegation: {
             register:
@@ -343,6 +349,10 @@ const t = {
             lowerDelegationStake:
                 'You are about to submit a delegation transaction that lowers your delegation amount. It will take effect after {{ cooldownPeriod }} days and the delegation amount cannot be changed during this period of time.',
             remove: 'Are you sure you want to make the following transaction to stop delegation? It will take effect after {{ cooldownPeriod }} days and the delegation amount cannot be changed during this period of time.',
+            notice: {
+                start: 'Once your transaction has successfully finalized, the delegation will take effect from the next pay day.',
+                update: 'Once your transaction has successfully finalized, the delegation update will take effect from the next pay day.',
+            },
         },
     },
     accountPending: 'This account is still pending finalization.',

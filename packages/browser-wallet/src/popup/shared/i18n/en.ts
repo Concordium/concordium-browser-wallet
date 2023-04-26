@@ -163,6 +163,8 @@ const t = {
     },
     cancel: 'Cancel',
     continue: 'Continue',
+    okay: 'Okay',
+    notice: 'Notice',
 };
 
 export default t;

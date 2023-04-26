@@ -162,6 +162,8 @@ const t: typeof en = {
     },
     cancel: 'Tilbage',
     continue: 'Fortsæt',
+    okay: 'Okay',
+    notice: 'Bemærk',
 };
 
 export default t;
