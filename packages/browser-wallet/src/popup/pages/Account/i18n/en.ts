@@ -160,7 +160,7 @@ const t = {
             noChanges: 'Your transaction contains no changes compared to the current baker.',
         },
         remove: {
-            notice: 'Stopping a baker will take effect after a cool-down period of {{cooldownPeriod}} days. During the cool-down period the baker stake is locked and cannot be changed.',
+            notice: 'Stopping a baker will take effect at the first pay day after a cool-down period of {{cooldownPeriod}} days. During the cool-down period the baker stake is locked and cannot be changed.',
         },
         details: {
             heading: 'Your baker is registered.',
@@ -271,7 +271,7 @@ const t = {
             },
         },
         remove: {
-            notice: 'Stopping delegation will take effect after a cool-down period of {{cooldownPeriod}} days. During the cool-down period the delegation amount is locked and cannot be changed.',
+            notice: 'Stopping delegation will take effect at the first pay day after a cool-down period of {{cooldownPeriod}} days. During the cool-down period the delegation amount is locked and cannot be changed.',
         },
         details: {
             heading: 'Your delegation is registered.',
@@ -333,9 +333,9 @@ const t = {
             registerBaker:
                 'You are about to submit a register baker transaction that locks some of your funds in a stake. If you want to unlock the stake again, there will be a cool-down period of {{ cooldownPeriod }} days.',
             lowerBakerStake:
-                'You are about to submit a baker transaction that lowers your  baker stake. It will take effect after {{ cooldownPeriod }} days and the baker stake cannot be changed during this period of time.',
+                'You are about to submit a baker transaction that lowers your baker stake. It will take effect at the first pay day after a cool-down period {{ cooldownPeriod }} days and the baker stake cannot be changed during this period of time.',
             removeBaker:
-                'Are you sure you want to make the following transaction to stop baking? It will take effect after {{ cooldownPeriod }} days and the baker stake cannot be changed during this period of time.',
+                'Are you sure you want to make the following transaction to stop baking? It will take effect at the first pay day after a cool-down period {{ cooldownPeriod }} days and the baker stake cannot be changed during this period of time.',
             notice: {
                 start: 'Once your transaction has successfully finalized, the baker registration will take effect from the next pay day.\n\nRemember to restart your node with the baker keys.',
                 update: 'Once your transaction has successfully finalized, the baker update will take effect from the next pay day.',
@@ -347,8 +347,8 @@ const t = {
             register:
                 'You are about to submit a register delegation transaction that locks some of your funds in a stake. If you want to unlock the stake again, there will be a cool-down period of {{ cooldownPeriod }} days.',
             lowerDelegationStake:
-                'You are about to submit a delegation transaction that lowers your delegation amount. It will take effect after {{ cooldownPeriod }} days and the delegation amount cannot be changed during this period of time.',
-            remove: 'Are you sure you want to make the following transaction to stop delegation? It will take effect after {{ cooldownPeriod }} days and the delegation amount cannot be changed during this period of time.',
+                'You are about to submit a delegation transaction that lowers your delegation amount. It will take effect at the first pay day after a cool-down period {{ cooldownPeriod }} days and the delegation amount cannot be changed during this period of time.',
+            remove: 'Are you sure you want to make the following transaction to stop delegation? It will take effect at the first pay day after a cool-down period {{ cooldownPeriod }} days and the delegation amount cannot be changed during this period of time.',
             notice: {
                 start: 'Once your transaction has successfully finalized, the delegation will take effect from the next pay day.',
                 update: 'Once your transaction has successfully finalized, the delegation update will take effect from the next pay day.',
