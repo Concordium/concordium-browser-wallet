@@ -6,6 +6,10 @@
 
 -   Popups when updating baking/delegation that the update will take effect will after the next payday, and reminders to give baker keys to the node.
 
+### Changed
+
+-   Updated messages when confirming baker/delegation transactions.
+
 ### Fixed
 
 -   Some issues in the baking and delegation text.
