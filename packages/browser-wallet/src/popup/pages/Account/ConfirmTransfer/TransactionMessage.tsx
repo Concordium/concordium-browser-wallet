@@ -11,6 +11,8 @@ import {
 import { useSelectedAccountInfo } from '@popup/shared/AccountInfoListenerContext/AccountInfoListenerContext';
 import { useBlockChainParametersV1 } from '@popup/shared/BlockChainParametersProvider';
 import { secondsToDaysRoundedDown } from '@shared/utils/time-helpers';
+import Modal from '@popup/shared/Modal';
+import Button from '@popup/shared/Button';
 
 interface Props {
     payload: AccountTransactionPayload;
