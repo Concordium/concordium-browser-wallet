@@ -2,6 +2,10 @@
 
 ## 1.0.2
 
+### Added
+
+-   Popups, when updating baking/delegation, that inform the user that the update will take effect after the next payday, and reminders to give baker keys to the node.
+
 ### Changed
 
 -   Updated messages when confirming baker/delegation transactions.

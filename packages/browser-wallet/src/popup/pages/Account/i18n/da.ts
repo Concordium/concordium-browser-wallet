@@ -331,13 +331,23 @@ const t: typeof en = {
             lowerBakerStake:
                 'Du er ved at indsende en transaktion som formindsker din baker stake. At formindske din baker stake har en cool-down periode, hvilket betyder at ændringen ikke træder i kraft med det samme.\n\nBakeren kan ikke fjernes og din baker stake kan ikke ændres indtil cool-down perioden er overstået.',
             removeBaker: 'Er du sikker du vil lave denne transaktion som stopper baking?',
+            notice: {
+                start: 'Når din transaktion er finalized, vil baker registreringen starte fra den efterfølgende pay day.\n\nHusk at genstarte din node med de nye baker keys',
+                update: 'Når din transaktion er blevet finalized, vil baker opdateringen træde i kraft fra den efterfølgende pay day.',
+                updateKeys:
+                    'Når din transaktion er finalized, vil de nye baker keys blive gyldige fra den efterfølgende pay day.\n\nDu bør derfor genstarte din node med de nye baker keys så tæt på den næste pay day som muligt.',
+            },
         },
         configureDelegation: {
             register:
                 'Du er ved at indsende en transaktion som registrerer dig som en delegator, hvillket som låser nogle af dine CCD som delegation stake. Hvis du vil frigøre din stake, vil der være en cool-down periode på {{ cooldownPeriod }} dage.',
             lowerDelegationStake:
-                'Du er ved at indsende en transaktion som formindkser din delegation stake. Det vil træde i kraft efter {{ cooldownPeriod }} dage og din delegation saldo kan ikke ændres i denne periode.',
+                'Du er ved at indsende en transaktion som formindsker din delegation stake. Det vil træde i kraft efter {{ cooldownPeriod }} dage og din delegation saldo kan ikke ændres i denne periode.',
             remove: 'Er du sikker du vil fjerne din delegation?',
+            notice: {
+                start: 'Når din transaktion er blevet finalized, vil delegation starte fra den efterfølgende pay day.',
+                update: 'Når din transaktion er blevet finalized, vil delegation opdateringen træde i kraft fra den efterfølgende pay day.',
+            },
         },
     },
     accountPending: 'Denne konto er stadig ved at blive oprettet.',
