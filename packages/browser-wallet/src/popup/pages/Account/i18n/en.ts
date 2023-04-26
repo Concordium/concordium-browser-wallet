@@ -160,7 +160,7 @@ const t = {
             noChanges: 'Your transaction contains no changes compared to the current baker.',
         },
         remove: {
-            notice: 'Removing a baking will take effect after a cool-down period of {{cooldownPeriod}} days. During the cool-down period the baker stake is locked and cannot be changed.',
+            notice: 'Stopping a baker will take effect after a cool-down period of {{cooldownPeriod}} days. During the cool-down period the baker stake is locked and cannot be changed.',
         },
         details: {
             heading: 'Your baker is registered.',
@@ -271,7 +271,7 @@ const t = {
             },
         },
         remove: {
-            notice: 'Removing delegation will take effect after a cool-down period of {{cooldownPeriod}} days. During the cool-down period the delegation amount is locked and cannot be changed.',
+            notice: 'Stopping delegation will take effect after a cool-down period of {{cooldownPeriod}} days. During the cool-down period the delegation amount is locked and cannot be changed.',
         },
         details: {
             heading: 'Your delegation is registered.',
