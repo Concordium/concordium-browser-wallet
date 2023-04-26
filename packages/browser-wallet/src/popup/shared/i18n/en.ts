@@ -161,6 +161,7 @@ const t = {
             incorrectUrlField: 'Url field was present but did not contain an url',
         },
     },
+    cancel: 'Cancel',
     continue: 'Continue',
 };
 

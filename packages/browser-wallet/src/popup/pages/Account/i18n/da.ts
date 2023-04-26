@@ -186,6 +186,9 @@ const t: typeof en = {
             noChanges:
                 'Transaktionen indeholder ikke nogen ændringer i forhold til de nuværende delegationindstillinger.',
         },
+        remove: {
+            notice: 'At stoppe en baker træder i kraft efter en cool-down periode på {{cooldownPeriod}} dage. I løbet af denne periode er baker stake låst og kan ikke ændres.',
+        },
         configure: {
             pool: {
                 description1:
@@ -270,6 +273,9 @@ const t: typeof en = {
                 keys: 'Opdater baker keys',
             },
             noChanges: 'Transaktionen indeholder ikke nogen ændringer i forhold til de nuværende puljeindstillinger.',
+        },
+        remove: {
+            notice: 'At stoppe delegation træder i kraft efter en cool-down periode på {{cooldownPeriod}} dage. I løbet af denne periode er baker stake låst og kan ikke ændres.',
         },
         details: {
             heading: 'Din baker er registreret.',

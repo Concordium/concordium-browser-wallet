@@ -7,12 +7,10 @@ import {
     isDelegatorAccount,
     ConfigureBakerPayload,
     ConfigureDelegationPayload,
-    isChainParametersV1,
 } from '@concordium/web-sdk';
 import { useSelectedAccountInfo } from '@popup/shared/AccountInfoListenerContext/AccountInfoListenerContext';
-import { useBlockChainParameters } from '@popup/shared/BlockChainParametersProvider';
+import { useBlockChainParametersV1 } from '@popup/shared/BlockChainParametersProvider';
 import { secondsToDaysRoundedDown } from '@shared/utils/time-helpers';
-import { filterType } from '../Earn/utils';
 
 interface Props {
     payload: AccountTransactionPayload;
@@ -22,8 +20,7 @@ interface Props {
 export function TransactionMessage({ transactionType, payload }: Props) {
     const { t } = useTranslation('account', { keyPrefix: 'transactionMessage' });
     const accountInfo = useSelectedAccountInfo();
-    const chainParameters = useBlockChainParameters();
-    const parametersV1 = chainParameters ? filterType(isChainParametersV1)(chainParameters) : undefined;
+    const parametersV1 = useBlockChainParametersV1();
 
     const message = useMemo(() => {
         if (!accountInfo) {

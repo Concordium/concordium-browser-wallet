@@ -2,6 +2,10 @@
 
 ## 1.0.2
 
+### Added
+
+-   Popups, when stopping baking or delegation, that inform the user about the cooldown period.
+
 ### Changed
 
 -   Updated messages when confirming baker/delegation transactions.

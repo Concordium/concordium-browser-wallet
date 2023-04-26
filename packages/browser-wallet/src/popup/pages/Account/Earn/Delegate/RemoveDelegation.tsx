@@ -1,18 +1,24 @@
-import React from 'react';
+import React, { useState } from 'react';
 import { useLocation, useNavigate } from 'react-router-dom';
-
 import Carousel from '@popup/shared/Carousel';
 import { useTranslation } from 'react-i18next';
 import { absoluteRoutes } from '@popup/constants/routes';
 import { AccountTransactionType, CcdAmount } from '@concordium/web-sdk';
-import { accountRoutes } from '../../routes';
-import { ConfirmGenericTransferState } from '../../ConfirmGenericTransfer';
+import Modal from '@popup/shared/Modal';
+import Button from '@popup/shared/Button';
+import { useBlockChainParametersV1 } from '@popup/shared/BlockChainParametersProvider';
+import { secondsToDaysRoundedDown } from '@shared/utils/time-helpers';
 import IntroPage from '../IntroPage';
+import { ConfirmGenericTransferState } from '../../ConfirmGenericTransfer';
+import { accountRoutes } from '../../routes';
 
 export default function RemoveDelegation() {
     const nav = useNavigate();
-    const { t } = useTranslation('account', { keyPrefix: 'delegate.removeIntro' });
+    const { t } = useTranslation('account');
+    const { t: tShared } = useTranslation('shared');
     const { pathname } = useLocation();
+    const [showModal, setShowModal] = useState<boolean>(false);
+    const chainParameters = useBlockChainParametersV1();
 
     const goToConfirm = () => {
         const confirmTransferState: ConfirmGenericTransferState = {
@@ -28,9 +34,27 @@ export default function RemoveDelegation() {
     };
 
     return (
-        <Carousel withBackButton className="earn-carousel" onContinue={goToConfirm}>
-            <IntroPage title={t('1.title')}>{t('1.body')}</IntroPage>
-            <IntroPage title={t('2.title')}>{t('2.body')}</IntroPage>
-        </Carousel>
+        <>
+            <Modal open={showModal} disableClose>
+                <div>
+                    <h3 className="m-t-0">{t('important')}</h3>
+                    <p className="white-space-break ">
+                        {t('delegate.remove.notice', {
+                            cooldownPeriod: secondsToDaysRoundedDown(chainParameters?.delegatorCooldown),
+                        })}
+                    </p>
+                    <Button className="m-t-10" width="wide" onClick={goToConfirm}>
+                        {tShared('continue')}
+                    </Button>
+                    <Button className="m-t-10" width="wide" onClick={() => setShowModal(false)}>
+                        {tShared('cancel')}
+                    </Button>
+                </div>
+            </Modal>
+            <Carousel withBackButton className="earn-carousel" onContinue={() => setShowModal(true)}>
+                <IntroPage title={t('delegate.removeIntro.1.title')}>{t('delegate.removeIntro.1.body')}</IntroPage>
+                <IntroPage title={t('delegate.removeIntro.2.title')}>{t('delegate.removeIntro.2.body')}</IntroPage>
+            </Carousel>
+        </>
     );
 }
