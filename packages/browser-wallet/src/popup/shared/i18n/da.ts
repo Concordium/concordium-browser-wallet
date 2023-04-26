@@ -161,6 +161,8 @@ const t: typeof en = {
         },
     },
     continue: 'Fortsæt',
+    okay: 'Okay',
+    notice: 'Bemærk',
 };
 
 export default t;

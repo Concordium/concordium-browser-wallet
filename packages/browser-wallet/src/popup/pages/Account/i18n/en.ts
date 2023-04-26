@@ -329,6 +329,12 @@ const t = {
             lowerBakerStake:
                 'You are about to submit a transaction that lowers your baker stake. Lowering your stake has a cool-down period, meaning it will not take effect immediately.\n\nThe baker cannot be removed and the stake cannot be changed until the cool-down is over.',
             removeBaker: 'Are you sure you want to make the following transaction to stop baking?',
+            notice: {
+                start: 'Once your transaction has successfully finalized, the baker registration will take effect from the next pay day.\n\nRemember to restart your node with the baker keys.',
+                update: 'Once your transaction has successfully finalized, the baker update will take effect from the next pay day.',
+                updateKeys:
+                    'Once your transaction has successfully finalized, the new baker keys will take effect from the next pay day.\n\nThis means the node should be restarted with the new keys, as close to the next pay day as possible.',
+            },
         },
         configureDelegation: {
             register:
@@ -336,6 +342,10 @@ const t = {
             lowerDelegationStake:
                 'You are about to submit a delegation transaction that lowers your delegation amount. It will take effect after {{ cooldownPeriod }} days and the delegation amount cannot be changed during this period of time.',
             remove: 'Are you sure you want to remove your delegation?',
+            notice: {
+                start: 'Once your transaction has successfully finalized, the delegation will take effect from the next pay day.',
+                update: 'Once your transaction has successfully finalized, the delegation update will take effect from the next pay day.',
+            },
         },
     },
     accountPending: 'This account is still pending finalization.',
