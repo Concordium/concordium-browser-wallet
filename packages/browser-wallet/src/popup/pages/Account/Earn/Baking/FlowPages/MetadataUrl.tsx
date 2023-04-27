@@ -4,9 +4,8 @@ import Form from '@popup/shared/Form';
 import { MultiStepFormPageProps } from '@popup/shared/MultiStepForm';
 import Submit from '@popup/shared/Form/Submit';
 import Input from '@popup/shared/Form/Input';
+import { METADATAURL_MAX_LENGTH } from '@shared/constants/baking';
 import { ConfigureBakerFlowState } from '../utils';
-
-const METADATAURL_MAX_LENGTH = 2048;
 
 type MetadataUrlForm = {
     url: string;

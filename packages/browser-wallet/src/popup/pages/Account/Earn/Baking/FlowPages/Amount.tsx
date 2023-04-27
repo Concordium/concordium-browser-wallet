@@ -1,7 +1,7 @@
 import React, { useContext, useEffect, useMemo, useState } from 'react';
 import { isBakerAccount } from '@concordium/web-sdk';
 import { useTranslation } from 'react-i18next';
-import { getCcdSymbol, ccdToMicroCcd } from 'wallet-common-helpers';
+import { getCcdSymbol, ccdToMicroCcd, displayAsCcd } from 'wallet-common-helpers';
 import { Validate } from 'react-hook-form';
 
 import Form, { useForm } from '@popup/shared/Form';
@@ -12,7 +12,11 @@ import { validateBakerStake } from '@popup/shared/utils/transaction-helpers';
 import { WithAccountInfo } from '@popup/shared/utils/account-helpers';
 import { accountPageContext } from '@popup/pages/Account/utils';
 import DisabledAmountInput from '@popup/shared/DisabledAmountInput';
-import { convertEnergyToMicroCcd } from '@shared/utils/energy-helpers';
+import {
+    convertEnergyToMicroCcd,
+    getConfigureBakerMaxEnergyCost,
+    getFullConfigureBakerMinEnergyCost,
+} from '@shared/utils/energy-helpers';
 import { earnPageContext, isAboveStakeWarningThreshold, STAKE_WARNING_THRESHOLD } from '../../utils';
 import { ConfigureBakerFlowState, getCost } from '../utils';
 import { AmountWarning, WarningModal } from '../../Warning';
@@ -35,12 +39,20 @@ export default function AmountPage({ initial, onNext, formValues, accountInfo }:
         defaultValues: initial === undefined ? { amount: '' } : { amount: initial },
     });
     const amount = form.watch('amount');
+    const isBaker = isBakerAccount(accountInfo);
 
-    const cost = useMemo(
-        () =>
-            chainParameters ? convertEnergyToMicroCcd(getCost(accountInfo, formValues, amount), chainParameters) : 0n,
-        [chainParameters, amount]
-    );
+    const cost = useMemo(() => {
+        const energyCost = isBaker ? getCost(accountInfo, formValues, amount) : getConfigureBakerMaxEnergyCost();
+        return chainParameters ? convertEnergyToMicroCcd(energyCost, chainParameters) : 0n;
+    }, [chainParameters, amount]);
+
+    const minCost = useMemo(() => {
+        if (isBaker) {
+            // min Cost only needed when we are registering a baker
+            return 0n;
+        }
+        return chainParameters ? convertEnergyToMicroCcd(getFullConfigureBakerMinEnergyCost(), chainParameters) : 0n;
+    }, [chainParameters, isBaker]);
 
     const validateAmount: Validate<string> = (amountToValidate) =>
         validateBakerStake(amountToValidate, chainParameters, accountInfo, cost);
@@ -50,7 +62,7 @@ export default function AmountPage({ initial, onNext, formValues, accountInfo }:
         return () => setDetailsExpanded(false);
     }, []);
 
-    const pendingChange = isBakerAccount(accountInfo) && accountInfo.accountBaker.pendingChange?.change !== undefined;
+    const pendingChange = isBaker && accountInfo.accountBaker.pendingChange?.change !== undefined;
 
     const onSubmit = (vs: AmountPageForm) => {
         const stake = ccdToMicroCcd(vs.amount);
@@ -60,7 +72,7 @@ export default function AmountPage({ initial, onNext, formValues, accountInfo }:
             isAboveStakeWarningThreshold(stake, accountInfo)
         ) {
             setOpenWarning(AmountWarning.AboveThreshold);
-        } else if (isBakerAccount(accountInfo) && accountInfo.accountBaker.stakedAmount > stake) {
+        } else if (isBaker && accountInfo.accountBaker.stakedAmount > stake) {
             setOpenWarning(AmountWarning.Decrease);
         } else {
             onNext(vs.amount);
@@ -100,6 +112,12 @@ export default function AmountPage({ initial, onNext, formValues, accountInfo }:
                                 }}
                             />
                         )}
+                        <div className="earn__cost">
+                            <p className="m-t-0">
+                                {tShared('estimatedTransactionFee')}: {isBaker && displayAsCcd(cost)}
+                                {!isBaker && `\n${displayAsCcd(minCost)} - ${displayAsCcd(cost)}`}
+                            </p>
+                        </div>
                     </div>
                     <Submit className="m-t-20" width="wide">
                         {tShared('continue')}

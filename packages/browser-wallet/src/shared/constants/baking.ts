@@ -1,0 +1,1 @@
+export const METADATAURL_MAX_LENGTH = 2048;
