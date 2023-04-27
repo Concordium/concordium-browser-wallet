@@ -12,6 +12,7 @@ import { decimalToRewardFraction } from '@popup/shared/utils/baking-helpers';
 import { getConfigureBakerEnergyCost } from '@shared/utils/energy-helpers';
 import { not } from '@shared/utils/function-helpers';
 import { ccdToMicroCcd, isDefined, isValidCcdString, microCcdToCcd, NotOptional } from 'wallet-common-helpers';
+import { getFormOrExistingValue } from '../utils';
 
 export type ConfigureBakerFlowState = {
     restake: boolean;
@@ -124,7 +125,7 @@ export const toPayload = ({
     finalizationRewardCommission: decimalToRewardFraction(commissionRates?.finalizationCommission),
 });
 
-export function getConfigureBakerChanges(updates: ConfigureBakerFlowState, accountInfo?: AccountInfo) {
+function getConfigureBakerChanges(updates: ConfigureBakerFlowState, accountInfo?: AccountInfo) {
     const existing = accountInfo !== undefined ? getExistingBakerValues(accountInfo) : undefined;
     const changes = existing !== undefined ? getBakerFlowChanges(existing, updates) : updates;
     return changes;
@@ -146,20 +147,6 @@ export const configureBakerChangesPayload = (accountInfo?: AccountInfo) => (valu
 
     return toPayload(changes);
 };
-
-function getFormOrExistingValue<T>(formValue?: T, existingBakerValue?: T) {
-    if (formValue !== undefined) {
-        return formValue;
-    }
-    if (existingBakerValue !== undefined) {
-        return existingBakerValue;
-    }
-
-    // Either a value should have been set by the user in the form, or the account
-    // should already be a baker with existing values. Otherwise this indicates an
-    // error in the UI flow.
-    throw new Error('Neither the form nor an existing baker value was available');
-}
 
 export function getCost(accountInfo: AccountInfo, formValues: Partial<ConfigureBakerFlowState>, amount: string) {
     const existingBakerValues = getExistingBakerValues(accountInfo);
