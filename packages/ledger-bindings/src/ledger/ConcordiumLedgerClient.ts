@@ -26,6 +26,7 @@ import { signRegisterData } from './RegisterData';
 import { signConfigureBaker } from './ConfigureBaker';
 import { signConfigureDelegation } from './ConfigureDelegation';
 import { signUpdateContract } from './UpdateContract';
+import { signInitContract } from './InitContract';
 
 /**
  * Concordium Ledger API.
@@ -100,6 +101,8 @@ export default class ConcordiumLedgerClient {
                 return signUpdateCredentialTransaction(this.transport, path, transaction);
             case AccountTransactionType.Update:
                 return signUpdateContract(this.transport, path, transaction);
+            case AccountTransactionType.InitContract:
+                return signInitContract(this.transport, path, transaction);
             default:
                 throw new Error(`The received transaction was not a supported transaction type`);
         }

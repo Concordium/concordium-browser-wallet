@@ -20,3 +20,4 @@ export const INS_UPDATE_CREDENTIALS = 0x31;
 export const INS_SIMPLE_TRANSFER_WITH_MEMO = 0x32;
 export const INS_REGISTER_DATA = 0x35;
 export const INS_UPDATE_CONTRACT = 0x36;
+export const INS_INIT_CONTRACT = 0x37;
