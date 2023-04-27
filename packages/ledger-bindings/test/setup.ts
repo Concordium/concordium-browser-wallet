@@ -1,6 +1,14 @@
 import { resolve } from 'path';
 import Zemu, { DEFAULT_START_OPTIONS, IStartOptions } from '@zondax/zemu';
 import Transport from '@ledgerhq/hw-transport';
+import {
+    AccountTransaction,
+    Network,
+    ConcordiumHdWallet,
+    signTransaction,
+    buildBasicAccountSigner,
+} from '@concordium/common-sdk';
+import { AccountPathInput } from '../src/ledger/Path';
 
 const SEED_PHRASE =
     'vendor sphere crew wise puppy wise stand wait tissue boy fortune myself hamster intact window garment negative dynamic permit genre limb work dial guess';
@@ -19,7 +27,7 @@ const options: IStartOptions = {
     rejectKeyword: 'reject',
 };
 
-export const NANOS_ELF_PATH = resolve('../concordium-ledger-app/tests/bin/nanos/concordium_nanos.elf');
+export const NANOS_ELF_PATH = resolve('../../../concordium-ledger-app/tests/bin/nanos/concordium_nanos.elf');
 
 export function setupZemu(func: (sim: Zemu, transport: Transport) => Promise<void>) {
     return async () => {
@@ -33,4 +41,21 @@ export function setupZemu(func: (sim: Zemu, transport: Transport) => Promise<voi
             await sim.close();
         }
     };
+}
+
+export async function signTransactionWithSeedPhrase(
+    transaction: AccountTransaction,
+    path: AccountPathInput,
+    network: Network
+) {
+    return (
+        await signTransaction(
+            transaction,
+            buildBasicAccountSigner(
+                ConcordiumHdWallet.fromSeedPhrase(SEED_PHRASE, network)
+                    .getAccountSigningKey(path.identityProviderIndex, path.identityIndex, path.accountIndex)
+                    .toString('hex')
+            )
+        )
+    )[0][0];
 }
