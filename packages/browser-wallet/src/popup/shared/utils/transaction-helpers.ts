@@ -44,7 +44,7 @@ export async function sendTransaction(
         { identityProviderIndex: cred.providerIndex, identityIndex: cred.identityIndex, accountIndex: cred.credNumber },
         net
     );
-    const rawSignature = (await ledger.signTransfer(transaction, path)).toString('hex');
+    const rawSignature = (await ledger.signAccountTransaction(transaction, path)).toString('hex');
     const transactionSignature = { 0: { 0: rawSignature } };
     const result = await client.sendAccountTransaction(transaction, transactionSignature);
 
