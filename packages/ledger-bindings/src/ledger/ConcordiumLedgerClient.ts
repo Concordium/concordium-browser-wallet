@@ -66,8 +66,13 @@ export default class ConcordiumLedgerClient {
         return getPrfKeyRecovery(this.transport, identity);
     }
 
-    verifyAddress(identity: number, credentialNumber: number): Promise<void> {
-        return verifyAddress(this.transport, identity, credentialNumber);
+    verifyAddress(
+        network: Network,
+        identityProvider: number,
+        identity: number,
+        credentialNumber: number
+    ): Promise<void> {
+        return verifyAddress(this.transport, network, identityProvider, identity, credentialNumber);
     }
 
     signTransfer(transaction: AccountTransaction, path: number[]): Promise<Buffer> {
