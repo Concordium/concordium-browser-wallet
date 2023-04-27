@@ -49,7 +49,7 @@ export function getConfigureBakerMaxEnergyCost(): bigint {
 }
 
 /**
- * Returns the minimum size for a configure baker transaction, where all fields are present.
+ * Returns the minimum energy cost for a configure baker transaction, where all fields are present.
  */
 export function getFullConfigureBakerMinEnergyCost(): bigint {
     const minPayloadSize = getFullConfigureBakerSize(0);
