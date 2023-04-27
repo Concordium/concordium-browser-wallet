@@ -3,8 +3,7 @@ import { Transport } from './Transport';
 import pathAsBuffer from './Path';
 import { serializeVerifyKey } from '../utils/serializationHelpers';
 import { PublicInformationForIp } from '../utils/types';
-
-const INS_PUBLIC_INFO_FOR_IP = 0x20;
+import { INS_PUBLIC_INFO_FOR_IP } from './constants';
 
 export default async function signPublicInformationForIp(
     transport: Transport,

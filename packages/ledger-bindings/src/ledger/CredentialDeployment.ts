@@ -9,6 +9,7 @@ import {
 import { Transport } from './Transport';
 import { encodeWord64, putBase58Check, serializeVerifyKey, serializeYearMonth } from '../utils/serializationHelpers';
 import pathAsBuffer from './Path';
+import { INS_SIGN_CREDENTIAL_DEPLOYMENT } from './constants';
 
 export async function signCredentialValues(
     transport: Transport,
@@ -143,8 +144,6 @@ function serializeIdOwnerShipProofs(proofs: IdOwnershipProofs) {
         Buffer.from(proofs.credCounterLessThanMaxAccounts, 'hex'),
     ]);
 }
-
-const INS_SIGN_CREDENTIAL_DEPLOYMENT = 0x04;
 
 async function signCredentialDeployment(
     transport: Transport,

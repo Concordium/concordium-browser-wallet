@@ -1,10 +1,15 @@
 /* eslint-disable @typescript-eslint/no-explicit-any */
 import type HwTransport from '@ledgerhq/hw-transport';
 import { Buffer } from 'buffer/';
-import { AccountTransaction, Network, UnsignedCredentialDeploymentInformation } from '@concordium/common-sdk';
+import {
+    AccountTransaction,
+    AccountTransactionType,
+    Network,
+    UnsignedCredentialDeploymentInformation,
+} from '@concordium/common-sdk';
 import { Transport, TransportImpl } from './Transport';
 import { getPublicKey, getPublicKeySilent, getSignedPublicKey } from './GetPublicKey';
-import signTransfer from './Transfer';
+import { signSimpleTransfer, signSimpleTransferWithMemo } from './Transfer';
 import signPublicInformationForIp from './PublicInformationForIp';
 import { getPrfKeyDecrypt, getPrivateKeys, getPrfKeyRecovery } from './ExportPrivateKeySeed';
 import {
@@ -17,6 +22,9 @@ import getAppAndVersion, { AppAndVersion } from './GetAppAndVersion';
 import signUpdateCredentialTransaction from './SignUpdateCredentials';
 import EmulatorTransport from './EmulatorTransport';
 import verifyAddress from './verifyAddress';
+import { signRegisterData } from './RegisterData';
+import { signConfigureBaker } from './ConfigureBaker';
+import { signConfigureDelegation } from './ConfigureDelegation';
 
 /**
  * Concordium Ledger API.
@@ -75,8 +83,23 @@ export default class ConcordiumLedgerClient {
         return verifyAddress(this.transport, network, identityProvider, identity, credentialNumber);
     }
 
-    signTransfer(transaction: AccountTransaction, path: number[]): Promise<Buffer> {
-        return signTransfer(this.transport, path, transaction);
+    signAccountTransaction(transaction: AccountTransaction, path: number[]): Promise<Buffer> {
+        switch (transaction.type) {
+            case AccountTransactionType.Transfer:
+                return signSimpleTransfer(this.transport, path, transaction);
+            case AccountTransactionType.TransferWithMemo:
+                return signSimpleTransferWithMemo(this.transport, path, transaction);
+            case AccountTransactionType.RegisterData:
+                return signRegisterData(this.transport, path, transaction);
+            case AccountTransactionType.ConfigureBaker:
+                return signConfigureBaker(this.transport, path, transaction);
+            case AccountTransactionType.ConfigureDelegation:
+                return signConfigureDelegation(this.transport, path, transaction);
+            case AccountTransactionType.UpdateCredentials:
+                return signUpdateCredentialTransaction(this.transport, path, transaction);
+            default:
+                throw new Error(`The received transaction was not a supported transaction type`);
+        }
     }
 
     signUpdateCredentialTransaction(transaction: AccountTransaction, path: number[]): Promise<Buffer> {

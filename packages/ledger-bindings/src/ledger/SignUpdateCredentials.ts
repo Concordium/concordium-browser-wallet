@@ -9,8 +9,7 @@ import { Transport } from './Transport';
 import pathAsBuffer from './Path';
 import { serializeTransactionHeader } from '../utils/transactionSerialization';
 import { signCredentialValues, signCredentialProofs } from './CredentialDeployment';
-
-const INS_UPDATE_CREDENTIALS = 0x31;
+import { INS_UPDATE_CREDENTIALS } from './constants';
 
 export default async function signUpdateCredentials(
     transport: Transport,

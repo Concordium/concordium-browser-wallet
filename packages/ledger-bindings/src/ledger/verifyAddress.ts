@@ -1,8 +1,7 @@
 import { Network } from '@concordium/common-sdk';
 import { Buffer } from 'buffer/';
+import { INS_VERIFY_ADDRESS } from './constants';
 import { Transport } from './Transport';
-
-const INS_VERIFY_ADDRESS = 0x00;
 
 export default async function verifyAddress(
     transport: Transport,

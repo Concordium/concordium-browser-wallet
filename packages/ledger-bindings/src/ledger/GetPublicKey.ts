@@ -2,8 +2,7 @@ import { Buffer } from 'buffer/';
 import { Transport } from './Transport';
 import { SignedPublicKey } from '../utils/types';
 import pathAsBuffer from './Path';
-
-const INS_PUBLIC_KEY = 0x01;
+import { INS_PUBLIC_KEY } from './constants';
 
 export async function getPublicKey(transport: Transport, path: number[]): Promise<Buffer> {
     const data = pathAsBuffer(path);

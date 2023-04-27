@@ -1,8 +1,8 @@
 import { Buffer } from 'buffer/';
 import { Transport } from './Transport';
 import { PrivateKeys } from '../utils/types';
+import { INS_EXPORT_PRIVATE_KEY_SEED } from './constants';
 
-const INS_EXPORT_PRIVATE_KEY_SEED = 0x05;
 const P1_PRF_KEY = 0;
 const P1_PRF_KEY_RECOVERY = 1;
 const P1_BOTH_KEYS = 2;
