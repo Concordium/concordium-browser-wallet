@@ -163,6 +163,7 @@ const t: typeof en = {
     continue: 'Fortsæt',
     okay: 'Okay',
     notice: 'Bemærk',
+    estimatedTransactionFee: 'Estimerede transaktionsomkostninger',
 };
 
 export default t;
