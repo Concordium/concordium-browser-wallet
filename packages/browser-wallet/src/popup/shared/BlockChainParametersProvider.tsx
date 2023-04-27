@@ -1,4 +1,5 @@
-import { ChainParameters } from '@concordium/web-sdk';
+import { ChainParameters, isChainParametersV1 } from '@concordium/web-sdk';
+import { filterType } from '@popup/pages/Account/Earn/utils';
 import { grpcClientAtom, networkConfigurationAtom } from '@popup/store/settings';
 import { useAtomValue } from 'jotai';
 import React, { createContext, ReactNode, useCallback, useContext, useEffect, useRef } from 'react';
@@ -45,4 +46,14 @@ export default function BlockChainParametersContext({ children }: Props) {
 export function useBlockChainParameters() {
     const getBlockChainParameters = useContext(blockChainParametersContext);
     return useAsyncMemo(getBlockChainParameters, undefined, []);
+}
+
+/**
+ * Hook for getting the blockchain parameters that ensures the parameters are version 1.
+ * If the parameters are not version 1, undefined is returned instead.
+ */
+export function useBlockChainParametersV1() {
+    const getBlockChainParameters = useContext(blockChainParametersContext);
+    const chainParameters = useAsyncMemo(getBlockChainParameters, undefined, []);
+    return chainParameters ? filterType(isChainParametersV1)(chainParameters) : undefined;
 }
