@@ -141,4 +141,10 @@
             margin-bottom: rem(1px);
         }
     }
+
+    &__cost {
+        color: $color-text-faded;
+        font-size: rem(8px);
+        margin: auto rem(25px) auto rem(31px);
+    }
 }

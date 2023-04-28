@@ -60,7 +60,7 @@ const t = {
             invalid: 'Invalid amount',
             insufficient: 'Insufficient funds',
             zero: 'Amount may not be zero',
-            belowBakerThreshold: 'Stake is below the threshold {{ threshold }} for baking',
+            belowBakerThreshold: 'Minimum stake: {{ threshold }}',
             exceedingDelegationCap: "Amount may not exceed the target pool's cap of {{ max }}.",
         },
         transaction: {
@@ -165,6 +165,7 @@ const t = {
     continue: 'Continue',
     okay: 'Okay',
     notice: 'Notice',
+    estimatedTransactionFee: 'Estimated transaction fee',
 };
 
 export default t;
