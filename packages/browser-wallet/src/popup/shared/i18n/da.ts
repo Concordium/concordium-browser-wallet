@@ -160,6 +160,7 @@ const t: typeof en = {
             incorrectUrlField: 'Url field was present but did not contain an url',
         },
     },
+    cancel: 'Tilbage',
     continue: 'Fortsæt',
     okay: 'Okay',
     notice: 'Bemærk',

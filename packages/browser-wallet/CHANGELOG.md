@@ -4,7 +4,9 @@
 
 ### Added
 
+-   Popups, when stopping baking or delegation, that inform the user about the cooldown period.
 -   Popups, when updating baking/delegation, that inform the user that the update will take effect after the next payday, and reminders to give baker keys to the node.
+-   Display expected cost while choosing amount in configureBaker flows.
 
 ### Changed
 
