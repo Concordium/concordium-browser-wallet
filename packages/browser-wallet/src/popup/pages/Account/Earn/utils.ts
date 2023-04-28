@@ -27,3 +27,17 @@ export function filterType<A, B extends A>(predicate: (x: A) => x is B): (x: A) 
 }
 
 export const earnPageContext = createContext<EarnPageContext>({});
+
+export function getFormOrExistingValue<T>(formValue?: T, existingValue?: T) {
+    if (formValue !== undefined) {
+        return formValue;
+    }
+    if (existingValue !== undefined) {
+        return existingValue;
+    }
+
+    // Either a value should have been set by the user in the form, or the account
+    // should already be a baker/delegator with existing values. Otherwise this indicates an
+    // error in the UI flow.
+    throw new Error('Neither the form nor an existing value was available');
+}

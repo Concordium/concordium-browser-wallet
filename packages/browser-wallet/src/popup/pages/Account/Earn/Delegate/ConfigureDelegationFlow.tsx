@@ -21,12 +21,12 @@ import FormInput from '@popup/shared/Form/Input';
 import ExternalLink from '@popup/shared/ExternalLink';
 import FormAmountInput from '@popup/shared/Form/AmountInput';
 import { validateDelegationAmount } from '@popup/shared/utils/transaction-helpers';
-import { convertEnergyToMicroCcd, getConfigureDelegationMaxEnergyCost } from '@shared/utils/energy-helpers';
+import { convertEnergyToMicroCcd } from '@shared/utils/energy-helpers';
 import { useAtomValue } from 'jotai';
 import { grpcClientAtom } from '@popup/store/settings';
 import DisabledAmountInput from '@popup/shared/DisabledAmountInput/DisabledAmountInput';
 import { useBlockChainParameters } from '@popup/shared/BlockChainParametersProvider';
-import { configureDelegationChangesPayload, ConfigureDelegationFlowState } from './utils';
+import { configureDelegationChangesPayload, ConfigureDelegationFlowState, getCost } from './utils';
 import AccountTransactionFlow from '../../AccountTransactionFlow';
 import { accountPageContext } from '../../utils';
 import { isAboveStakeWarningThreshold, STAKE_WARNING_THRESHOLD } from '../utils';
@@ -185,17 +185,16 @@ function AmountPage({ initial, onNext, formValues, accountInfo }: AmountPageProp
     const { setDetailsExpanded } = useContext(accountPageContext);
     const [openWarning, setOpenWarning] = useState<AmountWarning>(AmountWarning.None);
     const chainParameters = useBlockChainParameters();
-
-    const defaultValues: Partial<AmountPageForm> = useMemo(
-        () => (initial === undefined ? {} : { amount: initial }),
-        [initial]
-    );
+    const form = useForm<AmountPageForm>({
+        defaultValues: initial === undefined ? { amount: '' } : { amount: initial },
+    });
     const client = useAtomValue(grpcClientAtom);
+    const formAmount = form.watch('amount');
 
-    const cost = useMemo(
-        () => (chainParameters ? convertEnergyToMicroCcd(getConfigureDelegationMaxEnergyCost(), chainParameters) : 0n),
-        [chainParameters]
-    );
+    const cost = useMemo(() => {
+        const energyCost = getCost(accountInfo, formValues, formAmount);
+        return chainParameters ? convertEnergyToMicroCcd(energyCost, chainParameters) : 0n;
+    }, [chainParameters, formAmount]);
 
     const poolStatus = useAsyncMemo(
         async () => (formValues.pool ? client.getPoolInfo(BigInt(formValues.pool)) : undefined),
@@ -230,7 +229,7 @@ function AmountPage({ initial, onNext, formValues, accountInfo }: AmountPageProp
         isDelegatorAccount(accountInfo) && accountInfo.accountDelegation.pendingChange?.change !== undefined;
 
     return (
-        <Form<AmountPageForm> className="configure-flow-form" defaultValues={defaultValues} onSubmit={onSubmit}>
+        <Form<AmountPageForm> className="configure-flow-form" formMethods={form} onSubmit={onSubmit}>
             {(f) => (
                 <>
                     <WarningModal
@@ -266,9 +265,14 @@ function AmountPage({ initial, onNext, formValues, accountInfo }: AmountPageProp
                                 }}
                             />
                         )}
+                        <div className="earn__cost">
+                            <p className="m-v-0">
+                                {tShared('estimatedTransactionFee')}: {displayAsCcd(cost)}
+                            </p>
+                        </div>
                     </div>
                     {poolStatus && <DisplayPoolStatus status={poolStatus} />}
-                    <Submit className="m-t-20" width="wide">
+                    <Submit className="m-t-10" width="wide">
                         {tShared('continue')}
                     </Submit>
                 </>
