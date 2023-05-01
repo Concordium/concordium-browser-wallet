@@ -23,6 +23,7 @@ import {
     displayAsCcd,
     fractionalToInteger,
     isValidCcdString,
+    getPublicAccountAmounts,
 } from 'wallet-common-helpers';
 
 import i18n from '@popup/shell/i18n';
@@ -88,13 +89,19 @@ export function validateBakerStake(
     }
     const bakerStakeThreshold = chainParameters?.minimumEquityCapital || 0n;
     const amount = ccdToMicroCcd(amountToValidate);
+
     if (bakerStakeThreshold > amount) {
         return i18n.t('utils.ccdAmount.belowBakerThreshold', { threshold: displayAsCcd(bakerStakeThreshold) });
     }
+
     if (accountInfo && BigInt(accountInfo.accountAmount) < amount + (estimatedFee || 0n)) {
         return i18n.t('utils.ccdAmount.insufficient');
     }
 
+    // the fee must be paid with the current funds at disposal, because a reduction in baker stake is not immediate.
+    if (getPublicAccountAmounts(accountInfo).atDisposal < (estimatedFee || 0n)) {
+        return i18n.t('utils.ccdAmount.insufficientFundsAtDisposal');
+    }
     return undefined;
 }
 
@@ -131,6 +138,11 @@ export function validateDelegationAmount(
 
     if (BigInt(accountInfo.accountAmount) < amount + estimatedFee) {
         return i18n.t('utils.ccdAmount.insufficient');
+    }
+
+    // the fee must be paid with the current funds at disposal, because a reduction in delegation amount is not immediate.
+    if (getPublicAccountAmounts(accountInfo).atDisposal < estimatedFee) {
+        return i18n.t('utils.ccdAmount.insufficientFundsAtDisposal');
     }
 
     return undefined;

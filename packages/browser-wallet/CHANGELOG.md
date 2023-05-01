@@ -1,5 +1,11 @@
 # Changelog
 
+## 1.0.4
+
+### Fixed
+
+-   Validate during Baker/delegation stake reduction that at disposal funds can cover the fee.
+
 ## 1.0.3
 
 ### Fixed

@@ -62,6 +62,7 @@ const t: typeof en = {
             zero: 'Beløbet må ikke være nul',
             belowBakerThreshold: 'Indsat mængde er under grænsen {{ threshold }} for bagning',
             exceedingDelegationCap: "delegeret mængde må ikke gå over valgt bager gruppe's loft på {{ max }}.",
+            insufficientFundsAtDisposal: 'Ikke nok penge til rådighed',
         },
         transaction: {
             type: {
