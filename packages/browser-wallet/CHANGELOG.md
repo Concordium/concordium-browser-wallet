@@ -1,5 +1,11 @@
 # Changelog
 
+## 1.0.3
+
+### Fixed
+
+-   Some typos in the delegation texts.
+
 ## 1.0.2
 
 ### Added
