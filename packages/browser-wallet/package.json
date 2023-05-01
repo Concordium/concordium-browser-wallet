@@ -1,6 +1,6 @@
 {
     "name": "@concordium/browser-wallet",
-    "version": "1.0.2",
+    "version": "1.0.3",
     "description": "Browser extension wallet for the Concordium blockchain",
     "author": "Concordium Software",
     "license": "Apache-2.0",
