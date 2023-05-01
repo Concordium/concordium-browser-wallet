@@ -219,7 +219,7 @@ const t = {
         registerIntro: {
             '1': {
                 title: 'Delegation',
-                body: 'Delegation allows users on the Concordium blockchain to earn rewards without the need to become a baker or run a node.\n\nBy delegating some of your funds to a pool, your can earn rewards.\n\nOn the next few pages, we will go through the basics of delegation. If you want to learn more, you can visit our <1>documentation website</1>.',
+                body: 'Delegation allows users on the Concordium blockchain to earn rewards without the need to become a baker or run a node.\n\nBy delegating some of your funds to a pool, you can earn rewards.\n\nOn the next few pages, we will go through the basics of delegation. If you want to learn more, you can visit our <1>documentation website</1>.',
             },
             '2': {
                 title: 'Delegation models',
@@ -227,7 +227,7 @@ const t = {
             },
             '3': {
                 title: 'Baker pools',
-                body: "A baker pool is managed by an individual baker.\n\nRunning a pool allows a baker to attract more stake and thus increate chances of being selected to bake a block.\n\nBakers earn a commision from the delegators upon baking a block.\n\nDelegating to a baker pool is usually more profitable that passive delegation, but there is also a risk of losing out on rewards if the baker is not running properly. It is therefore a good idea to keep an eye on the baker's performance.\n\nYou can read more about how to investigate a baker's performance on our <1>documentation website</1>.",
+                body: "A baker pool is managed by an individual baker.\n\nRunning a pool allows a baker to attract more stake and thus increate chances of being selected to bake a block.\n\nBakers earn a commision from the delegators upon baking a block.\n\nDelegating to a baker pool is usually more profitable than passive delegation, but there is also a risk of losing out on rewards if the baker is not running properly. It is therefore a good idea to keep an eye on the baker's performance.\n\nYou can read more about how to investigate a baker's performance on our <1>documentation website</1>.",
             },
             '4': {
                 title: 'Passive delegation',
