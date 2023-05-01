@@ -1,5 +1,11 @@
 # Changelog
 
+## 1.0.4
+
+### Fixed
+
+-   Delegation target being changed to passive delegation when the user did not choose to update it.
+
 ## 1.0.3
 
 ### Fixed
