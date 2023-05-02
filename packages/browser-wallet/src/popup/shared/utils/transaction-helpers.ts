@@ -23,6 +23,7 @@ import {
     displayAsCcd,
     fractionalToInteger,
     isValidCcdString,
+    getPublicAccountAmounts,
 } from 'wallet-common-helpers';
 
 import i18n from '@popup/shell/i18n';
@@ -81,17 +82,24 @@ export function validateBakerStake(
     amountToValidate: string,
     chainParameters?: ChainParametersV1,
     accountInfo?: AccountInfo,
-    estimatedFee?: bigint
+    estimatedFee = 0n
 ): string | undefined {
     if (!isValidCcdString(amountToValidate)) {
         return i18n.t('utils.ccdAmount.invalid');
     }
     const bakerStakeThreshold = chainParameters?.minimumEquityCapital || 0n;
     const amount = ccdToMicroCcd(amountToValidate);
+
     if (bakerStakeThreshold > amount) {
         return i18n.t('utils.ccdAmount.belowBakerThreshold', { threshold: displayAsCcd(bakerStakeThreshold) });
     }
-    if (accountInfo && BigInt(accountInfo.accountAmount) < amount + (estimatedFee || 0n)) {
+
+    if (
+        accountInfo &&
+        (BigInt(accountInfo.accountAmount) < amount + estimatedFee ||
+            // the fee must be paid with the current funds at disposal, because a reduction in delegation amount is not immediate.
+            getPublicAccountAmounts(accountInfo).atDisposal < estimatedFee)
+    ) {
         return i18n.t('utils.ccdAmount.insufficient');
     }
 
@@ -129,7 +137,11 @@ export function validateDelegationAmount(
         return i18n.t('utils.ccdAmount.exceedingDelegationCap', { max: displayAsCcd(max) });
     }
 
-    if (BigInt(accountInfo.accountAmount) < amount + estimatedFee) {
+    if (
+        BigInt(accountInfo.accountAmount) < amount + estimatedFee ||
+        // the fee must be paid with the current funds at disposal, because a reduction in delegation amount is not immediate.
+        getPublicAccountAmounts(accountInfo).atDisposal < estimatedFee
+    ) {
         return i18n.t('utils.ccdAmount.insufficient');
     }
 
