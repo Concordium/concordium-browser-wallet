@@ -6,6 +6,7 @@
 
 -   Validate during Baker/delegation stake reduction that at disposal funds can cover the fee.
 -   Delegation target being changed to passive delegation when the user did not choose to update it.
+-   Improve display of errors from the node when sending transactions.
 
 ## 1.0.3
 
