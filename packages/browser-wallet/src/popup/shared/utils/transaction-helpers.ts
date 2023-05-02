@@ -82,7 +82,7 @@ export function validateBakerStake(
     amountToValidate: string,
     chainParameters?: ChainParametersV1,
     accountInfo?: AccountInfo,
-    estimatedFee?: bigint
+    estimatedFee = 0n
 ): string | undefined {
     if (!isValidCcdString(amountToValidate)) {
         return i18n.t('utils.ccdAmount.invalid');
@@ -94,14 +94,15 @@ export function validateBakerStake(
         return i18n.t('utils.ccdAmount.belowBakerThreshold', { threshold: displayAsCcd(bakerStakeThreshold) });
     }
 
-    if (accountInfo && BigInt(accountInfo.accountAmount) < amount + (estimatedFee || 0n)) {
+    if (
+        accountInfo &&
+        (BigInt(accountInfo.accountAmount) < amount + estimatedFee ||
+            // the fee must be paid with the current funds at disposal, because a reduction in delegation amount is not immediate.
+            getPublicAccountAmounts(accountInfo).atDisposal < estimatedFee)
+    ) {
         return i18n.t('utils.ccdAmount.insufficient');
     }
 
-    // the fee must be paid with the current funds at disposal, because a reduction in baker stake is not immediate.
-    if (getPublicAccountAmounts(accountInfo).atDisposal < (estimatedFee || 0n)) {
-        return i18n.t('utils.ccdAmount.insufficientFundsAtDisposal');
-    }
     return undefined;
 }
 
@@ -136,13 +137,12 @@ export function validateDelegationAmount(
         return i18n.t('utils.ccdAmount.exceedingDelegationCap', { max: displayAsCcd(max) });
     }
 
-    if (BigInt(accountInfo.accountAmount) < amount + estimatedFee) {
+    if (
+        BigInt(accountInfo.accountAmount) < amount + estimatedFee ||
+        // the fee must be paid with the current funds at disposal, because a reduction in delegation amount is not immediate.
+        getPublicAccountAmounts(accountInfo).atDisposal < estimatedFee
+    ) {
         return i18n.t('utils.ccdAmount.insufficient');
-    }
-
-    // the fee must be paid with the current funds at disposal, because a reduction in delegation amount is not immediate.
-    if (getPublicAccountAmounts(accountInfo).atDisposal < estimatedFee) {
-        return i18n.t('utils.ccdAmount.insufficientFundsAtDisposal');
     }
 
     return undefined;

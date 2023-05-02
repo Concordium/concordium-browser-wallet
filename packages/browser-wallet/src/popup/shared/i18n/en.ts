@@ -62,7 +62,6 @@ const t = {
             zero: 'Amount may not be zero',
             belowBakerThreshold: 'Minimum stake: {{ threshold }}',
             exceedingDelegationCap: "Amount may not exceed the target pool's cap of {{ max }}.",
-            insufficientFundsAtDisposal: 'Insufficient funds at disposal',
         },
         transaction: {
             type: {
