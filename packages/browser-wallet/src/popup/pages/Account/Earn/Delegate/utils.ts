@@ -73,7 +73,7 @@ export const getDelegationFlowChanges = (
 
 function toPayload(values: DeepPartial<ConfigureDelegationFlowState>): ConfigureDelegationPayload {
     let delegationTarget: DelegationTarget | undefined;
-    if (values.pool == null) {
+    if (values.pool === null) {
         delegationTarget = { delegateType: DelegationTargetType.PassiveDelegation };
     } else if (values.pool !== undefined) {
         delegationTarget = { delegateType: DelegationTargetType.Baker, bakerId: BigInt(values.pool) };
