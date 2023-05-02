@@ -138,7 +138,7 @@ export default function ConfirmTransfer(props: Props) {
                     <Button width="narrow" className="m-r-10" onClick={() => nav(-1)}>
                         {t('confirmTransfer.buttons.back')}
                     </Button>
-                    <Button width="narrow" onClick={() => send().catch((e) => addToast(e.toString()))}>
+                    <Button width="narrow" onClick={() => send().catch((e) => addToast(decodeURIComponent(e.message)))}>
                         {t('confirmTransfer.buttons.send')}
                     </Button>
                 </div>
