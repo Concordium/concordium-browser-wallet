@@ -5,8 +5,10 @@
     "author": "Concordium Software",
     "license": "Apache-2.0",
     "scripts": {
-        "build:dev": "cross-env NODE_ENV=development node --loader ts-node/esm -r tsconfig-paths/register ./build/dev.ts",
-        "build": "yarn build:dev",
+        "build:base": "node --loader ts-node/esm -r tsconfig-paths/register ./build/dev.ts",
+        "build:dev": "cross-env NODE_ENV=development yarn build:base",
+        "build:prod": "cross-env NODE_ENV=production yarn build:base",
+        "build": "yarn build:prod",
         "watch": "cross-env WATCH=1 yarn build:dev",
         "storybook": "start-storybook -p 6006",
         "build-storybook": "build-storybook"

@@ -18,4 +18,13 @@ export const testnet: NetworkConfiguration = {
     grpcUrl: 'https://grpc.testnet.concordium.com',
 };
 
+export const stagenet: NetworkConfiguration = {
+    genesisHash: '38bf770b4c247f09e1b62982bb71000c516480c5a2c5214dadac6da4b1ad50e5',
+    name: 'Concordium Stagenet',
+    jsonRpcUrl: 'https://json-rpc.stagenet.concordium.com/',
+    explorerUrl: 'https://wallet-proxy.stagenet.concordium.com',
+    grpcPort: 20000,
+    grpcUrl: 'https://grpc.stagenet.concordium.com',
+};
+
 export const GRPCTIMEOUT = 15000;
