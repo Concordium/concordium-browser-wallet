@@ -3,7 +3,7 @@ import React from 'react';
 import { useTranslation } from 'react-i18next';
 import urls from '@shared/constants/url';
 import ExternalLink from '@popup/shared/ExternalLink';
-import packageJson from '../../../../package.json';
+import { getVersionName } from 'src/shared/utils/environment-helpers';
 
 export default function About() {
     const { t } = useTranslation('about');
@@ -12,7 +12,7 @@ export default function About() {
         <div className="about-page">
             <div>
                 <h3>{t('version')}</h3>
-                {packageJson.version}
+                {getVersionName()}
             </div>
 
             <div className="about-page__support">
