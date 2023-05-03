@@ -1,5 +1,11 @@
 # Changelog
 
+## Unreleased
+
+### Added
+
+-   A build script for making builds that include the stagenet network.
+
 ## 1.0.4
 
 ### Fixed
