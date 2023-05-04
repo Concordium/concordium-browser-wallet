@@ -7,6 +7,7 @@ export const mainnet: NetworkConfiguration = {
     explorerUrl: 'https://wallet-proxy.mainnet.concordium.software',
     grpcPort: 20000,
     grpcUrl: 'https://grpc.mainnet.concordium.software',
+    ccdScanUrl: 'https://ccdscan.io/',
 };
 
 export const testnet: NetworkConfiguration = {
@@ -16,6 +17,7 @@ export const testnet: NetworkConfiguration = {
     explorerUrl: 'https://wallet-proxy.testnet.concordium.com',
     grpcPort: 20000,
     grpcUrl: 'https://grpc.testnet.concordium.com',
+    ccdScanUrl: 'https://testnet.ccdscan.io/',
 };
 
 export const stagenet: NetworkConfiguration = {
@@ -25,6 +27,7 @@ export const stagenet: NetworkConfiguration = {
     explorerUrl: 'https://wallet-proxy.stagenet.concordium.com',
     grpcPort: 20000,
     grpcUrl: 'https://grpc.stagenet.concordium.com',
+    ccdScanUrl: 'https://stagenet.ccdscan.io/',
 };
 
 export const GRPCTIMEOUT = 15000;

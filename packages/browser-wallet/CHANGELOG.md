@@ -6,6 +6,10 @@
 
 -   A build script for making builds that include the stagenet network.
 
+### Fixed
+
+-   Link to transaction log on stagenet was incorrect.
+
 ## 1.0.4
 
 ### Fixed
