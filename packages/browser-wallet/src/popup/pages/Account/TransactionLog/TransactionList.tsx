@@ -307,7 +307,7 @@ export default function TransactionList({ onTransactionClick }: TransactionListP
                                 ccdDrop(accountAddress);
                             }}
                         >
-                            Request CCD
+                            {t('requestCcd')}
                         </Button>
                     )}
                 </div>

@@ -5,6 +5,7 @@
 ### Fixed
 
 -   An issue where the transaction list view would show the `Request CCD` button while loading the initial batch of transactions.
+-   Added a missing translation for the `Request CCD` button.
 
 ## 1.0.4
 
