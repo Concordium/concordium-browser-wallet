@@ -41,9 +41,9 @@ $transaction-receipt-horizontal-padding: rem(20px);
         padding: rem(8px);
     }
 
+    &__value,
     &__address,
-    &__hash,
-    &__key {
+    &__hash {
         font-size: rem(8px);
     }
 

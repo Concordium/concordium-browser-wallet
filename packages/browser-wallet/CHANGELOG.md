@@ -1,5 +1,15 @@
 # Changelog
 
+## Unreleased
+
+### Fixed
+
+-   `deployModule` transactions do no longer cause the wallet to crash, when supplied with `sendTransaction`.
+
+### Added
+
+-   `deployModule` transactions now display the hash instead of the entire module source.
+
 ## 1.0.4
 
 ### Fixed

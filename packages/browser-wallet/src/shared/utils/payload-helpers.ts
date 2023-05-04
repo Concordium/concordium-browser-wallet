@@ -43,6 +43,8 @@ export function parse(input: string | undefined) {
                     return BigInt(v.value);
                 case serializationTypes.Date:
                     return new Date(v.value);
+                case serializationTypes.Buffer:
+                    return Buffer.from(v.value, 'base64');
                 case serializationTypes.CcdAmount:
                     return new CcdAmount(BigInt(v.value));
                 case serializationTypes.AccountAddress:
