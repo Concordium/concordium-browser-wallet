@@ -39,13 +39,14 @@ export enum EventType {
     ChainChanged = 'chainChanged',
 }
 
+export type SchemaTypeString = 'module' | 'parameter';
 export enum SchemaType {
     Module = 'module',
     Parameter = 'parameter',
 }
 
 export type SchemaWithContext = {
-    type: SchemaType;
+    type: SchemaType | SchemaTypeString;
     value: string;
 };
 
