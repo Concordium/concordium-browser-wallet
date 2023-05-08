@@ -24,6 +24,8 @@ const t: typeof en = {
         insufficientFunds: 'Utilstrækkelig CCD til at kunne sende transaktionen',
         missingNonce: 'Vi var ikke i stand til at finde den næste nonce for afsenderen',
     },
+    version: 'Version',
+    sourceHash: 'Modul hash',
 };
 
 export default t;
