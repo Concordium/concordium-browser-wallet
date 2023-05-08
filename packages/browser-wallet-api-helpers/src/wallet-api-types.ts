@@ -39,7 +39,6 @@ export enum EventType {
     ChainChanged = 'chainChanged',
 }
 
-
 export enum SchemaType {
     Module = 'module',
     Parameter = 'parameter',
@@ -49,9 +48,6 @@ type LaxStringEnumValue<E extends string> = `${E}`;
 
 export type SchemaWithContext = {
     type: LaxStringEnumValue<SchemaType>;
-    value: string;
-};
-    type: SchemaType | SchemaTypeString;
     value: string;
 };
 
