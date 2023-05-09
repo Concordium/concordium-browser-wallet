@@ -9,6 +9,7 @@ const t: typeof en = {
     header: {
         accounts: 'Konti',
         ids: 'ID kort',
+        verifiableCredentials: 'Legitimationsoplysninger',
         settings: {
             main: 'Wallet indstillinger',
             recovery: 'Genskabning af din wallet',

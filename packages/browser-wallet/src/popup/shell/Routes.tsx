@@ -32,6 +32,7 @@ import RecoveryFinish from '@popup/pages/Recovery/RecoveryFinish';
 import ChangePasscode from '@popup/pages/ChangePasscode/ChangePasscode';
 import AddTokensPrompt from '@popup/pages/ExternalAddTokens/ExternalAddTokens';
 import IdProofRequest from '@popup/pages/IdProofRequest';
+import VerifiableCredentialList from '@popup/pages/VerifiableCredential';
 
 type PromptKey = keyof Omit<typeof absoluteRoutes['prompt'], 'path'>;
 
@@ -172,6 +173,7 @@ export default function Routes() {
                     path={`${relativePath(relativeRoutes.home.path, absoluteRoutes.home.identities.add.path)}/*`}
                 />
                 <Route element={<Identity />} path={relativeRoutes.home.identities.path} />
+                <Route element={<VerifiableCredentialList />} path={relativeRoutes.home.verifiableCredentials.path} />
                 <Route path={relativeRoutes.home.settings.path}>
                     <Route index element={<Settings />} />
                     <Route element={<ChangePasscode />} path={relativeRoutes.home.settings.passcode.path} />

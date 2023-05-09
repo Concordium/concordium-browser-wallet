@@ -25,6 +25,7 @@ export enum ChromeStorageKey {
     Cookie = 'cookie',
     OpenPrompt = 'openPrompt',
     AcceptedTerms = 'acceptedTerms',
+    VerifiableCredentials = 'verifiableCredentials',
 }
 
 export enum Theme {
@@ -251,3 +252,16 @@ export type AcceptedTermsState = {
     accepted: boolean;
     version: string;
 };
+
+export enum VerifiableCredentialStatus {
+    Active,
+    Revoked,
+    Expired,
+    NotActivated,
+}
+
+export interface VerifiableCredential {
+    title: string;
+    status: VerifiableCredentialStatus;
+    attributes: Record<string, string | number>;
+}

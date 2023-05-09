@@ -7,6 +7,7 @@ const t = {
     header: {
         accounts: 'Accounts',
         ids: 'ID cards',
+        verifiableCredentials: 'Verifiable credentials',
         settings: {
             main: 'Wallet settings',
             recovery: 'Restoring your wallet',

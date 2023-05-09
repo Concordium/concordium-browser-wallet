@@ -11,6 +11,7 @@ import {
     TokenMetadata,
     TokenStorage,
     AcceptedTermsState,
+    VerifiableCredential,
 } from './types';
 
 export type StorageAccessor<V> = {
@@ -145,6 +146,10 @@ export const storedTokenMetadata = makeStorageAccessor<Record<string, TokenMetad
     ChromeStorageKey.TokenMetadata
 );
 export const storedAcceptedTerms = makeStorageAccessor<AcceptedTermsState>('local', ChromeStorageKey.AcceptedTerms);
+export const storedVerifiableCredentials = makeIndexedStorageAccessor<VerifiableCredential[]>(
+    'local',
+    ChromeStorageKey.VerifiableCredentials
+);
 
 export const sessionOpenPrompt = makeStorageAccessor<boolean>('session', ChromeStorageKey.OpenPrompt);
 export const sessionPasscode = makeStorageAccessor<string>('session', ChromeStorageKey.Passcode);

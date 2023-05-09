@@ -54,6 +54,7 @@ const transitionVariants: Variants = {
 enum Section {
     Account,
     Id,
+    VerifiableCredentials,
     Settings,
 }
 
@@ -67,6 +68,8 @@ function getTitle(section: Section, pathname: string) {
             return 'header.accounts';
         case Section.Id:
             return 'header.ids';
+        case Section.VerifiableCredentials:
+            return 'header.verifiableCredentials';
         case Section.Settings: {
             if (pathname.startsWith(absoluteRoutes.home.settings.recovery.path)) {
                 return 'header.settings.recovery';
@@ -90,6 +93,9 @@ function getTitle(section: Section, pathname: string) {
 function getSection(pathname: string): Section {
     if (pathname.startsWith(absoluteRoutes.home.identities.path)) {
         return Section.Id;
+    }
+    if (pathname.startsWith(absoluteRoutes.home.verifiableCredentials.path)) {
+        return Section.VerifiableCredentials;
     }
     if (pathname.startsWith(absoluteRoutes.home.settings.path)) {
         return Section.Settings;
@@ -186,6 +192,12 @@ export default function Header({ onToggle, className }: Props) {
                             </HeaderLink>
                             <HeaderLink onClick={() => setNavOpen(false)} to={absoluteRoutes.home.identities.path}>
                                 {t('header.ids')}
+                            </HeaderLink>
+                            <HeaderLink
+                                onClick={() => setNavOpen(false)}
+                                to={absoluteRoutes.home.verifiableCredentials.path}
+                            >
+                                {t('header.verifiableCredentials')}
                             </HeaderLink>
                             <HeaderLink onClick={() => setNavOpen(false)} to={absoluteRoutes.home.settings.path}>
                                 {t('header.settings.main')}
