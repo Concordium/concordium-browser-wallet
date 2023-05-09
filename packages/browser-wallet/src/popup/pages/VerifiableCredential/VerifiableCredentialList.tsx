@@ -1,6 +1,7 @@
-import React from 'react';
+import React, { useState } from 'react';
 import { storedVerifiableCredentialsAtom } from '@popup/store/verifiable-credential';
 import { useAtomValue } from 'jotai';
+import { VerifiableCredential } from '@shared/storage/types';
 import { VerifiableCredentialCard } from './VerifiableCredentialCard';
 
 /**
@@ -21,16 +22,26 @@ function NoVerifiableCredentials() {
  */
 export default function VerifiableCredentialList() {
     const verifiableCredentials = useAtomValue(storedVerifiableCredentialsAtom);
+    const [selected, setSelected] = useState<VerifiableCredential>();
 
     if (!verifiableCredentials) {
         return <NoVerifiableCredentials />;
+    }
+    if (selected) {
+        return <VerifiableCredentialCard credential={selected} />;
     }
 
     return (
         <>
             {verifiableCredentials.map((credential, index) => {
-                // eslint-disable-next-line react/no-array-index-key
-                return <VerifiableCredentialCard key={index} credential={credential} />;
+                return (
+                    <VerifiableCredentialCard
+                        // eslint-disable-next-line react/no-array-index-key
+                        key={index}
+                        credential={credential}
+                        onClick={() => setSelected(credential)}
+                    />
+                );
             })}
         </>
     );

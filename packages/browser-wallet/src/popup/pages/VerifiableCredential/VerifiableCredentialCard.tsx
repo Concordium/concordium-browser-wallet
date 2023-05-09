@@ -21,9 +21,34 @@ function Logo() {
     );
 }
 
-export function VerifiableCredentialCard({ credential }: { credential: VerifiableCredential }) {
+/**
+ * Provide the required clickable properties if onClick is defined.
+ */
+function clickableProperties(onClick?: () => void) {
+    if (onClick) {
+        return {
+            onClick,
+            onKeyDown: (e: React.KeyboardEvent<HTMLDivElement>) => {
+                if (e.key === 'Enter' && onClick) {
+                    onClick();
+                }
+            },
+            role: 'button',
+            tabIndex: 0,
+        };
+    }
+    return {};
+}
+
+export function VerifiableCredentialCard({
+    credential,
+    onClick,
+}: {
+    credential: VerifiableCredential;
+    onClick?: () => void;
+}) {
     return (
-        <div className="verifiable-credential">
+        <div className="verifiable-credential" {...clickableProperties(onClick)}>
             <header>
                 <Logo />
                 <div className="verifiable-credential__header-title">{credential.title}</div>
