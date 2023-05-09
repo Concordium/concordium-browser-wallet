@@ -2,7 +2,7 @@ import clsx from 'clsx';
 import { useTranslation } from 'react-i18next';
 import { ClassName } from 'wallet-common-helpers';
 
-import React, { Children, ReactNode, useContext, useRef } from 'react';
+import React, { Children, ReactNode, useRef } from 'react';
 import Button from '@popup/shared/Button';
 
 import BackIcon from '@assets/svg/back-arrow.svg';
@@ -14,7 +14,6 @@ import SettingsIcon from '@assets/svg/cog.svg';
 import EarnIcon from '@assets/svg/earn.svg';
 import TabBar from '@popup/shared/TabBar';
 import { accountRoutes } from '../routes';
-import { accountPageContext } from '../utils';
 
 const SCROLL_LIMIT = 5;
 
@@ -60,16 +59,15 @@ type ActionProps = {
     to: string;
     title: string;
     disabled?: boolean;
-    onClick?: () => void;
 };
 
-function Action({ children, to, title, disabled = false, onClick = undefined }: ActionProps) {
+function Action({ children, to, title, disabled = false }: ActionProps) {
     return disabled ? (
         <TabBar.Item as={Button} className="account-page-actions__link-disabled" disabled title={title}>
             {children}
         </TabBar.Item>
     ) : (
-        <TabBar.Item className="account-page-actions__link" to={to} title={title} onClick={onClick}>
+        <TabBar.Item className="account-page-actions__link" to={to} title={title}>
             {children}
         </TabBar.Item>
     );
@@ -81,7 +79,6 @@ type Props = ClassName & {
 
 export default function AccountActions({ className, disabled }: Props) {
     const { t } = useTranslation('account', { keyPrefix: 'actions' });
-    const { setDetailsExpanded } = useContext(accountPageContext);
 
     return (
         <nav className={clsx('account-page-actions', className, disabled && 'account-page-actions-disabled')}>
@@ -101,12 +98,7 @@ export default function AccountActions({ className, disabled }: Props) {
                 <Action to={accountRoutes.earn} title={t('earn')} disabled={disabled}>
                     <EarnIcon className="account-page-actions__earn-icon" />
                 </Action>
-                <Action
-                    to={accountRoutes.settings}
-                    title={t('settings')}
-                    disabled={disabled}
-                    onClick={() => setDetailsExpanded(false)}
-                >
+                <Action to={accountRoutes.settings} title={t('settings')} disabled={disabled}>
                     <SettingsIcon className="account-page-actions__settings-icon" />
                 </Action>
             </ActionLinks>

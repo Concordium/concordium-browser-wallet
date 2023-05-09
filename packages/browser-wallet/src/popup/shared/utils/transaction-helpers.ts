@@ -2,6 +2,7 @@ import {
     AccountAddress,
     AccountTransaction,
     AccountTransactionType,
+    AccountTransactionPayload,
     buildBasicAccountSigner,
     getAccountTransactionHash,
     CcdAmount,
@@ -12,6 +13,9 @@ import {
     AccountInfo,
     ChainParametersV1,
     BakerPoolStatusDetails,
+    InitContractPayload,
+    UpdateContractPayload,
+    SimpleTransferWithMemoPayload,
 } from '@concordium/web-sdk';
 import {
     isValidResolutionString,
@@ -19,6 +23,7 @@ import {
     displayAsCcd,
     fractionalToInteger,
     isValidCcdString,
+    getPublicAccountAmounts,
 } from 'wallet-common-helpers';
 
 import i18n from '@popup/shell/i18n';
@@ -77,17 +82,24 @@ export function validateBakerStake(
     amountToValidate: string,
     chainParameters?: ChainParametersV1,
     accountInfo?: AccountInfo,
-    estimatedFee?: bigint
+    estimatedFee = 0n
 ): string | undefined {
     if (!isValidCcdString(amountToValidate)) {
         return i18n.t('utils.ccdAmount.invalid');
     }
     const bakerStakeThreshold = chainParameters?.minimumEquityCapital || 0n;
     const amount = ccdToMicroCcd(amountToValidate);
+
     if (bakerStakeThreshold > amount) {
         return i18n.t('utils.ccdAmount.belowBakerThreshold', { threshold: displayAsCcd(bakerStakeThreshold) });
     }
-    if (accountInfo && BigInt(accountInfo.accountAmount) < amount + (estimatedFee || 0n)) {
+
+    if (
+        accountInfo &&
+        (BigInt(accountInfo.accountAmount) < amount + estimatedFee ||
+            // the fee must be paid with the current funds at disposal, because a reduction in delegation amount is not immediate.
+            getPublicAccountAmounts(accountInfo).atDisposal < estimatedFee)
+    ) {
         return i18n.t('utils.ccdAmount.insufficient');
     }
 
@@ -125,7 +137,11 @@ export function validateDelegationAmount(
         return i18n.t('utils.ccdAmount.exceedingDelegationCap', { max: displayAsCcd(max) });
     }
 
-    if (BigInt(accountInfo.accountAmount) < amount + estimatedFee) {
+    if (
+        BigInt(accountInfo.accountAmount) < amount + estimatedFee ||
+        // the fee must be paid with the current funds at disposal, because a reduction in delegation amount is not immediate.
+        getPublicAccountAmounts(accountInfo).atDisposal < estimatedFee
+    ) {
         return i18n.t('utils.ccdAmount.insufficient');
     }
 
@@ -203,4 +219,23 @@ export const createPendingTransactionFromAccountTransaction = (
 
 export function useHasPendingTransaction(transactionType: AccountTransactionType): boolean {
     return useAtomValue(selectedPendingTransactionsAtom).some((t) => t.type === transactionType);
+}
+
+/**
+ * Extract the microCCD amount related for the transaction, excluding the cost.
+ * Note that for many transactions there is no related amount, in which case this returns 0.
+ */
+export function getTransactionAmount(type: AccountTransactionType, payload: AccountTransactionPayload): bigint {
+    switch (type) {
+        case AccountTransactionType.InitContract:
+            return (payload as InitContractPayload).amount.microCcdAmount;
+        case AccountTransactionType.Update:
+            return (payload as UpdateContractPayload).amount.microCcdAmount;
+        case AccountTransactionType.Transfer:
+            return (payload as SimpleTransferPayload).amount.microCcdAmount;
+        case AccountTransactionType.TransferWithMemo:
+            return (payload as SimpleTransferWithMemoPayload).amount.microCcdAmount;
+        default:
+            return 0n;
+    }
 }

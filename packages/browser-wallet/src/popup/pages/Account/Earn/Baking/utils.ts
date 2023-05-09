@@ -9,8 +9,10 @@ import {
     BakerKeysWithProofs,
 } from '@concordium/web-sdk';
 import { decimalToRewardFraction } from '@popup/shared/utils/baking-helpers';
+import { getConfigureBakerEnergyCost } from '@shared/utils/energy-helpers';
 import { not } from '@shared/utils/function-helpers';
-import { ccdToMicroCcd, isDefined, microCcdToCcd, NotOptional } from 'wallet-common-helpers';
+import { ccdToMicroCcd, isDefined, isValidCcdString, microCcdToCcd, NotOptional } from 'wallet-common-helpers';
+import { getFormOrExistingValue } from '../utils';
 
 export type ConfigureBakerFlowState = {
     restake: boolean;
@@ -123,14 +125,19 @@ export const toPayload = ({
     finalizationRewardCommission: decimalToRewardFraction(commissionRates?.finalizationCommission),
 });
 
+function getConfigureBakerChanges(updates: ConfigureBakerFlowState, accountInfo?: AccountInfo) {
+    const existing = accountInfo !== undefined ? getExistingBakerValues(accountInfo) : undefined;
+    const changes = existing !== undefined ? getBakerFlowChanges(existing, updates) : updates;
+    return changes;
+}
+
 /**
  * Converts values of flow to a configure baker payload.
  *
- * Throws if no changes to existing values have been made.
+ * @throws if no changes to existing values have been made.
  */
 export const configureBakerChangesPayload = (accountInfo?: AccountInfo) => (values: ConfigureBakerFlowState) => {
-    const existing = accountInfo !== undefined ? getExistingBakerValues(accountInfo) : undefined;
-    const changes = existing !== undefined ? getBakerFlowChanges(existing, values) : values;
+    const changes = getConfigureBakerChanges(values, accountInfo);
 
     if (Object.values(changes).every(not(isDefined))) {
         throw new Error(
@@ -140,3 +147,19 @@ export const configureBakerChangesPayload = (accountInfo?: AccountInfo) => (valu
 
     return toPayload(changes);
 };
+
+export function getCost(accountInfo: AccountInfo, formValues: Partial<ConfigureBakerFlowState>, amount: string) {
+    const existingBakerValues = getExistingBakerValues(accountInfo);
+    const formOrExistingAmount = getFormOrExistingValue(amount, existingBakerValues?.amount);
+
+    const formValuesFull = {
+        restake: getFormOrExistingValue(formValues.restake, existingBakerValues?.restake),
+        openForDelegation: getFormOrExistingValue(formValues.openForDelegation, existingBakerValues?.openForDelegation),
+        metadataUrl: getFormOrExistingValue(formValues.metadataUrl, existingBakerValues?.metadataUrl),
+        commissionRates: getFormOrExistingValue(formValues.commissionRates, existingBakerValues?.commissionRates),
+        keys: formValues.keys || null,
+        amount: isValidCcdString(formOrExistingAmount) ? formOrExistingAmount : '0',
+    };
+
+    return getConfigureBakerEnergyCost(toPayload(getConfigureBakerChanges(formValuesFull, accountInfo)));
+}

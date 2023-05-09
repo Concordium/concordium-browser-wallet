@@ -18,6 +18,9 @@ const t = {
         total: 'Public balance total',
         atDisposal: 'Public amount at disposal',
         stakeAmount: 'Stake / delegation amount',
+        stakeWithBaker: 'Stake with baker {{ bakerId }}',
+        delegationWithBaker: 'Delegation with baker pool {{ bakerId }}',
+        passiveDelegation: 'Passive delegation',
     },
     settings: {
         connectedSites: {
@@ -52,9 +55,6 @@ const t = {
         labels: {
             ccd: 'Enter amount to transfer',
             recipient: 'Enter recipient address',
-        },
-        buttons: {
-            continue: 'Continue',
         },
         title: 'Send CCD',
         currentBalance: 'Current balance',
@@ -113,11 +113,11 @@ const t = {
         registerIntro: {
             '1': {
                 title: 'Become a baker',
-                body: 'A baker is a node that participates in the network by baking (creating) new blocks that are added to the chain.\n\nEach baker has a set of cryptographic keys called baker keys that the node needs to bake blocksYou generate the baker keys when you add a baker account.\n\nOnce the baker node has been restarted with the baker keys, it will start baking two epochs after the transaction has been approved.',
+                body: 'A baker is a node that participates in the network by baking (creating) new blocks that are added to the chain.\n\nEach baker has a set of cryptographic keys called baker keys that the node needs to bake blocks. You generate the baker keys when you add a baker account.\n\nOnce the baker node has been restarted with the baker keys, it will start baking two epochs after the transaction has been approved.',
             },
             '2': {
                 title: 'The node',
-                body: 'To become a baker you must run a node on the Concordium blockchain.Make sure that you have a setup where the node can operate around the clock.\n\nYou can run the node yourself or use a third-party provider. Make sure your account in the wallet has the required amount of CCD to become a baker.',
+                body: 'To become a baker you must run a node on the Concordium blockchain. Make sure that you have a setup where the node can operate around the clock.\n\nYou can run the node yourself or use a third-party provider. Make sure your account in the wallet has the required amount of CCD to become a baker.',
             },
             '3': {
                 title: 'Opening a pool',
@@ -149,7 +149,7 @@ const t = {
             },
         },
         register: {
-            title: 'Become a baker',
+            title: 'Register baker',
         },
         update: {
             title: {
@@ -158,6 +158,9 @@ const t = {
                 keys: 'Update baker keys',
             },
             noChanges: 'Your transaction contains no changes compared to the current baker.',
+        },
+        remove: {
+            notice: 'Stopping a baker will take effect at the first pay day after a cool-down period of {{cooldownPeriod}} days. During the cool-down period the baker stake is locked and cannot be changed.',
         },
         details: {
             heading: 'Your baker is registered.',
@@ -183,6 +186,8 @@ const t = {
                 lockedNote: 'You are unable to change the amount while there is a pending change',
                 overStakeThresholdWarning:
                     'You are about to lock more than {{ threshold }}% of your total balance in a baker stake.\n\nIf you don’t have enough unlocked CCD at your disposal, you might not be able to pay future transaction fees.',
+                decreaseWarning:
+                    'Reducing the baker stake will lock the total baker stake for a cool-down period. No changes can be made to the amount during this period, and the withdrawal will not take effect before the cool-down period is over.',
                 enterNewStake: 'Enter new baker stake',
             },
             openForDelegation: {
@@ -208,14 +213,13 @@ const t = {
                 maxLength: 'MetadataUrl length may not exceed {{ maxLength }}',
             },
             warning: 'Warning',
-            continueButton: 'Continue',
         },
     },
     delegate: {
         registerIntro: {
             '1': {
                 title: 'Delegation',
-                body: 'Delegation allows users on the Concordium blockchain to earn rewards without the need to become a baker or run a node.\n\nBy delegating some of your funds to a pool, your can earn rewards.\n\nOn the next few pages, we will go through the basics of delegation. If you want to learn more, you can visit our <1>documentation website</1>.',
+                body: 'Delegation allows users on the Concordium blockchain to earn rewards without the need to become a baker or run a node.\n\nBy delegating some of your funds to a pool, you can earn rewards.\n\nOn the next few pages, we will go through the basics of delegation. If you want to learn more, you can visit our <1>documentation website</1>.',
             },
             '2': {
                 title: 'Delegation models',
@@ -223,7 +227,7 @@ const t = {
             },
             '3': {
                 title: 'Baker pools',
-                body: "A baker pool is managed by an individual baker.\n\nRunning a pool allows a baker to attract more stake and thus increate chances of being selected to bake a block.\n\nBakers earn a commision from the delegators upon baking a block.\n\nDelegating to a baker pool is usually more profitable that passive delegation, but there is also a risk of losing out on rewards if the baker is not running properly. It is therefore a good idea to keep an eye on the baker's performance.\n\nYou can read more about how to investigate a baker's performance on our <1>documentation website</1>.",
+                body: "A baker pool is managed by an individual baker.\n\nRunning a pool allows a baker to attract more stake and thus increate chances of being selected to bake a block.\n\nBakers earn a commision from the delegators upon baking a block.\n\nDelegating to a baker pool is usually more profitable than passive delegation, but there is also a risk of losing out on rewards if the baker is not running properly. It is therefore a good idea to keep an eye on the baker's performance.\n\nYou can read more about how to investigate a baker's performance on our <1>documentation website</1>.",
             },
             '4': {
                 title: 'Passive delegation',
@@ -253,7 +257,7 @@ const t = {
             },
             '3': {
                 title: 'Updates with longer cool-downs',
-                body: 'If you decrease your stake, the change will take effect after a cool-down period.\n\nWhile in this cool-down period, the stake is locked and cannot be changed, and you will not be able to stop your delegation.\n\nYour delegation continues earning rewards during the cool-down period. While in the cool-down period you can update other delegation settings, but not the amount\n\n.If you made any other changes to your delegation while also decreasing your delegation amount, the other changes will take effect from the next pay day as described on the previous page.',
+                body: 'If you decrease your stake, the change will take effect after a cool-down period.\n\nWhile in this cool-down period, the stake is locked and cannot be changed, and you will not be able to stop your delegation.\n\nYour delegation continues earning rewards during the cool-down period. While in the cool-down period you can update other delegation settings, but not the amount.\n\nIf you made any other changes to your delegation while also decreasing your delegation amount, the other changes will take effect from the next pay day as described on the previous page.',
             },
         },
         removeIntro: {
@@ -265,6 +269,9 @@ const t = {
                 title: 'Update during the cool-down period',
                 body: 'Only the delegation amount is locked during the cool-down period.\n\nThis means that you can still change restake status and target baker pool during the cool-down.',
             },
+        },
+        remove: {
+            notice: 'Stopping delegation will take effect at the first pay day after a cool-down period of {{cooldownPeriod}} days. During the cool-down period the delegation amount is locked and cannot be changed.',
         },
         details: {
             heading: 'Your delegation is registered.',
@@ -315,16 +322,45 @@ const t = {
                 lockedNote: 'You are unable to change the amount while there is a pending change',
                 overStakeThresholdWarning:
                     'You are about to lock more than {{ threshold }}% of your total balance in a delegation stake.\n\nIf you don’t have enough unlocked CCD at your disposal, you might not be able to pay future transaction fees.',
+                decreaseWarning:
+                    'Reducing the delegation amount will lock the total delegation amount for a cool-down period. No changes can be made to the amount during this period, and the withdrawal will not take effect before the cool-down period is over.',
                 enterNewStake: 'Enter new delegation stake',
             },
-            continueButton: 'Continue',
-            warning: 'Warning',
+        },
+    },
+    transactionMessage: {
+        configureBaker: {
+            registerBaker:
+                'You are about to submit a register baker transaction that locks some of your funds in a stake. If you want to unlock the stake again, there will be a cool-down period of {{ cooldownPeriod }} days.',
+            lowerBakerStake:
+                'You are about to submit a baker transaction that lowers your baker stake. It will take effect at the first pay day after a cool-down period {{ cooldownPeriod }} days and the baker stake cannot be changed during this period of time.',
+            removeBaker:
+                'Are you sure you want to make the following transaction to stop baking? It will take effect at the first pay day after a cool-down period {{ cooldownPeriod }} days and the baker stake cannot be changed during this period of time.',
+            notice: {
+                start: 'Once your transaction has successfully finalized, the baker registration will take effect from the next pay day.\n\nRemember to restart your node with the baker keys.',
+                update: 'Once your transaction has successfully finalized, the baker update will take effect from the next pay day.',
+                updateKeys:
+                    'Once your transaction has successfully finalized, the new baker keys will take effect from the next pay day.\n\nThis means the node should be restarted with the new keys, as close to the next pay day as possible.',
+            },
+        },
+        configureDelegation: {
+            register:
+                'You are about to submit a register delegation transaction that locks some of your funds in a stake. If you want to unlock the stake again, there will be a cool-down period of {{ cooldownPeriod }} days.',
+            lowerDelegationStake:
+                'You are about to submit a delegation transaction that lowers your delegation amount. It will take effect at the first pay day after a cool-down period {{ cooldownPeriod }} days and the delegation amount cannot be changed during this period of time.',
+            remove: 'Are you sure you want to make the following transaction to stop delegation? It will take effect at the first pay day after a cool-down period {{ cooldownPeriod }} days and the delegation amount cannot be changed during this period of time.',
+            notice: {
+                start: 'Once your transaction has successfully finalized, the delegation will take effect from the next pay day.',
+                update: 'Once your transaction has successfully finalized, the delegation update will take effect from the next pay day.',
+            },
         },
     },
     accountPending: 'This account is still pending finalization.',
     accountRejected: 'This account failed to be created.',
     request: 'Create account',
     unknown: 'unknown',
+    important: 'Important',
+    warning: 'Warning',
 };
 
 export default t;

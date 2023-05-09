@@ -1918,7 +1918,7 @@ __metadata:
     "@babel/plugin-transform-modules-commonjs": ^7.12.1
     "@babel/plugin-transform-runtime": ^7.12.1
     "@babel/preset-env": ^7.12.1
-    "@concordium/web-sdk": ^3.4.0
+    "@concordium/web-sdk": ^3.4.2
     typescript: ^4.3.5
     webpack: ^5.72.0
     webpack-cli: ^4.9.2
@@ -1930,7 +1930,7 @@ __metadata:
   resolution: "@concordium/browser-wallet-api@workspace:packages/browser-wallet-api"
   dependencies:
     "@concordium/browser-wallet-api-helpers": "workspace:^"
-    "@concordium/common-sdk": ^6.4.0
+    "@concordium/common-sdk": ^6.4.2
     "@protobuf-ts/grpcweb-transport": ^2.8.2
     "@protobuf-ts/runtime-rpc": ^2.8.2
     "@types/json-bigint": ^1.0.1
@@ -1958,9 +1958,10 @@ __metadata:
     "@babel/core": ^7.18.2
     "@concordium/browser-wallet-api": "workspace:^"
     "@concordium/browser-wallet-api-helpers": "workspace:^"
-    "@concordium/web-sdk": ^3.4.0
+    "@concordium/web-sdk": ^3.4.2
     "@craftamap/esbuild-plugin-html": ^0.4.0
     "@mdx-js/react": ^1.6.22
+    "@protobuf-ts/runtime-rpc": ^2.8.2
     "@scure/bip39": ^1.1.0
     "@storybook/addon-actions": ^6.5.7
     "@storybook/addon-docs": ^6.5.7
@@ -2020,7 +2021,7 @@ __metadata:
     tsconfig-paths-webpack-plugin: ^3.5.2
     typescript: ^4.3.5
     uuid: ^8.3.2
-    wallet-common-helpers: "https://github.com/Concordium/concordium-wallet-common-helpers.git#744f6914608b61b884b84203de774111ff0178e1"
+    wallet-common-helpers: "https://github.com/Concordium/concordium-wallet-common-helpers.git#942b4d0f53a537a78bcce20f052f30b9f8444d4a"
   languageName: unknown
   linkType: soft
 
@@ -2044,7 +2045,27 @@ __metadata:
   languageName: node
   linkType: hard
 
-"@concordium/common-sdk@npm:6.4.0, @concordium/common-sdk@npm:^6.3.0, @concordium/common-sdk@npm:^6.4.0":
+"@concordium/common-sdk@npm:6.4.2, @concordium/common-sdk@npm:^6.4.2":
+  version: 6.4.2
+  resolution: "@concordium/common-sdk@npm:6.4.2"
+  dependencies:
+    "@concordium/rust-bindings": 0.11.1
+    "@grpc/grpc-js": ^1.3.4
+    "@noble/ed25519": ^1.7.1
+    "@protobuf-ts/runtime-rpc": ^2.8.2
+    "@scure/bip39": ^1.1.0
+    bs58check: ^2.1.2
+    buffer: ^6.0.3
+    cross-fetch: 3.1.5
+    hash.js: ^1.1.7
+    iso-3166-1: ^2.1.1
+    json-bigint: ^1.0.0
+    uuid: ^8.3.2
+  checksum: 3a8b978833ab0bb37f949c633cdfe6ad63154dc404a07fc091ca2fac224ae55dd957c4557e800fc298905eac3da9750b95e5e42308062830a039bac552205f60
+  languageName: node
+  linkType: hard
+
+"@concordium/common-sdk@npm:^6.3.0":
   version: 6.4.0
   resolution: "@concordium/common-sdk@npm:6.4.0"
   dependencies:
@@ -2089,6 +2110,13 @@ __metadata:
   languageName: node
   linkType: hard
 
+"@concordium/rust-bindings@npm:0.11.1":
+  version: 0.11.1
+  resolution: "@concordium/rust-bindings@npm:0.11.1"
+  checksum: fe1bbcd0a98a7e148cfe9fa5ec69a693b19608b64b01723aedd9a7616958d5069cef006f8dfa610f7fad3cd3e8d356c99c76ff2606ea44d90138a43897118277
+  languageName: node
+  linkType: hard
+
 "@concordium/wallet-connectors@npm:0.2.0":
   version: 0.2.0
   resolution: "@concordium/wallet-connectors@npm:0.2.0"
@@ -2114,17 +2142,17 @@ __metadata:
   languageName: node
   linkType: hard
 
-"@concordium/web-sdk@npm:^3.4.0":
-  version: 3.4.0
-  resolution: "@concordium/web-sdk@npm:3.4.0"
+"@concordium/web-sdk@npm:^3.4.2":
+  version: 3.4.2
+  resolution: "@concordium/web-sdk@npm:3.4.2"
   dependencies:
-    "@concordium/common-sdk": 6.4.0
-    "@concordium/rust-bindings": 0.11.0
+    "@concordium/common-sdk": 6.4.2
+    "@concordium/rust-bindings": 0.11.1
     "@grpc/grpc-js": ^1.3.4
     "@protobuf-ts/grpcweb-transport": ^2.8.2
     buffer: ^6.0.3
     process: ^0.11.10
-  checksum: 65474ebc30bd846d5848a76732ee6517e644b63ea916b625625e2a9e42e4980eacbcdd21ce286d11e27d09b2a262847a5b42577a28c6950837ddfbc04625590d
+  checksum: 6a4cb1156376fb4dc0cbedb09f083f46492afe8cb2963b3c009812383edecd46b88a35e8d611c15e390485a1725d1489e5747f164859e20bfc9ae809e53e7f20
   languageName: node
   linkType: hard
 
@@ -22228,9 +22256,9 @@ __metadata:
   languageName: node
   linkType: hard
 
-"wallet-common-helpers@https://github.com/Concordium/concordium-wallet-common-helpers.git#744f6914608b61b884b84203de774111ff0178e1":
+"wallet-common-helpers@https://github.com/Concordium/concordium-wallet-common-helpers.git#942b4d0f53a537a78bcce20f052f30b9f8444d4a":
   version: 1.5.0
-  resolution: "wallet-common-helpers@https://github.com/Concordium/concordium-wallet-common-helpers.git#commit=744f6914608b61b884b84203de774111ff0178e1"
+  resolution: "wallet-common-helpers@https://github.com/Concordium/concordium-wallet-common-helpers.git#commit=942b4d0f53a537a78bcce20f052f30b9f8444d4a"
   dependencies:
     "@concordium/common-sdk": ^6.3.0
     buffer: ^6.0.3
@@ -22241,7 +22269,7 @@ __metadata:
   peerDependencies:
     react: ">=16"
     react-dom: ">=16"
-  checksum: c70afe4a8908e566cfea405d0755267d8a4a96a0cc92bfed0d1121b4d8c2a4f193a1fdf95c429fa4f3fdef6cb52ae5c62f55a2ed60ba20c2f27cc7cbac42bfda
+  checksum: 02dc22e88a6b483b701aa5c4545053bceaa9af17dfe86900a3a700827921bb91669064eddf6eaa5038ca8aa893aa9252d1beafe15eab6039319722069017c2d9
   languageName: node
   linkType: hard
 

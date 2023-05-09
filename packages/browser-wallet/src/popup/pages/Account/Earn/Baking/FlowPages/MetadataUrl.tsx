@@ -4,9 +4,8 @@ import Form from '@popup/shared/Form';
 import { MultiStepFormPageProps } from '@popup/shared/MultiStepForm';
 import Submit from '@popup/shared/Form/Submit';
 import Input from '@popup/shared/Form/Input';
+import { METADATAURL_MAX_LENGTH } from '@shared/constants/baking';
 import { ConfigureBakerFlowState } from '../utils';
-
-const METADATAURL_MAX_LENGTH = 2048;
 
 type MetadataUrlForm = {
     url: string;
@@ -15,6 +14,7 @@ type MetadataUrlForm = {
 type MetadataUrlProps = MultiStepFormPageProps<ConfigureBakerFlowState['metadataUrl'], ConfigureBakerFlowState>;
 
 export function MetadataUrlPage({ initial, onNext }: MetadataUrlProps) {
+    const { t: tShared } = useTranslation('shared');
     const { t } = useTranslation('account', { keyPrefix: 'baking.configure' });
     const defaultValues: Partial<MetadataUrlForm> = useMemo(
         () => (initial ? { url: initial } : { url: '' }),
@@ -43,7 +43,7 @@ export function MetadataUrlPage({ initial, onNext }: MetadataUrlProps) {
                         />
                     </div>
                     <Submit className="m-t-20" width="wide">
-                        {t('continueButton')}
+                        {tShared('continue')}
                     </Submit>
                 </>
             )}

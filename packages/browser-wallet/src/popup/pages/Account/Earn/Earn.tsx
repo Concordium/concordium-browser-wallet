@@ -1,6 +1,6 @@
 import React, { useContext, useEffect, useMemo } from 'react';
 import { useTranslation } from 'react-i18next';
-import { Link, Route, Routes, useNavigate } from 'react-router-dom';
+import { Link, Route, Routes, useLocation, useNavigate } from 'react-router-dom';
 import {
     AccountTransactionType,
     ChainParametersV1,
@@ -18,7 +18,6 @@ import { useAtomValue } from 'jotai';
 import { grpcClientAtom } from '@popup/store/settings';
 import { displayAsCcd, useAsyncMemo, useUpdateEffect } from 'wallet-common-helpers';
 import ButtonGroup from '@popup/shared/ButtonGroup';
-import { selectedAccountAtom } from '@popup/store/account';
 import { absoluteRoutes } from '@popup/constants/routes';
 import { useBlockChainParameters } from '@popup/shared/BlockChainParametersProvider';
 import Baking from './Baking';
@@ -40,19 +39,6 @@ const defaultBakingMinimumEquityCapital = 14000000000n;
 
 function Earn({ chainParameters }: EarnProps) {
     const { t } = useTranslation('account', { keyPrefix: 'earn' });
-    const accountInfo = ensureDefined(useSelectedAccountInfo(), 'Expected to find account info for selected account');
-    const nav = useNavigate();
-
-    const hasPendingDelegationTransaction = useHasPendingTransaction(AccountTransactionType.ConfigureDelegation);
-    const hasPendingBakerTransaction = useHasPendingTransaction(AccountTransactionType.ConfigureBaker);
-
-    useEffect(() => {
-        if (isDelegatorAccount(accountInfo) || hasPendingDelegationTransaction) {
-            nav(routes.delegate);
-        } else if (isBakerAccount(accountInfo) || hasPendingBakerTransaction) {
-            nav(routes.baking);
-        }
-    }, [accountInfo]);
 
     return (
         <div className="earn-page">
@@ -88,12 +74,33 @@ function Earn({ chainParameters }: EarnProps) {
 
 export default function EarnRoutes() {
     const { setDetailsExpanded } = useContext(accountPageContext);
-    const account = useAtomValue(selectedAccountAtom);
+    const accountInfo = ensureDefined(useSelectedAccountInfo(), 'Expected to find account info for selected account');
     const nav = useNavigate();
+    const hasPendingDelegationTransaction = useHasPendingTransaction(AccountTransactionType.ConfigureDelegation);
+    const hasPendingBakerTransaction = useHasPendingTransaction(AccountTransactionType.ConfigureBaker);
+
+    const location = useLocation();
+
+    useEffect(() => {
+        if (location.pathname === `${absoluteRoutes.home.account.path}/${accountRoutes.earn}`) {
+            setDetailsExpanded(false);
+            if (isDelegatorAccount(accountInfo) || hasPendingDelegationTransaction) {
+                nav(routes.delegate);
+            } else if (isBakerAccount(accountInfo) || hasPendingBakerTransaction) {
+                nav(routes.baking);
+            }
+        }
+    }, [location.pathname]);
 
     useUpdateEffect(() => {
-        nav(`${absoluteRoutes.home.account.path}/${accountRoutes.earn}`);
-    }, [account]);
+        if (isDelegatorAccount(accountInfo) || hasPendingDelegationTransaction) {
+            nav(routes.delegate);
+        } else if (isBakerAccount(accountInfo) || hasPendingBakerTransaction) {
+            nav(routes.baking);
+        } else {
+            nav(`${absoluteRoutes.home.account.path}/${accountRoutes.earn}`);
+        }
+    }, [accountInfo]);
 
     const client = useAtomValue(grpcClientAtom);
     const chainParameters = useBlockChainParameters();
@@ -105,12 +112,6 @@ export default function EarnRoutes() {
         undefined,
         []
     );
-
-    useEffect(() => {
-        setDetailsExpanded(false);
-        return () => setDetailsExpanded(true);
-    }, []);
-
     const context = useMemo<EarnPageContext>(
         () => ({ chainParameters: ParametersV1, consensusStatus, tokenomicsInfo }),
         [consensusStatus, tokenomicsInfo, chainParameters]

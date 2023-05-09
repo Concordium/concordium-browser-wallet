@@ -1,36 +1,23 @@
 import React from 'react';
-import { useLocation, useNavigate } from 'react-router-dom';
-
-import Carousel from '@popup/shared/Carousel';
+import { AccountTransactionType } from '@concordium/web-sdk';
 import { useTranslation } from 'react-i18next';
-import { absoluteRoutes } from '@popup/constants/routes';
-import { AccountTransactionType, CcdAmount } from '@concordium/web-sdk';
-import { accountRoutes } from '../../routes';
-import { ConfirmGenericTransferState } from '../../ConfirmGenericTransfer';
+import { secondsToDaysRoundedDown } from '@shared/utils/time-helpers';
+import { useBlockChainParametersV1 } from '@popup/shared/BlockChainParametersProvider';
 import IntroPage from '../IntroPage';
+import RemoveCarousel from '../RemoveCarousel';
 
-export default function RemoveDelegation() {
-    const nav = useNavigate();
-    const { t } = useTranslation('account', { keyPrefix: 'delegate.removeIntro' });
-    const { pathname } = useLocation();
-
-    const goToConfirm = () => {
-        const confirmTransferState: ConfirmGenericTransferState = {
-            payload: {
-                stake: new CcdAmount(0n),
-            },
-            type: AccountTransactionType.ConfigureDelegation,
-        };
-        nav(pathname, { replace: true, state: true }); // Override current router entry with stateful version
-        nav(`${absoluteRoutes.home.account.path}/${accountRoutes.confirmTransfer}`, {
-            state: confirmTransferState,
-        });
-    };
-
+export default function RemoveDelegaton() {
+    const { t } = useTranslation('account', { keyPrefix: 'delegate' });
+    const chainParameters = useBlockChainParametersV1();
     return (
-        <Carousel withBackButton className="earn-carousel" onContinue={goToConfirm}>
-            <IntroPage title={t('1.title')}>{t('1.body')}</IntroPage>
-            <IntroPage title={t('2.title')}>{t('2.body')}</IntroPage>
-        </Carousel>
+        <RemoveCarousel
+            type={AccountTransactionType.ConfigureDelegation}
+            warningMessage={t('remove.notice', {
+                cooldownPeriod: secondsToDaysRoundedDown(chainParameters?.delegatorCooldown),
+            })}
+        >
+            <IntroPage title={t('removeIntro.1.title')}>{t('removeIntro.1.body')}</IntroPage>
+            <IntroPage title={t('removeIntro.2.title')}>{t('removeIntro.2.body')}</IntroPage>
+        </RemoveCarousel>
     );
 }

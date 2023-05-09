@@ -31,6 +31,7 @@ import { Cis2TransferParameters } from '@shared/utils/types';
 import { SmartContractParameters } from '@concordium/browser-wallet-api-helpers';
 import { TokenMetadata } from '@shared/storage/types';
 import { accountRoutes } from '../routes';
+import { TransactionMessage } from './TransactionMessage';
 
 type BaseProps = {
     setDetailsExpanded: (expanded: boolean) => void;
@@ -65,6 +66,7 @@ export default function ConfirmTransfer(props: Props) {
     const nav = useNavigate();
     const addToast = useSetAtom(addToastAtom);
     const addPendingTransaction = useUpdateAtom(addPendingTransactionAtom);
+    const [showNotice, setShowNotice] = useState(false);
 
     useEffect(() => {
         if (selectedAddress !== address) {
@@ -74,7 +76,6 @@ export default function ConfirmTransfer(props: Props) {
 
     useEffect(() => {
         setDetailsExpanded(false);
-        return () => setDetailsExpanded(true);
     }, []);
 
     const send = async () => {
@@ -96,6 +97,7 @@ export default function ConfirmTransfer(props: Props) {
 
         addPendingTransaction(createPendingTransactionFromAccountTransaction(transaction, transactionHash, cost));
         setHash(transactionHash);
+        setShowNotice(true);
     };
 
     if (!address) {
@@ -115,6 +117,12 @@ export default function ConfirmTransfer(props: Props) {
 
     return (
         <div className="w-full flex-column justify-space-between align-center">
+            <TransactionMessage
+                transactionType={transactionType}
+                payload={payload}
+                showNotice={showNotice}
+                setShowNotice={setShowNotice}
+            />
             {props.showAsTokenTransfer ? (
                 <TokenTransferReceipt
                     {...commonProps}
@@ -130,7 +138,7 @@ export default function ConfirmTransfer(props: Props) {
                     <Button width="narrow" className="m-r-10" onClick={() => nav(-1)}>
                         {t('confirmTransfer.buttons.back')}
                     </Button>
-                    <Button width="narrow" onClick={() => send().catch((e) => addToast(e.toString()))}>
+                    <Button width="narrow" onClick={() => send().catch((e) => addToast(decodeURIComponent(e.message)))}>
                         {t('confirmTransfer.buttons.send')}
                     </Button>
                 </div>

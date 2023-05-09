@@ -14,6 +14,7 @@ import {
     IdentityProvider,
     RecoveryStatus,
     CredentialBalancePair,
+    ConfirmedIdentity,
 } from '@shared/storage/types';
 import {
     sessionIsRecovering,
@@ -31,7 +32,7 @@ import { mnemonicToSeedSync } from '@scure/bip39';
 import { decrypt } from '@shared/utils/crypto';
 import { Buffer } from 'buffer/';
 import { GRPCTIMEOUT } from '@shared/constants/networkConfiguration';
-import { addCredential, addIdentity, updateCredentials } from './update';
+import { addCredential, addIdentity, updateCredentials, updateIdentities } from './update';
 import bgMessageHandler from './message-handler';
 import { openWindow } from './window-management';
 
@@ -121,9 +122,9 @@ async function performRecovery() {
         const recoveryInputs: Omit<RecoveryInputs, 'identityIndex'> = { globalContext, net, seedAsHex };
 
         const identitiesToAdd: Identity[] = status.identitiesToAdd || [];
+        const identitiesToUpdate: Identity[] = status.identitiesToUpdate || [];
         const credsToAdd: CredentialBalancePair[] = status.credentialsToAdd || [];
         const completedProviders = status.completedProviders || [];
-        let nextId = status?.nextId || 0;
 
         const network = await storedCurrentNetwork.get();
         if (!network) {
@@ -131,6 +132,8 @@ async function performRecovery() {
         }
         const identities = await storedIdentities.get(network.genesisHash);
         const credentials = await storedCredentials.get(network.genesisHash);
+        // Either use the saved nextId, otherwise start from after the existing identities
+        let nextId = status?.nextId || identities?.length || 0;
 
         const client = createConcordiumClient(network.grpcUrl, network.grpcPort, { timeout: GRPCTIMEOUT });
         const getAccountInfo = (credId: string) =>
@@ -159,21 +162,29 @@ async function performRecovery() {
             while (emptyIndices < maxEmpty) {
                 // Check if there is already an identity on the current index
                 let identity = identities?.find(identityMatch({ index: identityIndex, providerIndex }));
-                if (!identity) {
+                if (!identity || identity.status === CreationStatus.Rejected) {
                     // Attempt to recover the identity
                     const recoverUrl = getRecoverUrl({ ...recoveryInputs, identityIndex }, provider);
                     const response = await fetch(recoverUrl);
                     if (response.ok) {
                         const idObject = await response.json();
-                        identity = {
-                            name: `Identity ${nextId + 1}`,
+                        const newIdentity: ConfirmedIdentity = {
+                            name: identity?.name || `Identity ${nextId + 1}`,
                             index: identityIndex,
                             providerIndex,
                             status: CreationStatus.Confirmed,
                             idObject,
                         };
-                        identitiesToAdd.push(identity);
-                        status.identitiesToAdd = identitiesToAdd;
+                        if (identity) {
+                            // There is rejected identity on this index
+                            identitiesToUpdate.push(newIdentity);
+                            status.identitiesToUpdate = identitiesToUpdate;
+                        } else {
+                            identitiesToAdd.push(newIdentity);
+                            status.identitiesToAdd = identitiesToAdd;
+                            nextId += 1;
+                        }
+                        identity = newIdentity;
                         await sessionRecoveryStatus.set(status);
                     }
                 }
@@ -203,7 +214,6 @@ async function performRecovery() {
 
                         credsToAdd.push(...foundCreds);
                     }
-                    nextId += 1;
                     emptyIndices = 0;
                 } else {
                     emptyIndices += 1;
@@ -233,6 +243,9 @@ async function performRecovery() {
         if (identitiesToAdd.length) {
             await addIdentity(identitiesToAdd, network.genesisHash);
         }
+        if (identitiesToUpdate) {
+            await updateIdentities(identitiesToUpdate, network.genesisHash);
+        }
         const [updates, newCreds] = partition(
             credsToAdd.map((pair) => pair.cred),
             (cred) => !!credentials && credentials.some((cand) => cred.credId === cand.credId)
@@ -244,7 +257,10 @@ async function performRecovery() {
             await addCredential(newCreds, network.genesisHash);
         }
         return {
-            identities: identitiesToAdd.map((id) => ({ index: id.index, providerIndex: id.providerIndex })),
+            identities: [...identitiesToAdd, ...identitiesToUpdate].map((id) => ({
+                index: id.index,
+                providerIndex: id.providerIndex,
+            })),
             accounts: credsToAdd.map((pair) => {
                 return { address: pair.cred.address, balance: pair.balance };
             }),

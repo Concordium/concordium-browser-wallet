@@ -1,10 +1,79 @@
 # Changelog
 
-## 1.0.1
+## 1.0.5
 
 ### Fixed
 
 -   The About page link to the terms and conditions pointed to the wrong URL. It now uses the value retrieved from the wallet proxy, or the correct default to the unified terms and conditions page.
+
+## 1.0.4
+
+### Fixed
+
+-   Validate during Baker/delegation stake reduction that at disposal funds can cover the fee.
+-   Delegation target being changed to passive delegation when the user did not choose to update it.
+-   Improve display of errors from the node when sending transactions.
+
+## 1.0.3
+
+### Fixed
+
+-   Some typos in the delegation texts.
+
+## 1.0.2
+
+### Added
+
+-   Popups, when stopping baking or delegation, that inform the user about the cooldown period.
+-   Popups, when updating baking/delegation, that inform the user that the update will take effect after the next payday, and reminders to give baker keys to the node.
+-   Display expected cost while choosing amount in configureBaker flows.
+-   Display expected cost while choosing amount in configureDelegation flows.
+
+### Changed
+
+-   Updated messages when confirming baker/delegation transactions.
+
+### Fixed
+
+-   Some issues in the baking and delegation text.
+-   Added missing key to events in the list of events inside the transaction details.
+-   Baking and delegation icons now also work in dark mode.
+-   An application crash when attempting to update the baker stake.
+-   Delegation target always defaulting to baker, even if current target was a passive delegation.
+-   Fixed incorrect cost used to validate baker stake.
+
+## 1.0.1
+
+### Added
+
+-   SendTransaction now validates that an account has sufficient funds before sending a transaction (requested though the api).
+-   Support for eID (Criipto) identity document types.
+-   An icon is now shown in the account list if an account is either baking or delegating.
+-   The stake label in the account balance view now shows whether the user is baking, delegating or doing neither.
+-   When creating an account that already exist, it will now be added to the wallet.
+
+### Changed
+
+-   Improved readability of events in transaction details.
+-   When choosing baker stake amount, the minimumEquityCapital is no longer the default value for non bakers.
+-   Baker transactions no longer display a minimum of 3 decimals when confirming the transaction.
+-   Added warning when decreasing stake.
+-   Added info when confirming transactions, for registering/lowering stake/removing baker and delegation.
+-   Changed header while registering a baker to `Register baker`.
+-   When registering as a baker, restaking and being open for delegation are now the default options.
+-   When registering for delegation, restaking and targeting a baker are now the default options.
+
+### Fixed
+
+-   In the manage page for adding CIS-2 tokens, the contract index is now always initially empty.
+-   Incorrect navigation flow on the "earn" page when switching between accounts.
+-   Issues with the expansion of the account balance details view when navigating through different flows.
+-   Recovery no longer assigns duplicate names to identities when new identities are visited earlier than existing ones during the recovery process.
+-   AddCIS2Tokens through API now adds tokens to the given account, instead of the currently selected one.
+-   Missing translations for some identity attributes.
+-   The bakerKey export is now the correct format that the node expects. (It now includes `bakerId` and the private keys)
+-   Removed double unit on CCD in token overview.
+-   A bug that caused an identity to not be recovered if there was a rejected one present in the same index.
 
 ## 1.0.0
 

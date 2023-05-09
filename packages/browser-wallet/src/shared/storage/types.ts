@@ -187,6 +187,7 @@ export interface CredentialBalancePair {
 export interface RecoveryStatus {
     payload: RecoveryPayload;
     identitiesToAdd?: Identity[];
+    identitiesToUpdate?: Identity[];
     credentialsToAdd?: CredentialBalancePair[];
     completedProviders?: number[];
     identityIndex?: number;

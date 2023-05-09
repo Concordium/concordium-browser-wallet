@@ -20,9 +20,9 @@ const t = {
         firstName: 'First name',
         idDocExpiresAt: 'ID valid until',
         idDocIssuedAt: 'ID valid from',
-        idDocIssuer: ' Identity document issuer',
+        idDocIssuer: 'Identity document issuer',
         idDocType: 'Identity document type',
-        idDocNo: ' Identity document number',
+        idDocNo: 'Identity document number',
         lastName: 'Last name',
         taxIdNo: 'Tax ID number',
         nationalIdNo: 'National ID number',
@@ -30,6 +30,23 @@ const t = {
         sex: 'Sex',
         dob: 'Date of birth',
     } as typeof attributeNamesMap,
+    idAttributeValues: {
+        sex: {
+            NotKnown: 'Not known',
+            Male: 'Male',
+            Female: 'Female',
+            NA: 'N/A',
+            Unavailable: 'Unavailable',
+        },
+        documentType: {
+            NA: 'N/A',
+            NationalIdCard: 'National ID card',
+            Passport: 'Passport',
+            DriversLicense: 'Drivers license',
+            ImmigrationCard: 'Immigration card',
+            Unavailable: 'Unavailable',
+        },
+    },
     account: {
         error: 'Unable to retrieve account balance',
     },
@@ -43,7 +60,7 @@ const t = {
             invalid: 'Invalid amount',
             insufficient: 'Insufficient funds',
             zero: 'Amount may not be zero',
-            belowBakerThreshold: 'Stake is below the threshold {{ threshold }} for baking',
+            belowBakerThreshold: 'Minimum stake: {{ threshold }}',
             exceedingDelegationCap: "Amount may not exceed the target pool's cap of {{ max }}.",
         },
         transaction: {
@@ -144,6 +161,11 @@ const t = {
             incorrectUrlField: 'Url field was present but did not contain an url',
         },
     },
+    cancel: 'Cancel',
+    continue: 'Continue',
+    okay: 'Okay',
+    notice: 'Notice',
+    estimatedTransactionFee: 'Estimated transaction fee',
 };
 
 export default t;

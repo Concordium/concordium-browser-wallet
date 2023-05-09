@@ -1,4 +1,11 @@
-import { OpenStatus, OpenStatusText } from '@concordium/web-sdk';
+import {
+    OpenStatus,
+    OpenStatusText,
+    AccountInfo,
+    GenerateBakerKeysOutput,
+    PrivateBakerKeys,
+    PublicBakerKeys,
+} from '@concordium/web-sdk';
 import i18n from '@popup/shell/i18n';
 import { toFixed } from 'wallet-common-helpers';
 
@@ -26,8 +33,25 @@ export function openStatusToDisplay(status: OpenStatus | OpenStatusText): string
     }
 }
 
-const formatCommission = toFixed(3);
+const formatCommission = toFixed(0);
 
 export const displayDecimalCommissionRate = (value: number) => formatCommission((value * 100).toString());
 export const displayFractionCommissionRate = (value: number) =>
     `${formatCommission(fractionResolutionToPercentage(value).toString())}%`;
+
+type BakerKeyExport = {
+    bakerId: number;
+} & PrivateBakerKeys &
+    PublicBakerKeys;
+
+/**
+ * Given the output generateBakerKeys and the account's accountInfo, return a object that is equivalent to the JSON, which should be provided to the node, for it to run as a baker.
+ */
+export function getBakerKeyExport(keysAndProofs: GenerateBakerKeysOutput, accountInfo: AccountInfo): BakerKeyExport {
+    const { proofAggregation, proofElection, proofSig, ...keys } = keysAndProofs;
+    return {
+        // TODO Fix faulty conversion in case max account index approaches 2^53
+        bakerId: Number(accountInfo.accountIndex),
+        ...keys,
+    };
+}

@@ -37,7 +37,6 @@ export default function Details() {
 
     useEffect(() => {
         setDetailsExpanded(false);
-        return () => setDetailsExpanded(true);
     }, []);
 
     if (token === undefined) {

@@ -12,10 +12,9 @@ import {
     MAX_DATE,
 } from '@concordium/web-sdk';
 import { useTranslation } from 'react-i18next';
-import { formatAttributeValue } from 'wallet-common-helpers';
 import countryTranslations from 'i18n-iso-countries';
 
-import { useGetAttributeName } from '@popup/shared/utils/identity-helpers';
+import { useDisplayAttributeValue, useGetAttributeName } from '@popup/shared/utils/identity-helpers';
 import { ConfirmedIdentity } from '@shared/storage/types';
 
 export type SecretStatement = Exclude<AtomicStatement, RevealStatement>;
@@ -209,6 +208,7 @@ export const isoToCountryName = (locale: string) => (isoCode: string) => country
 
 export function useStatementDescription(statement: SecretStatement, identity: ConfirmedIdentity): string | undefined {
     const { t, i18n } = useTranslation('idProofRequest', { keyPrefix: 'displayStatement.descriptions' });
+    const displayAttribute = useDisplayAttributeValue();
     const hasAttribute = identity.idObject.value.attributeList.chosenAttributes[statement.attributeTag] !== undefined;
 
     if (!hasAttribute) {
@@ -246,7 +246,7 @@ export function useStatementDescription(statement: SecretStatement, identity: Co
             case 'idDocType':
                 return text('docType', 'notDocType', {
                     typeNamesString: statement.set
-                        .map((type) => formatAttributeValue(statement.attributeTag, type))
+                        .map((type) => displayAttribute(statement.attributeTag, type))
                         .join(', '),
                 });
         }

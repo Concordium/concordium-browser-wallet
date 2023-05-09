@@ -1,7 +1,7 @@
 import React, { useContext, useEffect, useMemo, useState } from 'react';
-import { AccountInfo, isBakerAccount, OpenStatus } from '@concordium/web-sdk';
+import { isBakerAccount } from '@concordium/web-sdk';
 import { useTranslation } from 'react-i18next';
-import { microCcdToCcd, getCcdSymbol, isValidCcdString, ccdToMicroCcd } from 'wallet-common-helpers';
+import { getCcdSymbol, ccdToMicroCcd, displayAsCcd } from 'wallet-common-helpers';
 import { Validate } from 'react-hook-form';
 
 import Form, { useForm } from '@popup/shared/Form';
@@ -9,30 +9,17 @@ import { MultiStepFormPageProps } from '@popup/shared/MultiStepForm';
 import Submit from '@popup/shared/Form/Submit';
 import FormAmountInput from '@popup/shared/Form/AmountInput';
 import { validateBakerStake } from '@popup/shared/utils/transaction-helpers';
-import { getConfigureBakerEnergyCost } from '@shared/utils/energy-helpers';
 import { WithAccountInfo } from '@popup/shared/utils/account-helpers';
 import { accountPageContext } from '@popup/pages/Account/utils';
 import DisabledAmountInput from '@popup/shared/DisabledAmountInput';
-import Modal from '@popup/shared/Modal';
-import Button from '@popup/shared/Button';
+import {
+    convertEnergyToMicroCcd,
+    getConfigureBakerMaxEnergyCost,
+    getFullConfigureBakerMinEnergyCost,
+} from '@shared/utils/energy-helpers';
 import { earnPageContext, isAboveStakeWarningThreshold, STAKE_WARNING_THRESHOLD } from '../../utils';
-import { configureBakerChangesPayload, ConfigureBakerFlowState } from '../utils';
-
-function getCost(accountInfo: AccountInfo, formValues: Partial<ConfigureBakerFlowState>, amount: string) {
-    const formValuesFull = {
-        restake: formValues.restake || true,
-        openForDelegation: formValues.openForDelegation || OpenStatus.ClosedForAll,
-        metadataUrl: formValues.metadataUrl || '',
-        commissionRates: formValues.commissionRates || {
-            transactionCommission: 0,
-            bakingCommission: 0,
-            finalizationCommission: 0,
-        },
-        keys: formValues.keys || null,
-        amount: isValidCcdString(amount) ? amount : '0',
-    };
-    return getConfigureBakerEnergyCost(configureBakerChangesPayload(accountInfo)(formValuesFull));
-}
+import { ConfigureBakerFlowState, getCost } from '../utils';
+import { AmountWarning, WarningModal } from '../../Warning';
 
 type AmountPageForm = {
     amount: string;
@@ -43,19 +30,29 @@ type AmountPageProps = MultiStepFormPageProps<ConfigureBakerFlowState['amount'],
 
 export default function AmountPage({ initial, onNext, formValues, accountInfo }: AmountPageProps) {
     const { chainParameters } = useContext(earnPageContext);
-    const [openWarning, setOpenWarning] = useState(false);
+    const [openWarning, setOpenWarning] = useState<AmountWarning>(AmountWarning.None);
     const { t } = useTranslation('account', { keyPrefix: 'baking.configure' });
+    const { t: tShared } = useTranslation('shared');
     const { setDetailsExpanded } = useContext(accountPageContext);
 
     const form = useForm<AmountPageForm>({
-        defaultValues:
-            initial === undefined
-                ? { amount: microCcdToCcd(chainParameters?.minimumEquityCapital) }
-                : { amount: initial },
+        defaultValues: initial === undefined ? { amount: '' } : { amount: initial },
     });
     const amount = form.watch('amount');
+    const isBaker = isBakerAccount(accountInfo);
 
-    const cost = useMemo(() => getCost(accountInfo, formValues, amount), [amount]);
+    const cost = useMemo(() => {
+        const energyCost = isBaker ? getCost(accountInfo, formValues, amount) : getConfigureBakerMaxEnergyCost();
+        return chainParameters ? convertEnergyToMicroCcd(energyCost, chainParameters) : 0n;
+    }, [chainParameters, amount]);
+
+    const minCost = useMemo(() => {
+        if (isBaker) {
+            // min Cost only needed when we are registering a baker
+            return 0n;
+        }
+        return chainParameters ? convertEnergyToMicroCcd(getFullConfigureBakerMinEnergyCost(), chainParameters) : 0n;
+    }, [chainParameters, isBaker]);
 
     const validateAmount: Validate<string> = (amountToValidate) =>
         validateBakerStake(amountToValidate, chainParameters, accountInfo, cost);
@@ -65,15 +62,18 @@ export default function AmountPage({ initial, onNext, formValues, accountInfo }:
         return () => setDetailsExpanded(false);
     }, []);
 
-    const pendingChange = isBakerAccount(accountInfo) && accountInfo.accountBaker.pendingChange?.change !== undefined;
+    const pendingChange = isBaker && accountInfo.accountBaker.pendingChange?.change !== undefined;
 
     const onSubmit = (vs: AmountPageForm) => {
+        const stake = ccdToMicroCcd(vs.amount);
         // If the default value i.e. current stake or previosly chosen stake is already above the threshold, do not display the warning
         if (
             !(initial && isAboveStakeWarningThreshold(ccdToMicroCcd(initial), accountInfo)) &&
-            isAboveStakeWarningThreshold(ccdToMicroCcd(vs.amount), accountInfo)
+            isAboveStakeWarningThreshold(stake, accountInfo)
         ) {
-            setOpenWarning(true);
+            setOpenWarning(AmountWarning.AboveThreshold);
+        } else if (isBaker && accountInfo.accountBaker.stakedAmount > stake) {
+            setOpenWarning(AmountWarning.Decrease);
         } else {
             onNext(vs.amount);
         }
@@ -84,27 +84,16 @@ export default function AmountPage({ initial, onNext, formValues, accountInfo }:
             {(f) => (
                 <>
                     <div className="w-full">
-                        <Modal open={openWarning} onClose={() => setOpenWarning(false)}>
-                            <div>
-                                <h3 className="m-t-0">{t('warning')}</h3>
-                                <p className="white-space-break ">
-                                    {t('amount.overStakeThresholdWarning', {
-                                        threshold: STAKE_WARNING_THRESHOLD.toString(),
-                                    })}
-                                </p>
-                                <Button
-                                    className="m-t-10"
-                                    width="wide"
-                                    onClick={f.handleSubmit((vs) => onNext(vs.amount))}
-                                >
-                                    {t('continueButton')}
-                                </Button>
-                                <Button className="m-t-10" width="wide" onClick={() => setOpenWarning(false)}>
-                                    {t('amount.enterNewStake')}
-                                </Button>
-                            </div>
-                        </Modal>
-
+                        <WarningModal
+                            onCancel={() => setOpenWarning(AmountWarning.None)}
+                            onContinue={f.handleSubmit((vs) => onNext(vs.amount))}
+                            thresholdWarning={t('amount.overStakeThresholdWarning', {
+                                threshold: STAKE_WARNING_THRESHOLD.toString(),
+                            })}
+                            decreaseWarning={t('amount.decreaseWarning')}
+                            cancelText={t('amount.enterNewStake')}
+                            warningState={openWarning}
+                        />
                         <p className="m-t-0 text-center">{t('amount.description')}</p>
                         {pendingChange && (
                             <DisabledAmountInput label={t('amount.locked')} note={t('amount.lockedNote')} />
@@ -123,9 +112,15 @@ export default function AmountPage({ initial, onNext, formValues, accountInfo }:
                                 }}
                             />
                         )}
+                        <div className="earn__cost">
+                            <p className="m-t-0">
+                                {tShared('estimatedTransactionFee')}: {isBaker && displayAsCcd(cost)}
+                                {!isBaker && `\n${displayAsCcd(minCost)} - ${displayAsCcd(cost)}`}
+                            </p>
+                        </div>
                     </div>
                     <Submit className="m-t-20" width="wide">
-                        {t('continueButton')}
+                        {tShared('continue')}
                     </Submit>
                 </>
             )}

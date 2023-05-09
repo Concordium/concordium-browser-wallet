@@ -1,4 +1,4 @@
-import React from 'react';
+import React, { useContext, useEffect } from 'react';
 import NavList from '@popup/shared/NavList';
 import { Link, Route, Routes } from 'react-router-dom';
 import { useTranslation } from 'react-i18next';
@@ -6,9 +6,14 @@ import { accountSettingsRoutes } from './routes';
 import ConnectedSites from './ConnectedSites';
 import ExportPrivateKey from './ExportPrivateKey';
 import AccountStatement from './AccountStatement';
+import { accountPageContext } from '../utils';
 
 export function AccountSettings() {
     const { t } = useTranslation('account', { keyPrefix: 'settings' });
+    const { setDetailsExpanded } = useContext(accountPageContext);
+    useEffect(() => {
+        setDetailsExpanded(false);
+    }, []);
 
     return (
         <NavList className="account-settings-page">

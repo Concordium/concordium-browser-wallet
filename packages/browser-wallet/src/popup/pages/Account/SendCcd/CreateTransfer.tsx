@@ -150,6 +150,9 @@ function CreateTransaction({ tokens, setCost, setDetailsExpanded, cost }: Props 
     }, [Boolean(chosenToken), currentBalance, cost]);
 
     useEffect(() => {
+        // When switching account reset whether or not the user is picking a token.
+        setPickingToken(false);
+
         // Reset chosen token if the current account is changed and the new account does not have the chosen token.
         if (
             chosenToken &&
@@ -176,6 +179,10 @@ function CreateTransaction({ tokens, setCost, setDetailsExpanded, cost }: Props 
             form.clearErrors('cost');
         }
     }, [canCoverCost, fee]);
+
+    useEffect(() => {
+        setDetailsExpanded(true);
+    }, []);
 
     const validateRecipient = useCallback<Validate<string>>(async (recipientAddress: string) => {
         if (!recipientAddress) {
@@ -299,7 +306,7 @@ function CreateTransaction({ tokens, setCost, setDetailsExpanded, cost }: Props 
                         {f.formState.errors.cost && <p className="m-0">{f.formState.errors.cost.message}</p>}
                     </div>
                     <Submit className="create-transfer__button" width="medium">
-                        {t('sendCcd.buttons.continue')}
+                        {tShared('continue')}
                     </Submit>
                 </>
             )}

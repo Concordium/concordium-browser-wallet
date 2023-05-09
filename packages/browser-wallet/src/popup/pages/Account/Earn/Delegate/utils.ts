@@ -6,8 +6,17 @@ import {
     DelegationTargetType,
     isDelegatorAccount,
 } from '@concordium/web-sdk';
+import { getConfigureDelegationEnergyCost } from '@shared/utils/energy-helpers';
 import { not } from '@shared/utils/function-helpers';
-import { ccdToMicroCcd, DeepPartial, isDefined, microCcdToCcd, NotOptional } from 'wallet-common-helpers';
+import {
+    ccdToMicroCcd,
+    DeepPartial,
+    isDefined,
+    isValidCcdString,
+    microCcdToCcd,
+    NotOptional,
+} from 'wallet-common-helpers';
+import { getFormOrExistingValue } from '../utils';
 
 export type ConfigureDelegationFlowState = {
     pool: string | null;
@@ -64,7 +73,7 @@ export const getDelegationFlowChanges = (
 
 function toPayload(values: DeepPartial<ConfigureDelegationFlowState>): ConfigureDelegationPayload {
     let delegationTarget: DelegationTarget | undefined;
-    if (values.pool == null) {
+    if (values.pool === null) {
         delegationTarget = { delegateType: DelegationTargetType.PassiveDelegation };
     } else if (values.pool !== undefined) {
         delegationTarget = { delegateType: DelegationTargetType.Baker, bakerId: BigInt(values.pool) };
@@ -76,6 +85,12 @@ function toPayload(values: DeepPartial<ConfigureDelegationFlowState>): Configure
     };
 }
 
+function getConfigureDelegationChanges(updates: ConfigureDelegationFlowState, accountInfo?: AccountInfo) {
+    const existing = accountInfo !== undefined ? getExistingDelegationValues(accountInfo) : undefined;
+    const changes = existing !== undefined ? getDelegationFlowChanges(existing, updates) : updates;
+    return changes;
+}
+
 /**
  * Converts values of flow to a configure delegation payload.
  *
@@ -83,9 +98,8 @@ function toPayload(values: DeepPartial<ConfigureDelegationFlowState>): Configure
  */
 export const configureDelegationChangesPayload =
     (accountInfo?: AccountInfo, allowEmpty = true) =>
-    (values: ConfigureDelegationFlowState) => {
-        const existing = accountInfo !== undefined ? getExistingDelegationValues(accountInfo) : undefined;
-        const changes = existing !== undefined ? getDelegationFlowChanges(existing, values) : values;
+    (updates: ConfigureDelegationFlowState) => {
+        const changes = getConfigureDelegationChanges(updates, accountInfo);
 
         if (!allowEmpty && Object.values(changes).every(not(isDefined))) {
             throw new Error(
@@ -95,3 +109,16 @@ export const configureDelegationChangesPayload =
 
         return toPayload(changes);
     };
+
+export function getCost(accountInfo: AccountInfo, formValues: Partial<ConfigureDelegationFlowState>, amount: string) {
+    const existingDelegationValues = getExistingDelegationValues(accountInfo);
+    const formOrExistingAmount = getFormOrExistingValue(amount, existingDelegationValues?.amount);
+
+    const formValuesFull = {
+        amount: isValidCcdString(formOrExistingAmount) ? formOrExistingAmount : '0',
+        pool: getFormOrExistingValue(formValues.pool, existingDelegationValues?.pool),
+        redelegate: getFormOrExistingValue(formValues.redelegate, existingDelegationValues?.redelegate),
+    };
+
+    return getConfigureDelegationEnergyCost(toPayload(getConfigureDelegationChanges(formValuesFull, accountInfo)));
+}

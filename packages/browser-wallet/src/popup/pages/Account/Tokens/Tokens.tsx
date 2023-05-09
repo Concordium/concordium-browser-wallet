@@ -1,4 +1,4 @@
-import React, { useMemo } from 'react';
+import React, { useContext, useEffect, useMemo } from 'react';
 import { useTranslation } from 'react-i18next';
 import { Outlet, Route, Routes, useNavigate } from 'react-router-dom';
 import { displayAsCcd } from 'wallet-common-helpers';
@@ -22,6 +22,7 @@ import { AccountTokenDetails, useFlattenedAccountTokens } from './utils';
 import ManageTokens from './ManageTokens';
 import ChooseContract from './ManageTokens/ChooseContract';
 import { contractDetailsAtom, contractTokensAtom } from './ManageTokens/state';
+import { accountPageContext } from '../utils';
 
 type FtProps = {
     accountAddress: string;
@@ -106,7 +107,7 @@ function Fungibles({ account, toDetails }: ListProps) {
                 <CcdIcon className="token-list__icon token-list__icon--ccd" />
                 <div>
                     <div className="token-list__name">{CCD_METADATA.name}</div>
-                    <div className="token-list__balance">{displayAsCcd(accountInfo.accountAmount)} CCD</div>
+                    <div className="token-list__balance">{displayAsCcd(accountInfo.accountAmount)}</div>
                 </div>
             </div>
             {tokens.map((token) => (
@@ -170,6 +171,12 @@ function Collectibles({ account, toDetails }: ListProps) {
 
 function Tokens() {
     const { t } = useTranslation('account', { keyPrefix: 'tokens.tabBar' });
+    const { setDetailsExpanded } = useContext(accountPageContext);
+
+    useEffect(() => {
+        setDetailsExpanded(true);
+    }, []);
+
     return (
         <div className="tokens">
             <TabBar className="tokens__actions">

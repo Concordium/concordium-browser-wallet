@@ -5,6 +5,8 @@ import { useNavigate } from 'react-router-dom';
 import { ClassName, displayAsCcd } from 'wallet-common-helpers';
 import CopyButton from '@popup/shared/CopyButton';
 import CheckmarkIcon from '@assets/svg/checkmark-blue.svg';
+import BakerIcon from '@assets/svg/baker.svg';
+import DelegationIcon from '@assets/svg/delegation.svg';
 import { absoluteRoutes } from '@popup/constants/routes';
 import { credentialsAtom, selectedAccountAtom } from '@popup/store/account';
 import { identityNamesAtom } from '@popup/store/identity';
@@ -12,6 +14,7 @@ import { useTranslation } from 'react-i18next';
 import { displaySplitAddress } from '@popup/shared/utils/account-helpers';
 import { WalletCredential } from '@shared/storage/types';
 import { useAccountInfo } from '@popup/shared/AccountInfoListenerContext';
+import { isDelegatorAccount, isBakerAccount, AccountInfo } from '@concordium/web-sdk';
 import EntityList from '../EntityList';
 
 export type Account = { address: string };
@@ -22,6 +25,24 @@ type ItemProps = {
     selected: boolean;
     identityName: string;
 };
+
+function BakerOrDelegatorIcon({
+    accountInfo,
+    width,
+    className,
+}: {
+    accountInfo: AccountInfo;
+    width: string;
+    className: string;
+}) {
+    if (isDelegatorAccount(accountInfo)) {
+        return <DelegationIcon width={width} className={`${className} delegationBakingImage`} />;
+    }
+    if (isBakerAccount(accountInfo)) {
+        return <BakerIcon width={width} className={`${className} delegationBakingImage`} />;
+    }
+    return null;
+}
 
 function AccountListItem({ account, checked, selected, identityName }: ItemProps) {
     const accountInfo = useAccountInfo(account);
@@ -35,6 +56,7 @@ function AccountListItem({ account, checked, selected, identityName }: ItemProps
                     {displaySplitAddress(account.address)}{' '}
                     {selected && <CheckmarkIcon className="main-layout__header-list-item__check" />}
                 </div>
+                {accountInfo && <BakerOrDelegatorIcon accountInfo={accountInfo} width="15" className="absolute r-25" />}
                 <CopyButton
                     className="absolute r-0"
                     value={account.address}
