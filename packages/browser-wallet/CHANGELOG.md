@@ -1,5 +1,11 @@
 # Changelog
 
+## 1.0.5
+
+### Fixed
+
+-   Fixed an empty recovery displaying an error instead of informing the user that nothing was found.
+
 ## 1.0.4
 
 ### Fixed
