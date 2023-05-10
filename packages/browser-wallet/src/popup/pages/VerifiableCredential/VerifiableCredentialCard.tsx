@@ -1,7 +1,5 @@
 import React, { PropsWithChildren } from 'react';
 import CcdIcon from '@assets/svg/concordium.svg';
-import { useAtomValue } from 'jotai';
-import { storedVerifiableCredentialSchemasAtom } from '@popup/store/verifiable-credential';
 import {
     VerifiableCredential,
     VerifiableCredentialStatus,
@@ -28,25 +26,20 @@ function Logo() {
 }
 
 /**
- * Renders a credential using the applied schema. The schema is used to determine the correct
- * label for the attribute value.
- * @param credential the credential to render
- * @param schema the schema for the credential
- * @throws if there is a mismatch in fields between the credential and the schema, i.e. the schema is invalid.
+ * Renders a verifiable credential attribute.
  */
 function DisplayAttribute({
     attributeKey,
     attributeValue,
-    schema,
+    attributeTitle,
 }: {
     attributeKey: string;
     attributeValue: string | number;
-    schema: VerifiableCredentialSchema;
+    attributeTitle: string;
 }) {
-    const attributeSchema = schema.schema.properties.credentialSubject.properties[attributeKey];
     return (
         <div key={attributeKey} className="verifiable-credential__body-attributes-row">
-            <label>{attributeSchema.title.toLowerCase()}</label>
+            <label>{attributeTitle.toLowerCase()}</label>
             <div className="verifiable-credential__body-attributes-row-value">{attributeValue}</div>
         </div>
     );
@@ -77,23 +70,43 @@ function ClickableVerifiableCredential({ children, onClick }: PropsWithChildren<
     return <div className="verifiable-credential">{children}</div>;
 }
 
+/**
+ * Apply the schema to an attribute, adding the index and title from the schema. The index
+ * should be used for sorting, and the title should be displayed to a user.
+ * @param schema the schema to apply
+ * @returns the attribute together with its index and title.
+ * @throws if there is a mismatch in fields between the credential and the schema, i.e. the schema is invalid.
+ */
+function applySchema(
+    schema: VerifiableCredentialSchema
+): (value: [string, string | number]) => { index: number; title: string; key: string; value: string | number } {
+    return (value: [string, string | number]) => {
+        const attributeSchema = schema.schema.properties.credentialSubject.properties[value[0]];
+        if (!attributeSchema) {
+            throw new Error(`Missing attribute schema for key: ${value[0]}`);
+        }
+        return {
+            index: Number(attributeSchema.index),
+            title: attributeSchema.title,
+            key: value[0],
+            value: value[1],
+        };
+    };
+}
+
 export function VerifiableCredentialCard({
     credential,
+    schema,
     onClick,
 }: {
     credential: VerifiableCredential;
+    schema: VerifiableCredentialSchema;
     onClick?: () => void;
 }) {
-    const schemas = useAtomValue(storedVerifiableCredentialSchemasAtom);
-    if (schemas.loading) {
-        return null;
-    }
-    if (!Object.keys(schemas.value).length) {
-        throw new Error('Attempted to render a verifiable credential, but no schemas were found.');
-    } else if (!schemas.value[credential.credentialSchema.id]) {
-        throw new Error(`No schema with id: ${credential.credentialSchema.id}`);
-    }
-    const schema = schemas.value[credential.credentialSchema.id];
+    const attributes = Object.entries(credential.credentialSubject)
+        .filter((val) => val[0] !== 'id')
+        .map(applySchema(schema))
+        .sort((a, b) => a.index - b.index);
 
     return (
         <ClickableVerifiableCredential onClick={onClick}>
@@ -103,13 +116,13 @@ export function VerifiableCredentialCard({
                 <StatusIcon status={VerifiableCredentialStatus.Active} />
             </header>
             <div className="verifiable-credential__body-attributes">
-                {credential.credentialSubject &&
-                    Object.entries(credential.credentialSubject).map((value) => (
+                {attributes &&
+                    attributes.map((attribute) => (
                         <DisplayAttribute
-                            key={value[0]}
-                            attributeKey={value[0]}
-                            attributeValue={value[1]}
-                            schema={schema}
+                            key={attribute.key}
+                            attributeKey={attribute.key}
+                            attributeValue={attribute.value}
+                            attributeTitle={attribute.title}
                         />
                     ))}
             </div>

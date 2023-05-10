@@ -1,5 +1,8 @@
 import React, { useState } from 'react';
-import { storedVerifiableCredentialsAtom } from '@popup/store/verifiable-credential';
+import {
+    storedVerifiableCredentialSchemasAtom,
+    storedVerifiableCredentialsAtom,
+} from '@popup/store/verifiable-credential';
 import { useAtomValue } from 'jotai';
 import { VerifiableCredential } from '@shared/storage/types';
 import { VerifiableCredentialCard } from './VerifiableCredentialCard';
@@ -22,13 +25,27 @@ function NoVerifiableCredentials() {
  */
 export default function VerifiableCredentialList() {
     const verifiableCredentials = useAtomValue(storedVerifiableCredentialsAtom);
+    const schemas = useAtomValue(storedVerifiableCredentialSchemasAtom);
     const [selected, setSelected] = useState<VerifiableCredential>();
 
+    if (schemas.loading) {
+        return null;
+    }
     if (!verifiableCredentials) {
         return <NoVerifiableCredentials />;
     }
+    if (!Object.keys(schemas.value).length) {
+        throw new Error('Attempted to render verifiable credentials, but no schemas were found.');
+    } else {
+        for (const verifiableCredential of verifiableCredentials) {
+            if (!Object.keys(schemas.value).includes(verifiableCredential.credentialSchema.id)) {
+                throw new Error(`A credential did not have a corresponding schema: ${verifiableCredential.id}`);
+            }
+        }
+    }
+
     if (selected) {
-        return <VerifiableCredentialCard credential={selected} />;
+        return <VerifiableCredentialCard credential={selected} schema={schemas.value[selected.credentialSchema.id]} />;
     }
 
     return (
@@ -39,6 +56,7 @@ export default function VerifiableCredentialList() {
                         // eslint-disable-next-line react/no-array-index-key
                         key={index}
                         credential={credential}
+                        schema={schemas.value[credential.credentialSchema.id]}
                         onClick={() => setSelected(credential)}
                     />
                 );
