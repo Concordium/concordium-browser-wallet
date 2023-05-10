@@ -12,6 +12,7 @@ import {
     TokenStorage,
     AcceptedTermsState,
     VerifiableCredential,
+    VerifiableCredentialSchema,
 } from './types';
 
 export type StorageAccessor<V> = {
@@ -149,6 +150,10 @@ export const storedAcceptedTerms = makeStorageAccessor<AcceptedTermsState>('loca
 export const storedVerifiableCredentials = makeIndexedStorageAccessor<VerifiableCredential[]>(
     'local',
     ChromeStorageKey.VerifiableCredentials
+);
+export const storedVerifiableCredentialSchemas = makeStorageAccessor<Record<string, VerifiableCredentialSchema>>(
+    'local',
+    ChromeStorageKey.VerifiableCredentialSchemas
 );
 
 export const sessionOpenPrompt = makeStorageAccessor<boolean>('session', ChromeStorageKey.OpenPrompt);

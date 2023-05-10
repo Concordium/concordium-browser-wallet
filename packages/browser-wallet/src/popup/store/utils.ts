@@ -27,6 +27,7 @@ import {
     sessionOpenPrompt,
     storedAcceptedTerms,
     storedVerifiableCredentials,
+    storedVerifiableCredentialSchemas,
 } from '@shared/storage/access';
 import { ChromeStorageKey } from '@shared/storage/types';
 import { atom, PrimitiveAtom, WritableAtom } from 'jotai';
@@ -58,6 +59,7 @@ const accessorMap: Record<ChromeStorageKey, StorageAccessor<any>> = {
     [ChromeStorageKey.OpenPrompt]: sessionOpenPrompt,
     [ChromeStorageKey.AcceptedTerms]: storedAcceptedTerms,
     [ChromeStorageKey.VerifiableCredentials]: useIndexedStorage(storedVerifiableCredentials, getGenesisHash),
+    [ChromeStorageKey.VerifiableCredentialSchemas]: storedVerifiableCredentialSchemas,
 };
 
 export function resetOnUnmountAtom<V>(initial: V): PrimitiveAtom<V> {

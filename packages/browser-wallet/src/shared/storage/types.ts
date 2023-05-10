@@ -26,6 +26,7 @@ export enum ChromeStorageKey {
     OpenPrompt = 'openPrompt',
     AcceptedTerms = 'acceptedTerms',
     VerifiableCredentials = 'verifiableCredentials',
+    VerifiableCredentialSchemas = 'verifiableCredentialSchemas',
 }
 
 export enum Theme {
@@ -253,6 +254,8 @@ export type AcceptedTermsState = {
     version: string;
 };
 
+// TODO[orhoj]: The types are incomplete as the final schemas are not ready.
+// The types used here are taken from the draft documents available.
 export enum VerifiableCredentialStatus {
     Active,
     Revoked,
@@ -260,8 +263,50 @@ export enum VerifiableCredentialStatus {
     NotActivated,
 }
 
+interface CredentialSchema {
+    id: string;
+    type: string;
+}
+
+export type CredentialSubject = { id: string } & Record<string, string | number>;
+
 export interface VerifiableCredential {
+    context: string[];
+    id: string;
+    type: string[];
+    issuer: string;
+    issuanceDate: string;
+    credentialSubject: CredentialSubject;
+    credentialSchema: CredentialSchema;
+}
+
+interface CredentialSchemaProperty {
     title: string;
-    status: VerifiableCredentialStatus;
-    attributes: Record<string, string | number>;
+    type: 'string' | 'number';
+    description: string;
+    index: string;
+}
+
+interface CredentialSchemaSubject {
+    properties: { id: CredentialSchemaProperty } & Record<string, CredentialSchemaProperty>;
+}
+
+export interface SchemaProperties {
+    credentialSubject: CredentialSchemaSubject;
+}
+
+export interface VerifiableCredentialSchemaSchema {
+    // credentialSubject: CredentialSchemaSubject;
+    properties: SchemaProperties;
+}
+
+export interface VerifiableCredentialSchema {
+    type: string;
+    version: string;
+    id: string;
+    name: string;
+    author: string;
+    authored: string;
+    schema: VerifiableCredentialSchemaSchema;
+    proof: string;
 }

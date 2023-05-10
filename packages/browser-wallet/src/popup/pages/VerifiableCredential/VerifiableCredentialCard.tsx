@@ -1,6 +1,12 @@
-import React from 'react';
+import React, { PropsWithChildren } from 'react';
 import CcdIcon from '@assets/svg/concordium.svg';
-import { VerifiableCredential, VerifiableCredentialStatus } from '../../../shared/storage/types';
+import { useAtomValue } from 'jotai';
+import { storedVerifiableCredentialSchemasAtom } from '@popup/store/verifiable-credential';
+import {
+    VerifiableCredential,
+    VerifiableCredentialStatus,
+    VerifiableCredentialSchema,
+} from '../../../shared/storage/types';
 
 function StatusIcon({ status }: { status: VerifiableCredentialStatus }) {
     switch (status) {
@@ -22,22 +28,53 @@ function Logo() {
 }
 
 /**
- * Provide the required clickable properties if onClick is defined.
+ * Renders a credential using the applied schema. The schema is used to determine the correct
+ * label for the attribute value.
+ * @param credential the credential to render
+ * @param schema the schema for the credential
+ * @throws if there is a mismatch in fields between the credential and the schema, i.e. the schema is invalid.
  */
-function clickableProperties(onClick?: () => void) {
+function DisplayAttribute({
+    attributeKey,
+    attributeValue,
+    schema,
+}: {
+    attributeKey: string;
+    attributeValue: string | number;
+    schema: VerifiableCredentialSchema;
+}) {
+    const attributeSchema = schema.schema.properties.credentialSubject.properties[attributeKey];
+    return (
+        <div key={attributeKey} className="verifiable-credential__body-attributes-row">
+            <label>{attributeSchema.title.toLowerCase()}</label>
+            <div className="verifiable-credential__body-attributes-row-value">{attributeValue}</div>
+        </div>
+    );
+}
+
+/**
+ * Wraps children components in a verifiable credential card that is clickable if onClick
+ * is defined.
+ */
+function ClickableVerifiableCredential({ children, onClick }: PropsWithChildren<{ onClick?: () => void }>) {
     if (onClick) {
-        return {
-            onClick,
-            onKeyDown: (e: React.KeyboardEvent<HTMLDivElement>) => {
-                if (e.key === 'Enter' && onClick) {
-                    onClick();
-                }
-            },
-            role: 'button',
-            tabIndex: 0,
-        };
+        return (
+            <div
+                className="verifiable-credential"
+                onClick={onClick}
+                onKeyDown={(e) => {
+                    if (e.key === 'Enter') {
+                        onClick();
+                    }
+                }}
+                role="button"
+                tabIndex={0}
+            >
+                {children}
+            </div>
+        );
     }
-    return {};
+    return <div className="verifiable-credential">{children}</div>;
 }
 
 export function VerifiableCredentialCard({
@@ -47,22 +84,30 @@ export function VerifiableCredentialCard({
     credential: VerifiableCredential;
     onClick?: () => void;
 }) {
+    const schemas = useAtomValue(storedVerifiableCredentialSchemasAtom);
+    if (schemas.loading || !Object.keys(schemas.value).length) {
+        return null;
+    }
+    const schema = schemas.value[credential.credentialSchema.id];
+
     return (
-        <div className="verifiable-credential" {...clickableProperties(onClick)}>
+        <ClickableVerifiableCredential onClick={onClick}>
             <header>
                 <Logo />
-                <div className="verifiable-credential__header-title">{credential.title}</div>
-                <StatusIcon status={credential.status} />
+                <div className="verifiable-credential__header-title">{credential.type[0]}</div>
+                <StatusIcon status={VerifiableCredentialStatus.Active} />
             </header>
             <div className="verifiable-credential__body-attributes">
-                {credential.attributes &&
-                    Object.entries(credential.attributes).map((value) => (
-                        <div key={value[0]} className="verifiable-credential__body-attributes-row">
-                            <label>attribute label {value[0]}</label>
-                            <div className="verifiable-credential__body-attributes-row-value">{value[1]}</div>
-                        </div>
+                {credential.credentialSubject &&
+                    Object.entries(credential.credentialSubject).map((value) => (
+                        <DisplayAttribute
+                            key={value[0]}
+                            attributeKey={value[0]}
+                            attributeValue={value[1]}
+                            schema={schema}
+                        />
                     ))}
             </div>
-        </div>
+        </ClickableVerifiableCredential>
     );
 }
