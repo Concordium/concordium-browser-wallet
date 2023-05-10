@@ -85,8 +85,13 @@ export function VerifiableCredentialCard({
     onClick?: () => void;
 }) {
     const schemas = useAtomValue(storedVerifiableCredentialSchemasAtom);
-    if (schemas.loading || !Object.keys(schemas.value).length) {
+    if (schemas.loading) {
         return null;
+    }
+    if (!Object.keys(schemas.value).length) {
+        throw new Error('Attempted to render a verifiable credential, but no schemas were found.');
+    } else if (!schemas.value[credential.credentialSchema.id]) {
+        throw new Error(`No schema with id: ${credential.credentialSchema.id}`);
     }
     const schema = schemas.value[credential.credentialSchema.id];
 
