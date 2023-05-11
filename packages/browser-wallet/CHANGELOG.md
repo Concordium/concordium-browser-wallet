@@ -1,6 +1,6 @@
 # Changelog
 
-## Unreleased
+## 1.0.5
 
 ### Added
 
@@ -8,6 +8,7 @@
 
 ### Fixed
 
+-   The About page link to the terms and conditions pointed to the wrong URL. It now uses the value retrieved from the wallet proxy, or the correct default to the unified terms and conditions page.
 -   Link to transaction log on stagenet was incorrect.
 
 ## 1.0.4
