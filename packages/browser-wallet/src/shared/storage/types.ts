@@ -172,6 +172,7 @@ export interface NetworkConfiguration {
     name: string;
     jsonRpcUrl: string;
     explorerUrl: string;
+    ccdScanUrl: string;
 }
 
 export type RecoveryPayload = {

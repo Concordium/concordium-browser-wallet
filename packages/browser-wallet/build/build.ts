@@ -6,6 +6,7 @@ import svgrPlugin from 'esbuild-plugin-svgr';
 import { copy } from 'esbuild-plugin-copy';
 import fs from 'fs';
 import { manifestPlugin } from './plugins/chrome-extension-manifest-v3';
+import { isDevelopmentBuild } from '../src/shared/utils/environment-helpers';
 
 const watch = Boolean(process.env.WATCH);
 
@@ -34,7 +35,7 @@ const config: BuildOptions = {
     minify: true,
     metafile: true,
     logLevel: 'info',
-    sourcemap: process.env.NODE_ENV !== 'production' && 'inline',
+    sourcemap: isDevelopmentBuild() && 'inline',
     target: ['chrome67'],
     outdir: 'dist',
     define: {

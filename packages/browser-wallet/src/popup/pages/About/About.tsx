@@ -3,9 +3,9 @@ import React from 'react';
 import { useTranslation } from 'react-i18next';
 import urls from '@shared/constants/url';
 import ExternalLink from '@popup/shared/ExternalLink';
+import { getVersionName } from 'src/shared/utils/environment-helpers';
 import { useAtomValue } from 'jotai';
 import { acceptedTermsAtom } from '@popup/store/settings';
-import packageJson from '../../../../package.json';
 
 export default function About() {
     const { t } = useTranslation('about');
@@ -19,7 +19,7 @@ export default function About() {
         <div className="about-page">
             <div>
                 <h3>{t('version')}</h3>
-                {packageJson.version}
+                {getVersionName()}
             </div>
 
             <div className="about-page__support">
