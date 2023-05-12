@@ -31,7 +31,7 @@ export default function VerifiableCredentialList() {
     if (schemas.loading) {
         return null;
     }
-    if (!verifiableCredentials) {
+    if (!verifiableCredentials || !verifiableCredentials.length) {
         return <NoVerifiableCredentials />;
     }
     if (!Object.keys(schemas.value).length) {
