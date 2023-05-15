@@ -8,6 +8,7 @@ const t = {
     rejectReason: 'Reject reason',
     noTransactions: 'This account has no transactions yet.',
     error: 'Unable to retrieve transaction history',
+    requestCcd: 'Request CCD',
 };
 
 export default t;
