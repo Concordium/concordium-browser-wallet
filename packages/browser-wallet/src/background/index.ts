@@ -23,7 +23,7 @@ import { getTermsAndConditionsConfig } from '@shared/utils/network-helpers';
 import { Buffer } from 'buffer/';
 import { BackgroundSendTransactionPayload } from '@shared/utils/types';
 import { parsePayload } from '@shared/utils/payload-helpers';
-import { mainnet, testnet } from '@shared/constants/networkConfiguration';
+import { mainnet, stagenet, testnet } from '@shared/constants/networkConfiguration';
 import bgMessageHandler from './message-handler';
 import {
     forwardToPopup,
@@ -159,9 +159,23 @@ async function checkForNewTermsAndConditions() {
     }
 }
 
+// TODO: This is a temporary hacky way to do migration. When more involved migration is required
+// we should implement a proper migration framework so that migration only runs once.
 async function migrateNetwork(network: NetworkConfiguration) {
-    if (network.genesisHash && (!network.grpcUrl || !network.grpcPort)) {
-        await storedCurrentNetwork.set(network.genesisHash === mainnet.genesisHash ? mainnet : testnet);
+    if (network.genesisHash && (!network.grpcUrl || !network.grpcPort || !network.ccdScanUrl)) {
+        switch (network.genesisHash) {
+            case mainnet.genesisHash:
+                await storedCurrentNetwork.set(mainnet);
+                break;
+            case testnet.genesisHash:
+                await storedCurrentNetwork.set(testnet);
+                break;
+            case stagenet.genesisHash:
+                await storedCurrentNetwork.set(stagenet);
+                break;
+            default:
+                break;
+        }
     }
 }
 

@@ -11,7 +11,8 @@ import { isMainnet } from '@shared/utils/network-helpers';
 import { pendingIdentityAtom } from '@popup/store/identity';
 import Modal from '@popup/shared/Modal';
 import { useNavigate } from 'react-router-dom';
-import { mainnet, testnet } from '@shared/constants/networkConfiguration';
+import { mainnet, testnet, stagenet } from '@shared/constants/networkConfiguration';
+import { isDevelopmentBuild } from '@shared/utils/environment-helpers';
 
 function NetworkConfigurationComponent({ networkConfiguration }: { networkConfiguration: NetworkConfiguration }) {
     const { t } = useTranslation('networkSettings');
@@ -61,6 +62,11 @@ export default function NetworkSettings() {
     const [pendingIdentity, setPendingIdentity] = useAtom(pendingIdentityAtom);
     const nav = useNavigate();
 
+    const networks = [mainnet, testnet];
+    if (isDevelopmentBuild()) {
+        networks.push(stagenet);
+    }
+
     return (
         <div className="network-settings-page">
             <Modal disableClose open={Boolean(pendingIdentity)}>
@@ -84,7 +90,7 @@ export default function NetworkSettings() {
                 </div>
             </Modal>
             <div className="network-settings-page__list">
-                {[mainnet, testnet].map((network) => {
+                {networks.map((network) => {
                     return (
                         <SidedRow
                             key={network.genesisHash}

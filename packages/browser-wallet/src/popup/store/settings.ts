@@ -8,8 +8,8 @@ import {
 import { atom } from 'jotai';
 import { EventType } from '@concordium/browser-wallet-api-helpers';
 import { popupMessageHandler } from '@popup/shared/message-handler';
-import { HttpProvider, JsonRpcClient, ConcordiumGRPCClient, createConcordiumClient } from '@concordium/web-sdk';
-import { sessionCookie, storedConnectedSites, storedCredentials } from '@shared/storage/access';
+import { ConcordiumGRPCClient, createConcordiumClient } from '@concordium/web-sdk';
+import { storedConnectedSites, storedCredentials } from '@shared/storage/access';
 import { GRPCTIMEOUT, mainnet } from '@shared/constants/networkConfiguration';
 import { atomWithChromeStorage } from './utils';
 import { selectedAccountAtom } from './account';
@@ -72,20 +72,6 @@ export const networkConfigurationAtom = atom<NetworkConfiguration, NetworkConfig
         });
     }
 );
-
-const cookieAtom = atomWithChromeStorage<string | undefined>(ChromeStorageKey.Cookie, undefined);
-export const jsonRpcClientAtom = atom<JsonRpcClient>((get) => {
-    const network = get(storedNetworkConfigurationAtom);
-    const cookie = get(cookieAtom);
-    return new JsonRpcClient(
-        new HttpProvider(
-            network.jsonRpcUrl,
-            undefined,
-            (value: string) => sessionCookie.set(network.genesisHash, value),
-            cookie
-        )
-    );
-});
 
 export const grpcClientAtom = atom<ConcordiumGRPCClient>((get) => {
     const network = get(storedNetworkConfigurationAtom);
