@@ -243,7 +243,7 @@ async function performRecovery() {
         if (identitiesToAdd.length) {
             await addIdentity(identitiesToAdd, network.genesisHash);
         }
-        if (identitiesToUpdate) {
+        if (identitiesToUpdate.length) {
             await updateIdentities(identitiesToUpdate, network.genesisHash);
         }
         const [updates, newCreds] = partition(
