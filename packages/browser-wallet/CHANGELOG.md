@@ -5,12 +5,17 @@
 ### Added
 
 -   A build script for making builds that include the stagenet network.
+-   Text that a transaction has been submitted.
 
 ### Fixed
 
 -   The About page link to the terms and conditions pointed to the wrong URL. It now uses the value retrieved from the wallet proxy, or the correct default to the unified terms and conditions page.
 -   Link to transaction log on stagenet was incorrect.
 -   Fixed an empty recovery displaying an error instead of informing the user that nothing was found.
+
+### Changed
+
+-   Messages when confirming baker/delegation transactions no longer appears after the transaction has been submitted.
 
 ## 1.0.4
 
