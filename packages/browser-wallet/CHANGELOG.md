@@ -5,6 +5,7 @@
 ### Added
 
 -   A build script for making builds that include the stagenet network.
+-   Text that a transaction has been submitted.
 
 ### Fixed
 
@@ -13,6 +14,10 @@
 -   Fixed an empty recovery displaying an error instead of informing the user that nothing was found.
 -   An issue where the transaction list view would show the `Request CCD` button while loading the initial batch of transactions.
 -   Added a missing translation for the `Request CCD` button.
+
+### Changed
+
+-   Messages when confirming baker/delegation transactions no longer appears after the transaction has been submitted.
 
 ## 1.0.4
 
