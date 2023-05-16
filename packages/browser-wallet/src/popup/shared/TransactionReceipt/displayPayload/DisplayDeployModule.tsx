@@ -9,7 +9,7 @@ interface Props {
 }
 
 /**
- * Displays an overview of a update contract transaction.
+ * Displays an overview of a deploy module transaction.
  */
 export default function DisplayDeployModule({ payload }: Props) {
     const { t } = useTranslation('sendTransaction');
