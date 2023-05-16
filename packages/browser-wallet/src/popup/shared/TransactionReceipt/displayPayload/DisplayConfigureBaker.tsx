@@ -16,7 +16,7 @@ interface KeyProps {
 }
 
 export function DisplayKey({ value }: KeyProps) {
-    return <div className="transaction-receipt__key mono">{chunkString(value, 32).join('\n')}</div>;
+    return <div className="transaction-receipt__value mono">{chunkString(value, 32).join('\n')}</div>;
 }
 
 export default function DisplayConfigureBaker({ payload }: Props) {

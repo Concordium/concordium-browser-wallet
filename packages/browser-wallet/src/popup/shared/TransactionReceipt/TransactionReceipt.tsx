@@ -12,6 +12,7 @@ import {
     RegisterDataPayload,
     ConfigureDelegationPayload,
     ConfigureBakerPayload,
+    DeployModulePayload,
 } from '@concordium/web-sdk';
 import { Cis2TransferParameters } from '@shared/utils/types';
 import { SmartContractParameters } from '@concordium/browser-wallet-api-helpers';
@@ -29,6 +30,7 @@ import Button from '../Button';
 import DisplayRegisterData from './displayPayload/DisplayRegisterData';
 import DisplayConfigureDelegation from './displayPayload/DisplayConfigureDelegation';
 import DisplayConfigureBaker from './displayPayload/DisplayConfigureBaker';
+import DisplayDeployModule from './displayPayload/DisplayDeployModule';
 
 export type GenericTransactionReceiptProps = {
     className?: string;
@@ -70,6 +72,8 @@ function displayPayload({ payload, type }: Omit<AccountTransaction, 'header'>, p
             return <DisplayConfigureDelegation payload={payload as ConfigureDelegationPayload} />;
         case AccountTransactionType.ConfigureBaker:
             return <DisplayConfigureBaker payload={payload as ConfigureBakerPayload} />;
+        case AccountTransactionType.DeployModule:
+            return <DisplayDeployModule payload={payload as DeployModulePayload} />;
         default:
             return <DisplayGenericPayload payload={payload} />;
     }

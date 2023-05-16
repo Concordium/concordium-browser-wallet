@@ -34,6 +34,9 @@ function replacer(this: any, k: string, value: any) {
     if (rawValue instanceof Date) {
         return { '@type': serializationTypes.Date, value };
     }
+    if (Buffer.isBuffer(rawValue)) {
+        return { '@type': serializationTypes.Buffer, value: rawValue.toString('base64') };
+    }
     // Support older versions of the SDK
     if (isGtuAmount(rawValue)) {
         return { '@type': serializationTypes.CcdAmount, value: rawValue.microGtuAmount.toString() };

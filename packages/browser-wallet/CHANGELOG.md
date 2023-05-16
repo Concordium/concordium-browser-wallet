@@ -5,6 +5,7 @@
 ### Added
 
 -   A build script for making builds that include the stagenet network.
+-   `deployModule` transactions now display the hash instead of the entire module source.
 -   Text that a transaction has been submitted.
 
 ### Fixed
@@ -14,6 +15,7 @@
 -   Fixed an empty recovery displaying an error instead of informing the user that nothing was found.
 -   An issue where the transaction list view would show the `Request CCD` button while loading the initial batch of transactions.
 -   Added a missing translation for the `Request CCD` button.
+-   `deployModule` transactions no longer cause the wallet to crash, when supplied with `sendTransaction`.
 
 ### Changed
 
