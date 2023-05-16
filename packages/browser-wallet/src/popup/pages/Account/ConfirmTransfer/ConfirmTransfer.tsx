@@ -32,6 +32,7 @@ import { SmartContractParameters } from '@concordium/browser-wallet-api-helpers'
 import { TokenMetadata } from '@shared/storage/types';
 import { accountRoutes } from '../routes';
 import { TransactionMessage } from './TransactionMessage';
+import TransactionPopup from './TransactionPopup';
 
 type BaseProps = {
     setDetailsExpanded: (expanded: boolean) => void;
@@ -66,7 +67,8 @@ export default function ConfirmTransfer(props: Props) {
     const nav = useNavigate();
     const addToast = useSetAtom(addToastAtom);
     const addPendingTransaction = useUpdateAtom(addPendingTransactionAtom);
-    const [showNotice, setShowNotice] = useState(false);
+    const [showPopup, setShowPopup] = useState(false);
+    const isSent = Boolean(hash);
 
     useEffect(() => {
         if (selectedAddress !== address) {
@@ -97,7 +99,7 @@ export default function ConfirmTransfer(props: Props) {
 
         addPendingTransaction(createPendingTransactionFromAccountTransaction(transaction, transactionHash, cost));
         setHash(transactionHash);
-        setShowNotice(true);
+        setShowPopup(true);
     };
 
     if (!address) {
@@ -117,12 +119,16 @@ export default function ConfirmTransfer(props: Props) {
 
     return (
         <div className="w-full flex-column justify-space-between align-center">
-            <TransactionMessage
+            <TransactionPopup
                 transactionType={transactionType}
                 payload={payload}
-                showNotice={showNotice}
-                setShowNotice={setShowNotice}
+                showPopup={showPopup}
+                setShowPopup={setShowPopup}
             />
+            {!isSent && <TransactionMessage transactionType={transactionType} payload={payload} />}
+            {isSent && (
+                <p className="white-space-break text-center m-h-20 m-t-20 m-b-0">{t('confirmTransfer.submitted')}</p>
+            )}
             {props.showAsTokenTransfer ? (
                 <TokenTransferReceipt
                     {...commonProps}
@@ -133,7 +139,7 @@ export default function ConfirmTransfer(props: Props) {
             ) : (
                 <GenericTransactionReceipt {...commonProps} />
             )}
-            {!hash && (
+            {!isSent && (
                 <div className="flex justify-center p-b-10 m-h-20">
                     <Button width="narrow" className="m-r-10" onClick={() => nav(-1)}>
                         {t('confirmTransfer.buttons.back')}
@@ -143,7 +149,7 @@ export default function ConfirmTransfer(props: Props) {
                     </Button>
                 </div>
             )}
-            {hash && (
+            {isSent && (
                 <div className="p-b-10">
                     <Button
                         width="medium"
