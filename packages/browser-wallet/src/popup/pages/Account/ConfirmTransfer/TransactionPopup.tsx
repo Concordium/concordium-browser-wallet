@@ -36,7 +36,7 @@ export default function TransactionPopup({ transactionType, payload, showPopup, 
                 case AccountTransactionType.ConfigureBaker: {
                     if (isBakerAccount(accountInfo)) {
                         const newStake = (payload as ConfigureBakerPayload).stake?.microCcdAmount;
-                        if (!newStake || accountInfo.accountBaker.stakedAmount < newStake) {
+                        if (newStake === undefined || accountInfo.accountBaker.stakedAmount < newStake) {
                             if ((payload as ConfigureBakerPayload).keys) {
                                 return t('configureBaker.updateKeys');
                             }
@@ -50,7 +50,7 @@ export default function TransactionPopup({ transactionType, payload, showPopup, 
                 case AccountTransactionType.ConfigureDelegation: {
                     if (isDelegatorAccount(accountInfo)) {
                         const newStake = (payload as ConfigureDelegationPayload).stake?.microCcdAmount;
-                        if (!newStake || accountInfo.accountDelegation.stakedAmount < newStake) {
+                        if (newStake === undefined || accountInfo.accountDelegation.stakedAmount < newStake) {
                             return t('configureDelegation.update');
                         }
                     } else {
