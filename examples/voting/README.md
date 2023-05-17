@@ -13,6 +13,7 @@ The example project serves as a working example of how to integrate with smart c
 ## Installing
 
 -   Run `yarn` in package root.
+-   Build concordium helpers by running `yarn build:api-helpers`.
 
 ## Running the voting example
 

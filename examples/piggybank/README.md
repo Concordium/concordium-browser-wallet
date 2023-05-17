@@ -10,7 +10,7 @@ It both includes a page for a V0 and a V1 version of the piggy bank smart contra
 ## Installing
 
 -   Run `yarn` in package root.
--   Build concordium helpers by running `yarn build:all`.
+-   Build concordium helpers by running `yarn build:api-helpers`.
 
 ## Running the example
 

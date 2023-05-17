@@ -12,7 +12,7 @@ The example project included in this repository serves as a working example of h
 ## Installing
 
 -   Run `yarn` in package root.
--   Run `yarn build:all` in package root.
+-   Build concordium helpers by running `yarn build:api-helpers`.
 
 ## Running the eSealing example
 
