@@ -32,6 +32,7 @@ import RecoveryFinish from '@popup/pages/Recovery/RecoveryFinish';
 import ChangePasscode from '@popup/pages/ChangePasscode/ChangePasscode';
 import AddTokensPrompt from '@popup/pages/ExternalAddTokens/ExternalAddTokens';
 import IdProofRequest from '@popup/pages/IdProofRequest';
+import ConnectAccountsRequest from '@popup/pages/ConnectAccountsRequest';
 
 type PromptKey = keyof Omit<typeof absoluteRoutes['prompt'], 'path'>;
 
@@ -82,6 +83,8 @@ function usePrompt(type: InternalMessageType | MessageType, promptKey: PromptKey
 
 export default function Routes() {
     const handleConnectionResponse = useMessagePrompt<boolean>(InternalMessageType.Connect, 'connectionRequest');
+    const handleConnectAccountsResponse = useMessagePrompt<boolean>(InternalMessageType.ConnectAccounts, 'connectAccountsRequest');
+
     const handleSendTransactionResponse = useMessagePrompt<MessageStatusWrapper<string>>(
         InternalMessageType.SendTransaction,
         'sendTransaction'
@@ -145,6 +148,15 @@ export default function Routes() {
                         <ConnectionRequest
                             onAllow={() => handleConnectionResponse(true)}
                             onReject={() => handleConnectionResponse(false)}
+                        />
+                    }
+                />
+                <Route
+                    path={relativeRoutes.prompt.connectAccountsRequest.path}
+                    element={
+                        <ConnectAccountsRequest
+                            onAllow={() => handleConnectAccountsResponse(true)}
+                            onReject={() => handleConnectAccountsResponse(false)}
                         />
                     }
                 />

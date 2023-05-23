@@ -16,6 +16,9 @@ function Header() {
         if (pathname.startsWith(absoluteRoutes.prompt.connectionRequest.path)) {
             return t('header.connect');
         }
+        if (pathname.startsWith(absoluteRoutes.prompt.connectAccountsRequest.path)) {
+            return t('header.connectAccountsRequest');
+        }
         if (pathname.startsWith(absoluteRoutes.prompt.addTokens.path)) {
             return t('header.addTokens');
         }

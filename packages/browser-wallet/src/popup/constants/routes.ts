@@ -39,6 +39,9 @@ export const relativeRoutes = {
         connectionRequest: {
             path: 'connection-request',
         },
+        connectAccountsRequest: {
+            path: 'connect-accounts-request',
+        },
         signMessage: {
             path: 'sign-message',
         },

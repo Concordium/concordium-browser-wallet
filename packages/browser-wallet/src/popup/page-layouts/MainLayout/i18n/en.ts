@@ -18,6 +18,7 @@ const t = {
         idProof: 'Proof of identity',
         request: 'Signature Request',
         connect: 'New connection',
+        connectAccountsRequest: 'Allowlisting request',
     },
     entityList: {
         searchPlaceholder: 'Search',

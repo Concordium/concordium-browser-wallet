@@ -94,6 +94,16 @@ class WalletApi extends EventEmitter implements IWalletApi {
         return response.result;
     }
 
+    public async requestAccounts(): Promise<string[] | undefined> {
+        const response = await this.messageHandler.sendMessage<MessageStatusWrapper<string[]>>(MessageType.ConnectAccounts);
+        console.log(response);
+        if (!response.success) {
+            throw new Error(response.message);
+        }
+
+        return response.result;
+    }
+
     /**
      * Returns some connected account, prioritizing the most recently selected. Resolves with account address or undefined if there are no connected account.
      */

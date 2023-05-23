@@ -471,6 +471,14 @@ forwardToPopup(
     withPromptEnd
 );
 forwardToPopup(
+    MessageType.ConnectAccounts,
+    InternalMessageType.ConnectAccounts,
+    runConditionComposer(runIfNotWhitelisted, withPromptStart),
+    handleConnectMessage,
+    handleConnectionResponse,
+    withPromptEnd
+);
+forwardToPopup(
     MessageType.SendTransaction,
     InternalMessageType.SendTransaction,
     runConditionComposer(runIfWhitelisted, ensureTransactionPayloadParse, withPromptStart),
