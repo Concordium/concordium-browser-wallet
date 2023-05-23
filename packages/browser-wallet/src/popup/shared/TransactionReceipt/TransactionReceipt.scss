@@ -58,6 +58,10 @@ $transaction-receipt-horizontal-padding: rem(20px);
         width: rem(180px);
         overflow-wrap: break-word;
     }
+
+    &__copy-button {
+        min-width: rem(18px);
+    }
 }
 
 :where(.transaction-receipt) h5 {
