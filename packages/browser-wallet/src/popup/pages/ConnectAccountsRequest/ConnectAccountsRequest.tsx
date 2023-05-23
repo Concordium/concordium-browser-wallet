@@ -1,21 +1,19 @@
-import { absoluteRoutes } from '@popup/constants/routes';
 import { fullscreenPromptContext } from '@popup/page-layouts/FullscreenPromptLayout';
 import { credentialsAtom, selectedAccountAtom, storedConnectedSitesAtom } from '@popup/store/account';
 import { sessionPasscodeAtom } from '@popup/store/settings';
 import { useAtom, useAtomValue } from 'jotai';
 import React, { useContext, useEffect, useMemo, useState } from 'react';
 import { useTranslation } from 'react-i18next';
-import { useLocation, Navigate } from 'react-router-dom';
+import { useLocation } from 'react-router-dom';
 import ExternalRequestLayout from '@popup/page-layouts/ExternalRequestLayout';
 import Button from '@popup/shared/Button';
 import { displayUrl } from '@popup/shared/utils/string-helpers';
 import { displaySplitAddress } from '@popup/shared/utils/account-helpers';
-import AccountList from '@popup/page-layouts/MainLayout/AccountList/AccountList';
 import { WalletCredential } from '@shared/storage/types';
 import { useAccountInfo } from '@popup/shared/AccountInfoListenerContext';
 import AccountInfoListenerContextProvider from '@popup/shared/AccountInfoListenerContext/AccountInfoListenerContext';
-import CopyButton from '@popup/shared/CopyButton';
 import { displayAsCcd } from 'wallet-common-helpers';
+import { Checkbox } from '@popup/shared/Form/Checkbox';
 
 type Props = {
     onAllow(): void;
@@ -34,20 +32,20 @@ function AccountListItem({ account, checked, selected, identityName }: ItemProps
     const totalBalance = useMemo(() => accountInfo?.accountAmount || 0n, [accountInfo?.accountAmount]);
 
     return (
-        <div className={'main-layout__header-list-item'}>
-            <div className="main-layout__header-list-item__primary">
+        <div className={'connect-accounts-request-accounts__account-item'}>
+            <div className="connect-accounts-request-accounts__account-item__primary">
                 <div className="flex align-center">
                     {displaySplitAddress(account.address)}{' '}
                 </div>
-                <CopyButton
-                    className="absolute r-0"
-                    value={account.address}
-                    onMouseUp={(e) => e.stopPropagation()}
-                    tabIndex={-1}
+                <Checkbox
+                    className="connect-accounts-request-accounts__account-item__check-box"
+                    onClick={(e) => {
+                        e.stopPropagation();
+                    }}
                 />
             </div>
-            <div className="main-layout__header-list-item__secondary">{identityName}</div>
-            <div className="main-layout__header-list-item__secondary mono">{displayAsCcd(totalBalance)}</div>
+            <div className="connect-accounts-request-accounts__account-item__secondary">{identityName}</div>
+            <div className="connect-accounts-request-accounts__account-item__secondary mono">{displayAsCcd(totalBalance)}</div>
         </div>
     );
 }
@@ -61,8 +59,8 @@ export default function ConnectionRequest({ onAllow, onReject }: Props) {
     const connectedSites = connectedSitesLoading.value;
     const passcode = useAtomValue(sessionPasscodeAtom);
     const [connectButtonDisabled, setConnectButtonDisabled] = useState<boolean>(false);
-    const accounts = useAtomValue(credentialsAtom);
-
+    const accountst = useAtomValue(credentialsAtom);
+    const accounts = accountst.concat(accountst).concat(accountst);
 
     useEffect(() => onClose(onReject), [onClose, onReject]);
 

@@ -1,6 +1,9 @@
 .connect-accounts-request {
+    width: 100%;
+
     margin-top: rem(8px);
     padding: rem(10px);
+    padding-top: rem(0px);
 
     background: #EAF0F5;
     border: 1px solid #DAE4EE;
@@ -8,8 +11,10 @@
 }
 
 .connect-accounts-request-accounts {
-    padding: rem(10px);
+    padding-left: rem(10px);
+    padding-right: rem(10px);
     width: 100%;
+    height: rem(207px);
     margin-left: auto;
     margin-right: auto;
 
@@ -18,7 +23,38 @@
     border-top: none;
     border-radius: 0px 0px 10px 10px;
 
-    .item:not(:last-of-type) & {
-        border-bottom: 1px dotted $color-petroleum;
+    scrollbar-width: thin;
+    overflow-y: auto;
+
+    &__account-item {
+        padding-top: rem(5px);
+        padding-bottom: rem(5px);
+        font-weight: $font-weight-light;
+
+        &:not(:last-child) {
+            border-bottom: rem(1px) dashed #DAE4EE;;
+        }
+
+        &__primary {
+            position: relative;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+        }
+
+        &__check-box {
+            position: absolute;
+            right: rem(0px);
+            bottom: rem(-12.5px);
+            width: rem(15px);
+        
+            input {
+                margin: 0;
+            }
+        }
+
+        &__secondary {
+            font-size: rem(8px);
+        }
     }
 }
