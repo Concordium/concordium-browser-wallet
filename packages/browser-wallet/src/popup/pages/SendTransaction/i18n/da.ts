@@ -25,7 +25,6 @@ const t: typeof en = {
         missingNonce: 'Vi var ikke i stand til at finde den næste nonce for afsenderen',
     },
     version: 'Version',
-    sourceHash: 'Modul hash',
 };
 
 export default t;
