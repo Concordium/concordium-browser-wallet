@@ -1,5 +1,15 @@
 # Changelog
 
+## 1.0.6
+
+### Changed
+
+-   In the display of a `deployModule` transaction, the previously titled module hash is now titled module reference.
+
+### Added
+
+-   Display of a `deployModule` transaction now includes a copy button for the module reference.
+
 ## 1.0.5
 
 ### Added
