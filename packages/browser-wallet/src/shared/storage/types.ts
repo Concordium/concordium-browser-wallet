@@ -25,6 +25,7 @@ export enum ChromeStorageKey {
     Cookie = 'cookie',
     OpenPrompt = 'openPrompt',
     AcceptedTerms = 'acceptedTerms',
+    AllowList = 'allowList',
 }
 
 export enum Theme {
@@ -253,3 +254,7 @@ export type AcceptedTermsState = {
     version: string;
     url?: string;
 };
+
+export interface AllowList {
+    
+}

@@ -26,6 +26,7 @@ import {
     sessionCookie,
     sessionOpenPrompt,
     storedAcceptedTerms,
+    storedAllowList,
 } from '@shared/storage/access';
 import { ChromeStorageKey } from '@shared/storage/types';
 import { atom, PrimitiveAtom, WritableAtom } from 'jotai';
@@ -55,6 +56,7 @@ const accessorMap = {
     [ChromeStorageKey.Cookie]: useIndexedStorage(sessionCookie, getGenesisHash),
     [ChromeStorageKey.OpenPrompt]: sessionOpenPrompt,
     [ChromeStorageKey.AcceptedTerms]: storedAcceptedTerms,
+    [ChromeStorageKey.AllowList]: storedAllowList,
 };
 
 export function resetOnUnmountAtom<V>(initial: V): PrimitiveAtom<V> {

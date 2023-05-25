@@ -19,6 +19,12 @@ export const storedConnectedSitesAtom = atomWithChromeStorage<Record<string, str
     true
 );
 
+export const storedAllowListAtom = atomWithChromeStorage<Record<string, string[]>>(
+    ChromeStorageKey.AllowList,
+    {},
+    true
+);
+
 const storedAccountAtom = atomWithChromeStorage<string | undefined>(ChromeStorageKey.SelectedAccount, undefined);
 export const selectedAccountAtom = atom<string | undefined, string | undefined, Promise<void>>(
     (get) => get(storedAccountAtom),
