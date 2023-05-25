@@ -7,6 +7,7 @@ import Toast from '@popup/shared/Toast/Toast';
 
 import { useCredential } from '@popup/shared/utils/account-helpers';
 import AccountDetails from '@popup/pages/Account/AccountDetails';
+import clsx from 'clsx';
 
 function Header() {
     const { t } = useTranslation('mainLayout');
@@ -63,7 +64,7 @@ export default function ExternalRequestLayout({ children }: Props) {
             <Header />
             <div className="external-request-layout">
                 {account && <AccountDetails expanded={false} account={account} />}
-                <main className="external-request-layout__main">{children}</main>
+                <main className={clsx('external-request-layout__main', !account && 'h-full')}>{children}</main>
                 <Toast />
             </div>
         </>

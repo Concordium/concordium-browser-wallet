@@ -1,28 +1,25 @@
 .connect-accounts-request {
     width: 100%;
-
     margin-top: rem(8px);
     padding: rem(10px);
-    padding-top: rem(0px);
-
-    background: #EAF0F5;
-    border: 1px solid #DAE4EE;
-    border-radius: 10px 10px 0px 0px;
+    padding-top: rem(0);
+    background: #eaf0f5;
+    border: 1px solid #dae4ee;
+    border-radius: 10px 10px 0 0;
 }
 
 .connect-accounts-request-accounts {
     padding-left: rem(10px);
     padding-right: rem(10px);
     width: 100%;
-    height: rem(207px);
+    min-height: rem(180px);
     margin-left: auto;
     margin-right: auto;
-
+    margin-bottom: rem(15px);
     background: $color-input-bg;
-    border: 1px solid #DAE4EE;
+    border: 1px solid #dae4ee;
     border-top: none;
-    border-radius: 0px 0px 10px 10px;
-
+    border-radius: 0 0 10px 10px;
     scrollbar-width: thin;
     overflow-y: auto;
 
@@ -32,7 +29,7 @@
         font-weight: $font-weight-light;
 
         &:not(:last-child) {
-            border-bottom: rem(1px) dashed #DAE4EE;;
+            border-bottom: rem(1px) dashed #dae4ee;
         }
 
         &__primary {
@@ -44,10 +41,10 @@
 
         &__check-box {
             position: absolute;
-            right: rem(0px);
+            right: rem(0);
             bottom: rem(-12.5px);
             width: rem(15px);
-        
+
             input {
                 margin: 0;
             }

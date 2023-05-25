@@ -83,7 +83,10 @@ function usePrompt(type: InternalMessageType | MessageType, promptKey: PromptKey
 
 export default function Routes() {
     const handleConnectionResponse = useMessagePrompt<boolean>(InternalMessageType.Connect, 'connectionRequest');
-    const handleConnectAccountsResponse = useMessagePrompt<boolean>(InternalMessageType.ConnectAccounts, 'connectAccountsRequest');
+    const handleConnectAccountsResponse = useMessagePrompt<boolean>(
+        InternalMessageType.ConnectAccounts,
+        'connectAccountsRequest'
+    );
 
     const handleSendTransactionResponse = useMessagePrompt<MessageStatusWrapper<string>>(
         InternalMessageType.SendTransaction,
