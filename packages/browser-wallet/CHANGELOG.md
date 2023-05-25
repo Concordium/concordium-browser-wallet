@@ -5,6 +5,7 @@
 ### Changed
 
 -   In the display of a `deployModule` transaction, the previously titled module hash is now titled module reference.
+-   Updated web-sdk to fix incorrect estimated cost for `deployModule` transaction.
 
 ### Added
 
