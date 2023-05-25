@@ -10,6 +10,10 @@
 
 -   Display of a `deployModule` transaction now includes a copy button for the module reference.
 
+### Fixed
+
+-   First call of the gRPC client no longer always fail.
+
 ## 1.0.5
 
 ### Added
