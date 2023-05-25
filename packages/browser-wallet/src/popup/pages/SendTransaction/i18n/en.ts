@@ -23,7 +23,6 @@ const t = {
         missingNonce: 'No nonce was found for the chosen account',
     },
     version: 'Version',
-    sourceHash: 'Module hash',
 };
 
 export default t;
