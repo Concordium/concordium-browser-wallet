@@ -5,7 +5,6 @@
 ### Changed
 
 -   In the display of a `deployModule` transaction, the previously titled module hash is now titled module reference.
--   Updated web-sdk to fix incorrect estimated cost for `deployModule` transaction.
 
 ### Added
 
@@ -13,7 +12,9 @@
 
 ### Fixed
 
--   First call of the gRPC client no longer always fail.
+-   First call of the gRPC client no longer always fails.
+-   First call of the gRPC client after changing network now uses the correct network.
+-   Updated web-sdk to fix incorrect estimated cost for `deployModule` transaction.
 
 ## 1.0.5
 
