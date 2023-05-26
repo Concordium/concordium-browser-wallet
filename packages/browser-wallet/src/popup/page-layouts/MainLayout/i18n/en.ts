@@ -9,6 +9,7 @@ const t = {
         ids: 'ID cards',
         settings: {
             main: 'Wallet settings',
+            allowlist: 'Allowlist',
             recovery: 'Restoring your wallet',
             network: 'Network settings',
             passcode: 'Change passcode',

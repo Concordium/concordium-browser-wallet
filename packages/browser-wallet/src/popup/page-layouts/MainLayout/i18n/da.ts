@@ -11,6 +11,7 @@ const t: typeof en = {
         ids: 'ID kort',
         settings: {
             main: 'Wallet indstillinger',
+            allowlist: 'Tilladelsesliste',
             recovery: 'Genskabning af din wallet',
             network: 'Netværksindstillinger',
             passcode: 'Skift adgangskode',

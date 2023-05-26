@@ -254,7 +254,3 @@ export type AcceptedTermsState = {
     version: string;
     url?: string;
 };
-
-export interface AllowList {
-    
-}

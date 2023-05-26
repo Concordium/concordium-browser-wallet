@@ -1,0 +1,19 @@
+.allowlist-settings-page {
+    height: 100%;
+    width: 100%;
+    background-color: $color-bg;
+    padding: 0 rem(10px);
+
+    &__link-icon {
+        width: rem(20px);
+        height: rem(10px);
+    }
+
+    &__list-item {
+        padding: rem(10px) 0;
+
+        &:not(:last-child) {
+            border-bottom: rem(1px) dashed $color-petroleum;
+        }
+    }
+}

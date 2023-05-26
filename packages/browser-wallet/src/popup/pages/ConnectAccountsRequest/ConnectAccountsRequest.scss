@@ -4,22 +4,22 @@
     padding: rem(10px);
     padding-top: rem(0);
     background: #eaf0f5;
-    border: 1px solid #dae4ee;
-    border-radius: 10px 10px 0 0;
+    border: rem(1px) solid #dae4ee;
+    border-radius: rem(10px) rem(10px) 0 0;
 }
 
 .connect-accounts-request-accounts {
     padding-left: rem(10px);
     padding-right: rem(10px);
     width: 100%;
-    min-height: rem(180px);
+    min-height: rem(175px);
     margin-left: auto;
     margin-right: auto;
     margin-bottom: rem(15px);
     background: $color-input-bg;
-    border: 1px solid #dae4ee;
+    border: rem(1px) solid #dae4ee;
     border-top: none;
-    border-radius: 0 0 10px 10px;
+    border-radius: 0 0 rem(10px) rem(10px);
     scrollbar-width: thin;
     overflow-y: auto;
 

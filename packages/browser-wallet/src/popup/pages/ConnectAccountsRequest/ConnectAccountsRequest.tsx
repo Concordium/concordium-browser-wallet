@@ -80,13 +80,12 @@ export default function ConnectionRequest({ onAllow, onReject }: Props) {
         }
     }
 
-    async function updateAllowList(url: string) {
-        const updatedAllowList = {
-            ...allowListLoading.value
+    async function updateAllowList(urlToUpdate: string) {
+        const updatedAllowList: Record<string, string[]> = {
+            ...allowListLoading.value,
         };
-
-        updatedAllowList[url] = accountsToAdd;
-        setAllowList(updatedAllowList);
+        updatedAllowList[urlToUpdate] = accountsToAdd;
+        await setAllowList(updatedAllowList);
     }
 
     return (
@@ -103,8 +102,14 @@ export default function ConnectionRequest({ onAllow, onReject }: Props) {
                 <div className="connect-accounts-request-accounts">
                     <AccountInfoListenerContextProvider>
                         {accounts.map((account) => {
-                            return <AccountListItem key={account.address} account={account} identityName="SomeName" onToggleChecked={() => updateAccountAddressChecked(account.address)}
-                            />;
+                            return (
+                                <AccountListItem
+                                    key={account.address}
+                                    account={account}
+                                    identityName="SomeName"
+                                    onToggleChecked={() => updateAccountAddressChecked(account.address)}
+                                />
+                            );
                         })}
                     </AccountInfoListenerContextProvider>
                 </div>

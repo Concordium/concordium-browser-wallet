@@ -20,6 +20,9 @@ export const relativeRoutes = {
         },
         settings: {
             path: 'settings',
+            allowList: {
+                path: 'allowlist',
+            },
             passcode: {
                 path: 'passcode',
             },

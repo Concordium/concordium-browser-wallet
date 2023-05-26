@@ -33,6 +33,7 @@ import ChangePasscode from '@popup/pages/ChangePasscode/ChangePasscode';
 import AddTokensPrompt from '@popup/pages/ExternalAddTokens/ExternalAddTokens';
 import IdProofRequest from '@popup/pages/IdProofRequest';
 import ConnectAccountsRequest from '@popup/pages/ConnectAccountsRequest';
+import Allowlist from '@popup/pages/Allowlist';
 
 type PromptKey = keyof Omit<typeof absoluteRoutes['prompt'], 'path'>;
 
@@ -189,6 +190,7 @@ export default function Routes() {
                 <Route element={<Identity />} path={relativeRoutes.home.identities.path} />
                 <Route path={relativeRoutes.home.settings.path}>
                     <Route index element={<Settings />} />
+                    <Route element={<Allowlist />} path={relativeRoutes.home.settings.allowList.path} />
                     <Route element={<ChangePasscode />} path={relativeRoutes.home.settings.passcode.path} />
                     <Route element={<NetworkSettings />} path={relativeRoutes.home.settings.network.path} />
                     <Route element={<RecoveryIntro />} path={relativeRoutes.home.settings.recovery.path} />
