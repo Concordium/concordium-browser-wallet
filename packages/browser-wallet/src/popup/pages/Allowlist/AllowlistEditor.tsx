@@ -1,5 +1,5 @@
 import AccountInfoListenerContextProvider, { useAccountInfo } from '@popup/shared/AccountInfoListenerContext';
-import { displaySplitAddress } from '@popup/shared/utils/account-helpers';
+import { displaySplitAddress, useIdentityName } from '@popup/shared/utils/account-helpers';
 import React, { useMemo } from 'react';
 import { Checkbox } from '@popup/shared/Form/Checkbox';
 import { WalletCredential } from '@shared/storage/types';
@@ -10,13 +10,13 @@ import { useTranslation } from 'react-i18next';
 
 type ItemProps = {
     account: WalletCredential;
-    identityName: string;
     checked: boolean;
     onToggleChecked: () => void;
 };
 
-function AccountListItem({ account, identityName, checked, onToggleChecked }: ItemProps) {
+function AccountListItem({ account, checked, onToggleChecked }: ItemProps) {
     const accountInfo = useAccountInfo(account);
+    const identityName = useIdentityName(account, 'Identity');
     const totalBalance = useMemo(() => accountInfo?.accountAmount || 0n, [accountInfo?.accountAmount]);
 
     return (
@@ -77,7 +77,6 @@ export default function AllowlistEditor({
                             <AccountListItem
                                 key={account.address}
                                 account={account}
-                                identityName="SomeName"
                                 checked={selectedAccounts.includes(account.address)}
                                 onToggleChecked={() => updateAccountAddressChecked(account.address)}
                             />
