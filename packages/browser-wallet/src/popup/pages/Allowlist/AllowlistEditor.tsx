@@ -1,88 +1,74 @@
-import AccountInfoListenerContextProvider, { useAccountInfo } from '@popup/shared/AccountInfoListenerContext';
-import { displaySplitAddress, useIdentityName } from '@popup/shared/utils/account-helpers';
-import React, { useMemo } from 'react';
-import { Checkbox } from '@popup/shared/Form/Checkbox';
-import { WalletCredential } from '@shared/storage/types';
-import { displayAsCcd } from 'wallet-common-helpers';
-import { useAtomValue } from 'jotai';
-import { credentialsAtom } from '@popup/store/account';
+import React, { useEffect, useState } from 'react';
+import { useNavigate, useParams } from 'react-router-dom';
+import Button from '@popup/shared/Button/Button';
+import { storedAllowListAtom } from '@popup/store/account';
+import { useAtom } from 'jotai';
 import { useTranslation } from 'react-i18next';
+import AllowlistEntryView, { AllowlistMode } from './AllowlistEntryView';
+import { updateAllowList } from './util';
 
-type ItemProps = {
-    account: WalletCredential;
-    checked: boolean;
-    onToggleChecked: () => void;
-};
-
-function AccountListItem({ account, checked, onToggleChecked }: ItemProps) {
-    const accountInfo = useAccountInfo(account);
-    const identityName = useIdentityName(account, 'Identity');
-    const totalBalance = useMemo(() => accountInfo?.accountAmount || 0n, [accountInfo?.accountAmount]);
-
-    return (
-        <div className="connect-accounts-request-accounts__account-item">
-            <div className="connect-accounts-request-accounts__account-item__primary">
-                <div className="flex align-center">{displaySplitAddress(account.address)} </div>
-                <Checkbox
-                    className="connect-accounts-request-accounts__account-item__check-box"
-                    onClick={(e) => {
-                        e.stopPropagation();
-                    }}
-                    checked={checked}
-                    onChange={onToggleChecked}
-                />
-            </div>
-            <div className="connect-accounts-request-accounts__account-item__secondary">{identityName}</div>
-            <div className="connect-accounts-request-accounts__account-item__secondary mono">
-                {displayAsCcd(totalBalance)}
-            </div>
-        </div>
-    );
+function LoadingAllowlistEditor() {
+    return <div className="allow-list-editor" />;
 }
 
-export default function AllowlistEditor({
-    selectedAccounts,
-    setSelectedAccounts,
-}: {
-    selectedAccounts: string[];
-    setSelectedAccounts: React.Dispatch<React.SetStateAction<string[]>>;
-}) {
-    const { t } = useTranslation('allowlist', { keyPrefix: 'editor' });
-    const accounts = useAtomValue(credentialsAtom);
+export default function AllowlistEditor() {
+    const nav = useNavigate();
+    const { t } = useTranslation('allowlist', { keyPrefix: 'view' });
+    const [selectedAccounts, setSelectedAccounts] = useState<string[]>([]);
+    const { serviceName } = useParams<{ serviceName: string }>();
+    const [allowListLoading, setAllowList] = useAtom(storedAllowListAtom);
 
-    /**
-     * Update the local state containing the list of account addresses. If the address
-     * is already present, then it is removed, if not present then it is added.
-     * @param accountAddress the account address to add or remove from the list.
-     */
-    function updateAccountAddressChecked(accountAddress: string) {
-        if (selectedAccounts.includes(accountAddress)) {
-            const updatedAccounts = selectedAccounts.filter((acc) => acc !== accountAddress);
-            setSelectedAccounts(updatedAccounts);
-        } else {
-            setSelectedAccounts([...selectedAccounts, accountAddress]);
+    if (!serviceName) {
+        throw new Error('Invalid URL - the service name should be part of the URL.');
+    }
+
+    const decodedServiceName = decodeURIComponent(serviceName);
+
+    useEffect(() => {
+        if (!allowListLoading.loading) {
+            setSelectedAccounts(allowListLoading.value[serviceName]);
         }
+    }, [allowListLoading]);
+
+    async function removeService(serviceNameToRemove: string, allowlist: Record<string, string[]>) {
+        const updatedAllowlist = { ...allowlist };
+        delete updatedAllowlist[serviceNameToRemove];
+        await setAllowList(updatedAllowlist);
+    }
+
+    if (allowListLoading.loading) {
+        return <LoadingAllowlistEditor />;
     }
 
     return (
-        <div>
-            <div className="connect-accounts-request">
-                <h3>{t('header')}</h3>
-                {t('description')}
-            </div>
-            <div className="connect-accounts-request-accounts">
-                <AccountInfoListenerContextProvider>
-                    {accounts.map((account) => {
-                        return (
-                            <AccountListItem
-                                key={account.address}
-                                account={account}
-                                checked={selectedAccounts.includes(account.address)}
-                                onToggleChecked={() => updateAccountAddressChecked(account.address)}
-                            />
-                        );
-                    })}
-                </AccountInfoListenerContextProvider>
+        <div className="allow-list-editor">
+            <AllowlistEntryView
+                selectedAccounts={selectedAccounts}
+                setSelectedAccounts={setSelectedAccounts}
+                mode={AllowlistMode.Modify}
+            />
+            <div className="flex ">
+                <Button
+                    className="margin-center m-b-5"
+                    width="narrow"
+                    onClick={() =>
+                        updateAllowList(
+                            decodedServiceName,
+                            allowListLoading.value,
+                            selectedAccounts,
+                            setAllowList
+                        ).then(() => nav(-1))
+                    }
+                >
+                    {t('update')}
+                </Button>
+                <Button
+                    className="margin-center m-b-5"
+                    width="narrow"
+                    onClick={() => removeService(decodedServiceName, allowListLoading.value).then(() => nav(-1))}
+                >
+                    {t('remove')}
+                </Button>
             </div>
         </div>
     );

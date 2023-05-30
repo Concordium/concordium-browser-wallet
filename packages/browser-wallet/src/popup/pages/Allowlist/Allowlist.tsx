@@ -8,15 +8,15 @@ import Button from '@popup/shared/Button';
 import { Route, Routes, generatePath, useNavigate } from 'react-router-dom';
 import { useTranslation } from 'react-i18next';
 import { allowlistRoutes } from './routes';
-import AllowListView from './AllowListView';
+import AllowListView from './AllowlistEditor';
 
 function LoadingAllowlistPage() {
-    return <div className="allowlist-settings-page" />;
+    return <div className="allowlist-page" />;
 }
 
 function EmptyAllowlistPage() {
     const { t } = useTranslation('allowlist');
-    return <div className="empty-allowlist-settings-page">{t('empty')}</div>;
+    return <div className="allowlist-empty">{t('empty')}</div>;
 }
 
 function Allowlist() {
@@ -32,16 +32,16 @@ function Allowlist() {
     }
 
     return (
-        <div className="allowlist-settings-page">
+        <div className="allowlist-page">
             {Object.keys(allowlist).map((serviceName) => {
                 const path = generatePath(allowlistRoutes.edit, { serviceName: encodeURIComponent(serviceName) });
                 return (
-                    <div className="allowlist-settings-page__list-item" key={serviceName}>
+                    <div className="allowlist-page__list-item" key={serviceName}>
                         <SidedRow
                             left={displayUrl(serviceName)}
                             right={
                                 <Button clear onClick={() => nav(path)}>
-                                    <LinkIcon className="allowlist-settings-page__link-icon" />
+                                    <LinkIcon className="allowlist-page__link-icon" />
                                 </Button>
                             }
                         />

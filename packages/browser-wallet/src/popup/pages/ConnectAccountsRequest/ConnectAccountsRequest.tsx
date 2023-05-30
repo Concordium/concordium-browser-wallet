@@ -7,7 +7,7 @@ import { useLocation } from 'react-router-dom';
 import ExternalRequestLayout from '@popup/page-layouts/ExternalRequestLayout';
 import Button from '@popup/shared/Button';
 import { displayUrl } from '@popup/shared/utils/string-helpers';
-import AllowlistEditor from '../Allowlist/AllowlistEditor';
+import AllowlistEntryView, { AllowlistMode } from '../Allowlist/AllowlistEntryView';
 import { updateAllowList } from '../Allowlist/util';
 
 type Props = {
@@ -15,7 +15,7 @@ type Props = {
     onReject(): void;
 };
 
-export default function ConnectionRequest({ onAllow, onReject }: Props) {
+export default function ConnectAccountsRequest({ onAllow, onReject }: Props) {
     const { state } = useLocation();
     const { t } = useTranslation('connectAccountsRequest');
     const { onClose, withClose } = useContext(fullscreenPromptContext);
@@ -35,7 +35,11 @@ export default function ConnectionRequest({ onAllow, onReject }: Props) {
                 <header className="text-center">
                     <h3 className="m-v-5">{t('header', { url: urlDisplay })}</h3>
                 </header>
-                <AllowlistEditor selectedAccounts={accountsToAdd} setSelectedAccounts={setAccountsToAdd} />
+                <AllowlistEntryView
+                    selectedAccounts={accountsToAdd}
+                    setSelectedAccounts={setAccountsToAdd}
+                    mode={AllowlistMode.Add}
+                />
                 <div className="flex p-b-10  m-t-auto">
                     <Button width="narrow" className="m-r-10" onClick={withClose(onReject)}>
                         {t('actions.cancel')}
