@@ -3,7 +3,6 @@ import { useNavigate, useParams } from 'react-router-dom';
 import Button from '@popup/shared/Button/Button';
 import { storedAllowListAtom } from '@popup/store/account';
 import { useAtom } from 'jotai';
-import { absoluteRoutes } from '@popup/constants/routes';
 import { useTranslation } from 'react-i18next';
 import AllowlistEditor from './AllowlistEditor';
 import { updateAllowList } from './util';
@@ -45,7 +44,7 @@ export default function AllowListView() {
                 width="wide"
                 onClick={() =>
                     updateAllowList(decodedServiceName, allowListLoading.value, selectedAccounts, setAllowList).then(
-                        () => nav(absoluteRoutes.home.settings.allowList.path)
+                        () => nav(-1)
                     )
                 }
             >
@@ -54,11 +53,7 @@ export default function AllowListView() {
             <Button
                 className="margin-center m-b-5"
                 width="wide"
-                onClick={() =>
-                    removeService(decodedServiceName, allowListLoading.value).then(() =>
-                        nav(absoluteRoutes.home.settings.allowList.path)
-                    )
-                }
+                onClick={() => removeService(decodedServiceName, allowListLoading.value).then(() => nav(-1))}
             >
                 {t('remove')}
             </Button>
