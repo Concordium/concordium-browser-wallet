@@ -6,6 +6,7 @@ import { WalletCredential } from '@shared/storage/types';
 import { displayAsCcd } from 'wallet-common-helpers';
 import { useAtomValue } from 'jotai';
 import { credentialsAtom } from '@popup/store/account';
+import { useTranslation } from 'react-i18next';
 
 type ItemProps = {
     account: WalletCredential;
@@ -46,6 +47,7 @@ export default function AllowlistEditor({
     selectedAccounts: string[];
     setSelectedAccounts: React.Dispatch<React.SetStateAction<string[]>>;
 }) {
+    const { t } = useTranslation('allowlist', { keyPrefix: 'editor' });
     const accounts = useAtomValue(credentialsAtom);
 
     /**
@@ -65,8 +67,8 @@ export default function AllowlistEditor({
     return (
         <div>
             <div className="connect-accounts-request">
-                <h3>Allowlisting a service</h3>
-                Allowlisting a service means that it can request identity proofs and signatures from selected accounts.
+                <h3>{t('header')}</h3>
+                {t('description')}
             </div>
             <div className="connect-accounts-request-accounts">
                 <AccountInfoListenerContextProvider>

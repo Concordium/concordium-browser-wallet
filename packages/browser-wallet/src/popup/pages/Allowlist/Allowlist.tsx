@@ -6,6 +6,7 @@ import LinkIcon from '@assets/svg/link.svg';
 import { displayUrl } from '@popup/shared/utils/string-helpers';
 import Button from '@popup/shared/Button';
 import { Route, Routes, generatePath, useNavigate } from 'react-router-dom';
+import { useTranslation } from 'react-i18next';
 import { allowlistRoutes } from './routes';
 import AllowListView from './AllowListView';
 
@@ -14,9 +15,8 @@ function LoadingAllowlistPage() {
 }
 
 function EmptyAllowlistPage() {
-    return (
-        <div className="empty-allowlist-settings-page">You do not currently have any services in your allowlist.</div>
-    );
+    const { t } = useTranslation('allowlist');
+    return <div className="empty-allowlist-settings-page">{t('empty')}</div>;
 }
 
 function Allowlist() {

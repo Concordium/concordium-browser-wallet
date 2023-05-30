@@ -17,7 +17,7 @@ type Props = {
 
 export default function ConnectionRequest({ onAllow, onReject }: Props) {
     const { state } = useLocation();
-    const { t } = useTranslation('connectionRequest');
+    const { t } = useTranslation('connectAccountsRequest');
     const { onClose, withClose } = useContext(fullscreenPromptContext);
     const [accountsToAdd, setAccountsToAdd] = useState<string[]>([]);
     const [connectButtonDisabled, setConnectButtonDisabled] = useState<boolean>(false);
@@ -33,7 +33,7 @@ export default function ConnectionRequest({ onAllow, onReject }: Props) {
         <ExternalRequestLayout>
             <div className="h-full flex-column align-center">
                 <header className="text-center">
-                    <h3 className="m-v-5">{urlDisplay} wants to be added to your allowlist.</h3>
+                    <h3 className="m-v-5">{t('header', { url: urlDisplay })}</h3>
                 </header>
                 <AllowlistEditor selectedAccounts={accountsToAdd} setSelectedAccounts={setAccountsToAdd} />
                 <div className="flex p-b-10  m-t-auto">

@@ -4,11 +4,13 @@ import Button from '@popup/shared/Button/Button';
 import { storedAllowListAtom } from '@popup/store/account';
 import { useAtom } from 'jotai';
 import { absoluteRoutes } from '@popup/constants/routes';
+import { useTranslation } from 'react-i18next';
 import AllowlistEditor from './AllowlistEditor';
 import { updateAllowList } from './util';
 
 export default function AllowListView() {
     const nav = useNavigate();
+    const { t } = useTranslation('allowlist', { keyPrefix: 'view' });
     const [selectedAccounts, setSelectedAccounts] = useState<string[]>([]);
     const { serviceName } = useParams<{ serviceName: string }>();
     const [allowListLoading, setAllowList] = useAtom(storedAllowListAtom);
@@ -47,7 +49,7 @@ export default function AllowListView() {
                     )
                 }
             >
-                Update allowlist
+                {t('update')}
             </Button>
             <Button
                 className="margin-center m-b-5"
@@ -58,7 +60,7 @@ export default function AllowListView() {
                     )
                 }
             >
-                Remove service from allowlist
+                {t('remove')}
             </Button>
         </div>
     );
