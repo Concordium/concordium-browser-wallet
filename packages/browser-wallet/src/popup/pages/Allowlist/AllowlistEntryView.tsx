@@ -69,25 +69,27 @@ export default function AllowlistEntryView({ selectedAccounts, setSelectedAccoun
 
     return (
         <AccountInfoListenerContextProvider>
-            <div className="allowlist-entry-view__header">
-                <h3>{t('header')}</h3>
-                {t('description')}
-                <div className="allowlist-entry-view__mode-description ">
-                    {mode === AllowlistMode.Add ? <div>{t('addDescription')}</div> : null}
-                    {mode === AllowlistMode.Modify ? <div>{t('modifyDescription')}</div> : null}
+            <div>
+                <div className="allowlist-entry-view__header">
+                    <h3>{t('header')}</h3>
+                    {t('description')}
+                    <div className="allowlist-entry-view__mode-description ">
+                        {mode === AllowlistMode.Add ? <div>{t('addDescription')}</div> : null}
+                        {mode === AllowlistMode.Modify ? <div>{t('modifyDescription')}</div> : null}
+                    </div>
                 </div>
-            </div>
-            <div className="allowlist-entry-view__accounts">
-                {accounts.map((account) => {
-                    return (
-                        <AccountListItem
-                            key={account.address}
-                            account={account}
-                            checked={selectedAccounts.includes(account.address)}
-                            onToggleChecked={() => updateAccountAddressChecked(account.address)}
-                        />
-                    );
-                })}
+                <div className="allowlist-entry-view__accounts">
+                    {accounts.map((account) => {
+                        return (
+                            <AccountListItem
+                                key={account.address}
+                                account={account}
+                                checked={selectedAccounts.includes(account.address)}
+                                onToggleChecked={() => updateAccountAddressChecked(account.address)}
+                            />
+                        );
+                    })}
+                </div>
             </div>
         </AccountInfoListenerContextProvider>
     );

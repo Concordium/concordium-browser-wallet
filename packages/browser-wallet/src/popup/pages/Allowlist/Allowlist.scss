@@ -31,7 +31,6 @@
 .allowlist-entry-view {
     &__header {
         width: 100%;
-        margin-top: rem(8px);
         padding: rem(10px);
         padding-top: rem(0);
         background: #eaf0f5;
@@ -100,4 +99,5 @@
     display: flex;
     flex-direction: column;
     justify-content: space-between;
+    align-items: center;
 }

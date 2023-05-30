@@ -47,9 +47,9 @@ export default function AllowlistEditor() {
                 setSelectedAccounts={setSelectedAccounts}
                 mode={AllowlistMode.Modify}
             />
-            <div className="flex ">
+            <div className="flex p-b-10 m-t-auto">
                 <Button
-                    className="margin-center m-b-5"
+                    className="m-r-10"
                     width="narrow"
                     onClick={() =>
                         updateAllowList(
@@ -63,7 +63,6 @@ export default function AllowlistEditor() {
                     {t('update')}
                 </Button>
                 <Button
-                    className="margin-center m-b-5"
                     width="narrow"
                     onClick={() => removeService(decodedServiceName, allowListLoading.value).then(() => nav(-1))}
                 >
