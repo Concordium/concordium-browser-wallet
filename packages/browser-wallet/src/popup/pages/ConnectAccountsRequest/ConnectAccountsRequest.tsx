@@ -8,6 +8,7 @@ import ExternalRequestLayout from '@popup/page-layouts/ExternalRequestLayout';
 import Button from '@popup/shared/Button';
 import { displayUrl } from '@popup/shared/utils/string-helpers';
 import AllowlistEditor from '../Allowlist/AllowlistEditor';
+import { updateAllowList } from '../Allowlist/util';
 
 type Props = {
     onAllow(): void;
@@ -28,14 +29,6 @@ export default function ConnectionRequest({ onAllow, onReject }: Props) {
     const { url } = (state as any).payload;
     const urlDisplay = displayUrl(url);
 
-    async function updateAllowList(urlToUpdate: string) {
-        const updatedAllowList: Record<string, string[]> = {
-            ...allowListLoading.value,
-        };
-        updatedAllowList[urlToUpdate] = accountsToAdd;
-        await setAllowList(updatedAllowList);
-    }
-
     return (
         <ExternalRequestLayout>
             <div className="h-full flex-column align-center">
@@ -52,7 +45,12 @@ export default function ConnectionRequest({ onAllow, onReject }: Props) {
                         disabled={connectButtonDisabled}
                         onClick={() => {
                             setConnectButtonDisabled(true);
-                            updateAllowList(new URL(url).origin).then(withClose(onAllow));
+                            updateAllowList(
+                                new URL(url).origin,
+                                allowListLoading.value,
+                                accountsToAdd,
+                                setAllowList
+                            ).then(withClose(onAllow));
                         }}
                     >
                         {t('actions.connect')}

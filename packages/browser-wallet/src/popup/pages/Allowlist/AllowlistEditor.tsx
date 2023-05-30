@@ -10,10 +10,11 @@ import { credentialsAtom } from '@popup/store/account';
 type ItemProps = {
     account: WalletCredential;
     identityName: string;
+    checked: boolean;
     onToggleChecked: () => void;
 };
 
-function AccountListItem({ account, identityName, onToggleChecked }: ItemProps) {
+function AccountListItem({ account, identityName, checked, onToggleChecked }: ItemProps) {
     const accountInfo = useAccountInfo(account);
     const totalBalance = useMemo(() => accountInfo?.accountAmount || 0n, [accountInfo?.accountAmount]);
 
@@ -26,6 +27,7 @@ function AccountListItem({ account, identityName, onToggleChecked }: ItemProps) 
                     onClick={(e) => {
                         e.stopPropagation();
                     }}
+                    checked={checked}
                     onChange={onToggleChecked}
                 />
             </div>
@@ -74,6 +76,7 @@ export default function AllowlistEditor({
                                 key={account.address}
                                 account={account}
                                 identityName="SomeName"
+                                checked={selectedAccounts.includes(account.address)}
                                 onToggleChecked={() => updateAccountAddressChecked(account.address)}
                             />
                         );

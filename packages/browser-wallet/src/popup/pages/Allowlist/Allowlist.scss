@@ -1,3 +1,14 @@
+.empty-allowlist-settings-page {
+    height: 100%;
+    width: 100%;
+    background-color: $color-bg;
+    padding: 0 rem(10px);
+    display: flex;
+    align-items: center;
+    text-align: center;
+    color: $color-text-faded;
+}
+
 .allowlist-settings-page {
     height: 100%;
     width: 100%;
@@ -65,4 +76,13 @@
             font-size: rem(8px);
         }
     }
+}
+
+.allow-list-edit-page {
+    height: 100%;
+    padding: rem(10px);
+    background-color: $color-bg;
+    display: flex;
+    flex-direction: column;
+    justify-content: space-between;
 }
