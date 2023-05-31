@@ -14,6 +14,7 @@ import {
     sessionOpenPrompt,
     storedAcceptedTerms,
     getGenesisHash,
+    storedAllowList,
 } from '@shared/storage/access';
 
 import JSONBig from 'json-bigint';
@@ -346,6 +347,38 @@ async function findPrioritizedAccountConnectedToSite(url: string): Promise<strin
 }
 
 /**
+ * Run condition that runs the handler if the service URL is not currently allowlisted.
+ *
+ * 1. If the wallet is locked, then do run.
+ * 1. If no allowlist exists in storage, then do run.
+ * 1. If the service URL is already in the allowlist, then do not run and return the list of account addresses.
+ * 1. Else run the handler.
+ */
+const runIfNotAllowlisted: RunCondition<MessageStatusWrapper<string[] | undefined>> = async (_msg, sender) => {
+    if (!sender.url) {
+        throw new Error('Expected URL to be available for sender.');
+    }
+
+    const locked = await isWalletLocked();
+    if (locked) {
+        return { run: true };
+    }
+
+    const allowlist = await storedAllowList.get();
+    if (!allowlist) {
+        return { run: true };
+    }
+
+    const allowlistedAccounts = allowlist[new URL(sender.url).origin];
+    if (allowlistedAccounts !== undefined) {
+        return { run: false, response: { success: true, result: allowlistedAccounts } };
+    }
+
+    // The URL has not been allowlisted yet, so run the handler.
+    return { run: true };
+};
+
+/**
  * Run condition that runs the handler if the wallet is non-empty (an account exists), and no
  * account in the wallet is connected to the sender URL.
  *
@@ -448,15 +481,17 @@ const getSelectedChainHandler: ExtensionMessageHandler = (_msg, sender, respond)
 
 bgMessageHandler.handleMessage(createMessageTypeFilter(MessageType.GetSelectedChain), getSelectedChainHandler);
 
-const withPromptStart: RunCondition<MessageStatusWrapper<string | undefined>> = async () => {
-    const isPromptOpen = await sessionOpenPrompt.get();
-    const isOpen = await testPopupOpen();
-    if (isPromptOpen && isOpen) {
-        return { run: false, response: { success: false, message: 'Another prompt is already open' } };
-    }
-    sessionOpenPrompt.set(true);
-    return { run: true };
-};
+function withPromptStart<T>(): RunCondition<MessageStatusWrapper<T | undefined>> {
+    return async () => {
+        const isPromptOpen = await sessionOpenPrompt.get();
+        const isOpen = await testPopupOpen();
+        if (isPromptOpen && isOpen) {
+            return { run: false, response: { success: false, message: 'Another prompt is already open' } };
+        }
+        sessionOpenPrompt.set(true);
+        return { run: true };
+    };
+}
 
 function withPromptEnd() {
     sessionOpenPrompt.set(false);
@@ -465,7 +500,7 @@ function withPromptEnd() {
 forwardToPopup(
     MessageType.Connect,
     InternalMessageType.Connect,
-    runConditionComposer(runIfNotWhitelisted, withPromptStart),
+    runConditionComposer(runIfNotWhitelisted, withPromptStart()),
     handleConnectMessage,
     handleConnectionResponse,
     withPromptEnd
@@ -473,15 +508,15 @@ forwardToPopup(
 forwardToPopup(
     MessageType.ConnectAccounts,
     InternalMessageType.ConnectAccounts,
-    runConditionComposer(runIfNotWhitelisted, withPromptStart),
+    runConditionComposer(runIfNotAllowlisted, withPromptStart()),
     handleConnectMessage,
-    handleConnectionResponse,
+    undefined,
     withPromptEnd
 );
 forwardToPopup(
     MessageType.SendTransaction,
     InternalMessageType.SendTransaction,
-    runConditionComposer(runIfWhitelisted, ensureTransactionPayloadParse, withPromptStart),
+    runConditionComposer(runIfWhitelisted, ensureTransactionPayloadParse, withPromptStart()),
     appendUrlToPayload,
     undefined,
     withPromptEnd
@@ -489,7 +524,7 @@ forwardToPopup(
 forwardToPopup(
     MessageType.SignMessage,
     InternalMessageType.SignMessage,
-    runConditionComposer(runIfWhitelisted, ensureMessageWithSchemaParse, withPromptStart),
+    runConditionComposer(runIfWhitelisted, ensureMessageWithSchemaParse, withPromptStart()),
     appendUrlToPayload,
     undefined,
     withPromptEnd
@@ -497,7 +532,7 @@ forwardToPopup(
 forwardToPopup(
     MessageType.AddTokens,
     InternalMessageType.AddTokens,
-    runConditionComposer(runIfWhitelisted, withPromptStart),
+    runConditionComposer(runIfWhitelisted, withPromptStart()),
     appendUrlToPayload,
     undefined,
     withPromptEnd
@@ -505,7 +540,7 @@ forwardToPopup(
 forwardToPopup(
     MessageType.IdProof,
     InternalMessageType.IdProof,
-    runConditionComposer(runIfWhitelisted, runIfValidProof, withPromptStart),
+    runConditionComposer(runIfWhitelisted, runIfValidProof, withPromptStart()),
     appendUrlToPayload,
     undefined,
     withPromptEnd

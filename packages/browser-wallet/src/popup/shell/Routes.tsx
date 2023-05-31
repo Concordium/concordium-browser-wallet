@@ -84,7 +84,7 @@ function usePrompt(type: InternalMessageType | MessageType, promptKey: PromptKey
 
 export default function Routes() {
     const handleConnectionResponse = useMessagePrompt<boolean>(InternalMessageType.Connect, 'connectionRequest');
-    const handleConnectAccountsResponse = useMessagePrompt<boolean>(
+    const handleConnectAccountsResponse = useMessagePrompt<MessageStatusWrapper<string[]>>(
         InternalMessageType.ConnectAccounts,
         'connectAccountsRequest'
     );
@@ -159,8 +159,15 @@ export default function Routes() {
                     path={relativeRoutes.prompt.connectAccountsRequest.path}
                     element={
                         <ConnectAccountsRequest
-                            onAllow={() => handleConnectAccountsResponse(true)}
-                            onReject={() => handleConnectAccountsResponse(false)}
+                            onAllow={(accountAddresses: string[]) =>
+                                handleConnectAccountsResponse({ success: true, result: accountAddresses })
+                            }
+                            onReject={() =>
+                                handleConnectAccountsResponse({
+                                    success: false,
+                                    message: 'Request was rejected',
+                                })
+                            }
                         />
                     }
                 />

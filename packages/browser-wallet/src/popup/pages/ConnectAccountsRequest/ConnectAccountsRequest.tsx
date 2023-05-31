@@ -1,19 +1,25 @@
 import { fullscreenPromptContext } from '@popup/page-layouts/FullscreenPromptLayout';
 import { storedAllowListAtom } from '@popup/store/account';
-import { useAtom } from 'jotai';
+import { useAtom, useAtomValue } from 'jotai';
 import React, { useContext, useEffect, useState } from 'react';
 import { useTranslation } from 'react-i18next';
-import { useLocation } from 'react-router-dom';
+import { Navigate, useLocation } from 'react-router-dom';
 import ExternalRequestLayout from '@popup/page-layouts/ExternalRequestLayout';
 import Button from '@popup/shared/Button';
 import { displayUrl } from '@popup/shared/utils/string-helpers';
+import { sessionPasscodeAtom } from '@popup/store/settings';
+import { absoluteRoutes } from '@popup/constants/routes';
 import AllowlistEntryView, { AllowlistMode } from '../Allowlist/AllowlistEntryView';
 import { updateAllowList } from '../Allowlist/util';
 
 type Props = {
-    onAllow(): void;
+    onAllow(accountAdresses: string[]): void;
     onReject(): void;
 };
+
+function LoadingConnectAccountsRequest() {
+    return <ExternalRequestLayout />;
+}
 
 export default function ConnectAccountsRequest({ onAllow, onReject }: Props) {
     const { state } = useLocation();
@@ -22,8 +28,23 @@ export default function ConnectAccountsRequest({ onAllow, onReject }: Props) {
     const [accountsToAdd, setAccountsToAdd] = useState<string[]>([]);
     const [connectButtonDisabled, setConnectButtonDisabled] = useState<boolean>(false);
     const [allowListLoading, setAllowList] = useAtom(storedAllowListAtom);
+    const passcode = useAtomValue(sessionPasscodeAtom);
 
     useEffect(() => onClose(onReject), [onClose, onReject]);
+
+    if (allowListLoading.loading || passcode.loading) {
+        return <LoadingConnectAccountsRequest />;
+    }
+
+    // The wallet is locked, so prompt the user to unlock the wallet before connecting.
+    if (!passcode.value) {
+        return (
+            <Navigate
+                to={absoluteRoutes.login.path}
+                state={{ to: absoluteRoutes.prompt.connectAccountsRequest.path, toState: state }}
+            />
+        );
+    }
 
     // eslint-disable-next-line @typescript-eslint/no-explicit-any
     const { url } = (state as any).payload;
@@ -54,7 +75,11 @@ export default function ConnectAccountsRequest({ onAllow, onReject }: Props) {
                                 allowListLoading.value,
                                 accountsToAdd,
                                 setAllowList
-                            ).then(withClose(onAllow));
+                            ).then(
+                                withClose(() => {
+                                    onAllow(accountsToAdd);
+                                })
+                            );
                         }}
                     >
                         {t('actions.connect')}

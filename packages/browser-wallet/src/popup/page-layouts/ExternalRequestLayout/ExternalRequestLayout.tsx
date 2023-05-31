@@ -52,7 +52,7 @@ interface Location {
 }
 
 interface Props {
-    children: ReactNode;
+    children?: ReactNode;
 }
 
 export default function ExternalRequestLayout({ children }: Props) {
