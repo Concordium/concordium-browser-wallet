@@ -1,6 +1,6 @@
 import React from 'react';
 import SidedRow from '@popup/shared/SidedRow/SidedRow';
-import { storedAllowListAtom } from '@popup/store/account';
+import { storedAllowlistAtom } from '@popup/store/account';
 import { useAtomValue } from 'jotai';
 import LinkIcon from '@assets/svg/link.svg';
 import { displayUrl } from '@popup/shared/utils/string-helpers';
@@ -21,7 +21,7 @@ function EmptyAllowlistPage() {
 
 function Allowlist() {
     const nav = useNavigate();
-    const allowlistWithLoading = useAtomValue(storedAllowListAtom);
+    const allowlistWithLoading = useAtomValue(storedAllowlistAtom);
     const allowlist = allowlistWithLoading.value;
 
     if (allowlistWithLoading.loading) {

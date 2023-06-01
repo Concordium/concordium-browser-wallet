@@ -194,7 +194,7 @@ const defaultBroadcastOptions: BroadcastOptions = { requireWhitelist: true };
 
 export class ExtensionsMessageHandler extends BaseMessageHandler<WalletMessage> {
     constructor(
-        private connectedSites: { get(): Promise<Record<string, string[]> | undefined> },
+        private allowlist: { get(): Promise<Record<string, string[]> | undefined> },
         private selectedAccount: { get(): Promise<string | undefined> }
     ) {
         super();
@@ -217,7 +217,8 @@ export class ExtensionsMessageHandler extends BaseMessageHandler<WalletMessage> 
 
     /**
      * Broadcast an event of a specific type, with an optional payload, to all currently
-     * open and whitelisted (connected to the selected account) tabs.
+     * open and allowlisted (connected to the selected account) tabs.
+     *
      * By specifying options, it's possible to disable the whitelist by `{requireWhitelist: false}`
      * and also declare a callback to be called for tabs not included in the whitelist through `{nonWhitelistedTabCallback: (t: chrome.tabs.Tab) => ...}`
      * Default options are {requireWhitelist: true}
@@ -291,12 +292,14 @@ export class ExtensionsMessageHandler extends BaseMessageHandler<WalletMessage> 
     }
 
     private async getWhitelistedTabs(tabs: chrome.tabs.Tab[]): Promise<chrome.tabs.Tab[]> {
-        const connectedSites = await this.connectedSites.get();
+        const allowlist = await this.allowlist.get();
         const selectedAccount = await this.selectedAccount.get();
 
         let whitelistedUrls: string[] = [];
-        if (selectedAccount && connectedSites) {
-            whitelistedUrls = connectedSites[selectedAccount] ?? [];
+        if (selectedAccount && allowlist) {
+            whitelistedUrls = Object.entries(allowlist)
+                .filter((entry) => entry[1].includes(selectedAccount))
+                .map((val) => val[0]);
         }
 
         return tabs.filter(({ url }) => url !== undefined && whitelistedUrls?.includes(new URL(url).origin));

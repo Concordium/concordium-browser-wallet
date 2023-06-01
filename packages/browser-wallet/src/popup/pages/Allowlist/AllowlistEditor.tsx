@@ -1,11 +1,13 @@
 import React, { useEffect, useState } from 'react';
 import { useNavigate, useParams } from 'react-router-dom';
 import Button from '@popup/shared/Button/Button';
-import { storedAllowListAtom } from '@popup/store/account';
-import { useAtom } from 'jotai';
+import { selectedAccountAtom, storedAllowlistAtom } from '@popup/store/account';
+import { useAtom, useAtomValue } from 'jotai';
 import { useTranslation } from 'react-i18next';
+import { popupMessageHandler } from '@popup/shared/message-handler';
+import { EventType } from '@concordium/browser-wallet-api-helpers';
 import AllowlistEntryView, { AllowlistMode } from './AllowlistEntryView';
-import { updateAllowList } from './util';
+import { handleAllowlistEntryUpdate } from './util';
 
 function LoadingAllowlistEditor() {
     return <div className="allow-list-editor" />;
@@ -16,7 +18,8 @@ export default function AllowlistEditor() {
     const { t } = useTranslation('allowlist', { keyPrefix: 'view' });
     const [selectedAccounts, setSelectedAccounts] = useState<string[]>([]);
     const { serviceName } = useParams<{ serviceName: string }>();
-    const [allowListLoading, setAllowList] = useAtom(storedAllowListAtom);
+    const [allowListLoading, setAllowList] = useAtom(storedAllowlistAtom);
+    const selectedAccount = useAtomValue(selectedAccountAtom);
 
     if (!serviceName) {
         throw new Error('Invalid URL - the service name should be part of the URL.');
@@ -32,8 +35,13 @@ export default function AllowlistEditor() {
 
     async function removeService(serviceNameToRemove: string, allowlist: Record<string, string[]>) {
         const updatedAllowlist = { ...allowlist };
+        const disconnectedAccounts = [...updatedAllowlist[serviceNameToRemove]];
         delete updatedAllowlist[serviceNameToRemove];
         await setAllowList(updatedAllowlist);
+
+        for (const account of disconnectedAccounts) {
+            popupMessageHandler.broadcastToUrl(EventType.AccountDisconnected, serviceNameToRemove, account);
+        }
     }
 
     if (allowListLoading.loading) {
@@ -52,11 +60,12 @@ export default function AllowlistEditor() {
                     className="m-r-10"
                     width="narrow"
                     onClick={() =>
-                        updateAllowList(
+                        handleAllowlistEntryUpdate(
                             decodedServiceName,
                             allowListLoading.value,
                             selectedAccounts,
-                            setAllowList
+                            setAllowList,
+                            selectedAccount
                         ).then(() => nav(-1))
                     }
                 >

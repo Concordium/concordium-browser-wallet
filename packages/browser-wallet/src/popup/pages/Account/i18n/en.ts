@@ -23,12 +23,6 @@ const t = {
         passiveDelegation: 'Passive delegation',
     },
     settings: {
-        connectedSites: {
-            title: 'Connected sites',
-            noConnected: 'The selected account is not connected to any sites.',
-            connect: 'Connect',
-            disconnect: 'Disconnect',
-        },
         exportPrivateKey: {
             title: 'Export private key',
             description: 'Please enter your passcode to show the private key.',

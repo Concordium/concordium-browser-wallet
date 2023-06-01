@@ -25,12 +25,6 @@ const t: typeof en = {
         passiveDelegation: 'Passiv delegation',
     },
     settings: {
-        connectedSites: {
-            title: 'Forbundne hjemmesider',
-            noConnected: 'Den valgte konto er ikke forbundet til nogen hjemmeside.',
-            connect: 'Forbind',
-            disconnect: 'Fjern',
-        },
         exportPrivateKey: {
             title: 'Eksportér privatnøgle',
             description: 'Indtast venligst din adgangskode for at vise din private nøgle.',

@@ -1,5 +1,4 @@
 .account-settings-page,
-.connected-sites-list,
 .export-private-key-page,
 .account-statement-page {
     min-height: 100%;
@@ -24,34 +23,6 @@
     &__link {
         display: block;
         padding: rem(10px) 0;
-    }
-}
-
-.connected-sites-list {
-    padding-left: rem(14px);
-    padding-right: rem(14px);
-    overflow: overlay;
-
-    &__element {
-        display: flex;
-        flex-direction: row;
-        justify-content: space-between;
-        padding-top: rem(10px);
-        padding-bottom: rem(10px);
-
-        &__connect {
-            cursor: pointer;
-            color: $color-dark-green;
-        }
-
-        &__disconnect {
-            cursor: pointer;
-            color: $color-blue;
-        }
-    }
-
-    & > *:not(:last-child) {
-        border-bottom: rem(1px) solid $color-petroleum;
     }
 }
 

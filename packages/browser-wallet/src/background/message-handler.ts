@@ -4,9 +4,9 @@ import {
     InternalMessageType,
     Payload,
 } from '@concordium/browser-wallet-message-hub';
-import { storedSelectedAccount, storedConnectedSites } from '@shared/storage/access';
+import { storedSelectedAccount, storedAllowlist } from '@shared/storage/access';
 
-const bgMessageHandler = new ExtensionsMessageHandler(storedConnectedSites, storedSelectedAccount);
+const bgMessageHandler = new ExtensionsMessageHandler(storedAllowlist, storedSelectedAccount);
 
 export default bgMessageHandler;
 

@@ -10,7 +10,6 @@ import { useCurrentOpenTabUrl } from '@popup/shared/utils/tabs';
 import Button from '@popup/shared/Button';
 import { absoluteRoutes } from '@popup/constants/routes';
 import { accountRoutes } from './routes';
-import { accountSettingsRoutes } from './AccountSettings/routes';
 import AccountActions from './AccountActions';
 import DisplayAddress from './DisplayAddress';
 import AccountDetails from './AccountDetails';
@@ -58,12 +57,7 @@ function Account() {
                                 onClick={() => setDetailsExpanded((o) => !o)}
                             />
                             <AccountDetails expanded={detailsExpanded} account={selectedCred} />
-                            <ConnectedBox
-                                url={currentUrl}
-                                link={`${accountRoutes.settings}/${accountSettingsRoutes.connectedSites}`}
-                                onNavigate={() => setDetailsExpanded(false)}
-                                accountAddress={selectedCred.address}
-                            />
+                            <ConnectedBox url={currentUrl} accountAddress={selectedCred.address} />
                         </div>
                         <div className="account-page__routes">
                             {isConfirmed && <Outlet />}

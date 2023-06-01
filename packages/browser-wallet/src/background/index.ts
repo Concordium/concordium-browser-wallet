@@ -7,14 +7,13 @@ import {
 } from '@concordium/browser-wallet-message-hub';
 import { deserializeTypeValue, HttpProvider } from '@concordium/web-sdk';
 import {
-    storedConnectedSites,
     storedSelectedAccount,
     storedCurrentNetwork,
     sessionPasscode,
     sessionOpenPrompt,
     storedAcceptedTerms,
     getGenesisHash,
-    storedAllowList,
+    storedAllowlist,
 } from '@shared/storage/access';
 
 import JSONBig from 'json-bigint';
@@ -49,13 +48,13 @@ async function isWalletLocked(): Promise<boolean> {
 }
 
 /**
- * Determines whether the given url has been whitelisted by any account.
+ * Determines whether the given URL has been allowlisted.
  */
-async function isWhiteListedForAnyAccount(url: string): Promise<boolean> {
+async function isAllowlisted(url: string): Promise<boolean> {
     const urlOrigin = new URL(url).origin;
-    const connectedSites = await storedConnectedSites.get();
-    if (connectedSites) {
-        return Object.values(connectedSites).some((sites) => sites.includes(urlOrigin));
+    const allowlist = await storedAllowlist.get();
+    if (allowlist) {
+        return Object.keys(allowlist).includes(urlOrigin);
     }
     return false;
 }
@@ -72,7 +71,7 @@ async function performRpcCall(
         onFailure(walletLockedMessage);
     }
 
-    const isWhiteListed = await isWhiteListedForAnyAccount(senderUrl);
+    const isWhiteListed = await isAllowlisted(senderUrl);
     if (isWhiteListed) {
         const url = (await storedCurrentNetwork.get())?.jsonRpcUrl;
         if (!url) {
@@ -102,7 +101,7 @@ async function exportGRPCLocation(
     onSuccess: (response: string | undefined) => void,
     onFailure: (response: string) => void
 ): Promise<void> {
-    const isWhiteListed = await isWhiteListedForAnyAccount(callerUrl);
+    const isWhiteListed = await isAllowlisted(callerUrl);
     if (!isWhiteListed) {
         return onFailure(rpcCallNotAllowedMessage);
     }
@@ -256,20 +255,23 @@ bgMessageHandler.handleMessage(createMessageTypeFilter(InternalMessageType.Creat
 const NOT_WHITELISTED = 'Site is not whitelisted';
 
 /**
- * Run condition which looks up URL in connected sites for the provided account. Runs handler if URL is included in connected sites.
+ * Run condition that ensures that a handler is only run if the URL is in the allowlist
+ * of the provided account.
  */
-const runIfWhitelisted: RunCondition<MessageStatusWrapper<undefined>> = async (msg, sender) => {
+const runIfAccountIsAllowlisted: RunCondition<MessageStatusWrapper<undefined>> = async (msg, sender) => {
     const { accountAddress } = msg.payload;
-    const connectedSites = await storedConnectedSites.get();
+    const allowlist = await storedAllowlist.get();
     const locked = await isWalletLocked();
 
-    if (!accountAddress || connectedSites === undefined || locked) {
+    if (!accountAddress || allowlist === undefined || locked) {
         return { run: false, response: { success: false, message: NOT_WHITELISTED } };
     }
 
-    const accountConnectedSites = connectedSites[accountAddress] ?? [];
-    if (sender.url !== undefined && accountConnectedSites.includes(new URL(sender.url).origin)) {
-        return { run: true };
+    if (sender.url !== undefined) {
+        const allowlistedAccounts = allowlist[new URL(sender.url).origin];
+        if (allowlistedAccounts.includes(accountAddress)) {
+            return { run: true };
+        }
     }
 
     return { run: false, response: { success: false, message: NOT_WHITELISTED } };
@@ -320,27 +322,26 @@ const ensureTransactionPayloadParse: RunCondition<MessageStatusWrapper<undefined
  * The priority is defined as:
  * 1. If the selected account is connected, then that is returned.
  * 1. The first account other than the selected account that is connected to the site. The order here
- * is defined by the order of the entries of the stored connected sites.
+ * is defined by the order of the entries in the stored allowlist entry.
  * @param url the site to find an account that is connected to
  * @returns the highest priority account address that is connected to the site with the provided URL.
  */
 async function findPrioritizedAccountConnectedToSite(url: string): Promise<string | undefined> {
     const urlOrigin = new URL(url).origin;
     const selectedAccount = await storedSelectedAccount.get();
-    const connectedSites = await storedConnectedSites.get();
+    const allowlist = await storedAllowlist.get();
 
-    if (!selectedAccount || !connectedSites) {
+    if (!selectedAccount || !allowlist) {
         return undefined;
     }
 
-    const selectedAccountConnectedSites = connectedSites[selectedAccount] ?? [];
-    if (selectedAccountConnectedSites.includes(urlOrigin)) {
+    const connectedAccounts = allowlist[urlOrigin] ?? [];
+    if (connectedAccounts.includes(selectedAccount)) {
         return selectedAccount;
     }
 
-    const connectedAccount = Object.entries(connectedSites).find((item) => item[1] && item[1].includes(urlOrigin));
-    if (connectedAccount) {
-        return connectedAccount[0];
+    if (connectedAccounts.length > 0) {
+        return connectedAccounts[0];
     }
 
     return undefined;
@@ -364,7 +365,7 @@ const runIfNotAllowlisted: RunCondition<MessageStatusWrapper<string[] | undefine
         return { run: true };
     }
 
-    const allowlist = await storedAllowList.get();
+    const allowlist = await storedAllowlist.get();
     if (!allowlist) {
         return { run: true };
     }
@@ -516,7 +517,7 @@ forwardToPopup(
 forwardToPopup(
     MessageType.SendTransaction,
     InternalMessageType.SendTransaction,
-    runConditionComposer(runIfWhitelisted, ensureTransactionPayloadParse, withPromptStart()),
+    runConditionComposer(runIfAccountIsAllowlisted, ensureTransactionPayloadParse, withPromptStart()),
     appendUrlToPayload,
     undefined,
     withPromptEnd
@@ -524,7 +525,7 @@ forwardToPopup(
 forwardToPopup(
     MessageType.SignMessage,
     InternalMessageType.SignMessage,
-    runConditionComposer(runIfWhitelisted, ensureMessageWithSchemaParse, withPromptStart()),
+    runConditionComposer(runIfAccountIsAllowlisted, ensureMessageWithSchemaParse, withPromptStart()),
     appendUrlToPayload,
     undefined,
     withPromptEnd
@@ -532,7 +533,7 @@ forwardToPopup(
 forwardToPopup(
     MessageType.AddTokens,
     InternalMessageType.AddTokens,
-    runConditionComposer(runIfWhitelisted, withPromptStart()),
+    runConditionComposer(runIfAccountIsAllowlisted, withPromptStart()),
     appendUrlToPayload,
     undefined,
     withPromptEnd
@@ -540,7 +541,7 @@ forwardToPopup(
 forwardToPopup(
     MessageType.IdProof,
     InternalMessageType.IdProof,
-    runConditionComposer(runIfWhitelisted, runIfValidProof, withPromptStart()),
+    runConditionComposer(runIfAccountIsAllowlisted, runIfValidProof, withPromptStart()),
     appendUrlToPayload,
     undefined,
     withPromptEnd

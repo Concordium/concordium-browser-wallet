@@ -1,5 +1,5 @@
 import { fullscreenPromptContext } from '@popup/page-layouts/FullscreenPromptLayout';
-import { storedAllowListAtom } from '@popup/store/account';
+import { storedAllowlistAtom } from '@popup/store/account';
 import { useAtom, useAtomValue } from 'jotai';
 import React, { useContext, useEffect, useState } from 'react';
 import { useTranslation } from 'react-i18next';
@@ -10,7 +10,7 @@ import { displayUrl } from '@popup/shared/utils/string-helpers';
 import { sessionPasscodeAtom } from '@popup/store/settings';
 import { absoluteRoutes } from '@popup/constants/routes';
 import AllowlistEntryView, { AllowlistMode } from '../Allowlist/AllowlistEntryView';
-import { updateAllowList } from '../Allowlist/util';
+import { handleAllowlistEntryUpdate } from '../Allowlist/util';
 
 type Props = {
     onAllow(accountAdresses: string[]): void;
@@ -27,7 +27,7 @@ export default function ConnectAccountsRequest({ onAllow, onReject }: Props) {
     const { onClose, withClose } = useContext(fullscreenPromptContext);
     const [accountsToAdd, setAccountsToAdd] = useState<string[]>([]);
     const [connectButtonDisabled, setConnectButtonDisabled] = useState<boolean>(false);
-    const [allowListLoading, setAllowList] = useAtom(storedAllowListAtom);
+    const [allowListLoading, setAllowList] = useAtom(storedAllowlistAtom);
     const passcode = useAtomValue(sessionPasscodeAtom);
 
     useEffect(() => onClose(onReject), [onClose, onReject]);
@@ -70,7 +70,7 @@ export default function ConnectAccountsRequest({ onAllow, onReject }: Props) {
                         disabled={connectButtonDisabled}
                         onClick={() => {
                             setConnectButtonDisabled(true);
-                            updateAllowList(
+                            handleAllowlistEntryUpdate(
                                 new URL(url).origin,
                                 allowListLoading.value,
                                 accountsToAdd,
