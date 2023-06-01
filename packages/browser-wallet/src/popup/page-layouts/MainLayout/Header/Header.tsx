@@ -68,7 +68,7 @@ function getTitle(section: Section, pathname: string) {
         case Section.Id:
             return 'header.ids';
         case Section.Settings: {
-            if (pathname.startsWith(absoluteRoutes.home.settings.allowList.path)) {
+            if (pathname.startsWith(absoluteRoutes.home.settings.allowlist.path)) {
                 return 'header.settings.allowlist';
             }
             if (pathname.startsWith(absoluteRoutes.home.settings.recovery.path)) {

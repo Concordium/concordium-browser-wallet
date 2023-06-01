@@ -1,5 +1,11 @@
 # Changelog
 
+## Unreleased
+
+### Added
+
+-   `requestAccounts` entrypoint to connect to a list of accounts.
+
 ## 2.5.0
 
 ### Added

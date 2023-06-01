@@ -102,12 +102,20 @@ interface MainWalletApi {
      * @param message message to be signed. Note that the wallet will prepend some bytes to ensure the message cannot be a transaction. The message should either be a utf8 string or { @link SignMessageObject }.
      */
     signMessage(accountAddress: string, message: string | SignMessageObject): Promise<AccountTransactionSignature>;
+
     /**
      * Requests a connection to the Concordium wallet, prompting the user to either accept or reject the request.
      * If a connection has already been accepted for the url once the returned promise will resolve without prompting the user.
+     * @deprecated use {@link requestAccounts} instead
      */
     connect(): Promise<string | undefined>;
 
+    /**
+     * Requests a connection to the Concordium wallet, prompting the user to either accept or reject the request. The
+     * user will be prompted to select which accounts should be connected. The list of connected accounts is returned
+     * to the caller. If a connection has already been accepted previously, then the returned promise will resolve
+     * with the list of connected accounts. Note that the list of accounts may be empty.
+     */
     requestAccounts(): Promise<string[] | undefined>;
 
     /**

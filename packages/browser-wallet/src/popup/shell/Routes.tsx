@@ -197,7 +197,7 @@ export default function Routes() {
                 <Route element={<Identity />} path={relativeRoutes.home.identities.path} />
                 <Route path={relativeRoutes.home.settings.path}>
                     <Route index element={<Settings />} />
-                    <Route element={<AllowListRoutes />} path={`${relativeRoutes.home.settings.allowList.path}/*`} />
+                    <Route element={<AllowListRoutes />} path={`${relativeRoutes.home.settings.allowlist.path}/*`} />
                     <Route element={<ChangePasscode />} path={relativeRoutes.home.settings.passcode.path} />
                     <Route element={<NetworkSettings />} path={relativeRoutes.home.settings.network.path} />
                     <Route element={<RecoveryIntro />} path={relativeRoutes.home.settings.recovery.path} />
