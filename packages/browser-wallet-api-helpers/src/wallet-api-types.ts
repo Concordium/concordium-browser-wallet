@@ -44,8 +44,10 @@ export enum SchemaType {
     Parameter = 'parameter',
 }
 
+type LaxStringEnumValue<E extends string> = `${E}`;
+
 export type SchemaWithContext = {
-    type: SchemaType;
+    type: LaxStringEnumValue<SchemaType>;
     value: string;
 };
 
