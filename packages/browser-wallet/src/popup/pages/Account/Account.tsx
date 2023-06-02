@@ -1,7 +1,7 @@
 import { useAtomValue } from 'jotai';
 import React, { useContext, useMemo, useState } from 'react';
 import { useTranslation } from 'react-i18next';
-import { Navigate, Outlet, Route, Routes, useNavigate } from 'react-router-dom';
+import { Navigate, Outlet, Route, Routes, generatePath, useNavigate } from 'react-router-dom';
 import { accountsAtom } from '@popup/store/account';
 import MenuButton from '@popup/shared/MenuButton';
 import { useSelectedCredential } from '@popup/shared/utils/account-helpers';
@@ -9,6 +9,7 @@ import { CreationStatus } from '@shared/storage/types';
 import { useCurrentOpenTabUrl } from '@popup/shared/utils/tabs';
 import Button from '@popup/shared/Button';
 import { absoluteRoutes } from '@popup/constants/routes';
+import { allowlistRoutes } from '@popup/pages/Allowlist/routes';
 import { accountRoutes } from './routes';
 import AccountActions from './AccountActions';
 import DisplayAddress from './DisplayAddress';
@@ -57,7 +58,14 @@ function Account() {
                                 onClick={() => setDetailsExpanded((o) => !o)}
                             />
                             <AccountDetails expanded={detailsExpanded} account={selectedCred} />
-                            <ConnectedBox url={currentUrl} accountAddress={selectedCred.address} />
+                            <ConnectedBox
+                                url={currentUrl}
+                                accountAddress={selectedCred.address}
+                                link={generatePath(
+                                    `${absoluteRoutes.home.settings.allowlist.path}/${allowlistRoutes.edit}`,
+                                    { serviceName: currentUrl ? encodeURIComponent(currentUrl) : '' }
+                                )}
+                            />
                         </div>
                         <div className="account-page__routes">
                             {isConfirmed && <Outlet />}

@@ -10,9 +10,15 @@ const t: typeof en = {
         modifyDescription:
             'Du kan ændre i hvilke konti der er tilgængelige for servicen nedenfor. En allowlisted service kan altid anmode om proofs.',
     },
-    view: {
-        remove: 'Fjern service fra allowlisten',
-        update: 'Opdater allowlist',
+    editor: {
+        removeButton: 'Fjern service fra allowlisten',
+        modal: {
+            header: 'Fjern service?',
+            description:
+                'Når du fjerner en service betyder det, at den ikke længere kan anmode om credential proofs, eller anmode dig om at signere transkationer.',
+            keep: 'Behold',
+            remove: 'Fjern',
+        },
     },
 };
 

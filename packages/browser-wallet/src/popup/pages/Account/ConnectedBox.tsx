@@ -1,29 +1,50 @@
 import { useAtomValue } from 'jotai';
-import React, { useMemo, useState } from 'react';
+import React, { useEffect, useState } from 'react';
 import { useTranslation } from 'react-i18next';
 import { storedAllowlistAtom } from '@popup/store/account';
 import clsx from 'clsx';
+import { Link } from 'react-router-dom';
 
-type Props = {
+interface Props {
     accountAddress?: string;
     url?: string;
-};
+    link?: string;
+}
 
-export default function ConnectedBox({ accountAddress, url }: Props) {
+export default function ConnectedBox({ accountAddress, url, link }: Props) {
     const { t } = useTranslation('account');
-    const [isConnectedToSite, setIsConnectedToSite] = useState<boolean>();
+    const [isWalletConnectedToSite, setWalletConnectedToSite] = useState<boolean>();
+    const [isAccountConnectedToSite, setAccountConnectedToSite] = useState<boolean>();
     const allowlist = useAtomValue(storedAllowlistAtom);
 
-    useMemo(() => {
+    useEffect(() => {
         if (accountAddress && !allowlist.loading && url) {
-            const connectedAccountsForUrl = allowlist.value[url] ?? [];
-            setIsConnectedToSite(connectedAccountsForUrl.includes(accountAddress));
+            const allowlistForUrl = allowlist.value[url];
+            const connectedAccountsForUrl = allowlistForUrl ?? [];
+            setAccountConnectedToSite(connectedAccountsForUrl.includes(accountAddress));
+            setWalletConnectedToSite(allowlistForUrl !== undefined);
         }
     }, [accountAddress, allowlist, url]);
 
+    if (!link || (!isWalletConnectedToSite && !isAccountConnectedToSite)) {
+        return (
+            <div
+                className={clsx(
+                    'account-page__connection-box',
+                    !isAccountConnectedToSite && 'account-page__not-connected'
+                )}
+            >
+                {isAccountConnectedToSite ? t('siteConnected') : t('siteNotConnected')}
+            </div>
+        );
+    }
+
     return (
-        <div className={clsx('account-page__connection-box', !isConnectedToSite && 'account-page__not-connected')}>
-            {isConnectedToSite ? t('siteConnected') : t('siteNotConnected')}
-        </div>
+        <Link
+            className={clsx('account-page__connection-box', !isAccountConnectedToSite && 'account-page__not-connected')}
+            to={link}
+        >
+            {isAccountConnectedToSite ? t('siteConnected') : t('siteNotConnected')}
+        </Link>
     );
 }

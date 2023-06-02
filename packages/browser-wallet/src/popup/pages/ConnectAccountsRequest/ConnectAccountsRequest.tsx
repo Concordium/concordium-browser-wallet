@@ -57,9 +57,9 @@ export default function ConnectAccountsRequest({ onAllow, onReject }: Props) {
                     <h3 className="m-v-5">{t('header', { url: urlDisplay })}</h3>
                 </header>
                 <AllowlistEntryView
-                    selectedAccounts={accountsToAdd}
-                    setSelectedAccounts={setAccountsToAdd}
+                    initialSelectedAccounts={[]}
                     mode={AllowlistMode.Add}
+                    onChange={(selectedAccounts) => setAccountsToAdd(selectedAccounts)}
                 />
                 <div className="flex p-b-10 m-t-auto">
                     <Button width="narrow" className="m-r-10" onClick={withClose(onReject)}>

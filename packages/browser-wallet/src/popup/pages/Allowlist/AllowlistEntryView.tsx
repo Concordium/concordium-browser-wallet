@@ -1,6 +1,6 @@
 import AccountInfoListenerContextProvider, { useAccountInfo } from '@popup/shared/AccountInfoListenerContext';
 import { displaySplitAddress, useIdentityName } from '@popup/shared/utils/account-helpers';
-import React, { useMemo } from 'react';
+import React, { useMemo, useState } from 'react';
 import { Checkbox } from '@popup/shared/Form/Checkbox';
 import { WalletCredential } from '@shared/storage/types';
 import { displayAsCcd } from 'wallet-common-helpers';
@@ -44,26 +44,33 @@ export enum AllowlistMode {
 }
 
 export interface Props {
-    selectedAccounts: string[];
-    setSelectedAccounts: React.Dispatch<React.SetStateAction<string[]>>;
+    initialSelectedAccounts: string[];
     mode: AllowlistMode;
+    onChange?: (selectedAccounts: string[]) => void;
 }
 
-export default function AllowlistEntryView({ selectedAccounts, setSelectedAccounts, mode }: Props) {
+export default function AllowlistEntryView({ initialSelectedAccounts, mode, onChange }: Props) {
     const { t } = useTranslation('allowlist', { keyPrefix: 'entry' });
+    const [selectedAccounts, setSelectedAccounts] = useState<string[]>(initialSelectedAccounts);
     const accounts = useAtomValue(credentialsAtom);
 
     /**
      * Update the local state containing the list of account addresses. If the address
-     * is already present, then it is removed, if not present then it is added.
+     * is already present, then it is removed, if not present then it is added. The onChange
+     * callback is called with the new list of selected account addresses.
      * @param accountAddress the account address to add or remove from the list.
      */
     function updateAccountAddressChecked(accountAddress: string) {
+        let updatedSelectedAccounts = [];
         if (selectedAccounts.includes(accountAddress)) {
-            const updatedAccounts = selectedAccounts.filter((acc) => acc !== accountAddress);
-            setSelectedAccounts(updatedAccounts);
+            updatedSelectedAccounts = selectedAccounts.filter((acc) => acc !== accountAddress);
         } else {
-            setSelectedAccounts([...selectedAccounts, accountAddress]);
+            updatedSelectedAccounts = [...selectedAccounts, accountAddress];
+        }
+
+        setSelectedAccounts(updatedSelectedAccounts);
+        if (onChange) {
+            onChange(updatedSelectedAccounts);
         }
     }
 

@@ -8,7 +8,7 @@ import Button from '@popup/shared/Button';
 import { Route, Routes, generatePath, useNavigate } from 'react-router-dom';
 import { useTranslation } from 'react-i18next';
 import { allowlistRoutes } from './routes';
-import AllowListView from './AllowlistEditor';
+import AllowlistEditor from './AllowlistEditor';
 
 function LoadingAllowlistPage() {
     return <div className="allowlist-page" />;
@@ -56,7 +56,7 @@ export default function AllowListRoutes() {
     return (
         <Routes>
             <Route index element={<Allowlist />} />
-            <Route path={`${allowlistRoutes.edit}`} element={<AllowListView />} />
+            <Route path={`${allowlistRoutes.edit}`} element={<AllowlistEditor />} />
         </Routes>
     );
 }

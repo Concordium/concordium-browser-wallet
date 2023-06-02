@@ -100,4 +100,16 @@
     flex-direction: column;
     justify-content: space-between;
     align-items: center;
+
+    &__remove-wrapper {
+        width: 100%;
+        display: flex;
+        justify-content: center;
+        margin-top: rem(10px);
+        padding-top: rem(10px);
+    }
+
+    &__remove-button {
+        color: $color-danger;
+    }
 }

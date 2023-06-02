@@ -8,9 +8,15 @@ const t = {
         modifyDescription:
             'You can modify which accounts are accessible to the service below. Any allowlisted service can request proofs.',
     },
-    view: {
-        remove: 'Remove',
-        update: 'Update',
+    editor: {
+        removeButton: 'Remove service from allowlist',
+        modal: {
+            header: 'Remove service?',
+            description:
+                'Removing a service means that it cannot request credential proofs, or ask you to sign transactions anymore.',
+            keep: 'Keep',
+            remove: 'Remove',
+        },
     },
 };
 

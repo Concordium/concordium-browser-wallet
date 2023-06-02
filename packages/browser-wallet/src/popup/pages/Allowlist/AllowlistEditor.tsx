@@ -1,4 +1,4 @@
-import React, { useEffect, useState } from 'react';
+import React, { useState } from 'react';
 import { useNavigate, useParams } from 'react-router-dom';
 import Button from '@popup/shared/Button/Button';
 import { selectedAccountAtom, storedAllowlistAtom } from '@popup/store/account';
@@ -6,6 +6,8 @@ import { useAtom, useAtomValue } from 'jotai';
 import { useTranslation } from 'react-i18next';
 import { popupMessageHandler } from '@popup/shared/message-handler';
 import { EventType } from '@concordium/browser-wallet-api-helpers';
+import Modal from '@popup/shared/Modal/Modal';
+import ButtonGroup from '@popup/shared/ButtonGroup';
 import AllowlistEntryView, { AllowlistMode } from './AllowlistEntryView';
 import { handleAllowlistEntryUpdate } from './util';
 
@@ -15,8 +17,8 @@ function LoadingAllowlistEditor() {
 
 export default function AllowlistEditor() {
     const nav = useNavigate();
-    const { t } = useTranslation('allowlist', { keyPrefix: 'view' });
-    const [selectedAccounts, setSelectedAccounts] = useState<string[]>([]);
+    const { t } = useTranslation('allowlist', { keyPrefix: 'editor' });
+    const [showPrompt, setShowPrompt] = useState(false);
     const { serviceName } = useParams<{ serviceName: string }>();
     const [allowListLoading, setAllowList] = useAtom(storedAllowlistAtom);
     const selectedAccount = useAtomValue(selectedAccountAtom);
@@ -26,12 +28,6 @@ export default function AllowlistEditor() {
     }
 
     const decodedServiceName = decodeURIComponent(serviceName);
-
-    useEffect(() => {
-        if (!allowListLoading.loading) {
-            setSelectedAccounts(allowListLoading.value[serviceName]);
-        }
-    }, [allowListLoading]);
 
     async function removeService(serviceNameToRemove: string, allowlist: Record<string, string[]>) {
         const updatedAllowlist = { ...allowlist };
@@ -48,35 +44,51 @@ export default function AllowlistEditor() {
         return <LoadingAllowlistEditor />;
     }
 
+    const trigger = (
+        <Button clear className="allow-list-editor__remove-button">
+            <h3>{t('removeButton')}</h3>
+        </Button>
+    );
+
     return (
         <div className="allow-list-editor">
             <AllowlistEntryView
-                selectedAccounts={selectedAccounts}
-                setSelectedAccounts={setSelectedAccounts}
+                initialSelectedAccounts={allowListLoading.value[decodedServiceName]}
                 mode={AllowlistMode.Modify}
+                onChange={(accounts) =>
+                    handleAllowlistEntryUpdate(
+                        decodedServiceName,
+                        allowListLoading.value,
+                        accounts,
+                        setAllowList,
+                        selectedAccount
+                    )
+                }
             />
             <div className="flex p-b-10 m-t-auto">
-                <Button
-                    className="m-r-10"
-                    width="narrow"
-                    onClick={() =>
-                        handleAllowlistEntryUpdate(
-                            decodedServiceName,
-                            allowListLoading.value,
-                            selectedAccounts,
-                            setAllowList,
-                            selectedAccount
-                        ).then(() => nav(-1))
-                    }
+                <Modal
+                    trigger={trigger}
+                    open={showPrompt}
+                    onOpen={() => setShowPrompt(true)}
+                    onClose={() => setShowPrompt(false)}
+                    disableClose
                 >
-                    {t('update')}
-                </Button>
-                <Button
-                    width="narrow"
-                    onClick={() => removeService(decodedServiceName, allowListLoading.value).then(() => nav(-1))}
-                >
-                    {t('remove')}
-                </Button>
+                    <h3 className="m-t-0">{t('modal.header')}</h3>
+                    <p className="m-b-20">{t('modal.description')}</p>
+                    <ButtonGroup>
+                        <Button faded onClick={() => setShowPrompt(false)}>
+                            {t('modal.keep')}
+                        </Button>
+                        <Button
+                            danger
+                            onClick={() =>
+                                removeService(decodedServiceName, allowListLoading.value).then(() => nav(-1))
+                            }
+                        >
+                            {t('modal.remove')}
+                        </Button>
+                    </ButtonGroup>
+                </Modal>
             </div>
         </div>
     );
