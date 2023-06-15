@@ -111,5 +111,13 @@
 
     &__remove-button {
         color: $color-danger;
+        display: flex;
+
+        &__icon {
+            margin-top: auto;
+            margin-bottom: auto;
+            margin-left: rem(5px);
+            stroke: $color-danger;
+        }
     }
 }

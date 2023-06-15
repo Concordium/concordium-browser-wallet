@@ -8,6 +8,7 @@ import { popupMessageHandler } from '@popup/shared/message-handler';
 import { EventType } from '@concordium/browser-wallet-api-helpers';
 import Modal from '@popup/shared/Modal/Modal';
 import ButtonGroup from '@popup/shared/ButtonGroup';
+import TrashcanIcon from '@assets/svg/trashcan.svg';
 import AllowlistEntryView, { AllowlistMode } from './AllowlistEntryView';
 import { handleAllowlistEntryUpdate } from './util';
 
@@ -47,6 +48,7 @@ export default function AllowlistEditor() {
     const trigger = (
         <Button clear className="allow-list-editor__remove-button">
             <h3>{t('removeButton')}</h3>
+            <TrashcanIcon className="allow-list-editor__remove-button__icon" />
         </Button>
     );
 
