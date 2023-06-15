@@ -8,8 +8,13 @@
 
 .allowlist-page {
     &__link-icon {
-        width: rem(20px);
-        height: rem(10px);
+        height: rem(12px);
+        display: block;
+        stroke: $color-cta;
+
+        path {
+            fill: $color-cta;
+        }
     }
 
     &__list-item {

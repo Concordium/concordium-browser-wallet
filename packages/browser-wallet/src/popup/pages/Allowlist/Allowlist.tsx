@@ -2,7 +2,7 @@ import React from 'react';
 import SidedRow from '@popup/shared/SidedRow/SidedRow';
 import { storedAllowlistAtom } from '@popup/store/account';
 import { useAtomValue } from 'jotai';
-import LinkIcon from '@assets/svg/link.svg';
+import ForwardArrowIcon from '@assets/svg/arrow-forward.svg';
 import { displayUrl } from '@popup/shared/utils/string-helpers';
 import Button from '@popup/shared/Button';
 import { Route, Routes, generatePath, useNavigate } from 'react-router-dom';
@@ -41,7 +41,7 @@ function Allowlist() {
                             left={displayUrl(serviceName)}
                             right={
                                 <Button clear onClick={() => nav(path)}>
-                                    <LinkIcon className="allowlist-page__link-icon" />
+                                    <ForwardArrowIcon className="allowlist-page__link-icon" />
                                 </Button>
                             }
                         />
