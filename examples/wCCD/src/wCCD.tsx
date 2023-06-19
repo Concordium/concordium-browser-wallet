@@ -14,7 +14,6 @@ import { multiply, round } from 'mathjs';
 import { withJsonRpcClient, WalletConnectionProps, useConnect, useConnection } from '@concordium/react-components';
 import { wrap, unwrap } from './utils';
 import {
-    WCCD_CONTRACT_INDEX,
     CONTRACT_SUB_INDEX,
     CONTRACT_NAME,
     VIEW_FUNCTION_RAW_SCHEMA,
@@ -22,6 +21,8 @@ import {
     BROWSER_WALLET,
     WALLET_CONNECT,
 } from './constants';
+
+import { WCCD_CONTRACT_INDEX } from './constants_network';
 
 import ArrowIcon from './assets/Arrow.svg';
 import RefreshIcon from './assets/Refresh.svg';

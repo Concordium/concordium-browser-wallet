@@ -12,7 +12,7 @@ The example project included in this repository serves as a working example of h
 
 ## Running the wCCD example
 
--   Run `yarn build` in a terminal in this folder.
+-   Run `yarn build` in a terminal in this folder for testnet or `yarn build:prod` in a terminal in this folder for mainnet.
 -   Run `yarn start`.
 -   Open URL logged in console (typically http://127.0.0.1:8080).
 
@@ -27,13 +27,13 @@ To have hot-reload (useful for development), do the following instead:
 To build the docker image run the following:
 
 ```
-docker build -t wccd_front_end:$PROJECT_VERSION .
+docker build --build-arg NETWORK=$NETWORK -t wccd_front_end:$PROJECT_VERSION .
 ```
 
 e.g.
 
 ```
-docker build -t wccd_front_end:3.0.0 .
+docker build --build-arg NETWORK=testnet -t wccd_front_end:3.0.0 .
 ```
 
 To run the docker image run the following:
