@@ -1,25 +1,47 @@
 import React, { PropsWithChildren } from 'react';
 import CcdIcon from '@assets/svg/concordium.svg';
+import RevokedIcon from '@assets/svg/revoked.svg';
+import ActiveIcon from '@assets/svg/verified.svg';
+import ExpiredIcon from '@assets/svg/block.svg';
+import PendingIcon from '@assets/svg/pending.svg';
 import {
     VerifiableCredential,
     VerifiableCredentialStatus,
     VerifiableCredentialSchema,
 } from '../../../shared/storage/types';
+import { useCredentialStatus } from './VerifiableCredentialHooks';
 
 function StatusIcon({ status }: { status: VerifiableCredentialStatus }) {
+    let icon = null;
     switch (status) {
         case VerifiableCredentialStatus.Active:
+            icon = <ActiveIcon />;
+            break;
         case VerifiableCredentialStatus.Revoked:
+            icon = <RevokedIcon />;
+            break;
         case VerifiableCredentialStatus.Expired:
+            icon = <ExpiredIcon />;
+            break;
         case VerifiableCredentialStatus.NotActivated:
+            icon = <PendingIcon />;
+            break;
         default:
-            return <div className="verifiable-credential__header-status">{VerifiableCredentialStatus[status]}</div>;
+            icon = null;
+            break;
     }
+
+    return (
+        <div className="verifiable-credential__header__status">
+            {VerifiableCredentialStatus[status]}
+            {icon}
+        </div>
+    );
 }
 
 function Logo() {
     return (
-        <div className="verifiable-credential__header-logo">
+        <div className="verifiable-credential__header__logo">
             <CcdIcon />
         </div>
     );
@@ -103,6 +125,8 @@ export function VerifiableCredentialCard({
     schema: VerifiableCredentialSchema;
     onClick?: () => void;
 }) {
+    const credentialStatus = useCredentialStatus();
+
     const attributes = Object.entries(credential.credentialSubject)
         .filter((val) => val[0] !== 'id')
         .map(applySchema(schema))
@@ -110,10 +134,10 @@ export function VerifiableCredentialCard({
 
     return (
         <ClickableVerifiableCredential onClick={onClick}>
-            <header>
+            <header className="verifiable-credential__header">
                 <Logo />
-                <div className="verifiable-credential__header-title">{credential.type[0]}</div>
-                <StatusIcon status={VerifiableCredentialStatus.Active} />
+                <div className="verifiable-credential__header__title">Concordium Employment</div>
+                <StatusIcon status={credentialStatus} />
             </header>
             <div className="verifiable-credential__body-attributes">
                 {attributes &&

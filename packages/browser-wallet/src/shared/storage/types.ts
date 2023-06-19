@@ -261,6 +261,7 @@ export enum VerifiableCredentialStatus {
     Revoked,
     Expired,
     NotActivated,
+    Unknown,
 }
 
 interface CredentialSchema {
@@ -271,7 +272,7 @@ interface CredentialSchema {
 export type CredentialSubject = { id: string } & Record<string, string | number>;
 
 export interface VerifiableCredential {
-    context: string[];
+    '@context': string[];
     id: string;
     type: string[];
     issuer: string;
@@ -280,11 +281,12 @@ export interface VerifiableCredential {
     credentialSchema: CredentialSchema;
 }
 
+// TODO Type this so that the id property does not require an index.
 interface CredentialSchemaProperty {
     title: string;
-    type: 'string' | 'number';
+    type: 'string' | 'number' | string;
     description: string;
-    index: string;
+    index?: string;
 }
 
 interface CredentialSchemaSubject {

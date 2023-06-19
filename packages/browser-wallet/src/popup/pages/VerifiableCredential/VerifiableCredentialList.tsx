@@ -49,7 +49,7 @@ export default function VerifiableCredentialList() {
     }
 
     return (
-        <>
+        <div className="verifiable-credential-list">
             {verifiableCredentials.map((credential, index) => {
                 return (
                     <VerifiableCredentialCard
@@ -61,6 +61,6 @@ export default function VerifiableCredentialList() {
                     />
                 );
             })}
-        </>
+        </div>
     );
 }
