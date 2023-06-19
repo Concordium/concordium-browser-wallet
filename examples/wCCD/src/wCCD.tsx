@@ -154,6 +154,9 @@ export default function wCCD(props: WalletConnectionProps) {
     const inputValue = useRef<HTMLInputElement | null>(null);
     const [receiver, setReceiver] = useState(account);
 
+    const [rpcGenesisHash, setRpcGenesisHash] = useState<string>();
+    const [rpcError, setRpcError] = useState('');
+
     // Sync connected account to receiver input
     useEffect(() => {
         if (account !== undefined) {
@@ -179,6 +182,25 @@ export default function wCCD(props: WalletConnectionProps) {
             setTransactionError('');
         }
     }, [connection, account, isFlipped]);
+
+    useEffect(() => {
+        if (connection && account) {
+            setRpcGenesisHash(undefined);
+            withJsonRpcClient(connection, (rpcClient) =>
+                rpcClient
+                    .getConsensusStatus()
+                    .then((status) => status.genesisBlock)
+                    .then((genHash) => {
+                        setRpcGenesisHash(genHash);
+                        setRpcError('');
+                    })
+                    .catch((e) => {
+                        setRpcGenesisHash(undefined);
+                        setRpcError((e as Error).message);
+                    })
+            );
+        }
+    }, [connection, account]);
 
     const [isWaitingForTransaction, setWaitingForUser] = useState(false);
     return (
@@ -206,6 +228,14 @@ export default function wCCD(props: WalletConnectionProps) {
                         {...props}
                     />
                 </div>
+                {((rpcGenesisHash && rpcGenesisHash !== network.genesisHash) ||
+                    (genesisHash && genesisHash !== network.genesisHash)) && (
+                    <p style={{ color: 'red' }}>
+                        Unexpected genesis hash: Please ensure that your wallet is connected to network{' '}
+                        <code>{network.name}</code>.
+                    </p>
+                )}
+                {rpcError && <div style={{ color: 'red' }}>Error: {rpcError}.</div>}
                 <div>
                     {activeConnectorError && <p style={{ color: 'red' }}>Connector Error: {activeConnectorError}.</p>}
                     {!activeConnectorError && !isWaitingForTransaction && activeConnectorType && !activeConnector && (
@@ -265,12 +295,6 @@ export default function wCCD(props: WalletConnectionProps) {
                                 </button>
                             </div>
                         </>
-                    )}
-                    {genesisHash && genesisHash !== network.genesisHash && (
-                        <p style={{ color: 'red' }}>
-                            Unexpected genesis hash: Please ensure that your wallet is connected to network{' '}
-                            <code>{network.name}</code>.
-                        </p>
                     )}
                 </div>
                 <div className="containerSwitch">
