@@ -132,18 +132,18 @@ export default function wCCD(props: WalletConnectionProps) {
 
     const [admin, setAdmin] = useState<string>();
     const [adminError, setAdminError] = useState('');
+    const [accountExistsOnNetwork, setAccountExistsOnNetwork] = useState(true);
 
-    // eslint-disable-next-line @typescript-eslint/no-unused-vars
     const testnet = 'testnet';
-    // eslint-disable-next-line @typescript-eslint/no-unused-vars
     const mainnet = 'mainnet';
     let WCCD_CONTRACT_INDEX: bigint;
 
-    if (process.env.network === 'mainnet') {
+    if (process.env.NETWORK === mainnet) {
         WCCD_CONTRACT_INDEX = WCCD_CONTRACT_INDEX_MAINNET;
-    }
-    if (process.env.network === 'testnet') {
+    } else if (process.env.NETWORK === testnet) {
         WCCD_CONTRACT_INDEX = WCCD_CONTRACT_INDEX_TESTNET;
+    } else {
+        throw Error('Environmental variable NETWORK needs to be defined and set to either "mainnet" or "testnet"');
     }
 
     useEffect(() => {
@@ -217,6 +217,26 @@ export default function wCCD(props: WalletConnectionProps) {
         }
     }, [connection, account]);
 
+    useEffect(() => {
+        if (connection && account) {
+            setAccountExistsOnNetwork(true);
+            withJsonRpcClient(connection, (rpcClient) =>
+                rpcClient
+                    .getAccountInfo(account)
+                    .then((returnValue) => {
+                        if (returnValue === null) {
+                            setAccountExistsOnNetwork(false);
+                            setRpcError('');
+                        }
+                    })
+                    .catch((e) => {
+                        setAccountExistsOnNetwork(false);
+                        setRpcError((e as Error).message);
+                    })
+            );
+        }
+    }, [connection, account]);
+
     const [isWaitingForTransaction, setWaitingForUser] = useState(false);
     return (
         <>
@@ -251,11 +271,14 @@ export default function wCCD(props: WalletConnectionProps) {
                         {...props}
                     />
                 </div>
-                {((rpcGenesisHash && rpcGenesisHash !== network.genesisHash) ||
+                {(!accountExistsOnNetwork ||
+                    (rpcGenesisHash && rpcGenesisHash !== network.genesisHash) ||
                     (genesisHash && genesisHash !== network.genesisHash)) && (
                     <p style={{ color: 'red' }}>
-                        Unexpected genesis hash: Please ensure that your wallet is connected to network `{network.name}`
-                        and you have an account in that wallet that is connected to this website.
+                        If you use a browser wallet, please ensure that your browser wallet is connected to network `
+                        {network.name}` and you have an account in that wallet that is connected to this website. If you
+                        use a mobile wallet, please ensure that you use the `{network.name}` mobile wallet app and you
+                        have an account in that wallet that is connected to this website.
                     </p>
                 )}
                 {rpcError && <div style={{ color: 'red' }}>Error: {rpcError}.</div>}

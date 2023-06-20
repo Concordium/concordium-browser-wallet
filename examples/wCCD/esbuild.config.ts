@@ -28,7 +28,7 @@ const config: BuildOptions = {
     outdir: 'dist',
     define: {
         global: 'window',
-        'process.env.network': process.env.NETWORK,
+        'process.env.NETWORK': process.env.NETWORK,
     },
     plugins: [
         htmlPlugin({

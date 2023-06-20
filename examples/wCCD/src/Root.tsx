@@ -9,18 +9,17 @@ import { MAINNET, TESTNET } from './constants';
  * Connect to wallet, setup application state context, and render children when the wallet API is ready for use.
  */
 export default function Root() {
-    // eslint-disable-next-line @typescript-eslint/no-unused-vars
     const testnet = 'testnet';
-    // eslint-disable-next-line @typescript-eslint/no-unused-vars
     const mainnet = 'mainnet';
-    let NETWORK: Network = MAINNET;
 
-    if (process.env.network === 'mainnet') {
+    let NETWORK: Network;
+
+    if (process.env.NETWORK === mainnet) {
         NETWORK = MAINNET;
-    } else if (process.env.network === 'testnet') {
+    } else if (process.env.NETWORK === testnet) {
         NETWORK = TESTNET;
     } else {
-        // return Error('NETWORK needs to be defined');
+        throw Error('Environmental variable NETWORK needs to be defined and set to either "mainnet" or "testnet"');
     }
 
     return (
