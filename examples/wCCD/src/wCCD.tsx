@@ -14,13 +14,14 @@ import { multiply, round } from 'mathjs';
 import { withJsonRpcClient, WalletConnectionProps, useConnect, useConnection } from '@concordium/react-components';
 import { wrap, unwrap } from './utils';
 import {
-    WCCD_CONTRACT_INDEX,
     CONTRACT_SUB_INDEX,
     CONTRACT_NAME,
     VIEW_FUNCTION_RAW_SCHEMA,
     BALANCEOF_FUNCTION_RAW_SCHEMA,
     BROWSER_WALLET,
     WALLET_CONNECT,
+    WCCD_CONTRACT_INDEX_TESTNET,
+    WCCD_CONTRACT_INDEX_MAINNET,
 } from './constants';
 
 import ArrowIcon from './assets/Arrow.svg';
@@ -73,7 +74,7 @@ const InputFieldStyle = {
     padding: '10px 20px',
 };
 
-async function viewAdmin(rpcClient: JsonRpcClient) {
+async function viewAdmin(rpcClient: JsonRpcClient, WCCD_CONTRACT_INDEX: bigint) {
     const res = await rpcClient.invokeContract({
         method: `${CONTRACT_NAME}.view`,
         contract: { index: WCCD_CONTRACT_INDEX, subindex: CONTRACT_SUB_INDEX },
@@ -94,7 +95,7 @@ async function viewAdmin(rpcClient: JsonRpcClient) {
     return returnValues.admin.Account[0];
 }
 
-async function updateWCCDBalanceAccount(rpcClient: JsonRpcClient, account: string) {
+async function updateWCCDBalanceAccount(rpcClient: JsonRpcClient, account: string, WCCD_CONTRACT_INDEX: bigint) {
     const param = serializeUpdateContractParameters(
         CONTRACT_NAME,
         'balanceOf',
@@ -131,11 +132,24 @@ export default function wCCD(props: WalletConnectionProps) {
 
     const [admin, setAdmin] = useState<string>();
     const [adminError, setAdminError] = useState('');
+    const [accountExistsOnNetwork, setAccountExistsOnNetwork] = useState(true);
+
+    const testnet = 'testnet';
+    const mainnet = 'mainnet';
+    let WCCD_CONTRACT_INDEX: bigint;
+
+    if (process.env.NETWORK === mainnet) {
+        WCCD_CONTRACT_INDEX = WCCD_CONTRACT_INDEX_MAINNET;
+    } else if (process.env.NETWORK === testnet) {
+        WCCD_CONTRACT_INDEX = WCCD_CONTRACT_INDEX_TESTNET;
+    } else {
+        throw Error('Environmental variable NETWORK needs to be defined and set to either "mainnet" or "testnet"');
+    }
 
     useEffect(() => {
         // Update admin contract.
         if (connection && account) {
-            withJsonRpcClient(connection, (rpcClient) => viewAdmin(rpcClient))
+            withJsonRpcClient(connection, (rpcClient) => viewAdmin(rpcClient, WCCD_CONTRACT_INDEX))
                 .then((a) => {
                     setAdmin(a);
                     setAdminError('');
@@ -153,6 +167,9 @@ export default function wCCD(props: WalletConnectionProps) {
     const inputValue = useRef<HTMLInputElement | null>(null);
     const [receiver, setReceiver] = useState(account);
 
+    const [rpcGenesisHash, setRpcGenesisHash] = useState<string>();
+    const [rpcError, setRpcError] = useState('');
+
     // Sync connected account to receiver input
     useEffect(() => {
         if (account !== undefined) {
@@ -162,7 +179,9 @@ export default function wCCD(props: WalletConnectionProps) {
 
     useEffect(() => {
         if (connection && account) {
-            withJsonRpcClient(connection, (rpcClient) => updateWCCDBalanceAccount(rpcClient, account))
+            withJsonRpcClient(connection, (rpcClient) =>
+                updateWCCDBalanceAccount(rpcClient, account, WCCD_CONTRACT_INDEX)
+            )
                 .then((a) => {
                     setAmountAccount(a);
                     setAmountAccountError('');
@@ -179,11 +198,58 @@ export default function wCCD(props: WalletConnectionProps) {
         }
     }, [connection, account, isFlipped]);
 
+    useEffect(() => {
+        if (connection && account) {
+            setRpcGenesisHash(undefined);
+            withJsonRpcClient(connection, (rpcClient) =>
+                rpcClient
+                    .getConsensusStatus()
+                    .then((status) => status.genesisBlock)
+                    .then((genHash) => {
+                        setRpcGenesisHash(genHash);
+                        setRpcError('');
+                    })
+                    .catch((e) => {
+                        setRpcGenesisHash(undefined);
+                        setRpcError((e as Error).message);
+                    })
+            );
+        }
+    }, [connection, account]);
+
+    useEffect(() => {
+        if (connection && account) {
+            setAccountExistsOnNetwork(true);
+            withJsonRpcClient(connection, (rpcClient) =>
+                rpcClient
+                    .getAccountInfo(account)
+                    .then((returnValue) => {
+                        if (returnValue === null) {
+                            setAccountExistsOnNetwork(false);
+                            setRpcError('');
+                        }
+                    })
+                    .catch((e) => {
+                        setAccountExistsOnNetwork(false);
+                        setRpcError((e as Error).message);
+                    })
+            );
+        }
+    }, [connection, account]);
+
     const [isWaitingForTransaction, setWaitingForUser] = useState(false);
     return (
         <>
+            <h1>
+                {network.name === 'testnet' ? (
+                    <p style={{ color: 'white' }}>TESTNET</p>
+                ) : (
+                    <p style={{ color: 'red' }}>MAINNET</p>
+                )}
+            </h1>
+
             <h1 className="header">CCD &#8644; wCCD Smart Contract</h1>
-            <h3>Wrap and unwrap your CCDs and wCCDs on the Concordium Testnet</h3>
+            <h3>Wrap and unwrap your CCDs and wCCDs on the Concordium {network.name}</h3>
             <div style={blackCardStyle}>
                 <div>
                     <WalletConnectionTypeButton
@@ -205,6 +271,17 @@ export default function wCCD(props: WalletConnectionProps) {
                         {...props}
                     />
                 </div>
+                {(!accountExistsOnNetwork ||
+                    (rpcGenesisHash && rpcGenesisHash !== network.genesisHash) ||
+                    (genesisHash && genesisHash !== network.genesisHash)) && (
+                    <p style={{ color: 'red' }}>
+                        If you use a browser wallet, please ensure that your browser wallet is connected to network `
+                        {network.name}` and you have an account in that wallet that is connected to this website. If you
+                        use a mobile wallet, please ensure that you use the `{network.name}` mobile wallet app and you
+                        have an account in that wallet that is connected to this website.
+                    </p>
+                )}
+                {rpcError && <div style={{ color: 'red' }}>Error: {rpcError}.</div>}
                 <div>
                     {activeConnectorError && <p style={{ color: 'red' }}>Connector Error: {activeConnectorError}.</p>}
                     {!activeConnectorError && !isWaitingForTransaction && activeConnectorType && !activeConnector && (
@@ -264,12 +341,6 @@ export default function wCCD(props: WalletConnectionProps) {
                                 </button>
                             </div>
                         </>
-                    )}
-                    {genesisHash && genesisHash !== network.genesisHash && (
-                        <p style={{ color: 'red' }}>
-                            Unexpected genesis hash: Please ensure that your wallet is connected to network{' '}
-                            <code>{network.name}</code>.
-                        </p>
                     )}
                 </div>
                 <div className="containerSwitch">
