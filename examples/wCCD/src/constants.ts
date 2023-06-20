@@ -1,5 +1,10 @@
 // The TESTNET_GENESIS_BLOCK_HASH is used to check that the user has its browser wallet connected to testnet and not to mainnet.
-import { BrowserWalletConnector, ephemeralConnectorType, WalletConnectConnector } from '@concordium/react-components';
+import {
+    Network,
+    BrowserWalletConnector,
+    ephemeralConnectorType,
+    WalletConnectConnector,
+} from '@concordium/react-components';
 import { SignClientTypes } from '@walletconnect/types';
 
 export const CONTRACT_NAME = 'cis2_wCCD';
@@ -30,3 +35,30 @@ export const BROWSER_WALLET = ephemeralConnectorType(BrowserWalletConnector.crea
 export const WALLET_CONNECT = ephemeralConnectorType(
     WalletConnectConnector.create.bind(undefined, WALLET_CONNECT_OPTS)
 );
+
+// The GENESIS_BLOCK_HASH is used to check that the user has its browser wallet connected to testnet and not to mainnet.
+export const MAINNET_GENESIS_BLOCK_HASH = '9dd9ca4d19e9393877d2c44b70f89acbfc0883c2243e5eeaecc0d1cd0503f478';
+export const TESTNET_GENESIS_BLOCK_HASH = '4221332d34e1694168c2a0c0b3fd0f273809612cb13d000d5c2e00e85f50f796';
+
+export const MAINNET: Network = {
+    name: 'mainnet',
+    genesisHash: MAINNET_GENESIS_BLOCK_HASH,
+    jsonRpcUrl: 'https://json-rpc.mainnet.concordium.software',
+    ccdScanBaseUrl: 'https://ccdscan.io',
+};
+export const TESTNET: Network = {
+    name: 'testnet',
+    genesisHash: TESTNET_GENESIS_BLOCK_HASH,
+    jsonRpcUrl: 'https://json-rpc.testnet.concordium.com',
+    ccdScanBaseUrl: 'https://testnet.ccdscan.io',
+};
+
+/** If you want to test admin functions of the wCCD contract,
+ * it will be necessary to instantiate your own wCCD contract using an account available in the browser wallet,
+ * and change these constants to match the indexes of the instances.
+ *
+ * Should match the subindexes of the instances targeted.
+ * V1 Module reference on testnet: cc285180b45d7695db75c29dee004d2e81a1383880c9b122399bea809196c98f
+ */
+export const WCCD_CONTRACT_INDEX_MAINNET = 9354n;
+export const WCCD_CONTRACT_INDEX_TESTNET = 2059n;

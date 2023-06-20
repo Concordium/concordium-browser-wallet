@@ -20,9 +20,9 @@ import {
     BALANCEOF_FUNCTION_RAW_SCHEMA,
     BROWSER_WALLET,
     WALLET_CONNECT,
+    WCCD_CONTRACT_INDEX_TESTNET,
+    WCCD_CONTRACT_INDEX_MAINNET,
 } from './constants';
-
-import { WCCD_CONTRACT_INDEX } from './constants_network';
 
 import ArrowIcon from './assets/Arrow.svg';
 import RefreshIcon from './assets/Refresh.svg';
@@ -74,7 +74,7 @@ const InputFieldStyle = {
     padding: '10px 20px',
 };
 
-async function viewAdmin(rpcClient: JsonRpcClient) {
+async function viewAdmin(rpcClient: JsonRpcClient, WCCD_CONTRACT_INDEX: bigint) {
     const res = await rpcClient.invokeContract({
         method: `${CONTRACT_NAME}.view`,
         contract: { index: WCCD_CONTRACT_INDEX, subindex: CONTRACT_SUB_INDEX },
@@ -95,7 +95,7 @@ async function viewAdmin(rpcClient: JsonRpcClient) {
     return returnValues.admin.Account[0];
 }
 
-async function updateWCCDBalanceAccount(rpcClient: JsonRpcClient, account: string) {
+async function updateWCCDBalanceAccount(rpcClient: JsonRpcClient, account: string, WCCD_CONTRACT_INDEX: bigint) {
     const param = serializeUpdateContractParameters(
         CONTRACT_NAME,
         'balanceOf',
@@ -133,10 +133,23 @@ export default function wCCD(props: WalletConnectionProps) {
     const [admin, setAdmin] = useState<string>();
     const [adminError, setAdminError] = useState('');
 
+    // eslint-disable-next-line @typescript-eslint/no-unused-vars
+    const testnet = 'testnet';
+    // eslint-disable-next-line @typescript-eslint/no-unused-vars
+    const mainnet = 'mainnet';
+    let WCCD_CONTRACT_INDEX: bigint;
+
+    if (process.env.network === 'mainnet') {
+        WCCD_CONTRACT_INDEX = WCCD_CONTRACT_INDEX_MAINNET;
+    }
+    if (process.env.network === 'testnet') {
+        WCCD_CONTRACT_INDEX = WCCD_CONTRACT_INDEX_TESTNET;
+    }
+
     useEffect(() => {
         // Update admin contract.
         if (connection && account) {
-            withJsonRpcClient(connection, (rpcClient) => viewAdmin(rpcClient))
+            withJsonRpcClient(connection, (rpcClient) => viewAdmin(rpcClient, WCCD_CONTRACT_INDEX))
                 .then((a) => {
                     setAdmin(a);
                     setAdminError('');
@@ -166,7 +179,9 @@ export default function wCCD(props: WalletConnectionProps) {
 
     useEffect(() => {
         if (connection && account) {
-            withJsonRpcClient(connection, (rpcClient) => updateWCCDBalanceAccount(rpcClient, account))
+            withJsonRpcClient(connection, (rpcClient) =>
+                updateWCCDBalanceAccount(rpcClient, account, WCCD_CONTRACT_INDEX)
+            )
                 .then((a) => {
                     setAmountAccount(a);
                     setAmountAccountError('');
@@ -205,8 +220,16 @@ export default function wCCD(props: WalletConnectionProps) {
     const [isWaitingForTransaction, setWaitingForUser] = useState(false);
     return (
         <>
+            <h1>
+                {network.name === 'testnet' ? (
+                    <p style={{ color: 'white' }}>TESTNET</p>
+                ) : (
+                    <p style={{ color: 'red' }}>MAINNET</p>
+                )}
+            </h1>
+
             <h1 className="header">CCD &#8644; wCCD Smart Contract</h1>
-            <h3>Wrap and unwrap your CCDs and wCCDs on the Concordium Testnet</h3>
+            <h3>Wrap and unwrap your CCDs and wCCDs on the Concordium {network.name}</h3>
             <div style={blackCardStyle}>
                 <div>
                     <WalletConnectionTypeButton
@@ -231,8 +254,8 @@ export default function wCCD(props: WalletConnectionProps) {
                 {((rpcGenesisHash && rpcGenesisHash !== network.genesisHash) ||
                     (genesisHash && genesisHash !== network.genesisHash)) && (
                     <p style={{ color: 'red' }}>
-                        Unexpected genesis hash: Please ensure that your wallet is connected to network{' '}
-                        <code>{network.name}</code>.
+                        Unexpected genesis hash: Please ensure that your wallet is connected to network `{network.name}`
+                        and you have an account in that wallet that is connected to this website.
                     </p>
                 )}
                 {rpcError && <div style={{ color: 'red' }}>Error: {rpcError}.</div>}

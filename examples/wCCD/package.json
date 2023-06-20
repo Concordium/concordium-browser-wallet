@@ -27,8 +27,8 @@
         "typescript": "^4.7.2"
     },
     "scripts": {
-        "build": "cp ./src/constants_testnet_network.ts ./src/constants_network.ts; node --loader ts-node/esm ./esbuild.config.ts; cp ./src/assets/* ./dist",
-        "build:prod": "cp ./src/constants_mainnet_network.ts ./src/constants_network.ts; node --loader ts-node/esm ./esbuild.config.ts; cp ./src/assets/* ./dist",
+        "build": "NETWORK='testnet' node --loader ts-node/esm ./esbuild.config.ts; cp ./src/assets/* ./dist",
+        "build:prod": "NETWORK='mainnet' node --loader ts-node/esm ./esbuild.config.ts; cp ./src/assets/* ./dist",
         "watch": "cross-env WATCH=1 yarn build",
         "start": "live-server ./dist"
     }
