@@ -307,7 +307,9 @@ export default function wCCD(props: WalletConnectionProps) {
                                 type="button"
                                 onClick={() => {
                                     window.open(
-                                        `https://testnet.ccdscan.io/?dcount=1&dentity=account&daddress=${account}`,
+                                        `https://${
+                                            process.env.NETWORK === testnet ? `testnet.` : ``
+                                        }ccdscan.io/?dcount=1&dentity=account&daddress=${account}`,
                                         '_blank',
                                         'noopener,noreferrer'
                                     );
@@ -446,7 +448,9 @@ export default function wCCD(props: WalletConnectionProps) {
                                         type="button"
                                         onClick={() => {
                                             window.open(
-                                                `https://testnet.ccdscan.io/?dcount=1&dentity=transaction&dhash=${hash}`,
+                                                `https://${
+                                                    process.env.NETWORK === testnet ? `testnet.` : ``
+                                                }ccdscan.io/?dcount=1&dentity=transaction&dhash=${hash}`,
                                                 '_blank',
                                                 'noopener,noreferrer'
                                             );
@@ -469,7 +473,9 @@ export default function wCCD(props: WalletConnectionProps) {
                                     type="button"
                                     onClick={() => {
                                         window.open(
-                                            `https://testnet.ccdscan.io/?dcount=1&dentity=account&daddress=${admin}`,
+                                            `https://${
+                                                process.env.NETWORK === testnet ? `testnet.` : ``
+                                            }ccdscan.io/?dcount=1&dentity=account&daddress=${admin}`,
                                             '_blank',
                                             'noopener,noreferrer'
                                         );
