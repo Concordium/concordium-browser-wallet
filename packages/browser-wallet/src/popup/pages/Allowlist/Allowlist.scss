@@ -7,21 +7,30 @@
 }
 
 .allowlist-page {
+    &__link {
+        display: block;
+
+        &:not(:last-child) {
+            border-bottom: rem(1px) dashed $color-petroleum;
+        }
+    }
+
     &__link-icon {
         height: rem(12px);
         display: block;
-        stroke: $color-cta;
 
         path {
-            fill: $color-cta;
+            fill: $color-text;
         }
     }
 
     &__list-item {
         padding: rem(10px) 0;
 
-        &:not(:last-child) {
-            border-bottom: rem(1px) dashed $color-petroleum;
+        &:hover {
+            path {
+                fill: $color-cta;
+            }
         }
     }
 }

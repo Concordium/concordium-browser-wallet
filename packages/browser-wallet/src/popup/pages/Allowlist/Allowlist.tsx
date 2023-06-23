@@ -4,8 +4,7 @@ import { storedAllowlistAtom } from '@popup/store/account';
 import { useAtomValue } from 'jotai';
 import ForwardArrowIcon from '@assets/svg/arrow-forward.svg';
 import { displayUrl } from '@popup/shared/utils/string-helpers';
-import Button from '@popup/shared/Button';
-import { Route, Routes, generatePath, useNavigate } from 'react-router-dom';
+import { Link, Route, Routes, generatePath } from 'react-router-dom';
 import { useTranslation } from 'react-i18next';
 import { allowlistRoutes } from './routes';
 import AllowlistEditor from './AllowlistEditor';
@@ -20,7 +19,6 @@ function EmptyAllowlistPage() {
 }
 
 function Allowlist() {
-    const nav = useNavigate();
     const allowlistWithLoading = useAtomValue(storedAllowlistAtom);
     const allowlist = allowlistWithLoading.value;
 
@@ -36,16 +34,14 @@ function Allowlist() {
             {Object.keys(allowlist).map((serviceName) => {
                 const path = generatePath(allowlistRoutes.edit, { serviceName: encodeURIComponent(serviceName) });
                 return (
-                    <div className="allowlist-page__list-item" key={serviceName}>
-                        <SidedRow
-                            left={displayUrl(serviceName)}
-                            right={
-                                <Button clear onClick={() => nav(path)}>
-                                    <ForwardArrowIcon className="allowlist-page__link-icon" />
-                                </Button>
-                            }
-                        />
-                    </div>
+                    <Link className="allowlist-page__link" to={path}>
+                        <div className="allowlist-page__list-item" key={serviceName}>
+                            <SidedRow
+                                left={displayUrl(serviceName)}
+                                right={<ForwardArrowIcon className="allowlist-page__link-icon" />}
+                            />
+                        </div>
+                    </Link>
                 );
             })}
         </div>
