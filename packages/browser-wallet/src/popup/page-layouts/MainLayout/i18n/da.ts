@@ -21,7 +21,7 @@ const t: typeof en = {
         idProof: 'Bevis for identitet',
         request: 'Anmodning om Signatur',
         connect: 'Ny Forbindelse',
-        connectAccountsRequest: 'Anmodning om tilladelse',
+        allowlistingRequest: 'Anmodning om tilladelse',
     },
     entityList: {
         searchPlaceholder: 'Søg',

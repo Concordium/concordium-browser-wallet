@@ -147,7 +147,7 @@ export const storedTokenMetadata = makeStorageAccessor<Record<string, TokenMetad
 export const storedAcceptedTerms = makeStorageAccessor<AcceptedTermsState>('local', ChromeStorageKey.AcceptedTerms);
 const indexedStoredAllowlist = makeIndexedStorageAccessor<Record<string, string[]>>(
     'local',
-    ChromeStorageKey.AllowList
+    ChromeStorageKey.Allowlist
 );
 export const storedAllowlist = useIndexedStorage(indexedStoredAllowlist, getGenesisHash);
 

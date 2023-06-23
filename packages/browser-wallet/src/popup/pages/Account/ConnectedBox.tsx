@@ -20,8 +20,7 @@ export default function ConnectedBox({ accountAddress, url, link }: Props) {
     useEffect(() => {
         if (accountAddress && !allowlist.loading && url) {
             const allowlistForUrl = allowlist.value[url];
-            const connectedAccountsForUrl = allowlistForUrl ?? [];
-            setAccountConnectedToSite(connectedAccountsForUrl.includes(accountAddress));
+            setAccountConnectedToSite(allowlistForUrl?.includes(accountAddress) ?? false);
             setWalletConnectedToSite(allowlistForUrl !== undefined);
         }
     }, [accountAddress, allowlist, url]);

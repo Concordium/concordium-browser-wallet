@@ -56,7 +56,7 @@ const accessorMap = {
     [ChromeStorageKey.Cookie]: useIndexedStorage(sessionCookie, getGenesisHash),
     [ChromeStorageKey.OpenPrompt]: sessionOpenPrompt,
     [ChromeStorageKey.AcceptedTerms]: storedAcceptedTerms,
-    [ChromeStorageKey.AllowList]: storedAllowlist,
+    [ChromeStorageKey.Allowlist]: storedAllowlist,
 };
 
 export function resetOnUnmountAtom<V>(initial: V): PrimitiveAtom<V> {

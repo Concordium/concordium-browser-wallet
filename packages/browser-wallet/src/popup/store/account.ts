@@ -20,7 +20,7 @@ export const storedConnectedSitesAtom = atomWithChromeStorage<Record<string, str
 );
 
 export const storedAllowlistAtom = atomWithChromeStorage<Record<string, string[]>>(
-    ChromeStorageKey.AllowList,
+    ChromeStorageKey.Allowlist,
     {},
     true
 );
