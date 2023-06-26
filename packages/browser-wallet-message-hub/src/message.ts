@@ -16,6 +16,7 @@ export enum MessageType {
     GrpcRequest = 'M_GrpcRequest',
     AddTokens = 'M_AddTokens',
     IdProof = 'M_IdProof',
+    ConnectAccounts = 'M_ConnectAccounts',
 }
 
 /**
@@ -37,6 +38,7 @@ export enum InternalMessageType {
     AddTokens = 'I_AddTokens',
     IdProof = 'I_IdProof',
     CreateIdProof = 'I_CreateIdProof',
+    ConnectAccounts = 'I_ConnectAccounts',
 }
 
 // eslint-disable-next-line @typescript-eslint/no-explicit-any

@@ -1,36 +1,39 @@
-import { absoluteRoutes } from '@popup/constants/routes';
 import { fullscreenPromptContext } from '@popup/page-layouts/FullscreenPromptLayout';
-import { selectedAccountAtom, storedAllowlistAtom } from '@popup/store/account';
-import { sessionPasscodeAtom } from '@popup/store/settings';
+import { storedAllowlistAtom } from '@popup/store/account';
 import { useAtom, useAtomValue } from 'jotai';
 import React, { useContext, useEffect, useState } from 'react';
 import { useTranslation } from 'react-i18next';
-import { useLocation, Navigate } from 'react-router-dom';
+import { Navigate, useLocation } from 'react-router-dom';
 import ExternalRequestLayout from '@popup/page-layouts/ExternalRequestLayout';
 import Button from '@popup/shared/Button';
 import { displayUrl } from '@popup/shared/utils/string-helpers';
-import { displaySplitAddress } from '@popup/shared/utils/account-helpers';
+import { sessionPasscodeAtom } from '@popup/store/settings';
+import { absoluteRoutes } from '@popup/constants/routes';
+import AllowlistEntryView, { AllowlistMode } from '../Allowlist/AllowlistEntryView';
 import { handleAllowlistEntryUpdate } from '../Allowlist/util';
 
 type Props = {
-    onAllow(): void;
+    onAllow(accountAdresses: string[]): void;
     onReject(): void;
 };
 
-export default function ConnectionRequest({ onAllow, onReject }: Props) {
+function LoadingConnectAccountsRequest() {
+    return <ExternalRequestLayout />;
+}
+
+export default function ConnectAccountsRequest({ onAllow, onReject }: Props) {
     const { state } = useLocation();
-    const { t } = useTranslation('connectionRequest');
+    const { t } = useTranslation('connectAccountsRequest');
     const { onClose, withClose } = useContext(fullscreenPromptContext);
-    const selectedAccount = useAtomValue(selectedAccountAtom);
-    const [allowlistLoading, setAllowlist] = useAtom(storedAllowlistAtom);
-    const allowlist = allowlistLoading.value;
-    const passcode = useAtomValue(sessionPasscodeAtom);
+    const [accountsToAdd, setAccountsToAdd] = useState<string[]>([]);
     const [connectButtonDisabled, setConnectButtonDisabled] = useState<boolean>(false);
+    const [allowListLoading, setAllowList] = useAtom(storedAllowlistAtom);
+    const passcode = useAtomValue(sessionPasscodeAtom);
 
     useEffect(() => onClose(onReject), [onClose, onReject]);
 
-    if (!selectedAccount || allowlistLoading.loading || passcode.loading) {
-        return null;
+    if (allowListLoading.loading || passcode.loading) {
+        return <LoadingConnectAccountsRequest />;
     }
 
     // The wallet is locked, so prompt the user to unlock the wallet before connecting.
@@ -38,13 +41,9 @@ export default function ConnectionRequest({ onAllow, onReject }: Props) {
         return (
             <Navigate
                 to={absoluteRoutes.login.path}
-                state={{ to: absoluteRoutes.prompt.connectionRequest.path, toState: state }}
+                state={{ to: absoluteRoutes.prompt.connectAccountsRequest.path, toState: state }}
             />
         );
-    }
-
-    async function connectAccount(account: string, url: string) {
-        await handleAllowlistEntryUpdate(url, allowlist, [account], setAllowlist);
     }
 
     // eslint-disable-next-line @typescript-eslint/no-explicit-any
@@ -53,14 +52,16 @@ export default function ConnectionRequest({ onAllow, onReject }: Props) {
 
     return (
         <ExternalRequestLayout>
-            <div className="account-page__connection-box connection-request__connection-box">{t('waiting')}</div>
             <div className="h-full flex-column align-center">
-                <header className="m-v-20">
-                    <h1>{t('title', { dApp: urlDisplay, account: displaySplitAddress(selectedAccount) })}</h1>
+                <header className="text-center">
+                    <h3 className="m-v-5">{t('header', { url: urlDisplay })}</h3>
                 </header>
-                <p className="connection-request__description">{t('descriptionP1', { dApp: urlDisplay })}</p>
-                <p className="connection-request__description">{t('descriptionP2')}</p>
-                <div className="flex p-b-10  m-t-auto">
+                <AllowlistEntryView
+                    initialSelectedAccounts={[]}
+                    mode={AllowlistMode.Add}
+                    onChange={(selectedAccounts) => setAccountsToAdd(selectedAccounts)}
+                />
+                <div className="flex p-b-10 m-t-auto">
                     <Button width="narrow" className="m-r-10" onClick={withClose(onReject)}>
                         {t('actions.cancel')}
                     </Button>
@@ -69,7 +70,16 @@ export default function ConnectionRequest({ onAllow, onReject }: Props) {
                         disabled={connectButtonDisabled}
                         onClick={() => {
                             setConnectButtonDisabled(true);
-                            connectAccount(selectedAccount, new URL(url).origin).then(withClose(onAllow));
+                            handleAllowlistEntryUpdate(
+                                new URL(url).origin,
+                                allowListLoading.value,
+                                accountsToAdd,
+                                setAllowList
+                            ).then(
+                                withClose(() => {
+                                    onAllow(accountsToAdd);
+                                })
+                            );
                         }}
                     >
                         {t('actions.connect')}
