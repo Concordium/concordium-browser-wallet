@@ -1,7 +1,7 @@
 {
     "name": "wccd",
     "packageManager": "yarn@3.2.0",
-    "version": "3.1.2",
+    "version": "4.0.0",
     "license": "Apache-2.0",
     "dependencies": {
         "@concordium/react-components": "^0.2.0",
@@ -27,7 +27,8 @@
         "typescript": "^4.7.2"
     },
     "scripts": {
-        "build": "node --loader ts-node/esm ./esbuild.config.ts; cp ./src/assets/* ./dist",
+        "build": "NETWORK='testnet' node --loader ts-node/esm ./esbuild.config.ts; cp ./src/assets/* ./dist",
+        "build:prod": "NETWORK='mainnet' node --loader ts-node/esm ./esbuild.config.ts; cp ./src/assets/* ./dist",
         "watch": "cross-env WATCH=1 yarn build",
         "start": "live-server ./dist"
     }

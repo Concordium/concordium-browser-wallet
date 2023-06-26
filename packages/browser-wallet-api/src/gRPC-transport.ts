@@ -24,10 +24,12 @@ import {
 export class BWGRPCTransport implements RpcTransport {
     messageHandler: InjectedMessageHandler;
 
-    transport: RpcTransport | undefined;
+    transport: RpcTransport;
 
     constructor(messageHandler: InjectedMessageHandler) {
         this.messageHandler = messageHandler;
+        // baseUrl is placeholder that is replaced during the call.
+        this.transport = new GrpcWebFetchTransport({ baseUrl: '' });
     }
 
     mergeOptions(options: RpcOptions) {
@@ -55,9 +57,8 @@ export class BWGRPCTransport implements RpcTransport {
                 if (!response.success) {
                     throw new Error(response.message);
                 }
-                // Perform the actual gRPC request:
-                this.transport = new GrpcWebFetchTransport({ baseUrl: response.result });
-                const unary = this.transport.unary(method, input, options);
+                // Perform the actual gRPC request: (Overwrite the baseUrl to use the one we got from the wallet)
+                const unary = this.transport.unary(method, input, { ...options, baseUrl: response.result });
                 // Forward results for all the 4 outputs:
                 unary.headers.then(defHeader.resolve.bind(defHeader)).catch(defHeader.reject.bind(defHeader));
                 unary.response.then(defMessage.resolve.bind(defMessage)).catch(defMessage.reject.bind(defMessage));
@@ -104,9 +105,9 @@ export class BWGRPCTransport implements RpcTransport {
                 if (!response.success) {
                     throw new Error(response.message);
                 }
-                // Perform the actual gRPC request:
-                this.transport = new GrpcWebFetchTransport({ baseUrl: response.result });
-                const stream = this.transport.serverStreaming(method, input, options);
+
+                // Perform the actual gRPC request: (Overwrite the baseUrl to use the one we got from the wallet)
+                const stream = this.transport.serverStreaming(method, input, { ...options, baseUrl: response.result });
                 // Forward results for all the 4 outputs:
                 stream.headers.then(defHeader.resolve.bind(defHeader)).catch(defHeader.reject.bind(defHeader));
                 stream.responses.onNext(responseStream.notifyNext.bind(responseStream));

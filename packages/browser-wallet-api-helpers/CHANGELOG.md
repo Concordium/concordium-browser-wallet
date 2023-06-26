@@ -6,6 +6,12 @@
 
 -   `requestAccounts` entrypoint to connect to a list of accounts.
 
+## 2.5.1
+
+### Changed
+
+-   Made it possible to define the `type` of `SchemaWithContext` as a string along with the existing `SchemaType` enum.
+
 ## 2.5.0
 
 ### Added

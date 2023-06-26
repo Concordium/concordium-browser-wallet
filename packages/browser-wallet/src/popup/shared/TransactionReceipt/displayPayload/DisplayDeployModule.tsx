@@ -2,6 +2,7 @@ import React, { useMemo } from 'react';
 import { useTranslation } from 'react-i18next';
 import { DeployModulePayload, sha256 } from '@concordium/web-sdk';
 import { chunkString } from 'wallet-common-helpers';
+import CopyButton from '@popup/shared/CopyButton';
 import OptionalField from './OptionalField';
 
 interface Props {
@@ -18,8 +19,11 @@ export default function DisplayDeployModule({ payload }: Props) {
     return (
         <>
             <OptionalField title={t('version')} value={payload.version} />
-            <h5>{t('sourceHash')}:</h5>
-            <div className="mono transaction-receipt__value text-center">{chunkString(hash, 32).join('\n')}</div>
+            <h5>{t('moduleReference')}:</h5>
+            <div className="flex align-center transaction-receipt__with-copy">
+                <p className="mono transaction-receipt__value text-center m-0">{chunkString(hash, 32).join('\n')}</p>
+                <CopyButton className="transaction-receipt__copy-button" value={hash} />
+            </div>
         </>
     );
 }
