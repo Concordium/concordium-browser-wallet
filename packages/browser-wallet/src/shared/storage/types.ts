@@ -27,6 +27,7 @@ export enum ChromeStorageKey {
     AcceptedTerms = 'acceptedTerms',
     VerifiableCredentials = 'verifiableCredentials',
     VerifiableCredentialSchemas = 'verifiableCredentialSchemas',
+    Allowlist = 'allowlist',
 }
 
 export enum Theme {
@@ -174,6 +175,7 @@ export interface NetworkConfiguration {
     name: string;
     jsonRpcUrl: string;
     explorerUrl: string;
+    ccdScanUrl: string;
 }
 
 export type RecoveryPayload = {
@@ -252,6 +254,7 @@ export type Cis2TokensResponse = {
 export type AcceptedTermsState = {
     accepted: boolean;
     version: string;
+    url?: string;
 };
 
 // TODO[orhoj]: The types are incomplete as the final schemas are not ready.

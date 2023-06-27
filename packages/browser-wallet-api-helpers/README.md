@@ -74,6 +74,17 @@ if (accountAddress) {
 }
 ```
 
+### requestAccounts
+
+To request a connection to the wallet from the user, the `requestAccounts` method has to be invoked. The method returns a `Promise` resolving with the list of accounts
+that the user has chosen to connect with. The list may be empty. Alternatively the promise will be rejecting if the request is rejected in the wallet. If the wallet is locked,
+then this call prompts the user to first unlock the wallet before accepting or rejecting the request.
+
+```typescript
+const provider = await detectConcordiumProvider();
+const accountAddresses = await provider.requestAccounts();
+```
+
 ### getSelectedChain
 
 This can be invoked to get the genesis hash of the chain selected in the wallet. The method returns a `Promise`, resolving with the genesis hash (as a hex string) of the selected chain, or undefined if the wallet is locked or has not been set up by the user.

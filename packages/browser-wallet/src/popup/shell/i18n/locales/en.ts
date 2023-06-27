@@ -18,6 +18,8 @@ import changePasscode from '@popup/pages/ChangePasscode/i18n/en';
 import externalAddTokens from '@popup/pages/ExternalAddTokens/i18n/en';
 import termsAndConditions from '@popup/pages/TermsAndConditions/i18n/en';
 import idProofRequest from '@popup/pages/IdProofRequest/i18n/en';
+import allowlist from '@popup/pages/Allowlist/i18n/en';
+import connectAccountsRequest from '@popup/pages/ConnectAccountsRequest/i18n/en';
 
 const t = {
     shared,
@@ -40,6 +42,8 @@ const t = {
     externalAddTokens,
     termsAndConditions,
     idProofRequest,
+    allowlist,
+    connectAccountsRequest,
 };
 
 export default t;

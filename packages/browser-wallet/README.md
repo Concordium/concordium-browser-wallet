@@ -11,6 +11,7 @@ See [installing](../../README.md#installing) in repository root.
 Assuming dependencies have been successfully installed,
 
 -   `cd` into package root
+-   Build concordium helpers by running `yarn build:api-helpers`
 -   Run `yarn build:(dev|prod)`
 -   To continuously watch for changes, run `yarn watch`
 

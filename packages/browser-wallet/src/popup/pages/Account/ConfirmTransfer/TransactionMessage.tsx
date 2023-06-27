@@ -1,4 +1,4 @@
-import React, { useMemo, useState } from 'react';
+import React, { useMemo } from 'react';
 import { useTranslation } from 'react-i18next';
 import {
     AccountTransactionPayload,
@@ -11,22 +11,20 @@ import {
 import { useSelectedAccountInfo } from '@popup/shared/AccountInfoListenerContext/AccountInfoListenerContext';
 import { useBlockChainParametersV1 } from '@popup/shared/BlockChainParametersProvider';
 import { secondsToDaysRoundedDown } from '@shared/utils/time-helpers';
-import Modal from '@popup/shared/Modal';
-import Button from '@popup/shared/Button';
 
 interface Props {
     payload: AccountTransactionPayload;
     transactionType: AccountTransactionType;
-    setShowNotice: (show: boolean) => void;
-    showNotice: boolean;
 }
 
-export function TransactionMessage({ transactionType, payload, showNotice, setShowNotice }: Props) {
+/**
+ * Component that displays a message related to a transaction before sending it.
+ * Note that only some transactions warrant a message.
+ */
+export function TransactionMessage({ transactionType, payload }: Props) {
     const { t } = useTranslation('account', { keyPrefix: 'transactionMessage' });
-    const { t: tShared } = useTranslation('shared');
     const accountInfo = useSelectedAccountInfo();
     const parametersV1 = useBlockChainParametersV1();
-    const [noticeMessage, setNoticeMessage] = useState<string>();
 
     const message = useMemo(() => {
         if (!accountInfo) {
@@ -44,14 +42,8 @@ export function TransactionMessage({ transactionType, payload, showNotice, setSh
                     if (newStake && accountInfo.accountBaker.stakedAmount > newStake) {
                         return t('configureBaker.lowerBakerStake', { cooldownPeriod });
                     }
-                    if ((payload as ConfigureBakerPayload).keys) {
-                        setNoticeMessage(t('configureBaker.notice.updateKeys'));
-                    } else {
-                        setNoticeMessage(t('configureBaker.notice.update'));
-                    }
                     return undefined;
                 }
-                setNoticeMessage(t('configureBaker.notice.start'));
                 return t('configureBaker.registerBaker', { cooldownPeriod });
             }
             case AccountTransactionType.ConfigureDelegation: {
@@ -68,10 +60,8 @@ export function TransactionMessage({ transactionType, payload, showNotice, setSh
                             cooldownPeriod,
                         });
                     }
-                    setNoticeMessage(t('configureDelegation.notice.update'));
                     return undefined;
                 }
-                setNoticeMessage(t('configureDelegation.notice.start'));
                 return t('configureDelegation.register', {
                     cooldownPeriod,
                 });
@@ -81,19 +71,5 @@ export function TransactionMessage({ transactionType, payload, showNotice, setSh
         }
         return undefined;
     }, [parametersV1?.delegatorCooldown]);
-
-    return (
-        <>
-            <Modal open={Boolean(noticeMessage) && showNotice} disableClose>
-                <div>
-                    <h3 className="m-t-0">{tShared('notice')}</h3>
-                    <p className="white-space-break ">{noticeMessage}</p>
-                    <Button className="m-t-10" width="wide" onClick={() => setShowNotice(false)}>
-                        {tShared('okay')}
-                    </Button>
-                </div>
-            </Modal>
-            {message && <p className="white-space-break text-center m-h-20 m-t-20 m-b-0">{message}</p>}
-        </>
-    );
+    return message ? <p className="white-space-break text-center m-h-20 m-t-20 m-b-0">{message}</p> : null;
 }

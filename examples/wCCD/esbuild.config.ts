@@ -12,6 +12,10 @@ const main = 'src/index.tsx';
 const htmlTemplate = fs.readFileSync('src/index.html').toString();
 const htmlOut = 'index.html';
 
+if (process.env.NETWORK === undefined || (process.env.NETWORK !== 'testnet' && process.env.NETWORK !== 'mainnet')) {
+    throw Error('Environmental variable NETWORK needs to be defined and set to either "mainnet" or "testnet"');
+}
+
 const config: BuildOptions = {
     entryPoints: [main],
     entryNames: '[name]',
@@ -22,6 +26,10 @@ const config: BuildOptions = {
     sourcemap: 'inline',
     target: ['chrome67'],
     outdir: 'dist',
+    define: {
+        global: 'window',
+        'process.env.NETWORK': process.env.NETWORK,
+    },
     plugins: [
         htmlPlugin({
             files: [
@@ -35,9 +43,6 @@ const config: BuildOptions = {
         svgrPlugin(),
     ],
     // https://github.com/evanw/esbuild/issues/73#issuecomment-1204706295
-    define: {
-        global: 'window',
-    },
 };
 
 if (watch) {

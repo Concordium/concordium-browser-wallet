@@ -12,6 +12,7 @@ const t: typeof en = {
         verifiableCredentials: 'Legitimationsoplysninger',
         settings: {
             main: 'Wallet indstillinger',
+            allowlist: 'Tilladelsesliste',
             recovery: 'Genskabning af din wallet',
             network: 'Netværksindstillinger',
             passcode: 'Skift adgangskode',
@@ -21,6 +22,7 @@ const t: typeof en = {
         idProof: 'Bevis for identitet',
         request: 'Anmodning om Signatur',
         connect: 'Ny Forbindelse',
+        allowlistingRequest: 'Anmodning om tilladelse',
     },
     entityList: {
         searchPlaceholder: 'Søg',

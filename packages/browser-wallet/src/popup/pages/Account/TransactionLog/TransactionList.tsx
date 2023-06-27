@@ -291,7 +291,7 @@ export default function TransactionList({ onTransactionClick }: TransactionListP
 
     let transactionListComponent;
     if (allTransactions.length === 0) {
-        if (isNextPageLoading) {
+        if (isNextPageLoading || hasNextPage) {
             transactionListComponent = null;
         } else {
             // If a test network then display button.
@@ -307,7 +307,7 @@ export default function TransactionList({ onTransactionClick }: TransactionListP
                                 ccdDrop(accountAddress);
                             }}
                         >
-                            Request CCD
+                            {t('requestCcd')}
                         </Button>
                     )}
                 </div>

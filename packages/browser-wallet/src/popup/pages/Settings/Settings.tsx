@@ -32,6 +32,9 @@ export default function Settings() {
     return (
         <div className="settings-page">
             <NavList>
+                <Link className="settings-page__link" to={absoluteRoutes.home.settings.allowlist.path}>
+                    {t('allowlist')}
+                </Link>
                 <Link className="settings-page__link" to={absoluteRoutes.home.settings.passcode.path}>
                     {t('passcode')}
                 </Link>

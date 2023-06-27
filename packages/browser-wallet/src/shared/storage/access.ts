@@ -155,6 +155,11 @@ export const storedVerifiableCredentialSchemas = makeStorageAccessor<Record<stri
     'local',
     ChromeStorageKey.VerifiableCredentialSchemas
 );
+const indexedStoredAllowlist = makeIndexedStorageAccessor<Record<string, string[]>>(
+    'local',
+    ChromeStorageKey.Allowlist
+);
+export const storedAllowlist = useIndexedStorage(indexedStoredAllowlist, getGenesisHash);
 
 export const sessionOpenPrompt = makeStorageAccessor<boolean>('session', ChromeStorageKey.OpenPrompt);
 export const sessionPasscode = makeStorageAccessor<string>('session', ChromeStorageKey.Passcode);

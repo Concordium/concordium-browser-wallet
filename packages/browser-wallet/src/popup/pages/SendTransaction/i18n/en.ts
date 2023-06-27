@@ -22,6 +22,7 @@ const t = {
         insufficientFunds: 'Account has insufficient funds for the transaction',
         missingNonce: 'No nonce was found for the chosen account',
     },
+    version: 'Version',
 };
 
 export default t;

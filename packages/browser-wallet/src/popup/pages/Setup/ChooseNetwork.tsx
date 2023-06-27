@@ -6,15 +6,21 @@ import { absoluteRoutes } from '@popup/constants/routes';
 import { useSetAtom } from 'jotai';
 import { useTranslation } from 'react-i18next';
 import { hasBeenOnBoardedAtom, networkConfigurationAtom, sessionPasscodeAtom } from '@popup/store/settings';
-import { mainnet, testnet } from '@shared/constants/networkConfiguration';
+import { mainnet, testnet, stagenet } from '@shared/constants/networkConfiguration';
+import { NetworkConfiguration } from '@shared/storage/types';
+import { isDevelopmentBuild } from '@shared/utils/environment-helpers';
 import { setupRoutes } from './routes';
 import { usePasscodeInSetup } from './passcode-helper';
 
-export function ChooseNetwork() {
+interface NetworkButtonProps {
+    text: string;
+    network: NetworkConfiguration;
+    className: string;
+    isRecovering: boolean;
+}
+
+function NetworkButton({ text, network, className, isRecovering }: NetworkButtonProps) {
     const navigate = useNavigate();
-    const location = useLocation();
-    const isRecovering = location.pathname.endsWith('recovering');
-    const { t } = useTranslation('setup');
     const setNetworkConfiguration = useSetAtom(networkConfigurationAtom);
     const setHasBeenOnboarded = useSetAtom(hasBeenOnBoardedAtom);
     const passcode = usePasscodeInSetup();
@@ -29,6 +35,25 @@ export function ChooseNetwork() {
             navigate(absoluteRoutes.home.identities.path);
         }
     };
+
+    return (
+        <Button
+            className={className}
+            width="wide"
+            onClick={async () => {
+                await setNetworkConfiguration(network);
+                goToNext();
+            }}
+        >
+            {text}
+        </Button>
+    );
+}
+
+export function ChooseNetwork() {
+    const location = useLocation();
+    const isRecovering = location.pathname.endsWith('recovering');
+    const { t } = useTranslation('setup');
 
     return (
         <>
@@ -55,26 +80,26 @@ export function ChooseNetwork() {
                     )}
                 </div>
                 <div>
-                    <Button
+                    <NetworkButton
+                        text="Concordium Mainnet"
                         className="onboarding-setup__page-with-header__mainnet-button"
-                        width="wide"
-                        onClick={async () => {
-                            await setNetworkConfiguration(mainnet);
-                            goToNext();
-                        }}
-                    >
-                        Concordium Mainnet
-                    </Button>
-                    <Button
+                        network={mainnet}
+                        isRecovering={isRecovering}
+                    />
+                    <NetworkButton
+                        text="Concordium Testnet"
                         className="onboarding-setup__page-with-header__testnet-button"
-                        width="wide"
-                        onClick={async () => {
-                            await setNetworkConfiguration(testnet);
-                            goToNext();
-                        }}
-                    >
-                        Concordium Testnet
-                    </Button>
+                        network={testnet}
+                        isRecovering={isRecovering}
+                    />
+                    {isDevelopmentBuild() && (
+                        <NetworkButton
+                            text="Concordium Stagenet"
+                            className="onboarding-setup__page-with-header__testnet-button"
+                            network={stagenet}
+                            isRecovering={isRecovering}
+                        />
+                    )}
                 </div>
             </div>
         </>

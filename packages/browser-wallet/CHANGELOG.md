@@ -1,5 +1,42 @@
 # Changelog
 
+## 1.0.6
+
+### Changed
+
+-   In the display of a `deployModule` transaction, the previously titled module hash is now titled module reference.
+
+### Added
+
+-   Display of a `deployModule` transaction now includes a copy button for the module reference.
+
+### Fixed
+
+-   First call of the gRPC client no longer always fails.
+-   First call of the gRPC client after changing network now uses the correct network.
+-   Updated web-sdk to fix incorrect estimated cost for `deployModule` transaction.
+
+## 1.0.5
+
+### Added
+
+-   A build script for making builds that include the stagenet network.
+-   `deployModule` transactions now display the hash instead of the entire module source.
+-   Text that a transaction has been submitted.
+
+### Fixed
+
+-   The About page link to the terms and conditions pointed to the wrong URL. It now uses the value retrieved from the wallet proxy, or the correct default to the unified terms and conditions page.
+-   Link to transaction log on stagenet was incorrect.
+-   Fixed an empty recovery displaying an error instead of informing the user that nothing was found.
+-   An issue where the transaction list view would show the `Request CCD` button while loading the initial batch of transactions.
+-   Added a missing translation for the `Request CCD` button.
+-   `deployModule` transactions no longer cause the wallet to crash, when supplied with `sendTransaction`.
+
+### Changed
+
+-   Messages when confirming baker/delegation transactions no longer appears after the transaction has been submitted.
+
 ## 1.0.4
 
 ### Fixed

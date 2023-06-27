@@ -71,6 +71,9 @@ function getTitle(section: Section, pathname: string) {
         case Section.VerifiableCredentials:
             return 'header.verifiableCredentials';
         case Section.Settings: {
+            if (pathname.startsWith(absoluteRoutes.home.settings.allowlist.path)) {
+                return 'header.settings.allowlist';
+            }
             if (pathname.startsWith(absoluteRoutes.home.settings.recovery.path)) {
                 return 'header.settings.recovery';
             }

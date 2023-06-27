@@ -1,6 +1,6 @@
 import { absoluteRoutes } from '@popup/constants/routes';
 import { fullscreenPromptContext } from '@popup/page-layouts/FullscreenPromptLayout';
-import { selectedAccountAtom, storedConnectedSitesAtom } from '@popup/store/account';
+import { selectedAccountAtom, storedAllowlistAtom } from '@popup/store/account';
 import { sessionPasscodeAtom } from '@popup/store/settings';
 import { useAtom, useAtomValue } from 'jotai';
 import React, { useContext, useEffect, useState } from 'react';
@@ -10,6 +10,7 @@ import ExternalRequestLayout from '@popup/page-layouts/ExternalRequestLayout';
 import Button from '@popup/shared/Button';
 import { displayUrl } from '@popup/shared/utils/string-helpers';
 import { displaySplitAddress } from '@popup/shared/utils/account-helpers';
+import { handleAllowlistEntryUpdate } from '../Allowlist/util';
 
 type Props = {
     onAllow(): void;
@@ -21,14 +22,14 @@ export default function ConnectionRequest({ onAllow, onReject }: Props) {
     const { t } = useTranslation('connectionRequest');
     const { onClose, withClose } = useContext(fullscreenPromptContext);
     const selectedAccount = useAtomValue(selectedAccountAtom);
-    const [connectedSitesLoading, setConnectedSites] = useAtom(storedConnectedSitesAtom);
-    const connectedSites = connectedSitesLoading.value;
+    const [allowlistLoading, setAllowlist] = useAtom(storedAllowlistAtom);
+    const allowlist = allowlistLoading.value;
     const passcode = useAtomValue(sessionPasscodeAtom);
     const [connectButtonDisabled, setConnectButtonDisabled] = useState<boolean>(false);
 
     useEffect(() => onClose(onReject), [onClose, onReject]);
 
-    if (!selectedAccount || connectedSitesLoading.loading || passcode.loading) {
+    if (!selectedAccount || allowlistLoading.loading || passcode.loading) {
         return null;
     }
 
@@ -43,15 +44,7 @@ export default function ConnectionRequest({ onAllow, onReject }: Props) {
     }
 
     async function connectAccount(account: string, url: string) {
-        const updatedConnectedSites = {
-            ...connectedSites,
-        };
-
-        const connectedSitesForAccount = connectedSites[account] ?? [];
-        connectedSitesForAccount.push(url);
-        updatedConnectedSites[account] = connectedSitesForAccount;
-
-        await setConnectedSites(updatedConnectedSites);
+        await handleAllowlistEntryUpdate(url, allowlist, [account], setAllowlist);
     }
 
     // eslint-disable-next-line @typescript-eslint/no-explicit-any

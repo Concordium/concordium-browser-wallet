@@ -36,6 +36,13 @@
                         document.getElementById('accountAddress').innerHTML = accountAddress;
                     });
                 });
+
+                document.getElementById('requestAccounts').addEventListener('click', () => {
+                    provider.requestAccounts().then((accountAddresses) => {
+                        currentAccountAddress = accountAddresses[0];
+                        document.getElementById('accountAddress').innerHTML = accountAddress;
+                    });
+                });
                 document.getElementById('sendTransfer').addEventListener('click', () =>
                     provider
                         .sendTransaction(currentAccountAddress, concordiumSDK.AccountTransactionType.Transfer, {
@@ -43,6 +50,14 @@
                             toAddress: new concordiumSDK.AccountAddress(
                                 '3kBx2h5Y2veb4hZgAJWPrr8RyQESKm5TjzF3ti1QQ4VSYLwK1G'
                             ),
+                        })
+                        .then(alert)
+                        .catch(alert)
+                );
+                document.getElementById('deployModule').addEventListener('click', () =>
+                    provider
+                        .sendTransaction(currentAccountAddress, concordiumSDK.AccountTransactionType.DeployModule, {
+                            source: concordiumSDK.toBuffer(moduleSource.value, 'base64'),
                         })
                         .then(alert)
                         .catch(alert)
@@ -216,6 +231,9 @@
             <h3 id="accountAddress">Account address:</h3>
         </div>
         <button id="connect">Connect</button>
+        <button id="requestAccounts">Request accounts</button>
+        <button id="deployModule">Deploy module</button>
+        ModuleSource (base64): <input type="text" id="moduleSource" value="" />
         <button id="sendInit">Initiate two step transfer contract</button>
         <button id="sendTransfer">Send transfer</button>
         <button id="sendDeposit">deposit in two step transfer</button>

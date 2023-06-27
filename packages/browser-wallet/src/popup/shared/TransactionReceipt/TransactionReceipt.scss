@@ -41,9 +41,9 @@ $transaction-receipt-horizontal-padding: rem(20px);
         padding: rem(8px);
     }
 
+    &__value,
     &__address,
-    &__hash,
-    &__key {
+    &__hash {
         font-size: rem(8px);
     }
 
@@ -57,6 +57,15 @@ $transaction-receipt-horizontal-padding: rem(20px);
     &__module-ref {
         width: rem(180px);
         overflow-wrap: break-word;
+    }
+
+    &__with-copy {
+        gap: rem(5px);
+        margin-left: rem(18px);
+    }
+
+    &__copy-button {
+        min-width: rem(18px);
     }
 }
 

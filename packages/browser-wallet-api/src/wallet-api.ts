@@ -95,6 +95,22 @@ class WalletApi extends EventEmitter implements IWalletApi {
     }
 
     /**
+     * Request a connection to the wallet. Resolves with a list of accounts that the user has accepted
+     * to connect with. The list of accounts may be empty. It rejects if the request is rejected or closed
+     * by the user in the wallet.
+     */
+    public async requestAccounts(): Promise<string[]> {
+        const response = await this.messageHandler.sendMessage<MessageStatusWrapper<string[]>>(
+            MessageType.ConnectAccounts
+        );
+        if (!response.success) {
+            throw new Error(response.message);
+        }
+
+        return response.result;
+    }
+
+    /**
      * Returns some connected account, prioritizing the most recently selected. Resolves with account address or undefined if there are no connected account.
      */
     public async getMostRecentlySelectedAccount(): Promise<string | undefined> {

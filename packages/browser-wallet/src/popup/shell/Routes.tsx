@@ -33,6 +33,8 @@ import ChangePasscode from '@popup/pages/ChangePasscode/ChangePasscode';
 import AddTokensPrompt from '@popup/pages/ExternalAddTokens/ExternalAddTokens';
 import IdProofRequest from '@popup/pages/IdProofRequest';
 import VerifiableCredentialList from '@popup/pages/VerifiableCredential';
+import ConnectAccountsRequest from '@popup/pages/ConnectAccountsRequest';
+import AllowListRoutes from '@popup/pages/Allowlist';
 
 type PromptKey = keyof Omit<typeof absoluteRoutes['prompt'], 'path'>;
 
@@ -83,6 +85,11 @@ function usePrompt(type: InternalMessageType | MessageType, promptKey: PromptKey
 
 export default function Routes() {
     const handleConnectionResponse = useMessagePrompt<boolean>(InternalMessageType.Connect, 'connectionRequest');
+    const handleConnectAccountsResponse = useMessagePrompt<MessageStatusWrapper<string[]>>(
+        InternalMessageType.ConnectAccounts,
+        'connectAccountsRequest'
+    );
+
     const handleSendTransactionResponse = useMessagePrompt<MessageStatusWrapper<string>>(
         InternalMessageType.SendTransaction,
         'sendTransaction'
@@ -150,6 +157,22 @@ export default function Routes() {
                     }
                 />
                 <Route
+                    path={relativeRoutes.prompt.connectAccountsRequest.path}
+                    element={
+                        <ConnectAccountsRequest
+                            onAllow={(accountAddresses: string[]) =>
+                                handleConnectAccountsResponse({ success: true, result: accountAddresses })
+                            }
+                            onReject={() =>
+                                handleConnectAccountsResponse({
+                                    success: false,
+                                    message: 'Request was rejected',
+                                })
+                            }
+                        />
+                    }
+                />
+                <Route
                     path={relativeRoutes.prompt.idProof.path}
                     element={
                         <IdProofRequest
@@ -176,6 +199,7 @@ export default function Routes() {
                 <Route element={<VerifiableCredentialList />} path={relativeRoutes.home.verifiableCredentials.path} />
                 <Route path={relativeRoutes.home.settings.path}>
                     <Route index element={<Settings />} />
+                    <Route element={<AllowListRoutes />} path={`${relativeRoutes.home.settings.allowlist.path}/*`} />
                     <Route element={<ChangePasscode />} path={relativeRoutes.home.settings.passcode.path} />
                     <Route element={<NetworkSettings />} path={relativeRoutes.home.settings.network.path} />
                     <Route element={<RecoveryIntro />} path={relativeRoutes.home.settings.recovery.path} />

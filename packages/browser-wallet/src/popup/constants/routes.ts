@@ -23,6 +23,9 @@ export const relativeRoutes = {
         },
         settings: {
             path: 'settings',
+            allowlist: {
+                path: 'allowlist',
+            },
             passcode: {
                 path: 'passcode',
             },
@@ -41,6 +44,9 @@ export const relativeRoutes = {
         path: '/prompt',
         connectionRequest: {
             path: 'connection-request',
+        },
+        connectAccountsRequest: {
+            path: 'connect-accounts-request',
         },
         signMessage: {
             path: 'sign-message',

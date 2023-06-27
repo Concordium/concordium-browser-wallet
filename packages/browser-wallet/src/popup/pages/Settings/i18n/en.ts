@@ -1,4 +1,5 @@
 const t = {
+    allowlist: 'Allowlist',
     passcode: 'Change passcode',
     network: 'Network settings',
     recover: 'Restore IDs & accounts',

@@ -2,8 +2,8 @@
 import esbuild from 'esbuild';
 import path from 'path';
 import { promises as fs } from 'fs';
-
 import packageJson from 'package.json';
+import { getVersionName } from '../../src/shared/utils/environment-helpers';
 
 export type Configuration = {
     /**
@@ -80,6 +80,7 @@ export const manifestPlugin = ({ manifestTemplate, popupHtmlFile }: Configuratio
 
             // Use package information from package.json
             manifest.version = packageJson.version;
+            manifest.version_name = getVersionName();
             manifest.description = packageJson.description;
             manifest.author = packageJson.author;
 
