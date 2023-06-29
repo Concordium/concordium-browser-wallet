@@ -6,6 +6,7 @@ import {
 import { useAtomValue } from 'jotai';
 import { VerifiableCredential } from '@shared/storage/types';
 import { VerifiableCredentialCard } from './VerifiableCredentialCard';
+import { useCredentialStatus } from './VerifiableCredentialHooks';
 
 /**
  * Component to display when there are no verifiable credentials in the wallet.
@@ -45,7 +46,13 @@ export default function VerifiableCredentialList() {
     }
 
     if (selected) {
-        return <VerifiableCredentialCard credential={selected} schema={schemas.value[selected.credentialSchema.id]} />;
+        return (
+            <VerifiableCredentialCard
+                credential={selected}
+                schema={schemas.value[selected.credentialSchema.id]}
+                useCredentialStatus={(cred) => useCredentialStatus(cred)}
+            />
+        );
     }
 
     return (
@@ -58,6 +65,7 @@ export default function VerifiableCredentialList() {
                         credential={credential}
                         schema={schemas.value[credential.credentialSchema.id]}
                         onClick={() => setSelected(credential)}
+                        useCredentialStatus={(cred) => useCredentialStatus(cred)}
                     />
                 );
             })}

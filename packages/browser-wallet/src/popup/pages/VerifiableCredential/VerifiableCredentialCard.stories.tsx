@@ -1,6 +1,7 @@
 /* eslint-disable react/function-component-definition, react/destructuring-assignment */
 import React from 'react';
 import { ComponentMeta, ComponentStory } from '@storybook/react';
+import { VerifiableCredentialStatus } from '@shared/storage/types';
 import { VerifiableCredentialCard } from './VerifiableCredentialCard';
 
 export default {
@@ -132,7 +133,11 @@ const verifiableCredential = {
 export const Primary: ComponentStory<typeof VerifiableCredentialCard> = () => {
     return (
         <div style={{ width: 354 }}>
-            <VerifiableCredentialCard credential={verifiableCredential} schema={schema} />
+            <VerifiableCredentialCard
+                credential={verifiableCredential}
+                schema={schema}
+                useCredentialStatus={() => VerifiableCredentialStatus.Active}
+            />
         </div>
     );
 };

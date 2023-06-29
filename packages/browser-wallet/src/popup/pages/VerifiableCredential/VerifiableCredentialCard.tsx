@@ -9,7 +9,6 @@ import {
     VerifiableCredentialStatus,
     VerifiableCredentialSchema,
 } from '../../../shared/storage/types';
-import { useCredentialStatus } from './VerifiableCredentialHooks';
 
 function StatusIcon({ status }: { status: VerifiableCredentialStatus }) {
     let icon = null;
@@ -120,13 +119,14 @@ export function VerifiableCredentialCard({
     credential,
     schema,
     onClick,
+    useCredentialStatus,
 }: {
     credential: VerifiableCredential;
     schema: VerifiableCredentialSchema;
     onClick?: () => void;
+    useCredentialStatus: (cred: VerifiableCredential) => VerifiableCredentialStatus;
 }) {
     const credentialStatus = useCredentialStatus(credential);
-
     const attributes = Object.entries(credential.credentialSubject)
         .filter((val) => val[0] !== 'id')
         .map(applySchema(schema))
