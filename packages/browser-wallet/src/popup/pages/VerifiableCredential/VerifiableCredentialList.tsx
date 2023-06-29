@@ -5,6 +5,7 @@ import {
 } from '@popup/store/verifiable-credential';
 import { useAtomValue } from 'jotai';
 import { VerifiableCredential } from '@shared/storage/types';
+import Topbar, { ButtonTypes } from '@popup/shared/Topbar/Topbar';
 import { VerifiableCredentialCard } from './VerifiableCredentialCard';
 import { useCredentialStatus } from './VerifiableCredentialHooks';
 
@@ -47,28 +48,40 @@ export default function VerifiableCredentialList() {
 
     if (selected) {
         return (
-            <VerifiableCredentialCard
-                credential={selected}
-                schema={schemas.value[selected.credentialSchema.id]}
-                useCredentialStatus={(cred) => useCredentialStatus(cred)}
-            />
+            <>
+                <Topbar
+                    title="Web3 ID Credentials"
+                    backButton={{ show: true, onClick: () => setSelected(undefined) }}
+                    menuButton={{ type: ButtonTypes.More, onClick: () => {} }}
+                />
+                <div className="verifiable-credential-list">
+                    <VerifiableCredentialCard
+                        credential={selected}
+                        schema={schemas.value[selected.credentialSchema.id]}
+                        useCredentialStatus={(cred) => useCredentialStatus(cred)}
+                    />
+                </div>
+            </>
         );
     }
 
     return (
-        <div className="verifiable-credential-list">
-            {verifiableCredentials.map((credential, index) => {
-                return (
-                    <VerifiableCredentialCard
-                        // eslint-disable-next-line react/no-array-index-key
-                        key={index}
-                        credential={credential}
-                        schema={schemas.value[credential.credentialSchema.id]}
-                        onClick={() => setSelected(credential)}
-                        useCredentialStatus={(cred) => useCredentialStatus(cred)}
-                    />
-                );
-            })}
-        </div>
+        <>
+            <Topbar title="Web3 ID Credentials" backButton={{ show: false }} />
+            <div className="verifiable-credential-list">
+                {verifiableCredentials.map((credential, index) => {
+                    return (
+                        <VerifiableCredentialCard
+                            // eslint-disable-next-line react/no-array-index-key
+                            key={index}
+                            credential={credential}
+                            schema={schemas.value[credential.credentialSchema.id]}
+                            onClick={() => setSelected(credential)}
+                            useCredentialStatus={(cred) => useCredentialStatus(cred)}
+                        />
+                    );
+                })}
+            </div>
+        </>
     );
 }

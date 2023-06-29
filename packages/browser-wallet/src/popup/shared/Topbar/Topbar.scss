@@ -1,0 +1,33 @@
+.topbar {
+    height: 56px;
+    background-color: $color-bg;
+    color: $color-cta;
+    padding-left: 16px;
+    padding-right: 16px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+
+    &__title {
+        text-align: center;
+        width: 100%;
+    }
+
+    &__icon-container {
+        height: 24px;
+        width: 24px;
+        flex-shrink: 0;
+
+        &__icon {
+            display: flex;
+            align-items: center;
+            height: 24px;
+            width: 24px;
+            stroke-width: 0;
+
+            path {
+                fill: $color-cta;
+            }
+        }
+    }
+}
