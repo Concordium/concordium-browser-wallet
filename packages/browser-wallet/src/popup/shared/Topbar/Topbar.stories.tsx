@@ -34,11 +34,11 @@ export const WithMoreMenuButton = Template.bind({});
 WithMoreMenuButton.args = {
     title: 'Page Navigation Title',
     backButton: { show: false },
-    menuButton: { type: ButtonTypes.More, onClick: () => {} },
+    menuButton: { type: ButtonTypes.More, items: [{ title: 'Revoke', icon: <div>Test</div> }] },
 };
 
 export const WithBackAndMoreMenuButton = Template.bind({});
 WithBackAndMoreMenuButton.args = {
     title: 'Page Navigation Title',
-    menuButton: { type: ButtonTypes.More, onClick: () => {} },
+    menuButton: { type: ButtonTypes.More, items: [{ title: 'Revoke', icon: <div>Test</div> }] },
 };

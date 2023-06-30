@@ -6,8 +6,10 @@ import {
 import { useAtomValue } from 'jotai';
 import { VerifiableCredential } from '@shared/storage/types';
 import Topbar, { ButtonTypes } from '@popup/shared/Topbar/Topbar';
+import { useTranslation } from 'react-i18next';
 import { VerifiableCredentialCard } from './VerifiableCredentialCard';
 import { useCredentialStatus } from './VerifiableCredentialHooks';
+import RevokeIcon from '../../../assets/svg/revoke.svg';
 
 /**
  * Component to display when there are no verifiable credentials in the wallet.
@@ -29,6 +31,7 @@ export default function VerifiableCredentialList() {
     const verifiableCredentials = useAtomValue(storedVerifiableCredentialsAtom);
     const schemas = useAtomValue(storedVerifiableCredentialSchemasAtom);
     const [selected, setSelected] = useState<VerifiableCredential>();
+    const { t } = useTranslation('verifiableCredential');
 
     if (schemas.loading) {
         return null;
@@ -47,12 +50,14 @@ export default function VerifiableCredentialList() {
     }
 
     if (selected) {
+        const menuButton = { type: ButtonTypes.More, items: [{ title: t('menu.revoke'), icon: <RevokeIcon /> }] };
+
         return (
             <>
                 <Topbar
-                    title="Web3 ID Credentials"
+                    title={t('topbar.details')}
                     backButton={{ show: true, onClick: () => setSelected(undefined) }}
-                    menuButton={{ type: ButtonTypes.More, onClick: () => {} }}
+                    menuButton={menuButton}
                 />
                 <div className="verifiable-credential-list">
                     <VerifiableCredentialCard
@@ -67,13 +72,12 @@ export default function VerifiableCredentialList() {
 
     return (
         <>
-            <Topbar title="Web3 ID Credentials" backButton={{ show: false }} />
+            <Topbar title={t('topbar.list')} backButton={{ show: false }} />
             <div className="verifiable-credential-list">
-                {verifiableCredentials.map((credential, index) => {
+                {verifiableCredentials.map((credential) => {
                     return (
                         <VerifiableCredentialCard
-                            // eslint-disable-next-line react/no-array-index-key
-                            key={index}
+                            key={credential.id}
                             credential={credential}
                             schema={schemas.value[credential.credentialSchema.id]}
                             onClick={() => setSelected(credential)}

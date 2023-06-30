@@ -1,4 +1,5 @@
 .topbar {
+    position: relative;
     height: 56px;
     background-color: $color-bg;
     color: $color-cta;
@@ -28,6 +29,17 @@
             path {
                 fill: $color-cta;
             }
+        }
+    }
+
+    &__popup-menu {
+        display: none;
+        position: absolute;
+        right: 10px;
+
+        &__show {
+            z-index: 1;
+            display: block;
         }
     }
 }

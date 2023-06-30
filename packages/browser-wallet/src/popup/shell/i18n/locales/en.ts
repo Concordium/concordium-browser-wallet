@@ -20,6 +20,7 @@ import termsAndConditions from '@popup/pages/TermsAndConditions/i18n/en';
 import idProofRequest from '@popup/pages/IdProofRequest/i18n/en';
 import allowlist from '@popup/pages/Allowlist/i18n/en';
 import connectAccountsRequest from '@popup/pages/ConnectAccountsRequest/i18n/en';
+import verifiableCredential from '@popup/pages/VerifiableCredential/i18n/en';
 
 const t = {
     shared,
@@ -44,6 +45,7 @@ const t = {
     idProofRequest,
     allowlist,
     connectAccountsRequest,
+    verifiableCredential,
 };
 
 export default t;

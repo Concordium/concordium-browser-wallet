@@ -4,6 +4,7 @@
     border-radius: 16px;
     display: flex;
     flex-direction: column;
+    background-color: $color-white;
 
     &__item {
         &:hover {

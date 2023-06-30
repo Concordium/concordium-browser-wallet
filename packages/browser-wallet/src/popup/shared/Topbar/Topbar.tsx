@@ -1,8 +1,10 @@
-import React from 'react';
+import React, { useState } from 'react';
 import BackIcon from '@assets/svg/back-icon.svg';
 import MoreIcon from '@assets/svg/more.svg';
 import { useNavigate } from 'react-router-dom';
+import clsx from 'clsx';
 import Button from '../Button';
+import PopupMenu, { PopupMenuItem } from '../PopupMenu/PopupMenu';
 
 export enum ButtonTypes {
     More,
@@ -19,10 +21,12 @@ interface ShowBackButton {
 
 type BackButton = ShowBackButton | NoBackButton;
 
-interface MenuButton {
-    type: ButtonTypes;
-    onClick: () => void;
+interface MoreMenuButton {
+    type: ButtonTypes.More;
+    items: PopupMenuItem[];
 }
+
+type MenuButton = MoreMenuButton;
 
 interface TopbarProps {
     title: string;
@@ -41,6 +45,8 @@ export default function Topbar({
     },
     menuButton,
 }: TopbarProps) {
+    const [showPopupMenu, setShowPopupMenu] = useState<boolean>(false);
+
     return (
         <div className="topbar">
             <div className="topbar__icon-container">
@@ -53,8 +59,11 @@ export default function Topbar({
             <div className="topbar__title display6">{title}</div>
             <div className="topbar__icon-container">
                 {menuButton && (
-                    <Button clear onClick={menuButton.onClick}>
+                    <Button clear onClick={() => setShowPopupMenu(true)}>
                         <MoreIcon className="topbar__icon-container__icon" />
+                        <div className={clsx('topbar__popup-menu', showPopupMenu && 'topbar__popup-menu__show')}>
+                            <PopupMenu items={menuButton.items} onClickOutside={() => setShowPopupMenu(false)} />
+                        </div>
                     </Button>
                 )}
             </div>
