@@ -1,4 +1,4 @@
-import { ChainParameters, isChainParametersV1 } from '@concordium/web-sdk';
+import { ChainParameters, ChainParametersV0, isChainParametersV0 } from '@concordium/web-sdk';
 import { filterType } from '@popup/pages/Account/Earn/utils';
 import { grpcClientAtom, networkConfigurationAtom } from '@popup/store/settings';
 import { useAtomValue } from 'jotai';
@@ -48,12 +48,16 @@ export function useBlockChainParameters() {
     return useAsyncMemo(getBlockChainParameters, undefined, []);
 }
 
+function isNotChainParametersV0(params: ChainParameters): params is Exclude<ChainParameters, ChainParametersV0> {
+    return !isChainParametersV0(params);
+}
+
 /**
  * Hook for getting the blockchain parameters that ensures the parameters are version 1.
  * If the parameters are not version 1, undefined is returned instead.
  */
-export function useBlockChainParametersV1() {
+export function useBlockChainParametersAboveV0() {
     const getBlockChainParameters = useContext(blockChainParametersContext);
     const chainParameters = useAsyncMemo(getBlockChainParameters, undefined, []);
-    return chainParameters ? filterType(isChainParametersV1)(chainParameters) : undefined;
+    return chainParameters ? filterType(isNotChainParametersV0)(chainParameters) : undefined;
 }

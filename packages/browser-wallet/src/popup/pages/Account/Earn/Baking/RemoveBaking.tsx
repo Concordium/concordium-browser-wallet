@@ -1,14 +1,14 @@
 import React from 'react';
 import { AccountTransactionType } from '@concordium/web-sdk';
 import { useTranslation } from 'react-i18next';
-import { useBlockChainParametersV1 } from '@popup/shared/BlockChainParametersProvider';
+import { useBlockChainParametersAboveV0 } from '@popup/shared/BlockChainParametersProvider';
 import { secondsToDaysRoundedDown } from '@shared/utils/time-helpers';
 import IntroPage from '../IntroPage';
 import RemoveCarousel from '../RemoveCarousel';
 
 export default function RemoveBaking() {
     const { t } = useTranslation('account', { keyPrefix: 'baking' });
-    const chainParameters = useBlockChainParametersV1();
+    const chainParameters = useBlockChainParametersAboveV0();
     return (
         <RemoveCarousel
             type={AccountTransactionType.ConfigureBaker}
