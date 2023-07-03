@@ -26,7 +26,7 @@ interface MoreMenuButton {
     items: PopupMenuItem[];
 }
 
-type MenuButton = MoreMenuButton;
+export type MenuButton = MoreMenuButton;
 
 interface TopbarProps {
     title: string;

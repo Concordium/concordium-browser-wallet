@@ -1,6 +1,60 @@
 import { ConcordiumGRPCClient, ContractAddress } from '@concordium/web-sdk';
 import { VerifiableCredentialStatus } from '@shared/storage/types';
 import { Buffer } from 'buffer/';
+import * as ed from '@noble/ed25519';
+
+export async function sign(digest: Buffer, privateKey: string) {
+    return Buffer.from(await ed.signAsync(digest, privateKey)).toString('hex');
+}
+
+export interface SigningData {
+    contractAddress: ContractAddress;
+    entryPoint: string;
+    nonce: bigint;
+    timestamp: bigint;
+}
+
+export interface RevocationDataHolder {
+    /** The public key identifying the credential holder */
+    credentialId: string;
+    /** Metadata of the signature */
+    signingData: SigningData;
+}
+
+export interface RevokeCredentialHolderParam {
+    /** Ed25519 signature on the revocation message as a hex string */
+    signature: string;
+    /** Revocation data */
+    data: RevocationDataHolder;
+}
+
+export function serializeRevokeCredentialHolderParam(parameter: RevokeCredentialHolderParam) {
+    let buffer = Buffer.from(parameter.signature, 'hex');
+    buffer = Buffer.concat([buffer, Buffer.from(parameter.data.credentialId, 'hex')]);
+
+    // TODO Fix BigInt issue here.
+    const addressBuffer = Buffer.alloc(16);
+    addressBuffer.writeBigUInt64LE(parameter.data.signingData.contractAddress.index, 0);
+    addressBuffer.writeBigUInt64LE(parameter.data.signingData.contractAddress.subindex, 8);
+
+    const serializedEntryPointName = Buffer.from(parameter.data.signingData.entryPoint, 'utf-8');
+    let entryPointSerialization = Buffer.alloc(2);
+    entryPointSerialization.writeUInt16LE(serializedEntryPointName.length, 0);
+    entryPointSerialization = Buffer.concat([entryPointSerialization, serializedEntryPointName]);
+
+    const finalBuffer = Buffer.alloc(16);
+    finalBuffer.writeBigUInt64LE(parameter.data.signingData.nonce, 0);
+    finalBuffer.writeBigUInt64LE(parameter.data.signingData.timestamp, 8);
+
+    return Buffer.concat([buffer, addressBuffer, entryPointSerialization, finalBuffer, Buffer.of(0)]);
+}
+
+/**
+ *     contractAddress: ContractAddress;
+    entryPoint: string;
+    nonce: BigInt;
+    timestamp: BigInt;
+ */
 
 /**
  * Extracts the credential holder id from a verifiable credential id (did).

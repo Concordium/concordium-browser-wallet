@@ -1961,6 +1961,7 @@ __metadata:
     "@concordium/web-sdk": ^4.0.1
     "@craftamap/esbuild-plugin-html": ^0.4.0
     "@mdx-js/react": ^1.6.22
+    "@noble/ed25519": ^2.0.0
     "@protobuf-ts/runtime-rpc": ^2.8.2
     "@scure/bip39": ^1.1.0
     "@storybook/addon-actions": ^6.5.7
@@ -3054,6 +3055,13 @@ __metadata:
   version: 1.7.1
   resolution: "@noble/ed25519@npm:1.7.1"
   checksum: b8e50306ac70f5cecc349111997e72e897b47a28d406b96cf95d0ebe7cbdefb8380d26117d7847d94102281db200aa3a494e520f9fc12e2f292e0762cb0fa333
+  languageName: node
+  linkType: hard
+
+"@noble/ed25519@npm:^2.0.0":
+  version: 2.0.0
+  resolution: "@noble/ed25519@npm:2.0.0"
+  checksum: 4404deb3ca4f7a07863a362d697dc624ff0e82083ca4e41f976f76ec6fe879363b4722529389aa1ae280fe62558d9f229c8403b0a077add8b5f1ec1290d6e2d7
   languageName: node
   linkType: hard
 

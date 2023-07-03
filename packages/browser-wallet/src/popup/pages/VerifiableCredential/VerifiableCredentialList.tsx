@@ -5,11 +5,11 @@ import {
 } from '@popup/store/verifiable-credential';
 import { useAtomValue } from 'jotai';
 import { VerifiableCredential } from '@shared/storage/types';
-import Topbar, { ButtonTypes } from '@popup/shared/Topbar/Topbar';
+import Topbar from '@popup/shared/Topbar/Topbar';
 import { useTranslation } from 'react-i18next';
 import { VerifiableCredentialCard } from './VerifiableCredentialCard';
 import { useCredentialStatus } from './VerifiableCredentialHooks';
-import RevokeIcon from '../../../assets/svg/revoke.svg';
+import VerifiableCredentialDetails from './VerifiableCredentialDetails';
 
 /**
  * Component to display when there are no verifiable credentials in the wallet.
@@ -50,24 +50,7 @@ export default function VerifiableCredentialList() {
     }
 
     if (selected) {
-        const menuButton = { type: ButtonTypes.More, items: [{ title: t('menu.revoke'), icon: <RevokeIcon /> }] };
-
-        return (
-            <>
-                <Topbar
-                    title={t('topbar.details')}
-                    backButton={{ show: true, onClick: () => setSelected(undefined) }}
-                    menuButton={menuButton}
-                />
-                <div className="verifiable-credential-list">
-                    <VerifiableCredentialCard
-                        credential={selected}
-                        schema={schemas.value[selected.credentialSchema.id]}
-                        useCredentialStatus={(cred) => useCredentialStatus(cred)}
-                    />
-                </div>
-            </>
-        );
+        return <VerifiableCredentialDetails credential={selected} backButtonOnClick={() => setSelected(undefined)} />;
     }
 
     return (
