@@ -53,8 +53,8 @@ function isNotChainParametersV0(params: ChainParameters): params is Exclude<Chai
 }
 
 /**
- * Hook for getting the blockchain parameters that ensures the parameters are version 1.
- * If the parameters are not version 1, undefined is returned instead.
+ * Hook for getting the blockchain parameters that ensures the parameters are a version above 0.
+ * If the parameters' version is not 1 or greater, undefined is returned instead.
  */
 export function useBlockChainParametersAboveV0() {
     const getBlockChainParameters = useContext(blockChainParametersContext);
