@@ -1918,7 +1918,7 @@ __metadata:
     "@babel/plugin-transform-modules-commonjs": ^7.12.1
     "@babel/plugin-transform-runtime": ^7.12.1
     "@babel/preset-env": ^7.12.1
-    "@concordium/web-sdk": ^4.0.1
+    "@concordium/web-sdk": ^5.0.0
     typescript: ^4.3.5
     webpack: ^5.72.0
     webpack-cli: ^4.9.2
@@ -1930,7 +1930,7 @@ __metadata:
   resolution: "@concordium/browser-wallet-api@workspace:packages/browser-wallet-api"
   dependencies:
     "@concordium/browser-wallet-api-helpers": "workspace:^"
-    "@concordium/common-sdk": ^7.0.1
+    "@concordium/common-sdk": ^8.0.0
     "@protobuf-ts/grpcweb-transport": ^2.8.2
     "@protobuf-ts/runtime-rpc": ^2.8.2
     "@types/json-bigint": ^1.0.1
@@ -1958,7 +1958,7 @@ __metadata:
     "@babel/core": ^7.18.2
     "@concordium/browser-wallet-api": "workspace:^"
     "@concordium/browser-wallet-api-helpers": "workspace:^"
-    "@concordium/web-sdk": ^4.0.1
+    "@concordium/web-sdk": ^5.0.0
     "@craftamap/esbuild-plugin-html": ^0.4.0
     "@mdx-js/react": ^1.6.22
     "@protobuf-ts/runtime-rpc": ^2.8.2
@@ -2021,7 +2021,7 @@ __metadata:
     tsconfig-paths-webpack-plugin: ^3.5.2
     typescript: ^4.3.5
     uuid: ^8.3.2
-    wallet-common-helpers: "https://github.com/Concordium/concordium-wallet-common-helpers.git#942b4d0f53a537a78bcce20f052f30b9f8444d4a"
+    wallet-common-helpers: "https://github.com/Concordium/concordium-wallet-common-helpers.git#143e7e268944d46b65eae0bd0b8e60d6be558f39"
   languageName: unknown
   linkType: soft
 
@@ -2045,11 +2045,11 @@ __metadata:
   languageName: node
   linkType: hard
 
-"@concordium/common-sdk@npm:7.0.1, @concordium/common-sdk@npm:^7.0.1":
-  version: 7.0.1
-  resolution: "@concordium/common-sdk@npm:7.0.1"
+"@concordium/common-sdk@npm:8.0.0, @concordium/common-sdk@npm:^8.0.0":
+  version: 8.0.0
+  resolution: "@concordium/common-sdk@npm:8.0.0"
   dependencies:
-    "@concordium/rust-bindings": 0.12.0
+    "@concordium/rust-bindings": 1.0.0
     "@grpc/grpc-js": ^1.3.4
     "@noble/ed25519": ^1.7.1
     "@protobuf-ts/runtime-rpc": ^2.8.2
@@ -2061,27 +2061,7 @@ __metadata:
     iso-3166-1: ^2.1.1
     json-bigint: ^1.0.0
     uuid: ^8.3.2
-  checksum: 96da061891eb4edb4e7ac1df0a19b5fe4930dfcb97040433b74e445acd51a749be1c08d30afd7f12673af9f3954be5b046c43e9741a85c59f19f57cd07450d80
-  languageName: node
-  linkType: hard
-
-"@concordium/common-sdk@npm:^6.3.0":
-  version: 6.4.0
-  resolution: "@concordium/common-sdk@npm:6.4.0"
-  dependencies:
-    "@concordium/rust-bindings": 0.11.0
-    "@grpc/grpc-js": ^1.3.4
-    "@noble/ed25519": ^1.7.1
-    "@protobuf-ts/runtime-rpc": ^2.8.2
-    "@scure/bip39": ^1.1.0
-    bs58check: ^2.1.2
-    buffer: ^6.0.3
-    cross-fetch: 3.1.5
-    hash.js: ^1.1.7
-    iso-3166-1: ^2.1.1
-    json-bigint: ^1.0.0
-    uuid: ^8.3.2
-  checksum: d4d8fcd1961cfbe6939958afec90eeff05cc88c83cbb5bd6e1dcf5f887324e15b2c175e4e0dced4cf2860cdc06dcb945b94c88a7790f087028d4f1dcd9b40f86
+  checksum: 2ee043af6fe32a6e78193876dc3dface9121f9ad6f88b4a70e3db3b1c94b8d9c636394c10e235b98234acfa31717c8f3f58b82af0300242a170ba8249d93fb94
   languageName: node
   linkType: hard
 
@@ -2103,17 +2083,10 @@ __metadata:
   languageName: node
   linkType: hard
 
-"@concordium/rust-bindings@npm:0.11.0":
-  version: 0.11.0
-  resolution: "@concordium/rust-bindings@npm:0.11.0"
-  checksum: a6c437cb782b7b2e9f217215dd4dbed9ffb8b3ef46fa307952aca3ae8f166cb96687de64efd18490aec7e86d58712dccb7d1a8bf63c151e3ed2a0170f066cd6d
-  languageName: node
-  linkType: hard
-
-"@concordium/rust-bindings@npm:0.12.0":
-  version: 0.12.0
-  resolution: "@concordium/rust-bindings@npm:0.12.0"
-  checksum: 7ecfc4d89d6771df7d64320ce81f93bfef3b3cd5a6e5b3d80379ea7c2cd54ecb828a9f54f350ead0771957c5c2fb369a06fa47ffc1391276ccac84ae78c3c574
+"@concordium/rust-bindings@npm:1.0.0":
+  version: 1.0.0
+  resolution: "@concordium/rust-bindings@npm:1.0.0"
+  checksum: f13a9ff622d45974eb6b49261291ef726faba888867d9beeb4a754200d0666c8fba6c983db5481c45d1f6ff3256716e6fae65b7f572c826417a0595e384e828c
   languageName: node
   linkType: hard
 
@@ -2142,17 +2115,17 @@ __metadata:
   languageName: node
   linkType: hard
 
-"@concordium/web-sdk@npm:^4.0.1":
-  version: 4.0.1
-  resolution: "@concordium/web-sdk@npm:4.0.1"
+"@concordium/web-sdk@npm:^5.0.0":
+  version: 5.0.0
+  resolution: "@concordium/web-sdk@npm:5.0.0"
   dependencies:
-    "@concordium/common-sdk": 7.0.1
-    "@concordium/rust-bindings": 0.12.0
+    "@concordium/common-sdk": 8.0.0
+    "@concordium/rust-bindings": 1.0.0
     "@grpc/grpc-js": ^1.3.4
     "@protobuf-ts/grpcweb-transport": ^2.8.2
     buffer: ^6.0.3
     process: ^0.11.10
-  checksum: d61bc6d6b520c7d19778dd6fbe4fd4878825561cb2da9961dc43e6ceaaa186a7f5eff8b672550ed5e5d7d90137dffb56900eb980a502efbed51527670f1d7dad
+  checksum: 779bb90cb7e5bfa25ad5bd0fa40447fc1fd92acc1b4bc24ac78f5c0010a0ff282a2db00153a84239328290b21c91d5d21364c54aac7404a81e7ad58a74daa597
   languageName: node
   linkType: hard
 
@@ -22256,11 +22229,11 @@ __metadata:
   languageName: node
   linkType: hard
 
-"wallet-common-helpers@https://github.com/Concordium/concordium-wallet-common-helpers.git#942b4d0f53a537a78bcce20f052f30b9f8444d4a":
+"wallet-common-helpers@https://github.com/Concordium/concordium-wallet-common-helpers.git#143e7e268944d46b65eae0bd0b8e60d6be558f39":
   version: 1.5.0
-  resolution: "wallet-common-helpers@https://github.com/Concordium/concordium-wallet-common-helpers.git#commit=942b4d0f53a537a78bcce20f052f30b9f8444d4a"
+  resolution: "wallet-common-helpers@https://github.com/Concordium/concordium-wallet-common-helpers.git#commit=143e7e268944d46b65eae0bd0b8e60d6be558f39"
   dependencies:
-    "@concordium/common-sdk": ^6.3.0
+    "@concordium/common-sdk": ^8.0.0
     buffer: ^6.0.3
     cbor: ^8.0.0
     clsx: ^1.1.1
@@ -22269,7 +22242,7 @@ __metadata:
   peerDependencies:
     react: ">=16"
     react-dom: ">=16"
-  checksum: 02dc22e88a6b483b701aa5c4545053bceaa9af17dfe86900a3a700827921bb91669064eddf6eaa5038ca8aa893aa9252d1beafe15eab6039319722069017c2d9
+  checksum: 48a7f21949248b96effc6acae166c1adda3fbb5c156fdfe7e60a2fae34edab2be2a0e181c4be0fea35a6473525cb4955277ea07bbcbe0ce3d171a5ff412df306
   languageName: node
   linkType: hard
 

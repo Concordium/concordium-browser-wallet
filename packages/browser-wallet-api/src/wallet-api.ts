@@ -25,7 +25,7 @@ import {
 import EventEmitter from 'events';
 import type { JsonRpcRequest } from '@concordium/common-sdk/lib/providers/provider';
 import { IdProofOutput, IdStatement } from '@concordium/common-sdk/lib/idProofTypes';
-import ConcordiumGRPCClient from '@concordium/common-sdk/lib/GRPCClient';
+import { ConcordiumGRPCClient } from '@concordium/common-sdk/lib/GRPCClient';
 import JSONBig from 'json-bigint';
 import { stringify } from './util';
 import { BWGRPCTransport } from './gRPC-transport';
