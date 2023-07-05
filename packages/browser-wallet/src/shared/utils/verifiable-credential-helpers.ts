@@ -107,21 +107,19 @@ export function serializeRevokeCredentialHolderParam(parameter: RevokeCredential
 }
 
 /**
- * Builds a holder revocation transaction to revoke a given verifiable credential in a CIS-4 contract.
- * @param address the address of the contract that the credential to revoke is registered in
- * @param contractName the name of the contract at {@link address}
- * @param credentialId the id of the credential to revoke
+ * Builds the parameters used for a holder revocation transaction to revoke a given credential in a CIS-4 contract.
+ * @param address the address of the contract that hte credential to revoke is registered in
+ * @param credentialId the id of the credential to revoke (this is a derived public key)
  * @param nonce the revocation nonce
  * @param signingKey the signing key associated with the credential (the private key to the {@link credentialId})
- * @returns an update contract transaction for revoking the credential with id {@link credentialId}
+ * @returns the unserialized parameters for a holder revocation transaction
  */
-export async function buildRevokeTransaction(
+export async function buildRevokeTransactionParameters(
     address: ContractAddress,
-    contractName: string,
     credentialId: string,
     nonce: bigint,
     signingKey: string
-): Promise<UpdateContractPayload> {
+) {
     const signingData: SigningData = {
         contractAddress: address,
         entryPoint: 'revokeCredentialHolder',
@@ -146,13 +144,30 @@ export async function buildRevokeTransaction(
         data,
     };
 
-    // Get better NRG estimate. How to do that? Invoke the contract and use that.
+    return parameter;
+}
+
+/**
+ * Builds a holder revocation transaction to revoke a given verifiable credential in a CIS-4 contract.
+ * @param address the address of the contract that the credential to revoke is registered in
+ * @param contractName the name of the contract at {@link address}
+ * @param credentialId the id of the credential to revoke
+ * @param maxContractExecutionEnergy the maximum contract execution energy
+ * @returns an update contract transaction for revoking the credential with id {@link credentialId}
+ */
+export async function buildRevokeTransaction(
+    address: ContractAddress,
+    contractName: string,
+    credentialId: string,
+    maxContractExecutionEnergy: bigint,
+    parameters: RevokeCredentialHolderParam
+): Promise<UpdateContractPayload> {
     return {
         address,
         amount: new CcdAmount(0n),
         receiveName: `${contractName}.revokeCredentialHolder`,
-        maxContractExecutionEnergy: BigInt(50000),
-        message: serializeRevokeCredentialHolderParam(parameter),
+        maxContractExecutionEnergy,
+        message: serializeRevokeCredentialHolderParam(parameters),
     };
 }
 
@@ -170,6 +185,27 @@ function deserializeCredentialStatus(serializedCredentialStatus: string): Verifi
         default:
             throw new Error(`Received an invalid credential status: ${serializedCredentialStatus}`);
     }
+}
+
+/**
+ * Estimates the cost of a holder revocation transaction.
+ * @param client the GRPC client for accessing a node
+ * @param contractName the name of the contract to invoke to get the estimate
+ * @param parameters the unserialized parameters for a holder revocation transaction
+ * @returns an estimate of the execution cost of the holder revocation transaction
+ */
+export async function getRevokeTransactionExecutionEnergyEstimate(
+    client: ConcordiumGRPCClient,
+    contractName: string,
+    parameters: RevokeCredentialHolderParam
+) {
+    const invokeResult = await client.invokeContract({
+        contract: parameters.data.signingData.contractAddress,
+        method: `${contractName}.${parameters.data.signingData.entryPoint}`,
+        parameter: serializeRevokeCredentialHolderParam(parameters),
+    });
+    // TODO Use a shared function for the buffer calculation. Also used in token-helpers.
+    return (invokeResult.usedEnergy * 12n) / 10n;
 }
 
 /**

@@ -11,8 +11,10 @@ import { absoluteRoutes } from '@popup/constants/routes';
 import { useHdWallet } from '@popup/shared/utils/account-helpers';
 import {
     buildRevokeTransaction,
+    buildRevokeTransactionParameters,
     getCredentialHolderId,
     getCredentialRegistryContractAddress,
+    getRevokeTransactionExecutionEnergyEstimate,
 } from '@shared/utils/verifiable-credential-helpers';
 import { fetchContractName } from '@shared/utils/token-helpers';
 import { accountRoutes } from '../Account/routes';
@@ -58,12 +60,20 @@ export default function VerifiableCredentialDetails({
         }
         const revocationNonce = getNextRevocationNonce(credentialEntry.revocationNonce);
         const signingKey = hdWallet.getVerifiableCredentialSigningKey(0).toString('hex');
+
+        const parameters = await buildRevokeTransactionParameters(
+            contractAddress,
+            credentialId,
+            revocationNonce,
+            signingKey
+        );
+        const maxExecutionEnergy = await getRevokeTransactionExecutionEnergyEstimate(client, contractName, parameters);
         const payload = await buildRevokeTransaction(
             contractAddress,
             contractName,
             credentialId,
-            revocationNonce,
-            signingKey
+            maxExecutionEnergy,
+            parameters
         );
 
         const confirmTransferState: ConfirmGenericTransferState = {
