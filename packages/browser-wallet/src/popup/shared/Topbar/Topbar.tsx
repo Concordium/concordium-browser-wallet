@@ -59,12 +59,14 @@ export default function Topbar({
             <div className="topbar__title display6">{title}</div>
             <div className="topbar__icon-container">
                 {menuButton && (
-                    <Button clear onClick={() => setShowPopupMenu(true)}>
-                        <MoreIcon className="topbar__icon-container__icon" />
+                    <>
+                        <Button clear onClick={() => setShowPopupMenu(true)}>
+                            <MoreIcon className="topbar__icon-container__icon" />
+                        </Button>
                         <div className={clsx('topbar__popup-menu', showPopupMenu && 'topbar__popup-menu__show')}>
                             <PopupMenu items={menuButton.items} onClickOutside={() => setShowPopupMenu(false)} />
                         </div>
-                    </Button>
+                    </>
                 )}
             </div>
         </div>

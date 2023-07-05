@@ -1,70 +1,33 @@
-import React from 'react';
-import { Buffer } from 'buffer/';
+import React, { useCallback, useMemo } from 'react';
 import { storedVerifiableCredentialSchemasAtom } from '@popup/store/verifiable-credential';
 import { useAtomValue } from 'jotai';
 import { VerifiableCredential } from '@shared/storage/types';
 import Topbar, { ButtonTypes, MenuButton } from '@popup/shared/Topbar/Topbar';
 import { useTranslation } from 'react-i18next';
-import { AccountTransactionType, CcdAmount, ConcordiumGRPCClient, UpdateContractPayload } from '@concordium/web-sdk';
+import { AccountTransactionType } from '@concordium/web-sdk';
 import { useLocation, useNavigate } from 'react-router-dom';
-import {
-    RevocationDataHolder,
-    RevokeCredentialHolderParam,
-    SigningData,
-    getCredentialHolderId,
-    getCredentialRegistryContractAddress,
-    serializeRevokeCredentialHolderParam,
-    sign,
-} from '@shared/utils/verifiable-credential-helpers';
-import { fetchContractName } from '@shared/utils/token-helpers';
 import { grpcClientAtom } from '@popup/store/settings';
 import { absoluteRoutes } from '@popup/constants/routes';
-import { selectedAccountAtom } from '@popup/store/account';
-import { usePrivateKey } from '@popup/shared/utils/account-helpers';
+import { useHdWallet } from '@popup/shared/utils/account-helpers';
+import {
+    buildRevokeTransaction,
+    getCredentialHolderId,
+    getCredentialRegistryContractAddress,
+} from '@shared/utils/verifiable-credential-helpers';
+import { fetchContractName } from '@shared/utils/token-helpers';
 import { accountRoutes } from '../Account/routes';
 import { ConfirmGenericTransferState } from '../Account/ConfirmGenericTransfer';
 import RevokeIcon from '../../../assets/svg/revoke.svg';
-import { useCredentialStatus } from './VerifiableCredentialHooks';
+import { useCredentialEntry, useCredentialStatus } from './VerifiableCredentialHooks';
 import { VerifiableCredentialCard } from './VerifiableCredentialCard';
 
-const REVOKE_SIGNATURE_MESSAGE = 'WEB3ID:REVOKE';
-
-async function buildRevokeTransaction(
-    client: ConcordiumGRPCClient,
-    credential: VerifiableCredential,
-    privateKey: string
-): Promise<UpdateContractPayload> {
-    const address = getCredentialRegistryContractAddress(credential.id);
-    const contractName = await fetchContractName(client, address.index, address.subindex);
-
-    // TODO Get the correct nonce.
-
-    const signingData: SigningData = {
-        contractAddress: address,
-        entryPoint: 'revokeCredentialHolder',
-        nonce: BigInt(1),
-        timestamp: BigInt(Date.now() + 60000),
-    };
-
-    const data: RevocationDataHolder = {
-        credentialId: getCredentialHolderId(credential.id),
-        signingData,
-    };
-
-    const signature = await sign(Buffer.from(REVOKE_SIGNATURE_MESSAGE, 'utf-8'), privateKey);
-    const parameter: RevokeCredentialHolderParam = {
-        signature,
-        data,
-    };
-
-    // Get better NRG estimate. How to do that?
-    return {
-        address,
-        amount: new CcdAmount(0n),
-        receiveName: `${contractName}.revokeCredentialHolder`,
-        maxContractExecutionEnergy: BigInt(5000),
-        message: serializeRevokeCredentialHolderParam(parameter),
-    };
+/**
+ * Calculates the next revocation nonce based on the current revocation nonce.
+ * @param nonce the current nonce returned in the credential entry
+ * @returns the next nonce to use for a holder revocation update
+ */
+function getNextRevocationNonce(nonce: bigint) {
+    return nonce + 1n;
 }
 
 export default function VerifiableCredentialDetails({
@@ -75,39 +38,68 @@ export default function VerifiableCredentialDetails({
     backButtonOnClick: () => void;
 }) {
     const nav = useNavigate();
-    const schemas = useAtomValue(storedVerifiableCredentialSchemasAtom);
-    const { t } = useTranslation('verifiableCredential');
-
-    const client = useAtomValue(grpcClientAtom);
     const { pathname } = useLocation();
+    const { t } = useTranslation('verifiableCredential');
+    const schemas = useAtomValue(storedVerifiableCredentialSchemasAtom);
+    const client = useAtomValue(grpcClientAtom);
+    const hdWallet = useHdWallet();
+    const credentialEntry = useCredentialEntry(credential);
 
-    const selectedAccount = useAtomValue(selectedAccountAtom);
-    const key = usePrivateKey(selectedAccount);
-
-    const goToConfirm = () => {
-        // TODO Fix this... Basically we need to wait for these values before displaying the card.
-        if (!selectedAccount || !key) {
+    const goToConfirmPage = useCallback(async () => {
+        if (credentialEntry === undefined || hdWallet === undefined) {
             return;
         }
 
-        buildRevokeTransaction(client, credential, key).then((payload) => {
-            const confirmTransferState: ConfirmGenericTransferState = {
-                payload,
-                type: AccountTransactionType.Update,
-            };
+        const contractAddress = getCredentialRegistryContractAddress(credential.id);
+        const credentialId = getCredentialHolderId(credential.id);
+        const contractName = await fetchContractName(client, contractAddress.index, contractAddress.subindex);
+        if (contractName === undefined) {
+            throw new Error(`Unable to find contract name for address: ${contractAddress}`);
+        }
+        const revocationNonce = getNextRevocationNonce(credentialEntry.revocationNonce);
+        const signingKey = hdWallet.getVerifiableCredentialSigningKey(0).toString('hex');
+        const payload = await buildRevokeTransaction(
+            contractAddress,
+            contractName,
+            credentialId,
+            revocationNonce,
+            signingKey
+        );
 
-            // Override current router entry with stateful version
-            nav(pathname, { replace: true, state: true });
-            nav(`${absoluteRoutes.home.account.path}/${accountRoutes.confirmTransfer}`, {
-                state: confirmTransferState,
-            });
+        const confirmTransferState: ConfirmGenericTransferState = {
+            payload,
+            type: AccountTransactionType.Update,
+        };
+
+        // Override current router entry with stateful version
+        nav(pathname, { replace: true, state: true });
+        nav(`${absoluteRoutes.home.account.path}/${accountRoutes.confirmTransfer}`, {
+            state: confirmTransferState,
         });
-    };
+    }, [client, credential, hdWallet, credentialEntry, nav, pathname]);
 
-    const menuButton: MenuButton = {
-        type: ButtonTypes.More,
-        items: [{ title: t('menu.revoke'), icon: <RevokeIcon />, onClick: () => goToConfirm() }],
-    };
+    const menuButton: MenuButton | undefined = useMemo(() => {
+        if (credentialEntry === undefined) {
+            return undefined;
+        }
+
+        return {
+            type: ButtonTypes.More,
+            items: [
+                {
+                    title: t('menu.revoke'),
+                    icon: <RevokeIcon />,
+                    onClick: credentialEntry.holderRevocable ? () => goToConfirmPage() : undefined,
+                },
+            ],
+        };
+    }, [credentialEntry, goToConfirmPage]);
+
+    // Wait for the credential entry to be loaded from the chain, and for the HdWallet
+    // to be loaded to be ready to derive keys.
+    if (credentialEntry === undefined || hdWallet === undefined) {
+        return null;
+    }
 
     return (
         <>

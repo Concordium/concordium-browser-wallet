@@ -1,5 +1,6 @@
 import React from 'react';
 import { DetectClickOutside } from 'wallet-common-helpers';
+import clsx from 'clsx';
 import Button from '../Button/Button';
 
 export interface PopupMenuItem {
@@ -19,7 +20,11 @@ export default function PopupMenu({ items, onClickOutside }: PopupMenuProps) {
             <div className="popup-menu">
                 {items.map((item) => {
                     return (
-                        <Button clear className="popup-menu__item" onClick={item.onClick}>
+                        <Button
+                            clear
+                            className={clsx('popup-menu__item', item.onClick ? null : 'popup-menu__item--disabled')}
+                            onClick={item.onClick}
+                        >
                             <div className="popup-menu__item__title heading6">{item.title}</div>
                             <div className="popup-menu__item__icon">{item.icon}</div>
                         </Button>
