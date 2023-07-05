@@ -2,6 +2,7 @@ import { CcdAmount, ConcordiumGRPCClient, ContractAddress, UpdateContractPayload
 import { VerifiableCredentialStatus } from '@shared/storage/types';
 import { Buffer } from 'buffer/';
 import * as ed from '@noble/ed25519';
+import { applyExecutionNRGBuffer } from './contract-helpers';
 
 /**
  * Extracts the credential holder id from a verifiable credential id (did).
@@ -204,8 +205,8 @@ export async function getRevokeTransactionExecutionEnergyEstimate(
         method: `${contractName}.${parameters.data.signingData.entryPoint}`,
         parameter: serializeRevokeCredentialHolderParam(parameters),
     });
-    // TODO Use a shared function for the buffer calculation. Also used in token-helpers.
-    return (invokeResult.usedEnergy * 12n) / 10n;
+
+    return applyExecutionNRGBuffer(invokeResult.usedEnergy);
 }
 
 /**
