@@ -99,7 +99,7 @@ export default function VerifiableCredentialDetails({
                 {
                     title: t('menu.revoke'),
                     icon: <RevokeIcon />,
-                    onClick: credentialEntry.holderRevocable ? () => goToConfirmPage() : undefined,
+                    onClick: credentialEntry.credentialInfo.holderRevocable ? () => goToConfirmPage() : undefined,
                 },
             ],
         };

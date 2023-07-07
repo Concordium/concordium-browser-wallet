@@ -245,16 +245,26 @@ export async function getVerifiableCredentialStatus(
     return deserializeCredentialStatus(returnValue);
 }
 
-export interface CredentialEntry {
+interface MetadataUrl {
+    url: string;
+    hash?: string;
+}
+
+export interface CredentialInfo {
     credentialHolderId: string;
     holderRevocable: boolean;
     validFrom: bigint;
     validUntil?: bigint;
-    credentialType: string;
-    metadataUrl: string;
-    metadataChecksum?: string;
-    schemaUrl: string;
-    schemaChecksum?: string;
+    metadataUrl: MetadataUrl;
+}
+
+export interface SchemaRef {
+    schema: MetadataUrl;
+}
+
+export interface CredentialQueryResponse {
+    credentialInfo: CredentialInfo;
+    schemaRef: SchemaRef;
     revocationNonce: bigint;
 }
 
@@ -286,7 +296,7 @@ function deserializeUrlChecksumPair(buffer: Buffer, offset: number) {
  * Deserializes a CredentialEntry according to the CIS-4 specification.
  * @param serializedCredentialEntry a serialized credential entry as a hex string
  */
-export function deserializeCredentialEntry(serializedCredentialEntry: string): CredentialEntry {
+export function deserializeCredentialEntry(serializedCredentialEntry: string): CredentialQueryResponse {
     const buffer = Buffer.from(serializedCredentialEntry, 'hex');
     let offset = 0;
 
@@ -295,11 +305,6 @@ export function deserializeCredentialEntry(serializedCredentialEntry: string): C
 
     const holderRevocable = Boolean(buffer.readUInt8(offset));
     offset += 1;
-
-    // TODO Remove this as the commitments are moving out of the contract.
-    const commitmentLength = buffer.readUInt16LE(offset);
-    offset += 2 + commitmentLength;
-    // TODO Remove until here.
 
     const validFrom = buffer.readBigUInt64LE(offset) as bigint;
     offset += 8;
@@ -313,11 +318,6 @@ export function deserializeCredentialEntry(serializedCredentialEntry: string): C
         offset += 8;
     }
 
-    const credentialTypeLength = buffer.readUInt8(offset);
-    offset += 1;
-    const credentialType = buffer.toString('utf-8', offset, offset + credentialTypeLength);
-    offset += credentialTypeLength;
-
     const metadata = deserializeUrlChecksumPair(buffer, offset);
     offset = metadata.offset;
 
@@ -328,15 +328,16 @@ export function deserializeCredentialEntry(serializedCredentialEntry: string): C
     offset += 8;
 
     return {
-        credentialHolderId,
-        holderRevocable,
-        validFrom,
-        validUntil,
-        credentialType,
-        metadataUrl: metadata.url,
-        metadataChecksum: metadata.checksum,
-        schemaUrl: schema.url,
-        schemaChecksum: schema.checksum,
+        credentialInfo: {
+            credentialHolderId,
+            holderRevocable,
+            validFrom,
+            validUntil,
+            metadataUrl: { url: metadata.url, hash: metadata.checksum },
+        },
+        schemaRef: {
+            schema: { url: schema.url, hash: schema.checksum },
+        },
         revocationNonce,
     };
 }

@@ -1,7 +1,7 @@
 import { grpcClientAtom } from '@popup/store/settings';
 import { VerifiableCredential, VerifiableCredentialStatus } from '@shared/storage/types';
 import {
-    CredentialEntry,
+    CredentialQueryResponse,
     getCredentialHolderId,
     getCredentialRegistryContractAddress,
     getVerifiableCredentialEntry,
@@ -16,7 +16,7 @@ import { useEffect, useState } from 'react';
  * @returns the credential entry for the given credential, undefined if one is not found yet
  */
 export function useCredentialEntry(credential: VerifiableCredential) {
-    const [credentialEntry, setCredentialEntry] = useState<CredentialEntry>();
+    const [credentialEntry, setCredentialEntry] = useState<CredentialQueryResponse>();
     const client = useAtomValue(grpcClientAtom);
 
     useEffect(() => {

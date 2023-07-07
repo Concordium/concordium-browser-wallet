@@ -21,6 +21,7 @@ export default function PopupMenu({ items, onClickOutside }: PopupMenuProps) {
                 {items.map((item) => {
                     return (
                         <Button
+                            key={item.title}
                             clear
                             className={clsx('popup-menu__item', item.onClick ? null : 'popup-menu__item--disabled')}
                             onClick={item.onClick}
