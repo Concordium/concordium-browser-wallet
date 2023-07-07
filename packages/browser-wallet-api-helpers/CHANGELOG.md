@@ -1,5 +1,12 @@
 # Changelog
 
+## 3.0.0
+
+### Changed
+
+-   Make dependency to `@concordium/web-sdk` a peer dependency.
+    This will require consuming apps to add an explicit dependency to the library with its own version constraints.
+
 ## 2.5.1
 
 ### Changed
