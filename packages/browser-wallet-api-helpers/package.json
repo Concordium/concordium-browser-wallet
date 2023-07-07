@@ -1,6 +1,6 @@
 {
     "name": "@concordium/browser-wallet-api-helpers",
-    "version": "2.5.1",
+    "version": "3.0.0",
     "license": "Apache-2.0",
     "packageManager": "yarn@3.2.0",
     "main": "lib/index.js",
@@ -18,8 +18,8 @@
         "email": "support@concordium.software",
         "url": "https://concordium.com"
     },
-    "dependencies": {
-        "@concordium/web-sdk": "^5.0.0"
+    "peerDependencies": {
+        "@concordium/web-sdk": "^6.0.0"
     },
     "devDependencies": {
         "@babel/core": "^7.17.10",
