@@ -23,15 +23,6 @@ import RevokeIcon from '../../../assets/svg/revoke.svg';
 import { useCredentialEntry, useCredentialStatus } from './VerifiableCredentialHooks';
 import { VerifiableCredentialCard } from './VerifiableCredentialCard';
 
-/**
- * Calculates the next revocation nonce based on the current revocation nonce.
- * @param nonce the current nonce returned in the credential entry
- * @returns the next nonce to use for a holder revocation update
- */
-function getNextRevocationNonce(nonce: bigint) {
-    return nonce + 1n;
-}
-
 export default function VerifiableCredentialDetails({
     credential,
     backButtonOnClick,
@@ -58,13 +49,14 @@ export default function VerifiableCredentialDetails({
         if (contractName === undefined) {
             throw new Error(`Unable to find contract name for address: ${contractAddress}`);
         }
-        const revocationNonce = getNextRevocationNonce(credentialEntry.revocationNonce);
-        const signingKey = hdWallet.getVerifiableCredentialSigningKey(0).toString('hex');
+
+        // TODO Select the correct key.
+        const signingKey = '03B8D24B808BEECE8C4E2538B173AFC7AF69FEC921B012768328196EB1030426';
 
         const parameters = await buildRevokeTransactionParameters(
             contractAddress,
             credentialId,
-            revocationNonce,
+            credentialEntry.revocationNonce,
             signingKey
         );
         const maxExecutionEnergy = await getRevokeTransactionExecutionEnergyEstimate(client, contractName, parameters);
