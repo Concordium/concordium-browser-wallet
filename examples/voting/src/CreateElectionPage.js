@@ -10,6 +10,7 @@ import { Link } from 'react-router-dom';
 import moment from 'moment';
 import Wallet, { createElection, init } from './Wallet';
 import { CONTRACT_NAME, MODULE_REF } from './config';
+import Footer from './Footer';
 
 async function addOption(options, setOptions, newOption, setOptionInput) {
     if (options.includes(newOption)) {
@@ -161,6 +162,7 @@ function CreateElectionPage() {
                     )}
                 </Col>
             </Row>
+            <Footer />
         </Container>
     );
 }
