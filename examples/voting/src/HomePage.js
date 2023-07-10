@@ -2,6 +2,7 @@
 import React from 'react';
 import { Button, Col, Container, Row } from 'react-bootstrap';
 import { Link } from 'react-router-dom';
+import Footer from './Footer';
 
 function HomePage() {
     return (
@@ -22,6 +23,7 @@ function HomePage() {
                     </Link>
                 </Col>
             </Row>
+            <Footer />
         </Container>
     );
 }
