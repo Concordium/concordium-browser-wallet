@@ -1,10 +1,6 @@
 import { grpcClientAtom } from '@popup/store/settings';
 import { VerifiableCredential, VerifiableCredentialStatus } from '@shared/storage/types';
-import {
-    getCredentialHolderId,
-    getCredentialRegistryContractAddress,
-    getVerifiableCredentialStatus,
-} from '@shared/utils/verifiable-credential-helpers';
+import { getVerifiableCredentialStatus } from '@shared/utils/verifiable-credential-helpers';
 import { useAtomValue } from 'jotai';
 import { useEffect, useState } from 'react';
 
@@ -18,9 +14,7 @@ export function useCredentialStatus(credential: VerifiableCredential) {
     const client = useAtomValue(grpcClientAtom);
 
     useEffect(() => {
-        const credentialHolderId = getCredentialHolderId(credential.id);
-        const registryContractAddress = getCredentialRegistryContractAddress(credential.id);
-        getVerifiableCredentialStatus(client, registryContractAddress, credentialHolderId).then((credentialStatus) => {
+        getVerifiableCredentialStatus(client, credential.id).then((credentialStatus) => {
             setStatus(credentialStatus);
         });
     }, [credential.id, client]);

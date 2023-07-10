@@ -49,16 +49,12 @@ function deserializeCredentialStatus(serializedCredentialStatus: string): Verifi
 /**
  * Get the status of a verifiable credential in a CIS-4 contract.
  * @param client the GRPC client for accessing a node
- * @param contractAddress the address of a CIS-4 contract
- * @param credentialHolderId the public key for the credential holder
+ * @param credentialId the id for a verifiable credential
  * @throws an error if the invoke contract call fails, or if no return value is available
  * @returns the status of the verifiable credential, the status will be unknown if the contract is not found
  */
-export async function getVerifiableCredentialStatus(
-    client: ConcordiumGRPCClient,
-    contractAddress: ContractAddress,
-    credentialHolderId: string
-) {
+export async function getVerifiableCredentialStatus(client: ConcordiumGRPCClient, credentialId: string) {
+    const contractAddress = getCredentialRegistryContractAddress(credentialId);
     const instanceInfo = await client.getInstanceInfo(contractAddress);
     if (instanceInfo === undefined) {
         return VerifiableCredentialStatus.Unknown;
@@ -67,7 +63,7 @@ export async function getVerifiableCredentialStatus(
     const result = await client.invokeContract({
         contract: contractAddress,
         method: `${instanceInfo.name.substring(5)}.credentialStatus`,
-        parameter: Buffer.from(credentialHolderId, 'hex'),
+        parameter: Buffer.from(getCredentialHolderId(credentialId), 'hex'),
     });
 
     if (result.tag !== 'success') {

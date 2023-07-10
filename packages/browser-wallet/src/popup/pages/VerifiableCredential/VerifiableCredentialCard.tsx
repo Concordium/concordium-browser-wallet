@@ -119,14 +119,13 @@ export function VerifiableCredentialCard({
     credential,
     schema,
     onClick,
-    useCredentialStatus,
+    credentialStatus,
 }: {
     credential: VerifiableCredential;
     schema: VerifiableCredentialSchema;
+    credentialStatus: VerifiableCredentialStatus;
     onClick?: () => void;
-    useCredentialStatus: (cred: VerifiableCredential) => VerifiableCredentialStatus;
 }) {
-    const credentialStatus = useCredentialStatus(credential);
     const attributes = Object.entries(credential.credentialSubject)
         .filter((val) => val[0] !== 'id')
         .map(applySchema(schema))

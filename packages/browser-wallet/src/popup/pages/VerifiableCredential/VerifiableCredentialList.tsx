@@ -4,7 +4,7 @@ import {
     storedVerifiableCredentialsAtom,
 } from '@popup/store/verifiable-credential';
 import { useAtomValue } from 'jotai';
-import { VerifiableCredential } from '@shared/storage/types';
+import { VerifiableCredential, VerifiableCredentialSchema, VerifiableCredentialStatus } from '@shared/storage/types';
 import { VerifiableCredentialCard } from './VerifiableCredentialCard';
 import { useCredentialStatus } from './VerifiableCredentialHooks';
 
@@ -19,6 +19,32 @@ function NoVerifiableCredentials() {
     );
 }
 
+function VerifiableCredentialCardWithStatusFromChain({
+    credential,
+    schemas,
+    onClick,
+}: {
+    credential: VerifiableCredential;
+    schemas: Record<string, VerifiableCredentialSchema>;
+    onClick?: (status: VerifiableCredentialStatus) => void;
+}) {
+    const status = useCredentialStatus(credential);
+    const schema = schemas[credential.credentialSchema.id];
+
+    return (
+        <VerifiableCredentialCard
+            credential={credential}
+            schema={schema}
+            onClick={() => {
+                if (onClick) {
+                    onClick(status);
+                }
+            }}
+            credentialStatus={status}
+        />
+    );
+}
+
 /**
  * Renders all verifiable credentials that are in the wallet. The credentials
  * are selectable by clicking them, which will move the user to a view containing
@@ -27,7 +53,10 @@ function NoVerifiableCredentials() {
 export default function VerifiableCredentialList() {
     const verifiableCredentials = useAtomValue(storedVerifiableCredentialsAtom);
     const schemas = useAtomValue(storedVerifiableCredentialSchemasAtom);
-    const [selected, setSelected] = useState<VerifiableCredential>();
+    const [selected, setSelected] = useState<{
+        credential: VerifiableCredential;
+        status: VerifiableCredentialStatus;
+    }>();
 
     if (schemas.loading) {
         return null;
@@ -48,9 +77,9 @@ export default function VerifiableCredentialList() {
     if (selected) {
         return (
             <VerifiableCredentialCard
-                credential={selected}
-                schema={schemas.value[selected.credentialSchema.id]}
-                useCredentialStatus={(cred) => useCredentialStatus(cred)}
+                credential={selected.credential}
+                schema={schemas.value[selected.credential.credentialSchema.id]}
+                credentialStatus={selected.status}
             />
         );
     }
@@ -59,13 +88,12 @@ export default function VerifiableCredentialList() {
         <div className="verifiable-credential-list">
             {verifiableCredentials.map((credential, index) => {
                 return (
-                    <VerifiableCredentialCard
+                    <VerifiableCredentialCardWithStatusFromChain
                         // eslint-disable-next-line react/no-array-index-key
                         key={index}
                         credential={credential}
-                        schema={schemas.value[credential.credentialSchema.id]}
-                        onClick={() => setSelected(credential)}
-                        useCredentialStatus={(cred) => useCredentialStatus(cred)}
+                        schemas={schemas.value}
+                        onClick={(status: VerifiableCredentialStatus) => setSelected({ credential, status })}
                     />
                 );
             })}
