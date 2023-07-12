@@ -1,18 +1,28 @@
 import React, { useEffect, useState } from 'react';
 import {
+    storedVerifiableCredentialMetadataAtom,
     storedVerifiableCredentialSchemasAtom,
     storedVerifiableCredentialsAtom,
 } from '@popup/store/verifiable-credential';
 import { useAtom, useAtomValue } from 'jotai';
-import { VerifiableCredential, VerifiableCredentialSchema, VerifiableCredentialStatus } from '@shared/storage/types';
 import {
+    MetadataUrl,
+    VerifiableCredential,
+    VerifiableCredentialSchema,
+    VerifiableCredentialStatus,
+} from '@shared/storage/types';
+import {
+    VerifiableCredentialMetadata,
+    getCredentialHolderId,
+    getCredentialMetadata,
     getCredentialRegistryContractAddress,
     getCredentialRegistryMetadata,
     getCredentialSchema,
+    getVerifiableCredentialEntry,
 } from '@shared/utils/verifiable-credential-helpers';
 import { grpcClientAtom } from '@popup/store/settings';
 import { ConcordiumGRPCClient, ContractAddress } from '@concordium/web-sdk';
-import { useCredentialSchema, useCredentialStatus } from './VerifiableCredentialHooks';
+import { useCredentialMetadata, useCredentialSchema, useCredentialStatus } from './VerifiableCredentialHooks';
 import { VerifiableCredentialCard } from './VerifiableCredentialCard';
 
 /**
@@ -31,14 +41,19 @@ function VerifiableCredentialCardWithStatusFromChain({
     onClick,
 }: {
     credential: VerifiableCredential;
-    onClick?: (status: VerifiableCredentialStatus, schema: VerifiableCredentialSchema) => void;
+    onClick?: (
+        status: VerifiableCredentialStatus,
+        schema: VerifiableCredentialSchema,
+        metadata: VerifiableCredentialMetadata
+    ) => void;
 }) {
     const status = useCredentialStatus(credential);
     const schema = useCredentialSchema(credential);
+    const metadata = useCredentialMetadata(credential);
 
     // TODO Improve this so that a card can render without a schema in some temporary
     // shape or form (e.g. an empty card, or just the raw attributes)
-    if (!schema) {
+    if (!schema || !metadata) {
         return null;
     }
 
@@ -48,10 +63,11 @@ function VerifiableCredentialCardWithStatusFromChain({
             schema={schema}
             onClick={() => {
                 if (onClick) {
-                    onClick(status, schema);
+                    onClick(status, schema, metadata);
                 }
             }}
             credentialStatus={status}
+            metadata={metadata}
         />
     );
 }
@@ -96,6 +112,35 @@ async function getCredentialSchemas(
     return onChainSchemas;
 }
 
+async function getCredentialMetadataBulk(
+    client: ConcordiumGRPCClient,
+    credentials: VerifiableCredential[],
+    abortControllers: AbortController[]
+) {
+    const metadataUrls: MetadataUrl[] = [];
+    for (const vc of credentials) {
+        const entry = await getVerifiableCredentialEntry(
+            client,
+            getCredentialRegistryContractAddress(vc.id),
+            getCredentialHolderId(vc.id)
+        );
+        if (entry) {
+            metadataUrls.push(entry.credentialInfo.metadataUrl);
+        }
+    }
+    const uniqueMetadataUrls = [...new Map(metadataUrls.map((item) => [item.url, item])).values()];
+
+    const metadataList: { metadata: VerifiableCredentialMetadata; url: string }[] = [];
+    for (const metadataUrl of uniqueMetadataUrls) {
+        const controller = new AbortController();
+        abortControllers.push(controller);
+        const metadata = await getCredentialMetadata(metadataUrl, controller);
+        metadataList.push({ metadata, url: metadataUrl.url });
+    }
+
+    return metadataList;
+}
+
 /**
  * Renders all verifiable credentials that are in the wallet. The credentials
  * are selectable by clicking them, which will move the user to a view containing
@@ -107,9 +152,42 @@ export default function VerifiableCredentialList() {
         credential: VerifiableCredential;
         status: VerifiableCredentialStatus;
         schema: VerifiableCredentialSchema;
+        metadata: VerifiableCredentialMetadata;
     }>();
     const client = useAtomValue(grpcClientAtom);
     const [schemas, setSchemas] = useAtom(storedVerifiableCredentialSchemasAtom);
+    const [storedMetadata, setStoredMetadata] = useAtom(storedVerifiableCredentialMetadataAtom);
+
+    useEffect(() => {
+        let isCancelled = false;
+        const abortControllers: AbortController[] = [];
+
+        if (verifiableCredentials && !storedMetadata.loading) {
+            getCredentialMetadataBulk(client, verifiableCredentials, abortControllers).then((metadataList) => {
+                let updatedStoredMetadata = { ...storedMetadata.value };
+
+                // TODO Verify that something has actually changed before making the update.
+                for (const updatedMetadata of metadataList) {
+                    if (storedMetadata.value === undefined) {
+                        updatedStoredMetadata = {
+                            [updatedMetadata.url]: updatedMetadata.metadata,
+                        };
+                    } else {
+                        updatedStoredMetadata[updatedMetadata.url] = updatedMetadata.metadata;
+                    }
+                }
+
+                if (!isCancelled) {
+                    setStoredMetadata(updatedStoredMetadata);
+                }
+            });
+        }
+
+        return () => {
+            isCancelled = true;
+            abortControllers.forEach((controller) => controller.abort());
+        };
+    }, [storedMetadata.loading, verifiableCredentials, client]);
 
     useEffect(() => {
         let isCancelled = false;
@@ -156,6 +234,7 @@ export default function VerifiableCredentialList() {
                 credential={selected.credential}
                 schema={selected.schema}
                 credentialStatus={selected.status}
+                metadata={selected.metadata}
             />
         );
     }
@@ -168,9 +247,11 @@ export default function VerifiableCredentialList() {
                         // eslint-disable-next-line react/no-array-index-key
                         key={index}
                         credential={credential}
-                        onClick={(status: VerifiableCredentialStatus, schema: VerifiableCredentialSchema) =>
-                            setSelected({ credential, status, schema })
-                        }
+                        onClick={(
+                            status: VerifiableCredentialStatus,
+                            schema: VerifiableCredentialSchema,
+                            metadata: VerifiableCredentialMetadata
+                        ) => setSelected({ credential, status, schema, metadata })}
                     />
                 );
             })}

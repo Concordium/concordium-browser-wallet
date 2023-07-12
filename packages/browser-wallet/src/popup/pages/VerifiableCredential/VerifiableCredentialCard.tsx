@@ -1,13 +1,15 @@
 import React, { PropsWithChildren } from 'react';
-import CcdIcon from '@assets/svg/concordium.svg';
 import RevokedIcon from '@assets/svg/revoked.svg';
 import ActiveIcon from '@assets/svg/verified.svg';
 import ExpiredIcon from '@assets/svg/block.svg';
 import PendingIcon from '@assets/svg/pending.svg';
+import { VerifiableCredentialMetadata } from '@shared/utils/verifiable-credential-helpers';
+import Img from '@popup/shared/Img';
 import {
     VerifiableCredential,
     VerifiableCredentialStatus,
     VerifiableCredentialSchema,
+    MetadataUrl,
 } from '../../../shared/storage/types';
 
 function StatusIcon({ status }: { status: VerifiableCredentialStatus }) {
@@ -38,12 +40,8 @@ function StatusIcon({ status }: { status: VerifiableCredentialStatus }) {
     );
 }
 
-function Logo() {
-    return (
-        <div className="verifiable-credential__header__logo">
-            <CcdIcon />
-        </div>
-    );
+function Logo({ logo }: { logo: MetadataUrl }) {
+    return <Img className="verifiable-credential__header__logo" src={logo.url} withDefaults />;
 }
 
 /**
@@ -70,11 +68,16 @@ function DisplayAttribute({
  * Wraps children components in a verifiable credential card that is clickable if onClick
  * is defined.
  */
-function ClickableVerifiableCredential({ children, onClick }: PropsWithChildren<{ onClick?: () => void }>) {
+function ClickableVerifiableCredential({
+    children,
+    onClick,
+    metadata,
+}: PropsWithChildren<{ onClick?: () => void; metadata: VerifiableCredentialMetadata }>) {
     if (onClick) {
         return (
             <div
                 className="verifiable-credential"
+                style={{ backgroundColor: metadata.backgroundColor }}
                 onClick={onClick}
                 onKeyDown={(e) => {
                     if (e.key === 'Enter') {
@@ -88,7 +91,11 @@ function ClickableVerifiableCredential({ children, onClick }: PropsWithChildren<
             </div>
         );
     }
-    return <div className="verifiable-credential">{children}</div>;
+    return (
+        <div className="verifiable-credential" style={{ backgroundColor: metadata.backgroundColor }}>
+            {children}
+        </div>
+    );
 }
 
 /**
@@ -120,11 +127,13 @@ export function VerifiableCredentialCard({
     schema,
     onClick,
     credentialStatus,
+    metadata,
 }: {
     credential: VerifiableCredential;
     schema: VerifiableCredentialSchema;
     credentialStatus: VerifiableCredentialStatus;
     onClick?: () => void;
+    metadata: VerifiableCredentialMetadata;
 }) {
     const attributes = Object.entries(credential.credentialSubject)
         .filter((val) => val[0] !== 'id')
@@ -132,10 +141,10 @@ export function VerifiableCredentialCard({
         .sort((a, b) => a.index - b.index);
 
     return (
-        <ClickableVerifiableCredential onClick={onClick}>
+        <ClickableVerifiableCredential onClick={onClick} metadata={metadata}>
             <header className="verifiable-credential__header">
-                <Logo />
-                <div className="verifiable-credential__header__title">Concordium Employment</div>
+                <Logo logo={metadata.logo} />
+                <div className="verifiable-credential__header__title">{metadata.title}</div>
                 <StatusIcon status={credentialStatus} />
             </header>
             <div className="verifiable-credential__body-attributes">

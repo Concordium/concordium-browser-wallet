@@ -27,6 +27,7 @@ export enum ChromeStorageKey {
     AcceptedTerms = 'acceptedTerms',
     VerifiableCredentials = 'verifiableCredentials',
     VerifiableCredentialSchemas = 'verifiableCredentialSchemas',
+    VerifiableCredentialMetadata = 'verifiableCredentialMetadata',
     Allowlist = 'allowlist',
 }
 

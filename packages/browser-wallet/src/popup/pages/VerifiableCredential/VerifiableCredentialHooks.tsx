@@ -1,9 +1,19 @@
 import { grpcClientAtom } from '@popup/store/settings';
 import { VerifiableCredential, VerifiableCredentialSchema, VerifiableCredentialStatus } from '@shared/storage/types';
-import { getVerifiableCredentialStatus } from '@shared/utils/verifiable-credential-helpers';
+import {
+    CredentialQueryResponse,
+    VerifiableCredentialMetadata,
+    getCredentialHolderId,
+    getCredentialRegistryContractAddress,
+    getVerifiableCredentialEntry,
+    getVerifiableCredentialStatus,
+} from '@shared/utils/verifiable-credential-helpers';
 import { useAtomValue } from 'jotai';
 import { useEffect, useState } from 'react';
-import { storedVerifiableCredentialSchemasAtom } from '@popup/store/verifiable-credential';
+import {
+    storedVerifiableCredentialMetadataAtom,
+    storedVerifiableCredentialSchemasAtom,
+} from '@popup/store/verifiable-credential';
 
 /**
  * Retrieve the on-chain credential status for a verifiable credential in a registry contract.
@@ -45,4 +55,51 @@ export function useCredentialSchema(credential: VerifiableCredential) {
     }, [schemas]);
 
     return schema;
+}
+
+/**
+ * Retrieve the on-chain credential entry for a verifiable credential in a CIS-4 credential registry contract.
+ * @param credential the verifiable credential to retrieve the credential entry for
+ * @returns the credential entry for the given credential, undefined if one is not found yet
+ */
+export function useCredentialEntry(credential: VerifiableCredential) {
+    const [credentialEntry, setCredentialEntry] = useState<CredentialQueryResponse>();
+    const client = useAtomValue(grpcClientAtom);
+
+    useEffect(() => {
+        const credentialHolderId = getCredentialHolderId(credential.id);
+        const registryContractAddress = getCredentialRegistryContractAddress(credential.id);
+        getVerifiableCredentialEntry(client, registryContractAddress, credentialHolderId).then((entry) => {
+            setCredentialEntry(entry);
+        });
+    }, [credential.id, client]);
+
+    return credentialEntry;
+}
+
+/**
+ * Retrieves the credential metadata to be used to render the credential. The credential metadata is
+ * found in storage and must be available there.
+ * @param credential the verifiable credential to retrieve the schema for
+ * @throws if no credential metadata is found in storage for the provided credential
+ * @returns the credential's metadata used for rendering the credential
+ */
+export function useCredentialMetadata(credential: VerifiableCredential) {
+    const [metadata, setMetadata] = useState<VerifiableCredentialMetadata>();
+    const credentialEntry = useCredentialEntry(credential);
+    const storedMetadata = useAtomValue(storedVerifiableCredentialMetadataAtom);
+
+    useEffect(() => {
+        if (!storedMetadata.loading && credentialEntry) {
+            const storedCredentialMetadata = storedMetadata.value[credentialEntry.credentialInfo.metadataUrl.url];
+            if (!storedCredentialMetadata) {
+                throw new Error(
+                    `Attempted to find credential metadata for credentialId: ${credential.id} but none was found!`
+                );
+            }
+            setMetadata(storedCredentialMetadata);
+        }
+    }, [storedMetadata, credentialEntry]);
+
+    return metadata;
 }

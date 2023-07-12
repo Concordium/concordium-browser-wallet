@@ -206,3 +206,162 @@ export async function getCredentialSchema(
         throw new Error(`Failed to parse JSON: ${bodyAsString}`);
     }
 }
+
+// {
+//     "title": "Concordium Employment",
+//     "logo" : {
+//       "url":  "https://concordium.com/wp-content/uploads/2022/07/Concordium-1.png",
+//       "hash": "1c74f7eb1b3343a5834e60e9a8fce277f2c7553112accd42e63fae7a09e0caf8"
+//       }
+//     "background_color": "#000000",
+//     "image": {
+//       "url": "https://concordium.com/employment/vc-background.png",
+//     }
+//     "localization": {
+//       "da-DK": {
+//         "url": "https://location.of/the/danish/metadata.json",
+//         "hash": "624a1a7e51f7a87effbf8261426cb7d436cf597be327ebbf113e62cb7814a34b"
+//       }
+//     }
+//   }
+
+export interface VerifiableCredentialMetadata {
+    title: string;
+    logo: MetadataUrl;
+    backgroundColor: string;
+    image: MetadataUrl;
+    localization?: Record<string, MetadataUrl>;
+}
+
+export interface CredentialInfo {
+    credentialHolderId: string;
+    holderRevocable: boolean;
+    validFrom: bigint;
+    validUntil?: bigint;
+    metadataUrl: MetadataUrl;
+}
+
+export interface CredentialQueryResponse {
+    credentialInfo: CredentialInfo;
+    schemaRef: SchemaRef;
+    revocationNonce: bigint;
+}
+
+/**
+ * Deserializes a CredentialEntry according to the CIS-4 specification.
+ * @param serializedCredentialEntry a serialized credential entry as a hex string
+ */
+export function deserializeCredentialEntry(serializedCredentialEntry: string): CredentialQueryResponse {
+    const buffer = Buffer.from(serializedCredentialEntry, 'hex');
+    let offset = 0;
+
+    const credentialHolderId = buffer.toString('hex', offset, offset + 32);
+    offset += 32;
+
+    const holderRevocable = Boolean(buffer.readUInt8(offset));
+    offset += 1;
+
+    const validFrom = buffer.readBigUInt64LE(offset) as bigint;
+    offset += 8;
+
+    const containsValidUntil = Boolean(buffer.readUInt8(offset));
+    offset += 1;
+
+    let validUntil: bigint | undefined;
+    if (containsValidUntil) {
+        validUntil = buffer.readBigUInt64LE(offset) as bigint;
+        offset += 8;
+    }
+
+    const metadata = deserializeUrlChecksumPair(buffer, offset);
+    offset = metadata.offset;
+
+    const schema = deserializeUrlChecksumPair(buffer, offset);
+    offset = schema.offset;
+
+    const revocationNonce = buffer.readBigInt64LE(offset) as bigint;
+    offset += 8;
+
+    return {
+        credentialInfo: {
+            credentialHolderId,
+            holderRevocable,
+            validFrom,
+            validUntil,
+            metadataUrl: { url: metadata.url, hash: metadata.checksum },
+        },
+        schemaRef: {
+            schema: { url: schema.url, hash: schema.checksum },
+        },
+        revocationNonce,
+    };
+}
+
+/**
+ * Get a Credential Entry from a CIS-4 contract.
+ * @param client the GRPC client for accessing a node
+ * @param contractAddress the address of a CIS-4 contract
+ * @param credentialHolderId the public key for the credential holder of the entry to retrieve
+ * @throws an error if the invoke contract call fails, or if no return value is available
+ * @returns the credential entry which contains data about the credential, undefined if the contract instance is not found
+ */
+export async function getVerifiableCredentialEntry(
+    client: ConcordiumGRPCClient,
+    contractAddress: ContractAddress,
+    credentialHolderId: string
+) {
+    const instanceInfo = await client.getInstanceInfo(contractAddress);
+    if (instanceInfo === undefined) {
+        return undefined;
+    }
+
+    const result = await client.invokeContract({
+        contract: contractAddress,
+        method: `${instanceInfo.name.substring(5)}.credentialEntry`,
+        parameter: Buffer.from(credentialHolderId, 'hex'),
+    });
+
+    if (result.tag !== 'success') {
+        throw new Error(result.reason.tag);
+    }
+
+    const { returnValue } = result;
+    if (returnValue === undefined) {
+        throw new Error(`Return value is missing from credentialEntry result in CIS-4 contract: ${contractAddress}`);
+    }
+
+    return deserializeCredentialEntry(returnValue);
+}
+
+// TODO This method is almost identical to getting credential schema. Share
+// the code instead. Only the verification of the type differs.
+/**
+ * Retrieves credential metadata from the specified URL.
+ */
+export async function getCredentialMetadata(
+    metadata: MetadataUrl,
+    abortController: AbortController
+): Promise<VerifiableCredentialMetadata> {
+    const response = await fetch(metadata.url, {
+        headers: new Headers({ 'Access-Control-Allow-Origin': '*' }),
+        mode: 'cors',
+        signal: abortController.signal,
+    });
+
+    if (!response.ok) {
+        throw new Error(`Failed to fetch the schema at: ${metadata.url}`);
+    }
+
+    // TODO Validate the checksum here.
+    const body = Buffer.from(await response.arrayBuffer());
+    let bodyAsString;
+    try {
+        bodyAsString = body.toString();
+        const schema = JSON.parse(bodyAsString);
+
+        // TODO Validate that the expected fields are available.
+        return schema;
+    } catch {
+        throw new Error(`Failed to parse JSON: ${bodyAsString}`);
+    }
+}
