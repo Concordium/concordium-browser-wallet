@@ -1,7 +1,7 @@
 {
     "name": "voting",
     "license": "Apache-2.0",
-    "version": "1.0.0",
+    "version": "1.1.0",
     "packageManager": "yarn@3.2.0",
     "dependencies": {
         "@concordium/browser-wallet-api-helpers": "^2.0.0",
