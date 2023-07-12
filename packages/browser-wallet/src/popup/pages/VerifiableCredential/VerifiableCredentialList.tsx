@@ -1,12 +1,19 @@
-import React, { useState } from 'react';
+import React, { useEffect, useState } from 'react';
 import {
     storedVerifiableCredentialSchemasAtom,
     storedVerifiableCredentialsAtom,
 } from '@popup/store/verifiable-credential';
-import { useAtomValue } from 'jotai';
+import { useAtom, useAtomValue } from 'jotai';
 import { VerifiableCredential, VerifiableCredentialSchema, VerifiableCredentialStatus } from '@shared/storage/types';
+import {
+    getCredentialRegistryContractAddress,
+    getCredentialRegistryMetadata,
+    getCredentialSchema,
+} from '@shared/utils/verifiable-credential-helpers';
+import { grpcClientAtom } from '@popup/store/settings';
+import { ConcordiumGRPCClient, ContractAddress } from '@concordium/web-sdk';
+import { useCredentialSchema, useCredentialStatus } from './VerifiableCredentialHooks';
 import { VerifiableCredentialCard } from './VerifiableCredentialCard';
-import { useCredentialStatus } from './VerifiableCredentialHooks';
 
 /**
  * Component to display when there are no verifiable credentials in the wallet.
@@ -21,15 +28,19 @@ function NoVerifiableCredentials() {
 
 function VerifiableCredentialCardWithStatusFromChain({
     credential,
-    schemas,
     onClick,
 }: {
     credential: VerifiableCredential;
-    schemas: Record<string, VerifiableCredentialSchema>;
-    onClick?: (status: VerifiableCredentialStatus) => void;
+    onClick?: (status: VerifiableCredentialStatus, schema: VerifiableCredentialSchema) => void;
 }) {
     const status = useCredentialStatus(credential);
-    const schema = schemas[credential.credentialSchema.id];
+    const schema = useCredentialSchema(credential);
+
+    // TODO Improve this so that a card can render without a schema in some temporary
+    // shape or form (e.g. an empty card, or just the raw attributes)
+    if (!schema) {
+        return null;
+    }
 
     return (
         <VerifiableCredentialCard
@@ -37,12 +48,52 @@ function VerifiableCredentialCardWithStatusFromChain({
             schema={schema}
             onClick={() => {
                 if (onClick) {
-                    onClick(status);
+                    onClick(status, schema);
                 }
             }}
             credentialStatus={status}
         />
     );
+}
+
+/**
+ * Finds all the unique contract addresses for the issuers in a list of
+ * verifiable credentials, i.e. taking all the contract addresses and removing
+ * any duplicates.
+ * @param verifiableCredentials the credentials to find the contract addresses for
+ */
+function findIssuerContractAddresses(verifiableCredentials: VerifiableCredential[]) {
+    const allContractAddresses = verifiableCredentials.map((vc) => getCredentialRegistryContractAddress(vc.id));
+    return [...new Set(allContractAddresses)];
+}
+
+async function getCredentialSchemas(
+    issuerContractAddresses: ContractAddress[],
+    abortControllers: AbortController[],
+    client: ConcordiumGRPCClient
+) {
+    const onChainSchemas: VerifiableCredentialSchema[] = [];
+
+    for (const contractAddress of issuerContractAddresses) {
+        const registryMetadata = await getCredentialRegistryMetadata(client, contractAddress);
+
+        if (registryMetadata) {
+            const controller = new AbortController();
+            abortControllers.push(controller);
+            try {
+                const credentialSchema = await getCredentialSchema(
+                    registryMetadata.credentialSchema.schema,
+                    controller
+                );
+                onChainSchemas.push(credentialSchema);
+            } catch {
+                // TODO An error is thrown here if the controller aborts which can be ignored.
+                // TODO An error can also be thrown if the fetching of the credential schema goes haywire.
+            }
+        }
+    }
+
+    return onChainSchemas;
 }
 
 /**
@@ -52,33 +103,58 @@ function VerifiableCredentialCardWithStatusFromChain({
  */
 export default function VerifiableCredentialList() {
     const verifiableCredentials = useAtomValue(storedVerifiableCredentialsAtom);
-    const schemas = useAtomValue(storedVerifiableCredentialSchemasAtom);
     const [selected, setSelected] = useState<{
         credential: VerifiableCredential;
         status: VerifiableCredentialStatus;
+        schema: VerifiableCredentialSchema;
     }>();
+    const client = useAtomValue(grpcClientAtom);
+    const [schemas, setSchemas] = useAtom(storedVerifiableCredentialSchemasAtom);
 
-    if (schemas.loading) {
-        return null;
-    }
-    if (!verifiableCredentials || !verifiableCredentials.length) {
-        return <NoVerifiableCredentials />;
-    }
-    if (!Object.keys(schemas.value).length) {
-        throw new Error('Attempted to render verifiable credentials, but no schemas were found.');
-    } else {
-        for (const verifiableCredential of verifiableCredentials) {
-            if (!Object.keys(schemas.value).includes(verifiableCredential.credentialSchema.id)) {
-                throw new Error(`A credential did not have a corresponding schema: ${verifiableCredential.id}`);
+    useEffect(() => {
+        let isCancelled = false;
+        const abortControllers: AbortController[] = [];
+
+        if (verifiableCredentials) {
+            const issuerContractAddresses = findIssuerContractAddresses(verifiableCredentials);
+
+            if (!schemas.loading) {
+                getCredentialSchemas(issuerContractAddresses, abortControllers, client).then((upToDateSchemas) => {
+                    let updatedSchemasInStorage = { ...schemas.value };
+
+                    // TODO Verify that something has actually changed before making the update.
+                    for (const updatedSchema of upToDateSchemas) {
+                        if (schemas.value === undefined) {
+                            updatedSchemasInStorage = {
+                                [updatedSchema.$id]: updatedSchema,
+                            };
+                        } else {
+                            updatedSchemasInStorage[updatedSchema.$id] = updatedSchema;
+                        }
+                    }
+
+                    if (!isCancelled) {
+                        setSchemas(updatedSchemasInStorage);
+                    }
+                });
             }
         }
+
+        return () => {
+            isCancelled = true;
+            abortControllers.forEach((controller) => controller.abort());
+        };
+    }, [schemas.loading, verifiableCredentials, client]);
+
+    if (!verifiableCredentials || !verifiableCredentials.length) {
+        return <NoVerifiableCredentials />;
     }
 
     if (selected) {
         return (
             <VerifiableCredentialCard
                 credential={selected.credential}
-                schema={schemas.value[selected.credential.credentialSchema.id]}
+                schema={selected.schema}
                 credentialStatus={selected.status}
             />
         );
@@ -92,8 +168,9 @@ export default function VerifiableCredentialList() {
                         // eslint-disable-next-line react/no-array-index-key
                         key={index}
                         credential={credential}
-                        schemas={schemas.value}
-                        onClick={(status: VerifiableCredentialStatus) => setSelected({ credential, status })}
+                        onClick={(status: VerifiableCredentialStatus, schema: VerifiableCredentialSchema) =>
+                            setSelected({ credential, status, schema })
+                        }
                     />
                 );
             })}

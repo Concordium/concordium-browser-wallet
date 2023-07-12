@@ -102,7 +102,7 @@ function applySchema(
     schema: VerifiableCredentialSchema
 ): (value: [string, string | number]) => { index: number; title: string; key: string; value: string | number } {
     return (value: [string, string | number]) => {
-        const attributeSchema = schema.schema.properties.credentialSubject.properties[value[0]];
+        const attributeSchema = schema.properties.credentialSubject.properties[value[0]];
         if (!attributeSchema) {
             throw new Error(`Missing attribute schema for key: ${value[0]}`);
         }
