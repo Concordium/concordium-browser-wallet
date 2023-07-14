@@ -1,4 +1,4 @@
-import { ConcordiumGRPCClient, ContractAddress } from '@concordium/web-sdk';
+import { ConcordiumGRPCClient, ContractAddress, sha256 } from '@concordium/web-sdk';
 import {
     MetadataUrl,
     VerifiableCredential,
@@ -288,19 +288,22 @@ export async function getVerifiableCredentialEntry(
  * Retrieves data from the from the specified URL.
  */
 // TODO This can be merged with the equivalent function in token-helpers.
-async function fetchDataFromUrl<T>(metadata: MetadataUrl, abortController: AbortController): Promise<T> {
-    const response = await fetch(metadata.url, {
+async function fetchDataFromUrl<T>({ url, hash }: MetadataUrl, abortController: AbortController): Promise<T> {
+    const response = await fetch(url, {
         headers: new Headers({ 'Access-Control-Allow-Origin': '*' }),
         mode: 'cors',
         signal: abortController.signal,
     });
 
     if (!response.ok) {
-        throw new Error(`Failed to fetch the schema at: ${metadata.url}`);
+        throw new Error(`Failed to fetch the schema at: ${url}`);
     }
 
-    // TODO Validate the checksum here (if available).
     const body = Buffer.from(await response.arrayBuffer());
+    if (hash && sha256([body]).toString('hex') !== hash) {
+        throw new Error(`The content at URL ${url} did not match the provided checksum: ${hash}`);
+    }
+
     let bodyAsString;
     try {
         bodyAsString = body.toString();
@@ -364,9 +367,11 @@ export async function getCredentialSchemas(
                     controller
                 );
                 onChainSchemas.push(credentialSchema);
-            } catch {
-                // TODO An error is thrown here if the controller aborts which can be ignored.
-                // TODO An error can also be thrown if the fetching of the credential schema goes haywire.
+            } catch (e) {
+                // Ignore errors that occur because we aborted, as that is expected to happen.
+                if (!controller.signal.aborted) {
+                    // TODO Does it make sense to show errors to the user?
+                }
             }
         }
     }
@@ -409,9 +414,11 @@ export async function getCredentialMetadata(
         try {
             const metadata = await fetchCredentialMetadata(metadataUrl, controller);
             metadataList.push({ metadata, url: metadataUrl.url });
-        } catch {
-            // TODO An error is thrown here if the controller aborts which can be ignored.
-            // TODO An error can also be thrown if the fetching of the credential schema goes haywire.
+        } catch (e) {
+            // Ignore errors that occur because we aborted, as that is expected to happen.
+            if (!controller.signal.aborted) {
+                // TODO Does it make sense to show errors to the user?
+            }
         }
     }
 
