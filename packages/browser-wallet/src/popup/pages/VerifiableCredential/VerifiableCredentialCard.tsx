@@ -44,6 +44,10 @@ function Logo({ logo }: { logo: MetadataUrl }) {
     return <Img className="verifiable-credential__header__logo" src={logo.url} withDefaults />;
 }
 
+function DisplayImage({ image }: { image: MetadataUrl }) {
+    return <Img src={image.url} withDefaults />;
+}
+
 /**
  * Renders a verifiable credential attribute.
  */
@@ -77,7 +81,7 @@ function ClickableVerifiableCredential({
         return (
             <div
                 className="verifiable-credential"
-                style={{ backgroundColor: metadata.backgroundColor }}
+                style={{ backgroundColor: metadata.background_color }}
                 onClick={onClick}
                 onKeyDown={(e) => {
                     if (e.key === 'Enter') {
@@ -92,7 +96,7 @@ function ClickableVerifiableCredential({
         );
     }
     return (
-        <div className="verifiable-credential" style={{ backgroundColor: metadata.backgroundColor }}>
+        <div className="verifiable-credential" style={{ backgroundColor: metadata.background_color }}>
             {children}
         </div>
     );
@@ -147,6 +151,11 @@ export function VerifiableCredentialCard({
                 <div className="verifiable-credential__header__title">{metadata.title}</div>
                 <StatusIcon status={credentialStatus} />
             </header>
+            {metadata.image && (
+                <div className="verifiable-credential__image">
+                    <DisplayImage image={metadata.image} />
+                </div>
+            )}
             <div className="verifiable-credential__body-attributes">
                 {attributes &&
                     attributes.map((attribute) => (

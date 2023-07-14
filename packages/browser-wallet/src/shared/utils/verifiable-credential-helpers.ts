@@ -228,8 +228,8 @@ export async function getCredentialSchema(
 export interface VerifiableCredentialMetadata {
     title: string;
     logo: MetadataUrl;
-    backgroundColor: string;
-    image: MetadataUrl;
+    background_color: string;
+    image?: MetadataUrl;
     localization?: Record<string, MetadataUrl>;
 }
 
