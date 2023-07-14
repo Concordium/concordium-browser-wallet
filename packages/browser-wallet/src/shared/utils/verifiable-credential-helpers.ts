@@ -1,5 +1,10 @@
 import { ConcordiumGRPCClient, ContractAddress } from '@concordium/web-sdk';
-import { MetadataUrl, VerifiableCredentialSchema, VerifiableCredentialStatus } from '@shared/storage/types';
+import {
+    MetadataUrl,
+    VerifiableCredential,
+    VerifiableCredentialSchema,
+    VerifiableCredentialStatus,
+} from '@shared/storage/types';
 import { Buffer } from 'buffer/';
 import { getContractName } from './contract-helpers';
 
@@ -63,7 +68,7 @@ export async function getVerifiableCredentialStatus(client: ConcordiumGRPCClient
 
     const result = await client.invokeContract({
         contract: contractAddress,
-        method: `${instanceInfo.name.substring(5)}.credentialStatus`,
+        method: `${getContractName(instanceInfo)}.credentialStatus`,
         parameter: Buffer.from(getCredentialHolderId(credentialId), 'hex'),
     });
 
@@ -171,60 +176,6 @@ export async function getCredentialRegistryMetadata(client: ConcordiumGRPCClient
     return deserializeRegistryMetadata(returnValue);
 }
 
-/**
- * Retrieves a credential schema from the specified URL.
- * @param metadata containing the URL and optionally the checksum of the JSON content served at the URL.
- * @throws if the URL is unavailable
- * @throws if the content served at the URL is not valid JSON
- * @throws if the JSON served at the URL is not a valid verifiable credential schema
- * @returns a credential schema
- */
-export async function getCredentialSchema(
-    metadata: MetadataUrl,
-    abortController: AbortController
-): Promise<VerifiableCredentialSchema> {
-    const response = await fetch(metadata.url, {
-        headers: new Headers({ 'Access-Control-Allow-Origin': '*' }),
-        mode: 'cors',
-        signal: abortController.signal,
-    });
-
-    if (!response.ok) {
-        throw new Error(`Failed to fetch the schema at: ${metadata.url}`);
-    }
-
-    // TODO Validate the checksum here.
-    const body = Buffer.from(await response.arrayBuffer());
-    let bodyAsString;
-    try {
-        bodyAsString = body.toString();
-        const schema = JSON.parse(bodyAsString);
-
-        // TODO Validate that the expected fields are available.
-        return schema;
-    } catch {
-        throw new Error(`Failed to parse JSON: ${bodyAsString}`);
-    }
-}
-
-// {
-//     "title": "Concordium Employment",
-//     "logo" : {
-//       "url":  "https://concordium.com/wp-content/uploads/2022/07/Concordium-1.png",
-//       "hash": "1c74f7eb1b3343a5834e60e9a8fce277f2c7553112accd42e63fae7a09e0caf8"
-//       }
-//     "background_color": "#000000",
-//     "image": {
-//       "url": "https://concordium.com/employment/vc-background.png",
-//     }
-//     "localization": {
-//       "da-DK": {
-//         "url": "https://location.of/the/danish/metadata.json",
-//         "hash": "624a1a7e51f7a87effbf8261426cb7d436cf597be327ebbf113e62cb7814a34b"
-//       }
-//     }
-//   }
-
 export interface VerifiableCredentialMetadata {
     title: string;
     logo: MetadataUrl;
@@ -317,7 +268,7 @@ export async function getVerifiableCredentialEntry(
 
     const result = await client.invokeContract({
         contract: contractAddress,
-        method: `${instanceInfo.name.substring(5)}.credentialEntry`,
+        method: `${getContractName(instanceInfo)}.credentialEntry`,
         parameter: Buffer.from(credentialHolderId, 'hex'),
     });
 
@@ -333,15 +284,11 @@ export async function getVerifiableCredentialEntry(
     return deserializeCredentialEntry(returnValue);
 }
 
-// TODO This method is almost identical to getting credential schema. Share
-// the code instead. Only the verification of the type differs.
 /**
- * Retrieves credential metadata from the specified URL.
+ * Retrieves data from the from the specified URL.
  */
-export async function getCredentialMetadata(
-    metadata: MetadataUrl,
-    abortController: AbortController
-): Promise<VerifiableCredentialMetadata> {
+// TODO This can be merged with the equivalent function in token-helpers.
+async function fetchDataFromUrl<T>(metadata: MetadataUrl, abortController: AbortController): Promise<T> {
     const response = await fetch(metadata.url, {
         headers: new Headers({ 'Access-Control-Allow-Origin': '*' }),
         mode: 'cors',
@@ -352,16 +299,166 @@ export async function getCredentialMetadata(
         throw new Error(`Failed to fetch the schema at: ${metadata.url}`);
     }
 
-    // TODO Validate the checksum here.
+    // TODO Validate the checksum here (if available).
     const body = Buffer.from(await response.arrayBuffer());
     let bodyAsString;
     try {
         bodyAsString = body.toString();
-        const schema = JSON.parse(bodyAsString);
-
         // TODO Validate that the expected fields are available.
+        const schema = JSON.parse(bodyAsString) as T;
         return schema;
     } catch {
         throw new Error(`Failed to parse JSON: ${bodyAsString}`);
     }
+}
+
+/**
+ * Retrieves a credential schema from the specified URL.
+ */
+export async function fetchCredentialSchema(
+    metadata: MetadataUrl,
+    abortController: AbortController
+): Promise<VerifiableCredentialSchema> {
+    return fetchDataFromUrl(metadata, abortController);
+}
+
+/**
+ * Retrieves credential metadata from the specified URL.
+ */
+export async function fetchCredentialMetadata(
+    metadata: MetadataUrl,
+    abortController: AbortController
+): Promise<VerifiableCredentialMetadata> {
+    return fetchDataFromUrl(metadata, abortController);
+}
+
+/**
+ * Retrieves credential schemas for each of the provided credentials. The method ensures
+ * that duplicate schemas are not fetched multiple times, by only fetching once per
+ * contract.
+ * @param credentials the verifiable credentials to get schemas for
+ * @param client the GRPC client for accessing a node
+ * @param abortControllers controllers to enable aborting the fetching if needed
+ * @returns a list of verifiable credential schemas
+ */
+export async function getCredentialSchemas(
+    credentials: VerifiableCredential[],
+    abortControllers: AbortController[],
+    client: ConcordiumGRPCClient
+) {
+    const onChainSchemas: VerifiableCredentialSchema[] = [];
+
+    const allContractAddresses = credentials.map((vc) => getCredentialRegistryContractAddress(vc.id));
+    const issuerContractAddresses = [...new Set(allContractAddresses)];
+
+    for (const contractAddress of issuerContractAddresses) {
+        // TODO Add error handling for the call below.
+        const registryMetadata = await getCredentialRegistryMetadata(client, contractAddress);
+
+        if (registryMetadata) {
+            const controller = new AbortController();
+            abortControllers.push(controller);
+            try {
+                const credentialSchema = await fetchCredentialSchema(
+                    registryMetadata.credentialSchema.schema,
+                    controller
+                );
+                onChainSchemas.push(credentialSchema);
+            } catch {
+                // TODO An error is thrown here if the controller aborts which can be ignored.
+                // TODO An error can also be thrown if the fetching of the credential schema goes haywire.
+            }
+        }
+    }
+
+    return onChainSchemas;
+}
+
+/**
+ * Retrieves credential metadata for each of the provided credentials. The method ensures
+ * that duplicate metadata (metadata hosted at the same URL) is not fetched multiple
+ * times.
+ * @param client the GRPC client for accessing a node
+ * @param credentials the verifiable credentials to get metadata for
+ * @param abortControllers controllers to enable aborting the fetching if needed
+ * @returns a list of pairs of verifiable credential metadata and the URL they were fetched from (their key)
+ */
+export async function getCredentialMetadata(
+    credentials: VerifiableCredential[],
+    client: ConcordiumGRPCClient,
+    abortControllers: AbortController[]
+) {
+    const metadataUrls: MetadataUrl[] = [];
+    for (const vc of credentials) {
+        // TODO Add error handling for the call below.
+        const entry = await getVerifiableCredentialEntry(
+            client,
+            getCredentialRegistryContractAddress(vc.id),
+            getCredentialHolderId(vc.id)
+        );
+        if (entry) {
+            metadataUrls.push(entry.credentialInfo.metadataUrl);
+        }
+    }
+    const uniqueMetadataUrls = [...new Map(metadataUrls.map((item) => [item.url, item])).values()];
+
+    const metadataList: { metadata: VerifiableCredentialMetadata; url: string }[] = [];
+    for (const metadataUrl of uniqueMetadataUrls) {
+        const controller = new AbortController();
+        abortControllers.push(controller);
+        try {
+            const metadata = await fetchCredentialMetadata(metadataUrl, controller);
+            metadataList.push({ metadata, url: metadataUrl.url });
+        } catch {
+            // TODO An error is thrown here if the controller aborts which can be ignored.
+            // TODO An error can also be thrown if the fetching of the credential schema goes haywire.
+        }
+    }
+
+    return metadataList;
+}
+
+export async function getChangesToCredentialMetadata(
+    credentials: VerifiableCredential[],
+    client: ConcordiumGRPCClient,
+    abortControllers: AbortController[],
+    storedMetadata: Record<string, VerifiableCredentialMetadata>
+) {
+    const upToDateCredentialMetadata = await getCredentialMetadata(credentials, client, abortControllers);
+    let updatedStoredMetadata = { ...storedMetadata };
+
+    // TODO Verify that something has actually changed before making the update.
+    for (const updatedMetadata of upToDateCredentialMetadata) {
+        if (storedMetadata.value === undefined) {
+            updatedStoredMetadata = {
+                [updatedMetadata.url]: updatedMetadata.metadata,
+            };
+        } else {
+            updatedStoredMetadata[updatedMetadata.url] = updatedMetadata.metadata;
+        }
+    }
+
+    return updatedStoredMetadata;
+}
+
+export async function getChangesToCredentialSchemas(
+    credentials: VerifiableCredential[],
+    client: ConcordiumGRPCClient,
+    abortControllers: AbortController[],
+    storedSchemas: Record<string, VerifiableCredentialSchema>
+) {
+    const upToDateSchemas = await getCredentialSchemas(credentials, abortControllers, client);
+    let updatedSchemasInStorage = { ...storedSchemas };
+
+    // TODO Verify that something has actually changed before making the update.
+    for (const updatedSchema of upToDateSchemas) {
+        if (storedSchemas === undefined) {
+            updatedSchemasInStorage = {
+                [updatedSchema.$id]: updatedSchema,
+            };
+        } else {
+            updatedSchemasInStorage[updatedSchema.$id] = updatedSchema;
+        }
+    }
+    return updatedSchemasInStorage;
 }

@@ -258,8 +258,6 @@ export type AcceptedTermsState = {
     url?: string;
 };
 
-// TODO[orhoj]: The types are incomplete as the final schemas are not ready.
-// The types used here are taken from the draft documents available.
 export enum VerifiableCredentialStatus {
     Active,
     Revoked,

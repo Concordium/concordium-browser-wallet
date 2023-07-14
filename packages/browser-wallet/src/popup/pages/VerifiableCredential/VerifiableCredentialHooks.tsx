@@ -14,6 +14,8 @@ import {
     storedVerifiableCredentialMetadataAtom,
     storedVerifiableCredentialSchemasAtom,
 } from '@popup/store/verifiable-credential';
+import { AsyncWrapper } from '@popup/store/utils';
+import { ConcordiumGRPCClient } from '@concordium/web-sdk';
 
 /**
  * Retrieve the on-chain credential status for a verifiable credential in a registry contract.
@@ -102,4 +104,44 @@ export function useCredentialMetadata(credential: VerifiableCredential) {
     }, [storedMetadata, credentialEntry]);
 
     return metadata;
+}
+
+/**
+ * Retrieves data and uses the provided data setter to update chrome.storage with the changes found.
+ * The dataFetcher is responsible for delivering the exact updated picture that should be set.
+ * @param credentials the credentials to fetch up to date data for
+ * @param storedData the current stored data (that is to be updated)
+ * @param setStoredData setter for setting the stored data, should be an atom setter connected to chrome.storage
+ * @param dataFetcher the function that fetches updated data
+ */
+export function useFetchingEffect<T>(
+    credentials: VerifiableCredential[] | undefined,
+    storedData: AsyncWrapper<Record<string, T>>,
+    setStoredData: (update: Record<string, T>) => Promise<void>,
+    dataFetcher: (
+        credentials: VerifiableCredential[],
+        client: ConcordiumGRPCClient,
+        abortControllers: AbortController[],
+        storedData: Record<string, T>
+    ) => Promise<Record<string, T>>
+) {
+    const client = useAtomValue(grpcClientAtom);
+
+    useEffect(() => {
+        let isCancelled = false;
+        const abortControllers: AbortController[] = [];
+
+        if (credentials && !storedData.loading) {
+            dataFetcher(credentials, client, abortControllers, storedData.value).then((result) => {
+                if (!isCancelled) {
+                    setStoredData(result);
+                }
+            });
+        }
+
+        return () => {
+            isCancelled = true;
+            abortControllers.forEach((controller) => controller.abort());
+        };
+    }, [storedData.loading, credentials, client]);
 }

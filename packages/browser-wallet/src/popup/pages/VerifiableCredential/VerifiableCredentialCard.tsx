@@ -1,8 +1,5 @@
 import React, { PropsWithChildren } from 'react';
-import RevokedIcon from '@assets/svg/revoked.svg';
-import ActiveIcon from '@assets/svg/verified.svg';
-import ExpiredIcon from '@assets/svg/block.svg';
-import PendingIcon from '@assets/svg/pending.svg';
+
 import { VerifiableCredentialMetadata } from '@shared/utils/verifiable-credential-helpers';
 import Img from '@popup/shared/Img';
 import {
@@ -11,41 +8,18 @@ import {
     VerifiableCredentialSchema,
     MetadataUrl,
 } from '../../../shared/storage/types';
-
-function StatusIcon({ status }: { status: VerifiableCredentialStatus }) {
-    let icon = null;
-    switch (status) {
-        case VerifiableCredentialStatus.Active:
-            icon = <ActiveIcon />;
-            break;
-        case VerifiableCredentialStatus.Revoked:
-            icon = <RevokedIcon />;
-            break;
-        case VerifiableCredentialStatus.Expired:
-            icon = <ExpiredIcon />;
-            break;
-        case VerifiableCredentialStatus.NotActivated:
-            icon = <PendingIcon />;
-            break;
-        default:
-            icon = null;
-            break;
-    }
-
-    return (
-        <div className="verifiable-credential__header__status">
-            {VerifiableCredentialStatus[status]}
-            {icon}
-        </div>
-    );
-}
+import StatusIcon from './VerifiableCredentialStatus';
 
 function Logo({ logo }: { logo: MetadataUrl }) {
     return <Img className="verifiable-credential__header__logo" src={logo.url} withDefaults />;
 }
 
 function DisplayImage({ image }: { image: MetadataUrl }) {
-    return <Img src={image.url} withDefaults />;
+    return (
+        <div className="verifiable-credential__image">
+            <Img src={image.url} withDefaults />
+        </div>
+    );
 }
 
 /**
@@ -129,15 +103,15 @@ function applySchema(
 export function VerifiableCredentialCard({
     credential,
     schema,
-    onClick,
     credentialStatus,
     metadata,
+    onClick,
 }: {
     credential: VerifiableCredential;
     schema: VerifiableCredentialSchema;
     credentialStatus: VerifiableCredentialStatus;
-    onClick?: () => void;
     metadata: VerifiableCredentialMetadata;
+    onClick?: () => void;
 }) {
     const attributes = Object.entries(credential.credentialSubject)
         .filter((val) => val[0] !== 'id')
@@ -151,11 +125,7 @@ export function VerifiableCredentialCard({
                 <div className="verifiable-credential__header__title">{metadata.title}</div>
                 <StatusIcon status={credentialStatus} />
             </header>
-            {metadata.image && (
-                <div className="verifiable-credential__image">
-                    <DisplayImage image={metadata.image} />
-                </div>
-            )}
+            {metadata.image && <DisplayImage image={metadata.image} />}
             <div className="verifiable-credential__body-attributes">
                 {attributes &&
                     attributes.map((attribute) => (
