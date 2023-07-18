@@ -13,6 +13,8 @@ import {
     getChangesToCredentialMetadata,
     getChangesToCredentialSchemas,
 } from '@shared/utils/verifiable-credential-helpers';
+import { Link } from 'react-router-dom';
+import { absoluteRoutes } from '@popup/constants/routes';
 import {
     useCredentialMetadata,
     useCredentialSchema,
@@ -118,8 +120,14 @@ export default function VerifiableCredentialList() {
     if (verifiableCredentials.loading) {
         return <LoadingVerifiableCredentials />;
     }
+
     if (verifiableCredentials.value.length === 0) {
-        return <NoVerifiableCredentials />;
+        return (
+            <>
+                <Link to={absoluteRoutes.home.verifiableCredentials.backup.path}>Backup</Link>
+                <NoVerifiableCredentials />
+            </>
+        );
     }
 
     if (selected) {

@@ -34,6 +34,7 @@ import AddTokensPrompt from '@popup/pages/ExternalAddTokens/ExternalAddTokens';
 import IdProofRequest from '@popup/pages/IdProofRequest';
 import VerifiableCredentialList from '@popup/pages/VerifiableCredential';
 import Web3ProofRequest from '@popup/pages/Web3ProofRequest';
+import VerifiableCredentialBackup from '@popup/pages/VerifiableCredentialBackup/VerifiableCredentialBackup';
 import ConnectAccountsRequest from '@popup/pages/ConnectAccountsRequest';
 import AllowListRoutes from '@popup/pages/Allowlist';
 import AddWeb3IdCredential from '@popup/pages/AddWeb3IdCredential/AddWeb3IdCredential';
@@ -233,6 +234,10 @@ export default function Routes() {
                     path={`${relativePath(relativeRoutes.home.path, absoluteRoutes.home.identities.add.path)}/*`}
                 />
                 <Route element={<Identity />} path={relativeRoutes.home.identities.path} />
+                <Route
+                    element={<VerifiableCredentialBackup />}
+                    path={absoluteRoutes.home.verifiableCredentials.backup.path}
+                />
                 <Route element={<VerifiableCredentialList />} path={relativeRoutes.home.verifiableCredentials.path} />
                 <Route path={relativeRoutes.home.settings.path}>
                     <Route index element={<Settings />} />
