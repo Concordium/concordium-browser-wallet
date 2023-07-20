@@ -45,6 +45,7 @@ export enum SchemaType {
 }
 
 type LaxStringEnumValue<E extends string> = `${E}`;
+type LaxNumberEnumValue<E extends number> = `${E}` extends `${infer T extends number}` ? T : never;
 
 export type SchemaWithContext = {
     type: LaxStringEnumValue<SchemaType>;
@@ -79,7 +80,7 @@ interface MainWalletApi {
      */
     sendTransaction(
         accountAddress: string,
-        type: AccountTransactionType.Update | AccountTransactionType.InitContract,
+        type: LaxNumberEnumValue<AccountTransactionType.Update | AccountTransactionType.InitContract>,
         payload: SendTransactionPayload,
         parameters: SmartContractParameters,
         schema: string | SchemaWithContext,
@@ -94,7 +95,7 @@ interface MainWalletApi {
      */
     sendTransaction(
         accountAddress: string,
-        type: AccountTransactionType,
+        type: LaxNumberEnumValue<AccountTransactionType>,
         payload: SendTransactionPayload
     ): Promise<string>;
     /**
