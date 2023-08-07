@@ -6,6 +6,7 @@ import {
     VerifiableCredentialStatus,
 } from '@shared/storage/types';
 import { Buffer } from 'buffer/';
+import jsonschema from 'jsonschema';
 import { getContractName } from './contract-helpers';
 
 /**
@@ -176,6 +177,142 @@ export async function getCredentialRegistryMetadata(client: ConcordiumGRPCClient
     return deserializeRegistryMetadata(returnValue);
 }
 
+// The schemas have been generated using ts-json-schema-generator and their
+// corresponding type definitions.
+const verifiableCredentialSchemaSchema = {
+    $ref: '#/definitions/VerifiableCredentialSchema',
+    $schema: 'http://json-schema.org/draft-07/schema#',
+    definitions: {
+        SchemaProperties: {
+            additionalProperties: false,
+            properties: {
+                credentialSubject: {
+                    additionalProperties: false,
+                    properties: {
+                        properties: {
+                            additionalProperties: {
+                                type: 'object',
+                            },
+                            properties: {
+                                id: {
+                                    additionalProperties: false,
+                                    properties: {
+                                        description: {
+                                            type: 'string',
+                                        },
+                                        title: {
+                                            type: 'string',
+                                        },
+                                        type: {
+                                            type: 'string',
+                                        },
+                                    },
+                                    required: ['title', 'type', 'description'],
+                                    type: 'object',
+                                },
+                            },
+                            required: ['id'],
+                            type: 'object',
+                        },
+                        required: {
+                            items: {
+                                type: 'string',
+                            },
+                            type: 'array',
+                        },
+                        type: {
+                            type: 'string',
+                        },
+                    },
+                    required: ['type', 'required', 'properties'],
+                    type: 'object',
+                },
+            },
+            required: ['credentialSubject'],
+            type: 'object',
+        },
+        VerifiableCredentialSchema: {
+            additionalProperties: false,
+            properties: {
+                $id: {
+                    type: 'string',
+                },
+                $schema: {
+                    type: 'string',
+                },
+                description: {
+                    type: 'string',
+                },
+                name: {
+                    type: 'string',
+                },
+                properties: {
+                    $ref: '#/definitions/SchemaProperties',
+                },
+                required: {
+                    items: {
+                        type: 'string',
+                    },
+                    type: 'array',
+                },
+                type: {
+                    type: 'string',
+                },
+            },
+            required: ['$id', '$schema', 'name', 'description', 'type', 'properties', 'required'],
+            type: 'object',
+        },
+    },
+};
+
+const verifiableCredentialMetadataSchema = {
+    $ref: '#/definitions/VerifiableCredentialMetadata',
+    $schema: 'http://json-schema.org/draft-07/schema#',
+    definitions: {
+        HexString: {
+            type: 'string',
+        },
+        MetadataUrl: {
+            additionalProperties: false,
+            properties: {
+                hash: {
+                    $ref: '#/definitions/HexString',
+                },
+                url: {
+                    type: 'string',
+                },
+            },
+            required: ['url'],
+            type: 'object',
+        },
+        VerifiableCredentialMetadata: {
+            additionalProperties: false,
+            properties: {
+                background_color: {
+                    type: 'string',
+                },
+                image: {
+                    $ref: '#/definitions/MetadataUrl',
+                },
+                localization: {
+                    additionalProperties: {
+                        $ref: '#/definitions/MetadataUrl',
+                    },
+                    type: 'object',
+                },
+                logo: {
+                    $ref: '#/definitions/MetadataUrl',
+                },
+                title: {
+                    type: 'string',
+                },
+            },
+            required: ['title', 'logo', 'background_color'],
+            type: 'object',
+        },
+    },
+};
+
 export interface VerifiableCredentialMetadata {
     title: string;
     logo: MetadataUrl;
@@ -285,10 +422,14 @@ export async function getVerifiableCredentialEntry(
 }
 
 /**
- * Retrieves data from the from the specified URL.
+ * Retrieves data from the from the specified URL. The result is validated according
+ * to the supplied JSON schema.
  */
-// TODO This can be merged with the equivalent function in token-helpers.
-async function fetchDataFromUrl<T>({ url, hash }: MetadataUrl, abortController: AbortController): Promise<T> {
+async function fetchDataFromUrl<T>(
+    { url, hash }: MetadataUrl,
+    abortController: AbortController,
+    jsonSchema: typeof verifiableCredentialSchemaSchema | typeof verifiableCredentialSchemaSchema
+): Promise<T> {
     const response = await fetch(url, {
         headers: new Headers({ 'Access-Control-Allow-Origin': '*' }),
         mode: 'cors',
@@ -304,15 +445,24 @@ async function fetchDataFromUrl<T>({ url, hash }: MetadataUrl, abortController: 
         throw new Error(`The content at URL ${url} did not match the provided checksum: ${hash}`);
     }
 
+    let bodyAsObject;
     let bodyAsString;
     try {
         bodyAsString = body.toString();
-        // TODO Validate that the expected fields are available.
-        const schema = JSON.parse(bodyAsString) as T;
-        return schema;
-    } catch {
+        bodyAsObject = JSON.parse(bodyAsString);
+    } catch (e) {
         throw new Error(`Failed to parse JSON: ${bodyAsString}`);
     }
+
+    const validator = new jsonschema.Validator();
+    const validationResult = validator.validate(bodyAsObject, jsonSchema);
+    if (!validationResult.valid) {
+        throw new Error(
+            `The received JSON [${bodyAsString}] did not validate according to the schema: ${validationResult.errors}`
+        );
+    }
+
+    return bodyAsObject as T;
 }
 
 /**
@@ -322,7 +472,7 @@ export async function fetchCredentialSchema(
     metadata: MetadataUrl,
     abortController: AbortController
 ): Promise<VerifiableCredentialSchema> {
-    return fetchDataFromUrl(metadata, abortController);
+    return fetchDataFromUrl(metadata, abortController, verifiableCredentialSchemaSchema);
 }
 
 /**
@@ -332,7 +482,7 @@ export async function fetchCredentialMetadata(
     metadata: MetadataUrl,
     abortController: AbortController
 ): Promise<VerifiableCredentialMetadata> {
-    return fetchDataFromUrl(metadata, abortController);
+    return fetchDataFromUrl(metadata, abortController, verifiableCredentialMetadataSchema);
 }
 
 /**

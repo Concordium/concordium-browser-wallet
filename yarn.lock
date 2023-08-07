@@ -2001,6 +2001,7 @@ __metadata:
     jest-chrome: ^0.8.0
     jotai: ^1.6.5
     json-bigint: ^1.0.0
+    jsonschema: ^1.4.1
     leb128: ^0.0.5
     lodash.debounce: ^4.0.8
     lodash.groupby: ^4.6.0
@@ -15303,6 +15304,13 @@ __metadata:
     graceful-fs:
       optional: true
   checksum: 7af3b8e1ac8fe7f1eccc6263c6ca14e1966fcbc74b618d3c78a0a2075579487547b94f72b7a1114e844a1e15bb00d440e5d1720bfc4612d790a6f285d5ea8354
+  languageName: node
+  linkType: hard
+
+"jsonschema@npm:^1.4.1":
+  version: 1.4.1
+  resolution: "jsonschema@npm:1.4.1"
+  checksum: 1ef02a6cd9bc32241ec86bbf1300bdbc3b5f2d8df6eb795517cf7d1cd9909e7beba1e54fdf73990fd66be98a182bda9add9607296b0cb00b1348212988e424b2
   languageName: node
   linkType: hard
 

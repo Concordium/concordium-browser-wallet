@@ -85,14 +85,13 @@ function ClickableVerifiableCredential({
  */
 function applySchema(
     schema: VerifiableCredentialSchema
-): (value: [string, string | number]) => { index: number; title: string; key: string; value: string | number } {
+): (value: [string, string | number]) => { title: string; key: string; value: string | number } {
     return (value: [string, string | number]) => {
         const attributeSchema = schema.properties.credentialSubject.properties[value[0]];
         if (!attributeSchema) {
             throw new Error(`Missing attribute schema for key: ${value[0]}`);
         }
         return {
-            index: Number(attributeSchema.index),
             title: attributeSchema.title,
             key: value[0],
             value: value[1],
@@ -115,8 +114,7 @@ export function VerifiableCredentialCard({
 }) {
     const attributes = Object.entries(credential.credentialSubject)
         .filter((val) => val[0] !== 'id')
-        .map(applySchema(schema))
-        .sort((a, b) => a.index - b.index);
+        .map(applySchema(schema));
 
     return (
         <ClickableVerifiableCredential onClick={onClick} metadata={metadata}>
