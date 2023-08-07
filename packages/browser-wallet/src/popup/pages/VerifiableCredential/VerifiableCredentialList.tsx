@@ -46,7 +46,7 @@ function VerifiableCredentialCardWithStatusFromChain({
     const metadata = useCredentialMetadata(credential);
 
     // Render nothing until all the required data is available.
-    if (!schema || !metadata || status === VerifiableCredentialStatus.Unknown) {
+    if (!schema || !metadata || status === undefined) {
         return null;
     }
 
@@ -112,11 +112,10 @@ export default function VerifiableCredentialList() {
 
     return (
         <div className="verifiable-credential-list">
-            {verifiableCredentials.map((credential, index) => {
+            {verifiableCredentials.map((credential) => {
                 return (
                     <VerifiableCredentialCardWithStatusFromChain
-                        // eslint-disable-next-line react/no-array-index-key
-                        key={index}
+                        key={credential.id}
                         credential={credential}
                         onClick={(
                             status: VerifiableCredentialStatus,

@@ -58,13 +58,13 @@ function deserializeCredentialStatus(serializedCredentialStatus: string): Verifi
  * @param client the GRPC client for accessing a node
  * @param credentialId the id for a verifiable credential
  * @throws an error if the invoke contract call fails, or if no return value is available
- * @returns the status of the verifiable credential, the status will be unknown if the contract is not found
+ * @returns the status of the verifiable credential, the status will be undefined if the contract is not found
  */
 export async function getVerifiableCredentialStatus(client: ConcordiumGRPCClient, credentialId: string) {
     const contractAddress = getCredentialRegistryContractAddress(credentialId);
     const instanceInfo = await client.getInstanceInfo(contractAddress);
     if (instanceInfo === undefined) {
-        return VerifiableCredentialStatus.Unknown;
+        return undefined;
     }
 
     const result = await client.invokeContract({
@@ -505,8 +505,12 @@ export async function getCredentialSchemas(
     const issuerContractAddresses = [...new Set(allContractAddresses)];
 
     for (const contractAddress of issuerContractAddresses) {
-        // TODO Add error handling for the call below.
-        const registryMetadata = await getCredentialRegistryMetadata(client, contractAddress);
+        let registryMetadata: MetadataResponse | undefined;
+        try {
+            registryMetadata = await getCredentialRegistryMetadata(client, contractAddress);
+        } catch (e) {
+            throw new Error(`Failed to get registry metadata for contract: ${contractAddress.index} with error: ${e}`);
+        }
 
         if (registryMetadata) {
             const controller = new AbortController();
@@ -520,7 +524,7 @@ export async function getCredentialSchemas(
             } catch (e) {
                 // Ignore errors that occur because we aborted, as that is expected to happen.
                 if (!controller.signal.aborted) {
-                    // TODO Does it make sense to show errors to the user?
+                    // TODO This should be logged.
                 }
             }
         }
@@ -545,7 +549,6 @@ export async function getCredentialMetadata(
 ) {
     const metadataUrls: MetadataUrl[] = [];
     for (const vc of credentials) {
-        // TODO Add error handling for the call below.
         const entry = await getVerifiableCredentialEntry(
             client,
             getCredentialRegistryContractAddress(vc.id),
@@ -567,7 +570,7 @@ export async function getCredentialMetadata(
         } catch (e) {
             // Ignore errors that occur because we aborted, as that is expected to happen.
             if (!controller.signal.aborted) {
-                // TODO Does it make sense to show errors to the user?
+                // TODO This should be logged.
             }
         }
     }
@@ -583,19 +586,23 @@ export async function getChangesToCredentialMetadata(
 ) {
     const upToDateCredentialMetadata = await getCredentialMetadata(credentials, client, abortControllers);
     let updatedStoredMetadata = { ...storedMetadata };
+    let updateReceived = false;
 
-    // TODO Verify that something has actually changed before making the update.
     for (const updatedMetadata of upToDateCredentialMetadata) {
         if (storedMetadata.value === undefined) {
             updatedStoredMetadata = {
                 [updatedMetadata.url]: updatedMetadata.metadata,
             };
+            updateReceived = true;
         } else {
             updatedStoredMetadata[updatedMetadata.url] = updatedMetadata.metadata;
+            if (JSON.stringify(storedMetadata[updatedMetadata.url]) !== JSON.stringify(updatedMetadata.metadata)) {
+                updateReceived = true;
+            }
         }
     }
 
-    return updatedStoredMetadata;
+    return { data: updatedStoredMetadata, updateReceived };
 }
 
 export async function getChangesToCredentialSchemas(
@@ -606,6 +613,7 @@ export async function getChangesToCredentialSchemas(
 ) {
     const upToDateSchemas = await getCredentialSchemas(credentials, abortControllers, client);
     let updatedSchemasInStorage = { ...storedSchemas };
+    let updateReceived = false;
 
     // TODO Verify that something has actually changed before making the update.
     for (const updatedSchema of upToDateSchemas) {
@@ -613,9 +621,13 @@ export async function getChangesToCredentialSchemas(
             updatedSchemasInStorage = {
                 [updatedSchema.$id]: updatedSchema,
             };
+            updateReceived = true;
         } else {
             updatedSchemasInStorage[updatedSchema.$id] = updatedSchema;
+            if (JSON.stringify(storedSchemas[updatedSchema.$id]) !== JSON.stringify(updatedSchema)) {
+                updateReceived = true;
+            }
         }
     }
-    return updatedSchemasInStorage;
+    return { data: updatedSchemasInStorage, updateReceived };
 }

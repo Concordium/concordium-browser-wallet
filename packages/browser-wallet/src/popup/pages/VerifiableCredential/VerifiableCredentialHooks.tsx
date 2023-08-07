@@ -23,7 +23,7 @@ import { ConcordiumGRPCClient } from '@concordium/web-sdk';
  * @returns the status for the given credential
  */
 export function useCredentialStatus(credential: VerifiableCredential) {
-    const [status, setStatus] = useState<VerifiableCredentialStatus>(VerifiableCredentialStatus.Unknown);
+    const [status, setStatus] = useState<VerifiableCredentialStatus>();
     const client = useAtomValue(grpcClientAtom);
 
     useEffect(() => {
@@ -123,7 +123,7 @@ export function useFetchingEffect<T>(
         client: ConcordiumGRPCClient,
         abortControllers: AbortController[],
         storedData: Record<string, T>
-    ) => Promise<Record<string, T>>
+    ) => Promise<{ data: Record<string, T>; updateReceived: boolean }>
 ) {
     const client = useAtomValue(grpcClientAtom);
 
@@ -133,8 +133,8 @@ export function useFetchingEffect<T>(
 
         if (credentials && !storedData.loading) {
             dataFetcher(credentials, client, abortControllers, storedData.value).then((result) => {
-                if (!isCancelled) {
-                    setStoredData(result);
+                if (!isCancelled && result.updateReceived) {
+                    setStoredData(result.data);
                 }
             });
         }

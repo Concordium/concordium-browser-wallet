@@ -48,9 +48,9 @@ function DisplayAttribute({
  */
 function ClickableVerifiableCredential({
     children,
-    onClick,
     metadata,
-}: PropsWithChildren<{ onClick?: () => void; metadata: VerifiableCredentialMetadata }>) {
+    onClick,
+}: PropsWithChildren<{ metadata: VerifiableCredentialMetadata; onClick?: () => void }>) {
     if (onClick) {
         return (
             <div
@@ -77,10 +77,10 @@ function ClickableVerifiableCredential({
 }
 
 /**
- * Apply the schema to an attribute, adding the index and title from the schema. The index
- * should be used for sorting, and the title should be displayed to a user.
+ * Apply the schema to an attribute, adding the title from the schema, which
+ * should be displayed to the user.
  * @param schema the schema to apply
- * @returns the attribute together with its index and title.
+ * @returns the attribute together with its title.
  * @throws if there is a mismatch in fields between the credential and the schema, i.e. the schema is invalid.
  */
 function applySchema(
@@ -117,7 +117,7 @@ export function VerifiableCredentialCard({
         .map(applySchema(schema));
 
     return (
-        <ClickableVerifiableCredential onClick={onClick} metadata={metadata}>
+        <ClickableVerifiableCredential metadata={metadata} onClick={onClick}>
             <header className="verifiable-credential__header">
                 <Logo logo={metadata.logo} />
                 <div className="verifiable-credential__header__title">{metadata.title}</div>

@@ -263,7 +263,6 @@ export enum VerifiableCredentialStatus {
     Revoked,
     Expired,
     NotActivated,
-    Unknown,
 }
 
 interface CredentialSchema {
@@ -287,7 +286,6 @@ interface CredentialSchemaProperty {
     title: string;
     type: 'string' | 'number' | string;
     description: string;
-    index: string;
 }
 
 interface CredentialSchemaSubject {
