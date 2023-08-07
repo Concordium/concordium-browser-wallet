@@ -10,6 +10,7 @@ import type {
     IdProofOutput,
     ConcordiumGRPCClient,
 } from '@concordium/web-sdk';
+import { LaxNumberEnumValue, LaxStringEnumValue } from './util';
 
 export type SendTransactionPayload =
     | Exclude<AccountTransactionPayload, UpdateContractPayload | InitContractPayload>
@@ -43,9 +44,6 @@ export enum SchemaType {
     Module = 'module',
     Parameter = 'parameter',
 }
-
-type LaxStringEnumValue<E extends string> = `${E}`;
-type LaxNumberEnumValue<E extends number> = `${E}` extends `${infer T extends number}` ? T : never;
 
 export type SchemaWithContext = {
     type: LaxStringEnumValue<SchemaType>;
