@@ -428,7 +428,7 @@ export async function getVerifiableCredentialEntry(
 async function fetchDataFromUrl<T>(
     { url, hash }: MetadataUrl,
     abortController: AbortController,
-    jsonSchema: typeof verifiableCredentialSchemaSchema | typeof verifiableCredentialSchemaSchema
+    jsonSchema: typeof verifiableCredentialMetadataSchema | typeof verifiableCredentialSchemaSchema
 ): Promise<T> {
     const response = await fetch(url, {
         headers: new Headers({ 'Access-Control-Allow-Origin': '*' }),
