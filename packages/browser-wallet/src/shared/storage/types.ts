@@ -293,7 +293,7 @@ interface CredentialSchemaProperty {
 interface CredentialSchemaSubject {
     type: string;
     required: string[];
-    properties: { id: Exclude<CredentialSchemaProperty, 'index'> } & Record<string, CredentialSchemaProperty>;
+    properties: { id: CredentialSchemaProperty } & Record<string, CredentialSchemaProperty>;
 }
 
 export interface SchemaProperties {
