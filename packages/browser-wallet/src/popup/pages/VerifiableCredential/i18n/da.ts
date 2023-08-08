@@ -7,6 +7,12 @@ const t: typeof en = {
     },
     menu: {
         revoke: 'Ophæv',
+        details: 'Detaljer',
+    },
+    details: {
+        id: 'Legimitationholders ID',
+        validFrom: 'Gyldig fra',
+        validUntil: 'Gyldig indtil',
     },
 };
 

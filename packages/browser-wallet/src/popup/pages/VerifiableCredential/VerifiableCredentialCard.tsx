@@ -25,7 +25,7 @@ function DisplayImage({ image }: { image: MetadataUrl }) {
 /**
  * Renders a verifiable credential attribute.
  */
-function DisplayAttribute({
+export function DisplayAttribute({
     attributeKey,
     attributeValue,
     attributeTitle,
@@ -99,6 +99,22 @@ function applySchema(
     };
 }
 
+export function VerifiableCredentialCardHeader({
+    metadata,
+    credentialStatus,
+}: {
+    metadata: VerifiableCredentialMetadata;
+    credentialStatus: VerifiableCredentialStatus;
+}) {
+    return (
+        <header className="verifiable-credential__header">
+            <Logo logo={metadata.logo} />
+            <div className="verifiable-credential__header__title">{metadata.title}</div>
+            <StatusIcon status={credentialStatus} />
+        </header>
+    );
+}
+
 export function VerifiableCredentialCard({
     credential,
     schema,
@@ -118,11 +134,7 @@ export function VerifiableCredentialCard({
 
     return (
         <ClickableVerifiableCredential metadata={metadata} onClick={onClick}>
-            <header className="verifiable-credential__header">
-                <Logo logo={metadata.logo} />
-                <div className="verifiable-credential__header__title">{metadata.title}</div>
-                <StatusIcon status={credentialStatus} />
-            </header>
+            <VerifiableCredentialCardHeader credentialStatus={credentialStatus} metadata={metadata} />
             {metadata.image && <DisplayImage image={metadata.image} />}
             <div className="verifiable-credential__body-attributes">
                 {attributes &&

@@ -118,7 +118,7 @@ export default function VerifiableCredentialList() {
     return (
         <>
             <Topbar title={t('topbar.list')} backButton={{ show: false }} />
-            <div className="verifiable-credential-list">
+            <div className="verifiable-credential-wrapper">
                 {verifiableCredentials.map((credential) => {
                     return (
                         <VerifiableCredentialCardWithStatusFromChain
