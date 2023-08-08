@@ -54,7 +54,7 @@ export function useCredentialSchema(credential: VerifiableCredential) {
             }
             setSchema(schemaValue);
         }
-    }, [schemas]);
+    }, [schemas.loading]);
 
     return schema;
 }

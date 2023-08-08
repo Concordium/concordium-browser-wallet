@@ -15,8 +15,8 @@ import { getContractName } from './contract-helpers';
  * @returns the credential holder id
  */
 export function getCredentialHolderId(credentialId: string): string {
-    const splitted = credentialId.split('/');
-    const credentialHolderId = splitted[splitted.length - 1];
+    const credentialIdParts = credentialId.split('/');
+    const credentialHolderId = credentialIdParts[credentialIdParts.length - 1];
 
     if (credentialHolderId.length !== 64) {
         throw new Error(`Invalid credential holder id found from: ${credentialId}`);
@@ -31,9 +31,9 @@ export function getCredentialHolderId(credentialId: string): string {
  * @returns the contract address of the issuing contract of the provided credential id
  */
 export function getCredentialRegistryContractAddress(credentialId: string): ContractAddress {
-    const splitted = credentialId.split(':');
-    const index = BigInt(splitted[4]);
-    const subindex = BigInt(splitted[5].split('/')[0]);
+    const credentialIdParts = credentialId.split(':');
+    const index = BigInt(credentialIdParts[4]);
+    const subindex = BigInt(credentialIdParts[5].split('/')[0]);
     return { index, subindex };
 }
 
@@ -502,7 +502,7 @@ export async function getCredentialSchemas(
     const onChainSchemas: VerifiableCredentialSchema[] = [];
 
     const allContractAddresses = credentials.map((vc) => getCredentialRegistryContractAddress(vc.id));
-    const issuerContractAddresses = [...new Set(allContractAddresses)];
+    const issuerContractAddresses = new Set(allContractAddresses);
 
     for (const contractAddress of issuerContractAddresses) {
         let registryMetadata: MetadataResponse | undefined;
@@ -558,6 +558,11 @@ export async function getCredentialMetadata(
             metadataUrls.push(entry.credentialInfo.metadataUrl);
         }
     }
+
+    // We filter any duplicate URLs. Note that there could be metadata pairs (url, hash) with the
+    // same URL but separate hashes that are thrown away here. This is done intentionally for now,
+    // as the assumption is that that would be a rare situation. This means that the first instance
+    // of the URL is the one used for gathering the credential metadata.
     const uniqueMetadataUrls = [...new Map(metadataUrls.map((item) => [item.url, item])).values()];
 
     const metadataList: { metadata: VerifiableCredentialMetadata; url: string }[] = [];
@@ -615,7 +620,6 @@ export async function getChangesToCredentialSchemas(
     let updatedSchemasInStorage = { ...storedSchemas };
     let updateReceived = false;
 
-    // TODO Verify that something has actually changed before making the update.
     for (const updatedSchema of upToDateSchemas) {
         if (storedSchemas === undefined) {
             updatedSchemasInStorage = {
