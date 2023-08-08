@@ -1,7 +1,8 @@
 /* eslint-disable react/function-component-definition, react/destructuring-assignment */
 import React from 'react';
 import { ComponentMeta, ComponentStory } from '@storybook/react';
-import { VerifiableCredentialStatus } from '@shared/storage/types';
+import { VerifiableCredentialSchema, VerifiableCredentialStatus } from '@shared/storage/types';
+import { VerifiableCredentialMetadata } from '@shared/utils/verifiable-credential-helpers';
 import { VerifiableCredentialCard } from './VerifiableCredentialCard';
 
 export default {
@@ -9,107 +10,60 @@ export default {
     component: VerifiableCredentialCard,
 } as ComponentMeta<typeof VerifiableCredentialCard>;
 
-const schema = {
-    type: 'https://w3c-ccg.github.io/vc-json-schemas/',
-    version: '1.0',
-    id: 'https://example-university.com/certificates/simple-education-certificate.json',
-    name: 'UniversityDegreeCredential',
-    author: 'did:ccd:mainnet:acc:...',
-    authored: '2023-01-01T00:00:00+00:00',
-    schema: {
-        $schema: 'http://json-schema.org/draft-07/schema#',
-        $id: 'https://example-university.com/certificates/simple-education-certificate.json',
-        title: 'Education certificate',
-        description: 'Simple representation of an education certificate.',
-        type: 'object',
-        required: ['@context', 'type', 'issuer', 'issuanceDate', 'credentialSubject'],
-        properties: {
-            '@context': {
-                type: ['string', 'array', 'object'],
-            },
-            id: {
-                type: 'string',
-                format: 'uri',
-            },
-            type: {
-                type: ['string', 'array'],
-                items: {
+const schema: VerifiableCredentialSchema = {
+    $id: 'https://example-university.com/certificates/JsonSchema2023-education-certificate.json',
+    $schema: 'https://json-schema.org/draft/2020-12/schema',
+    name: 'Education certificate',
+    description: 'Simple representation of an education certificate.',
+    type: 'object',
+    properties: {
+        credentialSubject: {
+            type: 'object',
+            properties: {
+                id: {
+                    title: 'Credential subject id',
                     type: 'string',
+                    description: 'Credential subject identifier',
+                },
+                degreeType: {
+                    title: 'Degree Hello',
+                    type: 'string',
+                    description: 'Degree type',
+                },
+                degreeName: {
+                    title: 'Degree name',
+                    type: 'string',
+                    description: 'Degree name',
+                },
+                graduationDate: {
+                    title: 'Graduation date',
+                    type: 'string',
+                    format: 'date-time',
+                    description: 'Graduation date',
                 },
             },
-            issuer: {
-                type: ['string', 'object'],
-                format: 'uri',
-                required: ['id'],
-                properties: {
-                    id: {
-                        type: 'string',
-                        format: 'uri',
-                    },
-                },
-            },
-            issuanceDate: {
-                type: 'string',
-                format: 'date-time',
-            },
-            expirationDate: {
-                type: 'string',
-                format: 'date-time',
-            },
-            validFrom: {
-                type: 'string',
-                format: 'date-time',
-            },
-            validUntil: {
-                type: 'string',
-                format: 'date-time',
-            },
-            credentialSubject: {
-                type: 'object',
-                properties: {
-                    id: {
-                        title: 'id',
-                        type: 'string',
-                        description: 'Credential subject identifier',
-                    },
-                    degreeType: {
-                        title: 'Degree type',
-                        type: 'string',
-                        description: 'Degree type',
-                        index: '0',
-                    },
-                    degreeName: {
-                        title: 'Degree name',
-                        type: 'string',
-                        description: 'Degree name',
-                        index: '1',
-                    },
-                    graduationDate: {
-                        type: 'string',
-                        format: 'date-time',
-                        description: 'Graduation date',
-                        index: '2',
-                        title: 'Graduation date',
-                    },
-                },
-                required: ['id', 'degreeType', 'degreeName', 'graduationDate'],
-            },
-            credentialSchema: {
-                type: 'object',
-                required: ['id', 'type'],
-                properties: {
-                    id: {
-                        type: 'string',
-                        format: 'uri',
-                    },
-                    type: {
-                        type: 'string',
-                    },
-                },
-            },
+            required: ['id', 'degreeType', 'degreeName', 'graduationDate'],
         },
     },
-    proof: '',
+    required: ['credentialSubject'],
+};
+
+const metadata: VerifiableCredentialMetadata = {
+    title: 'Education Certificate v2',
+    logo: {
+        url: 'https://img.logoipsum.com/298.svg',
+        hash: '1c74f7eb1b3343a5834e60e9a8fce277f2c7553112accd42e63fae7a09e0caf8',
+    },
+    background_color: '#003d73',
+    image: {
+        url: 'https://picsum.photos/327/120',
+    },
+    localization: {
+        'da-DK': {
+            url: 'https://location.of/the/danish/metadata.json',
+            hash: '624a1a7e51f7a87effbf8261426cb7d436cf597be327ebbf113e62cb7814a34b',
+        },
+    },
 };
 
 const verifiableCredential = {
@@ -132,11 +86,12 @@ const verifiableCredential = {
 
 export const Primary: ComponentStory<typeof VerifiableCredentialCard> = () => {
     return (
-        <div style={{ width: 354 }}>
+        <div style={{ width: 375 }}>
             <VerifiableCredentialCard
                 credential={verifiableCredential}
                 schema={schema}
-                useCredentialStatus={() => VerifiableCredentialStatus.Active}
+                credentialStatus={VerifiableCredentialStatus.Active}
+                metadata={metadata}
             />
         </div>
     );

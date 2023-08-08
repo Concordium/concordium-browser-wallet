@@ -27,6 +27,7 @@ export enum ChromeStorageKey {
     AcceptedTerms = 'acceptedTerms',
     VerifiableCredentials = 'verifiableCredentials',
     VerifiableCredentialSchemas = 'verifiableCredentialSchemas',
+    VerifiableCredentialMetadata = 'verifiableCredentialMetadata',
     Allowlist = 'allowlist',
 }
 
@@ -257,14 +258,11 @@ export type AcceptedTermsState = {
     url?: string;
 };
 
-// TODO[orhoj]: The types are incomplete as the final schemas are not ready.
-// The types used here are taken from the draft documents available.
 export enum VerifiableCredentialStatus {
     Active,
     Revoked,
     Expired,
     NotActivated,
-    Unknown,
 }
 
 interface CredentialSchema {
@@ -284,15 +282,15 @@ export interface VerifiableCredential {
     credentialSchema: CredentialSchema;
 }
 
-// TODO Type this so that the id property does not require an index.
 interface CredentialSchemaProperty {
     title: string;
     type: 'string' | 'number' | string;
     description: string;
-    index?: string;
 }
 
 interface CredentialSchemaSubject {
+    type: string;
+    required: string[];
     properties: { id: CredentialSchemaProperty } & Record<string, CredentialSchemaProperty>;
 }
 
@@ -300,18 +298,12 @@ export interface SchemaProperties {
     credentialSubject: CredentialSchemaSubject;
 }
 
-export interface VerifiableCredentialSchemaSchema {
-    // credentialSubject: CredentialSchemaSubject;
-    properties: SchemaProperties;
-}
-
 export interface VerifiableCredentialSchema {
-    type: string;
-    version: string;
-    id: string;
+    $id: string;
+    $schema: string;
     name: string;
-    author: string;
-    authored: string;
-    schema: VerifiableCredentialSchemaSchema;
-    proof: string;
+    description: string;
+    type: string;
+    properties: SchemaProperties;
+    required: string[];
 }

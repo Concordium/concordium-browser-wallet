@@ -1,8 +1,14 @@
-import { CcdAmount, ConcordiumGRPCClient, ContractAddress, UpdateContractPayload } from '@concordium/web-sdk';
-import { VerifiableCredentialStatus } from '@shared/storage/types';
-import { Buffer } from 'buffer/';
+import { CcdAmount, UpdateContractPayload, ConcordiumGRPCClient, ContractAddress, sha256 } from '@concordium/web-sdk';
 import * as ed from '@noble/ed25519';
-import { applyExecutionNRGBuffer } from './contract-helpers';
+import {
+    MetadataUrl,
+    VerifiableCredential,
+    VerifiableCredentialSchema,
+    VerifiableCredentialStatus,
+} from '@shared/storage/types';
+import { Buffer } from 'buffer/';
+import jsonschema from 'jsonschema';
+import { applyExecutionNRGBuffer, getContractName } from './contract-helpers';
 
 /**
  * Extracts the credential holder id from a verifiable credential id (did).
@@ -212,25 +218,21 @@ export async function getRevokeTransactionExecutionEnergyEstimate(
 /**
  * Get the status of a verifiable credential in a CIS-4 contract.
  * @param client the GRPC client for accessing a node
- * @param contractAddress the address of a CIS-4 contract
- * @param credentialHolderId the public key for the credential holder
+ * @param credentialId the id for a verifiable credential
  * @throws an error if the invoke contract call fails, or if no return value is available
- * @returns the status of the verifiable credential, the status will be unknown if the contract is not found
+ * @returns the status of the verifiable credential, the status will be undefined if the contract is not found
  */
-export async function getVerifiableCredentialStatus(
-    client: ConcordiumGRPCClient,
-    contractAddress: ContractAddress,
-    credentialHolderId: string
-) {
+export async function getVerifiableCredentialStatus(client: ConcordiumGRPCClient, credentialId: string) {
+    const contractAddress = getCredentialRegistryContractAddress(credentialId);
     const instanceInfo = await client.getInstanceInfo(contractAddress);
     if (instanceInfo === undefined) {
-        return VerifiableCredentialStatus.Unknown;
+        return undefined;
     }
 
     const result = await client.invokeContract({
         contract: contractAddress,
-        method: `${instanceInfo.name.substring(5)}.credentialStatus`,
-        parameter: Buffer.from(credentialHolderId, 'hex'),
+        method: `${getContractName(instanceInfo)}.credentialStatus`,
+        parameter: Buffer.from(getCredentialHolderId(credentialId), 'hex'),
     });
 
     if (result.tag !== 'success') {
@@ -245,27 +247,8 @@ export async function getVerifiableCredentialStatus(
     return deserializeCredentialStatus(returnValue);
 }
 
-interface MetadataUrl {
-    url: string;
-    hash?: string;
-}
-
-export interface CredentialInfo {
-    credentialHolderId: string;
-    holderRevocable: boolean;
-    validFrom: bigint;
-    validUntil?: bigint;
-    metadataUrl: MetadataUrl;
-}
-
 export interface SchemaRef {
     schema: MetadataUrl;
-}
-
-export interface CredentialQueryResponse {
-    credentialInfo: CredentialInfo;
-    schemaRef: SchemaRef;
-    revocationNonce: bigint;
 }
 
 function deserializeUrlChecksumPair(buffer: Buffer, offset: number) {
@@ -290,6 +273,228 @@ function deserializeUrlChecksumPair(buffer: Buffer, offset: number) {
         checksum,
         offset: localOffset,
     };
+}
+
+export interface RegistryMetadata {
+    issuerMetadata: MetadataUrl;
+    credentialType: string;
+    credentialSchema: SchemaRef;
+}
+
+interface MetadataResponse {
+    issuerMetadata: MetadataUrl;
+    credentialType: string;
+    credentialSchema: SchemaRef;
+}
+
+function deserializeRegistryMetadata(serializedRegistryMetadata: string): MetadataResponse {
+    const buffer = Buffer.from(serializedRegistryMetadata, 'hex');
+    let offset = 0;
+
+    const issuerMetadata = deserializeUrlChecksumPair(buffer, offset);
+    offset = issuerMetadata.offset;
+
+    const typeLength = buffer.readInt8(offset);
+    offset += 1;
+    const credentialType = buffer.toString('utf-8', offset, offset + typeLength);
+    offset += typeLength;
+
+    const credentialSchema = deserializeUrlChecksumPair(buffer, offset);
+
+    return {
+        issuerMetadata: { url: issuerMetadata.url, hash: issuerMetadata.checksum },
+        credentialType,
+        credentialSchema: {
+            schema: { url: credentialSchema.url, hash: credentialSchema.checksum },
+        },
+    };
+}
+
+/**
+ * Get the registry metadata from a credential registry CIS-4 contract.
+ * @param client the GRPC client for accessing a node
+ * @param contractAddress the address of a CIS-4 contract
+ * @returns the registry metadata for the contract, or undefined if the contract instance was not found
+ */
+export async function getCredentialRegistryMetadata(client: ConcordiumGRPCClient, contractAddress: ContractAddress) {
+    const instanceInfo = await client.getInstanceInfo(contractAddress);
+    if (instanceInfo === undefined) {
+        return undefined;
+    }
+
+    const result = await client.invokeContract({
+        contract: contractAddress,
+        method: `${getContractName(instanceInfo)}.registryMetadata`,
+    });
+
+    if (result.tag !== 'success') {
+        throw new Error(result.reason.tag);
+    }
+
+    const { returnValue } = result;
+    if (returnValue === undefined) {
+        throw new Error(`Return value is missing from credentialStatus result in CIS-4 contract: ${contractAddress}`);
+    }
+
+    return deserializeRegistryMetadata(returnValue);
+}
+
+// The schemas have been generated using ts-json-schema-generator and their
+// corresponding type definitions.
+const verifiableCredentialSchemaSchema = {
+    $ref: '#/definitions/VerifiableCredentialSchema',
+    $schema: 'http://json-schema.org/draft-07/schema#',
+    definitions: {
+        SchemaProperties: {
+            additionalProperties: false,
+            properties: {
+                credentialSubject: {
+                    additionalProperties: false,
+                    properties: {
+                        properties: {
+                            additionalProperties: {
+                                type: 'object',
+                            },
+                            properties: {
+                                id: {
+                                    additionalProperties: false,
+                                    properties: {
+                                        description: {
+                                            type: 'string',
+                                        },
+                                        title: {
+                                            type: 'string',
+                                        },
+                                        type: {
+                                            type: 'string',
+                                        },
+                                    },
+                                    required: ['title', 'type', 'description'],
+                                    type: 'object',
+                                },
+                            },
+                            required: ['id'],
+                            type: 'object',
+                        },
+                        required: {
+                            items: {
+                                type: 'string',
+                            },
+                            type: 'array',
+                        },
+                        type: {
+                            type: 'string',
+                        },
+                    },
+                    required: ['type', 'required', 'properties'],
+                    type: 'object',
+                },
+            },
+            required: ['credentialSubject'],
+            type: 'object',
+        },
+        VerifiableCredentialSchema: {
+            additionalProperties: false,
+            properties: {
+                $id: {
+                    type: 'string',
+                },
+                $schema: {
+                    type: 'string',
+                },
+                description: {
+                    type: 'string',
+                },
+                name: {
+                    type: 'string',
+                },
+                properties: {
+                    $ref: '#/definitions/SchemaProperties',
+                },
+                required: {
+                    items: {
+                        type: 'string',
+                    },
+                    type: 'array',
+                },
+                type: {
+                    type: 'string',
+                },
+            },
+            required: ['$id', '$schema', 'name', 'description', 'type', 'properties', 'required'],
+            type: 'object',
+        },
+    },
+};
+
+const verifiableCredentialMetadataSchema = {
+    $ref: '#/definitions/VerifiableCredentialMetadata',
+    $schema: 'http://json-schema.org/draft-07/schema#',
+    definitions: {
+        HexString: {
+            type: 'string',
+        },
+        MetadataUrl: {
+            additionalProperties: false,
+            properties: {
+                hash: {
+                    $ref: '#/definitions/HexString',
+                },
+                url: {
+                    type: 'string',
+                },
+            },
+            required: ['url'],
+            type: 'object',
+        },
+        VerifiableCredentialMetadata: {
+            additionalProperties: false,
+            properties: {
+                background_color: {
+                    type: 'string',
+                },
+                image: {
+                    $ref: '#/definitions/MetadataUrl',
+                },
+                localization: {
+                    additionalProperties: {
+                        $ref: '#/definitions/MetadataUrl',
+                    },
+                    type: 'object',
+                },
+                logo: {
+                    $ref: '#/definitions/MetadataUrl',
+                },
+                title: {
+                    type: 'string',
+                },
+            },
+            required: ['title', 'logo', 'background_color'],
+            type: 'object',
+        },
+    },
+};
+
+export interface VerifiableCredentialMetadata {
+    title: string;
+    logo: MetadataUrl;
+    background_color: string;
+    image?: MetadataUrl;
+    localization?: Record<string, MetadataUrl>;
+}
+
+export interface CredentialInfo {
+    credentialHolderId: string;
+    holderRevocable: boolean;
+    validFrom: bigint;
+    validUntil?: bigint;
+    metadataUrl: MetadataUrl;
+}
+
+export interface CredentialQueryResponse {
+    credentialInfo: CredentialInfo;
+    schemaRef: SchemaRef;
+    revocationNonce: bigint;
 }
 
 /**
@@ -362,7 +567,7 @@ export async function getVerifiableCredentialEntry(
 
     const result = await client.invokeContract({
         contract: contractAddress,
-        method: `${instanceInfo.name.substring(5)}.credentialEntry`,
+        method: `${getContractName(instanceInfo)}.credentialEntry`,
         parameter: Buffer.from(credentialHolderId, 'hex'),
     });
 
@@ -376,4 +581,215 @@ export async function getVerifiableCredentialEntry(
     }
 
     return deserializeCredentialEntry(returnValue);
+}
+
+/**
+ * Retrieves data from the from the specified URL. The result is validated according
+ * to the supplied JSON schema.
+ */
+async function fetchDataFromUrl<T>(
+    { url, hash }: MetadataUrl,
+    abortController: AbortController,
+    jsonSchema: typeof verifiableCredentialMetadataSchema | typeof verifiableCredentialSchemaSchema
+): Promise<T> {
+    const response = await fetch(url, {
+        headers: new Headers({ 'Access-Control-Allow-Origin': '*' }),
+        mode: 'cors',
+        signal: abortController.signal,
+    });
+
+    if (!response.ok) {
+        throw new Error(`Failed to fetch the schema at: ${url}`);
+    }
+
+    const body = Buffer.from(await response.arrayBuffer());
+    if (hash && sha256([body]).toString('hex') !== hash) {
+        throw new Error(`The content at URL ${url} did not match the provided checksum: ${hash}`);
+    }
+
+    let bodyAsObject;
+    let bodyAsString;
+    try {
+        bodyAsString = body.toString();
+        bodyAsObject = JSON.parse(bodyAsString);
+    } catch (e) {
+        throw new Error(`Failed to parse JSON: ${bodyAsString}`);
+    }
+
+    const validator = new jsonschema.Validator();
+    const validationResult = validator.validate(bodyAsObject, jsonSchema);
+    if (!validationResult.valid) {
+        throw new Error(
+            `The received JSON [${bodyAsString}] did not validate according to the schema: ${validationResult.errors}`
+        );
+    }
+
+    return bodyAsObject as T;
+}
+
+/**
+ * Retrieves a credential schema from the specified URL.
+ */
+export async function fetchCredentialSchema(
+    metadata: MetadataUrl,
+    abortController: AbortController
+): Promise<VerifiableCredentialSchema> {
+    return fetchDataFromUrl(metadata, abortController, verifiableCredentialSchemaSchema);
+}
+
+/**
+ * Retrieves credential metadata from the specified URL.
+ */
+export async function fetchCredentialMetadata(
+    metadata: MetadataUrl,
+    abortController: AbortController
+): Promise<VerifiableCredentialMetadata> {
+    return fetchDataFromUrl(metadata, abortController, verifiableCredentialMetadataSchema);
+}
+
+/**
+ * Retrieves credential schemas for each of the provided credentials. The method ensures
+ * that duplicate schemas are not fetched multiple times, by only fetching once per
+ * contract.
+ * @param credentials the verifiable credentials to get schemas for
+ * @param client the GRPC client for accessing a node
+ * @param abortControllers controllers to enable aborting the fetching if needed
+ * @returns a list of verifiable credential schemas
+ */
+export async function getCredentialSchemas(
+    credentials: VerifiableCredential[],
+    abortControllers: AbortController[],
+    client: ConcordiumGRPCClient
+) {
+    const onChainSchemas: VerifiableCredentialSchema[] = [];
+
+    const allContractAddresses = credentials.map((vc) => getCredentialRegistryContractAddress(vc.id));
+    const issuerContractAddresses = [...new Set(allContractAddresses)];
+
+    for (const contractAddress of issuerContractAddresses) {
+        let registryMetadata: MetadataResponse | undefined;
+        try {
+            registryMetadata = await getCredentialRegistryMetadata(client, contractAddress);
+        } catch (e) {
+            throw new Error(`Failed to get registry metadata for contract: ${contractAddress.index} with error: ${e}`);
+        }
+
+        if (registryMetadata) {
+            const controller = new AbortController();
+            abortControllers.push(controller);
+            try {
+                const credentialSchema = await fetchCredentialSchema(
+                    registryMetadata.credentialSchema.schema,
+                    controller
+                );
+                onChainSchemas.push(credentialSchema);
+            } catch (e) {
+                // Ignore errors that occur because we aborted, as that is expected to happen.
+                if (!controller.signal.aborted) {
+                    // TODO This should be logged.
+                }
+            }
+        }
+    }
+
+    return onChainSchemas;
+}
+
+/**
+ * Retrieves credential metadata for each of the provided credentials. The method ensures
+ * that duplicate metadata (metadata hosted at the same URL) is not fetched multiple
+ * times.
+ * @param client the GRPC client for accessing a node
+ * @param credentials the verifiable credentials to get metadata for
+ * @param abortControllers controllers to enable aborting the fetching if needed
+ * @returns a list of pairs of verifiable credential metadata and the URL they were fetched from (their key)
+ */
+export async function getCredentialMetadata(
+    credentials: VerifiableCredential[],
+    client: ConcordiumGRPCClient,
+    abortControllers: AbortController[]
+) {
+    const metadataUrls: MetadataUrl[] = [];
+    for (const vc of credentials) {
+        const entry = await getVerifiableCredentialEntry(
+            client,
+            getCredentialRegistryContractAddress(vc.id),
+            getCredentialHolderId(vc.id)
+        );
+        if (entry) {
+            metadataUrls.push(entry.credentialInfo.metadataUrl);
+        }
+    }
+    const uniqueMetadataUrls = [...new Map(metadataUrls.map((item) => [item.url, item])).values()];
+
+    const metadataList: { metadata: VerifiableCredentialMetadata; url: string }[] = [];
+    for (const metadataUrl of uniqueMetadataUrls) {
+        const controller = new AbortController();
+        abortControllers.push(controller);
+        try {
+            const metadata = await fetchCredentialMetadata(metadataUrl, controller);
+            metadataList.push({ metadata, url: metadataUrl.url });
+        } catch (e) {
+            // Ignore errors that occur because we aborted, as that is expected to happen.
+            if (!controller.signal.aborted) {
+                // TODO This should be logged.
+            }
+        }
+    }
+
+    return metadataList;
+}
+
+export async function getChangesToCredentialMetadata(
+    credentials: VerifiableCredential[],
+    client: ConcordiumGRPCClient,
+    abortControllers: AbortController[],
+    storedMetadata: Record<string, VerifiableCredentialMetadata>
+) {
+    const upToDateCredentialMetadata = await getCredentialMetadata(credentials, client, abortControllers);
+    let updatedStoredMetadata = { ...storedMetadata };
+    let updateReceived = false;
+
+    for (const updatedMetadata of upToDateCredentialMetadata) {
+        if (storedMetadata.value === undefined) {
+            updatedStoredMetadata = {
+                [updatedMetadata.url]: updatedMetadata.metadata,
+            };
+            updateReceived = true;
+        } else {
+            updatedStoredMetadata[updatedMetadata.url] = updatedMetadata.metadata;
+            if (JSON.stringify(storedMetadata[updatedMetadata.url]) !== JSON.stringify(updatedMetadata.metadata)) {
+                updateReceived = true;
+            }
+        }
+    }
+
+    return { data: updatedStoredMetadata, updateReceived };
+}
+
+export async function getChangesToCredentialSchemas(
+    credentials: VerifiableCredential[],
+    client: ConcordiumGRPCClient,
+    abortControllers: AbortController[],
+    storedSchemas: Record<string, VerifiableCredentialSchema>
+) {
+    const upToDateSchemas = await getCredentialSchemas(credentials, abortControllers, client);
+    let updatedSchemasInStorage = { ...storedSchemas };
+    let updateReceived = false;
+
+    // TODO Verify that something has actually changed before making the update.
+    for (const updatedSchema of upToDateSchemas) {
+        if (storedSchemas === undefined) {
+            updatedSchemasInStorage = {
+                [updatedSchema.$id]: updatedSchema,
+            };
+            updateReceived = true;
+        } else {
+            updatedSchemasInStorage[updatedSchema.$id] = updatedSchema;
+            if (JSON.stringify(storedSchemas[updatedSchema.$id]) !== JSON.stringify(updatedSchema)) {
+                updateReceived = true;
+            }
+        }
+    }
+    return { data: updatedSchemasInStorage, updateReceived };
 }

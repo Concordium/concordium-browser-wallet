@@ -29,6 +29,7 @@ import {
     storedVerifiableCredentials,
     storedVerifiableCredentialSchemas,
     storedAllowlist,
+    storedVerifiableCredentialMetadata,
 } from '@shared/storage/access';
 import { ChromeStorageKey } from '@shared/storage/types';
 import { atom, PrimitiveAtom, WritableAtom } from 'jotai';
@@ -61,6 +62,7 @@ const accessorMap: Record<ChromeStorageKey, StorageAccessor<any>> = {
     [ChromeStorageKey.AcceptedTerms]: storedAcceptedTerms,
     [ChromeStorageKey.VerifiableCredentials]: useIndexedStorage(storedVerifiableCredentials, getGenesisHash),
     [ChromeStorageKey.VerifiableCredentialSchemas]: storedVerifiableCredentialSchemas,
+    [ChromeStorageKey.VerifiableCredentialMetadata]: storedVerifiableCredentialMetadata,
     [ChromeStorageKey.Allowlist]: storedAllowlist,
 };
 

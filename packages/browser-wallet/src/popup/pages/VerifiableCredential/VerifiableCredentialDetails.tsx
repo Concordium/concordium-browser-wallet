@@ -1,7 +1,6 @@
 import React, { useCallback, useMemo } from 'react';
-import { storedVerifiableCredentialSchemasAtom } from '@popup/store/verifiable-credential';
 import { useAtomValue } from 'jotai';
-import { VerifiableCredential } from '@shared/storage/types';
+import { VerifiableCredential, VerifiableCredentialSchema, VerifiableCredentialStatus } from '@shared/storage/types';
 import Topbar, { ButtonTypes, MenuButton } from '@popup/shared/Topbar/Topbar';
 import { useTranslation } from 'react-i18next';
 import { AccountTransactionType } from '@concordium/web-sdk';
@@ -10,6 +9,7 @@ import { grpcClientAtom } from '@popup/store/settings';
 import { absoluteRoutes } from '@popup/constants/routes';
 import { useHdWallet } from '@popup/shared/utils/account-helpers';
 import {
+    VerifiableCredentialMetadata,
     buildRevokeTransaction,
     buildRevokeTransactionParameters,
     getCredentialHolderId,
@@ -20,20 +20,25 @@ import { fetchContractName } from '@shared/utils/token-helpers';
 import { accountRoutes } from '../Account/routes';
 import { ConfirmGenericTransferState } from '../Account/ConfirmGenericTransfer';
 import RevokeIcon from '../../../assets/svg/revoke.svg';
-import { useCredentialEntry, useCredentialStatus } from './VerifiableCredentialHooks';
+import { useCredentialEntry } from './VerifiableCredentialHooks';
 import { VerifiableCredentialCard } from './VerifiableCredentialCard';
 
 export default function VerifiableCredentialDetails({
     credential,
+    status,
+    metadata,
+    schema,
     backButtonOnClick,
 }: {
     credential: VerifiableCredential;
+    status: VerifiableCredentialStatus;
+    metadata: VerifiableCredentialMetadata;
+    schema: VerifiableCredentialSchema;
     backButtonOnClick: () => void;
 }) {
     const nav = useNavigate();
     const { pathname } = useLocation();
     const { t } = useTranslation('verifiableCredential');
-    const schemas = useAtomValue(storedVerifiableCredentialSchemasAtom);
     const client = useAtomValue(grpcClientAtom);
     const hdWallet = useHdWallet();
     const credentialEntry = useCredentialEntry(credential);
@@ -51,7 +56,7 @@ export default function VerifiableCredentialDetails({
         }
 
         // TODO Select the correct key.
-        const signingKey = '03B8D24B808BEECE8C4E2538B173AFC7AF69FEC921B012768328196EB1030426';
+        const signingKey = '741C117235A8F23AC9EB196B6A53FCD2C808691398407F7357548B7D437FC734';
 
         const parameters = await buildRevokeTransactionParameters(
             contractAddress,
@@ -81,7 +86,7 @@ export default function VerifiableCredentialDetails({
     }, [client, credential, hdWallet, credentialEntry, nav, pathname]);
 
     const menuButton: MenuButton | undefined = useMemo(() => {
-        if (credentialEntry === undefined) {
+        if (credentialEntry === undefined || !credentialEntry.credentialInfo.holderRevocable) {
             return undefined;
         }
 
@@ -91,7 +96,7 @@ export default function VerifiableCredentialDetails({
                 {
                     title: t('menu.revoke'),
                     icon: <RevokeIcon />,
-                    onClick: credentialEntry.credentialInfo.holderRevocable ? () => goToConfirmPage() : undefined,
+                    onClick: goToConfirmPage,
                 },
             ],
         };
@@ -113,8 +118,9 @@ export default function VerifiableCredentialDetails({
             <div className="verifiable-credential-list">
                 <VerifiableCredentialCard
                     credential={credential}
-                    schema={schemas.value[credential.credentialSchema.id]}
-                    useCredentialStatus={(cred) => useCredentialStatus(cred)}
+                    schema={schema}
+                    credentialStatus={status}
+                    metadata={metadata}
                 />
             </div>
         </>
