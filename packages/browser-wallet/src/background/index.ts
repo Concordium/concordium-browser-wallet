@@ -14,16 +14,21 @@ import {
     storedAcceptedTerms,
     getGenesisHash,
     storedAllowlist,
+    storedVerifiableCredentials,
+    sessionVerifiableCredentials,
+    useIndexedStorage,
 } from '@shared/storage/access';
 
 import JSONBig from 'json-bigint';
-import { ChromeStorageKey, NetworkConfiguration } from '@shared/storage/types';
+import { ChromeStorageKey, NetworkConfiguration, VerifiableCredential } from '@shared/storage/types';
 import { buildURLwithSearchParameters } from '@shared/utils/url-helpers';
 import { getTermsAndConditionsConfig } from '@shared/utils/network-helpers';
 import { Buffer } from 'buffer/';
 import { BackgroundSendTransactionPayload } from '@shared/utils/types';
 import { parsePayload } from '@shared/utils/payload-helpers';
 import { mainnet, stagenet, testnet } from '@shared/constants/networkConfiguration';
+import { addToList, web3IdCredentialLock } from '@shared/storage/update';
+import { CredentialProof } from '@concordium/browser-wallet-api-helpers';
 import bgMessageHandler from './message-handler';
 import {
     forwardToPopup,
@@ -380,6 +385,24 @@ const runIfNotAllowlisted: RunCondition<MessageStatusWrapper<string[] | undefine
 };
 
 /**
+ * Run condition that ensures that a handler is only run if the URL is in the allowlist.
+ */
+const runIfAllowlisted: RunCondition<MessageStatusWrapper<undefined>> = async (_msg, sender) => {
+    const allowlist = await storedAllowlist.get();
+    const locked = await isWalletLocked();
+
+    if (allowlist === undefined || locked) {
+        return { run: false, response: { success: false, message: NOT_WHITELISTED } };
+    }
+
+    if (sender.url !== undefined && allowlist[new URL(sender.url).origin]) {
+        return { run: true };
+    }
+
+    return { run: false, response: { success: false, message: NOT_WHITELISTED } };
+};
+
+/**
  * Run condition that runs the handler if the wallet is non-empty (an account exists), and no
  * account in the wallet is connected to the sender URL.
  *
@@ -482,6 +505,63 @@ const getSelectedChainHandler: ExtensionMessageHandler = (_msg, sender, respond)
 
 bgMessageHandler.handleMessage(createMessageTypeFilter(MessageType.GetSelectedChain), getSelectedChainHandler);
 
+const NO_CREDENTIALS_FIT = 'No temporary credentials fit the given id';
+const INVALID_CREDENTIAL_PROOF = 'Invalid credential proof given';
+
+async function web3IdAddSignatureHandler(input: {
+    credentialId: string;
+    proof: CredentialProof;
+    randomness: Record<number, string>;
+}): Promise<void> {
+    const { credentialId, proof, randomness } = input;
+
+    const genesisHash = await getGenesisHash();
+    const tempCredentials = await sessionVerifiableCredentials.get(genesisHash);
+
+    if (!tempCredentials) {
+        throw new Error(NO_CREDENTIALS_FIT);
+    }
+
+    const saved = tempCredentials.find((cred) => cred.credentialSubject.id === credentialId);
+
+    if (!saved) {
+        throw new Error(NO_CREDENTIALS_FIT);
+    }
+
+    // TODO verify signature/randomness
+    if (!proof?.proofValue) {
+        throw new Error(INVALID_CREDENTIAL_PROOF);
+    }
+
+    const credential: VerifiableCredential = {
+        ...saved,
+        signature: proof.proofValue,
+        randomness,
+    };
+
+    addToList(
+        web3IdCredentialLock,
+        credential,
+        useIndexedStorage(storedVerifiableCredentials, () => Promise.resolve(genesisHash))
+    );
+    // TODO remove temp in session
+}
+
+bgMessageHandler.handleMessage(
+    createMessageTypeFilter(MessageType.AddWeb3IdCredentialGiveSignature),
+    (input, sender, respond) => {
+        if (!sender.url || !isAllowlisted(sender.url)) {
+            respond({ success: false, message: 'not allowlisted' });
+        }
+
+        web3IdAddSignatureHandler(input.payload)
+            .then(() => respond({ success: true }))
+            .catch((error) => respond({ success: false, message: error.message }));
+
+        return true;
+    }
+);
+
 function withPromptStart<T>(): RunCondition<MessageStatusWrapper<T | undefined>> {
     return async () => {
         const isPromptOpen = await sessionOpenPrompt.get();
@@ -542,6 +622,15 @@ forwardToPopup(
     MessageType.IdProof,
     InternalMessageType.IdProof,
     runConditionComposer(runIfAccountIsAllowlisted, runIfValidProof, withPromptStart()),
+    appendUrlToPayload,
+    undefined,
+    withPromptEnd
+);
+forwardToPopup(
+    MessageType.AddWeb3IdCredential,
+    InternalMessageType.AddWeb3IdCredential,
+    // TODO Check stuff, particular that the ids have the same network, as the currently chosen one.
+    runConditionComposer(runIfAllowlisted, withPromptStart()),
     appendUrlToPayload,
     undefined,
     withPromptEnd

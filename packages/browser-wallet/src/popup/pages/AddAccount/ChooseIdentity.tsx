@@ -5,8 +5,8 @@ import { useAtomValue, useSetAtom } from 'jotai';
 import IdentityProviderIcon from '@popup/shared/IdentityProviderIcon';
 
 import IdCard from '@popup/shared/IdCard';
-import { identitiesAtom, selectedIdentityIndexAtom, identityProvidersAtom } from '@popup/store/identity';
-import { Identity, CreationStatus, WalletCredential, ConfirmedIdentity } from '@shared/storage/types';
+import { selectedIdentityIndexAtom, identityProvidersAtom } from '@popup/store/identity';
+import { Identity, WalletCredential, ConfirmedIdentity } from '@shared/storage/types';
 import { absoluteRoutes } from '@popup/constants/routes';
 import Button from '@popup/shared/Button';
 import { credentialsAtom } from '@popup/store/account';
@@ -14,6 +14,7 @@ import { getMaxAccountsForIdentity, isIdentityOfCredential } from '@shared/utils
 import { getNextEmptyCredNumber } from '@popup/shared/utils/account-helpers';
 import Modal from '@popup/shared/Modal';
 import i18n from '@popup/shell/i18n';
+import { useConfirmedIdentities } from '@popup/shared/utils/identity-helpers';
 
 function validateValidForAccountCreation(identity: ConfirmedIdentity, creds: WalletCredential[]): string | undefined {
     const nextCredNumber = getNextEmptyCredNumber(creds);
@@ -25,7 +26,7 @@ function validateValidForAccountCreation(identity: ConfirmedIdentity, creds: Wal
 
 export default function ChooseIdentity() {
     const { t } = useTranslation('addAccount');
-    const identities = useAtomValue(identitiesAtom);
+    const identities = useConfirmedIdentities();
     const setSelectedIdentityIndex = useSetAtom(selectedIdentityIndexAtom);
     const nav = useNavigate();
     const providers = useAtomValue(identityProvidersAtom);
@@ -37,7 +38,11 @@ export default function ChooseIdentity() {
         [providers]
     );
 
-    if (!identities.length) {
+    if (identities.loading) {
+        return null;
+    }
+
+    if (!identities.value.length) {
         return (
             <div className="flex-column align-center h-full">
                 <p className="m-t-20 m-h-40">{t('noIdentities')}</p>
@@ -58,10 +63,7 @@ export default function ChooseIdentity() {
                 {modalMessage}
             </Modal>
             <p className="m-t-20 text-center p-h-10">{t('chooseIdentity')}</p>
-            {identities.map((identity, i) => {
-                if (identity.status !== CreationStatus.Confirmed) {
-                    return null;
-                }
+            {identities.value.map((identity, i) => {
                 const credsOfCurrentIdentity = credentials.filter(isIdentityOfCredential(identity));
                 const reason = validateValidForAccountCreation(identity, credsOfCurrentIdentity);
 

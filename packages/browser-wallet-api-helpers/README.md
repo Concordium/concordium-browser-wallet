@@ -215,6 +215,8 @@ const provider = await detectConcordiumProvider();
 await provider.addCIS2Tokens('2za2yAXbFiaB151oYqTteZfqiBzibHXizwjNbpdU8hodq9SfEk', ['AA', 'BB'], '1399', '0');
 ```
 
+// TODO Remove this (because the function is deprecated)
+
 ### Prove ID statement
 
 It is possible to request a proof for a given ID statement on a specific account. The function takes 3 arguments. The statement to be proved, a challenge to ensure that the proof was not generated for a different context, and the account that should prove that statement.
@@ -224,12 +226,29 @@ If the wallet is locked, or you have not connected with the wallet (or previousl
 
 The following exemplifies requesting a proof for a statement name myIdStatement (To see how to create a statement check out [our documentation](https://developer.concordium.software/en/mainnet/net/guides/create-proofs.html)) with a challenge of "12346789ABCD" id, for the account `2za2yAXbFiaB151oYqTteZfqiBzibHXizwjNbpdU8hodq9SfEk`.
 
+// TODO Fix this example.
+
 ```typescript
 const statement = myIdStatement;
 const challenge = '12346789ABCD';
 const provider = await detectConcordiumProvider();
 await provider.requestIdProof('2za2yAXbFiaB151oYqTteZfqiBzibHXizwjNbpdU8hodq9SfEk', ['AA', 'BB'], '1399', '0');
 ```
+
+### Add WebId Credentials
+
+To add a Web3IdCredential, use the `addWeb3IdCredential` endpoint.
+The credential itself and the url for the metadata must be provided. In addition, the function takes a callback function that takes the credentialHolderId as input, and which should return the randomness used to create the commitments on the values/properties in the credential, and the signature on the commitments and credentialHolderId. If the callback does return a valid signature, the credential is not added to the wallet.
+
+// TODO Add example.
+
+### Request Verifiable Presentation
+
+It is possible to request a veriable presentation on a number statements about accounts and web3IdCredentials. The function takes 2 arguments. The statements to be proved and a challenge to ensure that the proof was not generated for a different context.
+
+To build a statement, the Web3StatementBuilder, from the web-sdk, can be used. (// TODO link to it)
+
+If the wallet is locked, or you have not connected with the wallet (or previously been allowlisted) or if the user rejects proving the statement, the `Promise` will reject.
 
 ## Events
 

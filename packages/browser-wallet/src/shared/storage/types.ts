@@ -1,3 +1,4 @@
+import { APIVerifiableCredential } from '@concordium/browser-wallet-api-helpers';
 import type { CryptographicParameters, HexString, IdentityObjectV1, Network, Versioned } from '@concordium/web-sdk';
 
 export enum ChromeStorageKey {
@@ -28,6 +29,7 @@ export enum ChromeStorageKey {
     VerifiableCredentials = 'verifiableCredentials',
     VerifiableCredentialSchemas = 'verifiableCredentialSchemas',
     VerifiableCredentialMetadata = 'verifiableCredentialMetadata',
+    TemporaryVerifiableCredentials = 'tempVerifiableCredentials',
     Allowlist = 'allowlist',
 }
 
@@ -272,15 +274,16 @@ interface CredentialSchema {
 
 export type CredentialSubject = {
     id: string;
-    attributes: Record<string, string | number>;
+    attributes: Record<string, string | bigint>;
 };
 
-export interface VerifiableCredential {
+export interface VerifiableCredential extends APIVerifiableCredential {
     id: string;
-    type: string[];
-    issuer: string;
-    credentialSubject: CredentialSubject;
+    signature: string;
+    randomness: Record<string, string>;
     credentialSchema: CredentialSchema;
+    credentialSubject: CredentialSubject;
+    index: number;
 }
 
 interface CredentialSchemaProperty {

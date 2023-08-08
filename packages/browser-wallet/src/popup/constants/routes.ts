@@ -45,6 +45,9 @@ export const relativeRoutes = {
         connectionRequest: {
             path: 'connection-request',
         },
+        addWeb3IdCredential: {
+            path: 'add-web3id-credential',
+        },
         connectAccountsRequest: {
             path: 'connect-accounts-request',
         },

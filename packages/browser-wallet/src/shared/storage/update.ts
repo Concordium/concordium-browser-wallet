@@ -1,6 +1,7 @@
 import { StorageAccessor } from './access';
 
 export const accountInfoCacheLock = 'concordium_account_info_cache_lock';
+export const web3IdCredentialLock = 'concordium_web3IdCredential_lock';
 
 /**
  * Safely updates a record in storage by first acquiring a lock, reading the current value

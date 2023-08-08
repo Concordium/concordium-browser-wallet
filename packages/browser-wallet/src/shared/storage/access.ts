@@ -187,3 +187,6 @@ export const sessionPendingTransactions = makeIndexedStorageAccessor<string[]>( 
     'session',
     ChromeStorageKey.PendingTransactions
 );
+export const sessionVerifiableCredentials = makeIndexedStorageAccessor<
+    Omit<VerifiableCredential, 'signature' | 'randomness'>[]
+>('session', ChromeStorageKey.TemporaryVerifiableCredentials);

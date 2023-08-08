@@ -23,6 +23,9 @@ function Header() {
         if (pathname.startsWith(absoluteRoutes.prompt.addTokens.path)) {
             return t('header.addTokens');
         }
+        if (pathname.startsWith(absoluteRoutes.prompt.addWeb3IdCredential.path)) {
+            return t('header.addWeb3IdCredential');
+        }
         if (pathname.startsWith(absoluteRoutes.prompt.idProof.path)) {
             return t('header.idProof');
         }

@@ -35,6 +35,7 @@ import IdProofRequest from '@popup/pages/IdProofRequest';
 import VerifiableCredentialList from '@popup/pages/VerifiableCredential';
 import ConnectAccountsRequest from '@popup/pages/ConnectAccountsRequest';
 import AllowListRoutes from '@popup/pages/Allowlist';
+import AddWeb3IdCredential from '@popup/pages/AddWeb3IdCredential/AddWeb3IdCredential';
 
 type PromptKey = keyof Omit<typeof absoluteRoutes['prompt'], 'path'>;
 
@@ -89,7 +90,10 @@ export default function Routes() {
         InternalMessageType.ConnectAccounts,
         'connectAccountsRequest'
     );
-
+    const handleAddWeb3IdCredentialResponse = useMessagePrompt<MessageStatusWrapper<string>>(
+        InternalMessageType.AddWeb3IdCredential,
+        'addWeb3IdCredential'
+    );
     const handleSendTransactionResponse = useMessagePrompt<MessageStatusWrapper<string>>(
         InternalMessageType.SendTransaction,
         'sendTransaction'
@@ -143,6 +147,20 @@ export default function Routes() {
                             onSubmit={(hash) => handleSendTransactionResponse({ success: true, result: hash })}
                             onReject={() =>
                                 handleSendTransactionResponse({ success: false, message: 'Signing was rejected' })
+                            }
+                        />
+                    }
+                />
+                <Route
+                    path={relativeRoutes.prompt.addWeb3IdCredential.path}
+                    element={
+                        <AddWeb3IdCredential
+                            onAllow={(key) => handleAddWeb3IdCredentialResponse({ success: true, result: key })}
+                            onReject={() =>
+                                handleAddWeb3IdCredentialResponse({
+                                    success: false,
+                                    message: 'Adding credential was rejected',
+                                })
                             }
                         />
                     }

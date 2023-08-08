@@ -4,6 +4,7 @@ import { Link, Route, Routes, useNavigate } from 'react-router-dom';
 import {
     AccountInfoDelegator,
     AccountTransactionType,
+    ConsensusStatusV0,
     DelegationTargetType,
     isDelegatorAccount,
     StakePendingChangeType,
@@ -63,7 +64,13 @@ function DisplayPendingChange({ pendingChange }: DisplayPendingChangeProps) {
 
     const effectiveTime = useMemo(() => {
         if (pendingChange) {
-            const date = dateFromStakePendingChange(pendingChange, consensusStatus, tokenomicsInfo, chainParameters);
+            // TODO fix type assertion
+            const date = dateFromStakePendingChange(
+                pendingChange,
+                consensusStatus as ConsensusStatusV0,
+                tokenomicsInfo,
+                chainParameters
+            );
             if (date) {
                 return getFormattedDateString(date);
             }

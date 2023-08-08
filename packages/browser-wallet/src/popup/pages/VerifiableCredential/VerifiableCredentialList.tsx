@@ -5,7 +5,7 @@ import {
     storedVerifiableCredentialsAtom,
 } from '@popup/store/verifiable-credential';
 import { useAtom, useAtomValue } from 'jotai';
-import { VerifiableCredential, VerifiableCredentialSchema, VerifiableCredentialStatus } from '@shared/storage/types';
+import { VerifiableCredential, VerifiableCredentialStatus, VerifiableCredentialSchema } from '@shared/storage/types';
 import {
     VerifiableCredentialMetadata,
     getChangesToCredentialMetadata,
@@ -33,8 +33,10 @@ function NoVerifiableCredentials() {
 function VerifiableCredentialCardWithStatusFromChain({
     credential,
     onClick,
+    className,
 }: {
     credential: VerifiableCredential;
+    className: string;
     onClick?: (
         status: VerifiableCredentialStatus,
         schema: VerifiableCredentialSchema,
@@ -52,8 +54,9 @@ function VerifiableCredentialCardWithStatusFromChain({
 
     return (
         <VerifiableCredentialCard
-            credential={credential}
+            credentialSubject={credential.credentialSubject}
             schema={schema}
+            className={className}
             onClick={() => {
                 if (onClick) {
                     onClick(status, schema, metadata);
@@ -102,8 +105,9 @@ export default function VerifiableCredentialList() {
     if (selected) {
         return (
             <VerifiableCredentialCard
-                credential={selected.credential}
-                schema={selected.schema}
+                className="verifiable-credential-list__card"
+                credentialSubject={selected.credential.credentialSubject}
+                schema={schemas.value[selected.schema.$id]}
                 credentialStatus={selected.status}
                 metadata={selected.metadata}
             />
@@ -116,6 +120,7 @@ export default function VerifiableCredentialList() {
                 return (
                     <VerifiableCredentialCardWithStatusFromChain
                         key={credential.id}
+                        className="verifiable-credential-list__card"
                         credential={credential}
                         onClick={(
                             status: VerifiableCredentialStatus,

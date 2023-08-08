@@ -1,0 +1,110 @@
+<!DOCTYPE html>
+<html>
+    <head>
+        <title>Example Web3Id</title>
+        <script src="/sdk.js"></script>
+        <script src="/helpers.js"></script>
+        <script src="https://unpkg.com/cbor-web"></script>
+        <meta charset="utf-8" />
+        <script>
+            let currentAccountAddress = '';
+            async function setupPage() {
+                const provider = await concordiumHelpers.detectConcordiumProvider();
+
+                document.getElementById('requestAccounts').addEventListener('click', () => {
+                    provider.requestAccounts().then((accountAddresses) => {
+                        currentAccountAddress = accountAddresses[0];
+                        document.getElementById('accountAddress').innerHTML = currentAccountAddress;
+                    });
+                });
+                provider.on('accountDisconnected', (accountAddress) => (currentAccountAddress = undefined));
+                provider.on('accountChanged', (accountAddress) => (currentAccountAddress = accountAddress));
+                provider.on('chainChanged', (chain) => alert(chain));
+                document.getElementById('addWeb3Id').addEventListener('click', () => {
+                    const values = {
+                        degreeType: degreeType.value,
+                        degreeName: degreeName.value,
+                        graduationDate: graduationDate.valueAsDate.toISOString(),
+                    };
+                    const metadataUrl = {
+                        url: web3metadataUrl.value,
+                    };
+                    provider.addWeb3IdCredential(
+                        {
+                            $schema: './JsonSchema2023-education-certificate.json',
+                            type: [
+                                'VerifiableCredential',
+                                'ConcordiumVerifiableCredential',
+                                'UniversityDegreeCredential',
+                            ],
+                            issuer: 'did:ccd:testnet:sci:5463:0/issuer',
+                            credentialSubject: {
+                                attributes: values,
+                            },
+                            credentialSchema: {
+                                id: 'https://raw.githubusercontent.com/Concordium/concordium-web3id/main/examples/json-schemas/education-certificate/JsonSchema2023-education-certificate.json',
+                                type: 'JsonSchema2023',
+                            },
+                        },
+                        metadataUrl,
+                        async (id) => {
+                            const body = {
+                                credentialSubject: {
+                                    attributes: values,
+                                    id,
+                                },
+                                validFrom: new Date().toISOString(),
+                                holderRevocable: true,
+                                metadataUrl,
+                            };
+                            const response = await fetch(web3IssuerUrl.value, {
+                                method: 'POST',
+                                headers: {
+                                    'Content-Type': 'application/json',
+                                },
+                                body: JSON.stringify(body),
+                            });
+                            const { credential } = await response.json();
+                            const { proof, randomness } = credential;
+                            return { proof, randomness };
+                        }
+                    );
+                });
+                document.getElementById('graduationDate').valueAsDate = new Date();
+            }
+            setupPage();
+        </script>
+    </head>
+    <style>
+        input {
+            width: 80%;
+        }
+    </style>
+    <body>
+        <div>
+            <button id="requestAccounts">Request accounts</button>
+            <h3 id="accountAddress">Account address:</h3>
+        </div>
+        <br />
+        <a href="https://github.com/Concordium/concordium-web3id/tree/web3id-revision/services/web3id-issuer"
+            >Web3IdIssuer Endpoint:</a
+        ><input type="text" id="web3IssuerUrl" value="http://localhost:8082/v0/issue" />
+        <br />
+        Web3Id MetadataUrl:
+        <input
+            type="text"
+            id="web3metadataUrl"
+            value="https://raw.githubusercontent.com/Concordium/concordium-web3id/credential-metadata-example/examples/json-schemas/metadata/credential-metadata.json"
+        />
+        <br />
+        <h3>Attribute values:</h3>
+        degreeType: <input type="text" id="degreeType" value="BachelorDegree" />
+        <br />
+        degreeName: <input type="text" id="degreeName" value="Bachelor of Science and Arts" />
+        <br />
+        graduationDate: <input type="date" id="graduationDate" value="" />
+        <br />
+        <br />
+        <button id="addWeb3Id">Add web3IdCredential Example to wallet</button>
+    </body>
+</html>

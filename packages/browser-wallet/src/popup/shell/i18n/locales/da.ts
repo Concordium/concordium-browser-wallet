@@ -20,6 +20,7 @@ import termsAndConditions from '@popup/pages/TermsAndConditions/i18n/da';
 import idProofRequest from '@popup/pages/IdProofRequest/i18n/da';
 import allowlist from '@popup/pages/Allowlist/i18n/da';
 import connectAccountsRequest from '@popup/pages/ConnectAccountsRequest/i18n/da';
+import addWeb3IdCredential from '@popup/pages/AddWeb3IdCredential/i18n/da';
 
 import type en from './en';
 
@@ -46,6 +47,7 @@ const t: typeof en = {
     idProofRequest,
     allowlist,
     connectAccountsRequest,
+    addWeb3IdCredential,
 };
 
 export default t;
