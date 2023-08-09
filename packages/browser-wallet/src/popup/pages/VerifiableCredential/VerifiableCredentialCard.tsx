@@ -87,7 +87,7 @@ function applySchema(
     schema: VerifiableCredentialSchema
 ): (value: [string, string | number]) => { title: string; key: string; value: string | number } {
     return (value: [string, string | number]) => {
-        const attributeSchema = schema.properties.credentialSubject.properties[value[0]];
+        const attributeSchema = schema.properties.credentialSubject.properties.attributes.properties[value[0]];
         if (!attributeSchema) {
             throw new Error(`Missing attribute schema for key: ${value[0]}`);
         }
@@ -112,7 +112,7 @@ export function VerifiableCredentialCard({
     metadata: VerifiableCredentialMetadata;
     onClick?: () => void;
 }) {
-    const attributes = Object.entries(credential.credentialSubject)
+    const attributes = Object.entries(credential.credentialSubject.attributes)
         .filter((val) => val[0] !== 'id')
         .map(applySchema(schema));
 

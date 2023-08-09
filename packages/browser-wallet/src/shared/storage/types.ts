@@ -270,14 +270,15 @@ interface CredentialSchema {
     type: string;
 }
 
-export type CredentialSubject = { id: string } & Record<string, string | number>;
+export type CredentialSubject = {
+    id: string;
+    attributes: Record<string, string | number>;
+};
 
 export interface VerifiableCredential {
-    '@context': string[];
     id: string;
     type: string[];
     issuer: string;
-    issuanceDate: string;
     credentialSubject: CredentialSubject;
     credentialSchema: CredentialSchema;
 }
@@ -286,12 +287,17 @@ interface CredentialSchemaProperty {
     title: string;
     type: 'string' | 'number' | string;
     description: string;
+    format?: string;
 }
+
+type CredentialSchemaAttributes = {
+    properties: Record<string, CredentialSchemaProperty>;
+} & CredentialSchemaProperty;
 
 interface CredentialSchemaSubject {
     type: string;
+    properties: { id: CredentialSchemaProperty } & { attributes: CredentialSchemaAttributes };
     required: string[];
-    properties: { id: CredentialSchemaProperty } & Record<string, CredentialSchemaProperty>;
 }
 
 export interface SchemaProperties {
