@@ -25,6 +25,9 @@ export enum ChromeStorageKey {
     Cookie = 'cookie',
     OpenPrompt = 'openPrompt',
     AcceptedTerms = 'acceptedTerms',
+    VerifiableCredentials = 'verifiableCredentials',
+    VerifiableCredentialSchemas = 'verifiableCredentialSchemas',
+    VerifiableCredentialMetadata = 'verifiableCredentialMetadata',
     Allowlist = 'allowlist',
 }
 
@@ -254,3 +257,53 @@ export type AcceptedTermsState = {
     version: string;
     url?: string;
 };
+
+export enum VerifiableCredentialStatus {
+    Active,
+    Revoked,
+    Expired,
+    NotActivated,
+}
+
+interface CredentialSchema {
+    id: string;
+    type: string;
+}
+
+export type CredentialSubject = { id: string } & Record<string, string | number>;
+
+export interface VerifiableCredential {
+    '@context': string[];
+    id: string;
+    type: string[];
+    issuer: string;
+    issuanceDate: string;
+    credentialSubject: CredentialSubject;
+    credentialSchema: CredentialSchema;
+}
+
+interface CredentialSchemaProperty {
+    title: string;
+    type: 'string' | 'number' | string;
+    description: string;
+}
+
+interface CredentialSchemaSubject {
+    type: string;
+    required: string[];
+    properties: { id: CredentialSchemaProperty } & Record<string, CredentialSchemaProperty>;
+}
+
+export interface SchemaProperties {
+    credentialSubject: CredentialSchemaSubject;
+}
+
+export interface VerifiableCredentialSchema {
+    $id: string;
+    $schema: string;
+    name: string;
+    description: string;
+    type: string;
+    properties: SchemaProperties;
+    required: string[];
+}

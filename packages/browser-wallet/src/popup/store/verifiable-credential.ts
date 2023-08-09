@@ -1,0 +1,18 @@
+import { ChromeStorageKey, VerifiableCredential, VerifiableCredentialSchema } from '@shared/storage/types';
+import { VerifiableCredentialMetadata } from '@shared/utils/verifiable-credential-helpers';
+import { atomWithChromeStorage } from './utils';
+
+export const storedVerifiableCredentialsAtom = atomWithChromeStorage<VerifiableCredential[] | undefined>(
+    ChromeStorageKey.VerifiableCredentials,
+    []
+);
+
+export const storedVerifiableCredentialSchemasAtom = atomWithChromeStorage<Record<string, VerifiableCredentialSchema>>(
+    ChromeStorageKey.VerifiableCredentialSchemas,
+    {},
+    true
+);
+
+export const storedVerifiableCredentialMetadataAtom = atomWithChromeStorage<
+    Record<string, VerifiableCredentialMetadata>
+>(ChromeStorageKey.VerifiableCredentialMetadata, {}, true);

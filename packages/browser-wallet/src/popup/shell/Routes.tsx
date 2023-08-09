@@ -32,6 +32,7 @@ import RecoveryFinish from '@popup/pages/Recovery/RecoveryFinish';
 import ChangePasscode from '@popup/pages/ChangePasscode/ChangePasscode';
 import AddTokensPrompt from '@popup/pages/ExternalAddTokens/ExternalAddTokens';
 import IdProofRequest from '@popup/pages/IdProofRequest';
+import VerifiableCredentialList from '@popup/pages/VerifiableCredential';
 import ConnectAccountsRequest from '@popup/pages/ConnectAccountsRequest';
 import AllowListRoutes from '@popup/pages/Allowlist';
 
@@ -195,6 +196,7 @@ export default function Routes() {
                     path={`${relativePath(relativeRoutes.home.path, absoluteRoutes.home.identities.add.path)}/*`}
                 />
                 <Route element={<Identity />} path={relativeRoutes.home.identities.path} />
+                <Route element={<VerifiableCredentialList />} path={relativeRoutes.home.verifiableCredentials.path} />
                 <Route path={relativeRoutes.home.settings.path}>
                     <Route index element={<Settings />} />
                     <Route element={<AllowListRoutes />} path={`${relativeRoutes.home.settings.allowlist.path}/*`} />

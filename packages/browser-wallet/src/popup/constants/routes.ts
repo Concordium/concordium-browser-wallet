@@ -18,6 +18,9 @@ export const relativeRoutes = {
             path: 'identities',
             add: { path: 'add' },
         },
+        verifiableCredentials: {
+            path: 'verifiable-credentials',
+        },
         settings: {
             path: 'settings',
             allowlist: {

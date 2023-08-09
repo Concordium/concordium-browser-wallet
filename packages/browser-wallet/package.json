@@ -33,6 +33,7 @@
         "i18next-browser-languagedetector": "^6.1.4",
         "jotai": "^1.6.5",
         "json-bigint": "^1.0.0",
+        "jsonschema": "^1.4.1",
         "leb128": "^0.0.5",
         "lodash.debounce": "^4.0.8",
         "lodash.groupby": "^4.6.0",

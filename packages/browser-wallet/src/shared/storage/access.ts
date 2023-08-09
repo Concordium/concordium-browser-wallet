@@ -1,3 +1,4 @@
+import { VerifiableCredentialMetadata } from '@shared/utils/verifiable-credential-helpers';
 import {
     ChromeStorageKey,
     EncryptedData,
@@ -11,6 +12,8 @@ import {
     TokenMetadata,
     TokenStorage,
     AcceptedTermsState,
+    VerifiableCredential,
+    VerifiableCredentialSchema,
 } from './types';
 
 export type StorageAccessor<V> = {
@@ -145,6 +148,18 @@ export const storedTokenMetadata = makeStorageAccessor<Record<string, TokenMetad
     ChromeStorageKey.TokenMetadata
 );
 export const storedAcceptedTerms = makeStorageAccessor<AcceptedTermsState>('local', ChromeStorageKey.AcceptedTerms);
+export const storedVerifiableCredentials = makeIndexedStorageAccessor<VerifiableCredential[]>(
+    'local',
+    ChromeStorageKey.VerifiableCredentials
+);
+export const storedVerifiableCredentialSchemas = makeStorageAccessor<Record<string, VerifiableCredentialSchema>>(
+    'local',
+    ChromeStorageKey.VerifiableCredentialSchemas
+);
+export const storedVerifiableCredentialMetadata = makeStorageAccessor<Record<string, VerifiableCredentialMetadata>>(
+    'local',
+    ChromeStorageKey.VerifiableCredentialMetadata
+);
 const indexedStoredAllowlist = makeIndexedStorageAccessor<Record<string, string[]>>(
     'local',
     ChromeStorageKey.Allowlist
