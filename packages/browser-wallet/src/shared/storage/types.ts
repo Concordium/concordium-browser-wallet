@@ -292,11 +292,15 @@ interface CredentialSchemaProperty {
 
 type CredentialSchemaAttributes = {
     properties: Record<string, CredentialSchemaProperty>;
+    required: string[];
 } & CredentialSchemaProperty;
 
 interface CredentialSchemaSubject {
     type: string;
-    properties: { id: CredentialSchemaProperty } & { attributes: CredentialSchemaAttributes };
+    properties: {
+        id: CredentialSchemaProperty;
+        attributes: CredentialSchemaAttributes;
+    };
     required: string[];
 }
 

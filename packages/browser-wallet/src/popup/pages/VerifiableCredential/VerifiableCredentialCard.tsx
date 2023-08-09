@@ -112,9 +112,7 @@ export function VerifiableCredentialCard({
     metadata: VerifiableCredentialMetadata;
     onClick?: () => void;
 }) {
-    const attributes = Object.entries(credential.credentialSubject.attributes)
-        .filter((val) => val[0] !== 'id')
-        .map(applySchema(schema));
+    const attributes = Object.entries(credential.credentialSubject.attributes).map(applySchema(schema));
 
     return (
         <ClickableVerifiableCredential metadata={metadata} onClick={onClick}>
