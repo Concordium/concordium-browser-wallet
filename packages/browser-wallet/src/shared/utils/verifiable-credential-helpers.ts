@@ -25,6 +25,18 @@ export function getCredentialHolderId(credentialId: string): string {
     return credentialHolderId;
 }
 
+/** Takes a PublicKey Identifier DID string and returns the public key.
+ * @param did a DID string on the form: "did:ccd:NETWORK:pkc:PUBLICKEY"
+ * @returns the publicKey PUBLICKEY
+ */
+export function getPublicKeyfromPublicKeyIdentifierDID(did: string) {
+    const didParts = did.split(':');
+    if (!(didParts.length === 5 || didParts.length === 4) || didParts[didParts.length - 2] !== 'pkc') {
+        throw new Error(`Given DID was not a PublicKey Identifier: ${did}`);
+    }
+    return didParts[didParts.length - 1];
+}
+
 /**
  * Extracts the credential registry contract addres from a verifiable credential id (did).
  * @param credentialId the did for a credential
@@ -634,4 +646,36 @@ export async function getChangesToCredentialSchemas(
         }
     }
     return { data: updatedSchemasInStorage, updateReceived };
+}
+
+/**
+ * Get the registry issuer public key from a credential registry CIS-4 contract.
+ * @param client the GRPC client for accessing a node
+ * @param contractAddress the address of a CIS-4 contract
+ * @returns the registry public key for the contract
+ */
+export async function getCredentialRegistryIssuerKey(
+    client: ConcordiumGRPCClient,
+    contractAddress: ContractAddress
+): Promise<string> {
+    const instanceInfo = await client.getInstanceInfo(contractAddress);
+    if (instanceInfo === undefined) {
+        throw new Error('Given contract address was not a created instance');
+    }
+
+    const result = await client.invokeContract({
+        contract: contractAddress,
+        method: `${getContractName(instanceInfo)}.issuer`,
+    });
+
+    if (result.tag !== 'success') {
+        throw new Error(result.reason.tag);
+    }
+
+    const { returnValue } = result;
+    if (returnValue === undefined) {
+        throw new Error(`Return value is missing from issuer public key result in CIS-4 contract: ${contractAddress}`);
+    }
+
+    return returnValue;
 }

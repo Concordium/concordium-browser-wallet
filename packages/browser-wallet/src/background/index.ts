@@ -5,7 +5,12 @@ import {
     ExtensionMessageHandler,
     MessageStatusWrapper,
 } from '@concordium/browser-wallet-message-hub';
-import { deserializeTypeValue, HttpProvider } from '@concordium/web-sdk';
+import {
+    createConcordiumClient,
+    deserializeTypeValue,
+    HttpProvider,
+    verifyWeb3IdCredentialSignature,
+} from '@concordium/web-sdk';
 import {
     storedSelectedAccount,
     storedCurrentNetwork,
@@ -26,9 +31,14 @@ import { getTermsAndConditionsConfig } from '@shared/utils/network-helpers';
 import { Buffer } from 'buffer/';
 import { BackgroundSendTransactionPayload } from '@shared/utils/types';
 import { parsePayload } from '@shared/utils/payload-helpers';
-import { mainnet, stagenet, testnet } from '@shared/constants/networkConfiguration';
+import { GRPCTIMEOUT, mainnet, stagenet, testnet } from '@shared/constants/networkConfiguration';
 import { addToList, web3IdCredentialLock } from '@shared/storage/update';
 import { CredentialProof } from '@concordium/browser-wallet-api-helpers';
+import {
+    getCredentialRegistryContractAddress,
+    getCredentialRegistryIssuerKey,
+    getPublicKeyfromPublicKeyIdentifierDID,
+} from '@shared/utils/verifiable-credential-helpers';
 import bgMessageHandler from './message-handler';
 import {
     forwardToPopup,
@@ -515,7 +525,13 @@ async function web3IdAddSignatureHandler(input: {
 }): Promise<void> {
     const { credentialId, proof, randomness } = input;
 
-    const genesisHash = await getGenesisHash();
+    const network = await storedCurrentNetwork.get();
+
+    if (!network) {
+        throw new Error('No network chosen');
+    }
+
+    const { genesisHash } = network;
     const tempCredentials = await sessionVerifiableCredentials.get(genesisHash);
 
     if (!tempCredentials) {
@@ -528,8 +544,21 @@ async function web3IdAddSignatureHandler(input: {
         throw new Error(NO_CREDENTIALS_FIT);
     }
 
-    // TODO verify signature/randomness
-    if (!proof?.proofValue) {
+    const client = createConcordiumClient(network.grpcUrl, network.grpcPort, { timeout: GRPCTIMEOUT });
+    const issuerContract = getCredentialRegistryContractAddress(saved.issuer);
+
+    if (
+        !proof?.proofValue ||
+        !verifyWeb3IdCredentialSignature({
+            globalContext: await client.getCryptographicParameters(),
+            signature: proof.proofValue,
+            randomness,
+            values: saved.credentialSubject.attributes,
+            issuerContract,
+            issuerPublicKey: await getCredentialRegistryIssuerKey(client, issuerContract),
+            holder: getPublicKeyfromPublicKeyIdentifierDID(saved.credentialSubject.id),
+        })
+    ) {
         throw new Error(INVALID_CREDENTIAL_PROOF);
     }
 
