@@ -7,7 +7,7 @@
     "license": "Apache-2.0",
     "dependencies": {
         "@concordium/browser-wallet-api-helpers": "workspace:^",
-        "@concordium/common-sdk": "^9.1.0-alpha",
+        "@concordium/common-sdk": "^9.1.0-alpha.1",
         "@protobuf-ts/grpcweb-transport": "^2.8.2",
         "@protobuf-ts/runtime-rpc": "^2.8.2",
         "buffer": "^6.0.3",

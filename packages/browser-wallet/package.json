@@ -19,7 +19,7 @@
     "dependencies": {
         "@concordium/browser-wallet-api": "workspace:^",
         "@concordium/browser-wallet-api-helpers": "workspace:^",
-        "@concordium/web-sdk": "^6.1.0-alpha",
+        "@concordium/web-sdk": "^6.1.0-alpha.1",
         "@protobuf-ts/runtime-rpc": "^2.8.2",
         "@scure/bip39": "^1.1.0",
         "axios": "^0.27.2",
