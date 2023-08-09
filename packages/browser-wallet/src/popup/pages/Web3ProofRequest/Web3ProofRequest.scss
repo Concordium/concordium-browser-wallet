@@ -1,0 +1,19 @@
+.web3-id-proof-request {
+    &__statement-container {
+        display: flex;
+        flex-direction: column;
+        height: 100%;
+    }
+
+    &__actions {
+        margin: auto rem(20px) 0;
+    }
+
+    &__loading-icon {
+        max-height: rem(20px);
+    }
+
+    &__credential-statement-container {
+        margin-bottom: rem(20px);
+    }
+}

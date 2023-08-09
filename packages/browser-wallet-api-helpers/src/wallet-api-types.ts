@@ -9,6 +9,8 @@ import type {
     IdStatement,
     IdProofOutput,
     ConcordiumGRPCClient,
+    CredentialStatements,
+    VerifiablePresentation,
     CredentialSubject,
     HexString,
 } from '@concordium/web-sdk';
@@ -218,6 +220,11 @@ interface MainWalletApi {
             credentialHolderIdDID: string
         ) => Promise<{ randomness: Record<string, string>; proof: CredentialProof }>
     ): Promise<string>;
+
+    /**
+     * @TODO write this + fix return type
+     */
+    requestVerifiablePresentation(challenge: string, statements: CredentialStatements): Promise<VerifiablePresentation>;
 }
 
 export type WalletApi = MainWalletApi & EventListeners;

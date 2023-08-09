@@ -3,7 +3,7 @@ import {
     SchemaWithContext,
     SmartContractParameters,
 } from '@concordium/browser-wallet-api-helpers/lib/wallet-api-types';
-import type { IdProofOutput, SchemaVersion, AccountTransactionType } from '@concordium/web-sdk';
+import type { SchemaVersion, AccountTransactionType } from '@concordium/web-sdk';
 import { RefAttributes } from 'react';
 /**
  * @description
@@ -42,10 +42,10 @@ export type CredentialDeploymentBackgroundResponse =
           address: string;
       };
 
-export type IdProofBackgroundResponse =
+export type ProofBackgroundResponse<ProofOutput> =
     | {
           status: BackgroundResponseStatus.Success;
-          proof: IdProofOutput;
+          proof: ProofOutput;
       }
     | {
           status: BackgroundResponseStatus.Error;

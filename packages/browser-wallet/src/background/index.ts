@@ -26,7 +26,7 @@ import { Buffer } from 'buffer/';
 import JSONBig from 'json-bigint';
 import { startMonitoringPendingStatus } from './confirmation';
 import { sendCredentialHandler } from './credential-deployment';
-import { createIdProofHandler, runIfValidProof } from './id-proof';
+import { createIdProofHandler, createWeb3ProofHandler, runIfValidProof, runIfValidWeb3IdProof } from './id-proof';
 import { addIdpListeners, identityIssuanceHandler } from './identity-issuance';
 import bgMessageHandler from './message-handler';
 import { setupRecoveryHandler, startRecovery } from './recovery';
@@ -40,7 +40,6 @@ import {
     testPopupOpen,
 } from './window-management';
 import { runIfValidWeb3IdCredentialRequest, web3IdAddCredentialFinishHandler } from './web3Id';
-
 const rpcCallNotAllowedMessage = 'RPC Call can only be performed by whitelisted sites';
 const walletLockedMessage = 'The wallet is locked';
 async function isWalletLocked(): Promise<boolean> {
@@ -252,6 +251,8 @@ bgMessageHandler.handleMessage(createMessageTypeFilter(MessageType.GrpcRequest),
 });
 
 bgMessageHandler.handleMessage(createMessageTypeFilter(InternalMessageType.CreateIdProof), createIdProofHandler);
+
+bgMessageHandler.handleMessage(createMessageTypeFilter(InternalMessageType.CreateWeb3Proof), createWeb3ProofHandler);
 
 const NOT_WHITELISTED = 'Site is not whitelisted';
 
@@ -584,6 +585,15 @@ forwardToPopup(
     MessageType.AddWeb3IdCredential,
     InternalMessageType.AddWeb3IdCredential,
     runConditionComposer(runIfAllowlisted, runIfValidWeb3IdCredentialRequest, withPromptStart()),
+    appendUrlToPayload,
+    undefined,
+    withPromptEnd
+);
+
+forwardToPopup(
+    MessageType.Web3Proof,
+    InternalMessageType.Web3Proof,
+    runConditionComposer(runIfAllowlisted, runIfValidWeb3IdProof, withPromptStart()),
     appendUrlToPayload,
     undefined,
     withPromptEnd

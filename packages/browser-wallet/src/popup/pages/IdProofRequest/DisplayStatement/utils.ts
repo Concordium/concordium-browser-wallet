@@ -11,7 +11,7 @@ import {
     getPastDate,
     MAX_DATE,
 } from '@concordium/web-sdk';
-import { useTranslation } from 'react-i18next';
+import { TFunction, useTranslation } from 'react-i18next';
 import countryTranslations from 'i18n-iso-countries';
 
 import { useDisplayAttributeValue, useGetAttributeName } from '@popup/shared/utils/identity-helpers';
@@ -206,14 +206,12 @@ export function useStatementValue(statement: SecretStatement): string {
 
 export const isoToCountryName = (locale: string) => (isoCode: string) => countryTranslations.getName(isoCode, locale);
 
-export function useStatementDescription(statement: SecretStatement, identity: ConfirmedIdentity): string | undefined {
-    const { t, i18n } = useTranslation('idProofRequest', { keyPrefix: 'displayStatement.descriptions' });
+export function getStatementDescription(
+    statement: SecretStatement,
+    t: TFunction<'idProofRequest', 'displayStatement.descriptions'>,
+    resolvedLanguage: string
+) {
     const displayAttribute = useDisplayAttributeValue();
-    const hasAttribute = identity.idObject.value.attributeList.chosenAttributes[statement.attributeTag] !== undefined;
-
-    if (!hasAttribute) {
-        return t('missingAttribute', { identityName: identity.name });
-    }
 
     if (statement.type === StatementTypes.AttributeInRange) {
         switch (statement.attributeTag) {
@@ -228,7 +226,7 @@ export function useStatementDescription(statement: SecretStatement, identity: Co
         }
     } else {
         const text = getTextForSet(t, statement);
-        const getCountryName = isoToCountryName(i18n.resolvedLanguage);
+        const getCountryName = isoToCountryName(resolvedLanguage);
 
         switch (statement.attributeTag) {
             case 'countryOfResidence':
@@ -253,6 +251,17 @@ export function useStatementDescription(statement: SecretStatement, identity: Co
     }
 
     return undefined;
+}
+
+export function useStatementDescription(statement: SecretStatement, identity: ConfirmedIdentity): string | undefined {
+    const { t, i18n } = useTranslation('idProofRequest', { keyPrefix: 'displayStatement.descriptions' });
+    const hasAttribute = identity.idObject.value.attributeList.chosenAttributes[statement.attributeTag] !== undefined;
+
+    if (!hasAttribute) {
+        return t('missingAttribute', { identityName: identity.name });
+    }
+
+    return getStatementDescription(statement, t, i18n.resolvedLanguage);
 }
 
 export function canProveStatement(statement: SecretStatement, identity: ConfirmedIdentity) {

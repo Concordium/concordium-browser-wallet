@@ -16,6 +16,7 @@ export enum MessageType {
     GrpcRequest = 'M_GrpcRequest',
     AddTokens = 'M_AddTokens',
     IdProof = 'M_IdProof',
+    Web3Proof = 'M_Web3Proof',
     ConnectAccounts = 'M_ConnectAccounts',
     AddWeb3IdCredential = 'M_AddWeb3IdCredential',
     AddWeb3IdCredentialFinish = 'M_AddWeb3IdCredentialFinish',
@@ -40,6 +41,8 @@ export enum InternalMessageType {
     AddTokens = 'I_AddTokens',
     IdProof = 'I_IdProof',
     CreateIdProof = 'I_CreateIdProof',
+    Web3Proof = 'I_Web3Proof',
+    CreateWeb3Proof = 'I_CreateWeb3Proof',
     ConnectAccounts = 'I_ConnectAccounts',
     AddWeb3IdCredential = 'I_AddWeb3IdCredential',
 }
