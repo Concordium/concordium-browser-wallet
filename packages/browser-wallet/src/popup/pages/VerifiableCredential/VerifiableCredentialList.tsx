@@ -20,12 +20,21 @@ import {
 import { VerifiableCredentialCard } from './VerifiableCredentialCard';
 
 /**
+ * Component to display while loading verifiable credentials from storage.
+ */
+function LoadingVerifiableCredentials() {
+    return <div className="verifiable-credential-list" />;
+}
+
+/**
  * Component to display when there are no verifiable credentials in the wallet.
  */
 function NoVerifiableCredentials() {
     return (
-        <div className="flex-column align-center h-full">
-            <p className="m-t-20 m-h-30">You do not have any verifiable credentials in your wallet.</p>
+        <div className="verifiable-credential-list">
+            <div className="flex-column align-center h-full">
+                <p className="m-t-20 m-h-30">You do not have any verifiable credentials in your wallet.</p>
+            </div>
         </div>
     );
 }
@@ -95,7 +104,10 @@ export default function VerifiableCredentialList() {
         getChangesToCredentialSchemas
     );
 
-    if (!verifiableCredentials || !verifiableCredentials.length) {
+    if (verifiableCredentials.loading) {
+        return <LoadingVerifiableCredentials />;
+    }
+    if (verifiableCredentials.value.length === 0) {
         return <NoVerifiableCredentials />;
     }
 
@@ -112,7 +124,7 @@ export default function VerifiableCredentialList() {
 
     return (
         <div className="verifiable-credential-list">
-            {verifiableCredentials.map((credential) => {
+            {verifiableCredentials.value.map((credential) => {
                 return (
                     <VerifiableCredentialCardWithStatusFromChain
                         key={credential.id}
