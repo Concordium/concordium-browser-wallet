@@ -1,5 +1,4 @@
 import { fullscreenPromptContext } from '@popup/page-layouts/FullscreenPromptLayout';
-import { selectedAccountAtom } from '@popup/store/account';
 import { useAtom, useAtomValue } from 'jotai';
 import React, { useContext, useEffect, useState } from 'react';
 import { useTranslation } from 'react-i18next';
@@ -47,7 +46,6 @@ export default function AddWeb3IdCredential({ onAllow, onReject }: Props) {
     const { state } = useLocation() as Location;
     const { t } = useTranslation('addWeb3IdCredential');
     const { onClose, withClose } = useContext(fullscreenPromptContext);
-    const selectedAccount = useAtomValue(selectedAccountAtom);
     const [acceptButtonDisabled, setAcceptButtonDisabled] = useState<boolean>(false);
     const [web3IdCredentials, setWeb3IdCredentials] = useAtom(sessionTemporaryVerifiableCredentialsAtom);
     const storedWeb3IdCredentials = useAtomValue(storedVerifiableCredentialsAtom);
@@ -88,12 +86,12 @@ export default function AddWeb3IdCredential({ onAllow, onReject }: Props) {
                 // TODO check hash?
                 return schemas.value[schemaUrl];
             }
-            return fetchCredentialSchema(metadataUrl, controller);
+            return fetchCredentialSchema({ url: schemaUrl }, controller);
         },
         undefined,
         [schemas.loading]
     );
-    useEffect(() => () => controller.abort(), [metadataUrl]);
+    useEffect(() => () => controller.abort(), []);
 
     async function addCredential(credentialSchema: VerifiableCredentialSchema) {
         if (!wallet) {
@@ -134,7 +132,7 @@ export default function AddWeb3IdCredential({ onAllow, onReject }: Props) {
         return credentialSubjectId;
     }
 
-    if (!selectedAccount || !schema || !wallet || !metadata) {
+    if (!schema || !wallet || !metadata) {
         // TODO: loading screen?
         return null;
     }

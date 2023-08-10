@@ -483,10 +483,10 @@ async function fetchDataFromUrl<T>(
  * Retrieves a credential schema from the specified URL.
  */
 export async function fetchCredentialSchema(
-    metadata: MetadataUrl,
+    url: MetadataUrl,
     abortController: AbortController
 ): Promise<VerifiableCredentialSchema> {
-    return fetchDataFromUrl(metadata, abortController, verifiableCredentialSchemaSchema);
+    return fetchDataFromUrl(url, abortController, verifiableCredentialSchemaSchema);
 }
 
 /**
