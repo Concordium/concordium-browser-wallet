@@ -12,18 +12,19 @@ import {
     storedVerifiableCredentialsAtom,
     storedVerifiableCredentialSchemasAtom,
 } from '@popup/store/verifiable-credential';
-import { NetworkConfiguration, VerifiableCredentialStatus, VerifiableCredentialSchema } from '@shared/storage/types';
+import { VerifiableCredentialStatus, VerifiableCredentialSchema } from '@shared/storage/types';
 import { useAsyncMemo } from 'wallet-common-helpers';
 import { useHdWallet } from '@popup/shared/utils/account-helpers';
-import { ContractAddress } from '@concordium/web-sdk';
 import { displayUrl } from '@popup/shared/utils/string-helpers';
 import {
+    createCredentialId,
+    createPublicKeyIdentifier,
     fetchCredentialMetadata,
+    fetchCredentialSchema,
     getCredentialRegistryContractAddress,
 } from '@shared/utils/verifiable-credential-helpers';
 import { APIVerifiableCredential } from '@concordium/browser-wallet-api-helpers';
 import { networkConfigurationAtom } from '@popup/store/settings';
-import { getNet } from '@shared/utils/network-helpers';
 import { MetadataUrl } from '@concordium/browser-wallet-api-helpers/lib/wallet-api-types';
 import { VerifiableCredentialCard } from '../VerifiableCredential/VerifiableCredentialCard';
 
@@ -40,16 +41,6 @@ interface Location {
             metadataUrl: MetadataUrl;
         };
     };
-}
-
-function createCredentialSubjectId(credentialHolderId: string, network: NetworkConfiguration) {
-    return `did:ccd:${getNet(network).toLowerCase()}:pkc:${credentialHolderId}`;
-}
-
-function createCredentialId(credentialHolderId: string, issuer: ContractAddress, network: NetworkConfiguration) {
-    return `did:ccd:${getNet(network).toLowerCase()}:sci:${issuer.index}:${
-        issuer.subindex
-    }/credentialEntry/${credentialHolderId}`;
 }
 
 export default function AddWeb3IdCredential({ onAllow, onReject }: Props) {
@@ -74,15 +65,19 @@ export default function AddWeb3IdCredential({ onAllow, onReject }: Props) {
     const controller = new AbortController();
 
     const metadata = useAsyncMemo(
-        () => {
+        async () => {
+            if (verifiableCredentialMetadata.loading) {
+                return undefined;
+            }
+            if (metadataUrl.url in verifiableCredentialMetadata.value) {
+                // TODO check hash?
+                return verifiableCredentialMetadata.value[metadataUrl.url];
+            }
             return fetchCredentialMetadata(metadataUrl, controller);
         },
         undefined,
-        [metadataUrl]
+        [verifiableCredentialMetadata.loading]
     );
-    useEffect(() => () => controller.abort(), [metadataUrl]);
-
-    // TODO use Jakobs?
     const schema = useAsyncMemo(
         async () => {
             if (schemas.loading) {
@@ -90,19 +85,19 @@ export default function AddWeb3IdCredential({ onAllow, onReject }: Props) {
             }
             const schemaUrl = credential.credentialSchema.id;
             if (schemaUrl in schemas.value) {
+                // TODO check hash?
                 return schemas.value[schemaUrl];
             }
-            // TODO check checksum
-            const response = await fetch(schemaUrl);
-            return JSON.parse(await response.text());
+            return fetchCredentialSchema(metadataUrl, controller);
         },
         undefined,
         [schemas.loading]
     );
+    useEffect(() => () => controller.abort(), [metadataUrl]);
 
     async function addCredential(credentialSchema: VerifiableCredentialSchema) {
         if (!wallet) {
-            throw new Error('unreachable');
+            throw new Error('Wallet is unexpectedly missing');
         }
 
         const schemaUrl = credential.credentialSchema.id;
@@ -111,7 +106,8 @@ export default function AddWeb3IdCredential({ onAllow, onReject }: Props) {
             updatedSchemas[schemaUrl] = credentialSchema;
             setSchemas(updatedSchemas);
         }
-        // Find the next unused index (// TODO verify on chain)
+        // Find the next unused index
+        // TODO verify index is unused on chain?
         const index = [...(web3IdCredentials || []), ...(storedWeb3IdCredentials || [])].reduce(
             (best, cred) => (cred.issuer === credential.issuer ? Math.max(cred.index + 1, best) : best),
             0
@@ -120,7 +116,7 @@ export default function AddWeb3IdCredential({ onAllow, onReject }: Props) {
         const issuer = getCredentialRegistryContractAddress(credential.issuer);
 
         const credentialHolderId = wallet.getVerifiableCredentialPublicKey(issuer, index).toString('hex');
-        const credentialSubjectId = createCredentialSubjectId(credentialHolderId, network);
+        const credentialSubjectId = createPublicKeyIdentifier(credentialHolderId, network);
         const credentialSubject = { ...credential.credentialSubject, id: credentialSubjectId };
 
         const fullCredential = {

@@ -251,7 +251,7 @@ class WalletApi extends EventEmitter implements IWalletApi {
         credential: APIVerifiableCredential,
         metadataUrl: MetadataUrl,
         createSignature: (
-            credentialId: string
+            credentialHolderIdDID: string
         ) => Promise<{ randomness: Record<string, string>; proof: CredentialProof }>
     ): Promise<string> {
         const res = await this.messageHandler.sendMessage<MessageStatusWrapper<string>>(
@@ -266,14 +266,14 @@ class WalletApi extends EventEmitter implements IWalletApi {
             throw new Error(res.message);
         }
 
-        const credentialId = res.result;
+        const credentialHolderIdDID = res.result;
 
-        const { proof, randomness } = await createSignature(credentialId);
+        const { proof, randomness } = await createSignature(credentialHolderIdDID);
 
         const saveSignatureResult = await this.messageHandler.sendMessage<MessageStatusWrapper<void>>(
-            MessageType.AddWeb3IdCredentialGiveSignature,
+            MessageType.AddWeb3IdCredentialFinish,
             {
-                credentialId,
+                credentialHolderIdDID,
                 proof,
                 randomness,
             }
@@ -283,7 +283,7 @@ class WalletApi extends EventEmitter implements IWalletApi {
             throw new Error(saveSignatureResult.message);
         }
 
-        return credentialId;
+        return credentialHolderIdDID;
     }
 }
 

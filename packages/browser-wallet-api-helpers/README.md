@@ -235,20 +235,20 @@ const provider = await detectConcordiumProvider();
 await provider.requestIdProof('2za2yAXbFiaB151oYqTteZfqiBzibHXizwjNbpdU8hodq9SfEk', ['AA', 'BB'], '1399', '0');
 ```
 
-### Add WebId Credentials
+### Add Web3Id Credentials
 
 To add a Web3IdCredential, use the `addWeb3IdCredential` endpoint.
-The credential itself and the url for the metadata must be provided. In addition, the function takes a callback function that takes the credentialHolderId as input, and which should return the randomness used to create the commitments on the values/properties in the credential, and the signature on the commitments and credentialHolderId. If the callback does return a valid signature, the credential is not added to the wallet.
+The credential itself and the url for the metadata must be provided. In addition, the function takes a callback function that takes a DID for the credentialHolderId as input, and which should return the randomness used to create the commitments on the values/properties in the credential, and the signature on the commitments and credentialHolderId. If the callback does return a valid signature, the credential is not added to the wallet.
 
-// TODO Add example.
+Note that the id fields of the credential are omitted, and added by the wallet itself, as they require the credentialHolderId.
 
-### Request Verifiable Presentation
-
-It is possible to request a veriable presentation on a number statements about accounts and web3IdCredentials. The function takes 2 arguments. The statements to be proved and a challenge to ensure that the proof was not generated for a different context.
-
-To build a statement, the Web3StatementBuilder, from the web-sdk, can be used. (// TODO link to it)
-
-If the wallet is locked, or you have not connected with the wallet (or previously been allowlisted) or if the user rejects proving the statement, the `Promise` will reject.
+```typescript
+provider.addWeb3IdCredential(credential, metadataUrl, async (id) => {
+    const randomness = createRandomness(attributes); // Choose some randomness for the attribute commitments.
+    const proof = createSignature(credential, id, randomness); // Create a signature to prove that the commitments are created by the issuer.
+    return { proof, randomness };
+});
+```
 
 ## Events
 

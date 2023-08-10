@@ -1,45 +1,35 @@
 import {
     createMessageTypeFilter,
-    InternalMessageType,
-    MessageType,
     ExtensionMessageHandler,
+    InternalMessageType,
     MessageStatusWrapper,
+    MessageType,
 } from '@concordium/browser-wallet-message-hub';
+import { deserializeTypeValue, HttpProvider } from '@concordium/web-sdk';
 import {
-    createConcordiumClient,
-    deserializeTypeValue,
-    HttpProvider,
-    verifyWeb3IdCredentialSignature,
-} from '@concordium/web-sdk';
-import {
-    storedSelectedAccount,
-    storedCurrentNetwork,
-    sessionPasscode,
-    sessionOpenPrompt,
-    storedAcceptedTerms,
     getGenesisHash,
+    sessionOpenPrompt,
+    sessionPasscode,
+    storedAcceptedTerms,
     storedAllowlist,
-    storedVerifiableCredentials,
-    sessionVerifiableCredentials,
-    useIndexedStorage,
+    storedCurrentNetwork,
+    storedSelectedAccount,
 } from '@shared/storage/access';
 
-import JSONBig from 'json-bigint';
-import { ChromeStorageKey, NetworkConfiguration, VerifiableCredential } from '@shared/storage/types';
-import { buildURLwithSearchParameters } from '@shared/utils/url-helpers';
+import { mainnet, stagenet, testnet } from '@shared/constants/networkConfiguration';
+import { ChromeStorageKey, NetworkConfiguration } from '@shared/storage/types';
 import { getTermsAndConditionsConfig } from '@shared/utils/network-helpers';
-import { Buffer } from 'buffer/';
-import { BackgroundSendTransactionPayload } from '@shared/utils/types';
 import { parsePayload } from '@shared/utils/payload-helpers';
-import { GRPCTIMEOUT, mainnet, stagenet, testnet } from '@shared/constants/networkConfiguration';
-import { addToList, web3IdCredentialLock } from '@shared/storage/update';
-import { CredentialProof } from '@concordium/browser-wallet-api-helpers';
-import {
-    getCredentialRegistryContractAddress,
-    getCredentialRegistryIssuerKey,
-    getPublicKeyfromPublicKeyIdentifierDID,
-} from '@shared/utils/verifiable-credential-helpers';
+import { BackgroundSendTransactionPayload } from '@shared/utils/types';
+import { buildURLwithSearchParameters } from '@shared/utils/url-helpers';
+import { Buffer } from 'buffer/';
+import JSONBig from 'json-bigint';
+import { startMonitoringPendingStatus } from './confirmation';
+import { sendCredentialHandler } from './credential-deployment';
+import { createIdProofHandler, runIfValidProof } from './id-proof';
+import { addIdpListeners, identityIssuanceHandler } from './identity-issuance';
 import bgMessageHandler from './message-handler';
+import { setupRecoveryHandler, startRecovery } from './recovery';
 import {
     forwardToPopup,
     HandleMessage,
@@ -49,11 +39,7 @@ import {
     setPopupSize,
     testPopupOpen,
 } from './window-management';
-import { addIdpListeners, identityIssuanceHandler } from './identity-issuance';
-import { startMonitoringPendingStatus } from './confirmation';
-import { sendCredentialHandler } from './credential-deployment';
-import { startRecovery, setupRecoveryHandler } from './recovery';
-import { createIdProofHandler, runIfValidProof } from './id-proof';
+import { web3IdAddCredentialFinishHandler } from './web3Id';
 
 const rpcCallNotAllowedMessage = 'RPC Call can only be performed by whitelisted sites';
 const walletLockedMessage = 'The wallet is locked';
@@ -515,75 +501,14 @@ const getSelectedChainHandler: ExtensionMessageHandler = (_msg, sender, respond)
 
 bgMessageHandler.handleMessage(createMessageTypeFilter(MessageType.GetSelectedChain), getSelectedChainHandler);
 
-const NO_CREDENTIALS_FIT = 'No temporary credentials fit the given id';
-const INVALID_CREDENTIAL_PROOF = 'Invalid credential proof given';
-
-async function web3IdAddSignatureHandler(input: {
-    credentialId: string;
-    proof: CredentialProof;
-    randomness: Record<number, string>;
-}): Promise<void> {
-    const { credentialId, proof, randomness } = input;
-
-    const network = await storedCurrentNetwork.get();
-
-    if (!network) {
-        throw new Error('No network chosen');
-    }
-
-    const { genesisHash } = network;
-    const tempCredentials = await sessionVerifiableCredentials.get(genesisHash);
-
-    if (!tempCredentials) {
-        throw new Error(NO_CREDENTIALS_FIT);
-    }
-
-    const saved = tempCredentials.find((cred) => cred.credentialSubject.id === credentialId);
-
-    if (!saved) {
-        throw new Error(NO_CREDENTIALS_FIT);
-    }
-
-    const client = createConcordiumClient(network.grpcUrl, network.grpcPort, { timeout: GRPCTIMEOUT });
-    const issuerContract = getCredentialRegistryContractAddress(saved.issuer);
-
-    if (
-        !proof?.proofValue ||
-        !verifyWeb3IdCredentialSignature({
-            globalContext: await client.getCryptographicParameters(),
-            signature: proof.proofValue,
-            randomness,
-            values: saved.credentialSubject.attributes,
-            issuerContract,
-            issuerPublicKey: await getCredentialRegistryIssuerKey(client, issuerContract),
-            holder: getPublicKeyfromPublicKeyIdentifierDID(saved.credentialSubject.id),
-        })
-    ) {
-        throw new Error(INVALID_CREDENTIAL_PROOF);
-    }
-
-    const credential: VerifiableCredential = {
-        ...saved,
-        signature: proof.proofValue,
-        randomness,
-    };
-
-    addToList(
-        web3IdCredentialLock,
-        credential,
-        useIndexedStorage(storedVerifiableCredentials, () => Promise.resolve(genesisHash))
-    );
-    // TODO remove temp in session
-}
-
 bgMessageHandler.handleMessage(
-    createMessageTypeFilter(MessageType.AddWeb3IdCredentialGiveSignature),
+    createMessageTypeFilter(MessageType.AddWeb3IdCredentialFinish),
     (input, sender, respond) => {
         if (!sender.url || !isAllowlisted(sender.url)) {
             respond({ success: false, message: 'not allowlisted' });
         }
 
-        web3IdAddSignatureHandler(input.payload)
+        web3IdAddCredentialFinishHandler(input.payload)
             .then(() => respond({ success: true }))
             .catch((error) => respond({ success: false, message: error.message }));
 

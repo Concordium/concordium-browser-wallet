@@ -37,7 +37,7 @@
                                 'ConcordiumVerifiableCredential',
                                 'UniversityDegreeCredential',
                             ],
-                            issuer: 'did:ccd:testnet:sci:5463:0/issuer',
+                            issuer: 'did:ccd:testnet:sci:' + issuerIndex.value + ':0/issuer',
                             credentialSubject: {
                                 attributes: values,
                             },
@@ -96,6 +96,8 @@
             id="web3metadataUrl"
             value="https://raw.githubusercontent.com/Concordium/concordium-web3id/credential-metadata-example/examples/json-schemas/metadata/credential-metadata.json"
         />
+        <br />
+        issuer Index: <input type="number" id="issuerIndex" value="5463" />
         <br />
         <h3>Attribute values:</h3>
         degreeType: <input type="text" id="degreeType" value="BachelorDegree" />

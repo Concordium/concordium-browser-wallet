@@ -1,6 +1,7 @@
 import { ConcordiumGRPCClient, ContractAddress, sha256 } from '@concordium/web-sdk';
 import {
     MetadataUrl,
+    NetworkConfiguration,
     VerifiableCredential,
     VerifiableCredentialSchema,
     VerifiableCredentialStatus,
@@ -8,6 +9,7 @@ import {
 import { Buffer } from 'buffer/';
 import jsonschema from 'jsonschema';
 import { getContractName } from './contract-helpers';
+import { getNet } from './network-helpers';
 
 /**
  * Extracts the credential holder id from a verifiable credential id (did).
@@ -678,4 +680,24 @@ export async function getCredentialRegistryIssuerKey(
     }
 
     return returnValue;
+}
+
+/**
+ * Create a publicKey DID identitifer for the given key.
+ */
+export function createPublicKeyIdentifier(publicKey: string, network: NetworkConfiguration): string {
+    return `did:ccd:${getNet(network).toLowerCase()}:pkc:${publicKey}`;
+}
+
+/**
+ * Create a DID identitifer for the given web3Id credential.
+ */
+export function createCredentialId(
+    credentialHolderId: string,
+    issuer: ContractAddress,
+    network: NetworkConfiguration
+): string {
+    return `did:ccd:${getNet(network).toLowerCase()}:sci:${issuer.index}:${
+        issuer.subindex
+    }/credentialEntry/${credentialHolderId}`;
 }

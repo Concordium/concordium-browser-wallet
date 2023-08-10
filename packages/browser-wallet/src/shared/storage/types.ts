@@ -267,22 +267,19 @@ export enum VerifiableCredentialStatus {
     NotActivated,
 }
 
-interface CredentialSchema {
-    id: string;
-    type: string;
-}
-
 export type CredentialSubject = {
     id: string;
     attributes: Record<string, string | bigint>;
 };
 
 export interface VerifiableCredential extends APIVerifiableCredential {
+    // With ID
+    credentialSubject: CredentialSubject;
     id: string;
+    // Secrets
     signature: string;
     randomness: Record<string, string>;
-    credentialSchema: CredentialSchema;
-    credentialSubject: CredentialSubject;
+    /** index used to derive keys for credential */
     index: number;
 }
 

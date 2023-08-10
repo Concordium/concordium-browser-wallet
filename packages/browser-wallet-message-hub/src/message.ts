@@ -18,7 +18,7 @@ export enum MessageType {
     IdProof = 'M_IdProof',
     ConnectAccounts = 'M_ConnectAccounts',
     AddWeb3IdCredential = 'M_AddWeb3IdCredential',
-    AddWeb3IdCredentialGiveSignature = 'M_AddWeb3IdCredentialGiveSignature',
+    AddWeb3IdCredentialFinish = 'M_AddWeb3IdCredentialFinish',
 }
 
 /**

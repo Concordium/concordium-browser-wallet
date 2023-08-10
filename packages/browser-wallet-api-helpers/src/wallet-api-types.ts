@@ -18,18 +18,26 @@ export interface MetadataUrl {
     hash?: string;
 }
 
+interface CredentialSchema {
+    id: string;
+    type: string;
+}
+
+/**
+ * The expected form of a Web3IdCredential, with the id fields omitted.
+ */
 export interface APIVerifiableCredential {
     $schema: string;
     type: string[];
     issuer: string;
     issuanceDate: string;
     credentialSubject: Omit<CredentialSubject, 'id'>;
-    credentialSchema: {
-        id: string;
-        type: string;
-    };
+    credentialSchema: CredentialSchema;
 }
 
+/**
+ * Expected format for the proof that the Web3IdCredential's attribute commitments are valid
+ */
 export interface CredentialProof {
     proofPurpose: 'assertionMethod';
     proofValue: HexString;
@@ -200,14 +208,14 @@ interface MainWalletApi {
      * Note that this will throw an error if the dApp is not allowlisted, locked, or if the user rejects adding the credential.
      * @param credential the web3IdCredential that should be added to the wallet
      * @param metadataUrl the url where the metadata, to display the credential, is located.
-     * @param createSignature a callback function, which takes the credentialId as input and must return the randomness used for the commitment of the values and signature on the commitments and credentialId.
-     * @returns the credentialId, containing the publicKey that will be associated with the credential.
+     * @param createSignature a callback function, which takes a DID identifier for the credentialHolderId as input and must return the randomness used for the commitment of the values and signature on the commitments and credentialId.
+     * @returns the DID identifier for the credentialHolderId, i.e. the publicKey that will be associated with the credential.
      */
     addWeb3IdCredential(
         credential: APIVerifiableCredential,
         metadataUrl: MetadataUrl,
         createSignature: (
-            credentialId: string
+            credentialHolderIdDID: string
         ) => Promise<{ randomness: Record<string, string>; proof: CredentialProof }>
     ): Promise<string>;
 }
