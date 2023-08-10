@@ -20,11 +20,11 @@ const NO_CREDENTIALS_FIT = 'No temporary credentials fit the given id';
 const INVALID_CREDENTIAL_PROOF = 'Invalid credential proof given';
 
 export async function web3IdAddCredentialFinishHandler(input: {
-    credentialId: string;
+    credentialHolderIdDID: string;
     proof: CredentialProof;
     randomness: Record<number, string>;
 }): Promise<void> {
-    const { credentialId, proof, randomness } = input;
+    const { credentialHolderIdDID, proof, randomness } = input;
 
     const network = await storedCurrentNetwork.get();
 
@@ -39,7 +39,7 @@ export async function web3IdAddCredentialFinishHandler(input: {
         throw new Error(NO_CREDENTIALS_FIT);
     }
 
-    const saved = tempCredentials.find((cred) => cred.credentialSubject.id === credentialId);
+    const saved = tempCredentials.find((cred) => cred.credentialSubject.id === credentialHolderIdDID);
 
     if (!saved) {
         throw new Error(NO_CREDENTIALS_FIT);
