@@ -107,7 +107,7 @@ export default function VerifiableCredentialList() {
             <VerifiableCredentialCard
                 className="verifiable-credential-list__card"
                 credentialSubject={selected.credential.credentialSubject}
-                schema={schemas.value[selected.schema.$id]}
+                schema={selected.schema}
                 credentialStatus={selected.status}
                 metadata={selected.metadata}
             />

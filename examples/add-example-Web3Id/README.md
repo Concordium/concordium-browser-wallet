@@ -5,12 +5,12 @@ The example project included in this repository, serves as a working example of 
 ## Prerequisites
 
 -   Browser wallet extension must be installed in google chrome.
--   A web3Id-issuer running ( https://github.com/Concordium/concordium-web3id/tree/web3id-revision/services/web3id-issuer )
+-   A web3Id-issuer running (https://github.com/Concordium/concordium-web3id/tree/main/services/web3id-issuer)
 
 ## Installing
 
 -   Run `yarn` in package root.
-    q- Build concordium helpers by running `yarn build:api-helpers`.
+-    Build concordium helpers by running `yarn build:api-helpers`.
 
 ## Running the example
 

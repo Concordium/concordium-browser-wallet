@@ -238,7 +238,7 @@ await provider.requestIdProof('2za2yAXbFiaB151oYqTteZfqiBzibHXizwjNbpdU8hodq9SfE
 ### Add Web3Id Credentials
 
 To add a Web3IdCredential, use the `addWeb3IdCredential` endpoint.
-The credential itself and the url for the metadata must be provided. In addition, the function takes a callback function that takes a DID for the credentialHolderId as input, and which should return the randomness used to create the commitments on the values/properties in the credential, and the signature on the commitments and credentialHolderId. If the callback does return a valid signature, the credential is not added to the wallet.
+The credential itself and the url for the metadata must be provided. In addition, the function takes a callback function that takes a DID for the credentialHolderId as input, and which should return the randomness used to create the commitments on the values/properties in the credential, and the signature on the commitments and credentialHolderId. If the callback does not return a valid signature, the credential is not added to the wallet.
 
 Note that the id fields of the credential are omitted, and added by the wallet itself, as they require the credentialHolderId.
 
