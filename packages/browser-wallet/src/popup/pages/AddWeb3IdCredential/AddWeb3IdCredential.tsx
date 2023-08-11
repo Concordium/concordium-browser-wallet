@@ -56,6 +56,8 @@ export default function AddWeb3IdCredential({ onAllow, onReject }: Props) {
     const wallet = useHdWallet();
     const network = useAtomValue(networkConfigurationAtom);
 
+    const [error, setError] = useState<string>();
+
     const { credential, url, metadataUrl } = state.payload;
 
     useEffect(() => onClose(onReject), [onClose, onReject]);
@@ -73,9 +75,10 @@ export default function AddWeb3IdCredential({ onAllow, onReject }: Props) {
             }
             return fetchCredentialMetadata(metadataUrl, controller);
         },
-        undefined,
+        () => setError(t('error.metadata')),
         [verifiableCredentialMetadata.loading]
     );
+
     const schema = useAsyncMemo(
         async () => {
             if (schemas.loading) {
@@ -88,7 +91,7 @@ export default function AddWeb3IdCredential({ onAllow, onReject }: Props) {
             }
             return fetchCredentialSchema({ url: schemaUrl }, controller);
         },
-        undefined,
+        () => setError(t('error.schema')),
         [schemas.loading]
     );
     useEffect(() => () => controller.abort(), []);
@@ -132,33 +135,40 @@ export default function AddWeb3IdCredential({ onAllow, onReject }: Props) {
         return credentialSubjectId;
     }
 
-    if (!schema || !wallet || !metadata) {
-        // TODO: loading screen?
-        return null;
-    }
-
     const urlDisplay = displayUrl(url);
     return (
         <ExternalRequestLayout>
             <div className="flex-column h-full">
-                <div>{t('description', { dapp: urlDisplay })}</div>
-                <VerifiableCredentialCard
-                    credentialSubject={credential.credentialSubject}
-                    className="add-web3Id-credential__card"
-                    schema={schema}
-                    credentialStatus={VerifiableCredentialStatus.NotActivated}
-                    metadata={metadata}
-                />
+                {error && (
+                    <div className="add-web3Id-credential__error">
+                        <p>{t('error.initial')}</p>
+                        <p>{error}</p>
+                    </div>
+                )}
+                {!error && schema && metadata && (
+                    <>
+                        <div>{t('description', { dapp: urlDisplay })}</div>
+                        <VerifiableCredentialCard
+                            credentialSubject={credential.credentialSubject}
+                            className="add-web3Id-credential__card"
+                            schema={schema}
+                            credentialStatus={VerifiableCredentialStatus.NotActivated}
+                            metadata={metadata}
+                        />
+                    </>
+                )}
                 <div className="flex justify-center m-t-auto m-b-20">
                     <Button width="medium" className="m-r-10" onClick={withClose(onReject)}>
                         {t('reject')}
                     </Button>
                     <Button
                         width="medium"
-                        disabled={acceptButtonDisabled}
+                        disabled={acceptButtonDisabled || !schema}
                         onClick={() => {
-                            setAcceptButtonDisabled(true);
-                            addCredential(schema).then(withClose(onAllow));
+                            if (schema) {
+                                setAcceptButtonDisabled(true);
+                                addCredential(schema).then(withClose(onAllow));
+                            }
                         }}
                     >
                         {t('accept')}

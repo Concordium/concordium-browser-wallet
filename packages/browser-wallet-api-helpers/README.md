@@ -215,37 +215,19 @@ const provider = await detectConcordiumProvider();
 await provider.addCIS2Tokens('2za2yAXbFiaB151oYqTteZfqiBzibHXizwjNbpdU8hodq9SfEk', ['AA', 'BB'], '1399', '0');
 ```
 
-// TODO Remove this (because the function is deprecated)
-
-### Prove ID statement
-
-It is possible to request a proof for a given ID statement on a specific account. The function takes 3 arguments. The statement to be proved, a challenge to ensure that the proof was not generated for a different context, and the account that should prove that statement.
-This method returns a `Promise` resolving with an object containing the proof and the credential id (field name: credential) of the credential used to prove the statement.
-
-If the wallet is locked, or you have not connected with the wallet (or previously been whitelisted) or if the user rejects proving the statement, the `Promise` will reject.
-
-The following exemplifies requesting a proof for a statement name myIdStatement (To see how to create a statement check out [our documentation](https://developer.concordium.software/en/mainnet/net/guides/create-proofs.html)) with a challenge of "12346789ABCD" id, for the account `2za2yAXbFiaB151oYqTteZfqiBzibHXizwjNbpdU8hodq9SfEk`.
-
-// TODO Fix this example.
-
-```typescript
-const statement = myIdStatement;
-const challenge = '12346789ABCD';
-const provider = await detectConcordiumProvider();
-await provider.requestIdProof('2za2yAXbFiaB151oYqTteZfqiBzibHXizwjNbpdU8hodq9SfEk', ['AA', 'BB'], '1399', '0');
-```
-
 ### Add Web3Id Credentials
 
 To add a Web3IdCredential, use the `addWeb3IdCredential` endpoint.
-The credential itself and the url for the metadata must be provided. In addition, the function takes a callback function that takes a DID for the credentialHolderId as input, and which should return the randomness used to create the commitments on the values/properties in the credential, and the signature on the commitments and credentialHolderId. If the callback does not return a valid signature, the credential is not added to the wallet.
+The credential itself and the url for the metadata must be provided. In addition, the function takes a callback function that takes a DID for the credentialHolderId as input, and which should return the randomness used to create the commitments on the values/properties in the credential, and a proof (which can be a signature on the commitments and credentialHolderId) of the credential's validity. If the callback does not return a valid proof, the credential is not added to the wallet.
 
 Note that the id fields of the credential are omitted, and added by the wallet itself, as they require the credentialHolderId.
+
+// TODO link to help for how to create proof and randomness
 
 ```typescript
 provider.addWeb3IdCredential(credential, metadataUrl, async (id) => {
     const randomness = createRandomness(attributes); // Choose some randomness for the attribute commitments.
-    const proof = createSignature(credential, id, randomness); // Create a signature to prove that the commitments are created by the issuer.
+    const proof = createCredentialProof(credential, id, randomness); // Create a proof to prove that the commitments are created by the issuer.
     return { proof, randomness };
 });
 ```
