@@ -22,7 +22,7 @@
                 provider.on('chainChanged', (chain) => alert(chain));
                 document.getElementById('web3Proof').addEventListener('click', () => {
                     const statement = new concordiumSDK.Web3StatementBuilder()
-                        .addForVerifiableCredentials([{ index: 5463, subindex: 0 }], (b) =>
+                        .addForVerifiableCredentials([{ index: 5463n, subindex: 0n }], (b) =>
                             b
                                 .revealAttribute('graduationDate')
                                 .addMembership('degreeName', ['Bachelor of Science and Arts', 'Bachelor of Finance'])

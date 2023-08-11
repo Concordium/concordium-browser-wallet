@@ -11,7 +11,6 @@ import {
     RevealStatementV2,
     ContractAddress,
     CommitmentInput,
-    VerifiableCredentialSchema,
     createWeb3IdDID,
 } from '@concordium/web-sdk';
 import { isIdentityOfCredential } from '@shared/utils/identity-helpers';
@@ -74,7 +73,6 @@ export function getCommitmentInput(
     identities: ConfirmedIdentity[],
     credentials: WalletCredential[],
     verifiableCredentials: VerifiableCredential[],
-    verifiableCredentialSchemas: Record<string, VerifiableCredentialSchema>
 ): CommitmentInput {
     if (statement.type) {
         const cred = verifiableCredentials?.find((c) => c.id === statement.id);
@@ -83,14 +81,11 @@ export function getCommitmentInput(
             throw new Error('IdQualifier not fulfilled');
         }
 
-        const schemaIndex = cred.credentialSchema.id;
-
         return createWeb3CommitmentInputWithHdWallet(
             wallet,
             getContractAddressFromIssuerDID(cred.issuer),
             cred.index,
             cred.credentialSubject,
-            verifiableCredentialSchemas[schemaIndex],
             cred.randomness,
             cred.signature
         );
@@ -146,13 +141,16 @@ export function getViableWeb3IdCredentialsForStatement(
     credentialStatement: VerifiableCredentialStatement,
     verifiableCredentials: VerifiableCredential[]
 ): VerifiableCredential[] {
+    // TODO check that credentials are active (maybe before this instead for each statement)
     const allowedContracts = credentialStatement.idQualifier.issuers;
     return verifiableCredentials?.filter((vc) =>
         allowedContracts.some((address) => BigInt(address.index) === getContractAddressFromIssuerDID(vc.issuer).index)
     );
 }
 
-// TODO move to SDK?
+/**
+ * Helper function to create a web3Id DID string from a verifiable credential
+ */
 export function createWeb3IdDIDFromCredential(credential: VerifiableCredential, net: Network) {
     const contractAddress = getContractAddressFromIssuerDID(credential.issuer);
     return createWeb3IdDID(

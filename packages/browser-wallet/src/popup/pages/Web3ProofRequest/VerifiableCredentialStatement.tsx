@@ -8,7 +8,7 @@ import {
     storedVerifiableCredentialsAtom,
     storedVerifiableCredentialSchemasAtom,
 } from '@popup/store/verifiable-credential';
-import { VerifiableCredential, CredentialSubject } from '@shared/storage/types';
+import { VerifiableCredential, CredentialSubject, VerifiableCredentialSchema } from '@shared/storage/types';
 import { useAtomValue } from 'jotai';
 import React, { useCallback, useEffect, useMemo, useState } from 'react';
 import { useTranslation } from 'react-i18next';
@@ -23,10 +23,31 @@ import {
     SecretStatementV2,
 } from './utils';
 
+function getPropertyTitle(attributeTag: string, schema: VerifiableCredentialSchema) {
+    const property = schema.properties.credentialSubject.properties.attributes.properties[attributeTag];
+    return property.title;
+}
+
+function useStatementValue(statement: SecretStatementV2, schema: VerifiableCredentialSchema): string {
+    const { t } = useTranslation('Web3IdProofRequest', { keyPrefix: 'displayStatement.proofs' });
+
+    const name = getPropertyTitle(statement.attributeTag, schema);
+    if (statement.type === StatementTypes.AttributeInRange) {
+        return t('range', { name, upper: statement.upper, lower: statement.lower });
+    } else if (statement.type === StatementTypes.AttributeInSet) {
+        return t('membership', { name });
+    } else if (statement.type === StatementTypes.AttributeNotInSet) {
+        return t('nonMembership', { name });
+    }
+    // TODO What to do here?
+    return '';
+}
+
 type DisplayWeb3StatementProps<Statement> = ClassName & {
     statements: Statement;
     dappName: string;
     credential: CredentialSubject;
+    schema: VerifiableCredentialSchema;
 };
 
 type AttributeInfo = {
@@ -38,7 +59,7 @@ function extractAttributesFromCredentialSubjectForSingleStatement(
     { attributeTag }: AtomicStatementV2,
     credentialSubject: CredentialSubject
 ): AttributeInfo {
-    return { name: attributeTag, value: credentialSubject[attributeTag] };
+    return { name: attributeTag, value: credentialSubject.attributes[attributeTag] };
 }
 
 function extractAttributesFromCredentialSubject(
@@ -59,16 +80,17 @@ export function DisplayWeb3RevealStatement({
     dappName,
     credential,
     className,
+    schema
 }: DisplayWeb3StatementProps<RevealStatementV2[]>) {
     const { t } = useTranslation('idProofRequest', { keyPrefix: 'displayStatement' });
     const attributes = extractAttributesFromCredentialSubject(statements, credential);
     const header = t('headers.reveal');
 
     const lines: StatementLine[] = statements.map((s) => {
-        const { name, value } = attributes[s.attributeTag];
-
+        const { value } = attributes[s.attributeTag];
+        const property = schema.properties.credentialSubject.properties.attributes.properties[s.attributeTag];
         return {
-            attribute: name,
+            attribute: property.title,
             value: value.toString() ?? 'Unavailable',
             isRequirementMet: value !== undefined,
         };
@@ -82,19 +104,23 @@ export function DisplayWeb3SecretStatement({
     dappName,
     credential,
     className,
+    schema
 }: DisplayWeb3StatementProps<SecretStatementV2>) {
     const { t } = useTranslation('idProofRequest', { keyPrefix: 'displayStatement' });
-    const { name, value } = extractAttributesFromCredentialSubjectForSingleStatement(statements, credential);
-    const header = t('headers.reveal');
+    // Fix double name for membership
+    const value = useStatementValue(statements, schema);
+    const header = t('headers.secret');
+    const property = schema.properties.credentialSubject.properties.attributes.properties[statements.attributeTag];
 
     const lines: StatementLine[] = [
         {
-            attribute: name,
-            value: value.toString() ?? 'Unavailable',
+            attribute: property.title,
+            value,
             isRequirementMet: value !== undefined,
         },
     ];
 
+    // TODO Add description / list of options for membership + check range
     return <DisplayStatementView lines={lines} dappName={dappName} header={header} className={className} />;
 }
 
@@ -147,7 +173,7 @@ export default function DisplayWeb3Statement({
     }
 
     return (
-        <div>
+        <div className="web3-id-proof-request__credential-statement-container">
             <CredentialSelector
                 options={validCredentials}
                 displayOption={(option) => getVerifiableCredentialPublicKeyfromSubjectDID(option.id)}
@@ -158,7 +184,8 @@ export default function DisplayWeb3Statement({
                     className="m-t-10:not-first"
                     dappName={dappName}
                     credential={chosenCredential.credentialSubject}
-                    statements={reveals}
+                statements={reveals}
+                schema={schema}
                 />
             )}
             {secrets.map((s, i) => (
@@ -168,7 +195,8 @@ export default function DisplayWeb3Statement({
                     className="m-t-10:not-first"
                     dappName={dappName}
                     credential={chosenCredential.credentialSubject}
-                    statements={s}
+                statements={s}
+                schema={schema}
                 />
             ))}
         </div>

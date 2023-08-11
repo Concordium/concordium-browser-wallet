@@ -31,6 +31,7 @@ import {
 import { useConfirmedIdentities } from '@popup/shared/utils/identity-helpers';
 import { DisplayCredentialStatement } from './DisplayStatement';
 import { getCommitmentInput } from './utils';
+import { parse } from '@shared/utils/payload-helpers';
 
 type Props = {
     onSubmit(presentationString: string): void;
@@ -41,7 +42,7 @@ interface Location {
     state: {
         payload: {
             challenge: string;
-            statements: CredentialStatements;
+            statements: string;
             url: string;
         };
     };
@@ -49,7 +50,7 @@ interface Location {
 
 export default function Web3ProofRequest({ onReject, onSubmit }: Props) {
     const { state } = useLocation() as Location;
-    const { statements, challenge, url } = state.payload;
+    const { statements: rawStatements, challenge, url } = state.payload;
     const { onClose, withClose } = useContext(fullscreenPromptContext);
     const { t } = useTranslation('idProofRequest');
     const network = useAtomValue(networkConfigurationAtom);
@@ -60,12 +61,14 @@ export default function Web3ProofRequest({ onReject, onSubmit }: Props) {
     const [creatingProof, setCreatingProof] = useState<boolean>(false);
     const net = getNet(network);
 
+    const statements: CredentialStatements = useMemo(() => parse(rawStatements), [rawStatements])
+
+    const [ids, setIds] = useState<string[]>(Array(statements.length).fill(''));
+
     const verifiableCredentialSchemas = useAtomValue(storedVerifiableCredentialSchemasAtom);
     const identities = useConfirmedIdentities();
     const credentials = useAtomValue(credentialsAtom);
     const verifiableCredentials = useAtomValue(storedVerifiableCredentialsAtom);
-
-    const [ids, setIds] = useState<string[]>(statements.map(() => ''));
 
     const canProve = useMemo(() => ids.every((x) => Boolean(x)), [ids]);
 
@@ -92,6 +95,7 @@ export default function Web3ProofRequest({ onReject, onSubmit }: Props) {
             return { statement: statement.statement, id: ids[index], type };
         });
 
+
         const commitmentInputs = parsedStatements.map((statement) =>
             getCommitmentInput(
                 statement,
@@ -99,7 +103,6 @@ export default function Web3ProofRequest({ onReject, onSubmit }: Props) {
                 identities.value,
                 credentials,
                 verifiableCredentials || [],
-                verifiableCredentialSchemas.value
             )
         );
 
@@ -115,7 +118,7 @@ export default function Web3ProofRequest({ onReject, onSubmit }: Props) {
         };
 
         const result: ProofBackgroundResponse<string> = await popupMessageHandler.sendInternalMessage(
-            InternalMessageType.CreateWeb3Proof,
+            InternalMessageType.CreateWeb3IdProof,
             input
         );
 

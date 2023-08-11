@@ -113,7 +113,7 @@ export default function Routes() {
     );
     // We manually stringify the presentation
     const handleWeb3IdProofResponse = useMessagePrompt<MessageStatusWrapper<string>>(
-        InternalMessageType.Web3Proof,
+        InternalMessageType.Web3IdProof,
         'web3IdProof'
     );
 
