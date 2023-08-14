@@ -701,3 +701,18 @@ export function createCredentialId(
         issuer.subindex
     }/credentialEntry/${credentialHolderId}`;
 }
+
+/**
+ * Extracts the credential registry contract addres from a verifiable credential id (did).
+ * @param credentialId the did for a credential
+ * @returns the contract address of the issuing contract of the provided credential id
+ */
+export function getDIDnetwork(did: string): 'mainnet' | 'testnet' {
+    const didParts = did.split(':');
+    const network = didParts[2];
+    if (network !== 'testnet' && network !== 'mainnet') {
+        // Only testnet and mainnet are valid identifiers, and if neither are present, then the network identifier is not present, and it defaults to mainnet
+        return 'mainnet';
+    }
+    return network;
+}

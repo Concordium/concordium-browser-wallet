@@ -39,7 +39,7 @@ import {
     setPopupSize,
     testPopupOpen,
 } from './window-management';
-import { web3IdAddCredentialFinishHandler } from './web3Id';
+import { runIfValidWeb3IdCredentialRequest, web3IdAddCredentialFinishHandler } from './web3Id';
 
 const rpcCallNotAllowedMessage = 'RPC Call can only be performed by whitelisted sites';
 const walletLockedMessage = 'The wallet is locked';
@@ -583,8 +583,7 @@ forwardToPopup(
 forwardToPopup(
     MessageType.AddWeb3IdCredential,
     InternalMessageType.AddWeb3IdCredential,
-    // TODO Check stuff, particular that the ids have the same network, as the currently chosen one.
-    runConditionComposer(runIfAllowlisted, withPromptStart()),
+    runConditionComposer(runIfAllowlisted, runIfValidWeb3IdCredentialRequest, withPromptStart()),
     appendUrlToPayload,
     undefined,
     withPromptEnd

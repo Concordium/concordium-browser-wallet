@@ -44,6 +44,23 @@ export async function addToList<Type>(
 }
 
 /**
+ * Generic method to remove an element from list in storage
+ */
+export async function removeFromList<Type>(
+    lock: string,
+    findPredicate: (candidate: Type) => boolean,
+    storage: StorageAccessor<Type[]>
+): Promise<void> {
+    return navigator.locks.request(lock, async () => {
+        const list = (await storage.get()) || [];
+        const index = list.findIndex(findPredicate);
+        if (index > -1) {
+            await storage.set(list.splice(index, 1));
+        }
+    });
+}
+
+/**
  * Generic method to edit/update elements in a list in storage
  * Note that this replaces the element found by the findPredicate with the edit.
  */

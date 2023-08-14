@@ -214,7 +214,7 @@ interface MainWalletApi {
     addWeb3IdCredential(
         credential: APIVerifiableCredential,
         metadataUrl: MetadataUrl,
-        createSignature: (
+        generateProofAndRandomness: (
             credentialHolderIdDID: string
         ) => Promise<{ randomness: Record<string, string>; proof: CredentialProof }>
     ): Promise<string>;

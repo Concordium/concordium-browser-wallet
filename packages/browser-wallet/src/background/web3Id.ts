@@ -6,18 +6,23 @@ import {
     useIndexedStorage,
 } from '@shared/storage/access';
 
-import { CredentialProof } from '@concordium/browser-wallet-api-helpers';
+import { CredentialProof, APIVerifiableCredential } from '@concordium/browser-wallet-api-helpers';
 import { GRPCTIMEOUT } from '@shared/constants/networkConfiguration';
 import { VerifiableCredential } from '@shared/storage/types';
-import { addToList, web3IdCredentialLock } from '@shared/storage/update';
+import { addToList, removeFromList, web3IdCredentialLock } from '@shared/storage/update';
 import {
     getCredentialRegistryContractAddress,
     getCredentialRegistryIssuerKey,
+    getDIDnetwork,
     getPublicKeyfromPublicKeyIdentifierDID,
 } from '@shared/utils/verifiable-credential-helpers';
+import { MessageStatusWrapper } from '@concordium/browser-wallet-message-hub';
+import { getNet } from '@shared/utils/network-helpers';
+import { RunCondition } from './window-management';
 
 const NO_CREDENTIALS_FIT = 'No temporary credentials fit the given id';
 const INVALID_CREDENTIAL_PROOF = 'Invalid credential proof given';
+const MISSING_CREDENTIAL_PROOF = 'No credential proof given';
 
 export async function web3IdAddCredentialFinishHandler(input: {
     credentialHolderIdDID: string;
@@ -48,8 +53,11 @@ export async function web3IdAddCredentialFinishHandler(input: {
     const client = createConcordiumClient(network.grpcUrl, network.grpcPort, { timeout: GRPCTIMEOUT });
     const issuerContract = getCredentialRegistryContractAddress(saved.issuer);
 
+    if (!proof || !proof.proofValue) {
+        throw new Error(MISSING_CREDENTIAL_PROOF);
+    }
+
     if (
-        !proof?.proofValue ||
         !verifyWeb3IdCredentialSignature({
             globalContext: await client.getCryptographicParameters(),
             signature: proof.proofValue,
@@ -69,10 +77,58 @@ export async function web3IdAddCredentialFinishHandler(input: {
         randomness,
     };
 
-    addToList(
+    await addToList(
         web3IdCredentialLock,
         credential,
         useIndexedStorage(storedVerifiableCredentials, () => Promise.resolve(genesisHash))
     );
-    // TODO remove temp in session
+
+    removeFromList(
+        web3IdCredentialLock,
+        (cred) => cred.credentialSubject.id === credentialHolderIdDID,
+        useIndexedStorage(sessionVerifiableCredentials, () => Promise.resolve(genesisHash))
+    );
 }
+
+/**
+ * Run condition which looks up URL in connected sites for the provided account. Runs handler if URL is included in connected sites.
+ */
+export const runIfValidWeb3IdCredentialRequest: RunCondition<MessageStatusWrapper<undefined>> = async (msg) => {
+    const { credential }: { credential: APIVerifiableCredential } = msg.payload;
+    const network = await storedCurrentNetwork.get();
+
+    if (!network) {
+        throw new Error('No network chosen');
+    }
+
+    const net = getNet(network);
+
+    try {
+        if (
+            !credential.type.includes('VerifiableCredential') ||
+            !credential.type.includes('ConcordiumVerifiableCredential')
+        ) {
+            return {
+                run: false,
+                response: { success: false, message: `Credential does not have the correct type` },
+            };
+        }
+
+        const credNetwork = getDIDnetwork(credential.issuer);
+        if (net.toLowerCase() !== credNetwork) {
+            return {
+                run: false,
+                response: {
+                    success: false,
+                    message: `Credential issuer network is not the same as the current wallet network`,
+                },
+            };
+        }
+        return { run: true };
+    } catch (e) {
+        return {
+            run: false,
+            response: { success: false, message: `Credential is not well-formed: ${(e as Error).message}` },
+        };
+    }
+};
