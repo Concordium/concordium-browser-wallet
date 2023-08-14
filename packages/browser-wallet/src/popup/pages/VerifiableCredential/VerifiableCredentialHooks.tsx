@@ -1,5 +1,5 @@
 import { grpcClientAtom } from '@popup/store/settings';
-import { VerifiableCredential, VerifiableCredentialSchema, VerifiableCredentialStatus } from '@shared/storage/types';
+import { VerifiableCredential, VerifiableCredentialStatus, VerifiableCredentialSchema } from '@shared/storage/types';
 import {
     CredentialQueryResponse,
     VerifiableCredentialMetadata,

@@ -1,6 +1,7 @@
 import { ConcordiumGRPCClient, ContractAddress, sha256 } from '@concordium/web-sdk';
 import {
     MetadataUrl,
+    NetworkConfiguration,
     VerifiableCredential,
     VerifiableCredentialSchema,
     VerifiableCredentialStatus,
@@ -8,6 +9,7 @@ import {
 import { Buffer } from 'buffer/';
 import jsonschema from 'jsonschema';
 import { getContractName } from './contract-helpers';
+import { getNet } from './network-helpers';
 
 /**
  * Extracts the credential holder id from a verifiable credential id (did).
@@ -23,6 +25,18 @@ export function getCredentialHolderId(credentialId: string): string {
     }
 
     return credentialHolderId;
+}
+
+/** Takes a PublicKey Identifier DID string and returns the public key.
+ * @param did a DID string on the form: "did:ccd:NETWORK:pkc:PUBLICKEY"
+ * @returns the publicKey PUBLICKEY
+ */
+export function getPublicKeyfromPublicKeyIdentifierDID(did: string) {
+    const didParts = did.split(':');
+    if (!(didParts.length === 5 || didParts.length === 4) || didParts[didParts.length - 2] !== 'pkc') {
+        throw new Error(`Given DID was not a PublicKey Identifier: ${did}`);
+    }
+    return didParts[didParts.length - 1];
 }
 
 /**
@@ -469,10 +483,10 @@ async function fetchDataFromUrl<T>(
  * Retrieves a credential schema from the specified URL.
  */
 export async function fetchCredentialSchema(
-    metadata: MetadataUrl,
+    url: MetadataUrl,
     abortController: AbortController
 ): Promise<VerifiableCredentialSchema> {
-    return fetchDataFromUrl(metadata, abortController, verifiableCredentialSchemaSchema);
+    return fetchDataFromUrl(url, abortController, verifiableCredentialSchemaSchema);
 }
 
 /**
@@ -634,4 +648,72 @@ export async function getChangesToCredentialSchemas(
         }
     }
     return { data: updatedSchemasInStorage, updateReceived };
+}
+
+/**
+ * Get the registry issuer public key from a credential registry CIS-4 contract.
+ * @param client the GRPC client for accessing a node
+ * @param contractAddress the address of a CIS-4 contract
+ * @returns the registry public key for the contract
+ */
+export async function getCredentialRegistryIssuerKey(
+    client: ConcordiumGRPCClient,
+    contractAddress: ContractAddress
+): Promise<string> {
+    const instanceInfo = await client.getInstanceInfo(contractAddress);
+    if (instanceInfo === undefined) {
+        throw new Error('Given contract address was not a created instance');
+    }
+
+    const result = await client.invokeContract({
+        contract: contractAddress,
+        method: `${getContractName(instanceInfo)}.issuer`,
+    });
+
+    if (result.tag !== 'success') {
+        throw new Error(result.reason.tag);
+    }
+
+    const { returnValue } = result;
+    if (returnValue === undefined) {
+        throw new Error(`Return value is missing from issuer public key result in CIS-4 contract: ${contractAddress}`);
+    }
+
+    return returnValue;
+}
+
+/**
+ * Create a publicKey DID identitifer for the given key.
+ */
+export function createPublicKeyIdentifier(publicKey: string, network: NetworkConfiguration): string {
+    return `did:ccd:${getNet(network).toLowerCase()}:pkc:${publicKey}`;
+}
+
+/**
+ * Create a DID identitifer for the given web3Id credential.
+ */
+export function createCredentialId(
+    credentialHolderId: string,
+    issuer: ContractAddress,
+    network: NetworkConfiguration
+): string {
+    return `did:ccd:${getNet(network).toLowerCase()}:sci:${issuer.index}:${
+        issuer.subindex
+    }/credentialEntry/${credentialHolderId}`;
+}
+
+/**
+ * Extracts the network from any concordium DID identitifer.
+ * Note that if the network is not present in the DID, then 'mainnet' is returned, per the specifiction, see https://proposals.concordium.software/ID/concordium-did.html#identifier-syntax.
+ * @param did the did to extract network from. did:ccd:NETWORK:...
+ * @returns the name of the network
+ */
+export function getDIDNetwork(did: string): 'mainnet' | 'testnet' {
+    const didParts = did.split(':');
+    const network = didParts[2];
+    if (network !== 'testnet' && network !== 'mainnet') {
+        // Only testnet and mainnet are valid identifiers, and if neither are present, then the network identifier is not present, and it defaults to mainnet.
+        return 'mainnet';
+    }
+    return network;
 }

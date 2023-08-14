@@ -30,6 +30,7 @@ import {
     storedVerifiableCredentialSchemas,
     storedAllowlist,
     storedVerifiableCredentialMetadata,
+    sessionVerifiableCredentials,
 } from '@shared/storage/access';
 import { ChromeStorageKey } from '@shared/storage/types';
 import { atom, PrimitiveAtom, WritableAtom } from 'jotai';
@@ -64,6 +65,7 @@ const accessorMap: Record<ChromeStorageKey, StorageAccessor<any>> = {
     [ChromeStorageKey.VerifiableCredentialSchemas]: storedVerifiableCredentialSchemas,
     [ChromeStorageKey.VerifiableCredentialMetadata]: storedVerifiableCredentialMetadata,
     [ChromeStorageKey.Allowlist]: storedAllowlist,
+    [ChromeStorageKey.TemporaryVerifiableCredentials]: useIndexedStorage(sessionVerifiableCredentials, getGenesisHash),
 };
 
 export function resetOnUnmountAtom<V>(initial: V): PrimitiveAtom<V> {
@@ -138,4 +140,11 @@ export function atomWithChromeStorage<V>(key: ChromeStorageKey, fallback: V, wit
     );
 
     return derived;
+}
+
+export function mapAsyncWrapper<Value, Mapped>(
+    wrapper: AsyncWrapper<Value>,
+    map: (v: Value) => Mapped
+): AsyncWrapper<Mapped> {
+    return { loading: wrapper.loading, value: map(wrapper.value) };
 }

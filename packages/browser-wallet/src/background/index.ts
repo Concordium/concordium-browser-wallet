@@ -1,30 +1,35 @@
 import {
     createMessageTypeFilter,
-    InternalMessageType,
-    MessageType,
     ExtensionMessageHandler,
+    InternalMessageType,
     MessageStatusWrapper,
+    MessageType,
 } from '@concordium/browser-wallet-message-hub';
 import { deserializeTypeValue, HttpProvider } from '@concordium/web-sdk';
 import {
-    storedSelectedAccount,
-    storedCurrentNetwork,
-    sessionPasscode,
-    sessionOpenPrompt,
-    storedAcceptedTerms,
     getGenesisHash,
+    sessionOpenPrompt,
+    sessionPasscode,
+    storedAcceptedTerms,
     storedAllowlist,
+    storedCurrentNetwork,
+    storedSelectedAccount,
 } from '@shared/storage/access';
 
-import JSONBig from 'json-bigint';
-import { ChromeStorageKey, NetworkConfiguration } from '@shared/storage/types';
-import { buildURLwithSearchParameters } from '@shared/utils/url-helpers';
-import { getTermsAndConditionsConfig } from '@shared/utils/network-helpers';
-import { Buffer } from 'buffer/';
-import { BackgroundSendTransactionPayload } from '@shared/utils/types';
-import { parsePayload } from '@shared/utils/payload-helpers';
 import { mainnet, stagenet, testnet } from '@shared/constants/networkConfiguration';
+import { ChromeStorageKey, NetworkConfiguration } from '@shared/storage/types';
+import { getTermsAndConditionsConfig } from '@shared/utils/network-helpers';
+import { parsePayload } from '@shared/utils/payload-helpers';
+import { BackgroundSendTransactionPayload } from '@shared/utils/types';
+import { buildURLwithSearchParameters } from '@shared/utils/url-helpers';
+import { Buffer } from 'buffer/';
+import JSONBig from 'json-bigint';
+import { startMonitoringPendingStatus } from './confirmation';
+import { sendCredentialHandler } from './credential-deployment';
+import { createIdProofHandler, runIfValidProof } from './id-proof';
+import { addIdpListeners, identityIssuanceHandler } from './identity-issuance';
 import bgMessageHandler from './message-handler';
+import { setupRecoveryHandler, startRecovery } from './recovery';
 import {
     forwardToPopup,
     HandleMessage,
@@ -34,11 +39,7 @@ import {
     setPopupSize,
     testPopupOpen,
 } from './window-management';
-import { addIdpListeners, identityIssuanceHandler } from './identity-issuance';
-import { startMonitoringPendingStatus } from './confirmation';
-import { sendCredentialHandler } from './credential-deployment';
-import { startRecovery, setupRecoveryHandler } from './recovery';
-import { createIdProofHandler, runIfValidProof } from './id-proof';
+import { runIfValidWeb3IdCredentialRequest, web3IdAddCredentialFinishHandler } from './web3Id';
 
 const rpcCallNotAllowedMessage = 'RPC Call can only be performed by whitelisted sites';
 const walletLockedMessage = 'The wallet is locked';
@@ -380,6 +381,24 @@ const runIfNotAllowlisted: RunCondition<MessageStatusWrapper<string[] | undefine
 };
 
 /**
+ * Run condition that ensures that a handler is only run if the URL is in the allowlist.
+ */
+const runIfAllowlisted: RunCondition<MessageStatusWrapper<undefined>> = async (_msg, sender) => {
+    const allowlist = await storedAllowlist.get();
+    const locked = await isWalletLocked();
+
+    if (allowlist === undefined || locked) {
+        return { run: false, response: { success: false, message: NOT_WHITELISTED } };
+    }
+
+    if (sender.url !== undefined && allowlist[new URL(sender.url).origin]) {
+        return { run: true };
+    }
+
+    return { run: false, response: { success: false, message: NOT_WHITELISTED } };
+};
+
+/**
  * Run condition that runs the handler if the wallet is non-empty (an account exists), and no
  * account in the wallet is connected to the sender URL.
  *
@@ -482,6 +501,21 @@ const getSelectedChainHandler: ExtensionMessageHandler = (_msg, sender, respond)
 
 bgMessageHandler.handleMessage(createMessageTypeFilter(MessageType.GetSelectedChain), getSelectedChainHandler);
 
+bgMessageHandler.handleMessage(
+    createMessageTypeFilter(MessageType.AddWeb3IdCredentialFinish),
+    (input, sender, respond) => {
+        if (!sender.url || !isAllowlisted(sender.url)) {
+            respond({ success: false, message: 'not allowlisted' });
+        }
+
+        web3IdAddCredentialFinishHandler(input.payload)
+            .then(() => respond({ success: true }))
+            .catch((error) => respond({ success: false, message: error.message }));
+
+        return true;
+    }
+);
+
 function withPromptStart<T>(): RunCondition<MessageStatusWrapper<T | undefined>> {
     return async () => {
         const isPromptOpen = await sessionOpenPrompt.get();
@@ -542,6 +576,14 @@ forwardToPopup(
     MessageType.IdProof,
     InternalMessageType.IdProof,
     runConditionComposer(runIfAccountIsAllowlisted, runIfValidProof, withPromptStart()),
+    appendUrlToPayload,
+    undefined,
+    withPromptEnd
+);
+forwardToPopup(
+    MessageType.AddWeb3IdCredential,
+    InternalMessageType.AddWeb3IdCredential,
+    runConditionComposer(runIfAllowlisted, runIfValidWeb3IdCredentialRequest, withPromptStart()),
     appendUrlToPayload,
     undefined,
     withPromptEnd
