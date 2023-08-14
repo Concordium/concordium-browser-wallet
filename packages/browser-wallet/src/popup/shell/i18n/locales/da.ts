@@ -21,6 +21,8 @@ import idProofRequest from '@popup/pages/IdProofRequest/i18n/da';
 import allowlist from '@popup/pages/Allowlist/i18n/da';
 import connectAccountsRequest from '@popup/pages/ConnectAccountsRequest/i18n/da';
 import addWeb3IdCredential from '@popup/pages/AddWeb3IdCredential/i18n/da';
+// TODO add "da" version
+import web3IdProofRequest from '@popup/pages/Web3ProofRequest/i18n/en';
 
 import type en from './en';
 
@@ -48,6 +50,7 @@ const t: typeof en = {
     allowlist,
     connectAccountsRequest,
     addWeb3IdCredential,
+    web3IdProofRequest,
 };
 
 export default t;

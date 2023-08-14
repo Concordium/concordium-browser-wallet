@@ -17,18 +17,20 @@ export default {
         },
         headers: {
             reveal: 'Information to reveal',
-            secret: 'Zero Knowledge proof'
+            secret: 'Zero Knowledge proof',
         },
         proofs: {
-            range: '{{ name }} is between {{ lower }} and {{ upper }}',
-            membership: '{{ name }} is 1 of the following',
-            nonMembership: '{{ name }} is none of the following',
+            range: 'Between {{ lower }} and {{ upper }}',
+            membership: '1 of the following',
+            nonMembership: 'None of the following',
         },
         descriptions: {
-
+            range: 'This will prove that your {{ name }} is between {{ lower }} and {{ upper }}',
+            membership: 'This will prove that your {{ name }} is 1 of the following:\n{{ setNames }}',
+            nonMembership: 'This will prove that your {{ name }} is none of the following:\n{{ setNames }}',
             missingAttribute: 'The attribute cannot be found on the identity "{{identityName}}"',
         },
     },
     failedProof: 'Unable to create proof',
     failedProofReason: 'Unable to create proof due to: {{ reason }}',
-}
+};

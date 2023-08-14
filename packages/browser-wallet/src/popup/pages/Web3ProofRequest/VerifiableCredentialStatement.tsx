@@ -29,24 +29,42 @@ function getPropertyTitle(attributeTag: string, schema: VerifiableCredentialSche
 }
 
 function useStatementValue(statement: SecretStatementV2, schema: VerifiableCredentialSchema): string {
-    const { t } = useTranslation('Web3IdProofRequest', { keyPrefix: 'displayStatement.proofs' });
+    const { t } = useTranslation('web3IdProofRequest', { keyPrefix: 'displayStatement.proofs' });
 
     const name = getPropertyTitle(statement.attributeTag, schema);
     if (statement.type === StatementTypes.AttributeInRange) {
         return t('range', { name, upper: statement.upper, lower: statement.lower });
-    } else if (statement.type === StatementTypes.AttributeInSet) {
+    }
+    if (statement.type === StatementTypes.AttributeInSet) {
         return t('membership', { name });
-    } else if (statement.type === StatementTypes.AttributeNotInSet) {
+    }
+    if (statement.type === StatementTypes.AttributeNotInSet) {
         return t('nonMembership', { name });
     }
     // TODO What to do here?
     return '';
 }
 
+export function useStatementDescription(statement: SecretStatementV2, schema: VerifiableCredentialSchema) {
+    const { t } = useTranslation('web3IdProofRequest', { keyPrefix: 'displayStatement.descriptions' });
+    const name = getPropertyTitle(statement.attributeTag, schema);
+    const listToString = (list: (string | bigint)[]) => list.map((member) => member.toString()).join(', ');
+
+    switch (statement.type) {
+        case StatementTypes.AttributeInRange:
+            return t('range', { name, lower: statement.lower, upper: statement.upper });
+        case StatementTypes.AttributeInSet:
+            return t('membership', { name, setNames: listToString(statement.set) });
+        case StatementTypes.AttributeNotInSet:
+            return t('nonMembership', { name, setNames: listToString(statement.set) });
+        default:
+            return undefined;
+    }
+}
+
 type DisplayWeb3StatementProps<Statement> = ClassName & {
     statements: Statement;
     dappName: string;
-    credential: CredentialSubject;
     schema: VerifiableCredentialSchema;
 };
 
@@ -75,14 +93,18 @@ function extractAttributesFromCredentialSubject(
     }, {});
 }
 
+type DisplayWeb3RevealStatementProps = DisplayWeb3StatementProps<RevealStatementV2[]> & {
+    credential: CredentialSubject;
+};
+
 export function DisplayWeb3RevealStatement({
     statements,
     dappName,
     credential,
     className,
-    schema
-}: DisplayWeb3StatementProps<RevealStatementV2[]>) {
-    const { t } = useTranslation('idProofRequest', { keyPrefix: 'displayStatement' });
+    schema,
+}: DisplayWeb3RevealStatementProps) {
+    const { t } = useTranslation('web3IdProofRequest', { keyPrefix: 'displayStatement' });
     const attributes = extractAttributesFromCredentialSubject(statements, credential);
     const header = t('headers.reveal');
 
@@ -102,15 +124,14 @@ export function DisplayWeb3RevealStatement({
 export function DisplayWeb3SecretStatement({
     statements,
     dappName,
-    credential,
     className,
-    schema
+    schema,
 }: DisplayWeb3StatementProps<SecretStatementV2>) {
-    const { t } = useTranslation('idProofRequest', { keyPrefix: 'displayStatement' });
-    // Fix double name for membership
+    const { t } = useTranslation('web3IdProofRequest', { keyPrefix: 'displayStatement' });
     const value = useStatementValue(statements, schema);
     const header = t('headers.secret');
     const property = schema.properties.credentialSubject.properties.attributes.properties[statements.attributeTag];
+    const description = useStatementDescription(statements, schema);
 
     const lines: StatementLine[] = [
         {
@@ -120,8 +141,15 @@ export function DisplayWeb3SecretStatement({
         },
     ];
 
-    // TODO Add description / list of options for membership + check range
-    return <DisplayStatementView lines={lines} dappName={dappName} header={header} className={className} />;
+    return (
+        <DisplayStatementView
+            lines={lines}
+            dappName={dappName}
+            header={header}
+            className={className}
+            description={description}
+        />
+    );
 }
 
 export default function DisplayWeb3Statement({
@@ -184,8 +212,8 @@ export default function DisplayWeb3Statement({
                     className="m-t-10:not-first"
                     dappName={dappName}
                     credential={chosenCredential.credentialSubject}
-                statements={reveals}
-                schema={schema}
+                    statements={reveals}
+                    schema={schema}
                 />
             )}
             {secrets.map((s, i) => (
@@ -194,9 +222,8 @@ export default function DisplayWeb3Statement({
                     key={i} // Allow this, as we don't expect these to ever change.
                     className="m-t-10:not-first"
                     dappName={dappName}
-                    credential={chosenCredential.credentialSubject}
-                statements={s}
-                schema={schema}
+                    statements={s}
+                    schema={schema}
                 />
             ))}
         </div>

@@ -24,7 +24,8 @@
                     const statement = new concordiumSDK.Web3StatementBuilder()
                         .addForVerifiableCredentials([{ index: 5463n, subindex: 0n }], (b) =>
                             b
-                                .revealAttribute('graduationDate')
+                                .revealAttribute('degreeType')
+                                .addRange('graduationDate', '2000-01-01T00:00:00.000Z', '2030-01-01T00:00:00.000Z')
                                 .addMembership('degreeName', ['Bachelor of Science and Arts', 'Bachelor of Finance'])
                         )
                         .getStatements();
