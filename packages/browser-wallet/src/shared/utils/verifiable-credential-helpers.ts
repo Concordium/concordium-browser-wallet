@@ -703,15 +703,16 @@ export function createCredentialId(
 }
 
 /**
- * Extracts the credential registry contract addres from a verifiable credential id (did).
- * @param credentialId the did for a credential
- * @returns the contract address of the issuing contract of the provided credential id
+ * Extracts the network from any concordium DID identitifer.
+ * Note that if the network is not present in the DID, then 'mainnet' is returned, per the specifiction, see https://proposals.concordium.software/ID/concordium-did.html#identifier-syntax.
+ * @param did the did to extract network from. did:ccd:NETWORK:...
+ * @returns the name of the network
  */
-export function getDIDnetwork(did: string): 'mainnet' | 'testnet' {
+export function getDIDNetwork(did: string): 'mainnet' | 'testnet' {
     const didParts = did.split(':');
     const network = didParts[2];
     if (network !== 'testnet' && network !== 'mainnet') {
-        // Only testnet and mainnet are valid identifiers, and if neither are present, then the network identifier is not present, and it defaults to mainnet
+        // Only testnet and mainnet are valid identifiers, and if neither are present, then the network identifier is not present, and it defaults to mainnet.
         return 'mainnet';
     }
     return network;

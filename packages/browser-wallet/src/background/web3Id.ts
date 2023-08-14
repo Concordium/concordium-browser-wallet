@@ -13,7 +13,7 @@ import { addToList, removeFromList, web3IdCredentialLock } from '@shared/storage
 import {
     getCredentialRegistryContractAddress,
     getCredentialRegistryIssuerKey,
-    getDIDnetwork,
+    getDIDNetwork,
     getPublicKeyfromPublicKeyIdentifierDID,
 } from '@shared/utils/verifiable-credential-helpers';
 import { MessageStatusWrapper } from '@concordium/browser-wallet-message-hub';
@@ -91,7 +91,7 @@ export async function web3IdAddCredentialFinishHandler(input: {
 }
 
 /**
- * Run condition which looks up URL in connected sites for the provided account. Runs handler if URL is included in connected sites.
+ * Run condition which ensures that the web3IdCredential request is valid.
  */
 export const runIfValidWeb3IdCredentialRequest: RunCondition<MessageStatusWrapper<undefined>> = async (msg) => {
     const { credential }: { credential: APIVerifiableCredential } = msg.payload;
@@ -114,7 +114,7 @@ export const runIfValidWeb3IdCredentialRequest: RunCondition<MessageStatusWrappe
             };
         }
 
-        const credNetwork = getDIDnetwork(credential.issuer);
+        const credNetwork = getDIDNetwork(credential.issuer);
         if (net.toLowerCase() !== credNetwork) {
             return {
                 run: false,
