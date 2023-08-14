@@ -217,10 +217,10 @@
                 document.getElementById('web3Proof').addEventListener('click', () => {
                     const statement = new concordiumSDK.Web3StatementBuilder()
                         .addForIdentityCredentials([0, 1, 2], (b) =>
-                            b.revealAttribute(0).addRange(3, '08000101', '20000101')
+                            b.revealAttribute('firstName').addRange('dob', '08000101', '20000101')
                         )
                         .addForVerifiableCredentials([{ index: 5463, subindex: 0 }], (b) =>
-                            b.revealAttribute(0).addMembership(2, ['2010-06-01T00:00:00Z'])
+                            b.revealAttribute('degreeName').addMembership('graduationDate', ['2010-06-01T00:00:00Z'])
                         )
                         .getStatements();
                     const challenge = '94d3e85bbc8ff0091e562ad8ef6c30d57f29b19f17c98ce155df2a30100dAAAA';
