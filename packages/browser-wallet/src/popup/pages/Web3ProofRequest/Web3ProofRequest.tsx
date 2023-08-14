@@ -29,9 +29,9 @@ import {
     storedVerifiableCredentialSchemasAtom,
 } from '@popup/store/verifiable-credential';
 import { useConfirmedIdentities } from '@popup/shared/utils/identity-helpers';
+import { parse } from '@shared/utils/payload-helpers';
 import { DisplayCredentialStatement } from './DisplayStatement';
 import { getCommitmentInput } from './utils';
-import { parse } from '@shared/utils/payload-helpers';
 
 type Props = {
     onSubmit(presentationString: string): void;
@@ -52,16 +52,17 @@ export default function Web3ProofRequest({ onReject, onSubmit }: Props) {
     const { state } = useLocation() as Location;
     const { statements: rawStatements, challenge, url } = state.payload;
     const { onClose, withClose } = useContext(fullscreenPromptContext);
-    const { t } = useTranslation('idProofRequest');
+    const { t } = useTranslation('web3IdProofRequest');
     const network = useAtomValue(networkConfigurationAtom);
     const client = useAtomValue(grpcClientAtom);
     const addToast = useSetAtom(addToastAtom);
     const recoveryPhrase = useDecryptedSeedPhrase((e) => addToast(e.message));
     const dappName = displayUrl(url);
     const [creatingProof, setCreatingProof] = useState<boolean>(false);
+    const [currentStatementIndex, setCurrentStatementIndex] = useState<number>(0);
     const net = getNet(network);
 
-    const statements: CredentialStatements = useMemo(() => parse(rawStatements), [rawStatements])
+    const statements: CredentialStatements = useMemo(() => parse(rawStatements), [rawStatements]);
 
     const [ids, setIds] = useState<string[]>(Array(statements.length).fill(''));
 
@@ -95,15 +96,8 @@ export default function Web3ProofRequest({ onReject, onSubmit }: Props) {
             return { statement: statement.statement, id: ids[index], type };
         });
 
-
         const commitmentInputs = parsedStatements.map((statement) =>
-            getCommitmentInput(
-                statement,
-                wallet,
-                identities.value,
-                credentials,
-                verifiableCredentials || [],
-            )
+            getCommitmentInput(statement, wallet, identities.value, credentials, verifiableCredentials || [])
         );
 
         const request = {
@@ -137,48 +131,53 @@ export default function Web3ProofRequest({ onReject, onSubmit }: Props) {
     return (
         <ExternalRequestLayout>
             <div className="web3-id-proof-request__statement-container">
-                {statements.map((s, index) => (
-                    <DisplayCredentialStatement
-                        className="m-t-10:not-first"
-                        dappName={dappName}
-                        credentialStatement={s}
-                        net={net}
-                        // eslint-disable-next-line react/no-array-index-key
-                        key={index} // Allow this, as we don't expect these to ever change.
-                        setChosenId={(newId) =>
-                            setIds((currentIds) => {
-                                const newIds = [...currentIds];
-                                newIds[index] = newId;
-                                return newIds;
-                            })
-                        }
-                    />
-                ))}
+                <DisplayCredentialStatement
+                    className="m-t-10:not-first"
+                    dappName={dappName}
+                    credentialStatement={statements[currentStatementIndex]}
+                    net={net}
+                    setChosenId={(newId) =>
+                        setIds((currentIds) => {
+                            const newIds = [...currentIds];
+                            newIds[currentStatementIndex] = newId;
+                            return newIds;
+                        })
+                    }
+                />
                 <ButtonGroup className="web3-id-proof-request__actions">
                     <Button disabled={creatingProof} onClick={withClose(onReject)}>
                         {t('reject')}
                     </Button>
-                    <Button
-                        className="flex-center"
-                        onClick={() => {
-                            setCreatingProof(true);
-                            handleSubmit()
-                                .then(withClose(onSubmit))
-                                .catch((e) => {
-                                    setCreatingProof(false);
-                                    addToast(
-                                        e.message ? t('failedProofReason', { reason: e.message }) : t('failedProof')
-                                    );
-                                });
-                        }}
-                        disabled={creatingProof || !canProve}
-                    >
-                        {creatingProof ? (
-                            <PendingArrows className="loading svg-white web3-id-proof-request__loading-icon" />
-                        ) : (
-                            t('accept')
-                        )}
-                    </Button>
+                    {currentStatementIndex === statements.length - 1 ? (
+                        <Button
+                            className="flex-center"
+                            onClick={() => {
+                                setCreatingProof(true);
+                                handleSubmit()
+                                    .then(withClose(onSubmit))
+                                    .catch((e) => {
+                                        setCreatingProof(false);
+                                        addToast(
+                                            e.message ? t('failedProofReason', { reason: e.message }) : t('failedProof')
+                                        );
+                                    });
+                            }}
+                            disabled={creatingProof || !canProve}
+                        >
+                            {creatingProof ? (
+                                <PendingArrows className="loading svg-white web3-id-proof-request__loading-icon" />
+                            ) : (
+                                t('accept')
+                            )}
+                        </Button>
+                    ) : (
+                        <Button
+                            className="flex-center"
+                            onClick={() => setCurrentStatementIndex(currentStatementIndex + 1)}
+                        >
+                            {t('continue')}
+                        </Button>
+                    )}
                 </ButtonGroup>
             </div>
         </ExternalRequestLayout>

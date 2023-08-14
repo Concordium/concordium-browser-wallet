@@ -1,6 +1,7 @@
 export default {
     header: '{{dappName}} requests the following information about you:',
     accept: 'Accept',
+    continue: 'Continue',
     reject: 'Reject',
     displayStatement: {
         requirementsMet: 'You meet this requirement',

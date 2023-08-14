@@ -8,12 +8,19 @@ import {
     storedVerifiableCredentialsAtom,
     storedVerifiableCredentialSchemasAtom,
 } from '@popup/store/verifiable-credential';
-import { VerifiableCredential, CredentialSubject, VerifiableCredentialSchema } from '@shared/storage/types';
+import {
+    VerifiableCredential,
+    CredentialSubject,
+    VerifiableCredentialSchema,
+    VerifiableCredentialStatus,
+} from '@shared/storage/types';
 import { useAtomValue } from 'jotai';
 import React, { useCallback, useEffect, useMemo, useState } from 'react';
 import { useTranslation } from 'react-i18next';
 import { ClassName } from 'wallet-common-helpers';
 import { DisplayStatementView, StatementLine } from '../IdProofRequest/DisplayStatement/DisplayStatement';
+import { VerifiableCredentialCard } from '../VerifiableCredential/VerifiableCredentialCard';
+import { useCredentialMetadata } from '../VerifiableCredential/VerifiableCredentialHooks';
 import CredentialSelector from './CredentialSelector';
 import {
     createWeb3IdDIDFromCredential,
@@ -196,12 +203,21 @@ export default function DisplayWeb3Statement({
         return null;
     }, [chosenCredential?.id, verifiableCredentials?.length]);
 
-    if (!chosenCredential || !schema) {
+    const metadata = useCredentialMetadata(chosenCredential);
+
+    if (!chosenCredential || !schema || !metadata) {
         return null;
     }
 
     return (
         <div className="web3-id-proof-request__credential-statement-container">
+            <VerifiableCredentialCard
+                credentialSubject={chosenCredential.credentialSubject}
+                schema={schema}
+                credentialStatus={VerifiableCredentialStatus.Active}
+                metadata={metadata}
+            />
+
             <CredentialSelector
                 options={validCredentials}
                 displayOption={(option) => getVerifiableCredentialPublicKeyfromSubjectDID(option.id)}

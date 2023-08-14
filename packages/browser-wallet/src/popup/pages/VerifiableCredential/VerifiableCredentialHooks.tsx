@@ -64,17 +64,19 @@ export function useCredentialSchema(credential: VerifiableCredential) {
  * @param credential the verifiable credential to retrieve the credential entry for
  * @returns the credential entry for the given credential, undefined if one is not found yet
  */
-export function useCredentialEntry(credential: VerifiableCredential) {
+export function useCredentialEntry(credential?: VerifiableCredential) {
     const [credentialEntry, setCredentialEntry] = useState<CredentialQueryResponse>();
     const client = useAtomValue(grpcClientAtom);
 
     useEffect(() => {
-        const credentialHolderId = getCredentialHolderId(credential.id);
-        const registryContractAddress = getCredentialRegistryContractAddress(credential.id);
-        getVerifiableCredentialEntry(client, registryContractAddress, credentialHolderId).then((entry) => {
-            setCredentialEntry(entry);
-        });
-    }, [credential.id, client]);
+        if (credential) {
+            const credentialHolderId = getCredentialHolderId(credential.id);
+            const registryContractAddress = getCredentialRegistryContractAddress(credential.id);
+            getVerifiableCredentialEntry(client, registryContractAddress, credentialHolderId).then((entry) => {
+                setCredentialEntry(entry);
+            });
+        }
+    }, [credential?.id, client]);
 
     return credentialEntry;
 }
@@ -86,7 +88,7 @@ export function useCredentialEntry(credential: VerifiableCredential) {
  * @throws if no credential metadata is found in storage for the provided credential
  * @returns the credential's metadata used for rendering the credential
  */
-export function useCredentialMetadata(credential: VerifiableCredential) {
+export function useCredentialMetadata(credential?: VerifiableCredential) {
     const [metadata, setMetadata] = useState<VerifiableCredentialMetadata>();
     const credentialEntry = useCredentialEntry(credential);
     const storedMetadata = useAtomValue(storedVerifiableCredentialMetadataAtom);
@@ -96,7 +98,7 @@ export function useCredentialMetadata(credential: VerifiableCredential) {
             const storedCredentialMetadata = storedMetadata.value[credentialEntry.credentialInfo.metadataUrl.url];
             if (!storedCredentialMetadata) {
                 throw new Error(
-                    `Attempted to find credential metadata for credentialId: ${credential.id} but none was found!`
+                    `Attempted to find credential metadata for credentialId: ${credential?.id} but none was found!`
                 );
             }
             setMetadata(storedCredentialMetadata);
