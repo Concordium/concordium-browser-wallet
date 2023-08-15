@@ -24,7 +24,6 @@ export default {
             residence: 'Zero Knowledge proof of country of residence',
             idDocType: 'Zero Knowledge proof of identity document type',
             idDocIssuer: 'Zero Knowledge proof of identity document issuer',
-            secret: 'Zero Knowledge proof'
         },
         names: {
             age: 'Age',

@@ -14,6 +14,7 @@ import {
     VerifiableCredentialSchema,
     VerifiableCredentialStatus,
 } from '@shared/storage/types';
+import { getVerifiableCredentialPublicKeyfromSubjectDID } from '@shared/utils/verifiable-credential-helpers';
 import { useAtomValue } from 'jotai';
 import React, { useCallback, useEffect, useMemo, useState } from 'react';
 import { useTranslation } from 'react-i18next';
@@ -25,7 +26,6 @@ import CredentialSelector from './CredentialSelector';
 import {
     createWeb3IdDIDFromCredential,
     DisplayCredentialStatementProps,
-    getVerifiableCredentialPublicKeyfromSubjectDID,
     getViableWeb3IdCredentialsForStatement,
     SecretStatementV2,
 } from './utils';
@@ -178,7 +178,7 @@ export default function DisplayWeb3Statement({
         if (!verifiableCredentials) {
             return [];
         }
-        return getViableWeb3IdCredentialsForStatement(credentialStatement, verifiableCredentials);
+        return getViableWeb3IdCredentialsForStatement(credentialStatement, verifiableCredentials.value);
     }, [credentialStatement.idQualifier.issuers]);
 
     const [chosenCredential, setChosenCredential] = useState<VerifiableCredential | undefined>(validCredentials[0]);
@@ -201,7 +201,7 @@ export default function DisplayWeb3Statement({
             return verifiableCredentialSchemas.value[schemaId];
         }
         return null;
-    }, [chosenCredential?.id, verifiableCredentials?.length]);
+    }, [chosenCredential?.id, verifiableCredentialSchemas.loading]);
 
     const metadata = useCredentialMetadata(chosenCredential);
 

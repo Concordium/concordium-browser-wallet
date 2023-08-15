@@ -26,7 +26,6 @@ const da: typeof en = {
             residence: 'Zero Knowledge bevis for bopælsland',
             idDocType: 'Zero Knowledge bevis for identitetsdokumenttype',
             idDocIssuer: 'Zero Knowledge bevis for identitetsdokumentudsteder',
-            secret: 'Zero Knowledge bevis'
         },
         names: {
             age: 'Alder',

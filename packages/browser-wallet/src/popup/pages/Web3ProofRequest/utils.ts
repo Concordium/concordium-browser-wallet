@@ -9,7 +9,6 @@ import {
     Network,
     AtomicStatementV2,
     RevealStatementV2,
-    ContractAddress,
     CommitmentInput,
     createWeb3IdDID,
     StatementTypes,
@@ -17,6 +16,11 @@ import {
 import { isIdentityOfCredential } from '@shared/utils/identity-helpers';
 import { ConfirmedIdentity, CreationStatus, VerifiableCredential, WalletCredential } from '@shared/storage/types';
 import { ClassName } from 'wallet-common-helpers';
+import {
+    getContractAddressFromIssuerDID,
+    getCredentialIdFromSubjectDID,
+    getVerifiableCredentialPublicKeyfromSubjectDID,
+} from '@shared/utils/verifiable-credential-helpers';
 
 export type SecretStatementV2 = Exclude<AtomicStatementV2, RevealStatementV2>;
 
@@ -25,44 +29,6 @@ export interface DisplayCredentialStatementProps<Statement> extends ClassName {
     dappName: string;
     setChosenId: (id: string) => void;
     net: Network;
-}
-
-/** Takes a Web3IdCredential issuer DID string and returns the contract address
- * @param did a issuer DID string on the form: "did:ccd:testnet:sci:INDEX:SUBINDEX/issuer"
- * @returns the contract address INDEX;SUBINDEX
- */
-export function getContractAddressFromIssuerDID(did: string): ContractAddress {
-    const split = did.split(':');
-    if (split.length !== 6 || split[3] !== 'sci') {
-        throw new Error('Given DID did not follow expected format');
-    }
-    const index = BigInt(split[4]);
-    const subindex = BigInt(split[5].substring(0, split[5].indexOf('/')));
-    return { index, subindex };
-}
-
-/** Takes a Web3IdCredential subject DID string and returns the publicKey of the verifiable credential
- * @param did a DID string on the form: "did:ccd:NETWORK:sci:INDEX:SUBINDEX/credentialEntry/KEY"
- * @returns the public key KEY
- */
-export function getVerifiableCredentialPublicKeyfromSubjectDID(did: string) {
-    const split = did.split('/');
-    if (split.length !== 3 || split[0].split(':')[3] !== 'sci') {
-        throw new Error(`Given DID did not follow expected format:${did}`);
-    }
-    return split[2];
-}
-
-/** Takes a AccountCredential subject DID string and returns the credential id of the account credential
- * @param did a DID string on the form: "did:ccd:NETWORK:cred:CREDID"
- * @returns the credId CREDID
- */
-export function getCredentialIdFromSubjectDID(did: string) {
-    const split = did.split(':');
-    if (split.length !== 5 || split[3] !== 'cred') {
-        throw new Error(`Given DID did not follow expected format: ${did}`);
-    }
-    return split[4];
 }
 
 /**

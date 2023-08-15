@@ -97,7 +97,7 @@ export default function Web3ProofRequest({ onReject, onSubmit }: Props) {
         });
 
         const commitmentInputs = parsedStatements.map((statement) =>
-            getCommitmentInput(statement, wallet, identities.value, credentials, verifiableCredentials || [])
+            getCommitmentInput(statement, wallet, identities.value, credentials, verifiableCredentials.value || [])
         );
 
         const request = {
@@ -120,11 +120,11 @@ export default function Web3ProofRequest({ onReject, onSubmit }: Props) {
             throw new Error(result.reason);
         }
         return result.proof;
-    }, [recoveryPhrase, network, ids]);
+    }, [recoveryPhrase, network, ids, verifiableCredentials.loading, identities.loading]);
 
     useEffect(() => onClose(onReject), [onClose, onReject]);
 
-    if (verifiableCredentialSchemas.loading || identities.loading) {
+    if (verifiableCredentials.loading || verifiableCredentialSchemas.loading || identities.loading) {
         return null;
     }
 

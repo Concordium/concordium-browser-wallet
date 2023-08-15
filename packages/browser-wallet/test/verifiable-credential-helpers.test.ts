@@ -4,6 +4,9 @@ import {
     getCredentialHolderId,
     getCredentialRegistryContractAddress,
     getPublicKeyfromPublicKeyIdentifierDID,
+    getCredentialIdFromSubjectDID,
+    getContractAddressFromIssuerDID,
+    getVerifiableCredentialPublicKeyfromSubjectDID,
 } from '../src/shared/utils/verifiable-credential-helpers';
 import { mainnet, testnet } from '../src/shared/constants/networkConfiguration';
 
@@ -80,5 +83,49 @@ test('credential Id is created with correct network', () => {
     );
     expect(didMainnet).toEqual(
         'did:ccd:mainnet:sci:2:7/credentialEntry/4799ec95500850d9368ca012faf60e9d632d3b1768d608c7e5e3d53fe96d669a'
+    );
+});
+
+test('getContractAddressFromIssuerDID extracts contract address', () => {
+    const address = getContractAddressFromIssuerDID('did:ccd:testnet:sci:1337:42/issuer');
+    expect(address.index).toBe(1337n);
+    expect(address.subindex).toBe(42n);
+});
+
+test('getContractAddressFromIssuerDID extracts contract address without network', () => {
+    const address = getContractAddressFromIssuerDID('did:ccd:sci:1338:43/issuer');
+    expect(address.index).toBe(1338n);
+    expect(address.subindex).toBe(43n);
+});
+
+test('getVerifiableCredentialPublicKeyfromSubjectDID extracts public key', () => {
+    const publicKey = getVerifiableCredentialPublicKeyfromSubjectDID(
+        'did:ccd:testnet:sci:1337:42/credentialEntry/76ada0ebd1e8aa5a651a0c4ac1ad3b62d3040f693722f94d61efa4fdd6ee797d'
+    );
+    expect(publicKey).toBe('76ada0ebd1e8aa5a651a0c4ac1ad3b62d3040f693722f94d61efa4fdd6ee797d');
+});
+
+test('getVerifiableCredentialPublicKeyfromSubjectDID extracts public key without network', () => {
+    const publicKey = getVerifiableCredentialPublicKeyfromSubjectDID(
+        'did:ccd:sci:1337:42/credentialEntry/76ada0ebd1e8aa5a651a0c4ac1ad3b62d3040f693722f94d61efa4fdd6ee797d'
+    );
+    expect(publicKey).toBe('76ada0ebd1e8aa5a651a0c4ac1ad3b62d3040f693722f94d61efa4fdd6ee797d');
+});
+
+test('getCredentialIdFromSubjectDID extracts credId', () => {
+    const credId = getCredentialIdFromSubjectDID(
+        'did:ccd:testnet:cred:aad98095db73b5b22f7f64823a495c6c57413947353646313dc453fa4604715d2f93b2c1f8cb4c9625edd6330e1d27fa'
+    );
+    expect(credId).toBe(
+        'aad98095db73b5b22f7f64823a495c6c57413947353646313dc453fa4604715d2f93b2c1f8cb4c9625edd6330e1d27fa'
+    );
+});
+
+test('getCredentialIdFromSubjectDID extracts credId without network', () => {
+    const credId = getCredentialIdFromSubjectDID(
+        'did:ccd:cred:aad98095db73b5b22f7f64823a495c6c57413947353646313dc453fa4604715d2f93b2c1f8cb4c9625edd6330e1d27fa'
+    );
+    expect(credId).toBe(
+        'aad98095db73b5b22f7f64823a495c6c57413947353646313dc453fa4604715d2f93b2c1f8cb4c9625edd6330e1d27fa'
     );
 });
