@@ -48,8 +48,8 @@ function useStatementValue(statement: SecretStatementV2, schema: VerifiableCrede
     if (statement.type === StatementTypes.AttributeNotInSet) {
         return t('nonMembership', { name });
     }
-    // TODO What to do here?
-    return '';
+
+    throw new Error('Unknown statement type');
 }
 
 export function useStatementDescription(statement: SecretStatementV2, schema: VerifiableCredentialSchema) {

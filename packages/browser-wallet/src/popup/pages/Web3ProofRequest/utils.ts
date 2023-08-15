@@ -12,6 +12,7 @@ import {
     ContractAddress,
     CommitmentInput,
     createWeb3IdDID,
+    StatementTypes,
 } from '@concordium/web-sdk';
 import { isIdentityOfCredential } from '@shared/utils/identity-helpers';
 import { ConfirmedIdentity, CreationStatus, VerifiableCredential, WalletCredential } from '@shared/storage/types';
@@ -72,7 +73,7 @@ export function getCommitmentInput(
     wallet: ConcordiumHdWallet,
     identities: ConfirmedIdentity[],
     credentials: WalletCredential[],
-    verifiableCredentials: VerifiableCredential[],
+    verifiableCredentials: VerifiableCredential[]
 ): CommitmentInput {
     if (statement.type) {
         const cred = verifiableCredentials?.find((c) => c.id === statement.id);
@@ -134,6 +135,22 @@ export function getViableAccountCredentialsForStatement(
     });
 }
 
+function doesCredentialSatisfyStatement(statement: AtomicStatementV2, cred: VerifiableCredential): boolean {
+    const value = cred.credentialSubject.attributes[statement.attributeTag];
+    switch (statement.type) {
+        case StatementTypes.AttributeInRange:
+            return statement.lower <= value && statement.upper > value;
+        case StatementTypes.AttributeInSet:
+            return statement.set.includes(value);
+        case StatementTypes.AttributeNotInSet:
+            return !statement.set.includes(value);
+        case StatementTypes.RevealAttribute:
+            return value !== undefined;
+        default:
+            throw new Error('Unknown statementType encountered');
+    }
+}
+
 /**
  * Given a credential statement for a verifiable credential, and a list of verifiable credentials, return the filtered list of verifiable credentials that satisfy the statement.
  */
@@ -143,8 +160,11 @@ export function getViableWeb3IdCredentialsForStatement(
 ): VerifiableCredential[] {
     // TODO check that credentials are active (maybe before this instead for each statement)
     const allowedContracts = credentialStatement.idQualifier.issuers;
-    return verifiableCredentials?.filter((vc) =>
+    const allowedCredentials = verifiableCredentials?.filter((vc) =>
         allowedContracts.some((address) => BigInt(address.index) === getContractAddressFromIssuerDID(vc.issuer).index)
+    );
+    return allowedCredentials.filter((cred) =>
+        credentialStatement.statement.every((stm) => doesCredentialSatisfyStatement(stm, cred))
     );
 }
 
