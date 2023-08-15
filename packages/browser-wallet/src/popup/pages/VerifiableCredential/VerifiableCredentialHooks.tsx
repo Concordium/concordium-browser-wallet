@@ -1,5 +1,5 @@
 import { grpcClientAtom } from '@popup/store/settings';
-import { VerifiableCredential, VerifiableCredentialSchema, VerifiableCredentialStatus } from '@shared/storage/types';
+import { VerifiableCredential, VerifiableCredentialStatus, VerifiableCredentialSchema } from '@shared/storage/types';
 import {
     CredentialQueryResponse,
     VerifiableCredentialMetadata,
@@ -54,7 +54,7 @@ export function useCredentialSchema(credential: VerifiableCredential) {
             }
             setSchema(schemaValue);
         }
-    }, [schemas]);
+    }, [schemas.loading]);
 
     return schema;
 }
@@ -115,7 +115,7 @@ export function useCredentialMetadata(credential: VerifiableCredential) {
  * @param dataFetcher the function that fetches updated data
  */
 export function useFetchingEffect<T>(
-    credentials: VerifiableCredential[] | undefined,
+    credentials: AsyncWrapper<VerifiableCredential[]>,
     storedData: AsyncWrapper<Record<string, T>>,
     setStoredData: (update: Record<string, T>) => Promise<void>,
     dataFetcher: (
@@ -131,8 +131,8 @@ export function useFetchingEffect<T>(
         let isCancelled = false;
         const abortControllers: AbortController[] = [];
 
-        if (credentials && !storedData.loading) {
-            dataFetcher(credentials, client, abortControllers, storedData.value).then((result) => {
+        if (!credentials.loading && credentials.value.length !== 0 && !storedData.loading) {
+            dataFetcher(credentials.value, client, abortControllers, storedData.value).then((result) => {
                 if (!isCancelled && result.updateReceived) {
                     setStoredData(result.data);
                 }
@@ -143,5 +143,5 @@ export function useFetchingEffect<T>(
             isCancelled = true;
             abortControllers.forEach((controller) => controller.abort());
         };
-    }, [storedData.loading, credentials, client]);
+    }, [storedData.loading, credentials.loading]);
 }

@@ -17,6 +17,8 @@ export enum MessageType {
     AddTokens = 'M_AddTokens',
     IdProof = 'M_IdProof',
     ConnectAccounts = 'M_ConnectAccounts',
+    AddWeb3IdCredential = 'M_AddWeb3IdCredential',
+    AddWeb3IdCredentialFinish = 'M_AddWeb3IdCredentialFinish',
 }
 
 /**
@@ -39,6 +41,7 @@ export enum InternalMessageType {
     IdProof = 'I_IdProof',
     CreateIdProof = 'I_CreateIdProof',
     ConnectAccounts = 'I_ConnectAccounts',
+    AddWeb3IdCredential = 'I_AddWeb3IdCredential',
 }
 
 // eslint-disable-next-line @typescript-eslint/no-explicit-any

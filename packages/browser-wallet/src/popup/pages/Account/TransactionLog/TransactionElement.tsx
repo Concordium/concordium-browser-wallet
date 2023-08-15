@@ -68,7 +68,7 @@ function isTransferTransaction(type: AccountTransactionType) {
         case AccountTransactionType.TransferToEncrypted:
         case AccountTransactionType.TransferToPublic:
         case AccountTransactionType.TransferWithSchedule:
-        case AccountTransactionType.TransferWithScheduleWithMemo:
+        case AccountTransactionType.TransferWithScheduleAndMemo:
         case AccountTransactionType.EncryptedAmountTransfer:
         case AccountTransactionType.EncryptedAmountTransferWithMemo:
             return true;
@@ -147,7 +147,7 @@ function mapTypeToText(type: AccountTransactionType | RewardType | SpecialTransa
             return 'Transfer';
         case AccountTransactionType.EncryptedAmountTransferWithMemo:
             return 'Shielded transfer';
-        case AccountTransactionType.TransferWithScheduleWithMemo:
+        case AccountTransactionType.TransferWithScheduleAndMemo:
             return 'Scheduled transfer';
         case AccountTransactionType.ConfigureBaker:
             return 'Configure baker';

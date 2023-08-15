@@ -23,12 +23,21 @@ import { VerifiableCredentialCard } from './VerifiableCredentialCard';
 import VerifiableCredentialDetails from './VerifiableCredentialDetails';
 
 /**
+ * Component to display while loading verifiable credentials from storage.
+ */
+function LoadingVerifiableCredentials() {
+    return <div className="verifiable-credential-list" />;
+}
+
+/**
  * Component to display when there are no verifiable credentials in the wallet.
  */
 function NoVerifiableCredentials() {
     return (
-        <div className="flex-column align-center h-full">
-            <p className="m-t-20 m-h-30">You do not have any verifiable credentials in your wallet.</p>
+        <div className="verifiable-credential-list">
+            <div className="flex-column align-center h-full">
+                <p className="m-t-20 m-h-30">You do not have any verifiable credentials in your wallet.</p>
+            </div>
         </div>
     );
 }
@@ -36,8 +45,10 @@ function NoVerifiableCredentials() {
 function VerifiableCredentialCardWithStatusFromChain({
     credential,
     onClick,
+    className,
 }: {
     credential: VerifiableCredential;
+    className: string;
     onClick?: (
         status: VerifiableCredentialStatus,
         schema: VerifiableCredentialSchema,
@@ -55,8 +66,9 @@ function VerifiableCredentialCardWithStatusFromChain({
 
     return (
         <VerifiableCredentialCard
-            credential={credential}
+            credentialSubject={credential.credentialSubject}
             schema={schema}
+            className={className}
             onClick={() => {
                 if (onClick) {
                     onClick(status, schema, metadata);
@@ -99,13 +111,17 @@ export default function VerifiableCredentialList() {
         getChangesToCredentialSchemas
     );
 
-    if (!verifiableCredentials || !verifiableCredentials.length) {
+    if (verifiableCredentials.loading) {
+        return <LoadingVerifiableCredentials />;
+    }
+    if (verifiableCredentials.value.length === 0) {
         return <NoVerifiableCredentials />;
     }
 
     if (selected) {
         return (
             <VerifiableCredentialDetails
+                className="verifiable-credential-list__card"
                 credential={selected.credential}
                 schema={selected.schema}
                 status={selected.status}
@@ -119,10 +135,11 @@ export default function VerifiableCredentialList() {
         <>
             <Topbar title={t('topbar.list')} backButton={{ show: false }} />
             <div className="verifiable-credential-list">
-                {verifiableCredentials.map((credential) => {
+                {verifiableCredentials.value.map((credential) => {
                     return (
                         <VerifiableCredentialCardWithStatusFromChain
                             key={credential.id}
+                            className="verifiable-credential-list__card"
                             credential={credential}
                             onClick={(
                                 status: VerifiableCredentialStatus,

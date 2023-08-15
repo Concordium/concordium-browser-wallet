@@ -18,10 +18,13 @@ function Header() {
             return t('header.connect');
         }
         if (pathname.startsWith(absoluteRoutes.prompt.connectAccountsRequest.path)) {
-            return t('header.connectAccountsRequest');
+            return t('header.allowlistingRequest');
         }
         if (pathname.startsWith(absoluteRoutes.prompt.addTokens.path)) {
             return t('header.addTokens');
+        }
+        if (pathname.startsWith(absoluteRoutes.prompt.addWeb3IdCredential.path)) {
+            return t('header.addWeb3IdCredential');
         }
         if (pathname.startsWith(absoluteRoutes.prompt.idProof.path)) {
             return t('header.idProof');

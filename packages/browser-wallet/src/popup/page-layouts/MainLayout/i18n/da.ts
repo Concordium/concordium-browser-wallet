@@ -18,6 +18,8 @@ const t: typeof en = {
             passcode: 'Skift adgangskode',
             about: 'Om',
         },
+        addWeb3IdCredential: 'Tilføj Web3Id Credential',
+        connectAccountsRequest: 'Forbind konti',
         addTokens: 'Tilføj tokens',
         idProof: 'Bevis for identitet',
         request: 'Anmodning om Signatur',

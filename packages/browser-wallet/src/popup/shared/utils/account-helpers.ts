@@ -51,6 +51,17 @@ export function useCredential(accountAddress?: string) {
     }, [accountAddress, JSON.stringify(credentials)]);
 }
 
+export function useCredentialByCredId(credId?: string) {
+    const credentials = useAtomValue(credentialsAtom);
+
+    return useMemo(() => {
+        if (!credId) {
+            return undefined;
+        }
+        return credentials.find((cred) => cred.credId === credId);
+    }, [credId, JSON.stringify(credentials)]);
+}
+
 export function useSelectedCredential() {
     const selectedAccount = useAtomValue(selectedAccountAtom);
     return useCredential(selectedAccount);

@@ -17,11 +17,20 @@ import {
     getRevokeTransactionExecutionEnergyEstimate,
 } from '@shared/utils/verifiable-credential-helpers';
 import { fetchContractName } from '@shared/utils/token-helpers';
+import { ClassName } from 'wallet-common-helpers';
 import { accountRoutes } from '../Account/routes';
 import { ConfirmGenericTransferState } from '../Account/ConfirmGenericTransfer';
 import RevokeIcon from '../../../assets/svg/revoke.svg';
 import { useCredentialEntry } from './VerifiableCredentialHooks';
 import { VerifiableCredentialCard } from './VerifiableCredentialCard';
+
+interface CredentialDetailsProps extends ClassName {
+    credential: VerifiableCredential;
+    status: VerifiableCredentialStatus;
+    metadata: VerifiableCredentialMetadata;
+    schema: VerifiableCredentialSchema;
+    backButtonOnClick: () => void;
+}
 
 export default function VerifiableCredentialDetails({
     credential,
@@ -29,13 +38,8 @@ export default function VerifiableCredentialDetails({
     metadata,
     schema,
     backButtonOnClick,
-}: {
-    credential: VerifiableCredential;
-    status: VerifiableCredentialStatus;
-    metadata: VerifiableCredentialMetadata;
-    schema: VerifiableCredentialSchema;
-    backButtonOnClick: () => void;
-}) {
+    className,
+}: CredentialDetailsProps) {
     const nav = useNavigate();
     const { pathname } = useLocation();
     const { t } = useTranslation('verifiableCredential');
@@ -55,8 +59,9 @@ export default function VerifiableCredentialDetails({
             throw new Error(`Unable to find contract name for address: ${contractAddress}`);
         }
 
-        // TODO Select the correct key.
-        const signingKey = '741C117235A8F23AC9EB196B6A53FCD2C808691398407F7357548B7D437FC734';
+        const signingKey = hdWallet
+            .getVerifiableCredentialSigningKey(contractAddress, credential.index)
+            .toString('hex');
 
         const parameters = await buildRevokeTransactionParameters(
             contractAddress,
@@ -117,7 +122,8 @@ export default function VerifiableCredentialDetails({
             />
             <div className="verifiable-credential-list">
                 <VerifiableCredentialCard
-                    credential={credential}
+                    className={className}
+                    credentialSubject={credential.credentialSubject}
                     schema={schema}
                     credentialStatus={status}
                     metadata={metadata}
