@@ -232,6 +232,21 @@ provider.addWeb3IdCredential(credential, metadataUrl, async (id) => {
 });
 ```
 
+### Request Verifiable Presentation for web3Id statements
+
+It is possible to request a verifiable presentation for a given set of web3Id statements. The function takes 2 arguments. A challenge to ensure that the proof was not generated for a different context, and the statements to be proven. This method returns a Promise resolving with the verifiable presentation for the statements.
+
+If the wallet is locked, or you have not connected with the wallet (or previously been whitelisted) or if the user rejects proving the statement, the Promise will reject.
+
+The following exemplifies requesting a verifiable presentation for a statement named myIdStatement (To see how to create a statement check out our documentation) with a challenge of "12346789ABCD".
+
+```typescript
+const statement = myIdStatement;
+const challenge = '12346789ABCD';
+const provider = await detectConcordiumProvider();
+const verifiablePresentation = await provider.requestVerifiablePresentation(challenge, statement);
+```
+
 ## Events
 
 ### Account changed
