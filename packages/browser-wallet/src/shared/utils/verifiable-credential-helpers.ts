@@ -608,7 +608,7 @@ export async function getChangesToCredentialMetadata(
     let updateReceived = false;
 
     for (const updatedMetadata of upToDateCredentialMetadata) {
-        if (storedMetadata.value === undefined) {
+        if (Object.keys(updatedStoredMetadata).length === 0) {
             updatedStoredMetadata = {
                 [updatedMetadata.url]: updatedMetadata.metadata,
             };
@@ -635,7 +635,7 @@ export async function getChangesToCredentialSchemas(
     let updateReceived = false;
 
     for (const updatedSchema of upToDateSchemas) {
-        if (storedSchemas === undefined) {
+        if (Object.keys(updatedSchemasInStorage).length === 0) {
             updatedSchemasInStorage = {
                 [updatedSchema.$id]: updatedSchema,
             };
