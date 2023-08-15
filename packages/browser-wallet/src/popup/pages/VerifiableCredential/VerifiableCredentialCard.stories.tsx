@@ -48,7 +48,6 @@ const schema: VerifiableCredentialSchema = {
                             description: 'Graduation date',
                         },
                     },
-                    required: [],
                 },
             },
             required: ['id'],

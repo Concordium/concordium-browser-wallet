@@ -109,7 +109,7 @@ export default function AddWeb3IdCredential({ onAllow, onReject }: Props) {
         }
         // Find the next unused index
         // TODO verify index is unused on chain?
-        const index = [...(web3IdCredentials || []), ...(storedWeb3IdCredentials || [])].reduce(
+        const index = [...(web3IdCredentials || []), ...(storedWeb3IdCredentials.value || [])].reduce(
             (best, cred) => (cred.issuer === credential.issuer ? Math.max(cred.index + 1, best) : best),
             0
         );
