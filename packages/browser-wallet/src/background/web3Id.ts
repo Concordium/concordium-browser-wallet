@@ -2,7 +2,9 @@ import {
     CredentialStatements,
     getVerifiablePresentation,
     Web3IdProofInput,
-    createConcordiumClient, verifyWeb3IdCredentialSignature, isHex, verifyAtomicStatements
+    createConcordiumClient,
+    verifyWeb3IdCredentialSignature,
+    isHex,
 } from '@concordium/web-sdk';
 import {
     sessionVerifiableCredentials,
@@ -166,16 +168,19 @@ export const runIfValidWeb3IdProof: RunCondition<MessageStatusWrapper<undefined>
         };
     }
     try {
-        const statements: CredentialStatements  = parse(msg.payload.statements);
-        // TODO Fix second parameter when SDK is updated
-        // If a statement does not verify, an error is thrown.
-        statements.every((credStatement) => verifyAtomicStatements(credStatement.statement, undefined as any));
+        const statements: CredentialStatements = parse(msg.payload.statements);
+        // TODO Enable when SDK is updated
+        // // If a statement does not verify, an error is thrown.
+        // statements.every((credStatement) => verifyAtomicStatements(credStatement.statement));
 
         const noEmptyQualifier = statements.every((credStatement) => credStatement.idQualifier.issuers.length > 0);
         if (!noEmptyQualifier) {
             return {
                 run: false,
-                response: { success: false, message: `Statements must have at least 1 possible identity provider / issuer` },
+                response: {
+                    success: false,
+                    message: `Statements must have at least 1 possible identity provider / issuer`,
+                },
             };
         }
         return { run: true };
