@@ -31,6 +31,7 @@ import {
 } from './utils';
 
 function getPropertyTitle(attributeTag: string, schema: VerifiableCredentialSchema) {
+    // TODO use localization here
     const property = schema.properties.credentialSubject.properties.attributes.properties[attributeTag];
     return property.title;
 }
@@ -65,7 +66,7 @@ export function useStatementDescription(statement: SecretStatementV2, schema: Ve
         case StatementTypes.AttributeNotInSet:
             return t('nonMembership', { name, setNames: listToString(statement.set) });
         default:
-            return undefined;
+            throw new Error('Unknown statement type encountered: ' + statement.type);
     }
 }
 
@@ -117,9 +118,9 @@ export function DisplayWeb3RevealStatement({
 
     const lines: StatementLine[] = statements.map((s) => {
         const { value } = attributes[s.attributeTag];
-        const property = schema.properties.credentialSubject.properties.attributes.properties[s.attributeTag];
+        const title = getPropertyTitle(s.attributeTag, schema);
         return {
-            attribute: property.title,
+            attribute: title,
             value: value.toString() ?? 'Unavailable',
             isRequirementMet: value !== undefined,
         };
@@ -137,12 +138,12 @@ export function DisplayWeb3SecretStatement({
     const { t } = useTranslation('web3IdProofRequest', { keyPrefix: 'displayStatement' });
     const value = useStatementValue(statements, schema);
     const header = t('headers.secret');
-    const property = schema.properties.credentialSubject.properties.attributes.properties[statements.attributeTag];
+    const title = getPropertyTitle(statements.attributeTag, schema);
     const description = useStatementDescription(statements, schema);
 
     const lines: StatementLine[] = [
         {
-            attribute: property.title,
+            attribute: title,
             value,
             isRequirementMet: value !== undefined,
         },
@@ -175,11 +176,11 @@ export default function DisplayWeb3Statement({
     const verifiableCredentialSchemas = useAtomValue(storedVerifiableCredentialSchemasAtom);
 
     const validCredentials = useMemo(() => {
-        if (!verifiableCredentials) {
+        if (verifiableCredentials.loading) {
             return [];
         }
         return getViableWeb3IdCredentialsForStatement(credentialStatement, verifiableCredentials.value);
-    }, [credentialStatement.idQualifier.issuers]);
+    }, [verifiableCredentials.loading]);
 
     const [chosenCredential, setChosenCredential] = useState<VerifiableCredential | undefined>(validCredentials[0]);
 

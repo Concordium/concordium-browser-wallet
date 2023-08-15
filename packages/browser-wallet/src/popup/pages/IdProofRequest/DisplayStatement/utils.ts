@@ -253,8 +253,13 @@ export function getStatementDescription(
     return undefined;
 }
 
-export function useStatementDescription(statement: SecretStatement, identity: ConfirmedIdentity): string | undefined {
+export function useStatementDescription(statement: SecretStatement, identity?: ConfirmedIdentity): string | undefined {
     const { t, i18n } = useTranslation('idProofRequest', { keyPrefix: 'displayStatement.descriptions' });
+
+    if (!identity) {
+        // TODO Should we write something here?
+        return '';
+    }
     const hasAttribute = identity.idObject.value.attributeList.chosenAttributes[statement.attributeTag] !== undefined;
 
     if (!hasAttribute) {

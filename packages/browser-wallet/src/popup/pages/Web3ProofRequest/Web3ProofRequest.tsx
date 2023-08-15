@@ -80,8 +80,8 @@ export default function Web3ProofRequest({ onReject, onSubmit }: Props) {
         if (!network) {
             throw new Error('Network is not specified');
         }
-        if (!ids.every((x) => Boolean(x))) {
-            throw new Error('Network is not specified');
+        if (!canProve) {
+            throw new Error('The statements are not satisfied and cannot be proven');
         }
 
         const global = await getGlobal(client);
@@ -97,7 +97,7 @@ export default function Web3ProofRequest({ onReject, onSubmit }: Props) {
         });
 
         const commitmentInputs = parsedStatements.map((statement) =>
-            getCommitmentInput(statement, wallet, identities.value, credentials, verifiableCredentials.value || [])
+            getCommitmentInput(statement, wallet, identities.value, credentials, verifiableCredentials.value)
         );
 
         const request = {
@@ -120,7 +120,7 @@ export default function Web3ProofRequest({ onReject, onSubmit }: Props) {
             throw new Error(result.reason);
         }
         return result.proof;
-    }, [recoveryPhrase, network, ids, verifiableCredentials.loading, identities.loading]);
+    }, [recoveryPhrase, network, ids, verifiableCredentials.loading, identities.loading, canProve]);
 
     useEffect(() => onClose(onReject), [onClose, onReject]);
 

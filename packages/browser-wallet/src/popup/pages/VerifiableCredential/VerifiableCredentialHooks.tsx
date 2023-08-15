@@ -98,7 +98,7 @@ export function useCredentialMetadata(credential?: VerifiableCredential) {
             const storedCredentialMetadata = storedMetadata.value[credentialEntry.credentialInfo.metadataUrl.url];
             if (!storedCredentialMetadata) {
                 throw new Error(
-                    `Attempted to find credential metadata for credentialId: ${credential?.id} but none was found!`
+                    `Attempted to find credential metadata for credentialId: ${credentialEntry.credentialInfo.credentialHolderId} but none was found!`
                 );
             }
             setMetadata(storedCredentialMetadata);

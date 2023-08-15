@@ -21,6 +21,7 @@ import {
     getCredentialIdFromSubjectDID,
     getVerifiableCredentialPublicKeyfromSubjectDID,
 } from '@shared/utils/verifiable-credential-helpers';
+import { areContractAddressesEqual } from '@shared/utils/contract-helpers';
 
 export type SecretStatementV2 = Exclude<AtomicStatementV2, RevealStatementV2>;
 
@@ -31,32 +32,12 @@ export interface DisplayCredentialStatementProps<Statement> extends ClassName {
     net: Network;
 }
 
-/**
- * Build the commitmentInputs required to create a presentation for the given statement.
- */
-export function getCommitmentInput(
+function getAccountCredentialCommitmentInput(
     statement: RequestStatement,
     wallet: ConcordiumHdWallet,
     identities: ConfirmedIdentity[],
     credentials: WalletCredential[],
-    verifiableCredentials: VerifiableCredential[]
-): CommitmentInput {
-    if (statement.type) {
-        const cred = verifiableCredentials?.find((c) => c.id === statement.id);
-
-        if (!cred) {
-            throw new Error('IdQualifier not fulfilled');
-        }
-
-        return createWeb3CommitmentInputWithHdWallet(
-            wallet,
-            getContractAddressFromIssuerDID(cred.issuer),
-            cred.index,
-            cred.credentialSubject,
-            cred.randomness,
-            cred.signature
-        );
-    }
+) {
     const credId = getCredentialIdFromSubjectDID(statement.id);
     const credential = credentials.find((cred) => cred.credId === credId);
 
@@ -75,9 +56,47 @@ export function getCommitmentInput(
         identity.providerIndex,
         identity.idObject.value.attributeList,
         wallet,
-        identity.providerIndex,
+        identity.index,
         credential.credNumber
     );
+}
+
+function createWeb3CommitmentInput(
+    statement: RequestStatement,
+    wallet: ConcordiumHdWallet,
+    verifiableCredentials: VerifiableCredential[]
+) {
+    const cred = verifiableCredentials?.find((c) => c.id === statement.id);
+
+    if (!cred) {
+        throw new Error('IdQualifier not fulfilled');
+    }
+
+    return createWeb3CommitmentInputWithHdWallet(
+        wallet,
+        getContractAddressFromIssuerDID(cred.issuer),
+        cred.index,
+        cred.credentialSubject,
+        cred.randomness,
+        cred.signature
+    );
+}
+
+/**
+ * Build the commitmentInputs required to create a presentation for the given statement.
+ */
+export function getCommitmentInput(
+    statement: RequestStatement,
+    wallet: ConcordiumHdWallet,
+    identities: ConfirmedIdentity[],
+    credentials: WalletCredential[],
+    verifiableCredentials: VerifiableCredential[]
+): CommitmentInput {
+    // TODO replace with isVerifiableCredentialRequestStatement when SDK is updated
+    if (statement.type) {
+        return createWeb3CommitmentInput(statement, wallet, verifiableCredentials);
+    }
+    return getAccountCredentialCommitmentInput(statement, wallet, identities, credentials);
 }
 
 /**
@@ -93,7 +112,7 @@ export function getViableAccountCredentialsForStatement(
     return credentials?.filter((c) => {
         if (allowedIssuers.includes(c.providerIndex)) {
             const identity = (identities || []).find((id) => isIdentityOfCredential(id)(c));
-            if (identity && identity.status === CreationStatus.Confirmed) {
+            if (identity) {
                 return canProveCredentialStatement(credentialStatement, identity.idObject.value.attributeList);
             }
         }
@@ -101,6 +120,7 @@ export function getViableAccountCredentialsForStatement(
     });
 }
 
+// TODO Replace with canProveAtomicStatement when SDK is updated
 function doesCredentialSatisfyStatement(statement: AtomicStatementV2, cred: VerifiableCredential): boolean {
     const value = cred.credentialSubject.attributes[statement.attributeTag];
     switch (statement.type) {
@@ -127,8 +147,9 @@ export function getViableWeb3IdCredentialsForStatement(
     // TODO check that credentials are active (maybe before this instead for each statement)
     const allowedContracts = credentialStatement.idQualifier.issuers;
     const allowedCredentials = verifiableCredentials?.filter((vc) =>
-        allowedContracts.some((address) => BigInt(address.index) === getContractAddressFromIssuerDID(vc.issuer).index)
+        allowedContracts.some((address) =>  areContractAddressesEqual(address, getContractAddressFromIssuerDID(vc.issuer)))
     );
+
     return allowedCredentials.filter((cred) =>
         credentialStatement.statement.every((stm) => doesCredentialSatisfyStatement(stm, cred))
     );

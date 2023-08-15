@@ -18,5 +18,6 @@ export function DisplayCredentialStatement({
     if (isVerifiableCredentialStatement(credentialStatement)) {
         return <DisplayWeb3Statement credentialStatement={credentialStatement} {...params} />;
     }
-    return null;
+
+    throw new Error('Invalid Statement encountered');
 }

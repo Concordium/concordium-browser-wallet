@@ -157,9 +157,6 @@ export const createWeb3IdProofHandler: ExtensionMessageHandler = (msg, _sender, 
     return true;
 };
 
-/**
- * Run condition which looks up URL in connected sites for the provided account. Runs handler if URL is included in connected sites.
- */
 export const runIfValidWeb3IdProof: RunCondition<MessageStatusWrapper<undefined>> = async (msg) => {
     if (!isHex(msg.payload.challenge)) {
         return {

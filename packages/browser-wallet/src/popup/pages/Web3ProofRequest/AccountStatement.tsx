@@ -23,9 +23,9 @@ import { DisplayStatementView, StatementLine } from '../IdProofRequest/DisplaySt
 import CredentialSelector from './CredentialSelector';
 import { DisplayCredentialStatementProps, getViableAccountCredentialsForStatement, SecretStatementV2 } from './utils';
 import {
-    getStatementDescription,
     isoToCountryName,
     SecretStatement,
+    useStatementDescription,
     useStatementHeader,
     useStatementName,
     useStatementValue,
@@ -36,21 +36,6 @@ type DisplaySecretStatementV2Props = ClassName & {
     dappName: string;
     statement: SecretStatementV2;
 };
-
-export function useStatementDescription(statement: SecretStatement, identity?: ConfirmedIdentity): string | undefined {
-    const { t, i18n } = useTranslation('idProofRequest', { keyPrefix: 'displayStatement.descriptions' });
-
-    if (!identity) {
-        // TODO Should we write something here?
-        return '';
-    }
-    const hasAttribute = identity.idObject.value.attributeList.chosenAttributes[statement.attributeTag] !== undefined;
-    if (!hasAttribute) {
-        return t('missingAttribute', { identityName: identity.name });
-    }
-
-    return getStatementDescription(statement, t, i18n.resolvedLanguage);
-}
 
 export function DisplaySecretStatementV2({ dappName, statement, identity, className }: DisplaySecretStatementV2Props) {
     const v1Statement: SecretStatement = statement as SecretStatement;
