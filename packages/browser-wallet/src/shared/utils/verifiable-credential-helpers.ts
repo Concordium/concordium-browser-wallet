@@ -78,7 +78,7 @@ export async function getVerifiableCredentialStatus(client: ConcordiumGRPCClient
     const contractAddress = getCredentialRegistryContractAddress(credentialId);
     const instanceInfo = await client.getInstanceInfo(contractAddress);
     if (instanceInfo === undefined) {
-        return undefined;
+        throw new Error('Given contract address was not a created instance');
     }
 
     const result = await client.invokeContract({

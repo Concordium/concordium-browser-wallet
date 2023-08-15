@@ -21,6 +21,7 @@ import idProofRequest from '@popup/pages/IdProofRequest/i18n/en';
 import allowlist from '@popup/pages/Allowlist/i18n/en';
 import connectAccountsRequest from '@popup/pages/ConnectAccountsRequest/i18n/en';
 import addWeb3IdCredential from '@popup/pages/AddWeb3IdCredential/i18n/en';
+import verifiableCredential from '@popup/pages/VerifiableCredential/i18n/en';
 
 const t = {
     shared,
@@ -46,6 +47,7 @@ const t = {
     allowlist,
     connectAccountsRequest,
     addWeb3IdCredential,
+    verifiableCredential,
 };
 
 export default t;
