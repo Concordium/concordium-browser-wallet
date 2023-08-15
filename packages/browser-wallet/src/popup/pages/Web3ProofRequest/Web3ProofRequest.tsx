@@ -136,6 +136,7 @@ export default function Web3ProofRequest({ onReject, onSubmit }: Props) {
                     dappName={dappName}
                     credentialStatement={statements[currentStatementIndex]}
                     net={net}
+                    key={currentStatementIndex}
                     setChosenId={(newId) =>
                         setIds((currentIds) => {
                             const newIds = [...currentIds];
