@@ -302,7 +302,7 @@ const verifiableCredentialMetadataSchema = {
         VerifiableCredentialMetadata: {
             additionalProperties: false,
             properties: {
-                background_color: {
+                backgroundColor: {
                     type: 'string',
                 },
                 image: {
@@ -321,7 +321,7 @@ const verifiableCredentialMetadataSchema = {
                     type: 'string',
                 },
             },
-            required: ['title', 'logo', 'background_color'],
+            required: ['title', 'logo', 'backgroundColor'],
             type: 'object',
         },
     },
@@ -330,7 +330,7 @@ const verifiableCredentialMetadataSchema = {
 export interface VerifiableCredentialMetadata {
     title: string;
     logo: MetadataUrl;
-    background_color: string;
+    backgroundColor: string;
     image?: MetadataUrl;
     localization?: Record<string, MetadataUrl>;
 }
