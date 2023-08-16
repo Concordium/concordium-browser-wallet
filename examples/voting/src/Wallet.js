@@ -46,7 +46,7 @@ export async function connect(client, setConnectedAccount) {
 // The smart contract voting module is deployed on the testnet chain.
 async function checkConnectedToTestnet(client) {
     return client
-        .getJsonRpcClient()
+        .getGrpcClient()
         .getCryptographicParameters(TESTNET_GENESIS_BLOCK_HASH.toString())
         .then((result) => {
             if (result === undefined || result?.value === null) {
@@ -96,7 +96,7 @@ export async function createElection(
 }
 
 export async function getView(client, contractIndex) {
-    return client.getJsonRpcClient().invokeContract({
+    return client.getGrpcClient().invokeContract({
         contract: { index: BigInt(contractIndex), subindex: BigInt(0) },
         method: 'voting.view',
     });
@@ -115,7 +115,7 @@ export async function getVotes(client, contractIndex, numOptions) {
             toBuffer(RAW_SCHEMA_BASE64, 'base64')
         );
 
-        const promise = client.getJsonRpcClient().invokeContract({
+        const promise = client.getGrpcClient().invokeContract({
             contract: { index: BigInt(contractIndex), subindex: BigInt(0) },
             method: 'voting.getNumberOfVotes',
             parameter: param,

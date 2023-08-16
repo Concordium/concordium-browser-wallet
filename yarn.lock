@@ -2065,6 +2065,26 @@ __metadata:
   languageName: node
   linkType: hard
 
+"@concordium/common-sdk@npm:9.0.0":
+  version: 9.0.0
+  resolution: "@concordium/common-sdk@npm:9.0.0"
+  dependencies:
+    "@concordium/rust-bindings": 1.1.0
+    "@grpc/grpc-js": ^1.3.4
+    "@noble/ed25519": ^1.7.1
+    "@protobuf-ts/runtime-rpc": ^2.8.2
+    "@scure/bip39": ^1.1.0
+    bs58check: ^2.1.2
+    buffer: ^6.0.3
+    cross-fetch: 3.1.5
+    hash.js: ^1.1.7
+    iso-3166-1: ^2.1.1
+    json-bigint: ^1.0.0
+    uuid: ^8.3.2
+  checksum: b640846415dfb18b4bb549519ab7fa7825c6b5e84adf1cfaeeea89bb54341e5176e71f00b732ea9bb375aac938842434ab1d6d5ffe2a5f360efc236ea5b0ef4a
+  languageName: node
+  linkType: hard
+
 "@concordium/react-components@npm:^0.2.0":
   version: 0.2.0
   resolution: "@concordium/react-components@npm:0.2.0"
@@ -2087,6 +2107,13 @@ __metadata:
   version: 1.0.0
   resolution: "@concordium/rust-bindings@npm:1.0.0"
   checksum: f13a9ff622d45974eb6b49261291ef726faba888867d9beeb4a754200d0666c8fba6c983db5481c45d1f6ff3256716e6fae65b7f572c826417a0595e384e828c
+  languageName: node
+  linkType: hard
+
+"@concordium/rust-bindings@npm:1.1.0":
+  version: 1.1.0
+  resolution: "@concordium/rust-bindings@npm:1.1.0"
+  checksum: 4890306b5df5fb85012cc6c6a6daf15ec1d24c528ac487a4547e8758738a1205b2386a1d4b015dc45312811466d853819edff4b9921d3674afe13ade5cacc061
   languageName: node
   linkType: hard
 
@@ -2126,6 +2153,20 @@ __metadata:
     buffer: ^6.0.3
     process: ^0.11.10
   checksum: 779bb90cb7e5bfa25ad5bd0fa40447fc1fd92acc1b4bc24ac78f5c0010a0ff282a2db00153a84239328290b21c91d5d21364c54aac7404a81e7ad58a74daa597
+  languageName: node
+  linkType: hard
+
+"@concordium/web-sdk@npm:^6.0.0":
+  version: 6.0.0
+  resolution: "@concordium/web-sdk@npm:6.0.0"
+  dependencies:
+    "@concordium/common-sdk": 9.0.0
+    "@concordium/rust-bindings": 1.1.0
+    "@grpc/grpc-js": ^1.3.4
+    "@protobuf-ts/grpcweb-transport": ^2.8.2
+    buffer: ^6.0.3
+    process: ^0.11.10
+  checksum: 23cfda2813ed86ed165f427edab237e5c20af70405d450541479294a1093b60843ce9d7f8a2dbeb69e174e0aed0ec51bee109e0fb7e22f121bff5c11c4bb24de
   languageName: node
   linkType: hard
 
@@ -22171,7 +22212,7 @@ __metadata:
   resolution: "voting@workspace:examples/voting"
   dependencies:
     "@concordium/browser-wallet-api-helpers": ^2.0.0
-    "@concordium/web-sdk": ^3.3.1
+    "@concordium/web-sdk": ^6.0.0
     "@types/node": ^18.7.23
     "@types/react": ^18.0.9
     "@types/react-dom": ^18.0.5
