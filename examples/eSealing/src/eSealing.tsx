@@ -156,7 +156,7 @@ export default function SEALING(props: WalletConnectionProps) {
 
     useEffect(() => {
         // View file record.
-        if (grpcClient && account && fileHashHex !== '') {
+        if (grpcClient && fileHashHex !== '') {
             viewFile(grpcClient, fileHashHex)
                 .then((record) => {
                     setGetFileError('');
@@ -169,7 +169,7 @@ export default function SEALING(props: WalletConnectionProps) {
                     setWitness('');
                 });
         }
-    }, [grpcClient, account, fileHashHex]);
+    }, [grpcClient, fileHashHex]);
 
     const [isRegisterFilePage, setIsRegisterFilePage] = useState(true);
     const [hash, setHash] = useState('');

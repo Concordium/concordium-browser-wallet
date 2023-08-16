@@ -1,5 +1,5 @@
 import { createContext } from 'react';
-import { AccountTransactionType, CcdAmount, UpdateContractPayload } from '@concordium/web-sdk';
+import { AccountTransactionType, CcdAmount } from '@concordium/web-sdk';
 import { WalletConnection, moduleSchemaFromBase64 } from '@concordium/react-components';
 import { E_SEALING_CONTRACT_NAME, E_SEALING_RAW_SCHEMA } from './constants';
 
@@ -24,7 +24,7 @@ export async function register(
             },
             receiveName: `${E_SEALING_CONTRACT_NAME}.registerFile`,
             maxContractExecutionEnergy: 30000n,
-        } as UpdateContractPayload,
+        },
         {
             parameters: fileHashHex,
             schema: moduleSchemaFromBase64(E_SEALING_RAW_SCHEMA),
