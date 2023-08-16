@@ -33,12 +33,16 @@ function LoadingVerifiableCredentials() {
  * Component to display when there are no verifiable credentials in the wallet.
  */
 function NoVerifiableCredentials() {
+    const { t } = useTranslation('verifiableCredential');
     return (
-        <div className="verifiable-credential-list">
-            <div className="flex-column align-center h-full">
-                <p className="m-t-20 m-h-30">You do not have any verifiable credentials in your wallet.</p>
+        <>
+            <Topbar title={t('topbar.list')} backButton={{ show: false }} />
+            <div className="verifiable-credential-list">
+                <div className="flex-column align-center">
+                    <p className="m-t-20 m-h-30">You do not have any verifiable credentials in your wallet.</p>
+                </div>
             </div>
-        </div>
+        </>
     );
 }
 
