@@ -91,7 +91,11 @@ export default function VerifiableCredentialDetails({
     }, [client, credential, hdWallet, credentialEntry, nav, pathname]);
 
     const menuButton: MenuButton | undefined = useMemo(() => {
-        if (credentialEntry === undefined || !credentialEntry.credentialInfo.holderRevocable) {
+        if (
+            credentialEntry === undefined ||
+            !credentialEntry.credentialInfo.holderRevocable ||
+            status === VerifiableCredentialStatus.Revoked
+        ) {
             return undefined;
         }
 
