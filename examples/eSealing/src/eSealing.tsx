@@ -4,10 +4,10 @@ import {
     toBuffer,
     deserializeReceiveReturnValue,
     serializeUpdateContractParameters,
-    JsonRpcClient,
+    ConcordiumGRPCClient,
 } from '@concordium/web-sdk';
 import sha256 from 'sha256';
-import { withJsonRpcClient, WalletConnectionProps, useConnection, useConnect } from '@concordium/react-components';
+import { useGrpcClient, TESTNET, WalletConnectionProps, useConnection, useConnect } from '@concordium/react-components';
 import { version } from '../package.json';
 
 import { register } from './utils';
@@ -94,7 +94,7 @@ const InputFieldStyle = {
     padding: '10px 20px',
 };
 
-async function viewFile(rpcClient: JsonRpcClient, fileHashHex: string) {
+async function viewFile(rpcClient: ConcordiumGRPCClient, fileHashHex: string) {
     const param = serializeUpdateContractParameters(
         E_SEALING_CONTRACT_NAME,
         'getFile',
@@ -134,6 +134,7 @@ export default function SEALING(props: WalletConnectionProps) {
 
     const { connection, setConnection, account, genesisHash } = useConnection(connectedAccounts, genesisHashes);
     const { connect, isConnecting, connectError } = useConnect(activeConnector, setConnection);
+    const grpcClient = useGrpcClient(TESTNET);
 
     const [isLoading, setLoading] = useState(false);
 
@@ -155,8 +156,8 @@ export default function SEALING(props: WalletConnectionProps) {
 
     useEffect(() => {
         // View file record.
-        if (connection && account && fileHashHex !== '') {
-            withJsonRpcClient(connection, (rpcClient) => viewFile(rpcClient, fileHashHex))
+        if (grpcClient && account && fileHashHex !== '') {
+            viewFile(grpcClient, fileHashHex)
                 .then((record) => {
                     setGetFileError('');
                     setTimestamp(record.timestamp);
@@ -168,7 +169,7 @@ export default function SEALING(props: WalletConnectionProps) {
                     setWitness('');
                 });
         }
-    }, [connection, account, fileHashHex]);
+    }, [grpcClient, account, fileHashHex]);
 
     const [isRegisterFilePage, setIsRegisterFilePage] = useState(true);
     const [hash, setHash] = useState('');
