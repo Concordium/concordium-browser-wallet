@@ -1910,7 +1910,7 @@ __metadata:
   languageName: node
   linkType: hard
 
-"@concordium/browser-wallet-api-helpers@^2.0.0, @concordium/browser-wallet-api-helpers@workspace:^, @concordium/browser-wallet-api-helpers@workspace:packages/browser-wallet-api-helpers":
+"@concordium/browser-wallet-api-helpers@^2.0.0, @concordium/browser-wallet-api-helpers@^2.5.0, @concordium/browser-wallet-api-helpers@workspace:^, @concordium/browser-wallet-api-helpers@workspace:packages/browser-wallet-api-helpers":
   version: 0.0.0-use.local
   resolution: "@concordium/browser-wallet-api-helpers@workspace:packages/browser-wallet-api-helpers"
   dependencies:
@@ -2076,6 +2076,17 @@ __metadata:
   languageName: node
   linkType: hard
 
+"@concordium/react-components@npm:^0.3.0":
+  version: 0.3.0
+  resolution: "@concordium/react-components@npm:0.3.0"
+  dependencies:
+    "@concordium/wallet-connectors": ^0.3.1
+  peerDependencies:
+    react: ^18
+  checksum: 08cc8077f77bc8faaf977e0dbc9270f386575f928d886c4efb3d888fe017edbd36653381e17a20b272409037e648f3eb023501d166e9df0ecd0b4a0c9537c110
+  languageName: node
+  linkType: hard
+
 "@concordium/rust-bindings@npm:0.10.0":
   version: 0.10.0
   resolution: "@concordium/rust-bindings@npm:0.10.0"
@@ -2098,6 +2109,17 @@ __metadata:
     "@walletconnect/qrcode-modal": ^1.8.0
     "@walletconnect/sign-client": ^2.1.4
   checksum: 262af06d5d09e452d307022c66a1d303d8aad1c21f6bfeb6bc24acb4f102bc5deb492de7e093612b05a6f67a9031f6801089f6aec671d0ae7eb26d7ead9cf528
+  languageName: node
+  linkType: hard
+
+"@concordium/wallet-connectors@npm:^0.3.1":
+  version: 0.3.1
+  resolution: "@concordium/wallet-connectors@npm:0.3.1"
+  dependencies:
+    "@concordium/browser-wallet-api-helpers": ^2.5.0
+    "@walletconnect/qrcode-modal": ^1.8.0
+    "@walletconnect/sign-client": ^2.1.4
+  checksum: 7ef4287d05977fe741d47d53ea9424f603c8acfe0a0c0af1bfea2c5752b0bc5750be942badaa414a6694e7be4032e8d1a91f8ab69327cdcff016f28da0cf6a23
   languageName: node
   linkType: hard
 
@@ -10182,8 +10204,7 @@ __metadata:
   version: 0.0.0-use.local
   resolution: "e_sealing@workspace:examples/eSealing"
   dependencies:
-    "@concordium/react-components": ^0.2.0
-    "@concordium/web-sdk": ^3.3.1
+    "@concordium/react-components": ^0.3.0
     "@craftamap/esbuild-plugin-html": ^0.4.0
     "@thi.ng/leb128": ^2.1.18
     "@types/node": ^18.7.23
