@@ -14,7 +14,13 @@ import {
     StatementTypes,
 } from '@concordium/web-sdk';
 import { isIdentityOfCredential } from '@shared/utils/identity-helpers';
-import { ConfirmedIdentity, CreationStatus, VerifiableCredential, WalletCredential } from '@shared/storage/types';
+import {
+    ConfirmedIdentity,
+    CreationStatus,
+    VerifiableCredential,
+    VerifiableCredentialStatus,
+    WalletCredential,
+} from '@shared/storage/types';
 import { ClassName } from 'wallet-common-helpers';
 import {
     getContractAddressFromIssuerDID,
@@ -30,13 +36,14 @@ export interface DisplayCredentialStatementProps<Statement> extends ClassName {
     dappName: string;
     setChosenId: (id: string) => void;
     net: Network;
+    statuses: Record<string, VerifiableCredentialStatus | undefined>;
 }
 
 function getAccountCredentialCommitmentInput(
     statement: RequestStatement,
     wallet: ConcordiumHdWallet,
     identities: ConfirmedIdentity[],
-    credentials: WalletCredential[],
+    credentials: WalletCredential[]
 ) {
     const credId = getCredentialIdFromSubjectDID(statement.id);
     const credential = credentials.find((cred) => cred.credId === credId);
@@ -142,12 +149,15 @@ function doesCredentialSatisfyStatement(statement: AtomicStatementV2, cred: Veri
  */
 export function getViableWeb3IdCredentialsForStatement(
     credentialStatement: VerifiableCredentialStatement,
-    verifiableCredentials: VerifiableCredential[]
+    verifiableCredentials: VerifiableCredential[],
+    statuses: Record<string, VerifiableCredentialStatus | undefined>
 ): VerifiableCredential[] {
-    // TODO check that credentials are active (maybe before this instead for each statement)
     const allowedContracts = credentialStatement.idQualifier.issuers;
-    const allowedCredentials = verifiableCredentials?.filter((vc) =>
-        allowedContracts.some((address) =>  areContractAddressesEqual(address, getContractAddressFromIssuerDID(vc.issuer)))
+    const allowedCredentials = verifiableCredentials?.filter(
+        (vc) =>
+            allowedContracts.some((address) =>
+                areContractAddressesEqual(address, getContractAddressFromIssuerDID(vc.issuer))
+            ) && statuses[vc.id] === VerifiableCredentialStatus.Active
     );
 
     return allowedCredentials.filter((cred) =>

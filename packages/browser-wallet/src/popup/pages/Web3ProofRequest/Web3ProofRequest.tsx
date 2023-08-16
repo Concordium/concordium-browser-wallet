@@ -8,6 +8,7 @@ import {
     ConcordiumHdWallet,
     isAccountCredentialStatement,
     Web3IdProofInput,
+    ConcordiumGRPCClient,
 } from '@concordium/web-sdk';
 import { InternalMessageType } from '@concordium/browser-wallet-message-hub';
 
@@ -30,8 +31,11 @@ import {
 } from '@popup/store/verifiable-credential';
 import { useConfirmedIdentities } from '@popup/shared/utils/identity-helpers';
 import { parse } from '@shared/utils/payload-helpers';
-import { DisplayCredentialStatement } from './DisplayStatement';
+import { VerifiableCredential, VerifiableCredentialStatus } from '@shared/storage/types';
+import { getVerifiableCredentialStatus } from '@shared/utils/verifiable-credential-helpers';
+import { useAsyncMemo } from 'wallet-common-helpers';
 import { getCommitmentInput } from './utils';
+import { DisplayCredentialStatement } from './DisplayStatement';
 
 type Props = {
     onSubmit(presentationString: string): void;
@@ -46,6 +50,18 @@ interface Location {
             url: string;
         };
     };
+}
+
+async function getAllCredentialStatuses(
+    client: ConcordiumGRPCClient,
+    credentials: VerifiableCredential[]
+): Promise<Record<string, VerifiableCredentialStatus | undefined>> {
+    const statuses = await Promise.all(
+        credentials.map((credential) =>
+            getVerifiableCredentialStatus(client, credential.id).then((status) => [credential.id, status])
+        )
+    );
+    return Object.fromEntries(statuses);
 }
 
 export default function Web3ProofRequest({ onReject, onSubmit }: Props) {
@@ -72,6 +88,16 @@ export default function Web3ProofRequest({ onReject, onSubmit }: Props) {
     const verifiableCredentials = useAtomValue(storedVerifiableCredentialsAtom);
 
     const canProve = useMemo(() => ids.every((x) => Boolean(x)), [ids]);
+
+    // TODO filter so that we only look up VC that are viable for some statement
+    const statuses = useAsyncMemo(
+        () =>
+            verifiableCredentials.loading
+                ? Promise.resolve(undefined)
+                : getAllCredentialStatuses(client, verifiableCredentials.value),
+        undefined,
+        [verifiableCredentials.loading]
+    );
 
     const handleSubmit = useCallback(async () => {
         if (!recoveryPhrase) {
@@ -124,7 +150,7 @@ export default function Web3ProofRequest({ onReject, onSubmit }: Props) {
 
     useEffect(() => onClose(onReject), [onClose, onReject]);
 
-    if (verifiableCredentials.loading || verifiableCredentialSchemas.loading || identities.loading) {
+    if (verifiableCredentials.loading || verifiableCredentialSchemas.loading || identities.loading || !statuses) {
         return null;
     }
 
@@ -144,6 +170,7 @@ export default function Web3ProofRequest({ onReject, onSubmit }: Props) {
                             return newIds;
                         })
                     }
+                    statuses={statuses}
                 />
                 <ButtonGroup className="web3-id-proof-request__actions">
                     <Button disabled={creatingProof} onClick={withClose(onReject)}>

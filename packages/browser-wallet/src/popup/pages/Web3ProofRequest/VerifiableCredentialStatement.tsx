@@ -66,7 +66,7 @@ export function useStatementDescription(statement: SecretStatementV2, schema: Ve
         case StatementTypes.AttributeNotInSet:
             return t('nonMembership', { name, setNames: listToString(statement.set) });
         default:
-            throw new Error('Unknown statement type encountered: ' + statement.type);
+            throw new Error(`Unknown statement type encountered: ${statement.type}`);
     }
 }
 
@@ -165,6 +165,7 @@ export default function DisplayWeb3Statement({
     dappName,
     setChosenId,
     net,
+    statuses,
 }: DisplayCredentialStatementProps<VerifiableCredentialStatement>) {
     const reveals = credentialStatement.statement.filter(
         (s) => s.type === StatementTypes.RevealAttribute
@@ -179,7 +180,7 @@ export default function DisplayWeb3Statement({
         if (verifiableCredentials.loading) {
             return [];
         }
-        return getViableWeb3IdCredentialsForStatement(credentialStatement, verifiableCredentials.value);
+        return getViableWeb3IdCredentialsForStatement(credentialStatement, verifiableCredentials.value, statuses);
     }, [verifiableCredentials.loading]);
 
     const [chosenCredential, setChosenCredential] = useState<VerifiableCredential | undefined>(validCredentials[0]);
