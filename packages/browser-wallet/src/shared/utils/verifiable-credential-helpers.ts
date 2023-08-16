@@ -2,6 +2,7 @@ import { CcdAmount, UpdateContractPayload, ConcordiumGRPCClient, ContractAddress
 import * as ed from '@noble/ed25519';
 import {
     MetadataUrl,
+    NetworkConfiguration,
     VerifiableCredential,
     VerifiableCredentialSchema,
     VerifiableCredentialStatus,
@@ -9,6 +10,7 @@ import {
 import { Buffer } from 'buffer/';
 import jsonschema from 'jsonschema';
 import { applyExecutionNRGBuffer, getContractName } from './contract-helpers';
+import { getNet } from './network-helpers';
 
 /**
  * Extracts the credential holder id from a verifiable credential id (did).
@@ -16,8 +18,8 @@ import { applyExecutionNRGBuffer, getContractName } from './contract-helpers';
  * @returns the credential holder id
  */
 export function getCredentialHolderId(credentialId: string): string {
-    const splitted = credentialId.split('/');
-    const credentialHolderId = splitted[splitted.length - 1];
+    const credentialIdParts = credentialId.split('/');
+    const credentialHolderId = credentialIdParts[credentialIdParts.length - 1];
 
     if (credentialHolderId.length !== 64) {
         throw new Error(`Invalid credential holder id found from: ${credentialId}`);
@@ -26,15 +28,27 @@ export function getCredentialHolderId(credentialId: string): string {
     return credentialHolderId;
 }
 
+/** Takes a PublicKey Identifier DID string and returns the public key.
+ * @param did a DID string on the form: "did:ccd:NETWORK:pkc:PUBLICKEY"
+ * @returns the publicKey PUBLICKEY
+ */
+export function getPublicKeyfromPublicKeyIdentifierDID(did: string) {
+    const didParts = did.split(':');
+    if (!(didParts.length === 5 || didParts.length === 4) || didParts[didParts.length - 2] !== 'pkc') {
+        throw new Error(`Given DID was not a PublicKey Identifier: ${did}`);
+    }
+    return didParts[didParts.length - 1];
+}
+
 /**
  * Extracts the credential registry contract addres from a verifiable credential id (did).
  * @param credentialId the did for a credential
  * @returns the contract address of the issuing contract of the provided credential id
  */
 export function getCredentialRegistryContractAddress(credentialId: string): ContractAddress {
-    const splitted = credentialId.split(':');
-    const index = BigInt(splitted[4]);
-    const subindex = BigInt(splitted[5].split('/')[0]);
+    const credentialIdParts = credentialId.split(':');
+    const index = BigInt(credentialIdParts[4]);
+    const subindex = BigInt(credentialIdParts[5].split('/')[0]);
     return { index, subindex };
 }
 
@@ -631,10 +645,10 @@ async function fetchDataFromUrl<T>(
  * Retrieves a credential schema from the specified URL.
  */
 export async function fetchCredentialSchema(
-    metadata: MetadataUrl,
+    url: MetadataUrl,
     abortController: AbortController
 ): Promise<VerifiableCredentialSchema> {
-    return fetchDataFromUrl(metadata, abortController, verifiableCredentialSchemaSchema);
+    return fetchDataFromUrl(url, abortController, verifiableCredentialSchemaSchema);
 }
 
 /**
@@ -664,7 +678,7 @@ export async function getCredentialSchemas(
     const onChainSchemas: VerifiableCredentialSchema[] = [];
 
     const allContractAddresses = credentials.map((vc) => getCredentialRegistryContractAddress(vc.id));
-    const issuerContractAddresses = [...new Set(allContractAddresses)];
+    const issuerContractAddresses = new Set(allContractAddresses);
 
     for (const contractAddress of issuerContractAddresses) {
         let registryMetadata: MetadataResponse | undefined;
@@ -720,6 +734,11 @@ export async function getCredentialMetadata(
             metadataUrls.push(entry.credentialInfo.metadataUrl);
         }
     }
+
+    // We filter any duplicate URLs. Note that there could be metadata pairs (url, hash) with the
+    // same URL but separate hashes that are thrown away here. This is done intentionally for now,
+    // as the assumption is that that would be a rare situation. This means that the first instance
+    // of the URL is the one used for gathering the credential metadata.
     const uniqueMetadataUrls = [...new Map(metadataUrls.map((item) => [item.url, item])).values()];
 
     const metadataList: { metadata: VerifiableCredentialMetadata; url: string }[] = [];
@@ -777,7 +796,6 @@ export async function getChangesToCredentialSchemas(
     let updatedSchemasInStorage = { ...storedSchemas };
     let updateReceived = false;
 
-    // TODO Verify that something has actually changed before making the update.
     for (const updatedSchema of upToDateSchemas) {
         if (storedSchemas === undefined) {
             updatedSchemasInStorage = {
@@ -792,4 +810,72 @@ export async function getChangesToCredentialSchemas(
         }
     }
     return { data: updatedSchemasInStorage, updateReceived };
+}
+
+/**
+ * Get the registry issuer public key from a credential registry CIS-4 contract.
+ * @param client the GRPC client for accessing a node
+ * @param contractAddress the address of a CIS-4 contract
+ * @returns the registry public key for the contract
+ */
+export async function getCredentialRegistryIssuerKey(
+    client: ConcordiumGRPCClient,
+    contractAddress: ContractAddress
+): Promise<string> {
+    const instanceInfo = await client.getInstanceInfo(contractAddress);
+    if (instanceInfo === undefined) {
+        throw new Error('Given contract address was not a created instance');
+    }
+
+    const result = await client.invokeContract({
+        contract: contractAddress,
+        method: `${getContractName(instanceInfo)}.issuer`,
+    });
+
+    if (result.tag !== 'success') {
+        throw new Error(result.reason.tag);
+    }
+
+    const { returnValue } = result;
+    if (returnValue === undefined) {
+        throw new Error(`Return value is missing from issuer public key result in CIS-4 contract: ${contractAddress}`);
+    }
+
+    return returnValue;
+}
+
+/**
+ * Create a publicKey DID identitifer for the given key.
+ */
+export function createPublicKeyIdentifier(publicKey: string, network: NetworkConfiguration): string {
+    return `did:ccd:${getNet(network).toLowerCase()}:pkc:${publicKey}`;
+}
+
+/**
+ * Create a DID identitifer for the given web3Id credential.
+ */
+export function createCredentialId(
+    credentialHolderId: string,
+    issuer: ContractAddress,
+    network: NetworkConfiguration
+): string {
+    return `did:ccd:${getNet(network).toLowerCase()}:sci:${issuer.index}:${
+        issuer.subindex
+    }/credentialEntry/${credentialHolderId}`;
+}
+
+/**
+ * Extracts the network from any concordium DID identitifer.
+ * Note that if the network is not present in the DID, then 'mainnet' is returned, per the specifiction, see https://proposals.concordium.software/ID/concordium-did.html#identifier-syntax.
+ * @param did the did to extract network from. did:ccd:NETWORK:...
+ * @returns the name of the network
+ */
+export function getDIDNetwork(did: string): 'mainnet' | 'testnet' {
+    const didParts = did.split(':');
+    const network = didParts[2];
+    if (network !== 'testnet' && network !== 'mainnet') {
+        // Only testnet and mainnet are valid identifiers, and if neither are present, then the network identifier is not present, and it defaults to mainnet.
+        return 'mainnet';
+    }
+    return network;
 }

@@ -3,7 +3,7 @@
     "packageManager": "yarn@3.2.0",
     "dependencies": {
         "@concordium/browser-wallet-api-helpers": "workspace:^",
-        "@concordium/web-sdk": "^3.3.1",
+        "@concordium/web-sdk": "^6.1.0-alpha.1",
         "react": "^18.1.0",
         "react-dom": "^18.1.0"
     },

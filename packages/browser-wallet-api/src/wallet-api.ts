@@ -21,11 +21,14 @@ import {
     SchemaType,
     SignMessageObject,
     SmartContractParameters,
+    APIVerifiableCredential,
+    MetadataUrl,
+    CredentialProof,
 } from '@concordium/browser-wallet-api-helpers';
 import EventEmitter from 'events';
 import type { JsonRpcRequest } from '@concordium/common-sdk/lib/providers/provider';
 import { IdProofOutput, IdStatement } from '@concordium/common-sdk/lib/idProofTypes';
-import ConcordiumGRPCClient from '@concordium/common-sdk/lib/GRPCClient';
+import { ConcordiumGRPCClient } from '@concordium/common-sdk/lib/GRPCClient';
 import JSONBig from 'json-bigint';
 import { stringify } from './util';
 import { BWGRPCTransport } from './gRPC-transport';
@@ -242,6 +245,45 @@ class WalletApi extends EventEmitter implements IWalletApi {
         }
 
         return res.result;
+    }
+
+    public async addWeb3IdCredential(
+        credential: APIVerifiableCredential,
+        metadataUrl: MetadataUrl,
+        generateProofAndRandomness: (
+            credentialHolderIdDID: string
+        ) => Promise<{ randomness: Record<string, string>; proof: CredentialProof }>
+    ): Promise<string> {
+        const res = await this.messageHandler.sendMessage<MessageStatusWrapper<string>>(
+            MessageType.AddWeb3IdCredential,
+            {
+                credential,
+                metadataUrl,
+            }
+        );
+
+        if (!res.success) {
+            throw new Error(res.message);
+        }
+
+        const credentialHolderIdDID = res.result;
+
+        const { proof, randomness } = await generateProofAndRandomness(credentialHolderIdDID);
+
+        const saveSignatureResult = await this.messageHandler.sendMessage<MessageStatusWrapper<void>>(
+            MessageType.AddWeb3IdCredentialFinish,
+            {
+                credentialHolderIdDID,
+                proof,
+                randomness,
+            }
+        );
+
+        if (!saveSignatureResult.success) {
+            throw new Error(saveSignatureResult.message);
+        }
+
+        return credentialHolderIdDID;
     }
 }
 

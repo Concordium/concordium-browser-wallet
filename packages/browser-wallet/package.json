@@ -1,6 +1,6 @@
 {
     "name": "@concordium/browser-wallet",
-    "version": "1.0.6",
+    "version": "1.1.0",
     "description": "Browser extension wallet for the Concordium blockchain",
     "author": "Concordium Software",
     "license": "Apache-2.0",
@@ -19,7 +19,7 @@
     "dependencies": {
         "@concordium/browser-wallet-api": "workspace:^",
         "@concordium/browser-wallet-api-helpers": "workspace:^",
-        "@concordium/web-sdk": "^4.0.1",
+        "@concordium/web-sdk": "^6.1.0-alpha.1",
         "@noble/ed25519": "^1.7.0",
         "@protobuf-ts/runtime-rpc": "^2.8.2",
         "@scure/bip39": "^1.1.0",

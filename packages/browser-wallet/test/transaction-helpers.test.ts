@@ -1,7 +1,7 @@
 import { validateTransferAmount } from '../src/popup/shared/utils/transaction-helpers';
 import en from '../src/popup/shared/i18n/en';
 
-test('validateTransfer amount respects decimals paraimeter', () => {
+test('validateTransfer amount respects decimals parameter', () => {
     const invalidMessage = en.utils.ccdAmount.invalid;
     expect(validateTransferAmount('1000', undefined, 0)).toBe(undefined);
     expect(validateTransferAmount('1000.1', undefined, 0)).toContain(invalidMessage);

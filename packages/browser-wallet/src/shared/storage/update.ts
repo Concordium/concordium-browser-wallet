@@ -1,6 +1,7 @@
 import { StorageAccessor } from './access';
 
 export const accountInfoCacheLock = 'concordium_account_info_cache_lock';
+export const web3IdCredentialLock = 'concordium_web3_id_credential_lock';
 
 /**
  * Safely updates a record in storage by first acquiring a lock, reading the current value
@@ -39,6 +40,23 @@ export async function addToList<Type>(
     return navigator.locks.request(lock, async () => {
         const list = (await storage.get()) || [];
         return storage.set(list.concat(addition));
+    });
+}
+
+/**
+ * Generic method to remove an element from list in storage
+ */
+export async function removeFromList<Type>(
+    lock: string,
+    findPredicate: (candidate: Type) => boolean,
+    storage: StorageAccessor<Type[]>
+): Promise<void> {
+    return navigator.locks.request(lock, async () => {
+        const list = (await storage.get()) || [];
+        const index = list.findIndex(findPredicate);
+        if (index > -1) {
+            await storage.set(list.splice(index, 1));
+        }
     });
 }
 

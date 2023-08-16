@@ -1,7 +1,7 @@
 /* eslint-disable react/function-component-definition, react/destructuring-assignment */
 import React from 'react';
 import { ComponentMeta, ComponentStory } from '@storybook/react';
-import { VerifiableCredentialSchema, VerifiableCredentialStatus } from '@shared/storage/types';
+import { VerifiableCredentialStatus, VerifiableCredentialSchema } from '@shared/storage/types';
 import { VerifiableCredentialMetadata } from '@shared/utils/verifiable-credential-helpers';
 import { VerifiableCredentialCard } from './VerifiableCredentialCard';
 
@@ -25,24 +25,32 @@ const schema: VerifiableCredentialSchema = {
                     type: 'string',
                     description: 'Credential subject identifier',
                 },
-                degreeType: {
-                    title: 'Degree Hello',
-                    type: 'string',
-                    description: 'Degree type',
-                },
-                degreeName: {
-                    title: 'Degree name',
-                    type: 'string',
-                    description: 'Degree name',
-                },
-                graduationDate: {
-                    title: 'Graduation date',
-                    type: 'string',
-                    format: 'date-time',
-                    description: 'Graduation date',
+                attributes: {
+                    title: 'Attributes',
+                    description: 'Credential attributes',
+                    type: 'object',
+                    required: ['degreeType', 'degreeName', 'graduationDate'],
+                    properties: {
+                        degreeType: {
+                            title: 'Degree Hello',
+                            type: 'string',
+                            description: 'Degree type',
+                        },
+                        degreeName: {
+                            title: 'Degree name',
+                            type: 'string',
+                            description: 'Degree name',
+                        },
+                        graduationDate: {
+                            title: 'Graduation date',
+                            type: 'string',
+                            format: 'date-time',
+                            description: 'Graduation date',
+                        },
+                    },
                 },
             },
-            required: ['id', 'degreeType', 'degreeName', 'graduationDate'],
+            required: ['id'],
         },
     },
     required: ['credentialSubject'],
@@ -66,21 +74,12 @@ const metadata: VerifiableCredentialMetadata = {
     },
 };
 
-const verifiableCredential = {
-    '@context': ['https://www.w3.org/2018/credentials/v1', 'Concordium VC URI'],
-    id: 'did:ccd:NETWORK:sci:INDEX:SUBINDEX/credentialEntry/ff4aa77af80b4d72973ccb957d180746',
-    type: ['VerifiableCredential', 'UniversityDegreeCredential'],
-    issuer: 'did:ccd:NETWORK:sci:INDEX:SUBINDEX/issuer',
-    issuanceDate: '2010-01-01T00:00:00Z',
-    credentialSubject: {
-        id: 'did:ccd:pkc:ebfeb1f712ebc6f1c276e12ec21',
-        degreeType: 'Bachelor degree',
+const credentialSubject = {
+    id: 'did:ccd:pkc:76ada0ebd1e8aa5a651a0c4ac1ad3b62d3040f693722f94d61efa4fdd6ee797d',
+    attributes: {
+        degreeType: 'BachelorDegree',
         degreeName: 'Bachelor of Science and Arts',
         graduationDate: '2010-06-01T00:00:00Z',
-    },
-    credentialSchema: {
-        id: 'https://example-university.com/certificates/simple-education-certificate.json',
-        type: 'CredentialSchema2022', // the same for all schemas
     },
 };
 
@@ -88,7 +87,7 @@ export const Primary: ComponentStory<typeof VerifiableCredentialCard> = () => {
     return (
         <div style={{ width: 375 }}>
             <VerifiableCredentialCard
-                credential={verifiableCredential}
+                credentialSubject={credentialSubject}
                 schema={schema}
                 credentialStatus={VerifiableCredentialStatus.Active}
                 metadata={metadata}

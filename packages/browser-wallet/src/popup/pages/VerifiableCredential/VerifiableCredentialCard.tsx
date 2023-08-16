@@ -1,13 +1,10 @@
 import React, { PropsWithChildren } from 'react';
-
+import { ClassName } from 'wallet-common-helpers';
+import clsx from 'clsx';
 import { VerifiableCredentialMetadata } from '@shared/utils/verifiable-credential-helpers';
 import Img from '@popup/shared/Img';
-import {
-    VerifiableCredential,
-    VerifiableCredentialStatus,
-    VerifiableCredentialSchema,
-    MetadataUrl,
-} from '../../../shared/storage/types';
+import { CredentialSubject } from '@concordium/web-sdk';
+import { VerifiableCredentialStatus, MetadataUrl, VerifiableCredentialSchema } from '@shared/storage/types';
 import StatusIcon from './VerifiableCredentialStatus';
 
 function Logo({ logo }: { logo: MetadataUrl }) {
@@ -31,30 +28,28 @@ export function DisplayAttribute({
     attributeTitle,
 }: {
     attributeKey: string;
-    attributeValue: string | number;
+    attributeValue: string | bigint;
     attributeTitle: string;
 }) {
     return (
         <div key={attributeKey} className="verifiable-credential__body-attributes-row">
             <label>{attributeTitle.toLowerCase()}</label>
-            <div className="verifiable-credential__body-attributes-row-value">{attributeValue}</div>
+            <div className="verifiable-credential__body-attributes-row-value">{attributeValue.toString()}</div>
         </div>
     );
 }
+
+type ClickableProps = ClassName & PropsWithChildren<{ onClick?: () => void; metadata: VerifiableCredentialMetadata }>;
 
 /**
  * Wraps children components in a verifiable credential card that is clickable if onClick
  * is defined.
  */
-function ClickableVerifiableCredential({
-    children,
-    metadata,
-    onClick,
-}: PropsWithChildren<{ metadata: VerifiableCredentialMetadata; onClick?: () => void }>) {
+function ClickableVerifiableCredential({ children, onClick, metadata, className }: ClickableProps) {
     if (onClick) {
         return (
             <div
-                className="verifiable-credential"
+                className={clsx('verifiable-credential', className)}
                 style={{ backgroundColor: metadata.background_color }}
                 onClick={onClick}
                 onKeyDown={(e) => {
@@ -70,7 +65,10 @@ function ClickableVerifiableCredential({
         );
     }
     return (
-        <div className="verifiable-credential" style={{ backgroundColor: metadata.background_color }}>
+        <div
+            className={clsx('verifiable-credential', className)}
+            style={{ backgroundColor: metadata.background_color }}
+        >
             {children}
         </div>
     );
@@ -85,9 +83,9 @@ function ClickableVerifiableCredential({
  */
 function applySchema(
     schema: VerifiableCredentialSchema
-): (value: [string, string | number]) => { title: string; key: string; value: string | number } {
-    return (value: [string, string | number]) => {
-        const attributeSchema = schema.properties.credentialSubject.properties[value[0]];
+): (value: [string, string | bigint]) => { title: string; key: string; value: string | bigint } {
+    return (value: [string, string | bigint]) => {
+        const attributeSchema = schema.properties.credentialSubject.properties.attributes.properties[value[0]];
         if (!attributeSchema) {
             throw new Error(`Missing attribute schema for key: ${value[0]}`);
         }
@@ -115,25 +113,26 @@ export function VerifiableCredentialCardHeader({
     );
 }
 
-export function VerifiableCredentialCard({
-    credential,
-    schema,
-    credentialStatus,
-    metadata,
-    onClick,
-}: {
-    credential: VerifiableCredential;
+interface CardProps extends ClassName {
+    credentialSubject: Omit<CredentialSubject, 'id'>;
     schema: VerifiableCredentialSchema;
     credentialStatus: VerifiableCredentialStatus;
     metadata: VerifiableCredentialMetadata;
     onClick?: () => void;
-}) {
-    const attributes = Object.entries(credential.credentialSubject)
-        .filter((val) => val[0] !== 'id')
-        .map(applySchema(schema));
+}
+
+export function VerifiableCredentialCard({
+    credentialSubject,
+    schema,
+    onClick,
+    credentialStatus,
+    metadata,
+    className,
+}: CardProps) {
+    const attributes = Object.entries(credentialSubject.attributes).map(applySchema(schema));
 
     return (
-        <ClickableVerifiableCredential metadata={metadata} onClick={onClick}>
+        <ClickableVerifiableCredential className={className} onClick={onClick} metadata={metadata}>
             <VerifiableCredentialCardHeader credentialStatus={credentialStatus} metadata={metadata} />
             {metadata.image && <DisplayImage image={metadata.image} />}
             <div className="verifiable-credential__body-attributes">

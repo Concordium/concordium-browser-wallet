@@ -97,7 +97,7 @@ function mapTransactionKindStringToTransactionType(
         case TransactionKindString.EncryptedAmountTransferWithMemo:
             return AccountTransactionType.EncryptedAmountTransferWithMemo;
         case TransactionKindString.TransferWithScheduleAndMemo:
-            return AccountTransactionType.TransferWithScheduleWithMemo;
+            return AccountTransactionType.TransferWithScheduleAndMemo;
         case TransactionKindString.ConfigureBaker:
             return AccountTransactionType.ConfigureBaker;
         case TransactionKindString.ConfigureDelegation:

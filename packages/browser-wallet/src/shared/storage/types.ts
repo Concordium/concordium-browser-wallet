@@ -1,3 +1,4 @@
+import { APIVerifiableCredential } from '@concordium/browser-wallet-api-helpers';
 import type { CryptographicParameters, HexString, IdentityObjectV1, Network, Versioned } from '@concordium/web-sdk';
 
 export enum ChromeStorageKey {
@@ -28,6 +29,7 @@ export enum ChromeStorageKey {
     VerifiableCredentials = 'verifiableCredentials',
     VerifiableCredentialSchemas = 'verifiableCredentialSchemas',
     VerifiableCredentialMetadata = 'verifiableCredentialMetadata',
+    TemporaryVerifiableCredentials = 'tempVerifiableCredentials',
     Allowlist = 'allowlist',
 }
 
@@ -265,33 +267,41 @@ export enum VerifiableCredentialStatus {
     NotActivated,
 }
 
-interface CredentialSchema {
+export type CredentialSubject = {
     id: string;
-    type: string;
-}
+    attributes: Record<string, string | bigint>;
+};
 
-export type CredentialSubject = { id: string } & Record<string, string | number>;
-
-export interface VerifiableCredential {
-    '@context': string[];
-    id: string;
-    type: string[];
-    issuer: string;
-    issuanceDate: string;
+export interface VerifiableCredential extends APIVerifiableCredential {
+    // With ID
     credentialSubject: CredentialSubject;
-    credentialSchema: CredentialSchema;
+    id: string;
+    // Secrets
+    signature: string;
+    randomness: Record<string, string>;
+    /** index used to derive keys for credential */
+    index: number;
 }
 
 interface CredentialSchemaProperty {
     title: string;
     type: 'string' | 'number' | string;
     description: string;
+    format?: string;
 }
+
+type CredentialSchemaAttributes = {
+    properties: Record<string, CredentialSchemaProperty>;
+    required: string[];
+} & CredentialSchemaProperty;
 
 interface CredentialSchemaSubject {
     type: string;
+    properties: {
+        id: CredentialSchemaProperty;
+        attributes: CredentialSchemaAttributes;
+    };
     required: string[];
-    properties: { id: CredentialSchemaProperty } & Record<string, CredentialSchemaProperty>;
 }
 
 export interface SchemaProperties {
