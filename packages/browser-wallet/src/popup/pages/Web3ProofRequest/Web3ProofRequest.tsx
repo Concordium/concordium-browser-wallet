@@ -9,6 +9,7 @@ import {
     isAccountCredentialStatement,
     Web3IdProofInput,
     ConcordiumGRPCClient,
+    CommitmentInput,
 } from '@concordium/web-sdk';
 import { InternalMessageType } from '@concordium/browser-wallet-message-hub';
 
@@ -34,7 +35,7 @@ import { parse } from '@shared/utils/payload-helpers';
 import { VerifiableCredential, VerifiableCredentialStatus } from '@shared/storage/types';
 import { getVerifiableCredentialStatus } from '@shared/utils/verifiable-credential-helpers';
 import { useAsyncMemo } from 'wallet-common-helpers';
-import { getCommitmentInput } from './utils';
+import { getAccountCredentialCommitmentInput, getWeb3CommitmentInput } from './utils';
 import { DisplayCredentialStatement } from './DisplayStatement';
 
 type Props = {
@@ -113,18 +114,28 @@ export default function Web3ProofRequest({ onReject, onSubmit }: Props) {
         const global = await getGlobal(client);
         const wallet = ConcordiumHdWallet.fromHex(recoveryPhrase, net);
 
-        const type = ['ConcordiumVerifiableCredential', 'TestCredential', 'VerifiableCredential'];
+        const parsedStatements: RequestStatement[] = [];
+        const commitmentInputs: CommitmentInput[] = [];
 
-        const parsedStatements: RequestStatement[] = statements.map((statement, index) => {
+        statements.forEach((statement, index) => {
             if (isAccountCredentialStatement(statement)) {
-                return { statement: statement.statement, id: ids[index] };
-            }
-            return { statement: statement.statement, id: ids[index], type };
-        });
+                const requestStatement = { statement: statement.statement, id: ids[index] };
+                parsedStatements.push(requestStatement);
+                commitmentInputs.push(
+                    getAccountCredentialCommitmentInput(requestStatement, wallet, identities.value, credentials)
+                );
+            } else {
+                const cred = verifiableCredentials.value.find((c) => c.id === ids[index]);
 
-        const commitmentInputs = parsedStatements.map((statement) =>
-            getCommitmentInput(statement, wallet, identities.value, credentials, verifiableCredentials.value)
-        );
+                if (!cred) {
+                    throw new Error('The credential was not found for a statement');
+                }
+
+                const requestStatement = { statement: statement.statement, id: ids[index], type: cred.type };
+                parsedStatements.push(requestStatement);
+                commitmentInputs.push(getWeb3CommitmentInput(cred, wallet));
+            }
+        });
 
         const request = {
             challenge,

@@ -9,7 +9,6 @@ import {
     Network,
     AtomicStatementV2,
     RevealStatementV2,
-    CommitmentInput,
     createWeb3IdDID,
     StatementTypes,
 } from '@concordium/web-sdk';
@@ -39,7 +38,7 @@ export interface DisplayCredentialStatementProps<Statement> extends ClassName {
     statuses: Record<string, VerifiableCredentialStatus | undefined>;
 }
 
-function getAccountCredentialCommitmentInput(
+export function getAccountCredentialCommitmentInput(
     statement: RequestStatement,
     wallet: ConcordiumHdWallet,
     identities: ConfirmedIdentity[],
@@ -68,42 +67,15 @@ function getAccountCredentialCommitmentInput(
     );
 }
 
-function createWeb3CommitmentInput(
-    statement: RequestStatement,
-    wallet: ConcordiumHdWallet,
-    verifiableCredentials: VerifiableCredential[]
-) {
-    const cred = verifiableCredentials?.find((c) => c.id === statement.id);
-
-    if (!cred) {
-        throw new Error('IdQualifier not fulfilled');
-    }
-
+export function getWeb3CommitmentInput(verifiableCredential: VerifiableCredential, wallet: ConcordiumHdWallet) {
     return createWeb3CommitmentInputWithHdWallet(
         wallet,
-        getContractAddressFromIssuerDID(cred.issuer),
-        cred.index,
-        cred.credentialSubject,
-        cred.randomness,
-        cred.signature
+        getContractAddressFromIssuerDID(verifiableCredential.issuer),
+        verifiableCredential.index,
+        verifiableCredential.credentialSubject,
+        verifiableCredential.randomness,
+        verifiableCredential.signature
     );
-}
-
-/**
- * Build the commitmentInputs required to create a presentation for the given statement.
- */
-export function getCommitmentInput(
-    statement: RequestStatement,
-    wallet: ConcordiumHdWallet,
-    identities: ConfirmedIdentity[],
-    credentials: WalletCredential[],
-    verifiableCredentials: VerifiableCredential[]
-): CommitmentInput {
-    // TODO replace with isVerifiableCredentialRequestStatement when SDK is updated
-    if (statement.type) {
-        return createWeb3CommitmentInput(statement, wallet, verifiableCredentials);
-    }
-    return getAccountCredentialCommitmentInput(statement, wallet, identities, credentials);
 }
 
 /**
