@@ -148,29 +148,29 @@ export default function VerifiableCredentialDetails({
     }, [client, credential, hdWallet, credentialEntry, nav, pathname]);
 
     const menuButton: MenuButton | undefined = useMemo(() => {
-        if (
-            credentialEntry === undefined ||
-            !credentialEntry.credentialInfo.holderRevocable ||
-            status === VerifiableCredentialStatus.Revoked
-        ) {
+        if (credentialEntry === undefined) {
             return undefined;
+        }
+
+        const detailsButton = {
+            title: t('menu.details'),
+            onClick: () => setShowExtraDetails(true),
+        };
+
+        let revokeButton;
+        if (credentialEntry?.credentialInfo.holderRevocable && status !== VerifiableCredentialStatus.Revoked) {
+            revokeButton = {
+                title: t('menu.revoke'),
+                icon: <RevokeIcon />,
+                onClick: goToConfirmPage,
+            };
         }
 
         return {
             type: ButtonTypes.More,
-            items: [
-                {
-                    title: t('menu.revoke'),
-                    icon: <RevokeIcon />,
-                    onClick: goToConfirmPage,
-                },
-                {
-                    title: t('menu.details'),
-                    onClick: () => setShowExtraDetails(true),
-                },
-            ],
+            items: revokeButton ? [detailsButton, revokeButton] : [detailsButton],
         };
-    }, [credentialEntry, goToConfirmPage]);
+    }, [credentialEntry?.credentialInfo.holderRevocable, goToConfirmPage]);
 
     // Wait for the credential entry to be loaded from the chain, and for the HdWallet
     // to be loaded to be ready to derive keys.
