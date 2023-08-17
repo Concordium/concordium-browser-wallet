@@ -18,7 +18,7 @@ import { AsyncWrapper } from '@popup/store/utils';
 import { ConcordiumGRPCClient } from '@concordium/web-sdk';
 
 /**
- * Retrieve the on-chain credential status for a verifiable credential in a registry contract.
+ * Retrieve the on-chain credential status for a verifiable credential in a CIS-4 credential registry contract.
  * @param credential the verifiable credential to lookup the status for
  * @returns the status for the given credential
  */

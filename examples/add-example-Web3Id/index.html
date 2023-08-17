@@ -42,26 +42,29 @@
                             b
                                 .revealAttribute('degreeType')
                                 .addMembership('degreeName', ['Bachelor of Science and Arts', 'Bachelor of Finance'])
-                        ).getStatements();
+                        )
+                        .getStatements();
                     sendStatement(statement);
                 });
                 document.getElementById('web3ProofIdOnly').addEventListener('click', () => {
                     const statement = new concordiumSDK.Web3StatementBuilder()
-                                                       .addForIdentityCredentials([0, 1, 2], (b) =>
-                                                           b.revealAttribute('firstName').addRange('dob', '08000101', '20000101')
-                                                       ).getStatements();
+                        .addForIdentityCredentials([0, 1, 2], (b) =>
+                            b.revealAttribute('firstName').addRange('dob', '08000101', '20000101')
+                        )
+                        .getStatements();
                     sendStatement(statement);
                 });
                 document.getElementById('web3ProofMixed').addEventListener('click', () => {
                     const statement = new concordiumSDK.Web3StatementBuilder()
-                                                       .addForIdentityCredentials([0, 1, 2], (b) =>
-                                                           b.revealAttribute('firstName').addRange('dob', '08000101', '20000101')
-                                                       )
-                                                       .addForVerifiableCredentials([{ index: 5463n, subindex: 0n }], (b) =>
-                                                           b
-                                                               .revealAttribute('degreeType')
-                                                               .addMembership('degreeName', ['Bachelor of Science and Arts', 'Bachelor of Finance'])
-                                                       ).getStatements();
+                        .addForIdentityCredentials([0, 1, 2], (b) =>
+                            b.revealAttribute('firstName').addRange('dob', '08000101', '20000101')
+                        )
+                        .addForVerifiableCredentials([{ index: 5463n, subindex: 0n }], (b) =>
+                            b
+                                .revealAttribute('degreeType')
+                                .addMembership('degreeName', ['Bachelor of Science and Arts', 'Bachelor of Finance'])
+                        )
+                        .getStatements();
                     sendStatement(statement);
                 });
                 // Add credential
@@ -157,8 +160,8 @@
         <h3>Request Proofs:</h3>
         <button id="web3ProofWeb3IdOnly">Request a Proof using web3Id</button>
         <br />
-       <button id="web3ProofIdOnly">Request a Proof using account credentials</button>
-       <br />
-       <button id="web3ProofMixed">Request a Proof using both web3Id and account credentials</button>
+        <button id="web3ProofIdOnly">Request a Proof using account credentials</button>
+        <br />
+        <button id="web3ProofMixed">Request a Proof using both web3Id and account credentials</button>
     </body>
 </html>

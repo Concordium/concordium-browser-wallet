@@ -1,4 +1,5 @@
-import { ConcordiumGRPCClient, ContractAddress, sha256 } from '@concordium/web-sdk';
+import { CcdAmount, UpdateContractPayload, ConcordiumGRPCClient, ContractAddress, sha256 } from '@concordium/web-sdk';
+import * as ed from '@noble/ed25519';
 import {
     MetadataUrl,
     NetworkConfiguration,
@@ -8,7 +9,7 @@ import {
 } from '@shared/storage/types';
 import { Buffer } from 'buffer/';
 import jsonschema from 'jsonschema';
-import { getContractName } from './contract-helpers';
+import { applyExecutionNRGBuffer, getContractName } from './contract-helpers';
 import { getNet } from './network-helpers';
 
 /**
@@ -51,6 +52,148 @@ export function getCredentialRegistryContractAddress(credentialId: string): Cont
     return { index, subindex };
 }
 
+export async function sign(digest: Buffer, privateKey: string) {
+    return Buffer.from(await ed.sign(digest, privateKey)).toString('hex');
+}
+
+// TODO This function is a copy from the node-sdk. Remove the duplicate here and export it in the SDK to use instead.
+export function encodeWord64LE(value: bigint): Buffer {
+    if (value > 18446744073709551615n || value < 0n) {
+        throw new Error(`The input has to be a 64 bit unsigned integer but it was: ${value}`);
+    }
+    const arr = new ArrayBuffer(8);
+    const view = new DataView(arr);
+    view.setBigUint64(0, value, true);
+    return Buffer.from(new Uint8Array(arr));
+}
+
+export interface SigningData {
+    contractAddress: ContractAddress;
+    entryPoint: string;
+    nonce: bigint;
+    timestamp: bigint;
+}
+
+export interface RevocationDataHolder {
+    /** The public key identifying the credential holder */
+    credentialId: string;
+    /** Metadata of the signature */
+    signingData: SigningData;
+}
+
+export interface RevokeCredentialHolderParam {
+    /** Ed25519 signature on the revocation message as a hex string */
+    signature: string;
+    /** Revocation data */
+    data: RevocationDataHolder;
+}
+
+/**
+ * Serializes the revocation data holder. This is the data that is signed, together with a prefix, to authorize
+ * the revocation of a held credential.
+ * @param data the revocation data context to serialize
+ * @returns the serialized revocation data holder
+ */
+function serializeRevocationDataHolder(data: RevocationDataHolder) {
+    const credentialId = Buffer.from(data.credentialId, 'hex');
+
+    const contractIndex = encodeWord64LE(data.signingData.contractAddress.index);
+    const contractSubindex = encodeWord64LE(data.signingData.contractAddress.subindex);
+
+    const entrypointName = Buffer.from(data.signingData.entryPoint, 'utf-8');
+    const entrypointLength = Buffer.alloc(2);
+    entrypointLength.writeUInt16LE(entrypointName.length, 0);
+
+    const nonce = encodeWord64LE(data.signingData.nonce);
+    const timestamp = encodeWord64LE(data.signingData.timestamp);
+
+    const optionalReason = Buffer.of(0);
+
+    return Buffer.concat([
+        credentialId,
+        contractIndex,
+        contractSubindex,
+        entrypointLength,
+        entrypointName,
+        nonce,
+        timestamp,
+        optionalReason,
+    ]);
+}
+
+export function serializeRevokeCredentialHolderParam(parameter: RevokeCredentialHolderParam) {
+    const signature = Buffer.from(parameter.signature, 'hex');
+    const data = serializeRevocationDataHolder(parameter.data);
+    return Buffer.concat([signature, data]);
+}
+
+/**
+ * Builds the parameters used for a holder revocation transaction to revoke a given credential in a CIS-4 contract.
+ * @param address the address of the contract that hte credential to revoke is registered in
+ * @param credentialId the id of the credential to revoke (this is a derived public key)
+ * @param nonce the revocation nonce
+ * @param signingKey the signing key associated with the credential (the private key to the {@link credentialId})
+ * @returns the unserialized parameters for a holder revocation transaction
+ */
+export async function buildRevokeTransactionParameters(
+    address: ContractAddress,
+    credentialId: string,
+    nonce: bigint,
+    signingKey: string
+) {
+    const fiveMinutesInMilliseconds = 5 * 60000;
+    const signatureExpirationTimestamp = BigInt(Date.now() + fiveMinutesInMilliseconds);
+    const signingData: SigningData = {
+        contractAddress: address,
+        entryPoint: 'revokeCredentialHolder',
+        nonce,
+        timestamp: signatureExpirationTimestamp,
+    };
+
+    const data: RevocationDataHolder = {
+        credentialId,
+        signingData,
+    };
+
+    const REVOKE_SIGNATURE_MESSAGE = 'WEB3ID:REVOKE';
+    const serializedData = serializeRevocationDataHolder(data);
+    const signature = await sign(
+        Buffer.concat([Buffer.from(REVOKE_SIGNATURE_MESSAGE, 'utf-8'), serializedData]),
+        signingKey
+    );
+
+    const parameter: RevokeCredentialHolderParam = {
+        signature,
+        data,
+    };
+
+    return parameter;
+}
+
+/**
+ * Builds a holder revocation transaction to revoke a given verifiable credential in a CIS-4 contract.
+ * @param address the address of the contract that the credential to revoke is registered in
+ * @param contractName the name of the contract at {@link address}
+ * @param credentialId the id of the credential to revoke
+ * @param maxContractExecutionEnergy the maximum contract execution energy
+ * @returns an update contract transaction for revoking the credential with id {@link credentialId}
+ */
+export async function buildRevokeTransaction(
+    address: ContractAddress,
+    contractName: string,
+    credentialId: string,
+    maxContractExecutionEnergy: bigint,
+    parameters: RevokeCredentialHolderParam
+): Promise<UpdateContractPayload> {
+    return {
+        address,
+        amount: new CcdAmount(0n),
+        receiveName: `${contractName}.revokeCredentialHolder`,
+        maxContractExecutionEnergy,
+        message: serializeRevokeCredentialHolderParam(parameters),
+    };
+}
+
 function deserializeCredentialStatus(serializedCredentialStatus: string): VerifiableCredentialStatus {
     const buff = Buffer.from(serializedCredentialStatus, 'hex');
     switch (buff.readUInt8(0)) {
@@ -65,6 +208,27 @@ function deserializeCredentialStatus(serializedCredentialStatus: string): Verifi
         default:
             throw new Error(`Received an invalid credential status: ${serializedCredentialStatus}`);
     }
+}
+
+/**
+ * Estimates the cost of a holder revocation transaction.
+ * @param client the GRPC client for accessing a node
+ * @param contractName the name of the contract to invoke to get the estimate
+ * @param parameters the unserialized parameters for a holder revocation transaction
+ * @returns an estimate of the execution cost of the holder revocation transaction
+ */
+export async function getRevokeTransactionExecutionEnergyEstimate(
+    client: ConcordiumGRPCClient,
+    contractName: string,
+    parameters: RevokeCredentialHolderParam
+) {
+    const invokeResult = await client.invokeContract({
+        contract: parameters.data.signingData.contractAddress,
+        method: `${contractName}.${parameters.data.signingData.entryPoint}`,
+        parameter: serializeRevokeCredentialHolderParam(parameters),
+    });
+
+    return applyExecutionNRGBuffer(invokeResult.usedEnergy);
 }
 
 /**

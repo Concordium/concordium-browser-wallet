@@ -10,7 +10,7 @@ The example project included in this repository, serves as a working example of 
 ## Installing
 
 -   Run `yarn` in package root.
--    Build concordium helpers by running `yarn build:api-helpers`.
+-   Build concordium helpers by running `yarn build:api-helpers`.
 
 ## Running the example
 

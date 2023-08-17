@@ -1,14 +1,69 @@
 import {
-    createCredentialId,
-    createPublicKeyIdentifier,
+    RevocationDataHolder,
+    RevokeCredentialHolderParam,
+    SigningData,
     getCredentialHolderId,
     getCredentialRegistryContractAddress,
+    serializeRevokeCredentialHolderParam,
+    createCredentialId,
+    createPublicKeyIdentifier,
     getPublicKeyfromPublicKeyIdentifierDID,
+    CredentialQueryResponse,
+    deserializeCredentialEntry,
     getCredentialIdFromSubjectDID,
     getContractAddressFromIssuerDID,
     getVerifiableCredentialPublicKeyfromSubjectDID,
 } from '../src/shared/utils/verifiable-credential-helpers';
 import { mainnet, testnet } from '../src/shared/constants/networkConfiguration';
+
+test('serializing a revoke credential holder parameter', () => {
+    const signingData: SigningData = {
+        contractAddress: { index: 4718n, subindex: 0n },
+        entryPoint: 'revokeCredentialHolder',
+        nonce: 0n,
+        timestamp: 1688542350309n,
+    };
+
+    const data: RevocationDataHolder = {
+        credentialId: '2eec102b173118dda466411fc7df88093788a34c3e2a4b0a8891f5c671a9d106',
+        signingData,
+    };
+
+    const revokeCredentialHolderParam: RevokeCredentialHolderParam = {
+        signature:
+            'a70b2b7987a2835726bc6166da1e4d223b9f215962e20726a39ea95afaf9d10d13d0f093761f2f2a4c34d37f081ea501fed8ab74fb565b87822ff0aec6071309',
+        data,
+    };
+
+    expect(serializeRevokeCredentialHolderParam(revokeCredentialHolderParam).toString('hex')).toEqual(
+        'a70b2b7987a2835726bc6166da1e4d223b9f215962e20726a39ea95afaf9d10d13d0f093761f2f2a4c34d37f081ea501fed8ab74fb565b87822ff0aec60713092eec102b173118dda466411fc7df88093788a34c3e2a4b0a8891f5c671a9d1066e12000000000000000000000000000016007265766f6b6543726564656e7469616c486f6c6465720000000000000000e58bf7248901000000'
+    );
+});
+
+test('deserializing a credential entry', () => {
+    const serializedCredentialEntry =
+        '22ea01dfab98d77c686358528faade31b88d2866633a31a2d6dd4119cf7a58c401f9ad46f889010000004e0068747470733a2f2f676973742e67697468756275736572636f6e74656e742e636f6d2f6f72686f6a2f32326162376364316161373464633834663766663734643534303136346463342f7261772f001500687474703a2f2f636f6e636f726469756d2e636f6d000100000000000000';
+
+    const expected: CredentialQueryResponse = {
+        credentialInfo: {
+            credentialHolderId: '22ea01dfab98d77c686358528faade31b88d2866633a31a2d6dd4119cf7a58c4',
+            holderRevocable: true,
+            metadataUrl: {
+                url: 'https://gist.githubusercontent.com/orhoj/22ab7cd1aa74dc84f7ff74d540164dc4/raw/',
+            },
+            validFrom: 1692087528953n,
+            validUntil: undefined,
+        },
+        schemaRef: {
+            schema: {
+                url: 'http://concordium.com',
+            },
+        },
+        revocationNonce: 1n,
+    };
+
+    expect(deserializeCredentialEntry(serializedCredentialEntry)).toEqual(expected);
+});
 
 test('credential holder id is extracted from verifiable credential id field', () => {
     const id =

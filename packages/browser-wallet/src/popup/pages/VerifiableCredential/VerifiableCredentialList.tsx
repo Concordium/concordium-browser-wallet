@@ -4,8 +4,10 @@ import {
     storedVerifiableCredentialSchemasAtom,
     storedVerifiableCredentialsAtom,
 } from '@popup/store/verifiable-credential';
-import { useAtom, useAtomValue } from 'jotai';
-import { VerifiableCredential, VerifiableCredentialStatus, VerifiableCredentialSchema } from '@shared/storage/types';
+import { useAtomValue, useAtom } from 'jotai';
+import Topbar from '@popup/shared/Topbar/Topbar';
+import { useTranslation } from 'react-i18next';
+import { VerifiableCredential, VerifiableCredentialSchema, VerifiableCredentialStatus } from '@shared/storage/types';
 import {
     VerifiableCredentialMetadata,
     getChangesToCredentialMetadata,
@@ -18,6 +20,7 @@ import {
     useFetchingEffect,
 } from './VerifiableCredentialHooks';
 import { VerifiableCredentialCard } from './VerifiableCredentialCard';
+import VerifiableCredentialDetails from './VerifiableCredentialDetails';
 
 /**
  * Component to display while loading verifiable credentials from storage.
@@ -30,12 +33,16 @@ function LoadingVerifiableCredentials() {
  * Component to display when there are no verifiable credentials in the wallet.
  */
 function NoVerifiableCredentials() {
+    const { t } = useTranslation('verifiableCredential');
     return (
-        <div className="verifiable-credential-list">
-            <div className="flex-column align-center h-full">
-                <p className="m-t-20 m-h-30">You do not have any verifiable credentials in your wallet.</p>
+        <>
+            <Topbar title={t('topbar.list')} />
+            <div className="verifiable-credential-list">
+                <div className="flex-column align-center">
+                    <p className="m-t-20 m-h-30">You do not have any verifiable credentials in your wallet.</p>
+                </div>
             </div>
-        </div>
+        </>
     );
 }
 
@@ -84,6 +91,7 @@ function VerifiableCredentialCardWithStatusFromChain({
  */
 export default function VerifiableCredentialList() {
     const verifiableCredentials = useAtomValue(storedVerifiableCredentialsAtom);
+    const { t } = useTranslation('verifiableCredential');
     const [selected, setSelected] = useState<{
         credential: VerifiableCredential;
         status: VerifiableCredentialStatus;
@@ -116,32 +124,36 @@ export default function VerifiableCredentialList() {
 
     if (selected) {
         return (
-            <VerifiableCredentialCard
+            <VerifiableCredentialDetails
                 className="verifiable-credential-list__card"
-                credentialSubject={selected.credential.credentialSubject}
+                credential={selected.credential}
                 schema={selected.schema}
-                credentialStatus={selected.status}
+                status={selected.status}
                 metadata={selected.metadata}
+                backButtonOnClick={() => setSelected(undefined)}
             />
         );
     }
 
     return (
-        <div className="verifiable-credential-list">
-            {verifiableCredentials.value.map((credential) => {
-                return (
-                    <VerifiableCredentialCardWithStatusFromChain
-                        key={credential.id}
-                        className="verifiable-credential-list__card"
-                        credential={credential}
-                        onClick={(
-                            status: VerifiableCredentialStatus,
-                            schema: VerifiableCredentialSchema,
-                            metadata: VerifiableCredentialMetadata
-                        ) => setSelected({ credential, status, schema, metadata })}
-                    />
-                );
-            })}
-        </div>
+        <>
+            <Topbar title={t('topbar.list')} />
+            <div className="verifiable-credential-list">
+                {verifiableCredentials.value.map((credential) => {
+                    return (
+                        <VerifiableCredentialCardWithStatusFromChain
+                            key={credential.id}
+                            className="verifiable-credential-list__card"
+                            credential={credential}
+                            onClick={(
+                                status: VerifiableCredentialStatus,
+                                schema: VerifiableCredentialSchema,
+                                metadata: VerifiableCredentialMetadata
+                            ) => setSelected({ credential, status, schema, metadata })}
+                        />
+                    );
+                })}
+            </div>
+        </>
     );
 }
