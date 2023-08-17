@@ -34,4 +34,6 @@ export default {
     },
     failedProof: 'Unable to create proof',
     failedProofReason: 'Unable to create proof due to: {{ reason }}',
+    unableToProve:
+        ' {{ dappName }} has requested a proof of identity from you, however you are unable to fulfill the request',
 };

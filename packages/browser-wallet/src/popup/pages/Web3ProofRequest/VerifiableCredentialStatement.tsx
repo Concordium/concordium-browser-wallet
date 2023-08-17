@@ -4,10 +4,7 @@ import {
     StatementTypes,
     VerifiableCredentialStatement,
 } from '@concordium/web-sdk';
-import {
-    storedVerifiableCredentialsAtom,
-    storedVerifiableCredentialSchemasAtom,
-} from '@popup/store/verifiable-credential';
+import { storedVerifiableCredentialSchemasAtom } from '@popup/store/verifiable-credential';
 import {
     VerifiableCredential,
     CredentialSubject,
@@ -23,12 +20,7 @@ import { DisplayStatementView, StatementLine } from '../IdProofRequest/DisplaySt
 import { VerifiableCredentialCard } from '../VerifiableCredential/VerifiableCredentialCard';
 import { useCredentialMetadata } from '../VerifiableCredential/VerifiableCredentialHooks';
 import CredentialSelector from './CredentialSelector';
-import {
-    createWeb3IdDIDFromCredential,
-    DisplayCredentialStatementProps,
-    getViableWeb3IdCredentialsForStatement,
-    SecretStatementV2,
-} from './utils';
+import { createWeb3IdDIDFromCredential, DisplayCredentialStatementProps, SecretStatementV2 } from './utils';
 
 function getPropertyTitle(attributeTag: string, schema: VerifiableCredentialSchema) {
     // TODO use localization here
@@ -162,26 +154,18 @@ export function DisplayWeb3SecretStatement({
 
 export default function DisplayWeb3Statement({
     credentialStatement,
+    validCredentials,
     dappName,
     setChosenId,
     net,
-    statuses,
-}: DisplayCredentialStatementProps<VerifiableCredentialStatement>) {
+}: DisplayCredentialStatementProps<VerifiableCredentialStatement, VerifiableCredential>) {
     const reveals = credentialStatement.statement.filter(
         (s) => s.type === StatementTypes.RevealAttribute
     ) as RevealStatementV2[];
     const secrets = credentialStatement.statement.filter(
         (s) => s.type !== StatementTypes.RevealAttribute
     ) as SecretStatementV2[];
-    const verifiableCredentials = useAtomValue(storedVerifiableCredentialsAtom);
     const verifiableCredentialSchemas = useAtomValue(storedVerifiableCredentialSchemasAtom);
-
-    const validCredentials = useMemo(() => {
-        if (verifiableCredentials.loading) {
-            return [];
-        }
-        return getViableWeb3IdCredentialsForStatement(credentialStatement, verifiableCredentials.value, statuses);
-    }, [verifiableCredentials.loading]);
 
     const [chosenCredential, setChosenCredential] = useState<VerifiableCredential | undefined>(validCredentials[0]);
 

@@ -6,22 +6,15 @@ import {
     AttributeKey,
     AttributeList,
 } from '@concordium/web-sdk';
-import { displaySplitAddress } from '@popup/shared/utils/account-helpers';
-import {
-    useConfirmedIdentities,
-    useDisplayAttributeValue,
-    useGetAttributeName,
-} from '@popup/shared/utils/identity-helpers';
-import { credentialsAtom } from '@popup/store/account';
+import { displaySplitAddress, useIdentityOf } from '@popup/shared/utils/account-helpers';
+import { useDisplayAttributeValue, useGetAttributeName } from '@popup/shared/utils/identity-helpers';
 import { WalletCredential, ConfirmedIdentity } from '@shared/storage/types';
-import { useAtomValue } from 'jotai';
-import React, { useCallback, useEffect, useMemo, useState } from 'react';
+import React, { useCallback, useEffect, useState } from 'react';
 import { useTranslation } from 'react-i18next';
 import { ClassName } from 'wallet-common-helpers';
-import { isIdentityOfCredential } from '@shared/utils/identity-helpers';
 import { DisplayStatementView, StatementLine } from '../IdProofRequest/DisplayStatement/DisplayStatement';
 import CredentialSelector from './CredentialSelector';
-import { DisplayCredentialStatementProps, getViableAccountCredentialsForStatement, SecretStatementV2 } from './utils';
+import { DisplayCredentialStatementProps, SecretStatementV2 } from './utils';
 import {
     isoToCountryName,
     SecretStatement,
@@ -99,10 +92,11 @@ export function DisplayRevealStatementV2({ dappName, statements, identity, class
 
 export default function AccountStatement({
     credentialStatement,
+    validCredentials,
     dappName,
     setChosenId,
     net,
-}: DisplayCredentialStatementProps<AccountCredentialStatement>) {
+}: DisplayCredentialStatementProps<AccountCredentialStatement, WalletCredential>) {
     const reveals = credentialStatement.statement.filter(
         (s) => s.type === StatementTypes.RevealAttribute
     ) as RevealStatementV2[];
@@ -110,17 +104,9 @@ export default function AccountStatement({
         (s) => s.type !== StatementTypes.RevealAttribute
     ) as SecretStatementV2[];
 
-    const identities = useConfirmedIdentities();
-    const credentials = useAtomValue(credentialsAtom);
-
-    const validCredentials = useMemo(() => {
-        if (identities.loading) {
-            return [];
-        }
-        return getViableAccountCredentialsForStatement(credentialStatement, identities.value, credentials);
-    }, [credentialStatement.idQualifier.issuers]);
-
     const [chosenCredential, setChosenCredential] = useState<WalletCredential | undefined>(validCredentials[0]);
+    // We do the type cast, because the check should have been done to filter validCredentials.
+    const identity = useIdentityOf(chosenCredential) as ConfirmedIdentity | undefined;
 
     const onChange = useCallback((credential: WalletCredential) => {
         setChosenCredential(credential);
@@ -133,13 +119,6 @@ export default function AccountStatement({
             setChosenId(createAccountDID(net, chosenCredential.credId));
         }
     }, []);
-
-    const identity = useMemo(() => {
-        if (!chosenCredential) {
-            return undefined;
-        }
-        return identities.value.find((id) => isIdentityOfCredential(id)(chosenCredential));
-    }, [chosenCredential?.credId]);
 
     return (
         <div className="web3-id-proof-request__credential-statement-container">

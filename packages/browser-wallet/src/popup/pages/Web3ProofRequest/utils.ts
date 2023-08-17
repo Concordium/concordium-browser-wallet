@@ -30,12 +30,12 @@ import { areContractAddressesEqual } from '@shared/utils/contract-helpers';
 
 export type SecretStatementV2 = Exclude<AtomicStatementV2, RevealStatementV2>;
 
-export interface DisplayCredentialStatementProps<Statement> extends ClassName {
+export interface DisplayCredentialStatementProps<Statement, Credential> extends ClassName {
     credentialStatement: Statement;
+    validCredentials: Credential[];
     dappName: string;
     setChosenId: (id: string) => void;
     net: Network;
-    statuses: Record<string, VerifiableCredentialStatus | undefined>;
 }
 
 export function getAccountCredentialCommitmentInput(

@@ -10,6 +10,7 @@ import {
     Web3IdProofInput,
     ConcordiumGRPCClient,
     CommitmentInput,
+    isVerifiableCredentialStatement,
 } from '@concordium/web-sdk';
 import { InternalMessageType } from '@concordium/browser-wallet-message-hub';
 
@@ -35,7 +36,12 @@ import { parse } from '@shared/utils/payload-helpers';
 import { VerifiableCredential, VerifiableCredentialStatus } from '@shared/storage/types';
 import { getVerifiableCredentialStatus } from '@shared/utils/verifiable-credential-helpers';
 import { useAsyncMemo } from 'wallet-common-helpers';
-import { getAccountCredentialCommitmentInput, getWeb3CommitmentInput } from './utils';
+import {
+    getAccountCredentialCommitmentInput,
+    getViableAccountCredentialsForStatement,
+    getViableWeb3IdCredentialsForStatement,
+    getWeb3CommitmentInput,
+} from './utils';
 import { DisplayCredentialStatement } from './DisplayStatement';
 
 type Props = {
@@ -65,6 +71,24 @@ async function getAllCredentialStatuses(
     return Object.fromEntries(statuses);
 }
 
+function DisplayNotProvable({ onClick, dappName }: { onClick: () => void; dappName: string }) {
+    const { t } = useTranslation('web3IdProofRequest');
+
+    return (
+        <ExternalRequestLayout>
+            <div className="web3-id-proof-request__statement-container">
+                <h3 className="m-t-0 text-center">{t('unableToProve', { dappName })}</h3>
+                <ButtonGroup className="web3-id-proof-request__actions">
+                    <Button onClick={onClick}>{t('reject')}</Button>
+                    <Button className="flex-center" disabled>
+                        {t('continue')}
+                    </Button>
+                </ButtonGroup>
+            </div>
+        </ExternalRequestLayout>
+    );
+}
+
 export default function Web3ProofRequest({ onReject, onSubmit }: Props) {
     const { state } = useLocation() as Location;
     const { statements: rawStatements, challenge, url } = state.payload;
@@ -88,8 +112,6 @@ export default function Web3ProofRequest({ onReject, onSubmit }: Props) {
     const credentials = useAtomValue(credentialsAtom);
     const verifiableCredentials = useAtomValue(storedVerifiableCredentialsAtom);
 
-    const canProve = useMemo(() => ids.every((x) => Boolean(x)), [ids]);
-
     // TODO filter so that we only look up VC that are viable for some statement
     const statuses = useAsyncMemo(
         () =>
@@ -100,15 +122,32 @@ export default function Web3ProofRequest({ onReject, onSubmit }: Props) {
         [verifiableCredentials.loading]
     );
 
+    const validCredentials = useMemo(() => {
+        if (identities.loading || verifiableCredentials.loading || !statuses) {
+            return undefined;
+        }
+        return statements.map((statement) => {
+            if (isAccountCredentialStatement(statement)) {
+                return getViableAccountCredentialsForStatement(statement, identities.value, credentials);
+            }
+            if (isVerifiableCredentialStatement(statement)) {
+                return getViableWeb3IdCredentialsForStatement(statement, verifiableCredentials.value, statuses);
+            }
+            throw new Error('Unknown statement type');
+        });
+    }, [identities.loading, verifiableCredentials.loading, Boolean(statuses)]);
+
+    const canProve = useMemo(
+        () => validCredentials && validCredentials.every((x) => x.length > 0),
+        [Boolean(validCredentials)]
+    );
+
     const handleSubmit = useCallback(async () => {
         if (!recoveryPhrase) {
             throw new Error('Missing recovery phrase');
         }
         if (!network) {
             throw new Error('Network is not specified');
-        }
-        if (!canProve) {
-            throw new Error('The statements are not satisfied and cannot be proven');
         }
 
         const global = await getGlobal(client);
@@ -157,12 +196,21 @@ export default function Web3ProofRequest({ onReject, onSubmit }: Props) {
             throw new Error(result.reason);
         }
         return result.proof;
-    }, [recoveryPhrase, network, ids, verifiableCredentials.loading, identities.loading, canProve]);
+    }, [recoveryPhrase, network, ids, verifiableCredentials.loading, identities.loading]);
 
     useEffect(() => onClose(onReject), [onClose, onReject]);
 
-    if (verifiableCredentials.loading || verifiableCredentialSchemas.loading || identities.loading || !statuses) {
+    if (
+        verifiableCredentials.loading ||
+        verifiableCredentialSchemas.loading ||
+        identities.loading ||
+        !validCredentials
+    ) {
         return null;
+    }
+
+    if (!canProve) {
+        return <DisplayNotProvable onClick={withClose(onReject)} dappName={dappName} />;
     }
 
     return (
@@ -171,6 +219,7 @@ export default function Web3ProofRequest({ onReject, onSubmit }: Props) {
                 <DisplayCredentialStatement
                     className="m-t-10:not-first"
                     dappName={dappName}
+                    validCredentials={validCredentials[currentStatementIndex]}
                     credentialStatement={statements[currentStatementIndex]}
                     net={net}
                     key={currentStatementIndex}
@@ -181,7 +230,6 @@ export default function Web3ProofRequest({ onReject, onSubmit }: Props) {
                             return newIds;
                         })
                     }
-                    statuses={statuses}
                 />
                 <ButtonGroup className="web3-id-proof-request__actions">
                     <Button disabled={creatingProof} onClick={withClose(onReject)}>
