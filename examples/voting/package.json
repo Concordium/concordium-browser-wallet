@@ -1,11 +1,11 @@
 {
     "name": "voting",
     "license": "Apache-2.0",
-    "version": "1.1.0",
+    "version": "1.1.1",
     "packageManager": "yarn@3.2.0",
     "dependencies": {
         "@concordium/browser-wallet-api-helpers": "^2.0.0",
-        "@concordium/web-sdk": "^3.3.1",
+        "@concordium/web-sdk": "^6.0.0",
         "bootstrap": "^5.2.1",
         "cross-env": "^7.0.3",
         "moment": "^2.29.4",
@@ -26,6 +26,9 @@
         "express": "^4.18.1",
         "ts-node": "^10.8.0",
         "typescript": "^4.7.2"
+    },
+    "resolutions": {
+        "@concordium/web-sdk": "^6.0.0"
     },
     "scripts": {
         "build": "node --loader ts-node/esm ./esbuild.config.ts; cp ./public/static/img/* ./dist",
