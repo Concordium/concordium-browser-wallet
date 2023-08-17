@@ -1,4 +1,11 @@
-import { createConcordiumClient, verifyWeb3IdCredentialSignature } from '@concordium/web-sdk';
+import {
+    CredentialStatements,
+    getVerifiablePresentation,
+    Web3IdProofInput,
+    createConcordiumClient,
+    verifyWeb3IdCredentialSignature,
+    isHex,
+} from '@concordium/web-sdk';
 import {
     sessionVerifiableCredentials,
     storedCurrentNetwork,
@@ -16,8 +23,10 @@ import {
     getDIDNetwork,
     getPublicKeyfromPublicKeyIdentifierDID,
 } from '@shared/utils/verifiable-credential-helpers';
-import { MessageStatusWrapper } from '@concordium/browser-wallet-message-hub';
+import { ExtensionMessageHandler, MessageStatusWrapper } from '@concordium/browser-wallet-message-hub';
 import { getNet } from '@shared/utils/network-helpers';
+import { parse } from '@shared/utils/payload-helpers';
+import { BackgroundResponseStatus, ProofBackgroundResponse } from '@shared/utils/types';
 import { RunCondition } from './window-management';
 
 const NO_CREDENTIALS_FIT = 'No temporary credentials fit the given id';
@@ -129,6 +138,53 @@ export const runIfValidWeb3IdCredentialRequest: RunCondition<MessageStatusWrappe
         return {
             run: false,
             response: { success: false, message: `Credential is not well-formed: ${(e as Error).message}` },
+        };
+    }
+};
+
+async function createWeb3Proof(input: Web3IdProofInput): Promise<ProofBackgroundResponse<string>> {
+    const proof = getVerifiablePresentation(input);
+    return {
+        status: BackgroundResponseStatus.Success,
+        proof: proof.toString(),
+    };
+}
+
+export const createWeb3IdProofHandler: ExtensionMessageHandler = (msg, _sender, respond) => {
+    createWeb3Proof(msg.payload)
+        .then(respond)
+        .catch((e: Error) => respond({ status: BackgroundResponseStatus.Error, error: e.message }));
+    return true;
+};
+
+export const runIfValidWeb3IdProof: RunCondition<MessageStatusWrapper<undefined>> = async (msg) => {
+    if (!isHex(msg.payload.challenge)) {
+        return {
+            run: false,
+            response: { success: false, message: `Challenge is invalid, it should be a HEX encoded string` },
+        };
+    }
+    try {
+        const statements: CredentialStatements = parse(msg.payload.statements);
+        // TODO Enable when SDK is updated
+        // // If a statement does not verify, an error is thrown.
+        // statements.every((credStatement) => verifyAtomicStatements(credStatement.statement));
+
+        const noEmptyQualifier = statements.every((credStatement) => credStatement.idQualifier.issuers.length > 0);
+        if (!noEmptyQualifier) {
+            return {
+                run: false,
+                response: {
+                    success: false,
+                    message: `Statements must have at least 1 possible identity provider / issuer`,
+                },
+            };
+        }
+        return { run: true };
+    } catch (e) {
+        return {
+            run: false,
+            response: { success: false, message: `Statement is not well-formed: ${(e as Error).message}` },
         };
     }
 };

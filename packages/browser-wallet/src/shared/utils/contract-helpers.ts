@@ -1,4 +1,4 @@
-import { InstanceInfo } from '@concordium/web-sdk';
+import { ContractAddress, InstanceInfo } from '@concordium/web-sdk';
 
 /**
  * Applies a buffer of 20% to an estimated execution energy amount. The goal is to prevent transactions
@@ -18,4 +18,11 @@ export function applyExecutionNRGBuffer(estimatedExecutionEnergy: bigint) {
  */
 export function getContractName(instanceInfo: InstanceInfo): string | undefined {
     return instanceInfo.name.substring(5);
+}
+
+/**
+ * Determine whether two contract addresses are the same
+ */
+export function areContractAddressesEqual(a: ContractAddress, b: ContractAddress) {
+    return a.index === b.index && a.subindex === b.subindex;
 }

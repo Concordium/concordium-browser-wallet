@@ -214,6 +214,27 @@
                         })
                         .catch(alert);
                 });
+                document.getElementById('web3Proof').addEventListener('click', () => {
+                    const statement = new concordiumSDK.Web3StatementBuilder()
+                        .addForIdentityCredentials([0, 1, 2], (b) =>
+                            b.revealAttribute('firstName').addRange('dob', '08000101', '20000101')
+                        )
+                        .addForVerifiableCredentials([{ index: 5463, subindex: 0 }], (b) =>
+                            b.revealAttribute('degreeName').addMembership('graduationDate', ['2010-06-01T00:00:00Z'])
+                        )
+                        .getStatements();
+                    const challenge = '94d3e85bbc8ff0091e562ad8ef6c30d57f29b19f17c98ce155df2a30100dAAAA';
+                    provider
+                        .requestVerifiablePresentation(challenge, statement)
+                        .then((proof) => {
+                            console.log(proof);
+                            alert('Proof received! (check the console)');
+                        })
+                        .catch((error) => {
+                            console.log(error);
+                            alert(error);
+                        });
+                });
                 document.getElementById('addWCCD').addEventListener('click', () => {
                     provider
                         .addCIS2Tokens(currentAccountAddress, [''], 2059n, 0n)
@@ -221,7 +242,6 @@
                         .catch(alert);
                 });
             }
-
             setupPage();
         </script>
     </head>
@@ -244,6 +264,7 @@
             <option value="parameter">Parameter</option>
         </select>
         <button id="idProof">Request an ID Proof</button>
+        <button id="web3Proof">Request an ID 3 Proof</button>
         <br />
         Message: <input type="text" id="message" value="I believe in miracles" />
         <button id="signMessage">SignMessage</button>

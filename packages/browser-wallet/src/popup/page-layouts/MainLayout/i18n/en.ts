@@ -20,6 +20,7 @@ const t = {
         connectAccountsRequest: 'Connect accounts',
         addTokens: 'Add tokens',
         idProof: 'Proof of identity',
+        web3IdProof: 'Proof of identity',
         request: 'Signature Request',
         connect: 'New connection',
         allowlistingRequest: 'Allowlisting request',

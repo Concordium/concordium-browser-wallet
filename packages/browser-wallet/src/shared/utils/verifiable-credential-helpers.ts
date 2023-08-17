@@ -881,3 +881,45 @@ export function getDIDNetwork(did: string): 'mainnet' | 'testnet' {
     }
     return network;
 }
+
+/** Takes a Web3IdCredential issuer DID string and returns the contract address
+ * @param did a issuer DID string on the form: "did:ccd:NETWORK:sci:INDEX:SUBINDEX/issuer"
+ * @returns the contract address INDEX;SUBINDEX
+ */
+export function getContractAddressFromIssuerDID(did: string): ContractAddress {
+    const preSplit = did.split('/');
+    if (preSplit[1] !== 'issuer') {
+        throw new Error('Given DID did not follow expected format');
+    }
+    const split = preSplit[0].split(':');
+    if ((split.length !== 6 && split.length !== 5) || split[split.length - 3] !== 'sci') {
+        throw new Error('Given DID did not follow expected format');
+    }
+    const index = BigInt(split[split.length - 2]);
+    const subindex = BigInt(split[split.length - 1]);
+    return { index, subindex };
+}
+
+/** Takes a Web3IdCredential subject DID string and returns the publicKey of the verifiable credential
+ * @param did a DID string on the form: "did:ccd:NETWORK:sci:INDEX:SUBINDEX/credentialEntry/KEY"
+ * @returns the public key KEY
+ */
+export function getVerifiableCredentialPublicKeyfromSubjectDID(did: string) {
+    const split = did.split('/');
+    if (split.length !== 3 || split[0].split(':')[split[0].split(':').length - 3] !== 'sci') {
+        throw new Error(`Given DID did not follow expected format:${did}`);
+    }
+    return split[2];
+}
+
+/** Takes a AccountCredential subject DID string and returns the credential id of the account credential
+ * @param did a DID string on the form: "did:ccd:NETWORK:cred:CREDID"
+ * @returns the credId CREDID
+ */
+export function getCredentialIdFromSubjectDID(did: string) {
+    const split = did.split(':');
+    if ((split.length !== 5 && split.length !== 4) || split[split.length - 2] !== 'cred') {
+        throw new Error(`Given DID did not follow expected format: ${did}`);
+    }
+    return split[split.length - 1];
+}

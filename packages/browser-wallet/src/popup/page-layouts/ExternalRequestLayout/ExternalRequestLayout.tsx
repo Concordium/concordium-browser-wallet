@@ -29,6 +29,9 @@ function Header() {
         if (pathname.startsWith(absoluteRoutes.prompt.idProof.path)) {
             return t('header.idProof');
         }
+        if (pathname.startsWith(absoluteRoutes.prompt.web3IdProof.path)) {
+            return t('header.web3IdProof');
+        }
         return t('header.request');
     }
 
