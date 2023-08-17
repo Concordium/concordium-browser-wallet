@@ -78,7 +78,7 @@ export async function getVerifiableCredentialStatus(client: ConcordiumGRPCClient
     const contractAddress = getCredentialRegistryContractAddress(credentialId);
     const instanceInfo = await client.getInstanceInfo(contractAddress);
     if (instanceInfo === undefined) {
-        return undefined;
+        throw new Error('Given contract address was not a created instance');
     }
 
     const result = await client.invokeContract({
@@ -302,7 +302,7 @@ const verifiableCredentialMetadataSchema = {
         VerifiableCredentialMetadata: {
             additionalProperties: false,
             properties: {
-                background_color: {
+                backgroundColor: {
                     type: 'string',
                 },
                 image: {
@@ -321,7 +321,7 @@ const verifiableCredentialMetadataSchema = {
                     type: 'string',
                 },
             },
-            required: ['title', 'logo', 'background_color'],
+            required: ['title', 'logo', 'backgroundColor'],
             type: 'object',
         },
     },
@@ -330,7 +330,7 @@ const verifiableCredentialMetadataSchema = {
 export interface VerifiableCredentialMetadata {
     title: string;
     logo: MetadataUrl;
-    background_color: string;
+    backgroundColor: string;
     image?: MetadataUrl;
     localization?: Record<string, MetadataUrl>;
 }
@@ -608,7 +608,7 @@ export async function getChangesToCredentialMetadata(
     let updateReceived = false;
 
     for (const updatedMetadata of upToDateCredentialMetadata) {
-        if (storedMetadata.value === undefined) {
+        if (Object.keys(updatedStoredMetadata).length === 0) {
             updatedStoredMetadata = {
                 [updatedMetadata.url]: updatedMetadata.metadata,
             };
@@ -635,7 +635,7 @@ export async function getChangesToCredentialSchemas(
     let updateReceived = false;
 
     for (const updatedSchema of upToDateSchemas) {
-        if (storedSchemas === undefined) {
+        if (Object.keys(updatedSchemasInStorage).length === 0) {
             updatedSchemasInStorage = {
                 [updatedSchema.$id]: updatedSchema,
             };
