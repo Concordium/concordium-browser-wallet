@@ -152,25 +152,33 @@ export default function VerifiableCredentialDetails({
             return undefined;
         }
 
-        const detailsButton = {
-            title: t('menu.details'),
-            onClick: () => setShowExtraDetails(true),
-        };
+        const menuButtons = [];
 
-        let revokeButton;
         if (credentialEntry?.credentialInfo.holderRevocable && status !== VerifiableCredentialStatus.Revoked) {
-            revokeButton = {
+            const revokeButton = {
                 title: t('menu.revoke'),
                 icon: <RevokeIcon />,
                 onClick: goToConfirmPage,
             };
+            menuButtons.push(revokeButton);
         }
 
-        return {
-            type: ButtonTypes.More,
-            items: revokeButton ? [detailsButton, revokeButton] : [detailsButton],
-        };
-    }, [credentialEntry?.credentialInfo.holderRevocable, goToConfirmPage]);
+        if (!showExtraDetails) {
+            const detailsButton = {
+                title: t('menu.details'),
+                onClick: () => setShowExtraDetails(true),
+            };
+            menuButtons.push(detailsButton);
+        }
+
+        if (menuButtons.length > 0) {
+            return {
+                type: ButtonTypes.More,
+                items: menuButtons,
+            };
+        }
+        return undefined;
+    }, [credentialEntry?.credentialInfo.holderRevocable, goToConfirmPage, showExtraDetails]);
 
     // Wait for the credential entry to be loaded from the chain, and for the HdWallet
     // to be loaded to be ready to derive keys.
