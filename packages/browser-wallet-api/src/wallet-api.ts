@@ -9,6 +9,7 @@ import {
     AccountTransactionSignature,
     AccountTransactionType,
     DeployModulePayload,
+    HexString,
     InitContractPayload,
     SchemaVersion,
     UpdateContractPayload,
@@ -28,6 +29,7 @@ import {
 import EventEmitter from 'events';
 import type { JsonRpcRequest } from '@concordium/common-sdk/lib/providers/provider';
 import { IdProofOutput, IdStatement } from '@concordium/common-sdk/lib/idProofTypes';
+import { CredentialStatements, VerifiablePresentation } from '@concordium/common-sdk/lib/web3ProofTypes';
 import { ConcordiumGRPCClient } from '@concordium/common-sdk/lib/GRPCClient';
 import JSONBig from 'json-bigint';
 import { stringify } from './util';
@@ -284,6 +286,20 @@ class WalletApi extends EventEmitter implements IWalletApi {
         }
 
         return credentialHolderIdDID;
+    }
+
+    public async requestVerifiablePresentation(challenge: HexString, statements: CredentialStatements) {
+        const res = await this.messageHandler.sendMessage<MessageStatusWrapper<string>>(MessageType.Web3IdProof, {
+            // We have to stringify the statements because they can contain bigints
+            statements: stringify(statements),
+            challenge,
+        });
+
+        if (!res.success) {
+            throw new Error(res.message);
+        }
+
+        return VerifiablePresentation.fromString(res.result);
     }
 }
 

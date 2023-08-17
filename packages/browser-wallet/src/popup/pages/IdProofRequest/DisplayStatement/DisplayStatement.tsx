@@ -28,7 +28,7 @@ import {
     isoToCountryName,
 } from './utils';
 
-type StatementLine = {
+export type StatementLine = {
     attribute: string;
     value: string;
     isRequirementMet: boolean;
@@ -36,7 +36,7 @@ type StatementLine = {
 
 type StatementLineProps = StatementLine;
 
-function DisplayStatementLine({ attribute, value, isRequirementMet }: StatementLineProps) {
+export function DisplayStatementLine({ attribute, value, isRequirementMet }: StatementLineProps) {
     return (
         <li className="display-statement__line">
             <div className="display-statement__line-attribute">{attribute}:</div>
@@ -181,10 +181,6 @@ type BaseProps = ClassName & {
     onInvalid(): void;
 };
 
-type DisplayRevealStatementProps = BaseProps & {
-    statements: RevealStatement[];
-};
-
 export function DisplayRevealStatement({
     dappName,
     statements,
@@ -224,6 +220,10 @@ export function DisplayRevealStatement({
 
     return <DisplayStatementView reveal lines={lines} dappName={dappName} header={header} className={className} />;
 }
+
+type DisplayRevealStatementProps = BaseProps & {
+    statements: RevealStatement[];
+};
 
 type DisplaySecretStatementProps = BaseProps & {
     statement: SecretStatement;

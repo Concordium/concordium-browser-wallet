@@ -9,6 +9,8 @@ import type {
     IdStatement,
     IdProofOutput,
     ConcordiumGRPCClient,
+    CredentialStatements,
+    VerifiablePresentation,
     CredentialSubject,
     HexString,
 } from '@concordium/web-sdk';
@@ -196,6 +198,7 @@ interface MainWalletApi {
 
     /**
      * Request that the user provides a proof for the given statement.
+     * @deprecated Please use { @link requestVerifiablePresentation} instead.
      * @param accountAddress the address of the account that should prove the statement.
      * @param statement the id statement that should be proven.
      * @param challenge bytes chosen by the verifier. Should be HEX encoded.
@@ -218,6 +221,14 @@ interface MainWalletApi {
             credentialHolderIdDID: string
         ) => Promise<{ randomness: Record<string, string>; proof: CredentialProof }>
     ): Promise<string>;
+
+    /**
+     * Request that the user provides a proof for the given statements.
+     * @param challenge bytes chosen by the verifier. Should be HEX encoded.
+     * @param statement the web3Id statements that should be proven.
+     * @returns The presentation for the statements.
+     */
+    requestVerifiablePresentation(challenge: string, statements: CredentialStatements): Promise<VerifiablePresentation>;
 }
 
 export type WalletApi = MainWalletApi & EventListeners;
