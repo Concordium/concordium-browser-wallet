@@ -39,7 +39,13 @@ import {
     setPopupSize,
     testPopupOpen,
 } from './window-management';
-import {runIfValidWeb3IdCredentialRequest, web3IdAddCredentialFinishHandler, createWeb3IdProofHandler, runIfValidWeb3IdProof } from './web3Id';
+import {
+    runIfValidWeb3IdCredentialRequest,
+    web3IdAddCredentialFinishHandler,
+    createWeb3IdProofHandler,
+    runIfValidWeb3IdProof,
+} from './web3Id';
+
 const rpcCallNotAllowedMessage = 'RPC Call can only be performed by whitelisted sites';
 const walletLockedMessage = 'The wallet is locked';
 async function isWalletLocked(): Promise<boolean> {
@@ -252,7 +258,10 @@ bgMessageHandler.handleMessage(createMessageTypeFilter(MessageType.GrpcRequest),
 
 bgMessageHandler.handleMessage(createMessageTypeFilter(InternalMessageType.CreateIdProof), createIdProofHandler);
 
-bgMessageHandler.handleMessage(createMessageTypeFilter(InternalMessageType.CreateWeb3IdProof), createWeb3IdProofHandler);
+bgMessageHandler.handleMessage(
+    createMessageTypeFilter(InternalMessageType.CreateWeb3IdProof),
+    createWeb3IdProofHandler
+);
 
 const NOT_WHITELISTED = 'Site is not whitelisted';
 

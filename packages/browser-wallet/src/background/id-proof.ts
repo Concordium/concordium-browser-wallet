@@ -1,9 +1,4 @@
-import {
-    getIdProof,
-    IdProofInput,
-    IdProofOutput,
-    verifyIdstatement,
-} from '@concordium/web-sdk';
+import { getIdProof, IdProofInput, IdProofOutput, verifyIdstatement } from '@concordium/web-sdk';
 import { BackgroundResponseStatus, ProofBackgroundResponse } from '@shared/utils/types';
 import { ExtensionMessageHandler, MessageStatusWrapper } from '@concordium/browser-wallet-message-hub';
 import { isHex } from 'wallet-common-helpers';
