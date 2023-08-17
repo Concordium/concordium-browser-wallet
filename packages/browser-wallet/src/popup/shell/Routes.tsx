@@ -38,6 +38,7 @@ import VerifiableCredentialBackup from '@popup/pages/VerifiableCredentialBackup/
 import ConnectAccountsRequest from '@popup/pages/ConnectAccountsRequest';
 import AllowListRoutes from '@popup/pages/Allowlist';
 import AddWeb3IdCredential from '@popup/pages/AddWeb3IdCredential/AddWeb3IdCredential';
+import VerifiableCredentialImport from '@popup/pages/VerifiableCredentialBackup/VerifiableCredentialImport';
 
 type PromptKey = keyof Omit<typeof absoluteRoutes['prompt'], 'path'>;
 
@@ -120,6 +121,7 @@ export default function Routes() {
 
     usePrompt(InternalMessageType.EndIdentityIssuance, 'endIdentityIssuance');
     usePrompt(InternalMessageType.RecoveryFinished, 'recovery');
+    usePrompt(InternalMessageType.ImportWeb3IdBackup, 'importWeb3IdBackup');
 
     useEffect(() => {
         popupMessageHandler.sendInternalMessage(InternalMessageType.PopupReady).catch(noOp);
@@ -223,6 +225,7 @@ export default function Routes() {
                 />
                 <Route path={relativeRoutes.prompt.endIdentityIssuance.path} element={<IdentityIssuanceEnd />} />
                 <Route path={relativeRoutes.prompt.recovery.path} element={<RecoveryFinish />} />
+                <Route path={relativeRoutes.prompt.importWeb3IdBackup.path} element={<VerifiableCredentialImport />} />
             </Route>
             <Route path={`${relativeRoutes.setup.path}/*`} element={<Setup />} />
             <Route element={<RecoveryMain />} path={relativeRoutes.recovery.path} />

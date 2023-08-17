@@ -44,6 +44,7 @@ import {
     web3IdAddCredentialFinishHandler,
     createWeb3IdProofHandler,
     runIfValidWeb3IdProof,
+    loadWeb3IdBackupHandler
 } from './web3Id';
 
 const rpcCallNotAllowedMessage = 'RPC Call can only be performed by whitelisted sites';
@@ -525,6 +526,8 @@ bgMessageHandler.handleMessage(
         return true;
     }
 );
+
+bgMessageHandler.handleMessage(createMessageTypeFilter(InternalMessageType.LoadWeb3IdBackup), loadWeb3IdBackupHandler);
 
 function withPromptStart<T>(): RunCondition<MessageStatusWrapper<T | undefined>> {
     return async () => {

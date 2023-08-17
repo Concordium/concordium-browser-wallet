@@ -9,17 +9,9 @@ import Button from '@popup/shared/Button';
 import { getNet } from '@shared/utils/network-helpers';
 import { networkConfigurationAtom } from '@popup/store/settings';
 import { saveData } from '@popup/shared/utils/file-helpers';
-
-type VerifiableCredentialExport = {
-    credentials: VerifiableCredential[];
-};
-
-type ExportFormat = {
-    type: 'concordium-browser-wallet-verifiable-credentials';
-    v: number;
-    environment: string; // 'testnet' or 'mainnet'
-    value: VerifiableCredentialExport;
-};
+import { popupMessageHandler } from '@popup/shared/message-handler';
+import { InternalMessageType } from '@concordium/browser-wallet-message-hub';
+import { ExportFormat } from './utils';
 
 function createPlainExport(verifiableCredentials: VerifiableCredential[], network: NetworkConfiguration) {
     const docContent: ExportFormat = {
@@ -46,37 +38,31 @@ function createExport(verifiableCredentials: VerifiableCredential[], network: Ne
  * a single credential.
  */
 export default function VerifiableCredentialList() {
-    const [verifiableCredentials, setVerifiableCredentials] = useAtom(storedVerifiableCredentialsAtom);
+    const [verifiableCredentials] = useAtom(storedVerifiableCredentialsAtom);
     const schemas = useAtomValue(storedVerifiableCredentialSchemasAtom);
     const network = useAtomValue(networkConfigurationAtom);
 
-    if (schemas.loading || !verifiableCredentials) {
+    if (schemas.loading || verifiableCredentials.loading) {
         return null;
     }
 
     const handleExport = () => {
-        const data = createExport(verifiableCredentials, network);
+        const data = createExport(verifiableCredentials.value, network);
         saveData(data, `web3IdCredentials.export`);
     };
 
-    const handleImport = async (event: React.ChangeEvent<HTMLInputElement>) => {
-        const file = event.target.files?.[0];
-        if (file) {
-            const backup: ExportFormat = JSON.parse(await file.text());
-            // TODO Decrypt
-            const credentials = backup.value.credentials.filter(
-                (cred) => !(verifiableCredentials || []).some((existing) => existing.id === cred.id)
-            );
-            setVerifiableCredentials([...verifiableCredentials, ...credentials]);
-        }
+    const handleImport = () => {
+        popupMessageHandler.sendInternalMessage(InternalMessageType.LoadWeb3IdBackup).then(() => window.close());
     };
 
     return (
         <div className="flex-column">
             <Button className="export-private-key-page__export-button" width="medium" onClick={handleExport}>
-                Download Export
+                Download Backup
             </Button>
-            <input type="file" onChange={(x) => handleImport(x)} />
+            <Button className="export-private-key-page__export-button" width="medium" onClick={handleImport}>
+                Import backup
+            </Button>
         </div>
     );
 }

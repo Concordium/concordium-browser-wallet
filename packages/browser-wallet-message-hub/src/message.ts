@@ -45,6 +45,8 @@ export enum InternalMessageType {
     CreateWeb3IdProof = 'I_CreateWeb3IdProof',
     ConnectAccounts = 'I_ConnectAccounts',
     AddWeb3IdCredential = 'I_AddWeb3IdCredential',
+    LoadWeb3IdBackup = 'I_LoadWeb3IdBackup',
+    ImportWeb3IdBackup = 'I_ImportWeb3IdBackup',
 }
 
 // eslint-disable-next-line @typescript-eslint/no-explicit-any

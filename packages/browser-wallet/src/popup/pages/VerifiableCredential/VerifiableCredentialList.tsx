@@ -48,7 +48,7 @@ function NoVerifiableCredentials() {
     );
 }
 
-function VerifiableCredentialCardWithStatusFromChain({
+export function VerifiableCredentialCardWithStatusFromChain({
     credential,
     onClick,
     className,
