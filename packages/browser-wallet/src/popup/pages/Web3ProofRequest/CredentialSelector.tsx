@@ -27,7 +27,9 @@ export default function CredentialSelector<T>({ options, onChange, displayOption
             }}
         >
             {options.map((opt, index) => (
-                <option value={index}>{displayOption(opt)}</option>
+                <option key={displayOption(opt)} value={index}>
+                    {displayOption(opt)}
+                </option>
             ))}
         </select>
     );

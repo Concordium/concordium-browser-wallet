@@ -22,6 +22,7 @@ const t: typeof en = {
         connectAccountsRequest: 'Forbind konti',
         addTokens: 'Tilføj tokens',
         idProof: 'Bevis for identitet',
+        web3IdProof: 'Bevis for identitet',
         request: 'Anmodning om Signatur',
         connect: 'Ny Forbindelse',
         allowlistingRequest: 'Anmodning om tilladelse',
