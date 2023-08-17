@@ -5,16 +5,17 @@ import Button from '../Button/Button';
 
 export interface PopupMenuItem {
     title: string;
-    icon: JSX.Element;
+    icon?: JSX.Element;
     onClick?: () => void;
 }
 
 interface PopupMenuProps {
     items: PopupMenuItem[];
     onClickOutside: () => void;
+    afterButtonClick: () => void;
 }
 
-export default function PopupMenu({ items, onClickOutside }: PopupMenuProps) {
+export default function PopupMenu({ items, afterButtonClick, onClickOutside }: PopupMenuProps) {
     return (
         <DetectClickOutside onClickOutside={onClickOutside}>
             <div className="popup-menu">
@@ -24,7 +25,12 @@ export default function PopupMenu({ items, onClickOutside }: PopupMenuProps) {
                             key={item.title}
                             clear
                             className={clsx('popup-menu__item', item.onClick ? null : 'popup-menu__item--disabled')}
-                            onClick={item.onClick}
+                            onClick={() => {
+                                if (item.onClick) {
+                                    item.onClick();
+                                }
+                                afterButtonClick();
+                            }}
                         >
                             <div className="popup-menu__item__title heading6">{item.title}</div>
                             <div className="popup-menu__item__icon">{item.icon}</div>

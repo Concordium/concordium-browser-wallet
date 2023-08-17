@@ -5,6 +5,12 @@ const t = {
     },
     menu: {
         revoke: 'Revoke',
+        details: 'Details',
+    },
+    details: {
+        id: 'Credential holder ID',
+        validFrom: 'Valid from',
+        validUntil: 'Valid until',
     },
     status: {
         Active: 'Active',

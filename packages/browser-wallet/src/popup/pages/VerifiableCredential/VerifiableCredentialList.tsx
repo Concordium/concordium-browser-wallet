@@ -26,7 +26,7 @@ import VerifiableCredentialDetails from './VerifiableCredentialDetails';
  * Component to display while loading verifiable credentials from storage.
  */
 function LoadingVerifiableCredentials() {
-    return <div className="verifiable-credential-list" />;
+    return <div className="verifiable-credential-wrapper" />;
 }
 
 /**
@@ -37,7 +37,7 @@ function NoVerifiableCredentials() {
     return (
         <>
             <Topbar title={t('topbar.list')} />
-            <div className="verifiable-credential-list">
+            <div className="verifiable-credential-wrapper">
                 <div className="flex-column align-center">
                     <p className="m-t-20 m-h-30">You do not have any verifiable credentials in your wallet.</p>
                 </div>
@@ -125,7 +125,7 @@ export default function VerifiableCredentialList() {
     if (selected) {
         return (
             <VerifiableCredentialDetails
-                className="verifiable-credential-list__card"
+                className="verifiable-credential-wrapper__card"
                 credential={selected.credential}
                 schema={selected.schema}
                 status={selected.status}
@@ -138,12 +138,12 @@ export default function VerifiableCredentialList() {
     return (
         <>
             <Topbar title={t('topbar.list')} />
-            <div className="verifiable-credential-list">
+            <div className="verifiable-credential-wrapper">
                 {verifiableCredentials.value.map((credential) => {
                     return (
                         <VerifiableCredentialCardWithStatusFromChain
                             key={credential.id}
-                            className="verifiable-credential-list__card"
+                            className="verifiable-credential-wrapper__card"
                             credential={credential}
                             onClick={(
                                 status: VerifiableCredentialStatus,

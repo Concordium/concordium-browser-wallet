@@ -22,7 +22,7 @@ function DisplayImage({ image }: { image: MetadataUrl }) {
 /**
  * Renders a verifiable credential attribute.
  */
-function DisplayAttribute({
+export function DisplayAttribute({
     attributeKey,
     attributeValue,
     attributeTitle,
@@ -49,7 +49,7 @@ function ClickableVerifiableCredential({ children, onClick, metadata, className 
     if (onClick) {
         return (
             <div
-                className={clsx('verifiable-credential', className)}
+                className={clsx('verifiable-credential verifiable-credential__clickable', className)}
                 style={{ backgroundColor: metadata.backgroundColor }}
                 onClick={onClick}
                 onKeyDown={(e) => {
@@ -94,6 +94,22 @@ function applySchema(
     };
 }
 
+export function VerifiableCredentialCardHeader({
+    metadata,
+    credentialStatus,
+}: {
+    metadata: VerifiableCredentialMetadata;
+    credentialStatus: VerifiableCredentialStatus;
+}) {
+    return (
+        <header className="verifiable-credential__header">
+            <Logo logo={metadata.logo} />
+            <div className="verifiable-credential__header__title">{metadata.title}</div>
+            <StatusIcon status={credentialStatus} />
+        </header>
+    );
+}
+
 interface CardProps extends ClassName {
     credentialSubject: Omit<CredentialSubject, 'id'>;
     schema: VerifiableCredentialSchema;
@@ -114,11 +130,7 @@ export function VerifiableCredentialCard({
 
     return (
         <ClickableVerifiableCredential className={className} onClick={onClick} metadata={metadata}>
-            <header className="verifiable-credential__header">
-                <Logo logo={metadata.logo} />
-                <div className="verifiable-credential__header__title">{metadata.title}</div>
-                <StatusIcon status={credentialStatus} />
-            </header>
+            <VerifiableCredentialCardHeader credentialStatus={credentialStatus} metadata={metadata} />
             {metadata.image && <DisplayImage image={metadata.image} />}
             <div className="verifiable-credential__body-attributes">
                 {attributes &&
