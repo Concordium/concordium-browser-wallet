@@ -22,23 +22,25 @@ const Template: ComponentStory<typeof Topbar> = (args) => {
 export const WithBackButton = Template.bind({});
 WithBackButton.args = {
     title: 'Page Navigation Title',
+    onBackButtonClick: () => {},
 };
 
 export const WithoutBackButton = Template.bind({});
 WithoutBackButton.args = {
     title: 'Page Navigation Title',
-    backButton: { show: false },
+    onBackButtonClick: undefined,
 };
 
 export const WithMoreMenuButton = Template.bind({});
 WithMoreMenuButton.args = {
     title: 'Page Navigation Title',
-    backButton: { show: false },
+    onBackButtonClick: undefined,
     menuButton: { type: ButtonTypes.More, items: [{ title: 'Revoke', icon: <div>Test</div> }] },
 };
 
 export const WithBackAndMoreMenuButton = Template.bind({});
 WithBackAndMoreMenuButton.args = {
     title: 'Page Navigation Title',
+    onBackButtonClick: () => {},
     menuButton: { type: ButtonTypes.More, items: [{ title: 'Revoke', icon: <div>Test</div> }] },
 };

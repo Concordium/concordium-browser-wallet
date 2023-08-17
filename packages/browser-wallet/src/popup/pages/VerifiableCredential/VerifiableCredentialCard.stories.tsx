@@ -62,7 +62,7 @@ const metadata: VerifiableCredentialMetadata = {
         url: 'https://img.logoipsum.com/298.svg',
         hash: '1c74f7eb1b3343a5834e60e9a8fce277f2c7553112accd42e63fae7a09e0caf8',
     },
-    background_color: '#003d73',
+    backgroundColor: '#003d73',
     image: {
         url: 'https://picsum.photos/327/120',
     },

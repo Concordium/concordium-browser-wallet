@@ -51,10 +51,7 @@ function VerifiableCredentialExtraDetails({
 
     return (
         <div className="verifiable-credential-wrapper">
-            <div
-                className={`verifiable-credential ${className}`}
-                style={{ backgroundColor: metadata.background_color }}
-            >
+            <div className={`verifiable-credential ${className}`} style={{ backgroundColor: metadata.backgroundColor }}>
                 <VerifiableCredentialCardHeader credentialStatus={status} metadata={metadata} />
                 <div className="verifiable-credential__body-attributes">
                     <DisplayAttribute
@@ -140,8 +137,6 @@ export default function VerifiableCredentialDetails({
             type: AccountTransactionType.Update,
         };
 
-        // Override current router entry with stateful version
-        nav(pathname, { replace: true, state: true });
         nav(`${absoluteRoutes.home.account.path}/${accountRoutes.confirmTransfer}`, {
             state: confirmTransferState,
         });
@@ -190,10 +185,7 @@ export default function VerifiableCredentialDetails({
         <>
             <Topbar
                 title={t('topbar.details')}
-                backButton={{
-                    show: true,
-                    onClick: () => (showExtraDetails ? setShowExtraDetails(false) : backButtonOnClick()),
-                }}
+                onBackButtonClick={() => (showExtraDetails ? setShowExtraDetails(false) : backButtonOnClick())}
                 menuButton={menuButton}
             />
             {showExtraDetails && (

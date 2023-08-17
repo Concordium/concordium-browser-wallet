@@ -14,6 +14,13 @@ const t: typeof en = {
         validFrom: 'Gyldig fra',
         validUntil: 'Gyldig indtil',
     },
+    status: {
+        Active: 'Aktiv',
+        Revoked: 'Ophævet',
+        Expired: 'Udløbet',
+        NotActivated: 'Ikke aktiveret',
+        Pending: 'Afventer',
+    },
 };
 
 export default t;

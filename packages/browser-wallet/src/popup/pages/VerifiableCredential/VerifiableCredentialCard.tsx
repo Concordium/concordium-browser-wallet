@@ -50,7 +50,7 @@ function ClickableVerifiableCredential({ children, onClick, metadata, className 
         return (
             <div
                 className={clsx('verifiable-credential verifiable-credential__clickable', className)}
-                style={{ backgroundColor: metadata.background_color }}
+                style={{ backgroundColor: metadata.backgroundColor }}
                 onClick={onClick}
                 onKeyDown={(e) => {
                     if (e.key === 'Enter') {
@@ -65,10 +65,7 @@ function ClickableVerifiableCredential({ children, onClick, metadata, className 
         );
     }
     return (
-        <div
-            className={clsx('verifiable-credential', className)}
-            style={{ backgroundColor: metadata.background_color }}
-        >
+        <div className={clsx('verifiable-credential', className)} style={{ backgroundColor: metadata.backgroundColor }}>
             {children}
         </div>
     );

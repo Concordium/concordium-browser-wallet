@@ -27,9 +27,9 @@ export function useCredentialStatus(credential: VerifiableCredential) {
     const client = useAtomValue(grpcClientAtom);
 
     useEffect(() => {
-        getVerifiableCredentialStatus(client, credential.id).then((credentialStatus) => {
-            setStatus(credentialStatus);
-        });
+        getVerifiableCredentialStatus(client, credential.id)
+            .then(setStatus)
+            .catch(() => setStatus(VerifiableCredentialStatus.Pending));
     }, [credential.id, client]);
 
     return status;
