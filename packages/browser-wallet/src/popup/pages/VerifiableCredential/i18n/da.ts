@@ -10,7 +10,7 @@ const t: typeof en = {
         details: 'Detaljer',
     },
     details: {
-        id: 'Legimitationholders ID',
+        id: 'Legitimationholders ID',
         validFrom: 'Gyldig fra',
         validUntil: 'Gyldig indtil',
     },

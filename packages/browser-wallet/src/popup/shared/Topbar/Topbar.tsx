@@ -67,7 +67,7 @@ export default function Topbar({
                             <PopupMenu
                                 items={menuButton.items}
                                 onClickOutside={() => setShowPopupMenu(false)}
-                                onButtonClick={() => setShowPopupMenu(false)}
+                                afterButtonClick={() => setShowPopupMenu(false)}
                             />
                         </div>
                     </>

@@ -12,10 +12,10 @@ export interface PopupMenuItem {
 interface PopupMenuProps {
     items: PopupMenuItem[];
     onClickOutside: () => void;
-    onButtonClick: () => void;
+    afterButtonClick: () => void;
 }
 
-export default function PopupMenu({ items, onButtonClick, onClickOutside }: PopupMenuProps) {
+export default function PopupMenu({ items, afterButtonClick, onClickOutside }: PopupMenuProps) {
     return (
         <DetectClickOutside onClickOutside={onClickOutside}>
             <div className="popup-menu">
@@ -29,7 +29,7 @@ export default function PopupMenu({ items, onButtonClick, onClickOutside }: Popu
                                 if (item.onClick) {
                                     item.onClick();
                                 }
-                                onButtonClick();
+                                afterButtonClick();
                             }}
                         >
                             <div className="popup-menu__item__title heading6">{item.title}</div>
