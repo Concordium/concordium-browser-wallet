@@ -49,7 +49,7 @@ function ClickableVerifiableCredential({ children, onClick, metadata, className 
     if (onClick) {
         return (
             <div
-                className={clsx('verifiable-credential', className)}
+                className={clsx('verifiable-credential verifiable-credential__clickable', className)}
                 style={{ backgroundColor: metadata.background_color }}
                 onClick={onClick}
                 onKeyDown={(e) => {
