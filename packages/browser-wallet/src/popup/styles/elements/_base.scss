@@ -95,10 +95,13 @@ body {
 }
 
 // Scrollbar section inspired by https://stackoverflow.com/questions/21684101/css-vertical-scrollbar-padding-left-right-in-ul-possible
+
+$scrollbar-width: 16px;
+
 ::-webkit-scrollbar {
     // TODO cross-browser compatibility
-    width: rem(12px);
-    height: rem(12px);
+    width: $scrollbar-width;
+    height: 16px;
 }
 
 ::-webkit-scrollbar-thumb {
