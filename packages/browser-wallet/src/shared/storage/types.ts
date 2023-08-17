@@ -265,6 +265,10 @@ export enum VerifiableCredentialStatus {
     Revoked,
     Expired,
     NotActivated,
+
+    // Pending is a local wallet state not reflected on chain. This is used
+    // when a credential is added to the wallet, but it is still not on chain.
+    Pending,
 }
 
 export type CredentialSubject = {
