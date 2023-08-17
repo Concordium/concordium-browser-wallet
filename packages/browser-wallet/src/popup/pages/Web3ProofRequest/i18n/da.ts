@@ -32,10 +32,12 @@ const t: typeof en = {
             membership: 'Dette vil bevise at deres {{ name }} er en af følgende:\n{{ setNames }}',
             nonMembership: 'This will prove that your {{ name }} er IKKE en af følgende:\n{{ setNames }}',
             missingAttribute: 'Denne Attribut kan ikke findes på identiteten "{{identityName}}"',
-        }
+        },
     },
     failedProof: 'Bevis kunne ikke oprettes',
     failedProofReason: 'Bevis kunne ikke oprettes: {{ reason }}',
+    unableToProve:
+        ' {{ dappName }} har anmodet et bevis for identitet fra dig, men du opfølger ikke kravene for beviset, så du kan ikke lave et bevis',
 };
 
 export default t;

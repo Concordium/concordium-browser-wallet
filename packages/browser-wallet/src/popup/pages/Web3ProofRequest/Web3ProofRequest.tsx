@@ -81,7 +81,7 @@ function DisplayNotProvable({ onClick, dappName }: { onClick: () => void; dappNa
                 <ButtonGroup className="web3-id-proof-request__actions">
                     <Button onClick={onClick}>{t('reject')}</Button>
                     <Button className="flex-center" disabled>
-                        {t('continue')}
+                        {t('accept')}
                     </Button>
                 </ButtonGroup>
             </div>
