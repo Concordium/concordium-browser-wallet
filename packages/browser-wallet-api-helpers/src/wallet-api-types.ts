@@ -198,6 +198,7 @@ interface MainWalletApi {
 
     /**
      * Request that the user provides a proof for the given statement.
+     * @deprecated Please use { @link requestVerifiablePresentation} instead.
      * @param accountAddress the address of the account that should prove the statement.
      * @param statement the id statement that should be proven.
      * @param challenge bytes chosen by the verifier. Should be HEX encoded.
