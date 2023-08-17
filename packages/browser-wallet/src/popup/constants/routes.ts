@@ -69,6 +69,9 @@ export const relativeRoutes = {
         idProof: {
             path: 'id-proof',
         },
+        web3IdProof: {
+            path: 'web3Id-proof',
+        },
     },
     setup: {
         path: '/setup',

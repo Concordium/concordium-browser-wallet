@@ -33,6 +33,7 @@ import ChangePasscode from '@popup/pages/ChangePasscode/ChangePasscode';
 import AddTokensPrompt from '@popup/pages/ExternalAddTokens/ExternalAddTokens';
 import IdProofRequest from '@popup/pages/IdProofRequest';
 import VerifiableCredentialList from '@popup/pages/VerifiableCredential';
+import Web3ProofRequest from '@popup/pages/Web3ProofRequest';
 import ConnectAccountsRequest from '@popup/pages/ConnectAccountsRequest';
 import AllowListRoutes from '@popup/pages/Allowlist';
 import AddWeb3IdCredential from '@popup/pages/AddWeb3IdCredential/AddWeb3IdCredential';
@@ -109,6 +110,11 @@ export default function Routes() {
     const handleIdProofResponse = useMessagePrompt<MessageStatusWrapper<IdProofOutput>>(
         InternalMessageType.IdProof,
         'idProof'
+    );
+    // We manually stringify the presentation
+    const handleWeb3IdProofResponse = useMessagePrompt<MessageStatusWrapper<string>>(
+        InternalMessageType.Web3IdProof,
+        'web3IdProof'
     );
 
     usePrompt(InternalMessageType.EndIdentityIssuance, 'endIdentityIssuance');
@@ -197,6 +203,19 @@ export default function Routes() {
                             onSubmit={(proof) => handleIdProofResponse({ success: true, result: proof })}
                             onReject={() =>
                                 handleIdProofResponse({ success: false, message: 'Proof generation was rejected' })
+                            }
+                        />
+                    }
+                />
+                <Route
+                    path={relativeRoutes.prompt.web3IdProof.path}
+                    element={
+                        <Web3ProofRequest
+                            onSubmit={(presentationString) =>
+                                handleWeb3IdProofResponse({ success: true, result: presentationString })
+                            }
+                            onReject={() =>
+                                handleWeb3IdProofResponse({ success: false, message: 'Proof generation was rejected' })
                             }
                         />
                     }

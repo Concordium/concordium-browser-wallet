@@ -10,16 +10,64 @@
             let currentAccountAddress = '';
             async function setupPage() {
                 const provider = await concordiumHelpers.detectConcordiumProvider();
-
                 document.getElementById('requestAccounts').addEventListener('click', () => {
                     provider.requestAccounts().then((accountAddresses) => {
                         currentAccountAddress = accountAddresses[0];
                         document.getElementById('accountAddress').innerHTML = currentAccountAddress;
                     });
                 });
+
+                function sendStatement(statement) {
+                    // Should be not be hardcoded
+                    const challenge = '94d3e85bbc8ff0091e562ad8ef6c30d57f29b19f17c98ce155df2a30100dAAAA';
+                    provider
+                        .requestVerifiablePresentation(challenge, statement)
+                        .then((proof) => {
+                            console.log(proof);
+                            alert('Proof received! (check the console)');
+                        })
+                        .catch((error) => {
+                            console.log(error);
+                            alert(error);
+                        });
+                }
+
                 provider.on('accountDisconnected', (accountAddress) => (currentAccountAddress = undefined));
                 provider.on('accountChanged', (accountAddress) => (currentAccountAddress = accountAddress));
                 provider.on('chainChanged', (chain) => alert(chain));
+                // Request proofs
+                document.getElementById('web3ProofWeb3IdOnly').addEventListener('click', () => {
+                    const statement = new concordiumSDK.Web3StatementBuilder()
+                        .addForVerifiableCredentials([{ index: 5463n, subindex: 0n }], (b) =>
+                            b
+                                .revealAttribute('degreeType')
+                                .addMembership('degreeName', ['Bachelor of Science and Arts', 'Bachelor of Finance'])
+                        )
+                        .getStatements();
+                    sendStatement(statement);
+                });
+                document.getElementById('web3ProofIdOnly').addEventListener('click', () => {
+                    const statement = new concordiumSDK.Web3StatementBuilder()
+                        .addForIdentityCredentials([0, 1, 2], (b) =>
+                            b.revealAttribute('firstName').addRange('dob', '08000101', '20000101')
+                        )
+                        .getStatements();
+                    sendStatement(statement);
+                });
+                document.getElementById('web3ProofMixed').addEventListener('click', () => {
+                    const statement = new concordiumSDK.Web3StatementBuilder()
+                        .addForIdentityCredentials([0, 1, 2], (b) =>
+                            b.revealAttribute('firstName').addRange('dob', '08000101', '20000101')
+                        )
+                        .addForVerifiableCredentials([{ index: 5463n, subindex: 0n }], (b) =>
+                            b
+                                .revealAttribute('degreeType')
+                                .addMembership('degreeName', ['Bachelor of Science and Arts', 'Bachelor of Finance'])
+                        )
+                        .getStatements();
+                    sendStatement(statement);
+                });
+                // Add credential
                 document.getElementById('addWeb3Id').addEventListener('click', () => {
                     const values = {
                         degreeType: degreeType.value,
@@ -108,5 +156,12 @@
         <br />
         <br />
         <button id="addWeb3Id">Add web3IdCredential Example to wallet</button>
+        <br />
+        <h3>Request Proofs:</h3>
+        <button id="web3ProofWeb3IdOnly">Request a Proof using web3Id</button>
+        <br />
+        <button id="web3ProofIdOnly">Request a Proof using account credentials</button>
+        <br />
+        <button id="web3ProofMixed">Request a Proof using both web3Id and account credentials</button>
     </body>
 </html>
