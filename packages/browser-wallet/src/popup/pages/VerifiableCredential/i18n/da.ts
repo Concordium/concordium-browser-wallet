@@ -8,6 +8,13 @@ const t: typeof en = {
     menu: {
         revoke: 'Ophæv',
     },
+    status: {
+        Active: 'Aktiv',
+        Revoked: 'Ophævet',
+        Expired: 'Udløbet',
+        NotActivated: 'Ikke aktiveret',
+        Pending: 'Afventer',
+    },
 };
 
 export default t;
