@@ -259,7 +259,7 @@ class WalletApi extends EventEmitter implements IWalletApi {
         const res = await this.messageHandler.sendMessage<MessageStatusWrapper<string>>(
             MessageType.AddWeb3IdCredential,
             {
-                credential,
+                credential: stringify(credential),
                 metadataUrl,
             }
         );

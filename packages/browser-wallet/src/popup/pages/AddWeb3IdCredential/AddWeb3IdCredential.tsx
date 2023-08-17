@@ -25,6 +25,7 @@ import {
 import { APIVerifiableCredential } from '@concordium/browser-wallet-api-helpers';
 import { networkConfigurationAtom } from '@popup/store/settings';
 import { MetadataUrl } from '@concordium/browser-wallet-api-helpers/lib/wallet-api-types';
+import { parse } from '@shared/utils/payload-helpers';
 import { VerifiableCredentialCard } from '../VerifiableCredential/VerifiableCredentialCard';
 
 type Props = {
@@ -36,7 +37,7 @@ interface Location {
     state: {
         payload: {
             url: string;
-            credential: APIVerifiableCredential;
+            credential: string;
             metadataUrl: MetadataUrl;
         };
     };
@@ -58,7 +59,8 @@ export default function AddWeb3IdCredential({ onAllow, onReject }: Props) {
 
     const [error, setError] = useState<string>();
 
-    const { credential, url, metadataUrl } = state.payload;
+    const { credential: rawCredential, url, metadataUrl } = state.payload;
+    const credential: APIVerifiableCredential = parse(rawCredential);
 
     useEffect(() => onClose(onReject), [onClose, onReject]);
 

@@ -103,7 +103,7 @@ export async function web3IdAddCredentialFinishHandler(input: {
  * Run condition which ensures that the web3IdCredential request is valid.
  */
 export const runIfValidWeb3IdCredentialRequest: RunCondition<MessageStatusWrapper<undefined>> = async (msg) => {
-    const { credential }: { credential: APIVerifiableCredential } = msg.payload;
+    const credential: APIVerifiableCredential = parse(msg.payload.credential);
     const network = await storedCurrentNetwork.get();
 
     if (!network) {
@@ -151,7 +151,7 @@ async function createWeb3Proof(input: Web3IdProofInput): Promise<ProofBackground
 }
 
 export const createWeb3IdProofHandler: ExtensionMessageHandler = (msg, _sender, respond) => {
-    createWeb3Proof(msg.payload)
+    createWeb3Proof(parse(msg.payload))
         .then(respond)
         .catch((e: Error) => respond({ status: BackgroundResponseStatus.Error, error: e.message }));
     return true;
