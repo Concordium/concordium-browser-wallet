@@ -141,11 +141,13 @@ export async function buildRevokeTransactionParameters(
     nonce: bigint,
     signingKey: string
 ) {
+    const fiveMinutesInMilliseconds = 5 * 60000;
+    const signatureExpirationTimestamp = BigInt(Date.now() + fiveMinutesInMilliseconds);
     const signingData: SigningData = {
         contractAddress: address,
         entryPoint: 'revokeCredentialHolder',
         nonce,
-        timestamp: BigInt(Date.now() + 5 * 60000),
+        timestamp: signatureExpirationTimestamp,
     };
 
     const data: RevocationDataHolder = {

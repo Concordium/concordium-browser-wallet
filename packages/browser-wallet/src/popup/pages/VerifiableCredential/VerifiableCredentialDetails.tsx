@@ -83,8 +83,6 @@ export default function VerifiableCredentialDetails({
             type: AccountTransactionType.Update,
         };
 
-        // Override current router entry with stateful version
-        nav(pathname, { replace: true, state: true });
         nav(`${absoluteRoutes.home.account.path}/${accountRoutes.confirmTransfer}`, {
             state: confirmTransferState,
         });
@@ -119,11 +117,7 @@ export default function VerifiableCredentialDetails({
 
     return (
         <>
-            <Topbar
-                title={t('topbar.details')}
-                backButton={{ show: true, onClick: backButtonOnClick }}
-                menuButton={menuButton}
-            />
+            <Topbar title={t('topbar.details')} onBackButtonClick={backButtonOnClick} menuButton={menuButton} />
             <div className="verifiable-credential-list">
                 <VerifiableCredentialCard
                     className={className}

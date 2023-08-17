@@ -36,7 +36,7 @@ function NoVerifiableCredentials() {
     const { t } = useTranslation('verifiableCredential');
     return (
         <>
-            <Topbar title={t('topbar.list')} backButton={{ show: false }} />
+            <Topbar title={t('topbar.list')} />
             <div className="verifiable-credential-list">
                 <div className="flex-column align-center">
                     <p className="m-t-20 m-h-30">You do not have any verifiable credentials in your wallet.</p>
@@ -137,7 +137,7 @@ export default function VerifiableCredentialList() {
 
     return (
         <>
-            <Topbar title={t('topbar.list')} backButton={{ show: false }} />
+            <Topbar title={t('topbar.list')} />
             <div className="verifiable-credential-list">
                 {verifiableCredentials.value.map((credential) => {
                     return (
