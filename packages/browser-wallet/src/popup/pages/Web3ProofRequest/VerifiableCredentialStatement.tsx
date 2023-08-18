@@ -18,7 +18,7 @@ import { useTranslation } from 'react-i18next';
 import { ClassName } from 'wallet-common-helpers';
 import { DisplayStatementView, StatementLine } from '../IdProofRequest/DisplayStatement/DisplayStatement';
 import { VerifiableCredentialCard } from '../VerifiableCredential/VerifiableCredentialCard';
-import { useCredentialMetadata } from '../VerifiableCredential/VerifiableCredentialHooks';
+import { useCredentialLocalization, useCredentialMetadata } from '../VerifiableCredential/VerifiableCredentialHooks';
 import CredentialSelector from './CredentialSelector';
 import { createWeb3IdDIDFromCredential, DisplayCredentialStatementProps, SecretStatementV2 } from './utils';
 
@@ -190,8 +190,9 @@ export default function DisplayWeb3Statement({
     }, [chosenCredential?.id, verifiableCredentialSchemas.loading]);
 
     const metadata = useCredentialMetadata(chosenCredential);
+    const localization = useCredentialLocalization(chosenCredential);
 
-    if (!chosenCredential || !schema || !metadata) {
+    if (!chosenCredential || !schema || !metadata || localization.loading) {
         return null;
     }
 
@@ -202,6 +203,7 @@ export default function DisplayWeb3Statement({
                 schema={schema}
                 credentialStatus={VerifiableCredentialStatus.Active}
                 metadata={metadata}
+                localization={localization.result}
             />
 
             <CredentialSelector

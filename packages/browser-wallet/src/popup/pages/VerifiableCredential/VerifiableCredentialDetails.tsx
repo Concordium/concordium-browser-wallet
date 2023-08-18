@@ -82,6 +82,7 @@ interface CredentialDetailsProps extends ClassName {
     status: VerifiableCredentialStatus;
     metadata: VerifiableCredentialMetadata;
     schema: VerifiableCredentialSchema;
+    localization?: Record<string, string>;
     backButtonOnClick: () => void;
 }
 
@@ -90,6 +91,7 @@ export default function VerifiableCredentialDetails({
     status,
     metadata,
     schema,
+    localization,
     backButtonOnClick,
     className,
 }: CredentialDetailsProps) {
@@ -204,6 +206,7 @@ export default function VerifiableCredentialDetails({
                         schema={schema}
                         credentialStatus={status}
                         metadata={metadata}
+                        localization={localization}
                     />
                 </div>
             )}

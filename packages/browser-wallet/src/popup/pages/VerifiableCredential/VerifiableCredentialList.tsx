@@ -14,6 +14,7 @@ import {
     getChangesToCredentialSchemas,
 } from '@shared/utils/verifiable-credential-helpers';
 import {
+    useCredentialLocalization,
     useCredentialMetadata,
     useCredentialSchema,
     useCredentialStatus,
@@ -56,15 +57,17 @@ function VerifiableCredentialCardWithStatusFromChain({
     onClick?: (
         status: VerifiableCredentialStatus,
         schema: VerifiableCredentialSchema,
-        metadata: VerifiableCredentialMetadata
+        metadata: VerifiableCredentialMetadata,
+        localization?: Record<string, string>
     ) => void;
 }) {
     const status = useCredentialStatus(credential);
     const schema = useCredentialSchema(credential);
     const metadata = useCredentialMetadata(credential);
+    const localization = useCredentialLocalization(credential);
 
     // Render nothing until all the required data is available.
-    if (!schema || !metadata || status === undefined) {
+    if (!schema || !metadata || localization.loading || status === undefined) {
         return null;
     }
 
@@ -75,11 +78,12 @@ function VerifiableCredentialCardWithStatusFromChain({
             className={className}
             onClick={() => {
                 if (onClick) {
-                    onClick(status, schema, metadata);
+                    onClick(status, schema, metadata, localization.result);
                 }
             }}
             credentialStatus={status}
             metadata={metadata}
+            localization={localization.result}
         />
     );
 }
@@ -97,6 +101,7 @@ export default function VerifiableCredentialList() {
         status: VerifiableCredentialStatus;
         schema: VerifiableCredentialSchema;
         metadata: VerifiableCredentialMetadata;
+        localization?: Record<string, string>;
     }>();
     const [schemas, setSchemas] = useAtom(storedVerifiableCredentialSchemasAtom);
     const [storedMetadata, setStoredMetadata] = useAtom(storedVerifiableCredentialMetadataAtom);
@@ -130,6 +135,7 @@ export default function VerifiableCredentialList() {
                 schema={selected.schema}
                 status={selected.status}
                 metadata={selected.metadata}
+                localization={selected.localization}
                 backButtonOnClick={() => setSelected(undefined)}
             />
         );
@@ -148,8 +154,9 @@ export default function VerifiableCredentialList() {
                             onClick={(
                                 status: VerifiableCredentialStatus,
                                 schema: VerifiableCredentialSchema,
-                                metadata: VerifiableCredentialMetadata
-                            ) => setSelected({ credential, status, schema, metadata })}
+                                metadata: VerifiableCredentialMetadata,
+                                localization?: Record<string, string>
+                            ) => setSelected({ credential, status, schema, metadata, localization })}
                         />
                     );
                 })}
