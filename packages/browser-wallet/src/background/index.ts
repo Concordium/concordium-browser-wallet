@@ -44,7 +44,7 @@ import {
     web3IdAddCredentialFinishHandler,
     createWeb3IdProofHandler,
     runIfValidWeb3IdProof,
-    loadWeb3IdBackupHandler
+    loadWeb3IdBackupHandler,
 } from './web3Id';
 
 const rpcCallNotAllowedMessage = 'RPC Call can only be performed by whitelisted sites';

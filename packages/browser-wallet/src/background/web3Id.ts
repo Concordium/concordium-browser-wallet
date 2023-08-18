@@ -192,7 +192,7 @@ export const runIfValidWeb3IdProof: RunCondition<MessageStatusWrapper<undefined>
             response: { success: false, message: `Statement is not well-formed: ${(e as Error).message}` },
         };
     }
-}
+};
 
 async function loadWeb3IdBackup(): Promise<void> {
     await openWindow();

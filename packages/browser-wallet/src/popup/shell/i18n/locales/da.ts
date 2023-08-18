@@ -54,7 +54,7 @@ const t: typeof en = {
     addWeb3IdCredential,
     web3IdProofRequest,
     verifiableCredential,
-    verifiableCredentialBackup
+    verifiableCredentialBackup,
 };
 
 export default t;
