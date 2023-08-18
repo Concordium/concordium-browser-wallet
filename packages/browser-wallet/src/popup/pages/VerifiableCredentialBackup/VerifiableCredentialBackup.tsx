@@ -41,11 +41,6 @@ function createExport(
     return encrypt(JSON.stringify(plain), encryptionKey);
 }
 
-/**
- * Renders all verifiable credentials that are in the wallet. The credentials
- * are selectable by clicking them, which will move the user to a view containing
- * a single credential.
- */
 export default function VerifiableCredentialList() {
     const [verifiableCredentials] = useAtom(storedVerifiableCredentialsAtom);
     const schemas = useAtomValue(storedVerifiableCredentialSchemasAtom);

@@ -53,11 +53,6 @@ async function parseExport(data: EncryptedData, encryptionKey: string): Promise<
     return backup.value.credentials;
 }
 
-/**
- * Renders all verifiable credentials that are in the wallet. The credentials
- * are selectable by clicking them, which will move the user to a view containing
- * a single credential.
- */
 export default function VerifiableCredentialImport() {
     const [verifiableCredentials, setVerifiableCredentials] = useAtom(storedVerifiableCredentialsAtom);
     const [imported, setImported] = useState<VerifiableCredential[]>();
