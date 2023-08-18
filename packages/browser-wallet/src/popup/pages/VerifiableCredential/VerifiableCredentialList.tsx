@@ -25,6 +25,11 @@ import { VerifiableCredentialCard } from './VerifiableCredentialCard';
 import VerifiableCredentialDetails from './VerifiableCredentialDetails';
 import { useVerifiableCredentialExport } from '../VerifiableCredentialBackup/utils';
 
+async function goToImportPage() {
+    await popupMessageHandler.sendInternalMessage(InternalMessageType.LoadWeb3IdBackup);
+    window.close();
+}
+
 /**
  * Component to display while loading verifiable credentials from storage.
  */
@@ -37,9 +42,22 @@ function LoadingVerifiableCredentials() {
  */
 function NoVerifiableCredentials() {
     const { t } = useTranslation('verifiableCredential');
+
+    const menuButton = useMemo(() => {
+        const importButton = {
+            title: t('menu.import'),
+            onClick: goToImportPage,
+        };
+
+        return {
+            type: ButtonTypes.More,
+            items: [importButton],
+        };
+    }, []);
+
     return (
         <>
-            <Topbar title={t('topbar.list')} />
+            <Topbar title={t('topbar.list')} menuButton={menuButton} />
             <div className="verifiable-credential-wrapper">
                 <div className="flex-column align-center">
                     <p className="m-t-20 m-h-30">You do not have any verifiable credentials in your wallet.</p>
@@ -107,9 +125,6 @@ export default function VerifiableCredentialList() {
     const exportCredentials = useVerifiableCredentialExport();
 
     const menuButton = useMemo(() => {
-        const goToImportPage = () =>
-            popupMessageHandler.sendInternalMessage(InternalMessageType.LoadWeb3IdBackup).then(() => window.close());
-
         const backupButton = {
             title: t('menu.export'),
             onClick: exportCredentials,

@@ -27,6 +27,7 @@ function DisplayResult({ imported }: { imported: VerifiableCredential[] }) {
                     {imported.map((credential) => {
                         return (
                             <VerifiableCredentialCardWithStatusFromChain
+                                key={credential.id}
                                 className="verifiable-credential-import__card"
                                 credential={credential}
                             />
