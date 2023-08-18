@@ -161,7 +161,7 @@ export function useCredentialLocalization(credential?: VerifiableCredential): Lo
         return () => {
             abortController.abort();
         };
-    }, [JSON.stringify(metadata), i18n.language]);
+    }, [JSON.stringify(metadata), JSON.stringify(schema), i18n.language]);
 
     return localization;
 }
