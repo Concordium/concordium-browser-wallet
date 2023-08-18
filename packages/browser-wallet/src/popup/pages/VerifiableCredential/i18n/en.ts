@@ -13,6 +13,12 @@ const t = {
         id: 'Credential holder ID',
         validFrom: 'Valid from',
         validUntil: 'Valid until',
+        issuer: {
+            title: 'Issued by',
+            name: 'Name',
+            description: 'Description',
+            url: 'Website',
+        },
     },
     status: {
         Active: 'Active',

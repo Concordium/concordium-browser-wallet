@@ -2,9 +2,12 @@ import { grpcClientAtom } from '@popup/store/settings';
 import { VerifiableCredential, VerifiableCredentialStatus, VerifiableCredentialSchema } from '@shared/storage/types';
 import {
     CredentialQueryResponse,
+    IssuerMetadata,
     VerifiableCredentialMetadata,
+    fetchIssuerMetadata,
     getCredentialHolderId,
     getCredentialRegistryContractAddress,
+    getCredentialRegistryMetadata,
     getVerifiableCredentialEntry,
     getVerifiableCredentialStatus,
 } from '@shared/utils/verifiable-credential-helpers';
@@ -106,6 +109,28 @@ export function useCredentialMetadata(credential?: VerifiableCredential) {
     }, [storedMetadata, credentialEntry]);
 
     return metadata;
+}
+
+/**
+ * Retrieves the issuer metadata JSON file. This is done by getting the credential
+ * registry metadata from the credential registry contract, and then fetching the
+ * issuer metadata JSON file at the extracted URL.
+ * @param issuer the issuer did
+ * @returns the issuer metadata for the provided issuer did
+ */
+export function useIssuerMetadata(issuer: string): IssuerMetadata | undefined {
+    const [issuerMetadata, setIssuerMetadata] = useState<IssuerMetadata>();
+    const client = useAtomValue(grpcClientAtom);
+
+    useEffect(() => {
+        const registryContractAddress = getCredentialRegistryContractAddress(issuer);
+        getCredentialRegistryMetadata(client, registryContractAddress).then((res) => {
+            const abortController = new AbortController();
+            fetchIssuerMetadata(res.issuerMetadata, abortController).then(setIssuerMetadata);
+        });
+    }, [client, issuer]);
+
+    return issuerMetadata;
 }
 
 /**

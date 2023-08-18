@@ -20,11 +20,61 @@ import {
 import { fetchContractName } from '@shared/utils/token-helpers';
 import { TimeStampUnit, dateFromTimestamp, ClassName } from 'wallet-common-helpers';
 import { withDateAndTime } from '@shared/utils/time-helpers';
+import Img from '@popup/shared/Img';
 import { accountRoutes } from '../Account/routes';
 import { ConfirmGenericTransferState } from '../Account/ConfirmGenericTransfer';
 import RevokeIcon from '../../../assets/svg/revoke.svg';
-import { useCredentialEntry } from './VerifiableCredentialHooks';
+import { useCredentialEntry, useIssuerMetadata } from './VerifiableCredentialHooks';
 import { DisplayAttribute, VerifiableCredentialCard, VerifiableCredentialCardHeader } from './VerifiableCredentialCard';
+
+/**
+ * Component for displaying issuer metadata, if any is available.
+ * All the fields in the issuer metadata are optional, and if none of
+ * them are provided, then the component returns null.
+ * @param issuer the did for the issuer
+ */
+function DisplayIssuerMetadata({ issuer }: { issuer: string }) {
+    const { t } = useTranslation('verifiableCredential');
+    const issuerMetadata = useIssuerMetadata(issuer);
+
+    if (
+        issuerMetadata === undefined ||
+        (issuerMetadata.description === undefined &&
+            issuerMetadata.icon === undefined &&
+            issuerMetadata.name === undefined &&
+            issuerMetadata.url === undefined)
+    ) {
+        return null;
+    }
+
+    return (
+        <div className="verifiable-credential__body-attributes">
+            <h3>{t('details.issuer.title')}</h3>
+            {issuerMetadata.icon && <Img className="issuer-logo" src={issuerMetadata.icon.url} withDefaults />}
+            {issuerMetadata.name && (
+                <DisplayAttribute
+                    attributeKey="issuerName"
+                    attributeTitle={t('details.issuer.name')}
+                    attributeValue={issuerMetadata.name}
+                />
+            )}
+            {issuerMetadata.description && (
+                <DisplayAttribute
+                    attributeKey="issuerName"
+                    attributeTitle={t('details.issuer.description')}
+                    attributeValue={issuerMetadata.description}
+                />
+            )}
+            {issuerMetadata.url && (
+                <DisplayAttribute
+                    attributeKey="issuerName"
+                    attributeTitle={t('details.issuer.url')}
+                    attributeValue={issuerMetadata.url}
+                />
+            )}
+        </div>
+    );
+}
 
 /**
  * Component for displaying the extra details about a verifiable credential, i.e. the
@@ -35,10 +85,12 @@ function VerifiableCredentialExtraDetails({
     status,
     metadata,
     className,
+    issuer,
 }: {
     credentialEntry: CredentialQueryResponse;
     status: VerifiableCredentialStatus;
     metadata: VerifiableCredentialMetadata;
+    issuer: string;
 } & ClassName) {
     const { t } = useTranslation('verifiableCredential');
 
@@ -72,6 +124,7 @@ function VerifiableCredentialExtraDetails({
                         />
                     )}
                 </div>
+                <DisplayIssuerMetadata issuer={issuer} />
             </div>
         </div>
     );
@@ -194,6 +247,7 @@ export default function VerifiableCredentialDetails({
                     credentialEntry={credentialEntry}
                     status={status}
                     metadata={metadata}
+                    issuer={credential.issuer}
                 />
             )}
             {!showExtraDetails && (
