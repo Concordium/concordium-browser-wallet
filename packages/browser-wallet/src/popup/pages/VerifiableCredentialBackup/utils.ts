@@ -1,7 +1,10 @@
-import { VerifiableCredential } from '@shared/storage/types';
+import { VerifiableCredential, VerifiableCredentialSchema } from '@shared/storage/types';
+import { VerifiableCredentialMetadata } from '@shared/utils/verifiable-credential-helpers';
 
 export type VerifiableCredentialExport = {
-    credentials: VerifiableCredential[];
+    verifiableCredentials: VerifiableCredential[];
+    schemas: Record<string, VerifiableCredentialSchema>;
+    metadata: Record<string, VerifiableCredentialMetadata>;
 };
 
 export type ExportFormat = {

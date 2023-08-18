@@ -104,6 +104,18 @@ export default function VerifiableCredentialList() {
     const [storedMetadata, setStoredMetadata] = useAtom(storedVerifiableCredentialMetadataAtom);
     const nav = useNavigate();
 
+    const menuButton = useMemo(() => {
+        const backupButton = {
+            title: t('menu.backup'),
+            onClick: () => nav(absoluteRoutes.home.verifiableCredentials.backup.path),
+        };
+
+        return {
+            type: ButtonTypes.More,
+            items: [backupButton],
+        };
+    }, [nav]);
+
     // Hooks that update the stored credential schemas and stored credential metadata.
     useFetchingEffect<VerifiableCredentialMetadata>(
         verifiableCredentials,
@@ -143,19 +155,6 @@ export default function VerifiableCredentialList() {
             />
         );
     }
-
-    const menuButton = useMemo(() => {
-        const backupButton = {
-            title: t('menu.backup'),
-            onClick: () => nav(absoluteRoutes.home.verifiableCredentials.backup.path),
-        };
-
-        return {
-            type: ButtonTypes.More,
-            items: [backupButton],
-        };
-    }, [nav]);
-
     return (
         <>
             <Topbar title={t('topbar.list')} menuButton={menuButton} />
