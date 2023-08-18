@@ -8,6 +8,7 @@ const t: typeof en = {
     menu: {
         revoke: 'Ophæv',
         details: 'Detaljer',
+        backup: 'Backup,',
     },
     details: {
         id: 'Legitimationholders ID',

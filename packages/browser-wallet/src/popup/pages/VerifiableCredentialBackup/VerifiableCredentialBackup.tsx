@@ -12,7 +12,9 @@ import { saveData } from '@popup/shared/utils/file-helpers';
 import { popupMessageHandler } from '@popup/shared/message-handler';
 import { InternalMessageType } from '@concordium/browser-wallet-message-hub';
 import { encrypt } from '@shared/utils/crypto';
-import ButtonGroup from '@popup/shared/ButtonGroup';
+import Topbar from '@popup/shared/Topbar';
+import { useNavigate } from 'react-router-dom';
+import { useTranslation } from 'react-i18next';
 import { ExportFormat } from './utils';
 
 function createPlainExport(verifiableCredentials: VerifiableCredential[], network: NetworkConfiguration) {
@@ -48,6 +50,8 @@ export default function VerifiableCredentialList() {
     const [verifiableCredentials] = useAtom(storedVerifiableCredentialsAtom);
     const schemas = useAtomValue(storedVerifiableCredentialSchemasAtom);
     const network = useAtomValue(networkConfigurationAtom);
+    const nav = useNavigate();
+    const { t } = useTranslation('verifiableCredentialBackup');
 
     if (schemas.loading || verifiableCredentials.loading) {
         return null;
@@ -64,15 +68,16 @@ export default function VerifiableCredentialList() {
     };
 
     return (
-        <div className="flex-column">
-            <ButtonGroup>
+        <>
+            <Topbar title={t('backup.header')} onBackButtonClick={() => nav(-1)} />
+            <div className="verifiable-credential-backup">
                 <Button className="export-private-key-page__export-button" width="medium" onClick={handleExport}>
-                    Download Backup
+                    {t('backup.button.export')}
                 </Button>
                 <Button className="export-private-key-page__export-button" width="medium" onClick={handleImport}>
-                    Import backup
+                    {t('backup.button.import')}
                 </Button>
-            </ButtonGroup>
-        </div>
+            </div>
+        </>
     );
 }

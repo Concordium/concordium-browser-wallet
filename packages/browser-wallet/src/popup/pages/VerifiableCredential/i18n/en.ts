@@ -6,6 +6,7 @@ const t = {
     menu: {
         revoke: 'Revoke',
         details: 'Details',
+        backup: 'Backup',
     },
     details: {
         id: 'Credential holder ID',

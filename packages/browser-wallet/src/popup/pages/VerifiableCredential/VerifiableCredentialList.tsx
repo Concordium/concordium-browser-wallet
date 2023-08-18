@@ -1,11 +1,11 @@
-import React, { useState } from 'react';
+import React, { useMemo, useState } from 'react';
 import {
     storedVerifiableCredentialMetadataAtom,
     storedVerifiableCredentialSchemasAtom,
     storedVerifiableCredentialsAtom,
 } from '@popup/store/verifiable-credential';
 import { useAtomValue, useAtom } from 'jotai';
-import Topbar from '@popup/shared/Topbar/Topbar';
+import Topbar, { ButtonTypes } from '@popup/shared/Topbar/Topbar';
 import { useTranslation } from 'react-i18next';
 import { VerifiableCredential, VerifiableCredentialSchema, VerifiableCredentialStatus } from '@shared/storage/types';
 import {
@@ -13,7 +13,7 @@ import {
     getChangesToCredentialMetadata,
     getChangesToCredentialSchemas,
 } from '@shared/utils/verifiable-credential-helpers';
-import { Link } from 'react-router-dom';
+import { Link, useNavigate } from 'react-router-dom';
 import { absoluteRoutes } from '@popup/constants/routes';
 import {
     useCredentialMetadata,
@@ -102,6 +102,7 @@ export default function VerifiableCredentialList() {
     }>();
     const [schemas, setSchemas] = useAtom(storedVerifiableCredentialSchemasAtom);
     const [storedMetadata, setStoredMetadata] = useAtom(storedVerifiableCredentialMetadataAtom);
+    const nav = useNavigate();
 
     // Hooks that update the stored credential schemas and stored credential metadata.
     useFetchingEffect<VerifiableCredentialMetadata>(
@@ -143,9 +144,21 @@ export default function VerifiableCredentialList() {
         );
     }
 
+    const menuButton = useMemo(() => {
+        const backupButton = {
+            title: t('menu.backup'),
+            onClick: () => nav(absoluteRoutes.home.verifiableCredentials.backup.path),
+        };
+
+        return {
+            type: ButtonTypes.More,
+            items: [backupButton],
+        };
+    }, [nav]);
+
     return (
         <>
-            <Topbar title={t('topbar.list')} />
+            <Topbar title={t('topbar.list')} menuButton={menuButton} />
             <div className="verifiable-credential-wrapper">
                 {verifiableCredentials.value.map((credential) => {
                     return (
