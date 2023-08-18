@@ -11,6 +11,8 @@ import { networkConfigurationAtom } from '@popup/store/settings';
 import { saveData } from '@popup/shared/utils/file-helpers';
 import { popupMessageHandler } from '@popup/shared/message-handler';
 import { InternalMessageType } from '@concordium/browser-wallet-message-hub';
+import { encrypt } from '@shared/utils/crypto';
+import ButtonGroup from '@popup/shared/ButtonGroup';
 import { ExportFormat } from './utils';
 
 function createPlainExport(verifiableCredentials: VerifiableCredential[], network: NetworkConfiguration) {
@@ -26,10 +28,15 @@ function createPlainExport(verifiableCredentials: VerifiableCredential[], networ
     return docContent;
 }
 
-function createExport(verifiableCredentials: VerifiableCredential[], network: NetworkConfiguration) {
+function createExport(
+    verifiableCredentials: VerifiableCredential[],
+    network: NetworkConfiguration,
+    encryptionKey: string
+) {
     const plain = createPlainExport(verifiableCredentials, network);
-    // TODO Encrypt
-    return plain;
+    // TODO don't use key as password;
+    // TODO handle bigints
+    return encrypt(JSON.stringify(plain), encryptionKey);
 }
 
 /**
@@ -46,8 +53,9 @@ export default function VerifiableCredentialList() {
         return null;
     }
 
-    const handleExport = () => {
-        const data = createExport(verifiableCredentials.value, network);
+    const handleExport = async () => {
+        // TODO get key
+        const data = await createExport(verifiableCredentials.value, network, 'myKey');
         saveData(data, `web3IdCredentials.export`);
     };
 
@@ -57,12 +65,14 @@ export default function VerifiableCredentialList() {
 
     return (
         <div className="flex-column">
-            <Button className="export-private-key-page__export-button" width="medium" onClick={handleExport}>
-                Download Backup
-            </Button>
-            <Button className="export-private-key-page__export-button" width="medium" onClick={handleImport}>
-                Import backup
-            </Button>
+            <ButtonGroup>
+                <Button className="export-private-key-page__export-button" width="medium" onClick={handleExport}>
+                    Download Backup
+                </Button>
+                <Button className="export-private-key-page__export-button" width="medium" onClick={handleImport}>
+                    Import backup
+                </Button>
+            </ButtonGroup>
         </div>
     );
 }

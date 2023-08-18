@@ -5,11 +5,12 @@ import {
 } from '@popup/store/verifiable-credential';
 import { useAtom, useAtomValue } from 'jotai';
 import PageHeader from '@popup/shared/PageHeader';
-import { VerifiableCredential } from '@shared/storage/types';
+import { EncryptedData, VerifiableCredential } from '@shared/storage/types';
 import { useTranslation } from 'react-i18next';
 import Button from '@popup/shared/Button';
 import { fullscreenPromptContext } from '@popup/page-layouts/FullscreenPromptLayout';
 import { noOp } from 'wallet-common-helpers';
+import { decrypt } from '@shared/utils/crypto';
 import { VerifiableCredentialCardWithStatusFromChain } from '../VerifiableCredential/VerifiableCredentialList';
 import { ExportFormat } from './utils';
 
@@ -20,20 +21,36 @@ function DisplayResult({ imported }: { imported: VerifiableCredential[] }) {
     return (
         <>
             <PageHeader>{t('import.title')}</PageHeader>
-            <div className="flex-column">
-                {imported.length === 0 && <>{t('import.noImported')}</>}
-                {imported.map((credential) => {
-                    return (
-                        <VerifiableCredentialCardWithStatusFromChain
-                            className="verifiable-credential-list__card"
-                            credential={credential}
-                        />
-                    );
-                })}
+            <div className="verifiable-credential-import">
+                {imported.length === 0 && (
+                    <p className="verifiable-credential-import__empty">{t('import.noImported')}</p>
+                )}
+                {imported.length > 0 && (
+                    <div className="verifiable-credential-import__list">
+                        {imported.map((credential) => {
+                            return (
+                                <VerifiableCredentialCardWithStatusFromChain
+                                    className="verifiable-credential-import__card"
+                                    credential={credential}
+                                />
+                            );
+                        })}
+                    </div>
+                )}
+                <Button className="verifiable-credential-import__button" width="wide" onClick={withClose(noOp)}>
+                    {t('close')}
+                </Button>
             </div>
-            <Button onClick={withClose(noOp)}>{t('close')}</Button>
         </>
     );
+}
+
+async function parseExport(data: EncryptedData, encryptionKey: string): Promise<VerifiableCredential[]> {
+    // TODO handle bigints
+    // TODO don't use key as password;
+    const backup: ExportFormat = JSON.parse(await decrypt(data, encryptionKey));
+    // TODO validation
+    return backup.value.credentials;
 }
 
 /**
@@ -55,15 +72,15 @@ export default function VerifiableCredentialImport() {
     const handleImport = async (event: React.ChangeEvent<HTMLInputElement>) => {
         const file = event.target.files?.[0];
         if (file) {
-            const backup: ExportFormat = JSON.parse(await file.text());
             // TODO error handling
-            // TODO validation
-            // TODO Decrypt
-            const credentials = backup.value.credentials.filter(
+            const encryptedBackup: EncryptedData = JSON.parse(await file.text());
+            // TODO get key
+            const credentials = await parseExport(encryptedBackup, 'myKey');
+            const filteredCredentials = credentials.filter(
                 (cred) => !(verifiableCredentials.value || []).some((existing) => existing.id === cred.id)
             );
-            setVerifiableCredentials([...verifiableCredentials.value, ...credentials]);
-            setImported(credentials);
+            setVerifiableCredentials([...verifiableCredentials.value, ...filteredCredentials]);
+            setImported(filteredCredentials);
         }
     };
 
@@ -71,13 +88,16 @@ export default function VerifiableCredentialImport() {
         return <DisplayResult imported={imported} />;
     }
 
+    // TODO drag and drop
     return (
         <>
             <PageHeader>{t('import.title')}</PageHeader>
-            <div className="flex-column">
-                <input type="file" onChange={(x) => handleImport(x)} />
+            <div className="verifiable-credential-import">
+                <input type="file" onChange={handleImport} />
+                <Button className="verifiable-credential-import__button" width="wide" onClick={withClose(noOp)}>
+                    {t('close')}
+                </Button>
             </div>
-            <Button onClick={withClose(noOp)}>{t('close')}</Button>
         </>
     );
 }
