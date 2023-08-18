@@ -659,7 +659,7 @@ async function fetchDataFromUrl<T>(
     });
 
     if (!response.ok) {
-        throw new Error(`Failed to fetch the schema at: ${url}`);
+        throw new Error(`Failed to fetch the data at: ${url}`);
     }
 
     const body = Buffer.from(await response.arrayBuffer());
