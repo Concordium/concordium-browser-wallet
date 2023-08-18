@@ -6,6 +6,8 @@ const t = {
     menu: {
         revoke: 'Revoke',
         details: 'Details',
+        import: 'Open import window',
+        export: 'Download export file',
     },
     details: {
         id: 'Credential holder ID',

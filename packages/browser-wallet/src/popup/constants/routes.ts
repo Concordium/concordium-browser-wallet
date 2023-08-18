@@ -63,6 +63,9 @@ export const relativeRoutes = {
         recovery: {
             path: 'recovery',
         },
+        importWeb3IdBackup: {
+            path: 'import-web3Id-Backup',
+        },
         addTokens: {
             path: 'add-tokens',
         },

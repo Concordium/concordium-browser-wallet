@@ -8,6 +8,8 @@ const t: typeof en = {
     menu: {
         revoke: 'Ophæv',
         details: 'Detaljer',
+        import: 'Åben import vinduet',
+        export: 'Download export fil',
     },
     details: {
         id: 'Legitimationholders ID',
