@@ -13,6 +13,12 @@ const t: typeof en = {
         id: 'Legitimationholders ID',
         validFrom: 'Gyldig fra',
         validUntil: 'Gyldig indtil',
+        issuer: {
+            title: 'Udstedt af',
+            name: 'Navn',
+            description: 'Beskrivelse',
+            url: 'Hjemmeside',
+        },
     },
     status: {
         Active: 'Aktiv',
