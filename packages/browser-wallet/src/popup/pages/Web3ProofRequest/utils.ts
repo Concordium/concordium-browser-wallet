@@ -101,7 +101,17 @@ export function getViableAccountCredentialsForStatement(
 
 // TODO Replace with canProveAtomicStatement when SDK is updated
 function doesCredentialSatisfyStatement(statement: AtomicStatementV2, cred: VerifiableCredential): boolean {
-    const value = cred.credentialSubject.attributes[statement.attributeTag];
+    let value = cred.credentialSubject.attributes[statement.attributeTag];
+
+    // temporary handling of numbers saved as numbers;
+    if (typeof value === 'number') {
+        value = BigInt(value);
+    }
+
+    if (value === undefined) {
+        return false;
+    }
+
     switch (statement.type) {
         case StatementTypes.AttributeInRange:
             return statement.lower <= value && statement.upper > value;
