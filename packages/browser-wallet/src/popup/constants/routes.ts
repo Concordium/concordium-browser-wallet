@@ -20,7 +20,6 @@ export const relativeRoutes = {
         },
         verifiableCredentials: {
             path: 'verifiable-credentials',
-            backup: { path: 'backup' },
         },
         settings: {
             path: 'settings',

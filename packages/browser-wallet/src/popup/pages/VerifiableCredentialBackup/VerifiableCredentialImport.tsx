@@ -21,7 +21,7 @@ function DisplayResult({ imported }: { imported: VerifiableCredential[] }) {
 
     return (
         <>
-            {imported.length === 0 && <p className="verifiable-credential-import__empty">{t('import.noImported')}</p>}
+            {imported.length === 0 && <p className="verifiable-credential-import__empty">{t('noImported')}</p>}
             {imported.length > 0 && (
                 <div className="verifiable-credential-import__list">
                     {imported.map((credential) => {
@@ -40,7 +40,6 @@ function DisplayResult({ imported }: { imported: VerifiableCredential[] }) {
 
 async function parseExport(data: EncryptedData, encryptionKey: string): Promise<VerifiableCredentialExport> {
     // TODO handle bigints
-    // TODO don't use key as password;
     const backup: ExportFormat = JSON.parse(await decrypt(data, encryptionKey));
     // TODO validation
     return backup.value;
@@ -105,14 +104,14 @@ export default function VerifiableCredentialImport() {
                 setImported(filteredCredentials);
             }
         } catch (e) {
-            setError(t('import.error'));
+            setError(t('error'));
         }
     };
 
     // TODO drag and drop
     return (
         <>
-            <PageHeader className="verifiable-credential-import__header">{t('import.title')}</PageHeader>
+            <PageHeader className="verifiable-credential-import__header">{t('title')}</PageHeader>
             <div className="verifiable-credential-import">
                 {imported && <DisplayResult imported={imported} />}
                 {!imported && (

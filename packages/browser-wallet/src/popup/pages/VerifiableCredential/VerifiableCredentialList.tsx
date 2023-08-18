@@ -13,8 +13,8 @@ import {
     getChangesToCredentialMetadata,
     getChangesToCredentialSchemas,
 } from '@shared/utils/verifiable-credential-helpers';
-import { Link, useNavigate } from 'react-router-dom';
-import { absoluteRoutes } from '@popup/constants/routes';
+import { popupMessageHandler } from '@popup/shared/message-handler';
+import { InternalMessageType } from '@concordium/browser-wallet-message-hub';
 import {
     useCredentialMetadata,
     useCredentialSchema,
@@ -23,6 +23,7 @@ import {
 } from './VerifiableCredentialHooks';
 import { VerifiableCredentialCard } from './VerifiableCredentialCard';
 import VerifiableCredentialDetails from './VerifiableCredentialDetails';
+import { useVerifiableCredentialExport } from '../VerifiableCredentialBackup/utils';
 
 /**
  * Component to display while loading verifiable credentials from storage.
@@ -102,19 +103,27 @@ export default function VerifiableCredentialList() {
     }>();
     const [schemas, setSchemas] = useAtom(storedVerifiableCredentialSchemasAtom);
     const [storedMetadata, setStoredMetadata] = useAtom(storedVerifiableCredentialMetadataAtom);
-    const nav = useNavigate();
+
+    const exportCredentials = useVerifiableCredentialExport();
 
     const menuButton = useMemo(() => {
+        const goToImportPage = () =>
+            popupMessageHandler.sendInternalMessage(InternalMessageType.LoadWeb3IdBackup).then(() => window.close());
+
         const backupButton = {
-            title: t('menu.backup'),
-            onClick: () => nav(absoluteRoutes.home.verifiableCredentials.backup.path),
+            title: t('menu.export'),
+            onClick: exportCredentials,
+        };
+        const importButton = {
+            title: t('menu.import'),
+            onClick: goToImportPage,
         };
 
         return {
             type: ButtonTypes.More,
-            items: [backupButton],
+            items: [backupButton, importButton],
         };
-    }, [nav]);
+    }, [exportCredentials]);
 
     // Hooks that update the stored credential schemas and stored credential metadata.
     useFetchingEffect<VerifiableCredentialMetadata>(
@@ -130,17 +139,12 @@ export default function VerifiableCredentialList() {
         getChangesToCredentialSchemas
     );
 
-    if (verifiableCredentials.loading) {
+    if (verifiableCredentials.loading || !exportCredentials) {
         return <LoadingVerifiableCredentials />;
     }
 
     if (verifiableCredentials.value.length === 0) {
-        return (
-            <>
-                <Link to={absoluteRoutes.home.verifiableCredentials.backup.path}>Backup</Link>
-                <NoVerifiableCredentials />
-            </>
-        );
+        return <NoVerifiableCredentials />;
     }
 
     if (selected) {
