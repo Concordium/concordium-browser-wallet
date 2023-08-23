@@ -23,11 +23,16 @@ import {
     getDIDNetwork,
     getPublicKeyfromPublicKeyIdentifierDID,
 } from '@shared/utils/verifiable-credential-helpers';
-import { ExtensionMessageHandler, MessageStatusWrapper } from '@concordium/browser-wallet-message-hub';
-import { getNet } from '@shared/utils/network-helpers';
 import { parse } from '@shared/utils/payload-helpers';
 import { BackgroundResponseStatus, ProofBackgroundResponse } from '@shared/utils/types';
-import { RunCondition } from './window-management';
+import {
+    ExtensionMessageHandler,
+    InternalMessageType,
+    MessageStatusWrapper,
+} from '@concordium/browser-wallet-message-hub';
+import { getNet } from '@shared/utils/network-helpers';
+import { openWindow, RunCondition } from './window-management';
+import bgMessageHandler from './message-handler';
 
 const NO_CREDENTIALS_FIT = 'No temporary credentials fit the given id';
 const INVALID_CREDENTIAL_PROOF = 'Invalid credential proof given';
@@ -103,7 +108,7 @@ export async function web3IdAddCredentialFinishHandler(input: {
  * Run condition which ensures that the web3IdCredential request is valid.
  */
 export const runIfValidWeb3IdCredentialRequest: RunCondition<MessageStatusWrapper<undefined>> = async (msg) => {
-    const { credential }: { credential: APIVerifiableCredential } = msg.payload;
+    const credential: APIVerifiableCredential = parse(msg.payload.credential);
     const network = await storedCurrentNetwork.get();
 
     if (!network) {
@@ -151,7 +156,7 @@ async function createWeb3Proof(input: Web3IdProofInput): Promise<ProofBackground
 }
 
 export const createWeb3IdProofHandler: ExtensionMessageHandler = (msg, _sender, respond) => {
-    createWeb3Proof(msg.payload)
+    createWeb3Proof(parse(msg.payload))
         .then(respond)
         .catch((e: Error) => respond({ status: BackgroundResponseStatus.Error, error: e.message }));
     return true;
@@ -187,4 +192,14 @@ export const runIfValidWeb3IdProof: RunCondition<MessageStatusWrapper<undefined>
             response: { success: false, message: `Statement is not well-formed: ${(e as Error).message}` },
         };
     }
+};
+
+async function loadWeb3IdBackup(): Promise<void> {
+    await openWindow();
+    bgMessageHandler.sendInternalMessage(InternalMessageType.ImportWeb3IdBackup);
+}
+
+export const loadWeb3IdBackupHandler: ExtensionMessageHandler = (_msg, _sender, respond) => {
+    loadWeb3IdBackup();
+    respond(undefined);
 };

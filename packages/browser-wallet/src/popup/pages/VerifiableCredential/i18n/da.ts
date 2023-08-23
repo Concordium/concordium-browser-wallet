@@ -8,11 +8,19 @@ const t: typeof en = {
     menu: {
         revoke: 'Ophæv',
         details: 'Detaljer',
+        import: 'Åben import vinduet',
+        export: 'Download export fil',
     },
     details: {
         id: 'Legitimationholders ID',
         validFrom: 'Gyldig fra',
         validUntil: 'Gyldig indtil',
+        issuer: {
+            title: 'Udstedt af',
+            name: 'Navn',
+            description: 'Beskrivelse',
+            url: 'Hjemmeside',
+        },
     },
     status: {
         Active: 'Aktiv',

@@ -335,7 +335,7 @@ function deserializeRegistryMetadata(serializedRegistryMetadata: string): Metada
 export async function getCredentialRegistryMetadata(client: ConcordiumGRPCClient, contractAddress: ContractAddress) {
     const instanceInfo = await client.getInstanceInfo(contractAddress);
     if (instanceInfo === undefined) {
-        return undefined;
+        throw new Error('Given contract address was not a created instance');
     }
 
     const result = await client.invokeContract({
@@ -503,6 +503,48 @@ const localizationRecordSchema = {
         },
     },
 };
+
+const issuerMetadataSchema = {
+    $ref: '#/definitions/IssuerMetadata',
+    $schema: 'http://json-schema.org/draft-07/schema#',
+    definitions: {
+        HexString: {
+            type: 'string',
+        },
+        IssuerMetadata: {
+            additionalProperties: false,
+            properties: {
+                description: {
+                    type: 'string',
+                },
+                icon: {
+                    $ref: '#/definitions/MetadataUrl',
+                },
+                name: {
+                    type: 'string',
+                },
+                url: {
+                    type: 'string',
+                },
+            },
+            type: 'object',
+        },
+        MetadataUrl: {
+            additionalProperties: false,
+            properties: {
+                hash: {
+                    $ref: '#/definitions/HexString',
+                },
+                url: {
+                    type: 'string',
+                },
+            },
+            required: ['url'],
+            type: 'object',
+        },
+    },
+};
+
 export interface VerifiableCredentialMetadata {
     title: string;
     logo: MetadataUrl;
@@ -622,6 +664,7 @@ async function fetchDataFromUrl<T>(
         | typeof verifiableCredentialMetadataSchema
         | typeof verifiableCredentialSchemaSchema
         | typeof localizationRecordSchema
+        | typeof issuerMetadataSchema
 ): Promise<T> {
     const response = await fetch(url, {
         headers: new Headers({ 'Access-Control-Allow-Origin': '*' }),
@@ -630,7 +673,7 @@ async function fetchDataFromUrl<T>(
     });
 
     if (!response.ok) {
-        throw new Error(`Failed to fetch the schema at: ${url}`);
+        throw new Error(`Failed to fetch the data at: ${url}`);
     }
 
     const body = Buffer.from(await response.arrayBuffer());
@@ -683,6 +726,23 @@ export async function fetchLocalization(
     abortController: AbortController
 ): Promise<Record<string, string>> {
     return fetchDataFromUrl(url, abortController, localizationRecordSchema);
+}
+
+export interface IssuerMetadata {
+    name?: string;
+    icon?: MetadataUrl;
+    description?: string;
+    url?: string;
+}
+
+/**
+ * Retrieves registry issuer metadata from the specified URL.
+ */
+export async function fetchIssuerMetadata(
+    metadata: MetadataUrl,
+    abortController: AbortController
+): Promise<IssuerMetadata> {
+    return fetchDataFromUrl(metadata, abortController, issuerMetadataSchema);
 }
 
 /**

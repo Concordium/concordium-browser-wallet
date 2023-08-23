@@ -36,6 +36,7 @@ import { parse } from '@shared/utils/payload-helpers';
 import { VerifiableCredential, VerifiableCredentialStatus } from '@shared/storage/types';
 import { getVerifiableCredentialStatus } from '@shared/utils/verifiable-credential-helpers';
 import { useAsyncMemo } from 'wallet-common-helpers';
+import { stringify } from '@concordium/browser-wallet-api/src/util';
 import {
     getAccountCredentialCommitmentInput,
     getViableAccountCredentialsForStatement,
@@ -189,7 +190,7 @@ export default function Web3ProofRequest({ onReject, onSubmit }: Props) {
 
         const result: ProofBackgroundResponse<string> = await popupMessageHandler.sendInternalMessage(
             InternalMessageType.CreateWeb3IdProof,
-            input
+            stringify(input)
         );
 
         if (result.status !== BackgroundResponseStatus.Success) {

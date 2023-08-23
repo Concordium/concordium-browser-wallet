@@ -23,6 +23,7 @@ import connectAccountsRequest from '@popup/pages/ConnectAccountsRequest/i18n/en'
 import web3IdProofRequest from '@popup/pages/Web3ProofRequest/i18n/en';
 import verifiableCredential from '@popup/pages/VerifiableCredential/i18n/en';
 import addWeb3IdCredential from '@popup/pages/AddWeb3IdCredential/i18n/en';
+import verifiableCredentialBackup from '@popup/pages/VerifiableCredentialBackup/i18n/en';
 
 const t = {
     shared,
@@ -50,6 +51,7 @@ const t = {
     addWeb3IdCredential,
     web3IdProofRequest,
     verifiableCredential,
+    verifiableCredentialBackup,
 };
 
 export default t;

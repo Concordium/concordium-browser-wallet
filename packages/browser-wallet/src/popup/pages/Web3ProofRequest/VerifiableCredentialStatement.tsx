@@ -25,7 +25,7 @@ import { createWeb3IdDIDFromCredential, DisplayCredentialStatementProps, SecretS
 function getPropertyTitle(attributeTag: string, schema: VerifiableCredentialSchema) {
     // TODO use localization here
     const property = schema.properties.credentialSubject.properties.attributes.properties[attributeTag];
-    return property.title;
+    return property ? property.title : attributeTag;
 }
 
 function useStatementValue(statement: SecretStatementV2, schema: VerifiableCredentialSchema): string {

@@ -1,11 +1,11 @@
-import React, { useState } from 'react';
+import React, { useMemo, useState } from 'react';
 import {
     storedVerifiableCredentialMetadataAtom,
     storedVerifiableCredentialSchemasAtom,
     storedVerifiableCredentialsAtom,
 } from '@popup/store/verifiable-credential';
 import { useAtomValue, useAtom } from 'jotai';
-import Topbar from '@popup/shared/Topbar/Topbar';
+import Topbar, { ButtonTypes } from '@popup/shared/Topbar/Topbar';
 import { useTranslation } from 'react-i18next';
 import { VerifiableCredential, VerifiableCredentialSchema, VerifiableCredentialStatus } from '@shared/storage/types';
 import {
@@ -13,6 +13,8 @@ import {
     getChangesToCredentialMetadata,
     getChangesToCredentialSchemas,
 } from '@shared/utils/verifiable-credential-helpers';
+import { popupMessageHandler } from '@popup/shared/message-handler';
+import { InternalMessageType } from '@concordium/browser-wallet-message-hub';
 import {
     useCredentialLocalization,
     useCredentialMetadata,
@@ -22,6 +24,12 @@ import {
 } from './VerifiableCredentialHooks';
 import { VerifiableCredentialCard } from './VerifiableCredentialCard';
 import VerifiableCredentialDetails from './VerifiableCredentialDetails';
+import { useVerifiableCredentialExport } from '../VerifiableCredentialBackup/utils';
+
+async function goToImportPage() {
+    await popupMessageHandler.sendInternalMessage(InternalMessageType.LoadWeb3IdBackup);
+    window.close();
+}
 
 /**
  * Component to display while loading verifiable credentials from storage.
@@ -35,9 +43,22 @@ function LoadingVerifiableCredentials() {
  */
 function NoVerifiableCredentials() {
     const { t } = useTranslation('verifiableCredential');
+
+    const menuButton = useMemo(() => {
+        const importButton = {
+            title: t('menu.import'),
+            onClick: goToImportPage,
+        };
+
+        return {
+            type: ButtonTypes.More,
+            items: [importButton],
+        };
+    }, []);
+
     return (
         <>
-            <Topbar title={t('topbar.list')} />
+            <Topbar title={t('topbar.list')} menuButton={menuButton} />
             <div className="verifiable-credential-wrapper">
                 <div className="flex-column align-center">
                     <p className="m-t-20 m-h-30">You do not have any verifiable credentials in your wallet.</p>
@@ -47,7 +68,7 @@ function NoVerifiableCredentials() {
     );
 }
 
-function VerifiableCredentialCardWithStatusFromChain({
+export function VerifiableCredentialCardWithStatusFromChain({
     credential,
     onClick,
     className,
@@ -106,6 +127,24 @@ export default function VerifiableCredentialList() {
     const [schemas, setSchemas] = useAtom(storedVerifiableCredentialSchemasAtom);
     const [storedMetadata, setStoredMetadata] = useAtom(storedVerifiableCredentialMetadataAtom);
 
+    const exportCredentials = useVerifiableCredentialExport();
+
+    const menuButton = useMemo(() => {
+        const backupButton = {
+            title: t('menu.export'),
+            onClick: exportCredentials,
+        };
+        const importButton = {
+            title: t('menu.import'),
+            onClick: goToImportPage,
+        };
+
+        return {
+            type: ButtonTypes.More,
+            items: [backupButton, importButton],
+        };
+    }, [exportCredentials]);
+
     // Hooks that update the stored credential schemas and stored credential metadata.
     useFetchingEffect<VerifiableCredentialMetadata>(
         verifiableCredentials,
@@ -120,9 +159,10 @@ export default function VerifiableCredentialList() {
         getChangesToCredentialSchemas
     );
 
-    if (verifiableCredentials.loading) {
+    if (verifiableCredentials.loading || !exportCredentials) {
         return <LoadingVerifiableCredentials />;
     }
+
     if (verifiableCredentials.value.length === 0) {
         return <NoVerifiableCredentials />;
     }
@@ -140,10 +180,9 @@ export default function VerifiableCredentialList() {
             />
         );
     }
-
     return (
         <>
-            <Topbar title={t('topbar.list')} />
+            <Topbar title={t('topbar.list')} menuButton={menuButton} />
             <div className="verifiable-credential-wrapper">
                 {verifiableCredentials.value.map((credential) => {
                     return (
