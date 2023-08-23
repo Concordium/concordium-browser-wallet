@@ -1,5 +1,11 @@
 # Changelog
 
+## Unreleased
+
+### Fixed
+
+-   Show verifiable credentials in overview before they are put on chain.
+
 ## 1.1.1
 
 ### Fixed

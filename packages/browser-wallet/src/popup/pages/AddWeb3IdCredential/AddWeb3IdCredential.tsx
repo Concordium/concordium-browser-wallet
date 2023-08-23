@@ -6,6 +6,7 @@ import { useLocation } from 'react-router-dom';
 import ExternalRequestLayout from '@popup/page-layouts/ExternalRequestLayout';
 import Button from '@popup/shared/Button';
 import {
+    sessionTemporaryVerifiableCredentialMetadataAtom,
     sessionTemporaryVerifiableCredentialsAtom,
     storedVerifiableCredentialMetadataAtom,
     storedVerifiableCredentialsAtom,
@@ -51,6 +52,7 @@ export default function AddWeb3IdCredential({ onAllow, onReject }: Props) {
     const { onClose, withClose } = useContext(fullscreenPromptContext);
     const [acceptButtonDisabled, setAcceptButtonDisabled] = useState<boolean>(false);
     const [web3IdCredentials, setWeb3IdCredentials] = useAtom(sessionTemporaryVerifiableCredentialsAtom);
+    const [tempMetdata, setTempMetadata] = useAtom(sessionTemporaryVerifiableCredentialMetadataAtom);
     const storedWeb3IdCredentials = useAtomValue(storedVerifiableCredentialsAtom);
     const [verifiableCredentialMetadata, setVerifiableCredentialMetadata] = useAtom(
         storedVerifiableCredentialMetadataAtom
@@ -144,11 +146,12 @@ export default function AddWeb3IdCredential({ onAllow, onReject }: Props) {
         const credentialHolderId = wallet.getVerifiableCredentialPublicKey(issuer, index).toString('hex');
         const credentialSubjectId = createPublicKeyIdentifier(credentialHolderId, network);
         const credentialSubject = { ...credential.credentialSubject, id: credentialSubjectId };
+        const credentialId = createCredentialId(credentialHolderId, issuer, network);
 
         const fullCredential = {
             ...credential,
             credentialSubject,
-            id: createCredentialId(credentialHolderId, issuer, network),
+            id: credentialId,
             index,
         };
         await setWeb3IdCredentials([...web3IdCredentials.value, fullCredential]);
@@ -156,6 +159,7 @@ export default function AddWeb3IdCredential({ onAllow, onReject }: Props) {
             const newMetadata = { ...verifiableCredentialMetadata.value };
             newMetadata[metadataUrl.url] = metadata;
             await setVerifiableCredentialMetadata(newMetadata);
+            await setTempMetadata({ ...tempMetdata.value, [credentialId]: metadata });
         }
         return credentialSubjectId;
     }

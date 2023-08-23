@@ -17,10 +17,12 @@ import { useEffect, useState } from 'react';
 import {
     storedVerifiableCredentialMetadataAtom,
     storedVerifiableCredentialSchemasAtom,
+    sessionTemporaryVerifiableCredentialMetadataAtom,
 } from '@popup/store/verifiable-credential';
 import { AsyncWrapper } from '@popup/store/utils';
 import { ConcordiumGRPCClient } from '@concordium/web-sdk';
 import { useTranslation } from 'react-i18next';
+import { noOp } from 'wallet-common-helpers';
 
 /**
  * Retrieve the on-chain credential status for a verifiable credential in a CIS-4 credential registry contract.
@@ -77,9 +79,11 @@ export function useCredentialEntry(credential?: VerifiableCredential) {
         if (credential) {
             const credentialHolderId = getCredentialHolderId(credential.id);
             const registryContractAddress = getCredentialRegistryContractAddress(credential.id);
-            getVerifiableCredentialEntry(client, registryContractAddress, credentialHolderId).then((entry) => {
-                setCredentialEntry(entry);
-            });
+            getVerifiableCredentialEntry(client, registryContractAddress, credentialHolderId)
+                .then((entry) => {
+                    setCredentialEntry(entry);
+                })
+                .catch(noOp); // TODO add logging on catch?
         }
     }, [credential?.id, client]);
 
@@ -97,6 +101,7 @@ export function useCredentialMetadata(credential?: VerifiableCredential) {
     const [metadata, setMetadata] = useState<VerifiableCredentialMetadata>();
     const credentialEntry = useCredentialEntry(credential);
     const storedMetadata = useAtomValue(storedVerifiableCredentialMetadataAtom);
+    const tempMetadata = useAtomValue(sessionTemporaryVerifiableCredentialMetadataAtom);
 
     useEffect(() => {
         if (!storedMetadata.loading && credentialEntry) {
@@ -107,8 +112,14 @@ export function useCredentialMetadata(credential?: VerifiableCredential) {
                 );
             }
             setMetadata(storedCredentialMetadata);
+        } else if (!storedMetadata.loading && !credentialEntry && !tempMetadata.loading && credential) {
+            // Use temporary metadata
+            const tMetadata = tempMetadata.value[credential.id];
+            if (tMetadata) {
+                setMetadata(tMetadata);
+            }
         }
-    }, [storedMetadata, credentialEntry]);
+    }, [storedMetadata.loading, tempMetadata.loading, credentialEntry, credential?.id]);
 
     return metadata;
 }

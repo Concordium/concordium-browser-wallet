@@ -21,3 +21,7 @@ export const storedVerifiableCredentialMetadataAtom = atomWithChromeStorage<
 export const sessionTemporaryVerifiableCredentialsAtom = atomWithChromeStorage<
     Omit<VerifiableCredential, 'signature' | 'randomness'>[]
 >(ChromeStorageKey.TemporaryVerifiableCredentials, [], true);
+
+export const sessionTemporaryVerifiableCredentialMetadataAtom = atomWithChromeStorage<
+    Record<string, VerifiableCredentialMetadata>
+>(ChromeStorageKey.TemporaryVerifiableCredentialMetadata, {}, true);

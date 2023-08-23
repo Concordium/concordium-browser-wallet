@@ -30,6 +30,7 @@ export enum ChromeStorageKey {
     VerifiableCredentialSchemas = 'verifiableCredentialSchemas',
     VerifiableCredentialMetadata = 'verifiableCredentialMetadata',
     TemporaryVerifiableCredentials = 'tempVerifiableCredentials',
+    TemporaryVerifiableCredentialMetadata = 'tempVerifiableCredentialMetadata',
     Allowlist = 'allowlist',
 }
 

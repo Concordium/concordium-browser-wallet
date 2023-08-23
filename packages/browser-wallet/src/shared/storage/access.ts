@@ -230,3 +230,7 @@ export const sessionPendingTransactions = makeIndexedStorageAccessor<string[]>( 
 export const sessionVerifiableCredentials = makeSerializedAndIndexedStorageAccessor<
     Omit<VerifiableCredential, 'signature' | 'randomness'>[]
 >('session', ChromeStorageKey.TemporaryVerifiableCredentials);
+
+export const sessionVerifiableCredentialMetadata = makeIndexedStorageAccessor<
+    Record<string, VerifiableCredentialMetadata>
+>('session', ChromeStorageKey.TemporaryVerifiableCredentialMetadata);
