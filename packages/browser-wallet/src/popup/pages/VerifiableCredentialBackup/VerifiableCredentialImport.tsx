@@ -13,6 +13,7 @@ import { fullscreenPromptContext } from '@popup/page-layouts/FullscreenPromptLay
 import { noOp } from 'wallet-common-helpers';
 import { decrypt } from '@shared/utils/crypto';
 import { useHdWallet } from '@popup/shared/utils/account-helpers';
+import JSONBigInt from 'json-bigint';
 import { VerifiableCredentialCardWithStatusFromChain } from '../VerifiableCredential/VerifiableCredentialList';
 import { ExportFormat, VerifiableCredentialExport } from './utils';
 
@@ -40,8 +41,16 @@ function DisplayResult({ imported }: { imported: VerifiableCredential[] }) {
 }
 
 async function parseExport(data: EncryptedData, encryptionKey: string): Promise<VerifiableCredentialExport> {
-    // TODO handle bigints
-    const backup: ExportFormat = JSON.parse(await decrypt(data, encryptionKey));
+    const decrypted = await decrypt(data, encryptionKey);
+    const backup: ExportFormat = JSONBigInt({
+        alwaysParseAsBig: true,
+        useNativeBigInt: true,
+    }).parse(decrypted);
+    // Change index to number, due to parse changing all numbers to bigints.
+    backup.value.verifiableCredentials = backup.value.verifiableCredentials.map((v) => ({
+        ...v,
+        index: Number(v.index),
+    }));
     // TODO validation
     return backup.value;
 }
