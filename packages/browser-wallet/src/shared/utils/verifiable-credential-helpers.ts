@@ -491,6 +491,19 @@ const verifiableCredentialMetadataSchema = {
     },
 };
 
+const localizationRecordSchema = {
+    $ref: '#/definitions/Localization',
+    $schema: 'http://json-schema.org/draft-07/schema#',
+    definitions: {
+        Localization: {
+            additionalProperties: {
+                type: 'string',
+            },
+            type: 'object',
+        },
+    },
+};
+
 const issuerMetadataSchema = {
     $ref: '#/definitions/IssuerMetadata',
     $schema: 'http://json-schema.org/draft-07/schema#',
@@ -650,6 +663,7 @@ async function fetchDataFromUrl<T>(
     jsonSchema:
         | typeof verifiableCredentialMetadataSchema
         | typeof verifiableCredentialSchemaSchema
+        | typeof localizationRecordSchema
         | typeof issuerMetadataSchema
 ): Promise<T> {
     const response = await fetch(url, {
@@ -705,6 +719,13 @@ export async function fetchCredentialMetadata(
     abortController: AbortController
 ): Promise<VerifiableCredentialMetadata> {
     return fetchDataFromUrl(metadata, abortController, verifiableCredentialMetadataSchema);
+}
+
+export async function fetchLocalization(
+    url: MetadataUrl,
+    abortController: AbortController
+): Promise<Record<string, string>> {
+    return fetchDataFromUrl(url, abortController, localizationRecordSchema);
 }
 
 export interface IssuerMetadata {

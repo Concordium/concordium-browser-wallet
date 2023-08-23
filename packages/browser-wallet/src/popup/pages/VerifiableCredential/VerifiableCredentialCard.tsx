@@ -72,22 +72,37 @@ function ClickableVerifiableCredential({ children, onClick, metadata, className 
 }
 
 /**
- * Apply the schema to an attribute, adding the title from the schema, which
+ * Apply the schema and localization to an attribute, adding the title from the schema or localization, which
  * should be displayed to the user.
  * @param schema the schema to apply
+ * @param localization the localization to apply
  * @returns the attribute together with its title.
  * @throws if there is a mismatch in fields between the credential and the schema, i.e. the schema is invalid.
  */
-function applySchema(
-    schema: VerifiableCredentialSchema
+function applySchemaAndLocalization(
+    schema: VerifiableCredentialSchema,
+    localization?: Record<string, string>
 ): (value: [string, string | bigint]) => { title: string; key: string; value: string | bigint } {
     return (value: [string, string | bigint]) => {
         const attributeSchema = schema.properties.credentialSubject.properties.attributes.properties[value[0]];
         if (!attributeSchema) {
             throw new Error(`Missing attribute schema for key: ${value[0]}`);
         }
+        let { title } = attributeSchema;
+
+        if (localization) {
+            const localizedTitle = localization[value[0]];
+            if (localizedTitle !== undefined) {
+                title = localizedTitle;
+            } else {
+                // TODO Throw an error if we are missing a localization attribute key when we have added
+                // validation at the time of retrieving localization data.
+                // throw new Error(`Missing localization for key: ${value[0]}`);
+            }
+        }
+
         return {
-            title: attributeSchema.title,
+            title,
             key: value[0],
             value: value[1],
         };
@@ -116,6 +131,7 @@ interface CardProps extends ClassName {
     credentialStatus: VerifiableCredentialStatus;
     metadata: VerifiableCredentialMetadata;
     onClick?: () => void;
+    localization?: Record<string, string>;
 }
 
 export function VerifiableCredentialCard({
@@ -125,8 +141,11 @@ export function VerifiableCredentialCard({
     credentialStatus,
     metadata,
     className,
+    localization,
 }: CardProps) {
-    const attributes = Object.entries(credentialSubject.attributes).map(applySchema(schema));
+    const attributes = Object.entries(credentialSubject.attributes).map(
+        applySchemaAndLocalization(schema, localization)
+    );
 
     return (
         <ClickableVerifiableCredential className={className} onClick={onClick} metadata={metadata}>

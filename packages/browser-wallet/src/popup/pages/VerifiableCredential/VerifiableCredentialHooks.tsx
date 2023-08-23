@@ -4,6 +4,7 @@ import {
     CredentialQueryResponse,
     IssuerMetadata,
     VerifiableCredentialMetadata,
+    fetchLocalization,
     fetchIssuerMetadata,
     getCredentialHolderId,
     getCredentialRegistryContractAddress,
@@ -19,6 +20,7 @@ import {
 } from '@popup/store/verifiable-credential';
 import { AsyncWrapper } from '@popup/store/utils';
 import { ConcordiumGRPCClient } from '@concordium/web-sdk';
+import { useTranslation } from 'react-i18next';
 
 /**
  * Retrieve the on-chain credential status for a verifiable credential in a CIS-4 credential registry contract.
@@ -45,19 +47,19 @@ export function useCredentialStatus(credential: VerifiableCredential) {
  * @throws if no schema is found in storage for the provided credential
  * @returns the credential's schema used for rendering the credential
  */
-export function useCredentialSchema(credential: VerifiableCredential) {
+export function useCredentialSchema(credential?: VerifiableCredential) {
     const [schema, setSchema] = useState<VerifiableCredentialSchema>();
     const schemas = useAtomValue(storedVerifiableCredentialSchemasAtom);
 
     useEffect(() => {
-        if (!schemas.loading) {
+        if (!schemas.loading && credential) {
             const schemaValue = schemas.value[credential.credentialSchema.id];
             if (!schemaValue) {
                 throw new Error(`Attempted to find schema for credentialId: ${credential.id} but none was found!`);
             }
             setSchema(schemaValue);
         }
-    }, [schemas.loading]);
+    }, [credential?.id, schemas.loading]);
 
     return schema;
 }
@@ -109,6 +111,62 @@ export function useCredentialMetadata(credential?: VerifiableCredential) {
     }, [storedMetadata, credentialEntry]);
 
     return metadata;
+}
+
+interface SuccessfulLocalizationResult {
+    loading: false;
+    result: Record<string, string>;
+}
+
+interface FailedLocalizationResult {
+    loading: false;
+    result?: never;
+}
+
+interface LoadingLocalizationResult {
+    loading: true;
+}
+
+type LocalizationResult = SuccessfulLocalizationResult | FailedLocalizationResult | LoadingLocalizationResult;
+
+export function useCredentialLocalization(credential?: VerifiableCredential): LocalizationResult {
+    const [localization, setLocalization] = useState<LocalizationResult>({ loading: true });
+    const { i18n } = useTranslation();
+    const metadata = useCredentialMetadata(credential);
+    const schema = useCredentialSchema(credential);
+
+    useEffect(() => {
+        if (metadata === undefined || schema === undefined) {
+            return () => {};
+        }
+
+        // No localization is available for the provided metadata.
+        if (metadata.localization === undefined) {
+            setLocalization({ loading: false });
+            return () => {};
+        }
+
+        const currentLanguageLocalization = metadata.localization[i18n.language];
+        // No localization is available for the selected language.
+        if (currentLanguageLocalization === undefined) {
+            setLocalization({ loading: false });
+            return () => {};
+        }
+
+        const abortController = new AbortController();
+        fetchLocalization(currentLanguageLocalization, abortController)
+            .then((res) => {
+                // TODO Validate that localization is present for all keys.
+                setLocalization({ loading: false, result: res });
+            })
+            .catch(() => setLocalization({ loading: false }));
+
+        return () => {
+            abortController.abort();
+        };
+    }, [JSON.stringify(metadata), JSON.stringify(schema), i18n.language]);
+
+    return localization;
 }
 
 /**

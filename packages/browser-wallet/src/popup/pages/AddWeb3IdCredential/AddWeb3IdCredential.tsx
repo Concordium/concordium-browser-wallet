@@ -20,6 +20,7 @@ import {
     createPublicKeyIdentifier,
     fetchCredentialMetadata,
     fetchCredentialSchema,
+    fetchLocalization,
     getCredentialRegistryContractAddress,
 } from '@shared/utils/verifiable-credential-helpers';
 import { APIVerifiableCredential } from '@concordium/browser-wallet-api-helpers';
@@ -46,6 +47,7 @@ interface Location {
 export default function AddWeb3IdCredential({ onAllow, onReject }: Props) {
     const { state } = useLocation() as Location;
     const { t } = useTranslation('addWeb3IdCredential');
+    const { i18n } = useTranslation();
     const { onClose, withClose } = useContext(fullscreenPromptContext);
     const [acceptButtonDisabled, setAcceptButtonDisabled] = useState<boolean>(false);
     const [web3IdCredentials, setWeb3IdCredentials] = useAtom(sessionTemporaryVerifiableCredentialsAtom);
@@ -97,6 +99,27 @@ export default function AddWeb3IdCredential({ onAllow, onReject }: Props) {
         [schemas.loading]
     );
     useEffect(() => () => controller.abort(), []);
+
+    const localization = useAsyncMemo(
+        async () => {
+            if (metadata === undefined) {
+                return undefined;
+            }
+
+            if (metadata.localization === undefined) {
+                return undefined;
+            }
+
+            const currentLanguageLocalization = metadata.localization[i18n.language];
+            if (currentLanguageLocalization === undefined) {
+                return undefined;
+            }
+
+            return fetchLocalization(currentLanguageLocalization, controller);
+        },
+        () => setError('Failed to get localization'),
+        [metadata, i18n]
+    );
 
     async function addCredential(credentialSchema: VerifiableCredentialSchema) {
         if (!wallet) {
@@ -156,6 +179,7 @@ export default function AddWeb3IdCredential({ onAllow, onReject }: Props) {
                             schema={schema}
                             credentialStatus={VerifiableCredentialStatus.NotActivated}
                             metadata={metadata}
+                            localization={localization}
                         />
                     </>
                 )}
