@@ -59,7 +59,7 @@ export type IndexedStorageAccessor<V> = {
 /**
  * Factory function for creating a StorageAccessor from a key.
  *
- * @param area storeage area to store value in
+ * @param area storage area to store value in
  * @param key key used to store value
  */
 const makeStorageAccessor = <V>(area: chrome.storage.AreaName, key: ChromeStorageKey): StorageAccessor<V> => {
@@ -116,7 +116,7 @@ export function useIndexedStorage<V>(
 /**
  * Factory function for creating a StorageAccessor, which serializes before storing the value and deserializes before loading the value, from a key.
  *
- * @param area storeage area to store value in
+ * @param area storage area to store value in
  * @param key key used to store value
  */
 export function makeSerializedStorageAccessor<V>(
