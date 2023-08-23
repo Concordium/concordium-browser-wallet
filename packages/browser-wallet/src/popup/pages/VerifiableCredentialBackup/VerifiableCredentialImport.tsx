@@ -61,7 +61,7 @@ function updateList<T>(stored: T[], toAdd: T[], isEqual: (a: T, b: T) => boolean
 function updateRecord<T>(
     stored: Record<string, T>,
     toAdd: Record<string, T>,
-    update: (updated: Record<string, T>) => void
+    update: (updated: Record<string, T>) => Promise<void>
 ) {
     const updated = { ...stored };
     Object.entries(toAdd).forEach(([key, value]) => {
@@ -70,7 +70,7 @@ function updateRecord<T>(
         }
     });
 
-    update(updated);
+    return update(updated);
 }
 
 export default function VerifiableCredentialImport() {
@@ -100,8 +100,8 @@ export default function VerifiableCredentialImport() {
                     (a, b) => a.id === b.id,
                     setVerifiableCredentials
                 );
-                updateRecord(storedSchemas.value, schemas, setSchemas);
-                updateRecord(storedMetadata.value, metadata, setMetadata);
+                await updateRecord(storedSchemas.value, schemas, setSchemas);
+                await updateRecord(storedMetadata.value, metadata, setMetadata);
                 setImported(filteredCredentials);
             }
         } catch (e) {
