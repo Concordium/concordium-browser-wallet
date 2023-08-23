@@ -84,12 +84,11 @@ function applySchemaAndLocalization(
     localization?: Record<string, string>
 ): (value: [string, string | bigint]) => { title: string; key: string; value: string | bigint } {
     return (value: [string, string | bigint]) => {
-        let title;
         const attributeSchema = schema.properties.credentialSubject.properties.attributes.properties[value[0]];
         if (!attributeSchema) {
             throw new Error(`Missing attribute schema for key: ${value[0]}`);
         }
-        title = attributeSchema.title;
+        let { title } = attributeSchema;
 
         if (localization) {
             const localizedTitle = localization[value[0]];
