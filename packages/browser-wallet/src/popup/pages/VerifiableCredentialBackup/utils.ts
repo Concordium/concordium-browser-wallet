@@ -11,6 +11,7 @@ import {
 } from '@popup/store/verifiable-credential';
 import { networkConfigurationAtom } from '@popup/store/settings';
 import { saveData } from '@popup/shared/utils/file-helpers';
+import { stringify } from 'json-bigint';
 
 export type VerifiableCredentialExport = {
     verifiableCredentials: VerifiableCredential[];
@@ -43,8 +44,8 @@ function createExport(
         },
     };
 
-    // TODO handle bigints
-    return encrypt(JSON.stringify(exportContent), encryptionKey);
+    // Use json-bigint to serialize bigints as json numbers.
+    return encrypt(stringify(exportContent), encryptionKey);
 }
 
 export function useVerifiableCredentialExport() {

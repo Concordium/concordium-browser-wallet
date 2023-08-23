@@ -134,7 +134,7 @@ export default function AddWeb3IdCredential({ onAllow, onReject }: Props) {
         }
         // Find the next unused index
         // TODO verify index is unused on chain?
-        const index = [...(web3IdCredentials || []), ...(storedWeb3IdCredentials.value || [])].reduce(
+        const index = [...web3IdCredentials.value, ...storedWeb3IdCredentials.value].reduce(
             (best, cred) => (cred.issuer === credential.issuer ? Math.max(cred.index + 1, best) : best),
             0
         );
@@ -151,13 +151,17 @@ export default function AddWeb3IdCredential({ onAllow, onReject }: Props) {
             id: createCredentialId(credentialHolderId, issuer, network),
             index,
         };
-        await setWeb3IdCredentials([...(web3IdCredentials || []), fullCredential]);
+        await setWeb3IdCredentials([...web3IdCredentials.value, fullCredential]);
         if (metadata) {
             const newMetadata = { ...verifiableCredentialMetadata.value };
             newMetadata[metadataUrl.url] = metadata;
             await setVerifiableCredentialMetadata(newMetadata);
         }
         return credentialSubjectId;
+    }
+
+    if (web3IdCredentials.loading || storedWeb3IdCredentials.loading) {
+        return null;
     }
 
     const urlDisplay = displayUrl(url);

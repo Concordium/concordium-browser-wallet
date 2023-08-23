@@ -1,5 +1,19 @@
 # Changelog
 
+## 1.1.1
+
+### Fixed
+
+-   Support number properties as bigints for verifiable credentials.
+-   Use localization for verifiable credentials.
+-   Fix wallet crashing when importing verifiable credentials with new schemas.
+
+## 1.1.0
+
+### Added
+
+-   Web3IdCredentials support.
+
 ## 1.0.6
 
 ### Changed
