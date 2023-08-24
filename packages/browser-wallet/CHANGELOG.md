@@ -1,5 +1,11 @@
 # Changelog
 
+## Unreleased
+
+### Fixed
+
+-   Wallet crashing when showing a proof request, while having a verifiable credential that is not yet on chain (or we otherwise fail to retrieve the status)
+
 ## 1.1.1
 
 ### Fixed
