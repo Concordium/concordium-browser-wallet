@@ -10,6 +10,7 @@ const t: typeof en = {
         // We don't translate these because they are mainly for bug reporting.
         metadata: en.error.metadata,
         schema: en.error.schema,
+        attribute: en.error.attribute,
     },
 };
 
