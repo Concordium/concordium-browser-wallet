@@ -31,7 +31,7 @@ import {
     MessageStatusWrapper,
 } from '@concordium/browser-wallet-message-hub';
 import { getNet } from '@shared/utils/network-helpers';
-import { openWindow, RunCondition } from './window-management';
+import { openWindow, RunCondition, testPopupOpen } from './window-management';
 import bgMessageHandler from './message-handler';
 
 const NO_CREDENTIALS_FIT = 'No temporary credentials fit the given id';
@@ -195,6 +195,22 @@ export const runIfValidWeb3IdProof: RunCondition<MessageStatusWrapper<undefined>
 };
 
 async function loadWeb3IdBackup(): Promise<void> {
+    const waitForClosedPopup = new Promise<boolean>((resolve, reject) => {
+        let escapeCounter = 0;
+        setTimeout(async function waitForClosed() {
+            const isOpen = await testPopupOpen();
+            if (!isOpen) {
+                resolve(true);
+            } else {
+                if (escapeCounter > 10) {
+                    reject();
+                }
+                escapeCounter += 1;
+                setTimeout(waitForClosed, 100);
+            }
+        }, 100);
+    });
+    await waitForClosedPopup;
     await openWindow();
     bgMessageHandler.sendInternalMessage(InternalMessageType.ImportWeb3IdBackup);
 }
