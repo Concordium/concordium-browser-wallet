@@ -2,6 +2,10 @@
 
 ## Unreleased
 
+### Added
+
+-   Display contract address of issuer in verifiable credential details.
+
 ### Fixed
 
 -   Incorrect verifiable presentations created, due to incorrect identity/identityProviderIndex used.
