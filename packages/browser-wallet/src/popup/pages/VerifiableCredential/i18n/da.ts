@@ -17,6 +17,7 @@ const t: typeof en = {
         validUntil: 'Gyldig indtil',
         issuer: {
             title: 'Udstedt af',
+            contract: 'kontraktindeks, subindeks',
             name: 'Navn',
             description: 'Beskrivelse',
             url: 'Hjemmeside',

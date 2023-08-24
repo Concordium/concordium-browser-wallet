@@ -16,6 +16,7 @@ import {
     getCredentialHolderId,
     getCredentialRegistryContractAddress,
     getRevokeTransactionExecutionEnergyEstimate,
+    getContractAddressFromIssuerDID,
 } from '@shared/utils/verifiable-credential-helpers';
 import { fetchContractName } from '@shared/utils/token-helpers';
 import { TimeStampUnit, dateFromTimestamp, ClassName } from 'wallet-common-helpers';
@@ -36,38 +37,34 @@ import { DisplayAttribute, VerifiableCredentialCard, VerifiableCredentialCardHea
 function DisplayIssuerMetadata({ issuer }: { issuer: string }) {
     const { t } = useTranslation('verifiableCredential');
     const issuerMetadata = useIssuerMetadata(issuer);
-
-    if (
-        issuerMetadata === undefined ||
-        (issuerMetadata.description === undefined &&
-            issuerMetadata.icon === undefined &&
-            issuerMetadata.name === undefined &&
-            issuerMetadata.url === undefined)
-    ) {
-        return null;
-    }
+    const issuerContract = getContractAddressFromIssuerDID(issuer);
 
     return (
         <div className="verifiable-credential__body-attributes">
             <h3>{t('details.issuer.title')}</h3>
-            {issuerMetadata.icon && <Img className="issuer-logo" src={issuerMetadata.icon.url} withDefaults />}
-            {issuerMetadata.name && (
+            <DisplayAttribute
+                attributeKey="issuerContract"
+                attributeTitle={t('details.issuer.contract')}
+                attributeValue={`${issuerContract.index.toString()} (${issuerContract.subindex.toString()})`}
+            />
+            {issuerMetadata?.icon && <Img className="issuer-logo" src={issuerMetadata.icon.url} withDefaults />}
+            {issuerMetadata?.name && (
                 <DisplayAttribute
                     attributeKey="issuerName"
                     attributeTitle={t('details.issuer.name')}
                     attributeValue={issuerMetadata.name}
                 />
             )}
-            {issuerMetadata.description && (
+            {issuerMetadata?.description && (
                 <DisplayAttribute
-                    attributeKey="issuerName"
+                    attributeKey="issuerDescription"
                     attributeTitle={t('details.issuer.description')}
                     attributeValue={issuerMetadata.description}
                 />
             )}
-            {issuerMetadata.url && (
+            {issuerMetadata?.url && (
                 <DisplayAttribute
-                    attributeKey="issuerName"
+                    attributeKey="issuerUrl"
                     attributeTitle={t('details.issuer.url')}
                     attributeValue={issuerMetadata.url}
                 />

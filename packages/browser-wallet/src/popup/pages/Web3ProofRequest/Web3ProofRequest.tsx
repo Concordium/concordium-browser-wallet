@@ -66,7 +66,9 @@ async function getAllCredentialStatuses(
 ): Promise<Record<string, VerifiableCredentialStatus | undefined>> {
     const statuses = await Promise.all(
         credentials.map((credential) =>
-            getVerifiableCredentialStatus(client, credential.id).then((status) => [credential.id, status])
+            getVerifiableCredentialStatus(client, credential.id)
+                .then((status) => [credential.id, status])
+                .catch(() => [credential.id, VerifiableCredentialStatus.Pending])
         )
     );
     return Object.fromEntries(statuses);
