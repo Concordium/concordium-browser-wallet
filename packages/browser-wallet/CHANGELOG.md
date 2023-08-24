@@ -5,6 +5,7 @@
 ### Added
 
 -   Validation of required attributes when adding a credential.
+-   Display contract address of issuer in verifiable credential details.
 
 ### Fixed
 
