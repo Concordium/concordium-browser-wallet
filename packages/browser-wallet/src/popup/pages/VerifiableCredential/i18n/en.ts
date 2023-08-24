@@ -15,6 +15,7 @@ const t = {
         validUntil: 'Valid until',
         issuer: {
             title: 'Issued by',
+            contract: 'contract index, subindex',
             name: 'Name',
             description: 'Description',
             url: 'Website',
