@@ -1,5 +1,11 @@
 # Changelog
 
+## Unreleased
+
+### Fixed
+
+-   Incorrect verifiable presentations created, due to incorrect identity/identityProviderIndex used.
+
 ## 1.1.1
 
 ### Fixed

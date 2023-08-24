@@ -51,7 +51,7 @@ export function getAccountCredentialCommitmentInput(
         throw new Error('IdQualifier not fulfilled');
     }
 
-    const identity = (identities || []).find(isIdentityOfCredential);
+    const identity = (identities || []).find((id) => isIdentityOfCredential(id)(credential));
 
     if (!identity || identity.status !== CreationStatus.Confirmed) {
         throw new Error('No identity found for credential');
