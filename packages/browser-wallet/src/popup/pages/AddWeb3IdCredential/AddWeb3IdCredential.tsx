@@ -98,6 +98,25 @@ export default function AddWeb3IdCredential({ onAllow, onReject }: Props) {
         () => setError(t('error.schema')),
         [schemas.loading]
     );
+
+    useEffect(() => {
+        if (schema) {
+            // Ensure that all attributes required by the schema are in the attributes. If not, then
+            // the credential should not be allowed to be added.
+            const missingRequiredAttributeKeys = [];
+            const requiredAttributes = schema.properties.credentialSubject.properties.attributes.required;
+            for (const requiredAttribute of requiredAttributes) {
+                if (!Object.keys(credential.credentialSubject.attributes).includes(requiredAttribute)) {
+                    missingRequiredAttributeKeys.push(requiredAttribute);
+                }
+            }
+
+            if (missingRequiredAttributeKeys.length > 0) {
+                setError(t('error.attribute', { attributeKeys: missingRequiredAttributeKeys }));
+            }
+        }
+    }, [schema?.properties.credentialSubject.properties.attributes.required]);
+
     useEffect(() => () => controller.abort(), []);
 
     const localization = useAsyncMemo(
