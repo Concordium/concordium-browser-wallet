@@ -231,6 +231,7 @@ export const sessionVerifiableCredentials = makeSerializedAndIndexedStorageAcces
     Omit<VerifiableCredential, 'signature' | 'randomness'>[]
 >('session', ChromeStorageKey.TemporaryVerifiableCredentials);
 
-export const sessionVerifiableCredentialMetadata = makeIndexedStorageAccessor<
-    Record<string, VerifiableCredentialMetadata>
->('session', ChromeStorageKey.TemporaryVerifiableCredentialMetadata);
+export const sessionVerifiableCredentialMetadataUrls = makeIndexedStorageAccessor<Record<string, string>>(
+    'session',
+    ChromeStorageKey.TemporaryVerifiableCredentialMetadataUrls
+);

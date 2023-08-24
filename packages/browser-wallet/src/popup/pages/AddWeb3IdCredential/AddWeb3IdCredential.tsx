@@ -6,7 +6,7 @@ import { useLocation } from 'react-router-dom';
 import ExternalRequestLayout from '@popup/page-layouts/ExternalRequestLayout';
 import Button from '@popup/shared/Button';
 import {
-    sessionTemporaryVerifiableCredentialMetadataAtom,
+    sessionTemporaryVerifiableCredentialMetadataUrlsAtom,
     sessionTemporaryVerifiableCredentialsAtom,
     storedVerifiableCredentialMetadataAtom,
     storedVerifiableCredentialsAtom,
@@ -52,7 +52,7 @@ export default function AddWeb3IdCredential({ onAllow, onReject }: Props) {
     const { onClose, withClose } = useContext(fullscreenPromptContext);
     const [acceptButtonDisabled, setAcceptButtonDisabled] = useState<boolean>(false);
     const [web3IdCredentials, setWeb3IdCredentials] = useAtom(sessionTemporaryVerifiableCredentialsAtom);
-    const [tempMetdata, setTempMetadata] = useAtom(sessionTemporaryVerifiableCredentialMetadataAtom);
+    const [metadataUrls, setMetadataUrls] = useAtom(sessionTemporaryVerifiableCredentialMetadataUrlsAtom);
     const storedWeb3IdCredentials = useAtomValue(storedVerifiableCredentialsAtom);
     const [verifiableCredentialMetadata, setVerifiableCredentialMetadata] = useAtom(
         storedVerifiableCredentialMetadataAtom
@@ -159,7 +159,7 @@ export default function AddWeb3IdCredential({ onAllow, onReject }: Props) {
             const newMetadata = { ...verifiableCredentialMetadata.value };
             newMetadata[metadataUrl.url] = metadata;
             await setVerifiableCredentialMetadata(newMetadata);
-            await setTempMetadata({ ...tempMetdata.value, [credentialId]: metadata });
+            await setMetadataUrls({ ...metadataUrls.value, [credentialId]: metadataUrl.url });
         }
         return credentialSubjectId;
     }

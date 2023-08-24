@@ -17,7 +17,7 @@ import { useEffect, useState } from 'react';
 import {
     storedVerifiableCredentialMetadataAtom,
     storedVerifiableCredentialSchemasAtom,
-    sessionTemporaryVerifiableCredentialMetadataAtom,
+    sessionTemporaryVerifiableCredentialMetadataUrlsAtom,
 } from '@popup/store/verifiable-credential';
 import { AsyncWrapper } from '@popup/store/utils';
 import { ConcordiumGRPCClient } from '@concordium/web-sdk';
@@ -101,24 +101,30 @@ export function useCredentialMetadata(credential?: VerifiableCredential) {
     const [metadata, setMetadata] = useState<VerifiableCredentialMetadata>();
     const credentialEntry = useCredentialEntry(credential);
     const storedMetadata = useAtomValue(storedVerifiableCredentialMetadataAtom);
-    const tempMetadata = useAtomValue(sessionTemporaryVerifiableCredentialMetadataAtom);
+    const tempMetadata = useAtomValue(sessionTemporaryVerifiableCredentialMetadataUrlsAtom);
 
     useEffect(() => {
-        if (!storedMetadata.loading && credentialEntry) {
-            const storedCredentialMetadata = storedMetadata.value[credentialEntry.credentialInfo.metadataUrl.url];
-            if (!storedCredentialMetadata) {
-                throw new Error(
-                    `Attempted to find credential metadata for credentialId: ${credentialEntry.credentialInfo.credentialHolderId} but none was found!`
-                );
-            }
-            setMetadata(storedCredentialMetadata);
-        } else if (!storedMetadata.loading && !credentialEntry && !tempMetadata.loading && credential) {
-            // Use temporary metadata
-            const tMetadata = tempMetadata.value[credential.id];
-            if (tMetadata) {
-                setMetadata(tMetadata);
-            }
+        if (storedMetadata.loading) {
+            return;
         }
+        let url;
+        if (credentialEntry) {
+            url = credentialEntry.credentialInfo.metadataUrl.url;
+        } else if (!tempMetadata.loading && credential) {
+            url = tempMetadata.value[credential.id];
+        }
+        if (!url) {
+            return;
+        }
+        const storedCredentialMetadata = storedMetadata.value[url];
+        if (!storedCredentialMetadata) {
+            throw new Error(
+                `Attempted to find credential metadata for credentialId: ${
+                    credentialEntry?.credentialInfo.credentialHolderId || credential?.id
+                } but none was found!`
+            );
+        }
+        setMetadata(storedCredentialMetadata);
     }, [storedMetadata.loading, tempMetadata.loading, credentialEntry, credential?.id]);
 
     return metadata;
