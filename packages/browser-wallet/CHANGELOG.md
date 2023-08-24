@@ -2,6 +2,10 @@
 
 ## Unreleased
 
+### Added
+
+-   Validation of required attributes when adding a credential.
+
 ### Fixed
 
 -   Incorrect verifiable presentations created, due to incorrect identity/identityProviderIndex used.
