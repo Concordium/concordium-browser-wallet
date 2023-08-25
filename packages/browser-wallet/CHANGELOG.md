@@ -1,5 +1,11 @@
 # Changelog
 
+## Unreleased
+
+### Fixed
+
+-   Updated the JSON schema for the verifiable credential schema validation, so that invalid schemas are rejected.
+
 ## 1.1.2
 
 ### Added

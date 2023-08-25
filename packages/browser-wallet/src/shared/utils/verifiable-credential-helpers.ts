@@ -368,14 +368,62 @@ const verifiableCredentialSchemaSchema = {
                     additionalProperties: false,
                     properties: {
                         properties: {
-                            additionalProperties: {
-                                type: 'object',
-                            },
+                            additionalProperties: false,
                             properties: {
+                                attributes: {
+                                    additionalProperties: false,
+                                    properties: {
+                                        description: {
+                                            type: 'string',
+                                        },
+                                        format: {
+                                            type: 'string',
+                                        },
+                                        properties: {
+                                            additionalProperties: {
+                                                additionalProperties: false,
+                                                properties: {
+                                                    description: {
+                                                        type: 'string',
+                                                    },
+                                                    format: {
+                                                        type: 'string',
+                                                    },
+                                                    title: {
+                                                        type: 'string',
+                                                    },
+                                                    type: {
+                                                        type: 'string',
+                                                    },
+                                                },
+                                                required: ['title', 'type', 'description'],
+                                                type: 'object',
+                                            },
+                                            type: 'object',
+                                        },
+                                        required: {
+                                            items: {
+                                                type: 'string',
+                                            },
+                                            type: 'array',
+                                        },
+                                        title: {
+                                            type: 'string',
+                                        },
+                                        type: {
+                                            type: 'string',
+                                        },
+                                    },
+                                    required: ['description', 'properties', 'required', 'title', 'type'],
+                                    type: 'object',
+                                },
                                 id: {
                                     additionalProperties: false,
                                     properties: {
                                         description: {
+                                            type: 'string',
+                                        },
+                                        format: {
                                             type: 'string',
                                         },
                                         title: {
@@ -389,7 +437,7 @@ const verifiableCredentialSchemaSchema = {
                                     type: 'object',
                                 },
                             },
-                            required: ['id'],
+                            required: ['id', 'attributes'],
                             type: 'object',
                         },
                         required: {
@@ -402,7 +450,7 @@ const verifiableCredentialSchemaSchema = {
                             type: 'string',
                         },
                     },
-                    required: ['type', 'required', 'properties'],
+                    required: ['type', 'properties', 'required'],
                     type: 'object',
                 },
             },
