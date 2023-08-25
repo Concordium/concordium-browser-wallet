@@ -5,6 +5,7 @@
 ### Fixed
 
 -   Updated the JSON schema for the verifiable credential schema validation, so that invalid schemas are rejected.
+-   An issue where a verifiable with the `NotActive` status would show as `Pending`.
 
 ## 1.1.2
 

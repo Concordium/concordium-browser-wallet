@@ -29,7 +29,7 @@ export default function StatusIcon({ status }: { status: VerifiableCredentialSta
             break;
         case VerifiableCredentialStatus.NotActivated:
             icon = <PendingIcon />;
-            text = t('Pending');
+            text = t('NotActivated');
             break;
         case VerifiableCredentialStatus.Pending:
             icon = <PendingIcon />;
