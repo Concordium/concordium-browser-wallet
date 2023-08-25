@@ -8,6 +8,7 @@ const t = {
         metadata: 'We are unable to load the metadata for the credential.',
         schema: 'We are unable to load the schema specification for the credential.',
         attribute: 'The received credential is missing one or more required attributes ({{ attributeKeys }})',
+        localization: 'Failed to get localization',
     },
 };
 

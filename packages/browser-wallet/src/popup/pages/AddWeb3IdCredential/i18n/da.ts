@@ -11,6 +11,7 @@ const t: typeof en = {
         metadata: en.error.metadata,
         schema: en.error.schema,
         attribute: en.error.attribute,
+        localization: en.error.localization,
     },
 };
 

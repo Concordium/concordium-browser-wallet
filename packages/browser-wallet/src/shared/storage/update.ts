@@ -60,6 +60,28 @@ export async function removeFromList<Type>(
     });
 }
 
+/*
+ * Generic method to add an element to list in storage while ensuring that
+ * the list never grows beyond the provided size. If the list is still small
+ * enough, then the addition is prepended to the list. If the the list would have
+ * grown greater than the max size, then the addition is prepended to the list and
+ * the last element of the list is removed.
+ */
+export async function addToListMaxSize<Type>(
+    lock: string,
+    addition: Type,
+    storage: StorageAccessor<Type[]>,
+    size: number
+): Promise<void> {
+    return navigator.locks.request(lock, async () => {
+        const list = (await storage.get()) || [];
+        if (list.length < size) {
+            return storage.set([addition].concat(list));
+        }
+        return storage.set([addition].concat(list.slice(0, list.length - 1)));
+    });
+}
+
 /**
  * Generic method to edit/update elements in a list in storage
  * Note that this replaces the element found by the findPredicate with the edit.

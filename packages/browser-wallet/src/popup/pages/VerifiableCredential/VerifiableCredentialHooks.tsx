@@ -22,7 +22,7 @@ import {
 import { AsyncWrapper } from '@popup/store/utils';
 import { ConcordiumGRPCClient } from '@concordium/web-sdk';
 import { useTranslation } from 'react-i18next';
-import { noOp } from 'wallet-common-helpers';
+import { logError } from '@shared/utils/log-helpers';
 
 /**
  * Retrieve the on-chain credential status for a verifiable credential in a CIS-4 credential registry contract.
@@ -36,7 +36,10 @@ export function useCredentialStatus(credential: VerifiableCredential) {
     useEffect(() => {
         getVerifiableCredentialStatus(client, credential.id)
             .then(setStatus)
-            .catch(() => setStatus(VerifiableCredentialStatus.Pending));
+            .catch((e) => {
+                setStatus(VerifiableCredentialStatus.Pending);
+                logError(e);
+            });
     }, [credential.id, client]);
 
     return status;
@@ -83,7 +86,7 @@ export function useCredentialEntry(credential?: VerifiableCredential) {
                 .then((entry) => {
                     setCredentialEntry(entry);
                 })
-                .catch(noOp); // TODO add logging on catch?
+                .catch(logError);
         }
     }, [credential?.id, client]);
 
@@ -176,7 +179,10 @@ export function useCredentialLocalization(credential?: VerifiableCredential): Lo
                 // TODO Validate that localization is present for all keys.
                 setLocalization({ loading: false, result: res });
             })
-            .catch(() => setLocalization({ loading: false }));
+            .catch((e) => {
+                setLocalization({ loading: false });
+                logError(e);
+            });
 
         return () => {
             abortController.abort();
@@ -199,10 +205,12 @@ export function useIssuerMetadata(issuer: string): IssuerMetadata | undefined {
 
     useEffect(() => {
         const registryContractAddress = getCredentialRegistryContractAddress(issuer);
-        getCredentialRegistryMetadata(client, registryContractAddress).then((res) => {
-            const abortController = new AbortController();
-            fetchIssuerMetadata(res.issuerMetadata, abortController).then(setIssuerMetadata);
-        });
+        getCredentialRegistryMetadata(client, registryContractAddress)
+            .then((res) => {
+                const abortController = new AbortController();
+                fetchIssuerMetadata(res.issuerMetadata, abortController).then(setIssuerMetadata).catch(logError);
+            })
+            .catch(logError);
     }, [client, issuer]);
 
     return issuerMetadata;
@@ -234,11 +242,13 @@ export function useFetchingEffect<T>(
         const abortControllers: AbortController[] = [];
 
         if (!credentials.loading && credentials.value.length !== 0 && !storedData.loading) {
-            dataFetcher(credentials.value, client, abortControllers, storedData.value).then((result) => {
-                if (!isCancelled && result.updateReceived) {
-                    setStoredData(result.data);
-                }
-            });
+            dataFetcher(credentials.value, client, abortControllers, storedData.value)
+                .then((result) => {
+                    if (!isCancelled && result.updateReceived) {
+                        setStoredData(result.data);
+                    }
+                })
+                .catch(logError);
         }
 
         return () => {
