@@ -28,6 +28,7 @@ import { APIVerifiableCredential } from '@concordium/browser-wallet-api-helpers'
 import { networkConfigurationAtom } from '@popup/store/settings';
 import { MetadataUrl } from '@concordium/browser-wallet-api-helpers/lib/wallet-api-types';
 import { parse } from '@shared/utils/payload-helpers';
+import { logError } from '@shared/utils/log-helpers';
 import { VerifiableCredentialCard } from '../VerifiableCredential/VerifiableCredentialCard';
 
 type Props = {
@@ -81,7 +82,10 @@ export default function AddWeb3IdCredential({ onAllow, onReject }: Props) {
             }
             return fetchCredentialMetadata(metadataUrl, controller);
         },
-        () => setError(t('error.metadata')),
+        (e) => {
+            setError(t('error.metadata'));
+            logError(e);
+        },
         [verifiableCredentialMetadata.loading]
     );
 
@@ -97,7 +101,10 @@ export default function AddWeb3IdCredential({ onAllow, onReject }: Props) {
             }
             return fetchCredentialSchema({ url: schemaUrl }, controller);
         },
-        () => setError(t('error.schema')),
+        (e) => {
+            setError(t('error.schema'));
+            logError(e);
+        },
         [schemas.loading]
     );
 
@@ -138,7 +145,10 @@ export default function AddWeb3IdCredential({ onAllow, onReject }: Props) {
 
             return fetchLocalization(currentLanguageLocalization, controller);
         },
-        () => setError('Failed to get localization'),
+        (e) => {
+            setError(t('error.localization'));
+            logError(e);
+        },
         [metadata, i18n]
     );
 

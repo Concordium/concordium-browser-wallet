@@ -11,6 +11,7 @@ import { Buffer } from 'buffer/';
 import jsonschema from 'jsonschema';
 import { applyExecutionNRGBuffer, getContractName } from './contract-helpers';
 import { getNet } from './network-helpers';
+import { logError } from './log-helpers';
 
 /**
  * Extracts the credential holder id from a verifiable credential id (did).
@@ -832,7 +833,7 @@ export async function getCredentialSchemas(
             } catch (e) {
                 // Ignore errors that occur because we aborted, as that is expected to happen.
                 if (!controller.signal.aborted) {
-                    // TODO This should be logged.
+                    logError(e);
                 }
             }
         }
@@ -867,7 +868,7 @@ export async function getCredentialMetadata(
                 metadataUrls.push(entry.credentialInfo.metadataUrl);
             }
         } catch (e) {
-            // If we fail, the credential most likely doesn't exist and we skip it
+            logError(e);
         }
     }
 
@@ -887,7 +888,7 @@ export async function getCredentialMetadata(
         } catch (e) {
             // Ignore errors that occur because we aborted, as that is expected to happen.
             if (!controller.signal.aborted) {
-                // TODO This should be logged.
+                logError(e);
             }
         }
     }

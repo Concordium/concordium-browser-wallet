@@ -32,6 +32,7 @@ import {
     storedVerifiableCredentialMetadata,
     sessionVerifiableCredentials,
     sessionVerifiableCredentialMetadataUrls,
+    storedLog,
 } from '@shared/storage/access';
 import { ChromeStorageKey } from '@shared/storage/types';
 import { atom, PrimitiveAtom, WritableAtom } from 'jotai';
@@ -71,6 +72,7 @@ const accessorMap: Record<ChromeStorageKey, StorageAccessor<any>> = {
         sessionVerifiableCredentialMetadataUrls,
         getGenesisHash
     ),
+    [ChromeStorageKey.Log]: storedLog,
 };
 
 export function resetOnUnmountAtom<V>(initial: V): PrimitiveAtom<V> {

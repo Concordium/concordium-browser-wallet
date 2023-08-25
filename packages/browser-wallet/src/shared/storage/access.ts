@@ -1,6 +1,7 @@
 import { stringify } from '@concordium/browser-wallet-api/src/util';
 import { parse } from '@shared/utils/payload-helpers';
 import { VerifiableCredentialMetadata } from '@shared/utils/verifiable-credential-helpers';
+import { Log } from '@shared/utils/log-helpers';
 import {
     ChromeStorageKey,
     EncryptedData,
@@ -205,6 +206,7 @@ const indexedStoredAllowlist = makeIndexedStorageAccessor<Record<string, string[
     ChromeStorageKey.Allowlist
 );
 export const storedAllowlist = useIndexedStorage(indexedStoredAllowlist, getGenesisHash);
+export const storedLog = makeStorageAccessor<Log[]>('local', ChromeStorageKey.Log);
 
 export const sessionOpenPrompt = makeStorageAccessor<boolean>('session', ChromeStorageKey.OpenPrompt);
 export const sessionPasscode = makeStorageAccessor<string>('session', ChromeStorageKey.Passcode);
