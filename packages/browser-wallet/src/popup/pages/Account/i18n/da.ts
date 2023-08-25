@@ -147,7 +147,7 @@ const t: typeof en = {
             },
             '3': {
                 title: 'Opdateringer med længere cool-downs',
-                body: 'Hvis du vælger at formindske din delegation saldo, så vil ændringen træde i kraft efter en cool-down periode.\n\nI løbet af denne cool-down periode, vil delegation saldoen være låst og kan ikke ændres, og du vil ikke kunne stoppe delegation.\n\nDu vil stadig få fortjenester i cool-down perioden, og du vil stadig kunne ændre andre delegationindstillinger.n\n.Hvis du laver andre ændringer samtidigt med at du formindsker delegation saldoen, vil disse ændringer træde i kraft ved den næste pay day, som beskrevet på sidste side.',
+                body: 'Hvis du vælger at formindske din delegation saldo, så vil ændringen træde i kraft efter en cool-down periode.\n\nI løbet af denne cool-down periode, vil delegation saldoen være låst og kan ikke ændres, og du vil ikke kunne stoppe delegation.\n\nDu vil stadig få fortjenester i cool-down perioden, og du vil stadig kunne ændre andre delegationindstillinger.\n\nHvis du laver andre ændringer samtidigt med at du formindsker delegation saldoen, vil disse ændringer træde i kraft ved den næste pay day, som beskrevet på sidste side.',
             },
         },
         removeIntro: {
