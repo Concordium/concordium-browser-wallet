@@ -11,6 +11,7 @@ import { Buffer } from 'buffer/';
 import jsonschema from 'jsonschema';
 import { applyExecutionNRGBuffer, getContractName } from './contract-helpers';
 import { getNet } from './network-helpers';
+import { logError } from './log-helpers';
 
 /**
  * Extracts the credential holder id from a verifiable credential id (did).
@@ -368,14 +369,62 @@ const verifiableCredentialSchemaSchema = {
                     additionalProperties: false,
                     properties: {
                         properties: {
-                            additionalProperties: {
-                                type: 'object',
-                            },
+                            additionalProperties: false,
                             properties: {
+                                attributes: {
+                                    additionalProperties: false,
+                                    properties: {
+                                        description: {
+                                            type: 'string',
+                                        },
+                                        format: {
+                                            type: 'string',
+                                        },
+                                        properties: {
+                                            additionalProperties: {
+                                                additionalProperties: false,
+                                                properties: {
+                                                    description: {
+                                                        type: 'string',
+                                                    },
+                                                    format: {
+                                                        type: 'string',
+                                                    },
+                                                    title: {
+                                                        type: 'string',
+                                                    },
+                                                    type: {
+                                                        type: 'string',
+                                                    },
+                                                },
+                                                required: ['title', 'type', 'description'],
+                                                type: 'object',
+                                            },
+                                            type: 'object',
+                                        },
+                                        required: {
+                                            items: {
+                                                type: 'string',
+                                            },
+                                            type: 'array',
+                                        },
+                                        title: {
+                                            type: 'string',
+                                        },
+                                        type: {
+                                            type: 'string',
+                                        },
+                                    },
+                                    required: ['description', 'properties', 'required', 'title', 'type'],
+                                    type: 'object',
+                                },
                                 id: {
                                     additionalProperties: false,
                                     properties: {
                                         description: {
+                                            type: 'string',
+                                        },
+                                        format: {
                                             type: 'string',
                                         },
                                         title: {
@@ -389,7 +438,7 @@ const verifiableCredentialSchemaSchema = {
                                     type: 'object',
                                 },
                             },
-                            required: ['id'],
+                            required: ['id', 'attributes'],
                             type: 'object',
                         },
                         required: {
@@ -402,7 +451,7 @@ const verifiableCredentialSchemaSchema = {
                             type: 'string',
                         },
                     },
-                    required: ['type', 'required', 'properties'],
+                    required: ['type', 'properties', 'required'],
                     type: 'object',
                 },
             },
@@ -784,7 +833,7 @@ export async function getCredentialSchemas(
             } catch (e) {
                 // Ignore errors that occur because we aborted, as that is expected to happen.
                 if (!controller.signal.aborted) {
-                    // TODO This should be logged.
+                    logError(e);
                 }
             }
         }
@@ -819,7 +868,7 @@ export async function getCredentialMetadata(
                 metadataUrls.push(entry.credentialInfo.metadataUrl);
             }
         } catch (e) {
-            // If we fail, the credential most likely doesn't exist and we skip it
+            logError(e);
         }
     }
 
@@ -839,7 +888,7 @@ export async function getCredentialMetadata(
         } catch (e) {
             // Ignore errors that occur because we aborted, as that is expected to happen.
             if (!controller.signal.aborted) {
-                // TODO This should be logged.
+                logError(e);
             }
         }
     }
