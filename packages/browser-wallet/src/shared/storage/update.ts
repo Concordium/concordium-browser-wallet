@@ -61,11 +61,8 @@ export async function removeFromList<Type>(
 }
 
 /*
- * Generic method to add an element to list in storage while ensuring that
- * the list never grows beyond the provided size. If the list is still small
- * enough, then the addition is prepended to the list. If the the list would have
- * grown greater than the max size, then the addition is prepended to the list and
- * the last element of the list is removed.
+ * Generic method to add an element to list in storage, while treating the list as a FIFO queue,
+ * to ensure the list never grows beyond the provided size.
  */
 export async function addToListMaxSize<Type>(
     lock: string,
