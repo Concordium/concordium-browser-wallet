@@ -1,5 +1,18 @@
 # Changelog
 
+## 1.1.2
+
+### Added
+
+-   Validation of required attributes when adding a credential.
+-   Display contract address of issuer in verifiable credential details.
+
+### Fixed
+
+-   Incorrect verifiable presentations created, due to incorrect identity/identityProviderIndex used.
+-   Wallet crashing when showing a proof request, while having a verifiable credential that is not yet on chain (or we otherwise fail to retrieve the status)
+-   Show verifiable credentials in overview before they are put on chain.
+
 ## 1.1.1
 
 ### Fixed

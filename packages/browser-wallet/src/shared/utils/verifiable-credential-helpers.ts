@@ -809,13 +809,17 @@ export async function getCredentialMetadata(
 ) {
     const metadataUrls: MetadataUrl[] = [];
     for (const vc of credentials) {
-        const entry = await getVerifiableCredentialEntry(
-            client,
-            getCredentialRegistryContractAddress(vc.id),
-            getCredentialHolderId(vc.id)
-        );
-        if (entry) {
-            metadataUrls.push(entry.credentialInfo.metadataUrl);
+        try {
+            const entry = await getVerifiableCredentialEntry(
+                client,
+                getCredentialRegistryContractAddress(vc.id),
+                getCredentialHolderId(vc.id)
+            );
+            if (entry) {
+                metadataUrls.push(entry.credentialInfo.metadataUrl);
+            }
+        } catch (e) {
+            // If we fail, the credential most likely doesn't exist and we skip it
         }
     }
 

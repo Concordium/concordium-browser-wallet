@@ -16,6 +16,7 @@ import {
     getCredentialHolderId,
     getCredentialRegistryContractAddress,
     getRevokeTransactionExecutionEnergyEstimate,
+    getContractAddressFromIssuerDID,
 } from '@shared/utils/verifiable-credential-helpers';
 import { fetchContractName } from '@shared/utils/token-helpers';
 import { TimeStampUnit, dateFromTimestamp, ClassName } from 'wallet-common-helpers';
@@ -36,40 +37,78 @@ import { DisplayAttribute, VerifiableCredentialCard, VerifiableCredentialCardHea
 function DisplayIssuerMetadata({ issuer }: { issuer: string }) {
     const { t } = useTranslation('verifiableCredential');
     const issuerMetadata = useIssuerMetadata(issuer);
-
-    if (
-        issuerMetadata === undefined ||
-        (issuerMetadata.description === undefined &&
-            issuerMetadata.icon === undefined &&
-            issuerMetadata.name === undefined &&
-            issuerMetadata.url === undefined)
-    ) {
-        return null;
-    }
+    const issuerContract = getContractAddressFromIssuerDID(issuer);
 
     return (
         <div className="verifiable-credential__body-attributes">
             <h3>{t('details.issuer.title')}</h3>
-            {issuerMetadata.icon && <Img className="issuer-logo" src={issuerMetadata.icon.url} withDefaults />}
-            {issuerMetadata.name && (
+            <DisplayAttribute
+                attributeKey="issuerContract"
+                attributeTitle={t('details.issuer.contract')}
+                attributeValue={`${issuerContract.index.toString()} (${issuerContract.subindex.toString()})`}
+            />
+            {issuerMetadata?.icon && <Img className="issuer-logo" src={issuerMetadata.icon.url} withDefaults />}
+            {issuerMetadata?.name && (
                 <DisplayAttribute
                     attributeKey="issuerName"
                     attributeTitle={t('details.issuer.name')}
                     attributeValue={issuerMetadata.name}
                 />
             )}
-            {issuerMetadata.description && (
+            {issuerMetadata?.description && (
                 <DisplayAttribute
-                    attributeKey="issuerName"
+                    attributeKey="issuerDescription"
                     attributeTitle={t('details.issuer.description')}
                     attributeValue={issuerMetadata.description}
                 />
             )}
-            {issuerMetadata.url && (
+            {issuerMetadata?.url && (
                 <DisplayAttribute
-                    attributeKey="issuerName"
+                    attributeKey="issuerUrl"
                     attributeTitle={t('details.issuer.url')}
                     attributeValue={issuerMetadata.url}
+                />
+            )}
+        </div>
+    );
+}
+
+/**
+ * Component for displaying information from the credentialEntry, if the entry is available.
+ * @param credentialEntry the credentialEntry to display info from
+ */
+
+function DisplayCredentialEntryInfo({ credentialEntry }: { credentialEntry?: CredentialQueryResponse }) {
+    const { t } = useTranslation('verifiableCredential');
+
+    if (!credentialEntry) {
+        return null;
+    }
+
+    const validFrom = dateFromTimestamp(credentialEntry.credentialInfo.validFrom, TimeStampUnit.milliSeconds);
+    const validUntil = credentialEntry.credentialInfo.validUntil
+        ? dateFromTimestamp(credentialEntry.credentialInfo.validUntil, TimeStampUnit.milliSeconds)
+        : undefined;
+    const validFromFormatted = withDateAndTime(validFrom);
+    const validUntilFormatted = withDateAndTime(validUntil);
+
+    return (
+        <div className="verifiable-credential__body-attributes">
+            <DisplayAttribute
+                attributeKey="credentialHolderId"
+                attributeTitle={t('details.id')}
+                attributeValue={credentialEntry.credentialInfo.credentialHolderId}
+            />
+            <DisplayAttribute
+                attributeKey="validFrom"
+                attributeTitle={t('details.validFrom')}
+                attributeValue={validFromFormatted}
+            />
+            {credentialEntry.credentialInfo.validUntil !== undefined && (
+                <DisplayAttribute
+                    attributeKey="validUntil"
+                    attributeTitle={t('details.validUntil')}
+                    attributeValue={validUntilFormatted}
                 />
             )}
         </div>
@@ -87,43 +126,16 @@ function VerifiableCredentialExtraDetails({
     className,
     issuer,
 }: {
-    credentialEntry: CredentialQueryResponse;
+    credentialEntry?: CredentialQueryResponse;
     status: VerifiableCredentialStatus;
     metadata: VerifiableCredentialMetadata;
     issuer: string;
 } & ClassName) {
-    const { t } = useTranslation('verifiableCredential');
-
-    const validFrom = dateFromTimestamp(credentialEntry.credentialInfo.validFrom, TimeStampUnit.milliSeconds);
-    const validUntil = credentialEntry.credentialInfo.validUntil
-        ? dateFromTimestamp(credentialEntry.credentialInfo.validUntil, TimeStampUnit.milliSeconds)
-        : undefined;
-    const validFromFormatted = withDateAndTime(validFrom);
-    const validUntilFormatted = withDateAndTime(validUntil);
-
     return (
         <div className="verifiable-credential-wrapper">
             <div className={`verifiable-credential ${className}`} style={{ backgroundColor: metadata.backgroundColor }}>
                 <VerifiableCredentialCardHeader credentialStatus={status} metadata={metadata} />
-                <div className="verifiable-credential__body-attributes">
-                    <DisplayAttribute
-                        attributeKey="credentialHolderId"
-                        attributeTitle={t('details.id')}
-                        attributeValue={credentialEntry.credentialInfo.credentialHolderId}
-                    />
-                    <DisplayAttribute
-                        attributeKey="validFrom"
-                        attributeTitle={t('details.validFrom')}
-                        attributeValue={validFromFormatted}
-                    />
-                    {credentialEntry.credentialInfo.validUntil !== undefined && (
-                        <DisplayAttribute
-                            attributeKey="validUntil"
-                            attributeTitle={t('details.validUntil')}
-                            attributeValue={validUntilFormatted}
-                        />
-                    )}
-                </div>
+                <DisplayCredentialEntryInfo credentialEntry={credentialEntry} />
                 <DisplayIssuerMetadata issuer={issuer} />
             </div>
         </div>
@@ -198,10 +210,6 @@ export default function VerifiableCredentialDetails({
     }, [client, credential, hdWallet, credentialEntry, nav, pathname]);
 
     const menuButton: MenuButton | undefined = useMemo(() => {
-        if (credentialEntry === undefined) {
-            return undefined;
-        }
-
         const menuButtons = [];
 
         if (credentialEntry?.credentialInfo.holderRevocable && status !== VerifiableCredentialStatus.Revoked) {
@@ -230,9 +238,9 @@ export default function VerifiableCredentialDetails({
         return undefined;
     }, [credentialEntry?.credentialInfo.holderRevocable, goToConfirmPage, showExtraDetails]);
 
-    // Wait for the credential entry to be loaded from the chain, and for the HdWallet
+    // Wait for the HdWallet
     // to be loaded to be ready to derive keys.
-    if (credentialEntry === undefined || hdWallet === undefined) {
+    if (hdWallet === undefined) {
         return null;
     }
 

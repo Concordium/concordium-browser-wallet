@@ -6,6 +6,7 @@ import { useLocation } from 'react-router-dom';
 import ExternalRequestLayout from '@popup/page-layouts/ExternalRequestLayout';
 import Button from '@popup/shared/Button';
 import {
+    sessionTemporaryVerifiableCredentialMetadataUrlsAtom,
     sessionTemporaryVerifiableCredentialsAtom,
     storedVerifiableCredentialMetadataAtom,
     storedVerifiableCredentialsAtom,
@@ -51,6 +52,7 @@ export default function AddWeb3IdCredential({ onAllow, onReject }: Props) {
     const { onClose, withClose } = useContext(fullscreenPromptContext);
     const [acceptButtonDisabled, setAcceptButtonDisabled] = useState<boolean>(false);
     const [web3IdCredentials, setWeb3IdCredentials] = useAtom(sessionTemporaryVerifiableCredentialsAtom);
+    const [metadataUrls, setMetadataUrls] = useAtom(sessionTemporaryVerifiableCredentialMetadataUrlsAtom);
     const storedWeb3IdCredentials = useAtomValue(storedVerifiableCredentialsAtom);
     const [verifiableCredentialMetadata, setVerifiableCredentialMetadata] = useAtom(
         storedVerifiableCredentialMetadataAtom
@@ -98,6 +100,25 @@ export default function AddWeb3IdCredential({ onAllow, onReject }: Props) {
         () => setError(t('error.schema')),
         [schemas.loading]
     );
+
+    useEffect(() => {
+        if (schema) {
+            // Ensure that all attributes required by the schema are in the attributes. If not, then
+            // the credential should not be allowed to be added.
+            const missingRequiredAttributeKeys = [];
+            const requiredAttributes = schema.properties.credentialSubject.properties.attributes.required;
+            for (const requiredAttribute of requiredAttributes) {
+                if (!Object.keys(credential.credentialSubject.attributes).includes(requiredAttribute)) {
+                    missingRequiredAttributeKeys.push(requiredAttribute);
+                }
+            }
+
+            if (missingRequiredAttributeKeys.length > 0) {
+                setError(t('error.attribute', { attributeKeys: missingRequiredAttributeKeys }));
+            }
+        }
+    }, [schema?.properties.credentialSubject.properties.attributes.required]);
+
     useEffect(() => () => controller.abort(), []);
 
     const localization = useAsyncMemo(
@@ -144,11 +165,12 @@ export default function AddWeb3IdCredential({ onAllow, onReject }: Props) {
         const credentialHolderId = wallet.getVerifiableCredentialPublicKey(issuer, index).toString('hex');
         const credentialSubjectId = createPublicKeyIdentifier(credentialHolderId, network);
         const credentialSubject = { ...credential.credentialSubject, id: credentialSubjectId };
+        const credentialId = createCredentialId(credentialHolderId, issuer, network);
 
         const fullCredential = {
             ...credential,
             credentialSubject,
-            id: createCredentialId(credentialHolderId, issuer, network),
+            id: credentialId,
             index,
         };
         await setWeb3IdCredentials([...web3IdCredentials.value, fullCredential]);
@@ -156,6 +178,7 @@ export default function AddWeb3IdCredential({ onAllow, onReject }: Props) {
             const newMetadata = { ...verifiableCredentialMetadata.value };
             newMetadata[metadataUrl.url] = metadata;
             await setVerifiableCredentialMetadata(newMetadata);
+            await setMetadataUrls({ ...metadataUrls.value, [credentialId]: metadataUrl.url });
         }
         return credentialSubjectId;
     }
