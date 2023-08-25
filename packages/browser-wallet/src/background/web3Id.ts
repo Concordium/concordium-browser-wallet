@@ -194,15 +194,24 @@ export const runIfValidWeb3IdProof: RunCondition<MessageStatusWrapper<undefined>
     }
 };
 
-async function loadWeb3IdBackup(): Promise<void> {
-    const waitForClosedPopup = new Promise<boolean>((resolve, reject) => {
+/**
+ * Wait until there are no popups open, or until the number of iterations supplied
+ * have been waited out. One check is attempted every 100ms.
+ *
+ * NOTE: We do this because we have found no better way to wait for the extension
+ * window to be closed from the verifiable credential list. It signals the background
+ * script and then closes, but it can take some time for it to close.
+ * @param waitIterations number of iterations before escaping the waiting
+ */
+async function waitForClosedPopup(waitIterations: number): Promise<void> {
+    return new Promise<void>((resolve, reject) => {
         let escapeCounter = 0;
         setTimeout(async function waitForClosed() {
             const isOpen = await testPopupOpen();
             if (!isOpen) {
-                resolve(true);
+                resolve();
             } else {
-                if (escapeCounter > 10) {
+                if (escapeCounter > waitIterations) {
                     reject();
                 }
                 escapeCounter += 1;
@@ -210,7 +219,10 @@ async function loadWeb3IdBackup(): Promise<void> {
             }
         }, 100);
     });
-    await waitForClosedPopup;
+}
+
+async function loadWeb3IdBackup(): Promise<void> {
+    await waitForClosedPopup(30);
     await openWindow();
     bgMessageHandler.sendInternalMessage(InternalMessageType.ImportWeb3IdBackup);
 }
