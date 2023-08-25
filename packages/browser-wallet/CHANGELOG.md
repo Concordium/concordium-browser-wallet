@@ -2,6 +2,10 @@
 
 ## Unreleased
 
+### Changed
+
+-   The status of a credential being added is now `Pending` instead of `NotActivated`.
+
 ### Fixed
 
 -   Updated the JSON schema for the verifiable credential schema validation, so that invalid schemas are rejected.
