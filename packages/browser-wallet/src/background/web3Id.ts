@@ -31,6 +31,7 @@ import {
     MessageStatusWrapper,
 } from '@concordium/browser-wallet-message-hub';
 import { getNet } from '@shared/utils/network-helpers';
+import { WAIT_FOR_CLOSED_POPUP_ITERATIONS, WAIT_FOR_CLOSED_POPUP_TIMEOUT_MS } from '@shared/constants/web3id';
 import { openWindow, RunCondition, testPopupOpen } from './window-management';
 import bgMessageHandler from './message-handler';
 
@@ -215,14 +216,14 @@ async function waitForClosedPopup(waitIterations: number): Promise<void> {
                     reject();
                 }
                 escapeCounter += 1;
-                setTimeout(waitForClosed, 100);
+                setTimeout(waitForClosed, WAIT_FOR_CLOSED_POPUP_TIMEOUT_MS);
             }
-        }, 100);
+        }, WAIT_FOR_CLOSED_POPUP_TIMEOUT_MS);
     });
 }
 
 async function loadWeb3IdBackup(): Promise<void> {
-    await waitForClosedPopup(30);
+    await waitForClosedPopup(WAIT_FOR_CLOSED_POPUP_ITERATIONS);
     await openWindow();
     bgMessageHandler.sendInternalMessage(InternalMessageType.ImportWeb3IdBackup);
 }
