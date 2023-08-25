@@ -205,12 +205,16 @@ export function useIssuerMetadata(issuer: string): IssuerMetadata | undefined {
 
     useEffect(() => {
         const registryContractAddress = getCredentialRegistryContractAddress(issuer);
+        const abortController = new AbortController();
         getCredentialRegistryMetadata(client, registryContractAddress)
             .then((res) => {
-                const abortController = new AbortController();
                 fetchIssuerMetadata(res.issuerMetadata, abortController).then(setIssuerMetadata).catch(logError);
             })
             .catch(logError);
+
+        return () => {
+            abortController.abort();
+        };
     }, [client, issuer]);
 
     return issuerMetadata;

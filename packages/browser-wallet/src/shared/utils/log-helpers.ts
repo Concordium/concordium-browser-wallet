@@ -1,12 +1,9 @@
 import { storedLog } from '@shared/storage/access';
 import { addToListMaxSize } from '@shared/storage/update';
+import { LOG_MAX_ENTRIES } from '@shared/constants/logging';
 import { isDevelopmentBuild } from './environment-helpers';
 
 const loggingLock = 'concordium_log_lock';
-
-// Determines the maximum number of log entries that is stored
-// at a time.
-const LOG_MAX_ENTRIES = 100;
 
 export enum LoggingLevel {
     INFO = 'INFO',
