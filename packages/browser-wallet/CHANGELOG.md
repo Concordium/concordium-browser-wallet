@@ -1,5 +1,11 @@
 # Changelog
 
+## Unreleased
+
+### Fixed
+
+-   An issue where the import window would fail to open.
+
 ## 1.1.2
 
 ### Added
