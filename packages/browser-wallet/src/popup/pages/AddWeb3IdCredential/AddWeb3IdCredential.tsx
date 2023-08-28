@@ -220,7 +220,7 @@ export default function AddWeb3IdCredential({ onAllow, onReject }: Props) {
                         />
                     </>
                 )}
-                <div className="flex justify-center m-t-auto m-b-20">
+                <div className="flex justify-center m-t-auto">
                     <Button width="medium" className="m-r-10" onClick={withClose(onReject)}>
                         {t('reject')}
                     </Button>
