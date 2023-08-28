@@ -10,7 +10,7 @@ const t = {
         attribute: {
             required: 'The received credential is missing one or more required attributes ({{ attributeKeys }})',
             additional:
-                'The attribute with key [{{ credentialAttribute }}] is not available in the list of schema attributes: [{{ schemaAttributes }} ]',
+                'The attribute with key [{{ credentialAttribute }}] is not available in the list of schema attributes: [{{ schemaAttributes }}]',
         },
         localization: 'Failed to get localization',
     },
