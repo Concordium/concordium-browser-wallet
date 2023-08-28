@@ -214,7 +214,7 @@ export default function AddWeb3IdCredential({ onAllow, onReject }: Props) {
                             credentialSubject={credential.credentialSubject}
                             className="add-web3Id-credential__card"
                             schema={schema}
-                            credentialStatus={VerifiableCredentialStatus.NotActivated}
+                            credentialStatus={VerifiableCredentialStatus.Pending}
                             metadata={metadata}
                             localization={localization}
                         />

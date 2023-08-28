@@ -2,10 +2,15 @@
 
 ## Unreleased
 
+### Changed
+
+-   The status of a credential being added is now `Pending` instead of `NotActivated`.
+
 ### Fixed
 
 -   An issue where the import window would fail to open.
 -   Updated the JSON schema for the verifiable credential schema validation, so that invalid schemas are rejected.
+-   An issue where a verifiable with the `NotActivated` status would show as `Pending`.
 
 ## 1.1.2
 
