@@ -40,6 +40,7 @@ $color-highlight-mainnet-light: #e0e9ed;
 $color-highlight-testnet-light: #dde9e5;
 $color-status-box-light: $color-off-black;
 $color-allowlist-background-light: #eaf0f5;
+$color-shadow-alpha-light: 15%;
 
 // Dark mode
 $color-bg-dark: $color-off-black;
@@ -53,6 +54,7 @@ $color-highlight-mainnet-dark: #203e4f;
 $color-highlight-testnet-dark: #1a3d3e;
 $color-status-box-dark: #313131;
 $color-allowlist-background-dark: #171818;
+$color-shadow-alpha-dark: 85%;
 
 // Theme variables
 $color-bg: var(--color-bg, $color-bg-light); // off-white/off-black
@@ -77,3 +79,4 @@ $color-highlight-testnet: var(--color-highlight-testnet, $color-highlight-testne
 $color-highlight: var(--color-highlight, $color-highlight-testnet);
 $color-status-box: var(--color-status-box, $color-status-box-light);
 $color-allowlist-background: var(--color-allowlist-background, $color-allowlist-background-light);
+$color-shadow-alpha: var(--color-shadow-alpha, $color-shadow-alpha-light);
