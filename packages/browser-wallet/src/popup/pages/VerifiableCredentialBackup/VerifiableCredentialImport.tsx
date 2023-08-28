@@ -14,6 +14,7 @@ import { noOp } from 'wallet-common-helpers';
 import { decrypt } from '@shared/utils/crypto';
 import { useHdWallet } from '@popup/shared/utils/account-helpers';
 import JSONBigInt from 'json-bigint';
+import { FileInput } from '@popup/shared/Form/FileInput';
 import { VerifiableCredentialCardWithStatusFromChain } from '../VerifiableCredential/VerifiableCredentialList';
 import { ExportFormat, VerifiableCredentialExport } from './utils';
 
@@ -126,7 +127,12 @@ export default function VerifiableCredentialImport() {
                 {imported && <DisplayResult imported={imported} />}
                 {!imported && (
                     <>
-                        <input type="file" onChange={handleImport} />
+                        <FileInput
+                            className="verifiable-credential-import__import"
+                            onChange={handleImport}
+                            buttonTitle="import"
+                            value={null}
+                        />
                         {error && <p className="m-h-10 form-error-message">{error}</p>}
                     </>
                 )}
