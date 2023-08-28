@@ -31,7 +31,8 @@ import {
     MessageStatusWrapper,
 } from '@concordium/browser-wallet-message-hub';
 import { getNet } from '@shared/utils/network-helpers';
-import { openWindow, RunCondition } from './window-management';
+import { WAIT_FOR_CLOSED_POPUP_ITERATIONS, WAIT_FOR_CLOSED_POPUP_TIMEOUT_MS } from '@shared/constants/web3id';
+import { openWindow, RunCondition, testPopupOpen } from './window-management';
 import bgMessageHandler from './message-handler';
 
 const NO_CREDENTIALS_FIT = 'No temporary credentials fit the given id';
@@ -194,7 +195,35 @@ export const runIfValidWeb3IdProof: RunCondition<MessageStatusWrapper<undefined>
     }
 };
 
+/**
+ * Wait until there are no popups open, or until the number of iterations supplied
+ * have been waited out. One check is attempted every 100ms.
+ *
+ * NOTE: We do this because we have found no better way to wait for the extension
+ * window to be closed from the verifiable credential list. It signals the background
+ * script and then closes, but it can take some time for it to close.
+ * @param waitIterations number of iterations before escaping the waiting
+ */
+async function waitForClosedPopup(waitIterations: number): Promise<void> {
+    return new Promise<void>((resolve, reject) => {
+        let escapeCounter = 0;
+        setTimeout(async function waitForClosed() {
+            const isOpen = await testPopupOpen();
+            if (!isOpen) {
+                resolve();
+            } else {
+                if (escapeCounter > waitIterations) {
+                    reject();
+                }
+                escapeCounter += 1;
+                setTimeout(waitForClosed, WAIT_FOR_CLOSED_POPUP_TIMEOUT_MS);
+            }
+        }, WAIT_FOR_CLOSED_POPUP_TIMEOUT_MS);
+    });
+}
+
 async function loadWeb3IdBackup(): Promise<void> {
+    await waitForClosedPopup(WAIT_FOR_CLOSED_POPUP_ITERATIONS);
     await openWindow();
     bgMessageHandler.sendInternalMessage(InternalMessageType.ImportWeb3IdBackup);
 }

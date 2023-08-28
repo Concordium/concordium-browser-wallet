@@ -4,6 +4,7 @@
 
 ### Fixed
 
+-   An issue where the import window would fail to open.
 -   Updated the JSON schema for the verifiable credential schema validation, so that invalid schemas are rejected.
 
 ## 1.1.2
