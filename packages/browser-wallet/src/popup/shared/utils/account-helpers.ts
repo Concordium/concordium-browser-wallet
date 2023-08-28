@@ -67,10 +67,7 @@ export function useSelectedCredential() {
     return useCredential(selectedAccount);
 }
 
-// TODO fix type
-export function useHdWallet():
-    | (ConcordiumHdWallet & { getVerifiableCredentialBackupEncryptionKey: () => Buffer })
-    | undefined {
+export function useHdWallet(): ConcordiumHdWallet | undefined {
     const network = useAtomValue(networkConfigurationAtom);
     const seedPhrase = useDecryptedSeedPhrase();
 
@@ -79,16 +76,7 @@ export function useHdWallet():
             return undefined;
         }
 
-        // return ConcordiumHdWallet.fromHex(seedPhrase, getNet(network));
-        // TODO remove this hack when SDK is updated
-        // START OF HACK
-        const w = ConcordiumHdWallet.fromHex(seedPhrase, getNet(network));
-        // eslint-disable-next-line @typescript-eslint/no-explicit-any
-        (w as any).getVerifiableCredentialBackupEncryptionKey = () =>
-            w.getVerifiableCredentialSigningKey({ index: 0n, subindex: 0n }, 0);
-        // eslint-disable-next-line @typescript-eslint/no-explicit-any
-        return w as any;
-        // END OF HACK
+        return ConcordiumHdWallet.fromHex(seedPhrase, getNet(network));
     }, [seedPhrase]);
 
     return wallet;
