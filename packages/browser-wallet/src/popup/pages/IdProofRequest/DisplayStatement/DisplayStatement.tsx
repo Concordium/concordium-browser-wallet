@@ -56,7 +56,7 @@ type StatementTooltipProps = {
     reveal?: boolean;
 };
 
-export function StatementTooltip({ reveal }: StatementTooltipProps) {
+function StatementTooltip({ reveal }: StatementTooltipProps) {
     const [open, setOpen] = useState(false);
     const { t } = useTranslation('idProofRequest', { keyPrefix: 'displayStatement' });
 

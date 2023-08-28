@@ -9,9 +9,7 @@ import {
     AtomicStatementV2,
     RevealStatementV2,
     createWeb3IdDID,
-    StatementTypes,
-    isStringAttributeInRange,
-    AttributeType,
+    canProveCredentialStatement,
 } from '@concordium/web-sdk';
 import { isIdentityOfCredential } from '@shared/utils/identity-helpers';
 import {
@@ -79,45 +77,6 @@ export function getWeb3CommitmentInput(verifiableCredential: VerifiableCredentia
     );
 }
 
-function isInRange(value: AttributeType, lower: AttributeType, upper: AttributeType) {
-    if (typeof value === 'string' && typeof lower === 'string' && typeof upper === 'string') {
-        return isStringAttributeInRange(value, lower, upper);
-    }
-    if (typeof value === 'bigint' && typeof lower === 'bigint' && typeof upper === 'bigint') {
-        return lower <= value && upper > value;
-    }
-    if (value instanceof Date && lower instanceof Date && upper instanceof Date) {
-        return lower.getTime() <= value.getTime() && upper.getTime() > value.getTime();
-    }
-    // Mismatch in types.
-    return false;
-}
-
-// TODO Replace with canProveAtomicStatement when SDK is updated (AttributeNotInSet vs undefined)
-function doesCredentialSatisfyStatement(
-    statement: AtomicStatementV2,
-    attributes: Record<string, AttributeType>
-): boolean {
-    const value = attributes[statement.attributeTag];
-
-    if (value === undefined) {
-        return false;
-    }
-
-    switch (statement.type) {
-        case StatementTypes.AttributeInRange:
-            return isInRange(value, statement.lower, statement.upper);
-        case StatementTypes.AttributeInSet:
-            return statement.set.includes(value);
-        case StatementTypes.AttributeNotInSet:
-            return !statement.set.includes(value);
-        case StatementTypes.RevealAttribute:
-            return value !== undefined;
-        default:
-            throw new Error('Unknown statementType encountered');
-    }
-}
-
 /**
  * Given a credential statement for an account credential, and a list of account credentials, return the filtered list of credentials that satisfy the statement.
  * Note this also requires the identities for the account credentials as an additional argument, to actually check the attributes of the credential.
@@ -132,8 +91,9 @@ export function getViableAccountCredentialsForStatement(
         if (allowedIssuers.includes(c.providerIndex)) {
             const identity = (identities || []).find((id) => isIdentityOfCredential(id)(c));
             if (identity) {
-                credentialStatement.statement.every((stm) =>
-                    doesCredentialSatisfyStatement(stm, identity.idObject.value.attributeList.chosenAttributes)
+                return canProveCredentialStatement(
+                    credentialStatement,
+                    identity.idObject.value.attributeList.chosenAttributes
                 );
             }
         }
@@ -158,9 +118,7 @@ export function getViableWeb3IdCredentialsForStatement(
     );
 
     return allowedCredentials.filter((cred) =>
-        credentialStatement.statement.every((stm) =>
-            doesCredentialSatisfyStatement(stm, cred.credentialSubject.attributes)
-        )
+        canProveCredentialStatement(credentialStatement, cred.credentialSubject.attributes)
     );
 }
 
