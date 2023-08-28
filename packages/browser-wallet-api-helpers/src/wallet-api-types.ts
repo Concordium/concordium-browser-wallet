@@ -225,7 +225,7 @@ interface MainWalletApi {
     /**
      * Request that the user provides a proof for the given statements.
      * @param challenge bytes chosen by the verifier. Should be HEX encoded.
-     * @param statement the web3Id statements that should be proven.
+     * @param statements the web3Id statements that should be proven. The promise rejects if the array of statements is empty.
      * @returns The presentation for the statements.
      */
     requestVerifiablePresentation(challenge: string, statements: CredentialStatements): Promise<VerifiablePresentation>;
