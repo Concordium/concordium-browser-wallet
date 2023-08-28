@@ -121,7 +121,15 @@ export default function AddWeb3IdCredential({ onAllow, onReject }: Props) {
             }
 
             if (missingRequiredAttributeKeys.length > 0) {
-                setError(t('error.attribute', { attributeKeys: missingRequiredAttributeKeys }));
+                setError(t('error.attribute.required', { attributeKeys: missingRequiredAttributeKeys }));
+            }
+
+            // Ensure that a credential with more attributes than listed by the schema cannot be added.
+            const schemaAttributes = Object.keys(schema.properties.credentialSubject.properties.attributes.properties);
+            for (const credentialAttribute of Object.keys(credential.credentialSubject.attributes)) {
+                if (!schemaAttributes.includes(credentialAttribute)) {
+                    setError(t('error.attribute.additional', { credentialAttribute, schemaAttributes }));
+                }
             }
         }
     }, [schema?.properties.credentialSubject.properties.attributes.required]);
