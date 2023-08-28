@@ -11,6 +11,7 @@
 -   An issue where the import window would fail to open.
 -   Updated the JSON schema for the verifiable credential schema validation, so that invalid schemas are rejected.
 -   An issue where a verifiable with the `NotActivated` status would show as `Pending`.
+-   Enable validation of veriable presentation requests before opening the popup window.
 
 ## 1.1.2
 
