@@ -40,6 +40,8 @@
         &__show {
             z-index: 1;
             display: block;
+            border-radius: 16px;
+            backdrop-filter: blur(2px);
         }
     }
 }
