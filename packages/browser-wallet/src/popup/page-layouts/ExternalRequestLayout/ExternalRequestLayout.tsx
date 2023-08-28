@@ -2,12 +2,12 @@ import React, { ReactNode } from 'react';
 import { useTranslation } from 'react-i18next';
 import { useLocation } from 'react-router-dom';
 import { absoluteRoutes } from '@popup/constants/routes';
-import Logo from '@assets/svg/concordium.svg';
 import Toast from '@popup/shared/Toast/Toast';
 
 import { useCredential } from '@popup/shared/utils/account-helpers';
 import AccountDetails from '@popup/pages/Account/AccountDetails';
 import clsx from 'clsx';
+import PopupHeader from '../MainLayout/PopupHeader/PopupHeader';
 
 function Header() {
     const { t } = useTranslation('mainLayout');
@@ -35,18 +35,7 @@ function Header() {
         return t('header.request');
     }
 
-    return (
-        <header className="main-layout-header">
-            <div className="main-layout-header__bar">
-                <div className="main-layout-header__logo">
-                    <Logo />
-                </div>
-                <label className="main-layout-header__title">
-                    <h1 className="relative flex align-center">{getHeaderTitle()}</h1>
-                </label>
-            </div>
-        </header>
-    );
+    return <PopupHeader headerTitle={getHeaderTitle()} />;
 }
 
 interface Location {

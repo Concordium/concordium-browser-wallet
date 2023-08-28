@@ -5,7 +5,6 @@ import {
     storedVerifiableCredentialMetadataAtom,
 } from '@popup/store/verifiable-credential';
 import { useAtom } from 'jotai';
-import PageHeader from '@popup/shared/PageHeader';
 import { EncryptedData, VerifiableCredential } from '@shared/storage/types';
 import { useTranslation } from 'react-i18next';
 import Button from '@popup/shared/Button';
@@ -14,6 +13,8 @@ import { noOp } from 'wallet-common-helpers';
 import { decrypt } from '@shared/utils/crypto';
 import { useHdWallet } from '@popup/shared/utils/account-helpers';
 import JSONBigInt from 'json-bigint';
+import { Input } from '@popup/shared/Form/Input';
+import PopupHeader from '@popup/page-layouts/MainLayout/PopupHeader/PopupHeader';
 import { VerifiableCredentialCardWithStatusFromChain } from '../VerifiableCredential/VerifiableCredentialList';
 import { ExportFormat, VerifiableCredentialExport } from './utils';
 
@@ -121,12 +122,17 @@ export default function VerifiableCredentialImport() {
     // TODO drag and drop
     return (
         <>
-            <PageHeader className="verifiable-credential-import__header">{t('title')}</PageHeader>
+            <PopupHeader headerTitle={t('title')} />
             <div className="verifiable-credential-import">
                 {imported && <DisplayResult imported={imported} />}
                 {!imported && (
                     <>
-                        <input type="file" onChange={handleImport} />
+                        <Input
+                            type="file"
+                            onChange={handleImport}
+                            className="button verifiable-credential-import__input"
+                            label={t('select')}
+                        />
                         {error && <p className="m-h-10 form-error-message">{error}</p>}
                     </>
                 )}

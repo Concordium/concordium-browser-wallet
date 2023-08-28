@@ -3,4 +3,5 @@ export default {
     noImported: 'No Web3 ID Credentials were imported',
     error: 'Unable to import the chosen file. The file must be a backup created with the same seed phrase.',
     close: 'Close',
+    select: 'Select a file to import',
 };
