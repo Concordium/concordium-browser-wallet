@@ -63,7 +63,7 @@ export default function AddWeb3IdCredential({ onAllow, onReject }: Props) {
     const network = useAtomValue(networkConfigurationAtom);
 
     const [error, setError] = useState<string>();
-    const [validationComplete, setValidationComplete] = useState<boolean>();
+    const [validationComplete, setValidationComplete] = useState<boolean>(false);
 
     const { credential: rawCredential, url, metadataUrl } = state.payload;
     const credential: APIVerifiableCredential = parse(rawCredential);
@@ -136,6 +136,8 @@ export default function AddWeb3IdCredential({ onAllow, onReject }: Props) {
                     return;
                 }
             }
+
+            setValidationComplete(true);
         }
     }, [Boolean(schema)]);
 
