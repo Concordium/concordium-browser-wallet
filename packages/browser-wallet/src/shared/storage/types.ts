@@ -1,5 +1,12 @@
 import { APIVerifiableCredential } from '@concordium/browser-wallet-api-helpers';
-import type { CryptographicParameters, HexString, IdentityObjectV1, Network, Versioned } from '@concordium/web-sdk';
+import type {
+    CredentialSubject,
+    CryptographicParameters,
+    HexString,
+    IdentityObjectV1,
+    Network,
+    Versioned,
+} from '@concordium/web-sdk';
 
 export enum ChromeStorageKey {
     ConnectedSites = 'connectedSites',
@@ -272,11 +279,6 @@ export enum VerifiableCredentialStatus {
     // when a credential is added to the wallet, but it is still not on chain.
     Pending,
 }
-
-export type CredentialSubject = {
-    id: string;
-    attributes: Record<string, string | bigint>;
-};
 
 export interface VerifiableCredential extends APIVerifiableCredential {
     // With ID

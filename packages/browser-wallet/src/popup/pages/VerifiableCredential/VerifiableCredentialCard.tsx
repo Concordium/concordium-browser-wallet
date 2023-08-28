@@ -3,7 +3,7 @@ import { ClassName } from 'wallet-common-helpers';
 import clsx from 'clsx';
 import { VerifiableCredentialMetadata } from '@shared/utils/verifiable-credential-helpers';
 import Img from '@popup/shared/Img';
-import { CredentialSubject } from '@concordium/web-sdk';
+import { AttributeType, CredentialSubject } from '@concordium/web-sdk';
 import { VerifiableCredentialStatus, MetadataUrl, VerifiableCredentialSchema } from '@shared/storage/types';
 import StatusIcon from './VerifiableCredentialStatus';
 
@@ -28,7 +28,7 @@ export function DisplayAttribute({
     attributeTitle,
 }: {
     attributeKey: string;
-    attributeValue: string | bigint;
+    attributeValue: AttributeType;
     attributeTitle: string;
 }) {
     return (
@@ -82,8 +82,8 @@ function ClickableVerifiableCredential({ children, onClick, metadata, className 
 function applySchemaAndLocalization(
     schema: VerifiableCredentialSchema,
     localization?: Record<string, string>
-): (value: [string, string | bigint]) => { title: string; key: string; value: string | bigint } {
-    return (value: [string, string | bigint]) => {
+): (value: [string, AttributeType]) => { title: string; key: string; value: AttributeType } {
+    return (value: [string, AttributeType]) => {
         const attributeSchema = schema.properties.credentialSubject.properties.attributes.properties[value[0]];
         if (!attributeSchema) {
             throw new Error(`Missing attribute schema for key: ${value[0]}`);
