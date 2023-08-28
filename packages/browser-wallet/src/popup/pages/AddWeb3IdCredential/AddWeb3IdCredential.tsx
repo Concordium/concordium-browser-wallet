@@ -63,6 +63,7 @@ export default function AddWeb3IdCredential({ onAllow, onReject }: Props) {
     const network = useAtomValue(networkConfigurationAtom);
 
     const [error, setError] = useState<string>();
+    const [validationComplete, setValidationComplete] = useState<boolean>();
 
     const { credential: rawCredential, url, metadataUrl } = state.payload;
     const credential: APIVerifiableCredential = parse(rawCredential);
@@ -122,6 +123,8 @@ export default function AddWeb3IdCredential({ onAllow, onReject }: Props) {
 
             if (missingRequiredAttributeKeys.length > 0) {
                 setError(t('error.attribute.required', { attributeKeys: missingRequiredAttributeKeys }));
+                setValidationComplete(true);
+                return;
             }
 
             // Ensure that a credential with more attributes than listed by the schema cannot be added.
@@ -129,10 +132,12 @@ export default function AddWeb3IdCredential({ onAllow, onReject }: Props) {
             for (const credentialAttribute of Object.keys(credential.credentialSubject.attributes)) {
                 if (!schemaAttributes.includes(credentialAttribute)) {
                     setError(t('error.attribute.additional', { credentialAttribute, schemaAttributes }));
+                    setValidationComplete(true);
+                    return;
                 }
             }
         }
-    }, [schema?.properties.credentialSubject.properties.attributes.required]);
+    }, [Boolean(schema)]);
 
     useEffect(() => () => controller.abort(), []);
 
@@ -201,7 +206,7 @@ export default function AddWeb3IdCredential({ onAllow, onReject }: Props) {
         return credentialSubjectId;
     }
 
-    if (web3IdCredentials.loading || storedWeb3IdCredentials.loading) {
+    if (web3IdCredentials.loading || storedWeb3IdCredentials.loading || !validationComplete) {
         return null;
     }
 
