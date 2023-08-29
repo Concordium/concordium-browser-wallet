@@ -382,23 +382,30 @@ const verifiableCredentialSchemaSchema = {
                                         },
                                         properties: {
                                             additionalProperties: {
-                                                additionalProperties: false,
-                                                properties: {
-                                                    description: {
-                                                        type: 'string',
+                                                anyOf: [
+                                                    {
+                                                        additionalProperties: false,
+                                                        properties: {
+                                                            description: {
+                                                                type: 'string',
+                                                            },
+                                                            format: {
+                                                                type: 'string',
+                                                            },
+                                                            title: {
+                                                                type: 'string',
+                                                            },
+                                                            type: {
+                                                                type: 'string',
+                                                            },
+                                                        },
+                                                        required: ['title', 'type', 'description'],
+                                                        type: 'object',
                                                     },
-                                                    format: {
-                                                        type: 'string',
+                                                    {
+                                                        $ref: '#/definitions/TimestampProperty',
                                                     },
-                                                    title: {
-                                                        type: 'string',
-                                                    },
-                                                    type: {
-                                                        type: 'string',
-                                                    },
-                                                },
-                                                required: ['title', 'type', 'description'],
-                                                type: 'object',
+                                                ],
                                             },
                                             type: 'object',
                                         },
@@ -456,6 +463,75 @@ const verifiableCredentialSchemaSchema = {
                 },
             },
             required: ['credentialSubject'],
+            type: 'object',
+        },
+        TimestampProperty: {
+            additionalProperties: false,
+            properties: {
+                description: {
+                    type: 'string',
+                },
+                properties: {
+                    additionalProperties: false,
+                    properties: {
+                        timestamp: {
+                            additionalProperties: false,
+                            properties: {
+                                format: {
+                                    const: 'date-time',
+                                    type: 'string',
+                                },
+                                type: {
+                                    const: 'string',
+                                    type: 'string',
+                                },
+                            },
+                            required: ['type'],
+                            type: 'object',
+                        },
+                        type: {
+                            additionalProperties: false,
+                            properties: {
+                                const: {
+                                    const: 'date-time',
+                                    type: 'string',
+                                },
+                                type: {
+                                    const: 'string',
+                                    type: 'string',
+                                },
+                            },
+                            required: ['type', 'const'],
+                            type: 'object',
+                        },
+                    },
+                    required: ['type', 'timestamp'],
+                    type: 'object',
+                },
+                required: {
+                    items: [
+                        {
+                            const: 'type',
+                            type: 'string',
+                        },
+                        {
+                            const: 'timestamp',
+                            type: 'string',
+                        },
+                    ],
+                    maxItems: 2,
+                    minItems: 2,
+                    type: 'array',
+                },
+                title: {
+                    type: 'string',
+                },
+                type: {
+                    const: 'object',
+                    type: 'string',
+                },
+            },
+            required: ['title', 'type', 'properties', 'required'],
             type: 'object',
         },
         VerifiableCredentialSchema: {
