@@ -208,7 +208,7 @@ export default function AddWeb3IdCredential({ onAllow, onReject }: Props) {
         return credentialSubjectId;
     }
 
-    if (web3IdCredentials.loading || storedWeb3IdCredentials.loading || !validationComplete) {
+    if (web3IdCredentials.loading || storedWeb3IdCredentials.loading || (!validationComplete && !error)) {
         return null;
     }
 
