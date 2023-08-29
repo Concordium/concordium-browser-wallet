@@ -128,7 +128,7 @@ export function useCredentialMetadata(credential?: VerifiableCredential) {
         }
 
         // The URL we got does not have a corresponding entry in our local storage.
-        // In this case we fallback to using the known "good" value so that we can`
+        // In this case we fallback to using the known "good" value so that we can
         // still get metadata for this credential.
         const fallbackCredentialMetadata = storedMetadata.value[credential.metadataUrl];
         if (!fallbackCredentialMetadata) {
