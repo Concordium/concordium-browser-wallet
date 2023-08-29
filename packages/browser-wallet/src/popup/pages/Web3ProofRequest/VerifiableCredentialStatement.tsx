@@ -17,9 +17,10 @@ import { DisplayStatementView, StatementLine } from '../IdProofRequest/DisplaySt
 import { VerifiableCredentialCard } from '../VerifiableCredential/VerifiableCredentialCard';
 import { useCredentialLocalization, useCredentialMetadata } from '../VerifiableCredential/VerifiableCredentialHooks';
 import CredentialSelector from './CredentialSelector';
+import { DisplayRevealStatements, DisplaySecretStatements } from './DisplayBox';
 import { createWeb3IdDIDFromCredential, DisplayCredentialStatementProps, SecretStatementV2 } from './utils';
 
-function getPropertyTitle(attributeTag: string, schema: VerifiableCredentialSchema) {
+export function getPropertyTitle(attributeTag: string, schema: VerifiableCredentialSchema) {
     // TODO use localization here
     const property = schema.properties.credentialSubject.properties.attributes.properties[attributeTag];
     return property ? property.title : attributeTag;
@@ -209,24 +210,23 @@ export default function DisplayWeb3Statement({
                 onChange={onChange}
             />
             {reveals.length !== 0 && (
-                <DisplayWeb3RevealStatement
+                <DisplayRevealStatements
                     className="m-t-10:not-first"
                     dappName={dappName}
-                    credential={chosenCredential.credentialSubject}
+                    attributes={chosenCredential.credentialSubject.attributes}
                     statements={reveals}
                     schema={schema}
                 />
             )}
-            {secrets.map((s, i) => (
-                <DisplayWeb3SecretStatement
-                    // eslint-disable-next-line react/no-array-index-key
-                    key={i} // Allow this, as we don't expect these to ever change.
-                    className="m-t-10:not-first"
-                    dappName={dappName}
-                    statements={s}
-                    schema={schema}
+        {secrets.length !== 0 && (
+            <DisplaySecretStatements
+            className="m-t-10:not-first"
+            dappName={dappName}
+            attributes={chosenCredential.credentialSubject.attributes}
+            statements={secrets}
+            schema={schema}
                 />
-            ))}
+        )}
         </div>
     );
 }

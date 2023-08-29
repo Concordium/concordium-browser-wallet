@@ -19,6 +19,7 @@ export default function CredentialSelector<T>({ options, onChange, displayOption
 
     return (
         <select
+            className="m-10"
             value={chosenIndex}
             onChange={(event) => {
                 const index = Number(event.target.value);
