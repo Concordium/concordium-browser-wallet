@@ -5,6 +5,9 @@ import {
     createConcordiumClient,
     verifyWeb3IdCredentialSignature,
     isHex,
+    verifyAtomicStatements,
+    isAccountCredentialStatement,
+    IDENTITY_SUBJECT_SCHEMA,
 } from '@concordium/web-sdk';
 import {
     sessionVerifiableCredentials,
@@ -172,9 +175,12 @@ export const runIfValidWeb3IdProof: RunCondition<MessageStatusWrapper<undefined>
     }
     try {
         const statements: CredentialStatements = parse(msg.payload.statements);
-        // TODO Enable when SDK is updated
-        // // If a statement does not verify, an error is thrown.
-        // statements.every((credStatement) => verifyAtomicStatements(credStatement.statement));
+        // If a statement does not verify, an error is thrown.
+        statements.every((credStatement) =>
+            isAccountCredentialStatement(credStatement)
+                ? verifyAtomicStatements(credStatement.statement, IDENTITY_SUBJECT_SCHEMA)
+                : verifyAtomicStatements(credStatement.statement)
+        );
 
         const noEmptyQualifier = statements.every((credStatement) => credStatement.idQualifier.issuers.length > 0);
         if (!noEmptyQualifier) {

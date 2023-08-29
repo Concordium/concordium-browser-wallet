@@ -1,6 +1,5 @@
 import {
     RequestStatement,
-    canProveCredentialStatement,
     ConcordiumHdWallet,
     createWeb3CommitmentInputWithHdWallet,
     createAccountCommitmentInputWithHdWallet,
@@ -10,7 +9,7 @@ import {
     AtomicStatementV2,
     RevealStatementV2,
     createWeb3IdDID,
-    StatementTypes,
+    canProveCredentialStatement,
 } from '@concordium/web-sdk';
 import { isIdentityOfCredential } from '@shared/utils/identity-helpers';
 import {
@@ -92,38 +91,14 @@ export function getViableAccountCredentialsForStatement(
         if (allowedIssuers.includes(c.providerIndex)) {
             const identity = (identities || []).find((id) => isIdentityOfCredential(id)(c));
             if (identity) {
-                return canProveCredentialStatement(credentialStatement, identity.idObject.value.attributeList);
+                return canProveCredentialStatement(
+                    credentialStatement,
+                    identity.idObject.value.attributeList.chosenAttributes
+                );
             }
         }
         return false;
     });
-}
-
-// TODO Replace with canProveAtomicStatement when SDK is updated
-function doesCredentialSatisfyStatement(statement: AtomicStatementV2, cred: VerifiableCredential): boolean {
-    let value = cred.credentialSubject.attributes[statement.attributeTag];
-
-    // temporary handling of numbers saved as numbers;
-    if (typeof value === 'number') {
-        value = BigInt(value);
-    }
-
-    if (value === undefined) {
-        return false;
-    }
-
-    switch (statement.type) {
-        case StatementTypes.AttributeInRange:
-            return statement.lower <= value && statement.upper > value;
-        case StatementTypes.AttributeInSet:
-            return statement.set.includes(value);
-        case StatementTypes.AttributeNotInSet:
-            return !statement.set.includes(value);
-        case StatementTypes.RevealAttribute:
-            return value !== undefined;
-        default:
-            throw new Error('Unknown statementType encountered');
-    }
 }
 
 /**
@@ -143,7 +118,7 @@ export function getViableWeb3IdCredentialsForStatement(
     );
 
     return allowedCredentials.filter((cred) =>
-        credentialStatement.statement.every((stm) => doesCredentialSatisfyStatement(stm, cred))
+        canProveCredentialStatement(credentialStatement, cred.credentialSubject.attributes)
     );
 }
 

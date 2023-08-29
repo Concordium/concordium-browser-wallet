@@ -3,14 +3,11 @@ import {
     RevealStatementV2,
     StatementTypes,
     VerifiableCredentialStatement,
+    CredentialSubject,
+    AttributeType,
 } from '@concordium/web-sdk';
 import { storedVerifiableCredentialSchemasAtom } from '@popup/store/verifiable-credential';
-import {
-    VerifiableCredential,
-    CredentialSubject,
-    VerifiableCredentialSchema,
-    VerifiableCredentialStatus,
-} from '@shared/storage/types';
+import { VerifiableCredential, VerifiableCredentialSchema, VerifiableCredentialStatus } from '@shared/storage/types';
 import { getVerifiableCredentialPublicKeyfromSubjectDID } from '@shared/utils/verifiable-credential-helpers';
 import { useAtomValue } from 'jotai';
 import React, { useCallback, useEffect, useMemo, useState } from 'react';
@@ -48,7 +45,7 @@ function useStatementValue(statement: SecretStatementV2, schema: VerifiableCrede
 export function useStatementDescription(statement: SecretStatementV2, schema: VerifiableCredentialSchema) {
     const { t } = useTranslation('web3IdProofRequest', { keyPrefix: 'displayStatement.descriptions' });
     const name = getPropertyTitle(statement.attributeTag, schema);
-    const listToString = (list: (string | bigint)[]) => list.map((member) => member.toString()).join(', ');
+    const listToString = (list: AttributeType[]) => list.map((member) => member.toString()).join(', ');
 
     switch (statement.type) {
         case StatementTypes.AttributeInRange:
@@ -70,7 +67,7 @@ type DisplayWeb3StatementProps<Statement> = ClassName & {
 
 type AttributeInfo = {
     name: string;
-    value: string | bigint;
+    value: AttributeType;
 };
 
 function extractAttributesFromCredentialSubjectForSingleStatement(

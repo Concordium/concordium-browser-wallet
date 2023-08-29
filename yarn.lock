@@ -1918,7 +1918,7 @@ __metadata:
     "@babel/plugin-transform-modules-commonjs": ^7.12.1
     "@babel/plugin-transform-runtime": ^7.12.1
     "@babel/preset-env": ^7.12.1
-    "@concordium/web-sdk": ^6.1.0-alpha.1
+    "@concordium/web-sdk": ^6.1.1
     typescript: ^4.3.5
     webpack: ^5.72.0
     webpack-cli: ^4.9.2
@@ -1930,7 +1930,7 @@ __metadata:
   resolution: "@concordium/browser-wallet-api@workspace:packages/browser-wallet-api"
   dependencies:
     "@concordium/browser-wallet-api-helpers": "workspace:^"
-    "@concordium/common-sdk": ^9.1.0-alpha.1
+    "@concordium/common-sdk": ^9.1.1
     "@protobuf-ts/grpcweb-transport": ^2.8.2
     "@protobuf-ts/runtime-rpc": ^2.8.2
     "@types/json-bigint": ^1.0.1
@@ -1958,7 +1958,7 @@ __metadata:
     "@babel/core": ^7.18.2
     "@concordium/browser-wallet-api": "workspace:^"
     "@concordium/browser-wallet-api-helpers": "workspace:^"
-    "@concordium/web-sdk": ^6.1.0-alpha.1
+    "@concordium/web-sdk": ^6.1.1
     "@craftamap/esbuild-plugin-html": ^0.4.0
     "@mdx-js/react": ^1.6.22
     "@noble/ed25519": ^1.7.0
@@ -2027,15 +2027,16 @@ __metadata:
   languageName: unknown
   linkType: soft
 
-"@concordium/common-sdk@npm:9.1.0-alpha.1, @concordium/common-sdk@npm:^9.1.0-alpha.1":
-  version: 9.1.0-alpha.1
-  resolution: "@concordium/common-sdk@npm:9.1.0-alpha.1"
+"@concordium/common-sdk@npm:9.1.1, @concordium/common-sdk@npm:^9.1.1":
+  version: 9.1.1
+  resolution: "@concordium/common-sdk@npm:9.1.1"
   dependencies:
-    "@concordium/rust-bindings": 1.2.0-alpha.1
+    "@concordium/rust-bindings": 1.2.0
     "@grpc/grpc-js": ^1.3.4
     "@noble/ed25519": ^1.7.1
     "@protobuf-ts/runtime-rpc": ^2.8.2
     "@scure/bip39": ^1.1.0
+    big.js: ^6.2.0
     bs58check: ^2.1.2
     buffer: ^6.0.3
     cross-fetch: 3.1.5
@@ -2043,7 +2044,7 @@ __metadata:
     iso-3166-1: ^2.1.1
     json-bigint: ^1.0.0
     uuid: ^8.3.2
-  checksum: dd87f2e6fae7f9590ed167ad5f739d82b25bebb29cca14f871db2a8c9c5957f9e7d19cdf9d062a7191417968a7544d0a8678674f3cb06949055088ee4d44e443
+  checksum: e7f43e085b968e9772f2559b2530bca59a9aab426332c3e088f266a76bc1e913bedff097aa61bc5a9c5ddb78db4decf2fd6a027d7231e95fcb368fe41f2820c8
   languageName: node
   linkType: hard
 
@@ -2085,10 +2086,10 @@ __metadata:
   languageName: node
   linkType: hard
 
-"@concordium/rust-bindings@npm:1.2.0-alpha.1":
-  version: 1.2.0-alpha.1
-  resolution: "@concordium/rust-bindings@npm:1.2.0-alpha.1"
-  checksum: c5f17b05a19eef4edcdcd0ef8372615662f5a05f8de062dff87c3c95b35583c556a5633d0394c91ac8680cd9bb7b06134b745cb7e850e9dcc94715d8cf72ef5f
+"@concordium/rust-bindings@npm:1.2.0":
+  version: 1.2.0
+  resolution: "@concordium/rust-bindings@npm:1.2.0"
+  checksum: a0deb7d2a8bea7b32487a85fd9981e40a1e0ad5ca72c625887e7d735933abae9adac34ab3047a0ac2f3e690ac8c5ac5d7a763a5fef9efe2c6d209860aa5cf6ec
   languageName: node
   linkType: hard
 
@@ -2103,17 +2104,17 @@ __metadata:
   languageName: node
   linkType: hard
 
-"@concordium/web-sdk@npm:^6.1.0-alpha.1":
-  version: 6.1.0-alpha.1
-  resolution: "@concordium/web-sdk@npm:6.1.0-alpha.1"
+"@concordium/web-sdk@npm:^6.1.1":
+  version: 6.1.1
+  resolution: "@concordium/web-sdk@npm:6.1.1"
   dependencies:
-    "@concordium/common-sdk": 9.1.0-alpha.1
-    "@concordium/rust-bindings": 1.2.0-alpha.1
+    "@concordium/common-sdk": 9.1.1
+    "@concordium/rust-bindings": 1.2.0
     "@grpc/grpc-js": ^1.3.4
     "@protobuf-ts/grpcweb-transport": ^2.8.2
     buffer: ^6.0.3
     process: ^0.11.10
-  checksum: 97590bae0e27fcb1157407aac12f4f3fd05c89580ea2e75007b3803e1fa32c142279558610597b263de84e8e28a3f3ca478c69a173c35578b3d215a3cc16cc1e
+  checksum: 85fa565d4ea9e6dfbc7b924b96e511fdb8094d7d3fdbc733204e65495f1969f9a9dd13a3e869c6b5e2501d1b65e1eb7296f282e78b456d3f03d0fac2c101ccad
   languageName: node
   linkType: hard
 
@@ -6735,7 +6736,7 @@ __metadata:
   resolution: "NFT-Minting@workspace:examples/nft-minting"
   dependencies:
     "@concordium/browser-wallet-api-helpers": "workspace:^"
-    "@concordium/web-sdk": ^6.1.0-alpha.1
+    "@concordium/web-sdk": ^6.1.1
     "@craftamap/esbuild-plugin-html": ^0.4.0
     "@types/react": ^18.0.9
     "@types/react-dom": ^18.0.5
@@ -6878,7 +6879,7 @@ __metadata:
   version: 0.0.0-use.local
   resolution: "add-example-web3-id@workspace:examples/add-example-Web3Id"
   dependencies:
-    "@concordium/web-sdk": ^6.1.0-alpha.1
+    "@concordium/web-sdk": ^6.1.1
     live-server: ^1.2.2
   languageName: unknown
   linkType: soft
@@ -7852,6 +7853,13 @@ __metadata:
   version: 5.2.2
   resolution: "big.js@npm:5.2.2"
   checksum: b89b6e8419b097a8fb4ed2399a1931a68c612bce3cfd5ca8c214b2d017531191070f990598de2fc6f3f993d91c0f08aa82697717f6b3b8732c9731866d233c9e
+  languageName: node
+  linkType: hard
+
+"big.js@npm:^6.2.0":
+  version: 6.2.1
+  resolution: "big.js@npm:6.2.1"
+  checksum: 0b234a2fd56c52bed2798ed2020bcab6fef5e9523b99a05406ad071d1aed6ee97ada9fb8de9576092da74c68825c276e19015743b8d1baea269b60a5c666b0cd
   languageName: node
   linkType: hard
 
@@ -10187,7 +10195,7 @@ __metadata:
   resolution: "e_sealing@workspace:examples/eSealing"
   dependencies:
     "@concordium/react-components": ^0.2.0
-    "@concordium/web-sdk": ^6.1.0-alpha.1
+    "@concordium/web-sdk": ^6.1.1
     "@craftamap/esbuild-plugin-html": ^0.4.0
     "@thi.ng/leb128": ^2.1.18
     "@types/node": ^18.7.23
@@ -17567,7 +17575,7 @@ __metadata:
   resolution: "piggybank@workspace:examples/piggybank"
   dependencies:
     "@concordium/browser-wallet-api-helpers": "workspace:^"
-    "@concordium/web-sdk": ^6.1.0-alpha.1
+    "@concordium/web-sdk": ^6.1.1
     "@craftamap/esbuild-plugin-html": ^0.4.0
     "@types/react": ^18.0.9
     "@types/react-dom": ^18.0.5
@@ -21484,7 +21492,7 @@ __metadata:
   version: 0.0.0-use.local
   resolution: "two-step-transfer@workspace:examples/two-step-transfer"
   dependencies:
-    "@concordium/web-sdk": ^6.1.0-alpha.1
+    "@concordium/web-sdk": ^6.1.1
     live-server: ^1.2.2
   languageName: unknown
   linkType: soft
@@ -22182,7 +22190,7 @@ __metadata:
   resolution: "voting@workspace:examples/voting"
   dependencies:
     "@concordium/browser-wallet-api-helpers": ^2.0.0
-    "@concordium/web-sdk": ^6.1.0-alpha.1
+    "@concordium/web-sdk": ^6.1.1
     "@types/node": ^18.7.23
     "@types/react": ^18.0.9
     "@types/react-dom": ^18.0.5
@@ -22307,7 +22315,7 @@ __metadata:
   resolution: "wccd@workspace:examples/wCCD"
   dependencies:
     "@concordium/react-components": ^0.2.0
-    "@concordium/web-sdk": ^6.1.0-alpha.1
+    "@concordium/web-sdk": ^6.1.1
     "@craftamap/esbuild-plugin-html": ^0.4.0
     "@thi.ng/leb128": ^2.1.18
     "@types/node": ^18.7.23

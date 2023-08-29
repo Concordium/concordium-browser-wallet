@@ -1,5 +1,12 @@
 import { APIVerifiableCredential } from '@concordium/browser-wallet-api-helpers';
-import type { CryptographicParameters, HexString, IdentityObjectV1, Network, Versioned } from '@concordium/web-sdk';
+import type {
+    CredentialSubject,
+    CryptographicParameters,
+    HexString,
+    IdentityObjectV1,
+    Network,
+    Versioned,
+} from '@concordium/web-sdk';
 
 export enum ChromeStorageKey {
     ConnectedSites = 'connectedSites',
@@ -273,11 +280,6 @@ export enum VerifiableCredentialStatus {
     Pending,
 }
 
-export type CredentialSubject = {
-    id: string;
-    attributes: Record<string, string | bigint>;
-};
-
 export interface VerifiableCredential extends APIVerifiableCredential {
     // With ID
     credentialSubject: CredentialSubject;
@@ -296,8 +298,25 @@ interface CredentialSchemaProperty {
     format?: string;
 }
 
+export type TimestampProperty = {
+    title: string;
+    type: 'object';
+    properties: {
+        type: {
+            type: 'string';
+            const: 'date-time';
+        };
+        timestamp: {
+            type: 'string';
+            format?: 'date-time';
+        };
+    };
+    required: ['type', 'timestamp'];
+    description?: string;
+};
+
 type CredentialSchemaAttributes = {
-    properties: Record<string, CredentialSchemaProperty>;
+    properties: Record<string, CredentialSchemaProperty | TimestampProperty>;
     required: string[];
 } & CredentialSchemaProperty;
 
