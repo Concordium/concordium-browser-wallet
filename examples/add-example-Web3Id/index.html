@@ -19,6 +19,7 @@
 
                 function sendStatement(statement) {
                     // Should be not be hardcoded
+                    console.log(statement);
                     const challenge = '94d3e85bbc8ff0091e562ad8ef6c30d57f29b19f17c98ce155df2a30100dAAAA';
                     provider
                         .requestVerifiablePresentation(challenge, statement)
@@ -38,11 +39,16 @@
                 // Request proofs
                 document.getElementById('web3ProofWeb3IdOnly').addEventListener('click', () => {
                     const statement = new concordiumSDK.Web3StatementBuilder()
-                        .addForVerifiableCredentials([{ index: 5463n, subindex: 0n }], (b) =>
+                        .addForVerifiableCredentials([{ index: 6105n, subindex: 0n }], (b) =>
                             b
                                 .revealAttribute('degreeType')
-                                .addMembership('degreeName', ['Bachelor of Science and Arts', 'Bachelor of Finance'])
+                                .revealAttribute('degreeName')
+                                .addMembership('graduationDate', [
+                                    graduationDate.valueAsDate,
+                                    new Date('2023-08-28T00:00:00.000Z'),
+                                ])
                         )
+
                         .getStatements();
                     sendStatement(statement);
                 });
@@ -64,6 +70,10 @@
                                 .revealAttribute('degreeType')
                                 .addMembership('degreeName', ['Bachelor of Science and Arts', 'Bachelor of Finance'])
                         )
+                        .addForVerifiableCredentials([{ index: 6105n, subindex: 0n }], (b) =>
+                            b.revealAttribute('graduationDate')
+                        )
+
                         .getStatements();
                     sendStatement(statement);
                 });
@@ -72,7 +82,7 @@
                     const values = {
                         degreeType: degreeType.value,
                         degreeName: degreeName.value,
-                        graduationDate: graduationDate.valueAsDate.toISOString(),
+                        graduationDate: graduationDate.valueAsDate,
                     };
                     const metadataUrl = {
                         url: web3metadataUrl.value,
@@ -90,7 +100,7 @@
                                 attributes: values,
                             },
                             credentialSchema: {
-                                id: 'https://raw.githubusercontent.com/Concordium/concordium-web3id/main/examples/json-schemas/education-certificate/JsonSchema2023-education-certificate.json',
+                                id: 'https://gist.githubusercontent.com/shjortConcordium/a2dc69761d2007c308f6511abaa3eb70/raw/11ad6745dcfa57e7049b08be146858a928a7aa82/gistfile1.txt',
                                 type: 'JsonSchema2023',
                             },
                         },
@@ -98,7 +108,14 @@
                         async (id) => {
                             const body = {
                                 credentialSubject: {
-                                    attributes: values,
+                                    attributes: {
+                                        degreeType: degreeType.value,
+                                        degreeName: degreeName.value,
+                                        graduationDate: {
+                                            timestamp: graduationDate.valueAsDate.toISOString(),
+                                            type: 'date-time',
+                                        },
+                                    },
                                     id,
                                 },
                                 validFrom: new Date().toISOString(),
@@ -145,7 +162,7 @@
             value="https://raw.githubusercontent.com/Concordium/concordium-web3id/credential-metadata-example/examples/json-schemas/metadata/credential-metadata.json"
         />
         <br />
-        issuer Index: <input type="number" id="issuerIndex" value="5463" />
+        issuer Index: <input type="number" id="issuerIndex" value="6105" />
         <br />
         <h3>Attribute values:</h3>
         degreeType: <input type="text" id="degreeType" value="BachelorDegree" />
