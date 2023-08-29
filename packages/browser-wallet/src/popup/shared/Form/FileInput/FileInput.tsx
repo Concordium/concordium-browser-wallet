@@ -81,7 +81,7 @@ export const FileInput = forwardRef<FileInputRef, FileInputProps>(
                                   {f?.name}
                               </div>
                           ))}
-                    <Button className="form-file-input__button" width="narrow" disabled={disabled}>
+                    <Button className="form-file-input__button" disabled={disabled}>
                         {buttonTitle}
                     </Button>
                     <input

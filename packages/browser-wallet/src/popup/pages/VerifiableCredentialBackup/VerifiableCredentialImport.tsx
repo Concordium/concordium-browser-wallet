@@ -130,7 +130,7 @@ export default function VerifiableCredentialImport() {
                         <FileInput
                             className="verifiable-credential-import__import"
                             onChange={handleImport}
-                            buttonTitle="import"
+                            buttonTitle={t('importButton')}
                             value={null}
                         />
                         {error && <p className="m-h-10 form-error-message">{error}</p>}
