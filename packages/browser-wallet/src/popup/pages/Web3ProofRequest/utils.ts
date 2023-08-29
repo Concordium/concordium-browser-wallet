@@ -10,6 +10,8 @@ import {
     RevealStatementV2,
     createWeb3IdDID,
     canProveCredentialStatement,
+    AttributeType,
+    CredentialSubject,
 } from '@concordium/web-sdk';
 import { isIdentityOfCredential } from '@shared/utils/identity-helpers';
 import {
@@ -133,4 +135,29 @@ export function createWeb3IdDIDFromCredential(credential: VerifiableCredential, 
         BigInt(contractAddress.index),
         BigInt(contractAddress.subindex)
     );
+}
+
+type AttributeInfo = {
+    name: string;
+    value: AttributeType;
+};
+
+function extractAttributesFromCredentialSubjectForSingleStatement(
+    { attributeTag }: AtomicStatementV2,
+    credentialSubject: CredentialSubject
+): AttributeInfo {
+    return { name: attributeTag, value: credentialSubject.attributes[attributeTag] };
+}
+
+export function extractAttributesFromCredentialSubject(
+    statements: AtomicStatementV2[],
+    credentialSubject: CredentialSubject
+): Record<string, AttributeInfo> {
+    return statements.reduce<Record<string, AttributeInfo>>((acc, statement) => {
+        acc[statement.attributeTag] = extractAttributesFromCredentialSubjectForSingleStatement(
+            statement,
+            credentialSubject
+        );
+        return acc;
+    }, {});
 }

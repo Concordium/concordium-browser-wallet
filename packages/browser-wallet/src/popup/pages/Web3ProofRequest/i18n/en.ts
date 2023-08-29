@@ -9,12 +9,12 @@ export default {
         revealDescription:
             '<1>Important:</1> {{dappName}} will be given all the information above. You should only accept, if you trust the service, and you are familiar with their privacy policy.',
         revealTooltip: {
-            header: 'Revealing information <1 />',
-            body: 'When you reveal information to a third party, you effectively hand over the information to them. This means you should only do this if you agree to their data usage and protection policies.\n\nYou can read more in\n<1>the developer documentation</1>.',
+            header: 'Information to reveal',
+            body: 'When you reveal information for a third party, you effectively hand over the information to them. This means that you should only do this if you have absolute trust in them, and if you are familiar with their data usage and protection procedures.\n\nYou can read more on\ndeveloper.concordium.software',
         },
         secretTooltip: {
-            header: 'Zero Knowledge proofs',
-            body: 'Zero Knowledge proofs are a way of proving something to a service or dApp without revealing the exact personal information. One example can be that you prove that you are over 18 years old without revealing your exact age. Another example could be proving your residency is within a given set of countries without revealing which of those countries you reside within.\n\nYou can read more in\n<1>the developer documentation</1>.',
+            header: 'Zero Knowledge proof',
+            body: 'Zero-knowledge proofs are a way of proving something to a service or dApp without revealing the exact personal information. One example can be that you prove that you are over 18 years old without revealing your exact date of birth. Another example could be that you live in one of a range of countries without revealing exactly which country you live in.\n\nYou can read more on\ndeveloper.concordium.software',
         },
         headers: {
             reveal: 'Information to reveal',

@@ -20,17 +20,18 @@
 
 .display-box {
     border-radius: 16px;
-    box-shadow: 0px 0px 15px 0px #0000001A;
+    box-shadow: 0 0 15px 0 #0000001a;
 
     &__header {
-        background: linear-gradient(91.35deg, #B6DADF 13.38%, #DAECEF 93.45%);
+        background: linear-gradient(91.35deg, #b6dadf 13.38%, #daecef 93.45%);
         border-top-left-radius: 16px;
         border-top-right-radius: 16px;
         height: 48px;
         padding: 15px;
         display: flex;
         justify-content: space-between;
-   }
+        color: $color-secondary-ocean-blue;
+    }
 
     &__tooltip-icon {
         height: 24px;
@@ -38,11 +39,19 @@
 }
 
 .display-reveal-statements {
-
     &__line {
         &:not(:last-child) {
             margin-bottom: 8px;
         }
     }
+}
 
+.display-secret-statements {
+    &__line {
+        margin-top: 5px;
+
+        &:not(:last-child) {
+            border-bottom: 1px solid #e5e5e5;
+        }
+    }
 }
