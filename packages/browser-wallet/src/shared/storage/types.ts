@@ -287,8 +287,11 @@ export interface VerifiableCredential extends APIVerifiableCredential {
     // Secrets
     signature: string;
     randomness: Record<string, string>;
-    /** index used to derive keys for credential */
+    // Index used to derive keys for credential
     index: number;
+    // The original metadataUrl received when first adding the credential
+    // TODO: The URL should be updated when there are valid updates to the metadata.
+    metadataUrl: string;
 }
 
 interface CredentialSchemaProperty {

@@ -22,7 +22,7 @@ import {
 import { AsyncWrapper } from '@popup/store/utils';
 import { ConcordiumGRPCClient } from '@concordium/web-sdk';
 import { useTranslation } from 'react-i18next';
-import { logError } from '@shared/utils/log-helpers';
+import { logError, logWarningMessage } from '@shared/utils/log-helpers';
 
 /**
  * Retrieve the on-chain credential status for a verifiable credential in a CIS-4 credential registry contract.
@@ -110,24 +110,36 @@ export function useCredentialMetadata(credential?: VerifiableCredential) {
         if (storedMetadata.loading) {
             return;
         }
-        let url;
+
+        let url: string | undefined;
         if (credentialEntry) {
             url = credentialEntry.credentialInfo.metadataUrl.url;
         } else if (!tempMetadata.loading && credential) {
             url = tempMetadata.value[credential.id];
         }
-        if (!url) {
+        if (url === undefined || credential === undefined) {
             return;
         }
+
         const storedCredentialMetadata = storedMetadata.value[url];
-        if (!storedCredentialMetadata) {
+        if (storedCredentialMetadata) {
+            setMetadata(storedCredentialMetadata);
+            return;
+        }
+
+        // The URL we got does not have a corresponding entry in our local storage.
+        // In this case we fallback to using the known "good" value so that we can
+        // still get metadata for this credential.
+        const fallbackCredentialMetadata = storedMetadata.value[credential.metadataUrl];
+        if (!fallbackCredentialMetadata) {
             throw new Error(
-                `Attempted to find credential metadata for credentialId: ${
-                    credentialEntry?.credentialInfo.credentialHolderId || credential?.id
-                } but none was found!`
+                `Attempted to find credential metadata for credentialId: ${credential.id} at URL ${credential.metadataUrl} but none was found!`
             );
         }
-        setMetadata(storedCredentialMetadata);
+        logWarningMessage(
+            `Using fallback credential metadata for credential ${credential.id}. The credential entry metadata URL is [${credentialEntry?.credentialInfo.metadataUrl.url}]`
+        );
+        setMetadata(fallbackCredentialMetadata);
     }, [storedMetadata.loading, tempMetadata.loading, credentialEntry, credential?.id]);
 
     return metadata;
