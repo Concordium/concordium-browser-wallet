@@ -42,6 +42,12 @@
 
 -   Web3IdCredentials support.
 
+## 1.0.7
+
+### Added
+
+-   Support for protocol version 6.
+
 ## 1.0.6
 
 ### Changed

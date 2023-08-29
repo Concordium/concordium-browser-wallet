@@ -6,6 +6,7 @@ import { useParams, Link } from 'react-router-dom';
 import { Button, Col, Container, Form, Row } from 'react-bootstrap';
 import Wallet, { castVote, init, getView } from './Wallet';
 import { decodeView } from './buffer';
+import Footer from './Footer';
 
 function VotePage() {
     const params = useParams();
@@ -101,6 +102,7 @@ function VotePage() {
             <footer>
                 <p>*Smart contract index on the Concordium chain</p>
             </footer>
+            <Footer />
         </Container>
     );
 }

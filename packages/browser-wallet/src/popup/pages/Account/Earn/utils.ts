@@ -1,8 +1,8 @@
-import { AccountInfo, ChainParametersV1, ConsensusStatus, RewardStatusV1 } from '@concordium/web-sdk';
+import { AccountInfo, ChainParameters, ChainParametersV0, ConsensusStatus, RewardStatusV1 } from '@concordium/web-sdk';
 import { createContext } from 'react';
 
 export type EarnPageContext = {
-    chainParameters?: ChainParametersV1;
+    chainParameters?: Exclude<ChainParameters, ChainParametersV0>;
     consensusStatus?: ConsensusStatus;
     tokenomicsInfo?: RewardStatusV1;
 };

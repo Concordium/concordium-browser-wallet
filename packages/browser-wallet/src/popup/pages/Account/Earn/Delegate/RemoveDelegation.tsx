@@ -2,13 +2,13 @@ import React from 'react';
 import { AccountTransactionType } from '@concordium/web-sdk';
 import { useTranslation } from 'react-i18next';
 import { secondsToDaysRoundedDown } from '@shared/utils/time-helpers';
-import { useBlockChainParametersV1 } from '@popup/shared/BlockChainParametersProvider';
+import { useBlockChainParametersAboveV0 } from '@popup/shared/BlockChainParametersProvider';
 import IntroPage from '../IntroPage';
 import RemoveCarousel from '../RemoveCarousel';
 
 export default function RemoveDelegaton() {
     const { t } = useTranslation('account', { keyPrefix: 'delegate' });
-    const chainParameters = useBlockChainParametersV1();
+    const chainParameters = useBlockChainParametersAboveV0();
     return (
         <RemoveCarousel
             type={AccountTransactionType.ConfigureDelegation}

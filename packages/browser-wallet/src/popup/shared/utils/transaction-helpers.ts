@@ -11,7 +11,8 @@ import {
     SimpleTransferPayload,
     TransactionExpiry,
     AccountInfo,
-    ChainParametersV1,
+    ChainParameters,
+    ChainParametersV0,
     BakerPoolStatusDetails,
     InitContractPayload,
     UpdateContractPayload,
@@ -80,7 +81,7 @@ export function validateTransferAmount(
 
 export function validateBakerStake(
     amountToValidate: string,
-    chainParameters?: ChainParametersV1,
+    chainParameters?: Exclude<ChainParameters, ChainParametersV0>,
     accountInfo?: AccountInfo,
     estimatedFee = 0n
 ): string | undefined {
