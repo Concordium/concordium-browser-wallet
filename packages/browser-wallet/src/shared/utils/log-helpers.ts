@@ -66,3 +66,7 @@ export async function logError(error: unknown) {
         logErrorMessage(String(error));
     }
 }
+
+export async function logWarningMessage(message: string) {
+    log(message, LoggingLevel.WARN);
+}

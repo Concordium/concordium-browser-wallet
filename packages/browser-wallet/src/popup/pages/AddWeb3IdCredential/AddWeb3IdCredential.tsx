@@ -197,6 +197,7 @@ export default function AddWeb3IdCredential({ onAllow, onReject }: Props) {
             credentialSubject,
             id: credentialId,
             index,
+            metadataUrl: metadataUrl.url,
         };
         await setWeb3IdCredentials([...web3IdCredentials.value, fullCredential]);
         if (metadata) {

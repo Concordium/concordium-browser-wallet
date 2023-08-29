@@ -1,5 +1,11 @@
 # Changelog
 
+## Unreleased
+
+### Fixed
+
+-   An issue where changing the credential metadata URL to an invalid URL, or a URL that does not contain a credential metadata file, would result in an empty screen.
+
 ## 1.1.3
 
 ### Changed
