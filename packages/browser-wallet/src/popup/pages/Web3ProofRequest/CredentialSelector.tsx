@@ -1,37 +1,51 @@
-import React, { useState } from 'react';
+import Button from '@popup/shared/Button';
+import Modal from '@popup/shared/Modal';
+import React, { ComponentType, useState } from 'react';
 
 interface Props<T> {
     options: T[];
+    initialIndex?: number;
     onChange: (x: T) => void;
-    displayOption: (x: T) => string;
+    DisplayOption: ComponentType<{ option: T }>;
 }
 
 /**
  * Component to select a credential, either account credential or web3Id credential.
  */
-export default function CredentialSelector<T>({ options, onChange, displayOption }: Props<T>) {
-    const [chosenIndex, setChosenIndex] = useState<number>(0);
+export default function CredentialSelector<T extends string | number | object>({
+    options,
+    initialIndex = 0,
+    onChange,
+    DisplayOption,
+}: Props<T>) {
+    const [chosenIndex, setChosenIndex] = useState<number>(initialIndex);
+    const [open, setOpen] = useState(false);
 
     if (options.length === 0) {
-        // TODO Translate
-        return <div>No candidate available</div>;
+        return null;
+    }
+
+    function onClick(index: number) {
+        setChosenIndex(index);
+        onChange(options[index]);
     }
 
     return (
-        <select
-            className="m-10"
-            value={chosenIndex}
-            onChange={(event) => {
-                const index = Number(event.target.value);
-                setChosenIndex(index);
-                onChange(options[index]);
-            }}
+        <Modal
+            open={open}
+            onOpen={() => setOpen(true)}
+            onClose={() => setOpen(false)}
+            trigger={
+                <Button clear className="flex m-10 verifiable-credential__selector">
+                    <DisplayOption option={options[chosenIndex]} />
+                </Button>
+            }
         >
             {options.map((opt, index) => (
-                <option key={displayOption(opt)} value={index}>
-                    {displayOption(opt)}
-                </option>
+                <Button clear key={opt.toString()} onClick={() => onClick(index)}>
+                    <DisplayOption option={options[index]} />
+                </Button>
             ))}
-        </select>
+        </Modal>
     );
 }

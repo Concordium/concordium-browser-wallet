@@ -55,3 +55,13 @@
         }
     }
 }
+
+.verifiable-credential {
+    &__selector {
+        width: 376px;
+        height: 60px;
+        border-radius: 12px;
+        box-shadow: 0 0 15px 0 #0000001a;
+        background: #fff;
+    }
+}

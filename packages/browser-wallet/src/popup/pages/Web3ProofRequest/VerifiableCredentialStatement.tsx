@@ -1,7 +1,8 @@
+import { MetadataUrl } from '@concordium/browser-wallet-api-helpers/lib/wallet-api-types';
 import { RevealStatementV2, StatementTypes, VerifiableCredentialStatement } from '@concordium/web-sdk';
+import Img from '@popup/shared/Img';
 import { storedVerifiableCredentialSchemasAtom } from '@popup/store/verifiable-credential';
 import { VerifiableCredential, VerifiableCredentialStatus } from '@shared/storage/types';
-import { getVerifiableCredentialPublicKeyfromSubjectDID } from '@shared/utils/verifiable-credential-helpers';
 import { useAtomValue } from 'jotai';
 import React, { useCallback, useEffect, useMemo, useState } from 'react';
 import { VerifiableCredentialCard } from '../VerifiableCredential/VerifiableCredentialCard';
@@ -10,6 +11,25 @@ import CredentialSelector from './CredentialSelector';
 import { DisplayRevealStatements } from './Display/DisplayRevealStatements';
 import { DisplaySecretStatements } from './Display/DisplaySecretStatements';
 import { createWeb3IdDIDFromCredential, DisplayCredentialStatementProps, SecretStatementV2 } from './utils';
+
+function Logo({ logo }: { logo: MetadataUrl }) {
+    return <Img className="verifiable-credential__header__logo" src={logo.url} withDefaults />;
+}
+
+export function DisplayVC({ option }: { option: VerifiableCredential }) {
+    const metadata = useCredentialMetadata(option);
+
+    if (!metadata) {
+        return null;
+    }
+
+    return (
+        <header className="verifiable-credential__header">
+            <Logo logo={metadata.logo} />
+            <div className="verifiable-credential__header__title">{metadata.title}</div>
+        </header>
+    );
+}
 
 export default function DisplayWeb3Statement({
     credentialStatement,
@@ -64,10 +84,9 @@ export default function DisplayWeb3Statement({
                 metadata={metadata}
                 localization={localization.result}
             />
-
-            <CredentialSelector
+            <CredentialSelector<VerifiableCredential>
                 options={validCredentials}
-                displayOption={(option) => getVerifiableCredentialPublicKeyfromSubjectDID(option.id)}
+                DisplayOption={DisplayVC}
                 onChange={onChange}
             />
             {reveals.length !== 0 && (
