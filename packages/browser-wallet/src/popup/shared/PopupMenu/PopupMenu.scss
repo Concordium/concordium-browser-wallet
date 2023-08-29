@@ -1,14 +1,15 @@
 .popup-menu {
     width: 200px;
-    box-shadow: 0 0 20px rgb(0 0 0 / 15%);
+    box-shadow: 0 0 20px rgb(0 0 0 / $color-shadow-alpha);
     border-radius: 16px;
     display: flex;
     flex-direction: column;
-    background-color: $color-white;
+    opacity: 0.95;
+    background-color: $color-bg;
 
     &__item {
         &:hover {
-            background-color: lightgray;
+            background-color: rgb(0 0 0 / $color-shadow-alpha);
         }
 
         &:first-child {
@@ -28,7 +29,7 @@
         height: 44px;
 
         &:not(:last-child) {
-            border-bottom: 1px solid lightgray;
+            border-bottom: 1px solid rgb(0 0 0 / $color-shadow-alpha);
         }
 
         &--disabled {
@@ -41,6 +42,10 @@
             display: flex;
             align-items: center;
             justify-content: center;
+
+            path {
+                fill: $color-text;
+            }
         }
     }
 }

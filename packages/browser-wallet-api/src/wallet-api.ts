@@ -290,6 +290,10 @@ class WalletApi extends EventEmitter implements IWalletApi {
     }
 
     public async requestVerifiablePresentation(challenge: HexString, statements: CredentialStatements) {
+        if (statements === undefined || statements.length === 0) {
+            throw new Error('A request for a verifiable presentation must contain statements');
+        }
+
         const res = await this.messageHandler.sendMessage<MessageStatusWrapper<string>>(MessageType.Web3IdProof, {
             // We have to stringify the statements because they can contain bigints
             statements: stringify(statements),

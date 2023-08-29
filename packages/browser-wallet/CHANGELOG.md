@@ -12,6 +12,8 @@
 -   Updated the JSON schema for the verifiable credential schema validation, so that invalid schemas are rejected.
 -   An issue where a verifiable with the `NotActivated` status would show as `Pending`.
 -   Enable validation of veriable presentation requests before opening the popup window.
+-   An issue that allowed empty credential statements to be accepted by the wallet-api.
+-   An issue where the wallet allowed for requests adding credentials with more attributes than listed in the schema.
 
 ## 1.1.2
 

@@ -66,6 +66,8 @@ body {
         --color-main-header: #{$color-main-header-dark};
         --color-disabled-input-bg: #{$color-main-header-dark};
         --color-status-box: #{$color-status-box-dark};
+        --color-allowlist-background: #{$color-allowlist-background-dark};
+        --color-shadow-alpha: #{$color-shadow-alpha-dark};
 
         .bg {
             background-image: url('../assets/images/bg-dark.jpg');
