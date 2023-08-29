@@ -3,9 +3,9 @@ import { useTranslation } from 'react-i18next';
 import { Link, Route, Routes, useLocation, useNavigate } from 'react-router-dom';
 import {
     AccountTransactionType,
-    ChainParametersV1,
+    ChainParameters,
+    ChainParametersV0,
     isBakerAccount,
-    isChainParametersV1,
     isDelegatorAccount,
     isRewardStatusV1,
 } from '@concordium/web-sdk';
@@ -19,7 +19,7 @@ import { grpcClientAtom } from '@popup/store/settings';
 import { displayAsCcd, useAsyncMemo, useUpdateEffect } from 'wallet-common-helpers';
 import ButtonGroup from '@popup/shared/ButtonGroup';
 import { absoluteRoutes } from '@popup/constants/routes';
-import { useBlockChainParameters } from '@popup/shared/BlockChainParametersProvider';
+import { useBlockChainParametersAboveV0 } from '@popup/shared/BlockChainParametersProvider';
 import Baking from './Baking';
 import Delegate from './Delegate';
 import { accountPageContext } from '../utils';
@@ -32,7 +32,7 @@ const routes = {
 };
 
 interface EarnProps {
-    chainParameters?: ChainParametersV1;
+    chainParameters?: Exclude<ChainParameters, ChainParametersV0>;
 }
 
 const defaultBakingMinimumEquityCapital = 14000000000n;
@@ -103,8 +103,7 @@ export default function EarnRoutes() {
     }, [accountInfo]);
 
     const client = useAtomValue(grpcClientAtom);
-    const chainParameters = useBlockChainParameters();
-    const ParametersV1 = chainParameters ? filterType(isChainParametersV1)(chainParameters) : undefined;
+    const chainParameters = useBlockChainParametersAboveV0();
 
     const consensusStatus = useAsyncMemo(() => client.getConsensusStatus(), undefined, []);
     const tokenomicsInfo = useAsyncMemo(
@@ -113,14 +112,14 @@ export default function EarnRoutes() {
         []
     );
     const context = useMemo<EarnPageContext>(
-        () => ({ chainParameters: ParametersV1, consensusStatus, tokenomicsInfo }),
+        () => ({ chainParameters, consensusStatus, tokenomicsInfo }),
         [consensusStatus, tokenomicsInfo, chainParameters]
     );
 
     return (
         <earnPageContext.Provider value={context}>
             <Routes>
-                <Route index element={<Earn chainParameters={ParametersV1} />} />
+                <Route index element={<Earn chainParameters={chainParameters} />} />
                 <Route path={`${routes.delegate}/*`} element={<Delegate />} />
                 <Route path={`${routes.baking}/*`} element={<Baking />} />
             </Routes>

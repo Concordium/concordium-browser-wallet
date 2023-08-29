@@ -9,7 +9,7 @@ import {
     ConfigureDelegationPayload,
 } from '@concordium/web-sdk';
 import { useSelectedAccountInfo } from '@popup/shared/AccountInfoListenerContext/AccountInfoListenerContext';
-import { useBlockChainParametersV1 } from '@popup/shared/BlockChainParametersProvider';
+import { useBlockChainParametersAboveV0 } from '@popup/shared/BlockChainParametersProvider';
 import { secondsToDaysRoundedDown } from '@shared/utils/time-helpers';
 
 interface Props {
@@ -24,7 +24,7 @@ interface Props {
 export function TransactionMessage({ transactionType, payload }: Props) {
     const { t } = useTranslation('account', { keyPrefix: 'transactionMessage' });
     const accountInfo = useSelectedAccountInfo();
-    const parametersV1 = useBlockChainParametersV1();
+    const parametersV1 = useBlockChainParametersAboveV0();
 
     const message = useMemo(() => {
         if (!accountInfo) {
