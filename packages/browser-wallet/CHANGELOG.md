@@ -5,6 +5,7 @@
 ### Fixed
 
 -   An issue where changing the credential metadata URL to an invalid URL, or a URL that does not contain a credential metadata file, would result in an empty screen.
+-   Enabled ID statement checks for Web3 ID proof requests containing account credential statements.
 
 ## 1.1.3
 
