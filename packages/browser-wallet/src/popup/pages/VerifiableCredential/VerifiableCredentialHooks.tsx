@@ -1,5 +1,10 @@
 import { grpcClientAtom } from '@popup/store/settings';
-import { VerifiableCredential, VerifiableCredentialStatus, VerifiableCredentialSchema } from '@shared/storage/types';
+import {
+    VerifiableCredential,
+    VerifiableCredentialStatus,
+    VerifiableCredentialSchema,
+    VerifiableCredentialSchemaWithFallback,
+} from '@shared/storage/types';
 import {
     CredentialQueryResponse,
     IssuerMetadata,
@@ -52,19 +57,31 @@ export function useCredentialStatus(credential: VerifiableCredential) {
  * @throws if no schema is found in storage for the provided credential
  * @returns the credential's schema used for rendering the credential
  */
-export function useCredentialSchema(credential?: VerifiableCredential) {
-    const [schema, setSchema] = useState<VerifiableCredentialSchema>();
+export function useCredentialSchema(
+    credential?: VerifiableCredential
+): VerifiableCredentialSchemaWithFallback | undefined {
+    const [schema, setSchema] = useState<VerifiableCredentialSchema & { usingFallback: boolean }>();
     const schemas = useAtomValue(storedVerifiableCredentialSchemasAtom);
+    const client = useAtomValue(grpcClientAtom);
 
     useEffect(() => {
         if (!schemas.loading && credential) {
-            const schemaValue = schemas.value[credential.credentialSchema.id];
-            if (!schemaValue) {
-                throw new Error(`Attempted to find schema for credentialId: ${credential.id} but none was found!`);
-            }
-            setSchema(schemaValue);
+            const registryContractAddress = getCredentialRegistryContractAddress(credential.id);
+            getCredentialRegistryMetadata(client, registryContractAddress)
+                .then((registryMetadata) => {
+                    let usingFallback = false;
+                    let schemaValue = schemas.value[registryMetadata.credentialSchema.schema.url];
+                    if (!schemaValue) {
+                        // Use the schema we got when originally adding the credential as a fallback for the
+                        // credential, if we do not have the new schema saved yet.
+                        usingFallback = true;
+                        schemaValue = schemas.value[credential.credentialSchema.id];
+                    }
+                    setSchema({ ...schemaValue, usingFallback });
+                })
+                .catch(logError);
         }
-    }, [credential?.id, schemas.loading]);
+    }, [credential?.id, schemas.loading, JSON.stringify(schemas.value)]);
 
     return schema;
 }

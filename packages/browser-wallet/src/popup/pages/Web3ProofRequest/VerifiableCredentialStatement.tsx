@@ -6,16 +6,18 @@ import {
     CredentialSubject,
     AttributeType,
 } from '@concordium/web-sdk';
-import { storedVerifiableCredentialSchemasAtom } from '@popup/store/verifiable-credential';
 import { VerifiableCredential, VerifiableCredentialSchema, VerifiableCredentialStatus } from '@shared/storage/types';
 import { getVerifiableCredentialPublicKeyfromSubjectDID } from '@shared/utils/verifiable-credential-helpers';
-import { useAtomValue } from 'jotai';
-import React, { useCallback, useEffect, useMemo, useState } from 'react';
+import React, { useCallback, useEffect, useState } from 'react';
 import { useTranslation } from 'react-i18next';
 import { ClassName } from 'wallet-common-helpers';
 import { DisplayStatementView, StatementLine } from '../IdProofRequest/DisplayStatement/DisplayStatement';
 import { VerifiableCredentialCard } from '../VerifiableCredential/VerifiableCredentialCard';
-import { useCredentialLocalization, useCredentialMetadata } from '../VerifiableCredential/VerifiableCredentialHooks';
+import {
+    useCredentialLocalization,
+    useCredentialMetadata,
+    useCredentialSchema,
+} from '../VerifiableCredential/VerifiableCredentialHooks';
 import CredentialSelector from './CredentialSelector';
 import { createWeb3IdDIDFromCredential, DisplayCredentialStatementProps, SecretStatementV2 } from './utils';
 
@@ -162,8 +164,6 @@ export default function DisplayWeb3Statement({
     const secrets = credentialStatement.statement.filter(
         (s) => s.type !== StatementTypes.RevealAttribute
     ) as SecretStatementV2[];
-    const verifiableCredentialSchemas = useAtomValue(storedVerifiableCredentialSchemasAtom);
-
     const [chosenCredential, setChosenCredential] = useState<VerifiableCredential | undefined>(validCredentials[0]);
 
     const onChange = useCallback((credential: VerifiableCredential) => {
@@ -178,14 +178,7 @@ export default function DisplayWeb3Statement({
         }
     }, []);
 
-    const schema = useMemo(() => {
-        if (!verifiableCredentialSchemas.loading && chosenCredential) {
-            const schemaId = chosenCredential.credentialSchema.id;
-            return verifiableCredentialSchemas.value[schemaId];
-        }
-        return null;
-    }, [chosenCredential?.id, verifiableCredentialSchemas.loading]);
-
+    const schema = useCredentialSchema(chosenCredential);
     const metadata = useCredentialMetadata(chosenCredential);
     const localization = useCredentialLocalization(chosenCredential);
 

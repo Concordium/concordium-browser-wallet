@@ -1,6 +1,10 @@
 import React, { useCallback, useMemo, useState } from 'react';
 import { useAtomValue } from 'jotai';
-import { VerifiableCredential, VerifiableCredentialSchema, VerifiableCredentialStatus } from '@shared/storage/types';
+import {
+    VerifiableCredential,
+    VerifiableCredentialSchemaWithFallback,
+    VerifiableCredentialStatus,
+} from '@shared/storage/types';
 import Topbar, { ButtonTypes, MenuButton } from '@popup/shared/Topbar/Topbar';
 import { useTranslation } from 'react-i18next';
 import { AccountTransactionType } from '@concordium/web-sdk';
@@ -146,7 +150,7 @@ interface CredentialDetailsProps extends ClassName {
     credential: VerifiableCredential;
     status: VerifiableCredentialStatus;
     metadata: VerifiableCredentialMetadata;
-    schema: VerifiableCredentialSchema;
+    schema: VerifiableCredentialSchemaWithFallback;
     localization?: Record<string, string>;
     backButtonOnClick: () => void;
 }

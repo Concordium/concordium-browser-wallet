@@ -88,7 +88,7 @@ export const Primary: ComponentStory<typeof VerifiableCredentialCard> = () => {
         <div style={{ width: 375 }}>
             <VerifiableCredentialCard
                 credentialSubject={credentialSubject}
-                schema={schema}
+                schema={{ ...schema, usingFallback: false }}
                 credentialStatus={VerifiableCredentialStatus.Active}
                 metadata={metadata}
             />

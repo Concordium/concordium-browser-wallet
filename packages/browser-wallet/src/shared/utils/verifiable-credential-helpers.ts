@@ -42,7 +42,7 @@ export function getPublicKeyfromPublicKeyIdentifierDID(did: string) {
 }
 
 /**
- * Extracts the credential registry contract addres from a verifiable credential id (did).
+ * Extracts the credential registry contract address from a verifiable credential id (did).
  * @param credentialId the did for a credential
  * @returns the contract address of the issuing contract of the provided credential id
  */

@@ -5,6 +5,7 @@
 ### Fixed
 
 -   An issue where changing the credential metadata URL to an invalid URL, or a URL that does not contain a credential metadata file, would result in an empty screen.
+-   Issues with a contract switching to an invalid schema or switching the schema to a new URL.
 
 ## 1.1.3
 
