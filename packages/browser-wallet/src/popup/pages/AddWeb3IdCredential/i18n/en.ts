@@ -13,6 +13,7 @@ const t = {
                 'The attribute with key [{{ credentialAttribute }}] is not available in the list of schema attributes: [{{ schemaAttributes }}]',
         },
         localization: 'Failed to get localization',
+        findingNextIndex: 'An error ocurred while attempting to add the credential. Please try again.',
     },
 };
 

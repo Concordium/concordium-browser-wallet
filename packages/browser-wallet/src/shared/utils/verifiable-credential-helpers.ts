@@ -233,6 +233,31 @@ export async function getRevokeTransactionExecutionEnergyEstimate(
 }
 
 /**
+ * Determines whether a verifiable credential with the provided key already
+ * exists in the provided contract.
+ *
+ * This is done by invoking the credentialStatus method and checking that the
+ * call succeeded.
+ */
+export async function isVerifiableCredentialInContract(
+    client: ConcordiumGRPCClient,
+    credentialHolderId: string,
+    issuer: ContractAddress
+) {
+    const instanceInfo = await client.getInstanceInfo(issuer);
+    if (instanceInfo === undefined) {
+        throw new Error('Given contract address was not a created instance');
+    }
+    const result = await client.invokeContract({
+        contract: issuer,
+        method: `${getContractName(instanceInfo)}.credentialStatus`,
+        parameter: Buffer.from(credentialHolderId, 'hex'),
+    });
+
+    return result.tag === 'success';
+}
+
+/**
  * Get the status of a verifiable credential in a CIS-4 contract.
  * @param client the GRPC client for accessing a node
  * @param credentialId the id for a verifiable credential
