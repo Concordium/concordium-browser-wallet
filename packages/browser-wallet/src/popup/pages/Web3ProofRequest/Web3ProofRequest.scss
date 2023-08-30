@@ -6,7 +6,10 @@
     }
 
     &__actions {
-        margin: auto rem(20px) 0;
+        margin-top: auto;
+        display: grid;
+        grid-auto-flow: column;
+        column-gap: 7px;
     }
 
     &__loading-icon {
@@ -14,8 +17,60 @@
     }
 
     &__credential-statement-container {
+        height: calc(100% - 115px);
+        overflow-y: overlay;
         margin-bottom: rem(20px);
     }
+
+    &__selector-icon {
+        border-radius: 50%;
+        width: 40px;
+        height: 40px;
+        display: flex;
+        justify-content: center;
+        align-items: center;
+        margin-left: 16px;
+    }
+
+    &__selector-icon-image {
+        height: 28.3px;
+        width: 28.3px;
+    }
+
+    &__selector-title {
+        margin-left: 25px;
+    }
+
+    &__reject-icon {
+        height: 12px;
+        width: 12px;
+
+        path {
+            fill: $color-neutral-white;
+        }
+    }
+
+    &__reject-button {
+        width: 56px;
+        height: 48px;
+        border-radius: 16px;
+        background: #ab2b2b;
+    }
+
+    &__back-button {
+        width: 112px;
+    }
+
+    &__continue-button {
+        flex-grow: 1;
+    }
+}
+
+.new-button-styling {
+    height: 48px;
+    border-radius: 16px;
+    background: linear-gradient(94.88deg, #005a78 -3.22%, #48a2ae 87.51%);
+    box-shadow: 0 0 15px 0 #0003;
 }
 
 .display-box {
@@ -58,10 +113,41 @@
 
 .verifiable-credential {
     &__selector {
-        width: 376px;
+        width: 100%;
+        margin: 10px 0;
         height: 60px;
         border-radius: 12px;
         box-shadow: 0 0 15px 0 #0000001a;
         background: #fff;
+    }
+
+    &__selector-item {
+        width: 100%;
+        margin: 0 16px;
+
+        &:not(:last-child) {
+            border-bottom: 1px solid #e5e5e5;
+        }
+    }
+
+    &__selector-header {
+        height: 58px;
+        width: 100%;
+        padding: 0 16px;
+        border-bottom: 1px solid #e5e5e5;
+        display: flex;
+        align-items: center;
+        justify-content: space-between;
+    }
+
+    &__selector-header-icon {
+        transform: translate(100%, rem(1px)) rotate(-90deg);
+        height: 16px;
+        width: 10px;
+        margin-right: 20px;
+
+        path {
+            fill: $color-primary-mineral-blue;
+        }
     }
 }

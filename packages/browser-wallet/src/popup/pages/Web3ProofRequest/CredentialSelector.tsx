@@ -1,12 +1,14 @@
 import Button from '@popup/shared/Button';
 import Modal from '@popup/shared/Modal';
 import React, { ComponentType, useState } from 'react';
+import BackIcon from '@assets/svg/back-arrow.svg';
 
 interface Props<T> {
     options: T[];
     initialIndex?: number;
     onChange: (x: T) => void;
     DisplayOption: ComponentType<{ option: T }>;
+    header: string;
 }
 
 /**
@@ -17,6 +19,7 @@ export default function CredentialSelector<T extends string | number | object>({
     initialIndex = 0,
     onChange,
     DisplayOption,
+    header,
 }: Props<T>) {
     const [chosenIndex, setChosenIndex] = useState<number>(initialIndex);
     const [open, setOpen] = useState(false);
@@ -28,21 +31,33 @@ export default function CredentialSelector<T extends string | number | object>({
     function onClick(index: number) {
         setChosenIndex(index);
         onChange(options[index]);
+        setOpen(false);
     }
 
     return (
         <Modal
+            disableClose
             open={open}
             onOpen={() => setOpen(true)}
             onClose={() => setOpen(false)}
             trigger={
-                <Button clear className="flex m-10 verifiable-credential__selector">
+                <Button clear className="verifiable-credential__selector">
                     <DisplayOption option={options[chosenIndex]} />
                 </Button>
             }
+            className="p-0"
         >
+            <div className="bodyL verifiable-credential__selector-header">
+                <p>{header}</p>
+                <BackIcon className="verifiable-credential__selector-header-icon" />
+            </div>
             {options.map((opt, index) => (
-                <Button clear key={opt.toString()} onClick={() => onClick(index)}>
+                <Button
+                    className="verifiable-credential__selector-item"
+                    clear
+                    key={opt.toString()}
+                    onClick={() => onClick(index)}
+                >
                     <DisplayOption option={options[index]} />
                 </Button>
             ))}

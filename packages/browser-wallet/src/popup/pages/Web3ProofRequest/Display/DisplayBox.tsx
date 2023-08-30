@@ -29,7 +29,7 @@ export function DisplayBox({ className, children, header, infoBox }: DisplayBoxP
                     }
                 >
                     {infoBox}
-                    <Button width="wide" onClick={() => setOpen(false)}>
+                    <Button className="new-button-styling w-full" width="wide" onClick={() => setOpen(false)}>
                         Ok
                     </Button>
                 </Modal>

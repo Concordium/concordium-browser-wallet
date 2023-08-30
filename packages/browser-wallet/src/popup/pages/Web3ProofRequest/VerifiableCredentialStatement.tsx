@@ -1,20 +1,15 @@
-import { MetadataUrl } from '@concordium/browser-wallet-api-helpers/lib/wallet-api-types';
 import { RevealStatementV2, StatementTypes, VerifiableCredentialStatement } from '@concordium/web-sdk';
 import Img from '@popup/shared/Img';
 import { storedVerifiableCredentialSchemasAtom } from '@popup/store/verifiable-credential';
-import { VerifiableCredential, VerifiableCredentialStatus } from '@shared/storage/types';
+import { VerifiableCredential } from '@shared/storage/types';
 import { useAtomValue } from 'jotai';
 import React, { useCallback, useEffect, useMemo, useState } from 'react';
-import { VerifiableCredentialCard } from '../VerifiableCredential/VerifiableCredentialCard';
+import { useTranslation } from 'react-i18next';
 import { useCredentialLocalization, useCredentialMetadata } from '../VerifiableCredential/VerifiableCredentialHooks';
 import CredentialSelector from './CredentialSelector';
 import { DisplayRevealStatements } from './Display/DisplayRevealStatements';
 import { DisplaySecretStatements } from './Display/DisplaySecretStatements';
 import { createWeb3IdDIDFromCredential, DisplayCredentialStatementProps, SecretStatementV2 } from './utils';
-
-function Logo({ logo }: { logo: MetadataUrl }) {
-    return <Img className="verifiable-credential__header__logo" src={logo.url} withDefaults />;
-}
 
 export function DisplayVC({ option }: { option: VerifiableCredential }) {
     const metadata = useCredentialMetadata(option);
@@ -25,8 +20,10 @@ export function DisplayVC({ option }: { option: VerifiableCredential }) {
 
     return (
         <header className="verifiable-credential__header">
-            <Logo logo={metadata.logo} />
-            <div className="verifiable-credential__header__title">{metadata.title}</div>
+            <div style={{ backgroundColor: metadata.backgroundColor }} className="web3-id-proof-request__selector-icon">
+                <Img className="web3-id-proof-request__selector-icon-image" src={metadata.logo.url} withDefaults />
+            </div>
+            <div className="web3-id-proof-request__selector-title display5">{metadata.title}</div>
         </header>
     );
 }
@@ -38,6 +35,7 @@ export default function DisplayWeb3Statement({
     setChosenId,
     net,
 }: DisplayCredentialStatementProps<VerifiableCredentialStatement, VerifiableCredential>) {
+    const { t } = useTranslation('web3IdProofRequest');
     const reveals = credentialStatement.statement.filter(
         (s) => s.type === StatementTypes.RevealAttribute
     ) as RevealStatementV2[];
@@ -75,19 +73,15 @@ export default function DisplayWeb3Statement({
         return null;
     }
 
+    // TODO translate selector header
     return (
         <div className="web3-id-proof-request__credential-statement-container">
-            <VerifiableCredentialCard
-                credentialSubject={chosenCredential.credentialSubject}
-                schema={schema}
-                credentialStatus={VerifiableCredentialStatus.Active}
-                metadata={metadata}
-                localization={localization.result}
-            />
+            <p>{t('descriptions.verifiableCredential')}</p>
             <CredentialSelector<VerifiableCredential>
                 options={validCredentials}
                 DisplayOption={DisplayVC}
                 onChange={onChange}
+                header="Select verifiable credential"
             />
             {reveals.length !== 0 && (
                 <DisplayRevealStatements

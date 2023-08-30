@@ -51,6 +51,10 @@ export type ModalProps<T extends WithOnClick = WithOnClick> = {
     onOpen?(): void;
     onClose?(): void;
     bottom?: boolean;
+    /**
+     * Used to overwrite styling for the modal content box
+     */
+    className?: string;
 };
 
 /**
@@ -64,6 +68,7 @@ export type ModalProps<T extends WithOnClick = WithOnClick> = {
  */
 export default function Modal<T extends WithOnClick = WithOnClick>({
     trigger,
+    className,
     disableClose = false,
     open: isOpenOverride,
     error = false,
@@ -143,7 +148,7 @@ export default function Modal<T extends WithOnClick = WithOnClick>({
                         {!isExiting && (
                             <DetectClickOutside
                                 as={motion.div}
-                                className={clsx('modal__content', error && 'modal__content--error')}
+                                className={clsx('modal__content', error && 'modal__content--error', className)}
                                 initial="closed"
                                 animate="open"
                                 exit="closed"

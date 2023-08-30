@@ -2,6 +2,7 @@ export default {
     header: '{{dappName}} requests the following information about you:',
     accept: 'Accept',
     continue: 'Continue',
+    back: 'Back',
     reject: 'Reject',
     displayStatement: {
         requirementsMet: 'You meet this requirement',
@@ -31,6 +32,11 @@ export default {
             nonMembership: 'This will prove that your {{ name }} is none of the following:\n{{ setNames }}',
             missingAttribute: 'The attribute cannot be found on the identity "{{identityName}}"',
         },
+    },
+    descriptions: {
+        verifiableCredential: 'Select a verifiable credential to reveal/prove the requested information.',
+        accountCredential:
+            'Select an account associated with the identity whose credentials will be used to reveal/prove the requested information.',
     },
     failedProof: 'Unable to create proof',
     failedProofReason: 'Unable to create proof due to: {{ reason }}',

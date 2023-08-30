@@ -37,6 +37,7 @@ import { VerifiableCredential, VerifiableCredentialStatus } from '@shared/storag
 import { getVerifiableCredentialStatus } from '@shared/utils/verifiable-credential-helpers';
 import { useAsyncMemo } from 'wallet-common-helpers';
 import { stringify } from '@concordium/browser-wallet-api/src/util';
+import CloseIcon from '@assets/svg/cross.svg';
 import {
     getAccountCredentialCommitmentInput,
     getViableAccountCredentialsForStatement,
@@ -234,13 +235,27 @@ export default function Web3ProofRequest({ onReject, onSubmit }: Props) {
                         })
                     }
                 />
-                <ButtonGroup className="web3-id-proof-request__actions">
-                    <Button disabled={creatingProof} onClick={withClose(onReject)}>
-                        {t('reject')}
+                <div className="web3-id-proof-request__actions flex">
+                    <Button
+                        danger
+                        className="web3-id-proof-request__reject-button"
+                        disabled={creatingProof}
+                        onClick={withClose(onReject)}
+                    >
+                        <CloseIcon className="web3-id-proof-request__reject-icon" />
                     </Button>
+                    {currentStatementIndex > 0 && (
+                        <Button
+                            disabled={creatingProof}
+                            className="web3-id-proof-request__back-button new-button-styling"
+                            onClick={() => setCurrentStatementIndex(currentStatementIndex - 1)}
+                        >
+                            {t('back')}
+                        </Button>
+                    )}
                     {currentStatementIndex === statements.length - 1 ? (
                         <Button
-                            className="flex-center"
+                            className="flex-center web3-id-proof-request__continue-button new-button-styling"
                             onClick={() => {
                                 setCreatingProof(true);
                                 handleSubmit()
@@ -262,13 +277,13 @@ export default function Web3ProofRequest({ onReject, onSubmit }: Props) {
                         </Button>
                     ) : (
                         <Button
-                            className="flex-center"
+                            className="flex-center web3-id-proof-request__continue-button new-button-styling"
                             onClick={() => setCurrentStatementIndex(currentStatementIndex + 1)}
                         >
                             {t('continue')}
                         </Button>
                     )}
-                </ButtonGroup>
+                </div>
             </div>
         </ExternalRequestLayout>
     );
