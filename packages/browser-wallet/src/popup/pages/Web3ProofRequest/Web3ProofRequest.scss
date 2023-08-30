@@ -18,8 +18,9 @@
 
     &__credential-statement-container {
         height: calc(100% - 115px);
-        overflow-y: overlay;
         margin-bottom: rem(20px);
+        scrollbar-gutter: stable;
+        margin-right: 16px;
     }
 
     &__selector-icon {
