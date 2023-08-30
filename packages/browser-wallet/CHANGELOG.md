@@ -2,6 +2,10 @@
 
 ## Unreleased
 
+### Added
+
+-   The wallet now validates verifiable credential attributes based on their type. String attributes can at most be 31 bytes (UTF-8), integer attributes must fit in a u64 and Date attributes must be between -262144-01-01T00:00:00> and +262143-12-31T23:59:59.999999999Z'.
+
 ### Fixed
 
 -   An issue where changing the credential metadata URL to an invalid URL, or a URL that does not contain a credential metadata file, would result in an empty screen.
