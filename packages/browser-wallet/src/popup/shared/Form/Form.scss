@@ -329,3 +329,75 @@ $handle-scale: scale(1.02);
         }
     }
 }
+
+.form-file-input {
+    &__root,
+    &__wrapper {
+        display: flex;
+        flex-direction: column;
+        justify-content: center;
+        align-items: center;
+        border-radius: 10px;
+    }
+
+    &__label {
+        margin-bottom: 5px;
+    }
+
+    &__root {
+        font-size: rem(12px);
+    }
+
+    &__disabled {
+        cursor: default;
+    }
+
+    &__wrapper {
+        flex: 1;
+        height: 100%;
+        width: 100%;
+        padding: 20px 30px;
+        position: relative;
+        border: 2px dashed $color-grey;
+
+        &__hovering & {
+            border-color: $color-cta;
+        }
+
+        &__invalid & {
+            border-color: $color-error;
+        }
+    }
+
+    &__fileName {
+        word-break: break-all;
+        text-align: center;
+    }
+
+    &__empty {
+        color: $color-grey;
+    }
+
+    &__input {
+        position: absolute;
+        top: 0;
+        bottom: 0;
+        left: 0;
+        right: 0;
+        opacity: 0;
+        width: 100%;
+        cursor: pointer;
+
+        &__disabled & {
+            cursor: default;
+        }
+    }
+
+    &__button {
+        pointer-events: none;
+
+        * + & {
+            margin-top: 30px;
+        }
+    }
+}
