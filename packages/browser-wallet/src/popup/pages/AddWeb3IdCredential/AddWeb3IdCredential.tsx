@@ -280,7 +280,9 @@ export default function AddWeb3IdCredential({ onAllow, onReject }: Props) {
                         onClick={() => {
                             if (schema) {
                                 setAcceptButtonDisabled(true);
-                                addCredential(schema).then(withClose(onAllow));
+                                addCredential(schema)
+                                    .then(withClose(onAllow))
+                                    .catch(() => setAcceptButtonDisabled(false));
                             }
                         }}
                     >
