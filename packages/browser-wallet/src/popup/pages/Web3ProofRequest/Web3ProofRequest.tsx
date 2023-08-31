@@ -11,6 +11,8 @@ import {
     ConcordiumGRPCClient,
     CommitmentInput,
     isVerifiableCredentialStatement,
+    CredentialStatement,
+    Network,
 } from '@concordium/web-sdk';
 import { InternalMessageType } from '@concordium/browser-wallet-message-hub';
 
@@ -25,7 +27,6 @@ import PendingArrows from '@assets/svg/pending-arrows.svg';
 import ExternalRequestLayout from '@popup/page-layouts/ExternalRequestLayout';
 import { fullscreenPromptContext } from '@popup/page-layouts/FullscreenPromptLayout';
 import Button from '@popup/shared/Button';
-import ButtonGroup from '@popup/shared/ButtonGroup';
 import { displayUrl } from '@popup/shared/utils/string-helpers';
 import {
     storedVerifiableCredentialsAtom,
@@ -35,7 +36,7 @@ import { useConfirmedIdentities } from '@popup/shared/utils/identity-helpers';
 import { parse } from '@shared/utils/payload-helpers';
 import { VerifiableCredential, VerifiableCredentialStatus } from '@shared/storage/types';
 import { getVerifiableCredentialStatus } from '@shared/utils/verifiable-credential-helpers';
-import { useAsyncMemo } from 'wallet-common-helpers';
+import { noOp, useAsyncMemo } from 'wallet-common-helpers';
 import { stringify } from '@concordium/browser-wallet-api/src/util';
 import CloseIcon from '@assets/svg/cross.svg';
 import {
@@ -75,19 +76,39 @@ async function getAllCredentialStatuses(
     return Object.fromEntries(statuses);
 }
 
-function DisplayNotProvable({ onClick, dappName }: { onClick: () => void; dappName: string }) {
+function DisplayNotProvable({
+    onClick,
+    dappName,
+    statement,
+    net,
+}: {
+    onClick: () => void;
+    dappName: string;
+    statement: CredentialStatement;
+    net: Network;
+}) {
     const { t } = useTranslation('web3IdProofRequest');
+    const credentials = useAtomValue(credentialsAtom);
+    const verifiableCredentials = useAtomValue(storedVerifiableCredentialsAtom);
+    const validCredentials = isAccountCredentialStatement(statement) ? credentials : verifiableCredentials.value;
 
+    // TODO fix display of reject button
     return (
         <ExternalRequestLayout>
             <div className="web3-id-proof-request__statement-container">
-                <h3 className="m-t-0 text-center">{t('unableToProve', { dappName })}</h3>
-                <ButtonGroup className="web3-id-proof-request__actions">
-                    <Button onClick={onClick}>{t('reject')}</Button>
-                    <Button className="flex-center" disabled>
-                        {t('accept')}
-                    </Button>
-                </ButtonGroup>
+                <p className="web3-id-proof-request__description bodyM">{t('descriptions.unableToProve')}</p>
+                <DisplayCredentialStatement
+                    className="m-t-10:not-first"
+                    dappName={dappName}
+                    validCredentials={validCredentials}
+                    credentialStatement={statement}
+                    net={net}
+                    setChosenId={noOp}
+                />
+
+                <Button className="web3-id-proof-request__reject-button" onClick={onClick}>
+                    {t('reject')}
+                </Button>
             </div>
         </ExternalRequestLayout>
     );
@@ -214,7 +235,14 @@ export default function Web3ProofRequest({ onReject, onSubmit }: Props) {
     }
 
     if (!canProve) {
-        return <DisplayNotProvable onClick={withClose(onReject)} dappName={dappName} />;
+        return (
+            <DisplayNotProvable
+                onClick={withClose(onReject)}
+                dappName={dappName}
+                net={net}
+                statement={statements[validCredentials.findIndex((v) => !v.length)]}
+            />
+        );
     }
 
     return (

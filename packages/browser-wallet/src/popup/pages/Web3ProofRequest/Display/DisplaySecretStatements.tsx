@@ -73,6 +73,7 @@ export function DisplaySecretStatements<Attribute extends AttributeType>({
         return {
             attribute: title,
             value: value.toString() ?? 'Unavailable',
+            // TODO this is not enough for secrets
             isRequirementMet: value !== undefined,
             description,
         };

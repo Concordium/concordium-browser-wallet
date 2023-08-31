@@ -16,7 +16,7 @@ export function DisplayRevealStatements<Attribute extends AttributeType>({
     attributes,
     dappName,
     schema,
-    formatAttribute = (_, value) => value.toString(),
+    formatAttribute = (_, value) => value?.toString(),
 }: Props<Attribute>) {
     const { t } = useTranslation('web3IdProofRequest', { keyPrefix: 'displayStatement' });
     const header = t('headers.reveal');
