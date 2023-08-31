@@ -102,8 +102,16 @@
         color: $color-secondary-ocean-blue;
     }
 
+    &__tooltip-button {
+        align-items: center;
+    }
+
     &__tooltip-icon {
         height: 24px;
+
+        path {
+            fill: $color-secondary-ocean-blue;
+        }
     }
 }
 
