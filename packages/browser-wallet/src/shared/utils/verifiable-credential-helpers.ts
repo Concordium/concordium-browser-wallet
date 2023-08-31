@@ -1,4 +1,11 @@
-import { CcdAmount, UpdateContractPayload, ConcordiumGRPCClient, ContractAddress, sha256 } from '@concordium/web-sdk';
+import {
+    CcdAmount,
+    UpdateContractPayload,
+    ConcordiumGRPCClient,
+    ContractAddress,
+    sha256,
+    ConcordiumHdWallet,
+} from '@concordium/web-sdk';
 import * as ed from '@noble/ed25519';
 import {
     MetadataUrl,
@@ -1158,4 +1165,33 @@ export function getCredentialIdFromSubjectDID(did: string) {
         throw new Error(`Given DID did not follow expected format: ${did}`);
     }
     return split[split.length - 1];
+}
+
+/**
+ * Finds the next unused verifiable credential index, i.e. the next index that has not
+ * been used as a credential holder id in the provided issuer contract.
+ * @param client the GRPC client for accessing a node
+ * @param localIndex the currently best guess on the next index, based on what is currently stored locally
+ * @param issuer the issuer credential registry contract
+ * @param hdWallet the key derivation wallet
+ * @returns the next unused verifiable credential index
+ */
+export async function findNextUnusedVerifiableCredentialIndex(
+    client: ConcordiumGRPCClient,
+    localIndex: number,
+    issuer: ContractAddress,
+    hdWallet: ConcordiumHdWallet
+): Promise<number> {
+    let index = localIndex;
+    let credentialAlreadyExists = true;
+
+    do {
+        const credentialHolderId = hdWallet.getVerifiableCredentialPublicKey(issuer, index).toString('hex');
+        credentialAlreadyExists = await isVerifiableCredentialInContract(client, credentialHolderId, issuer);
+        if (credentialAlreadyExists) {
+            index += 1;
+        }
+    } while (credentialAlreadyExists);
+
+    return index;
 }

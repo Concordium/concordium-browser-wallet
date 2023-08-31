@@ -22,15 +22,14 @@ import {
     fetchCredentialMetadata,
     fetchCredentialSchema,
     fetchLocalization,
+    findNextUnusedVerifiableCredentialIndex,
     getCredentialRegistryContractAddress,
-    isVerifiableCredentialInContract,
 } from '@shared/utils/verifiable-credential-helpers';
 import { APIVerifiableCredential } from '@concordium/browser-wallet-api-helpers';
 import { grpcClientAtom, networkConfigurationAtom } from '@popup/store/settings';
 import { MetadataUrl } from '@concordium/browser-wallet-api-helpers/lib/wallet-api-types';
 import { parse } from '@shared/utils/payload-helpers';
 import { logError } from '@shared/utils/log-helpers';
-import { ConcordiumHdWallet, ContractAddress } from '@concordium/web-sdk';
 import { addToastAtom } from '@popup/state';
 import { VerifiableCredentialCard } from '../VerifiableCredential/VerifiableCredentialCard';
 
@@ -172,25 +171,6 @@ export default function AddWeb3IdCredential({ onAllow, onReject }: Props) {
         [metadata, i18n]
     );
 
-    async function findNextUnusedVerifiableCredentialIndex(
-        localIndex: number,
-        issuer: ContractAddress,
-        hdWallet: ConcordiumHdWallet
-    ) {
-        let index = localIndex;
-        let credentialAlreadyExists = true;
-
-        do {
-            const credentialHolderId = hdWallet.getVerifiableCredentialPublicKey(issuer, index).toString('hex');
-            credentialAlreadyExists = await isVerifiableCredentialInContract(client, credentialHolderId, issuer);
-            if (credentialAlreadyExists) {
-                index += 1;
-            }
-        } while (credentialAlreadyExists);
-
-        return index;
-    }
-
     async function addCredential(credentialSchema: VerifiableCredentialSchema) {
         if (!wallet) {
             throw new Error('Wallet is unexpectedly missing');
@@ -207,7 +187,7 @@ export default function AddWeb3IdCredential({ onAllow, onReject }: Props) {
         // the next unused index based on that.
         let nextUnusedIndex: number;
         try {
-            nextUnusedIndex = await findNextUnusedVerifiableCredentialIndex(index, issuer, wallet);
+            nextUnusedIndex = await findNextUnusedVerifiableCredentialIndex(client, index, issuer, wallet);
         } catch (e) {
             addToast(t('error.findingNextIndex'));
             logError(e);
