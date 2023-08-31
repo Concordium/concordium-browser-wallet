@@ -1,7 +1,7 @@
 import en from './en';
 
 const t: typeof en = {
-    description: '{{ dapp }} anmoder at du tilføjer denne web3Id Credential til din wallet.',
+    description: '{{ dapp }} anmoder at du tilføjer denne Web3 ID credential til din wallet.',
     accept: 'Tilføj credential',
     reject: 'Annuller',
     error: {

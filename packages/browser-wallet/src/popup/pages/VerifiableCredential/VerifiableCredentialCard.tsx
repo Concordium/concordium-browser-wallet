@@ -1,10 +1,14 @@
 import React, { PropsWithChildren } from 'react';
 import { ClassName } from 'wallet-common-helpers';
 import clsx from 'clsx';
-import { VerifiableCredentialMetadata } from '@shared/utils/verifiable-credential-helpers';
+import {
+    VerifiableCredentialMetadata,
+    VerifiableCredentialSchemaWithFallback,
+} from '@shared/utils/verifiable-credential-helpers';
 import Img from '@popup/shared/Img';
 import { AttributeType, CredentialSubject } from '@concordium/web-sdk';
 import { VerifiableCredentialStatus, MetadataUrl, VerifiableCredentialSchema } from '@shared/storage/types';
+import { useTranslation } from 'react-i18next';
 import StatusIcon from './VerifiableCredentialStatus';
 
 function Logo({ logo }: { logo: MetadataUrl }) {
@@ -72,12 +76,31 @@ function ClickableVerifiableCredential({ children, onClick, metadata, className 
 }
 
 /**
+ * Checks that the schema has an entry for each attribute.
+ * @param schema the schema to validate against the attributes
+ * @param attributes the attributes which keys should be in the schema
+ * @returns true if all attribute keys are present in the schema, otherwise false
+ */
+function validateSchemaMatchesAttributes(
+    schema: VerifiableCredentialSchema,
+    attributes: Record<string, AttributeType>
+) {
+    for (const attributeKey of Object.keys(attributes)) {
+        const schemaProperty = schema.properties.credentialSubject.properties.attributes.properties[attributeKey];
+        if (!schemaProperty) {
+            return false;
+        }
+    }
+    return true;
+}
+
+/**
  * Apply the schema and localization to an attribute, adding the title from the schema or localization, which
  * should be displayed to the user.
+ * If there is a missing key in the schema, then the attribute key is used as the title instead.
  * @param schema the schema to apply
  * @param localization the localization to apply
  * @returns the attribute together with its title.
- * @throws if there is a mismatch in fields between the credential and the schema, i.e. the schema is invalid.
  */
 function applySchemaAndLocalization(
     schema: VerifiableCredentialSchema,
@@ -85,10 +108,7 @@ function applySchemaAndLocalization(
 ): (value: [string, AttributeType]) => { title: string; key: string; value: AttributeType } {
     return (value: [string, AttributeType]) => {
         const attributeSchema = schema.properties.credentialSubject.properties.attributes.properties[value[0]];
-        if (!attributeSchema) {
-            throw new Error(`Missing attribute schema for key: ${value[0]}`);
-        }
-        let { title } = attributeSchema;
+        let title = attributeSchema ? attributeSchema.title : value[0];
 
         if (localization) {
             const localizedTitle = localization[value[0]];
@@ -127,7 +147,7 @@ export function VerifiableCredentialCardHeader({
 
 interface CardProps extends ClassName {
     credentialSubject: Omit<CredentialSubject, 'id'>;
-    schema: VerifiableCredentialSchema;
+    schema: VerifiableCredentialSchemaWithFallback;
     credentialStatus: VerifiableCredentialStatus;
     metadata: VerifiableCredentialMetadata;
     onClick?: () => void;
@@ -143,6 +163,9 @@ export function VerifiableCredentialCard({
     className,
     localization,
 }: CardProps) {
+    const { t } = useTranslation('verifiableCredential');
+
+    const schemaMatchesCredentialAttributes = validateSchemaMatchesAttributes(schema, credentialSubject.attributes);
     const attributes = Object.entries(credentialSubject.attributes).map(
         applySchemaAndLocalization(schema, localization)
     );
@@ -152,6 +175,8 @@ export function VerifiableCredentialCard({
             <VerifiableCredentialCardHeader credentialStatus={credentialStatus} metadata={metadata} />
             {metadata.image && <DisplayImage image={metadata.image} />}
             <div className="verifiable-credential__body-attributes">
+                {schema.usingFallback && <div className="m-b-5">{t('errors.fallbackSchema')}</div>}
+                {!schemaMatchesCredentialAttributes && <div className="m-b-5">{t('errors.badSchema')}</div>}
                 {attributes &&
                     attributes.map((attribute) => (
                         <DisplayAttribute

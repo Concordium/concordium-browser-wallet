@@ -9,6 +9,7 @@
 ### Fixed
 
 -   An issue where changing the credential metadata URL to an invalid URL, or a URL that does not contain a credential metadata file, would result in an empty screen.
+-   Issues with a contract switching to an invalid schema or switching the schema to a new URL.
 -   The wallet now ensures that the verifiable credential index used when adding a credential has not already been used in the contract.
 -   An issue where an invalid Date would result in the epoch timestamp instead of returning an error.
 -   Enabled ID statement checks for Web3 ID proof requests containing account credential statements.
