@@ -319,9 +319,12 @@ export type TimestampProperty = {
 };
 
 type CredentialSchemaAttributes = {
+    title?: string;
+    description?: string;
+    type: 'object';
     properties: Record<string, CredentialSchemaProperty | TimestampProperty>;
     required: string[];
-} & CredentialSchemaProperty;
+};
 
 interface CredentialSchemaSubject {
     type: string;

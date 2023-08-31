@@ -409,9 +409,6 @@ const verifiableCredentialSchemaSchema = {
                                         description: {
                                             type: 'string',
                                         },
-                                        format: {
-                                            type: 'string',
-                                        },
                                         properties: {
                                             additionalProperties: {
                                                 anyOf: [
@@ -451,10 +448,11 @@ const verifiableCredentialSchemaSchema = {
                                             type: 'string',
                                         },
                                         type: {
+                                            const: 'object',
                                             type: 'string',
                                         },
                                     },
-                                    required: ['description', 'properties', 'required', 'title', 'type'],
+                                    required: ['type', 'properties', 'required'],
                                     type: 'object',
                                 },
                                 id: {
