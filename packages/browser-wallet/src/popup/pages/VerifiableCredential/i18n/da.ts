@@ -30,6 +30,12 @@ const t: typeof en = {
         NotActivated: 'Ikke aktiveret',
         Pending: 'Afventer',
     },
+    errors: {
+        badSchema:
+            'Skemaet stemmer ikke overens med attributterne. Kontakt udstederen af dit Web3 ID kort for at rapportere fejlen.',
+        fallbackSchema:
+            'Det var ikke muligt at hente skemaet for denne credential. Der benyttes et fallback skema til at vise denne credential. Kontakt udstederen af dit Web3 ID kort for at rapportere fejlen.',
+    },
 };
 
 export default t;

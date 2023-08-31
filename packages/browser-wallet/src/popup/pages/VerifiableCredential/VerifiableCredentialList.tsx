@@ -10,6 +10,7 @@ import { useTranslation } from 'react-i18next';
 import { VerifiableCredential, VerifiableCredentialSchema, VerifiableCredentialStatus } from '@shared/storage/types';
 import {
     VerifiableCredentialMetadata,
+    VerifiableCredentialSchemaWithFallback,
     getChangesToCredentialMetadata,
     getChangesToCredentialSchemas,
 } from '@shared/utils/verifiable-credential-helpers';
@@ -77,7 +78,7 @@ export function VerifiableCredentialCardWithStatusFromChain({
     className: string;
     onClick?: (
         status: VerifiableCredentialStatus,
-        schema: VerifiableCredentialSchema,
+        schema: VerifiableCredentialSchemaWithFallback,
         metadata: VerifiableCredentialMetadata,
         localization?: Record<string, string>
     ) => void;
@@ -120,7 +121,7 @@ export default function VerifiableCredentialList() {
     const [selected, setSelected] = useState<{
         credential: VerifiableCredential;
         status: VerifiableCredentialStatus;
-        schema: VerifiableCredentialSchema;
+        schema: VerifiableCredentialSchemaWithFallback;
         metadata: VerifiableCredentialMetadata;
         localization?: Record<string, string>;
     }>();
@@ -192,7 +193,7 @@ export default function VerifiableCredentialList() {
                             credential={credential}
                             onClick={(
                                 status: VerifiableCredentialStatus,
-                                schema: VerifiableCredentialSchema,
+                                schema: VerifiableCredentialSchemaWithFallback,
                                 metadata: VerifiableCredentialMetadata,
                                 localization?: Record<string, string>
                             ) => setSelected({ credential, status, schema, metadata, localization })}

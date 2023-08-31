@@ -8,6 +8,8 @@ import {
     verifyAtomicStatements,
     isAccountCredentialStatement,
     IDENTITY_SUBJECT_SCHEMA,
+    verifyIdstatement,
+    IdStatement,
 } from '@concordium/web-sdk';
 import {
     sessionVerifiableCredentials,
@@ -199,7 +201,8 @@ export const runIfValidWeb3IdProof: RunCondition<MessageStatusWrapper<undefined>
         // If a statement does not verify, an error is thrown.
         statements.every((credStatement) =>
             isAccountCredentialStatement(credStatement)
-                ? verifyAtomicStatements(credStatement.statement, IDENTITY_SUBJECT_SCHEMA)
+                ? verifyAtomicStatements(credStatement.statement, IDENTITY_SUBJECT_SCHEMA) &&
+                  verifyIdstatement(credStatement.statement as IdStatement)
                 : verifyAtomicStatements(credStatement.statement)
         );
 

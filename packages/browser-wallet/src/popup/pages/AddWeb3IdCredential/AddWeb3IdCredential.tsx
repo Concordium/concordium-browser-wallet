@@ -1,5 +1,5 @@
 import { fullscreenPromptContext } from '@popup/page-layouts/FullscreenPromptLayout';
-import { useAtom, useAtomValue } from 'jotai';
+import { useAtom, useAtomValue, useSetAtom } from 'jotai';
 import React, { useContext, useEffect, useState } from 'react';
 import { useTranslation } from 'react-i18next';
 import { useLocation } from 'react-router-dom';
@@ -22,13 +22,15 @@ import {
     fetchCredentialMetadata,
     fetchCredentialSchema,
     fetchLocalization,
+    findNextUnusedVerifiableCredentialIndex,
     getCredentialRegistryContractAddress,
 } from '@shared/utils/verifiable-credential-helpers';
 import { APIVerifiableCredential } from '@concordium/browser-wallet-api-helpers';
-import { networkConfigurationAtom } from '@popup/store/settings';
+import { grpcClientAtom, networkConfigurationAtom } from '@popup/store/settings';
 import { MetadataUrl } from '@concordium/browser-wallet-api-helpers/lib/wallet-api-types';
 import { parse } from '@shared/utils/payload-helpers';
 import { logError } from '@shared/utils/log-helpers';
+import { addToastAtom } from '@popup/state';
 import { VerifiableCredentialCard } from '../VerifiableCredential/VerifiableCredentialCard';
 
 type Props = {
@@ -61,8 +63,10 @@ export default function AddWeb3IdCredential({ onAllow, onReject }: Props) {
     const [schemas, setSchemas] = useAtom(storedVerifiableCredentialSchemasAtom);
     const wallet = useHdWallet();
     const network = useAtomValue(networkConfigurationAtom);
+    const client = useAtomValue(grpcClientAtom);
 
     const [error, setError] = useState<string>();
+    const addToast = useSetAtom(addToastAtom);
     const [validationComplete, setValidationComplete] = useState<boolean>(false);
 
     const { credential: rawCredential, url, metadataUrl } = state.payload;
@@ -172,22 +176,32 @@ export default function AddWeb3IdCredential({ onAllow, onReject }: Props) {
             throw new Error('Wallet is unexpectedly missing');
         }
 
-        const schemaUrl = credential.credentialSchema.id;
-        if (!Object.keys(schemas.value).includes(schemaUrl)) {
-            const updatedSchemas = { ...schemas.value };
-            updatedSchemas[schemaUrl] = credentialSchema;
-            setSchemas(updatedSchemas);
-        }
-        // Find the next unused index
-        // TODO verify index is unused on chain?
+        // Find the next unused verifiable credential index, based on what we have stored locally.
         const index = [...web3IdCredentials.value, ...storedWeb3IdCredentials.value].reduce(
             (best, cred) => (cred.issuer === credential.issuer ? Math.max(cred.index + 1, best) : best),
             0
         );
 
         const issuer = getCredentialRegistryContractAddress(credential.issuer);
+        // Check if the index has already been used in the contract on-chain, and use that to find
+        // the next unused index based on that.
+        let nextUnusedIndex: number;
+        try {
+            nextUnusedIndex = await findNextUnusedVerifiableCredentialIndex(client, index, issuer, wallet);
+        } catch (e) {
+            addToast(t('error.findingNextIndex'));
+            logError(e);
+            throw e;
+        }
 
-        const credentialHolderId = wallet.getVerifiableCredentialPublicKey(issuer, index).toString('hex');
+        const schemaUrl = credential.credentialSchema.id;
+        if (!Object.keys(schemas.value).includes(schemaUrl)) {
+            const updatedSchemas = { ...schemas.value };
+            updatedSchemas[schemaUrl] = credentialSchema;
+            setSchemas(updatedSchemas);
+        }
+
+        const credentialHolderId = wallet.getVerifiableCredentialPublicKey(issuer, nextUnusedIndex).toString('hex');
         const credentialSubjectId = createPublicKeyIdentifier(credentialHolderId, network);
         const credentialSubject = { ...credential.credentialSubject, id: credentialSubjectId };
         const credentialId = createCredentialId(credentialHolderId, issuer, network);
@@ -196,7 +210,7 @@ export default function AddWeb3IdCredential({ onAllow, onReject }: Props) {
             ...credential,
             credentialSubject,
             id: credentialId,
-            index,
+            index: nextUnusedIndex,
             metadataUrl: metadataUrl.url,
         };
         await setWeb3IdCredentials([...web3IdCredentials.value, fullCredential]);
@@ -229,7 +243,7 @@ export default function AddWeb3IdCredential({ onAllow, onReject }: Props) {
                         <VerifiableCredentialCard
                             credentialSubject={credential.credentialSubject}
                             className="add-web3Id-credential__card"
-                            schema={schema}
+                            schema={{ ...schema, usingFallback: false }}
                             credentialStatus={VerifiableCredentialStatus.Pending}
                             metadata={metadata}
                             localization={localization}
@@ -246,7 +260,9 @@ export default function AddWeb3IdCredential({ onAllow, onReject }: Props) {
                         onClick={() => {
                             if (schema) {
                                 setAcceptButtonDisabled(true);
-                                addCredential(schema).then(withClose(onAllow));
+                                addCredential(schema)
+                                    .then(withClose(onAllow))
+                                    .catch(() => setAcceptButtonDisabled(false));
                             }
                         }}
                     >
