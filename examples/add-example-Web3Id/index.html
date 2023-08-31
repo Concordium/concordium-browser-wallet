@@ -62,7 +62,13 @@
                 document.getElementById('web3ProofIdOnly').addEventListener('click', () => {
                     const statement = new concordiumSDK.Web3StatementBuilder()
                         .addForIdentityCredentials([0, 1, 2], (b) =>
-                            b.revealAttribute('firstName').addRange('dob', '08000101', '20000101')
+                            b
+                                .revealAttribute('idDocType')
+                                .revealAttribute('firstName')
+                                .revealAttribute('lastName')
+                                .revealAttribute('countryOfResidence')
+                                .addRange('dob', '19410101', '20050202')
+                                .addMembership('nationality', ['FR', 'ES', 'DK'])
                         )
                         .getStatements();
                     sendStatement(statement);
