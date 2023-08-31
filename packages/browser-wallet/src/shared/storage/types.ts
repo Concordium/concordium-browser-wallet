@@ -5,6 +5,8 @@ import type {
     HexString,
     IdentityObjectV1,
     Network,
+    SimplePropertyDetails,
+    TimestampPropertyDetails,
     Versioned,
 } from '@concordium/web-sdk';
 
@@ -315,15 +317,28 @@ export type TimestampProperty = {
     description?: string;
 };
 
+type IdDetails = {
+    title: string;
+    description?: string;
+    type: 'string';
+};
+
 type CredentialSchemaAttributes = {
-    properties: Record<string, CredentialSchemaProperty | TimestampProperty>;
+    properties: Record<
+        string,
+        CredentialSchemaProperty | TimestampProperty | SimplePropertyDetails | TimestampPropertyDetails
+    >;
     required: string[];
+    title?: string;
+    type: 'object';
+    description?: string;
+    format?: string;
 } & CredentialSchemaProperty;
 
-interface CredentialSchemaSubject {
+export interface CredentialSchemaSubject {
     type: string;
     properties: {
-        id: CredentialSchemaProperty;
+        id: IdDetails;
         attributes: CredentialSchemaAttributes;
     };
     required: string[];

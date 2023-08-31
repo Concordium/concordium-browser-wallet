@@ -1,7 +1,16 @@
-import { VerifiableCredentialSchema } from '@shared/storage/types';
+import { CredentialSchemaSubject } from '@shared/storage/types';
+import { ClassName } from 'wallet-common-helpers';
 
-export function getPropertyTitle(attributeTag: string, schema: VerifiableCredentialSchema) {
+export function getPropertyTitle(attributeTag: string, schemaSubject: CredentialSchemaSubject) {
     // TODO use localization here
-    const property = schema.properties.credentialSubject.properties.attributes.properties[attributeTag];
+    const property = schemaSubject.properties.attributes.properties[attributeTag];
     return property ? property.title : attributeTag;
 }
+
+export type DisplayProps<StatementType, Attribute> = ClassName & {
+    statements: StatementType[];
+    attributes: Record<string, Attribute>;
+    schema: CredentialSchemaSubject;
+    className: string;
+    formatAttribute?: (key: string, value: Attribute) => string;
+};

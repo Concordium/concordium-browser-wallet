@@ -18,7 +18,7 @@ type Props = {
 };
 
 function LoadingConnectAccountsRequest() {
-    return <ExternalRequestLayout />;
+    return <ExternalRequestLayout className="p-10" />;
 }
 
 export default function ConnectAccountsRequest({ onAllow, onReject }: Props) {
@@ -51,7 +51,7 @@ export default function ConnectAccountsRequest({ onAllow, onReject }: Props) {
     const urlDisplay = displayUrl(url);
 
     return (
-        <ExternalRequestLayout>
+        <ExternalRequestLayout className="p-10">
             <div className="h-full flex-column align-center">
                 <header className="text-center">
                     <h3 className="m-v-5">{t('header', { url: urlDisplay })}</h3>

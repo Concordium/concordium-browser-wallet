@@ -5,8 +5,9 @@ import {
     StatementTypes,
     AttributeKey,
     AttributeList,
+    IDENTITY_SUBJECT_SCHEMA,
 } from '@concordium/web-sdk';
-import { displaySplitAddress, useIdentityOf } from '@popup/shared/utils/account-helpers';
+import { displaySplitAddress, useIdentityName, useIdentityOf } from '@popup/shared/utils/account-helpers';
 import { useDisplayAttributeValue, useGetAttributeName } from '@popup/shared/utils/identity-helpers';
 import { WalletCredential, ConfirmedIdentity } from '@shared/storage/types';
 import React, { useCallback, useEffect, useState } from 'react';
@@ -23,6 +24,25 @@ import {
     useStatementName,
     useStatementValue,
 } from '../IdProofRequest/DisplayStatement/utils';
+import { DisplayRevealStatements } from './Display/DisplayRevealStatements';
+import { DisplaySecretStatements } from './Display/DisplaySecretStatements';
+
+export function DisplayAccount({ option }: { option: WalletCredential }) {
+    const identityName = useIdentityName(option);
+
+    if (!identityName) {
+        return null;
+    }
+
+    return (
+        <header className="verifiable-credential__header">
+            <div className="web3-id-proof-request__selector-title flex-column align-start">
+                <div className="display5">{displaySplitAddress(option.address)}</div>
+                <div className="bodyS">{identityName}</div>
+            </div>
+        </header>
+    );
+}
 
 type DisplaySecretStatementV2Props = ClassName & {
     identity?: ConfirmedIdentity;
@@ -97,12 +117,14 @@ export default function AccountStatement({
     setChosenId,
     net,
 }: DisplayCredentialStatementProps<AccountCredentialStatement, WalletCredential>) {
+    const { t } = useTranslation('web3IdProofRequest');
     const reveals = credentialStatement.statement.filter(
         (s) => s.type === StatementTypes.RevealAttribute
     ) as RevealStatementV2[];
     const secrets = credentialStatement.statement.filter(
         (s) => s.type !== StatementTypes.RevealAttribute
     ) as SecretStatementV2[];
+    const displayAttribute = useDisplayAttributeValue();
 
     const [chosenCredential, setChosenCredential] = useState<WalletCredential | undefined>(validCredentials[0]);
     // We do the type cast, because the check should have been done to filter validCredentials.
@@ -120,31 +142,38 @@ export default function AccountStatement({
         }
     }, []);
 
+    if (!identity) {
+        return null;
+    }
+
     return (
         <div className="web3-id-proof-request__credential-statement-container">
-            <CredentialSelector
+            <p className="web3-id-proof-request__description bodyM">{t('descriptions.accountCredential')}</p>
+            <CredentialSelector<WalletCredential>
                 options={validCredentials}
-                displayOption={(option) => displaySplitAddress(option.address)}
+                DisplayOption={DisplayAccount}
                 onChange={onChange}
+                header={t('select.accountCredential')}
             />
             {reveals.length !== 0 && (
-                <DisplayRevealStatementV2
-                    className="m-t-10:not-first"
+                <DisplayRevealStatements
+                    className="web3-id-proof-request__statement"
                     dappName={dappName}
-                    identity={identity}
+                    attributes={identity.idObject.value.attributeList.chosenAttributes}
                     statements={reveals}
+                    formatAttribute={displayAttribute}
+                    schema={IDENTITY_SUBJECT_SCHEMA}
                 />
             )}
-            {secrets.map((s, i) => (
-                <DisplaySecretStatementV2
-                    // eslint-disable-next-line react/no-array-index-key
-                    key={i} // Allow this, as we don't expect these to ever change.
-                    className="m-t-10:not-first"
-                    dappName={dappName}
-                    identity={identity}
-                    statement={s}
+            {secrets.length !== 0 && (
+                <DisplaySecretStatements
+                    className="web3-id-proof-request__statement"
+                    attributes={identity.idObject.value.attributeList.chosenAttributes}
+                    statements={secrets}
+                    formatAttribute={displayAttribute}
+                    schema={IDENTITY_SUBJECT_SCHEMA}
                 />
-            ))}
+            )}
         </div>
     );
 }

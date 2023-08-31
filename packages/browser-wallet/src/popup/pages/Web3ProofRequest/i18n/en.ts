@@ -33,6 +33,10 @@ export default {
             missingAttribute: 'The attribute cannot be found on the identity "{{identityName}}"',
         },
     },
+    select: {
+        verifiableCredential: 'Select verifiable credential',
+        accountCredential: 'Select Account',
+    },
     descriptions: {
         verifiableCredential: 'Select a verifiable credential to reveal/prove the requested information.',
         accountCredential:

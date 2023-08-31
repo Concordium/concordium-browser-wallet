@@ -1,28 +1,25 @@
 import { AttributeType, StatementTypes } from '@concordium/web-sdk';
-import { DisplayStatementLine } from '@popup/pages/IdProofRequest/DisplayStatement/DisplayStatement';
-import { VerifiableCredentialSchema } from '@shared/storage/types';
+import { CredentialSchemaSubject } from '@shared/storage/types';
 import React from 'react';
 import { TFunction, useTranslation } from 'react-i18next';
-import { ClassName } from 'wallet-common-helpers';
+import { DisplayStatementLine } from './DisplayStatementLine';
 import { DisplayBox } from './DisplayBox';
 import { SecretStatementV2 } from '../utils';
-import { getPropertyTitle } from './utils';
+import { DisplayProps, getPropertyTitle } from './utils';
 
-type SecretProps = ClassName & {
-    statements: SecretStatementV2[];
-    attributes: Record<string, AttributeType>;
-    schema: VerifiableCredentialSchema;
-    className: string;
-};
-
-function getStatementValue(
+function getStatementValue<Attribute extends AttributeType>(
     statement: SecretStatementV2,
-    schema: VerifiableCredentialSchema,
-    t: TFunction<'web3IdProofRequest', 'displayStatement'>
+    schema: CredentialSchemaSubject,
+    t: TFunction<'web3IdProofRequest', 'displayStatement'>,
+    formatAttribute: (key: string, value: Attribute) => string
 ): string {
     const name = getPropertyTitle(statement.attributeTag, schema);
     if (statement.type === StatementTypes.AttributeInRange) {
-        return t('proofs.range', { name, upper: statement.upper, lower: statement.lower });
+        return t('proofs.range', {
+            name,
+            upper: formatAttribute(statement.attributeTag, statement.upper as Attribute),
+            lower: formatAttribute(statement.attributeTag, statement.lower as Attribute),
+        });
     }
     if (statement.type === StatementTypes.AttributeInSet) {
         return t('proofs.membership', { name });
@@ -34,17 +31,23 @@ function getStatementValue(
     throw new Error('Unknown statement type');
 }
 
-function getStatementDescription(
+function getStatementDescription<Attribute extends AttributeType>(
     statement: SecretStatementV2,
-    schema: VerifiableCredentialSchema,
-    t: TFunction<'web3IdProofRequest', 'displayStatement'>
+    schema: CredentialSchemaSubject,
+    t: TFunction<'web3IdProofRequest', 'displayStatement'>,
+    formatAttribute: (key: string, value: Attribute) => string
 ) {
     const name = getPropertyTitle(statement.attributeTag, schema);
-    const listToString = (list: AttributeType[]) => list.map((member) => member.toString()).join(', ');
+    const listToString = (list: AttributeType[]) =>
+        list.map((member) => formatAttribute(statement.attributeTag, member as Attribute)).join(', ');
 
     switch (statement.type) {
         case StatementTypes.AttributeInRange:
-            return t('descriptions.range', { name, lower: statement.lower, upper: statement.upper });
+            return t('descriptions.range', {
+                name,
+                upper: formatAttribute(statement.attributeTag, statement.upper as Attribute),
+                lower: formatAttribute(statement.attributeTag, statement.lower as Attribute),
+            });
         case StatementTypes.AttributeInSet:
             return t('descriptions.membership', { name, setNames: listToString(statement.set) });
         case StatementTypes.AttributeNotInSet:
@@ -54,14 +57,19 @@ function getStatementDescription(
     }
 }
 
-export function DisplaySecretStatements({ schema, statements, className }: SecretProps) {
+export function DisplaySecretStatements<Attribute extends AttributeType>({
+    schema,
+    statements,
+    className,
+    formatAttribute = (_, value) => value.toString(),
+}: DisplayProps<SecretStatementV2, Attribute>) {
     const { t } = useTranslation('web3IdProofRequest', { keyPrefix: 'displayStatement' });
     const header = t('headers.secret');
 
     const lines = statements.map((s) => {
-        const value = getStatementValue(s, schema, t);
+        const value = getStatementValue(s, schema, t, formatAttribute);
         const title = getPropertyTitle(s.attributeTag, schema);
-        const description = getStatementDescription(s, schema, t);
+        const description = getStatementDescription(s, schema, t, formatAttribute);
         return {
             attribute: title,
             value: value.toString() ?? 'Unavailable',
@@ -81,7 +89,7 @@ export function DisplaySecretStatements({ schema, statements, className }: Secre
                 </>
             }
         >
-            <ul className="list-clear p-5 m-0">
+            <ul className="display-secret-statements__body list-clear">
                 {lines.map(({ description, ...l }, i) => (
                     <div className="display-secret-statements__line">
                         <DisplayStatementLine
@@ -90,7 +98,7 @@ export function DisplaySecretStatements({ schema, statements, className }: Secre
                             key={i} // Allow this, as we don't expect these to ever change.
                             {...l}
                         />
-                        <div className="display-statement__description">{description}</div>
+                        <div className="display-secret-statements__description bodyXS">{description}</div>
                     </div>
                 ))}
             </ul>

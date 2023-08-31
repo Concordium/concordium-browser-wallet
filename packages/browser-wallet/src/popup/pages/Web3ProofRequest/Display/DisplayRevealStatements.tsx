@@ -1,21 +1,23 @@
 import { AttributeType, RevealStatementV2 } from '@concordium/web-sdk';
-import { VerifiableCredentialSchema } from '@shared/storage/types';
 import React from 'react';
 import { Trans, useTranslation } from 'react-i18next';
-import { ClassName } from 'wallet-common-helpers';
-import { DisplayStatementLine } from '../../IdProofRequest/DisplayStatement/DisplayStatement';
+import WarningTriangleIcon from '@assets/svg/warning-triangle.svg';
+import { DisplayStatementLine } from './DisplayStatementLine';
 import { DisplayBox } from './DisplayBox';
-import { getPropertyTitle } from './utils';
+import { DisplayProps, getPropertyTitle } from './utils';
 
-type RevealProps = ClassName & {
+type Props<Attribute> = DisplayProps<RevealStatementV2, Attribute> & {
     dappName: string;
-    statements: RevealStatementV2[];
-    attributes: Record<string, AttributeType>;
-    schema: VerifiableCredentialSchema;
-    className: string;
 };
 
-export function DisplayRevealStatements({ className, statements, attributes, dappName, schema }: RevealProps) {
+export function DisplayRevealStatements<Attribute extends AttributeType>({
+    className,
+    statements,
+    attributes,
+    dappName,
+    schema,
+    formatAttribute = (_, value) => value.toString(),
+}: Props<Attribute>) {
     const { t } = useTranslation('web3IdProofRequest', { keyPrefix: 'displayStatement' });
     const header = t('headers.reveal');
 
@@ -24,7 +26,7 @@ export function DisplayRevealStatements({ className, statements, attributes, dap
         const title = getPropertyTitle(s.attributeTag, schema);
         return {
             attribute: title,
-            value: value.toString() ?? 'Unavailable',
+            value: formatAttribute(s.attributeTag, value) ?? 'Unavailable',
             isRequirementMet: value !== undefined,
         };
     });
@@ -35,12 +37,13 @@ export function DisplayRevealStatements({ className, statements, attributes, dap
             header={header}
             infoBox={
                 <>
+                    <WarningTriangleIcon />
                     <p className="display4">{t('revealTooltip.header')}</p>
                     <p className="bodyLightL">{t('revealTooltip.body')}</p>
                 </>
             }
         >
-            <ul className="list-clear p-5 m-0">
+            <ul className="display-reveal-statements__body list-clear">
                 {lines.map((l, i) => (
                     <DisplayStatementLine
                         className="display-reveal-statements__line"
@@ -50,11 +53,11 @@ export function DisplayRevealStatements({ className, statements, attributes, dap
                     />
                 ))}
             </ul>
-            <div className="display-statement__description">
+            <div className="display-reveal-statements__description bodyXS">
                 <Trans
                     ns="idProofRequest"
                     i18nKey="displayStatement.revealDescription"
-                    components={{ 1: <strong /> }}
+                    components={{ 1: <span className="heading7 color-feedback-negative-dark" /> }}
                     values={{ dappName }}
                 />
             </div>

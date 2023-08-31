@@ -45,6 +45,8 @@ function useScaling() {
         }
 
         if (dimensions && isSpawnedWindow) {
+            // TODO only for web3IdRequest?
+            dimensions = { width: 440, height: 870 };
             // Send a message to the BG script to resize the window.
             popupMessageHandler.sendInternalMessage(InternalMessageType.SetViewSize, dimensions).catch(noOp);
         }

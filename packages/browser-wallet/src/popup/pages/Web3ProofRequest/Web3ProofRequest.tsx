@@ -218,72 +218,70 @@ export default function Web3ProofRequest({ onReject, onSubmit }: Props) {
     }
 
     return (
-        <ExternalRequestLayout>
-            <div className="web3-id-proof-request__statement-container">
-                <DisplayCredentialStatement
-                    className="m-t-10:not-first"
-                    dappName={dappName}
-                    validCredentials={validCredentials[currentStatementIndex]}
-                    credentialStatement={statements[currentStatementIndex]}
-                    net={net}
-                    key={currentStatementIndex}
-                    setChosenId={(newId) =>
-                        setIds((currentIds) => {
-                            const newIds = [...currentIds];
-                            newIds[currentStatementIndex] = newId;
-                            return newIds;
-                        })
-                    }
-                />
-                <div className="web3-id-proof-request__actions flex">
+        <ExternalRequestLayout className="web3-id-proof-request__statement-container">
+            <DisplayCredentialStatement
+                className="m-t-10:not-first"
+                dappName={dappName}
+                validCredentials={validCredentials[currentStatementIndex]}
+                credentialStatement={statements[currentStatementIndex]}
+                net={net}
+                key={currentStatementIndex}
+                setChosenId={(newId) =>
+                    setIds((currentIds) => {
+                        const newIds = [...currentIds];
+                        newIds[currentStatementIndex] = newId;
+                        return newIds;
+                    })
+                }
+            />
+            <div className="web3-id-proof-request__actions flex">
+                <Button
+                    danger
+                    className="web3-id-proof-request__reject-button"
+                    disabled={creatingProof}
+                    onClick={withClose(onReject)}
+                >
+                    <CloseIcon className="web3-id-proof-request__reject-icon" />
+                </Button>
+                {currentStatementIndex > 0 && (
                     <Button
-                        danger
-                        className="web3-id-proof-request__reject-button"
                         disabled={creatingProof}
-                        onClick={withClose(onReject)}
+                        className="web3-id-proof-request__back-button new-button-styling"
+                        onClick={() => setCurrentStatementIndex(currentStatementIndex - 1)}
                     >
-                        <CloseIcon className="web3-id-proof-request__reject-icon" />
+                        {t('back')}
                     </Button>
-                    {currentStatementIndex > 0 && (
-                        <Button
-                            disabled={creatingProof}
-                            className="web3-id-proof-request__back-button new-button-styling"
-                            onClick={() => setCurrentStatementIndex(currentStatementIndex - 1)}
-                        >
-                            {t('back')}
-                        </Button>
-                    )}
-                    {currentStatementIndex === statements.length - 1 ? (
-                        <Button
-                            className="flex-center web3-id-proof-request__continue-button new-button-styling"
-                            onClick={() => {
-                                setCreatingProof(true);
-                                handleSubmit()
-                                    .then(withClose(onSubmit))
-                                    .catch((e) => {
-                                        setCreatingProof(false);
-                                        addToast(
-                                            e.message ? t('failedProofReason', { reason: e.message }) : t('failedProof')
-                                        );
-                                    });
-                            }}
-                            disabled={creatingProof || !canProve}
-                        >
-                            {creatingProof ? (
-                                <PendingArrows className="loading svg-white web3-id-proof-request__loading-icon" />
-                            ) : (
-                                t('accept')
-                            )}
-                        </Button>
-                    ) : (
-                        <Button
-                            className="flex-center web3-id-proof-request__continue-button new-button-styling"
-                            onClick={() => setCurrentStatementIndex(currentStatementIndex + 1)}
-                        >
-                            {t('continue')}
-                        </Button>
-                    )}
-                </div>
+                )}
+                {currentStatementIndex === statements.length - 1 ? (
+                    <Button
+                        className="flex-center web3-id-proof-request__continue-button new-button-styling"
+                        onClick={() => {
+                            setCreatingProof(true);
+                            handleSubmit()
+                                .then(withClose(onSubmit))
+                                .catch((e) => {
+                                    setCreatingProof(false);
+                                    addToast(
+                                        e.message ? t('failedProofReason', { reason: e.message }) : t('failedProof')
+                                    );
+                                });
+                        }}
+                        disabled={creatingProof || !canProve}
+                    >
+                        {creatingProof ? (
+                            <PendingArrows className="loading svg-white web3-id-proof-request__loading-icon" />
+                        ) : (
+                            t('accept')
+                        )}
+                    </Button>
+                ) : (
+                    <Button
+                        className="flex-center web3-id-proof-request__continue-button new-button-styling"
+                        onClick={() => setCurrentStatementIndex(currentStatementIndex + 1)}
+                    >
+                        {t('continue')}
+                    </Button>
+                )}
             </div>
         </ExternalRequestLayout>
     );

@@ -73,31 +73,30 @@ export default function DisplayWeb3Statement({
         return null;
     }
 
-    // TODO translate selector header
     return (
         <div className="web3-id-proof-request__credential-statement-container">
-            <p>{t('descriptions.verifiableCredential')}</p>
+            <p className="web3-id-proof-request__description bodyM">{t('descriptions.verifiableCredential')}</p>
             <CredentialSelector<VerifiableCredential>
                 options={validCredentials}
                 DisplayOption={DisplayVC}
                 onChange={onChange}
-                header="Select verifiable credential"
+                header={t('select.verifiableCredential')}
             />
             {reveals.length !== 0 && (
                 <DisplayRevealStatements
-                    className="m-t-10:not-first"
+                    className="web3-id-proof-request__statement"
                     dappName={dappName}
                     attributes={chosenCredential.credentialSubject.attributes}
                     statements={reveals}
-                    schema={schema}
+                    schema={schema.properties.credentialSubject}
                 />
             )}
             {secrets.length !== 0 && (
                 <DisplaySecretStatements
-                    className="m-t-10:not-first"
+                    className="web3-id-proof-request__statement"
                     attributes={chosenCredential.credentialSubject.attributes}
                     statements={secrets}
-                    schema={schema}
+                    schema={schema.properties.credentialSubject}
                 />
             )}
         </div>
