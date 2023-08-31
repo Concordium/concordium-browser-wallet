@@ -1,7 +1,7 @@
 import Button from '@popup/shared/Button';
 import Modal from '@popup/shared/Modal';
 import React, { ComponentType, useState } from 'react';
-import BackIcon from '@assets/svg/back-arrow.svg';
+import ArrowIcon from '@assets/svg/down-arrow.svg';
 
 interface Props<T> {
     options: T[];
@@ -41,15 +41,16 @@ export default function CredentialSelector<T extends string | number | object>({
             onOpen={() => setOpen(true)}
             onClose={() => setOpen(false)}
             trigger={
-                <Button clear className="verifiable-credential__selector">
+                <Button clear className="verifiable-credential__selector-trigger">
                     <DisplayOption option={options[chosenIndex]} />
+                    <ArrowIcon className="verifiable-credential__selector-trigger-icon" />
                 </Button>
             }
-            className="p-0"
+            className="verifiable-credential__selector-modal"
         >
             <div className="bodyL verifiable-credential__selector-header">
                 <p>{header}</p>
-                <BackIcon className="verifiable-credential__selector-header-icon" />
+                <ArrowIcon className="verifiable-credential__selector-header-icon" />
             </div>
             {options.map((opt, index) => (
                 <Button

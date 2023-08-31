@@ -13,6 +13,12 @@
         justify-content: flex-end;
     }
 
+    &--align-middle {
+        display: flex;
+        flex-direction: column;
+        justify-content: center;
+    }
+
     &__content {
         position: relative;
         width: 90%;

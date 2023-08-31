@@ -40,16 +40,12 @@
         display: flex;
         justify-content: center;
         align-items: center;
-        margin-left: 16px;
+        margin-right: 25px;
     }
 
     &__selector-icon-image {
         height: 28.3px;
         width: 28.3px;
-    }
-
-    &__selector-title {
-        margin-left: 25px;
     }
 
     &__reject-icon {
@@ -150,18 +146,30 @@
 }
 
 .verifiable-credential {
-    &__selector {
+    &__selector-trigger {
+        position: relative;
         width: 100%;
         margin: 0;
         height: 60px;
         border-radius: 12px;
         box-shadow: 0 0 15px 0 #0000001a;
         background: #fff;
+        padding-left: 16px;
+    }
+
+    &__selector-modal {
+        padding: 0;
+        border: none;
+        box-shadow: 0 0 15px 0 #0000001a;
+        margin-top: 178px;
+        margin-left: 32px;
+        margin-right: 32px;
+        width: calc(100% - 64px);
     }
 
     &__selector-item {
-        width: 100%;
-        margin: 0 16px;
+        width: calc(100% - 32px);
+        margin: 5px 16px;
 
         &:not(:last-child) {
             border-bottom: 1px solid #e5e5e5;
@@ -178,14 +186,20 @@
         justify-content: space-between;
     }
 
-    &__selector-header-icon {
-        transform: translate(100%, rem(1px)) rotate(-90deg);
-        height: 16px;
-        width: 10px;
-        margin-right: 20px;
+    &__selector-header-icon,
+    &__selector-trigger-icon {
+        height: 24px;
+        width: 24px;
 
         path {
             fill: $color-primary-mineral-blue;
         }
+    }
+
+    &__selector-trigger-icon {
+        position: absolute;
+        top: 18px;
+        right: 40px;
+        transform: translate(100%, rem(1px)) rotate(-90deg);
     }
 }
