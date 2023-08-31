@@ -43,7 +43,7 @@ const NO_CREDENTIALS_FIT = 'No temporary credentials fit the given id';
 const INVALID_CREDENTIAL_PROOF = 'Invalid credential proof given';
 const MISSING_CREDENTIAL_PROOF = 'No credential proof given';
 
-const MAX_U64 = 2n ** 64n;
+const MAX_U64 = 2n ** 64n - 1n;
 const MIN_DATE_ISO = '-262144-01-01T00:00:00Z';
 const MAX_DATE_ISO = '+262143-12-31T23:59:59.999999999Z';
 const MIN_DATE_TIMESTAMP = Date.parse(MIN_DATE_ISO);
@@ -148,9 +148,7 @@ export const runIfValidWeb3IdCredentialRequest: RunCondition<MessageStatusWrappe
             return rejectRequest(`Credential issuer network is not the same as the current wallet network`);
         }
 
-        for (const attributeEntry of Object.entries(credential.credentialSubject.attributes)) {
-            const attributeKey = attributeEntry[0];
-            const attributeValue = attributeEntry[1];
+        for (const [attributeKey, attributeValue] of Object.entries(credential.credentialSubject.attributes)) {
             if (typeof attributeValue === 'string' && Buffer.from(attributeValue, 'utf-8').length > 31) {
                 return rejectRequest(
                     `The attribute [${attributeValue}] for key [${attributeKey}] is greater than 31 bytes.`
