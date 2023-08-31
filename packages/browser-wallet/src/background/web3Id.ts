@@ -37,12 +37,19 @@ import {
 } from '@concordium/browser-wallet-message-hub';
 import { getNet } from '@shared/utils/network-helpers';
 import { WAIT_FOR_CLOSED_POPUP_ITERATIONS, WAIT_FOR_CLOSED_POPUP_TIMEOUT_MS } from '@shared/constants/web3id';
+import { Buffer } from 'buffer/';
 import { openWindow, RunCondition, testPopupOpen } from './window-management';
 import bgMessageHandler from './message-handler';
 
 const NO_CREDENTIALS_FIT = 'No temporary credentials fit the given id';
 const INVALID_CREDENTIAL_PROOF = 'Invalid credential proof given';
 const MISSING_CREDENTIAL_PROOF = 'No credential proof given';
+
+const MAX_U64 = 2n ** 64n - 1n;
+const MIN_DATE_ISO = '-262144-01-01T00:00:00Z';
+const MAX_DATE_ISO = '+262143-12-31T23:59:59.999999999Z';
+const MIN_DATE_TIMESTAMP = Date.parse(MIN_DATE_ISO);
+const MAX_DATE_TIMESTAMP = Date.parse(MAX_DATE_ISO);
 
 export async function web3IdAddCredentialFinishHandler(input: {
     credentialHolderIdDID: string;
@@ -110,6 +117,13 @@ export async function web3IdAddCredentialFinishHandler(input: {
     );
 }
 
+function rejectRequest(message: string): { run: false; response: MessageStatusWrapper<undefined> } {
+    return {
+        run: false,
+        response: { success: false, message },
+    };
+}
+
 /**
  * Run condition which ensures that the web3IdCredential request is valid.
  */
@@ -128,28 +142,38 @@ export const runIfValidWeb3IdCredentialRequest: RunCondition<MessageStatusWrappe
             !credential.type.includes('VerifiableCredential') ||
             !credential.type.includes('ConcordiumVerifiableCredential')
         ) {
-            return {
-                run: false,
-                response: { success: false, message: `Credential does not have the correct type` },
-            };
+            return rejectRequest('Credential does not have the correct type');
         }
 
         const credNetwork = getDIDNetwork(credential.issuer);
         if (net.toLowerCase() !== credNetwork) {
-            return {
-                run: false,
-                response: {
-                    success: false,
-                    message: `Credential issuer network is not the same as the current wallet network`,
-                },
-            };
+            return rejectRequest(`Credential issuer network is not the same as the current wallet network`);
         }
+
+        for (const [attributeKey, attributeValue] of Object.entries(credential.credentialSubject.attributes)) {
+            if (typeof attributeValue === 'string' && Buffer.from(attributeValue, 'utf-8').length > 31) {
+                return rejectRequest(
+                    `The attribute [${attributeValue}] for key [${attributeKey}] is greater than 31 bytes.`
+                );
+            }
+            if (typeof attributeValue === 'bigint' && (attributeValue < 0 || attributeValue > MAX_U64)) {
+                return rejectRequest(
+                    `The attribute [${attributeValue}] for key [${attributeKey}] is out of bounds for a u64 integer.`
+                );
+            }
+            if (
+                attributeValue instanceof Date &&
+                (attributeValue.getTime() < MIN_DATE_TIMESTAMP || attributeValue.getTime() > MAX_DATE_TIMESTAMP)
+            ) {
+                return rejectRequest(
+                    `The attribute [${attributeValue}] for key [${attributeKey}] is out of bounds for a Date. The Date must be between ${MIN_DATE_ISO} and ${MAX_DATE_ISO}`
+                );
+            }
+        }
+
         return { run: true };
     } catch (e) {
-        return {
-            run: false,
-            response: { success: false, message: `Credential is not well-formed: ${(e as Error).message}` },
-        };
+        return rejectRequest(`Credential is not well-formed: ${(e as Error).message}`);
     }
 };
 
@@ -170,10 +194,7 @@ export const createWeb3IdProofHandler: ExtensionMessageHandler = (msg, _sender, 
 
 export const runIfValidWeb3IdProof: RunCondition<MessageStatusWrapper<undefined>> = async (msg) => {
     if (!isHex(msg.payload.challenge)) {
-        return {
-            run: false,
-            response: { success: false, message: `Challenge is invalid, it should be a HEX encoded string` },
-        };
+        return rejectRequest(`Challenge is invalid, it should be a HEX encoded string`);
     }
     try {
         const statements: CredentialStatements = parse(msg.payload.statements);
@@ -187,20 +208,11 @@ export const runIfValidWeb3IdProof: RunCondition<MessageStatusWrapper<undefined>
 
         const noEmptyQualifier = statements.every((credStatement) => credStatement.idQualifier.issuers.length > 0);
         if (!noEmptyQualifier) {
-            return {
-                run: false,
-                response: {
-                    success: false,
-                    message: `Statements must have at least 1 possible identity provider / issuer`,
-                },
-            };
+            return rejectRequest(`Statements must have at least 1 possible identity provider / issuer`);
         }
         return { run: true };
     } catch (e) {
-        return {
-            run: false,
-            response: { success: false, message: `Statement is not well-formed: ${(e as Error).message}` },
-        };
+        return rejectRequest(`Statement is not well-formed: ${(e as Error).message}`);
     }
 };
 
