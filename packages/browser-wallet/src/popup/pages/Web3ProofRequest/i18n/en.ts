@@ -1,6 +1,6 @@
 export default {
     header: '{{dappName}} requests the following information about you:',
-    accept: 'Accept',
+    approve: 'Approve',
     continue: 'Continue',
     back: 'Back',
     reject: 'Reject',

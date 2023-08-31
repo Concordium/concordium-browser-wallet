@@ -85,7 +85,7 @@ function DisplayNotProvable({ onClick, dappName }: { onClick: () => void; dappNa
                 <ButtonGroup className="web3-id-proof-request__actions">
                     <Button onClick={onClick}>{t('reject')}</Button>
                     <Button className="flex-center" disabled>
-                        {t('accept')}
+                        {t('approve')}
                     </Button>
                 </ButtonGroup>
             </div>
@@ -271,7 +271,7 @@ export default function Web3ProofRequest({ onReject, onSubmit }: Props) {
                         {creatingProof ? (
                             <PendingArrows className="loading svg-white web3-id-proof-request__loading-icon" />
                         ) : (
-                            t('accept')
+                            t('approve')
                         )}
                     </Button>
                 ) : (

@@ -2,7 +2,7 @@ import type en from './en';
 
 const t: typeof en = {
     header: '{{dappName}} anmoder om følgende information om dig:',
-    accept: 'Godkend',
+    approve: 'Godkend',
     reject: 'Afvis',
     continue: 'Fortsæt',
     displayStatement: {
