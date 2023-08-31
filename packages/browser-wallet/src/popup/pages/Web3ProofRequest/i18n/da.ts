@@ -4,6 +4,7 @@ const t: typeof en = {
     header: '{{dappName}} anmoder om følgende information om dig:',
     accept: 'Godkend',
     reject: 'Afvis',
+    back: 'Tilbage',
     continue: 'Fortsæt',
     displayStatement: {
         requirementsMet: 'Du opfylder kravet',
@@ -33,6 +34,15 @@ const t: typeof en = {
             nonMembership: 'This will prove that your {{ name }} er IKKE en af følgende:\n{{ setNames }}',
             missingAttribute: 'Denne Attribut kan ikke findes på identiteten "{{identityName}}"',
         },
+    },
+    select: {
+        verifiableCredential: 'Vælg verifiable credential',
+        accountCredential: 'Væg Account',
+    },
+    descriptions: {
+        verifiableCredential: 'Vælg en verifiable credential til at afsløre/bevise den anmodet information.',
+        accountCredential:
+            'Vælg en account, hvis forbundne identity skal bruges til at afsløre/bevise den anmodet information.',
     },
     failedProof: 'Bevis kunne ikke oprettes',
     failedProofReason: 'Bevis kunne ikke oprettes: {{ reason }}',

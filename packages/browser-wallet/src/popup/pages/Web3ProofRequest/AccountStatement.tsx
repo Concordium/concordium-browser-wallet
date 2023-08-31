@@ -9,7 +9,7 @@ import {
 } from '@concordium/web-sdk';
 import { displaySplitAddress, useIdentityName, useIdentityOf } from '@popup/shared/utils/account-helpers';
 import { useDisplayAttributeValue, useGetAttributeName } from '@popup/shared/utils/identity-helpers';
-import { WalletCredential, ConfirmedIdentity } from '@shared/storage/types';
+import { WalletCredential, ConfirmedIdentity, CredentialSchemaSubject } from '@shared/storage/types';
 import React, { useCallback, useEffect, useState } from 'react';
 import { useTranslation } from 'react-i18next';
 import { ClassName } from 'wallet-common-helpers';
@@ -162,7 +162,7 @@ export default function AccountStatement({
                     attributes={identity.idObject.value.attributeList.chosenAttributes}
                     statements={reveals}
                     formatAttribute={displayAttribute}
-                    schema={IDENTITY_SUBJECT_SCHEMA}
+                    schema={IDENTITY_SUBJECT_SCHEMA as CredentialSchemaSubject}
                 />
             )}
             {secrets.length !== 0 && (
@@ -171,7 +171,7 @@ export default function AccountStatement({
                     attributes={identity.idObject.value.attributeList.chosenAttributes}
                     statements={secrets}
                     formatAttribute={displayAttribute}
-                    schema={IDENTITY_SUBJECT_SCHEMA}
+                    schema={IDENTITY_SUBJECT_SCHEMA as CredentialSchemaSubject}
                 />
             )}
         </div>
