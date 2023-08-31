@@ -32,6 +32,9 @@ function replacer(this: any, k: string, value: any) {
     }
     const rawValue = this[k];
     if (rawValue instanceof Date) {
+        if (Number.isNaN(rawValue.getTime())) {
+            throw new Error(`Received a Date instance that was an invalid Date. Raw value was: [${rawValue}]`);
+        }
         return { '@type': serializationTypes.Date, value };
     }
     if (Buffer.isBuffer(rawValue)) {

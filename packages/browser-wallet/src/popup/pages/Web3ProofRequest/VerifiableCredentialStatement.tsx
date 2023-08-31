@@ -1,11 +1,13 @@
 import { RevealStatementV2, StatementTypes, VerifiableCredentialStatement } from '@concordium/web-sdk';
 import Img from '@popup/shared/Img';
-import { storedVerifiableCredentialSchemasAtom } from '@popup/store/verifiable-credential';
 import { VerifiableCredential } from '@shared/storage/types';
-import { useAtomValue } from 'jotai';
-import React, { useCallback, useEffect, useMemo, useState } from 'react';
+import React, { useCallback, useEffect, useState } from 'react';
 import { useTranslation } from 'react-i18next';
-import { useCredentialLocalization, useCredentialMetadata } from '../VerifiableCredential/VerifiableCredentialHooks';
+import {
+    useCredentialLocalization,
+    useCredentialMetadata,
+    useCredentialSchema,
+} from '../VerifiableCredential/VerifiableCredentialHooks';
 import CredentialSelector from './CredentialSelector';
 import { DisplayRevealStatements } from './Display/DisplayRevealStatements';
 import { DisplaySecretStatements } from './Display/DisplaySecretStatements';
@@ -42,8 +44,6 @@ export default function DisplayWeb3Statement({
     const secrets = credentialStatement.statement.filter(
         (s) => s.type !== StatementTypes.RevealAttribute
     ) as SecretStatementV2[];
-    const verifiableCredentialSchemas = useAtomValue(storedVerifiableCredentialSchemasAtom);
-
     const [chosenCredential, setChosenCredential] = useState<VerifiableCredential | undefined>(validCredentials[0]);
 
     const onChange = useCallback((credential: VerifiableCredential) => {
@@ -58,14 +58,7 @@ export default function DisplayWeb3Statement({
         }
     }, []);
 
-    const schema = useMemo(() => {
-        if (!verifiableCredentialSchemas.loading && chosenCredential) {
-            const schemaId = chosenCredential.credentialSchema.id;
-            return verifiableCredentialSchemas.value[schemaId];
-        }
-        return null;
-    }, [chosenCredential?.id, verifiableCredentialSchemas.loading]);
-
+    const schema = useCredentialSchema(chosenCredential);
     const metadata = useCredentialMetadata(chosenCredential);
     const localization = useCredentialLocalization(chosenCredential);
 

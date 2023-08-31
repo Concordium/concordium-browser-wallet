@@ -28,6 +28,12 @@ const t = {
         NotActivated: 'Not activated',
         Pending: 'Pending',
     },
+    errors: {
+        badSchema:
+            'The credential schema does not match the credential attributes. Please contact the issuer of the Web3 ID credential to report the error.',
+        fallbackSchema:
+            'There was an issue retrieving the schema for the credential. Using fallback schema to display the credential. Please contact the issuer of the Web3 ID credential to report the error.',
+    },
 };
 
 export default t;

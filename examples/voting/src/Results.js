@@ -12,6 +12,7 @@ import { detectConcordiumProvider } from '@concordium/browser-wallet-api-helpers
 import { decodeView, decodeVotes } from './buffer';
 import { getView, getVotes } from './Wallet';
 import { REFRESH_INTERVAL } from './config';
+import Footer from './Footer';
 
 function VoteLink(props) {
     const { electionId, endsInMillis } = props;
@@ -155,6 +156,7 @@ function Results() {
             <footer>
                 <p>*Smart contract index on the Concordium chain</p>
             </footer>
+            <Footer />
         </Container>
     );
 }

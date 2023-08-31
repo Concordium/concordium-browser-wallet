@@ -1,13 +1,6 @@
 // The TESTNET_GENESIS_BLOCK_HASH is used to check that the user has its browser wallet connected to testnet and not to mainnet.
-import {
-    BrowserWalletConnector,
-    ephemeralConnectorType,
-    Network,
-    WalletConnectConnector,
-} from '@concordium/react-components';
+import { BrowserWalletConnector, ephemeralConnectorType, WalletConnectConnector } from '@concordium/react-components';
 import { SignClientTypes } from '@walletconnect/types';
-
-export const TESTNET_GENESIS_BLOCK_HASH = '4221332d34e1694168c2a0c0b3fd0f273809612cb13d000d5c2e00e85f50f796';
 
 export const E_SEALING_CONTRACT_NAME = 'eSealing';
 
@@ -27,12 +20,6 @@ const WALLET_CONNECT_OPTS: SignClientTypes.Options = {
         url: '#',
         icons: ['https://walletconnect.com/walletconnect-logo.png'],
     },
-};
-export const TESTNET: Network = {
-    name: 'testnet',
-    genesisHash: TESTNET_GENESIS_BLOCK_HASH,
-    jsonRpcUrl: 'https://json-rpc.testnet.concordium.com',
-    ccdScanBaseUrl: 'https://testnet.ccdscan.io',
 };
 
 export const BROWSER_WALLET = ephemeralConnectorType(BrowserWalletConnector.create);

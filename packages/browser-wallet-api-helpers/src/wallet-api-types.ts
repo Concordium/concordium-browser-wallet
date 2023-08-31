@@ -14,6 +14,7 @@ import type {
     CredentialSubject,
     HexString,
 } from '@concordium/web-sdk';
+import { LaxNumberEnumValue, LaxStringEnumValue } from './util';
 
 export interface MetadataUrl {
     url: string;
@@ -80,8 +81,6 @@ export enum SchemaType {
     Parameter = 'parameter',
 }
 
-type LaxStringEnumValue<E extends string> = `${E}`;
-
 export type SchemaWithContext = {
     type: LaxStringEnumValue<SchemaType>;
     value: string;
@@ -115,7 +114,7 @@ interface MainWalletApi {
      */
     sendTransaction(
         accountAddress: string,
-        type: AccountTransactionType.Update | AccountTransactionType.InitContract,
+        type: LaxNumberEnumValue<AccountTransactionType.Update | AccountTransactionType.InitContract>,
         payload: SendTransactionPayload,
         parameters: SmartContractParameters,
         schema: string | SchemaWithContext,
@@ -130,7 +129,7 @@ interface MainWalletApi {
      */
     sendTransaction(
         accountAddress: string,
-        type: AccountTransactionType,
+        type: LaxNumberEnumValue<AccountTransactionType>,
         payload: SendTransactionPayload
     ): Promise<string>;
     /**

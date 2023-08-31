@@ -9,7 +9,7 @@ import {
     ConfigureDelegationPayload,
 } from '@concordium/web-sdk';
 import { useSelectedAccountInfo } from '@popup/shared/AccountInfoListenerContext/AccountInfoListenerContext';
-import { useBlockChainParametersV1 } from '@popup/shared/BlockChainParametersProvider';
+import { useBlockChainParametersAboveV0 } from '@popup/shared/BlockChainParametersProvider';
 import Modal from '@popup/shared/Modal';
 import Button from '@popup/shared/Button';
 
@@ -28,7 +28,7 @@ export default function TransactionPopup({ transactionType, payload, showPopup, 
     const { t } = useTranslation('account', { keyPrefix: 'transactionPopup' });
     const { t: tShared } = useTranslation('shared');
     const accountInfo = useSelectedAccountInfo();
-    const parametersV1 = useBlockChainParametersV1();
+    const parametersV1 = useBlockChainParametersAboveV0();
 
     const message = useMemo(() => {
         if (accountInfo) {

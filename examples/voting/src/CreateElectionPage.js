@@ -5,11 +5,11 @@
 /* eslint-disable react/jsx-filename-extension */
 import React, { useEffect, useState } from 'react';
 import { Button, Col, Container, FloatingLabel, Form, InputGroup, Row, Spinner } from 'react-bootstrap';
-import { TransactionStatusEnum } from '@concordium/web-sdk';
 import { Link } from 'react-router-dom';
 import moment from 'moment';
 import Wallet, { createElection, init } from './Wallet';
 import { CONTRACT_NAME, MODULE_REF } from './config';
+import Footer from './Footer';
 
 async function addOption(options, setOptions, newOption, setOptionInput) {
     if (options.includes(newOption)) {
@@ -43,13 +43,12 @@ function CreateElectionPage() {
             const interval = setInterval(
                 () =>
                     client
-                        .getJsonRpcClient()
-                        .getTransactionStatus(submittedTxHash)
+                        .getGrpcClient()
+                        .getBlockItemStatus(submittedTxHash)
                         .then((status) => {
-                            if (status && status.status === TransactionStatusEnum.Finalized && status.outcomes) {
-                                const outcome = Object.values(status.outcomes)[0];
-                                if (outcome.result.outcome === 'success') {
-                                    const contractIndex = outcome.result.events[0].address.index;
+                            if (status && status.status === 'finalized') {
+                                if (status.outcome.summary.contractInitialized.address.index !== undefined) {
+                                    const contractIndex = status.outcome.summary.contractInitialized.address.index;
                                     setCreatedContractId(contractIndex);
                                 } else {
                                     console.error('creation failed');
@@ -161,6 +160,7 @@ function CreateElectionPage() {
                     )}
                 </Col>
             </Row>
+            <Footer />
         </Container>
     );
 }

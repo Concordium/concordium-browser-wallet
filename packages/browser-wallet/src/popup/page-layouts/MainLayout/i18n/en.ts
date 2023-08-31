@@ -16,7 +16,7 @@ const t = {
             passcode: 'Change passcode',
             about: 'About',
         },
-        addWeb3IdCredential: 'Add Web3Id Credential',
+        addWeb3IdCredential: 'Add Web3 ID Credential',
         connectAccountsRequest: 'Connect accounts',
         addTokens: 'Add tokens',
         idProof: 'Proof of identity',
