@@ -2,7 +2,7 @@ import clsx from 'clsx';
 import React from 'react';
 import { ClassName } from 'wallet-common-helpers';
 
-import CheckmarkIcon from '@assets/svg/checkmark-dark-green.svg';
+import CheckmarkIcon from '@assets/svg/check_small.svg';
 import CrossIcon from '@assets/svg/cross.svg';
 
 export type StatementLine = {
@@ -20,7 +20,7 @@ export function DisplayStatementLine({ attribute, value, isRequirementMet, class
             <div className="display-statement__line-value bodyM">
                 {value}
                 {isRequirementMet ? (
-                    <CheckmarkIcon className="display-statement__line-check" />
+                    <CheckmarkIcon className="display-statement__line-check display-statement-checkmark " />
                 ) : (
                     <CrossIcon className="display-statement__line-cross" />
                 )}

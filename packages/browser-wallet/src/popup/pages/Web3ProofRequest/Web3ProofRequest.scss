@@ -203,3 +203,11 @@
         transform: translate(100%, rem(1px)) rotate(-90deg);
     }
 }
+
+.display-statement-checkmark {
+    flex-shrink: 0;
+
+    path {
+        fill: $color-feedback-positive-base;
+    }
+}

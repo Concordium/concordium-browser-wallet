@@ -38,7 +38,7 @@ type StatementLineProps = StatementLine & ClassName;
 
 export function DisplayStatementLine({ attribute, value, isRequirementMet, className }: StatementLineProps) {
     return (
-        <li className={clsx(className, "display-statement__line")}>
+        <li className={clsx(className, 'display-statement__line')}>
             <div className="display-statement__line-attribute">{attribute}:</div>
             <div className="display-statement__line-value">
                 {value}
