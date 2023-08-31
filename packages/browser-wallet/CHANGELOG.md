@@ -2,10 +2,15 @@
 
 ## Unreleased
 
+### Changed
+
+-   Adjusted the schema validation for credential schemas to no longer require title and description. The type is now required to be 'object'.
+
 ### Fixed
 
 -   An issue where changing the credential metadata URL to an invalid URL, or a URL that does not contain a credential metadata file, would result in an empty screen.
 -   An issue where an invalid Date would result in the epoch timestamp instead of returning an error.
+-   Enabled ID statement checks for Web3 ID proof requests containing account credential statements.
 
 ## 1.1.3
 
