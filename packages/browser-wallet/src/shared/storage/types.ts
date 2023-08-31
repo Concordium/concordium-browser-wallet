@@ -345,5 +345,3 @@ export interface VerifiableCredentialSchema {
     properties: SchemaProperties;
     required: string[];
 }
-
-export type VerifiableCredentialSchemaWithFallback = VerifiableCredentialSchema & { usingFallback: boolean };

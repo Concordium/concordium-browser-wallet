@@ -1,15 +1,13 @@
 import React, { PropsWithChildren } from 'react';
 import { ClassName } from 'wallet-common-helpers';
 import clsx from 'clsx';
-import { VerifiableCredentialMetadata } from '@shared/utils/verifiable-credential-helpers';
+import {
+    VerifiableCredentialMetadata,
+    VerifiableCredentialSchemaWithFallback,
+} from '@shared/utils/verifiable-credential-helpers';
 import Img from '@popup/shared/Img';
 import { AttributeType, CredentialSubject } from '@concordium/web-sdk';
-import {
-    VerifiableCredentialStatus,
-    MetadataUrl,
-    VerifiableCredentialSchema,
-    VerifiableCredentialSchemaWithFallback,
-} from '@shared/storage/types';
+import { VerifiableCredentialStatus, MetadataUrl, VerifiableCredentialSchema } from '@shared/storage/types';
 import { useTranslation } from 'react-i18next';
 import StatusIcon from './VerifiableCredentialStatus';
 
@@ -110,10 +108,7 @@ function applySchemaAndLocalization(
 ): (value: [string, AttributeType]) => { title: string; key: string; value: AttributeType } {
     return (value: [string, AttributeType]) => {
         const attributeSchema = schema.properties.credentialSubject.properties.attributes.properties[value[0]];
-        let title = value[0];
-        if (attributeSchema) {
-            title = attributeSchema.title;
-        }
+        let title = attributeSchema ? attributeSchema.title : value[0];
 
         if (localization) {
             const localizedTitle = localization[value[0]];

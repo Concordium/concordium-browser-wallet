@@ -1,10 +1,6 @@
 import React, { useCallback, useMemo, useState } from 'react';
 import { useAtomValue } from 'jotai';
-import {
-    VerifiableCredential,
-    VerifiableCredentialSchemaWithFallback,
-    VerifiableCredentialStatus,
-} from '@shared/storage/types';
+import { VerifiableCredential, VerifiableCredentialStatus } from '@shared/storage/types';
 import Topbar, { ButtonTypes, MenuButton } from '@popup/shared/Topbar/Topbar';
 import { useTranslation } from 'react-i18next';
 import { AccountTransactionType } from '@concordium/web-sdk';
@@ -21,6 +17,7 @@ import {
     getCredentialRegistryContractAddress,
     getRevokeTransactionExecutionEnergyEstimate,
     getContractAddressFromIssuerDID,
+    VerifiableCredentialSchemaWithFallback,
 } from '@shared/utils/verifiable-credential-helpers';
 import { fetchContractName } from '@shared/utils/token-helpers';
 import { TimeStampUnit, dateFromTimestamp, ClassName } from 'wallet-common-helpers';

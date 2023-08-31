@@ -7,14 +7,10 @@ import {
 import { useAtomValue, useAtom } from 'jotai';
 import Topbar, { ButtonTypes } from '@popup/shared/Topbar/Topbar';
 import { useTranslation } from 'react-i18next';
-import {
-    VerifiableCredential,
-    VerifiableCredentialSchema,
-    VerifiableCredentialSchemaWithFallback,
-    VerifiableCredentialStatus,
-} from '@shared/storage/types';
+import { VerifiableCredential, VerifiableCredentialSchema, VerifiableCredentialStatus } from '@shared/storage/types';
 import {
     VerifiableCredentialMetadata,
+    VerifiableCredentialSchemaWithFallback,
     getChangesToCredentialMetadata,
     getChangesToCredentialSchemas,
 } from '@shared/utils/verifiable-credential-helpers';

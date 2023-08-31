@@ -13,6 +13,8 @@ import { applyExecutionNRGBuffer, getContractName } from './contract-helpers';
 import { getNet } from './network-helpers';
 import { logError } from './log-helpers';
 
+export type VerifiableCredentialSchemaWithFallback = VerifiableCredentialSchema & { usingFallback: boolean };
+
 /**
  * Extracts the credential holder id from a verifiable credential id (did).
  * @param credentialId the did for a credential

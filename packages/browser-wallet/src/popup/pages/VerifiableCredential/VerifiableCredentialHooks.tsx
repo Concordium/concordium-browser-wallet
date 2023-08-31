@@ -1,10 +1,5 @@
 import { grpcClientAtom } from '@popup/store/settings';
-import {
-    VerifiableCredential,
-    VerifiableCredentialStatus,
-    VerifiableCredentialSchema,
-    VerifiableCredentialSchemaWithFallback,
-} from '@shared/storage/types';
+import { VerifiableCredential, VerifiableCredentialStatus } from '@shared/storage/types';
 import {
     CredentialQueryResponse,
     IssuerMetadata,
@@ -16,6 +11,7 @@ import {
     getCredentialRegistryMetadata,
     getVerifiableCredentialEntry,
     getVerifiableCredentialStatus,
+    VerifiableCredentialSchemaWithFallback,
 } from '@shared/utils/verifiable-credential-helpers';
 import { useAtomValue } from 'jotai';
 import { useEffect, useState } from 'react';
@@ -60,7 +56,7 @@ export function useCredentialStatus(credential: VerifiableCredential) {
 export function useCredentialSchema(
     credential?: VerifiableCredential
 ): VerifiableCredentialSchemaWithFallback | undefined {
-    const [schema, setSchema] = useState<VerifiableCredentialSchema & { usingFallback: boolean }>();
+    const [schema, setSchema] = useState<VerifiableCredentialSchemaWithFallback>();
     const schemas = useAtomValue(storedVerifiableCredentialSchemasAtom);
     const client = useAtomValue(grpcClientAtom);
 
