@@ -43,7 +43,7 @@ export default function Login() {
             try {
                 await decrypt(encryptedSeedPhrase.value, vs.passcode);
                 // If decryption did not throw an error, then the password is correct.
-                setPasscodeInSession(vs.passcode);
+                await setPasscodeInSession(vs.passcode);
                 navigate(state.to, { state: state.toState });
             } catch {
                 form.setError('passcode', { message: t('incorrectPasscode') });

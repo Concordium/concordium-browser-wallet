@@ -50,7 +50,7 @@ async function isWalletLocked(): Promise<boolean> {
 /**
  * Determines whether the given url has been whitelisted by any account.
  */
-async function isWhiteListedForAnyAccount(url: string): Promise<boolean> {
+async function isAllowListedForAnyAccount(url: string): Promise<boolean> {
     const urlOrigin = new URL(url).origin;
     const connectedSites = await storedConnectedSites.get();
     if (connectedSites) {
@@ -71,7 +71,7 @@ async function performRpcCall(
         onFailure(walletLockedMessage);
     }
 
-    const isWhiteListed = await isWhiteListedForAnyAccount(senderUrl);
+    const isWhiteListed = await isAllowListedForAnyAccount(senderUrl);
     if (isWhiteListed) {
         const url = (await storedCurrentNetwork.get())?.jsonRpcUrl;
         if (!url) {
@@ -101,7 +101,7 @@ async function exportGRPCLocation(
     onSuccess: (response: string | undefined) => void,
     onFailure: (response: string) => void
 ): Promise<void> {
-    const isWhiteListed = await isWhiteListedForAnyAccount(callerUrl);
+    const isWhiteListed = await isAllowListedForAnyAccount(callerUrl);
     if (!isWhiteListed) {
         return onFailure(rpcCallNotAllowedMessage);
     }
@@ -260,9 +260,8 @@ const NOT_WHITELISTED = 'Site is not whitelisted';
 const runIfWhitelisted: RunCondition<MessageStatusWrapper<undefined>> = async (msg, sender) => {
     const { accountAddress } = msg.payload;
     const connectedSites = await storedConnectedSites.get();
-    const locked = await isWalletLocked();
 
-    if (!accountAddress || connectedSites === undefined || locked) {
+    if (!accountAddress || connectedSites === undefined) {
         return { run: false, response: { success: false, message: NOT_WHITELISTED } };
     }
 
@@ -349,7 +348,6 @@ async function findPrioritizedAccountConnectedToSite(url: string): Promise<strin
  * Run condition that runs the handler if the wallet is non-empty (an account exists), and no
  * account in the wallet is connected to the sender URL.
  *
- * 1. If the wallet is locked, then do run.
  * 1. If no selected account exists (the wallet is empty), then do not run and return undefined.
  * 1. Else if the selected account is connected to the sender URL, then do not run and return the selected account address.
  * 1. Else if any other account is connected to the sender URL, then do not run and return that account's address.
@@ -365,11 +363,6 @@ const runIfNotWhitelisted: RunCondition<MessageStatusWrapper<string | undefined>
     // No accounts in the wallet.
     if (selectedAccount === undefined) {
         return { run: false, response: { success: false, message: 'No account in the wallet' } };
-    }
-
-    const locked = await isWalletLocked();
-    if (locked) {
-        return { run: true };
     }
 
     const accountConnectedToSite = await findPrioritizedAccountConnectedToSite(sender.url);
@@ -411,16 +404,10 @@ const handleConnectionResponse: HandleResponse<MessageStatusWrapper<string | und
  * Callback method which returns the prioritized account's address.
  */
 const getMostRecentlySelectedAccountHandler: ExtensionMessageHandler = (_msg, sender, respond) => {
-    isWalletLocked().then((locked) => {
-        if (locked) {
-            respond(undefined);
-        } else {
-            if (!sender.url) {
-                throw new Error('Expected URL to be available for sender.');
-            }
-            findPrioritizedAccountConnectedToSite(sender.url).then(respond);
-        }
-    });
+    if (!sender.url) {
+        throw new Error('Expected URL to be available for sender.');
+    }
+    findPrioritizedAccountConnectedToSite(sender.url).then(respond);
     return true;
 };
 
@@ -430,14 +417,14 @@ bgMessageHandler.handleMessage(
 );
 
 const getSelectedChainHandler: ExtensionMessageHandler = (_msg, sender, respond) => {
-    isWalletLocked().then((locked) => {
-        if (locked) {
+    if (!sender.url) {
+        throw new Error('Expected URL to be available for sender.');
+    }
+
+    isAllowListedForAnyAccount(sender.url).then((allowListed) => {
+        if (!allowListed) {
             respond(undefined);
         } else {
-            if (!sender.url) {
-                throw new Error('Expected URL to be available for sender.');
-            }
-
             getGenesisHash()
                 .then(respond)
                 .catch(() => respond(undefined));

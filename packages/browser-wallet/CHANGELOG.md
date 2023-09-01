@@ -1,5 +1,11 @@
 # Changelog
 
+## Unreleased
+
+### Changed
+
+-   Allow allowlisted sites to connect/requestAccounts/getSelectedChain/getMostRecentlySelectedAccount without unlocking. The user will still be prompted to unlock if other requests are made.
+
 ## 1.0.7
 
 ### Added
