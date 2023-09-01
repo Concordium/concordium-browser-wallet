@@ -94,13 +94,13 @@
 .new-button-styling {
     height: 48px;
     border-radius: 16px;
-    background: linear-gradient(94.88deg, #005a78 -3.22%, #48a2ae 87.51%);
+    background: $gradient-dark-mineral-blue-button;
     box-shadow: 0 0 15px 0 #0003;
 }
 
 .display-box {
     border-radius: 16px;
-    box-shadow: 0 0 15px 0 #0000001a;
+    box-shadow: $standard-box-shadow;
 
     &__header {
         background: linear-gradient(91.35deg, #b6dadf 13.38%, #daecef 93.45%);
@@ -146,7 +146,7 @@
         margin-top: 5px;
 
         &:not(:last-child) {
-            border-bottom: 1px solid #e5e5e5;
+            border-bottom: 1px solid $color-neutral-gray-10;
         }
     }
 
@@ -163,15 +163,15 @@
         margin: 0;
         height: 60px;
         border-radius: 12px;
-        box-shadow: 0 0 15px 0 #0000001a;
-        background: #fff;
+        box-shadow: $standard-box-shadow;
+        background: $color-neutral-white;
         padding-left: 16px;
     }
 
     &__selector-modal {
         padding: 0;
         border: none;
-        box-shadow: 0 0 15px 0 #0000001a;
+        box-shadow: $standard-box-shadow;
         margin-top: 178px;
         margin-left: 32px;
         margin-right: 32px;
@@ -183,7 +183,7 @@
         margin: 5px 16px;
 
         &:not(:last-child) {
-            border-bottom: 1px solid #e5e5e5;
+            border-bottom: 1px solid $color-neutral-gray-10;
         }
     }
 
@@ -191,7 +191,7 @@
         height: 58px;
         width: 100%;
         padding: 0 16px;
-        border-bottom: 1px solid #e5e5e5;
+        border-bottom: 1px solid $color-neutral-gray-10;
         display: flex;
         align-items: center;
         justify-content: space-between;

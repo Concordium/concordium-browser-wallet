@@ -37,7 +37,7 @@ const t: typeof en = {
     },
     select: {
         verifiableCredential: 'Vælg verifiable credential',
-        accountCredential: 'Væg Account',
+        accountCredential: 'Væg konto',
     },
     descriptions: {
         verifiableCredential: 'Vælg en verifiable credential til at afsløre/bevise den anmodet information.',

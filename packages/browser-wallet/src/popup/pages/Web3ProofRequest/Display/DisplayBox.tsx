@@ -19,6 +19,7 @@ export function DisplayBox({ className, children, header, infoBox }: DisplayBoxP
             <header className="display-box__header">
                 <div className="display6">{header}</div>
                 <Modal
+                    disableClose
                     middle
                     open={open}
                     onOpen={() => setOpen(true)}

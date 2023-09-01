@@ -4,6 +4,9 @@ import React, { ComponentType, useState } from 'react';
 import ArrowIcon from '@assets/svg/down-arrow.svg';
 
 interface Props<T> {
+    /**
+     * Must include at least 1 option
+     */
     options: T[];
     initialIndex?: number;
     onChange: (x: T) => void;
@@ -25,7 +28,7 @@ export default function CredentialSelector<T extends string | number | object>({
     const [open, setOpen] = useState(false);
 
     if (options.length === 0) {
-        return null;
+        throw new Error('No options given to selector');
     }
 
     function onClick(index: number) {
