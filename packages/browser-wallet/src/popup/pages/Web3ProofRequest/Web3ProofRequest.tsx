@@ -92,11 +92,12 @@ function DisplayNotProvable({
     const verifiableCredentials = useAtomValue(storedVerifiableCredentialsAtom);
     const validCredentials = isAccountCredentialStatement(statement) ? credentials : verifiableCredentials.value;
 
-    // TODO fix display of reject button
     return (
         <ExternalRequestLayout>
             <div className="web3-id-proof-request__statement-container">
-                <p className="web3-id-proof-request__description bodyM">{t('descriptions.unableToProve')}</p>
+                <p className="web3-id-proof-request__not-provable-description bodyM ">
+                    {t('descriptions.unableToProve')}
+                </p>
                 <DisplayCredentialStatement
                     className="m-t-10:not-first"
                     dappName={dappName}
@@ -104,11 +105,13 @@ function DisplayNotProvable({
                     credentialStatement={statement}
                     net={net}
                     setChosenId={noOp}
+                    showDescription={false}
                 />
-
-                <Button className="web3-id-proof-request__reject-button" onClick={onClick}>
-                    {t('reject')}
-                </Button>
+                <div className="web3-id-proof-request__actions flex">
+                    <Button className="web3-id-proof-request__not-provable-button flex-child-fill" onClick={onClick}>
+                        {t('reject')}
+                    </Button>
+                </div>
             </div>
         </ExternalRequestLayout>
     );
@@ -261,6 +264,7 @@ export default function Web3ProofRequest({ onReject, onSubmit }: Props) {
                         return newIds;
                     })
                 }
+                showDescription
             />
             <div className="web3-id-proof-request__actions flex">
                 <Button

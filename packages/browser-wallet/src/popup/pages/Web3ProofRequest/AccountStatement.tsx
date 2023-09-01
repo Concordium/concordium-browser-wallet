@@ -38,6 +38,7 @@ export default function AccountStatement({
     dappName,
     setChosenId,
     net,
+    showDescription,
 }: DisplayCredentialStatementProps<AccountCredentialStatement, WalletCredential>) {
     const { t } = useTranslation('web3IdProofRequest');
     const reveals = credentialStatement.statement.filter(
@@ -70,7 +71,9 @@ export default function AccountStatement({
 
     return (
         <div className="web3-id-proof-request__credential-statement-container">
-            <p className="web3-id-proof-request__description bodyM">{t('descriptions.accountCredential')}</p>
+            {showDescription && (
+                <p className="web3-id-proof-request__description bodyM">{t('descriptions.accountCredential')}</p>
+            )}
             <CredentialSelector<WalletCredential>
                 options={validCredentials}
                 DisplayOption={DisplayAccount}
