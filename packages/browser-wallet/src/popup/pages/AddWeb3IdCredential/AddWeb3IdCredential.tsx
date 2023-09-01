@@ -31,6 +31,7 @@ import { MetadataUrl } from '@concordium/browser-wallet-api-helpers/lib/wallet-a
 import { parse } from '@shared/utils/payload-helpers';
 import { logError } from '@shared/utils/log-helpers';
 import { addToastAtom } from '@popup/state';
+import { Schema, Validator } from 'jsonschema';
 import { VerifiableCredentialCard } from '../VerifiableCredential/VerifiableCredentialCard';
 
 type Props = {
@@ -115,23 +116,31 @@ export default function AddWeb3IdCredential({ onAllow, onReject }: Props) {
 
     useEffect(() => {
         if (schema) {
-            // Ensure that all attributes required by the schema are in the attributes. If not, then
-            // the credential should not be allowed to be added.
-            const missingRequiredAttributeKeys = [];
-            const requiredAttributes = schema.properties.credentialSubject.properties.attributes.required;
-            for (const requiredAttribute of requiredAttributes) {
-                if (!Object.keys(credential.credentialSubject.attributes).includes(requiredAttribute)) {
-                    missingRequiredAttributeKeys.push(requiredAttribute);
+            // Use the schema to validate the credential.
+            const validator = new Validator();
+            try {
+                const validationResult = validator.validate(
+                    { credentialSubject: credential.credentialSubject },
+                    schema as unknown as Schema
+                );
+                if (!validationResult.valid) {
+                    setError(t('error.schemaValidation', { errors: validationResult.errors.toString() }));
+                    setValidationComplete(true);
+                    return;
                 }
-            }
-
-            if (missingRequiredAttributeKeys.length > 0) {
-                setError(t('error.attribute.required', { attributeKeys: missingRequiredAttributeKeys }));
+            } catch (e) {
+                logError(e);
+                setError(
+                    t('error.schemaValidation', {
+                        errors: 'An error occurred while attempting to validate credential.',
+                    })
+                );
                 setValidationComplete(true);
                 return;
             }
 
             // Ensure that a credential with more attributes than listed by the schema cannot be added.
+            // The schema might not check this in the current iteration of schemas (additionalProperties: false).
             const schemaAttributes = Object.keys(schema.properties.credentialSubject.properties.attributes.properties);
             for (const credentialAttribute of Object.keys(credential.credentialSubject.attributes)) {
                 if (!schemaAttributes.includes(credentialAttribute)) {
