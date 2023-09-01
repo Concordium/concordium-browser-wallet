@@ -7,6 +7,10 @@
 
     &__statement {
         margin-top: 25px;
+
+        &:last-child {
+            margin-bottom: 25px;
+        }
     }
 
     &__actions {
@@ -140,7 +144,9 @@
     }
 
     &__line {
-        margin-top: 5px;
+        &:not(:first-child) {
+            margin-top: 8px;
+        }
 
         &:not(:last-child) {
             border-bottom: 1px solid #e5e5e5;
