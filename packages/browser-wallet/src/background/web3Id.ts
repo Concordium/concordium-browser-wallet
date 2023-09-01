@@ -10,6 +10,8 @@ import {
     IDENTITY_SUBJECT_SCHEMA,
     verifyIdstatement,
     IdStatement,
+    StatementTypes,
+    AttributeType,
 } from '@concordium/web-sdk';
 import {
     sessionVerifiableCredentials,
@@ -124,6 +126,52 @@ function rejectRequest(message: string): { run: false; response: MessageStatusWr
     };
 }
 
+function validateTimestampAttribute(attributeTag: string, attributeValue: AttributeType) {
+    if (
+        attributeValue instanceof Date &&
+        (attributeValue.getTime() < MIN_DATE_TIMESTAMP || attributeValue.getTime() > MAX_DATE_TIMESTAMP)
+    ) {
+        return `The attribute [${attributeValue}] for key [${attributeTag}] is out of bounds for a Date. The Date must be between ${MIN_DATE_ISO} and ${MAX_DATE_ISO}`;
+    }
+    return undefined;
+}
+
+function validateIntegerAttribute(attributeTag: string, attributeValue: AttributeType): string | undefined {
+    if (typeof attributeValue === 'bigint' && (attributeValue < 0 || attributeValue > MAX_U64)) {
+        return `The attribute [${attributeValue}] for key [${attributeTag}] is out of bounds for a u64 integer.`;
+    }
+    return undefined;
+}
+
+function validateStringAttribute(attributeTag: string, attributeValue: AttributeType): string | undefined {
+    if (typeof attributeValue === 'string' && Buffer.from(attributeValue, 'utf-8').length > 31) {
+        return `The attribute [${attributeValue}] for key [${attributeTag}] is greater than 31 bytes.`;
+    }
+    return undefined;
+}
+
+function validateAttributeBounds(
+    attributeTag: string,
+    attributeValue: AttributeType
+): { error: false } | { error: true; message: string } {
+    const stringError = validateStringAttribute(attributeTag, attributeValue);
+    if (stringError) {
+        return { error: true, message: stringError };
+    }
+
+    const integerError = validateIntegerAttribute(attributeTag, attributeValue);
+    if (integerError) {
+        return { error: true, message: integerError };
+    }
+
+    const timestampError = validateTimestampAttribute(attributeTag, attributeValue);
+    if (timestampError) {
+        return { error: true, message: timestampError };
+    }
+
+    return { error: false };
+}
+
 /**
  * Run condition which ensures that the web3IdCredential request is valid.
  */
@@ -151,23 +199,9 @@ export const runIfValidWeb3IdCredentialRequest: RunCondition<MessageStatusWrappe
         }
 
         for (const [attributeKey, attributeValue] of Object.entries(credential.credentialSubject.attributes)) {
-            if (typeof attributeValue === 'string' && Buffer.from(attributeValue, 'utf-8').length > 31) {
-                return rejectRequest(
-                    `The attribute [${attributeValue}] for key [${attributeKey}] is greater than 31 bytes.`
-                );
-            }
-            if (typeof attributeValue === 'bigint' && (attributeValue < 0 || attributeValue > MAX_U64)) {
-                return rejectRequest(
-                    `The attribute [${attributeValue}] for key [${attributeKey}] is out of bounds for a u64 integer.`
-                );
-            }
-            if (
-                attributeValue instanceof Date &&
-                (attributeValue.getTime() < MIN_DATE_TIMESTAMP || attributeValue.getTime() > MAX_DATE_TIMESTAMP)
-            ) {
-                return rejectRequest(
-                    `The attribute [${attributeValue}] for key [${attributeKey}] is out of bounds for a Date. The Date must be between ${MIN_DATE_ISO} and ${MAX_DATE_ISO}`
-                );
+            const validationResult = validateAttributeBounds(attributeKey, attributeValue);
+            if (validationResult.error) {
+                return rejectRequest(validationResult.message);
             }
         }
 
@@ -198,6 +232,43 @@ export const runIfValidWeb3IdProof: RunCondition<MessageStatusWrapper<undefined>
     }
     try {
         const statements: CredentialStatements = parse(msg.payload.statements);
+
+        // The `verifyAtomicStatements` method only verifies the bounds of the statement variables when it has the
+        // schema available. So we manually do this check here, even though it ideally be moved to the SDK.
+        for (const stat of statements) {
+            for (const atomicStatement of stat.statement) {
+                if (atomicStatement.type === StatementTypes.AttributeInRange) {
+                    const lowerValidationResult = validateAttributeBounds(
+                        atomicStatement.attributeTag,
+                        atomicStatement.lower
+                    );
+                    if (lowerValidationResult.error) {
+                        return rejectRequest(lowerValidationResult.message);
+                    }
+
+                    const upperValidationResult = validateAttributeBounds(
+                        atomicStatement.attributeTag,
+                        atomicStatement.upper
+                    );
+                    if (upperValidationResult.error) {
+                        return rejectRequest(upperValidationResult.message);
+                    }
+                }
+
+                if (
+                    StatementTypes.AttributeInSet === atomicStatement.type ||
+                    StatementTypes.AttributeNotInSet === atomicStatement.type
+                ) {
+                    for (const setItem of atomicStatement.set) {
+                        const validationResult = validateAttributeBounds(atomicStatement.attributeTag, setItem);
+                        if (validationResult.error) {
+                            return rejectRequest(validationResult.message);
+                        }
+                    }
+                }
+            }
+        }
+
         // If a statement does not verify, an error is thrown.
         statements.every((credStatement) =>
             isAccountCredentialStatement(credStatement)
