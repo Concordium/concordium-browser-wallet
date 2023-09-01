@@ -48,7 +48,8 @@ export default function IdProofRequest({ onReject, onSubmit }: Props) {
     const network = useAtomValue(networkConfigurationAtom);
     const client = useAtomValue(grpcClientAtom);
     const addToast = useSetAtom(addToastAtom);
-    const recoveryPhrase = useDecryptedSeedPhrase((e) => addToast(e.message));
+    // TODO log this;
+    const recoveryPhrase = useDecryptedSeedPhrase(undefined);
     const dappName = displayUrl(url);
     const [creatingProof, setCreatingProof] = useState<boolean>(false);
     const [canProve, setCanProve] = useState(statement.length > 0);
