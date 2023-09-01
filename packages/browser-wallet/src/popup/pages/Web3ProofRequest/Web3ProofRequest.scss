@@ -104,7 +104,7 @@
 
 .display-box {
     border-radius: 16px;
-    box-shadow: 0 0 15px 0 #0000001a;
+    box-shadow: 0 0 15px 0 rgb(0 0 0 / $color-shadow-alpha);
 
     &__header {
         background: linear-gradient(91.35deg, #b6dadf 13.38%, #daecef 93.45%);
@@ -177,15 +177,15 @@
         margin: 0;
         height: 60px;
         border-radius: 12px;
-        box-shadow: 0 0 15px 0 #0000001a;
-        background: #fff;
+        box-shadow: 0 0 15px 0 rgb(0 0 0 / $color-shadow-alpha);
+        background: $color-input-bg;
         padding-left: 16px;
     }
 
     &__selector-modal {
         padding: 0;
         border: none;
-        box-shadow: 0 0 15px 0 #0000001a;
+        box-shadow: 0 0 15px 0 rgb(0 0 0 / $color-shadow-alpha);
         margin-top: 178px;
         margin-left: 32px;
         width: calc(100% - 48px);

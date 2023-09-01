@@ -18,5 +18,5 @@ export type DisplayProps<StatementType, Attribute> = ClassName & {
 };
 
 export function defaultFormatAttribute<Attribute extends AttributeType>(_: string, value: Attribute) {
-    return value instanceof Date ? withDateAndTime(value) : value.toString();
+    return value instanceof Date ? withDateAndTime(value) : value?.toString();
 }
