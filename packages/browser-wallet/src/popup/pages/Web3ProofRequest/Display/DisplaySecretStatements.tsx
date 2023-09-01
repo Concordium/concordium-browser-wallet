@@ -73,7 +73,7 @@ export function DisplaySecretStatements<Attribute extends AttributeType>({
         const description = getStatementDescription(s, schema, t, formatAttribute);
         return {
             attribute: title,
-            value: value.toString() ?? 'Unavailable',
+            value,
             isRequirementMet: canProveAtomicStatement(s, attributes),
             description,
         };
