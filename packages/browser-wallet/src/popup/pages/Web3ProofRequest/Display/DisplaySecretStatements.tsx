@@ -63,19 +63,22 @@ export function DisplaySecretStatements<Attribute extends AttributeType>({
     attributes,
     className,
     formatAttribute = (_, value) => value.toString(),
+    overwriteSecretLine = () => ({}),
 }: DisplayProps<SecretStatementV2, Attribute>) {
     const { t } = useTranslation('web3IdProofRequest', { keyPrefix: 'displayStatement' });
     const header = t('headers.secret');
 
     const lines = statements.map((s) => {
         const value = getStatementValue(s, schema, t, formatAttribute);
-        const title = getPropertyTitle(s.attributeTag, schema);
+        const attribute = getPropertyTitle(s.attributeTag, schema);
         const description = getStatementDescription(s, schema, t, formatAttribute);
+
         return {
-            attribute: title,
             value,
-            isRequirementMet: canProveAtomicStatement(s, attributes),
+            attribute,
             description,
+            ...overwriteSecretLine(s),
+            isRequirementMet: canProveAtomicStatement(s, attributes),
         };
     });
 
