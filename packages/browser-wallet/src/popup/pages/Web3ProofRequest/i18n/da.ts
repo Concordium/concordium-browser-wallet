@@ -43,7 +43,7 @@ const t: typeof en = {
         verifiableCredential: 'Vælg en verifiable credential til at afsløre/bevise den anmodet information.',
         accountCredential:
             'Vælg en account, hvis forbundne identity skal bruges til at afsløre/bevise den anmodet information.',
-        unableToProve: 'One or more attributes does not meet the requirements from the verifier.', // TODO
+        unableToProve: 'One or more attributes do not meet the requirements from the verifier.', // TODO
     },
     failedProof: 'Bevis kunne ikke oprettes',
     failedProofReason: 'Bevis kunne ikke oprettes: {{ reason }}',
