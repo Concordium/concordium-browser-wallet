@@ -43,11 +43,10 @@ const t: typeof en = {
         verifiableCredential: 'Vælg en verifiable credential til at afsløre/bevise den anmodet information.',
         accountCredential:
             'Vælg en account, hvis forbundne identity skal bruges til at afsløre/bevise den anmodet information.',
+        unableToProve: 'One or more attributes does not meet the requirements from the verifier.', // TODO
     },
     failedProof: 'Bevis kunne ikke oprettes',
     failedProofReason: 'Bevis kunne ikke oprettes: {{ reason }}',
-    unableToProve:
-        ' {{ dappName }} har anmodet et bevis for identitet fra dig, men du opfølger ikke kravene for beviset, så du kan ikke lave et bevis',
 };
 
 export default t;

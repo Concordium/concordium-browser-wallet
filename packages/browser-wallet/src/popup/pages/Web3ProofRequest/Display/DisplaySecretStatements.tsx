@@ -1,4 +1,4 @@
-import { AttributeType, StatementTypes } from '@concordium/web-sdk';
+import { AttributeType, canProveAtomicStatement, StatementTypes } from '@concordium/web-sdk';
 import { CredentialSchemaSubject } from '@shared/storage/types';
 import React from 'react';
 import { TFunction, useTranslation } from 'react-i18next';
@@ -60,6 +60,7 @@ function getStatementDescription<Attribute extends AttributeType>(
 export function DisplaySecretStatements<Attribute extends AttributeType>({
     schema,
     statements,
+    attributes,
     className,
     formatAttribute = defaultFormatAttribute,
 }: DisplayProps<SecretStatementV2, Attribute>) {
@@ -73,7 +74,7 @@ export function DisplaySecretStatements<Attribute extends AttributeType>({
         return {
             attribute: title,
             value: value.toString() ?? 'Unavailable',
-            isRequirementMet: value !== undefined,
+            isRequirementMet: canProveAtomicStatement(s, attributes),
             description,
         };
     });

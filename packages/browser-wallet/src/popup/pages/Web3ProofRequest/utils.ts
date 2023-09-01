@@ -37,6 +37,7 @@ export interface DisplayCredentialStatementProps<Statement, Credential> extends 
     dappName: string;
     setChosenId: (id: string) => void;
     net: Network;
+    showDescription: boolean;
 }
 
 export function getAccountCredentialCommitmentInput(

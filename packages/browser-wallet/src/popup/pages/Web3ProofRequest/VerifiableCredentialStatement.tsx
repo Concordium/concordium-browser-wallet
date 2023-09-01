@@ -36,6 +36,7 @@ export default function DisplayWeb3Statement({
     dappName,
     setChosenId,
     net,
+    showDescription,
 }: DisplayCredentialStatementProps<VerifiableCredentialStatement, VerifiableCredential>) {
     const { t } = useTranslation('web3IdProofRequest');
     const reveals = credentialStatement.statement.filter(
@@ -68,7 +69,9 @@ export default function DisplayWeb3Statement({
 
     return (
         <div className="web3-id-proof-request__credential-statement-container">
-            <p className="web3-id-proof-request__description bodyM">{t('descriptions.verifiableCredential')}</p>
+            {showDescription && (
+                <p className="web3-id-proof-request__description bodyM">{t('descriptions.verifiableCredential')}</p>
+            )}
             <CredentialSelector<VerifiableCredential>
                 options={validCredentials}
                 DisplayOption={DisplayVC}

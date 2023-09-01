@@ -63,9 +63,18 @@
 
     &__reject-button {
         width: 56px;
+    }
+
+    &__reject-button,
+    &__not-provable-button {
         height: 48px;
         border-radius: 16px;
-        background: #ab2b2b;
+        background: $color-feedback-negative-dark;
+    }
+
+    &__not-provable-description {
+        margin-left: 32px;
+        margin-right: 32px;
     }
 
     &__back-button {
@@ -76,11 +85,13 @@
         flex-grow: 1;
     }
 
+    &__not-provable-description,
     &__description {
         height: 120px;
         padding-top: 32px;
         color: $color-neutral-gray-50;
-        margin: 0;
+        margin-top: 0;
+        margin-bottom: 0;
     }
 }
 

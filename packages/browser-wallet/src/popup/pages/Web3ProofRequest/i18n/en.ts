@@ -41,9 +41,8 @@ export default {
         verifiableCredential: 'Select a verifiable credential to reveal/prove the requested information.',
         accountCredential:
             'Select an account associated with the identity whose credentials will be used to reveal/prove the requested information.',
+        unableToProve: 'One or more attributes does not meet the requirements from the verifier.',
     },
     failedProof: 'Unable to create proof',
     failedProofReason: 'Unable to create proof due to: {{ reason }}',
-    unableToProve:
-        ' {{ dappName }} has requested a proof of identity from you, however you are unable to fulfill the request',
 };
