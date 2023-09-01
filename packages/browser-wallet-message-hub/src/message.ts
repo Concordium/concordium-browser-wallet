@@ -40,6 +40,7 @@ export enum InternalMessageType {
     RecoveryFinished = 'I_RecoveryFinished',
     AddTokens = 'I_AddTokens',
     IdProof = 'I_IdProof',
+    AgeProof = 'I_AgeProof',
     CreateIdProof = 'I_CreateIdProof',
     Web3IdProof = 'I_Web3IdProof',
     CreateWeb3IdProof = 'I_CreateWeb3IdProof',

@@ -56,7 +56,7 @@ function addDays(date: string, days: number): string {
     return dateToDateString(d);
 }
 
-const isAgeStatement = (statement: SecretStatement): boolean => {
+export const isAgeStatement = (statement: SecretStatement): boolean => {
     if (statement.type !== StatementTypes.AttributeInRange) {
         return false;
     }
@@ -282,4 +282,25 @@ export function canProveStatement(statement: SecretStatement, identity: Confirme
         default:
             throw new Error(`Statement type not supported in ${JSON.stringify(statement)}`);
     }
+}
+
+export function useAgeFromStatement(statement: AtomicStatement) {
+    if (statement.type !== 'AttributeInRange' || statement.attributeTag !== 'dob') {
+        throw new Error('unexpected');
+    }
+
+    const today = getPastDate(0);
+
+    const ageMin = getYearFromDateString(today) - getYearFromDateString(addDays(statement.upper, -1));
+    const ageMax = getYearFromDateString(today) - getYearFromDateString(addDays(statement.lower, -1)) - 1;
+
+    if (statement.lower === MIN_DATE) {
+        return { ageMin };
+    }
+
+    if (statement.upper > today) {
+        return { ageMax };
+    }
+
+    return { ageMin, ageMax };
 }

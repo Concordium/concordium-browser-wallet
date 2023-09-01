@@ -38,6 +38,7 @@ import ConnectAccountsRequest from '@popup/pages/ConnectAccountsRequest';
 import AllowListRoutes from '@popup/pages/Allowlist';
 import AddWeb3IdCredential from '@popup/pages/AddWeb3IdCredential/AddWeb3IdCredential';
 import VerifiableCredentialImport from '@popup/pages/VerifiableCredentialBackup/VerifiableCredentialImport';
+import AgeProofRequest from '@popup/pages/AgeProofRequest';
 
 type PromptKey = keyof Omit<typeof absoluteRoutes['prompt'], 'path'>;
 
@@ -112,10 +113,15 @@ export default function Routes() {
         InternalMessageType.IdProof,
         'idProof'
     );
+
     // We manually stringify the presentation
     const handleWeb3IdProofResponse = useMessagePrompt<MessageStatusWrapper<string>>(
         InternalMessageType.Web3IdProof,
         'web3IdProof'
+    );
+    const handleAgeProofResponse = useMessagePrompt<MessageStatusWrapper<IdProofOutput>>(
+        InternalMessageType.AgeProof,
+        'ageProof'
     );
 
     usePrompt(InternalMessageType.EndIdentityIssuance, 'endIdentityIssuance');
@@ -209,6 +215,7 @@ export default function Routes() {
                         />
                     }
                 />
+
                 <Route
                     path={relativeRoutes.prompt.web3IdProof.path}
                     element={
@@ -218,6 +225,17 @@ export default function Routes() {
                             }
                             onReject={() =>
                                 handleWeb3IdProofResponse({ success: false, message: 'Proof generation was rejected' })
+                            }
+                        />
+                    }
+                />
+                <Route
+                    path={relativeRoutes.prompt.ageProof.path}
+                    element={
+                        <AgeProofRequest
+                            onSubmit={(proof) => handleAgeProofResponse({ success: true, result: proof })}
+                            onReject={() =>
+                                handleAgeProofResponse({ success: false, message: 'Proof generation was rejected' })
                             }
                         />
                     }

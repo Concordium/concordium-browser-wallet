@@ -142,7 +142,11 @@ export const forwardToPopup = <P, R>(
     /**
      * Function to run after responding
      */
-    handleFinally: () => void = noOp
+    handleFinally: () => void = noOp,
+    /**
+     * Overwrite the filter used
+     */
+    filter: (msg: unknown) => boolean = createMessageTypeFilter(messageType)
 ): void => {
     // Wrap handler in helper ensuring a popup window is available and ready to handle incomming messages.
     const handler = ensureAvailableWindow((msg, sender, respond) => {
@@ -152,7 +156,6 @@ export const forwardToPopup = <P, R>(
             .then(respond)
             .catch((e: Error) => respond(new WalletError(msg, e.message))) // Usually if popup is closed prior to a response being sent.
             .finally(handleFinally);
-
         return true;
     });
 
@@ -169,7 +172,7 @@ export const forwardToPopup = <P, R>(
         return true;
     };
 
-    bgMessageHandler.handleMessage(createMessageTypeFilter(messageType), conditionalHandler);
+    bgMessageHandler.handleMessage(filter, conditionalHandler);
 };
 
 /**

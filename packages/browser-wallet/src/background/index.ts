@@ -5,7 +5,7 @@ import {
     MessageStatusWrapper,
     MessageType,
 } from '@concordium/browser-wallet-message-hub';
-import { deserializeTypeValue, HttpProvider } from '@concordium/web-sdk';
+import { AttributeKeyString, deserializeTypeValue, HttpProvider, IdStatement } from '@concordium/web-sdk';
 import {
     getGenesisHash,
     sessionOpenPrompt,
@@ -24,6 +24,7 @@ import { BackgroundSendTransactionPayload } from '@shared/utils/types';
 import { buildURLwithSearchParameters } from '@shared/utils/url-helpers';
 import { Buffer } from 'buffer/';
 import JSONBig from 'json-bigint';
+import { isAgeStatement } from '@popup/pages/IdProofRequest/DisplayStatement/utils';
 import { startMonitoringPendingStatus } from './confirmation';
 import { sendCredentialHandler } from './credential-deployment';
 import { createIdProofHandler, runIfValidProof } from './id-proof';
@@ -527,6 +528,15 @@ bgMessageHandler.handleMessage(
     }
 );
 
+function isAgeProof({ statement }: { statement: IdStatement }): boolean {
+    return (
+        statement.length === 1 &&
+        statement[0].type === 'AttributeInRange' &&
+        statement[0].attributeTag === AttributeKeyString.dob &&
+        isAgeStatement(statement[0])
+    );
+}
+
 bgMessageHandler.handleMessage(createMessageTypeFilter(InternalMessageType.LoadWeb3IdBackup), loadWeb3IdBackupHandler);
 
 function withPromptStart<T>(): RunCondition<MessageStatusWrapper<T | undefined>> {
@@ -608,5 +618,15 @@ forwardToPopup(
     runConditionComposer(runIfAllowlisted, runIfValidWeb3IdProof, withPromptStart()),
     appendUrlToPayload,
     undefined,
-    withPromptEnd
+    withPromptEnd,
+    (msg) => createMessageTypeFilter(MessageType.IdProof)(msg) && !isAgeProof(msg.payload)
+);
+forwardToPopup(
+    MessageType.IdProof,
+    InternalMessageType.AgeProof,
+    runConditionComposer(runIfAllowlisted, runIfValidProof, withPromptStart()),
+    appendUrlToPayload,
+    undefined,
+    withPromptEnd,
+    (msg) => createMessageTypeFilter(MessageType.IdProof)(msg) && isAgeProof(msg.payload)
 );
