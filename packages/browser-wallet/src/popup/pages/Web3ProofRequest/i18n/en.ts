@@ -42,6 +42,8 @@ export default {
         accountCredential:
             'Select an account associated with the identity whose credentials will be used to reveal/prove the requested information.',
         unableToProve: 'One or more attributes do not meet the requirements from the verifier.',
+        noCredentialsForThatIssuer:
+            'You do not hold any active credentials from the issuer that the verifier requested.',
     },
     failedProof: 'Unable to create proof',
     failedProofReason: 'Unable to create proof due to: {{ reason }}',
