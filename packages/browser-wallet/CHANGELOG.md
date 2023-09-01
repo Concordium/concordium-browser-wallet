@@ -1,5 +1,12 @@
 # Changelog
 
+## Unreleased
+
+### Fixed
+
+-   An issue where Date attributes were saved as strings when exported. This would mean that they would lose typing and the credential would be broken.
+-   An issue where statement parameters were not validated according to the attribute bounds.
+
 ## 1.1.4
 
 ### Added
