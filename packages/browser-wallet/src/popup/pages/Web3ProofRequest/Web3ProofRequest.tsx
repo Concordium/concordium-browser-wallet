@@ -1,4 +1,5 @@
 import React, { useCallback, useContext, useEffect, useMemo, useState } from 'react';
+import clsx from 'clsx';
 import { useLocation } from 'react-router-dom';
 import { useAtomValue, useSetAtom } from 'jotai';
 import { useTranslation } from 'react-i18next';
@@ -267,6 +268,21 @@ export default function Web3ProofRequest({ onReject, onSubmit }: Props) {
                 showDescription
             />
             <div className="web3-id-proof-request__actions flex">
+                <div className="web3-id-proof-request__progress">
+                    {statements.length > 1 &&
+                        statements.map((_, i) => (
+                            <Button
+                                // eslint-disable-next-line react/no-array-index-key
+                                key={i}
+                                className={clsx(
+                                    'web3-id-proof-request__progress-dot',
+                                    currentStatementIndex === i && 'web3-id-proof-request__progress-dot--active'
+                                )}
+                                clear
+                                onClick={() => setCurrentStatementIndex(i)}
+                            />
+                        ))}
+                </div>
                 <Button
                     danger
                     className="web3-id-proof-request__reject-button"

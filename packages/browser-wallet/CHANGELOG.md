@@ -1,5 +1,11 @@
 # Changelog
 
+## Unreleased
+
+### Added
+
+-   Indicator on proof request page, to show how many credential statements are requested, and the current position.
+
 ## 1.1.4
 
 ### Added
