@@ -420,16 +420,10 @@ const getSelectedChainHandler: ExtensionMessageHandler = (_msg, sender, respond)
     if (!sender.url) {
         throw new Error('Expected URL to be available for sender.');
     }
+    getGenesisHash()
+        .then(respond)
+        .catch(() => respond(undefined));
 
-    isAllowlistedForAnyAccount(sender.url).then((allowlisted) => {
-        if (!allowlisted) {
-            respond(undefined);
-        } else {
-            getGenesisHash()
-                .then(respond)
-                .catch(() => respond(undefined));
-        }
-    });
     return true;
 };
 
