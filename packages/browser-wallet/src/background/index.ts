@@ -40,7 +40,7 @@ import { sendCredentialHandler } from './credential-deployment';
 import { startRecovery, setupRecoveryHandler } from './recovery';
 import { createIdProofHandler, runIfValidProof } from './id-proof';
 
-const rpcCallNotAllowedMessage = 'RPC Call can only be performed by whitelisted sites';
+const rpcCallNotAllowedMessage = 'RPC Call can only be performed by allowlisted sites';
 const walletLockedMessage = 'The wallet is locked';
 async function isWalletLocked(): Promise<boolean> {
     const passcode = await sessionPasscode.get();
@@ -48,9 +48,9 @@ async function isWalletLocked(): Promise<boolean> {
 }
 
 /**
- * Determines whether the given url has been whitelisted by any account.
+ * Determines whether the given url has been allowlisted by any account.
  */
-async function isAllowListedForAnyAccount(url: string): Promise<boolean> {
+async function isAllowlistedForAnyAccount(url: string): Promise<boolean> {
     const urlOrigin = new URL(url).origin;
     const connectedSites = await storedConnectedSites.get();
     if (connectedSites) {
@@ -71,8 +71,8 @@ async function performRpcCall(
         onFailure(walletLockedMessage);
     }
 
-    const isWhiteListed = await isAllowListedForAnyAccount(senderUrl);
-    if (isWhiteListed) {
+    const isAllowlisted = await isAllowlistedForAnyAccount(senderUrl);
+    if (isAllowlisted) {
         const url = (await storedCurrentNetwork.get())?.jsonRpcUrl;
         if (!url) {
             onFailure('No JSON-RPC URL available');
@@ -101,8 +101,8 @@ async function exportGRPCLocation(
     onSuccess: (response: string | undefined) => void,
     onFailure: (response: string) => void
 ): Promise<void> {
-    const isWhiteListed = await isAllowListedForAnyAccount(callerUrl);
-    if (!isWhiteListed) {
+    const isAllowlisted = await isAllowlistedForAnyAccount(callerUrl);
+    if (!isAllowlisted) {
         return onFailure(rpcCallNotAllowedMessage);
     }
     const network = await storedCurrentNetwork.get();
@@ -252,17 +252,17 @@ bgMessageHandler.handleMessage(createMessageTypeFilter(MessageType.GrpcRequest),
 
 bgMessageHandler.handleMessage(createMessageTypeFilter(InternalMessageType.CreateIdProof), createIdProofHandler);
 
-const NOT_WHITELISTED = 'Site is not whitelisted';
+const NOT_ALLOWLISTED = 'Site is not allowlisted';
 
 /**
  * Run condition which looks up URL in connected sites for the provided account. Runs handler if URL is included in connected sites.
  */
-const runIfWhitelisted: RunCondition<MessageStatusWrapper<undefined>> = async (msg, sender) => {
+const runIfAllowlisted: RunCondition<MessageStatusWrapper<undefined>> = async (msg, sender) => {
     const { accountAddress } = msg.payload;
     const connectedSites = await storedConnectedSites.get();
 
     if (!accountAddress || connectedSites === undefined) {
-        return { run: false, response: { success: false, message: NOT_WHITELISTED } };
+        return { run: false, response: { success: false, message: NOT_ALLOWLISTED } };
     }
 
     const accountConnectedSites = connectedSites[accountAddress] ?? [];
@@ -270,7 +270,7 @@ const runIfWhitelisted: RunCondition<MessageStatusWrapper<undefined>> = async (m
         return { run: true };
     }
 
-    return { run: false, response: { success: false, message: NOT_WHITELISTED } };
+    return { run: false, response: { success: false, message: NOT_ALLOWLISTED } };
 };
 
 const INCORRECT_SIGN_MESSAGE_FORMAT = 'The given message does not have correct format.';
@@ -353,7 +353,7 @@ async function findPrioritizedAccountConnectedToSite(url: string): Promise<strin
  * 1. Else if any other account is connected to the sender URL, then do not run and return that account's address.
  * 1. Else run the handler.
  */
-const runIfNotWhitelisted: RunCondition<MessageStatusWrapper<string | undefined>> = async (_msg, sender) => {
+const runIfNotAllowlisted: RunCondition<MessageStatusWrapper<string | undefined>> = async (_msg, sender) => {
     if (!sender.url) {
         throw new Error('Expected URL to be available for sender.');
     }
@@ -421,8 +421,8 @@ const getSelectedChainHandler: ExtensionMessageHandler = (_msg, sender, respond)
         throw new Error('Expected URL to be available for sender.');
     }
 
-    isAllowListedForAnyAccount(sender.url).then((allowListed) => {
-        if (!allowListed) {
+    isAllowlistedForAnyAccount(sender.url).then((allowlisted) => {
+        if (!allowlisted) {
             respond(undefined);
         } else {
             getGenesisHash()
@@ -452,7 +452,7 @@ function withPromptEnd() {
 forwardToPopup(
     MessageType.Connect,
     InternalMessageType.Connect,
-    runConditionComposer(runIfNotWhitelisted, withPromptStart),
+    runConditionComposer(runIfNotAllowlisted, withPromptStart),
     handleConnectMessage,
     handleConnectionResponse,
     withPromptEnd
@@ -460,7 +460,7 @@ forwardToPopup(
 forwardToPopup(
     MessageType.SendTransaction,
     InternalMessageType.SendTransaction,
-    runConditionComposer(runIfWhitelisted, ensureTransactionPayloadParse, withPromptStart),
+    runConditionComposer(runIfAllowlisted, ensureTransactionPayloadParse, withPromptStart),
     appendUrlToPayload,
     undefined,
     withPromptEnd
@@ -468,7 +468,7 @@ forwardToPopup(
 forwardToPopup(
     MessageType.SignMessage,
     InternalMessageType.SignMessage,
-    runConditionComposer(runIfWhitelisted, ensureMessageWithSchemaParse, withPromptStart),
+    runConditionComposer(runIfAllowlisted, ensureMessageWithSchemaParse, withPromptStart),
     appendUrlToPayload,
     undefined,
     withPromptEnd
@@ -476,7 +476,7 @@ forwardToPopup(
 forwardToPopup(
     MessageType.AddTokens,
     InternalMessageType.AddTokens,
-    runConditionComposer(runIfWhitelisted, withPromptStart),
+    runConditionComposer(runIfAllowlisted, withPromptStart),
     appendUrlToPayload,
     undefined,
     withPromptEnd
@@ -484,7 +484,7 @@ forwardToPopup(
 forwardToPopup(
     MessageType.IdProof,
     InternalMessageType.IdProof,
-    runConditionComposer(runIfWhitelisted, runIfValidProof, withPromptStart),
+    runConditionComposer(runIfAllowlisted, runIfValidProof, withPromptStart),
     appendUrlToPayload,
     undefined,
     withPromptEnd
