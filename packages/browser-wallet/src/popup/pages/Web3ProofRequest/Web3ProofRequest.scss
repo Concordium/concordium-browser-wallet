@@ -1,3 +1,5 @@
+$standard-box-shadow: 0 0 15px 0 rgb(0 0 0 / $color-shadow-alpha);
+
 .web3-id-proof-request {
     &__statement-container {
         display: flex;
@@ -7,6 +9,10 @@
 
     &__statement {
         margin-top: 25px;
+
+        &:last-child {
+            margin-bottom: 25px;
+        }
     }
 
     &__actions {
@@ -143,8 +149,16 @@
         color: $color-secondary-ocean-blue;
     }
 
+    &__tooltip-button {
+        align-items: center;
+    }
+
     &__tooltip-icon {
         height: 24px;
+
+        path {
+            fill: $color-secondary-ocean-blue;
+        }
     }
 }
 
@@ -173,7 +187,9 @@
     }
 
     &__line {
-        margin-top: 5px;
+        &:not(:first-child) {
+            margin-top: 8px;
+        }
 
         &:not(:last-child) {
             border-bottom: 1px solid $color-neutral-gray-10;
@@ -194,7 +210,7 @@
         height: 60px;
         border-radius: 12px;
         box-shadow: $standard-box-shadow;
-        background: $color-neutral-white;
+        background: $color-input-bg;
         padding-left: 16px;
     }
 
@@ -204,8 +220,7 @@
         box-shadow: $standard-box-shadow;
         margin-top: 178px;
         margin-left: 32px;
-        margin-right: 32px;
-        width: calc(100% - 64px);
+        width: calc(100% - 48px);
     }
 
     &__selector-item {
@@ -242,5 +257,13 @@
         top: 18px;
         right: 40px;
         transform: translate(100%, rem(1px)) rotate(-90deg);
+    }
+}
+
+.display-statement-checkmark {
+    flex-shrink: 0;
+
+    path {
+        fill: $color-feedback-positive-base;
     }
 }

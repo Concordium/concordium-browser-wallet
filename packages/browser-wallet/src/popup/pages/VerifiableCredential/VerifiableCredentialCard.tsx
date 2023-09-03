@@ -10,6 +10,7 @@ import { AttributeType, CredentialSubject } from '@concordium/web-sdk';
 import { VerifiableCredentialStatus, MetadataUrl, VerifiableCredentialSchema } from '@shared/storage/types';
 import { useTranslation } from 'react-i18next';
 import StatusIcon from './VerifiableCredentialStatus';
+import { defaultFormatAttribute } from '../Web3ProofRequest/Display/utils';
 
 function Logo({ logo }: { logo: MetadataUrl }) {
     return <Img className="verifiable-credential__header__logo" src={logo.url} withDefaults />;
@@ -38,7 +39,9 @@ export function DisplayAttribute({
     return (
         <div key={attributeKey} className="verifiable-credential__body-attributes-row">
             <label>{attributeTitle.toLowerCase()}</label>
-            <div className="verifiable-credential__body-attributes-row-value">{attributeValue.toString()}</div>
+            <div className="verifiable-credential__body-attributes-row-value">
+                {defaultFormatAttribute(attributeKey, attributeValue)}
+            </div>
         </div>
     );
 }

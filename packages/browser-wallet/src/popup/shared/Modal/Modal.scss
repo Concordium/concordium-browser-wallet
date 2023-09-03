@@ -19,6 +19,10 @@
         justify-content: center;
     }
 
+    &--stable-scrollbar-gutter {
+        scrollbar-gutter: stable;
+    }
+
     &__content {
         position: relative;
         width: 90%;

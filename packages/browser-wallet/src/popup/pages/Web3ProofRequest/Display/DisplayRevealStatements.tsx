@@ -4,7 +4,7 @@ import { Trans, useTranslation } from 'react-i18next';
 import WarningTriangleIcon from '@assets/svg/warning-triangle.svg';
 import { DisplayStatementLine } from './DisplayStatementLine';
 import { DisplayBox } from './DisplayBox';
-import { DisplayProps, getPropertyTitle } from './utils';
+import { DisplayProps, defaultFormatAttribute, getPropertyTitle } from './utils';
 
 type Props<Attribute> = DisplayProps<RevealStatementV2, Attribute> & {
     dappName: string;
@@ -16,7 +16,7 @@ export function DisplayRevealStatements<Attribute extends AttributeType>({
     attributes,
     dappName,
     schema,
-    formatAttribute = (_, value) => value?.toString(),
+    formatAttribute = defaultFormatAttribute,
 }: Props<Attribute>) {
     const { t } = useTranslation('web3IdProofRequest', { keyPrefix: 'displayStatement' });
     const header = t('headers.reveal');
