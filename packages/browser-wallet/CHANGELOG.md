@@ -2,6 +2,10 @@
 
 ## Unreleased
 
+### Added
+
+-   Indicator on proof request page, to show how many credential statements are requested, and the current position.
+
 ### Fixed
 
 -   An issue where Date attributes were saved as strings when exported. This would mean that they would lose typing and the credential would be broken.
