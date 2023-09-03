@@ -8,7 +8,7 @@ import {
     WalletMessage,
 } from '@concordium/browser-wallet-message-hub';
 
-import { Dimensions, small } from '@popup/constants/dimensions';
+import { Dimensions, large, small } from '@popup/constants/dimensions';
 import { spawnedPopupUrl } from '@shared/constants/url';
 import { noOp } from 'wallet-common-helpers';
 import bgMessageHandler, { onMessage } from './message-handler';
@@ -25,15 +25,19 @@ const getTopLeft = async (): Promise<{ top: number; left: number }> => {
 /**
  * Spawns a new popup on screen. Returning promise resolves when it receives a ready event from the popup
  */
-export const spawnPopup = async (): Promise<chrome.windows.Window> => {
+export const spawnPopup = async (messageType: MessageType | InternalMessageType): Promise<chrome.windows.Window> => {
     const { top, left } = await getTopLeft();
 
     const window = chrome.windows.create({
-        url: spawnedPopupUrl,
+        // The Web3 ID proof popup has a separate size from other windows. Convery this by adjusting the URL, so that
+        // the scaling adjusts the window correctly.
+        url: messageType === MessageType.Web3IdProof ? `${spawnedPopupUrl}&web3idproof` : spawnedPopupUrl,
         type: 'popup',
         ...small,
         top,
         left,
+        width: large.width,
+        height: large.height,
     });
 
     // As the react app needs a chance to bootstrap, we need to wait for the ready signal.
@@ -79,11 +83,11 @@ export const setPopupSize = async ({ width, height }: Dimensions) => {
     }
 };
 
-export const openWindow = async () => {
+export const openWindow = async (messageType: MessageType | InternalMessageType) => {
     const isOpen = await testPopupOpen();
 
     if (!isOpen) {
-        const { id } = await spawnPopup();
+        const { id } = await spawnPopup(messageType);
         popupId = id;
     } else {
         focusExisting();
@@ -97,7 +101,7 @@ const ensureAvailableWindow =
     (handler: ExtensionMessageHandler): ExtensionMessageHandler =>
     (...args) => {
         (async () => {
-            await openWindow();
+            await openWindow(args[0].messageType);
             handler(...args);
         })();
 

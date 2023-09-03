@@ -1,4 +1,5 @@
 export const spawnedPopupUrl = 'popup.html?spawned';
+export const web3IdProofPopupUrl = `${spawnedPopupUrl}&web3idproof`;
 
 const urls = {
     termsAndConditions: 'https://developer.concordium.software/en/mainnet/net/resources/terms-and-conditions.html',
