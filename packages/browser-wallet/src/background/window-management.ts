@@ -25,7 +25,7 @@ const getTopLeft = async (): Promise<{ top: number; left: number }> => {
 /**
  * Spawns a new popup on screen. Returning promise resolves when it receives a ready event from the popup
  */
-export const spawnPopup = async (messageType: MessageType | InternalMessageType): Promise<chrome.windows.Window> => {
+export const spawnPopup = async (messageType?: MessageType | InternalMessageType): Promise<chrome.windows.Window> => {
     const { top, left } = await getTopLeft();
 
     const window = chrome.windows.create({
@@ -83,7 +83,7 @@ export const setPopupSize = async ({ width, height }: Dimensions) => {
     }
 };
 
-export const openWindow = async (messageType: MessageType | InternalMessageType) => {
+export const openWindow = async (messageType?: MessageType | InternalMessageType) => {
     const isOpen = await testPopupOpen();
 
     if (!isOpen) {
