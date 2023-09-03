@@ -52,7 +52,7 @@ export default function ConnectionRequest({ onAllow, onReject }: Props) {
     const urlDisplay = displayUrl(url);
 
     return (
-        <ExternalRequestLayout>
+        <ExternalRequestLayout className="p-10">
             <div className="account-page__connection-box connection-request__connection-box">{t('waiting')}</div>
             <div className="h-full flex-column align-center">
                 <header className="m-v-20">

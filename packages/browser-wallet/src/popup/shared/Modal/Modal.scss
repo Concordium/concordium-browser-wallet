@@ -13,6 +13,16 @@
         justify-content: flex-end;
     }
 
+    &--align-middle {
+        display: flex;
+        flex-direction: column;
+        justify-content: center;
+    }
+
+    &--stable-scrollbar-gutter {
+        scrollbar-gutter: stable;
+    }
+
     &__content {
         position: relative;
         width: 90%;

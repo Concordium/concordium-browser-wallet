@@ -2,8 +2,9 @@ import type en from './en';
 
 const t: typeof en = {
     header: '{{dappName}} anmoder om følgende information om dig:',
-    accept: 'Godkend',
+    approve: 'Godkend',
     reject: 'Afvis',
+    back: 'Tilbage',
     continue: 'Fortsæt',
     displayStatement: {
         requirementsMet: 'Du opfylder kravet',
@@ -34,10 +35,19 @@ const t: typeof en = {
             missingAttribute: 'Denne Attribut kan ikke findes på identiteten "{{identityName}}"',
         },
     },
+    select: {
+        verifiableCredential: 'Vælg verifiable credential',
+        accountCredential: 'Væg konto',
+    },
+    descriptions: {
+        verifiableCredential: 'Vælg en verifiable credential til at afsløre/bevise den anmodet information.',
+        accountCredential:
+            'Vælg en account, hvis forbundne identity skal bruges til at afsløre/bevise den anmodet information.',
+        unableToProve: 'One or more attributes do not meet the requirements from the verifier.',
+        noCredentialsForThatIssuer: 'You do not hold any credentials from the issuer that the verifier requested.',
+    },
     failedProof: 'Bevis kunne ikke oprettes',
     failedProofReason: 'Bevis kunne ikke oprettes: {{ reason }}',
-    unableToProve:
-        ' {{ dappName }} har anmodet et bevis for identitet fra dig, men du opfølger ikke kravene for beviset, så du kan ikke lave et bevis',
 };
 
 export default t;

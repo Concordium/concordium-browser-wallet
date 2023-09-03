@@ -112,7 +112,7 @@ export default function SignMessage({ onSubmit, onReject }: Props) {
     }, [state.payload.message, state.payload.accountAddress, key]);
 
     return (
-        <ExternalRequestLayout>
+        <ExternalRequestLayout className="p-10">
             <ConnectedBox accountAddress={accountAddress} url={new URL(url).origin} />
             <div className="h-full flex-column align-center">
                 <h3 className="m-t-0 text-center">{t('description', { dApp: displayUrl(url) })}</h3>

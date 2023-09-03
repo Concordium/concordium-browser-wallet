@@ -1,4 +1,5 @@
 import React, { useCallback, useContext, useEffect, useMemo, useState } from 'react';
+import clsx from 'clsx';
 import { useLocation } from 'react-router-dom';
 import { useAtomValue, useSetAtom } from 'jotai';
 import { useTranslation } from 'react-i18next';
@@ -11,6 +12,8 @@ import {
     ConcordiumGRPCClient,
     CommitmentInput,
     isVerifiableCredentialStatement,
+    CredentialStatement,
+    Network,
 } from '@concordium/web-sdk';
 import { InternalMessageType } from '@concordium/browser-wallet-message-hub';
 
@@ -25,7 +28,6 @@ import PendingArrows from '@assets/svg/pending-arrows.svg';
 import ExternalRequestLayout from '@popup/page-layouts/ExternalRequestLayout';
 import { fullscreenPromptContext } from '@popup/page-layouts/FullscreenPromptLayout';
 import Button from '@popup/shared/Button';
-import ButtonGroup from '@popup/shared/ButtonGroup';
 import { displayUrl } from '@popup/shared/utils/string-helpers';
 import {
     storedVerifiableCredentialsAtom,
@@ -33,12 +35,15 @@ import {
 } from '@popup/store/verifiable-credential';
 import { useConfirmedIdentities } from '@popup/shared/utils/identity-helpers';
 import { parse } from '@shared/utils/payload-helpers';
-import { VerifiableCredential, VerifiableCredentialStatus } from '@shared/storage/types';
+import { VerifiableCredential, VerifiableCredentialStatus, WalletCredential } from '@shared/storage/types';
 import { getVerifiableCredentialStatus } from '@shared/utils/verifiable-credential-helpers';
-import { useAsyncMemo } from 'wallet-common-helpers';
+import { noOp, useAsyncMemo } from 'wallet-common-helpers';
 import { stringify } from '@concordium/browser-wallet-api/src/util';
+import CloseIcon from '@assets/svg/cross.svg';
 import {
     getAccountCredentialCommitmentInput,
+    getAccountCredentialsWithMatchingIssuer,
+    getActiveWeb3IdCredentialsWithMatchingIssuer,
     getViableAccountCredentialsForStatement,
     getViableWeb3IdCredentialsForStatement,
     getWeb3CommitmentInput,
@@ -74,19 +79,75 @@ async function getAllCredentialStatuses(
     return Object.fromEntries(statuses);
 }
 
-function DisplayNotProvable({ onClick, dappName }: { onClick: () => void; dappName: string }) {
+function findCredentialsForStatementIssuer(
+    statement: CredentialStatement,
+    credentials: WalletCredential[],
+    verifiableCredentials: VerifiableCredential[],
+    statuses: Record<string, VerifiableCredentialStatus | undefined> | undefined
+) {
+    if (isAccountCredentialStatement(statement)) {
+        return getAccountCredentialsWithMatchingIssuer(statement, credentials);
+    }
+
+    if (isVerifiableCredentialStatement(statement)) {
+        return getActiveWeb3IdCredentialsWithMatchingIssuer(statement, verifiableCredentials, statuses);
+    }
+
+    return undefined;
+}
+
+function DisplayNotProvable({
+    onClick,
+    dappName,
+    statement,
+    net,
+    statuses,
+}: {
+    onClick: () => void;
+    dappName: string;
+    statement: CredentialStatement;
+    net: Network;
+    statuses: Record<string, VerifiableCredentialStatus | undefined> | undefined;
+}) {
     const { t } = useTranslation('web3IdProofRequest');
+    const credentials = useAtomValue(credentialsAtom);
+    const verifiableCredentials = useAtomValue(storedVerifiableCredentialsAtom);
+    const validCredentials = findCredentialsForStatementIssuer(
+        statement,
+        credentials,
+        verifiableCredentials.value,
+        statuses
+    );
 
     return (
         <ExternalRequestLayout>
             <div className="web3-id-proof-request__statement-container">
-                <h3 className="m-t-0 text-center">{t('unableToProve', { dappName })}</h3>
-                <ButtonGroup className="web3-id-proof-request__actions">
-                    <Button onClick={onClick}>{t('reject')}</Button>
-                    <Button className="flex-center" disabled>
-                        {t('accept')}
+                {validCredentials && validCredentials?.length === 0 && (
+                    <p className="web3-id-proof-request__not-provable-description bodyM ">
+                        {t('descriptions.noCredentialsForThatIssuer')}
+                    </p>
+                )}
+                {validCredentials && validCredentials?.length > 0 && (
+                    <>
+                        <p className="web3-id-proof-request__not-provable-description bodyM ">
+                            {t('descriptions.unableToProve')}
+                        </p>
+                        <DisplayCredentialStatement
+                            className="m-t-10:not-first"
+                            dappName={dappName}
+                            validCredentials={validCredentials}
+                            credentialStatement={statement}
+                            net={net}
+                            setChosenId={noOp}
+                            showDescription={false}
+                        />
+                    </>
+                )}
+                <div className="web3-id-proof-request__actions flex">
+                    <Button className="web3-id-proof-request__not-provable-button flex-child-fill" onClick={onClick}>
+                        {t('reject')}
                     </Button>
-                </ButtonGroup>
+                </div>
             </div>
         </ExternalRequestLayout>
     );
@@ -213,62 +274,98 @@ export default function Web3ProofRequest({ onReject, onSubmit }: Props) {
     }
 
     if (!canProve) {
-        return <DisplayNotProvable onClick={withClose(onReject)} dappName={dappName} />;
+        return (
+            <DisplayNotProvable
+                onClick={withClose(onReject)}
+                dappName={dappName}
+                net={net}
+                statement={statements[validCredentials.findIndex((v) => !v.length)]}
+                statuses={statuses}
+            />
+        );
     }
 
     return (
-        <ExternalRequestLayout>
-            <div className="web3-id-proof-request__statement-container">
-                <DisplayCredentialStatement
-                    className="m-t-10:not-first"
-                    dappName={dappName}
-                    validCredentials={validCredentials[currentStatementIndex]}
-                    credentialStatement={statements[currentStatementIndex]}
-                    net={net}
-                    key={currentStatementIndex}
-                    setChosenId={(newId) =>
-                        setIds((currentIds) => {
-                            const newIds = [...currentIds];
-                            newIds[currentStatementIndex] = newId;
-                            return newIds;
-                        })
-                    }
-                />
-                <ButtonGroup className="web3-id-proof-request__actions">
-                    <Button disabled={creatingProof} onClick={withClose(onReject)}>
-                        {t('reject')}
+        <ExternalRequestLayout className="web3-id-proof-request__statement-container">
+            <DisplayCredentialStatement
+                className="m-t-10:not-first"
+                dappName={dappName}
+                validCredentials={validCredentials[currentStatementIndex]}
+                credentialStatement={statements[currentStatementIndex]}
+                net={net}
+                key={currentStatementIndex}
+                setChosenId={(newId) =>
+                    setIds((currentIds) => {
+                        const newIds = [...currentIds];
+                        newIds[currentStatementIndex] = newId;
+                        return newIds;
+                    })
+                }
+                showDescription
+            />
+            <div className="web3-id-proof-request__actions flex">
+                <div className="web3-id-proof-request__progress">
+                    {statements.length > 1 &&
+                        statements.map((_, i) => (
+                            <Button
+                                // eslint-disable-next-line react/no-array-index-key
+                                key={i}
+                                className={clsx(
+                                    'web3-id-proof-request__progress-dot',
+                                    currentStatementIndex === i && 'web3-id-proof-request__progress-dot--active'
+                                )}
+                                clear
+                                onClick={() => setCurrentStatementIndex(i)}
+                            />
+                        ))}
+                </div>
+                <Button
+                    danger
+                    className="web3-id-proof-request__reject-button"
+                    disabled={creatingProof}
+                    onClick={withClose(onReject)}
+                >
+                    <CloseIcon className="web3-id-proof-request__reject-icon" />
+                </Button>
+                {currentStatementIndex > 0 && (
+                    <Button
+                        disabled={creatingProof}
+                        className="web3-id-proof-request__back-button new-button-styling"
+                        onClick={() => setCurrentStatementIndex(currentStatementIndex - 1)}
+                    >
+                        {t('back')}
                     </Button>
-                    {currentStatementIndex === statements.length - 1 ? (
-                        <Button
-                            className="flex-center"
-                            onClick={() => {
-                                setCreatingProof(true);
-                                handleSubmit()
-                                    .then(withClose(onSubmit))
-                                    .catch((e) => {
-                                        setCreatingProof(false);
-                                        addToast(
-                                            e.message ? t('failedProofReason', { reason: e.message }) : t('failedProof')
-                                        );
-                                    });
-                            }}
-                            disabled={creatingProof || !canProve}
-                        >
-                            {creatingProof ? (
-                                <PendingArrows className="loading svg-white web3-id-proof-request__loading-icon" />
-                            ) : (
-                                t('accept')
-                            )}
-                        </Button>
-                    ) : (
-                        <Button
-                            className="flex-center"
-                            onClick={() => setCurrentStatementIndex(currentStatementIndex + 1)}
-                        >
-                            {t('continue')}
-                        </Button>
-                    )}
-                </ButtonGroup>
+                )}
+                {currentStatementIndex === statements.length - 1 ? (
+                    <Button
+                        className="flex-center web3-id-proof-request__continue-button new-button-styling"
+                        onClick={() => {
+                            setCreatingProof(true);
+                            handleSubmit()
+                                .then(withClose(onSubmit))
+                                .catch((e) => {
+                                    setCreatingProof(false);
+                                    addToast(
+                                        e.message ? t('failedProofReason', { reason: e.message }) : t('failedProof')
+                                    );
+                                });
+                        }}
+                        disabled={creatingProof || !canProve}
+                    >
+                        {creatingProof ? (
+                            <PendingArrows className="loading svg-white web3-id-proof-request__loading-icon" />
+                        ) : (
+                            t('approve')
+                        )}
+                    </Button>
+                ) : (
+                    <Button
+                        className="flex-center web3-id-proof-request__continue-button new-button-styling"
+                        onClick={() => setCurrentStatementIndex(currentStatementIndex + 1)}
+                    >
+                        {t('continue')}
+                    </Button>
+                )}
             </div>
         </ExternalRequestLayout>
     );

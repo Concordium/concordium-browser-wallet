@@ -105,7 +105,7 @@ export default function IdProofRequest({ onReject, onSubmit }: Props) {
     }
 
     return (
-        <ExternalRequestLayout>
+        <ExternalRequestLayout className="p-10">
             <div className="id-proof-request">
                 <div>
                     <h3 className="m-t-0 text-center">{t('header', { dappName })}</h3>
