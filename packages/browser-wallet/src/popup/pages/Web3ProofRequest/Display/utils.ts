@@ -1,5 +1,4 @@
-import { AttributeType } from '@concordium/web-sdk';
-import { CredentialSchemaSubject } from '@shared/storage/types';
+import { AttributeType, CredentialSchemaSubject } from '@concordium/web-sdk';
 import { withDateAndTime } from '@shared/utils/time-helpers';
 import { ClassName } from 'wallet-common-helpers';
 

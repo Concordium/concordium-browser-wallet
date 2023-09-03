@@ -82,7 +82,7 @@ function findCredentialsForStatementIssuer(
     statement: CredentialStatement,
     credentials: WalletCredential[],
     verifiableCredentials: VerifiableCredential[],
-    statuses: Record<string, VerifiableCredentialStatus | undefined>
+    statuses: Record<string, VerifiableCredentialStatus | undefined> | undefined
 ) {
     if (isAccountCredentialStatement(statement)) {
         return getAccountCredentialsWithMatchingIssuer(statement, credentials);
@@ -106,7 +106,7 @@ function DisplayNotProvable({
     dappName: string;
     statement: CredentialStatement;
     net: Network;
-    statuses: Record<string, VerifiableCredentialStatus | undefined>;
+    statuses: Record<string, VerifiableCredentialStatus | undefined> | undefined;
 }) {
     const { t } = useTranslation('web3IdProofRequest');
     const credentials = useAtomValue(credentialsAtom);

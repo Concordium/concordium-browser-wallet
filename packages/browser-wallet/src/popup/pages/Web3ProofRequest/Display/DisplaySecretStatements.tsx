@@ -1,5 +1,4 @@
-import { AttributeType, canProveAtomicStatement, StatementTypes } from '@concordium/web-sdk';
-import { CredentialSchemaSubject } from '@shared/storage/types';
+import { AttributeType, canProveAtomicStatement, CredentialSchemaSubject, StatementTypes } from '@concordium/web-sdk';
 import React from 'react';
 import { TFunction, useTranslation } from 'react-i18next';
 import { DisplayStatementLine } from './DisplayStatementLine';

@@ -116,14 +116,16 @@ export function getViableAccountCredentialsForStatement(
 export function getActiveWeb3IdCredentialsWithMatchingIssuer(
     credentialStatement: VerifiableCredentialStatement,
     verifiableCredentials: VerifiableCredential[],
-    statuses: Record<string, VerifiableCredentialStatus | undefined>
+    statuses: Record<string, VerifiableCredentialStatus | undefined> | undefined
 ) {
     const allowedContracts = credentialStatement.idQualifier.issuers;
     const allowedCredentials = verifiableCredentials?.filter(
         (vc) =>
             allowedContracts.some((address) =>
                 areContractAddressesEqual(address, getContractAddressFromIssuerDID(vc.issuer))
-            ) && statuses[vc.id] === VerifiableCredentialStatus.Active
+            ) &&
+            statuses !== undefined &&
+            statuses[vc.id] === VerifiableCredentialStatus.Active
     );
     return allowedCredentials;
 }
