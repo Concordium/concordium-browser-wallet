@@ -4,6 +4,7 @@ import { ConfirmedIdentity, CreationStatus, Identity } from '@shared/storage/typ
 import { useAtomValue } from 'jotai';
 import { TFunction, useTranslation } from 'react-i18next';
 import { formatDate } from 'wallet-common-helpers';
+import { isoToCountryName } from '@popup/pages/IdProofRequest/DisplayStatement/utils';
 import sharedTranslations from '../i18n/en';
 
 export function useGetAttributeName() {
@@ -76,6 +77,10 @@ export function useDisplayAttributeValue() {
                 return formatGender(parseInt(value, 10), t);
             case 'idDocType':
                 return formatDocumentType(value, t);
+            case 'countryOfResidence':
+            case 'nationality':
+            case 'idDocIssuer':
+                return isoToCountryName(i18n.resolvedLanguage)(value);
             default:
                 return value;
         }
