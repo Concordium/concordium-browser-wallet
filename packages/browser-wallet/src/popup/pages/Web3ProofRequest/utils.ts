@@ -80,6 +80,14 @@ export function getWeb3CommitmentInput(verifiableCredential: VerifiableCredentia
     );
 }
 
+export function getAccountCredentialsWithMatchingIssuer(
+    credentialStatement: AccountCredentialStatement,
+    credentials: WalletCredential[]
+) {
+    const allowedIssuers = credentialStatement.idQualifier.issuers;
+    return credentials?.filter((c) => allowedIssuers.includes(c.providerIndex));
+}
+
 /**
  * Given a credential statement for an account credential, and a list of account credentials, return the filtered list of credentials that satisfy the statement.
  * Note this also requires the identities for the account credentials as an additional argument, to actually check the attributes of the credential.
@@ -89,19 +97,37 @@ export function getViableAccountCredentialsForStatement(
     identities: ConfirmedIdentity[],
     credentials: WalletCredential[]
 ): WalletCredential[] {
-    const allowedIssuers = credentialStatement.idQualifier.issuers;
-    return credentials?.filter((c) => {
-        if (allowedIssuers.includes(c.providerIndex)) {
-            const identity = (identities || []).find((id) => isIdentityOfCredential(id)(c));
-            if (identity) {
-                return canProveCredentialStatement(
-                    credentialStatement,
-                    identity.idObject.value.attributeList.chosenAttributes
-                );
-            }
+    const accountCredentialsWithMatchingIssuer = getAccountCredentialsWithMatchingIssuer(
+        credentialStatement,
+        credentials
+    );
+    return accountCredentialsWithMatchingIssuer?.filter((c) => {
+        const identity = (identities || []).find((id) => isIdentityOfCredential(id)(c));
+        if (identity) {
+            return canProveCredentialStatement(
+                credentialStatement,
+                identity.idObject.value.attributeList.chosenAttributes
+            );
         }
         return false;
     });
+}
+
+export function getActiveWeb3IdCredentialsWithMatchingIssuer(
+    credentialStatement: VerifiableCredentialStatement,
+    verifiableCredentials: VerifiableCredential[],
+    statuses: Record<string, VerifiableCredentialStatus | undefined> | undefined
+) {
+    const allowedContracts = credentialStatement.idQualifier.issuers;
+    const allowedCredentials = verifiableCredentials?.filter(
+        (vc) =>
+            allowedContracts.some((address) =>
+                areContractAddressesEqual(address, getContractAddressFromIssuerDID(vc.issuer))
+            ) &&
+            statuses !== undefined &&
+            statuses[vc.id] === VerifiableCredentialStatus.Active
+    );
+    return allowedCredentials;
 }
 
 /**
@@ -112,14 +138,11 @@ export function getViableWeb3IdCredentialsForStatement(
     verifiableCredentials: VerifiableCredential[],
     statuses: Record<string, VerifiableCredentialStatus | undefined>
 ): VerifiableCredential[] {
-    const allowedContracts = credentialStatement.idQualifier.issuers;
-    const allowedCredentials = verifiableCredentials?.filter(
-        (vc) =>
-            allowedContracts.some((address) =>
-                areContractAddressesEqual(address, getContractAddressFromIssuerDID(vc.issuer))
-            ) && statuses[vc.id] === VerifiableCredentialStatus.Active
+    const allowedCredentials = getActiveWeb3IdCredentialsWithMatchingIssuer(
+        credentialStatement,
+        verifiableCredentials,
+        statuses
     );
-
     return allowedCredentials.filter((cred) =>
         canProveCredentialStatement(credentialStatement, cred.credentialSubject.attributes)
     );

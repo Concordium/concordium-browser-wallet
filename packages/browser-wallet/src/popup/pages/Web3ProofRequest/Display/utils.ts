@@ -1,4 +1,5 @@
-import { CredentialSchemaSubject } from '@shared/storage/types';
+import { AttributeType, CredentialSchemaSubject } from '@concordium/web-sdk';
+import { withDateAndTime } from '@shared/utils/time-helpers';
 import { ClassName } from 'wallet-common-helpers';
 import { SecretStatementV2 } from '../utils';
 
@@ -22,3 +23,7 @@ export type DisplayProps<StatementType, Attribute> = ClassName & {
     formatAttribute?: (key: string, value: Attribute) => string;
     overwriteSecretLine?: OverwriteSecretLine;
 };
+
+export function defaultFormatAttribute<Attribute extends AttributeType>(_: string, value: Attribute) {
+    return value instanceof Date ? withDateAndTime(value) : value?.toString();
+}

@@ -1,13 +1,14 @@
 import {
     AccountCredentialStatement,
     createAccountDID,
+    CredentialSchemaSubject,
     IDENTITY_SUBJECT_SCHEMA,
     RevealStatementV2,
     StatementTypes,
 } from '@concordium/web-sdk';
 import { displaySplitAddress, useIdentityName, useIdentityOf } from '@popup/shared/utils/account-helpers';
 import { useDisplayAttributeValue } from '@popup/shared/utils/identity-helpers';
-import { ConfirmedIdentity, CredentialSchemaSubject, WalletCredential } from '@shared/storage/types';
+import { ConfirmedIdentity, WalletCredential } from '@shared/storage/types';
 import React, { useCallback, useEffect, useState } from 'react';
 import { useTranslation } from 'react-i18next';
 import { SecretStatement, useStatementName, useStatementValue } from '../IdProofRequest/DisplayStatement/utils';

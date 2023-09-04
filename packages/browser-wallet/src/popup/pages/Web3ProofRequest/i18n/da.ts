@@ -2,7 +2,7 @@ import type en from './en';
 
 const t: typeof en = {
     header: '{{dappName}} anmoder om følgende information om dig:',
-    accept: 'Godkend',
+    approve: 'Godkend',
     reject: 'Afvis',
     back: 'Tilbage',
     continue: 'Fortsæt',
@@ -43,7 +43,8 @@ const t: typeof en = {
         verifiableCredential: 'Vælg en verifiable credential til at afsløre/bevise den anmodet information.',
         accountCredential:
             'Vælg en account, hvis forbundne identity skal bruges til at afsløre/bevise den anmodet information.',
-        unableToProve: 'One or more attributes does not meet the requirements from the verifier.', // TODO
+        unableToProve: 'One or more attributes do not meet the requirements from the verifier.',
+        noCredentialsForThatIssuer: 'You do not hold any credentials from the issuer that the verifier requested.',
     },
     failedProof: 'Bevis kunne ikke oprettes',
     failedProofReason: 'Bevis kunne ikke oprettes: {{ reason }}',

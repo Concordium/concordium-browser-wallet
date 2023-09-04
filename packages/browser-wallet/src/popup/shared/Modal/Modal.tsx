@@ -52,6 +52,7 @@ export type ModalProps<T extends WithOnClick = WithOnClick> = {
     onClose?(): void;
     bottom?: boolean;
     middle?: boolean;
+    stableScrollbarGutter?: boolean;
     /**
      * Used to overwrite styling for the modal content box
      */
@@ -77,6 +78,7 @@ export default function Modal<T extends WithOnClick = WithOnClick>({
     onClose = noOp,
     bottom = false,
     middle = false,
+    stableScrollbarGutter = false,
     children,
 }: PropsWithChildren<ModalProps<T>>): JSX.Element | null {
     const [{ isOpen, isExiting }, setOpenState] = useState<OpenState>({ isOpen: false, isExiting: false });
@@ -145,7 +147,14 @@ export default function Modal<T extends WithOnClick = WithOnClick>({
         <>
             {triggerWithOpen}
             {isOpen && (
-                <Portal className={clsx('modal', bottom && 'modal--align-bottom', middle && 'modal--align-middle')}>
+                <Portal
+                    className={clsx(
+                        'modal',
+                        bottom && 'modal--align-bottom',
+                        middle && 'modal--align-middle',
+                        stableScrollbarGutter && 'modal--stable-scrollbar-gutter'
+                    )}
+                >
                     <AnimatePresence onExitComplete={handleExitComplete}>
                         {!isExiting && (
                             <DetectClickOutside

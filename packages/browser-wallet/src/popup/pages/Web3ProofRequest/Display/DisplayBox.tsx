@@ -3,7 +3,7 @@ import Modal from '@popup/shared/Modal';
 import clsx from 'clsx';
 import React, { ReactNode, useState } from 'react';
 import { ClassName } from 'wallet-common-helpers';
-import InfoTooltipIcon from '@assets/svg/info-tooltip.svg';
+import InfoTooltipIcon from '@assets/svg/help.svg';
 
 type DisplayBoxProps = ClassName & {
     header: string;
@@ -25,7 +25,7 @@ export function DisplayBox({ className, children, header, infoBox }: DisplayBoxP
                     onOpen={() => setOpen(true)}
                     onClose={() => setOpen(false)}
                     trigger={
-                        <Button clear className="flex">
+                        <Button clear className="flex display-box__tooltip-button">
                             <InfoTooltipIcon className="display-box__tooltip-icon" />
                         </Button>
                     }

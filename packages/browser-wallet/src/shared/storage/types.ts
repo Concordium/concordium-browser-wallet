@@ -1,12 +1,11 @@
 import { APIVerifiableCredential } from '@concordium/browser-wallet-api-helpers';
 import type {
+    CredentialSchemaSubject,
     CredentialSubject,
     CryptographicParameters,
     HexString,
     IdentityObjectV1,
     Network,
-    SimplePropertyDetails,
-    TimestampPropertyDetails,
     Versioned,
 } from '@concordium/web-sdk';
 
@@ -294,56 +293,6 @@ export interface VerifiableCredential extends APIVerifiableCredential {
     // The original metadataUrl received when first adding the credential
     // TODO: The URL should be updated when there are valid updates to the metadata.
     metadataUrl: string;
-}
-
-interface CredentialSchemaProperty {
-    title: string;
-    type: 'string' | 'number' | string;
-    description: string;
-    format?: string;
-}
-
-export type TimestampProperty = {
-    title: string;
-    type: 'object';
-    properties: {
-        type: {
-            type: 'string';
-            const: 'date-time';
-        };
-        timestamp: {
-            type: 'string';
-            format?: 'date-time';
-        };
-    };
-    required: ['type', 'timestamp'];
-    description?: string;
-};
-
-type IdDetails = {
-    title: string;
-    description?: string;
-    type: 'string';
-};
-
-type CredentialSchemaAttributes = {
-    title?: string;
-    description?: string;
-    type: 'object';
-    properties: Record<
-        string,
-        CredentialSchemaProperty | TimestampProperty | SimplePropertyDetails | TimestampPropertyDetails
-    >;
-    required: string[];
-};
-
-export interface CredentialSchemaSubject {
-    type: string;
-    properties: {
-        id: IdDetails;
-        attributes: CredentialSchemaAttributes;
-    };
-    required: string[];
 }
 
 export interface SchemaProperties {

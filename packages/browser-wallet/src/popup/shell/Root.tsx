@@ -6,7 +6,7 @@ import { noOp } from 'wallet-common-helpers';
 
 import { Dimensions, large, medium, small } from '@popup/constants/dimensions';
 import { popupMessageHandler } from '@popup/shared/message-handler';
-import { isSpawnedWindow } from '@popup/shared/window-helpers';
+import { isSpawnedWeb3IdProofWindow, isSpawnedWindow } from '@popup/shared/window-helpers';
 import { networkConfigurationAtom, themeAtom } from '@popup/store/settings';
 import { Theme as ThemeType } from '@shared/storage/types';
 import { absoluteRoutes } from '@popup/constants/routes';
@@ -45,8 +45,10 @@ function useScaling() {
         }
 
         if (dimensions && isSpawnedWindow) {
-            // TODO only for web3IdRequest?
-            dimensions = { width: 440, height: 870 };
+            if (isSpawnedWeb3IdProofWindow) {
+                dimensions = { width: 440, height: 870 };
+            }
+
             // Send a message to the BG script to resize the window.
             popupMessageHandler.sendInternalMessage(InternalMessageType.SetViewSize, dimensions).catch(noOp);
         }

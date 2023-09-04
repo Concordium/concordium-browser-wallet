@@ -12,6 +12,7 @@ import {
 import { networkConfigurationAtom } from '@popup/store/settings';
 import { saveData } from '@popup/shared/utils/file-helpers';
 import { stringify } from 'json-bigint';
+import { replaceDateWithTimeStampAttribute } from '@concordium/web-sdk';
 
 export type VerifiableCredentialExport = {
     verifiableCredentials: VerifiableCredential[];
@@ -45,7 +46,8 @@ function createExport(
     };
 
     // Use json-bigint to serialize bigints as json numbers.
-    return encrypt(stringify(exportContent), encryptionKey);
+    // Ensure that Dates are stored as timestamps to not lose typing (otherwise they are serialized as strings).
+    return encrypt(stringify(exportContent, replaceDateWithTimeStampAttribute), encryptionKey);
 }
 
 export function useVerifiableCredentialExport() {
