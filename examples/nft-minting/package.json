@@ -3,7 +3,7 @@
     "packageManager": "yarn@3.2.0",
     "dependencies": {
         "@concordium/browser-wallet-api-helpers": "workspace:^",
-        "@concordium/web-sdk": "^6.2.1",
+        "@concordium/web-sdk": "^6.3.0",
         "cors": "^2.8.5",
         "express": "^4.18.1",
         "express-fileupload": "^1.4.0",
