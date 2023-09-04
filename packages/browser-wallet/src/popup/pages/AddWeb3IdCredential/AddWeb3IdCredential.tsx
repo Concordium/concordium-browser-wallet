@@ -238,7 +238,7 @@ export default function AddWeb3IdCredential({ onAllow, onReject }: Props) {
 
     const urlDisplay = displayUrl(url);
     return (
-        <ExternalRequestLayout>
+        <ExternalRequestLayout className="p-10">
             <div className="flex-column h-full">
                 {error && (
                     <div className="add-web3Id-credential__error">

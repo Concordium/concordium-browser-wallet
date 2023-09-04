@@ -6,6 +6,17 @@
 
 -   Verifiable credentials are now validated according to the schema when being added. This will e.g. block setting an attribute as an integer if the schema defines it as a string.
 
+## 1.1.5
+
+### Added
+
+-   Indicator on proof request page, to show how many credential statements are requested, and the current position.
+
+### Fixed
+
+-   An issue where Date attributes were saved as strings when exported. This would mean that they would lose typing and the credential would be broken.
+-   An issue where statement parameters were not validated according to the attribute bounds.
+
 ## 1.1.4
 
 ### Added

@@ -8,6 +8,7 @@ import Toast from '@popup/shared/Toast/Toast';
 import { useCredential } from '@popup/shared/utils/account-helpers';
 import AccountDetails from '@popup/pages/Account/AccountDetails';
 import clsx from 'clsx';
+import { ClassName } from 'wallet-common-helpers';
 
 function Header() {
     const { t } = useTranslation('mainLayout');
@@ -61,7 +62,7 @@ interface Props {
     children?: ReactNode;
 }
 
-export default function ExternalRequestLayout({ children }: Props) {
+export default function ExternalRequestLayout({ children, className }: Props & ClassName) {
     const { state } = useLocation() as Location;
     const account = useCredential(state.payload.accountAddress);
 
@@ -70,7 +71,9 @@ export default function ExternalRequestLayout({ children }: Props) {
             <Header />
             <div className="external-request-layout">
                 {account && <AccountDetails expanded={false} account={account} />}
-                <main className={clsx('external-request-layout__main', !account && 'h-full')}>{children}</main>
+                <main className={clsx('external-request-layout__main', !account && 'h-full', className)}>
+                    {children}
+                </main>
                 <Toast />
             </div>
         </>
