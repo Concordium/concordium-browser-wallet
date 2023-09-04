@@ -1958,7 +1958,7 @@ __metadata:
     "@babel/core": ^7.18.2
     "@concordium/browser-wallet-api": "workspace:^"
     "@concordium/browser-wallet-api-helpers": "workspace:^"
-    "@concordium/web-sdk": ^6.2.1
+    "@concordium/web-sdk": ^6.3.0
     "@craftamap/esbuild-plugin-html": ^0.4.0
     "@mdx-js/react": ^1.6.22
     "@noble/ed25519": ^1.7.0
@@ -2045,6 +2045,27 @@ __metadata:
     json-bigint: ^1.0.0
     uuid: ^8.3.2
   checksum: fd308fd31f9833a90e526c672bc8e0fd173ee41841350c2b477b39ac7c336f67b27c20d638416a0a807c631afdd196764f882e59ada5aa65d88f955901715d07
+  languageName: node
+  linkType: hard
+
+"@concordium/common-sdk@npm:9.3.0":
+  version: 9.3.0
+  resolution: "@concordium/common-sdk@npm:9.3.0"
+  dependencies:
+    "@concordium/rust-bindings": 1.2.0
+    "@grpc/grpc-js": ^1.3.4
+    "@noble/ed25519": ^1.7.1
+    "@protobuf-ts/runtime-rpc": ^2.8.2
+    "@scure/bip39": ^1.1.0
+    big.js: ^6.2.0
+    bs58check: ^2.1.2
+    buffer: ^6.0.3
+    cross-fetch: 3.1.5
+    hash.js: ^1.1.7
+    iso-3166-1: ^2.1.1
+    json-bigint: ^1.0.0
+    uuid: ^8.3.2
+  checksum: 7457c54948feba0e6ad5e6e591c292300fe6457d77235f4aa0d63efc9328bb63a103144502962b53bac323d98af4407b7322bd8c74ad05252329d9ef9c1ad5f3
   languageName: node
   linkType: hard
 
@@ -2137,6 +2158,20 @@ __metadata:
     buffer: ^6.0.3
     process: ^0.11.10
   checksum: 6344d56fc8f71ab92c6913c4e2755a21660491964503d2f5709d59501e634c279611b620ec067937eb132f9a47109f54bcb0dcbceca87377a9de88e69bb61ed0
+  languageName: node
+  linkType: hard
+
+"@concordium/web-sdk@npm:^6.3.0":
+  version: 6.3.0
+  resolution: "@concordium/web-sdk@npm:6.3.0"
+  dependencies:
+    "@concordium/common-sdk": 9.3.0
+    "@concordium/rust-bindings": 1.2.0
+    "@grpc/grpc-js": ^1.3.4
+    "@protobuf-ts/grpcweb-transport": ^2.8.2
+    buffer: ^6.0.3
+    process: ^0.11.10
+  checksum: 86b069988c88e148490dd12b8d0c2bcbe954dee67c4074ec4965a491ab907c5ffba2a76da53479802605313f204fc6dfc0b0e3033fc186391ae3fe3a21ca6796
   languageName: node
   linkType: hard
 
