@@ -1,5 +1,11 @@
 # Changelog
 
+## Unreleased
+
+### Fixed
+
+-   An issue where credential schemas were not updated with the correct key.
+
 ## 1.1.5
 
 ### Added

@@ -916,7 +916,7 @@ export async function getCredentialSchemas(
     abortControllers: AbortController[],
     client: ConcordiumGRPCClient
 ) {
-    const onChainSchemas: VerifiableCredentialSchema[] = [];
+    const onChainSchemas: { schema: VerifiableCredentialSchema; url: string }[] = [];
 
     const allContractAddresses = credentials.map((vc) => getCredentialRegistryContractAddress(vc.id));
     const issuerContractAddresses = new Set(allContractAddresses);
@@ -937,7 +937,7 @@ export async function getCredentialSchemas(
                     registryMetadata.credentialSchema.schema,
                     controller
                 );
-                onChainSchemas.push(credentialSchema);
+                onChainSchemas.push({ schema: credentialSchema, url: registryMetadata.credentialSchema.schema.url });
             } catch (e) {
                 // Ignore errors that occur because we aborted, as that is expected to happen.
                 if (!controller.signal.aborted) {
@@ -1044,12 +1044,12 @@ export async function getChangesToCredentialSchemas(
     for (const updatedSchema of upToDateSchemas) {
         if (Object.keys(updatedSchemasInStorage).length === 0) {
             updatedSchemasInStorage = {
-                [updatedSchema.$id]: updatedSchema,
+                [updatedSchema.url]: updatedSchema.schema,
             };
             updateReceived = true;
         } else {
-            updatedSchemasInStorage[updatedSchema.$id] = updatedSchema;
-            if (JSON.stringify(storedSchemas[updatedSchema.$id]) !== JSON.stringify(updatedSchema)) {
+            updatedSchemasInStorage[updatedSchema.url] = updatedSchema.schema;
+            if (JSON.stringify(storedSchemas[updatedSchema.url]) !== JSON.stringify(updatedSchema)) {
                 updateReceived = true;
             }
         }
