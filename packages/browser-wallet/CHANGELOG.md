@@ -1,5 +1,11 @@
 # Changelog
 
+## 1.1.6
+
+### Fixed
+
+-   On the proof request page, routing back to credential statements no longer resets the selection.
+
 ## 1.1.5
 
 ### Added

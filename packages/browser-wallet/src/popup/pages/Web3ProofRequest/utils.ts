@@ -35,6 +35,7 @@ export interface DisplayCredentialStatementProps<Statement, Credential> extends 
     credentialStatement: Statement;
     validCredentials: Credential[];
     dappName: string;
+    chosenId: string;
     setChosenId: (id: string) => void;
     net: Network;
     showDescription: boolean;

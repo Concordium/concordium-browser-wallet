@@ -1,7 +1,7 @@
 import { RevealStatementV2, StatementTypes, VerifiableCredentialStatement } from '@concordium/web-sdk';
 import Img from '@popup/shared/Img';
 import { VerifiableCredential } from '@shared/storage/types';
-import React, { useCallback, useEffect, useState } from 'react';
+import React, { useCallback, useMemo, useState } from 'react';
 import { useTranslation } from 'react-i18next';
 import {
     useCredentialLocalization,
@@ -34,6 +34,7 @@ export default function DisplayWeb3Statement({
     credentialStatement,
     validCredentials,
     dappName,
+    chosenId,
     setChosenId,
     net,
     showDescription,
@@ -45,18 +46,15 @@ export default function DisplayWeb3Statement({
     const secrets = credentialStatement.statement.filter(
         (s) => s.type !== StatementTypes.RevealAttribute
     ) as SecretStatementV2[];
-    const [chosenCredential, setChosenCredential] = useState<VerifiableCredential | undefined>(validCredentials[0]);
+
+    const initialIndex = useMemo(() => validCredentials.findIndex((c) => c.id === chosenId), []);
+    const [chosenCredential, setChosenCredential] = useState<VerifiableCredential | undefined>(
+        validCredentials[initialIndex]
+    );
 
     const onChange = useCallback((credential: VerifiableCredential) => {
         setChosenCredential(credential);
         setChosenId(createWeb3IdDIDFromCredential(credential, net));
-    }, []);
-
-    // Initially set chosenId
-    useEffect(() => {
-        if (chosenCredential) {
-            setChosenId(createWeb3IdDIDFromCredential(chosenCredential, net));
-        }
     }, []);
 
     const schema = useCredentialSchema(chosenCredential);
@@ -77,6 +75,7 @@ export default function DisplayWeb3Statement({
                 DisplayOption={DisplayVC}
                 onChange={onChange}
                 header={t('select.verifiableCredential')}
+                initialIndex={initialIndex}
             />
             {reveals.length !== 0 && (
                 <DisplayRevealStatements
