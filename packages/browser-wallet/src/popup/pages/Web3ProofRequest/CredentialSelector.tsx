@@ -39,7 +39,7 @@ export default function CredentialSelector<T extends string | number | object>({
 
     return (
         <Modal
-            disableClose
+            showCloseButton={false}
             open={open}
             onOpen={() => setOpen(true)}
             onClose={() => setOpen(false)}
