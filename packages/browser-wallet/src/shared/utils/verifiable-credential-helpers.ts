@@ -1211,3 +1211,28 @@ export async function findNextUnusedVerifiableCredentialIndex(
 
     return index;
 }
+
+/**
+ * Creates a schema like the input with the id removed. This is used to be able to use the
+ * schema to validate an incoming credential being added, as the wallet is responsible for
+ * adding the id at a later point.
+ * @param schema the schema to create a version of without an id
+ * @returns the schema without the required id field
+ */
+export function withIdRemovedFromSchema(schema: VerifiableCredentialSchema) {
+    const propertiesWithNoId = {
+        attributes: schema.properties.credentialSubject.properties.attributes,
+    };
+    const requiredAttributes = schema.properties.credentialSubject.required.filter((req) => req !== 'id');
+    const credentialSubjectWithNoId = {
+        ...schema.properties.credentialSubject,
+        properties: propertiesWithNoId,
+        required: requiredAttributes,
+    };
+    const schemaOuterPropertiesWithNoId = {
+        ...schema.properties,
+        credentialSubject: credentialSubjectWithNoId,
+    };
+
+    return { ...schema, properties: schemaOuterPropertiesWithNoId };
+}

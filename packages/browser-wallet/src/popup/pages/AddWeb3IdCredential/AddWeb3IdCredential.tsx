@@ -24,6 +24,7 @@ import {
     fetchLocalization,
     findNextUnusedVerifiableCredentialIndex,
     getCredentialRegistryContractAddress,
+    withIdRemovedFromSchema,
 } from '@shared/utils/verifiable-credential-helpers';
 import { APIVerifiableCredential } from '@concordium/browser-wallet-api-helpers';
 import { grpcClientAtom, networkConfigurationAtom } from '@popup/store/settings';
@@ -119,9 +120,10 @@ export default function AddWeb3IdCredential({ onAllow, onReject }: Props) {
             // Use the schema to validate the credential.
             const validator = new Validator();
             try {
+                const schemaWithNoId = withIdRemovedFromSchema(schema);
                 const validationResult = validator.validate(
                     { credentialSubject: credential.credentialSubject },
-                    schema as unknown as Schema
+                    schemaWithNoId as unknown as Schema
                 );
                 if (!validationResult.valid) {
                     setError(t('error.schemaValidation', { errors: validationResult.errors.toString() }));
