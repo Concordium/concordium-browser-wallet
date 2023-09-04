@@ -1,5 +1,11 @@
 # Changelog
 
+## Unreleased
+
+### Fixed
+
+-   UI improvements to the credential selector.
+
 ## 1.1.5
 
 ### Added
