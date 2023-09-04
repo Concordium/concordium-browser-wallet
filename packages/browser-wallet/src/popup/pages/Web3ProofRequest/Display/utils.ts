@@ -1,4 +1,4 @@
-import { AttributeType, CredentialSchemaSubject } from '@concordium/web-sdk';
+import { AttributeType, CredentialSchemaSubject, isTimestampAttribute } from '@concordium/web-sdk';
 import { withDateAndTime } from '@shared/utils/time-helpers';
 import { ClassName } from 'wallet-common-helpers';
 import { SecretStatementV2 } from '../utils';
@@ -25,5 +25,7 @@ export type DisplayProps<StatementType, Attribute> = ClassName & {
 };
 
 export function defaultFormatAttribute<Attribute extends AttributeType>(_: string, value: Attribute) {
-    return value instanceof Date ? withDateAndTime(value) : value?.toString();
+    return value !== undefined && isTimestampAttribute(value)
+        ? withDateAndTime(Date.parse(value.timestamp))
+        : value?.toString();
 }

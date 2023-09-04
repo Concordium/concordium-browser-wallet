@@ -15,7 +15,6 @@ import { decrypt } from '@shared/utils/crypto';
 import { useHdWallet } from '@popup/shared/utils/account-helpers';
 import JSONBigInt from 'json-bigint';
 import { FileInput } from '@popup/shared/Form/FileInput';
-import { reviveDateFromTimeStampAttribute } from '@concordium/web-sdk';
 import { VerifiableCredentialCardWithStatusFromChain } from '../VerifiableCredential/VerifiableCredentialList';
 import { ExportFormat, VerifiableCredentialExport } from './utils';
 
@@ -47,7 +46,7 @@ async function parseExport(data: EncryptedData, encryptionKey: string): Promise<
     const backup: ExportFormat = JSONBigInt({
         alwaysParseAsBig: true,
         useNativeBigInt: true,
-    }).parse(decrypted, reviveDateFromTimeStampAttribute);
+    }).parse(decrypted);
     // Change index to number, due to parse changing all numbers to bigints.
     backup.value.verifiableCredentials = backup.value.verifiableCredentials.map((v) => ({
         ...v,
