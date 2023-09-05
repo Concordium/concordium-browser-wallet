@@ -1,3 +1,4 @@
+import { Schema, Validator } from 'jsonschema';
 import {
     RevocationDataHolder,
     RevokeCredentialHolderParam,
@@ -13,6 +14,7 @@ import {
     getCredentialIdFromSubjectDID,
     getContractAddressFromIssuerDID,
     getVerifiableCredentialPublicKeyfromSubjectDID,
+    coerceBigIntIntegerToNumber,
 } from '../src/shared/utils/verifiable-credential-helpers';
 import { mainnet, testnet } from '../src/shared/constants/networkConfiguration';
 
@@ -183,4 +185,22 @@ test('getCredentialIdFromSubjectDID extracts credId without network', () => {
     expect(credId).toBe(
         'aad98095db73b5b22f7f64823a495c6c57413947353646313dc453fa4604715d2f93b2c1f8cb4c9625edd6330e1d27fa'
     );
+});
+
+test('bigint with type integer validates against schema when coercing in pre validate', () => {
+    const validator = new Validator();
+    const schema: Schema = {
+        type: 'object',
+        properties: {
+            age: { type: 'integer' },
+        },
+    };
+
+    const p = {
+        age: BigInt(97),
+    };
+
+    const validationResult = validator.validate(p, schema, { preValidateProperty: coerceBigIntIntegerToNumber });
+
+    expect(validationResult.valid).toBeTruthy();
 });
