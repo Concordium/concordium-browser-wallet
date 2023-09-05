@@ -134,12 +134,15 @@ function timestampToDate(attribute: TimestampAttribute): Date {
 }
 
 function validateTimestampAttribute(attributeTag: string, attributeValue: AttributeType) {
-    if (
-        isTimestampAttribute(attributeValue) &&
-        (timestampToDate(attributeValue).getTime() < MIN_DATE_TIMESTAMP ||
-            timestampToDate(attributeValue).getTime() > MAX_DATE_TIMESTAMP)
-    ) {
-        return `The attribute [${attributeValue}] for key [${attributeTag}] is out of bounds for a Date. The Date must be between ${MIN_DATE_ISO} and ${MAX_DATE_ISO}`;
+    if (isTimestampAttribute(attributeValue)) {
+        const timestamp = timestampToDate(attributeValue).getTime();
+        if (Number.isNaN(timestamp)) {
+            return `The attribute [${attributeValue.timestamp}] for key [${attributeTag}] cannot be parsed as a Date.`;
+        }
+
+        if (timestamp < MIN_DATE_TIMESTAMP || timestamp > MAX_DATE_TIMESTAMP) {
+            return `The attribute [${attributeValue.timestamp}] for key [${attributeTag}] is out of bounds for a Date. The Date must be between ${MIN_DATE_ISO} and ${MAX_DATE_ISO}`;
+        }
     }
     return undefined;
 }
