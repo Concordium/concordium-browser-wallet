@@ -396,105 +396,121 @@ const verifiableCredentialSchemaSchema = {
     $ref: '#/definitions/VerifiableCredentialSchema',
     $schema: 'http://json-schema.org/draft-07/schema#',
     definitions: {
+        CredentialSchemaProperty: {
+            anyOf: [
+                {
+                    $ref: '#/definitions/SimpleProperty',
+                },
+                {
+                    $ref: '#/definitions/TimestampProperty',
+                },
+            ],
+        },
+        CredentialSchemaSubject: {
+            additionalProperties: false,
+            properties: {
+                properties: {
+                    additionalProperties: false,
+                    properties: {
+                        attributes: {
+                            additionalProperties: false,
+                            properties: {
+                                description: {
+                                    type: 'string',
+                                },
+                                properties: {
+                                    additionalProperties: {
+                                        anyOf: [
+                                            {
+                                                $ref: '#/definitions/CredentialSchemaProperty',
+                                            },
+                                            {
+                                                $ref: '#/definitions/TimestampProperty',
+                                            },
+                                        ],
+                                    },
+                                    type: 'object',
+                                },
+                                required: {
+                                    items: {
+                                        type: 'string',
+                                    },
+                                    type: 'array',
+                                },
+                                title: {
+                                    type: 'string',
+                                },
+                                type: {
+                                    const: 'object',
+                                    type: 'string',
+                                },
+                            },
+                            required: ['type', 'properties', 'required'],
+                            type: 'object',
+                        },
+                        id: {
+                            additionalProperties: false,
+                            properties: {
+                                description: {
+                                    type: 'string',
+                                },
+                                title: {
+                                    type: 'string',
+                                },
+                                type: {
+                                    const: 'string',
+                                    type: 'string',
+                                },
+                            },
+                            required: ['title', 'type'],
+                            type: 'object',
+                        },
+                    },
+                    required: ['id', 'attributes'],
+                    type: 'object',
+                },
+                required: {
+                    items: {
+                        type: 'string',
+                    },
+                    type: 'array',
+                },
+                type: {
+                    const: 'object',
+                    type: 'string',
+                },
+            },
+            required: ['type', 'properties', 'required'],
+            type: 'object',
+        },
         SchemaProperties: {
             additionalProperties: false,
             properties: {
                 credentialSubject: {
-                    additionalProperties: false,
-                    properties: {
-                        properties: {
-                            additionalProperties: false,
-                            properties: {
-                                attributes: {
-                                    additionalProperties: false,
-                                    properties: {
-                                        description: {
-                                            type: 'string',
-                                        },
-                                        properties: {
-                                            additionalProperties: {
-                                                anyOf: [
-                                                    {
-                                                        additionalProperties: false,
-                                                        properties: {
-                                                            description: {
-                                                                type: 'string',
-                                                            },
-                                                            format: {
-                                                                type: 'string',
-                                                            },
-                                                            title: {
-                                                                type: 'string',
-                                                            },
-                                                            type: {
-                                                                type: 'string',
-                                                            },
-                                                        },
-                                                        required: ['title', 'type', 'description'],
-                                                        type: 'object',
-                                                    },
-                                                    {
-                                                        $ref: '#/definitions/TimestampProperty',
-                                                    },
-                                                ],
-                                            },
-                                            type: 'object',
-                                        },
-                                        required: {
-                                            items: {
-                                                type: 'string',
-                                            },
-                                            type: 'array',
-                                        },
-                                        title: {
-                                            type: 'string',
-                                        },
-                                        type: {
-                                            const: 'object',
-                                            type: 'string',
-                                        },
-                                    },
-                                    required: ['type', 'properties', 'required'],
-                                    type: 'object',
-                                },
-                                id: {
-                                    additionalProperties: false,
-                                    properties: {
-                                        description: {
-                                            type: 'string',
-                                        },
-                                        format: {
-                                            type: 'string',
-                                        },
-                                        title: {
-                                            type: 'string',
-                                        },
-                                        type: {
-                                            type: 'string',
-                                        },
-                                    },
-                                    required: ['title', 'type', 'description'],
-                                    type: 'object',
-                                },
-                            },
-                            required: ['id', 'attributes'],
-                            type: 'object',
-                        },
-                        required: {
-                            items: {
-                                type: 'string',
-                            },
-                            type: 'array',
-                        },
-                        type: {
-                            type: 'string',
-                        },
-                    },
-                    required: ['type', 'properties', 'required'],
-                    type: 'object',
+                    $ref: '#/definitions/CredentialSchemaSubject',
                 },
             },
             required: ['credentialSubject'],
+            type: 'object',
+        },
+        SimpleProperty: {
+            additionalProperties: false,
+            properties: {
+                description: {
+                    type: 'string',
+                },
+                format: {
+                    type: 'string',
+                },
+                title: {
+                    type: 'string',
+                },
+                type: {
+                    enum: ['string', 'integer'],
+                    type: 'string',
+                },
+            },
+            required: ['title', 'type'],
             type: 'object',
         },
         TimestampProperty: {
@@ -916,7 +932,7 @@ export async function getCredentialSchemas(
     abortControllers: AbortController[],
     client: ConcordiumGRPCClient
 ) {
-    const onChainSchemas: VerifiableCredentialSchema[] = [];
+    const onChainSchemas: { schema: VerifiableCredentialSchema; url: string }[] = [];
 
     const allContractAddresses = credentials.map((vc) => getCredentialRegistryContractAddress(vc.id));
     const issuerContractAddresses = new Set(allContractAddresses);
@@ -937,7 +953,7 @@ export async function getCredentialSchemas(
                     registryMetadata.credentialSchema.schema,
                     controller
                 );
-                onChainSchemas.push(credentialSchema);
+                onChainSchemas.push({ schema: credentialSchema, url: registryMetadata.credentialSchema.schema.url });
             } catch (e) {
                 // Ignore errors that occur because we aborted, as that is expected to happen.
                 if (!controller.signal.aborted) {
@@ -1044,12 +1060,12 @@ export async function getChangesToCredentialSchemas(
     for (const updatedSchema of upToDateSchemas) {
         if (Object.keys(updatedSchemasInStorage).length === 0) {
             updatedSchemasInStorage = {
-                [updatedSchema.$id]: updatedSchema,
+                [updatedSchema.url]: updatedSchema.schema,
             };
             updateReceived = true;
         } else {
-            updatedSchemasInStorage[updatedSchema.$id] = updatedSchema;
-            if (JSON.stringify(storedSchemas[updatedSchema.$id]) !== JSON.stringify(updatedSchema)) {
+            updatedSchemasInStorage[updatedSchema.url] = updatedSchema.schema;
+            if (JSON.stringify(storedSchemas[updatedSchema.url]) !== JSON.stringify(updatedSchema)) {
                 updateReceived = true;
             }
         }
@@ -1194,4 +1210,29 @@ export async function findNextUnusedVerifiableCredentialIndex(
     } while (credentialAlreadyExists);
 
     return index;
+}
+
+/**
+ * Creates a schema like the input with the id removed. This is used to be able to use the
+ * schema to validate an incoming credential being added, as the wallet is responsible for
+ * adding the id at a later point.
+ * @param schema the schema to create a version of without an id
+ * @returns the schema without the required id field
+ */
+export function withIdRemovedFromSchema(schema: VerifiableCredentialSchema) {
+    const propertiesWithNoId = {
+        attributes: schema.properties.credentialSubject.properties.attributes,
+    };
+    const requiredAttributes = schema.properties.credentialSubject.required.filter((req) => req !== 'id');
+    const credentialSubjectWithNoId = {
+        ...schema.properties.credentialSubject,
+        properties: propertiesWithNoId,
+        required: requiredAttributes,
+    };
+    const schemaOuterPropertiesWithNoId = {
+        ...schema.properties,
+        credentialSubject: credentialSubjectWithNoId,
+    };
+
+    return { ...schema, properties: schemaOuterPropertiesWithNoId };
 }

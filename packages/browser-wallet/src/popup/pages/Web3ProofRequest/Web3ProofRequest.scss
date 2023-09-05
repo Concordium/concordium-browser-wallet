@@ -226,9 +226,18 @@ $standard-box-shadow: 0 0 15px 0 rgb(0 0 0 / $color-shadow-alpha);
     &__selector-item {
         width: calc(100% - 32px);
         margin: 5px 16px;
+        display: flex;
+        justify-content: space-between;
+        align-items: center;
 
         &:not(:last-child) {
             border-bottom: 1px solid $color-neutral-gray-10;
+        }
+
+        &-icon {
+            height: 20px;
+            width: 20px;
+            margin-right: 10px;
         }
     }
 
@@ -265,5 +274,13 @@ $standard-box-shadow: 0 0 15px 0 rgb(0 0 0 / $color-shadow-alpha);
 
     path {
         fill: $color-feedback-positive-base;
+    }
+}
+
+.display-statement-cross {
+    flex-shrink: 0;
+
+    path {
+        fill: $color-feedback-negative-base;
     }
 }

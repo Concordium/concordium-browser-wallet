@@ -13,6 +13,7 @@ const t: typeof en = {
         attribute: en.error.attribute,
         localization: en.error.localization,
         findingNextIndex: en.error.findingNextIndex,
+        schemaValidation: en.error.schemaValidation,
     },
 };
 

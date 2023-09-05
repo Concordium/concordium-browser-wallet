@@ -20,9 +20,9 @@ export function DisplayStatementLine({ attribute, value, isRequirementMet, class
             <div className="display-statement__line-value bodyM">
                 {value}
                 {isRequirementMet ? (
-                    <CheckmarkIcon className="display-statement__line-check display-statement-checkmark " />
+                    <CheckmarkIcon className="display-statement__line-check display-statement-checkmark" />
                 ) : (
-                    <CrossIcon className="display-statement__line-cross" />
+                    <CrossIcon className="display-statement__line-cross display-statement-cross" />
                 )}
             </div>
         </li>
