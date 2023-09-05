@@ -9,7 +9,8 @@ import {
 import { displaySplitAddress, useIdentityName, useIdentityOf } from '@popup/shared/utils/account-helpers';
 import { useDisplayAttributeValue } from '@popup/shared/utils/identity-helpers';
 import { ConfirmedIdentity, WalletCredential } from '@shared/storage/types';
-import React, { useCallback, useEffect, useState } from 'react';
+import { getCredentialIdFromSubjectDID } from '@shared/utils/verifiable-credential-helpers';
+import React, { useCallback, useMemo, useState } from 'react';
 import { useTranslation } from 'react-i18next';
 import { SecretStatement, useStatementName, useStatementValue } from '../IdProofRequest/DisplayStatement/utils';
 import CredentialSelector from './CredentialSelector';
@@ -39,6 +40,7 @@ export default function AccountStatement({
     credentialStatement,
     validCredentials,
     dappName,
+    chosenId,
     setChosenId,
     net,
     showDescription,
@@ -52,20 +54,20 @@ export default function AccountStatement({
     ) as SecretStatementV2[];
     const displayAttribute = useDisplayAttributeValue();
 
-    const [chosenCredential, setChosenCredential] = useState<WalletCredential | undefined>(validCredentials[0]);
+    const initialIndex = useMemo(
+        () => validCredentials.findIndex((c) => c.credId === getCredentialIdFromSubjectDID(chosenId)),
+        []
+    );
+    const [chosenCredential, setChosenCredential] = useState<WalletCredential | undefined>(
+        validCredentials[initialIndex]
+    );
+
     // We do the type cast, because the check should have been done to filter validCredentials.
     const identity = useIdentityOf(chosenCredential) as ConfirmedIdentity | undefined;
 
     const onChange = useCallback((credential: WalletCredential) => {
         setChosenCredential(credential);
         setChosenId(createAccountDID(net, credential.credId));
-    }, []);
-
-    // Initially set chosenId
-    useEffect(() => {
-        if (chosenCredential) {
-            setChosenId(createAccountDID(net, chosenCredential.credId));
-        }
     }, []);
 
     const accountCreateSecretLine: OverwriteSecretLine = (statement: SecretStatementV2) => {
@@ -88,6 +90,7 @@ export default function AccountStatement({
             )}
             <CredentialSelector<WalletCredential>
                 options={validCredentials}
+                initialIndex={initialIndex}
                 DisplayOption={DisplayAccount}
                 onChange={onChange}
                 header={t('select.accountCredential')}

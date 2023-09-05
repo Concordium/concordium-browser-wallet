@@ -1,9 +1,10 @@
 # Changelog
 
-## Unreleased
+## 1.1.6
 
-### Changed
+### Fixed
 
+-   On the proof request page, routing back to credential statements no longer resets the selection.
 -   Update according to the change to AttributeType from the SDK. In particular the timestamp type is now explicit, and therefore we have removed hhe special serialization/parsing of Dates when exporting/import verifiable credentials.
 
 ### Fixed

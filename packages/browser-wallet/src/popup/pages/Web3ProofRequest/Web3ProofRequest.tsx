@@ -14,6 +14,7 @@ import {
     isVerifiableCredentialStatement,
     CredentialStatement,
     Network,
+    createAccountDID,
 } from '@concordium/web-sdk';
 import { InternalMessageType } from '@concordium/browser-wallet-message-hub';
 
@@ -41,6 +42,7 @@ import { noOp, useAsyncMemo } from 'wallet-common-helpers';
 import { stringify } from '@concordium/browser-wallet-api/src/util';
 import CloseIcon from '@assets/svg/cross.svg';
 import {
+    createWeb3IdDIDFromCredential,
     getAccountCredentialCommitmentInput,
     getAccountCredentialsWithMatchingIssuer,
     getActiveWeb3IdCredentialsWithMatchingIssuer,
@@ -63,6 +65,16 @@ interface Location {
             url: string;
         };
     };
+}
+
+function getIdFromCredential(
+    cred: WalletCredential | VerifiableCredential,
+    statement: CredentialStatement,
+    net: Network
+): string {
+    return isVerifiableCredentialStatement(statement)
+        ? createWeb3IdDIDFromCredential(cred as VerifiableCredential, net)
+        : createAccountDID(net, (cred as WalletCredential).credId);
 }
 
 async function getAllCredentialStatuses(
@@ -139,6 +151,7 @@ function DisplayNotProvable({
                             credentialStatement={statement}
                             net={net}
                             setChosenId={noOp}
+                            chosenId={getIdFromCredential(validCredentials[0], statement, net)}
                             showDescription={false}
                         />
                     </>
@@ -169,7 +182,7 @@ export default function Web3ProofRequest({ onReject, onSubmit }: Props) {
 
     const statements: CredentialStatements = useMemo(() => parse(rawStatements), [rawStatements]);
 
-    const [ids, setIds] = useState<string[]>(Array(statements.length).fill(''));
+    const [ids, setIds] = useState<string[]>([]);
 
     const verifiableCredentialSchemas = useAtomValue(storedVerifiableCredentialSchemasAtom);
     const identities = useConfirmedIdentities();
@@ -200,6 +213,16 @@ export default function Web3ProofRequest({ onReject, onSubmit }: Props) {
             throw new Error('Unknown statement type');
         });
     }, [identities.loading, verifiableCredentials.loading, Boolean(statuses)]);
+
+    useEffect(() => {
+        if (validCredentials) {
+            setIds(
+                validCredentials.map((creds, index) =>
+                    creds[0] ? getIdFromCredential(creds[0], statements[index], net) : ''
+                )
+            );
+        }
+    }, [Boolean(validCredentials)]);
 
     const canProve = useMemo(
         () => validCredentials && validCredentials.every((x) => x.length > 0),
@@ -268,7 +291,8 @@ export default function Web3ProofRequest({ onReject, onSubmit }: Props) {
         verifiableCredentials.loading ||
         verifiableCredentialSchemas.loading ||
         identities.loading ||
-        !validCredentials
+        !validCredentials ||
+        !ids.length
     ) {
         return null;
     }
@@ -294,6 +318,7 @@ export default function Web3ProofRequest({ onReject, onSubmit }: Props) {
                 credentialStatement={statements[currentStatementIndex]}
                 net={net}
                 key={currentStatementIndex}
+                chosenId={ids[currentStatementIndex]}
                 setChosenId={(newId) =>
                     setIds((currentIds) => {
                         const newIds = [...currentIds];
