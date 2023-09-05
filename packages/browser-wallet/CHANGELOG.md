@@ -1,5 +1,12 @@
 # Changelog
 
+## Unreleased
+
+### Fixed
+
+-   Changed 'Zero Knowledge' to 'Zero-knowledge' in display texts.
+-   An issue with images in verifiable credentials for lower resolutions.
+
 ## 1.1.6
 
 ### Fixed
