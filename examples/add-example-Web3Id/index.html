@@ -96,7 +96,7 @@
                     const values = {
                         degreeType: degreeType.value,
                         degreeName: degreeName.value,
-                        graduationDate: graduationDate.valueAsDate,
+                        graduationDate: { type: 'date-time', timestamp: graduationDate.valueAsDate.toISOString() },
                     };
                     const metadataUrl = {
                         url: web3metadataUrl.value,
