@@ -53,6 +53,8 @@ export type ModalProps<T extends WithOnClick = WithOnClick> = {
     bottom?: boolean;
     middle?: boolean;
     stableScrollbarGutter?: boolean;
+    // Determines whether to hide the close button if disableClose === true.
+    hideCloseButton?: boolean;
     /**
      * Used to overwrite styling for the modal content box
      */
@@ -79,6 +81,7 @@ export default function Modal<T extends WithOnClick = WithOnClick>({
     bottom = false,
     middle = false,
     stableScrollbarGutter = false,
+    hideCloseButton = false,
     children,
 }: PropsWithChildren<ModalProps<T>>): JSX.Element | null {
     const [{ isOpen, isExiting }, setOpenState] = useState<OpenState>({ isOpen: false, isExiting: false });
@@ -167,7 +170,9 @@ export default function Modal<T extends WithOnClick = WithOnClick>({
                                 transition={defaultTransition}
                                 onClickOutside={close}
                             >
-                                {!disableClose && <CloseButton className="modal__close" onClick={() => close()} />}
+                                {!disableClose && !hideCloseButton && (
+                                    <CloseButton className="modal__close" onClick={() => close()} />
+                                )}
                                 {children}
                             </DetectClickOutside>
                         )}

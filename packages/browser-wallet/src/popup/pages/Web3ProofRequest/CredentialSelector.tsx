@@ -2,6 +2,7 @@ import Button from '@popup/shared/Button';
 import Modal from '@popup/shared/Modal';
 import React, { ComponentType, useState } from 'react';
 import ArrowIcon from '@assets/svg/down-arrow.svg';
+import CheckmarkIcon from '@assets/svg/check_small.svg';
 
 interface Props<T> {
     /**
@@ -39,7 +40,8 @@ export default function CredentialSelector<T extends string | number | object>({
 
     return (
         <Modal
-            disableClose
+            stableScrollbarGutter
+            hideCloseButton
             open={open}
             onOpen={() => setOpen(true)}
             onClose={() => setOpen(false)}
@@ -63,6 +65,7 @@ export default function CredentialSelector<T extends string | number | object>({
                     onClick={() => onClick(index)}
                 >
                     <DisplayOption option={options[index]} />
+                    {chosenIndex === index && <CheckmarkIcon className="verifiable-credential__selector-item-icon" />}
                 </Button>
             ))}
         </Modal>
