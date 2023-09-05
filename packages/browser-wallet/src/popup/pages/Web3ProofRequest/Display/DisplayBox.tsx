@@ -22,6 +22,7 @@ export function DisplayBox({ className, children, header, infoBox }: DisplayBoxP
                     disableClose
                     middle
                     open={open}
+                    className="display-box__modal"
                     onOpen={() => setOpen(true)}
                     onClose={() => setOpen(false)}
                     trigger={
