@@ -41,7 +41,7 @@ export default function CredentialSelector<T extends string | number | object>({
     return (
         <Modal
             stableScrollbarGutter
-            showCloseButton={false}
+            hideCloseButton
             open={open}
             onOpen={() => setOpen(true)}
             onClose={() => setOpen(false)}
