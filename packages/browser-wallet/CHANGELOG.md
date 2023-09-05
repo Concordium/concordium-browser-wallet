@@ -2,8 +2,15 @@
 
 ## Unreleased
 
+### Changed
+
+-   Update according to the change to AttributeType from the SDK. In particular the timestamp type is now explicit, and therefore we have removed hhe special serialization/parsing of Dates when exporting/import verifiable credentials.
+
 ### Fixed
 
+-   Verifiable credentials are now validated according to the schema when being added. This will e.g. block setting an attribute as an integer if the schema defines it as a string.
+-   Refreshed the schema for credential schemas so that attribute types are now restricted as expected (`string`, `integer` and the special types are allowed).
+-   An issue where credential schemas were not updated with the correct key.
 -   UI improvements to the credential selector.
 
 ## 1.1.5

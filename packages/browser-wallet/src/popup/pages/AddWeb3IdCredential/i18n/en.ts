@@ -14,6 +14,7 @@ const t = {
         },
         localization: 'Failed to get localization',
         findingNextIndex: 'An error ocurred while attempting to add the credential. Please try again.',
+        schemaValidation: 'The credential did not validate according to the schema: [{{ errors }}]',
     },
 };
 

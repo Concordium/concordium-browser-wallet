@@ -7,7 +7,6 @@ $t-font-weight-regular: 400;
 $t-font-weight-medium: 500;
 $t-font-weight-semi-bold: 600;
 $t-font-weight-bold: 700;
-
 $s-type-config: (
     display: (
         font-weight: $t-font-weight-bold,
@@ -118,15 +117,6 @@ $s-type-config: (
             bodyLightXS: (
                 font-size: 11px,
                 line-height: 14px,
-            ),
-        ),
-    ),
-    button: (
-        font-weight: $t-font-weight-semi-bold,
-        styles: (
-            button: (
-                font-size: 14px,
-                line-height: 20px,
             ),
         ),
     ),

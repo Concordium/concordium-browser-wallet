@@ -276,3 +276,11 @@ $standard-box-shadow: 0 0 15px 0 rgb(0 0 0 / $color-shadow-alpha);
         fill: $color-feedback-positive-base;
     }
 }
+
+.display-statement-cross {
+    flex-shrink: 0;
+
+    path {
+        fill: $color-feedback-negative-base;
+    }
+}
