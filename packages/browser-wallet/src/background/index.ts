@@ -5,7 +5,7 @@ import {
     MessageStatusWrapper,
     MessageType,
 } from '@concordium/browser-wallet-message-hub';
-import { AttributeKeyString, deserializeTypeValue, HttpProvider, IdStatement } from '@concordium/web-sdk';
+import { deserializeTypeValue, HttpProvider } from '@concordium/web-sdk';
 import {
     getGenesisHash,
     sessionOpenPrompt,
@@ -24,7 +24,6 @@ import { BackgroundSendTransactionPayload } from '@shared/utils/types';
 import { buildURLwithSearchParameters } from '@shared/utils/url-helpers';
 import { Buffer } from 'buffer/';
 import JSONBig from 'json-bigint';
-import { isAgeStatement } from '@popup/pages/IdProofRequest/DisplayStatement/utils';
 import { startMonitoringPendingStatus } from './confirmation';
 import { sendCredentialHandler } from './credential-deployment';
 import { createIdProofHandler, runIfValidProof } from './id-proof';
@@ -46,6 +45,7 @@ import {
     createWeb3IdProofHandler,
     runIfValidWeb3IdProof,
     loadWeb3IdBackupHandler,
+    isAgeProof,
 } from './web3Id';
 
 const rpcCallNotAllowedMessage = 'RPC Call can only be performed by whitelisted sites';
@@ -528,15 +528,6 @@ bgMessageHandler.handleMessage(
     }
 );
 
-function isAgeProof({ statement }: { statement: IdStatement }): boolean {
-    return (
-        statement.length === 1 &&
-        statement[0].type === 'AttributeInRange' &&
-        statement[0].attributeTag === AttributeKeyString.dob &&
-        isAgeStatement(statement[0])
-    );
-}
-
 bgMessageHandler.handleMessage(createMessageTypeFilter(InternalMessageType.LoadWeb3IdBackup), loadWeb3IdBackupHandler);
 
 function withPromptStart<T>(): RunCondition<MessageStatusWrapper<T | undefined>> {
@@ -619,14 +610,14 @@ forwardToPopup(
     appendUrlToPayload,
     undefined,
     withPromptEnd,
-    (msg) => createMessageTypeFilter(MessageType.IdProof)(msg) && !isAgeProof(msg.payload)
+    (msg) => createMessageTypeFilter(MessageType.Web3IdProof)(msg) && !isAgeProof(msg.payload)
 );
 forwardToPopup(
-    MessageType.IdProof,
+    MessageType.Web3IdProof,
     InternalMessageType.AgeProof,
-    runConditionComposer(runIfAllowlisted, runIfValidProof, withPromptStart()),
+    runConditionComposer(runIfAllowlisted, runIfValidWeb3IdProof, withPromptStart()),
     appendUrlToPayload,
     undefined,
     withPromptEnd,
-    (msg) => createMessageTypeFilter(MessageType.IdProof)(msg) && isAgeProof(msg.payload)
+    (msg) => createMessageTypeFilter(MessageType.Web3IdProof)(msg) && isAgeProof(msg.payload)
 );

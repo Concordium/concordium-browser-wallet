@@ -15,6 +15,8 @@ import {
     CredentialStatement,
     Network,
     createAccountDID,
+    Web3IdProofRequest,
+    CryptographicParameters,
 } from '@concordium/web-sdk';
 import { InternalMessageType } from '@concordium/browser-wallet-message-hub';
 
@@ -166,6 +168,28 @@ function DisplayNotProvable({
     );
 }
 
+export async function proveRequest(
+    request: Web3IdProofRequest,
+    commitmentInputs: CommitmentInput[],
+    global: CryptographicParameters
+) {
+    const input: Web3IdProofInput = {
+        request,
+        commitmentInputs,
+        globalContext: global,
+    };
+
+    const result: ProofBackgroundResponse<string> = await popupMessageHandler.sendInternalMessage(
+        InternalMessageType.CreateWeb3IdProof,
+        stringify(input)
+    );
+
+    if (result.status !== BackgroundResponseStatus.Success) {
+        throw new Error(result.reason);
+    }
+    return result.proof;
+}
+
 export default function Web3ProofRequest({ onReject, onSubmit }: Props) {
     const { state } = useLocation() as Location;
     const { statements: rawStatements, challenge, url } = state.payload;
@@ -268,21 +292,7 @@ export default function Web3ProofRequest({ onReject, onSubmit }: Props) {
             credentialStatements: parsedStatements,
         };
 
-        const input: Web3IdProofInput = {
-            request,
-            commitmentInputs,
-            globalContext: global,
-        };
-
-        const result: ProofBackgroundResponse<string> = await popupMessageHandler.sendInternalMessage(
-            InternalMessageType.CreateWeb3IdProof,
-            stringify(input)
-        );
-
-        if (result.status !== BackgroundResponseStatus.Success) {
-            throw new Error(result.reason);
-        }
-        return result.proof;
+        return proveRequest(request, commitmentInputs, global);
     }, [recoveryPhrase, network, ids, verifiableCredentials.loading, identities.loading]);
 
     useEffect(() => onClose(onReject), [onClose, onReject]);

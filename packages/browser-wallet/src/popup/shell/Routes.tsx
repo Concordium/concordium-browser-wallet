@@ -119,7 +119,7 @@ export default function Routes() {
         InternalMessageType.Web3IdProof,
         'web3IdProof'
     );
-    const handleAgeProofResponse = useMessagePrompt<MessageStatusWrapper<IdProofOutput>>(
+    const handleAgeProofResponse = useMessagePrompt<MessageStatusWrapper<string>>(
         InternalMessageType.AgeProof,
         'ageProof'
     );

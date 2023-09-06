@@ -2,48 +2,112 @@ import React, { useCallback, useContext, useEffect, useMemo, useState } from 're
 import { Navigate, useLocation, useNavigate } from 'react-router-dom';
 import { useAtomValue, useSetAtom } from 'jotai';
 import { useTranslation } from 'react-i18next';
-import { IdStatement, IdProofOutput } from '@concordium/web-sdk';
-import { InternalMessageType } from '@concordium/browser-wallet-message-hub';
+import {
+    CredentialStatements,
+    canProveCredentialStatement,
+    AtomicStatementV2,
+    getPastDate,
+    MIN_DATE,
+    createAccountDID,
+    ConcordiumHdWallet,
+    isAccountCredentialStatement,
+} from '@concordium/web-sdk';
 
-import { popupMessageHandler } from '@popup/shared/message-handler';
-import { identityByAddressAtomFamily } from '@popup/store/identity';
-import { useCredential } from '@popup/shared/utils/account-helpers';
 import { grpcClientAtom, networkConfigurationAtom, sessionPasscodeAtom } from '@popup/store/settings';
 import { addToastAtom } from '@popup/state';
 import { useDecryptedSeedPhrase } from '@popup/shared/utils/seed-phrase-helpers';
 import { getGlobal, getNet } from '@shared/utils/network-helpers';
-import { BackgroundResponseStatus, IdProofBackgroundResponse } from '@shared/utils/types';
 import PendingArrows from '@assets/svg/pending-arrows.svg';
 import { fullscreenPromptContext } from '@popup/page-layouts/FullscreenPromptLayout';
 import Button from '@popup/shared/Button';
 import { displayUrl } from '@popup/shared/utils/string-helpers';
 import { absoluteRoutes } from '@popup/constants/routes';
 import Logo from '@assets/svg/concordium-with-letters.svg';
-import { canProveStatement, SecretStatement, useAgeFromStatement } from '../IdProofRequest/DisplayStatement/utils';
+import { parse } from '@shared/utils/payload-helpers';
+import { credentialsAtomWithLoading } from '@popup/store/account';
+import { useConfirmedIdentities } from '@popup/shared/utils/identity-helpers';
+import { isIdentityOfCredential } from '@shared/utils/identity-helpers';
+import Toast from '@popup/shared/Toast';
+import { logError } from '@shared/utils/log-helpers';
+import { proveRequest } from '../Web3ProofRequest/Web3ProofRequest';
+import { getAccountCredentialCommitmentInput } from '../Web3ProofRequest/utils';
+import { addDays, getYearFromDateString } from '../IdProofRequest/DisplayStatement/utils';
 
 type Props = {
-    onSubmit(proof: IdProofOutput): void;
+    onSubmit(proof: string): void;
     onReject(): void;
 };
 
 interface Location {
     state: {
         payload: {
-            accountAddress: string;
-            statement: IdStatement;
+            statements: string;
             challenge: string;
             url: string;
         };
     };
 }
 
+function useAgeFromStatement(statement: AtomicStatementV2) {
+    if (
+        statement.type !== 'AttributeInRange' ||
+        statement.attributeTag !== 'dob' ||
+        typeof statement.lower !== 'string' ||
+        typeof statement.upper !== 'string'
+    ) {
+        throw new Error('unexpected');
+    }
+
+    const today = getPastDate(0);
+
+    const ageMin = getYearFromDateString(today) - getYearFromDateString(addDays(statement.upper, -1));
+    const ageMax = getYearFromDateString(today) - getYearFromDateString(addDays(statement.lower, -1)) - 1;
+
+    if (statement.lower === MIN_DATE) {
+        return { ageMin };
+    }
+
+    if (statement.upper > today) {
+        return { ageMax };
+    }
+
+    return { ageMin, ageMax };
+}
+
 export default function AgeProofRequest({ onReject, onSubmit }: Props) {
     const { state } = useLocation() as Location;
-    const { statement, challenge, url, accountAddress: account } = state.payload;
+    const { statements: rawStatements, challenge, url } = state.payload;
     const { onClose, withClose } = useContext(fullscreenPromptContext);
     const { t } = useTranslation('ageProofRequest');
-    const { loading: identityLoading, value: identity } = useAtomValue(identityByAddressAtomFamily(account));
-    const credential = useCredential(account);
+
+    const statements: CredentialStatements = useMemo(() => parse(rawStatements), [rawStatements]);
+    const statement = statements[0].statement[0];
+
+    const identities = useConfirmedIdentities();
+    const credentials = useAtomValue(credentialsAtomWithLoading);
+
+    const credential = useMemo(() => {
+        const credentialStatement = statements[0];
+        if (!isAccountCredentialStatement(credentialStatement)) {
+            throw new Error('Unexpected error type');
+        }
+
+        return credentials.value.find((cred) => {
+            const identity = (identities.value || []).find((id) => isIdentityOfCredential(id)(cred));
+            if (identity && credentialStatement.idQualifier.issuers.includes(identity.providerIndex)) {
+                return canProveCredentialStatement(
+                    credentialStatement,
+                    identity.idObject.value.attributeList.chosenAttributes
+                );
+            }
+            return false;
+        });
+    }, [identities.loading, credentials.loading]);
+
+    const identity = credential ? identities.value.find((id) => isIdentityOfCredential(id)(credential)) : undefined;
+
+    const canProve = Boolean(credential);
+
     const network = useAtomValue(networkConfigurationAtom);
     const client = useAtomValue(grpcClientAtom);
     const addToast = useSetAtom(addToastAtom);
@@ -51,22 +115,12 @@ export default function AgeProofRequest({ onReject, onSubmit }: Props) {
     const recoveryPhrase = useDecryptedSeedPhrase(undefined);
     const dappName = displayUrl(url);
     const [creatingProof, setCreatingProof] = useState<boolean>(false);
-    const [canProve, setCanProve] = useState(statement.length > 0);
     const nav = useNavigate();
     const { loading: loadingPasscode, value: sessionPasscode } = useAtomValue(sessionPasscodeAtom);
 
-    useEffect(() => {
-        if (!identityLoading && identity && !canProveStatement(statement[0] as SecretStatement, identity)) {
-            setCanProve(false);
-        }
-    }, [identityLoading]);
-
-    const age = useAgeFromStatement(statement[0]);
+    const age = useAgeFromStatement(statement);
 
     const handleSubmit = useCallback(async () => {
-        if (!identity) {
-            throw new Error('Missing identity');
-        }
         if (!recoveryPhrase) {
             throw new Error('Missing recovery phrase');
         }
@@ -74,30 +128,29 @@ export default function AgeProofRequest({ onReject, onSubmit }: Props) {
             throw new Error('Network is not specified');
         }
         if (!credential) {
-            throw new Error('Missing credential');
+            throw new Error('credential is not loaded');
         }
+
+        const net = getNet(network);
 
         const global = await getGlobal(client);
+        const wallet = ConcordiumHdWallet.fromHex(recoveryPhrase, net);
 
-        const idProofResult: IdProofBackgroundResponse = await popupMessageHandler.sendInternalMessage(
-            InternalMessageType.CreateIdProof,
-            {
-                identityIndex: credential.identityIndex,
-                identityProviderIndex: credential.providerIndex,
-                credNumber: credential.credNumber,
-                idObject: identity.idObject.value,
-                seedAsHex: recoveryPhrase,
-                net: getNet(network),
-                globalContext: global,
-                statement,
-                challenge,
-            }
+        const requestStatement = { statement: [statement], id: createAccountDID(net, credential?.credId) };
+
+        const commitmentInput = getAccountCredentialCommitmentInput(
+            requestStatement,
+            wallet,
+            identities.value,
+            credentials.value
         );
 
-        if (idProofResult.status !== BackgroundResponseStatus.Success) {
-            throw new Error(idProofResult.reason);
-        }
-        return idProofResult.proof;
+        const request = {
+            challenge,
+            credentialStatements: [requestStatement],
+        };
+
+        return proveRequest(request, [commitmentInput], global);
     }, [credential, identity, recoveryPhrase, network]);
 
     useEffect(() => onClose(onReject), [onClose, onReject]);
@@ -132,12 +185,9 @@ export default function AgeProofRequest({ onReject, onSubmit }: Props) {
         return <Navigate to={absoluteRoutes.login.path} state={{ to: -1 }} />;
     }
 
-    if (identityLoading || !identity) {
-        return null;
-    }
-
     return (
         <div className="age-proof__request">
+            <Toast />
             <div>
                 <div className="age-proof__logos">
                     <Logo className="age-proof__logo" />
@@ -145,7 +195,7 @@ export default function AgeProofRequest({ onReject, onSubmit }: Props) {
                 <h3 className="m-t-40 text-center age-proof__description">{description}</h3>
                 <Button
                     clear
-                    onClick={() => nav(absoluteRoutes.prompt.idProof.path, { state })}
+                    onClick={() => nav(absoluteRoutes.prompt.web3IdProof.path, { state })}
                     className="age-proof__more-details"
                 >
                     {t('moreDetails', { dappName })}
@@ -157,8 +207,9 @@ export default function AgeProofRequest({ onReject, onSubmit }: Props) {
                     setCreatingProof(true);
                     handleSubmit()
                         .then(withClose(onSubmit))
-                        .catch(() => {
+                        .catch((e) => {
                             setCreatingProof(false);
+                            logError(e);
                             // TODO what to do
                             addToast('Failed');
                         });

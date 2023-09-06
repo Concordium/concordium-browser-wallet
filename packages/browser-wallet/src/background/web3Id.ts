@@ -14,6 +14,7 @@ import {
     AttributeType,
     isTimestampAttribute,
     TimestampAttribute,
+    AttributeKeyString,
 } from '@concordium/web-sdk';
 import {
     sessionVerifiableCredentials,
@@ -42,6 +43,7 @@ import {
 import { getNet } from '@shared/utils/network-helpers';
 import { WAIT_FOR_CLOSED_POPUP_ITERATIONS, WAIT_FOR_CLOSED_POPUP_TIMEOUT_MS } from '@shared/constants/web3id';
 import { Buffer } from 'buffer/';
+import { isAgeStatement, SecretStatement } from '@popup/pages/IdProofRequest/DisplayStatement/utils';
 import { openWindow, RunCondition, testPopupOpen } from './window-management';
 import bgMessageHandler from './message-handler';
 
@@ -343,3 +345,20 @@ export const loadWeb3IdBackupHandler: ExtensionMessageHandler = (_msg, _sender, 
     loadWeb3IdBackup();
     respond(undefined);
 };
+
+export function isAgeProof(payload: { statements: string }): boolean {
+    try {
+        const statements: CredentialStatements = parse(payload.statements);
+
+        return (
+            statements.length === 1 &&
+            isAccountCredentialStatement(statements[0]) &&
+            statements[0].statement.length === 1 &&
+            statements[0].statement[0].type === 'AttributeInRange' &&
+            statements[0].statement[0].attributeTag === AttributeKeyString.dob &&
+            isAgeStatement(statements[0].statement[0] as SecretStatement)
+        );
+    } catch (e) {
+        return false;
+    }
+}
