@@ -12,6 +12,8 @@ import {
     IdStatement,
     StatementTypes,
     AttributeType,
+    isTimestampAttribute,
+    TimestampAttribute,
 } from '@concordium/web-sdk';
 import {
     sessionVerifiableCredentials,
@@ -126,12 +128,21 @@ function rejectRequest(message: string): { run: false; response: MessageStatusWr
     };
 }
 
+// TODO Expose function from SDK and re-use.
+function timestampToDate(attribute: TimestampAttribute): Date {
+    return new Date(Date.parse(attribute.timestamp));
+}
+
 function validateTimestampAttribute(attributeTag: string, attributeValue: AttributeType) {
-    if (
-        attributeValue instanceof Date &&
-        (attributeValue.getTime() < MIN_DATE_TIMESTAMP || attributeValue.getTime() > MAX_DATE_TIMESTAMP)
-    ) {
-        return `The attribute [${attributeValue}] for key [${attributeTag}] is out of bounds for a Date. The Date must be between ${MIN_DATE_ISO} and ${MAX_DATE_ISO}`;
+    if (isTimestampAttribute(attributeValue)) {
+        const timestamp = timestampToDate(attributeValue).getTime();
+        if (Number.isNaN(timestamp)) {
+            return `The attribute [${attributeValue.timestamp}] for key [${attributeTag}] cannot be parsed as a Date.`;
+        }
+
+        if (timestamp < MIN_DATE_TIMESTAMP || timestamp > MAX_DATE_TIMESTAMP) {
+            return `The attribute [${attributeValue.timestamp}] for key [${attributeTag}] is out of bounds for a Date. The Date must be between ${MIN_DATE_ISO} and ${MAX_DATE_ISO}`;
+        }
     }
     return undefined;
 }
@@ -154,6 +165,14 @@ function validateAttributeBounds(
     attributeTag: string,
     attributeValue: AttributeType
 ): { error: false } | { error: true; message: string } {
+    if (
+        typeof attributeValue !== 'string' &&
+        typeof attributeValue !== 'bigint' &&
+        !isTimestampAttribute(attributeValue)
+    ) {
+        return { error: true, message: 'Unsupported attribute type' };
+    }
+
     const stringError = validateStringAttribute(attributeTag, attributeValue);
     if (stringError) {
         return { error: true, message: stringError };

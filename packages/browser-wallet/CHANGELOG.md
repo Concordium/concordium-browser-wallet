@@ -6,6 +6,7 @@
 
 -   Changed 'Zero Knowledge' to 'Zero-knowledge' in display texts.
 -   An issue with images in verifiable credentials for lower resolutions.
+-   Schema validation of verifiable credentials with attributes that have `{ type: "integer" }` no longer rejects BigInt values.
 
 ## 1.1.6
 
