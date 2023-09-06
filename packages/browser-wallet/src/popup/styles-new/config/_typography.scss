@@ -1,5 +1,5 @@
 @use 'sass:map';
-@import url('https://fonts.googleapis.com/css2?family=IBM+Plex+Sans:wght@300;400;500;700&display=swap');
+@import url('https://fonts.googleapis.com/css2?family=IBM+Plex+Sans:wght@300;400;500;600;700&display=swap');
 
 $t-font-family-ibm: 'IBM Plex Sans', sans-serif;
 $t-font-weight-light: 300;
@@ -120,14 +120,31 @@ $s-type-config: (
             ),
         ),
     ),
+    newButton: (
+        font-weight: $t-font-weight-regular,
+        styles: (
+            newButton: (
+                font-size: 16px,
+                line-height: 20px
+            )
+        )
+    )
 );
+
+
+@each $cat-name, $cat-content in $s-type-config {
+    @each $style-name, $style-content in map.get($cat-content, 'styles') {
+        .#{$style-name} {
+            font-family: $t-font-family-ibm;
+        }
+    }
+}
 
 @each $cat-name, $cat-content in $s-type-config {
     $style-weight: map.get($cat-content, 'font-weight');
     @each $style-name, $style-content in map.get($cat-content, 'styles') {
         .#{$style-name} {
             font-weight: $style-weight;
-            font-family: $t-font-family-ibm;
             @each $key, $value in $style-content {
                 #{$key}: #{$value};
             }
