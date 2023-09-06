@@ -1,5 +1,5 @@
 import React, { useCallback, useContext, useEffect, useMemo, useState } from 'react';
-import { Navigate, useLocation, useNavigate } from 'react-router-dom';
+import { Navigate, useLocation } from 'react-router-dom';
 import { useAtomValue, useSetAtom } from 'jotai';
 import { useTranslation } from 'react-i18next';
 import {
@@ -29,7 +29,7 @@ import { useConfirmedIdentities } from '@popup/shared/utils/identity-helpers';
 import { isIdentityOfCredential } from '@shared/utils/identity-helpers';
 import Toast from '@popup/shared/Toast';
 import { logError } from '@shared/utils/log-helpers';
-import { proveRequest } from '../Web3ProofRequest/Web3ProofRequest';
+import Web3ProofRequest, { proveRequest } from '../Web3ProofRequest/Web3ProofRequest';
 import { getAccountCredentialCommitmentInput } from '../Web3ProofRequest/utils';
 import { addDays, getYearFromDateString } from '../IdProofRequest/DisplayStatement/utils';
 
@@ -79,6 +79,7 @@ export default function AgeProofRequest({ onReject, onSubmit }: Props) {
     const { statements: rawStatements, challenge, url } = state.payload;
     const { onClose, withClose } = useContext(fullscreenPromptContext);
     const { t } = useTranslation('ageProofRequest');
+    const [more, setMore] = useState(false);
 
     const statements: CredentialStatements = useMemo(() => parse(rawStatements), [rawStatements]);
     const statement = statements[0].statement[0];
@@ -115,7 +116,6 @@ export default function AgeProofRequest({ onReject, onSubmit }: Props) {
     const recoveryPhrase = useDecryptedSeedPhrase(undefined);
     const dappName = displayUrl(url);
     const [creatingProof, setCreatingProof] = useState<boolean>(false);
-    const nav = useNavigate();
     const { loading: loadingPasscode, value: sessionPasscode } = useAtomValue(sessionPasscodeAtom);
 
     const age = useAgeFromStatement(statement);
@@ -185,6 +185,10 @@ export default function AgeProofRequest({ onReject, onSubmit }: Props) {
         return <Navigate to={absoluteRoutes.login.path} state={{ to: -1 }} />;
     }
 
+    if (more) {
+        return <Web3ProofRequest onSubmit={onSubmit} onReject={onReject} />;
+    }
+
     return (
         <div className="age-proof__request">
             <Toast />
@@ -193,11 +197,7 @@ export default function AgeProofRequest({ onReject, onSubmit }: Props) {
                     <Logo className="age-proof__logo" />
                 </div>
                 <h3 className="m-t-40 text-center age-proof__description">{description}</h3>
-                <Button
-                    clear
-                    onClick={() => nav(absoluteRoutes.prompt.web3IdProof.path, { state })}
-                    className="age-proof__more-details"
-                >
+                <Button clear onClick={() => setMore(true)} className="age-proof__more-details">
                     {t('moreDetails', { dappName })}
                 </Button>
             </div>
