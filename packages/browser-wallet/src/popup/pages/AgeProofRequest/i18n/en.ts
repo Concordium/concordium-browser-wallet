@@ -1,7 +1,6 @@
 const t = {
     moreDetails: 'More details',
     verify: 'Verify',
-    reject: 'Reject',
     ageMin: 'Verify that you are older than {{ age }}',
     ageMax: 'Verify that you are younger than {{ age }}',
     ageBetween: 'Verify that you are between {{ ageMin }} and {{ ageMax }} years old',

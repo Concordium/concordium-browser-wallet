@@ -1,15 +1,13 @@
 import type en from './en';
 
-// TODO translate
 const t: typeof en = {
-    moreDetails: 'More details',
-    verify: 'Verify',
-    notAbleToVerify: 'Unable to verify',
-    ageMin: 'Verify that you are older than {{ age }}',
-    ageMax: 'Verify that you are younger than {{ age }}',
-    ageBetween: 'Verify that you are between {{ ageMin }} and {{ ageMax }} years old',
-    ageExact: 'Verify that you are {{ age }} years old',
-    reject: 'Reject',
+    moreDetails: 'Flere detajler',
+    verify: 'Verificer',
+    notAbleToVerify: 'Det er ikke muligt at verificere',
+    ageMin: 'Verificer at du er ældre end {{ age }}',
+    ageMax: 'Verificer at du er yngre end {{ age }}',
+    ageBetween: 'Verificer at du er mellem {{ ageMin }} og {{ ageMax }} år gammel',
+    ageExact: 'Verificer at du er {{ age }} år gammel',
 };
 
 export default t;
