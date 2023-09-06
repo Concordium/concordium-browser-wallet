@@ -152,8 +152,12 @@ interface MainWalletApi {
      * user will be prompted to select which accounts should be connected. The list of connected accounts is returned
      * to the caller. If a connection has already been accepted previously, then the returned promise will resolve
      * with the list of connected accounts. Note that the list of accounts may be empty.
+     *
+     * @throws If connection is rejected by the user
+     *
+     * @returns {string[]} The list of accounts connected to the application.
      */
-    requestAccounts(): Promise<string[] | undefined>;
+    requestAccounts(): Promise<string[]>;
 
     /**
      * Returns some connected account, prioritizing the most recently selected. Resolves with account address or undefined if there are no connected account.
