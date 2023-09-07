@@ -10,7 +10,6 @@ import {
     storedConnectedSites,
     storedSelectedAccount,
     storedCurrentNetwork,
-    sessionPasscode,
     sessionOpenPrompt,
     storedAcceptedTerms,
     getGenesisHash,
@@ -41,11 +40,6 @@ import { startRecovery, setupRecoveryHandler } from './recovery';
 import { createIdProofHandler, runIfValidProof } from './id-proof';
 
 const rpcCallNotAllowedMessage = 'RPC Call can only be performed by allowlisted sites';
-const walletLockedMessage = 'The wallet is locked';
-async function isWalletLocked(): Promise<boolean> {
-    const passcode = await sessionPasscode.get();
-    return !passcode;
-}
 
 /**
  * Determines whether the given url has been allowlisted by any account.
@@ -66,11 +60,6 @@ async function performRpcCall(
     onSuccess: (response: string | undefined) => void,
     onFailure: (response: string) => void
 ) {
-    const locked = await isWalletLocked();
-    if (locked) {
-        onFailure(walletLockedMessage);
-    }
-
     const isAllowlisted = await isAllowlistedForAnyAccount(senderUrl);
     if (isAllowlisted) {
         const url = (await storedCurrentNetwork.get())?.jsonRpcUrl;
