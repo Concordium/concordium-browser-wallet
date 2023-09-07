@@ -9,8 +9,44 @@ import type {
     IdStatement,
     IdProofOutput,
     ConcordiumGRPCClient,
+    CredentialStatements,
+    VerifiablePresentation,
+    CredentialSubject,
+    HexString,
 } from '@concordium/web-sdk';
 import { LaxNumberEnumValue, LaxStringEnumValue } from './util';
+
+export interface MetadataUrl {
+    url: string;
+    hash?: string;
+}
+
+interface CredentialSchema {
+    id: string;
+    type: string;
+}
+
+/**
+ * The expected form of a Web3IdCredential, with the id fields omitted.
+ */
+export interface APIVerifiableCredential {
+    $schema: string;
+    type: string[];
+    issuer: string;
+    issuanceDate: string;
+    credentialSubject: Omit<CredentialSubject, 'id'>;
+    credentialSchema: CredentialSchema;
+}
+
+/**
+ * Expected format for the proof that the Web3IdCredential's attribute commitments are valid
+ */
+export interface CredentialProof {
+    proofPurpose: 'assertionMethod';
+    proofValue: HexString;
+    type: 'Ed25519Signature2020';
+    verificationMethod: string;
+}
 
 export type SendTransactionPayload =
     | Exclude<AccountTransactionPayload, UpdateContractPayload | InitContractPayload>
@@ -103,11 +139,25 @@ interface MainWalletApi {
      * @param message message to be signed. Note that the wallet will prepend some bytes to ensure the message cannot be a transaction. The message should either be a utf8 string or { @link SignMessageObject }.
      */
     signMessage(accountAddress: string, message: string | SignMessageObject): Promise<AccountTransactionSignature>;
+
     /**
      * Requests a connection to the Concordium wallet, prompting the user to either accept or reject the request.
      * If a connection has already been accepted for the url once the returned promise will resolve without prompting the user.
+     * @deprecated use {@link requestAccounts} instead
      */
     connect(): Promise<string | undefined>;
+
+    /**
+     * Requests a connection to the Concordium wallet, prompting the user to either accept or reject the request. The
+     * user will be prompted to select which accounts should be connected. The list of connected accounts is returned
+     * to the caller. If a connection has already been accepted previously, then the returned promise will resolve
+     * with the list of connected accounts. Note that the list of accounts may be empty.
+     *
+     * @throws If connection is rejected by the user
+     *
+     * @returns {string[]} The list of accounts connected to the application.
+     */
+    requestAccounts(): Promise<string[]>;
 
     /**
      * Returns some connected account, prioritizing the most recently selected. Resolves with account address or undefined if there are no connected account.
@@ -151,12 +201,37 @@ interface MainWalletApi {
 
     /**
      * Request that the user provides a proof for the given statement.
+     * @deprecated Please use { @link requestVerifiablePresentation} instead.
      * @param accountAddress the address of the account that should prove the statement.
      * @param statement the id statement that should be proven.
      * @param challenge bytes chosen by the verifier. Should be HEX encoded.
      * @returns The id proof and the id of the credential used to prove it.
      */
     requestIdProof(accountAddress: string, statement: IdStatement, challenge: string): Promise<IdProofOutput>;
+
+    /**
+     * Requests that a web3IdCredential is added to the wallet.
+     * Note that this will throw an error if the dApp is not allowlisted, locked, or if the user rejects adding the credential.
+     * @param credential the web3IdCredential that should be added to the wallet
+     * @param metadataUrl the url where the metadata, to display the credential, is located.
+     * @param createSignature a callback function, which takes a DID identifier for the credentialHolderId as input and must return the randomness used for the commitment of the values and signature on the commitments and credentialId.
+     * @returns the DID identifier for the credentialHolderId, i.e. the publicKey that will be associated with the credential.
+     */
+    addWeb3IdCredential(
+        credential: APIVerifiableCredential,
+        metadataUrl: MetadataUrl,
+        generateProofAndRandomness: (
+            credentialHolderIdDID: string
+        ) => Promise<{ randomness: Record<string, string>; proof: CredentialProof }>
+    ): Promise<string>;
+
+    /**
+     * Request that the user provides a proof for the given statements.
+     * @param challenge bytes chosen by the verifier. Should be HEX encoded.
+     * @param statements the web3Id statements that should be proven. The promise rejects if the array of statements is empty.
+     * @returns The presentation for the statements.
+     */
+    requestVerifiablePresentation(challenge: string, statements: CredentialStatements): Promise<VerifiablePresentation>;
 }
 
 export type WalletApi = MainWalletApi & EventListeners;

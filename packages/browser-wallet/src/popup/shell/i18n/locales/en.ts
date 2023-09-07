@@ -18,6 +18,12 @@ import changePasscode from '@popup/pages/ChangePasscode/i18n/en';
 import externalAddTokens from '@popup/pages/ExternalAddTokens/i18n/en';
 import termsAndConditions from '@popup/pages/TermsAndConditions/i18n/en';
 import idProofRequest from '@popup/pages/IdProofRequest/i18n/en';
+import allowlist from '@popup/pages/Allowlist/i18n/en';
+import connectAccountsRequest from '@popup/pages/ConnectAccountsRequest/i18n/en';
+import web3IdProofRequest from '@popup/pages/Web3ProofRequest/i18n/en';
+import verifiableCredential from '@popup/pages/VerifiableCredential/i18n/en';
+import addWeb3IdCredential from '@popup/pages/AddWeb3IdCredential/i18n/en';
+import verifiableCredentialBackup from '@popup/pages/VerifiableCredentialBackup/i18n/en';
 
 const t = {
     shared,
@@ -40,6 +46,12 @@ const t = {
     externalAddTokens,
     termsAndConditions,
     idProofRequest,
+    allowlist,
+    connectAccountsRequest,
+    addWeb3IdCredential,
+    web3IdProofRequest,
+    verifiableCredential,
+    verifiableCredentialBackup,
 };
 
 export default t;

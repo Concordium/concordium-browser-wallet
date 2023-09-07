@@ -26,11 +26,19 @@ import {
     sessionCookie,
     sessionOpenPrompt,
     storedAcceptedTerms,
+    storedVerifiableCredentials,
+    storedVerifiableCredentialSchemas,
+    storedAllowlist,
+    storedVerifiableCredentialMetadata,
+    sessionVerifiableCredentials,
+    sessionVerifiableCredentialMetadataUrls,
+    storedLog,
 } from '@shared/storage/access';
 import { ChromeStorageKey } from '@shared/storage/types';
 import { atom, PrimitiveAtom, WritableAtom } from 'jotai';
 
-const accessorMap = {
+// eslint-disable-next-line @typescript-eslint/no-explicit-any
+const accessorMap: Record<ChromeStorageKey, StorageAccessor<any>> = {
     [ChromeStorageKey.Identities]: useIndexedStorage(storedIdentities, getGenesisHash),
     [ChromeStorageKey.SelectedIdentity]: storedSelectedIdentity,
     [ChromeStorageKey.ConnectedSites]: storedConnectedSites,
@@ -55,6 +63,16 @@ const accessorMap = {
     [ChromeStorageKey.Cookie]: useIndexedStorage(sessionCookie, getGenesisHash),
     [ChromeStorageKey.OpenPrompt]: sessionOpenPrompt,
     [ChromeStorageKey.AcceptedTerms]: storedAcceptedTerms,
+    [ChromeStorageKey.VerifiableCredentials]: useIndexedStorage(storedVerifiableCredentials, getGenesisHash),
+    [ChromeStorageKey.VerifiableCredentialSchemas]: storedVerifiableCredentialSchemas,
+    [ChromeStorageKey.VerifiableCredentialMetadata]: storedVerifiableCredentialMetadata,
+    [ChromeStorageKey.Allowlist]: storedAllowlist,
+    [ChromeStorageKey.TemporaryVerifiableCredentials]: useIndexedStorage(sessionVerifiableCredentials, getGenesisHash),
+    [ChromeStorageKey.TemporaryVerifiableCredentialMetadataUrls]: useIndexedStorage(
+        sessionVerifiableCredentialMetadataUrls,
+        getGenesisHash
+    ),
+    [ChromeStorageKey.Log]: storedLog,
 };
 
 export function resetOnUnmountAtom<V>(initial: V): PrimitiveAtom<V> {
@@ -129,4 +147,11 @@ export function atomWithChromeStorage<V>(key: ChromeStorageKey, fallback: V, wit
     );
 
     return derived;
+}
+
+export function mapAsyncWrapper<Value, Mapped>(
+    wrapper: AsyncWrapper<Value>,
+    map: (v: Value) => Mapped
+): AsyncWrapper<Mapped> {
+    return { loading: wrapper.loading, value: map(wrapper.value) };
 }

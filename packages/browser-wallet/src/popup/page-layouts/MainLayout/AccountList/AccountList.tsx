@@ -9,9 +9,8 @@ import BakerIcon from '@assets/svg/baker.svg';
 import DelegationIcon from '@assets/svg/delegation.svg';
 import { absoluteRoutes } from '@popup/constants/routes';
 import { credentialsAtom, selectedAccountAtom } from '@popup/store/account';
-import { identityNamesAtom } from '@popup/store/identity';
 import { useTranslation } from 'react-i18next';
-import { displaySplitAddress } from '@popup/shared/utils/account-helpers';
+import { displaySplitAddress, useIdentityName } from '@popup/shared/utils/account-helpers';
 import { WalletCredential } from '@shared/storage/types';
 import { useAccountInfo } from '@popup/shared/AccountInfoListenerContext';
 import { isDelegatorAccount, isBakerAccount, AccountInfo } from '@concordium/web-sdk';
@@ -23,7 +22,6 @@ type ItemProps = {
     account: WalletCredential;
     checked: boolean;
     selected: boolean;
-    identityName: string;
 };
 
 function BakerOrDelegatorIcon({
@@ -44,9 +42,10 @@ function BakerOrDelegatorIcon({
     return null;
 }
 
-function AccountListItem({ account, checked, selected, identityName }: ItemProps) {
+function AccountListItem({ account, checked, selected }: ItemProps) {
     const accountInfo = useAccountInfo(account);
     const totalBalance = useMemo(() => accountInfo?.accountAmount || 0n, [accountInfo?.accountAmount]);
+    const identityName = useIdentityName(account, 'Unknown');
 
     return (
         <div className={clsx('main-layout__header-list-item', checked && 'main-layout__header-list-item--checked')}>
@@ -79,7 +78,6 @@ const AccountList = forwardRef<HTMLDivElement, Props>(({ className, onSelect }, 
     const [selectedAccount, setSelectedAccount] = useAtom(selectedAccountAtom);
     const nav = useNavigate();
     const { t } = useTranslation('mainLayout');
-    const identityNames = useAtomValue(identityNamesAtom);
 
     return (
         <EntityList<WalletCredential>
@@ -95,14 +93,7 @@ const AccountList = forwardRef<HTMLDivElement, Props>(({ className, onSelect }, 
             ref={ref}
             searchableKeys={['address']}
         >
-            {(a, checked) => (
-                <AccountListItem
-                    account={a}
-                    checked={checked}
-                    selected={a.address === selectedAccount}
-                    identityName={identityNames?.[a.providerIndex]?.[a.identityIndex] || 'Unknown'}
-                />
-            )}
+            {(a, checked) => <AccountListItem account={a} checked={checked} selected={a.address === selectedAccount} />}
         </EntityList>
     );
 });

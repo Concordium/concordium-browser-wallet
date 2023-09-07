@@ -7,17 +7,23 @@ const t = {
     header: {
         accounts: 'Accounts',
         ids: 'ID cards',
+        verifiableCredentials: 'Verifiable credentials',
         settings: {
             main: 'Wallet settings',
+            allowlist: 'Allowlist',
             recovery: 'Restoring your wallet',
             network: 'Network settings',
             passcode: 'Change passcode',
             about: 'About',
         },
+        addWeb3IdCredential: 'Add Web3 ID Credential',
+        connectAccountsRequest: 'Connect accounts',
         addTokens: 'Add tokens',
         idProof: 'Proof of identity',
+        web3IdProof: 'Proof of identity request',
         request: 'Signature Request',
         connect: 'New connection',
+        allowlistingRequest: 'Allowlisting request',
     },
     entityList: {
         searchPlaceholder: 'Search',

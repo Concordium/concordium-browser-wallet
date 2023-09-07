@@ -1,5 +1,13 @@
 # Changelog
 
+## 2.6.0
+
+### Added
+
+-   `requestAccounts` entrypoint to connect to a list of accounts.
+-   `addWeb3IdCredential` entrypoint to add verifiable credentials.
+-   `requestVerifiablePresentation`entrypoint to prove statements about identities and verifiable credentials.
+
 ## 2.5.1
 
 ### Changed

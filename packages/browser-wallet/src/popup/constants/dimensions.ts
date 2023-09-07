@@ -17,6 +17,6 @@ export const medium: Dimensions = {
 
 // >=1440p
 export const large: Dimensions = {
-    width: 354,
+    width: 375,
     height: 600, // Max allowed
 };

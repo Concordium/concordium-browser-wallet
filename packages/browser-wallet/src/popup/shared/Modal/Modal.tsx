@@ -51,6 +51,14 @@ export type ModalProps<T extends WithOnClick = WithOnClick> = {
     onOpen?(): void;
     onClose?(): void;
     bottom?: boolean;
+    middle?: boolean;
+    stableScrollbarGutter?: boolean;
+    // Determines whether to hide the close button if disableClose === true.
+    hideCloseButton?: boolean;
+    /**
+     * Used to overwrite styling for the modal content box
+     */
+    className?: string;
 };
 
 /**
@@ -64,12 +72,16 @@ export type ModalProps<T extends WithOnClick = WithOnClick> = {
  */
 export default function Modal<T extends WithOnClick = WithOnClick>({
     trigger,
+    className,
     disableClose = false,
     open: isOpenOverride,
     error = false,
     onOpen = noOp,
     onClose = noOp,
     bottom = false,
+    middle = false,
+    stableScrollbarGutter = false,
+    hideCloseButton = false,
     children,
 }: PropsWithChildren<ModalProps<T>>): JSX.Element | null {
     const [{ isOpen, isExiting }, setOpenState] = useState<OpenState>({ isOpen: false, isExiting: false });
@@ -138,12 +150,19 @@ export default function Modal<T extends WithOnClick = WithOnClick>({
         <>
             {triggerWithOpen}
             {isOpen && (
-                <Portal className={clsx('modal', bottom && 'modal--align-bottom')}>
+                <Portal
+                    className={clsx(
+                        'modal',
+                        bottom && 'modal--align-bottom',
+                        middle && 'modal--align-middle',
+                        stableScrollbarGutter && 'modal--stable-scrollbar-gutter'
+                    )}
+                >
                     <AnimatePresence onExitComplete={handleExitComplete}>
                         {!isExiting && (
                             <DetectClickOutside
                                 as={motion.div}
-                                className={clsx('modal__content', error && 'modal__content--error')}
+                                className={clsx('modal__content', error && 'modal__content--error', className)}
                                 initial="closed"
                                 animate="open"
                                 exit="closed"
@@ -151,7 +170,9 @@ export default function Modal<T extends WithOnClick = WithOnClick>({
                                 transition={defaultTransition}
                                 onClickOutside={close}
                             >
-                                {!disableClose && <CloseButton className="modal__close" onClick={() => close()} />}
+                                {!disableClose && !hideCloseButton && (
+                                    <CloseButton className="modal__close" onClick={() => close()} />
+                                )}
                                 {children}
                             </DetectClickOutside>
                         )}

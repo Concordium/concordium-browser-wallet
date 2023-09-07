@@ -1,4 +1,13 @@
-import type { CryptographicParameters, HexString, IdentityObjectV1, Network, Versioned } from '@concordium/web-sdk';
+import { APIVerifiableCredential } from '@concordium/browser-wallet-api-helpers';
+import type {
+    CredentialSchemaSubject,
+    CredentialSubject,
+    CryptographicParameters,
+    HexString,
+    IdentityObjectV1,
+    Network,
+    Versioned,
+} from '@concordium/web-sdk';
 
 export enum ChromeStorageKey {
     ConnectedSites = 'connectedSites',
@@ -25,6 +34,13 @@ export enum ChromeStorageKey {
     Cookie = 'cookie',
     OpenPrompt = 'openPrompt',
     AcceptedTerms = 'acceptedTerms',
+    VerifiableCredentials = 'verifiableCredentials',
+    VerifiableCredentialSchemas = 'verifiableCredentialSchemas',
+    VerifiableCredentialMetadata = 'verifiableCredentialMetadata',
+    TemporaryVerifiableCredentials = 'tempVerifiableCredentials',
+    TemporaryVerifiableCredentialMetadataUrls = 'tempVerifiableCredentialMetadataUrls',
+    Allowlist = 'allowlist',
+    Log = 'log',
 }
 
 export enum Theme {
@@ -253,3 +269,42 @@ export type AcceptedTermsState = {
     version: string;
     url?: string;
 };
+
+export enum VerifiableCredentialStatus {
+    Active,
+    Revoked,
+    Expired,
+    NotActivated,
+
+    // Pending is a local wallet state not reflected on chain. This is used
+    // when a credential is added to the wallet, but it is still not on chain.
+    Pending,
+}
+
+export interface VerifiableCredential extends APIVerifiableCredential {
+    // With ID
+    credentialSubject: CredentialSubject;
+    id: string;
+    // Secrets
+    signature: string;
+    randomness: Record<string, string>;
+    // Index used to derive keys for credential
+    index: number;
+    // The original metadataUrl received when first adding the credential
+    // TODO: The URL should be updated when there are valid updates to the metadata.
+    metadataUrl: string;
+}
+
+export interface SchemaProperties {
+    credentialSubject: CredentialSchemaSubject;
+}
+
+export interface VerifiableCredentialSchema {
+    $id: string;
+    $schema: string;
+    name: string;
+    description: string;
+    type: string;
+    properties: SchemaProperties;
+    required: string[];
+}

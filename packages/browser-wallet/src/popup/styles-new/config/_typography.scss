@@ -1,0 +1,136 @@
+@use 'sass:map';
+@import url('https://fonts.googleapis.com/css2?family=IBM+Plex+Sans:wght@300;400;500;700&display=swap');
+
+$t-font-family-ibm: 'IBM Plex Sans', sans-serif;
+$t-font-weight-light: 300;
+$t-font-weight-regular: 400;
+$t-font-weight-medium: 500;
+$t-font-weight-semi-bold: 600;
+$t-font-weight-bold: 700;
+$s-type-config: (
+    display: (
+        font-weight: $t-font-weight-bold,
+        styles: (
+            display1: (
+                font-size: 40px,
+                line-height: 47px,
+            ),
+            display2: (
+                font-size: 32px,
+                line-height: 36px,
+            ),
+            display3: (
+                font-size: 25px,
+                line-height: 30px,
+            ),
+            display4: (
+                font-size: 20px,
+                line-height: 24px,
+            ),
+            display5: (
+                font-size: 16px,
+                line-height: 19px,
+            ),
+            display6: (
+                font-size: 14px,
+                line-height: 17px,
+            ),
+        ),
+    ),
+    heading: (
+        font-weight: $t-font-weight-medium,
+        styles: (
+            heading1: (
+                font-size: 28px,
+                line-height: 36px,
+            ),
+            heading2: (
+                font-size: 24px,
+                line-height: 32px,
+            ),
+            heading3: (
+                font-size: 20px,
+                line-height: 28px,
+            ),
+            heading4: (
+                font-size: 18px,
+                line-height: 26px,
+            ),
+            heading5: (
+                font-size: 16px,
+                line-height: 20px,
+            ),
+            heading6: (
+                font-size: 14px,
+                line-height: 18px,
+            ),
+            heading7: (
+                font-size: 12px,
+                line-height: 16px,
+            ),
+        ),
+    ),
+    body: (
+        font-weight: $t-font-weight-regular,
+        styles: (
+            bodyXL: (
+                font-size: 20px,
+                line-height: 26px,
+            ),
+            bodyL: (
+                font-size: 16px,
+                line-height: 20px,
+            ),
+            bodyM: (
+                font-size: 14px,
+                line-height: 18px,
+            ),
+            bodyS: (
+                font-size: 12px,
+                line-height: 16px,
+            ),
+            bodyXS: (
+                font-size: 11px,
+                line-height: 14px,
+            ),
+        ),
+    ),
+    bodyLight: (
+        font-weight: $t-font-weight-light,
+        styles: (
+            bodyLightXL: (
+                font-size: 20px,
+                line-height: 26px,
+            ),
+            bodyLightL: (
+                font-size: 16px,
+                line-height: 20px,
+            ),
+            bodyLightM: (
+                font-size: 14px,
+                line-height: 18px,
+            ),
+            bodyLightS: (
+                font-size: 12px,
+                line-height: 16px,
+            ),
+            bodyLightXS: (
+                font-size: 11px,
+                line-height: 14px,
+            ),
+        ),
+    ),
+);
+
+@each $cat-name, $cat-content in $s-type-config {
+    $style-weight: map.get($cat-content, 'font-weight');
+    @each $style-name, $style-content in map.get($cat-content, 'styles') {
+        .#{$style-name} {
+            font-weight: $style-weight;
+            font-family: $t-font-family-ibm;
+            @each $key, $value in $style-content {
+                #{$key}: #{$value};
+            }
+        }
+    }
+}

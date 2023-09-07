@@ -9,7 +9,7 @@ import {
     SessionPendingIdentity,
 } from '@shared/storage/types';
 import { Atom, atom, WritableAtom } from 'jotai';
-import { atomFamily, selectAtom } from 'jotai/utils';
+import { atomFamily } from 'jotai/utils';
 import { credentialsAtomWithLoading } from './account';
 import { AsyncWrapper, atomWithChromeStorage } from './utils';
 
@@ -43,17 +43,6 @@ export const selectedIdentityAtom = atom<Identity | undefined, Identity | undefi
 );
 
 export const identityProvidersAtom = atomWithChromeStorage<IdentityProvider[]>(ChromeStorageKey.IdentityProviders, []);
-
-export const identityNamesAtom = selectAtom(identitiesAtom, (identities) => {
-    const map = {} as Record<number, Record<number, string>>;
-    identities.forEach((identity) => {
-        if (!map[identity.providerIndex]) {
-            map[identity.providerIndex] = {} as Record<number, string>;
-        }
-        map[identity.providerIndex][identity.index] = identity.name;
-    });
-    return map;
-});
 
 export const isRecoveringAtom = atomWithChromeStorage<boolean>(ChromeStorageKey.IsRecovering, false, true);
 const recoveryStatusAtom = atomWithChromeStorage<RecoveryStatus | undefined>(

@@ -118,7 +118,7 @@ export default function SignMessage({ respond }: Props) {
     const allExisting = addingTokens.every(({ status }) => status === ChoiceStatus.existing);
 
     return (
-        <ExternalRequestLayout>
+        <ExternalRequestLayout className="p-10">
             <ConnectedBox accountAddress={accountAddress} url={new URL(url).origin} />
             {detailView !== undefined && (
                 <TokenDetails

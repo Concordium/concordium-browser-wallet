@@ -51,14 +51,14 @@ declare global {
 
 ### connect
 
-To request a connection to the wallet from the user, the `connect` method has to be invoked. The method returns a `Promise` resolving with information related to the most recently selected account, which has whitelisted the dApp, or rejecting if the request is rejected in the wallet. If the wallet is locked, then this call prompts the user to first unlock the wallet before accepting or rejecting the connection request.
+To request a connection to the wallet from the user, the `connect` method has to be invoked. The method returns a `Promise` resolving with information related to the most recently selected account, which has allowlisted the dApp, or rejecting if the request is rejected in the wallet. If the wallet is locked, then this call prompts the user to first unlock the wallet before accepting or rejecting the connection request.
 
 ```typescript
 const provider = await detectConcordiumProvider();
 const accountAddress = await provider.connect();
 ```
 
-N.B. In the current version, if the dApp is already whitelisted, but not by the currently selected account, the returned account will not actually be the most recently selected account, but instead the oldest account that has whitelisted the dApp.
+N.B. In the current version, if the dApp is already allowlisted, but not by the currently selected account, the returned account will not actually be the most recently selected account, but instead the oldest account that has allowlisted the dApp.
 
 ### getMostRecentlySelectedAccount
 
@@ -74,6 +74,17 @@ if (accountAddress) {
 }
 ```
 
+### requestAccounts
+
+To request a connection to the wallet from the user, the `requestAccounts` method has to be invoked. The method returns a `Promise` resolving with the list of accounts
+that the user has chosen to connect with. The list may be empty. Alternatively the promise will be rejecting if the request is rejected in the wallet. If the wallet is locked,
+then this call prompts the user to first unlock the wallet before accepting or rejecting the request.
+
+```typescript
+const provider = await detectConcordiumProvider();
+const accountAddresses = await provider.requestAccounts();
+```
+
 ### getSelectedChain
 
 This can be invoked to get the genesis hash of the chain selected in the wallet. The method returns a `Promise`, resolving with the genesis hash (as a hex string) of the selected chain, or undefined if the wallet is locked or has not been set up by the user.
@@ -83,13 +94,13 @@ const provider = await detectConcordiumProvider();
 const genesisHash = await provider.getSelectedChain();
 ```
 
-N.B. In the current version, if the currently selected account has not whitelisted the dApp, the returned account will not actually be the most recently selected account, but instead the oldest account that has whitelisted the dApp.
+N.B. In the current version, if the currently selected account has not allowlisted the dApp, the returned account will not actually be the most recently selected account, but instead the oldest account that has allowlisted the dApp.
 
 ### sendTransaction
 
 To send a transaction, three arguments need to be provided: The account address for the account in the wallet that should sign the transaction, a transaction type and a corresponding payload. Invoking `sendTransaction` returns a `Promise`, which resolves with the transaction hash for the submitted transaction.
 
-If the wallet is locked, or you have not connected with the wallet (or previously been whitelisted) or if the user rejects signing the transaction, the `Promise` will reject.
+If the wallet is locked, or you have not connected with the wallet (or previously been allowlisted) or if the user rejects signing the transaction, the `Promise` will reject.
 
 The following exemplifies how to create a simple transfer of funds from one account to another. Please note that [@concordium/web-sdk](https://github.com/Concordium/concordium-node-sdk-js/tree/main/packages/web) is used to provide the correct formats and types for the transaction payload.
 
@@ -149,7 +160,7 @@ const parameterSchema = {
 
 It is possible to sign arbitrary messages using the keys for an account stored in the wallet, by invoking the `signMessage` method. The first parameter is the account to be used for signing the message. This method returns a `Promise` resolving with a signature of the message.
 
-If the wallet is locked, or you have not connected with the wallet (or previously been whitelisted) or if the user rejects signing the meesage, the `Promise` will reject.
+If the wallet is locked, or you have not connected with the wallet (or previously been allowlisted) or if the user rejects signing the meesage, the `Promise` will reject.
 
 The message should be either a utf8 string or an object with the following fields:
 
@@ -195,7 +206,7 @@ In this example the user will be shown:
 
 It is possible to suggest CIS-2 tokens to be added to an account's display. This method returns a `Promise` resolving with a list containing the ids of the tokens that were added.
 
-If the wallet is locked, or you have not connected with the wallet (or previously been whitelisted) or if the user rejects signing the meesage, the `Promise` will reject.
+If the wallet is locked, or you have not connected with the wallet (or previously been allowlisted) or if the user rejects signing the meesage, the `Promise` will reject.
 
 The following exemplifies requesting tokens with id AA and BB from the contract on index 1399, and subindex 0 to the account `2za2yAXbFiaB151oYqTteZfqiBzibHXizwjNbpdU8hodq9SfEk`.
 
@@ -204,20 +215,36 @@ const provider = await detectConcordiumProvider();
 await provider.addCIS2Tokens('2za2yAXbFiaB151oYqTteZfqiBzibHXizwjNbpdU8hodq9SfEk', ['AA', 'BB'], '1399', '0');
 ```
 
-### Prove ID statement
+### Add Web3Id Credentials
 
-It is possible to request a proof for a given ID statement on a specific account. The function takes 3 arguments. The statement to be proved, a challenge to ensure that the proof was not generated for a different context, and the account that should prove that statement.
-This method returns a `Promise` resolving with an object containing the proof and the credential id (field name: credential) of the credential used to prove the statement.
+To add a Web3IdCredential, use the `addWeb3IdCredential` endpoint.
+The credential itself and the url for the metadata must be provided. In addition, the function takes a callback function that takes a DID for the credentialHolderId as input, and which should return the randomness used to create the commitments on the values/properties in the credential, and a proof (which can be a signature on the commitments and credentialHolderId) of the credential's validity. If the callback does not return a valid proof, the credential is not added to the wallet.
 
-If the wallet is locked, or you have not connected with the wallet (or previously been whitelisted) or if the user rejects proving the statement, the `Promise` will reject.
+Note that the id fields of the credential are omitted, and added by the wallet itself, as they require the credentialHolderId.
 
-The following exemplifies requesting a proof for a statement name myIdStatement (To see how to create a statement check out [our documentation](https://developer.concordium.software/en/mainnet/net/guides/create-proofs.html)) with a challenge of "12346789ABCD" id, for the account `2za2yAXbFiaB151oYqTteZfqiBzibHXizwjNbpdU8hodq9SfEk`.
+// TODO link to help for how to create proof and randomness
+
+```typescript
+provider.addWeb3IdCredential(credential, metadataUrl, async (id) => {
+    const randomness = createRandomness(attributes); // Choose some randomness for the attribute commitments.
+    const proof = createCredentialProof(credential, id, randomness); // Create a proof to prove that the commitments are created by the issuer.
+    return { proof, randomness };
+});
+```
+
+### Request Verifiable Presentation for web3Id statements
+
+It is possible to request a verifiable presentation for a given set of web3Id statements. The function takes 2 arguments. A challenge to ensure that the proof was not generated for a different context, and the statements to be proven. This method returns a Promise resolving with the verifiable presentation for the statements.
+
+If the wallet is locked, or you have not connected with the wallet (or previously been allowlisted) or if the user rejects proving the statement, the Promise will reject.
+
+The following exemplifies requesting a verifiable presentation for a statement named myIdStatement (To see how to create a statement check out our documentation) with a challenge of "12346789ABCD".
 
 ```typescript
 const statement = myIdStatement;
 const challenge = '12346789ABCD';
 const provider = await detectConcordiumProvider();
-await provider.requestIdProof('2za2yAXbFiaB151oYqTteZfqiBzibHXizwjNbpdU8hodq9SfEk', ['AA', 'BB'], '1399', '0');
+const verifiablePresentation = await provider.requestVerifiablePresentation(challenge, statement);
 ```
 
 ## Events
@@ -259,7 +286,7 @@ provider.connect().then((accountAddress) => (selectedAccountAddress = accountAdd
 The wallet API exposes access to a JSON-RPC client. This allows a dApp to communicate with the same node as the wallet is connected to, and enables dApps to access the JSON-RPC interface without being connected to a separate server itself. The client is accessed as shown in the example below.
 The dApp does not need to recreate the client again when the wallet changes node or network, the client will always use the wallet's current connected JSON-RPC server.
 
-If you have not connected with the wallet (or previously been whitelisted), the commands will not be executed and the method will throw an error.
+If you have not connected with the wallet (or previously been allowlisted), the commands will not be executed and the method will throw an error.
 
 ```typescript
 const provider = await detectConcordiumProvider();

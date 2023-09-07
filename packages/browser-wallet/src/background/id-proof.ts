@@ -1,10 +1,10 @@
-import { getIdProof, IdProofInput, verifyIdstatement } from '@concordium/web-sdk';
-import { BackgroundResponseStatus, IdProofBackgroundResponse } from '@shared/utils/types';
+import { getIdProof, IdProofInput, IdProofOutput, verifyIdstatement } from '@concordium/web-sdk';
+import { BackgroundResponseStatus, ProofBackgroundResponse } from '@shared/utils/types';
 import { ExtensionMessageHandler, MessageStatusWrapper } from '@concordium/browser-wallet-message-hub';
 import { isHex } from 'wallet-common-helpers';
 import { RunCondition } from './window-management';
 
-async function createIdProof(input: IdProofInput): Promise<IdProofBackgroundResponse> {
+async function createIdProof(input: IdProofInput): Promise<ProofBackgroundResponse<IdProofOutput>> {
     const proof = getIdProof(input);
     return {
         status: BackgroundResponseStatus.Success,

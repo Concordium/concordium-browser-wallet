@@ -21,6 +21,8 @@
 @import '../shared/TokenDetails/TokenDetails';
 @import '../shared/ContractTokenLine/ContractTokenLine';
 @import '../shared/DisabledAmountInput/DisabledAmountInput';
+@import '../shared/Topbar/Topbar';
+@import '../shared/PopupMenu/PopupMenu';
 
 // Pages
 @import '../pages/Account';
@@ -30,15 +32,20 @@
 @import '../pages/Settings/Settings';
 @import '../pages/Identity/Identity';
 @import '../pages/IdentityIssuance/IdentityIssuance';
+@import '../pages/VerifiableCredential/VerifiableCredential';
 @import '../pages/About/About';
 @import '../pages/Login/Login';
 @import '../pages/AddAccount/AddAccount';
 @import '../pages/NetworkSettings/NetworkSettings';
 @import '../pages/ChangePasscode/ChangePasscode';
+@import '../pages/Allowlist/Allowlist';
 @import '../pages/Recovery/Recovery';
 @import '../pages/ExternalAddTokens/ExternalAddTokens';
 @import '../pages/TermsAndConditions/TermsAndConditions';
 @import '../pages/IdProofRequest';
+@import '../pages/AddWeb3IdCredential/AddWeb3IdCredential';
+@import '../pages/Web3ProofRequest/Web3ProofRequest';
+@import '../pages/VerifiableCredentialBackup/VerifiableCredentialBackup';
 
 // Layouts
 @import '../page-layouts/MainLayout';

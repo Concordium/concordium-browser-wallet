@@ -1,0 +1,60 @@
+// Color definitions
+
+// Primary Colors
+$color-primary-mineral-blue: #48a2ae;
+$color-primary-mineral-80: #6db5be;
+$color-primary-mineral-60: #91c7ce;
+$color-primary-mineral-40: #b6dadf;
+$color-primary-mineral-20: #daecef;
+$color-primary-mineral-10: #ecf6f7;
+$color-primary-mineral-05: #f6fafb;
+
+// Secondary Colors
+$color-secondary-dark-blue: #052535;
+$color-secondary-ocean-140: #013243;
+$color-secondary-ocean-120: #01475f;
+$color-secondary-ocean-blue: #005a78;
+$color-secondary-ocean-80: #337b93;
+$color-secondary-ocean-60: #7facbb;
+$color-secondary-egg-shell-white: #fffde4;
+$color-secondary-off-white: #ebf0f0;
+
+// Neutral Colors
+$color-neutral-black: #000;
+$color-neutral-gray-90: #191919;
+$color-neutral-gray-80: #333;
+$color-neutral-gray-70: #4c4c4c;
+$color-neutral-gray-60: #666;
+$color-neutral-gray-50: #7f7f7f;
+$color-neutral-gray-40: #999;
+$color-neutral-gray-30: #b2b2b2;
+$color-neutral-gray-20: #ccc;
+$color-neutral-gray-10: #e5e5e5;
+$color-neutral-gray-05: #f2f2f2;
+$color-neutral-white: #fff;
+
+// State Colors
+$color-feedback-negative-dark: #ab2b2b;
+$color-feedback-negative-base: #dc5050;
+$color-feedback-negative-light: #e87e90;
+$color-feedback-positive-dark: #189e46;
+$color-feedback-positive-base: #33c364;
+$color-feedback-positive-light: #8be7aa;
+$color-feedback-warning-dark: #c89e0a;
+$color-feedback-warning-base: #fbcd29;
+$color-feedback-warning-light: #f6db9a;
+$color-feedback-info-dark: #075cab;
+$color-feedback-info-base: #2485df;
+$color-feedback-info-light: #65a4dd;
+$color-feedback-help-dark: #53198e;
+$color-feedback-help-base: #7939ba;
+$color-feedback-help-light: #b37cdf;
+
+// Grdients
+$gradient-dark-mineral-blue-bg: linear-gradient(144deg, #005a78 0%, #2e8894 100%);
+$gradient-dark-mineral-blue-button: linear-gradient(161deg, #005a78 0%, #48a2ae 100%);
+$gradient-disable-button: linear-gradient(170deg, #ccc 0%, #e5e5e5 100%);
+
+.color-feedback-negative-dark {
+    color: $color-feedback-negative-dark;
+}

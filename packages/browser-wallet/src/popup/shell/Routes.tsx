@@ -32,6 +32,12 @@ import RecoveryFinish from '@popup/pages/Recovery/RecoveryFinish';
 import ChangePasscode from '@popup/pages/ChangePasscode/ChangePasscode';
 import AddTokensPrompt from '@popup/pages/ExternalAddTokens/ExternalAddTokens';
 import IdProofRequest from '@popup/pages/IdProofRequest';
+import VerifiableCredentialList from '@popup/pages/VerifiableCredential';
+import Web3ProofRequest from '@popup/pages/Web3ProofRequest';
+import ConnectAccountsRequest from '@popup/pages/ConnectAccountsRequest';
+import AllowListRoutes from '@popup/pages/Allowlist';
+import AddWeb3IdCredential from '@popup/pages/AddWeb3IdCredential/AddWeb3IdCredential';
+import VerifiableCredentialImport from '@popup/pages/VerifiableCredentialBackup/VerifiableCredentialImport';
 
 type PromptKey = keyof Omit<typeof absoluteRoutes['prompt'], 'path'>;
 
@@ -82,6 +88,14 @@ function usePrompt(type: InternalMessageType | MessageType, promptKey: PromptKey
 
 export default function Routes() {
     const handleConnectionResponse = useMessagePrompt<boolean>(InternalMessageType.Connect, 'connectionRequest');
+    const handleConnectAccountsResponse = useMessagePrompt<MessageStatusWrapper<string[]>>(
+        InternalMessageType.ConnectAccounts,
+        'connectAccountsRequest'
+    );
+    const handleAddWeb3IdCredentialResponse = useMessagePrompt<MessageStatusWrapper<string>>(
+        InternalMessageType.AddWeb3IdCredential,
+        'addWeb3IdCredential'
+    );
     const handleSendTransactionResponse = useMessagePrompt<MessageStatusWrapper<string>>(
         InternalMessageType.SendTransaction,
         'sendTransaction'
@@ -98,9 +112,15 @@ export default function Routes() {
         InternalMessageType.IdProof,
         'idProof'
     );
+    // We manually stringify the presentation
+    const handleWeb3IdProofResponse = useMessagePrompt<MessageStatusWrapper<string>>(
+        InternalMessageType.Web3IdProof,
+        'web3IdProof'
+    );
 
     usePrompt(InternalMessageType.EndIdentityIssuance, 'endIdentityIssuance');
     usePrompt(InternalMessageType.RecoveryFinished, 'recovery');
+    usePrompt(InternalMessageType.ImportWeb3IdBackup, 'importWeb3IdBackup');
 
     useEffect(() => {
         popupMessageHandler.sendInternalMessage(InternalMessageType.PopupReady).catch(noOp);
@@ -140,11 +160,41 @@ export default function Routes() {
                     }
                 />
                 <Route
+                    path={relativeRoutes.prompt.addWeb3IdCredential.path}
+                    element={
+                        <AddWeb3IdCredential
+                            onAllow={(key) => handleAddWeb3IdCredentialResponse({ success: true, result: key })}
+                            onReject={() =>
+                                handleAddWeb3IdCredentialResponse({
+                                    success: false,
+                                    message: 'Adding credential was rejected',
+                                })
+                            }
+                        />
+                    }
+                />
+                <Route
                     path={relativeRoutes.prompt.connectionRequest.path}
                     element={
                         <ConnectionRequest
                             onAllow={() => handleConnectionResponse(true)}
                             onReject={() => handleConnectionResponse(false)}
+                        />
+                    }
+                />
+                <Route
+                    path={relativeRoutes.prompt.connectAccountsRequest.path}
+                    element={
+                        <ConnectAccountsRequest
+                            onAllow={(accountAddresses: string[]) =>
+                                handleConnectAccountsResponse({ success: true, result: accountAddresses })
+                            }
+                            onReject={() =>
+                                handleConnectAccountsResponse({
+                                    success: false,
+                                    message: 'Request was rejected',
+                                })
+                            }
                         />
                     }
                 />
@@ -159,8 +209,22 @@ export default function Routes() {
                         />
                     }
                 />
+                <Route
+                    path={relativeRoutes.prompt.web3IdProof.path}
+                    element={
+                        <Web3ProofRequest
+                            onSubmit={(presentationString) =>
+                                handleWeb3IdProofResponse({ success: true, result: presentationString })
+                            }
+                            onReject={() =>
+                                handleWeb3IdProofResponse({ success: false, message: 'Proof generation was rejected' })
+                            }
+                        />
+                    }
+                />
                 <Route path={relativeRoutes.prompt.endIdentityIssuance.path} element={<IdentityIssuanceEnd />} />
                 <Route path={relativeRoutes.prompt.recovery.path} element={<RecoveryFinish />} />
+                <Route path={relativeRoutes.prompt.importWeb3IdBackup.path} element={<VerifiableCredentialImport />} />
             </Route>
             <Route path={`${relativeRoutes.setup.path}/*`} element={<Setup />} />
             <Route element={<RecoveryMain />} path={relativeRoutes.recovery.path} />
@@ -172,8 +236,10 @@ export default function Routes() {
                     path={`${relativePath(relativeRoutes.home.path, absoluteRoutes.home.identities.add.path)}/*`}
                 />
                 <Route element={<Identity />} path={relativeRoutes.home.identities.path} />
+                <Route element={<VerifiableCredentialList />} path={relativeRoutes.home.verifiableCredentials.path} />
                 <Route path={relativeRoutes.home.settings.path}>
                     <Route index element={<Settings />} />
+                    <Route element={<AllowListRoutes />} path={`${relativeRoutes.home.settings.allowlist.path}/*`} />
                     <Route element={<ChangePasscode />} path={relativeRoutes.home.settings.passcode.path} />
                     <Route element={<NetworkSettings />} path={relativeRoutes.home.settings.network.path} />
                     <Route element={<RecoveryIntro />} path={relativeRoutes.home.settings.recovery.path} />

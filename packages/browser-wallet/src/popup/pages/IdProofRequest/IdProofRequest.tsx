@@ -12,7 +12,7 @@ import { grpcClientAtom, networkConfigurationAtom } from '@popup/store/settings'
 import { addToastAtom } from '@popup/state';
 import { useDecryptedSeedPhrase } from '@popup/shared/utils/seed-phrase-helpers';
 import { getGlobal, getNet } from '@shared/utils/network-helpers';
-import { BackgroundResponseStatus, IdProofBackgroundResponse } from '@shared/utils/types';
+import { BackgroundResponseStatus, ProofBackgroundResponse } from '@shared/utils/types';
 import PendingArrows from '@assets/svg/pending-arrows.svg';
 import ExternalRequestLayout from '@popup/page-layouts/ExternalRequestLayout';
 import { fullscreenPromptContext } from '@popup/page-layouts/FullscreenPromptLayout';
@@ -71,7 +71,7 @@ export default function IdProofRequest({ onReject, onSubmit }: Props) {
 
         const global = await getGlobal(client);
 
-        const idProofResult: IdProofBackgroundResponse = await popupMessageHandler.sendInternalMessage(
+        const idProofResult: ProofBackgroundResponse<IdProofOutput> = await popupMessageHandler.sendInternalMessage(
             InternalMessageType.CreateIdProof,
             {
                 identityIndex: credential.identityIndex,
@@ -105,7 +105,7 @@ export default function IdProofRequest({ onReject, onSubmit }: Props) {
     }
 
     return (
-        <ExternalRequestLayout>
+        <ExternalRequestLayout className="p-10">
             <div className="id-proof-request">
                 <div>
                     <h3 className="m-t-0 text-center">{t('header', { dappName })}</h3>

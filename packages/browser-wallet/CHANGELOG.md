@@ -1,5 +1,98 @@
 # Changelog
 
+## 1.1.7
+
+### Fixed
+
+-   Changed 'Zero Knowledge' to 'Zero-knowledge' in display texts.
+-   An issue with images in verifiable credentials for lower resolutions.
+-   Schema validation of verifiable credentials with attributes that have `{ type: "integer" }` no longer rejects BigInt values.
+
+## 1.1.6
+
+### Fixed
+
+-   On the proof request page, routing back to credential statements no longer resets the selection.
+-   Update according to the change to AttributeType from the SDK. In particular the timestamp type is now explicit, and therefore we have removed hhe special serialization/parsing of Dates when exporting/import verifiable credentials.
+
+### Fixed
+
+-   Verifiable credentials are now validated according to the schema when being added. This will e.g. block setting an attribute as an integer if the schema defines it as a string.
+-   Refreshed the schema for credential schemas so that attribute types are now restricted as expected (`string`, `integer` and the special types are allowed).
+-   An issue where credential schemas were not updated with the correct key.
+-   UI improvements to the credential selector.
+
+## 1.1.5
+
+### Added
+
+-   Indicator on proof request page, to show how many credential statements are requested, and the current position.
+
+### Fixed
+
+-   An issue where Date attributes were saved as strings when exported. This would mean that they would lose typing and the credential would be broken.
+-   An issue where statement parameters were not validated according to the attribute bounds.
+
+## 1.1.4
+
+### Added
+
+-   The wallet now validates verifiable credential attributes based on their type. String attributes can at most be 31 bytes (UTF-8), integer attributes must fit in a u64 and Date attributes must be between -262144-01-01T00:00:00 and +262143-12-31T23:59:59.999999999Z'.
+
+### Changed
+
+-   Adjusted the schema validation for credential schemas to no longer require title and description. The type is now required to be 'object'.
+
+### Fixed
+
+-   An issue where changing the credential metadata URL to an invalid URL, or a URL that does not contain a credential metadata file, would result in an empty screen.
+-   Issues with a contract switching to an invalid schema or switching the schema to a new URL.
+-   The wallet now ensures that the verifiable credential index used when adding a credential has not already been used in the contract.
+-   An issue where an invalid Date would result in the epoch timestamp instead of returning an error.
+-   Enabled ID statement checks for Web3 ID proof requests containing account credential statements.
+
+## 1.1.3
+
+### Changed
+
+-   The status of a credential being added is now `Pending` instead of `NotActivated`.
+
+### Fixed
+
+-   An issue where the import window would fail to open.
+-   Updated the JSON schema for the verifiable credential schema validation, so that invalid schemas are rejected.
+-   An issue where a verifiable with the `NotActivated` status would show as `Pending`.
+-   Enable validation of veriable presentation requests before opening the popup window.
+-   An issue that allowed empty credential statements to be accepted by the wallet-api.
+-   An issue where the wallet allowed for requests adding credentials with more attributes than listed in the schema.
+
+## 1.1.2
+
+### Added
+
+-   Validation of required attributes when adding a credential.
+-   Display contract address of issuer in verifiable credential details.
+
+### Fixed
+
+-   Incorrect verifiable presentations created, due to incorrect identity/identityProviderIndex used.
+-   Wallet crashing when showing a proof request, while having a verifiable credential that is not yet on chain (or we otherwise fail to retrieve the status)
+-   Show verifiable credentials in overview before they are put on chain.
+
+## 1.1.1
+
+### Fixed
+
+-   Support number properties as bigints for verifiable credentials.
+-   Use localization for verifiable credentials.
+-   Fix wallet crashing when importing verifiable credentials with new schemas.
+
+## 1.1.0
+
+### Added
+
+-   Web3IdCredentials support.
+
 ## 1.0.7
 
 ### Added

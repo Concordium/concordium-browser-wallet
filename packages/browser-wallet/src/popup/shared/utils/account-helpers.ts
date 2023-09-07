@@ -1,7 +1,7 @@
 import { credentialsAtom, selectedAccountAtom } from '@popup/store/account';
 import { networkConfigurationAtom } from '@popup/store/settings';
 import { useAtomValue } from 'jotai';
-import { useMemo } from 'react';
+import { useEffect, useMemo, useState } from 'react';
 import { identitiesAtom } from '@popup/store/identity';
 import { AccountInfo, ConcordiumHdWallet } from '@concordium/web-sdk';
 import { WalletCredential } from '@shared/storage/types';
@@ -25,6 +25,21 @@ export function useIdentityOf(cred?: WalletCredential) {
     return identity;
 }
 
+export function useIdentityName(credential: WalletCredential, fallback?: string) {
+    const [identityName, setIdentityName] = useState<string>();
+    const identity = useIdentityOf(credential);
+
+    useEffect(() => {
+        if (identity) {
+            setIdentityName(identity.name);
+        } else if (fallback !== undefined) {
+            setIdentityName(fallback);
+        }
+    }, [identity]);
+
+    return identityName;
+}
+
 export function useCredential(accountAddress?: string) {
     const credentials = useAtomValue(credentialsAtom);
 
@@ -34,6 +49,17 @@ export function useCredential(accountAddress?: string) {
         }
         return credentials.find((cred) => cred.address === accountAddress);
     }, [accountAddress, JSON.stringify(credentials)]);
+}
+
+export function useCredentialByCredId(credId?: string) {
+    const credentials = useAtomValue(credentialsAtom);
+
+    return useMemo(() => {
+        if (!credId) {
+            return undefined;
+        }
+        return credentials.find((cred) => cred.credId === credId);
+    }, [credId, JSON.stringify(credentials)]);
 }
 
 export function useSelectedCredential() {

@@ -15,6 +15,7 @@ import { CIS2_SCHEMA_CONTRACT_NAME, CIS2_SCHEMA } from '@popup/constants/schema'
 import i18n from '@popup/shell/i18n';
 import { SmartContractParameters } from '@concordium/browser-wallet-api-helpers';
 import { determineUpdatePayloadSize } from './energy-helpers';
+import { applyExecutionNRGBuffer } from './contract-helpers';
 
 export interface ContractDetails {
     contractName: string;
@@ -347,8 +348,8 @@ async function getTokenTransferExecutionEnergyEstimate(
     if (!res || res.tag === 'failure') {
         throw new Error(res?.reason?.tag || 'no response');
     }
-    // TODO: determine the "safety ratio"
-    return (res.usedEnergy * 12n) / 10n;
+
+    return applyExecutionNRGBuffer(res.usedEnergy);
 }
 
 function getContractName(instanceInfo: InstanceInfo): string | undefined {

@@ -1,0 +1,137 @@
+.allowlist-page,
+.allowlist-empty {
+    height: 100%;
+    width: 100%;
+    background-color: $color-bg;
+    padding: 0 rem(10px);
+}
+
+.allowlist-page {
+    &__link {
+        display: block;
+
+        &:not(:last-child) {
+            border-bottom: rem(1px) dashed $color-petroleum;
+        }
+    }
+
+    &__link-icon {
+        height: rem(12px);
+        display: block;
+
+        path {
+            fill: $color-text;
+        }
+    }
+
+    &__list-item {
+        padding: rem(10px) 0;
+
+        &:hover {
+            path {
+                fill: $color-cta;
+            }
+        }
+    }
+}
+
+.allowlist-empty {
+    display: flex;
+    align-items: center;
+    text-align: center;
+    color: $color-text-faded;
+}
+
+.allowlist-entry-view {
+    &__header {
+        width: 100%;
+        padding: rem(10px);
+        padding-top: rem(0);
+        background-color: $color-allowlist-background;
+        border: rem(1px) solid #dae4ee;
+        border-radius: rem(10px) rem(10px) 0 0;
+    }
+
+    &__mode-description {
+        margin-top: rem(10px);
+    }
+
+    &__accounts {
+        width: 100%;
+        min-height: rem(160px);
+        height: rem(160px);
+        padding-left: rem(10px);
+        padding-right: rem(10px);
+        margin-left: auto;
+        margin-right: auto;
+        margin-bottom: rem(15px);
+        background: $color-input-bg;
+        border: rem(1px) solid #dae4ee;
+        border-top: none;
+        border-radius: 0 0 rem(10px) rem(10px);
+        scrollbar-width: thin;
+        overflow-y: auto;
+
+        &__item {
+            padding-top: rem(5px);
+            padding-bottom: rem(5px);
+            font-weight: $font-weight-light;
+
+            &:not(:last-child) {
+                border-bottom: rem(1px) dashed #dae4ee;
+            }
+
+            &__primary {
+                position: relative;
+                display: flex;
+                justify-content: space-between;
+                align-items: center;
+            }
+
+            &__check-box {
+                position: absolute;
+                right: rem(0);
+                bottom: rem(-12.5px);
+                width: rem(15px);
+
+                input {
+                    margin: 0;
+                }
+            }
+
+            &__secondary {
+                font-size: rem(8px);
+            }
+        }
+    }
+}
+
+.allow-list-editor {
+    height: 100%;
+    padding: rem(10px);
+    background-color: $color-bg;
+    display: flex;
+    flex-direction: column;
+    justify-content: space-between;
+    align-items: center;
+
+    &__remove-wrapper {
+        width: 100%;
+        display: flex;
+        justify-content: center;
+        margin-top: rem(10px);
+        padding-top: rem(10px);
+    }
+
+    &__remove-button {
+        color: $color-danger;
+        display: flex;
+
+        &__icon {
+            margin-top: auto;
+            margin-bottom: auto;
+            margin-left: rem(5px);
+            stroke: $color-danger;
+        }
+    }
+}

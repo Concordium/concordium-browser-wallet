@@ -1,9 +1,9 @@
 .external-request-layout {
     position: relative;
     height: calc(100% - $main-layout-header-height);
+    background-color: $color-bg;
 
     &__main {
-        padding: rem(10px);
         height: calc(100% - $account-page-details-height);
         overflow: overlay;
     }

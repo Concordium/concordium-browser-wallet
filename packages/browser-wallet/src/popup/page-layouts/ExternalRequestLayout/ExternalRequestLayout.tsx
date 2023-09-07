@@ -7,6 +7,8 @@ import Toast from '@popup/shared/Toast/Toast';
 
 import { useCredential } from '@popup/shared/utils/account-helpers';
 import AccountDetails from '@popup/pages/Account/AccountDetails';
+import clsx from 'clsx';
+import { ClassName } from 'wallet-common-helpers';
 
 function Header() {
     const { t } = useTranslation('mainLayout');
@@ -16,11 +18,20 @@ function Header() {
         if (pathname.startsWith(absoluteRoutes.prompt.connectionRequest.path)) {
             return t('header.connect');
         }
+        if (pathname.startsWith(absoluteRoutes.prompt.connectAccountsRequest.path)) {
+            return t('header.allowlistingRequest');
+        }
         if (pathname.startsWith(absoluteRoutes.prompt.addTokens.path)) {
             return t('header.addTokens');
         }
+        if (pathname.startsWith(absoluteRoutes.prompt.addWeb3IdCredential.path)) {
+            return t('header.addWeb3IdCredential');
+        }
         if (pathname.startsWith(absoluteRoutes.prompt.idProof.path)) {
             return t('header.idProof');
+        }
+        if (pathname.startsWith(absoluteRoutes.prompt.web3IdProof.path)) {
+            return t('header.web3IdProof');
         }
         return t('header.request');
     }
@@ -48,10 +59,10 @@ interface Location {
 }
 
 interface Props {
-    children: ReactNode;
+    children?: ReactNode;
 }
 
-export default function ExternalRequestLayout({ children }: Props) {
+export default function ExternalRequestLayout({ children, className }: Props & ClassName) {
     const { state } = useLocation() as Location;
     const account = useCredential(state.payload.accountAddress);
 
@@ -60,7 +71,9 @@ export default function ExternalRequestLayout({ children }: Props) {
             <Header />
             <div className="external-request-layout">
                 {account && <AccountDetails expanded={false} account={account} />}
-                <main className="external-request-layout__main">{children}</main>
+                <main className={clsx('external-request-layout__main', !account && 'h-full', className)}>
+                    {children}
+                </main>
                 <Toast />
             </div>
         </>

@@ -18,8 +18,14 @@ export const relativeRoutes = {
             path: 'identities',
             add: { path: 'add' },
         },
+        verifiableCredentials: {
+            path: 'verifiable-credentials',
+        },
         settings: {
             path: 'settings',
+            allowlist: {
+                path: 'allowlist',
+            },
             passcode: {
                 path: 'passcode',
             },
@@ -39,6 +45,12 @@ export const relativeRoutes = {
         connectionRequest: {
             path: 'connection-request',
         },
+        addWeb3IdCredential: {
+            path: 'add-web3id-credential',
+        },
+        connectAccountsRequest: {
+            path: 'connect-accounts-request',
+        },
         signMessage: {
             path: 'sign-message',
         },
@@ -51,11 +63,17 @@ export const relativeRoutes = {
         recovery: {
             path: 'recovery',
         },
+        importWeb3IdBackup: {
+            path: 'import-web3Id-Backup',
+        },
         addTokens: {
             path: 'add-tokens',
         },
         idProof: {
             path: 'id-proof',
+        },
+        web3IdProof: {
+            path: 'web3Id-proof',
         },
     },
     setup: {

@@ -9,6 +9,7 @@ import {
     AccountTransactionSignature,
     AccountTransactionType,
     DeployModulePayload,
+    HexString,
     InitContractPayload,
     SchemaVersion,
     UpdateContractPayload,
@@ -21,10 +22,15 @@ import {
     SchemaType,
     SignMessageObject,
     SmartContractParameters,
+    APIVerifiableCredential,
+    MetadataUrl,
+    CredentialProof,
 } from '@concordium/browser-wallet-api-helpers';
 import EventEmitter from 'events';
 import type { JsonRpcRequest } from '@concordium/common-sdk/lib/providers/provider';
 import { IdProofOutput, IdStatement } from '@concordium/common-sdk/lib/idProofTypes';
+import { CredentialStatements } from '@concordium/common-sdk/lib/web3ProofTypes';
+import { VerifiablePresentation } from '@concordium/common-sdk/lib/types/VerifiablePresentation';
 import { ConcordiumGRPCClient } from '@concordium/common-sdk/lib/GRPCClient';
 import JSONBig from 'json-bigint';
 import { stringify } from './util';
@@ -87,6 +93,22 @@ class WalletApi extends EventEmitter implements IWalletApi {
     public async connect(): Promise<string | undefined> {
         const response = await this.messageHandler.sendMessage<MessageStatusWrapper<string>>(MessageType.Connect);
 
+        if (!response.success) {
+            throw new Error(response.message);
+        }
+
+        return response.result;
+    }
+
+    /**
+     * Request a connection to the wallet. Resolves with a list of accounts that the user has accepted
+     * to connect with. The list of accounts may be empty. It rejects if the request is rejected or closed
+     * by the user in the wallet.
+     */
+    public async requestAccounts(): Promise<string[]> {
+        const response = await this.messageHandler.sendMessage<MessageStatusWrapper<string[]>>(
+            MessageType.ConnectAccounts
+        );
         if (!response.success) {
             throw new Error(response.message);
         }
@@ -226,6 +248,63 @@ class WalletApi extends EventEmitter implements IWalletApi {
         }
 
         return res.result;
+    }
+
+    public async addWeb3IdCredential(
+        credential: APIVerifiableCredential,
+        metadataUrl: MetadataUrl,
+        generateProofAndRandomness: (
+            credentialHolderIdDID: string
+        ) => Promise<{ randomness: Record<string, string>; proof: CredentialProof }>
+    ): Promise<string> {
+        const res = await this.messageHandler.sendMessage<MessageStatusWrapper<string>>(
+            MessageType.AddWeb3IdCredential,
+            {
+                credential: stringify(credential),
+                metadataUrl,
+            }
+        );
+
+        if (!res.success) {
+            throw new Error(res.message);
+        }
+
+        const credentialHolderIdDID = res.result;
+
+        const { proof, randomness } = await generateProofAndRandomness(credentialHolderIdDID);
+
+        const saveSignatureResult = await this.messageHandler.sendMessage<MessageStatusWrapper<void>>(
+            MessageType.AddWeb3IdCredentialFinish,
+            {
+                credentialHolderIdDID,
+                proof,
+                randomness,
+            }
+        );
+
+        if (!saveSignatureResult.success) {
+            throw new Error(saveSignatureResult.message);
+        }
+
+        return credentialHolderIdDID;
+    }
+
+    public async requestVerifiablePresentation(challenge: HexString, statements: CredentialStatements) {
+        if (statements === undefined || statements.length === 0) {
+            throw new Error('A request for a verifiable presentation must contain statements');
+        }
+
+        const res = await this.messageHandler.sendMessage<MessageStatusWrapper<string>>(MessageType.Web3IdProof, {
+            // We have to stringify the statements because they can contain bigints
+            statements: stringify(statements),
+            challenge,
+        });
+
+        if (!res.success) {
+            throw new Error(res.message);
+        }
+
+        return VerifiablePresentation.fromString(res.result);
     }
 }
 

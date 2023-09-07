@@ -25,20 +25,19 @@ import {
     useStatementHeader,
     useStatementValue,
     useStatementName,
-    isoToCountryName,
 } from './utils';
 
-type StatementLine = {
+export type StatementLine = {
     attribute: string;
     value: string;
     isRequirementMet: boolean;
 };
 
-type StatementLineProps = StatementLine;
+type StatementLineProps = StatementLine & ClassName;
 
-function DisplayStatementLine({ attribute, value, isRequirementMet }: StatementLineProps) {
+export function DisplayStatementLine({ attribute, value, isRequirementMet, className }: StatementLineProps) {
     return (
-        <li className="display-statement__line">
+        <li className={clsx(className, 'display-statement__line')}>
             <div className="display-statement__line-attribute">{attribute}:</div>
             <div className="display-statement__line-value">
                 {value}
@@ -181,10 +180,6 @@ type BaseProps = ClassName & {
     onInvalid(): void;
 };
 
-type DisplayRevealStatementProps = BaseProps & {
-    statements: RevealStatement[];
-};
-
 export function DisplayRevealStatement({
     dappName,
     statements,
@@ -192,7 +187,7 @@ export function DisplayRevealStatement({
     className,
     onInvalid,
 }: DisplayRevealStatementProps) {
-    const { t, i18n } = useTranslation('idProofRequest', { keyPrefix: 'displayStatement' });
+    const { t } = useTranslation('idProofRequest', { keyPrefix: 'displayStatement' });
     const getAttributeName = useGetAttributeName();
     const displayAttribute = useDisplayAttributeValue();
     const attributes =
@@ -201,11 +196,7 @@ export function DisplayRevealStatement({
 
     const lines: StatementLine[] = statements.map((s) => {
         const raw = attributes[s.attributeTag];
-        let value = displayAttribute(s.attributeTag, attributes[s.attributeTag] ?? '');
-
-        if (value && ['countryOfResidence', 'nationality', 'idDocIssuer'].includes(s.attributeTag)) {
-            value = isoToCountryName(i18n.resolvedLanguage)(value);
-        }
+        const value = displayAttribute(s.attributeTag, attributes[s.attributeTag] ?? '');
 
         return {
             attribute: getAttributeName(s.attributeTag),
@@ -224,6 +215,10 @@ export function DisplayRevealStatement({
 
     return <DisplayStatementView reveal lines={lines} dappName={dappName} header={header} className={className} />;
 }
+
+type DisplayRevealStatementProps = BaseProps & {
+    statements: RevealStatement[];
+};
 
 type DisplaySecretStatementProps = BaseProps & {
     statement: SecretStatement;

@@ -9,4 +9,3 @@
 ### Fixed
 
 -   CCDScan URL to work for mainnet and testnet
-

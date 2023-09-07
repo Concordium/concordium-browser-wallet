@@ -16,6 +16,10 @@ export enum MessageType {
     GrpcRequest = 'M_GrpcRequest',
     AddTokens = 'M_AddTokens',
     IdProof = 'M_IdProof',
+    Web3IdProof = 'M_Web3Proof',
+    ConnectAccounts = 'M_ConnectAccounts',
+    AddWeb3IdCredential = 'M_AddWeb3IdCredential',
+    AddWeb3IdCredentialFinish = 'M_AddWeb3IdCredentialFinish',
 }
 
 /**
@@ -37,6 +41,12 @@ export enum InternalMessageType {
     AddTokens = 'I_AddTokens',
     IdProof = 'I_IdProof',
     CreateIdProof = 'I_CreateIdProof',
+    Web3IdProof = 'I_Web3IdProof',
+    CreateWeb3IdProof = 'I_CreateWeb3IdProof',
+    ConnectAccounts = 'I_ConnectAccounts',
+    AddWeb3IdCredential = 'I_AddWeb3IdCredential',
+    LoadWeb3IdBackup = 'I_LoadWeb3IdBackup',
+    ImportWeb3IdBackup = 'I_ImportWeb3IdBackup',
 }
 
 // eslint-disable-next-line @typescript-eslint/no-explicit-any

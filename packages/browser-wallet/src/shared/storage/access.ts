@@ -1,3 +1,7 @@
+import { stringify } from '@concordium/browser-wallet-api/src/util';
+import { parse } from '@shared/utils/payload-helpers';
+import { VerifiableCredentialMetadata } from '@shared/utils/verifiable-credential-helpers';
+import { Log } from '@shared/utils/log-helpers';
 import {
     ChromeStorageKey,
     EncryptedData,
@@ -11,6 +15,8 @@ import {
     TokenMetadata,
     TokenStorage,
     AcceptedTermsState,
+    VerifiableCredential,
+    VerifiableCredentialSchema,
 } from './types';
 
 export type StorageAccessor<V> = {
@@ -54,7 +60,7 @@ export type IndexedStorageAccessor<V> = {
 /**
  * Factory function for creating a StorageAccessor from a key.
  *
- * @param area storeage area to store value in
+ * @param area storage area to store value in
  * @param key key used to store value
  */
 const makeStorageAccessor = <V>(area: chrome.storage.AreaName, key: ChromeStorageKey): StorageAccessor<V> => {
@@ -108,6 +114,44 @@ export function useIndexedStorage<V>(
     };
 }
 
+/**
+ * Factory function for creating a StorageAccessor, which serializes before storing the value and deserializes before loading the value, from a key.
+ *
+ * @param area storage area to store value in
+ * @param key key used to store value
+ */
+export function makeSerializedStorageAccessor<V>(
+    area: chrome.storage.AreaName,
+    key: ChromeStorageKey
+): StorageAccessor<V> {
+    const inner = makeStorageAccessor<string | undefined>(area, key);
+    return {
+        get: (): Promise<V | undefined> => inner.get().then((v) => (v !== undefined ? parse(v) : undefined)),
+        set: (value: V) => inner.set(stringify(value)),
+        remove: () => inner.remove(),
+        area,
+    };
+}
+
+/**
+ * Factory function for creating an IndexedStorageAccessor, which serializes before storing the value and deserializes before loading the value, from a key.
+ *
+ * @param area storage area to store value in
+ * @param key key used to store value
+ */
+export function makeSerializedAndIndexedStorageAccessor<Value>(
+    area: chrome.storage.AreaName,
+    key: ChromeStorageKey
+): IndexedStorageAccessor<Value> {
+    const inner = makeIndexedStorageAccessor<string | undefined>(area, key);
+    return {
+        get: (index: string) => inner.get(index).then((s) => (s !== undefined ? parse(s) : undefined)),
+        set: (index: string, value: Value) => inner.set(index, stringify(value)),
+        remove: (index: string) => inner.remove(index),
+        area,
+    };
+}
+
 export const storedCurrentNetwork = makeStorageAccessor<NetworkConfiguration>(
     'local',
     ChromeStorageKey.NetworkConfiguration
@@ -145,6 +189,24 @@ export const storedTokenMetadata = makeStorageAccessor<Record<string, TokenMetad
     ChromeStorageKey.TokenMetadata
 );
 export const storedAcceptedTerms = makeStorageAccessor<AcceptedTermsState>('local', ChromeStorageKey.AcceptedTerms);
+export const storedVerifiableCredentials = makeSerializedAndIndexedStorageAccessor<VerifiableCredential[]>(
+    'local',
+    ChromeStorageKey.VerifiableCredentials
+);
+export const storedVerifiableCredentialSchemas = makeStorageAccessor<Record<string, VerifiableCredentialSchema>>(
+    'local',
+    ChromeStorageKey.VerifiableCredentialSchemas
+);
+export const storedVerifiableCredentialMetadata = makeStorageAccessor<Record<string, VerifiableCredentialMetadata>>(
+    'local',
+    ChromeStorageKey.VerifiableCredentialMetadata
+);
+const indexedStoredAllowlist = makeIndexedStorageAccessor<Record<string, string[]>>(
+    'local',
+    ChromeStorageKey.Allowlist
+);
+export const storedAllowlist = useIndexedStorage(indexedStoredAllowlist, getGenesisHash);
+export const storedLog = makeStorageAccessor<Log[]>('local', ChromeStorageKey.Log);
 
 export const sessionOpenPrompt = makeStorageAccessor<boolean>('session', ChromeStorageKey.OpenPrompt);
 export const sessionPasscode = makeStorageAccessor<string>('session', ChromeStorageKey.Passcode);
@@ -166,4 +228,12 @@ export const sessionCookie = makeIndexedStorageAccessor<string>('session', Chrom
 export const sessionPendingTransactions = makeIndexedStorageAccessor<string[]>( // Underlying type is serialized BrowserWalletAccountTransaction[]
     'session',
     ChromeStorageKey.PendingTransactions
+);
+export const sessionVerifiableCredentials = makeSerializedAndIndexedStorageAccessor<
+    Omit<VerifiableCredential, 'signature' | 'randomness'>[]
+>('session', ChromeStorageKey.TemporaryVerifiableCredentials);
+
+export const sessionVerifiableCredentialMetadataUrls = makeIndexedStorageAccessor<Record<string, string>>(
+    'session',
+    ChromeStorageKey.TemporaryVerifiableCredentialMetadataUrls
 );

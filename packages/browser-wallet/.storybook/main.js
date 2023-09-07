@@ -38,4 +38,10 @@ module.exports = {
 
         return config;
     },
+    babel: async (options) => {
+        return {
+            ...options,
+            plugins: options.plugins.filter((x) => !(typeof x === 'string' && x.includes('plugin-transform-classes'))),
+        };
+    },
 };

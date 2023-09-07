@@ -1,5 +1,10 @@
+import { identitiesAtomWithLoading } from '@popup/store/identity';
+import { mapAsyncWrapper } from '@popup/store/utils';
+import { ConfirmedIdentity, CreationStatus, Identity } from '@shared/storage/types';
+import { useAtomValue } from 'jotai';
 import { TFunction, useTranslation } from 'react-i18next';
 import { formatDate } from 'wallet-common-helpers';
+import { isoToCountryName } from '@popup/pages/IdProofRequest/DisplayStatement/utils';
 import sharedTranslations from '../i18n/en';
 
 export function useGetAttributeName() {
@@ -72,8 +77,21 @@ export function useDisplayAttributeValue() {
                 return formatGender(parseInt(value, 10), t);
             case 'idDocType':
                 return formatDocumentType(value, t);
+            case 'countryOfResidence':
+            case 'nationality':
+            case 'idDocIssuer':
+                return isoToCountryName(i18n.resolvedLanguage)(value);
             default:
                 return value;
         }
     };
+}
+
+export function isConfirmedIdentity(identity: Identity): identity is ConfirmedIdentity {
+    return identity.status === CreationStatus.Confirmed;
+}
+
+export function useConfirmedIdentities() {
+    const identities = useAtomValue(identitiesAtomWithLoading);
+    return mapAsyncWrapper(identities, (ids) => ids.filter(isConfirmedIdentity));
 }

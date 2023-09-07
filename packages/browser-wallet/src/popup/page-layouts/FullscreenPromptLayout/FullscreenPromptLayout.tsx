@@ -8,7 +8,7 @@ type OnCloseHandler = () => void;
 type Unsubscribe = () => void;
 
 type OnClose = (handler: OnCloseHandler) => Unsubscribe;
-type WithClose = <A extends unknown[], F extends (...args: A) => void>(action: F) => (...args: A) => void;
+type WithClose = <A extends unknown[]>(action: (...args: A) => void) => (...args: A) => void;
 
 type FullscreenPromptContext = {
     onClose: OnClose;
