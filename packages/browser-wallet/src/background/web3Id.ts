@@ -44,6 +44,7 @@ import { getNet } from '@shared/utils/network-helpers';
 import { WAIT_FOR_CLOSED_POPUP_ITERATIONS, WAIT_FOR_CLOSED_POPUP_TIMEOUT_MS } from '@shared/constants/web3id';
 import { Buffer } from 'buffer/';
 import { isAgeStatement, SecretStatement } from '@popup/pages/IdProofRequest/DisplayStatement/utils';
+import { logError } from '@shared/utils/log-helpers';
 import { openWindow, RunCondition, testPopupOpen } from './window-management';
 import bgMessageHandler from './message-handler';
 
@@ -248,8 +249,8 @@ export const createWeb3IdProofHandler: ExtensionMessageHandler = (msg, _sender, 
 };
 
 export const runIfValidWeb3IdProof: RunCondition<MessageStatusWrapper<undefined>> = async (msg) => {
-    if (!isHex(msg.payload.challenge)) {
-        return rejectRequest(`Challenge is invalid, it should be a HEX encoded string`);
+    if (!isHex(msg.payload.challenge) || msg.payload.challenge.length !== 64) {
+        return rejectRequest(`Challenge is invalid, it should be 32 bytes as a HEX encoded string`);
     }
     try {
         const statements: CredentialStatements = parse(msg.payload.statements);
@@ -346,19 +347,30 @@ export const loadWeb3IdBackupHandler: ExtensionMessageHandler = (_msg, _sender, 
     respond(undefined);
 };
 
+/**
+ * Check if the web3IdProof payload statements are an "Age proof"
+ * i.e. it is a single account credential statement with a single atomic statement, which is an age statement.
+ * n.b. We have this to filter some request to a special page for age statements.
+ */
 export function isAgeProof(payload: { statements: string }): boolean {
     try {
         const statements: CredentialStatements = parse(payload.statements);
+        const credentialStatement = statements[0];
+
+        if (!(statements.length === 1 && isAccountCredentialStatement(credentialStatement))) {
+            return false;
+        }
+
+        const atomicStatement = credentialStatement.statement[0];
 
         return (
-            statements.length === 1 &&
-            isAccountCredentialStatement(statements[0]) &&
-            statements[0].statement.length === 1 &&
-            statements[0].statement[0].type === 'AttributeInRange' &&
-            statements[0].statement[0].attributeTag === AttributeKeyString.dob &&
-            isAgeStatement(statements[0].statement[0] as SecretStatement)
+            credentialStatement.statement.length === 1 &&
+            atomicStatement.type === StatementTypes.AttributeInRange &&
+            atomicStatement.attributeTag === AttributeKeyString.dob &&
+            isAgeStatement(atomicStatement as SecretStatement)
         );
     } catch (e) {
+        logError(e);
         return false;
     }
 }

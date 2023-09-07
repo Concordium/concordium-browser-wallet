@@ -55,7 +55,7 @@ export default function Login() {
         <div className="onboarding-setup__intro-wrapper">
             <div className="onboarding-setup__intro-wrapper__logos">
                 <Logo className="onboarding-setup__intro-wrapper__logo" />
-                <ConcordiumLetters className="age-request__concordium-letters" />
+                <ConcordiumLetters className="onboarding-setup__intro-wrapper__concordium-letters" />
             </div>
             <p className="login__description">{t('description')}</p>
             <Form onSubmit={handleSubmit} className="login__form" formMethods={form}>

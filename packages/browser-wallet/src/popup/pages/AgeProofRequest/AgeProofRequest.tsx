@@ -11,6 +11,8 @@ import {
     createAccountDID,
     ConcordiumHdWallet,
     isAccountCredentialStatement,
+    StatementTypes,
+    AttributeKeyString,
 } from '@concordium/web-sdk';
 
 import { grpcClientAtom, networkConfigurationAtom, sessionPasscodeAtom } from '@popup/store/settings';
@@ -50,8 +52,8 @@ interface Location {
 
 function useAgeFromStatement(statement: AtomicStatementV2) {
     if (
-        statement.type !== 'AttributeInRange' ||
-        statement.attributeTag !== 'dob' ||
+        statement.type !== StatementTypes.AttributeInRange ||
+        statement.attributeTag !== AttributeKeyString.dob ||
         typeof statement.lower !== 'string' ||
         typeof statement.upper !== 'string'
     ) {
@@ -90,7 +92,7 @@ export default function AgeProofRequest({ onReject, onSubmit }: Props) {
     const credential = useMemo(() => {
         const credentialStatement = statements[0];
         if (!isAccountCredentialStatement(credentialStatement)) {
-            throw new Error('Unexpected error type');
+            throw new Error('Unexpected credential statement type');
         }
 
         return credentials.value.find((cred) => {
@@ -112,8 +114,7 @@ export default function AgeProofRequest({ onReject, onSubmit }: Props) {
     const network = useAtomValue(networkConfigurationAtom);
     const client = useAtomValue(grpcClientAtom);
     const addToast = useSetAtom(addToastAtom);
-    // TODO log this;
-    const recoveryPhrase = useDecryptedSeedPhrase(undefined);
+    const recoveryPhrase = useDecryptedSeedPhrase(logError);
     const dappName = displayUrl(url);
     const [creatingProof, setCreatingProof] = useState<boolean>(false);
     const { loading: loadingPasscode, value: sessionPasscode } = useAtomValue(sessionPasscodeAtom);
@@ -196,7 +197,7 @@ export default function AgeProofRequest({ onReject, onSubmit }: Props) {
                 <div className="age-proof__logos">
                     <Logo className="age-proof__logo" />
                 </div>
-                <h3 className="m-t-40 text-center age-proof__description">{description}</h3>
+                <h3 className="age-proof__description">{description}</h3>
                 <Button clear onClick={() => setMore(true)} className="age-proof__more-details">
                     {t('moreDetails', { dappName })}
                 </Button>
@@ -210,8 +211,7 @@ export default function AgeProofRequest({ onReject, onSubmit }: Props) {
                         .catch((e) => {
                             setCreatingProof(false);
                             logError(e);
-                            // TODO what to do
-                            addToast('Failed');
+                            addToast(t('failure'));
                         });
                 }}
                 disabled={!canProve || creatingProof}

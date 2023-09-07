@@ -198,10 +198,15 @@
                 provider.on('accountChanged', (accountAddress) => (currentAccountAddress = accountAddress));
                 provider.on('chainChanged', (chain) => alert(chain));
                 document.getElementById('ageProof').addEventListener('click', () => {
-                    const statement = new concordiumSDK.IdStatementBuilder().addMaximumAge(18).getStatement();
-                    const challenge = 'AAAAAAAA';
+                    // TODO Replace add range with addMinimumAge(18) when SDK is fixed.
+                    const statement = new concordiumSDK.Web3StatementBuilder()
+                        .addForIdentityCredentials([0, 1, 2, 3, 4, 5], (b) =>
+                            b.addRange('dob', concordiumSDK.MIN_DATE, concordiumSDK.getPastDate(18, 1))
+                        )
+                        .getStatements();
+                    const challenge = 'AAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAA';
                     provider
-                        .requestIdProof(currentAccountAddress, statement, challenge)
+                        .requestVerifiablePresentation(challenge, statement)
                         .then((proof) => {
                             console.log(proof);
                             alert('Proof received! (check the console)');
