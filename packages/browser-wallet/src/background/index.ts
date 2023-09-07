@@ -546,9 +546,13 @@ function withPromptEnd() {
     sessionOpenPrompt.set(false);
 }
 
+function goToAgeProof(payload: { statements: string }, { url }: { url?: string | undefined }): boolean {
+    return Boolean(url && new URL(url).origin.includes('concordium') && isAgeProof(payload));
+}
+
 forwardToPopup(
     MessageType.Connect,
-    InternalMessageType.Connect,
+    () => InternalMessageType.Connect,
     runConditionComposer(runIfNotWhitelisted, withPromptStart()),
     handleConnectMessage,
     handleConnectionResponse,
@@ -556,7 +560,7 @@ forwardToPopup(
 );
 forwardToPopup(
     MessageType.ConnectAccounts,
-    InternalMessageType.ConnectAccounts,
+    () => InternalMessageType.ConnectAccounts,
     runConditionComposer(runIfNotAllowlisted, withPromptStart()),
     handleConnectMessage,
     undefined,
@@ -564,7 +568,7 @@ forwardToPopup(
 );
 forwardToPopup(
     MessageType.SendTransaction,
-    InternalMessageType.SendTransaction,
+    () => InternalMessageType.SendTransaction,
     runConditionComposer(runIfAccountIsAllowlisted, ensureTransactionPayloadParse, withPromptStart()),
     appendUrlToPayload,
     undefined,
@@ -572,7 +576,7 @@ forwardToPopup(
 );
 forwardToPopup(
     MessageType.SignMessage,
-    InternalMessageType.SignMessage,
+    () => InternalMessageType.SignMessage,
     runConditionComposer(runIfAccountIsAllowlisted, ensureMessageWithSchemaParse, withPromptStart()),
     appendUrlToPayload,
     undefined,
@@ -580,7 +584,7 @@ forwardToPopup(
 );
 forwardToPopup(
     MessageType.AddTokens,
-    InternalMessageType.AddTokens,
+    () => InternalMessageType.AddTokens,
     runConditionComposer(runIfAccountIsAllowlisted, withPromptStart()),
     appendUrlToPayload,
     undefined,
@@ -588,7 +592,7 @@ forwardToPopup(
 );
 forwardToPopup(
     MessageType.IdProof,
-    InternalMessageType.IdProof,
+    () => InternalMessageType.IdProof,
     runConditionComposer(runIfAccountIsAllowlisted, runIfValidProof, withPromptStart()),
     appendUrlToPayload,
     undefined,
@@ -596,7 +600,7 @@ forwardToPopup(
 );
 forwardToPopup(
     MessageType.AddWeb3IdCredential,
-    InternalMessageType.AddWeb3IdCredential,
+    () => InternalMessageType.AddWeb3IdCredential,
     runConditionComposer(runIfAllowlisted, runIfValidWeb3IdCredentialRequest, withPromptStart()),
     appendUrlToPayload,
     undefined,
@@ -605,19 +609,10 @@ forwardToPopup(
 
 forwardToPopup(
     MessageType.Web3IdProof,
-    InternalMessageType.Web3IdProof,
+    (msg, sender) =>
+        goToAgeProof(msg.payload, sender) ? InternalMessageType.AgeProof : InternalMessageType.Web3IdProof,
     runConditionComposer(runIfAllowlisted, runIfValidWeb3IdProof, withPromptStart()),
     appendUrlToPayload,
     undefined,
-    withPromptEnd,
-    (msg) => createMessageTypeFilter(MessageType.Web3IdProof)(msg) && !isAgeProof(msg.payload)
-);
-forwardToPopup(
-    MessageType.Web3IdProof,
-    InternalMessageType.AgeProof,
-    runConditionComposer(runIfAllowlisted, runIfValidWeb3IdProof, withPromptStart()),
-    appendUrlToPayload,
-    undefined,
-    withPromptEnd,
-    (msg) => createMessageTypeFilter(MessageType.Web3IdProof)(msg) && isAgeProof(msg.payload)
+    withPromptEnd
 );

@@ -98,10 +98,13 @@ export const openWindow = async (messageType?: InternalMessageType) => {
  * Ensures the handler is executed when a popup window is on screen.
  */
 const ensureAvailableWindow =
-    (handler: ExtensionMessageHandler, messageType?: InternalMessageType): ExtensionMessageHandler =>
+    (
+        handler: ExtensionMessageHandler,
+        getMessageType: (msg: Message, sender: Sender) => InternalMessageType
+    ): ExtensionMessageHandler =>
     (...args) => {
         (async () => {
-            await openWindow(messageType);
+            await openWindow(getMessageType(args[0], args[1]));
             handler(...args);
         })();
 
@@ -124,7 +127,7 @@ export type RunCondition<R> = (msg: Message, sender: Sender) => RunConditionResp
  */
 export const forwardToPopup = <P, R>(
     messageType: MessageType,
-    internalMessageType: InternalMessageType,
+    getInternalMessageType: (msg: Message, sender: Sender) => InternalMessageType,
     /**
      * Will only forward handle request if condition resolves to {run: true}.
      */
@@ -142,22 +145,18 @@ export const forwardToPopup = <P, R>(
     /**
      * Function to run after responding
      */
-    handleFinally: () => void = noOp,
-    /**
-     * Overwrite the filter used
-     */
-    filter: (msg: unknown) => boolean = createMessageTypeFilter(messageType)
+    handleFinally: () => void = noOp
 ): void => {
     // Wrap handler in helper ensuring a popup window is available and ready to handle incomming messages.
     const handler = ensureAvailableWindow((msg, sender, respond) => {
         bgMessageHandler
-            .sendInternalMessage(internalMessageType, handleMessage(msg, sender))
+            .sendInternalMessage(getInternalMessageType(msg, sender), handleMessage(msg, sender))
             .then((r) => handleResponse(r, msg, sender))
             .then(respond)
             .catch((e: Error) => respond(new WalletError(msg, e.message))) // Usually if popup is closed prior to a response being sent.
             .finally(handleFinally);
         return true;
-    }, internalMessageType);
+    }, getInternalMessageType);
 
     // Check if handler should be run, or if it should be short-circuited.
     const conditionalHandler: ExtensionMessageHandler = (msg, sender, respond) => {
@@ -172,7 +171,7 @@ export const forwardToPopup = <P, R>(
         return true;
     };
 
-    bgMessageHandler.handleMessage(filter, conditionalHandler);
+    bgMessageHandler.handleMessage(createMessageTypeFilter(messageType), conditionalHandler);
 };
 
 /**
