@@ -35,6 +35,7 @@ import Web3ProofRequest from '../Web3ProofRequest/Web3ProofRequest';
 import {
     checkIfAccountCredentialIsViableForStatement,
     getAccountCredentialCommitmentInput,
+    getAccountCredentialsWithMatchingIssuer,
 } from '../Web3ProofRequest/utils';
 import { addDays, getYearFromDateString } from '../IdProofRequest/DisplayStatement/utils';
 
@@ -98,7 +99,7 @@ export default function AgeProofRequest({ onReject, onSubmit }: Props) {
             throw new Error('Unexpected credential statement type');
         }
 
-        return credentials.value.find((cred) =>
+        return getAccountCredentialsWithMatchingIssuer(credentialStatement, credentials.value).find((cred) =>
             checkIfAccountCredentialIsViableForStatement(credentialStatement, cred, identities.value)
         );
     }, [identities.loading, credentials.loading]);
