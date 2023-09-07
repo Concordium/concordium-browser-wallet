@@ -4,7 +4,6 @@ import { useAtomValue, useSetAtom } from 'jotai';
 import { useTranslation } from 'react-i18next';
 import {
     CredentialStatements,
-    canProveCredentialStatement,
     AtomicStatementV2,
     getPastDate,
     MIN_DATE,
@@ -31,8 +30,12 @@ import { useConfirmedIdentities } from '@popup/shared/utils/identity-helpers';
 import { isIdentityOfCredential } from '@shared/utils/identity-helpers';
 import Toast from '@popup/shared/Toast';
 import { logError } from '@shared/utils/log-helpers';
-import Web3ProofRequest, { proveRequest } from '../Web3ProofRequest/Web3ProofRequest';
-import { getAccountCredentialCommitmentInput } from '../Web3ProofRequest/utils';
+import { proveWeb3Request } from '@shared/utils/proof-helpers';
+import Web3ProofRequest from '../Web3ProofRequest/Web3ProofRequest';
+import {
+    checkIfAccountCredentialIsViableForStatement,
+    getAccountCredentialCommitmentInput,
+} from '../Web3ProofRequest/utils';
 import { addDays, getYearFromDateString } from '../IdProofRequest/DisplayStatement/utils';
 
 type Props = {
@@ -95,16 +98,9 @@ export default function AgeProofRequest({ onReject, onSubmit }: Props) {
             throw new Error('Unexpected credential statement type');
         }
 
-        return credentials.value.find((cred) => {
-            const identity = (identities.value || []).find((id) => isIdentityOfCredential(id)(cred));
-            if (identity && credentialStatement.idQualifier.issuers.includes(identity.providerIndex)) {
-                return canProveCredentialStatement(
-                    credentialStatement,
-                    identity.idObject.value.attributeList.chosenAttributes
-                );
-            }
-            return false;
-        });
+        return credentials.value.find((cred) =>
+            checkIfAccountCredentialIsViableForStatement(credentialStatement, cred, identities.value)
+        );
     }, [identities.loading, credentials.loading]);
 
     const identity = credential ? identities.value.find((id) => isIdentityOfCredential(id)(credential)) : undefined;
@@ -151,7 +147,7 @@ export default function AgeProofRequest({ onReject, onSubmit }: Props) {
             credentialStatements: [requestStatement],
         };
 
-        return proveRequest(request, [commitmentInput], global);
+        return proveWeb3Request(request, [commitmentInput], global);
     }, [credential, identity, recoveryPhrase, network]);
 
     useEffect(() => onClose(onReject), [onClose, onReject]);
