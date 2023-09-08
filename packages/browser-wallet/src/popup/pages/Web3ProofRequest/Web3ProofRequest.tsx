@@ -159,7 +159,10 @@ function DisplayNotProvable({
                     </>
                 )}
                 <div className="web3-id-proof-request__actions flex">
-                    <Button className="flex-center web3-id-proof-request__not-provable-button flex-child-fill" onClick={onClick}>
+                    <Button
+                        className="flex-center web3-id-proof-request__not-provable-button flex-child-fill"
+                        onClick={onClick}
+                    >
                         <CloseIcon className="web3-id-proof-request__reject-icon reject-title" />
                         {t('reject')}
                     </Button>
@@ -381,7 +384,6 @@ export default function Web3ProofRequest({ onReject, onSubmit }: Props) {
                         }}
                         disabled={creatingProof || !canProve}
                     >
-
                         {creatingProof ? (
                             <PendingArrows className="loading svg-white web3-id-proof-request__loading-icon" />
                         ) : (
