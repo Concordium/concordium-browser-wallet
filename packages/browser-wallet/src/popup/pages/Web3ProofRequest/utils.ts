@@ -90,6 +90,22 @@ export function getAccountCredentialsWithMatchingIssuer(
 }
 
 /**
+ * Given a credential statement for an account credential, and an account credential, return whether the credential satisfies the statement.
+ * Note this also requires the identities for the account credentials as an additional argument, to actually check the attributes of the credential.
+ */
+export function checkIfAccountCredentialIsViableForStatement(
+    credentialStatement: AccountCredentialStatement,
+    credential: WalletCredential,
+    identities: ConfirmedIdentity[]
+): boolean {
+    const identity = (identities || []).find((id) => isIdentityOfCredential(id)(credential));
+    if (identity) {
+        return canProveCredentialStatement(credentialStatement, identity.idObject.value.attributeList.chosenAttributes);
+    }
+    return false;
+}
+
+/**
  * Given a credential statement for an account credential, and a list of account credentials, return the filtered list of credentials that satisfy the statement.
  * Note this also requires the identities for the account credentials as an additional argument, to actually check the attributes of the credential.
  */
@@ -102,16 +118,9 @@ export function getViableAccountCredentialsForStatement(
         credentialStatement,
         credentials
     );
-    return accountCredentialsWithMatchingIssuer?.filter((c) => {
-        const identity = (identities || []).find((id) => isIdentityOfCredential(id)(c));
-        if (identity) {
-            return canProveCredentialStatement(
-                credentialStatement,
-                identity.idObject.value.attributeList.chosenAttributes
-            );
-        }
-        return false;
-    });
+    return accountCredentialsWithMatchingIssuer?.filter((c) =>
+        checkIfAccountCredentialIsViableForStatement(credentialStatement, c, identities)
+    );
 }
 
 export function getActiveWeb3IdCredentialsWithMatchingIssuer(

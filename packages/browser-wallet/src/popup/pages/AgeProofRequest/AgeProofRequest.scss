@@ -1,0 +1,79 @@
+.age-proof {
+    &__request {
+        background: linear-gradient(94.88deg, #005a78 -3.22%, #48a2ae 87.51%);
+        display: flex;
+        flex-direction: column;
+        justify-content: space-between;
+        min-height: 100%;
+        font-family: $t-font-family-ibm;
+    }
+
+    &__description {
+        color: $color-off-white;
+        margin: 50px 20px 20px;
+        text-align: center;
+    }
+
+    &__more-details {
+        background: #7facbb;
+        color: $color-off-white;
+        height: 50px;
+        display: flex;
+        justify-content: space-between;
+        padding: 10px 15px;
+        width: calc(100% - 40px);
+        margin: 20px;
+        align-items: center;
+    }
+
+    &__verify-button {
+        background: #fffde4;
+        color: $color-off-black;
+        font-weight: 400;
+
+        &:hover,
+        &:visited,
+        &:focus {
+            color: $color-off-black;
+
+            &:not(:disabled) {
+                box-shadow: inset 0 0 rem(10px) rem(15px) rgb(255 255 255 / 15%);
+            }
+        }
+
+        &:disabled {
+            background: #ccc;
+
+            &:hover {
+                cursor: not-allowed;
+            }
+        }
+    }
+
+    &__logos {
+        display: flex;
+        flex-direction: row;
+        align-items: center;
+        justify-content: center;
+        margin-top: 20px;
+        margin-left: rem(22px);
+        margin-right: rem(22px);
+    }
+
+    &__concordium-letters {
+        margin-left: rem(5px);
+        height: rem(10px);
+
+        path {
+            fill: $color-off-white;
+        }
+    }
+
+    &__logo {
+        height: rem(25px);
+
+        path {
+            fill: $color-off-white;
+        }
+    }
+}

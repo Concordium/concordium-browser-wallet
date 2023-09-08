@@ -25,6 +25,7 @@ import verifiableCredential from '@popup/pages/VerifiableCredential/i18n/da';
 import addWeb3IdCredential from '@popup/pages/AddWeb3IdCredential/i18n/da';
 // TODO dansk
 import verifiableCredentialBackup from '@popup/pages/VerifiableCredentialBackup/i18n/en';
+import ageProofRequest from '@popup/pages/AgeProofRequest/i18n/da';
 
 import type en from './en';
 
@@ -55,6 +56,7 @@ const t: typeof en = {
     web3IdProofRequest,
     verifiableCredential,
     verifiableCredentialBackup,
+    ageProofRequest,
 };
 
 export default t;

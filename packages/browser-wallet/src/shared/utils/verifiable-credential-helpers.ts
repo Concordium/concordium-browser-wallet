@@ -15,7 +15,7 @@ import {
     VerifiableCredentialStatus,
 } from '@shared/storage/types';
 import { Buffer } from 'buffer/';
-import jsonschema from 'jsonschema';
+import jsonschema, { Schema } from 'jsonschema';
 import { applyExecutionNRGBuffer, getContractName } from './contract-helpers';
 import { getNet } from './network-helpers';
 import { logError } from './log-helpers';
@@ -1235,4 +1235,22 @@ export function withIdRemovedFromSchema(schema: VerifiableCredentialSchema) {
     };
 
     return { ...schema, properties: schemaOuterPropertiesWithNoId };
+}
+
+/**
+ * BigInts do not validate against a json schema as being an integer. This pre validate function
+ * coerces any bigint values where { type: "integer" } into number, as that will ensure that
+ * they validate against the schema.
+ */
+export function coerceBigIntIntegerToNumber(
+    // eslint-disable-next-line @typescript-eslint/no-explicit-any
+    instance: any,
+    key: string,
+    schema: Schema
+) {
+    const value = instance[key];
+    if (schema.type && schema.type === 'integer' && typeof value === 'bigint') {
+        // eslint-disable-next-line no-param-reassign
+        instance[key] = Number(value);
+    }
 }

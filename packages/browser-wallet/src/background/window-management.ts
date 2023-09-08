@@ -25,13 +25,13 @@ const getTopLeft = async (): Promise<{ top: number; left: number }> => {
 /**
  * Spawns a new popup on screen. Returning promise resolves when it receives a ready event from the popup
  */
-export const spawnPopup = async (messageType?: MessageType | InternalMessageType): Promise<chrome.windows.Window> => {
+export const spawnPopup = async (messageType?: InternalMessageType): Promise<chrome.windows.Window> => {
     const { top, left } = await getTopLeft();
 
     const window = chrome.windows.create({
         // The Web3 ID proof popup has a separate size from other windows. Convery this by adjusting the URL, so that
         // the scaling adjusts the window correctly.
-        url: messageType === MessageType.Web3IdProof ? `${spawnedPopupUrl}&web3idproof` : spawnedPopupUrl,
+        url: messageType === InternalMessageType.Web3IdProof ? `${spawnedPopupUrl}&web3idproof` : spawnedPopupUrl,
         type: 'popup',
         ...small,
         top,
@@ -83,7 +83,7 @@ export const setPopupSize = async ({ width, height }: Dimensions) => {
     }
 };
 
-export const openWindow = async (messageType?: MessageType | InternalMessageType) => {
+export const openWindow = async (messageType?: InternalMessageType) => {
     const isOpen = await testPopupOpen();
 
     if (!isOpen) {
@@ -98,10 +98,10 @@ export const openWindow = async (messageType?: MessageType | InternalMessageType
  * Ensures the handler is executed when a popup window is on screen.
  */
 const ensureAvailableWindow =
-    (handler: ExtensionMessageHandler): ExtensionMessageHandler =>
+    (handler: ExtensionMessageHandler, messageType?: InternalMessageType): ExtensionMessageHandler =>
     (...args) => {
         (async () => {
-            await openWindow(args[0].messageType);
+            await openWindow(messageType);
             handler(...args);
         })();
 
@@ -142,7 +142,11 @@ export const forwardToPopup = <P, R>(
     /**
      * Function to run after responding
      */
-    handleFinally: () => void = noOp
+    handleFinally: () => void = noOp,
+    /**
+     * Overwrite the filter used
+     */
+    filter: (msg: unknown) => boolean = createMessageTypeFilter(messageType)
 ): void => {
     // Wrap handler in helper ensuring a popup window is available and ready to handle incomming messages.
     const handler = ensureAvailableWindow((msg, sender, respond) => {
@@ -152,9 +156,8 @@ export const forwardToPopup = <P, R>(
             .then(respond)
             .catch((e: Error) => respond(new WalletError(msg, e.message))) // Usually if popup is closed prior to a response being sent.
             .finally(handleFinally);
-
         return true;
-    });
+    }, internalMessageType);
 
     // Check if handler should be run, or if it should be short-circuited.
     const conditionalHandler: ExtensionMessageHandler = (msg, sender, respond) => {
@@ -169,7 +172,7 @@ export const forwardToPopup = <P, R>(
         return true;
     };
 
-    bgMessageHandler.handleMessage(createMessageTypeFilter(messageType), conditionalHandler);
+    bgMessageHandler.handleMessage(filter, conditionalHandler);
 };
 
 /**

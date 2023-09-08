@@ -45,6 +45,7 @@ import {
     createWeb3IdProofHandler,
     runIfValidWeb3IdProof,
     loadWeb3IdBackupHandler,
+    isAgeProof,
 } from './web3Id';
 
 const rpcCallNotAllowedMessage = 'RPC Call can only be performed by whitelisted sites';
@@ -608,5 +609,15 @@ forwardToPopup(
     runConditionComposer(runIfAllowlisted, runIfValidWeb3IdProof, withPromptStart()),
     appendUrlToPayload,
     undefined,
-    withPromptEnd
+    withPromptEnd,
+    (msg) => createMessageTypeFilter(MessageType.Web3IdProof)(msg) && !isAgeProof(msg.payload)
+);
+forwardToPopup(
+    MessageType.Web3IdProof,
+    InternalMessageType.AgeProof,
+    runConditionComposer(runIfAllowlisted, runIfValidWeb3IdProof, withPromptStart()),
+    appendUrlToPayload,
+    undefined,
+    withPromptEnd,
+    (msg) => createMessageTypeFilter(MessageType.Web3IdProof)(msg) && isAgeProof(msg.payload)
 );

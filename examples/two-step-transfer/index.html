@@ -197,6 +197,22 @@
                 provider.on('accountDisconnected', (accountAddress) => (currentAccountAddress = undefined));
                 provider.on('accountChanged', (accountAddress) => (currentAccountAddress = accountAddress));
                 provider.on('chainChanged', (chain) => alert(chain));
+                document.getElementById('ageProof').addEventListener('click', () => {
+                    // TODO Replace add range with addMinimumAge(18) when SDK is fixed.
+                    const statement = new concordiumSDK.Web3StatementBuilder()
+                        .addForIdentityCredentials([0, 1, 2, 3, 4, 5], (b) =>
+                            b.addRange('dob', concordiumSDK.MIN_DATE, concordiumSDK.getPastDate(18, 1))
+                        )
+                        .getStatements();
+                    const challenge = 'AAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAA';
+                    provider
+                        .requestVerifiablePresentation(challenge, statement)
+                        .then((proof) => {
+                            console.log(proof);
+                            alert('Proof received! (check the console)');
+                        })
+                        .catch(alert);
+                });
                 document.getElementById('idProof').addEventListener('click', () => {
                     const statement = new concordiumSDK.IdStatementBuilder()
                         .revealAttribute(0)
@@ -265,6 +281,7 @@
         </select>
         <button id="idProof">Request an ID Proof</button>
         <button id="web3Proof">Request an ID 3 Proof</button>
+        <button id="ageProof">Request an Age Proof</button>
         <br />
         Message: <input type="text" id="message" value="I believe in miracles" />
         <button id="signMessage">SignMessage</button>

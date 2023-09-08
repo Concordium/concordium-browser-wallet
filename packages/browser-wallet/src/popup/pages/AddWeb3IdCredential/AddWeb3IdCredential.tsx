@@ -17,6 +17,7 @@ import { useAsyncMemo } from 'wallet-common-helpers';
 import { useHdWallet } from '@popup/shared/utils/account-helpers';
 import { displayUrl } from '@popup/shared/utils/string-helpers';
 import {
+    coerceBigIntIntegerToNumber,
     createCredentialId,
     createPublicKeyIdentifier,
     fetchCredentialMetadata,
@@ -123,7 +124,8 @@ export default function AddWeb3IdCredential({ onAllow, onReject }: Props) {
                 const schemaWithNoId = withIdRemovedFromSchema(schema);
                 const validationResult = validator.validate(
                     { credentialSubject: credential.credentialSubject },
-                    schemaWithNoId as unknown as Schema
+                    schemaWithNoId as unknown as Schema,
+                    { preValidateProperty: coerceBigIntIntegerToNumber }
                 );
                 if (!validationResult.valid) {
                     setError(t('error.schemaValidation', { errors: validationResult.errors.toString() }));
