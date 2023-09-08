@@ -30,7 +30,10 @@ function Header() {
         if (pathname.startsWith(absoluteRoutes.prompt.idProof.path)) {
             return t('header.idProof');
         }
-        if (pathname.startsWith(absoluteRoutes.prompt.web3IdProof.path)) {
+        if (
+            pathname.startsWith(absoluteRoutes.prompt.web3IdProof.path) ||
+            pathname.startsWith(absoluteRoutes.prompt.ageProof.path)
+        ) {
             return t('header.web3IdProof');
         }
         return t('header.request');

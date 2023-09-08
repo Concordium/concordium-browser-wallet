@@ -1,5 +1,11 @@
 # Changelog
 
+## Unreleased
+
+### Added
+
+-   A simple page for web3Id age proofs.
+
 ## 1.1.7
 
 ### Fixed

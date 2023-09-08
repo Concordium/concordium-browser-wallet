@@ -19,7 +19,7 @@ import { ConfirmedIdentity } from '@shared/storage/types';
 
 export type SecretStatement = Exclude<AtomicStatement, RevealStatement>;
 
-const getYearFromDateString = (ds: string): number => Number(ds.substring(0, 4));
+export const getYearFromDateString = (ds: string): number => Number(ds.substring(0, 4));
 const formatDateString = (ds: string): string => `${ds.substring(0, 4)}-${ds.substring(4, 6)}-${ds.substring(6)}`;
 
 const isEuCountrySet = (countries: string[]) =>
@@ -50,13 +50,13 @@ function dateToDateString(date: Date): string {
 /**
  * Given YYYYMMDD return YYYYMMDD + x day(s).
  */
-function addDays(date: string, days: number): string {
+export function addDays(date: string, days: number): string {
     const d = dateStringToDate(date);
     d.setDate(d.getDate() + days);
     return dateToDateString(d);
 }
 
-const isAgeStatement = (statement: SecretStatement): boolean => {
+export const isAgeStatement = (statement: SecretStatement): boolean => {
     if (statement.type !== StatementTypes.AttributeInRange) {
         return false;
     }
