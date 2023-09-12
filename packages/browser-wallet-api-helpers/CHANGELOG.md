@@ -1,5 +1,15 @@
 # Changelog
 
+## 2.7.0
+
+### Fixed
+
+-   `requestAccounts` no longer appears to be able to return undefined.
+
+### Changed
+
+-   Bumped version of @concordium/web-sdk to 6.3.0.
+
 ## 2.6.0
 
 ### Added
