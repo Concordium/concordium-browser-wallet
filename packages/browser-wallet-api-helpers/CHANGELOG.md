@@ -1,10 +1,12 @@
 # Changelog
 
-## 2.7.0
+## 2.8.0
 
 ### Fixed
 
 -   `requestAccounts` no longer appears to be able to return undefined.
+
+## 2.7.0
 
 ### Changed
 
