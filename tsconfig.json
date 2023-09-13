@@ -10,7 +10,7 @@
         "strict": true,
         "noFallthroughCasesInSwitch": true,
         "module": "esnext",
-        "moduleResolution": "node",
+        "moduleResolution": "node16",
         "resolveJsonModule": true,
         "isolatedModules": true,
         "downlevelIteration": true,
