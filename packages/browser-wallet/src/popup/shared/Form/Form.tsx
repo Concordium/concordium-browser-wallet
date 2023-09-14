@@ -23,7 +23,7 @@ export const useForm = <TFormValues extends FieldValues = FieldValues>(
     props?: UseFormProps<TFormValues>
 ): UseFormReturn<TFormValues> => useFormLib<TFormValues>({ ...useFormDefaults, ...props });
 
-type FormProps<TFormValues> = ClassName & {
+type FormProps<TFormValues extends FieldValues = FieldValues> = ClassName & {
     /**
      * Submit handler, receiving the values of the form as arg.
      */

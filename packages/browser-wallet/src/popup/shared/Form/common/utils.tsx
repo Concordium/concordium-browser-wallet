@@ -121,7 +121,7 @@ export const makeUncontrolled = <E, P extends RequiredUncontrolledFieldProps<E>>
         // Filter away all props required for form registration, leaving the props for the input '<Field />'
         const { name, rules, register, onChange: ownOnChange = noOp, onBlur: ownOnBlur = noOp, ...ownProps } = props;
         const registerProps = register(name, rules);
-        const { errors, touchedFields, isSubmitted } = useFormState<TFieldValues>(name);
+        const { errors, touchedFields, isSubmitted } = useFormState<TFieldValues>({ name });
 
         const error = errors[name];
         const isTouched = touchedFields[name];

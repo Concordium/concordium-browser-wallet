@@ -27,9 +27,8 @@ import {
     getCredentialRegistryContractAddress,
     withIdRemovedFromSchema,
 } from '@shared/utils/verifiable-credential-helpers';
-import { APIVerifiableCredential } from '@concordium/browser-wallet-api-helpers';
+import { APIVerifiableCredential, MetadataUrl } from '@concordium/browser-wallet-api-helpers';
 import { grpcClientAtom, networkConfigurationAtom } from '@popup/store/settings';
-import { MetadataUrl } from '@concordium/browser-wallet-api-helpers/lib/wallet-api-types';
 import { parse } from '@shared/utils/payload-helpers';
 import { logError } from '@shared/utils/log-helpers';
 import { addToastAtom } from '@popup/state';

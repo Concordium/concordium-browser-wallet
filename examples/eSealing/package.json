@@ -27,7 +27,7 @@
         "live-server": "^1.2.2",
         "process": "^0.11.10",
         "ts-node": "^10.8.0",
-        "typescript": "^4.7.2"
+        "typescript": "^5.2.2"
     },
     "scripts": {
         "build": "node --loader ts-node/esm ./esbuild.config.ts; cp ./src/assets/* ./dist",
