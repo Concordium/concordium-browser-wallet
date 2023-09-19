@@ -36,6 +36,8 @@ import { VerifiableCredential, VerifiableCredentialStatus, WalletCredential } fr
 import { getVerifiableCredentialStatus } from '@shared/utils/verifiable-credential-helpers';
 import { noOp, useAsyncMemo } from 'wallet-common-helpers';
 import CloseIcon from '@assets/svg/cross.svg';
+import BackIcon from '@assets/svg/arrow_backward.svg';
+import ContinueIcon from '@assets/svg/arrow_forward.svg';
 import { proveWeb3Request } from '@shared/utils/proof-helpers';
 import {
     createWeb3IdDIDFromCredential,
@@ -153,7 +155,11 @@ function DisplayNotProvable({
                     </>
                 )}
                 <div className="web3-id-proof-request__actions flex">
-                    <Button className="web3-id-proof-request__not-provable-button flex-child-fill" onClick={onClick}>
+                    <Button
+                        className="flex-center web3-id-proof-request__not-provable-button flex-child-fill"
+                        onClick={onClick}
+                    >
+                        <CloseIcon className="web3-id-proof-request__reject-icon reject-title" />
                         {t('reject')}
                     </Button>
                 </div>
@@ -328,7 +334,7 @@ export default function Web3ProofRequest({ onReject, onSubmit }: Props) {
                 </div>
                 <Button
                     danger
-                    className="web3-id-proof-request__reject-button"
+                    className="flex-center web3-id-proof-request__reject-button newButton"
                     disabled={creatingProof}
                     onClick={withClose(onReject)}
                 >
@@ -337,15 +343,16 @@ export default function Web3ProofRequest({ onReject, onSubmit }: Props) {
                 {currentStatementIndex > 0 && (
                     <Button
                         disabled={creatingProof}
-                        className="web3-id-proof-request__back-button new-button-styling"
+                        className="flex-center web3-id-proof-request__back-button new-button-styling newButton"
                         onClick={() => setCurrentStatementIndex(currentStatementIndex - 1)}
                     >
+                        <BackIcon className="web3-id-proof-request__back-icon" />
                         {t('back')}
                     </Button>
                 )}
                 {currentStatementIndex === statements.length - 1 ? (
                     <Button
-                        className="flex-center web3-id-proof-request__continue-button new-button-styling"
+                        className="flex-center web3-id-proof-request__continue-button new-button-styling newButton"
                         onClick={() => {
                             setCreatingProof(true);
                             handleSubmit()
@@ -367,10 +374,11 @@ export default function Web3ProofRequest({ onReject, onSubmit }: Props) {
                     </Button>
                 ) : (
                     <Button
-                        className="flex-center web3-id-proof-request__continue-button new-button-styling"
+                        className="flex-center web3-id-proof-request__continue-button new-button-styling newButton"
                         onClick={() => setCurrentStatementIndex(currentStatementIndex + 1)}
                     >
                         {t('continue')}
+                        <ContinueIcon className="web3-id-proof-request__continue-icon" />
                     </Button>
                 )}
             </div>

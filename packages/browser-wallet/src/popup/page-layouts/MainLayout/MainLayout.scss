@@ -13,7 +13,7 @@ $main-layout-header-height: rem(40px);
         @include transition(filter);
 
         &--blur {
-            filter: blur(5px);
+            filter: blur(10px);
         }
     }
 
