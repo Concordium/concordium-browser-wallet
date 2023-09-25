@@ -12,7 +12,7 @@ on:
 
 env:
     dummy: 1 # change to force cache invalidation
-    node_version: 14.16.0
+    node_version: 18.14.2
 
 jobs:
     dependencies:

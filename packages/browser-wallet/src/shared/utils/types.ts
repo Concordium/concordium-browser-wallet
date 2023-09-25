@@ -1,8 +1,5 @@
 /* eslint-disable @typescript-eslint/ban-types */
-import {
-    SchemaWithContext,
-    SmartContractParameters,
-} from '@concordium/browser-wallet-api-helpers/lib/wallet-api-types';
+import { SchemaWithContext, SmartContractParameters } from '@concordium/browser-wallet-api-helpers';
 import type { SchemaVersion, AccountTransactionType } from '@concordium/web-sdk';
 import { RefAttributes } from 'react';
 /**

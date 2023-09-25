@@ -1,4 +1,4 @@
-import { LaxNumberEnumValue } from '@concordium/browser-wallet-api-helpers/src/util';
+import { LaxNumberEnumValue } from '@concordium/browser-wallet-api-helpers';
 
 enum Enum {
     One = 1,
