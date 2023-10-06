@@ -13,9 +13,12 @@ const fractionResolution = 100000;
 const percentageModifier = fractionResolution / 100;
 
 export const decimalToRewardFraction = (d: number | undefined) =>
-    d === undefined ? undefined : d * percentageModifier;
+    d === undefined ? undefined : Math.floor(d * percentageModifier);
 
 const fractionResolutionToPercentage = (v: number) => v / percentageModifier;
+
+export const fractionToPercentage = (d: number | undefined) =>
+    d === undefined ? undefined : Math.floor(d * fractionResolution) / percentageModifier;
 
 export function openStatusToDisplay(status: OpenStatus | OpenStatusText): string {
     switch (status) {
@@ -33,9 +36,8 @@ export function openStatusToDisplay(status: OpenStatus | OpenStatusText): string
     }
 }
 
-const formatCommission = toFixed(0);
+const formatCommission = toFixed(3);
 
-export const displayDecimalCommissionRate = (value: number) => formatCommission((value * 100).toString());
 export const displayFractionCommissionRate = (value: number) =>
     `${formatCommission(fractionResolutionToPercentage(value).toString())}%`;
 

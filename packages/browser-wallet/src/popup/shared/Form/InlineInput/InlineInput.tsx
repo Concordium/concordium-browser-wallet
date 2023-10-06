@@ -9,6 +9,7 @@ type Props = Pick<InputHTMLAttributes<HTMLInputElement>, 'type' | 'className' | 
     RequiredControlledFieldProps &
     CommonFieldProps & {
         fallbackValue?: string;
+        fallbackOnError?: boolean;
     };
 
 export function InlineInput({
@@ -16,6 +17,7 @@ export function InlineInput({
     type = 'text',
     value,
     fallbackValue,
+    fallbackOnError = false,
     onChange = noOp,
     onBlur = noOp,
     error,
@@ -34,7 +36,7 @@ export function InlineInput({
 
     const handleBlur = useCallback(() => {
         onBlur();
-        if (!value) {
+        if (!value || (fallbackOnError && error)) {
             onChange(fallbackValue);
         }
     }, [onBlur, value, fallbackValue, onChange]);

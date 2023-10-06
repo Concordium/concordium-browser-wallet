@@ -30,30 +30,30 @@ export default function CommissionsPage({ initial, onNext }: CommissionsProps) {
             {(f) => (
                 <>
                     <div>
-                        <div className="m-t-0">{t('commission.description')}</div>
+                        <div className="m-t-0 m-b-10">{t('commission.description')}</div>
                         <CommissionField
                             label={tShared('baking.transactionCommission')}
                             name="transactionCommission"
                             min={chainParameters.transactionCommissionRange.min}
                             max={chainParameters.transactionCommissionRange.max}
-                            register={f.register}
+                            control={f.control}
                         />
                         <CommissionField
                             label={tShared('baking.bakingCommission')}
                             name="bakingCommission"
                             min={chainParameters.bakingCommissionRange.min}
-                            register={f.register}
                             max={chainParameters.bakingCommissionRange.max}
+                            control={f.control}
                         />
                         <CommissionField
                             label={tShared('baking.finalizationCommission')}
                             name="finalizationCommission"
                             min={chainParameters.finalizationCommissionRange.min}
-                            register={f.register}
                             max={chainParameters.finalizationCommissionRange.max}
+                            control={f.control}
                         />
                     </div>
-                    <Submit className="m-t-20" width="wide">
+                    <Submit className="m-t-10" width="wide">
                         {tShared('continue')}
                     </Submit>
                 </>
