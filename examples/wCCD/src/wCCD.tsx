@@ -6,12 +6,20 @@ import {
     toBuffer,
     deserializeReceiveReturnValue,
     serializeUpdateContractParameters,
-    JsonRpcClient,
+    ConcordiumGRPCClient,
+    AccountAddress,
 } from '@concordium/web-sdk';
 import * as leb from '@thi.ng/leb128';
 import { multiply, round } from 'mathjs';
 
-import { withJsonRpcClient, WalletConnectionProps, useConnect, useConnection } from '@concordium/react-components';
+import {
+    useGrpcClient,
+    WalletConnectionProps,
+    useConnect,
+    useConnection,
+    TESTNET,
+    MAINNET,
+} from '@concordium/react-components';
 import { wrap, unwrap } from './utils';
 import {
     CONTRACT_SUB_INDEX,
@@ -74,7 +82,7 @@ const InputFieldStyle = {
     padding: '10px 20px',
 };
 
-async function viewAdmin(rpcClient: JsonRpcClient, WCCD_CONTRACT_INDEX: bigint) {
+async function viewAdmin(rpcClient: ConcordiumGRPCClient, WCCD_CONTRACT_INDEX: bigint) {
     const res = await rpcClient.invokeContract({
         method: `${CONTRACT_NAME}.view`,
         contract: { index: WCCD_CONTRACT_INDEX, subindex: CONTRACT_SUB_INDEX },
@@ -95,7 +103,7 @@ async function viewAdmin(rpcClient: JsonRpcClient, WCCD_CONTRACT_INDEX: bigint) 
     return returnValues.admin.Account[0];
 }
 
-async function updateWCCDBalanceAccount(rpcClient: JsonRpcClient, account: string, WCCD_CONTRACT_INDEX: bigint) {
+async function updateWCCDBalanceAccount(rpcClient: ConcordiumGRPCClient, account: string, WCCD_CONTRACT_INDEX: bigint) {
     const param = serializeUpdateContractParameters(
         CONTRACT_NAME,
         'balanceOf',
@@ -138,25 +146,29 @@ export default function wCCD(props: WalletConnectionProps) {
     const mainnet = 'mainnet';
     let WCCD_CONTRACT_INDEX: bigint;
 
+    let grpcClient: ConcordiumGRPCClient | undefined;
+
     if (process.env.NETWORK === mainnet) {
         WCCD_CONTRACT_INDEX = WCCD_CONTRACT_INDEX_MAINNET;
+        grpcClient = useGrpcClient(MAINNET);
     } else if (process.env.NETWORK === testnet) {
         WCCD_CONTRACT_INDEX = WCCD_CONTRACT_INDEX_TESTNET;
+        grpcClient = useGrpcClient(TESTNET);
     } else {
         throw Error('Environmental variable NETWORK needs to be defined and set to either "mainnet" or "testnet"');
     }
 
     useEffect(() => {
         // Update admin contract.
-        if (connection && account) {
-            withJsonRpcClient(connection, (rpcClient) => viewAdmin(rpcClient, WCCD_CONTRACT_INDEX))
+        if (grpcClient && connection) {
+            viewAdmin(grpcClient, WCCD_CONTRACT_INDEX)
                 .then((a) => {
                     setAdmin(a);
                     setAdminError('');
                 })
                 .catch((e) => setAdminError((e as Error).message));
         }
-    }, [connection, account]);
+    }, [grpcClient, connection]);
 
     const [isWrapping, setIsWrapping] = useState(true);
     const [hash, setHash] = useState('');
@@ -178,10 +190,8 @@ export default function wCCD(props: WalletConnectionProps) {
     }, [account]);
 
     useEffect(() => {
-        if (connection && account) {
-            withJsonRpcClient(connection, (rpcClient) =>
-                updateWCCDBalanceAccount(rpcClient, account, WCCD_CONTRACT_INDEX)
-            )
+        if (grpcClient && connection && account) {
+            updateWCCDBalanceAccount(grpcClient, account, WCCD_CONTRACT_INDEX)
                 .then((a) => {
                     setAmountAccount(a);
                     setAmountAccountError('');
@@ -196,46 +206,42 @@ export default function wCCD(props: WalletConnectionProps) {
             setHash('');
             setTransactionError('');
         }
-    }, [connection, account, isFlipped]);
+    }, [grpcClient, connection, account, isFlipped]);
 
     useEffect(() => {
-        if (connection && account) {
+        if (grpcClient && connection && account) {
             setRpcGenesisHash(undefined);
-            withJsonRpcClient(connection, (rpcClient) =>
-                rpcClient
-                    .getConsensusStatus()
-                    .then((status) => status.genesisBlock)
-                    .then((genHash) => {
-                        setRpcGenesisHash(genHash);
-                        setRpcError('');
-                    })
-                    .catch((e) => {
-                        setRpcGenesisHash(undefined);
-                        setRpcError((e as Error).message);
-                    })
-            );
+            grpcClient
+                .getConsensusStatus()
+                .then((status) => status.genesisBlock)
+                .then((genHash) => {
+                    setRpcGenesisHash(genHash);
+                    setRpcError('');
+                })
+                .catch((e) => {
+                    setRpcGenesisHash(undefined);
+                    setRpcError((e as Error).message);
+                });
         }
-    }, [connection, account]);
+    }, [grpcClient, connection, account]);
 
     useEffect(() => {
-        if (connection && account) {
+        if (grpcClient && connection && account) {
             setAccountExistsOnNetwork(true);
-            withJsonRpcClient(connection, (rpcClient) =>
-                rpcClient
-                    .getAccountInfo(account)
-                    .then((returnValue) => {
-                        if (returnValue === null) {
-                            setAccountExistsOnNetwork(false);
-                            setRpcError('');
-                        }
-                    })
-                    .catch((e) => {
+            grpcClient
+                .getAccountInfo(new AccountAddress(account))
+                .then((returnValue) => {
+                    if (returnValue === null) {
                         setAccountExistsOnNetwork(false);
-                        setRpcError((e as Error).message);
-                    })
-            );
+                        setRpcError('');
+                    }
+                })
+                .catch((e) => {
+                    setAccountExistsOnNetwork(false);
+                    setRpcError((e as Error).message);
+                });
         }
-    }, [connection, account]);
+    }, [grpcClient, connection, account]);
 
     const [isWaitingForTransaction, setWaitingForUser] = useState(false);
     return (

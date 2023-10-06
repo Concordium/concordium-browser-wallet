@@ -1,6 +1,6 @@
 import { createContext } from 'react';
-import { AccountTransactionType, UpdateContractPayload, CcdAmount } from '@concordium/web-sdk';
-import { WalletConnection } from '@concordium/react-components';
+import { AccountTransactionType, CcdAmount } from '@concordium/web-sdk';
+import { WalletConnection, typeSchemaFromBase64 } from '@concordium/react-components';
 import { CONTRACT_NAME, WRAP_FUNCTION_RAW_SCHEMA, UNWRAP_FUNCTION_RAW_SCHEMA } from './constants';
 
 /**
@@ -18,6 +18,13 @@ export async function wrap(
         throw new Error('invalid amount');
     }
 
+    const parameter = {
+        data: [],
+        to: {
+            Account: [receiver],
+        },
+    };
+
     return connection.signAndSendTransaction(
         account,
         AccountTransactionType.Update,
@@ -29,14 +36,11 @@ export async function wrap(
             },
             receiveName: `${CONTRACT_NAME}.wrap`,
             maxContractExecutionEnergy: 30000n,
-        } as UpdateContractPayload,
-        {
-            data: '',
-            to: {
-                Account: [receiver],
-            },
         },
-        WRAP_FUNCTION_RAW_SCHEMA
+        {
+            parameters: parameter,
+            schema: typeSchemaFromBase64(WRAP_FUNCTION_RAW_SCHEMA),
+        }
     );
 }
 
@@ -55,6 +59,17 @@ export async function unwrap(
         throw new Error('invalid amount');
     }
 
+    const parameter = {
+        amount: amount.toString(),
+        data: [],
+        owner: {
+            Account: [account],
+        },
+        receiver: {
+            Account: [receiver],
+        },
+    };
+
     return connection.signAndSendTransaction(
         account,
         AccountTransactionType.Update,
@@ -68,16 +83,9 @@ export async function unwrap(
             maxContractExecutionEnergy: 30000n,
         },
         {
-            amount: amount.toString(),
-            data: '',
-            owner: {
-                Account: [account],
-            },
-            receiver: {
-                Account: [receiver],
-            },
-        },
-        UNWRAP_FUNCTION_RAW_SCHEMA
+            parameters: parameter,
+            schema: typeSchemaFromBase64(UNWRAP_FUNCTION_RAW_SCHEMA),
+        }
     );
 }
 
