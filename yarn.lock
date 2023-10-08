@@ -2094,13 +2094,13 @@ __metadata:
   linkType: hard
 
 "@concordium/wallet-connectors@npm:^0.3.1":
-  version: 0.3.1
-  resolution: "@concordium/wallet-connectors@npm:0.3.1"
+  version: 0.3.2
+  resolution: "@concordium/wallet-connectors@npm:0.3.2"
   dependencies:
     "@concordium/browser-wallet-api-helpers": ^2.5.0
     "@walletconnect/qrcode-modal": ^1.8.0
     "@walletconnect/sign-client": ^2.1.4
-  checksum: 7ef4287d05977fe741d47d53ea9424f603c8acfe0a0c0af1bfea2c5752b0bc5750be942badaa414a6694e7be4032e8d1a91f8ab69327cdcff016f28da0cf6a23
+  checksum: ed1485fe22d7b4fc52fdd0377a7acd501927143cde597117ecde8d5cb69ba3f61420e0c749e84951cf0a943226df9864718c6e9856c70e487c873a4d3458ed8e
   languageName: node
   linkType: hard
 
