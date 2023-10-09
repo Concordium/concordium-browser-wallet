@@ -12,14 +12,7 @@ import {
 import * as leb from '@thi.ng/leb128';
 import { multiply, round } from 'mathjs';
 
-import {
-    useGrpcClient,
-    WalletConnectionProps,
-    useConnect,
-    useConnection,
-    TESTNET,
-    MAINNET,
-} from '@concordium/react-components';
+import { useGrpcClient, WalletConnectionProps, useConnect, useConnection } from '@concordium/react-components';
 import { wrap, unwrap } from './utils';
 import {
     CONTRACT_SUB_INDEX,
@@ -28,8 +21,6 @@ import {
     BALANCEOF_FUNCTION_RAW_SCHEMA,
     BROWSER_WALLET,
     WALLET_CONNECT,
-    WCCD_CONTRACT_INDEX_TESTNET,
-    WCCD_CONTRACT_INDEX_MAINNET,
 } from './constants';
 
 import ArrowIcon from './assets/Arrow.svg';
@@ -132,9 +123,17 @@ async function updateWCCDBalanceAccount(rpcClient: ConcordiumGRPCClient, account
     return BigInt(leb.decodeULEB128(toBuffer(res.returnValue.slice(4), 'hex'))[0]);
 }
 
-export default function wCCD(props: WalletConnectionProps) {
+interface ConnectionProps {
+    walletConnectionProps: WalletConnectionProps;
+    wCCDContractIndex: bigint;
+}
+
+export default function wCCD(props: ConnectionProps) {
+    const { walletConnectionProps, wCCDContractIndex } = props;
+
     const { network, activeConnectorType, activeConnector, activeConnectorError, connectedAccounts, genesisHashes } =
-        props;
+        walletConnectionProps;
+
     const { connection, setConnection, account, genesisHash } = useConnection(connectedAccounts, genesisHashes);
     const { connect, isConnecting, connectError } = useConnect(activeConnector, setConnection);
 
@@ -142,26 +141,12 @@ export default function wCCD(props: WalletConnectionProps) {
     const [adminError, setAdminError] = useState('');
     const [accountExistsOnNetwork, setAccountExistsOnNetwork] = useState(true);
 
-    const testnet = 'testnet';
-    const mainnet = 'mainnet';
-    let WCCD_CONTRACT_INDEX: bigint;
-
-    let grpcClient: ConcordiumGRPCClient | undefined;
-
-    if (process.env.NETWORK === mainnet) {
-        WCCD_CONTRACT_INDEX = WCCD_CONTRACT_INDEX_MAINNET;
-        grpcClient = useGrpcClient(MAINNET);
-    } else if (process.env.NETWORK === testnet) {
-        WCCD_CONTRACT_INDEX = WCCD_CONTRACT_INDEX_TESTNET;
-        grpcClient = useGrpcClient(TESTNET);
-    } else {
-        throw Error('Environmental variable NETWORK needs to be defined and set to either "mainnet" or "testnet"');
-    }
+    const grpcClient = useGrpcClient(network);
 
     useEffect(() => {
         // Update admin contract.
         if (grpcClient && connection) {
-            viewAdmin(grpcClient, WCCD_CONTRACT_INDEX)
+            viewAdmin(grpcClient, wCCDContractIndex)
                 .then((a) => {
                     setAdmin(a);
                     setAdminError('');
@@ -191,7 +176,7 @@ export default function wCCD(props: WalletConnectionProps) {
 
     useEffect(() => {
         if (grpcClient && connection && account) {
-            updateWCCDBalanceAccount(grpcClient, account, WCCD_CONTRACT_INDEX)
+            updateWCCDBalanceAccount(grpcClient, account, wCCDContractIndex)
                 .then((a) => {
                     setAmountAccount(a);
                     setAmountAccountError('');
@@ -265,7 +250,7 @@ export default function wCCD(props: WalletConnectionProps) {
                         connectorName="Browser Wallet"
                         setWaitingForUser={setWaitingForUser}
                         connection={connection}
-                        {...props}
+                        {...walletConnectionProps}
                     />
                     <WalletConnectionTypeButton
                         buttonStyle={ButtonStyle}
@@ -274,7 +259,7 @@ export default function wCCD(props: WalletConnectionProps) {
                         connectorName="Wallet Connect"
                         setWaitingForUser={setWaitingForUser}
                         connection={connection}
-                        {...props}
+                        {...walletConnectionProps}
                     />
                 </div>
                 {(!accountExistsOnNetwork ||
@@ -314,7 +299,7 @@ export default function wCCD(props: WalletConnectionProps) {
                                 onClick={() => {
                                     window.open(
                                         `https://${
-                                            process.env.NETWORK === testnet ? `testnet.` : ``
+                                            network.name === 'testnet' ? `testnet.` : ``
                                         }ccdscan.io/?dcount=1&dentity=account&daddress=${account}`,
                                         '_blank',
                                         'noopener,noreferrer'
@@ -424,7 +409,7 @@ export default function wCCD(props: WalletConnectionProps) {
                                     const tx = (isWrapping ? wrap : unwrap)(
                                         connection,
                                         account,
-                                        WCCD_CONTRACT_INDEX,
+                                        wCCDContractIndex,
                                         CONTRACT_SUB_INDEX,
                                         amount,
                                         receiver
@@ -455,7 +440,7 @@ export default function wCCD(props: WalletConnectionProps) {
                                         onClick={() => {
                                             window.open(
                                                 `https://${
-                                                    process.env.NETWORK === testnet ? `testnet.` : ``
+                                                    network.name === 'testnet' ? `testnet.` : ``
                                                 }ccdscan.io/?dcount=1&dentity=transaction&dhash=${hash}`,
                                                 '_blank',
                                                 'noopener,noreferrer'
@@ -480,7 +465,7 @@ export default function wCCD(props: WalletConnectionProps) {
                                     onClick={() => {
                                         window.open(
                                             `https://${
-                                                process.env.NETWORK === testnet ? `testnet.` : ``
+                                                network.name === 'testnet' ? `testnet.` : ``
                                             }ccdscan.io/?dcount=1&dentity=account&daddress=${admin}`,
                                             '_blank',
                                             'noopener,noreferrer'
