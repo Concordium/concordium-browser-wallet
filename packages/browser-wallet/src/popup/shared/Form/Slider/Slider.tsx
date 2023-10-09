@@ -3,7 +3,7 @@ import RcSlider from 'rc-slider';
 import clsx from 'clsx';
 import { noOp, toFixed, valueNoOp } from 'wallet-common-helpers';
 import { CommonFieldProps } from '../common/types';
-import { InlineInput } from '../InlineInput';
+import InlineNumber from '../InlineNumber';
 
 interface Props extends CommonFieldProps {
     min: number;
@@ -41,19 +41,13 @@ export default function Slider({
     }, [innerValue, onChange]);
 
     const handleChange = (v: string | undefined) => {
-        if (v === undefined) {
-            setInnerValue(0);
+        if (v === undefined || v === '') {
+            setInnerValue(undefined);
             return;
         }
 
         const parser = Number.isInteger(step) ? parseInt : parseFloat;
         setInnerValue(parser(v));
-    };
-
-    const handleBlur = () => {
-        onBlur();
-        const parser = Number.isInteger(step) ? parseInt : parseFloat;
-        setInnerValue(innerValue ? parser(formatNumber(innerValue.toString())) : innerValue);
     };
 
     if (min > max) {
@@ -73,7 +67,7 @@ export default function Slider({
                 <RcSlider
                     className="form-slider__slider"
                     value={innerValue}
-                    onChange={(v: number) => setInnerValue(v)}
+                    onChange={setInnerValue}
                     min={min}
                     max={max}
                     step={step}
@@ -85,14 +79,16 @@ export default function Slider({
                     {unit}
                 </span>
                 <div className="form-slider__inputWrapper">
-                    <InlineInput
+                    <InlineNumber
                         value={innerValue?.toString()}
-                        error={isInvalid ? 'value must be number in range' : undefined}
                         onChange={handleChange}
-                        onBlur={handleBlur}
-                        fallbackValue={min.toString()}
+                        onBlur={onBlur}
+                        fallbackValue={max}
+                        allowFractions={ensureDigits ?? false}
+                        ensureDigits={ensureDigits}
+                        isInvalid={isInvalid}
                         name={name}
-                        fallbackOnError
+                        fallbackOnInvalid
                     />
                     {unit}
                 </div>

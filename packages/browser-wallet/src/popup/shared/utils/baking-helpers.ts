@@ -13,7 +13,7 @@ const fractionResolution = 100000;
 const percentageModifier = fractionResolution / 100;
 
 export const decimalToRewardFraction = (d: number | undefined) =>
-    d === undefined ? undefined : Math.floor(d * percentageModifier);
+    d === undefined ? undefined : d * percentageModifier;
 
 const fractionResolutionToPercentage = (v: number) => v / percentageModifier;
 

@@ -1,10 +1,11 @@
 import React, { useContext, useMemo } from 'react';
-import { CommissionRates, isChainParametersV0 } from '@concordium/web-sdk';
+import { CommissionRates, isChainParametersV0, CommissionRange } from '@concordium/web-sdk';
 import { useTranslation } from 'react-i18next';
 
 import Form from '@popup/shared/Form';
 import { MultiStepFormPageProps } from '@popup/shared/MultiStepForm';
 import Submit from '@popup/shared/Form/Submit';
+import { not } from '@shared/utils/function-helpers';
 import { ConfigureBakerFlowState } from '../utils';
 import CommissionField from './CommissionField';
 import { earnPageContext } from '../../utils';
@@ -13,13 +14,20 @@ type CommissionsForm = CommissionRates;
 
 type CommissionsProps = MultiStepFormPageProps<ConfigureBakerFlowState['commissionRates'], ConfigureBakerFlowState>;
 
+const validationRules = (range: CommissionRange) => ({
+    min: range.min * 100,
+    max: range.max * 100,
+    // Note: The error is not actually displayed, so this doesn't need to be translated.
+    required: 'commission is required',
+    validate: not(Number.isNaN),
+});
+
 export default function CommissionsPage({ initial, onNext }: CommissionsProps) {
     const { t: tShared } = useTranslation('shared');
     const { t } = useTranslation('account', { keyPrefix: 'baking.configure' });
+    const { chainParameters } = useContext(earnPageContext);
     const defaultValues: Partial<CommissionsForm> = useMemo(() => (initial === undefined ? {} : initial), [initial]);
     const onSubmit = (vs: CommissionsForm) => onNext(vs);
-
-    const { chainParameters } = useContext(earnPageContext);
 
     if (!chainParameters || isChainParametersV0(chainParameters)) {
         return null;
@@ -36,6 +44,7 @@ export default function CommissionsPage({ initial, onNext }: CommissionsProps) {
                             name="transactionCommission"
                             min={chainParameters.transactionCommissionRange.min}
                             max={chainParameters.transactionCommissionRange.max}
+                            rules={validationRules(chainParameters.transactionCommissionRange)}
                             control={f.control}
                         />
                         <CommissionField
@@ -43,6 +52,7 @@ export default function CommissionsPage({ initial, onNext }: CommissionsProps) {
                             name="bakingCommission"
                             min={chainParameters.bakingCommissionRange.min}
                             max={chainParameters.bakingCommissionRange.max}
+                            rules={validationRules(chainParameters.bakingCommissionRange)}
                             control={f.control}
                         />
                         <CommissionField
@@ -50,6 +60,7 @@ export default function CommissionsPage({ initial, onNext }: CommissionsProps) {
                             name="finalizationCommission"
                             min={chainParameters.finalizationCommissionRange.min}
                             max={chainParameters.finalizationCommissionRange.max}
+                            rules={validationRules(chainParameters.finalizationCommissionRange)}
                             control={f.control}
                         />
                     </div>
