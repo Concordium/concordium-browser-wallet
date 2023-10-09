@@ -1,6 +1,6 @@
 import { createContext } from 'react';
 import { AccountTransactionType, CcdAmount } from '@concordium/web-sdk';
-import { WalletConnection, typeSchemaFromBase64 } from '@concordium/react-components';
+import { WalletConnection, moduleSchemaFromBase64 } from '@concordium/react-components';
 import { CONTRACT_NAME, WRAP_FUNCTION_RAW_SCHEMA, UNWRAP_FUNCTION_RAW_SCHEMA } from './constants';
 
 /**
@@ -19,7 +19,7 @@ export async function wrap(
     }
 
     const parameter = {
-        data: [],
+        data: '',
         to: {
             Account: [receiver],
         },
@@ -39,7 +39,7 @@ export async function wrap(
         },
         {
             parameters: parameter,
-            schema: typeSchemaFromBase64(WRAP_FUNCTION_RAW_SCHEMA),
+            schema: moduleSchemaFromBase64(WRAP_FUNCTION_RAW_SCHEMA),
         }
     );
 }
@@ -61,7 +61,7 @@ export async function unwrap(
 
     const parameter = {
         amount: amount.toString(),
-        data: [],
+        data: '',
         owner: {
             Account: [account],
         },
@@ -84,7 +84,7 @@ export async function unwrap(
         },
         {
             parameters: parameter,
-            schema: typeSchemaFromBase64(UNWRAP_FUNCTION_RAW_SCHEMA),
+            schema: moduleSchemaFromBase64(UNWRAP_FUNCTION_RAW_SCHEMA),
         }
     );
 }
