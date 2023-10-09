@@ -1,9 +1,9 @@
 import React from 'react';
-import { Network, WithWalletConnector } from '@concordium/react-components';
+import { Network, WithWalletConnector, MAINNET, TESTNET } from '@concordium/react-components';
 import { version } from '../package.json';
 
 import WCCD from './wCCD';
-import { MAINNET, TESTNET } from './constants';
+import { WCCD_CONTRACT_INDEX_MAINNET, WCCD_CONTRACT_INDEX_TESTNET } from './constants';
 
 /**
  * Connect to wallet, setup application state context, and render children when the wallet API is ready for use.
@@ -13,11 +13,14 @@ export default function Root() {
     const mainnet = 'mainnet';
 
     let NETWORK: Network;
+    let wCCDContractIndex: bigint;
 
     if (process.env.NETWORK === mainnet) {
         NETWORK = MAINNET;
+        wCCDContractIndex = WCCD_CONTRACT_INDEX_MAINNET;
     } else if (process.env.NETWORK === testnet) {
         NETWORK = TESTNET;
+        wCCDContractIndex = WCCD_CONTRACT_INDEX_TESTNET;
     } else {
         throw Error('Environmental variable NETWORK needs to be defined and set to either "mainnet" or "testnet"');
     }
@@ -25,7 +28,9 @@ export default function Root() {
     return (
         <div>
             <main className="wccd">
-                <WithWalletConnector network={NETWORK}>{(props) => <WCCD {...props} />}</WithWalletConnector>
+                <WithWalletConnector network={NETWORK}>
+                    {(props) => <WCCD walletConnectionProps={props} wCCDContractIndex={wCCDContractIndex} />}
+                </WithWalletConnector>
                 <div>
                     Version: {version} |{' '}
                     <a

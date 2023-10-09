@@ -6,12 +6,13 @@ import {
     toBuffer,
     deserializeReceiveReturnValue,
     serializeUpdateContractParameters,
-    JsonRpcClient,
+    ConcordiumGRPCClient,
+    AccountAddress,
 } from '@concordium/web-sdk';
 import * as leb from '@thi.ng/leb128';
 import { multiply, round } from 'mathjs';
 
-import { withJsonRpcClient, WalletConnectionProps, useConnect, useConnection } from '@concordium/react-components';
+import { useGrpcClient, WalletConnectionProps, useConnect, useConnection } from '@concordium/react-components';
 import { wrap, unwrap } from './utils';
 import {
     CONTRACT_SUB_INDEX,
@@ -20,8 +21,6 @@ import {
     BALANCEOF_FUNCTION_RAW_SCHEMA,
     BROWSER_WALLET,
     WALLET_CONNECT,
-    WCCD_CONTRACT_INDEX_TESTNET,
-    WCCD_CONTRACT_INDEX_MAINNET,
 } from './constants';
 
 import ArrowIcon from './assets/Arrow.svg';
@@ -74,7 +73,7 @@ const InputFieldStyle = {
     padding: '10px 20px',
 };
 
-async function viewAdmin(rpcClient: JsonRpcClient, WCCD_CONTRACT_INDEX: bigint) {
+async function viewAdmin(rpcClient: ConcordiumGRPCClient, WCCD_CONTRACT_INDEX: bigint) {
     const res = await rpcClient.invokeContract({
         method: `${CONTRACT_NAME}.view`,
         contract: { index: WCCD_CONTRACT_INDEX, subindex: CONTRACT_SUB_INDEX },
@@ -95,7 +94,7 @@ async function viewAdmin(rpcClient: JsonRpcClient, WCCD_CONTRACT_INDEX: bigint) 
     return returnValues.admin.Account[0];
 }
 
-async function updateWCCDBalanceAccount(rpcClient: JsonRpcClient, account: string, WCCD_CONTRACT_INDEX: bigint) {
+async function updateWCCDBalanceAccount(rpcClient: ConcordiumGRPCClient, account: string, WCCD_CONTRACT_INDEX: bigint) {
     const param = serializeUpdateContractParameters(
         CONTRACT_NAME,
         'balanceOf',
@@ -124,9 +123,17 @@ async function updateWCCDBalanceAccount(rpcClient: JsonRpcClient, account: strin
     return BigInt(leb.decodeULEB128(toBuffer(res.returnValue.slice(4), 'hex'))[0]);
 }
 
-export default function wCCD(props: WalletConnectionProps) {
+interface ConnectionProps {
+    walletConnectionProps: WalletConnectionProps;
+    wCCDContractIndex: bigint;
+}
+
+export default function wCCD(props: ConnectionProps) {
+    const { walletConnectionProps, wCCDContractIndex } = props;
+
     const { network, activeConnectorType, activeConnector, activeConnectorError, connectedAccounts, genesisHashes } =
-        props;
+        walletConnectionProps;
+
     const { connection, setConnection, account, genesisHash } = useConnection(connectedAccounts, genesisHashes);
     const { connect, isConnecting, connectError } = useConnect(activeConnector, setConnection);
 
@@ -134,29 +141,19 @@ export default function wCCD(props: WalletConnectionProps) {
     const [adminError, setAdminError] = useState('');
     const [accountExistsOnNetwork, setAccountExistsOnNetwork] = useState(true);
 
-    const testnet = 'testnet';
-    const mainnet = 'mainnet';
-    let WCCD_CONTRACT_INDEX: bigint;
-
-    if (process.env.NETWORK === mainnet) {
-        WCCD_CONTRACT_INDEX = WCCD_CONTRACT_INDEX_MAINNET;
-    } else if (process.env.NETWORK === testnet) {
-        WCCD_CONTRACT_INDEX = WCCD_CONTRACT_INDEX_TESTNET;
-    } else {
-        throw Error('Environmental variable NETWORK needs to be defined and set to either "mainnet" or "testnet"');
-    }
+    const grpcClient = useGrpcClient(network);
 
     useEffect(() => {
         // Update admin contract.
-        if (connection && account) {
-            withJsonRpcClient(connection, (rpcClient) => viewAdmin(rpcClient, WCCD_CONTRACT_INDEX))
+        if (grpcClient && connection) {
+            viewAdmin(grpcClient, wCCDContractIndex)
                 .then((a) => {
                     setAdmin(a);
                     setAdminError('');
                 })
                 .catch((e) => setAdminError((e as Error).message));
         }
-    }, [connection, account]);
+    }, [grpcClient, connection]);
 
     const [isWrapping, setIsWrapping] = useState(true);
     const [hash, setHash] = useState('');
@@ -178,10 +175,8 @@ export default function wCCD(props: WalletConnectionProps) {
     }, [account]);
 
     useEffect(() => {
-        if (connection && account) {
-            withJsonRpcClient(connection, (rpcClient) =>
-                updateWCCDBalanceAccount(rpcClient, account, WCCD_CONTRACT_INDEX)
-            )
+        if (grpcClient && connection && account) {
+            updateWCCDBalanceAccount(grpcClient, account, wCCDContractIndex)
                 .then((a) => {
                     setAmountAccount(a);
                     setAmountAccountError('');
@@ -196,46 +191,42 @@ export default function wCCD(props: WalletConnectionProps) {
             setHash('');
             setTransactionError('');
         }
-    }, [connection, account, isFlipped]);
+    }, [grpcClient, connection, account, isFlipped]);
 
     useEffect(() => {
-        if (connection && account) {
+        if (grpcClient && connection && account) {
             setRpcGenesisHash(undefined);
-            withJsonRpcClient(connection, (rpcClient) =>
-                rpcClient
-                    .getConsensusStatus()
-                    .then((status) => status.genesisBlock)
-                    .then((genHash) => {
-                        setRpcGenesisHash(genHash);
-                        setRpcError('');
-                    })
-                    .catch((e) => {
-                        setRpcGenesisHash(undefined);
-                        setRpcError((e as Error).message);
-                    })
-            );
+            grpcClient
+                .getConsensusStatus()
+                .then((status) => status.genesisBlock)
+                .then((genHash) => {
+                    setRpcGenesisHash(genHash);
+                    setRpcError('');
+                })
+                .catch((e) => {
+                    setRpcGenesisHash(undefined);
+                    setRpcError((e as Error).message);
+                });
         }
-    }, [connection, account]);
+    }, [grpcClient, connection, account]);
 
     useEffect(() => {
-        if (connection && account) {
+        if (grpcClient && connection && account) {
             setAccountExistsOnNetwork(true);
-            withJsonRpcClient(connection, (rpcClient) =>
-                rpcClient
-                    .getAccountInfo(account)
-                    .then((returnValue) => {
-                        if (returnValue === null) {
-                            setAccountExistsOnNetwork(false);
-                            setRpcError('');
-                        }
-                    })
-                    .catch((e) => {
+            grpcClient
+                .getAccountInfo(new AccountAddress(account))
+                .then((returnValue) => {
+                    if (returnValue === null) {
                         setAccountExistsOnNetwork(false);
-                        setRpcError((e as Error).message);
-                    })
-            );
+                        setRpcError('');
+                    }
+                })
+                .catch((e) => {
+                    setAccountExistsOnNetwork(false);
+                    setRpcError((e as Error).message);
+                });
         }
-    }, [connection, account]);
+    }, [grpcClient, connection, account]);
 
     const [isWaitingForTransaction, setWaitingForUser] = useState(false);
     return (
@@ -259,7 +250,7 @@ export default function wCCD(props: WalletConnectionProps) {
                         connectorName="Browser Wallet"
                         setWaitingForUser={setWaitingForUser}
                         connection={connection}
-                        {...props}
+                        {...walletConnectionProps}
                     />
                     <WalletConnectionTypeButton
                         buttonStyle={ButtonStyle}
@@ -268,7 +259,7 @@ export default function wCCD(props: WalletConnectionProps) {
                         connectorName="Wallet Connect"
                         setWaitingForUser={setWaitingForUser}
                         connection={connection}
-                        {...props}
+                        {...walletConnectionProps}
                     />
                 </div>
                 {(!accountExistsOnNetwork ||
@@ -308,7 +299,7 @@ export default function wCCD(props: WalletConnectionProps) {
                                 onClick={() => {
                                     window.open(
                                         `https://${
-                                            process.env.NETWORK === testnet ? `testnet.` : ``
+                                            network.name === 'testnet' ? `testnet.` : ``
                                         }ccdscan.io/?dcount=1&dentity=account&daddress=${account}`,
                                         '_blank',
                                         'noopener,noreferrer'
@@ -418,7 +409,7 @@ export default function wCCD(props: WalletConnectionProps) {
                                     const tx = (isWrapping ? wrap : unwrap)(
                                         connection,
                                         account,
-                                        WCCD_CONTRACT_INDEX,
+                                        wCCDContractIndex,
                                         CONTRACT_SUB_INDEX,
                                         amount,
                                         receiver
@@ -449,7 +440,7 @@ export default function wCCD(props: WalletConnectionProps) {
                                         onClick={() => {
                                             window.open(
                                                 `https://${
-                                                    process.env.NETWORK === testnet ? `testnet.` : ``
+                                                    network.name === 'testnet' ? `testnet.` : ``
                                                 }ccdscan.io/?dcount=1&dentity=transaction&dhash=${hash}`,
                                                 '_blank',
                                                 'noopener,noreferrer'
@@ -474,7 +465,7 @@ export default function wCCD(props: WalletConnectionProps) {
                                     onClick={() => {
                                         window.open(
                                             `https://${
-                                                process.env.NETWORK === testnet ? `testnet.` : ``
+                                                network.name === 'testnet' ? `testnet.` : ``
                                             }ccdscan.io/?dcount=1&dentity=account&daddress=${admin}`,
                                             '_blank',
                                             'noopener,noreferrer'

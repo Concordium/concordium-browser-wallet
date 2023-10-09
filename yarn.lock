@@ -2068,17 +2068,6 @@ __metadata:
   languageName: node
   linkType: hard
 
-"@concordium/react-components@npm:^0.2.0":
-  version: 0.2.0
-  resolution: "@concordium/react-components@npm:0.2.0"
-  dependencies:
-    "@concordium/wallet-connectors": 0.2.0
-  peerDependencies:
-    react: ^18
-  checksum: b4141037d2f38d289362ca124369d7d61b9ec5260ca895d57bf6d5823027c901e96943f27261b2813ccdfaae9dbeecaf35a1a37492e146ea6d32fc358486f4be
-  languageName: node
-  linkType: hard
-
 "@concordium/react-components@npm:^0.3.0":
   version: 0.3.0
   resolution: "@concordium/react-components@npm:0.3.0"
@@ -2104,25 +2093,14 @@ __metadata:
   languageName: node
   linkType: hard
 
-"@concordium/wallet-connectors@npm:0.2.0":
-  version: 0.2.0
-  resolution: "@concordium/wallet-connectors@npm:0.2.0"
-  dependencies:
-    "@concordium/browser-wallet-api-helpers": ^2.0.0
-    "@walletconnect/qrcode-modal": ^1.8.0
-    "@walletconnect/sign-client": ^2.1.4
-  checksum: 262af06d5d09e452d307022c66a1d303d8aad1c21f6bfeb6bc24acb4f102bc5deb492de7e093612b05a6f67a9031f6801089f6aec671d0ae7eb26d7ead9cf528
-  languageName: node
-  linkType: hard
-
 "@concordium/wallet-connectors@npm:^0.3.1":
-  version: 0.3.1
-  resolution: "@concordium/wallet-connectors@npm:0.3.1"
+  version: 0.3.2
+  resolution: "@concordium/wallet-connectors@npm:0.3.2"
   dependencies:
     "@concordium/browser-wallet-api-helpers": ^2.5.0
     "@walletconnect/qrcode-modal": ^1.8.0
     "@walletconnect/sign-client": ^2.1.4
-  checksum: 7ef4287d05977fe741d47d53ea9424f603c8acfe0a0c0af1bfea2c5752b0bc5750be942badaa414a6694e7be4032e8d1a91f8ab69327cdcff016f28da0cf6a23
+  checksum: ed1485fe22d7b4fc52fdd0377a7acd501927143cde597117ecde8d5cb69ba3f61420e0c749e84951cf0a943226df9864718c6e9856c70e487c873a4d3458ed8e
   languageName: node
   linkType: hard
 
@@ -22392,7 +22370,7 @@ __metadata:
   version: 0.0.0-use.local
   resolution: "wccd@workspace:examples/wCCD"
   dependencies:
-    "@concordium/react-components": ^0.2.0
+    "@concordium/react-components": ^0.3.0
     "@concordium/web-sdk": ^6.3.0
     "@craftamap/esbuild-plugin-html": ^0.4.0
     "@thi.ng/leb128": ^2.1.18
