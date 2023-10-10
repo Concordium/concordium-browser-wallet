@@ -71,6 +71,7 @@ export function CommissionInput({
             onChange={onChange}
             onBlur={onBlur}
             className={clsx('baking__commissionField-slider', className)}
+            isInvalid={error !== undefined}
             {...commonSliderProps}
         />
     );

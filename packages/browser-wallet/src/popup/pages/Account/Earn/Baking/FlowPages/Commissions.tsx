@@ -1,11 +1,11 @@
 import React, { useContext, useMemo } from 'react';
 import { CommissionRates, isChainParametersV0, CommissionRange } from '@concordium/web-sdk';
 import { useTranslation } from 'react-i18next';
+import { isValidResolutionString } from 'wallet-common-helpers';
 
 import Form from '@popup/shared/Form';
 import { MultiStepFormPageProps } from '@popup/shared/MultiStepForm';
 import Submit from '@popup/shared/Form/Submit';
-import { not } from '@shared/utils/function-helpers';
 import { ConfigureBakerFlowState } from '../utils';
 import CommissionField from './CommissionField';
 import { earnPageContext } from '../../utils';
@@ -19,7 +19,8 @@ const validationRules = (range: CommissionRange) => ({
     max: range.max * 100,
     // Note: The error is not actually displayed, so this doesn't need to be translated.
     required: 'commission is required',
-    validate: not(Number.isNaN),
+    validate: (v?: number) =>
+        !Number.isNaN(v) && v ? isValidResolutionString(1000, false, true, false)(v.toString()) : true,
 });
 
 export default function CommissionsPage({ initial, onNext }: CommissionsProps) {

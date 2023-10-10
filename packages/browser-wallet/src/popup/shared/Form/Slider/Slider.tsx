@@ -15,6 +15,7 @@ interface Props extends CommonFieldProps {
     onBlur?(): void;
     className: string;
     name: string;
+    isInvalid?: boolean;
 }
 
 export default function Slider({
@@ -28,9 +29,12 @@ export default function Slider({
     value,
     className,
     name,
+    isInvalid: outerIsInvalid,
 }: Props) {
     const [innerValue, setInnerValue] = useState<number | undefined>(value);
-    const isInvalid = innerValue !== undefined && (Number.isNaN(innerValue) || innerValue > max || innerValue < min);
+    const isInvalid =
+        outerIsInvalid ||
+        (innerValue !== undefined && (Number.isNaN(innerValue) || innerValue > max || innerValue < min));
 
     const allowFractions = step < 1 && step > 0;
     const ensureDigits = allowFractions ? step.toString().split('.')[1].length : undefined;
