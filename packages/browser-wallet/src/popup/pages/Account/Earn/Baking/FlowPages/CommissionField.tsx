@@ -14,10 +14,9 @@ interface CommissionFieldProps {
     max: number;
 }
 
-const commonSliderProps: Pick<PropsOf<typeof Slider>, 'step' | 'unit' | 'className'> = {
+const commonSliderProps: Pick<PropsOf<typeof Slider>, 'step' | 'unit'> = {
     step: 0.001,
     unit: '%',
-    className: 'm-b-10',
 };
 
 type Props = Pick<InputHTMLAttributes<HTMLInputElement>, 'type' | 'className' | 'autoFocus'> &
@@ -64,6 +63,7 @@ export function CommissionInput({
             max={maxPercentage}
             onChange={onChange}
             onBlur={onBlur}
+            className={clsx('baking__commissionField-slider', className)}
             {...commonSliderProps}
         />
     );
