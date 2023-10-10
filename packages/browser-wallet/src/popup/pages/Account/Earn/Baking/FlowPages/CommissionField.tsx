@@ -49,7 +49,7 @@ export function CommissionInput({
                 {label && <div className="baking__commissionField-label">{label}</div>}
                 <div className="baking__commissionField-value">
                     <InlineNumber
-                        onChange={() => onChange(minPercentage)}
+                        onChange={() => onChange?.(minPercentage)}
                         disabled
                         name={name}
                         {...props}
