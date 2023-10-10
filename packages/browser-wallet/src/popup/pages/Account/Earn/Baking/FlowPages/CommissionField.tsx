@@ -1,5 +1,6 @@
 import { CommonFieldProps, RequiredControlledFieldProps } from '@popup/shared/Form/common/types';
 import { makeControlled } from '@popup/shared/Form/common/utils';
+import InlineNumber from '@popup/shared/Form/InlineNumber/InlineNumber';
 import Slider from '@popup/shared/Form/Slider';
 import clsx from 'clsx';
 import React, { InputHTMLAttributes } from 'react';
@@ -44,13 +45,19 @@ export function CommissionInput({
 
     if (min === max) {
         return (
-            <>
-                <input type="hidden" name={name} value={minPercentage} {...props} />
-                <div className={clsx('baking__commissionField-slider', className)}>
-                    {label && <div className="baking__commissionField-label">{label}</div>}
-                    <div className="baking__commissionField-value">{minPercentage}%</div>
+            <div className={clsx('baking__commissionField-slider', className)}>
+                {label && <div className="baking__commissionField-label">{label}</div>}
+                <div className="baking__commissionField-value">
+                    <InlineNumber
+                        onChange={() => onChange(minPercentage)}
+                        disabled
+                        name={name}
+                        {...props}
+                        value={minPercentage.toString()}
+                    />
+                    %
                 </div>
-            </>
+            </div>
         );
     }
 
