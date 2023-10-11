@@ -401,3 +401,71 @@ $handle-scale: scale(1.02);
         }
     }
 }
+
+.form-slider {
+    display: block;
+    text-align: center;
+
+    &__slider {
+        height: 30px;
+        padding: 0;
+        z-index: 0;
+    }
+
+    .rc-slider-rail {
+        background-color: transparent;
+        border: 1px solid $color-grey;
+        height: 100%;
+        z-index: 1;
+
+        .invalid & {
+            border-color: $color-error;
+            border-width: 2px;
+        }
+    }
+
+    .rc-slider-track {
+        background-color: $color-cta;
+        height: 100%;
+    }
+
+    .rc-slider-handle {
+        top: 50%;
+        border-color: $color-grey;
+        margin-top: -7px;
+        z-index: 2;
+
+        &:hover,
+        &:active {
+            border-color: $color-cta;
+        }
+
+        .invalid & {
+            &,
+            &:hover,
+            &:active {
+                border-color: $color-error;
+            }
+        }
+    }
+
+    &__grid {
+        display: grid;
+        grid-template-columns: 60px auto 60px;
+        grid-gap: 5px;
+        align-items: center;
+        justify-items: center;
+    }
+
+    &__inputWrapper {
+        grid-column-start: 2;
+        border-bottom: 1px solid $color-text;
+        width: 100%;
+        max-width: 200px;
+
+        .invalid & {
+            color: $color-error;
+            border-color: $color-error;
+        }
+    }
+}

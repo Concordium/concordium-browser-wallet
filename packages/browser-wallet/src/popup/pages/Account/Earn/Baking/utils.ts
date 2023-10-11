@@ -8,7 +8,7 @@ import {
     OpenStatusText,
     BakerKeysWithProofs,
 } from '@concordium/web-sdk';
-import { decimalToRewardFraction } from '@popup/shared/utils/baking-helpers';
+import { decimalToRewardFraction, fractionToPercentage } from '@popup/shared/utils/baking-helpers';
 import { getConfigureBakerEnergyCost } from '@shared/utils/energy-helpers';
 import { not } from '@shared/utils/function-helpers';
 import { ccdToMicroCcd, isDefined, isValidCcdString, microCcdToCcd, NotOptional } from 'wallet-common-helpers';
@@ -51,7 +51,11 @@ export const getExistingBakerValues = (accountInfo: AccountInfo): NotOptional<Co
         restake: restakeEarnings,
         openForDelegation: openStatusFromText(openStatus),
         metadataUrl,
-        commissionRates,
+        commissionRates: {
+            transactionCommission: fractionToPercentage(commissionRates.transactionCommission),
+            bakingCommission: fractionToPercentage(commissionRates.bakingCommission),
+            finalizationCommission: fractionToPercentage(commissionRates.finalizationCommission),
+        },
     };
 };
 

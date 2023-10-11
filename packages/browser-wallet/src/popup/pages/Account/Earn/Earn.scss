@@ -84,12 +84,11 @@
 .baking {
     &__commissionField-slider {
         margin-top: rem(10px);
+        margin-bottom: rem(10px);
     }
 
     &__commissionField-label {
-        font-size: rem(8px);
         color: $color-text;
-        font-weight: $font-weight-bold;
         text-align: center;
     }
 

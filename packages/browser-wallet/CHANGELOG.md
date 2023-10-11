@@ -1,5 +1,11 @@
 # Changelog
 
+## 1.1.9
+
+### Added
+
+-   When creating/updating a baker, the commission rates can now be changed, if the ranges are not singletons.
+
 ## 1.1.8
 
 ### Added
