@@ -19,8 +19,15 @@ const validationRules = (range: CommissionRange) => ({
     max: range.max * 100,
     // Note: The error is not actually displayed, so this doesn't need to be translated.
     required: 'commission is required',
-    validate: (v?: number) =>
-        !Number.isNaN(v) && v ? isValidResolutionString(1000, false, true, false)(v.toString()) : true,
+    validate: (v?: number) => {
+        if (Number.isNaN(v)) {
+            return 'Must be a number';
+        }
+        if (v && !isValidResolutionString(1000, false, true, false)(v.toString())) {
+            return 'Must only have 3 decimals';
+        }
+        return undefined;
+    },
 });
 
 export default function CommissionsPage({ initial, onNext }: CommissionsProps) {
