@@ -1,24 +1,21 @@
 /* eslint-disable @typescript-eslint/no-explicit-any */
 import { Buffer } from 'buffer/';
-import { CcdAmount } from '@concordium/common-sdk/lib/types/ccdAmount';
-import { AccountAddress } from '@concordium/common-sdk/lib/types/accountAddress';
-import { ModuleReference } from '@concordium/common-sdk/lib/types/moduleReference';
-import { DataBlob } from '@concordium/common-sdk/lib/types/DataBlob';
+import { CcdAmount, AccountAddress, ModuleReference, DataBlob } from '@concordium/web-sdk';
 import { serializationTypes } from './constants';
 
 function isGtuAmount(cand: any): cand is { microGtuAmount: bigint } {
     return cand && typeof cand.microGtuAmount === 'bigint';
 }
 
-function isCcdAmount(cand: any): cand is CcdAmount {
+function isCcdAmount(cand: any): cand is CcdAmount.Type {
     return cand && typeof cand.microCcdAmount === 'bigint';
 }
 
-function isAccountAddress(cand: any): cand is AccountAddress {
+function isAccountAddress(cand: any): cand is AccountAddress.Type {
     return cand && typeof cand.address === 'string' && cand.address.length === 50;
 }
 
-function isModuleReference(cand: any): cand is ModuleReference {
+function isModuleReference(cand: any): cand is ModuleReference.Type {
     return cand && typeof cand.moduleRef === 'string' && cand.moduleRef.length === 64;
 }
 

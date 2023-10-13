@@ -3,7 +3,6 @@ import type {
     AccountTransactionSignature,
     AccountTransactionType,
     InitContractPayload,
-    JsonRpcClient,
     SchemaVersion,
     UpdateContractPayload,
     IdStatement,
@@ -165,11 +164,6 @@ interface MainWalletApi {
     getMostRecentlySelectedAccount(): Promise<string | undefined>;
 
     removeAllListeners(event?: EventType | string | undefined): this;
-
-    /**
-     * @deprecated use { @link getGrpcClient} instead
-     */
-    getJsonRpcClient(): JsonRpcClient;
 
     /**
      * Returns a gRPC client that is connected to the node that the wallet is.
