@@ -5,26 +5,25 @@ import {
     MessageStatusWrapper,
 } from '@concordium/browser-wallet-message-hub';
 import {
+    AccountAddress,
     AccountTransactionPayload,
     AccountTransactionSignature,
     AccountTransactionType,
-    DeployModulePayload,
     HexString,
-    InitContractPayload,
     SchemaVersion,
-    UpdateContractPayload,
+    ContractAddress,
     VerifiablePresentation,
 } from '@concordium/web-sdk/types';
 import {
     WalletApi as IWalletApi,
     EventType,
-    SchemaWithContext,
-    SchemaType,
     SignMessageObject,
     SmartContractParameters,
     APIVerifiableCredential,
     MetadataUrl,
     CredentialProof,
+    AccountAddressLike,
+    SchemaLike,
 } from '@concordium/browser-wallet-api-helpers';
 import EventEmitter from 'events';
 import { IdProofOutput, IdStatement } from '@concordium/web-sdk/id';
@@ -32,6 +31,12 @@ import { CredentialStatements } from '@concordium/web-sdk/web3-id';
 import { ConcordiumGRPCClient } from '@concordium/web-sdk/grpc';
 import { stringify } from './util';
 import { BWGRPCTransport } from './gRPC-transport';
+import {
+    sanitizeAddCIS2TokensInput,
+    sanitizeRequestIdProofInput,
+    sanitizeSendTransactionInput,
+    sanitizeSignMessageInput,
+} from './compatibility';
 
 class WalletApi extends EventEmitter implements IWalletApi {
     private messageHandler = new InjectedMessageHandler();
@@ -50,14 +55,15 @@ class WalletApi extends EventEmitter implements IWalletApi {
      * Sends a sign request to the Concordium Wallet and awaits the users action
      */
     public async signMessage(
-        accountAddress: string,
+        accountAddress: AccountAddressLike,
         message: string | SignMessageObject
     ): Promise<AccountTransactionSignature> {
+        const input = sanitizeSignMessageInput(accountAddress, message);
         const response = await this.messageHandler.sendMessage<MessageStatusWrapper<AccountTransactionSignature>>(
             MessageType.SignMessage,
             {
-                accountAddress,
-                message,
+                ...input,
+                accountAddress: AccountAddress.toBase58(input.accountAddress),
             }
         );
 
@@ -114,55 +120,20 @@ class WalletApi extends EventEmitter implements IWalletApi {
      * Sends a transaction to the Concordium Wallet and awaits the users action
      */
     public async sendTransaction(
-        accountAddress: string,
+        accountAddress: AccountAddressLike,
         type: AccountTransactionType,
         payload: AccountTransactionPayload,
         parameters?: SmartContractParameters,
-        schema?: string | SchemaWithContext,
+        schema?: SchemaLike,
         schemaVersion?: SchemaVersion
     ): Promise<string> {
-        // This parsing is to temporarily support older versions of the web-SDK, which has different field names.
-        let parsedPayload = payload;
-        if (type === AccountTransactionType.InitContract) {
-            const initPayload: InitContractPayload = {
-                ...(payload as InitContractPayload),
-                // eslint-disable-next-line @typescript-eslint/no-explicit-any
-                initName: (payload as InitContractPayload).initName || (payload as any).contractName,
-            };
-            parsedPayload = initPayload;
-        } else if (type === AccountTransactionType.Update) {
-            const updatePayload: UpdateContractPayload = {
-                ...(payload as UpdateContractPayload),
-                // eslint-disable-next-line @typescript-eslint/no-explicit-any
-                address: (payload as UpdateContractPayload).address || (payload as any).contractAddress,
-            };
-            parsedPayload = updatePayload;
-        } else if (type === AccountTransactionType.DeployModule) {
-            const deployPayload: DeployModulePayload = {
-                ...(payload as DeployModulePayload),
-                // eslint-disable-next-line @typescript-eslint/no-explicit-any
-                source: (payload as DeployModulePayload).source || (payload as any).content,
-            };
-            parsedPayload = deployPayload;
-        }
-        let parsedSchema: SchemaWithContext | undefined;
-        if (typeof schema === 'string' || schema instanceof String) {
-            parsedSchema = {
-                type: SchemaType.Module,
-                value: schema.toString(),
-            };
-        } else {
-            parsedSchema = schema;
-        }
+        const input = sanitizeSendTransactionInput(accountAddress, type, payload, parameters, schema, schemaVersion);
         const response = await this.messageHandler.sendMessage<MessageStatusWrapper<string>>(
             MessageType.SendTransaction,
             {
-                accountAddress,
-                type,
-                payload: stringify(parsedPayload),
-                parameters,
-                schema: parsedSchema,
-                schemaVersion,
+                ...input,
+                accountAddress: AccountAddress.toBase58(input.accountAddress),
+                payload: stringify(input.payload),
             }
         );
 
@@ -192,16 +163,20 @@ class WalletApi extends EventEmitter implements IWalletApi {
     }
 
     public async addCIS2Tokens(
-        accountAddress: string,
+        accountAddress: AccountAddressLike,
         tokenIds: string[],
-        contractIndex: bigint,
+        dyn: ContractAddress.Type | bigint,
         contractSubindex?: bigint
     ): Promise<string[]> {
+        const input = sanitizeAddCIS2TokensInput(accountAddress, tokenIds, dyn, contractSubindex);
         const response = await this.messageHandler.sendMessage<MessageStatusWrapper<string[]>>(MessageType.AddTokens, {
-            accountAddress,
-            tokenIds,
-            contractIndex: contractIndex.toString(),
-            contractSubindex: contractSubindex?.toString(),
+            ...input,
+            accountAddress: AccountAddress.toBase58(input.accountAddress),
+            contractAddress: {
+                // TODO: ContractAddress.toSerializable(input.contractAddress)
+                index: input.contractAddress.index.toString(),
+                subindex: input.contractAddress.subindex.toString(),
+            },
         });
         if (!response.success) {
             throw new Error(response.message);
@@ -210,14 +185,14 @@ class WalletApi extends EventEmitter implements IWalletApi {
     }
 
     public async requestIdProof(
-        accountAddress: string,
+        accountAddress: AccountAddressLike,
         statement: IdStatement,
         challenge: string
     ): Promise<IdProofOutput> {
+        const input = sanitizeRequestIdProofInput(accountAddress, statement, challenge);
         const res = await this.messageHandler.sendMessage<MessageStatusWrapper<IdProofOutput>>(MessageType.IdProof, {
-            accountAddress,
-            statement,
-            challenge,
+            ...input,
+            accountAddress: AccountAddress.toBase58(input.accountAddress),
         });
 
         if (!res.success) {

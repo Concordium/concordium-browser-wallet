@@ -30,8 +30,11 @@ interface Location {
     state: {
         payload: {
             accountAddress: string;
-            contractIndex: string;
-            contractSubindex: string;
+            // TODO: change to ContractAddress.Serializable
+            contractAddress: {
+                index: string;
+                subindex: string;
+            };
             tokenIds: string[];
             url: string;
         };
@@ -42,7 +45,12 @@ export default function SignMessage({ respond }: Props) {
     const { state } = useLocation() as Location;
     const { t } = useTranslation('externalAddTokens');
     const { withClose, onClose } = useContext(fullscreenPromptContext);
-    const { accountAddress, contractIndex, contractSubindex, tokenIds, url } = state.payload;
+    const {
+        accountAddress,
+        contractAddress: { index: contractIndex, subindex: contractSubindex },
+        tokenIds,
+        url,
+    } = state.payload;
     const addToast = useSetAtom(addToastAtom);
     const client = useAtomValue(grpcClientAtom);
     const [accountTokens, setAccountTokens] = useAtom(accountTokensFamily(accountAddress));
