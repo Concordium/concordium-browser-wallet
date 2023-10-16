@@ -148,6 +148,7 @@ class WalletApi extends EventEmitter implements IWalletApi {
         this.messageHandler.handleMessage(createEventTypeFilter(type), (msg) => this.emit(type, msg.payload));
     }
 
+    // TODO: the types exposed by the client have changed due to breaking changes in the SDK.. How do we avoid propagating these to the consumers?
     public getGrpcClient(): ConcordiumGRPCClient {
         return this.grpcClient;
     }

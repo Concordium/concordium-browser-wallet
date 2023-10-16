@@ -13,6 +13,8 @@ import {
     AccountTransactionPayload,
     AccountTransactionType,
     CcdAmount,
+    ConfigureBakerPayload,
+    ConfigureDelegationPayload,
     ContractAddress,
     ContractName,
     DeployModulePayload,
@@ -24,6 +26,7 @@ import {
     Parameter,
     ReceiveName,
     SchemaVersion,
+    SimpleTransferPayload,
     UpdateContractPayload,
 } from '@concordium/web-sdk';
 
@@ -97,7 +100,17 @@ export function sanitizeAddCIS2TokensInput(
 }
 
 interface CcdAmountV0 {
-    microCcdAmount: bigint;
+    readonly microCcdAmount: bigint;
+}
+
+interface ContractAddressV0 {
+    index: bigint;
+    subindex: bigint;
+}
+
+interface AccountAddressV0 {
+    readonly address: HexString;
+    readonly decodedAddress: Uint8Array;
 }
 
 interface ModuleReferenceV0 {
@@ -129,11 +142,6 @@ const isInitContractPayloadV1 = (p: InitContractPayloadCompat): p is InitContrac
     typeof (p as InitContractPayloadV1).initName === 'string' && typeof p.maxContractExecutionEnergy === 'bigint';
 const isInitContractPayloadCurrent = (p: InitContractPayloadCompat): p is InitContractPayload =>
     Parameter.instanceOf(p.param);
-
-interface ContractAddressV0 {
-    index: bigint;
-    subindex: bigint;
-}
 
 interface UpdateContractPayloadV0 {
     amount: CcdAmountV0;
@@ -171,6 +179,25 @@ const isDeployModulePayloadV0 = (p: DeployModulePayloadCompat): p is DeployModul
     (p as DeployModulePayloadV0).content !== undefined;
 const isDeployModulePayloadCurrent = (p: DeployModulePayloadCompat): p is DeployModulePayload =>
     (p as DeployModulePayload).source !== undefined;
+
+interface SimpleTransferPayloadV0 {
+    amount: CcdAmountV0;
+    toAddress: AccountAddressV0;
+}
+
+type SimpleTransferPayloadCompat = SimpleTransferPayloadV0 | SimpleTransferPayload;
+
+interface ConfigureBakerPayloadV0 extends Omit<ConfigureBakerPayload, 'stake'> {
+    stake?: CcdAmountV0;
+}
+
+type ConfigureBakerPayloadCompat = ConfigureBakerPayloadV0 | ConfigureBakerPayload;
+
+interface ConfigureDelegationPayloadV0 extends Omit<ConfigureDelegationPayload, 'stake'> {
+    stake?: CcdAmountV0;
+}
+
+type ConfigureDelegationPayloadCompat = ConfigureDelegationPayloadV0 | ConfigureDelegationPayload;
 
 type SanitizedSendTransactionInput = {
     accountAddress: AccountAddress.Type;
@@ -264,6 +291,20 @@ function sanitizePayload(type: AccountTransactionType, payload: AccountTransacti
                 version: p.version,
                 source,
             } as DeployModulePayload;
+        }
+        case AccountTransactionType.Transfer:
+        case AccountTransactionType.TransferWithMemo: {
+            const p = payload as SimpleTransferPayloadCompat;
+            const amount = CcdAmount.fromMicroCcd(p.amount.microCcdAmount);
+            const toAddress = AccountAddress.fromBuffer(p.toAddress.decodedAddress);
+
+            return { ...p, amount, toAddress };
+        }
+        case AccountTransactionType.ConfigureBaker:
+        case AccountTransactionType.ConfigureDelegation: {
+            const p = payload as ConfigureBakerPayloadCompat | ConfigureDelegationPayloadCompat;
+            const stake = p.stake !== undefined ? CcdAmount.fromMicroCcd(p.stake.microCcdAmount) : undefined;
+            return { ...p, stake };
         }
         default:
             return payload;
