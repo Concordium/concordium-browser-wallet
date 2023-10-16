@@ -72,7 +72,7 @@ export default function AmountPage({ initial, onNext, formValues, accountInfo }:
             isAboveStakeWarningThreshold(stake, accountInfo)
         ) {
             setOpenWarning(AmountWarning.AboveThreshold);
-        } else if (isBaker && accountInfo.accountBaker.stakedAmount > stake) {
+        } else if (isBaker && accountInfo.accountBaker.stakedAmount.microCcdAmount > stake) {
             setOpenWarning(AmountWarning.Decrease);
         } else {
             onNext(vs.amount);

@@ -8,7 +8,7 @@ import {
     DelegationTargetType,
     isDelegatorAccount,
     StakePendingChangeType,
-    StakePendingChangeV1,
+    StakePendingChange,
 } from '@concordium/web-sdk';
 import {
     dateFromStakePendingChange,
@@ -56,7 +56,7 @@ function PendingDelegation({ transaction }: PendingDelegationProps): JSX.Element
 }
 
 type DisplayPendingChangeProps = {
-    pendingChange?: StakePendingChangeV1;
+    pendingChange?: StakePendingChange;
 };
 
 function DisplayPendingChange({ pendingChange }: DisplayPendingChangeProps) {
@@ -88,7 +88,7 @@ function DisplayPendingChange({ pendingChange }: DisplayPendingChangeProps) {
             </>
         );
     }
-    if (pendingChange?.change === StakePendingChangeType.RemoveStakeV1) {
+    if (pendingChange?.change === StakePendingChangeType.RemoveStake) {
         return (
             <>
                 <div className="earn-details__header">{sharedT('changesTakesEffectOn', { effectiveTime })}</div>
@@ -115,7 +115,9 @@ function DelegationDetails({ accountInfo }: DelegationDetailsProps) {
                     <h3 className="earn-details__title m-v-0 m-r-20">{t('heading')}</h3>
                 </div>
                 <div className="earn-details__header">{sharedT('amount')}</div>
-                <div className="earn-details__value">{displayAsCcd(accountInfo.accountDelegation.stakedAmount)}</div>
+                <div className="earn-details__value">
+                    {displayAsCcd(accountInfo.accountDelegation.stakedAmount.microCcdAmount)}
+                </div>
                 <div className="earn-details__header">{sharedT('target')}</div>
                 <div className="earn-details__value">
                     {accountInfo.accountDelegation.delegationTarget.delegateType === DelegationTargetType.Baker

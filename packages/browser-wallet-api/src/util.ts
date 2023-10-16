@@ -1,5 +1,6 @@
 /* eslint-disable @typescript-eslint/no-explicit-any */
 import { CcdAmount, jsonStringify } from '@concordium/web-sdk/types';
+import { Buffer } from 'buffer/';
 import { isGtuAmount } from './compatibility';
 import { serializationTypes } from './constants';
 

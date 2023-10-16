@@ -79,8 +79,7 @@ export default function SendTransaction({ onSubmit, onReject }: Props) {
             throw new Error(t('errors.missingKey'));
         }
 
-        const sender = new AccountAddress(accountAddress);
-
+        const sender = AccountAddress.fromBase58(accountAddress);
         const accountInfo = await client.getAccountInfo(sender);
         if (
             getPublicAccountAmounts(accountInfo).atDisposal <

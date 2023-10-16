@@ -105,7 +105,7 @@ export default function SignMessage({ onSubmit, onReject }: Props) {
         }
 
         return signMessage(
-            new AccountAddress(accountAddress),
+            AccountAddress.fromBase58(accountAddress),
             messageIsAString ? message : Buffer.from(message.data, 'hex'),
             buildBasicAccountSigner(key)
         );

@@ -24,7 +24,7 @@ export default function RemoveCarousel({ children, type, warningMessage }: Props
     const goToConfirm = () => {
         const confirmTransferState: ConfirmGenericTransferState = {
             payload: {
-                stake: new CcdAmount(0n),
+                stake: CcdAmount.fromMicroCcd(0n),
             },
             type,
         };

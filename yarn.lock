@@ -2040,30 +2040,9 @@ __metadata:
     tsconfig-paths-webpack-plugin: ^3.5.2
     typescript: ^5.2.2
     uuid: ^8.3.2
-    wallet-common-helpers: "https://github.com/Concordium/concordium-wallet-common-helpers.git#5ca8e393426acaaf81a477f1b10d8683e313719b"
+    wallet-common-helpers: "https://github.com/Concordium/concordium-wallet-common-helpers.git#100f621706fbb9be839e04da00cee5733b4e54bc"
   languageName: unknown
   linkType: soft
-
-"@concordium/common-sdk@npm:9.3.0":
-  version: 9.3.0
-  resolution: "@concordium/common-sdk@npm:9.3.0"
-  dependencies:
-    "@concordium/rust-bindings": 1.2.0
-    "@grpc/grpc-js": ^1.3.4
-    "@noble/ed25519": ^1.7.1
-    "@protobuf-ts/runtime-rpc": ^2.8.2
-    "@scure/bip39": ^1.1.0
-    big.js: ^6.2.0
-    bs58check: ^2.1.2
-    buffer: ^6.0.3
-    cross-fetch: 3.1.5
-    hash.js: ^1.1.7
-    iso-3166-1: ^2.1.1
-    json-bigint: ^1.0.0
-    uuid: ^8.3.2
-  checksum: 7457c54948feba0e6ad5e6e591c292300fe6457d77235f4aa0d63efc9328bb63a103144502962b53bac323d98af4407b7322bd8c74ad05252329d9ef9c1ad5f3
-  languageName: node
-  linkType: hard
 
 "@concordium/react-components@npm:^0.3.0":
   version: 0.3.0
@@ -2073,13 +2052,6 @@ __metadata:
   peerDependencies:
     react: ^18
   checksum: 08cc8077f77bc8faaf977e0dbc9270f386575f928d886c4efb3d888fe017edbd36653381e17a20b272409037e648f3eb023501d166e9df0ecd0b4a0c9537c110
-  languageName: node
-  linkType: hard
-
-"@concordium/rust-bindings@npm:1.2.0":
-  version: 1.2.0
-  resolution: "@concordium/rust-bindings@npm:1.2.0"
-  checksum: a0deb7d2a8bea7b32487a85fd9981e40a1e0ad5ca72c625887e7d735933abae9adac34ab3047a0ac2f3e690ac8c5ac5d7a763a5fef9efe2c6d209860aa5cf6ec
   languageName: node
   linkType: hard
 
@@ -2103,23 +2075,9 @@ __metadata:
   languageName: node
   linkType: hard
 
-"@concordium/web-sdk@npm:^6.3.0":
-  version: 6.3.0
-  resolution: "@concordium/web-sdk@npm:6.3.0"
-  dependencies:
-    "@concordium/common-sdk": 9.3.0
-    "@concordium/rust-bindings": 1.2.0
-    "@grpc/grpc-js": ^1.3.4
-    "@protobuf-ts/grpcweb-transport": ^2.8.2
-    buffer: ^6.0.3
-    process: ^0.11.10
-  checksum: 86b069988c88e148490dd12b8d0c2bcbe954dee67c4074ec4965a491ab907c5ffba2a76da53479802605313f204fc6dfc0b0e3033fc186391ae3fe3a21ca6796
-  languageName: node
-  linkType: hard
-
 "@concordium/web-sdk@npm:beta":
-  version: 7.0.0-rc.1
-  resolution: "@concordium/web-sdk@npm:7.0.0-rc.1"
+  version: 7.0.0-rc.2
+  resolution: "@concordium/web-sdk@npm:7.0.0-rc.2"
   dependencies:
     "@concordium/rust-bindings": 2.0.0-rc.1
     "@grpc/grpc-js": ^1.9.4
@@ -2128,6 +2086,7 @@ __metadata:
     "@protobuf-ts/grpcweb-transport": ^2.9.1
     "@protobuf-ts/runtime-rpc": ^2.8.2
     "@scure/bip39": ^1.1.0
+    "@types/big.js": ^6.2.0
     big.js: ^6.2.0
     bs58check: ^3.0.1
     buffer: ^6.0.3
@@ -2135,7 +2094,7 @@ __metadata:
     iso-3166-1: ^2.1.1
     json-bigint: ^1.0.0
     uuid: ^8.3.2
-  checksum: bfdaeae33a01c191616fddedc324d4cdd765f586f721eb78c7c5c32b53ab8e8266fb6ed839e6c4d23acad8babaf1f89e67428603ba16c9f5ceeacb4ae3523f6f
+  checksum: 46935e5940a59e15c1b386452296b14e8cd6d46f756f7a5f7679295545a0b5968a7fec53a6b1cb0b6e746ffabc98b3e5a7303d2be03c2eaa32b4489e6d869b15
   languageName: node
   linkType: hard
 
@@ -2476,16 +2435,6 @@ __metadata:
   languageName: node
   linkType: hard
 
-"@grpc/grpc-js@npm:^1.3.4":
-  version: 1.8.11
-  resolution: "@grpc/grpc-js@npm:1.8.11"
-  dependencies:
-    "@grpc/proto-loader": ^0.7.0
-    "@types/node": ">=12.12.47"
-  checksum: b2ff645ac3a10f8f6ae380945dff2ef2faf2be118b3e7870efecaf2b9a601ab8a4f00d297c3e3f83665a4c5584a9948da336a9df81debb73e5172683bc674c3c
-  languageName: node
-  linkType: hard
-
 "@grpc/grpc-js@npm:^1.9.4":
   version: 1.9.5
   resolution: "@grpc/grpc-js@npm:1.9.5"
@@ -2493,21 +2442,6 @@ __metadata:
     "@grpc/proto-loader": ^0.7.8
     "@types/node": ">=12.12.47"
   checksum: 06834554a0935906652b4b9c5c71f08dd9bdcd4a00d65465c569eae770a9856ecabf7711290bf6d935a8127779c1f35d9cc8cf029693493da02864a330c78e25
-  languageName: node
-  linkType: hard
-
-"@grpc/proto-loader@npm:^0.7.0":
-  version: 0.7.5
-  resolution: "@grpc/proto-loader@npm:0.7.5"
-  dependencies:
-    "@types/long": ^4.0.1
-    lodash.camelcase: ^4.3.0
-    long: ^4.0.0
-    protobufjs: ^7.0.0
-    yargs: ^16.2.0
-  bin:
-    proto-loader-gen-types: build/bin/proto-loader-gen-types.js
-  checksum: ca3a16fc18526a835d006802d15dcf21cb3e2a7a803a988bf34397ebeb07ae94062b3f06db3d1a9b8ec3c40bd96354ca69d9e2ac06ef4c3a74a990d9e55ca2fd
   languageName: node
   linkType: hard
 
@@ -3261,13 +3195,6 @@ __metadata:
   version: 1.7.3
   resolution: "@noble/ed25519@npm:1.7.3"
   checksum: 45169927d51de513e47bbeebff3a603433c4ac7579e1b8c5034c380a0afedbe85e6959be3d69584a7a5ed6828d638f8f28879003b9bb2fb5f22d8aa2d88fd5fe
-  languageName: node
-  linkType: hard
-
-"@noble/ed25519@npm:^1.7.1":
-  version: 1.7.1
-  resolution: "@noble/ed25519@npm:1.7.1"
-  checksum: b8e50306ac70f5cecc349111997e72e897b47a28d406b96cf95d0ebe7cbdefb8380d26117d7847d94102281db200aa3a494e520f9fc12e2f292e0762cb0fa333
   languageName: node
   linkType: hard
 
@@ -5621,6 +5548,13 @@ __metadata:
   languageName: node
   linkType: hard
 
+"@types/big.js@npm:^6.2.0":
+  version: 6.2.0
+  resolution: "@types/big.js@npm:6.2.0"
+  checksum: 69216051378559083453eb89ff63c70300928ebe3e5ccf2af98be39cdce1591d206a2206f1b3b97234b281646b54ded4c7bdf67fa4e383dccd278d129694af67
+  languageName: node
+  linkType: hard
+
 "@types/chrome@npm:^0.0.114":
   version: 0.0.114
   resolution: "@types/chrome@npm:0.0.114"
@@ -5855,13 +5789,6 @@ __metadata:
   version: 4.14.182
   resolution: "@types/lodash@npm:4.14.182"
   checksum: 7dd137aa9dbabd632408bd37009d984655164fa1ecc3f2b6eb94afe35bf0a5852cbab6183148d883e9c73a958b7fec9a9bcf7c8e45d41195add6a18c34958209
-  languageName: node
-  linkType: hard
-
-"@types/long@npm:^4.0.1":
-  version: 4.0.2
-  resolution: "@types/long@npm:4.0.2"
-  checksum: d16cde7240d834cf44ba1eaec49e78ae3180e724cd667052b194a372f350d024cba8dd3f37b0864931683dab09ca935d52f0c4c1687178af5ada9fc85b0635f4
   languageName: node
   linkType: hard
 
@@ -7052,7 +6979,7 @@ __metadata:
   resolution: "NFT-Minting@workspace:examples/nft-minting"
   dependencies:
     "@concordium/browser-wallet-api-helpers": "workspace:^"
-    "@concordium/web-sdk": ^6.3.0
+    "@concordium/web-sdk": beta
     "@craftamap/esbuild-plugin-html": ^0.4.0
     "@types/react": ^18.0.9
     "@types/react-dom": ^18.0.5
@@ -7204,7 +7131,7 @@ __metadata:
   version: 0.0.0-use.local
   resolution: "add-example-web3-id@workspace:examples/add-example-Web3Id"
   dependencies:
-    "@concordium/web-sdk": ^6.3.0
+    "@concordium/web-sdk": beta
     live-server: ^1.2.2
   languageName: unknown
   linkType: soft
@@ -8104,15 +8031,6 @@ __metadata:
   languageName: node
   linkType: hard
 
-"base-x@npm:^3.0.2":
-  version: 3.0.9
-  resolution: "base-x@npm:3.0.9"
-  dependencies:
-    safe-buffer: ^5.0.1
-  checksum: 957101d6fd09e1903e846fd8f69fd7e5e3e50254383e61ab667c725866bec54e5ece5ba49ce385128ae48f9ec93a26567d1d5ebb91f4d56ef4a9cc0d5a5481e8
-  languageName: node
-  linkType: hard
-
 "base-x@npm:^4.0.0":
   version: 4.0.0
   resolution: "base-x@npm:4.0.0"
@@ -8490,32 +8408,12 @@ __metadata:
   languageName: node
   linkType: hard
 
-"bs58@npm:^4.0.0":
-  version: 4.0.1
-  resolution: "bs58@npm:4.0.1"
-  dependencies:
-    base-x: ^3.0.2
-  checksum: b3c5365bb9e0c561e1a82f1a2d809a1a692059fae016be233a6127ad2f50a6b986467c3a50669ce4c18929dcccb297c5909314dd347a25a68c21b68eb3e95ac2
-  languageName: node
-  linkType: hard
-
 "bs58@npm:^5.0.0":
   version: 5.0.0
   resolution: "bs58@npm:5.0.0"
   dependencies:
     base-x: ^4.0.0
   checksum: 2475cb0684e07077521aac718e604a13e0f891d58cff923d437a2f7e9e28703ab39fce9f84c7c703ab369815a675f11e3bd394d38643bfe8969fbe42e6833d45
-  languageName: node
-  linkType: hard
-
-"bs58check@npm:^2.1.2":
-  version: 2.1.2
-  resolution: "bs58check@npm:2.1.2"
-  dependencies:
-    bs58: ^4.0.0
-    create-hash: ^1.1.0
-    safe-buffer: ^5.1.2
-  checksum: 43bdf08a5dd04581b78f040bc4169480e17008da482ffe2a6507327bbc4fc5c28de0501f7faf22901cfe57fbca79cbb202ca529003fedb4cb8dccd265b38e54d
   languageName: node
   linkType: hard
 
@@ -9798,15 +9696,6 @@ __metadata:
   languageName: node
   linkType: hard
 
-"cross-fetch@npm:3.1.5":
-  version: 3.1.5
-  resolution: "cross-fetch@npm:3.1.5"
-  dependencies:
-    node-fetch: 2.6.7
-  checksum: f6b8c6ee3ef993ace6277fd789c71b6acf1b504fd5f5c7128df4ef2f125a429e29cd62dc8c127523f04a5f2fa4771ed80e3f3d9695617f441425045f505cf3bb
-  languageName: node
-  linkType: hard
-
 "cross-spawn@npm:^6.0.0":
   version: 6.0.5
   resolution: "cross-spawn@npm:6.0.5"
@@ -10572,7 +10461,7 @@ __metadata:
   resolution: "e_sealing@workspace:examples/eSealing"
   dependencies:
     "@concordium/react-components": ^0.3.0
-    "@concordium/web-sdk": ^6.3.0
+    "@concordium/web-sdk": beta
     "@craftamap/esbuild-plugin-html": ^0.4.0
     "@thi.ng/leb128": ^2.1.18
     "@types/node": ^18.7.23
@@ -16466,13 +16355,6 @@ __metadata:
   languageName: node
   linkType: hard
 
-"long@npm:^4.0.0":
-  version: 4.0.0
-  resolution: "long@npm:4.0.0"
-  checksum: 16afbe8f749c7c849db1f4de4e2e6a31ac6e617cead3bdc4f9605cb703cd20e1e9fc1a7baba674ffcca57d660a6e5b53a9e236d7b25a295d3855cca79cc06744
-  languageName: node
-  linkType: hard
-
 "long@npm:^5.0.0":
   version: 5.2.1
   resolution: "long@npm:5.2.1"
@@ -17356,7 +17238,7 @@ __metadata:
   languageName: node
   linkType: hard
 
-"node-fetch@npm:2.6.7, node-fetch@npm:^2.6.1, node-fetch@npm:^2.6.7":
+"node-fetch@npm:^2.6.1, node-fetch@npm:^2.6.7":
   version: 2.6.7
   resolution: "node-fetch@npm:2.6.7"
   dependencies:
@@ -18312,7 +18194,7 @@ __metadata:
   resolution: "piggybank@workspace:examples/piggybank"
   dependencies:
     "@concordium/browser-wallet-api-helpers": "workspace:^"
-    "@concordium/web-sdk": ^6.3.0
+    "@concordium/web-sdk": beta
     "@craftamap/esbuild-plugin-html": ^0.4.0
     "@types/react": ^18.0.9
     "@types/react-dom": ^18.0.5
@@ -18885,26 +18767,6 @@ __metadata:
   dependencies:
     xtend: ^4.0.0
   checksum: fcf87c6542e59a8bbe31ca0b3255a4a63ac1059b01b04469680288998bcfa97f341ca989566adbb63975f4d85339030b82320c324a511532d390910d1c583893
-  languageName: node
-  linkType: hard
-
-"protobufjs@npm:^7.0.0":
-  version: 7.2.2
-  resolution: "protobufjs@npm:7.2.2"
-  dependencies:
-    "@protobufjs/aspromise": ^1.1.2
-    "@protobufjs/base64": ^1.1.2
-    "@protobufjs/codegen": ^2.0.4
-    "@protobufjs/eventemitter": ^1.1.0
-    "@protobufjs/fetch": ^1.1.0
-    "@protobufjs/float": ^1.0.2
-    "@protobufjs/inquire": ^1.1.0
-    "@protobufjs/path": ^1.1.2
-    "@protobufjs/pool": ^1.1.0
-    "@protobufjs/utf8": ^1.1.0
-    "@types/node": ">=13.7.0"
-    long: ^5.0.0
-  checksum: 86166e8f3e46789fa4d117ae72c17356db36bf87c0e0710d224be32e543b1c378a94e66dc2b1de5af45edfc25f56acfc7e688c50c956426a3ae97bc474f4445c
   languageName: node
   linkType: hard
 
@@ -22368,7 +22230,7 @@ __metadata:
   version: 0.0.0-use.local
   resolution: "two-step-transfer@workspace:examples/two-step-transfer"
   dependencies:
-    "@concordium/web-sdk": ^6.3.0
+    "@concordium/web-sdk": beta
     live-server: ^1.2.2
   languageName: unknown
   linkType: soft
@@ -23046,7 +22908,7 @@ __metadata:
   resolution: "voting@workspace:examples/voting"
   dependencies:
     "@concordium/browser-wallet-api-helpers": ^2.0.0
-    "@concordium/web-sdk": ^6.3.0
+    "@concordium/web-sdk": beta
     "@types/node": ^18.7.23
     "@types/react": ^18.0.9
     "@types/react-dom": ^18.0.5
@@ -23104,9 +22966,9 @@ __metadata:
   languageName: node
   linkType: hard
 
-"wallet-common-helpers@https://github.com/Concordium/concordium-wallet-common-helpers.git#5ca8e393426acaaf81a477f1b10d8683e313719b":
+"wallet-common-helpers@https://github.com/Concordium/concordium-wallet-common-helpers.git#100f621706fbb9be839e04da00cee5733b4e54bc":
   version: 2.0.0
-  resolution: "wallet-common-helpers@https://github.com/Concordium/concordium-wallet-common-helpers.git#commit=5ca8e393426acaaf81a477f1b10d8683e313719b"
+  resolution: "wallet-common-helpers@https://github.com/Concordium/concordium-wallet-common-helpers.git#commit=100f621706fbb9be839e04da00cee5733b4e54bc"
   dependencies:
     "@concordium/web-sdk": beta
     buffer: ^6.0.3
@@ -23116,7 +22978,7 @@ __metadata:
   peerDependencies:
     react: ">=16"
     react-dom: ">=16"
-  checksum: 93185d801e5724e2d03f07c633647cf9ad83bd309aa7e105b08459503cc67a7cd2b5e0aafb5a1a1efb85007ac9ae0fd4154a2b6bff66c679f20411a3609fac2a
+  checksum: 89717bb3380460a18c96c7f2e61a86b18661591cf424635ec150a5c1a9a53357f69cabf21ed2ae10282b349c0bc38ff709e51475cb67287994729344a10ed46c
   languageName: node
   linkType: hard
 
@@ -23170,7 +23032,7 @@ __metadata:
   resolution: "wccd@workspace:examples/wCCD"
   dependencies:
     "@concordium/react-components": ^0.3.0
-    "@concordium/web-sdk": ^6.3.0
+    "@concordium/web-sdk": beta
     "@craftamap/esbuild-plugin-html": ^0.4.0
     "@thi.ng/leb128": ^2.1.18
     "@types/node": ^18.7.23

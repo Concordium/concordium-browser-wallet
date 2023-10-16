@@ -278,11 +278,11 @@ export default function TransactionList({ onTransactionClick }: TransactionListP
             !accountChanged.current &&
             amount !== undefined &&
             accountInfo?.accountAmount !== undefined &&
-            accountInfo?.accountAmount !== amount
+            accountInfo?.accountAmount.microCcdAmount !== amount
         ) {
             getNewTransactions();
         }
-        setAmount(accountInfo?.accountAmount);
+        setAmount(accountInfo?.accountAmount.microCcdAmount);
     }, [accountInfo?.accountAmount]);
 
     function ccdDrop(address: string) {

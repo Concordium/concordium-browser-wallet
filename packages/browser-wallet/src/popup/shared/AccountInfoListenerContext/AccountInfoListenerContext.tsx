@@ -37,13 +37,13 @@ export const accountInfoAtom = atom<Record<string, AccountInfo>, AccountInfoActi
         const addToast = (v: string) => set(addToastAtom, v);
 
         try {
-            const newAccountInfo = await client.getAccountInfo(new AccountAddress(update.address));
+            const newAccountInfo = await client.getAccountInfo(AccountAddress.fromBase58(update.address));
 
             if (newAccountInfo) {
                 updateRecord(
                     accountInfoCacheLock,
                     useIndexedStorage(sessionAccountInfoCache, getGenesisHash),
-                    newAccountInfo.accountAddress,
+                    newAccountInfo.accountAddress.address,
                     stringify(newAccountInfo)
                 );
             }

@@ -32,7 +32,7 @@ const config: BuildOptions = {
     outbase: 'src',
     entryNames: '[dir]',
     bundle: true,
-    minify: true,
+    // minify: true, //TODO: revert..
     metafile: true,
     logLevel: 'info',
     sourcemap: isDevelopmentBuild() && 'inline',

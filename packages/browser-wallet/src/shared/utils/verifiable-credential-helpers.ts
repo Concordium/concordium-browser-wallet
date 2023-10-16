@@ -5,6 +5,10 @@ import {
     ContractAddress,
     sha256,
     ConcordiumHdWallet,
+    ReceiveName,
+    Energy,
+    Parameter,
+    ReturnValue,
 } from '@concordium/web-sdk';
 import * as ed from '@noble/ed25519';
 import {
@@ -55,11 +59,11 @@ export function getPublicKeyfromPublicKeyIdentifierDID(did: string) {
  * @param credentialId the did for a credential
  * @returns the contract address of the issuing contract of the provided credential id
  */
-export function getCredentialRegistryContractAddress(credentialId: string): ContractAddress {
+export function getCredentialRegistryContractAddress(credentialId: string): ContractAddress.Type {
     const credentialIdParts = credentialId.split(':');
     const index = BigInt(credentialIdParts[4]);
     const subindex = BigInt(credentialIdParts[5].split('/')[0]);
-    return { index, subindex };
+    return ContractAddress.create(index, subindex);
 }
 
 export async function sign(digest: Buffer, privateKey: string) {
@@ -78,7 +82,7 @@ export function encodeWord64LE(value: bigint): Buffer {
 }
 
 export interface SigningData {
-    contractAddress: ContractAddress;
+    contractAddress: ContractAddress.Type;
     entryPoint: string;
     nonce: bigint;
     timestamp: bigint;
@@ -146,7 +150,7 @@ export function serializeRevokeCredentialHolderParam(parameter: RevokeCredential
  * @returns the unserialized parameters for a holder revocation transaction
  */
 export async function buildRevokeTransactionParameters(
-    address: ContractAddress,
+    address: ContractAddress.Type,
     credentialId: string,
     nonce: bigint,
     signingKey: string
@@ -189,7 +193,7 @@ export async function buildRevokeTransactionParameters(
  * @returns an update contract transaction for revoking the credential with id {@link credentialId}
  */
 export async function buildRevokeTransaction(
-    address: ContractAddress,
+    address: ContractAddress.Type,
     contractName: string,
     credentialId: string,
     maxContractExecutionEnergy: bigint,
@@ -197,10 +201,10 @@ export async function buildRevokeTransaction(
 ): Promise<UpdateContractPayload> {
     return {
         address,
-        amount: new CcdAmount(0n),
-        receiveName: `${contractName}.revokeCredentialHolder`,
-        maxContractExecutionEnergy,
-        message: serializeRevokeCredentialHolderParam(parameters),
+        amount: CcdAmount.fromMicroCcd(0n),
+        receiveName: ReceiveName.fromString(`${contractName}.revokeCredentialHolder`),
+        maxContractExecutionEnergy: Energy.create(maxContractExecutionEnergy),
+        message: Parameter.fromBuffer(serializeRevokeCredentialHolderParam(parameters)),
     };
 }
 
@@ -234,11 +238,11 @@ export async function getRevokeTransactionExecutionEnergyEstimate(
 ) {
     const invokeResult = await client.invokeContract({
         contract: parameters.data.signingData.contractAddress,
-        method: `${contractName}.${parameters.data.signingData.entryPoint}`,
-        parameter: serializeRevokeCredentialHolderParam(parameters),
+        method: ReceiveName.fromString(`${contractName}.${parameters.data.signingData.entryPoint}`),
+        parameter: Parameter.fromBuffer(serializeRevokeCredentialHolderParam(parameters)),
     });
 
-    return applyExecutionNRGBuffer(invokeResult.usedEnergy);
+    return applyExecutionNRGBuffer(invokeResult.usedEnergy.value);
 }
 
 /**
@@ -251,7 +255,7 @@ export async function getRevokeTransactionExecutionEnergyEstimate(
 export async function isVerifiableCredentialInContract(
     client: ConcordiumGRPCClient,
     credentialHolderId: string,
-    issuer: ContractAddress
+    issuer: ContractAddress.Type
 ) {
     const instanceInfo = await client.getInstanceInfo(issuer);
     if (instanceInfo === undefined) {
@@ -259,8 +263,8 @@ export async function isVerifiableCredentialInContract(
     }
     const result = await client.invokeContract({
         contract: issuer,
-        method: `${getContractName(instanceInfo)}.credentialStatus`,
-        parameter: Buffer.from(credentialHolderId, 'hex'),
+        method: ReceiveName.fromString(`${getContractName(instanceInfo)}.credentialStatus`),
+        parameter: Parameter.fromHexString(credentialHolderId),
     });
 
     return result.tag === 'success';
@@ -282,8 +286,8 @@ export async function getVerifiableCredentialStatus(client: ConcordiumGRPCClient
 
     const result = await client.invokeContract({
         contract: contractAddress,
-        method: `${getContractName(instanceInfo)}.credentialStatus`,
-        parameter: Buffer.from(getCredentialHolderId(credentialId), 'hex'),
+        method: ReceiveName.fromString(`${getContractName(instanceInfo)}.credentialStatus`),
+        parameter: Parameter.fromHexString(getCredentialHolderId(credentialId)),
     });
 
     if (result.tag !== 'success') {
@@ -295,7 +299,7 @@ export async function getVerifiableCredentialStatus(client: ConcordiumGRPCClient
         throw new Error(`Return value is missing from credentialStatus result in CIS-4 contract: ${contractAddress}`);
     }
 
-    return deserializeCredentialStatus(returnValue);
+    return deserializeCredentialStatus(ReturnValue.toHexString(returnValue));
 }
 
 export interface SchemaRef {
@@ -367,7 +371,10 @@ function deserializeRegistryMetadata(serializedRegistryMetadata: string): Metada
  * @param contractAddress the address of a CIS-4 contract
  * @returns the registry metadata for the contract, or undefined if the contract instance was not found
  */
-export async function getCredentialRegistryMetadata(client: ConcordiumGRPCClient, contractAddress: ContractAddress) {
+export async function getCredentialRegistryMetadata(
+    client: ConcordiumGRPCClient,
+    contractAddress: ContractAddress.Type
+) {
     const instanceInfo = await client.getInstanceInfo(contractAddress);
     if (instanceInfo === undefined) {
         throw new Error('Given contract address was not a created instance');
@@ -375,7 +382,7 @@ export async function getCredentialRegistryMetadata(client: ConcordiumGRPCClient
 
     const result = await client.invokeContract({
         contract: contractAddress,
-        method: `${getContractName(instanceInfo)}.registryMetadata`,
+        method: ReceiveName.fromString(`${getContractName(instanceInfo)}.registryMetadata`),
     });
 
     if (result.tag !== 'success') {
@@ -387,7 +394,7 @@ export async function getCredentialRegistryMetadata(client: ConcordiumGRPCClient
         throw new Error(`Return value is missing from credentialStatus result in CIS-4 contract: ${contractAddress}`);
     }
 
-    return deserializeRegistryMetadata(returnValue);
+    return deserializeRegistryMetadata(ReturnValue.toHexString(returnValue));
 }
 
 // The schemas have been generated using ts-json-schema-generator and their
@@ -800,7 +807,7 @@ export function deserializeCredentialEntry(serializedCredentialEntry: string): C
  */
 export async function getVerifiableCredentialEntry(
     client: ConcordiumGRPCClient,
-    contractAddress: ContractAddress,
+    contractAddress: ContractAddress.Type,
     credentialHolderId: string
 ) {
     const instanceInfo = await client.getInstanceInfo(contractAddress);
@@ -810,8 +817,8 @@ export async function getVerifiableCredentialEntry(
 
     const result = await client.invokeContract({
         contract: contractAddress,
-        method: `${getContractName(instanceInfo)}.credentialEntry`,
-        parameter: Buffer.from(credentialHolderId, 'hex'),
+        method: ReceiveName.fromString(`${getContractName(instanceInfo)}.credentialEntry`),
+        parameter: Parameter.fromHexString(credentialHolderId),
     });
 
     if (result.tag !== 'success') {
@@ -823,7 +830,7 @@ export async function getVerifiableCredentialEntry(
         throw new Error(`Return value is missing from credentialEntry result in CIS-4 contract: ${contractAddress}`);
     }
 
-    return deserializeCredentialEntry(returnValue);
+    return deserializeCredentialEntry(ReturnValue.toHexString(returnValue));
 }
 
 /**
@@ -1081,7 +1088,7 @@ export async function getChangesToCredentialSchemas(
  */
 export async function getCredentialRegistryIssuerKey(
     client: ConcordiumGRPCClient,
-    contractAddress: ContractAddress
+    contractAddress: ContractAddress.Type
 ): Promise<string> {
     const instanceInfo = await client.getInstanceInfo(contractAddress);
     if (instanceInfo === undefined) {
@@ -1090,7 +1097,7 @@ export async function getCredentialRegistryIssuerKey(
 
     const result = await client.invokeContract({
         contract: contractAddress,
-        method: `${getContractName(instanceInfo)}.issuer`,
+        method: ReceiveName.fromString(`${getContractName(instanceInfo)}.issuer`),
     });
 
     if (result.tag !== 'success') {
@@ -1102,7 +1109,7 @@ export async function getCredentialRegistryIssuerKey(
         throw new Error(`Return value is missing from issuer public key result in CIS-4 contract: ${contractAddress}`);
     }
 
-    return returnValue;
+    return ReturnValue.toHexString(returnValue);
 }
 
 /**
@@ -1117,7 +1124,7 @@ export function createPublicKeyIdentifier(publicKey: string, network: NetworkCon
  */
 export function createCredentialId(
     credentialHolderId: string,
-    issuer: ContractAddress,
+    issuer: ContractAddress.Type,
     network: NetworkConfiguration
 ): string {
     return `did:ccd:${getNet(network).toLowerCase()}:sci:${issuer.index}:${
@@ -1145,7 +1152,7 @@ export function getDIDNetwork(did: string): 'mainnet' | 'testnet' {
  * @param did a issuer DID string on the form: "did:ccd:NETWORK:sci:INDEX:SUBINDEX/issuer"
  * @returns the contract address INDEX;SUBINDEX
  */
-export function getContractAddressFromIssuerDID(did: string): ContractAddress {
+export function getContractAddressFromIssuerDID(did: string): ContractAddress.Type {
     const preSplit = did.split('/');
     if (preSplit[1] !== 'issuer') {
         throw new Error('Given DID did not follow expected format');
@@ -1156,7 +1163,7 @@ export function getContractAddressFromIssuerDID(did: string): ContractAddress {
     }
     const index = BigInt(split[split.length - 2]);
     const subindex = BigInt(split[split.length - 1]);
-    return { index, subindex };
+    return ContractAddress.create(index, subindex);
 }
 
 /** Takes a Web3IdCredential subject DID string and returns the publicKey of the verifiable credential
@@ -1195,7 +1202,7 @@ export function getCredentialIdFromSubjectDID(did: string) {
 export async function findNextUnusedVerifiableCredentialIndex(
     client: ConcordiumGRPCClient,
     localIndex: number,
-    issuer: ContractAddress,
+    issuer: ContractAddress.Type,
     hdWallet: ConcordiumHdWallet
 ): Promise<number> {
     let index = localIndex;

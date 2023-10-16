@@ -35,8 +35,8 @@ import { BrowserWalletAccountTransaction, TransactionStatus } from './transactio
 
 export function buildSimpleTransferPayload(recipient: string, amount: bigint): SimpleTransferPayload {
     return {
-        toAddress: new AccountAddress(recipient),
-        amount: new CcdAmount(amount),
+        toAddress: AccountAddress.fromBase58(recipient),
+        amount: CcdAmount.fromMicroCcd(amount),
     };
 }
 
@@ -88,7 +88,7 @@ export function validateBakerStake(
     if (!isValidCcdString(amountToValidate)) {
         return i18n.t('utils.ccdAmount.invalid');
     }
-    const bakerStakeThreshold = chainParameters?.minimumEquityCapital || 0n;
+    const bakerStakeThreshold = chainParameters?.minimumEquityCapital.microCcdAmount || 0n;
     const amount = ccdToMicroCcd(amountToValidate);
 
     if (bakerStakeThreshold > amount) {
@@ -97,7 +97,7 @@ export function validateBakerStake(
 
     if (
         accountInfo &&
-        (BigInt(accountInfo.accountAmount) < amount + estimatedFee ||
+        (BigInt(accountInfo.accountAmount.microCcdAmount) < amount + estimatedFee ||
             // the fee must be paid with the current funds at disposal, because a reduction in delegation amount is not immediate.
             getPublicAccountAmounts(accountInfo).atDisposal < estimatedFee)
     ) {
@@ -110,7 +110,7 @@ export function validateBakerStake(
 export function validateAccountAddress(cand: string): string | undefined {
     try {
         // eslint-disable-next-line no-new
-        new AccountAddress(cand);
+        AccountAddress.fromBase58(cand);
         return undefined;
     } catch {
         return i18n.t('utils.address.invalid');
@@ -133,13 +133,15 @@ export function validateDelegationAmount(
         return i18n.t('utils.ccdAmount.zero');
     }
 
-    const max = targetStatus ? targetStatus.delegatedCapitalCap - targetStatus.delegatedCapital : undefined;
+    const max = targetStatus
+        ? targetStatus.delegatedCapitalCap.microCcdAmount - targetStatus.delegatedCapital.microCcdAmount
+        : undefined;
     if (max !== undefined && amount > max) {
         return i18n.t('utils.ccdAmount.exceedingDelegationCap', { max: displayAsCcd(max) });
     }
 
     if (
-        BigInt(accountInfo.accountAmount) < amount + estimatedFee ||
+        BigInt(accountInfo.accountAmount.microCcdAmount) < amount + estimatedFee ||
         // the fee must be paid with the current funds at disposal, because a reduction in delegation amount is not immediate.
         getPublicAccountAmounts(accountInfo).atDisposal < estimatedFee
     ) {
@@ -149,8 +151,8 @@ export function validateDelegationAmount(
     return undefined;
 }
 
-export function getDefaultExpiry(): TransactionExpiry {
-    return new TransactionExpiry(new Date(Date.now() + DEFAULT_TRANSACTION_EXPIRY));
+export function getDefaultExpiry(): TransactionExpiry.Type {
+    return TransactionExpiry.fromDate(new Date(Date.now() + DEFAULT_TRANSACTION_EXPIRY));
 }
 
 export function getTransactionTypeName(type: AccountTransactionType): string {

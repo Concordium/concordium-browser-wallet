@@ -39,7 +39,7 @@ export function TransactionMessage({ transactionType, payload }: Props) {
                     if (newStake === 0n) {
                         return t('configureBaker.removeBaker', { cooldownPeriod });
                     }
-                    if (newStake && accountInfo.accountBaker.stakedAmount > newStake) {
+                    if (newStake && accountInfo.accountBaker.stakedAmount.microCcdAmount > newStake) {
                         return t('configureBaker.lowerBakerStake', { cooldownPeriod });
                     }
                     return undefined;
@@ -55,7 +55,7 @@ export function TransactionMessage({ transactionType, payload }: Props) {
                             cooldownPeriod,
                         });
                     }
-                    if (newStake && accountInfo.accountDelegation.stakedAmount > newStake) {
+                    if (newStake && accountInfo.accountDelegation.stakedAmount.microCcdAmount > newStake) {
                         return t('configureDelegation.lowerDelegationStake', {
                             cooldownPeriod,
                         });

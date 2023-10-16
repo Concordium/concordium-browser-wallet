@@ -9,6 +9,13 @@ import {
     serializeUpdateContractParameters,
     UpdateContractPayload,
     sha256,
+    ContractAddress,
+    Parameter,
+    ReceiveName,
+    ReturnValue,
+    ContractName,
+    EntrypointName,
+    Energy,
 } from '@concordium/web-sdk';
 import { MetadataUrl, TokenMetadata, TokenIdAndMetadata } from '@shared/storage/types';
 import { CIS2_SCHEMA_CONTRACT_NAME, CIS2_SCHEMA } from '@popup/constants/schema';
@@ -101,9 +108,9 @@ export async function confirmCIS2Contract(
     { contractName, index, subindex }: ContractDetails
 ): Promise<string | undefined> {
     const supports = await client.invokeContract({
-        contract: { index, subindex },
-        method: `${contractName}.supports`,
-        parameter: getCIS2Identifier(),
+        contract: ContractAddress.create(index, subindex),
+        method: ReceiveName.fromString(`${contractName}.supports`),
+        parameter: Parameter.fromBuffer(getCIS2Identifier()),
     });
     if (!supports || supports.tag === 'failure') {
         return i18n.t('addTokens.cis0Error');
@@ -112,7 +119,7 @@ export async function confirmCIS2Contract(
     // Supports return 2 bytes that determine the number of answers. 0100 means there is 1 answer
     // 01 Means the standard is supported.
     // TODO: Handle 02 answer properly (https://proposals.concordium.software/CIS/cis-0.html#response)
-    if (supports.returnValue !== '010001') {
+    if (supports.returnValue === undefined || ReturnValue.toHexString(supports.returnValue) !== '010001') {
         return i18n.t('addTokens.cis2Error');
     }
 
@@ -130,14 +137,14 @@ export function getTokenUrl(
     return new Promise((resolve, reject) => {
         client
             .invokeContract({
-                contract: { index, subindex },
-                method: `${contractName}.tokenMetadata`,
-                parameter: getMetadataParameter(ids),
+                contract: ContractAddress.create(index, subindex),
+                method: ReceiveName.fromString(`${contractName}.tokenMetadata`),
+                parameter: Parameter.fromBuffer(getMetadataParameter(ids)),
             })
             .then((returnValue) => {
                 if (returnValue && returnValue.tag === 'success' && returnValue.returnValue) {
                     try {
-                        resolve(deserializeTokenMetadataReturnValue(returnValue.returnValue));
+                        resolve(deserializeTokenMetadataReturnValue(ReturnValue.toHexString(returnValue.returnValue)));
                     } catch (e) {
                         reject(e);
                     }
@@ -213,7 +220,7 @@ const serializeBalanceParameter = (tokenIds: string[], accountAddress: string) =
         tokenLength.writeUInt8(token.length, 0);
 
         const addressType = Buffer.alloc(1); // Account address type
-        const address = new AccountAddress(accountAddress).decodedAddress;
+        const address = AccountAddress.fromBase58(accountAddress).decodedAddress;
 
         return Buffer.concat([acc, tokenLength, token, addressType, address]);
     }, queries);
@@ -253,16 +260,16 @@ export const getContractBalances = async (
     accountAddress: string,
     onError?: (error: string) => void
 ): Promise<ContractBalances> => {
-    const instanceInfo = await client.getInstanceInfo({ index, subindex });
+    const instanceInfo = await client.getInstanceInfo(ContractAddress.create(index, subindex));
 
     if (instanceInfo === undefined) {
         return {};
     }
 
     const result = await client.invokeContract({
-        contract: { index, subindex },
-        method: `${instanceInfo.name.substring(5)}.balanceOf`,
-        parameter: serializeBalanceParameter(tokenIds, accountAddress),
+        contract: ContractAddress.create(index, subindex),
+        method: ReceiveName.fromString(`${instanceInfo.name.value.substring(5)}.balanceOf`),
+        parameter: Parameter.fromBuffer(serializeBalanceParameter(tokenIds, accountAddress)),
     });
 
     if (result === undefined || result.tag === 'failure' || result.returnValue === undefined) {
@@ -270,7 +277,7 @@ export const getContractBalances = async (
         return {};
     }
 
-    const amounts = deserializeBalanceAmounts(result.returnValue);
+    const amounts = deserializeBalanceAmounts(ReturnValue.toHexString(result.returnValue));
 
     if (amounts.length !== tokenIds.length) {
         throw new Error('Mismatch between length of requested tokens and token amounts in response.');
@@ -306,8 +313,8 @@ export function getTokenTransferParameters(
 
 function serializeTokenTransferParameters(parameters: SmartContractParameters) {
     return serializeUpdateContractParameters(
-        CIS2_SCHEMA_CONTRACT_NAME,
-        'transfer',
+        ContractName.fromString(CIS2_SCHEMA_CONTRACT_NAME),
+        EntrypointName.fromString('transfer'),
         parameters,
         Buffer.from(CIS2_SCHEMA, 'base64'),
         1
@@ -322,42 +329,42 @@ export function getTokenTransferPayload(
     subindex = 0n
 ): UpdateContractPayload {
     return {
-        amount: new CcdAmount(0n),
-        address: { index, subindex },
-        receiveName: `${contractName}.transfer`,
+        amount: CcdAmount.fromMicroCcd(0n),
+        address: ContractAddress.create(index, subindex),
+        receiveName: ReceiveName.fromString(`${contractName}.transfer`),
         message: serializeTokenTransferParameters(parameters),
-        maxContractExecutionEnergy,
+        maxContractExecutionEnergy: Energy.create(maxContractExecutionEnergy),
     };
 }
 
 async function getTokenTransferExecutionEnergyEstimate(
     client: ConcordiumGRPCClient,
     parameter: Buffer,
-    invoker: AccountAddress,
+    invoker: AccountAddress.Type,
     contractName: string,
     index: bigint,
     subindex = 0n
 ): Promise<bigint> {
-    const contractAddress = { index, subindex };
+    const contractAddress = ContractAddress.create(index, subindex);
     const res = await client.invokeContract({
         contract: contractAddress,
         invoker,
-        parameter,
-        method: `${contractName}.transfer`,
+        parameter: Parameter.fromBuffer(parameter),
+        method: ReceiveName.fromString(`${contractName}.transfer`),
     });
     if (!res || res.tag === 'failure') {
         throw new Error(res?.reason?.tag || 'no response');
     }
 
-    return applyExecutionNRGBuffer(res.usedEnergy);
+    return applyExecutionNRGBuffer(res.usedEnergy.value);
 }
 
 function getContractName(instanceInfo: InstanceInfo): string | undefined {
-    return instanceInfo.name.substring(5);
+    return instanceInfo.name.value.substring(5);
 }
 
 export async function fetchContractName(client: ConcordiumGRPCClient, index: bigint, subindex = 0n) {
-    const instanceInfo = await client.getInstanceInfo({ index, subindex });
+    const instanceInfo = await client.getInstanceInfo(ContractAddress.create(index, subindex));
     if (!instanceInfo) {
         return undefined;
     }
@@ -376,14 +383,14 @@ export async function getTokenTransferEnergy(
     const contractName = (await fetchContractName(client, contractIndex)) || '';
     const execution = await getTokenTransferExecutionEnergyEstimate(
         client,
-        serializedParameters,
-        new AccountAddress(address),
+        Buffer.from(Parameter.toBuffer(serializedParameters)),
+        AccountAddress.fromBase58(address),
         contractName,
         contractIndex
     );
     const total = calculateEnergyCost(
         1n,
-        determineUpdatePayloadSize(serializedParameters.length, `${contractName}.transfer`),
+        determineUpdatePayloadSize(serializedParameters.buffer.length, `${contractName}.transfer`),
         execution
     );
     return { execution, total };

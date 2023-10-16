@@ -17,12 +17,12 @@ export function applyExecutionNRGBuffer(estimatedExecutionEnergy: bigint) {
  * @returns the contract's name to be used as a prefix when setting the receive name for a contract method
  */
 export function getContractName(instanceInfo: InstanceInfo): string | undefined {
-    return instanceInfo.name.substring(5);
+    return instanceInfo.name.value.substring(5);
 }
 
 /**
  * Determine whether two contract addresses are the same
  */
-export function areContractAddressesEqual(a: ContractAddress, b: ContractAddress) {
+export function areContractAddressesEqual(a: ContractAddress.Type, b: ContractAddress.Type) {
     return a.index === b.index && a.subindex === b.subindex;
 }

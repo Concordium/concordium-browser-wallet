@@ -107,7 +107,7 @@ function Fungibles({ account, toDetails }: ListProps) {
                 <CcdIcon className="token-list__icon token-list__icon--ccd" />
                 <div>
                     <div className="token-list__name">{CCD_METADATA.name}</div>
-                    <div className="token-list__balance">{displayAsCcd(accountInfo.accountAmount)}</div>
+                    <div className="token-list__balance">{displayAsCcd(accountInfo.accountAmount.microCcdAmount)}</div>
                 </div>
             </div>
             {tokens.map((token) => (

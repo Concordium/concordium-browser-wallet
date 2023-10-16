@@ -12,6 +12,7 @@ import { confirmCIS2Contract, ContractDetails } from '@shared/utils/token-helper
 import { selectedAccountAtom } from '@popup/store/account';
 import { ensureDefined } from '@shared/utils/basic-helpers';
 import { debouncedAsyncValidate } from '@popup/shared/utils/validation-helpers';
+import { ContractAddress } from '@concordium/web-sdk';
 import { contractDetailsAtom, contractTokensAtom } from './state';
 import { fetchTokensConfigure, FetchTokensResponse } from './utils';
 import { tokensRoutes } from '../routes';
@@ -69,12 +70,12 @@ export default function ChooseContract() {
 
                 let instanceInfo;
                 try {
-                    instanceInfo = await client.getInstanceInfo({ index, subindex: 0n });
+                    instanceInfo = await client.getInstanceInfo(ContractAddress.create(index));
                 } catch {
                     return t('noContractFound');
                 }
 
-                const contractName = instanceInfo.name.substring(5);
+                const contractName = instanceInfo.name.value.substring(5);
                 const cd: ContractDetails = { contractName, index, subindex: 0n };
                 const error = await confirmCIS2Contract(client, cd);
 

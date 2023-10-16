@@ -26,7 +26,7 @@ export function determineUpdatePayloadSize(parameterSize: number, receiveName: s
 export function getEnergyCost(transactionType: AccountTransactionType, payload: AccountTransactionPayload): bigint {
     const handler = getAccountTransactionHandler(transactionType);
     const size = handler.serialize(payload).length + 1;
-    return calculateEnergyCost(1n, BigInt(size), handler.getBaseEnergyCost(payload));
+    return calculateEnergyCost(1n, BigInt(size), handler.getBaseEnergyCost(payload)).value;
 }
 
 export function getConfigureDelegationEnergyCost(payload: ConfigureDelegationPayload): bigint {
@@ -44,7 +44,7 @@ function getFullConfigureBakerSize(urlLength: number) {
 
 export function getConfigureBakerMaxEnergyCost(): bigint {
     const maxPayloadSize = getFullConfigureBakerSize(METADATAURL_MAX_LENGTH);
-    return calculateEnergyCost(1n, maxPayloadSize, CONFIGURE_BAKER_WITH_KEYS_BASE_COST);
+    return calculateEnergyCost(1n, maxPayloadSize, CONFIGURE_BAKER_WITH_KEYS_BASE_COST).value;
 }
 
 /**
@@ -52,7 +52,7 @@ export function getConfigureBakerMaxEnergyCost(): bigint {
  */
 export function getFullConfigureBakerMinEnergyCost(): bigint {
     const minPayloadSize = getFullConfigureBakerSize(0);
-    return calculateEnergyCost(1n, minPayloadSize, CONFIGURE_BAKER_WITH_KEYS_BASE_COST);
+    return calculateEnergyCost(1n, minPayloadSize, CONFIGURE_BAKER_WITH_KEYS_BASE_COST).value;
 }
 
 // TODO: Replace this with helpers from SDK
