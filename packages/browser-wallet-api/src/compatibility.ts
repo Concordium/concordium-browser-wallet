@@ -1,5 +1,5 @@
 /* eslint-disable @typescript-eslint/no-explicit-any */
-
+import { Buffer } from 'buffer/';
 import {
     SmartContractParameters,
     SchemaWithContext,
@@ -12,10 +12,17 @@ import {
     AccountAddress,
     AccountTransactionPayload,
     AccountTransactionType,
+    CcdAmount,
     ContractAddress,
+    ContractName,
     DeployModulePayload,
+    Energy,
+    HexString,
     IdStatement,
     InitContractPayload,
+    ModuleReference,
+    Parameter,
+    ReceiveName,
     SchemaVersion,
     UpdateContractPayload,
 } from '@concordium/web-sdk';
@@ -89,6 +96,82 @@ export function sanitizeAddCIS2TokensInput(
     return { accountAddress, tokenIds, contractAddress };
 }
 
+interface CcdAmountV0 {
+    microCcdAmount: bigint;
+}
+
+interface ModuleReferenceV0 {
+    readonly moduleRef: HexString;
+    readonly decodedModuleRef: Uint8Array;
+}
+
+interface InitContractPayloadV0 {
+    amount: CcdAmountV0;
+    moduleRef: ModuleReferenceV0;
+    contractName: string;
+    param: Buffer;
+    maxContractExecutionEnergy: bigint;
+}
+
+interface InitContractPayloadV1 {
+    amount: CcdAmountV0;
+    moduleRef: ModuleReferenceV0;
+    initName: string;
+    param: Buffer;
+    maxContractExecutionEnergy: bigint;
+}
+
+type InitContractPayloadCompat = InitContractPayloadV0 | InitContractPayloadV1 | InitContractPayload;
+
+const isInitContractPayloadV0 = (p: InitContractPayloadCompat): p is InitContractPayloadV0 =>
+    typeof (p as InitContractPayloadV0).contractName === 'string';
+const isInitContractPayloadV1 = (p: InitContractPayloadCompat): p is InitContractPayloadV1 =>
+    typeof (p as InitContractPayloadV1).initName === 'string' && typeof p.maxContractExecutionEnergy === 'bigint';
+const isInitContractPayloadCurrent = (p: InitContractPayloadCompat): p is InitContractPayload =>
+    Parameter.instanceOf(p.param);
+
+interface ContractAddressV0 {
+    index: bigint;
+    subindex: bigint;
+}
+
+interface UpdateContractPayloadV0 {
+    amount: CcdAmountV0;
+    contractAddress: ContractAddressV0;
+    receiveName: string;
+    message: Buffer;
+    maxContractExecutionEnergy: bigint;
+}
+
+interface UpdateContractPayloadV1 {
+    amount: CcdAmountV0;
+    address: ContractAddressV0;
+    receiveName: string;
+    message: Buffer;
+    maxContractExecutionEnergy: bigint;
+}
+
+type UpdateContractPayloadCompat = UpdateContractPayloadV0 | UpdateContractPayloadV1 | UpdateContractPayload;
+
+const isUpdateContractPayloadV0 = (p: UpdateContractPayloadCompat): p is UpdateContractPayloadV0 =>
+    (p as UpdateContractPayloadV0).contractAddress !== undefined;
+const isUpdateContractPayloadV1 = (p: UpdateContractPayloadCompat): p is UpdateContractPayloadV1 =>
+    (p as UpdateContractPayloadV1).address !== undefined && typeof p.maxContractExecutionEnergy === 'bigint';
+const isUpdateContractPayloadCurrent = (p: UpdateContractPayloadCompat): p is UpdateContractPayload =>
+    Parameter.instanceOf(p.message) && ContractAddress.instanceOf((p as UpdateContractPayload).address);
+
+interface DeployModulePayloadV0 {
+    version?: number;
+    content: Uint8Array;
+}
+
+type DeployModulePayloadCompat = DeployModulePayloadV0 | DeployModulePayload;
+
+const isDeployModulePayloadV0 = (p: DeployModulePayloadCompat): p is DeployModulePayloadV0 =>
+    (p as DeployModulePayloadV0).content !== undefined;
+const isDeployModulePayloadCurrent = (p: DeployModulePayloadCompat): p is DeployModulePayload =>
+    (p as DeployModulePayload).source !== undefined;
+
 type SanitizedSendTransactionInput = {
     accountAddress: AccountAddress.Type;
     type: AccountTransactionType;
@@ -97,6 +180,95 @@ type SanitizedSendTransactionInput = {
     schema?: SchemaWithContext;
     schemaVersion?: SchemaVersion;
 };
+
+function sanitizePayload(type: AccountTransactionType, payload: AccountTransactionPayload): AccountTransactionPayload {
+    switch (type) {
+        case AccountTransactionType.InitContract: {
+            const p = payload as InitContractPayloadCompat;
+
+            const amount: CcdAmount.Type = CcdAmount.fromMicroCcd(p.amount.microCcdAmount);
+            const moduleRef: ModuleReference.Type = ModuleReference.fromHexString(p.moduleRef.moduleRef);
+            let initName: ContractName.Type;
+            let maxContractExecutionEnergy: Energy.Type;
+            let param: Parameter.Type | undefined;
+
+            if (isInitContractPayloadV0(p)) {
+                initName = ContractName.fromString(p.contractName);
+                maxContractExecutionEnergy = Energy.create(p.maxContractExecutionEnergy);
+                param = p.param !== undefined ? Parameter.fromBuffer(p.param) : undefined;
+            } else if (isInitContractPayloadV1(p)) {
+                initName = ContractName.fromString(p.initName);
+                maxContractExecutionEnergy = Energy.create(p.maxContractExecutionEnergy);
+                param = p.param !== undefined ? Parameter.fromBuffer(p.param) : undefined;
+            } else if (isInitContractPayloadCurrent(p)) {
+                return p;
+            } else {
+                throw new Error(`Could not sanitize payload as type "${type}": ${p}`);
+            }
+
+            return {
+                amount,
+                moduleRef,
+                param,
+                initName,
+                maxContractExecutionEnergy,
+            } as InitContractPayload;
+        }
+        case AccountTransactionType.Update: {
+            const p = payload as UpdateContractPayloadCompat;
+
+            const amount: CcdAmount.Type = CcdAmount.fromMicroCcd(p.amount.microCcdAmount);
+            let maxContractExecutionEnergy: Energy.Type;
+            let message: Parameter.Type | undefined;
+            let address: ContractAddress.Type;
+            let receiveName: ReceiveName.Type;
+
+            if (isUpdateContractPayloadV0(p)) {
+                address = ContractAddress.create(p.contractAddress.index, p.contractAddress.subindex);
+                maxContractExecutionEnergy = Energy.create(p.maxContractExecutionEnergy);
+                message = p.message !== undefined ? Parameter.fromBuffer(p.message) : undefined;
+                receiveName = ReceiveName.fromString(p.receiveName);
+            } else if (isUpdateContractPayloadV1(p)) {
+                address = ContractAddress.create(p.address.index, p.address.subindex);
+                maxContractExecutionEnergy = Energy.create(p.maxContractExecutionEnergy);
+                message = p.message !== undefined ? Parameter.fromBuffer(p.message) : undefined;
+                receiveName = ReceiveName.fromString(p.receiveName);
+            } else if (isUpdateContractPayloadCurrent(p)) {
+                return p;
+            } else {
+                throw new Error(`Could not sanitize payload as type "${type}": ${p}`);
+            }
+
+            return {
+                amount,
+                address,
+                message,
+                receiveName,
+                maxContractExecutionEnergy,
+            } as UpdateContractPayload;
+        }
+        case AccountTransactionType.DeployModule: {
+            const p = payload as DeployModulePayloadCompat;
+
+            let source: Uint8Array;
+
+            if (isDeployModulePayloadV0(p)) {
+                source = p.content;
+            } else if (isDeployModulePayloadCurrent(p)) {
+                return p;
+            } else {
+                throw new Error(`Could not sanitize payload as type "${type}": ${p}`);
+            }
+
+            return {
+                version: p.version,
+                source,
+            } as DeployModulePayload;
+        }
+        default:
+            return payload;
+    }
+}
 
 /**
  * Compatibility layer for `WalletApi.sendTransaction`
@@ -110,30 +282,7 @@ export function sanitizeSendTransactionInput(
     schemaVersion?: SchemaVersion
 ): SanitizedSendTransactionInput {
     const accountAddress = sanitizeAccountAddress(_accountAddress);
-
-    let payload = _payload;
-    if (type === AccountTransactionType.InitContract) {
-        const initPayload: InitContractPayload = {
-            ...(_payload as InitContractPayload),
-            // eslint-disable-next-line @typescript-eslint/no-explicit-any
-            initName: (_payload as InitContractPayload).initName || (_payload as any).contractName,
-        };
-        payload = initPayload;
-    } else if (type === AccountTransactionType.Update) {
-        const updatePayload: UpdateContractPayload = {
-            ...(_payload as UpdateContractPayload),
-            // eslint-disable-next-line @typescript-eslint/no-explicit-any
-            address: (_payload as UpdateContractPayload).address || (_payload as any).contractAddress,
-        };
-        payload = updatePayload;
-    } else if (type === AccountTransactionType.DeployModule) {
-        const deployPayload: DeployModulePayload = {
-            ...(_payload as DeployModulePayload),
-            // eslint-disable-next-line @typescript-eslint/no-explicit-any
-            source: (_payload as DeployModulePayload).source || (_payload as any).content,
-        };
-        payload = deployPayload;
-    }
+    const payload = sanitizePayload(type, _payload);
 
     let schema: SchemaWithContext | undefined;
     if (typeof _schema === 'string' || _schema instanceof String) {

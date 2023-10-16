@@ -15,8 +15,8 @@ export function replacer(this: any, k: string, value: any) {
         }
         return { '@type': serializationTypes.Date, value };
     }
-    if (Buffer.isBuffer(rawValue)) {
-        return { '@type': serializationTypes.Buffer, value: rawValue.toString('base64') };
+    if (rawValue instanceof Uint8Array) {
+        return { '@type': serializationTypes.Buffer, value: Buffer.from(rawValue).toString('base64') };
     }
     // Support older versions of the SDK
     if (isGtuAmount(rawValue)) {
