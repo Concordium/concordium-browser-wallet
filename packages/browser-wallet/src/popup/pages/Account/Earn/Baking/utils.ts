@@ -2,16 +2,16 @@ import {
     AccountInfo,
     CcdAmount,
     CommissionRates,
-    isBakerAccountV1,
     OpenStatus,
     ConfigureBakerPayload,
     OpenStatusText,
     BakerKeysWithProofs,
+    AccountInfoType,
 } from '@concordium/web-sdk';
 import { decimalToRewardFraction, fractionToPercentage } from '@popup/shared/utils/baking-helpers';
 import { getConfigureBakerEnergyCost } from '@shared/utils/energy-helpers';
 import { not } from '@shared/utils/function-helpers';
-import { ccdToMicroCcd, isDefined, isValidCcdString, microCcdToCcd, NotOptional } from 'wallet-common-helpers';
+import { ccdToMicroCcd, isDefined, isValidCcdString, NotOptional } from 'wallet-common-helpers';
 import { getFormOrExistingValue } from '../utils';
 
 export type ConfigureBakerFlowState = {
@@ -38,7 +38,7 @@ function openStatusFromText(status: OpenStatusText): OpenStatus {
 }
 
 export const getExistingBakerValues = (accountInfo: AccountInfo): NotOptional<ConfigureBakerFlowState> | undefined => {
-    if (!isBakerAccountV1(accountInfo)) {
+    if (accountInfo.type !== AccountInfoType.Baker || accountInfo.accountBaker.version === 0) {
         return undefined;
     }
 
@@ -47,7 +47,7 @@ export const getExistingBakerValues = (accountInfo: AccountInfo): NotOptional<Co
 
     return {
         keys: null,
-        amount: microCcdToCcd(stakedAmount) ?? '0.00',
+        amount: CcdAmount.toCcd(stakedAmount).toString() ?? '0.00', // TODO: ensure validity
         restake: restakeEarnings,
         openForDelegation: openStatusFromText(openStatus),
         metadataUrl,
@@ -120,7 +120,7 @@ export const toPayload = ({
     commissionRates,
 }: Partial<ConfigureBakerFlowState>): ConfigureBakerPayload => ({
     keys: keys || undefined,
-    stake: amount ? new CcdAmount(ccdToMicroCcd(amount)) : undefined,
+    stake: amount ? CcdAmount.fromCcd(amount) : undefined,
     restakeEarnings: restake,
     openForDelegation,
     metadataUrl,

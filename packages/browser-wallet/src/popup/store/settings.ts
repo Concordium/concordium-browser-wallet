@@ -8,7 +8,7 @@ import {
 import { atom } from 'jotai';
 import { EventType } from '@concordium/browser-wallet-api-helpers';
 import { popupMessageHandler } from '@popup/shared/message-handler';
-import { ConcordiumGRPCClient, createConcordiumClient } from '@concordium/web-sdk';
+import { ConcordiumGRPCClient, ConcordiumGRPCWebClient } from '@concordium/web-sdk';
 import { storedAllowlist, storedCredentials } from '@shared/storage/access';
 import { GRPCTIMEOUT, mainnet } from '@shared/constants/networkConfiguration';
 import { atomWithChromeStorage } from './utils';
@@ -63,7 +63,7 @@ export const networkConfigurationAtom = atom<NetworkConfiguration, NetworkConfig
 export const grpcClientAtom = atom<ConcordiumGRPCClient>((get) => {
     const network = get(storedNetworkConfigurationAtom);
 
-    return createConcordiumClient(network.grpcUrl, network.grpcPort, { timeout: GRPCTIMEOUT });
+    return new ConcordiumGRPCWebClient(network.grpcUrl, network.grpcPort, { timeout: GRPCTIMEOUT });
 });
 
 export const acceptedTermsAtom = atomWithChromeStorage<AcceptedTermsState | undefined>(

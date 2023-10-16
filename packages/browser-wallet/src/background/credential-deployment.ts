@@ -3,13 +3,14 @@ import { ExtensionMessageHandler } from '@concordium/browser-wallet-message-hub'
 import {
     CredentialInput,
     getAccountAddress,
-    createConcordiumClient,
+    ConcordiumGRPCWebClient,
     createCredentialTransaction,
     signCredentialTransaction,
     ConcordiumHdWallet,
     TransactionExpiry,
     getCredentialDeploymentTransactionHash,
     CredentialRegistrationId,
+    serializeCredentialDeploymentPayload,
 } from '@concordium/web-sdk';
 import { GRPCTIMEOUT } from '@shared/constants/networkConfiguration';
 import { DEFAULT_TRANSACTION_EXPIRY } from '@shared/constants/time';
@@ -30,7 +31,7 @@ async function createAndSendCredential(credIn: CredentialInput): Promise<Credent
         const { identityIndex, credNumber } = credIn;
         const providerIndex = credIn.ipInfo.ipIdentity;
 
-        const expiry = new TransactionExpiry(new Date(Date.now() + DEFAULT_TRANSACTION_EXPIRY));
+        const expiry = TransactionExpiry.fromDate(new Date(Date.now() + DEFAULT_TRANSACTION_EXPIRY));
         const request = createCredentialTransaction(credIn, expiry);
         const signingKey = ConcordiumHdWallet.fromHex(credIn.seedAsHex, credIn.net)
             .getAccountSigningKey(providerIndex, identityIndex, credNumber)
@@ -49,14 +50,14 @@ async function createAndSendCredential(credIn: CredentialInput): Promise<Credent
             deploymentHash,
         };
 
-        const client = createConcordiumClient(network.grpcUrl, network.grpcPort, {
+        const client = new ConcordiumGRPCWebClient(network.grpcUrl, network.grpcPort, {
             timeout: GRPCTIMEOUT,
         });
 
         // Check that the credential has not already been deployed:
         try {
-            const accountInfo = await client.getAccountInfo(new CredentialRegistrationId(credId));
-            const existingAddress = accountInfo.accountAddress;
+            const accountInfo = await client.getAccountInfo(CredentialRegistrationId.fromHexString(credId));
+            const existingAddress = accountInfo.accountAddress.address;
             await addCredential(
                 {
                     identityIndex,
@@ -81,7 +82,8 @@ async function createAndSendCredential(credIn: CredentialInput): Promise<Credent
         }
 
         // Send Request
-        const successful = await client.sendCredentialDeploymentTransaction(request, [signature]);
+        const payload = serializeCredentialDeploymentPayload([signature], request);
+        const successful = await client.sendCredentialDeploymentTransaction(payload, expiry);
         if (!successful) {
             throw new Error('Credential deployment was rejected');
         }

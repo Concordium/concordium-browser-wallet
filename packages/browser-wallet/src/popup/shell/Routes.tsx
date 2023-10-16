@@ -215,7 +215,6 @@ export default function Routes() {
                         />
                     }
                 />
-
                 <Route
                     path={relativeRoutes.prompt.web3IdProof.path}
                     element={

@@ -1,4 +1,4 @@
-import { AccountAddress, ConcordiumGRPCClient, createConcordiumClient } from '@concordium/web-sdk';
+import { AccountAddress, ConcordiumGRPCClient, ConcordiumGRPCWebClient } from '@concordium/web-sdk';
 import { GRPCTIMEOUT } from '@shared/constants/networkConfiguration';
 import { sessionAccountInfoCache, useIndexedStorage } from '@shared/storage/access';
 import { NetworkConfiguration } from '@shared/storage/types';
@@ -20,7 +20,7 @@ export class AccountInfoListener extends EventEmitter {
 
     constructor(network: NetworkConfiguration) {
         super();
-        this.client = createConcordiumClient(network.grpcUrl, network.grpcPort, { timeout: GRPCTIMEOUT });
+        this.client = new ConcordiumGRPCWebClient(network.grpcUrl, network.grpcPort, { timeout: GRPCTIMEOUT });
         this.genesisHash = network.genesisHash;
     }
 
@@ -49,13 +49,13 @@ export class AccountInfoListener extends EventEmitter {
             try {
                 if (this.accountsMap.size > 0) {
                     for (const accountAddress of this.accountsMap.keys()) {
-                        const address = new AccountAddress(accountAddress);
+                        const address = AccountAddress.fromBase58(accountAddress);
                         const accountInfo = await this.client.getAccountInfo(address);
                         if (accountInfo) {
                             updateRecord(
                                 accountInfoCacheLock,
                                 useIndexedStorage(sessionAccountInfoCache, async () => this.genesisHash),
-                                accountInfo.accountAddress,
+                                accountInfo.accountAddress.address,
                                 stringify(accountInfo)
                             );
                         }

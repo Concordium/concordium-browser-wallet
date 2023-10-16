@@ -1,4 +1,4 @@
-import { createConcordiumClient, TransactionStatusEnum } from '@concordium/web-sdk';
+import { ConcordiumGRPCWebClient, TransactionHash, TransactionStatusEnum } from '@concordium/web-sdk';
 import { GRPCTIMEOUT } from '@shared/constants/networkConfiguration';
 import { storedCurrentNetwork, storedCredentials, storedIdentities } from '@shared/storage/access';
 import {
@@ -30,7 +30,9 @@ const isMonitoringCred = (genesisHash: string, id: PendingWalletCredential): boo
 
 async function monitorCredentialStatus(initialNetwork: NetworkConfiguration, cred: PendingWalletCredential) {
     const { genesisHash } = initialNetwork;
-    const client = createConcordiumClient(initialNetwork.grpcUrl, initialNetwork.grpcPort, { timeout: GRPCTIMEOUT });
+    const client = new ConcordiumGRPCWebClient(initialNetwork.grpcUrl, initialNetwork.grpcPort, {
+        timeout: GRPCTIMEOUT,
+    });
     if (isMonitoringCred(genesisHash, cred)) {
         return;
     }
@@ -51,7 +53,7 @@ async function monitorCredentialStatus(initialNetwork: NetworkConfiguration, cre
         }
 
         try {
-            const response = await client.getBlockItemStatus(deploymentHash);
+            const response = await client.getBlockItemStatus(TransactionHash.fromHexString(deploymentHash));
             // transaction has not finalized yet
             if (response?.status !== TransactionStatusEnum.Finalized) {
                 return true;

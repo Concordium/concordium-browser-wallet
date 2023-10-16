@@ -2,13 +2,10 @@
 import React, { useContext, useEffect, useMemo } from 'react';
 import { Link, Route, Routes, useNavigate } from 'react-router-dom';
 import {
-    AccountInfoBakerV1,
     AccountTransactionType,
-    ConsensusStatusV0,
-    isBakerAccountV1,
+    ConsensusStatus,
     StakePendingChange,
     StakePendingChangeType,
-    StakePendingChangeV1,
 } from '@concordium/web-sdk';
 import {
     dateFromStakePendingChange,
@@ -70,7 +67,7 @@ function DisplayPendingChange({ pendingChange }: DisplayPendingChangeProps) {
             // TODO fix type assertion
             const date = dateFromStakePendingChange(
                 pendingChange,
-                consensusStatus as ConsensusStatusV0,
+                consensusStatus as ConsensusStatus,
                 tokenomicsInfo,
                 chainParameters
             );
@@ -80,7 +77,7 @@ function DisplayPendingChange({ pendingChange }: DisplayPendingChangeProps) {
         }
         return undefined;
     }, [
-        (pendingChange as StakePendingChangeV1)?.effectiveTime?.toString?.(),
+        (pendingChange as StakePendingChange)?.effectiveTime?.toString?.(),
         consensusStatus,
         tokenomicsInfo,
         chainParameters,
