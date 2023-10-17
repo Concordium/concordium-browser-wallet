@@ -2084,12 +2084,12 @@ __metadata:
   languageName: node
   linkType: hard
 
-"@concordium/rust-bindings@npm:2.0.0-rc.1":
-  version: 2.0.0-rc.1
-  resolution: "@concordium/rust-bindings@npm:2.0.0-rc.1"
+"@concordium/rust-bindings@npm:2.0.0-rc.2":
+  version: 2.0.0-rc.2
+  resolution: "@concordium/rust-bindings@npm:2.0.0-rc.2"
   dependencies:
     buffer: ^6.0.3
-  checksum: ee3e5931c4042b57157289a2181c4d38721ae999526d37fb8d28dc7f1eec3e2021b61467a9b062a2ff51ddff5673c88ed47845612d01d4ea591797182a7f2a10
+  checksum: 09124d40712fa97606e7af0ae42dbabd7dad6e95b1e3575bf465642545b442a5017f7ef1c8e82159471ffccd89d85036c3775f541edc8b15065505e18561fcfc
   languageName: node
   linkType: hard
 
@@ -2119,10 +2119,10 @@ __metadata:
   linkType: hard
 
 "@concordium/web-sdk@npm:beta":
-  version: 7.0.0-rc.2
-  resolution: "@concordium/web-sdk@npm:7.0.0-rc.2"
+  version: 7.0.0-rc.3
+  resolution: "@concordium/web-sdk@npm:7.0.0-rc.3"
   dependencies:
-    "@concordium/rust-bindings": 2.0.0-rc.1
+    "@concordium/rust-bindings": 2.0.0-rc.2
     "@grpc/grpc-js": ^1.9.4
     "@noble/ed25519": ^2.0.0
     "@protobuf-ts/grpc-transport": ^2.9.1
@@ -2137,7 +2137,7 @@ __metadata:
     iso-3166-1: ^2.1.1
     json-bigint: ^1.0.0
     uuid: ^8.3.2
-  checksum: 46935e5940a59e15c1b386452296b14e8cd6d46f756f7a5f7679295545a0b5968a7fec53a6b1cb0b6e746ffabc98b3e5a7303d2be03c2eaa32b4489e6d869b15
+  checksum: cc76059562c02fa6b0cd809a66350d4297725b09be15012c3608b0f474b34e08b3d9385a95ac90764d8070df68f174a9aefacfc8b1d630a1db6011eda5ac0617
   languageName: node
   linkType: hard
 
