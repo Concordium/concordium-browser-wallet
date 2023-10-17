@@ -14,7 +14,7 @@ import { grpcClientAtom } from '@popup/store/settings';
 import { fullscreenPromptContext } from '@popup/page-layouts/FullscreenPromptLayout';
 import { Input as UncontrolledInput } from '@popup/shared/Form/Input';
 import Button from '@popup/shared/Button';
-import { isHex } from '@concordium/web-sdk';
+import { ContractAddress, isHex } from '@concordium/web-sdk';
 import ContractTokenLine, { ChoiceStatus } from '@popup/shared/ContractTokenLine';
 import TokenDetails from '@popup/shared/TokenDetails';
 
@@ -30,11 +30,7 @@ interface Location {
     state: {
         payload: {
             accountAddress: string;
-            // TODO: change to ContractAddress.Serializable
-            contractAddress: {
-                index: string;
-                subindex: string;
-            };
+            contractAddress: ContractAddress.Serializable;
             tokenIds: string[];
             url: string;
         };

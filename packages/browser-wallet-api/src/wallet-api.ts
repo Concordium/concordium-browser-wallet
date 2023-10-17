@@ -197,11 +197,7 @@ class WalletApi extends EventEmitter implements IWalletApi {
         const response = await this.messageHandler.sendMessage<MessageStatusWrapper<string[]>>(MessageType.AddTokens, {
             ...input,
             accountAddress: AccountAddress.toBase58(input.accountAddress),
-            contractAddress: {
-                // TODO: ContractAddress.toSerializable(input.contractAddress)
-                index: input.contractAddress.index.toString(),
-                subindex: input.contractAddress.subindex.toString(),
-            },
+            contractAddress: ContractAddress.toSerializable(input.contractAddress),
         });
         if (!response.success) {
             throw new Error(response.message);

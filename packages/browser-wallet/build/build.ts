@@ -27,15 +27,17 @@ const streamPlugin = {
     },
 };
 
+const isDev = isDevelopmentBuild();
+
 const config: BuildOptions = {
     entryPoints: [popup, background, content, inject],
     outbase: 'src',
     entryNames: '[dir]',
     bundle: true,
-    // minify: true, //TODO: revert..
+    minify: !isDev,
     metafile: true,
     logLevel: 'info',
-    sourcemap: isDevelopmentBuild() && 'inline',
+    sourcemap: isDev && 'inline',
     target: ['chrome67'],
     outdir: 'dist',
     define: {

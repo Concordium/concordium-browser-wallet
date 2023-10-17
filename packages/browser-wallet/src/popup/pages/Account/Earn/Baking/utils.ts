@@ -47,7 +47,7 @@ export const getExistingBakerValues = (accountInfo: AccountInfo): NotOptional<Co
 
     return {
         keys: null,
-        amount: CcdAmount.toCcd(stakedAmount).toString() ?? '0.00', // TODO: ensure validity
+        amount: CcdAmount.toCcd(stakedAmount).toString() ?? '0.00',
         restake: restakeEarnings,
         openForDelegation: openStatusFromText(openStatus),
         metadataUrl,
