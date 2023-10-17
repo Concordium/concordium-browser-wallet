@@ -68,7 +68,7 @@ async function recoverAccounts(
                         identityIndex,
                         providerIndex,
                     },
-                    balance: accountInfo.accountAmount.toString(),
+                    balance: accountInfo.accountAmount.toJSON(),
                 });
                 emptyIndices = 0;
             } else {
