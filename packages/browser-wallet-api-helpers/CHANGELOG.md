@@ -1,5 +1,16 @@
 # Changelog
 
+## Unreleased
+
+### Breaking changes
+
+-   Removed `getGrpcClient`. As an alternative, `grpcTransport` can be used with `ConcordiumGRPCClient` from `@concordium/web-sdk`.
+-
+
+### Added
+
+-   `grpcTransport` getter for getting a gprc transport layer for constructing a GRPC client which uses the node settings from the wallet.
+
 ## 2.8.0
 
 ### Fixed

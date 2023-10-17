@@ -16,6 +16,7 @@ import type {
     Base64String,
     ContractAddress,
 } from '@concordium/web-sdk';
+import type { RpcTransport } from '@protobuf-ts/runtime-rpc';
 import { LaxNumberEnumValue, LaxStringEnumValue } from './util';
 
 export interface MetadataUrl {
@@ -175,11 +176,37 @@ interface MainWalletApi {
     removeAllListeners(event?: EventType | string | undefined): this;
 
     /**
+     * A GRPC transport layer which uses the node used in the wallet to communicate with the selected chain.
+     *
+     * @example
+     * import { ConcordiumGRPCClient } from '@concordium/web-sdk/grpc';
+     * import { detectConcordiumProvider } from '@concordium/browser-wallet-api-helpers';
+     *
+     * const walletApi = await detectConcordiumProvider();
+     * const grpcClient = new ConcordiumGRPCClient(await walletApi.grpcTransport);
+     */
+    get grpcTransport(): RpcTransport;
+
+    /**
      * Returns the genesis hash of the currently selected chain in the wallet.
      * Returns undefined if the wallet is either locked or not set up by the user.
      */
     getSelectedChain(): Promise<string | undefined>;
 
+    /**
+     * Request that the user adds the specified tokens for a given contract to the wallet.
+     * Returns which of the given tokens the user accepted to add the tokens into the wallet.
+     * Note that this will throw an error if the dApp is not connected with the accountAddress.
+     * @param accountAddress the {@linkcode AccountAddressLike} of the account whose display the tokens should be added to.
+     * @param tokenIds the list of ids, for the tokens that should be added.
+     * @param contractAddress the {@link ContractAddress} of the contract
+     * @returns a list containing the ids of the tokens that was added to the wallet.
+     */
+    addCIS2Tokens(
+        accountAddress: AccountAddressLike,
+        tokenIds: string[],
+        contractAddress: ContractAddress.Type
+    ): Promise<string[]>;
     /**
      * Request that the user adds the specified tokens for a given contract to the wallet.
      * Returns which of the given tokens the user accepted to add the tokens into the wallet.
@@ -195,20 +222,6 @@ interface MainWalletApi {
         tokenIds: string[],
         contractIndex: bigint,
         contractSubindex?: bigint
-    ): Promise<string[]>;
-    /**
-     * Request that the user adds the specified tokens for a given contract to the wallet.
-     * Returns which of the given tokens the user accepted to add the tokens into the wallet.
-     * Note that this will throw an error if the dApp is not connected with the accountAddress.
-     * @param accountAddress the {@linkcode AccountAddressLike} of the account whose display the tokens should be added to.
-     * @param tokenIds the list of ids, for the tokens that should be added.
-     * @param contractAddress the {@link ContractAddress} of the contract
-     * @returns a list containing the ids of the tokens that was added to the wallet.
-     */
-    addCIS2Tokens(
-        accountAddress: AccountAddressLike,
-        tokenIds: string[],
-        contractAddress: ContractAddress.Type
     ): Promise<string[]>;
 
     /**

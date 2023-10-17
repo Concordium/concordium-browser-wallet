@@ -1935,6 +1935,7 @@ __metadata:
     "@babel/plugin-transform-runtime": ^7.12.1
     "@babel/preset-env": ^7.12.1
     "@concordium/web-sdk": beta
+    "@protobuf-ts/runtime-rpc": ^2.9.1
     typescript: ^5.2.2
     webpack: ^5.72.0
     webpack-cli: ^4.9.2
@@ -3254,16 +3255,7 @@ __metadata:
   languageName: node
   linkType: hard
 
-"@protobuf-ts/runtime-rpc@npm:^2.8.2":
-  version: 2.8.3
-  resolution: "@protobuf-ts/runtime-rpc@npm:2.8.3"
-  dependencies:
-    "@protobuf-ts/runtime": ^2.8.3
-  checksum: 9b6124abde33669ba87f15f921d6fcc60d09cfd2ffcbdda257e791edbd5be0c66f682ac207843f5841ba829354ec86664c627a4c2cdce3525f4cf9e3db8fdbdf
-  languageName: node
-  linkType: hard
-
-"@protobuf-ts/runtime-rpc@npm:^2.9.1":
+"@protobuf-ts/runtime-rpc@npm:^2.8.2, @protobuf-ts/runtime-rpc@npm:^2.9.1":
   version: 2.9.1
   resolution: "@protobuf-ts/runtime-rpc@npm:2.9.1"
   dependencies:
@@ -3276,13 +3268,6 @@ __metadata:
   version: 2.8.2
   resolution: "@protobuf-ts/runtime@npm:2.8.2"
   checksum: ab322e832bfb347b271a8862b8ef3db27ffa380f9c49f94acb410534586a282ebd8af96d4459f959ad0fe5fbf34183f3f4fe512e50c9a4331b742a7445b16c92
-  languageName: node
-  linkType: hard
-
-"@protobuf-ts/runtime@npm:^2.8.3":
-  version: 2.8.3
-  resolution: "@protobuf-ts/runtime@npm:2.8.3"
-  checksum: b5237c5ec4b05f407a8afb51e066a5e27d03da55763e9c83a0d0d32433d95d0b8be0cdf5bcafb5616250c382299dc7c9f9b8a4334813e2cb4615e27a971daada
   languageName: node
   linkType: hard
 

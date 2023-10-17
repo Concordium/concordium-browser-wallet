@@ -186,7 +186,6 @@ export interface NetworkConfiguration {
     grpcPort: number;
     genesisHash: string;
     name: string;
-    jsonRpcUrl: string;
     explorerUrl: string;
     ccdScanUrl: string;
 }

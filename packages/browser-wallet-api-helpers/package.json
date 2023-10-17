@@ -28,7 +28,8 @@
         "url": "https://concordium.com"
     },
     "dependencies": {
-        "@concordium/web-sdk": "beta"
+        "@concordium/web-sdk": "beta",
+        "@protobuf-ts/runtime-rpc": "^2.9.1"
     },
     "devDependencies": {
         "@babel/core": "^7.17.10",
