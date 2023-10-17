@@ -28,7 +28,8 @@ import {
 import EventEmitter from 'events';
 import { IdProofOutput, IdStatement } from '@concordium/web-sdk/id';
 import { CredentialStatements } from '@concordium/web-sdk/web3-id';
-import { ConcordiumGRPCClient } from '@concordium/web-sdk/grpc';
+import { ConcordiumGRPCClient } from '@concordium/web-sdk-legacy';
+import { RpcTransport } from '@protobuf-ts/runtime-rpc';
 import { stringify } from './util';
 import { BWGRPCTransport } from './gRPC-transport';
 import {
@@ -43,9 +44,12 @@ class WalletApi extends EventEmitter implements IWalletApi {
 
     private grpcClient: ConcordiumGRPCClient;
 
+    private bwgrpcTransport: RpcTransport;
+
     constructor() {
         super();
-        this.grpcClient = new ConcordiumGRPCClient(new BWGRPCTransport(this.messageHandler));
+        this.bwgrpcTransport = new BWGRPCTransport(this.messageHandler);
+        this.grpcClient = new ConcordiumGRPCClient(this.bwgrpcTransport);
 
         // Set up message handlers to emit events.
         Object.values(EventType).forEach((eventType) => this.handleEvent(eventType));
@@ -148,9 +152,29 @@ class WalletApi extends EventEmitter implements IWalletApi {
         this.messageHandler.handleMessage(createEventTypeFilter(type), (msg) => this.emit(type, msg.payload));
     }
 
-    // TODO: the types exposed by the client have changed due to breaking changes in the SDK.. How do we avoid propagating these to the consumers?
+    /**
+     * @deprecated the GRPC client version exposed by the wallet API will not be updated and should not be used.
+     * This is due to not being able to ensure compatibility between the API expected by a web application and
+     * the GRPC client injected into the application context.
+     *
+     * Instead, the exposed {@linkcode grpcTransport} can be used to to construct a GRPC client.
+     */
     public getGrpcClient(): ConcordiumGRPCClient {
         return this.grpcClient;
+    }
+
+    /**
+     * A GRPC transport layer which uses the node used in the wallet to communicate with the selected chain.
+     *
+     * @example
+     * import { ConcordiumGRPCClient } from '@concordium/web-sdk/grpc';
+     * import { detectConcordiumProvider } from '@concordium/browser-wallet-api-helpers';
+     *
+     * const walletApi = await detectConcordiumProvider();
+     * const grpcClient = new ConcordiumGRPCClient(await walletApi.grpcTransport);
+     */
+    public get grpcTransport(): RpcTransport {
+        return this.bwgrpcTransport;
     }
 
     public async getSelectedChain(): Promise<string | undefined> {

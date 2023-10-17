@@ -13,8 +13,8 @@
     "packageManager": "yarn@3.2.0",
     "scripts": {
         "lint": "eslint . --cache --max-warnings 0 --ext .ts,.tsx",
-        "type:check": "yarn workspaces foreach -v -t --no-private run tsc --noEmit",
-        "build:all": "yarn workspaces foreach -v -t --no-private run build",
+        "type:check": "yarn workspaces foreach -vt run tsc --noEmit",
+        "build:all": "yarn workspaces foreach -vt run build",
         "postinstall": "husky install",
         "test": "cd ./packages/browser-wallet && jest --config jest.config.ts",
         "generate-disclaimer": "yarn licenses generate-disclaimer --production > ./disclaimer.txt && node disclaimer.js"

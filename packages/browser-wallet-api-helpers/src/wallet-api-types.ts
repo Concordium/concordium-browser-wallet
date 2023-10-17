@@ -7,7 +7,6 @@ import type {
     UpdateContractPayload,
     IdStatement,
     IdProofOutput,
-    ConcordiumGRPCClient,
     CredentialStatements,
     VerifiablePresentation,
     CredentialSubject,
@@ -175,11 +174,6 @@ interface MainWalletApi {
 
     removeAllListeners(event?: EventType | string | undefined): this;
 
-    /**
-     * Returns a gRPC client that is connected to the node that the wallet is.
-     * Note that any calls will throw an error, if the site is not connected with the wallet.
-     */
-    getGrpcClient(): ConcordiumGRPCClient;
     /**
      * Returns the genesis hash of the currently selected chain in the wallet.
      * Returns undefined if the wallet is either locked or not set up by the user.
