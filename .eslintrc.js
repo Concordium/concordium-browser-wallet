@@ -7,7 +7,7 @@ module.exports = {
         ecmaFeatures: {
             jsx: true,
         },
-        project: ['./tsconfig.json', './packages/browser-wallet/tsconfig.eslint.json'],
+        project: ['./tsconfig.json', './packages/browser-wallet/tsconfig.eslint.json', './examples/*/tsconfig.json'],
         tsconfigRootDir: __dirname,
     },
     env: {

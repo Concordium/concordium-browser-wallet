@@ -1,6 +1,15 @@
 /* eslint-disable no-console */
 import React, { useEffect, useState, useMemo, useContext, useRef } from 'react';
-import { deserializeContractState, InstanceInfoV0, isInstanceInfoV0, toBuffer } from '@concordium/web-sdk';
+import {
+    ConcordiumGRPCClient,
+    ContractAddress,
+    ContractName,
+    deserializeContractState,
+    InitName,
+    InstanceInfoV0,
+    isInstanceInfoV0,
+    toBuffer,
+} from '@concordium/web-sdk';
 import { detectConcordiumProvider } from '@concordium/browser-wallet-api-helpers';
 import { smash, deposit, state, CONTRACT_NAME } from './utils';
 
@@ -28,11 +37,12 @@ export default function PiggyBankV0() {
     useEffect(() => {
         // Get piggy bank data.
         detectConcordiumProvider()
-            .then((provider) =>
-                provider.getJsonRpcClient().getInstanceInfo({ index: CONTRACT_INDEX, subindex: CONTRACT_SUB_INDEX })
-            )
+            .then((provider) => {
+                const grpc = new ConcordiumGRPCClient(provider.grpcTransport);
+                return grpc.getInstanceInfo(ContractAddress.create(CONTRACT_INDEX, CONTRACT_SUB_INDEX));
+            })
             .then((info) => {
-                if (info?.name !== `init_${CONTRACT_NAME}`) {
+                if (InitName.fromContractName(ContractName.fromString(CONTRACT_NAME)).value === info.name.value) {
                     // Check that we have the expected instance.
                     throw new Error(`Expected instance of PiggyBank: ${info?.name}`);
                 }
@@ -49,7 +59,7 @@ export default function PiggyBankV0() {
     const piggyBankState: PiggyBankState | undefined = useMemo(
         () =>
             piggybank?.model !== undefined
-                ? deserializeContractState(CONTRACT_NAME, CONTRACT_SCHEMA, piggybank.model)
+                ? deserializeContractState(ContractName.fromString(CONTRACT_NAME), CONTRACT_SCHEMA, piggybank.model)
                 : undefined,
         [piggybank?.model]
     );

@@ -1,7 +1,14 @@
 /* eslint-disable no-console */
 import { createContext } from 'react';
 import { detectConcordiumProvider } from '@concordium/browser-wallet-api-helpers';
-import { AccountTransactionType, CcdAmount, UpdateContractPayload } from '@concordium/web-sdk';
+import {
+    AccountTransactionType,
+    CcdAmount,
+    ContractAddress,
+    Energy,
+    ReceiveName,
+    UpdateContractPayload,
+} from '@concordium/web-sdk';
 
 export const CONTRACT_NAME = 'PiggyBank';
 
@@ -17,13 +24,10 @@ export const deposit = (account: string, index: bigint, subindex = 0n, amount = 
         .then((provider) => {
             provider
                 .sendTransaction(account, AccountTransactionType.Update, {
-                    amount: new CcdAmount(BigInt(amount)),
-                    address: {
-                        index,
-                        subindex,
-                    },
-                    receiveName: `${CONTRACT_NAME}.insert`,
-                    maxContractExecutionEnergy: 30000n,
+                    amount: CcdAmount.fromMicroCcd(amount),
+                    address: ContractAddress.create(index, subindex),
+                    receiveName: ReceiveName.fromString(`${CONTRACT_NAME}.insert`),
+                    maxContractExecutionEnergy: Energy.create(30000),
                 } as UpdateContractPayload)
                 .then((txHash) =>
                     console.log(`https://testnet.ccdscan.io/?dcount=1&dentity=transaction&dhash=${txHash}`)
@@ -44,13 +48,10 @@ export const smash = (account: string, index: bigint, subindex = 0n) => {
         .then((provider) => {
             provider
                 .sendTransaction(account, AccountTransactionType.Update, {
-                    amount: new CcdAmount(0n), // This feels weird? Why do I need an amount for a non-payable receive?
-                    address: {
-                        index,
-                        subindex,
-                    },
-                    receiveName: `${CONTRACT_NAME}.smash`,
-                    maxContractExecutionEnergy: 30000n,
+                    amount: CcdAmount.fromMicroCcd(0), // This feels weird? Why do I need an amount for a non-payable receive?
+                    address: ContractAddress.create(index, subindex),
+                    receiveName: ReceiveName.fromString(`${CONTRACT_NAME}.smash`),
+                    maxContractExecutionEnergy: Energy.create(30000),
                 } as UpdateContractPayload)
                 .then((txHash) =>
                     console.log(`https://testnet.ccdscan.io/?dcount=1&dentity=transaction&dhash=${txHash}`)
