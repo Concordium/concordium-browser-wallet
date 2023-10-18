@@ -14,7 +14,7 @@
     "scripts": {
         "lint": "eslint . --cache --max-warnings 0 --ext .ts,.tsx",
         "type:check": "yarn workspaces foreach -vt run tsc --noEmit",
-        "build:all": "yarn workspaces foreach -vpt run build",
+        "build:all": "yarn build:api-helpers && yarn workspaces foreach -vt --exclude @concordium/browser-wallet-api-helpers run build",
         "postinstall": "husky install",
         "test": "yarn workspaces foreach run test",
         "generate-disclaimer": "yarn licenses generate-disclaimer --production > ./disclaimer.txt && node disclaimer.js"
