@@ -122,7 +122,7 @@ interface InitContractPayloadV0 {
     amount: CcdAmountV0;
     moduleRef: ModuleReferenceV0;
     contractName: string;
-    param: Buffer;
+    param?: Buffer;
     maxContractExecutionEnergy: bigint;
 }
 
@@ -130,24 +130,17 @@ interface InitContractPayloadV1 {
     amount: CcdAmountV0;
     moduleRef: ModuleReferenceV0;
     initName: string;
-    param: Buffer;
+    param?: Buffer;
     maxContractExecutionEnergy: bigint;
 }
 
 type InitContractPayloadCompat = InitContractPayloadV0 | InitContractPayloadV1 | InitContractPayload;
 
-const isInitContractPayloadV0 = (p: InitContractPayloadCompat): p is InitContractPayloadV0 =>
-    typeof (p as InitContractPayloadV0).contractName === 'string';
-const isInitContractPayloadV1 = (p: InitContractPayloadCompat): p is InitContractPayloadV1 =>
-    typeof (p as InitContractPayloadV1).initName === 'string' && typeof p.maxContractExecutionEnergy === 'bigint';
-const isInitContractPayloadCurrent = (p: InitContractPayloadCompat): p is InitContractPayload =>
-    Parameter.instanceOf(p.param);
-
 interface UpdateContractPayloadV0 {
     amount: CcdAmountV0;
     contractAddress: ContractAddressV0;
     receiveName: string;
-    message: Buffer;
+    message?: Buffer;
     maxContractExecutionEnergy: bigint;
 }
 
@@ -155,18 +148,11 @@ interface UpdateContractPayloadV1 {
     amount: CcdAmountV0;
     address: ContractAddressV0;
     receiveName: string;
-    message: Buffer;
+    message?: Buffer;
     maxContractExecutionEnergy: bigint;
 }
 
 type UpdateContractPayloadCompat = UpdateContractPayloadV0 | UpdateContractPayloadV1 | UpdateContractPayload;
-
-const isUpdateContractPayloadV0 = (p: UpdateContractPayloadCompat): p is UpdateContractPayloadV0 =>
-    (p as UpdateContractPayloadV0).contractAddress !== undefined;
-const isUpdateContractPayloadV1 = (p: UpdateContractPayloadCompat): p is UpdateContractPayloadV1 =>
-    (p as UpdateContractPayloadV1).address !== undefined && typeof p.maxContractExecutionEnergy === 'bigint';
-const isUpdateContractPayloadCurrent = (p: UpdateContractPayloadCompat): p is UpdateContractPayload =>
-    Parameter.instanceOf(p.message) && ContractAddress.instanceOf((p as UpdateContractPayload).address);
 
 interface DeployModulePayloadV0 {
     version?: number;
@@ -174,11 +160,6 @@ interface DeployModulePayloadV0 {
 }
 
 type DeployModulePayloadCompat = DeployModulePayloadV0 | DeployModulePayload;
-
-const isDeployModulePayloadV0 = (p: DeployModulePayloadCompat): p is DeployModulePayloadV0 =>
-    (p as DeployModulePayloadV0).content !== undefined;
-const isDeployModulePayloadCurrent = (p: DeployModulePayloadCompat): p is DeployModulePayload =>
-    (p as DeployModulePayload).source !== undefined;
 
 interface SimpleTransferPayloadV0 {
     amount: CcdAmountV0;
@@ -213,24 +194,26 @@ function sanitizePayload(type: AccountTransactionType, payload: AccountTransacti
         case AccountTransactionType.InitContract: {
             const p = payload as InitContractPayloadCompat;
 
-            const amount: CcdAmount.Type = CcdAmount.fromMicroCcd(p.amount.microCcdAmount);
-            const moduleRef: ModuleReference.Type = ModuleReference.fromHexString(p.moduleRef.moduleRef);
-            let initName: ContractName.Type;
-            let maxContractExecutionEnergy: Energy.Type;
-            let param: Parameter.Type | undefined;
+            const amount = CcdAmount.fromMicroCcd(p.amount.microCcdAmount);
+            const moduleRef = ModuleReference.fromHexString(p.moduleRef.moduleRef);
+            const initName =
+                typeof (p as InitContractPayload).initName !== 'string'
+                    ? (p as InitContractPayload).initName
+                    : ContractName.fromString(
+                          (p as InitContractPayloadV0).contractName ?? (p as InitContractPayloadV1).initName
+                      );
+            const maxContractExecutionEnergy =
+                typeof p.maxContractExecutionEnergy !== 'bigint'
+                    ? p.maxContractExecutionEnergy
+                    : Energy.create(p.maxContractExecutionEnergy);
 
-            if (isInitContractPayloadV0(p)) {
-                initName = ContractName.fromString(p.contractName);
-                maxContractExecutionEnergy = Energy.create(p.maxContractExecutionEnergy);
-                param = p.param !== undefined ? Parameter.fromBuffer(p.param) : undefined;
-            } else if (isInitContractPayloadV1(p)) {
-                initName = ContractName.fromString(p.initName);
-                maxContractExecutionEnergy = Energy.create(p.maxContractExecutionEnergy);
-                param = p.param !== undefined ? Parameter.fromBuffer(p.param) : undefined;
-            } else if (isInitContractPayloadCurrent(p)) {
-                return p;
+            let param: Parameter.Type | undefined;
+            if (p.param === undefined) {
+                param = undefined;
+            } else if (p.param instanceof Uint8Array) {
+                param = Parameter.fromBuffer(p.param);
             } else {
-                throw new Error(`Could not sanitize payload as type "${type}": ${p}`);
+                param = p.param;
             }
 
             return {
@@ -244,26 +227,26 @@ function sanitizePayload(type: AccountTransactionType, payload: AccountTransacti
         case AccountTransactionType.Update: {
             const p = payload as UpdateContractPayloadCompat;
 
-            const amount: CcdAmount.Type = CcdAmount.fromMicroCcd(p.amount.microCcdAmount);
-            let maxContractExecutionEnergy: Energy.Type;
-            let message: Parameter.Type | undefined;
-            let address: ContractAddress.Type;
-            let receiveName: ReceiveName.Type;
+            const amount = CcdAmount.fromMicroCcd(p.amount.microCcdAmount);
+            const maxContractExecutionEnergy =
+                typeof p.maxContractExecutionEnergy !== 'bigint'
+                    ? p.maxContractExecutionEnergy
+                    : Energy.create(p.maxContractExecutionEnergy);
+            const receiveName =
+                typeof p.receiveName === 'string' ? ReceiveName.fromString(p.receiveName) : p.receiveName;
 
-            if (isUpdateContractPayloadV0(p)) {
-                address = ContractAddress.create(p.contractAddress.index, p.contractAddress.subindex);
-                maxContractExecutionEnergy = Energy.create(p.maxContractExecutionEnergy);
-                message = p.message !== undefined ? Parameter.fromBuffer(p.message) : undefined;
-                receiveName = ReceiveName.fromString(p.receiveName);
-            } else if (isUpdateContractPayloadV1(p)) {
-                address = ContractAddress.create(p.address.index, p.address.subindex);
-                maxContractExecutionEnergy = Energy.create(p.maxContractExecutionEnergy);
-                message = p.message !== undefined ? Parameter.fromBuffer(p.message) : undefined;
-                receiveName = ReceiveName.fromString(p.receiveName);
-            } else if (isUpdateContractPayloadCurrent(p)) {
-                return p;
+            const { index, subindex } =
+                (p as UpdateContractPayloadV1 | UpdateContractPayload).address ??
+                (p as UpdateContractPayloadV0).contractAddress;
+            const address = ContractAddress.create(index, subindex);
+
+            let message: Parameter.Type | undefined;
+            if (p.message === undefined) {
+                message = undefined;
+            } else if (p.message instanceof Uint8Array) {
+                message = Parameter.fromBuffer(p.message);
             } else {
-                throw new Error(`Could not sanitize payload as type "${type}": ${p}`);
+                message = p.message;
             }
 
             return {
@@ -276,16 +259,7 @@ function sanitizePayload(type: AccountTransactionType, payload: AccountTransacti
         }
         case AccountTransactionType.DeployModule: {
             const p = payload as DeployModulePayloadCompat;
-
-            let source: Uint8Array;
-
-            if (isDeployModulePayloadV0(p)) {
-                source = p.content;
-            } else if (isDeployModulePayloadCurrent(p)) {
-                return p;
-            } else {
-                throw new Error(`Could not sanitize payload as type "${type}": ${p}`);
-            }
+            const source = (p as DeployModulePayloadV0).content ?? (p as DeployModulePayload).source;
 
             return {
                 version: p.version,
@@ -295,6 +269,7 @@ function sanitizePayload(type: AccountTransactionType, payload: AccountTransacti
         case AccountTransactionType.Transfer:
         case AccountTransactionType.TransferWithMemo: {
             const p = payload as SimpleTransferPayloadCompat;
+
             const amount = CcdAmount.fromMicroCcd(p.amount.microCcdAmount);
             const toAddress = AccountAddress.fromBuffer(p.toAddress.decodedAddress);
 
