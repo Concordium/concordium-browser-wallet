@@ -1926,7 +1926,7 @@ __metadata:
   languageName: node
   linkType: hard
 
-"@concordium/browser-wallet-api-helpers@^2.0.0, @concordium/browser-wallet-api-helpers@^2.5.0, @concordium/browser-wallet-api-helpers@workspace:^, @concordium/browser-wallet-api-helpers@workspace:packages/browser-wallet-api-helpers":
+"@concordium/browser-wallet-api-helpers@3.0.0-rc.1, @concordium/browser-wallet-api-helpers@workspace:^, @concordium/browser-wallet-api-helpers@workspace:packages/browser-wallet-api-helpers":
   version: 0.0.0-use.local
   resolution: "@concordium/browser-wallet-api-helpers@workspace:packages/browser-wallet-api-helpers"
   dependencies:
@@ -1934,13 +1934,25 @@ __metadata:
     "@babel/plugin-transform-modules-commonjs": ^7.12.1
     "@babel/plugin-transform-runtime": ^7.12.1
     "@babel/preset-env": ^7.12.1
-    "@concordium/web-sdk": beta
     "@protobuf-ts/runtime-rpc": ^2.9.1
     typescript: ^5.2.2
     webpack: ^5.72.0
     webpack-cli: ^4.9.2
+  peerDependencies:
+    "@concordium/web-sdk": 7.0.0-rc.4
   languageName: unknown
   linkType: soft
+
+"@concordium/browser-wallet-api-helpers@npm:beta":
+  version: 3.0.0-rc.1
+  resolution: "@concordium/browser-wallet-api-helpers@npm:3.0.0-rc.1"
+  dependencies:
+    "@protobuf-ts/runtime-rpc": ^2.9.1
+  peerDependencies:
+    "@concordium/web-sdk": 7.0.0-rc.4
+  checksum: ddf28e049ddf562845f611a3a8cbe770433e8d139b4859ce6162a727d9c4108ef477c5365c8836519f912888b8f293a7f3c8edb3b35860290ee434954e2f63c1
+  languageName: node
+  linkType: hard
 
 "@concordium/browser-wallet-api@workspace:^, @concordium/browser-wallet-api@workspace:packages/browser-wallet-api":
   version: 0.0.0-use.local
@@ -2067,14 +2079,15 @@ __metadata:
   languageName: node
   linkType: hard
 
-"@concordium/react-components@npm:^0.3.0":
-  version: 0.3.0
-  resolution: "@concordium/react-components@npm:0.3.0"
+"@concordium/react-components@npm:beta":
+  version: 0.4.0-rc.3
+  resolution: "@concordium/react-components@npm:0.4.0-rc.3"
   dependencies:
-    "@concordium/wallet-connectors": ^0.3.1
+    "@concordium/wallet-connectors": ^0.4.0-rc.2
   peerDependencies:
+    "@concordium/web-sdk": 7.0.0-rc.4
     react: ^18
-  checksum: 08cc8077f77bc8faaf977e0dbc9270f386575f928d886c4efb3d888fe017edbd36653381e17a20b272409037e648f3eb023501d166e9df0ecd0b4a0c9537c110
+  checksum: e7900a36231d03e948b5f39f3e2285bffa11a27fa4f58fa1dfaef050994963599ecc187b04898eb0db3b46e3d52bb543ef49a8d89317ff13384524a059800bc8
   languageName: node
   linkType: hard
 
@@ -2094,14 +2107,16 @@ __metadata:
   languageName: node
   linkType: hard
 
-"@concordium/wallet-connectors@npm:^0.3.1":
-  version: 0.3.2
-  resolution: "@concordium/wallet-connectors@npm:0.3.2"
+"@concordium/wallet-connectors@npm:^0.4.0-rc.2":
+  version: 0.4.0-rc.2
+  resolution: "@concordium/wallet-connectors@npm:0.4.0-rc.2"
   dependencies:
-    "@concordium/browser-wallet-api-helpers": ^2.5.0
+    "@concordium/browser-wallet-api-helpers": 3.0.0-rc.1
     "@walletconnect/qrcode-modal": ^1.8.0
     "@walletconnect/sign-client": ^2.1.4
-  checksum: ed1485fe22d7b4fc52fdd0377a7acd501927143cde597117ecde8d5cb69ba3f61420e0c749e84951cf0a943226df9864718c6e9856c70e487c873a4d3458ed8e
+  peerDependencies:
+    "@concordium/web-sdk": 7.0.0-rc.4
+  checksum: 0c85cd9b4ca89c4a4c5056a5e0f2c162f775ebd03ef709450b656760b89dce936bc9755117c0a5ef6986a91b6db126405d82094582bf65cd35299912cc1dc1f3
   languageName: node
   linkType: hard
 
@@ -10319,7 +10334,7 @@ __metadata:
   version: 0.0.0-use.local
   resolution: "e_sealing@workspace:examples/eSealing"
   dependencies:
-    "@concordium/react-components": ^0.3.0
+    "@concordium/react-components": beta
     "@concordium/web-sdk": beta
     "@craftamap/esbuild-plugin-html": ^0.4.0
     "@thi.ng/leb128": ^2.1.18
@@ -22226,7 +22241,7 @@ __metadata:
   version: 0.0.0-use.local
   resolution: "voting@workspace:examples/voting"
   dependencies:
-    "@concordium/browser-wallet-api-helpers": ^2.0.0
+    "@concordium/browser-wallet-api-helpers": beta
     "@concordium/web-sdk": beta
     "@types/node": ^18.7.23
     "@types/react": ^18.0.9
@@ -22350,7 +22365,7 @@ __metadata:
   version: 0.0.0-use.local
   resolution: "wccd@workspace:examples/wCCD"
   dependencies:
-    "@concordium/react-components": ^0.3.0
+    "@concordium/react-components": beta
     "@concordium/web-sdk": beta
     "@craftamap/esbuild-plugin-html": ^0.4.0
     "@thi.ng/leb128": ^2.1.18

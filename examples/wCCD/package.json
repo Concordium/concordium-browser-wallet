@@ -4,7 +4,7 @@
     "version": "4.1.0",
     "license": "Apache-2.0",
     "dependencies": {
-        "@concordium/react-components": "^0.3.0",
+        "@concordium/react-components": "beta",
         "@concordium/web-sdk": "beta",
         "@thi.ng/leb128": "^2.1.18",
         "@walletconnect/types": "^2.1.4",
@@ -25,9 +25,6 @@
         "process": "^0.11.10",
         "ts-node": "^10.8.0",
         "typescript": "^5.2.2"
-    },
-    "resolutions": {
-        "@concordium/web-sdk": "^6.3.0"
     },
     "scripts": {
         "build": "NETWORK='testnet' node --loader ts-node/esm ./esbuild.config.ts; cp ./src/assets/* ./dist",

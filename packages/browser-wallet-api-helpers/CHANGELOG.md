@@ -5,7 +5,8 @@
 ### Breaking changes
 
 -   Removed `getGrpcClient`. As an alternative, `grpcTransport` can be used with `ConcordiumGRPCClient` from `@concordium/web-sdk`.
--
+-   Make dependency to `@concordium/web-sdk` a peer dependency (^7.0).
+    This will require consuming apps to add an explicit dependency to the library with its own version constraints.
 
 ### Added
 
