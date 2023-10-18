@@ -2079,15 +2079,15 @@ __metadata:
   languageName: node
   linkType: hard
 
-"@concordium/react-components@npm:beta":
-  version: 0.4.0-rc.3
-  resolution: "@concordium/react-components@npm:0.4.0-rc.3"
+"@concordium/react-components@npm:0.4.0-rc.2":
+  version: 0.4.0-rc.2
+  resolution: "@concordium/react-components@npm:0.4.0-rc.2"
   dependencies:
-    "@concordium/wallet-connectors": ^0.4.0-rc.2
+    "@concordium/wallet-connectors": ^0.4.0-rc.1
   peerDependencies:
     "@concordium/web-sdk": 7.0.0-rc.4
     react: ^18
-  checksum: e7900a36231d03e948b5f39f3e2285bffa11a27fa4f58fa1dfaef050994963599ecc187b04898eb0db3b46e3d52bb543ef49a8d89317ff13384524a059800bc8
+  checksum: c0fa892724d6a4a37699d46423c42fb073f49bd8832301ae2d67cb7fa0e1471f6f5df4104e99780de1f5948b01214d6c969c1e757f79bec9e9f65a64bdef5750
   languageName: node
   linkType: hard
 
@@ -2107,7 +2107,7 @@ __metadata:
   languageName: node
   linkType: hard
 
-"@concordium/wallet-connectors@npm:^0.4.0-rc.2":
+"@concordium/wallet-connectors@npm:^0.4.0-rc.1":
   version: 0.4.0-rc.2
   resolution: "@concordium/wallet-connectors@npm:0.4.0-rc.2"
   dependencies:
@@ -10334,7 +10334,7 @@ __metadata:
   version: 0.0.0-use.local
   resolution: "e_sealing@workspace:examples/eSealing"
   dependencies:
-    "@concordium/react-components": beta
+    "@concordium/react-components": 0.4.0-rc.2
     "@concordium/web-sdk": beta
     "@craftamap/esbuild-plugin-html": ^0.4.0
     "@thi.ng/leb128": ^2.1.18
@@ -22365,7 +22365,7 @@ __metadata:
   version: 0.0.0-use.local
   resolution: "wccd@workspace:examples/wCCD"
   dependencies:
-    "@concordium/react-components": beta
+    "@concordium/react-components": 0.4.0-rc.2
     "@concordium/web-sdk": beta
     "@craftamap/esbuild-plugin-html": ^0.4.0
     "@thi.ng/leb128": ^2.1.18
