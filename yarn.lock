@@ -2314,15 +2314,15 @@ __metadata:
   languageName: node
   linkType: hard
 
-"@concordium/react-components@npm:0.4.0-rc.2":
-  version: 0.4.0-rc.2
-  resolution: "@concordium/react-components@npm:0.4.0-rc.2"
+"@concordium/react-components@npm:0.4.0-rc.5":
+  version: 0.4.0-rc.5
+  resolution: "@concordium/react-components@npm:0.4.0-rc.5"
   dependencies:
-    "@concordium/wallet-connectors": ^0.4.0-rc.1
+    "@concordium/wallet-connectors": ^0.4.0-rc.4
   peerDependencies:
     "@concordium/web-sdk": 7.0.0-rc.4
     react: ^18
-  checksum: c0fa892724d6a4a37699d46423c42fb073f49bd8832301ae2d67cb7fa0e1471f6f5df4104e99780de1f5948b01214d6c969c1e757f79bec9e9f65a64bdef5750
+  checksum: 49e32d5b6090d1da849bd2a8a1710e77420ef4c9f422223c7ea65ff2a0a404b97e98ab42ee38a2a155f849b1743ba92c0331a26ed3e33f6ca7afb75886062033
   languageName: node
   linkType: hard
 
@@ -2342,16 +2342,16 @@ __metadata:
   languageName: node
   linkType: hard
 
-"@concordium/wallet-connectors@npm:^0.4.0-rc.1":
-  version: 0.4.0-rc.2
-  resolution: "@concordium/wallet-connectors@npm:0.4.0-rc.2"
+"@concordium/wallet-connectors@npm:^0.4.0-rc.4":
+  version: 0.4.0-rc.4
+  resolution: "@concordium/wallet-connectors@npm:0.4.0-rc.4"
   dependencies:
     "@concordium/browser-wallet-api-helpers": 3.0.0-rc.1
     "@walletconnect/qrcode-modal": ^1.8.0
     "@walletconnect/sign-client": ^2.1.4
   peerDependencies:
     "@concordium/web-sdk": 7.0.0-rc.4
-  checksum: 0c85cd9b4ca89c4a4c5056a5e0f2c162f775ebd03ef709450b656760b89dce936bc9755117c0a5ef6986a91b6db126405d82094582bf65cd35299912cc1dc1f3
+  checksum: 31a59dde90930f8f04c037f9a9e9a38651fb4086b024d6a75403e2d5146ade7f087756c139d9dbe814d2a227b2eacfa05216aad16b68d06d35b17d41309fc65e
   languageName: node
   linkType: hard
 
@@ -2370,8 +2370,8 @@ __metadata:
   linkType: hard
 
 "@concordium/web-sdk@npm:beta":
-  version: 7.0.0-rc.3
-  resolution: "@concordium/web-sdk@npm:7.0.0-rc.3"
+  version: 7.0.0-rc.4
+  resolution: "@concordium/web-sdk@npm:7.0.0-rc.4"
   dependencies:
     "@concordium/rust-bindings": 2.0.0-rc.2
     "@grpc/grpc-js": ^1.9.4
@@ -2379,7 +2379,7 @@ __metadata:
     "@protobuf-ts/grpc-transport": ^2.9.1
     "@protobuf-ts/grpcweb-transport": ^2.9.1
     "@protobuf-ts/runtime-rpc": ^2.8.2
-    "@scure/bip39": ^1.1.0
+    "@scure/bip39": ^1.2.1
     "@types/big.js": ^6.2.0
     big.js: ^6.2.0
     bs58check: ^3.0.1
@@ -2388,7 +2388,7 @@ __metadata:
     iso-3166-1: ^2.1.1
     json-bigint: ^1.0.0
     uuid: ^8.3.2
-  checksum: cc76059562c02fa6b0cd809a66350d4297725b09be15012c3608b0f474b34e08b3d9385a95ac90764d8070df68f174a9aefacfc8b1d630a1db6011eda5ac0617
+  checksum: cd868bf0114932c8f57f979461cc9465417d2a63ced8d80b1e04119532ebd5250c6709eb5f8d732ae54bdb378e389349c62b85d62715fdb4b4e72e0c21e50f21
   languageName: node
   linkType: hard
 
@@ -3496,7 +3496,7 @@ __metadata:
   languageName: node
   linkType: hard
 
-"@noble/hashes@npm:^1.2.0":
+"@noble/hashes@npm:^1.2.0, @noble/hashes@npm:~1.3.0":
   version: 1.3.2
   resolution: "@noble/hashes@npm:1.3.2"
   checksum: fe23536b436539d13f90e4b9be843cc63b1b17666a07634a2b1259dded6f490be3d050249e6af98076ea8f2ea0d56f578773c2197f2aa0eeaa5fba5bc18ba474
@@ -3849,6 +3849,16 @@ __metadata:
     "@noble/hashes": ~1.1.1
     "@scure/base": ~1.1.0
   checksum: c4361406f092a45e511dc572c89f497af6665ad81cb3fd7bf78e6772f357f7ae885e129ef0b985cb3496a460b4811318f77bc61634d9b0a8446079a801b6003c
+  languageName: node
+  linkType: hard
+
+"@scure/bip39@npm:^1.2.1":
+  version: 1.2.1
+  resolution: "@scure/bip39@npm:1.2.1"
+  dependencies:
+    "@noble/hashes": ~1.3.0
+    "@scure/base": ~1.1.0
+  checksum: c5bd6f1328fdbeae2dcdd891825b1610225310e5e62a4942714db51066866e4f7bef242c7b06a1b9dcc8043a4a13412cf5c5df76d3b10aa9e36b82e9b6e3eeaa
   languageName: node
   linkType: hard
 
@@ -11074,7 +11084,7 @@ __metadata:
   version: 0.0.0-use.local
   resolution: "e_sealing@workspace:examples/eSealing"
   dependencies:
-    "@concordium/react-components": 0.4.0-rc.2
+    "@concordium/react-components": 0.4.0-rc.5
     "@concordium/web-sdk": beta
     "@craftamap/esbuild-plugin-html": ^0.4.0
     "@thi.ng/leb128": ^2.1.18
@@ -23354,7 +23364,7 @@ __metadata:
   version: 0.0.0-use.local
   resolution: "wccd@workspace:examples/wCCD"
   dependencies:
-    "@concordium/react-components": 0.4.0-rc.2
+    "@concordium/react-components": 0.4.0-rc.5
     "@concordium/web-sdk": beta
     "@thi.ng/leb128": ^2.1.18
     "@types/node": ^18.7.23

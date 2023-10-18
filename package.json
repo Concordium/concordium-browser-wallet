@@ -14,9 +14,9 @@
     "scripts": {
         "lint": "eslint . --cache --max-warnings 0 --ext .ts,.tsx",
         "type:check": "yarn workspaces foreach -vt run tsc --noEmit",
-        "build:all": "yarn workspaces foreach -vt run build",
+        "build:all": "yarn workspaces foreach -vpt run build",
         "postinstall": "husky install",
-        "test": "cd ./packages/browser-wallet && jest --config jest.config.ts",
+        "test": "yarn workspaces foreach run test",
         "generate-disclaimer": "yarn licenses generate-disclaimer --production > ./disclaimer.txt && node disclaimer.js"
     },
     "lint-staged": {

@@ -4,7 +4,7 @@
     "version": "4.1.0",
     "license": "Apache-2.0",
     "dependencies": {
-        "@concordium/react-components": "0.4.0-rc.2",
+        "@concordium/react-components": "0.4.0-rc.5",
         "@concordium/web-sdk": "beta",
         "@thi.ng/leb128": "^2.1.18",
         "@walletconnect/types": "^2.1.4",
