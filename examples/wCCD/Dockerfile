@@ -5,8 +5,8 @@ FROM ${base_image} AS build
 WORKDIR /app
 COPY ./package.json ./package.json
 COPY ./tsconfig.json ./tsconfig.json
-COPY ./esbuild.config.ts ./
-COPY ./types ./types
+COPY ./index.html ./
+COPY ./vite.config.ts ./
 COPY ./src ./src
 
 RUN yarn && yarn cache clean

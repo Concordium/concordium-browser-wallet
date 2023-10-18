@@ -30,8 +30,8 @@ import {
     WALLET_CONNECT,
 } from './constants';
 
-import ArrowIcon from './assets/Arrow.svg';
-import RefreshIcon from './assets/Refresh.svg';
+import ArrowIcon from './assets/Arrow.svg?react';
+import RefreshIcon from './assets/Refresh.svg?react';
 import { WalletConnectionTypeButton } from './WalletConnectorTypeButton';
 
 const blackCardStyle = {
