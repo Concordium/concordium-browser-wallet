@@ -2370,8 +2370,8 @@ __metadata:
   linkType: hard
 
 "@concordium/web-sdk@npm:beta":
-  version: 7.0.0-rc.4
-  resolution: "@concordium/web-sdk@npm:7.0.0-rc.4"
+  version: 7.0.0-rc.5
+  resolution: "@concordium/web-sdk@npm:7.0.0-rc.5"
   dependencies:
     "@concordium/rust-bindings": 2.0.0-rc.2
     "@grpc/grpc-js": ^1.9.4
@@ -2388,7 +2388,7 @@ __metadata:
     iso-3166-1: ^2.1.1
     json-bigint: ^1.0.0
     uuid: ^8.3.2
-  checksum: cd868bf0114932c8f57f979461cc9465417d2a63ced8d80b1e04119532ebd5250c6709eb5f8d732ae54bdb378e389349c62b85d62715fdb4b4e72e0c21e50f21
+  checksum: 0c20b2a97be2ba7e54e4321f3efa52484eab7e2b066530168cf1e3debb790521f6d387de0d32d313d5e6010106c4efbc4c1128c159bc4e6cf7afc75c7764765f
   languageName: node
   linkType: hard
 
