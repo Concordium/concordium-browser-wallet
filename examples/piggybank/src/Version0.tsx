@@ -5,16 +5,15 @@ import {
     ContractAddress,
     ContractName,
     deserializeContractState,
-    InitName,
     InstanceInfoV0,
     isInstanceInfoV0,
     toBuffer,
 } from '@concordium/web-sdk';
 import { detectConcordiumProvider } from '@concordium/browser-wallet-api-helpers';
-import { smash, deposit, state, CONTRACT_NAME } from './utils';
+import { smash, deposit, state, CONTRACT_NAME, expectedInitName } from './utils';
 
-import PiggyIcon from './assets/piggy-bank-solid.svg';
-import HammerIcon from './assets/hammer-solid.svg';
+import PiggyIcon from './assets/piggy-bank-solid.svg?react';
+import HammerIcon from './assets/hammer-solid.svg?react';
 
 const CONTRACT_INDEX = 6n; // V0 instance
 const CONTRACT_SUB_INDEX = 0n;
@@ -42,9 +41,9 @@ export default function PiggyBankV0() {
                 return grpc.getInstanceInfo(ContractAddress.create(CONTRACT_INDEX, CONTRACT_SUB_INDEX));
             })
             .then((info) => {
-                if (InitName.fromContractName(ContractName.fromString(CONTRACT_NAME)).value === info.name.value) {
+                if (expectedInitName.value !== info.name.value) {
                     // Check that we have the expected instance.
-                    throw new Error(`Expected instance of PiggyBank: ${info?.name}`);
+                    throw new Error(`Expected instance of PiggyBank: ${info?.name.value}`);
                 }
                 if (!isInstanceInfoV0(info)) {
                     // Check smart contract version. We expect V0.

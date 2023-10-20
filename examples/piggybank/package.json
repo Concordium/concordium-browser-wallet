@@ -8,19 +8,18 @@
         "react-dom": "^18.1.0"
     },
     "devDependencies": {
-        "@craftamap/esbuild-plugin-html": "^0.4.0",
         "@types/react": "^18.0.9",
         "@types/react-dom": "^18.0.5",
-        "cross-env": "^7.0.3",
-        "esbuild": "^0.19.5",
-        "esbuild-plugin-svgr": "^1.0.1",
-        "live-server": "^1.2.2",
-        "ts-node": "^10.8.0",
-        "typescript": "^5.2.2"
+        "@vitejs/plugin-react-swc": "^3.4.0",
+        "typescript": "^5.2.2",
+        "vite": "^4.5.0",
+        "vite-plugin-svgr": "^4.1.0",
+        "vite-plugin-top-level-await": "^1.3.1",
+        "vite-plugin-wasm": "^3.2.2"
     },
     "scripts": {
-        "build": "node --loader ts-node/esm ./esbuild.config.ts",
-        "watch": "cross-env WATCH=1 yarn build",
-        "start": "live-server ./dist"
+        "build": "tsc && vite build",
+        "dev": "vite",
+        "start": "vite preview"
     }
 }

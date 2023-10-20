@@ -1,19 +1,11 @@
 /* eslint-disable no-console */
 import React, { useEffect, useState, useContext, useRef } from 'react';
-import {
-    ConcordiumGRPCClient,
-    ContractAddress,
-    ContractName,
-    InitName,
-    ReceiveName,
-    ReturnValue,
-    toBuffer,
-} from '@concordium/web-sdk';
+import { ConcordiumGRPCClient, ContractAddress, ReceiveName, ReturnValue, toBuffer } from '@concordium/web-sdk';
 import { detectConcordiumProvider } from '@concordium/browser-wallet-api-helpers';
-import { smash, deposit, state, CONTRACT_NAME } from './utils';
+import { smash, deposit, state, CONTRACT_NAME, expectedInitName } from './utils';
 
-import PiggyIcon from './assets/piggy-bank-solid.svg';
-import HammerIcon from './assets/hammer-solid.svg';
+import PiggyIcon from './assets/piggy-bank-solid.svg?react';
+import HammerIcon from './assets/hammer-solid.svg?react';
 
 // V1 Module reference on testnet: 12362dd6f12fabd95959cafa27e512805161467b3156c7ccb043318cd2478838
 const CONTRACT_INDEX = 81n; // V1 instance
@@ -56,9 +48,9 @@ export default function PiggyBank() {
                     return grpc.getInstanceInfo(ContractAddress.create(CONTRACT_INDEX, CONTRACT_SUB_INDEX));
                 })
                 .then((info) => {
-                    if (InitName.fromContractName(ContractName.fromString(CONTRACT_NAME)).value === info.name.value) {
+                    if (expectedInitName.value !== info.name.value) {
                         // Check that we have the expected instance.
-                        throw new Error(`Expected instance of PiggyBank: ${info?.name}`);
+                        throw new Error(`Expected instance of PiggyBank: ${info?.name.value}`);
                     }
 
                     setOwner(info.owner.address);

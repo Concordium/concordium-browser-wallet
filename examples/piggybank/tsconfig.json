@@ -3,12 +3,8 @@
     "compilerOptions": {
         "baseUrl": ".",
         "noEmit": true,
-        "jsx": "react"
-    },
-    "ts-node": {
-        "compilerOptions": {
-            "module": "CommonJS"
-        }
+        "jsx": "react",
+        "types": ["vite-plugin-svgr/client"]
     },
     "include": ["./**/*"]
 }

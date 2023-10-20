@@ -5,12 +5,15 @@ import {
     AccountTransactionType,
     CcdAmount,
     ContractAddress,
+    ContractName,
     Energy,
+    InitName,
     ReceiveName,
     UpdateContractPayload,
 } from '@concordium/web-sdk';
 
 export const CONTRACT_NAME = 'PiggyBank';
+export const expectedInitName = InitName.fromContractName(ContractName.fromString(CONTRACT_NAME));
 
 /**
  * Action for depositing an amount of microCCD to the piggy bank instance
