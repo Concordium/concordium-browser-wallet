@@ -1,6 +1,7 @@
 /* eslint-disable no-console */
 import React, { useEffect, useState, useContext, useRef } from 'react';
-import { ConcordiumGRPCClient, ContractAddress, ReceiveName, ReturnValue, toBuffer } from '@concordium/web-sdk';
+// import { ConcordiumGRPCClient, ContractAddress, ReceiveName, ReturnValue, toBuffer } from '@concordium/web-sdk';
+import { ContractAddress, toBuffer } from '@concordium/web-sdk';
 import { detectConcordiumProvider } from '@concordium/browser-wallet-api-helpers';
 import { smash, deposit, state, CONTRACT_NAME, expectedInitName } from './utils';
 
@@ -19,15 +20,21 @@ const CONTRACT_SUB_INDEX = 0n;
 
 async function updateState(setSmashed: (x: boolean) => void, setAmount: (x: bigint) => void): Promise<void> {
     const provider = await detectConcordiumProvider();
-    const grpc = new ConcordiumGRPCClient(provider.grpcTransport);
+    // const grpc = new ConcordiumGRPCClient(provider.grpcTransport);
+    const grpc = provider.getGrpcClient();
+    // const res = await grpc.invokeContract({
+    // method: ReceiveName.fromString(`${CONTRACT_NAME}.view`),
+    // contract: ContractAddress.create(CONTRACT_INDEX, CONTRACT_SUB_INDEX),
+    // });
     const res = await grpc.invokeContract({
-        method: ReceiveName.fromString(`${CONTRACT_NAME}.view`),
+        method: `${CONTRACT_NAME}.view`,
         contract: ContractAddress.create(CONTRACT_INDEX, CONTRACT_SUB_INDEX),
     });
     if (!res || res.tag === 'failure' || !res.returnValue) {
         throw new Error(`Expected succesful invocation`);
     }
-    const hexVal = ReturnValue.toHexString(res.returnValue);
+    // const hexVal = ReturnValue.toHexString(res.returnValue);
+    const hexVal = res.returnValue;
     setSmashed(!!Number(hexVal.substring(0, 2)));
     setAmount(toBuffer(hexVal, 'hex').readBigUInt64LE(0) as bigint);
 }
@@ -44,13 +51,15 @@ export default function PiggyBank() {
             // Get piggy bank owner.
             detectConcordiumProvider()
                 .then((provider) => {
-                    const grpc = new ConcordiumGRPCClient(provider.grpcTransport);
+                    const grpc = provider.getGrpcClient();
                     return grpc.getInstanceInfo(ContractAddress.create(CONTRACT_INDEX, CONTRACT_SUB_INDEX));
                 })
                 .then((info) => {
-                    if (expectedInitName.value !== info.name.value) {
+                    // if (expectedInitName.value !== info.name.value) {
+                    if (expectedInitName.value !== info.name) {
                         // Check that we have the expected instance.
-                        throw new Error(`Expected instance of PiggyBank: ${info?.name.value}`);
+                        // throw new Error(`Expected instance of PiggyBank: ${info?.name.value}`);
+                        throw new Error(`Expected instance of PiggyBank: ${info?.name}`);
                     }
 
                     setOwner(info.owner.address);

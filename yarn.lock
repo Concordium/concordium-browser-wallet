@@ -2178,6 +2178,15 @@ __metadata:
   languageName: unknown
   linkType: soft
 
+"@concordium/browser-wallet-api-helpers@npm:2.8.0":
+  version: 2.8.0
+  resolution: "@concordium/browser-wallet-api-helpers@npm:2.8.0"
+  dependencies:
+    "@concordium/web-sdk": ^6.3.0
+  checksum: ce62acd34db7b107ee7a6a3a730ecf875e33932fbe0f8743d7e1a4ee16724cd2ac7430d90714771bac2291dc411775ba807b0a38b45830bf4b665e14e1a6693a
+  languageName: node
+  linkType: hard
+
 "@concordium/browser-wallet-api-helpers@npm:beta":
   version: 3.0.0-rc.1
   resolution: "@concordium/browser-wallet-api-helpers@npm:3.0.0-rc.1"
@@ -2314,6 +2323,27 @@ __metadata:
   languageName: node
   linkType: hard
 
+"@concordium/common-sdk@npm:9.5.1":
+  version: 9.5.1
+  resolution: "@concordium/common-sdk@npm:9.5.1"
+  dependencies:
+    "@concordium/rust-bindings": 1.2.0
+    "@grpc/grpc-js": ^1.3.4
+    "@noble/ed25519": ^1.7.1
+    "@protobuf-ts/runtime-rpc": ^2.8.2
+    "@scure/bip39": ^1.1.0
+    big.js: ^6.2.0
+    bs58check: ^2.1.2
+    buffer: ^6.0.3
+    cross-fetch: 3.1.5
+    hash.js: ^1.1.7
+    iso-3166-1: ^2.1.1
+    json-bigint: ^1.0.0
+    uuid: ^8.3.2
+  checksum: 5a521a2ebaa78984d4bd4e27c7e26306aa8c00e81b341566500237babe647cb7da72e77409a86d34e34658a14780974e6f68dbd02318eb1f2f5c1fa9da9ef461
+  languageName: node
+  linkType: hard
+
 "@concordium/react-components@npm:0.4.0-rc.5":
   version: 0.4.0-rc.5
   resolution: "@concordium/react-components@npm:0.4.0-rc.5"
@@ -2366,6 +2396,20 @@ __metadata:
     buffer: ^6.0.3
     process: ^0.11.10
   checksum: 7553e594e07fec3081bfb73b88f615c3a6e438e84cb22d3d3ba57e91803a5c2660d8181fc58e9c23871d8d47ffee5b79eeeb9f5f783ae934614c295b65bc6fde
+  languageName: node
+  linkType: hard
+
+"@concordium/web-sdk@npm:^6.3.0":
+  version: 6.5.1
+  resolution: "@concordium/web-sdk@npm:6.5.1"
+  dependencies:
+    "@concordium/common-sdk": 9.5.1
+    "@concordium/rust-bindings": 1.2.0
+    "@grpc/grpc-js": ^1.3.4
+    "@protobuf-ts/grpcweb-transport": ^2.8.2
+    buffer: ^6.0.3
+    process: ^0.11.10
+  checksum: 7fccd3d1d26284028981cd1e7d446254eb9a4ba01644226b9ac09f1d33466a6d76ffac2cc35057a4c6b6ba8f1c078f06ca24ef839780322c63f729a524901b58
   languageName: node
   linkType: hard
 
@@ -18381,7 +18425,7 @@ __metadata:
   version: 0.0.0-use.local
   resolution: "piggybank@workspace:examples/piggybank"
   dependencies:
-    "@concordium/browser-wallet-api-helpers": "workspace:^"
+    "@concordium/browser-wallet-api-helpers": 2.8.0
     "@concordium/web-sdk": ^7.0.0
     "@types/react": ^18.0.9
     "@types/react-dom": ^18.0.5

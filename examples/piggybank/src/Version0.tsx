@@ -1,7 +1,7 @@
+/* eslint-disable @typescript-eslint/no-explicit-any */
 /* eslint-disable no-console */
 import React, { useEffect, useState, useMemo, useContext, useRef } from 'react';
 import {
-    ConcordiumGRPCClient,
     ContractAddress,
     ContractName,
     deserializeContractState,
@@ -37,20 +37,20 @@ export default function PiggyBankV0() {
         // Get piggy bank data.
         detectConcordiumProvider()
             .then((provider) => {
-                const grpc = new ConcordiumGRPCClient(provider.grpcTransport);
+                const grpc = provider.getGrpcClient();
                 return grpc.getInstanceInfo(ContractAddress.create(CONTRACT_INDEX, CONTRACT_SUB_INDEX));
             })
             .then((info) => {
-                if (expectedInitName.value !== info.name.value) {
+                if (expectedInitName.value !== info.name) {
                     // Check that we have the expected instance.
-                    throw new Error(`Expected instance of PiggyBank: ${info?.name.value}`);
+                    throw new Error(`Expected instance of PiggyBank: ${info?.name}`);
                 }
-                if (!isInstanceInfoV0(info)) {
+                if (!isInstanceInfoV0(info as any)) {
                     // Check smart contract version. We expect V0.
                     throw new Error('Expected SC version 0');
                 }
 
-                setPiggyBank(info);
+                setPiggyBank(info as any);
             });
     }, []);
 
