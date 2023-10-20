@@ -15,7 +15,8 @@
         "downlevelIteration": true,
         "baseUrl": ".",
         "noEmit": true,
-        "jsx": "react"
+        "jsx": "react",
+        "types": ["vite-plugin-svgr/client"]
     },
     "ts-node": {
         "compilerOptions": {

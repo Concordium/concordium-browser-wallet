@@ -7,6 +7,7 @@ COPY ./package.json ./package.json
 COPY ./tsconfig.json ./tsconfig.json
 COPY ./index.html ./
 COPY ./vite.config.ts ./
+COPY ./public ./public
 COPY ./src ./src
 
 RUN yarn && yarn cache clean
