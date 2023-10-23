@@ -13,8 +13,9 @@ import type {
     VerifiablePresentation,
     CredentialSubject,
     HexString,
+    CcdAmount,
 } from '@concordium/web-sdk';
-import { LaxNumberEnumValue, LaxStringEnumValue } from './util';
+import { DeepReplaceType, LaxNumberEnumValue, LaxStringEnumValue } from './util';
 
 export interface MetadataUrl {
     url: string;
@@ -48,17 +49,27 @@ export interface CredentialProof {
     verificationMethod: string;
 }
 
-export type SendTransactionPayload =
+/**
+ * Interface covering both the old (prior v7) and new CcdAmount in web-sdk.
+ */
+export interface HasMicroCcd {
+    microCcdAmount: bigint;
+}
+
+type SendTransactionPayloadRaw =
     | Exclude<AccountTransactionPayload, UpdateContractPayload | InitContractPayload>
     | Omit<UpdateContractPayload, 'message'>
     | Omit<InitContractPayload, 'param'>;
+
+export type SendTransactionPayload = DeepReplaceType<SendTransactionPayloadRaw, CcdAmount, HasMicroCcd>;
 
 export type SmartContractParameters =
     | { [key: string]: SmartContractParameters }
     | SmartContractParameters[]
     | number
     | string
-    | boolean;
+    | boolean
+    | bigint;
 
 export type SignMessageObject = {
     /** as base64 */
