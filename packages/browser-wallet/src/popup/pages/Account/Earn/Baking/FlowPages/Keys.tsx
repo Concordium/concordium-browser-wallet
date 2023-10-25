@@ -17,7 +17,7 @@ type KeysForm = GenerateBakerKeysOutput;
 
 type KeysProps = MultiStepFormPageProps<ConfigureBakerFlowState['keys'], ConfigureBakerFlowState> & WithAccountInfo;
 
-const KEYS_FILENAME = 'baker-credentials.json';
+const KEYS_FILENAME = 'validator-credentials.json';
 
 interface ShowKeysProp {
     keys: BakerKeysWithProofs;
