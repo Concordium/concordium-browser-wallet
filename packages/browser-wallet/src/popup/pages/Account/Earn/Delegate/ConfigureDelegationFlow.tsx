@@ -4,7 +4,6 @@ import {
     AccountInfoType,
     AccountTransactionType,
     BakerPoolStatus,
-    isDelegatorAccount,
     OpenStatusText,
 } from '@concordium/web-sdk';
 import { Trans, useTranslation } from 'react-i18next';
@@ -71,7 +70,7 @@ function PoolPage({ onNext, initial, accountInfo }: PoolPageProps) {
             }
 
             if (
-                isDelegatorAccount(accountInfo) &&
+                accountInfo.type === AccountInfoType.Delegator &&
                 poolStatus.delegatedCapitalCap.microCcdAmount - poolStatus.delegatedCapital.microCcdAmount <
                     accountInfo.accountDelegation.stakedAmount.microCcdAmount
             ) {
@@ -234,7 +233,8 @@ function AmountPage({ initial, onNext, formValues, accountInfo }: AmountPageProp
     };
 
     const pendingChange =
-        isDelegatorAccount(accountInfo) && accountInfo.accountDelegation.pendingChange?.change !== undefined;
+        accountInfo.type === AccountInfoType.Delegator &&
+        accountInfo.accountDelegation.pendingChange?.change !== undefined;
 
     return (
         <Form<AmountPageForm> className="configure-flow-form" formMethods={form} onSubmit={onSubmit}>

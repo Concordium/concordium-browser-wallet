@@ -17,7 +17,10 @@ type ItemProps = {
 function AccountListItem({ account, checked, onToggleChecked }: ItemProps) {
     const accountInfo = useAccountInfo(account);
     const identityName = useIdentityName(account, 'Identity');
-    const totalBalance = useMemo(() => accountInfo?.accountAmount.microCcdAmount || 0n, [accountInfo?.accountAmount]);
+    const totalBalance = useMemo(
+        () => accountInfo?.accountAmount.microCcdAmount || 0n,
+        [accountInfo?.accountAmount.microCcdAmount]
+    );
 
     return (
         <div className="allowlist-entry-view__accounts__item">

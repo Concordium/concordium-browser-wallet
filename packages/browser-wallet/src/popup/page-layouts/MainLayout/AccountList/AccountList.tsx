@@ -44,7 +44,10 @@ function BakerOrDelegatorIcon({
 
 function AccountListItem({ account, checked, selected }: ItemProps) {
     const accountInfo = useAccountInfo(account);
-    const totalBalance = useMemo(() => accountInfo?.accountAmount?.microCcdAmount || 0n, [accountInfo?.accountAmount]);
+    const totalBalance = useMemo(
+        () => accountInfo?.accountAmount?.microCcdAmount || 0n,
+        [accountInfo?.accountAmount.microCcdAmount]
+    );
     const identityName = useIdentityName(account, 'Unknown');
 
     return (

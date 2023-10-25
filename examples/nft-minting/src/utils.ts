@@ -73,7 +73,7 @@ export const mint = async (account: string, id: string, url: string, index: bigi
 
     if (
         status.summary.type === TransactionSummaryType.AccountTransaction &&
-        status.summary.transactionType === TransactionKindString.InitContract
+        status.summary.transactionType === TransactionKindString.Update
     ) {
         return txHash;
     }

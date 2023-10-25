@@ -4,8 +4,8 @@ import {
     SmartContractParameters,
     SchemaWithContext,
     SchemaType,
-    AccountAddressLike,
-    SchemaLike,
+    AccountAddressSource,
+    SchemaSource,
     SignMessageObject,
 } from '@concordium/browser-wallet-api-helpers';
 import {
@@ -39,7 +39,7 @@ export function isGtuAmount(cand: any): cand is GtuAmount {
     return cand && typeof cand.microGtuAmount === 'bigint';
 }
 
-function sanitizeAccountAddress(accountAddress: AccountAddressLike): AccountAddress.Type {
+function sanitizeAccountAddress(accountAddress: AccountAddressSource): AccountAddress.Type {
     return AccountAddress.instanceOf(accountAddress) ? accountAddress : AccountAddress.fromBase58(accountAddress);
 }
 
@@ -49,7 +49,7 @@ type SanitizedSignMessageInput = {
 };
 
 export function sanitizeSignMessageInput(
-    accountAddress: AccountAddressLike,
+    accountAddress: AccountAddressSource,
     message: string | SignMessageObject
 ): SanitizedSignMessageInput {
     return {
@@ -65,7 +65,7 @@ type SanitizedRequestIdProofInput = {
 };
 
 export function sanitizeRequestIdProofInput(
-    accountAddress: AccountAddressLike,
+    accountAddress: AccountAddressSource,
     statement: IdStatement,
     challenge: string
 ): SanitizedRequestIdProofInput {
@@ -83,7 +83,7 @@ type SanitizedAddCIS2TokensInput = {
 };
 
 export function sanitizeAddCIS2TokensInput(
-    _accountAddress: AccountAddressLike,
+    _accountAddress: AccountAddressSource,
     tokenIds: string[],
     dyn: ContractAddress.Type | bigint,
     contractSubindex?: bigint
@@ -290,11 +290,11 @@ function sanitizePayload(type: AccountTransactionType, payload: AccountTransacti
  * Compatibility layer for `WalletApi.sendTransaction`
  */
 export function sanitizeSendTransactionInput(
-    _accountAddress: AccountAddressLike,
+    _accountAddress: AccountAddressSource,
     type: AccountTransactionType,
     _payload: AccountTransactionPayload,
     parameters?: SmartContractParameters,
-    _schema?: SchemaLike,
+    _schema?: SchemaSource,
     schemaVersion?: SchemaVersion
 ): SanitizedSendTransactionInput {
     const accountAddress = sanitizeAccountAddress(_accountAddress);

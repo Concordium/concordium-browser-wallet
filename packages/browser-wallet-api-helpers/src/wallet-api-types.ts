@@ -89,8 +89,8 @@ export type SchemaWithContext = {
     value: string;
 };
 
-export type AccountAddressLike = Base58String | AccountAddress.Type;
-export type SchemaLike = Base64String | SchemaWithContext;
+export type AccountAddressSource = Base58String | AccountAddress.Type;
+export type SchemaSource = Base64String | SchemaWithContext;
 
 // eslint-disable-next-line  @typescript-eslint/no-explicit-any
 type EventListener<Args extends any[]> = (...args: Args) => void;
@@ -119,11 +119,11 @@ interface MainWalletApi {
      * @param [schemaVersion] version of the schema provided. Must be supplied for schemas that use version 0 or 1, as they don't have the version embedded.
      */
     sendTransaction(
-        accountAddress: AccountAddressLike,
+        accountAddress: AccountAddressSource,
         type: LaxNumberEnumValue<AccountTransactionType.Update | AccountTransactionType.InitContract>,
         payload: SendTransactionPayload,
         parameters: SmartContractParameters,
-        schema: SchemaLike,
+        schema: SchemaSource,
         schemaVersion?: SchemaVersion
     ): Promise<string>;
     /**
@@ -134,7 +134,7 @@ interface MainWalletApi {
      * @param payload the payload of the transaction to be signed and sent. Note that for smart contract transactions, the payload should not contain the parameters, those should instead be provided in the subsequent argument instead.
      */
     sendTransaction(
-        accountAddress: AccountAddressLike,
+        accountAddress: AccountAddressSource,
         type: LaxNumberEnumValue<AccountTransactionType>,
         payload: SendTransactionPayload
     ): Promise<string>;
@@ -145,7 +145,7 @@ interface MainWalletApi {
      * @param message message to be signed. Note that the wallet will prepend some bytes to ensure the message cannot be a transaction. The message should either be a utf8 string or { @link SignMessageObject }.
      */
     signMessage(
-        accountAddress: AccountAddressLike,
+        accountAddress: AccountAddressSource,
         message: string | SignMessageObject
     ): Promise<AccountTransactionSignature>;
 
@@ -197,31 +197,15 @@ interface MainWalletApi {
      * Request that the user adds the specified tokens for a given contract to the wallet.
      * Returns which of the given tokens the user accepted to add the tokens into the wallet.
      * Note that this will throw an error if the dApp is not connected with the accountAddress.
-     * @param accountAddress the {@linkcode AccountAddressLike} of the account whose display the tokens should be added to.
+     * @param accountAddress the {@linkcode AccountAddressSource} of the account whose display the tokens should be added to.
      * @param tokenIds the list of ids, for the tokens that should be added.
      * @param contractAddress the {@link ContractAddress} of the contract
-     * @returns a list containing the ids of the tokens that was added to the wallet.
+     * @returns a list containing the ids of the tokens that were added to the wallet.
      */
     addCIS2Tokens(
-        accountAddress: AccountAddressLike,
+        accountAddress: AccountAddressSource,
         tokenIds: string[],
         contractAddress: ContractAddress.Type
-    ): Promise<string[]>;
-    /**
-     * Request that the user adds the specified tokens for a given contract to the wallet.
-     * Returns which of the given tokens the user accepted to add the tokens into the wallet.
-     * Note that this will throw an error if the dApp is not connected with the accountAddress.
-     * @param accountAddress the {@linkcode AccountAddressLike} of the account whose display the tokens should be added to.
-     * @param tokenIds the list of ids, for the tokens that should be added.
-     * @param contractIndex the index of the CIS-2 contract which the tokens are in.
-     * @param [contractSubindex] the subindex of the CIS-2 contract which the tokens are in.
-     * @returns a list containing the ids of the tokens that was added to the wallet.
-     */
-    addCIS2Tokens(
-        accountAddress: AccountAddressLike,
-        tokenIds: string[],
-        contractIndex: bigint,
-        contractSubindex?: bigint
     ): Promise<string[]>;
 
     /**
@@ -233,7 +217,7 @@ interface MainWalletApi {
      * @returns The id proof and the id of the credential used to prove it.
      */
     requestIdProof(
-        accountAddress: AccountAddressLike,
+        accountAddress: AccountAddressSource,
         statement: IdStatement,
         challenge: string
     ): Promise<IdProofOutput>;

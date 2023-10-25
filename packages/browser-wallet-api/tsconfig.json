@@ -8,5 +8,6 @@
         },
         "outDir": "./lib"
     },
-    "include": ["./src"]
+    "include": ["./src"],
+    "files": ["../browser-wallet-api-helpers/src/extend-window.ts"]
 }

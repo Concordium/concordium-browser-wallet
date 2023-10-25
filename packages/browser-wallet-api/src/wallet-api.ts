@@ -22,8 +22,8 @@ import {
     APIVerifiableCredential,
     MetadataUrl,
     CredentialProof,
-    AccountAddressLike,
-    SchemaLike,
+    AccountAddressSource,
+    SchemaSource,
 } from '@concordium/browser-wallet-api-helpers';
 import EventEmitter from 'events';
 import { IdProofOutput, IdStatement } from '@concordium/web-sdk/id';
@@ -59,7 +59,7 @@ class WalletApi extends EventEmitter implements IWalletApi {
      * Sends a sign request to the Concordium Wallet and awaits the users action
      */
     public async signMessage(
-        accountAddress: AccountAddressLike,
+        accountAddress: AccountAddressSource,
         message: string | SignMessageObject
     ): Promise<AccountTransactionSignature> {
         const input = sanitizeSignMessageInput(accountAddress, message);
@@ -124,11 +124,11 @@ class WalletApi extends EventEmitter implements IWalletApi {
      * Sends a transaction to the Concordium Wallet and awaits the users action
      */
     public async sendTransaction(
-        accountAddress: AccountAddressLike,
+        accountAddress: AccountAddressSource,
         type: AccountTransactionType,
         payload: AccountTransactionPayload,
         parameters?: SmartContractParameters,
-        schema?: SchemaLike,
+        schema?: SchemaSource,
         schemaVersion?: SchemaVersion
     ): Promise<string> {
         const input = sanitizeSendTransactionInput(accountAddress, type, payload, parameters, schema, schemaVersion);
@@ -188,12 +188,12 @@ class WalletApi extends EventEmitter implements IWalletApi {
     }
 
     public async addCIS2Tokens(
-        accountAddress: AccountAddressLike,
+        accountAddress: AccountAddressSource,
         tokenIds: string[],
-        dyn: ContractAddress.Type | bigint,
+        contractAddressSource: ContractAddress.Type | bigint,
         contractSubindex?: bigint
     ): Promise<string[]> {
-        const input = sanitizeAddCIS2TokensInput(accountAddress, tokenIds, dyn, contractSubindex);
+        const input = sanitizeAddCIS2TokensInput(accountAddress, tokenIds, contractAddressSource, contractSubindex);
         const response = await this.messageHandler.sendMessage<MessageStatusWrapper<string[]>>(MessageType.AddTokens, {
             ...input,
             accountAddress: AccountAddress.toBase58(input.accountAddress),
@@ -206,7 +206,7 @@ class WalletApi extends EventEmitter implements IWalletApi {
     }
 
     public async requestIdProof(
-        accountAddress: AccountAddressLike,
+        accountAddress: AccountAddressSource,
         statement: IdStatement,
         challenge: string
     ): Promise<IdProofOutput> {
