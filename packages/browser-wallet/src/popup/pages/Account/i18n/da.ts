@@ -20,8 +20,8 @@ const t: typeof en = {
         total: 'Offentligt total',
         atDisposal: 'Offentligt til rådighed',
         stakeAmount: 'Stake',
-        stakeWithBaker: 'Stake ved baker {{ bakerId }}',
-        delegationWithBaker: 'Delegation ved baker pool {{ bakerId }}',
+        stakeWithBaker: 'Stake ved validator {{ bakerId }}',
+        delegationWithBaker: 'Delegation ved staking pool {{ bakerId }}',
         passiveDelegation: 'Passiv delegation',
     },
     settings: {
@@ -95,37 +95,37 @@ const t: typeof en = {
     },
     earn: {
         title: 'Fortjenester',
-        description: 'Der are to måder at få fortjenester på Concordium: Baking and delegation.',
-        bakingHeader: 'Baking',
+        description: 'Der are to måder at få fortjenester på Concordium: Validation and delegation.',
+        bakingHeader: 'Validation',
         bakingDescription:
-            'Som en baker deltager i netværket ved at bage blocks på Concordium netværket. Dette kræver som minimum {{ minAmount }} CCD og adgang til en dedikeret node.',
+            'Som en validator deltager i netværket ved at bage blocks på Concordium netværket. Dette kræver som minimum {{ minAmount }} CCD og adgang til en dedikeret node.',
         delegateHeader: 'Delegation',
         delegateDescription:
-            'Hvis du ikke har adgang til din egen node kan du delegere dit stake til en anden baker. Det kræver ikke noget minimumsbeløb af CCD for at delegere\n\nVælg muligheden der passer dig bedst nedenfor for at lære mere.\n\nNOTE: Én konto kan ikke både være baker og delegator, men det er muligt at skifte ved at stoppe den nuværende rolle.',
+            'Hvis du ikke har adgang til din egen node kan du delegere dit stake til en anden validator. Det kræver ikke noget minimumsbeløb af CCD for at delegere\n\nVælg muligheden der passer dig bedst nedenfor for at lære mere.\n\nNOTE: Én konto kan ikke både være validator og delegator, men det er muligt at skifte ved at stoppe den nuværende rolle.',
         delegateCta: 'Opsæt delegation',
-        bakingCta: 'Opsæt baking',
+        bakingCta: 'Opsæt validation',
     },
     delegate: {
         registerIntro: {
             '1': {
                 title: 'Delegation',
-                body: 'Delegation tillader brugere af Concordium blockchain at få fortjenester uden at være baker eller køre en node.\n\nVed at indsætte CCD på din delegation saldo kan du få fortjenester.\n\nPå de næste sider, vil vi gå igennem de basale delegation koncepter. Hvis du vil lære mere, kan du besøge vores <1>dokumentation side</1>.',
+                body: 'Delegation tillader brugere af Concordium blockchain at få fortjenester uden at være validator eller køre en node.\n\nVed at indsætte CCD på din delegation saldo kan du få fortjenester.\n\nPå de næste sider, vil vi gå igennem de basale delegation koncepter. Hvis du vil lære mere, kan du besøge vores <1>dokumentation side</1>.',
             },
             '2': {
                 title: 'Delegation modeller',
-                body: 'Der er to modeller man kan være til delegation. <2><3>Delegating til en specifik pulje</3><3>Passiv delegation</3></2>En baker-pulje administreres af en individuel baker, som kører en node, så fortjenesterne afhænger af bakerens ydeevne/stabilitet.\n\nPassiv delegation går ikke til en specifik pulje, hvilket gør at det mitigerer risikoen for problemer med en baker, men fortjenesterne er lavere.\n\nFor at læse mere, besøg vores <1>dokumentation side</1>.',
+                body: 'Der er to modeller man kan være til delegation. <2><3>Delegating til en specifik pulje</3><3>Passiv delegation</3></2>En validator-pulje administreres af en individuel validator, som kører en node, så fortjenesterne afhænger af validatorens ydeevne/stabilitet.\n\nPassiv delegation går ikke til en specifik pulje, hvilket gør at det mitigerer risikoen for problemer med en validator, men fortjenesterne er lavere.\n\nFor at læse mere, besøg vores <1>dokumentation side</1>.',
             },
             '3': {
-                title: 'baker-puljer',
-                body: 'En baker-pulje administreres af en individuel baker.\n\nAt have en pulje kan give bakeren en større stake og øge deres chance for at blive valgt til at bake en block.\n\nBakerer tjener provision fra deres delegators når de baker en block.\n\nDelegering til en pulge har normalt højere fortjeneste end passiv delegation, men der er en risiko for at tabe fortjenester hvis bakeren ikke er stabil eller oplever problemer. Det er derfor en god ide at holde øje med bakerens velbefindende.\n\nDu kan læse mere om dette på vores <1>dokumentation side</1>.',
+                title: 'validator-puljer',
+                body: 'En validator-pulje administreres af en individuel validator.\n\nAt have en pulje kan give validatoren en større stake og øge deres chance for at blive valgt til at bake en block.\n\nValidatorer tjener provision fra deres delegators når de validator en block.\n\nDelegering til en pulge har normalt højere fortjeneste end passiv delegation, men der er en risiko for at tabe fortjenester hvis validatoren ikke er stabil eller oplever problemer. Det er derfor en god ide at holde øje med validatorens velbefindende.\n\nDu kan læse mere om dette på vores <1>dokumentation side</1>.',
             },
             '4': {
                 title: 'Passiv delegation',
-                body: 'For CCD indehavere som ikke ønske at holde øje med deres valgte puljes velbefindende, men bare vil have stabile fortjenester, så er passiv delegation et lav-risiko, lav-fortjeneste alternative.\n\nDenne strategi er ikke forbundet med en specfic baker, så der er ingen risiko ved en baker dårlige velbefindende.\n\nPassiv delegation tilbyder dog lavere fortjenester end hvad du ville kunne forvente hvis du valgt en bestemt pulje.',
+                body: 'For CCD indehavere som ikke ønske at holde øje med deres valgte puljes velbefindende, men bare vil have stabile fortjenester, så er passiv delegation et lav-risiko, lav-fortjeneste alternative.\n\nDenne strategi er ikke forbundet med en specfic validator, så der er ingen risiko ved en validator dårlige velbefindende.\n\nPassiv delegation tilbyder dog lavere fortjenester end hvad du ville kunne forvente hvis du valgt en bestemt pulje.',
             },
             '5': {
                 title: 'Pay days',
-                body: 'Uanset om du har valgt en bestemt baker-pulje eller passiv delegation, så bliver fortjenester betalt ud ved en pay day. Fortjenesterne er distribureret ud til alle i puljen forholdsmæssigt til deres delegation saldo, og en provision er udbetalt til bakers af alle delegators.\n\nHvis du senere ændrer dine delegationindstillinger, så vil de fleste af dem træde i kraft ved den efterfølgende pay day.\n\nFor at læse mere om en pay day, kan du besøge vores <1>dokumentation side</1>.',
+                body: 'Uanset om du har valgt en bestemt validator-pulje eller passiv delegation, så bliver fortjenester betalt ud ved en pay day. Fortjenesterne er distribureret ud til alle i puljen forholdsmæssigt til deres delegation saldo, og en provision er udbetalt til validators af alle delegators.\n\nHvis du senere ændrer dine delegationindstillinger, så vil de fleste af dem træde i kraft ved den efterfølgende pay day.\n\nFor at læse mere om en pay day, kan du besøge vores <1>dokumentation side</1>.',
             },
             '6': {
                 title: 'Lock-in og cool-downs',
@@ -164,7 +164,7 @@ const t: typeof en = {
             heading: 'Din delegation er registreret',
             target: 'Target',
             targetPassive: 'Passiv delegation',
-            targetBaker: 'Baker {{bakerId}}',
+            targetBaker: 'Validator {{bakerId}}',
             restake: 'Fortjenester vil blive ',
             optionRestake: 'Lagt til delegation saldo',
             optionNoRestake: 'Lagt til din offentligte saldo',
@@ -182,24 +182,24 @@ const t: typeof en = {
                 'Transaktionen indeholder ikke nogen ændringer i forhold til de nuværende delegationindstillinger.',
         },
         remove: {
-            notice: 'At stoppe en baker træder i kraft efter en cool-down periode på {{cooldownPeriod}} dage. I løbet af denne periode er baker stake låst og kan ikke ændres.',
+            notice: 'At stoppe en validator træder i kraft efter en cool-down periode på {{cooldownPeriod}} dage. I løbet af denne periode er validator stake låst og kan ikke ændres.',
         },
         configure: {
             pool: {
                 description1:
-                    'Du kan delegere til en vilkårlig åben baker-pulje, eller du kan delegere med Passiv delegation',
-                optionBaker: 'Baker',
+                    'Du kan delegere til en vilkårlig åben validator-pulje, eller du kan delegere med Passiv delegation',
+                optionBaker: 'Validator',
                 optionPassive: 'Passiv',
                 descriptionBaker:
-                    'Hvis du ikke allerede ved hvilke baker-pulje du vil delegere til, kan du læse mere på vores <1>dokumentation side</1>',
+                    'Hvis du ikke allerede ved hvilke validator-pulje du vil delegere til, kan du læse mere på vores <1>dokumentation side</1>',
                 descriptionPassive:
-                    'Passiv delegation er et alternativ til delegation til en specifik bager pulje, men har lavere fortjenester. Med passiv delegation behøver du ikke bekymre om dig om oppetiden eller kvaliteten af baker noden.\n\nFor mere info, kan du besøge vores <1>dokumentation side</1>',
-                bakerIdLabel: 'Baker ID',
-                bakerIdRequired: 'Du skal specificere et baker ID',
-                targetNotOpenForAll: 'Valgt baker tillader ikke nye delegators',
-                currentStakeExceedsCap: 'Din nuværende delegation saldo overtræder den valgte bakers loft',
-                chosenStakeExceedsCap: 'Den valgte delegation saldo  overtræder bakerens loft',
-                notABaker: 'Det medgivne baker ID svarer ikke til en aktiv baker',
+                    'Passiv delegation er et alternativ til delegation til en specifik bager pulje, men har lavere fortjenester. Med passiv delegation behøver du ikke bekymre om dig om oppetiden eller kvaliteten af validator noden.\n\nFor mere info, kan du besøge vores <1>dokumentation side</1>',
+                bakerIdLabel: 'Validator ID',
+                bakerIdRequired: 'Du skal specificere et validator ID',
+                targetNotOpenForAll: 'Valgt validator tillader ikke nye delegators',
+                currentStakeExceedsCap: 'Din nuværende delegation saldo overtræder den valgte validators loft',
+                chosenStakeExceedsCap: 'Den valgte delegation saldo  overtræder validatorens loft',
+                notABaker: 'Det medgivne validator ID svarer ikke til en aktiv validator',
             },
             amount: {
                 description: 'Indtast din ønskede delegation saldo',
@@ -222,59 +222,59 @@ const t: typeof en = {
     baking: {
         registerIntro: {
             '1': {
-                title: 'Opret en baker',
-                body: 'En baker er en node som deltager i netværket ved at bake (lave) nye blocks som bliver tilføjet til kæden. Hver baker har nogle kryptografiske nøgler, som refereres til som "baker keys", som noden bruger når den baker blocks. Du genererer baker keys når du tilføjer en baker-konto. Når baker noden er blevet genstartet med disse baker keys, så vil den starte med at bake, to epochs efter transaktionen er blevet godkendt.',
+                title: 'Opret en validator',
+                body: 'En validator er en node som deltager i netværket ved at bake (lave) nye blocks som bliver tilføjet til kæden. Hver validator har nogle kryptografiske nøgler, som refereres til som "validator keys", som noden bruger når den validator blocks. Du genererer validator keys når du tilføjer en validator-konto. Når validator noden er blevet genstartet med disse validator keys, så vil den starte med at bake, to epochs efter transaktionen er blevet godkendt.',
             },
             '2': {
                 title: 'Noden',
-                body: 'For at blive en baker skal du køre en node på Concordium blockchain. Det er vigtigt at have det sat op så noden kan køre døgnet rundt.\n\nDu kan køre noden selv eller bruge en tredjepartsudbyder. Sørg for at din konto i din wallet har den nødvendige mængde CCD for at blive en baker.',
+                body: 'For at blive en validator skal du køre en node på Concordium blockchain. Det er vigtigt at have det sat op så noden kan køre døgnet rundt.\n\nDu kan køre noden selv eller bruge en tredjepartsudbyder. Sørg for at din konto i din wallet har den nødvendige mængde CCD for at blive en validator.',
             },
             '3': {
-                title: 'baker-pulje',
-                body: 'Når du opretter en baker kan du vælge at åbne en baker-pulje. En baker-pulje gør det muligt for andre at får fortjenester uden at køre en node eller selv blive baker.\n\n For at gøre dette, så delegerer de CCD til din baker-pulje, som øger din totale stake og din change for at vinde lotteriet om at bake en block. Ved hver pay day bliver fortjenesterne fordelt mellem dig og dine delegators.\n\nDu kan også vælge ikke at åbne en pulje, og så vil det kun være din egen stake som tæller med til lotteriet. Du kan altid åbne eller lukke en pulje senere.',
+                title: 'validator-pulje',
+                body: 'Når du opretter en validator kan du vælge at åbne en validator-pulje. En validator-pulje gør det muligt for andre at får fortjenester uden at køre en node eller selv blive validator.\n\n For at gøre dette, så delegerer de CCD til din validator-pulje, som øger din totale stake og din change for at vinde lotteriet om at bake en block. Ved hver pay day bliver fortjenesterne fordelt mellem dig og dine delegators.\n\nDu kan også vælge ikke at åbne en pulje, og så vil det kun være din egen stake som tæller med til lotteriet. Du kan altid åbne eller lukke en pulje senere.',
             },
         },
         removeIntro: {
             '1': {
-                title: 'Stop baking',
-                body: 'Hvis du ønsker ikke at bake på en konto, kan du stoppe baking. Der er en cool-down periode, hvor din baker stake stadig vil blive brugt til baking og få fortjenester. Efter denne cool-down periode, bliver din baker stake låst op på din offentlige saldo, og kan bruges igen.\n\nHvis du pulje har delegators, vil de automatisk blive flyttet til passiv delegation.\n\nHvis du afmelder din konto som baker, så husk at dette ikke lukker din node ned. Du skal stadig lukke din node ned separat, hvis du ikke længere ønske at køre en node Concordium blockchain.',
+                title: 'Stop validation',
+                body: 'Hvis du ønsker ikke at bake på en konto, kan du stoppe validation. Der er en cool-down periode, hvor din validator stake stadig vil blive brugt til validation og få fortjenester. Efter denne cool-down periode, bliver din validator stake låst op på din offentlige saldo, og kan bruges igen.\n\nHvis du pulje har delegators, vil de automatisk blive flyttet til passiv delegation.\n\nHvis du afmelder din konto som validator, så husk at dette ikke lukker din node ned. Du skal stadig lukke din node ned separat, hvis du ikke længere ønske at køre en node Concordium blockchain.',
             },
         },
         updateIntro: {
             '2': {
-                title: 'Opdater baker stake',
-                body: 'Når du opdaterer din baker stake, kan du vælge at øge eller formindske din stake, så vil ændringen som regel tage effekt fra den næste pay day. Hvis det er for tæt på den næste pay day, så vil ændringen tage i kraft den efterfølgende pay day.\n\n Hvis du formindsker din stake så er der en cool-down periode. I denne periode vil din stake stadig blive brugt til baking og få fortjenester\n\nDu kan også ændre hvorvidt dine fortjenester til tilføjet til din stake eller ej.',
+                title: 'Opdater validator stake',
+                body: 'Når du opdaterer din validator stake, kan du vælge at øge eller formindske din stake, så vil ændringen som regel tage effekt fra den næste pay day. Hvis det er for tæt på den næste pay day, så vil ændringen tage i kraft den efterfølgende pay day.\n\n Hvis du formindsker din stake så er der en cool-down periode. I denne periode vil din stake stadig blive brugt til validation og få fortjenester\n\nDu kan også ændre hvorvidt dine fortjenester til tilføjet til din stake eller ej.',
             },
             '3': {
                 title: 'Opdater puljeindstillinger',
-                body: 'Du kan ændre de følgende indstillinger i forbindelse med baker-puljen. Hver af de individuelle indstillinger er frivillige, så du behøver ikke ændre dem alle.\n\nPuljestatus:\n  • Åben pulje: åben en pulje for en tidligere lukket baker\n  • Lukket for nye: luk en pulje for nye delegators. Nuværende delegators vil ikke blive påvirket.\n  • Luk pulje: luk en pulje for alle delegators.\n\nMetadata URL:\n  • metadata URLen kan ændres, fjernes eller forblive den samme.',
+                body: 'Du kan ændre de følgende indstillinger i forbindelse med validator-puljen. Hver af de individuelle indstillinger er frivillige, så du behøver ikke ændre dem alle.\n\nPuljestatus:\n  • Åben pulje: åben en pulje for en tidligere lukket validator\n  • Lukket for nye: luk en pulje for nye delegators. Nuværende delegators vil ikke blive påvirket.\n  • Luk pulje: luk en pulje for alle delegators.\n\nMetadata URL:\n  • metadata URLen kan ændres, fjernes eller forblive den samme.',
             },
             '4': {
                 title: 'Opdater puljeindstillinger',
-                body: 'Der er en cool-down periode hvis du vælger at lukke en pulje. I løbet af denne periode vil alle delegators blive i puljen, og får fortjenester hvis bakeren baker blocks.\n\nEfter cool-down perioden bliver alle delegators fjernet og puljen lukkes. Bagefter vil bakeren blive ved med at bake med kontoens egen stake.\n\nÆndringerne til metadata URLen tager kraft ved næste pay day medmindre det er for tæt på den næste pay day og i så fald vil ændringen tage i kraft den efterfølgende pay day.',
+                body: 'Der er en cool-down periode hvis du vælger at lukke en pulje. I løbet af denne periode vil alle delegators blive i puljen, og får fortjenester hvis validatoren validator blocks.\n\nEfter cool-down perioden bliver alle delegators fjernet og puljen lukkes. Bagefter vil validatoren blive ved med at bake med kontoens egen stake.\n\nÆndringerne til metadata URLen tager kraft ved næste pay day medmindre det er for tæt på den næste pay day og i så fald vil ændringen tage i kraft den efterfølgende pay day.',
             },
             '5': {
-                title: 'Opdater baker keys',
-                body: 'Hvis du har tabt dine baker keys eller de er blevet kompromitteret, så kan du generere og registrere et nyt sæt baker keys. Det er vigtigt at genstarte din node med de nye nøgler efter de er blevet registreret på kæden. Da ændringen tager kraft ved næste pay day, er det bedst at genstarte noden med de nye nøgler så tæt på den næste pay day som muligt, for at minimere tiden hvor din baker ikke baker.',
+                title: 'Opdater validator keys',
+                body: 'Hvis du har tabt dine validator keys eller de er blevet kompromitteret, så kan du generere og registrere et nyt sæt validator keys. Det er vigtigt at genstarte din node med de nye nøgler efter de er blevet registreret på kæden. Da ændringen tager kraft ved næste pay day, er det bedst at genstarte noden med de nye nøgler så tæt på den næste pay day som muligt, for at minimere tiden hvor din validator ikke validator.',
             },
         },
         register: {
-            title: 'Registrer baker',
+            title: 'Registrer validator',
         },
         update: {
             title: {
-                stake: 'Opdater baker stake',
+                stake: 'Opdater validator stake',
                 pool: ' Opdater puljeindstillinger',
-                keys: 'Opdater baker keys',
+                keys: 'Opdater validator keys',
             },
             noChanges: 'Transaktionen indeholder ikke nogen ændringer i forhold til de nuværende puljeindstillinger.',
         },
         remove: {
-            notice: 'At stoppe delegation træder i kraft efter en cool-down periode på {{cooldownPeriod}} dage. I løbet af denne periode er baker stake låst og kan ikke ændres.',
+            notice: 'At stoppe delegation træder i kraft efter en cool-down periode på {{cooldownPeriod}} dage. I løbet af denne periode er validator stake låst og kan ikke ændres.',
         },
         details: {
-            heading: 'Din baker er registreret.',
-            amount: 'Baker stake',
+            heading: 'Din validator er registreret.',
+            amount: 'Validator stake',
             restake: 'Fortjenester vil blive',
             update: 'Opdater',
             stop: 'Stop',
@@ -284,41 +284,41 @@ const t: typeof en = {
         configure: {
             restake: {
                 description:
-                    'Vil du gerne automatisk tilføje dine fortjenester som din baker stake?\n\nHvis du vælger ikke at indsætte dine fortjenester, vil de blive tilføjet til din offentlige saldo hver pay day.',
+                    'Vil du gerne automatisk tilføje dine fortjenester som din validator stake?\n\nHvis du vælger ikke at indsætte dine fortjenester, vil de blive tilføjet til din offentlige saldo hver pay day.',
                 optionRestake: 'Ja, indsæt',
                 optionNoRestake: 'Nej, indsæt ikke',
             },
             amount: {
-                description: 'Indtast din ønskede baker stake',
-                amountLabel: 'Baker stake',
-                amountRequired: 'Du skal specificere en baker stake',
-                locked: 'Baker stake låst',
+                description: 'Indtast din ønskede validator stake',
+                amountLabel: 'Validator stake',
+                amountRequired: 'Du skal specificere en validator stake',
+                locked: 'Validator stake låst',
                 lockedNote: 'Du kan ikke ændre saldoen mens der er en kommende ændring',
                 overStakeThresholdWarning:
-                    'Du er ved at låse mere end {{ threshold }}% af din totale saldo som din baker stake.\n\nHvis du ikke har nok ulåste CCD, vil du ikke kunne betale for transaktionsomkostninger.',
+                    'Du er ved at låse mere end {{ threshold }}% af din totale saldo som din validator stake.\n\nHvis du ikke har nok ulåste CCD, vil du ikke kunne betale for transaktionsomkostninger.',
                 decreaseWarning:
-                    'At formindske din baker stake låser hele din baker stake i en cool-down periode. Det er ikke muligt at ændre mængden i denne periode og flytningen af CCD træder ikke i kraft indtil cool-down perioden er afsluttet.',
-                enterNewStake: 'Indtast ny baker stake',
+                    'At formindske din validator stake låser hele din validator stake i en cool-down periode. Det er ikke muligt at ændre mængden i denne periode og flytningen af CCD træder ikke i kraft indtil cool-down perioden er afsluttet.',
+                enterNewStake: 'Indtast ny validator stake',
             },
             openForDelegation: {
                 description:
-                    'Du kan åbne en pulje for din baker, så andre kan delegere CCD til dig\n\nHvis du åbner en pulje, så vil andre kunne delegere CCD til din baker-pulje\n\nDu kan også vælge ikke at åbne en pulje, hvis du kun ønsker at dine egne CCD bliver brugt til din baker',
+                    'Du kan åbne en pulje for din validator, så andre kan delegere CCD til dig\n\nHvis du åbner en pulje, så vil andre kunne delegere CCD til din validator-pulje\n\nDu kan også vælge ikke at åbne en pulje, hvis du kun ønsker at dine egne CCD bliver brugt til din validator',
             },
             commission: {
                 description:
-                    'Når du åbner en baker-pulje, vil du tjene provision fra CCD som bliver delegated til din pulje fra andre konti:',
+                    'Når du åbner en validator-pulje, vil du tjene provision fra CCD som bliver delegated til din pulje fra andre konti:',
             },
             keys: {
-                save: 'Eksporter baker keys',
+                save: 'Eksporter validator keys',
                 description:
-                    'Dine nye baker keys er blevet genereret. For at kunne fortsætte skal du eksportere og gemme dem. Nøglerne skal derefter tilføjes til baker noden.\n\nBEMÆRK: Udover at eksportere nøglerne sal du færdiggøre og indsende denne transaktion for at din konto bliver registreret som en baker.',
+                    'Dine nye validator keys er blevet genereret. For at kunne fortsætte skal du eksportere og gemme dem. Nøglerne skal derefter tilføjes til validator noden.\n\nBEMÆRK: Udover at eksportere nøglerne sal du færdiggøre og indsende denne transaktion for at din konto bliver registreret som en validator.',
                 downloadedTitle: 'Bemærk',
                 downloaded:
                     'Dine nøgler er blevet downloaded som "{{ fileName}}", du kan nu fortsætte og færdiggøre transaktionen',
             },
             metadataUrl: {
                 description:
-                    'Du kan tilføje en URL med metadata om din baker. Du kan efterlade den blank, hvis du ikke vil tilføje noget.',
+                    'Du kan tilføje en URL med metadata om din validator. Du kan efterlade den blank, hvis du ikke vil tilføje noget.',
                 label: 'Indtast metadata URL',
                 maxLength: 'MetadataUrl længde må ikke være mere end {{ maxLength }}',
             },
@@ -328,10 +328,10 @@ const t: typeof en = {
     transactionMessage: {
         configureBaker: {
             registerBaker:
-                'Du er ved at indsende en transaktion som registrerer dig som en baker, hvillket som låser nogle af dine CCD som baker stake. Hvis du vil frigøre din stake, vil der være en cool-down periode.',
+                'Du er ved at indsende en transaktion som registrerer dig som en validator, hvillket som låser nogle af dine CCD som validator stake. Hvis du vil frigøre din stake, vil der være en cool-down periode.',
             lowerBakerStake:
-                'Du er ved at indsende en transaktion som formindsker din baker stake. At formindske din baker stake har en cool-down periode, hvilket betyder at ændringen ikke træder i kraft med det samme.\n\nBakeren kan ikke fjernes og din baker stake kan ikke ændres indtil cool-down perioden er overstået.',
-            removeBaker: 'Er du sikker du vil lave denne transaktion som stopper baking?',
+                'Du er ved at indsende en transaktion som formindsker din validator stake. At formindske din validator stake har en cool-down periode, hvilket betyder at ændringen ikke træder i kraft med det samme.\n\nValidatoren kan ikke fjernes og din validator stake kan ikke ændres indtil cool-down perioden er overstået.',
+            removeBaker: 'Er du sikker du vil lave denne transaktion som stopper validation?',
         },
         configureDelegation: {
             register:
@@ -343,10 +343,10 @@ const t: typeof en = {
     },
     transactionPopup: {
         configureBaker: {
-            start: 'Når din transaktion er finalized, vil baker registreringen starte fra den efterfølgende pay day.\n\nHusk at genstarte din node med de nye baker keys',
-            update: 'Når din transaktion er blevet finalized, vil baker opdateringen træde i kraft fra den efterfølgende pay day.',
+            start: 'Når din transaktion er finalized, vil validator registreringen starte fra den efterfølgende pay day.\n\nHusk at genstarte din node med de nye validator keys',
+            update: 'Når din transaktion er blevet finalized, vil validator opdateringen træde i kraft fra den efterfølgende pay day.',
             updateKeys:
-                'Når din transaktion er finalized, vil de nye baker keys blive gyldige fra den efterfølgende pay day.\n\nDu bør derfor genstarte din node med de nye baker keys så tæt på den næste pay day som muligt.',
+                'Når din transaktion er finalized, vil de nye validator keys blive gyldige fra den efterfølgende pay day.\n\nDu bør derfor genstarte din node med de nye validator keys så tæt på den næste pay day som muligt.',
         },
         configureDelegation: {
             start: 'Når din transaktion er blevet finalized, vil delegation starte fra den efterfølgende pay day.',
