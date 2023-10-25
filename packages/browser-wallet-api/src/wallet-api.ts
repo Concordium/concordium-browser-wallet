@@ -6,7 +6,6 @@ import {
 } from '@concordium/browser-wallet-message-hub';
 import {
     AccountAddress,
-    AccountTransactionPayload,
     AccountTransactionSignature,
     AccountTransactionType,
     HexString,
@@ -24,6 +23,7 @@ import {
     CredentialProof,
     AccountAddressSource,
     SchemaSource,
+    SendTransactionPayload,
 } from '@concordium/browser-wallet-api-helpers';
 import EventEmitter from 'events';
 import { IdProofOutput, IdStatement } from '@concordium/web-sdk/id';
@@ -126,7 +126,7 @@ class WalletApi extends EventEmitter implements IWalletApi {
     public async sendTransaction(
         accountAddress: AccountAddressSource,
         type: AccountTransactionType,
-        payload: AccountTransactionPayload,
+        payload: SendTransactionPayload,
         parameters?: SmartContractParameters,
         schema?: SchemaSource,
         schemaVersion?: SchemaVersion

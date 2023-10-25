@@ -14,5 +14,13 @@
         "@protobuf-ts/grpcweb-transport": "^2.8.2",
         "@protobuf-ts/runtime-rpc": "^2.8.2",
         "buffer": "^6.0.3"
+    },
+    "devDependencies": {
+        "jest": "^29.7.0",
+        "ts-jest": "^29.1.1"
+    },
+    "scripts": {
+        "test": "jest",
+        "build": "tsc"
     }
 }

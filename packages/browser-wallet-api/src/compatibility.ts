@@ -1,5 +1,4 @@
 /* eslint-disable @typescript-eslint/no-explicit-any */
-import { Buffer } from 'buffer/';
 import {
     SmartContractParameters,
     SchemaWithContext,
@@ -7,10 +6,12 @@ import {
     AccountAddressSource,
     SchemaSource,
     SignMessageObject,
+    SendTransactionPayload,
+    SendTransactionInitContractPayload,
+    SendTransactionUpdateContractPayload,
 } from '@concordium/browser-wallet-api-helpers';
 import {
     AccountAddress,
-    AccountTransactionPayload,
     AccountTransactionType,
     CcdAmount,
     ConfigureBakerPayload,
@@ -23,14 +24,15 @@ import {
     IdStatement,
     InitContractPayload,
     ModuleReference,
-    Parameter,
     ReceiveName,
+    RegisterDataPayload,
     SchemaVersion,
     SimpleTransferPayload,
-    UpdateContractPayload,
+    SimpleTransferWithMemoPayload,
+    UpdateCredentialsPayload,
 } from '@concordium/web-sdk';
 
-type GtuAmount = { microGtuAmount: bigint };
+export type GtuAmount = { microGtuAmount: bigint };
 
 /**
  * Used in versions released prior to coin being renamed to CCD.
@@ -43,7 +45,7 @@ function sanitizeAccountAddress(accountAddress: AccountAddressSource): AccountAd
     return AccountAddress.instanceOf(accountAddress) ? accountAddress : AccountAddress.fromBase58(accountAddress);
 }
 
-type SanitizedSignMessageInput = {
+export type SanitizedSignMessageInput = {
     accountAddress: AccountAddress.Type;
     message: string | SignMessageObject;
 };
@@ -58,7 +60,7 @@ export function sanitizeSignMessageInput(
     };
 }
 
-type SanitizedRequestIdProofInput = {
+export type SanitizedRequestIdProofInput = {
     accountAddress: AccountAddress.Type;
     statement: IdStatement;
     challenge: string;
@@ -76,7 +78,7 @@ export function sanitizeRequestIdProofInput(
     };
 }
 
-type SanitizedAddCIS2TokensInput = {
+export type SanitizedAddCIS2TokensInput = {
     accountAddress: AccountAddress.Type;
     tokenIds: string[];
     contractAddress: ContractAddress.Type;
@@ -85,149 +87,187 @@ type SanitizedAddCIS2TokensInput = {
 export function sanitizeAddCIS2TokensInput(
     _accountAddress: AccountAddressSource,
     tokenIds: string[],
-    dyn: ContractAddress.Type | bigint,
+    contractAddressSource: ContractAddress.Type | bigint,
     contractSubindex?: bigint
 ): SanitizedAddCIS2TokensInput {
     const accountAddress = sanitizeAccountAddress(_accountAddress);
     let contractAddress: ContractAddress.Type;
-    if (ContractAddress.instanceOf(dyn)) {
-        contractAddress = dyn;
+    if (ContractAddress.instanceOf(contractAddressSource)) {
+        contractAddress = contractAddressSource;
     } else {
-        contractAddress = ContractAddress.create(dyn, contractSubindex);
+        contractAddress = ContractAddress.create(contractAddressSource, contractSubindex);
     }
 
     return { accountAddress, tokenIds, contractAddress };
 }
 
-interface CcdAmountV0 {
+export interface CcdAmountV0 {
     readonly microCcdAmount: bigint;
 }
 
-interface ContractAddressV0 {
+export interface ContractAddressV0 {
     index: bigint;
     subindex: bigint;
 }
 
-interface AccountAddressV0 {
+export interface AccountAddressV0 {
     readonly address: HexString;
     readonly decodedAddress: Uint8Array;
 }
 
-interface ModuleReferenceV0 {
+export interface ModuleReferenceV0 {
     readonly moduleRef: HexString;
     readonly decodedModuleRef: Uint8Array;
 }
 
-interface InitContractPayloadV0 {
+export interface InitContractPayloadV0 {
+    amount: GtuAmount;
+    moduleRef: ModuleReferenceV0;
+    contractName: string;
+    maxContractExecutionEnergy: bigint;
+}
+
+export interface InitContractPayloadV1 {
     amount: CcdAmountV0;
     moduleRef: ModuleReferenceV0;
     contractName: string;
-    param?: Buffer;
     maxContractExecutionEnergy: bigint;
 }
 
-interface InitContractPayloadV1 {
+export interface InitContractPayloadV2 {
     amount: CcdAmountV0;
     moduleRef: ModuleReferenceV0;
     initName: string;
-    param?: Buffer;
     maxContractExecutionEnergy: bigint;
 }
 
-type InitContractPayloadCompat = InitContractPayloadV0 | InitContractPayloadV1 | InitContractPayload;
+export type InitContractPayloadCompat =
+    | InitContractPayloadV0
+    | InitContractPayloadV1
+    | InitContractPayloadV2
+    | SendTransactionInitContractPayload;
 
-interface UpdateContractPayloadV0 {
+export interface UpdateContractPayloadV0 {
+    amount: GtuAmount;
+    contractAddress: ContractAddressV0;
+    receiveName: string;
+    maxContractExecutionEnergy: bigint;
+}
+
+export interface UpdateContractPayloadV1 {
     amount: CcdAmountV0;
     contractAddress: ContractAddressV0;
     receiveName: string;
-    message?: Buffer;
     maxContractExecutionEnergy: bigint;
 }
 
-interface UpdateContractPayloadV1 {
+export interface UpdateContractPayloadV2 {
     amount: CcdAmountV0;
     address: ContractAddressV0;
     receiveName: string;
-    message?: Buffer;
     maxContractExecutionEnergy: bigint;
 }
 
-type UpdateContractPayloadCompat = UpdateContractPayloadV0 | UpdateContractPayloadV1 | UpdateContractPayload;
+export type UpdateContractPayloadCompat =
+    | UpdateContractPayloadV0
+    | UpdateContractPayloadV1
+    | UpdateContractPayloadV2
+    | SendTransactionUpdateContractPayload;
 
-interface DeployModulePayloadV0 {
+export interface DeployModulePayloadV0 {
     version?: number;
     content: Uint8Array;
 }
 
-type DeployModulePayloadCompat = DeployModulePayloadV0 | DeployModulePayload;
+export type DeployModulePayloadCompat = DeployModulePayloadV0 | DeployModulePayload;
 
-interface SimpleTransferPayloadV0 {
+type WithMemo<T> = T & Pick<SimpleTransferWithMemoPayload, 'memo'>;
+
+export interface SimpleTransferPayloadV0 {
+    amount: GtuAmount;
+    toAddress: AccountAddressV0;
+}
+export type SimpleTransferWithMemoPayloadV0 = WithMemo<SimpleTransferPayloadV0>;
+
+export interface SimpleTransferPayloadV1 {
     amount: CcdAmountV0;
     toAddress: AccountAddressV0;
 }
+export type SimpleTransferWithMemoPayloadV1 = WithMemo<SimpleTransferPayloadV1>;
 
-type SimpleTransferPayloadCompat = SimpleTransferPayloadV0 | SimpleTransferPayload;
+export type SimpleTransferPayloadCompat = SimpleTransferPayloadV0 | SimpleTransferPayloadV1 | SimpleTransferPayload;
+export type SimpleTransferWithMemoPayloadCompat =
+    | SimpleTransferWithMemoPayloadV0
+    | SimpleTransferWithMemoPayloadV1
+    | SimpleTransferWithMemoPayload;
 
-interface ConfigureBakerPayloadV0 extends Omit<ConfigureBakerPayload, 'stake'> {
+export interface ConfigureBakerPayloadV0 extends Omit<ConfigureBakerPayload, 'stake'> {
     stake?: CcdAmountV0;
 }
 
-type ConfigureBakerPayloadCompat = ConfigureBakerPayloadV0 | ConfigureBakerPayload;
+export type ConfigureBakerPayloadCompat = ConfigureBakerPayloadV0 | ConfigureBakerPayload;
 
-interface ConfigureDelegationPayloadV0 extends Omit<ConfigureDelegationPayload, 'stake'> {
+export interface ConfigureDelegationPayloadV0 extends Omit<ConfigureDelegationPayload, 'stake'> {
     stake?: CcdAmountV0;
 }
 
-type ConfigureDelegationPayloadCompat = ConfigureDelegationPayloadV0 | ConfigureDelegationPayload;
+export type ConfigureDelegationPayloadCompat = ConfigureDelegationPayloadV0 | ConfigureDelegationPayload;
 
-type SanitizedSendTransactionInput = {
-    accountAddress: AccountAddress.Type;
-    type: AccountTransactionType;
-    payload: AccountTransactionPayload;
-    parameters?: SmartContractParameters;
-    schema?: SchemaWithContext;
-    schemaVersion?: SchemaVersion;
-};
+export type RegisterDataPayloadCompat = RegisterDataPayload;
+export type UpdateCredentialsPayloadCompat = UpdateCredentialsPayload;
 
-function sanitizePayload(type: AccountTransactionType, payload: AccountTransactionPayload): AccountTransactionPayload {
+export type SendTransactionPayloadCompat =
+    | InitContractPayloadCompat
+    | UpdateContractPayloadCompat
+    | DeployModulePayloadCompat
+    | SimpleTransferPayloadCompat
+    | ConfigureBakerPayloadCompat
+    | ConfigureDelegationPayloadCompat
+    | RegisterDataPayloadCompat
+    | UpdateCredentialsPayloadCompat;
+
+function sanitizePayload(type: AccountTransactionType, payload: SendTransactionPayloadCompat): SendTransactionPayload {
     switch (type) {
         case AccountTransactionType.InitContract: {
             const p = payload as InitContractPayloadCompat;
 
-            const amount = CcdAmount.fromMicroCcd(p.amount.microCcdAmount);
+            const amount = CcdAmount.fromMicroCcd(
+                isGtuAmount(p.amount) ? p.amount.microGtuAmount : p.amount.microCcdAmount
+            );
             const moduleRef = ModuleReference.fromHexString(p.moduleRef.moduleRef);
-            const initName =
-                typeof (p as InitContractPayload).initName !== 'string'
-                    ? (p as InitContractPayload).initName
-                    : ContractName.fromString(
-                          (p as InitContractPayloadV0).contractName ?? (p as InitContractPayloadV1).initName
-                      );
+
+            let initName: ContractName.Type;
+            if (typeof (p as InitContractPayloadV0 | InitContractPayloadV1).contractName === 'string') {
+                initName = ContractName.fromString((p as InitContractPayloadV0).contractName);
+            } else if (typeof (p as InitContractPayloadV2).initName === 'string') {
+                initName = ContractName.fromString((p as InitContractPayloadV2).initName);
+            } else if (
+                typeof (p as InitContractPayload).initName === 'object' &&
+                (p as InitContractPayload).initName !== null
+            ) {
+                initName = (p as InitContractPayload).initName;
+            } else {
+                throw new Error(`Unexpected payload for type ${type}: ${p}`);
+            }
+
             const maxContractExecutionEnergy =
                 typeof p.maxContractExecutionEnergy !== 'bigint'
                     ? p.maxContractExecutionEnergy
                     : Energy.create(p.maxContractExecutionEnergy);
 
-            let param: Parameter.Type | undefined;
-            if (p.param === undefined) {
-                param = undefined;
-            } else if (p.param instanceof Uint8Array) {
-                param = Parameter.fromBuffer(p.param);
-            } else {
-                param = p.param;
-            }
-
             return {
                 amount,
                 moduleRef,
-                param,
                 initName,
                 maxContractExecutionEnergy,
-            } as InitContractPayload;
+            } as SendTransactionInitContractPayload;
         }
         case AccountTransactionType.Update: {
             const p = payload as UpdateContractPayloadCompat;
 
-            const amount = CcdAmount.fromMicroCcd(p.amount.microCcdAmount);
+            const amount = CcdAmount.fromMicroCcd(
+                isGtuAmount(p.amount) ? p.amount.microGtuAmount : p.amount.microCcdAmount
+            );
             const maxContractExecutionEnergy =
                 typeof p.maxContractExecutionEnergy !== 'bigint'
                     ? p.maxContractExecutionEnergy
@@ -236,26 +276,16 @@ function sanitizePayload(type: AccountTransactionType, payload: AccountTransacti
                 typeof p.receiveName === 'string' ? ReceiveName.fromString(p.receiveName) : p.receiveName;
 
             const { index, subindex } =
-                (p as UpdateContractPayloadV1 | UpdateContractPayload).address ??
+                (p as Exclude<SendTransactionUpdateContractPayload, UpdateContractPayloadV0>).address ??
                 (p as UpdateContractPayloadV0).contractAddress;
             const address = ContractAddress.create(index, subindex);
-
-            let message: Parameter.Type | undefined;
-            if (p.message === undefined) {
-                message = undefined;
-            } else if (p.message instanceof Uint8Array) {
-                message = Parameter.fromBuffer(p.message);
-            } else {
-                message = p.message;
-            }
 
             return {
                 amount,
                 address,
-                message,
                 receiveName,
                 maxContractExecutionEnergy,
-            } as UpdateContractPayload;
+            } as SendTransactionUpdateContractPayload;
         }
         case AccountTransactionType.DeployModule: {
             const p = payload as DeployModulePayloadCompat;
@@ -268,47 +298,71 @@ function sanitizePayload(type: AccountTransactionType, payload: AccountTransacti
         }
         case AccountTransactionType.Transfer:
         case AccountTransactionType.TransferWithMemo: {
-            const p = payload as SimpleTransferPayloadCompat;
+            // The "memo" part of transfers have not changes, so these are treated the same.
+            const p = payload as SimpleTransferPayloadCompat | SimpleTransferWithMemoPayloadCompat;
 
-            const amount = CcdAmount.fromMicroCcd(p.amount.microCcdAmount);
+            const amount = CcdAmount.fromMicroCcd(
+                isGtuAmount(p.amount) ? p.amount.microGtuAmount : p.amount.microCcdAmount
+            );
             const toAddress = AccountAddress.fromBuffer(p.toAddress.decodedAddress);
 
-            return { ...p, amount, toAddress };
+            return { ...p, amount, toAddress } as SimpleTransferPayload | SimpleTransferWithMemoPayload;
         }
         case AccountTransactionType.ConfigureBaker:
         case AccountTransactionType.ConfigureDelegation: {
             const p = payload as ConfigureBakerPayloadCompat | ConfigureDelegationPayloadCompat;
             const stake = p.stake !== undefined ? CcdAmount.fromMicroCcd(p.stake.microCcdAmount) : undefined;
-            return { ...p, stake };
+            return { ...p, stake } as ConfigureBakerPayload | ConfigureDelegationPayload;
         }
+        case AccountTransactionType.RegisterData:
+        case AccountTransactionType.UpdateCredentials:
+            // No changes across any API versions.
+            return payload as RegisterDataPayload | UpdateCredentialsPayload;
         default:
-            return payload;
+            // This should never happen, but is here for backwards compatibility.
+            return payload as SendTransactionPayload;
     }
 }
+
+export type SanitizedSendTransactionInput = {
+    accountAddress: AccountAddress.Type;
+    type: AccountTransactionType;
+    payload: SendTransactionPayload;
+    parameters?: SmartContractParameters;
+    schema?: SchemaWithContext;
+    schemaVersion?: SchemaVersion;
+};
 
 /**
  * Compatibility layer for `WalletApi.sendTransaction`
  */
 export function sanitizeSendTransactionInput(
-    _accountAddress: AccountAddressSource,
+    accountAddress: AccountAddressSource,
     type: AccountTransactionType,
-    _payload: AccountTransactionPayload,
+    payload: SendTransactionPayloadCompat,
     parameters?: SmartContractParameters,
-    _schema?: SchemaSource,
+    schema?: SchemaSource,
     schemaVersion?: SchemaVersion
 ): SanitizedSendTransactionInput {
-    const accountAddress = sanitizeAccountAddress(_accountAddress);
-    const payload = sanitizePayload(type, _payload);
+    const sanitizedAccountAddress = sanitizeAccountAddress(accountAddress);
+    const sanitizedPayload = sanitizePayload(type, payload);
 
-    let schema: SchemaWithContext | undefined;
-    if (typeof _schema === 'string' || _schema instanceof String) {
-        schema = {
+    let sanitizedSchema: SchemaWithContext | undefined;
+    if (typeof schema === 'string' || schema instanceof String) {
+        sanitizedSchema = {
             type: SchemaType.Module,
-            value: _schema.toString(),
+            value: schema.toString(),
         };
     } else {
-        schema = _schema;
+        sanitizedSchema = schema;
     }
 
-    return { accountAddress, type, payload, parameters, schema, schemaVersion };
+    return {
+        accountAddress: sanitizedAccountAddress,
+        type,
+        payload: sanitizedPayload,
+        parameters,
+        schema: sanitizedSchema,
+        schemaVersion,
+    };
 }

@@ -15,6 +15,13 @@ import type {
     Base58String,
     Base64String,
     ContractAddress,
+    UpdateCredentialsPayload,
+    RegisterDataPayload,
+    SimpleTransferPayload,
+    SimpleTransferWithMemoPayload,
+    DeployModulePayload,
+    ConfigureBakerPayload,
+    ConfigureDelegationPayload,
 } from '@concordium/web-sdk';
 import type { RpcTransport } from '@protobuf-ts/runtime-rpc';
 import { LaxNumberEnumValue, LaxStringEnumValue } from './util';
@@ -51,10 +58,13 @@ export interface CredentialProof {
     verificationMethod: string;
 }
 
+export type SendTransactionUpdateContractPayload = Omit<UpdateContractPayload, 'message'>;
+export type SendTransactionInitContractPayload = Omit<InitContractPayload, 'param'>;
+
 export type SendTransactionPayload =
     | Exclude<AccountTransactionPayload, UpdateContractPayload | InitContractPayload>
-    | Omit<UpdateContractPayload, 'message'>
-    | Omit<InitContractPayload, 'param'>;
+    | SendTransactionUpdateContractPayload
+    | SendTransactionInitContractPayload;
 
 export type SmartContractParameters =
     | { [key: string]: SmartContractParameters }
@@ -114,16 +124,34 @@ interface MainWalletApi {
      * @param accountAddress the address of the account that should sign the transaction
      * @param type the type of transaction that is to be signed and sent.
      * @param payload the payload of the transaction to be signed and sent. Note that for smart contract transactions, the payload should not contain the params/message fields, those should instead be provided in the subsequent argument instead.
-     * @param parameters parameters for the initContract and updateContract transactions in JSON-like format.
-     * @param schema schema used for the initContract and updateContract transactions to serialize the parameters. Should be base64 encoded.
+     * @param [parameters] parameters for the initContract and updateContract transactions in JSON-like format.
+     * @param [schema] schema used for the initContract and updateContract transactions to serialize the parameters. Should be base64 encoded.
      * @param [schemaVersion] version of the schema provided. Must be supplied for schemas that use version 0 or 1, as they don't have the version embedded.
      */
     sendTransaction(
         accountAddress: AccountAddressSource,
-        type: LaxNumberEnumValue<AccountTransactionType.Update | AccountTransactionType.InitContract>,
-        payload: SendTransactionPayload,
-        parameters: SmartContractParameters,
-        schema: SchemaSource,
+        type: LaxNumberEnumValue<AccountTransactionType.InitContract>,
+        payload: SendTransactionInitContractPayload,
+        parameters?: SmartContractParameters,
+        schema?: SchemaSource,
+        schemaVersion?: SchemaVersion
+    ): Promise<string>;
+    /**
+     * Sends a transaction to the Concordium Wallet and awaits the users action. Note that a header is not sent, and will be constructed by the wallet itself.
+     * Note that if the user rejects signing the transaction, this will throw an error.
+     * @param accountAddress the address of the account that should sign the transaction
+     * @param type the type of transaction that is to be signed and sent.
+     * @param payload the payload of the transaction to be signed and sent. Note that for smart contract transactions, the payload should not contain the params/message fields, those should instead be provided in the subsequent argument instead.
+     * @param [parameters] parameters for the initContract and updateContract transactions in JSON-like format.
+     * @param [schema] schema used for the initContract and updateContract transactions to serialize the parameters. Should be base64 encoded.
+     * @param [schemaVersion] version of the schema provided. Must be supplied for schemas that use version 0 or 1, as they don't have the version embedded.
+     */
+    sendTransaction(
+        accountAddress: AccountAddressSource,
+        type: LaxNumberEnumValue<AccountTransactionType.Update>,
+        payload: SendTransactionUpdateContractPayload,
+        parameters?: SmartContractParameters,
+        schema?: SchemaSource,
         schemaVersion?: SchemaVersion
     ): Promise<string>;
     /**
@@ -135,8 +163,80 @@ interface MainWalletApi {
      */
     sendTransaction(
         accountAddress: AccountAddressSource,
-        type: LaxNumberEnumValue<AccountTransactionType>,
-        payload: SendTransactionPayload
+        type: LaxNumberEnumValue<AccountTransactionType.UpdateCredentials>,
+        payload: UpdateCredentialsPayload
+    ): Promise<string>;
+    /**
+     * Sends a transaction to the Concordium Wallet and awaits the users action. Note that a header is not sent, and will be constructed by the wallet itself.
+     * Note that if the user rejects signing the transaction, this will throw an error.
+     * @param accountAddress the address of the account that should sign the transaction
+     * @param type the type of transaction that is to be signed and sent.
+     * @param payload the payload of the transaction to be signed and sent. Note that for smart contract transactions, the payload should not contain the parameters, those should instead be provided in the subsequent argument instead.
+     */
+    sendTransaction(
+        accountAddress: AccountAddressSource,
+        type: LaxNumberEnumValue<AccountTransactionType.RegisterData>,
+        payload: RegisterDataPayload
+    ): Promise<string>;
+    /**
+     * Sends a transaction to the Concordium Wallet and awaits the users action. Note that a header is not sent, and will be constructed by the wallet itself.
+     * Note that if the user rejects signing the transaction, this will throw an error.
+     * @param accountAddress the address of the account that should sign the transaction
+     * @param type the type of transaction that is to be signed and sent.
+     * @param payload the payload of the transaction to be signed and sent. Note that for smart contract transactions, the payload should not contain the parameters, those should instead be provided in the subsequent argument instead.
+     */
+    sendTransaction(
+        accountAddress: AccountAddressSource,
+        type: LaxNumberEnumValue<AccountTransactionType.Transfer>,
+        payload: SimpleTransferPayload
+    ): Promise<string>;
+    /**
+     * Sends a transaction to the Concordium Wallet and awaits the users action. Note that a header is not sent, and will be constructed by the wallet itself.
+     * Note that if the user rejects signing the transaction, this will throw an error.
+     * @param accountAddress the address of the account that should sign the transaction
+     * @param type the type of transaction that is to be signed and sent.
+     * @param payload the payload of the transaction to be signed and sent. Note that for smart contract transactions, the payload should not contain the parameters, those should instead be provided in the subsequent argument instead.
+     */
+    sendTransaction(
+        accountAddress: AccountAddressSource,
+        type: LaxNumberEnumValue<AccountTransactionType.TransferWithMemo>,
+        payload: SimpleTransferWithMemoPayload
+    ): Promise<string>;
+    /**
+     * Sends a transaction to the Concordium Wallet and awaits the users action. Note that a header is not sent, and will be constructed by the wallet itself.
+     * Note that if the user rejects signing the transaction, this will throw an error.
+     * @param accountAddress the address of the account that should sign the transaction
+     * @param type the type of transaction that is to be signed and sent.
+     * @param payload the payload of the transaction to be signed and sent. Note that for smart contract transactions, the payload should not contain the parameters, those should instead be provided in the subsequent argument instead.
+     */
+    sendTransaction(
+        accountAddress: AccountAddressSource,
+        type: LaxNumberEnumValue<AccountTransactionType.DeployModule>,
+        payload: DeployModulePayload
+    ): Promise<string>;
+    /**
+     * Sends a transaction to the Concordium Wallet and awaits the users action. Note that a header is not sent, and will be constructed by the wallet itself.
+     * Note that if the user rejects signing the transaction, this will throw an error.
+     * @param accountAddress the address of the account that should sign the transaction
+     * @param type the type of transaction that is to be signed and sent.
+     * @param payload the payload of the transaction to be signed and sent. Note that for smart contract transactions, the payload should not contain the parameters, those should instead be provided in the subsequent argument instead.
+     */
+    sendTransaction(
+        accountAddress: AccountAddressSource,
+        type: LaxNumberEnumValue<AccountTransactionType.ConfigureBaker>,
+        payload: ConfigureBakerPayload
+    ): Promise<string>;
+    /**
+     * Sends a transaction to the Concordium Wallet and awaits the users action. Note that a header is not sent, and will be constructed by the wallet itself.
+     * Note that if the user rejects signing the transaction, this will throw an error.
+     * @param accountAddress the address of the account that should sign the transaction
+     * @param type the type of transaction that is to be signed and sent.
+     * @param payload the payload of the transaction to be signed and sent. Note that for smart contract transactions, the payload should not contain the parameters, those should instead be provided in the subsequent argument instead.
+     */
+    sendTransaction(
+        accountAddress: AccountAddressSource,
+        type: LaxNumberEnumValue<AccountTransactionType.ConfigureDelegation>,
+        payload: ConfigureDelegationPayload
     ): Promise<string>;
     /**
      * Sends a message to the Concordium Wallet and awaits the users action. If the user signs the message, this will resolve to the signature.

@@ -55,7 +55,7 @@ export const smash = (account: string, index: bigint, subindex = 0n) => {
                     address: ContractAddress.create(index, subindex),
                     receiveName: ReceiveName.fromString(`${CONTRACT_NAME}.smash`),
                     maxContractExecutionEnergy: Energy.create(30000),
-                } as UpdateContractPayload)
+                })
                 .then((txHash) =>
                     console.log(`https://testnet.ccdscan.io/?dcount=1&dentity=transaction&dhash=${txHash}`)
                 )
