@@ -7,6 +7,8 @@ import {
     OpenStatusText,
     BakerKeysWithProofs,
     AccountInfoType,
+    AccountInfoBaker,
+    AccountBakerDetailsV1,
 } from '@concordium/web-sdk';
 import { decimalToRewardFraction, fractionToPercentage } from '@popup/shared/utils/baking-helpers';
 import { getConfigureBakerEnergyCost } from '@shared/utils/energy-helpers';
@@ -167,3 +169,10 @@ export function getCost(accountInfo: AccountInfo, formValues: Partial<ConfigureB
 
     return getConfigureBakerEnergyCost(toPayload(getConfigureBakerChanges(formValuesFull, accountInfo)));
 }
+
+export interface AccountInfoBakerV1 extends AccountInfoBaker {
+    accountBaker: AccountBakerDetailsV1;
+}
+
+export const isBakerAccountV1 = (accountInfo: AccountInfo): accountInfo is AccountInfoBakerV1 =>
+    accountInfo.type === AccountInfoType.Baker && accountInfo.accountBaker.version === 1;

@@ -3,9 +3,6 @@ import React, { useContext, useEffect, useMemo } from 'react';
 import { Link, Route, Routes, useNavigate } from 'react-router-dom';
 import {
     AccountBakerDetailsV1,
-    AccountInfo,
-    AccountInfoBaker,
-    AccountInfoType,
     AccountTransactionType,
     ConsensusStatus,
     StakePendingChange,
@@ -34,6 +31,7 @@ import RegisterBaking from './RegisterBaking';
 import RemoveBaking from './RemoveBaking';
 import UpdateBaking from './UpdateBaking';
 import { earnPageContext } from '../utils';
+import { isBakerAccountV1 } from './utils';
 
 const routes = {
     register: 'register',
@@ -106,9 +104,6 @@ function DisplayPendingChange({ pendingChange }: DisplayPendingChangeProps) {
         </>
     );
 }
-
-const isBakerAccountV1 = (accountInfo: AccountInfo): accountInfo is AccountInfoBaker =>
-    accountInfo.type === AccountInfoType.Baker && accountInfo.accountBaker.version === 1;
 
 type BakingDetailsProps = {
     bakerDetails: AccountBakerDetailsV1;
@@ -187,7 +182,7 @@ function BakingStatus() {
         }
     }, []);
 
-    if (isBakerAccountV1(accountInfo) && accountInfo.accountBaker.version === 1) {
+    if (isBakerAccountV1(accountInfo)) {
         return <BakingDetails bakerDetails={accountInfo.accountBaker} />;
     }
     if (hasUpdate && transaction) {
