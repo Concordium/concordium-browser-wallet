@@ -281,17 +281,16 @@ provider.on('accountDisconnected', (accountAddress) => {
 provider.connect().then((accountAddress) => (selectedAccountAddress = accountAddress));
 ```
 
-## Accessing node through JSON-RPC
+## Accessing the node through GRPC
 
-The wallet API exposes access to a JSON-RPC client. This allows a dApp to communicate with the same node as the wallet is connected to, and enables dApps to access the JSON-RPC interface without being connected to a separate server itself. The client is accessed as shown in the example below.
-The dApp does not need to recreate the client again when the wallet changes node or network, the client will always use the wallet's current connected JSON-RPC server.
-
-If you have not connected with the wallet (or previously been allowlisted), the commands will not be executed and the method will throw an error.
+The wallet API exposes a browser-wallet specific GRPC transport layer, which communicates with the concordium blockchain selected in the wallet. This can be used to construct a GRPC client, by installing the peer dependency `@concordium/web-sdk`.
 
 ```typescript
+import { ConcordiumGRPCClient } from '@concordium/web-sdk/grpc';
 const provider = await detectConcordiumProvider();
-const client: JsonRpcClient = await provider.getJsonRpcClient();
+const client = new ConcordiumGRPCClient(provider.grpcTransport);
+
 ...
-// The client can then be used to acccess node through JSON-RPC
+// The client can then be used to acccess the GRPC v2 API of the node used in the wallet.
 const accountInfo = await client.getAccountInfo(accountAddress);
 ```

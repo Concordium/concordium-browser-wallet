@@ -2161,7 +2161,18 @@ __metadata:
   languageName: node
   linkType: hard
 
-"@concordium/browser-wallet-api-helpers@3.0.0-rc.1, @concordium/browser-wallet-api-helpers@workspace:^, @concordium/browser-wallet-api-helpers@workspace:packages/browser-wallet-api-helpers":
+"@concordium/browser-wallet-api-helpers@npm:3.0.0-rc.1, @concordium/browser-wallet-api-helpers@npm:beta":
+  version: 3.0.0-rc.1
+  resolution: "@concordium/browser-wallet-api-helpers@npm:3.0.0-rc.1"
+  dependencies:
+    "@protobuf-ts/runtime-rpc": ^2.9.1
+  peerDependencies:
+    "@concordium/web-sdk": 7.0.0-rc.4
+  checksum: ddf28e049ddf562845f611a3a8cbe770433e8d139b4859ce6162a727d9c4108ef477c5365c8836519f912888b8f293a7f3c8edb3b35860290ee434954e2f63c1
+  languageName: node
+  linkType: hard
+
+"@concordium/browser-wallet-api-helpers@workspace:^, @concordium/browser-wallet-api-helpers@workspace:packages/browser-wallet-api-helpers":
   version: 0.0.0-use.local
   resolution: "@concordium/browser-wallet-api-helpers@workspace:packages/browser-wallet-api-helpers"
   dependencies:
@@ -2177,17 +2188,6 @@ __metadata:
     "@concordium/web-sdk": ^7.0
   languageName: unknown
   linkType: soft
-
-"@concordium/browser-wallet-api-helpers@npm:beta":
-  version: 3.0.0-rc.1
-  resolution: "@concordium/browser-wallet-api-helpers@npm:3.0.0-rc.1"
-  dependencies:
-    "@protobuf-ts/runtime-rpc": ^2.9.1
-  peerDependencies:
-    "@concordium/web-sdk": 7.0.0-rc.4
-  checksum: ddf28e049ddf562845f611a3a8cbe770433e8d139b4859ce6162a727d9c4108ef477c5365c8836519f912888b8f293a7f3c8edb3b35860290ee434954e2f63c1
-  languageName: node
-  linkType: hard
 
 "@concordium/browser-wallet-api@workspace:^, @concordium/browser-wallet-api@workspace:packages/browser-wallet-api":
   version: 0.0.0-use.local
