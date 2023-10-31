@@ -8,11 +8,15 @@
 
 ### Added
 
--   Add `grpcTransport` to the wallet-api.
+-   `grpcTransport` to the wallet-api.
 
 ### Removed
 
 -   `getJsonRpcClient` from the wallet-api.
+
+### Deprecated
+
+-   `getGrpcClient` in favor of the new `grpcTransport`. (and has been removed from the types in api-helpers)
 
 ## 1.1.9
 
