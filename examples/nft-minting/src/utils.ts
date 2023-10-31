@@ -6,9 +6,16 @@ import { detectConcordiumProvider } from '@concordium/browser-wallet-api-helpers
 import {
     AccountTransactionType,
     CcdAmount,
+    ContractAddress,
+    ContractName,
+    Energy,
     ModuleReference,
-    TransactionStatusEnum,
+    ReceiveName,
     UpdateContractPayload,
+    ConcordiumGRPCClient,
+    TransactionHash,
+    TransactionSummaryType,
+    TransactionKindString,
 } from '@concordium/web-sdk';
 import { RAW_SCHEMA } from './constant';
 
@@ -17,123 +24,75 @@ export const CONTRACT_NAME = 'PiggyBank';
 /**
  * Action for initializing a smart contract for keeping a collections of tokens.
  */
-export const createCollection = (address: string) => {
-    return new Promise<bigint>((resolve, reject) => {
-        detectConcordiumProvider()
-            .then((provider) => {
-                provider
-                    .sendTransaction(address, AccountTransactionType.InitContract, {
-                        amount: new CcdAmount(0n),
-                        moduleRef: new ModuleReference(
-                            '69d48cea644389f65be2cd807df746abc8b97d888dc98ae531030c2a3bffeee0'
-                        ),
-                        initName: 'CIS2-NFT',
-                        maxContractExecutionEnergy: 30000n,
-                    })
-                    .then((txHash) =>
-                        setTimeout(function listen() {
-                            provider
-                                .getJsonRpcClient()
-                                .getTransactionStatus(txHash)
-                                .then((status) => {
-                                    if (
-                                        status &&
-                                        status.status === TransactionStatusEnum.Finalized &&
-                                        status.outcomes
-                                    ) {
-                                        const outcome = Object.values(status.outcomes)[0];
-                                        if (outcome.result.outcome === 'success') {
-                                            resolve((outcome.result.events[0] as any).address.index);
-                                        } else {
-                                            reject(new Error('failed'));
-                                        }
-                                        // return Index
-                                    } else {
-                                        setTimeout(listen, 3000);
-                                    }
-                                });
-                        }, 3000)
-                    )
-                    .catch((e) => alert(e.message));
-            })
-            .catch(() => {
-                throw new Error('Concordium Wallet API not accessible');
-            });
+export const createCollection = async (address: string): Promise<bigint> => {
+    const provider = await detectConcordiumProvider();
+    const txHash = await provider.sendTransaction(address, AccountTransactionType.InitContract, {
+        amount: CcdAmount.fromMicroCcd(0),
+        moduleRef: ModuleReference.fromHexString('69d48cea644389f65be2cd807df746abc8b97d888dc98ae531030c2a3bffeee0'),
+        initName: ContractName.fromString('CIS2-NFT'),
+        maxContractExecutionEnergy: Energy.create(30000),
     });
+
+    const grpc = new ConcordiumGRPCClient(provider.grpcTransport);
+    const status = await grpc.waitForTransactionFinalization(TransactionHash.fromHexString(txHash));
+
+    if (
+        status.summary.type === TransactionSummaryType.AccountTransaction &&
+        status.summary.transactionType === TransactionKindString.InitContract
+    ) {
+        return status.summary.contractInitialized.address.index;
+    }
+
+    throw new Error('failed');
 };
 
 /**
  * Action for minting NFT's in a collection. This is only possible to do, if the account sending the transaction is the owner of the collection:
  */
-export const mint = (account: string, id: string, url: string, index: bigint, subindex = 0n) => {
-    return new Promise((resolve, reject) => {
-        detectConcordiumProvider()
-            .then((provider) => {
-                provider
-                    .sendTransaction(
-                        account,
-                        AccountTransactionType.Update,
-                        {
-                            amount: new CcdAmount(0n),
-                            address: {
-                                index,
-                                subindex,
-                            },
-                            receiveName: `CIS2-NFT.mint`,
-                            maxContractExecutionEnergy: 30000n,
-                        } as UpdateContractPayload,
-                        {
-                            owner: { Account: [account] },
-                            token_id: id,
-                            metadata: { url, hash: { None: [] } },
-                        },
-                        RAW_SCHEMA
-                    )
-                    .then((txHash) =>
-                        setTimeout(function listen() {
-                            provider
-                                .getJsonRpcClient()
-                                .getTransactionStatus(txHash)
-                                .then((status) => {
-                                    if (
-                                        status &&
-                                        status.status === TransactionStatusEnum.Finalized &&
-                                        status.outcomes
-                                    ) {
-                                        const outcome = Object.values(status.outcomes)[0];
-                                        if (outcome.result.outcome === 'success') {
-                                            resolve(txHash);
-                                        } else {
-                                            reject(new Error('failed'));
-                                        }
-                                        // return Index
-                                    } else {
-                                        setTimeout(listen, 3000);
-                                    }
-                                });
-                        }, 3000)
-                    );
-            })
-            .catch(() => {
-                throw new Error('Concordium Wallet API not accessible');
-            });
-    });
+export const mint = async (account: string, id: string, url: string, index: bigint, subindex = 0n): Promise<string> => {
+    const provider = await detectConcordiumProvider();
+    const txHash = await provider.sendTransaction(
+        account,
+        AccountTransactionType.Update,
+        {
+            amount: CcdAmount.fromMicroCcd(0n),
+            address: ContractAddress.create(index, subindex),
+            receiveName: ReceiveName.fromString(`CIS2-NFT.mint`),
+            maxContractExecutionEnergy: Energy.create(30000),
+        } as UpdateContractPayload,
+        {
+            owner: { Account: [account] },
+            token_id: id,
+            metadata: { url, hash: { None: [] } },
+        },
+        RAW_SCHEMA
+    );
+
+    const grpc = new ConcordiumGRPCClient(provider.grpcTransport);
+    const status = await grpc.waitForTransactionFinalization(TransactionHash.fromHexString(txHash));
+
+    if (
+        status.summary.type === TransactionSummaryType.AccountTransaction &&
+        status.summary.transactionType === TransactionKindString.Update
+    ) {
+        return txHash;
+    }
+
+    throw new Error('failed');
 };
 
-export const isOwner = (account: string, index: bigint, subindex = 0n) => {
-    return new Promise<boolean>((resolve) => {
-        detectConcordiumProvider().then((provider) => {
-            provider
-                .getJsonRpcClient()
-                .getInstanceInfo({ index, subindex })
-                .then((info) => {
-                    if (info) {
-                        resolve(info.owner.address === account);
-                    }
-                })
-                .catch((e) => alert(e.message));
-        });
-    });
+export const isOwner = async (account: string, index: bigint, subindex = 0n): Promise<boolean> => {
+    const provider = await detectConcordiumProvider();
+    const grpc = new ConcordiumGRPCClient(provider.grpcTransport);
+
+    try {
+        const info = await grpc.getInstanceInfo(ContractAddress.create(index, subindex));
+        return info.owner.address === account;
+    } catch (e) {
+        alert((e as Error).message);
+    }
+
+    return false;
 };
 
 /**

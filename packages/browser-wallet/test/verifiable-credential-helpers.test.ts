@@ -1,4 +1,5 @@
 import { Schema, Validator } from 'jsonschema';
+import { ContractAddress } from '@concordium/web-sdk';
 import {
     RevocationDataHolder,
     RevokeCredentialHolderParam,
@@ -17,10 +18,10 @@ import {
     coerceBigIntIntegerToNumber,
 } from '../src/shared/utils/verifiable-credential-helpers';
 import { mainnet, testnet } from '../src/shared/constants/networkConfiguration';
-
+//
 test('serializing a revoke credential holder parameter', () => {
     const signingData: SigningData = {
-        contractAddress: { index: 4718n, subindex: 0n },
+        contractAddress: ContractAddress.create(4718n, 0n),
         entryPoint: 'revokeCredentialHolder',
         nonce: 0n,
         timestamp: 1688542350309n,
@@ -88,7 +89,7 @@ test('credentialHolderId: an error is thrown if the credential id is invalid', (
 test('registry contract address is extracted from verifiable credential id field', () => {
     const id =
         'did:ccd:mainnet:sci:4718:0/credentialEntry/2eec102b173118dda466411fc7df88093788a34c3e2a4b0a8891f5c671a9d106';
-    expect(getCredentialRegistryContractAddress(id)).toEqual({ index: BigInt(4718), subindex: BigInt(0) });
+    expect(getCredentialRegistryContractAddress(id)).toEqual(ContractAddress.create(4718, 0));
 });
 
 test('credentialRegistryContractAddress: an error is thrown if the credential id is invalid', () => {
@@ -127,7 +128,7 @@ test('public key DID is created with correct network', () => {
 test('credential Id is created with correct network', () => {
     const didTestnet = createCredentialId(
         'aa379617282c124e5c341573295e92f6fcb67cd8c852afb8c61943daba694b6d',
-        { index: 4n, subindex: 3n },
+        ContractAddress.create(4n, 3n),
         testnet
     );
     expect(didTestnet).toEqual(
@@ -135,7 +136,7 @@ test('credential Id is created with correct network', () => {
     );
     const didMainnet = createCredentialId(
         '4799ec95500850d9368ca012faf60e9d632d3b1768d608c7e5e3d53fe96d669a',
-        { index: 2n, subindex: 7n },
+        ContractAddress.create(2n, 7n),
         mainnet
     );
     expect(didMainnet).toEqual(

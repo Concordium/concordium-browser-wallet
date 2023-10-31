@@ -4,8 +4,8 @@
     "version": "1.1.1",
     "packageManager": "yarn@3.2.0",
     "dependencies": {
-        "@concordium/browser-wallet-api-helpers": "^2.0.0",
-        "@concordium/web-sdk": "^6.3.0",
+        "@concordium/browser-wallet-api-helpers": "beta",
+        "@concordium/web-sdk": "^7.0.0",
         "bootstrap": "^5.2.1",
         "cross-env": "^7.0.3",
         "moment": "^2.29.4",
@@ -20,15 +20,12 @@
         "@types/node": "^18.7.23",
         "@types/react": "^18.0.9",
         "@types/react-dom": "^18.0.5",
-        "esbuild": "^0.14.42",
+        "esbuild": "^0.19.5",
         "esbuild-plugin-copy": "^1.6.0",
         "esbuild-plugin-svgr": "^1.0.1",
         "express": "^4.18.1",
         "ts-node": "^10.8.0",
         "typescript": "^5.2.2"
-    },
-    "resolutions": {
-        "@concordium/web-sdk": "^6.0.0"
     },
     "scripts": {
         "build": "node --loader ts-node/esm ./esbuild.config.ts; cp ./public/static/img/* ./dist",

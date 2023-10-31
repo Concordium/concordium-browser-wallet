@@ -2,7 +2,16 @@
 /* eslint-disable @typescript-eslint/no-explicit-any */
 import React, { useEffect, useState, useContext } from 'react';
 import { detectConcordiumProvider } from '@concordium/browser-wallet-api-helpers';
-import { serializeUpdateContractParameters, toBuffer } from '@concordium/web-sdk';
+import {
+    ConcordiumGRPCClient,
+    ContractAddress,
+    ContractName,
+    EntrypointName,
+    ReceiveName,
+    ReturnValue,
+    serializeUpdateContractParameters,
+    toBuffer,
+} from '@concordium/web-sdk';
 import { createCollection, state, mint, isOwner } from './utils';
 import { RAW_SCHEMA } from './constant';
 
@@ -13,31 +22,30 @@ type NFTPRops = {
     id: string;
 };
 
-export const getTokenUrl = (id: string, index: bigint, subindex = 0n): Promise<string> => {
-    return new Promise((resolve) => {
-        const param = serializeUpdateContractParameters(
-            'CIS2-NFT',
-            'tokenMetadata',
-            [id],
-            toBuffer(RAW_SCHEMA, 'base64')
-        );
-        detectConcordiumProvider().then((provider) => {
-            provider
-                .getJsonRpcClient()
-                .invokeContract({ contract: { index, subindex }, method: 'CIS2-NFT.tokenMetadata', parameter: param })
-                .then((returnValue) => {
-                    console.log('text');
-                    if (returnValue && returnValue.tag === 'success' && returnValue.returnValue) {
-                        const bufferStream = toBuffer(returnValue.returnValue, 'hex');
-                        const length = bufferStream.readUInt16LE(2);
-                        const url = bufferStream.slice(4, 4 + length).toString('utf8');
-                        resolve(url);
-                    } else {
-                        console.log(id);
-                    }
-                });
-        });
+export const getTokenUrl = async (id: string, index: bigint, subindex = 0n): Promise<string | undefined> => {
+    const param = serializeUpdateContractParameters(
+        ContractName.fromString('CIS2-NFT'),
+        EntrypointName.fromString('tokenMetadata'),
+        [id],
+        toBuffer(RAW_SCHEMA, 'base64')
+    );
+    const provider = await detectConcordiumProvider();
+    const grpc = new ConcordiumGRPCClient(provider.grpcTransport);
+    const returnValue = await grpc.invokeContract({
+        contract: ContractAddress.create(index, subindex),
+        method: ReceiveName.fromString('CIS2-NFT.tokenMetadata'),
+        parameter: param,
     });
+
+    if (returnValue && returnValue.tag === 'success' && returnValue.returnValue) {
+        const bufferStream = toBuffer(ReturnValue.toHexString(returnValue.returnValue), 'hex');
+        const length = bufferStream.readUInt16LE(2);
+        const url = bufferStream.slice(4, 4 + length).toString('utf8');
+        return url;
+    }
+
+    console.log(id);
+    return undefined;
 };
 
 function NFT({ index, id }: NFTPRops) {
@@ -45,13 +53,15 @@ function NFT({ index, id }: NFTPRops) {
 
     useEffect(() => {
         getTokenUrl(id, index).then((tokenUrl) => {
-            fetch(tokenUrl, { headers: new Headers({ 'Access-Control-Allow-Origin': '*' }), mode: 'cors' }).then(
-                (resp) => {
-                    if (resp.ok) {
-                        resp.json().then(setMetadata);
+            if (tokenUrl !== undefined) {
+                fetch(tokenUrl, { headers: new Headers({ 'Access-Control-Allow-Origin': '*' }), mode: 'cors' }).then(
+                    (resp) => {
+                        if (resp.ok) {
+                            resp.json().then(setMetadata);
+                        }
                     }
-                }
-            );
+                );
+            }
         });
     }, [index, id]);
 

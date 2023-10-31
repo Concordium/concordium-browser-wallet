@@ -4,7 +4,7 @@ import {
     createIdentityRecoveryRequest,
     CredentialRegistrationId,
     IdentityRecoveryRequestInput,
-    createConcordiumClient,
+    ConcordiumGRPCWebClient,
 } from '@concordium/web-sdk';
 import { InternalMessageType } from '@concordium/browser-wallet-message-hub';
 import { BackgroundResponseStatus, RecoveryBackgroundResponse } from '@shared/utils/types';
@@ -61,14 +61,14 @@ async function recoverAccounts(
             if (accountInfo) {
                 credsToAdd.push({
                     cred: {
-                        address: accountInfo.accountAddress,
+                        address: accountInfo.accountAddress.address,
                         credId,
                         credNumber,
                         status: CreationStatus.Confirmed,
                         identityIndex,
                         providerIndex,
                     },
-                    balance: accountInfo.accountAmount.toString(),
+                    balance: accountInfo.accountAmount.toJSON(),
                 });
                 emptyIndices = 0;
             } else {
@@ -135,9 +135,9 @@ async function performRecovery() {
         // Either use the saved nextId, otherwise start from after the existing identities
         let nextId = status?.nextId || identities?.length || 0;
 
-        const client = createConcordiumClient(network.grpcUrl, network.grpcPort, { timeout: GRPCTIMEOUT });
+        const client = new ConcordiumGRPCWebClient(network.grpcUrl, network.grpcPort, { timeout: GRPCTIMEOUT });
         const getAccountInfo = (credId: string) =>
-            client.getAccountInfo(new CredentialRegistrationId(credId)).catch(() => {
+            client.getAccountInfo(CredentialRegistrationId.fromHexString(credId)).catch(() => {
                 return undefined;
             });
 

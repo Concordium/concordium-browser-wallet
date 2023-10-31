@@ -5,6 +5,11 @@ import {
     deserializeReceiveReturnValue,
     serializeUpdateContractParameters,
     ConcordiumGRPCClient,
+    ContractName,
+    EntrypointName,
+    ContractAddress,
+    ReceiveName,
+    ReturnValue,
 } from '@concordium/web-sdk';
 import sha256 from 'sha256';
 import { useGrpcClient, TESTNET, WalletConnectionProps, useConnection, useConnect } from '@concordium/react-components';
@@ -96,15 +101,15 @@ const InputFieldStyle = {
 
 async function viewFile(rpcClient: ConcordiumGRPCClient, fileHashHex: string) {
     const param = serializeUpdateContractParameters(
-        E_SEALING_CONTRACT_NAME,
-        'getFile',
+        ContractName.fromString(E_SEALING_CONTRACT_NAME),
+        EntrypointName.fromString('getFile'),
         fileHashHex,
         toBuffer(E_SEALING_RAW_SCHEMA, 'base64')
     );
 
     const res = await rpcClient.invokeContract({
-        method: `${E_SEALING_CONTRACT_NAME}.getFile`,
-        contract: { index: E_SEALING_CONTRACT_INDEX, subindex: CONTRACT_SUB_INDEX },
+        method: ReceiveName.fromString(`${E_SEALING_CONTRACT_NAME}.getFile`),
+        contract: ContractAddress.create(E_SEALING_CONTRACT_INDEX, CONTRACT_SUB_INDEX),
         parameter: param,
     });
 
@@ -115,10 +120,10 @@ async function viewFile(rpcClient: ConcordiumGRPCClient, fileHashHex: string) {
     }
 
     const returnValues = deserializeReceiveReturnValue(
-        toBuffer(res.returnValue, 'hex'),
+        ReturnValue.toBuffer(res.returnValue),
         toBuffer(E_SEALING_RAW_SCHEMA, 'base64'),
-        E_SEALING_CONTRACT_NAME,
-        'getFile',
+        ContractName.fromString(E_SEALING_CONTRACT_NAME),
+        EntrypointName.fromString('getFile'),
         2
     );
 

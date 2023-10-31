@@ -1,5 +1,5 @@
 import { createContext } from 'react';
-import { AccountTransactionType, CcdAmount } from '@concordium/web-sdk';
+import { AccountTransactionType, CcdAmount, ContractAddress, Energy, ReceiveName } from '@concordium/web-sdk';
 import { WalletConnection, moduleSchemaFromBase64 } from '@concordium/react-components';
 import { CONTRACT_NAME, WRAP_FUNCTION_RAW_SCHEMA, UNWRAP_FUNCTION_RAW_SCHEMA } from './constants';
 
@@ -29,13 +29,10 @@ export async function wrap(
         account,
         AccountTransactionType.Update,
         {
-            amount: new CcdAmount(BigInt(amount)),
-            address: {
-                index,
-                subindex,
-            },
-            receiveName: `${CONTRACT_NAME}.wrap`,
-            maxContractExecutionEnergy: 30000n,
+            amount: CcdAmount.fromMicroCcd(BigInt(amount)),
+            address: ContractAddress.create(index, subindex),
+            receiveName: ReceiveName.fromString(`${CONTRACT_NAME}.wrap`),
+            maxContractExecutionEnergy: Energy.create(30000),
         },
         {
             parameters: parameter,
@@ -74,13 +71,10 @@ export async function unwrap(
         account,
         AccountTransactionType.Update,
         {
-            amount: new CcdAmount(BigInt(0)),
-            address: {
-                index,
-                subindex,
-            },
-            receiveName: `${CONTRACT_NAME}.unwrap`,
-            maxContractExecutionEnergy: 30000n,
+            amount: CcdAmount.fromMicroCcd(BigInt(0)),
+            address: ContractAddress.create(index, subindex),
+            receiveName: ReceiveName.fromString(`${CONTRACT_NAME}.unwrap`),
+            maxContractExecutionEnergy: Energy.create(30000),
         },
         {
             parameters: parameter,

@@ -23,5 +23,5 @@
     },
     "include": ["./src/**/*.ts", "./src/**/*.tsx"],
     "exclude": ["./../../node_modules/**/*", "./dist/**/*"],
-    "files": ["../../node_modules/@concordium/browser-wallet-api-helpers/lib/extend-window.d.ts"]
+    "files": ["../browser-wallet-api-helpers/src/extend-window.ts"]
 }

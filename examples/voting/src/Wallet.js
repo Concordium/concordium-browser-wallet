@@ -82,8 +82,8 @@ export async function createElection(
             senderAddress,
             AccountTransactionType.InitContract,
             {
-                amount: new CcdAmount(BigInt(0)),
-                moduleRef: new ModuleReference(moduleRef),
+                amount: CcdAmount.fromMicroCcd(BigInt(0)),
+                moduleRef: ModuleReference.fromHexString(moduleRef),
                 initName: contractName,
                 maxContractExecutionEnergy: BigInt(30000),
             },
@@ -139,7 +139,7 @@ export async function castVote(client, contractIndex, vote, senderAddress) {
             senderAddress,
             AccountTransactionType.Update,
             {
-                amount: new CcdAmount(BigInt(0)),
+                amount: CcdAmount.fromMicroCcd(BigInt(0)),
                 address: { index: BigInt(contractIndex), subindex: BigInt(0) },
                 receiveName: 'voting.vote',
                 maxContractExecutionEnergy: BigInt(30000),

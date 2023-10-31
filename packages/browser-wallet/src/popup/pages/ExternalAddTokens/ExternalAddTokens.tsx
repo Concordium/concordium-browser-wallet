@@ -14,7 +14,7 @@ import { grpcClientAtom } from '@popup/store/settings';
 import { fullscreenPromptContext } from '@popup/page-layouts/FullscreenPromptLayout';
 import { Input as UncontrolledInput } from '@popup/shared/Form/Input';
 import Button from '@popup/shared/Button';
-import { isHex } from '@concordium/web-sdk';
+import { ContractAddress, isHex } from '@concordium/web-sdk';
 import ContractTokenLine, { ChoiceStatus } from '@popup/shared/ContractTokenLine';
 import TokenDetails from '@popup/shared/TokenDetails';
 
@@ -30,8 +30,7 @@ interface Location {
     state: {
         payload: {
             accountAddress: string;
-            contractIndex: string;
-            contractSubindex: string;
+            contractAddress: ContractAddress.Serializable;
             tokenIds: string[];
             url: string;
         };
@@ -42,7 +41,12 @@ export default function SignMessage({ respond }: Props) {
     const { state } = useLocation() as Location;
     const { t } = useTranslation('externalAddTokens');
     const { withClose, onClose } = useContext(fullscreenPromptContext);
-    const { accountAddress, contractIndex, contractSubindex, tokenIds, url } = state.payload;
+    const {
+        accountAddress,
+        contractAddress: { index: contractIndex, subindex: contractSubindex },
+        tokenIds,
+        url,
+    } = state.payload;
     const addToast = useSetAtom(addToastAtom);
     const client = useAtomValue(grpcClientAtom);
     const [accountTokens, setAccountTokens] = useAtom(accountTokensFamily(accountAddress));

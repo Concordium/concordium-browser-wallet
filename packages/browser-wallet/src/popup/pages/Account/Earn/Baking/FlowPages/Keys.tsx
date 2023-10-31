@@ -1,5 +1,5 @@
 import React, { useState } from 'react';
-import { AccountAddress, BakerKeysWithProofs, generateBakerKeys, GenerateBakerKeysOutput } from '@concordium/web-sdk';
+import { BakerKeysWithProofs, generateBakerKeys, GenerateBakerKeysOutput } from '@concordium/web-sdk';
 import { useTranslation } from 'react-i18next';
 
 import Form from '@popup/shared/Form';
@@ -64,7 +64,7 @@ export default function KeysPage({ initial, onNext, accountInfo }: KeysProps) {
     const [showPrompt, setShowPrompt] = useState(false);
     const form = useForm<KeysForm>({
         // TODO #delegation: test this on a slow computer, does it need to be moved to background script?
-        defaultValues: initial || generateBakerKeys(new AccountAddress(accountInfo.accountAddress)),
+        defaultValues: initial || generateBakerKeys(accountInfo.accountAddress),
     });
     const keys = form.watch();
 

@@ -17,7 +17,7 @@ import {
 
 /**
  * A transport that retrieves the location of the server from the wallet each time a request is made.
- * The purpose of this custom transport is to defer providing the baseUrl a request is called, instead of when the transport is created,
+ * The purpose of this custom transport is to defer providing the baseUrl until a request is called, instead of when the transport is created,
  * but other than that it is just forwards the inputs to the internal GrpcWebFetchTransport and forwards the outputs to the returned UnaryCall / ServerStreamingCall.
  * TODO: Move the actual fetch to the background / or content script to make this more robust / not leak the URL into this context.
  */

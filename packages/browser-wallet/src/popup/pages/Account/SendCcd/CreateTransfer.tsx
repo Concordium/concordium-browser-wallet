@@ -113,7 +113,7 @@ function CreateTransaction({ tokens, setCost, setDetailsExpanded, cost }: Props 
                         BigInt(chosenToken.contractIndex)
                     );
                     form.setValue('executionEnergy', energy.execution.toString());
-                    return { success: true, value: energy.total };
+                    return { success: true, value: energy.total.value };
                 } catch (e) {
                     addToast(t('sendCcd.transferInvokeFailed', { message: (e as Error).message }));
                     return { success: false };
@@ -193,7 +193,7 @@ function CreateTransaction({ tokens, setCost, setDetailsExpanded, cost }: Props 
             return validateAddress;
         }
         try {
-            await client.getAccountInfo(new AccountAddress(recipientAddress));
+            await client.getAccountInfo(AccountAddress.fromBase58(recipientAddress));
             return undefined;
         } catch {
             return t('sendCcd.nonexistingAccount');

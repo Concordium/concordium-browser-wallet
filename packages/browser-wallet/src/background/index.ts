@@ -1,3 +1,4 @@
+// eslint-disable-next-line import/no-extraneous-dependencies
 import {
     createMessageTypeFilter,
     ExtensionMessageHandler,
@@ -5,7 +6,7 @@ import {
     MessageStatusWrapper,
     MessageType,
 } from '@concordium/browser-wallet-message-hub';
-import { deserializeTypeValue, HttpProvider } from '@concordium/web-sdk';
+import { deserializeTypeValue } from '@concordium/web-sdk';
 import {
     getGenesisHash,
     sessionOpenPrompt,
@@ -23,7 +24,6 @@ import { parsePayload } from '@shared/utils/payload-helpers';
 import { BackgroundSendTransactionPayload } from '@shared/utils/types';
 import { buildURLwithSearchParameters } from '@shared/utils/url-helpers';
 import { Buffer } from 'buffer/';
-import JSONBig from 'json-bigint';
 import { startMonitoringPendingStatus } from './confirmation';
 import { sendCredentialHandler } from './credential-deployment';
 import { createIdProofHandler, runIfValidProof } from './id-proof';
@@ -49,7 +49,6 @@ import {
 } from './web3Id';
 
 const rpcCallNotAllowedMessage = 'RPC Call can only be performed by whitelisted sites';
-const walletLockedMessage = 'The wallet is locked';
 async function isWalletLocked(): Promise<boolean> {
     const passcode = await sessionPasscode.get();
     return !passcode;
@@ -65,40 +64,6 @@ async function isAllowlisted(url: string): Promise<boolean> {
         return Object.keys(allowlist).includes(urlOrigin);
     }
     return false;
-}
-
-async function performRpcCall(
-    method: string,
-    params: string | undefined,
-    senderUrl: string,
-    onSuccess: (response: string | undefined) => void,
-    onFailure: (response: string) => void
-) {
-    const locked = await isWalletLocked();
-    if (locked) {
-        onFailure(walletLockedMessage);
-    }
-
-    const isWhiteListed = await isAllowlisted(senderUrl);
-    if (isWhiteListed) {
-        const url = (await storedCurrentNetwork.get())?.jsonRpcUrl;
-        if (!url) {
-            onFailure('No JSON-RPC URL available');
-        } else {
-            const provider = new HttpProvider(url, fetch);
-            provider
-                .request(
-                    // We lose the method's typing when sending the message.
-                    // eslint-disable-next-line @typescript-eslint/no-explicit-any
-                    method as any,
-                    params && JSONBig.parse(params)
-                )
-                .then(onSuccess)
-                .catch((e) => onFailure(e.toString()));
-        }
-    } else {
-        onFailure(rpcCallNotAllowedMessage);
-    }
 }
 
 /**
@@ -235,17 +200,6 @@ bgMessageHandler.handleMessage(
 bgMessageHandler.handleMessage(createMessageTypeFilter(InternalMessageType.Init), injectScript);
 bgMessageHandler.handleMessage(createMessageTypeFilter(InternalMessageType.SetViewSize), ({ payload }) => {
     setPopupSize(payload);
-});
-
-bgMessageHandler.handleMessage(createMessageTypeFilter(MessageType.JsonRpcRequest), (input, sender, respond) => {
-    const onFailure = (error: string) => respond({ success: false, error });
-    if (sender.url) {
-        const onSuccess = (result: string | undefined) => respond({ success: true, result });
-        performRpcCall(input.payload.method, input.payload.params, sender.url, onSuccess, onFailure);
-    } else {
-        onFailure('Missing sender URL');
-    }
-    return true;
 });
 
 bgMessageHandler.handleMessage(createMessageTypeFilter(MessageType.GrpcRequest), (_input, sender, respond) => {

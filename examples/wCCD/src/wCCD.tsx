@@ -8,6 +8,13 @@ import {
     serializeUpdateContractParameters,
     ConcordiumGRPCClient,
     AccountAddress,
+    ReceiveName,
+    ContractAddress,
+    Parameter,
+    ContractName,
+    ReturnValue,
+    EntrypointName,
+    BlockHash,
 } from '@concordium/web-sdk';
 import * as leb from '@thi.ng/leb128';
 import { multiply, round } from 'mathjs';
@@ -23,8 +30,8 @@ import {
     WALLET_CONNECT,
 } from './constants';
 
-import ArrowIcon from './assets/Arrow.svg';
-import RefreshIcon from './assets/Refresh.svg';
+import ArrowIcon from './assets/Arrow.svg?react';
+import RefreshIcon from './assets/Refresh.svg?react';
 import { WalletConnectionTypeButton } from './WalletConnectorTypeButton';
 
 const blackCardStyle = {
@@ -75,9 +82,9 @@ const InputFieldStyle = {
 
 async function viewAdmin(rpcClient: ConcordiumGRPCClient, WCCD_CONTRACT_INDEX: bigint) {
     const res = await rpcClient.invokeContract({
-        method: `${CONTRACT_NAME}.view`,
-        contract: { index: WCCD_CONTRACT_INDEX, subindex: CONTRACT_SUB_INDEX },
-        parameter: toBuffer(''),
+        method: ReceiveName.fromString(`${CONTRACT_NAME}.view`),
+        contract: ContractAddress.create(WCCD_CONTRACT_INDEX, CONTRACT_SUB_INDEX),
+        parameter: Parameter.empty(),
     });
     if (!res || res.tag === 'failure' || !res.returnValue) {
         throw new Error(
@@ -85,10 +92,10 @@ async function viewAdmin(rpcClient: ConcordiumGRPCClient, WCCD_CONTRACT_INDEX: b
         );
     }
     const returnValues = deserializeReceiveReturnValue(
-        toBuffer(res.returnValue, 'hex'),
+        ReturnValue.toBuffer(res.returnValue),
         toBuffer(VIEW_FUNCTION_RAW_SCHEMA, 'base64'),
-        CONTRACT_NAME,
-        'view',
+        ContractName.fromString(CONTRACT_NAME),
+        EntrypointName.fromString('view'),
         2
     );
     return returnValues.admin.Account[0];
@@ -96,8 +103,8 @@ async function viewAdmin(rpcClient: ConcordiumGRPCClient, WCCD_CONTRACT_INDEX: b
 
 async function updateWCCDBalanceAccount(rpcClient: ConcordiumGRPCClient, account: string, WCCD_CONTRACT_INDEX: bigint) {
     const param = serializeUpdateContractParameters(
-        CONTRACT_NAME,
-        'balanceOf',
+        ContractName.fromString(CONTRACT_NAME),
+        EntrypointName.fromString('balanceOf'),
         [
             {
                 address: {
@@ -110,8 +117,8 @@ async function updateWCCDBalanceAccount(rpcClient: ConcordiumGRPCClient, account
     );
 
     const res = await rpcClient.invokeContract({
-        method: `${CONTRACT_NAME}.balanceOf`,
-        contract: { index: WCCD_CONTRACT_INDEX, subindex: CONTRACT_SUB_INDEX },
+        method: ReceiveName.fromString(`${CONTRACT_NAME}.balanceOf`),
+        contract: ContractAddress.create(WCCD_CONTRACT_INDEX, CONTRACT_SUB_INDEX),
         parameter: param,
     });
     if (!res || res.tag === 'failure' || !res.returnValue) {
@@ -120,7 +127,7 @@ async function updateWCCDBalanceAccount(rpcClient: ConcordiumGRPCClient, account
         );
     }
     // The return value is an array. The value stored in the array starts at position 4 of the return value.
-    return BigInt(leb.decodeULEB128(toBuffer(res.returnValue.slice(4), 'hex'))[0]);
+    return BigInt(leb.decodeULEB128(toBuffer(ReturnValue.toHexString(res.returnValue).slice(4), 'hex'))[0]);
 }
 
 interface ConnectionProps {
@@ -200,7 +207,7 @@ export default function wCCD(props: ConnectionProps) {
                 .getConsensusStatus()
                 .then((status) => status.genesisBlock)
                 .then((genHash) => {
-                    setRpcGenesisHash(genHash);
+                    setRpcGenesisHash(BlockHash.toHexString(genHash));
                     setRpcError('');
                 })
                 .catch((e) => {
@@ -214,7 +221,7 @@ export default function wCCD(props: ConnectionProps) {
         if (grpcClient && connection && account) {
             setAccountExistsOnNetwork(true);
             grpcClient
-                .getAccountInfo(new AccountAddress(account))
+                .getAccountInfo(AccountAddress.fromBase58(account))
                 .then((returnValue) => {
                     if (returnValue === null) {
                         setAccountExistsOnNetwork(false);

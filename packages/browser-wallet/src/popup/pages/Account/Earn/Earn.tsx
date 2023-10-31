@@ -50,7 +50,7 @@ function Earn({ chainParameters }: EarnProps) {
                     <br />
                     {t('bakingDescription', {
                         minAmount: displayAsCcd(
-                            chainParameters?.minimumEquityCapital?.toString() || defaultBakingMinimumEquityCapital
+                            chainParameters?.minimumEquityCapital?.microCcdAmount || defaultBakingMinimumEquityCapital
                         ),
                     })}
                 </p>

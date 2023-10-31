@@ -84,7 +84,7 @@ export default function ConfirmTransfer(props: Props) {
         if (!address || !key) {
             throw new Error('Missing address or key for selected account');
         }
-        const sender = new AccountAddress(address);
+        const sender = AccountAddress.fromBase58(address);
         const nonce = await client.getNextAccountNonce(sender);
         if (!nonce) {
             throw new Error('No nonce found for sender');

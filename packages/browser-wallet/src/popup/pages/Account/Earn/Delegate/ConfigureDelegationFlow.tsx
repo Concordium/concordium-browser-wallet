@@ -1,9 +1,9 @@
 import React, { useCallback, useContext, useEffect, useMemo, useState } from 'react';
 import {
     AccountInfo,
+    AccountInfoType,
     AccountTransactionType,
     BakerPoolStatus,
-    isDelegatorAccount,
     OpenStatusText,
 } from '@concordium/web-sdk';
 import { Trans, useTranslation } from 'react-i18next';
@@ -70,9 +70,9 @@ function PoolPage({ onNext, initial, accountInfo }: PoolPageProps) {
             }
 
             if (
-                isDelegatorAccount(accountInfo) &&
-                poolStatus.delegatedCapitalCap - poolStatus.delegatedCapital <
-                    accountInfo.accountDelegation.stakedAmount
+                accountInfo.type === AccountInfoType.Delegator &&
+                poolStatus.delegatedCapitalCap.microCcdAmount - poolStatus.delegatedCapital.microCcdAmount <
+                    accountInfo.accountDelegation.stakedAmount.microCcdAmount
             ) {
                 return t('pool.currentStakeExceedsCap');
             }
@@ -163,11 +163,15 @@ interface DisplayPoolStatusProps {
 function DisplayPoolStatus({ status }: DisplayPoolStatusProps) {
     return (
         <div className="delegation__pool-status">
-            <SidedRow className="m-t-5" left="Current pool:" right={displayAsCcd(status.delegatedCapital).toString()} />
+            <SidedRow
+                className="m-t-5"
+                left="Current pool:"
+                right={displayAsCcd(status.delegatedCapital.microCcdAmount).toString()}
+            />
             <SidedRow
                 className="m-t-5"
                 left="Pool limit:"
-                right={displayAsCcd(status.delegatedCapitalCap).toString()}
+                right={displayAsCcd(status.delegatedCapitalCap.microCcdAmount).toString()}
             />
         </div>
     );
@@ -218,7 +222,10 @@ function AmountPage({ initial, onNext, formValues, accountInfo }: AmountPageProp
             isAboveStakeWarningThreshold(amount, accountInfo)
         ) {
             setOpenWarning(AmountWarning.AboveThreshold);
-        } else if (isDelegatorAccount(accountInfo) && accountInfo.accountDelegation.stakedAmount > amount) {
+        } else if (
+            accountInfo.type === AccountInfoType.Delegator &&
+            accountInfo.accountDelegation.stakedAmount.microCcdAmount > amount
+        ) {
             setOpenWarning(AmountWarning.Decrease);
         } else {
             onNext(vs.amount);
@@ -226,7 +233,8 @@ function AmountPage({ initial, onNext, formValues, accountInfo }: AmountPageProp
     };
 
     const pendingChange =
-        isDelegatorAccount(accountInfo) && accountInfo.accountDelegation.pendingChange?.change !== undefined;
+        accountInfo.type === AccountInfoType.Delegator &&
+        accountInfo.accountDelegation.pendingChange?.change !== undefined;
 
     return (
         <Form<AmountPageForm> className="configure-flow-form" formMethods={form} onSubmit={onSubmit}>

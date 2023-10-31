@@ -11,7 +11,7 @@ export type EarnPageContext = {
 export const STAKE_WARNING_THRESHOLD = 95n;
 
 export function isAboveStakeWarningThreshold(amount: bigint, accountInfo: AccountInfo): boolean {
-    return amount * 100n > accountInfo.accountAmount * STAKE_WARNING_THRESHOLD;
+    return amount * 100n > accountInfo.accountAmount.microCcdAmount * STAKE_WARNING_THRESHOLD;
 }
 
 /**

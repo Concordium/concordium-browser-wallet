@@ -8,7 +8,7 @@ interface Props {
 
 // eslint-disable-next-line @typescript-eslint/no-explicit-any
 function displayValue(value: any) {
-    if (value instanceof AccountAddress) {
+    if (AccountAddress.instanceOf(value)) {
         return (
             <DisplayAddress
                 className="transaction-receipt__address"
@@ -17,7 +17,7 @@ function displayValue(value: any) {
             />
         );
     }
-    if (value instanceof CcdAmount) {
+    if (CcdAmount.instanceOf(value)) {
         return <p className="m-t-0">{displayAsCcd(value.microCcdAmount)}</p>;
     }
     return <p className="m-t-0">{value.toString()}</p>;

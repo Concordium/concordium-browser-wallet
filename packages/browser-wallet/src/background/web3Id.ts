@@ -2,7 +2,7 @@ import {
     CredentialStatements,
     getVerifiablePresentation,
     Web3IdProofInput,
-    createConcordiumClient,
+    ConcordiumGRPCWebClient,
     verifyWeb3IdCredentialSignature,
     isHex,
     verifyAtomicStatements,
@@ -84,7 +84,7 @@ export async function web3IdAddCredentialFinishHandler(input: {
         throw new Error(NO_CREDENTIALS_FIT);
     }
 
-    const client = createConcordiumClient(network.grpcUrl, network.grpcPort, { timeout: GRPCTIMEOUT });
+    const client = new ConcordiumGRPCWebClient(network.grpcUrl, network.grpcPort, { timeout: GRPCTIMEOUT });
     const issuerContract = getCredentialRegistryContractAddress(saved.issuer);
 
     if (!proof || !proof.proofValue) {

@@ -5,61 +5,51 @@ import {
     MessageStatusWrapper,
 } from '@concordium/browser-wallet-message-hub';
 import {
-    AccountTransactionPayload,
+    AccountAddress,
     AccountTransactionSignature,
     AccountTransactionType,
-    DeployModulePayload,
     HexString,
-    InitContractPayload,
     SchemaVersion,
-    UpdateContractPayload,
-} from '@concordium/common-sdk/lib/types';
-import { JsonRpcClient } from '@concordium/common-sdk/lib/JsonRpcClient';
+    ContractAddress,
+    VerifiablePresentation,
+} from '@concordium/web-sdk/types';
 import {
     WalletApi as IWalletApi,
     EventType,
-    SchemaWithContext,
-    SchemaType,
     SignMessageObject,
     SmartContractParameters,
     APIVerifiableCredential,
     MetadataUrl,
     CredentialProof,
+    AccountAddressSource,
+    SchemaSource,
+    SendTransactionPayload,
 } from '@concordium/browser-wallet-api-helpers';
 import EventEmitter from 'events';
-import type { JsonRpcRequest } from '@concordium/common-sdk/lib/providers/provider';
-import { IdProofOutput, IdStatement } from '@concordium/common-sdk/lib/idProofTypes';
-import { CredentialStatements } from '@concordium/common-sdk/lib/web3ProofTypes';
-import { VerifiablePresentation } from '@concordium/common-sdk/lib/types/VerifiablePresentation';
-import { ConcordiumGRPCClient } from '@concordium/common-sdk/lib/GRPCClient';
-import JSONBig from 'json-bigint';
+import { IdProofOutput, IdStatement } from '@concordium/web-sdk/id';
+import { CredentialStatements } from '@concordium/web-sdk/web3-id';
+import { ConcordiumGRPCClient } from '@concordium/web-sdk-legacy';
+import { RpcTransport } from '@protobuf-ts/runtime-rpc';
 import { stringify } from './util';
 import { BWGRPCTransport } from './gRPC-transport';
+import {
+    sanitizeAddCIS2TokensInput,
+    sanitizeRequestIdProofInput,
+    sanitizeSendTransactionInput,
+    sanitizeSignMessageInput,
+} from './compatibility';
 
 class WalletApi extends EventEmitter implements IWalletApi {
     private messageHandler = new InjectedMessageHandler();
 
-    private jsonRpcClient: JsonRpcClient;
-
     private grpcClient: ConcordiumGRPCClient;
+
+    private bwgrpcTransport: RpcTransport;
 
     constructor() {
         super();
-        // We pre-serialize the parameters before sending to the background script.
-        const request = (...input: Parameters<JsonRpcRequest>) =>
-            this.messageHandler
-                .sendMessage<MessageStatusWrapper<string>>(MessageType.JsonRpcRequest, {
-                    method: input[0],
-                    params: JSONBig.stringify(input[1]),
-                })
-                .then((result) => {
-                    if (!result.success) {
-                        throw new Error(result.message);
-                    }
-                    return result.result;
-                });
-        this.jsonRpcClient = new JsonRpcClient({ request });
-        this.grpcClient = new ConcordiumGRPCClient(new BWGRPCTransport(this.messageHandler));
+        this.bwgrpcTransport = new BWGRPCTransport(this.messageHandler);
+        this.grpcClient = new ConcordiumGRPCClient(this.bwgrpcTransport);
 
         // Set up message handlers to emit events.
         Object.values(EventType).forEach((eventType) => this.handleEvent(eventType));
@@ -69,14 +59,15 @@ class WalletApi extends EventEmitter implements IWalletApi {
      * Sends a sign request to the Concordium Wallet and awaits the users action
      */
     public async signMessage(
-        accountAddress: string,
+        accountAddress: AccountAddressSource,
         message: string | SignMessageObject
     ): Promise<AccountTransactionSignature> {
+        const input = sanitizeSignMessageInput(accountAddress, message);
         const response = await this.messageHandler.sendMessage<MessageStatusWrapper<AccountTransactionSignature>>(
             MessageType.SignMessage,
             {
-                accountAddress,
-                message,
+                ...input,
+                accountAddress: AccountAddress.toBase58(input.accountAddress),
             }
         );
 
@@ -133,55 +124,20 @@ class WalletApi extends EventEmitter implements IWalletApi {
      * Sends a transaction to the Concordium Wallet and awaits the users action
      */
     public async sendTransaction(
-        accountAddress: string,
+        accountAddress: AccountAddressSource,
         type: AccountTransactionType,
-        payload: AccountTransactionPayload,
+        payload: SendTransactionPayload,
         parameters?: SmartContractParameters,
-        schema?: string | SchemaWithContext,
+        schema?: SchemaSource,
         schemaVersion?: SchemaVersion
     ): Promise<string> {
-        // This parsing is to temporarily support older versions of the web-SDK, which has different field names.
-        let parsedPayload = payload;
-        if (type === AccountTransactionType.InitContract) {
-            const initPayload: InitContractPayload = {
-                ...(payload as InitContractPayload),
-                // eslint-disable-next-line @typescript-eslint/no-explicit-any
-                initName: (payload as InitContractPayload).initName || (payload as any).contractName,
-            };
-            parsedPayload = initPayload;
-        } else if (type === AccountTransactionType.Update) {
-            const updatePayload: UpdateContractPayload = {
-                ...(payload as UpdateContractPayload),
-                // eslint-disable-next-line @typescript-eslint/no-explicit-any
-                address: (payload as UpdateContractPayload).address || (payload as any).contractAddress,
-            };
-            parsedPayload = updatePayload;
-        } else if (type === AccountTransactionType.DeployModule) {
-            const deployPayload: DeployModulePayload = {
-                ...(payload as DeployModulePayload),
-                // eslint-disable-next-line @typescript-eslint/no-explicit-any
-                source: (payload as DeployModulePayload).source || (payload as any).content,
-            };
-            parsedPayload = deployPayload;
-        }
-        let parsedSchema: SchemaWithContext | undefined;
-        if (typeof schema === 'string' || schema instanceof String) {
-            parsedSchema = {
-                type: SchemaType.Module,
-                value: schema.toString(),
-            };
-        } else {
-            parsedSchema = schema;
-        }
+        const input = sanitizeSendTransactionInput(accountAddress, type, payload, parameters, schema, schemaVersion);
         const response = await this.messageHandler.sendMessage<MessageStatusWrapper<string>>(
             MessageType.SendTransaction,
             {
-                accountAddress,
-                type,
-                payload: stringify(parsedPayload),
-                parameters,
-                schema: parsedSchema,
-                schemaVersion,
+                ...input,
+                accountAddress: AccountAddress.toBase58(input.accountAddress),
+                payload: stringify(input.payload),
             }
         );
 
@@ -196,12 +152,29 @@ class WalletApi extends EventEmitter implements IWalletApi {
         this.messageHandler.handleMessage(createEventTypeFilter(type), (msg) => this.emit(type, msg.payload));
     }
 
-    public getJsonRpcClient(): JsonRpcClient {
-        return this.jsonRpcClient;
-    }
-
+    /**
+     * @deprecated the GRPC client version exposed by the wallet API will not be updated and should not be used.
+     * This is due to not being able to ensure compatibility between the API expected by a web application and
+     * the GRPC client injected into the application context.
+     *
+     * Instead, the exposed {@linkcode grpcTransport} can be used to to construct a GRPC client.
+     */
     public getGrpcClient(): ConcordiumGRPCClient {
         return this.grpcClient;
+    }
+
+    /**
+     * A GRPC transport layer which uses the node used in the wallet to communicate with the selected chain.
+     *
+     * @example
+     * import { ConcordiumGRPCClient } from '@concordium/web-sdk/grpc';
+     * import { detectConcordiumProvider } from '@concordium/browser-wallet-api-helpers';
+     *
+     * const walletApi = await detectConcordiumProvider();
+     * const grpcClient = new ConcordiumGRPCClient(await walletApi.grpcTransport);
+     */
+    public get grpcTransport(): RpcTransport {
+        return this.bwgrpcTransport;
     }
 
     public async getSelectedChain(): Promise<string | undefined> {
@@ -215,16 +188,16 @@ class WalletApi extends EventEmitter implements IWalletApi {
     }
 
     public async addCIS2Tokens(
-        accountAddress: string,
+        accountAddress: AccountAddressSource,
         tokenIds: string[],
-        contractIndex: bigint,
+        contractAddressSource: ContractAddress.Type | bigint,
         contractSubindex?: bigint
     ): Promise<string[]> {
+        const input = sanitizeAddCIS2TokensInput(accountAddress, tokenIds, contractAddressSource, contractSubindex);
         const response = await this.messageHandler.sendMessage<MessageStatusWrapper<string[]>>(MessageType.AddTokens, {
-            accountAddress,
-            tokenIds,
-            contractIndex: contractIndex.toString(),
-            contractSubindex: contractSubindex?.toString(),
+            ...input,
+            accountAddress: AccountAddress.toBase58(input.accountAddress),
+            contractAddress: ContractAddress.toSerializable(input.contractAddress),
         });
         if (!response.success) {
             throw new Error(response.message);
@@ -233,14 +206,14 @@ class WalletApi extends EventEmitter implements IWalletApi {
     }
 
     public async requestIdProof(
-        accountAddress: string,
+        accountAddress: AccountAddressSource,
         statement: IdStatement,
         challenge: string
     ): Promise<IdProofOutput> {
+        const input = sanitizeRequestIdProofInput(accountAddress, statement, challenge);
         const res = await this.messageHandler.sendMessage<MessageStatusWrapper<IdProofOutput>>(MessageType.IdProof, {
-            accountAddress,
-            statement,
-            challenge,
+            ...input,
+            accountAddress: AccountAddress.toBase58(input.accountAddress),
         });
 
         if (!res.success) {

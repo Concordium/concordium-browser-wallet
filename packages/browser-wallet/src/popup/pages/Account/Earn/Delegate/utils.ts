@@ -35,7 +35,7 @@ export const getExistingDelegationValues = (
     const { delegationTarget, stakedAmount, restakeEarnings } = accountInfo.accountDelegation;
 
     return {
-        amount: microCcdToCcd(stakedAmount) ?? '0.00',
+        amount: microCcdToCcd(stakedAmount.microCcdAmount) ?? '0.00',
         redelegate: restakeEarnings,
         pool: delegationTarget.delegateType === DelegationTargetType.Baker ? delegationTarget.bakerId.toString() : null,
     };
@@ -79,7 +79,7 @@ function toPayload(values: DeepPartial<ConfigureDelegationFlowState>): Configure
         delegationTarget = { delegateType: DelegationTargetType.Baker, bakerId: BigInt(values.pool) };
     }
     return {
-        stake: values?.amount ? new CcdAmount(ccdToMicroCcd(values.amount)) : undefined,
+        stake: values?.amount ? CcdAmount.fromCcd(values.amount) : undefined,
         restakeEarnings: values?.redelegate,
         delegationTarget,
     };

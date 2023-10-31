@@ -2,13 +2,11 @@
 import React, { useContext, useEffect, useMemo } from 'react';
 import { Link, Route, Routes, useNavigate } from 'react-router-dom';
 import {
-    AccountInfoBakerV1,
+    AccountBakerDetailsV1,
     AccountTransactionType,
-    ConsensusStatusV0,
-    isBakerAccountV1,
+    ConsensusStatus,
     StakePendingChange,
     StakePendingChangeType,
-    StakePendingChangeV1,
 } from '@concordium/web-sdk';
 import {
     dateFromStakePendingChange,
@@ -33,6 +31,7 @@ import RegisterBaking from './RegisterBaking';
 import RemoveBaking from './RemoveBaking';
 import UpdateBaking from './UpdateBaking';
 import { earnPageContext } from '../utils';
+import { isBakerAccountV1 } from './utils';
 
 const routes = {
     register: 'register',
@@ -70,7 +69,7 @@ function DisplayPendingChange({ pendingChange }: DisplayPendingChangeProps) {
             // TODO fix type assertion
             const date = dateFromStakePendingChange(
                 pendingChange,
-                consensusStatus as ConsensusStatusV0,
+                consensusStatus as ConsensusStatus,
                 tokenomicsInfo,
                 chainParameters
             );
@@ -80,7 +79,7 @@ function DisplayPendingChange({ pendingChange }: DisplayPendingChangeProps) {
         }
         return undefined;
     }, [
-        (pendingChange as StakePendingChangeV1)?.effectiveTime?.toString?.(),
+        (pendingChange as StakePendingChange)?.effectiveTime?.toString?.(),
         consensusStatus,
         tokenomicsInfo,
         chainParameters,
@@ -99,7 +98,7 @@ function DisplayPendingChange({ pendingChange }: DisplayPendingChangeProps) {
                     <div className="earn-details__value">{displayAsCcd(pendingChange.newStake)} </div>
                 </>
             )}
-            {pendingChange?.change === StakePendingChangeType.RemoveStakeV1 && (
+            {pendingChange?.change === StakePendingChangeType.RemoveStake && (
                 <div className="earn-details__value">{sharedT('pendingRemove')}</div>
             )}
         </>
@@ -107,13 +106,13 @@ function DisplayPendingChange({ pendingChange }: DisplayPendingChangeProps) {
 }
 
 type BakingDetailsProps = {
-    accountInfo: AccountInfoBakerV1;
+    bakerDetails: AccountBakerDetailsV1;
 };
 
-function BakingDetails({ accountInfo }: BakingDetailsProps) {
+function BakingDetails({ bakerDetails }: BakingDetailsProps) {
     const { t } = useTranslation('account', { keyPrefix: 'baking.details' });
     const { t: sharedT } = useTranslation('shared', { keyPrefix: 'baking' });
-    const { metadataUrl } = accountInfo.accountBaker.bakerPoolInfo;
+    const { metadataUrl } = bakerDetails.bakerPoolInfo;
 
     return (
         <div className="earn-details">
@@ -123,28 +122,26 @@ function BakingDetails({ accountInfo }: BakingDetailsProps) {
                     <h3 className="earn-details__title m-v-0 m-r-20">{t('heading')}</h3>
                 </div>
                 <div className="earn-details__header">{sharedT('amount')}</div>
-                <div className="earn-details__value">{displayAsCcd(accountInfo.accountBaker.stakedAmount)}</div>
+                <div className="earn-details__value">{displayAsCcd(bakerDetails.stakedAmount.microCcdAmount)}</div>
                 <div className="earn-details__header">{sharedT('bakerId')}</div>
-                <div className="earn-details__value">{accountInfo.accountBaker.bakerId.toString()}</div>
+                <div className="earn-details__value">{bakerDetails.bakerId.toString()}</div>
                 <div className="earn-details__header">{sharedT('restake')}</div>
                 <div className="earn-details__value">
-                    {accountInfo.accountBaker.restakeEarnings ? sharedT('restakeOption') : sharedT('noRestakeOption')}
+                    {bakerDetails.restakeEarnings ? sharedT('restakeOption') : sharedT('noRestakeOption')}
                 </div>
                 <div className="earn-details__header">{sharedT('openForDelegation')}</div>
-                <div className="earn-details__value">
-                    {openStatusToDisplay(accountInfo.accountBaker.bakerPoolInfo.openStatus)}
-                </div>
+                <div className="earn-details__value">{openStatusToDisplay(bakerDetails.bakerPoolInfo.openStatus)}</div>
                 {metadataUrl && (
                     <>
                         <div className="earn-details__header">{sharedT('metadataUrl')}</div>
                         <DisplayPartialString className="earn-details__value word-break-all" value={metadataUrl} />
                     </>
                 )}
-                <DisplayPendingChange pendingChange={accountInfo.accountBaker.pendingChange} />
+                <DisplayPendingChange pendingChange={bakerDetails.pendingChange} />
             </div>
             <div className="m-10 m-b-0 text-center">
                 <ButtonGroup>
-                    {accountInfo.accountBaker.pendingChange !== undefined ? (
+                    {bakerDetails.pendingChange !== undefined ? (
                         <Button disabled>{t('stop')}</Button>
                     ) : (
                         <Button danger as={Link} to={routes.remove}>
@@ -186,7 +183,7 @@ function BakingStatus() {
     }, []);
 
     if (isBakerAccountV1(accountInfo)) {
-        return <BakingDetails accountInfo={accountInfo} />;
+        return <BakingDetails bakerDetails={accountInfo.accountBaker} />;
     }
     if (hasUpdate && transaction) {
         return <PendingBaking transaction={transaction} />;
