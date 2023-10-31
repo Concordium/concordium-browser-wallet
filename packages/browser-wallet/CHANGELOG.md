@@ -1,5 +1,19 @@
 # Changelog
 
+## 1.1.10
+
+### Changed
+
+-   Refactoring to support new SDK version.
+
+### Added
+
+-   Add `grpcTransport` to the wallet-api.
+
+### Removed
+
+-   `getJsonRpcClient` from the wallet-api.
+
 ## 1.1.9
 
 ### Added
