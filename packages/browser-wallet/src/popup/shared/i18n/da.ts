@@ -117,7 +117,6 @@ const t: typeof en = {
         noUrl: 'Ingen URL',
         transactionCommission: 'Transaktionsomkostning provision',
         bakingCommission: 'Block-fortjeneste provision',
-        finalizationCommission: 'Finalization-fortjeneste provision',
         bakerId: 'Validator ID',
         changesTakesEffectOn: 'De følgende ændringer tager effekt d.\n{{ effectiveTime }}',
         pendingRemove:

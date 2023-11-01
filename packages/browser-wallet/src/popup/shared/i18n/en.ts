@@ -103,7 +103,6 @@ const t = {
         noUrl: 'Empty',
         transactionCommission: 'Transaction fee commission',
         bakingCommission: 'Block reward commission',
-        finalizationCommission: 'Finalization reward commission',
         bakerId: 'Validator ID',
         changesTakesEffectOn: 'The following changes will take effect on\n{{ effectiveTime }}',
         pendingRemove:
