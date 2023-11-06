@@ -20,6 +20,7 @@ import { addToastAtom } from '@popup/state';
 import ExternalRequestLayout from '@popup/page-layouts/ExternalRequestLayout';
 import TabBar from '@popup/shared/TabBar';
 import clsx from 'clsx';
+import { stringify } from 'json-bigint';
 
 type Props = {
     onSubmit(signature: AccountTransactionSignature): void;
@@ -47,13 +48,13 @@ function BinaryDisplay({ message, url }: { message: MessageObject; url: string }
 
     const parsedMessage = useMemo(() => {
         try {
-            return JSON.stringify(
+            return stringify(
                 deserializeTypeValue(Buffer.from(message.data, 'hex'), Buffer.from(message.schema, 'base64')),
                 undefined,
                 2
             );
         } catch (e) {
-            return 'a';
+            return t('unableToDeserialize');
         }
     }, []);
 

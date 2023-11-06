@@ -5,6 +5,7 @@ const t: typeof en = {
     descriptionWithSchema:
         '{{ dApp }} har sendt en rå besked og et schema til at oversætte den. Vi har oversat beskeden, men du burde kun underskrive hvis du stoler på {{ dApp }}',
     deserializedDisplay: 'Oversat',
+    unableToDeserialize: 'Det var ikke muligt at oversætte beskeden',
     rawDisplay: 'Rå',
     sign: 'Signér',
     reject: 'Afvis',
