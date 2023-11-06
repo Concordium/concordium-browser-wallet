@@ -1,5 +1,12 @@
 # Changelog
 
+## 1.1.11
+
+### Fixed
+
+-   Sign message's rendered view displaying 'a' when deserialization failed.
+-   Sign message's stringification failing with new `deserializeTypeValue`.
+
 ## 1.1.10
 
 ### Changed
