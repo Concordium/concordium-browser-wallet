@@ -5,7 +5,7 @@
 ### Fixed
 
 -   Sign message's rendered view displaying 'a' when deserialization failed.
--   Sign message deserialization failing with new `deserializeTypeValue`.
+-   Sign message's stringification failing with new `deserializeTypeValue`.
 -   An issue where the max contract execution energy was not rendered correctly for init contract transactions.
 
 ## 1.1.10
