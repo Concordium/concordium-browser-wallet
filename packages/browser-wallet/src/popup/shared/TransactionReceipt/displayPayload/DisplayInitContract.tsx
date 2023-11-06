@@ -26,7 +26,7 @@ export default function DisplayInitContract({ payload, parameters }: Props) {
             {displayAsCcd(payload.amount.microCcdAmount)}
             <h5>{t('maxEnergy')}:</h5>
             <span>
-                {payload.maxContractExecutionEnergy.toString()} {t('nrg')}
+                {payload.maxContractExecutionEnergy.value.toString()} {t('nrg')}
             </span>
             <DisplayParameters parameters={parameters} />
         </>
