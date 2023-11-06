@@ -1,5 +1,13 @@
 # Changelog
 
+## Unreleased
+
+### Changed
+
+-   Baker/baking renamed to validator/validation in UI.
+-   Default name for key file is now `validator-credentials.json`.
+-   Hide finalization commission rate in validator flows.
+
 ## 1.1.11
 
 ### Fixed
