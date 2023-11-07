@@ -501,7 +501,7 @@ describe(sanitizeSendTransactionInput, () => {
         };
         const result = sanitizeSendTransactionInput(accountAddress, type, payload);
         expect(result).toEqual(expected);
-        expect(result.payload).toBe(payload);
+        expect((result.payload as RegisterDataPayload).data).toStrictEqual(payload.data);
     });
 
     test('Transforms "UpdateCredentials" transaction input as expected', () => {
