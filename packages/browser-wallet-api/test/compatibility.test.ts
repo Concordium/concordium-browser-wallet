@@ -15,6 +15,8 @@ import {
     Energy,
     EntrypointName,
     IdStatementBuilder,
+    jsonParse,
+    jsonStringify,
     ModuleReference,
     OpenStatus,
     ReceiveName,
@@ -391,6 +393,46 @@ describe(sanitizeSendTransactionInput, () => {
         expect(result).toEqual(expected);
     });
 
+    test('Transforms "TransferWithMemo" transaction input with incorrect type as expected', () => {
+        const type = AccountTransactionType.TransferWithMemo;
+        const memo = new DataBlob(Buffer.from('Some memo message'));
+        const address = AccountAddress.fromBase58(accountAddress);
+
+        const expectedPayload: SimpleTransferWithMemoPayload = {
+            toAddress: AccountAddress.fromBase58(accountAddress),
+            amount: CcdAmount.fromMicroCcd(amount),
+            memo,
+        };
+
+        const expected: SanitizedSendTransactionInput = {
+            accountAddress: AccountAddress.fromBase58(accountAddress),
+            type,
+            payload: expectedPayload,
+        };
+
+        const payload: SimpleTransferWithMemoPayload = {
+            toAddress: {
+                address: address.address,
+                decodedAddress: address.decodedAddress,
+                __type: 'ccd_account_address',
+            },
+            amount: {
+                microCcdAmount: amount,
+                __type: 'ccd_ccd_amount',
+            },
+            memo: {
+                data: memo.data,
+                __type: 'ccd_data_blob',
+            },
+        } as unknown as SimpleTransferWithMemoPayload;
+
+        const result = sanitizeSendTransactionInput(accountAddress, type, payload);
+        expect(result).toEqual(expected);
+        const parsed = jsonParse(jsonStringify(result));
+        expect(() => parsed.payload.memo.toJSON()).not.toThrow();
+        expect(parsed).toEqual(expected);
+    });
+
     test('Transforms "ConfigureBaker" transaction input as expected', () => {
         const type = AccountTransactionType.ConfigureBaker;
         const keys: BakerKeysWithProofs = {
@@ -501,7 +543,32 @@ describe(sanitizeSendTransactionInput, () => {
         };
         const result = sanitizeSendTransactionInput(accountAddress, type, payload);
         expect(result).toEqual(expected);
-        expect(result.payload).toBe(payload);
+        expect((result.payload as RegisterDataPayload).data).toStrictEqual(payload.data);
+    });
+
+    test('Transformed "RegisterData" transaction input with "DataBlob"-like parameter can be parsed', () => {
+        const type = AccountTransactionType.RegisterData;
+
+        const payload: RegisterDataPayload = {
+            data: {
+                __type: 'ccd_data_blob',
+                data: new DataBlob(Buffer.from('This is data!')).data,
+            } as unknown as DataBlob,
+        };
+
+        const expected: SanitizedSendTransactionInput = {
+            accountAddress: AccountAddress.fromBase58(accountAddress),
+            type,
+            payload: {
+                data: new DataBlob(Buffer.from('This is data!')),
+            },
+        };
+
+        const result = sanitizeSendTransactionInput(accountAddress, type, payload);
+        expect(result).toEqual(expected);
+        const parsed = jsonParse(jsonStringify(result));
+        expect(() => parsed.payload.data.toJSON()).not.toThrow();
+        expect(parsed).toEqual(expected);
     });
 
     test('Transforms "UpdateCredentials" transaction input as expected', () => {

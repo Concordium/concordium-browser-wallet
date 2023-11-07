@@ -10,6 +10,7 @@ import {
     InitName,
     ReceiveName,
     UpdateContractPayload,
+    AccountAddress,
 } from '@concordium/web-sdk';
 
 export const CONTRACT_NAME = 'PiggyBank';
@@ -26,7 +27,7 @@ export const deposit = (account: string, index: bigint, subindex = 0n, amount = 
     detectConcordiumProvider()
         .then((provider) => {
             provider
-                .sendTransaction(account, AccountTransactionType.Update, {
+                .sendTransaction(AccountAddress.fromBase58(account), AccountTransactionType.Update, {
                     amount: CcdAmount.fromMicroCcd(amount),
                     address: ContractAddress.create(index, subindex),
                     receiveName: ReceiveName.fromString(`${CONTRACT_NAME}.insert`),
@@ -50,7 +51,7 @@ export const smash = (account: string, index: bigint, subindex = 0n) => {
     detectConcordiumProvider()
         .then((provider) => {
             provider
-                .sendTransaction(account, AccountTransactionType.Update, {
+                .sendTransaction(AccountAddress.fromBase58(account), AccountTransactionType.Update, {
                     amount: CcdAmount.fromMicroCcd(0), // This feels weird? Why do I need an amount for a non-payable receive?
                     address: ContractAddress.create(index, subindex),
                     receiveName: ReceiveName.fromString(`${CONTRACT_NAME}.smash`),

@@ -46,8 +46,8 @@
                 document.getElementById('sendTransfer').addEventListener('click', () =>
                     provider
                         .sendTransaction(currentAccountAddress, concordiumSDK.AccountTransactionType.Transfer, {
-                            amount: new concordiumSDK.CcdAmount(1n),
-                            toAddress: new concordiumSDK.AccountAddress(
+                            amount: concordiumSDK.CcdAmount.fromMicroCcd(1n),
+                            toAddress: concordiumSDK.AccountAddress.fromBase58(
                                 '3kBx2h5Y2veb4hZgAJWPrr8RyQESKm5TjzF3ti1QQ4VSYLwK1G'
                             ),
                         })
@@ -103,7 +103,7 @@
                     );
                     provider
                         .signMessage(currentAccountAddress, {
-                            data: serializedMessage.toString('hex'),
+                            data: concordiumSDK.Parameter.toHexString(serializedMessage),
                             schema: SERIALIZATION_HELPER_SCHEMA,
                         })
                         .then((sig) => alert(JSON.stringify(sig)))
@@ -112,7 +112,7 @@
                 document.getElementById('sendDeposit').addEventListener('click', () =>
                     provider
                         .sendTransaction(currentAccountAddress, concordiumSDK.AccountTransactionType.Update, {
-                            amount: new concordiumSDK.CcdAmount(1n),
+                            amount: concordiumSDK.CcdAmount.fromMicroCcd(1n),
                             contractAddress: {
                                 index: 98n,
                                 subindex: 0n,
@@ -129,7 +129,7 @@
                             currentAccountAddress,
                             concordiumSDK.AccountTransactionType.Update,
                             {
-                                amount: new concordiumSDK.CcdAmount(1n),
+                                amount: concordiumSDK.CcdAmount.fromMicroCcd(1n),
                                 contractAddress: {
                                     index: 98n,
                                     subindex: 0n,
@@ -154,8 +154,8 @@
                             currentAccountAddress,
                             concordiumSDK.AccountTransactionType.InitContract,
                             {
-                                amount: new concordiumSDK.CcdAmount(1n),
-                                moduleRef: new concordiumSDK.ModuleReference(
+                                amount: concordiumSDK.CcdAmount.fromMicroCcd(1n),
+                                moduleRef: concordiumSDK.ModuleReference.fromHexString(
                                     '6eab4584bd60b1d82fba3abe16082cde3dbee4c08c9f60b6dc523688bdc421b9'
                                 ),
                                 contractName: 'two-step-transfer',
