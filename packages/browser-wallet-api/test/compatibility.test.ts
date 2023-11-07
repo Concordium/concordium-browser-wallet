@@ -23,6 +23,8 @@ import {
     SimpleTransferPayload,
     SimpleTransferWithMemoPayload,
     UpdateCredentialsPayload,
+    jsonParse,
+    jsonStringify,
 } from '@concordium/web-sdk';
 import {
     SendTransactionInitContractPayload,
@@ -502,6 +504,32 @@ describe(sanitizeSendTransactionInput, () => {
         const result = sanitizeSendTransactionInput(accountAddress, type, payload);
         expect(result).toEqual(expected);
         expect((result.payload as RegisterDataPayload).data).toStrictEqual(payload.data);
+    });
+
+    test('Transformed "RegisterData" transaction input with "DataBlob"-like parameter can be parsed', () => {
+        const type = AccountTransactionType.RegisterData;
+
+        const payload: RegisterDataPayload = {
+            data: {
+                __type: 'ccd_block_hash',
+                data: new DataBlob(Buffer.from('This is data!')).data,
+            } as unknown as DataBlob,
+        };
+
+        const expected: SanitizedSendTransactionInput = {
+            accountAddress: AccountAddress.fromBase58(accountAddress),
+            type,
+            payload: {
+                data: new DataBlob(Buffer.from('This is data!')),
+            },
+        };
+
+        const result = sanitizeSendTransactionInput(accountAddress, type, payload);
+
+        const parsed = jsonParse(jsonStringify(result));
+
+        expect(() => parsed.payload.data.toJSON()).not.toThrow();
+        expect(parsed).toEqual(expected);
     });
 
     test('Transforms "UpdateCredentials" transaction input as expected', () => {
