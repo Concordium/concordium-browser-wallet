@@ -42,7 +42,9 @@ export function isGtuAmount(cand: any): cand is GtuAmount {
 }
 
 function sanitizeAccountAddress(accountAddress: AccountAddressSource): AccountAddress.Type {
-    return AccountAddress.instanceOf(accountAddress) ? accountAddress : AccountAddress.fromBase58(accountAddress);
+    return typeof accountAddress === 'string'
+        ? AccountAddress.fromBase58(accountAddress)
+        : AccountAddress.fromBase58(accountAddress.address);
 }
 
 export type SanitizedSignMessageInput = {
@@ -92,10 +94,10 @@ export function sanitizeAddCIS2TokensInput(
 ): SanitizedAddCIS2TokensInput {
     const accountAddress = sanitizeAccountAddress(_accountAddress);
     let contractAddress: ContractAddress.Type;
-    if (ContractAddress.instanceOf(contractAddressSource)) {
-        contractAddress = contractAddressSource;
-    } else {
+    if (typeof contractAddressSource === 'bigint') {
         contractAddress = ContractAddress.create(contractAddressSource, contractSubindex);
+    } else {
+        contractAddress = ContractAddress.create(contractAddressSource.index, contractSubindex);
     }
 
     return { accountAddress, tokenIds, contractAddress };
