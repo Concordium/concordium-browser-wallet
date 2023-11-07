@@ -7,6 +7,7 @@
 -   Sign message's rendered view displaying 'a' when deserialization failed.
 -   Sign message's stringification failing with new `deserializeTypeValue`.
 -   An issue where the max contract execution energy was not rendered correctly for init contract transactions.
+-   Updated web-sdk to fix an issue where init contract transactions were not serialized correctly.
 
 ## 1.1.10
 
