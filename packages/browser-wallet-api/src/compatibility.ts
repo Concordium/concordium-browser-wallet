@@ -98,7 +98,7 @@ export function sanitizeAddCIS2TokensInput(
     if (typeof contractAddressSource === 'bigint') {
         contractAddress = ContractAddress.create(contractAddressSource, contractSubindex);
     } else {
-        contractAddress = ContractAddress.create(contractAddressSource.index, contractSubindex);
+        contractAddress = ContractAddress.create(contractAddressSource.index, contractAddressSource.subindex);
     }
 
     return { accountAddress, tokenIds, contractAddress };
