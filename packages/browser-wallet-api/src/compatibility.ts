@@ -30,6 +30,7 @@ import {
     SimpleTransferPayload,
     SimpleTransferWithMemoPayload,
     UpdateCredentialsPayload,
+    DataBlob,
 } from '@concordium/web-sdk';
 
 export type GtuAmount = { microGtuAmount: bigint };
@@ -298,17 +299,27 @@ function sanitizePayload(type: AccountTransactionType, payload: SendTransactionP
                 source,
             } as DeployModulePayload;
         }
-        case AccountTransactionType.Transfer:
-        case AccountTransactionType.TransferWithMemo: {
-            // The "memo" part of transfers have not changes, so these are treated the same.
-            const p = payload as SimpleTransferPayloadCompat | SimpleTransferWithMemoPayloadCompat;
+        case AccountTransactionType.Transfer: {
+            const p = payload as SimpleTransferPayloadCompat;
 
             const amount = CcdAmount.fromMicroCcd(
                 isGtuAmount(p.amount) ? p.amount.microGtuAmount : p.amount.microCcdAmount
             );
             const toAddress = AccountAddress.fromBuffer(p.toAddress.decodedAddress);
 
-            return { ...p, amount, toAddress } as SimpleTransferPayload | SimpleTransferWithMemoPayload;
+            return { amount, toAddress } as SimpleTransferPayload;
+        }
+        case AccountTransactionType.TransferWithMemo: {
+            const p = payload as SimpleTransferWithMemoPayloadCompat;
+
+            const amount = CcdAmount.fromMicroCcd(
+                isGtuAmount(p.amount) ? p.amount.microGtuAmount : p.amount.microCcdAmount
+            );
+            const toAddress = AccountAddress.fromBuffer(p.toAddress.decodedAddress);
+
+            const memo = new DataBlob(p.memo.data);
+
+            return { amount, toAddress, memo } as SimpleTransferWithMemoPayload;
         }
         case AccountTransactionType.ConfigureBaker:
         case AccountTransactionType.ConfigureDelegation: {
@@ -316,10 +327,16 @@ function sanitizePayload(type: AccountTransactionType, payload: SendTransactionP
             const stake = p.stake !== undefined ? CcdAmount.fromMicroCcd(p.stake.microCcdAmount) : undefined;
             return { ...p, stake } as ConfigureBakerPayload | ConfigureDelegationPayload;
         }
-        case AccountTransactionType.RegisterData:
+        case AccountTransactionType.RegisterData: {
+            const p = payload as RegisterDataPayloadCompat;
+
+            const data = new DataBlob(p.data.data);
+
+            return { data } as RegisterDataPayload;
+        }
         case AccountTransactionType.UpdateCredentials:
             // No changes across any API versions.
-            return payload as RegisterDataPayload | UpdateCredentialsPayload;
+            return payload as UpdateCredentialsPayload;
         default:
             // This should never happen, but is here for backwards compatibility.
             return payload as SendTransactionPayload;
