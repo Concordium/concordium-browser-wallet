@@ -41,7 +41,7 @@ export default function CommissionsPage({ initial, onNext }: CommissionsProps) {
     }
 
     const onSubmit = (vs: CommissionsForm) => {
-        const finalizationCommissionPercentage = chainParameters.transactionCommissionRange.max * 100;
+        const finalizationCommissionPercentage = chainParameters.finalizationCommissionRange.max * 100;
         onNext({ ...vs, finalizationCommission: finalizationCommissionPercentage });
     };
 
