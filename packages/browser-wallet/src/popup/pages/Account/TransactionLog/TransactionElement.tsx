@@ -114,15 +114,15 @@ function mapTypeToText(type: AccountTransactionType | RewardType | SpecialTransa
         case AccountTransactionType.Transfer:
             return 'Transfer';
         case AccountTransactionType.AddBaker:
-            return 'Add baker';
+            return 'Add validator';
         case AccountTransactionType.RemoveBaker:
-            return 'Remove baker';
+            return 'Remove validator';
         case AccountTransactionType.UpdateBakerStake:
-            return 'Baker stake update';
+            return 'Validator stake update';
         case AccountTransactionType.UpdateBakerRestakeEarnings:
-            return 'Baker restake earnings update';
+            return 'Validator restake earnings update';
         case AccountTransactionType.UpdateBakerKeys:
-            return 'Baker keys update';
+            return 'Validator keys update';
         case AccountTransactionType.UpdateCredentialKeys:
             return 'Account keys update';
         case RewardType.BakingReward:
@@ -150,7 +150,7 @@ function mapTypeToText(type: AccountTransactionType | RewardType | SpecialTransa
         case AccountTransactionType.TransferWithScheduleAndMemo:
             return 'Scheduled transfer';
         case AccountTransactionType.ConfigureBaker:
-            return 'Configure baker';
+            return 'Configure validator';
         case AccountTransactionType.ConfigureDelegation:
             return 'Configure delegation';
         case RewardType.StakingReward:

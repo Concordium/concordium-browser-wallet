@@ -35,11 +35,15 @@ export default function CommissionsPage({ initial, onNext }: CommissionsProps) {
     const { t } = useTranslation('account', { keyPrefix: 'baking.configure' });
     const { chainParameters } = useContext(earnPageContext);
     const defaultValues: Partial<CommissionsForm> = useMemo(() => (initial === undefined ? {} : initial), [initial]);
-    const onSubmit = (vs: CommissionsForm) => onNext(vs);
 
     if (!chainParameters || isChainParametersV0(chainParameters)) {
         return null;
     }
+
+    const onSubmit = (vs: CommissionsForm) => {
+        const finalizationCommissionPercentage = chainParameters.finalizationCommissionRange.max * 100;
+        onNext({ ...vs, finalizationCommission: finalizationCommissionPercentage });
+    };
 
     return (
         <Form<CommissionsForm> className="configure-flow-form" defaultValues={defaultValues} onSubmit={onSubmit}>
@@ -61,14 +65,6 @@ export default function CommissionsPage({ initial, onNext }: CommissionsProps) {
                             min={chainParameters.bakingCommissionRange.min}
                             max={chainParameters.bakingCommissionRange.max}
                             rules={validationRules(chainParameters.bakingCommissionRange)}
-                            control={f.control}
-                        />
-                        <CommissionField
-                            label={tShared('baking.finalizationCommission')}
-                            name="finalizationCommission"
-                            min={chainParameters.finalizationCommissionRange.min}
-                            max={chainParameters.finalizationCommissionRange.max}
-                            rules={validationRules(chainParameters.finalizationCommissionRange)}
                             control={f.control}
                         />
                     </div>
