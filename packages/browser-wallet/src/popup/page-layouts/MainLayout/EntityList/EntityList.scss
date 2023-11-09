@@ -11,6 +11,7 @@ $entity-list-top-height: rem(25px);
         height: $entity-list-top-height;
         border: 1px solid $color-petroleum;
         border-top: none;
+        z-index: 1;
 
         &--search-focus {
             grid-template-columns: auto rem(25px);
