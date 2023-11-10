@@ -2184,7 +2184,7 @@ __metadata:
   dependencies:
     "@concordium/browser-wallet-api-helpers": "workspace:^"
     "@concordium/browser-wallet-message-hub": "workspace:^"
-    "@concordium/web-sdk": ^7.0.3
+    "@concordium/web-sdk": beta
     "@concordium/web-sdk-legacy": "npm:@concordium/web-sdk@6"
     "@protobuf-ts/grpcweb-transport": ^2.8.2
     "@protobuf-ts/runtime-rpc": ^2.8.2
@@ -2213,7 +2213,7 @@ __metadata:
     "@concordium/browser-wallet-api": "workspace:^"
     "@concordium/browser-wallet-api-helpers": "workspace:^"
     "@concordium/browser-wallet-message-hub": "workspace:^"
-    "@concordium/web-sdk": ^7.0.3
+    "@concordium/web-sdk": beta
     "@craftamap/esbuild-plugin-html": ^0.4.0
     "@mdx-js/react": ^1.6.22
     "@noble/ed25519": ^1.7.0
@@ -2358,30 +2358,6 @@ __metadata:
   languageName: node
   linkType: hard
 
-"@concordium/web-sdk@npm:7.0.4-rc.3":
-  version: 7.0.4-rc.3
-  resolution: "@concordium/web-sdk@npm:7.0.4-rc.3"
-  dependencies:
-    "@concordium/rust-bindings": 2.0.1
-    "@grpc/grpc-js": ^1.9.4
-    "@noble/ed25519": ^2.0.0
-    "@noble/hashes": ^1.3.2
-    "@protobuf-ts/grpc-transport": ^2.9.1
-    "@protobuf-ts/grpcweb-transport": ^2.9.1
-    "@protobuf-ts/runtime-rpc": ^2.8.2
-    "@scure/bip39": ^1.2.1
-    "@types/big.js": ^6.2.0
-    big.js: ^6.2.0
-    bs58check: ^3.0.1
-    buffer: ^6.0.3
-    hash.js: ^1.1.7
-    iso-3166-1: ^2.1.1
-    json-bigint: ^1.0.0
-    uuid: ^8.3.2
-  checksum: df85c9fbb9dd069b72df6dbd6ed6f0c1d29b479e1b56beab2267da46b8f2f78f5c5cd8fa3d1a103f4263c3e8c1b999693a3da7dfa7b99be04b0b6b1a6983cdd8
-  languageName: node
-  linkType: hard
-
 "@concordium/web-sdk@npm:^7.0.3":
   version: 7.0.3
   resolution: "@concordium/web-sdk@npm:7.0.3"
@@ -2403,6 +2379,30 @@ __metadata:
     json-bigint: ^1.0.0
     uuid: ^8.3.2
   checksum: 1cb8966c335655f0d9cdb19dd5f39acb655136ddae4181b29368dfa555852eac41f14d983792b5fbdaf5a2ce0383638c9b6c1e81a61cbecd6da61426f5753a6d
+  languageName: node
+  linkType: hard
+
+"@concordium/web-sdk@npm:beta":
+  version: 7.0.4-rc.3
+  resolution: "@concordium/web-sdk@npm:7.0.4-rc.3"
+  dependencies:
+    "@concordium/rust-bindings": 2.0.1
+    "@grpc/grpc-js": ^1.9.4
+    "@noble/ed25519": ^2.0.0
+    "@noble/hashes": ^1.3.2
+    "@protobuf-ts/grpc-transport": ^2.9.1
+    "@protobuf-ts/grpcweb-transport": ^2.9.1
+    "@protobuf-ts/runtime-rpc": ^2.8.2
+    "@scure/bip39": ^1.2.1
+    "@types/big.js": ^6.2.0
+    big.js: ^6.2.0
+    bs58check: ^3.0.1
+    buffer: ^6.0.3
+    hash.js: ^1.1.7
+    iso-3166-1: ^2.1.1
+    json-bigint: ^1.0.0
+    uuid: ^8.3.2
+  checksum: df85c9fbb9dd069b72df6dbd6ed6f0c1d29b479e1b56beab2267da46b8f2f78f5c5cd8fa3d1a103f4263c3e8c1b999693a3da7dfa7b99be04b0b6b1a6983cdd8
   languageName: node
   linkType: hard
 
@@ -7553,7 +7553,7 @@ __metadata:
   resolution: "NFT-Minting@workspace:examples/nft-minting"
   dependencies:
     "@concordium/browser-wallet-api-helpers": "workspace:^"
-    "@concordium/web-sdk": 7.0.4-rc.3
+    "@concordium/web-sdk": beta
     "@craftamap/esbuild-plugin-html": ^0.4.0
     "@types/react": ^18.0.9
     "@types/react-dom": ^18.0.5
@@ -7705,7 +7705,7 @@ __metadata:
   version: 0.0.0-use.local
   resolution: "add-example-web3-id@workspace:examples/add-example-Web3Id"
   dependencies:
-    "@concordium/web-sdk": 7.0.4-rc.3
+    "@concordium/web-sdk": beta
     live-server: ^1.2.2
   languageName: unknown
   linkType: soft
@@ -11099,7 +11099,7 @@ __metadata:
   resolution: "e_sealing@workspace:examples/eSealing"
   dependencies:
     "@concordium/react-components": beta
-    "@concordium/web-sdk": 7.0.4-rc.3
+    "@concordium/web-sdk": beta
     "@thi.ng/leb128": ^2.1.18
     "@types/node": ^18.7.23
     "@types/react": ^18.0.9
@@ -18383,7 +18383,7 @@ __metadata:
   resolution: "piggybank@workspace:examples/piggybank"
   dependencies:
     "@concordium/browser-wallet-api-helpers": "workspace:^"
-    "@concordium/web-sdk": 7.0.4-rc.3
+    "@concordium/web-sdk": beta
     "@types/react": ^18.0.9
     "@types/react-dom": ^18.0.5
     "@vitejs/plugin-react-swc": ^3.4.0
@@ -22489,7 +22489,7 @@ __metadata:
   version: 0.0.0-use.local
   resolution: "two-step-transfer@workspace:examples/two-step-transfer"
   dependencies:
-    "@concordium/web-sdk": 7.0.4-rc.3
+    "@concordium/web-sdk": beta
     live-server: ^1.2.2
   languageName: unknown
   linkType: soft
@@ -23265,13 +23265,12 @@ __metadata:
   resolution: "voting@workspace:examples/voting"
   dependencies:
     "@concordium/browser-wallet-api-helpers": ^3.0.0
-    "@concordium/web-sdk": 7.0.4-rc.3
+    "@concordium/web-sdk": beta
     "@types/node": ^18.7.23
     "@types/react": ^18.0.9
     "@types/react-dom": ^18.0.5
     "@vitejs/plugin-react-swc": ^3.4.0
     bootstrap: ^5.2.1
-    cross-env: ^7.0.3
     moment: ^2.29.4
     react: ^18.2.0
     react-bootstrap: ^2.5.0
@@ -23390,7 +23389,7 @@ __metadata:
   resolution: "wccd@workspace:examples/wCCD"
   dependencies:
     "@concordium/react-components": beta
-    "@concordium/web-sdk": 7.0.4-rc.3
+    "@concordium/web-sdk": beta
     "@thi.ng/leb128": ^2.1.18
     "@types/node": ^18.7.23
     "@types/react": ^18.0.9

@@ -9,7 +9,7 @@
     "dependencies": {
         "@concordium/browser-wallet-api-helpers": "workspace:^",
         "@concordium/browser-wallet-message-hub": "workspace:^",
-        "@concordium/web-sdk": "^7.0.3",
+        "@concordium/web-sdk": "beta",
         "@concordium/web-sdk-legacy": "npm:@concordium/web-sdk@6",
         "@protobuf-ts/grpcweb-transport": "^2.8.2",
         "@protobuf-ts/runtime-rpc": "^2.8.2",

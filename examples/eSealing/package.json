@@ -5,7 +5,7 @@
     "license": "Apache-2.0",
     "dependencies": {
         "@concordium/react-components": "beta",
-        "@concordium/web-sdk": "7.0.4-rc.3",
+        "@concordium/web-sdk": "beta",
         "@thi.ng/leb128": "^2.1.18",
         "@types/sha256": "^0.2.0",
         "@walletconnect/types": "^2.1.4",
