@@ -24,20 +24,12 @@ type ItemProps = {
     selected: boolean;
 };
 
-function BakerOrDelegatorIcon({
-    accountInfo,
-    width,
-    className,
-}: {
-    accountInfo: AccountInfo;
-    width: string;
-    className: string;
-}) {
+function BakerOrDelegatorIcon({ accountInfo, className }: { accountInfo: AccountInfo; className: string }) {
     if (isDelegatorAccount(accountInfo)) {
-        return <DelegationIcon width={width} className={className} />;
+        return <DelegationIcon width="71" className={className} />;
     }
     if (isBakerAccount(accountInfo)) {
-        return <BakerIcon width={width} className={className} />;
+        return <BakerIcon width="65" className={className} />;
     }
     return null;
 }
@@ -58,7 +50,7 @@ function AccountListItem({ account, checked, selected }: ItemProps) {
                     {displaySplitAddress(account.address)}{' '}
                     {selected && <CheckmarkIcon className="main-layout__header-list-item__check" />}
                 </div>
-                {accountInfo && <BakerOrDelegatorIcon accountInfo={accountInfo} width="15" className="absolute r-25" />}
+                {accountInfo && <BakerOrDelegatorIcon accountInfo={accountInfo} className="absolute r-25" />}
                 <CopyButton
                     className="absolute r-0"
                     value={account.address}
