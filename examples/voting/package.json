@@ -1,13 +1,12 @@
 {
     "name": "voting",
     "license": "Apache-2.0",
-    "version": "1.1.1",
+    "version": "1.1.3",
     "packageManager": "yarn@3.2.0",
     "dependencies": {
-        "@concordium/browser-wallet-api-helpers": "beta",
-        "@concordium/web-sdk": "^7.0.3",
+        "@concordium/browser-wallet-api-helpers": "^3.0.0",
+        "@concordium/web-sdk": "^7.1.0",
         "bootstrap": "^5.2.1",
-        "cross-env": "^7.0.3",
         "moment": "^2.29.4",
         "react": "^18.2.0",
         "react-bootstrap": "^2.5.0",
@@ -20,16 +19,17 @@
         "@types/node": "^18.7.23",
         "@types/react": "^18.0.9",
         "@types/react-dom": "^18.0.5",
-        "esbuild": "^0.19.5",
-        "esbuild-plugin-copy": "^1.6.0",
-        "esbuild-plugin-svgr": "^1.0.1",
-        "express": "^4.18.1",
+        "@vitejs/plugin-react-swc": "^3.4.0",
         "ts-node": "^10.8.0",
-        "typescript": "^5.2.2"
+        "typescript": "^5.2.2",
+        "vite": "^4.5.0",
+        "vite-plugin-svgr": "^4.1.0",
+        "vite-plugin-top-level-await": "^1.3.1",
+        "vite-plugin-wasm": "^3.2.2"
     },
     "scripts": {
-        "build": "node --loader ts-node/esm ./esbuild.config.ts; cp ./public/static/img/* ./dist",
-        "start": "node ./serve",
-        "watch": "cross-env WATCH=1 yarn build"
+        "build": "vite build",
+        "start": "vite preview",
+        "watch": "vite"
     }
 }
