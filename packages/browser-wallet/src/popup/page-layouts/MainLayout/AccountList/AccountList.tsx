@@ -5,7 +5,7 @@ import { useNavigate } from 'react-router-dom';
 import { ClassName, displayAsCcd } from 'wallet-common-helpers';
 import CopyButton from '@popup/shared/CopyButton';
 import CheckmarkIcon from '@assets/svg/checkmark-blue.svg';
-import BakerIcon from '@assets/svg/baker.svg';
+import BakerIcon from '@assets/svg/validator.svg';
 import DelegationIcon from '@assets/svg/delegation.svg';
 import { absoluteRoutes } from '@popup/constants/routes';
 import { credentialsAtom, selectedAccountAtom } from '@popup/store/account';
@@ -26,10 +26,10 @@ type ItemProps = {
 
 function BakerOrDelegatorIcon({ accountInfo, className }: { accountInfo: AccountInfo; className: string }) {
     if (isDelegatorAccount(accountInfo)) {
-        return <DelegationIcon width="71" className={className} />;
+        return <DelegationIcon width="70" className={className} />;
     }
     if (isBakerAccount(accountInfo)) {
-        return <BakerIcon width="65" className={className} />;
+        return <BakerIcon width="66" className={className} />;
     }
     return null;
 }
