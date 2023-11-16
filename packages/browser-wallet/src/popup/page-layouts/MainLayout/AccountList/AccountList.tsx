@@ -5,7 +5,7 @@ import { useNavigate } from 'react-router-dom';
 import { ClassName, displayAsCcd } from 'wallet-common-helpers';
 import CopyButton from '@popup/shared/CopyButton';
 import CheckmarkIcon from '@assets/svg/checkmark-blue.svg';
-import BakerIcon from '@assets/svg/baker.svg';
+import BakerIcon from '@assets/svg/validator.svg';
 import DelegationIcon from '@assets/svg/delegation.svg';
 import { absoluteRoutes } from '@popup/constants/routes';
 import { credentialsAtom, selectedAccountAtom } from '@popup/store/account';
@@ -24,20 +24,12 @@ type ItemProps = {
     selected: boolean;
 };
 
-function BakerOrDelegatorIcon({
-    accountInfo,
-    width,
-    className,
-}: {
-    accountInfo: AccountInfo;
-    width: string;
-    className: string;
-}) {
+function BakerOrDelegatorIcon({ accountInfo, className }: { accountInfo: AccountInfo; className: string }) {
     if (isDelegatorAccount(accountInfo)) {
-        return <DelegationIcon width={width} className={`${className} delegationBakingImage`} />;
+        return <DelegationIcon width="70" className={className} />;
     }
     if (isBakerAccount(accountInfo)) {
-        return <BakerIcon width={width} className={`${className} delegationBakingImage`} />;
+        return <BakerIcon width="66" className={className} />;
     }
     return null;
 }
@@ -58,7 +50,7 @@ function AccountListItem({ account, checked, selected }: ItemProps) {
                     {displaySplitAddress(account.address)}{' '}
                     {selected && <CheckmarkIcon className="main-layout__header-list-item__check" />}
                 </div>
-                {accountInfo && <BakerOrDelegatorIcon accountInfo={accountInfo} width="15" className="absolute r-25" />}
+                {accountInfo && <BakerOrDelegatorIcon accountInfo={accountInfo} className="absolute r-25" />}
                 <CopyButton
                     className="absolute r-0"
                     value={account.address}
