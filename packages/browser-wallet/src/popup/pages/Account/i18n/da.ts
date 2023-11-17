@@ -116,8 +116,8 @@ const t: typeof en = {
                 body: 'Der er to modeller man kan være til delegation. <2><3>Delegating til en specifik pulje</3><3>Passiv delegation</3></2>En validator-pulje administreres af en individuel validator, som kører en node, så fortjenesterne afhænger af validatorens ydeevne/stabilitet.\n\nPassiv delegation går ikke til en specifik pulje, hvilket gør at det mitigerer risikoen for problemer med en validator, men fortjenesterne er lavere.\n\nFor at læse mere, besøg vores <1>dokumentation side</1>.',
             },
             '3': {
-                title: 'validator-puljer',
-                body: 'En validator-pulje administreres af en individuel validator.\n\nAt have en pulje kan give validatoren en større stake og øge deres chance for at blive valgt til at bake en block.\n\nValidatorer tjener provision fra deres delegators når de validator en block.\n\nDelegering til en pulge har normalt højere fortjeneste end passiv delegation, men der er en risiko for at tabe fortjenester hvis validatoren ikke er stabil eller oplever problemer. Det er derfor en god ide at holde øje med validatorens velbefindende.\n\nDu kan læse mere om dette på vores <1>dokumentation side</1>.',
+                title: 'Validator-puljer',
+                body: 'En validator-pulje administreres af en individuel validator.\n\nAt have en pulje kan give validatoren en større stake og øge deres chance for at blive valgt til at producere en block.\n\nValidatorer tjener provision fra deres delegators når de validator en block.\n\nDelegering til en pulge har normalt højere fortjeneste end passiv delegation, men der er en risiko for at tabe fortjenester hvis validatoren ikke er stabil eller oplever problemer. Det er derfor en god ide at holde øje med validatorens velbefindende.\n\nDu kan læse mere om dette på vores <1>dokumentation side</1>.',
             },
             '4': {
                 title: 'Passiv delegation',
@@ -129,7 +129,7 @@ const t: typeof en = {
             },
             '6': {
                 title: 'Lock-in og cool-downs',
-                body: 'Når du laver delegation, bliver din delegation saldo låst til din konto.\n\nDette betyder at du ikke kan bruge CCD fra denne saldo mens det bliver brugt til delegation.\n\nHvis du formindsker din delegation saldo eller helt stopper for delegation, vil denne saldo forblive låst i en cool-down periode. I løbet af denne cool-down periode, vil den fulde delegation saldo stadig yde fortjenester.\n\nDa transaktioner har omkostninger er det vigtigt at huske på at man behøver nogle ulåste CCD, udenfor delegation saldoen, som kan bruges til at betale omkostningerne for at frigøre delegation saldoen igen.',
+                body: 'Når du laver delegation, bliver din delegation saldo låst til din konto.\n\nDette betyder at du ikke kan bruge CCD fra denne saldo mens det bliver brugt til delegation.\n\nHvis du formindsker din delegation saldo eller helt stopper for delegation, vil denne saldo forblive låst i en cool-down periode.\n\nDa transaktioner har omkostninger er det vigtigt at huske på at man behøver nogle ulåste CCD, udenfor delegation saldoen, som kan bruges til at betale omkostningerne for at frigøre delegation saldoen igen.',
             },
             '7': {
                 title: 'Status siden',
@@ -231,7 +231,7 @@ const t: typeof en = {
             },
             '3': {
                 title: 'Validator-pulje',
-                body: 'Når du opretter en validator kan du vælge at åbne en validator-pulje. En validator-pulje gør det muligt for andre at får fortjenester uden at køre en node eller selv blive validator.\n\n For at gøre dette, så delegerer de CCD til din validator-pulje, som øger din totale stake og din change for at vinde lotteriet om at bake en block. Ved hver pay day bliver fortjenesterne fordelt mellem dig og dine delegators.\n\nDu kan også vælge ikke at åbne en pulje, og så vil det kun være din egen stake som tæller med til lotteriet. Du kan altid åbne eller lukke en pulje senere.',
+                body: 'Når du opretter en validator kan du vælge at åbne en validator-pulje. En validator-pulje gør det muligt for andre at får fortjenester uden at køre en node eller selv blive validator.\n\n For at gøre dette, så delegerer de CCD til din validator-pulje, som øger din totale stake og din change for at vinde lotteriet om at producere en block. Ved hver pay day bliver fortjenesterne fordelt mellem dig og dine delegators.\n\nDu kan også vælge ikke at åbne en pulje, og så vil det kun være din egen stake som tæller med til lotteriet. Du kan altid åbne eller lukke en pulje senere.',
             },
         },
         removeIntro: {
