@@ -136,7 +136,7 @@ const t = {
             },
             '4': {
                 title: 'Update pool settings',
-                body: 'There is a cool-down period if you choose to close a pool. During this time, all delegators continue in the pool, and the pool continues to earn rewards if it bakes.\n\nAfter the cool-down, the delegators are removed and the pool will be closed. The validator will keep validating with your own stake afterwards.\n\nChanges to the metadata URL take effect from the next pay day unless the transaction is made too close to the pay day. In that case, it will take effect from the next pay day over.',
+                body: 'There is a cool-down period if you choose to close a pool. During this time, all delegators continue in the pool, and the pool continues to earn rewards if it produces blocks.\n\nAfter the cool-down, the delegators are removed and the pool will be closed. The validator will keep validating with your own stake afterwards.\n\nChanges to the metadata URL take effect from the next pay day unless the transaction is made too close to the pay day. In that case, it will take effect from the pay day following.',
             },
             '5': {
                 title: 'Update validator keys',
