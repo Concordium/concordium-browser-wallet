@@ -237,7 +237,7 @@ const t: typeof en = {
         removeIntro: {
             '1': {
                 title: 'Stop validation',
-                body: 'Hvis du længere ønsker at være validator på en konto kan du stoppe validation. Der er en cool-down periode hvorefter den fulde stake vil blive frigjort til din offentlige saldo ved den første pay day efter cool down.\n\nHvis din pulje har delegators, vil de automatisk blive flyttet til passiv delegation.\n\nHvis du afmelder din konto som validator, så husk at dette ikke lukker din node ned. Du skal stadig lukke din node ned separat, hvis du ikke længere ønske at køre en node Concordium blockchain.',
+                body: 'Hvis du ikke længere ønsker at være validator på en konto kan du stoppe validation. Der er en cool-down periode hvorefter den fulde stake vil blive frigjort til din offentlige saldo ved den første pay day efter cool down.\n\nHvis din pulje har delegators, vil de automatisk blive flyttet til passiv delegation.\n\nHvis du afmelder din konto som validator, så husk at dette ikke lukker din node ned. Du skal stadig lukke din node ned separat, hvis du ikke længere ønske at køre en node Concordium blockchain.',
             },
         },
         updateIntro: {
