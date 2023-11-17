@@ -243,7 +243,7 @@ const t: typeof en = {
         updateIntro: {
             '2': {
                 title: 'Opdater validator stake',
-                body: 'Når du opdaterer din validator stake, kan du vælge at øge eller formindske din stake, så vil ændringen som regel tage effekt fra den næste pay day. Hvis det er for tæt på den næste pay day, så vil ændringen tage i kraft den efterfølgende pay day.\n\n Hvis du formindsker din stake så er der en cool-down periode. I denne periode vil din stake stadig blive brugt til validation og få fortjenester\n\nDu kan også ændre hvorvidt dine fortjenester til tilføjet til din stake eller ej.',
+                body: 'Når du opdaterer din validator stake, kan du vælge at øge eller formindske din stake, så vil ændringen som regel tage effekt fra den næste pay day. Hvis det er for tæt på den næste pay day, så vil ændringen tage i kraft den efterfølgende pay day.\n\n Hvis du formindsker din stake så er der en cool-down periode.\n\nDu kan også ændre hvorvidt dine fortjenester til tilføjet til din stake eller ej.',
             },
             '3': {
                 title: 'Opdater puljeindstillinger',

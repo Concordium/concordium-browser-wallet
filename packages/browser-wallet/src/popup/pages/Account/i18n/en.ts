@@ -128,7 +128,7 @@ const t = {
         updateIntro: {
             '2': {
                 title: 'Update validator stake',
-                body: 'When updating your validator stake you can choose to increase or decrease your stake. If you increase your stake, this is most often effective from the next pay day. If the transaction occurs too close to the next pay day, the update will be effective from the following pay day.\n\nIf you decrease your stake, there is a longer cool-down period. During the cool-down period, the staked amount continues to bake and earn rewards.\n\nYou can also adjust whether you want rewards restaked or not. If the transaction is not made too close to the next pay day, it will take effect then; otherwise it will be effective at the next pay day over.',
+                body: 'When updating your validator stake you can choose to increase or decrease your stake. If you increase your stake, this is most often effective from the next pay day. If the transaction occurs too close to the next pay day, the update will be effective from the following pay day.\n\nIf you decrease your stake, there is a longer cool-down period.\n\nYou can also adjust whether you want rewards restaked or not. If the transaction occurs too close to the next pay day, the update will be effective from the following pay day.',
             },
             '3': {
                 title: 'Update pool settings',
