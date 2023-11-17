@@ -223,7 +223,7 @@ const t: typeof en = {
         registerIntro: {
             '1': {
                 title: 'Opret en validator',
-                body: 'En validator er en node som deltager i netværket ved at bake (lave) nye blocks som bliver tilføjet til kæden. Hver validator har nogle kryptografiske nøgler, som refereres til som "validator keys", som noden bruger når den validator blocks. Du genererer validator keys når du tilføjer en validator-konto. Når validator noden er blevet genstartet med disse validator keys, så vil den starte med at bake, to epochs efter transaktionen er blevet godkendt.',
+                body: 'En validator er en node som deltager i netværket ved at producere nye blocks som bliver tilføjet til kæden.\n\nHver validator har nogle kryptografiske nøgler, som refereres til som "validator keys", som noden bruger når den validator blocks.\n\nDu genererer validator keys når du tilføjer en validator-konto. Når validator noden er blevet genstartet med disse validator keys, så vil den starte validation to epochs efter transaktionen er blevet godkendt.',
             },
             '2': {
                 title: 'Noden',
