@@ -1,5 +1,11 @@
 # Changelog
 
+## Unreleased
+
+### Fixed
+
+-   Some mistakes in the validation renaming.
+
 ## 1.2.0
 
 ### Changed
