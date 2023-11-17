@@ -122,7 +122,7 @@ const t = {
         removeIntro: {
             '1': {
                 title: 'Stop validation',
-                body: 'If you no longer wish to bake on an account, you can stop validation. There is a cool-down period, during which the staked amount for the validator will continue to bake and earn rewards. After the cool-down, the full stake amount will be unlocked on your public balance.\n\nIf your pool has any delegators, they will be automatically moved to passive delegation, if they don’t decide to do something else.\n\nIf you deregister the validator, remember that this does not shut down your node. You must shut down the node in a separate action if you no longer wish to run a node on the Concordium blockchain.',
+                body: 'If you no longer wish to be a validator on an account, you can stop validation. There is a cool-down period after which the full staked amount will be unlocked on your public balance at the first pay day after cool down.\n\nIf your pool has any delegators, they will be automatically moved to passive delegation, if they don’t decide to do something else.\n\nIf you deregister the validator, remember that this does not shut down your node. You must shut down the node in a separate action if you no longer wish to run a node on the Concordium blockchain.',
             },
         },
         updateIntro: {
@@ -252,13 +252,13 @@ const t = {
             },
             '3': {
                 title: 'Updates with longer cool-downs',
-                body: 'If you decrease your stake, the change will take effect after a cool-down period.\n\nWhile in this cool-down period, the stake is locked and cannot be changed, and you will not be able to stop your delegation.\n\nYour delegation continues earning rewards during the cool-down period. While in the cool-down period you can update other delegation settings, but not the amount.\n\nIf you made any other changes to your delegation while also decreasing your delegation amount, the other changes will take effect from the next pay day as described on the previous page.',
+                body: 'If you decrease your stake, the change will take effect after a cool-down period.\n\nWhile in this cool-down period, the stake is locked and cannot be changed, and you will not be able to stop your delegation.\n\nWhile in the cool-down period you can update other delegation settings, but not the amount.\n\nIf you made any other changes to your delegation while also decreasing your delegation amount, the other changes will take effect from the next pay day as described on the previous page.',
             },
         },
         removeIntro: {
             '1': {
                 title: 'Stop your delegation',
-                body: 'If you decide to stop your delegation, there is a longer cool-down period.\n\nWhile in the cool-down period your delegation continues to earn rewards.\n\nAt the end of the cool-down period, the delegated amount is unlocked on your public balance, and the funds will be at disposal again.',
+                body: 'If you decide to stop your delegation, there is a longer cool-down period.\n\nAt the end of the cool-down period, the delegated amount is unlocked on your public balance, and the funds will be at disposal again.',
             },
             '2': {
                 title: 'Update during the cool-down period',
@@ -328,16 +328,16 @@ const t = {
             registerBaker:
                 'You are about to submit a register validator transaction that locks some of your funds in a stake. If you want to unlock the stake again, there will be a cool-down period of {{ cooldownPeriod }} days.',
             lowerBakerStake:
-                'You are about to submit a validator transaction that lowers your validator stake. It will take effect at the first pay day after a cool-down period {{ cooldownPeriod }} days and the validator stake cannot be changed during this period of time.',
+                'You are about to submit a validator transaction that lowers your validator stake. It will take effect at the first pay day after a cool-down period of {{ cooldownPeriod }} days and the validator stake cannot be changed during this period of time.',
             removeBaker:
-                'Are you sure you want to make the following transaction to stop validation? It will take effect at the first pay day after a cool-down period {{ cooldownPeriod }} days and the validator stake cannot be changed during this period of time.',
+                'Are you sure you want to make the following transaction to stop validation? It will take effect at the first pay day after a cool-down period of {{ cooldownPeriod }} days and the validator stake cannot be changed during this period of time.',
         },
         configureDelegation: {
             register:
                 'You are about to submit a register delegation transaction that locks some of your funds in a stake. If you want to unlock the stake again, there will be a cool-down period of {{ cooldownPeriod }} days.',
             lowerDelegationStake:
-                'You are about to submit a delegation transaction that lowers your delegation amount. It will take effect at the first pay day after a cool-down period {{ cooldownPeriod }} days and the delegation amount cannot be changed during this period of time.',
-            remove: 'Are you sure you want to make the following transaction to stop delegation? It will take effect at the first pay day after a cool-down period {{ cooldownPeriod }} days and the delegation amount cannot be changed during this period of time.',
+                'You are about to submit a delegation transaction that lowers your delegation amount. It will take effect at the first pay day after a cool-down period of {{ cooldownPeriod }} days and the delegation amount cannot be changed during this period of time.',
+            remove: 'Are you sure you want to make the following transaction to stop delegation? It will take effect at the first pay day after a cool-down period of {{ cooldownPeriod }} days and the delegation amount cannot be changed during this period of time.',
         },
     },
     transactionPopup: {

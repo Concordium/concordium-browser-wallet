@@ -147,13 +147,13 @@ const t: typeof en = {
             },
             '3': {
                 title: 'Opdateringer med længere cool-downs',
-                body: 'Hvis du vælger at formindske din delegation saldo, så vil ændringen træde i kraft efter en cool-down periode.\n\nI løbet af denne cool-down periode, vil delegation saldoen være låst og kan ikke ændres, og du vil ikke kunne stoppe delegation.\n\nDu vil stadig få fortjenester i cool-down perioden, og du vil stadig kunne ændre andre delegationindstillinger.\n\nHvis du laver andre ændringer samtidigt med at du formindsker delegation saldoen, vil disse ændringer træde i kraft ved den næste pay day, som beskrevet på sidste side.',
+                body: 'Hvis du vælger at formindske din delegation saldo, så vil ændringen træde i kraft efter en cool-down periode.\n\nI løbet af denne cool-down periode, vil delegation saldoen være låst og kan ikke ændres, og du vil ikke kunne stoppe delegation.\n\nDu vil stadig kunne ændre andre delegationindstillinger.\n\nHvis du laver andre ændringer samtidigt med at du formindsker delegation saldoen, vil disse ændringer træde i kraft ved den næste pay day, som beskrevet på sidste side.',
             },
         },
         removeIntro: {
             '1': {
                 title: 'Stop delegation',
-                body: 'Hvis du vælger at stoppe delegation, så er der en længere cool-down periode.\n\nMens man er i en  cool-down periode fortsætter man må at gå fortjenester.\n\nI slutningen af cool-down perioden bliver det delegeret CCD låst op på din offentlige saldo, og kan bruges igen.',
+                body: 'Hvis du vælger at stoppe delegation, så er der en længere cool-down periode.\n\nI slutningen af cool-down perioden bliver det delegeret CCD låst op på din offentlige saldo, og kan bruges igen.',
             },
             '2': {
                 title: 'Opdateringer i en cool-down periode',
@@ -230,14 +230,14 @@ const t: typeof en = {
                 body: 'For at blive en validator skal du køre en node på Concordium blockchain. Det er vigtigt at have det sat op så noden kan køre døgnet rundt.\n\nDu kan køre noden selv eller bruge en tredjepartsudbyder. Sørg for at din konto i din wallet har den nødvendige mængde CCD for at blive en validator.',
             },
             '3': {
-                title: 'validator-pulje',
+                title: 'Validator-pulje',
                 body: 'Når du opretter en validator kan du vælge at åbne en validator-pulje. En validator-pulje gør det muligt for andre at får fortjenester uden at køre en node eller selv blive validator.\n\n For at gøre dette, så delegerer de CCD til din validator-pulje, som øger din totale stake og din change for at vinde lotteriet om at bake en block. Ved hver pay day bliver fortjenesterne fordelt mellem dig og dine delegators.\n\nDu kan også vælge ikke at åbne en pulje, og så vil det kun være din egen stake som tæller med til lotteriet. Du kan altid åbne eller lukke en pulje senere.',
             },
         },
         removeIntro: {
             '1': {
                 title: 'Stop validation',
-                body: 'Hvis du ønsker ikke at bake på en konto, kan du stoppe validation. Der er en cool-down periode, hvor din validator stake stadig vil blive brugt til validation og få fortjenester. Efter denne cool-down periode, bliver din validator stake låst op på din offentlige saldo, og kan bruges igen.\n\nHvis du pulje har delegators, vil de automatisk blive flyttet til passiv delegation.\n\nHvis du afmelder din konto som validator, så husk at dette ikke lukker din node ned. Du skal stadig lukke din node ned separat, hvis du ikke længere ønske at køre en node Concordium blockchain.',
+                body: 'Hvis du længere ønsker at være validator på en konto kan du stoppe validation. Der er en cool-down periode hvorefter den fulde stake vil blive frigjort til din offentlige saldo ved den første pay day efter cool down.\n\nHvis din pulje har delegators, vil de automatisk blive flyttet til passiv delegation.\n\nHvis du afmelder din konto som validator, så husk at dette ikke lukker din node ned. Du skal stadig lukke din node ned separat, hvis du ikke længere ønske at køre en node Concordium blockchain.',
             },
         },
         updateIntro: {
