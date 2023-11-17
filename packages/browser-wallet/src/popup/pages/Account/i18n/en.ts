@@ -108,7 +108,7 @@ const t = {
         registerIntro: {
             '1': {
                 title: 'Become a validator',
-                body: 'A validator is a node that participates in the network by validation (creating) new blocks that are added to the chain.\n\nEach validator has a set of cryptographic keys called validator keys that the node needs to bake blocks. You generate the validator keys when you add a validator account.\n\nOnce the validator node has been restarted with the validator keys, it will start validation two epochs after the transaction has been approved.',
+                body: 'A validator is a node that participates in the network by producing new blocks that are added to the chain.\n\nEach validator has a set of cryptographic keys called validator keys that the node needs to produce blocks. You generate the validator keys when you add a validator account.\n\nOnce the validator node has been restarted with the validator keys, it will start validation two epochs after the transaction has been approved.',
             },
             '2': {
                 title: 'The node',
