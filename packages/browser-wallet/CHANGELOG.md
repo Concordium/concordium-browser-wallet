@@ -1,5 +1,11 @@
 # Changelog
 
+## Unreleased
+
+### Fixed
+
+-   Inject script loading wasm module, unnecessarily.
+
 ## 1.2.1
 
 ### Fixed

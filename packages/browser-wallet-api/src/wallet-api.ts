@@ -13,6 +13,7 @@ import {
     ContractAddress,
     VerifiablePresentation,
 } from '@concordium/web-sdk/types';
+import { CredentialStatements } from '@concordium/web-sdk/web3-id';
 import {
     WalletApi as IWalletApi,
     EventType,
@@ -27,8 +28,7 @@ import {
 } from '@concordium/browser-wallet-api-helpers';
 import EventEmitter from 'events';
 import { IdProofOutput, IdStatement } from '@concordium/web-sdk/id';
-import { CredentialStatements } from '@concordium/web-sdk/web3-id';
-import { ConcordiumGRPCClient } from '@concordium/web-sdk-legacy';
+import { ConcordiumGRPCClient } from '@concordium/web-sdk/grpc';
 import { RpcTransport } from '@protobuf-ts/runtime-rpc';
 import { stringify } from './util';
 import { BWGRPCTransport } from './gRPC-transport';
