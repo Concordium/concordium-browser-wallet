@@ -1,5 +1,11 @@
 # Changelog
 
+## Unreleased
+
+### Fixed
+
+-   Missing date for delegation/validation stake decrease/stop has been restored.
+
 ## 1.2.1
 
 ### Fixed
