@@ -13,6 +13,7 @@ import { selectedAccountAtom } from '@popup/store/account';
 import { ensureDefined } from '@shared/utils/basic-helpers';
 import { debouncedAsyncValidate } from '@popup/shared/utils/validation-helpers';
 import { ContractAddress } from '@concordium/web-sdk';
+import { logWarningMessage } from '@shared/utils/log-helpers';
 import { contractDetailsAtom, contractTokensAtom } from './state';
 import { fetchTokensConfigure, FetchTokensResponse } from './utils';
 import { tokensRoutes } from '../routes';
@@ -90,12 +91,15 @@ export default function ChooseContract() {
                 })();
 
                 if (fetchErrors.length > 0) {
-                    return t('failedTokensError', { errors: fetchErrors.join('\n') });
+                    logWarningMessage(
+                        `Tokens in contract ${cd.index.toString()}:${cd.subindex.toString()} failed: \n${fetchErrors.join(
+                            '\n'
+                        )}`
+                    );
                 }
                 if (response.tokens.length === 0) {
                     return t('noTokensError');
                 }
-
                 validContract.current = { details: cd, tokens: response };
                 return true;
             },

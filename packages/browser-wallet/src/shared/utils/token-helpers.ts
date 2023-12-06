@@ -254,26 +254,19 @@ export type ContractBalances = Record<string, bigint | undefined>;
 
 export const getContractBalances = async (
     client: ConcordiumGRPCClient,
-    index: bigint,
-    subindex: bigint,
+    contractDetails: ContractDetails,
     tokenIds: string[],
     accountAddress: string,
     onError?: (error: string) => void
 ): Promise<ContractBalances> => {
-    const instanceInfo = await client.getInstanceInfo(ContractAddress.create(index, subindex));
-
-    if (instanceInfo === undefined) {
-        return {};
-    }
-
     const result = await client.invokeContract({
-        contract: ContractAddress.create(index, subindex),
-        method: ReceiveName.fromString(`${instanceInfo.name.value.substring(5)}.balanceOf`),
+        contract: ContractAddress.create(contractDetails.index, contractDetails.subindex),
+        method: ReceiveName.fromString(`${contractDetails.contractName}.balanceOf`),
         parameter: Parameter.fromBuffer(serializeBalanceParameter(tokenIds, accountAddress)),
     });
 
     if (result === undefined || result.tag === 'failure' || result.returnValue === undefined) {
-        onError?.(`Failed to retrieve balances for index ${index.toString()}`);
+        onError?.(`Failed to retrieve balances for index ${contractDetails.index.toString()}`);
         return {};
     }
 
@@ -396,12 +389,14 @@ export async function getTokenTransferEnergy(
     return { execution, total };
 }
 
-type GetTokensResult = {
+type TokenData = {
     id: string;
     metadataLink: string;
     metadata: TokenMetadata | undefined;
     balance: bigint;
-}[];
+};
+
+type GetTokensResult = TokenData[];
 
 export async function getTokens(
     contractDetails: ContractDetails,
@@ -410,52 +405,42 @@ export async function getTokens(
     ids: string[],
     onError?: (error: string) => void
 ): Promise<GetTokensResult> {
-    const metadataPromise: Promise<[MetadataUrl[], Array<TokenMetadata | undefined>]> = (async () => {
-        let metadataUrls;
-        try {
-            metadataUrls = await getTokenUrl(client, ids, contractDetails);
-        } catch (e) {
-            onError?.(`Failed to get metadata urls on index: ${contractDetails.index}`);
-            return [[], []];
-        }
-        const metadata = await Promise.all(
-            metadataUrls.map((url, index) =>
-                getTokenMetadata(url).catch((error) => {
-                    onError?.(`id: "${ids[index]}": ${error.message}`);
-                    return Promise.resolve(undefined);
-                })
-            )
-        );
+    const tokenData: (TokenData | undefined)[] = await Promise.all(
+        ids.map(async (id, index) => {
+            let metadataUrl;
+            try {
+                [metadataUrl] = await getTokenUrl(client, [id], contractDetails);
+            } catch (e) {
+                onError?.(`id: "${id}: Failed to get metadata url`);
+                return undefined;
+            }
 
-        return [metadataUrls, metadata];
-    })();
+            let metadata;
+            try {
+                metadata = await getTokenMetadata(metadataUrl);
+            } catch (error) {
+                onError?.(`id: "${ids[index]}": ${(error as Error).message}`);
+                return undefined;
+            }
 
-    const balancesPromise = getContractBalances(
-        client,
-        contractDetails.index,
-        contractDetails.subindex,
-        ids,
-        account,
-        onError
+            let balance: bigint;
+            try {
+                balance =
+                    (
+                        await getContractBalances(client, contractDetails, [id], account, (e) => {
+                            throw Error(e);
+                        })
+                    )[0] || 0n;
+            } catch (error) {
+                onError?.(`id: "${ids[index]}": Failed to get token balance`);
+                return undefined;
+            }
+
+            return { id, metadataLink: metadataUrl.url, metadata, balance };
+        })
     );
 
-    const [[metadataUrls, metadata], balances] = await Promise.all([metadataPromise, balancesPromise]); // Run in parallel.
-
-    return ids.reduce(
-        (acc, id, i) =>
-            id in balances && metadata[i]
-                ? [
-                      ...acc,
-                      {
-                          id,
-                          metadataLink: metadataUrls[i].url,
-                          metadata: metadata[i],
-                          balance: balances[id] ?? 0n,
-                      },
-                  ]
-                : acc,
-        [] as GetTokensResult
-    );
+    return tokenData.filter((data): data is TokenData => Boolean(data));
 }
 
 const MAX_SYMBOL_LENGTH = 10;
