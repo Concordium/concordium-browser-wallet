@@ -1,5 +1,11 @@
 # Changelog
 
+## Unreleased
+
+### Changed
+
+-   CIS-2 token lookup no longer blocks choosing a contract, if looking up metadata or balance only fails for some tokens.
+
 ## 1.2.1
 
 ### Fixed

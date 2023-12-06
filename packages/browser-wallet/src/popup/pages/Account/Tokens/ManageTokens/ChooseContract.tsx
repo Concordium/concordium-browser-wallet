@@ -97,9 +97,11 @@ export default function ChooseContract() {
                         )}`
                     );
                 }
+
                 if (response.tokens.length === 0) {
                     return t('noTokensError');
                 }
+
                 validContract.current = { details: cd, tokens: response };
                 return true;
             },
