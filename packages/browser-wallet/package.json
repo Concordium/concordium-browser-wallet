@@ -53,7 +53,7 @@
         "react-window-infinite-loader": "^1.0.8",
         "readable-stream": "^4.2.0",
         "uuid": "^8.3.2",
-        "wallet-common-helpers": "https://github.com/Concordium/concordium-wallet-common-helpers.git#6ffa41dc5f7bd345f4ef07860982d6d290880c44"
+        "wallet-common-helpers": "https://github.com/Concordium/concordium-wallet-common-helpers.git#b5b8acd7304f297a1aa67c91b735e90f3edef5a5"
     },
     "devDependencies": {
         "@babel/core": "^7.18.2",
