@@ -22,7 +22,7 @@
         "@concordium/browser-wallet-api": "workspace:^",
         "@concordium/browser-wallet-api-helpers": "workspace:^",
         "@concordium/browser-wallet-message-hub": "workspace:^",
-        "@concordium/web-sdk": "^7.1.0",
+        "@concordium/web-sdk": "alpha",
         "@noble/ed25519": "^1.7.0",
         "@protobuf-ts/runtime-rpc": "^2.8.2",
         "@scure/bip39": "^1.1.0",

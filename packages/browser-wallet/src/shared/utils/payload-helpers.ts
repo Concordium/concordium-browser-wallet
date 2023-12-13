@@ -12,6 +12,7 @@ import {
     EntrypointName,
     Parameter,
     jsonParse,
+    getAccountTransactionHandler,
 } from '@concordium/web-sdk';
 import { Buffer } from 'buffer/';
 import { SmartContractParameters, SchemaType, SchemaWithContext } from '@concordium/browser-wallet-api-helpers';
@@ -60,7 +61,9 @@ export function parsePayload(
     schema?: SchemaWithContext,
     schemaVersion: SchemaVersion = 0
 ): HeadlessTransaction {
-    const payload = parse(stringifiedPayload);
+    const payloadJSON = parse(stringifiedPayload);
+    const handler = getAccountTransactionHandler(type);
+    const payload = handler.fromJSON(payloadJSON);
 
     switch (type) {
         case AccountTransactionType.Update: {
@@ -116,6 +119,11 @@ export function parsePayload(
                 },
             };
         }
+        case AccountTransactionType.Transfer:
+            return {
+                type,
+                payload: payload as SimpleTransferPayload,
+            };
         default:
             return {
                 type,
