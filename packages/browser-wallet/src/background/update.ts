@@ -33,6 +33,7 @@ async function addEuroeToken(cred: WalletCredential | WalletCredential[], genesi
             await add(EUROE_TESTNET_INDEX.toString());
             break;
         default:
+        // The euroe Token only exists on mainnet and testnet, so for other networks we don't do anything.
     }
 }
 

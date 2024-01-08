@@ -185,7 +185,7 @@ async function addTokenToAccounts(network: NetworkConfiguration, contractIndex: 
 }
 
 /**
- * Add euroe tokens to all accounts that don't already have it, if the migration have no already been run, and sets the euroe migration check.
+ * Add euroe tokens to all accounts that don't already have it, if the migration has not atlready been run, and sets the euroe migration check.
  */
 async function euroeMigration() {
     const migrations = (await storedMigrations.get()) || [];
@@ -203,12 +203,18 @@ async function euroeMigration() {
     }
 }
 
-const startupHandler = async () => {
-    const network = await storedCurrentNetwork.get();
+async function runMigrations(network?: NetworkConfiguration) {
     if (network) {
         await migrateNetwork(network);
+    }
+    await euroeMigration();
+}
+
+const startupHandler = async () => {
+    const network = await storedCurrentNetwork.get();
+    runMigrations(network);
+    if (network) {
         await startMonitoringPendingStatus(network);
-        await euroeMigration();
     }
     checkForNewTermsAndConditions();
 
