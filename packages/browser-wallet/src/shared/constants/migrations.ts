@@ -1,3 +1,3 @@
 export enum Migrations {
-    euroe = "euroe_migration"
+    euroe = 'euroe_migration',
 }
