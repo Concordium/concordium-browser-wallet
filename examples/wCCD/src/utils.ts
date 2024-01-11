@@ -1,6 +1,6 @@
 import { createContext } from 'react';
 import { AccountTransactionType, CcdAmount, ContractAddress, Energy, ReceiveName } from '@concordium/web-sdk';
-import { WalletConnection, moduleSchemaFromBase64 } from '@concordium/react-components';
+import { TypedSmartContractParameters, WalletConnection, moduleSchemaFromBase64 } from '@concordium/react-components';
 import { CONTRACT_NAME, WRAP_FUNCTION_RAW_SCHEMA, UNWRAP_FUNCTION_RAW_SCHEMA } from './constants';
 
 /**
@@ -12,18 +12,23 @@ export async function wrap(
     index: bigint,
     subindex = 0n,
     amount = 0,
-    receiver = account
+    receiver = account // eslint-disable-line
 ) {
     if (!Number.isInteger(amount) || amount <= 0) {
         throw new Error('invalid amount');
     }
 
+    const contractAddress = {
+        index: BigInt(Number.MAX_SAFE_INTEGER) + 10n, // 2^53 -1 +10 or 9007199254741001
+        subindex: 0n,
+    };
+
     const parameter = {
         data: '',
         to: {
-            Account: [receiver],
+            Contract: [contractAddress, 'some_entry'],
         },
-    };
+    } as unknown as TypedSmartContractParameters['parameters'];
 
     return connection.signAndSendTransaction(
         account,
