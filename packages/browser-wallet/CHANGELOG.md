@@ -5,6 +5,13 @@
 ### Fixed
 
 -   Inject script loading wasm module, unnecessarily.
+-   Missing date for delegation/validation stake decrease/stop has been restored.
+
+## 1.3.0
+
+### Added
+
+-   The EuroE token is now added to all accounts by default.
 
 ## 1.2.1
 

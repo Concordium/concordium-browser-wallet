@@ -13,17 +13,28 @@ import {
     sessionPasscode,
     storedAcceptedTerms,
     storedAllowlist,
+    storedCredentials,
     storedCurrentNetwork,
+    storedMigrations,
     storedSelectedAccount,
+    storedTokenMetadata,
+    storedTokens,
 } from '@shared/storage/access';
 
 import { mainnet, stagenet, testnet } from '@shared/constants/networkConfiguration';
-import { ChromeStorageKey, NetworkConfiguration } from '@shared/storage/types';
+import { ChromeStorageKey, NetworkConfiguration, TokenStorage } from '@shared/storage/types';
 import { getTermsAndConditionsConfig } from '@shared/utils/network-helpers';
 import { parsePayload } from '@shared/utils/payload-helpers';
 import { BackgroundSendTransactionPayload } from '@shared/utils/types';
 import { buildURLwithSearchParameters } from '@shared/utils/url-helpers';
 import { Buffer } from 'buffer/';
+import { Migrations } from '@shared/constants/migrations';
+import {
+    EUROE_MAINNET_INDEX,
+    EUROE_METADATA,
+    EUROE_TESTNET_INDEX,
+    euroeTokenStorage,
+} from '@shared/constants/token-metadata';
 import { startMonitoringPendingStatus } from './confirmation';
 import { sendCredentialHandler } from './credential-deployment';
 import { createIdProofHandler, runIfValidProof } from './id-proof';
@@ -152,10 +163,57 @@ async function migrateNetwork(network: NetworkConfiguration) {
     }
 }
 
-const startupHandler = async () => {
-    const network = await storedCurrentNetwork.get();
+/*
+ * Add the given token to all accounts of the given network, that don't already have it.
+ */
+async function addTokenToAccounts(network: NetworkConfiguration, contractIndex: number, token: TokenStorage) {
+    const tokens = await storedTokens.get(network.genesisHash);
+    const creds = await storedCredentials.get(network.genesisHash);
+    if (creds && creds.length > 0) {
+        const accountAddresses = creds.map((cred) => cred.address);
+        const newTokens = accountAddresses.reduce((accumulator, address) => {
+            const accTokens = tokens?.[address] || {};
+            if (contractIndex in accTokens) {
+                accumulator[address] = accTokens;
+            } else {
+                accumulator[address] = { [contractIndex]: [token], ...accTokens };
+            }
+            return accumulator;
+        }, {} as Record<string, Record<string, TokenStorage[]>>);
+        await storedTokens.set(network.genesisHash, newTokens);
+    }
+}
+
+/**
+ * Add euroe tokens to all accounts that don't already have it, if the migration has not atlready been run, and sets the euroe migration check.
+ */
+async function euroeMigration() {
+    const migrations = (await storedMigrations.get()) || [];
+    if (!migrations.includes(Migrations.euroe)) {
+        // Add metadata, if not present
+        const metadata = (await storedTokenMetadata.get()) || {};
+        const { metadataLink } = euroeTokenStorage;
+        if (!(metadataLink in metadata)) {
+            metadata[metadataLink] = EUROE_METADATA;
+            await storedTokenMetadata.set(metadata);
+        }
+        await addTokenToAccounts(mainnet, EUROE_MAINNET_INDEX, euroeTokenStorage);
+        await addTokenToAccounts(testnet, EUROE_TESTNET_INDEX, euroeTokenStorage);
+        await storedMigrations.set([...migrations, Migrations.euroe]);
+    }
+}
+
+async function runMigrations(network?: NetworkConfiguration) {
     if (network) {
         await migrateNetwork(network);
+    }
+    await euroeMigration();
+}
+
+const startupHandler = async () => {
+    const network = await storedCurrentNetwork.get();
+    runMigrations(network);
+    if (network) {
         await startMonitoringPendingStatus(network);
     }
     checkForNewTermsAndConditions();
