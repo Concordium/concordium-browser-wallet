@@ -21,7 +21,6 @@ import {
     DeployModulePayload,
     Energy,
     HexString,
-    IdStatement,
     InitContractPayload,
     ModuleReference,
     ReceiveName,
@@ -31,7 +30,8 @@ import {
     SimpleTransferWithMemoPayload,
     UpdateCredentialsPayload,
     DataBlob,
-} from '@concordium/web-sdk';
+} from '@concordium/web-sdk/types';
+import { IdStatement } from '@concordium/web-sdk/id';
 
 export type GtuAmount = { microGtuAmount: bigint };
 

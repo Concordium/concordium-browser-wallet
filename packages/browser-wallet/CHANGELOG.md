@@ -4,6 +4,7 @@
 
 ### Fixed
 
+-   Inject script loading wasm module, unnecessarily.
 -   Missing date for delegation/validation stake decrease/stop has been restored.
 
 ## 1.3.0
