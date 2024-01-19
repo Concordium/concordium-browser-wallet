@@ -20,6 +20,7 @@ const t = {
         description:
             'You now have the option to create a new wallet or restore an existing one. How do you want to proceed?',
         create: 'Create',
+        createFromExisting: 'Create from existing',
         restore: 'Restore',
     },
     recoveryPhrase: {

@@ -34,6 +34,13 @@ export default function CreateOrRestore() {
                 <Button
                     className="onboarding-setup__page-with-header__create-restore-button"
                     width="wide"
+                    onClick={() => navigate(`${absoluteRoutes.setup.path}/${setupRoutes.createNewFromExisting}`)}
+                >
+                    {t('createRestore.createFromExisting')}
+                </Button>
+                <Button
+                    className="onboarding-setup__page-with-header__create-restore-button"
+                    width="wide"
                     onClick={() => {
                         navigate(`${absoluteRoutes.setup.path}/${setupRoutes.restore}`);
                     }}

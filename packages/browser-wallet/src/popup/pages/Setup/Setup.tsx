@@ -10,6 +10,7 @@ import CreateOrRestore from './CreateOrRestore';
 import GenerateSeedPhrase from './GenerateSeedPhrase';
 import RestoreRecoveryPhrase from './RecoverSeedPhrase';
 import AcceptTerms from '../TermsAndConditions/AcceptTerms';
+import SetSeedPhrase from './SetSeedPhrase';
 
 function Intro() {
     const navigate = useNavigate();
@@ -30,6 +31,7 @@ export default function SetupRoutes() {
             <Route path={setupRoutes.passcode} element={<SetupPasscode />} />
             <Route path={setupRoutes.createOrRestore} element={<CreateOrRestore />} />
             <Route path={setupRoutes.createNew} element={<GenerateSeedPhrase />} />
+            <Route path={setupRoutes.createNewFromExisting} element={<SetSeedPhrase />} />
             <Route path={setupRoutes.enterRecoveryPhrase} element={<EnterRecoveryPhrase />} />
             <Route path={setupRoutes.restore} element={<RestoreRecoveryPhrase />} />
             <Route path={setupRoutes.performRecovery} element={<PerformRecovery />} />

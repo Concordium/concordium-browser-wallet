@@ -22,6 +22,7 @@ const t: typeof en = {
         description:
             'Du har nu muligheden for enten at oprette en ny wallet, eller at genskabe en eksisterende. Hvordan vil du fortsætte?',
         create: 'Opret',
+        createFromExisting: 'Opret fra eksisterende',
         restore: 'Genskab',
     },
     recoveryPhrase: {
