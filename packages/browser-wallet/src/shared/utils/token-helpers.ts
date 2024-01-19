@@ -16,6 +16,7 @@ import {
     ContractName,
     EntrypointName,
     Energy,
+    CIS2Contract,
 } from '@concordium/web-sdk';
 import { MetadataUrl, TokenMetadata, TokenIdAndMetadata } from '@shared/storage/types';
 import { CIS2_SCHEMA_CONTRACT_NAME, CIS2_SCHEMA } from '@popup/constants/schema';
@@ -64,43 +65,6 @@ export function getMetadataParameter(ids: string[]): Buffer {
 }
 
 /**
- * Returns the url for the token metadata.
- * returnValue is assumed to be a HEX-encoded string.
- */
-function deserializeTokenMetadataReturnValue(returnValue: string): MetadataUrl[] {
-    const buf = Buffer.from(returnValue, 'hex');
-    const n = buf.readUInt16LE(0);
-    let cursor = 2; // First 2 bytes hold number of token amounts included in response.
-    const urls: MetadataUrl[] = [];
-
-    // eslint-disable-next-line no-plusplus
-    for (let i = 0; i < n; i++) {
-        const length = buf.readUInt16LE(cursor);
-        const urlStart = cursor + 2;
-        const urlEnd = urlStart + length;
-
-        const url = Buffer.from(buf.subarray(urlStart, urlEnd)).toString('utf8');
-
-        cursor = urlEnd;
-
-        const hasChecksum = buf.readUInt8(cursor);
-        cursor += 1;
-
-        if (hasChecksum === 1) {
-            const hash = Buffer.from(buf.subarray(cursor, cursor + 32)).toString('hex');
-            cursor += 32;
-            urls.push({ url, hash });
-        } else if (hasChecksum === 0) {
-            urls.push({ url });
-        } else {
-            throw new Error('Deserialization failed: boolean value had an unexpected value');
-        }
-    }
-
-    return urls;
-}
-
-/**
  * Confirms that the given smart contract instance is CIS-2 compliant
  */
 export async function confirmCIS2Contract(
@@ -124,36 +88,6 @@ export async function confirmCIS2Contract(
     }
 
     return undefined;
-}
-
-/**
- * Determines the metadata url for the given token.
- */
-export function getTokenUrl(
-    client: ConcordiumGRPCClient,
-    ids: string[],
-    { contractName, index, subindex }: ContractDetails
-): Promise<MetadataUrl[]> {
-    return new Promise((resolve, reject) => {
-        client
-            .invokeContract({
-                contract: ContractAddress.create(index, subindex),
-                method: ReceiveName.fromString(`${contractName}.tokenMetadata`),
-                parameter: Parameter.fromBuffer(getMetadataParameter(ids)),
-            })
-            .then((returnValue) => {
-                if (returnValue && returnValue.tag === 'success' && returnValue.returnValue) {
-                    try {
-                        resolve(deserializeTokenMetadataReturnValue(ReturnValue.toHexString(returnValue.returnValue)));
-                    } catch (e) {
-                        reject(e);
-                    }
-                } else {
-                    // TODO: perhaps we need to make this error more precise
-                    reject(new Error('Token does not exist in this contract'));
-                }
-            });
-    });
 }
 
 function confirmMetadataUrl(field?: MetadataUrl) {
@@ -405,11 +339,16 @@ export async function getTokens(
     ids: string[],
     onError?: (error: string) => void
 ): Promise<GetTokensResult> {
+    const contract = new CIS2Contract(
+        client,
+        ContractAddress.create(contractDetails.index, contractDetails.subindex),
+        ContractName.fromString(contractDetails.contractName)
+    );
     const tokenData: (TokenData | undefined)[] = await Promise.all(
         ids.map(async (id, index) => {
             let metadataUrl;
             try {
-                [metadataUrl] = await getTokenUrl(client, [id], contractDetails);
+                metadataUrl = await contract.tokenMetadata(id);
             } catch (e) {
                 onError?.(`id: "${id}: Failed to get metadata url`);
                 return undefined;
@@ -426,11 +365,7 @@ export async function getTokens(
             let balance: bigint;
             try {
                 balance =
-                    (
-                        await getContractBalances(client, contractDetails, [id], account, (e) => {
-                            throw Error(e);
-                        })
-                    )[0] || 0n;
+                    (await contract.balanceOf({ address: AccountAddress.fromBase58(account), tokenId: id })) || 0n;
             } catch (error) {
                 onError?.(`id: "${ids[index]}": Failed to get token balance`);
                 return undefined;

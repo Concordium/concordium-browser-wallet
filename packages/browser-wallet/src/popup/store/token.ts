@@ -6,6 +6,7 @@ import { ChromeStorageKey, TokenIdAndMetadata, TokenMetadata, TokenStorage } fro
 import { ContractBalances, getContractBalances } from '@shared/utils/token-helpers';
 import { addToastAtom } from '@popup/state';
 import { ContractAddress } from '@concordium/web-sdk';
+import { getContractName } from '@shared/utils/contract-helpers';
 import { AsyncWrapper, atomWithChromeStorage } from './utils';
 import { grpcClientAtom } from './settings';
 import { selectedAccountAtom } from './account';
@@ -137,7 +138,7 @@ const cbf = atomFamily<string, Atom<ContractBalances>>((identifier: string) => {
             const tokenIds = tokens.value[contractIndex]?.map((t) => t.id) ?? [];
 
             if (tokenIds.length !== 0) {
-                const instanceInfo = await client.getInstanceInfo(ContractAddress.create(BigInt(contractIndex), 0n));
+                const instanceInfo = await client.getInstanceInfo(ContractAddress.create(BigInt(contractIndex)));
 
                 let balances = {};
                 if (instanceInfo !== undefined) {
@@ -146,7 +147,7 @@ const cbf = atomFamily<string, Atom<ContractBalances>>((identifier: string) => {
                         {
                             index: BigInt(contractIndex),
                             subindex: 0n,
-                            contractName: instanceInfo.name.value.substring(5),
+                            contractName: getContractName(instanceInfo),
                         },
                         tokenIds,
                         accountAddress,
