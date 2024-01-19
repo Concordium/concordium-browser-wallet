@@ -7,7 +7,8 @@ import {
     ChainParametersV0,
     isBakerAccount,
     isDelegatorAccount,
-    isRewardStatusV1,
+    RewardStatus,
+    RewardStatusV0,
 } from '@concordium/web-sdk';
 
 import Button from '@popup/shared/Button';
@@ -72,6 +73,10 @@ function Earn({ chainParameters }: EarnProps) {
     );
 }
 
+function isNotRewardStatusV0(rewardStatus?: RewardStatus): rewardStatus is Exclude<RewardStatus, RewardStatusV0> {
+    return rewardStatus ? rewardStatus.version !== 0 : false;
+}
+
 export default function EarnRoutes() {
     const { setDetailsExpanded } = useContext(accountPageContext);
     const accountInfo = ensureDefined(useSelectedAccountInfo(), 'Expected to find account info for selected account');
@@ -107,7 +112,7 @@ export default function EarnRoutes() {
 
     const consensusStatus = useAsyncMemo(() => client.getConsensusStatus(), undefined, []);
     const tokenomicsInfo = useAsyncMemo(
-        () => client.getTokenomicsInfo().then(filterType(isRewardStatusV1)),
+        () => client.getTokenomicsInfo().then(filterType(isNotRewardStatusV0)),
         undefined,
         []
     );
