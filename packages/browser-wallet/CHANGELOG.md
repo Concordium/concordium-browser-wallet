@@ -11,6 +11,7 @@
 -   Inject script loading wasm module, unnecessarily.
 -   Missing date for delegation/validation stake decrease/stop has been restored.
 -   Changing restake preference is no longer blocked when below minimum stake threshold.
+-   `SendTransaction` in wallet-api now supports `bigint` as part of smart contract parameters, fixing an issue with using large numbers.
 
 ## 1.3.0
 

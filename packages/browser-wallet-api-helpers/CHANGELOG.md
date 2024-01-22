@@ -1,5 +1,9 @@
 # Changelog
 
+### Fixed
+
+-   Extend type `SmartContractParameters` with `bigint` allowing large numbers in smart contract parameters.
+
 ## 3.0.0
 
 ### Breaking changes
