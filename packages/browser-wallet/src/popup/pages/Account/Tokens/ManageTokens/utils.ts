@@ -32,31 +32,41 @@ export const fetchTokensConfigure =
         account: string,
         onError?: (error: string) => void
     ) =>
-    async (from?: number): Promise<FetchTokensResponse> => {
-        const {
-            tokens: cts,
-            count,
-            limit,
-        } = (await getCis2Tokens(contractDetails.index, contractDetails.subindex, from, TOKENS_PAGE_SIZE)) ?? {
-            tokens: [],
-            count: 0,
-            limit: TOKENS_PAGE_SIZE,
-            from,
-        };
+    async (initialFrom?: number): Promise<FetchTokensResponse> => {
+        let tokens: TokenWithPageID[] = [];
+        let hasMore = true;
+        let from = initialFrom;
+        while (tokens.length === 0 && hasMore) {
+            const {
+                tokens: cts,
+                count,
+                limit,
+            } = (await getCis2Tokens(contractDetails.index, contractDetails.subindex, from, TOKENS_PAGE_SIZE)) ?? {
+                tokens: [],
+                count: 0,
+                limit: TOKENS_PAGE_SIZE,
+                from,
+            };
 
-        const tokens = await getTokens(
-            contractDetails,
-            client,
-            account,
-            cts.map((t) => t.token),
-            onError
-        );
+            hasMore = count === limit;
+            from = cts[cts.length - 1]?.id;
 
-        return {
-            hasMore: count === limit,
-            tokens: tokens.map((t, i) => ({
+            const tokenData = await getTokens(
+                contractDetails,
+                client,
+                account,
+                cts.map((t) => t.token),
+                onError
+            );
+
+            tokens = tokenData.map((t, i) => ({
                 ...t,
                 pageId: cts[i].id,
-            })),
+            }));
+        }
+
+        return {
+            hasMore,
+            tokens,
         };
     };

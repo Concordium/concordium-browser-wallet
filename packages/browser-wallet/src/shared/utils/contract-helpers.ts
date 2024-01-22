@@ -16,7 +16,7 @@ export function applyExecutionNRGBuffer(estimatedExecutionEnergy: bigint) {
  * @param instanceInfo the instance info to extract the contract name from
  * @returns the contract's name to be used as a prefix when setting the receive name for a contract method
  */
-export function getContractName(instanceInfo: InstanceInfo): string | undefined {
+export function getContractName(instanceInfo: InstanceInfo): string {
     return instanceInfo.name.value.substring(5);
 }
 

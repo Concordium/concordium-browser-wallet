@@ -65,7 +65,7 @@ export const contractTokensAtom = (() => {
                     set(loadingAtom, true);
 
                     const tokens = get(listAtom);
-                    const topId = [...tokens].reverse()[0]?.pageId;
+                    const topId = tokens[tokens.length - 1]?.pageId;
 
                     const { hasMore, tokens: next } = await fetchTokens(topId);
 
