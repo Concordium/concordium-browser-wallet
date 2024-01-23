@@ -10,6 +10,7 @@
 
 -   Inject script loading wasm module, unnecessarily.
 -   Missing date for delegation/validation stake decrease/stop has been restored.
+-   Changing restake preference is no longer blocked when below minimum stake threshold.
 
 ## 1.3.0
 

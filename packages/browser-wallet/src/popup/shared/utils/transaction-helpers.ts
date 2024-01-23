@@ -17,6 +17,7 @@ import {
     InitContractPayload,
     UpdateContractPayload,
     SimpleTransferWithMemoPayload,
+    AccountInfoType,
 } from '@concordium/web-sdk';
 import {
     isValidResolutionString,
@@ -91,7 +92,10 @@ export function validateBakerStake(
     const bakerStakeThreshold = chainParameters?.minimumEquityCapital.microCcdAmount || 0n;
     const amount = ccdToMicroCcd(amountToValidate);
 
-    if (bakerStakeThreshold > amount) {
+    const amountNotChanged =
+        accountInfo?.type === AccountInfoType.Baker && amount === accountInfo.accountBaker.stakedAmount.microCcdAmount;
+
+    if (!amountNotChanged && bakerStakeThreshold > amount) {
         return i18n.t('utils.ccdAmount.belowBakerThreshold', { threshold: displayAsCcd(bakerStakeThreshold) });
     }
 
