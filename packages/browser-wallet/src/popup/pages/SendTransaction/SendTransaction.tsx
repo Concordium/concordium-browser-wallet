@@ -25,6 +25,8 @@ import { BackgroundSendTransactionPayload } from '@shared/utils/types';
 import { convertEnergyToMicroCcd, getEnergyCost } from '@shared/utils/energy-helpers';
 import { useBlockChainParameters } from '@popup/shared/BlockChainParametersProvider';
 import { getPublicAccountAmounts } from 'wallet-common-helpers';
+import * as JSONBig from 'json-bigint';
+import { SmartContractParameters } from '@concordium/browser-wallet-api-helpers';
 
 interface Location {
     state: {
@@ -59,6 +61,13 @@ export default function SendTransaction({ onSubmit, onReject }: Props) {
                 state.payload.schemaVersion
             ),
         [JSON.stringify(state.payload)]
+    );
+    const parameters = useMemo(
+        () =>
+            state.payload.parameters === undefined
+                ? undefined
+                : (JSONBig.parse(state.payload.parameters) as SmartContractParameters),
+        [state.payload.parameters]
     );
 
     const cost = useMemo(() => {
@@ -116,7 +125,7 @@ export default function SendTransaction({ onSubmit, onReject }: Props) {
                 <TransactionReceipt
                     transactionType={transactionType}
                     payload={payload}
-                    parameters={state.payload.parameters}
+                    parameters={parameters}
                     sender={accountAddress}
                     cost={cost}
                     className="m-10"

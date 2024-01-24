@@ -70,6 +70,7 @@ export type SmartContractParameters =
     | { [key: string]: SmartContractParameters }
     | SmartContractParameters[]
     | number
+    | bigint
     | string
     | boolean;
 

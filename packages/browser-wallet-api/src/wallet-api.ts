@@ -30,6 +30,7 @@ import EventEmitter from 'events';
 import { IdProofOutput, IdStatement } from '@concordium/web-sdk/id';
 import { ConcordiumGRPCClient } from '@concordium/web-sdk/grpc';
 import { RpcTransport } from '@protobuf-ts/runtime-rpc';
+import * as JSONBig from 'json-bigint';
 import { stringify } from './util';
 import { BWGRPCTransport } from './gRPC-transport';
 import {
@@ -138,6 +139,7 @@ class WalletApi extends EventEmitter implements IWalletApi {
                 ...input,
                 accountAddress: AccountAddress.toBase58(input.accountAddress),
                 payload: stringify(input.payload),
+                parameters: JSONBig.stringify(input.parameters),
             }
         );
 
