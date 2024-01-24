@@ -60,6 +60,11 @@
             margin: $description-margin-top rem(20px) 0;
             margin-bottom: rem(10px);
         }
+
+        &__abort-button {
+            color: $color-cta;
+            text-decoration: underline;
+        }
     }
 
     &__exit-button {

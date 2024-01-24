@@ -1,5 +1,11 @@
 # Changelog
 
+## Unreleased
+
+### Added
+
+-   Recovery can now be aborted, while no identities exist/have been found.
+
 ## 1.3.1
 
 ### Changed

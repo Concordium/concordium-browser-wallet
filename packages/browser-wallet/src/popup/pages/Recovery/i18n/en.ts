@@ -6,6 +6,8 @@ const t = {
     main: {
         title: 'Restoring your wallet',
         description: 'Searching for your IDs and accounts. Please wait.',
+        abort: 'I have never created an account',
+        abortClickable: 'skip this check',
     },
     finish: {
         success: 'The following identities and accounts were recovered.',
