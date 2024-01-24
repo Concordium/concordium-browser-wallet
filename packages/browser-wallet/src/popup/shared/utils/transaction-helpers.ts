@@ -92,10 +92,10 @@ export function validateBakerStake(
     const bakerStakeThreshold = chainParameters?.minimumEquityCapital.microCcdAmount || 0n;
     const amount = ccdToMicroCcd(amountToValidate);
 
-    const amountNotChanged =
-        accountInfo?.type === AccountInfoType.Baker && amount === accountInfo.accountBaker.stakedAmount.microCcdAmount;
+    const amountChanged =
+        accountInfo?.type !== AccountInfoType.Baker || amount !== accountInfo.accountBaker.stakedAmount.microCcdAmount;
 
-    if (!amountNotChanged && bakerStakeThreshold > amount) {
+    if (amountChanged && bakerStakeThreshold > amount) {
         return i18n.t('utils.ccdAmount.belowBakerThreshold', { threshold: displayAsCcd(bakerStakeThreshold) });
     }
 
