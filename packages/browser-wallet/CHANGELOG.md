@@ -2,6 +2,10 @@
 
 ## 1.3.1
 
+### Added
+
+-   A page in settings to display the recovery phrase.
+
 ### Changed
 
 -   CIS-2 token lookup no longer blocks choosing a contract, if looking up metadata or balance only fails for some tokens.
