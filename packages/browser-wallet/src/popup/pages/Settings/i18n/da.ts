@@ -6,7 +6,7 @@ const t: typeof en = {
     network: 'Netværksindstillinger',
     recover: 'Genskab ID & konti',
     about: 'Om',
-    seedPhrase: 'Vis recovery phrase',
+    seedPhrase: 'Vis hemmeligt recovery phrase',
     toggle: {
         dark: 'Skift til mørkt udseende',
         light: 'Skift til lyst udseende',

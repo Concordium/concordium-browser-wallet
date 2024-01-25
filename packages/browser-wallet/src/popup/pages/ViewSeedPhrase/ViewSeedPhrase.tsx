@@ -85,7 +85,7 @@ export default function ViewSeedPhrase() {
                             />
                             <Submit
                                 className="view-seed-phrase-page__button"
-                                width="medium"
+                                width="dynamic"
                                 disabled={f.formState.isSubmitting}
                             >
                                 {t('show')}
