@@ -1,5 +1,11 @@
 # Changelog
 
+## 1.3.2
+
+### Fixed
+
+-   Updating stake crashing if the amount as microCCD exceeds 64 bits.
+
 ## 1.3.1
 
 ### Changed
