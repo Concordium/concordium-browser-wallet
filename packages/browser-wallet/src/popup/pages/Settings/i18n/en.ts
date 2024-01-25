@@ -4,6 +4,7 @@ const t = {
     network: 'Network settings',
     recover: 'Restore IDs & accounts',
     about: 'About',
+    seedPhrase: 'View secret recovery phrase',
     toggle: {
         dark: 'Switch to dark mode',
         light: 'Switch to light mode',
