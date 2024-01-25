@@ -1,10 +1,16 @@
 # Changelog
 
-## 1.3.1
+## 1.3.2
 
 ### Added
 
--   A page in settings to display the recovery phrase.
+-   A page in settings to display the secret recovery phrase.
+
+### Fixed
+
+-   Updating stake crashing if the amount as microCCD exceeds 64 bits.
+
+## 1.3.1
 
 ### Changed
 
