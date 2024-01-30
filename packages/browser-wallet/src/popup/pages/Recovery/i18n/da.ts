@@ -8,6 +8,8 @@ const t: typeof en = {
     main: {
         title: 'Genskaber din wallet',
         description: 'Vent venligst mens der søges efter dine identiteter og konti.',
+        abort: 'Jeg har ikke lavet en konto,',
+        abortClickable: 'så spring over',
     },
     finish: {
         success: 'Følgende identiteter og konti blev fundet.',
