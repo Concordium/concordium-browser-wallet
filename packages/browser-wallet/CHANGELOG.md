@@ -6,6 +6,10 @@
 
 -   Recovery can now be aborted when an identity has not yet been found.
 
+### Fixed
+
+-   An issue where, in some cases, the wrong list of identity providers was used when recovering from the wallet settings menu.
+
 ## 1.3.2
 
 ### Added
