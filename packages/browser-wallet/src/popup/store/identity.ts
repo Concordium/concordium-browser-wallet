@@ -9,7 +9,7 @@ import {
     SessionPendingIdentity,
 } from '@shared/storage/types';
 import { Atom, atom, WritableAtom } from 'jotai';
-import { atomFamily } from 'jotai/utils';
+import { atomFamily, selectAtom } from 'jotai/utils';
 import { credentialsAtomWithLoading } from './account';
 import { AsyncWrapper, atomWithChromeStorage } from './utils';
 
@@ -53,6 +53,7 @@ const recoveryStatusAtom = atomWithChromeStorage<RecoveryStatus | undefined>(
 export const setRecoveryPayloadAtom = atom<null, RecoveryPayload, Promise<void>>(null, (_, set, payload) =>
     set(recoveryStatusAtom, { payload })
 );
+export const recoveryNewIdentitiesAtom = selectAtom(recoveryStatusAtom, (v) => v.value?.identitiesToAdd);
 
 export const identityByAddressAtomFamily = atomFamily<
     string | undefined,

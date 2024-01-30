@@ -33,7 +33,7 @@ import { decrypt } from '@shared/utils/crypto';
 import { Buffer } from 'buffer/';
 import { GRPCTIMEOUT } from '@shared/constants/networkConfiguration';
 import { addCredential, addIdentity, updateCredentials, updateIdentities } from './update';
-import bgMessageHandler from './message-handler';
+import bgMessageHandler, { onMessage } from './message-handler';
 import { openWindow } from './window-management';
 
 // How many empty identityIndices are allowed before stopping
@@ -107,7 +107,7 @@ async function getSeed() {
     return Buffer.from(mnemonicToSeedSync(await decrypt(encryptedSeed, passcode))).toString('hex');
 }
 
-async function performRecovery() {
+async function performRecovery(respond: (i: RecoveryBackgroundResponse) => void) {
     try {
         let status = await sessionRecoveryStatus.get();
         if (!status) {
@@ -144,8 +144,12 @@ async function performRecovery() {
         let initialGap: number | undefined = status.identityGap || 0;
         let initialIndex: number | undefined = status.identityIndex || 0;
 
+        const aborted = new AbortController();
+        onMessage(InternalMessageType.AbortRecovery).then(() => aborted.abort());
+
         for (const provider of providers) {
             const providerIndex = provider.ipInfo.ipIdentity;
+
             if (completedProviders.includes(providerIndex)) {
                 // eslint-disable-next-line no-continue
                 continue;
@@ -160,6 +164,9 @@ async function performRecovery() {
             let identityIndex = initialIndex || 0;
             initialIndex = undefined;
             while (emptyIndices < maxEmpty) {
+                if (aborted.signal.aborted) {
+                    return;
+                }
                 // Check if there is already an identity on the current index
                 let identity = identities?.find(identityMatch({ index: identityIndex, providerIndex }));
                 if (!identity || identity.status === CreationStatus.Rejected) {
@@ -256,7 +263,7 @@ async function performRecovery() {
         if (newCreds.length) {
             await addCredential(newCreds, network.genesisHash);
         }
-        return {
+        const added = {
             identities: [...identitiesToAdd, ...identitiesToUpdate].map((id) => ({
                 index: id.index,
                 providerIndex: id.providerIndex,
@@ -265,6 +272,9 @@ async function performRecovery() {
                 return { address: pair.cred.address, balance: pair.balance };
             }),
         };
+        respond({ status: BackgroundResponseStatus.Success, added });
+    } catch (e) {
+        respond({ status: BackgroundResponseStatus.Error, reason: (e as Error).toString() });
     } finally {
         await sessionIsRecovering.set(false);
     }
@@ -284,10 +294,7 @@ export async function startRecovery() {
                 await openWindow();
                 bgMessageHandler.sendInternalMessage(InternalMessageType.RecoveryFinished, result);
             };
-            return performRecovery()
-                .then((added) => respond({ status: BackgroundResponseStatus.Success, added }))
-                .catch((e) => respond({ status: BackgroundResponseStatus.Error, reason: e.toString() }))
-                .finally(() => chrome.alarms.clear(RECOVERY_ALARM_NAME));
+            return performRecovery(respond).finally(() => chrome.alarms.clear(RECOVERY_ALARM_NAME));
         });
     }
 }

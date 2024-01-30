@@ -1,5 +1,11 @@
 # Changelog
 
+## 1.4.0
+
+### Added
+
+-   Recovery can now be aborted when an identity has not yet been found.
+
 ## 1.3.2
 
 ### Added
