@@ -39,6 +39,7 @@ import AllowListRoutes from '@popup/pages/Allowlist';
 import AddWeb3IdCredential from '@popup/pages/AddWeb3IdCredential/AddWeb3IdCredential';
 import VerifiableCredentialImport from '@popup/pages/VerifiableCredentialBackup/VerifiableCredentialImport';
 import AgeProofRequest from '@popup/pages/AgeProofRequest';
+import ViewSeedPhrase from '@popup/pages/ViewSeedPhrase';
 
 type PromptKey = keyof Omit<typeof absoluteRoutes['prompt'], 'path'>;
 
@@ -261,6 +262,7 @@ export default function Routes() {
                     <Route element={<NetworkSettings />} path={relativeRoutes.home.settings.network.path} />
                     <Route element={<RecoveryIntro />} path={relativeRoutes.home.settings.recovery.path} />
                     <Route element={<About />} path={relativeRoutes.home.settings.about.path} />
+                    <Route element={<ViewSeedPhrase />} path={relativeRoutes.home.settings.seedPhrase.path} />
                 </Route>
                 <Route
                     element={<AddAccount />}

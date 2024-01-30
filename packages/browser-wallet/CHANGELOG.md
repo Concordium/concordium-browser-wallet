@@ -1,10 +1,20 @@
 # Changelog
 
-## Unreleased
+## 1.4.0
 
 ### Added
 
--   Recovery can now be aborted, while no identities exist/have been found.
+-   Recovery can now be aborted when an identity has not yet been found.
+
+## 1.3.2
+
+### Added
+
+-   A page in settings to display the secret recovery phrase.
+
+### Fixed
+
+-   Updating stake crashing if the amount as microCCD exceeds 64 bits.
 
 ## 1.3.1
 

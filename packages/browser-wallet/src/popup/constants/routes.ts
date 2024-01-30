@@ -38,6 +38,9 @@ export const relativeRoutes = {
             about: {
                 path: 'about',
             },
+            seedPhrase: {
+                path: 'seed-phrase',
+            },
         },
     },
     prompt: {
