@@ -268,18 +268,3 @@ export function useStatementDescription(statement: SecretStatement, identity?: C
 
     return getStatementDescription(statement, t, i18n.resolvedLanguage);
 }
-
-export function canProveStatement(statement: SecretStatement, identity: ConfirmedIdentity) {
-    const attribute = identity.idObject.value.attributeList.chosenAttributes[statement.attributeTag];
-
-    switch (statement.type) {
-        case StatementTypes.AttributeInSet:
-            return statement.set.includes(attribute);
-        case StatementTypes.AttributeNotInSet:
-            return !statement.set.includes(attribute);
-        case StatementTypes.AttributeInRange:
-            return statement.upper > attribute && attribute >= statement.lower;
-        default:
-            throw new Error(`Statement type not supported in ${JSON.stringify(statement)}`);
-    }
-}
