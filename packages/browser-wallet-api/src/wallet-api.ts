@@ -28,7 +28,7 @@ import {
 } from '@concordium/browser-wallet-api-helpers';
 import EventEmitter from 'events';
 import { IdProofOutput, IdStatement } from '@concordium/web-sdk/id';
-import { ConcordiumGRPCClient } from '@concordium/web-sdk/grpc';
+import { ConcordiumGRPCClient } from '@concordium/common-sdk/lib/GRPCClient';
 import { RpcTransport } from '@protobuf-ts/runtime-rpc';
 import * as JSONBig from 'json-bigint';
 import { stringify } from './util';
