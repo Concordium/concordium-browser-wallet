@@ -13,7 +13,7 @@ import { storedAllowlist, storedCredentials } from '@shared/storage/access';
 import { GRPCTIMEOUT, mainnet } from '@shared/constants/networkConfiguration';
 import { atomWithChromeStorage } from './utils';
 import { selectedAccountAtom } from './account';
-import { selectedIdentityIndexAtom } from './identity';
+import { identityProvidersAtom, selectedIdentityIndexAtom } from './identity';
 
 export const encryptedSeedPhraseAtom = atomWithChromeStorage<EncryptedData | undefined>(
     ChromeStorageKey.SeedPhrase,
@@ -37,8 +37,12 @@ export const networkConfigurationAtom = atom<NetworkConfiguration, NetworkConfig
         const selectedAccount = credentials?.length ? credentials[0]?.address : undefined;
         const accountPromise = set(selectedAccountAtom, selectedAccount);
 
+        // As identity providers are different per network, we must also reset the list of cached
+        // identity providers when the network configuration is changed.
+        const identityProviderPromise = set(identityProvidersAtom, []);
+
         // Wait for all the derived state of a network change to be done before broadcasting
-        await Promise.all([networkPromise, identityPromise, accountPromise]);
+        await Promise.all([networkPromise, identityPromise, accountPromise, identityProviderPromise]);
 
         const allowlist = await storedAllowlist.get();
         popupMessageHandler.broadcast(EventType.ChainChanged, networkConfiguration.genesisHash, {

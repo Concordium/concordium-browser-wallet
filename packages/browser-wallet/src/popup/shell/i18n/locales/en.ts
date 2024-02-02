@@ -25,6 +25,7 @@ import verifiableCredential from '@popup/pages/VerifiableCredential/i18n/en';
 import addWeb3IdCredential from '@popup/pages/AddWeb3IdCredential/i18n/en';
 import verifiableCredentialBackup from '@popup/pages/VerifiableCredentialBackup/i18n/en';
 import ageProofRequest from '@popup/pages/AgeProofRequest/i18n/en';
+import viewSeedPhrase from '@popup/pages/ViewSeedPhrase/i18n/en';
 
 const t = {
     shared,
@@ -54,6 +55,7 @@ const t = {
     verifiableCredential,
     verifiableCredentialBackup,
     ageProofRequest,
+    viewSeedPhrase,
 };
 
 export default t;

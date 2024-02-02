@@ -5,6 +5,8 @@ import { atomFamily } from 'jotai/utils';
 import { ChromeStorageKey, TokenIdAndMetadata, TokenMetadata, TokenStorage } from '@shared/storage/types';
 import { ContractBalances, getContractBalances } from '@shared/utils/token-helpers';
 import { addToastAtom } from '@popup/state';
+import { ContractAddress } from '@concordium/web-sdk';
+import { getContractName } from '@shared/utils/contract-helpers';
 import { AsyncWrapper, atomWithChromeStorage } from './utils';
 import { grpcClientAtom } from './settings';
 import { selectedAccountAtom } from './account';
@@ -136,14 +138,22 @@ const cbf = atomFamily<string, Atom<ContractBalances>>((identifier: string) => {
             const tokenIds = tokens.value[contractIndex]?.map((t) => t.id) ?? [];
 
             if (tokenIds.length !== 0) {
-                const balances = await getContractBalances(
-                    client,
-                    BigInt(contractIndex),
-                    0n,
-                    tokenIds,
-                    accountAddress,
-                    (error) => set(addToastAtom, error)
-                );
+                const instanceInfo = await client.getInstanceInfo(ContractAddress.create(BigInt(contractIndex)));
+
+                let balances = {};
+                if (instanceInfo !== undefined) {
+                    balances = await getContractBalances(
+                        client,
+                        {
+                            index: BigInt(contractIndex),
+                            subindex: 0n,
+                            contractName: getContractName(instanceInfo),
+                        },
+                        tokenIds,
+                        accountAddress,
+                        (error) => set(addToastAtom, error)
+                    );
+                }
                 set(baseAtom, balances);
             }
         }

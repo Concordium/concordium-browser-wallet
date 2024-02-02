@@ -17,6 +17,7 @@ import {
 import { Buffer } from 'buffer/';
 import { SmartContractParameters, SchemaType, SchemaWithContext } from '@concordium/browser-wallet-api-helpers';
 import { serializationTypes } from '@concordium/browser-wallet-api/src/constants';
+import * as JSONBig from 'json-bigint';
 
 export type HeadlessTransaction =
     | { type: AccountTransactionType.Update; payload: UpdateContractPayload }
@@ -57,13 +58,17 @@ export function parse(input: string | undefined) {
 export function parsePayload(
     type: AccountTransactionType,
     stringifiedPayload: string,
-    parameters?: SmartContractParameters,
+    stringifiedParameters?: string,
     schema?: SchemaWithContext,
     schemaVersion: SchemaVersion = 0
 ): HeadlessTransaction {
     const payloadJSON = parse(stringifiedPayload);
     const handler = getAccountTransactionHandler(type);
     const payload = handler.fromJSON(payloadJSON);
+    const parameters =
+        stringifiedParameters === undefined
+            ? undefined
+            : (JSONBig.parse(stringifiedParameters) as SmartContractParameters);
 
     switch (type) {
         case AccountTransactionType.Update: {

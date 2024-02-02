@@ -47,6 +47,7 @@ export enum InternalMessageType {
     AddWeb3IdCredential = 'I_AddWeb3IdCredential',
     LoadWeb3IdBackup = 'I_LoadWeb3IdBackup',
     ImportWeb3IdBackup = 'I_ImportWeb3IdBackup',
+    AbortRecovery = 'I_AbortRecovery',
 }
 
 // eslint-disable-next-line @typescript-eslint/no-explicit-any

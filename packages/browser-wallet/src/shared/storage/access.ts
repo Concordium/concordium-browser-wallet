@@ -2,6 +2,7 @@ import { stringify } from '@concordium/browser-wallet-api/src/util';
 import { parse } from '@shared/utils/payload-helpers';
 import { VerifiableCredentialMetadata } from '@shared/utils/verifiable-credential-helpers';
 import { Log } from '@shared/utils/log-helpers';
+import { Migrations } from '@shared/constants/migrations';
 import {
     ChromeStorageKey,
     EncryptedData,
@@ -237,3 +238,4 @@ export const sessionVerifiableCredentialMetadataUrls = makeIndexedStorageAccesso
     'session',
     ChromeStorageKey.TemporaryVerifiableCredentialMetadataUrls
 );
+export const storedMigrations = makeStorageAccessor<Migrations[]>('local', ChromeStorageKey.Migrations);

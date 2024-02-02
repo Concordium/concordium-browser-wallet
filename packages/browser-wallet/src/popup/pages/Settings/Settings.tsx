@@ -44,6 +44,9 @@ export default function Settings() {
                 <Link className="settings-page__link" to={absoluteRoutes.home.settings.recovery.path}>
                     {t('recover')}
                 </Link>
+                <Link className="settings-page__link" to={absoluteRoutes.home.settings.seedPhrase.path}>
+                    {t('seedPhrase')}
+                </Link>
                 <Link className="settings-page__link" to={absoluteRoutes.home.settings.about.path}>
                     {t('about')}
                 </Link>

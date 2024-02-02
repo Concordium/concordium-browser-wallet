@@ -76,7 +76,6 @@ const t: typeof en = {
             invalidIndex: 'Kontraktindeks skal være et heltal',
             noContractFound: 'Ingen kontrakt fundet på indeks',
             noTokensError: 'Ingen tokens fundet i kontrakten',
-            failedTokensError: 'En fejl skete under tjekket efter tokens',
             contractIndex: 'Kontraktindeks',
             hexId: 'Ugyldigt token ID (skal være HEX encodet)',
             updateTokens: 'Opdater tokens',

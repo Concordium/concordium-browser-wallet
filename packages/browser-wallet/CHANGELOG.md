@@ -1,5 +1,44 @@
 # Changelog
 
+## 1.4.0
+
+### Added
+
+-   Recovery can now be aborted when an identity has not yet been found.
+
+### Fixed
+
+-   An issue where, in some cases, the wrong list of identity providers was used when recovering from the wallet settings menu.
+
+## 1.3.2
+
+### Added
+
+-   A page in settings to display the secret recovery phrase.
+
+### Fixed
+
+-   Updating stake crashing if the amount as microCCD exceeds 64 bits.
+
+## 1.3.1
+
+### Changed
+
+-   CIS-2 token lookup no longer blocks choosing a contract, if looking up metadata or balance only fails for some tokens.
+
+### Fixed
+
+-   Inject script loading wasm module, unnecessarily.
+-   Missing date for delegation/validation stake decrease/stop has been restored.
+-   Changing restake preference is no longer blocked when below minimum stake threshold.
+-   `SendTransaction` in wallet-api now supports `bigint` as part of smart contract parameters, fixing an issue with using large numbers.
+
+## 1.3.0
+
+### Added
+
+-   The EuroE token is now added to all accounts by default.
+
 ## 1.2.1
 
 ### Fixed

@@ -73,9 +73,7 @@ const t = {
             invalidIndex: 'Contract index must be an integer',
             indexMax: 'Contract index can not exceed 18446744073709551615',
             noContractFound: 'No contract found on index',
-            noTokensError: 'No tokens found in contract',
-            failedTokensError:
-                'The following errors were encountered while checking for tokens in the contract: \n{{ errors }}',
+            noTokensError: 'No valid tokens found in contract',
             contractIndex: 'Contract index',
             hexId: 'Invalid token ID (must be HEX encoded)',
             updateTokens: 'Update tokens',

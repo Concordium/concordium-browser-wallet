@@ -1,6 +1,7 @@
 import React from 'react';
 import { useTranslation } from 'react-i18next';
 import { SmartContractParameters } from '@concordium/browser-wallet-api-helpers';
+import * as JSONBig from 'json-bigint';
 
 type Props = {
     parameters?: SmartContractParameters;
@@ -16,7 +17,7 @@ export default function DisplayParameters({ parameters }: Props) {
             {hasParameters && (
                 <>
                     <h5 className="m-b-5">{t('parameter')}:</h5>
-                    <pre className="transaction-receipt__parameter">{JSON.stringify(parameters, null, 2)}</pre>
+                    <pre className="transaction-receipt__parameter">{JSONBig.stringify(parameters, null, 2)}</pre>
                 </>
             )}
             {!hasParameters && <h5>{t('noParameter')}</h5>}
