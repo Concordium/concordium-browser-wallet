@@ -77,5 +77,5 @@ jobs:
             - name: Upload development release
               uses: actions/upload-artifact@master
               with:
-                  name: concordium-browser-wallet-dev-${{steps.package-version.outputs.current-version}}
+                  name: concordium-browser-wallet-${{steps.package-version.outputs.current-version}}-dev
                   path: ./packages/browser-wallet/dist
