@@ -1,5 +1,11 @@
 # Changelog
 
+## Unreleased
+
+### Fixed
+
+-   An issue where the identity selected for creating a new account was swapped with another identity if the wallet contained failed identities.
+
 ## 1.4.0
 
 ### Added
