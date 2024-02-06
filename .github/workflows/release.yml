@@ -36,7 +36,7 @@ jobs:
               if: steps.fetch-dependencies.outputs.cache-hit != 'true'
               run: YARN_CHECKSUM_BEHAVIOR=ignore yarn
 
-    build:
+    release:
         runs-on: ubuntu-20.04
         needs: [dependencies]
 
@@ -53,6 +53,12 @@ jobs:
                       **/node_modules
                   key: ${{ runner.os }}-${{ env.dummy }}-${{ hashFiles('**/package.json', '**/yarn.lock') }}
 
+            - name: get-npm-version
+              id: package-version
+              uses: martinbeentjes/npm-get-version-action@v1.3.1
+              with:
+                  path: packages/browser-wallet
+
             - name: Build
               run: yarn build:all
 
@@ -62,7 +68,7 @@ jobs:
             - name: Upload release
               uses: actions/upload-artifact@master
               with:
-                  name: concordium-browser-wallet
+                  name: concordium-browser-wallet-${{steps.package-version.outputs.current-version}}
                   path: ./packages/browser-wallet/dist
 
             - name: Make development build
@@ -71,5 +77,5 @@ jobs:
             - name: Upload development release
               uses: actions/upload-artifact@master
               with:
-                  name: concordium-browser-wallet-dev
+                  name: concordium-browser-wallet-dev-${{steps.package-version.outputs.current-version}}
                   path: ./packages/browser-wallet/dist
