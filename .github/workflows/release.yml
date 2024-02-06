@@ -1,0 +1,66 @@
+name: Release browser wallet
+
+on:
+    # Triggers the workflow on push or pull request events but only for the main branch and release branches
+    push:
+        branches: [release-pipeline]
+
+    # Allows us to run the workflow manually from the Actions tab
+    workflow_dispatch:
+
+env:
+    dummy: 1 # change to force cache invalidation
+    node_version: 18.14.2
+
+jobs:
+    dependencies:
+        runs-on: ubuntu-20.04
+
+        steps:
+            - uses: actions/checkout@v2
+
+            - name: Cache dependencies
+              id: fetch-dependencies
+              uses: actions/cache@v2
+              with:
+                  path: |
+                      **/node_modules
+                  key: ${{ runner.os }}-${{ env.dummy }}-${{ hashFiles('**/package.json', '**/yarn.lock') }}
+
+            - uses: actions/setup-node@v2
+              if: steps.fetch-dependencies.outputs.cache-hit != 'true'
+              with:
+                  node-version: '${{ env.node_version }}'
+
+            - name: Download dependencies
+              if: steps.fetch-dependencies.outputs.cache-hit != 'true'
+              run: YARN_CHECKSUM_BEHAVIOR=ignore yarn
+
+    build:
+        runs-on: ubuntu-20.04
+        needs: [dependencies]
+
+        steps:
+            - uses: actions/checkout@v2
+            - uses: actions/setup-node@v2
+              with:
+                  node-version: '${{ env.node_version }}'
+
+            - name: Get cached dependencies
+              uses: actions/cache@v2
+              with:
+                  path: |
+                      **/node_modules
+                  key: ${{ runner.os }}-${{ env.dummy }}-${{ hashFiles('**/package.json', '**/yarn.lock') }}
+
+            - name: Build
+              run: yarn build:all
+
+            - name: TypeCheck
+              run: yarn type:check
+
+            - name: Upload release
+              uses: actions/upload-artifact@master
+              with:
+                  name: concordium-browser-wallet
+                  path: ./packages/browser-wallet/dist
