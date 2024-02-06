@@ -64,3 +64,12 @@ jobs:
               with:
                   name: concordium-browser-wallet
                   path: ./packages/browser-wallet/dist
+
+            - name: Make development build
+              run: cd ./packages/browser-wallet && yarn build:dev
+
+            - name: Upload development release
+              uses: actions/upload-artifact@master
+              with:
+                  name: concordium-browser-wallet-dev
+                  path: ./packages/browser-wallet/dist
