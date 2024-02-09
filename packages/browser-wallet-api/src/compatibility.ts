@@ -30,6 +30,10 @@ import {
     SimpleTransferWithMemoPayload,
     UpdateCredentialsPayload,
     DataBlob,
+    AccountTransactionPayload,
+    Parameter,
+    getAccountTransactionHandler,
+    AccountTransactionPayloadJSON,
 } from '@concordium/web-sdk/types';
 import { IdStatement } from '@concordium/web-sdk/id';
 
@@ -346,7 +350,7 @@ function sanitizePayload(type: AccountTransactionType, payload: SendTransactionP
 export type SanitizedSendTransactionInput = {
     accountAddress: AccountAddress.Type;
     type: AccountTransactionType;
-    payload: SendTransactionPayload;
+    payload: AccountTransactionPayloadJSON;
     parameters?: SmartContractParameters;
     schema?: SchemaWithContext;
     schemaVersion?: SchemaVersion;
@@ -366,6 +370,28 @@ export function sanitizeSendTransactionInput(
     const sanitizedAccountAddress = sanitizeAccountAddress(accountAddress);
     const sanitizedPayload = sanitizePayload(type, payload);
 
+    let accountTransactionPayload: AccountTransactionPayload;
+    switch (type) {
+        case AccountTransactionType.Update:
+            accountTransactionPayload = {
+                ...(sanitizedPayload as SendTransactionUpdateContractPayload),
+                message: Parameter.empty(),
+            };
+            break;
+        case AccountTransactionType.InitContract:
+            accountTransactionPayload = {
+                ...(sanitizedPayload as SendTransactionInitContractPayload),
+                param: Parameter.empty(),
+            };
+            break;
+        default:
+            accountTransactionPayload = sanitizedPayload as AccountTransactionPayload;
+            break;
+    }
+
+    const handler = getAccountTransactionHandler(type);
+    const sanitizedPayloadJSON = handler.toJSON(accountTransactionPayload);
+
     let sanitizedSchema: SchemaWithContext | undefined;
     if (typeof schema === 'string' || schema instanceof String) {
         sanitizedSchema = {
@@ -379,7 +405,7 @@ export function sanitizeSendTransactionInput(
     return {
         accountAddress: sanitizedAccountAddress,
         type,
-        payload: sanitizedPayload,
+        payload: sanitizedPayloadJSON,
         parameters,
         schema: sanitizedSchema,
         schemaVersion,

@@ -12,9 +12,6 @@ import {
     SchemaVersion,
     ContractAddress,
     VerifiablePresentation,
-    getAccountTransactionHandler,
-    AccountTransactionPayload,
-    Parameter,
 } from '@concordium/web-sdk/types';
 import { CredentialStatements } from '@concordium/web-sdk/web3-id';
 import {
@@ -28,8 +25,6 @@ import {
     AccountAddressSource,
     SchemaSource,
     SendTransactionPayload,
-    SendTransactionUpdateContractPayload,
-    SendTransactionInitContractPayload,
 } from '@concordium/browser-wallet-api-helpers';
 import EventEmitter from 'events';
 import { IdProofOutput, IdStatement } from '@concordium/web-sdk/id';
@@ -139,32 +134,12 @@ class WalletApi extends EventEmitter implements IWalletApi {
     ): Promise<string> {
         const input = sanitizeSendTransactionInput(accountAddress, type, payload, parameters, schema, schemaVersion);
 
-        let accountTransactionPayload: AccountTransactionPayload;
-        switch (type) {
-            case AccountTransactionType.Update:
-                accountTransactionPayload = {
-                    ...(payload as SendTransactionUpdateContractPayload),
-                    message: Parameter.empty(),
-                };
-                break;
-            case AccountTransactionType.InitContract:
-                accountTransactionPayload = {
-                    ...(payload as SendTransactionInitContractPayload),
-                    param: Parameter.empty(),
-                };
-                break;
-            default:
-                accountTransactionPayload = payload as AccountTransactionPayload;
-                break;
-        }
-
-        const handler = getAccountTransactionHandler(type);
         const response = await this.messageHandler.sendMessage<MessageStatusWrapper<string>>(
             MessageType.SendTransaction,
             {
                 ...input,
                 accountAddress: AccountAddress.toBase58(input.accountAddress),
-                payload: stringify(handler.toJSON(accountTransactionPayload)),
+                payload: stringify(input.payload),
                 parameters: JSONBig.stringify(input.parameters),
             }
         );
