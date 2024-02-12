@@ -1,0 +1,77 @@
+name: Release browser wallet
+
+on:
+    # Allows us to run the workflow manually from the Actions tab
+    workflow_dispatch:
+
+env:
+    dummy: 1 # change to force cache invalidation
+    node_version: 18.14.2
+
+jobs:
+    dependencies:
+        runs-on: ubuntu-20.04
+
+        steps:
+            - uses: actions/checkout@v2
+
+            - name: Cache dependencies
+              id: fetch-dependencies
+              uses: actions/cache@v2
+              with:
+                  path: |
+                      **/node_modules
+                  key: ${{ runner.os }}-${{ env.dummy }}-${{ hashFiles('**/package.json', '**/yarn.lock') }}
+
+            - uses: actions/setup-node@v2
+              if: steps.fetch-dependencies.outputs.cache-hit != 'true'
+              with:
+                  node-version: '${{ env.node_version }}'
+
+            - name: Download dependencies
+              if: steps.fetch-dependencies.outputs.cache-hit != 'true'
+              run: YARN_CHECKSUM_BEHAVIOR=ignore yarn
+
+    build-and-upload:
+        runs-on: ubuntu-20.04
+        needs: [dependencies]
+
+        steps:
+            - uses: actions/checkout@v2
+            - uses: actions/setup-node@v2
+              with:
+                  node-version: '${{ env.node_version }}'
+
+            - name: Get cached dependencies
+              uses: actions/cache@v2
+              with:
+                  path: |
+                      **/node_modules
+                  key: ${{ runner.os }}-${{ env.dummy }}-${{ hashFiles('**/package.json', '**/yarn.lock') }}
+
+            - name: get-npm-version
+              id: package-version
+              uses: martinbeentjes/npm-get-version-action@v1.3.1
+              with:
+                  path: packages/browser-wallet
+
+            - name: Build
+              run: yarn build:all
+
+            - name: TypeCheck
+              run: yarn type:check
+
+            - name: Upload release
+              uses: actions/upload-artifact@master
+              with:
+                  name: concordium-browser-wallet-${{steps.package-version.outputs.current-version}}
+                  path: ./packages/browser-wallet/dist
+
+            - name: Make development build
+              run: cd ./packages/browser-wallet && yarn build:dev
+
+            - name: Upload development release
+              uses: actions/upload-artifact@master
+              with:
+                  name: concordium-browser-wallet-${{steps.package-version.outputs.current-version}}-dev
+                  path: ./packages/browser-wallet/dist
