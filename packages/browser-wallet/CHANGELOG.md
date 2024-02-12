@@ -1,10 +1,11 @@
 # Changelog
 
-## Unreleased
+## 1.4.1
 
 ### Fixed
 
 -   An issue where the identity selected for creating a new account was swapped with another identity if the wallet contained failed identities.
+-   An issue where the deprecated function `getGrpcClient` in the wallet-api returned the wrong type.
 
 ## 1.4.0
 
