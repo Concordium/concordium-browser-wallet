@@ -1,5 +1,5 @@
 /* eslint-disable @typescript-eslint/no-explicit-any */
-import { CcdAmount, jsonStringify } from '@concordium/web-sdk/types';
+import { CcdAmount } from '@concordium/web-sdk/types';
 import { Buffer } from 'buffer/';
 import { isGtuAmount } from './compatibility';
 import { serializationTypes } from './constants';
@@ -29,5 +29,5 @@ export function replacer(this: any, k: string, value: any) {
  * Stringify that acts as an inverse for parse from browser-wallet @shared/utils/payload-helpers
  */
 export function stringify(input: any) {
-    return jsonStringify(input, replacer);
+    return JSON.stringify(input, replacer);
 }

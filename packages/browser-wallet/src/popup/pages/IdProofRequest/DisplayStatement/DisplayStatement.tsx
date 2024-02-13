@@ -18,9 +18,9 @@ import { useDisplayAttributeValue, useGetAttributeName } from '@popup/shared/uti
 import { ConfirmedIdentity } from '@shared/storage/types';
 import ExternalLink from '@popup/shared/ExternalLink';
 import urls from '@shared/constants/url';
+import { canProveStatement } from '@shared/utils/proof-helpers';
 import {
     SecretStatement,
-    canProveStatement,
     useStatementDescription,
     useStatementHeader,
     useStatementValue,

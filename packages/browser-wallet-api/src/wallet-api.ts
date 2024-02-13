@@ -133,6 +133,7 @@ class WalletApi extends EventEmitter implements IWalletApi {
         schemaVersion?: SchemaVersion
     ): Promise<string> {
         const input = sanitizeSendTransactionInput(accountAddress, type, payload, parameters, schema, schemaVersion);
+
         const response = await this.messageHandler.sendMessage<MessageStatusWrapper<string>>(
             MessageType.SendTransaction,
             {

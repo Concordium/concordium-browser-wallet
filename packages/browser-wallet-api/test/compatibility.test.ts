@@ -14,16 +14,18 @@ import {
     DeployModulePayload,
     Energy,
     EntrypointName,
+    getAccountTransactionHandler,
     IdStatementBuilder,
-    jsonParse,
-    jsonStringify,
+    InitContractPayload,
     ModuleReference,
     OpenStatus,
+    Parameter,
     ReceiveName,
     RegisterDataPayload,
     SchemaVersion,
     SimpleTransferPayload,
     SimpleTransferWithMemoPayload,
+    UpdateContractPayload,
     UpdateCredentialsPayload,
 } from '@concordium/web-sdk';
 import {
@@ -146,10 +148,17 @@ describe(sanitizeSendTransactionInput, () => {
         const parameters: SmartContractParameters = { obj: 'test' };
         const schema = 'VGhpcyBpcyBiYXNlNjQK';
 
+        const handler = getAccountTransactionHandler(type);
+        const accountTransactionPayload = {
+            ...payload,
+            message: Parameter.empty(),
+        };
+        const payloadJSON = handler.toJSON(accountTransactionPayload);
+
         let expected: SanitizedSendTransactionInput = {
             accountAddress: AccountAddress.fromBase58(accountAddress),
             type,
-            payload,
+            payload: payloadJSON,
         };
 
         let result = sanitizeSendTransactionInput(accountAddress, type, payload);
@@ -174,16 +183,20 @@ describe(sanitizeSendTransactionInput, () => {
             '23513bcb5dbc81216fa4e12d3165a818e2b8699a1c9ef5c699f46ca3b1024ebf'
         );
 
-        const expectedPayload: SendTransactionInitContractPayload = {
+        const expectedPayload: InitContractPayload = {
             moduleRef,
             maxContractExecutionEnergy: Energy.create(maxContractExecutionEnergy),
             amount: CcdAmount.fromMicroCcd(amount),
             initName: ContractName.fromString(contractName),
+            param: Parameter.empty(),
         };
+        const handler = getAccountTransactionHandler(type);
+        const expectedPayloadJSON = handler.toJSON(expectedPayload);
+
         const expected: SanitizedSendTransactionInput = {
             accountAddress: AccountAddress.fromBase58(accountAddress),
             type,
-            payload: expectedPayload,
+            payload: expectedPayloadJSON,
         };
 
         const v0: InitContractPayloadV0 = {
@@ -231,7 +244,7 @@ describe(sanitizeSendTransactionInput, () => {
         const type = AccountTransactionType.Update;
         const receiveName = `${contractName}.${entrypointName}`;
 
-        const expectedPayload: SendTransactionUpdateContractPayload = {
+        const expectedPayload: UpdateContractPayload = {
             maxContractExecutionEnergy: Energy.create(maxContractExecutionEnergy),
             amount: CcdAmount.fromMicroCcd(amount),
             address: ContractAddress.create(contractIndex, contractSubindex),
@@ -239,11 +252,14 @@ describe(sanitizeSendTransactionInput, () => {
                 ContractName.fromString(contractName),
                 EntrypointName.fromString(entrypointName)
             ),
+            message: Parameter.empty(),
         };
+        const handler = getAccountTransactionHandler(type);
+        const expectedPayloadJSON = handler.toJSON(expectedPayload);
         const expected: SanitizedSendTransactionInput = {
             accountAddress: AccountAddress.fromBase58(accountAddress),
             type,
-            payload: expectedPayload,
+            payload: expectedPayloadJSON,
         };
 
         const v0: UpdateContractPayloadV0 = {
@@ -289,10 +305,12 @@ describe(sanitizeSendTransactionInput, () => {
             version,
             source,
         };
+        const handler = getAccountTransactionHandler(type);
+        const expectedPayloadJSON = handler.toJSON(expectedPayload);
         const expected: SanitizedSendTransactionInput = {
             accountAddress: AccountAddress.fromBase58(accountAddress),
             type,
-            payload: expectedPayload,
+            payload: expectedPayloadJSON,
         };
 
         const v0: DeployModulePayloadV0 = {
@@ -319,10 +337,12 @@ describe(sanitizeSendTransactionInput, () => {
             toAddress: AccountAddress.fromBase58(accountAddress),
             amount: CcdAmount.fromMicroCcd(amount),
         };
+        const handler = getAccountTransactionHandler(type);
+        const expectedPayloadJSON = handler.toJSON(expectedPayload);
         const expected: SanitizedSendTransactionInput = {
             accountAddress: AccountAddress.fromBase58(accountAddress),
             type,
-            payload: expectedPayload,
+            payload: expectedPayloadJSON,
         };
 
         const v0: SimpleTransferPayloadV0 = {
@@ -359,10 +379,12 @@ describe(sanitizeSendTransactionInput, () => {
             amount: CcdAmount.fromMicroCcd(amount),
             memo,
         };
+        const handler = getAccountTransactionHandler(type);
+        const expectedPayloadJSON = handler.toJSON(expectedPayload);
         const expected: SanitizedSendTransactionInput = {
             accountAddress: AccountAddress.fromBase58(accountAddress),
             type,
-            payload: expectedPayload,
+            payload: expectedPayloadJSON,
         };
 
         const v0: SimpleTransferWithMemoPayloadV0 = {
@@ -403,11 +425,13 @@ describe(sanitizeSendTransactionInput, () => {
             amount: CcdAmount.fromMicroCcd(amount),
             memo,
         };
+        const handler = getAccountTransactionHandler(type);
+        const expectedPayloadJSON = handler.toJSON(expectedPayload);
 
         const expected: SanitizedSendTransactionInput = {
             accountAddress: AccountAddress.fromBase58(accountAddress),
             type,
-            payload: expectedPayload,
+            payload: expectedPayloadJSON,
         };
 
         const payload: SimpleTransferWithMemoPayload = {
@@ -428,9 +452,6 @@ describe(sanitizeSendTransactionInput, () => {
 
         const result = sanitizeSendTransactionInput(accountAddress, type, payload);
         expect(result).toEqual(expected);
-        const parsed = jsonParse(jsonStringify(result));
-        expect(() => parsed.payload.memo.toJSON()).not.toThrow();
-        expect(parsed).toEqual(expected);
     });
 
     test('Transforms "ConfigureBaker" transaction input as expected', () => {
@@ -460,10 +481,13 @@ describe(sanitizeSendTransactionInput, () => {
             transactionFeeCommission,
             finalizationRewardCommission,
         };
+        const handler = getAccountTransactionHandler(type);
+        const expectedPayloadJSON = handler.toJSON(expectedPayload);
+
         const expected: SanitizedSendTransactionInput = {
             accountAddress: AccountAddress.fromBase58(accountAddress),
             type,
-            payload: expectedPayload,
+            payload: expectedPayloadJSON,
         };
 
         const v0: ConfigureBakerPayloadV0 = {
@@ -505,10 +529,13 @@ describe(sanitizeSendTransactionInput, () => {
             restakeEarnings,
             delegationTarget,
         };
+        const handler = getAccountTransactionHandler(type);
+        const expectedPayloadJSON = handler.toJSON(expectedPayload);
+
         const expected: SanitizedSendTransactionInput = {
             accountAddress: AccountAddress.fromBase58(accountAddress),
             type,
-            payload: expectedPayload,
+            payload: expectedPayloadJSON,
         };
 
         const v0: ConfigureDelegationPayloadV0 = {
@@ -536,14 +563,16 @@ describe(sanitizeSendTransactionInput, () => {
         const payload: RegisterDataPayload = {
             data: new DataBlob(Buffer.from('This is data!')),
         };
+        const handler = getAccountTransactionHandler(type);
+        const expectedPayloadJSON = handler.toJSON(payload);
+
         const expected: SanitizedSendTransactionInput = {
             accountAddress: AccountAddress.fromBase58(accountAddress),
             type,
-            payload,
+            payload: expectedPayloadJSON,
         };
         const result = sanitizeSendTransactionInput(accountAddress, type, payload);
         expect(result).toEqual(expected);
-        expect((result.payload as RegisterDataPayload).data).toStrictEqual(payload.data);
     });
 
     test('Transformed "RegisterData" transaction input with "DataBlob"-like parameter can be parsed', () => {
@@ -556,19 +585,20 @@ describe(sanitizeSendTransactionInput, () => {
             } as unknown as DataBlob,
         };
 
+        const expectedPayload: RegisterDataPayload = {
+            data: new DataBlob(Buffer.from('This is data!')),
+        };
+        const handler = getAccountTransactionHandler(type);
+        const expectedPayloadJSON = handler.toJSON(expectedPayload);
+
         const expected: SanitizedSendTransactionInput = {
             accountAddress: AccountAddress.fromBase58(accountAddress),
             type,
-            payload: {
-                data: new DataBlob(Buffer.from('This is data!')),
-            },
+            payload: expectedPayloadJSON,
         };
 
         const result = sanitizeSendTransactionInput(accountAddress, type, payload);
         expect(result).toEqual(expected);
-        const parsed = jsonParse(jsonStringify(result));
-        expect(() => parsed.payload.data.toJSON()).not.toThrow();
-        expect(parsed).toEqual(expected);
     });
 
     test('Transforms "UpdateCredentials" transaction input as expected', () => {
@@ -607,10 +637,13 @@ describe(sanitizeSendTransactionInput, () => {
             removeCredentialIds: ['010302'],
             currentNumberOfCredentials: 1n,
         };
+        const handler = getAccountTransactionHandler(type);
+        const expectedPayloadJSON = handler.toJSON(payload);
+
         const expected: SanitizedSendTransactionInput = {
             accountAddress: AccountAddress.fromBase58(accountAddress),
             type,
-            payload,
+            payload: expectedPayloadJSON,
         };
         const result = sanitizeSendTransactionInput(accountAddress, type, payload);
         expect(result).toEqual(expected);

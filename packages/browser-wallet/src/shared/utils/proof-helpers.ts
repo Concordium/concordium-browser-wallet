@@ -14,6 +14,9 @@ import { BackgroundResponseStatus, ProofBackgroundResponse } from './types';
 
 export function canProveStatement(statement: AtomicStatement, identity: ConfirmedIdentity) {
     const attribute = identity.idObject.value.attributeList.chosenAttributes[statement.attributeTag];
+    if (attribute === undefined) {
+        return false;
+    }
 
     switch (statement.type) {
         case StatementTypes.AttributeInSet:
@@ -23,7 +26,7 @@ export function canProveStatement(statement: AtomicStatement, identity: Confirme
         case StatementTypes.AttributeInRange:
             return statement.upper > attribute && attribute >= statement.lower;
         case StatementTypes.RevealAttribute:
-            return attribute !== undefined;
+            return true;
         default:
             throw new Error(`Statement type of ${statement.type} is not supported`);
     }
