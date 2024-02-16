@@ -1,5 +1,11 @@
 # Changelog
 
+## Unreleased
+
+### Fixed
+
+-   No longer blocks creating the last possible account for an identity.
+
 ## 1.4.1
 
 ### Fixed

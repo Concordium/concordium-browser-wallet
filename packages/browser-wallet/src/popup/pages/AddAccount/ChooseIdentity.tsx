@@ -18,7 +18,7 @@ import { isConfirmedIdentity } from '@popup/shared/utils/identity-helpers';
 
 function validateValidForAccountCreation(identity: ConfirmedIdentity, creds: WalletCredential[]): string | undefined {
     const nextCredNumber = getNextEmptyCredNumber(creds);
-    if (nextCredNumber >= getMaxAccountsForIdentity(identity)) {
+    if (nextCredNumber > getMaxAccountsForIdentity(identity)) {
         return i18n.t('maxAccountsReached', { ns: 'addAccount' });
     }
     return undefined;
