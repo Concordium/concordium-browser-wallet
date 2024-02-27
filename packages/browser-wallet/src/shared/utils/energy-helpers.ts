@@ -16,7 +16,7 @@ const CONFIGURE_BAKER_WITH_KEYS_BASE_COST = 4050n;
 
 // TODO: replace this with helpers from SDK
 export function determineUpdatePayloadSize(parameterSize: number, receiveName: string) {
-    return 8n + 8n + 8n + 2n + BigInt(parameterSize) + 2n + BigInt(receiveName.length);
+    return 8n + 8n + 8n + 2n + BigInt(parameterSize) + 2n + BigInt(receiveName.length) + 1n;
 }
 
 // TODO: Replace this with helpers from SDK

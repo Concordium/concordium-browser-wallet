@@ -4,6 +4,7 @@
 
 ### Fixed
 
+-   The token transfer estimate now takes the transfer amount into account.
 -   No longer blocks creating the last possible account for an identity.
 
 ## 1.4.1
