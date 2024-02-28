@@ -303,9 +303,10 @@ export async function getTokenTransferEnergy(
     address: string,
     recipient: string,
     tokenId: string,
+    amount: bigint,
     contractIndex: bigint
 ) {
-    const parameters = getTokenTransferParameters(address, recipient, tokenId, 1n);
+    const parameters = getTokenTransferParameters(address, recipient, tokenId, amount);
     const serializedParameters = serializeTokenTransferParameters(parameters);
     const contractName = (await fetchContractName(client, contractIndex)) || '';
     const execution = await getTokenTransferExecutionEnergyEstimate(

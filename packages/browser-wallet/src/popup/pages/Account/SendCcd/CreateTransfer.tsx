@@ -6,7 +6,14 @@ import { selectedAccountAtom } from '@popup/store/account';
 import Form from '@popup/shared/Form';
 import AmountInput from '@popup/shared/Form/AmountInput';
 import Input from '@popup/shared/Form/Input';
-import { getPublicAccountAmounts, useAsyncMemo, integerToFractional, max, displayAsCcd } from 'wallet-common-helpers';
+import {
+    getPublicAccountAmounts,
+    fractionalToInteger,
+    useAsyncMemo,
+    integerToFractional,
+    max,
+    displayAsCcd,
+} from 'wallet-common-helpers';
 import { AccountAddress } from '@concordium/web-sdk';
 import { SubmitHandler, useForm, Validate } from 'react-hook-form';
 import clsx from 'clsx';
@@ -91,43 +98,14 @@ function CreateTransaction({ tokens, setCost, setDetailsExpanded, cost }: Props 
     const [pickingToken, setPickingToken] = useState<boolean>(false);
     const addToast = useSetAtom(addToastAtom);
     const chainParameters = useBlockChainParameters();
+    const currentAmount = form.watch('amount');
 
     if (!address || !selectedCred) {
         throw new Error('Missing selected accoount');
     }
 
     const [contractBalances] = useAtom(contractBalancesFamily(address, chosenToken?.contractIndex || ''));
-
-    const fee = useAsyncMemo<FeeResult>(
-        async () => {
-            if (chosenToken) {
-                if (validateAccountAddress(recipient)) {
-                    return undefined;
-                }
-                try {
-                    const energy = await getTokenTransferEnergy(
-                        client,
-                        address,
-                        recipient,
-                        chosenToken.tokenId,
-                        BigInt(chosenToken.contractIndex)
-                    );
-                    form.setValue('executionEnergy', energy.execution.toString());
-                    return { success: true, value: energy.total.value };
-                } catch (e) {
-                    addToast(t('sendCcd.transferInvokeFailed', { message: (e as Error).message }));
-                    return { success: false };
-                }
-            }
-            return { success: true, value: SIMPLE_TRANSFER_ENERGY_TOTAL_COST };
-        },
-        undefined,
-        [chosenToken?.contractIndex, chosenToken?.tokenId, recipient]
-    );
-
-    useEffect(() => {
-        setCost(chainParameters && fee?.success ? convertEnergyToMicroCcd(fee.value, chainParameters) : 0n);
-    }, [fee, chainParameters]);
+    const decimals = getMetadataDecimals(tokenMetadata);
 
     const accountInfo = useAccountInfo(selectedCred);
 
@@ -140,7 +118,7 @@ function CreateTransaction({ tokens, setCost, setDetailsExpanded, cost }: Props 
     }, [chosenToken, ccdBalance]);
 
     const validateAmount: Validate<string> = (amount) =>
-        validateTransferAmount(amount, currentBalance, getMetadataDecimals(tokenMetadata), chosenToken ? 0n : cost);
+        validateTransferAmount(amount, currentBalance, decimals, chosenToken ? 0n : cost);
 
     const maxValue = useMemo(() => {
         if (currentBalance !== undefined) {
@@ -148,6 +126,42 @@ function CreateTransaction({ tokens, setCost, setDetailsExpanded, cost }: Props 
         }
         return undefined;
     }, [Boolean(chosenToken), currentBalance, cost]);
+
+    const fee = useAsyncMemo<FeeResult>(
+        async () => {
+            if (chosenToken) {
+                if (validateAccountAddress(recipient)) {
+                    return undefined;
+                }
+                const amount =
+                    validateAmount(currentAmount) === undefined
+                        ? fractionalToInteger(currentAmount, decimals)
+                        : undefined;
+                try {
+                    const energy = await getTokenTransferEnergy(
+                        client,
+                        address,
+                        recipient,
+                        chosenToken.tokenId,
+                        amount || maxValue || 1n,
+                        BigInt(chosenToken.contractIndex)
+                    );
+                    form.setValue('executionEnergy', energy.execution.toString());
+                    return { success: true, value: energy.total.value };
+                } catch (e) {
+                    addToast(t('sendCcd.transferInvokeFailed', { message: (e as Error).message }));
+                    return { success: false };
+                }
+            }
+            return { success: true, value: SIMPLE_TRANSFER_ENERGY_TOTAL_COST };
+        },
+        undefined,
+        [chosenToken?.contractIndex, chosenToken?.tokenId, recipient, currentAmount]
+    );
+
+    useEffect(() => {
+        setCost(chainParameters && fee?.success ? convertEnergyToMicroCcd(fee.value, chainParameters) : 0n);
+    }, [fee, chainParameters]);
 
     useEffect(() => {
         // When switching account reset whether or not the user is picking a token.
@@ -200,7 +214,7 @@ function CreateTransaction({ tokens, setCost, setDetailsExpanded, cost }: Props 
         }
     }, []);
 
-    const displayAmount = integerToFractional(getMetadataDecimals(tokenMetadata));
+    const displayAmount = integerToFractional(decimals);
 
     const onMax = () => {
         form.setValue('amount', displayAmount(maxValue) || '0');
