@@ -48,6 +48,7 @@ export enum InternalMessageType {
     LoadWeb3IdBackup = 'I_LoadWeb3IdBackup',
     ImportWeb3IdBackup = 'I_ImportWeb3IdBackup',
     AbortRecovery = 'I_AbortRecovery',
+    OpenFullscreen = 'I_OpenFullscreen',
 }
 
 // eslint-disable-next-line @typescript-eslint/no-explicit-any
