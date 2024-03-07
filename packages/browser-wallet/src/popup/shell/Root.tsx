@@ -6,7 +6,7 @@ import { noOp } from 'wallet-common-helpers';
 
 import { Dimensions, large, medium, small } from '@popup/constants/dimensions';
 import { popupMessageHandler } from '@popup/shared/message-handler';
-import { isSpawnedWeb3IdProofWindow, isSpawnedWindow } from '@popup/shared/window-helpers';
+import { isFullscreenWindow, isSpawnedWeb3IdProofWindow, isSpawnedWindow } from '@popup/shared/window-helpers';
 import { networkConfigurationAtom, themeAtom } from '@popup/store/settings';
 import { Theme as ThemeType } from '@shared/storage/types';
 import { absoluteRoutes } from '@popup/constants/routes';
@@ -36,12 +36,16 @@ function useScaling() {
         }
 
         // When opened by clicking on the extension icon
-        if (!isSpawnedWindow && html) {
+        if (!isSpawnedWindow && body) {
             const { width, height } = dimensions ?? small;
 
             // Mimic what's done on a spawned popup window in the bg script.
-            html.style.width = `${width}px`;
-            html.style.height = `${height}px`;
+            body.style.width = `${width}px`;
+            body.style.height = `${height}px`;
+
+            if (isFullscreenWindow) {
+                body.style.margin = '32px auto';
+            }
         }
 
         if (dimensions && isSpawnedWindow) {
