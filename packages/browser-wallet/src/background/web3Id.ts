@@ -336,14 +336,17 @@ async function waitForClosedPopup(waitIterations: number): Promise<void> {
     });
 }
 
-async function loadWeb3IdBackup(): Promise<void> {
-    await waitForClosedPopup(WAIT_FOR_CLOSED_POPUP_ITERATIONS);
+async function loadWeb3IdBackup(calledFromFullscreenWindow: boolean): Promise<void> {
+    if (!calledFromFullscreenWindow) {
+        await waitForClosedPopup(WAIT_FOR_CLOSED_POPUP_ITERATIONS);
+    }
     await openWindow();
     bgMessageHandler.sendInternalMessage(InternalMessageType.ImportWeb3IdBackup);
 }
 
 export const loadWeb3IdBackupHandler: ExtensionMessageHandler = (_msg, _sender, respond) => {
-    loadWeb3IdBackup();
+    const calledFromFullscreenWindow = _msg.payload as boolean;
+    loadWeb3IdBackup(calledFromFullscreenWindow);
     respond(undefined);
 };
 
