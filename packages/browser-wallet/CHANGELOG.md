@@ -6,6 +6,10 @@
 
 -   A button in settings that opens the wallet in fullscreen mode in a tab.
 
+### Fixed
+
+-   An issue where some proof requests for nationality or country of residence would be misintrepreted as asking whether in the EU or not.
+
 ## 1.4.2
 
 ### Fixed
