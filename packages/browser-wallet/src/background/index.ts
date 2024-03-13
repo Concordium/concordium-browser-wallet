@@ -277,6 +277,10 @@ bgMessageHandler.handleMessage(
     createWeb3IdProofHandler
 );
 
+bgMessageHandler.handleMessage(createMessageTypeFilter(InternalMessageType.OpenFullscreen), () => {
+    chrome.tabs.create({ url: chrome.runtime.getURL('popup.html#fullscreen') });
+});
+
 const NOT_WHITELISTED = 'Site is not whitelisted';
 
 /**

@@ -10,6 +10,7 @@ import { useCurrentOpenTabUrl } from '@popup/shared/utils/tabs';
 import Button from '@popup/shared/Button';
 import { absoluteRoutes } from '@popup/constants/routes';
 import { allowlistRoutes } from '@popup/pages/Allowlist/routes';
+import { isFullscreenWindow } from '@popup/shared/window-helpers';
 import { accountRoutes } from './routes';
 import AccountActions from './AccountActions';
 import DisplayAddress from './DisplayAddress';
@@ -58,14 +59,16 @@ function Account() {
                                 onClick={() => setDetailsExpanded((o) => !o)}
                             />
                             <AccountDetails expanded={detailsExpanded} account={selectedCred} />
-                            <ConnectedBox
-                                url={currentUrl}
-                                accountAddress={selectedCred.address}
-                                link={generatePath(
-                                    `${absoluteRoutes.home.settings.allowlist.path}/${allowlistRoutes.edit}`,
-                                    { serviceName: currentUrl ? encodeURIComponent(currentUrl) : '' }
-                                )}
-                            />
+                            {!isFullscreenWindow && (
+                                <ConnectedBox
+                                    url={currentUrl}
+                                    accountAddress={selectedCred.address}
+                                    link={generatePath(
+                                        `${absoluteRoutes.home.settings.allowlist.path}/${allowlistRoutes.edit}`,
+                                        { serviceName: currentUrl ? encodeURIComponent(currentUrl) : '' }
+                                    )}
+                                />
+                            )}
                         </div>
                         <div className="account-page__routes">
                             {isConfirmed && <Outlet />}

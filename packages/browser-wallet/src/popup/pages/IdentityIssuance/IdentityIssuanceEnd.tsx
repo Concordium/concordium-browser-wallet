@@ -17,6 +17,7 @@ import { IdentityIssuanceBackgroundResponse } from '@shared/utils/identity-helpe
 import IdentityProviderIcon from '@popup/shared/IdentityProviderIcon';
 import { BackgroundResponseStatus } from '@shared/utils/types';
 import { CreationStatus } from '@shared/storage/types';
+import { absoluteRoutes } from '@popup/constants/routes';
 
 interface Location {
     state: {
@@ -30,7 +31,7 @@ export default function IdentityIssuanceEnd() {
     const { state } = useLocation() as Location;
     const { t } = useTranslation('identityIssuance');
     const providers = useAtomValue(identityProvidersAtom);
-    const { withClose } = useContext(fullscreenPromptContext);
+    const { withClose, setReturnLocation } = useContext(fullscreenPromptContext);
     const selectedIdentity = useAtomValue(selectedIdentityAtom);
     const identities = useAtomValue(identitiesAtom);
     const setSelectedIdentityIndex = useSetAtom(selectedIdentityIndexAtom);
@@ -45,6 +46,10 @@ export default function IdentityIssuanceEnd() {
             setSelectedIdentityIndex(identities.length - 1);
         }
     }, [identities.length]);
+
+    useEffect(() => {
+        setReturnLocation(absoluteRoutes.home.identities.path);
+    }, [setReturnLocation]);
 
     return (
         <>

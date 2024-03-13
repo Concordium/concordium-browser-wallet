@@ -6,6 +6,11 @@
     &__link {
         display: block;
         padding: rem(10px) 0;
+
+        &--button {
+            width: 100%;
+            text-align: left;
+        }
     }
 
     &__toggle {

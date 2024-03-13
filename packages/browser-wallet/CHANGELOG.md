@@ -1,5 +1,11 @@
 # Changelog
 
+# Unreleased
+
+### Added
+
+-   A button in settings that opens the wallet in fullscreen mode in a tab.
+
 ## 1.4.2
 
 ### Fixed

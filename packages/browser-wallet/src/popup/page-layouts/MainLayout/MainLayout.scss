@@ -4,6 +4,7 @@ $main-layout-header-height: rem(40px);
     height: 100%;
     position: relative;
     z-index: 0;
+    overflow: hidden;
 
     &__main {
         overflow: overlay;

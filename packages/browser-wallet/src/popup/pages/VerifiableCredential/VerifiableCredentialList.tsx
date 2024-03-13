@@ -16,6 +16,7 @@ import {
 } from '@shared/utils/verifiable-credential-helpers';
 import { popupMessageHandler } from '@popup/shared/message-handler';
 import { InternalMessageType } from '@concordium/browser-wallet-message-hub';
+import { isFullscreenWindow } from '@popup/shared/window-helpers';
 import {
     useCredentialLocalization,
     useCredentialMetadata,
@@ -28,8 +29,10 @@ import VerifiableCredentialDetails from './VerifiableCredentialDetails';
 import { useVerifiableCredentialExport } from '../VerifiableCredentialBackup/utils';
 
 async function goToImportPage() {
-    await popupMessageHandler.sendInternalMessage(InternalMessageType.LoadWeb3IdBackup);
-    window.close();
+    await popupMessageHandler.sendInternalMessage(InternalMessageType.LoadWeb3IdBackup, isFullscreenWindow);
+    if (!isFullscreenWindow) {
+        window.close();
+    }
 }
 
 /**

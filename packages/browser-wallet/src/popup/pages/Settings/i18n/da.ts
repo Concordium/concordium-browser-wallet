@@ -7,6 +7,7 @@ const t: typeof en = {
     recover: 'Genskab ID & konti',
     about: 'Om',
     seedPhrase: 'Vis hemmeligt recovery phrase',
+    fullscreenWallet: 'Åbn i fuldskærm',
     toggle: {
         dark: 'Skift til mørkt udseende',
         light: 'Skift til lyst udseende',
