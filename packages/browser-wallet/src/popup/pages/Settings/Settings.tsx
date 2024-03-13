@@ -59,7 +59,7 @@ export default function Settings() {
                             popupMessageHandler.sendInternalMessage(InternalMessageType.OpenFullscreen);
                         }}
                     >
-                        Open fullscreen wallet
+                        {t('fullscreenWallet')}
                     </Button>
                 )}
                 <Link className="settings-page__link" to={absoluteRoutes.home.settings.about.path}>
