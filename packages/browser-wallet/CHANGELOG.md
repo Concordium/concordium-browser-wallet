@@ -1,10 +1,14 @@
 # Changelog
 
-# Unreleased
+## Unreleased
 
 ### Added
 
 -   A button in settings that opens the wallet in fullscreen mode in a tab.
+
+### Fixed
+
+-   Inject script not loading on the first page of a new tab, causing API to not be available for dApps.
 
 ## 1.4.2
 

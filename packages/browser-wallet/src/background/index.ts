@@ -96,6 +96,16 @@ async function exportGRPCLocation(
     return onSuccess(`${network.grpcUrl}:${network.grpcPort}`);
 }
 
+async function executeInjectScript(tabId: number): Promise<void> {
+    await chrome.scripting.executeScript({
+        target: { tabId },
+        // TODO this is a reference to the output file, expecting to be placed in the root with manifest.json.
+        // Would be nice if the relative output path could be built from a reference to the entrypoint file instead.
+        files: ['inject.js'],
+        world: 'MAIN',
+    });
+}
+
 /**
  * Callback method which installs Injected script into Main world of Dapp
  */
@@ -103,15 +113,7 @@ const injectScript: ExtensionMessageHandler = (_msg, sender, respond) => {
     if (sender.tab?.id === undefined) {
         throw new Error('No ID for tab.');
     }
-
-    chrome.scripting
-        .executeScript({
-            target: { tabId: sender.tab.id },
-            // TODO this is a reference to the output file, expecting to be placed in the root with manifest.json.
-            // Would be nice if the relative output path could be built from a reference to the entrypoint file instead.
-            files: ['inject.js'],
-            world: 'MAIN',
-        })
+    executeInjectScript(sender.tab.id)
         .then(() => respond(true))
         .catch(() => respond(false));
 
@@ -251,11 +253,14 @@ bgMessageHandler.handleMessage(
     sendCredentialHandler
 );
 
+chrome.tabs.onUpdated.addListener((tabId, _, tab) => tab.url?.startsWith('http') && executeInjectScript(tabId));
+
 bgMessageHandler.handleMessage(
     createMessageTypeFilter(InternalMessageType.StartIdentityIssuance),
     identityIssuanceHandler
 );
 bgMessageHandler.handleMessage(createMessageTypeFilter(InternalMessageType.Init), injectScript);
+
 bgMessageHandler.handleMessage(createMessageTypeFilter(InternalMessageType.SetViewSize), ({ payload }) => {
     setPopupSize(payload);
 });
