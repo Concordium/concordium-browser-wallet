@@ -23,8 +23,11 @@ This repository contains the implementation of the Concordium browser wallet, wh
 -   Install dependencies by running `yarn install`
 -   Build concordium api helpers by running `yarn build:api-helpers` (The wallet and examples require this package to be built, before they can be built)
 
-The primary package is the [browser-wallet](./packages/browser-wallet) package, which builds the final artifact.
-Please check out [README for that package](.packages/browser-wallet/README.md) to see how to built it for development.
+The primary package is the [browser-wallet](./packages/browser-wallet) package, which builds the final artifact. To built it locally:
+
+-   Run `yarn build:(dev|prod)` (Note these are global commands and can be run from anywhere in the repository)
+
+Please check out the [README for that package](.packages/browser-wallet/README.md), for more information, including how to install this unpacked version.
 To build the extension for release, use the "Release browser wallet" action.
 
 ## Development and building packages
