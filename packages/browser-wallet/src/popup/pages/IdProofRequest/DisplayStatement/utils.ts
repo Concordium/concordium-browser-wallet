@@ -22,8 +22,8 @@ export type SecretStatement = Exclude<AtomicStatement, RevealStatement>;
 export const getYearFromDateString = (ds: string): number => Number(ds.substring(0, 4));
 const formatDateString = (ds: string): string => `${ds.substring(0, 4)}-${ds.substring(4, 6)}-${ds.substring(6)}`;
 
-const isEuCountrySet = (countries: string[]) =>
-    countries.length === EU_MEMBERS.length && countries.every((n) => EU_MEMBERS.includes(n));
+export const isEuCountrySet = (countries: string[]) =>
+    countries.length === EU_MEMBERS.length && EU_MEMBERS.every((euCountry) => countries.includes(euCountry));
 
 const getTextForSet =
     <T extends (...args: any) => any>(t: T, statement: MembershipStatement | NonMembershipStatement) =>
