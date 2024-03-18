@@ -15,7 +15,7 @@ RUN yarn && yarn cache clean
 ARG NETWORK
 
 RUN if [ "$NETWORK" = "testnet" ]; then yarn build; fi
-RUN if [ "$NETWORK" = "mainnet" ]; then yarn build:prod; fi
+RUN if [ "$NETWORK" = "mainnet" ]; then yarn build-prod; fi
 
 FROM nginx
 COPY --from=build ./app/dist ./usr/share/nginx/html

@@ -12,8 +12,11 @@ Assuming dependencies have been successfully installed,
 
 -   `cd` into package root
 -   Build concordium helpers by running `yarn build:api-helpers`
--   Run `yarn build:(dev|prod)`
+-   Run `yarn build:(dev|prod)` (Note these are global commands and can be run from anywhere in the repository)
 -   To continuously watch for changes, run `yarn watch`
+
+Note: `yarn build:dev` builds the browser wallet with access to stagenet, concordium's internal chain for testing, and with debug data,
+while `yarn build:prod` builds the release version, where only mainnet and testnet can be chosen and with bebug information stripped away.
 
 When the extension has been successfully built,
 

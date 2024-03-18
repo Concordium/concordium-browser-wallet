@@ -1,6 +1,6 @@
 # Changelog
 
-# Unreleased
+## Unreleased
 
 ### Added
 
@@ -9,6 +9,7 @@
 ### Fixed
 
 -   An issue where some proof requests for nationality or country of residence would be misintrepreted as asking whether in the EU or not.
+-   Inject script not loading on the first page of a new tab, causing API to not be available for dApps.
 
 ## 1.4.2
 
