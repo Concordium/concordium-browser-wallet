@@ -61,6 +61,24 @@ jobs:
             - name: TypeCheck
               run: yarn type:check
 
+    build-example-docker:
+        runs-on: ubuntu-20.04
+        strategy:
+            matrix:
+                image:
+                    - { dir: eSealing, dockerfile: Dockerfile }
+                    - { dir: voting, dockerfile: Dockerfile }
+                    - { dir: wCCD, dockerfile: Dockerfile, extraArguments: '--build-arg NETWORK="mainnet"' }
+        steps:
+            - name: Checkout
+              uses: actions/checkout@v4
+              with:
+                  submodules: recursive
+
+            - name: Build image
+              working-directory: examples/${{ matrix.image.dir }}
+              run: docker build ${{matrix.image.extraArguments}} -f ${{ matrix.image.dockerfile }} .
+
     lint:
         runs-on: ubuntu-20.04
         needs: [build]

@@ -1,4 +1,4 @@
-ARG base_image=node:16-slim
+ARG base_image=node:18-slim
 
 FROM ${base_image} AS build
 
