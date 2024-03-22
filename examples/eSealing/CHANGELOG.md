@@ -1,5 +1,9 @@
 # Changelog
 
+## 1.1.5
+
+-   Removed hardcoded energy for update, now invokes contract to check the energy usage.
+
 ## 1.1.4
 
 -   Bumped version of @concordium/web-sdk and @concordium/react-components (fixes wallet connect serialization issue)
