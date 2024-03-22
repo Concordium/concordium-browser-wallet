@@ -1,5 +1,15 @@
 import { createContext } from 'react';
-import { AccountTransactionType, CcdAmount, ContractAddress, Energy, ReceiveName } from '@concordium/web-sdk';
+import {
+    AccountAddress,
+    AccountTransactionType,
+    CcdAmount,
+    ConcordiumGRPCClient,
+    ContractAddress,
+    ContractName,
+    EntrypointName,
+    ReceiveName,
+    serializeUpdateContractParameters,
+} from '@concordium/web-sdk';
 import { WalletConnection, moduleSchemaFromBase64 } from '@concordium/react-components';
 import { E_SEALING_CONTRACT_NAME, E_SEALING_RAW_SCHEMA } from './constants';
 
@@ -8,23 +18,46 @@ import { E_SEALING_CONTRACT_NAME, E_SEALING_RAW_SCHEMA } from './constants';
  */
 export async function register(
     connection: WalletConnection,
+    grpcClient: ConcordiumGRPCClient,
     account: string,
     fileHashHex: string,
     index: bigint,
     subindex = 0n
 ) {
+    const contractAddress = ContractAddress.create(index, subindex);
+    const receiveName = ReceiveName.fromString(`${E_SEALING_CONTRACT_NAME}.registerFile`);
+
+    const schema = moduleSchemaFromBase64(E_SEALING_RAW_SCHEMA);
+    const serializedParameters = serializeUpdateContractParameters(
+        ContractName.fromString(E_SEALING_CONTRACT_NAME),
+        EntrypointName.fromString('registerFile'),
+        fileHashHex,
+        schema.value
+    );
+
+    const invokeResult = await grpcClient.invokeContract({
+        contract: contractAddress,
+        method: receiveName,
+        invoker: AccountAddress.fromBase58(account),
+        parameter: serializedParameters,
+    });
+
+    if (invokeResult.tag === 'failure') {
+        throw Error('Transaction would fail!');
+    }
+
     return connection.signAndSendTransaction(
         account,
         AccountTransactionType.Update,
         {
             amount: CcdAmount.fromMicroCcd(0),
-            address: ContractAddress.create(index, subindex),
-            receiveName: ReceiveName.fromString(`${E_SEALING_CONTRACT_NAME}.registerFile`),
-            maxContractExecutionEnergy: Energy.create(30000n),
+            address: contractAddress,
+            receiveName,
+            maxContractExecutionEnergy: invokeResult.usedEnergy,
         },
         {
             parameters: fileHashHex,
-            schema: moduleSchemaFromBase64(E_SEALING_RAW_SCHEMA),
+            schema,
         }
     );
 }
