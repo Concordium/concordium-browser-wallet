@@ -16,10 +16,12 @@ import {
     TransactionHash,
     TransactionSummaryType,
     TransactionKindString,
+    AccountAddress,
+    toBuffer,
+    EntrypointName,
+    serializeUpdateContractParameters,
 } from '@concordium/web-sdk';
 import { RAW_SCHEMA } from './constant';
-
-export const CONTRACT_NAME = 'PiggyBank';
 
 /**
  * Action for initializing a smart contract for keeping a collections of tokens.
@@ -51,20 +53,39 @@ export const createCollection = async (address: string): Promise<bigint> => {
  */
 export const mint = async (account: string, id: string, url: string, index: bigint, subindex = 0n): Promise<string> => {
     const provider = await detectConcordiumProvider();
+    const address = ContractAddress.create(index, subindex);
+    const receiveName = ReceiveName.fromString(`CIS2-NFT.mint`);
+    const parameter = {
+        owner: { Account: [account] },
+        token_id: id,
+        metadata: { url, hash: { None: [] } },
+    };
+    const serializedParameters = serializeUpdateContractParameters(
+        ContractName.fromString('CIS2-NFT'),
+        EntrypointName.fromString('mint'),
+        parameter,
+        toBuffer(RAW_SCHEMA, 'base64')
+    );
+    const invokeResult = await new ConcordiumGRPCClient(provider.grpcTransport).invokeContract({
+        contract: address,
+        method: receiveName,
+        invoker: AccountAddress.fromBase58(account),
+        parameter: serializedParameters,
+    });
+    if (invokeResult.tag === 'failure') {
+        throw Error('Transaction would fail!');
+    }
+    const maxContractExecutionEnergy = invokeResult.usedEnergy;
     const txHash = await provider.sendTransaction(
         account,
         AccountTransactionType.Update,
         {
             amount: CcdAmount.fromMicroCcd(0n),
-            address: ContractAddress.create(index, subindex),
-            receiveName: ReceiveName.fromString(`CIS2-NFT.mint`),
-            maxContractExecutionEnergy: Energy.create(30000),
+            address,
+            receiveName,
+            maxContractExecutionEnergy,
         } as UpdateContractPayload,
-        {
-            owner: { Account: [account] },
-            token_id: id,
-            metadata: { url, hash: { None: [] } },
-        },
+        parameter,
         RAW_SCHEMA
     );
 
