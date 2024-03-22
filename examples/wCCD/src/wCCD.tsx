@@ -409,12 +409,13 @@ export default function wCCD(props: ConnectionProps) {
                                 // Amount needs to be in WEI
                                 const amount = round(multiply(input, 1000000));
 
-                                if (connection && account) {
+                                if (connection && account && grpcClient) {
                                     setHash('');
                                     setTransactionError('');
                                     setWaitingForUser(true);
                                     const tx = (isWrapping ? wrap : unwrap)(
                                         connection,
+                                        grpcClient,
                                         account,
                                         wCCDContractIndex,
                                         CONTRACT_SUB_INDEX,

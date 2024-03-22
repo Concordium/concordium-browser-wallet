@@ -1,13 +1,82 @@
 import { createContext } from 'react';
-import { AccountTransactionType, CcdAmount, ContractAddress, Energy, ReceiveName } from '@concordium/web-sdk';
+import {
+    AccountAddress,
+    AccountTransactionType,
+    CcdAmount,
+    ConcordiumGRPCClient,
+    ContractAddress,
+    ContractContext,
+    ContractName,
+    EntrypointName,
+    ReceiveName,
+    serializeUpdateContractParameters,
+} from '@concordium/web-sdk';
 import { WalletConnection, moduleSchemaFromBase64 } from '@concordium/react-components';
 import { CONTRACT_NAME, WRAP_FUNCTION_RAW_SCHEMA, UNWRAP_FUNCTION_RAW_SCHEMA } from './constants';
+
+async function getExecutionEnergy(client: ConcordiumGRPCClient, invokeInput: ContractContext) {
+    const invokeResult = await client.invokeContract(invokeInput);
+    if (invokeResult.tag === 'failure') {
+        throw Error('Transaction would fail!');
+    }
+    return invokeResult.usedEnergy;
+}
+
+/**
+ * Shared method for wrap and unwrap
+ */
+async function send(
+    connection: WalletConnection,
+    grpcClient: ConcordiumGRPCClient,
+    methodName: string,
+    base64Schema: string,
+    // eslint-disable-next-line @typescript-eslint/no-explicit-any
+    parameter: any,
+    account: string,
+    index: bigint,
+    subindex = 0n,
+    amount = 0
+) {
+    const address = ContractAddress.create(index, subindex);
+    const receiveName = ReceiveName.fromString(`${CONTRACT_NAME}.${methodName}`);
+    const ccdAmount = CcdAmount.fromMicroCcd(BigInt(amount));
+    const schema = moduleSchemaFromBase64(base64Schema);
+    const serializedParameters = serializeUpdateContractParameters(
+        ContractName.fromString(CONTRACT_NAME),
+        EntrypointName.fromString(methodName),
+        parameter,
+        schema.value
+    );
+    const maxContractExecutionEnergy = await getExecutionEnergy(grpcClient, {
+        contract: address,
+        method: receiveName,
+        invoker: AccountAddress.fromBase58(account),
+        amount: ccdAmount,
+        parameter: serializedParameters,
+    });
+
+    return connection.signAndSendTransaction(
+        account,
+        AccountTransactionType.Update,
+        {
+            amount: ccdAmount,
+            address,
+            receiveName,
+            maxContractExecutionEnergy,
+        },
+        {
+            parameters: parameter,
+            schema,
+        }
+    );
+}
 
 /**
  * Action for wrapping some CCD to WCCD in the WCCD smart contract instance
  */
 export async function wrap(
     connection: WalletConnection,
+    grpcClient: ConcordiumGRPCClient,
     account: string,
     index: bigint,
     subindex = 0n,
@@ -24,21 +93,7 @@ export async function wrap(
             Account: [receiver],
         },
     };
-
-    return connection.signAndSendTransaction(
-        account,
-        AccountTransactionType.Update,
-        {
-            amount: CcdAmount.fromMicroCcd(BigInt(amount)),
-            address: ContractAddress.create(index, subindex),
-            receiveName: ReceiveName.fromString(`${CONTRACT_NAME}.wrap`),
-            maxContractExecutionEnergy: Energy.create(30000),
-        },
-        {
-            parameters: parameter,
-            schema: moduleSchemaFromBase64(WRAP_FUNCTION_RAW_SCHEMA),
-        }
-    );
+    return send(connection, grpcClient, 'wrap', WRAP_FUNCTION_RAW_SCHEMA, parameter, account, index, subindex, amount);
 }
 
 /**
@@ -46,6 +101,7 @@ export async function wrap(
  */
 export async function unwrap(
     connection: WalletConnection,
+    grpcClient: ConcordiumGRPCClient,
     account: string,
     index: bigint,
     subindex = 0n,
@@ -67,20 +123,7 @@ export async function unwrap(
         },
     };
 
-    return connection.signAndSendTransaction(
-        account,
-        AccountTransactionType.Update,
-        {
-            amount: CcdAmount.fromMicroCcd(BigInt(0)),
-            address: ContractAddress.create(index, subindex),
-            receiveName: ReceiveName.fromString(`${CONTRACT_NAME}.unwrap`),
-            maxContractExecutionEnergy: Energy.create(30000),
-        },
-        {
-            parameters: parameter,
-            schema: moduleSchemaFromBase64(UNWRAP_FUNCTION_RAW_SCHEMA),
-        }
-    );
+    return send(connection, grpcClient, 'unwrap', UNWRAP_FUNCTION_RAW_SCHEMA, parameter, account, index, subindex, 0);
 }
 
 /**
