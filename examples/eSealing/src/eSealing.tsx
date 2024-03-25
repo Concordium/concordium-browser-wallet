@@ -345,7 +345,7 @@ export default function SEALING(props: WalletConnectionProps) {
                     Waiting for connection...
                 </button>
             )}
-            {connection && isRegisterFilePage && account && (
+            {connection && isRegisterFilePage && account && grpcClient && (
                 <button
                     style={fileHashHex === '' ? ButtonStyleDisabled : ButtonStyle}
                     type="button"
@@ -362,6 +362,7 @@ export default function SEALING(props: WalletConnectionProps) {
                             setWaitingForUser(true);
                             const tx = (isRegisterFilePage ? register : register)(
                                 connection,
+                                grpcClient,
                                 account,
                                 fileHashHex,
                                 E_SEALING_CONTRACT_INDEX,
