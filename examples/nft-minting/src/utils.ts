@@ -21,7 +21,7 @@ import {
     EntrypointName,
     serializeUpdateContractParameters,
 } from '@concordium/web-sdk';
-import { RAW_SCHEMA } from './constant';
+import { EPSILON_ENERGY, RAW_SCHEMA } from './constant';
 
 /**
  * Action for initializing a smart contract for keeping a collections of tokens.
@@ -75,7 +75,7 @@ export const mint = async (account: string, id: string, url: string, index: bigi
     if (invokeResult.tag === 'failure') {
         throw Error('Transaction would fail!');
     }
-    const maxContractExecutionEnergy = invokeResult.usedEnergy;
+    const maxContractExecutionEnergy = Energy.create(invokeResult.usedEnergy.value + EPSILON_ENERGY);
     const txHash = await provider.sendTransaction(
         account,
         AccountTransactionType.Update,

@@ -7,19 +7,20 @@ import {
     ContractAddress,
     ContractContext,
     ContractName,
+    Energy,
     EntrypointName,
     ReceiveName,
     serializeUpdateContractParameters,
 } from '@concordium/web-sdk';
 import { WalletConnection, moduleSchemaFromBase64 } from '@concordium/react-components';
-import { CONTRACT_NAME, WRAP_FUNCTION_RAW_SCHEMA, UNWRAP_FUNCTION_RAW_SCHEMA } from './constants';
+import { CONTRACT_NAME, WRAP_FUNCTION_RAW_SCHEMA, UNWRAP_FUNCTION_RAW_SCHEMA, EPSILON_ENERGY } from './constants';
 
 async function getExecutionEnergy(client: ConcordiumGRPCClient, invokeInput: ContractContext) {
     const invokeResult = await client.invokeContract(invokeInput);
     if (invokeResult.tag === 'failure') {
         throw Error('Transaction would fail!');
     }
-    return invokeResult.usedEnergy;
+    return Energy.create(invokeResult.usedEnergy.value + EPSILON_ENERGY);
 }
 
 /**

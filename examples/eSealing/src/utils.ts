@@ -8,10 +8,11 @@ import {
     ContractName,
     EntrypointName,
     ReceiveName,
+    Energy,
     serializeUpdateContractParameters,
 } from '@concordium/web-sdk';
 import { WalletConnection, moduleSchemaFromBase64 } from '@concordium/react-components';
-import { E_SEALING_CONTRACT_NAME, E_SEALING_RAW_SCHEMA } from './constants';
+import { EPSILON_ENERGY, E_SEALING_CONTRACT_NAME, E_SEALING_RAW_SCHEMA } from './constants';
 
 /**
  * Action for registering a new file has in the eSealing smart contract instance
@@ -53,7 +54,7 @@ export async function register(
             amount: CcdAmount.fromMicroCcd(0),
             address: contractAddress,
             receiveName,
-            maxContractExecutionEnergy: invokeResult.usedEnergy,
+            maxContractExecutionEnergy: Energy.create(invokeResult.usedEnergy.value + EPSILON_ENERGY),
         },
         {
             parameters: fileHashHex,
