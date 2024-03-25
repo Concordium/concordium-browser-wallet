@@ -9,7 +9,9 @@ import {
     ContractName,
     Energy,
     EntrypointName,
+    InvokeContractFailedResult,
     ReceiveName,
+    RejectedReceive,
     serializeUpdateContractParameters,
 } from '@concordium/web-sdk';
 import { WalletConnection, moduleSchemaFromBase64 } from '@concordium/react-components';
@@ -17,8 +19,17 @@ import { CONTRACT_NAME, WRAP_FUNCTION_RAW_SCHEMA, UNWRAP_FUNCTION_RAW_SCHEMA, EP
 
 async function getExecutionEnergy(client: ConcordiumGRPCClient, invokeInput: ContractContext) {
     const invokeResult = await client.invokeContract(invokeInput);
-    if (invokeResult.tag === 'failure') {
-        throw Error('Transaction would fail!');
+    if (!invokeResult || invokeResult.tag === 'failure') {
+        const rejectReason = JSON.stringify(
+            ((invokeResult as InvokeContractFailedResult)?.reason as RejectedReceive)?.rejectReason
+        );
+
+        throw new Error(
+            `RPC call 'invokeContract' on method '${invokeInput.method.value}' of contract '${
+                invokeInput.contract.index
+            }' failed.
+            ${rejectReason !== undefined ? `Reject reason: ${rejectReason}` : ''}`
+        );
     }
     return Energy.create(invokeResult.usedEnergy.value + EPSILON_ENERGY);
 }

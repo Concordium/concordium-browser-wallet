@@ -20,6 +20,8 @@ import {
     toBuffer,
     EntrypointName,
     serializeUpdateContractParameters,
+    InvokeContractFailedResult,
+    RejectedReceive,
 } from '@concordium/web-sdk';
 import { EPSILON_ENERGY, RAW_SCHEMA } from './constant';
 
@@ -72,9 +74,18 @@ export const mint = async (account: string, id: string, url: string, index: bigi
         invoker: AccountAddress.fromBase58(account),
         parameter: serializedParameters,
     });
-    if (invokeResult.tag === 'failure') {
-        throw Error('Transaction would fail!');
+
+    if (!invokeResult || invokeResult.tag === 'failure') {
+        const rejectReason = JSON.stringify(
+            ((invokeResult as InvokeContractFailedResult)?.reason as RejectedReceive)?.rejectReason
+        );
+
+        throw new Error(
+            `RPC call 'invokeContract' on method '${receiveName}' of contract '${index}' failed.
+            ${rejectReason !== undefined ? `Reject reason: ${rejectReason}` : ''}`
+        );
     }
+
     const maxContractExecutionEnergy = Energy.create(invokeResult.usedEnergy.value + EPSILON_ENERGY);
     const txHash = await provider.sendTransaction(
         account,

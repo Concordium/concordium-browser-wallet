@@ -10,6 +10,8 @@ import {
     ReceiveName,
     Energy,
     serializeUpdateContractParameters,
+    InvokeContractFailedResult,
+    RejectedReceive,
 } from '@concordium/web-sdk';
 import { WalletConnection, moduleSchemaFromBase64 } from '@concordium/react-components';
 import { EPSILON_ENERGY, E_SEALING_CONTRACT_NAME, E_SEALING_RAW_SCHEMA } from './constants';
@@ -43,8 +45,15 @@ export async function register(
         parameter: serializedParameters,
     });
 
-    if (invokeResult.tag === 'failure') {
-        throw Error('Transaction would fail!');
+    if (!invokeResult || invokeResult.tag === 'failure') {
+        const rejectReason = JSON.stringify(
+            ((invokeResult as InvokeContractFailedResult)?.reason as RejectedReceive)?.rejectReason
+        );
+
+        throw new Error(
+            `RPC call 'invokeContract' on method '${receiveName}' of contract '${index}' failed.
+            ${rejectReason !== undefined ? `Reject reason: ${rejectReason}` : ''}`
+        );
     }
 
     return connection.signAndSendTransaction(
