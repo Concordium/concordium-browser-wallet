@@ -106,20 +106,6 @@ async function executeInjectScript(tabId: number): Promise<void> {
     });
 }
 
-/**
- * Callback method which installs Injected script into Main world of Dapp
- */
-const injectScript: ExtensionMessageHandler = (_msg, sender, respond) => {
-    if (sender.tab?.id === undefined) {
-        throw new Error('No ID for tab.');
-    }
-    executeInjectScript(sender.tab.id)
-        .then(() => respond(true))
-        .catch(() => respond(false));
-
-    return true;
-};
-
 async function reportVersion(network?: NetworkConfiguration) {
     const baseUrl = 'https://concordium.matomo.cloud/matomo.php';
     const params = {
@@ -253,13 +239,15 @@ bgMessageHandler.handleMessage(
     sendCredentialHandler
 );
 
-chrome.tabs.onUpdated.addListener((tabId, _, tab) => tab.url?.startsWith('http') && executeInjectScript(tabId));
+chrome.tabs.onUpdated.addListener(
+    (tabId, changeInfo, tab) =>
+        tab.url?.startsWith('http') && changeInfo.status === 'complete' && executeInjectScript(tabId)
+);
 
 bgMessageHandler.handleMessage(
     createMessageTypeFilter(InternalMessageType.StartIdentityIssuance),
     identityIssuanceHandler
 );
-bgMessageHandler.handleMessage(createMessageTypeFilter(InternalMessageType.Init), injectScript);
 
 bgMessageHandler.handleMessage(createMessageTypeFilter(InternalMessageType.SetViewSize), ({ payload }) => {
     setPopupSize(payload);

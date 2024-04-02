@@ -1,5 +1,11 @@
 # Changelog
 
+## Unreleased
+
+### Fixed
+
+-   Inject script being loaded on every tab update event, instead now only when loading is completed.
+
 ## 1.5.0
 
 ### Added
