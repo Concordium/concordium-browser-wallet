@@ -133,15 +133,14 @@ async function updateWCCDBalanceAccount(rpcClient: ConcordiumGRPCClient, account
 
 function addWCDToWallet(
     _accountAddress: string,
+    client: WalletApi,
     tokenIds: string[],
     contractAddressSource: number | bigint,
     contractSubindex: number | bigint
 ) {
     const accountAddress = AccountAddress.fromBase58(_accountAddress);
     const contractAddress = ContractAddress.create(contractAddressSource, contractSubindex);
-    detectConcordiumProvider().then((provider) => {
-        provider.addCIS2Tokens(accountAddress, tokenIds, contractAddress);
-    });
+    return client.addCIS2Tokens(accountAddress, tokenIds, contractAddress);
 }
 
 interface ConnectionProps {
