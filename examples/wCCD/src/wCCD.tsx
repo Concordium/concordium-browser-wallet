@@ -19,8 +19,13 @@ import {
 import * as leb from '@thi.ng/leb128';
 import { multiply, round } from 'mathjs';
 
-import { useGrpcClient, WalletConnectionProps, useConnect, useConnection } from '@concordium/react-components';
-import { detectConcordiumProvider } from '@concordium/browser-wallet-api-helpers';
+import {
+    useGrpcClient,
+    WalletConnectionProps,
+    useConnect,
+    useConnection,
+    BrowserWalletConnector,
+} from '@concordium/react-components';
 import { wrap, unwrap } from './utils';
 import {
     CONTRACT_SUB_INDEX,
@@ -133,14 +138,14 @@ async function updateWCCDBalanceAccount(rpcClient: ConcordiumGRPCClient, account
 
 function addWCDToWallet(
     _accountAddress: string,
-    client: WalletApi,
+    connection: BrowserWalletConnector,
     tokenIds: string[],
     contractAddressSource: number | bigint,
     contractSubindex: number | bigint
 ) {
     const accountAddress = AccountAddress.fromBase58(_accountAddress);
     const contractAddress = ContractAddress.create(contractAddressSource, contractSubindex);
-    return client.addCIS2Tokens(accountAddress, tokenIds, contractAddress);
+    return connection.client.addCIS2Tokens(accountAddress, tokenIds, contractAddress);
 }
 
 interface ConnectionProps {
@@ -450,7 +455,7 @@ export default function wCCD(props: ConnectionProps) {
                             disabled={account === undefined}
                             onClick={() => {
                                 if (account) {
-                                    addWCDToWallet(account, connection.client, [''], wCCDContractIndex, CONTRACT_SUB_INDEX);
+                                    addWCDToWallet(account, connection, [''], wCCDContractIndex, CONTRACT_SUB_INDEX);
                                 }
                             }}
                         >
