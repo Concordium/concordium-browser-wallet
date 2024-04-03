@@ -23362,7 +23362,6 @@ __metadata:
   version: 0.0.0-use.local
   resolution: "wccd@workspace:examples/wCCD"
   dependencies:
-    "@concordium/browser-wallet-api-helpers": "workspace:^"
     "@concordium/react-components": ^0.4.0
     "@concordium/web-sdk": ^7.3.2
     "@thi.ng/leb128": ^2.1.18
