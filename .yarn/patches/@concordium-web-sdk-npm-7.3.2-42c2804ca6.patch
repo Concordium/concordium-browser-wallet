@@ -122,7 +122,7 @@ index 2653ea6fbf48c58e34e4b8235fc624d2a358b2e0..e4cbc990fa038fb69504ef7cb28eb83c
          },
 +        "./types/*": {
 +            "types": "./lib/esm/types/*.d.ts",
-+            "bun": "./src/pub/*.ts",
++            "bun": "./src/types/*.ts",
 +            "default": "./lib/esm/types/*.js"
 +        },
          "./*": {
