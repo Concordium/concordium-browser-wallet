@@ -443,14 +443,14 @@ export default function wCCD(props: ConnectionProps) {
                             {isWrapping ? 'Wrap' : 'Unwrap'}
                         </button>
                     )}
-                    {connection && activeConnectorType === BROWSER_WALLET && (
+                    {connection instanceof BrowserWalletConnector && activeConnectorType === BROWSER_WALLET && (
                         <button
                             style={account === undefined ? ButtonStyleDisabled : ButtonStyle}
                             type="button"
                             disabled={account === undefined}
                             onClick={() => {
                                 if (account) {
-                                    addWCDToWallet(account, [''], wCCDContractIndex, CONTRACT_SUB_INDEX);
+                                    addWCDToWallet(account, connection.client, [''], wCCDContractIndex, CONTRACT_SUB_INDEX);
                                 }
                             }}
                         >
