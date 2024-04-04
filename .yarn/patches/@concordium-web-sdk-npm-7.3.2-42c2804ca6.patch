@@ -1,0 +1,16 @@
+diff --git a/package.json b/package.json
+index 2653ea6fbf48c58e34e4b8235fc624d2a358b2e0..e4cbc990fa038fb69504ef7cb28eb83c82178c2b 100644
+--- a/package.json
++++ b/package.json
+@@ -38,6 +38,11 @@
+             "react-native": null,
+             "default": "./lib/esm/pub/wasm.js"
+         },
++        "./types/*": {
++            "types": "./lib/esm/types/*.d.ts",
++            "bun": "./src/types/*.ts",
++            "default": "./lib/esm/types/*.js"
++        },
+         "./*": {
+             "types": "./lib/esm/pub/*.d.ts",
+             "bun": "./src/pub/*.ts",
