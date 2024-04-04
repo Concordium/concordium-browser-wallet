@@ -1,8 +1,8 @@
-import React, { useContext, useCallback, useState, useMemo } from 'react';
+import React, { useContext, useCallback, useState, useMemo, useEffect } from 'react';
 import { Buffer } from 'buffer/';
 import { fullscreenPromptContext } from '@popup/page-layouts/FullscreenPromptLayout';
-import { useTranslation } from 'react-i18next';
-import { useSetAtom } from 'jotai';
+import { TFunction, useTranslation } from 'react-i18next';
+import { useAtomValue, useSetAtom } from 'jotai';
 import { useLocation } from 'react-router-dom';
 import {
     signMessage,
@@ -10,6 +10,12 @@ import {
     AccountTransactionSignature,
     AccountAddress,
     deserializeTypeValue,
+    ContractAddress,
+    ModuleReference,
+    getUpdateContractParameterSchema,
+    ContractName,
+    EntrypointName,
+    ConcordiumGRPCClient,
 } from '@concordium/web-sdk';
 import { usePrivateKey } from '@popup/shared/utils/account-helpers';
 import { displayUrl } from '@popup/shared/utils/string-helpers';
@@ -21,6 +27,7 @@ import ExternalRequestLayout from '@popup/page-layouts/ExternalRequestLayout';
 import TabBar from '@popup/shared/TabBar';
 import clsx from 'clsx';
 import { stringify } from 'json-bigint';
+import { grpcClientAtom } from '@popup/store/settings';
 
 type Props = {
     onSubmit(signature: AccountTransactionSignature): void;
@@ -42,23 +49,69 @@ type MessageObject = {
     data: string;
 };
 
+async function parseMessage(
+    message: MessageObject,
+    client: ConcordiumGRPCClient,
+    t: TFunction,
+    setParsedMessage: React.Dispatch<React.SetStateAction<string>>
+) {
+    try {
+        const deserializedMessage = deserializeTypeValue(
+            Buffer.from(message.data, 'hex'),
+            Buffer.from(message.schema, 'base64')
+        );
+
+        const instanceInfo = await client.getInstanceInfo(
+            ContractAddress.create(
+                deserializedMessage.contract_address.index,
+                deserializedMessage.contract_address.subindex
+            )
+        );
+
+        // Need better way to define is contract CIS3. Something like function confirmCIS2Contract ?
+        const isCIS3 = instanceInfo.name.value.includes('cis3');
+
+        // Contract name does not match value stored in instanceInfo.name.value -> init_cis3_nft
+        // Used contract 6372
+        const CONTRACT_NAME = 'cis3_nft';
+
+        if (isCIS3) {
+            const schema = await client.getEmbeddedSchema(
+                ModuleReference.fromHexString(instanceInfo.sourceModule.moduleRef)
+            );
+
+            const updateContractParameterSchema = getUpdateContractParameterSchema(
+                schema,
+                ContractName.fromString(CONTRACT_NAME),
+                EntrypointName.fromString(deserializedMessage.entry_point),
+                instanceInfo.version
+            );
+
+            deserializedMessage.payload = deserializeTypeValue(
+                BigInt64Array.from(deserializedMessage.payload).buffer,
+                updateContractParameterSchema.buffer
+            );
+        }
+        setParsedMessage(stringify(deserializedMessage, undefined, 2));
+    } catch (e) {
+        setParsedMessage(`${t('unableToDeserialize')}`);
+    }
+}
+
 function BinaryDisplay({ message, url }: { message: MessageObject; url: string }) {
     const { t } = useTranslation('signMessage');
+    const client = useAtomValue(grpcClientAtom);
     const [displayDeserialized, setDisplayDeserialized] = useState<boolean>(true);
+    const [parsedMessage, setParsedMessage] = useState<string>('');
 
-    const parsedMessage = useMemo(() => {
-        try {
-            return stringify(
-                deserializeTypeValue(Buffer.from(message.data, 'hex'), Buffer.from(message.schema, 'base64')),
-                undefined,
-                2
-            );
-        } catch (e) {
-            return t('unableToDeserialize');
-        }
+    useEffect(() => {
+        parseMessage(message, client, t, setParsedMessage);
     }, []);
 
-    const display = useMemo(() => (displayDeserialized ? parsedMessage : message.data), [displayDeserialized]);
+    const display = useMemo(
+        () => (displayDeserialized ? parsedMessage : message.data),
+        [displayDeserialized, parsedMessage]
+    );
 
     return (
         <>
