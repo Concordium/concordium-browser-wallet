@@ -1,7 +1,7 @@
 import React, { useContext, useCallback, useState, useMemo, useEffect } from 'react';
 import { Buffer } from 'buffer/';
 import { fullscreenPromptContext } from '@popup/page-layouts/FullscreenPromptLayout';
-import { TFunction, useTranslation } from 'react-i18next';
+import { useTranslation } from 'react-i18next';
 import { useAtomValue, useSetAtom } from 'jotai';
 import { useLocation } from 'react-router-dom';
 import {
@@ -49,53 +49,57 @@ type MessageObject = {
     data: string;
 };
 
+type DeserializedMessageObject = {
+    contract_address: {
+        index: number;
+        subindex: number;
+    };
+    entry_point: string;
+    payload: bigint[] | [];
+};
+
 async function parseMessage(
     message: MessageObject,
     client: ConcordiumGRPCClient,
-    t: TFunction,
     setParsedMessage: React.Dispatch<React.SetStateAction<string>>
 ) {
-    try {
-        const deserializedMessage = deserializeTypeValue(
-            Buffer.from(message.data, 'hex'),
-            Buffer.from(message.schema, 'base64')
+    const deserializedMessage = deserializeTypeValue(
+        Buffer.from(message.data, 'hex'),
+        Buffer.from(message.schema, 'base64')
+    ) as DeserializedMessageObject;
+
+    const instanceInfo = await client.getInstanceInfo(
+        ContractAddress.create(
+            deserializedMessage.contract_address.index,
+            deserializedMessage.contract_address.subindex
+        )
+    );
+
+    // Need better way to define is contract CIS3. Something like function confirmCIS2Contract ?
+    const isCIS3 = instanceInfo.name.value.includes('cis3');
+
+    // Contract name does not match value stored in instanceInfo.name.value -> init_cis3_nft
+    // Used contract 6372
+    const CONTRACT_NAME = 'cis3_nft';
+
+    if (isCIS3) {
+        const schema = await client.getEmbeddedSchema(
+            ModuleReference.fromHexString(instanceInfo.sourceModule.moduleRef)
         );
 
-        const instanceInfo = await client.getInstanceInfo(
-            ContractAddress.create(
-                deserializedMessage.contract_address.index,
-                deserializedMessage.contract_address.subindex
-            )
+        const updateContractParameterSchema = getUpdateContractParameterSchema(
+            schema,
+            ContractName.fromString(CONTRACT_NAME),
+            EntrypointName.fromString(deserializedMessage.entry_point),
+            instanceInfo.version
         );
 
-        // Need better way to define is contract CIS3. Something like function confirmCIS2Contract ?
-        const isCIS3 = instanceInfo.name.value.includes('cis3');
-
-        // Contract name does not match value stored in instanceInfo.name.value -> init_cis3_nft
-        // Used contract 6372
-        const CONTRACT_NAME = 'cis3_nft';
-
-        if (isCIS3) {
-            const schema = await client.getEmbeddedSchema(
-                ModuleReference.fromHexString(instanceInfo.sourceModule.moduleRef)
-            );
-
-            const updateContractParameterSchema = getUpdateContractParameterSchema(
-                schema,
-                ContractName.fromString(CONTRACT_NAME),
-                EntrypointName.fromString(deserializedMessage.entry_point),
-                instanceInfo.version
-            );
-
-            deserializedMessage.payload = deserializeTypeValue(
-                BigInt64Array.from(deserializedMessage.payload).buffer,
-                updateContractParameterSchema.buffer
-            );
-        }
-        setParsedMessage(stringify(deserializedMessage, undefined, 2));
-    } catch (e) {
-        setParsedMessage(`${t('unableToDeserialize')}`);
+        deserializedMessage.payload = deserializeTypeValue(
+            BigInt64Array.from(deserializedMessage.payload).buffer,
+            updateContractParameterSchema.buffer
+        ) as [];
     }
+    setParsedMessage(stringify(deserializedMessage, undefined, 2));
 }
 
 function BinaryDisplay({ message, url }: { message: MessageObject; url: string }) {
@@ -105,7 +109,11 @@ function BinaryDisplay({ message, url }: { message: MessageObject; url: string }
     const [parsedMessage, setParsedMessage] = useState<string>('');
 
     useEffect(() => {
-        parseMessage(message, client, t, setParsedMessage);
+        try {
+            parseMessage(message, client, setParsedMessage);
+        } catch (e) {
+            setParsedMessage(t('unableToDeserialize'));
+        }
     }, []);
 
     const display = useMemo(
