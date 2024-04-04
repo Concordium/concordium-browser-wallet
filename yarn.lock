@@ -2346,7 +2346,7 @@ __metadata:
   languageName: node
   linkType: hard
 
-"@concordium/web-sdk@npm:7.3.2":
+"@concordium/web-sdk@npm:^7.3.2":
   version: 7.3.2
   resolution: "@concordium/web-sdk@npm:7.3.2"
   dependencies:
