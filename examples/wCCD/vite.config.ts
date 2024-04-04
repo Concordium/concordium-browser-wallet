@@ -5,6 +5,7 @@ import svgr from 'vite-plugin-svgr';
 // @ts-ignore
 import wasm from 'vite-plugin-wasm';
 import topLevelAwait from 'vite-plugin-top-level-await';
+import { nodePolyfills } from 'vite-plugin-node-polyfills';
 
 export default defineConfig({
     plugins: [
@@ -13,12 +14,18 @@ export default defineConfig({
         wasm(),
         topLevelAwait(), // For legacy browser compatibility
     ],
+    build: {
+        rollupOptions: {
+            plugins: [nodePolyfills()],
+        },
+    },
     define: {
         'process.env.NETWORK': process.env.NETWORK ?? 'testnet',
     },
     resolve: {
         alias: {
             '@concordium/rust-bindings': '@concordium/rust-bindings/bundler', // Resolve bundler-specific wasm entrypoints.
+            stream: 'rollup-plugin-node-polyfills/polyfills/stream',
         },
     },
 });
