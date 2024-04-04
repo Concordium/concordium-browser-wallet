@@ -19,7 +19,13 @@ import {
 import * as leb from '@thi.ng/leb128';
 import { multiply, round } from 'mathjs';
 
-import { useGrpcClient, WalletConnectionProps, useConnect, useConnection } from '@concordium/react-components';
+import {
+    useGrpcClient,
+    WalletConnectionProps,
+    useConnect,
+    useConnection,
+    BrowserWalletConnector,
+} from '@concordium/react-components';
 import { wrap, unwrap } from './utils';
 import {
     CONTRACT_SUB_INDEX,
@@ -128,6 +134,18 @@ async function updateWCCDBalanceAccount(rpcClient: ConcordiumGRPCClient, account
     }
     // The return value is an array. The value stored in the array starts at position 4 of the return value.
     return BigInt(leb.decodeULEB128(toBuffer(ReturnValue.toHexString(res.returnValue).slice(4), 'hex'))[0]);
+}
+
+function addWCDToWallet(
+    _accountAddress: string,
+    connection: BrowserWalletConnector,
+    tokenIds: string[],
+    contractAddressSource: number | bigint,
+    contractSubindex: number | bigint
+) {
+    const accountAddress = AccountAddress.fromBase58(_accountAddress);
+    const contractAddress = ContractAddress.create(contractAddressSource, contractSubindex);
+    return connection.client.addCIS2Tokens(accountAddress, tokenIds, contractAddress);
 }
 
 interface ConnectionProps {
@@ -428,6 +446,20 @@ export default function wCCD(props: ConnectionProps) {
                             }}
                         >
                             {isWrapping ? 'Wrap' : 'Unwrap'}
+                        </button>
+                    )}
+                    {connection instanceof BrowserWalletConnector && activeConnectorType === BROWSER_WALLET && (
+                        <button
+                            style={account === undefined ? ButtonStyleDisabled : ButtonStyle}
+                            type="button"
+                            disabled={account === undefined}
+                            onClick={() => {
+                                if (account) {
+                                    addWCDToWallet(account, connection, [''], wCCDContractIndex, CONTRACT_SUB_INDEX);
+                                }
+                            }}
+                        >
+                            Add Token to wallet
                         </button>
                     )}
                 </label>
