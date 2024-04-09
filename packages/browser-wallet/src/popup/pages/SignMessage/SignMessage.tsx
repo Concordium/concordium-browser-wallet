@@ -40,6 +40,7 @@ interface Location {
             accountAddress: string;
             message: string | MessageObject;
             url: string;
+            cis3ContractDetails: Cis3ContractDetailsObject | undefined;
         };
     };
 }
@@ -49,18 +50,20 @@ type MessageObject = {
     data: string;
 };
 
+type Cis3ContractDetailsObject = {
+    contractAddress: ContractAddress.Type;
+    contractName: ContractName.Type;
+    entrypointName: EntrypointName.Type;
+};
+
 type DeserializedMessageObject = {
-    contract_address: {
-        index: number;
-        subindex: number;
-    };
-    entry_point: string;
     payload: bigint[] | [];
 };
 
 async function parseMessage(
     message: MessageObject,
     client: ConcordiumGRPCClient,
+    cis3ContractDetails: Cis3ContractDetailsObject | undefined,
     setParsedMessage: React.Dispatch<React.SetStateAction<string>>
 ) {
     const deserializedMessage = deserializeTypeValue(
@@ -68,29 +71,18 @@ async function parseMessage(
         Buffer.from(message.schema, 'base64')
     ) as DeserializedMessageObject;
 
-    const instanceInfo = await client.getInstanceInfo(
-        ContractAddress.create(
-            deserializedMessage.contract_address.index,
-            deserializedMessage.contract_address.subindex
-        )
-    );
+    if (cis3ContractDetails) {
+        const { contractAddress, contractName, entrypointName } = cis3ContractDetails;
+        const instanceInfo = await client.getInstanceInfo(contractAddress);
 
-    // Need better way to define is contract CIS3. Something like function confirmCIS2Contract ?
-    const isCIS3 = instanceInfo.name.value.includes('cis3');
-
-    // Contract name does not match value stored in instanceInfo.name.value -> init_cis3_nft
-    // Used contract 6372
-    const CONTRACT_NAME = 'cis3_nft';
-
-    if (isCIS3) {
         const schema = await client.getEmbeddedSchema(
             ModuleReference.fromHexString(instanceInfo.sourceModule.moduleRef)
         );
 
         const updateContractParameterSchema = getUpdateContractParameterSchema(
             schema,
-            ContractName.fromString(CONTRACT_NAME),
-            EntrypointName.fromString(deserializedMessage.entry_point),
+            contractName,
+            entrypointName,
             instanceInfo.version
         );
 
@@ -102,7 +94,15 @@ async function parseMessage(
     setParsedMessage(stringify(deserializedMessage, undefined, 2));
 }
 
-function BinaryDisplay({ message, url }: { message: MessageObject; url: string }) {
+function BinaryDisplay({
+    message,
+    url,
+    cis3ContractDetails,
+}: {
+    message: MessageObject;
+    url: string;
+    cis3ContractDetails: Cis3ContractDetailsObject | undefined;
+}) {
     const { t } = useTranslation('signMessage');
     const client = useAtomValue(grpcClientAtom);
     const [displayDeserialized, setDisplayDeserialized] = useState<boolean>(true);
@@ -110,7 +110,7 @@ function BinaryDisplay({ message, url }: { message: MessageObject; url: string }
 
     useEffect(() => {
         try {
-            parseMessage(message, client, setParsedMessage);
+            parseMessage(message, client, cis3ContractDetails, setParsedMessage);
         } catch (e) {
             setParsedMessage(t('unableToDeserialize'));
         }
@@ -158,7 +158,7 @@ export default function SignMessage({ onSubmit, onReject }: Props) {
     const { accountAddress, url } = state.payload;
     const key = usePrivateKey(accountAddress);
     const addToast = useSetAtom(addToastAtom);
-    const { message } = state.payload;
+    const { message, cis3ContractDetails } = state.payload;
     const messageIsAString = typeof message === 'string';
 
     const onClick = useCallback(async () => {
@@ -179,7 +179,9 @@ export default function SignMessage({ onSubmit, onReject }: Props) {
             <div className="h-full flex-column align-center">
                 <h3 className="m-t-0 text-center">{t('description', { dApp: displayUrl(url) })}</h3>
                 {messageIsAString && <TextArea readOnly className="m-v-20 w-full flex-child-fill" value={message} />}
-                {!messageIsAString && <BinaryDisplay message={message} url={url} />}
+                {!messageIsAString && (
+                    <BinaryDisplay message={message} url={url} cis3ContractDetails={cis3ContractDetails} />
+                )}
                 <div className="flex p-b-10  m-t-auto">
                     <Button width="narrow" className="m-r-10" onClick={withClose(onReject)}>
                         {t('reject')}
