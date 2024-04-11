@@ -1,8 +1,8 @@
-import React, { useContext, useCallback, useState, useMemo, useEffect } from 'react';
+import React, { useContext, useCallback, useState, useMemo } from 'react';
 import { Buffer } from 'buffer/';
 import { fullscreenPromptContext } from '@popup/page-layouts/FullscreenPromptLayout';
 import { useTranslation } from 'react-i18next';
-import { useAtomValue, useSetAtom } from 'jotai';
+import { useSetAtom } from 'jotai';
 import { useLocation } from 'react-router-dom';
 import {
     signMessage,
@@ -10,12 +10,6 @@ import {
     AccountTransactionSignature,
     AccountAddress,
     deserializeTypeValue,
-    ContractAddress,
-    ModuleReference,
-    getUpdateContractParameterSchema,
-    ContractName,
-    EntrypointName,
-    ConcordiumGRPCClient,
 } from '@concordium/web-sdk';
 import { usePrivateKey } from '@popup/shared/utils/account-helpers';
 import { displayUrl } from '@popup/shared/utils/string-helpers';
@@ -27,7 +21,6 @@ import ExternalRequestLayout from '@popup/page-layouts/ExternalRequestLayout';
 import TabBar from '@popup/shared/TabBar';
 import clsx from 'clsx';
 import { stringify } from 'json-bigint';
-import { grpcClientAtom } from '@popup/store/settings';
 
 type Props = {
     onSubmit(signature: AccountTransactionSignature): void;
@@ -40,7 +33,6 @@ interface Location {
             accountAddress: string;
             message: string | MessageObject;
             url: string;
-            cis3ContractDetails: Cis3ContractDetailsObject | undefined;
         };
     };
 }
@@ -50,76 +42,23 @@ type MessageObject = {
     data: string;
 };
 
-type Cis3ContractDetailsObject = {
-    contractAddress: ContractAddress.Type;
-    contractName: ContractName.Type;
-    entrypointName: EntrypointName.Type;
-};
-
-type DeserializedMessageObject = {
-    payload: bigint[] | [];
-};
-
-async function parseMessage(
-    message: MessageObject,
-    client: ConcordiumGRPCClient,
-    cis3ContractDetails: Cis3ContractDetailsObject | undefined,
-    setParsedMessage: React.Dispatch<React.SetStateAction<string>>
-) {
-    const deserializedMessage = deserializeTypeValue(
-        Buffer.from(message.data, 'hex'),
-        Buffer.from(message.schema, 'base64')
-    ) as DeserializedMessageObject;
-
-    if (cis3ContractDetails) {
-        const { contractAddress, contractName, entrypointName } = cis3ContractDetails;
-        const instanceInfo = await client.getInstanceInfo(contractAddress);
-
-        const schema = await client.getEmbeddedSchema(
-            ModuleReference.fromHexString(instanceInfo.sourceModule.moduleRef)
-        );
-
-        const updateContractParameterSchema = getUpdateContractParameterSchema(
-            schema,
-            contractName,
-            entrypointName,
-            instanceInfo.version
-        );
-
-        deserializedMessage.payload = deserializeTypeValue(
-            BigInt64Array.from(deserializedMessage.payload).buffer,
-            updateContractParameterSchema.buffer
-        ) as [];
-    }
-    setParsedMessage(stringify(deserializedMessage, undefined, 2));
-}
-
-function BinaryDisplay({
-    message,
-    url,
-    cis3ContractDetails,
-}: {
-    message: MessageObject;
-    url: string;
-    cis3ContractDetails: Cis3ContractDetailsObject | undefined;
-}) {
+function BinaryDisplay({ message, url }: { message: MessageObject; url: string }) {
     const { t } = useTranslation('signMessage');
-    const client = useAtomValue(grpcClientAtom);
     const [displayDeserialized, setDisplayDeserialized] = useState<boolean>(true);
-    const [parsedMessage, setParsedMessage] = useState<string>('');
 
-    useEffect(() => {
+    const parsedMessage = useMemo(() => {
         try {
-            parseMessage(message, client, cis3ContractDetails, setParsedMessage);
+            return stringify(
+                deserializeTypeValue(Buffer.from(message.data, 'hex'), Buffer.from(message.schema, 'base64')),
+                undefined,
+                2
+            );
         } catch (e) {
-            setParsedMessage(t('unableToDeserialize'));
+            return t('unableToDeserialize');
         }
     }, []);
 
-    const display = useMemo(
-        () => (displayDeserialized ? parsedMessage : message.data),
-        [displayDeserialized, parsedMessage]
-    );
+    const display = useMemo(() => (displayDeserialized ? parsedMessage : message.data), [displayDeserialized]);
 
     return (
         <>
@@ -158,7 +97,7 @@ export default function SignMessage({ onSubmit, onReject }: Props) {
     const { accountAddress, url } = state.payload;
     const key = usePrivateKey(accountAddress);
     const addToast = useSetAtom(addToastAtom);
-    const { message, cis3ContractDetails } = state.payload;
+    const { message } = state.payload;
     const messageIsAString = typeof message === 'string';
 
     const onClick = useCallback(async () => {
@@ -179,9 +118,7 @@ export default function SignMessage({ onSubmit, onReject }: Props) {
             <div className="h-full flex-column align-center">
                 <h3 className="m-t-0 text-center">{t('description', { dApp: displayUrl(url) })}</h3>
                 {messageIsAString && <TextArea readOnly className="m-v-20 w-full flex-child-fill" value={message} />}
-                {!messageIsAString && (
-                    <BinaryDisplay message={message} url={url} cis3ContractDetails={cis3ContractDetails} />
-                )}
+                {!messageIsAString && <BinaryDisplay message={message} url={url} />}
                 <div className="flex p-b-10  m-t-auto">
                     <Button width="narrow" className="m-r-10" onClick={withClose(onReject)}>
                         {t('reject')}
