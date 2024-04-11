@@ -159,7 +159,7 @@ export default function Routes() {
                             }
                         />
                     }
-                />{' '}
+                />
                 <Route
                     path={relativeRoutes.prompt.signCIS3Message.path}
                     element={

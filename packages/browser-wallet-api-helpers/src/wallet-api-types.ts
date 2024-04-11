@@ -259,7 +259,7 @@ interface MainWalletApi {
      * @param contractName the {@link ContractName} of the contract
      * @param entrypointName the {@link EntrypointName} of the contract
      * @param accountAddress the address of the account that should sign the message
-     * @param message message to be signed. Note that the wallet will prepend some bytes to ensure the message cannot be a transaction. The message should either be a utf8 string or { @link SignMessageObject }.
+     * @param message message to be signed. Note that the wallet will prepend some bytes to ensure the message cannot be a transaction. The message should be { @link SignMessageObject }.
      */
     signCIS3Message(
         contractAddress: ContractAddress.Type,
