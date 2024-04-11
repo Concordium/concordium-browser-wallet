@@ -15,6 +15,7 @@ import FullscreenPromptLayout from '@popup/page-layouts/FullscreenPromptLayout';
 import Account from '@popup/pages/Account';
 import Identity from '@popup/pages/Identity';
 import SignMessage from '@popup/pages/SignMessage';
+import SignCIS3Message from '@popup/pages/SignCIS3Message';
 import SendTransaction from '@popup/pages/SendTransaction';
 import Setup from '@popup/pages/Setup';
 import ConnectionRequest from '@popup/pages/ConnectionRequest';
@@ -106,6 +107,10 @@ export default function Routes() {
         InternalMessageType.SignMessage,
         'signMessage'
     );
+    const handleSignCIS3MessageResponse = useMessagePrompt<MessageStatusWrapper<AccountTransactionSignature>>(
+        InternalMessageType.SignCIS3Message,
+        'signCIS3Message'
+    );
     const handleAddTokensResponse = useMessagePrompt<MessageStatusWrapper<string[]>>(
         InternalMessageType.AddTokens,
         'addTokens'
@@ -151,6 +156,19 @@ export default function Routes() {
                             onSubmit={(signature) => handleSignMessageResponse({ success: true, result: signature })}
                             onReject={() =>
                                 handleSignMessageResponse({ success: false, message: 'Signing was rejected' })
+                            }
+                        />
+                    }
+                />{' '}
+                <Route
+                    path={relativeRoutes.prompt.signCIS3Message.path}
+                    element={
+                        <SignCIS3Message
+                            onSubmit={(signature) =>
+                                handleSignCIS3MessageResponse({ success: true, result: signature })
+                            }
+                            onReject={() =>
+                                handleSignCIS3MessageResponse({ success: false, message: 'Signing was rejected' })
                             }
                         />
                     }

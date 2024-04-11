@@ -1,0 +1,26 @@
+$message-details-horizontal-padding: rem(20px);
+
+.sign-cis3-message {
+    &__details {
+        display: flex;
+        flex-direction: column;
+        align-items: center;
+        background-color: $color-bg;
+        height: 100%;
+        border: rem(1px) solid $color-grey;
+        border-radius: rem(10px);
+        padding: rem(10px) $message-details-horizontal-padding;
+
+        :where(&) h5 {
+            margin-top: rem(10px);
+            margin-bottom: 0;
+        }
+    }
+
+    &__details-text-area textarea {
+        border-top-left-radius: 0;
+        border-top-right-radius: 0;
+        font-family: $font-family-mono;
+        padding: rem(10px);
+    }
+}

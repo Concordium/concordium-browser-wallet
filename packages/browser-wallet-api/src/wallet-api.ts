@@ -86,11 +86,11 @@ class WalletApi extends EventEmitter implements IWalletApi {
         contractName: ContractName.Type,
         entrypointName: EntrypointName.Type,
         accountAddress: AccountAddressSource,
-        message: string | SignMessageObject
+        message: SignMessageObject
     ): Promise<AccountTransactionSignature> {
         const input = sanitizeSignMessageInput(accountAddress, message);
         const response = await this.messageHandler.sendMessage<MessageStatusWrapper<AccountTransactionSignature>>(
-            MessageType.SignMessage,
+            MessageType.SignCIS3Message,
             {
                 message: input.message,
                 accountAddress: AccountAddress.toBase58(input.accountAddress),

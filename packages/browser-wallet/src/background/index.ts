@@ -588,6 +588,14 @@ forwardToPopup(
     withPromptEnd
 );
 forwardToPopup(
+    MessageType.SignCIS3Message,
+    InternalMessageType.SignCIS3Message,
+    runConditionComposer(runIfAccountIsAllowlisted, ensureMessageWithSchemaParse, withPromptStart()),
+    appendUrlToPayload,
+    undefined,
+    withPromptEnd
+);
+forwardToPopup(
     MessageType.AddTokens,
     InternalMessageType.AddTokens,
     runConditionComposer(runIfAccountIsAllowlisted, withPromptStart()),

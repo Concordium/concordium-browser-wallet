@@ -4,6 +4,7 @@ import account from '@popup/pages/Account/i18n/da';
 import setup from '@popup/pages/Setup/i18n/da';
 import sendTransaction from '@popup/pages/SendTransaction/i18n/da';
 import signMessage from '@popup/pages/SignMessage/i18n/da';
+import signCIS3Message from '@popup/pages/SignCIS3Message/i18n/da';
 import connectionRequest from '@popup/pages/ConnectionRequest/i18n/da';
 import settings from '@popup/pages/Settings/i18n/da';
 import networkSettings from '@popup/pages/NetworkSettings/i18n/da';
@@ -37,6 +38,7 @@ const t: typeof en = {
     setup,
     sendTransaction,
     signMessage,
+    signCIS3Message,
     connectionRequest,
     settings,
     networkSettings,

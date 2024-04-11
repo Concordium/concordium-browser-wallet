@@ -266,7 +266,7 @@ interface MainWalletApi {
         contractName: ContractName.Type,
         entrypointName: EntrypointName.Type,
         accountAddress: AccountAddressSource,
-        message: string | SignMessageObject
+        message: SignMessageObject
     ): Promise<AccountTransactionSignature>;
 
     /**

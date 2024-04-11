@@ -57,6 +57,9 @@ export const relativeRoutes = {
         signMessage: {
             path: 'sign-message',
         },
+        signCIS3Message: {
+            path: 'sign-cis3-message',
+        },
         sendTransaction: {
             path: 'send-transaction',
         },
