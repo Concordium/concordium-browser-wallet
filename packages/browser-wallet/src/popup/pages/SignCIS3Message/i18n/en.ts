@@ -6,6 +6,8 @@ const t = {
     contractIndex: 'Contract index (subindex)',
     receiveName: 'Contract and function name',
     parameter: 'Parameter',
+    nonce: 'Nonce',
+    expiry: 'Expiry time',
     sign: 'Sign',
     reject: 'Reject',
 };

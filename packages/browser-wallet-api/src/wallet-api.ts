@@ -85,10 +85,12 @@ class WalletApi extends EventEmitter implements IWalletApi {
         contractAddress: ContractAddress.Type,
         contractName: ContractName.Type,
         entrypointName: EntrypointName.Type,
+        nonce: bigint,
+        expiryTimeSignature: string,
         accountAddress: AccountAddressSource,
-        message: SignMessageObject
+        payloadMessage: SignMessageObject
     ): Promise<AccountTransactionSignature> {
-        const input = sanitizeSignMessageInput(accountAddress, message);
+        const input = sanitizeSignMessageInput(accountAddress, payloadMessage);
         const response = await this.messageHandler.sendMessage<MessageStatusWrapper<AccountTransactionSignature>>(
             MessageType.SignCIS3Message,
             {
@@ -98,6 +100,8 @@ class WalletApi extends EventEmitter implements IWalletApi {
                     contractAddress,
                     contractName,
                     entrypointName,
+                    nonce,
+                    expiryTimeSignature,
                 },
             }
         );

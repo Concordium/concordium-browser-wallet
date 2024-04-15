@@ -18,6 +18,7 @@ $message-details-horizontal-padding: rem(20px);
     }
 
     &__details-text-area textarea {
+        min-height: 10rem;
         border-top-left-radius: 0;
         border-top-right-radius: 0;
         font-family: $font-family-mono;

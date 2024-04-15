@@ -8,6 +8,8 @@ const t: typeof en = {
     contractIndex: 'Kontrakt indeks (under indeks)',
     receiveName: 'Kontrakt og funktions navn',
     parameter: 'Parameter',
+    nonce: 'Nonce',
+    expiry: 'Udløber',
     sign: 'Signér',
     reject: 'Afvis',
 };

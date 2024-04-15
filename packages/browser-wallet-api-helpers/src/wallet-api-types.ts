@@ -254,12 +254,14 @@ interface MainWalletApi {
 
     /**
      * Sends a message of the CIS3 contract standard, to the Concordium Wallet and awaits the users action. If the user signs the message, this will resolve to the signature.
-     * 
+     *
      * @param contractAddress the {@link ContractAddress} of the contract
      * @param contractName the {@link ContractName} of the contract
      * @param entrypointName the {@link EntrypointName} of the contract
+     * @param nonce the revocation nonce
+     * @param expiryTimeSignature RFC 3339 format (e.g. 2030-08-08T05:15:00Z)
      * @param accountAddress the address of the account that should sign the message
-     * @param message message to be signed. Note that the wallet will prepend some bytes to ensure the message cannot be a transaction. The message should be { @link SignMessageObject }.
+     * @param payloadMessage payload message to be signed, complete CIS3 message will be created from provided parameters. Note that the wallet will prepend some bytes to ensure the message cannot be a transaction. The message should be { @link SignMessageObject }.
      *
      * @throws if the user rejects signing the message.
      */
@@ -267,8 +269,10 @@ interface MainWalletApi {
         contractAddress: ContractAddress.Type,
         contractName: ContractName.Type,
         entrypointName: EntrypointName.Type,
+        nonce: bigint,
+        expiryTimeSignature: string,
         accountAddress: AccountAddressSource,
-        message: SignMessageObject
+        payloadMessage: SignMessageObject
     ): Promise<AccountTransactionSignature>;
 
     /**

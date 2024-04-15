@@ -3,19 +3,17 @@ import { useLocation } from 'react-router-dom';
 import clsx from 'clsx';
 import { stringify } from 'json-bigint';
 import { useTranslation } from 'react-i18next';
-import { useAtomValue, useSetAtom } from 'jotai';
+import { useSetAtom } from 'jotai';
 import { Buffer } from 'buffer/';
 import {
     AccountAddress,
     AccountTransactionSignature,
     buildBasicAccountSigner,
-    ConcordiumGRPCClient,
     ContractAddress,
     ContractName,
     deserializeTypeValue,
     EntrypointName,
-    getUpdateContractParameterSchema,
-    ModuleReference,
+    serializeTypeValue,
     signMessage,
 } from '@concordium/web-sdk';
 import { fullscreenPromptContext } from '@popup/page-layouts/FullscreenPromptLayout';
@@ -26,8 +24,10 @@ import ConnectedBox from '@popup/pages/Account/ConnectedBox';
 import Button from '@popup/shared/Button';
 import { addToastAtom } from '@popup/state';
 import ExternalRequestLayout from '@popup/page-layouts/ExternalRequestLayout';
-import { grpcClientAtom } from '@popup/store/settings';
 import { SignMessageObject } from '@concordium/browser-wallet-api-helpers';
+
+const SERIALIZATION_HELPER_SCHEMA =
+    'FAAFAAAAEAAAAGNvbnRyYWN0X2FkZHJlc3MMBQAAAG5vbmNlBQkAAAB0aW1lc3RhbXANCwAAAGVudHJ5X3BvaW50FgEHAAAAcGF5bG9hZBABAg==';
 
 type Props = {
     onSubmit(signature: AccountTransactionSignature): void;
@@ -49,59 +49,49 @@ type Cis3ContractDetailsObject = {
     contractAddress: ContractAddress.Type;
     contractName: ContractName.Type;
     entrypointName: EntrypointName.Type;
+    nonce: bigint;
+    expiryTimeSignature: string;
 };
 
-type DeserializedMessageObject = {
-    payload: bigint[] | [];
-};
-
-async function parseMessage(
-    message: SignMessageObject,
-    client: ConcordiumGRPCClient,
-    cis3ContractDetails: Cis3ContractDetailsObject
-) {
-    const deserializedMessage = deserializeTypeValue(
-        Buffer.from(message.data, 'hex'),
-        Buffer.from(message.schema, 'base64')
-    ) as DeserializedMessageObject;
-
-    const { contractAddress, contractName, entrypointName } = cis3ContractDetails;
-    const instanceInfo = await client.getInstanceInfo(contractAddress);
-
-    const schema = await client.getEmbeddedSchema(ModuleReference.fromHexString(instanceInfo.sourceModule.moduleRef));
-
-    const updateContractParameterSchema = getUpdateContractParameterSchema(
-        schema,
-        contractName,
-        entrypointName,
-        instanceInfo.version
-    );
-
+async function parseMessage(message: SignMessageObject) {
     return stringify(
-        deserializeTypeValue(
-            BigInt64Array.from(deserializedMessage.payload).buffer,
-            updateContractParameterSchema.buffer
-        ),
+        deserializeTypeValue(Buffer.from(message.data, 'hex'), Buffer.from(message.schema, 'base64')),
         undefined,
         2
     );
 }
 
+function serializeMessage(payloadMessage: SignMessageObject, cis3ContractDetails: Cis3ContractDetailsObject) {
+    const { contractAddress, entrypointName, nonce, expiryTimeSignature } = cis3ContractDetails;
+    const message = {
+        contract_address: {
+            index: Number(contractAddress.index),
+            subindex: Number(contractAddress.subindex),
+        },
+        nonce: Number(nonce),
+        timestamp: expiryTimeSignature,
+        entry_point: EntrypointName.toString(entrypointName),
+        payload: Array.from(Buffer.from(payloadMessage.data, 'hex')),
+    };
+
+    return serializeTypeValue(message, Buffer.from(SERIALIZATION_HELPER_SCHEMA, 'base64'));
+}
+
 function MessageDetailsDisplay({
-    message,
+    payloadMessage,
     cis3ContractDetails,
 }: {
-    message: SignMessageObject;
+    payloadMessage: SignMessageObject;
     cis3ContractDetails: Cis3ContractDetailsObject;
 }) {
     const { t } = useTranslation('signCIS3Message');
-    const client = useAtomValue(grpcClientAtom);
-    const { contractAddress, contractName, entrypointName } = cis3ContractDetails;
+    const { contractAddress, contractName, entrypointName, nonce, expiryTimeSignature } = cis3ContractDetails;
     const [parsedMessage, setParsedMessage] = useState<string>('');
+    const expiry = new Date(expiryTimeSignature).toString();
 
     useEffect(() => {
         try {
-            parseMessage(message, client, cis3ContractDetails).then((m) => setParsedMessage(m));
+            parseMessage(payloadMessage).then((m) => setParsedMessage(m));
         } catch (e) {
             setParsedMessage(t('unableToDeserialize'));
         }
@@ -117,6 +107,10 @@ function MessageDetailsDisplay({
             <div>
                 {contractName.value.toString()}.{entrypointName.value.toString()}
             </div>
+            <h5>{t('nonce')}:</h5>
+            <div>{nonce.toString()}</div>
+            <h5>{t('expiry')}:</h5>
+            <div>{expiry}</div>
             <h5>{t('parameter')}:</h5>
             <TextArea
                 readOnly
@@ -134,7 +128,6 @@ export default function SignCIS3Message({ onSubmit, onReject }: Props) {
     const { accountAddress, url, message, cis3ContractDetails } = state.payload;
     const key = usePrivateKey(accountAddress);
     const addToast = useSetAtom(addToastAtom);
-
     const onClick = useCallback(async () => {
         if (!key) {
             throw new Error('Missing key for the chosen address');
@@ -142,7 +135,7 @@ export default function SignCIS3Message({ onSubmit, onReject }: Props) {
 
         return signMessage(
             AccountAddress.fromBase58(accountAddress),
-            Buffer.from(message.data, 'hex'),
+            serializeMessage(message, cis3ContractDetails).buffer,
             buildBasicAccountSigner(key)
         );
     }, [state.payload.message, state.payload.accountAddress, key]);
@@ -153,7 +146,7 @@ export default function SignCIS3Message({ onSubmit, onReject }: Props) {
             <div className="h-full flex-column align-center">
                 <h3 className="m-t-0 text-center">{t('description', { dApp: displayUrl(url) })}</h3>
                 <p className="m-t-0 text-center">{t('descriptionWithSchema', { dApp: displayUrl(url) })}</p>
-                <MessageDetailsDisplay message={message} cis3ContractDetails={cis3ContractDetails} />
+                <MessageDetailsDisplay payloadMessage={message} cis3ContractDetails={cis3ContractDetails} />
                 <br />
                 <div className="flex p-b-10 p-t-10  m-t-auto">
                     <Button width="narrow" className="m-r-10" onClick={withClose(onReject)}>
