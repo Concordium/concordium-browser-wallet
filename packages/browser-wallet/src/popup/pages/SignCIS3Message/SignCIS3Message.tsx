@@ -90,11 +90,9 @@ function MessageDetailsDisplay({
     const expiry = new Date(expiryTimeSignature).toString();
 
     useEffect(() => {
-        try {
-            parseMessage(payloadMessage).then((m) => setParsedMessage(m));
-        } catch (e) {
-            setParsedMessage(t('unableToDeserialize'));
-        }
+        parseMessage(payloadMessage)
+          .then((m) => setParsedMessage(m))
+          .catch((_) => setParsedMessage(t('unableToDeserialize')));
     }, []);
 
     return (
