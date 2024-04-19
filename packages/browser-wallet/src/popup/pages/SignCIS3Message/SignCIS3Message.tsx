@@ -91,8 +91,8 @@ function MessageDetailsDisplay({
 
     useEffect(() => {
         parseMessage(payloadMessage)
-          .then((m) => setParsedMessage(m))
-          .catch((_) => setParsedMessage(t('unableToDeserialize')));
+            .then((m) => setParsedMessage(m))
+            .catch(() => setParsedMessage(t('unableToDeserialize')));
     }, []);
 
     return (
