@@ -19,6 +19,7 @@ export enum MessageType {
     ConnectAccounts = 'M_ConnectAccounts',
     AddWeb3IdCredential = 'M_AddWeb3IdCredential',
     AddWeb3IdCredentialFinish = 'M_AddWeb3IdCredentialFinish',
+    SignCIS3Message = 'M_SignCIS3Message',
 }
 
 /**
@@ -49,6 +50,7 @@ export enum InternalMessageType {
     ImportWeb3IdBackup = 'I_ImportWeb3IdBackup',
     AbortRecovery = 'I_AbortRecovery',
     OpenFullscreen = 'I_OpenFullscreen',
+    SignCIS3Message = 'I_SignCIS3Message',
 }
 
 // eslint-disable-next-line @typescript-eslint/no-explicit-any

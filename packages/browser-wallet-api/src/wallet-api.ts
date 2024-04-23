@@ -12,6 +12,8 @@ import {
     SchemaVersion,
     ContractAddress,
     VerifiablePresentation,
+    ContractName,
+    EntrypointName,
 } from '@concordium/web-sdk/types';
 import { CredentialStatements } from '@concordium/web-sdk/web3-id';
 import {
@@ -69,6 +71,38 @@ class WalletApi extends EventEmitter implements IWalletApi {
             {
                 ...input,
                 accountAddress: AccountAddress.toBase58(input.accountAddress),
+            }
+        );
+
+        if (!response.success) {
+            throw new Error(response.message);
+        }
+
+        return response.result;
+    }
+
+    public async signCIS3Message(
+        contractAddress: ContractAddress.Type,
+        contractName: ContractName.Type,
+        entrypointName: EntrypointName.Type,
+        nonce: bigint | number,
+        expiryTimeSignature: string,
+        accountAddress: AccountAddressSource,
+        payloadMessage: SignMessageObject
+    ): Promise<AccountTransactionSignature> {
+        const input = sanitizeSignMessageInput(accountAddress, payloadMessage);
+        const response = await this.messageHandler.sendMessage<MessageStatusWrapper<AccountTransactionSignature>>(
+            MessageType.SignCIS3Message,
+            {
+                message: input.message,
+                accountAddress: AccountAddress.toBase58(input.accountAddress),
+                cis3ContractDetails: {
+                    contractAddress,
+                    contractName,
+                    entrypointName,
+                    nonce,
+                    expiryTimeSignature,
+                },
             }
         );
 
