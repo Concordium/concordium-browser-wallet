@@ -85,7 +85,7 @@ class WalletApi extends EventEmitter implements IWalletApi {
         contractAddress: ContractAddress.Type,
         contractName: ContractName.Type,
         entrypointName: EntrypointName.Type,
-        nonce: bigint,
+        nonce: bigint | number,
         expiryTimeSignature: string,
         accountAddress: AccountAddressSource,
         payloadMessage: SignMessageObject

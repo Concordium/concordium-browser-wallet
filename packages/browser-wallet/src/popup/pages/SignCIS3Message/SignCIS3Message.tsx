@@ -49,7 +49,7 @@ type Cis3ContractDetailsObject = {
     contractAddress: ContractAddress.Type;
     contractName: ContractName.Type;
     entrypointName: EntrypointName.Type;
-    nonce: bigint;
+    nonce: bigint | number;
     expiryTimeSignature: string;
 };
 

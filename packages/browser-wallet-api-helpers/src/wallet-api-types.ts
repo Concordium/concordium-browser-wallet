@@ -258,7 +258,7 @@ interface MainWalletApi {
      * @param contractAddress the {@link ContractAddress} of the contract
      * @param contractName the {@link ContractName} of the contract
      * @param entrypointName the {@link EntrypointName} of the contract
-     * @param nonce the revocation nonce
+     * @param nonce the nonce (CIS3 standard) that was part of the message that was signed
      * @param expiryTimeSignature RFC 3339 format (e.g. 2030-08-08T05:15:00Z)
      * @param accountAddress the address of the account that should sign the message
      * @param payloadMessage payload message to be signed, complete CIS3 message will be created from provided parameters. Note that the wallet will prepend some bytes to ensure the message cannot be a transaction. The message should be { @link SignMessageObject }.
@@ -269,7 +269,7 @@ interface MainWalletApi {
         contractAddress: ContractAddress.Type,
         contractName: ContractName.Type,
         entrypointName: EntrypointName.Type,
-        nonce: bigint,
+        nonce: bigint | number,
         expiryTimeSignature: string,
         accountAddress: AccountAddressSource,
         payloadMessage: SignMessageObject
