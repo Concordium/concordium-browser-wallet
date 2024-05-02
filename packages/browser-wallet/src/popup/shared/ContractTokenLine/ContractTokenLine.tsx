@@ -38,15 +38,16 @@ export default function ContractTokenLine({
             className={clsx('contract-token-line__token', className)}
             style={style}
             onClick={() => onClick(token)}
+            disabled={!!token.error}
         >
             <div className="flex align-center h-full m-r-5">
                 <Img
-                    src={token.metadata.thumbnail?.url ?? token.metadata.display?.url ?? ''}
-                    alt={token.metadata.name ?? ''}
+                    src={token.metadata?.thumbnail?.url ?? token.metadata?.display?.url ?? ''}
+                    alt={token.metadata?.name ?? ''}
                     withDefaults
                 />
                 <div>
-                    <div className="clamp-2">{token.metadata.name}</div>
+                    <div className="clamp-2">{token.metadata?.name}</div>
                     <div
                         className={clsx(
                             'contract-token-line__token-balance',
@@ -56,21 +57,24 @@ export default function ContractTokenLine({
                         {t('ItemBalancePre')}
                         <TokenBalance
                             balance={token.balance}
-                            decimals={getMetadataDecimals(token.metadata)}
-                            symbol={token.metadata.symbol}
+                            decimals={getMetadataDecimals({ decimals: token.metadata?.decimals })}
+                            symbol={token.metadata?.symbol}
                         />
                     </div>
+                    <div className="contract-token-line__error">{token.error}</div>
                 </div>
             </div>
-            <Checkbox
-                onClick={(e) => {
-                    e.stopPropagation();
-                }}
-                onChange={() => toggleChecked(token)}
-                checked={status === ChoiceStatus.chosen || status === ChoiceStatus.existing}
-                className="contract-token-line__checkbox"
-                disabled={status === ChoiceStatus.existing}
-            />
+            {!token.error && (
+                <Checkbox
+                    onClick={(e) => {
+                        e.stopPropagation();
+                    }}
+                    onChange={() => toggleChecked(token)}
+                    checked={status === ChoiceStatus.chosen || status === ChoiceStatus.existing}
+                    className="contract-token-line__checkbox"
+                    disabled={status === ChoiceStatus.existing}
+                />
+            )}
         </Button>
     );
 }

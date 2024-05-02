@@ -33,6 +33,7 @@ export interface ContractDetails {
 
 export type ContractTokenDetails = TokenIdAndMetadata & {
     balance: bigint;
+    error: string;
 };
 
 /**
@@ -329,6 +330,7 @@ type TokenData = {
     metadataLink: string;
     metadata: TokenMetadata | undefined;
     balance: bigint;
+    error: string;
 };
 
 type GetTokensResult = TokenData[];
@@ -347,32 +349,42 @@ export async function getTokens(
     );
     const tokenData: (TokenData | undefined)[] = await Promise.all(
         ids.map(async (id, index) => {
+            const internalData: TokenData = { id, metadataLink: '', metadata: undefined, balance: 0n, error: '' };
             let metadataUrl;
             try {
                 metadataUrl = await contract.tokenMetadata(id);
+                internalData.metadataLink = metadataUrl.url;
             } catch (e) {
-                onError?.(`id: "${id}: Failed to get metadata url`);
-                return undefined;
+                const errorMessage = `id: "${id}: Failed to get metadata url`;
+                internalData.error = errorMessage;
+                onError?.(errorMessage);
+                return internalData;
             }
 
             let metadata;
             try {
                 metadata = await getTokenMetadata(metadataUrl);
-            } catch (error) {
-                onError?.(`id: "${ids[index]}": ${(error as Error).message}`);
-                return undefined;
+                internalData.metadata = metadata;
+            } catch (e) {
+                const errorMessage = `id: "${ids[index]}": ${(e as Error).message}`;
+                internalData.error = errorMessage;
+                onError?.(errorMessage);
+                return internalData;
             }
 
             let balance: bigint;
             try {
                 balance =
                     (await contract.balanceOf({ address: AccountAddress.fromBase58(account), tokenId: id })) || 0n;
-            } catch (error) {
-                onError?.(`id: "${ids[index]}": Failed to get token balance`);
-                return undefined;
+                internalData.balance = balance;
+            } catch (e) {
+                const errorMessage = `id: "${ids[index]}": Failed to get token balance`;
+                internalData.error = errorMessage;
+                onError?.(errorMessage);
+                return internalData;
             }
 
-            return { id, metadataLink: metadataUrl.url, metadata, balance };
+            return internalData;
         })
     );
 

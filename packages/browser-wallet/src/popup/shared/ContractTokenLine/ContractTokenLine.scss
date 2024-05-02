@@ -46,4 +46,9 @@ $element-border-radius: rem(5px);
             margin: 0;
         }
     }
+
+    &__error {
+        font-size: 10px;
+        color: $color-error;
+    }
 }
