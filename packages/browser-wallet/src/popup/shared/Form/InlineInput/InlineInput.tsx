@@ -5,7 +5,10 @@ import { scaleFieldWidth } from '../../utils/html-helpers';
 import { CommonFieldProps, RequiredControlledFieldProps } from '../common/types';
 import { makeControlled } from '../common/utils';
 
-type Props = Pick<InputHTMLAttributes<HTMLInputElement>, 'type' | 'className' | 'autoFocus'> &
+type Props = Pick<
+    InputHTMLAttributes<HTMLInputElement>,
+    'type' | 'className' | 'autoFocus' | 'onKeyUp' | 'onMouseUp' | 'maxLength'
+> &
     RequiredControlledFieldProps &
     CommonFieldProps & {
         fallbackValue?: string;

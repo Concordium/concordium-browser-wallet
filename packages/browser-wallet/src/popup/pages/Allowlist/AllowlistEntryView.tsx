@@ -1,5 +1,5 @@
 import AccountInfoListenerContextProvider, { useAccountInfo } from '@popup/shared/AccountInfoListenerContext';
-import { displaySplitAddress, useIdentityName } from '@popup/shared/utils/account-helpers';
+import { displayNameOrSplitAddress, useIdentityName } from '@popup/shared/utils/account-helpers';
 import React, { useMemo, useState } from 'react';
 import { Checkbox } from '@popup/shared/Form/Checkbox';
 import { WalletCredential } from '@shared/storage/types';
@@ -25,7 +25,7 @@ function AccountListItem({ account, checked, onToggleChecked }: ItemProps) {
     return (
         <div className="allowlist-entry-view__accounts__item">
             <div className="allowlist-entry-view__accounts__item__primary">
-                <div className="flex align-center">{displaySplitAddress(account.address)} </div>
+                <div className="flex align-center">{displayNameOrSplitAddress(account)} </div>
                 <Checkbox
                     className="allowlist-entry-view__accounts__item__check-box"
                     onClick={(e) => {
