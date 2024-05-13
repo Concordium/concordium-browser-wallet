@@ -46,6 +46,7 @@ async function createAndSendCredential(credIn: CredentialInput): Promise<Credent
             providerIndex,
             credId,
             credNumber,
+            credName: '',
             status: CreationStatus.Pending,
             deploymentHash,
         };
@@ -64,6 +65,7 @@ async function createAndSendCredential(credIn: CredentialInput): Promise<Credent
                     providerIndex,
                     credId,
                     credNumber,
+                    credName: '',
                     address: existingAddress,
                     status: CreationStatus.Confirmed,
                 },
