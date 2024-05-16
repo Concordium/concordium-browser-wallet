@@ -23,7 +23,8 @@ import IconButton from '@popup/shared/IconButton';
 import { InlineInput } from '@popup/shared/Form/InlineInput';
 import EntityList from '../EntityList';
 
-const ACCOUNT_NAME_MAX_LENGTH = 12;
+const ACCOUNT_NAME_MAX_LENGTH = 15;
+const ACCOUNT_NAME_INPUT_WIDTH = 100;
 
 const useEditableAccountName = (account: WalletCredential) => {
     const setAccount = useWritableSelectedAccount(account.address);
@@ -56,6 +57,7 @@ const useEditableAccountName = (account: WalletCredential) => {
                         onMouseUp={(e) => e.stopPropagation()}
                         autoFocus
                         maxLength={ACCOUNT_NAME_MAX_LENGTH}
+                        fixedWidth={ACCOUNT_NAME_INPUT_WIDTH}
                     />
                 ) : (
                     displayNameOrSplitAddress(account)

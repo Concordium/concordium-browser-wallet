@@ -13,6 +13,7 @@ type Props = Pick<
     CommonFieldProps & {
         fallbackValue?: string;
         fallbackOnError?: boolean;
+        fixedWidth?: number;
     };
 
 export function InlineInput({
@@ -23,6 +24,7 @@ export function InlineInput({
     fallbackOnError = false,
     onChange = noOp,
     onBlur = noOp,
+    fixedWidth,
     error,
     ...props
 }: Props) {
@@ -30,7 +32,9 @@ export function InlineInput({
     const [innerValue, setInnerValue] = useState(value ?? fallbackValue);
 
     useLayoutEffect(() => {
-        scaleFieldWidth(ref.current);
+        if (!fixedWidth) {
+            scaleFieldWidth(ref.current);
+        }
     }, [innerValue]);
 
     useUpdateEffect(() => {
@@ -56,7 +60,7 @@ export function InlineInput({
             autoComplete="off"
             spellCheck="false"
             {...props}
-            style={{ width: 6 }} // To prevent initial UI jitter.
+            style={{ width: fixedWidth || 6 }} // To prevent initial UI jitter.
         />
     );
 }
