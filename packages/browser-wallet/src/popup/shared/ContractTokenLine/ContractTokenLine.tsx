@@ -47,7 +47,7 @@ export default function ContractTokenLine({
                     withDefaults
                 />
                 <div>
-                    <div className="clamp-2">{token.metadata?.name}</div>
+                    <div className="clamp-2">{token.metadata.name}</div>
                     <div
                         className={clsx(
                             'contract-token-line__token-balance',
@@ -57,8 +57,8 @@ export default function ContractTokenLine({
                         {t('ItemBalancePre')}
                         <TokenBalance
                             balance={token.balance}
-                            decimals={getMetadataDecimals({ decimals: token.metadata?.decimals })}
-                            symbol={token.metadata?.symbol}
+                            decimals={getMetadataDecimals(token.metadata)}
+                            symbol={token.metadata.symbol}
                         />
                     </div>
                     <div className="contract-token-line__error">{token.error}</div>
