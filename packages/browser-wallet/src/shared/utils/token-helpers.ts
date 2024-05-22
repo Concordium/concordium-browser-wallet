@@ -330,7 +330,7 @@ type TokenData = {
     metadataLink: string;
     metadata: TokenMetadata | undefined;
     balance: bigint;
-    error: string;
+    error?: string;
 };
 
 type GetTokensResult = TokenData[];
