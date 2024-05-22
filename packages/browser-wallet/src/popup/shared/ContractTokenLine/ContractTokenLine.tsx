@@ -42,8 +42,8 @@ export default function ContractTokenLine({
         >
             <div className="flex align-center h-full m-r-5">
                 <Img
-                    src={token.metadata?.thumbnail?.url ?? token.metadata?.display?.url ?? ''}
-                    alt={token.metadata?.name ?? ''}
+                    src={token.metadata.thumbnail?.url ?? token.metadata.display?.url ?? ''}
+                    alt={token.metadata.name ?? ''}
                     withDefaults
                 />
                 <div>

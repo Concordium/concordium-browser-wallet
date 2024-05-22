@@ -33,7 +33,7 @@ export interface ContractDetails {
 
 export type ContractTokenDetails = TokenIdAndMetadata & {
     balance: bigint;
-    error: string;
+    error?: string;
 };
 
 /**
@@ -361,7 +361,7 @@ export async function getTokens(
                 return internalData;
             }
 
-            let metadata;
+            let metadata: TokenMetadata = {};
             try {
                 metadata = await getTokenMetadata(metadataUrl);
                 internalData.metadata = metadata;
