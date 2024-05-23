@@ -1,5 +1,11 @@
 # Changelog
 
+## Unreleased
+
+### Added
+
+-   Additional error message. Now instead of not showing invalid tokens, they displayed in token list with corresponding error. In order to show, that we found tokens in contract, but they have error.
+
 ## 1.5.1
 
 ### Fixed

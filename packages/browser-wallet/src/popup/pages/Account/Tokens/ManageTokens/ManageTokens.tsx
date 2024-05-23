@@ -69,7 +69,6 @@ export default function AddTokens() {
                 accountTokens.value[contractDetails.index.toString()]?.map((token) => ({
                     ...token,
                     balance: currentContractBalances[token.id] ?? 0n,
-                    error: '',
                 })) ?? [];
 
             setTopTokens(currentChecked);

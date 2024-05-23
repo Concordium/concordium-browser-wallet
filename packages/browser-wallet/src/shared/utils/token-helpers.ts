@@ -349,7 +349,7 @@ export async function getTokens(
     );
     const tokenData: (TokenData | undefined)[] = await Promise.all(
         ids.map(async (id, index) => {
-            const internalData: TokenData = { id, metadataLink: '', metadata: {}, balance: 0n, error: '' };
+            const internalData: TokenData = { id, metadataLink: '', metadata: {}, balance: 0n };
             let metadataUrl;
             try {
                 metadataUrl = await contract.tokenMetadata(id);
