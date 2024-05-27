@@ -176,10 +176,8 @@ async function startIdentityIssuance({
                 status: BackgroundResponseStatus.Error,
                 reason: `Initial location did not redirect as expected.`,
             });
-        } else if (!response.url.includes(`${redirectUri}#`)) {
-            launchExternalIssuance(response.url);
         } else {
-            throw new Error('Unexpected redirected');
+            launchExternalIssuance(response.url);
         }
         // eslint-disable-next-line @typescript-eslint/no-explicit-any
     } catch (e: any) {
