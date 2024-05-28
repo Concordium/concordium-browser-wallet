@@ -1,5 +1,10 @@
 # Changelog
 
+## Unreleased
+
+-   Remove check for redirectUri when launching identity issuance. This check was causing issues with an upcoming identity provider and seems to provide no value.
+-   Increased padding for QR code background. In dark mode, QR code not blending with background.
+
 ## 1.5.1
 
 ### Fixed
