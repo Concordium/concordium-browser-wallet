@@ -1,6 +1,6 @@
 import { absoluteRoutes } from '@popup/constants/routes';
 import { fullscreenPromptContext } from '@popup/page-layouts/FullscreenPromptLayout';
-import { selectedAccountAtom, storedAllowlistAtom } from '@popup/store/account';
+import { selectedCredentialAtom, storedAllowlistAtom } from '@popup/store/account';
 import { sessionPasscodeAtom } from '@popup/store/settings';
 import { useAtom, useAtomValue } from 'jotai';
 import React, { useContext, useEffect, useState } from 'react';
@@ -9,7 +9,7 @@ import { useLocation, Navigate } from 'react-router-dom';
 import ExternalRequestLayout from '@popup/page-layouts/ExternalRequestLayout';
 import Button from '@popup/shared/Button';
 import { displayUrl } from '@popup/shared/utils/string-helpers';
-import { displaySplitAddress } from '@popup/shared/utils/account-helpers';
+import { displayNameOrSplitAddress } from '@popup/shared/utils/account-helpers';
 import { handleAllowlistEntryUpdate } from '../Allowlist/util';
 
 type Props = {
@@ -21,7 +21,7 @@ export default function ConnectionRequest({ onAllow, onReject }: Props) {
     const { state } = useLocation();
     const { t } = useTranslation('connectionRequest');
     const { onClose, withClose } = useContext(fullscreenPromptContext);
-    const selectedAccount = useAtomValue(selectedAccountAtom);
+    const selectedAccount = useAtomValue(selectedCredentialAtom);
     const [allowlistLoading, setAllowlist] = useAtom(storedAllowlistAtom);
     const allowlist = allowlistLoading.value;
     const passcode = useAtomValue(sessionPasscodeAtom);
@@ -56,7 +56,7 @@ export default function ConnectionRequest({ onAllow, onReject }: Props) {
             <div className="account-page__connection-box connection-request__connection-box">{t('waiting')}</div>
             <div className="h-full flex-column align-center">
                 <header className="m-v-20">
-                    <h1>{t('title', { dApp: urlDisplay, account: displaySplitAddress(selectedAccount) })}</h1>
+                    <h1>{t('title', { dApp: urlDisplay, account: displayNameOrSplitAddress(selectedAccount) })}</h1>
                 </header>
                 <p className="connection-request__description">{t('descriptionP1', { dApp: urlDisplay })}</p>
                 <p className="connection-request__description">{t('descriptionP2')}</p>
@@ -69,7 +69,7 @@ export default function ConnectionRequest({ onAllow, onReject }: Props) {
                         disabled={connectButtonDisabled}
                         onClick={() => {
                             setConnectButtonDisabled(true);
-                            connectAccount(selectedAccount, new URL(url).origin).then(withClose(onAllow));
+                            connectAccount(selectedAccount.address, new URL(url).origin).then(withClose(onAllow));
                         }}
                     >
                         {t('actions.connect')}

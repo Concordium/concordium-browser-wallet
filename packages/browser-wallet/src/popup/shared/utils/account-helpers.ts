@@ -1,6 +1,6 @@
-import { credentialsAtom, selectedAccountAtom } from '@popup/store/account';
+import { credentialsAtom, selectedAccountAtom, writableCredentialAtom } from '@popup/store/account';
 import { networkConfigurationAtom } from '@popup/store/settings';
-import { useAtomValue } from 'jotai';
+import { useAtom, useAtomValue } from 'jotai';
 import { useEffect, useMemo, useState } from 'react';
 import { identitiesAtom } from '@popup/store/identity';
 import { AccountInfo, ConcordiumHdWallet } from '@concordium/web-sdk';
@@ -10,7 +10,10 @@ import { isIdentityOfCredential } from '@shared/utils/identity-helpers';
 import { getNextUnused } from '@shared/utils/number-helpers';
 import { useDecryptedSeedPhrase } from './seed-phrase-helpers';
 
-export const displaySplitAddress = (address: string) => `${address.slice(0, 4)}...${address.slice(address.length - 4)}`;
+export const displayNameOrSplitAddress = (account: WalletCredential | undefined) => {
+    const { credName, address } = account || { address: '' };
+    return credName || `${address.slice(0, 4)}...${address.slice(address.length - 4)}`;
+};
 
 export function useIdentityOf(cred?: WalletCredential) {
     const identities = useAtomValue(identitiesAtom);
@@ -38,6 +41,16 @@ export function useIdentityName(credential: WalletCredential, fallback?: string)
     }, [identity]);
 
     return identityName;
+}
+
+export function useWritableSelectedAccount(accountAddress: string) {
+    const [accounts, setAccounts] = useAtom(writableCredentialAtom);
+    const setAccount = (update: WalletCredential) =>
+        setAccounts(
+            accounts.map((account) => (account.address === accountAddress ? { ...account, ...update } : account))
+        );
+
+    return setAccount;
 }
 
 export function useCredential(accountAddress?: string) {

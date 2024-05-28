@@ -64,6 +64,7 @@ async function recoverAccounts(
                         address: accountInfo.accountAddress.address,
                         credId,
                         credNumber,
+                        credName: '',
                         status: CreationStatus.Confirmed,
                         identityIndex,
                         providerIndex,

@@ -147,6 +147,7 @@ export interface BaseCredential {
     address: string;
     credId: string;
     credNumber: number;
+    credName: string;
     status: CreationStatus;
     identityIndex: number;
     providerIndex: number;

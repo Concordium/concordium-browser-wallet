@@ -2,8 +2,10 @@ $display-address-copy-left-margin: rem(5px);
 
 .display-address {
     &__address-qr {
-        height: rem(130px);
-        width: rem(130px);
+        height: rem(140px);
+        width: rem(140px);
+        padding: rem(5px);
+        background-color: $color-white;
     }
 
     &__address-text {

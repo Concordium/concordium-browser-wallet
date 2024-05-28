@@ -6,7 +6,7 @@ import {
     RevealStatementV2,
     StatementTypes,
 } from '@concordium/web-sdk';
-import { displaySplitAddress, useIdentityName, useIdentityOf } from '@popup/shared/utils/account-helpers';
+import { displayNameOrSplitAddress, useIdentityName, useIdentityOf } from '@popup/shared/utils/account-helpers';
 import { useDisplayAttributeValue } from '@popup/shared/utils/identity-helpers';
 import { ConfirmedIdentity, WalletCredential } from '@shared/storage/types';
 import { getCredentialIdFromSubjectDID } from '@shared/utils/verifiable-credential-helpers';
@@ -29,7 +29,7 @@ export function DisplayAccount({ option }: { option: WalletCredential }) {
     return (
         <header className="verifiable-credential__header">
             <div className="web3-id-proof-request__selector-title flex-column align-start">
-                <div className="display5">{displaySplitAddress(option.address)}</div>
+                <div className="display5">{displayNameOrSplitAddress(option)}</div>
                 <div className="bodyS">{identityName}</div>
             </div>
         </header>

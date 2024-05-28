@@ -7,7 +7,7 @@ import { identitiesAtom } from '@popup/store/identity';
 import Button from '@popup/shared/Button';
 import { absoluteRoutes } from '@popup/constants/routes';
 import { noOp, displayAsCcd } from 'wallet-common-helpers';
-import { displaySplitAddress } from '@popup/shared/utils/account-helpers';
+import { displayNameOrSplitAddress } from '@popup/shared/utils/account-helpers';
 import { IdentityIdentifier, BackgroundResponseStatus, RecoveryBackgroundResponse } from '@shared/utils/types';
 import { fullscreenPromptContext } from '@popup/page-layouts/FullscreenPromptLayout';
 import PageHeader from '@popup/shared/PageHeader';
@@ -69,7 +69,7 @@ export function DisplaySuccess({ added }: Props) {
                         </p>
                         {addedAccounts.filter(isIdentityOfCredential(identity)).map((cred) => (
                             <div className="recovery__main__credential" key={cred.credId}>
-                                <p>{displaySplitAddress(cred.address)}</p>
+                                <p>{displayNameOrSplitAddress(cred)}</p>
                                 <p>
                                     {displayAsCcd(
                                         added.accounts.find((pair) => pair.address === cred.address)?.balance ||
