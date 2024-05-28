@@ -13,6 +13,13 @@ export const credentialsAtomWithLoading = atomWithChromeStorage<WalletCredential
 );
 export const credentialsAtom = selectAtom(credentialsAtomWithLoading, (v) => v.value);
 
+export const writableCredentialAtom = atom<WalletCredential[], WalletCredential[]>(
+    (get) => get(credentialsAtom),
+    async (_, set, update) => {
+        await set(credentialsAtomWithLoading, update);
+    }
+);
+
 export const storedConnectedSitesAtom = atomWithChromeStorage<Record<string, string[]>>(
     ChromeStorageKey.ConnectedSites,
     {},
@@ -33,6 +40,12 @@ export const selectedAccountAtom = atom<string | undefined, string | undefined, 
         popupMessageHandler.broadcast(EventType.AccountChanged, address);
     }
 );
+
+export const selectedCredentialAtom = atom<WalletCredential | undefined>((get) => {
+    const selectedAccount = get(selectedAccountAtom);
+    const credentials = get(credentialsAtom);
+    return credentials.find((cred) => cred.address === selectedAccount);
+});
 
 export const accountsAtom = selectAtom(credentialsAtom, (cs) => cs.map((c) => c.address));
 

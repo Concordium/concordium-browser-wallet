@@ -120,4 +120,18 @@ $entity-list-top-height: rem(25px);
             fill: $color-text;
         }
     }
+
+    &__edit {
+        width: rem(18px);
+        height: rem(18px);
+        top: rem(15px);
+
+        path {
+            fill: $color-text;
+        }
+
+        svg {
+            transform: scale(1.2);
+        }
+    }
 }

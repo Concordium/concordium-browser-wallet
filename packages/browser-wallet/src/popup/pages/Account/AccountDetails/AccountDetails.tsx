@@ -2,7 +2,7 @@ import clsx from 'clsx';
 import React, { useEffect, useState } from 'react';
 import { displayAsCcd, getPublicAccountAmounts, PublicAccountAmounts } from 'wallet-common-helpers';
 import { useTranslation } from 'react-i18next';
-import { displaySplitAddress, useIdentityName } from '@popup/shared/utils/account-helpers';
+import { displayNameOrSplitAddress, useIdentityName } from '@popup/shared/utils/account-helpers';
 import VerifiedIcon from '@assets/svg/verified-stamp.svg';
 import { CreationStatus, WalletCredential } from '@shared/storage/types';
 import { useAccountInfo } from '@popup/shared/AccountInfoListenerContext';
@@ -68,7 +68,7 @@ export default function AccountDetails({ expanded, account, className }: Props) 
 
     return (
         <div className={clsx('account-page-details', expanded && 'account-page-details--expanded', className)}>
-            <div className="account-page-details__address">{displaySplitAddress(account.address)}</div>
+            <div className="account-page-details__address">{displayNameOrSplitAddress(account)}</div>
             <div className="account-page-details__id">{identityName}</div>
             <div className="account-page-details__balance">
                 <Amount label={t('total')} amount={balances.total} />
