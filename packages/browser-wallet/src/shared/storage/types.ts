@@ -113,9 +113,15 @@ export interface IpInfo {
  * but is not contained in IpInfo.
  */
 export interface IdentityProviderMetaData {
+    /** Optional string to use for displaying the ID Provider, when not present fallback to `ipDescription.name` */
+    display?: string;
+    /** URL for initiating identity issuance for this ID provider. */
     issuanceStart: string;
+    /** URL for recovering identities from this ID provider. */
     recoveryStart: string;
+    /** A PNG image to display, encoded in base64. */
     icon: string;
+    /** URL for the support site of this ID provider. */
     support: string;
 }
 
