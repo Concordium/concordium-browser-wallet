@@ -38,6 +38,7 @@ export default function ContractTokenLine({
             className={clsx('contract-token-line__token', className)}
             style={style}
             onClick={() => onClick(token)}
+            disabled={!!token.error}
         >
             <div className="flex align-center h-full m-r-5">
                 <Img
@@ -60,17 +61,20 @@ export default function ContractTokenLine({
                             symbol={token.metadata.symbol}
                         />
                     </div>
+                    <div className="contract-token-line__error">{token.error}</div>
                 </div>
             </div>
-            <Checkbox
-                onClick={(e) => {
-                    e.stopPropagation();
-                }}
-                onChange={() => toggleChecked(token)}
-                checked={status === ChoiceStatus.chosen || status === ChoiceStatus.existing}
-                className="contract-token-line__checkbox"
-                disabled={status === ChoiceStatus.existing}
-            />
+            {!token.error && (
+                <Checkbox
+                    onClick={(e) => {
+                        e.stopPropagation();
+                    }}
+                    onChange={() => toggleChecked(token)}
+                    checked={status === ChoiceStatus.chosen || status === ChoiceStatus.existing}
+                    className="contract-token-line__checkbox"
+                    disabled={status === ChoiceStatus.existing}
+                />
+            )}
         </Button>
     );
 }

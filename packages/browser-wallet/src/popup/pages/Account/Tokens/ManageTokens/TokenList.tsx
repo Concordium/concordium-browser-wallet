@@ -163,7 +163,9 @@ export default function TokenList() {
 
     const allTokens = [...topTokens, ...contractTokens.filter((ct) => !topTokens.some((tt) => tt.id === ct.id))];
     const displayTokens = searchResult.value !== undefined ? searchResult.value : allTokens;
-    const filteredDisplayTokens = displayTokens.filter((td) => isDefined(td.metadata));
+    const filteredDisplayTokens = displayTokens
+        .filter((td) => isDefined(td.metadata))
+        .sort((td) => (!td.error ? -1 : 1));
 
     useUpdateEffect(() => {
         lookupTokenId(search, setSearchResult);
