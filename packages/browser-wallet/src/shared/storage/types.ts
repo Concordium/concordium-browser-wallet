@@ -121,7 +121,7 @@ export interface IdentityProviderMetaData {
     recoveryStart: string;
     /** A PNG image to display, encoded in base64. */
     icon: string;
-    /** URL for the support site of this ID provider. */
+    /** Support Email address of this ID provider. */
     support: string;
 }
 
