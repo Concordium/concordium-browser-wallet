@@ -101,11 +101,11 @@ function IdentityIssuanceStart({ onStart, onError }: InnerProps) {
                         className="identity-issuance__provider-button flex justify-space-between align-center"
                         width="wide"
                         disabled={buttonDisabled}
-                        key={p.ipInfo.ipIdentity + p.ipInfo.ipDescription.name}
+                        key={p.metadata.issuanceStart}
                         onClick={() => startIssuance(p).catch((e) => onError(e.toString()))}
                     >
                         <IdentityProviderIcon provider={p} />
-                        {p.ipInfo.ipDescription.name}
+                        {p.metadata.display ?? p.ipInfo.ipDescription.name}
                     </Button>
                 ))}
             </div>

@@ -2,6 +2,7 @@
 
 ## Unreleased
 
+-   Display the optional name for ID providers when present, otherwise fallback to the chain name.
 -   Remove check for redirectUri when launching identity issuance. This check was causing issues with an upcoming identity provider and seems to provide no value.
 -   Increased padding for QR code background. In dark mode, QR code not blending with background.
 -   Added new option to edit account name. Name saved in local storage. Changed name displayed across all BrowserWallet.
