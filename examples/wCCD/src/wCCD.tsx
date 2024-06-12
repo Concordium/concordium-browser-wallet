@@ -136,7 +136,7 @@ async function updateWCCDBalanceAccount(rpcClient: ConcordiumGRPCClient, account
     return BigInt(leb.decodeULEB128(toBuffer(ReturnValue.toHexString(res.returnValue).slice(4), 'hex'))[0]);
 }
 
-function addWCDToWallet(
+function addWCCDToWallet(
     _accountAddress: string,
     connection: BrowserWalletConnector,
     tokenIds: string[],
@@ -455,7 +455,7 @@ export default function wCCD(props: ConnectionProps) {
                             disabled={account === undefined}
                             onClick={() => {
                                 if (account) {
-                                    addWCDToWallet(account, connection, [''], wCCDContractIndex, CONTRACT_SUB_INDEX);
+                                    addWCCDToWallet(account, connection, [''], wCCDContractIndex, CONTRACT_SUB_INDEX);
                                 }
                             }}
                         >
