@@ -1,6 +1,6 @@
 # Changelog
 
-## Unreleased
+## 1.5.2
 
 -   Display the optional name for ID providers when present, otherwise fallback to the chain name.
 -   Remove check for redirectUri when launching identity issuance. This check was causing issues with an upcoming identity provider and seems to provide no value.
