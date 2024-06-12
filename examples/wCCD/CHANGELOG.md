@@ -1,5 +1,9 @@
 # Changelog
 
+## 4.1.3
+
+-   Added new button `Add Token to wallet` that calls addCIS2Tokens from browser-wallet-api-helpers
+
 ## 4.1.2
 
 -   Bumped version of @concordium/web-sdk and @concordium/react-components (fixes wallet connect serialization issue)
