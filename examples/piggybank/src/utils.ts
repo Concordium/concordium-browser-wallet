@@ -1,6 +1,6 @@
 /* eslint-disable no-console */
 import { createContext } from 'react';
-import { detectConcordiumProvider } from '@concordium/browser-wallet-api-helpers';
+import { walletApi } from '@concordium/browser-wallet-api';
 import {
     AccountTransactionType,
     CcdAmount,
@@ -24,23 +24,15 @@ export const deposit = (account: string, index: bigint, subindex = 0n, amount = 
         return;
     }
 
-    detectConcordiumProvider()
-        .then((provider) => {
-            provider
-                .sendTransaction(AccountAddress.fromBase58(account), AccountTransactionType.Update, {
-                    amount: CcdAmount.fromMicroCcd(amount),
-                    address: ContractAddress.create(index, subindex),
-                    receiveName: ReceiveName.fromString(`${CONTRACT_NAME}.insert`),
-                    maxContractExecutionEnergy: Energy.create(30000),
-                } as UpdateContractPayload)
-                .then((txHash) =>
-                    console.log(`https://testnet.ccdscan.io/?dcount=1&dentity=transaction&dhash=${txHash}`)
-                )
-                .catch(alert);
-        })
-        .catch(() => {
-            throw new Error('Concordium Wallet API not accessible');
-        });
+    walletApi
+        .sendTransaction(AccountAddress.fromBase58(account), AccountTransactionType.Update, {
+            amount: CcdAmount.fromMicroCcd(amount),
+            address: ContractAddress.create(index, subindex),
+            receiveName: ReceiveName.fromString(`${CONTRACT_NAME}.insert`),
+            maxContractExecutionEnergy: Energy.create(30000),
+        } as UpdateContractPayload)
+        .then((txHash) => console.log(`https://testnet.ccdscan.io/?dcount=1&dentity=transaction&dhash=${txHash}`))
+        .catch(alert);
 };
 
 /**
@@ -48,23 +40,15 @@ export const deposit = (account: string, index: bigint, subindex = 0n, amount = 
  * https://github.com/Concordium/concordium-rust-smart-contracts/blob/c4d95504a51c15bdbfec503c9e8bf5e93a42e24d/examples/piggy-bank/part1/src/lib.rs#L64
  */
 export const smash = (account: string, index: bigint, subindex = 0n) => {
-    detectConcordiumProvider()
-        .then((provider) => {
-            provider
-                .sendTransaction(AccountAddress.fromBase58(account), AccountTransactionType.Update, {
-                    amount: CcdAmount.fromMicroCcd(0), // This feels weird? Why do I need an amount for a non-payable receive?
-                    address: ContractAddress.create(index, subindex),
-                    receiveName: ReceiveName.fromString(`${CONTRACT_NAME}.smash`),
-                    maxContractExecutionEnergy: Energy.create(30000),
-                })
-                .then((txHash) =>
-                    console.log(`https://testnet.ccdscan.io/?dcount=1&dentity=transaction&dhash=${txHash}`)
-                )
-                .catch(alert);
+    walletApi
+        .sendTransaction(AccountAddress.fromBase58(account), AccountTransactionType.Update, {
+            amount: CcdAmount.fromMicroCcd(0), // This feels weird? Why do I need an amount for a non-payable receive?
+            address: ContractAddress.create(index, subindex),
+            receiveName: ReceiveName.fromString(`${CONTRACT_NAME}.smash`),
+            maxContractExecutionEnergy: Energy.create(30000),
         })
-        .catch(() => {
-            throw new Error('Concordium Wallet API not accessible');
-        });
+        .then((txHash) => console.log(`https://testnet.ccdscan.io/?dcount=1&dentity=transaction&dhash=${txHash}`))
+        .catch(alert);
 };
 
 /**

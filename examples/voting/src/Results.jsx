@@ -8,7 +8,7 @@ import { Badge, Button, Col, Container, Row, Spinner } from 'react-bootstrap';
 import ListGroup from 'react-bootstrap/ListGroup';
 import { Link, useParams } from 'react-router-dom';
 import moment from 'moment';
-import { detectConcordiumProvider } from '@concordium/browser-wallet-api-helpers';
+import { walletApi } from '@concordium/browser-wallet-api';
 import { decodeView, decodeVotes } from './buffer';
 import { getView, getVotes } from './Wallet';
 import { REFRESH_INTERVAL } from './config';
@@ -45,8 +45,8 @@ function VoteLink(props) {
 function Results() {
     const params = useParams();
     const { electionId } = params;
+    const client = walletApi;
 
-    const [client, setClient] = useState();
     const [view, setView] = useState();
     const [votes, setVotes] = useState();
 
@@ -55,11 +55,6 @@ function Results() {
     useEffect(() => {
         const interval = setInterval(() => setNow(moment()), moment.duration(1, 'second').asMilliseconds());
         return () => clearInterval(interval);
-    }, []);
-
-    // Attempt to initialize Browser Wallet Client.
-    useEffect(() => {
-        detectConcordiumProvider().then(setClient).catch(console.error);
     }, []);
 
     // Attempt to get general information about the election.

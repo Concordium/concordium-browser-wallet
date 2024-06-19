@@ -1,7 +1,7 @@
 /* eslint-disable no-console */
 import React, { useEffect, useState, useMemo, useCallback } from 'react';
 
-import { detectConcordiumProvider } from '@concordium/browser-wallet-api-helpers';
+import { walletApi } from '@concordium/browser-wallet-api';
 import PiggyBankV0 from './Version0';
 import PiggyBankV1 from './Version1';
 import { state, State } from './utils';
@@ -19,27 +19,15 @@ export default function Root() {
         setIsConnected(Boolean(accountAddress));
     }, []);
 
-    const handleOnClick = useCallback(
-        () =>
-            detectConcordiumProvider()
-                .then((provider) => provider.connect())
-                .then(handleGetAccount),
-        []
-    );
+    const handleOnClick = useCallback(() => walletApi.connect().then(handleGetAccount), []);
 
     useEffect(() => {
-        detectConcordiumProvider()
-            .then((provider) => {
-                // Listen for relevant events from the wallet.
-                provider.on('accountChanged', setAccount);
-                provider.on('accountDisconnected', () =>
-                    provider.getMostRecentlySelectedAccount().then(handleGetAccount)
-                );
-                provider.on('chainChanged', (chain) => console.log(chain));
-                // Check if you are already connected
-                provider.getMostRecentlySelectedAccount().then(handleGetAccount);
-            })
-            .catch(() => setIsConnected(false));
+        // Listen for relevant events from the wallet.
+        walletApi.on('accountChanged', setAccount);
+        walletApi.on('accountDisconnected', () => walletApi.getMostRecentlySelectedAccount().then(handleGetAccount));
+        walletApi.on('chainChanged', (chain) => console.log(chain));
+        // Check if you are already connected
+        walletApi.getMostRecentlySelectedAccount().then(handleGetAccount);
     }, []);
 
     const stateValue: State = useMemo(() => ({ isConnected, account }), [isConnected, account]);

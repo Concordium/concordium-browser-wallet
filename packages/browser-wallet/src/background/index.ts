@@ -96,16 +96,6 @@ async function exportGRPCLocation(
     return onSuccess(`${network.grpcUrl}:${network.grpcPort}`);
 }
 
-async function executeInjectScript(tabId: number): Promise<void> {
-    await chrome.scripting.executeScript({
-        target: { tabId },
-        // TODO this is a reference to the output file, expecting to be placed in the root with manifest.json.
-        // Would be nice if the relative output path could be built from a reference to the entrypoint file instead.
-        files: ['inject.js'],
-        world: 'MAIN',
-    });
-}
-
 async function reportVersion(network?: NetworkConfiguration) {
     const baseUrl = 'https://concordium.matomo.cloud/matomo.php';
     const params = {
@@ -237,11 +227,6 @@ addIdpListeners();
 bgMessageHandler.handleMessage(
     createMessageTypeFilter(InternalMessageType.SendCredentialDeployment),
     sendCredentialHandler
-);
-
-chrome.tabs.onUpdated.addListener(
-    (tabId, changeInfo, tab) =>
-        tab.url?.startsWith('http') && changeInfo.status === 'complete' && executeInjectScript(tabId)
 );
 
 bgMessageHandler.handleMessage(

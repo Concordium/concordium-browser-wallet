@@ -6,7 +6,7 @@
 /* eslint-disable import/no-unresolved */
 /* eslint-disable no-plusplus */
 import React from 'react';
-import { detectConcordiumProvider } from '@concordium/browser-wallet-api-helpers';
+import { walletApi } from '@concordium/browser-wallet-api';
 import { Alert, Button } from 'react-bootstrap';
 import {
     AccountTransactionType,
@@ -19,7 +19,7 @@ import moment from 'moment';
 import { RAW_SCHEMA_BASE64, TESTNET_GENESIS_BLOCK_HASH } from './config';
 
 export async function init(setConnectedAccount) {
-    const client = await detectConcordiumProvider();
+    const client = walletApi;
     // Listen for relevant events from the wallet.
     client.on('accountChanged', (account) => {
         console.debug('browserwallet event: accountChange', { account });
