@@ -9,3 +9,4 @@ package.json
 !.storybook
 
 packages/browser-wallet-api-helpers/lib
+packages/browser-wallet-api/lib
