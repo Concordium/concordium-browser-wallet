@@ -6,6 +6,7 @@
 
 -   Added new option to edit account name. Name saved in local storage. Changed name displayed across all BrowserWallet.
 -   Additional error message. Now instead of not showing invalid tokens, they displayed in token list with corresponding error. In order to show, that we found tokens in contract, but they have error.
+-   Added signCIS3Message method for explicit CIS3 sign in walletApi, and new page SignCIS3Message to display decoded CIS3 message.
 
 ### Changed
 
