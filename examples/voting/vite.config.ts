@@ -21,7 +21,6 @@ export default defineConfig({
     },
     resolve: {
         alias: {
-            '@concordium/rust-bindings': '@concordium/rust-bindings/bundler', // Resolve bundler-specific wasm entrypoints.
             stream: 'rollup-plugin-node-polyfills/polyfills/stream',
         },
     },

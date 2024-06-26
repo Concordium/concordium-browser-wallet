@@ -1,7 +1,7 @@
 /* eslint-disable no-console */
 import React, { useEffect, useState, useContext, useRef } from 'react';
 import { ConcordiumGRPCClient, ContractAddress, ReceiveName, ReturnValue, toBuffer } from '@concordium/web-sdk';
-import { detectConcordiumProvider } from '@concordium/browser-wallet-api-helpers';
+import { walletApi } from '@concordium/browser-wallet-api';
 import { smash, deposit, state, CONTRACT_NAME, expectedInitName } from './utils';
 
 import PiggyIcon from './assets/piggy-bank-solid.svg?react';
@@ -18,8 +18,7 @@ const CONTRACT_INDEX = 81n; // V1 instance
 const CONTRACT_SUB_INDEX = 0n;
 
 async function updateState(setSmashed: (x: boolean) => void, setAmount: (x: bigint) => void): Promise<void> {
-    const provider = await detectConcordiumProvider();
-    const grpc = new ConcordiumGRPCClient(provider.grpcTransport);
+    const grpc = new ConcordiumGRPCClient(walletApi.grpcTransport);
     const res = await grpc.invokeContract({
         method: ReceiveName.fromString(`${CONTRACT_NAME}.view`),
         contract: ContractAddress.create(CONTRACT_INDEX, CONTRACT_SUB_INDEX),
@@ -42,19 +41,15 @@ export default function PiggyBank() {
     useEffect(() => {
         if (isConnected) {
             // Get piggy bank owner.
-            detectConcordiumProvider()
-                .then((provider) => {
-                    const grpc = new ConcordiumGRPCClient(provider.grpcTransport);
-                    return grpc.getInstanceInfo(ContractAddress.create(CONTRACT_INDEX, CONTRACT_SUB_INDEX));
-                })
-                .then((info) => {
-                    if (expectedInitName.value !== info.name.value) {
-                        // Check that we have the expected instance.
-                        throw new Error(`Expected instance of PiggyBank: ${info?.name.value}`);
-                    }
+            const grpc = new ConcordiumGRPCClient(walletApi.grpcTransport);
+            grpc.getInstanceInfo(ContractAddress.create(CONTRACT_INDEX, CONTRACT_SUB_INDEX)).then((info) => {
+                if (expectedInitName.value !== info.name.value) {
+                    // Check that we have the expected instance.
+                    throw new Error(`Expected instance of PiggyBank: ${info?.name.value}`);
+                }
 
-                    setOwner(info.owner.address);
-                });
+                setOwner(info.owner.address);
+            });
         }
     }, [isConnected]);
 

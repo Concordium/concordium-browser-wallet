@@ -3,7 +3,7 @@
     <head>
         <title>My cool dapp</title>
         <script src="/sdk.js"></script>
-        <script src="/helpers.js"></script>
+        <script src="/api.js"></script>
         <script src="https://unpkg.com/cbor-web"></script>
         <meta charset="utf-8" />
         <script>
@@ -28,7 +28,7 @@
             async function setupPage() {
                 const twoStepTransferSchema =
                     'AQAAABEAAAB0d28tc3RlcC10cmFuc2ZlcgEUAAIAAAALAAAAaW5pdF9wYXJhbXMUAAMAAAAPAAAAYWNjb3VudF9ob2xkZXJzEQALHAAAAHRyYW5zZmVyX2FncmVlbWVudF90aHJlc2hvbGQCFAAAAHRyYW5zZmVyX3JlcXVlc3RfdHRsDggAAAByZXF1ZXN0cxIBBRQABAAAAA8AAAB0cmFuc2Zlcl9hbW91bnQKDgAAAHRhcmdldF9hY2NvdW50CwwAAAB0aW1lc19vdXRfYXQNCgAAAHN1cHBvcnRlcnMRAgsBFAADAAAADwAAAGFjY291bnRfaG9sZGVycxEACxwAAAB0cmFuc2Zlcl9hZ3JlZW1lbnRfdGhyZXNob2xkAhQAAAB0cmFuc2Zlcl9yZXF1ZXN0X3R0bA4BAAAABwAAAHJlY2VpdmUVAgAAAA8AAABSZXF1ZXN0VHJhbnNmZXIBAwAAAAUKCw8AAABTdXBwb3J0VHJhbnNmZXIBAwAAAAUKCw==';
-                const provider = await concordiumHelpers.detectConcordiumProvider();
+                const provider = concordiumWalletApi.walletApi;
 
                 document.getElementById('connect').addEventListener('click', () => {
                     provider.connect().then((accountAddress) => {
@@ -258,7 +258,10 @@
                         .catch(alert);
                 });
             }
-            setupPage();
+
+            window.onload = function () {
+                setupPage();
+            };
         </script>
     </head>
 

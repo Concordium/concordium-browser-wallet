@@ -9,7 +9,7 @@ import {
     isInstanceInfoV0,
     toBuffer,
 } from '@concordium/web-sdk';
-import { detectConcordiumProvider } from '@concordium/browser-wallet-api-helpers';
+import { walletApi } from '@concordium/browser-wallet-api';
 import { smash, deposit, state, CONTRACT_NAME, expectedInitName } from './utils';
 
 import PiggyIcon from './assets/piggy-bank-solid.svg?react';
@@ -29,29 +29,26 @@ const isPiggybankSmashed = (piggyState: PiggyBankState): piggyState is PiggyBank
     (piggyState as PiggyBankStateSmashed).Smashed !== undefined;
 
 export default function PiggyBankV0() {
+    const grpc = new ConcordiumGRPCClient(walletApi.grpcTransport);
+
     const { account, isConnected } = useContext(state);
     const [piggybank, setPiggyBank] = useState<InstanceInfoV0>();
     const input = useRef<HTMLInputElement>(null);
 
     useEffect(() => {
         // Get piggy bank data.
-        detectConcordiumProvider()
-            .then((provider) => {
-                const grpc = new ConcordiumGRPCClient(provider.grpcTransport);
-                return grpc.getInstanceInfo(ContractAddress.create(CONTRACT_INDEX, CONTRACT_SUB_INDEX));
-            })
-            .then((info) => {
-                if (expectedInitName.value !== info.name.value) {
-                    // Check that we have the expected instance.
-                    throw new Error(`Expected instance of PiggyBank: ${info?.name.value}`);
-                }
-                if (!isInstanceInfoV0(info)) {
-                    // Check smart contract version. We expect V0.
-                    throw new Error('Expected SC version 0');
-                }
+        grpc.getInstanceInfo(ContractAddress.create(CONTRACT_INDEX, CONTRACT_SUB_INDEX)).then((info) => {
+            if (expectedInitName.value !== info.name.value) {
+                // Check that we have the expected instance.
+                throw new Error(`Expected instance of PiggyBank: ${info?.name.value}`);
+            }
+            if (!isInstanceInfoV0(info)) {
+                // Check smart contract version. We expect V0.
+                throw new Error('Expected SC version 0');
+            }
 
-                setPiggyBank(info);
-            });
+            setPiggyBank(info);
+        });
     }, []);
 
     // The internal state of the piggy bank, which is either intact or smashed.

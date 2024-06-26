@@ -13,7 +13,6 @@ const watch = Boolean(process.env.WATCH);
 const popup = 'src/popup/index.tsx';
 const background = 'src/background/index.ts';
 const content = 'src/content/index.ts';
-const inject = 'src/inject/index.ts';
 
 const popupHtmlTemplate = fs.readFileSync('src/popup/index.html').toString();
 const popupHtmlOut = 'popup.html';
@@ -30,7 +29,7 @@ const streamPlugin = {
 const isDev = isDevelopmentBuild();
 
 const config: BuildOptions = {
-    entryPoints: [popup, background, content, inject],
+    entryPoints: [popup, background, content],
     outbase: 'src',
     entryNames: '[dir]',
     bundle: true,

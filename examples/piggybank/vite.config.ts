@@ -13,9 +13,4 @@ export default defineConfig({
         wasm(),
         topLevelAwait(), // For legacy browser compatibility
     ],
-    resolve: {
-        alias: {
-            '@concordium/rust-bindings': '@concordium/rust-bindings/bundler', // Resolve bundler-specific wasm entrypoints.
-        },
-    },
 });
