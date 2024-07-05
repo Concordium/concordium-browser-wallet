@@ -1,5 +1,11 @@
 # Changelog
 
+## 1.6.0
+
+### Added
+
+-   Support creating accounts from Company IDs.
+
 ## 1.5.2
 
 ### Added
