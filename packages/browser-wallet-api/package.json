@@ -10,7 +10,7 @@
         "@concordium/browser-wallet-api-helpers": "workspace:^",
         "@concordium/browser-wallet-message-hub": "workspace:^",
         "@concordium/common-sdk": "^9.5.3",
-        "@concordium/web-sdk": "^7.3.2",
+        "@concordium/web-sdk": "^7.5.0",
         "@protobuf-ts/grpcweb-transport": "^2.8.2",
         "@protobuf-ts/runtime-rpc": "^2.8.2",
         "buffer": "^6.0.3",
