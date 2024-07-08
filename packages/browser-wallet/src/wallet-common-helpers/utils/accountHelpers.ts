@@ -1,5 +1,5 @@
 import type { AccountInfo, AccountInfoBaker, AccountInfoDelegator } from '@concordium/web-sdk';
-import { max } from './basicHelpers.js';
+import { max } from './basicHelpers';
 
 export interface PublicAccountAmounts {
     total: bigint;

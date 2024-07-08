@@ -1,7 +1,7 @@
 /* eslint-disable @typescript-eslint/no-explicit-any */
 import React, { ElementType, PropsWithChildren, Ref } from 'react';
-import { ClassName, PolymorphicComponentProps } from '../utils/types.js';
-import { useDetectClickOutside } from '../utils/eventHooks.js';
+import { ClassName, PolymorphicComponentProps } from '../utils/types';
+import { useDetectClickOutside } from '../utils/eventHooks';
 
 interface Props extends ClassName {
     /**

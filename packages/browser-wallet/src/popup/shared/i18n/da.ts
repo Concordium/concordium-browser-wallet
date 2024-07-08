@@ -29,6 +29,11 @@ const t: typeof en = {
         nationality: 'Nationalitet',
         sex: 'Køn',
         dob: 'Fødselsdato',
+        lei: 'LEI',
+        legalName: 'Juridiske navn',
+        legalCountry: 'Juridisk land',
+        businessNumber: 'Virksomhedsnummer',
+        registrationAuth: 'Virksomhedsregister',
     },
     idAttributeValues: {
         sex: {

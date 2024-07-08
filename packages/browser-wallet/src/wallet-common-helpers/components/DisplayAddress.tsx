@@ -1,7 +1,7 @@
 /* eslint-disable react/destructuring-assignment */
 import React from 'react';
 import clsx from 'clsx';
-import { chunkString } from '../utils/basicHelpers.js';
+import { chunkString } from '../utils/basicHelpers';
 
 export enum AddressDisplayFormat {
     Ledger,

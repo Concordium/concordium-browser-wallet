@@ -7,7 +7,7 @@ import {
     RewardStatus,
     StakePendingChange,
 } from '@concordium/web-sdk';
-import { ensureNumberLength } from './basicHelpers.js';
+import { ensureNumberLength } from './basicHelpers';
 /* eslint-disable import/prefer-default-export */
 type YearMonth = string; // "YYYYMM"
 type YearMonthDate = string; // "YYYYMMDD"

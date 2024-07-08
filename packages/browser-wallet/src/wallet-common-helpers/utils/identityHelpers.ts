@@ -16,6 +16,11 @@ export const attributeNamesMap: {
     nationality: 'Country of nationality',
     sex: 'Sex',
     dob: 'Date of birth',
+    lei: 'LEI',
+    legalName: 'Legal Name',
+    legalCountry: 'Legal Country',
+    businessNumber: 'Business Number',
+    registrationAuth: 'Registration Authority',
 };
 
 /**

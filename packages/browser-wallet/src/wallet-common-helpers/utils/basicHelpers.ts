@@ -1,4 +1,4 @@
-import { Buffer } from 'buffer/index.js';
+import { Buffer } from 'buffer/';
 
 /**
  * Partitions the array according to the given criteria

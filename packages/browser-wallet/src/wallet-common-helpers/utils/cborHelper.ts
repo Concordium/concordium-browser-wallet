@@ -1,6 +1,6 @@
-import { Buffer } from 'buffer/index.js';
+import { Buffer } from 'buffer/';
 import { encode, decode } from 'cbor';
-import { isValidResolutionString } from './numberStringHelpers.js';
+import { isValidResolutionString } from './numberStringHelpers';
 
 const isInteger = isValidResolutionString(1, true, false, false);
 /**
