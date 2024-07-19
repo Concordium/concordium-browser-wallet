@@ -33,5 +33,8 @@
         "build": "vite build",
         "start": "vite preview",
         "watch": "vite"
+    },
+    "resolutions": {
+        "**/vite-plugin-top-level-await/@swc/core": "1.6.13"
     }
 }
