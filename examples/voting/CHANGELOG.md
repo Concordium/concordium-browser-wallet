@@ -1,5 +1,9 @@
 # Changelog
 
+## 1.1.3
+
+-   Fixed problems on the result page due to breaking changes in the web SDK.
+
 ## 1.1.2
 
 -   Bumped version of @concordium/web-sdk and @concordium/browser-wallet-api-helpers
