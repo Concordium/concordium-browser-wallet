@@ -33,5 +33,8 @@
         "build": "tsc && vite build",
         "dev": "vite",
         "start": "vite preview"
+    },
+    "resolutions": {
+        "**/vite-plugin-top-level-await/@swc/core": "1.6.13"
     }
 }
