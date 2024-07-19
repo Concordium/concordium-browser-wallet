@@ -11,7 +11,12 @@ import { Alert, Button } from 'react-bootstrap';
 import {
     AccountTransactionType,
     CcdAmount,
+    ConcordiumGRPCClient,
+    ContractAddress,
+    ContractName,
+    EntrypointName,
     ModuleReference,
+    ReceiveName,
     serializeUpdateContractParameters,
     toBuffer,
 } from '@concordium/web-sdk';
@@ -105,19 +110,20 @@ export async function getView(client, contractIndex) {
 export async function getVotes(client, contractIndex, numOptions) {
     const promises = [];
 
+    const grpcClient = new ConcordiumGRPCClient(client.grpcTransport);
     for (let i = 0; i < numOptions; i++) {
         const param = serializeUpdateContractParameters(
-            'voting',
-            'getNumberOfVotes',
+            ContractName.fromString('voting'),
+            EntrypointName.fromString('getNumberOfVotes'),
             {
                 vote_index: i,
             },
             toBuffer(RAW_SCHEMA_BASE64, 'base64')
         );
 
-        const promise = client.getGrpcClient().invokeContract({
-            contract: { index: BigInt(contractIndex), subindex: BigInt(0) },
-            method: 'voting.getNumberOfVotes',
+        const promise = grpcClient.invokeContract({
+            contract: ContractAddress.create(contractIndex, 0),
+            method: ReceiveName.fromString('voting.getNumberOfVotes'),
             parameter: param,
         });
 

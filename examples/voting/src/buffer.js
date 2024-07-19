@@ -42,7 +42,7 @@ export function decodeVotes(votesResult) {
     const votes = new Array(0);
     votesResult.forEach((element) => {
         const offset0 = 0;
-        const buffer = toBuffer(element.returnValue, 'hex');
+        const buffer = toBuffer(element.returnValue.buffer, 'hex');
         const [voteCount] = [buffer.readUInt32LE(offset0), offset0 + 4];
         votes.push(voteCount);
     });
