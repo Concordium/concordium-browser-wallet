@@ -79,7 +79,7 @@ function Results() {
     // Attempt to get the voting results.
     useMemo(() => {
         if (viewResult && client && electionId) {
-            getVotes(client, electionId, viewResult?.numOptions).then(setVotes).catch(console.error);
+            getVotes(client, electionId, viewResult?.opts).then(setVotes).catch(console.error);
         }
     }, [viewResult, client, electionId]);
 
@@ -90,11 +90,11 @@ function Results() {
         }
     }, [votes]);
 
-    const endsInMillis = viewResult?.endTime.diff(now);
+    const endsInMillis = viewResult?.deadline.diff(now);
 
     // Refresh tally periodically until deadline.
     useEffect(() => {
-        if (client && viewResult?.endTime.isAfter()) {
+        if (client && viewResult?.deadline.isAfter()) {
             const interval = setInterval(() => {
                 console.log('refreshing');
                 setView(undefined);

@@ -76,9 +76,7 @@ function VotePage() {
                         </div>
                         <Button
                             className="w-100"
-                            onClick={() =>
-                                castVote(client, electionId, viewResult?.opts.indexOf(selectedOption), connectedAccount)
-                            }
+                            onClick={() => castVote(client, electionId, selectedOption, connectedAccount)}
                         >
                             <strong>Cast Vote!</strong>
                         </Button>
