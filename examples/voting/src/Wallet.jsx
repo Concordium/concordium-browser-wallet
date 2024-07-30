@@ -80,7 +80,7 @@ export async function createElection(
         const parameter = {
             description,
             options,
-            end_time: deadlineTimestamp,
+            deadline: deadlineTimestamp,
         };
 
         const txHash = await client.sendTransaction(
@@ -107,17 +107,15 @@ export async function getView(client, contractIndex) {
     });
 }
 
-export async function getVotes(client, contractIndex, numOptions) {
+export async function getVotes(client, contractIndex, options) {
     const promises = [];
 
     const grpcClient = new ConcordiumGRPCClient(client.grpcTransport);
-    for (let i = 0; i < numOptions; i++) {
+    for (const option of options) {
         const param = serializeUpdateContractParameters(
             ContractName.fromString('voting'),
             EntrypointName.fromString('getNumberOfVotes'),
-            {
-                vote_index: i,
-            },
+            option,
             toBuffer(RAW_SCHEMA_BASE64, 'base64')
         );
 
@@ -134,28 +132,30 @@ export async function getVotes(client, contractIndex, numOptions) {
 }
 
 export async function castVote(client, contractIndex, vote, senderAddress) {
-    if (vote === -1) {
+    if (!vote) {
         window.alert('Select one option.');
         return;
     }
 
     const connectedToTestnet = await checkConnectedToTestnet(client);
-    if (connectedToTestnet) {
-        const txHash = await client.sendTransaction(
-            senderAddress,
-            AccountTransactionType.Update,
-            {
-                amount: CcdAmount.fromMicroCcd(BigInt(0)),
-                address: { index: BigInt(contractIndex), subindex: BigInt(0) },
-                receiveName: 'voting.vote',
-                maxContractExecutionEnergy: BigInt(30000),
-            },
-            { vote_index: vote },
-            RAW_SCHEMA_BASE64
-        );
-        console.log({ txHash });
-        return txHash;
+    if (!connectedToTestnet) {
+        return;
     }
+
+    const txHash = await client.sendTransaction(
+        senderAddress,
+        AccountTransactionType.Update,
+        {
+            amount: CcdAmount.fromMicroCcd(BigInt(0)),
+            address: { index: BigInt(contractIndex), subindex: BigInt(0) },
+            receiveName: 'voting.vote',
+            maxContractExecutionEnergy: BigInt(30000),
+        },
+        vote,
+        RAW_SCHEMA_BASE64
+    );
+    console.log({ txHash });
+    return txHash;
 }
 
 export default function Wallet(props) {

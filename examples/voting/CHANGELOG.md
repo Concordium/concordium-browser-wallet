@@ -1,5 +1,9 @@
 # Changelog
 
+## 1.1.4
+
+-   Adjusted according to the simplified voting smart contract example, see https://github.com/Concordium/concordium-rust-smart-contracts/pull/441.
+
 ## 1.1.3
 
 -   Fixed problems on the result page due to breaking changes in the web SDK.

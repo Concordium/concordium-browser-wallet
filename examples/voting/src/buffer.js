@@ -26,15 +26,13 @@ export function decodeView(result) {
     const offset0 = 0;
     const buffer = toBuffer(result, 'hex');
     const [descriptionText, offset1] = decodeString(buffer, offset0);
-    const endTimestamp = buffer.readBigUInt64LE(offset1);
-    const endTime = moment.unix(Number(endTimestamp / BigInt(1000)));
-    const [opts, offset2] = decodeStrings(buffer, offset1 + 8);
-    const numOptions = buffer.readUInt32LE(offset2);
+    const [opts, offset2] = decodeStrings(buffer, offset1);
+    const deadlineTimestamp = buffer.readBigUInt64LE(offset2);
+    const deadline = moment.unix(Number(deadlineTimestamp / BigInt(1000)));
     return {
         descriptionText,
-        endTime,
         opts,
-        numOptions,
+        deadline,
     };
 }
 
