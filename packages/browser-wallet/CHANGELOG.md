@@ -1,5 +1,11 @@
 # Changelog
 
+## 1.6.1
+
+### Fixed
+
+-   Update web-sdk fixing the `unreachable` runtime error during account creation with id object containing attributes using special characters.
+
 ## 1.6.0
 
 ### Added
