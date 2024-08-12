@@ -252,14 +252,14 @@ function sanitizePayload(type: AccountTransactionType, payload: SendTransactionP
                 typeof (p as InitContractPayload).initName === 'object' &&
                 (p as InitContractPayload).initName !== null
             ) {
-                initName = (p as InitContractPayload).initName;
+                initName = ContractName.fromString((p as InitContractPayload).initName.value);
             } else {
                 throw new Error(`Unexpected payload for type ${type}: ${p}`);
             }
 
             const maxContractExecutionEnergy =
                 typeof p.maxContractExecutionEnergy !== 'bigint'
-                    ? p.maxContractExecutionEnergy
+                    ? Energy.create(p.maxContractExecutionEnergy.value)
                     : Energy.create(p.maxContractExecutionEnergy);
 
             return {
@@ -277,10 +277,12 @@ function sanitizePayload(type: AccountTransactionType, payload: SendTransactionP
             );
             const maxContractExecutionEnergy =
                 typeof p.maxContractExecutionEnergy !== 'bigint'
-                    ? p.maxContractExecutionEnergy
+                    ? Energy.create(p.maxContractExecutionEnergy.value)
                     : Energy.create(p.maxContractExecutionEnergy);
             const receiveName =
-                typeof p.receiveName === 'string' ? ReceiveName.fromString(p.receiveName) : p.receiveName;
+                typeof p.receiveName === 'string'
+                    ? ReceiveName.fromString(p.receiveName)
+                    : ReceiveName.fromString(p.receiveName.value);
 
             const { index, subindex } =
                 (p as Exclude<SendTransactionUpdateContractPayload, UpdateContractPayloadV0>).address ??
