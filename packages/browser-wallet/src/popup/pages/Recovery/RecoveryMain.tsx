@@ -18,7 +18,7 @@ import PageHeader from '@popup/shared/PageHeader';
 import { absoluteRoutes } from '@popup/constants/routes';
 import Button from '@popup/shared/Button';
 import { popupMessageHandler } from '@popup/shared/message-handler';
-import { InternalMessageType } from '@concordium/browser-wallet-message-hub';
+import { InternalMessageType } from '@messaging';
 
 export default function RecoveryMain() {
     const { t } = useTranslation('recovery');

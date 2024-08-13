@@ -11,8 +11,9 @@
             "@inject/*": ["./src/inject/*"],
             "@shared/*": ["./src/shared/*"],
             "@assets/*": ["./src/assets/*"],
-            "@concordium/browser-wallet-api": ["../browser-wallet-api/src"],
-            "@concordium/browser-wallet-message-hub": ["../browser-wallet-message-hub/src"],
+            "@wallet-api": ["./src/wallet-api/index.ts"],
+            "@wallet-api/*": ["./src/wallet-api/*"],
+            "@messaging": ["./src/messaging/index.ts"],
             "@concordium/browser-wallet-api-helpers": ["../browser-wallet-api-helpers/src"],
             "wallet-common-helpers": ["./src/wallet-common-helpers"]
         }

@@ -1,5 +1,11 @@
 # Changelog
 
+## 1.6.2
+
+### Fixed
+
+-   Ensure that the wallet API and the wallet are built with the same version of the web-sdk, fixing an issue that caused serialization of values to not conform to the expected format.
+
 ## 1.6.1
 
 ### Fixed

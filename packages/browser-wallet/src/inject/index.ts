@@ -1,4 +1,4 @@
-import { walletApi } from '@concordium/browser-wallet-api';
+import { walletApi } from '@wallet-api';
 
 // Inject WalletAPI to dApp
 window.concordium = walletApi;

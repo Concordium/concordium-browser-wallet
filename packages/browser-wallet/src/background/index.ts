@@ -5,7 +5,7 @@ import {
     InternalMessageType,
     MessageStatusWrapper,
     MessageType,
-} from '@concordium/browser-wallet-message-hub';
+} from '@messaging';
 import { deserializeTypeValue } from '@concordium/web-sdk';
 import {
     getGenesisHash,

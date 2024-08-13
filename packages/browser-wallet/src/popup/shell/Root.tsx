@@ -1,7 +1,7 @@
 import { Provider, useAtomValue } from 'jotai';
 import React, { ReactElement, useEffect } from 'react';
 import { MemoryRouter } from 'react-router-dom';
-import { InternalMessageType } from '@concordium/browser-wallet-message-hub';
+import { InternalMessageType } from '@messaging';
 import { noOp } from 'wallet-common-helpers';
 
 import { Dimensions, large, medium, small } from '@popup/constants/dimensions';

@@ -1,4 +1,4 @@
-import { InjectedMessageHandler, MessageStatusWrapper, MessageType } from '@concordium/browser-wallet-message-hub';
+import { InjectedMessageHandler, MessageStatusWrapper, MessageType } from '@messaging';
 import { GrpcStatusCode, GrpcWebFetchTransport } from '@protobuf-ts/grpcweb-transport';
 import {
     ClientStreamingCall,

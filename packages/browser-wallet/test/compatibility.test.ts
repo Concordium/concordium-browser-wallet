@@ -55,7 +55,7 @@ import {
     SimpleTransferWithMemoPayloadV1,
     ConfigureBakerPayloadV0,
     ConfigureDelegationPayloadV0,
-} from '../src/compatibility';
+} from '../src/wallet-api/compatibility';
 
 const accountAddress = '4UC8o4m8AgTxt5VBFMdLwMCwwJQVJwjesNzW7RPXkACynrULmd';
 

@@ -1,6 +1,6 @@
 import { getIdProof, IdProofInput, IdProofOutput, verifyIdstatement } from '@concordium/web-sdk';
 import { BackgroundResponseStatus, ProofBackgroundResponse } from '@shared/utils/types';
-import { ExtensionMessageHandler, MessageStatusWrapper } from '@concordium/browser-wallet-message-hub';
+import { ExtensionMessageHandler, MessageStatusWrapper } from '@messaging';
 import { isHex } from 'wallet-common-helpers';
 import { RunCondition } from './window-management';
 

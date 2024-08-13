@@ -1,9 +1,4 @@
-import {
-    InjectedMessageHandler,
-    createEventTypeFilter,
-    MessageType,
-    MessageStatusWrapper,
-} from '@concordium/browser-wallet-message-hub';
+import { InjectedMessageHandler, createEventTypeFilter, MessageType, MessageStatusWrapper } from '@messaging';
 import {
     AccountAddress,
     AccountTransactionSignature,

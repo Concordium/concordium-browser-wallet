@@ -16,8 +16,6 @@
         "downlevelIteration": true,
         "jsx": "react",
         "paths": {
-            "@concordium/browser-wallet-api": ["./packages/browser-wallet-api/src"],
-            "@concordium/browser-wallet-message-hub": ["./packages/browser-wallet-message-hub/src"],
             "@concordium/browser-wallet-api-helpers": ["./packages/browser-wallet-api-helpers/src"]
         }
     },

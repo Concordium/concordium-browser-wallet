@@ -6,7 +6,7 @@ import {
     WalletError,
     WalletEvent,
     WalletMessage,
-} from '@concordium/browser-wallet-message-hub';
+} from '@messaging';
 
 import { Dimensions, large, small } from '@popup/constants/dimensions';
 import { spawnedPopupUrl } from '@shared/constants/url';

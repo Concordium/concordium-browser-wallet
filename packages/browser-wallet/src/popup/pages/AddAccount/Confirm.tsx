@@ -12,7 +12,7 @@ import ArrowIcon from '@assets/svg/arrow.svg';
 import IdentityProviderIcon from '@popup/shared/IdentityProviderIcon';
 
 import { absoluteRoutes } from '@popup/constants/routes';
-import { InternalMessageType } from '@concordium/browser-wallet-message-hub';
+import { InternalMessageType } from '@messaging';
 import { popupMessageHandler } from '@popup/shared/message-handler';
 import { BackgroundResponseStatus } from '@shared/utils/types';
 import { isIdentityOfCredential } from '@shared/utils/identity-helpers';
