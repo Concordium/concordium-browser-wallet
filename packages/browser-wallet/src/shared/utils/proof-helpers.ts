@@ -8,8 +8,8 @@ import {
 } from '@concordium/web-sdk';
 import { popupMessageHandler } from '@popup/shared/message-handler';
 import { ConfirmedIdentity } from '@shared/storage/types';
-import { InternalMessageType } from '@concordium/browser-wallet-message-hub';
-import { stringify } from '@concordium/browser-wallet-api/src/util';
+import { InternalMessageType } from '@messaging';
+import { stringify } from '@wallet-api/util';
 import { BackgroundResponseStatus, ProofBackgroundResponse } from './types';
 
 export function canProveStatement(statement: AtomicStatement, identity: ConfirmedIdentity) {

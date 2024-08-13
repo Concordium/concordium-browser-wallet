@@ -10,7 +10,7 @@ import SunIcon from '@assets/svg/sun.svg';
 import MoonIcon from '@assets/svg/moon.svg';
 import { ToggleCheckbox } from '@popup/shared/Form/ToggleCheckbox';
 import { popupMessageHandler } from '@popup/shared/message-handler';
-import { InternalMessageType } from '@concordium/browser-wallet-message-hub';
+import { InternalMessageType } from '@messaging';
 import Button from '@popup/shared/Button';
 import { isFullscreenWindow } from '@popup/shared/window-helpers';
 

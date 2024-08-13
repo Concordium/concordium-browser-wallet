@@ -1,11 +1,6 @@
 import React, { useEffect, useRef } from 'react';
 import { Route, Routes as ReactRoutes, useLocation, useNavigate } from 'react-router-dom';
-import {
-    InternalMessageType,
-    MessageType,
-    createMessageTypeFilter,
-    MessageStatusWrapper,
-} from '@concordium/browser-wallet-message-hub';
+import { InternalMessageType, MessageType, createMessageTypeFilter, MessageStatusWrapper } from '@messaging';
 import { AccountTransactionSignature, IdProofOutput } from '@concordium/web-sdk';
 import { noOp } from 'wallet-common-helpers';
 

@@ -16,7 +16,7 @@ import {
 } from '@concordium/web-sdk';
 import { Buffer } from 'buffer/';
 import { SmartContractParameters, SchemaType, SchemaWithContext } from '@concordium/browser-wallet-api-helpers';
-import { serializationTypes } from '@concordium/browser-wallet-api/src/constants';
+import { serializationTypes } from '@wallet-api/constants';
 import * as JSONBig from 'json-bigint';
 
 export type HeadlessTransaction =

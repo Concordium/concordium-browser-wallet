@@ -6,7 +6,7 @@ import {
     IdentityRecoveryRequestInput,
     ConcordiumGRPCWebClient,
 } from '@concordium/web-sdk';
-import { InternalMessageType } from '@concordium/browser-wallet-message-hub';
+import { InternalMessageType } from '@messaging';
 import { BackgroundResponseStatus, RecoveryBackgroundResponse } from '@shared/utils/types';
 import {
     Identity,

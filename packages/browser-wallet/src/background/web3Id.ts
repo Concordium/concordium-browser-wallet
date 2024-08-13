@@ -35,11 +35,7 @@ import {
 } from '@shared/utils/verifiable-credential-helpers';
 import { parse } from '@shared/utils/payload-helpers';
 import { BackgroundResponseStatus, ProofBackgroundResponse } from '@shared/utils/types';
-import {
-    ExtensionMessageHandler,
-    InternalMessageType,
-    MessageStatusWrapper,
-} from '@concordium/browser-wallet-message-hub';
+import { ExtensionMessageHandler, InternalMessageType, MessageStatusWrapper } from '@messaging';
 import { getNet } from '@shared/utils/network-helpers';
 import { WAIT_FOR_CLOSED_POPUP_ITERATIONS, WAIT_FOR_CLOSED_POPUP_TIMEOUT_MS } from '@shared/constants/web3id';
 import { Buffer } from 'buffer/';
