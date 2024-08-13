@@ -2178,48 +2178,18 @@ __metadata:
   languageName: unknown
   linkType: soft
 
-"@concordium/browser-wallet-api@workspace:^, @concordium/browser-wallet-api@workspace:packages/browser-wallet-api":
-  version: 0.0.0-use.local
-  resolution: "@concordium/browser-wallet-api@workspace:packages/browser-wallet-api"
-  dependencies:
-    "@concordium/browser-wallet-api-helpers": "workspace:^"
-    "@concordium/browser-wallet-message-hub": "workspace:^"
-    "@concordium/common-sdk": ^9.5.3
-    "@protobuf-ts/grpcweb-transport": ^2.8.2
-    "@protobuf-ts/runtime-rpc": ^2.8.2
-    "@types/json-bigint": ^1.0.2
-    buffer: ^6.0.3
-    jest: ^29.7.0
-    json-bigint: ^1.0.0
-    ts-jest: ^29.1.1
-  peerDependencies:
-    "@concordium/web-sdk": "*"
-  languageName: unknown
-  linkType: soft
-
-"@concordium/browser-wallet-message-hub@workspace:^, @concordium/browser-wallet-message-hub@workspace:packages/browser-wallet-message-hub":
-  version: 0.0.0-use.local
-  resolution: "@concordium/browser-wallet-message-hub@workspace:packages/browser-wallet-message-hub"
-  dependencies:
-    "@concordium/browser-wallet-api-helpers": "workspace:^"
-    "@types/chrome": ^0.0.247
-    "@types/uuid": ^8.3.2
-    uuid: ^8.3.2
-  languageName: unknown
-  linkType: soft
-
 "@concordium/browser-wallet@workspace:packages/browser-wallet":
   version: 0.0.0-use.local
   resolution: "@concordium/browser-wallet@workspace:packages/browser-wallet"
   dependencies:
     "@babel/core": ^7.18.2
-    "@concordium/browser-wallet-api": "workspace:^"
     "@concordium/browser-wallet-api-helpers": "workspace:^"
-    "@concordium/browser-wallet-message-hub": "workspace:^"
+    "@concordium/common-sdk": ^9.5.3
     "@concordium/web-sdk": ^7.5.1
     "@craftamap/esbuild-plugin-html": ^0.4.0
     "@mdx-js/react": ^1.6.22
     "@noble/ed25519": ^1.7.0
+    "@protobuf-ts/grpcweb-transport": ^2.9.4
     "@protobuf-ts/runtime-rpc": ^2.8.2
     "@scure/bip39": ^1.1.0
     "@storybook/addon-actions": ^6.5.7
@@ -2241,6 +2211,7 @@ __metadata:
     "@types/react-dom": ^18.0.0
     "@types/react-virtualized-auto-sizer": ^1.0.1
     "@types/react-window-infinite-loader": ^1.0.6
+    "@types/uuid": ^10.0.0
     axios: ^0.27.2
     babel-loader: ^8.2.5
     buffer: ^6.0.3
@@ -2283,7 +2254,7 @@ __metadata:
     ts-jest: ^29.0.5
     tsconfig-paths-webpack-plugin: ^3.5.2
     typescript: ^5.2.2
-    uuid: ^8.3.2
+    uuid: ^10.0.0
   languageName: unknown
   linkType: soft
 
@@ -3659,16 +3630,6 @@ __metadata:
   languageName: node
   linkType: hard
 
-"@protobuf-ts/grpcweb-transport@npm:^2.8.2":
-  version: 2.8.2
-  resolution: "@protobuf-ts/grpcweb-transport@npm:2.8.2"
-  dependencies:
-    "@protobuf-ts/runtime": ^2.8.2
-    "@protobuf-ts/runtime-rpc": ^2.8.2
-  checksum: c579ab87c5d20ae815fcd8ad59326fd36337cd35118dbecdfada8951efa9eeffffbc54052d4132b98615dd9c23c860b90f210ad538ab7b228b484645f7121ee9
-  languageName: node
-  linkType: hard
-
 "@protobuf-ts/grpcweb-transport@npm:^2.9.1":
   version: 2.9.1
   resolution: "@protobuf-ts/grpcweb-transport@npm:2.9.1"
@@ -3676,6 +3637,16 @@ __metadata:
     "@protobuf-ts/runtime": ^2.9.1
     "@protobuf-ts/runtime-rpc": ^2.9.1
   checksum: 9b9090faa4e5f0496cb6978d606eb9b06064cd31680b2709aa93c7800e798a47eb7f7bf73c25338c96b1b08a7046e8bc3e9bb51fafc88741bb5c9e127122e373
+  languageName: node
+  linkType: hard
+
+"@protobuf-ts/grpcweb-transport@npm:^2.9.4":
+  version: 2.9.4
+  resolution: "@protobuf-ts/grpcweb-transport@npm:2.9.4"
+  dependencies:
+    "@protobuf-ts/runtime": ^2.9.4
+    "@protobuf-ts/runtime-rpc": ^2.9.4
+  checksum: 40a038da3e9184496cf4fe7dc171a7a2af93a1d4051048c56428897aaea34eb65db94ef1e740aae5cfe52d76127ab5896d62e048994cf0a8e1b9b280fd2439a1
   languageName: node
   linkType: hard
 
@@ -3688,10 +3659,12 @@ __metadata:
   languageName: node
   linkType: hard
 
-"@protobuf-ts/runtime@npm:^2.8.2":
-  version: 2.8.2
-  resolution: "@protobuf-ts/runtime@npm:2.8.2"
-  checksum: ab322e832bfb347b271a8862b8ef3db27ffa380f9c49f94acb410534586a282ebd8af96d4459f959ad0fe5fbf34183f3f4fe512e50c9a4331b742a7445b16c92
+"@protobuf-ts/runtime-rpc@npm:^2.9.4":
+  version: 2.9.4
+  resolution: "@protobuf-ts/runtime-rpc@npm:2.9.4"
+  dependencies:
+    "@protobuf-ts/runtime": ^2.9.4
+  checksum: a457c981aef71b5121b1f5a1a3e49510fd42017c7a88d75c60b3ba425a3fab886f8e89e8987f601c0585fdbcdeb4dc6c616ad6c8c0cae8b822cd9c0387d77345
   languageName: node
   linkType: hard
 
@@ -3699,6 +3672,13 @@ __metadata:
   version: 2.9.1
   resolution: "@protobuf-ts/runtime@npm:2.9.1"
   checksum: 8507103d7bf790c57c383bfc711e1c2766fab34c4a4d0ec30395f6da8f06e86a9e8b7af0f00cf19a8a0ecaf2feaf75cf3787ee1fd1d1d8ecedba5fc290113e15
+  languageName: node
+  linkType: hard
+
+"@protobuf-ts/runtime@npm:^2.9.4":
+  version: 2.9.4
+  resolution: "@protobuf-ts/runtime@npm:2.9.4"
+  checksum: de9e8bd47ef15539df6bccaa3e7bc7b6b198062eea8bf888eadf09208f377b9915969a17764106179228ae027ebaf390c4642261e623abd87b0c373fd7bf58b8
   languageName: node
   linkType: hard
 
@@ -6815,10 +6795,10 @@ __metadata:
   languageName: node
   linkType: hard
 
-"@types/uuid@npm:^8.3.2":
-  version: 8.3.4
-  resolution: "@types/uuid@npm:8.3.4"
-  checksum: 6f11f3ff70f30210edaa8071422d405e9c1d4e53abbe50fdce365150d3c698fe7bbff65c1e71ae080cbfb8fded860dbb5e174da96fdbbdfcaa3fb3daa474d20f
+"@types/uuid@npm:^10.0.0":
+  version: 10.0.0
+  resolution: "@types/uuid@npm:10.0.0"
+  checksum: e3958f8b0fe551c86c14431f5940c3470127293280830684154b91dc7eb3514aeb79fe3216968833cf79d4d1c67f580f054b5be2cd562bebf4f728913e73e944
   languageName: node
   linkType: hard
 
@@ -22918,39 +22898,6 @@ __metadata:
   bin:
     ts-jest: cli.js
   checksum: f60f129c2287f4c963d9ee2677132496c5c5a5d39c27ad234199a1140c26318a7d5bda34890ab0e30636ec42a8de28f84487c09e9dcec639c9c67812b3a38373
-  languageName: node
-  linkType: hard
-
-"ts-jest@npm:^29.1.1":
-  version: 29.1.1
-  resolution: "ts-jest@npm:29.1.1"
-  dependencies:
-    bs-logger: 0.x
-    fast-json-stable-stringify: 2.x
-    jest-util: ^29.0.0
-    json5: ^2.2.3
-    lodash.memoize: 4.x
-    make-error: 1.x
-    semver: ^7.5.3
-    yargs-parser: ^21.0.1
-  peerDependencies:
-    "@babel/core": ">=7.0.0-beta.0 <8"
-    "@jest/types": ^29.0.0
-    babel-jest: ^29.0.0
-    jest: ^29.0.0
-    typescript: ">=4.3 <6"
-  peerDependenciesMeta:
-    "@babel/core":
-      optional: true
-    "@jest/types":
-      optional: true
-    babel-jest:
-      optional: true
-    esbuild:
-      optional: true
-  bin:
-    ts-jest: cli.js
-  checksum: a8c9e284ed4f819526749f6e4dc6421ec666f20ab44d31b0f02b4ed979975f7580b18aea4813172d43e39b29464a71899f8893dd29b06b4a351a3af8ba47b402
   languageName: node
   linkType: hard
 

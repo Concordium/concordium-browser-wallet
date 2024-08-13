@@ -34,7 +34,7 @@ import {
     getAccountTransactionHandler,
     AccountTransactionPayloadJSON,
 } from '@concordium/web-sdk/types';
-import { empty } from '@concordium/web-sdk/types/Parameter';
+import { Parameter } from '@concordium/web-sdk';
 import { IdStatement } from '@concordium/web-sdk/id';
 
 export type GtuAmount = { microGtuAmount: bigint };
@@ -377,13 +377,13 @@ export function sanitizeSendTransactionInput(
         case AccountTransactionType.Update:
             accountTransactionPayload = {
                 ...(sanitizedPayload as SendTransactionUpdateContractPayload),
-                message: empty(),
+                message: Parameter.empty(),
             };
             break;
         case AccountTransactionType.InitContract:
             accountTransactionPayload = {
                 ...(sanitizedPayload as SendTransactionInitContractPayload),
-                param: empty(),
+                param: Parameter.empty(),
             };
             break;
         default:
