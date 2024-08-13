@@ -2175,6 +2175,7 @@ __metadata:
     webpack-cli: ^4.9.2
   peerDependencies:
     "@concordium/web-sdk": ^7.5
+    "@protobuf-ts/runtime-rpc": ^2.9.1
   languageName: unknown
   linkType: soft
 
@@ -2189,7 +2190,7 @@ __metadata:
     "@craftamap/esbuild-plugin-html": ^0.4.0
     "@mdx-js/react": ^1.6.22
     "@noble/ed25519": ^1.7.0
-    "@protobuf-ts/grpcweb-transport": ^2.9.4
+    "@protobuf-ts/grpcweb-transport": ^2.9.1
     "@protobuf-ts/runtime-rpc": ^2.8.2
     "@scure/bip39": ^1.1.0
     "@storybook/addon-actions": ^6.5.7
@@ -3640,16 +3641,6 @@ __metadata:
   languageName: node
   linkType: hard
 
-"@protobuf-ts/grpcweb-transport@npm:^2.9.4":
-  version: 2.9.4
-  resolution: "@protobuf-ts/grpcweb-transport@npm:2.9.4"
-  dependencies:
-    "@protobuf-ts/runtime": ^2.9.4
-    "@protobuf-ts/runtime-rpc": ^2.9.4
-  checksum: 40a038da3e9184496cf4fe7dc171a7a2af93a1d4051048c56428897aaea34eb65db94ef1e740aae5cfe52d76127ab5896d62e048994cf0a8e1b9b280fd2439a1
-  languageName: node
-  linkType: hard
-
 "@protobuf-ts/runtime-rpc@npm:^2.8.2, @protobuf-ts/runtime-rpc@npm:^2.9.1":
   version: 2.9.1
   resolution: "@protobuf-ts/runtime-rpc@npm:2.9.1"
@@ -3659,26 +3650,10 @@ __metadata:
   languageName: node
   linkType: hard
 
-"@protobuf-ts/runtime-rpc@npm:^2.9.4":
-  version: 2.9.4
-  resolution: "@protobuf-ts/runtime-rpc@npm:2.9.4"
-  dependencies:
-    "@protobuf-ts/runtime": ^2.9.4
-  checksum: a457c981aef71b5121b1f5a1a3e49510fd42017c7a88d75c60b3ba425a3fab886f8e89e8987f601c0585fdbcdeb4dc6c616ad6c8c0cae8b822cd9c0387d77345
-  languageName: node
-  linkType: hard
-
 "@protobuf-ts/runtime@npm:^2.9.1":
   version: 2.9.1
   resolution: "@protobuf-ts/runtime@npm:2.9.1"
   checksum: 8507103d7bf790c57c383bfc711e1c2766fab34c4a4d0ec30395f6da8f06e86a9e8b7af0f00cf19a8a0ecaf2feaf75cf3787ee1fd1d1d8ecedba5fc290113e15
-  languageName: node
-  linkType: hard
-
-"@protobuf-ts/runtime@npm:^2.9.4":
-  version: 2.9.4
-  resolution: "@protobuf-ts/runtime@npm:2.9.4"
-  checksum: de9e8bd47ef15539df6bccaa3e7bc7b6b198062eea8bf888eadf09208f377b9915969a17764106179228ae027ebaf390c4642261e623abd87b0c373fd7bf58b8
   languageName: node
   linkType: hard
 
