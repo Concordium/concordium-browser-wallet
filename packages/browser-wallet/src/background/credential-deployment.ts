@@ -1,4 +1,4 @@
-import { ExtensionMessageHandler } from '@concordium/browser-wallet-message-hub';
+import { ExtensionMessageHandler } from '@messaging';
 
 import {
     CredentialInput,

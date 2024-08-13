@@ -1,3 +1,3 @@
-import { ContentMessageHandler } from '@concordium/browser-wallet-message-hub';
+import { ContentMessageHandler } from '@messaging';
 
 export const contentMessageHandler = new ContentMessageHandler();

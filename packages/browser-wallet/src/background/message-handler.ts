@@ -1,9 +1,4 @@
-import {
-    createMessageTypeFilter,
-    ExtensionsMessageHandler,
-    InternalMessageType,
-    Payload,
-} from '@concordium/browser-wallet-message-hub';
+import { createMessageTypeFilter, ExtensionsMessageHandler, InternalMessageType, Payload } from '@messaging';
 import { storedSelectedAccount, storedAllowlist } from '@shared/storage/access';
 
 const bgMessageHandler = new ExtensionsMessageHandler(storedAllowlist, storedSelectedAccount);

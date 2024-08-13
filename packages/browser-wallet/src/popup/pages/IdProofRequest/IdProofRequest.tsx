@@ -3,7 +3,7 @@ import { useLocation } from 'react-router-dom';
 import { useAtomValue, useSetAtom } from 'jotai';
 import { useTranslation } from 'react-i18next';
 import { IdStatement, StatementTypes, RevealStatement, IdProofOutput } from '@concordium/web-sdk';
-import { InternalMessageType } from '@concordium/browser-wallet-message-hub';
+import { InternalMessageType } from '@messaging';
 
 import { popupMessageHandler } from '@popup/shared/message-handler';
 import { identityByAddressAtomFamily } from '@popup/store/identity';

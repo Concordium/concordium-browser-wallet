@@ -1,4 +1,4 @@
-import { stringify } from '@concordium/browser-wallet-api/util';
+import { stringify } from '@wallet-api/util';
 import { parse } from '@shared/utils/payload-helpers';
 import { VerifiableCredentialMetadata } from '@shared/utils/verifiable-credential-helpers';
 import { Log } from '@shared/utils/log-helpers';
