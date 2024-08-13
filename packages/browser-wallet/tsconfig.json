@@ -23,7 +23,7 @@
             "module": "CommonJS"
         }
     },
-    "include": ["./src/**/*.ts", "./src/**/*.tsx", "test/compatibility.test.ts"],
+    "include": ["./src/**/*.ts", "./src/**/*.tsx"],
     "exclude": ["./../../node_modules/**/*", "./dist/**/*"],
     "files": ["../browser-wallet-api-helpers/src/extend-window.ts"]
 }
