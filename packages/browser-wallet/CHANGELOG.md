@@ -1,5 +1,11 @@
 # Changelog
 
+## 1.6.3
+
+### Fixed
+
+-   Use new wallet proxy endpoint `/v2/ip_info` which includes Company ID Providers, as these are now removed from the `/v1/ip_info`.
+
 ## 1.6.2
 
 ### Fixed

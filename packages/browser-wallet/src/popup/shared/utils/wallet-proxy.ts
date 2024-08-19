@@ -259,7 +259,12 @@ export async function getTransactions(
 }
 
 export async function getIdentityProviders(): Promise<IdentityProvider[]> {
-    const proxyPath = `/v1/ip_info`;
+    const currentNetwork = await storedCurrentNetwork.get();
+    if (currentNetwork === undefined) {
+        throw new Error('Tried to access wallet proxy without a loaded network.');
+    }
+    // Use the new endpoint for Testnet only, this logic can be simplified once Company ID as been released on mainnet.
+    const proxyPath = currentNetwork.name === 'Concordium Testnet' ? '/v2/ip_info' : '/v1/ip_info';
     const response = await (await getWalletProxy()).get(proxyPath);
     return response.data;
 }
