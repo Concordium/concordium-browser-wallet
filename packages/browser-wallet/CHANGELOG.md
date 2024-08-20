@@ -1,10 +1,16 @@
 # Changelog
 
+## 1.6.4
+
+### Fixed
+
+-   Prepare for Company ID providers on Mainnet by using wallet proxy endpoint `/v2/ip_info`.
+
 ## 1.6.3
 
 ### Fixed
 
--   Use new wallet proxy endpoint `/v2/ip_info` which includes Company ID Providers, as these are now removed from the `/v1/ip_info`.
+-   Use new wallet proxy endpoint `/v2/ip_info` on Testnet, which includes Company ID Providers, as these are now removed from the `/v1/ip_info`.
 
 ## 1.6.2
 
