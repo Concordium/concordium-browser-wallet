@@ -2186,7 +2186,7 @@ __metadata:
     "@babel/core": ^7.18.2
     "@concordium/browser-wallet-api-helpers": "workspace:^"
     "@concordium/common-sdk": ^9.5.3
-    "@concordium/web-sdk": ^7.5.1
+    "@concordium/web-sdk": ^8.0.1
     "@craftamap/esbuild-plugin-html": ^0.4.0
     "@mdx-js/react": ^1.6.22
     "@noble/ed25519": ^1.7.0
@@ -2319,7 +2319,7 @@ __metadata:
   languageName: node
   linkType: hard
 
-"@concordium/web-sdk@npm:^7.5.0, @concordium/web-sdk@npm:^7.5.1":
+"@concordium/web-sdk@npm:^7.5.0":
   version: 7.5.1
   resolution: "@concordium/web-sdk@npm:7.5.1"
   dependencies:
@@ -2345,7 +2345,33 @@ __metadata:
   languageName: node
   linkType: hard
 
-"@concordium/web-sdk@patch:@concordium/web-sdk@npm:^7.5.0#.yarn/patches/@concordium-web-sdk-npm-7.5.0-ed44307ebf.patch::locator=concordium-browser-wallet%40workspace%3A., @concordium/web-sdk@patch:@concordium/web-sdk@npm:^7.5.1#.yarn/patches/@concordium-web-sdk-npm-7.5.0-ed44307ebf.patch::locator=concordium-browser-wallet%40workspace%3A.":
+"@concordium/web-sdk@npm:^8.0.1":
+  version: 8.0.1
+  resolution: "@concordium/web-sdk@npm:8.0.1"
+  dependencies:
+    "@concordium/rust-bindings": ^3.2.1
+    "@grpc/grpc-js": ^1.9.4
+    "@noble/ed25519": ^2.0.0
+    "@noble/hashes": ^1.3.2
+    "@protobuf-ts/grpc-transport": ^2.9.1
+    "@protobuf-ts/grpcweb-transport": ^2.9.1
+    "@protobuf-ts/runtime-rpc": ^2.8.2
+    "@scure/bip39": ^1.2.1
+    "@types/big.js": ^6.2.0
+    big.js: ^6.2.0
+    bs58check: ^3.0.1
+    buffer: ^6.0.3
+    hash.js: ^1.1.7
+    iso-3166-1: ^2.1.1
+    json-bigint: ^1.0.0
+    uuid: ^8.3.2
+  peerDependencies:
+    "@protobuf-ts/runtime-rpc": ^2.8.2
+  checksum: c6d98c7e883556983274492a289d8a403bcaa540f90402918988926cd1a14b2c47274bb58b081f818e09d270da46e6b2b49c95ce09d9ff705a64c2b95351a3d4
+  languageName: node
+  linkType: hard
+
+"@concordium/web-sdk@patch:@concordium/web-sdk@npm:^7.5.0#.yarn/patches/@concordium-web-sdk-npm-7.5.0-ed44307ebf.patch::locator=concordium-browser-wallet%40workspace%3A.":
   version: 7.5.1
   resolution: "@concordium/web-sdk@patch:@concordium/web-sdk@npm%3A7.5.1#.yarn/patches/@concordium-web-sdk-npm-7.5.0-ed44307ebf.patch::version=7.5.1&hash=f177fc&locator=concordium-browser-wallet%40workspace%3A."
   dependencies:
