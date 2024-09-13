@@ -320,6 +320,21 @@ const t = {
                 enterNewStake: 'Enter new delegation stake',
             },
         },
+        cooldowns: {
+            inactiveStake: 'Inactive Stake',
+            cooldownInfo:
+                'You don’t receive rewards from this part of stake now, this amount will be at disposal after cooldown period.',
+            cooldownTime: 'Cooldown time:',
+            time: {
+                day_one: 'day',
+                day_other: 'days',
+                hour_one: 'hour',
+                hour_other: 'hours',
+                minute_one: 'minute',
+                minute_other: 'minutes',
+                valueRemain: ' {{value}} left',
+            },
+        },
     },
     transactionMessage: {
         configureBaker: {

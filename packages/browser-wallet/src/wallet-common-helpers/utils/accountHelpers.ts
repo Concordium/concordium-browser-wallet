@@ -1,5 +1,4 @@
 import type { AccountInfo, AccountInfoBaker, AccountInfoDelegator } from '@concordium/web-sdk';
-import { max } from './basicHelpers';
 
 export interface PublicAccountAmounts {
     total: bigint;
@@ -27,6 +26,6 @@ export function getPublicAccountAmounts(accountInfo?: AccountInfo): PublicAccoun
     const scheduled = accountInfo.accountReleaseSchedule
         ? BigInt(accountInfo.accountReleaseSchedule.total.microCcdAmount)
         : 0n;
-    const atDisposal = total - max(scheduled, staked);
+    const atDisposal = BigInt(accountInfo.accountAvailableBalance.microCcdAmount);
     return { total, staked, scheduled, atDisposal };
 }

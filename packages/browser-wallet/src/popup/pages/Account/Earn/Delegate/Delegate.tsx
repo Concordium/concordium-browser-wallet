@@ -27,6 +27,7 @@ import PendingIcon from '@assets/svg/logo-pending.svg';
 import CheckmarkIcon from '@assets/svg/logo-checkmark.svg';
 import { BrowserWalletAccountTransaction, TransactionStatus } from '@popup/shared/utils/transaction-history-types';
 import ButtonGroup from '@popup/shared/ButtonGroup';
+import { msToTimeRemain } from '@shared/utils/time-helpers';
 import RegisterDelegation from './RegisterDelegation';
 import UpdateDelegation from './UpdateDelegation';
 import RemoveDelegation from './RemoveDelegation';
@@ -99,6 +100,38 @@ function DisplayPendingChange({ pendingChange }: DisplayPendingChangeProps) {
     return null;
 }
 
+function DisplayCooldowns({ accountInfo }: DelegationDetailsProps) {
+    const { t } = useTranslation('account', { keyPrefix: 'delegate.cooldowns' });
+    return (
+        <div className="earn-details__coldowns">
+            {accountInfo.accountCooldowns.map((accountCooldown) => {
+                const { time, unit } = msToTimeRemain(accountCooldown.timestamp.value);
+
+                // i18n unable to type check dynamic strings
+                // eslint-disable-next-line @typescript-eslint/ban-ts-comment
+                // @ts-ignore
+                const timeLocale = t('time.valueRemain', { value: t(`time.${unit}`, { count: Number(time) }) });
+
+                return (
+                    <div
+                        key={accountCooldown.timestamp.value.toString()}
+                        className="coldown-card flex-column align-center justify-center"
+                    >
+                        <div className="coldown-card__header">{t('inactiveStake')}</div>
+                        <div className="coldown-card__info-text">{t('cooldownInfo')}</div>
+                        <div className="earn-details__value">{displayAsCcd(accountCooldown.amount.microCcdAmount)}</div>
+                        <div className="coldown-card__time flex">
+                            <span className="coldown-card__info-text">{t('cooldownTime')}</span>
+                            <span className="coldown-card__value">{time.toString()}</span>
+                            <span className="coldown-card__info-text">{timeLocale}</span>
+                        </div>
+                    </div>
+                );
+            })}
+        </div>
+    );
+}
+
 type DelegationDetailsProps = {
     accountInfo: AccountInfoDelegator;
 };
@@ -134,6 +167,7 @@ function DelegationDetails({ accountInfo }: DelegationDetailsProps) {
                 </div>
                 <DisplayPendingChange pendingChange={accountInfo.accountDelegation.pendingChange} />
             </div>
+            <DisplayCooldowns accountInfo={accountInfo} />
             <div className="m-10 m-b-0 text-center">
                 <ButtonGroup>
                     {accountInfo.accountDelegation.pendingChange !== undefined ? (

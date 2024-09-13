@@ -217,6 +217,21 @@ const t: typeof en = {
                 enterNewStake: 'Indtast ny delegation saldo',
             },
         },
+        cooldowns: {
+            inactiveStake: 'Inaktiv indsats',
+            cooldownInfo:
+                'Du modtager ikke belønninger fra denne del af indsatsen nu, dette beløb vil være til rådighed efter nedkølingsperioden.',
+            cooldownTime: 'Nedkølingstid:',
+            time: {
+                day_one: 'dag',
+                day_other: 'dage',
+                hour_one: 'time',
+                hour_other: 'timer',
+                minute_one: 'minut',
+                minute_other: 'minutter',
+                valueRemain: ' {{value}} tilbage',
+            },
+        },
     },
     baking: {
         registerIntro: {
