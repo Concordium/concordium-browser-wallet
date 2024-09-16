@@ -1,5 +1,9 @@
 # Changelog
 
+## Unreleased
+
+-   Bumped version of @concordium/web-sdk (with new protocol7 update)
+
 ## 1.1.4
 
 -   Adjusted according to the simplified voting smart contract example, see https://github.com/Concordium/concordium-rust-smart-contracts/pull/441.

@@ -12,7 +12,7 @@
     flex-direction: column;
     width: 100%;
     justify-content: space-between;
-    height: 100%;
+    min-height: 100%;
 }
 
 .earn-page {
@@ -40,6 +40,7 @@
 
 .earn-details {
     &__card {
+        min-height: rem(200px);
         background-color: $color-status-box;
         border: rem(2px) solid $color-cta;
         border-radius: rem(10px);
@@ -47,6 +48,43 @@
         padding: rem(10px) rem(5px);
         flex-grow: 1;
         overflow-y: overlay;
+    }
+
+    &__coldowns {
+        .coldown-card {
+            background-color: $color-status-box;
+            border: rem(2px) solid $color-cta;
+            border-radius: rem(10px);
+            text-align: center;
+            margin-top: rem(5px);
+            padding: rem(10px);
+            flex-grow: 1;
+
+            &__header {
+                margin-bottom: rem(5px);
+                color: $color-off-white;
+            }
+
+            &__value {
+                color: $color-cta;
+            }
+
+            &__info-text {
+                color: $color-text-faded;
+                font-size: rem(8px);
+            }
+
+            &__time {
+                width: 100%;
+                margin-top: rem(10px);
+
+                .coldown-card__value {
+                    margin-left: auto;
+                    font-size: rem(8px);
+                    color: $color-off-white;
+                }
+            }
+        }
     }
 
     &__header {

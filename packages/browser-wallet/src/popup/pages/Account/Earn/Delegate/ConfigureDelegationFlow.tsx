@@ -65,12 +65,14 @@ function PoolPage({ onNext, initial, accountInfo }: PoolPageProps) {
             const bakerId = BigInt(value);
             const poolStatus = await client.getPoolInfo(bakerId);
 
-            if (poolStatus.poolInfo.openStatus !== OpenStatusText.OpenForAll) {
+            if (poolStatus.poolInfo?.openStatus !== OpenStatusText.OpenForAll) {
                 return t('pool.targetNotOpenForAll');
             }
 
             if (
                 accountInfo.type === AccountInfoType.Delegator &&
+                poolStatus.delegatedCapitalCap &&
+                poolStatus.delegatedCapital &&
                 poolStatus.delegatedCapitalCap.microCcdAmount - poolStatus.delegatedCapital.microCcdAmount <
                     accountInfo.accountDelegation.stakedAmount.microCcdAmount
             ) {
@@ -161,17 +163,26 @@ interface DisplayPoolStatusProps {
 }
 
 function DisplayPoolStatus({ status }: DisplayPoolStatusProps) {
+    const { t } = useTranslation('shared', { keyPrefix: 'transactionReceipt' });
     return (
         <div className="delegation__pool-status">
             <SidedRow
                 className="m-t-5"
                 left="Current pool:"
-                right={displayAsCcd(status.delegatedCapital.microCcdAmount).toString()}
+                right={
+                    status.delegatedCapital
+                        ? displayAsCcd(status.delegatedCapital.microCcdAmount).toString()
+                        : t('unknown')
+                }
             />
             <SidedRow
                 className="m-t-5"
                 left="Pool limit:"
-                right={displayAsCcd(status.delegatedCapitalCap.microCcdAmount).toString()}
+                right={
+                    status.delegatedCapitalCap
+                        ? displayAsCcd(status.delegatedCapitalCap.microCcdAmount).toString()
+                        : t('unknown')
+                }
             />
         </div>
     );

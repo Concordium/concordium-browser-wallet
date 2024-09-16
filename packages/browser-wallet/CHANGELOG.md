@@ -1,5 +1,14 @@
 # Changelog
 
+## Unreleased
+
+### Added
+
+-   Updated version of @concordium/web-sdk to ver.-8 (with new protocol7 update)
+-   Additional cooldown card with info about pending changes, if delegation was updated
+-   Updated properties checks in `poolStatus` according to new types
+-   Updated value for `accountAvailableBalance` is now received from web-sdk
+
 ## 1.6.4
 
 ### Fixed

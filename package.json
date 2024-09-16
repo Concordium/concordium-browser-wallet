@@ -66,6 +66,7 @@
     },
     "resolutions": {
         "@concordium/web-sdk@^7.5.0": "patch:@concordium/web-sdk@npm:^7.5.0#.yarn/patches/@concordium-web-sdk-npm-7.5.0-ed44307ebf.patch",
-        "@concordium/web-sdk@^7.5.1": "patch:@concordium/web-sdk@npm:^7.5.1#.yarn/patches/@concordium-web-sdk-npm-7.5.0-ed44307ebf.patch"
+        "@concordium/web-sdk@^7.5.1": "patch:@concordium/web-sdk@npm:^7.5.1#.yarn/patches/@concordium-web-sdk-npm-7.5.0-ed44307ebf.patch",
+        "@concordium/web-sdk@^8.1.0": "patch:@concordium/web-sdk@npm:^8.1.0#.yarn/patches/@concordium-web-sdk-npm-8.1.0-468ad0a8b1.patch"
     }
 }

@@ -137,9 +137,10 @@ export function validateDelegationAmount(
         return i18n.t('utils.ccdAmount.zero');
     }
 
-    const max = targetStatus
-        ? targetStatus.delegatedCapitalCap.microCcdAmount - targetStatus.delegatedCapital.microCcdAmount
-        : undefined;
+    const max =
+        targetStatus && targetStatus.delegatedCapitalCap && targetStatus.delegatedCapital
+            ? targetStatus.delegatedCapitalCap.microCcdAmount - targetStatus.delegatedCapital.microCcdAmount
+            : undefined;
     if (max !== undefined && amount > max) {
         return i18n.t('utils.ccdAmount.exceedingDelegationCap', { max: displayAsCcd(max) });
     }

@@ -1,5 +1,9 @@
 # Changelog
 
+## Unreleased
+
+-   Bumped version of @concordium/web-sdk (with new protocol7 update)
+
 ## 4.1.3
 
 -   Added new button `Add Token to wallet` that calls addCIS2Tokens from browser-wallet-api-helpers
