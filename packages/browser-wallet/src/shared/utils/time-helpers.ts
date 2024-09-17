@@ -1,3 +1,5 @@
+import { MILLISECONDS_PER_DAY, MILLISECONDS_PER_HOUR, MILLISECONDS_PER_MINUTE } from '@popup/constants/time';
+
 export function secondsToDaysRoundedDown(seconds: bigint | undefined): bigint {
     return seconds ? seconds / (60n * 60n * 24n) : 0n;
 }
@@ -6,12 +8,10 @@ type TimeAndUnit = { time: bigint; unit: string };
 
 function msToTime(ms: bigint | undefined): TimeAndUnit {
     if (!ms) return { time: 0n, unit: 'minute' };
-    const minutes = ms / (1000n * 60n);
-    const hours = ms / (1000n * 60n * 60n);
-    const days = ms / (1000n * 60n * 60n * 24n);
-    if (minutes < 60n) return { time: minutes, unit: 'minute' };
-    if (hours < 24n) return { time: hours, unit: 'hour' };
-    return { time: days, unit: 'day' };
+
+    if (ms < MILLISECONDS_PER_HOUR) return { time: ms / MILLISECONDS_PER_MINUTE, unit: 'minute' };
+    if (ms < MILLISECONDS_PER_DAY) return { time: ms / MILLISECONDS_PER_HOUR, unit: 'hour' };
+    return { time: ms / MILLISECONDS_PER_DAY, unit: 'day' };
 }
 
 export function msToTimeRemain(ms: bigint | undefined): TimeAndUnit {
