@@ -9,6 +9,10 @@
 -   Updated properties checks in `poolStatus` according to new types
 -   Updated value for `accountAvailableBalance` is now received from web-sdk
 
+### Fixed
+
+-   Window height change on modal open
+
 ## 1.6.4
 
 ### Fixed
