@@ -2347,7 +2347,7 @@ __metadata:
 
 "@concordium/web-sdk@patch:@concordium/web-sdk@npm:^8.1.0#.yarn/patches/@concordium-web-sdk-npm-8.1.0-468ad0a8b1.patch::locator=concordium-browser-wallet%40workspace%3A.":
   version: 8.1.0
-  resolution: "@concordium/web-sdk@patch:@concordium/web-sdk@npm%3A8.1.0#.yarn/patches/@concordium-web-sdk-npm-8.1.0-468ad0a8b1.patch::version=8.1.0&hash=3c84b6&locator=concordium-browser-wallet%40workspace%3A."
+  resolution: "@concordium/web-sdk@patch:@concordium/web-sdk@npm%3A8.1.0#.yarn/patches/@concordium-web-sdk-npm-8.1.0-468ad0a8b1.patch::version=8.1.0&hash=9a8329&locator=concordium-browser-wallet%40workspace%3A."
   dependencies:
     "@concordium/rust-bindings": ^3.2.1
     "@grpc/grpc-js": ^1.9.4
@@ -2367,7 +2367,7 @@ __metadata:
     uuid: ^8.3.2
   peerDependencies:
     "@protobuf-ts/runtime-rpc": ^2.8.2
-  checksum: f3e2cf080c074c82809f0f69c46907da0a18178bc0604930913963ea73d37ce11e19b9f08ff0c5b77c64f7deb7f59a62afaf09d02e95953e8633d1f7e5790d13
+  checksum: 60037c820fc86d55b833664ad9ee426862a9238b6745dcbf234d6b969dc3cc8a8a8c7abdf4285c00aaedfc13a2f60b653f2a4516533445985dc463efdabd067b
   languageName: node
   linkType: hard
 
