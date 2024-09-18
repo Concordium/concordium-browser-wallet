@@ -1,5 +1,9 @@
 # Changelog
 
+## Unreleased
+
+-   Bumped version of @concordium/web-sdk (with new protocol7 update)
+
 ## 1.1.4
 
 -   Bumped version of @concordium/web-sdk and @concordium/react-components (fixes wallet connect serialization issue)

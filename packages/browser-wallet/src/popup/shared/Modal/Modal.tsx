@@ -21,6 +21,7 @@ const modalTransitionVariants: Variants = {
 };
 
 const htmlElement = document.getElementsByTagName('html')[0];
+const bodyElement = document.getElementsByTagName('body')[0];
 
 type WithOnClick = {
     onClick?: MouseEventHandler;
@@ -119,7 +120,19 @@ export default function Modal<T extends WithOnClick = WithOnClick>({
     useEffect(() => {
         if (isOpen) {
             htmlElement?.classList.add('modal-open');
-            return () => htmlElement?.classList.remove('modal-open');
+
+            // Prevent modal from stretching window height
+            if (htmlElement && bodyElement) {
+                htmlElement.style.height = bodyElement.style.height;
+            }
+
+            return () => {
+                htmlElement?.classList.remove('modal-open');
+                if (htmlElement) {
+                    // Reset to initial value
+                    htmlElement.style.height = '100%';
+                }
+            };
         }
         return noOp;
     }, [isOpen]);
