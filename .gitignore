@@ -97,4 +97,7 @@ fabric.properties
 examples/nft-minting/file-server/.log
 examples/nft-minting/file-server/data
 examples/nft-minting/file-server/collections.json
-
+/test-results/
+/playwright-report/
+/blob-report/
+/playwright/.cache/
