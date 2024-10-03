@@ -2,6 +2,8 @@ import React from 'react';
 import Note from '@assets/svgX/note.svg';
 import { useNavigate } from 'react-router-dom';
 import { relativeRoutes } from '@popup/popupX/constants/routes';
+import Page from '@popup/popupX/shared/Page';
+import Text from '@popup/popupX/shared/Text';
 
 const transaction_log = [
     {
@@ -72,44 +74,44 @@ export default function TransactionLog() {
     const nav = useNavigate();
     const navToTransactionDetails = () => nav(relativeRoutes.home.transactionLog.details.path);
     return (
-        <div className="transaction-log-container">
-            <div className="transaction-log__title">
-                <span className="heading_medium">Transaction log</span>
-            </div>
-            <div className="transaction-log__history">
-                {transaction_log.map((day, day_idx) => (
-                    <div key={day_idx} className="transaction-log__history_day">
-                        <div className="transaction-log__history_day-date">
-                            <span className="capture__additional_small">{day.date}</span>
-                            <span className="capture__additional_small">${day.total}</span>
-                        </div>
-                        {day.transactions.map((transaction, transaction_idx) => (
-                            <div
-                                key={`${day_idx}_${transaction_idx}`}
-                                className="transaction-log__history_transaction"
-                                onClick={() => navToTransactionDetails()}
-                            >
-                                <div className="transaction value">
-                                    <span className="label__main">{transaction.type}</span>
-                                    <span className={`label__main ${transaction.amount > 0 && 'income'}`}>
-                                        {transaction.amount} {transaction.currency}
-                                    </span>
-                                </div>
-                                <div className="transaction info">
-                                    <span className="capture__main_small">{transaction.time}</span>
-                                    <span className="capture__main_small">{transaction.info}</span>
-                                </div>
-                                {transaction.note && (
-                                    <div className="transaction note">
-                                        <Note />
-                                        <span className="capture__main_small">{transaction.note}</span>
-                                    </div>
-                                )}
+        <Page className="transaction-log">
+            <Page.Top heading="Transaction log" />
+            <Page.Main>
+                <div className="transaction-log__history">
+                    {transaction_log.map((day, day_idx) => (
+                        <div key={day_idx} className="transaction-log__history_day">
+                            <div className="transaction-log__history_day-date">
+                                <Text.CaptureAdditional>{day.date}</Text.CaptureAdditional>
+                                <Text.CaptureAdditional>${day.total}</Text.CaptureAdditional>
                             </div>
-                        ))}
-                    </div>
-                ))}
-            </div>
-        </div>
+                            {day.transactions.map((transaction, transaction_idx) => (
+                                <div
+                                    key={`${day_idx}_${transaction_idx}`}
+                                    className="transaction-log__history_transaction"
+                                    onClick={() => navToTransactionDetails()}
+                                >
+                                    <div className="transaction value">
+                                        <Text.Label>{transaction.type}</Text.Label>
+                                        <Text.Label className={transaction.amount > 0 ? 'income' : ''}>
+                                            {transaction.amount} {transaction.currency}
+                                        </Text.Label>
+                                    </div>
+                                    <div className="transaction info">
+                                        <Text.Capture>{transaction.time}</Text.Capture>
+                                        <Text.Capture>{transaction.info}</Text.Capture>
+                                    </div>
+                                    {transaction.note && (
+                                        <div className="transaction note">
+                                            <Note />
+                                            <Text.Capture>{transaction.note}</Text.Capture>
+                                        </div>
+                                    )}
+                                </div>
+                            ))}
+                        </div>
+                    ))}
+                </div>
+            </Page.Main>
+        </Page>
     );
 }

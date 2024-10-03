@@ -108,7 +108,7 @@ export default function Root() {
 
     return (
         <Provider>
-            <MemoryRouter initialEntries={['/home/transactionLog/details']}>
+            <MemoryRouter initialEntries={['/home/transactionLog']}>
                 <Network>
                     <Theme>
                         <AccountInfoListenerContext>
