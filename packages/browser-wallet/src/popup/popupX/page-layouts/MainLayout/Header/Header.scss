@@ -1,0 +1,254 @@
+.main-header {
+    .tablet & {
+        display: flex;
+        justify-content: space-between;
+        flex-direction: row;
+        align-items: center;
+    }
+
+    &.fade-bg {
+        background: rgba($color-black, 0.9);
+    }
+
+    .fade-menu-bg {
+        position: absolute;
+        top: 0;
+        margin: rem(80px) auto 0 auto;
+        width: 100%;
+        max-width: rem(1328px);
+        height: calc(100% - rem(80px));
+        z-index: 1;
+        backdrop-filter: blur(10px);
+        background: rgba($color-black, 0.9);
+    }
+
+    &__top {
+        display: flex;
+        justify-content: space-between;
+        gap: rem(4px);
+        padding: rem(4px);
+        align-items: center;
+    }
+
+    &__bottom {
+        display: flex;
+        justify-content: space-between;
+        padding: rem(20px) rem(24px);
+    }
+
+    &__fullscreen {
+        display: flex;
+        width: 100%;
+
+        &_button {
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            height: 100%;
+            width: 100%;
+            padding: rem(4px) rem(6px);
+            border: unset;
+            border-radius: 2px;
+            background: $gradient-header-button-bg;
+            cursor: pointer;
+
+            .tablet & {
+                padding: rem(12px);
+                border-radius: rem(12px);
+            }
+        }
+    }
+
+    &__connection {
+        display: flex;
+        align-items: center;
+        white-space: nowrap;
+        width: 100%;
+        height: rem(24px);
+        padding: rem(1px);
+        box-sizing: border-box;
+        position: relative;
+        border-radius: 2px;
+        background: $gradient-header-button-bg;
+
+        .tablet & {
+            background: unset;
+        }
+
+        &_info {
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            width: 100%;
+            height: 100%;
+            border-radius: 2px;
+            padding: 0 rem(6px) 0 rem(8px);
+            background-color: $color-black;
+
+            .tablet & {
+                background: unset;
+            }
+
+            & .connection_status {
+                display: flex;
+                align-items: center;
+
+                .capture__main_small {
+                    padding: 0 rem(10px) rem(2px) rem(6px);
+                }
+            }
+        }
+    }
+
+    &__menu {
+        margin-left: auto;
+
+        &.hidden {
+            visibility: hidden;
+        }
+
+        &_button {
+            display: flex;
+            padding: unset;
+            border: unset;
+            background: unset;
+            cursor: pointer;
+        }
+    }
+
+    &__menu-tiles {
+        padding: rem(24px);
+
+        .tablet & {
+            margin-top: rem(72px);
+            height: calc(100% - rem(72px));
+        }
+
+        &_container {
+            display: flex;
+            flex-direction: row;
+            flex-wrap: wrap;
+            justify-content: flex-start;
+            width: rem(324px);
+            margin: 0 auto;
+
+            .tablet & {
+                margin: 0 0 0 auto;
+            }
+
+            .icon-button {
+                flex-direction: column;
+                margin: rem(1px);
+                width: rem(106px);
+                height: rem(106px);
+
+                &.wide {
+                    width: rem(160px);
+                }
+            }
+        }
+    }
+
+    &__account-selector {
+        &_group {
+            display: flex;
+            flex-direction: column;
+            margin: rem(16px) rem(8px);
+            padding: rem(16px);
+            border-radius: rem(12px);
+            border: 1px solid $color-grey-3;
+            background: $color-grey-1;
+        }
+
+        &_search-form {
+            display: flex;
+
+            .account-search__form {
+                width: 100%;
+            }
+
+            .icon-button {
+                height: rem(32px);
+                min-width: rem(90px);
+                padding: rem(8px) rem(12px);
+                margin-left: rem(8px);
+                border-radius: rem(12px);
+
+                .capture__additional_small {
+                    color: $color-white;
+                    margin-left: auto;
+                }
+            }
+        }
+
+        &_list {
+            display: flex;
+            flex-direction: column;
+
+            &-item {
+                display: flex;
+                padding: rem(12px) 0;
+                align-items: center;
+                border-bottom: 1px solid $color-grey-3;
+
+                &:last-child {
+                    border-bottom: none;
+                }
+
+                .text__additional_small {
+                    color: $color-white;
+                }
+
+                &.active {
+                    .account {
+                        .text__additional_small {
+                            color: $color-mineral-1;
+                        }
+
+                        svg {
+                            display: unset;
+                        }
+                    }
+                }
+
+                .account {
+                    display: flex;
+                    align-items: center;
+
+                    svg {
+                        display: none;
+                        margin-right: rem(4px);
+                    }
+                }
+
+                .balance {
+                    margin-left: auto;
+                    min-width: rem(65px);
+                }
+
+                .tokens {
+                    display: flex;
+                    gap: rem(1px);
+                    width: unset;
+                    min-width: rem(100px);
+                    justify-content: flex-end;
+                    margin-left: rem(16px);
+
+                    .token-icon {
+                        display: flex;
+                        align-items: center;
+                        justify-content: center;
+                        width: rem(24px);
+                        height: rem(24px);
+                        border-radius: rem(5px);
+                        background-color: $color-main-bg;
+                    }
+                }
+            }
+        }
+    }
+
+    &.scroll-border {
+        border-bottom: 1px solid $color-grey-3;
+    }
+}

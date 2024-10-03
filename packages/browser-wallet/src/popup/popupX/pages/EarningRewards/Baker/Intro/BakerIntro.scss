@@ -1,0 +1,18 @@
+.baker-intro-container {
+    display: flex;
+    flex-direction: column;
+    height: 100%;
+    padding-bottom: rem(48px);
+
+    .capture__main_small {
+        display: flex;
+        flex-direction: column;
+        gap: rem(16px);
+    }
+
+    .baker-intro {
+        &__title {
+            margin-bottom: rem(12px);
+        }
+    }
+}

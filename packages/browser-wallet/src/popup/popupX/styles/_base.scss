@@ -1,0 +1,17 @@
+.bg {
+    opacity: unset;
+    filter: unset;
+    background: linear-gradient(rgb(0 0 0 / 70%) 0%, rgb(0 0 0 / 70%) 100%),
+        radial-gradient(circle at 20% 10%, rgb(203 231 232 / 25%) 0%, transparent 30%),
+        radial-gradient(circle at 80% 90%, rgb(203 231 232 / 25%) 0%, transparent 30%),
+        linear-gradient(90deg, #576a6f 0%, #101414 100%);
+
+    &.welcome-page {
+        background-image: url('../assets/images/img2.png');
+        background-size: contain;
+    }
+
+    &.fade-bg {
+        background: rgba($color-black, 0.9);
+    }
+}

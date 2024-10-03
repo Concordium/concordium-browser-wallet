@@ -1,0 +1,89 @@
+.welcome {
+    .page__top {
+        margin-top: rem(28px);
+        margin-bottom: rem(56px);
+    }
+
+    &__description {
+        display: flex;
+        margin-bottom: rem(24px);
+
+        &_icon {
+            margin-right: rem(2px);
+        }
+
+        &_text {
+            display: flex;
+            flex-direction: column;
+            margin-left: rem(16px);
+        }
+    }
+
+    &__footer {
+        margin: rem(16px) auto 0 auto;
+    }
+}
+
+.request-identity {
+    &__provider {
+        margin-top: rem(28px);
+
+        &_option {
+            display: flex;
+            align-items: center;
+            padding: rem(16px);
+            margin-bottom: rem(8px);
+            border-radius: rem(12px);
+            background-color: rgba($color-grey-3, 0.3);
+
+            .provider {
+                &__name {
+                    margin-left: rem(16px);
+                }
+
+                &__icon {
+                    display: flex;
+
+                    svg {
+                        border-radius: rem(5px);
+                    }
+                }
+            }
+        }
+    }
+}
+
+.id-submitted {
+    .id-card-x {
+        margin-top: rem(24px);
+    }
+}
+
+.onboarding-container {
+    display: flex;
+    flex-direction: column;
+    height: 100%;
+    padding-bottom: rem(32px);
+    white-space: break-spaces;
+
+    .setup_password {
+        &__title {
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            text-align: center;
+
+            .heading_medium {
+                margin-top: rem(36px);
+                margin-bottom: rem(24px);
+            }
+        }
+
+        &__form {
+            display: flex;
+            flex-direction: column;
+            height: 100%;
+            margin-top: rem(64px);
+        }
+    }
+}

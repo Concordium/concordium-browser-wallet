@@ -7,6 +7,9 @@ type RouteChildren = {
 };
 
 export const relativeRoutes = {
+    onboarding: {
+        path: '/onboarding',
+    },
     home: {
         path: '/',
         account: {

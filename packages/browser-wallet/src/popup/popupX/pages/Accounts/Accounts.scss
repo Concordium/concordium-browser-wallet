@@ -1,0 +1,57 @@
+.accounts-container {
+    margin-bottom: rem(16px);
+
+    .accounts {
+        &__title {
+            display: flex;
+            margin-bottom: rem(18px);
+
+            .heading_medium {
+                margin-right: auto;
+            }
+
+            .icon-button {
+                margin-left: rem(2px);
+
+                svg path {
+                    fill: $color-white;
+                }
+            }
+        }
+
+        &__card {
+            background-color: $color-transaction-bg;
+            border-radius: rem(12px);
+            margin-bottom: rem(8px);
+            padding: rem(2px) rem(16px) rem(8px) rem(16px);
+
+            &_row {
+                display: flex;
+                align-items: center;
+                padding: rem(12px) 0;
+                border-bottom: 1px solid rgba($color-white, 0.1);
+
+                &:last-child {
+                    border-bottom: none;
+                }
+
+                &.title {
+                    padding-bottom: rem(16px);
+                }
+
+                .text__main_medium,
+                .text__main {
+                    color: $color-white;
+                }
+
+                & span:first-child {
+                    margin-right: auto;
+                }
+
+                svg {
+                    margin-left: rem(16px);
+                }
+            }
+        }
+    }
+}

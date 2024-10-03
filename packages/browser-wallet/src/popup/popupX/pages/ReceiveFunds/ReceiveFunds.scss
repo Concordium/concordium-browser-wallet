@@ -1,0 +1,23 @@
+.receive-funds {
+    .page__main {
+        height: 100%;
+
+        .card-x {
+            height: 100%;
+            padding: rem(40px) rem(64px);
+        }
+    }
+
+    .text__main {
+        word-wrap: break-word;
+        margin-top: rem(40px);
+        margin-bottom: rem(16px);
+        color: $color-grey-1;
+    }
+
+    .qr-card {
+        height: rem(200px);
+        width: rem(200px);
+        background-color: transparent;
+    }
+}

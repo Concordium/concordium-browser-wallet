@@ -28,6 +28,10 @@ import verifiableCredentialBackup from '@popup/pages/VerifiableCredentialBackup/
 import ageProofRequest from '@popup/pages/AgeProofRequest/i18n/en';
 import viewSeedPhrase from '@popup/pages/ViewSeedPhrase/i18n/en';
 
+// Wallet-X locales
+import onboarding from '@popup/popupX/pages/Onboarding/i18n/en';
+import receiveFunds from '@popup/popupX/pages/ReceiveFunds/i18n/en';
+
 const t = {
     shared,
     mainLayout,
@@ -58,6 +62,7 @@ const t = {
     verifiableCredentialBackup,
     ageProofRequest,
     viewSeedPhrase,
+    x: { onboarding, receiveFunds },
 };
 
 export default t;

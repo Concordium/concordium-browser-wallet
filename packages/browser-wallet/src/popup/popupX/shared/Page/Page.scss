@@ -1,0 +1,26 @@
+.page-container {
+    display: flex;
+    flex-direction: column;
+    height: 100%;
+    padding-bottom: rem(32px);
+    white-space: break-spaces;
+
+    .page {
+        &__top {
+            display: flex;
+            flex-direction: row;
+            align-items: baseline;
+            margin-bottom: rem(12px);
+
+            &_side {
+                margin-left: auto;
+            }
+        }
+
+        &__footer {
+            display: flex;
+            flex-direction: column;
+            margin-top: auto;
+        }
+    }
+}

@@ -6,7 +6,12 @@ import { noOp } from 'wallet-common-helpers';
 
 import { Dimensions, large, medium, small } from '@popup/constants/dimensions';
 import { popupMessageHandler } from '@popup/shared/message-handler';
-import { isFullscreenWindow, isSpawnedWeb3IdProofWindow, isSpawnedWindow } from '@popup/shared/window-helpers';
+import {
+    isFullscreenWindow,
+    isFullscreenWindowDemo,
+    isSpawnedWeb3IdProofWindow,
+    isSpawnedWindow,
+} from '@popup/shared/window-helpers';
 import { networkConfigurationAtom, themeAtom } from '@popup/store/settings';
 import { Theme as ThemeType } from '@shared/storage/types';
 import { absoluteRoutes } from '@popup/constants/routes';
@@ -17,13 +22,15 @@ import './i18n';
 
 import { mainnet } from '@shared/constants/networkConfiguration';
 import Routes from './Routes';
+import RoutesX from '../popupX/shell/Routes';
 
 const body = document.getElementsByTagName('body').item(0);
 const html = document.getElementsByTagName('html').item(0);
+body?.classList.add('popup-x');
 
 function useScaling() {
     useEffect(() => {
-        const h = Math.min(window.screen.width, window.screen.height); // Seems to get dimensions for primary display only for the non-spawned popup.
+        const h = 1500; // Seems to get dimensions for primary display only for the non-spawned popup.
 
         let dimensions: Dimensions | undefined;
 
@@ -56,7 +63,16 @@ function useScaling() {
             // Send a message to the BG script to resize the window.
             popupMessageHandler.sendInternalMessage(InternalMessageType.SetViewSize, dimensions).catch(noOp);
         }
-    }, []);
+
+        if (isFullscreenWindowDemo && body) {
+            console.log('isFullscreenWindowDemo');
+            body.style.margin = 'unset';
+            body.style.width = 'unset';
+            body.style.height = '100%';
+            html?.classList.add('tablet');
+            body.classList.add('popup-x');
+        }
+    }, [body?.classList.length]);
 }
 
 function Network({ children }: { children: ReactElement }) {
@@ -92,12 +108,13 @@ export default function Root() {
 
     return (
         <Provider>
-            <MemoryRouter initialEntries={[absoluteRoutes.home.account.path]}>
+            <MemoryRouter initialEntries={['/home/transactionLog/details']}>
                 <Network>
                     <Theme>
                         <AccountInfoListenerContext>
                             <BlockChainParametersContext>
                                 <Routes />
+                                <RoutesX />
                             </BlockChainParametersContext>
                         </AccountInfoListenerContext>
                     </Theme>

@@ -1,0 +1,48 @@
+.connect-network-container {
+    display: flex;
+    flex-direction: column;
+    height: 100%;
+    padding-bottom: rem(32px);
+
+    .connect-network {
+        &__name {
+            display: flex;
+            flex-direction: column;
+            margin-top: rem(36px);
+
+            .text__main_medium {
+                display: flex;
+                align-items: center;
+                color: $color-white;
+                margin-top: rem(8px);
+
+                svg {
+                    margin-left: rem(8px);
+                }
+            }
+        }
+    }
+
+    .setup_network__form {
+        display: flex;
+        flex-direction: column;
+        height: 100%;
+
+        .form-input {
+            margin-top: rem(36px);
+        }
+
+        .label__main {
+            display: flex;
+            margin-top: rem(12px);
+
+            svg {
+                margin-right: rem(8px);
+            }
+        }
+
+        .button-main {
+            margin-top: auto;
+        }
+    }
+}

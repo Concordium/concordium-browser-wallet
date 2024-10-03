@@ -1,0 +1,37 @@
+.id-card-x {
+    .text__main {
+        margin-left: rem(16px);
+        color: $color-grey-1;
+    }
+
+    .capture__main_small {
+        margin-left: rem(16px);
+        color: $color-mineral-0;
+    }
+
+    .text__main_regular {
+        color: $color-mineral-2;
+    }
+
+    .text__main_medium {
+        color: $color-white;
+    }
+
+    &.card-x {
+        &.gradient {
+            padding: rem(16px) rem(4px) rem(4px) rem(4px);
+        }
+    }
+
+    .card-x {
+        &.grey {
+            margin-top: rem(18px);
+            border-radius: rem(12px);
+            background: $color-grey-1;
+
+            .row {
+                justify-content: space-between;
+            }
+        }
+    }
+}

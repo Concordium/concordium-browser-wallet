@@ -1,0 +1,116 @@
+@import url('https://fonts.cdnfonts.com/css/satoshi');
+
+$t-font-family-satoshi: 'Satoshi', sans-serif;
+$t-font-weight-light: 300;
+$t-font-weight-regular: 400;
+$t-font-weight-medium: 500;
+$t-font-weight-semi-bold: 600;
+$t-font-weight-bold: 700;
+
+.heading {
+    &_large {
+        font-family: $t-font-family-satoshi;
+        font-weight: $t-font-weight-medium;
+        font-size: 40px;
+        line-height: 48px;
+    }
+
+    &_big {
+        font-family: $t-font-family-satoshi;
+        font-weight: $t-font-weight-medium;
+        font-size: 32px;
+        line-height: 32px;
+        color: $color-grey-1;
+    }
+
+    &_medium {
+        font-family: $t-font-family-satoshi;
+        font-weight: $t-font-weight-medium;
+        font-size: 24px;
+        line-height: 32px;
+        color: $color-white;
+    }
+}
+
+.text {
+    &__main {
+        font-family: $t-font-family-satoshi;
+        font-weight: $t-font-weight-bold;
+        font-size: 16px;
+        line-height: 24px;
+        color: $color-white;
+
+        &_small {
+            font-family: $t-font-family-satoshi;
+            font-weight: $t-font-weight-medium;
+            font-size: 12px;
+            line-height: 14px;
+            color: $color-white;
+        }
+
+        &_regular {
+            font-family: $t-font-family-satoshi;
+            font-weight: $t-font-weight-regular;
+            font-size: 14px;
+            line-height: 16px;
+            color: $color-mineral-2;
+        }
+
+        &_medium {
+            font-family: $t-font-family-satoshi;
+            font-weight: $t-font-weight-medium;
+            font-size: 14px;
+            line-height: 16px;
+            color: $color-mineral-3;
+        }
+    }
+
+    &__additional {
+        &_small {
+            font-family: $t-font-family-satoshi;
+            font-weight: $t-font-weight-medium;
+            font-size: 12px;
+            line-height: 16px;
+            color: $color-black;
+        }
+    }
+}
+
+.capture {
+    &__main {
+        &_small {
+            font-family: $t-font-family-satoshi;
+            font-weight: $t-font-weight-regular;
+            font-size: 12px;
+            line-height: 16px;
+            color: $color-mineral-2;
+        }
+    }
+
+    &__additional {
+        &_small {
+            font-family: $t-font-family-satoshi;
+            font-weight: $t-font-weight-medium;
+            font-size: 12px;
+            line-height: 16px;
+            color: $color-mineral-2;
+        }
+    }
+}
+
+.label {
+    &__main {
+        font-family: $t-font-family-satoshi;
+        font-weight: $t-font-weight-medium;
+        font-size: 15px;
+        line-height: 16px;
+    }
+
+    &__regular {
+        font-family: $t-font-family-satoshi;
+        font-weight: $t-font-weight-regular;
+        font-size: 15px;
+        line-height: 16px;
+        color: $color-mineral-3;
+    }
+}

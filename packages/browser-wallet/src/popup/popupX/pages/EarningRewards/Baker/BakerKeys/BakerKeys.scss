@@ -1,0 +1,47 @@
+.baker-keys-container {
+    .capture__main_small {
+        color: $color-white;
+        word-wrap: break-word;
+    }
+
+    .baker-keys {
+        &__title {
+            display: flex;
+            justify-content: space-between;
+            align-items: flex-end;
+            margin-bottom: rem(12px);
+        }
+
+        &__card {
+            display: flex;
+            flex-direction: column;
+            border-radius: rem(12px);
+            padding: rem(16px);
+            margin-top: rem(16px);
+            background-color: rgba($color-grey-3, 0.3);
+
+            &_row:not(:last-child) {
+                padding-bottom: rem(8px);
+                margin-bottom: rem(8px);
+                border-bottom: 1px solid $color-grey-3;
+            }
+
+            &_row {
+                display: flex;
+                flex-direction: column;
+
+                .capture__main_small:first-child {
+                    color: rgba($color-mineral-3, 0.5);
+                    margin-bottom: rem(6px);
+                }
+            }
+        }
+
+        &__export {
+            display: flex;
+            align-items: center;
+            gap: rem(8px);
+            margin-top: rem(16px);
+        }
+    }
+}

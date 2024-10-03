@@ -1,0 +1,59 @@
+.id-cards-container {
+    .id-cards {
+        &__title {
+            display: flex;
+            justify-content: space-between;
+        }
+
+        &__identity-card {
+            border-radius: rem(16px);
+            background: $gradient-card-bg;
+            padding: rem(16px) rem(4px) rem(4px) rem(4px);
+            margin: rem(16px) 0;
+
+            &_heading {
+                display: flex;
+                justify-content: space-between;
+                padding: 0 rem(12px) 0 rem(16px);
+            }
+
+            .capture__additional_small.verifier {
+                padding-left: rem(16px);
+                color: $color-mineral-0;
+            }
+
+            &_document,
+            &_accounts {
+                margin-top: rem(16px);
+                padding: rem(4px) rem(16px);
+                background-color: $color-grey-1;
+                border-radius: rem(12px) rem(12px) rem(4px) rem(4px);
+
+                .details-data-line {
+                    display: flex;
+                    justify-content: space-between;
+                    padding: rem(12px) 0;
+                    border-bottom: 1px solid rgba($color-white, 0.1);
+
+                    &:last-child {
+                        border-bottom: none;
+                    }
+
+                    .text__main_medium {
+                        color: $color-white;
+                    }
+                }
+            }
+
+            &_accounts {
+                margin-top: rem(1px);
+                background-color: $color-grey-1;
+                border-radius: rem(4px) rem(4px) rem(12px) rem(12px);
+
+                .text__main_regular {
+                    color: $color-white;
+                }
+            }
+        }
+    }
+}

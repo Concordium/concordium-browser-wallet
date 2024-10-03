@@ -1,0 +1,56 @@
+.transaction-log-container {
+    padding-bottom: rem(12px);
+
+    .transaction-log {
+        &__title {
+            margin-bottom: rem(-4px);
+        }
+
+        &__history {
+            &_day {
+                margin-top: rem(20px);
+
+                &-date {
+                    display: flex;
+                    justify-content: space-between;
+                    margin-bottom: rem(8px);
+                }
+            }
+
+            &_transaction {
+                padding: rem(12px) rem(14px) rem(10px) rem(14px);
+                border-radius: rem(12px);
+                background: $color-transaction-bg;
+                margin-bottom: rem(4px);
+
+                .transaction {
+                    &.value,
+                    &.info {
+                        display: flex;
+                        justify-content: space-between;
+                    }
+
+                    &.value .income {
+                        color: $color-green-success;
+                    }
+
+                    &.info {
+                        margin-top: rem(7px);
+                        margin-bottom: rem(3px);
+                    }
+
+                    &.note {
+                        display: flex;
+                        border-top: 1px solid rgba($color-white, 0.1);
+                        margin-top: rem(13px);
+                        padding-top: rem(8px);
+
+                        .capture__main_small {
+                            margin-left: rem(6px);
+                        }
+                    }
+                }
+            }
+        }
+    }
+}

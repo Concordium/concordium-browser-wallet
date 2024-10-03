@@ -1,0 +1,35 @@
+.connected-sites-container {
+    .connected-sites {
+        &__title {
+            display: flex;
+            justify-content: space-between;
+            align-items: baseline;
+            margin-bottom: rem(18px);
+        }
+
+        &__card {
+            background-color: $color-transaction-bg;
+            border-radius: rem(12px);
+            padding: rem(12px) rem(16px);
+
+            &_row {
+                display: flex;
+                justify-content: space-between;
+                align-items: center;
+                padding: rem(8px) 0;
+                border-bottom: 1px solid rgba($color-white, 0.1);
+
+                &:last-child {
+                    border-bottom: none;
+                }
+
+                .capture__additional_small {
+                    color: $color-white;
+                    background-color: $color-main-bg;
+                    padding: rem(4px);
+                    border-radius: rem(4px);
+                }
+            }
+        }
+    }
+}

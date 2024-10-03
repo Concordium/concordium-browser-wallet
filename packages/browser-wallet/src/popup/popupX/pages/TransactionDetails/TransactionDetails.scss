@@ -1,0 +1,87 @@
+.transaction-details-container {
+    .transaction-details {
+        &__title {
+            display: flex;
+            color: $color-white;
+
+            .heading_medium {
+                margin-right: auto;
+            }
+
+            .icon-button {
+                margin-left: rem(2px);
+            }
+        }
+
+        &__card {
+            background-color: $color-transaction-bg;
+            border-radius: rem(12px);
+            margin: rem(16px) 0 rem(24px) 0;
+            padding: rem(4px) rem(14px) rem(13px) rem(14px);
+            word-wrap: break-word;
+
+            &_row {
+                display: flex;
+                flex-direction: column;
+                padding: rem(8px) 0;
+                border-bottom: 1px solid rgba($color-white, 0.1);
+
+                &:last-child {
+                    border-bottom: unset;
+                }
+
+                &.capture__main_small {
+                    color: $color-white;
+
+                    .title {
+                        color: $color-mineral-3;
+                        margin-bottom: rem(6px);
+                    }
+
+                    .secondary-info {
+                        display: flex;
+                        flex-direction: column;
+                        margin-top: rem(2px);
+
+                        .title-secondary {
+                            color: $color-mineral-0;
+                        }
+                    }
+                }
+
+                .top-info {
+                    display: flex;
+                    justify-content: space-between;
+
+                    &:first-child {
+                        margin-bottom: rem(7px);
+                    }
+
+                    .label__main.income {
+                        color: $color-green-success;
+                    }
+                }
+            }
+        }
+    }
+
+    .card-x .row {
+        display: flex;
+        flex-direction: column;
+
+        .transaction-details__card_row {
+            .top-info {
+                display: flex;
+                justify-content: space-between;
+
+                &:first-child {
+                    margin-bottom: rem(7px);
+                }
+
+                .label__main.income {
+                    color: $color-green-success;
+                }
+            }
+        }
+    }
+}

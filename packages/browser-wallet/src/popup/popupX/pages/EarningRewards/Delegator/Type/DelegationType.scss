@@ -1,0 +1,17 @@
+.delegation-type-container {
+    display: flex;
+    flex-direction: column;
+    height: 100%;
+    padding-bottom: rem(32px);
+
+    .delegation-type {
+        &__title {
+            margin-bottom: rem(12px);
+        }
+
+        &__select-form {
+            margin-top: rem(16px);
+            margin-bottom: rem(16px);
+        }
+    }
+}
