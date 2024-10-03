@@ -13,7 +13,9 @@
             margin-bottom: rem(12px);
 
             &_side {
+                display: flex;
                 margin-left: auto;
+                gap: rem(2px);
             }
         }
 

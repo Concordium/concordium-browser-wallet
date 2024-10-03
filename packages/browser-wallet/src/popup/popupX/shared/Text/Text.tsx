@@ -1,4 +1,5 @@
 import React, { ReactNode } from 'react';
+import clsx from 'clsx';
 
 function TextRoot({ children }: { children: ReactNode }) {
     return children;
@@ -19,12 +20,12 @@ function TextMainMedium({ children }: { children: ReactNode }) {
     return <span className="text__main_medium">{children}</span>;
 }
 
-function TextCaptureMainSmall({ children }: { children: ReactNode }) {
-    return <span className="capture__main_small">{children}</span>;
+function TextCaptureMainSmall({ className, children }: { className?: string; children: ReactNode }) {
+    return <span className={clsx('capture__main_small', className)}>{children}</span>;
 }
 
-function TextLabelMain({ children }: { children: ReactNode }) {
-    return <span className="label__main">{children}</span>;
+function TextLabelMain({ className, children }: { className?: string; children: ReactNode }) {
+    return <span className={clsx('label__main', className)}>{children}</span>;
 }
 
 const Text = TextRoot as typeof TextRoot & {

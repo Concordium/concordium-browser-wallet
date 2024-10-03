@@ -40,9 +40,18 @@ function ButtonSecondary({ label, className, ...props }: { label: string } & But
     );
 }
 
+function ButtonIcon({ icon, className, ...props }: { icon: ReactNode } & ButtonProps) {
+    return (
+        <ButtonBase className={`button__icon ${className}`} {...props}>
+            {icon}
+        </ButtonBase>
+    );
+}
+
 const Button = {
     Main: ButtonMain,
     Secondary: ButtonSecondary,
+    Icon: ButtonIcon,
 };
 
 export default Button;

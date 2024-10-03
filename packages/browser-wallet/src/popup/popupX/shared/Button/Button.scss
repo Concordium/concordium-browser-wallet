@@ -28,4 +28,25 @@
         width: fit-content;
         background: $secondary-button-bg;
     }
+
+    &__icon {
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        padding: rem(8px);
+        border-radius: rem(4px);
+        border: unset;
+        background-color: $color-main-bg;
+        @include transition(background-color);
+
+        &:hover:not(:disabled) {
+            border-color: unset;
+            background-color: $color-main-bg-hover;
+        }
+
+        svg {
+            width: auto;
+            height: auto;
+        }
+    }
 }
