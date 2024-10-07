@@ -47,6 +47,7 @@ export interface BrowserWalletTransaction {
     id: number;
     events: string[];
     rejectReason?: string;
+    memo?: string;
 }
 
 export interface BrowserWalletAccountTransaction extends BrowserWalletTransaction {
