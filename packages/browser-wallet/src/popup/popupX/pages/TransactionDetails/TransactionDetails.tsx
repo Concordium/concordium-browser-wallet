@@ -1,4 +1,4 @@
-import React from 'react';
+import React, { useCallback } from 'react';
 import Copy from '@assets/svgX/copy.svg';
 import ArrowSquareOut from '@assets/svgX/arrow-square-out.svg';
 import Card from '@popup/popupX/shared/Card';
@@ -10,7 +10,7 @@ import { TransactionLogEntry } from '../TransactionLog/TransactionLog';
 
 /** State passed as part of the navigation */
 type LocationState = {
-    /** Hash of the transaction. */
+    /** Transaction information. */
     transaction: TransactionLogEntry
 }
 
@@ -19,11 +19,12 @@ type TransactionDetailsProps = {
 }
 
 function TransactionDetails({transaction}: TransactionDetailsProps) {
+    const copyTransactionHash = useCallback(() => navigator.clipboard.writeText(transaction.hash), []);
     return (
         <Page className="transaction-details-x">
             <Page.Top heading="Transaction details">
-                <Button.Icon icon={<Copy />} />
-                <Button.Icon icon={<ArrowSquareOut />} />
+                <Button.Icon icon={<Copy />} onClick={copyTransactionHash} />
+                {/*<Button.Icon icon={<ArrowSquareOut />} disabled />*/}
             </Page.Top>
             <Page.Main>
                 <Card>
