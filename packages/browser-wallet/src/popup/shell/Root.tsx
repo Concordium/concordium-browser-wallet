@@ -14,7 +14,6 @@ import {
 } from '@popup/shared/window-helpers';
 import { networkConfigurationAtom, themeAtom } from '@popup/store/settings';
 import { Theme as ThemeType } from '@shared/storage/types';
-import { absoluteRoutes } from '@popup/constants/routes';
 import BlockChainParametersContext from '@popup/shared/BlockChainParametersProvider';
 import AccountInfoListenerContext from '@popup/shared/AccountInfoListenerContext';
 
@@ -108,7 +107,7 @@ export default function Root() {
 
     return (
         <Provider>
-            <MemoryRouter initialEntries={['/home/transactionLog']}>
+            <MemoryRouter initialEntries={['/home/account/3G5srtaeRvy2uzyaiheY3ZZ6nqTkDg1kRm59xWVnFo8CoEiZ6Y/transactions']}>
                 <Network>
                     <Theme>
                         <AccountInfoListenerContext>

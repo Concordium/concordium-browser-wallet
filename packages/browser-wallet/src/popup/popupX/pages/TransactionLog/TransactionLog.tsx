@@ -1,6 +1,6 @@
 import React, { useEffect, useMemo, useState } from 'react';
 import Note from '@assets/svgX/note.svg';
-import { useNavigate } from 'react-router-dom';
+import { Navigate, useNavigate, useParams } from 'react-router-dom';
 import { relativeRoutes } from '@popup/popupX/constants/routes';
 import Page from '@popup/popupX/shared/Page';
 import Text from '@popup/popupX/shared/Text';
@@ -211,14 +211,19 @@ function convertToLogEntry(accountAddress: string, transactions: BrowserWalletTr
     for (const tx of transactions) {
         const dateTime = new Date(Number(tx.time * 1000n));
         const date = onlyDate(dateTime);
-        const transactionLog: LogEntry = {
-            key: tx.transactionHash,
+        const transactionLog: TransactionLogEntry = {
+            date,
+            hash: tx.transactionHash,
             type: mapTypeToText(tx.type),
             income: tx.fromAddress !== accountAddress,
             amount: hasAmount(tx.type) ? displayAsCcd(tx.amount) : undefined,
             time: onlyTime(dateTime),
             info: tx.cost === undefined ? '' : `with fee ${displayAsCcd(tx.cost)}`,
             note: tx.memo,
+            block: tx.blockHash,
+            events: tx.events ?? [],
+            fromAddress: tx.fromAddress,
+            toAddress: tx.toAddress
         };
         if (dayLog === undefined || dayLog.date !== date) {
             dayLog = {
@@ -234,28 +239,56 @@ function convertToLogEntry(accountAddress: string, transactions: BrowserWalletTr
     return dayLogs;
 }
 
-
-type LogEntry = {
-    key: string;
-    type: string; // 'Unstaked amount',
-    income: boolean;
-    amount?: string; //10.02,
+/** Transaction information. */
+export type TransactionLogEntry = {
+    /** Hash of the transaction. */
+    hash: string;
+    /** Hash of the block which included this transaction. */
+    block: string;
+    /** Localized date string. Date of the block including this transaction.  */
+    date: string;
+    /** Localized time string. Time of the block including this transaction. */
     time: string; // '11:24',
+    /** Readable transaction type. */
+    type: string; // 'Unstaked amount',
+    /** Whether this transaction should be considered as income. */
+    income: boolean;
+    /** The amount of CCD/tokens being transferred/rewarded, includes the token symbol. Is undefined for transactions which are not relevant. */
+    amount?: string; //10.02,
+    /** Fee information. */
     info: string; // 'with fee 0.02 CCD',
+    /** Transaction memo. */
     note?: string;
+    /** Summary of the events in the transaction. */
+    events: string[],
+    /** Account address which sent the transaction. */
+    fromAddress?: string,
+    /** Account address which received funds. */
+    toAddress?: string
 };
 
+/** Transactions group together for a given day. */
 type DayLogEntry = {
+    /** Localized date string. Date of the block.  */
     date: string; // '21 May 2024',
+    /** Total income for transactions added this day. */
     total: string; // '4029.87',
-    transactions: LogEntry[];
+    /** Transactions for this day. */
+    transactions: TransactionLogEntry[];
 };
 
+/** Parameters parsed from the path */
+type Params = {
+    /** Address of the account to display transactions for. */
+    account: string
+}
 
-export default function TransactionLog() {
+type TransactionLogProps = {account: string}
+
+function TransactionLog({account}: TransactionLogProps) {
     const nav = useNavigate();
-    const navToTransactionDetails = () => nav(relativeRoutes.home.transactionLog.details.path);
-    const account = '3G5srtaeRvy2uzyaiheY3ZZ6nqTkDg1kRm59xWVnFo8CoEiZ6Y';
+
+    const navToTransactionDetails = (transaction: TransactionLogEntry) => nav(relativeRoutes.home.transactionLog.details.path, {state: {transaction}});
     const transactionList = useAccountTransactionList(account);
     const transactionLogs = useMemo(() => convertToLogEntry(account, transactionList), [transactionList]);
 
@@ -272,9 +305,9 @@ export default function TransactionLog() {
                             </div>
                             {day.transactions.map((transaction) => (
                                 <div
-                                    key={`${day.date}_${transaction.time}`}
+                                    key={transaction.hash}
                                     className="transaction-log__history_transaction"
-                                    onClick={navToTransactionDetails}
+                                    onClick={() => navToTransactionDetails(transaction)}
                                 >
                                     <div className="transaction value">
                                         <Text.Label>{transaction.type}</Text.Label>
@@ -292,7 +325,7 @@ export default function TransactionLog() {
                                             <Text.Capture>{transaction.note}</Text.Capture>
                                         </div>
                                     )}
-                                </button>
+                                </div>
                             ))}
                         </div>
                     ))}
@@ -300,4 +333,14 @@ export default function TransactionLog() {
             </Page.Main>
         </Page>
     );
+}
+
+export default function Loader () {
+    const params = useParams<Params>();
+    if (params.account === undefined) {
+        // No account address in the path.
+        return <Navigate to="../" />;
+    } else {
+        return <TransactionLog account={params.account}/>;
+    }
 }
