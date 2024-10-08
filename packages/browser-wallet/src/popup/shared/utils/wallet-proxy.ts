@@ -107,7 +107,7 @@ function mapTransactionKindStringToTransactionType(
         case TransactionKindString.Malformed:
             return SpecialTransactionType.Malformed;
         default:
-            throw Error(`Unkown transaction kind was encounted: ${kind}`);
+            throw Error(`Unknown transaction kind was encounted: ${kind}`);
     }
 }
 
@@ -125,6 +125,7 @@ interface Details {
     transferDestination: string;
     events: string[];
     rejectReason: string;
+    memo?: string;
 }
 
 enum OriginType {
@@ -234,21 +235,29 @@ function mapTransaction(transaction: WalletProxyTransaction, accountAddress: str
         id: transaction.id,
         events: transaction.details.events,
         rejectReason: transaction.details.rejectReason,
+        memo: transaction.details.memo,
     };
 }
+
+export type GetTransactionsConfig = {
+    /** Transaction database ID to start fetching from. */
+    from?: number;
+    /** Cancel the request */
+    signal?: AbortSignal;
+};
 
 export async function getTransactions(
     accountAddress: string,
     resultLimit: number,
     order: 'ascending' | 'descending',
-    from?: number
+    config: GetTransactionsConfig = {}
 ): Promise<TransactionHistoryResult> {
     let proxyPath = `/v1/accTransactions/${accountAddress}?limit=${resultLimit}&order=${order.toString()}&includeRawRejectReason`;
-    if (from) {
-        proxyPath += `&from=${from}`;
+    if (config.from) {
+        proxyPath += `&from=${config.from}`;
     }
 
-    const response = await (await getWalletProxy()).get(proxyPath);
+    const response = await (await getWalletProxy()).get(proxyPath, { signal: config.signal });
     const result: WalletProxyAccTransactionsResult = response.data;
     const transactions = result.transactions.map((t) => mapTransaction(t, accountAddress));
 

@@ -45,8 +45,9 @@ export interface BrowserWalletTransaction {
     status: TransactionStatus;
     time: bigint;
     id: number;
-    events: string[];
+    events?: string[];
     rejectReason?: string;
+    memo?: string;
 }
 
 export interface BrowserWalletAccountTransaction extends BrowserWalletTransaction {
