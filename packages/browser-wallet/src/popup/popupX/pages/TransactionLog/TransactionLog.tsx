@@ -223,7 +223,7 @@ function convertToLogEntry(accountAddress: string, transactions: BrowserWalletTr
             block: tx.blockHash,
             events: tx.events ?? [],
             fromAddress: tx.fromAddress,
-            toAddress: tx.toAddress
+            toAddress: tx.toAddress,
         };
         if (dayLog === undefined || dayLog.date !== date) {
             dayLog = {
@@ -260,11 +260,11 @@ export type TransactionLogEntry = {
     /** Transaction memo. */
     note?: string;
     /** Summary of the events in the transaction. */
-    events: string[],
+    events: string[];
     /** Account address which sent the transaction. */
-    fromAddress?: string,
+    fromAddress?: string;
     /** Account address which received funds. */
-    toAddress?: string
+    toAddress?: string;
 };
 
 /** Transactions group together for a given day. */
@@ -280,15 +280,16 @@ type DayLogEntry = {
 /** Parameters parsed from the path */
 type Params = {
     /** Address of the account to display transactions for. */
-    account: string
-}
+    account: string;
+};
 
-type TransactionLogProps = {account: string}
+type TransactionLogProps = { account: string };
 
-function TransactionLog({account}: TransactionLogProps) {
+function TransactionLog({ account }: TransactionLogProps) {
     const nav = useNavigate();
 
-    const navToTransactionDetails = (transaction: TransactionLogEntry) => nav(relativeRoutes.home.transactionLog.details.path, {state: {transaction}});
+    const navToTransactionDetails = (transaction: TransactionLogEntry) =>
+        nav(relativeRoutes.home.transactionLog.details.path, { state: { transaction } });
     const transactionList = useAccountTransactionList(account);
     const transactionLogs = useMemo(() => convertToLogEntry(account, transactionList), [transactionList]);
 
@@ -335,12 +336,12 @@ function TransactionLog({account}: TransactionLogProps) {
     );
 }
 
-export default function Loader () {
+export default function Loader() {
     const params = useParams<Params>();
     if (params.account === undefined) {
         // No account address in the path.
         return <Navigate to="../" />;
     } else {
-        return <TransactionLog account={params.account}/>;
+        return <TransactionLog account={params.account} />;
     }
 }
