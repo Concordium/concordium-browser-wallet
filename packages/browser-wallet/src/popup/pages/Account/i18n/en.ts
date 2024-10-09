@@ -250,7 +250,7 @@ const t = {
             },
             '3': {
                 title: 'Updates with longer cool-downs',
-                body: 'If you decrease your stake, you will continue to earh rewards on it until the next pay day.\n\nHowever, the stake will not immediately be at disposal. Instead it is subject to a cool-down period during which it cannot be spent or transferred, and no longer earns rewards.\n\nOnce the cool-down period elapses, the removed stake can be spent.\n\nWhile yo uhave stake in cool-down, you can still make changes to your delegation or validator settings.\n\nIncreasing your setake will take preferentially from the stake in cool-down, rather than your balance at disposal.',
+                body: 'If you decrease your stake, you will continue to earn rewards on it until the next pay day.\n\nHowever, the stake will not immediately be at disposal. Instead it is subject to a cool-down period during which it cannot be spent or transferred, and no longer earns rewards.\n\nOnce the cool-down period elapses, the removed stake can be spent.\n\nWhile you have stake in cool-down, you can still make changes to your delegation or validator settings.\n\nIncreasing your stake will take preferentially from the stake in cool-down, rather than your balance at disposal.',
             },
         },
         removeIntro: {

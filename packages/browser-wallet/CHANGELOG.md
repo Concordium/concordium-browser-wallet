@@ -1,5 +1,11 @@
 # Changelog
 
+## Unreleased
+
+### Changed
+
+-   Updated screens mentioning stake cooldowns to reflect protocol version 7 cooldown changes
+
 ## 1.7.0
 
 ### Added
