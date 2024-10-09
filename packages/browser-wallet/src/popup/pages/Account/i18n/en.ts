@@ -126,7 +126,7 @@ const t = {
         updateIntro: {
             '2': {
                 title: 'Update validator stake',
-                body: 'When updating your validator stake you can choose to increase or decrease your stake. If you increase your stake, this is most often effective from the next pay day. If the transaction occurs too close to the next pay day, the update will be effective from the following pay day.\n\nIf you decrease your stake, there is a longer cool-down period.\n\nYou can also adjust whether you want rewards restaked or not. If the transaction occurs too close to the next pay day, the update will be effective from the following pay day.',
+                body: 'When updating your validator stake you can choose to increase or decrease your stake. If you increase your stake, this is most often effective from the next pay day. If the transaction occurs too close to the next pay day, the update will be effective from the following pay day.\n\nIf you decrease your stake, there is a cool-down period.\n\nYou can also adjust whether you want rewards restaked or not. If the transaction occurs too close to the next pay day, the update will be effective from the following pay day.',
             },
             '3': {
                 title: 'Update pool settings',
@@ -180,7 +180,7 @@ const t = {
                 overStakeThresholdWarning:
                     'You are about to lock more than {{ threshold }}% of your total balance in a validator stake.\n\nIf you don’t have enough unlocked CCD at your disposal, you might not be able to pay future transaction fees.',
                 decreaseWarning:
-                    'Reducing the validator stake will lock the total validator stake for a cool-down period. No changes can be made to the amount during this period, and the withdrawal will not take effect before the cool-down period is over.',
+                    'Reducing your stake is subject to a cool-down period, in which the stake cannot be spent or transferred.',
                 enterNewStake: 'Enter new validator stake',
             },
             openForDelegation: {
@@ -250,13 +250,13 @@ const t = {
             },
             '3': {
                 title: 'Updates with longer cool-downs',
-                body: 'If you decrease your stake, the change will take effect after a cool-down period.\n\nWhile in this cool-down period, the stake is locked and cannot be changed, and you will not be able to stop your delegation.\n\nWhile in the cool-down period you can update other delegation settings, but not the amount.\n\nIf you made any other changes to your delegation while also decreasing your delegation amount, the other changes will take effect from the next pay day as described on the previous page.',
+                body: 'If you decrease your stake, you will continue to earh rewards on it until the next pay day.\n\nHowever, the stake will not immediately be at disposal. Instead it is subject to a cool-down period during which it cannot be spent or transferred, and no longer earns rewards.\n\nOnce the cool-down period elapses, the removed stake can be spent.\n\nWhile yo uhave stake in cool-down, you can still make changes to your delegation or validator settings.\n\nIncreasing your setake will take preferentially from the stake in cool-down, rather than your balance at disposal.',
             },
         },
         removeIntro: {
             '1': {
                 title: 'Stop your delegation',
-                body: 'If you decide to stop your delegation, there is a longer cool-down period.\n\nAt the end of the cool-down period, the delegated amount is unlocked on your public balance, and the funds will be at disposal again.',
+                body: 'If you decide to stop your delegation there is a cool-down period.\n\nAt the end of the cool-down period, the delegated amount is unlocked on your public balance, and the funds will be at disposal again.',
             },
             '2': {
                 title: 'Update during the cool-down period',
@@ -264,7 +264,7 @@ const t = {
             },
         },
         remove: {
-            notice: 'Stopping delegation will take effect at the first pay day after a cool-down period of {{cooldownPeriod}} days. During the cool-down period the delegation amount is locked and cannot be changed.',
+            notice: 'Stopping delegation will take effect at the first pay day after a cool-down period of {{cooldownPeriod}} days. During the cool-down period the delegation amount is locked.',
         },
         details: {
             heading: 'Your delegation is registered.',
@@ -316,7 +316,7 @@ const t = {
                 overStakeThresholdWarning:
                     'You are about to lock more than {{ threshold }}% of your total balance in a delegation stake.\n\nIf you don’t have enough unlocked CCD at your disposal, you might not be able to pay future transaction fees.',
                 decreaseWarning:
-                    'Reducing the delegation amount will lock the total delegation amount for a cool-down period. No changes can be made to the amount during this period, and the withdrawal will not take effect before the cool-down period is over.',
+                    'Reducing your stake is subject to a cool-down period, in which the stake cannot be spent or transferred.',
                 enterNewStake: 'Enter new delegation stake',
             },
         },
@@ -341,16 +341,16 @@ const t = {
             registerBaker:
                 'You are about to submit a register validator transaction that locks some of your funds in a stake. If you want to unlock the stake again, there will be a cool-down period of {{ cooldownPeriod }} days.',
             lowerBakerStake:
-                'You are about to submit a validator transaction that lowers your validator stake. It will take effect at the first pay day after a cool-down period of {{ cooldownPeriod }} days and the validator stake cannot be changed during this period of time.',
+                'You are about to submit a validator transaction that lowers your validator stake. It will take effect at the first pay day after a cool-down period of {{ cooldownPeriod }} days.',
             removeBaker:
-                'Are you sure you want to make the following transaction to stop validation? It will take effect at the first pay day after a cool-down period of {{ cooldownPeriod }} days and the validator stake cannot be changed during this period of time.',
+                'Are you sure you want to make the following transaction to stop validation? It will take effect at the first pay day after a cool-down period of {{ cooldownPeriod }} days.',
         },
         configureDelegation: {
             register:
                 'You are about to submit a register delegation transaction that locks some of your funds in a stake. If you want to unlock the stake again, there will be a cool-down period of {{ cooldownPeriod }} days.',
             lowerDelegationStake:
-                'You are about to submit a delegation transaction that lowers your delegation amount. It will take effect at the first pay day after a cool-down period of {{ cooldownPeriod }} days and the delegation amount cannot be changed during this period of time.',
-            remove: 'Are you sure you want to make the following transaction to stop delegation? It will take effect at the first pay day after a cool-down period of {{ cooldownPeriod }} days and the delegation amount cannot be changed during this period of time.',
+                'You are about to submit a delegation transaction that lowers your delegation amount. It will take effect at the first pay day after a cool-down period of {{ cooldownPeriod }} days.',
+            remove: 'Are you sure you want to make the following transaction to stop delegation? It will take effect at the first pay day after a cool-down period of {{ cooldownPeriod }} days.',
         },
     },
     transactionPopup: {
