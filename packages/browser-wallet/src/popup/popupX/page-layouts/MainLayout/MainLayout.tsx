@@ -11,7 +11,7 @@ function exctractByProps(obj, props) {
 
 const getPageConfig = () => {
     const location = useLocation();
-    const keyArray = useMemo(() => location.pathname.split('/').slice(1), [location.pathname]);
+    const keyArray = useMemo(() => location.pathname.split('/').slice(2), [location.pathname]);
     const config = exctractByProps(relativeRoutes, keyArray)?.config;
     return config || {};
 };

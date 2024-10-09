@@ -31,6 +31,13 @@ import viewSeedPhrase from '@popup/pages/ViewSeedPhrase/i18n/en';
 // Wallet-X locales
 import onboarding from '@popup/popupX/pages/Onboarding/i18n/en';
 import receiveFunds from '@popup/popupX/pages/ReceiveFunds/i18n/en';
+import idCards from '@popup/popupX/pages/IdCards/i18n/en';
+import accounts from '@popup/popupX/pages/Accounts/i18n/en';
+import connectedSites from '@popup/popupX/pages/ConnectedSites/i18n/en';
+import privateKey from '@popup/popupX/pages/PrivateKey/i18n/en';
+import seedPhrase from '@popup/popupX/pages/SeedPhrase/i18n/en';
+import network from '@popup/popupX/pages/NetworkSettings/i18n/en';
+import connect from '@popup/popupX/pages/ConnectNetwork/i18n/en';
 
 const t = {
     shared,
@@ -62,7 +69,7 @@ const t = {
     verifiableCredentialBackup,
     ageProofRequest,
     viewSeedPhrase,
-    x: { onboarding, receiveFunds },
+    x: { onboarding, receiveFunds, idCards, accounts, connectedSites, privateKey, seedPhrase, network, connect },
 };
 
 export default t;

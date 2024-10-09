@@ -1,43 +1,14 @@
-.network-settings-container {
-    .network-settings {
-        &__title {
-            display: flex;
-            align-items: baseline;
-            margin-bottom: rem(18px);
-        }
+.network-settings-x {
+    .card-x .row {
+        align-items: center;
+        justify-content: space-between;
 
-        &__card {
-            background-color: $color-transaction-bg;
-            border-radius: rem(12px);
-            padding: rem(8px) rem(16px);
+        .button__secondary {
+            svg {
+                margin-left: rem(2px);
 
-            &_row {
-                display: flex;
-                justify-content: space-between;
-                align-items: center;
-                padding: rem(8px) 0;
-                border-bottom: 1px solid rgba($color-white, 0.1);
-
-                &:last-child {
-                    border-bottom: none;
-                }
-
-                .capture__additional_small {
-                    display: flex;
-                    align-items: center;
-                    color: $color-white;
-                    background-color: $color-main-bg;
-                    padding: rem(4px);
-                    border-radius: rem(4px);
-                    cursor: pointer;
-
-                    svg {
-                        margin: 0 rem(6px) 0 rem(2px);
-
-                        circle {
-                            fill: $color-green-success;
-                        }
-                    }
+                circle {
+                    fill: $color-green-success;
                 }
             }
         }

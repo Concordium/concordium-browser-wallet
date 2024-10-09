@@ -1,26 +1,33 @@
 import React from 'react';
+import Page from '@popup/popupX/shared/Page';
+import { useTranslation } from 'react-i18next';
+import Text from '@popup/popupX/shared/Text';
+import Card from '@popup/popupX/shared/Card';
+import Button from '@popup/popupX/shared/Button';
 
 export default function ConnectedSites() {
+    const { t } = useTranslation('x', { keyPrefix: 'connectedSites' });
     return (
-        <div className="connected-sites-container">
-            <div className="connected-sites__title">
-                <span className="heading_medium">Connected sites</span>
-                <span className="capture__main_small">Accout 1 / 6gk...Fk7o</span>
-            </div>
-            <div className="connected-sites__card">
-                <div className="connected-sites__card_row">
-                    <span className="text__main_regular">concordium.com</span>
-                    <span className="capture__additional_small">Disconnect</span>
-                </div>
-                <div className="connected-sites__card_row">
-                    <span className="text__main_regular">app.uniswap.org</span>
-                    <span className="capture__additional_small">Disconnect</span>
-                </div>
-                <div className="connected-sites__card_row">
-                    <span className="text__main_regular">binance.com</span>
-                    <span className="capture__additional_small">Disconnect</span>
-                </div>
-            </div>
-        </div>
+        <Page className="connected-sites-x">
+            <Page.Top heading={t('connectedSites')}>
+                <Text.Capture>Accout 1 / 6gk...Fk7o</Text.Capture>
+            </Page.Top>
+            <Page.Main>
+                <Card>
+                    <Card.Row>
+                        <Text.MainRegular>concordium.com</Text.MainRegular>
+                        <Button.Secondary className="dark" label={t('disconnect')} />
+                    </Card.Row>
+                    <Card.Row>
+                        <Text.MainRegular>app.uniswap.org</Text.MainRegular>
+                        <Button.Secondary className="dark" label={t('disconnect')} />
+                    </Card.Row>
+                    <Card.Row>
+                        <Text.MainRegular>binance.com</Text.MainRegular>
+                        <Button.Secondary className="dark" label={t('disconnect')} />
+                    </Card.Row>
+                </Card>
+            </Page.Main>
+        </Page>
     );
 }

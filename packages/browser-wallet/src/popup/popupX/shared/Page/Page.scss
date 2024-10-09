@@ -19,6 +19,11 @@
             }
         }
 
+        &__main {
+            display: flex;
+            flex-direction: column;
+        }
+
         &__footer {
             display: flex;
             flex-direction: column;
