@@ -1,3 +1,4 @@
+import { CcdAmount } from '@concordium/web-sdk';
 import {
     formatNumberStringWithDigits,
     isValidResolutionString,
@@ -75,10 +76,10 @@ export const formatCcdString = formatNumberStringWithDigits(2);
  * Allows input type string, because microCCD from external sources are strings.
  * N.B. In case the input is a string, it is assumed that it represents the value in microCCD.
  */
-export function displayAsCcd(microCcdAmount: bigint | string) {
-    const amount: bigint = toBigInt(microCcdAmount);
-    const negative = amount < 0n ? '-' : '';
-    const abs = amount < 0n ? -amount : amount;
+export function displayAsCcd(amount: bigint | string | CcdAmount.Type, ccdPrefix = true) {
+    const microCcdAmount: bigint = CcdAmount.instanceOf(amount) ? amount.microCcdAmount : toBigInt(amount);
+    const negative = microCcdAmount < 0n ? '-' : '';
+    const abs = microCcdAmount < 0n ? -microCcdAmount : microCcdAmount;
     const formatted = addThousandSeparators(formatCcdString(microCcdToCcd(abs)));
-    return `${negative}${getCcdSymbol()}${formatted}`;
+    return `${negative}${ccdPrefix ? getCcdSymbol() : ''}${formatted}`;
 }

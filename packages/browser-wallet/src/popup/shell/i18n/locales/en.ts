@@ -38,6 +38,7 @@ import privateKey from '@popup/popupX/pages/PrivateKey/i18n/en';
 import seedPhrase from '@popup/popupX/pages/SeedPhrase/i18n/en';
 import network from '@popup/popupX/pages/NetworkSettings/i18n/en';
 import connect from '@popup/popupX/pages/ConnectNetwork/i18n/en';
+import earn from '@popup/popupX/pages/EarningRewards/i18n/en';
 
 const t = {
     shared,
@@ -69,7 +70,7 @@ const t = {
     verifiableCredentialBackup,
     ageProofRequest,
     viewSeedPhrase,
-    x: { onboarding, receiveFunds, idCards, accounts, connectedSites, privateKey, seedPhrase, network, connect },
+    x: { onboarding, receiveFunds, idCards, accounts, connectedSites, privateKey, seedPhrase, network, connect, earn },
 };
 
 export default t;
