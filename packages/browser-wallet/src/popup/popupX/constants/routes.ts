@@ -189,5 +189,5 @@ export function relativePath(fromPath: string, toPath: string) {
     if (!toPath.startsWith(fromPath)) {
         throw new Error('fromPath is not a prefix of toPath');
     }
-    return toPath.substring(fromPath.length);
+    return toPath.substring(fromPath.length).replace(/^\/+/, '');
 }
