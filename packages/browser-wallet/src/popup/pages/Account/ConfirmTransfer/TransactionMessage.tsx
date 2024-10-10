@@ -3,10 +3,9 @@ import { useTranslation } from 'react-i18next';
 import {
     AccountTransactionPayload,
     AccountTransactionType,
-    isBakerAccount,
-    isDelegatorAccount,
     ConfigureBakerPayload,
     ConfigureDelegationPayload,
+    AccountInfoType,
 } from '@concordium/web-sdk';
 import { useSelectedAccountInfo } from '@popup/shared/AccountInfoListenerContext/AccountInfoListenerContext';
 import { useBlockChainParametersAboveV0 } from '@popup/shared/BlockChainParametersProvider';
@@ -31,10 +30,19 @@ export function TransactionMessage({ transactionType, payload }: Props) {
             return undefined;
         }
 
+        let cooldownParam = 0n;
+        if (parametersV1 !== undefined) {
+            // From protocol version 7, the lower of the two values is the value that counts.
+            cooldownParam =
+                parametersV1.poolOwnerCooldown < parametersV1.delegatorCooldown
+                    ? parametersV1.poolOwnerCooldown
+                    : parametersV1.delegatorCooldown;
+        }
+        const cooldownPeriod = secondsToDaysRoundedDown(cooldownParam);
+
         switch (transactionType) {
             case AccountTransactionType.ConfigureBaker: {
-                const cooldownPeriod = secondsToDaysRoundedDown(parametersV1?.poolOwnerCooldown);
-                if (isBakerAccount(accountInfo)) {
+                if (accountInfo.type === AccountInfoType.Baker) {
                     const newStake = (payload as ConfigureBakerPayload).stake?.microCcdAmount;
                     if (newStake === 0n) {
                         return t('configureBaker.removeBaker', { cooldownPeriod });
@@ -47,8 +55,7 @@ export function TransactionMessage({ transactionType, payload }: Props) {
                 return t('configureBaker.registerBaker', { cooldownPeriod });
             }
             case AccountTransactionType.ConfigureDelegation: {
-                const cooldownPeriod = secondsToDaysRoundedDown(parametersV1?.delegatorCooldown);
-                if (isDelegatorAccount(accountInfo)) {
+                if (accountInfo.type === AccountInfoType.Delegator) {
                     const newStake = (payload as ConfigureDelegationPayload).stake?.microCcdAmount;
                     if (newStake === 0n) {
                         return t('configureDelegation.remove', {
