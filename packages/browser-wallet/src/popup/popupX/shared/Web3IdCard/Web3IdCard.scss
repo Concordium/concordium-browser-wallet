@@ -1,0 +1,32 @@
+.web-id-card-x {
+    &.card-x.grey {
+        padding: rem(8px) rem(0) rem(0) rem(0);
+        border: rem(1px) solid $color-input-border;
+
+        .row:not(.details) {
+            display: flex;
+            align-items: center;
+            padding: rem(0) rem(14px) rem(8px) rem(14px);
+
+            .text__main_medium {
+                color: $color-mineral-2;
+                margin-left: rem(8px);
+            }
+
+            .capture__additional_small {
+                margin-left: auto;
+                color: $color-green-success;
+            }
+        }
+
+        .row.details {
+            margin: rem(0) rem(14px) rem(8px) rem(14px);
+            padding: rem(0) rem(0) rem(8px) rem(0);
+        }
+    }
+
+    svg {
+        width: rem(16px);
+        height: rem(16px);
+    }
+}

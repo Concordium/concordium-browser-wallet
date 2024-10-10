@@ -11,9 +11,10 @@ import TokenDetails from '@popup/popupX/pages/TokenDetails';
 import IdCards from '@popup/popupX/pages/IdCards';
 import Accounts from '@popup/popupX/pages/Accounts';
 import SeedPhrase from 'src/popup/popupX/pages/SeedPhrase';
-import Web3Id from '@popup/popupX/pages/Web3Id';
+import { Web3IdCredentials, Web3IdImport } from '@popup/popupX/pages/Web3Id';
 import NetworkSettings from '@popup/popupX/pages/NetworkSettings';
 import ConnectNetwork from '@popup/popupX/pages/ConnectNetwork';
+import About from '@popup/popupX/pages/About';
 import { IdSubmitted, IdCardsInfo, RequestIdentity, SetupPassword, Welcome } from '@popup/popupX/pages/Onboarding';
 import ConnectedSites from '@popup/popupX/pages/ConnectedSites';
 import EarningRewards from '@popup/popupX/pages/EarningRewards';
@@ -71,11 +72,15 @@ export default function Routes() {
                         <Route element={<PrivateKey />} path={relativeRoutes.settings.accounts.privateKey.path} />
                     </Route>
                     <Route element={<SeedPhrase />} path={relativeRoutes.settings.seedPhrase.path} />
-                    <Route element={<Web3Id />} path={relativeRoutes.settings.web3Id.path} />
+                    <Route path={relativeRoutes.settings.web3Id.path}>
+                        <Route index element={<Web3IdCredentials />} />
+                        <Route element={<Web3IdImport />} path={relativeRoutes.settings.web3Id.import.path} />
+                    </Route>
                     <Route path={relativeRoutes.settings.network.path}>
                         <Route index element={<NetworkSettings />} />
                         <Route element={<ConnectNetwork />} path={relativeRoutes.settings.network.connect.path} />
                     </Route>
+                    <Route element={<About />} path={relativeRoutes.settings.about.path} />
                     <Route path={relativeRoutes.settings.earn.path}>
                         <Route index element={<EarningRewards />} />
                         <Route path={relativeRoutes.settings.earn.baker.path}>

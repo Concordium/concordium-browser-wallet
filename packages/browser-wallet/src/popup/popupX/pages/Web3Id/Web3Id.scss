@@ -1,38 +1,38 @@
-.web-id-container {
-    display: flex;
-    flex-direction: column;
-    height: 100%;
-    padding-bottom: rem(32px);
-
-    .web-id {
-        &__drop-area {
+.web-id-x {
+    &.credintials {
+        .page__main {
             display: flex;
             flex-direction: column;
-            align-items: center;
-            justify-content: center;
-            height: 100%;
-            padding-bottom: rem(50px);
-            margin-top: rem(16px);
-            border-radius: rem(12px);
-            border: 1px dashed $color-mineral-1;
-            background-color: rgba($color-grey-1, 0.5);
-
-            .capture__main_small {
-                text-align: center;
-            }
-
-            svg {
-                margin-bottom: rem(32px);
-            }
+            gap: rem(8px);
         }
+    }
 
-        &__file-select {
-            display: flex;
-            justify-content: center;
-            margin-top: rem(24px);
+    &.import {
+        height: 100%;
 
-            .label__main {
-                margin-left: rem(8px);
+        .page__main {
+            height: 100%;
+
+            .card-x.grey {
+                display: flex;
+                flex-direction: column;
+                align-items: center;
+                justify-content: center;
+                height: 100%;
+                border: 1px dashed $color-mineral-1;
+                background-color: rgba($color-grey-1, 0.5);
+
+                .capture__main_small {
+                    text-align: center;
+                }
+
+                svg {
+                    margin-bottom: rem(32px);
+                }
+            }
+
+            .button__icon {
+                margin-top: rem(24px);
             }
         }
     }

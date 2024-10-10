@@ -38,6 +38,9 @@ import privateKey from '@popup/popupX/pages/PrivateKey/i18n/en';
 import seedPhrase from '@popup/popupX/pages/SeedPhrase/i18n/en';
 import network from '@popup/popupX/pages/NetworkSettings/i18n/en';
 import connect from '@popup/popupX/pages/ConnectNetwork/i18n/en';
+import aboutPage from '@popup/popupX/pages/About/i18n/en';
+import header from '@popup/popupX/page-layouts/MainLayout/Header/i18n/en';
+import web3Id from '@popup/popupX/pages/Web3Id/i18n/en';
 
 const t = {
     shared,
@@ -69,7 +72,20 @@ const t = {
     verifiableCredentialBackup,
     ageProofRequest,
     viewSeedPhrase,
-    x: { onboarding, receiveFunds, idCards, accounts, connectedSites, privateKey, seedPhrase, network, connect },
+    x: {
+        onboarding,
+        receiveFunds,
+        idCards,
+        accounts,
+        connectedSites,
+        privateKey,
+        seedPhrase,
+        network,
+        connect,
+        aboutPage,
+        header,
+        web3Id,
+    },
 };
 
 export default t;

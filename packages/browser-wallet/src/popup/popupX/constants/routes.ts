@@ -90,6 +90,9 @@ export const relativeRoutes = {
         idCards: {
             path: 'idCards',
         },
+        about: {
+            path: 'about',
+        },
         accounts: {
             path: 'accounts',
             connectedSites: {
@@ -113,6 +116,9 @@ export const relativeRoutes = {
         },
         web3Id: {
             path: 'web3Id',
+            import: {
+                path: 'import',
+            },
         },
         network: {
             path: 'network',
