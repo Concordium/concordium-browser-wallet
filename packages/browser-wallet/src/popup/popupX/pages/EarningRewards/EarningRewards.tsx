@@ -7,7 +7,7 @@ import { cpBakingThreshold } from '@shared/utils/chain-parameters-helpers';
 import { displayAsCcd } from 'wallet-common-helpers';
 import { useTranslation } from 'react-i18next';
 import { Link } from 'react-router-dom';
-import { absoluteRoutes } from '@popup/popupX/constants/routes';
+import { absoluteRoutes, relativePath } from '@popup/popupX/constants/routes';
 
 export default function EarningRewards() {
     const { t } = useTranslation('x', { keyPrefix: 'earn.root' });
@@ -28,7 +28,12 @@ export default function EarningRewards() {
                     <span className="capture__main_small">
                         {t('bakerDescription', { amount: displayAsCcd(bakingThreshold, false) })}
                     </span>
-                    <Link to={absoluteRoutes.settings.earn.baker.intro.path}>
+                    <Link
+                        to={relativePath(
+                            absoluteRoutes.settings.earn.path,
+                            absoluteRoutes.settings.earn.baker.intro.path
+                        )}
+                    >
                         <div className="earn__card_continue">
                             <span className="label__regular">{t('bakerAction')}</span>
                             <ArrowRight />
@@ -38,7 +43,12 @@ export default function EarningRewards() {
                 <div className="earn__card">
                     <span className="text__main">{t('delegationTitle')}</span>
                     <span className="capture__main_small">{t('delegationDescription')}</span>
-                    <Link to={absoluteRoutes.settings.earn.delegator.intro.path}>
+                    <Link
+                        to={relativePath(
+                            absoluteRoutes.settings.earn.path,
+                            absoluteRoutes.settings.earn.delegator.intro.path
+                        )}
+                    >
                         <div className="earn__card_continue">
                             <span className="label__regular">{t('delegationAction')}</span>
                             <ArrowRight />
