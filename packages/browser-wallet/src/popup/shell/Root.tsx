@@ -14,7 +14,6 @@ import {
 } from '@popup/shared/window-helpers';
 import { networkConfigurationAtom, themeAtom } from '@popup/store/settings';
 import { Theme as ThemeType } from '@shared/storage/types';
-import { absoluteRoutes } from '@popup/constants/routes';
 import BlockChainParametersContext from '@popup/shared/BlockChainParametersProvider';
 import AccountInfoListenerContext from '@popup/shared/AccountInfoListenerContext';
 
@@ -108,7 +107,7 @@ export default function Root() {
 
     return (
         <Provider>
-            <MemoryRouter initialEntries={['/walletX/home/receive']}>
+            <MemoryRouter initialEntries={['/walletX/home']}>
                 <Network>
                     <Theme>
                         <AccountInfoListenerContext>
