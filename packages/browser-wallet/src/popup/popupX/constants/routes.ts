@@ -1,15 +1,16 @@
-type RouteConfig = {
+export type RouteConfig = {
     hideBackArrow?: boolean;
     backTitle?: string;
     hideMenu?: boolean;
     hideConnection?: boolean;
+    showAccountSelector?: boolean;
 };
-type RoutePath = {
+export type RoutePath = {
     path: string;
     config?: RouteConfig;
 };
-type RouteNode = RoutePath & RouteChildren;
-type RouteChildren = {
+export type RouteNode = RoutePath & RouteChildren;
+export type RouteChildren = {
     [key: string]: RouteNode | RoutePath;
 };
 

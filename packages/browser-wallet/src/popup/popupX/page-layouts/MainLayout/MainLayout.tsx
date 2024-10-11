@@ -3,10 +3,15 @@ import { Outlet, useLocation } from 'react-router-dom';
 import clsx from 'clsx';
 import Header from '@popup/popupX/page-layouts/MainLayout/Header';
 import { AccountButton, NavButton } from '@popup/popupX/page-layouts/MainLayout/Header/components';
-import { relativeRoutes } from '@popup/popupX/constants/routes';
+import { relativeRoutes, RoutePath } from '@popup/popupX/constants/routes';
 
-function exctractByProps(obj, props) {
-    return props.reduce((acc, prop) => (typeof acc === 'object' && prop in acc ? acc[prop] : undefined), obj);
+function exctractByProps(obj: typeof relativeRoutes, props: string[]): RoutePath | undefined {
+    return props.reduce(
+        // FIXME: see if we can get rid of any here...
+        // eslint-disable-next-line @typescript-eslint/no-explicit-any
+        (acc: any, prop) => (typeof acc === 'object' && prop in acc ? (acc[prop] as any) : undefined),
+        obj
+    );
 }
 
 const getPageConfig = () => {
@@ -20,14 +25,20 @@ export default function MainLayout() {
     const [scroll, setScroll] = React.useState(0);
     const isScrolling = useMemo(() => scroll > 0, [!!scroll]);
     const [menuOpen, setMenuOpen] = React.useState(false);
-    const { hideBackArrow, backTitle, hideMenu, hideConnection, showAccountSelector } = getPageConfig();
+    const {
+        hideBackArrow = false,
+        backTitle = '',
+        hideMenu = false,
+        hideConnection = false,
+        showAccountSelector,
+    } = getPageConfig();
     return (
         <div className="main-layout-x">
             <Header {...{ isScrolling, hideMenu, hideConnection, menuOpen, setMenuOpen }} />
             <main
                 className={clsx('main-layout-x__main')}
                 onScroll={(e) => {
-                    setScroll(e.target.scrollTop);
+                    setScroll(e.currentTarget.scrollTop);
                 }}
             >
                 <div className="float-section">
