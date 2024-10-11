@@ -1,7 +1,14 @@
+type RouteConfig = {
+    hideBackArrow?: boolean;
+    backTitle?: string;
+    hideMenu?: boolean;
+    hideConnection?: boolean;
+};
 type RoutePath = {
     path: string;
+    config?: RouteConfig;
 };
-type RouteNode = RouteChildren & RoutePath;
+type RouteNode = RoutePath & RouteChildren;
 type RouteChildren = {
     [key: string]: RouteNode | RoutePath;
 };
