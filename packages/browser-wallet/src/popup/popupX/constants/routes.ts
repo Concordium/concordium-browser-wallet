@@ -8,7 +8,7 @@ type RouteChildren = {
 
 export const relativeRoutes = {
     onboarding: {
-        path: '/onboarding',
+        path: 'onboarding',
         config: {
             hideBackArrow: true,
             backTitle: '',
@@ -50,7 +50,7 @@ export const relativeRoutes = {
         },
     },
     home: {
-        path: '/home',
+        path: 'home',
         config: {
             hideBackArrow: true,
         },
@@ -88,7 +88,10 @@ export const relativeRoutes = {
     settings: {
         path: 'settings',
         idCards: {
-            path: 'id-cards',
+            path: 'idCards',
+        },
+        about: {
+            path: 'about',
         },
         accounts: {
             path: 'accounts',
@@ -98,22 +101,31 @@ export const relativeRoutes = {
                     backTitle: 'to Accounts list',
                 },
             },
+            privateKey: {
+                path: 'privateKey',
+            },
         },
         seedPhrase: {
             path: 'seedPhrase',
+            config: {
+                backTitle: '',
+            },
         },
         passcode: {
             path: 'passcode',
         },
         web3Id: {
             path: 'web3Id',
+            import: {
+                path: 'import',
+            },
         },
         network: {
             path: 'network',
             connect: {
                 path: 'connect',
                 config: {
-                    backTitle: 'to Network settings',
+                    backTitle: 'Network settings',
                 },
             },
         },
@@ -183,5 +195,5 @@ export function relativePath(fromPath: string, toPath: string) {
     if (!toPath.startsWith(fromPath)) {
         throw new Error('fromPath is not a prefix of toPath');
     }
-    return toPath.substring(fromPath.length);
+    return toPath.substring(fromPath.length).replace(/^\/+/, '');
 }

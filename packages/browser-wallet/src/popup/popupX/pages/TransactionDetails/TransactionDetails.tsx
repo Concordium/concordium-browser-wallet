@@ -6,6 +6,7 @@ import Text from '@popup/popupX/shared/Text';
 import Page from '@popup/popupX/shared/Page';
 import Button from '@popup/popupX/shared/Button';
 import { Navigate, useLocation } from 'react-router-dom';
+import * as CcdScan from '@popup/shared/utils/ccdscan';
 import { TransactionLogEntry } from '../TransactionLog/TransactionLog';
 
 /** State passed as part of the navigation */
@@ -20,11 +21,14 @@ type TransactionDetailsProps = {
 
 function TransactionDetails({ transaction }: TransactionDetailsProps) {
     const copyTransactionHash = useCallback(() => navigator.clipboard.writeText(transaction.hash), []);
+    const seeOnCcdScan = useCallback(() => {
+        CcdScan.openTransaction(transaction.hash);
+    }, []);
     return (
         <Page className="transaction-details-x">
             <Page.Top heading="Transaction details">
                 <Button.Icon icon={<Copy />} onClick={copyTransactionHash} />
-                {/*<Button.Icon icon={<ArrowSquareOut />} disabled />*/}
+                <Button.Icon icon={<ArrowSquareOut />} onClick={seeOnCcdScan} />
             </Page.Top>
             <Page.Main>
                 <Card>
@@ -73,8 +77,7 @@ export default function Loader() {
     if (typeof location.state !== 'object' || location.state === null || !('transaction' in location.state)) {
         // No transaction passed as part of the navigation state.
         return <Navigate to="../" />;
-    } else {
-        const state = location.state as LocationState;
-        return <TransactionDetails transaction={state.transaction} />;
     }
+    const state = location.state as LocationState;
+    return <TransactionDetails transaction={state.transaction} />;
 }

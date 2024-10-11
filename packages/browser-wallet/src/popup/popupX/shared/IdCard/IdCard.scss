@@ -1,6 +1,5 @@
 .id-card-x {
     .text__main {
-        margin-left: rem(16px);
         color: $color-grey-1;
     }
 
@@ -17,6 +16,14 @@
         color: $color-white;
     }
 
+    & .title-row {
+        display: flex;
+        justify-content: space-between;
+        align-items: baseline;
+        margin-left: rem(16px);
+        margin-right: rem(16px);
+    }
+
     &.card-x {
         &.gradient {
             padding: rem(16px) rem(4px) rem(4px) rem(4px);
@@ -26,11 +33,23 @@
     .card-x {
         &.grey {
             margin-top: rem(18px);
-            border-radius: rem(12px);
             background: $color-grey-1;
 
             .row {
                 justify-content: space-between;
+            }
+
+            &:first-of-type {
+                border-radius: rem(12px) rem(12px) rem(4px) rem(4px);
+            }
+
+            &:last-of-type {
+                margin-top: rem(1px);
+                border-radius: rem(4px) rem(4px) rem(12px) rem(12px);
+            }
+
+            &:only-of-type {
+                border-radius: rem(12px);
             }
         }
     }

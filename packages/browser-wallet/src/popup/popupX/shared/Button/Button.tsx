@@ -1,6 +1,7 @@
 import clsx from 'clsx';
 import React, { ButtonHTMLAttributes, ElementType, ReactNode } from 'react';
 import { PolymorphicComponentProps } from 'wallet-common-helpers';
+import Text from '@popup/popupX/shared/Text';
 
 export type ButtonProps = Pick<
     ButtonHTMLAttributes<HTMLButtonElement>,
@@ -32,18 +33,35 @@ function ButtonMain({ label, className, ...props }: { label: string } & ButtonPr
     );
 }
 
-function ButtonSecondary({ label, className, ...props }: { label: string } & ButtonProps) {
+function ButtonSecondary({ label, icon, className, ...props }: { label: string; icon?: ReactNode } & ButtonProps) {
     return (
-        <ButtonBase className={`button__secondary ${className}`} {...props}>
-            {label}
+        <ButtonBase className={clsx('button__secondary', className)} {...props}>
+            {icon}
+            <Text.CaptureAdditional>{label}</Text.CaptureAdditional>
         </ButtonBase>
     );
 }
 
 function ButtonIcon({ icon, className, ...props }: { icon: ReactNode } & ButtonProps) {
     return (
-        <ButtonBase className={`button__icon ${className}`} {...props}>
+        <ButtonBase className={clsx('button__icon', className)} {...props}>
             {icon}
+        </ButtonBase>
+    );
+}
+
+function ButtonIconText({
+    icon,
+    label,
+    leftLabel,
+    className,
+    ...props
+}: { icon: ReactNode; label?: string; leftLabel?: boolean } & ButtonProps) {
+    return (
+        <ButtonBase className={clsx('button__icon', 'text', className)} {...props}>
+            {leftLabel && <Text.Label>{label}</Text.Label>}
+            {icon}
+            {!leftLabel && <Text.Label>{label}</Text.Label>}
         </ButtonBase>
     );
 }
@@ -52,6 +70,7 @@ const Button = {
     Main: ButtonMain,
     Secondary: ButtonSecondary,
     Icon: ButtonIcon,
+    IconText: ButtonIconText,
 };
 
 export default Button;
