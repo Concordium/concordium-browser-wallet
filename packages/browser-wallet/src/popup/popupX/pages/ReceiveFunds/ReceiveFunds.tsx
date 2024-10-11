@@ -7,10 +7,11 @@ import Card from '@popup/popupX/shared/Card';
 import { useAtomValue } from 'jotai';
 import { selectedAccountAtom } from '@popup/store/account';
 import { DisplayAsQR } from 'wallet-common-helpers';
+import { copyToClipboard } from '@popup/popupX/shared/utils/helpers';
 
 export default function ReceiveFunds() {
     const { t } = useTranslation('x', { keyPrefix: 'receiveFunds' });
-    const address = useAtomValue(selectedAccountAtom);
+    const address = useAtomValue(selectedAccountAtom) || '';
 
     return (
         <Page className="receive-funds">
@@ -21,7 +22,7 @@ export default function ReceiveFunds() {
                 <Card type="gradient">
                     <DisplayAsQR value={address} bgColor="transparent" className="qr-card" />
                     <Text.Main>{address}</Text.Main>
-                    <Button.Secondary label={t('copyAddress')} onClick={() => {}} />
+                    <Button.Secondary label={t('copyAddress')} onClick={() => copyToClipboard(address)} />
                 </Card>
             </Page.Main>
         </Page>

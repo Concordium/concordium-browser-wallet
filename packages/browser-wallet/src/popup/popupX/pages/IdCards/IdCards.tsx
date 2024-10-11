@@ -1,72 +1,36 @@
 import React from 'react';
 import Plus from '@assets/svgX/plus.svg';
 import Button from '@popup/popupX/shared/Button';
-import IconButton from '@popup/popupX/shared/IconButton';
+import Page from '@popup/popupX/shared/Page';
+import { useTranslation } from 'react-i18next';
+import IdCard from '@popup/popupX/shared/IdCard';
 
+const rowsIdInfo = [
+    ['Identity document type', 'Drivers licence'],
+    ['Identity document number', 'BXM680515'],
+    ['First name', 'Lewis'],
+    ['Last name', 'Hamilton'],
+    ['Date of birth', '13 August 1992'],
+    ['Identity document issuer', 'New Zeland'],
+    ['ID valid until', '30 October 2051'],
+];
+
+const rowsConnectedAccounts = [
+    ['Accout 1 / 6gk...Fk7o', '4,227.38 USD'],
+    ['Accout 2 / tt2...50eo', '1,195.41 USD'],
+    ['Accout 3 / bnh...JJ76', '123.38 USD'],
+    ['Accout 4 / rijf...8h7T', '7,200.41 USD'],
+];
 export default function IdCards() {
+    const { t } = useTranslation('x', { keyPrefix: 'idCards' });
     return (
-        <div className="id-cards-container">
-            <div className="id-cards__title">
-                <span className="heading_medium">ID Cards</span>
-                <IconButton>
-                    <Plus />
-                </IconButton>
-            </div>
-            <div className="id-cards__identity-card">
-                <div className="id-cards__identity-card_heading">
-                    <span className="text__main">Identity 1</span>
-                    <Button className="button-secondary">Edit name</Button>
-                </div>
-                <span className="capture__additional_small verifier">Verified by NotaBene</span>
-                <div className="id-cards__identity-card_document">
-                    <div className="details-data-line">
-                        <span className="text__main_regular">Identity document type</span>
-                        <span className="text__main_medium">Drivers licence</span>
-                    </div>
-                    <div className="details-data-line">
-                        <span className="text__main_regular">Identity document number</span>
-                        <span className="text__main_medium">BXM680515</span>
-                    </div>
-                    <div className="details-data-line">
-                        <span className="text__main_regular">First name</span>
-                        <span className="text__main_medium">Lewis</span>
-                    </div>
-                    <div className="details-data-line">
-                        <span className="text__main_regular">Last name</span>
-                        <span className="text__main_medium">Hamilton</span>
-                    </div>
-                    <div className="details-data-line">
-                        <span className="text__main_regular">Date of birth</span>
-                        <span className="text__main_medium">13 August 1992</span>
-                    </div>
-                    <div className="details-data-line">
-                        <span className="text__main_regular">Identity document issuer</span>
-                        <span className="text__main_medium">New Zeland</span>
-                    </div>
-                    <div className="details-data-line">
-                        <span className="text__main_regular">ID valid until</span>
-                        <span className="text__main_medium">30 October 2051</span>
-                    </div>
-                </div>
-                <div className="id-cards__identity-card_accounts">
-                    <div className="details-data-line">
-                        <span className="text__main_regular">Accout 1 / 6gk...Fk7o</span>
-                        <span className="text__main_medium">4,227.38 USD</span>
-                    </div>
-                    <div className="details-data-line">
-                        <span className="text__main_regular">Accout 2 / tt2...50eo</span>
-                        <span className="text__main_medium">1,195.41 USD</span>
-                    </div>
-                    <div className="details-data-line">
-                        <span className="text__main_regular">Accout 3 / bnh...JJ76</span>
-                        <span className="text__main_medium">123.38 USD</span>
-                    </div>
-                    <div className="details-data-line">
-                        <span className="text__main_regular">Accout 4 / rijf...8h7T</span>
-                        <span className="text__main_medium">7,200.41 USD</span>
-                    </div>
-                </div>
-            </div>
-        </div>
+        <Page className="id-cards-x">
+            <Page.Top heading={t('idCards')}>
+                <Button.Icon icon={<Plus />} />
+            </Page.Top>
+            <Page.Main>
+                <IdCard rowsIdInfo={rowsIdInfo} rowsConnectedAccounts={rowsConnectedAccounts} />
+            </Page.Main>
+        </Page>
     );
 }

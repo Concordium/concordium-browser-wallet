@@ -1,0 +1,15 @@
+.account-private-key-x {
+    .card-x.grey {
+        margin-top: rem(26px);
+        border: rem(1px) solid $color-input-border;
+    }
+
+    .label__regular {
+        color: $color-white;
+        word-break: break-word;
+    }
+
+    .button__icon {
+        margin-top: rem(24px);
+    }
+}

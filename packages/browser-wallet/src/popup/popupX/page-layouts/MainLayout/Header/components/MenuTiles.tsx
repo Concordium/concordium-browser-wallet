@@ -7,68 +7,72 @@ import WebId from '@assets/svgX/web-id.svg';
 import Plant from '@assets/svgX/plant.svg';
 import LinkSimple from '@assets/svgX/link-simple-horizontal.svg';
 import Info from '@assets/svgX/info2.svg';
-import Nft from '@assets/svgX/cube-focus.svg';
+import Restore from '@assets/svgX/arrow-counter-clock.svg';
 import IconButton from '@popup/shared/IconButton';
+import Text from '@popup/popupX/shared/Text';
 import { Link } from 'react-router-dom';
-import { absoluteRoutes } from '@popup/popupX/constants/routes';
+import { relativeRoutes } from '@popup/popupX/constants/routes';
+import { useTranslation } from 'react-i18next';
 
 export default function MenuTiles({ menuOpen, setMenuOpen }) {
+    const { t } = useTranslation('x', { keyPrefix: 'header.menu' });
+
     if (!menuOpen) return null;
     return (
         <div className="main-header__menu-tiles fade-menu-bg">
             <div className="main-header__menu-tiles_container" onClick={() => setMenuOpen(false)}>
-                <Link to={absoluteRoutes.settings.idCards.path}>
+                <Link to={relativeRoutes.settings.idCards.path}>
                     <IconButton className="main-header__menu-tiles_tile wide">
                         <Identification />
-                        <span className="capture__main_small">Identities</span>
+                        <Text.Capture>{t('identities')}</Text.Capture>
                     </IconButton>
                 </Link>
-                <Link to={absoluteRoutes.settings.accounts.path}>
+                <Link to={relativeRoutes.settings.accounts.path}>
                     <IconButton className="main-header__menu-tiles_tile wide">
                         <Browsers />
-                        <span className="capture__main_small">Accounts</span>
+                        <Text.Capture>{t('accounts')}</Text.Capture>
                     </IconButton>
                 </Link>
-                <Link to={absoluteRoutes.settings.seedPhrase.path}>
+                <Link to={relativeRoutes.settings.seedPhrase.path}>
                     <IconButton className="main-header__menu-tiles_tile">
                         <TextColumns />
-                        <span className="capture__main_small">Seed phrase</span>
+                        <Text.Capture>{t('seedPhrase')}</Text.Capture>
                     </IconButton>
                 </Link>
                 <Link to="/">
                     <IconButton className="main-header__menu-tiles_tile">
                         <Password />
-                        <span className="capture__main_small">Passcode</span>
+                        <Text.Capture>{t('passcode')}</Text.Capture>
                     </IconButton>
                 </Link>
-                <Link to={absoluteRoutes.settings.web3Id.path}>
+                <Link to={relativeRoutes.settings.web3Id.path}>
                     <IconButton className="main-header__menu-tiles_tile">
                         <WebId />
-                        <span className="capture__main_small">Web3 ID</span>
+                        <Text.Capture>{t('web3Id')}</Text.Capture>
                     </IconButton>
                 </Link>
                 <Link to="/">
                     <IconButton className="main-header__menu-tiles_tile">
                         <Plant />
-                        <span className="capture__main_small">Earn</span>
+                        <Text.Capture>{t('earn')}</Text.Capture>
                     </IconButton>
                 </Link>
-                <Link to={absoluteRoutes.settings.network.path}>
+                <Link to={relativeRoutes.settings.network.path}>
                     <IconButton className="main-header__menu-tiles_tile">
                         <LinkSimple />
-                        <span className="capture__main_small">Network</span>
+                        <Text.Capture>{t('network')}</Text.Capture>
                     </IconButton>
                 </Link>
-                <Link to="/">
+                <Link to={relativeRoutes.settings.about.path}>
                     <IconButton className="main-header__menu-tiles_tile">
                         <Info />
-                        <span className="capture__main_small">About</span>
+                        <Text.Capture>{t('about')}</Text.Capture>
                     </IconButton>
                 </Link>
                 <Link to="/">
                     <IconButton className="main-header__menu-tiles_tile">
-                        <Nft />
-                        <span className="capture__main_small">NFT</span>
+                        <Restore />
+                        <Text.Capture>{t('restore')}</Text.Capture>
                     </IconButton>
                 </Link>
             </div>
