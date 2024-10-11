@@ -39,7 +39,7 @@ export default function RegisterBaker() {
                     balance at each pay day.
                 </span>
             </div>
-            <Button className="button-main">Continue</Button>
+            <Button.Main label="Continue" />
         </div>
     );
 }

@@ -20,7 +20,7 @@ export default function DelegationType() {
                 passive delegation you do not have to worry about the uptime or quality of a baker node.
             </span>
             <span className="capture__main_small">For more info you can visit developer.concordium.software</span>
-            <Button className="button-main">Continue</Button>
+            <Button.Main label="Continue" />
         </div>
     );
 }

@@ -48,7 +48,7 @@ export default function RegisterDelegator() {
                     I want to automatically add my baking rewards to my baker stake
                 </span>
             </div>
-            <Button className="button-main">Continue</Button>
+            <Button.Main label="Continue" />
         </div>
     );
 }
