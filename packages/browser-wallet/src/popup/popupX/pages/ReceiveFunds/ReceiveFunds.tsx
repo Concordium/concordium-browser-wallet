@@ -12,6 +12,10 @@ export default function ReceiveFunds() {
     const { t } = useTranslation('x', { keyPrefix: 'receiveFunds' });
     const address = useAtomValue(selectedAccountAtom);
 
+    if (address === undefined) {
+        return null;
+    }
+
     return (
         <Page className="receive-funds">
             <Page.Top heading={t('receiveFunds')}>

@@ -1,6 +1,4 @@
-import { useTranslation } from 'react-i18next';
-import React, { InputHTMLAttributes, useMemo, useState } from 'react';
-import { passwordStrength } from 'check-password-strength';
+import React, { InputHTMLAttributes } from 'react';
 import clsx from 'clsx';
 import { Input } from '@popup/popupX/shared/Form/Input';
 import Magnifying from '@assets/svgX/magnifying-glass.svg';

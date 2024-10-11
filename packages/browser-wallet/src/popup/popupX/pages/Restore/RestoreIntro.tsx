@@ -15,9 +15,7 @@ export default function RestoreIntro() {
                     installation.
                 </span>
             </div>
-            <Button className="button-main" onClick={() => {}}>
-                Restore
-            </Button>
+            <Button.Main className="button-main" onClick={() => {}} label="Restore" />
         </div>
     );
 }

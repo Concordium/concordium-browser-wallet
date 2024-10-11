@@ -7,7 +7,7 @@ import ErrorMessage from '../ErrorMessage';
 
 type Props = Pick<
     InputHTMLAttributes<HTMLInputElement>,
-    'className' | 'type' | 'value' | 'onChange' | 'onBlur' | 'autoFocus' | 'readOnly'
+    'className' | 'type' | 'value' | 'onChange' | 'onBlur' | 'autoFocus' | 'readOnly' | 'placeholder'
 > &
     RequiredUncontrolledFieldProps<HTMLInputElement> &
     CommonFieldProps;

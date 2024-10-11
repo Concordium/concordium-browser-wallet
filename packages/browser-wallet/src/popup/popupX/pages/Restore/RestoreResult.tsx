@@ -25,9 +25,7 @@ export default function RestoreResult() {
                     </div>
                 </div>
             </div>
-            <Button className="button-main" onClick={() => {}}>
-                Continue
-            </Button>
+            <Button.Main className="button-main" onClick={() => {}} label="Continue" />
         </div>
     );
 }

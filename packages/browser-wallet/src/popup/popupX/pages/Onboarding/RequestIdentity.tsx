@@ -8,7 +8,12 @@ import { useTranslation } from 'react-i18next';
 import Page from '@popup/popupX/shared/Page';
 import Text from '@popup/popupX/shared/Text';
 
-function ProviderOption({ icon, name }) {
+interface ProviderOptionProps {
+    icon: React.ReactNode;
+    name: string;
+}
+
+function ProviderOption({ icon, name }: ProviderOptionProps) {
     return (
         <div className="request-identity__provider_option">
             <div className="provider__icon">{icon}</div>

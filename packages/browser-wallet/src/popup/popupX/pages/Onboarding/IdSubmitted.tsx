@@ -6,7 +6,7 @@ import Text from '@popup/popupX/shared/Text';
 import { useTranslation } from 'react-i18next';
 import IdCard from '@popup/popupX/shared/IdCard';
 
-const rowsIdInfo = [
+const rowsIdInfo: [string, string][] = [
     ['Identity document type', 'Drivers licence'],
     ['Identity document number', 'BXM680515'],
 ];

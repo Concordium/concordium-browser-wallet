@@ -23,9 +23,7 @@ export default function SendConfirm() {
                 <span className="capture__main_small">Est. fee: 0.03614 CCD</span>
             </div>
 
-            <Button className="button-main" onClick={() => navToConfirmed()}>
-                Send funds
-            </Button>
+            <Button.Main className="button-main" onClick={() => navToConfirmed()} label="Send funds" />
         </div>
     );
 }
