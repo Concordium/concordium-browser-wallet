@@ -12,8 +12,11 @@ import IconButton from '@popup/shared/IconButton';
 import Text from '@popup/popupX/shared/Text';
 import { Link } from 'react-router-dom';
 import { relativeRoutes } from '@popup/popupX/constants/routes';
+import { useTranslation } from 'react-i18next';
 
 export default function MenuTiles({ menuOpen, setMenuOpen }) {
+    const { t } = useTranslation('x', { keyPrefix: 'header.menu' });
+
     if (!menuOpen) return null;
     return (
         <div className="main-header__menu-tiles fade-menu-bg">
@@ -21,55 +24,55 @@ export default function MenuTiles({ menuOpen, setMenuOpen }) {
                 <Link to={relativeRoutes.settings.idCards.path}>
                     <IconButton className="main-header__menu-tiles_tile wide">
                         <Identification />
-                        <Text.Capture>Identities</Text.Capture>
+                        <Text.Capture>{t('identities')}</Text.Capture>
                     </IconButton>
                 </Link>
                 <Link to={relativeRoutes.settings.accounts.path}>
                     <IconButton className="main-header__menu-tiles_tile wide">
                         <Browsers />
-                        <Text.Capture>Accounts</Text.Capture>
+                        <Text.Capture>{t('accounts')}</Text.Capture>
                     </IconButton>
                 </Link>
                 <Link to={relativeRoutes.settings.seedPhrase.path}>
                     <IconButton className="main-header__menu-tiles_tile">
                         <TextColumns />
-                        <Text.Capture>Seed phrase</Text.Capture>
+                        <Text.Capture>{t('seedPhrase')}</Text.Capture>
                     </IconButton>
                 </Link>
                 <Link to="/">
                     <IconButton className="main-header__menu-tiles_tile">
                         <Password />
-                        <Text.Capture>Passcode</Text.Capture>
+                        <Text.Capture>{t('passcode')}</Text.Capture>
                     </IconButton>
                 </Link>
                 <Link to={relativeRoutes.settings.web3Id.path}>
                     <IconButton className="main-header__menu-tiles_tile">
                         <WebId />
-                        <Text.Capture>Web3 ID</Text.Capture>
+                        <Text.Capture>{t('web3Id')}</Text.Capture>
                     </IconButton>
                 </Link>
                 <Link to="/">
                     <IconButton className="main-header__menu-tiles_tile">
                         <Plant />
-                        <Text.Capture>Earn</Text.Capture>
+                        <Text.Capture>{t('earn')}</Text.Capture>
                     </IconButton>
                 </Link>
                 <Link to={relativeRoutes.settings.network.path}>
                     <IconButton className="main-header__menu-tiles_tile">
                         <LinkSimple />
-                        <Text.Capture>Network</Text.Capture>
+                        <Text.Capture>{t('network')}</Text.Capture>
                     </IconButton>
                 </Link>
-                <Link to="/">
+                <Link to={relativeRoutes.settings.about.path}>
                     <IconButton className="main-header__menu-tiles_tile">
                         <Info />
-                        <Text.Capture>About</Text.Capture>
+                        <Text.Capture>{t('about')}</Text.Capture>
                     </IconButton>
                 </Link>
                 <Link to="/">
                     <IconButton className="main-header__menu-tiles_tile">
                         <Restore />
-                        <Text.Capture>Restore</Text.Capture>
+                        <Text.Capture>{t('restore')}</Text.Capture>
                     </IconButton>
                 </Link>
             </div>

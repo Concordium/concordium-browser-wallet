@@ -1,0 +1,14 @@
+.external-link {
+    text-decoration: underline;
+
+    &,
+    &:hover,
+    &:visited,
+    &:active {
+        color: inherit;
+    }
+
+    &:hover {
+        color: $color-white;
+    }
+}

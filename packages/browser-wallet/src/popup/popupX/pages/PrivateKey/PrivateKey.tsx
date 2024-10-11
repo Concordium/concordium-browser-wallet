@@ -5,23 +5,109 @@ import Text from '@popup/popupX/shared/Text';
 import Card from '@popup/popupX/shared/Card';
 import Button from '@popup/popupX/shared/Button';
 import Copy from '@assets/svgX/copy.svg';
+import { useAtomValue } from 'jotai';
+import { selectedAccountAtom } from '@popup/store/account';
+import { useCredential, usePrivateKey, usePublicKey } from '@popup/shared/utils/account-helpers';
+import { networkConfigurationAtom } from '@popup/store/settings';
+import { saveData } from '@popup/shared/utils/file-helpers';
+import { NetworkConfiguration } from '@shared/storage/types';
+import { getNet } from '@shared/utils/network-helpers';
+import { copyToClipboard } from '@popup/popupX/shared/utils/helpers';
+
+type CredentialKeys = {
+    threshold: number;
+    keys: Record<number, { signKey: string; verifyKey: string }>;
+};
+
+type AccountKeys = {
+    threshold: number;
+    keys: Record<number, CredentialKeys>;
+};
+
+type AccountExport = {
+    accountKeys: AccountKeys;
+    address: string;
+    credentials: Record<string, string>;
+};
+
+type ExportFormat = {
+    type: 'concordium-browser-wallet-account';
+    v: number;
+    environment: string; // 'testnet' or 'mainnet'
+    value: AccountExport;
+};
+
+function createExport(
+    address: string,
+    credId: string,
+    signKey: string,
+    verifyKey: string,
+    network: NetworkConfiguration
+) {
+    const docContent: ExportFormat = {
+        type: 'concordium-browser-wallet-account',
+        v: 0,
+        environment: getNet(network).toLowerCase(),
+        value: {
+            accountKeys: {
+                keys: {
+                    '0': {
+                        keys: {
+                            '0': {
+                                signKey,
+                                verifyKey,
+                            },
+                        },
+                        threshold: 1,
+                    },
+                },
+                threshold: 1,
+            },
+            credentials: {
+                '0': credId,
+            },
+            address,
+        },
+    };
+
+    return docContent;
+}
+
+function usePrivateKeyData() {
+    const selectedAccountAddress = useAtomValue(selectedAccountAtom);
+    const credential = useCredential(selectedAccountAddress);
+    const privateKey = usePrivateKey(selectedAccountAddress);
+    const publicKey = usePublicKey(selectedAccountAddress);
+    const network = useAtomValue(networkConfigurationAtom);
+
+    const isDataExist = selectedAccountAddress && credential && privateKey && publicKey && network;
+
+    const handleExport = () => {
+        if (isDataExist) {
+            const data = createExport(selectedAccountAddress, credential.credId, privateKey, publicKey, network);
+            saveData(data, `${selectedAccountAddress}.export`);
+        }
+    };
+
+    return { privateKey: privateKey || '', handleExport };
+}
 
 export default function PrivateKey() {
     const { t } = useTranslation('x', { keyPrefix: 'privateKey' });
+    const { privateKey, handleExport } = usePrivateKeyData();
+
     return (
         <Page className="account-private-key-x">
             <Page.Top heading={t('accountPrivateKey')} />
             <Page.Main>
                 <Text.Capture>{t('keyDescription')}</Text.Capture>
                 <Card>
-                    <Text.LabelRegular>
-                        575f0f919c99ed4b7d858df2aea68112292da4eae98e2e69410cd5283f3c727b282caeba754f815dc876d8b84d3339c6f74c4127f238a391891dd23c74892943
-                    </Text.LabelRegular>
+                    <Text.LabelRegular>{privateKey}</Text.LabelRegular>
                 </Card>
-                <Button.IconText label={t('copyKey')} icon={<Copy />} />
+                <Button.IconText label={t('copyKey')} icon={<Copy />} onClick={() => copyToClipboard(privateKey)} />
             </Page.Main>
             <Page.Footer>
-                <Button.Main label={t('export')} />
+                <Button.Main label={t('export')} onClick={handleExport} />
             </Page.Footer>
         </Page>
     );
