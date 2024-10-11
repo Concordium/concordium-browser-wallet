@@ -1,5 +1,6 @@
 import React, { ReactNode } from 'react';
 import clsx from 'clsx';
+import { ClassName } from 'wallet-common-helpers';
 
 function TextRoot({ children }: { children: ReactNode }) {
     return children;
@@ -35,6 +36,16 @@ function TextLabelRegular({ className, children }: { className?: string; childre
     return <span className={clsx('label__regular', className)}>{children}</span>;
 }
 
+type Props = ClassName & { path: string; children?: string | ReactNode };
+
+function TextExternalLink({ path, children = path, className }: Props) {
+    return (
+        <a className={clsx('external-link', className)} href={`${path}`} target="_blank" rel="noreferrer">
+            {children}
+        </a>
+    );
+}
+
 const Text = TextRoot as typeof TextRoot & {
     Heading: typeof TextHeading;
     Main: typeof TextMain;
@@ -44,6 +55,7 @@ const Text = TextRoot as typeof TextRoot & {
     CaptureAdditional: typeof TextCaptureAdditionalSmall;
     Label: typeof TextLabelMain;
     LabelRegular: typeof TextLabelRegular;
+    ExternalLink: typeof TextExternalLink;
 };
 Text.Heading = TextHeading;
 Text.Main = TextMain;
@@ -53,5 +65,6 @@ Text.Capture = TextCaptureMainSmall;
 Text.CaptureAdditional = TextCaptureAdditionalSmall;
 Text.Label = TextLabelMain;
 Text.LabelRegular = TextLabelRegular;
+Text.ExternalLink = TextExternalLink;
 
 export default Text;

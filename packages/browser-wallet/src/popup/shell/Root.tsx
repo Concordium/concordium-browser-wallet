@@ -106,7 +106,7 @@ export default function Root() {
 
     return (
         <Provider>
-            <MemoryRouter initialEntries={['/walletX/settings/network/connect']}>
+            <MemoryRouter initialEntries={['/walletX/home']}>
                 <Network>
                     <Theme>
                         <AccountInfoListenerContext>

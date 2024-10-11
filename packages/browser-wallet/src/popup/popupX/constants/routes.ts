@@ -81,9 +81,9 @@ export const relativeRoutes = {
             path: 'receive',
         },
         transactionLog: {
-            path: 'transactionLog',
+            path: 'account/:account/transactions',
             details: {
-                path: 'details',
+                path: ':transactionHash',
                 config: {
                     backTitle: 'to Transaction log',
                 },
@@ -97,6 +97,9 @@ export const relativeRoutes = {
         path: 'settings',
         idCards: {
             path: 'idCards',
+        },
+        about: {
+            path: 'about',
         },
         accounts: {
             path: 'accounts',
@@ -121,6 +124,9 @@ export const relativeRoutes = {
         },
         web3Id: {
             path: 'web3Id',
+            import: {
+                path: 'import',
+            },
         },
         network: {
             path: 'network',
@@ -197,5 +203,5 @@ export function relativePath(fromPath: string, toPath: string) {
     if (!toPath.startsWith(fromPath)) {
         throw new Error('fromPath is not a prefix of toPath');
     }
-    return toPath.substring(fromPath.length);
+    return toPath.substring(fromPath.length).replace(/^\/+/, '');
 }
