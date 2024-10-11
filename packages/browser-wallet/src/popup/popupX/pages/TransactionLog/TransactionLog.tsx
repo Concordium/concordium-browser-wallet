@@ -5,7 +5,7 @@ import { relativeRoutes } from '@popup/popupX/constants/routes';
 import Page from '@popup/popupX/shared/Page';
 import Text from '@popup/popupX/shared/Text';
 
-const transaction_log = [
+const transactionLog = [
     {
         date: '21 May 2024',
         total: '4029.87',
@@ -78,15 +78,18 @@ export default function TransactionLog() {
             <Page.Top heading="Transaction log" />
             <Page.Main>
                 <div className="transaction-log__history">
-                    {transaction_log.map((day, day_idx) => (
-                        <div key={day_idx} className="transaction-log__history_day">
+                    {transactionLog.map((day, iDay) => (
+                        // eslint-disable-next-line react/no-array-index-key
+                        <div key={iDay} className="transaction-log__history_day">
                             <div className="transaction-log__history_day-date">
                                 <Text.CaptureAdditional>{day.date}</Text.CaptureAdditional>
                                 <Text.CaptureAdditional>${day.total}</Text.CaptureAdditional>
                             </div>
-                            {day.transactions.map((transaction, transaction_idx) => (
+                            {day.transactions.map((transaction, iTx) => (
+                                // eslint-disable-next-line jsx-a11y/no-static-element-interactions, jsx-a11y/click-events-have-key-events
                                 <div
-                                    key={`${day_idx}_${transaction_idx}`}
+                                    // eslint-disable-next-line react/no-array-index-key
+                                    key={`${iDay}_${iTx}`}
                                     className="transaction-log__history_transaction"
                                     onClick={() => navToTransactionDetails()}
                                 >

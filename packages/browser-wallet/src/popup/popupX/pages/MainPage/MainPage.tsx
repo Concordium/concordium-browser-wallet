@@ -41,7 +41,13 @@ export default function MainPage() {
             </div>
             <div className="main-page__tokens">
                 <div className="main-page__tokens-list">
-                    <div className="main-page__tokens-list_item" onClick={() => navToTokenDetails()}>
+                    {/* eslint-disable-next-line jsx-a11y/click-events-have-key-events */}
+                    <div
+                        role="button"
+                        tabIndex={0}
+                        className="main-page__tokens-list_item"
+                        onClick={() => navToTokenDetails()}
+                    >
                         <div className="token-icon">
                             <ConcordiumLogo />
                         </div>
@@ -57,7 +63,13 @@ export default function MainPage() {
                             </div>
                         </div>
                     </div>
-                    <div className="main-page__tokens-list_item" onClick={() => navToTokenDetails()}>
+                    {/* eslint-disable-next-line jsx-a11y/click-events-have-key-events */}
+                    <div
+                        role="button"
+                        tabIndex={0}
+                        className="main-page__tokens-list_item"
+                        onClick={() => navToTokenDetails()}
+                    >
                         <div className="token-icon">
                             <EthLogo />
                         </div>
@@ -72,7 +84,13 @@ export default function MainPage() {
                             </div>
                         </div>
                     </div>
-                    <div className="main-page__tokens-list_item" onClick={() => navToTokenDetails()}>
+                    {/* eslint-disable-next-line jsx-a11y/click-events-have-key-events */}
+                    <div
+                        role="button"
+                        tabIndex={0}
+                        className="main-page__tokens-list_item"
+                        onClick={() => navToTokenDetails()}
+                    >
                         <div className="token-icon">
                             <DnwLogo />
                         </div>
@@ -84,7 +102,13 @@ export default function MainPage() {
                             </div>
                         </div>
                     </div>
-                    <div className="main-page__tokens-list_item" onClick={() => navToTokenDetails()}>
+                    {/* eslint-disable-next-line jsx-a11y/click-events-have-key-events */}
+                    <div
+                        role="button"
+                        tabIndex={0}
+                        className="main-page__tokens-list_item"
+                        onClick={() => navToTokenDetails()}
+                    >
                         <div className="token-icon">
                             <EureLogo />
                         </div>
@@ -99,7 +123,13 @@ export default function MainPage() {
                             </div>
                         </div>
                     </div>
-                    <div className="main-page__tokens-list_item" onClick={() => navToTokenDetails()}>
+                    {/* eslint-disable-next-line jsx-a11y/click-events-have-key-events */}
+                    <div
+                        role="button"
+                        tabIndex={0}
+                        className="main-page__tokens-list_item"
+                        onClick={() => navToTokenDetails()}
+                    >
                         <div className="token-icon">
                             <BtcLogo />
                         </div>
@@ -114,7 +144,13 @@ export default function MainPage() {
                             </div>
                         </div>
                     </div>
-                    <div className="main-page__tokens-list_item" onClick={() => navToTokenDetails()}>
+                    {/* eslint-disable-next-line jsx-a11y/click-events-have-key-events */}
+                    <div
+                        role="button"
+                        tabIndex={0}
+                        className="main-page__tokens-list_item"
+                        onClick={() => navToTokenDetails()}
+                    >
                         <div className="token-icon">
                             <EthLogo />
                         </div>
@@ -129,7 +165,13 @@ export default function MainPage() {
                             </div>
                         </div>
                     </div>
-                    <div className="main-page__tokens-list_item" onClick={() => navToTokenDetails()}>
+                    {/* eslint-disable-next-line jsx-a11y/click-events-have-key-events */}
+                    <div
+                        role="button"
+                        tabIndex={0}
+                        className="main-page__tokens-list_item"
+                        onClick={() => navToTokenDetails()}
+                    >
                         <div className="token-icon">
                             <EthLogo />
                         </div>

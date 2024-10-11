@@ -1,7 +1,6 @@
 import React from 'react';
 import ConcordiumLogo from '@assets/svgX/concordium-logo.svg';
 import FormPassword from '@popup/popupX/shared/Form/Password';
-import Submit from '@popup/popupX/shared/Form/Submit';
 import Form from '@popup/popupX/shared/Form/Form';
 import { useNavigate } from 'react-router-dom';
 import { relativeRoutes } from '@popup/popupX/constants/routes';
