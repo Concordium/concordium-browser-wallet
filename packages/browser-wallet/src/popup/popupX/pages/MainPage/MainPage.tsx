@@ -47,7 +47,7 @@ type TokenBalanceProps = { decimals?: number; tokenId: string; contractAddress: 
 function AccountTokenBalance({ decimals, tokenId, contractAddress, accountAddress }: TokenBalanceProps) {
     const balanceRaw = useAccountTokenBalance(accountAddress, contractAddress, tokenId) ?? 0n;
     const balance = useMemo(() => formatBalance(balanceRaw, decimals), [balanceRaw]);
-    return balance;
+    return <span>{balance}</span>;
 }
 
 /** Convert and display an amount of CCD to EUR using an exchange rate. */

@@ -239,7 +239,7 @@ export default function TransactionList({ onTransactionClick }: TransactionListP
 
     async function loadTransactionsDescending(address: string, appendTransactions: boolean, fromId?: number) {
         setIsNextPageLoading(true);
-        return getTransactions(address, transactionResultLimit, 'descending', fromId)
+        return getTransactions(address, transactionResultLimit, 'descending', { from: fromId })
             .then((transactionResult) => {
                 setHasNextPage(transactionResult.full);
 
