@@ -1,13 +1,16 @@
 import React from 'react';
 import Carousel from '@popup/popupX/shared/Carousel';
+import { relativeRoutes } from '@popup/popupX/constants/routes';
+import { useNavigate } from 'react-router-dom';
 
 export default function BakerIntro() {
+    const nav = useNavigate();
     return (
         <div className="baker-intro-container">
             <div className="baker-intro__title">
                 <span className="heading_medium">Become a baker</span>
             </div>
-            <Carousel>
+            <Carousel onDone={() => nav(`../${relativeRoutes.settings.earn.baker.register}`)}>
                 <span className="capture__main_small">
                     <div>
                         A baker is a mode that participates in the network by baking (creating) new blocks that are
