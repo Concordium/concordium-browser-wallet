@@ -50,6 +50,14 @@ function ButtonIcon({ icon, className, ...props }: { icon: ReactNode } & ButtonP
     );
 }
 
+function ButtonText({ label, className, ...props }: { label: string } & ButtonProps) {
+    return (
+        <ButtonBase className={clsx('button__icon', 'text', className)} {...props}>
+            <Text.Label>{label}</Text.Label>
+        </ButtonBase>
+    );
+}
+
 function ButtonIconText({
     icon,
     label,
@@ -71,6 +79,7 @@ const Button = {
     Secondary: ButtonSecondary,
     Icon: ButtonIcon,
     IconText: ButtonIconText,
+    Text: ButtonText,
 };
 
 export default Button;

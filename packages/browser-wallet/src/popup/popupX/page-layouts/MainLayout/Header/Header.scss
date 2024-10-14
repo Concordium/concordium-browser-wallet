@@ -126,8 +126,7 @@
 
         &_container {
             display: flex;
-            flex-direction: row;
-            flex-wrap: wrap;
+            flex-flow: row wrap;
             justify-content: flex-start;
             width: rem(324px);
             margin: 0 auto;

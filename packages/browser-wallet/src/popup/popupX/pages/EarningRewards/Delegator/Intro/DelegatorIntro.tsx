@@ -1,13 +1,16 @@
 import React from 'react';
 import Carousel from '@popup/popupX/shared/Carousel';
+import { useNavigate } from 'react-router-dom';
+import { relativeRoutes } from '@popup/popupX/constants/routes';
 
 export default function DelegatorIntro() {
+    const nav = useNavigate();
     return (
         <div className="delegator-intro-container">
             <div className="delegator-intro__title">
                 <span className="heading_medium">Delegation</span>
             </div>
-            <Carousel>
+            <Carousel onDone={() => nav(`../${relativeRoutes.settings.earn.delegator.type.path}`)}>
                 <span className="capture__main_small">
                     <div>
                         Delegation allows users on the Concordium blockchain to earn rewards without the need to become
