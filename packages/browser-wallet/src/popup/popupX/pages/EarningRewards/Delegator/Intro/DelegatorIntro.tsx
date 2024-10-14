@@ -1,7 +1,7 @@
 import React from 'react';
 import Carousel from '@popup/popupX/shared/Carousel';
 import { useNavigate } from 'react-router-dom';
-import { relativeRoutes } from '@popup/popupX/constants/routes';
+import { absoluteRoutes } from '@popup/popupX/constants/routes';
 import Page from '@popup/popupX/shared/Page';
 import { Trans, useTranslation } from 'react-i18next';
 import ExternalLink from '@popup/popupX/shared/ExternalLink';
@@ -11,8 +11,8 @@ export default function DelegatorIntro() {
     const { t } = useTranslation('x', { keyPrefix: 'earn.delegator.intro' });
     return (
         <Page className="delegator-intro-container">
-            <Carousel onDone={() => nav(`../${relativeRoutes.settings.earn.delegator.type.path}`)}>
-                <span>
+            <Carousel onDone={() => nav(absoluteRoutes.settings.earn.delegator.type.path)}>
+                <span className="capture__main_small">
                     <Page.Top heading={t('1.title')} />
                     <Trans
                         t={t}
@@ -24,7 +24,7 @@ export default function DelegatorIntro() {
                         }}
                     />
                 </span>
-                <span>
+                <span className="capture__main_small">
                     <Page.Top heading={t('2.title')} />
                     <Trans
                         t={t}
@@ -38,7 +38,7 @@ export default function DelegatorIntro() {
                         }}
                     />
                 </span>
-                <span>
+                <span className="capture__main_small">
                     <Page.Top heading={t('3.title')} />
                     <Trans
                         t={t}
@@ -52,11 +52,11 @@ export default function DelegatorIntro() {
                         }}
                     />
                 </span>
-                <span>
+                <span className="capture__main_small">
                     <Page.Top heading={t('4.title')} />
                     <Trans t={t} i18nKey="4.body" />
                 </span>
-                <span>
+                <span className="capture__main_small">
                     <Page.Top heading={t('5.title')} />
                     <Trans
                         t={t}
@@ -68,7 +68,7 @@ export default function DelegatorIntro() {
                         }}
                     />
                 </span>
-                <span>
+                <span className="capture__main_small">
                     <Page.Top heading={t('6.title')} />
                     <Trans t={t} i18nKey="6.body" />
                 </span>

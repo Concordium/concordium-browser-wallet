@@ -173,13 +173,22 @@ export const relativeRoutes = {
     },
 };
 
-const buildAbsoluteRoutes = <R extends RouteNode | RoutePath | RouteChildren>(route: R, base?: string): R => {
+/**
+ * The temporary prefix for all wallet-x routes in the application.
+ */
+export const routePrefix = '/walletX'; // FIXME: Remove hardcoded walletX prefix.
+
+const buildAbsoluteRoutes = <R extends RouteNode | RoutePath | RouteChildren>(
+    route: R,
+    root = true,
+    base?: string
+): R => {
     const { path, config, ...rs } = route;
 
     let aPath = path as string | undefined;
 
-    if (base === '/') {
-        aPath = `/${path}`;
+    if (root) {
+        aPath = routePrefix; // FIXME: Remove hardcoded walletX prefix.
     } else if (base !== undefined) {
         aPath = `${base}/${path}`;
     }
@@ -187,7 +196,7 @@ const buildAbsoluteRoutes = <R extends RouteNode | RoutePath | RouteChildren>(ro
     return Object.entries(rs).reduce(
         (acc, [k, r]) => ({
             ...acc,
-            [k]: buildAbsoluteRoutes(r as R, aPath),
+            [k]: buildAbsoluteRoutes(r as R, false, aPath),
         }),
         { path: aPath }
     ) as R;
