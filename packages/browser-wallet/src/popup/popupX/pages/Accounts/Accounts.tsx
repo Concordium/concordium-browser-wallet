@@ -1,12 +1,10 @@
 import React from 'react';
-import { useNavigate } from 'react-router-dom';
 import Plus from '@assets/svgX/plus.svg';
 import Arrows from '@assets/svgX/arrows-down-up.svg';
 import MagnifyingGlass from '@assets/svgX/magnifying-glass.svg';
 import Pencil from '@assets/svgX/pencil-simple.svg';
 import Copy from '@assets/svgX/copy.svg';
 import ArrowRight from '@assets/svgX/arrow-right.svg';
-import { relativeRoutes } from '@popup/popupX/constants/routes';
 import Page from '@popup/popupX/shared/Page';
 import Button from '@popup/popupX/shared/Button';
 import { useTranslation } from 'react-i18next';
@@ -36,8 +34,6 @@ const ACCOUNT_LIST = [
 
 export default function Accounts() {
     const { t } = useTranslation('x', { keyPrefix: 'accounts' });
-    const nav = useNavigate();
-    const navToConnect = () => nav(relativeRoutes.settings.accounts.connectedSites.path);
     return (
         <Page className="accounts-x">
             <Page.Top heading={t('accounts')}>

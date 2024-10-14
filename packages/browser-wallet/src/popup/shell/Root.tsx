@@ -64,7 +64,6 @@ function useScaling() {
         }
 
         if (isFullscreenWindowDemo && body) {
-            console.log('isFullscreenWindowDemo');
             body.style.margin = 'unset';
             body.style.width = 'unset';
             body.style.height = '100%';

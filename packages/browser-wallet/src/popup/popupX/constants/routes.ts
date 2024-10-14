@@ -1,8 +1,16 @@
-type RoutePath = {
-    path: string;
+export type RouteConfig = {
+    hideBackArrow?: boolean;
+    backTitle?: string;
+    hideMenu?: boolean;
+    hideConnection?: boolean;
+    showAccountSelector?: boolean;
 };
-type RouteNode = RouteChildren & RoutePath;
-type RouteChildren = {
+export type RoutePath = {
+    path: string;
+    config?: RouteConfig;
+};
+export type RouteNode = RoutePath & RouteChildren;
+export type RouteChildren = {
     [key: string]: RouteNode | RoutePath;
 };
 

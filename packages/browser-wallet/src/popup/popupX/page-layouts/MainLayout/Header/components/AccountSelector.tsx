@@ -1,7 +1,5 @@
 import React from 'react';
-import FormInput from '@popup/popupX/shared/Form/Input';
 import CarretRight from '@assets/svgX/caret-right.svg';
-import Submit from '@popup/popupX/shared/Form/Submit';
 import Form from '@popup/popupX/shared/Form/Form';
 import EthLogo from '@assets/svgX/eth-logo.svg';
 import DnwLogo from '@assets/svgX/dnw-logo.svg';
@@ -11,7 +9,9 @@ import IconButton from '@popup/popupX/shared/IconButton';
 import ArrowsUpDown from '@assets/svgX/arrows-down-up.svg';
 import FormSearch from '@popup/popupX/shared/Form/Search';
 
-export default function AccountSelector({ showAccountSelector }) {
+type Props = { showAccountSelector: boolean };
+
+export default function AccountSelector({ showAccountSelector }: Props) {
     if (!showAccountSelector) return null;
     return (
         <div className="main-header__account-selector fade-menu-bg">
@@ -25,10 +25,10 @@ export default function AccountSelector({ showAccountSelector }) {
                         {(f) => {
                             return (
                                 <FormSearch
-                                    register={f.register}
+                                    control={f.control}
                                     name="network"
                                     autoFocus
-                                    value="https://whatevertheaddressIs.com"
+                                    defaultValue="https://whatevertheaddressIs.com"
                                 />
                             );
                         }}

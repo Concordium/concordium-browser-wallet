@@ -3,9 +3,15 @@ import DotsNine from '@assets/svgX/dots-nine.svg';
 import Close from '@assets/svgX/close.svg';
 import clsx from 'clsx';
 
+type Props = {
+    setMenuOpen: (open: boolean) => void;
+    menuOpen: boolean;
+    hideMenu: boolean;
+};
+
 const background = document.getElementsByClassName('bg').item(0);
 
-export default function MenuButton({ setMenuOpen, menuOpen, hideMenu }) {
+export default function MenuButton({ setMenuOpen, menuOpen, hideMenu }: Props) {
     useEffect(() => {
         if (menuOpen) {
             background?.classList.add('fade-bg');

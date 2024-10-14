@@ -14,13 +14,23 @@ import { Link } from 'react-router-dom';
 import { relativeRoutes } from '@popup/popupX/constants/routes';
 import { useTranslation } from 'react-i18next';
 
-export default function MenuTiles({ menuOpen, setMenuOpen }) {
-    const { t } = useTranslation('x', { keyPrefix: 'header.menu' });
+type MenuTilesProps = {
+    menuOpen: boolean;
+    setMenuOpen: (open: boolean) => void;
+};
 
+export default function MenuTiles({ menuOpen, setMenuOpen }: MenuTilesProps) {
+    const { t } = useTranslation('x', { keyPrefix: 'header.menu' });
     if (!menuOpen) return null;
     return (
         <div className="main-header__menu-tiles fade-menu-bg">
-            <div className="main-header__menu-tiles_container" onClick={() => setMenuOpen(false)}>
+            {/* eslint-disable-next-line jsx-a11y/click-events-have-key-events */}
+            <div
+                role="button"
+                tabIndex={0}
+                className="main-header__menu-tiles_container"
+                onClick={() => setMenuOpen(false)}
+            >
                 <Link to={relativeRoutes.settings.idCards.path}>
                     <IconButton className="main-header__menu-tiles_tile wide">
                         <Identification />

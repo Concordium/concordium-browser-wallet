@@ -18,9 +18,7 @@ export default function SendSuccess() {
                 <span className="label__regular">Transaction details</span>
                 <Arrow />
             </div>
-            <Button className="button-main" onClick={() => nav('../../../../home')}>
-                Return to Account
-            </Button>
+            <Button.Main className="button-main" onClick={() => nav('../../../../home')} label="Return to Account" />
         </div>
     );
 }

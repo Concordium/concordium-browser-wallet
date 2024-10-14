@@ -10,7 +10,7 @@ import {
     isSpawnedWindow,
 } from '@popup/shared/window-helpers';
 import { popupMessageHandler } from '@popup/shared/message-handler';
-import { InternalMessageType } from '@concordium/browser-wallet-message-hub';
+import { InternalMessageType } from '@messaging';
 import { noOp } from 'wallet-common-helpers';
 import { Theme as ThemeType } from '@shared/storage/types';
 
@@ -55,7 +55,6 @@ export function Scaling({ children }: { children: ReactElement }) {
         }
 
         if (isFullscreenWindowDemo && body) {
-            console.log('isFullscreenWindowDemo');
             body.style.margin = 'unset';
             body.style.width = '100%';
             body.style.height = '100%';

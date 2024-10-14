@@ -2,7 +2,11 @@ import React from 'react';
 import Info from '@assets/svgX/info.svg';
 import Dot from '@assets/svgX/dot.svg';
 
-export default function Connection({ hideConnection }) {
+type Props = {
+    hideConnection: boolean;
+};
+
+export default function Connection({ hideConnection }: Props) {
     if (hideConnection) return null;
     return (
         <div className="main-header__connection">

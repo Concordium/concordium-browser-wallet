@@ -1,4 +1,4 @@
-import React, { ReactNode } from 'react';
+import React from 'react';
 import ConcordiumLogo from '@assets/svgX/concordium-logo.svg';
 import Card from '@popup/popupX/shared/Card';
 import Text from '@popup/popupX/shared/Text';

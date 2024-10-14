@@ -24,7 +24,7 @@ export default function OpenPool() {
                     You can also keep the pool closed, if you want only your own CCDs to be stalked.
                 </span>
             </div>
-            <Button className="button-main">Continue</Button>
+            <Button.Main label="Continue" />
         </div>
     );
 }

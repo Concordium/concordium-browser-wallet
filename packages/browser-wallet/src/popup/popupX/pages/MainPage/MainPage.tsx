@@ -37,6 +37,7 @@ function formatBalance(balance: bigint, decimals: number = 0) {
     const integer = padded.slice(0, -decimals);
     const fraction = padded.slice(-decimals);
     const balanceFormatter = new Intl.NumberFormat(undefined, { minimumFractionDigits: decimals });
+    // eslint-disable-next-line @typescript-eslint/ban-ts-comment
     // @ts-ignore format below supports strings, TypeScript is just not aware.
     return balanceFormatter.format(`${integer}.${fraction}`);
 }
@@ -46,7 +47,7 @@ type TokenBalanceProps = { decimals?: number; tokenId: string; contractAddress: 
 function AccountTokenBalance({ decimals, tokenId, contractAddress, accountAddress }: TokenBalanceProps) {
     const balanceRaw = useAccountTokenBalance(accountAddress, contractAddress, tokenId) ?? 0n;
     const balance = useMemo(() => formatBalance(balanceRaw, decimals), [balanceRaw]);
-    return balance;
+    return <span>{balance}</span>;
 }
 
 /** Convert and display an amount of CCD to EUR using an exchange rate. */
@@ -109,7 +110,13 @@ function MainPage({ credential }: MainPageProps) {
             </div>
             <div className="main-page__tokens">
                 <div className="main-page__tokens-list">
-                    <div className="main-page__tokens-list_item" onClick={() => navToTokenDetails()}>
+                    {/* eslint-disable-next-line jsx-a11y/click-events-have-key-events */}
+                    <div
+                        role="button"
+                        tabIndex={0}
+                        className="main-page__tokens-list_item"
+                        onClick={() => navToTokenDetails()}
+                    >
                         <div className="token-icon">
                             <ConcordiumLogo />
                         </div>
@@ -134,6 +141,7 @@ function MainPage({ credential }: MainPageProps) {
                         </div>
                     </div>
                     {tokens.map((token) => (
+                        // eslint-disable-next-line jsx-a11y/click-events-have-key-events, jsx-a11y/no-static-element-interactions
                         <div
                             className="main-page__tokens-list_item"
                             onClick={() => navToTokenDetails()}

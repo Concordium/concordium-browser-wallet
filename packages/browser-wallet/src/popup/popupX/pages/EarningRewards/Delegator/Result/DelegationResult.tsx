@@ -1,5 +1,4 @@
 import React from 'react';
-import ExportIcon from '@assets/svgX/sign-out.svg';
 import Button from '@popup/popupX/shared/Button';
 
 export default function DelegationResult() {
@@ -29,7 +28,7 @@ export default function DelegationResult() {
                     </span>
                 </div>
             </div>
-            <Button className="button-main">Continue</Button>
+            <Button.Main label="Continue" />
         </div>
     );
 }

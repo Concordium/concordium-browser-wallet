@@ -47,9 +47,7 @@ export default function SendFunds() {
                 <Plus />
                 <span className="label__main">Add memo</span>
             </div>
-            <Button className="button-main" onClick={() => navToConfirm()}>
-                Continue
-            </Button>
+            <Button.Main className="button-main" onClick={() => navToConfirm()} label="Continue" />
         </div>
     );
 }

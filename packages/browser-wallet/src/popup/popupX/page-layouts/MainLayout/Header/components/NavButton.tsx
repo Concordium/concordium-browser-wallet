@@ -3,7 +3,12 @@ import { useNavigate } from 'react-router-dom';
 import ArrowsLeft from '@assets/svgX/arrow-left.svg';
 import clsx from 'clsx';
 
-export default function NavButton({ hideBackArrow, backTitle = 'to Main page' }) {
+type NavButtonProps = {
+    hideBackArrow: boolean;
+    backTitle?: string;
+};
+
+export default function NavButton({ hideBackArrow, backTitle = 'to Main page' }: NavButtonProps) {
     const nav = useNavigate();
     if (hideBackArrow) return null;
     return (

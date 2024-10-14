@@ -28,7 +28,7 @@ async function fetchLatestAccountTransactions(
     signal?: AbortSignal
 ): Promise<BrowserWalletTransaction[]> {
     const transactions: BrowserWalletTransaction[] = [];
-    let startingId = undefined;
+    let startingId;
     // eslint-disable-next-line no-constant-condition
     while (true) {
         const result = await WalletProxy.getTransactions(accountAddress, transactionResultLimit, 'ascending', {
@@ -207,7 +207,7 @@ Assumes 'transactions' are sorted by time in descending order.
  */
 function convertToLogEntry(accountAddress: string, transactions: BrowserWalletTransaction[]): DayLogEntry[] {
     const dayLogs = [];
-    let dayLog: DayLogEntry | undefined = undefined;
+    let dayLog: DayLogEntry | undefined;
     for (const tx of transactions) {
         const dateTime = new Date(Number(tx.time * 1000n));
         const date = onlyDate(dateTime);
@@ -254,7 +254,7 @@ export type TransactionLogEntry = {
     /** Whether this transaction should be considered as income. */
     income: boolean;
     /** The amount of CCD/tokens being transferred/rewarded, includes the token symbol. Is undefined for transactions which are not relevant. */
-    amount?: string; //10.02,
+    amount?: string; // 10.02,
     /** Fee information. */
     info: string; // 'with fee 0.02 CCD',
     /** Transaction memo. */
@@ -302,9 +302,10 @@ function TransactionLog({ account }: TransactionLogProps) {
                         <div key={day.date} className="transaction-log__history_day">
                             <div className="transaction-log__history_day-date">
                                 <Text.CaptureAdditional>{day.date}</Text.CaptureAdditional>
-                                {/*<Text.CaptureAdditional>${day.total}</Text.CaptureAdditional>*/}
+                                {/* <Text.CaptureAdditional>${day.total}</Text.CaptureAdditional> */}
                             </div>
                             {day.transactions.map((transaction) => (
+                                // eslint-disable-next-line jsx-a11y/click-events-have-key-events, jsx-a11y/no-static-element-interactions
                                 <div
                                     key={transaction.hash}
                                     className="transaction-log__history_transaction"
@@ -341,7 +342,6 @@ export default function Loader() {
     if (params.account === undefined) {
         // No account address in the path.
         return <Navigate to="../" />;
-    } else {
-        return <TransactionLog account={params.account} />;
     }
+    return <TransactionLog account={params.account} />;
 }

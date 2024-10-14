@@ -14,7 +14,7 @@ import { networkConfigurationAtom } from '@popup/store/settings';
 
 function useNetworks() {
     const { t } = useTranslation('x', { keyPrefix: 'network' });
-    const [currentNetworkConfiguration, setCurrentNetworkConfiguration] = useAtom(networkConfigurationAtom);
+    const [currentNetworkConfiguration] = useAtom(networkConfigurationAtom);
 
     const networks = [mainnet, testnet];
     if (isDevelopmentBuild()) {
