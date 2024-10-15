@@ -38,6 +38,22 @@ const t = {
             },
         },
     },
+    validator: {
+        intro: {
+            '1': {
+                title: 'Become a validator',
+                body: 'A validator is a node that participates in the network by producing new blocks that are added to the chain.\n\nEach validator has a set of cryptographic keys called validator keys that the node needs to produce blocks. You generate the validator keys when you add a validator account.\n\nOnce the validator node has been restarted with the validator keys, it will start validation two epochs after the transaction has been approved.',
+            },
+            '2': {
+                title: 'The node',
+                body: 'To become a validator you must run a node on the Concordium blockchain. Make sure that you have a setup where the node can operate around the clock.  You can run the node yourself or use a third-party provider. Make sure your account in the wallet has the required amount of CCD to become a validator.',
+            },
+            '3': {
+                title: 'Opening a pool',
+                body: 'You have the option when adding a validator to open a staking pool or not. A staking pool allows others who want to earn rewards to do so without the need to run a node or become a validator themselves.\n\nTo do this they delegate an amount to your staking pool which then increases your total stake and your chances of winning the lottery to bake a block. At each pay day the rewards will be distributed to you and your delegators.\n\nYou can also choose not to open a pool, in which case only your own stake applies toward the lottery. You can always open or close a pool later.',
+            },
+        },
+    },
 };
 
 export default t;
