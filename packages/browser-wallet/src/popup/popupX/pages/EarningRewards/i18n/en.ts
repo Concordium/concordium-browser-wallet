@@ -37,6 +37,15 @@ const t = {
                 body: 'When you make a delegation to either type of pool, your delegation amount will be locked on your account.\n\nThis means that you cannot use the amount for anything while it is still locked in for delegation.\n\nIf you decrease your delegation amount or stop the delegation altogether, the amount will still be locked for a cool-down period.\n\nAs transactions cost a fee, it is important to take into consideration that you will need some unlocked funds on your public balance to pay the fee for unlocking your delegation amount again.',
             },
         },
+        target: {
+            title: 'Register delegation',
+            description: 'You can delegate to an open pool of your choice, or you can stake using passive delegation.',
+            radioValidatorLabel: 'Validator',
+            radioPassiveLabel: 'Passive',
+            passiveDelegationDescription:
+                'Passive delegation is an alternative to delegation to a specific validator pool that has lower rewards. With passive delegation you do not have to worry about the uptime or quality of a baker node.\nFor more info you can visit <1>developer.concordium.software</1>',
+            buttonContinue: 'Continue',
+        },
     },
     validator: {
         intro: {
