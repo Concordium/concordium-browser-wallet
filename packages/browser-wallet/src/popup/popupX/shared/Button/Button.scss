@@ -42,7 +42,8 @@
         }
     }
 
-    &__icon {
+    &__icon,
+    &__text {
         display: flex;
         align-items: center;
         justify-content: center;

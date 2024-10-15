@@ -1,16 +1,25 @@
 import React, { Children, useMemo, useState } from 'react';
+import clsx from 'clsx';
 import { AnimatePresence, motion } from 'framer-motion';
 import Button from '@popup/popupX/shared/Button';
-import clsx from 'clsx';
+import ArrowRight from '@assets/svgX/arrow-right.svg';
 
 type Direction = 'next' | 'prev';
 
-export default function Carousel({ children }: { children: React.ReactNode }) {
+type CarouselProps = {
+    children: React.ReactNode;
+    /** Function to be called when the carousel is finished */
+    onDone: () => void;
+};
+
+export default function Carousel({ children, onDone }: CarouselProps) {
     const [[active], setActive] = useState<[number, Direction]>([0, 'next']);
     const pages = useMemo(() => Children.toArray(children), [children]);
     if (!pages) {
         return null;
     }
+
+    const isLast = active === pages.length - 1;
     return (
         <div className="info-carousel-container">
             <div className="info-carousel__content">
@@ -19,10 +28,10 @@ export default function Carousel({ children }: { children: React.ReactNode }) {
                 </AnimatePresence>
             </div>
             <div className="info-carousel__controls">
-                <div>Skip</div>
+                <Button.Text label="Skip" onClick={onDone} />
                 <div className="info-carousel__controls_dots">
                     {pages.map((_, i) => (
-                        <Button.Main
+                        <Button.Text
                             // eslint-disable-next-line react/no-array-index-key
                             key={i}
                             className={clsx('dot', active === i && 'dot--active')}
@@ -31,7 +40,15 @@ export default function Carousel({ children }: { children: React.ReactNode }) {
                         />
                     ))}
                 </div>
-                <div>{'Next ->'}</div>
+                {isLast && <Button.IconText label="Continue" icon={<ArrowRight />} leftLabel onClick={onDone} />}
+                {!isLast && (
+                    <Button.IconText
+                        label="Next"
+                        icon={<ArrowRight />}
+                        leftLabel
+                        onClick={() => setActive([active + 1, 'next'])}
+                    />
+                )}
             </div>
         </div>
     );

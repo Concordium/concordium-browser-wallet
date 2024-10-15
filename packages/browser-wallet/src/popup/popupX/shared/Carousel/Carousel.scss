@@ -4,9 +4,6 @@
     height: 100%;
 
     .info-carousel {
-        &__content {
-        }
-
         &__controls {
             display: flex;
             flex-direction: row;
@@ -19,6 +16,9 @@
                 align-items: center;
                 justify-content: center;
                 height: rem(6px);
+                position: absolute;
+                left: 50%;
+                transform: translateX(-50%);
 
                 .dot {
                     cursor: pointer;

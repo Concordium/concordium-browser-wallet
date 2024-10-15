@@ -1,8 +1,7 @@
 .seed-phrase-x {
     .card-x.grey {
         display: flex;
-        flex-direction: row;
-        flex-wrap: wrap;
+        flex-flow: row wrap;
         margin-top: rem(24px);
         border: rem(1px) solid $color-input-border;
 

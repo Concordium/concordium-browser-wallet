@@ -7,7 +7,7 @@ import { cpBakingThreshold } from '@shared/utils/chain-parameters-helpers';
 import { displayAsCcd } from 'wallet-common-helpers';
 import { useTranslation } from 'react-i18next';
 import { Link } from 'react-router-dom';
-import { absoluteRoutes, relativePath } from '@popup/popupX/constants/routes';
+import { absoluteRoutes } from '@popup/popupX/constants/routes';
 
 export default function EarningRewards() {
     const { t } = useTranslation('x', { keyPrefix: 'earn.root' });
@@ -24,18 +24,13 @@ export default function EarningRewards() {
             <Page.Top heading="Earning Rewards" />
             <Page.Main>
                 <div className="earn__card">
-                    <span className="text__main">{t('bakerTitle')}</span>
+                    <span className="text__main">{t('validatorTitle')}</span>
                     <span className="capture__main_small">
-                        {t('bakerDescription', { amount: displayAsCcd(bakingThreshold, false) })}
+                        {t('validatorDescription', { amount: displayAsCcd(bakingThreshold, false) })}
                     </span>
-                    <Link
-                        to={relativePath(
-                            absoluteRoutes.settings.earn.path,
-                            absoluteRoutes.settings.earn.baker.intro.path
-                        )}
-                    >
+                    <Link to={absoluteRoutes.settings.earn.baker.intro.path}>
                         <div className="earn__card_continue">
-                            <span className="label__regular">{t('bakerAction')}</span>
+                            <span className="label__regular">{t('validatorAction')}</span>
                             <ArrowRight />
                         </div>
                     </Link>
@@ -43,12 +38,7 @@ export default function EarningRewards() {
                 <div className="earn__card">
                     <span className="text__main">{t('delegationTitle')}</span>
                     <span className="capture__main_small">{t('delegationDescription')}</span>
-                    <Link
-                        to={relativePath(
-                            absoluteRoutes.settings.earn.path,
-                            absoluteRoutes.settings.earn.delegator.intro.path
-                        )}
-                    >
+                    <Link to={absoluteRoutes.settings.earn.delegator.intro.path}>
                         <div className="earn__card_continue">
                             <span className="label__regular">{t('delegationAction')}</span>
                             <ArrowRight />

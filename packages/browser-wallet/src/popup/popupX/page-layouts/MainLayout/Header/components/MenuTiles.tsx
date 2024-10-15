@@ -11,7 +11,7 @@ import Restore from '@assets/svgX/arrow-counter-clock.svg';
 import IconButton from '@popup/shared/IconButton';
 import Text from '@popup/popupX/shared/Text';
 import { Link } from 'react-router-dom';
-import { relativeRoutes } from '@popup/popupX/constants/routes';
+import { absoluteRoutes, relativeRoutes } from '@popup/popupX/constants/routes';
 import { useTranslation } from 'react-i18next';
 
 type MenuTilesProps = {
@@ -43,7 +43,7 @@ export default function MenuTiles({ menuOpen, setMenuOpen }: MenuTilesProps) {
                         <Text.Capture>{t('accounts')}</Text.Capture>
                     </IconButton>
                 </Link>
-                <Link to={relativeRoutes.settings.seedPhrase.path}>
+                <Link to="/">
                     <IconButton className="main-header__menu-tiles_tile">
                         <TextColumns />
                         <Text.Capture>{t('seedPhrase')}</Text.Capture>
@@ -55,13 +55,13 @@ export default function MenuTiles({ menuOpen, setMenuOpen }: MenuTilesProps) {
                         <Text.Capture>{t('passcode')}</Text.Capture>
                     </IconButton>
                 </Link>
-                <Link to={relativeRoutes.settings.web3Id.path}>
+                <Link to={absoluteRoutes.settings.web3Id.path}>
                     <IconButton className="main-header__menu-tiles_tile">
                         <WebId />
                         <Text.Capture>{t('web3Id')}</Text.Capture>
                     </IconButton>
                 </Link>
-                <Link to="/">
+                <Link to={absoluteRoutes.settings.earn.path}>
                     <IconButton className="main-header__menu-tiles_tile">
                         <Plant />
                         <Text.Capture>{t('earn')}</Text.Capture>

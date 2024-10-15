@@ -1,6 +1,6 @@
 import React from 'react';
 import { Route, Routes as ReactRoutes } from 'react-router-dom';
-import { relativeRoutes } from '@popup/popupX/constants/routes';
+import { relativeRoutes, routePrefix } from '@popup/popupX/constants/routes';
 import MainLayout from '@popup/popupX/page-layouts/MainLayout';
 import MainPage from '@popup/popupX/pages/MainPage';
 import { SendConfirm, SendFunds, SendSuccess } from '@popup/popupX/pages/SendFunds';
@@ -31,7 +31,7 @@ import DelegationResult from '../pages/EarningRewards/Delegator/Result/Delegatio
 export default function Routes() {
     return (
         <ReactRoutes>
-            <Route path="/walletX">
+            <Route path={routePrefix}>
                 <Route element={<MainLayout />} path={relativeRoutes.onboarding.path}>
                     <Route index element={<Welcome />} />
                     <Route element={<SetupPassword />} path={relativeRoutes.onboarding.setupPassword.path} />
