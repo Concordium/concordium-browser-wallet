@@ -162,6 +162,7 @@ $handle-size: rem(20px);
 
 .form-radios-x {
     &__radio {
+        cursor: pointer;
         display: flex;
         align-items: center;
         gap: rem(16px);
@@ -175,7 +176,6 @@ $handle-size: rem(20px);
         }
 
         .checkmark {
-            cursor: pointer;
             height: rem(20px);
             width: rem(20px);
             background-color: $color-grey-2;
