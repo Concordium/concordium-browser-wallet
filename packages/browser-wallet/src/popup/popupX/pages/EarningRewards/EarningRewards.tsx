@@ -24,9 +24,9 @@ export default function EarningRewards() {
             <Page.Top heading="Earning Rewards" />
             <Page.Main>
                 <div className="earn__card">
-                    <span className="text__main">{t('bakerTitle')}</span>
+                    <span className="text__main">{t('validatorTitle')}</span>
                     <span className="capture__main_small">
-                        {t('bakerDescription', { amount: displayAsCcd(bakingThreshold, false) })}
+                        {t('validatorDescription', { amount: displayAsCcd(bakingThreshold, false) })}
                     </span>
                     <Link
                         to={relativePath(
@@ -35,7 +35,7 @@ export default function EarningRewards() {
                         )}
                     >
                         <div className="earn__card_continue">
-                            <span className="label__regular">{t('bakerAction')}</span>
+                            <span className="label__regular">{t('validatorAction')}</span>
                             <ArrowRight />
                         </div>
                     </Link>
