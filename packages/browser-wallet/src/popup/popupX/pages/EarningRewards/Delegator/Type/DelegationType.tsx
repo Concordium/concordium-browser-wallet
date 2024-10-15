@@ -1,26 +1,32 @@
 import React from 'react';
 import Radio from '@popup/popupX/shared/Form/Radios';
 import Button from '@popup/popupX/shared/Button';
+import { Trans, useTranslation } from 'react-i18next';
+import Page from '@popup/popupX/shared/Page';
+import ExternalLink from '@popup/popupX/shared/ExternalLink';
 
 export default function DelegationType() {
+    const { t } = useTranslation('x', { keyPrefix: 'earn.delegator.target' });
     return (
-        <div className="delegation-type-container">
-            <div className="delegation-type__title">
-                <span className="heading_medium">Register Delegation</span>
-            </div>
-            <span className="capture__main_small">
-                You can delegate to an open pool of your choice, or you can stake using passive delegation.
-            </span>
+        <Page className="delegation-type-container">
+            <Page.Top heading={t('title')} />
+            <span className="capture__main_small">{t('description')}</span>
             <div className="delegation-type__select-form">
-                <Radio id="baker" label="Baker" name="radio" />
-                <Radio id="passive" label="Passive" name="radio" />
+                <Radio id="validator" label={t('radioValidatorLabel')} name="radio" />
+                <Radio id="passive" label={t('radioPassiveLabel')} name="radio" />
             </div>
             <span className="capture__main_small">
-                Passive delegation is an alternative to delegation to a specific baker pool that has lower rewards. With
-                passive delegation you do not have to worry about the uptime or quality of a baker node.
+                <Trans
+                    t={t}
+                    i18nKey="passiveDelegationDescription"
+                    components={{
+                        '1': (
+                            <ExternalLink path="https://developer.concordium.software/en/mainnet/net/concepts/concepts-delegation.html" />
+                        ),
+                    }}
+                />
             </span>
-            <span className="capture__main_small">For more info you can visit developer.concordium.software</span>
-            <Button.Main label="Continue" />
-        </div>
+            <Button.Main label={t('buttonContinue')} />
+        </Page>
     );
 }
