@@ -1,6 +1,7 @@
 import MultiStepForm from '@popup/popupX/shared/MultiStepForm';
 import React, { useCallback } from 'react';
 import { Location, useLocation, useNavigate } from 'react-router-dom';
+import { useTranslation } from 'react-i18next';
 import DelegatorStake, { DelegatorStakeForm } from '../Stake';
 import DelegatorType, { DelegationTypeForm } from '../Type';
 
@@ -15,6 +16,7 @@ type DelegatorForm = {
 export default function TransactionFlow() {
     const { state: initialValues, pathname } = useLocation() as Location & { state: DelegatorForm | undefined };
     const nav = useNavigate();
+    const { t } = useTranslation('x', { keyPrefix: 'earn.delegator.register' });
 
     const handleDone = useCallback(
         (values: DelegatorForm) => {
@@ -27,10 +29,19 @@ export default function TransactionFlow() {
         <MultiStepForm<DelegatorForm> onDone={handleDone} initialValues={initialValues}>
             {{
                 target: {
-                    render: (initial, onNext) => <DelegatorType initialValues={initial} onSubmit={onNext} />,
+                    render: (initial, onNext) => (
+                        <DelegatorType initialValues={initial} onSubmit={onNext} title={t('title')} />
+                    ),
                 },
                 stake: {
-                    render: () => <DelegatorStake />,
+                    render: (initial, onNext, form) => {
+                        if (form.target === undefined) {
+                            nav('..');
+                            return null;
+                        }
+
+                        return <DelegatorStake title={t('title')} target={form.target.type} />;
+                    },
                 },
             }}
         </MultiStepForm>

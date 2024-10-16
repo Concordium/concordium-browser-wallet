@@ -27,7 +27,7 @@ export function ButtonBase<A extends ElementType = 'button'>({
 
 function ButtonMain({ label, className, ...props }: { label: string } & ButtonProps) {
     return (
-        <ButtonBase className={`button__main ${className}`} {...props}>
+        <ButtonBase className={clsx('button__main', className)} {...props}>
             {label}
         </ButtonBase>
     );
