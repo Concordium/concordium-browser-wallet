@@ -28,7 +28,7 @@ type Props = {
     className?: string;
 };
 
-const zeroBalance: Omit<PublicAccountAmounts, 'scheduled'> = {
+const zeroBalance: Omit<PublicAccountAmounts, 'scheduled' | 'cooldown'> = {
     total: 0n,
     staked: 0n,
     atDisposal: 0n,
@@ -36,7 +36,7 @@ const zeroBalance: Omit<PublicAccountAmounts, 'scheduled'> = {
 
 export default function AccountDetails({ expanded, account, className }: Props) {
     const { t } = useTranslation('account', { keyPrefix: 'details' });
-    const [balances, setBalances] = useState<Omit<PublicAccountAmounts, 'scheduled'>>(zeroBalance);
+    const [balances, setBalances] = useState<Omit<PublicAccountAmounts, 'scheduled' | 'cooldown'>>(zeroBalance);
     const identityName = useIdentityName(account);
     const accountInfo = useAccountInfo(account);
 

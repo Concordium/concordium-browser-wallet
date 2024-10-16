@@ -1,162 +1,53 @@
-.token-details-container {
-    padding-bottom: rem(64px);
+.token-details-x {
+    &__stake {
+        display: flex;
+        justify-content: space-between;
+        margin-top: rem(12px);
+        margin-bottom: rem(16px);
+        padding-top: rem(12px);
+        border-top: 1px solid rgba($color-white, 0.1);
 
-    .token-details {
-        &__selected-token {
-            display: flex;
-
-            .token-icon {
-                display: flex;
-                padding: rem(8px);
-                margin-right: rem(8px);
-                border-radius: rem(6px);
-                background: $color-main-bg;
-
-                svg {
-                    width: rem(16px);
-                    height: rem(16px);
-                }
-            }
-
-            .token-info {
-                display: flex;
-                flex-direction: column;
-
-                .text__main {
-                    color: $color-white;
-                    line-height: rem(18px);
-                }
-
-                .capture__main_small {
-                    line-height: rem(12px);
-                }
-            }
-        }
-
-        &__balance {
+        &_group {
             display: flex;
             flex-direction: column;
-            margin-top: rem(24px);
 
-            .heading_large {
-                background-image: $gradient-balance-bg;
-                color: transparent;
-                background-clip: text;
-            }
-
-            .staked {
-                display: flex;
-                margin-top: rem(8px);
-
-                .capture__additional_small {
-                    color: $color-white;
-                    margin-left: rem(8px);
-                }
-
-                svg {
-                    width: rem(16px);
-                    height: rem(16px);
-                }
+            .capture__additional_small {
+                color: $color-white;
             }
         }
+    }
 
-        &__action-buttons {
-            display: flex;
-            margin-top: rem(32px);
-            align-items: stretch;
-            gap: rem(4px);
+    &__action-buttons {
+        display: flex;
+        align-items: stretch;
+        width: 100%;
+        gap: rem(4px);
+        margin-top: rem(12px);
 
-            .icon-button {
-                flex: 1;
-                gap: rem(6px);
-                border-radius: rem(12px);
-                padding: rem(12px) 0;
+        .send svg {
+            transform: rotate(-90deg);
+        }
 
-                .capture__additional_small {
-                    color: $color-white;
-                }
+        .receive svg {
+            transform: rotate(90deg);
+        }
+    }
+
+    .card-x {
+        margin-top: rem(16px);
+    }
+
+    .button__icon.text {
+        margin-top: rem(12px);
+        align-self: flex-start;
+
+        &:last-child {
+            .label__main {
+                color: $color-red-attention;
             }
 
             svg path {
-                fill: $color-mineral-0;
-            }
-
-            .send svg {
-                transform: rotate(-90deg);
-            }
-
-            .receive svg {
-                transform: rotate(90deg);
-            }
-
-            &_secondary {
-                .icon-button {
-                    cursor: pointer;
-                    padding: rem(6px) rem(0);
-                    background-color: unset;
-
-                    &:hover {
-                        background-color: unset;
-                    }
-
-                    .capture__additional_small {
-                        color: $color-white;
-                        margin-left: rem(8px);
-                    }
-
-                    svg {
-                        width: rem(16px);
-                        height: rem(16px);
-                    }
-
-                    svg path {
-                        fill: $color-white;
-                    }
-
-                    &.hide-token {
-                        .capture__additional_small {
-                            color: red;
-                        }
-
-                        svg path {
-                            fill: red;
-                        }
-                    }
-                }
-            }
-        }
-
-        &__card {
-            background-color: $color-transaction-bg;
-            border-radius: rem(12px);
-            padding: rem(8px) rem(14px);
-            margin-top: rem(40px);
-            margin-bottom: rem(24px);
-
-            &_row {
-                display: flex;
-                flex-direction: column;
-                gap: rem(6px);
-                padding: rem(8px) 0;
-                border-bottom: 1px solid rgba($color-white, 0.1);
-
-                &:last-child {
-                    border-bottom: none;
-                }
-
-                .stock {
-                    .capture__main_small:nth-child(1) {
-                        color: $color-white;
-                    }
-
-                    .capture__main_small:nth-child(2) {
-                        color: $color-green-success;
-                    }
-                }
-
-                .capture__main_small:nth-child(2) {
-                    color: $color-white;
-                }
+                fill: $color-red-attention;
             }
         }
     }

@@ -10,6 +10,9 @@ import Button from '@popup/popupX/shared/Button';
 import { useTranslation } from 'react-i18next';
 import Card from '@popup/popupX/shared/Card';
 import Text from '@popup/popupX/shared/Text';
+import { useNavigate } from 'react-router-dom';
+import { absoluteRoutes } from '@popup/popupX/constants/routes';
+import { copyToClipboard } from '@popup/popupX/shared/utils/helpers';
 
 const ACCOUNT_LIST = [
     {
@@ -34,6 +37,10 @@ const ACCOUNT_LIST = [
 
 export default function Accounts() {
     const { t } = useTranslation('x', { keyPrefix: 'accounts' });
+    const nav = useNavigate();
+    const navToPrivateKey = () => nav(absoluteRoutes.settings.accounts.privateKey.path);
+    const navToConnectedSites = () => nav(absoluteRoutes.settings.accounts.connectedSites.path);
+    const navToIdCards = () => nav(absoluteRoutes.settings.idCards.path);
     return (
         <Page className="accounts-x">
             <Page.Top heading={t('accounts')}>
@@ -43,14 +50,18 @@ export default function Accounts() {
             </Page.Top>
             <Page.Main>
                 {ACCOUNT_LIST.map(({ account, address, balance, attached }) => (
-                    <Card>
+                    <Card key={account}>
                         <Card.Row>
                             <Text.Main>{account}</Text.Main>
                             <Button.Icon className="transparent" icon={<Pencil />} />
                         </Card.Row>
                         <Card.Row>
                             <Text.Capture>{address}</Text.Capture>
-                            <Button.Icon className="transparent" icon={<Copy />} />
+                            <Button.Icon
+                                className="transparent"
+                                onClick={() => copyToClipboard(address)}
+                                icon={<Copy />}
+                            />
                         </Card.Row>
                         <Card.Row>
                             <Text.MainRegular>{t('totalBalance')}</Text.MainRegular>
@@ -60,6 +71,7 @@ export default function Accounts() {
                             <Text.MainRegular>{t('connectedSites')}</Text.MainRegular>
                             <Button.IconText
                                 className="transparent"
+                                onClick={navToConnectedSites}
                                 label={t('seeList')}
                                 icon={<ArrowRight />}
                                 leftLabel
@@ -69,6 +81,7 @@ export default function Accounts() {
                             <Text.MainRegular>{t('privateKey')}</Text.MainRegular>
                             <Button.IconText
                                 className="transparent"
+                                onClick={navToPrivateKey}
                                 label={t('export')}
                                 icon={<ArrowRight />}
                                 leftLabel
@@ -76,7 +89,13 @@ export default function Accounts() {
                         </Card.Row>
                         <Card.Row>
                             <Text.MainRegular>{t('attachedTo')}</Text.MainRegular>
-                            <Button.IconText className="transparent" label={attached} icon={<ArrowRight />} leftLabel />
+                            <Button.IconText
+                                className="transparent"
+                                onClick={navToIdCards}
+                                label={attached}
+                                icon={<ArrowRight />}
+                                leftLabel
+                            />
                         </Card.Row>
                     </Card>
                 ))}

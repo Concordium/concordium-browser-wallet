@@ -1,31 +1,39 @@
-import React from 'react';
+import React, { ReactNode } from 'react';
 import ArrowRight from '@assets/svgX/arrow-right.svg';
 import Button from '@popup/popupX/shared/Button';
+import Page from '@popup/popupX/shared/Page';
+import Text from '@popup/popupX/shared/Text';
+import { useTranslation } from 'react-i18next';
+import IdCard from '@popup/popupX/shared/IdCard';
+
+function AccountLink({ account, balance }: { account: string; balance: string }) {
+    return (
+        <div className="account-link">
+            <Text.Capture>{account}</Text.Capture>
+            {balance}
+            <Button.Icon className="transparent" icon={<ArrowRight />} />
+        </div>
+    );
+}
+
+const rowsIdInfo: [string, ReactNode][] = [
+    ['', <AccountLink account="Accout 1 / 6gk...k7o" balance="1,285,700 CCD" />],
+    ['', <AccountLink account="Accout 2 / tt2...50eo" balance="90,800 CCD" />],
+];
 
 export default function RestoreResult() {
+    const { t } = useTranslation('x', { keyPrefix: 'restore' });
+
     return (
-        <div className="restore-container">
-            <div className="restore-result__title">
-                <span className="heading_medium">Restoring result</span>
-                <span className="capture__main_small">The following identities and accounts were recovered.</span>
-            </div>
-            <div className="restore-result__identity-card">
-                <span className="text__main">Identity 1</span>
-                <span className="capture__additional_small">Verified by NotaBene</span>
-                <div className="restore-result__identity-card_details">
-                    <div className="details-data-line">
-                        <span className="text__main_regular">Accout 1 / 6gk...Fk7o</span>
-                        <span className="text__main_medium">4,227.38 USD</span>
-                        <ArrowRight />
-                    </div>
-                    <div className="details-data-line">
-                        <span className="text__main_regular">Accout 2 / tt2...50eo</span>
-                        <span className="text__main_medium">1,195.41 USD</span>
-                        <ArrowRight />
-                    </div>
-                </div>
-            </div>
-            <Button.Main className="button-main" onClick={() => {}} label="Continue" />
-        </div>
+        <Page className="restore-result-x">
+            <Page.Top heading={t('result')} />
+            <Page.Main>
+                <Text.Capture>{t('recoveredIds')}</Text.Capture>
+                <IdCard rowsIdInfo={rowsIdInfo} />
+            </Page.Main>
+            <Page.Footer>
+                <Button.Main label={t('continue')} />
+            </Page.Footer>
+        </Page>
     );
 }

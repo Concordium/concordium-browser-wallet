@@ -1,68 +1,28 @@
-.restore-container {
-    display: flex;
-    flex-direction: column;
-    height: 100%;
-    padding-bottom: rem(32px);
+.restore-result-x {
+    .card-x.gradient {
+        margin-top: rem(16px);
 
-    .restore-intro {
-        &__title {
-            display: flex;
-            flex-direction: column;
-
-            & > .capture__main_small {
-                margin-top: rem(12px);
-                margin-bottom: rem(16px);
-            }
-        }
-    }
-
-    .restore-result {
-        &__title {
-            display: flex;
-            flex-direction: column;
-
-            .capture__main_small {
-                margin-top: rem(12px);
-            }
-        }
-
-        &__identity-card {
-            display: flex;
-            flex-direction: column;
-            background: $gradient-card-bg;
-            border-radius: rem(16px);
-            margin-top: rem(16px);
-
-            .text__main {
-                margin-top: rem(16px);
-                margin-left: rem(20px);
-            }
-
-            .capture__additional_small {
-                color: $color-mineral-0;
-                margin-left: rem(20px);
-            }
-
-            &_details {
-                padding: rem(16px);
-                margin: rem(18px) rem(4px) rem(4px) rem(4px);
-                border-radius: rem(12px);
-                background-color: $color-grey-1;
-
-                .details-data-line {
-                    display: flex;
-                }
-
-                .details-data-line:not(:last-child) {
-                    padding-bottom: rem(12px);
-                    margin-bottom: rem(12px);
-                    border-bottom: 1px solid rgba($color-white, 0.1);
-                }
+        .card-x.grey {
+            .row {
+                justify-content: unset;
 
                 .text__main_medium {
-                    color: $color-white;
-                    margin-left: auto;
-                    margin-right: rem(16px);
+                    width: 100%;
+
+                    .account-link {
+                        width: 100%;
+                        display: flex;
+
+                        .capture__main_small {
+                            margin-left: unset;
+                            color: $color-white;
+                            margin-right: auto;
+                        }
+
+                        .button__icon {
+                            margin-left: rem(16px);
+                        }
+                    }
                 }
             }
         }

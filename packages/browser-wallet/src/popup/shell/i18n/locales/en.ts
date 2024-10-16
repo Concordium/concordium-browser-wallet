@@ -33,6 +33,9 @@ import onboarding from '@popup/popupX/pages/Onboarding/i18n/en';
 import receiveFunds from '@popup/popupX/pages/ReceiveFunds/i18n/en';
 import idCards from '@popup/popupX/pages/IdCards/i18n/en';
 import accounts from '@popup/popupX/pages/Accounts/i18n/en';
+import mainPage from '@popup/popupX/pages/MainPage/i18n/en';
+import tokenDetails from '@popup/popupX/pages/TokenDetails/i18n/en';
+import restore from '@popup/popupX/pages/Restore/i18n/en';
 import connectedSites from '@popup/popupX/pages/ConnectedSites/i18n/en';
 import privateKey from '@popup/popupX/pages/PrivateKey/i18n/en';
 import seedPhrase from '@popup/popupX/pages/SeedPhrase/i18n/en';
@@ -79,6 +82,9 @@ const t = {
         receiveFunds,
         idCards,
         accounts,
+        mainPage,
+        tokenDetails,
+        restore,
         connectedSites,
         privateKey,
         seedPhrase,

@@ -1,21 +1,25 @@
 import React from 'react';
+import { useNavigate } from 'react-router-dom';
 import Button from '@popup/popupX/shared/Button';
+import Page from '@popup/popupX/shared/Page';
+import { useTranslation } from 'react-i18next';
+import Text from '@popup/popupX/shared/Text';
+import { absoluteRoutes } from '@popup/popupX/constants/routes';
 
 export default function RestoreIntro() {
+    const { t } = useTranslation('x', { keyPrefix: 'restore' });
+    const nav = useNavigate();
+    const navToResult = () => nav(absoluteRoutes.settings.restore.result.path);
+
     return (
-        <div className="restore-container">
-            <div className="restore-intro__title">
-                <span className="heading_medium">Restore wallet</span>
-                <span className="capture__main_small">
-                    If you are missing some identities or accounts in your wallet, you can try restoring them here.
-                </span>
-                <span className="capture__main_small">
-                    If you used your secret recovery phrase to create more identities and accounts in another
-                    installation of the Concordium wallet, you can also use this option to add them to this
-                    installation.
-                </span>
-            </div>
-            <Button.Main className="button-main" onClick={() => {}} label="Restore" />
-        </div>
+        <Page className="restore-intro-x">
+            <Page.Top heading={t('restoreIds')} />
+            <Page.Main>
+                <Text.Capture>{t('restoreInfo')}</Text.Capture>
+            </Page.Main>
+            <Page.Footer>
+                <Button.Main label={t('restore')} onClick={navToResult} />
+            </Page.Footer>
+        </Page>
     );
 }

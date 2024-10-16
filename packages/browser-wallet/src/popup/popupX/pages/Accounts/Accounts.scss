@@ -1,4 +1,12 @@
 .accounts-x {
+    .page__top {
+        .button__icon {
+            svg path {
+                fill: $color-white;
+            }
+        }
+    }
+
     .page__main {
         display: flex;
         flex-direction: column;
