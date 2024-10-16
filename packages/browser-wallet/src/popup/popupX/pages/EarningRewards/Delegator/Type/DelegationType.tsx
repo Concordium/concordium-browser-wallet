@@ -14,28 +14,29 @@ import { grpcClientAtom, networkConfigurationAtom } from '@popup/store/settings'
 /** Describes the form values for configuring the delegation target of a delegation transaction */
 export type DelegationTypeForm = {
     /** The target for the delegation */
-    target: DelegationTargetType;
+    type: DelegationTargetType;
     /** The target baker ID - only relevant for target = {@linkcode DelegationTargetType.Baker} */
     bakerId?: string;
 };
 
 type Props = {
+    title: string;
     /** The initial values delegation configuration target step */
-    initialValues: DelegationTypeForm | undefined;
+    initialValues?: DelegationTypeForm;
     /** The submit handler triggered when submitting the form in the step */
     onSubmit(values: DelegationTypeForm): void;
 };
 
-export default function DelegationType({ initialValues, onSubmit }: Props) {
+export default function DelegationType({ initialValues, onSubmit, title }: Props) {
     const network = useAtomValue(networkConfigurationAtom);
     const client = useAtomValue(grpcClientAtom);
     const { t } = useTranslation('x', { keyPrefix: 'earn.delegator.target' });
 
     const form = useForm<DelegationTypeForm>({
-        defaultValues: initialValues ?? { target: DelegationTargetType.PassiveDelegation },
+        defaultValues: initialValues ?? { type: DelegationTargetType.PassiveDelegation },
     });
     const submit = form.handleSubmit(onSubmit);
-    const target = form.watch('target');
+    const target = form.watch('type');
 
     const validateBakerId: Validate<string | undefined> = async (value) => {
         try {
@@ -53,7 +54,7 @@ export default function DelegationType({ initialValues, onSubmit }: Props) {
 
     return (
         <Page className="delegation-type-container">
-            <Page.Top heading={t('title')} />
+            <Page.Top heading={title} />
             <span className="capture__main_small">{t('description')}</span>
             <Form<DelegationTypeForm> className="delegation-type__select-form" formMethods={form} onSubmit={onSubmit}>
                 {(f) => (
@@ -61,13 +62,13 @@ export default function DelegationType({ initialValues, onSubmit }: Props) {
                         <FormRadio
                             id={DelegationTargetType.Baker}
                             label={t('radioValidatorLabel')}
-                            name="target"
+                            name="type"
                             register={f.register}
                         />
                         <FormRadio
                             id={DelegationTargetType.PassiveDelegation}
                             label={t('radioPassiveLabel')}
-                            name="target"
+                            name="type"
                             register={f.register}
                         />
                         {target === DelegationTargetType.Baker && (
@@ -108,7 +109,9 @@ export default function DelegationType({ initialValues, onSubmit }: Props) {
                     />
                 )}
             </span>
-            <Button.Main label={t('buttonContinue')} onClick={submit} />
+            <Page.Footer>
+                <Button.Main label={t('buttonContinue')} onClick={submit} />
+            </Page.Footer>
         </Page>
     );
 }

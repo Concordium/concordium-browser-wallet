@@ -37,8 +37,9 @@ const t = {
                 body: 'When you make a delegation to either type of pool, your delegation amount will be locked on your account.\n\nThis means that you cannot use the amount for anything while it is still locked in for delegation.\n\nIf you decrease your delegation amount or stop the delegation altogether, the amount will still be locked for a cool-down period.\n\nAs transactions cost a fee, it is important to take into consideration that you will need some unlocked funds on your public balance to pay the fee for unlocking your delegation amount again.',
             },
         },
+        register: { title: 'Register delegation' },
+        update: { title: 'Update delegation' },
         target: {
-            title: 'Register delegation',
             description: 'You can delegate to an open pool of your choice, or you can stake using passive delegation.',
             radioValidatorLabel: 'Validator',
             radioPassiveLabel: 'Passive',
@@ -53,6 +54,35 @@ const t = {
                 'If you don’t already know which validator pool you want to delegate an amount to, you can look for on <1>here.</1>',
             passiveDelegationDescription:
                 'Passive delegation is an alternative to delegation to a specific validator pool that has lower rewards. With passive delegation you do not have to worry about the uptime or quality of a baker node.\nFor more info you can visit <1>developer.concordium.software</1>',
+            buttonContinue: 'Continue',
+        },
+        stake: {
+            selectedAccount: 'on {{account}}',
+            token: {
+                label: 'Token',
+                value: 'CCD',
+                balance: '{{balance}} CCD available',
+            },
+            inputAmount: {
+                label: 'Amount',
+                buttonMax: 'Stake max.',
+            },
+            fee: {
+                label: 'Estimated transaction fee:',
+                value: '{{amount}} CCD',
+            },
+            poolStake: {
+                label: 'Current pool',
+                value: '{{amount}} CCD',
+            },
+            poolCap: {
+                label: 'Pool limit',
+                value: '{{amount}} CCD',
+            },
+            redelegate: {
+                label: 'Restake rewards',
+                description: 'I want to automatically add my delegation rewards to my delegation amount.',
+            },
             buttonContinue: 'Continue',
         },
     },

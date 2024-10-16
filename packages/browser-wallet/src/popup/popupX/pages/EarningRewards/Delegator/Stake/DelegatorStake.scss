@@ -1,23 +1,12 @@
 .register-delegator-container {
     display: flex;
     flex-direction: column;
-    height: 100%;
+    min-height: 100%;
     padding-bottom: rem(32px);
 
     .register-delegator {
-        &__title {
-            display: flex;
-            flex-direction: column;
-            align-items: baseline;
-            justify-content: space-between;
-            margin-bottom: rem(16px);
-
-            .capture__main_small {
-                padding-left: rem(6px);
-            }
-        }
-
         &__token-card {
+            margin-top: rem(16px);
             background: $gradient-card-bg;
             border-radius: rem(16px);
             padding: rem(20px) rem(16px);

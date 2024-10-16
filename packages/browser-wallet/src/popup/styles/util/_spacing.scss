@@ -48,6 +48,11 @@ p-h-50 = padding-left: 5rem; padding-right: 5rem;
                 margin-#{$side}: #{rem($space)};
             }
         }
+        .m-#{str-slice($side, 0, 1)}-neg-#{$space} {
+            @include with-first-last-mods {
+                margin-#{$side}: -#{rem($space)};
+            }
+        }
         .p-#{str-slice($side, 0, 1)}-#{$space} {
             @include with-first-last-mods {
                 padding-#{$side}: #{rem($space)};
