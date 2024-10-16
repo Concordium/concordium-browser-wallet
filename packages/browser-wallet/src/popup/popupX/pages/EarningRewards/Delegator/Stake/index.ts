@@ -1,1 +1,1 @@
-export { default } from './DelegatorStake';
+export { default, type DelegatorStakeForm } from './DelegatorStake';

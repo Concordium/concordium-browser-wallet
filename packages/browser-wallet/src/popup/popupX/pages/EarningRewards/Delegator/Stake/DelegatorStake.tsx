@@ -2,6 +2,14 @@ import React from 'react';
 import Button from '@popup/popupX/shared/Button';
 import { ToggleCheckbox } from '@popup/popupX/shared/Form/ToggleCheckbox';
 
+/** The form values for delegator stake configuration step */
+export type DelegatorStakeForm = {
+    /** in CCD */
+    amount: string;
+    /** Whether to add rewards to the stake or not */
+    redelegate: boolean;
+};
+
 export default function DelegatorStake() {
     return (
         <div className="register-delegator-container">

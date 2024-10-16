@@ -1,1 +1,1 @@
-export { default } from './Radios';
+export { default, FormRadio } from './Radios';
