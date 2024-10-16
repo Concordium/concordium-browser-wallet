@@ -9,7 +9,7 @@ import {
     useForm as useFormLib,
     FormProvider,
 } from 'react-hook-form';
-import { ClassName } from 'wallet-common-helpers';
+import { ClassName, noOp } from 'wallet-common-helpers';
 
 const useFormDefaults: Pick<UseFormProps, 'mode'> = {
     mode: 'onTouched',
@@ -25,9 +25,9 @@ export const useForm = <TFormValues extends FieldValues = FieldValues>(
 
 type FormProps<TFormValues extends FieldValues = FieldValues> = ClassName & {
     /**
-     * Submit handler, receiving the values of the form as arg.
+     * Submit handler, receiving the values of the form as arg. If left undefined, form submission is expected to be handled explicitly elsewhere.
      */
-    onSubmit: SubmitHandler<TFormValues>;
+    onSubmit?: SubmitHandler<TFormValues>;
     /**
      * Optional form methods from 'react-hook-form' useForm, if form methods need to be accessed outside of the form.
      */
@@ -74,9 +74,11 @@ const Form = forwardRef(
         const internal = useForm<V>({ defaultValues });
         const methods = external ?? internal;
 
+        const submit = () => (onSubmit === undefined ? noOp : methods.handleSubmit(onSubmit));
+
         return (
             <FormProvider {...methods}>
-                <form className={className} onSubmit={methods.handleSubmit(onSubmit)} ref={ref}>
+                <form className={className} onSubmit={submit} ref={ref}>
                     {children(methods)}
                 </form>
             </FormProvider>
