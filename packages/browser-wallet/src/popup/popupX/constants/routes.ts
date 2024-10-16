@@ -146,9 +146,11 @@ export const relativeRoutes = {
                 },
             },
         },
+        /** Routes related to staking for the currently selected account */
         earn: {
             path: 'earn',
-            baker: {
+            /** Validation related routes */
+            validator: {
                 path: 'baker',
                 intro: {
                     path: 'intro',
@@ -159,23 +161,20 @@ export const relativeRoutes = {
                 openPool: {
                     path: 'openPool',
                 },
-                bakerKeys: {
-                    path: 'bakerKeys',
+                keys: {
+                    path: 'keys',
                 },
             },
+            /** Delegation related routes */
             delegator: {
                 path: 'delegator',
-                intro: {
-                    path: 'intro',
-                },
-                type: {
-                    path: 'type',
-                },
+                /** Configure new delegator */
                 register: {
                     path: 'register',
                 },
-                result: {
-                    path: 'result',
+                /** Configure existing delegator */
+                update: {
+                    path: 'update',
                 },
             },
         },

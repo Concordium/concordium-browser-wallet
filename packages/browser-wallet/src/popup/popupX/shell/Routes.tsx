@@ -20,15 +20,12 @@ import { IdSubmitted, IdCardsInfo, RequestIdentity, SetupPassword, Welcome } fro
 import ConnectedSites from '@popup/popupX/pages/ConnectedSites';
 import EarningRewards from '@popup/popupX/pages/EarningRewards';
 import { BakerIntro } from '@popup/popupX/pages/EarningRewards/Baker/Intro';
-import { DelegatorIntro } from '@popup/popupX/pages/EarningRewards/Delegator/Intro';
 import { RegisterBaker } from '@popup/popupX/pages/EarningRewards/Baker/Register';
 import { OpenPool } from '@popup/popupX/pages/EarningRewards/Baker/OpenPool';
 import { BakerKeys } from '@popup/popupX/pages/EarningRewards/Baker/BakerKeys';
-import DelegationType from '@popup/popupX/pages/EarningRewards/Delegator/Type/DelegationType';
 import PrivateKey from '@popup/popupX/pages/PrivateKey';
 import { RestoreIntro, RestoreResult } from '@popup/popupX/pages/Restore';
-import RegisterDelegator from '../pages/EarningRewards/Delegator/Register/RegisterDelegator';
-import DelegationResult from '../pages/EarningRewards/Delegator/Result/DelegationResult';
+import RegisterDelegator from '../pages/EarningRewards/Delegator/RegisterDelegator';
 
 export default function Routes() {
     return (
@@ -91,31 +88,23 @@ export default function Routes() {
                     <Route element={<About />} path={relativeRoutes.settings.about.path} />
                     <Route path={relativeRoutes.settings.earn.path}>
                         <Route index element={<EarningRewards />} />
-                        <Route path={relativeRoutes.settings.earn.baker.path}>
-                            <Route element={<BakerIntro />} path={relativeRoutes.settings.earn.baker.intro.path} />
+                        <Route path={relativeRoutes.settings.earn.validator.path}>
+                            <Route element={<BakerIntro />} path={relativeRoutes.settings.earn.validator.intro.path} />
                             <Route
                                 element={<RegisterBaker />}
-                                path={relativeRoutes.settings.earn.baker.register.path}
+                                path={relativeRoutes.settings.earn.validator.register.path}
                             />
-                            <Route element={<OpenPool />} path={relativeRoutes.settings.earn.baker.openPool.path} />
-                            <Route element={<BakerKeys />} path={relativeRoutes.settings.earn.baker.bakerKeys.path} />
+                            <Route element={<OpenPool />} path={relativeRoutes.settings.earn.validator.openPool.path} />
+                            <Route element={<BakerKeys />} path={relativeRoutes.settings.earn.validator.keys.path} />
                         </Route>
                         <Route path={relativeRoutes.settings.earn.delegator.path}>
                             <Route
-                                element={<DelegatorIntro />}
-                                path={relativeRoutes.settings.earn.delegator.intro.path}
-                            />
-                            <Route
-                                element={<DelegationType />}
-                                path={relativeRoutes.settings.earn.delegator.type.path}
-                            />
-                            <Route
                                 element={<RegisterDelegator />}
-                                path={relativeRoutes.settings.earn.delegator.register.path}
+                                path={`${relativeRoutes.settings.earn.delegator.register.path}/*`}
                             />
                             <Route
-                                element={<DelegationResult />}
-                                path={relativeRoutes.settings.earn.delegator.result.path}
+                                element={<RegisterDelegator />} // FIXME: change to update flow
+                                path={`${relativeRoutes.settings.earn.delegator.update.path}/*`}
                             />
                         </Route>
                     </Route>

@@ -2,7 +2,7 @@ import React from 'react';
 import Button from '@popup/popupX/shared/Button';
 import { ToggleCheckbox } from '@popup/popupX/shared/Form/ToggleCheckbox';
 
-export default function RegisterDelegator() {
+export default function DelegatorStake() {
     return (
         <div className="register-delegator-container">
             <div className="register-delegator__title">
