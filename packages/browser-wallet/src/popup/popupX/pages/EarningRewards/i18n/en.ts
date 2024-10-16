@@ -42,6 +42,15 @@ const t = {
             description: 'You can delegate to an open pool of your choice, or you can stake using passive delegation.',
             radioValidatorLabel: 'Validator',
             radioPassiveLabel: 'Passive',
+            inputValidatorId: {
+                label: 'Enter validator pool ID',
+                errorRequired: 'Please specify a validator ID',
+                errorMin: 'Validator ID cannot be negative',
+                errorClosed: 'The validator pool is not open for delegation',
+                errorNotValidator: 'The specified ID is not a validator pool',
+            },
+            validatorDelegationDescription:
+                'If you don’t already know which validator pool you want to delegate an amount to, you can look for on <1>here.</1>',
             passiveDelegationDescription:
                 'Passive delegation is an alternative to delegation to a specific validator pool that has lower rewards. With passive delegation you do not have to worry about the uptime or quality of a baker node.\nFor more info you can visit <1>developer.concordium.software</1>',
             buttonContinue: 'Continue',
