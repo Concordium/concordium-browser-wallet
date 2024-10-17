@@ -1,3 +1,76 @@
 .token-amount {
-    display: block;
+    display: flex;
+    flex-direction: column;
+    border-radius: rem(16px);
+    background: $gradient-card-bg;
+    margin-top: rem(16px);
+    padding: rem(20px) rem(16px);
+
+    .text__main_medium {
+        color: $color-black;
+    }
+
+    .capture__additional_small {
+        padding: rem(4px);
+        border-radius: rem(4px);
+        color: $color-black;
+        background: $secondary-button-bg;
+    }
+
+    &_token,
+    &_amount,
+    &_receiver {
+        display: flex;
+        flex-direction: column;
+    }
+
+    &_token {
+        .token-selector {
+            display: flex;
+            align-items: center;
+            margin-top: rem(12px);
+            padding-bottom: rem(12px);
+            border-bottom: 1px solid rgba($color-black, 0.1);
+
+            .text__additional_small {
+                margin-left: auto;
+            }
+
+            .token-icon {
+                display: flex;
+                padding: rem(5px);
+                margin-right: rem(8px);
+                border-radius: rem(6px);
+                background: $color-grey-1;
+
+                svg {
+                    width: rem(14px);
+                    height: rem(14px);
+                }
+            }
+        }
+    }
+
+    &_amount {
+        margin-top: rem(24px);
+
+        .amount-selector {
+            display: flex;
+            align-items: flex-end;
+            justify-content: space-between;
+            padding: rem(8px) 0;
+            margin-bottom: rem(4px);
+            border-bottom: 1px solid rgba($color-black, 0.1);
+        }
+    }
+
+    &_receiver {
+        margin-top: rem(24px);
+
+        .address-selector {
+            display: flex;
+            justify-content: space-between;
+            margin-top: rem(12px);
+        }
+    }
 }
