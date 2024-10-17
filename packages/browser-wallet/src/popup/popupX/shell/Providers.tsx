@@ -3,12 +3,7 @@ import { useAtomValue } from 'jotai';
 import { networkConfigurationAtom, themeAtom } from '@popup/store/settings';
 import { mainnet } from '@shared/constants/networkConfiguration';
 import { Dimensions, large, medium, small } from '@popup/constants/dimensions';
-import {
-    isFullscreenWindow,
-    isFullscreenWindowDemo,
-    isSpawnedWeb3IdProofWindow,
-    isSpawnedWindow,
-} from '@popup/shared/window-helpers';
+import { isFullscreenWindow, isSpawnedWeb3IdProofWindow, isSpawnedWindow } from '@popup/shared/window-helpers';
 import { popupMessageHandler } from '@popup/shared/message-handler';
 import { InternalMessageType } from '@messaging';
 import { noOp } from 'wallet-common-helpers';
@@ -52,13 +47,6 @@ export function Scaling({ children }: { children: ReactElement }) {
 
             // Send a message to the BG script to resize the window.
             popupMessageHandler.sendInternalMessage(InternalMessageType.SetViewSize, dimensions).catch(noOp);
-        }
-
-        if (isFullscreenWindowDemo && body) {
-            body.style.margin = 'unset';
-            body.style.width = '100%';
-            body.style.height = '100%';
-            html?.classList.add('tablet');
         }
     }, []);
 

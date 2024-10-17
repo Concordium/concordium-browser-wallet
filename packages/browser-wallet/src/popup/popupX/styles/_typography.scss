@@ -7,6 +7,18 @@ $t-font-weight-medium: 500;
 $t-font-weight-semi-bold: 600;
 $t-font-weight-bold: 700;
 
+html.popup-x {
+    font-size: 14px;
+
+    &.ui-scale-medium {
+        font-size: 14px;
+    }
+
+    &.ui-scale-large {
+        font-size: 14px;
+    }
+}
+
 .heading {
     &_large {
         font-family: $t-font-family-satoshi;

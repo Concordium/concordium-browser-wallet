@@ -1,3 +1,7 @@
+&:not(html) {
+    background-color: rgba($color-black, 0.9);
+}
+
 .bg {
     opacity: unset;
     filter: unset;

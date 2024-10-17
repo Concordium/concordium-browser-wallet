@@ -8,6 +8,7 @@ import Plant from '@assets/svgX/plant.svg';
 import LinkSimple from '@assets/svgX/link-simple-horizontal.svg';
 import Info from '@assets/svgX/info2.svg';
 import Restore from '@assets/svgX/arrow-counter-clock.svg';
+import Eye from '@assets/svgX/eye.svg';
 import IconButton from '@popup/shared/IconButton';
 import Text from '@popup/popupX/shared/Text';
 import { Link } from 'react-router-dom';
@@ -49,7 +50,7 @@ export default function MenuTiles({ menuOpen, setMenuOpen }: MenuTilesProps) {
                         <Text.Capture>{t('seedPhrase')}</Text.Capture>
                     </IconButton>
                 </Link>
-                <Link to="/">
+                <Link to={absoluteRoutes.settings.passcode.path}>
                     <IconButton className="main-header__menu-tiles_tile">
                         <Password />
                         <Text.Capture>{t('passcode')}</Text.Capture>
@@ -83,6 +84,12 @@ export default function MenuTiles({ menuOpen, setMenuOpen }: MenuTilesProps) {
                     <IconButton className="main-header__menu-tiles_tile">
                         <Restore />
                         <Text.Capture>{t('restore')}</Text.Capture>
+                    </IconButton>
+                </Link>
+                <Link to="/account/tokens">
+                    <IconButton className="main-header__menu-tiles_tile">
+                        <Eye />
+                        <Text.Capture>{t('oldUI')}</Text.Capture>
                     </IconButton>
                 </Link>
             </div>

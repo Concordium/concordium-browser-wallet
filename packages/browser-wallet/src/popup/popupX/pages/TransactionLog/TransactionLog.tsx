@@ -307,7 +307,7 @@ function TransactionLog({ account }: TransactionLogProps) {
                             {day.transactions.map((transaction) => (
                                 // eslint-disable-next-line jsx-a11y/click-events-have-key-events, jsx-a11y/no-static-element-interactions
                                 <div
-                                    key={transaction.hash}
+                                    key={transaction.block}
                                     className="transaction-log__history_transaction"
                                     onClick={() => navToTransactionDetails(transaction)}
                                 >

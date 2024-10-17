@@ -3,7 +3,7 @@ import { useNavigate } from 'react-router-dom';
 import { useTranslation } from 'react-i18next';
 import { useAtomValue } from 'jotai';
 import { displayAsCcd } from 'wallet-common-helpers';
-import { Ratio } from '@concordium/web-sdk';
+import { AccountInfoType, Ratio } from '@concordium/web-sdk';
 import { relativeRoutes } from '@popup/popupX/constants/routes';
 import Img from '@popup/shared/Img';
 import { WalletCredential } from '@shared/storage/types';
@@ -142,6 +142,8 @@ function MainPage({ credential }: MainPageProps) {
         return <>Loading</>;
     }
 
+    const isStaked = [AccountInfoType.Delegator, AccountInfoType.Baker].includes(accountInfo.type);
+
     return (
         <Page className="main-page-x">
             <Balance credential={credential} />
@@ -161,7 +163,7 @@ function MainPage({ credential }: MainPageProps) {
                         onClick={() => nav(`${relativeRoutes.home.token.path}/ccd`)}
                         thumbnail={<ConcordiumLogo />}
                         symbol="CCD"
-                        staked
+                        staked={isStaked}
                         balance={displayAsCcd(accountInfo.accountAmount.microCcdAmount, false)}
                         balanceBase={accountInfo.accountAmount.microCcdAmount}
                         microCcdPerEur={microCcdPerEur}
