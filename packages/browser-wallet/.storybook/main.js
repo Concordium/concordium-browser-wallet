@@ -1,3 +1,4 @@
+import { dirname, join } from 'path';
 /* eslint-disable import/no-extraneous-dependencies, @typescript-eslint/no-var-requires, no-param-reassign */
 const path = require('path');
 const TsconfigPathsPlugin = require('tsconfig-paths-webpack-plugin');
@@ -5,23 +6,25 @@ const TsconfigPathsPlugin = require('tsconfig-paths-webpack-plugin');
 const pathToSvgAssets = path.resolve(__dirname, '../src/assets/svg');
 
 module.exports = {
-    core: {
-        builder: {
-            name: 'webpack5',
-            // options: {
-            //     lazyCompilation: true,
-            //     fsCache: true,
-            // },
-        },
-    },
-    stories: ['../src/**/*.stories.mdx', '../src/**/*.stories.@(js|jsx|ts|tsx)'],
+    stories: ['../src/**/*.mdx', '../src/**/*.stories.@(js|jsx|ts|tsx)'],
+
     addons: [
-        '@storybook/addon-links',
-        '@storybook/addon-essentials',
-        '@storybook/addon-interactions',
-        '@storybook/preset-scss',
+        getAbsolutePath('@storybook/addon-links'),
+        getAbsolutePath('@storybook/addon-essentials'),
+        getAbsolutePath('@storybook/addon-interactions'),
+        getAbsolutePath('@storybook/preset-scss'),
+        getAbsolutePath('@storybook/addon-webpack5-compiler-swc'),
     ],
-    framework: '@storybook/react',
+
+    framework: {
+        name: getAbsolutePath('@storybook/react-webpack5'),
+        options: {},
+    },
+
+    core: {
+        disableTelemetry: true,
+    },
+
     webpackFinal: async (config) => {
         const { rules } = config.module;
 
@@ -38,10 +41,21 @@ module.exports = {
 
         return config;
     },
+
     babel: async (options) => {
         return {
             ...options,
             plugins: options.plugins.filter((x) => !(typeof x === 'string' && x.includes('plugin-transform-classes'))),
         };
     },
+
+    docs: {},
+
+    typescript: {
+        reactDocgen: 'react-docgen-typescript',
+    },
 };
+
+function getAbsolutePath(value) {
+    return dirname(require.resolve(join(value, 'package.json')));
+}

@@ -1,14 +1,19 @@
 /* eslint-disable react/function-component-definition */
 import React from 'react';
-import { ComponentMeta, ComponentStory } from '@storybook/react';
+import { MemoryRouter } from 'react-router-dom';
+import { Meta, StoryObj } from '@storybook/react';
 
 import BackButton from './BackButton';
 
 export default {
     title: 'Shared/BackButton',
     component: BackButton,
-} as ComponentMeta<typeof BackButton>;
+} as Meta<typeof BackButton>;
 
-export const Primary: ComponentStory<typeof BackButton> = () => {
-    return <BackButton />;
+export const Primary: StoryObj<typeof BackButton> = {
+    render: () => (
+        <MemoryRouter>
+            <BackButton />
+        </MemoryRouter>
+    ),
 };

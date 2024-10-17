@@ -1,14 +1,16 @@
 /* eslint-disable react/function-component-definition */
 import React, { useState } from 'react';
-import { ComponentMeta, ComponentStory } from '@storybook/react';
+import { Meta, StoryObj } from '@storybook/react';
 import { InlineInput } from './InlineInput';
 
 export default {
     title: 'Shared/Form/InlineInput',
     component: InlineInput,
-} as ComponentMeta<typeof InlineInput>;
+} as Meta<typeof InlineInput>;
 
-const Template: ComponentStory<typeof InlineInput> = (args) => {
+type Story = StoryObj<typeof InlineInput>;
+
+const render: Story['render'] = (args) => {
     const [value, setValue] = useState<string>();
 
     return (
@@ -18,24 +20,28 @@ const Template: ComponentStory<typeof InlineInput> = (args) => {
     );
 };
 
-export const Text = Template.bind({});
-Text.args = {
-    label: 'Label',
-    type: 'text',
-    fallbackValue: '0',
+export const Text: Story = {
+    render,
+    args: {
+        label: 'Label',
+        type: 'text',
+        fallbackValue: '0',
+    },
 };
-
-export const Number = Template.bind({});
-Number.args = {
-    label: 'Label',
-    type: 'number',
-    fallbackValue: '0',
+export const Number: Story = {
+    render,
+    args: {
+        label: 'Label',
+        type: 'number',
+        fallbackValue: '0',
+    },
 };
-
-export const Invalid = Template.bind({});
-Invalid.args = {
-    label: 'Label',
-    type: 'text',
-    error: 'This is an error',
-    fallbackValue: '0',
+export const Invalid: Story = {
+    render,
+    args: {
+        label: 'Label',
+        type: 'text',
+        error: 'This is an error',
+        fallbackValue: '0',
+    },
 };

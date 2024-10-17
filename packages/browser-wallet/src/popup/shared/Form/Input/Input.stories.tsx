@@ -1,14 +1,16 @@
 /* eslint-disable react/function-component-definition */
 import React, { useState } from 'react';
-import { ComponentMeta, ComponentStory } from '@storybook/react';
+import { Meta, StoryObj } from '@storybook/react';
 import { Input } from './Input';
 
 export default {
     title: 'Shared/Form/Input',
     component: Input,
-} as ComponentMeta<typeof Input>;
+} as Meta<typeof Input>;
 
-const Template: ComponentStory<typeof Input> = (args) => {
+type Story = StoryObj<typeof Input>;
+
+const render: Story['render'] = (args) => {
     const [value, setValue] = useState<string>();
 
     return (
@@ -18,35 +20,41 @@ const Template: ComponentStory<typeof Input> = (args) => {
     );
 };
 
-export const Primary = Template.bind({});
-Primary.args = {
-    label: 'Label',
-    type: 'text',
+export const Primary: Story = {
+    render,
+    args: {
+        label: 'Label',
+        type: 'text',
+    },
 };
-
-export const WithNote = Template.bind({});
-WithNote.args = {
-    label: 'Label',
-    note: 'This is a note',
-    type: 'text',
+export const WithNote: Story = {
+    render,
+    args: {
+        label: 'Label',
+        note: 'This is a note',
+        type: 'text',
+    },
 };
-
-export const Number = Template.bind({});
-Number.args = {
-    label: 'Label',
-    type: 'number',
+export const Number: Story = {
+    render,
+    args: {
+        label: 'Label',
+        type: 'number',
+    },
 };
-
-export const Invalid = Template.bind({});
-Invalid.args = {
-    label: 'Label',
-    type: 'text',
-    error: 'This is an error',
+export const Invalid: Story = {
+    render,
+    args: {
+        label: 'Label',
+        type: 'text',
+        error: 'This is an error',
+    },
 };
-
-export const Valid = Template.bind({});
-Valid.args = {
-    label: 'Label',
-    type: 'text',
-    valid: true,
+export const Valid: Story = {
+    render,
+    args: {
+        label: 'Label',
+        type: 'text',
+        valid: true,
+    },
 };

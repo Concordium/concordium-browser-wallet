@@ -1,18 +1,15 @@
 /* eslint-disable react/function-component-definition */
 import React from 'react';
-import { ComponentMeta, ComponentStory } from '@storybook/react';
+import { Meta, StoryObj } from '@storybook/react';
 import Submit from './Submit';
 
 export default {
     title: 'Shared/Form/Submit',
     component: Submit,
-} as ComponentMeta<typeof Submit>;
+} as Meta<typeof Submit>;
 
-const Template: ComponentStory<typeof Submit> = (args) => {
-    return <Submit {...args} />;
-};
-
-export const Primary = Template.bind({});
-Primary.args = {
-    children: 'Submit',
+export const Primary: StoryObj<typeof Submit> = {
+    render: (args) => {
+        return <Submit {...args} />;
+    },
 };

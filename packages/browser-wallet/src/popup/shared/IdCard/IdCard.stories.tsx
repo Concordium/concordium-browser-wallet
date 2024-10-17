@@ -1,6 +1,6 @@
 /* eslint-disable react/function-component-definition, react/destructuring-assignment */
 import React, { useEffect, useState } from 'react';
-import { ComponentMeta, ComponentStory } from '@storybook/react';
+import { Meta, StoryObj } from '@storybook/react';
 import IdCard from './IdCard';
 
 const notabeneLogo = (
@@ -29,19 +29,20 @@ const notabeneLogo = (
 export default {
     title: 'Shared/IdCard',
     component: IdCard,
-} as ComponentMeta<typeof IdCard>;
+} as Meta<typeof IdCard>;
 
-const Template: ComponentStory<typeof IdCard> = (args) => {
-    const [name, setName] = useState(args.name);
+export const Primary: StoryObj<typeof IdCard> = {
+    render: (args) => {
+        const [name, setName] = useState(args.name);
 
-    useEffect(() => {
-        setName(args.name);
-    }, [args.name]);
+        useEffect(() => {
+            setName(args.name);
+        }, [args.name]);
 
-    return (
-        <>
-            <style>
-                {`
+        return (
+            <>
+                <style>
+                    {`
                     .notabene {
                         width: 3.9rem;
                         height: 1.3rem;
@@ -51,29 +52,14 @@ const Template: ComponentStory<typeof IdCard> = (args) => {
                         fill: white;
                     }
                 `}
-            </style>
-            <IdCard {...args} name={name} onNameChange={setName} />
-        </>
-    );
-};
-
-export const Pending = Template.bind({});
-Pending.args = {
-    name: 'Name',
-    status: 'pending',
-    provider: notabeneLogo,
-};
-
-export const Confirmed = Template.bind({});
-Confirmed.args = {
-    name: 'Name',
-    status: 'confirmed',
-    provider: notabeneLogo,
-};
-
-export const Rejected = Template.bind({});
-Rejected.args = {
-    name: 'Name',
-    status: 'rejected',
-    provider: notabeneLogo,
+                </style>
+                <IdCard {...args} name={name} onNameChange={setName} />
+            </>
+        );
+    },
+    args: {
+        name: 'Name',
+        status: 'confirmed',
+        provider: notabeneLogo,
+    },
 };
