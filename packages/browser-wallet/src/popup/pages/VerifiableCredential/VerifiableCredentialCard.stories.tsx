@@ -1,6 +1,6 @@
 /* eslint-disable react/function-component-definition, react/destructuring-assignment */
 import React from 'react';
-import { ComponentMeta, ComponentStory } from '@storybook/react';
+import { Meta, StoryObj } from '@storybook/react';
 import { VerifiableCredentialStatus, VerifiableCredentialSchema } from '@shared/storage/types';
 import { VerifiableCredentialMetadata } from '@shared/utils/verifiable-credential-helpers';
 import { VerifiableCredentialCard } from './VerifiableCredentialCard';
@@ -8,7 +8,7 @@ import { VerifiableCredentialCard } from './VerifiableCredentialCard';
 export default {
     title: 'VerifiableCredential/VerifiableCredentialCard',
     component: VerifiableCredentialCard,
-} as ComponentMeta<typeof VerifiableCredentialCard>;
+} as Meta<typeof VerifiableCredentialCard>;
 
 const schema: VerifiableCredentialSchema = {
     $id: 'https://example-university.com/certificates/JsonSchema2023-education-certificate.json',
@@ -83,15 +83,17 @@ const credentialSubject = {
     },
 };
 
-export const Primary: ComponentStory<typeof VerifiableCredentialCard> = () => {
-    return (
-        <div style={{ width: 375 }}>
-            <VerifiableCredentialCard
-                credentialSubject={credentialSubject}
-                schema={{ ...schema, usingFallback: false }}
-                credentialStatus={VerifiableCredentialStatus.Active}
-                metadata={metadata}
-            />
-        </div>
-    );
+export const Primary: StoryObj<typeof VerifiableCredentialCard> = {
+    render: () => {
+        return (
+            <div style={{ width: 375 }}>
+                <VerifiableCredentialCard
+                    credentialSubject={credentialSubject}
+                    schema={{ ...schema, usingFallback: false }}
+                    credentialStatus={VerifiableCredentialStatus.Active}
+                    metadata={metadata}
+                />
+            </div>
+        );
+    },
 };
