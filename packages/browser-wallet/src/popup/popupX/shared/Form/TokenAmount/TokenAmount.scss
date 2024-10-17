@@ -30,6 +30,7 @@
 
     &_token {
         .token-selector {
+            flex-wrap: wrap;
             display: flex;
             align-items: center;
             margin-top: rem(12px);
@@ -38,6 +39,7 @@
 
             .text__additional_small {
                 margin-left: auto;
+                text-wrap: nowrap;
             }
 
             .token-icon {
@@ -56,20 +58,40 @@
     }
 
     &_amount {
+        position: relative;
         margin-top: rem(24px);
 
-        .amount-selector {
+        &_selector {
             display: flex;
-            align-items: flex-end;
+            align-items: center;
             justify-content: space-between;
             padding: rem(8px) 0;
             margin-bottom: rem(4px);
             border-bottom: 1px solid rgba($color-black, 0.1);
 
-            .heading_big {
+            .heading_medium {
                 color: $color-black;
             }
         }
+
+        &_field {
+            flex: 1;
+            border: none;
+            width: 100%;
+            min-width: 0;
+            background: none;
+            margin-right: rem(4px);
+        }
+
+        &_max {
+            flex: 0;
+            text-wrap: nowrap;
+        }
+    }
+
+    button.capture__additional_small {
+        border: unset;
+        cursor: pointer;
     }
 
     &_receiver {
