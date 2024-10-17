@@ -146,13 +146,13 @@ const t: typeof en = {
             },
             '3': {
                 title: 'Opdateringer med længere cool-downs',
-                body: 'Hvis du vælger at formindske din delegation saldo, så vil ændringen træde i kraft efter en cool-down periode.\n\nI løbet af denne cool-down periode, vil delegation saldoen være låst og kan ikke ændres, og du vil ikke kunne stoppe delegation.\n\nDu vil stadig kunne ændre andre delegationindstillinger.\n\nHvis du laver andre ændringer samtidigt med at du formindsker delegation saldoen, vil disse ændringer træde i kraft ved den næste pay day, som beskrevet på sidste side.',
+                body: 'Hvis du vælger at formindske din delegation saldo, så vil ændringen træde i kraft efter en cool-down periode.\n\nI løbet af denne cool-down periode, vil delegation saldoen være låst.\n\nDu vil stadig kunne ændre andre delegationindstillinger.\n\nHvis du laver andre ændringer samtidigt med at du formindsker delegation saldoen, vil disse ændringer træde i kraft ved den næste pay day, som beskrevet på sidste side.',
             },
         },
         removeIntro: {
             '1': {
                 title: 'Stop delegation',
-                body: 'Hvis du vælger at stoppe delegation, så er der en længere cool-down periode.\n\nI slutningen af cool-down perioden bliver det delegeret CCD låst op på din offentlige saldo, og kan bruges igen.',
+                body: 'Hvis du vælger at stoppe delegation er der en cool-down periode.\n\nI slutningen af cool-down perioden bliver det delegeret CCD låst op på din offentlige saldo, og kan bruges igen.',
             },
             '2': {
                 title: 'Opdateringer i en cool-down periode',
@@ -181,7 +181,7 @@ const t: typeof en = {
                 'Transaktionen indeholder ikke nogen ændringer i forhold til de nuværende delegationindstillinger.',
         },
         remove: {
-            notice: 'At stoppe en validator træder i kraft efter en cool-down periode på {{cooldownPeriod}} dage. I løbet af denne periode er validator stake låst og kan ikke ændres.',
+            notice: 'At stoppe en validator træder i kraft efter en cool-down periode på {{cooldownPeriod}} dage. I løbet af denne periode er validator stake låst.',
         },
         configure: {
             pool: {
@@ -213,7 +213,7 @@ const t: typeof en = {
                 overStakeThresholdWarning:
                     'Du er ved at låse mere end {{ threshold }}% af din totale saldo som din delegation saldo.\n\nHvis du ikke har nok ulåste CCD, vil du ikke kunne betale for transaktionsomkostninger.',
                 decreaseWarning:
-                    'At formindske din delegation saldo låser hele delegation saldoen i en cool-down periode. Det er ikke muligt at ændre mængden i denne periode og flytningen af CCD træder ikke i kraft indtil cool-down perioden er afsluttet.',
+                    'At reducere din delegation saldo resulterer i at mængden der reduceres med er i cool-down. I denne periode kan mængden ikke bruges til overførsler.',
                 enterNewStake: 'Indtast ny delegation saldo',
             },
         },
@@ -284,7 +284,7 @@ const t: typeof en = {
             noChanges: 'Transaktionen indeholder ikke nogen ændringer i forhold til de nuværende puljeindstillinger.',
         },
         remove: {
-            notice: 'At stoppe delegation træder i kraft efter en cool-down periode på {{cooldownPeriod}} dage. I løbet af denne periode er validator stake låst og kan ikke ændres.',
+            notice: 'At stoppe delegation træder i kraft efter en cool-down periode på {{cooldownPeriod}} dage. I løbet af denne periode er validator stake låst.',
         },
         details: {
             heading: 'Din validator er registreret.',
@@ -311,7 +311,7 @@ const t: typeof en = {
                 overStakeThresholdWarning:
                     'Du er ved at låse mere end {{ threshold }}% af din totale saldo som din validator stake.\n\nHvis du ikke har nok ulåste CCD, vil du ikke kunne betale for transaktionsomkostninger.',
                 decreaseWarning:
-                    'At formindske din validator stake låser hele din validator stake i en cool-down periode. Det er ikke muligt at ændre mængden i denne periode og flytningen af CCD træder ikke i kraft indtil cool-down perioden er afsluttet.',
+                    'At reducere din validator stake resulterer i at mængden der reduceres med er i cool-down. I denne periode kan mængden ikke bruges til overførsler.',
                 enterNewStake: 'Indtast ny validator stake',
             },
             openForDelegation: {
@@ -344,14 +344,15 @@ const t: typeof en = {
             registerBaker:
                 'Du er ved at indsende en transaktion som registrerer dig som en validator, hvillket som låser nogle af dine CCD som validator stake. Hvis du vil frigøre din stake, vil der være en cool-down periode.',
             lowerBakerStake:
-                'Du er ved at indsende en transaktion som formindsker din validator stake. At formindske din validator stake har en cool-down periode, hvilket betyder at ændringen ikke træder i kraft med det samme.\n\nValidatoren kan ikke fjernes og din validator stake kan ikke ændres indtil cool-down perioden er overstået.',
-            removeBaker: 'Er du sikker du vil lave denne transaktion som stopper validation?',
+                'Du er ved at indsende en transaktion som formindsker din validator stake. At formindske din validator stake har en cool-down periode, hvilket betyder at ændringen ikke træder i kraft med det samme.',
+            removeBaker:
+                'Er du sikker du vil lave denne transaktion som stopper validation? Dette vil træde i kraft efter en cool-down periode på {{ cooldownPeriod }} dage',
         },
         configureDelegation: {
             register:
                 'Du er ved at indsende en transaktion som registrerer dig som en delegator, hvillket som låser nogle af dine CCD som delegation stake. Hvis du vil frigøre din stake, vil der være en cool-down periode på {{ cooldownPeriod }} dage.',
             lowerDelegationStake:
-                'Du er ved at indsende en transaktion som formindsker din delegation stake. Det vil træde i kraft efter {{ cooldownPeriod }} dage og din delegation saldo kan ikke ændres i denne periode.',
+                'Du er ved at indsende en transaktion som formindsker din delegation stake. Det vil træde i kraft efter {{ cooldownPeriod }} dage.',
             remove: 'Er du sikker du vil fjerne din delegation?',
         },
     },
