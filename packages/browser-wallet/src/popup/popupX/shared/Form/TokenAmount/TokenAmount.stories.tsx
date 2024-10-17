@@ -1,3 +1,6 @@
+/* eslint-disable prefer-destructuring */
+import React from 'react';
+import { useForm } from 'react-hook-form';
 import { Meta, StoryObj } from '@storybook/react';
 import { AccountAddress, CcdAmount, ContractAddress } from '@concordium/web-sdk';
 
@@ -6,6 +9,19 @@ import TokenAmount from './TokenAmount';
 export default {
     title: 'X/Shared/TokenAmount',
     component: TokenAmount,
+    decorators: [
+        (Story, context) => {
+            const form = useForm<{ amount: bigint; receiver?: AccountAddress.Type }>({
+                defaultValues: {
+                    amount: 1000n,
+                    receiver: AccountAddress.fromBase58('3ybJ66spZ2xdWF3avgxQb2meouYa7mpvMWNPmUnczU8FoF8cGB'),
+                },
+            });
+            const args = context.args;
+            args.form = form;
+            return <Story {...context} />;
+        },
+    ],
     beforeEach: () => {
         const body = document.getElementsByTagName('body').item(0);
         body?.classList.add('popup-x');
@@ -22,7 +38,6 @@ export const OnlyAmount: Story = {
     args: {
         token: 'ccd',
         fee: CcdAmount.fromCcd(0.032),
-        value: { amount: 100n },
         buttonMaxLabel: 'Stake max.',
         receiver: false,
     },
@@ -34,10 +49,6 @@ export const WithReceiver: Story = {
         buttonMaxLabel: 'Send max.',
         fee: CcdAmount.fromCcd(0.032),
         receiver: true,
-        value: {
-            amount: 1000n,
-            receiver: AccountAddress.fromBase58('4UC8o4m8AgTxt5VBFMdLwMCwwJQVJwjesNzW7RPXkACynrULmd'),
-        },
     },
 };
 
@@ -48,9 +59,5 @@ export const TokenWithReceiver: Story = {
         buttonMaxLabel: 'Send max.',
         fee: CcdAmount.fromCcd(0.132),
         receiver: true,
-        value: {
-            amount: 1000n,
-            receiver: AccountAddress.fromBase58('4UC8o4m8AgTxt5VBFMdLwMCwwJQVJwjesNzW7RPXkACynrULmd'),
-        },
     },
 };

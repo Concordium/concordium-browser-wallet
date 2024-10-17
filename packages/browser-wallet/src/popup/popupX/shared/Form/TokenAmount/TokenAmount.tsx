@@ -1,5 +1,6 @@
 /* eslint-disable react/destructuring-assignment */
 import React, { ReactNode, useCallback, useMemo } from 'react';
+import { UseFormReturn } from 'react-hook-form';
 import { AccountAddress, CcdAmount, ContractAddress, HexString } from '@concordium/web-sdk';
 import { TokenMetadata } from '@shared/storage/types';
 import SideArrow from '@assets/svgX/side-arrow.svg';
@@ -27,30 +28,19 @@ type TokenVariants =
           };
       };
 
-type FieldProps<V> = {
-    /** The field value */
-    value: V | undefined;
-    /** A value change handler */
-    onChange?(value: V): void;
-};
-
 type ValueVariants =
-    | ({
+    | {
           /** Whether it should be possible to specify a receiver. Defaults to false */
           receiver?: false;
-      } & FieldProps<{
-          /** The amount */
-          amount: bigint;
-      }>)
-    | ({
+          /** The required form control for the inner fields */
+          form: UseFormReturn<{ amount: bigint }>;
+      }
+    | {
           /** Whether it should be possible to specify a receiver. Defaults to false */
           receiver: true;
-      } & FieldProps<{
-          /** The amount */
-          amount: bigint;
-          /** The specified receiver of the amount */
-          receiver: AccountAddress.Type;
-      }>);
+          /** The required form control for the inner fields */
+          form: UseFormReturn<{ amount: bigint; receiver: AccountAddress.Type }>;
+      };
 
 type Props = {
     /** The label used for the button setting the amount to the maximum possible */
@@ -81,7 +71,6 @@ export default function TokenAmount(props: Props) {
                 throw new Error('Unreachable');
         }
     }, [props]);
-    const amount = useMemo(() => props.value?.amount ?? CcdAmount.zero(), [props.value?.amount]);
     const formatAmount = useCallback(
         (someAmount: bigint) => {
             return addThousandSeparators(integerToFractional(selectedToken.decimals)(someAmount));
@@ -89,6 +78,7 @@ export default function TokenAmount(props: Props) {
         [selectedToken]
     );
     const balance = 17800021000n; // FIXME: get actual value
+    const values = props.form.watch() as { amount: bigint; receiver?: AccountAddress.Type }; // This is kind of unsafe so we need to tread carefully, but there is no good way around it...
 
     return (
         <div className="token-amount">
@@ -108,7 +98,7 @@ export default function TokenAmount(props: Props) {
                 <span className="text__main_medium">Amount</span>
                 <div className="amount-selector">
                     {/* FIXME: format amount properly, change to input field */}
-                    <span className="heading_big">{amount.toString()}</span>{' '}
+                    <span className="heading_big">{values.amount.toString()}</span>
                     <span className="capture__additional_small">{buttonMaxLabel}</span>
                 </div>
                 {/* FIXME: translate */}
@@ -120,7 +110,9 @@ export default function TokenAmount(props: Props) {
                     <span className="text__main_medium">Receiver address</span>
                     <div className="address-selector">
                         {/* FIXME: format as design */}
-                        <span className="text__main">{props.value?.receiver.toString()}</span>
+                        <span className="text__main">
+                            {values.receiver ? AccountAddress.toBase58(values.receiver) : ''}
+                        </span>
                     </div>
                 </div>
             )}
