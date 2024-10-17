@@ -42,13 +42,13 @@
 
     @include when-valid {
         .form-input__field:where(:focus) {
-            border-color: green; /* ToDo get color */
+            border-color: $color-green-success;
         }
     }
 
     @include when-invalid {
         .form-input__field {
-            border-color: red; /* ToDo get color */
+            border-color: $color-red-attention;
         }
     }
 
