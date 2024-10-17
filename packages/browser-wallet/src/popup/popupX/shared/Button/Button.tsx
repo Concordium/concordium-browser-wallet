@@ -74,12 +74,23 @@ function ButtonIconText({
     );
 }
 
+function ButtonIconTile({ icon, label, className, ...props }: { icon: ReactNode; label: string } & ButtonProps) {
+    return (
+        <ButtonBase className={clsx('button__icon', 'tile', className)} {...props}>
+            {icon}
+            <Text.CaptureAdditional>{label}</Text.CaptureAdditional>
+        </ButtonBase>
+    );
+}
+
 const Button = {
+    Base: ButtonBase,
     Main: ButtonMain,
     Secondary: ButtonSecondary,
     Icon: ButtonIcon,
     IconText: ButtonIconText,
     Text: ButtonText,
+    IconTile: ButtonIconTile,
 };
 
 export default Button;

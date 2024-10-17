@@ -1,15 +1,15 @@
-import React from 'react';
+import React, { ReactNode } from 'react';
 import Card from '@popup/popupX/shared/Card';
 import Text from '@popup/popupX/shared/Text';
 import Button from '@popup/popupX/shared/Button';
 
 interface IdCardProps {
-    rowsIdInfo?: [string, string][];
+    rowsIdInfo?: [string, string | ReactNode][];
     rowsConnectedAccounts?: [string, string][];
     onEditName?: () => void;
 }
 
-export default function IdCgrd({ rowsIdInfo = [], rowsConnectedAccounts, onEditName }: IdCardProps) {
+export default function IdCard({ rowsIdInfo = [], rowsConnectedAccounts, onEditName }: IdCardProps) {
     return (
         <Card type="gradient" className="id-card-x">
             <span className="title-row">

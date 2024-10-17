@@ -137,6 +137,15 @@ export const relativeRoutes = {
                 },
             },
         },
+        restore: {
+            path: 'restore',
+            result: {
+                path: 'result',
+                config: {
+                    backTitle: 'Restore wallet',
+                },
+            },
+        },
         earn: {
             path: 'earn',
             baker: {

@@ -7,7 +7,7 @@ import { SendConfirm, SendFunds, SendSuccess } from '@popup/popupX/pages/SendFun
 import ReceiveFunds from '@popup/popupX/pages/ReceiveFunds';
 import TransactionLog from '@popup/popupX/pages/TransactionLog';
 import TransactionDetails from '@popup/popupX/pages/TransactionDetails';
-import TokenDetails from '@popup/popupX/pages/TokenDetails';
+import { TokenDetails, TokenDetailsCcd } from '@popup/popupX/pages/TokenDetails';
 import IdCards from '@popup/popupX/pages/IdCards';
 import Accounts from '@popup/popupX/pages/Accounts';
 import SeedPhrase from 'src/popup/popupX/pages/SeedPhrase';
@@ -25,6 +25,7 @@ import { OpenPool } from '@popup/popupX/pages/EarningRewards/Baker/OpenPool';
 import { BakerKeys } from '@popup/popupX/pages/EarningRewards/Baker/BakerKeys';
 import DelegationType from '@popup/popupX/pages/EarningRewards/Delegator/Type/DelegationType';
 import PrivateKey from '@popup/popupX/pages/PrivateKey';
+import { RestoreIntro, RestoreResult } from '@popup/popupX/pages/Restore';
 import RegisterDelegator from '../pages/EarningRewards/Delegator/Register/RegisterDelegator';
 import DelegationResult from '../pages/EarningRewards/Delegator/Result/DelegationResult';
 
@@ -60,6 +61,7 @@ export default function Routes() {
                         />
                     </Route>
                     <Route element={<TokenDetails />} path={relativeRoutes.home.token.path} />
+                    <Route element={<TokenDetailsCcd />} path={`${relativeRoutes.home.token.path}/ccd`} />
                 </Route>
                 <Route element={<MainLayout />} path={relativeRoutes.settings.path}>
                     <Route element={<IdCards />} path={relativeRoutes.settings.idCards.path} />
@@ -79,6 +81,10 @@ export default function Routes() {
                     <Route path={relativeRoutes.settings.network.path}>
                         <Route index element={<NetworkSettings />} />
                         <Route element={<ConnectNetwork />} path={relativeRoutes.settings.network.connect.path} />
+                    </Route>
+                    <Route path={relativeRoutes.settings.restore.path}>
+                        <Route index element={<RestoreIntro />} />
+                        <Route element={<RestoreResult />} path={relativeRoutes.settings.restore.result.path} />
                     </Route>
                     <Route element={<About />} path={relativeRoutes.settings.about.path} />
                     <Route path={relativeRoutes.settings.earn.path}>

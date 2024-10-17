@@ -32,7 +32,7 @@
 
     .card-x {
         &.grey {
-            margin-top: rem(18px);
+            margin-top: rem(16px);
             background: $color-grey-1;
 
             .row {
@@ -49,6 +49,7 @@
             }
 
             &:only-of-type {
+                margin-top: rem(16px);
                 border-radius: rem(12px);
             }
         }

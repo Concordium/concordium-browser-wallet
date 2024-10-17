@@ -1,23 +1,26 @@
-import React, { useMemo } from 'react';
+import React, { ReactNode, useMemo } from 'react';
 import { useNavigate } from 'react-router-dom';
-import IconButton from '@popup/popupX/shared/IconButton';
+import { useTranslation } from 'react-i18next';
+import { useAtomValue } from 'jotai';
+import { displayAsCcd } from 'wallet-common-helpers';
+import { Ratio } from '@concordium/web-sdk';
+import { relativeRoutes } from '@popup/popupX/constants/routes';
+import Img from '@popup/shared/Img';
+import { WalletCredential } from '@shared/storage/types';
+import { useAccountInfo } from '@popup/shared/AccountInfoListenerContext';
+import { useFlattenedAccountTokens } from '@popup/pages/Account/Tokens/utils';
+import { getMetadataUnique } from '@shared/utils/token-helpers';
+import { contractBalancesFamily } from '@popup/store/token';
+import { useBlockChainParameters } from '@popup/shared/BlockChainParametersProvider';
+import Page from '@popup/popupX/shared/Page';
+import Text from '@popup/popupX/shared/Text';
+import Button from '@popup/popupX/shared/Button';
+import { withSelectedCredential } from '@popup/popupX/shared/utils/hoc';
 import Arrow from '@assets/svgX/arrow-right.svg';
 import FileText from '@assets/svgX/file-text.svg';
 import ConcordiumLogo from '@assets/svgX/concordium-logo.svg';
 import Plant from '@assets/svgX/plant.svg';
-import { relativeRoutes } from '@popup/popupX/constants/routes';
-import Page from '@popup/popupX/shared/Page';
-import { useAccountInfo } from '@popup/shared/AccountInfoListenerContext';
-import { useSelectedCredential } from '@popup/shared/utils/account-helpers';
-import { WalletCredential } from '@shared/storage/types';
-import { displayAsCcd } from 'wallet-common-helpers';
-import { useFlattenedAccountTokens } from '@popup/pages/Account/Tokens/utils';
-import { getMetadataUnique } from '@shared/utils/token-helpers';
-import Img from '@popup/shared/Img';
-import { contractBalancesFamily } from '@popup/store/token';
-import { useAtomValue } from 'jotai';
-import { useBlockChainParameters } from '@popup/shared/BlockChainParametersProvider';
-import { Ratio } from '@concordium/web-sdk';
+import Gear from '@assets/svgX/gear.svg';
 
 /** Hook loading every fungible token added to the account. */
 function useAccountFungibleTokens(account: WalletCredential) {
@@ -51,18 +54,79 @@ function AccountTokenBalance({ decimals, tokenId, contractAddress, accountAddres
 }
 
 /** Convert and display an amount of CCD to EUR using an exchange rate. */
-function displayCcdAsEur(microCcdPerEur: Ratio, microCcd: bigint, decimals: number) {
+function displayCcdAsEur(microCcdPerEur: Ratio, microCcd: bigint, decimals: number, eurPostfix?: boolean) {
     const eur = Number(microCcdPerEur.denominator * microCcd) / Number(microCcdPerEur.numerator);
     const eurFormatter = new Intl.NumberFormat(undefined, {
-        style: 'currency',
+        style: eurPostfix ? undefined : 'currency',
         currency: 'EUR',
         maximumFractionDigits: decimals,
     });
+    if (eurPostfix) {
+        return `${eurFormatter.format(eur)} EUR`;
+    }
+
     return eurFormatter.format(eur);
 }
 
+function Balance({ credential }: { credential: WalletCredential }) {
+    const chainParameters = useBlockChainParameters();
+    const microCcdPerEur = chainParameters?.microGTUPerEuro;
+    const accountInfo = useAccountInfo(credential);
+
+    if (!accountInfo) {
+        return null;
+    }
+
+    const ccdBalance = displayAsCcd(accountInfo.accountAmount.microCcdAmount, false, true);
+    const eurBalance =
+        microCcdPerEur && displayCcdAsEur(microCcdPerEur, accountInfo.accountAmount.microCcdAmount, 2, true);
+
+    return (
+        <div className="main-page-x__balance">
+            <Text.HeadingLarge>{microCcdPerEur ? eurBalance : ccdBalance}</Text.HeadingLarge>
+            <Text.Capture>{microCcdPerEur ? ccdBalance : ''}</Text.Capture>
+        </div>
+    );
+}
+
+type TokenItemProps = {
+    thumbnail: string | ReactNode;
+    symbol: string;
+    balance: string | ReactNode;
+    balanceBase?: bigint;
+    staked?: boolean;
+    microCcdPerEur?: Ratio;
+    onClick: () => void;
+};
+function TokenItem({ thumbnail, symbol, balance, balanceBase, staked, microCcdPerEur, onClick }: TokenItemProps) {
+    const isNoExchange = microCcdPerEur === undefined || balanceBase === undefined;
+    return (
+        <Button.Base onClick={onClick} className="main-page-x__tokens-list_item">
+            <div className="token-icon">
+                {typeof thumbnail === 'string' ? <Img src={thumbnail} alt={symbol} withDefaults /> : thumbnail}
+            </div>
+            <div className="token-balance">
+                <div className="token-balance__amount">
+                    <Text.Label>{symbol}</Text.Label>
+                    {staked && <Plant />}
+                    <Text.Label>{balance}</Text.Label>
+                </div>
+                {isNoExchange ? null : (
+                    <div className="token-balance__exchange-rate">
+                        <Text.Capture>{displayCcdAsEur(microCcdPerEur, 1000000n, 6)}</Text.Capture>
+                        <Text.Capture>{displayCcdAsEur(microCcdPerEur, balanceBase, 2)}</Text.Capture>
+                    </div>
+                )}
+            </div>
+        </Button.Base>
+    );
+}
+
 type MainPageProps = { credential: WalletCredential };
+
 function MainPage({ credential }: MainPageProps) {
+    const { t } = useTranslation('x', { keyPrefix: 'mainPage' });
+
     const nav = useNavigate();
     const navToSend = () => nav(relativeRoutes.home.send.path);
     const navToReceive = () => nav(relativeRoutes.home.receive.path);
@@ -79,102 +143,50 @@ function MainPage({ credential }: MainPageProps) {
     }
 
     return (
-        <Page className="main-page-container">
-            <div className="main-page__balance">
-                {microCcdPerEur === undefined ? (
-                    <span className="heading_large">{displayAsCcd(accountInfo.accountAmount.microCcdAmount)}</span>
-                ) : (
-                    <>
-                        <span className="heading_large">
-                            {displayCcdAsEur(microCcdPerEur, accountInfo.accountAmount.microCcdAmount, 2)}
-                        </span>
-                        <span className="capture__main_small">
-                            {displayAsCcd(accountInfo.accountAmount.microCcdAmount)}
-                        </span>
-                    </>
-                )}
+        <Page className="main-page-x">
+            <Balance credential={credential} />
+            <div className="main-page-x__action-buttons">
+                <Button.IconTile
+                    icon={<Arrow />}
+                    label={t('receive')}
+                    onClick={() => navToReceive()}
+                    className="receive"
+                />
+                <Button.IconTile icon={<Arrow />} label={t('send')} onClick={() => navToSend()} className="send" />
+                <Button.IconTile icon={<FileText />} label={t('transactions')} onClick={() => navToTransactionLog()} />
             </div>
-            <div className="main-page__action-buttons">
-                <IconButton className="send" onClick={() => navToSend()}>
-                    <Arrow />
-                    <span className="capture__additional_small">Send</span>
-                </IconButton>
-                <IconButton className="receive" onClick={() => navToReceive()}>
-                    <Arrow />
-                    <span className="capture__additional_small">Receive</span>
-                </IconButton>
-                <IconButton onClick={() => navToTransactionLog()}>
-                    <FileText />
-                    <span className="capture__additional_small">Transactions</span>
-                </IconButton>
-            </div>
-            <div className="main-page__tokens">
-                <div className="main-page__tokens-list">
-                    {/* eslint-disable-next-line jsx-a11y/click-events-have-key-events */}
-                    <div
-                        role="button"
-                        tabIndex={0}
-                        className="main-page__tokens-list_item"
-                        onClick={() => navToTokenDetails()}
-                    >
-                        <div className="token-icon">
-                            <ConcordiumLogo />
-                        </div>
-                        <div className="token-balance">
-                            <div className="token-balance__amount">
-                                <span className="label__main">CCD</span>
-                                <Plant />
-                                <span className="label__main">
-                                    {displayAsCcd(accountInfo.accountAmount.microCcdAmount)}
-                                </span>
-                            </div>
-                            {microCcdPerEur === undefined ? null : (
-                                <div className="token-balance__exchange-rate">
-                                    <span className="capture__main_small">
-                                        {displayCcdAsEur(microCcdPerEur, 1000000n, 6)}
-                                    </span>
-                                    <span className="capture__main_small">
-                                        {displayCcdAsEur(microCcdPerEur, accountInfo.accountAmount.microCcdAmount, 6)}
-                                    </span>
-                                </div>
-                            )}
-                        </div>
-                    </div>
+            <div className="main-page-x__tokens">
+                <div className="main-page-x__tokens-list">
+                    <TokenItem
+                        onClick={() => nav(`${relativeRoutes.home.token.path}/ccd`)}
+                        thumbnail={<ConcordiumLogo />}
+                        symbol="CCD"
+                        staked
+                        balance={displayAsCcd(accountInfo.accountAmount.microCcdAmount, false)}
+                        balanceBase={accountInfo.accountAmount.microCcdAmount}
+                        microCcdPerEur={microCcdPerEur}
+                    />
                     {tokens.map((token) => (
-                        // eslint-disable-next-line jsx-a11y/click-events-have-key-events, jsx-a11y/no-static-element-interactions
-                        <div
-                            className="main-page__tokens-list_item"
+                        <TokenItem
                             onClick={() => navToTokenDetails()}
                             key={`${token.contractIndex}.${token.id}`}
-                        >
-                            <div className="token-icon">
-                                <Img src={token.metadata.thumbnail?.url} alt={token.metadata.name} withDefaults />
-                            </div>
-                            <div className="token-balance">
-                                <div className="token-balance__amount">
-                                    <span className="label__main">{token.metadata.symbol}</span>
-                                    <span className="label__main">
-                                        <AccountTokenBalance
-                                            decimals={token.metadata.decimals}
-                                            contractAddress={token.contractIndex}
-                                            accountAddress={credential.address}
-                                            tokenId={token.id}
-                                        />
-                                    </span>
-                                </div>
-                            </div>
-                        </div>
+                            thumbnail={token.metadata.thumbnail?.url || ''}
+                            symbol={token.metadata.symbol || ''}
+                            balance={
+                                <AccountTokenBalance
+                                    decimals={token.metadata.decimals}
+                                    contractAddress={token.contractIndex}
+                                    accountAddress={credential.address}
+                                    tokenId={token.id}
+                                />
+                            }
+                        />
                     ))}
+                    <Button.IconText icon={<Gear />} label={t('manageTokenList')} />
                 </div>
             </div>
         </Page>
     );
 }
 
-export default function Loader() {
-    const credential = useSelectedCredential();
-    if (credential === undefined) {
-        return <>Loading</>;
-    }
-    return <MainPage credential={credential} />;
-}
+export default withSelectedCredential(MainPage);

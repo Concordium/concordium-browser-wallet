@@ -76,10 +76,10 @@ export const formatCcdString = formatNumberStringWithDigits(2);
  * Allows input type string, because microCCD from external sources are strings.
  * N.B. In case the input is a string, it is assumed that it represents the value in microCCD.
  */
-export function displayAsCcd(amount: bigint | string | CcdAmount.Type, ccdPrefix = true) {
+export function displayAsCcd(amount: bigint | string | CcdAmount.Type, ccdPrefix = true, ccdPostfix = false) {
     const microCcdAmount: bigint = CcdAmount.instanceOf(amount) ? amount.microCcdAmount : toBigInt(amount);
     const negative = microCcdAmount < 0n ? '-' : '';
     const abs = microCcdAmount < 0n ? -microCcdAmount : microCcdAmount;
     const formatted = addThousandSeparators(formatCcdString(microCcdToCcd(abs)));
-    return `${negative}${ccdPrefix ? getCcdSymbol() : ''}${formatted}`;
+    return `${negative}${ccdPrefix ? getCcdSymbol() : ''}${formatted}${ccdPostfix ? ` CCD` : ''}`;
 }

@@ -11,7 +11,7 @@ import Restore from '@assets/svgX/arrow-counter-clock.svg';
 import IconButton from '@popup/shared/IconButton';
 import Text from '@popup/popupX/shared/Text';
 import { Link } from 'react-router-dom';
-import { absoluteRoutes, relativeRoutes } from '@popup/popupX/constants/routes';
+import { absoluteRoutes } from '@popup/popupX/constants/routes';
 import { useTranslation } from 'react-i18next';
 
 type MenuTilesProps = {
@@ -31,19 +31,19 @@ export default function MenuTiles({ menuOpen, setMenuOpen }: MenuTilesProps) {
                 className="main-header__menu-tiles_container"
                 onClick={() => setMenuOpen(false)}
             >
-                <Link to={relativeRoutes.settings.idCards.path}>
+                <Link to={absoluteRoutes.settings.idCards.path}>
                     <IconButton className="main-header__menu-tiles_tile wide">
                         <Identification />
                         <Text.Capture>{t('identities')}</Text.Capture>
                     </IconButton>
                 </Link>
-                <Link to={relativeRoutes.settings.accounts.path}>
+                <Link to={absoluteRoutes.settings.accounts.path}>
                     <IconButton className="main-header__menu-tiles_tile wide">
                         <Browsers />
                         <Text.Capture>{t('accounts')}</Text.Capture>
                     </IconButton>
                 </Link>
-                <Link to="/">
+                <Link to={absoluteRoutes.settings.seedPhrase.path}>
                     <IconButton className="main-header__menu-tiles_tile">
                         <TextColumns />
                         <Text.Capture>{t('seedPhrase')}</Text.Capture>
@@ -67,19 +67,19 @@ export default function MenuTiles({ menuOpen, setMenuOpen }: MenuTilesProps) {
                         <Text.Capture>{t('earn')}</Text.Capture>
                     </IconButton>
                 </Link>
-                <Link to={relativeRoutes.settings.network.path}>
+                <Link to={absoluteRoutes.settings.network.path}>
                     <IconButton className="main-header__menu-tiles_tile">
                         <LinkSimple />
                         <Text.Capture>{t('network')}</Text.Capture>
                     </IconButton>
                 </Link>
-                <Link to={relativeRoutes.settings.about.path}>
+                <Link to={absoluteRoutes.settings.about.path}>
                     <IconButton className="main-header__menu-tiles_tile">
                         <Info />
                         <Text.Capture>{t('about')}</Text.Capture>
                     </IconButton>
                 </Link>
-                <Link to="/">
+                <Link to={absoluteRoutes.settings.restore.path}>
                     <IconButton className="main-header__menu-tiles_tile">
                         <Restore />
                         <Text.Capture>{t('restore')}</Text.Capture>

@@ -10,6 +10,14 @@ function TextHeading({ children }: { children: ReactNode }) {
     return <span className="heading_medium">{children}</span>;
 }
 
+function TextHeadingLarge({ children }: { children: ReactNode }) {
+    return <span className="heading_large">{children}</span>;
+}
+
+function TextHeadingBig({ children }: { children: ReactNode }) {
+    return <span className="heading_big">{children}</span>;
+}
+
 function TextMain({ children }: { children: ReactNode }) {
     return <span className="text__main">{children}</span>;
 }
@@ -47,6 +55,8 @@ function TextExternalLink({ path, children = path, className }: Props) {
 }
 
 const Text = TextRoot as typeof TextRoot & {
+    HeadingLarge: typeof TextHeadingLarge;
+    HeadingBig: typeof TextHeadingBig;
     Heading: typeof TextHeading;
     Main: typeof TextMain;
     MainRegular: typeof TextMainRegular;
@@ -57,6 +67,8 @@ const Text = TextRoot as typeof TextRoot & {
     LabelRegular: typeof TextLabelRegular;
     ExternalLink: typeof TextExternalLink;
 };
+Text.HeadingLarge = TextHeadingLarge;
+Text.HeadingBig = TextHeadingBig;
 Text.Heading = TextHeading;
 Text.Main = TextMain;
 Text.MainRegular = TextMainRegular;
