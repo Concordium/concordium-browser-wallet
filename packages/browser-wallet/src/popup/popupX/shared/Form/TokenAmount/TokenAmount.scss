@@ -56,6 +56,7 @@
     }
 
     &_amount {
+        position: relative;
         margin-top: rem(24px);
 
         .amount-selector {
@@ -70,6 +71,18 @@
                 color: $color-black;
             }
         }
+
+        &_max {
+            position: absolute;
+            right: 0;
+            top: 50%;
+            transform: translateY(-50%);
+        }
+    }
+
+    button.capture__additional_small {
+        border: unset;
+        cursor: pointer;
     }
 
     &_receiver {
