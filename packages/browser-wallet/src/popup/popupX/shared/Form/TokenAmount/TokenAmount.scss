@@ -6,8 +6,12 @@
     margin-top: rem(16px);
     padding: rem(20px) rem(16px);
 
-    .text__main_medium {
+    .text__main_medium, .text__main {
         color: $color-black;
+    }
+
+    .capture__main_small {
+        color: $color-grey-3
     }
 
     .capture__additional_small {
@@ -61,6 +65,10 @@
             padding: rem(8px) 0;
             margin-bottom: rem(4px);
             border-bottom: 1px solid rgba($color-black, 0.1);
+
+            .heading_big {
+                color: $color-black;
+            }
         }
     }
 

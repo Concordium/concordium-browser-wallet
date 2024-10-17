@@ -3,6 +3,14 @@ import React, { useEffect } from 'react';
 import '../src/popup/index.scss';
 import '../src/popup/shell/i18n';
 
+// Workaround for bigint serialization error: https://github.com/storybookjs/storybook/issues/22452
+// eslint-disable-next-line @typescript-eslint/ban-ts-comment
+// @ts-ignore
+// eslint-disable-next-line no-extend-native, func-names
+BigInt.prototype.toJSON = function () {
+    return this.toString();
+};
+
 document.getElementsByTagName('html').item(0)?.classList.add('ui-scale-large');
 
 /**
