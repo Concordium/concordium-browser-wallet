@@ -24,8 +24,10 @@
         margin-bottom: rem(8px);
         width: 100%;
         outline: none;
-        font-size: rem(14px); /* override base style, remove after release */
-        transform: unset; /* override base style, remove after release */
+        font-size: rem(14px);
+        /* override base style, remove after release */
+        transform: unset;
+        /* override base style, remove after release */
         @include transition(border-color);
 
         &:focus {
@@ -42,13 +44,15 @@
 
     @include when-valid {
         .form-input__field:where(:focus) {
-            border-color: green; /* ToDo get color */
+            border-color: green;
+            /* ToDo get color */
         }
     }
 
     @include when-invalid {
         .form-input__field {
-            border-color: red; /* ToDo get color */
+            border-color: red;
+            /* ToDo get color */
         }
     }
 
@@ -76,6 +80,7 @@
         transform: unset;
 
         svg {
+
             g,
             path {
                 fill: $color-mineral-3;
@@ -110,11 +115,11 @@ $handle-size: rem(20px);
 
 .form-toggle-x {
     &__root {
-        input:checked + .form-toggle-x__slider {
+        input:checked+.form-toggle-x__slider {
             background-color: $color-green-toggle;
         }
 
-        input:checked + .form-toggle-x__slider::before {
+        input:checked+.form-toggle-x__slider::before {
             transform: translateX(rem(24px));
         }
     }
@@ -191,11 +196,11 @@ $handle-size: rem(20px);
             }
         }
 
-        &:hover input ~ .checkmark {
+        &:hover input~.checkmark {
             background-color: $color-grey-3;
         }
 
-        input:checked ~ .checkmark::after {
+        input:checked~.checkmark::after {
             display: block;
         }
 
@@ -205,4 +210,8 @@ $handle-size: rem(20px);
             display: none;
         }
     }
+}
+
+.form-error-message {
+    color: $color-red-attention !important;
 }

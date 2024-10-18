@@ -3,30 +3,31 @@
 import React from 'react';
 import { Meta, StoryObj } from '@storybook/react';
 import { CcdAmount, ContractAddress } from '@concordium/web-sdk';
+import { PropsOf } from 'wallet-common-helpers';
 
-import TokenAmount from './TokenAmount';
+import TokenAmount, { AmountReceiveForm } from './TokenAmount';
 import Form, { useForm } from '..';
+
+function Wrapper(props: PropsOf<typeof TokenAmount>) {
+    const form = useForm<AmountReceiveForm>({
+        mode: 'onTouched',
+        defaultValues: {
+            amount: '1,000.00',
+            receiver: '3ybJ66spZ2xdWF3avgxQb2meouYa7mpvMWNPmUnczU8FoF8cGB',
+        },
+    });
+    return (
+        <Form formMethods={form} onSubmit={console.log}>
+            {/* eslint-disable-next-line @typescript-eslint/no-explicit-any */}
+            {() => <TokenAmount {...props} form={form as any} />}
+        </Form>
+    );
+}
 
 export default {
     title: 'X/Shared/Form/TokenAmount',
     component: TokenAmount,
-    decorators: [
-        (Story, context) => {
-            const form = useForm<{ amount: string; receiver?: string }>({
-                defaultValues: {
-                    amount: '1,000.00',
-                    receiver: '3ybJ66spZ2xdWF3avgxQb2meouYa7mpvMWNPmUnczU8FoF8cGB',
-                },
-            });
-            const args = context.args;
-            args.form = form;
-            return (
-                <Form formMethods={form} onSubmit={console.log}>
-                    {() => <Story {...context} />}
-                </Form>
-            );
-        },
-    ],
+    render: (props) => <Wrapper {...props} />,
     beforeEach: () => {
         const body = document.getElementsByTagName('body').item(0);
         body?.classList.add('popup-x');

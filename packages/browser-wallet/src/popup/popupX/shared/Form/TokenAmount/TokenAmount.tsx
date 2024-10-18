@@ -1,17 +1,20 @@
 /* eslint-disable @typescript-eslint/no-explicit-any */
 /* eslint-disable react/destructuring-assignment */
 import React, { InputHTMLAttributes, ReactNode, forwardRef, useCallback, useMemo } from 'react';
-import { UseFormReturn } from 'react-hook-form';
+import { UseFormReturn, Validate } from 'react-hook-form';
+import { useTranslation } from 'react-i18next';
 import clsx from 'clsx';
 import { CcdAmount, ContractAddress, HexString } from '@concordium/web-sdk';
 import { TokenMetadata } from '@shared/storage/types';
 import SideArrow from '@assets/svgX/side-arrow.svg';
 import ConcordiumLogo from '@assets/svgX/concordium-logo.svg';
-import { addThousandSeparators, displayAsCcd, fractionalToInteger } from 'wallet-common-helpers';
+import { displayAsCcd, fractionalToInteger } from 'wallet-common-helpers';
 import { RequiredUncontrolledFieldProps } from '../common/types';
 import { makeUncontrolled } from '../common/utils';
 import Button from '../../Button';
 import { formatTokenAmount } from '../../utils/helpers';
+import { validateAccountAddress, validateTransferAmount } from '../../utils/transaction-helpers';
+import ErrorMessage from '../ErrorMessage';
 
 type AmountInputProps = Pick<
     InputHTMLAttributes<HTMLInputElement>,
@@ -24,10 +27,10 @@ type AmountInputProps = Pick<
  * Use as a normal \<input /\>. Should NOT be used for checkbox or radio.
  */
 const InputClear = forwardRef<HTMLInputElement, AmountInputProps>(
-    ({ error, className, type = 'text', valid, ...props }, ref) => {
+    ({ error, className, type = 'text', ...props }, ref) => {
         return (
             <input
-                className={clsx('token-amount_field', className)}
+                className={clsx('token-amount_field', error !== undefined && 'token-amount_field--invalid', className)}
                 type={type}
                 ref={ref}
                 autoComplete="off"
@@ -61,8 +64,8 @@ type TokenVariants =
           };
       };
 
-type AmountForm = { amount: string };
-type AmountReceiveForm = AmountForm & { receiver: string };
+export type AmountForm = { amount: string };
+export type AmountReceiveForm = AmountForm & { receiver: string };
 
 type ValueVariants =
     | {
@@ -86,7 +89,10 @@ type Props = {
 } & ValueVariants &
     TokenVariants;
 
+const removeThousandSeparators = (value: string) => value.replace(/[,]/g, '');
+
 export default function TokenAmount(props: Props) {
+    const { t } = useTranslation('x', { keyPrefix: 'sharedX' });
     const { buttonMaxLabel, fee } = props;
     const balance = 17800021000n; // FIXME: get actual value
 
@@ -100,7 +106,7 @@ export default function TokenAmount(props: Props) {
             }
             case 'ccd':
             case undefined: {
-                const name = 'CCD'; // FIXME: translation
+                const name = 'CCD';
                 const icon = <ConcordiumLogo />;
                 return { name, icon, decimals: 6, type: 'ccd' };
             }
@@ -118,68 +124,94 @@ export default function TokenAmount(props: Props) {
         [selectedToken]
     );
 
+    const availableAmount = useMemo(
+        () => (selectedToken.type === 'ccd' ? balance - fee.microCcdAmount : balance),
+        [selectedToken, fee, balance]
+    );
+
     const setMax = useCallback(() => {
-        const available = selectedToken.type === 'ccd' ? balance - fee.microCcdAmount : balance;
-        (props.form as UseFormReturn<AmountForm>).setValue('amount', formatAmount(available) ?? '', {
+        (props.form as UseFormReturn<AmountForm>).setValue('amount', formatAmount(availableAmount) ?? '', {
             shouldDirty: true,
             shouldTouch: true,
             shouldValidate: true,
         });
-    }, [selectedToken, props.form]);
+    }, [availableAmount, props.form]);
 
-    const handleAmountBlur: React.FocusEventHandler<HTMLInputElement> = (event) => {
-        const { value } = event.target;
+    const handleAmountBlur: React.FocusEventHandler<HTMLInputElement> = useCallback(
+        (event) => {
+            const { value } = event.target;
 
-        if (value === '') {
-            return;
-        }
-
-        try {
-            const formatted = formatAmount(parseAmount(value));
-            if (formatted !== value) {
-                (props.form as UseFormReturn<AmountForm>).setValue('amount', formatted ?? '');
+            if (value === '') {
+                return;
             }
-        } catch {
-            // Do nothing...
-        }
-    };
+
+            try {
+                const formatted = formatAmount(parseAmount(value));
+                if (formatted !== value) {
+                    (props.form as UseFormReturn<AmountForm>).setValue('amount', formatted ?? '');
+                }
+            } catch {
+                // Do nothing...
+            }
+        },
+        [props.form, formatAmount, parseAmount]
+    );
+
+    const validateAmount: Validate<string> = useCallback(
+        (value: string) =>
+            validateTransferAmount(
+                removeThousandSeparators(value),
+                availableAmount,
+                selectedToken.decimals,
+                selectedToken.type === 'ccd' ? fee.microCcdAmount : 0n
+            ),
+        [availableAmount, selectedToken]
+    );
 
     return (
         <div className="token-amount">
             <div className="token-amount_token">
-                <span className="text__main_medium">Token</span>
+                <span className="text__main_medium">{t('form.tokenAmount.token.label')}</span>
                 <div className="token-selector">
                     <div className="token-icon">{selectedToken.icon}</div>
                     <span className="text__main">{selectedToken.name}</span>
                     {props.token === undefined && <SideArrow />}
-                    {/* FIXME: translation */}
                     <span className="text__additional_small">
-                        {addThousandSeparators(formatAmount(balance))} {selectedToken.name} available
+                        {t('form.tokenAmount.token.available', {
+                            balance: formatAmount(balance),
+                            name: selectedToken.name,
+                        })}
                     </span>
                 </div>
             </div>
             <div className="token-amount_amount">
                 <span className="text__main_medium">Amount</span>
                 <div className="token-amount_amount_selector">
-                    {/* FIXME: format amount properly */}
                     <FormInputClear
                         className="heading_medium token-amount_amount_field"
                         register={(props.form as UseFormReturn<AmountForm>).register}
                         name="amount"
                         onBlur={handleAmountBlur}
-                        // FIXME: Add validation
+                        rules={{
+                            required: t('utils.amount.required'),
+                            min: { value: 0, message: t('utils.amount.zero') },
+                            validate: validateAmount,
+                        }}
                     />
                     <Button.Base className="capture__additional_small token-amount_amount_max" onClick={() => setMax()}>
                         {buttonMaxLabel}
                     </Button.Base>
                 </div>
-                {/* FIXME: translate */}
-                <span className="capture__main_small">Estimated transaction fee: {displayAsCcd(fee, false, true)}</span>
+                <ErrorMessage className="capture__main_small">
+                    {props.form.formState.errors.amount?.message}
+                </ErrorMessage>
+                <span className="capture__main_small">
+                    {t('form.tokenAmount.amount.fee', { fee: displayAsCcd(fee, false, true) })}
+                </span>
             </div>
             {props.receiver === true && (
                 <div className="token-amount_receiver">
-                    {/* FIXME: translate */}
-                    <span className="text__main_medium">Receiver address</span>
+                    <span className="text__main_medium">{t('form.tokenAmount.address.label')}</span>
                     {/* TODO: Figure out what to do with overflowing text?
                         1. multiline <input type="text">
                         2. show abbreviated version on blur */}
@@ -187,8 +219,14 @@ export default function TokenAmount(props: Props) {
                         className="text__main"
                         register={(props.form as UseFormReturn<AmountReceiveForm>).register}
                         name="receiver"
-                        // FIXME: Add validation
+                        rules={{
+                            required: t('utils.address.required'),
+                            validate: validateAccountAddress,
+                        }}
                     />
+                    <ErrorMessage className="capture__main_small">
+                        {props.form.formState.errors.receiver?.message}
+                    </ErrorMessage>
                 </div>
             )}
         </div>

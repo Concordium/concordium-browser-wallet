@@ -90,6 +90,10 @@
         border: none;
         width: 100%;
         background: none;
+
+        &--invalid {
+            color: $color-red-attention !important;
+        }
     }
 
     button.capture__additional_small {

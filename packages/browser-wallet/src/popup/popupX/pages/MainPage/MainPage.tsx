@@ -21,7 +21,7 @@ import FileText from '@assets/svgX/file-text.svg';
 import ConcordiumLogo from '@assets/svgX/concordium-logo.svg';
 import Plant from '@assets/svgX/plant.svg';
 import Gear from '@assets/svgX/gear.svg';
-import { formatBalance } from '@popup/popupX/shared/utils/helpers';
+import { formatTokenAmount } from '@popup/popupX/shared/utils/helpers';
 
 /** Hook loading every fungible token added to the account. */
 function useAccountFungibleTokens(account: WalletCredential) {
@@ -39,7 +39,7 @@ type TokenBalanceProps = { decimals?: number; tokenId: string; contractAddress: 
 /** Component for fetching and displaying a CIS-2 token balance of an account. */
 function AccountTokenBalance({ decimals, tokenId, contractAddress, accountAddress }: TokenBalanceProps) {
     const balanceRaw = useAccountTokenBalance(accountAddress, contractAddress, tokenId) ?? 0n;
-    const balance = useMemo(() => formatBalance(balanceRaw, decimals), [balanceRaw]);
+    const balance = useMemo(() => formatTokenAmount(balanceRaw, decimals), [balanceRaw]);
     return <span>{balance}</span>;
 }
 
