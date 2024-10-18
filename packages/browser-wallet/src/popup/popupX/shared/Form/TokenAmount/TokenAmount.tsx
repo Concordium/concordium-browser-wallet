@@ -7,26 +7,27 @@ import { CcdAmount, ContractAddress, HexString } from '@concordium/web-sdk';
 import { TokenMetadata } from '@shared/storage/types';
 import SideArrow from '@assets/svgX/side-arrow.svg';
 import ConcordiumLogo from '@assets/svgX/concordium-logo.svg';
-import { addThousandSeparators, displayAsCcd, integerToFractional } from 'wallet-common-helpers';
-import { RequiredControlledFieldProps } from '../common/types';
-import { makeControlled } from '../common/utils';
+import { addThousandSeparators, displayAsCcd, fractionalToInteger } from 'wallet-common-helpers';
+import { RequiredUncontrolledFieldProps } from '../common/types';
+import { makeUncontrolled } from '../common/utils';
 import Button from '../../Button';
+import { formatTokenAmount } from '../../utils/helpers';
 
 type AmountInputProps = Pick<
     InputHTMLAttributes<HTMLInputElement>,
     'className' | 'type' | 'value' | 'onChange' | 'onBlur' | 'autoFocus'
 > &
-    RequiredControlledFieldProps;
+    RequiredUncontrolledFieldProps<HTMLInputElement>;
 
 /**
  * @description
  * Use as a normal \<input /\>. Should NOT be used for checkbox or radio.
  */
-const AmountInput = forwardRef<HTMLInputElement, AmountInputProps>(
+const InputClear = forwardRef<HTMLInputElement, AmountInputProps>(
     ({ error, className, type = 'text', valid, ...props }, ref) => {
         return (
             <input
-                className={clsx('heading_medium', className)}
+                className={clsx('token-amount_field', className)}
                 type={type}
                 ref={ref}
                 autoComplete="off"
@@ -37,7 +38,7 @@ const AmountInput = forwardRef<HTMLInputElement, AmountInputProps>(
     }
 );
 
-const FormAmountInput = makeControlled(AmountInput);
+const FormInputClear = makeUncontrolled(InputClear);
 
 type TokenVariants =
     | {
@@ -87,6 +88,7 @@ type Props = {
 
 export default function TokenAmount(props: Props) {
     const { buttonMaxLabel, fee } = props;
+    const balance = 17800021000n; // FIXME: get actual value
 
     const selectedToken: { name: string; icon: ReactNode; decimals: number; type: 'ccd' | 'cis2' } = useMemo(() => {
         switch (props.token) {
@@ -107,8 +109,14 @@ export default function TokenAmount(props: Props) {
         }
     }, [props]);
 
-    const formatAmount = useCallback(integerToFractional(selectedToken.decimals), [selectedToken]);
-    const balance = 17800021000n; // FIXME: get actual value
+    const formatAmount = useCallback(
+        (amountValue: bigint) => formatTokenAmount(BigInt(amountValue), selectedToken.decimals, 2),
+        [selectedToken]
+    );
+    const parseAmount = useCallback(
+        (amountValue: string) => fractionalToInteger(amountValue.replace(/[,]/g, ''), selectedToken.decimals),
+        [selectedToken]
+    );
 
     const setMax = useCallback(() => {
         const available = selectedToken.type === 'ccd' ? balance - fee.microCcdAmount : balance;
@@ -118,6 +126,23 @@ export default function TokenAmount(props: Props) {
             shouldValidate: true,
         });
     }, [selectedToken, props.form]);
+
+    const handleAmountBlur: React.FocusEventHandler<HTMLInputElement> = (event) => {
+        const { value } = event.target;
+
+        if (value === '') {
+            return;
+        }
+
+        try {
+            const formatted = formatAmount(parseAmount(value));
+            if (formatted !== value) {
+                (props.form as UseFormReturn<AmountForm>).setValue('amount', formatted ?? '');
+            }
+        } catch {
+            // Do nothing...
+        }
+    };
 
     return (
         <div className="token-amount">
@@ -137,11 +162,12 @@ export default function TokenAmount(props: Props) {
                 <span className="text__main_medium">Amount</span>
                 <div className="token-amount_amount_selector">
                     {/* FIXME: format amount properly */}
-                    {/* TODO: ensure the value does not overflow the max amount of space available */}
-                    <FormAmountInput
-                        className="token-amount_amount_field"
-                        control={(props.form as UseFormReturn<AmountForm>).control}
+                    <FormInputClear
+                        className="heading_medium token-amount_amount_field"
+                        register={(props.form as UseFormReturn<AmountForm>).register}
                         name="amount"
+                        onBlur={handleAmountBlur}
+                        // FIXME: Add validation
                     />
                     <Button.Base className="capture__additional_small token-amount_amount_max" onClick={() => setMax()}>
                         {buttonMaxLabel}
@@ -154,12 +180,15 @@ export default function TokenAmount(props: Props) {
                 <div className="token-amount_receiver">
                     {/* FIXME: translate */}
                     <span className="text__main_medium">Receiver address</span>
-                    <div className="address-selector">
-                        {/* FIXME: format as design */}
-                        <span className="text__main">
-                            {/* values.receiver ? AccountAddress.toBase58(values.receiver) : '' */}
-                        </span>
-                    </div>
+                    {/* TODO: Figure out what to do with overflowing text?
+                        1. multiline <input type="text">
+                        2. show abbreviated version on blur */}
+                    <FormInputClear
+                        className="text__main"
+                        register={(props.form as UseFormReturn<AmountReceiveForm>).register}
+                        name="receiver"
+                        // FIXME: Add validation
+                    />
                 </div>
             )}
         </div>

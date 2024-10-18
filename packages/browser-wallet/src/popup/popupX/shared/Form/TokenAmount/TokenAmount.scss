@@ -76,10 +76,7 @@
 
         &_field {
             flex: 1;
-            border: none;
-            width: 100%;
             min-width: 0;
-            background: none;
             margin-right: rem(4px);
         }
 
@@ -87,6 +84,12 @@
             flex: 0;
             text-wrap: nowrap;
         }
+    }
+
+    &_field {
+        border: none;
+        width: 100%;
+        background: none;
     }
 
     button.capture__additional_small {

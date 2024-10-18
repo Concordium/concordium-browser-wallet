@@ -1,10 +1,11 @@
+/* eslint-disable no-console */
 /* eslint-disable prefer-destructuring */
 import React from 'react';
-import { useForm } from 'react-hook-form';
 import { Meta, StoryObj } from '@storybook/react';
 import { CcdAmount, ContractAddress } from '@concordium/web-sdk';
 
 import TokenAmount from './TokenAmount';
+import Form, { useForm } from '..';
 
 export default {
     title: 'X/Shared/Form/TokenAmount',
@@ -13,13 +14,17 @@ export default {
         (Story, context) => {
             const form = useForm<{ amount: string; receiver?: string }>({
                 defaultValues: {
-                    amount: '1000',
+                    amount: '1,000.00',
                     receiver: '3ybJ66spZ2xdWF3avgxQb2meouYa7mpvMWNPmUnczU8FoF8cGB',
                 },
             });
             const args = context.args;
             args.form = form;
-            return <Story {...context} />;
+            return (
+                <Form formMethods={form} onSubmit={console.log}>
+                    {() => <Story {...context} />}
+                </Form>
+            );
         },
     ],
     beforeEach: () => {
