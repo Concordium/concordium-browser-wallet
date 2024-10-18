@@ -14,6 +14,7 @@ module.exports = {
         getAbsolutePath('@storybook/addon-interactions'),
         getAbsolutePath('@storybook/preset-scss'),
         getAbsolutePath('@storybook/addon-webpack5-compiler-swc'),
+        getAbsolutePath('@storybook/addon-viewport'),
     ],
 
     framework: {

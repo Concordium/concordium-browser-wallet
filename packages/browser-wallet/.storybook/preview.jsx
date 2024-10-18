@@ -38,14 +38,46 @@ const themeDecorator = (Story, { globals, parameters }) => {
     return <Story />;
 };
 
+/**
+ * Adds custom styling to the HTML surrounding individual stories.
+ */
+const customStyleDecorator = (Story) => {
+    return (
+        <div style={{ padding: '0.5rem' }}>
+            <Story />
+        </div>
+    );
+};
+
 export const parameters = {
+    viewport: {
+        viewports: {
+            Small: {
+                name: 'Small',
+                styles: {
+                    width: '312px',
+                    height: '528px',
+                },
+            },
+            Normal: {
+                name: 'Normal',
+                styles: {
+                    width: '375px',
+                    height: '600px',
+                },
+            },
+        },
+        // Optionally, you can set default viewports
+        defaultViewport: 'Normal',
+    },
     controls: {
         matchers: {
             color: /(background|color)$/i,
             date: /Date$/,
         },
     },
+    backgrounds: { default: 'dark' },
 };
 
-export const decorators = [themeDecorator];
+export const decorators = [themeDecorator, customStyleDecorator];
 export const tags = ['autodocs'];
