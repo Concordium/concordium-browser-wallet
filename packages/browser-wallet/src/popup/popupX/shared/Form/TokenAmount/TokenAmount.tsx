@@ -45,15 +45,15 @@ const FormInputClear = makeUncontrolled(InputClear);
 
 type TokenVariants =
     | {
-          /** The token type */
+          /** The token type. If undefined, a token picker is rendered */
           token?: undefined;
       }
     | {
-          /** The token type */
+          /** The token type. If undefined, a token picker is rendered */
           token: 'ccd';
       }
     | {
-          /** The token type */
+          /** The token type. If undefined, a token picker is rendered */
           token: 'cis2';
           /** The token address */
           address: {
@@ -64,8 +64,23 @@ type TokenVariants =
           };
       };
 
-export type AmountForm = { amount: string };
-export type AmountReceiveForm = AmountForm & { receiver: string };
+/**
+ * @description
+ * Represents a form with an amount field.
+ */
+export type AmountForm = {
+    /** The amount to be transferred */
+    amount: string;
+};
+
+/**
+ * @description
+ * Represents a form with an amount field and a receiver field.
+ */
+export type AmountReceiveForm = AmountForm & {
+    /** The receiver of the amount */
+    receiver: string;
+};
 
 type ValueVariants =
     | {
@@ -91,6 +106,45 @@ type Props = {
 
 const removeThousandSeparators = (value: string) => value.replace(/[,]/g, '');
 
+// TODO: Token picker...
+// 1. Token picker
+// 2. Get values from store
+
+/**
+ * TokenAmount component renders a form for transferring tokens with an amount field and optionally a receiver field.
+ *
+ * @example
+ * // Usage with token picker + receiver
+ * const formMethods = useForm<AmountReceiveForm>();
+ * <TokenAmount
+ *   buttonMaxLabel="Max"
+ *   fee={{ microCcdAmount: 1000n }}
+ *   form={formMethods}
+ *   receiver
+ * />
+ *
+ * @example
+ * // Usage with CCD token
+ * const formMethods = useForm<AmountForm>();
+ * <TokenAmount
+ *   buttonMaxLabel="Max"
+ *   fee={{ microCcdAmount: 1000n }}
+ *   form={formMethods}
+ *   token="ccd"
+ * />
+ *
+ * @example
+ * // Usage with CIS2 token + receiver
+ * const formMethods = useForm<AmountReceiveForm>();
+ * <TokenAmount
+ *   buttonMaxLabel="Max"
+ *   fee={{ microCcdAmount: 1000n }}
+ *   form={formMethods}
+ *   receiver
+ *   token="cis2"
+ *   address={{ id: '0x123', contract: { index: 1, subindex: 0 } }}
+ * />
+ */
 export default function TokenAmount(props: Props) {
     const { t } = useTranslation('x', { keyPrefix: 'sharedX' });
     const { buttonMaxLabel, fee } = props;
