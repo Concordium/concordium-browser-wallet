@@ -49,7 +49,12 @@ const tokens = [
     {
         id: '',
         contract: ContractAddress.create(123, 0),
-        metadata: { symbol: 'wETH', name: 'Wrapped Ether', decimals: 18 },
+        metadata: {
+            symbol: 'wETH',
+            name: 'Wrapped Ether',
+            decimals: 18,
+            thumbnail: { url: 'https://s2.coinmarketcap.com/static/img/coins/64x64/2396.png' },
+        },
     },
     {
         id: '',

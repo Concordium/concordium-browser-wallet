@@ -7,6 +7,7 @@ const pathToSvgAssets = path.resolve(__dirname, '../src/assets/svg');
 
 module.exports = {
     stories: ['../src/**/*.mdx', '../src/**/*.stories.@(js|jsx|ts|tsx)'],
+    staticDirs: [{ from: '../src/assets', to: '/assets' }],
 
     addons: [
         getAbsolutePath('@storybook/addon-links'),
@@ -35,7 +36,21 @@ module.exports = {
         rules.push({
             test: /\.svg$/,
             include: pathToSvgAssets,
-            use: ['@svgr/webpack'],
+            use: [
+                {
+                    loader: '@svgr/webpack',
+                    options: {
+                        svgoConfig: {
+                            plugins: [
+                                {
+                                    name: 'removeViewBox',
+                                    active: false,
+                                },
+                            ],
+                        },
+                    },
+                },
+            ],
         });
 
         config.resolve.plugins = [new TsconfigPathsPlugin()];

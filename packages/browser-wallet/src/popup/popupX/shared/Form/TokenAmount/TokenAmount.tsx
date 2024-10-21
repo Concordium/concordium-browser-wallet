@@ -4,21 +4,20 @@ import React, { InputHTMLAttributes, ReactNode, forwardRef, useCallback, useMemo
 import { UseFormReturn, Validate } from 'react-hook-form';
 import { useTranslation } from 'react-i18next';
 import clsx from 'clsx';
-import { AccountAddress, AccountInfo, CIS2, CcdAmount, ContractAddress, HexString } from '@concordium/web-sdk';
+import { AccountInfo, CIS2, CcdAmount, ContractAddress } from '@concordium/web-sdk';
+import { ensureDefined } from '@shared/utils/basic-helpers';
 import { TokenMetadata } from '@shared/storage/types';
 import SideArrow from '@assets/svgX/side-arrow.svg';
 import ConcordiumLogo from '@assets/svgX/concordium-logo.svg';
-import { displayAsCcd, fractionalToInteger } from 'wallet-common-helpers';
+import { displayAsCcd } from 'wallet-common-helpers';
 import { RequiredUncontrolledFieldProps } from '../common/types';
 import { makeUncontrolled } from '../common/utils';
 import Button from '../../Button';
 import { formatTokenAmount, parseTokenAmount, removeNumberGrouping } from '../../utils/helpers';
 import { validateAccountAddress, validateTransferAmount } from '../../utils/transaction-helpers';
 import ErrorMessage from '../ErrorMessage';
-import { ensureDefined } from '@shared/utils/basic-helpers';
-import { getMetadataUrlChecked } from '@shared/utils/token-helpers';
 import Img, { DEFAULT_FAILED } from '../../Img';
-import { useSelectedAccountInfo } from '@popup/shared/AccountInfoListenerContext/AccountInfoListenerContext';
+import { TokenInfo } from './util';
 
 type AmountInputProps = Pick<
     InputHTMLAttributes<HTMLInputElement>,
@@ -106,8 +105,9 @@ type Props = {
 const DEFAULT_TOKEN_THUMBNAIL = DEFAULT_FAILED;
 
 // TODO: Token picker...
+// [x] Get values from store
+// [x] Token images
 // [ ] Token picker
-// [ ] Get values from store
 
 /**
  * TokenAmount component renders a form for transferring tokens with an amount field and optionally a receiver field.
