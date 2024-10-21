@@ -4,7 +4,7 @@ import React, { InputHTMLAttributes, ReactNode, forwardRef, useCallback, useMemo
 import { UseFormReturn, Validate } from 'react-hook-form';
 import { useTranslation } from 'react-i18next';
 import clsx from 'clsx';
-import { CcdAmount, ContractAddress, HexString } from '@concordium/web-sdk';
+import { AccountAddress, AccountInfo, CIS2, CcdAmount, ContractAddress, HexString } from '@concordium/web-sdk';
 import { TokenMetadata } from '@shared/storage/types';
 import SideArrow from '@assets/svgX/side-arrow.svg';
 import ConcordiumLogo from '@assets/svgX/concordium-logo.svg';
@@ -12,9 +12,12 @@ import { displayAsCcd, fractionalToInteger } from 'wallet-common-helpers';
 import { RequiredUncontrolledFieldProps } from '../common/types';
 import { makeUncontrolled } from '../common/utils';
 import Button from '../../Button';
-import { formatTokenAmount, parseTokenAmount } from '../../utils/helpers';
+import { formatTokenAmount, parseTokenAmount, removeNumberGrouping } from '../../utils/helpers';
 import { validateAccountAddress, validateTransferAmount } from '../../utils/transaction-helpers';
 import ErrorMessage from '../ErrorMessage';
+import { ensureDefined } from '@shared/utils/basic-helpers';
+import { getMetadataUrlChecked } from '@shared/utils/token-helpers';
+import Img, { DEFAULT_FAILED } from '../../Img';
 
 type AmountInputProps = Pick<
     InputHTMLAttributes<HTMLInputElement>,
@@ -46,22 +49,13 @@ const FormInputClear = makeUncontrolled(InputClear);
 type TokenVariants =
     | {
           /** The token type. If undefined, a token picker is rendered */
-          token?: undefined;
+          tokenType?: 'ccd';
       }
     | {
           /** The token type. If undefined, a token picker is rendered */
-          token: 'ccd';
-      }
-    | {
-          /** The token type. If undefined, a token picker is rendered */
-          token: 'cis2';
+          tokenType: 'cis2';
           /** The token address */
-          address: {
-              /** The token ID within the contract */
-              id: HexString;
-              /** The token contract address */
-              contract: ContractAddress.Type;
-          };
+          tokenAddress: CIS2.TokenAddress;
       };
 
 /**
@@ -96,66 +90,108 @@ type ValueVariants =
           form: UseFormReturn<AmountReceiveForm>;
       };
 
+type TokenInfo = CIS2.TokenAddress & {
+    /** The token metadata corresponding to the {@linkcode CIS2.TokenAddress} */
+    metadata: TokenMetadata;
+};
+
 type Props = {
     /** The label used for the button setting the amount to the maximum possible */
     buttonMaxLabel: string;
     /** The fee associated with the transaction */
     fee: CcdAmount.Type;
+    /** The account information for the account the token amount is taken from */
+    accountInfo: AccountInfo;
+    /** The set of tokens available for the account specified by `accountInfo` */
+    tokens: TokenInfo[];
 } & ValueVariants &
     TokenVariants;
 
-const removeThousandSeparators = (value: string) => value.replace(/[,]/g, '');
+const DEFAULT_TOKEN_THUMBNAIL = DEFAULT_FAILED;
 
 // TODO: Token picker...
-// 1. Token picker
-// 2. Get values from store
+// [ ] Token picker
+// [ ] Get values from store
 
 /**
  * TokenAmount component renders a form for transferring tokens with an amount field and optionally a receiver field.
  *
  * @example
- * // Usage with token picker + receiver
  * const formMethods = useForm<AmountReceiveForm>();
+ * const accountInfo = {
+ *   accountAddress: '4J1p...8K1p',
+ *   accountNonce: 1,
+ *   accountAmount: 1000000000n,
+ *   accountEncryptedAmount: { startIndex: 0, incomingAmounts: [] },
+ *   accountReleaseSchedule: [],
+ *   accountDelegation: null,
+ *   accountBaker: null,
+ * };
+ * const tokens = [{
+ *   id: '0x123',
+ *   contract: { index: 1, subindex: 0 },
+ *   metadata: { symbol: 'wETH', name: 'Wrapped Ether', decimals: 18 },
+ * }];
+ *
+ * // Usage with token picker + receiver
  * <TokenAmount
  *   buttonMaxLabel="Max"
  *   fee={{ microCcdAmount: 1000n }}
  *   form={formMethods}
+ *   accountInfo={accountInfo}
+ *   tokens={tokens}
  *   receiver
  * />
  *
- * @example
  * // Usage with CCD token
  * const formMethods = useForm<AmountForm>();
  * <TokenAmount
  *   buttonMaxLabel="Max"
  *   fee={{ microCcdAmount: 1000n }}
  *   form={formMethods}
+ *   accountInfo={accountInfo}
+ *   tokens={[]}
  *   token="ccd"
  * />
  *
- * @example
  * // Usage with CIS2 token + receiver
  * const formMethods = useForm<AmountReceiveForm>();
  * <TokenAmount
  *   buttonMaxLabel="Max"
  *   fee={{ microCcdAmount: 1000n }}
  *   form={formMethods}
+ *   accountInfo={accountInfo}
+ *   tokens={tokens}
  *   receiver
  *   token="cis2"
  *   address={{ id: '0x123', contract: { index: 1, subindex: 0 } }}
  * />
  */
-export default function TokenAmount(props: Props) {
+export default function TokenAmountView(props: Props) {
     const { t } = useTranslation('x', { keyPrefix: 'sharedX' });
-    const { buttonMaxLabel, fee } = props;
-    const balance = 17800021000n; // FIXME: get actual value
+    const { buttonMaxLabel, fee, accountInfo, tokens } = props;
+    const balance = accountInfo.accountAvailableBalance.microCcdAmount;
 
     const selectedToken: { name: string; icon: ReactNode; decimals: number; type: 'ccd' | 'cis2' } = useMemo(() => {
-        switch (props.token) {
+        switch (props.tokenType) {
             case 'cis2': {
-                const { symbol, name, decimals = 0 }: TokenMetadata = { symbol: 'wETH', decimals: 18 }; // FIXME: hook up to actual metadata
-                const safeName = symbol ?? name ?? `${props.address.id}@${props.address.contract.toString()}`;
-                const icon = <ConcordiumLogo />; // FIXME: get token icon
+                const {
+                    symbol,
+                    name,
+                    decimals = 0,
+                    display,
+                    thumbnail = display,
+                }: TokenMetadata = ensureDefined(
+                    tokens.find(
+                        (tk) =>
+                            tk.id === props.tokenAddress.id &&
+                            ContractAddress.equals(tk.contract, props.tokenAddress.contract)
+                    )?.metadata,
+                    'Expected the token specified to be available in the set of tokens given'
+                );
+                const safeName = symbol ?? name ?? `${props.tokenAddress.id}@${props.tokenAddress.contract.toString()}`;
+                const tokenImage = thumbnail?.url ?? DEFAULT_TOKEN_THUMBNAIL;
+                const icon = <Img src={tokenImage} alt={name} />;
                 return { name: safeName, icon, decimals, type: 'cis2' };
             }
             case 'ccd':
@@ -214,7 +250,7 @@ export default function TokenAmount(props: Props) {
     const validateAmount: Validate<string> = useCallback(
         (value) =>
             validateTransferAmount(
-                removeThousandSeparators(value),
+                removeNumberGrouping(value),
                 availableAmount,
                 selectedToken.decimals,
                 selectedToken.type === 'ccd' ? fee.microCcdAmount : 0n
@@ -229,7 +265,7 @@ export default function TokenAmount(props: Props) {
                 <div className="token-selector">
                     <div className="token-icon">{selectedToken.icon}</div>
                     <span className="text__main">{selectedToken.name}</span>
-                    {props.token === undefined && <SideArrow />}
+                    {props.tokenType === undefined && <SideArrow />}
                     <span className="text__additional_small">
                         {t('form.tokenAmount.token.available', {
                             balance: formatAmount(balance),
