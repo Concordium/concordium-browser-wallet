@@ -5,10 +5,10 @@ import { Meta, StoryObj } from '@storybook/react';
 import { AccountAddress, AccountInfo, AccountInfoType, CcdAmount, ContractAddress } from '@concordium/web-sdk';
 import { PropsOf } from 'wallet-common-helpers';
 
-import TokenAmountView, { AmountReceiveForm } from './TokenAmount';
+import TokenAmount, { AmountReceiveForm } from './TokenAmount';
 import Form, { useForm } from '..';
 
-function Wrapper(props: PropsOf<typeof TokenAmountView>) {
+function Wrapper(props: PropsOf<typeof TokenAmount>) {
     const form = useForm<AmountReceiveForm>({
         mode: 'onTouched',
         defaultValues: {
@@ -19,14 +19,14 @@ function Wrapper(props: PropsOf<typeof TokenAmountView>) {
     return (
         <Form formMethods={form} onSubmit={console.log}>
             {/* eslint-disable-next-line @typescript-eslint/no-explicit-any */}
-            {() => <TokenAmountView {...props} form={form as any} />}
+            {() => <TokenAmount {...props} form={form as any} />}
         </Form>
     );
 }
 
 export default {
     title: 'X/Shared/Form/TokenAmount',
-    component: TokenAmountView,
+    component: TokenAmount,
     render: (props) => <Wrapper {...props} />,
     beforeEach: () => {
         const body = document.getElementsByTagName('body').item(0);
@@ -36,14 +36,15 @@ export default {
             body?.classList.remove('popup-x');
         };
     },
-} as Meta<typeof TokenAmountView>;
+} as Meta<typeof TokenAmount>;
 
-type Story = StoryObj<typeof TokenAmountView>;
+type Story = StoryObj<typeof TokenAmount>;
 const accountInfo = {
     type: AccountInfoType.Simple,
     accountAddress: AccountAddress.fromBase58('3ybJ66spZ2xdWF3avgxQb2meouYa7mpvMWNPmUnczU8FoF8cGB'),
     accountAvailableBalance: CcdAmount.fromCcd(174000),
 } as unknown as AccountInfo;
+
 const tokens = [
     {
         id: '',

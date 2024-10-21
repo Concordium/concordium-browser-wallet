@@ -18,6 +18,7 @@ import ErrorMessage from '../ErrorMessage';
 import { ensureDefined } from '@shared/utils/basic-helpers';
 import { getMetadataUrlChecked } from '@shared/utils/token-helpers';
 import Img, { DEFAULT_FAILED } from '../../Img';
+import { useSelectedAccountInfo } from '@popup/shared/AccountInfoListenerContext/AccountInfoListenerContext';
 
 type AmountInputProps = Pick<
     InputHTMLAttributes<HTMLInputElement>,
@@ -90,11 +91,6 @@ type ValueVariants =
           form: UseFormReturn<AmountReceiveForm>;
       };
 
-type TokenInfo = CIS2.TokenAddress & {
-    /** The token metadata corresponding to the {@linkcode CIS2.TokenAddress} */
-    metadata: TokenMetadata;
-};
-
 type Props = {
     /** The label used for the button setting the amount to the maximum possible */
     buttonMaxLabel: string;
@@ -119,24 +115,19 @@ const DEFAULT_TOKEN_THUMBNAIL = DEFAULT_FAILED;
  * @example
  * const formMethods = useForm<AmountReceiveForm>();
  * const accountInfo = {
- *   accountAddress: '4J1p...8K1p',
- *   accountNonce: 1,
- *   accountAmount: 1000000000n,
- *   accountEncryptedAmount: { startIndex: 0, incomingAmounts: [] },
- *   accountReleaseSchedule: [],
- *   accountDelegation: null,
- *   accountBaker: null,
+     accountAvailableBalance: CcdAmount.fromCcd(1000),
+     ...
  * };
  * const tokens = [{
- *   id: '0x123',
- *   contract: { index: 1, subindex: 0 },
+ *   id: '',
+ *   contract: ContractAddress.create(1),
  *   metadata: { symbol: 'wETH', name: 'Wrapped Ether', decimals: 18 },
  * }];
  *
  * // Usage with token picker + receiver
  * <TokenAmount
  *   buttonMaxLabel="Max"
- *   fee={{ microCcdAmount: 1000n }}
+ *   fee={CcdAmount.fromMicroCcd(1000n)}
  *   form={formMethods}
  *   accountInfo={accountInfo}
  *   tokens={tokens}
@@ -147,7 +138,7 @@ const DEFAULT_TOKEN_THUMBNAIL = DEFAULT_FAILED;
  * const formMethods = useForm<AmountForm>();
  * <TokenAmount
  *   buttonMaxLabel="Max"
- *   fee={{ microCcdAmount: 1000n }}
+ *   fee={CcdAmount.fromMicroCcd(1000n)}
  *   form={formMethods}
  *   accountInfo={accountInfo}
  *   tokens={[]}
@@ -158,16 +149,16 @@ const DEFAULT_TOKEN_THUMBNAIL = DEFAULT_FAILED;
  * const formMethods = useForm<AmountReceiveForm>();
  * <TokenAmount
  *   buttonMaxLabel="Max"
- *   fee={{ microCcdAmount: 1000n }}
+ *   fee={CcdAmount.fromMicroCcd(1000n)}
  *   form={formMethods}
  *   accountInfo={accountInfo}
  *   tokens={tokens}
  *   receiver
  *   token="cis2"
- *   address={{ id: '0x123', contract: { index: 1, subindex: 0 } }}
+ *   address={{ id: '', contract: ContractAddress.create(1) }}
  * />
  */
-export default function TokenAmountView(props: Props) {
+export default function TokenAmount(props: Props) {
     const { t } = useTranslation('x', { keyPrefix: 'sharedX' });
     const { buttonMaxLabel, fee, accountInfo, tokens } = props;
     const balance = accountInfo.accountAvailableBalance.microCcdAmount;
@@ -191,7 +182,7 @@ export default function TokenAmountView(props: Props) {
                 );
                 const safeName = symbol ?? name ?? `${props.tokenAddress.id}@${props.tokenAddress.contract.toString()}`;
                 const tokenImage = thumbnail?.url ?? DEFAULT_TOKEN_THUMBNAIL;
-                const icon = <Img src={tokenImage} alt={name} />;
+                const icon = <Img src={tokenImage} alt={name} withDefaults />;
                 return { name: safeName, icon, decimals, type: 'cis2' };
             }
             case 'ccd':
