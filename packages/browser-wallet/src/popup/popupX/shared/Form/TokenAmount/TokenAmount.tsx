@@ -12,7 +12,7 @@ import { displayAsCcd, fractionalToInteger } from 'wallet-common-helpers';
 import { RequiredUncontrolledFieldProps } from '../common/types';
 import { makeUncontrolled } from '../common/utils';
 import Button from '../../Button';
-import { formatTokenAmount } from '../../utils/helpers';
+import { formatTokenAmount, parseTokenAmount } from '../../utils/helpers';
 import { validateAccountAddress, validateTransferAmount } from '../../utils/transaction-helpers';
 import ErrorMessage from '../ErrorMessage';
 
@@ -174,11 +174,11 @@ export default function TokenAmount(props: Props) {
         [selectedToken]
     );
     const parseAmount = useCallback(
-        (amountValue: string) => fractionalToInteger(amountValue.replace(/[,]/g, ''), selectedToken.decimals),
+        (amountValue: string) => parseTokenAmount(amountValue, selectedToken.decimals),
         [selectedToken]
     );
 
-    const availableAmount = useMemo(
+    const availableAmount: bigint = useMemo(
         () => (selectedToken.type === 'ccd' ? balance - fee.microCcdAmount : balance),
         [selectedToken, fee, balance]
     );
@@ -212,7 +212,7 @@ export default function TokenAmount(props: Props) {
     );
 
     const validateAmount: Validate<string> = useCallback(
-        (value: string) =>
+        (value) =>
             validateTransferAmount(
                 removeThousandSeparators(value),
                 availableAmount,
