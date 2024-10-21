@@ -2,13 +2,13 @@
 /* eslint-disable prefer-destructuring */
 import React from 'react';
 import { Meta, StoryObj } from '@storybook/react';
-import { AccountAddress, AccountInfo, AccountInfoType, CcdAmount, ContractAddress } from '@concordium/web-sdk';
+import { CcdAmount, ContractAddress } from '@concordium/web-sdk';
 import { PropsOf } from 'wallet-common-helpers';
 
-import TokenAmount, { AmountReceiveForm } from './TokenAmount';
+import TokenAmountView, { AmountReceiveForm } from './View';
 import Form, { useForm } from '..';
 
-function Wrapper(props: PropsOf<typeof TokenAmount>) {
+function Wrapper(props: PropsOf<typeof TokenAmountView>) {
     const form = useForm<AmountReceiveForm>({
         mode: 'onTouched',
         defaultValues: {
@@ -19,14 +19,14 @@ function Wrapper(props: PropsOf<typeof TokenAmount>) {
     return (
         <Form formMethods={form} onSubmit={console.log}>
             {/* eslint-disable-next-line @typescript-eslint/no-explicit-any */}
-            {() => <TokenAmount {...props} form={form as any} />}
+            {() => <TokenAmountView {...props} form={form as any} />}
         </Form>
     );
 }
 
 export default {
     title: 'X/Shared/Form/TokenAmount',
-    component: TokenAmount,
+    component: TokenAmountView,
     render: (props) => <Wrapper {...props} />,
     beforeEach: () => {
         const body = document.getElementsByTagName('body').item(0);
@@ -36,14 +36,9 @@ export default {
             body?.classList.remove('popup-x');
         };
     },
-} as Meta<typeof TokenAmount>;
+} as Meta<typeof TokenAmountView>;
 
-type Story = StoryObj<typeof TokenAmount>;
-const accountInfo = {
-    type: AccountInfoType.Simple,
-    accountAddress: AccountAddress.fromBase58('3ybJ66spZ2xdWF3avgxQb2meouYa7mpvMWNPmUnczU8FoF8cGB'),
-    accountAvailableBalance: CcdAmount.fromCcd(174000),
-} as unknown as AccountInfo;
+type Story = StoryObj<typeof TokenAmountView>;
 
 const tokens = [
     {
@@ -69,8 +64,9 @@ export const OnlyAmount: Story = {
         fee: CcdAmount.fromCcd(0.032),
         buttonMaxLabel: 'Stake max.',
         receiver: false,
-        accountInfo,
         tokens,
+        balance: 17004000000n,
+        onSelectToken: console.log,
     },
 };
 
@@ -79,8 +75,9 @@ export const WithReceiver: Story = {
         buttonMaxLabel: 'Send max.',
         fee: CcdAmount.fromCcd(0.032),
         receiver: true,
-        accountInfo,
         tokens,
+        balance: 17004000000n,
+        onSelectToken: console.log,
     },
 };
 
@@ -91,7 +88,8 @@ export const TokenWithReceiver: Story = {
         buttonMaxLabel: 'Send max.',
         fee: CcdAmount.fromCcd(0.132),
         receiver: true,
-        accountInfo,
         tokens,
+        balance: 17004000000n,
+        onSelectToken: console.log,
     },
 };
