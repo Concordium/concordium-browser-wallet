@@ -1,7 +1,9 @@
-import MultiStepForm from '@popup/popupX/shared/MultiStepForm';
 import React, { useCallback } from 'react';
-import { Location, useLocation, useNavigate } from 'react-router-dom';
+import { Location, Navigate, useLocation, useNavigate } from 'react-router-dom';
 import { useTranslation } from 'react-i18next';
+import { DelegationTarget, DelegationTargetType } from '@concordium/web-sdk';
+
+import MultiStepForm from '@popup/popupX/shared/MultiStepForm';
 import DelegatorStake, { DelegatorStakeForm } from '../Stake';
 import DelegatorType, { DelegationTypeForm } from '../Type';
 
@@ -21,6 +23,7 @@ export default function TransactionFlow() {
     const handleDone = useCallback(
         (values: DelegatorForm) => {
             nav(pathname, { replace: true, state: values }); // Override current router entry with stateful version
+            // TODO: where do we go from here?
         },
         [pathname]
     );
@@ -36,11 +39,22 @@ export default function TransactionFlow() {
                 stake: {
                     render: (initial, onNext, form) => {
                         if (form.target === undefined) {
-                            nav('..');
-                            return null;
+                            return <Navigate to=".." />;
                         }
 
-                        return <DelegatorStake title={t('title')} target={form.target.type} />;
+                        const target: DelegationTarget =
+                            form.target.type === DelegationTargetType.PassiveDelegation
+                                ? { delegateType: DelegationTargetType.PassiveDelegation }
+                                : { delegateType: DelegationTargetType.Baker, bakerId: BigInt(form.target.bakerId!) };
+
+                        return (
+                            <DelegatorStake
+                                title={t('title')}
+                                target={target}
+                                onSubmit={onNext}
+                                initialValues={initial}
+                            />
+                        );
                     },
                 },
             }}

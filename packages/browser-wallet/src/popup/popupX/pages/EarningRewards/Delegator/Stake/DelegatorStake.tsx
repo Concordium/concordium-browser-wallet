@@ -1,14 +1,25 @@
-import React from 'react';
+import React, { useMemo } from 'react';
 import { UseFormReturn } from 'react-hook-form';
 import Button from '@popup/popupX/shared/Button';
 import FormToggleCheckbox from '@popup/popupX/shared/Form/ToggleCheckbox';
 import Page from '@popup/popupX/shared/Page';
 import { useTranslation } from 'react-i18next';
-import { CcdAmount, DelegationTargetType } from '@concordium/web-sdk';
+import {
+    CcdAmount,
+    DelegationTarget,
+    DelegationTargetType,
+    ConfigureDelegationPayload,
+    convertEnergyToMicroCcd,
+    Energy,
+} from '@concordium/web-sdk';
 import Form, { useForm } from '@popup/popupX/shared/Form';
 import TokenAmount, { AmountForm } from '@popup/popupX/shared/Form/TokenAmount';
 import { useAccountInfo } from '@popup/shared/AccountInfoListenerContext/AccountInfoListenerContext';
 import { displayNameAndSplitAddress, useSelectedCredential } from '@popup/shared/utils/account-helpers';
+import { getConfigureDelegationEnergyCost } from '@shared/utils/energy-helpers';
+import { parseTokenAmount } from '@popup/popupX/shared/utils/helpers';
+import { CCD_METADATA } from '@shared/constants/token-metadata';
+import { useBlockChainParameters } from '@popup/shared/BlockChainParametersProvider';
 
 /** The form values for delegator stake configuration step */
 export type DelegatorStakeForm = AmountForm & {
@@ -19,10 +30,10 @@ export type DelegatorStakeForm = AmountForm & {
 type Props = {
     /** The title for the configuriation step */
     title: string;
-    /** The delegation target type */
-    target: DelegationTargetType;
     /** The initial values of the step, if any */
     initialValues?: DelegatorStakeForm;
+    /** The delegation target */
+    target: DelegationTarget;
     /** The submit handler triggered when submitting the form in the step */
     onSubmit(values: DelegatorStakeForm): void;
 };
@@ -33,16 +44,31 @@ export default function DelegatorStake({ title, target, initialValues, onSubmit 
         defaultValues: initialValues ?? { amount: '0.00', redelegate: true },
     });
     const submit = form.handleSubmit(onSubmit);
+    const chainParameters = useBlockChainParameters();
     const selectedCred = useSelectedCredential();
     const selectedAccountInfo = useAccountInfo(selectedCred);
+    const { amount, redelegate } = form.watch();
+    const fee = useMemo(() => {
+        if (chainParameters === undefined) {
+            return undefined;
+        }
 
-    if (selectedAccountInfo === undefined || selectedCred === undefined) {
+        const payload: ConfigureDelegationPayload = {
+            stake: CcdAmount.fromMicroCcd(parseTokenAmount(amount, CCD_METADATA.decimals)),
+            delegationTarget: target,
+            restakeEarnings: redelegate,
+        };
+
+        const energy = getConfigureDelegationEnergyCost(payload);
+        return convertEnergyToMicroCcd(Energy.create(energy), chainParameters);
+    }, [target, amount, redelegate, selectedAccountInfo, chainParameters]);
+
+    if (selectedAccountInfo === undefined || selectedCred === undefined || fee === undefined) {
         return null;
     }
 
-    // FIXME: hardcoded...
     const accountShow = displayNameAndSplitAddress(selectedCred);
-    const fee = CcdAmount.fromCcd(0.032);
+    // FIXME: hardcoded...
     const poolStake = '300,000.00';
     const poolCap = '56,400.00';
 
@@ -62,7 +88,7 @@ export default function DelegatorStake({ title, target, initialValues, onSubmit 
                             buttonMaxLabel={t('inputAmount.buttonMax')}
                             form={f as unknown as UseFormReturn<AmountForm>}
                         />
-                        {target === DelegationTargetType.Baker && (
+                        {target.delegateType === DelegationTargetType.Baker && (
                             <div className="register-delegator__pool-info">
                                 <div className="register-delegator__pool-info_row">
                                     <span className="capture__main_small">{t('poolStake.label')}</span>
