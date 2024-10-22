@@ -6,7 +6,7 @@
 // Temporary workaround to wrap all new classes
 // Should be removed on new design release
 html.popup-x,
-body.popup-x,
+body.light.popup-x,
 body.dark.popup-x {
     @import 'base';
     @import 'elements';

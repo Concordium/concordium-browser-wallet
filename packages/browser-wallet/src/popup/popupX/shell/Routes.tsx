@@ -11,6 +11,7 @@ import { TokenDetails, TokenDetailsCcd } from '@popup/popupX/pages/TokenDetails'
 import IdCards from '@popup/popupX/pages/IdCards';
 import Accounts from '@popup/popupX/pages/Accounts';
 import SeedPhrase from 'src/popup/popupX/pages/SeedPhrase';
+import ChangePasscode from 'src/popup/popupX/pages/ChangePasscode';
 import { Web3IdCredentials, Web3IdImport } from '@popup/popupX/pages/Web3Id';
 import NetworkSettings from '@popup/popupX/pages/NetworkSettings';
 import ConnectNetwork from '@popup/popupX/pages/ConnectNetwork';
@@ -74,6 +75,7 @@ export default function Routes() {
                         <Route element={<PrivateKey />} path={relativeRoutes.settings.accounts.privateKey.path} />
                     </Route>
                     <Route element={<SeedPhrase />} path={relativeRoutes.settings.seedPhrase.path} />
+                    <Route element={<ChangePasscode />} path={relativeRoutes.settings.passcode.path} />
                     <Route path={relativeRoutes.settings.web3Id.path}>
                         <Route index element={<Web3IdCredentials />} />
                         <Route element={<Web3IdImport />} path={relativeRoutes.settings.web3Id.import.path} />

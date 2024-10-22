@@ -15,6 +15,12 @@ export const displayNameOrSplitAddress = (account: WalletCredential | undefined)
     return credName || `${address.slice(0, 4)}...${address.slice(address.length - 4)}`;
 };
 
+export const displayNameAndSplitAddress = (account: WalletCredential | undefined) => {
+    const { credName, address } = account || { address: '' };
+    const splitAddress = `${address.slice(0, 4)}...${address.slice(address.length - 4)}`;
+    return `${credName ? `${credName} / ` : ''}${splitAddress}`;
+};
+
 export function useIdentityOf(cred?: WalletCredential) {
     const identities = useAtomValue(identitiesAtom);
 

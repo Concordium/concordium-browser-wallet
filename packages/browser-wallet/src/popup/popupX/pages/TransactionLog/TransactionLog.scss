@@ -17,6 +17,10 @@
             margin-bottom: rem(4px);
 
             .transaction {
+                .label__main {
+                    color: $color-white;
+                }
+
                 &.value,
                 &.info {
                     display: flex;

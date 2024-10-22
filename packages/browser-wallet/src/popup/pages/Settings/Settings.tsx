@@ -13,7 +13,7 @@ import { popupMessageHandler } from '@popup/shared/message-handler';
 import { InternalMessageType } from '@messaging';
 import Button from '@popup/shared/Button';
 import { isFullscreenWindow } from '@popup/shared/window-helpers';
-import { noOp } from 'wallet-common-helpers';
+import { routePrefix } from '@popup/popupX/constants/routes';
 
 function LightDarkModeToggle() {
     const { t } = useTranslation('settings');
@@ -63,24 +63,7 @@ export default function Settings() {
                         {t('fullscreenWallet')}
                     </Button>
                 )}
-                <Link
-                    className="settings-page__link"
-                    to={absoluteRoutes.onboarding.path}
-                    onClick={() => {
-                        const body = document.getElementsByTagName('body').item(0);
-                        const html = document.getElementsByTagName('html').item(0);
-                        const bg = document.getElementsByClassName('bg').item(0);
-                        body?.classList.add('popup-x');
-                        bg?.classList.add('welcome-page');
-                        body?.setAttribute('style', 'width:375px; height:600px; margin: auto;');
-
-                        popupMessageHandler
-                            .sendInternalMessage(InternalMessageType.SetViewSize, { width: 375, height: 600 })
-                            .catch(noOp);
-                        html?.classList.remove('ui-scale-medium');
-                        html?.classList.add('ui-scale-large');
-                    }}
-                >
+                <Link className="settings-page__link" to={`${routePrefix}/home`}>
                     Wallet X
                 </Link>
                 <Link className="settings-page__link" to={absoluteRoutes.home.settings.about.path}>

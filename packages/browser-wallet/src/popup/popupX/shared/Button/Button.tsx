@@ -5,7 +5,7 @@ import Text from '@popup/popupX/shared/Text';
 
 export type ButtonProps = Pick<
     ButtonHTMLAttributes<HTMLButtonElement>,
-    'type' | 'children' | 'disabled' | 'className' | 'onClick' | 'onMouseUp' | 'tabIndex'
+    'type' | 'children' | 'disabled' | 'className' | 'onClick' | 'onMouseUp' | 'tabIndex' | 'form'
 >;
 
 type PolymorphicProps<A extends ElementType = 'button'> = PolymorphicComponentProps<A, ButtonProps>;

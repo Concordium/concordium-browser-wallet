@@ -9,6 +9,7 @@ const t = {
         network: 'Network',
         about: 'About',
         restore: 'Restore',
+        oldUI: 'Old UI',
     },
 };
 
