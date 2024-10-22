@@ -3,9 +3,7 @@ import { atomFamily, selectAtom, useAtomValue } from 'jotai/utils';
 import { AccountAddress, AccountInfo, ContractAddress, CIS2 } from '@concordium/web-sdk';
 import { atom } from 'jotai';
 
-import { useSelectedAccountInfo } from '@popup/shared/AccountInfoListenerContext/AccountInfoListenerContext';
 import { contractBalancesFamily } from '@popup/store/token';
-import { ensureDefined } from '@shared/utils/basic-helpers';
 import TokenAmountView, { TokenAmountViewProps } from './View';
 import { useTokenInfo } from './util';
 
@@ -28,7 +26,10 @@ const balanceAtomFamily = atomFamily(
     ([aa, ta], [ab, tb]) => AccountAddress.equals(aa.accountAddress, ab.accountAddress) && tokenAddressEq(ta, tb)
 );
 
-type Props = Omit<TokenAmountViewProps, 'tokens' | 'balance' | 'onSelectToken'>;
+type Props = Omit<TokenAmountViewProps, 'tokens' | 'balance' | 'onSelectToken'> & {
+    /** The account info of the account to take the amount from */
+    accountInfo: AccountInfo;
+};
 
 /**
  * TokenAmount component renders a form for transferring tokens with an amount field and optionally a receiver field.
@@ -69,8 +70,7 @@ type Props = Omit<TokenAmountViewProps, 'tokens' | 'balance' | 'onSelectToken'>;
  *   address={{ id: '', contract: ContractAddress.create(1) }}
  * />
  */
-export default function TokenAmount(props: Props) {
-    const accountInfo = ensureDefined(useSelectedAccountInfo(), 'Expected selected account to be available');
+export default function TokenAmount({ accountInfo, ...props }: Props) {
     const tokenInfo = useTokenInfo(accountInfo.accountAddress);
     const [tokenAddress, setTokenAddress] = useState<CIS2.TokenAddress | null>(null);
     const tokenBalance = useAtomValue(balanceAtomFamily([accountInfo, tokenAddress]));
