@@ -5,6 +5,7 @@ import { UseFormReturn, Validate } from 'react-hook-form';
 import { useTranslation } from 'react-i18next';
 import clsx from 'clsx';
 import { CIS2, CcdAmount, ContractAddress } from '@concordium/web-sdk';
+import { CCD_METADATA } from '@shared/constants/token-metadata';
 import { ensureDefined } from '@shared/utils/basic-helpers';
 import SideArrow from '@assets/svgX/side-arrow.svg';
 import ConcordiumLogo from '@assets/svgX/concordium-logo.svg';
@@ -284,7 +285,7 @@ export default function TokenAmountView(props: TokenAmountViewProps) {
 
     const tokenDecimals = useMemo(() => {
         if (selectedToken === null) {
-            return 6;
+            return CCD_METADATA.decimals;
         }
         return selectedToken.metadata.decimals ?? 0;
     }, [selectedToken]);
