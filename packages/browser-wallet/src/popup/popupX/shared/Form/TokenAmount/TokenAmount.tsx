@@ -6,7 +6,7 @@ import { atom } from 'jotai';
 import { useSelectedAccountInfo } from '@popup/shared/AccountInfoListenerContext/AccountInfoListenerContext';
 import { contractBalancesFamily } from '@popup/store/token';
 import { ensureDefined } from '@shared/utils/basic-helpers';
-import TokenAmountView, { TokenAmountViewProps, TokenSelectEvent } from './View';
+import TokenAmountView, { TokenAmountViewProps } from './View';
 import { useTokenInfo } from './util';
 
 const tokenAddressEq = (a: CIS2.TokenAddress | null, b: CIS2.TokenAddress | null) => {
@@ -75,19 +75,15 @@ export default function TokenAmount(props: Props) {
     const [tokenAddress, setTokenAddress] = useState<CIS2.TokenAddress | null>(null);
     const tokenBalance = useAtomValue(balanceAtomFamily([accountInfo, tokenAddress]));
 
-    if (accountInfo === undefined || tokenInfo === undefined || tokenInfo.loading) {
+    if (tokenInfo.loading) {
         return null;
     }
-
-    const handleSelectToken = (e: TokenSelectEvent) => {
-        setTokenAddress(e);
-    };
 
     return (
         <TokenAmountView
             {...(props as TokenAmountViewProps)}
             tokens={tokenInfo.value}
-            onSelectToken={handleSelectToken}
+            onSelectToken={setTokenAddress}
             balance={tokenBalance}
         />
     );

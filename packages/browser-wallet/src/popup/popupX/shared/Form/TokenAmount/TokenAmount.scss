@@ -132,5 +132,9 @@
             justify-content: space-between;
             margin-top: rem(12px);
         }
+
+        textarea {
+            resize: none;
+        }
     }
 }

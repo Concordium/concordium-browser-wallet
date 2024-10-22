@@ -45,6 +45,30 @@ const InputClear = forwardRef<HTMLInputElement, AmountInputProps>(
 
 const FormInputClear = makeUncontrolled(InputClear);
 
+type ReceiverInputProps = Pick<
+    InputHTMLAttributes<HTMLTextAreaElement>,
+    'className' | 'value' | 'onChange' | 'onBlur' | 'autoFocus'
+> &
+    RequiredUncontrolledFieldProps<HTMLInputElement>;
+
+/**
+ * @description
+ * Use as a normal \<textarea /\>.
+ */
+const ReceiverInput = forwardRef<HTMLTextAreaElement, ReceiverInputProps>(({ error, className, ...props }, ref) => {
+    return (
+        <textarea
+            className={clsx('token-amount_field', error !== undefined && 'token-amount_field--invalid', className)}
+            ref={ref}
+            autoComplete="off"
+            spellCheck="false"
+            {...props}
+        />
+    );
+});
+
+const FormReceiverInput = makeUncontrolled(ReceiverInput);
+
 const parseTokenSelectorId = (value: string): null | CIS2.TokenAddress => {
     if (value.startsWith('ccd')) {
         return null;
@@ -335,7 +359,7 @@ export default function TokenAmountView(props: TokenAmountViewProps) {
                         selectedToken={selectedToken}
                         onSelect={handleTokenSelect}
                         tokens={tokens}
-                        selectedTokenBalance={availableAmount}
+                        selectedTokenBalance={balance}
                         formatAmount={formatAmount}
                     />
                 ) : (
@@ -344,7 +368,7 @@ export default function TokenAmountView(props: TokenAmountViewProps) {
                         onSelect={handleTokenSelect}
                         tokens={tokens}
                         canSelect
-                        selectedTokenBalance={availableAmount}
+                        selectedTokenBalance={balance}
                         formatAmount={formatAmount}
                     />
                 )}
@@ -377,10 +401,7 @@ export default function TokenAmountView(props: TokenAmountViewProps) {
             {props.receiver === true && (
                 <div className="token-amount_receiver">
                     <span className="text__main_medium">{t('form.tokenAmount.address.label')}</span>
-                    {/* TODO: Figure out what to do with overflowing text?
-                        1. multiline <input type="text">
-                        2. show abbreviated version on blur */}
-                    <FormInputClear
+                    <FormReceiverInput
                         className="text__main"
                         register={(props.form as UseFormReturn<AmountReceiveForm>).register}
                         name="receiver"
