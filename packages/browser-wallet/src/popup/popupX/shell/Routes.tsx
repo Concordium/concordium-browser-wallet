@@ -26,6 +26,7 @@ import { BakerKeys } from '@popup/popupX/pages/EarningRewards/Baker/BakerKeys';
 import PrivateKey from '@popup/popupX/pages/PrivateKey';
 import { RestoreIntro, RestoreResult } from '@popup/popupX/pages/Restore';
 import RegisterDelegator from '../pages/EarningRewards/Delegator/RegisterDelegator';
+import { DelegationResult } from '../pages/EarningRewards/Delegator/Result';
 
 export default function Routes() {
     return (
@@ -105,6 +106,10 @@ export default function Routes() {
                             <Route
                                 element={<RegisterDelegator />} // FIXME: change to update flow
                                 path={`${relativeRoutes.settings.earn.delegator.update.path}/*`}
+                            />
+                            <Route
+                                element={<DelegationResult />}
+                                path={relativeRoutes.settings.earn.delegator.submit.path}
                             />
                         </Route>
                     </Route>

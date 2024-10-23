@@ -10,14 +10,7 @@ import Button from '@popup/popupX/shared/Button';
 import FormInput from '@popup/popupX/shared/Form/Input/Input';
 import { useAtomValue } from 'jotai';
 import { grpcClientAtom, networkConfigurationAtom } from '@popup/store/settings';
-
-/** Describes the form values for configuring the delegation target of a delegation transaction */
-export type DelegationTypeForm = {
-    /** The target for the delegation */
-    type: DelegationTargetType;
-    /** The target baker ID - only relevant for target = {@linkcode DelegationTargetType.Baker} */
-    bakerId?: string;
-};
+import { DelegationTypeForm } from '../util';
 
 type Props = {
     title: string;
@@ -72,7 +65,7 @@ export default function DelegationType({ initialValues, onSubmit, title }: Props
                             register={f.register}
                         />
                         {target === DelegationTargetType.Baker && (
-                            <FormInput // TODO: Add validation...
+                            <FormInput
                                 className="m-t-30 m-b-0"
                                 name="bakerId"
                                 register={f.register}

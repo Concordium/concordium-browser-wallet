@@ -176,6 +176,10 @@ export const relativeRoutes = {
                 update: {
                     path: 'update',
                 },
+                /** Submit configure delegator transaction */
+                submit: {
+                    path: 'submit',
+                },
             },
         },
     },

@@ -1,13 +1,28 @@
 import React from 'react';
+import { ConfigureDelegationPayload } from '@concordium/web-sdk';
+import { Navigate, useLocation, Location } from 'react-router-dom';
+
 import Button from '@popup/popupX/shared/Button';
+import Page from '@popup/popupX/shared/Page';
+import { formatCcdAmount } from '@popup/popupX/shared/utils/helpers';
+import { useGetConfigureDelegationCost } from '../util';
 
 export default function DelegationResult() {
+    const { state } = useLocation() as Location & {
+        state: ConfigureDelegationPayload | undefined;
+    };
+    const getCost = useGetConfigureDelegationCost();
+
+    if (state === undefined) {
+        return <Navigate to=".." />;
+    }
+
+    const fee = getCost(state);
+
+    // FIXME: translations...
     return (
-        <div className="delegation-result-container">
-            <div className="delegation-result__title">
-                <span className="heading_medium">Register Delegation</span>
-                <span className="capture__main_small">on Accout 1 / 6gk...k7o</span>
-            </div>
+        <Page className="delegation-result-container">
+            <Page.Top heading="Register delegation" />
             <span className="capture__main_small">
                 This will lock your delegation amount. Amount is released after 14 days from the time you remove or
                 decrease your delegation.
@@ -19,7 +34,7 @@ export default function DelegationResult() {
                 </div>
                 <div className="delegation-result__card_row">
                     <span className="capture__main_small">Estimated transaction fee</span>
-                    <span className="capture__main_small">1,000.00 CCD</span>
+                    <span className="capture__main_small">{fee !== undefined ? formatCcdAmount(fee) : '...'} CCD</span>
                 </div>
                 <div className="delegation-result__card_row">
                     <span className="capture__main_small">Transaction hash</span>
@@ -28,7 +43,9 @@ export default function DelegationResult() {
                     </span>
                 </div>
             </div>
-            <Button.Main label="Continue" />
-        </div>
+            <Page.Footer>
+                <Button.Main label="Submit delegation" />
+            </Page.Footer>
+        </Page>
     );
 }

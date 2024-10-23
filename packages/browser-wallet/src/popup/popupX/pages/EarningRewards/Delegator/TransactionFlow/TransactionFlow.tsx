@@ -1,11 +1,12 @@
 import React, { useCallback } from 'react';
 import { Location, Navigate, useLocation, useNavigate } from 'react-router-dom';
 import { useTranslation } from 'react-i18next';
-import { DelegationTarget, DelegationTargetType } from '@concordium/web-sdk';
 
 import MultiStepForm from '@popup/popupX/shared/MultiStepForm';
+import { absoluteRoutes } from '@popup/popupX/constants/routes';
 import DelegatorStake, { DelegatorStakeForm } from '../Stake';
 import DelegatorType, { DelegationTypeForm } from '../Type';
+import { configureDelegatorPayloadFromForm } from '../util';
 
 /** Represents the form data for a configure delegator transaction. */
 type DelegatorForm = {
@@ -22,8 +23,10 @@ export default function TransactionFlow() {
 
     const handleDone = useCallback(
         (values: DelegatorForm) => {
+            const payload = configureDelegatorPayloadFromForm(values);
             nav(pathname, { replace: true, state: values }); // Override current router entry with stateful version
             // TODO: where do we go from here?
+            nav(absoluteRoutes.settings.earn.delegator.submit.path, { state: payload }); // Override current router entry with stateful version
         },
         [pathname]
     );
@@ -42,15 +45,10 @@ export default function TransactionFlow() {
                             return <Navigate to=".." />;
                         }
 
-                        const target: DelegationTarget =
-                            form.target.type === DelegationTargetType.PassiveDelegation
-                                ? { delegateType: DelegationTargetType.PassiveDelegation }
-                                : { delegateType: DelegationTargetType.Baker, bakerId: BigInt(form.target.bakerId!) };
-
                         return (
                             <DelegatorStake
                                 title={t('title')}
-                                target={target}
+                                target={form.target}
                                 onSubmit={onNext}
                                 initialValues={initial}
                             />

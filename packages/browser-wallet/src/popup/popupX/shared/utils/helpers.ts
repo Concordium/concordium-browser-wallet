@@ -1,3 +1,6 @@
+import { CcdAmount } from '@concordium/web-sdk';
+import { CCD_METADATA } from '@shared/constants/token-metadata';
+
 export async function copyToClipboard(text: string): Promise<void> {
     try {
         await navigator.clipboard.writeText(text);
@@ -9,7 +12,7 @@ export async function copyToClipboard(text: string): Promise<void> {
 export const removeNumberGrouping = (amount: string) => amount.replace(/,/g, '');
 
 /** Display a token amount with a number of decimals + number groupings (thousand separators) */
-export function formatTokenAmount(amount: bigint, decimals = 0, minDecimals = decimals) {
+export function formatTokenAmount(amount: bigint, decimals = 0, minDecimals = 2) {
     const padded = amount.toString().padStart(decimals + 1, '0'); // Ensure the string length is minimum decimals + 1 characters. For CCD, this would mean minimum 7 characters long
     const integer = padded.slice(0, -decimals);
     const fraction = padded.slice(-decimals);
@@ -33,3 +36,10 @@ export function parseTokenAmount(amount: string, decimals = 0): bigint {
     const combined = integerPart + fractionPart;
     return BigInt(combined);
 }
+
+/** {@linkcode formatTokenAmount} for CCD + 2 minimum decimals */
+export const formatCcdAmount = (amount: CcdAmount.Type) =>
+    formatTokenAmount(amount.microCcdAmount, CCD_METADATA.decimals);
+/** {@linkcode parseTokenAmount} for CCD */
+export const parseCcdAmount = (amount: string): CcdAmount.Type =>
+    CcdAmount.fromMicroCcd(parseTokenAmount(amount, CCD_METADATA.decimals));
