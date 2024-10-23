@@ -2,6 +2,7 @@ import React, { useEffect } from 'react';
 import DotsNine from '@assets/svgX/dots-nine.svg';
 import Close from '@assets/svgX/close.svg';
 import clsx from 'clsx';
+import Button from '@popup/popupX/shared/Button';
 
 type Props = {
     setMenuOpen: (open: boolean) => void;
@@ -21,15 +22,13 @@ export default function MenuButton({ setMenuOpen, menuOpen, hideMenu }: Props) {
     }, [menuOpen]);
     return (
         <div className={clsx('main-header__menu', hideMenu && 'hidden')}>
-            <button
-                type="button"
-                className="main-header__menu_button"
+            <Button.Icon
+                className="transparent"
+                icon={menuOpen ? <Close /> : <DotsNine />}
                 onClick={() => {
                     setMenuOpen(!menuOpen);
                 }}
-            >
-                {menuOpen ? <Close /> : <DotsNine />}
-            </button>
+            />
         </div>
     );
 }

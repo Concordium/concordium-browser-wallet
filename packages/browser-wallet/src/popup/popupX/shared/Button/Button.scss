@@ -1,4 +1,11 @@
 .button {
+    &__base {
+        &:focus-visible {
+            outline: 1px solid $color-white;
+            outline-offset: -1px;
+        }
+    }
+
     &__main {
         display: flex;
         align-items: center;
@@ -10,6 +17,11 @@
         margin-top: auto;
         border-radius: rem(32px);
         background: $color-white;
+
+        &.secondary {
+            background: $color-grey-2;
+            color: $color-white;
+        }
 
         .tablet & {
             max-width: rem(240px);

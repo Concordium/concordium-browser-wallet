@@ -18,6 +18,7 @@ import {
     AcceptedTermsState,
     VerifiableCredential,
     VerifiableCredentialSchema,
+    UiStyle,
 } from './types';
 
 export type StorageAccessor<V> = {
@@ -176,6 +177,7 @@ export const storedCredentials = makeIndexedStorageAccessor<WalletCredential[]>(
 export const storedSelectedAccount = makeStorageAccessor<string>('local', ChromeStorageKey.SelectedAccount);
 export const storedEncryptedSeedPhrase = makeStorageAccessor<EncryptedData>('local', ChromeStorageKey.SeedPhrase);
 export const storedTheme = makeStorageAccessor<Theme>('local', ChromeStorageKey.Theme);
+export const storedUiStyle = makeStorageAccessor<UiStyle>('local', ChromeStorageKey.UiStyle);
 export const storedIdentityProviders = makeIndexedStorageAccessor<IdentityProvider>(
     'local',
     ChromeStorageKey.IdentityProviders

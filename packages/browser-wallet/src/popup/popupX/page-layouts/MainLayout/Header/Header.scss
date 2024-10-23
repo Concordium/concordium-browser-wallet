@@ -13,10 +13,10 @@
     .fade-menu-bg {
         position: absolute;
         top: 0;
-        margin: rem(80px) auto 0 auto;
+        margin: rem(90px) auto 0 auto;
         width: 100%;
         max-width: rem(1328px);
-        height: calc(100% - rem(80px));
+        height: calc(100% - rem(90px));
         z-index: 1;
         backdrop-filter: blur(10px);
         background: rgba($color-black, 0.9);
@@ -107,17 +107,15 @@
             visibility: hidden;
         }
 
-        &_button {
-            display: flex;
-            padding: unset;
-            border: unset;
-            background: unset;
-            cursor: pointer;
+        .button__icon.transparent {
+            &:hover:not(:disabled) {
+                opacity: 1;
+            }
         }
     }
 
     &__menu-tiles {
-        padding: rem(24px);
+        padding: rem(14px) rem(24px) rem(24px) rem(24px);
 
         .tablet & {
             margin-top: rem(72px);

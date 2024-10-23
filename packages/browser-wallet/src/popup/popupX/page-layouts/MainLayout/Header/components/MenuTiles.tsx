@@ -14,6 +14,9 @@ import Text from '@popup/popupX/shared/Text';
 import { Link } from 'react-router-dom';
 import { absoluteRoutes } from '@popup/popupX/constants/routes';
 import { useTranslation } from 'react-i18next';
+import { useAtom } from 'jotai';
+import { uiStyleAtom } from '@popup/store/settings';
+import { UiStyle } from '@shared/storage/types';
 
 type MenuTilesProps = {
     menuOpen: boolean;
@@ -22,6 +25,7 @@ type MenuTilesProps = {
 
 export default function MenuTiles({ menuOpen, setMenuOpen }: MenuTilesProps) {
     const { t } = useTranslation('x', { keyPrefix: 'header.menu' });
+    const [, setUiStyle] = useAtom(uiStyleAtom);
     if (!menuOpen) return null;
     return (
         <div className="main-header__menu-tiles fade-menu-bg">
@@ -86,7 +90,12 @@ export default function MenuTiles({ menuOpen, setMenuOpen }: MenuTilesProps) {
                         <Text.Capture>{t('restore')}</Text.Capture>
                     </IconButton>
                 </Link>
-                <Link to="/account/tokens">
+                <Link
+                    to="/account/tokens"
+                    onClick={() => {
+                        setUiStyle(UiStyle.Old);
+                    }}
+                >
                     <IconButton className="main-header__menu-tiles_tile">
                         <Eye />
                         <Text.Capture>{t('oldUI')}</Text.Capture>

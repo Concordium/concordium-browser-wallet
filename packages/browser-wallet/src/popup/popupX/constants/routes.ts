@@ -180,6 +180,12 @@ export const relativeRoutes = {
             },
         },
     },
+    prompt: {
+        path: 'prompt',
+        connectionRequest: {
+            path: 'connectionRequest',
+        },
+    },
 };
 
 /**
