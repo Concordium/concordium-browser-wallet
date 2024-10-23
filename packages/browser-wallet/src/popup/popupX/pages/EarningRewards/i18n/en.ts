@@ -37,7 +37,10 @@ const t = {
                 body: 'When you make a delegation to either type of pool, your delegation amount will be locked on your account.\n\nThis means that you cannot use the amount for anything while it is still locked in for delegation.\n\nIf you decrease your delegation amount or stop the delegation altogether, the amount will still be locked for a cool-down period.\n\nAs transactions cost a fee, it is important to take into consideration that you will need some unlocked funds on your public balance to pay the fee for unlocking your delegation amount again.',
             },
         },
-        register: { title: 'Register delegation' },
+        register: {
+            title: 'Register delegation',
+            notice: 'This will lock your delegation amount. Amount is released after {{cooldown}} days from the time you remove or decrease your delegation.',
+        },
         update: { title: 'Update delegation' },
         target: {
             description: 'You can delegate to an open pool of your choice, or you can stake using passive delegation.',
@@ -84,6 +87,18 @@ const t = {
                 description: 'I want to automatically add my delegation rewards to my delegation amount.',
             },
             buttonContinue: 'Continue',
+        },
+        submit: {
+            sender: { label: 'Sender' },
+            target: { label: 'Target', passive: 'Passive delegation', validator: 'Validator {{id}}' },
+            amount: { label: 'Delegation amount' },
+            redelegate: {
+                label: 'Rewards will be',
+                delegation: 'Added to delegation amount',
+                public: 'Added to public balance',
+            },
+            fee: { label: 'Estimated transaction fee' },
+            button: 'Submit delegation',
         },
     },
     validator: {
