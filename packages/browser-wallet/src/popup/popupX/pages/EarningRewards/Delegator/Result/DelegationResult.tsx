@@ -1,6 +1,14 @@
-import React, { useMemo } from 'react';
-import { ConfigureDelegationPayload, DelegationTargetType } from '@concordium/web-sdk';
-import { Navigate, useLocation, Location } from 'react-router-dom';
+import React, { useCallback, useMemo } from 'react';
+import {
+    AccountAddress,
+    AccountTransactionPayload,
+    AccountTransactionType,
+    CcdAmount,
+    ConfigureDelegationPayload,
+    DelegationTargetType,
+    TransactionHash,
+} from '@concordium/web-sdk';
+import { Navigate, useLocation, Location, useNavigate } from 'react-router-dom';
 import { useAtomValue } from 'jotai';
 import { useTranslation } from 'react-i18next';
 
@@ -13,7 +21,68 @@ import { ensureDefined } from '@shared/utils/basic-helpers';
 import { useBlockChainParametersAboveV0 } from '@popup/shared/BlockChainParametersProvider';
 import { secondsToDaysRoundedDown } from '@shared/utils/time-helpers';
 
-import { useGetConfigureDelegationCost } from '../util';
+import { grpcClientAtom } from '@popup/store/settings';
+import { usePrivateKey } from '@popup/shared/utils/account-helpers';
+import {
+    createPendingTransactionFromAccountTransaction,
+    getDefaultExpiry,
+    getTransactionAmount,
+    sendTransaction,
+} from '@popup/shared/utils/transaction-helpers';
+import { useUpdateAtom } from 'jotai/utils';
+import { addPendingTransactionAtom } from '@popup/store/transactions';
+import { cpStakingCooldown } from '@shared/utils/chain-parameters-helpers';
+import { useGetTransactionFee } from '@popup/popupX/shared/utils/transaction-helpers';
+import { submittedTransactionRoute } from '@popup/popupX/constants/routes';
+
+enum TransactionSubmitErrorType {
+    InsufficientFunds = 'InsufficientFunds',
+}
+
+class TransactionSubmitError extends Error {
+    private constructor(public type: TransactionSubmitErrorType) {
+        super();
+        super.name = `${'TransactionSubmitError'}.type`;
+    }
+
+    public static insufficientFunds(): TransactionSubmitError {
+        return new TransactionSubmitError(TransactionSubmitErrorType.InsufficientFunds);
+    }
+}
+
+function useTransactionSubmit(sender: AccountAddress.Type, type: AccountTransactionType) {
+    const grpc = useAtomValue(grpcClientAtom);
+    const key = usePrivateKey(sender.address);
+    const addPendingTransaction = useUpdateAtom(addPendingTransactionAtom);
+
+    return useCallback(
+        async (payload: AccountTransactionPayload, cost: CcdAmount.Type) => {
+            const accountInfo = await grpc.getAccountInfo(sender);
+            if (
+                accountInfo.accountAvailableBalance.microCcdAmount <
+                getTransactionAmount(type, payload) + (cost.microCcdAmount || 0n)
+            ) {
+                throw TransactionSubmitError.insufficientFunds();
+            }
+
+            const nonce = await grpc.getNextAccountNonce(sender);
+
+            const header = {
+                expiry: getDefaultExpiry(),
+                sender,
+                nonce: nonce.nonce,
+            };
+            const transaction = { payload, header, type };
+
+            const hash = await sendTransaction(grpc, transaction, key!);
+            const pending = createPendingTransactionFromAccountTransaction(transaction, hash, cost.microCcdAmount);
+            await addPendingTransaction(pending);
+
+            return hash;
+        },
+        [key]
+    );
+}
 
 export type DelegationResultLocationState = {
     payload: ConfigureDelegationPayload;
@@ -24,20 +93,21 @@ export default function DelegationResult() {
     const { state } = useLocation() as Location & {
         state: DelegationResultLocationState | undefined;
     };
+    const nav = useNavigate();
     const { t } = useTranslation('x', { keyPrefix: 'earn.delegator' });
-    const getCost = useGetConfigureDelegationCost();
+    const getCost = useGetTransactionFee(AccountTransactionType.ConfigureDelegation);
     const account = ensureDefined(useAtomValue(selectedAccountAtom), 'No account selected');
 
     const parametersV1 = useBlockChainParametersAboveV0();
+    const submitTransaction = useTransactionSubmit(
+        AccountAddress.fromBase58(account),
+        AccountTransactionType.ConfigureDelegation
+    );
 
     const cooldown = useMemo(() => {
         let cooldownParam = 0n;
         if (parametersV1 !== undefined) {
-            // From protocol version 7, the lower of the two values is the value that counts.
-            cooldownParam =
-                parametersV1.poolOwnerCooldown < parametersV1.delegatorCooldown
-                    ? parametersV1.poolOwnerCooldown
-                    : parametersV1.delegatorCooldown;
+            cooldownParam = cpStakingCooldown(parametersV1);
         }
         return secondsToDaysRoundedDown(cooldownParam);
     }, [parametersV1]);
@@ -61,9 +131,12 @@ export default function DelegationResult() {
     }
 
     const fee = getCost(state.payload);
-
-    const submit = () => {
-        console.log(state.payload);
+    const submit = async () => {
+        if (fee === undefined) {
+            throw Error('Fee could not be calculated');
+        }
+        const tx = await submitTransaction(state.payload, fee);
+        nav(submittedTransactionRoute(TransactionHash.fromHexString(tx)));
     };
 
     return (

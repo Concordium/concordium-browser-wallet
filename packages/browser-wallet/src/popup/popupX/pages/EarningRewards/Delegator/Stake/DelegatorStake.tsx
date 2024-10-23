@@ -1,25 +1,23 @@
 import React, { useMemo } from 'react';
 import { UseFormReturn } from 'react-hook-form';
+import { useTranslation } from 'react-i18next';
+import { useAtomValue } from 'jotai';
+import { useAsyncMemo } from 'wallet-common-helpers';
+import { AccountTransactionType, DelegationTargetType } from '@concordium/web-sdk';
+
 import Button from '@popup/popupX/shared/Button';
 import FormToggleCheckbox from '@popup/popupX/shared/Form/ToggleCheckbox';
 import Page from '@popup/popupX/shared/Page';
-import { useTranslation } from 'react-i18next';
-import { DelegationTargetType } from '@concordium/web-sdk';
 import Form, { useForm } from '@popup/popupX/shared/Form';
 import TokenAmount, { AmountForm } from '@popup/popupX/shared/Form/TokenAmount';
 import { useAccountInfo } from '@popup/shared/AccountInfoListenerContext/AccountInfoListenerContext';
 import { displayNameAndSplitAddress, useSelectedCredential } from '@popup/shared/utils/account-helpers';
 import { formatTokenAmount } from '@popup/popupX/shared/utils/helpers';
 import { CCD_METADATA } from '@shared/constants/token-metadata';
-import { useAtomValue } from 'jotai';
 import { grpcClientAtom } from '@popup/store/settings';
-import { useAsyncMemo } from 'wallet-common-helpers';
-import {
-    DelegationTypeForm,
-    DelegatorStakeForm,
-    configureDelegatorPayloadFromForm,
-    useGetConfigureDelegationCost,
-} from '../util';
+import { useGetTransactionFee } from '@popup/popupX/shared/utils/transaction-helpers';
+
+import { DelegationTypeForm, DelegatorStakeForm, configureDelegatorPayloadFromForm } from '../util';
 
 type PoolInfoProps = {
     /** The validator pool ID to show information for */
@@ -80,7 +78,7 @@ export default function DelegatorStake({ title, target, initialValues, onSubmit 
     const selectedCred = useSelectedCredential();
     const selectedAccountInfo = useAccountInfo(selectedCred);
     const { amount, redelegate } = form.watch();
-    const getCost = useGetConfigureDelegationCost();
+    const getCost = useGetTransactionFee(AccountTransactionType.ConfigureDelegation);
     const fee = useMemo(() => {
         const payload = configureDelegatorPayloadFromForm({ target, stake: { amount, redelegate } });
         return getCost(payload);

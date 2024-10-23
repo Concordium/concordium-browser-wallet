@@ -2,11 +2,17 @@ import {
     AccountAddress,
     AccountInfo,
     AccountInfoType,
+    AccountTransactionType,
     BakerPoolStatusDetails,
     ChainParameters,
     ChainParametersV0,
+    ConfigureDelegationPayload,
+    convertEnergyToMicroCcd,
+    getEnergyCost,
 } from '@concordium/web-sdk';
+import { useBlockChainParameters } from '@popup/shared/BlockChainParametersProvider';
 import i18n from '@popup/shell/i18n';
+import { useCallback } from 'react';
 import {
     ccdToMicroCcd,
     displayAsCcd,
@@ -116,4 +122,20 @@ export function validateDelegationAmount(
     }
 
     return undefined;
+}
+
+/** Hook which exposes a function for getting the transaction fee for a given transaction type */
+export function useGetTransactionFee(type: AccountTransactionType) {
+    const cp = useBlockChainParameters();
+
+    return useCallback(
+        (payload: ConfigureDelegationPayload) => {
+            if (cp === undefined) {
+                return undefined;
+            }
+            const energy = getEnergyCost(type, payload);
+            return convertEnergyToMicroCcd(energy, cp);
+        },
+        [cp, type]
+    );
 }

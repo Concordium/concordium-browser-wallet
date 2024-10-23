@@ -1,16 +1,14 @@
 import {
-    CcdAmount,
-    ChainParameters,
+    AccountTransactionType,
     ConfigureDelegationPayload,
     DelegationTarget,
     DelegationTargetType,
-    Energy,
     convertEnergyToMicroCcd,
+    getEnergyCost,
 } from '@concordium/web-sdk';
 import { AmountForm } from '@popup/popupX/shared/Form/TokenAmount';
 import { parseCcdAmount } from '@popup/popupX/shared/utils/helpers';
 import { useBlockChainParameters } from '@popup/shared/BlockChainParametersProvider';
-import { getConfigureDelegationEnergyCost } from '@shared/utils/energy-helpers';
 
 /** Describes the form values for configuring the delegation target of a delegation transaction */
 export type DelegationTypeForm = {
@@ -49,25 +47,5 @@ export function configureDelegatorPayloadFromForm(values: DelegatorForm): Config
         restakeEarnings: values.stake.redelegate,
         stake: parseCcdAmount(values.stake.amount),
         delegationTarget,
-    };
-}
-
-function getConfigureDelegationCost(
-    payload: ConfigureDelegationPayload,
-    chainParameters: ChainParameters
-): CcdAmount.Type {
-    const energy = getConfigureDelegationEnergyCost(payload);
-    return convertEnergyToMicroCcd(Energy.create(energy), chainParameters);
-}
-
-export function useGetConfigureDelegationCost() {
-    const cp = useBlockChainParameters();
-
-    return (payload: ConfigureDelegationPayload) => {
-        if (cp === undefined) {
-            return undefined;
-        }
-
-        return getConfigureDelegationCost(payload, cp);
     };
 }

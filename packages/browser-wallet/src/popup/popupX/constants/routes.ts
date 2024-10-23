@@ -1,3 +1,5 @@
+import { AccountAddress, HexString, TransactionHash } from '@concordium/web-sdk';
+
 export type RouteConfig = {
     hideBackArrow?: boolean;
     backTitle?: string;
@@ -91,6 +93,9 @@ export const relativeRoutes = {
         },
         token: {
             path: 'token',
+        },
+        submittedTransaction: {
+            path: ':transactionHash',
         },
     },
     settings: {
@@ -215,6 +220,14 @@ const buildAbsoluteRoutes = <R extends RouteNode | RoutePath | RouteChildren>(
 };
 
 export const absoluteRoutes = buildAbsoluteRoutes(relativeRoutes);
+
+export const transactionDetailsRoute = (account: AccountAddress.Type, tx: TransactionHash.Type) =>
+    absoluteRoutes.home.transactionLog.details.path
+        .replace(':account', account.address)
+        .replace(':transactionHash', TransactionHash.toHexString(tx));
+
+export const submittedTransactionRoute = (tx: TransactionHash.Type) =>
+    absoluteRoutes.home.submittedTransaction.path.replace(':transactionHash', TransactionHash.toHexString(tx));
 
 /**
  * Given two absolute routes, returns the relative route between them.

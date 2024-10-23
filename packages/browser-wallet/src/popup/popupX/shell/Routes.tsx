@@ -27,6 +27,7 @@ import PrivateKey from '@popup/popupX/pages/PrivateKey';
 import { RestoreIntro, RestoreResult } from '@popup/popupX/pages/Restore';
 import RegisterDelegator from '../pages/EarningRewards/Delegator/RegisterDelegator';
 import { DelegationResult } from '../pages/EarningRewards/Delegator/Result';
+import SubmittedTransaction from '../pages/SubmittedTransaction';
 
 export default function Routes() {
     return (
@@ -61,6 +62,10 @@ export default function Routes() {
                     </Route>
                     <Route element={<TokenDetails />} path={relativeRoutes.home.token.path} />
                     <Route element={<TokenDetailsCcd />} path={`${relativeRoutes.home.token.path}/ccd`} />
+                    <Route
+                        element={<SubmittedTransaction />}
+                        path={`${relativeRoutes.home.submittedTransaction.path}`}
+                    />
                 </Route>
                 <Route element={<MainLayout />} path={relativeRoutes.settings.path}>
                     <Route element={<IdCards />} path={relativeRoutes.settings.idCards.path} />
