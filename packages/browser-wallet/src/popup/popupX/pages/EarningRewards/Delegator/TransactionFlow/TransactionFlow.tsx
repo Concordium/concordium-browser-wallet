@@ -7,6 +7,7 @@ import { absoluteRoutes } from '@popup/popupX/constants/routes';
 import DelegatorStake, { DelegatorStakeForm } from '../Stake';
 import DelegatorType, { DelegationTypeForm } from '../Type';
 import { configureDelegatorPayloadFromForm } from '../util';
+import { DelegationResultLocationState } from '../Result/DelegationResult';
 
 /** Represents the form data for a configure delegator transaction. */
 type DelegatorForm = {
@@ -24,9 +25,11 @@ export default function TransactionFlow() {
     const handleDone = useCallback(
         (values: DelegatorForm) => {
             const payload = configureDelegatorPayloadFromForm(values);
+
             nav(pathname, { replace: true, state: values }); // Override current router entry with stateful version
-            // TODO: where do we go from here?
-            nav(absoluteRoutes.settings.earn.delegator.submit.path, { state: payload }); // Override current router entry with stateful version
+
+            const submitDelegatorState: DelegationResultLocationState = { payload, type: 'register' };
+            nav(absoluteRoutes.settings.earn.delegator.submit.path, { state: submitDelegatorState });
         },
         [pathname]
     );
