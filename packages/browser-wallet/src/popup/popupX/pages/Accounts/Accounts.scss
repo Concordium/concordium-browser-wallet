@@ -25,6 +25,10 @@
             color: $color-white;
         }
 
+        .capture__main_small {
+            overflow-wrap: anywhere;
+        }
+
         .button__icon {
             gap: rem(16px);
 
