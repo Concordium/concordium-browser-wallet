@@ -17,9 +17,52 @@ import TokenAmount, { AmountForm } from '@popup/popupX/shared/Form/TokenAmount';
 import { useAccountInfo } from '@popup/shared/AccountInfoListenerContext/AccountInfoListenerContext';
 import { displayNameAndSplitAddress, useSelectedCredential } from '@popup/shared/utils/account-helpers';
 import { getConfigureDelegationEnergyCost } from '@shared/utils/energy-helpers';
-import { parseTokenAmount } from '@popup/popupX/shared/utils/helpers';
+import { formatTokenAmount, parseTokenAmount } from '@popup/popupX/shared/utils/helpers';
 import { CCD_METADATA } from '@shared/constants/token-metadata';
 import { useBlockChainParameters } from '@popup/shared/BlockChainParametersProvider';
+import { useAtomValue } from 'jotai';
+import { grpcClientAtom } from '@popup/store/settings';
+import { useAsyncMemo } from 'wallet-common-helpers';
+
+type PoolInfoProps = {
+    /** The validator pool ID to show information for */
+    validatorId: bigint;
+};
+
+function PoolInfo({ validatorId }: PoolInfoProps) {
+    const { t } = useTranslation('x', { keyPrefix: 'earn.delegator.stake' });
+    const client = useAtomValue(grpcClientAtom);
+    const poolStatus = useAsyncMemo(async () => client.getPoolInfo(validatorId), undefined, []);
+
+    if (poolStatus?.bakerEquityCapital === undefined) {
+        return null;
+    }
+
+    const poolStake = poolStatus.bakerEquityCapital.microCcdAmount + poolStatus.delegatedCapital!.microCcdAmount;
+
+    return (
+        <div className="register-delegator__pool-info">
+            <div className="register-delegator__pool-info_row">
+                <span className="capture__main_small">{t('poolStake.label')}</span>
+                <span className="capture__main_small">
+                    {t('poolStake.value', { amount: formatTokenAmount(poolStake, CCD_METADATA.decimals, 2) })}
+                </span>
+            </div>
+            <div className="register-delegator__pool-info_row">
+                <span className="capture__main_small">{t('poolCap.label')}</span>
+                <span className="capture__main_small">
+                    {t('poolCap.value', {
+                        amount: formatTokenAmount(
+                            poolStatus.delegatedCapitalCap!.microCcdAmount,
+                            CCD_METADATA.decimals,
+                            2
+                        ),
+                    })}
+                </span>
+            </div>
+        </div>
+    );
+}
 
 /** The form values for delegator stake configuration step */
 export type DelegatorStakeForm = AmountForm & {
@@ -68,9 +111,6 @@ export default function DelegatorStake({ title, target, initialValues, onSubmit 
     }
 
     const accountShow = displayNameAndSplitAddress(selectedCred);
-    // FIXME: hardcoded...
-    const poolStake = '300,000.00';
-    const poolCap = '56,400.00';
 
     return (
         <Page className="register-delegator-container">
@@ -89,20 +129,7 @@ export default function DelegatorStake({ title, target, initialValues, onSubmit 
                             form={f as unknown as UseFormReturn<AmountForm>}
                         />
                         {target.delegateType === DelegationTargetType.Baker && (
-                            <div className="register-delegator__pool-info">
-                                <div className="register-delegator__pool-info_row">
-                                    <span className="capture__main_small">{t('poolStake.label')}</span>
-                                    <span className="capture__main_small">
-                                        {t('poolStake.value', { amount: poolStake })}
-                                    </span>
-                                </div>
-                                <div className="register-delegator__pool-info_row">
-                                    <span className="capture__main_small">{t('poolCap.label')}</span>
-                                    <span className="capture__main_small">
-                                        {t('poolCap.value', { amount: poolCap })}
-                                    </span>
-                                </div>
-                            </div>
+                            <PoolInfo validatorId={target.bakerId} />
                         )}
                         <div className="register-delegator__reward">
                             <div className="register-delegator__reward_auto-add">
