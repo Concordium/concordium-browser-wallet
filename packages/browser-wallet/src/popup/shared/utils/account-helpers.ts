@@ -51,9 +51,11 @@ export function useIdentityName(credential: WalletCredential, fallback?: string)
 
 export function useWritableSelectedAccount(accountAddress: string) {
     const [accounts, setAccounts] = useAtom(writableCredentialAtom);
-    const setAccount = (update: WalletCredential) =>
+    const setAccount = (update: Partial<WalletCredential>) =>
         setAccounts(
-            accounts.map((account) => (account.address === accountAddress ? { ...account, ...update } : account))
+            accounts.map((account) =>
+                account.address === accountAddress ? ({ ...account, ...update } as WalletCredential) : account
+            )
         );
 
     return setAccount;

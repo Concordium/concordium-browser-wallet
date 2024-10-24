@@ -29,8 +29,25 @@
             overflow-wrap: anywhere;
         }
 
+        input.editable {
+            background: none;
+            color: inherit;
+            border: none;
+            font-weight: inherit;
+            font-size: inherit;
+            font-family: inherit;
+            padding: 0;
+            margin: 0;
+
+            &:focus {
+                outline: none;
+            }
+        }
+
         .button__icon {
             gap: rem(16px);
+            height: rem(16px);
+            width: rem(16px);
 
             .label__main {
                 color: $color-white;
