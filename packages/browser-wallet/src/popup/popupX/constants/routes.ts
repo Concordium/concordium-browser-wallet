@@ -104,7 +104,7 @@ export const relativeRoutes = {
         accounts: {
             path: 'accounts',
             connectedSites: {
-                path: 'connectedSites',
+                path: 'connected-sites/:account',
                 config: {
                     backTitle: 'to Accounts list',
                 },
