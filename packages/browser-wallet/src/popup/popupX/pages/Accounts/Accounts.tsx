@@ -114,7 +114,7 @@ function AccountListItem({ credential }: AccountListItemProps) {
                 />
             </Card.Row>
             <Card.Row>
-                <Text.Capture>{address}</Text.Capture>
+                <Text.Capture className="wrap-anywhere">{address}</Text.Capture>
                 <Button.Icon className="transparent" onClick={() => copyToClipboard(address)} icon={<Copy />} />
             </Card.Row>
             <Card.Row>

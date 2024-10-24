@@ -25,7 +25,7 @@
             color: $color-white;
         }
 
-        .capture__main_small {
+        .wrap-anywhere {
             overflow-wrap: anywhere;
         }
 
@@ -46,8 +46,10 @@
 
         .button__icon {
             gap: rem(16px);
-            height: rem(16px);
-            width: rem(16px);
+
+            svg {
+                width: rem(16px);
+            }
 
             .label__main {
                 color: $color-white;
