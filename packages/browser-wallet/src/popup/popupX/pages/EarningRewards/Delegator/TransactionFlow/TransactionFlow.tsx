@@ -4,18 +4,10 @@ import { useTranslation } from 'react-i18next';
 
 import MultiStepForm from '@popup/popupX/shared/MultiStepForm';
 import { absoluteRoutes } from '@popup/popupX/constants/routes';
-import DelegatorStake, { DelegatorStakeForm } from '../Stake';
-import DelegatorType, { DelegationTypeForm } from '../Type';
-import { configureDelegatorPayloadFromForm } from '../util';
+import DelegatorStake from '../Stake';
+import DelegatorType from '../Type';
+import { configureDelegatorPayloadFromForm, type DelegatorForm } from '../util';
 import { DelegationResultLocationState } from '../Result/DelegationResult';
-
-/** Represents the form data for a configure delegator transaction. */
-type DelegatorForm = {
-    /** The delegation target configuration */
-    target: DelegationTypeForm;
-    /** The delegation stake configuration */
-    stake: DelegatorStakeForm;
-};
 
 export default function TransactionFlow() {
     const { state: initialValues, pathname } = useLocation() as Location & { state: DelegatorForm | undefined };

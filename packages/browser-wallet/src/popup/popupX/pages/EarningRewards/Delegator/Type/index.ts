@@ -1,1 +1,1 @@
-export { default, type DelegationTypeForm } from './DelegationType';
+export { default } from './DelegationType';

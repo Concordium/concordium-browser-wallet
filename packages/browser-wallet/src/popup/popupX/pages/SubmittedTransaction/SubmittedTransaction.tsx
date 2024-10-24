@@ -1,5 +1,5 @@
 import React, { useMemo } from 'react';
-import { Location, Navigate, useLocation, useNavigate, useParams } from 'react-router-dom';
+import { Navigate, useNavigate, useParams } from 'react-router-dom';
 
 import CheckCircle from '@assets/svgX/check-circle.svg';
 import Arrow from '@assets/svgX/arrow-right.svg';
@@ -77,6 +77,17 @@ function Failure({ message }: FailureProps) {
     );
 }
 
+// TODO:
+// 1. Proper error icon
+function Finalizing() {
+    return (
+        <>
+            <CheckCircle />
+            <span className="capture__main_small">Finalizing on chain</span>
+        </>
+    );
+}
+
 export type SubmittedTransactionParams = {
     /** The transaction to show the status for */
     txHash: HexString;
@@ -124,10 +135,10 @@ export default function SubmittedTransaction() {
 
     // FIXME:
     // 1. translations...
-    // 2. finalizing state (undefined)
     return (
         <Page>
             <Card type="transparent">
+                {status === undefined && <Finalizing />}
                 {status?.type === 'success' && <Success tx={status.summary} />}
                 {status?.type === 'failure' && (
                     <Failure message={`The transaction failed: ${status.summary.rejectReason.tag}`} />

@@ -1,14 +1,6 @@
-import {
-    AccountTransactionType,
-    ConfigureDelegationPayload,
-    DelegationTarget,
-    DelegationTargetType,
-    convertEnergyToMicroCcd,
-    getEnergyCost,
-} from '@concordium/web-sdk';
+import { ConfigureDelegationPayload, DelegationTarget, DelegationTargetType } from '@concordium/web-sdk';
 import { AmountForm } from '@popup/popupX/shared/Form/TokenAmount';
 import { parseCcdAmount } from '@popup/popupX/shared/utils/helpers';
-import { useBlockChainParameters } from '@popup/shared/BlockChainParametersProvider';
 
 /** Describes the form values for configuring the delegation target of a delegation transaction */
 export type DelegationTypeForm = {

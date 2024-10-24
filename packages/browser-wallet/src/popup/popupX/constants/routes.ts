@@ -1,4 +1,4 @@
-import { AccountAddress, HexString, TransactionHash } from '@concordium/web-sdk';
+import { AccountAddress, TransactionHash } from '@concordium/web-sdk';
 
 export type RouteConfig = {
     hideBackArrow?: boolean;

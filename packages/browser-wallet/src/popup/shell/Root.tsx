@@ -15,7 +15,7 @@ import AccountInfoListenerContext from '@popup/shared/AccountInfoListenerContext
 import './i18n';
 
 import { mainnet } from '@shared/constants/networkConfiguration';
-import { routePrefix } from '@popup/popupX/constants/routes';
+import { routePrefix, absoluteRoutes } from '@popup/popupX/constants/routes';
 import Routes from './Routes';
 import RoutesX from '../popupX/shell/Routes';
 
@@ -123,7 +123,7 @@ function Theme({ children }: { children: ReactElement }) {
 export default function Root() {
     return (
         <Provider>
-            <MemoryRouter initialEntries={['/walletX/home/receive']}>
+            <MemoryRouter initialEntries={[absoluteRoutes.settings.earn.delegator.register.path]}>
                 <Scaling>
                     <Network>
                         <Theme>
