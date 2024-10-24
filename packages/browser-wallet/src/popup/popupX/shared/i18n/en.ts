@@ -23,15 +23,10 @@ const t = {
     utils: {
         address: {
             required: 'Please enter an address',
-            invalid: 'Invalid address',
         },
         amount: {
             required: 'Please enter an amount',
-            invalid: 'Invalid amount',
-            insufficient: 'Insufficient funds',
             zero: 'Amount may not be zero',
-            belowBakerThreshold: 'Minimum stake: {{ threshold }}',
-            exceedingDelegationCap: "Amount may not exceed the target pool's cap of {{ max }}.",
         },
     },
 };
