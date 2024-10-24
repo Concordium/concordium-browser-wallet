@@ -14,6 +14,10 @@
     position: relative;
     display: block;
 
+    &:not(:last-of-type) {
+        margin-bottom: rem(8px);
+    }
+
     &__field {
         background-color: $color-input-bg;
         color: $color-white;
@@ -21,7 +25,6 @@
         border: rem(1px) solid $color-grey-4;
         border-radius: rem(12px);
         padding: rem(28px) rem(14px) rem(12px);
-        margin-bottom: rem(8px);
         width: 100%;
         outline: none;
         font-size: rem(14px);
@@ -33,6 +36,13 @@
         &:focus {
             border-color: $color-mineral-2;
         }
+
+        // Hide the buttons to increment/decrement
+        &::-webkit-outer-spin-button,
+        &::-webkit-inner-spin-button {
+            appearance: none;
+            margin: 0;
+        }
     }
 
     &__label {
@@ -40,6 +50,7 @@
         left: rem(14px);
         top: rem(8px);
         color: $color-mineral-3;
+        opacity: 0.5;
     }
 
     @include when-valid {
@@ -162,20 +173,23 @@ $handle-size: rem(20px);
 
 .form-radios-x {
     &__radio {
+        cursor: pointer;
         display: flex;
         align-items: center;
         gap: rem(16px);
         background-color: rgba($color-grey-3, 0.3);
         padding: rem(22px);
         border-radius: rem(8px);
-        margin-bottom: rem(4px);
+
+        &:not(:last-of-type) {
+            margin-bottom: rem(4px);
+        }
 
         input {
             display: none;
         }
 
         .checkmark {
-            cursor: pointer;
             height: rem(20px);
             width: rem(20px);
             background-color: $color-grey-2;

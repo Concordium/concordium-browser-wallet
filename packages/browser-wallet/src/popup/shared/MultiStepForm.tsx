@@ -94,6 +94,19 @@ export type MultiStepFormProps<F extends Record<string, unknown>> =
  * A component for spanning forms over multiple pages. This component doesn't render any UI, but merely handles collecting data from the different steps and routing between the steps.
  *
  * @template F Type of the form as a whole. Each step in the form flow should correspond to a member on the type.
+ * @component
+ * @example
+ * type Values = {
+ *   first: { a: string; b: number; };
+ *   second: { c: boolean; };
+ * };
+ *
+ * <MultiStepForm<Values>>
+ *   {{
+ *     first: { render: (initialValues, onNext) => <First initialValues={initialValues} onSubmit={onNext} /> },
+ *     second: { render: (initialValues, onNext) => <Second initialValues={initialValues} onSubmit={onNext} /> },
+ *   }}
+ * </MultiStepForm>
  */
 export default function MultiStepForm<
     // eslint-disable-next-line @typescript-eslint/no-explicit-any

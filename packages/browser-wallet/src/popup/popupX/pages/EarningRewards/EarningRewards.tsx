@@ -28,7 +28,7 @@ export default function EarningRewards() {
                     <span className="capture__main_small">
                         {t('validatorDescription', { amount: displayAsCcd(bakingThreshold, false) })}
                     </span>
-                    <Link to={absoluteRoutes.settings.earn.baker.intro.path}>
+                    <Link to={absoluteRoutes.settings.earn.validator.intro.path}>
                         <div className="earn__card_continue">
                             <span className="label__regular">{t('validatorAction')}</span>
                             <ArrowRight />
@@ -38,7 +38,7 @@ export default function EarningRewards() {
                 <div className="earn__card">
                     <span className="text__main">{t('delegationTitle')}</span>
                     <span className="capture__main_small">{t('delegationDescription')}</span>
-                    <Link to={absoluteRoutes.settings.earn.delegator.intro.path}>
+                    <Link to={absoluteRoutes.settings.earn.delegator.register.path}>
                         <div className="earn__card_continue">
                             <span className="label__regular">{t('delegationAction')}</span>
                             <ArrowRight />

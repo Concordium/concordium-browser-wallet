@@ -15,20 +15,29 @@ const tokenAddressEq = (a: CIS2.TokenAddress | null, b: CIS2.TokenAddress | null
     return a === b;
 };
 
+type CcdBalanceType = 'total' | 'available';
+
 const balanceAtomFamily = atomFamily(
-    ([account, tokenAddress]: [AccountInfo, CIS2.TokenAddress | null]) => {
+    ([account, ccdBalance, tokenAddress]: [AccountInfo, CcdBalanceType, CIS2.TokenAddress | null]) => {
         if (tokenAddress === null) {
-            return atom(account.accountAvailableBalance.microCcdAmount);
+            return atom(
+                ccdBalance === 'available'
+                    ? account.accountAvailableBalance.microCcdAmount
+                    : account.accountAmount.microCcdAmount
+            );
         }
         const tokens = contractBalancesFamily(account.accountAddress.address, tokenAddress.contract.index.toString());
         return selectAtom(tokens, (ts) => ts[tokenAddress.id]);
     },
-    ([aa, ta], [ab, tb]) => AccountAddress.equals(aa.accountAddress, ab.accountAddress) && tokenAddressEq(ta, tb)
+    ([aa, ba, ta], [ab, bb, tb]) =>
+        AccountAddress.equals(aa.accountAddress, ab.accountAddress) && ba === bb && tokenAddressEq(ta, tb)
 );
 
 type Props = Omit<TokenAmountViewProps, 'tokens' | 'balance' | 'onSelectToken'> & {
     /** The account info of the account to take the amount from */
     accountInfo: AccountInfo;
+    /** The ccd balance to use. Defaults to 'available' */
+    ccdBalance?: CcdBalanceType;
 };
 
 /**
@@ -70,10 +79,10 @@ type Props = Omit<TokenAmountViewProps, 'tokens' | 'balance' | 'onSelectToken'> 
  *   address={{ id: '', contract: ContractAddress.create(1) }}
  * />
  */
-export default function TokenAmount({ accountInfo, ...props }: Props) {
+export default function TokenAmount({ accountInfo, ccdBalance = 'available', ...props }: Props) {
     const tokenInfo = useTokenInfo(accountInfo.accountAddress);
     const [tokenAddress, setTokenAddress] = useState<CIS2.TokenAddress | null>(null);
-    const tokenBalance = useAtomValue(balanceAtomFamily([accountInfo, tokenAddress]));
+    const tokenBalance = useAtomValue(balanceAtomFamily([accountInfo, ccdBalance, tokenAddress]));
 
     if (tokenInfo.loading) {
         return null;

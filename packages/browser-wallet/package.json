@@ -10,6 +10,7 @@
         "build:dev": "cross-env NODE_ENV=development yarn build-base",
         "build:prod": "cross-env NODE_ENV=production yarn build-base",
         "build": "yarn build:prod",
+        "check": "tsc --noEmit",
         "test": "jest",
         "watch": "cross-env WATCH=1 yarn build:dev",
         "storybook": "storybook dev -p 6006",

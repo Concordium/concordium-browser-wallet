@@ -1,7 +1,7 @@
 .delegation-type-container {
     display: flex;
     flex-direction: column;
-    height: 100%;
+    min-height: 100%;
     padding-bottom: rem(32px);
 
     .delegation-type {
