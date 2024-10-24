@@ -1,3 +1,6 @@
+import { useLocation } from 'react-router-dom';
+import { displayUrl } from '@popup/shared/utils/string-helpers';
+
 export async function copyToClipboard(text: string): Promise<void> {
     try {
         await navigator.clipboard.writeText(text);
@@ -32,4 +35,15 @@ export function parseTokenAmount(amount: string, decimals = 0): bigint {
     const fractionPart = parts[1] ? parts[1].padEnd(decimals, '0') : ''.padEnd(decimals, '0');
     const combined = integerPart + fractionPart;
     return BigInt(combined);
+}
+
+export function useUrlDisplay() {
+    const { state } = useLocation();
+
+    // eslint-disable-next-line @typescript-eslint/no-explicit-any
+    const url = (state as any)?.payload?.url;
+    if (!url) {
+        return ['', ''];
+    }
+    return [displayUrl(url), url];
 }

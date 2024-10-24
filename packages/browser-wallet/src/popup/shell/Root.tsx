@@ -1,4 +1,4 @@
-import { Provider, useAtomValue } from 'jotai';
+import { Provider, useAtom, useAtomValue } from 'jotai';
 import React, { ReactElement, useEffect, useMemo } from 'react';
 import { MemoryRouter, useLocation } from 'react-router-dom';
 import { InternalMessageType } from '@messaging';
@@ -7,8 +7,8 @@ import { noOp } from 'wallet-common-helpers';
 import { Dimensions, large, medium, small } from '@popup/constants/dimensions';
 import { popupMessageHandler } from '@popup/shared/message-handler';
 import { isFullscreenWindow, isSpawnedWeb3IdProofWindow, isSpawnedWindow } from '@popup/shared/window-helpers';
-import { networkConfigurationAtom, themeAtom } from '@popup/store/settings';
-import { Theme as ThemeType } from '@shared/storage/types';
+import { networkConfigurationAtom, themeAtom, uiStyleAtom } from '@popup/store/settings';
+import { Theme as ThemeType, UiStyle } from '@shared/storage/types';
 import BlockChainParametersContext from '@popup/shared/BlockChainParametersProvider';
 import AccountInfoListenerContext from '@popup/shared/AccountInfoListenerContext';
 
@@ -16,6 +16,7 @@ import './i18n';
 
 import { mainnet } from '@shared/constants/networkConfiguration';
 import { routePrefix } from '@popup/popupX/constants/routes';
+import { MessagePromptHandlersType, useMessagePromptHandlers } from '@popup/shared/utils/message-prompt-handlers';
 import Routes from './Routes';
 import RoutesX from '../popupX/shell/Routes';
 
@@ -120,17 +121,35 @@ function Theme({ children }: { children: ReactElement }) {
     return children;
 }
 
+function MessagePromptHandlers({
+    children,
+}: {
+    children: (messagePromptHandlers: MessagePromptHandlersType) => ReactElement;
+}) {
+    const messagePromptHandlers = useMessagePromptHandlers();
+    return children(messagePromptHandlers);
+}
+
 export default function Root() {
+    const [uiStyle] = useAtom(uiStyleAtom);
+    if (uiStyle.loading) return null;
+
     return (
         <Provider>
-            <MemoryRouter initialEntries={['/walletX/home/receive']}>
+            <MemoryRouter initialEntries={[uiStyle.value === UiStyle.Old ? '/account' : '/walletX/home']}>
                 <Scaling>
                     <Network>
                         <Theme>
                             <AccountInfoListenerContext>
                                 <BlockChainParametersContext>
-                                    <Routes />
-                                    <RoutesX />
+                                    <MessagePromptHandlers>
+                                        {(messagePromptHandlers) => (
+                                            <>
+                                                <Routes messagePromptHandlers={messagePromptHandlers} />
+                                                <RoutesX messagePromptHandlers={messagePromptHandlers} />
+                                            </>
+                                        )}
+                                    </MessagePromptHandlers>
                                 </BlockChainParametersContext>
                             </AccountInfoListenerContext>
                         </Theme>

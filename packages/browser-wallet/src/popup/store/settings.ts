@@ -4,6 +4,7 @@ import {
     EncryptedData,
     NetworkConfiguration,
     Theme,
+    UiStyle,
 } from '@shared/storage/types';
 import { atom } from 'jotai';
 import { EventType } from '@concordium/browser-wallet-api-helpers';
@@ -21,6 +22,7 @@ export const encryptedSeedPhraseAtom = atomWithChromeStorage<EncryptedData | und
     true
 );
 export const themeAtom = atomWithChromeStorage<Theme>(ChromeStorageKey.Theme, Theme.Light);
+export const uiStyleAtom = atomWithChromeStorage<UiStyle>(ChromeStorageKey.UiStyle, UiStyle.Old, true);
 export const hasBeenOnBoardedAtom = atomWithChromeStorage<boolean>(ChromeStorageKey.HasBeenOnboarded, false, true);
 
 const storedNetworkConfigurationAtom = atomWithChromeStorage<NetworkConfiguration>(
