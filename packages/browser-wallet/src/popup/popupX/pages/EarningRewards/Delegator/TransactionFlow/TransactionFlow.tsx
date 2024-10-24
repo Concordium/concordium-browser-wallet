@@ -2,8 +2,8 @@ import React, { useCallback } from 'react';
 import { Location, Navigate, useLocation, useNavigate } from 'react-router-dom';
 import { useTranslation } from 'react-i18next';
 
-import MultiStepForm from '@popup/popupX/shared/MultiStepForm';
 import { absoluteRoutes } from '@popup/popupX/constants/routes';
+import MultiStepForm from '@popup/shared/MultiStepForm';
 import DelegatorStake from '../Stake';
 import DelegatorType from '../Type';
 import { configureDelegatorPayloadFromForm, type DelegatorForm } from '../util';

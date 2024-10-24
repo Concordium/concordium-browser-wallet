@@ -71,12 +71,6 @@ export const relativeRoutes = {
                 config: {
                     backTitle: 'to Send Funds form',
                 },
-                confirmed: {
-                    path: 'confirmed',
-                    config: {
-                        hideBackArrow: true,
-                    },
-                },
             },
         },
         receive: {
@@ -96,6 +90,9 @@ export const relativeRoutes = {
         },
         submittedTransaction: {
             path: 'submitted/:transactionHash',
+            config: {
+                hideBackArrow: true,
+            },
         },
     },
     settings: {
