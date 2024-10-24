@@ -2,6 +2,7 @@ import React from 'react';
 import { Navigate, useNavigate, useParams } from 'react-router-dom';
 
 import CheckCircle from '@assets/svgX/check-circle.svg';
+import Cross from '@assets/svgX/close.svg';
 import Arrow from '@assets/svgX/arrow-right.svg';
 import Button from '@popup/popupX/shared/Button';
 import Page from '@popup/popupX/shared/Page';
@@ -26,12 +27,15 @@ import {
 import { useAtomValue } from 'jotai';
 import { grpcClientAtom } from '@popup/store/settings';
 import { formatCcdAmount } from '@popup/popupX/shared/utils/helpers';
+import { LoaderInline } from '@popup/popupX/shared/Loader';
+import { useTranslation } from 'react-i18next';
 
 const TX_TIMEOUT = 60 * 1000; // 1 minute
 
 type DelegationBodyProps = BaseAccountTransactionSummary & ConfigureDelegationSummary;
 
 function DelegationBody({ events }: DelegationBodyProps) {
+    const { t } = useTranslation('x', { keyPrefix: 'submittedTransaction.success.configureDelegation' });
     const stakeChange = events.find((e) =>
         [TransactionEventTag.DelegationStakeIncreased, TransactionEventTag.DelegationStakeDecreased].includes(e.tag)
     ) as DelegationStakeChangedEvent | undefined;
@@ -39,7 +43,7 @@ function DelegationBody({ events }: DelegationBodyProps) {
     if (stakeChange !== undefined) {
         return (
             <>
-                <span className="capture__main_small">You’ve delegated</span>
+                <span className="capture__main_small">{t('changeStake')}</span>
                 <span className="heading_large">{formatCcdAmount(stakeChange.newStake)}</span>
                 <span className="capture__main_small">CCD</span>
             </>
@@ -51,10 +55,10 @@ function DelegationBody({ events }: DelegationBodyProps) {
         | undefined;
 
     if (removal !== undefined) {
-        return <span className="capture__main_small">You’ve removed your delegated stake</span>;
+        return <span className="capture__main_small">{t('removed')}</span>;
     }
 
-    return <span className="capture__main_small">You’ve updated your delegation settings</span>;
+    return <span className="capture__main_small">{t('updated')}</span>;
 }
 
 type SuccessSummary = Exclude<AccountTransactionSummary, FailedTransactionSummary>;
@@ -69,16 +73,15 @@ type SuccessProps = {
     tx: SuccessSummary;
 };
 
-// TODO:
-// 1. Handle delegation transaction case
 function Success({ tx }: SuccessProps) {
+    const { t } = useTranslation('x', { keyPrefix: 'submittedTransaction' });
     return (
         <>
             <CheckCircle />
             {tx.transactionType === TransactionKindString.Transfer && (
                 <>
-                    <span className="capture__main_small">You’ve sent</span>
-                    <span className="heading_large">12,600.00</span>
+                    <span className="capture__main_small">{t('success.transfer.label')}</span>
+                    <span className="heading_large">{formatCcdAmount(tx.transfer.amount)}</span>
                     <span className="capture__main_small">CCD</span>
                 </>
             )}
@@ -90,24 +93,21 @@ type FailureProps = {
     message: string;
 };
 
-// TODO:
-// 1. Proper error icon
 function Failure({ message }: FailureProps) {
     return (
         <>
-            <CheckCircle />
+            <Cross className="submitted-tx__failed-icon" />
             <span className="capture__main_small">{message}</span>
         </>
     );
 }
 
-// TODO:
-// 1. Proper error icon
 function Finalizing() {
+    const { t } = useTranslation('x', { keyPrefix: 'submittedTransaction' });
     return (
         <>
-            <CheckCircle />
-            <span className="capture__main_small">Finalizing on chain</span>
+            <LoaderInline />
+            <span className="capture__main_small">{t('pending.label')}</span>
         </>
     );
 }
@@ -117,7 +117,9 @@ export type SubmittedTransactionParams = {
     transactionHash: HexString;
 };
 
+/** Component displaying the status of a submitted transaction. Must be given a transaction hash as a route parameter */
 export default function SubmittedTransaction() {
+    const { t } = useTranslation('x', { keyPrefix: 'submittedTransaction' });
     const { transactionHash } = useParams<SubmittedTransactionParams>();
     const nav = useNavigate();
     const grpc = useAtomValue(grpcClientAtom);
@@ -157,22 +159,20 @@ export default function SubmittedTransaction() {
         return <Navigate to={absoluteRoutes.home.path} />;
     }
 
-    // FIXME:
-    // 1. translations...
     return (
         <Page className="submitted-tx">
             <Card type="transparent" className="submitted-tx__card">
                 {status === undefined && <Finalizing />}
                 {status?.type === 'success' && <Success tx={status.summary} />}
                 {status?.type === 'failure' && (
-                    <Failure message={`The transaction failed: ${status.summary.rejectReason.tag}`} />
+                    <Failure message={t('failure.label', { reason: status.summary.rejectReason.tag })} />
                 )}
                 {status?.type === 'error' && <Failure message={status.message} />}
             </Card>
             {status?.type !== undefined && status.type !== 'error' && (
                 <Button.IconText
                     icon={<Arrow />}
-                    label="Transaction details"
+                    label={t('detailsButton')}
                     className="submitted-tx__details-btn"
                     leftLabel
                     onClick={() => nav(transactionDetailsRoute(status.summary.sender, status.summary.hash))}
@@ -182,7 +182,7 @@ export default function SubmittedTransaction() {
                 <Button.Main
                     className="button-main"
                     onClick={() => nav(absoluteRoutes.home.path)}
-                    label="Return to Account"
+                    label={t('continue')}
                 />
             </Page.Footer>
         </Page>

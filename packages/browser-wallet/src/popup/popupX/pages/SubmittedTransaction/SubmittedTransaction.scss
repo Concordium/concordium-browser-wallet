@@ -12,12 +12,22 @@
             margin: rem(8px) 0;
         }
 
-        svg {
+        svg, .loader-x {
             margin-bottom: rem(30px);
         }
     }
 
     &__details-btn {
         margin-top: rem(24px);
+    }
+
+    &__failed-icon {
+        width: rem(48px);
+        height: rem(48px);
+        margin-bottom: rem(18px) !important;
+
+        & path {
+            fill: $color-red-attention !important;
+        }
     }
 }
