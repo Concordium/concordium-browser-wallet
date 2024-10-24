@@ -167,7 +167,6 @@ function TokenPicker({
                 <span className="text__additional_small">
                     {t('form.tokenAmount.token.available', {
                         balance: formatAmount(selectedTokenBalance),
-                        name: token.name,
                     })}
                 </span>
             )}

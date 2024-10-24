@@ -9,7 +9,7 @@ const t = {
         tokenAmount: {
             token: {
                 label: 'Token',
-                available: '{{balance}} {{name}} available',
+                available: '{{balance}} available',
             },
             amount: {
                 label: 'Amount',
