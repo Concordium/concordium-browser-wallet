@@ -103,6 +103,7 @@ export default function DelegatorStake({ title, target, initialValues, onSubmit 
                             tokenType="ccd"
                             buttonMaxLabel={t('inputAmount.buttonMax')}
                             form={f as unknown as UseFormReturn<AmountForm>}
+                            ccdBalance="total"
                         />
                         {target.type === DelegationTargetType.Baker && (
                             <PoolInfo validatorId={BigInt(target.bakerId!)} />

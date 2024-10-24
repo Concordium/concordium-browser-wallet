@@ -95,7 +95,7 @@ export const relativeRoutes = {
             path: 'token',
         },
         submittedTransaction: {
-            path: ':transactionHash',
+            path: 'submitted/:transactionHash',
         },
     },
     settings: {

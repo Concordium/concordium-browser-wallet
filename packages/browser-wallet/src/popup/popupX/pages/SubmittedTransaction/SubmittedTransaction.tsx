@@ -1,4 +1,4 @@
-import React, { useMemo } from 'react';
+import React from 'react';
 import { Navigate, useNavigate, useParams } from 'react-router-dom';
 
 import CheckCircle from '@assets/svgX/check-circle.svg';
@@ -18,11 +18,44 @@ import {
     TransactionKindString,
     FailedTransactionSummary,
     BaseAccountTransactionSummary,
+    TransactionEventTag,
+    DelegationStakeChangedEvent,
+    DelegatorEvent,
+    ConfigureDelegationSummary,
 } from '@concordium/web-sdk';
 import { useAtomValue } from 'jotai';
 import { grpcClientAtom } from '@popup/store/settings';
+import { formatCcdAmount } from '@popup/popupX/shared/utils/helpers';
 
 const TX_TIMEOUT = 60 * 1000; // 1 minute
+
+type DelegationBodyProps = BaseAccountTransactionSummary & ConfigureDelegationSummary;
+
+function DelegationBody({ events }: DelegationBodyProps) {
+    const stakeChange = events.find((e) =>
+        [TransactionEventTag.DelegationStakeIncreased, TransactionEventTag.DelegationStakeDecreased].includes(e.tag)
+    ) as DelegationStakeChangedEvent | undefined;
+
+    if (stakeChange !== undefined) {
+        return (
+            <>
+                <span className="capture__main_small">You’ve delegated</span>
+                <span className="heading_large">{formatCcdAmount(stakeChange.newStake)}</span>
+                <span className="capture__main_small">CCD</span>
+            </>
+        );
+    }
+
+    const removal = events.find((e) => [TransactionEventTag.DelegationRemoved].includes(e.tag)) as
+        | DelegatorEvent
+        | undefined;
+
+    if (removal !== undefined) {
+        return <span className="capture__main_small">You’ve removed your delegated stake</span>;
+    }
+
+    return <span className="capture__main_small">You’ve updated your delegation settings</span>;
+}
 
 type SuccessSummary = Exclude<AccountTransactionSummary, FailedTransactionSummary>;
 type FailureSummary = BaseAccountTransactionSummary & FailedTransactionSummary;
@@ -39,26 +72,17 @@ type SuccessProps = {
 // TODO:
 // 1. Handle delegation transaction case
 function Success({ tx }: SuccessProps) {
-    const body = useMemo(() => {
-        switch (tx.transactionType) {
-            case TransactionKindString.Transfer: {
-                return (
-                    <>
-                        <span className="capture__main_small">You’ve sent</span>
-                        <span className="heading_large">12,600.00</span>
-                        <span className="capture__main_small">CCD</span>
-                    </>
-                );
-            }
-            default:
-                throw new Error(`${tx.transactionType} transactions are not supported`);
-        }
-    }, [tx]);
-
     return (
         <>
             <CheckCircle />
-            {body}
+            {tx.transactionType === TransactionKindString.Transfer && (
+                <>
+                    <span className="capture__main_small">You’ve sent</span>
+                    <span className="heading_large">12,600.00</span>
+                    <span className="capture__main_small">CCD</span>
+                </>
+            )}
+            {tx.transactionType === TransactionKindString.ConfigureDelegation && <DelegationBody {...tx} />}
         </>
     );
 }
@@ -90,23 +114,23 @@ function Finalizing() {
 
 export type SubmittedTransactionParams = {
     /** The transaction to show the status for */
-    txHash: HexString;
+    transactionHash: HexString;
 };
 
 export default function SubmittedTransaction() {
-    const { txHash } = useParams<SubmittedTransactionParams>();
+    const { transactionHash } = useParams<SubmittedTransactionParams>();
     const nav = useNavigate();
     const grpc = useAtomValue(grpcClientAtom);
 
     const status = useAsyncMemo(
         async (): Promise<Status> => {
-            if (txHash === undefined) {
+            if (transactionHash === undefined) {
                 throw new Error('Transaction not specified in url');
             }
 
             try {
                 const outcome = await grpc.waitForTransactionFinalization(
-                    TransactionHash.fromHexString(txHash),
+                    TransactionHash.fromHexString(transactionHash),
                     TX_TIMEOUT
                 );
 
@@ -126,18 +150,18 @@ export default function SubmittedTransaction() {
             }
         },
         undefined,
-        [txHash, grpc]
+        [transactionHash, grpc]
     );
 
-    if (txHash === undefined) {
+    if (transactionHash === undefined) {
         return <Navigate to={absoluteRoutes.home.path} />;
     }
 
     // FIXME:
     // 1. translations...
     return (
-        <Page>
-            <Card type="transparent">
+        <Page className="submitted-tx">
+            <Card type="transparent" className="submitted-tx__card">
                 {status === undefined && <Finalizing />}
                 {status?.type === 'success' && <Success tx={status.summary} />}
                 {status?.type === 'failure' && (
@@ -149,6 +173,7 @@ export default function SubmittedTransaction() {
                 <Button.IconText
                     icon={<Arrow />}
                     label="Transaction details"
+                    className="submitted-tx__details-btn"
                     leftLabel
                     onClick={() => nav(transactionDetailsRoute(status.summary.sender, status.summary.hash))}
                 />

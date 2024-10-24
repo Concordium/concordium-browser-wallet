@@ -136,7 +136,11 @@ export default function Root() {
 
     return (
         <Provider>
-            <MemoryRouter initialEntries={[uiStyle.value === UiStyle.Old ? '/account' : absoluteRoutes.settings.earn.delegator.register.path]}>
+            <MemoryRouter
+                initialEntries={[
+                    uiStyle.value === UiStyle.Old ? '/account' : absoluteRoutes.settings.earn.delegator.register.path,
+                ]}
+            >
                 <Scaling>
                     <Network>
                         <Theme>
