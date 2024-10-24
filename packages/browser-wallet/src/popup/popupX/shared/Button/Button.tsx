@@ -22,7 +22,7 @@ export function ButtonBase<A extends ElementType = 'button'>({
 }: PolymorphicProps<A>) {
     const Component = as || 'button';
 
-    return <Component {...props} type={type} className={className} />;
+    return <Component {...props} type={type} className={clsx('button__base', className)} />;
 }
 
 function ButtonMain({ label, className, ...props }: { label: string } & ButtonProps) {

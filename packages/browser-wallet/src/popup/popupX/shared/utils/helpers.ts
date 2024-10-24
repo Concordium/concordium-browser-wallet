@@ -1,5 +1,7 @@
 import { CcdAmount } from '@concordium/web-sdk';
 import { CCD_METADATA } from '@shared/constants/token-metadata';
+import { useLocation } from 'react-router-dom';
+import { displayUrl } from '@popup/shared/utils/string-helpers';
 
 export async function copyToClipboard(text: string): Promise<void> {
     try {
@@ -43,3 +45,14 @@ export const formatCcdAmount = (amount: CcdAmount.Type) =>
 /** {@linkcode parseTokenAmount} for CCD */
 export const parseCcdAmount = (amount: string): CcdAmount.Type =>
     CcdAmount.fromMicroCcd(parseTokenAmount(amount, CCD_METADATA.decimals));
+
+export function useUrlDisplay() {
+    const { state } = useLocation();
+
+    // eslint-disable-next-line @typescript-eslint/no-explicit-any
+    const url = (state as any)?.payload?.url;
+    if (!url) {
+        return ['', ''];
+    }
+    return [displayUrl(url), url];
+}

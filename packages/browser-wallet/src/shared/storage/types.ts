@@ -17,6 +17,7 @@ export enum ChromeStorageKey {
     SeedPhrase = 'seedPhrase',
     SelectedAccount = 'selectedAccount',
     Theme = 'theme',
+    UiStyle = 'uiStyle',
     PendingIdentity = 'pendingIdentity',
     Identities = 'identities',
     SelectedIdentity = 'selectedIdentity',
@@ -47,6 +48,11 @@ export enum ChromeStorageKey {
 export enum Theme {
     Light = 'light',
     Dark = 'dark',
+}
+
+export enum UiStyle {
+    Old = 'old',
+    WalletX = 'walletX',
 }
 
 /**

@@ -25,11 +25,15 @@ import { OpenPool } from '@popup/popupX/pages/EarningRewards/Baker/OpenPool';
 import { BakerKeys } from '@popup/popupX/pages/EarningRewards/Baker/BakerKeys';
 import PrivateKey from '@popup/popupX/pages/PrivateKey';
 import { RestoreIntro, RestoreResult } from '@popup/popupX/pages/Restore';
+import { MessagePromptHandlersType } from '@popup/shared/utils/message-prompt-handlers';
+import ConnectionRequest from '@popup/popupX/pages/prompts/ConnectionRequest';
+import ExternalRequestLayout from '@popup/popupX/page-layouts/ExternalRequestLayout';
 import RegisterDelegator from '../pages/EarningRewards/Delegator/RegisterDelegator';
 import { DelegationResult } from '../pages/EarningRewards/Delegator/Result';
 import SubmittedTransaction from '../pages/SubmittedTransaction';
 
-export default function Routes() {
+export default function Routes({ messagePromptHandlers }: { messagePromptHandlers: MessagePromptHandlersType }) {
+    const { handleConnectionResponse } = messagePromptHandlers;
     return (
         <ReactRoutes>
             <Route path={routePrefix}>
@@ -118,6 +122,17 @@ export default function Routes() {
                             />
                         </Route>
                     </Route>
+                </Route>
+                <Route element={<ExternalRequestLayout />} path={relativeRoutes.prompt.path}>
+                    <Route
+                        path={relativeRoutes.prompt.connectionRequest.path}
+                        element={
+                            <ConnectionRequest
+                                onAllow={() => handleConnectionResponse(true)}
+                                onReject={() => handleConnectionResponse(false)}
+                            />
+                        }
+                    />
                 </Route>
             </Route>
         </ReactRoutes>

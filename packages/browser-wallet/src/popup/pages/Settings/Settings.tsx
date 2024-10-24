@@ -4,8 +4,8 @@ import { useTranslation } from 'react-i18next';
 import { absoluteRoutes } from '@popup/constants/routes';
 import NavList from '@popup/shared/NavList';
 import { useAtom } from 'jotai';
-import { themeAtom } from '@popup/store/settings';
-import { Theme } from '@shared/storage/types';
+import { themeAtom, uiStyleAtom } from '@popup/store/settings';
+import { Theme, UiStyle } from '@shared/storage/types';
 import SunIcon from '@assets/svg/sun.svg';
 import MoonIcon from '@assets/svg/moon.svg';
 import { ToggleCheckbox } from '@popup/shared/Form/ToggleCheckbox';
@@ -33,6 +33,8 @@ function LightDarkModeToggle() {
 
 export default function Settings() {
     const { t } = useTranslation('settings');
+
+    const [, setUiStyle] = useAtom(uiStyleAtom);
 
     return (
         <div className="settings-page">
@@ -63,7 +65,13 @@ export default function Settings() {
                         {t('fullscreenWallet')}
                     </Button>
                 )}
-                <Link className="settings-page__link" to={`${routePrefix}/home`}>
+                <Link
+                    className="settings-page__link"
+                    to={`${routePrefix}/home`}
+                    onClick={() => {
+                        setUiStyle(UiStyle.WalletX);
+                    }}
+                >
                     Wallet X
                 </Link>
                 <Link className="settings-page__link" to={absoluteRoutes.home.settings.about.path}>

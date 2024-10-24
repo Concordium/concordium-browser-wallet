@@ -9,14 +9,14 @@ import { CCD_METADATA } from '@shared/constants/token-metadata';
 import { ensureDefined } from '@shared/utils/basic-helpers';
 import SideArrow from '@assets/svgX/side-arrow.svg';
 import ConcordiumLogo from '@assets/svgX/concordium-logo.svg';
+import { validateAccountAddress, validateTransferAmount } from '@popup/shared/utils/transaction-helpers';
+import Img, { DEFAULT_FAILED } from '@popup/shared/Img';
 import { displayAsCcd } from 'wallet-common-helpers';
 import { RequiredUncontrolledFieldProps } from '../common/types';
 import { makeUncontrolled } from '../common/utils';
 import Button from '../../Button';
 import { formatTokenAmount, parseTokenAmount, removeNumberGrouping } from '../../utils/helpers';
-import { validateAccountAddress, validateTransferAmount } from '../../utils/transaction-helpers';
 import ErrorMessage from '../ErrorMessage';
-import Img, { DEFAULT_FAILED } from '../../Img';
 import { TokenInfo } from './util';
 
 type AmountInputProps = Pick<
@@ -167,7 +167,6 @@ function TokenPicker({
                 <span className="text__additional_small">
                     {t('form.tokenAmount.token.available', {
                         balance: formatAmount(selectedTokenBalance),
-                        name: token.name,
                     })}
                 </span>
             )}
