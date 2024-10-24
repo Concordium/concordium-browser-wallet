@@ -18,13 +18,9 @@ import { copyToClipboard } from '@popup/popupX/shared/utils/helpers';
 import { useAtomValue } from 'jotai';
 import { credentialsAtom } from '@popup/store/account';
 import { WalletCredential } from '@shared/storage/types';
-import { useIdentityName, useWritableSelectedAccount } from '@popup/shared/utils/account-helpers';
+import { displaySplitAddress, useIdentityName, useWritableSelectedAccount } from '@popup/shared/utils/account-helpers';
 import { useAccountInfo } from '@popup/shared/AccountInfoListenerContext';
 import { displayAsCcd } from 'wallet-common-helpers';
-
-function fallbackAccountName(credentialNumber: number): string {
-    return `Account ${1 + credentialNumber}`;
-}
 
 type EditableAccountNameProps = {
     currentName: string;
@@ -72,8 +68,14 @@ function EditableAccountName({ currentName, fallbackName, onNewName }: EditableA
                         maxLength={25}
                     />
                 </Text.Main>
-                <Button.Icon className="transparent" icon={<Checkmark />} onClick={onComplete} />
-                <Button.Icon className="transparent" icon={<Close />} onClick={onAbort} />
+                <div className="row gap-16">
+                    <Button.Icon
+                        className="transparent"
+                        icon={<Checkmark className="width-12" />}
+                        onClick={onComplete}
+                    />
+                    <Button.Icon className="transparent" icon={<Close className="width-16" />} onClick={onAbort} />
+                </div>
             </>
         );
     }
@@ -98,7 +100,7 @@ function AccountListItem({ credential }: AccountListItemProps) {
     const identityName = useIdentityName(credential);
     const accountInfo = useAccountInfo(credential);
     const setAccount = useWritableSelectedAccount(credential.address);
-    const fallbackName = fallbackAccountName(credential.credNumber);
+    const fallbackName = displaySplitAddress(credential.address);
     const accountName = credential.credName !== '' ? credential.credName : fallbackName;
     const { address } = credential;
     const ccdBalance =
