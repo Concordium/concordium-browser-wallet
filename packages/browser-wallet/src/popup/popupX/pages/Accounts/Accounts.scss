@@ -25,6 +25,37 @@
             color: $color-white;
         }
 
+        .wrap-anywhere {
+            overflow-wrap: anywhere;
+        }
+
+        input.editable {
+            background: none;
+            color: inherit;
+            border: none;
+            font-weight: inherit;
+            font-size: inherit;
+            font-family: inherit;
+            padding: 0;
+            margin: 0;
+
+            &:focus {
+                outline: none;
+            }
+        }
+
+        .gap-16 {
+            gap: rem(16px);
+        }
+
+        .width-16 {
+            width: rem(16px);
+        }
+
+        .width-12 {
+            width: rem(12px);
+        }
+
         .button__icon {
             gap: rem(16px);
 

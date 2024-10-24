@@ -10,15 +10,19 @@ import { isIdentityOfCredential } from '@shared/utils/identity-helpers';
 import { getNextUnused } from '@shared/utils/number-helpers';
 import { useDecryptedSeedPhrase } from './seed-phrase-helpers';
 
+/** Format an account address for display by showing the 4 first and last characters in the base58check representation. */
+export function displaySplitAddress(address: string) {
+    return `${address.slice(0, 4)}...${address.slice(-4)}`;
+}
+
 export const displayNameOrSplitAddress = (account: WalletCredential | undefined) => {
     const { credName, address } = account || { address: '' };
-    return credName || `${address.slice(0, 4)}...${address.slice(address.length - 4)}`;
+    return credName || displaySplitAddress(address);
 };
 
 export const displayNameAndSplitAddress = (account: WalletCredential | undefined) => {
     const { credName, address } = account || { address: '' };
-    const splitAddress = `${address.slice(0, 4)}...${address.slice(address.length - 4)}`;
-    return `${credName ? `${credName} / ` : ''}${splitAddress}`;
+    return `${credName ? `${credName} / ` : ''}${displaySplitAddress(address)}`;
 };
 
 export function useIdentityOf(cred?: WalletCredential) {
@@ -51,9 +55,11 @@ export function useIdentityName(credential: WalletCredential, fallback?: string)
 
 export function useWritableSelectedAccount(accountAddress: string) {
     const [accounts, setAccounts] = useAtom(writableCredentialAtom);
-    const setAccount = (update: WalletCredential) =>
+    const setAccount = (update: Partial<WalletCredential>) =>
         setAccounts(
-            accounts.map((account) => (account.address === accountAddress ? { ...account, ...update } : account))
+            accounts.map((account) =>
+                account.address === accountAddress ? ({ ...account, ...update } as WalletCredential) : account
+            )
         );
 
     return setAccount;

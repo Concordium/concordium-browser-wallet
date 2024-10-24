@@ -1,6 +1,6 @@
 const t = {
     accounts: 'Accounts',
-    totalBalance: 'Total Balance',
+    ccdBalance: 'CCD Balance',
     connectedSites: 'Connected sites',
     seeList: 'See list',
     privateKey: 'Private key',
