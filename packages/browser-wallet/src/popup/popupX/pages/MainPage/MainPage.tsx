@@ -21,6 +21,7 @@ import FileText from '@assets/svgX/file-text.svg';
 import ConcordiumLogo from '@assets/svgX/concordium-logo.svg';
 import Plant from '@assets/svgX/plant.svg';
 import Gear from '@assets/svgX/gear.svg';
+import { formatTokenAmount } from '@popup/popupX/shared/utils/helpers';
 
 /** Hook loading every fungible token added to the account. */
 function useAccountFungibleTokens(account: WalletCredential) {
@@ -34,22 +35,11 @@ function useAccountTokenBalance(accountAddress: string, contractAddress: string,
     return balance;
 }
 
-/** Display a token balance with a number of decimals. Localized. */
-function formatBalance(balance: bigint, decimals: number = 0) {
-    const padded = balance.toString().padStart(decimals + 1, '0');
-    const integer = padded.slice(0, -decimals);
-    const fraction = padded.slice(-decimals);
-    const balanceFormatter = new Intl.NumberFormat(undefined, { minimumFractionDigits: decimals });
-    // eslint-disable-next-line @typescript-eslint/ban-ts-comment
-    // @ts-ignore format below supports strings, TypeScript is just not aware.
-    return balanceFormatter.format(`${integer}.${fraction}`);
-}
-
 type TokenBalanceProps = { decimals?: number; tokenId: string; contractAddress: string; accountAddress: string };
 /** Component for fetching and displaying a CIS-2 token balance of an account. */
 function AccountTokenBalance({ decimals, tokenId, contractAddress, accountAddress }: TokenBalanceProps) {
     const balanceRaw = useAccountTokenBalance(accountAddress, contractAddress, tokenId) ?? 0n;
-    const balance = useMemo(() => formatBalance(balanceRaw, decimals), [balanceRaw]);
+    const balance = useMemo(() => formatTokenAmount(balanceRaw, decimals), [balanceRaw]);
     return <span>{balance}</span>;
 }
 

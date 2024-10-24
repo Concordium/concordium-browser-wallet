@@ -6,6 +6,28 @@ const t = {
             medium: 'Medium',
             strong: 'Strong',
         },
+        tokenAmount: {
+            token: {
+                label: 'Token',
+                available: '{{balance}} available',
+            },
+            amount: {
+                label: 'Amount',
+                fee: 'Estimated transaction fee: {{fee}}',
+            },
+            address: {
+                label: 'Receiver address',
+            },
+        },
+    },
+    utils: {
+        address: {
+            required: 'Please enter an address',
+        },
+        amount: {
+            required: 'Please enter an amount',
+            zero: 'Amount may not be zero',
+        },
     },
 };
 

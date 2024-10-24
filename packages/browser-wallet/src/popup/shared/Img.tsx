@@ -3,7 +3,7 @@ import React, { useState } from 'react';
 import { ClassName } from 'wallet-common-helpers';
 
 const DEFAULT_LOADING = '/assets/svg/loading_icon.svg';
-const DEFAULT_FAILED = '/assets/svg/no_icon.svg';
+export const DEFAULT_FAILED = '/assets/svg/no_icon.svg';
 
 type BaseProps = ClassName & {
     src?: string;

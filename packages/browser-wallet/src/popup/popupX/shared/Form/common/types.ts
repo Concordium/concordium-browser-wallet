@@ -9,7 +9,7 @@ export type RequiredFormFieldProps = {
     /**
      * Sets valid state of the field. This has no effect if an error is also set.
      */
-    valid?: boolean;
+    valid?: boolean; // TODO: in practice this is a number, either 0 or 1???
 };
 export type RequiredControlledFieldProps = RequiredFormFieldProps &
     Omit<Partial<ControllerRenderProps>, 'ref' | 'onBlur'> & {

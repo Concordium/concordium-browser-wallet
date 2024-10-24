@@ -2184,6 +2184,7 @@ __metadata:
     "@storybook/addon-essentials": ^8.3.5
     "@storybook/addon-interactions": ^8.3.5
     "@storybook/addon-links": ^8.3.5
+    "@storybook/addon-viewport": ^8.3.5
     "@storybook/addon-webpack5-compiler-swc": ^1.0.5
     "@storybook/preset-scss": ^1.0.3
     "@storybook/react": ^8.3.5
@@ -4221,7 +4222,7 @@ __metadata:
   languageName: node
   linkType: hard
 
-"@storybook/addon-viewport@npm:8.3.5":
+"@storybook/addon-viewport@npm:8.3.5, @storybook/addon-viewport@npm:^8.3.5":
   version: 8.3.5
   resolution: "@storybook/addon-viewport@npm:8.3.5"
   dependencies:

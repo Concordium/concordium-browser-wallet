@@ -32,7 +32,7 @@ type Props = Pick<InputHTMLAttributes<HTMLInputElement>, 'className' | 'autoFocu
  * Password input with reveal button and optional strength check.
  */
 export function Password({ showStrength = false, value, className, autoFocus, ...props }: Props) {
-    const { t } = useTranslation();
+    const { t } = useTranslation('x', { keyPrefix: 'sharedX' });
     const [reveal, setReveal] = useState(false);
 
     const strength = useMemo(
