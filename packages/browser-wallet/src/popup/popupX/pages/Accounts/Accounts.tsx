@@ -94,7 +94,8 @@ type AccountListItemProps = {
 function AccountListItem({ credential }: AccountListItemProps) {
     const { t } = useTranslation('x', { keyPrefix: 'accounts' });
     const nav = useNavigate();
-    const navToPrivateKey = () => nav(absoluteRoutes.settings.accounts.privateKey.path);
+    const navToPrivateKey = () =>
+        nav(generatePath(absoluteRoutes.settings.accounts.privateKey.path, { account: credential.address }));
     const navToConnectedSites = () =>
         nav(generatePath(absoluteRoutes.settings.accounts.connectedSites.path, { account: credential.address }));
     const navToIdCards = () => nav(absoluteRoutes.settings.idCards.path);
