@@ -169,7 +169,7 @@ export const relativeRoutes = {
                     path: 'keys',
                 },
             },
-            /** Delegation related routes */
+            /** Delegation section */
             delegator: {
                 path: 'delegator',
                 config: {
@@ -181,6 +181,7 @@ export const relativeRoutes = {
                     config: {
                         backTitle: i18n.t('x:earn.delegator.register.backTitle'),
                     },
+                    /** Flow for constructing the transaction */
                     configure: {
                         config: {
                             backTitle: i18n.t('x:earn.delegator.register.backTitle'),
