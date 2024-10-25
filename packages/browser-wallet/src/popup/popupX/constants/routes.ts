@@ -61,6 +61,7 @@ export const relativeRoutes = {
         path: 'home',
         config: {
             hideBackArrow: true,
+            showAccountSelector: true,
         },
         send: {
             path: 'send',
@@ -91,6 +92,12 @@ export const relativeRoutes = {
         },
         token: {
             path: 'token',
+        },
+        manageTokenList: {
+            path: 'manageTokenList',
+            addToken: {
+                path: 'addToken',
+            },
         },
     },
     settings: {

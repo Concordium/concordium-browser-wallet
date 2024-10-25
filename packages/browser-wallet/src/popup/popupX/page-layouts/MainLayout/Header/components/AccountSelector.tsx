@@ -5,9 +5,9 @@ import EthLogo from '@assets/svgX/eth-logo.svg';
 import DnwLogo from '@assets/svgX/dnw-logo.svg';
 import EureLogo from '@assets/svgX/eure-logo.svg';
 import BtcLogo from '@assets/svgX/btc-logo.svg';
-import IconButton from '@popup/popupX/shared/IconButton';
 import ArrowsUpDown from '@assets/svgX/arrows-down-up.svg';
 import FormSearch from '@popup/popupX/shared/Form/Search';
+import Button from '@popup/popupX/shared/Button';
 
 type Props = { showAccountSelector: boolean };
 
@@ -27,16 +27,14 @@ export default function AccountSelector({ showAccountSelector }: Props) {
                                 <FormSearch
                                     control={f.control}
                                     name="network"
+                                    placeholder="Search by name"
                                     autoFocus
                                     defaultValue="https://whatevertheaddressIs.com"
                                 />
                             );
                         }}
                     </Form>
-                    <IconButton>
-                        <ArrowsUpDown />
-                        <span className="capture__additional_small">Sort A-Z</span>
-                    </IconButton>
+                    <Button.IconText icon={<ArrowsUpDown />} label="Sort A-Z" />
                 </div>
                 <div className="main-header__account-selector_list">
                     <div className="main-header__account-selector_list-item active">

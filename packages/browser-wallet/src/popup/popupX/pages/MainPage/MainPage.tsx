@@ -123,6 +123,7 @@ function MainPage({ credential }: MainPageProps) {
     const navToTransactionLog = () =>
         nav(relativeRoutes.home.transactionLog.path.replace(':account', credential.address));
     const navToTokenDetails = () => nav(relativeRoutes.home.token.path);
+    const navToManageToken = () => nav(relativeRoutes.home.manageTokenList.path);
 
     const chainParameters = useBlockChainParameters();
     const microCcdPerEur = chainParameters?.microGTUPerEuro;
@@ -174,7 +175,7 @@ function MainPage({ credential }: MainPageProps) {
                             }
                         />
                     ))}
-                    <Button.IconText icon={<Gear />} label={t('manageTokenList')} />
+                    <Button.IconText onClick={() => navToManageToken()} icon={<Gear />} label={t('manageTokenList')} />
                 </div>
             </div>
         </Page>

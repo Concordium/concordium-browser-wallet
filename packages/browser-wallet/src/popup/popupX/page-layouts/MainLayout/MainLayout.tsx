@@ -25,6 +25,7 @@ export default function MainLayout() {
     const [scroll, setScroll] = React.useState(0);
     const isScrolling = useMemo(() => scroll > 0, [!!scroll]);
     const [menuOpen, setMenuOpen] = React.useState(false);
+    const [accountOpen, setAccountOpen] = React.useState(false);
     const {
         hideBackArrow = false,
         backTitle = '',
@@ -34,7 +35,9 @@ export default function MainLayout() {
     } = getPageConfig();
     return (
         <div className="main-layout-x">
-            <Header {...{ isScrolling, hideMenu, hideConnection, menuOpen, setMenuOpen }} />
+            <Header
+                {...{ isScrolling, hideMenu, hideConnection, menuOpen, setMenuOpen, accountOpen, setAccountOpen }}
+            />
             <main
                 className={clsx('main-layout-x__main')}
                 onScroll={(e) => {
@@ -43,7 +46,11 @@ export default function MainLayout() {
             >
                 <div className="float-section">
                     <NavButton hideBackArrow={hideBackArrow || menuOpen} backTitle={backTitle} />
-                    {showAccountSelector && <AccountButton />}
+                    <AccountButton
+                        hideAccountButton={!showAccountSelector || menuOpen}
+                        setAccountOpen={setAccountOpen}
+                        accountOpen={accountOpen}
+                    />
                 </div>
                 <Outlet />
             </main>

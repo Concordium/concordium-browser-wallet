@@ -1,0 +1,36 @@
+.token-list-x {
+    display: flex;
+    flex-direction: column;
+    gap: rem(4px);
+
+    &__item {
+        display: flex;
+        align-items: center;
+        padding: rem(12px) rem(20px) rem(12px) rem(12px);
+        border: unset;
+        border-radius: rem(12px);
+        background: $color-transaction-bg;
+
+        .token-icon {
+            display: flex;
+            padding: rem(10px);
+            margin-right: rem(10px);
+            border-radius: rem(8px);
+            background: $color-main-bg;
+
+            svg,
+            img {
+                width: rem(20px);
+                height: rem(20px);
+            }
+        }
+
+        .label__main {
+            color: $color-white;
+        }
+
+        .form-input__checkbox {
+            margin-left: auto;
+        }
+    }
+}

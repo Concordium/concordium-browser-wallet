@@ -47,6 +47,7 @@ import aboutPage from '@popup/popupX/pages/About/i18n/en';
 import header from '@popup/popupX/page-layouts/MainLayout/Header/i18n/en';
 import web3Id from '@popup/popupX/pages/Web3Id/i18n/en';
 import earn from '@popup/popupX/pages/EarningRewards/i18n/en';
+import mangeTokens from '@popup/popupX/pages/ManageTokens/i18n/en';
 import connectionRequestX from '@popup/popupX/pages/prompts/ConnectionRequest/i18n/en';
 
 const t = {
@@ -98,6 +99,7 @@ const t = {
         header,
         web3Id,
         earn,
+        mangeTokens,
         prompts: { connectionRequestX },
     },
 };

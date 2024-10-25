@@ -25,13 +25,55 @@
         width: 100%;
         outline: none;
         font-size: rem(14px);
+
         /* override base style, remove after release */
         transform: unset;
+
         /* override base style, remove after release */
         @include transition(border-color);
 
         &:focus {
             border-color: $color-mineral-2;
+        }
+    }
+
+    &__checkbox {
+        display: flex;
+        flex-direction: row;
+
+        label {
+            margin-top: auto;
+            margin-bottom: auto;
+        }
+
+        input {
+            &[type='checkbox'] {
+                display: flex;
+                align-items: center;
+                justify-content: center;
+                width: rem(24px);
+                height: rem(24px);
+                margin: 0;
+                appearance: none;
+                background-color: $color-grey-2;
+                color: $color-white;
+                border: 1px solid $color-white;
+                border-radius: rem(6px);
+
+                &::before {
+                    content: '';
+                    width: rem(14px);
+                    height: rem(14px);
+                    border-radius: rem(3px);
+                    transform: scale(0);
+                    transition: 60ms transform ease-in-out;
+                    box-shadow: inset rem(14px) rem(14px) $color-white;
+                }
+
+                &:checked::before {
+                    transform: scale(1);
+                }
+            }
         }
     }
 
@@ -78,7 +120,6 @@
         transform: unset;
 
         svg {
-
             g,
             path {
                 fill: $color-mineral-3;
@@ -90,19 +131,14 @@
 .form-search {
     position: relative;
 
-    .form-input__field {
-        height: rem(32px);
-        padding: rem(10px);
-        padding-left: rem(34px);
-        border-radius: rem(12px);
-        border-color: $color-grey-3;
-        background-color: unset;
-    }
-
     svg {
         position: absolute;
-        top: rem(8px);
-        left: rem(8px);
+        top: rem(20px);
+        right: rem(20px);
+
+        path {
+            fill: $color-mineral-3;
+        }
     }
 }
 
@@ -113,11 +149,11 @@ $handle-size: rem(20px);
 
 .form-toggle-x {
     &__root {
-        input:checked+.form-toggle-x__slider {
+        input:checked + .form-toggle-x__slider {
             background-color: $color-green-toggle;
         }
 
-        input:checked+.form-toggle-x__slider::before {
+        input:checked + .form-toggle-x__slider::before {
             transform: translateX(rem(24px));
         }
     }
@@ -194,11 +230,11 @@ $handle-size: rem(20px);
             }
         }
 
-        &:hover input~.checkmark {
+        &:hover input ~ .checkmark {
             background-color: $color-grey-3;
         }
 
-        input:checked~.checkmark::after {
+        input:checked ~ .checkmark::after {
             display: block;
         }
 

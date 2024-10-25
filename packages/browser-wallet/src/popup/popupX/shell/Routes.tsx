@@ -30,6 +30,7 @@ import { RestoreIntro, RestoreResult } from '@popup/popupX/pages/Restore';
 import { MessagePromptHandlersType } from '@popup/shared/utils/message-prompt-handlers';
 import ConnectionRequest from '@popup/popupX/pages/prompts/ConnectionRequest';
 import ExternalRequestLayout from '@popup/popupX/page-layouts/ExternalRequestLayout';
+import { ManageTokenList, AddToken } from '@popup/popupX/pages/ManageTokens';
 import RegisterDelegator from '../pages/EarningRewards/Delegator/Register/RegisterDelegator';
 import DelegationResult from '../pages/EarningRewards/Delegator/Result/DelegationResult';
 
@@ -67,6 +68,10 @@ export default function Routes({ messagePromptHandlers }: { messagePromptHandler
                     </Route>
                     <Route element={<TokenDetails />} path={relativeRoutes.home.token.path} />
                     <Route element={<TokenDetailsCcd />} path={`${relativeRoutes.home.token.path}/ccd`} />
+                    <Route path={relativeRoutes.home.manageTokenList.path}>
+                        <Route index element={<ManageTokenList />} />
+                        <Route element={<AddToken />} path={relativeRoutes.home.manageTokenList.addToken.path} />
+                    </Route>
                 </Route>
                 <Route element={<MainLayout />} path={relativeRoutes.settings.path}>
                     <Route element={<IdCards />} path={relativeRoutes.settings.idCards.path} />
