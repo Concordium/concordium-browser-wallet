@@ -12,7 +12,7 @@ import Button from '@popup/popupX/shared/Button';
 import { useTranslation } from 'react-i18next';
 import Card from '@popup/popupX/shared/Card';
 import Text from '@popup/popupX/shared/Text';
-import { useNavigate } from 'react-router-dom';
+import { generatePath, useNavigate } from 'react-router-dom';
 import { absoluteRoutes } from '@popup/popupX/constants/routes';
 import { copyToClipboard } from '@popup/popupX/shared/utils/helpers';
 import { useAtomValue } from 'jotai';
@@ -95,7 +95,8 @@ function AccountListItem({ credential }: AccountListItemProps) {
     const { t } = useTranslation('x', { keyPrefix: 'accounts' });
     const nav = useNavigate();
     const navToPrivateKey = () => nav(absoluteRoutes.settings.accounts.privateKey.path);
-    const navToConnectedSites = () => nav(absoluteRoutes.settings.accounts.connectedSites.path);
+    const navToConnectedSites = () =>
+        nav(generatePath(absoluteRoutes.settings.accounts.connectedSites.path, { account: credential.address }));
     const navToIdCards = () => nav(absoluteRoutes.settings.idCards.path);
     const identityName = useIdentityName(credential);
     const accountInfo = useAccountInfo(credential);
