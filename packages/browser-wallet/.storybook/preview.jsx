@@ -11,6 +11,18 @@ BigInt.prototype.toJSON = function () {
     return this.toString();
 };
 
+// NOTE: mock chrome storage API to be somewhat compatible with extension storage
+chrome = chrome ?? {};
+chrome.storage = chrome.storage ?? {};
+
+chrome.storage.local = chrome.storage.local ?? {};
+chrome.storage.session = chrome.storage.session ?? {};
+
+chrome.storage.local.get = chrome.storage.local.get ?? (() => {});
+chrome.storage.session.get = chrome.storage.session.get ?? (() => {});
+chrome.storage.local.set = chrome.storage.local.set ?? (() => {});
+chrome.storage.session.set = chrome.storage.session.set ?? (() => {});
+
 document.getElementsByTagName('html').item(0)?.classList.add('ui-scale-large');
 
 /**

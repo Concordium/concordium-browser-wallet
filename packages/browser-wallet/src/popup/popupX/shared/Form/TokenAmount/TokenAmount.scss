@@ -40,8 +40,11 @@
 
             .token-selector {
                 display: flex;
-                cursor: pointer;
                 position: relative;
+
+                select {
+                    cursor: pointer;
+                }
             }
 
             .text__additional_small {
