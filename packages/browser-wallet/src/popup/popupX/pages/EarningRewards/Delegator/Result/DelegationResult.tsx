@@ -150,13 +150,13 @@ export default function DelegationResult() {
                 {state.payload.delegationTarget !== undefined && (
                     <Card.Row>
                         <Card.RowDetails
-                            title={t('submit.target.label')}
+                            title={t('values.target.label')}
                             value={
                                 state.payload.delegationTarget.delegateType === DelegationTargetType.Baker
-                                    ? t('submit.target.validator', {
+                                    ? t('values.target.validator', {
                                           id: state.payload.delegationTarget.bakerId.toString(),
                                       })
-                                    : t('submit.target.passive')
+                                    : t('values.target.passive')
                             }
                         />
                     </Card.Row>
@@ -164,7 +164,7 @@ export default function DelegationResult() {
                 {state.payload.stake !== undefined && (
                     <Card.Row>
                         <Card.RowDetails
-                            title={t('submit.amount.label')}
+                            title={t('values.amount.label')}
                             value={`${formatCcdAmount(state.payload.stake)} CCD`}
                         />
                     </Card.Row>
@@ -172,11 +172,11 @@ export default function DelegationResult() {
                 {state.payload.restakeEarnings !== undefined && (
                     <Card.Row>
                         <Card.RowDetails
-                            title={t('submit.redelegate.label')}
+                            title={t('values.redelegate.label')}
                             value={
                                 state.payload.restakeEarnings
-                                    ? t('submit.redelegate.delegation')
-                                    : t('submit.redelegate.public')
+                                    ? t('values.redelegate.delegation')
+                                    : t('values.redelegate.public')
                             }
                         />
                     </Card.Row>
