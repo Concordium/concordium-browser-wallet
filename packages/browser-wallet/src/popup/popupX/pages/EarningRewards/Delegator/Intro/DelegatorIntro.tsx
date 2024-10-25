@@ -12,7 +12,7 @@ export default function DelegatorIntro({ onDoneRoute }: Props) {
     const { t } = useTranslation('x', { keyPrefix: 'earn.delegator.intro' });
     return (
         <Page className="delegator-intro-container">
-            <Carousel onDone={() => nav(onDoneRoute)}>
+            <Carousel onDone={() => nav(onDoneRoute, { replace: true })}>
                 <span className="capture__main_small">
                     <Page.Top heading={t('1.title')} />
                     <Trans

@@ -64,6 +64,7 @@ const t = {
         },
         register: {
             title: 'Register delegation',
+            backTitle: 'Earning rewards',
             notice: 'This will lock your delegation amount. Amount is released after {{cooldown}} days from the time you remove or decrease your delegation.',
         },
         update: { title: 'Update delegation' },
@@ -114,6 +115,7 @@ const t = {
             buttonContinue: 'Continue',
         },
         submit: {
+            backTitle: 'Opening a pool',
             sender: { label: 'Sender' },
             fee: { label: 'Estimated transaction fee' },
             button: 'Submit delegation',

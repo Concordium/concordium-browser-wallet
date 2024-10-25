@@ -11,7 +11,7 @@ export default function BakerIntro() {
     const { t } = useTranslation('x', { keyPrefix: 'earn.validator.intro' });
     return (
         <Page className="baker-intro-container">
-            <Carousel onDone={() => nav(absoluteRoutes.settings.earn.validator.register.path)}>
+            <Carousel onDone={() => nav(absoluteRoutes.settings.earn.validator.register.path, { replace: true })}>
                 <Text.Capture>
                     <Page.Top heading={t('1.title')} />
                     <Trans t={t} i18nKey="1.body" />
