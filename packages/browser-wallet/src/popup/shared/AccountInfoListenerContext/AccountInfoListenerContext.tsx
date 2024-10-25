@@ -1,5 +1,5 @@
 import { useAtomValue, useSetAtom, useAtom, atom, WritableAtom } from 'jotai';
-import React, { createContext, ReactNode, useContext, useEffect, useMemo, useState } from 'react';
+import React, { createContext, ReactNode, useContext, useEffect, useState } from 'react';
 import { AccountAddress, AccountInfo } from '@concordium/web-sdk';
 import { useTranslation } from 'react-i18next';
 import i18next from 'i18next';
@@ -98,23 +98,22 @@ export default function AccountInfoListenerContextProvider({ children }: Props) 
  *
  * N.B. has to be used inside an AccountInfoEmitterContext.
  */
-export function useAccountInfo(account: WalletCredential): AccountInfo | undefined {
+export function useAccountInfo(account: WalletCredential | undefined): AccountInfo | undefined {
     const accountInfoEmitter = useContext<AccountInfoListener | undefined>(AccountInfoListenerContext);
-    const [accountInfo, refreshAccountInfo] = useAtom(accountInfoFamily(account.address));
+    const [accountInfo, refreshAccountInfo] = useAtom(accountInfoFamily(account?.address ?? ''));
     const { genesisHash } = useAtomValue(networkConfigurationAtom);
-    const address = useMemo(() => account.address, [account]);
 
     useEffect(() => {
-        if (!accountInfo && account.status === CreationStatus.Confirmed) {
+        if (!accountInfo && account?.status === CreationStatus.Confirmed) {
             refreshAccountInfo();
         }
-    }, [genesisHash, accountInfo, account.status]);
+    }, [genesisHash, accountInfo, account?.status]);
 
     useEffect(() => {
-        if (account.status === CreationStatus.Confirmed && accountInfoEmitter) {
-            accountInfoEmitter.subscribe(address);
+        if (account?.status === CreationStatus.Confirmed && accountInfoEmitter) {
+            accountInfoEmitter.subscribe(account.address);
             return () => {
-                accountInfoEmitter.unsubscribe(address);
+                accountInfoEmitter.unsubscribe(account.address);
             };
         }
         return noOp;
@@ -125,10 +124,5 @@ export function useAccountInfo(account: WalletCredential): AccountInfo | undefin
 
 export function useSelectedAccountInfo() {
     const cred = useSelectedCredential();
-
-    if (cred === undefined) {
-        return undefined;
-    }
-
     return useAccountInfo(cred);
 }

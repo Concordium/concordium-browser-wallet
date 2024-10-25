@@ -3,7 +3,7 @@ import { Route, Routes as ReactRoutes } from 'react-router-dom';
 import { relativeRoutes, routePrefix } from '@popup/popupX/constants/routes';
 import MainLayout from '@popup/popupX/page-layouts/MainLayout';
 import MainPage from '@popup/popupX/pages/MainPage';
-import { SendConfirm, SendFunds, SendSuccess } from '@popup/popupX/pages/SendFunds';
+import { SendConfirm, SendFunds } from '@popup/popupX/pages/SendFunds';
 import ReceiveFunds from '@popup/popupX/pages/ReceiveFunds';
 import TransactionLog from '@popup/popupX/pages/TransactionLog';
 import TransactionDetails from '@popup/popupX/pages/TransactionDetails';
@@ -20,18 +20,18 @@ import { IdSubmitted, IdCardsInfo, RequestIdentity, SetupPassword, Welcome } fro
 import ConnectedSites from '@popup/popupX/pages/ConnectedSites';
 import EarningRewards from '@popup/popupX/pages/EarningRewards';
 import { BakerIntro } from '@popup/popupX/pages/EarningRewards/Baker/Intro';
-import { DelegatorIntro } from '@popup/popupX/pages/EarningRewards/Delegator/Intro';
 import { RegisterBaker } from '@popup/popupX/pages/EarningRewards/Baker/Register';
 import { OpenPool } from '@popup/popupX/pages/EarningRewards/Baker/OpenPool';
 import { BakerKeys } from '@popup/popupX/pages/EarningRewards/Baker/BakerKeys';
-import DelegationType from '@popup/popupX/pages/EarningRewards/Delegator/Type/DelegationType';
 import PrivateKey from '@popup/popupX/pages/PrivateKey';
 import { RestoreIntro, RestoreResult } from '@popup/popupX/pages/Restore';
 import { MessagePromptHandlersType } from '@popup/shared/utils/message-prompt-handlers';
 import ConnectionRequest from '@popup/popupX/pages/prompts/ConnectionRequest';
 import ExternalRequestLayout from '@popup/popupX/page-layouts/ExternalRequestLayout';
-import RegisterDelegator from '../pages/EarningRewards/Delegator/Register/RegisterDelegator';
-import DelegationResult from '../pages/EarningRewards/Delegator/Result/DelegationResult';
+import { DelegationResult } from '../pages/EarningRewards/Delegator/Result';
+import SubmittedTransaction from '../pages/SubmittedTransaction';
+import { DelegatorIntro } from '../pages/EarningRewards/Delegator/Intro';
+import DelegatorTransactionFlow from '../pages/EarningRewards/Delegator/TransactionFlow';
 
 export default function Routes({ messagePromptHandlers }: { messagePromptHandlers: MessagePromptHandlersType }) {
     const { handleConnectionResponse } = messagePromptHandlers;
@@ -51,10 +51,6 @@ export default function Routes({ messagePromptHandlers }: { messagePromptHandler
                         <Route index element={<SendFunds />} />
                         <Route path={relativeRoutes.home.send.confirmation.path}>
                             <Route index element={<SendConfirm />} />
-                            <Route
-                                element={<SendSuccess />}
-                                path={relativeRoutes.home.send.confirmation.confirmed.path}
-                            />
                         </Route>
                     </Route>
                     <Route element={<ReceiveFunds />} path={relativeRoutes.home.receive.path} />
@@ -67,6 +63,10 @@ export default function Routes({ messagePromptHandlers }: { messagePromptHandler
                     </Route>
                     <Route element={<TokenDetails />} path={relativeRoutes.home.token.path} />
                     <Route element={<TokenDetailsCcd />} path={`${relativeRoutes.home.token.path}/ccd`} />
+                    <Route
+                        element={<SubmittedTransaction />}
+                        path={`${relativeRoutes.home.submittedTransaction.path}`}
+                    />
                 </Route>
                 <Route element={<MainLayout />} path={relativeRoutes.settings.path}>
                     <Route element={<IdCards />} path={relativeRoutes.settings.idCards.path} />
@@ -95,31 +95,37 @@ export default function Routes({ messagePromptHandlers }: { messagePromptHandler
                     <Route element={<About />} path={relativeRoutes.settings.about.path} />
                     <Route path={relativeRoutes.settings.earn.path}>
                         <Route index element={<EarningRewards />} />
-                        <Route path={relativeRoutes.settings.earn.baker.path}>
-                            <Route element={<BakerIntro />} path={relativeRoutes.settings.earn.baker.intro.path} />
+                        <Route path={relativeRoutes.settings.earn.validator.path}>
+                            <Route element={<BakerIntro />} path={relativeRoutes.settings.earn.validator.intro.path} />
                             <Route
                                 element={<RegisterBaker />}
-                                path={relativeRoutes.settings.earn.baker.register.path}
+                                path={relativeRoutes.settings.earn.validator.register.path}
                             />
-                            <Route element={<OpenPool />} path={relativeRoutes.settings.earn.baker.openPool.path} />
-                            <Route element={<BakerKeys />} path={relativeRoutes.settings.earn.baker.bakerKeys.path} />
+                            <Route element={<OpenPool />} path={relativeRoutes.settings.earn.validator.openPool.path} />
+                            <Route element={<BakerKeys />} path={relativeRoutes.settings.earn.validator.keys.path} />
                         </Route>
                         <Route path={relativeRoutes.settings.earn.delegator.path}>
+                            <Route path={`${relativeRoutes.settings.earn.delegator.register.path}`}>
+                                <Route
+                                    index
+                                    element={
+                                        <DelegatorIntro
+                                            onDoneRoute={relativeRoutes.settings.earn.delegator.register.configure.path}
+                                        />
+                                    }
+                                />
+                                <Route
+                                    path={`${relativeRoutes.settings.earn.delegator.register.configure.path}/*`}
+                                    element={<DelegatorTransactionFlow />}
+                                />
+                            </Route>
                             <Route
-                                element={<DelegatorIntro />}
-                                path={relativeRoutes.settings.earn.delegator.intro.path}
-                            />
-                            <Route
-                                element={<DelegationType />}
-                                path={relativeRoutes.settings.earn.delegator.type.path}
-                            />
-                            <Route
-                                element={<RegisterDelegator />}
-                                path={relativeRoutes.settings.earn.delegator.register.path}
+                                element={<DelegatorTransactionFlow />}
+                                path={`${relativeRoutes.settings.earn.delegator.update.path}/*`}
                             />
                             <Route
                                 element={<DelegationResult />}
-                                path={relativeRoutes.settings.earn.delegator.result.path}
+                                path={relativeRoutes.settings.earn.delegator.submit.path}
                             />
                         </Route>
                     </Route>

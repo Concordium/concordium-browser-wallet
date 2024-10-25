@@ -1,3 +1,6 @@
+import { AccountAddress, TransactionHash } from '@concordium/web-sdk';
+import { generatePath } from 'react-router-dom';
+
 export type RouteConfig = {
     hideBackArrow?: boolean;
     backTitle?: string;
@@ -69,12 +72,6 @@ export const relativeRoutes = {
                 config: {
                     backTitle: 'to Send Funds form',
                 },
-                confirmed: {
-                    path: 'confirmed',
-                    config: {
-                        hideBackArrow: true,
-                    },
-                },
             },
         },
         receive: {
@@ -91,6 +88,12 @@ export const relativeRoutes = {
         },
         token: {
             path: 'token',
+        },
+        submittedTransaction: {
+            path: 'submitted/:transactionHash',
+            config: {
+                hideBackArrow: true,
+            },
         },
     },
     settings: {
@@ -146,9 +149,11 @@ export const relativeRoutes = {
                 },
             },
         },
+        /** Routes related to staking for the currently selected account */
         earn: {
             path: 'earn',
-            baker: {
+            /** Validation related routes */
+            validator: {
                 path: 'baker',
                 intro: {
                     path: 'intro',
@@ -159,23 +164,27 @@ export const relativeRoutes = {
                 openPool: {
                     path: 'openPool',
                 },
-                bakerKeys: {
-                    path: 'bakerKeys',
+                keys: {
+                    path: 'keys',
                 },
             },
+            /** Delegation related routes */
             delegator: {
                 path: 'delegator',
-                intro: {
-                    path: 'intro',
-                },
-                type: {
-                    path: 'type',
-                },
+                /** Configure new delegator */
                 register: {
                     path: 'register',
+                    configure: {
+                        path: 'configure',
+                    },
                 },
-                result: {
-                    path: 'result',
+                /** Configure existing delegator */
+                update: {
+                    path: 'update',
+                },
+                /** Submit configure delegator transaction */
+                submit: {
+                    path: 'submit',
                 },
             },
         },
@@ -218,6 +227,15 @@ const buildAbsoluteRoutes = <R extends RouteNode | RoutePath | RouteChildren>(
 };
 
 export const absoluteRoutes = buildAbsoluteRoutes(relativeRoutes);
+
+export const transactionDetailsRoute = (account: AccountAddress.Type, tx: TransactionHash.Type) =>
+    generatePath(absoluteRoutes.home.transactionLog.details.path, {
+        account: account.address,
+        transactionHash: TransactionHash.toHexString(tx),
+    });
+
+export const submittedTransactionRoute = (tx: TransactionHash.Type) =>
+    generatePath(absoluteRoutes.home.submittedTransaction.path, { transactionHash: TransactionHash.toHexString(tx) });
 
 /**
  * Given two absolute routes, returns the relative route between them.

@@ -4,23 +4,34 @@ import Text from '@popup/popupX/shared/Text';
 
 type CardType = 'gradient' | 'transparent' | 'grey';
 
-function CardRoot({
-    type = 'grey',
-    className,
-    children,
-}: {
+type CardRootProps = {
     type?: CardType;
     className?: string;
     children: ReactNode;
-}) {
+};
+
+function CardRoot({ type = 'grey', className, children }: CardRootProps) {
     return <div className={clsx('card-x', type, className)}>{children}</div>;
 }
 
-function CardRow({ className, children }: { className?: string; children: ReactNode }) {
+type CardRowProps = {
+    className?: string;
+    children: ReactNode;
+};
+
+function CardRow({ className, children }: CardRowProps) {
     return <div className={clsx('row', className)}>{children}</div>;
 }
 
-function CardRowDetails({ title, value, className }: { title?: string; value?: string; className?: string }) {
+type CardRowDetailsProps = {
+    /** Title of the card row detail */
+    title?: string;
+    /** Value of the card row detail */
+    value?: string;
+    className?: string;
+};
+
+function CardRowDetails({ title, value, className }: CardRowDetailsProps) {
     return (
         <div className={clsx('row', 'details', className)}>
             <Text.Capture>{title}</Text.Capture>

@@ -18,6 +18,9 @@ import {
     UpdateContractPayload,
     SimpleTransferWithMemoPayload,
     AccountInfoType,
+    ConfigureDelegationPayload,
+    getEnergyCost,
+    convertEnergyToMicroCcd,
 } from '@concordium/web-sdk';
 import {
     isValidResolutionString,
@@ -32,7 +35,9 @@ import i18n from '@popup/shell/i18n';
 import { useAtomValue } from 'jotai';
 import { selectedPendingTransactionsAtom } from '@popup/store/transactions';
 import { DEFAULT_TRANSACTION_EXPIRY } from '@shared/constants/time';
+import { useCallback } from 'react';
 import { BrowserWalletAccountTransaction, TransactionStatus } from './transaction-history-types';
+import { useBlockChainParameters } from '../BlockChainParametersProvider';
 
 export function buildSimpleTransferPayload(recipient: string, amount: bigint): SimpleTransferPayload {
     return {
@@ -246,4 +251,19 @@ export function getTransactionAmount(type: AccountTransactionType, payload: Acco
         default:
             return 0n;
     }
+}
+/** Hook which exposes a function for getting the transaction fee for a given transaction type */
+export function useGetTransactionFee(type: AccountTransactionType) {
+    const cp = useBlockChainParameters();
+
+    return useCallback(
+        (payload: ConfigureDelegationPayload) => {
+            if (cp === undefined) {
+                return undefined;
+            }
+            const energy = getEnergyCost(type, payload);
+            return convertEnergyToMicroCcd(energy, cp);
+        },
+        [cp, type]
+    );
 }

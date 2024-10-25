@@ -2,11 +2,15 @@ import React from 'react';
 import Arrow from '@assets/svgX/arrow-right.svg';
 import Button from '@popup/popupX/shared/Button';
 import { useNavigate } from 'react-router-dom';
-import { relativeRoutes } from '@popup/popupX/constants/routes';
+import { submittedTransactionRoute } from '@popup/popupX/constants/routes';
+import { TransactionHash } from '@concordium/web-sdk';
 
 export default function SendConfirm() {
     const nav = useNavigate();
-    const navToConfirmed = () => nav(relativeRoutes.home.send.confirmation.confirmed.path);
+    // TODO:
+    // 1. Submit transaction (see `Delegator/TransactionFlow`)
+    // 2. Pass the transaction hash to the route function below
+    const navToConfirmed = () => nav(submittedTransactionRoute(TransactionHash.fromHexString('..')));
     return (
         <div className="send-funds-container">
             <div className="send-funds-confirm__title">

@@ -1,26 +1,110 @@
 import React from 'react';
-import Radio from '@popup/popupX/shared/Form/Radios';
+import { FormRadio } from '@popup/popupX/shared/Form/Radios';
+import { Trans, useTranslation } from 'react-i18next';
+import { Validate } from 'react-hook-form';
+import Page from '@popup/popupX/shared/Page';
+import ExternalLink from '@popup/popupX/shared/ExternalLink';
+import { DelegationTargetType, OpenStatusText } from '@concordium/web-sdk';
+import Form, { useForm } from '@popup/popupX/shared/Form';
 import Button from '@popup/popupX/shared/Button';
+import FormInput from '@popup/popupX/shared/Form/Input/Input';
+import { useAtomValue } from 'jotai';
+import { grpcClientAtom, networkConfigurationAtom } from '@popup/store/settings';
+import { DelegationTypeForm } from '../util';
 
-export default function DelegationType() {
+type Props = {
+    title: string;
+    /** The initial values delegation configuration target step */
+    initialValues?: DelegationTypeForm;
+    /** The submit handler triggered when submitting the form in the step */
+    onSubmit(values: DelegationTypeForm): void;
+};
+
+export default function DelegationType({ initialValues, onSubmit, title }: Props) {
+    const network = useAtomValue(networkConfigurationAtom);
+    const client = useAtomValue(grpcClientAtom);
+    const { t } = useTranslation('x', { keyPrefix: 'earn.delegator.target' });
+
+    const form = useForm<DelegationTypeForm>({
+        defaultValues: initialValues ?? { type: DelegationTargetType.PassiveDelegation },
+    });
+    const submit = form.handleSubmit(onSubmit);
+    const target = form.watch('type');
+
+    const validateBakerId: Validate<string | undefined> = async (value) => {
+        try {
+            const bakerId = BigInt(value!); // Unwrap is safe here, as it will always be defined.
+            const poolStatus = await client.getPoolInfo(bakerId);
+
+            if (poolStatus.poolInfo?.openStatus !== OpenStatusText.OpenForAll) {
+                return t('inputValidatorId.errorClosed');
+            }
+            return true;
+        } catch {
+            return t('inputValidatorId.errorNotValidator');
+        }
+    };
+
     return (
-        <div className="delegation-type-container">
-            <div className="delegation-type__title">
-                <span className="heading_medium">Register Delegation</span>
-            </div>
+        <Page className="delegation-type-container">
+            <Page.Top heading={title} />
+            <span className="capture__main_small">{t('description')}</span>
+            <Form<DelegationTypeForm> className="delegation-type__select-form" formMethods={form} onSubmit={onSubmit}>
+                {(f) => (
+                    <>
+                        <FormRadio
+                            id={DelegationTargetType.Baker}
+                            label={t('radioValidatorLabel')}
+                            name="type"
+                            register={f.register}
+                        />
+                        <FormRadio
+                            id={DelegationTargetType.PassiveDelegation}
+                            label={t('radioPassiveLabel')}
+                            name="type"
+                            register={f.register}
+                        />
+                        {target === DelegationTargetType.Baker && (
+                            <FormInput
+                                className="m-t-30 m-b-0"
+                                name="bakerId"
+                                register={f.register}
+                                label={t('inputValidatorId.label')}
+                                type="number"
+                                rules={{
+                                    required: t('inputValidatorId.errorRequired'),
+                                    min: { value: 0, message: t('inputValidatorId.errorMin') },
+                                    validate: validateBakerId,
+                                }}
+                            />
+                        )}
+                    </>
+                )}
+            </Form>
             <span className="capture__main_small">
-                You can delegate to an open pool of your choice, or you can stake using passive delegation.
+                {target === DelegationTargetType.PassiveDelegation ? (
+                    <Trans
+                        t={t}
+                        i18nKey="passiveDelegationDescription"
+                        components={{
+                            '1': (
+                                <ExternalLink path="https://developer.concordium.software/en/mainnet/net/concepts/concepts-delegation.html" />
+                            ),
+                        }}
+                    />
+                ) : (
+                    <Trans
+                        t={t}
+                        i18nKey="validatorDelegationDescription"
+                        components={{
+                            '1': <ExternalLink path={`${network.ccdScanUrl}nodes`} />,
+                        }}
+                    />
+                )}
             </span>
-            <div className="delegation-type__select-form">
-                <Radio id="baker" label="Baker" name="radio" />
-                <Radio id="passive" label="Passive" name="radio" />
-            </div>
-            <span className="capture__main_small">
-                Passive delegation is an alternative to delegation to a specific baker pool that has lower rewards. With
-                passive delegation you do not have to worry about the uptime or quality of a baker node.
-            </span>
-            <span className="capture__main_small">For more info you can visit developer.concordium.software</span>
-            <Button.Main label="Continue" />
-        </div>
+            <Page.Footer>
+                <Button.Main label={t('buttonContinue')} onClick={submit} />
+            </Page.Footer>
+        </Page>
     );
 }

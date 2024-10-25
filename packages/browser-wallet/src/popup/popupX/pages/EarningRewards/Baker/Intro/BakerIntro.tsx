@@ -3,6 +3,7 @@ import Carousel from '@popup/popupX/shared/Carousel';
 import { absoluteRoutes } from '@popup/popupX/constants/routes';
 import { useNavigate } from 'react-router-dom';
 import Page from '@popup/popupX/shared/Page';
+import Text from '@popup/popupX/shared/Text';
 import { Trans, useTranslation } from 'react-i18next';
 
 export default function BakerIntro() {
@@ -10,19 +11,19 @@ export default function BakerIntro() {
     const { t } = useTranslation('x', { keyPrefix: 'earn.validator.intro' });
     return (
         <Page className="baker-intro-container">
-            <Carousel onDone={() => nav(absoluteRoutes.settings.earn.baker.register.path)}>
-                <span className="capture__main_small">
+            <Carousel onDone={() => nav(absoluteRoutes.settings.earn.validator.register.path)}>
+                <Text.Capture>
                     <Page.Top heading={t('1.title')} />
                     <Trans t={t} i18nKey="1.body" />
-                </span>
-                <span className="capture__main_small">
+                </Text.Capture>
+                <Text.Capture>
                     <Page.Top heading={t('2.title')} />
                     <Trans t={t} i18nKey="2.body" />
-                </span>
-                <span className="capture__main_small">
+                </Text.Capture>
+                <Text.Capture>
                     <Page.Top heading={t('3.title')} />
                     <Trans t={t} i18nKey="3.body" />
-                </span>
+                </Text.Capture>
             </Carousel>
         </Page>
     );

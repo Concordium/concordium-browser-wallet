@@ -12,6 +12,7 @@ import ConcordiumLogo from '@assets/svgX/concordium-logo.svg';
 import { validateAccountAddress, validateTransferAmount } from '@popup/shared/utils/transaction-helpers';
 import Img, { DEFAULT_FAILED } from '@popup/shared/Img';
 import { displayAsCcd } from 'wallet-common-helpers';
+import Text from '@popup/popupX/shared/Text';
 import { RequiredUncontrolledFieldProps } from '../common/types';
 import { makeUncontrolled } from '../common/utils';
 import Button from '../../Button';
@@ -160,7 +161,7 @@ function TokenPicker({
                     </select>
                 )}
                 <div className="token-icon">{token.icon}</div>
-                <span className="text__main">{token.name}</span>
+                <Text.Main>{token.name}</Text.Main>
                 {canSelect && <SideArrow />}
             </label>
             {selectedTokenBalance !== undefined && (
@@ -394,9 +395,7 @@ export default function TokenAmountView(props: TokenAmountViewProps) {
                 <ErrorMessage className="capture__main_small">
                     {props.form.formState.errors.amount?.message}
                 </ErrorMessage>
-                <span className="capture__main_small">
-                    {t('form.tokenAmount.amount.fee', { fee: displayAsCcd(fee, false, true) })}
-                </span>
+                <Text.Capture>{t('form.tokenAmount.amount.fee', { fee: displayAsCcd(fee, false, true) })}</Text.Capture>
             </div>
             {props.receiver === true && (
                 <div className="token-amount_receiver">
