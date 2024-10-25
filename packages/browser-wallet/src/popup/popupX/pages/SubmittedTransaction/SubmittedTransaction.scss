@@ -1,0 +1,35 @@
+.submitted-tx {
+    padding-top: rem(50px);
+
+    &__card {
+        align-items: center;
+        padding: rem(24px) !important;
+
+        .capture__main_small {
+            color: $color-white;
+        }
+
+        .heading_large {
+            margin: rem(8px) 0;
+        }
+
+        svg,
+        .loader-x {
+            margin-bottom: rem(30px);
+        }
+    }
+
+    &__details-btn {
+        margin-top: rem(24px);
+    }
+
+    &__failed-icon {
+        width: rem(48px);
+        height: rem(48px);
+        margin-bottom: rem(18px) !important;
+
+        & path {
+            fill: $color-red-attention !important;
+        }
+    }
+}

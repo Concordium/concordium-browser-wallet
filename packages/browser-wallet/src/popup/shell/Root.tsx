@@ -15,7 +15,7 @@ import AccountInfoListenerContext from '@popup/shared/AccountInfoListenerContext
 import './i18n';
 
 import { mainnet } from '@shared/constants/networkConfiguration';
-import { routePrefix } from '@popup/popupX/constants/routes';
+import { routePrefix, absoluteRoutes } from '@popup/popupX/constants/routes';
 import { MessagePromptHandlersType, useMessagePromptHandlers } from '@popup/shared/utils/message-prompt-handlers';
 import Routes from './Routes';
 import RoutesX from '../popupX/shell/Routes';
@@ -136,7 +136,11 @@ export default function Root() {
 
     return (
         <Provider>
-            <MemoryRouter initialEntries={[uiStyle.value === UiStyle.Old ? '/account' : '/walletX/home']}>
+            <MemoryRouter
+                initialEntries={[
+                    uiStyle.value === UiStyle.Old ? '/account' : absoluteRoutes.settings.earn.delegator.register.path,
+                ]}
+            >
                 <Scaling>
                     <Network>
                         <Theme>

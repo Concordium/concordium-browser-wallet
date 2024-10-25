@@ -1,8 +1,9 @@
 import React, { ReactNode } from 'react';
 import Text from '@popup/popupX/shared/Text';
+import clsx from 'clsx';
 
-function PageRoot({ className, children }: { className: string; children: ReactNode }) {
-    return <div className={`page-container ${className}`}>{children}</div>;
+function PageRoot({ className, children }: { className?: string; children: ReactNode }) {
+    return <div className={clsx('page-container', className)}>{children}</div>;
 }
 
 function PageTop({ heading, children }: { heading?: ReactNode; children?: ReactNode }) {
