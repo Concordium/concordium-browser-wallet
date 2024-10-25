@@ -12,13 +12,13 @@ import ConcordiumLogo from '@assets/svgX/concordium-logo.svg';
 import { validateAccountAddress, validateTransferAmount } from '@popup/shared/utils/transaction-helpers';
 import Img, { DEFAULT_FAILED } from '@popup/shared/Img';
 import { displayAsCcd } from 'wallet-common-helpers';
+import Text from '@popup/popupX/shared/Text';
 import { RequiredUncontrolledFieldProps } from '../common/types';
 import { makeUncontrolled } from '../common/utils';
 import Button from '../../Button';
 import { formatTokenAmount, parseTokenAmount, removeNumberGrouping } from '../../utils/helpers';
 import ErrorMessage from '../ErrorMessage';
 import { TokenInfo } from './util';
-import Text from '@popup/popupX/shared/Text';
 
 type AmountInputProps = Pick<
     InputHTMLAttributes<HTMLInputElement>,

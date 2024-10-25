@@ -35,9 +35,9 @@ import i18n from '@popup/shell/i18n';
 import { useAtomValue } from 'jotai';
 import { selectedPendingTransactionsAtom } from '@popup/store/transactions';
 import { DEFAULT_TRANSACTION_EXPIRY } from '@shared/constants/time';
+import { useCallback } from 'react';
 import { BrowserWalletAccountTransaction, TransactionStatus } from './transaction-history-types';
 import { useBlockChainParameters } from '../BlockChainParametersProvider';
-import { useCallback } from 'react';
 
 export function buildSimpleTransferPayload(recipient: string, amount: bigint): SimpleTransferPayload {
     return {

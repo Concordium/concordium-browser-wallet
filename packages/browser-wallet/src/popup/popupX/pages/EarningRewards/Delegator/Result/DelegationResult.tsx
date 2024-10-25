@@ -42,7 +42,7 @@ enum TransactionSubmitErrorType {
 class TransactionSubmitError extends Error {
     private constructor(public type: TransactionSubmitErrorType) {
         super();
-        super.name = `${'TransactionSubmitError'}.type`;
+        super.name = `TransactionSubmitError.${type}`;
     }
 
     public static insufficientFunds(): TransactionSubmitError {

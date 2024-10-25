@@ -1,4 +1,5 @@
 import { AccountAddress, TransactionHash } from '@concordium/web-sdk';
+import { generatePath } from 'react-router-dom';
 
 export type RouteConfig = {
     hideBackArrow?: boolean;
@@ -228,12 +229,13 @@ const buildAbsoluteRoutes = <R extends RouteNode | RoutePath | RouteChildren>(
 export const absoluteRoutes = buildAbsoluteRoutes(relativeRoutes);
 
 export const transactionDetailsRoute = (account: AccountAddress.Type, tx: TransactionHash.Type) =>
-    absoluteRoutes.home.transactionLog.details.path
-        .replace(':account', account.address)
-        .replace(':transactionHash', TransactionHash.toHexString(tx));
+    generatePath(absoluteRoutes.home.transactionLog.details.path, {
+        account: account.address,
+        transactionHash: TransactionHash.toHexString(tx),
+    });
 
 export const submittedTransactionRoute = (tx: TransactionHash.Type) =>
-    absoluteRoutes.home.submittedTransaction.path.replace(':transactionHash', TransactionHash.toHexString(tx));
+    generatePath(absoluteRoutes.home.submittedTransaction.path, { transactionHash: TransactionHash.toHexString(tx) });
 
 /**
  * Given two absolute routes, returns the relative route between them.
