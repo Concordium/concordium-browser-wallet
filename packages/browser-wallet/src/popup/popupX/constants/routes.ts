@@ -110,7 +110,7 @@ export const relativeRoutes = {
                 },
             },
             privateKey: {
-                path: 'privateKey',
+                path: 'private-key/:account',
             },
         },
         seedPhrase: {

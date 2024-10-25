@@ -6,13 +6,13 @@ import Card from '@popup/popupX/shared/Card';
 import Button from '@popup/popupX/shared/Button';
 import Copy from '@assets/svgX/copy.svg';
 import { useAtomValue } from 'jotai';
-import { selectedAccountAtom } from '@popup/store/account';
 import { useCredential, usePrivateKey, usePublicKey } from '@popup/shared/utils/account-helpers';
 import { networkConfigurationAtom } from '@popup/store/settings';
 import { saveData } from '@popup/shared/utils/file-helpers';
 import { NetworkConfiguration } from '@shared/storage/types';
 import { getNet } from '@shared/utils/network-helpers';
 import { copyToClipboard } from '@popup/popupX/shared/utils/helpers';
+import { Navigate, useParams } from 'react-router-dom';
 
 type CredentialKeys = {
     threshold: number;
@@ -73,8 +73,7 @@ function createExport(
     return docContent;
 }
 
-function usePrivateKeyData() {
-    const selectedAccountAddress = useAtomValue(selectedAccountAtom);
+function usePrivateKeyData(selectedAccountAddress: string) {
     const credential = useCredential(selectedAccountAddress);
     const privateKey = usePrivateKey(selectedAccountAddress);
     const publicKey = usePublicKey(selectedAccountAddress);
@@ -92,9 +91,13 @@ function usePrivateKeyData() {
     return { privateKey: privateKey || '', handleExport };
 }
 
-export default function PrivateKey() {
+type Props = {
+    address: string;
+};
+
+function PrivateKey({ address }: Props) {
     const { t } = useTranslation('x', { keyPrefix: 'privateKey' });
-    const { privateKey, handleExport } = usePrivateKeyData();
+    const { privateKey, handleExport } = usePrivateKeyData(address);
 
     return (
         <Page className="account-private-key-x">
@@ -102,7 +105,14 @@ export default function PrivateKey() {
             <Page.Main>
                 <Text.Capture>{t('keyDescription')}</Text.Capture>
                 <Card>
-                    <Text.LabelRegular>{privateKey}</Text.LabelRegular>
+                    <Text.LabelRegular>
+                        {privateKey ?? (
+                            /* When no private key, put in two lines to avoid UI jumping around as it loads. */ <>
+                                <br />
+                                <br />
+                            </>
+                        )}
+                    </Text.LabelRegular>
                 </Card>
                 <Button.IconText label={t('copyKey')} icon={<Copy />} onClick={() => copyToClipboard(privateKey)} />
             </Page.Main>
@@ -111,4 +121,13 @@ export default function PrivateKey() {
             </Page.Footer>
         </Page>
     );
+}
+
+export default function Loader() {
+    const params = useParams();
+    if (!('account' in params) || params.account === undefined) {
+        // No account address passed in the url.
+        return <Navigate to="../" />;
+    }
+    return <PrivateKey address={params.account} />;
 }
