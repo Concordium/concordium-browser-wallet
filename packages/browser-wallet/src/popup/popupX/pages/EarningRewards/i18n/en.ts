@@ -117,7 +117,7 @@ const t = {
             buttonContinue: 'Continue',
         },
         submit: {
-            backTitle: 'Opening a pool',
+            backTitle: 'Delegation settings',
             sender: { label: 'Sender' },
             fee: { label: 'Estimated transaction fee' },
             button: 'Submit delegation',
