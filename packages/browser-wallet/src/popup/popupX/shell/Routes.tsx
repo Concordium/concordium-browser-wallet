@@ -28,9 +28,10 @@ import { RestoreIntro, RestoreResult } from '@popup/popupX/pages/Restore';
 import { MessagePromptHandlersType } from '@popup/shared/utils/message-prompt-handlers';
 import ConnectionRequest from '@popup/popupX/pages/prompts/ConnectionRequest';
 import ExternalRequestLayout from '@popup/popupX/page-layouts/ExternalRequestLayout';
-import RegisterDelegator from '../pages/EarningRewards/Delegator/RegisterDelegator';
 import { DelegationResult } from '../pages/EarningRewards/Delegator/Result';
 import SubmittedTransaction from '../pages/SubmittedTransaction';
+import { DelegatorIntro } from '../pages/EarningRewards/Delegator/Intro';
+import DelegatorTransactionFlow from '../pages/EarningRewards/Delegator/TransactionFlow';
 
 export default function Routes({ messagePromptHandlers }: { messagePromptHandlers: MessagePromptHandlersType }) {
     const { handleConnectionResponse } = messagePromptHandlers;
@@ -104,12 +105,22 @@ export default function Routes({ messagePromptHandlers }: { messagePromptHandler
                             <Route element={<BakerKeys />} path={relativeRoutes.settings.earn.validator.keys.path} />
                         </Route>
                         <Route path={relativeRoutes.settings.earn.delegator.path}>
+                            <Route path={`${relativeRoutes.settings.earn.delegator.register.path}`}>
+                                <Route
+                                    index
+                                    element={
+                                        <DelegatorIntro
+                                            onDoneRoute={relativeRoutes.settings.earn.delegator.register.configure.path}
+                                        />
+                                    }
+                                />
+                                <Route
+                                    path={`${relativeRoutes.settings.earn.delegator.register.configure.path}/*`}
+                                    element={<DelegatorTransactionFlow />}
+                                />
+                            </Route>
                             <Route
-                                element={<RegisterDelegator />}
-                                path={`${relativeRoutes.settings.earn.delegator.register.path}/*`}
-                            />
-                            <Route
-                                element={<RegisterDelegator />} // FIXME: change to update flow
+                                element={<DelegatorTransactionFlow />}
                                 path={`${relativeRoutes.settings.earn.delegator.update.path}/*`}
                             />
                             <Route

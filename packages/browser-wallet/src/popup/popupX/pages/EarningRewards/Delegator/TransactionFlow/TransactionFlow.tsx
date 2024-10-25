@@ -9,7 +9,7 @@ import DelegatorType from '../Type';
 import { configureDelegatorPayloadFromForm, type DelegatorForm } from '../util';
 import { DelegationResultLocationState } from '../Result/DelegationResult';
 
-export default function TransactionFlow() {
+export default function DelegatorTransactionFlow() {
     const { state: initialValues, pathname } = useLocation() as Location & { state: DelegatorForm | undefined };
     const nav = useNavigate();
     const { t } = useTranslation('x', { keyPrefix: 'earn.delegator.register' });

@@ -173,6 +173,9 @@ export const relativeRoutes = {
                 /** Configure new delegator */
                 register: {
                     path: 'register',
+                    configure: {
+                        path: 'configure',
+                    },
                 },
                 /** Configure existing delegator */
                 update: {

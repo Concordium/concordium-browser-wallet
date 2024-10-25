@@ -28,10 +28,10 @@ import {
     getDefaultExpiry,
     getTransactionAmount,
     sendTransaction,
+    useGetTransactionFee,
 } from '@popup/shared/utils/transaction-helpers';
 import { addPendingTransactionAtom } from '@popup/store/transactions';
 import { cpStakingCooldown } from '@shared/utils/chain-parameters-helpers';
-import { useGetTransactionFee } from '@popup/popupX/shared/utils/transaction-helpers';
 import { submittedTransactionRoute } from '@popup/popupX/constants/routes';
 import Text from '@popup/popupX/shared/Text';
 

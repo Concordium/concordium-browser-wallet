@@ -165,11 +165,11 @@ function TokenPicker({
                 {canSelect && <SideArrow />}
             </label>
             {selectedTokenBalance !== undefined && (
-                <Text.CaptureAdditional>
+                <span className="text__additional_small">
                     {t('form.tokenAmount.token.available', {
                         balance: formatAmount(selectedTokenBalance),
                     })}
-                </Text.CaptureAdditional>
+                </span>
             )}
         </div>
     );

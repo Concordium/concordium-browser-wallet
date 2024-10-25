@@ -15,8 +15,8 @@ import { displayNameAndSplitAddress, useSelectedCredential } from '@popup/shared
 import { formatTokenAmount } from '@popup/popupX/shared/utils/helpers';
 import { CCD_METADATA } from '@shared/constants/token-metadata';
 import { grpcClientAtom } from '@popup/store/settings';
-import { useGetTransactionFee } from '@popup/popupX/shared/utils/transaction-helpers';
 import Text from '@popup/popupX/shared/Text';
+import { useGetTransactionFee } from '@popup/shared/utils/transaction-helpers';
 
 import { DelegationTypeForm, DelegatorStakeForm, configureDelegatorPayloadFromForm } from '../util';
 
@@ -78,12 +78,11 @@ export default function DelegatorStake({ title, target, initialValues, onSubmit 
     const submit = form.handleSubmit(onSubmit);
     const selectedCred = useSelectedCredential();
     const selectedAccountInfo = useAccountInfo(selectedCred);
-    const { amount, redelegate } = form.watch();
     const getCost = useGetTransactionFee(AccountTransactionType.ConfigureDelegation);
-    const fee = useMemo(() => {
-        const payload = configureDelegatorPayloadFromForm({ target, stake: { amount, redelegate } });
-        return getCost(payload);
-    }, [target, amount, redelegate, getCost]);
+    const fee = useMemo(
+        () => getCost(configureDelegatorPayloadFromForm({ target, stake: { amount: '0', redelegate: true } })), // Use dummy values, as it does not matter when calculating transaction cost
+        [target, getCost]
+    );
 
     if (selectedAccountInfo === undefined || selectedCred === undefined || fee === undefined) {
         return null;
@@ -92,9 +91,9 @@ export default function DelegatorStake({ title, target, initialValues, onSubmit 
     return (
         <Page className="register-delegator-container">
             <Page.Top heading={title} />
-            <span className="capture__main_small m-l-5 m-t-neg-5">
+            <Text.Capture className="m-l-5 m-t-neg-5">
                 {t('selectedAccount', { account: displayNameAndSplitAddress(selectedCred) })}
-            </span>
+            </Text.Capture>
             <Form formMethods={form} onSubmit={onSubmit}>
                 {(f) => (
                     <>
