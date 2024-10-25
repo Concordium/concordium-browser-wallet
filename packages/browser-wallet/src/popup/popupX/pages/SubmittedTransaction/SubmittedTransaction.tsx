@@ -29,6 +29,7 @@ import { grpcClientAtom } from '@popup/store/settings';
 import { formatCcdAmount } from '@popup/popupX/shared/utils/helpers';
 import { LoaderInline } from '@popup/popupX/shared/Loader';
 import { useTranslation } from 'react-i18next';
+import Text from '@popup/popupX/shared/Text';
 
 const TX_TIMEOUT = 60 * 1000; // 1 minute
 
@@ -43,9 +44,9 @@ function DelegationBody({ events }: DelegationBodyProps) {
     if (stakeChange !== undefined) {
         return (
             <>
-                <span className="capture__main_small">{t('changeStake')}</span>
-                <span className="heading_large">{formatCcdAmount(stakeChange.newStake)}</span>
-                <span className="capture__main_small">CCD</span>
+                <Text.Capture>{t('changeStake')}</Text.Capture>
+                <Text.HeadingLarge>{formatCcdAmount(stakeChange.newStake)}</Text.HeadingLarge>
+                <Text.Capture>CCD</Text.Capture>
             </>
         );
     }
@@ -55,10 +56,10 @@ function DelegationBody({ events }: DelegationBodyProps) {
         | undefined;
 
     if (removal !== undefined) {
-        return <span className="capture__main_small">{t('removed')}</span>;
+        return <Text.Capture>{t('removed')}</Text.Capture>;
     }
 
-    return <span className="capture__main_small">{t('updated')}</span>;
+    return <Text.Capture>{t('updated')}</Text.Capture>;
 }
 
 type SuccessSummary = Exclude<AccountTransactionSummary, FailedTransactionSummary>;
@@ -80,9 +81,9 @@ function Success({ tx }: SuccessProps) {
             <CheckCircle />
             {tx.transactionType === TransactionKindString.Transfer && (
                 <>
-                    <span className="capture__main_small">{t('success.transfer.label')}</span>
-                    <span className="heading_large">{formatCcdAmount(tx.transfer.amount)}</span>
-                    <span className="capture__main_small">CCD</span>
+                    <Text.Capture>{t('success.transfer.label')}</Text.Capture>
+                    <Text.HeadingLarge>{formatCcdAmount(tx.transfer.amount)}</Text.HeadingLarge>
+                    <Text.Capture>CCD</Text.Capture>
                 </>
             )}
             {tx.transactionType === TransactionKindString.ConfigureDelegation && <DelegationBody {...tx} />}
@@ -97,7 +98,7 @@ function Failure({ message }: FailureProps) {
     return (
         <>
             <Cross className="submitted-tx__failed-icon" />
-            <span className="capture__main_small">{message}</span>
+            <Text.Capture>{message}</Text.Capture>
         </>
     );
 }
@@ -107,7 +108,7 @@ function Finalizing() {
     return (
         <>
             <LoaderInline />
-            <span className="capture__main_small">{t('pending.label')}</span>
+            <Text.Capture>{t('pending.label')}</Text.Capture>
         </>
     );
 }

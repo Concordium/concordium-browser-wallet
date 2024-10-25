@@ -16,6 +16,7 @@ import { formatTokenAmount } from '@popup/popupX/shared/utils/helpers';
 import { CCD_METADATA } from '@shared/constants/token-metadata';
 import { grpcClientAtom } from '@popup/store/settings';
 import { useGetTransactionFee } from '@popup/popupX/shared/utils/transaction-helpers';
+import Text from '@popup/popupX/shared/Text';
 
 import { DelegationTypeForm, DelegatorStakeForm, configureDelegatorPayloadFromForm } from '../util';
 
@@ -38,14 +39,14 @@ function PoolInfo({ validatorId }: PoolInfoProps) {
     return (
         <div className="register-delegator__pool-info">
             <div className="register-delegator__pool-info_row">
-                <span className="capture__main_small">{t('poolStake.label')}</span>
-                <span className="capture__main_small">
+                <Text.Capture>{t('poolStake.label')}</Text.Capture>
+                <Text.Capture>
                     {t('poolStake.value', { amount: formatTokenAmount(poolStake, CCD_METADATA.decimals, 2) })}
-                </span>
+                </Text.Capture>
             </div>
             <div className="register-delegator__pool-info_row">
-                <span className="capture__main_small">{t('poolCap.label')}</span>
-                <span className="capture__main_small">
+                <Text.Capture>{t('poolCap.label')}</Text.Capture>
+                <Text.Capture>
                     {t('poolCap.value', {
                         amount: formatTokenAmount(
                             poolStatus.delegatedCapitalCap!.microCcdAmount,
@@ -53,7 +54,7 @@ function PoolInfo({ validatorId }: PoolInfoProps) {
                             2
                         ),
                     })}
-                </span>
+                </Text.Capture>
             </div>
         </div>
     );
@@ -110,10 +111,10 @@ export default function DelegatorStake({ title, target, initialValues, onSubmit 
                         )}
                         <div className="register-delegator__reward">
                             <div className="register-delegator__reward_auto-add">
-                                <span className="text__main">{t('redelegate.label')}</span>
+                                <Text.Main>{t('redelegate.label')}</Text.Main>
                                 <FormToggleCheckbox register={f.register} name="redelegate" />
                             </div>
-                            <span className="capture__main_small">{t('redelegate.description')}</span>
+                            <Text.Capture>{t('redelegate.description')}</Text.Capture>
                         </div>
                     </>
                 )}

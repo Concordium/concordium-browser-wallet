@@ -11,6 +11,7 @@ import {
 import { Navigate, useLocation, Location, useNavigate } from 'react-router-dom';
 import { useAtomValue } from 'jotai';
 import { useTranslation } from 'react-i18next';
+import { useUpdateAtom } from 'jotai/utils';
 
 import { selectedAccountAtom } from '@popup/store/account';
 import Button from '@popup/popupX/shared/Button';
@@ -20,7 +21,6 @@ import Card from '@popup/popupX/shared/Card';
 import { ensureDefined } from '@shared/utils/basic-helpers';
 import { useBlockChainParametersAboveV0 } from '@popup/shared/BlockChainParametersProvider';
 import { secondsToDaysRoundedDown } from '@shared/utils/time-helpers';
-
 import { grpcClientAtom } from '@popup/store/settings';
 import { usePrivateKey } from '@popup/shared/utils/account-helpers';
 import {
@@ -29,11 +29,11 @@ import {
     getTransactionAmount,
     sendTransaction,
 } from '@popup/shared/utils/transaction-helpers';
-import { useUpdateAtom } from 'jotai/utils';
 import { addPendingTransactionAtom } from '@popup/store/transactions';
 import { cpStakingCooldown } from '@shared/utils/chain-parameters-helpers';
 import { useGetTransactionFee } from '@popup/popupX/shared/utils/transaction-helpers';
 import { submittedTransactionRoute } from '@popup/popupX/constants/routes';
+import Text from '@popup/popupX/shared/Text';
 
 enum TransactionSubmitErrorType {
     InsufficientFunds = 'InsufficientFunds',
@@ -142,7 +142,7 @@ export default function DelegationResult() {
     return (
         <Page className="delegation-result-container">
             <Page.Top heading={title} />
-            <span className="capture__main_small">{notice}</span>
+            <Text.Capture>{notice}</Text.Capture>
             <Card className="delegation-result__card">
                 <Card.Row>
                     <Card.RowDetails title={t('submit.sender.label')} value={account} />

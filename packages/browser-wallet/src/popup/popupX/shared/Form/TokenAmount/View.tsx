@@ -18,6 +18,7 @@ import Button from '../../Button';
 import { formatTokenAmount, parseTokenAmount, removeNumberGrouping } from '../../utils/helpers';
 import ErrorMessage from '../ErrorMessage';
 import { TokenInfo } from './util';
+import Text from '@popup/popupX/shared/Text';
 
 type AmountInputProps = Pick<
     InputHTMLAttributes<HTMLInputElement>,
@@ -160,15 +161,15 @@ function TokenPicker({
                     </select>
                 )}
                 <div className="token-icon">{token.icon}</div>
-                <span className="text__main">{token.name}</span>
+                <Text.Main>{token.name}</Text.Main>
                 {canSelect && <SideArrow />}
             </label>
             {selectedTokenBalance !== undefined && (
-                <span className="text__additional_small">
+                <Text.CaptureAdditional>
                     {t('form.tokenAmount.token.available', {
                         balance: formatAmount(selectedTokenBalance),
                     })}
-                </span>
+                </Text.CaptureAdditional>
             )}
         </div>
     );
@@ -394,9 +395,7 @@ export default function TokenAmountView(props: TokenAmountViewProps) {
                 <ErrorMessage className="capture__main_small">
                     {props.form.formState.errors.amount?.message}
                 </ErrorMessage>
-                <span className="capture__main_small">
-                    {t('form.tokenAmount.amount.fee', { fee: displayAsCcd(fee, false, true) })}
-                </span>
+                <Text.Capture>{t('form.tokenAmount.amount.fee', { fee: displayAsCcd(fee, false, true) })}</Text.Capture>
             </div>
             {props.receiver === true && (
                 <div className="token-amount_receiver">
