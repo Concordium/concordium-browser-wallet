@@ -62,7 +62,7 @@ function ConnectedSites({ address }: ConnectedSitesProps) {
 
 export default function Loader() {
     const params = useParams();
-    if (!('account' in params) || params.account === undefined) {
+    if (params.account === undefined) {
         // No account address passed in the url.
         return <Navigate to="../" />;
     }
