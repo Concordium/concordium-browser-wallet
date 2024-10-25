@@ -1,13 +1,14 @@
+import React from 'react';
 import { AccountInfoType, DelegationTargetType } from '@concordium/web-sdk';
 import { absoluteRoutes } from '@popup/popupX/constants/routes';
 import Button from '@popup/popupX/shared/Button';
 import Card from '@popup/popupX/shared/Card';
 import Page from '@popup/popupX/shared/Page';
+import { useTranslation } from 'react-i18next';
 import { formatCcdAmount } from '@popup/popupX/shared/utils/helpers';
 import { useSelectedAccountInfo } from '@popup/shared/AccountInfoListenerContext/AccountInfoListenerContext';
-import React from 'react';
-import { useTranslation } from 'react-i18next';
 import { Navigate, useNavigate } from 'react-router-dom';
+import AccountCooldowns from '../AccountCooldowns';
 
 export default function DelegatorStatus() {
     const { t } = useTranslation('x', { keyPrefix: 'earn.delegator' });
@@ -18,6 +19,8 @@ export default function DelegatorStatus() {
         return <Navigate to=".." />;
     }
 
+    const { accountDelegation, accountCooldowns } = accountInfo;
+
     return (
         <Page>
             <Page.Top heading={t('status.title')} />
@@ -25,16 +28,16 @@ export default function DelegatorStatus() {
                 <Card.Row>
                     <Card.RowDetails
                         title={t('values.amount.label')}
-                        value={`${formatCcdAmount(accountInfo.accountDelegation.stakedAmount)}`}
+                        value={`${formatCcdAmount(accountDelegation.stakedAmount)}`}
                     />
                 </Card.Row>
                 <Card.Row>
                     <Card.RowDetails
                         title={t('values.target.label')}
                         value={
-                            accountInfo.accountDelegation.delegationTarget.delegateType === DelegationTargetType.Baker
+                            accountDelegation.delegationTarget.delegateType === DelegationTargetType.Baker
                                 ? t('values.target.validator', {
-                                      id: accountInfo.accountDelegation.delegationTarget.bakerId.toString(),
+                                      id: accountDelegation.delegationTarget.bakerId.toString(),
                                   })
                                 : t('values.target.passive')
                         }
@@ -44,15 +47,17 @@ export default function DelegatorStatus() {
                     <Card.RowDetails
                         title={t('values.redelegate.label')}
                         value={
-                            accountInfo.accountDelegation.restakeEarnings
+                            accountDelegation.restakeEarnings
                                 ? t('values.redelegate.delegation')
                                 : t('values.redelegate.public')
                         }
                     />
                 </Card.Row>
             </Card>
+            <AccountCooldowns cooldowns={accountCooldowns} />
             <Page.Footer>
                 <Button.Main
+                    className="m-t-10"
                     label={t('status.buttonUpdate')}
                     onClick={() => nav(absoluteRoutes.settings.earn.delegator.update.path)}
                 />
