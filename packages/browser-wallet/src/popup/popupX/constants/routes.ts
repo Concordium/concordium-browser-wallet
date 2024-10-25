@@ -65,6 +65,7 @@ export const relativeRoutes = {
         path: 'home',
         config: {
             hideBackArrow: true,
+            showAccountSelector: true,
         },
         send: {
             path: 'send',
@@ -94,6 +95,12 @@ export const relativeRoutes = {
             path: 'submitted/:transactionHash',
             config: {
                 hideBackArrow: true,
+            },
+        },
+        manageTokenList: {
+            path: 'manageTokenList',
+            addToken: {
+                path: 'addToken',
             },
         },
     },

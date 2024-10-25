@@ -162,18 +162,42 @@
 
             .account-search__form {
                 width: 100%;
+
+                .form-input__field {
+                    height: rem(32px);
+                    padding: rem(10px);
+                    padding-left: rem(34px);
+                    border-radius: rem(12px);
+                    border-color: $color-grey-3;
+                    background-color: unset;
+                }
+
+                svg {
+                    position: absolute;
+                    top: rem(8px);
+                    left: rem(8px);
+                }
             }
 
-            .icon-button {
+            .button__base.button__icon.text {
                 height: rem(32px);
                 min-width: rem(90px);
                 padding: rem(8px) rem(12px);
                 margin-left: rem(8px);
                 border-radius: rem(12px);
+                text-wrap: nowrap;
+                background-color: $color-main-bg;
 
-                .capture__additional_small {
+                &:hover {
+                    opacity: 1;
+                    background-color: $color-main-bg-hover;
+                }
+
+                .label__main {
                     color: $color-white;
                     margin-left: auto;
+                    font-size: 12px;
+                    line-height: 16px;
                 }
             }
         }

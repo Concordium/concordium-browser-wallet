@@ -1,5 +1,6 @@
 .submitted-tx {
     padding-top: rem(50px);
+
     &__card {
         align-items: center;
         padding: rem(24px) !important;
@@ -12,7 +13,8 @@
             margin: rem(8px) 0;
         }
 
-        svg, .loader-x {
+        svg,
+        .loader-x {
             margin-bottom: rem(30px);
         }
     }

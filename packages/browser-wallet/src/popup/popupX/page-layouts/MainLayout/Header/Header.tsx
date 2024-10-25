@@ -1,8 +1,10 @@
-import React from 'react';
+import React, { useEffect } from 'react';
 
 import { Connection, Fullscreen, MenuButton, MenuTiles } from '@popup/popupX/page-layouts/MainLayout/Header/components';
 import clsx from 'clsx';
 import AccountSelector from './components/AccountSelector';
+
+const background = document.getElementsByClassName('bg').item(0);
 
 type HeaderProps = {
     isScrolling: boolean;
@@ -10,9 +12,29 @@ type HeaderProps = {
     menuOpen: boolean;
     hideConnection: boolean;
     setMenuOpen: (open: boolean) => void;
+    accountOpen: boolean;
+    setAccountOpen: (open: boolean) => void;
 };
 
-export default function Header({ isScrolling, hideMenu, hideConnection, menuOpen, setMenuOpen }: HeaderProps) {
+export default function Header({
+    isScrolling,
+    hideMenu,
+    hideConnection,
+    menuOpen,
+    setMenuOpen,
+    accountOpen,
+    setAccountOpen,
+}: HeaderProps) {
+    if (menuOpen) {
+        setAccountOpen(false);
+    }
+    useEffect(() => {
+        if (menuOpen || accountOpen) {
+            background?.classList.add('fade-bg');
+        } else {
+            background?.classList.remove('fade-bg');
+        }
+    }, [menuOpen, accountOpen]);
     return (
         <div className={clsx('main-header', isScrolling && 'scroll-border')}>
             <div className="main-header__top">
@@ -23,7 +45,7 @@ export default function Header({ isScrolling, hideMenu, hideConnection, menuOpen
                 <MenuButton setMenuOpen={setMenuOpen} menuOpen={menuOpen} hideMenu={hideMenu} />
             </div>
             <MenuTiles menuOpen={menuOpen} setMenuOpen={setMenuOpen} />
-            <AccountSelector showAccountSelector={false} />
+            <AccountSelector showAccountSelector={accountOpen} />
         </div>
     );
 }
