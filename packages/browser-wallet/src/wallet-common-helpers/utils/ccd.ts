@@ -81,5 +81,5 @@ export function displayAsCcd(amount: bigint | string | CcdAmount.Type, ccdPrefix
     const negative = microCcdAmount < 0n ? '-' : '';
     const abs = microCcdAmount < 0n ? -microCcdAmount : microCcdAmount;
     const formatted = addThousandSeparators(formatCcdString(microCcdToCcd(abs)));
-    return `${negative}${ccdPrefix ? getCcdSymbol() : ''}${formatted}${ccdPostfix ? ` CCD` : ''}`;
+    return `${negative}${ccdPrefix ? getCcdSymbol() : ''}${formatted}${ccdPostfix ? `\u00A0CCD` : ''}`;
 }
