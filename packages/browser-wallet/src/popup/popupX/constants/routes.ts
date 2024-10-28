@@ -1,5 +1,6 @@
 import { AccountAddress, TransactionHash } from '@concordium/web-sdk';
 import { generatePath } from 'react-router-dom';
+import i18n from '@popup/shell/i18n';
 
 export type RouteConfig = {
     hideBackArrow?: boolean;
@@ -175,13 +176,23 @@ export const relativeRoutes = {
                     path: 'keys',
                 },
             },
-            /** Delegation related routes */
+            /** Delegation section */
             delegator: {
                 path: 'delegator',
+                config: {
+                    backTitle: i18n.t('x:earn.delegator.status.backTitle'),
+                },
                 /** Configure new delegator */
                 register: {
                     path: 'register',
+                    config: {
+                        backTitle: i18n.t('x:earn.delegator.register.backTitle'),
+                    },
+                    /** Flow for constructing the transaction */
                     configure: {
+                        config: {
+                            backTitle: i18n.t('x:earn.delegator.register.backTitle'),
+                        },
                         path: 'configure',
                     },
                 },
@@ -189,9 +200,16 @@ export const relativeRoutes = {
                 update: {
                     path: 'update',
                 },
+                /** Remove existing delegator */
+                stop: {
+                    path: 'stop',
+                },
                 /** Submit configure delegator transaction */
                 submit: {
                     path: 'submit',
+                    config: {
+                        backTitle: i18n.t('x:earn.delegator.submit.backTitle'),
+                    },
                 },
             },
         },

@@ -10,7 +10,34 @@ const t = {
         delegationAction: 'Continue to delegation setup',
         note: 'Please note, a single account cannot both be a validator and a delegator, but it is possible to stop one and change to the other.',
     },
+    cooldowns: {
+        inactiveStake: {
+            label: 'Inactive stake',
+            description:
+                'You don’t receive rewards from this part of stake now, this amount will be at disposal after cooldown period.',
+        },
+        cooldown: {
+            label: 'Cooldown time:',
+            value_one: 'day left',
+            value_other: 'days left',
+        },
+    },
     delegator: {
+        values: {
+            target: { label: 'Target', passive: 'Passive delegation', validator: 'Validator {{id}}' },
+            amount: { label: 'Delegation amount' },
+            redelegate: {
+                label: 'Rewards will be',
+                delegation: 'Added to delegation amount',
+                public: 'Added to public balance',
+            },
+        },
+        status: {
+            title: 'Your delegation is registered',
+            backTitle: 'to Main page',
+            buttonUpdate: 'Update',
+            buttonStop: 'Stop',
+        },
         intro: {
             '1': {
                 title: 'Delegation',
@@ -39,6 +66,7 @@ const t = {
         },
         register: {
             title: 'Register delegation',
+            backTitle: 'Earning rewards',
             notice: 'This will lock your delegation amount. Amount is released after {{cooldown}} days from the time you remove or decrease your delegation.',
         },
         update: { title: 'Update delegation' },
@@ -89,14 +117,8 @@ const t = {
             buttonContinue: 'Continue',
         },
         submit: {
+            backTitle: 'Delegation settings',
             sender: { label: 'Sender' },
-            target: { label: 'Target', passive: 'Passive delegation', validator: 'Validator {{id}}' },
-            amount: { label: 'Delegation amount' },
-            redelegate: {
-                label: 'Rewards will be',
-                delegation: 'Added to delegation amount',
-                public: 'Added to public balance',
-            },
             fee: { label: 'Estimated transaction fee' },
             button: 'Submit delegation',
         },

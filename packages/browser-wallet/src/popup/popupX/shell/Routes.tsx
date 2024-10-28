@@ -33,6 +33,7 @@ import { DelegationResult } from '../pages/EarningRewards/Delegator/Result';
 import SubmittedTransaction from '../pages/SubmittedTransaction';
 import { DelegatorIntro } from '../pages/EarningRewards/Delegator/Intro';
 import DelegatorTransactionFlow from '../pages/EarningRewards/Delegator/TransactionFlow';
+import DelegatorStatus from '../pages/EarningRewards/Delegator/Status';
 
 export default function Routes({ messagePromptHandlers }: { messagePromptHandlers: MessagePromptHandlersType }) {
     const { handleConnectionResponse } = messagePromptHandlers;
@@ -110,6 +111,7 @@ export default function Routes({ messagePromptHandlers }: { messagePromptHandler
                             <Route element={<BakerKeys />} path={relativeRoutes.settings.earn.validator.keys.path} />
                         </Route>
                         <Route path={relativeRoutes.settings.earn.delegator.path}>
+                            <Route index element={<DelegatorStatus />} />
                             <Route path={`${relativeRoutes.settings.earn.delegator.register.path}`}>
                                 <Route
                                     index
@@ -128,6 +130,7 @@ export default function Routes({ messagePromptHandlers }: { messagePromptHandler
                                 element={<DelegatorTransactionFlow />}
                                 path={`${relativeRoutes.settings.earn.delegator.update.path}/*`}
                             />
+                            <Route element={<>TODO</>} path={`${relativeRoutes.settings.earn.delegator.stop.path}`} />
                             <Route
                                 element={<DelegationResult />}
                                 path={relativeRoutes.settings.earn.delegator.submit.path}
