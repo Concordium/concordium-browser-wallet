@@ -13,7 +13,7 @@ import { IdCardAccountInfo, IdCardAttributeInfo } from '@popup/popupX/shared/IdC
 import { credentialsAtomWithLoading } from '@popup/store/account';
 import { displayNameAndSplitAddress } from '@popup/shared/utils/account-helpers';
 import { useAccountInfo } from '@popup/shared/AccountInfoListenerContext';
-import { displayAsCcd } from 'wallet-common-helpers';
+import { compareAttributes, displayAsCcd } from 'wallet-common-helpers';
 
 function CcdBalance({ credential }: { credential: WalletCredential }) {
     const accountInfo = useAccountInfo(credential);
@@ -38,10 +38,12 @@ function ConfirmedIdCard({ identity, onNewName }: ConfirmedIdentityProps) {
     const providerName = provider?.ipInfo.ipDescription.name ?? 'Unknown';
     const rowsIdInfo: IdCardAttributeInfo[] = useMemo(
         () =>
-            Object.entries(identity.idObject.value.attributeList.chosenAttributes).map(([key, value]) => ({
-                key: getAttributeName(key as AttributeKey),
-                value: displayAttribute(key, value),
-            })),
+            Object.entries(identity.idObject.value.attributeList.chosenAttributes)
+                .sort(([left], [right]) => compareAttributes(left, right))
+                .map(([key, value]) => ({
+                    key: getAttributeName(key as AttributeKey),
+                    value: displayAttribute(key, value),
+                })),
         [identity]
     );
     const rowsConnectedAccounts = useMemo(() => {
