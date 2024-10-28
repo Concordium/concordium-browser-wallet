@@ -1,4 +1,4 @@
-import { ConfigureDelegationPayload, DelegationTarget, DelegationTargetType } from '@concordium/web-sdk';
+import { CcdAmount, ConfigureDelegationPayload, DelegationTarget, DelegationTargetType } from '@concordium/web-sdk';
 import { AmountForm } from '@popup/popupX/shared/Form/TokenAmount';
 import { parseCcdAmount } from '@popup/popupX/shared/utils/helpers';
 
@@ -24,20 +24,40 @@ export type DelegatorForm = {
     stake: DelegatorStakeForm;
 };
 
-/** Constructs a {@linkcode ConfigureDelegationPayload} from the corresponding {@linkcode DelegatorForm} */
-export function configureDelegatorPayloadFromForm(values: DelegatorForm): ConfigureDelegationPayload {
-    let delegationTarget: DelegationTarget;
-    if (values.target.type === DelegationTargetType.PassiveDelegation) {
-        delegationTarget = { delegateType: DelegationTargetType.PassiveDelegation };
-    } else if (values.target.bakerId === undefined) {
-        throw new Error('Expected bakerId to be defined');
-    } else {
-        delegationTarget = { delegateType: DelegationTargetType.Baker, bakerId: BigInt(values.target.bakerId) };
+/**
+ * Constructs a {@linkcode ConfigureDelegationPayload} from the corresponding {@linkcode DelegatorForm}
+ * @throws if the given `values.state.amount` cannot be parsed.
+ */
+export function configureDelegatorPayloadFromForm(
+    values: DelegatorForm,
+    existingValues?: DelegatorForm
+): ConfigureDelegationPayload {
+    let delegationTarget: DelegationTarget | undefined;
+    if (
+        existingValues === undefined ||
+        values.target.type !== existingValues.target.type ||
+        values.target.bakerId !== existingValues.target.bakerId
+    ) {
+        if (values.target.type === DelegationTargetType.PassiveDelegation) {
+            delegationTarget = { delegateType: DelegationTargetType.PassiveDelegation };
+        } else if (values.target.bakerId === undefined) {
+            throw new Error('Expected bakerId to be defined');
+        } else {
+            delegationTarget = { delegateType: DelegationTargetType.Baker, bakerId: BigInt(values.target.bakerId) };
+        }
+    }
+    let restakeEarnings: boolean | undefined;
+    if (existingValues === undefined || values.stake.redelegate !== existingValues.stake.redelegate) {
+        restakeEarnings = values.stake.redelegate;
+    }
+    let stake: CcdAmount.Type | undefined;
+    if (existingValues === undefined || values.stake.amount !== existingValues.stake.amount) {
+        stake = parseCcdAmount(values.stake.amount);
     }
 
     return {
-        restakeEarnings: values.stake.redelegate,
-        stake: parseCcdAmount(values.stake.amount),
+        restakeEarnings,
+        stake,
         delegationTarget,
     };
 }

@@ -3,7 +3,7 @@ import { UseFormReturn } from 'react-hook-form';
 import { useTranslation } from 'react-i18next';
 import { useAtomValue } from 'jotai';
 import { useAsyncMemo } from 'wallet-common-helpers';
-import { AccountTransactionType, DelegationTargetType } from '@concordium/web-sdk';
+import { AccountTransactionType, CcdAmount, DelegationTargetType } from '@concordium/web-sdk';
 
 import Button from '@popup/popupX/shared/Button';
 import FormToggleCheckbox from '@popup/popupX/shared/Form/ToggleCheckbox';
@@ -65,12 +65,15 @@ type Props = {
     title: string;
     /** The initial values of the step, if any */
     initialValues?: DelegatorStakeForm;
+    /** The delegation target of the transaction */
     target: DelegationTypeForm;
+    /** The calculated fee for the transaction */
+    fee: CcdAmount.Type;
     /** The submit handler triggered when submitting the form in the step */
     onSubmit(values: DelegatorStakeForm): void;
 };
 
-export default function DelegatorStake({ title, target, initialValues, onSubmit }: Props) {
+export default function DelegatorStake({ title, target, fee, initialValues, onSubmit }: Props) {
     const { t } = useTranslation('x', { keyPrefix: 'earn.delegator.stake' });
     const form = useForm<DelegatorStakeForm>({
         defaultValues: initialValues ?? { amount: '0.00', redelegate: true },
@@ -78,11 +81,6 @@ export default function DelegatorStake({ title, target, initialValues, onSubmit 
     const submit = form.handleSubmit(onSubmit);
     const selectedCred = useSelectedCredential();
     const selectedAccountInfo = useAccountInfo(selectedCred);
-    const getCost = useGetTransactionFee(AccountTransactionType.ConfigureDelegation);
-    const fee = useMemo(
-        () => getCost(configureDelegatorPayloadFromForm({ target, stake: { amount: '0', redelegate: true } })), // Use dummy values, as it does not matter when calculating transaction cost
-        [target, getCost]
-    );
 
     if (selectedAccountInfo === undefined || selectedCred === undefined || fee === undefined) {
         return null;

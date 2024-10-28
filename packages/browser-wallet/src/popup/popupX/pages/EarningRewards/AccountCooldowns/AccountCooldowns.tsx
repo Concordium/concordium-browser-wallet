@@ -22,7 +22,7 @@ export default function AccountCooldowns({ cooldowns }: Props) {
             {cooldowns.map((c) => {
                 const cdDays = timestampToRelativeDays(c.timestamp);
                 return (
-                    <Card className="account-cooldowns__item">
+                    <Card className="account-cooldowns__item" key={c.timestamp.toString()}>
                         <Card.Row className="flex-column">
                             <Text.Capture className="account-cooldowns__em">{t('inactiveStake.label')}</Text.Capture>
                             <Text.Capture>{t('inactiveStake.description')}</Text.Capture>

@@ -2,13 +2,15 @@ import React from 'react';
 import { FormRadio } from '@popup/popupX/shared/Form/Radios';
 import { Trans, useTranslation } from 'react-i18next';
 import { Validate } from 'react-hook-form';
+import { useAtomValue } from 'jotai';
+import { DelegationTargetType, OpenStatusText } from '@concordium/web-sdk';
+
 import Page from '@popup/popupX/shared/Page';
 import ExternalLink from '@popup/popupX/shared/ExternalLink';
-import { DelegationTargetType, OpenStatusText } from '@concordium/web-sdk';
 import Form, { useForm } from '@popup/popupX/shared/Form';
 import Button from '@popup/popupX/shared/Button';
 import FormInput from '@popup/popupX/shared/Form/Input/Input';
-import { useAtomValue } from 'jotai';
+import Text from '@popup/popupX/shared/Text';
 import { grpcClientAtom, networkConfigurationAtom } from '@popup/store/settings';
 import { DelegationTypeForm } from '../util';
 
@@ -48,7 +50,7 @@ export default function DelegationType({ initialValues, onSubmit, title }: Props
     return (
         <Page className="delegation-type-container">
             <Page.Top heading={title} />
-            <span className="capture__main_small">{t('description')}</span>
+            <Text.Capture>{t('description')}</Text.Capture>
             <Form<DelegationTypeForm> className="delegation-type__select-form" formMethods={form} onSubmit={onSubmit}>
                 {(f) => (
                     <>
@@ -81,7 +83,7 @@ export default function DelegationType({ initialValues, onSubmit, title }: Props
                     </>
                 )}
             </Form>
-            <span className="capture__main_small">
+            <Text.Capture>
                 {target === DelegationTargetType.PassiveDelegation ? (
                     <Trans
                         t={t}
@@ -101,7 +103,7 @@ export default function DelegationType({ initialValues, onSubmit, title }: Props
                         }}
                     />
                 )}
-            </span>
+            </Text.Capture>
             <Page.Footer>
                 <Button.Main label={t('buttonContinue')} onClick={submit} />
             </Page.Footer>
