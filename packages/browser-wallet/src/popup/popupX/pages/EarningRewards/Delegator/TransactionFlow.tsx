@@ -1,18 +1,12 @@
-import React, { useCallback, useMemo, useState } from 'react';
+import React, { useCallback, useState } from 'react';
 import { Location, Navigate, useLocation, useNavigate } from 'react-router-dom';
 import { useTranslation } from 'react-i18next';
-import {
-    AccountInfoType,
-    AccountTransactionType,
-    ConfigureDelegationPayload,
-    DelegationTargetType,
-} from '@concordium/web-sdk';
+import { AccountInfoType, DelegationTargetType } from '@concordium/web-sdk';
 
 import { absoluteRoutes } from '@popup/popupX/constants/routes';
 import MultiStepForm from '@popup/shared/MultiStepForm';
 import { useSelectedAccountInfo } from '@popup/shared/AccountInfoListenerContext/AccountInfoListenerContext';
 import { formatCcdAmount } from '@popup/popupX/shared/utils/helpers';
-import { useGetTransactionFee } from '@popup/shared/utils/transaction-helpers';
 import DelegatorStake from './Stake';
 import DelegatorType from './Type';
 import { configureDelegatorPayloadFromForm, type DelegatorForm } from './util';
@@ -29,29 +23,6 @@ export default function DelegatorTransactionFlow({ existingValues }: Props) {
 
     const initialValues = state ?? existingValues;
     const store = useState<Partial<DelegatorForm>>(initialValues ?? {});
-    const [values] = store;
-
-    const getCost = useGetTransactionFee(AccountTransactionType.ConfigureDelegation);
-    const fee = useMemo(() => {
-        let payload: ConfigureDelegationPayload;
-        try {
-            //  We try here, as parsing invalid CCD amounts from the input can fail.
-            payload = configureDelegatorPayloadFromForm(values as DelegatorForm, existingValues);
-        } catch {
-            // Fall back to a payload from a form with any parsable amount
-            payload = configureDelegatorPayloadFromForm(
-                {
-                    target: {
-                        type: values.target?.type ?? DelegationTargetType.PassiveDelegation,
-                        bakerId: values.target?.bakerId,
-                    },
-                    stake: { amount: '0', redelegate: values.stake?.redelegate ?? false },
-                },
-                existingValues
-            );
-        }
-        return getCost(payload);
-    }, [values, getCost]);
 
     const handleDone = useCallback(
         (form: DelegatorForm) => {
@@ -79,17 +50,13 @@ export default function DelegatorTransactionFlow({ existingValues }: Props) {
                             return <Navigate to=".." />;
                         }
 
-                        if (fee === undefined) {
-                            return null;
-                        }
-
                         return (
                             <DelegatorStake
                                 title={t('title')}
                                 target={form.target}
                                 onSubmit={onNext}
                                 initialValues={initial}
-                                fee={fee}
+                                existingValues={existingValues}
                             />
                         );
                     },
