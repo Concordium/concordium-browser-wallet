@@ -1,5 +1,5 @@
 import React from 'react';
-import { AccountInfoType, DelegationTargetType } from '@concordium/web-sdk';
+import { AccountInfoType, CcdAmount, DelegationTargetType } from '@concordium/web-sdk';
 import { absoluteRoutes } from '@popup/popupX/constants/routes';
 import Button from '@popup/popupX/shared/Button';
 import Card from '@popup/popupX/shared/Card';
@@ -9,6 +9,12 @@ import { formatCcdAmount } from '@popup/popupX/shared/utils/helpers';
 import { useSelectedAccountInfo } from '@popup/shared/AccountInfoListenerContext/AccountInfoListenerContext';
 import { Navigate, useNavigate } from 'react-router-dom';
 import AccountCooldowns from '../AccountCooldowns';
+import { DelegationResultLocationState } from './Result/DelegationResult';
+
+const REMOVE_STATE: DelegationResultLocationState = {
+    type: 'remove',
+    payload: { stake: CcdAmount.zero() },
+};
 
 export default function DelegatorStatus() {
     const { t } = useTranslation('x', { keyPrefix: 'earn.delegator' });
@@ -63,7 +69,7 @@ export default function DelegatorStatus() {
                 />
                 <Button.Main
                     label={t('status.buttonStop')}
-                    onClick={() => nav(absoluteRoutes.settings.earn.delegator.stop.path)}
+                    onClick={() => nav(absoluteRoutes.settings.earn.delegator.submit.path, { state: REMOVE_STATE })}
                 />
             </Page.Footer>
         </Page>

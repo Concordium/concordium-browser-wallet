@@ -112,19 +112,18 @@ export default function DelegationResult() {
         return secondsToDaysRoundedDown(cooldownParam);
     }, [parametersV1]);
 
-    const title = useMemo(() => {
+    const [title, notice] = useMemo(() => {
         switch (state?.type) {
             case 'register':
-                return t('register.title');
+                return [t('register.title'), t('register.notice', { cooldown })];
             case 'change':
-                return t('update.title');
-            // case 'remove':
-            //    return t('remove.title');
+                return [t('update.title'), t('update.lowerStakeNotice', { cooldown })];
+            case 'remove':
+                return [t('remove.title'), t('remove.notice', { cooldown })];
             default:
-                return undefined;
+                throw new Error("'type' must be defined on route state");
         }
-    }, [state, t]);
-    const notice = t('register.notice', { cooldown }); // TODO: add more cases when supporting change/remove
+    }, [state, t, cooldown]);
 
     if (state === undefined) {
         return <Navigate to=".." />;
@@ -142,7 +141,7 @@ export default function DelegationResult() {
     return (
         <Page className="delegation-result-container">
             <Page.Top heading={title} />
-            <Text.Capture>{notice}</Text.Capture>
+            {notice !== undefined && <Text.Capture>{notice}</Text.Capture>}
             <Card className="delegation-result__card">
                 <Card.Row>
                     <Card.RowDetails title={t('submit.sender.label')} value={account} />

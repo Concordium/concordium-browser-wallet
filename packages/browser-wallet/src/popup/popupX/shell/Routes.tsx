@@ -133,7 +133,6 @@ export default function Routes({ messagePromptHandlers }: { messagePromptHandler
                                 element={<UpdateDelegatorTransactionFlow />}
                                 path={`${relativeRoutes.settings.earn.delegator.update.path}/*`}
                             />
-                            <Route element={<>TODO</>} path={`${relativeRoutes.settings.earn.delegator.stop.path}`} />
                             <Route
                                 element={<DelegationResult />}
                                 path={relativeRoutes.settings.earn.delegator.submit.path}

@@ -200,10 +200,6 @@ export const relativeRoutes = {
                 update: {
                     path: 'update',
                 },
-                /** Remove existing delegator */
-                stop: {
-                    path: 'stop',
-                },
                 /** Submit configure delegator transaction */
                 submit: {
                     path: 'submit',
