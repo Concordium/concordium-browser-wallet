@@ -1,6 +1,7 @@
 import React, { useCallback, useMemo } from 'react';
 import {
     AccountAddress,
+    AccountInfoDelegator,
     AccountTransactionPayload,
     AccountTransactionType,
     CcdAmount,
@@ -34,6 +35,7 @@ import { addPendingTransactionAtom } from '@popup/store/transactions';
 import { cpStakingCooldown } from '@shared/utils/chain-parameters-helpers';
 import { submittedTransactionRoute } from '@popup/popupX/constants/routes';
 import Text from '@popup/popupX/shared/Text';
+import { useSelectedAccountInfo } from '@popup/shared/AccountInfoListenerContext/AccountInfoListenerContext';
 
 enum TransactionSubmitErrorType {
     InsufficientFunds = 'InsufficientFunds',
@@ -96,11 +98,11 @@ export default function DelegationResult() {
     const nav = useNavigate();
     const { t } = useTranslation('x', { keyPrefix: 'earn.delegator' });
     const getCost = useGetTransactionFee(AccountTransactionType.ConfigureDelegation);
-    const account = ensureDefined(useAtomValue(selectedAccountAtom), 'No account selected');
+    const accountInfo = ensureDefined(useSelectedAccountInfo(), 'No account selected');
 
     const parametersV1 = useBlockChainParametersAboveV0();
     const submitTransaction = useTransactionSubmit(
-        AccountAddress.fromBase58(account),
+        accountInfo.accountAddress,
         AccountTransactionType.ConfigureDelegation
     );
 
@@ -117,6 +119,14 @@ export default function DelegationResult() {
             case 'register':
                 return [t('register.title'), t('register.notice', { cooldown })];
             case 'change':
+                if (
+                    state.payload.stake === undefined ||
+                    state.payload.stake.microCcdAmount >=
+                        (accountInfo as AccountInfoDelegator).accountDelegation.stakedAmount.microCcdAmount
+                ) {
+                    // Staked amount is not lowered
+                    return [t('update.title')];
+                }
                 return [t('update.title'), t('update.lowerStakeNotice', { cooldown })];
             case 'remove':
                 return [t('remove.title'), t('remove.notice', { cooldown })];
@@ -144,7 +154,7 @@ export default function DelegationResult() {
             {notice !== undefined && <Text.Capture>{notice}</Text.Capture>}
             <Card className="delegation-result__card">
                 <Card.Row>
-                    <Card.RowDetails title={t('submit.sender.label')} value={account} />
+                    <Card.RowDetails title={t('submit.sender.label')} value={accountInfo.accountAddress.address} />
                 </Card.Row>
                 {state.payload.delegationTarget !== undefined && (
                     <Card.Row>
