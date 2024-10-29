@@ -1,35 +1,53 @@
 /* eslint-disable react/function-component-definition, react/destructuring-assignment */
 import React from 'react';
 import { Meta, StoryObj } from '@storybook/react';
-import Modal from './Modal';
+import FullscreenNotice from './FullscreenNotice';
+import Page from '../Page';
+import Button from '../Button';
 
 export default {
-    title: 'Shared/Modal',
-    component: Modal,
+    title: 'X/Shared/FullscreenNotice',
+    component: FullscreenNotice,
+    beforeEach: () => {
+        const body = document.getElementsByTagName('body').item(0);
+        body?.classList.add('popup-x');
+
+        return () => {
+            body?.classList.remove('popup-x');
+        };
+    },
     tags: ['!autodocs'],
-} as Meta<typeof Modal>;
+} as Meta<typeof FullscreenNotice>;
 
-type Story = StoryObj<typeof Modal>;
-
-const render: Story['render'] = (args) => {
-    return (
-        <div style={{ width: 300, height: 400 }}>
-            <style>{`body {width:fit-content;}`}</style>
-            <Modal {...args} />
-        </div>
-    );
-};
+type Story = StoryObj<typeof FullscreenNotice>;
 
 export const Primary: Story = {
-    render,
     args: {
-        children: <>Modal content</>,
+        children: (
+            <Page>
+                <Page.Top heading="Some title" />
+                <p>
+                    Lorem ipsum dolor sit amet, consectetur adipiscing elit, sed do eiusmod tempor incididunt ut labore
+                    et dolore magna aliqua. Tincidunt nunc pulvinar sapien et. Mattis aliquam faucibus purus in.
+                    Tristique sollicitudin nibh sit amet commodo nulla facilisi. Eget nullam non nisi est sit amet. At
+                    lectus urna duis convallis. Consequat semper viverra nam libero. Gravida rutrum quisque non tellus
+                    orci ac auctor. Mattis aliquam faucibus purus in massa tempor nec feugiat. Consectetur adipiscing
+                    elit duis tristique sollicitudin. Sit amet est placerat in egestas erat imperdiet sed euismod.
+                    Ornare massa eget egestas purus viverra. Viverra maecenas accumsan lacus vel facilisis. Malesuada
+                    fames ac turpis egestas integer eget aliquet nibh. Non diam phasellus vestibulum lorem sed risus.
+                    Tincidunt vitae semper quis lectus nulla. Cursus euismod quis viverra nibh cras pulvinar mattis nunc
+                    sed.
+                </p>
+                <Page.Footer>
+                    <Button.Main label="Some action" />
+                </Page.Footer>
+            </Page>
+        ),
         open: true,
     },
 };
 
 export const WallOfText: Story = {
-    render,
     args: {
         children: (
             <>
@@ -84,12 +102,5 @@ export const WallOfText: Story = {
             </>
         ),
         open: true,
-    },
-};
-
-export const Trigger: Story = {
-    args: {
-        children: <>Modal content</>,
-        trigger: <button type="button">Open modal</button>,
     },
 };
