@@ -55,7 +55,10 @@ function DelegatorTransactionFlow({ existingValues, title }: Props) {
 
             nav(pathname, { replace: true, state: form }); // Override current router entry with stateful version
 
-            const submitDelegatorState: DelegationResultLocationState = { payload, type: 'register' };
+            const submitDelegatorState: DelegationResultLocationState = {
+                payload,
+                type: existingValues !== undefined ? 'change' : 'register',
+            };
             nav(absoluteRoutes.settings.earn.delegator.submit.path, { state: submitDelegatorState });
         },
         [pathname, existingValues, setNoChangesNotice]
