@@ -1,0 +1,23 @@
+.fullscreen-notice {
+    position: absolute;
+    top: 0;
+    bottom: 0;
+    left: 0;
+    right: 0;
+    z-index: 1000;
+
+    &__back {
+        border: none;
+        background: none;
+
+        &:hover {
+            background: none !important;
+        }
+    }
+
+    &__content {
+        padding: 0 rem(24px);
+        overflow: auto;
+        height: calc(100% - 7.4rem);
+    }
+}
