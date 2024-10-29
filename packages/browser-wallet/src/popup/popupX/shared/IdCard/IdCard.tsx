@@ -3,6 +3,7 @@ import Card from '@popup/popupX/shared/Card';
 import Text from '@popup/popupX/shared/Text';
 import Button from '@popup/popupX/shared/Button';
 import useEditableValue from '@popup/popupX/shared/EditableValue';
+import { useTranslation } from 'react-i18next';
 
 export type IdCardAttributeInfo = {
     key: string;
@@ -32,20 +33,22 @@ export default function IdCard({
     identityNameFallback,
 }: IdCardProps) {
     const editable = useEditableValue(identityName, identityNameFallback ?? '', onNewName ?? (() => {}));
+    const { t } = useTranslation('x', { keyPrefix: 'sharedX' });
+
     return (
         <Card type="gradient" className="id-card-x">
             <span className="title-row">
                 <Text.Main>{editable.value}</Text.Main>
                 {editable.isEditing ? (
                     <>
-                        <Button.Secondary label="Save" onClick={editable.onComplete} />
-                        <Button.Secondary label="Abort" onClick={editable.onAbort} />
+                        <Button.Secondary label={t('idCard.name.save')} onClick={editable.onComplete} />
+                        <Button.Secondary label={t('idCard.name.abort')} onClick={editable.onAbort} />
                     </>
                 ) : (
-                    onNewName && <Button.Secondary label="Edit Name" onClick={editable.onEdit} />
+                    onNewName && <Button.Secondary label={t('idCard.name.edit')} onClick={editable.onEdit} />
                 )}
             </span>
-            <Text.Capture>Verified by {idProviderName}</Text.Capture>
+            <Text.Capture>{t('idCard.verifiedBy', { idProviderName })}</Text.Capture>
             <Card>
                 {rowsIdInfo.map((info) => (
                     <Card.Row key={info.key}>
