@@ -5,6 +5,9 @@ const t = {
             weak: 'Weak',
             medium: 'Medium',
             strong: 'Strong',
+            incorrectPasscode: 'Incorrect passcode',
+            currentPasscode: 'Enter current passcode',
+            passcodeRequired: 'A passcode must be entered',
         },
         tokenAmount: {
             token: {

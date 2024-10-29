@@ -75,7 +75,7 @@ const Form = forwardRef(
         const internal = useForm<V>({ defaultValues });
         const methods = external ?? internal;
 
-        const submit = () => (onSubmit === undefined ? noOp : methods.handleSubmit(onSubmit));
+        const submit = onSubmit === undefined ? () => noOp : methods.handleSubmit(onSubmit);
 
         return (
             <FormProvider {...methods}>

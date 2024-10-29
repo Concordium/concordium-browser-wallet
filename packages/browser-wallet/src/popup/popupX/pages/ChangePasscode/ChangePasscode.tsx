@@ -54,7 +54,7 @@ export default function ChangePasscode() {
             <Page.Top heading={t('changePasscode')} />
             <Page.Main>
                 <Form
-                    id="test-form"
+                    id="change-password-form"
                     onSubmit={handleSubmit}
                     className="change-passcode-page__form"
                     formMethods={form}
@@ -98,7 +98,7 @@ export default function ChangePasscode() {
             </Page.Main>
             <Page.Footer>
                 <Button.Main
-                    form="test-form"
+                    form="change-password-form"
                     type="submit"
                     label={t('changePasscode')}
                     disabled={form.formState.isSubmitting}
