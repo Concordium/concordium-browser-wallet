@@ -27,7 +27,7 @@ function Header({ isScrolling, onBack }: HeaderProps) {
 const htmlElement = document.getElementsByTagName('html')[0]!;
 const bodyElement = document.getElementsByTagName('body')[0]!;
 
-export type ModalProps = {
+type Props = {
     /** Control whether notice is shown or not */
     open: boolean;
     /** Invoked when the notice is closed */
@@ -50,11 +50,7 @@ export type ModalProps = {
  *   This content is shown in a modal!
  * </FullscreenNotice>
  */
-export default function FullscreenNotice({
-    open,
-    onClose,
-    children,
-}: PropsWithChildren<ModalProps>): JSX.Element | null {
+export default function FullscreenNotice({ open, onClose, children }: PropsWithChildren<Props>): JSX.Element | null {
     const [scroll, setScroll] = React.useState(0);
     const isScrolling = useMemo(() => scroll > 0, [!!scroll]);
     const close = useCallback(() => {

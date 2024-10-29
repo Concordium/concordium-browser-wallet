@@ -6,6 +6,7 @@ import Modal from './Modal';
 export default {
     title: 'Shared/Modal',
     component: Modal,
+    tags: ['!autodocs'],
 } as Meta<typeof Modal>;
 
 type Story = StoryObj<typeof Modal>;

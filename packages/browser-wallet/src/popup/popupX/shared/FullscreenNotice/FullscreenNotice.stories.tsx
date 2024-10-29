@@ -16,6 +16,7 @@ export default {
             body?.classList.remove('popup-x');
         };
     },
+    tags: ['!autodocs'],
 } as Meta<typeof FullscreenNotice>;
 
 type Story = StoryObj<typeof FullscreenNotice>;
