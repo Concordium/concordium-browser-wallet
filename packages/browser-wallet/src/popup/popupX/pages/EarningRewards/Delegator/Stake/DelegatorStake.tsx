@@ -26,7 +26,7 @@ import { useGetTransactionFee } from '@popup/shared/utils/transaction-helpers';
 import FullscreenNotice, { FullscreenNoticeProps } from '@popup/popupX/shared/FullscreenNotice';
 
 import { DelegationTypeForm, DelegatorForm, DelegatorStakeForm, configureDelegatorPayloadFromForm } from '../util';
-import {isAboveStakeWarningThreshold} from '../../util';
+import { STAKE_WARNING_THRESHOLD, isAboveStakeWarningThreshold } from '../../util';
 
 type PoolInfoProps = {
     /** The validator pool ID to show information for */
@@ -72,15 +72,16 @@ type HighStakeNoticeProps = FullscreenNoticeProps & {
     onContinue(): void;
 };
 
-function HighStakeNotice({ onContinue, ...props }: HighStakeNoticeProps) {
+function HighStakeWarning({ onContinue, ...props }: HighStakeNoticeProps) {
+    const { t } = useTranslation('x', { keyPrefix: 'earn.delegator.stake.overStakeThresholdWarning' });
     return (
         <FullscreenNotice {...props}>
             <Page>
-                <Page.Top heading="Title" />
-                Notice text...
+                <Page.Top heading={t('title')} />
+                {t('description', { threshold: STAKE_WARNING_THRESHOLD.toString() })}
                 <Page.Footer>
-                    <Button.Main label="Continue" onClick={onContinue} />
-                    <Button.Main label="Enter new stake" onClick={props.onClose} />
+                    <Button.Main label={t('buttonContinue')} onClick={onContinue} />
+                    <Button.Main label={t('buttonBack')} onClick={props.onClose} />
                 </Page.Footer>
             </Page>
         </FullscreenNotice>
@@ -171,7 +172,7 @@ export default function DelegatorStake({ title, target, initialValues, existingV
 
     return (
         <>
-            <HighStakeNotice open={highStakeWarning} onClose={() => setHighStakeWarning(false)} onContinue={submit} />
+            <HighStakeWarning open={highStakeWarning} onClose={() => setHighStakeWarning(false)} onContinue={submit} />
             <Page className="register-delegator-container">
                 <Page.Top heading={title} />
                 <Text.Capture className="m-l-5 m-t-neg-5">

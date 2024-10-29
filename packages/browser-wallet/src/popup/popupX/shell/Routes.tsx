@@ -32,7 +32,10 @@ import { ManageTokenList, AddToken } from '@popup/popupX/pages/ManageTokens';
 import { DelegationResult } from '../pages/EarningRewards/Delegator/Result';
 import SubmittedTransaction from '../pages/SubmittedTransaction';
 import { DelegatorIntro } from '../pages/EarningRewards/Delegator/Intro';
-import DelegatorTransactionFlow, { UpdateDelegatorTransactionFlow } from '../pages/EarningRewards/Delegator/TransactionFlow';
+import {
+    RegisterDelegatorTransactionFlow,
+    UpdateDelegatorTransactionFlow,
+} from '../pages/EarningRewards/Delegator/TransactionFlow';
 import DelegatorStatus from '../pages/EarningRewards/Delegator/Status';
 
 export default function Routes({ messagePromptHandlers }: { messagePromptHandlers: MessagePromptHandlersType }) {
@@ -123,7 +126,7 @@ export default function Routes({ messagePromptHandlers }: { messagePromptHandler
                                 />
                                 <Route
                                     path={`${relativeRoutes.settings.earn.delegator.register.configure.path}/*`}
-                                    element={<DelegatorTransactionFlow />}
+                                    element={<RegisterDelegatorTransactionFlow />}
                                 />
                             </Route>
                             <Route

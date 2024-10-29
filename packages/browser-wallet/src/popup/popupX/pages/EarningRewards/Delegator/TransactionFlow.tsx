@@ -1,3 +1,4 @@
+/* eslint-disable react/destructuring-assignment */
 import React, { useCallback, useState } from 'react';
 import { Location, Navigate, useLocation, useNavigate } from 'react-router-dom';
 import { useTranslation } from 'react-i18next';
@@ -7,19 +8,38 @@ import { absoluteRoutes } from '@popup/popupX/constants/routes';
 import MultiStepForm from '@popup/shared/MultiStepForm';
 import { useSelectedAccountInfo } from '@popup/shared/AccountInfoListenerContext/AccountInfoListenerContext';
 import { formatCcdAmount } from '@popup/popupX/shared/utils/helpers';
+import FullscreenNotice, { FullscreenNoticeProps } from '@popup/popupX/shared/FullscreenNotice';
+import Page from '@popup/popupX/shared/Page';
+import Button from '@popup/popupX/shared/Button';
 import DelegatorStake from './Stake';
 import DelegatorType from './Type';
 import { configureDelegatorPayloadFromForm, type DelegatorForm } from './util';
 import { DelegationResultLocationState } from './Result/DelegationResult';
 
+function NoChangesNotice(props: FullscreenNoticeProps) {
+    const { t } = useTranslation('x', { keyPrefix: 'earn.delegator.update.noChangesNotice' });
+    return (
+        <FullscreenNotice {...props}>
+            <Page>
+                <Page.Top heading={t('title')} />
+                {t('description')}
+                <Page.Footer>
+                    <Button.Main label={t('buttonBack')} onClick={props.onClose} />
+                </Page.Footer>
+            </Page>
+        </FullscreenNotice>
+    );
+}
+
 type Props = {
+    title: string;
     existingValues?: DelegatorForm | undefined;
 };
 
-export default function DelegatorTransactionFlow({ existingValues }: Props) {
+function DelegatorTransactionFlow({ existingValues, title }: Props) {
     const { state, pathname } = useLocation() as Location & { state: DelegatorForm | undefined };
-    const { t } = useTranslation('x', { keyPrefix: 'earn.delegator.register' });
     const nav = useNavigate();
+    const [noChangesNotice, setNoChangesNotice] = useState(false);
 
     const initialValues = state ?? existingValues;
     const store = useState<Partial<DelegatorForm>>(initialValues ?? {});
@@ -28,45 +48,59 @@ export default function DelegatorTransactionFlow({ existingValues }: Props) {
         (form: DelegatorForm) => {
             const payload = configureDelegatorPayloadFromForm(form, existingValues);
 
+            if (Object.values(payload).every((v) => v === undefined)) {
+                setNoChangesNotice(true);
+                return;
+            }
+
             nav(pathname, { replace: true, state: form }); // Override current router entry with stateful version
 
             const submitDelegatorState: DelegationResultLocationState = { payload, type: 'register' };
             nav(absoluteRoutes.settings.earn.delegator.submit.path, { state: submitDelegatorState });
         },
-        [pathname, existingValues]
+        [pathname, existingValues, setNoChangesNotice]
     );
 
     return (
-        <MultiStepForm<DelegatorForm> onDone={handleDone} valueStore={store}>
-            {{
-                target: {
-                    render: (initial, onNext) => (
-                        <DelegatorType initialValues={initial} onSubmit={onNext} title={t('title')} />
-                    ),
-                },
-                stake: {
-                    render: (initial, onNext, form) => {
-                        if (form.target === undefined) {
-                            return <Navigate to=".." />;
-                        }
-
-                        return (
-                            <DelegatorStake
-                                title={t('title')}
-                                target={form.target}
-                                onSubmit={onNext}
-                                initialValues={initial}
-                                existingValues={existingValues}
-                            />
-                        );
+        <>
+            <NoChangesNotice open={noChangesNotice} onClose={() => setNoChangesNotice(false)} />
+            <MultiStepForm<DelegatorForm> onDone={handleDone} valueStore={store}>
+                {{
+                    target: {
+                        render: (initial, onNext) => (
+                            <DelegatorType initialValues={initial} onSubmit={onNext} title={title} />
+                        ),
                     },
-                },
-            }}
-        </MultiStepForm>
+                    stake: {
+                        render: (initial, onNext, form) => {
+                            if (form.target === undefined) {
+                                return <Navigate to=".." />;
+                            }
+
+                            return (
+                                <DelegatorStake
+                                    title={title}
+                                    target={form.target}
+                                    onSubmit={onNext}
+                                    initialValues={initial}
+                                    existingValues={existingValues}
+                                />
+                            );
+                        },
+                    },
+                }}
+            </MultiStepForm>
+        </>
     );
 }
 
+export function RegisterDelegatorTransactionFlow() {
+    const { t } = useTranslation('x', { keyPrefix: 'earn.delegator.register' });
+    return <DelegatorTransactionFlow title={t('title')} />;
+}
+
 export function UpdateDelegatorTransactionFlow() {
+    const { t } = useTranslation('x', { keyPrefix: 'earn.delegator.update' });
     const accountInfo = useSelectedAccountInfo();
 
     if (accountInfo === undefined || accountInfo.type !== AccountInfoType.Delegator) {
@@ -87,5 +121,5 @@ export function UpdateDelegatorTransactionFlow() {
                 : { type: DelegationTargetType.Baker, bakerId: delegationTarget.bakerId.toString() },
     };
 
-    return <DelegatorTransactionFlow existingValues={values} />;
+    return <DelegatorTransactionFlow existingValues={values} title={t('title')} />;
 }
