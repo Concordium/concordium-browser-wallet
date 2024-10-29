@@ -1,4 +1,5 @@
-import React, { useEffect, useMemo } from 'react';
+/* eslint-disable react/destructuring-assignment */
+import React, { useEffect, useMemo, useState } from 'react';
 import { UseFormReturn } from 'react-hook-form';
 import { useTranslation } from 'react-i18next';
 import { useAtomValue } from 'jotai';
@@ -22,8 +23,10 @@ import { CCD_METADATA } from '@shared/constants/token-metadata';
 import { grpcClientAtom } from '@popup/store/settings';
 import Text from '@popup/popupX/shared/Text';
 import { useGetTransactionFee } from '@popup/shared/utils/transaction-helpers';
+import FullscreenNotice, { FullscreenNoticeProps } from '@popup/popupX/shared/FullscreenNotice';
 
 import { DelegationTypeForm, DelegatorForm, DelegatorStakeForm, configureDelegatorPayloadFromForm } from '../util';
+import {isAboveStakeWarningThreshold} from '../../util';
 
 type PoolInfoProps = {
     /** The validator pool ID to show information for */
@@ -65,6 +68,25 @@ function PoolInfo({ validatorId }: PoolInfoProps) {
     );
 }
 
+type HighStakeNoticeProps = FullscreenNoticeProps & {
+    onContinue(): void;
+};
+
+function HighStakeNotice({ onContinue, ...props }: HighStakeNoticeProps) {
+    return (
+        <FullscreenNotice {...props}>
+            <Page>
+                <Page.Top heading="Title" />
+                Notice text...
+                <Page.Footer>
+                    <Button.Main label="Continue" onClick={onContinue} />
+                    <Button.Main label="Enter new stake" onClick={props.onClose} />
+                </Page.Footer>
+            </Page>
+        </FullscreenNotice>
+    );
+}
+
 type Props = {
     /** The title for the configuriation step */
     title: string;
@@ -86,6 +108,7 @@ export default function DelegatorStake({ title, target, initialValues, existingV
     const submit = form.handleSubmit(onSubmit);
     const selectedCred = useSelectedCredential();
     const selectedAccountInfo = useAccountInfo(selectedCred);
+    const [highStakeWarning, setHighStakeWarning] = useState(false);
 
     const values = form.watch();
     const getCost = useGetTransactionFee(AccountTransactionType.ConfigureDelegation);
@@ -132,40 +155,57 @@ export default function DelegatorStake({ title, target, initialValues, existingV
         return null;
     }
 
+    const handleSubmit = () => {
+        if (!form.formState.errors.amount === undefined) {
+            submit(); // To set the form to submitted.
+            return;
+        }
+
+        const amount = parseCcdAmount(form.getValues().amount);
+        if (isAboveStakeWarningThreshold(amount.microCcdAmount, selectedAccountInfo)) {
+            setHighStakeWarning(true);
+        } else {
+            submit();
+        }
+    };
+
     return (
-        <Page className="register-delegator-container">
-            <Page.Top heading={title} />
-            <Text.Capture className="m-l-5 m-t-neg-5">
-                {t('selectedAccount', { account: displayNameAndSplitAddress(selectedCred) })}
-            </Text.Capture>
-            <Form formMethods={form} onSubmit={onSubmit}>
-                {(f) => (
-                    <>
-                        <TokenAmount
-                            className="register-delegator__token-card"
-                            accountInfo={selectedAccountInfo}
-                            fee={fee}
-                            tokenType="ccd"
-                            buttonMaxLabel={t('inputAmount.buttonMax')}
-                            form={f as unknown as UseFormReturn<AmountForm>}
-                            ccdBalance="total"
-                        />
-                        {target.type === DelegationTargetType.Baker && (
-                            <PoolInfo validatorId={BigInt(target.bakerId!)} />
-                        )}
-                        <div className="register-delegator__reward">
-                            <div className="register-delegator__reward_auto-add">
-                                <Text.Main>{t('redelegate.label')}</Text.Main>
-                                <FormToggleCheckbox register={f.register} name="redelegate" />
+        <>
+            <HighStakeNotice open={highStakeWarning} onClose={() => setHighStakeWarning(false)} onContinue={submit} />
+            <Page className="register-delegator-container">
+                <Page.Top heading={title} />
+                <Text.Capture className="m-l-5 m-t-neg-5">
+                    {t('selectedAccount', { account: displayNameAndSplitAddress(selectedCred) })}
+                </Text.Capture>
+                <Form formMethods={form} onSubmit={handleSubmit}>
+                    {(f) => (
+                        <>
+                            <TokenAmount
+                                className="register-delegator__token-card"
+                                accountInfo={selectedAccountInfo}
+                                fee={fee}
+                                tokenType="ccd"
+                                buttonMaxLabel={t('inputAmount.buttonMax')}
+                                form={f as unknown as UseFormReturn<AmountForm>}
+                                ccdBalance="total"
+                            />
+                            {target.type === DelegationTargetType.Baker && (
+                                <PoolInfo validatorId={BigInt(target.bakerId!)} />
+                            )}
+                            <div className="register-delegator__reward">
+                                <div className="register-delegator__reward_auto-add">
+                                    <Text.Main>{t('redelegate.label')}</Text.Main>
+                                    <FormToggleCheckbox register={f.register} name="redelegate" />
+                                </div>
+                                <Text.Capture>{t('redelegate.description')}</Text.Capture>
                             </div>
-                            <Text.Capture>{t('redelegate.description')}</Text.Capture>
-                        </div>
-                    </>
-                )}
-            </Form>
-            <Page.Footer>
-                <Button.Main className="m-t-20" label={t('buttonContinue')} onClick={submit} />
-            </Page.Footer>
-        </Page>
+                        </>
+                    )}
+                </Form>
+                <Page.Footer>
+                    <Button.Main className="m-t-20" label={t('buttonContinue')} onClick={handleSubmit} />
+                </Page.Footer>
+            </Page>
+        </>
     );
 }
