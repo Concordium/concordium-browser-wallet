@@ -2,14 +2,14 @@ import React from 'react';
 import Button from '@popup/popupX/shared/Button';
 import { ToggleCheckbox } from '@popup/popupX/shared/Form/ToggleCheckbox';
 
-export default function RegisterBaker() {
+export default function RegisterValidator() {
     return (
-        <div className="register-baker-container">
-            <div className="register-baker__title">
-                <span className="heading_medium">Register Baker</span>
+        <div className="register-validator-container">
+            <div className="register-validator__title">
+                <span className="heading_medium">Register validator</span>
                 <span className="capture__main_small">on Accout 1 / 6gk...k7o</span>
             </div>
-            <div className="register-baker__token-card">
+            <div className="register-validator__token-card">
                 <div className="token">
                     <span className="text__main_regular">Token</span>
                     <div className="token-available">
@@ -29,14 +29,14 @@ export default function RegisterBaker() {
                     <span className="capture__main_small"> 12.200,29 CCD – 18.500,04 CCD</span>
                 </div>
             </div>
-            <div className="register-baker__reward">
-                <div className="register-baker__reward_auto-add">
+            <div className="register-validator__reward">
+                <div className="register-validator__reward_auto-add">
                     <span className="text__main">Auto add rewards</span>
                     <ToggleCheckbox />
                 </div>
                 <span className="capture__main_small">
-                    Set to automatically add baking rewards to baker stake. amounts will be at disposal on your account
-                    balance at each pay day.
+                    Set to automatically add baking rewards to validator stake. amounts will be at disposal on your
+                    account balance at each pay day.
                 </span>
             </div>
             <Button.Main label="Continue" />

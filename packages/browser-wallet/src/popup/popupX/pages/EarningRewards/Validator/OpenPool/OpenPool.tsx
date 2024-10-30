@@ -15,7 +15,7 @@ export default function OpenPool() {
                     <ToggleCheckbox />
                 </div>
                 <span className="capture__main_small">
-                    You have the option to open your baker as a pool for others to delegate their CCD to.
+                    You have the option to open your validator as a pool for others to delegate their CCD to.
                 </span>
                 <span className="capture__main_small">
                     If you choose to open your pool, other people will be able to delegate CCDs to your baking pool.
