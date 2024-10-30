@@ -11,6 +11,11 @@ const t = {
         restore: 'Restore',
         oldUI: 'Old UI',
     },
+    accountSelector: {
+        sortAsc: 'Sort A-Z',
+        sortDesc: 'Sort Z-A',
+        searchBy: 'Search by name or address',
+    },
 };
 
 export default t;
