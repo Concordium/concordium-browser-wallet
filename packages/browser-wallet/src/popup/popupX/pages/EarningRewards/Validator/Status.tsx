@@ -1,26 +1,31 @@
 import React from 'react';
-import { AccountInfoType, DelegationTargetType } from '@concordium/web-sdk';
+import { AccountInfoType } from '@concordium/web-sdk';
 import { absoluteRoutes } from '@popup/popupX/constants/routes';
 import Button from '@popup/popupX/shared/Button';
 import Card from '@popup/popupX/shared/Card';
 import Page from '@popup/popupX/shared/Page';
 import { useTranslation } from 'react-i18next';
-import { formatCcdAmount } from '@popup/popupX/shared/utils/helpers';
 import { useSelectedAccountInfo } from '@popup/shared/AccountInfoListenerContext/AccountInfoListenerContext';
 import { Navigate, useNavigate } from 'react-router-dom';
 import AccountCooldowns from '../AccountCooldowns';
+import { showRestake, showValidatorAmount, showValidatorOpenStatus } from './util';
 
-export default function DelegatorStatus() {
-    const { t } = useTranslation('x', { keyPrefix: 'earn.delegator' });
+export default function ValidatorStatus() {
+    const { t } = useTranslation('x', { keyPrefix: 'earn.validator' });
     const accountInfo = useSelectedAccountInfo();
     const nav = useNavigate();
 
-    if (accountInfo?.type !== AccountInfoType.Delegator) {
+    if (accountInfo?.type !== AccountInfoType.Baker) {
         return <Navigate to=".." />;
     }
 
-    const { accountDelegation, accountCooldowns } = accountInfo;
+    const { accountBaker, accountCooldowns } = accountInfo;
 
+    if (accountBaker.version === 0) {
+        return null;
+    }
+
+    // TODO: add missing rows...
     return (
         <Page>
             <Page.Top heading={t('status.title')} />
@@ -28,29 +33,19 @@ export default function DelegatorStatus() {
                 <Card.Row>
                     <Card.RowDetails
                         title={t('values.amount.label')}
-                        value={`${formatCcdAmount(accountDelegation.stakedAmount)}`}
+                        value={showValidatorAmount(accountBaker.stakedAmount)}
                     />
                 </Card.Row>
                 <Card.Row>
                     <Card.RowDetails
-                        title={t('values.target.label')}
-                        value={
-                            accountDelegation.delegationTarget.delegateType === DelegationTargetType.Baker
-                                ? t('values.target.validator', {
-                                      id: accountDelegation.delegationTarget.bakerId.toString(),
-                                  })
-                                : t('values.target.passive')
-                        }
+                        title={t('values.openStatus.label')}
+                        value={showValidatorOpenStatus(accountBaker.bakerPoolInfo.openStatus)}
                     />
                 </Card.Row>
                 <Card.Row>
                     <Card.RowDetails
-                        title={t('values.redelegate.label')}
-                        value={
-                            accountDelegation.restakeEarnings
-                                ? t('values.redelegate.delegation')
-                                : t('values.redelegate.public')
-                        }
+                        title={t('values.restake.label')}
+                        value={showRestake(accountBaker.restakeEarnings)}
                     />
                 </Card.Row>
             </Card>

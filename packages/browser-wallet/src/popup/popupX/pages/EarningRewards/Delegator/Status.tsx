@@ -28,7 +28,7 @@ export default function DelegatorStatus() {
                 <Card.Row>
                     <Card.RowDetails
                         title={t('values.amount.label')}
-                        value={`${formatCcdAmount(accountDelegation.stakedAmount)}`}
+                        value={`${formatCcdAmount(accountDelegation.stakedAmount)} CCD`}
                     />
                 </Card.Row>
                 <Card.Row>

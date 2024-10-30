@@ -124,6 +124,26 @@ const t = {
         },
     },
     validator: {
+        values: {
+            openStatus: {
+                label: 'Status',
+                open: 'Open for all ',
+                closed: 'Closed for all',
+                closedNew: 'Closed for new',
+            },
+            amount: { label: 'Validation amount' },
+            restake: {
+                label: 'Rewards will be',
+                validation: 'Added to validation amount',
+                public: 'Added to public balance',
+            },
+        },
+        status: {
+            title: 'Your validation is registered',
+            backTitle: 'to Main page',
+            buttonUpdate: 'Update',
+            buttonStop: 'Stop',
+        },
         intro: {
             '1': {
                 title: 'Become a validator',

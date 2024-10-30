@@ -34,6 +34,7 @@ import SubmittedTransaction from '../pages/SubmittedTransaction';
 import { DelegatorIntro } from '../pages/EarningRewards/Delegator/Intro';
 import DelegatorTransactionFlow from '../pages/EarningRewards/Delegator/TransactionFlow';
 import DelegatorStatus from '../pages/EarningRewards/Delegator/Status';
+import ValidatorStatus from '../pages/EarningRewards/Validator/Status';
 
 export default function Routes({ messagePromptHandlers }: { messagePromptHandlers: MessagePromptHandlersType }) {
     const { handleConnectionResponse } = messagePromptHandlers;
@@ -102,6 +103,7 @@ export default function Routes({ messagePromptHandlers }: { messagePromptHandler
                     <Route path={relativeRoutes.settings.earn.path}>
                         <Route index element={<EarningRewards />} />
                         <Route path={relativeRoutes.settings.earn.validator.path}>
+                            <Route index element={<ValidatorStatus />} />
                             <Route
                                 element={<ValidatorIntro />}
                                 path={relativeRoutes.settings.earn.validator.intro.path}
