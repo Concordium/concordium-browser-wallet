@@ -25,7 +25,6 @@ export default function ValidatorStatus() {
         return null;
     }
 
-    // TODO: add missing rows...
     return (
         <Page>
             <Page.Top heading={t('status.title')} />
