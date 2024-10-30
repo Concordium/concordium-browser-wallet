@@ -69,7 +69,14 @@ const t = {
             backTitle: 'Earning rewards',
             notice: 'This will lock your delegation amount. Amount is released after {{cooldown}} days from the time you remove or decrease your delegation.',
         },
-        update: { title: 'Update delegation' },
+        update: {
+            title: 'Update delegation',
+            noChangesNotice: {
+                title: 'No changes',
+                description: 'The proposed transaction contains no changes compared to the current delegation.',
+                buttonBack: 'Go back',
+            },
+        },
         target: {
             description: 'You can delegate to an open pool of your choice, or you can stake using passive delegation.',
             radioValidatorLabel: 'Validator',
@@ -115,6 +122,13 @@ const t = {
                 description: 'I want to automatically add my delegation rewards to my delegation amount.',
             },
             buttonContinue: 'Continue',
+            overStakeThresholdWarning: {
+                title: 'Important',
+                description:
+                    'You are about to lock more than {{ threshold }}% of your total balance in a delegation stake.\n\nIf you don’t have enough unlocked CCD at your disposal, you might not be able to pay future transaction fees.',
+                buttonContinue: 'Continue',
+                buttonBack: 'Enter new stake',
+            },
         },
         submit: {
             backTitle: 'Delegation settings',

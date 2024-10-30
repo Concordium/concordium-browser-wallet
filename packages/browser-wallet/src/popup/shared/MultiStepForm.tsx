@@ -1,4 +1,4 @@
-import React, { Dispatch, SetStateAction, useCallback, useEffect, useMemo, useState } from 'react';
+import React, { Dispatch, ReactNode, SetStateAction, useCallback, useEffect, useMemo, useState } from 'react';
 import { Routes, useNavigate, Route, useLocation } from 'react-router-dom';
 import { isDefined, noOp, useUpdateEffect } from 'wallet-common-helpers';
 
@@ -35,7 +35,7 @@ export interface FormChild<F, K extends keyof F = any> {
      * Function to render page component responsible for letting user fill out the respective substate.
      * This is a function to avoid anonymous components messing up render tree updates.
      */
-    render(initial: F[K] | undefined, onNext: (values: F[K]) => void, formValues: Partial<F>): JSX.Element;
+    render(initial: F[K] | undefined, onNext: (values: F[K]) => void, formValues: Partial<F>): ReactNode;
 }
 
 export type FormChildren<F extends Record<string, unknown>> = {

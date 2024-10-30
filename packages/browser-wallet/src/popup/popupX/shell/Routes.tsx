@@ -30,7 +30,10 @@ import { ManageTokenList, AddToken } from '@popup/popupX/pages/ManageTokens';
 import { DelegationResult } from '../pages/EarningRewards/Delegator/Result';
 import SubmittedTransaction from '../pages/SubmittedTransaction';
 import { DelegatorIntro } from '../pages/EarningRewards/Delegator/Intro';
-import DelegatorTransactionFlow from '../pages/EarningRewards/Delegator/TransactionFlow';
+import {
+    RegisterDelegatorTransactionFlow,
+    UpdateDelegatorTransactionFlow,
+} from '../pages/EarningRewards/Delegator/TransactionFlow';
 import DelegatorStatus from '../pages/EarningRewards/Delegator/Status';
 import ValidatorStatus from '../pages/EarningRewards/Validator/Status';
 
@@ -116,11 +119,11 @@ export default function Routes({ messagePromptHandlers }: { messagePromptHandler
                                 <Route index element={<DelegatorIntro />} />
                                 <Route
                                     path={`${relativeRoutes.settings.earn.delegator.register.configure.path}/*`}
-                                    element={<DelegatorTransactionFlow />}
+                                    element={<RegisterDelegatorTransactionFlow />}
                                 />
                             </Route>
                             <Route
-                                element={<DelegatorTransactionFlow />}
+                                element={<UpdateDelegatorTransactionFlow />}
                                 path={`${relativeRoutes.settings.earn.delegator.update.path}/*`}
                             />
                             <Route element={<>TODO</>} path={`${relativeRoutes.settings.earn.delegator.stop.path}`} />

@@ -89,6 +89,9 @@ body {
 
 #root {
     height: 100%;
+}
+
+:is(:not(.popup-x)) #root {
     @include transition(filter);
 
     .modal-open & {
