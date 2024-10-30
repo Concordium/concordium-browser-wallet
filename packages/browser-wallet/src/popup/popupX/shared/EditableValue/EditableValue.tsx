@@ -8,15 +8,15 @@ export default function useEditableValue(current: string, fallback: string, onNe
     const onAbort = useCallback(() => {
         setIsEditing(false);
         setEdited(current);
-    }, []);
+    }, [current]);
     const onComplete = useCallback(() => {
         onNewValue(edited.trim());
         setIsEditing(false);
-    }, []);
+    }, [edited]);
     const onEdit = useCallback(() => {
         setEdited(current);
         setIsEditing(true);
-    }, []);
+    }, [current]);
     const onInputChange = (event: ChangeEvent<HTMLInputElement>) => {
         setEdited(event.target.value);
     };
