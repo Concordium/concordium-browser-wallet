@@ -1,9 +1,15 @@
-import React, { useMemo } from 'react';
+/* eslint-disable react/destructuring-assignment */
+import React, { useEffect, useMemo, useState } from 'react';
 import { UseFormReturn } from 'react-hook-form';
 import { useTranslation } from 'react-i18next';
 import { useAtomValue } from 'jotai';
 import { useAsyncMemo } from 'wallet-common-helpers';
-import { AccountTransactionType, DelegationTargetType } from '@concordium/web-sdk';
+import {
+    AccountTransactionType,
+    CcdAmount,
+    ConfigureDelegationPayload,
+    DelegationTargetType,
+} from '@concordium/web-sdk';
 
 import Button from '@popup/popupX/shared/Button';
 import FormToggleCheckbox from '@popup/popupX/shared/Form/ToggleCheckbox';
@@ -12,13 +18,15 @@ import Form, { useForm } from '@popup/popupX/shared/Form';
 import TokenAmount, { AmountForm } from '@popup/popupX/shared/Form/TokenAmount';
 import { useAccountInfo } from '@popup/shared/AccountInfoListenerContext/AccountInfoListenerContext';
 import { displayNameAndSplitAddress, useSelectedCredential } from '@popup/shared/utils/account-helpers';
-import { formatTokenAmount } from '@popup/popupX/shared/utils/helpers';
+import { formatCcdAmount, formatTokenAmount, parseCcdAmount } from '@popup/popupX/shared/utils/helpers';
 import { CCD_METADATA } from '@shared/constants/token-metadata';
 import { grpcClientAtom } from '@popup/store/settings';
 import Text from '@popup/popupX/shared/Text';
 import { useGetTransactionFee } from '@popup/shared/utils/transaction-helpers';
+import FullscreenNotice, { FullscreenNoticeProps } from '@popup/popupX/shared/FullscreenNotice';
 
-import { DelegationTypeForm, DelegatorStakeForm, configureDelegatorPayloadFromForm } from '../util';
+import { DelegationTypeForm, DelegatorForm, DelegatorStakeForm, configureDelegatorPayloadFromForm } from '../util';
+import { STAKE_WARNING_THRESHOLD, isAboveStakeWarningThreshold } from '../../util';
 
 type PoolInfoProps = {
     /** The validator pool ID to show information for */
@@ -60,17 +68,40 @@ function PoolInfo({ validatorId }: PoolInfoProps) {
     );
 }
 
+type HighStakeNoticeProps = FullscreenNoticeProps & {
+    onContinue(): void;
+};
+
+function HighStakeWarning({ onContinue, ...props }: HighStakeNoticeProps) {
+    const { t } = useTranslation('x', { keyPrefix: 'earn.delegator.stake.overStakeThresholdWarning' });
+    return (
+        <FullscreenNotice {...props}>
+            <Page>
+                <Page.Top heading={t('title')} />
+                {t('description', { threshold: STAKE_WARNING_THRESHOLD.toString() })}
+                <Page.Footer>
+                    <Button.Main label={t('buttonContinue')} onClick={onContinue} />
+                    <Button.Main label={t('buttonBack')} onClick={props.onClose} />
+                </Page.Footer>
+            </Page>
+        </FullscreenNotice>
+    );
+}
+
 type Props = {
     /** The title for the configuriation step */
     title: string;
     /** The initial values of the step, if any */
     initialValues?: DelegatorStakeForm;
+    /** The delegation target of the transaction */
     target: DelegationTypeForm;
+    /** The existing delegation values registered on the account */
+    existingValues: DelegatorForm | undefined;
     /** The submit handler triggered when submitting the form in the step */
     onSubmit(values: DelegatorStakeForm): void;
 };
 
-export default function DelegatorStake({ title, target, initialValues, onSubmit }: Props) {
+export default function DelegatorStake({ title, target, initialValues, existingValues, onSubmit }: Props) {
     const { t } = useTranslation('x', { keyPrefix: 'earn.delegator.stake' });
     const form = useForm<DelegatorStakeForm>({
         defaultValues: initialValues ?? { amount: '0.00', redelegate: true },
@@ -78,49 +109,104 @@ export default function DelegatorStake({ title, target, initialValues, onSubmit 
     const submit = form.handleSubmit(onSubmit);
     const selectedCred = useSelectedCredential();
     const selectedAccountInfo = useAccountInfo(selectedCred);
+    const [highStakeWarning, setHighStakeWarning] = useState(false);
+
+    const values = form.watch();
     const getCost = useGetTransactionFee(AccountTransactionType.ConfigureDelegation);
-    const fee = useMemo(
-        () => getCost(configureDelegatorPayloadFromForm({ target, stake: { amount: '0', redelegate: true } })), // Use dummy values, as it does not matter when calculating transaction cost
-        [target, getCost]
-    );
+    const fee = useMemo(() => {
+        let payload: ConfigureDelegationPayload;
+        try {
+            //  We try here, as parsing invalid CCD amounts from the input can fail.
+            payload = configureDelegatorPayloadFromForm({ target, stake: values }, existingValues);
+        } catch {
+            // Fall back to a payload from a form with any parsable amount
+            payload = configureDelegatorPayloadFromForm(
+                {
+                    target: {
+                        type: target?.type ?? DelegationTargetType.PassiveDelegation,
+                        bakerId: target?.bakerId,
+                    },
+                    stake: { amount: '0', redelegate: values.redelegate ?? false },
+                },
+                existingValues
+            );
+        }
+        return getCost(payload);
+    }, [target, values, getCost]);
+
+    useEffect(() => {
+        if (selectedAccountInfo === undefined || fee === undefined) {
+            return;
+        }
+
+        try {
+            const parsed = parseCcdAmount(values.amount);
+            const newMax = CcdAmount.fromMicroCcd(
+                selectedAccountInfo.accountAmount.microCcdAmount - fee.microCcdAmount
+            );
+            if (parsed.microCcdAmount > newMax.microCcdAmount) {
+                form.setValue('amount', formatCcdAmount(newMax), { shouldValidate: true });
+            }
+        } catch {
+            // Do nothing..
+        }
+    }, [selectedAccountInfo?.accountAmount, fee]);
 
     if (selectedAccountInfo === undefined || selectedCred === undefined || fee === undefined) {
         return null;
     }
 
+    const handleSubmit = () => {
+        if (!form.formState.errors.amount === undefined) {
+            submit(); // To set the form to submitted.
+            return;
+        }
+
+        const amount = parseCcdAmount(form.getValues().amount);
+        if (isAboveStakeWarningThreshold(amount.microCcdAmount, selectedAccountInfo)) {
+            setHighStakeWarning(true);
+        } else {
+            submit();
+        }
+    };
+
     return (
-        <Page className="register-delegator-container">
-            <Page.Top heading={title} />
-            <Text.Capture className="m-l-5 m-t-neg-5">
-                {t('selectedAccount', { account: displayNameAndSplitAddress(selectedCred) })}
-            </Text.Capture>
-            <Form formMethods={form} onSubmit={onSubmit}>
-                {(f) => (
-                    <>
-                        <TokenAmount
-                            accountInfo={selectedAccountInfo}
-                            fee={fee}
-                            tokenType="ccd"
-                            buttonMaxLabel={t('inputAmount.buttonMax')}
-                            form={f as unknown as UseFormReturn<AmountForm>}
-                            ccdBalance="total"
-                        />
-                        {target.type === DelegationTargetType.Baker && (
-                            <PoolInfo validatorId={BigInt(target.bakerId!)} />
-                        )}
-                        <div className="register-delegator__reward">
-                            <div className="register-delegator__reward_auto-add">
-                                <Text.Main>{t('redelegate.label')}</Text.Main>
-                                <FormToggleCheckbox register={f.register} name="redelegate" />
+        <>
+            <HighStakeWarning open={highStakeWarning} onClose={() => setHighStakeWarning(false)} onContinue={submit} />
+            <Page className="register-delegator-container">
+                <Page.Top heading={title} />
+                <Text.Capture className="m-l-5 m-t-neg-5">
+                    {t('selectedAccount', { account: displayNameAndSplitAddress(selectedCred) })}
+                </Text.Capture>
+                <Form formMethods={form} onSubmit={handleSubmit}>
+                    {(f) => (
+                        <>
+                            <TokenAmount
+                                className="register-delegator__token-card"
+                                accountInfo={selectedAccountInfo}
+                                fee={fee}
+                                tokenType="ccd"
+                                buttonMaxLabel={t('inputAmount.buttonMax')}
+                                form={f as unknown as UseFormReturn<AmountForm>}
+                                ccdBalance="total"
+                            />
+                            {target.type === DelegationTargetType.Baker && (
+                                <PoolInfo validatorId={BigInt(target.bakerId!)} />
+                            )}
+                            <div className="register-delegator__reward">
+                                <div className="register-delegator__reward_auto-add">
+                                    <Text.Main>{t('redelegate.label')}</Text.Main>
+                                    <FormToggleCheckbox register={f.register} name="redelegate" />
+                                </div>
+                                <Text.Capture>{t('redelegate.description')}</Text.Capture>
                             </div>
-                            <Text.Capture>{t('redelegate.description')}</Text.Capture>
-                        </div>
-                    </>
-                )}
-            </Form>
-            <Page.Footer>
-                <Button.Main className="m-t-20" label={t('buttonContinue')} onClick={submit} />
-            </Page.Footer>
-        </Page>
+                        </>
+                    )}
+                </Form>
+                <Page.Footer>
+                    <Button.Main className="m-t-20" label={t('buttonContinue')} onClick={handleSubmit} />
+                </Page.Footer>
+            </Page>
+        </>
     );
 }

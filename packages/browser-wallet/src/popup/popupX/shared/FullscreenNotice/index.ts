@@ -1,1 +1,1 @@
-export { default } from './FullscreenNotice';
+export { default, type FullscreenNoticeProps } from './FullscreenNotice';

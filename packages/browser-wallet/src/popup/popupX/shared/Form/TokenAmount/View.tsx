@@ -11,7 +11,7 @@ import SideArrow from '@assets/svgX/side-arrow.svg';
 import ConcordiumLogo from '@assets/svgX/concordium-logo.svg';
 import { validateAccountAddress, validateTransferAmount } from '@popup/shared/utils/transaction-helpers';
 import Img, { DEFAULT_FAILED } from '@popup/shared/Img';
-import { displayAsCcd } from 'wallet-common-helpers';
+import { ClassName, displayAsCcd } from 'wallet-common-helpers';
 import Text from '@popup/popupX/shared/Text';
 import { RequiredUncontrolledFieldProps } from '../common/types';
 import { makeUncontrolled } from '../common/utils';
@@ -237,7 +237,8 @@ export type TokenAmountViewProps = {
      */
     onSelectToken(event: TokenSelectEvent): void;
 } & ValueVariant &
-    TokenVariant;
+    TokenVariant &
+    ClassName;
 
 /**
  * TokenAmount component renders a form for transferring tokens with an amount field and optionally a receiver field.
@@ -246,7 +247,7 @@ export type TokenAmountViewProps = {
  */
 export default function TokenAmountView(props: TokenAmountViewProps) {
     const { t } = useTranslation('x', { keyPrefix: 'sharedX' });
-    const { buttonMaxLabel, fee, tokens, balance, onSelectToken } = props;
+    const { buttonMaxLabel, fee, tokens, balance, onSelectToken, className } = props;
     const [selectedToken, setSelectedToken] = useState<TokenInfo | null>(() => {
         switch (props.tokenType) {
             case 'cis2': {
@@ -352,7 +353,7 @@ export default function TokenAmountView(props: TokenAmountViewProps) {
     );
 
     return (
-        <div className="token-amount">
+        <div className={clsx('token-amount', className)}>
             <div className="token-amount_token">
                 <span className="text__main_medium">{t('form.tokenAmount.token.label')}</span>
                 {props.tokenType !== undefined ? (

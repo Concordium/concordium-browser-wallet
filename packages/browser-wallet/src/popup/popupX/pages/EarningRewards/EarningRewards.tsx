@@ -17,15 +17,17 @@ export default function EarningRewards() {
     const cp = useBlockChainParameters();
     const accountInfo = useSelectedAccountInfo();
 
-    if (cp === undefined) {
-        return null;
+    switch (accountInfo?.type) {
+        case AccountInfoType.Delegator:
+            return <Navigate to={relativeRoutes.settings.earn.delegator.path} />;
+        case AccountInfoType.Baker:
+            return <Navigate to={relativeRoutes.settings.earn.validator.path} />;
+        default:
+            break;
     }
 
-    if (accountInfo?.type === AccountInfoType.Delegator) {
-        return <Navigate to={relativeRoutes.settings.earn.delegator.path} />;
-    }
-    if (accountInfo?.type === AccountInfoType.Baker) {
-        return <Navigate to={relativeRoutes.settings.earn.validator.path} />;
+    if (cp === undefined) {
+        return null;
     }
 
     const bakingThreshold = cpBakingThreshold(cp);
