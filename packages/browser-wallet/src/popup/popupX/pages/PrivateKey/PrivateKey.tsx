@@ -13,6 +13,7 @@ import { NetworkConfiguration } from '@shared/storage/types';
 import { getNet } from '@shared/utils/network-helpers';
 import { copyToClipboard } from '@popup/popupX/shared/utils/helpers';
 import { Navigate, useParams } from 'react-router-dom';
+import { withPasswordProtected } from '@popup/popupX/shared/utils/hoc';
 
 type CredentialKeys = {
     threshold: number;
@@ -123,7 +124,7 @@ function PrivateKey({ address }: Props) {
     );
 }
 
-export default function Loader() {
+function Loader() {
     const params = useParams();
     if (!('account' in params) || params.account === undefined) {
         // No account address passed in the url.
@@ -131,3 +132,9 @@ export default function Loader() {
     }
     return <PrivateKey address={params.account} />;
 }
+
+export default withPasswordProtected(Loader, {
+    headingKey: 'privateKey.accountPrivateKey',
+    pageInfoKey: 'privateKey.passwordDescription',
+    submitKey: 'privateKey.showPrivateKey',
+});

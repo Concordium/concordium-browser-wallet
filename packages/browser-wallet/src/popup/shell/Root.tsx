@@ -136,9 +136,7 @@ export default function Root() {
 
     return (
         <Provider>
-            <MemoryRouter
-                initialEntries={[uiStyle.value === UiStyle.Old ? '/account' : absoluteRoutes.settings.earn.path]}
-            >
+            <MemoryRouter initialEntries={[uiStyle.value === UiStyle.Old ? '/account' : absoluteRoutes.home.path]}>
                 <Scaling>
                     <Network>
                         <Theme>

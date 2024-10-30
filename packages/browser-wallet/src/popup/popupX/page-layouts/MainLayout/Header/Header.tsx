@@ -25,10 +25,10 @@ export default function Header({
     accountOpen,
     setAccountOpen,
 }: HeaderProps) {
-    if (menuOpen) {
-        setAccountOpen(false);
-    }
     useEffect(() => {
+        if (menuOpen) {
+            setAccountOpen(false);
+        }
         if (menuOpen || accountOpen) {
             background?.classList.add('fade-bg');
         } else {

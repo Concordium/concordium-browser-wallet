@@ -1,6 +1,7 @@
-import React from 'react';
+import React, { useState } from 'react';
 import { useSelectedCredential } from '@popup/shared/utils/account-helpers';
 import Loader from '@popup/popupX/shared/Loader';
+import PasswordProtect, { PasswordProtectConfigType } from '@popup/popupX/shared/PasswordProtect';
 
 export function withSelectedCredential<P extends object>(
     Component: React.ComponentType<P>
@@ -13,6 +14,19 @@ export function withSelectedCredential<P extends object>(
         }
 
         return <Loader />;
+    }
+    return NewComponent;
+}
+
+export function withPasswordProtected(Component: React.ComponentType, config: PasswordProtectConfigType) {
+    function NewComponent() {
+        const [passwordConfirmed, setPasswordConfirmed] = useState(false);
+
+        if (!passwordConfirmed) {
+            return <PasswordProtect setPasswordConfirmed={setPasswordConfirmed} config={config} />;
+        }
+
+        return <Component />;
     }
     return NewComponent;
 }

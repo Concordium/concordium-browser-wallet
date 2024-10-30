@@ -1,7 +1,13 @@
 .change-passcode-x {
-    .divider {
-        display: block;
-        margin: rem(16px) 0 rem(24px) 0;
-        border-bottom: 1px solid rgba($color-white, 0.1);
+    .change-passcode-page__form {
+        display: flex;
+        flex-direction: column;
+        gap: rem(8px);
+
+        .divider {
+            display: block;
+            margin: rem(8px) 0 rem(16px) 0;
+            border-bottom: 1px solid rgba($color-white, 0.1);
+        }
     }
 }

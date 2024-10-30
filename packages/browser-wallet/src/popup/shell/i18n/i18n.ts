@@ -3,6 +3,7 @@ import i18n from 'i18next';
 import { initReactI18next } from 'react-i18next';
 import LanguageDetector from 'i18next-browser-languagedetector';
 import countries from 'i18n-iso-countries';
+import { ObjectPath } from '@popup/popupX/shared/utils/typescriptHelpers';
 
 import en from './locales/en';
 import da from './locales/da';
@@ -10,6 +11,7 @@ import da from './locales/da';
 countries.registerLocale(require('i18n-iso-countries/langs/en.json'));
 countries.registerLocale(require('i18n-iso-countries/langs/da.json'));
 
+export type TranslationKeyX = ObjectPath<typeof en.x>;
 export const defaultNS: keyof typeof en = 'shared';
 const ns: Array<keyof typeof en> = Object.keys(en) as Array<keyof typeof en>;
 
