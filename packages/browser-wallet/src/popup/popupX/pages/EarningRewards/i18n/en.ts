@@ -14,7 +14,7 @@ const t = {
         inactiveStake: {
             label: 'Inactive stake',
             description:
-                'You don’t receive rewards from this part of stake now, this amount will be at disposal after cooldown period.',
+                'You don’t receive rewards from this part of the stake now. This amount will be at your disposal after the cooldown period.',
         },
         cooldown: {
             label: 'Cooldown time:',
@@ -45,7 +45,7 @@ const t = {
             },
             '2': {
                 title: 'Delegation models',
-                body: "There are two staking models that a delegator can choose:<ul><li>Delegating to a specific pool</li><li>Passive delegation</li></ul>A staking pool is managed by an individual validator running a node, so the rewards depend on that validator's performance.\n\nSince passive delegation doesn't go to a specific pool, it mitigates the risk of a single validator performing badly, however, the rewards are lower.\n\nFor more info, visit our <1>documentation website</1>",
+                body: "There are two staking models that a delegator can choose:<ul><li>Delegating to a specific pool</li><li>Passive delegation</li></ul>A staking pool is managed by an individual validator running a node, so the rewards depend on that validator's performance.\n\nSince passive delegation doesn't go to a specific pool, it mitigates the risk of a single validator performing badly. However, the rewards are lower.\n\nFor more info, visit our <1>documentation website</1>",
             },
             '3': {
                 title: 'Staking pools',
@@ -82,9 +82,9 @@ const t = {
                 errorNotValidator: 'The specified ID is not a validator pool',
             },
             validatorDelegationDescription:
-                'If you don’t already know which validator pool you want to delegate an amount to, you can look for on <1>here.</1>',
+                'If you don’t already know which validator pool you want to delegate an amount to, you can look for one <1>here.</1>',
             passiveDelegationDescription:
-                'Passive delegation is an alternative to delegation to a specific validator pool that has lower rewards. With passive delegation you do not have to worry about the uptime or quality of a baker node.\nFor more info you can visit <1>developer.concordium.software</1>',
+                'Passive delegation is an alternative to delegation to a specific validator pool that has lower rewards. With passive delegation, you do not have to worry about the uptime or quality of a baker node.\nFor more info, you can visit <1>developer.concordium.software</1>',
             buttonContinue: 'Continue',
         },
         stake: {
@@ -126,17 +126,19 @@ const t = {
     validator: {
         values: {
             openStatus: {
-                label: 'Status',
-                open: 'Open for all ',
-                closed: 'Closed for all',
-                closedNew: 'Closed for new',
+                label: 'Delegation pool status',
+                open: 'Open for delegation',
+                closed: 'Closed for delegation',
+                closedNew: 'Closed for new delegators',
             },
-            amount: { label: 'Validation amount' },
+            amount: { label: 'Validator stake' },
+            id: { label: 'Validator ID' },
             restake: {
                 label: 'Rewards will be',
-                validation: 'Added to validation amount',
+                validation: 'Added to validator stake',
                 public: 'Added to public balance',
             },
+            metadataUrl: { label: 'Metadata URL' },
         },
         status: {
             title: 'Your validation is registered',

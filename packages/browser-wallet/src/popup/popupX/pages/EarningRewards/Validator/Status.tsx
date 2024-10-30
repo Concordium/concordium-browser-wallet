@@ -37,6 +37,15 @@ export default function ValidatorStatus() {
                     />
                 </Card.Row>
                 <Card.Row>
+                    <Card.RowDetails title={t('values.id.label')} value={accountBaker.bakerId.toString()} />
+                </Card.Row>
+                <Card.Row>
+                    <Card.RowDetails
+                        title={t('values.restake.label')}
+                        value={showRestake(accountBaker.restakeEarnings)}
+                    />
+                </Card.Row>
+                <Card.Row>
                     <Card.RowDetails
                         title={t('values.openStatus.label')}
                         value={showValidatorOpenStatus(accountBaker.bakerPoolInfo.openStatus)}
@@ -44,8 +53,8 @@ export default function ValidatorStatus() {
                 </Card.Row>
                 <Card.Row>
                     <Card.RowDetails
-                        title={t('values.restake.label')}
-                        value={showRestake(accountBaker.restakeEarnings)}
+                        title={t('values.metadataUrl.label')}
+                        value={accountBaker.bakerPoolInfo.metadataUrl}
                     />
                 </Card.Row>
             </Card>
