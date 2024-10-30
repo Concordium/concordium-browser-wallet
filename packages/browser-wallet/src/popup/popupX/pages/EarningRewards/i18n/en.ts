@@ -158,6 +158,10 @@ const t = {
                 body: 'You have the option when adding a validator to open a staking pool or not. A staking pool allows others who want to earn rewards to do so without the need to run a node or become a validator themselves.\n\nTo do this they delegate an amount to your staking pool which then increases your total stake and your chances of winning the lottery to bake a block. At each pay day the rewards will be distributed to you and your delegators.\n\nYou can also choose not to open a pool, in which case only your own stake applies toward the lottery. You can always open or close a pool later.',
             },
         },
+        register: {
+            title: 'Register validator',
+            backTitle: 'Earning rewards',
+        },
     },
 };
 

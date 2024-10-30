@@ -58,7 +58,7 @@ export default function ValidatorStatus() {
                 />
                 <Button.Main
                     label={t('status.buttonStop')}
-                    onClick={() => nav(absoluteRoutes.settings.earn.delegator.stop.path)}
+                    // onClick={() => nav(absoluteRoutes.settings.earn.delegator.stop.path)}
                 />
             </Page.Footer>
         </Page>

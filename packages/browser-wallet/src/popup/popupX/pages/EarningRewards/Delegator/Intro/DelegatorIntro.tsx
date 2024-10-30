@@ -4,15 +4,16 @@ import { useNavigate } from 'react-router-dom';
 import Page from '@popup/popupX/shared/Page';
 import { Trans, useTranslation } from 'react-i18next';
 import ExternalLink from '@popup/popupX/shared/ExternalLink';
+import { absoluteRoutes } from '@popup/popupX/constants/routes';
 
-type Props = { onDoneRoute: string };
-
-export default function DelegatorIntro({ onDoneRoute }: Props) {
+export default function DelegatorIntro() {
     const nav = useNavigate();
     const { t } = useTranslation('x', { keyPrefix: 'earn.delegator.intro' });
     return (
         <Page className="delegator-intro-container">
-            <Carousel onDone={() => nav(onDoneRoute, { replace: true })}>
+            <Carousel
+                onDone={() => nav(absoluteRoutes.settings.earn.delegator.register.configure.path, { replace: true })}
+            >
                 <span className="capture__main_small">
                     <Page.Top heading={t('1.title')} />
                     <Trans
