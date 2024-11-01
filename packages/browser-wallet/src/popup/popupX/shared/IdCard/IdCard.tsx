@@ -2,35 +2,67 @@ import React, { ReactNode } from 'react';
 import Card from '@popup/popupX/shared/Card';
 import Text from '@popup/popupX/shared/Text';
 import Button from '@popup/popupX/shared/Button';
+import useEditableValue from '@popup/popupX/shared/EditableValue';
+import { useTranslation } from 'react-i18next';
 
-interface IdCardProps {
-    rowsIdInfo?: [string, string | ReactNode][];
-    rowsConnectedAccounts?: [string, string][];
-    onEditName?: () => void;
-}
+export type IdCardAttributeInfo = {
+    key: string;
+    value: string | ReactNode;
+};
 
-export default function IdCard({ rowsIdInfo = [], rowsConnectedAccounts, onEditName }: IdCardProps) {
+export type IdCardAccountInfo = {
+    address: string;
+    amount: ReactNode;
+};
+
+export type IdCardProps = {
+    idProviderName: string;
+    identityName: string;
+    rowsIdInfo?: IdCardAttributeInfo[];
+    rowsConnectedAccounts?: IdCardAccountInfo[];
+    onNewName?: (newName: string) => void;
+    identityNameFallback?: string;
+};
+
+export default function IdCard({
+    idProviderName,
+    identityName,
+    rowsIdInfo = [],
+    rowsConnectedAccounts,
+    onNewName,
+    identityNameFallback,
+}: IdCardProps) {
+    const editable = useEditableValue(identityName, identityNameFallback ?? '', onNewName ?? (() => {}));
+    const { t } = useTranslation('x', { keyPrefix: 'sharedX' });
+
     return (
         <Card type="gradient" className="id-card-x">
             <span className="title-row">
-                <Text.Main>Identity 1</Text.Main>
-                {onEditName && <Button.Secondary label="Edit Name" />}
+                <Text.Main>{editable.value}</Text.Main>
+                {editable.isEditing ? (
+                    <>
+                        <Button.Secondary label={t('idCard.name.save')} onClick={editable.onComplete} />
+                        <Button.Secondary label={t('idCard.name.abort')} onClick={editable.onAbort} />
+                    </>
+                ) : (
+                    onNewName && <Button.Secondary label={t('idCard.name.edit')} onClick={editable.onEdit} />
+                )}
             </span>
-            <Text.Capture>Verified by NotaBene</Text.Capture>
+            <Text.Capture>{t('idCard.verifiedBy', { idProviderName })}</Text.Capture>
             <Card>
-                {rowsIdInfo.map(([key, value]) => (
-                    <Card.Row key={key}>
-                        <Text.MainRegular>{key}</Text.MainRegular>
-                        <Text.MainMedium>{value}</Text.MainMedium>
+                {rowsIdInfo.map((info) => (
+                    <Card.Row key={info.key}>
+                        <Text.MainRegular>{info.key}</Text.MainRegular>
+                        <Text.MainMedium>{info.value}</Text.MainMedium>
                     </Card.Row>
                 ))}
             </Card>
             {rowsConnectedAccounts && (
                 <Card>
-                    {rowsConnectedAccounts.map(([key, value]) => (
-                        <Card.Row key={key}>
-                            <Text.MainRegular>{key}</Text.MainRegular>
-                            <Text.MainMedium>{value}</Text.MainMedium>
+                    {rowsConnectedAccounts.map((account) => (
+                        <Card.Row key={account.address}>
+                            <Text.MainRegular>{account.address}</Text.MainRegular>
+                            <Text.MainMedium>{account.amount}</Text.MainMedium>
                         </Card.Row>
                     ))}
                 </Card>

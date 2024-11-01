@@ -32,6 +32,14 @@ const t = {
             zero: 'Amount may not be zero',
         },
     },
+    idCard: {
+        name: {
+            edit: 'Edit Name',
+            save: 'Save',
+            abort: 'Abort',
+        },
+        verifiedBy: 'Verified by {{idProviderName}}',
+    },
 };
 
 export default t;

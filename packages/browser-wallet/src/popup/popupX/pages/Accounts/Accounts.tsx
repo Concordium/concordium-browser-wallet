@@ -1,4 +1,4 @@
-import React, { ChangeEvent, KeyboardEvent, useState } from 'react';
+import React from 'react';
 import Plus from '@assets/svgX/plus.svg';
 import Arrows from '@assets/svgX/arrows-down-up.svg';
 import MagnifyingGlass from '@assets/svgX/magnifying-glass.svg';
@@ -21,71 +21,7 @@ import { WalletCredential } from '@shared/storage/types';
 import { displaySplitAddress, useIdentityName, useWritableSelectedAccount } from '@popup/shared/utils/account-helpers';
 import { useAccountInfo } from '@popup/shared/AccountInfoListenerContext';
 import { displayAsCcd } from 'wallet-common-helpers';
-
-type EditableAccountNameProps = {
-    currentName: string;
-    fallbackName: string;
-    onNewName: (newName: string) => void;
-};
-
-function EditableAccountName({ currentName, fallbackName, onNewName }: EditableAccountNameProps) {
-    const [isEditingName, setIsEditingName] = useState(false);
-    const [editedName, setEditedName] = useState(currentName);
-    // Using editedName instead of currentName to avoid flickering after completing.
-    const displayName = editedName === '' ? fallbackName : editedName;
-    const onAbort = () => {
-        setIsEditingName(false);
-        setEditedName(currentName);
-    };
-    const onComplete = () => {
-        onNewName(editedName.trim());
-        setIsEditingName(false);
-    };
-    const onEdit = () => {
-        setEditedName(currentName);
-        setIsEditingName(true);
-    };
-    const onInputChange = (event: ChangeEvent<HTMLInputElement>) => {
-        setEditedName(event.target.value);
-    };
-    const onKeyUp = (event: KeyboardEvent<HTMLInputElement>) => {
-        if (event.key === 'Enter') {
-            event.preventDefault();
-            onComplete();
-        }
-    };
-    if (isEditingName) {
-        return (
-            <>
-                <Text.Main>
-                    <input
-                        autoFocus
-                        className="editable"
-                        value={editedName}
-                        placeholder={fallbackName}
-                        onChange={onInputChange}
-                        onKeyUp={onKeyUp}
-                        maxLength={25}
-                    />
-                </Text.Main>
-                <div className="row gap-16">
-                    <Button.Icon
-                        className="transparent"
-                        icon={<Checkmark className="width-12" />}
-                        onClick={onComplete}
-                    />
-                    <Button.Icon className="transparent" icon={<Close className="width-16" />} onClick={onAbort} />
-                </div>
-            </>
-        );
-    }
-    return (
-        <>
-            <Text.Main>{displayName}</Text.Main>
-            <Button.Icon className="transparent" icon={<Pencil />} onClick={onEdit} />
-        </>
-    );
-}
+import useEditableValue from '@popup/popupX/shared/EditableValue';
 
 type AccountListItemProps = {
     credential: WalletCredential;
@@ -108,14 +44,28 @@ function AccountListItem({ credential }: AccountListItemProps) {
     const ccdBalance =
         accountInfo === undefined ? 'Loading' : displayAsCcd(accountInfo.accountAmount.microCcdAmount, false);
     const onNewAccountName = (newName: string) => setAccount({ credName: newName });
+    const editable = useEditableValue(accountName, fallbackName, onNewAccountName);
+
     return (
         <Card key={accountName}>
             <Card.Row>
-                <EditableAccountName
-                    currentName={accountName}
-                    onNewName={onNewAccountName}
-                    fallbackName={fallbackName}
-                />
+                <Text.Main>{editable.value}</Text.Main>
+                {editable.isEditing ? (
+                    <div className="row gap-16">
+                        <Button.Icon
+                            className="transparent"
+                            icon={<Checkmark className="width-12" />}
+                            onClick={editable.onComplete}
+                        />
+                        <Button.Icon
+                            className="transparent"
+                            icon={<Close className="width-16" />}
+                            onClick={editable.onAbort}
+                        />
+                    </div>
+                ) : (
+                    <Button.Icon className="transparent" icon={<Pencil />} onClick={editable.onEdit} />
+                )}
             </Card.Row>
             <Card.Row>
                 <Text.Capture className="wrap-anywhere">{address}</Text.Capture>
