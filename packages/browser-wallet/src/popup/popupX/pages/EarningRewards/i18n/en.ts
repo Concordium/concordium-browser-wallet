@@ -76,6 +76,12 @@ const t = {
                 description: 'The proposed transaction contains no changes compared to the current delegation.',
                 buttonBack: 'Go back',
             },
+            lowerStakeNotice:
+                'Reducing your stake is subject to a cooldown period of {{cooldown}} days, in which the stake cannot be spent or transferred.',
+        },
+        remove: {
+            title: 'Remove delegation',
+            notice: 'The delegated stake is released after {{cooldown}} days',
         },
         target: {
             description: 'You can delegate to an open pool of your choice, or you can stake using passive delegation.',

@@ -1,7 +1,7 @@
 import { MILLISECONDS_PER_DAY, MILLISECONDS_PER_HOUR, MILLISECONDS_PER_MINUTE } from '@popup/constants/time';
 
 export function secondsToDaysRoundedDown(seconds: bigint | undefined): bigint {
-    return seconds ? seconds / (60n * 60n * 24n) : 0n;
+    return seconds !== undefined ? seconds / (60n * 60n * 24n) : 0n;
 }
 
 type TimeAndUnit = { time: bigint; unit: string };
