@@ -1,13 +1,17 @@
-import React, { useMemo } from 'react';
+import React, { useCallback, useMemo } from 'react';
 import {
-    AccountInfoDelegator,
+    AccountAddress,
+    AccountInfoBaker,
+    AccountTransactionPayload,
     AccountTransactionType,
-    ConfigureDelegationPayload,
-    DelegationTargetType,
+    CcdAmount,
+    ConfigureBakerPayload,
     TransactionHash,
 } from '@concordium/web-sdk';
 import { Navigate, useLocation, Location, useNavigate } from 'react-router-dom';
+import { useAtomValue } from 'jotai';
 import { useTranslation } from 'react-i18next';
+import { useUpdateAtom } from 'jotai/utils';
 
 import Button from '@popup/popupX/shared/Button';
 import Page from '@popup/popupX/shared/Page';
@@ -16,31 +20,87 @@ import Card from '@popup/popupX/shared/Card';
 import { ensureDefined } from '@shared/utils/basic-helpers';
 import { useBlockChainParametersAboveV0 } from '@popup/shared/BlockChainParametersProvider';
 import { secondsToDaysRoundedDown } from '@shared/utils/time-helpers';
-import { useGetTransactionFee, useTransactionSubmit } from '@popup/shared/utils/transaction-helpers';
+import { grpcClientAtom } from '@popup/store/settings';
+import { usePrivateKey } from '@popup/shared/utils/account-helpers';
+import {
+    createPendingTransactionFromAccountTransaction,
+    getDefaultExpiry,
+    getTransactionAmount,
+    sendTransaction,
+    useGetTransactionFee,
+} from '@popup/shared/utils/transaction-helpers';
+import { addPendingTransactionAtom } from '@popup/store/transactions';
 import { cpStakingCooldown } from '@shared/utils/chain-parameters-helpers';
 import { submittedTransactionRoute } from '@popup/popupX/constants/routes';
 import Text from '@popup/popupX/shared/Text';
 import { useSelectedAccountInfo } from '@popup/shared/AccountInfoListenerContext/AccountInfoListenerContext';
+import { showValidatorAmount, showValidatorOpenStatus, showValidatorRestake } from '../util';
 
-export type DelegationResultLocationState = {
-    payload: ConfigureDelegationPayload;
+enum TransactionSubmitErrorType {
+    InsufficientFunds = 'InsufficientFunds',
+}
+
+class TransactionSubmitError extends Error {
+    private constructor(public type: TransactionSubmitErrorType) {
+        super();
+        super.name = `TransactionSubmitError.${type}`;
+    }
+
+    public static insufficientFunds(): TransactionSubmitError {
+        return new TransactionSubmitError(TransactionSubmitErrorType.InsufficientFunds);
+    }
+}
+
+function useTransactionSubmit(sender: AccountAddress.Type, type: AccountTransactionType) {
+    const grpc = useAtomValue(grpcClientAtom);
+    const key = usePrivateKey(sender.address);
+    const addPendingTransaction = useUpdateAtom(addPendingTransactionAtom);
+
+    return useCallback(
+        async (payload: AccountTransactionPayload, cost: CcdAmount.Type) => {
+            const accountInfo = await grpc.getAccountInfo(sender);
+            if (
+                accountInfo.accountAvailableBalance.microCcdAmount <
+                getTransactionAmount(type, payload) + (cost.microCcdAmount || 0n)
+            ) {
+                throw TransactionSubmitError.insufficientFunds();
+            }
+
+            const nonce = await grpc.getNextAccountNonce(sender);
+
+            const header = {
+                expiry: getDefaultExpiry(),
+                sender,
+                nonce: nonce.nonce,
+            };
+            const transaction = { payload, header, type };
+
+            const hash = await sendTransaction(grpc, transaction, key!);
+            const pending = createPendingTransactionFromAccountTransaction(transaction, hash, cost.microCcdAmount);
+            await addPendingTransaction(pending);
+
+            return hash;
+        },
+        [key]
+    );
+}
+
+export type ValidationResultLocationState = {
+    payload: ConfigureBakerPayload;
     type: 'register' | 'change' | 'remove';
 };
 
 export default function DelegationResult() {
     const { state } = useLocation() as Location & {
-        state: DelegationResultLocationState | undefined;
+        state: ValidationResultLocationState | undefined;
     };
     const nav = useNavigate();
-    const { t } = useTranslation('x', { keyPrefix: 'earn.delegator' });
-    const getCost = useGetTransactionFee(AccountTransactionType.ConfigureDelegation);
+    const { t } = useTranslation('x', { keyPrefix: 'earn.validator' });
+    const getCost = useGetTransactionFee(AccountTransactionType.ConfigureBaker);
     const accountInfo = ensureDefined(useSelectedAccountInfo(), 'No account selected');
 
     const parametersV1 = useBlockChainParametersAboveV0();
-    const submitTransaction = useTransactionSubmit(
-        accountInfo.accountAddress,
-        AccountTransactionType.ConfigureDelegation
-    );
+    const submitTransaction = useTransactionSubmit(accountInfo.accountAddress, AccountTransactionType.ConfigureBaker);
 
     const cooldown = useMemo(() => {
         let cooldownParam = 0n;
@@ -58,7 +118,7 @@ export default function DelegationResult() {
                 if (
                     state.payload.stake === undefined ||
                     state.payload.stake.microCcdAmount >=
-                        (accountInfo as AccountInfoDelegator).accountDelegation.stakedAmount.microCcdAmount
+                        (accountInfo as AccountInfoBaker).accountBaker.stakedAmount.microCcdAmount
                 ) {
                     // Staked amount is not lowered
                     return [t('update.title')];
@@ -84,45 +144,37 @@ export default function DelegationResult() {
         nav(submittedTransactionRoute(TransactionHash.fromHexString(tx)));
     };
 
+    // TODO:
+    // - Add the rest of the transaction fields
     return (
-        <Page className="delegation-result-container">
+        <Page className="validation-result-container">
             <Page.Top heading={title} />
             {notice !== undefined && <Text.Capture>{notice}</Text.Capture>}
-            <Card className="delegation-result__card">
+            <Card className="validation-result__card">
                 <Card.Row>
                     <Card.RowDetails title={t('submit.sender.label')} value={accountInfo.accountAddress.address} />
                 </Card.Row>
-                {state.payload.delegationTarget !== undefined && (
-                    <Card.Row>
-                        <Card.RowDetails
-                            title={t('values.target.label')}
-                            value={
-                                state.payload.delegationTarget.delegateType === DelegationTargetType.Baker
-                                    ? t('values.target.validator', {
-                                          id: state.payload.delegationTarget.bakerId.toString(),
-                                      })
-                                    : t('values.target.passive')
-                            }
-                        />
-                    </Card.Row>
-                )}
                 {state.payload.stake !== undefined && (
                     <Card.Row>
                         <Card.RowDetails
                             title={t('values.amount.label')}
-                            value={`${formatCcdAmount(state.payload.stake)} CCD`}
+                            value={showValidatorAmount(state.payload.stake)}
                         />
                     </Card.Row>
                 )}
                 {state.payload.restakeEarnings !== undefined && (
                     <Card.Row>
                         <Card.RowDetails
-                            title={t('values.redelegate.label')}
-                            value={
-                                state.payload.restakeEarnings
-                                    ? t('values.redelegate.delegation')
-                                    : t('values.redelegate.public')
-                            }
+                            title={t('values.restake.label')}
+                            value={showValidatorRestake(state.payload.restakeEarnings)}
+                        />
+                    </Card.Row>
+                )}
+                {state.payload.openForDelegation !== undefined && (
+                    <Card.Row>
+                        <Card.RowDetails
+                            title={t('values.restake.label')}
+                            value={showValidatorOpenStatus(state.payload.openForDelegation)}
                         />
                     </Card.Row>
                 )}

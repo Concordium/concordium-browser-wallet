@@ -1,5 +1,5 @@
 import React from 'react';
-import { AccountInfoType } from '@concordium/web-sdk';
+import { AccountInfoType, CcdAmount } from '@concordium/web-sdk';
 import { absoluteRoutes } from '@popup/popupX/constants/routes';
 import Button from '@popup/popupX/shared/Button';
 import Card from '@popup/popupX/shared/Card';
@@ -8,7 +8,13 @@ import { useTranslation } from 'react-i18next';
 import { useSelectedAccountInfo } from '@popup/shared/AccountInfoListenerContext/AccountInfoListenerContext';
 import { Navigate, useNavigate } from 'react-router-dom';
 import AccountCooldowns from '../AccountCooldowns';
-import { showRestake, showValidatorAmount, showValidatorOpenStatus } from './util';
+import { showValidatorRestake, showValidatorAmount, showValidatorOpenStatus } from './util';
+import { ValidationResultLocationState } from './Result/ValidatorResult';
+
+const REMOVE_STATE: ValidationResultLocationState = {
+    type: 'remove',
+    payload: { stake: CcdAmount.zero() },
+};
 
 export default function ValidatorStatus() {
     const { t } = useTranslation('x', { keyPrefix: 'earn.validator' });
@@ -22,6 +28,7 @@ export default function ValidatorStatus() {
     const { accountBaker, accountCooldowns } = accountInfo;
 
     if (accountBaker.version === 0) {
+        // assume protocol version >= 4
         return null;
     }
 
@@ -41,7 +48,7 @@ export default function ValidatorStatus() {
                 <Card.Row>
                     <Card.RowDetails
                         title={t('values.restake.label')}
-                        value={showRestake(accountBaker.restakeEarnings)}
+                        value={showValidatorRestake(accountBaker.restakeEarnings)}
                     />
                 </Card.Row>
                 <Card.Row>
@@ -66,7 +73,7 @@ export default function ValidatorStatus() {
                 />
                 <Button.Main
                     label={t('status.buttonStop')}
-                    // onClick={() => nav(absoluteRoutes.settings.earn.delegator.stop.path)}
+                    onClick={() => nav(absoluteRoutes.settings.earn.validator.submit.path, { state: REMOVE_STATE })}
                 />
             </Page.Footer>
         </Page>

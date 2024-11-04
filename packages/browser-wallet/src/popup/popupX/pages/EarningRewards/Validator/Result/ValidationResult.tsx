@@ -1,11 +1,5 @@
 import React, { useMemo } from 'react';
-import {
-    AccountInfoDelegator,
-    AccountTransactionType,
-    ConfigureDelegationPayload,
-    DelegationTargetType,
-    TransactionHash,
-} from '@concordium/web-sdk';
+import { AccountInfoBaker, AccountTransactionType, ConfigureBakerPayload, TransactionHash } from '@concordium/web-sdk';
 import { Navigate, useLocation, Location, useNavigate } from 'react-router-dom';
 import { useTranslation } from 'react-i18next';
 
@@ -21,26 +15,24 @@ import { cpStakingCooldown } from '@shared/utils/chain-parameters-helpers';
 import { submittedTransactionRoute } from '@popup/popupX/constants/routes';
 import Text from '@popup/popupX/shared/Text';
 import { useSelectedAccountInfo } from '@popup/shared/AccountInfoListenerContext/AccountInfoListenerContext';
+import { showValidatorAmount, showValidatorOpenStatus, showValidatorRestake } from '../util';
 
-export type DelegationResultLocationState = {
-    payload: ConfigureDelegationPayload;
+export type ValidationResultLocationState = {
+    payload: ConfigureBakerPayload;
     type: 'register' | 'change' | 'remove';
 };
 
-export default function DelegationResult() {
+export default function ValidationResult() {
     const { state } = useLocation() as Location & {
-        state: DelegationResultLocationState | undefined;
+        state: ValidationResultLocationState | undefined;
     };
     const nav = useNavigate();
-    const { t } = useTranslation('x', { keyPrefix: 'earn.delegator' });
-    const getCost = useGetTransactionFee(AccountTransactionType.ConfigureDelegation);
+    const { t } = useTranslation('x', { keyPrefix: 'earn.validator' });
+    const getCost = useGetTransactionFee(AccountTransactionType.ConfigureBaker);
     const accountInfo = ensureDefined(useSelectedAccountInfo(), 'No account selected');
 
     const parametersV1 = useBlockChainParametersAboveV0();
-    const submitTransaction = useTransactionSubmit(
-        accountInfo.accountAddress,
-        AccountTransactionType.ConfigureDelegation
-    );
+    const submitTransaction = useTransactionSubmit(accountInfo.accountAddress, AccountTransactionType.ConfigureBaker);
 
     const cooldown = useMemo(() => {
         let cooldownParam = 0n;
@@ -58,7 +50,7 @@ export default function DelegationResult() {
                 if (
                     state.payload.stake === undefined ||
                     state.payload.stake.microCcdAmount >=
-                        (accountInfo as AccountInfoDelegator).accountDelegation.stakedAmount.microCcdAmount
+                        (accountInfo as AccountInfoBaker).accountBaker.stakedAmount.microCcdAmount
                 ) {
                     // Staked amount is not lowered
                     return [t('update.title')];
@@ -84,45 +76,37 @@ export default function DelegationResult() {
         nav(submittedTransactionRoute(TransactionHash.fromHexString(tx)));
     };
 
+    // TODO:
+    // [ ] Add the rest of the transaction fields
     return (
-        <Page className="delegation-result-container">
+        <Page className="validation-result-container">
             <Page.Top heading={title} />
             {notice !== undefined && <Text.Capture>{notice}</Text.Capture>}
-            <Card className="delegation-result__card">
+            <Card className="validation-result__card">
                 <Card.Row>
                     <Card.RowDetails title={t('submit.sender.label')} value={accountInfo.accountAddress.address} />
                 </Card.Row>
-                {state.payload.delegationTarget !== undefined && (
-                    <Card.Row>
-                        <Card.RowDetails
-                            title={t('values.target.label')}
-                            value={
-                                state.payload.delegationTarget.delegateType === DelegationTargetType.Baker
-                                    ? t('values.target.validator', {
-                                          id: state.payload.delegationTarget.bakerId.toString(),
-                                      })
-                                    : t('values.target.passive')
-                            }
-                        />
-                    </Card.Row>
-                )}
                 {state.payload.stake !== undefined && (
                     <Card.Row>
                         <Card.RowDetails
                             title={t('values.amount.label')}
-                            value={`${formatCcdAmount(state.payload.stake)} CCD`}
+                            value={showValidatorAmount(state.payload.stake)}
                         />
                     </Card.Row>
                 )}
                 {state.payload.restakeEarnings !== undefined && (
                     <Card.Row>
                         <Card.RowDetails
-                            title={t('values.redelegate.label')}
-                            value={
-                                state.payload.restakeEarnings
-                                    ? t('values.redelegate.delegation')
-                                    : t('values.redelegate.public')
-                            }
+                            title={t('values.restake.label')}
+                            value={showValidatorRestake(state.payload.restakeEarnings)}
+                        />
+                    </Card.Row>
+                )}
+                {state.payload.openForDelegation !== undefined && (
+                    <Card.Row>
+                        <Card.RowDetails
+                            title={t('values.restake.label')}
+                            value={showValidatorOpenStatus(state.payload.openForDelegation)}
                         />
                     </Card.Row>
                 )}

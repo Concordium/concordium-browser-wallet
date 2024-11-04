@@ -183,6 +183,63 @@ const t = {
         register: {
             title: 'Register validator',
             backTitle: 'Earning rewards',
+            notice: 'This will lock your validation amount. Amount is released after {{cooldown}} days from the time you remove or decrease your validation stake.',
+        },
+        update: {
+            title: 'Update validator',
+            noChangesNotice: {
+                title: 'No changes',
+                description: 'The proposed transaction contains no changes compared to the current validation.',
+                buttonBack: 'Go back',
+            },
+            lowerStakeNotice:
+                'Reducing your stake is subject to a cooldown period of {{cooldown}} days, in which the stake cannot be spent or transferred.',
+        },
+        remove: {
+            title: 'Remove validator',
+            notice: 'The validator stake is released after {{cooldown}} days',
+        },
+        stake: {
+            selectedAccount: 'on {{account}}',
+            token: {
+                label: 'Token',
+                value: 'CCD',
+                balance: '{{balance}} CCD available',
+            },
+            inputAmount: {
+                label: 'Amount',
+                buttonMax: 'Stake max.',
+            },
+            fee: {
+                label: 'Estimated transaction fee:',
+                value: '{{amount}} CCD',
+            },
+            poolStake: {
+                label: 'Current pool',
+                value: '{{amount}} CCD',
+            },
+            poolCap: {
+                label: 'Pool limit',
+                value: '{{amount}} CCD',
+            },
+            restake: {
+                label: 'Restake rewards',
+                description: 'I want to automatically add my validation rewards to my validation amount.',
+            },
+            buttonContinue: 'Continue',
+            overStakeThresholdWarning: {
+                title: 'Important',
+                description:
+                    'You are about to lock more than {{ threshold }}% of your total balance in a validation stake.\n\nIf you don’t have enough unlocked CCD at your disposal, you might not be able to pay future transaction fees.',
+                buttonContinue: 'Continue',
+                buttonBack: 'Enter new stake',
+            },
+        },
+        submit: {
+            backTitle: 'Validation settings',
+            sender: { label: 'Sender' },
+            fee: { label: 'Estimated transaction fee' },
+            button: 'Submit validation',
         },
     },
 };

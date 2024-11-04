@@ -18,7 +18,6 @@ import {
     UpdateContractPayload,
     SimpleTransferWithMemoPayload,
     AccountInfoType,
-    ConfigureDelegationPayload,
     getEnergyCost,
     convertEnergyToMicroCcd,
 } from '@concordium/web-sdk';
@@ -33,11 +32,14 @@ import {
 
 import i18n from '@popup/shell/i18n';
 import { useAtomValue } from 'jotai';
-import { selectedPendingTransactionsAtom } from '@popup/store/transactions';
+import { addPendingTransactionAtom, selectedPendingTransactionsAtom } from '@popup/store/transactions';
 import { DEFAULT_TRANSACTION_EXPIRY } from '@shared/constants/time';
 import { useCallback } from 'react';
+import { grpcClientAtom } from '@popup/store/settings';
+import { useUpdateAtom } from 'jotai/utils';
 import { BrowserWalletAccountTransaction, TransactionStatus } from './transaction-history-types';
 import { useBlockChainParameters } from '../BlockChainParametersProvider';
+import { usePrivateKey } from './account-helpers';
 
 export function buildSimpleTransferPayload(recipient: string, amount: bigint): SimpleTransferPayload {
     return {
@@ -257,7 +259,7 @@ export function useGetTransactionFee(type: AccountTransactionType) {
     const cp = useBlockChainParameters();
 
     return useCallback(
-        (payload: ConfigureDelegationPayload) => {
+        (payload: AccountTransactionPayload) => {
             if (cp === undefined) {
                 return undefined;
             }
@@ -265,5 +267,66 @@ export function useGetTransactionFee(type: AccountTransactionType) {
             return convertEnergyToMicroCcd(energy, cp);
         },
         [cp, type]
+    );
+}
+
+/** Types of errors returned when attempting transaction submission */
+export enum TransactionSubmitErrorType {
+    InsufficientFunds = 'InsufficientFunds',
+}
+
+/** Error returned when attempting to submit a transaction using {@linkcode useTransactionSubmit} */
+export class TransactionSubmitError extends Error {
+    private constructor(public type: TransactionSubmitErrorType) {
+        super();
+        super.name = `TransactionSubmitError.${type}`;
+    }
+
+    public static insufficientFunds(): TransactionSubmitError {
+        return new TransactionSubmitError(TransactionSubmitErrorType.InsufficientFunds);
+    }
+}
+
+/**
+ * Hook returning a function to submit a transaction of the specified type from the specified sender.
+ * If successful, a pending transaction is added to the local store which will then await finalization status from the node.
+ *
+ * @param sender - The account address of the sender.
+ * @param type - The type of the account transaction.
+ *
+ * @returns A function to submit a transaction.
+ * @throws {@linkcode TransactionSubmitError}
+ */
+export function useTransactionSubmit(sender: AccountAddress.Type, type: AccountTransactionType) {
+    const grpc = useAtomValue(grpcClientAtom);
+    const key = usePrivateKey(sender.address);
+    const addPendingTransaction = useUpdateAtom(addPendingTransactionAtom);
+
+    return useCallback(
+        async (payload: AccountTransactionPayload, cost: CcdAmount.Type) => {
+            const accountInfo = await grpc.getAccountInfo(sender);
+            if (
+                accountInfo.accountAvailableBalance.microCcdAmount <
+                getTransactionAmount(type, payload) + (cost.microCcdAmount || 0n)
+            ) {
+                throw TransactionSubmitError.insufficientFunds();
+            }
+
+            const nonce = await grpc.getNextAccountNonce(sender);
+
+            const header = {
+                expiry: getDefaultExpiry(),
+                sender,
+                nonce: nonce.nonce,
+            };
+            const transaction = { payload, header, type };
+
+            const hash = await sendTransaction(grpc, transaction, key!);
+            const pending = createPendingTransactionFromAccountTransaction(transaction, hash, cost.microCcdAmount);
+            await addPendingTransaction(pending);
+
+            return hash;
+        },
+        [key]
     );
 }
