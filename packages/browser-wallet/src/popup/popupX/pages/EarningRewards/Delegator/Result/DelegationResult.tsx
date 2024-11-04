@@ -14,7 +14,6 @@ import { useAtomValue } from 'jotai';
 import { useTranslation } from 'react-i18next';
 import { useUpdateAtom } from 'jotai/utils';
 
-import { selectedAccountAtom } from '@popup/store/account';
 import Button from '@popup/popupX/shared/Button';
 import Page from '@popup/popupX/shared/Page';
 import { formatCcdAmount } from '@popup/popupX/shared/utils/helpers';
