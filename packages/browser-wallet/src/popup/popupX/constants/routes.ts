@@ -160,14 +160,26 @@ export const relativeRoutes = {
         /** Routes related to staking for the currently selected account */
         earn: {
             path: 'earn',
-            /** Validation related routes */
+            /** Validation section */
             validator: {
                 path: 'baker',
-                intro: {
-                    path: 'intro',
-                },
+                /** Configure new validator */
                 register: {
                     path: 'register',
+                    config: {
+                        backTitle: i18n.t('x:earn.validator.register.backTitle'),
+                    },
+                    /** Flow for constructing the transaction */
+                    configure: {
+                        config: {
+                            backTitle: i18n.t('x:earn.validator.register.backTitle'),
+                        },
+                        path: 'configure',
+                    },
+                },
+                /** Configure existing delegator */
+                update: {
+                    path: 'update',
                 },
                 openPool: {
                     path: 'openPool',

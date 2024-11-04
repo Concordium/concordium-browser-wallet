@@ -14,7 +14,7 @@ const t = {
         inactiveStake: {
             label: 'Inactive stake',
             description:
-                'You don’t receive rewards from this part of stake now, this amount will be at disposal after cooldown period.',
+                'You don’t receive rewards from this part of the stake now. This amount will be at your disposal after the cooldown period.',
         },
         cooldown: {
             label: 'Cooldown time:',
@@ -45,7 +45,7 @@ const t = {
             },
             '2': {
                 title: 'Delegation models',
-                body: "There are two staking models that a delegator can choose:<ul><li>Delegating to a specific pool</li><li>Passive delegation</li></ul>A staking pool is managed by an individual validator running a node, so the rewards depend on that validator's performance.\n\nSince passive delegation doesn't go to a specific pool, it mitigates the risk of a single validator performing badly, however, the rewards are lower.\n\nFor more info, visit our <1>documentation website</1>",
+                body: "There are two staking models that a delegator can choose:<ul><li>Delegating to a specific pool</li><li>Passive delegation</li></ul>A staking pool is managed by an individual validator running a node, so the rewards depend on that validator's performance.\n\nSince passive delegation doesn't go to a specific pool, it mitigates the risk of a single validator performing badly. However, the rewards are lower.\n\nFor more info, visit our <1>documentation website</1>",
             },
             '3': {
                 title: 'Staking pools',
@@ -95,9 +95,9 @@ const t = {
                 errorNotValidator: 'The specified ID is not a validator pool',
             },
             validatorDelegationDescription:
-                'If you don’t already know which validator pool you want to delegate an amount to, you can look for on <1>here.</1>',
+                'If you don’t already know which validator pool you want to delegate an amount to, you can look for one <1>here.</1>',
             passiveDelegationDescription:
-                'Passive delegation is an alternative to delegation to a specific validator pool that has lower rewards. With passive delegation you do not have to worry about the uptime or quality of a baker node.\nFor more info you can visit <1>developer.concordium.software</1>',
+                'Passive delegation is an alternative to delegation to a specific validator pool that has lower rewards. With passive delegation, you do not have to worry about the uptime or quality of a baker node.\nFor more info, you can visit <1>developer.concordium.software</1>',
             buttonContinue: 'Continue',
         },
         stake: {
@@ -144,6 +144,28 @@ const t = {
         },
     },
     validator: {
+        values: {
+            openStatus: {
+                label: 'Delegation pool status',
+                open: 'Open for delegation',
+                closed: 'Closed for delegation',
+                closedNew: 'Closed for new delegators',
+            },
+            amount: { label: 'Validator stake' },
+            id: { label: 'Validator ID' },
+            restake: {
+                label: 'Rewards will be',
+                validation: 'Added to validator stake',
+                public: 'Added to public balance',
+            },
+            metadataUrl: { label: 'Metadata URL' },
+        },
+        status: {
+            title: 'Your validation is registered',
+            backTitle: 'to Main page',
+            buttonUpdate: 'Update',
+            buttonStop: 'Stop',
+        },
         intro: {
             '1': {
                 title: 'Become a validator',
@@ -157,6 +179,10 @@ const t = {
                 title: 'Opening a pool',
                 body: 'You have the option when adding a validator to open a staking pool or not. A staking pool allows others who want to earn rewards to do so without the need to run a node or become a validator themselves.\n\nTo do this they delegate an amount to your staking pool which then increases your total stake and your chances of winning the lottery to bake a block. At each pay day the rewards will be distributed to you and your delegators.\n\nYou can also choose not to open a pool, in which case only your own stake applies toward the lottery. You can always open or close a pool later.',
             },
+        },
+        register: {
+            title: 'Register validator',
+            backTitle: 'Earning rewards',
         },
     },
 };

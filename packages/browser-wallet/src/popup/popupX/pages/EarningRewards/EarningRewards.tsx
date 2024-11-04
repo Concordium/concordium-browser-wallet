@@ -41,7 +41,7 @@ export default function EarningRewards() {
                     <Text.Capture>
                         {t('validatorDescription', { amount: displayAsCcd(bakingThreshold, false) })}
                     </Text.Capture>
-                    <Link to={absoluteRoutes.settings.earn.validator.intro.path}>
+                    <Link to={absoluteRoutes.settings.earn.validator.register.path}>
                         <div className="earn__card_continue">
                             <Text.LabelRegular>{t('validatorAction')}</Text.LabelRegular>
                             <ArrowRight />

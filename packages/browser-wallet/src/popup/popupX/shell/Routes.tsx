@@ -19,10 +19,8 @@ import About from '@popup/popupX/pages/About';
 import { IdSubmitted, IdCardsInfo, RequestIdentity, SetupPassword, Welcome } from '@popup/popupX/pages/Onboarding';
 import ConnectedSites from '@popup/popupX/pages/ConnectedSites';
 import EarningRewards from '@popup/popupX/pages/EarningRewards';
-import { BakerIntro } from '@popup/popupX/pages/EarningRewards/Baker/Intro';
-import { RegisterBaker } from '@popup/popupX/pages/EarningRewards/Baker/Register';
-import { OpenPool } from '@popup/popupX/pages/EarningRewards/Baker/OpenPool';
-import { BakerKeys } from '@popup/popupX/pages/EarningRewards/Baker/BakerKeys';
+import ValidatorIntro from '@popup/popupX/pages/EarningRewards/Validator/Intro';
+import RegisterValidator from '@popup/popupX/pages/EarningRewards/Validator/Register';
 import PrivateKey from '@popup/popupX/pages/PrivateKey';
 import { RestoreIntro, RestoreResult } from '@popup/popupX/pages/Restore';
 import { MessagePromptHandlersType } from '@popup/shared/utils/message-prompt-handlers';
@@ -37,6 +35,7 @@ import {
     UpdateDelegatorTransactionFlow,
 } from '../pages/EarningRewards/Delegator/TransactionFlow';
 import DelegatorStatus from '../pages/EarningRewards/Delegator/Status';
+import ValidatorStatus from '../pages/EarningRewards/Validator/Status';
 
 export default function Routes({ messagePromptHandlers }: { messagePromptHandlers: MessagePromptHandlersType }) {
     const { handleConnectionResponse } = messagePromptHandlers;
@@ -105,25 +104,19 @@ export default function Routes({ messagePromptHandlers }: { messagePromptHandler
                     <Route path={relativeRoutes.settings.earn.path}>
                         <Route index element={<EarningRewards />} />
                         <Route path={relativeRoutes.settings.earn.validator.path}>
-                            <Route element={<BakerIntro />} path={relativeRoutes.settings.earn.validator.intro.path} />
-                            <Route
-                                element={<RegisterBaker />}
-                                path={relativeRoutes.settings.earn.validator.register.path}
-                            />
-                            <Route element={<OpenPool />} path={relativeRoutes.settings.earn.validator.openPool.path} />
-                            <Route element={<BakerKeys />} path={relativeRoutes.settings.earn.validator.keys.path} />
+                            <Route index element={<ValidatorStatus />} />
+                            <Route path={`${relativeRoutes.settings.earn.validator.register.path}`}>
+                                <Route index element={<ValidatorIntro />} />
+                                <Route
+                                    path={`${relativeRoutes.settings.earn.validator.register.configure.path}/*`}
+                                    element={<RegisterValidator />}
+                                />
+                            </Route>
                         </Route>
                         <Route path={relativeRoutes.settings.earn.delegator.path}>
                             <Route index element={<DelegatorStatus />} />
                             <Route path={`${relativeRoutes.settings.earn.delegator.register.path}`}>
-                                <Route
-                                    index
-                                    element={
-                                        <DelegatorIntro
-                                            onDoneRoute={relativeRoutes.settings.earn.delegator.register.configure.path}
-                                        />
-                                    }
-                                />
+                                <Route index element={<DelegatorIntro />} />
                                 <Route
                                     path={`${relativeRoutes.settings.earn.delegator.register.configure.path}/*`}
                                     element={<RegisterDelegatorTransactionFlow />}
