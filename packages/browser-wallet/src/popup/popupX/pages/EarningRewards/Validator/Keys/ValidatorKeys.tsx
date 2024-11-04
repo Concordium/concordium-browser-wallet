@@ -5,7 +5,7 @@ export default function ValidatorKeys() {
     return (
         <div className="validator-keys-container">
             <div className="validator-keys__title">
-                <span className="heading_medium">validator keys</span>
+                <span className="heading_medium">Validator keys</span>
                 <span className="capture__main_small">on Accout 1 / 6gk...k7o</span>
             </div>
             <span className="capture__main_small">
