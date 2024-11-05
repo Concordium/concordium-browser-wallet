@@ -1,5 +1,5 @@
 import React, { useCallback, useMemo, useState } from 'react';
-import { BakerKeysWithProofs, generateBakerKeys } from '@concordium/web-sdk';
+import { GenerateBakerKeysOutput, generateBakerKeys } from '@concordium/web-sdk';
 
 import ExportIcon from '@assets/svgX/sign-out.svg';
 import Caret from '@assets/svgX/caret-right.svg';
@@ -15,29 +15,21 @@ import clsx from 'clsx';
 
 const KEYS_FILENAME = 'validator-credentials.json';
 
-type Props = { onSubmit(keys: BakerKeysWithProofs): void };
+type Props = {
+    initial: GenerateBakerKeysOutput | undefined;
+    onSubmit(keys: GenerateBakerKeysOutput): void;
+};
 
-export default function ValidatorKeys({ onSubmit }: Props) {
+export default function ValidatorKeys({ onSubmit, initial }: Props) {
     const [expand, setExpand] = useState(false);
     const [exported, setExported] = useState(false);
     const accountInfo = ensureDefined(useSelectedAccountInfo(), 'Expected seleted account');
-    const keysFull = useMemo(() => generateBakerKeys(accountInfo.accountAddress), [accountInfo]);
-    const keysPublic: BakerKeysWithProofs = useMemo(
-        () => ({
-            proofSig: keysFull.proofSig,
-            proofElection: keysFull.proofElection,
-            proofAggregation: keysFull.proofAggregation,
-            electionVerifyKey: keysFull.electionVerifyKey,
-            signatureVerifyKey: keysFull.signatureVerifyKey,
-            aggregationVerifyKey: keysFull.aggregationVerifyKey,
-        }),
-        [keysFull]
-    );
+    const keys = useMemo(() => initial ?? generateBakerKeys(accountInfo.accountAddress), [initial, accountInfo]);
 
     const exportKeys = useCallback(() => {
-        saveData(getBakerKeyExport(keysFull, accountInfo), KEYS_FILENAME);
+        saveData(getBakerKeyExport(keys, accountInfo), KEYS_FILENAME);
         setExported(true);
-    }, [keysFull]);
+    }, [keys]);
 
     return (
         <Page className={clsx('validator-keys', expand && 'validator-keys--expanded')}>
@@ -48,13 +40,13 @@ export default function ValidatorKeys({ onSubmit }: Props) {
             </Text.Capture>
             <Card>
                 <Card.Row>
-                    <Card.RowDetails title="Election verify key" value={keysPublic.electionVerifyKey} />
+                    <Card.RowDetails title="Election verify key" value={keys.electionVerifyKey} />
                 </Card.Row>
                 <Card.Row>
-                    <Card.RowDetails title="Signature verify key" value={keysPublic.signatureVerifyKey} />
+                    <Card.RowDetails title="Signature verify key" value={keys.signatureVerifyKey} />
                 </Card.Row>
                 <Card.Row>
-                    <Card.RowDetails title="Aggregation verify key" value={keysPublic.aggregationVerifyKey} />
+                    <Card.RowDetails title="Aggregation verify key" value={keys.aggregationVerifyKey} />
                 </Card.Row>
             </Card>
             <div>
@@ -66,9 +58,9 @@ export default function ValidatorKeys({ onSubmit }: Props) {
                 />
                 <Button.IconText icon={<ExportIcon />} label="Export keys as .json" onClick={exportKeys} />
             </div>
-            {exported && (
+            {(exported || initial !== undefined) && (
                 <Page.Footer>
-                    <Button.Main label="Continue" onClick={() => onSubmit(keysPublic)} />
+                    <Button.Main label="Continue" onClick={() => onSubmit(keys)} />
                 </Page.Footer>
             )}
         </Page>

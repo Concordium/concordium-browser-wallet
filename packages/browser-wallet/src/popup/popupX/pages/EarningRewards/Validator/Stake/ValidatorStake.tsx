@@ -17,9 +17,9 @@ import { useGetTransactionFee } from '@popup/shared/utils/transaction-helpers';
 import FullscreenNotice, { FullscreenNoticeProps } from '@popup/popupX/shared/FullscreenNotice';
 
 import { METADATAURL_MAX_LENGTH } from '@shared/constants/baking';
+import { displayAsCcd } from 'wallet-common-helpers';
 import { STAKE_WARNING_THRESHOLD, isAboveStakeWarningThreshold } from '../../util';
 import { ValidatorStakeForm } from '../util';
-import { displayAsCcd } from 'wallet-common-helpers';
 
 type HighStakeNoticeProps = FullscreenNoticeProps & {
     onContinue(): void;

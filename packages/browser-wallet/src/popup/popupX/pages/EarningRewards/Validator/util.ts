@@ -1,8 +1,8 @@
 import {
-    BakerKeysWithProofs,
     CcdAmount,
     CommissionRates,
     ConfigureBakerPayload,
+    GenerateBakerKeysOutput,
     OpenStatus,
     OpenStatusText,
 } from '@concordium/web-sdk';
@@ -39,7 +39,7 @@ export function showValidatorRestake(value: boolean): string {
 export type ValidatorStakeForm = { amount: string; restake: boolean };
 
 export type ValidatorFormUpdateStake = { stake: ValidatorStakeForm };
-export type ValidatorFormUpdateKeys = { keys: BakerKeysWithProofs };
+export type ValidatorFormUpdateKeys = { keys: GenerateBakerKeysOutput };
 export type ValidatorFormUpdateSettings = {
     status: OpenStatusText;
     commissions: CommissionRates;

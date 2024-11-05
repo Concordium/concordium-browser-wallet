@@ -84,8 +84,8 @@ function ValidatorTransactionFlow({ existingValues, title }: Props) {
                     },
                 },
                 keys: {
-                    render(_, onNext) {
-                        return <Keys onSubmit={onNext} />;
+                    render(initial, onNext) {
+                        return <Keys onSubmit={onNext} initial={initial} />;
                     },
                 },
             }}
