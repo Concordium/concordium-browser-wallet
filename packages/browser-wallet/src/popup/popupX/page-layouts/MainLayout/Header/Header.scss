@@ -229,13 +229,20 @@
 
                         svg {
                             display: unset;
+                            position: absolute;
+                            left: rem(12px);
                         }
                     }
                 }
 
                 .account {
+                    flex: 1;
                     display: flex;
                     align-items: center;
+
+                    .text__additional_small {
+                        text-align: left;
+                    }
 
                     svg {
                         display: none;
@@ -244,7 +251,6 @@
                 }
 
                 .balance {
-                    margin-left: auto;
                     min-width: rem(65px);
                 }
 
@@ -254,7 +260,6 @@
                     width: unset;
                     min-width: rem(100px);
                     justify-content: flex-end;
-                    margin-left: rem(16px);
 
                     .token-icon {
                         display: flex;

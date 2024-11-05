@@ -78,42 +78,44 @@ export default function AccountSelector({ showAccountSelector, onUpdateSelectedA
                         onClick={() => setAscSort((a) => !a)}
                     />
                 </div>
-                {sorted.map((credential) => (
-                    <Button.Base
-                        className={clsx('main-header__account-selector_list-item', {
-                            active: credential.address === selectedAccount,
-                        })}
-                        onClick={onAccountClick(credential.address)}
-                    >
-                        <div className="account">
-                            {credential.address === selectedAccount && <CarretRight />}
-                            <span className="text__additional_small">{displayNameAndSplitAddress(credential)}</span>
-                        </div>
-                        <div className="balance">
-                            <span className="text__additional_small">
-                                <CcdBalance credential={credential} />
-                            </span>
-                        </div>
-                        <div className="tokens">
-                            {tokens.loading ||
-                                Object.values(tokens.value[credential.address]).flatMap((contractTokens) =>
-                                    contractTokens.flatMap((token) =>
-                                        token.metadata.thumbnail?.url === undefined
-                                            ? []
-                                            : [
-                                                  <div className="token-icon">
-                                                      <Img
-                                                          src={token.metadata.thumbnail.url}
-                                                          alt={token.metadata.symbol ?? '?'}
-                                                          withDefaults
-                                                      />
-                                                  </div>,
-                                              ]
-                                    )
-                                )}
-                        </div>
-                    </Button.Base>
-                ))}
+                <div className="main-header__account-selector_list">
+                    {sorted.map((credential) => (
+                        <Button.Base
+                            className={clsx('main-header__account-selector_list-item', {
+                                active: credential.address === selectedAccount,
+                            })}
+                            onClick={onAccountClick(credential.address)}
+                        >
+                            <div className="account">
+                                {credential.address === selectedAccount && <CarretRight />}
+                                <span className="text__additional_small">{displayNameAndSplitAddress(credential)}</span>
+                            </div>
+                            <div className="balance">
+                                <span className="text__additional_small">
+                                    <CcdBalance credential={credential} />
+                                </span>
+                            </div>
+                            <div className="tokens">
+                                {tokens.loading ||
+                                    Object.values(tokens.value[credential.address]).flatMap((contractTokens) =>
+                                        contractTokens.flatMap((token) =>
+                                            token.metadata.thumbnail?.url === undefined
+                                                ? []
+                                                : [
+                                                      <div className="token-icon">
+                                                          <Img
+                                                              src={token.metadata.thumbnail.url}
+                                                              alt={token.metadata.symbol ?? '?'}
+                                                              withDefaults
+                                                          />
+                                                      </div>,
+                                                  ]
+                                        )
+                                    )}
+                            </div>
+                        </Button.Base>
+                    ))}
+                </div>
             </div>
         </div>
     );
