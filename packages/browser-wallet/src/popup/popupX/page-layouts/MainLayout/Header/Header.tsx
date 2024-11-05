@@ -45,7 +45,7 @@ export default function Header({
                 <MenuButton setMenuOpen={setMenuOpen} menuOpen={menuOpen} hideMenu={hideMenu} />
             </div>
             <MenuTiles menuOpen={menuOpen} setMenuOpen={setMenuOpen} />
-            <AccountSelector showAccountSelector={accountOpen} />
+            <AccountSelector showAccountSelector={accountOpen} onUpdateSelectedAccount={() => setAccountOpen(false)} />
         </div>
     );
 }

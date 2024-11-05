@@ -161,9 +161,7 @@
         &_search-form {
             display: flex;
 
-            .account-search__form {
-                width: 100%;
-
+            .form-search {
                 .form-input__field {
                     height: rem(32px);
                     padding: rem(10px);
@@ -211,7 +209,9 @@
                 display: flex;
                 padding: rem(12px) 0;
                 align-items: center;
+                border: unset;
                 border-bottom: 1px solid $color-grey-3;
+                background: none;
 
                 &:last-child {
                     border-bottom: none;
@@ -229,13 +229,20 @@
 
                         svg {
                             display: unset;
+                            position: absolute;
+                            left: rem(12px);
                         }
                     }
                 }
 
                 .account {
+                    flex: 1;
                     display: flex;
                     align-items: center;
+
+                    .text__additional_small {
+                        text-align: left;
+                    }
 
                     svg {
                         display: none;
@@ -244,7 +251,6 @@
                 }
 
                 .balance {
-                    margin-left: auto;
                     min-width: rem(65px);
                 }
 
@@ -254,7 +260,6 @@
                     width: unset;
                     min-width: rem(100px);
                     justify-content: flex-end;
-                    margin-left: rem(16px);
 
                     .token-icon {
                         display: flex;
@@ -264,6 +269,11 @@
                         height: rem(24px);
                         border-radius: rem(5px);
                         background-color: $color-main-bg;
+
+                        img {
+                            max-width: rem(24px);
+                            max-height: rem(24px);
+                        }
                     }
                 }
             }
