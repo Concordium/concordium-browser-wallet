@@ -16,6 +16,7 @@ import ValidatorStake from './Stake';
 import { type ValidationResultLocationState } from './Result';
 import OpenPool from './OpenPool';
 import Keys from './Keys';
+import Metadata from './Metadata';
 
 // TODO:
 // - Form steps
@@ -74,6 +75,12 @@ function ValidatorTransactionFlow({ existingValues, title }: Props) {
                 status: {
                     render(initial, onNext) {
                         return <OpenPool initial={initial} onSubmit={onNext} />;
+                    },
+                },
+                // commissions: {}, // TODO: ...
+                metadataUrl: {
+                    render(initial, onNext) {
+                        return <Metadata initial={initial} onSubmit={onNext} />;
                     },
                 },
                 keys: {
