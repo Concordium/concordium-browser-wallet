@@ -15,6 +15,7 @@ import { ValidatorForm, ValidatorFormExisting, configureValidatorFromForm } from
 import ValidatorStake from './Stake';
 import { type ValidationResultLocationState } from './Result';
 import OpenPool from './OpenPool';
+import Keys from './Keys';
 
 // TODO:
 // - Form steps
@@ -73,6 +74,11 @@ function ValidatorTransactionFlow({ existingValues, title }: Props) {
                 status: {
                     render(initial, onNext) {
                         return <OpenPool initial={initial} onSubmit={onNext} />;
+                    },
+                },
+                keys: {
+                    render(_, onNext) {
+                        return <Keys onSubmit={onNext} />;
                     },
                 },
             }}

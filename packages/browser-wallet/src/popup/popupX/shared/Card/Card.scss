@@ -28,6 +28,7 @@
 
         &.details {
             flex-direction: column;
+            max-width: 100%;
 
             .capture__main_small {
                 color: $color-white;

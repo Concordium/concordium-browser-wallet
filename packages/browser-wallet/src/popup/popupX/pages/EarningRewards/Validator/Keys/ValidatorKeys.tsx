@@ -1,42 +1,76 @@
-import React from 'react';
-import ExportIcon from '@assets/svgX/sign-out.svg';
+import React, { useCallback, useMemo, useState } from 'react';
+import { BakerKeysWithProofs, generateBakerKeys } from '@concordium/web-sdk';
 
-export default function ValidatorKeys() {
+import ExportIcon from '@assets/svgX/sign-out.svg';
+import Caret from '@assets/svgX/caret-right.svg';
+import Page from '@popup/popupX/shared/Page';
+import Text from '@popup/popupX/shared/Text';
+import Button from '@popup/popupX/shared/Button';
+import Card from '@popup/popupX/shared/Card';
+import { ensureDefined } from '@shared/utils/basic-helpers';
+import { saveData } from '@popup/shared/utils/file-helpers';
+import { useSelectedAccountInfo } from '@popup/shared/AccountInfoListenerContext/AccountInfoListenerContext';
+import { getBakerKeyExport } from '@popup/shared/utils/baking-helpers';
+import clsx from 'clsx';
+
+const KEYS_FILENAME = 'validator-credentials.json';
+
+type Props = { onSubmit(keys: BakerKeysWithProofs): void };
+
+export default function ValidatorKeys({ onSubmit }: Props) {
+    const [expand, setExpand] = useState(false);
+    const [exported, setExported] = useState(false);
+    const accountInfo = ensureDefined(useSelectedAccountInfo(), 'Expected seleted account');
+    const keysFull = useMemo(() => generateBakerKeys(accountInfo.accountAddress), [accountInfo]);
+    const keysPublic: BakerKeysWithProofs = useMemo(
+        () => ({
+            proofSig: keysFull.proofSig,
+            proofElection: keysFull.proofElection,
+            proofAggregation: keysFull.proofAggregation,
+            electionVerifyKey: keysFull.electionVerifyKey,
+            signatureVerifyKey: keysFull.signatureVerifyKey,
+            aggregationVerifyKey: keysFull.aggregationVerifyKey,
+        }),
+        [keysFull]
+    );
+
+    const exportKeys = useCallback(() => {
+        saveData(getBakerKeyExport(keysFull, accountInfo), KEYS_FILENAME);
+        setExported(true);
+    }, [keysFull]);
+
     return (
-        <div className="validator-keys-container">
-            <div className="validator-keys__title">
-                <span className="heading_medium">Validator keys</span>
-                <span className="capture__main_small">on Accout 1 / 6gk...k7o</span>
-            </div>
-            <span className="capture__main_small">
+        <Page className={clsx('validator-keys', expand && 'validator-keys--expanded')}>
+            <Page.Top heading="Validator keys" />
+            <Text.Capture>
                 Your new validator keys have been generated. Before you can continue, you must export and save them. The
-                keys will have to be added to the validator node. Besides exporting the keys, you will have to finish
-                and submit the transaction afterwards for the validator to be registered.
-            </span>
-            <div className="validator-keys__card">
-                <div className="validator-keys__card_row">
-                    <span className="capture__main_small">Election verify key</span>
-                    <span className="capture__main_small">
-                        474564hhfjdjde5f8f9g7fnsnsjs9e7g8f7fs64d3s3f6vb90f9d8d8dd66d
-                    </span>
-                </div>
-                <div className="validator-keys__card_row">
-                    <span className="capture__main_small">Signature verify key</span>
-                    <span className="capture__main_small">
-                        9f6g5e6g8gh9g9r7d4fghgfdx76gv5b4hg4fd5sxs9cvbn9m9nhgf77dfgh
-                    </span>
-                </div>
-                <div className="validator-keys__card_row">
-                    <span className="capture__main_small">Aggregation verify key</span>
-                    <span className="capture__main_small">
-                        4f84fg3gb6d9s9s3s1d46gg9grf7jmf9xc5c7s5x3vn80b8c6x5x4f84fg3gb6d9s9s3s1d46gg9grf7jmf9xc5c7s5x3vn80b8c6x5x4f84fg3gb6d9s9s3s1d46gg9grf7jmf9xc5c7s5x3vn80b8c6x5x4f84fg3gb6d9s9s3s1d46gg9grf7jmf9xc5c7s5x3vn80b8c6x5xdjd9f7g66673
-                    </span>
-                </div>
+                keys will have to be added to the validator node.
+            </Text.Capture>
+            <Card>
+                <Card.Row>
+                    <Card.RowDetails title="Election verify key" value={keysPublic.electionVerifyKey} />
+                </Card.Row>
+                <Card.Row>
+                    <Card.RowDetails title="Signature verify key" value={keysPublic.signatureVerifyKey} />
+                </Card.Row>
+                <Card.Row>
+                    <Card.RowDetails title="Aggregation verify key" value={keysPublic.aggregationVerifyKey} />
+                </Card.Row>
+            </Card>
+            <div>
+                <Button.IconText
+                    className="validator-keys__expand"
+                    icon={<Caret />}
+                    label={expand ? 'Show less' : 'Show full'}
+                    onClick={() => setExpand((v) => !v)}
+                />
+                <Button.IconText icon={<ExportIcon />} label="Export keys as .json" onClick={exportKeys} />
             </div>
-            <div className="validator-keys__export">
-                <ExportIcon />
-                <span className="label__main">Export validator keys</span>
-            </div>
-        </div>
+            {exported && (
+                <Page.Footer>
+                    <Button.Main label="Continue" onClick={() => onSubmit(keysPublic)} />
+                </Page.Footer>
+            )}
+        </Page>
     );
 }
