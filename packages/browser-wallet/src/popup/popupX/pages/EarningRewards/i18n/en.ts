@@ -159,6 +159,9 @@ const t = {
                 public: 'Added to public balance',
             },
             metadataUrl: { label: 'Metadata URL' },
+            electionKey: { label: 'Election verify key' },
+            signatureKey: { label: 'Signature verify key' },
+            aggregationKey: { label: 'Aggregation verify key' },
         },
         status: {
             title: 'Your validation is registered',

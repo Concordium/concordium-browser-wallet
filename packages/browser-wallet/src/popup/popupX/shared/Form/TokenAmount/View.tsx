@@ -227,6 +227,8 @@ export type TokenAmountViewProps = {
     buttonMaxLabel: string;
     /** The fee associated with the transaction */
     fee: CcdAmount.Type;
+    /** A custom function for formatting the fee. Defaults to `displayAsCcd(fee, false, true)` */
+    formatFee?(fee: CcdAmount.Type): ReactNode;
     /** The set of tokens available for the account specified by `accountInfo` */
     tokens: TokenInfo[];
     /** The token balance. `undefined` should be used to indicate that the balance is not yet available. */
@@ -247,7 +249,15 @@ export type TokenAmountViewProps = {
  */
 export default function TokenAmountView(props: TokenAmountViewProps) {
     const { t } = useTranslation('x', { keyPrefix: 'sharedX' });
-    const { buttonMaxLabel, fee, tokens, balance, onSelectToken, className } = props;
+    const {
+        buttonMaxLabel,
+        fee,
+        tokens,
+        balance,
+        onSelectToken,
+        className,
+        formatFee = (f) => displayAsCcd(f, false, true),
+    } = props;
     const [selectedToken, setSelectedToken] = useState<TokenInfo | null>(() => {
         switch (props.tokenType) {
             case 'cis2': {
@@ -396,7 +406,9 @@ export default function TokenAmountView(props: TokenAmountViewProps) {
                 <ErrorMessage className="capture__main_small">
                     {props.form.formState.errors.amount?.message}
                 </ErrorMessage>
-                <Text.Capture>{t('form.tokenAmount.amount.fee', { fee: displayAsCcd(fee, false, true) })}</Text.Capture>
+                <Text.Capture>
+                    {t('form.tokenAmount.amount.fee')} {formatFee(fee)}
+                </Text.Capture>
             </div>
             {props.receiver === true && (
                 <div className="token-amount_receiver">

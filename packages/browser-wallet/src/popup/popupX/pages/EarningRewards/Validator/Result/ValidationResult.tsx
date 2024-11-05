@@ -110,6 +110,33 @@ export default function ValidationResult() {
                         />
                     </Card.Row>
                 )}
+                {state.payload.metadataUrl !== undefined && (
+                    <Card.Row>
+                        <Card.RowDetails title={t('values.metadataUrl.label')} value={state.payload.metadataUrl} />
+                    </Card.Row>
+                )}
+                {state.payload.keys !== undefined && (
+                    <>
+                        <Card.Row>
+                            <Card.RowDetails
+                                title={t('values.electionKey.label')}
+                                value={state.payload.keys.electionVerifyKey}
+                            />
+                        </Card.Row>
+                        <Card.Row>
+                            <Card.RowDetails
+                                title={t('values.signatureKey.label')}
+                                value={state.payload.keys.signatureVerifyKey}
+                            />
+                        </Card.Row>
+                        <Card.Row>
+                            <Card.RowDetails
+                                title={t('values.aggregationKey.label')}
+                                value={state.payload.keys.aggregationVerifyKey}
+                            />
+                        </Card.Row>
+                    </>
+                )}
                 <Card.Row>
                     <Card.RowDetails
                         title={t('submit.fee.label')}

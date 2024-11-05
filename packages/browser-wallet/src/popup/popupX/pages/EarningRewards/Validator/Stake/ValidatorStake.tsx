@@ -1,5 +1,5 @@
 /* eslint-disable react/destructuring-assignment */
-import React, { useEffect, useMemo, useState } from 'react';
+import React, { ReactNode, useEffect, useMemo, useState } from 'react';
 import { UseFormReturn } from 'react-hook-form';
 import { useTranslation } from 'react-i18next';
 import { AccountTransactionType, CcdAmount, ConfigureBakerPayload, OpenStatus } from '@concordium/web-sdk';
@@ -19,6 +19,7 @@ import FullscreenNotice, { FullscreenNoticeProps } from '@popup/popupX/shared/Fu
 import { METADATAURL_MAX_LENGTH } from '@shared/constants/baking';
 import { STAKE_WARNING_THRESHOLD, isAboveStakeWarningThreshold } from '../../util';
 import { ValidatorStakeForm } from '../util';
+import { displayAsCcd } from 'wallet-common-helpers';
 
 type HighStakeNoticeProps = FullscreenNoticeProps & {
     onContinue(): void;
@@ -61,6 +62,8 @@ const PAYLOAD_MAX: ConfigureBakerPayload = {
     restakeEarnings: true,
     metadataUrl: 'a'.repeat(METADATAURL_MAX_LENGTH),
 };
+
+const PAYLOAD_MIN: ConfigureBakerPayload = { ...PAYLOAD_MAX, metadataUrl: '' };
 
 type Props = {
     /** The title for the configuriation step */
@@ -108,6 +111,14 @@ export default function ValidatorStake({ title, initialValues, existingValues, o
         }
     }, [getCost, existingValues, values]);
 
+    const minFee = useMemo(() => {
+        if (existingValues !== undefined) {
+            return undefined; // We know the cost as we don't depend on values set later in the flow
+        }
+
+        return getCost(PAYLOAD_MIN);
+    }, [getCost, existingValues]);
+
     useEffect(() => {
         if (selectedAccountInfo === undefined || fee === undefined) {
             return;
@@ -125,6 +136,19 @@ export default function ValidatorStake({ title, initialValues, existingValues, o
             // Do nothing..
         }
     }, [selectedAccountInfo?.accountAmount, fee]);
+
+    const formatFee: undefined | ((v: CcdAmount.Type) => ReactNode) = useMemo(() => {
+        if (minFee === undefined) {
+            return undefined;
+        }
+
+        // eslint-disable-next-line react/function-component-definition
+        return (v) => (
+            <div>
+                {displayAsCcd(minFee, false, true)} - {displayAsCcd(v, false, true)}
+            </div>
+        );
+    }, [minFee]);
 
     if (selectedAccountInfo === undefined || selectedCred === undefined || fee === undefined) {
         return null;
@@ -159,6 +183,7 @@ export default function ValidatorStake({ title, initialValues, existingValues, o
                                 className="register-validator__token-card"
                                 accountInfo={selectedAccountInfo}
                                 fee={fee}
+                                formatFee={formatFee}
                                 tokenType="ccd"
                                 buttonMaxLabel={t('inputAmount.buttonMax')}
                                 form={f as unknown as UseFormReturn<AmountForm>}
