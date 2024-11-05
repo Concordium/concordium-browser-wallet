@@ -1,9 +1,4 @@
 .open-pool-container {
-    display: flex;
-    flex-direction: column;
-    height: 100%;
-    padding-bottom: rem(32px);
-
     .open-pool {
         &__title {
             display: flex;
@@ -12,13 +7,8 @@
         }
 
         &__card {
-            display: flex;
-            flex-direction: column;
-            gap: rem(16px);
-            border-radius: rem(12px);
-            padding: rem(16px);
             margin-top: rem(16px);
-            background-color: rgba($color-grey-3, 0.3);
+            gap: rem(16px);
 
             &_delegation {
                 display: flex;

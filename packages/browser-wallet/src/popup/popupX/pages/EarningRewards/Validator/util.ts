@@ -37,17 +37,13 @@ export function showValidatorRestake(value: boolean): string {
 
 /** The form data for specifying validator stake */
 export type ValidatorStakeForm = { amount: string; restake: boolean };
-/** The form data for specifying validator metadata url */
-export type ValidatorMetadataForm = { url: string };
-/** The form data for specifying validator pool status for delegators */
-export type ValidatorStatusForm = { status: OpenStatusText };
 
 export type ValidatorFormUpdateStake = { stake: ValidatorStakeForm };
 export type ValidatorFormUpdateKeys = { keys: BakerKeysWithProofs };
 export type ValidatorFormUpdateSettings = {
-    status: ValidatorStatusForm;
+    status: OpenStatusText;
     commissions: CommissionRates;
-    metadata: ValidatorMetadataForm;
+    metadataUrl: string;
 };
 
 /** The cummulative validator form for declaring the data for the transaction for configuring validators */
@@ -69,8 +65,8 @@ export function configureValidatorFromForm(
         stake = parseCcdAmount(values.stake.amount);
     }
     let openForDelegation: OpenStatus | undefined;
-    if (values.status?.status !== existingValues?.status.status) {
-        switch (values.status?.status) {
+    if (values.status !== existingValues?.status) {
+        switch (values.status) {
             case OpenStatusText.OpenForAll:
                 openForDelegation = OpenStatus.OpenForAll;
                 break;
@@ -85,8 +81,8 @@ export function configureValidatorFromForm(
         }
     }
     let metadataUrl: string | undefined;
-    if (values.metadata?.url !== existingValues?.metadata.url) {
-        metadataUrl = values.metadata?.url;
+    if (values.metadataUrl !== existingValues?.metadataUrl) {
+        metadataUrl = values.metadataUrl;
     }
 
     let bakingRewardCommission: number | undefined;

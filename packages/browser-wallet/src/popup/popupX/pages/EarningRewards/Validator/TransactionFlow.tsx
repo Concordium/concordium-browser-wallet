@@ -14,6 +14,7 @@ import Button from '@popup/popupX/shared/Button';
 import { ValidatorForm, ValidatorFormExisting, configureValidatorFromForm } from './util';
 import ValidatorStake from './Stake';
 import { type ValidationResultLocationState } from './Result';
+import OpenPool from './OpenPool';
 
 // TODO:
 // - Form steps
@@ -65,8 +66,13 @@ function ValidatorTransactionFlow({ existingValues, title }: Props) {
         <MultiStepForm<ValidatorForm> onDone={handleDone} valueStore={store}>
             {{
                 stake: {
-                    render: (initial, onNext) => {
+                    render(initial, onNext) {
                         return <ValidatorStake title={title} onSubmit={onNext} initialValues={initial} />;
+                    },
+                },
+                status: {
+                    render(initial, onNext) {
+                        return <OpenPool initial={initial} onSubmit={onNext} />;
                     },
                 },
             }}
@@ -99,8 +105,8 @@ export function UpdateValidatorTransactionFlow() {
             amount: formatCcdAmount(stakedAmount),
             restake: restakeEarnings,
         },
-        status: { status: bakerPoolInfo.openStatus },
-        metadata: { url: bakerPoolInfo.metadataUrl },
+        status: bakerPoolInfo.openStatus,
+        metadataUrl: bakerPoolInfo.metadataUrl,
         commissions: bakerPoolInfo.commissionRates,
     };
 
