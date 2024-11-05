@@ -1,6 +1,7 @@
 import React from 'react';
 import Button from '@popup/popupX/shared/Button';
 import { useTranslation } from 'react-i18next';
+import i18n from '@popup/shell/i18n';
 import Page from '@popup/popupX/shared/Page';
 import Text from '@popup/popupX/shared/Text';
 import Card from '@popup/popupX/shared/Card';
@@ -50,7 +51,7 @@ function SeedPhrase() {
 }
 
 export default withPasswordProtected(SeedPhrase, {
-    headingKey: 'seedPhrase.seedPhrase',
-    pageInfoKey: 'seedPhrase.passwordDescription',
-    submitKey: 'seedPhrase.showSeedPhrase',
+    headingText: i18n.t('x:seedPhrase.seedPhrase'),
+    pageInfoText: i18n.t('x:seedPhrase.passwordDescription'),
+    submitText: i18n.t('x:seedPhrase.showSeedPhrase'),
 });

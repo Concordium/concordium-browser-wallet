@@ -1,6 +1,7 @@
 import React from 'react';
 import Page from '@popup/popupX/shared/Page';
 import { useTranslation } from 'react-i18next';
+import i18n from '@popup/shell/i18n/i18n';
 import Text from '@popup/popupX/shared/Text';
 import Card from '@popup/popupX/shared/Card';
 import Button from '@popup/popupX/shared/Button';
@@ -134,7 +135,7 @@ function Loader() {
 }
 
 export default withPasswordProtected(Loader, {
-    headingKey: 'privateKey.accountPrivateKey',
-    pageInfoKey: 'privateKey.passwordDescription',
-    submitKey: 'privateKey.showPrivateKey',
+    headingText: i18n.t('x:privateKey.accountPrivateKey'),
+    pageInfoText: i18n.t('x:privateKey.passwordDescription'),
+    submitText: i18n.t('x:privateKey.showPrivateKey'),
 });

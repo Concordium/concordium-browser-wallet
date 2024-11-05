@@ -9,16 +9,15 @@ import FormPassword from '@popup/popupX/shared/Form/Password';
 import Form from '@popup/popupX/shared/Form/Form';
 import { sessionPasscodeAtom } from '@popup/store/settings';
 import { useForm } from '@popup/shared/Form';
-import { TranslationKeyX } from '@popup/shell/i18n/i18n';
 
 type FormValues = {
     currentPasscode: string;
 };
 
 export type PasswordProtectConfigType = {
-    headingKey: TranslationKeyX;
-    pageInfoKey: TranslationKeyX;
-    submitKey: TranslationKeyX;
+    headingText: string;
+    pageInfoText: string;
+    submitText: string;
 };
 
 type PasswordProtectProps = {
@@ -28,10 +27,8 @@ type PasswordProtectProps = {
 
 export default function PasswordProtect({
     setPasswordConfirmed,
-    config: { headingKey, pageInfoKey, submitKey },
+    config: { headingText, pageInfoText, submitText },
 }: PasswordProtectProps) {
-    const { t: tUse } = useTranslation('x');
-    const t = (key: TranslationKeyX) => tUse(key) as unknown as string;
     const { t: tPasscode } = useTranslation('x', { keyPrefix: 'sharedX.form.password' });
     const passcode = useAtomValue(sessionPasscodeAtom);
     const form = useForm<FormValues>();
@@ -46,9 +43,9 @@ export default function PasswordProtect({
 
     return (
         <Page className="confirm-password-x">
-            <Page.Top heading={t(headingKey)} />
+            <Page.Top heading={headingText} />
             <Page.Main>
-                <Text.MainRegular>{t(pageInfoKey)}</Text.MainRegular>
+                <Text.MainRegular>{pageInfoText}</Text.MainRegular>
                 <Form id="confirm-password-form" onSubmit={handleSubmit} formMethods={form}>
                     {(f) => {
                         return (
@@ -70,7 +67,7 @@ export default function PasswordProtect({
                 <Button.Main
                     form="confirm-password-form"
                     type="submit"
-                    label={t(submitKey)}
+                    label={submitText}
                     disabled={form.formState.isSubmitting}
                 />
             </Page.Footer>
