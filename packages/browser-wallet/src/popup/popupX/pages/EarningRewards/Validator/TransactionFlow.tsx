@@ -11,17 +11,18 @@ import { formatCcdAmount } from '@popup/popupX/shared/utils/helpers';
 import FullscreenNotice, { FullscreenNoticeProps } from '@popup/popupX/shared/FullscreenNotice';
 import Page from '@popup/popupX/shared/Page';
 import Button from '@popup/popupX/shared/Button';
+import { useBlockChainParametersAboveV0 } from '@popup/shared/BlockChainParametersProvider';
+
 import { ValidatorForm, ValidatorFormExisting, configureValidatorFromForm } from './util';
 import ValidatorStake from './Stake';
 import { type ValidationResultLocationState } from './Result';
 import OpenPool from './OpenPool';
 import Keys from './Keys';
 import Metadata from './Metadata';
-
-// TODO:
-// - Form steps
+import Commissions from './Commissions';
 
 // TODO: use this when implementing update flows
+// eslint-disable-next-line @typescript-eslint/no-unused-vars
 function NoChangesNotice(props: FullscreenNoticeProps) {
     const { t } = useTranslation('x', { keyPrefix: 'earn.validator.update.noChangesNotice' });
     return (
@@ -44,6 +45,7 @@ type Props = {
 
 function ValidatorTransactionFlow({ existingValues, title }: Props) {
     const { state, pathname } = useLocation() as Location & { state: ValidatorForm | undefined };
+    const chainParams = useBlockChainParametersAboveV0();
     const nav = useNavigate();
 
     const initialValues = state ?? existingValues;
@@ -77,7 +79,14 @@ function ValidatorTransactionFlow({ existingValues, title }: Props) {
                         return <OpenPool initial={initial} onSubmit={onNext} />;
                     },
                 },
-                // commissions: {}, // TODO: ...
+                commissions: {
+                    render(initial, onNext) {
+                        if (chainParams === undefined) {
+                            return null;
+                        }
+                        return <Commissions initial={initial} onSubmit={onNext} chainParams={chainParams} />;
+                    },
+                },
                 metadataUrl: {
                     render(initial, onNext) {
                         return <Metadata initial={initial} onSubmit={onNext} />;

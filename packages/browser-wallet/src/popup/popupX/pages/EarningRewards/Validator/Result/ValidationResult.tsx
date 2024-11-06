@@ -15,7 +15,13 @@ import { cpStakingCooldown } from '@shared/utils/chain-parameters-helpers';
 import { submittedTransactionRoute } from '@popup/popupX/constants/routes';
 import Text from '@popup/popupX/shared/Text';
 import { useSelectedAccountInfo } from '@popup/shared/AccountInfoListenerContext/AccountInfoListenerContext';
-import { showValidatorAmount, showValidatorOpenStatus, showValidatorRestake } from '../util';
+import {
+    isRange,
+    showCommissionRate,
+    showValidatorAmount,
+    showValidatorOpenStatus,
+    showValidatorRestake,
+} from '../util';
 
 export type ValidationResultLocationState = {
     payload: ConfigureBakerPayload;
@@ -67,6 +73,10 @@ export default function ValidationResult() {
         return <Navigate to=".." />;
     }
 
+    if (parametersV1 === undefined) {
+        return null;
+    }
+
     const fee = getCost(state.payload);
     const submit = async () => {
         if (fee === undefined) {
@@ -110,9 +120,39 @@ export default function ValidationResult() {
                         />
                     </Card.Row>
                 )}
+                {isRange(parametersV1.transactionCommissionRange) &&
+                    state.payload.transactionFeeCommission !== undefined && (
+                        <Card.Row>
+                            {' '}
+                            <Card.RowDetails
+                                title={t('values.transactionFeeCommission.label')}
+                                value={showCommissionRate(state.payload.transactionFeeCommission)}
+                            />
+                        </Card.Row>
+                    )}
+                {isRange(parametersV1.bakingCommissionRange) && state.payload.bakingRewardCommission !== undefined && (
+                    <Card.Row>
+                        <Card.RowDetails
+                            title={t('values.bakingRewardCommission.label')}
+                            value={showCommissionRate(state.payload.bakingRewardCommission)}
+                        />
+                    </Card.Row>
+                )}
+                {isRange(parametersV1.finalizationCommissionRange) &&
+                    state.payload.finalizationRewardCommission !== undefined && (
+                        <Card.Row>
+                            <Card.RowDetails
+                                title={t('values.finalizationRewardCommission.label')}
+                                value={showCommissionRate(state.payload.finalizationRewardCommission)}
+                            />
+                        </Card.Row>
+                    )}
                 {state.payload.metadataUrl !== undefined && (
                     <Card.Row>
-                        <Card.RowDetails title={t('values.metadataUrl.label')} value={state.payload.metadataUrl} />
+                        <Card.RowDetails
+                            title={t('values.metadataUrl.label')}
+                            value={state.payload.metadataUrl || ' '}
+                        />
                     </Card.Row>
                 )}
                 {state.payload.keys !== undefined && (

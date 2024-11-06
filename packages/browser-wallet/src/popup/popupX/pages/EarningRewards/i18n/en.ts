@@ -162,6 +162,9 @@ const t = {
             electionKey: { label: 'Election verify key' },
             signatureKey: { label: 'Signature verify key' },
             aggregationKey: { label: 'Aggregation verify key' },
+            transactionFeeCommission: { label: 'Transaction fee commission' },
+            bakingRewardCommission: { label: 'Baking reward commission' },
+            finalizationRewardCommission: { label: 'Finalization reward commission' },
         },
         status: {
             title: 'Your validation is registered',
@@ -256,6 +259,26 @@ const t = {
                 error: {
                     maxLength: 'Cannot exceed {{max}} characters',
                 },
+            },
+            buttonContinue: 'Continue',
+        },
+        commissions: {
+            title: 'Commissions',
+            desciption:
+                'When you open your validator as a pool, you earn commissions of stake delegated to your pool from other accounts:',
+            fieldTransactionFee: {
+                label: 'Transaction fee commission',
+            },
+            fieldBlockReward: {
+                label: 'Block reward commission',
+            },
+            fieldFinalizationReward: {
+                label: 'Finalization reward commission',
+            },
+            error: {
+                required: 'Please specify a value',
+                min: 'Value exceeds lower bound of {{min}}',
+                max: 'Value exceeds upper bound of {{max}}',
             },
             buttonContinue: 'Continue',
         },

@@ -1,5 +1,6 @@
 import {
     CcdAmount,
+    CommissionRange,
     CommissionRates,
     ConfigureBakerPayload,
     GenerateBakerKeysOutput,
@@ -8,6 +9,8 @@ import {
 } from '@concordium/web-sdk';
 import { formatCcdAmount, parseCcdAmount } from '@popup/popupX/shared/utils/helpers';
 import i18n from '@popup/shell/i18n';
+
+const FRACTION_RES = 100000;
 
 export function showValidatorAmount(amount: CcdAmount.Type): string {
     return `${formatCcdAmount(amount)} CCD`;
@@ -35,6 +38,12 @@ export function showValidatorRestake(value: boolean): string {
         : i18n.t('x:earn.validator.values.restake.public');
 }
 
+export function showCommissionRate(fraction: number): string {
+    return `${(fraction * 100) / FRACTION_RES}%`;
+}
+
+export const isRange = (range: CommissionRange) => range.min !== range.max;
+
 /** The form data for specifying validator stake */
 export type ValidatorStakeForm = { amount: string; restake: boolean };
 
@@ -51,6 +60,9 @@ export type ValidatorForm = ValidatorFormUpdateStake & ValidatorFormUpdateSettin
 
 /** The existing values needed to compare with updates */
 export type ValidatorFormExisting = Omit<ValidatorForm, 'keys'>;
+
+const numToFraction = (value: number | undefined) =>
+    value === undefined ? undefined : Math.floor(value * FRACTION_RES);
 
 export function configureValidatorFromForm(
     values: Partial<ValidatorForm>,
@@ -87,15 +99,15 @@ export function configureValidatorFromForm(
 
     let bakingRewardCommission: number | undefined;
     if (values.commissions?.bakingCommission !== existingValues?.commissions.bakingCommission) {
-        bakingRewardCommission = values.commissions?.bakingCommission;
+        bakingRewardCommission = numToFraction(values.commissions?.bakingCommission);
     }
     let finalizationRewardCommission: number | undefined;
     if (values.commissions?.finalizationCommission !== existingValues?.commissions.finalizationCommission) {
-        finalizationRewardCommission = values.commissions?.finalizationCommission;
+        finalizationRewardCommission = numToFraction(values.commissions?.finalizationCommission);
     }
     let transactionFeeCommission: number | undefined;
     if (values.commissions?.transactionCommission !== existingValues?.commissions.transactionCommission) {
-        transactionFeeCommission = values.commissions?.transactionCommission;
+        transactionFeeCommission = numToFraction(values.commissions?.transactionCommission);
     }
 
     return {

@@ -1,15 +1,17 @@
 import React from 'react';
 import { AccountInfoType, CcdAmount } from '@concordium/web-sdk';
+import { useTranslation } from 'react-i18next';
+import { Navigate, useNavigate } from 'react-router-dom';
+
 import { absoluteRoutes } from '@popup/popupX/constants/routes';
 import Button from '@popup/popupX/shared/Button';
 import Card from '@popup/popupX/shared/Card';
 import Page from '@popup/popupX/shared/Page';
-import { useTranslation } from 'react-i18next';
 import { useSelectedAccountInfo } from '@popup/shared/AccountInfoListenerContext/AccountInfoListenerContext';
-import { Navigate, useNavigate } from 'react-router-dom';
+
 import AccountCooldowns from '../AccountCooldowns';
 import { showValidatorRestake, showValidatorAmount, showValidatorOpenStatus } from './util';
-import { ValidationResultLocationState } from './Result/ValidatorResult';
+import { ValidationResultLocationState } from './Result';
 
 const REMOVE_STATE: ValidationResultLocationState = {
     type: 'remove',
@@ -60,7 +62,7 @@ export default function ValidatorStatus() {
                 <Card.Row>
                     <Card.RowDetails
                         title={t('values.metadataUrl.label')}
-                        value={accountBaker.bakerPoolInfo.metadataUrl}
+                        value={accountBaker.bakerPoolInfo.metadataUrl || ' '}
                     />
                 </Card.Row>
             </Card>
