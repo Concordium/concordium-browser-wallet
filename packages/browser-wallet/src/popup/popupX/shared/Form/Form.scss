@@ -115,6 +115,40 @@
     }
 }
 
+.form-inline-input {
+    appearance: textfield;
+    border: none;
+    padding: 0;
+    color: inherit;
+    font-size: inherit;
+    font-family: inherit;
+    font-weight: inherit;
+    line-height: inherit;
+    background: none;
+
+    &::-webkit-outer-spin-button,
+    &::-webkit-inner-spin-button {
+        appearance: none;
+        margin: 0;
+    }
+
+    &:focus {
+        outline: none;
+    }
+
+    &:disabled {
+        color: $color-grey-3;
+    }
+
+    &:read-only {
+        color: inherit;
+    }
+
+    @include when-invalid {
+        color: $color-red-attention !important;
+    }
+}
+
 .form-password {
     position: relative;
 
@@ -131,6 +165,7 @@
         transform: unset;
 
         svg {
+
             g,
             path {
                 fill: $color-mineral-3;
@@ -160,11 +195,11 @@ $handle-size: rem(20px);
 
 .form-toggle-x {
     &__root {
-        input:checked + .form-toggle-x__slider {
+        input:checked+.form-toggle-x__slider {
             background-color: $color-green-toggle;
         }
 
-        input:checked + .form-toggle-x__slider::before {
+        input:checked+.form-toggle-x__slider::before {
             transform: translateX(rem(24px));
         }
     }
@@ -244,11 +279,11 @@ $handle-size: rem(20px);
             }
         }
 
-        &:hover input ~ .checkmark {
+        &:hover input~.checkmark {
             background-color: $color-grey-3;
         }
 
-        input:checked ~ .checkmark::after {
+        input:checked~.checkmark::after {
             display: block;
         }
 
