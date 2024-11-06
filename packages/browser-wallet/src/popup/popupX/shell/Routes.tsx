@@ -7,7 +7,7 @@ import { SendConfirm, SendFunds } from '@popup/popupX/pages/SendFunds';
 import ReceiveFunds from '@popup/popupX/pages/ReceiveFunds';
 import TransactionLog from '@popup/popupX/pages/TransactionLog';
 import TransactionDetails from '@popup/popupX/pages/TransactionDetails';
-import { TokenDetails, TokenDetailsCcd } from '@popup/popupX/pages/TokenDetails';
+import { TokenDetails, TokenDetailsCcd, TokenRaw } from '@popup/popupX/pages/TokenDetails';
 import IdCards from '@popup/popupX/pages/IdCards';
 import Accounts from '@popup/popupX/pages/Accounts';
 import SeedPhrase from 'src/popup/popupX/pages/SeedPhrase';
@@ -27,6 +27,7 @@ import { MessagePromptHandlersType } from '@popup/shared/utils/message-prompt-ha
 import ConnectionRequest from '@popup/popupX/pages/prompts/ConnectionRequest';
 import ExternalRequestLayout from '@popup/popupX/page-layouts/ExternalRequestLayout';
 import { ManageTokenList, AddToken } from '@popup/popupX/pages/ManageTokens';
+import { Nft, NftDetails, NftRaw } from 'src/popup/popupX/pages/Nft';
 import { DelegationResult } from '../pages/EarningRewards/Delegator/Result';
 import SubmittedTransaction from '../pages/SubmittedTransaction';
 import { DelegatorIntro } from '../pages/EarningRewards/Delegator/Intro';
@@ -65,8 +66,13 @@ export default function Routes({ messagePromptHandlers }: { messagePromptHandler
                             path={relativeRoutes.home.transactionLog.details.path}
                         />
                     </Route>
-                    <Route element={<TokenDetails />} path={relativeRoutes.home.token.path} />
-                    <Route element={<TokenDetailsCcd />} path={`${relativeRoutes.home.token.path}/ccd`} />
+                    <Route path={relativeRoutes.home.token.path}>
+                        <Route element={<TokenDetailsCcd />} path={`${relativeRoutes.home.token.ccd.path}`} />
+                        <Route path={relativeRoutes.home.token.details.path}>
+                            <Route index element={<TokenDetails />} />
+                            <Route element={<TokenRaw />} path={`${relativeRoutes.home.token.details.raw.path}`} />
+                        </Route>
+                    </Route>
                     <Route
                         element={<SubmittedTransaction />}
                         path={`${relativeRoutes.home.submittedTransaction.path}`}
@@ -101,6 +107,13 @@ export default function Routes({ messagePromptHandlers }: { messagePromptHandler
                         <Route element={<RestoreResult />} path={relativeRoutes.settings.restore.result.path} />
                     </Route>
                     <Route element={<About />} path={relativeRoutes.settings.about.path} />
+                    <Route path={relativeRoutes.settings.nft.path}>
+                        <Route index element={<Nft />} />
+                        <Route path={relativeRoutes.settings.nft.details.path}>
+                            <Route index element={<NftDetails />} />
+                            <Route element={<NftRaw />} path={relativeRoutes.settings.nft.details.raw.path} />
+                        </Route>
+                    </Route>
                     <Route path={relativeRoutes.settings.earn.path}>
                         <Route index element={<EarningRewards />} />
                         <Route path={relativeRoutes.settings.earn.validator.path}>

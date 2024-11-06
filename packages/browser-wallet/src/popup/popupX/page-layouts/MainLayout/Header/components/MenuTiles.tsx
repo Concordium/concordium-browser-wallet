@@ -9,6 +9,7 @@ import LinkSimple from '@assets/svgX/link-simple-horizontal.svg';
 import Info from '@assets/svgX/info2.svg';
 import Restore from '@assets/svgX/arrow-counter-clock.svg';
 import Eye from '@assets/svgX/eye.svg';
+import NFT from '@assets/svgX/cube-focus.svg';
 import IconButton from '@popup/shared/IconButton';
 import Text from '@popup/popupX/shared/Text';
 import { Link } from 'react-router-dom';
@@ -99,6 +100,12 @@ export default function MenuTiles({ menuOpen, setMenuOpen }: MenuTilesProps) {
                     <IconButton className="main-header__menu-tiles_tile">
                         <Eye />
                         <Text.Capture>{t('oldUI')}</Text.Capture>
+                    </IconButton>
+                </Link>
+                <Link to={absoluteRoutes.settings.nft.path}>
+                    <IconButton className="main-header__menu-tiles_tile">
+                        <NFT />
+                        <Text.Capture>{t('nft')}</Text.Capture>
                     </IconButton>
                 </Link>
             </div>

@@ -90,6 +90,15 @@ export const relativeRoutes = {
         },
         token: {
             path: 'token',
+            ccd: {
+                path: 'ccd',
+            },
+            details: {
+                path: ':contractIndex',
+                raw: {
+                    path: 'raw',
+                },
+            },
         },
         submittedTransaction: {
             path: 'submitted/:transactionHash',
@@ -154,6 +163,15 @@ export const relativeRoutes = {
                 path: 'result',
                 config: {
                     backTitle: 'Restore wallet',
+                },
+            },
+        },
+        nft: {
+            path: 'nft',
+            details: {
+                path: ':contractIndex/:id/details',
+                raw: {
+                    path: 'raw',
                 },
             },
         },

@@ -50,6 +50,7 @@ import earn from '@popup/popupX/pages/EarningRewards/i18n/en';
 import mangeTokens from '@popup/popupX/pages/ManageTokens/i18n/en';
 import connectionRequestX from '@popup/popupX/pages/prompts/ConnectionRequest/i18n/en';
 import submittedTransaction from '@popup/popupX/pages/SubmittedTransaction/i18n/en';
+import nft from '@popup/popupX/pages/Nft/i18n/en';
 
 const t = {
     shared,
@@ -103,6 +104,7 @@ const t = {
         mangeTokens,
         prompts: { connectionRequestX },
         submittedTransaction,
+        nft,
     },
 };
 

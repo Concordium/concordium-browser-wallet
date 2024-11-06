@@ -38,10 +38,12 @@
     }
 
     .button__icon.text {
-        margin-top: rem(12px);
+        margin-top: rem(24px);
         align-self: flex-start;
 
         &:last-child {
+            margin-top: rem(12px);
+
             .label__main {
                 color: $color-red-attention;
             }

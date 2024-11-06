@@ -10,6 +10,7 @@ const t = {
         about: 'About',
         restore: 'Restore',
         oldUI: 'Old UI',
+        nft: 'NFT',
     },
     accountSelector: {
         sortAsc: 'Sort A-Z',

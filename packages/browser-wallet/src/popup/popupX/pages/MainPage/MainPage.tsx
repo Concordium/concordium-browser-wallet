@@ -4,7 +4,7 @@ import { useTranslation } from 'react-i18next';
 import { useAtomValue } from 'jotai';
 import { displayAsCcd } from 'wallet-common-helpers';
 import { AccountInfoType, Ratio } from '@concordium/web-sdk';
-import { relativeRoutes } from '@popup/popupX/constants/routes';
+import { absoluteRoutes, relativeRoutes } from '@popup/popupX/constants/routes';
 import Img from '@popup/shared/Img';
 import { WalletCredential } from '@shared/storage/types';
 import { useAccountInfo } from '@popup/shared/AccountInfoListenerContext';
@@ -122,7 +122,9 @@ function MainPage({ credential }: MainPageProps) {
     const navToReceive = () => nav(relativeRoutes.home.receive.path);
     const navToTransactionLog = () =>
         nav(relativeRoutes.home.transactionLog.path.replace(':account', credential.address));
-    const navToTokenDetails = () => nav(relativeRoutes.home.token.path);
+    const navToTokenDetails = (contractIndex: string) => {
+        return nav(absoluteRoutes.home.token.details.path.replace(':contractIndex', contractIndex));
+    };
     const navToManageToken = () => nav(relativeRoutes.home.manageTokenList.path);
 
     const chainParameters = useBlockChainParameters();
@@ -151,7 +153,7 @@ function MainPage({ credential }: MainPageProps) {
             <div className="main-page-x__tokens">
                 <div className="main-page-x__tokens-list">
                     <TokenItem
-                        onClick={() => nav(`${relativeRoutes.home.token.path}/ccd`)}
+                        onClick={() => nav(`${absoluteRoutes.home.token.ccd.path}`)}
                         thumbnail={<ConcordiumLogo />}
                         symbol="CCD"
                         staked={isStaked}
@@ -161,7 +163,7 @@ function MainPage({ credential }: MainPageProps) {
                     />
                     {tokens.map((token) => (
                         <TokenItem
-                            onClick={() => navToTokenDetails()}
+                            onClick={() => navToTokenDetails(token.contractIndex)}
                             key={`${token.contractIndex}.${token.id}`}
                             thumbnail={token.metadata.thumbnail?.url || ''}
                             symbol={token.metadata.symbol || ''}
