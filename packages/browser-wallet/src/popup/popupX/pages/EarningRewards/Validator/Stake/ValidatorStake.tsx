@@ -1,6 +1,6 @@
 /* eslint-disable react/destructuring-assignment */
 import React, { ReactNode, useEffect, useMemo, useState } from 'react';
-import { UseFormReturn } from 'react-hook-form';
+import { UseFormReturn, Validate } from 'react-hook-form';
 import { useTranslation } from 'react-i18next';
 import { AccountTransactionType, CcdAmount, ConfigureBakerPayload, OpenStatus } from '@concordium/web-sdk';
 
@@ -68,6 +68,8 @@ const PAYLOAD_MIN: ConfigureBakerPayload = { ...PAYLOAD_MAX, metadataUrl: '' };
 type Props = {
     /** The title for the configuriation step */
     title: string;
+    /** The minimum stake required to be a validator */
+    minStake: CcdAmount.Type;
     /** The initial values of the step, if any */
     initialValues?: ValidatorStakeForm;
     /** The existing validation stake values registered on the account */
@@ -76,7 +78,7 @@ type Props = {
     onSubmit(values: ValidatorStakeForm): void;
 };
 
-export default function ValidatorStake({ title, initialValues, existingValues, onSubmit }: Props) {
+export default function ValidatorStake({ title, initialValues, existingValues, onSubmit, minStake }: Props) {
     const { t } = useTranslation('x', { keyPrefix: 'earn.validator.stake' });
     const form = useForm<ValidatorStakeForm>({
         defaultValues: initialValues ?? { amount: '0.00', restake: true },
@@ -168,6 +170,15 @@ export default function ValidatorStake({ title, initialValues, existingValues, o
         }
     };
 
+    const validateAmount: Validate<string> = (v) => {
+        const amount = parseCcdAmount(v);
+        if (amount.microCcdAmount < minStake.microCcdAmount) {
+            return t('inputAmount.errors.min', { min: formatCcdAmount(minStake) });
+        }
+
+        return undefined;
+    };
+
     return (
         <>
             <HighStakeWarning open={highStakeWarning} onClose={() => setHighStakeWarning(false)} onContinue={submit} />
@@ -188,6 +199,7 @@ export default function ValidatorStake({ title, initialValues, existingValues, o
                                 buttonMaxLabel={t('inputAmount.buttonMax')}
                                 form={f as unknown as UseFormReturn<AmountForm>}
                                 ccdBalance="total"
+                                validateAmount={validateAmount}
                             />
                             <div className="register-validator__reward">
                                 <div className="register-validator__reward_auto-add">

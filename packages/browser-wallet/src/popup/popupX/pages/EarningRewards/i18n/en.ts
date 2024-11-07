@@ -214,6 +214,9 @@ const t = {
             },
             inputAmount: {
                 label: 'Amount',
+                errors: {
+                    min: 'A minimum stake of {{min}} CCD is required',
+                },
                 buttonMax: 'Stake max.',
             },
             fee: {

@@ -2,18 +2,15 @@
 import React, { useCallback, useState } from 'react';
 import { Location, useLocation, useNavigate } from 'react-router-dom';
 import { useTranslation } from 'react-i18next';
-import { AccountInfoType } from '@concordium/web-sdk';
 
 import { absoluteRoutes } from '@popup/popupX/constants/routes';
 import MultiStepForm from '@popup/shared/MultiStepForm';
-import { useSelectedAccountInfo } from '@popup/shared/AccountInfoListenerContext/AccountInfoListenerContext';
-import { formatCcdAmount } from '@popup/popupX/shared/utils/helpers';
 import FullscreenNotice, { FullscreenNoticeProps } from '@popup/popupX/shared/FullscreenNotice';
 import Page from '@popup/popupX/shared/Page';
 import Button from '@popup/popupX/shared/Button';
 import { useBlockChainParametersAboveV0 } from '@popup/shared/BlockChainParametersProvider';
 
-import { ValidatorForm, ValidatorFormExisting, configureValidatorFromForm } from './util';
+import { ValidatorForm, configureValidatorFromForm } from './util';
 import ValidatorStake from './Stake';
 import { type ValidationResultLocationState } from './Result';
 import OpenPool from './OpenPool';
@@ -38,17 +35,13 @@ function NoChangesNotice(props: FullscreenNoticeProps) {
     );
 }
 
-type Props = {
-    title: string;
-    existingValues?: ValidatorFormExisting | undefined;
-};
-
-function ValidatorTransactionFlow({ existingValues, title }: Props) {
+export function RegisterValidatorTransactionFlow() {
+    const { t } = useTranslation('x', { keyPrefix: 'earn.validator.register' });
     const { state, pathname } = useLocation() as Location & { state: ValidatorForm | undefined };
     const chainParams = useBlockChainParametersAboveV0();
     const nav = useNavigate();
 
-    const initialValues = state ?? existingValues;
+    const initialValues = state;
     const store = useState<Partial<ValidatorForm>>(initialValues ?? {});
 
     const handleDone = useCallback(
@@ -63,7 +56,7 @@ function ValidatorTransactionFlow({ existingValues, title }: Props) {
             };
             nav(absoluteRoutes.settings.earn.validator.submit.path, { state: submitDelegatorState });
         },
-        [pathname, existingValues]
+        [pathname]
     );
 
     return (
@@ -71,7 +64,17 @@ function ValidatorTransactionFlow({ existingValues, title }: Props) {
             {{
                 stake: {
                     render(initial, onNext) {
-                        return <ValidatorStake title={title} onSubmit={onNext} initialValues={initial} />;
+                        if (chainParams === undefined) {
+                            return null;
+                        }
+                        return (
+                            <ValidatorStake
+                                title={t('title')}
+                                onSubmit={onNext}
+                                initialValues={initial}
+                                minStake={chainParams.minimumEquityCapital}
+                            />
+                        );
                     },
                 },
                 status: {
@@ -100,37 +103,4 @@ function ValidatorTransactionFlow({ existingValues, title }: Props) {
             }}
         </MultiStepForm>
     );
-}
-
-export function RegisterValidatorTransactionFlow() {
-    const { t } = useTranslation('x', { keyPrefix: 'earn.validator.register' });
-    return <ValidatorTransactionFlow title={t('title')} />;
-}
-
-export function UpdateValidatorTransactionFlow() {
-    const { t } = useTranslation('x', { keyPrefix: 'earn.validator.update' });
-    const accountInfo = useSelectedAccountInfo();
-
-    if (
-        accountInfo === undefined ||
-        accountInfo.type !== AccountInfoType.Baker ||
-        accountInfo.accountBaker.version === 0
-    ) {
-        return null;
-    }
-    const {
-        accountBaker: { stakedAmount, restakeEarnings, bakerPoolInfo },
-    } = accountInfo;
-
-    const values: ValidatorFormExisting = {
-        stake: {
-            amount: formatCcdAmount(stakedAmount),
-            restake: restakeEarnings,
-        },
-        status: bakerPoolInfo.openStatus,
-        metadataUrl: bakerPoolInfo.metadataUrl,
-        commissions: bakerPoolInfo.commissionRates,
-    };
-
-    return <ValidatorTransactionFlow existingValues={values} title={t('title')} />;
 }
