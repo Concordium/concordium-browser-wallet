@@ -18,6 +18,5 @@ RUN if [ "$NETWORK" = "testnet" ]; then yarn build; fi
 RUN if [ "$NETWORK" = "mainnet" ]; then yarn build-prod; fi
 
 FROM nginx
-LABEL build_image="${build_image}"
 COPY --from=build ./app/dist ./usr/share/nginx/html
 COPY ./nginx.conf /etc/nginx/conf.d/default.conf
