@@ -5,10 +5,11 @@ on:
 
 jobs:
   release-base-image:
-    uses: concordium/.github/.github/workflows/docker-release-workflow.yaml@v1
+    uses: concordium/.github/.github/workflows/docker-release-workflow.yaml@main
     with:
-      SERVICE_NAME: "dapp-esealing"
+      DOCKER_FILE_PATH: ./examples/eSealing/Dockerfile
+      DOCKER_CONTEXT: examples/eSealing
       BUILD_ARGS: |
         base_image=node:18-slim
-      DOCKER_FILE_PATH: examples/eSealing
+      SERVICE_NAME: "dapp-esealing"
     secrets: inherit
