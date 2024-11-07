@@ -192,14 +192,22 @@ const t = {
             notice: 'This will lock your validation amount. Amount is released after {{cooldown}} days from the time you remove or decrease your validation stake.',
         },
         update: {
-            title: 'Update validator',
+            title: 'Update validation',
+            backTitle: 'Earning rewards',
             noChangesNotice: {
                 title: 'No changes',
                 description: 'The proposed transaction contains no changes compared to the current validation.',
                 buttonBack: 'Go back',
             },
+            description: 'Choose what you want to make changes to.',
+            buttonStake: 'Update validation stake',
+            buttonPoolSettings: 'Update pool settings',
+            buttonKeys: 'Update validator keys',
             lowerStakeNotice:
                 'Reducing your stake is subject to a cooldown period of {{cooldown}} days, in which the stake cannot be spent or transferred.',
+            step: {
+                backTitle: 'Update validation',
+            },
         },
         remove: {
             title: 'Remove validator',
@@ -289,6 +297,9 @@ const t = {
             backTitle: 'Validation settings',
             sender: { label: 'Sender' },
             fee: { label: 'Estimated transaction fee' },
+            error: {
+                insufficientFunds: 'Insufficient funds on account',
+            },
             button: 'Submit validation',
         },
     },

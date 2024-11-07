@@ -1,4 +1,4 @@
-import React, { useMemo } from 'react';
+import React, { useMemo, useState } from 'react';
 import { AccountInfoBaker, AccountTransactionType, ConfigureBakerPayload, TransactionHash } from '@concordium/web-sdk';
 import { Navigate, useLocation, Location, useNavigate } from 'react-router-dom';
 import { useTranslation } from 'react-i18next';
@@ -10,7 +10,12 @@ import Card from '@popup/popupX/shared/Card';
 import { ensureDefined } from '@shared/utils/basic-helpers';
 import { useBlockChainParametersAboveV0 } from '@popup/shared/BlockChainParametersProvider';
 import { secondsToDaysRoundedDown } from '@shared/utils/time-helpers';
-import { useGetTransactionFee, useTransactionSubmit } from '@popup/shared/utils/transaction-helpers';
+import {
+    TransactionSubmitError,
+    TransactionSubmitErrorType,
+    useGetTransactionFee,
+    useTransactionSubmit,
+} from '@popup/shared/utils/transaction-helpers';
 import { cpStakingCooldown } from '@shared/utils/chain-parameters-helpers';
 import { submittedTransactionRoute } from '@popup/popupX/constants/routes';
 import Text from '@popup/popupX/shared/Text';
@@ -22,6 +27,7 @@ import {
     showValidatorOpenStatus,
     showValidatorRestake,
 } from '../util';
+import ErrorMessage from '@popup/popupX/shared/Form/ErrorMessage';
 
 export type ValidationResultLocationState = {
     payload: ConfigureBakerPayload;
@@ -36,6 +42,7 @@ export default function ValidationResult() {
     const { t } = useTranslation('x', { keyPrefix: 'earn.validator' });
     const getCost = useGetTransactionFee(AccountTransactionType.ConfigureBaker);
     const accountInfo = ensureDefined(useSelectedAccountInfo(), 'No account selected');
+    const [error, setError] = useState<Error>();
 
     const parametersV1 = useBlockChainParametersAboveV0();
     const submitTransaction = useTransactionSubmit(accountInfo.accountAddress, AccountTransactionType.ConfigureBaker);
@@ -82,12 +89,16 @@ export default function ValidationResult() {
         if (fee === undefined) {
             throw Error('Fee could not be calculated');
         }
-        const tx = await submitTransaction(state.payload, fee);
-        nav(submittedTransactionRoute(TransactionHash.fromHexString(tx)));
+        try {
+            const tx = await submitTransaction(state.payload, fee);
+            nav(submittedTransactionRoute(TransactionHash.fromHexString(tx)));
+        } catch (e) {
+            if (e instanceof Error) {
+                setError(e);
+            }
+        }
     };
 
-    // TODO:
-    // [ ] Add the rest of the transaction fields
     return (
         <Page className="validation-result-container">
             <Page.Top heading={title} />
@@ -184,6 +195,9 @@ export default function ValidationResult() {
                     />
                 </Card.Row>
             </Card>
+            {error instanceof TransactionSubmitError && error.type === TransactionSubmitErrorType.InsufficientFunds && (
+                <ErrorMessage className="m-t-10 text-center">{t('submit.error.insufficientFunds')}</ErrorMessage>
+            )}
             <Page.Footer>
                 <Button.Main onClick={submit} label={t('submit.button')} className="m-t-20" />
             </Page.Footer>

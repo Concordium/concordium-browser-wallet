@@ -53,6 +53,7 @@ export default function ValidatorStatus() {
                     />
                 </Card.Row>
             </Card>
+            <AccountCooldowns cooldowns={accountCooldowns} />
             <Card className="validator-status__info">
                 <Card.Row>
                     <Card.RowDetails title={t('values.id.label')} value={accountBaker.bakerId.toString()} />
@@ -94,12 +95,11 @@ export default function ValidatorStatus() {
                     </Card.Row>
                 )}
             </Card>
-            <AccountCooldowns cooldowns={accountCooldowns} />
             <Page.Footer>
                 <Button.Main
                     className="m-t-10"
                     label={t('status.buttonUpdate')}
-                    onClick={() => nav(absoluteRoutes.settings.earn.delegator.update.path)}
+                    onClick={() => nav(absoluteRoutes.settings.earn.validator.update.path)}
                 />
                 <Button.Main
                     label={t('status.buttonStop')}
