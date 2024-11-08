@@ -6,7 +6,7 @@ import { displayAsCcd } from 'wallet-common-helpers';
 import { AccountInfoType, Ratio } from '@concordium/web-sdk';
 import { absoluteRoutes, relativeRoutes } from '@popup/popupX/constants/routes';
 import Img from '@popup/shared/Img';
-import { WalletCredential } from '@shared/storage/types';
+import { ConfirmedCredential, CreationStatus, WalletCredential } from '@shared/storage/types';
 import { useAccountInfo } from '@popup/shared/AccountInfoListenerContext';
 import { useFlattenedAccountTokens } from '@popup/pages/Account/Tokens/utils';
 import { getMetadataUnique } from '@shared/utils/token-helpers';
@@ -112,9 +112,9 @@ function TokenItem({ thumbnail, symbol, balance, balanceBase, staked, microCcdPe
     );
 }
 
-type MainPageProps = { credential: WalletCredential };
+type MainPageConfirmedAccountProps = { credential: ConfirmedCredential };
 
-function MainPage({ credential }: MainPageProps) {
+function MainPageConfirmedAccount({ credential }: MainPageConfirmedAccountProps) {
     const { t } = useTranslation('x', { keyPrefix: 'mainPage' });
 
     const nav = useNavigate();
@@ -122,15 +122,16 @@ function MainPage({ credential }: MainPageProps) {
     const navToReceive = () => nav(relativeRoutes.home.receive.path);
     const navToTransactionLog = () =>
         nav(relativeRoutes.home.transactionLog.path.replace(':account', credential.address));
-    const navToTokenDetails = (contractIndex: string) => {
-        return nav(absoluteRoutes.home.token.details.path.replace(':contractIndex', contractIndex));
-    };
+    const navToTokenDetails = (contractIndex: string) =>
+        nav(absoluteRoutes.home.token.details.path.replace(':contractIndex', contractIndex));
+
     const navToManageToken = () => nav(relativeRoutes.home.manageTokenList.path);
 
     const chainParameters = useBlockChainParameters();
     const microCcdPerEur = chainParameters?.microGTUPerEuro;
     const accountInfo = useAccountInfo(credential);
     const tokens = useAccountFungibleTokens(credential);
+
     if (accountInfo === undefined) {
         return <>Loading</>;
     }
@@ -141,19 +142,14 @@ function MainPage({ credential }: MainPageProps) {
         <Page className="main-page-x">
             <Balance credential={credential} />
             <div className="main-page-x__action-buttons">
-                <Button.IconTile
-                    icon={<Arrow />}
-                    label={t('receive')}
-                    onClick={() => navToReceive()}
-                    className="receive"
-                />
-                <Button.IconTile icon={<Arrow />} label={t('send')} onClick={() => navToSend()} className="send" />
-                <Button.IconTile icon={<FileText />} label={t('transactions')} onClick={() => navToTransactionLog()} />
+                <Button.IconTile icon={<Arrow />} label={t('receive')} onClick={navToReceive} className="receive" />
+                <Button.IconTile icon={<Arrow />} label={t('send')} onClick={navToSend} className="send" />
+                <Button.IconTile icon={<FileText />} label={t('transactions')} onClick={navToTransactionLog} />
             </div>
             <div className="main-page-x__tokens">
                 <div className="main-page-x__tokens-list">
                     <TokenItem
-                        onClick={() => nav(`${absoluteRoutes.home.token.ccd.path}`)}
+                        onClick={() => nav(absoluteRoutes.home.token.ccd.path)}
                         thumbnail={<ConcordiumLogo />}
                         symbol="CCD"
                         staked={isStaked}
@@ -177,11 +173,56 @@ function MainPage({ credential }: MainPageProps) {
                             }
                         />
                     ))}
-                    <Button.IconText onClick={() => navToManageToken()} icon={<Gear />} label={t('manageTokenList')} />
+                    <Button.IconText onClick={navToManageToken} icon={<Gear />} label={t('manageTokenList')} />
                 </div>
             </div>
         </Page>
     );
+}
+
+function MainPagePendingAccount() {
+    const { t } = useTranslation('x', { keyPrefix: 'mainPage' });
+    const nav = useNavigate();
+    return (
+        <Page className="main-page-x">
+            <div className="main-page-x__balance">
+                <Text.HeadingLarge>{t('pendingAccount')}</Text.HeadingLarge>
+                <Text.Capture>{t('pendingSubText')}</Text.Capture>
+            </div>
+            <div className="main-page-x__action-buttons">
+                <Button.IconTile icon={<Arrow />} label={t('receive')} disabled className="receive" />
+                <Button.IconTile icon={<Arrow />} label={t('send')} disabled className="send" />
+                <Button.IconTile icon={<FileText />} label={t('transactions')} disabled />
+            </div>
+            <div className="main-page-x__tokens">
+                <div className="main-page-x__tokens-list">
+                    <TokenItem
+                        onClick={() => nav(absoluteRoutes.home.token.ccd.path)}
+                        thumbnail={<ConcordiumLogo />}
+                        symbol="CCD"
+                        balance={displayAsCcd(0n, false)}
+                        balanceBase={0n}
+                    />
+                    <Button.IconText disabled icon={<Gear />} label={t('manageTokenList')} />
+                </div>
+            </div>
+        </Page>
+    );
+}
+
+type MainPageProps = { credential: WalletCredential };
+
+function MainPage({ credential }: MainPageProps) {
+    switch (credential.status) {
+        case CreationStatus.Confirmed:
+            return <MainPageConfirmedAccount credential={credential} />;
+        case CreationStatus.Pending:
+            return <MainPagePendingAccount />;
+        case CreationStatus.Rejected:
+            return <>Account Creation was rejected</>;
+        default:
+            throw new Error(`Unexpected status for credential: ${credential.status}`);
+    }
 }
 
 export default withSelectedCredential(MainPage);
