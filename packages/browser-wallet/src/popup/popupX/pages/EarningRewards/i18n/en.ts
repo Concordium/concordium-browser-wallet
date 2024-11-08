@@ -244,6 +244,14 @@ const t = {
                 buttonBack: 'Enter new stake',
             },
         },
+        keys: {
+            title: 'Validator keys',
+            description:
+                'Your new validator keys have been generated. Before you can continue, you must export and save them. The keys will have to be added to the validator node.',
+            buttonToggle: { less: 'Show less', full: 'Show full' },
+            buttonExport: 'Export as .json',
+            buttonContinue: 'Continue',
+        },
         openStatus: {
             title: 'Opening a pool',
             switch: {
