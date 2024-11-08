@@ -36,8 +36,14 @@ import {
 } from '../pages/EarningRewards/Delegator/TransactionFlow';
 import DelegatorStatus from '../pages/EarningRewards/Delegator/Status';
 import ValidatorStatus from '../pages/EarningRewards/Validator/Status';
-import { RegisterValidatorTransactionFlow } from '../pages/EarningRewards/Validator/TransactionFlow';
+import {
+    RegisterValidatorTransactionFlow,
+    UpdateValidatorKeysTransactionFlow,
+    UpdateValidatorPoolSettingsTransactionFlow,
+    UpdateValidatorStakeTransactionFlow,
+} from '../pages/EarningRewards/Validator/TransactionFlow';
 import ValidationResult from '../pages/EarningRewards/Validator/Result/ValidationResult';
+import UpdateValidator from '../pages/EarningRewards/Validator/Update';
 
 export default function Routes({ messagePromptHandlers }: { messagePromptHandlers: MessagePromptHandlersType }) {
     const { handleConnectionResponse } = messagePromptHandlers;
@@ -124,6 +130,21 @@ export default function Routes({ messagePromptHandlers }: { messagePromptHandler
                                 <Route
                                     path={`${relativeRoutes.settings.earn.validator.register.configure.path}/*`}
                                     element={<RegisterValidatorTransactionFlow />}
+                                />
+                            </Route>
+                            <Route path={relativeRoutes.settings.earn.validator.update.path}>
+                                <Route index element={<UpdateValidator />} />
+                                <Route
+                                    path={`${relativeRoutes.settings.earn.validator.update.stake.path}/*`}
+                                    element={<UpdateValidatorStakeTransactionFlow />}
+                                />
+                                <Route
+                                    path={`${relativeRoutes.settings.earn.validator.update.settings.path}/*`}
+                                    element={<UpdateValidatorPoolSettingsTransactionFlow />}
+                                />
+                                <Route
+                                    path={`${relativeRoutes.settings.earn.validator.update.keys.path}/*`}
+                                    element={<UpdateValidatorKeysTransactionFlow />}
                                 />
                             </Route>
                             <Route
