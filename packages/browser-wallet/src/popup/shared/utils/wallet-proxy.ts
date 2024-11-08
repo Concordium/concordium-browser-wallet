@@ -270,7 +270,7 @@ export async function getCcdDrop(accountAddress: string): Promise<BrowserWalletA
     return createPendingTransaction(
         AccountTransactionType.Transfer,
         response.data.submissionId,
-        BigInt(2000000000),
+        BigInt(20000000000),
         undefined,
         undefined,
         accountAddress
