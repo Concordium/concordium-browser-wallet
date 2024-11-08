@@ -11,5 +11,5 @@ jobs:
       DOCKER_CONTEXT: "./examples/voting"
       BUILD_ARGS: |
         base_image=node:18-slim
-      DOCKER_FILE_PATH: examples/voting
+      DOCKER_FILE_PATH: examples/voting/Dockerfile
     secrets: inherit
