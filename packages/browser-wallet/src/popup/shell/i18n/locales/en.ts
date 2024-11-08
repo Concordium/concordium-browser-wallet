@@ -33,6 +33,7 @@ import onboarding from '@popup/popupX/pages/Onboarding/i18n/en';
 import receiveFunds from '@popup/popupX/pages/ReceiveFunds/i18n/en';
 import idCards from '@popup/popupX/pages/IdCards/i18n/en';
 import accounts from '@popup/popupX/pages/Accounts/i18n/en';
+import createAccount from '@popup/popupX/pages/CreateAccount/i18n/en';
 import mainPage from '@popup/popupX/pages/MainPage/i18n/en';
 import tokenDetails from '@popup/popupX/pages/TokenDetails/i18n/en';
 import restore from '@popup/popupX/pages/Restore/i18n/en';
@@ -87,6 +88,7 @@ const t = {
         receiveFunds,
         idCards,
         accounts,
+        createAccount,
         mainPage,
         tokenDetails,
         restore,

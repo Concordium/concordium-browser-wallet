@@ -133,6 +133,15 @@ export const relativeRoutes = {
                 path: 'private-key/:account',
             },
         },
+        createAccount: {
+            path: 'create-account',
+            confirm: {
+                path: 'confirm/:identityProviderIndex/:identityIndex',
+            },
+            config: {
+                backTitle: '',
+            },
+        },
         seedPhrase: {
             path: 'seedPhrase',
             config: {

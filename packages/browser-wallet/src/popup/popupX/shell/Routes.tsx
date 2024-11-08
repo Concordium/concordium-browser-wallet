@@ -10,6 +10,7 @@ import TransactionDetails from '@popup/popupX/pages/TransactionDetails';
 import { TokenDetails, TokenDetailsCcd, TokenRaw } from '@popup/popupX/pages/TokenDetails';
 import IdCards from '@popup/popupX/pages/IdCards';
 import Accounts from '@popup/popupX/pages/Accounts';
+import CreateAccount, { CreateAccountConfirm } from '@popup/popupX/pages/CreateAccount';
 import SeedPhrase from 'src/popup/popupX/pages/SeedPhrase';
 import ChangePasscode from 'src/popup/popupX/pages/ChangePasscode';
 import { Web3IdCredentials, Web3IdImport } from '@popup/popupX/pages/Web3Id';
@@ -98,6 +99,13 @@ export default function Routes({ messagePromptHandlers }: { messagePromptHandler
                             path={relativeRoutes.settings.accounts.connectedSites.path}
                         />
                         <Route element={<PrivateKey />} path={relativeRoutes.settings.accounts.privateKey.path} />
+                    </Route>
+                    <Route path={relativeRoutes.settings.createAccount.path}>
+                        <Route index element={<CreateAccount />} />
+                        <Route
+                            path={relativeRoutes.settings.createAccount.confirm.path}
+                            element={<CreateAccountConfirm />}
+                        />
                     </Route>
                     <Route element={<SeedPhrase />} path={relativeRoutes.settings.seedPhrase.path} />
                     <Route element={<ChangePasscode />} path={relativeRoutes.settings.passcode.path} />
