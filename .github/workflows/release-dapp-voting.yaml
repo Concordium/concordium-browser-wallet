@@ -4,7 +4,7 @@ on:
       - dapp-voting/*
 
 jobs:
-  release-base-image:
+  release-dapp-voting-image:
     uses: concordium/.github/.github/workflows/docker-release-workflow.yaml@main
     with:
       SERVICE_NAME: "dapp-voting"

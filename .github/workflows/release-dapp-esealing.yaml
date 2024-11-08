@@ -4,7 +4,7 @@ on:
       - dapp-esealing/*
 
 jobs:
-  release-base-image:
+  release-dapp-esealing-image:
     uses: concordium/.github/.github/workflows/docker-release-workflow.yaml@main
     with:
       DOCKER_FILE_PATH: ./examples/eSealing/Dockerfile
