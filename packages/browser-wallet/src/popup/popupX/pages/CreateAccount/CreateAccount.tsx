@@ -30,10 +30,13 @@ export default function CreateAccount() {
                     switch (id.status) {
                         case CreationStatus.Confirmed:
                             return (
-                                <Button.Base className="id-card-button" onClick={navToCreateAccountConfirm(id)}>
+                                <Button.Base
+                                    className="id-card-button"
+                                    key={`${id.providerIndex}:${id.index}`}
+                                    onClick={navToCreateAccountConfirm(id)}
+                                >
                                     <ConfirmedIdCard
                                         identity={id}
-                                        key={`${id.providerIndex}:${id.index}`}
                                         shownAttributes={['idDocType', 'idDocNo']}
                                         hideAccounts
                                     />
