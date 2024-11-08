@@ -1,18 +1,13 @@
-import React, { useCallback, useMemo } from 'react';
+import React, { useMemo } from 'react';
 import {
-    AccountAddress,
     AccountInfoDelegator,
-    AccountTransactionPayload,
     AccountTransactionType,
-    CcdAmount,
     ConfigureDelegationPayload,
     DelegationTargetType,
     TransactionHash,
 } from '@concordium/web-sdk';
 import { Navigate, useLocation, Location, useNavigate } from 'react-router-dom';
-import { useAtomValue } from 'jotai';
 import { useTranslation } from 'react-i18next';
-import { useUpdateAtom } from 'jotai/utils';
 
 import Button from '@popup/popupX/shared/Button';
 import Page from '@popup/popupX/shared/Page';
@@ -21,69 +16,11 @@ import Card from '@popup/popupX/shared/Card';
 import { ensureDefined } from '@shared/utils/basic-helpers';
 import { useBlockChainParametersAboveV0 } from '@popup/shared/BlockChainParametersProvider';
 import { secondsToDaysRoundedDown } from '@shared/utils/time-helpers';
-import { grpcClientAtom } from '@popup/store/settings';
-import { usePrivateKey } from '@popup/shared/utils/account-helpers';
-import {
-    createPendingTransactionFromAccountTransaction,
-    getDefaultExpiry,
-    getTransactionAmount,
-    sendTransaction,
-    useGetTransactionFee,
-} from '@popup/shared/utils/transaction-helpers';
-import { addPendingTransactionAtom } from '@popup/store/transactions';
+import { useGetTransactionFee, useTransactionSubmit } from '@popup/shared/utils/transaction-helpers';
 import { cpStakingCooldown } from '@shared/utils/chain-parameters-helpers';
 import { submittedTransactionRoute } from '@popup/popupX/constants/routes';
 import Text from '@popup/popupX/shared/Text';
 import { useSelectedAccountInfo } from '@popup/shared/AccountInfoListenerContext/AccountInfoListenerContext';
-
-enum TransactionSubmitErrorType {
-    InsufficientFunds = 'InsufficientFunds',
-}
-
-class TransactionSubmitError extends Error {
-    private constructor(public type: TransactionSubmitErrorType) {
-        super();
-        super.name = `TransactionSubmitError.${type}`;
-    }
-
-    public static insufficientFunds(): TransactionSubmitError {
-        return new TransactionSubmitError(TransactionSubmitErrorType.InsufficientFunds);
-    }
-}
-
-function useTransactionSubmit(sender: AccountAddress.Type, type: AccountTransactionType) {
-    const grpc = useAtomValue(grpcClientAtom);
-    const key = usePrivateKey(sender.address);
-    const addPendingTransaction = useUpdateAtom(addPendingTransactionAtom);
-
-    return useCallback(
-        async (payload: AccountTransactionPayload, cost: CcdAmount.Type) => {
-            const accountInfo = await grpc.getAccountInfo(sender);
-            if (
-                accountInfo.accountAvailableBalance.microCcdAmount <
-                getTransactionAmount(type, payload) + (cost.microCcdAmount || 0n)
-            ) {
-                throw TransactionSubmitError.insufficientFunds();
-            }
-
-            const nonce = await grpc.getNextAccountNonce(sender);
-
-            const header = {
-                expiry: getDefaultExpiry(),
-                sender,
-                nonce: nonce.nonce,
-            };
-            const transaction = { payload, header, type };
-
-            const hash = await sendTransaction(grpc, transaction, key!);
-            const pending = createPendingTransactionFromAccountTransaction(transaction, hash, cost.microCcdAmount);
-            await addPendingTransaction(pending);
-
-            return hash;
-        },
-        [key]
-    );
-}
 
 export type DelegationResultLocationState = {
     payload: ConfigureDelegationPayload;

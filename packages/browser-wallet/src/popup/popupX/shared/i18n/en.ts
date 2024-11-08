@@ -16,7 +16,7 @@ const t = {
             },
             amount: {
                 label: 'Amount',
-                fee: 'Estimated transaction fee: {{fee}}',
+                fee: 'Estimated transaction fee:',
             },
             address: {
                 label: 'Receiver address',

@@ -159,6 +159,12 @@ const t = {
                 public: 'Added to public balance',
             },
             metadataUrl: { label: 'Metadata URL' },
+            electionKey: { label: 'Election verify key' },
+            signatureKey: { label: 'Signature verify key' },
+            aggregationKey: { label: 'Aggregation verify key' },
+            transactionFeeCommission: { label: 'Transaction fee commission' },
+            bakingRewardCommission: { label: 'Baking reward commission' },
+            finalizationRewardCommission: { label: 'Finalization reward commission' },
         },
         status: {
             title: 'Your validation is registered',
@@ -183,6 +189,115 @@ const t = {
         register: {
             title: 'Register validator',
             backTitle: 'Earning rewards',
+            notice: 'This will lock your validation amount. Amount is released after {{cooldown}} days from the time you remove or decrease your validation stake.',
+        },
+        update: {
+            title: 'Update validator',
+            noChangesNotice: {
+                title: 'No changes',
+                description: 'The proposed transaction contains no changes compared to the current validation.',
+                buttonBack: 'Go back',
+            },
+            lowerStakeNotice:
+                'Reducing your stake is subject to a cooldown period of {{cooldown}} days, in which the stake cannot be spent or transferred.',
+        },
+        remove: {
+            title: 'Remove validator',
+            notice: 'The validator stake is released after {{cooldown}} days',
+        },
+        stake: {
+            selectedAccount: 'on {{account}}',
+            token: {
+                label: 'Token',
+                value: 'CCD',
+                balance: '{{balance}} CCD available',
+            },
+            inputAmount: {
+                label: 'Amount',
+                errors: {
+                    min: 'A minimum stake of {{min}} CCD is required',
+                },
+                buttonMax: 'Stake max.',
+            },
+            fee: {
+                label: 'Estimated transaction fee:',
+                value: '{{amount}} CCD',
+            },
+            poolStake: {
+                label: 'Current pool',
+                value: '{{amount}} CCD',
+            },
+            poolCap: {
+                label: 'Pool limit',
+                value: '{{amount}} CCD',
+            },
+            restake: {
+                label: 'Restake rewards',
+                description: 'I want to automatically add my validation rewards to my validation amount.',
+            },
+            buttonContinue: 'Continue',
+            overStakeThresholdWarning: {
+                title: 'Important',
+                description:
+                    'You are about to lock more than {{ threshold }}% of your total balance in a validation stake.\n\nIf you don’t have enough unlocked CCD at your disposal, you might not be able to pay future transaction fees.',
+                buttonContinue: 'Continue',
+                buttonBack: 'Enter new stake',
+            },
+        },
+        keys: {
+            title: 'Validator keys',
+            description:
+                'Your new validator keys have been generated. Before you can continue, you must export and save them. The keys will have to be added to the validator node.',
+            buttonToggle: { less: 'Show less', full: 'Show full' },
+            buttonExport: 'Export as .json',
+            buttonContinue: 'Continue',
+        },
+        openStatus: {
+            title: 'Opening a pool',
+            switch: {
+                label: 'Open for delegation',
+            },
+            description:
+                'Opening a pool\nYou have the option when adding a validator to open a staking pool or not. A staking pool allows others who want to earn rewards to do so without the need to run a node or become a validator themselves.\n\nTo do this they delegate an amount to your staking pool which then increases your total stake and your chances of winning the lottery to bake a block. At each pay day the rewards will be distributed to you and your delegators.\n\nYou can also choose not to open a pool, in which case only your own stake applies toward the lottery. You can always open or close a pool later.',
+            buttonContinue: 'Continue',
+        },
+        metadata: {
+            title: 'Metadata',
+            description:
+                'You can choose to add a URL with metadata about your validator. Leave it blank if you don’t have any.',
+            field: {
+                label: 'Enter metadata URL',
+                error: {
+                    maxLength: 'Cannot exceed {{max}} characters',
+                },
+            },
+            buttonContinue: 'Continue',
+        },
+        commissions: {
+            title: 'Commissions',
+            desciption:
+                'When you open your validator as a pool, you earn commissions of stake delegated to your pool from other accounts:',
+            fieldTransactionFee: {
+                label: 'Transaction fee commission',
+            },
+            fieldBlockReward: {
+                label: 'Block reward commission',
+            },
+            fieldFinalizationReward: {
+                label: 'Finalization reward commission',
+            },
+            error: {
+                required: 'Please specify a value',
+                min: 'Value exceeds lower bound of {{min}}',
+                max: 'Value exceeds upper bound of {{max}}',
+            },
+            buttonContinue: 'Continue',
+        },
+        submit: {
+            backTitle: 'Validation settings',
+            sender: { label: 'Sender' },
+            fee: { label: 'Estimated transaction fee' },
+            button: 'Submit validation',
         },
     },
 };

@@ -20,7 +20,6 @@ import { IdSubmitted, IdCardsInfo, RequestIdentity, SetupPassword, Welcome } fro
 import ConnectedSites from '@popup/popupX/pages/ConnectedSites';
 import EarningRewards from '@popup/popupX/pages/EarningRewards';
 import ValidatorIntro from '@popup/popupX/pages/EarningRewards/Validator/Intro';
-import RegisterValidator from '@popup/popupX/pages/EarningRewards/Validator/Register';
 import PrivateKey from '@popup/popupX/pages/PrivateKey';
 import { RestoreIntro, RestoreResult } from '@popup/popupX/pages/Restore';
 import { MessagePromptHandlersType } from '@popup/shared/utils/message-prompt-handlers';
@@ -37,6 +36,8 @@ import {
 } from '../pages/EarningRewards/Delegator/TransactionFlow';
 import DelegatorStatus from '../pages/EarningRewards/Delegator/Status';
 import ValidatorStatus from '../pages/EarningRewards/Validator/Status';
+import { RegisterValidatorTransactionFlow } from '../pages/EarningRewards/Validator/TransactionFlow';
+import ValidationResult from '../pages/EarningRewards/Validator/Result/ValidationResult';
 
 export default function Routes({ messagePromptHandlers }: { messagePromptHandlers: MessagePromptHandlersType }) {
     const { handleConnectionResponse } = messagePromptHandlers;
@@ -122,9 +123,13 @@ export default function Routes({ messagePromptHandlers }: { messagePromptHandler
                                 <Route index element={<ValidatorIntro />} />
                                 <Route
                                     path={`${relativeRoutes.settings.earn.validator.register.configure.path}/*`}
-                                    element={<RegisterValidator />}
+                                    element={<RegisterValidatorTransactionFlow />}
                                 />
                             </Route>
+                            <Route
+                                element={<ValidationResult />}
+                                path={relativeRoutes.settings.earn.delegator.submit.path}
+                            />
                         </Route>
                         <Route path={relativeRoutes.settings.earn.delegator.path}>
                             <Route index element={<DelegatorStatus />} />

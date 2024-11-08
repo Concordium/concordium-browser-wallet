@@ -1,0 +1,43 @@
+.form-slider-x {
+    position: relative;
+    cursor: pointer;
+    height: rem(63px);
+    padding: rem(28px) rem(14px) rem(19px);
+
+    @include when-valid {
+        &:where(:focus) {
+            border-color: $color-green-success;
+        }
+    }
+
+    @include when-invalid {
+        border-color: $color-red-attention;
+    }
+
+    &__slider {
+        position: absolute;
+        bottom: rem(-6px);
+        left: rem(4px);
+        width: calc(100% - rem(8px));
+
+        &,
+        & .rc-slider-rail,
+        & .rc-slider-track {
+            border-bottom-left-radius: rem(16px);
+            border-bottom-right-radius: rem(16px);
+            border-top-left-radius: 0;
+            border-top-right-radius: 0;
+        }
+
+        .rc-slider-track {
+            background-color: $color-green-success;
+        }
+
+        .rc-slider-handle {
+            border: none;
+            height: rem(20px);
+            width: rem(20px);
+            margin-top: rem(-8px);
+        }
+    }
+}

@@ -198,12 +198,19 @@ export const relativeRoutes = {
                 /** Configure existing delegator */
                 update: {
                     path: 'update',
+                    /** Update validator stake */
+                    stake: { path: 'stake' },
+                    /** Update validator pool settings */
+                    settings: { path: 'settings' },
+                    /** Update validator keys */
+                    keys: { path: 'keys' },
                 },
-                openPool: {
-                    path: 'openPool',
-                },
-                keys: {
-                    path: 'keys',
+                /** Submit configure validator transaction */
+                submit: {
+                    path: 'submit',
+                    config: {
+                        backTitle: i18n.t('x:earn.validator.submit.backTitle'),
+                    },
                 },
             },
             /** Delegation section */

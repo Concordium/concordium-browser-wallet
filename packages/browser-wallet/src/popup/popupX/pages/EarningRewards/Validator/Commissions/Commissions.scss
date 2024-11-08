@@ -1,0 +1,15 @@
+.validator-commissions {
+    .page__top {
+        margin-bottom: 0 !important;
+    }
+
+    &,
+    &__form {
+        gap: rem(16px);
+    }
+
+    &__form {
+        display: flex;
+        flex-direction: column;
+    }
+}

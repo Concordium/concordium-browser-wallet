@@ -20,10 +20,14 @@
 @import '../pages/Nft/Nft';
 @import '../pages/EarningRewards/EarningRewards';
 @import '../pages/EarningRewards/AccountCooldowns/AccountCooldowns';
+@import '../pages/EarningRewards/Validator/Status/Status';
 @import '../pages/EarningRewards/Validator/Intro/ValidatorIntro';
-@import '../pages/EarningRewards/Validator/Register/RegisterValidator';
+@import '../pages/EarningRewards/Validator/Stake/ValidatorStake';
+@import '../pages/EarningRewards/Validator/Result/ValidationResult';
 @import '../pages/EarningRewards/Validator/OpenPool/OpenPool';
 @import '../pages/EarningRewards/Validator/Keys/ValidatorKeys';
+@import '../pages/EarningRewards/Validator/Metadata/Metadata';
+@import '../pages/EarningRewards/Validator/Commissions/Commissions';
 @import '../pages/EarningRewards/Delegator/Intro/DelegatorIntro';
 @import '../pages/EarningRewards/Delegator/Type/DelegationType';
 @import '../pages/EarningRewards/Delegator/Stake/DelegatorStake';
@@ -45,5 +49,6 @@
 @import '../shared/Carousel/Carousel';
 @import '../shared/Form/Form';
 @import '../shared/Form/TokenAmount/TokenAmount';
+@import '../shared/Form/Slider/Slider';
 @import '../shared/FullscreenNotice/FullscreenNotice';
 @import '../shared/EditableValue/EditableValue';
