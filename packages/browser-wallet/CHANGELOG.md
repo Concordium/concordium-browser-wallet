@@ -4,7 +4,7 @@
 
 ### Fixed
 
--   Fixed amount of CCD drop displayed in pending transaction from 2,000 to actual amount of 20,000
+-   Fixed amount of CCD drop (Testnet) displayed in pending transaction from 2,000 to actual amount of 20,000
 
 ## 1.7.1
 
