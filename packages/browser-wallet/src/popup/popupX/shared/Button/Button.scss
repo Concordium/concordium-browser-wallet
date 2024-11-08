@@ -1,5 +1,7 @@
 .button {
     &__base {
+        cursor: pointer;
+
         &:focus-visible {
             outline: 1px solid $color-white;
             outline-offset: -1px;
