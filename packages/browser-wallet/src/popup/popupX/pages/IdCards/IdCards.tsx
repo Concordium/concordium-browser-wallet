@@ -6,7 +6,7 @@ import { useTranslation } from 'react-i18next';
 import { identitiesAtom } from '@popup/store/identity';
 import { useAtom } from 'jotai';
 import { CreationStatus } from '@shared/storage/types';
-import { ConfirmedIdCard } from '@popup/popupX/shared/IdCard';
+import { ConfirmedIdCard, RejectedIdCard } from '@popup/popupX/shared/IdCard';
 
 export default function IdCards() {
     const { t } = useTranslation('x', { keyPrefix: 'idCards' });
@@ -35,7 +35,13 @@ export default function IdCards() {
                         case CreationStatus.Pending:
                             return null;
                         case CreationStatus.Rejected:
-                            return null;
+                            return (
+                                <RejectedIdCard
+                                    identity={id}
+                                    key={`${id.providerIndex}:${id.index}`}
+                                    onNewName={onNewName(index)}
+                                />
+                            );
                         default:
                             return <>Unsupported</>;
                     }

@@ -1,4 +1,4 @@
-import React, { useMemo } from 'react';
+import React, { ReactNode, useMemo } from 'react';
 import { useDisplayAttributeValue, useGetAttributeName } from '@popup/shared/utils/identity-helpers';
 import { identityProvidersAtom } from '@popup/store/identity';
 import { useAtomValue } from 'jotai';
@@ -8,7 +8,10 @@ import { compareAttributes, displayAsCcd } from 'wallet-common-helpers';
 import { credentialsAtomWithLoading } from '@popup/store/account';
 import { AttributeKey } from '@concordium/web-sdk';
 import { displayNameAndSplitAddress } from '@popup/shared/utils/account-helpers';
-import IdCard, { IdCardAccountInfo, IdCardAttributeInfo } from './IdCard';
+import { useTranslation } from 'react-i18next';
+import Text from '@popup/popupX/shared/Text';
+import IdCard from './IdCard';
+import useEditableName from './useEditableName';
 
 function CcdBalance({ credential }: { credential: WalletCredential }) {
     const accountInfo = useAccountInfo(credential);
@@ -18,9 +21,15 @@ function CcdBalance({ credential }: { credential: WalletCredential }) {
     return <>{balance}</>;
 }
 
-function fallbackIdentityName(index: number) {
-    return `Identity ${index + 1}`;
-}
+type IdCardAttributeInfo = {
+    key: string;
+    value: ReactNode;
+};
+
+type IdCardAccountInfo = {
+    address: string;
+    amount: ReactNode;
+};
 
 export type ConfirmedIdentityProps = {
     /** Identity to show. */
@@ -39,12 +48,14 @@ export default function ConfirmedIdCard({
     shownAttributes,
     onNewName,
 }: ConfirmedIdentityProps) {
+    const { t } = useTranslation('x', { keyPrefix: 'sharedX' });
+    const editable = useEditableName(identity, onNewName);
     const displayAttribute = useDisplayAttributeValue();
     const getAttributeName = useGetAttributeName();
     const providers = useAtomValue(identityProvidersAtom);
     const credentials = useAtomValue(credentialsAtomWithLoading);
     const provider = providers.find((p) => p.ipInfo.ipIdentity === identity.providerIndex);
-    const providerName = provider?.ipInfo.ipDescription.name ?? 'Unknown';
+    const idProviderName = provider?.ipInfo.ipDescription.name ?? 'Unknown';
     const rowsIdInfo: IdCardAttributeInfo[] = useMemo(
         () =>
             Object.entries(identity.idObject.value.attributeList.chosenAttributes)
@@ -76,12 +87,30 @@ export default function ConfirmedIdCard({
     }, [credentials, identity, hideAccounts]);
     return (
         <IdCard
-            identityName={identity.name}
-            onNewName={onNewName}
-            identityNameFallback={fallbackIdentityName(identity.index)}
-            idProviderName={providerName}
-            rowsIdInfo={rowsIdInfo}
-            rowsConnectedAccounts={rowsConnectedAccounts}
-        />
+            title={editable.value}
+            titleAction={editable.actions}
+            subtitle={t('idCard.verifiedBy', { idProviderName })}
+        >
+            {rowsIdInfo && (
+                <IdCard.Content>
+                    {rowsIdInfo.map((info) => (
+                        <IdCard.ContentRow key={info.key}>
+                            <Text.MainRegular>{info.key}</Text.MainRegular>
+                            <Text.MainMedium>{info.value}</Text.MainMedium>
+                        </IdCard.ContentRow>
+                    ))}
+                </IdCard.Content>
+            )}
+            {rowsConnectedAccounts && (
+                <IdCard.Content>
+                    {rowsConnectedAccounts.map((account) => (
+                        <IdCard.ContentRow key={account.address}>
+                            <Text.MainRegular>{account.address}</Text.MainRegular>
+                            <Text.MainMedium>{account.amount}</Text.MainMedium>
+                        </IdCard.ContentRow>
+                    ))}
+                </IdCard.Content>
+            )}
+        </IdCard>
     );
 }
