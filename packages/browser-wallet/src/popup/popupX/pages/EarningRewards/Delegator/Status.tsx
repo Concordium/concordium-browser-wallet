@@ -22,7 +22,7 @@ export default function DelegatorStatus() {
     const nav = useNavigate();
 
     if (accountInfo?.type !== AccountInfoType.Delegator) {
-        return <Navigate to=".." />;
+        return <Navigate to={absoluteRoutes.settings.earn.path} />;
     }
 
     const { accountDelegation, accountCooldowns } = accountInfo;
