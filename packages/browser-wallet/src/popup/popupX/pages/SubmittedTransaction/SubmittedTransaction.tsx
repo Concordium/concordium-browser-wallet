@@ -24,6 +24,8 @@ import {
     DelegatorEvent,
     ConfigureDelegationSummary,
     ConfigureBakerSummary,
+    BakerStakeChangedEvent,
+    BakerEvent,
 } from '@concordium/web-sdk';
 import { useAtomValue } from 'jotai';
 import { grpcClientAtom } from '@popup/store/settings';
@@ -67,10 +69,10 @@ type ValidatorBodyProps = BaseAccountTransactionSummary & ConfigureBakerSummary;
 
 function ValidatorBody({ events }: ValidatorBodyProps) {
     const { t } = useTranslation('x', { keyPrefix: 'submittedTransaction.success.configureValidator' });
-    const stakeChange = events.find((e) =>
-        [TransactionEventTag.DelegationStakeIncreased, TransactionEventTag.DelegationStakeDecreased].includes(e.tag)
-    ) as DelegationStakeChangedEvent | undefined;
 
+    const stakeChange = events.find((e) =>
+        [TransactionEventTag.BakerStakeIncreased, TransactionEventTag.BakerStakeDecreased].includes(e.tag)
+    ) as BakerStakeChangedEvent | undefined;
     if (stakeChange !== undefined) {
         return (
             <>
@@ -81,10 +83,7 @@ function ValidatorBody({ events }: ValidatorBodyProps) {
         );
     }
 
-    const removal = events.find((e) => [TransactionEventTag.DelegationRemoved].includes(e.tag)) as
-        | DelegatorEvent
-        | undefined;
-
+    const removal = events.find((e) => [TransactionEventTag.BakerRemoved].includes(e.tag)) as BakerEvent | undefined;
     if (removal !== undefined) {
         return <Text.Capture>{t('removed')}</Text.Capture>;
     }
