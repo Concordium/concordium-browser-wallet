@@ -34,7 +34,7 @@ function AccountListItem({ credential }: AccountListItemProps) {
         nav(generatePath(absoluteRoutes.settings.accounts.privateKey.path, { account: credential.address }));
     const navToConnectedSites = () =>
         nav(generatePath(absoluteRoutes.settings.accounts.connectedSites.path, { account: credential.address }));
-    const navToIdCards = () => nav(absoluteRoutes.settings.idCards.path);
+    const navToIdCards = () => nav(absoluteRoutes.settings.identities.path);
     const identityName = useIdentityName(credential);
     const accountInfo = useAccountInfo(credential);
     const setAccount = useWritableSelectedAccount(credential.address);

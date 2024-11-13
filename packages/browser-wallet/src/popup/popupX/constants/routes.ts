@@ -115,8 +115,11 @@ export const relativeRoutes = {
     },
     settings: {
         path: 'settings',
-        idCards: {
-            path: 'id-cards',
+        identities: {
+            path: 'identities',
+            create: {
+                path: 'create',
+            },
         },
         about: {
             path: 'about',

@@ -37,7 +37,7 @@ export default function MenuTiles({ menuOpen, setMenuOpen }: MenuTilesProps) {
                 className="main-header__menu-tiles_container"
                 onClick={() => setMenuOpen(false)}
             >
-                <Link to={absoluteRoutes.settings.idCards.path}>
+                <Link to={absoluteRoutes.settings.identities.path}>
                     <IconButton className="main-header__menu-tiles_tile wide">
                         <Identification />
                         <Text.Capture>{t('identities')}</Text.Capture>

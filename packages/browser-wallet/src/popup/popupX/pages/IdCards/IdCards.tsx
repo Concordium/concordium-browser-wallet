@@ -14,6 +14,8 @@ import { credentialsAtomWithLoading } from '@popup/store/account';
 import { displayNameAndSplitAddress } from '@popup/shared/utils/account-helpers';
 import { useAccountInfo } from '@popup/shared/AccountInfoListenerContext';
 import { compareAttributes, displayAsCcd } from 'wallet-common-helpers';
+import { useNavigate } from 'react-router-dom';
+import { absoluteRoutes } from '@popup/popupX/constants/routes';
 
 function CcdBalance({ credential }: { credential: WalletCredential }) {
     const accountInfo = useAccountInfo(credential);
@@ -73,6 +75,7 @@ function ConfirmedIdCard({ identity, onNewName }: ConfirmedIdentityProps) {
 
 export default function IdCards() {
     const { t } = useTranslation('x', { keyPrefix: 'idCards' });
+    const nav = useNavigate();
     const [identities, setIdentities] = useAtom(identitiesAtom);
     const onNewName = (index: number) => (newName: string) => {
         const identitiesClone = [...identities];
@@ -82,7 +85,7 @@ export default function IdCards() {
     return (
         <Page className="id-cards-x">
             <Page.Top heading={t('idCards')}>
-                <Button.Icon icon={<Plus />} />
+                <Button.Icon icon={<Plus />} onClick={() => nav(absoluteRoutes.settings.identities.create.path)} />
             </Page.Top>
             <Page.Main>
                 {identities.map((id, index) => {

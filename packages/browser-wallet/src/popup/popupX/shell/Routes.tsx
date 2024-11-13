@@ -90,7 +90,10 @@ export default function Routes({ messagePromptHandlers }: { messagePromptHandler
                     </Route>
                 </Route>
                 <Route element={<MainLayout />} path={relativeRoutes.settings.path}>
-                    <Route element={<IdCards />} path={relativeRoutes.settings.idCards.path} />
+                    <Route path={relativeRoutes.settings.identities.path}>
+                        <Route index element={<IdCards />} />
+                        <Route element={<>CREATE IDENTITY</>} path={relativeRoutes.settings.identities.create.path} />
+                    </Route>
                     <Route path={relativeRoutes.settings.accounts.path}>
                         <Route index element={<Accounts />} />
                         <Route
