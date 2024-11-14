@@ -1,6 +1,6 @@
 /* eslint-disable @typescript-eslint/ban-types */
 import { SchemaWithContext } from '@concordium/browser-wallet-api-helpers';
-import type { SchemaVersion, AccountTransactionType } from '@concordium/web-sdk';
+import type { SchemaVersion, AccountTransactionType, IdentityRequestInput } from '@concordium/web-sdk';
 import { RefAttributes } from 'react';
 /**
  * @description
@@ -86,3 +86,5 @@ export type BackgroundSendTransactionPayload = {
     schemaVersion?: SchemaVersion;
     url: string;
 };
+
+export type IdentityIssuanceRequestPayload = IdentityRequestInput & { baseUrl: string };

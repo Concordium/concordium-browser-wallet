@@ -46,7 +46,7 @@ import ValidationResult from '../pages/EarningRewards/Validator/Result/Validatio
 import UpdateValidator from '../pages/EarningRewards/Validator/Update';
 import IdIssuance from '../pages/IdIssuance';
 import IdIssuanceSubmitted from '../pages/IdIssuance/Submitted';
-import IdIssuanceFailed from '../pages/IdIssuance/Failed';
+import IdIssuanceExternalFlow from '../pages/IdIssuance/ExternalFlow';
 
 export default function Routes({ messagePromptHandlers }: { messagePromptHandlers: MessagePromptHandlersType }) {
     const { handleConnectionResponse } = messagePromptHandlers;
@@ -98,12 +98,12 @@ export default function Routes({ messagePromptHandlers }: { messagePromptHandler
                         <Route path={relativeRoutes.settings.identities.create.path}>
                             <Route element={<IdIssuance />} index />
                             <Route
-                                element={<IdIssuanceSubmitted />}
-                                path={relativeRoutes.settings.identities.create.submitted.path}
+                                element={<IdIssuanceExternalFlow />}
+                                path={relativeRoutes.settings.identities.create.externalFlow.path}
                             />
                             <Route
-                                element={<IdIssuanceFailed />}
-                                path={relativeRoutes.settings.identities.create.failed.path}
+                                element={<IdIssuanceSubmitted />}
+                                path={relativeRoutes.settings.identities.create.submitted.path}
                             />
                         </Route>
                     </Route>

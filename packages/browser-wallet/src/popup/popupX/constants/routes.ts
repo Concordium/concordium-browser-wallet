@@ -121,15 +121,16 @@ export const relativeRoutes = {
                 path: 'create',
                 externalFlow: {
                     path: 'external-flow',
+                    config: {
+                        hideMenu: true,
+                    },
                 },
                 submitted: {
                     path: 'submitted',
                     config: {
+                        hideMenu: true,
                         hideBackArrow: true,
                     },
-                },
-                failed: {
-                    path: 'failed',
                 },
             },
         },
