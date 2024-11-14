@@ -132,6 +132,12 @@ export const relativeRoutes = {
                         hideBackArrow: true,
                     },
                 },
+                failed: {
+                    path: 'failed',
+                    config: {
+                        hideMenu: true,
+                    },
+                },
             },
         },
         about: {
