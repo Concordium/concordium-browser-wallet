@@ -9,6 +9,7 @@ import { ConfirmedIdCard } from '@popup/popupX/shared/IdCard';
 import Button from '@popup/popupX/shared/Button';
 import { generatePath, useNavigate } from 'react-router-dom';
 import { absoluteRoutes } from '@popup/popupX/constants/routes';
+import { compareYearMonth, getCurrentYearMonth } from 'wallet-common-helpers';
 
 /**
  * Get the valid identities, which is Identities that are confirmed by the ID provider and are not
@@ -19,13 +20,14 @@ import { absoluteRoutes } from '@popup/popupX/constants/routes';
 function useValidIdentities(): ConfirmedIdentity[] {
     const identities = useAtomValue(identitiesAtom);
     return useMemo(() => {
-        const now = new Date();
+        const now = getCurrentYearMonth();
         return identities.flatMap((id) => {
             if (id.status !== CreationStatus.Confirmed) {
                 return [];
             }
-            const validToDate = new Date(id.idObject.value.attributeList.validTo);
-            if (validToDate < now) {
+            // Negative number is indicating that `validTo` is before `now`, therefore expired.
+            const isExpired = compareYearMonth(id.idObject.value.attributeList.validTo, now) < 0;
+            if (isExpired) {
                 return [];
             }
             return [id];

@@ -56,6 +56,32 @@ export function getCurrentYearMonth(): YearMonth {
 }
 
 /**
+ * Function comparing two YearMonth strings.
+ *
+ * Returns a number where:
+ *
+ * - A negative value indicates that `left` is before `right`.
+ * - A positive value indicates that `left` is after `right`.
+ * - Zero indicates that `left` and `right` are equal.
+ */
+export function compareYearMonth(left: YearMonth, right: YearMonth): number {
+    const leftYear = parseInt(left.slice(0, 4), 10);
+    const rightYear = parseInt(right.slice(0, 4), 10);
+    if (Number.isNaN(leftYear) || Number.isNaN(rightYear)) {
+        throw new Error('Invalid input for compareYearMonth, unable to parse integer representing the year');
+    }
+    if (leftYear !== rightYear) {
+        return leftYear - rightYear;
+    }
+    const leftMonth = parseInt(left.slice(4, 6), 10);
+    const rightMonth = parseInt(right.slice(4, 6), 10);
+    if (Number.isNaN(leftMonth) || Number.isNaN(rightMonth)) {
+        throw new Error('Invalid input for compareYearMonth, unable to parse integer representing the month');
+    }
+    return leftMonth - rightMonth;
+}
+
+/**
  * Converts a unix timestamp to a Date type.
  * @param timestamp the unix timestamp, in seconds or milliseconds.
  * @param unit the unit of timestamp
