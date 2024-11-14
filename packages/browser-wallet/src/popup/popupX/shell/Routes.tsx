@@ -48,6 +48,7 @@ import IdIssuance from '../pages/IdIssuance';
 import IdIssuanceSubmitted from '../pages/IdIssuance/Submitted';
 import IdIssuanceExternalFlow from '../pages/IdIssuance/ExternalFlow';
 import IdIssuanceFailed from '../pages/IdIssuance/Failed';
+import EndIdentityIssuance from '../pages/prompts/EndIdentityIssuance';
 
 export default function Routes({ messagePromptHandlers }: { messagePromptHandlers: MessagePromptHandlersType }) {
     const { handleConnectionResponse } = messagePromptHandlers;
@@ -203,6 +204,7 @@ export default function Routes({ messagePromptHandlers }: { messagePromptHandler
                             />
                         }
                     />
+                    <Route path={relativeRoutes.prompt.endIdentityIssuance.path} element={<EndIdentityIssuance />} />
                 </Route>
             </Route>
         </ReactRoutes>

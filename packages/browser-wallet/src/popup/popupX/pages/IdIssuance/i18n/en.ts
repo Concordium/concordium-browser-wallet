@@ -13,6 +13,10 @@ const en = {
         title: 'Error',
         buttonRetry: 'Try again',
     },
+    aborted: {
+        message:
+            'The identity request was aborted. If you did not abort the process, please try again, or contact support.',
+    },
 };
 
 export default en;

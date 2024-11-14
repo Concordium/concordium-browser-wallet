@@ -292,6 +292,9 @@ export const relativeRoutes = {
         connectionRequest: {
             path: 'connectionRequest',
         },
+        endIdentityIssuance: {
+            path: 'end-identity-issuance',
+        },
     },
 };
 
