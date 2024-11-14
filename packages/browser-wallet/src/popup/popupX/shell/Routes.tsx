@@ -44,6 +44,9 @@ import {
 } from '../pages/EarningRewards/Validator/TransactionFlow';
 import ValidationResult from '../pages/EarningRewards/Validator/Result/ValidationResult';
 import UpdateValidator from '../pages/EarningRewards/Validator/Update';
+import IdIssuance from '../pages/IdIssuance';
+import IdIssuanceSubmitted from '../pages/IdIssuance/Submitted';
+import IdIssuanceFailed from '../pages/IdIssuance/Failed';
 
 export default function Routes({ messagePromptHandlers }: { messagePromptHandlers: MessagePromptHandlersType }) {
     const { handleConnectionResponse } = messagePromptHandlers;
@@ -92,7 +95,17 @@ export default function Routes({ messagePromptHandlers }: { messagePromptHandler
                 <Route element={<MainLayout />} path={relativeRoutes.settings.path}>
                     <Route path={relativeRoutes.settings.identities.path}>
                         <Route index element={<IdCards />} />
-                        <Route element={<>CREATE IDENTITY</>} path={relativeRoutes.settings.identities.create.path} />
+                        <Route path={relativeRoutes.settings.identities.create.path}>
+                            <Route element={<IdIssuance />} index />
+                            <Route
+                                element={<IdIssuanceSubmitted />}
+                                path={relativeRoutes.settings.identities.create.submitted.path}
+                            />
+                            <Route
+                                element={<IdIssuanceFailed />}
+                                path={relativeRoutes.settings.identities.create.failed.path}
+                            />
+                        </Route>
                     </Route>
                     <Route path={relativeRoutes.settings.accounts.path}>
                         <Route index element={<Accounts />} />

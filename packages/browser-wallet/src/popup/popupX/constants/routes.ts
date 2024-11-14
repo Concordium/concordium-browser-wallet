@@ -119,6 +119,18 @@ export const relativeRoutes = {
             path: 'identities',
             create: {
                 path: 'create',
+                externalFlow: {
+                    path: 'external-flow',
+                },
+                submitted: {
+                    path: 'submitted',
+                    config: {
+                        hideBackArrow: true,
+                    },
+                },
+                failed: {
+                    path: 'failed',
+                },
             },
         },
         about: {
