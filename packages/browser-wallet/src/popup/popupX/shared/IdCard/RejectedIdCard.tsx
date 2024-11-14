@@ -1,5 +1,5 @@
 import React from 'react';
-import Rejected from '@assets/svgX/rejected.svg';
+import Close from '@assets/svgX/close.svg';
 import { identityProvidersAtom } from '@popup/store/identity';
 import { useAtomValue } from 'jotai';
 import { RejectedIdentity } from '@shared/storage/types';
@@ -20,7 +20,7 @@ export default function RejectedIdCard({ identity }: RejectedIdentityProps) {
     return (
         <IdCard title={identity.name} subtitle={t('idCard.rejectedBy', { idProviderName })}>
             <IdCard.Content className="rejected">
-                <Rejected />
+                <Close className="icon-rejected" />
                 <Text.MainRegular>{t('idCard.itentityRejected')}</Text.MainRegular>
                 <Text.MainMedium>{identity.error}</Text.MainMedium>
             </IdCard.Content>
