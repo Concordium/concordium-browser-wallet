@@ -20,6 +20,7 @@ import { cpStakingCooldown } from '@shared/utils/chain-parameters-helpers';
 import { submittedTransactionRoute } from '@popup/popupX/constants/routes';
 import Text from '@popup/popupX/shared/Text';
 import { useSelectedAccountInfo } from '@popup/shared/AccountInfoListenerContext/AccountInfoListenerContext';
+import ErrorMessage from '@popup/popupX/shared/Form/ErrorMessage';
 import {
     isRange,
     showCommissionRate,
@@ -27,7 +28,6 @@ import {
     showValidatorOpenStatus,
     showValidatorRestake,
 } from '../util';
-import ErrorMessage from '@popup/popupX/shared/Form/ErrorMessage';
 
 export type ValidationResultLocationState = {
     payload: ConfigureBakerPayload;

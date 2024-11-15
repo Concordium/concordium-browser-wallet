@@ -27,7 +27,7 @@ export type IdCardProps = {
 export default function IdCard({
     idProviderName,
     identityName,
-    rowsIdInfo = [],
+    rowsIdInfo,
     rowsConnectedAccounts,
     onNewName,
     identityNameFallback,
@@ -49,14 +49,16 @@ export default function IdCard({
                 )}
             </span>
             <Text.Capture>{t('idCard.verifiedBy', { idProviderName })}</Text.Capture>
-            <Card>
-                {rowsIdInfo.map((info) => (
-                    <Card.Row key={info.key}>
-                        <Text.MainRegular>{info.key}</Text.MainRegular>
-                        <Text.MainMedium>{info.value}</Text.MainMedium>
-                    </Card.Row>
-                ))}
-            </Card>
+            {rowsIdInfo && (
+                <Card>
+                    {rowsIdInfo.map((info) => (
+                        <Card.Row key={info.key}>
+                            <Text.MainRegular>{info.key}</Text.MainRegular>
+                            <Text.MainMedium>{info.value}</Text.MainMedium>
+                        </Card.Row>
+                    ))}
+                </Card>
+            )}
             {rowsConnectedAccounts && (
                 <Card>
                     {rowsConnectedAccounts.map((account) => (
