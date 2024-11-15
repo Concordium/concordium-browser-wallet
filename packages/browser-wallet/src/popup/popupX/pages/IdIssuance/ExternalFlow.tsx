@@ -1,7 +1,7 @@
 import React, { useCallback, useEffect } from 'react';
-import { Location, Navigate, useLocation, useNavigate } from 'react-router-dom';
+import { Location, useLocation, useNavigate } from 'react-router-dom';
 import { useTranslation } from 'react-i18next';
-import { useAtom } from 'jotai';
+import { useSetAtom } from 'jotai';
 
 import { InternalMessageType } from '@messaging';
 import { absoluteRoutes } from '@popup/popupX/constants/routes';
@@ -20,9 +20,9 @@ import { IdIssuanceFailedLocationState } from './Failed';
 import { IdIssuanceExternalFlowLocationState } from './util';
 
 export default function IdIssuanceExternalFlow() {
-    const { state, pathname } = useLocation() as Location & { state: IdIssuanceExternalFlowLocationState | undefined };
+    const { state } = useLocation() as Location & { state: IdIssuanceExternalFlowLocationState };
     const { t } = useTranslation('x', { keyPrefix: 'idIssuance.externalFlow' });
-    const [pendingIdentity, updatePendingIdentity] = useAtom(pendingIdentityAtom);
+    const updatePendingIdentity = useSetAtom(pendingIdentityAtom);
     const nav = useNavigate();
 
     const handleError = useCallback(
@@ -36,7 +36,6 @@ export default function IdIssuanceExternalFlow() {
     const seedPhrase = useDecryptedSeedPhrase((e) => handleError(e.message));
 
     const start = useCallback(async () => {
-        if (state === undefined) throw new Error('Location state not available');
         if (seedPhrase === undefined) throw new Error('Seed phrase not available');
 
         updatePendingIdentity(state.pendingIdentity);
@@ -61,34 +60,24 @@ export default function IdIssuanceExternalFlow() {
             logError('Failed to issue identity due to internal error');
             handleError('Internal error, please try again.');
         } else {
-            nav(pathname, { state: undefined, replace: true }); // This ensures that when we navigate back, we don't try again automatically.
+            nav(absoluteRoutes.settings.identities.path, { replace: true });
         }
     }, [state, seedPhrase, handleError]);
 
     useEffect(() => {
-        if (state !== undefined && seedPhrase !== undefined) {
+        if (state !== null && seedPhrase !== undefined) {
             start();
         }
     }, [start]);
 
-    if (state === undefined) {
-        return <Navigate to={absoluteRoutes.settings.identities.create.path} />;
-    }
-
     return (
         <Page>
             <Page.Top />
-            {pendingIdentity === undefined ? (
-                <Text.Capture className="text-center">{t('description')}</Text.Capture>
-            ) : (
-                <Text.Capture className="text-center">{t('descriptionOngoing')}</Text.Capture>
-            )}
+            <Text.Capture className="text-center">{t('description')}</Text.Capture>
             <LoaderInline className="m-t-50 margin-center" />
-            {pendingIdentity !== undefined && (
-                <Page.Footer>
-                    <Button.Main label={t('buttonReset')} />
-                </Page.Footer>
-            )}
+            <Page.Footer>
+                <Button.Main label={t('buttonReset')} />
+            </Page.Footer>
         </Page>
     );
 }

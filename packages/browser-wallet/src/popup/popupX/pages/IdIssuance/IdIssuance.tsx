@@ -1,4 +1,4 @@
-import { useAtom, useAtomValue, useSetAtom } from 'jotai';
+import { useAtom, useAtomValue } from 'jotai';
 import React, { useCallback, useEffect, useState } from 'react';
 import { useTranslation } from 'react-i18next';
 import { useNavigate } from 'react-router-dom';
@@ -11,26 +11,28 @@ import IdentityProviderIcon from '@popup/shared/IdentityProviderIcon';
 import { getIdentityProviders } from '@popup/shared/utils/wallet-proxy';
 import { identitiesAtom, identityProvidersAtom, pendingIdentityAtom } from '@popup/store/identity';
 import { grpcClientAtom, networkConfigurationAtom } from '@popup/store/settings';
-import { CreationStatus, IdentityProvider } from '@shared/storage/types';
-import { getGlobal, getNet } from '@shared/utils/network-helpers';
-import { IdIssuanceExternalFlowLocationState } from './ExternalFlow';
+import { CreationStatus, IdentityProvider, SessionPendingIdentity } from '@shared/storage/types';
+import { getGlobal } from '@shared/utils/network-helpers';
+import { logErrorMessage } from '@shared/utils/log-helpers';
+
+import { IdIssuanceExternalFlowLocationState } from './util';
 
 export default function IdIssuance() {
     const { t } = useTranslation('x', { keyPrefix: 'idIssuance.idIssuer' });
     const [providers, setProviders] = useAtom(identityProvidersAtom);
     const network = useAtomValue(networkConfigurationAtom);
     const identities = useAtomValue(identitiesAtom);
-    const updatePendingIdentity = useSetAtom(pendingIdentityAtom);
     const client = useAtomValue(grpcClientAtom);
     const nav = useNavigate();
     const [buttonDisabled, setButtonDisabled] = useState(false);
+    const [pendingIdentity, setPendingIdentity] = useAtom(pendingIdentityAtom);
 
     useEffect(() => {
         // TODO: only load once per session?
         getIdentityProviders()
             .then(setProviders)
             // eslint-disable-next-line no-console
-            .catch(() => console.error('Unable to update identity provider list')); // TODO: log error
+            .catch(() => logErrorMessage('Unable to update identity provider list'));
     }, []);
 
     const startIssuance = useCallback(
@@ -49,7 +51,7 @@ export default function IdIssuance() {
                     0
                 );
 
-                updatePendingIdentity({
+                const identity: SessionPendingIdentity = {
                     identity: {
                         status: CreationStatus.Pending,
                         index: identityIndex,
@@ -57,16 +59,12 @@ export default function IdIssuance() {
                         providerIndex,
                     },
                     network,
-                });
+                };
 
                 const issuanceParams: IdIssuanceExternalFlowLocationState = {
-                    globalContext: global,
-                    ipInfo: provider.ipInfo,
-                    arsInfos: provider.arsInfos,
-                    net: getNet(network),
-                    identityIndex,
-                    arThreshold: Math.min(Object.keys(provider.arsInfos).length - 1, 255),
-                    baseUrl: provider.metadata.issuanceStart,
+                    global,
+                    provider,
+                    pendingIdentity: identity,
                 };
                 nav(absoluteRoutes.settings.identities.create.externalFlow.path, { state: issuanceParams });
             } catch {
@@ -79,20 +77,31 @@ export default function IdIssuance() {
     return (
         <Page>
             <Page.Top heading={t('title')} />
-            <Text.Capture>{t('description')}</Text.Capture>
-            <div className="m-t-20">
-                {providers.map((p) => (
-                    <Button.Base
-                        className="id-issuance__issuer-btn"
-                        key={p.ipInfo.ipDescription.url}
-                        disabled={buttonDisabled}
-                        onClick={() => startIssuance(p)}
-                    >
-                        <IdentityProviderIcon provider={p} />
-                        <span>{p.metadata.display ?? p.ipInfo.ipDescription.name}</span>
-                    </Button.Base>
-                ))}
-            </div>
+            {pendingIdentity !== undefined ? (
+                <Text.Capture>{t('descriptionOngoing')}</Text.Capture>
+            ) : (
+                <Text.Capture>{t('description')}</Text.Capture>
+            )}
+            {pendingIdentity === undefined && (
+                <div className="m-t-20">
+                    {providers.map((p) => (
+                        <Button.Base
+                            className="id-issuance__issuer-btn"
+                            key={p.ipInfo.ipDescription.url}
+                            disabled={buttonDisabled}
+                            onClick={() => startIssuance(p)}
+                        >
+                            <IdentityProviderIcon provider={p} />
+                            <span>{p.metadata.display ?? p.ipInfo.ipDescription.name}</span>
+                        </Button.Base>
+                    ))}
+                </div>
+            )}
+            {pendingIdentity !== undefined && (
+                <Page.Footer>
+                    <Button.Main label={t('buttonReset')} onClick={() => setPendingIdentity(undefined)} />
+                </Page.Footer>
+            )}
         </Page>
     );
 }

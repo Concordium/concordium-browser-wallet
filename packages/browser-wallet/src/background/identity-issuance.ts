@@ -1,4 +1,4 @@
-import { createIdentityRequest, IdentityRequestInput } from '@concordium/web-sdk';
+import { createIdentityRequest } from '@concordium/web-sdk';
 import { IdentityIssuanceBackgroundResponse } from '@shared/utils/identity-helpers';
 import { ExtensionMessageHandler, InternalMessageType } from '@messaging';
 import { BackgroundResponseStatus, IdentityIssuanceRequestPayload } from '@shared/utils/types';

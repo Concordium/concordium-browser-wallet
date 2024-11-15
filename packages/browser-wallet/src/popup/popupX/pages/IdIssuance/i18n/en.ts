@@ -3,7 +3,10 @@ const en = {
         title: 'Request an identity',
         description:
             'The ID Documents (e.g. Passport pictures) that are used for the ID verification, are held exclusively by our trusted, third-party identity providers in their own off-chain records.\n\nChoose one of the identity providers below to request a Concordium Identity and create an account.',
+        descriptionOngoing:
+            'An identity issuance process is ongoing in the browser. Please follow the steps to complete the process for the identity provider.\n\nIf you wish to abort the flow, or try again, press "Reset" below.',
         buttonContinue: 'Request Identity',
+        buttonReset: 'Reset',
     },
     externalFlow: {
         description:

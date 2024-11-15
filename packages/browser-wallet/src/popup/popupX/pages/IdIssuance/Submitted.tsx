@@ -1,7 +1,6 @@
-import React, { useContext, useEffect } from 'react';
+import React from 'react';
 import { useTranslation } from 'react-i18next';
 import { useAtomValue } from 'jotai';
-import { noOp } from 'wallet-common-helpers';
 
 import Button from '@popup/popupX/shared/Button';
 import { ConfirmedIdCard, RejectedIdCard, PendingIdCard } from '@popup/popupX/shared/IdCard';
@@ -9,17 +8,22 @@ import Page from '@popup/popupX/shared/Page';
 import Text from '@popup/popupX/shared/Text';
 import { identitiesAtomWithLoading } from '@popup/store/identity';
 import { CreationStatus } from '@shared/storage/types';
-import { fullscreenPromptContext } from '@popup/popupX/page-layouts/FullscreenPromptLayout';
 import { absoluteRoutes } from '@popup/popupX/constants/routes';
+import { isSpawnedWindow } from '@popup/shared/window-helpers';
+import { useNavigate } from 'react-router-dom';
 
 export default function IdIssuanceSubmitted() {
     const { t } = useTranslation('x', { keyPrefix: 'idIssuance.submitted' });
     const { loading, value: identities } = useAtomValue(identitiesAtomWithLoading);
-    const { setReturnLocation, withClose } = useContext(fullscreenPromptContext);
+    const nav = useNavigate();
 
-    useEffect(() => {
-        setReturnLocation(absoluteRoutes.settings.identities.path);
-    }, [setReturnLocation]);
+    const handleDone = () => {
+        if (isSpawnedWindow) {
+            window.close();
+        } else {
+            nav(absoluteRoutes.settings.identities.path, { replace: true });
+        }
+    };
 
     if (loading) {
         return null;
@@ -37,7 +41,7 @@ export default function IdIssuanceSubmitted() {
                 {identity.status === CreationStatus.Confirmed && <ConfirmedIdCard identity={identity} />}
             </div>
             <Page.Footer>
-                <Button.Main className="m-t-20" label={t('buttonContinue')} onClick={withClose(noOp)} />
+                <Button.Main className="m-t-20" label={t('buttonContinue')} onClick={handleDone} />
             </Page.Footer>
         </Page>
     );

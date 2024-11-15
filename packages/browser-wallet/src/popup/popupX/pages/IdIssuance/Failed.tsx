@@ -13,18 +13,16 @@ export type IdIssuanceFailedLocationState = { message: string; backState?: IdIss
 
 export default function IdIssuanceFailed() {
     const { t } = useTranslation('x', { keyPrefix: 'idIssuance.failed' });
-    const { state } = useLocation() as Location & { state: IdIssuanceFailedLocationState | undefined };
+    const { state } = useLocation() as Location & { state: IdIssuanceFailedLocationState };
     const nav = useNavigate();
 
     const handleRetry = useCallback(() => {
-        if (state?.backState !== undefined) {
+        if (state.backState !== undefined) {
             nav(absoluteRoutes.settings.identities.create.externalFlow.path, { state: state.backState, replace: true });
         } else {
             nav(absoluteRoutes.settings.identities.create.path, { replace: true });
         }
-    }, [state?.backState]);
-
-    if (state === undefined) throw new Error('Must specify "state.message" for route');
+    }, [state.backState]);
 
     return (
         <Page>

@@ -5,12 +5,17 @@ import { absoluteRoutes } from '@popup/popupX/constants/routes';
 import { IdentityIssuanceBackgroundResponse } from '@shared/utils/identity-helpers';
 import { BackgroundResponseStatus } from '@shared/utils/types';
 import { useTranslation } from 'react-i18next';
+import { WalletEvent } from '@messaging';
 
 export default function EndIdentityIssuance() {
-    const { state } = useLocation() as Location & { state: IdentityIssuanceBackgroundResponse };
+    const {
+        state: { payload },
+    } = useLocation() as Location & {
+        state: WalletEvent & { payload: IdentityIssuanceBackgroundResponse };
+    };
     const { t } = useTranslation('x', { keyPrefix: 'idIssuance.aborted' });
 
-    switch (state.status) {
+    switch (payload.status) {
         case BackgroundResponseStatus.Success:
             return <Navigate to={absoluteRoutes.settings.identities.create.submitted.path} replace />;
         case BackgroundResponseStatus.Error:
@@ -18,7 +23,7 @@ export default function EndIdentityIssuance() {
                 <Navigate
                     to={absoluteRoutes.settings.identities.create.failed.path}
                     replace
-                    state={{ message: state.reason }}
+                    state={{ message: payload.reason }}
                 />
             );
         case BackgroundResponseStatus.Aborted:
