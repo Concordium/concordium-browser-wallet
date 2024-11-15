@@ -20,6 +20,7 @@ const t = {
             },
             address: {
                 label: 'Receiver address',
+                placeholder: 'Enter receiver address here',
             },
         },
     },

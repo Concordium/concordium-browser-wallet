@@ -49,7 +49,7 @@ const FormInputClear = makeUncontrolled(InputClear);
 
 type ReceiverInputProps = Pick<
     InputHTMLAttributes<HTMLTextAreaElement>,
-    'className' | 'value' | 'onChange' | 'onBlur' | 'autoFocus'
+    'className' | 'value' | 'onChange' | 'onBlur' | 'autoFocus' | 'placeholder'
 > &
     RequiredUncontrolledFieldProps<HTMLInputElement>;
 
@@ -369,24 +369,14 @@ export default function TokenAmountView(props: TokenAmountViewProps) {
         <div className={clsx('token-amount', className)}>
             <div className="token-amount_token">
                 <span className="text__main_medium">{t('form.tokenAmount.token.label')}</span>
-                {props.tokenType !== undefined ? (
-                    <TokenPicker
-                        selectedToken={selectedToken}
-                        onSelect={handleTokenSelect}
-                        tokens={tokens}
-                        selectedTokenBalance={balance}
-                        formatAmount={formatAmount}
-                    />
-                ) : (
-                    <TokenPicker
-                        selectedToken={selectedToken}
-                        onSelect={handleTokenSelect}
-                        tokens={tokens}
-                        canSelect
-                        selectedTokenBalance={balance}
-                        formatAmount={formatAmount}
-                    />
-                )}
+                <TokenPicker
+                    selectedToken={selectedToken}
+                    onSelect={handleTokenSelect}
+                    tokens={tokens}
+                    canSelect={props.tokenType !== undefined}
+                    selectedTokenBalance={balance}
+                    formatAmount={formatAmount}
+                />
             </div>
             <div className="token-amount_amount">
                 <span className="text__main_medium">Amount</span>
@@ -420,6 +410,7 @@ export default function TokenAmountView(props: TokenAmountViewProps) {
                         className="text__main"
                         register={(props.form as UseFormReturn<AmountReceiveForm>).register}
                         name="receiver"
+                        placeholder={t('form.tokenAmount.address.placeholder')}
                         rules={{
                             required: t('utils.address.required'),
                             validate: validateAccountAddress,

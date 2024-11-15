@@ -1,53 +1,112 @@
-import React from 'react';
-import ConcordiumLogo from '@assets/svgX/concordium-logo.svg';
-import Plus from '@assets/svgX/plus.svg';
-import SideArrow from '@assets/svgX/side-arrow.svg';
+import React, { useState } from 'react';
 import Button from '@popup/popupX/shared/Button';
-import { useNavigate } from 'react-router-dom';
-import { relativeRoutes } from '@popup/popupX/constants/routes';
+import { Navigate, useNavigate, useParams } from 'react-router-dom';
+import { displayNameAndSplitAddress, displaySplitAddress, useCredential } from '@popup/shared/utils/account-helpers';
+import { useTranslation } from 'react-i18next';
+import Page from '@popup/popupX/shared/Page';
+import Text from '@popup/popupX/shared/Text';
+import TokenAmount, { AmountReceiveForm } from '@popup/popupX/shared/Form/TokenAmount';
+import Form, { useForm } from '@popup/popupX/shared/Form';
+import { AccountAddress, AccountTransactionType, CcdAmount, TransactionHash } from '@concordium/web-sdk';
+import { useAccountInfo } from '@popup/shared/AccountInfoListenerContext';
+import { useGetTransactionFee } from '@popup/shared/utils/transaction-helpers';
+import FullscreenNotice from '@popup/popupX/shared/FullscreenNotice';
+import Arrow from '@assets/svgX/arrow-right.svg';
+import { submittedTransactionRoute } from '@popup/popupX/constants/routes';
 
-export default function SendFunds() {
+type SendFundsProps = { address: string };
+
+function SendFunds({ address }: SendFundsProps) {
+    const { t } = useTranslation('x', { keyPrefix: 'sendFunds' });
     const nav = useNavigate();
-    const navToConfirm = () => nav(relativeRoutes.home.send.confirmation.path);
+    const credential = useCredential(address);
+    const form = useForm<AmountReceiveForm>({
+        mode: 'onTouched',
+        defaultValues: {
+            amount: '0.00',
+        },
+    });
+    const accountInfo = useAccountInfo(credential);
+    const cost =
+        useGetTransactionFee(AccountTransactionType.Transfer)({
+            amount: CcdAmount.zero(),
+            toAddress: AccountAddress.fromBuffer(new Uint8Array(32)),
+        }) ?? CcdAmount.fromCcd(1);
+
+    const [showConfirmationPage, setShowConfirmationPage] = useState(false);
+    const onSubmit = () => setShowConfirmationPage(true);
+
+    // TODO:
+    // 1. Submit transaction (see `Delegator/TransactionFlow`)
+    // 2. Pass the transaction hash to the route function below
+    const navToSubmitted = () => nav(submittedTransactionRoute(TransactionHash.fromHexString('..')));
+
+    const receiver: string | undefined = form.watch('receiver');
+
+    if (accountInfo === undefined) {
+        return null;
+    }
     return (
-        <div className="send-funds-container">
-            <div className="send-funds__title">
-                <span className="heading_medium">Send funds</span>
-                <span className="capture__main_small">from Account 1 / 6gk...Fk7o</span>
-            </div>
-            <div className="send-funds__card">
-                <div className="send-funds__card_token">
-                    <span className="text__main_medium">Token</span>
-                    <div className="token-selector">
-                        <div className="token-icon">
-                            <ConcordiumLogo />
-                        </div>
-                        <span className="text__main">CCD</span>
-                        <SideArrow />
-                        <span className="text__additional_small">17,800 CCD available</span>
-                    </div>
-                </div>
-                <div className="send-funds__card_amount">
-                    <span className="text__main_medium">Amount</span>
-                    <div className="amount-selector">
-                        <span className="heading_big">12,600.00</span>
-                        <span className="capture__additional_small">Send max.</span>
-                    </div>
-                    <span className="capture__main_small">Estimated transaction fee: 0.03614 CCD</span>
-                </div>
-                <div className="send-funds__card_receiver">
-                    <span className="text__main_medium">Receiver address</span>
-                    <div className="address-selector">
-                        <span className="text__main">bc1qxy2kgdygq2...0wlh</span>
-                        <span className="capture__additional_small">Address Book</span>
-                    </div>
-                </div>
-            </div>
+        <>
+            <Page className="send-funds-container">
+                <Page.Top heading={t('sendFunds')}>
+                    <Text.Capture className="m-l-5 m-t-neg-5">
+                        {t('from', { name: displayNameAndSplitAddress(credential) })}
+                    </Text.Capture>
+                </Page.Top>
+                <Form formMethods={form} onSubmit={onSubmit}>
+                    {() => (
+                        <TokenAmount
+                            buttonMaxLabel={t('sendMax')}
+                            receiver
+                            fee={cost}
+                            form={form}
+                            accountInfo={accountInfo}
+                        />
+                    )}
+                </Form>
+                {/*
             <div className="send-funds__memo">
                 <Plus />
                 <span className="label__main">Add memo</span>
             </div>
-            <Button.Main className="button-main" onClick={() => navToConfirm()} label="Continue" />
-        </div>
+              */}
+                <Page.Footer>
+                    <Button.Main className="button-main" onClick={form.handleSubmit(onSubmit)} label="Continue" />
+                </Page.Footer>
+            </Page>
+            {/* Confirmation page modal */}
+            <FullscreenNotice open={showConfirmationPage} onClose={() => setShowConfirmationPage(false)}>
+                <Page className="send-funds-container">
+                    <Page.Top heading="Confirmation" />
+
+                    <div className="send-funds-confirm__card">
+                        <div className="send-funds-confirm__card_destination">
+                            <Text.MainMedium>{displayNameAndSplitAddress(credential)}</Text.MainMedium>
+                            <Arrow />
+                            <Text.MainMedium>{receiver && displaySplitAddress(receiver)}</Text.MainMedium>
+                        </div>
+                        <Text.Capture>
+                            {t('amount')} ({}):
+                        </Text.Capture>
+                        <Text.HeadingLarge>{form.watch('amount')}</Text.HeadingLarge>
+                        <Text.Capture>{t('estimatedFee', { fee: cost })}</Text.Capture>
+                    </div>
+
+                    <Page.Footer>
+                        <Button.Main className="button-main" onClick={navToSubmitted} label={t('sendFunds')} />
+                    </Page.Footer>
+                </Page>
+            </FullscreenNotice>
+        </>
     );
+}
+
+export default function Loader() {
+    const params = useParams();
+    if (params.account === undefined) {
+        // No account address passed in the url.
+        return <Navigate to="../" />;
+    }
+    return <SendFunds address={params.account} />;
 }

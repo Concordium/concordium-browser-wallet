@@ -67,14 +67,8 @@ export const relativeRoutes = {
             hideBackArrow: true,
             showAccountSelector: true,
         },
-        send: {
-            path: 'send',
-            confirmation: {
-                path: 'confirmation',
-                config: {
-                    backTitle: 'to Send Funds form',
-                },
-            },
+        sendFunds: {
+            path: 'account/:account/send-funds',
         },
         receive: {
             path: 'receive',
