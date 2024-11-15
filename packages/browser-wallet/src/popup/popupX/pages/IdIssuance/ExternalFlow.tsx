@@ -1,7 +1,7 @@
 import React, { useCallback, useEffect } from 'react';
 import { Location, Navigate, useLocation, useNavigate } from 'react-router-dom';
 import { useTranslation } from 'react-i18next';
-import { useSetAtom } from 'jotai';
+import { useAtom } from 'jotai';
 
 import { InternalMessageType } from '@messaging';
 import { absoluteRoutes } from '@popup/popupX/constants/routes';
@@ -14,6 +14,7 @@ import { logError } from '@shared/utils/log-helpers';
 import { IdentityIssuanceRequestPayload } from '@shared/utils/types';
 import { pendingIdentityAtom } from '@popup/store/identity';
 import { getNet } from '@shared/utils/network-helpers';
+import Button from '@popup/popupX/shared/Button';
 
 import { IdIssuanceFailedLocationState } from './Failed';
 import { IdIssuanceExternalFlowLocationState } from './util';
@@ -21,7 +22,7 @@ import { IdIssuanceExternalFlowLocationState } from './util';
 export default function IdIssuanceExternalFlow() {
     const { state, pathname } = useLocation() as Location & { state: IdIssuanceExternalFlowLocationState | undefined };
     const { t } = useTranslation('x', { keyPrefix: 'idIssuance.externalFlow' });
-    const updatePendingIdentity = useSetAtom(pendingIdentityAtom);
+    const [pendingIdentity, updatePendingIdentity] = useAtom(pendingIdentityAtom);
     const nav = useNavigate();
 
     const handleError = useCallback(
@@ -77,8 +78,17 @@ export default function IdIssuanceExternalFlow() {
     return (
         <Page>
             <Page.Top />
-            <Text.Capture className="text-center">{t('description')}</Text.Capture>
+            {pendingIdentity === undefined ? (
+                <Text.Capture className="text-center">{t('description')}</Text.Capture>
+            ) : (
+                <Text.Capture className="text-center">{t('descriptionOngoing')}</Text.Capture>
+            )}
             <LoaderInline className="m-t-50 margin-center" />
+            {pendingIdentity !== undefined && (
+                <Page.Footer>
+                    <Button.Main label={t('buttonReset')} />
+                </Page.Footer>
+            )}
         </Page>
     );
 }

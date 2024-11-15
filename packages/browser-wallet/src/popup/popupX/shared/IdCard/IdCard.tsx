@@ -4,6 +4,8 @@ import Text from '@popup/popupX/shared/Text';
 import Button from '@popup/popupX/shared/Button';
 import useEditableValue from '@popup/popupX/shared/EditableValue';
 import { useTranslation } from 'react-i18next';
+import { ClassName } from 'wallet-common-helpers';
+import clsx from 'clsx';
 
 export type IdCardAttributeInfo = {
     key: string;
@@ -15,7 +17,7 @@ export type IdCardAccountInfo = {
     amount: ReactNode;
 };
 
-export type IdCardProps = {
+export type IdCardProps = ClassName & {
     idProviderName: string;
     identityName: string;
     rowsIdInfo?: IdCardAttributeInfo[];
@@ -31,12 +33,13 @@ export default function IdCard({
     rowsConnectedAccounts,
     onNewName,
     identityNameFallback,
+    className,
 }: IdCardProps) {
     const editable = useEditableValue(identityName, identityNameFallback ?? '', onNewName ?? (() => {}));
     const { t } = useTranslation('x', { keyPrefix: 'sharedX' });
 
     return (
-        <Card type="gradient" className="id-card-x">
+        <Card type="gradient" className={clsx('id-card-x', className)}>
             <span className="title-row">
                 <Text.Main>{editable.value}</Text.Main>
                 {editable.isEditing ? (
