@@ -1,44 +1,43 @@
-import React, { useMemo } from 'react';
+import React, { useContext, useEffect } from 'react';
 import { useTranslation } from 'react-i18next';
+import { useAtomValue } from 'jotai';
+import { noOp } from 'wallet-common-helpers';
 
 import Button from '@popup/popupX/shared/Button';
-import IdCard from '@popup/popupX/shared/IdCard';
+import { ConfirmedIdCard, RejectedIdCard, PendingIdCard } from '@popup/popupX/shared/IdCard';
 import Page from '@popup/popupX/shared/Page';
 import Text from '@popup/popupX/shared/Text';
-import { useAtomValue } from 'jotai';
-import { identitiesAtom, identityProvidersAtom } from '@popup/store/identity';
+import { identitiesAtomWithLoading } from '@popup/store/identity';
 import { CreationStatus } from '@shared/storage/types';
+import { fullscreenPromptContext } from '@popup/popupX/page-layouts/FullscreenPromptLayout';
+import { absoluteRoutes } from '@popup/popupX/constants/routes';
 
 export default function IdIssuanceSubmitted() {
     const { t } = useTranslation('x', { keyPrefix: 'idIssuance.submitted' });
-    const providers = useAtomValue(identityProvidersAtom);
-    const identity = useAtomValue(identitiesAtom).slice(-1)[0];
-    const provider = useMemo(
-        () => providers.find((p) => p.ipInfo.ipIdentity === identity.providerIndex),
-        [identity.providerIndex]
-    );
+    const { loading, value: identities } = useAtomValue(identitiesAtomWithLoading);
+    const { setReturnLocation, withClose } = useContext(fullscreenPromptContext);
 
-    if (provider === undefined) {
+    useEffect(() => {
+        setReturnLocation(absoluteRoutes.settings.identities.path);
+    }, [setReturnLocation]);
+
+    if (loading) {
         return null;
     }
 
-    const providerName = provider.metadata.display ?? provider.ipInfo.ipDescription.name;
+    const identity = identities.slice(-1)[0];
 
     return (
         <Page>
             <Page.Top heading={t('title')} />
             <Text.Capture>{t('description')}</Text.Capture>
-            {identity.status === CreationStatus.Pending && (
-                <IdCard className="m-t-20" idProviderName={providerName} identityName={identity.name} />
-            )}
-            {identity.status === CreationStatus.Rejected && (
-                <IdCard className="m-t-20" idProviderName={providerName} identityName={identity.name} />
-            )}
-            {identity.status === CreationStatus.Confirmed && (
-                <IdCard className="m-t-20" idProviderName={providerName} identityName={identity.name} />
-            )}
+            <div className="m-t-20">
+                {identity.status === CreationStatus.Pending && <PendingIdCard identity={identity} />}
+                {identity.status === CreationStatus.Rejected && <RejectedIdCard identity={identity} />}
+                {identity.status === CreationStatus.Confirmed && <ConfirmedIdCard identity={identity} />}
+            </div>
             <Page.Footer>
-                <Button.Main className="m-t-20" label={t('buttonContinue')} />
+                <Button.Main className="m-t-20" label={t('buttonContinue')} onClick={withClose(noOp)} />
             </Page.Footer>
         </Page>
     );
