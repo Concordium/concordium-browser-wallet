@@ -10,6 +10,7 @@ import { identitiesAtom } from '@popup/store/identity';
 import { CreationStatus } from '@shared/storage/types';
 import { ConfirmedIdCard, RejectedIdCard } from '@popup/popupX/shared/IdCard';
 import { absoluteRoutes } from '@popup/popupX/constants/routes';
+import PendingIdCard from '@popup/popupX/shared/IdCard/PendingIdCard';
 
 export default function IdCards() {
     const { t } = useTranslation('x', { keyPrefix: 'idCards' });
@@ -37,15 +38,9 @@ export default function IdCards() {
                                 />
                             );
                         case CreationStatus.Pending:
-                            return null;
+                            return <PendingIdCard identity={id} key={`${id.providerIndex}:${id.index}`} />;
                         case CreationStatus.Rejected:
-                            return (
-                                <RejectedIdCard
-                                    identity={id}
-                                    key={`${id.providerIndex}:${id.index}`}
-                                    onNewName={onNewName(index)}
-                                />
-                            );
+                            return <RejectedIdCard identity={id} key={`${id.providerIndex}:${id.index}`} />;
                         default:
                             return <>Unsupported</>;
                     }
