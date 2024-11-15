@@ -1,0 +1,19 @@
+.create-account-x {
+    .id-card-button {
+        margin-top: rem(14px);
+        padding: unset;
+        background-color: unset;
+        border: none;
+        text-align: left;
+        cursor: pointer;
+    }
+
+    .justify-content-center {
+        display: flex;
+        justify-content: center;
+    }
+
+    .page__footer {
+        gap: rem(24px) !important;
+    }
+}

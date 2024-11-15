@@ -55,4 +55,18 @@
             }
         }
     }
+
+    .card-x.rejected {
+        justify-content: center;
+        align-items: center;
+
+        svg.icon-rejected {
+            width: rem(48px);
+            height: rem(48px);
+
+            path {
+                fill: $color-red-attention;
+            }
+        }
+    }
 }

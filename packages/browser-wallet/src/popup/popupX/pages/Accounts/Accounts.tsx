@@ -1,4 +1,4 @@
-import React from 'react';
+import React, { useCallback } from 'react';
 import Plus from '@assets/svgX/plus.svg';
 import Arrows from '@assets/svgX/arrows-down-up.svg';
 import MagnifyingGlass from '@assets/svgX/magnifying-glass.svg';
@@ -112,12 +112,14 @@ function AccountListItem({ credential }: AccountListItemProps) {
 export default function Accounts() {
     const { t } = useTranslation('x', { keyPrefix: 'accounts' });
     const accounts = useAtomValue(credentialsAtom);
+    const nav = useNavigate();
+    const navToCreateAccount = useCallback(() => nav(absoluteRoutes.settings.createAccount.path), []);
     return (
         <Page className="accounts-x">
             <Page.Top heading={t('accounts')}>
                 <Button.Icon icon={<Arrows />} />
                 <Button.Icon icon={<MagnifyingGlass />} />
-                <Button.Icon icon={<Plus />} />
+                <Button.Icon icon={<Plus />} onClick={navToCreateAccount} />
             </Page.Top>
             <Page.Main>
                 {accounts.map((item) => (

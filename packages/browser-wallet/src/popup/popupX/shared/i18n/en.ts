@@ -39,6 +39,8 @@ const t = {
             abort: 'Abort',
         },
         verifiedBy: 'Verified by {{idProviderName}}',
+        rejectedBy: 'Rejected by {{idProviderName}}',
+        itentityRejected: 'This identity has been rejected',
     },
 };
 
