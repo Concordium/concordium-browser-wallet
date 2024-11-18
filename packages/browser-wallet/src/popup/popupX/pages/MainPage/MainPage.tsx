@@ -221,7 +221,7 @@ function MainPage({ credential }: MainPageProps) {
         case CreationStatus.Rejected:
             return <>Account Creation was rejected</>;
         default:
-            throw new Error(`Unexpected status for credential: ${credential.status}`);
+            throw new Error(`Unexpected status for credential`);
     }
 }
 

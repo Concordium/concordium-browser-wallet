@@ -115,8 +115,30 @@ export const relativeRoutes = {
     },
     settings: {
         path: 'settings',
-        idCards: {
-            path: 'id-cards',
+        identities: {
+            path: 'identities',
+            create: {
+                path: 'create',
+                externalFlow: {
+                    path: 'external-flow',
+                    config: {
+                        hideMenu: true,
+                    },
+                },
+                submitted: {
+                    path: 'submitted',
+                    config: {
+                        hideMenu: true,
+                        hideBackArrow: true,
+                    },
+                },
+                failed: {
+                    path: 'failed',
+                    config: {
+                        hideMenu: true,
+                    },
+                },
+            },
         },
         about: {
             path: 'about',
@@ -278,6 +300,9 @@ export const relativeRoutes = {
         path: 'prompt',
         connectionRequest: {
             path: 'connectionRequest',
+        },
+        endIdentityIssuance: {
+            path: 'end-identity-issuance',
         },
     },
 };

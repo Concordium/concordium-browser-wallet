@@ -1,15 +1,20 @@
 import React from 'react';
+import { useNavigate } from 'react-router-dom';
+import { useTranslation } from 'react-i18next';
+import { useAtom } from 'jotai';
+
 import Plus from '@assets/svgX/plus.svg';
 import Button from '@popup/popupX/shared/Button';
 import Page from '@popup/popupX/shared/Page';
-import { useTranslation } from 'react-i18next';
 import { identitiesAtom } from '@popup/store/identity';
-import { useAtom } from 'jotai';
 import { CreationStatus } from '@shared/storage/types';
 import { ConfirmedIdCard, RejectedIdCard } from '@popup/popupX/shared/IdCard';
+import { absoluteRoutes } from '@popup/popupX/constants/routes';
+import PendingIdCard from '@popup/popupX/shared/IdCard/PendingIdCard';
 
 export default function IdCards() {
     const { t } = useTranslation('x', { keyPrefix: 'idCards' });
+    const nav = useNavigate();
     const [identities, setIdentities] = useAtom(identitiesAtom);
     const onNewName = (index: number) => (newName: string) => {
         const identitiesClone = [...identities];
@@ -19,7 +24,7 @@ export default function IdCards() {
     return (
         <Page className="id-cards-x">
             <Page.Top heading={t('idCards')}>
-                <Button.Icon icon={<Plus />} />
+                <Button.Icon icon={<Plus />} onClick={() => nav(absoluteRoutes.settings.identities.create.path)} />
             </Page.Top>
             <Page.Main>
                 {identities.map((id, index) => {
@@ -33,15 +38,9 @@ export default function IdCards() {
                                 />
                             );
                         case CreationStatus.Pending:
-                            return null;
+                            return <PendingIdCard identity={id} key={`${id.providerIndex}:${id.index}`} />;
                         case CreationStatus.Rejected:
-                            return (
-                                <RejectedIdCard
-                                    identity={id}
-                                    key={`${id.providerIndex}:${id.index}`}
-                                    onNewName={onNewName(index)}
-                                />
-                            );
+                            return <RejectedIdCard identity={id} key={`${id.providerIndex}:${id.index}`} />;
                         default:
                             return <>Unsupported</>;
                     }
