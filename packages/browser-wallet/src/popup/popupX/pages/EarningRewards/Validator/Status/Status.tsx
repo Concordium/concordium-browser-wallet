@@ -26,7 +26,7 @@ export default function ValidatorStatus() {
     const chainParams = useBlockChainParametersAboveV0();
 
     if (accountInfo?.type !== AccountInfoType.Baker) {
-        return <Navigate to=".." />;
+        return <Navigate to={absoluteRoutes.settings.earn.path} />;
     }
 
     const { accountBaker, accountCooldowns } = accountInfo;

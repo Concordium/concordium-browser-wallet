@@ -2,7 +2,7 @@ const t = {
     root: {
         validatorTitle: 'Validation',
         validatorDescription:
-            'As a validator, you can participate in the network by baking blocks on the Concordium network. This requires a minimum of {{amount}} CCD and access to a dedicated node.',
+            'As a validator, you can participate in the network by validating blocks on the Concordium network. This requires a minimum of {{amount}} CCD and access to a dedicated node.',
         validatorAction: 'Continue to validation setup',
         delegationTitle: 'Delegation',
         delegationDescription:
