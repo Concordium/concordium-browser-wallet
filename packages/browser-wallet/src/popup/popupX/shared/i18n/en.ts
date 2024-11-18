@@ -41,6 +41,7 @@ const t = {
         },
         verifiedBy: 'Verified by {{idProviderName}}',
         rejectedBy: 'Rejected by {{idProviderName}}',
+        pendingBy: 'Pending verification by {{idProviderName}}',
         itentityRejected: 'This identity has been rejected',
     },
 };

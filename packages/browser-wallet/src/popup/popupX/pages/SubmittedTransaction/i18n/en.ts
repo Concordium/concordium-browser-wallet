@@ -5,6 +5,11 @@ const t = {
             removed: "You've removed your delegated stake",
             updated: "You've updated your delegation settings",
         },
+        configureValidator: {
+            changeStake: "You've validating with",
+            removed: "You've stopped validating",
+            updated: "You've updated your delegation settings",
+        },
         transfer: {
             label: "You've sent",
         },

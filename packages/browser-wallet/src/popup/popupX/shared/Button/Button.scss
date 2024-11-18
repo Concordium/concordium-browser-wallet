@@ -1,6 +1,7 @@
 .button {
     &__base {
         cursor: pointer;
+        font-family: $t-font-family-satoshi;
 
         &:focus-visible {
             outline: 1px solid $color-white;

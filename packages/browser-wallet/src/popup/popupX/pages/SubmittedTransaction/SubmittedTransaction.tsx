@@ -23,6 +23,9 @@ import {
     DelegationStakeChangedEvent,
     DelegatorEvent,
     ConfigureDelegationSummary,
+    ConfigureBakerSummary,
+    BakerStakeChangedEvent,
+    BakerEvent,
 } from '@concordium/web-sdk';
 import { useAtomValue } from 'jotai';
 import { grpcClientAtom } from '@popup/store/settings';
@@ -62,6 +65,32 @@ function DelegationBody({ events }: DelegationBodyProps) {
     return <Text.Capture>{t('updated')}</Text.Capture>;
 }
 
+type ValidatorBodyProps = BaseAccountTransactionSummary & ConfigureBakerSummary;
+
+function ValidatorBody({ events }: ValidatorBodyProps) {
+    const { t } = useTranslation('x', { keyPrefix: 'submittedTransaction.success.configureValidator' });
+
+    const stakeChange = events.find((e) =>
+        [TransactionEventTag.BakerStakeIncreased, TransactionEventTag.BakerStakeDecreased].includes(e.tag)
+    ) as BakerStakeChangedEvent | undefined;
+    if (stakeChange !== undefined) {
+        return (
+            <>
+                <Text.Capture>{t('changeStake')}</Text.Capture>
+                <Text.HeadingLarge>{formatCcdAmount(stakeChange.newStake)}</Text.HeadingLarge>
+                <Text.Capture>CCD</Text.Capture>
+            </>
+        );
+    }
+
+    const removal = events.find((e) => [TransactionEventTag.BakerRemoved].includes(e.tag)) as BakerEvent | undefined;
+    if (removal !== undefined) {
+        return <Text.Capture>{t('removed')}</Text.Capture>;
+    }
+
+    return <Text.Capture>{t('updated')}</Text.Capture>;
+}
+
 type SuccessSummary = Exclude<AccountTransactionSummary, FailedTransactionSummary>;
 type FailureSummary = BaseAccountTransactionSummary & FailedTransactionSummary;
 
@@ -87,6 +116,7 @@ function Success({ tx }: SuccessProps) {
                 </>
             )}
             {tx.transactionType === TransactionKindString.ConfigureDelegation && <DelegationBody {...tx} />}
+            {tx.transactionType === TransactionKindString.ConfigureBaker && <ValidatorBody {...tx} />}
         </>
     );
 }
