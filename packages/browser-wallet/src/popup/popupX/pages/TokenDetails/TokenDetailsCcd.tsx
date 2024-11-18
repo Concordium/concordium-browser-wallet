@@ -1,8 +1,8 @@
 import React, { useEffect, useMemo, useState } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { useTranslation } from 'react-i18next';
-import { AccountInfoType } from '@concordium/web-sdk';
-import { relativeRoutes, absoluteRoutes } from '@popup/popupX/constants/routes';
+import { AccountAddress, AccountInfoType } from '@concordium/web-sdk';
+import { relativeRoutes, absoluteRoutes, sendFundsRoute } from '@popup/popupX/constants/routes';
 import Page from '@popup/popupX/shared/Page';
 import Text from '@popup/popupX/shared/Text';
 import Button from '@popup/popupX/shared/Button';
@@ -14,6 +14,7 @@ import { withSelectedCredential } from '@popup/popupX/shared/utils/hoc';
 import Arrow from '@assets/svgX/arrow-right.svg';
 import FileText from '@assets/svgX/file-text.svg';
 import Plant from '@assets/svgX/plant.svg';
+import { TokenPickerVariant } from '@popup/popupX/shared/Form/TokenAmount/View';
 
 const zeroBalance: Omit<PublicAccountAmounts, 'scheduled'> = {
     total: 0n,
@@ -64,7 +65,10 @@ function TokenDetailsCcd({ credential }: { credential: WalletCredential }) {
     const tokenDetails = useCcdInfo(credential);
 
     const nav = useNavigate();
-    const navToSend = () => nav(`../${relativeRoutes.home.sendFunds.path}`);
+    const navToSend = () =>
+        nav(sendFundsRoute(AccountAddress.fromBase58(credential.address)), {
+            state: { tokenType: 'ccd' } as TokenPickerVariant,
+        });
     const navToReceive = () => nav(`../${relativeRoutes.home.receive.path}`);
     const navToTransactionLog = () => nav(`../${relativeRoutes.home.transactionLog.path}`);
     const navToEarn = () => nav(absoluteRoutes.settings.earn.path);

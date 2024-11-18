@@ -1,6 +1,6 @@
 import React from 'react';
 import { useNavigate, useParams } from 'react-router-dom';
-import { relativeRoutes } from '@popup/popupX/constants/routes';
+import { relativeRoutes, sendFundsRoute } from '@popup/popupX/constants/routes';
 import Page from '@popup/popupX/shared/Page';
 import Text from '@popup/popupX/shared/Text';
 import Button from '@popup/popupX/shared/Button';
@@ -18,6 +18,8 @@ import Arrow from '@assets/svgX/arrow-right.svg';
 import FileText from '@assets/svgX/file-text.svg';
 import Notebook from '@assets/svgX/notebook.svg';
 import Eye from '@assets/svgX/eye-slash.svg';
+import { AccountAddress, ContractAddress } from '@concordium/web-sdk';
+import { SendFundsLocationState } from '../SendFunds/SendFunds';
 
 const SUB_INDEX = '0';
 
@@ -37,7 +39,13 @@ function TokenDetails({ credential }: { credential: WalletCredential }) {
     const remove = useUpdateAtom(removeTokenFromCurrentAccountAtom);
 
     const nav = useNavigate();
-    const navToSend = () => nav(`../${relativeRoutes.home.sendFunds.path}`);
+    const navToSend = () =>
+        nav(sendFundsRoute(AccountAddress.fromBase58(credential.address)), {
+            state: {
+                tokenType: 'cis2',
+                tokenAddress: { id, contract: ContractAddress.create(BigInt(contractIndex), 0) },
+            } as SendFundsLocationState,
+        });
     const navToReceive = () => nav(`../${relativeRoutes.home.receive.path}`);
     const navToTransactionLog = () => nav(`../${relativeRoutes.home.transactionLog.path}`);
     const navToRaw = () => nav(relativeRoutes.home.token.details.raw.path);

@@ -1,6 +1,6 @@
 import React, { useState } from 'react';
 import Button from '@popup/popupX/shared/Button';
-import { Navigate, useNavigate, useParams } from 'react-router-dom';
+import { Navigate, useLocation, useNavigate, useParams } from 'react-router-dom';
 import { displayNameAndSplitAddress, displaySplitAddress, useCredential } from '@popup/shared/utils/account-helpers';
 import { useTranslation } from 'react-i18next';
 import Page from '@popup/popupX/shared/Page';
@@ -13,11 +13,14 @@ import { useGetTransactionFee } from '@popup/shared/utils/transaction-helpers';
 import FullscreenNotice from '@popup/popupX/shared/FullscreenNotice';
 import Arrow from '@assets/svgX/arrow-right.svg';
 import { submittedTransactionRoute } from '@popup/popupX/constants/routes';
+import { TokenPickerVariant } from '@popup/popupX/shared/Form/TokenAmount/View';
 
 type SendFundsProps = { address: string };
+export type SendFundsLocationState = TokenPickerVariant;
 
 function SendFunds({ address }: SendFundsProps) {
     const { t } = useTranslation('x', { keyPrefix: 'sendFunds' });
+    const { state } = useLocation() as { state: SendFundsLocationState | null };
     const nav = useNavigate();
     const credential = useCredential(address);
     const form = useForm<AmountReceiveForm>({
@@ -46,6 +49,7 @@ function SendFunds({ address }: SendFundsProps) {
     if (accountInfo === undefined) {
         return null;
     }
+
     return (
         <>
             <Page className="send-funds-container">
@@ -62,6 +66,7 @@ function SendFunds({ address }: SendFundsProps) {
                             fee={cost}
                             form={form}
                             accountInfo={accountInfo}
+                            {...state}
                         />
                     )}
                 </Form>

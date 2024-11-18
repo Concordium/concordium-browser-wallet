@@ -175,7 +175,7 @@ function TokenPicker({
     );
 }
 
-type TokenVariant =
+export type TokenPickerVariant =
     | {
           /** The token type. If undefined, a token picker is rendered */
           tokenType?: 'ccd';
@@ -241,7 +241,7 @@ export type TokenAmountViewProps = {
     /** Custom validation for the amount */
     validateAmount?: Validate<string>;
 } & ValueVariant &
-    TokenVariant &
+    TokenPickerVariant &
     ClassName;
 
 /**
@@ -373,7 +373,7 @@ export default function TokenAmountView(props: TokenAmountViewProps) {
                     selectedToken={selectedToken}
                     onSelect={handleTokenSelect}
                     tokens={tokens}
-                    canSelect={props.tokenType !== undefined}
+                    canSelect={props.tokenType === undefined}
                     selectedTokenBalance={balance}
                     formatAmount={formatAmount}
                 />
