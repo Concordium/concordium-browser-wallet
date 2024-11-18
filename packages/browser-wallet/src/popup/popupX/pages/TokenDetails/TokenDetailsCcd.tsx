@@ -64,7 +64,7 @@ function TokenDetailsCcd({ credential }: { credential: WalletCredential }) {
     const tokenDetails = useCcdInfo(credential);
 
     const nav = useNavigate();
-    const navToSend = () => nav(`../${relativeRoutes.home.send.path}`);
+    const navToSend = () => nav(`../${relativeRoutes.home.sendFunds.path}`);
     const navToReceive = () => nav(`../${relativeRoutes.home.receive.path}`);
     const navToTransactionLog = () => nav(`../${relativeRoutes.home.transactionLog.path}`);
     const navToEarn = () => nav(absoluteRoutes.settings.earn.path);

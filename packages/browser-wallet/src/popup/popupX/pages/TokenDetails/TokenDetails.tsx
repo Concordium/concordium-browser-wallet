@@ -37,7 +37,7 @@ function TokenDetails({ credential }: { credential: WalletCredential }) {
     const remove = useUpdateAtom(removeTokenFromCurrentAccountAtom);
 
     const nav = useNavigate();
-    const navToSend = () => nav(`../${relativeRoutes.home.send.path}`);
+    const navToSend = () => nav(`../${relativeRoutes.home.sendFunds.path}`);
     const navToReceive = () => nav(`../${relativeRoutes.home.receive.path}`);
     const navToTransactionLog = () => nav(`../${relativeRoutes.home.transactionLog.path}`);
     const navToRaw = () => nav(relativeRoutes.home.token.details.raw.path);
