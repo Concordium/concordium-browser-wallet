@@ -13,9 +13,8 @@ export type RequiredFormFieldProps = {
 };
 // eslint-disable-next-line @typescript-eslint/no-explicit-any
 export type RequiredControlledFieldProps<V = any> = RequiredFormFieldProps &
-    Omit<Partial<ControllerRenderProps>, 'ref' | 'onBlur' | 'value' | 'onChange'> & {
+    Omit<Partial<ControllerRenderProps>, 'ref' | 'onBlur' | 'value'> & {
         value: V;
-        onChange?(value: V): void;
         onBlur?: () => void;
     };
 export type RequiredUncontrolledFieldProps<E> = RequiredFormFieldProps &
