@@ -33,7 +33,7 @@ export default function DelegationResult() {
     };
     const nav = useNavigate();
     const { t } = useTranslation('x', { keyPrefix: 'earn.delegator' });
-    const getCost = useGetTransactionFee(AccountTransactionType.ConfigureDelegation);
+    const getCost = useGetTransactionFee();
     const accountInfo = ensureDefined(useSelectedAccountInfo(), 'No account selected');
 
     const parametersV1 = useBlockChainParametersAboveV0();
@@ -75,7 +75,7 @@ export default function DelegationResult() {
         return <Navigate to=".." />;
     }
 
-    const fee = getCost(state.payload);
+    const fee = getCost(AccountTransactionType.ConfigureDelegation, state.payload);
     const submit = async () => {
         if (fee === undefined) {
             throw Error('Fee could not be calculated');

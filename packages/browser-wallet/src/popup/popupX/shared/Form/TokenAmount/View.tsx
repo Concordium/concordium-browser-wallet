@@ -207,7 +207,7 @@ export type TokenPickerVariant =
 export type AmountForm = {
     /** The amount to be transferred */
     amount: string;
-    token: TokenPickerVariant;
+    token?: TokenPickerVariant;
 };
 
 /**

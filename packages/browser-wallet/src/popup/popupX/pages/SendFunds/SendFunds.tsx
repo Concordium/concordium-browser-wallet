@@ -7,22 +7,36 @@ import Page from '@popup/popupX/shared/Page';
 import Text from '@popup/popupX/shared/Text';
 import TokenAmount, { AmountReceiveForm } from '@popup/popupX/shared/Form/TokenAmount';
 import Form, { useForm } from '@popup/popupX/shared/Form';
-import { AccountAddress, AccountTransactionType, CcdAmount, TransactionHash } from '@concordium/web-sdk';
+import {
+    AccountAddress,
+    AccountTransactionType,
+    CIS2,
+    CIS2Contract,
+    CcdAmount,
+    SimpleTransferPayload,
+    TransactionHash,
+} from '@concordium/web-sdk';
 import { useAccountInfo } from '@popup/shared/AccountInfoListenerContext';
 import { useGetTransactionFee } from '@popup/shared/utils/transaction-helpers';
 import FullscreenNotice from '@popup/popupX/shared/FullscreenNotice';
 import Arrow from '@assets/svgX/arrow-right.svg';
 import { submittedTransactionRoute } from '@popup/popupX/constants/routes';
 import { TokenPickerVariant } from '@popup/popupX/shared/Form/TokenAmount/View';
+import { parseTokenAmount } from '@popup/popupX/shared/utils/helpers';
+import { noOp, useAsyncMemo } from 'wallet-common-helpers';
+import { useAtomValue } from 'jotai';
+import { grpcClientAtom } from '@popup/store/settings';
+import { logError } from '@shared/utils/log-helpers';
 
-type SendFundsProps = { address: string };
+type SendFundsProps = { address: AccountAddress.Type };
 export type SendFundsLocationState = TokenPickerVariant;
 
 function SendFunds({ address }: SendFundsProps) {
     const { t } = useTranslation('x', { keyPrefix: 'sendFunds' });
     const { state } = useLocation() as { state: SendFundsLocationState | null };
     const nav = useNavigate();
-    const credential = useCredential(address);
+    const credential = useCredential(address.address);
+    const grpcClient = useAtomValue(grpcClientAtom);
     const form = useForm<AmountReceiveForm>({
         mode: 'onTouched',
         defaultValues: {
@@ -30,11 +44,48 @@ function SendFunds({ address }: SendFundsProps) {
         },
     });
     const accountInfo = useAccountInfo(credential);
-    const cost =
-        useGetTransactionFee(AccountTransactionType.Transfer)({
-            amount: CcdAmount.zero(),
-            toAddress: AccountAddress.fromBuffer(new Uint8Array(32)),
-        }) ?? CcdAmount.fromCcd(1);
+    const [token, amount] = form.watch(['token', 'amount']);
+    const contractClient = useAsyncMemo(
+        async () => {
+            if (token?.tokenType !== 'cis2') {
+                return undefined;
+            }
+            return CIS2Contract.create(grpcClient, token.tokenAddress.contract);
+        },
+        noOp,
+        [token, grpcClient]
+    );
+    const getFee = useGetTransactionFee();
+    const cost = useAsyncMemo(
+        async () => {
+            if (token?.tokenType === 'cis2') {
+                if (contractClient === undefined) {
+                    return undefined;
+                }
+
+                const transfer: CIS2.Transfer = {
+                    from: address,
+                    to: address,
+                    tokenId: token.tokenAddress.id,
+                    tokenAmount: parseTokenAmount(amount),
+                };
+                const result = await contractClient.dryRun.transfer(address, transfer);
+                const { payload } = contractClient.createTransfer({ energy: result.usedEnergy }, transfer);
+                return getFee(AccountTransactionType.Update, payload);
+            }
+            if (token?.tokenType === 'ccd') {
+                const payload: SimpleTransferPayload = {
+                    amount: CcdAmount.zero(),
+                    toAddress: AccountAddress.fromBuffer(new Uint8Array(32)),
+                };
+                return getFee(AccountTransactionType.Transfer, payload);
+            }
+
+            return undefined;
+        },
+        logError,
+        [token, address, amount, contractClient]
+    );
 
     const [showConfirmationPage, setShowConfirmationPage] = useState(false);
     const onSubmit = () => setShowConfirmationPage(true);
@@ -63,7 +114,7 @@ function SendFunds({ address }: SendFundsProps) {
                         <TokenAmount
                             buttonMaxLabel={t('sendMax')}
                             receiver
-                            fee={cost}
+                            fee={cost ?? CcdAmount.zero()}
                             form={form}
                             accountInfo={accountInfo}
                             {...state}
@@ -113,5 +164,5 @@ export default function Loader() {
         // No account address passed in the url.
         return <Navigate to="../" />;
     }
-    return <SendFunds address={params.account} />;
+    return <SendFunds address={AccountAddress.fromBase58(params.account)} />;
 }
