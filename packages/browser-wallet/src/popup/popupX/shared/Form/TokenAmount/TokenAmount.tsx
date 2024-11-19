@@ -1,4 +1,4 @@
-import React, { useState } from 'react';
+import React from 'react';
 import { atomFamily, selectAtom, useAtomValue } from 'jotai/utils';
 import { AccountAddress, AccountInfo, ContractAddress, CIS2 } from '@concordium/web-sdk';
 import { atom } from 'jotai';
@@ -80,20 +80,15 @@ type Props = Omit<TokenAmountViewProps, 'tokens' | 'balance' | 'onSelectToken'> 
  * />
  */
 export default function TokenAmount({ accountInfo, ccdBalance = 'available', ...props }: Props) {
+    const { token } = props.form.watch();
+    const tokenAddress = token?.tokenType === 'cis2' ? token.tokenAddress : null;
+
     const tokenInfo = useTokenInfo(accountInfo.accountAddress);
-    const [tokenAddress, setTokenAddress] = useState<CIS2.TokenAddress | null>(null);
     const tokenBalance = useAtomValue(balanceAtomFamily([accountInfo, ccdBalance, tokenAddress]));
 
     if (tokenInfo.loading) {
         return null;
     }
 
-    return (
-        <TokenAmountView
-            {...(props as TokenAmountViewProps)}
-            tokens={tokenInfo.value}
-            onSelectToken={setTokenAddress}
-            balance={tokenBalance}
-        />
-    );
+    return <TokenAmountView {...(props as TokenAmountViewProps)} tokens={tokenInfo.value} balance={tokenBalance} />;
 }

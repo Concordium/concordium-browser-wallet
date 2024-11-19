@@ -11,8 +11,11 @@ export type RequiredFormFieldProps = {
      */
     valid?: boolean; // TODO: in practice this is a number, either 0 or 1???
 };
-export type RequiredControlledFieldProps = RequiredFormFieldProps &
-    Omit<Partial<ControllerRenderProps>, 'ref' | 'onBlur'> & {
+// eslint-disable-next-line @typescript-eslint/no-explicit-any
+export type RequiredControlledFieldProps<V = any> = RequiredFormFieldProps &
+    Omit<Partial<ControllerRenderProps>, 'ref' | 'onBlur' | 'value' | 'onChange'> & {
+        value: V;
+        onChange?(value: V): void;
         onBlur?: () => void;
     };
 export type RequiredUncontrolledFieldProps<E> = RequiredFormFieldProps &
