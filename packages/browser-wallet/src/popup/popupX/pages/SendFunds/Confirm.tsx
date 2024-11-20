@@ -34,6 +34,7 @@ import { logError } from '@shared/utils/log-helpers';
 import { submittedTransactionRoute } from '@popup/popupX/constants/routes';
 
 import { CIS2_TRANSFER_NRG_OFFSET, showToken, useTokenMetadata } from './util';
+import { UpdateContractSubmittedLocationState } from '../SubmittedTransaction/SubmittedTransaction';
 
 type Props = {
     sender: AccountAddress.Type;
@@ -102,12 +103,15 @@ export default function SendFundsConfirm({ values, fee, sender }: Props) {
     );
 
     const submit = async () => {
-        if (payload === undefined) {
+        if (payload === undefined || tokenName === undefined) {
             throw Error('Payload could not be created...');
         }
 
         const tx = await submitTransaction(payload, fee);
-        nav(submittedTransactionRoute(TransactionHash.fromHexString(tx)));
+        const state: UpdateContractSubmittedLocationState = { type: 'cis2.transfer', amount: values.amount, tokenName };
+        nav(submittedTransactionRoute(TransactionHash.fromHexString(tx)), {
+            state,
+        });
     };
 
     return (

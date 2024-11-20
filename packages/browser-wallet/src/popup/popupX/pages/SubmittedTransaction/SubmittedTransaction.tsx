@@ -1,5 +1,5 @@
 import React from 'react';
-import { Navigate, useNavigate, useParams } from 'react-router-dom';
+import { Location, Navigate, useLocation, useNavigate, useParams } from 'react-router-dom';
 
 import CheckCircle from '@assets/svgX/check-circle.svg';
 import Cross from '@assets/svgX/close.svg';
@@ -26,6 +26,8 @@ import {
     ConfigureBakerSummary,
     BakerStakeChangedEvent,
     BakerEvent,
+    TransferSummary,
+    UpdateSummary,
 } from '@concordium/web-sdk';
 import { useAtomValue } from 'jotai';
 import { grpcClientAtom } from '@popup/store/settings';
@@ -91,6 +93,41 @@ function ValidatorBody({ events }: ValidatorBodyProps) {
     return <Text.Capture>{t('updated')}</Text.Capture>;
 }
 
+type TransferBodyProps = BaseAccountTransactionSummary & TransferSummary;
+function TransferBody(tx: TransferBodyProps) {
+    const { t } = useTranslation('x', { keyPrefix: 'submittedTransaction.success.transfer' });
+    return (
+        <>
+            <Text.Capture>{t('label')}</Text.Capture>
+            <Text.HeadingLarge>{formatCcdAmount(tx.transfer.amount)}</Text.HeadingLarge>
+            <Text.Capture>CCD</Text.Capture>
+        </>
+    );
+}
+
+export type UpdateContractSubmittedLocationState = {
+    type: 'cis2.transfer';
+    /** formatted amount */
+    amount: string;
+    tokenName: string;
+};
+function UpdateContractBody() {
+    const { t } = useTranslation('x', { keyPrefix: 'submittedTransaction.success' });
+    const { state } = useLocation() as Location & { state: UpdateContractSubmittedLocationState };
+    switch (state.type) {
+        case 'cis2.transfer':
+            return (
+                <>
+                    <Text.Capture>{t('transfer.label')}</Text.Capture>
+                    <Text.HeadingLarge>{state.amount}</Text.HeadingLarge>
+                    <Text.Capture>{state.tokenName}</Text.Capture>
+                </>
+            );
+        default:
+            throw new Error('Unsupported');
+    }
+}
+
 type SuccessSummary = Exclude<AccountTransactionSummary, FailedTransactionSummary>;
 type FailureSummary = BaseAccountTransactionSummary & FailedTransactionSummary;
 
@@ -104,19 +141,13 @@ type SuccessProps = {
 };
 
 function Success({ tx }: SuccessProps) {
-    const { t } = useTranslation('x', { keyPrefix: 'submittedTransaction' });
     return (
         <>
             <CheckCircle />
-            {tx.transactionType === TransactionKindString.Transfer && (
-                <>
-                    <Text.Capture>{t('success.transfer.label')}</Text.Capture>
-                    <Text.HeadingLarge>{formatCcdAmount(tx.transfer.amount)}</Text.HeadingLarge>
-                    <Text.Capture>CCD</Text.Capture>
-                </>
-            )}
+            {tx.transactionType === TransactionKindString.Transfer && <TransferBody {...tx} />}
             {tx.transactionType === TransactionKindString.ConfigureDelegation && <DelegationBody {...tx} />}
             {tx.transactionType === TransactionKindString.ConfigureBaker && <ValidatorBody {...tx} />}
+            {tx.transactionType === TransactionKindString.Update && <UpdateContractBody />}
         </>
     );
 }
