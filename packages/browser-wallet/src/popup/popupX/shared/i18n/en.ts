@@ -22,6 +22,9 @@ const t = {
                 label: 'Receiver address',
                 placeholder: 'Enter receiver address here',
             },
+            validation: {
+                insufficientCcd: 'Not enough CCD in account to cover transaction fee',
+            },
         },
     },
     utils: {

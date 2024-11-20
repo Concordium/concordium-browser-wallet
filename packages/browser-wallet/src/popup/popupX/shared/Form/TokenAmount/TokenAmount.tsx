@@ -33,7 +33,7 @@ const balanceAtomFamily = atomFamily(
         AccountAddress.equals(aa.accountAddress, ab.accountAddress) && ba === bb && tokenAddressEq(ta, tb)
 );
 
-type Props = Omit<TokenAmountViewProps, 'tokens' | 'balance' | 'onSelectToken'> & {
+type Props = Omit<TokenAmountViewProps, 'tokens' | 'balance' | 'onSelectToken' | 'ccdBalance'> & {
     /** The account info of the account to take the amount from */
     accountInfo: AccountInfo;
     /** The ccd balance to use. Defaults to 'available' */
@@ -90,5 +90,12 @@ export default function TokenAmount({ accountInfo, ccdBalance = 'available', ...
         return null;
     }
 
-    return <TokenAmountView {...(props as TokenAmountViewProps)} tokens={tokenInfo.value} balance={tokenBalance} />;
+    return (
+        <TokenAmountView
+            {...(props as TokenAmountViewProps)}
+            tokens={tokenInfo.value}
+            balance={tokenBalance}
+            ccdBalance={accountInfo.accountAvailableBalance}
+        />
+    );
 }

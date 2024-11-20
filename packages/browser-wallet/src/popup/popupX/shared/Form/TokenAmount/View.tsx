@@ -5,7 +5,7 @@ import { UseFormReturn, Validate } from 'react-hook-form';
 import { useTranslation } from 'react-i18next';
 import clsx from 'clsx';
 import { ClassName, displayAsCcd } from 'wallet-common-helpers';
-import { CIS2, CcdAmount, ContractAddress } from '@concordium/web-sdk';
+import { AccountAddress, CIS2, CcdAmount, ContractAddress } from '@concordium/web-sdk';
 
 import { CCD_METADATA } from '@shared/constants/token-metadata';
 import { ensureDefined } from '@shared/utils/basic-helpers';
@@ -235,6 +235,8 @@ type ValueVariantProps =
       };
 
 export type TokenAmountViewProps = {
+    /** The CCD balance used to check transaction fee coverage */
+    ccdBalance: CcdAmount.Type;
     /** The label used for the button setting the amount to the maximum possible */
     buttonMaxLabel: string;
     /** The fee associated with the transaction */
@@ -264,19 +266,30 @@ export default function TokenAmountView(props: TokenAmountViewProps) {
         tokens,
         balance,
         className,
+        ccdBalance,
         formatFee = (f) => displayAsCcd(f, false, true),
         validateAmount: customValidateAmount,
     } = props;
-    const { token } = props.form.watch();
-    const selectedTokenMetadata = useMemo<TokenMetadata | undefined>(() => {
-        const value = token ?? props;
-        switch (value?.tokenType) {
+    const defaultToken: TokenPickerVariant = useMemo(() => {
+        switch (props.tokenType) {
+            case 'ccd':
+            case undefined:
+                return { tokenType: 'ccd' };
+            case 'cis2':
+                return { tokenType: 'cis2', tokenAddress: props.tokenAddress };
+            default:
+                throw new Error('Unreachable');
+        }
+    }, [props.tokenType]);
+    const { token = defaultToken } = props.form.watch();
+    const selectedTokenMetadata = useMemo<TokenMetadata>(() => {
+        switch (token.tokenType) {
             case 'cis2': {
                 return ensureDefined(
                     tokens.find(
                         (tk) =>
-                            tk.id === value.tokenAddress.id &&
-                            ContractAddress.equals(tk.contract, value.tokenAddress.contract)
+                            tk.id === token.tokenAddress.id &&
+                            ContractAddress.equals(tk.contract, token.tokenAddress.contract)
                     ),
                     'Expected the token specified to be available in the set of tokens given'
                 ).metadata;
@@ -290,26 +303,12 @@ export default function TokenAmountView(props: TokenAmountViewProps) {
     }, [token]);
 
     useEffect(() => {
-        if (token !== undefined) {
-            return;
-        }
-
         const form = props.form as UseFormReturn<AmountForm>;
-        switch (props.tokenType) {
-            case 'ccd':
-            case undefined:
-                form.setValue('token', { tokenType: 'ccd' });
-                break;
-            case 'cis2':
-                form.setValue('token', { tokenType: 'cis2', tokenAddress: props.tokenAddress });
-                break;
-            default:
-                throw new Error('Unreachable');
-        }
+        form.setValue('token', defaultToken);
     }, []);
 
     const tokenDecimals = useMemo(() => {
-        return selectedTokenMetadata?.decimals ?? 0;
+        return selectedTokenMetadata.decimals ?? 0;
     }, [selectedTokenMetadata]);
 
     const formatAmount = useCallback(
@@ -359,14 +358,14 @@ export default function TokenAmountView(props: TokenAmountViewProps) {
     );
 
     const validateAmount: Validate<string> = useCallback(
-        (value) =>
-            validateTransferAmount(
-                removeNumberGrouping(value),
-                balance,
-                tokenDecimals,
-                selectedTokenMetadata === null ? fee.microCcdAmount : 0n
-            ),
-        [balance, tokenDecimals, selectedTokenMetadata, fee]
+        (value) => {
+            const sanitizedValue = removeNumberGrouping(value);
+            if (token.tokenType === 'cis2' && ccdBalance.microCcdAmount < fee.microCcdAmount) {
+                return t('form.tokenAmount.validation.insufficientCcd');
+            }
+            return validateTransferAmount(sanitizedValue, balance, tokenDecimals, fee.microCcdAmount);
+        },
+        [balance, tokenDecimals, token, fee]
     );
 
     return (
