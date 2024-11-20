@@ -187,8 +187,8 @@ function TokenPicker({
 
 const FormTokenPicker = makeControlled(TokenPicker);
 
+/** Possible values of the token picker */
 export type TokenPickerVariant =
-    | { tokenType?: undefined }
     | {
           /** The token type. If undefined, a token picker is rendered */
           tokenType: 'ccd';
@@ -199,6 +199,7 @@ export type TokenPickerVariant =
           /** The token address */
           tokenAddress: CIS2.TokenAddress;
       };
+type TokenPickerVariantProps = { tokenType?: undefined } | TokenPickerVariant;
 
 /**
  * @description
@@ -207,7 +208,7 @@ export type TokenPickerVariant =
 export type AmountForm = {
     /** The amount to be transferred */
     amount: string;
-    token?: TokenPickerVariant;
+    token: TokenPickerVariant;
 };
 
 /**
@@ -219,7 +220,7 @@ export type AmountReceiveForm = AmountForm & {
     receiver: string;
 };
 
-type ValueVariant =
+type ValueVariantProps =
     | {
           /** Whether it should be possible to specify a receiver. Defaults to false */
           receiver?: false;
@@ -246,8 +247,8 @@ export type TokenAmountViewProps = {
     balance: bigint | undefined;
     /** Custom validation for the amount */
     validateAmount?: Validate<string>;
-} & ValueVariant &
-    TokenPickerVariant &
+} & ValueVariantProps &
+    TokenPickerVariantProps &
     ClassName;
 
 /**

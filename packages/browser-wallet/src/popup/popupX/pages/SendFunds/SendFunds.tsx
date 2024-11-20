@@ -1,36 +1,33 @@
-import React, { useMemo, useState } from 'react';
-import Button from '@popup/popupX/shared/Button';
-import { Navigate, useLocation, useNavigate, useParams } from 'react-router-dom';
-import { displayNameAndSplitAddress, displaySplitAddress, useCredential } from '@popup/shared/utils/account-helpers';
+import React, { useState } from 'react';
+import { Navigate, useLocation, useParams } from 'react-router-dom';
 import { useTranslation } from 'react-i18next';
-import Page from '@popup/popupX/shared/Page';
-import Text from '@popup/popupX/shared/Text';
-import TokenAmount, { AmountReceiveForm } from '@popup/popupX/shared/Form/TokenAmount';
-import Form, { useForm } from '@popup/popupX/shared/Form';
 import {
     AccountAddress,
     AccountTransactionType,
     CIS2,
     CIS2Contract,
     CcdAmount,
-    ContractAddress,
+    Energy,
     SimpleTransferPayload,
-    TransactionHash,
 } from '@concordium/web-sdk';
+import { useAsyncMemo } from 'wallet-common-helpers';
+import { useAtomValue } from 'jotai';
+
+import Button from '@popup/popupX/shared/Button';
+import { displayNameAndSplitAddress, useCredential } from '@popup/shared/utils/account-helpers';
+import Page from '@popup/popupX/shared/Page';
+import Text from '@popup/popupX/shared/Text';
+import TokenAmount, { AmountReceiveForm } from '@popup/popupX/shared/Form/TokenAmount';
+import Form, { useForm } from '@popup/popupX/shared/Form';
 import { useAccountInfo } from '@popup/shared/AccountInfoListenerContext';
 import { useGetTransactionFee } from '@popup/shared/utils/transaction-helpers';
-import FullscreenNotice from '@popup/popupX/shared/FullscreenNotice';
-import Arrow from '@assets/svgX/arrow-right.svg';
-import { submittedTransactionRoute } from '@popup/popupX/constants/routes';
 import { TokenPickerVariant } from '@popup/popupX/shared/Form/TokenAmount/View';
 import { parseTokenAmount } from '@popup/popupX/shared/utils/helpers';
-import { noOp, useAsyncMemo } from 'wallet-common-helpers';
-import { useAtomValue } from 'jotai';
 import { grpcClientAtom } from '@popup/store/settings';
 import { logError } from '@shared/utils/log-helpers';
-import { useTokenInfo } from '@popup/popupX/shared/Form/TokenAmount/util';
-import { CCD_METADATA } from '@shared/constants/token-metadata';
-import Card from '@popup/popupX/shared/Card';
+import FullscreenNotice from '@popup/popupX/shared/FullscreenNotice';
+import SendFundsConfirm from './Confirm';
+import { CIS2_TRANSFER_NRG_OFFSET, useTokenMetadata } from './util';
 
 type SendFundsProps = { address: AccountAddress.Type };
 export type SendFundsLocationState = TokenPickerVariant;
@@ -38,12 +35,12 @@ export type SendFundsLocationState = TokenPickerVariant;
 function SendFunds({ address }: SendFundsProps) {
     const { t } = useTranslation('x', { keyPrefix: 'sendFunds' });
     const { state } = useLocation() as { state: SendFundsLocationState | null };
-    const nav = useNavigate();
     const credential = useCredential(address.address);
     const grpcClient = useAtomValue(grpcClientAtom);
     const form = useForm<AmountReceiveForm>({
         mode: 'onTouched',
         defaultValues: {
+            token: state ?? { tokenType: 'ccd' },
             amount: '0.00',
         },
     });
@@ -56,35 +53,23 @@ function SendFunds({ address }: SendFundsProps) {
             }
             return CIS2Contract.create(grpcClient, token.tokenAddress.contract);
         },
-        noOp,
+        logError,
         [token, grpcClient]
     );
-    const tokens = useTokenInfo(address);
-    const tokenName = useMemo(() => {
-        if (tokens.loading) return undefined;
-        if (token?.tokenType === undefined) return undefined;
-
-        if (token.tokenType === 'ccd') {
-            return CCD_METADATA.symbol;
-        }
-
-        const { metadata } =
-            tokens.value.find(
-                (tk) =>
-                    tk.id === token.tokenAddress.id && ContractAddress.equals(tk.contract, token.tokenAddress.contract)
-            ) ?? {};
-        if (metadata === undefined) return undefined;
-
-        const safeName =
-            metadata.symbol ?? metadata.name ?? `${token.tokenAddress.id}@${token.tokenAddress.contract.toString()}`;
-        return safeName;
-    }, [tokens, token]);
 
     const getFee = useGetTransactionFee();
-    const cost = useAsyncMemo(
+    const metadata = useTokenMetadata(token, address);
+    const fee = useAsyncMemo(
         async () => {
             if (token?.tokenType === 'cis2') {
-                if (contractClient === undefined) {
+                if (contractClient === undefined || metadata === undefined) {
+                    return undefined;
+                }
+
+                let tokenAmount: bigint;
+                try {
+                    tokenAmount = parseTokenAmount(amount, metadata.decimals);
+                } catch {
                     return undefined;
                 }
 
@@ -92,10 +77,13 @@ function SendFunds({ address }: SendFundsProps) {
                     from: address,
                     to: address,
                     tokenId: token.tokenAddress.id,
-                    tokenAmount: parseTokenAmount(amount),
+                    tokenAmount,
                 };
                 const result = await contractClient.dryRun.transfer(address, transfer);
-                const { payload } = contractClient.createTransfer({ energy: result.usedEnergy }, transfer);
+                const { payload } = contractClient.createTransfer(
+                    { energy: Energy.create(result.usedEnergy.value + CIS2_TRANSFER_NRG_OFFSET) },
+                    transfer
+                );
                 return getFee(AccountTransactionType.Update, payload);
             }
             if (token?.tokenType === 'ccd') {
@@ -115,19 +103,15 @@ function SendFunds({ address }: SendFundsProps) {
     const [showConfirmationPage, setShowConfirmationPage] = useState(false);
     const onSubmit = () => setShowConfirmationPage(true);
 
-    // TODO:
-    // 1. Submit transaction (see `Delegator/TransactionFlow`)
-    // 2. Pass the transaction hash to the route function below
-    const navToSubmitted = () => nav(submittedTransactionRoute(TransactionHash.fromHexString('..')));
-
-    const receiver: string | undefined = form.watch('receiver');
-
     if (accountInfo === undefined) {
         return null;
     }
 
     return (
         <>
+            <FullscreenNotice open={showConfirmationPage} onClose={() => setShowConfirmationPage(false)}>
+                {fee && <SendFundsConfirm sender={address} values={form.getValues()} fee={fee} />}
+            </FullscreenNotice>
             <Page className="send-funds-container">
                 <Page.Top heading={t('sendFunds')}>
                     <Text.Capture className="m-l-5 m-t-neg-5">
@@ -139,7 +123,7 @@ function SendFunds({ address }: SendFundsProps) {
                         <TokenAmount
                             buttonMaxLabel={t('sendMax')}
                             receiver
-                            fee={cost ?? CcdAmount.zero()}
+                            fee={fee ?? CcdAmount.zero()}
                             form={form}
                             accountInfo={accountInfo}
                             {...state}
@@ -147,39 +131,15 @@ function SendFunds({ address }: SendFundsProps) {
                     )}
                 </Form>
                 {/*
-                    <div className="send-funds__memo">
-                        <Plus />
-                        <span className="label__main">Add memo</span>
-                    </div>
-                */}
+                <div className="send-funds__memo">
+                    <Plus />
+                    <span className="label__main">Add memo</span>
+                </div>
+            */}
                 <Page.Footer>
                     <Button.Main className="button-main" onClick={form.handleSubmit(onSubmit)} label="Continue" />
                 </Page.Footer>
             </Page>
-            {/* Confirmation page modal */}
-            <FullscreenNotice open={showConfirmationPage} onClose={() => setShowConfirmationPage(false)}>
-                <Page className="send-funds-container">
-                    <Page.Top heading={t('confirmation.title')} />
-
-                    <Card className="send-funds-confirm__card" type="transparent">
-                        <div className="send-funds-confirm__card_destination">
-                            <Text.MainMedium>{displayNameAndSplitAddress(credential)}</Text.MainMedium>
-                            <Arrow />
-                            <Text.MainMedium>{receiver && displaySplitAddress(receiver)}</Text.MainMedium>
-                        </div>
-                        <Text.Capture>
-                            {t('amount')} ({tokenName}
-                            ):
-                        </Text.Capture>
-                        <Text.HeadingLarge>{form.watch('amount')}</Text.HeadingLarge>
-                        <Text.Capture>{t('estimatedFee', { fee: cost })}</Text.Capture>
-                    </Card>
-
-                    <Page.Footer>
-                        <Button.Main className="button-main" onClick={navToSubmitted} label={t('sendFunds')} />
-                    </Page.Footer>
-                </Page>
-            </FullscreenNotice>
         </>
     );
 }

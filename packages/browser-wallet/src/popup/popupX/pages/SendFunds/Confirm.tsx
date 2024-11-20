@@ -1,0 +1,141 @@
+import React, { useMemo } from 'react';
+import { useTranslation } from 'react-i18next';
+import {
+    AccountAddress,
+    AccountTransactionType,
+    CIS2,
+    CIS2Contract,
+    CcdAmount,
+    Energy,
+    SimpleTransferPayload,
+    TransactionHash,
+} from '@concordium/web-sdk';
+import { useAsyncMemo } from 'wallet-common-helpers';
+import { useAtomValue } from 'jotai';
+import { useNavigate } from 'react-router-dom';
+
+import Page from '@popup/popupX/shared/Page';
+import Text from '@popup/popupX/shared/Text';
+import Arrow from '@assets/svgX/arrow-right.svg';
+import Card from '@popup/popupX/shared/Card';
+import {
+    displayNameAndSplitAddress,
+    displaySplitAddress,
+    useSelectedCredential,
+} from '@popup/shared/utils/account-helpers';
+import { AmountReceiveForm } from '@popup/popupX/shared/Form/TokenAmount/View';
+import { ensureDefined } from '@shared/utils/basic-helpers';
+import { CCD_METADATA } from '@shared/constants/token-metadata';
+import { formatCcdAmount, parseCcdAmount, parseTokenAmount } from '@popup/popupX/shared/utils/helpers';
+import { useTransactionSubmit } from '@popup/shared/utils/transaction-helpers';
+import Button from '@popup/popupX/shared/Button';
+import { grpcClientAtom } from '@popup/store/settings';
+import { logError } from '@shared/utils/log-helpers';
+import { submittedTransactionRoute } from '@popup/popupX/constants/routes';
+
+import { CIS2_TRANSFER_NRG_OFFSET, showToken, useTokenMetadata } from './util';
+
+type Props = {
+    sender: AccountAddress.Type;
+    values: AmountReceiveForm;
+    fee: CcdAmount.Type;
+};
+
+export default function SendFundsConfirm({ values, fee, sender }: Props) {
+    const { t } = useTranslation('x', { keyPrefix: 'sendFunds' });
+    const credential = ensureDefined(useSelectedCredential(), 'Expected selected account to be available');
+    const tokenMetadata = useTokenMetadata(values.token, sender);
+    const nav = useNavigate();
+    const tokenName = useMemo(() => {
+        if (values.token.tokenType === 'ccd') return CCD_METADATA.name;
+        if (tokenMetadata === undefined || values.token.tokenType === undefined) return undefined;
+
+        return showToken(tokenMetadata, values.token.tokenAddress);
+    }, [tokenMetadata, values.token]);
+    const receiver = AccountAddress.fromBase58(values.receiver);
+    const submitTransaction = useTransactionSubmit(
+        sender,
+        values.token.tokenType === 'ccd' ? AccountTransactionType.Transfer : AccountTransactionType.Update
+    );
+    const grpcClient = useAtomValue(grpcClientAtom);
+    const contractClient = useAsyncMemo(
+        async () => {
+            if (values.token.tokenType !== 'cis2') {
+                return undefined;
+            }
+            return CIS2Contract.create(grpcClient, values.token.tokenAddress.contract);
+        },
+        logError,
+        [values.token, grpcClient]
+    );
+
+    const payload = useAsyncMemo(
+        async () => {
+            if (values.token.tokenType === 'cis2') {
+                if (contractClient === undefined) return undefined; // We wait for the client to be ready
+                if (tokenMetadata === undefined) throw new Error('No metadata for token');
+
+                const transfer: CIS2.Transfer = {
+                    from: sender,
+                    to: receiver,
+                    tokenId: values.token.tokenAddress.id,
+                    tokenAmount: parseTokenAmount(values.amount, tokenMetadata?.decimals),
+                };
+                const result = await contractClient.dryRun.transfer(sender, transfer);
+                return contractClient.createTransfer(
+                    { energy: Energy.create(result.usedEnergy.value + CIS2_TRANSFER_NRG_OFFSET) },
+                    transfer
+                ).payload;
+            }
+            if (values.token.tokenType === 'ccd') {
+                const p: SimpleTransferPayload = {
+                    amount: parseCcdAmount(values.amount),
+                    toAddress: receiver,
+                };
+                return p;
+            }
+
+            return undefined;
+        },
+        logError,
+        [values.token, sender, values.receiver, contractClient]
+    );
+
+    const submit = async () => {
+        if (payload === undefined) {
+            throw Error('Payload could not be created...');
+        }
+
+        const tx = await submitTransaction(payload, fee);
+        nav(submittedTransactionRoute(TransactionHash.fromHexString(tx)));
+    };
+
+    return (
+        <Page className="send-funds-container">
+            <Page.Top heading={t('confirmation.title')} />
+
+            <Card className="send-funds-confirm__card" type="transparent">
+                <div className="send-funds-confirm__card_destination">
+                    <Text.MainMedium>{displayNameAndSplitAddress(credential)}</Text.MainMedium>
+                    <Arrow />
+                    <Text.MainMedium>{displaySplitAddress(values.receiver)}</Text.MainMedium>
+                </div>
+                <Text.Capture>
+                    {t('amount')} ({tokenName}
+                    ):
+                </Text.Capture>
+                <Text.HeadingLarge>{values.amount}</Text.HeadingLarge>
+                <Text.Capture>{t('estimatedFee', { fee: formatCcdAmount(fee) })}</Text.Capture>
+            </Card>
+
+            <Page.Footer>
+                <Button.Main
+                    className="button-main"
+                    onClick={submit}
+                    label={t('sendFunds')}
+                    disabled={payload === undefined}
+                />
+            </Page.Footer>
+        </Page>
+    );
+}
