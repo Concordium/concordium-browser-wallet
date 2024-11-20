@@ -11,7 +11,7 @@ export type DelegationTypeForm = {
 };
 
 /** The form values for delegator stake configuration step */
-export type DelegatorStakeForm = AmountForm & {
+export type DelegatorStakeForm = Omit<AmountForm, 'token'> & {
     /** Whether to add rewards to the stake or not */
     redelegate: boolean;
 };

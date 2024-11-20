@@ -7,6 +7,7 @@ import {
     OpenStatus,
     OpenStatusText,
 } from '@concordium/web-sdk';
+import { AmountForm } from '@popup/popupX/shared/Form/TokenAmount';
 import { formatCcdAmount, parseCcdAmount } from '@popup/popupX/shared/utils/helpers';
 import i18n from '@popup/shell/i18n';
 
@@ -45,8 +46,7 @@ export function showCommissionRate(fraction: number): string {
 export const isRange = (range: CommissionRange) => range.min !== range.max;
 
 /** The form data for specifying validator stake */
-export type ValidatorStakeForm = { amount: string; restake: boolean };
-
+export type ValidatorStakeForm = Omit<AmountForm, 'token'> & { restake: boolean };
 export type ValidatorFormUpdateStake = { stake: ValidatorStakeForm };
 export type ValidatorFormUpdateKeys = { keys: GenerateBakerKeysOutput };
 export type ValidatorFormUpdateSettings = {

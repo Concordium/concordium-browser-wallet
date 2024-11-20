@@ -27,7 +27,6 @@ import {
     BakerStakeChangedEvent,
     BakerEvent,
     TransferSummary,
-    UpdateSummary,
 } from '@concordium/web-sdk';
 import { useAtomValue } from 'jotai';
 import { grpcClientAtom } from '@popup/store/settings';
@@ -94,12 +93,12 @@ function ValidatorBody({ events }: ValidatorBodyProps) {
 }
 
 type TransferBodyProps = BaseAccountTransactionSummary & TransferSummary;
-function TransferBody(tx: TransferBodyProps) {
+function TransferBody({ transfer }: TransferBodyProps) {
     const { t } = useTranslation('x', { keyPrefix: 'submittedTransaction.success.transfer' });
     return (
         <>
             <Text.Capture>{t('label')}</Text.Capture>
-            <Text.HeadingLarge>{formatCcdAmount(tx.transfer.amount)}</Text.HeadingLarge>
+            <Text.HeadingLarge>{formatCcdAmount(transfer.amount)}</Text.HeadingLarge>
             <Text.Capture>CCD</Text.Capture>
         </>
     );

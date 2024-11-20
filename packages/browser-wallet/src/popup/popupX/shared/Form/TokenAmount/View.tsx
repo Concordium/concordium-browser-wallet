@@ -5,7 +5,7 @@ import { UseFormReturn, Validate } from 'react-hook-form';
 import { useTranslation } from 'react-i18next';
 import clsx from 'clsx';
 import { ClassName, displayAsCcd } from 'wallet-common-helpers';
-import { AccountAddress, CIS2, CcdAmount, ContractAddress } from '@concordium/web-sdk';
+import { CIS2, CcdAmount, ContractAddress } from '@concordium/web-sdk';
 
 import { CCD_METADATA } from '@shared/constants/token-metadata';
 import { ensureDefined } from '@shared/utils/basic-helpers';
@@ -169,7 +169,6 @@ function TokenPicker({
                         })}
                     </select>
                 )}
-                {!canSelect && <input type="hidden" value={formatTokenSelectorId(value)} />}
                 {token !== undefined && <div className="token-icon">{token.icon}</div>}
                 <Text.Main>{token?.name}</Text.Main>
                 {canSelect && <SideArrow />}
@@ -208,6 +207,7 @@ type TokenPickerVariantProps = { tokenType?: undefined } | TokenPickerVariant;
 export type AmountForm = {
     /** The amount to be transferred */
     amount: string;
+    /** The token to transfer */
     token: TokenPickerVariant;
 };
 
