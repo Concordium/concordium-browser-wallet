@@ -1,4 +1,4 @@
-import React, { useState } from 'react';
+import React, { useMemo, useState } from 'react';
 import Button from '@popup/popupX/shared/Button';
 import { Navigate, useLocation, useNavigate, useParams } from 'react-router-dom';
 import { displayNameAndSplitAddress, displaySplitAddress, useCredential } from '@popup/shared/utils/account-helpers';
@@ -13,6 +13,7 @@ import {
     CIS2,
     CIS2Contract,
     CcdAmount,
+    ContractAddress,
     SimpleTransferPayload,
     TransactionHash,
 } from '@concordium/web-sdk';
@@ -27,6 +28,9 @@ import { noOp, useAsyncMemo } from 'wallet-common-helpers';
 import { useAtomValue } from 'jotai';
 import { grpcClientAtom } from '@popup/store/settings';
 import { logError } from '@shared/utils/log-helpers';
+import { useTokenInfo } from '@popup/popupX/shared/Form/TokenAmount/util';
+import { CCD_METADATA } from '@shared/constants/token-metadata';
+import Card from '@popup/popupX/shared/Card';
 
 type SendFundsProps = { address: AccountAddress.Type };
 export type SendFundsLocationState = TokenPickerVariant;
@@ -55,6 +59,27 @@ function SendFunds({ address }: SendFundsProps) {
         noOp,
         [token, grpcClient]
     );
+    const tokens = useTokenInfo(address);
+    const tokenName = useMemo(() => {
+        if (tokens.loading) return undefined;
+        if (token?.tokenType === undefined) return undefined;
+
+        if (token.tokenType === 'ccd') {
+            return CCD_METADATA.symbol;
+        }
+
+        const { metadata } =
+            tokens.value.find(
+                (tk) =>
+                    tk.id === token.tokenAddress.id && ContractAddress.equals(tk.contract, token.tokenAddress.contract)
+            ) ?? {};
+        if (metadata === undefined) return undefined;
+
+        const safeName =
+            metadata.symbol ?? metadata.name ?? `${token.tokenAddress.id}@${token.tokenAddress.contract.toString()}`;
+        return safeName;
+    }, [tokens, token]);
+
     const getFee = useGetTransactionFee();
     const cost = useAsyncMemo(
         async () => {
@@ -122,11 +147,11 @@ function SendFunds({ address }: SendFundsProps) {
                     )}
                 </Form>
                 {/*
-            <div className="send-funds__memo">
-                <Plus />
-                <span className="label__main">Add memo</span>
-            </div>
-              */}
+                    <div className="send-funds__memo">
+                        <Plus />
+                        <span className="label__main">Add memo</span>
+                    </div>
+                */}
                 <Page.Footer>
                     <Button.Main className="button-main" onClick={form.handleSubmit(onSubmit)} label="Continue" />
                 </Page.Footer>
@@ -134,20 +159,21 @@ function SendFunds({ address }: SendFundsProps) {
             {/* Confirmation page modal */}
             <FullscreenNotice open={showConfirmationPage} onClose={() => setShowConfirmationPage(false)}>
                 <Page className="send-funds-container">
-                    <Page.Top heading="Confirmation" />
+                    <Page.Top heading={t('confirmation.title')} />
 
-                    <div className="send-funds-confirm__card">
+                    <Card className="send-funds-confirm__card" type="transparent">
                         <div className="send-funds-confirm__card_destination">
                             <Text.MainMedium>{displayNameAndSplitAddress(credential)}</Text.MainMedium>
                             <Arrow />
                             <Text.MainMedium>{receiver && displaySplitAddress(receiver)}</Text.MainMedium>
                         </div>
                         <Text.Capture>
-                            {t('amount')} ({}):
+                            {t('amount')} ({tokenName}
+                            ):
                         </Text.Capture>
                         <Text.HeadingLarge>{form.watch('amount')}</Text.HeadingLarge>
                         <Text.Capture>{t('estimatedFee', { fee: cost })}</Text.Capture>
-                    </div>
+                    </Card>
 
                     <Page.Footer>
                         <Button.Main className="button-main" onClick={navToSubmitted} label={t('sendFunds')} />

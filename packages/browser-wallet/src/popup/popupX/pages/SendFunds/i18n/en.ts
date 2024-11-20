@@ -5,6 +5,9 @@ const t = {
     amount: 'Amount',
     sendMax: 'Send max.',
     estimatedFee: 'Est. fee: {{fee}} CCD',
+    confirmation: {
+        title: 'Confirmation',
+    },
 };
 
 export default t;

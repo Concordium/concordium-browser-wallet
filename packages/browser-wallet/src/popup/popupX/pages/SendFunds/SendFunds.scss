@@ -5,89 +5,6 @@
     padding-bottom: rem(32px);
 
     .send-funds {
-        &__title {
-            display: flex;
-            align-items: baseline;
-            justify-content: space-between;
-        }
-
-        &__card {
-            display: flex;
-            flex-direction: column;
-            border-radius: rem(16px);
-            background: $gradient-card-bg;
-            margin-top: rem(16px);
-            padding: rem(20px) rem(16px);
-
-            .text__main_medium {
-                color: $color-black;
-            }
-
-            .capture__additional_small {
-                padding: rem(4px);
-                border-radius: rem(4px);
-                color: $color-black;
-                background: $secondary-button-bg;
-            }
-
-            &_token,
-            &_amount,
-            &_receiver {
-                display: flex;
-                flex-direction: column;
-            }
-
-            &_token {
-                .token-selector {
-                    display: flex;
-                    align-items: center;
-                    margin-top: rem(12px);
-                    padding-bottom: rem(12px);
-                    border-bottom: 1px solid rgba($color-black, 0.1);
-
-                    .text__additional_small {
-                        margin-left: auto;
-                    }
-
-                    .token-icon {
-                        display: flex;
-                        padding: rem(5px);
-                        margin-right: rem(8px);
-                        border-radius: rem(6px);
-                        background: $color-grey-1;
-
-                        svg {
-                            width: rem(14px);
-                            height: rem(14px);
-                        }
-                    }
-                }
-            }
-
-            &_amount {
-                margin-top: rem(24px);
-
-                .amount-selector {
-                    display: flex;
-                    align-items: flex-end;
-                    justify-content: space-between;
-                    padding: rem(8px) 0;
-                    margin-bottom: rem(4px);
-                    border-bottom: 1px solid rgba($color-black, 0.1);
-                }
-            }
-
-            &_receiver {
-                margin-top: rem(24px);
-
-                .address-selector {
-                    display: flex;
-                    justify-content: space-between;
-                    margin-top: rem(12px);
-                }
-            }
-        }
-
         &__memo {
             display: flex;
             margin-top: rem(16px);
@@ -100,13 +17,9 @@
 
     .send-funds-confirm {
         &__card {
-            display: flex;
-            flex-direction: column;
             align-items: center;
             margin-top: rem(16px);
             padding: rem(40px) 0;
-            border: 1px solid rgba($color-grey-4, 0.4);
-            border-radius: rem(12px);
 
             &_destination {
                 display: flex;
@@ -135,41 +48,6 @@
 
             .capture__main_small:nth-child(4) {
                 color: $color-mineral-1;
-            }
-        }
-    }
-
-    .send-funds-success {
-        &__card {
-            display: flex;
-            flex-direction: column;
-            align-items: center;
-            margin-top: rem(16px);
-            padding: rem(24px) 0 rem(36px) 0;
-            border: 1px solid rgba($color-grey-4, 0.4);
-            border-radius: rem(12px);
-
-            .capture__main_small {
-                color: $color-white;
-            }
-
-            .heading_large {
-                margin: rem(8px) 0;
-            }
-
-            svg {
-                margin-bottom: rem(30px);
-            }
-        }
-
-        &__details {
-            display: flex;
-            justify-content: center;
-            margin-top: rem(24px);
-
-            .label__regular {
-                color: $color-white;
-                margin-right: rem(8px);
             }
         }
     }
