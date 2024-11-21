@@ -3,7 +3,7 @@ import { Route, Routes as ReactRoutes } from 'react-router-dom';
 import { relativeRoutes, routePrefix } from '@popup/popupX/constants/routes';
 import MainLayout from '@popup/popupX/page-layouts/MainLayout';
 import MainPage from '@popup/popupX/pages/MainPage';
-import { SendConfirm, SendFunds } from '@popup/popupX/pages/SendFunds';
+import { SendFunds } from '@popup/popupX/pages/SendFunds';
 import ReceiveFunds from '@popup/popupX/pages/ReceiveFunds';
 import TransactionLog from '@popup/popupX/pages/TransactionLog';
 import TransactionDetails from '@popup/popupX/pages/TransactionDetails';
@@ -65,12 +65,7 @@ export default function Routes({ messagePromptHandlers }: { messagePromptHandler
                 </Route>
                 <Route element={<MainLayout />} path={relativeRoutes.home.path}>
                     <Route index element={<MainPage />} />
-                    <Route path={relativeRoutes.home.send.path}>
-                        <Route index element={<SendFunds />} />
-                        <Route path={relativeRoutes.home.send.confirmation.path}>
-                            <Route index element={<SendConfirm />} />
-                        </Route>
-                    </Route>
+                    <Route path={relativeRoutes.home.sendFunds.path} element={<SendFunds />} />
                     <Route element={<ReceiveFunds />} path={relativeRoutes.home.receive.path} />
                     <Route path={relativeRoutes.home.transactionLog.path}>
                         <Route index element={<TransactionLog />} />

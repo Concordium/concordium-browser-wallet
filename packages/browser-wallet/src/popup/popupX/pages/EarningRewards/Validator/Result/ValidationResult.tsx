@@ -40,7 +40,7 @@ export default function ValidationResult() {
     };
     const nav = useNavigate();
     const { t } = useTranslation('x', { keyPrefix: 'earn.validator' });
-    const getCost = useGetTransactionFee(AccountTransactionType.ConfigureBaker);
+    const getCost = useGetTransactionFee();
     const accountInfo = ensureDefined(useSelectedAccountInfo(), 'No account selected');
     const [error, setError] = useState<Error>();
 
@@ -84,7 +84,7 @@ export default function ValidationResult() {
         return null;
     }
 
-    const fee = getCost(state.payload);
+    const fee = getCost(AccountTransactionType.ConfigureBaker, state.payload);
     const submit = async () => {
         if (fee === undefined) {
             throw Error('Fee could not be calculated');

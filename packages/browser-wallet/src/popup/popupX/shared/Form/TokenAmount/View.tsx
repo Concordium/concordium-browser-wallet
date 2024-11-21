@@ -1,20 +1,23 @@
 /* eslint-disable @typescript-eslint/no-explicit-any */
 /* eslint-disable react/destructuring-assignment */
-import React, { InputHTMLAttributes, ReactNode, forwardRef, useCallback, useEffect, useMemo, useState } from 'react';
+import React, { InputHTMLAttributes, ReactNode, forwardRef, useCallback, useEffect, useMemo } from 'react';
 import { UseFormReturn, Validate } from 'react-hook-form';
 import { useTranslation } from 'react-i18next';
 import clsx from 'clsx';
+import { ClassName, displayAsCcd } from 'wallet-common-helpers';
 import { CIS2, CcdAmount, ContractAddress } from '@concordium/web-sdk';
+
 import { CCD_METADATA } from '@shared/constants/token-metadata';
 import { ensureDefined } from '@shared/utils/basic-helpers';
 import SideArrow from '@assets/svgX/side-arrow.svg';
 import ConcordiumLogo from '@assets/svgX/concordium-logo.svg';
 import { validateAccountAddress, validateTransferAmount } from '@popup/shared/utils/transaction-helpers';
+import { TokenMetadata } from '@shared/storage/types';
 import Img, { DEFAULT_FAILED } from '@popup/shared/Img';
-import { ClassName, displayAsCcd } from 'wallet-common-helpers';
 import Text from '@popup/popupX/shared/Text';
-import { RequiredUncontrolledFieldProps } from '../common/types';
-import { makeUncontrolled } from '../common/utils';
+
+import { RequiredControlledFieldProps, RequiredUncontrolledFieldProps } from '../common/types';
+import { makeControlled, makeUncontrolled } from '../common/utils';
 import Button from '../../Button';
 import { formatTokenAmount, parseTokenAmount, removeNumberGrouping } from '../../utils/helpers';
 import ErrorMessage from '../ErrorMessage';
@@ -49,7 +52,7 @@ const FormInputClear = makeUncontrolled(InputClear);
 
 type ReceiverInputProps = Pick<
     InputHTMLAttributes<HTMLTextAreaElement>,
-    'className' | 'value' | 'onChange' | 'onBlur' | 'autoFocus'
+    'className' | 'value' | 'onChange' | 'onBlur' | 'autoFocus' | 'placeholder'
 > &
     RequiredUncontrolledFieldProps<HTMLInputElement>;
 
@@ -71,31 +74,30 @@ const ReceiverInput = forwardRef<HTMLTextAreaElement, ReceiverInputProps>(({ err
 
 const FormReceiverInput = makeUncontrolled(ReceiverInput);
 
-const parseTokenSelectorId = (value: string): null | CIS2.TokenAddress => {
+const parseTokenSelectorId = (value: string): Exclude<TokenPickerVariant, undefined> => {
     if (value.startsWith('ccd')) {
-        return null;
+        return { tokenType: 'ccd' };
     }
 
     const [, index, subindex, id] = value.split(':');
-    return { id, contract: ContractAddress.create(BigInt(index), BigInt(subindex)) };
+    return {
+        tokenType: 'cis2',
+        tokenAddress: { id, contract: ContractAddress.create(BigInt(index), BigInt(subindex)) },
+    };
 };
 
-const formatTokenSelectorId = (address: null | CIS2.TokenAddress) => {
-    if (address == null) {
-        return 'ccd';
+const formatTokenSelectorId = (token: TokenPickerVariant) => {
+    if (token?.tokenType === 'cis2') {
+        return `cis2:${token.tokenAddress.contract.index}:${token.tokenAddress.contract.subindex}:${token.tokenAddress.id}`;
     }
-    return `cis2:${address.contract.index}:${address.contract.subindex}:${address.id}`;
+    return 'ccd';
 };
 
 const DEFAULT_TOKEN_THUMBNAIL = DEFAULT_FAILED;
 
-type TokenPickerProps = {
-    /** null == CCD */
-    selectedToken: null | TokenInfo;
+type TokenPickerProps = RequiredControlledFieldProps<TokenPickerVariant> & {
     /** The set of tokens available for the account specified by `accountInfo` */
     tokens: TokenInfo[];
-    /** Callback invoked when a token is selected */
-    onSelect(value: null | CIS2.TokenAddress): void;
     /** Whether to enable selection */
     canSelect?: boolean;
     /** The balance of the selected token */
@@ -105,53 +107,60 @@ type TokenPickerProps = {
 };
 
 function TokenPicker({
-    selectedToken,
     tokens,
-    onSelect,
+    onChange,
+    value,
+    onBlur,
     canSelect = false,
     selectedTokenBalance,
     formatAmount,
 }: TokenPickerProps) {
     const { t } = useTranslation('x', { keyPrefix: 'sharedX' });
-    const token: {
-        name: string;
-        icon: ReactNode;
-        decimals: number;
-        type: 'ccd' | 'cis2';
-        address: null | CIS2.TokenAddress;
-    } = useMemo(() => {
-        if (selectedToken !== null) {
-            const {
-                metadata: { symbol, name, decimals = 0, thumbnail },
-                id,
-                contract,
-            } = ensureDefined(
-                tokens.find(
-                    (tk) => tk.id === selectedToken.id && ContractAddress.equals(tk.contract, selectedToken.contract)
-                ),
-                'Expected the token specified to be available in the set of tokens given'
-            );
-            const safeName = symbol ?? name ?? `${selectedToken.id}@${selectedToken.contract.toString()}`;
-            const tokenImage = thumbnail?.url ?? DEFAULT_TOKEN_THUMBNAIL;
-            const icon = <Img src={tokenImage} alt={name} withDefaults />;
-            return { name: safeName, icon, decimals, type: 'cis2', address: { id, contract } };
+    const token:
+        | {
+              name: string;
+              icon: ReactNode;
+              decimals: number;
+              type: 'ccd' | 'cis2';
+              address: null | CIS2.TokenAddress;
+          }
+        | undefined = useMemo(() => {
+        if (value?.tokenType === undefined) return undefined;
+        if (value.tokenType === 'ccd') {
+            const name = 'CCD';
+            const icon = <ConcordiumLogo />;
+            return { name, icon, decimals: 6, type: 'ccd', address: null };
         }
-        const name = 'CCD';
-        const icon = <ConcordiumLogo />;
-        return { name, icon, decimals: 6, type: 'ccd', address: null };
-    }, [selectedToken]);
+
+        const {
+            metadata: { symbol, name, decimals = 0, thumbnail },
+            id,
+            contract,
+        } = ensureDefined(
+            tokens.find(
+                (tk) =>
+                    tk.id === value.tokenAddress.id && ContractAddress.equals(tk.contract, value.tokenAddress.contract)
+            ),
+            'Expected the token specified to be available in the set of tokens given'
+        );
+        const safeName = symbol ?? name ?? `${value.tokenAddress.id}@${value.tokenAddress.contract.toString()}`;
+        const tokenImage = thumbnail?.url ?? DEFAULT_TOKEN_THUMBNAIL;
+        const icon = <Img src={tokenImage} alt={name} withDefaults />;
+        return { name: safeName, icon, decimals, type: 'cis2', address: { id, contract } };
+    }, [value]);
 
     return (
         <div className="token-selector-container">
             <label className="token-selector">
                 {canSelect && (
                     <select
-                        value={formatTokenSelectorId(selectedToken)}
-                        onChange={(e) => onSelect(parseTokenSelectorId(e.target.value))}
+                        value={formatTokenSelectorId(value)}
+                        onChange={(e) => onChange?.(parseTokenSelectorId(e.target.value))}
+                        onBlur={onBlur}
                     >
-                        <option value={formatTokenSelectorId(null)}>CCD</option>
+                        <option value={formatTokenSelectorId({ tokenType: 'ccd' })}>CCD</option>
                         {tokens.map((tk) => {
-                            const id = formatTokenSelectorId(tk);
+                            const id = formatTokenSelectorId({ tokenType: 'cis2', tokenAddress: tk });
                             return (
                                 <option key={id} value={id}>
                                     {tk.metadata.symbol ?? tk.metadata.name ?? `${tk.id}@${tk.contract.toString()}`}
@@ -160,8 +169,8 @@ function TokenPicker({
                         })}
                     </select>
                 )}
-                <div className="token-icon">{token.icon}</div>
-                <Text.Main>{token.name}</Text.Main>
+                {token !== undefined && <div className="token-icon">{token.icon}</div>}
+                <Text.Main>{token?.name}</Text.Main>
                 {canSelect && <SideArrow />}
             </label>
             {selectedTokenBalance !== undefined && (
@@ -175,10 +184,13 @@ function TokenPicker({
     );
 }
 
-type TokenVariant =
+const FormTokenPicker = makeControlled(TokenPicker);
+
+/** Possible values of the token picker */
+export type TokenPickerVariant =
     | {
           /** The token type. If undefined, a token picker is rendered */
-          tokenType?: 'ccd';
+          tokenType: 'ccd';
       }
     | {
           /** The token type. If undefined, a token picker is rendered */
@@ -186,6 +198,7 @@ type TokenVariant =
           /** The token address */
           tokenAddress: CIS2.TokenAddress;
       };
+type TokenPickerVariantProps = { tokenType?: undefined } | TokenPickerVariant;
 
 /**
  * @description
@@ -194,6 +207,8 @@ type TokenVariant =
 export type AmountForm = {
     /** The amount to be transferred */
     amount: string;
+    /** The token to transfer */
+    token: TokenPickerVariant;
 };
 
 /**
@@ -205,7 +220,7 @@ export type AmountReceiveForm = AmountForm & {
     receiver: string;
 };
 
-type ValueVariant =
+type ValueVariantProps =
     | {
           /** Whether it should be possible to specify a receiver. Defaults to false */
           receiver?: false;
@@ -219,10 +234,9 @@ type ValueVariant =
           form: UseFormReturn<AmountReceiveForm>;
       };
 
-/** The event emitted when a token is selected internally. `null` is used when CCD is selected. */
-export type TokenSelectEvent = null | CIS2.TokenAddress;
-
 export type TokenAmountViewProps = {
+    /** The CCD balance used to check transaction fee coverage */
+    ccdBalance: CcdAmount.Type;
     /** The label used for the button setting the amount to the maximum possible */
     buttonMaxLabel: string;
     /** The fee associated with the transaction */
@@ -233,15 +247,10 @@ export type TokenAmountViewProps = {
     tokens: TokenInfo[];
     /** The token balance. `undefined` should be used to indicate that the balance is not yet available. */
     balance: bigint | undefined;
-    /**
-     * Callback invoked when the user selects a token. This is also invoked when the component renders initially.
-     * `null` is used to communicate the native token (CCD) is selected.
-     */
-    onSelectToken(event: TokenSelectEvent): void;
     /** Custom validation for the amount */
     validateAmount?: Validate<string>;
-} & ValueVariant &
-    TokenVariant &
+} & ValueVariantProps &
+    TokenPickerVariantProps &
     ClassName;
 
 /**
@@ -256,60 +265,54 @@ export default function TokenAmountView(props: TokenAmountViewProps) {
         fee,
         tokens,
         balance,
-        onSelectToken,
         className,
+        ccdBalance,
         formatFee = (f) => displayAsCcd(f, false, true),
         validateAmount: customValidateAmount,
     } = props;
-    const [selectedToken, setSelectedToken] = useState<TokenInfo | null>(() => {
+    const defaultToken: TokenPickerVariant = useMemo(() => {
         switch (props.tokenType) {
+            case 'ccd':
+            case undefined:
+                return { tokenType: 'ccd' };
+            case 'cis2':
+                return { tokenType: 'cis2', tokenAddress: props.tokenAddress };
+            default:
+                throw new Error('Unreachable');
+        }
+    }, [props.tokenType]);
+    const { token = defaultToken } = props.form.watch();
+    const selectedTokenMetadata = useMemo<TokenMetadata>(() => {
+        switch (token.tokenType) {
             case 'cis2': {
                 return ensureDefined(
                     tokens.find(
                         (tk) =>
-                            tk.id === props.tokenAddress.id &&
-                            ContractAddress.equals(tk.contract, props.tokenAddress.contract)
+                            tk.id === token.tokenAddress.id &&
+                            ContractAddress.equals(tk.contract, token.tokenAddress.contract)
                     ),
                     'Expected the token specified to be available in the set of tokens given'
-                );
+                ).metadata;
             }
             case 'ccd':
-            case undefined: {
-                return null;
-            }
+            case undefined:
+                return CCD_METADATA;
             default:
                 throw new Error('Unreachable');
         }
-    });
-
-    const handleTokenSelect = useCallback(
-        (value: null | CIS2.TokenAddress) => {
-            if (value === null) {
-                setSelectedToken(value);
-            } else {
-                const selected = ensureDefined(
-                    tokens.find((tk) => tk.id === value.id && ContractAddress.equals(tk.contract, value.contract)),
-                    'Expected the token specified to be available in the set of tokens given'
-                );
-                setSelectedToken(selected);
-            }
-        },
-        [tokens, setSelectedToken]
-    );
-
-    const tokenDecimals = useMemo(() => {
-        if (selectedToken === null) {
-            return CCD_METADATA.decimals;
-        }
-        return selectedToken.metadata.decimals ?? 0;
-    }, [selectedToken]);
+    }, [token]);
 
     useEffect(() => {
-        onSelectToken(selectedToken);
-    }, [selectedToken]);
+        const form = props.form as UseFormReturn<AmountForm>;
+        form.setValue('token', defaultToken);
+    }, []);
+
+    const tokenDecimals = useMemo(() => {
+        return selectedTokenMetadata.decimals ?? 0;
+    }, [selectedTokenMetadata]);
 
     const formatAmount = useCallback(
-        (amountValue: bigint) => formatTokenAmount(amountValue, tokenDecimals, 2),
+        (amountValue: bigint) => formatTokenAmount(amountValue, tokenDecimals, Math.min(2, tokenDecimals)),
         [tokenDecimals]
     );
     const parseAmount = useCallback(
@@ -318,11 +321,11 @@ export default function TokenAmountView(props: TokenAmountViewProps) {
     );
 
     const availableAmount: bigint | undefined = useMemo(() => {
-        if (balance === undefined) {
+        if (balance === undefined || token === undefined) {
             return undefined;
         }
-        return selectedToken === null ? balance - fee.microCcdAmount : balance;
-    }, [selectedToken, fee, balance]);
+        return token.tokenType === 'ccd' ? balance - fee.microCcdAmount : balance;
+    }, [token, fee, balance]);
 
     const setMax = useCallback(() => {
         if (availableAmount === undefined) return;
@@ -355,38 +358,28 @@ export default function TokenAmountView(props: TokenAmountViewProps) {
     );
 
     const validateAmount: Validate<string> = useCallback(
-        (value) =>
-            validateTransferAmount(
-                removeNumberGrouping(value),
-                balance,
-                tokenDecimals,
-                selectedToken === null ? fee.microCcdAmount : 0n
-            ),
-        [balance, tokenDecimals, selectedToken, fee]
+        (value) => {
+            const sanitizedValue = removeNumberGrouping(value);
+            if (token.tokenType === 'cis2' && ccdBalance.microCcdAmount < fee.microCcdAmount) {
+                return t('form.tokenAmount.validation.insufficientCcd');
+            }
+            return validateTransferAmount(sanitizedValue, balance, tokenDecimals, fee.microCcdAmount);
+        },
+        [balance, tokenDecimals, token, fee]
     );
 
     return (
         <div className={clsx('token-amount', className)}>
             <div className="token-amount_token">
                 <span className="text__main_medium">{t('form.tokenAmount.token.label')}</span>
-                {props.tokenType !== undefined ? (
-                    <TokenPicker
-                        selectedToken={selectedToken}
-                        onSelect={handleTokenSelect}
-                        tokens={tokens}
-                        selectedTokenBalance={balance}
-                        formatAmount={formatAmount}
-                    />
-                ) : (
-                    <TokenPicker
-                        selectedToken={selectedToken}
-                        onSelect={handleTokenSelect}
-                        tokens={tokens}
-                        canSelect
-                        selectedTokenBalance={balance}
-                        formatAmount={formatAmount}
-                    />
-                )}
+                <FormTokenPicker
+                    control={(props.form as UseFormReturn<AmountForm>).control}
+                    name="token"
+                    tokens={tokens}
+                    canSelect={props.tokenType === undefined}
+                    selectedTokenBalance={balance}
+                    formatAmount={formatAmount}
+                />
             </div>
             <div className="token-amount_amount">
                 <span className="text__main_medium">Amount</span>
@@ -420,6 +413,7 @@ export default function TokenAmountView(props: TokenAmountViewProps) {
                         className="text__main"
                         register={(props.form as UseFormReturn<AmountReceiveForm>).register}
                         name="receiver"
+                        placeholder={t('form.tokenAmount.address.placeholder')}
                         rules={{
                             required: t('utils.address.required'),
                             validate: validateAccountAddress,

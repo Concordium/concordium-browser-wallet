@@ -67,14 +67,8 @@ export const relativeRoutes = {
             hideBackArrow: true,
             showAccountSelector: true,
         },
-        send: {
-            path: 'send',
-            confirmation: {
-                path: 'confirmation',
-                config: {
-                    backTitle: 'to Send Funds form',
-                },
-            },
+        sendFunds: {
+            path: 'account/:account/send-funds',
         },
         receive: {
             path: 'receive',
@@ -346,6 +340,9 @@ export const transactionDetailsRoute = (account: AccountAddress.Type, tx: Transa
 
 export const submittedTransactionRoute = (tx: TransactionHash.Type) =>
     generatePath(absoluteRoutes.home.submittedTransaction.path, { transactionHash: TransactionHash.toHexString(tx) });
+
+export const sendFundsRoute = (account: AccountAddress.Type) =>
+    generatePath(absoluteRoutes.home.sendFunds.path, { account: account.address });
 
 /**
  * Given two absolute routes, returns the relative route between them.

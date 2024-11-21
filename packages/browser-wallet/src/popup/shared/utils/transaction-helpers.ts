@@ -255,18 +255,18 @@ export function getTransactionAmount(type: AccountTransactionType, payload: Acco
     }
 }
 /** Hook which exposes a function for getting the transaction fee for a given transaction type */
-export function useGetTransactionFee(type: AccountTransactionType) {
+export function useGetTransactionFee() {
     const cp = useBlockChainParameters();
 
     return useCallback(
-        (payload: AccountTransactionPayload) => {
+        (type: AccountTransactionType, payload: AccountTransactionPayload) => {
             if (cp === undefined) {
                 return undefined;
             }
             const energy = getEnergyCost(type, payload);
             return convertEnergyToMicroCcd(energy, cp);
         },
-        [cp, type]
+        [cp]
     );
 }
 

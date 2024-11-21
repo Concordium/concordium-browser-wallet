@@ -1,5 +1,5 @@
 import React, { ReactNode, useMemo } from 'react';
-import { useNavigate } from 'react-router-dom';
+import { generatePath, useNavigate } from 'react-router-dom';
 import { useTranslation } from 'react-i18next';
 import { useAtomValue } from 'jotai';
 import { displayAsCcd } from 'wallet-common-helpers';
@@ -118,7 +118,7 @@ function MainPageConfirmedAccount({ credential }: MainPageConfirmedAccountProps)
     const { t } = useTranslation('x', { keyPrefix: 'mainPage' });
 
     const nav = useNavigate();
-    const navToSend = () => nav(relativeRoutes.home.send.path);
+    const navToSend = () => nav(generatePath(absoluteRoutes.home.sendFunds.path, { account: credential.address }));
     const navToReceive = () => nav(relativeRoutes.home.receive.path);
     const navToTransactionLog = () =>
         nav(relativeRoutes.home.transactionLog.path.replace(':account', credential.address));

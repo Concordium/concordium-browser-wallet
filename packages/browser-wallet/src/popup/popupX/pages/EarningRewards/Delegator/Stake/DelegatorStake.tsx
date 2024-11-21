@@ -112,7 +112,7 @@ export default function DelegatorStake({ title, target, initialValues, existingV
     const [highStakeWarning, setHighStakeWarning] = useState(false);
 
     const values = form.watch();
-    const getCost = useGetTransactionFee(AccountTransactionType.ConfigureDelegation);
+    const getCost = useGetTransactionFee();
     const fee = useMemo(() => {
         let payload: ConfigureDelegationPayload;
         try {
@@ -131,7 +131,7 @@ export default function DelegatorStake({ title, target, initialValues, existingV
                 existingValues
             );
         }
-        return getCost(payload);
+        return getCost(AccountTransactionType.ConfigureDelegation, payload);
     }, [target, values, getCost]);
 
     useEffect(() => {

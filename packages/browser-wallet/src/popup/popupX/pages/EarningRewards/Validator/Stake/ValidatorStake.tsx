@@ -89,10 +89,10 @@ export default function ValidatorStake({ title, initialValues, existingValues, o
     const [highStakeWarning, setHighStakeWarning] = useState(false);
 
     const values = form.watch();
-    const getCost = useGetTransactionFee(AccountTransactionType.ConfigureBaker);
+    const getCost = useGetTransactionFee();
     const fee = useMemo(() => {
         if (existingValues === undefined) {
-            return getCost(PAYLOAD_MAX);
+            return getCost(AccountTransactionType.ConfigureBaker, PAYLOAD_MAX);
         }
 
         try {
@@ -106,7 +106,7 @@ export default function ValidatorStake({ title, initialValues, existingValues, o
             }
 
             const payload: ConfigureBakerPayload = { stake, restakeEarnings: restake };
-            return getCost(payload);
+            return getCost(AccountTransactionType.ConfigureBaker, payload);
         } catch {
             // We failed to parse the amount
             return undefined;
@@ -118,7 +118,7 @@ export default function ValidatorStake({ title, initialValues, existingValues, o
             return undefined; // We know the cost as we don't depend on values set later in the flow
         }
 
-        return getCost(PAYLOAD_MIN);
+        return getCost(AccountTransactionType.ConfigureBaker, PAYLOAD_MIN);
     }, [getCost, existingValues]);
 
     useEffect(() => {

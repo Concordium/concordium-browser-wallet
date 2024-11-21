@@ -1,53 +1,154 @@
-import React from 'react';
-import ConcordiumLogo from '@assets/svgX/concordium-logo.svg';
-import Plus from '@assets/svgX/plus.svg';
-import SideArrow from '@assets/svgX/side-arrow.svg';
-import Button from '@popup/popupX/shared/Button';
-import { useNavigate } from 'react-router-dom';
-import { relativeRoutes } from '@popup/popupX/constants/routes';
+import React, { useState } from 'react';
+import { Navigate, useLocation, useParams } from 'react-router-dom';
+import { useTranslation } from 'react-i18next';
+import {
+    AccountAddress,
+    AccountTransactionType,
+    CIS2,
+    CIS2Contract,
+    CcdAmount,
+    Energy,
+    SimpleTransferPayload,
+} from '@concordium/web-sdk';
+import { useAsyncMemo } from 'wallet-common-helpers';
+import { useAtomValue } from 'jotai';
 
-export default function SendFunds() {
-    const nav = useNavigate();
-    const navToConfirm = () => nav(relativeRoutes.home.send.confirmation.path);
-    return (
-        <div className="send-funds-container">
-            <div className="send-funds__title">
-                <span className="heading_medium">Send funds</span>
-                <span className="capture__main_small">from Account 1 / 6gk...Fk7o</span>
-            </div>
-            <div className="send-funds__card">
-                <div className="send-funds__card_token">
-                    <span className="text__main_medium">Token</span>
-                    <div className="token-selector">
-                        <div className="token-icon">
-                            <ConcordiumLogo />
-                        </div>
-                        <span className="text__main">CCD</span>
-                        <SideArrow />
-                        <span className="text__additional_small">17,800 CCD available</span>
-                    </div>
-                </div>
-                <div className="send-funds__card_amount">
-                    <span className="text__main_medium">Amount</span>
-                    <div className="amount-selector">
-                        <span className="heading_big">12,600.00</span>
-                        <span className="capture__additional_small">Send max.</span>
-                    </div>
-                    <span className="capture__main_small">Estimated transaction fee: 0.03614 CCD</span>
-                </div>
-                <div className="send-funds__card_receiver">
-                    <span className="text__main_medium">Receiver address</span>
-                    <div className="address-selector">
-                        <span className="text__main">bc1qxy2kgdygq2...0wlh</span>
-                        <span className="capture__additional_small">Address Book</span>
-                    </div>
-                </div>
-            </div>
-            <div className="send-funds__memo">
-                <Plus />
-                <span className="label__main">Add memo</span>
-            </div>
-            <Button.Main className="button-main" onClick={() => navToConfirm()} label="Continue" />
-        </div>
+import Button from '@popup/popupX/shared/Button';
+import { displayNameAndSplitAddress, useCredential } from '@popup/shared/utils/account-helpers';
+import Page from '@popup/popupX/shared/Page';
+import Text from '@popup/popupX/shared/Text';
+import TokenAmount, { AmountReceiveForm } from '@popup/popupX/shared/Form/TokenAmount';
+import Form, { useForm } from '@popup/popupX/shared/Form';
+import { useAccountInfo } from '@popup/shared/AccountInfoListenerContext';
+import { useGetTransactionFee } from '@popup/shared/utils/transaction-helpers';
+import { TokenPickerVariant } from '@popup/popupX/shared/Form/TokenAmount/View';
+import { parseTokenAmount } from '@popup/popupX/shared/utils/helpers';
+import { grpcClientAtom } from '@popup/store/settings';
+import { logError } from '@shared/utils/log-helpers';
+import FullscreenNotice from '@popup/popupX/shared/FullscreenNotice';
+import SendFundsConfirm from './Confirm';
+import { CIS2_TRANSFER_NRG_OFFSET, useTokenMetadata } from './util';
+
+type SendFundsProps = { address: AccountAddress.Type };
+export type SendFundsLocationState = TokenPickerVariant;
+
+function SendFunds({ address }: SendFundsProps) {
+    const { t } = useTranslation('x', { keyPrefix: 'sendFunds' });
+    const { state } = useLocation() as { state: SendFundsLocationState | null };
+    const credential = useCredential(address.address);
+    const grpcClient = useAtomValue(grpcClientAtom);
+    const form = useForm<AmountReceiveForm>({
+        mode: 'onTouched',
+        defaultValues: {
+            token: state ?? { tokenType: 'ccd' },
+            amount: '0.00',
+        },
+    });
+    const accountInfo = useAccountInfo(credential);
+    const [token, amount] = form.watch(['token', 'amount']);
+    const contractClient = useAsyncMemo(
+        async () => {
+            if (token?.tokenType !== 'cis2') {
+                return undefined;
+            }
+            return CIS2Contract.create(grpcClient, token.tokenAddress.contract);
+        },
+        logError,
+        [token, grpcClient]
     );
+
+    const getFee = useGetTransactionFee();
+    const metadata = useTokenMetadata(token, address);
+    const fee = useAsyncMemo(
+        async () => {
+            if (token?.tokenType === 'cis2') {
+                if (contractClient === undefined || metadata === undefined) {
+                    return undefined;
+                }
+
+                let tokenAmount: bigint;
+                try {
+                    tokenAmount = parseTokenAmount(amount, metadata.decimals);
+                } catch {
+                    return undefined;
+                }
+
+                const transfer: CIS2.Transfer = {
+                    from: address,
+                    to: address,
+                    tokenId: token.tokenAddress.id,
+                    tokenAmount,
+                };
+                const result = await contractClient.dryRun.transfer(address, transfer);
+                const { payload } = contractClient.createTransfer(
+                    { energy: Energy.create(result.usedEnergy.value + CIS2_TRANSFER_NRG_OFFSET) },
+                    transfer
+                );
+                return getFee(AccountTransactionType.Update, payload);
+            }
+            if (token?.tokenType === 'ccd') {
+                const payload: SimpleTransferPayload = {
+                    amount: CcdAmount.zero(),
+                    toAddress: AccountAddress.fromBuffer(new Uint8Array(32)),
+                };
+                return getFee(AccountTransactionType.Transfer, payload);
+            }
+
+            return undefined;
+        },
+        logError,
+        [token, address, amount, contractClient]
+    );
+
+    const [showConfirmationPage, setShowConfirmationPage] = useState(false);
+    const onSubmit = () => setShowConfirmationPage(true);
+
+    if (accountInfo === undefined) {
+        return null;
+    }
+
+    return (
+        <>
+            <FullscreenNotice open={showConfirmationPage} onClose={() => setShowConfirmationPage(false)}>
+                {fee && <SendFundsConfirm sender={address} values={form.getValues()} fee={fee} />}
+            </FullscreenNotice>
+            <Page className="send-funds-container">
+                <Page.Top heading={t('sendFunds')}>
+                    <Text.Capture className="m-l-5 m-t-neg-5">
+                        {t('from', { name: displayNameAndSplitAddress(credential) })}
+                    </Text.Capture>
+                </Page.Top>
+                <Form formMethods={form} onSubmit={onSubmit}>
+                    {() => (
+                        <TokenAmount
+                            buttonMaxLabel={t('sendMax')}
+                            receiver
+                            fee={fee ?? CcdAmount.zero()}
+                            form={form}
+                            accountInfo={accountInfo}
+                            {...state}
+                        />
+                    )}
+                </Form>
+                {/*
+                <div className="send-funds__memo">
+                    <Plus />
+                    <span className="label__main">Add memo</span>
+                </div>
+            */}
+                <Page.Footer>
+                    <Button.Main className="button-main" onClick={form.handleSubmit(onSubmit)} label="Continue" />
+                </Page.Footer>
+            </Page>
+        </>
+    );
+}
+
+export default function Loader() {
+    const params = useParams();
+    if (params.account === undefined) {
+        // No account address passed in the url.
+        return <Navigate to="../" />;
+    }
+    return <SendFunds address={AccountAddress.fromBase58(params.account)} />;
 }

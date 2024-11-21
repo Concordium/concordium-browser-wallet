@@ -66,7 +66,6 @@ export const OnlyAmount: Story = {
         receiver: false,
         tokens,
         balance: 17004000000n,
-        onSelectToken: console.log,
     },
 };
 
@@ -77,7 +76,6 @@ export const WithReceiver: Story = {
         receiver: true,
         tokens,
         balance: 17004000000n,
-        onSelectToken: console.log,
     },
 };
 
@@ -90,6 +88,5 @@ export const TokenWithReceiver: Story = {
         receiver: true,
         tokens,
         balance: 17004000000n,
-        onSelectToken: console.log,
     },
 };
