@@ -47,6 +47,19 @@ const t = {
         pendingBy: 'Pending verification by {{idProviderName}}',
         itentityRejected: 'This identity has been rejected',
     },
+    web3IdCard: {
+        status: {
+            active: 'Active',
+            revoked: 'Revoked',
+            expired: 'Expired',
+            notActivated: 'Not activated',
+            pending: 'Pending',
+        },
+        warning: {
+            schemaMismatch: 'Attributes found do not match credential schema',
+            fallback: 'Using fallback credential chema',
+        },
+    },
 };
 
 export default t;

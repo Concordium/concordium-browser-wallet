@@ -6,9 +6,12 @@ import Button from '@popup/popupX/shared/Button';
 import Web3IdCard from '@popup/popupX/shared/Web3IdCard';
 import { useNavigate } from 'react-router-dom';
 import { relativeRoutes } from '@popup/popupX/constants/routes';
+import { useAtomValue } from 'jotai';
+import { storedVerifiableCredentialsAtom } from '@popup/store/verifiable-credential';
 
 export default function Web3IdCredentials() {
     const { t } = useTranslation('x', { keyPrefix: 'web3Id.credentials' });
+    const verifiableCredentials = useAtomValue(storedVerifiableCredentialsAtom);
     const nav = useNavigate();
     const navToImport = () => nav(relativeRoutes.settings.web3Id.import.path);
 
