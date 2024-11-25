@@ -40,7 +40,7 @@ const t = {
         name: {
             edit: 'Edit Name',
             save: 'Save',
-            abort: 'Abort',
+            abort: 'Cancel',
         },
         verifiedBy: 'Verified by {{idProviderName}}',
         rejectedBy: 'Rejected by {{idProviderName}}',
