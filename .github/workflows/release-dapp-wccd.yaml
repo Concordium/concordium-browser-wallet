@@ -1,0 +1,71 @@
+on:
+  push:
+    tags:
+      - dapp-wccd/mainnet-*
+      - dapp-wccd/testnet-*
+
+env:
+  SERVICE_NAME: 'dapp-wccd'
+  BASE_IMAGE: 'node:18-slim'
+  AWS_ROLE_TO_ASSUME: 'arn:aws:iam::192549843005:role/github_browser_wallet'
+
+jobs:
+  release-docker:
+    runs-on: ubuntu-latest
+    environment: release
+    steps:
+      - name: Login to Docker Hub
+        if: ${{ secrets.DOCKERHUB_TOKEN }}
+        uses: docker/login-action@v3
+        with:
+            username: 'concordium'
+            password: ${{ secrets.DOCKERHUB_TOKEN }}
+
+      - name: Clone repo
+        uses: actions/checkout@v4
+        with:
+            ref: ${{ github.ref_name }}
+            submodules: recursive
+
+      - name: Set image tag if correctly formatted
+        env:
+            TAG: ${{ github.ref_name }}
+        run: |
+            SERVICE_TAG=${TAG##${{ env.SERVICE_NAME }}/}
+            IFS='-' read -r ENVIRONMENT TAG_VERSION <<< "$SERVICE_TAG"
+            echo "FULL_IMAGE_TAG=concordium/${{ env.SERVICE_NAME }}:${TAG_VERSION}" >> $GITHUB_ENV
+            echo "ENVIRONMENT=$ENVIRONMENT" >> $GITHUB_ENV
+
+      - name: Check if image exist
+        run: |
+            set +e
+            docker manifest inspect ${{ env.FULL_IMAGE_TAG }}
+            EXITCODE=$?
+            if [ $EXITCODE -eq "0" ]; then
+              echo "Error: ${{ env.FULL_IMAGE_TAG }} already exist"
+              exit 1
+            fi
+
+      - name: Build and push docker mage
+        if: ${{ secrets.DOCKERHUB_TOKEN }}
+        uses: docker/build-push-action@v6
+        with:
+          context: ./examples/wCCD
+          file: ./examples/wCCD/Dockerfile
+          tags: ${{ env.FULL_IMAGE_TAG }}
+          no-cache: true
+          push: true
+          build-args: |
+            NETWORK=${{ env.ENVIRONMENT }}
+            build_image=${{ env.base_image }}
+
+      - name: Build and push Docker to ecr
+        if: ${{ inputs.AWS_ROLE }}
+        uses: explosion/action-ecr-publish@v1
+        with:
+            dockerfile: examples/wCCD/Dockerfile
+            platforms: "linux/amd64"
+            aws_region: "eu-west-1"
+            aws_role_to_assume: ${{ inputs.AWS_ROLE }}
+            aws_account_id: "192549843005"
+            ecr_repo_name: "192549843005.dkr.ecr.eu-west-1.amazonaws.com/concordium/${{ inputs.SERVICE_NAME }}"
