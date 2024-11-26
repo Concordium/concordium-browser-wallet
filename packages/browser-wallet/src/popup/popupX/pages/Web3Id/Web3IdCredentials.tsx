@@ -16,13 +16,14 @@ export default function Web3IdCredentials() {
     const navToImport = () => nav(relativeRoutes.settings.web3Id.import.path);
 
     return (
-        <Page className="web-id-x credintials">
+        <Page className="web3-id-x credentials">
             <Page.Top heading={t('webId')}>
                 <Button.Icon icon={<Plus />} onClick={navToImport} />
             </Page.Top>
             <Page.Main>
-                <Web3IdCard />
-                <Web3IdCard />
+                {verifiableCredentials.value.map((vc) => (
+                    <Web3IdCard credential={vc} />
+                ))}
             </Page.Main>
         </Page>
     );

@@ -25,7 +25,7 @@ function Status({ status }: { status: VerifiableCredentialStatus }) {
     const { t } = useTranslation('x', { keyPrefix: 'sharedX.web3IdCard.status' });
 
     let text = '';
-    let className = '';
+    let className: string | undefined;
     switch (status) {
         case VerifiableCredentialStatus.Active:
             text = t('active');
@@ -33,11 +33,11 @@ function Status({ status }: { status: VerifiableCredentialStatus }) {
             break;
         case VerifiableCredentialStatus.Revoked:
             text = t('revoked');
-            className = 'web3-id-card-x__status--success';
+            className = 'web3-id-card-x__status--error';
             break;
         case VerifiableCredentialStatus.Expired:
             text = t('expired');
-            className = 'web3-id-card-x__status--success';
+            className = 'web3-id-card-x__status--error';
             break;
         case VerifiableCredentialStatus.NotActivated:
             text = t('notActivated');
@@ -69,11 +69,13 @@ type ViewProps = ClassName & {
  */
 export function Web3IdCardView({ onClick, status, title, attributes, className, warning }: ViewProps) {
     return (
-        <Button.Base onClick={onClick}>
-            <Card className={clsx('web3-id-card-x', className)}>
+        <Button.Base className={clsx('web3-id-card-x', className)} onClick={onClick}>
+            <Card>
                 <Card.Row>
-                    <ConcordiumLogo />
-                    <Text.MainMedium>{title}</Text.MainMedium>
+                    <div className="flex align-items-center">
+                        <ConcordiumLogo />
+                        <Text.MainMedium>{title}</Text.MainMedium>
+                    </div>
                     <Status status={status} />
                 </Card.Row>
                 {warning !== undefined && <div>{warning}</div>} {/* FIXME: make this look right... */}
@@ -142,6 +144,8 @@ type Props = Pick<ViewProps, 'onClick' | 'className'> & {
     credential: VerifiableCredential;
 };
 
+// TODO:
+// - Use the icon from the issuer if available
 export default function Web3IdCard({ credential, ...viewProps }: Props) {
     const { t } = useTranslation('x', { keyPrefix: 'sharedX.web3IdCard.warning' });
     const status = useCredentialStatus(credential);

@@ -1,11 +1,17 @@
 .web3-id-card-x {
-    &.card-x.grey {
+    text-align: left;
+    background: none;
+    padding: 0;
+    border: none;
+
+    .card-x.grey {
         padding: rem(8px) rem(0) rem(0) rem(0);
         border: rem(1px) solid $color-input-border;
 
         .row:not(.details) {
             display: flex;
             align-items: center;
+            justify-content: space-between;
             padding: rem(0) rem(14px) rem(8px) rem(14px);
 
             .text__main_medium {
@@ -28,5 +34,17 @@
     svg {
         width: rem(16px);
         height: rem(16px);
+    }
+
+    &__status {
+        color: $color-grey-4;
+
+        &--success {
+            color: $color-green-success;
+        }
+
+        &--error {
+            color: $color-red-attention;
+        }
     }
 }
