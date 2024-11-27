@@ -1,4 +1,4 @@
-import { AccountAddress, TransactionHash } from '@concordium/web-sdk';
+import { AccountAddress, ContractAddress, TransactionHash } from '@concordium/web-sdk';
 import { generatePath } from 'react-router-dom';
 import i18n from '@popup/shell/i18n';
 
@@ -172,6 +172,12 @@ export const relativeRoutes = {
             import: {
                 path: 'import',
             },
+            details: {
+                path: ':sci/:holderId',
+                config: {
+                    backTitle: i18n.t('x:web3Id.credentials.title'),
+                },
+            },
         },
         network: {
             path: 'network',
@@ -343,6 +349,12 @@ export const submittedTransactionRoute = (tx: TransactionHash.Type) =>
 
 export const sendFundsRoute = (account: AccountAddress.Type) =>
     generatePath(absoluteRoutes.home.sendFunds.path, { account: account.address });
+
+export const web3IdDetailsRoute = (contract: ContractAddress.Type, holderId: string) =>
+    generatePath(absoluteRoutes.settings.web3Id.details.path, {
+        sci: `${contract.index}-${contract.subindex}`,
+        holderId,
+    });
 
 /**
  * Given two absolute routes, returns the relative route between them.

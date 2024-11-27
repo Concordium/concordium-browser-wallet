@@ -80,7 +80,7 @@ export function Web3IdCardView({ onClick, status, title, attributes, className, 
                 </Card.Row>
                 {warning !== undefined && <div>{warning}</div>} {/* FIXME: make this look right... */}
                 {attributes.map((attr) => (
-                    <Card.RowDetails title={attr.title} value={attr.value} />
+                    <Card.RowDetails key={attr.title} title={attr.title} value={attr.value} />
                 ))}
             </Card>
         </Button.Base>
