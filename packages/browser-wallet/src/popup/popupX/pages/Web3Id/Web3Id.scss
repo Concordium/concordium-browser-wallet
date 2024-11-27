@@ -1,4 +1,11 @@
 .web3-id-x {
+    &__card {
+        background: none;
+        padding: 0;
+        border: none;
+        text-align: left;
+    }
+
     &.credentials {
         .page__main {
             display: flex;

@@ -33,7 +33,9 @@ export default function Web3IdCredentials() {
             </Page.Top>
             <Page.Main>
                 {verifiableCredentials.value.map((vc) => (
-                    <Web3IdCard key={vc.id} credential={vc} onClick={() => toDetails(vc)} />
+                    <Button.Base className="web3-id-x__card" onClick={() => toDetails(vc)}>
+                        <Web3IdCard key={vc.id} credential={vc} />
+                    </Button.Base>
                 ))}
             </Page.Main>
         </Page>

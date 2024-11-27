@@ -1,10 +1,5 @@
 .web3-id-card-x {
-    text-align: left;
-    background: none;
-    padding: 0;
-    border: none;
-
-    .card-x.grey {
+    &.card-x.grey {
         padding: rem(8px) rem(0) rem(0) rem(0);
         border: rem(1px) solid $color-input-border;
 
@@ -34,6 +29,12 @@
     svg {
         width: rem(16px);
         height: rem(16px);
+    }
+
+    &__top {
+        width: 100%;
+        display: flex;
+        flex-direction: column;
     }
 
     &__status {

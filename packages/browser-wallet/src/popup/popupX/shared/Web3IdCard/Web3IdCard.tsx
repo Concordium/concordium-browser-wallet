@@ -16,7 +16,6 @@ import {
     useCredentialSchema,
     useCredentialStatus,
 } from '../utils/verifiable-credentials';
-import Button from '../Button';
 
 /**
  * Component for displaying the status of a verifiable credential.
@@ -41,11 +40,9 @@ function Status({ status }: { status: VerifiableCredentialStatus }) {
             break;
         case VerifiableCredentialStatus.NotActivated:
             text = t('notActivated');
-            className = 'web3-id-card-x__status--success';
             break;
         case VerifiableCredentialStatus.Pending:
             text = t('pending');
-            className = 'web3-id-card-x__status--success';
             break;
         default:
             break;
@@ -57,7 +54,6 @@ function Status({ status }: { status: VerifiableCredentialStatus }) {
 type AttributeView = { title: string; value: string };
 
 type ViewProps = ClassName & {
-    onClick?: () => void;
     attributes: AttributeView[];
     title: string;
     status: VerifiableCredentialStatus;
@@ -67,23 +63,25 @@ type ViewProps = ClassName & {
 /**
  * Presentation component for {@linkcode Web3IdCard}, which should generally be used instead.
  */
-export function Web3IdCardView({ onClick, status, title, attributes, className, warning }: ViewProps) {
+export function Web3IdCardView({ status, title, attributes, className, warning }: ViewProps) {
     return (
-        <Button.Base className={clsx('web3-id-card-x', className)} onClick={onClick}>
-            <Card>
-                <Card.Row>
-                    <div className="flex align-items-center">
-                        <ConcordiumLogo />
-                        <Text.MainMedium>{title}</Text.MainMedium>
+        <Card className={clsx('web3-id-card-x', className)}>
+            <Card.Row>
+                <div className="web3-id-card-x__top">
+                    <div className="flex align-items-center justify-space-between">
+                        <div className="flex align-items-center">
+                            <ConcordiumLogo />
+                            <Text.MainMedium>{title}</Text.MainMedium>
+                        </div>
+                        <Status status={status} />
                     </div>
-                    <Status status={status} />
-                </Card.Row>
-                {warning !== undefined && <div>{warning}</div>} {/* FIXME: make this look right... */}
-                {attributes.map((attr) => (
-                    <Card.RowDetails key={attr.title} title={attr.title} value={attr.value} />
-                ))}
-            </Card>
-        </Button.Base>
+                    {warning !== undefined && <Text.Capture>{warning}</Text.Capture>}{' '}
+                </div>
+            </Card.Row>
+            {attributes.map((attr) => (
+                <Card.RowDetails key={attr.title} title={attr.title} value={attr.value} />
+            ))}
+        </Card>
     );
 }
 
@@ -140,7 +138,7 @@ function applySchemaAndLocalization(
     };
 }
 
-type Props = Pick<ViewProps, 'onClick' | 'className'> & {
+type Props = Pick<ViewProps, 'className'> & {
     credential: VerifiableCredential;
 };
 
