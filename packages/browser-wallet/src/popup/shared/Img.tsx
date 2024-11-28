@@ -17,7 +17,7 @@ type WithDefaultsProps = BaseProps & {
 type NoDefaultsProps = BaseProps & {
     withDefaults?: false;
     loadingImage?: string;
-    failedImage?: string;
+    failedImage?: string | JSX.Element;
 };
 
 type Props = WithDefaultsProps | NoDefaultsProps;
@@ -49,7 +49,10 @@ export default function Img({ src, alt, className, ...props }: Props) {
                 }}
                 onError={handleError}
             />
-            {shouldHide && <img className={className} src={failed ? failedImage : loadingImage} alt={alt} />}
+            {shouldHide && failed && typeof failedImage !== 'string' && failedImage !== undefined && failedImage}
+            {shouldHide && (typeof failedImage === 'string' || failedImage === undefined || !failed) && (
+                <img className={className} src={failed ? (failedImage as string) : loadingImage} alt={alt} />
+            )}
         </>
     );
 }

@@ -14,6 +14,7 @@ import {
     VerifiableCredentialStatus,
 } from '@shared/storage/types';
 
+import Img from '@popup/shared/Img';
 import {
     defaultFormatAttribute,
     useCredentialLocalization,
@@ -21,7 +22,6 @@ import {
     useCredentialSchema,
     useCredentialStatus,
 } from '../utils/verifiable-credentials';
-import Img from '@popup/shared/Img';
 
 /**
  * Component for displaying the status of a verifiable credential.
@@ -75,9 +75,9 @@ export function Web3IdCardView({ status, title, attributes, className, warning, 
         <Card className={clsx('web3-id-card-x', className)}>
             <Card.Row>
                 <div className="web3-id-card-x__top">
-                    <div className="flex align-items-center justify-space-between">
-                        <div className="flex align-items-center">
-                            {logo !== undefined ? <Img src={logo.url} withDefaults /> : <ConcordiumLogo />}
+                    <div className="flex align-center justify-space-between">
+                        <div className="flex align-center">
+                            {logo !== undefined ? <Img src={logo.url} /> : <ConcordiumLogo />}
                             <Text.MainMedium>{title}</Text.MainMedium>
                         </div>
                         <Status status={status} />
@@ -149,8 +149,6 @@ type Props = Pick<ViewProps, 'className'> & {
     credential: VerifiableCredential;
 };
 
-// TODO:
-// - Use the icon from the issuer if available
 export default function Web3IdCard({ credential, ...viewProps }: Props) {
     const { t } = useTranslation('x', { keyPrefix: 'sharedX.web3IdCard.warning' });
     const status = useCredentialStatus(credential);
@@ -184,6 +182,7 @@ export default function Web3IdCard({ credential, ...viewProps }: Props) {
             title={metadata.title}
             status={status}
             warning={warning}
+            logo={metadata.logo}
             {...viewProps}
         />
     );
