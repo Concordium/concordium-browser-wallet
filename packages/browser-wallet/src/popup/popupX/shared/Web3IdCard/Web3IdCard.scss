@@ -26,9 +26,12 @@
         }
     }
 
-    svg {
+    svg, img {
         width: rem(16px);
         height: rem(16px);
+
+        object-position: center;
+        object-fit: contain;
     }
 
     &__top {

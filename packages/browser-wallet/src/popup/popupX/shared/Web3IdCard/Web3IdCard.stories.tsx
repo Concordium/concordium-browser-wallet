@@ -37,3 +37,15 @@ export const Primary: Story = {
         ],
     },
 };
+
+export const Logo: Story = {
+    args: {
+        title: 'Credential title',
+        status: VerifiableCredentialStatus.Active,
+        attributes: [
+            { title: 'Attribute title', value: 'Attribute value' },
+            { title: 'Attribute title', value: 'Attribute value' },
+        ],
+        logo: { url: 'https://img.logoipsum.com/298.svg' },
+    },
+};

@@ -7,7 +7,12 @@ import { useTranslation } from 'react-i18next';
 import ConcordiumLogo from '@assets/svgX/concordium-logo.svg';
 import Card from '@popup/popupX/shared/Card';
 import Text from '@popup/popupX/shared/Text';
-import { VerifiableCredential, VerifiableCredentialSchema, VerifiableCredentialStatus } from '@shared/storage/types';
+import {
+    MetadataUrl,
+    VerifiableCredential,
+    VerifiableCredentialSchema,
+    VerifiableCredentialStatus,
+} from '@shared/storage/types';
 
 import {
     defaultFormatAttribute,
@@ -16,6 +21,7 @@ import {
     useCredentialSchema,
     useCredentialStatus,
 } from '../utils/verifiable-credentials';
+import Img from '@popup/shared/Img';
 
 /**
  * Component for displaying the status of a verifiable credential.
@@ -58,19 +64,20 @@ type ViewProps = ClassName & {
     title: string;
     status: VerifiableCredentialStatus;
     warning?: string;
+    logo?: MetadataUrl;
 };
 
 /**
  * Presentation component for {@linkcode Web3IdCard}, which should generally be used instead.
  */
-export function Web3IdCardView({ status, title, attributes, className, warning }: ViewProps) {
+export function Web3IdCardView({ status, title, attributes, className, warning, logo }: ViewProps) {
     return (
         <Card className={clsx('web3-id-card-x', className)}>
             <Card.Row>
                 <div className="web3-id-card-x__top">
                     <div className="flex align-items-center justify-space-between">
                         <div className="flex align-items-center">
-                            <ConcordiumLogo />
+                            {logo !== undefined ? <Img src={logo.url} withDefaults /> : <ConcordiumLogo />}
                             <Text.MainMedium>{title}</Text.MainMedium>
                         </div>
                         <Status status={status} />
