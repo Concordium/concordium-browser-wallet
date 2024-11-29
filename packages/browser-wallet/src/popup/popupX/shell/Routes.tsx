@@ -50,6 +50,7 @@ import IdIssuanceSubmitted from '../pages/IdIssuance/Submitted';
 import IdIssuanceExternalFlow from '../pages/IdIssuance/ExternalFlow';
 import IdIssuanceFailed from '../pages/IdIssuance/Failed';
 import EndIdentityIssuance from '../pages/prompts/EndIdentityIssuance';
+import Web3IdDetails from '../pages/Web3Id/Web3IdDetails';
 
 export default function Routes({ messagePromptHandlers }: { messagePromptHandlers: MessagePromptHandlersType }) {
     const { handleConnectionResponse } = messagePromptHandlers;
@@ -129,6 +130,7 @@ export default function Routes({ messagePromptHandlers }: { messagePromptHandler
                     <Route path={relativeRoutes.settings.web3Id.path}>
                         <Route index element={<Web3IdCredentials />} />
                         <Route element={<Web3IdImport />} path={relativeRoutes.settings.web3Id.import.path} />
+                        <Route element={<Web3IdDetails />} path={relativeRoutes.settings.web3Id.details.path} />
                     </Route>
                     <Route path={relativeRoutes.settings.network.path}>
                         <Route index element={<NetworkSettings />} />

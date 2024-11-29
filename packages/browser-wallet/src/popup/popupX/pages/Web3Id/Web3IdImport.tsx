@@ -11,7 +11,7 @@ export default function Web3IdImport() {
     const { t } = useTranslation('x', { keyPrefix: 'web3Id.import' });
 
     return (
-        <Page className="web-id-x import">
+        <Page className="web3-id-x import">
             <Page.Top heading={t('importWeb3Id')} />
             <Page.Main>
                 <Card>

@@ -40,12 +40,25 @@ const t = {
         name: {
             edit: 'Edit Name',
             save: 'Save',
-            abort: 'Abort',
+            abort: 'Cancel',
         },
         verifiedBy: 'Verified by {{idProviderName}}',
         rejectedBy: 'Rejected by {{idProviderName}}',
         pendingBy: 'Pending verification by {{idProviderName}}',
         itentityRejected: 'This identity has been rejected',
+    },
+    web3IdCard: {
+        status: {
+            active: 'Active',
+            revoked: 'Revoked',
+            expired: 'Expired',
+            notActivated: 'Not activated',
+            pending: 'Pending',
+        },
+        warning: {
+            schemaMismatch: 'Attributes found do not match credential schema',
+            fallback: 'Using fallback credential chema',
+        },
     },
 };
 
