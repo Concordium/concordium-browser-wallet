@@ -1,14 +1,18 @@
 import React from 'react';
-import Page from '@popup/popupX/shared/Page';
 import { useTranslation } from 'react-i18next';
-import Web3IdCard from '@popup/popupX/shared/Web3IdCard';
-import { useAtomValue } from 'jotai';
-import { storedVerifiableCredentialsAtom } from '@popup/store/verifiable-credential';
-import { ContractAddress, HexString } from '@concordium/web-sdk';
 import { Navigate, useParams } from 'react-router-dom';
+import { useAtomValue } from 'jotai';
+import { ContractAddress, HexString } from '@concordium/web-sdk';
+
+import Page from '@popup/popupX/shared/Page';
+import Web3IdCard from '@popup/popupX/shared/Web3IdCard';
+import { storedVerifiableCredentialsAtom } from '@popup/store/verifiable-credential';
 import { absoluteRoutes } from '@popup/popupX/constants/routes';
 import { networkConfigurationAtom } from '@popup/store/settings';
 import { createCredentialId } from '@shared/utils/verifiable-credential-helpers';
+import Button from '@popup/popupX/shared/Button';
+import Stop from '@assets/svgX/stop.svg';
+import Info from '@assets/svgX/info.svg';
 
 type Props = {
     contract: ContractAddress.Type;
@@ -26,7 +30,10 @@ function Web3IdDetailsParsed({ id, contract }: Props) {
 
     return (
         <Page>
-            <Page.Top heading={t('title')} />
+            <Page.Top heading={t('title')}>
+                <Button.Icon icon={<Stop />} />
+                <Button.Icon className="web3-id-details-x__info" icon={<Info />} />
+            </Page.Top>
             <Page.Main>
                 <Web3IdCard credential={credential} />
             </Page.Main>
