@@ -1,4 +1,4 @@
-import React from 'react';
+import React, { useState } from 'react';
 import { useTranslation } from 'react-i18next';
 import { Navigate, useParams } from 'react-router-dom';
 import { useAtomValue } from 'jotai';
@@ -24,6 +24,7 @@ function Web3IdDetailsParsed({ id, contract }: Props) {
     const verifiableCredentials = useAtomValue(storedVerifiableCredentialsAtom);
     const net = useAtomValue(networkConfigurationAtom);
     const credential = verifiableCredentials.value.find((c) => c.id === createCredentialId(id, contract, net));
+    const [showInfo, setShowInfo] = useState(false);
 
     if (verifiableCredentials.loading) return null;
     if (credential === undefined) throw new Error('Expected to find credential');
@@ -32,10 +33,14 @@ function Web3IdDetailsParsed({ id, contract }: Props) {
         <Page>
             <Page.Top heading={t('title')}>
                 <Button.Icon icon={<Stop />} />
-                <Button.Icon className="web3-id-details-x__info" icon={<Info />} />
+                <Button.Icon
+                    className="web3-id-details-x__info"
+                    icon={<Info />}
+                    onClick={() => setShowInfo((v) => !v)}
+                />
             </Page.Top>
             <Page.Main>
-                <Web3IdCard credential={credential} />
+                <Web3IdCard showInfo={showInfo} credential={credential} />
             </Page.Main>
         </Page>
     );
