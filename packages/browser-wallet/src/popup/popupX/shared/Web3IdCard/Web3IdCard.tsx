@@ -1,4 +1,4 @@
-import React, { useMemo } from 'react';
+import React from 'react';
 import { ClassName, TimeStampUnit, dateFromTimestamp } from 'wallet-common-helpers';
 import { AttributeType } from '@concordium/web-sdk';
 import clsx from 'clsx';
@@ -16,6 +16,7 @@ import {
 import { parseCredentialDID } from '@shared/utils/verifiable-credential-helpers';
 import Img from '@popup/shared/Img';
 
+import { withDateAndTime } from '@shared/utils/time-helpers';
 import {
     defaultFormatAttribute,
     useCredentialEntry,
@@ -24,7 +25,6 @@ import {
     useCredentialSchema,
     useCredentialStatus,
 } from '../utils/verifiable-credentials';
-import { withDateAndTime } from '@shared/utils/time-helpers';
 
 /**
  * Component for displaying the status of a verifiable credential.

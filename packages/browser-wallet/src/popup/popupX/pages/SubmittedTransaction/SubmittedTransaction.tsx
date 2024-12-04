@@ -104,12 +104,18 @@ function TransferBody({ transfer }: TransferBodyProps) {
     );
 }
 
-export type UpdateContractSubmittedLocationState = {
+export type CIS2TransferSubmittedLocationState = {
     type: 'cis2.transfer';
     /** formatted amount */
     amount: string;
     tokenName: string;
 };
+
+export type CIS4RevokeSubmittedLocationState = {
+    type: 'cis4.revoke';
+};
+
+type UpdateContractSubmittedLocationState = CIS2TransferSubmittedLocationState | CIS4RevokeSubmittedLocationState;
 function UpdateContractBody() {
     const { t } = useTranslation('x', { keyPrefix: 'submittedTransaction.success' });
     const { state } = useLocation() as Location & { state: UpdateContractSubmittedLocationState };
@@ -122,6 +128,8 @@ function UpdateContractBody() {
                     <Text.Capture>{state.tokenName}</Text.Capture>
                 </>
             );
+        case 'cis4.revoke':
+            return <Text.Capture>{t('web3Revoke')}</Text.Capture>;
         default:
             throw new Error('Unsupported');
     }

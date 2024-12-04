@@ -27,12 +27,17 @@ import {
 import Button from '@popup/popupX/shared/Button';
 import Stop from '@assets/svgX/stop.svg';
 import Info from '@assets/svgX/info.svg';
-import { useCredentialEntry } from '@popup/popupX/shared/utils/verifiable-credentials';
+import { useCredentialEntry, useCredentialStatus } from '@popup/popupX/shared/utils/verifiable-credentials';
 import FullscreenNotice, { FullscreenNoticeProps } from '@popup/popupX/shared/FullscreenNotice';
 import { displayNameOrSplitAddress, useHdWallet, useSelectedCredential } from '@popup/shared/utils/account-helpers';
 import { fetchContractName } from '@shared/utils/token-helpers';
 import Text from '@popup/popupX/shared/Text';
-import { ConfirmedCredential, CreationStatus, VerifiableCredential } from '@shared/storage/types';
+import {
+    ConfirmedCredential,
+    CreationStatus,
+    VerifiableCredential,
+    VerifiableCredentialStatus,
+} from '@shared/storage/types';
 import { displayAsCcd, noOp, useAsyncMemo } from 'wallet-common-helpers';
 import {
     TransactionSubmitError,
@@ -41,6 +46,7 @@ import {
     useTransactionSubmit,
 } from '@popup/shared/utils/transaction-helpers';
 import ErrorMessage from '@popup/popupX/shared/Form/ErrorMessage';
+import { CIS4RevokeSubmittedLocationState } from '../SubmittedTransaction/SubmittedTransaction';
 
 type ConfirmRevocationProps = FullscreenNoticeProps & {
     credential: VerifiableCredential;
@@ -104,7 +110,8 @@ function ConfirmRevocation({ credential, entry, walletCred, ...props }: ConfirmR
         }
         try {
             const tx = await submitTransaction(payload, fee);
-            nav(submittedTransactionRoute(TransactionHash.fromHexString(tx)));
+            const submittedState: CIS4RevokeSubmittedLocationState = { type: 'cis4.revoke' };
+            nav(submittedTransactionRoute(TransactionHash.fromHexString(tx)), { state: submittedState });
         } catch (e) {
             if (e instanceof Error) {
                 setError(e);
@@ -158,13 +165,20 @@ function Web3IdDetailsParsed({ id, contract }: Props) {
     const [showConfirm, setShowConfirm] = useState(false);
     const credentialEntry = useCredentialEntry(credential);
     const walletCredential = useSelectedCredential();
+    const status = useCredentialStatus(credential);
 
     if (verifiableCredentials.loading) return null;
     if (credential === undefined) throw new Error('Expected to find credential');
 
+    const canRevoke =
+        walletCredential?.status === CreationStatus.Confirmed &&
+        credentialEntry?.credentialInfo.holderRevocable &&
+        status !== undefined &&
+        [VerifiableCredentialStatus.Active, VerifiableCredentialStatus.NotActivated].includes(status);
+
     return (
         <>
-            {walletCredential?.status === CreationStatus.Confirmed && (
+            {canRevoke && (
                 <ConfirmRevocation
                     open={showConfirm}
                     onClose={() => setShowConfirm(false)}
@@ -175,11 +189,7 @@ function Web3IdDetailsParsed({ id, contract }: Props) {
             )}
             <Page>
                 <Page.Top heading={t('title')}>
-                    {walletCredential?.status === CreationStatus.Confirmed &&
-                        credentialEntry?.credentialInfo.holderRevocable &&
-                        credentialEntry !== undefined && (
-                            <Button.Icon icon={<Stop />} onClick={() => setShowConfirm(true)} />
-                        )}
+                    {canRevoke && <Button.Icon icon={<Stop />} onClick={() => setShowConfirm(true)} />}
                     <Button.Icon
                         className="web3-id-details-x__info"
                         icon={<Info />}

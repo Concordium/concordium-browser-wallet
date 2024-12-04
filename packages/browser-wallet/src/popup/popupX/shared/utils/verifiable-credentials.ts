@@ -31,18 +31,20 @@ import { withDateAndTime } from '@shared/utils/time-helpers';
  * @param credential the verifiable credential to lookup the status for
  * @returns the status for the given credential
  */
-export function useCredentialStatus(credential: VerifiableCredential) {
+export function useCredentialStatus(credential: VerifiableCredential | undefined) {
     const [status, setStatus] = useState<VerifiableCredentialStatus>();
     const client = useAtomValue(grpcClientAtom);
 
     useEffect(() => {
+        if (credential === undefined) return;
+
         getVerifiableCredentialStatus(client, credential.id)
             .then(setStatus)
             .catch((e) => {
                 setStatus(VerifiableCredentialStatus.Pending);
                 logError(e);
             });
-    }, [credential.id, client]);
+    }, [credential?.id, client]);
 
     return status;
 }
