@@ -59,6 +59,12 @@ const t = {
             schemaMismatch: 'Attributes found do not match credential schema',
             fallback: 'Using fallback credential chema',
         },
+        details: {
+            id: 'Credential holder ID',
+            contract: 'Contract address',
+            validFrom: 'Valid from',
+            validUntil: 'Valid until',
+        },
     },
 };
 

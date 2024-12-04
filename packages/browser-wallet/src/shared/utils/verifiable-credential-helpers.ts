@@ -9,6 +9,7 @@ import {
     Energy,
     Parameter,
     ReturnValue,
+    HexString,
 } from '@concordium/web-sdk';
 import * as ed from '@noble/ed25519';
 import {
@@ -1130,6 +1131,19 @@ export function createCredentialId(
     return `did:ccd:${getNet(network).toLowerCase()}:sci:${issuer.index}:${
         issuer.subindex
     }/credentialEntry/${credentialHolderId}`;
+}
+
+/**
+ * Parse the {@linkcode ContractAddress.Type} and holder ID from the given DID string
+ */
+export function parseCredentialDID(did: string): [ContractAddress.Type, HexString] {
+    const [, index, subindex, id] =
+        did.match(/.*:sci:(\d*):(\d*)\/credentialEntry\/(.*)$/) ??
+        (() => {
+            throw new Error('Invalid ID found in verifiable credential');
+        })();
+    const contract = ContractAddress.create(BigInt(index), BigInt(subindex));
+    return [contract, id];
 }
 
 /**

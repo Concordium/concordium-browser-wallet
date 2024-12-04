@@ -1,15 +1,16 @@
 import React from 'react';
-import Plus from '@assets/svgX/plus.svg';
 import { useTranslation } from 'react-i18next';
+import { useNavigate } from 'react-router-dom';
+import { useAtomValue } from 'jotai';
+
+import Plus from '@assets/svgX/plus.svg';
 import Page from '@popup/popupX/shared/Page';
 import Button from '@popup/popupX/shared/Button';
 import Web3IdCard from '@popup/popupX/shared/Web3IdCard';
-import { useNavigate } from 'react-router-dom';
 import { relativeRoutes, web3IdDetailsRoute } from '@popup/popupX/constants/routes';
-import { useAtomValue } from 'jotai';
 import { storedVerifiableCredentialsAtom } from '@popup/store/verifiable-credential';
 import { VerifiableCredential } from '@shared/storage/types';
-import { ContractAddress } from '@concordium/web-sdk';
+import { parseCredentialDID } from '@shared/utils/verifiable-credential-helpers';
 
 export default function Web3IdCredentials() {
     const { t } = useTranslation('x', { keyPrefix: 'web3Id.credentials' });
@@ -17,12 +18,7 @@ export default function Web3IdCredentials() {
     const nav = useNavigate();
 
     const toDetails = (vc: VerifiableCredential) => {
-        const [, index, subindex, id] =
-            vc.id.match(/.*:sci:(\d*):(\d*)\/credentialEntry\/(.*)$/) ??
-            (() => {
-                throw new Error('Invalid ID found in verifiable credential');
-            })();
-        const contract = ContractAddress.create(BigInt(index), BigInt(subindex));
+        const [contract, id] = parseCredentialDID(vc.id);
         nav(web3IdDetailsRoute(contract, id));
     };
 

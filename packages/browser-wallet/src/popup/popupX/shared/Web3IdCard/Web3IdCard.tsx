@@ -1,5 +1,5 @@
 import React from 'react';
-import { ClassName } from 'wallet-common-helpers';
+import { ClassName, TimeStampUnit, dateFromTimestamp } from 'wallet-common-helpers';
 import { AttributeType } from '@concordium/web-sdk';
 import clsx from 'clsx';
 import { useTranslation } from 'react-i18next';
@@ -13,10 +13,13 @@ import {
     VerifiableCredentialSchema,
     VerifiableCredentialStatus,
 } from '@shared/storage/types';
-
+import { parseCredentialDID } from '@shared/utils/verifiable-credential-helpers';
 import Img from '@popup/shared/Img';
+
+import { withDateAndTime } from '@shared/utils/time-helpers';
 import {
     defaultFormatAttribute,
+    useCredentialEntry,
     useCredentialLocalization,
     useCredentialMetadata,
     useCredentialSchema,
@@ -147,14 +150,16 @@ function applySchemaAndLocalization(
 
 type Props = Pick<ViewProps, 'className'> & {
     credential: VerifiableCredential;
+    showInfo?: boolean;
 };
 
-export default function Web3IdCard({ credential, ...viewProps }: Props) {
-    const { t } = useTranslation('x', { keyPrefix: 'sharedX.web3IdCard.warning' });
+export default function Web3IdCard({ credential, showInfo = false, ...viewProps }: Props) {
+    const { t } = useTranslation('x', { keyPrefix: 'sharedX.web3IdCard' });
     const status = useCredentialStatus(credential);
     const schema = useCredentialSchema(credential);
     const metadata = useCredentialMetadata(credential);
     const localization = useCredentialLocalization(credential);
+    const entry = useCredentialEntry(credential);
 
     // Render nothing until all the required data is available.
     if (!schema || !metadata || localization.loading || status === undefined) {
@@ -165,15 +170,38 @@ export default function Web3IdCard({ credential, ...viewProps }: Props) {
         schema,
         credential.credentialSubject.attributes
     );
-    const attributes = Object.entries(credential.credentialSubject.attributes).map(
-        applySchemaAndLocalization(schema, localization.result)
-    );
+
+    let attributes: AttributeView[] = [];
+    if (showInfo && entry !== undefined) {
+        const [contract, id] = parseCredentialDID(credential.id);
+        if (!entry) {
+            return null;
+        }
+
+        const validFrom = dateFromTimestamp(entry.credentialInfo.validFrom, TimeStampUnit.milliSeconds);
+        const validFromFormatted = withDateAndTime(validFrom);
+        attributes = [
+            { title: t('details.id'), value: id },
+            { title: t('details.contract'), value: contract.toString() },
+            { title: t('details.validFrom'), value: validFromFormatted },
+        ];
+
+        if (entry.credentialInfo.validUntil !== undefined) {
+            const validUntil = dateFromTimestamp(entry.credentialInfo.validUntil, TimeStampUnit.milliSeconds);
+            const validUntilFormatted = withDateAndTime(validUntil);
+            attributes.push({ title: t('details.validUntil'), value: validUntilFormatted });
+        }
+    } else if (!showInfo) {
+        attributes = Object.entries(credential.credentialSubject.attributes).map(
+            applySchemaAndLocalization(schema, localization.result)
+        );
+    }
 
     let warning: string | undefined;
     if (!schemaMatchesCredentialAttributes) {
-        warning = t('schemaMismatch');
+        warning = t('warning.schemaMismatch');
     } else if (schema.usingFallback) {
-        warning = t('fallback');
+        warning = t('warning.fallback');
     }
 
     return (

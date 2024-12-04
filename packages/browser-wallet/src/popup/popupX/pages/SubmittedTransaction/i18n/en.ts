@@ -6,13 +6,14 @@ const t = {
             updated: "You've updated your delegation settings",
         },
         configureValidator: {
-            changeStake: "You've validating with",
-            removed: "You've stopped validating",
-            updated: "You've updated your delegation settings",
+            changeStake: "You're validating with",
+            removed: "You've removed your validation stake",
+            updated: "You've updated your validation settings",
         },
         transfer: {
             label: "You've sent",
         },
+        web3Revoke: 'Your credential has been successfully revoked',
     },
     pending: {
         label: 'Transaction in progress',

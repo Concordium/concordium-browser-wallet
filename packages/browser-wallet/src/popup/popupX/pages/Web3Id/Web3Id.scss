@@ -44,3 +44,16 @@
         }
     }
 }
+
+.web3-id-details-x {
+    &__info {
+        svg {
+            width: rem(16px) !important;
+            height: rem(16px) !important;
+
+            & path {
+                fill: $color-white;
+            }
+        }
+    }
+}
