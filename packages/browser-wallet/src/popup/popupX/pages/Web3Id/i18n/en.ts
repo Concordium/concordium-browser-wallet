@@ -10,6 +10,15 @@ const t = {
     },
     details: {
         title: 'Credential details',
+        confirmRevoke: {
+            title: 'Revoke credential',
+            description: "You're about to revoke your Web3 ID. This is an irreversible action.",
+            buttonContinue: 'Revoke credential',
+            buttonCancel: 'Cancel',
+            fee: 'Estimated transaction fee',
+            account: 'Selected account',
+            error: { insufficientFunds: 'Insufficient funds on selected account to cover transaction fee' },
+        },
     },
 };
 
