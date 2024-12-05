@@ -1,6 +1,6 @@
 import React from 'react';
 import { useNavigate, useParams } from 'react-router-dom';
-import { relativeRoutes, sendFundsRoute } from '@popup/popupX/constants/routes';
+import { relativeRoutes, absoluteRoutes, sendFundsRoute } from '@popup/popupX/constants/routes';
 import Page from '@popup/popupX/shared/Page';
 import Text from '@popup/popupX/shared/Text';
 import Button from '@popup/popupX/shared/Button';
@@ -48,7 +48,8 @@ function TokenDetails({ credential }: { credential: WalletCredential }) {
             } as SendFundsLocationState,
         });
     const navToReceive = () => nav(`../${relativeRoutes.home.receive.path}`);
-    const navToTransactionLog = () => nav(`../${relativeRoutes.home.transactionLog.path}`);
+    const navToTransactionLog = () =>
+        nav(absoluteRoutes.home.transactionLog.path.replace(':account', credential.address));
     const navToRaw = () => nav(relativeRoutes.home.token.details.raw.path);
     const removeToken = () => {
         remove({ contractIndex, tokenId: id });

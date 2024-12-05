@@ -62,7 +62,8 @@ function TokenDetailsCcd({ credential }: { credential: WalletCredential }) {
             state: { tokenType: 'ccd' } as TokenPickerVariant,
         });
     const navToReceive = () => nav(`../${relativeRoutes.home.receive.path}`);
-    const navToTransactionLog = () => nav(`../${relativeRoutes.home.transactionLog.path}`);
+    const navToTransactionLog = () =>
+        nav(absoluteRoutes.home.transactionLog.path.replace(':account', credential.address));
     const navToEarn = () => nav(absoluteRoutes.settings.earn.path);
 
     return (
