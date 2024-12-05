@@ -7,6 +7,7 @@
     &__balance {
         display: flex;
         flex-direction: column;
+        align-items: flex-start;
     }
 
     &__action-buttons {
@@ -71,6 +72,9 @@
                     &__amount,
                     &__exchange-rate {
                         display: flex;
+                        width: 100%;
+                        justify-content: flex-end;
+                        align-items: center;
                     }
 
                     .capture__main_small {
@@ -81,14 +85,15 @@
                         color: $color-white;
                     }
 
-                    .label__main:last-child,
-                    .capture__main_small:last-child {
+                    .balance-rate {
+                        display: flex;
+                        flex-direction: column;
+                        gap: rem(8px);
                         margin-left: auto;
                     }
 
                     svg {
                         margin-left: rem(8px);
-                        margin-top: rem(-2px);
                         opacity: 0.5;
                         width: rem(16px);
                         height: rem(16px);

@@ -1,0 +1,22 @@
+.send-transaction-x {
+    .text__main {
+        color: $color-mineral-2;
+
+        &_medium {
+            color: $color-white;
+        }
+
+        .white {
+            color: $color-white;
+        }
+    }
+
+    .card-x.grey {
+        margin-top: rem(16px);
+        margin-bottom: rem(32px);
+
+        .row.details:has(+ .parameter-x) {
+            border: unset;
+        }
+    }
+}

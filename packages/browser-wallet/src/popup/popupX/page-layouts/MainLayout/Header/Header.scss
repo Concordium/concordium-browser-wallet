@@ -38,7 +38,8 @@
 
     &__fullscreen {
         display: flex;
-        width: 100%;
+        width: 0;
+        flex: 1 1 0px;
 
         &_button {
             display: flex;
@@ -61,9 +62,10 @@
 
     &__connection {
         display: flex;
+        flex: 1 1 0px;
         align-items: center;
         white-space: nowrap;
-        width: 100%;
+        width: 0;
         height: rem(24px);
         padding: rem(1px);
         box-sizing: border-box;
@@ -92,6 +94,27 @@
             & .connection_status {
                 display: flex;
                 align-items: center;
+
+                &.waiting {
+                    circle {
+                        fill: $color-orange-info;
+                    }
+                }
+
+                &.connected {
+                    max-width: 90%;
+
+                    circle {
+                        fill: $color-green-success;
+                    }
+
+                    .capture__main_small {
+                        color: $color-white;
+                        overflow: hidden;
+                        white-space: nowrap;
+                        text-overflow: ellipsis;
+                    }
+                }
 
                 .capture__main_small {
                     padding: 0 rem(10px) rem(2px) rem(6px);
@@ -142,6 +165,12 @@
 
                 &.wide {
                     width: rem(160px);
+                }
+
+                svg {
+                    path {
+                        fill: $color-white;
+                    }
                 }
             }
         }

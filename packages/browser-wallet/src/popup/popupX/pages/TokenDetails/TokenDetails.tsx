@@ -15,10 +15,11 @@ import { getMetadataDecimals, trunctateSymbol } from '@shared/utils/token-helper
 import { useUpdateAtom } from 'jotai/utils';
 import { WalletCredential } from '@shared/storage/types';
 import Arrow from '@assets/svgX/arrow-right.svg';
-import FileText from '@assets/svgX/file-text.svg';
+import Clock from '@assets/svgX/clock.svg';
 import Notebook from '@assets/svgX/notebook.svg';
 import Eye from '@assets/svgX/eye-slash.svg';
 import { AccountAddress, ContractAddress } from '@concordium/web-sdk';
+import Img from '@popup/shared/Img';
 import { SendFundsLocationState } from '../SendFunds/SendFunds';
 
 const SUB_INDEX = '0';
@@ -57,9 +58,9 @@ function TokenDetails({ credential }: { credential: WalletCredential }) {
     return (
         <Page className="token-details-x">
             <Page.Main>
-                <Text.HeadingBig>
+                <Text.DynamicSize baseFontSize={32} baseTextLength={17} className="heading_big">
                     {renderBalance(balance)} {trunctateSymbol(metadata.symbol || '')}
-                </Text.HeadingBig>
+                </Text.DynamicSize>
                 <div className="token-details-x__action-buttons">
                     <Button.IconTile
                         icon={<Arrow />}
@@ -68,13 +69,18 @@ function TokenDetails({ credential }: { credential: WalletCredential }) {
                         className="receive"
                     />
                     <Button.IconTile icon={<Arrow />} label={t('send')} onClick={() => navToSend()} className="send" />
-                    <Button.IconTile
-                        icon={<FileText />}
-                        label={t('transactions')}
-                        onClick={() => navToTransactionLog()}
-                    />
+                    <Button.IconTile icon={<Clock />} label={t('activity')} onClick={() => navToTransactionLog()} />
                 </div>
                 <Card>
+                    <div className="token-details-x__token">
+                        <Img
+                            className="token-icon"
+                            src={metadata.thumbnail?.url || ''}
+                            alt={metadata.symbol}
+                            withDefaults
+                        />
+                        <Text.Main>{metadata.name}</Text.Main>
+                    </div>
                     <Card.RowDetails title={t('description')} value={metadata.description} />
                     <Card.RowDetails title={t('decimals')} value={`0 - ${metadata.decimals}`} />
                     <Card.RowDetails title={t('indexSubindex')} value={`${contractIndex}, ${SUB_INDEX}`} />

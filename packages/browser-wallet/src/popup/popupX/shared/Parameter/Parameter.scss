@@ -1,0 +1,23 @@
+.parameter-x {
+    display: flex;
+    flex-direction: column;
+    height: rem(200px);
+    border: 1px solid $color-input-border;
+    border-radius: rem(8px);
+    background-color: $color-transaction-bg;
+
+    .text__main_regular {
+        padding: rem(8px) rem(12px);
+        border-bottom: 1px solid $color-input-border;
+    }
+
+    .form-input {
+        height: 100%;
+
+        &__area {
+            font-size: rem(12px);
+            line-height: rem(16px);
+            padding: rem(8px) rem(12px);
+        }
+    }
+}

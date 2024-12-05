@@ -2,15 +2,14 @@ import React, { useMemo } from 'react';
 import { Outlet } from 'react-router-dom';
 import Toast from '@popup/shared/Toast/Toast';
 import clsx from 'clsx';
-import { Connection, Fullscreen } from '@popup/popupX/page-layouts/MainLayout/Header/components';
+import { Connection } from '@popup/popupX/page-layouts/MainLayout/Header/components';
 import FullscreenPromptLayout from '@popup/popupX/page-layouts/FullscreenPromptLayout';
 
 function Header({ isScrolling }: { isScrolling: boolean }) {
     return (
         <div className={clsx('main-header', isScrolling && 'scroll-border')}>
             <div className="main-header__top">
-                <Fullscreen />
-                <Connection hideConnection={false} />
+                <Connection />
             </div>
         </div>
     );

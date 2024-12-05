@@ -1,8 +1,9 @@
 const t = {
     receive: 'Receive',
     send: 'Send',
-    transactions: 'Transactions',
+    activity: 'Activity',
     earn: 'Earn',
+    earning: 'Earning',
     description: 'Description',
     decimals: 'Decimals',
     indexSubindex: 'Contract index, subindex',

@@ -1,15 +1,15 @@
 .token-details-x {
     &__stake {
         display: flex;
-        justify-content: space-between;
+        flex-direction: column;
         margin-top: rem(12px);
         margin-bottom: rem(16px);
         padding-top: rem(12px);
-        border-top: 1px solid rgba($color-white, 0.1);
 
         &_group {
             display: flex;
-            flex-direction: column;
+            flex-direction: row;
+            justify-content: space-between;
 
             .capture__additional_small {
                 color: $color-white;
@@ -30,6 +30,19 @@
 
         .receive svg {
             transform: rotate(90deg);
+        }
+    }
+
+    &__token {
+        display: flex;
+        align-items: center;
+        margin-bottom: rem(8px);
+
+        .token-icon,
+        svg {
+            width: rem(20px);
+            height: rem(20px);
+            margin-right: rem(8px);
         }
     }
 

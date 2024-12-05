@@ -17,6 +17,10 @@ const t = {
         sortDesc: 'Sort Z-A',
         searchBy: 'Search by name or address',
     },
+    connection: {
+        siteNotConnected: 'No website connected',
+        waiting: 'Waiting',
+    },
 };
 
 export default t;

@@ -1,4 +1,4 @@
-import React, { ReactNode } from 'react';
+import React, { ReactNode, useEffect, useRef } from 'react';
 import clsx from 'clsx';
 import { ClassName } from 'wallet-common-helpers';
 
@@ -54,6 +54,36 @@ function TextExternalLink({ path, children = path, className }: Props) {
     );
 }
 
+function TextDynamicSize({
+    baseFontSize,
+    baseTextLength,
+    className,
+    children,
+}: {
+    baseFontSize: number;
+    baseTextLength: number;
+    className?: string;
+    children: ReactNode;
+}) {
+    const ref = useRef<HTMLDivElement | null>(null);
+    const getFontSize = (textContent: number) => {
+        const fontSize = baseFontSize * (baseTextLength / Math.max(baseTextLength, textContent));
+        return `${fontSize}px`;
+    };
+
+    useEffect(() => {
+        if (ref.current) {
+            ref.current.style.fontSize = getFontSize(ref.current.textContent?.length || 0);
+        }
+    }, [ref, children]);
+
+    return (
+        <span ref={ref} className={clsx('dynamic-size', className)}>
+            {children}
+        </span>
+    );
+}
+
 const Text = TextRoot as typeof TextRoot & {
     HeadingLarge: typeof TextHeadingLarge;
     HeadingBig: typeof TextHeadingBig;
@@ -66,6 +96,7 @@ const Text = TextRoot as typeof TextRoot & {
     Label: typeof TextLabelMain;
     LabelRegular: typeof TextLabelRegular;
     ExternalLink: typeof TextExternalLink;
+    DynamicSize: typeof TextDynamicSize;
 };
 Text.HeadingLarge = TextHeadingLarge;
 Text.HeadingBig = TextHeadingBig;
@@ -78,5 +109,6 @@ Text.CaptureAdditional = TextCaptureAdditionalSmall;
 Text.Label = TextLabelMain;
 Text.LabelRegular = TextLabelRegular;
 Text.ExternalLink = TextExternalLink;
+Text.DynamicSize = TextDynamicSize;
 
 export default Text;

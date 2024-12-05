@@ -1,10 +1,12 @@
 const t = {
     receive: 'Receive',
     send: 'Send',
-    transactions: 'Transactions',
+    earn: 'Earn',
+    activity: 'Activity',
     manageTokenList: 'Manage token list',
     pendingAccount: 'Creating account',
     pendingSubText: 'Ready within a few minutes',
+    atDisposal: 'at disposal',
 };
 
 export default t;

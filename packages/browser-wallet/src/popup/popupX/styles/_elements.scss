@@ -35,11 +35,17 @@
 @import '../pages/EarningRewards/Delegator/Stake/DelegatorStake';
 @import '../pages/EarningRewards/Delegator/Result/DelegationResult';
 @import '../pages/prompts/ConnectionRequest/ConnectionRequest';
+@import '../pages/prompts/SignCis3Message/SignCis3Message';
+@import '../pages/prompts/SignMessage/SignMessage';
+@import '../pages/prompts/SendTransaction/SendTransaction';
 @import '../pages/SubmittedTransaction/SubmittedTransaction';
 @import '../page-layouts/MainLayout';
 @import '../page-layouts/ExternalRequestLayout/ExternalRequestLayout';
 @import '../shared/Page/Page';
 @import '../shared/Card/Card';
+@import '../shared/Parameter/Parameter';
+@import '../shared/TabBar/TabBar';
+@import '../shared/BinaryDisplay/BinaryDisplay';
 @import '../shared/TokenList/TokenList';
 @import '../shared/Text/Text';
 @import '../shared/Loader/Loader';

@@ -17,9 +17,9 @@ import Text from '@popup/popupX/shared/Text';
 import Button from '@popup/popupX/shared/Button';
 import { withSelectedCredential } from '@popup/popupX/shared/utils/hoc';
 import Arrow from '@assets/svgX/arrow-right.svg';
-import FileText from '@assets/svgX/file-text.svg';
+import Clock from '@assets/svgX/clock.svg';
 import ConcordiumLogo from '@assets/svgX/concordium-logo.svg';
-import Plant from '@assets/svgX/plant.svg';
+import Percent from '@assets/svgX/percent.svg';
 import Gear from '@assets/svgX/gear.svg';
 import { formatTokenAmount } from '@popup/popupX/shared/utils/helpers';
 
@@ -59,8 +59,7 @@ function displayCcdAsEur(microCcdPerEur: Ratio, microCcd: bigint, decimals: numb
 }
 
 function Balance({ credential }: { credential: WalletCredential }) {
-    const chainParameters = useBlockChainParameters();
-    const microCcdPerEur = chainParameters?.microGTUPerEuro;
+    const { t } = useTranslation('x', { keyPrefix: 'mainPage' });
     const accountInfo = useAccountInfo(credential);
 
     if (!accountInfo) {
@@ -68,13 +67,16 @@ function Balance({ credential }: { credential: WalletCredential }) {
     }
 
     const ccdBalance = displayAsCcd(accountInfo.accountAmount.microCcdAmount, false, true);
-    const eurBalance =
-        microCcdPerEur && displayCcdAsEur(microCcdPerEur, accountInfo.accountAmount.microCcdAmount, 2, true);
+    const ccdAvailableBalance = displayAsCcd(accountInfo.accountAvailableBalance.microCcdAmount, false, true);
 
     return (
         <div className="main-page-x__balance">
-            <Text.HeadingLarge>{microCcdPerEur ? eurBalance : ccdBalance}</Text.HeadingLarge>
-            <Text.Capture>{microCcdPerEur ? ccdBalance : ''}</Text.Capture>
+            <Text.DynamicSize baseFontSize={55} baseTextLength={10} className="heading_large">
+                {ccdBalance}
+            </Text.DynamicSize>
+            <Text.Capture>
+                {ccdAvailableBalance} {t('atDisposal')}
+            </Text.Capture>
         </div>
     );
 }
@@ -98,15 +100,16 @@ function TokenItem({ thumbnail, symbol, balance, balanceBase, staked, microCcdPe
             <div className="token-balance">
                 <div className="token-balance__amount">
                     <Text.Label>{symbol}</Text.Label>
-                    {staked && <Plant />}
-                    <Text.Label>{balance}</Text.Label>
+                    {staked && <Percent />}
+                    <span className="balance-rate">
+                        <Text.Label>{balance}</Text.Label>
+                        {isNoExchange ? null : (
+                            <div className="token-balance__exchange-rate">
+                                <Text.Capture>{displayCcdAsEur(microCcdPerEur, balanceBase, 2)}</Text.Capture>
+                            </div>
+                        )}
+                    </span>
                 </div>
-                {isNoExchange ? null : (
-                    <div className="token-balance__exchange-rate">
-                        <Text.Capture>{displayCcdAsEur(microCcdPerEur, 1000000n, 6)}</Text.Capture>
-                        <Text.Capture>{displayCcdAsEur(microCcdPerEur, balanceBase, 2)}</Text.Capture>
-                    </div>
-                )}
             </div>
         </Button.Base>
     );
@@ -120,6 +123,7 @@ function MainPageConfirmedAccount({ credential }: MainPageConfirmedAccountProps)
     const nav = useNavigate();
     const navToSend = () => nav(generatePath(absoluteRoutes.home.sendFunds.path, { account: credential.address }));
     const navToReceive = () => nav(relativeRoutes.home.receive.path);
+    const navToEarn = () => nav(absoluteRoutes.settings.earn.path);
     const navToTransactionLog = () =>
         nav(relativeRoutes.home.transactionLog.path.replace(':account', credential.address));
     const navToTokenDetails = (contractIndex: string) =>
@@ -144,7 +148,8 @@ function MainPageConfirmedAccount({ credential }: MainPageConfirmedAccountProps)
             <div className="main-page-x__action-buttons">
                 <Button.IconTile icon={<Arrow />} label={t('receive')} onClick={navToReceive} className="receive" />
                 <Button.IconTile icon={<Arrow />} label={t('send')} onClick={navToSend} className="send" />
-                <Button.IconTile icon={<FileText />} label={t('transactions')} onClick={navToTransactionLog} />
+                <Button.IconTile icon={<Percent />} label={t('earn')} onClick={navToEarn} />
+                <Button.IconTile icon={<Clock />} label={t('activity')} onClick={navToTransactionLog} />
             </div>
             <div className="main-page-x__tokens">
                 <div className="main-page-x__tokens-list">
@@ -192,7 +197,8 @@ function MainPagePendingAccount() {
             <div className="main-page-x__action-buttons">
                 <Button.IconTile icon={<Arrow />} label={t('receive')} disabled className="receive" />
                 <Button.IconTile icon={<Arrow />} label={t('send')} disabled className="send" />
-                <Button.IconTile icon={<FileText />} label={t('transactions')} disabled />
+                <Button.IconTile icon={<Percent />} label={t('earn')} disabled />
+                <Button.IconTile icon={<Clock />} label={t('activity')} disabled />
             </div>
             <div className="main-page-x__tokens">
                 <div className="main-page-x__tokens-list">

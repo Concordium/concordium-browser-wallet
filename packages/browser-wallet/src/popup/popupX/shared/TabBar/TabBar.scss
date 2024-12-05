@@ -1,0 +1,60 @@
+.tab-bar {
+    background-color: transparent;
+}
+
+.tab-bar-item {
+    position: relative;
+    height: 100%;
+    width: 100%;
+    text-align: center;
+    display: flex;
+    flex-direction: column;
+    justify-content: center;
+    align-items: center;
+    background: $color-transaction-bg;
+    border: 1px solid $color-input-border;
+    padding: unset;
+    border-radius: rem(12px) 0 0 0;
+
+    &:not(:last-of-type) {
+        border-right: unset;
+    }
+
+    &:last-of-type {
+        border-left: unset;
+        border-radius: 0 rem(12px) 0 0;
+    }
+
+    &,
+    &:hover,
+    &:focus {
+        color: $color-white;
+    }
+
+    &::after {
+        display: block;
+        content: '';
+        position: absolute;
+        bottom: rem(-1px);
+        width: 100%;
+        height: rem(1px);
+        background-color: $color-mineral-1;
+        opacity: 0.6;
+        transform: scaleX(0);
+        transition: transition(transform), transition(opacity);
+    }
+
+    &.active::after {
+        opacity: 1;
+        transform: scaleX(1);
+    }
+
+    &:not(.active) {
+        &:focus,
+        &:hover {
+            &::after {
+                transform: scaleX(0.6);
+            }
+        }
+    }
+}

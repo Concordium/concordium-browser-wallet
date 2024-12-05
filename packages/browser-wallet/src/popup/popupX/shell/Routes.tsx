@@ -25,6 +25,9 @@ import PrivateKey from '@popup/popupX/pages/PrivateKey';
 import { RestoreIntro, RestoreResult } from '@popup/popupX/pages/Restore';
 import { MessagePromptHandlersType } from '@popup/shared/utils/message-prompt-handlers';
 import ConnectionRequest from '@popup/popupX/pages/prompts/ConnectionRequest';
+import SignCis3Message from '@popup/popupX/pages/prompts/SignCis3Message';
+import SignMessage from '@popup/popupX/pages/prompts/SignMessage';
+import SendTransaction from '@popup/popupX/pages/prompts/SendTransaction';
 import ExternalRequestLayout from '@popup/popupX/page-layouts/ExternalRequestLayout';
 import { ManageTokenList, AddToken } from '@popup/popupX/pages/ManageTokens';
 import { Nft, NftDetails, NftRaw } from 'src/popup/popupX/pages/Nft';
@@ -53,7 +56,12 @@ import EndIdentityIssuance from '../pages/prompts/EndIdentityIssuance';
 import Web3IdDetails from '../pages/Web3Id/Web3IdDetails';
 
 export default function Routes({ messagePromptHandlers }: { messagePromptHandlers: MessagePromptHandlersType }) {
-    const { handleConnectionResponse } = messagePromptHandlers;
+    const {
+        handleConnectionResponse,
+        handleSignCIS3MessageResponse,
+        handleSignMessageResponse,
+        handleSendTransactionResponse,
+    } = messagePromptHandlers;
     return (
         <ReactRoutes>
             <Route path={routePrefix}>
@@ -206,6 +214,43 @@ export default function Routes({ messagePromptHandlers }: { messagePromptHandler
                             <ConnectionRequest
                                 onAllow={() => handleConnectionResponse(true)}
                                 onReject={() => handleConnectionResponse(false)}
+                            />
+                        }
+                    />
+                    <Route
+                        path={relativeRoutes.prompt.signMessage.path}
+                        element={
+                            <SignMessage
+                                onSubmit={(signature) =>
+                                    handleSignMessageResponse({ success: true, result: signature })
+                                }
+                                onReject={() =>
+                                    handleSignMessageResponse({ success: false, message: 'Signing was rejected' })
+                                }
+                            />
+                        }
+                    />
+                    <Route
+                        path={relativeRoutes.prompt.signCIS3Message.path}
+                        element={
+                            <SignCis3Message
+                                onSubmit={(signature) =>
+                                    handleSignCIS3MessageResponse({ success: true, result: signature })
+                                }
+                                onReject={() =>
+                                    handleSignCIS3MessageResponse({ success: false, message: 'Signing was rejected' })
+                                }
+                            />
+                        }
+                    />
+                    <Route
+                        path={relativeRoutes.prompt.sendTransaction.path}
+                        element={
+                            <SendTransaction
+                                onSubmit={(hash) => handleSendTransactionResponse({ success: true, result: hash })}
+                                onReject={() =>
+                                    handleSendTransactionResponse({ success: false, message: 'Signing was rejected' })
+                                }
                             />
                         }
                     />

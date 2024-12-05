@@ -4,7 +4,7 @@ import Browsers from '@assets/svgX/browsers.svg';
 import TextColumns from '@assets/svgX/text-columns.svg';
 import Password from '@assets/svgX/password.svg';
 import WebId from '@assets/svgX/web-id.svg';
-import Plant from '@assets/svgX/plant.svg';
+import Percent from '@assets/svgX/percent.svg';
 import LinkSimple from '@assets/svgX/link-simple-horizontal.svg';
 import Info from '@assets/svgX/info2.svg';
 import Restore from '@assets/svgX/arrow-counter-clock.svg';
@@ -69,7 +69,7 @@ export default function MenuTiles({ menuOpen, setMenuOpen }: MenuTilesProps) {
                 </Link>
                 <Link to={absoluteRoutes.settings.earn.path}>
                     <IconButton className="main-header__menu-tiles_tile">
-                        <Plant />
+                        <Percent />
                         <Text.Capture>{t('earn')}</Text.Capture>
                     </IconButton>
                 </Link>

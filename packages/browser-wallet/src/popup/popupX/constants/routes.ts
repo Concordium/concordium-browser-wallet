@@ -304,6 +304,15 @@ export const relativeRoutes = {
         endIdentityIssuance: {
             path: 'end-identity-issuance',
         },
+        signCIS3Message: {
+            path: 'signCIS3Message',
+        },
+        signMessage: {
+            path: 'signMessage',
+        },
+        sendTransaction: {
+            path: 'sendTransaction',
+        },
     },
 };
 

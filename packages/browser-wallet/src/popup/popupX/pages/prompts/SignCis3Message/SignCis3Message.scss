@@ -1,0 +1,25 @@
+.sign-cis3-x {
+    .page__main {
+        .text__main {
+            margin-bottom: rem(24px);
+        }
+
+        .text__main,
+        .capture__main_small {
+            color: $color-mineral-2;
+
+            .white {
+                color: $color-white;
+            }
+        }
+
+        .card-x {
+            margin-top: rem(16px);
+            margin-bottom: rem(32px);
+
+            .row.details:has(+ .parameter-x) {
+                border: unset;
+            }
+        }
+    }
+}
