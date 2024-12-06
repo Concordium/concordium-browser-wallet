@@ -13,7 +13,8 @@ import { storedVerifiableCredentialsAtom } from '@popup/store/verifiable-credent
 import { VerifiableCredential } from '@shared/storage/types';
 import { parseCredentialDID } from '@shared/utils/verifiable-credential-helpers';
 import Text from '@popup/popupX/shared/Text';
-import { useVerifiableCredentialExport } from '@popup/pages/VerifiableCredentialBackup/utils';
+
+import { useVerifiableCredentialExport } from './utils';
 
 export default function Web3IdCredentials() {
     const { t } = useTranslation('x', { keyPrefix: 'web3Id.credentials' });
