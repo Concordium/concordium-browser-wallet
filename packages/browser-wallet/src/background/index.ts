@@ -638,3 +638,30 @@ forwardToPopup(
     withPromptEnd,
     (msg) => createMessageTypeFilter(MessageType.Web3IdProof)(msg) && isAgeProof(msg.payload)
 );
+
+// import { walletApi } from '@concordium/browser-wallet-api';
+// We cannot do a simple import in this case
+// It creates circular dependencies that cause errors during build
+// walletApi is build to work in page context, not inside BW
+
+// Alternatively we can create new implementation of class WalletApi
+// For example implementation of connect()
+// Inside can be used bgMessageHandler.sendInternalMessage
+// But BW page with connect prompt, will try to receive 'window.location' of the page from which request was made
+// So now value 'location' should be provided in payload, and corresponding changes made in React component
+// All this leads to more changes across BW, not just only of creation of new WalletApi class
+class WalletApi {
+    public async connect(): Promise<string | undefined> {
+        return Promise.resolve(bgMessageHandler.sendInternalMessage(InternalMessageType.Connect));
+    }
+}
+
+const walletApi = new WalletApi();
+
+chrome.runtime.onMessageExternal.addListener(function (request, sender, sendResponse) {
+    const { payload, target } = request;
+    walletApi[target](...payload).then((response) => {
+        sendResponse(response);
+    });
+    return true;
+});
