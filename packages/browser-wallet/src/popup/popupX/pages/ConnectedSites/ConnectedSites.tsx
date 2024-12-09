@@ -40,7 +40,7 @@ function ConnectedSites({ address }: ConnectedSitesProps) {
             <Card>
                 {connectedAccountSites.map((site) => (
                     <Card.Row key={site.url}>
-                        <Text.MainRegular>{site.url + site.url}</Text.MainRegular>
+                        <Text.MainRegular>{new URL(site.url).host}</Text.MainRegular>
                         <Button.Secondary
                             className="dark"
                             label={t('disconnect')}
