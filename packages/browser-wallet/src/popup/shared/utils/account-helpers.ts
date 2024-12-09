@@ -15,6 +15,10 @@ export function displaySplitAddress(address: string) {
     return `${address.slice(0, 4)}...${address.slice(-4)}`;
 }
 
+export function displaySplitAddressShort(address: string) {
+    return `${address.slice(0, 3)}...${address.slice(-3)}`;
+}
+
 export const displayNameOrSplitAddress = (account: WalletCredential | undefined) => {
     const { credName, address } = account || { address: '' };
     return credName || displaySplitAddress(address);
@@ -22,7 +26,7 @@ export const displayNameOrSplitAddress = (account: WalletCredential | undefined)
 
 export const displayNameAndSplitAddress = (account: WalletCredential | undefined) => {
     const { credName, address } = account || { address: '' };
-    return `${credName ? `${credName} / ` : ''}${address.slice(0, 3)}...${address.slice(-3)}`;
+    return `${credName ? `${credName} / ` : ''}${displaySplitAddressShort(address)}`;
 };
 
 export function useIdentityOf(cred?: WalletCredential) {

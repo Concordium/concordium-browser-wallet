@@ -10,11 +10,12 @@ import {
     RewardType,
     SpecialTransactionType,
 } from '@popup/shared/utils/transaction-history-types';
-import { useTranslation } from 'react-i18next';
+import { useTranslation, TFunction } from 'react-i18next';
 import { useSetAtom } from 'jotai';
 import { addToastAtom } from '@popup/state';
 import { displayAsCcd } from 'wallet-common-helpers';
 import { AccountTransactionType } from '@concordium/web-sdk';
+import { displaySplitAddressShort } from '@popup/shared/utils/account-helpers';
 
 /** The max number of transactions to query per request to the wallet proxy. */
 const transactionResultLimit = 20;
@@ -108,12 +109,17 @@ function useAccountTransactionList(accountAddress: string) {
 }
 
 /** Convert Date object to local string only showing the current date. */
-const onlyDate = Intl.DateTimeFormat(undefined, {
-    dateStyle: 'medium',
-}).format;
+const onlyDate = (date?: number | Date | undefined) =>
+    `${Intl.DateTimeFormat(undefined, {
+        day: '2-digit',
+    }).format(date)} ${Intl.DateTimeFormat(undefined, {
+        month: 'short',
+        year: 'numeric',
+    }).format(date)}`;
 /** Convert Date object to local string only showing the current time. */
 const onlyTime = Intl.DateTimeFormat(undefined, {
-    timeStyle: 'medium',
+    timeStyle: 'short',
+    hour12: false,
 }).format;
 
 /** Check if type is an account transaction which transfers some CCD. */
@@ -143,69 +149,76 @@ function hasAmount(type: AccountTransactionType | RewardType | SpecialTransactio
 /**
  * Maps transaction type to a displayable text string.
  */
-function mapTypeToText(type: AccountTransactionType | RewardType | SpecialTransactionType): string {
+function mapTypeToText(
+    type: AccountTransactionType | RewardType | SpecialTransactionType,
+    t: TFunction<'x', 'transactionLogX'>
+): string {
     switch (type) {
         case AccountTransactionType.DeployModule:
-            return 'Module deployment';
+            return t('deployModule');
         case AccountTransactionType.InitContract:
-            return 'Contract initialization';
+            return t('initContract');
         case AccountTransactionType.Update:
-            return 'Contract update';
+            return t('update');
         case AccountTransactionType.Transfer:
-            return 'Transfer';
+            return t('transfer');
         case AccountTransactionType.AddBaker:
-            return 'Add validator';
+            return t('addBaker');
         case AccountTransactionType.RemoveBaker:
-            return 'Remove validator';
+            return t('removeBaker');
         case AccountTransactionType.UpdateBakerStake:
-            return 'Validator stake update';
+            return t('updateBakerStake');
         case AccountTransactionType.UpdateBakerRestakeEarnings:
-            return 'Validator restake earnings update';
+            return t('updateBakerRestakeEarnings');
         case AccountTransactionType.UpdateBakerKeys:
-            return 'Validator keys update';
+            return t('updateBakerKeys');
         case AccountTransactionType.UpdateCredentialKeys:
-            return 'Account keys update';
+            return t('updateCredentialKeys');
         case RewardType.BakingReward:
-            return 'Baking reward';
+            return t('bakingReward');
         case RewardType.BlockReward:
-            return 'Block reward';
+            return t('blockReward');
         case RewardType.FinalizationReward:
-            return 'Finalization reward';
+            return t('finalizationReward');
         case AccountTransactionType.EncryptedAmountTransfer:
-            return 'Shielded transfer';
+            return t('encryptedAmountTransfer');
         case AccountTransactionType.TransferToEncrypted:
-            return 'Shielded amount';
+            return t('transferToEncrypted');
         case AccountTransactionType.TransferToPublic:
-            return 'Unshielded amount';
+            return t('transferToPublic');
         case AccountTransactionType.TransferWithSchedule:
-            return 'Scheduled transfer';
+            return t('transferWithSchedule');
         case AccountTransactionType.UpdateCredentials:
-            return 'Credentials update';
+            return t('updateCredentials');
         case AccountTransactionType.RegisterData:
-            return 'Data registration';
+            return t('registerData');
         case AccountTransactionType.TransferWithMemo:
-            return 'Transfer';
+            return t('transferWithMemo');
         case AccountTransactionType.EncryptedAmountTransferWithMemo:
-            return 'Shielded transfer';
+            return t('encryptedAmountTransferWithMemo');
         case AccountTransactionType.TransferWithScheduleAndMemo:
-            return 'Scheduled transfer';
+            return t('transferWithScheduleAndMemo');
         case AccountTransactionType.ConfigureBaker:
-            return 'Configure validator';
+            return t('configureBaker');
         case AccountTransactionType.ConfigureDelegation:
-            return 'Configure delegation';
+            return t('configureDelegation');
         case RewardType.StakingReward:
-            return 'Reward payout';
+            return t('stakingReward');
         case SpecialTransactionType.Malformed:
-            return 'Malformed';
+            return t('malformed');
         default:
-            return 'Unknown';
+            return t('unknown');
     }
 }
 
 /** Convert transactions fetched from the wallet proxy into data format expected by the view.
 Assumes 'transactions' are sorted by time in descending order.
  */
-function convertToLogEntry(accountAddress: string, transactions: BrowserWalletTransaction[]): DayLogEntry[] {
+function convertToLogEntry(
+    accountAddress: string,
+    transactions: BrowserWalletTransaction[],
+    t: TFunction<'x', 'transactionLogX'>
+): DayLogEntry[] {
     const dayLogs = [];
     let dayLog: DayLogEntry | undefined;
     for (const tx of transactions) {
@@ -214,15 +227,16 @@ function convertToLogEntry(accountAddress: string, transactions: BrowserWalletTr
         const transactionLog: TransactionLogEntry = {
             date,
             hash: tx.transactionHash,
-            type: mapTypeToText(tx.type),
+            type: mapTypeToText(tx.type, t),
             income: tx.fromAddress !== accountAddress,
-            amount: hasAmount(tx.type) ? displayAsCcd(tx.amount) : undefined,
+            amount: hasAmount(tx.type) ? displayAsCcd(tx.amount, false, true) : undefined,
             time: onlyTime(dateTime),
-            info: tx.cost === undefined ? '' : `with fee ${displayAsCcd(tx.cost)}`,
+            info: (tx.cost !== undefined && t('withFee', { value: displayAsCcd(tx.cost, false, true) })) || '',
             note: tx.memo,
             block: tx.blockHash,
             events: tx.events ?? [],
             fromAddress: tx.fromAddress,
+            fromAddressShort: tx.fromAddress && t('from', { value: displaySplitAddressShort(tx.fromAddress) }),
             toAddress: tx.toAddress,
         };
         if (dayLog === undefined || dayLog.date !== date) {
@@ -263,6 +277,8 @@ export type TransactionLogEntry = {
     events: string[];
     /** Account address which sent the transaction. */
     fromAddress?: string;
+    /** Account address which sent the transaction short display. */
+    fromAddressShort?: string;
     /** Account address which received funds. */
     toAddress?: string;
 };
@@ -287,11 +303,12 @@ type TransactionLogProps = { account: string };
 
 function TransactionLog({ account }: TransactionLogProps) {
     const nav = useNavigate();
+    const { t } = useTranslation('x', { keyPrefix: 'transactionLogX' });
 
     const navToTransactionDetails = (transaction: TransactionLogEntry) =>
         nav(relativeRoutes.home.transactionLog.details.path, { state: { transaction } });
     const transactionList = useAccountTransactionList(account);
-    const transactionLogs = useMemo(() => convertToLogEntry(account, transactionList), [transactionList]);
+    const transactionLogs = useMemo(() => convertToLogEntry(account, transactionList, t), [transactionList]);
 
     return (
         <Page className="transaction-log">
@@ -319,7 +336,7 @@ function TransactionLog({ account }: TransactionLogProps) {
                                     </div>
                                     <div className="transaction info">
                                         <Text.Capture>{transaction.time}</Text.Capture>
-                                        <Text.Capture>{transaction.info}</Text.Capture>
+                                        <Text.Capture>{transaction.info || transaction.fromAddressShort}</Text.Capture>
                                     </div>
                                     {transaction.note && (
                                         <div className="transaction note">

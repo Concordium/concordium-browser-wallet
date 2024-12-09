@@ -1,5 +1,10 @@
 .transaction-log {
     &__history {
+        .capture__additional_small,
+        .capture__main_small {
+            color: rgba($color-mineral-3, 0.5);
+        }
+
         &_day {
             margin-top: rem(20px);
 
