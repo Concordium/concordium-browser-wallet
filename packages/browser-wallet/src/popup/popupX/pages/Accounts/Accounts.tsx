@@ -1,7 +1,6 @@
-import React, { useCallback } from 'react';
+import React, { useCallback, useMemo, useState } from 'react';
 import Plus from '@assets/svgX/plus.svg';
 import Arrows from '@assets/svgX/arrows-down-up.svg';
-import MagnifyingGlass from '@assets/svgX/magnifying-glass.svg';
 import Pencil from '@assets/svgX/pencil-simple.svg';
 import Checkmark from '@assets/svgX/checkmark.svg';
 import Close from '@assets/svgX/close.svg';
@@ -22,6 +21,20 @@ import { displaySplitAddress, useIdentityName, useWritableSelectedAccount } from
 import { useAccountInfo } from '@popup/shared/AccountInfoListenerContext';
 import { displayAsCcd } from 'wallet-common-helpers';
 import useEditableValue from '@popup/popupX/shared/EditableValue';
+
+function compareAsc(left: WalletCredential, right: WalletCredential): number {
+    if (left.credName === '' && right.credName !== '') {
+        return 1;
+    }
+    if (right.credName === '' && left.credName !== '') {
+        return -1;
+    }
+    return left.credName.localeCompare(right.credName) || left.address.localeCompare(right.address);
+}
+
+function compareDesc(left: WalletCredential, right: WalletCredential): number {
+    return compareAsc(right, left);
+}
 
 type AccountListItemProps = {
     credential: WalletCredential;
@@ -111,18 +124,20 @@ function AccountListItem({ credential }: AccountListItemProps) {
 
 export default function Accounts() {
     const { t } = useTranslation('x', { keyPrefix: 'accounts' });
+    const [ascSort, setAscSort] = useState(true);
     const accounts = useAtomValue(credentialsAtom);
     const nav = useNavigate();
     const navToCreateAccount = useCallback(() => nav(absoluteRoutes.settings.createAccount.path), []);
+    const sorted = useMemo(() => accounts.sort(ascSort ? compareAsc : compareDesc), [accounts, ascSort]);
+
     return (
         <Page className="accounts-x">
             <Page.Top heading={t('accounts')}>
-                <Button.Icon icon={<Arrows />} />
-                <Button.Icon icon={<MagnifyingGlass />} />
+                <Button.Icon icon={<Arrows />} onClick={() => setAscSort((a) => !a)} />
                 <Button.Icon icon={<Plus />} onClick={navToCreateAccount} />
             </Page.Top>
             <Page.Main>
-                {accounts.map((item) => (
+                {sorted.map((item) => (
                     <AccountListItem credential={item} key={item.address} />
                 ))}
             </Page.Main>
