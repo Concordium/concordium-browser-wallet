@@ -79,6 +79,10 @@
                         width: 100%;
                         justify-content: flex-end;
                         align-items: center;
+
+                        .capture__main_small {
+                            color: rgba($color-mineral-3, 0.5);
+                        }
                     }
 
                     .label__main {
