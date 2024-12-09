@@ -14,5 +14,6 @@ RUN yarn && yarn cache clean
 RUN yarn build
 
 FROM nginx
+LABEL build_image="${build_image}"
 COPY --from=build ./app/dist ./usr/share/nginx/html
 COPY ./nginx.conf /etc/nginx/conf.d/default.conf
