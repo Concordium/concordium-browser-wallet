@@ -26,6 +26,6 @@ export default {
 type Story = StoryObj<typeof FileInput>;
 export const Main: Story = {
     args: {
-        buttonTitle: 'This is the button title',
+        placeholder: 'This is the placeholder',
     },
 };

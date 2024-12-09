@@ -1,5 +1,9 @@
 import clsx from 'clsx';
 import React, { forwardRef, InputHTMLAttributes, useImperativeHandle, useMemo, useRef, useState } from 'react';
+import { useTranslation } from 'react-i18next';
+
+import FolderIcon from '@assets/svgX/folder-open.svg';
+import FileIcon from '@assets/svgX/file.svg';
 import ErrorMessage from '../ErrorMessage';
 import Button from '../../Button';
 
@@ -11,13 +15,13 @@ export type FileInputValue = FileList | null;
 
 export type FileInputProps = Pick<
     InputHTMLAttributes<HTMLInputElement>,
-    'accept' | 'multiple' | 'placeholder' | 'disabled' | 'className'
+    'accept' | 'multiple' | 'disabled' | 'className'
 > & {
-    buttonTitle: string;
     value: FileInputValue;
     disableFileNames?: boolean;
     onChange(files: FileInputValue): void;
     valid: boolean;
+    placeholder: string;
     error?: string;
 };
 
@@ -30,13 +34,13 @@ export type FileInputProps = Pick<
  */
 export const FileInput = forwardRef<FileInputRef, FileInputProps>(
     (
-        { value, onChange, valid, error, placeholder, className, buttonTitle, disableFileNames = false, ...inputProps },
+        { value, onChange, valid, error, placeholder, className, disableFileNames = false, ...inputProps },
         ref
     ): JSX.Element => {
+        const { t } = useTranslation('x', { keyPrefix: 'sharedX.form.fileInput' });
         const inputRef = useRef<HTMLInputElement>(null);
         const [dragOver, setDragOver] = useState<boolean>(false);
         const files = useMemo(() => new Array(value?.length ?? 0).fill(0).map((_, i) => value?.item(i)), [value]);
-
         const { disabled } = inputProps;
 
         useImperativeHandle(ref, () => ({
@@ -50,34 +54,38 @@ export const FileInput = forwardRef<FileInputRef, FileInputProps>(
         return (
             <label
                 className={clsx(
-                    'form-file-input__root',
-                    !valid && 'form-file-input__invalid',
-                    disabled && 'form-file-input__disabled',
-                    dragOver && 'form-file-input__hovering',
+                    'form-file-input-x',
+                    !valid && 'form-file-input-x--invalid',
+                    disabled && 'form-file-input-x--disabled',
+                    dragOver && 'form-file-input-x--hovering',
                     className
                 )}
                 onDragOver={() => setDragOver(true)}
                 onDragLeave={() => setDragOver(false)}
             >
-                <div className="form-file-input__wrapper">
+                <div className="form-file-input-x__wrapper">
+                    <FileIcon className="m-b-20" />
                     {files.length === 0 || disableFileNames
-                        ? placeholder && <div className="form-file-input__empty">{placeholder}</div>
+                        ? placeholder && <div className="form-file-input-x__empty">{placeholder}</div>
                         : files.map((f, i) => (
                               // eslint-disable-next-line react/no-array-index-key
-                              <div key={i} className="form-file-input__fileName">
+                              <div key={i} className="form-file-input-x__filename">
                                   {f?.name}
                               </div>
                           ))}
-                    <Button.Text className="form-file-input__button" disabled={disabled} label={buttonTitle} />
-                    <input
-                        className="form-file-input__input"
-                        type="file"
-                        onChange={(e) => onChange(e.target.files)}
-                        ref={inputRef}
-                        {...inputProps}
-                    />
                 </div>
-                <ErrorMessage>{error}</ErrorMessage>
+                <ErrorMessage className="m-t-10">{error}</ErrorMessage>
+                <div className="form-file-input-x__button">
+                    <FolderIcon />
+                    {t('selectButton')}
+                </div>
+                <input
+                    className="form-file-input-x__input"
+                    type="file"
+                    onChange={(e) => onChange(e.target.files)}
+                    ref={inputRef}
+                    {...inputProps}
+                />
             </label>
         );
     }
