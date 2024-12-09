@@ -20,6 +20,7 @@ import Clock from '@assets/svgX/clock.svg';
 import ConcordiumLogo from '@assets/svgX/concordium-logo.svg';
 import Percent from '@assets/svgX/percent.svg';
 import Gear from '@assets/svgX/gear.svg';
+import Dot from '@assets/svgX/dot.svg';
 import { formatTokenAmount } from '@popup/popupX/shared/utils/helpers';
 
 /** Hook loading every fungible token added to the account. */
@@ -194,8 +195,13 @@ function MainPagePendingAccount() {
     return (
         <Page className="main-page-x">
             <div className="main-page-x__balance">
-                <Text.HeadingLarge>{t('pendingAccount')}</Text.HeadingLarge>
-                <Text.Capture>{t('pendingSubText')}</Text.Capture>
+                <Text.DynamicSize baseFontSize={55} baseTextLength={10} className="heading_large">
+                    0.00 CCD
+                </Text.DynamicSize>
+            </div>
+            <div className="main-page-x__pending">
+                <Text.Main>{t('pendingSubText')}</Text.Main>
+                <Dot />
             </div>
             <div className="main-page-x__action-buttons">
                 <Button.IconTile icon={<Arrow />} label={t('receive')} disabled className="receive" />

@@ -1,3 +1,17 @@
+@keyframes pulsate {
+    from {
+        opacity: 1;
+    }
+
+    50% {
+        opacity: 0;
+    }
+
+    to {
+        opacity: 1;
+    }
+}
+
 .main-page-x {
     &.page-container {
         height: 100%;
@@ -11,6 +25,30 @@
 
         .heading_large {
             font-family: $t-font-family-ibm;
+        }
+    }
+
+    &__pending {
+        display: flex;
+        align-items: center;
+        padding: rem(12px) rem(16px);
+        margin: rem(26px) 0 rem(10px) 0;
+        border-radius: rem(12px);
+        background-color: $color-transaction-bg;
+
+        .text__main {
+            color: $color-orange-info;
+        }
+
+        svg {
+            margin-left: auto;
+            height: rem(11px);
+            width: rem(11px);
+            animation: pulsate 4s linear infinite;
+
+            circle {
+                fill: $color-orange-info;
+            }
         }
     }
 
