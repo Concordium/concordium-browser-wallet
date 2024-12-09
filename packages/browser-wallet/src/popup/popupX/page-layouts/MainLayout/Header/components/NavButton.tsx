@@ -2,6 +2,7 @@ import React from 'react';
 import { useNavigate } from 'react-router-dom';
 import ArrowsLeft from '@assets/svgX/arrow-left.svg';
 import clsx from 'clsx';
+import Button from '@popup/popupX/shared/Button';
 
 type NavButtonProps = {
     hideBackArrow: boolean;
@@ -13,7 +14,7 @@ export default function NavButton({ hideBackArrow, backTitle = 'to Main page' }:
     if (hideBackArrow) return null;
     return (
         <div className={clsx('header__nav', hideBackArrow && 'hidden')}>
-            <button
+            <Button.Base
                 type="button"
                 className="header__nav_button"
                 onClick={() => {
@@ -22,7 +23,7 @@ export default function NavButton({ hideBackArrow, backTitle = 'to Main page' }:
             >
                 <ArrowsLeft />
                 <span className="text__main_medium">{backTitle}</span>
-            </button>
+            </Button.Base>
         </div>
     );
 }

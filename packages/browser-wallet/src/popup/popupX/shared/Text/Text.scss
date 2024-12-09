@@ -8,6 +8,10 @@
 .external-link {
     text-decoration: underline;
 
+    &:focus-visible {
+        outline: 1px solid $color-white;
+    }
+
     &,
     &:hover,
     &:visited,

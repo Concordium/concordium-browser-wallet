@@ -34,31 +34,41 @@ export default function About() {
                     <Card.Row>
                         <Text.MainMedium>{t('documentation')}</Text.MainMedium>
                         <Text.ExternalLink path={urls.documentationWebsite}>
-                            <Button.Icon className="transparent" icon={<ArrowSquare />} />
+                            <Button.Base as="span" className="button__icon transparent">
+                                <ArrowSquare />
+                            </Button.Base>
                         </Text.ExternalLink>
                     </Card.Row>
                     <Card.Row>
                         <Text.MainMedium>{t('forum')}</Text.MainMedium>
                         <Text.ExternalLink path={urls.supportWebsite}>
-                            <Button.Icon className="transparent" icon={<ArrowSquare />} />
+                            <Button.Base as="span" className="button__icon transparent">
+                                <ArrowSquare />
+                            </Button.Base>
                         </Text.ExternalLink>
                     </Card.Row>
                     <Card.Row>
                         <Text.MainMedium>{t('website')}</Text.MainMedium>
                         <Text.ExternalLink path={urls.website}>
-                            <Button.Icon className="transparent" icon={<ArrowSquare />} />
+                            <Button.Base as="span" className="button__icon transparent">
+                                <ArrowSquare />
+                            </Button.Base>
                         </Text.ExternalLink>
                     </Card.Row>
                     <Card.Row>
                         <Text.MainMedium>{t('termsAndConditions')}</Text.MainMedium>
                         <Text.ExternalLink path={termsUrl}>
-                            <Button.Icon className="transparent" icon={<ArrowSquare />} />
+                            <Button.Base as="span" className="button__icon transparent">
+                                <ArrowSquare />
+                            </Button.Base>
                         </Text.ExternalLink>
                     </Card.Row>
                     <Card.Row>
                         <Text.MainMedium>{t('licence')}</Text.MainMedium>
                         <Text.ExternalLink path={urls.licenseAttributions}>
-                            <Button.Icon className="transparent" icon={<ArrowSquare />} />
+                            <Button.Base as="span" className="button__icon transparent">
+                                <ArrowSquare />
+                            </Button.Base>
                         </Text.ExternalLink>
                     </Card.Row>
                 </Card>
