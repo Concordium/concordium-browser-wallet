@@ -15,7 +15,7 @@ const t = {
     accountSelector: {
         sortAsc: 'Sort A-Z',
         sortDesc: 'Sort Z-A',
-        searchBy: 'Search by name or address',
+        searchBy: 'Search by name',
     },
     connection: {
         siteNotConnected: 'No website connected',

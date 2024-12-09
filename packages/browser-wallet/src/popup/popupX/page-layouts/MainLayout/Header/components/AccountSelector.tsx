@@ -1,25 +1,48 @@
 import React, { ChangeEvent, useMemo, useState } from 'react';
 import CarretRight from '@assets/svgX/caret-right.svg';
 import ArrowsUpDown from '@assets/svgX/arrows-down-up.svg';
+import Percent from '@assets/svgX/percent.svg';
+import Copy from '@assets/svgX/copy.svg';
+import ConcordiumLogo from '@assets/svgX/concordium-logo.svg';
 import { Search } from '@popup/popupX/shared/Form/Search';
 import Button from '@popup/popupX/shared/Button';
 import { useAtom, useAtomValue } from 'jotai';
 import { credentialsAtomWithLoading, selectedAccountAtom } from '@popup/store/account';
-import { displayNameAndSplitAddress } from '@popup/shared/utils/account-helpers';
+import { displayNameOrSplitAddress } from '@popup/shared/utils/account-helpers';
 import { useAccountInfo } from '@popup/shared/AccountInfoListenerContext';
-import { displayAsCcd } from 'wallet-common-helpers';
+import { getPublicAccountAmounts, microCcdToCcd } from 'wallet-common-helpers';
 import { WalletCredential } from '@shared/storage/types';
 import { useTranslation } from 'react-i18next';
 import clsx from 'clsx';
-import { tokensAtom } from '@popup/store/token';
-import Img from '@popup/shared/Img';
+import Text from '@popup/popupX/shared/Text';
+import { AccountInfoType } from '@concordium/web-sdk';
+import { copyToClipboard } from '@popup/popupX/shared/utils/helpers';
+
+function shortNumber(number: number | string): string {
+    return number.toLocaleString('en-US', {
+        maximumFractionDigits: 1,
+        notation: 'compact',
+        compactDisplay: 'short',
+    });
+}
 
 function CcdBalance({ credential }: { credential: WalletCredential }) {
     const accountInfo = useAccountInfo(credential);
-    const balance =
-        accountInfo === undefined ? '' : displayAsCcd(accountInfo.accountAmount.microCcdAmount, false, true);
-    // eslint-disable-next-line react/jsx-no-useless-fragment
-    return <>{balance}</>;
+    const { total, staked } = getPublicAccountAmounts(accountInfo);
+    const accountTotal = Number(microCcdToCcd(total));
+    const accountStaked = Number(microCcdToCcd(staked));
+
+    return (
+        <>
+            {shortNumber(accountTotal)}
+            <ConcordiumLogo />
+            {!!accountStaked && (
+                <>
+                    {` \u00B7 `} {shortNumber(accountStaked)} <ConcordiumLogo />
+                </>
+            )}
+        </>
+    );
 }
 
 type Props = { showAccountSelector: boolean; onUpdateSelectedAccount: () => void };
@@ -38,6 +61,18 @@ function compareDesc(left: WalletCredential, right: WalletCredential): number {
     return compareAsc(right, left);
 }
 
+function Earning({ credential }: { credential: WalletCredential }) {
+    const accountInfo = useAccountInfo(credential);
+    const isEarning =
+        accountInfo === undefined
+            ? false
+            : [AccountInfoType.Delegator, AccountInfoType.Baker].includes(accountInfo?.type);
+    if (isEarning) {
+        return <Percent />;
+    }
+    return null;
+}
+
 export default function AccountSelector({ showAccountSelector, onUpdateSelectedAccount }: Props) {
     const { t } = useTranslation('x', { keyPrefix: 'header.accountSelector' });
     const credentialsLoading = useAtomValue(credentialsAtomWithLoading);
@@ -45,7 +80,6 @@ export default function AccountSelector({ showAccountSelector, onUpdateSelectedA
     const [search, setSearch] = useState('');
     const [ascSort, setAscSort] = useState(true);
     const credentials = credentialsLoading.value ?? [];
-    const tokens = useAtomValue(tokensAtom);
     const filtered = useMemo(
         () =>
             credentials.filter(
@@ -59,6 +93,11 @@ export default function AccountSelector({ showAccountSelector, onUpdateSelectedA
     const onAccountClick = (address: string) => () => {
         setSelectedAccount(address);
         onUpdateSelectedAccount();
+    };
+
+    const copyAddress = (event: React.MouseEvent<HTMLButtonElement, MouseEvent>, address: string) => {
+        event.stopPropagation();
+        copyToClipboard(address);
     };
 
     if (!showAccountSelector) return null;
@@ -81,6 +120,7 @@ export default function AccountSelector({ showAccountSelector, onUpdateSelectedA
                 <div className="main-header__account-selector_list">
                     {sorted.map((credential) => (
                         <Button.Base
+                            key={credential.credId}
                             className={clsx('main-header__account-selector_list-item', {
                                 active: credential.address === selectedAccount,
                             })}
@@ -88,30 +128,24 @@ export default function AccountSelector({ showAccountSelector, onUpdateSelectedA
                         >
                             <div className="account">
                                 {credential.address === selectedAccount && <CarretRight />}
-                                <span className="text__additional_small">{displayNameAndSplitAddress(credential)}</span>
+                                <Text.AdditionalSmall>{displayNameOrSplitAddress(credential)}</Text.AdditionalSmall>
                             </div>
                             <div className="balance">
-                                <span className="text__additional_small">
+                                <Text.AdditionalSmall>
                                     <CcdBalance credential={credential} />
-                                </span>
+                                </Text.AdditionalSmall>
                             </div>
-                            <div className="tokens">
-                                {tokens.loading ||
-                                    Object.values(tokens.value[credential.address]).flatMap((contractTokens) =>
-                                        contractTokens.flatMap((token) =>
-                                            token.metadata.thumbnail?.url === undefined
-                                                ? []
-                                                : [
-                                                      <div className="token-icon">
-                                                          <Img
-                                                              src={token.metadata.thumbnail.url}
-                                                              alt={token.metadata.symbol ?? '?'}
-                                                              withDefaults
-                                                          />
-                                                      </div>,
-                                                  ]
-                                        )
-                                    )}
+                            <div className="earning">
+                                <Earning credential={credential} />
+                            </div>
+                            <div className="copy">
+                                <Button.Base
+                                    as="span"
+                                    className="transparent button__icon"
+                                    onClick={(event) => copyAddress(event, credential.address)}
+                                >
+                                    <Copy />
+                                </Button.Base>
                             </div>
                         </Button.Base>
                     ))}

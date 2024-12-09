@@ -14,7 +14,7 @@ export async function copyToClipboard(text: string): Promise<void> {
 export const removeNumberGrouping = (amount: string) => amount.replace(/,/g, '');
 
 /** Display a token amount with a number of decimals + number groupings (thousand separators) */
-export function formatTokenAmount(amount: bigint, decimals = 0, minDecimals = 2, maxDecimals = 0) {
+export function formatTokenAmount(amount: bigint, decimals = 0, minDecimals = 2, maxDecimals = -1) {
     const padded = amount.toString().padStart(decimals + 1, '0'); // Ensure the string length is minimum decimals + 1 characters. For CCD, this would mean minimum 7 characters long
     if (decimals === 0) {
         return amount.toString();
@@ -24,7 +24,7 @@ export function formatTokenAmount(amount: bigint, decimals = 0, minDecimals = 2,
     const fraction = padded.slice(-decimals);
     const balanceFormatter = new Intl.NumberFormat('en-US', {
         minimumFractionDigits: minDecimals,
-        maximumFractionDigits: maxDecimals || decimals,
+        maximumFractionDigits: maxDecimals > -1 ? maxDecimals : decimals,
         useGrouping: true,
     });
     // eslint-disable-next-line @typescript-eslint/ban-ts-comment

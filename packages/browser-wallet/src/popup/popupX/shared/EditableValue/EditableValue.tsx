@@ -30,7 +30,7 @@ export default function useEditableValue(current: string, fallback: string, onNe
         <input
             className="editable-value-x"
             autoFocus
-            maxLength={25}
+            maxLength={16}
             value={edited}
             placeholder={fallback}
             onChange={onInputChange}

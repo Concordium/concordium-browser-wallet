@@ -28,6 +28,9 @@ function TextMainRegular({ children }: { children: ReactNode }) {
 function TextMainMedium({ children }: { children: ReactNode }) {
     return <span className="text__main_medium">{children}</span>;
 }
+function TextAdditionalSmall({ children }: { children: ReactNode }) {
+    return <span className="text__additional_small">{children}</span>;
+}
 
 function TextCaptureMainSmall({ className, children }: { className?: string; children: ReactNode }) {
     return <span className={clsx('capture__main_small', className)}>{children}</span>;
@@ -91,6 +94,7 @@ const Text = TextRoot as typeof TextRoot & {
     Main: typeof TextMain;
     MainRegular: typeof TextMainRegular;
     MainMedium: typeof TextMainMedium;
+    AdditionalSmall: typeof TextAdditionalSmall;
     Capture: typeof TextCaptureMainSmall;
     CaptureAdditional: typeof TextCaptureAdditionalSmall;
     Label: typeof TextLabelMain;
@@ -104,6 +108,7 @@ Text.Heading = TextHeading;
 Text.Main = TextMain;
 Text.MainRegular = TextMainRegular;
 Text.MainMedium = TextMainMedium;
+Text.AdditionalSmall = TextAdditionalSmall;
 Text.Capture = TextCaptureMainSmall;
 Text.CaptureAdditional = TextCaptureAdditionalSmall;
 Text.Label = TextLabelMain;

@@ -180,6 +180,7 @@
         &_group {
             display: flex;
             flex-direction: column;
+            max-height: rem(450px);
             margin: rem(16px) rem(8px);
             padding: rem(16px);
             border-radius: rem(12px);
@@ -191,19 +192,33 @@
             display: flex;
 
             .form-search {
+                width: 100%;
+
                 .form-input__field {
                     height: rem(32px);
                     padding: rem(10px);
-                    padding-left: rem(34px);
+                    padding-left: rem(32px);
                     border-radius: rem(12px);
                     border-color: $color-grey-3;
                     background-color: unset;
+
+                    &::placeholder {
+                        font-family: $t-font-family-satoshi;
+                        font-weight: $t-font-weight-medium;
+                        font-size: 12px;
+                        line-height: 16px;
+                        color: $color-grey-4;
+                    }
                 }
 
                 svg {
                     position: absolute;
                     top: rem(8px);
                     left: rem(8px);
+
+                    path {
+                        fill: $color-grey-4;
+                    }
                 }
             }
 
@@ -214,7 +229,7 @@
                 margin-left: rem(8px);
                 border-radius: rem(12px);
                 text-wrap: nowrap;
-                background-color: $color-main-bg;
+                background-color: $color-grey-2;
 
                 &:hover {
                     opacity: 1;
@@ -233,6 +248,12 @@
         &_list {
             display: flex;
             flex-direction: column;
+            overflow: auto;
+            margin-top: rem(8px);
+
+            &::-webkit-scrollbar {
+                display: none;
+            }
 
             &-item {
                 display: flex;
@@ -258,16 +279,14 @@
 
                         svg {
                             display: unset;
-                            position: absolute;
-                            left: rem(12px);
                         }
                     }
                 }
 
                 .account {
-                    flex: 1;
                     display: flex;
                     align-items: center;
+                    min-width: rem(150px);
 
                     .text__additional_small {
                         text-align: left;
@@ -280,10 +299,42 @@
                 }
 
                 .balance {
-                    min-width: rem(65px);
+                    display: flex;
+                    align-items: center;
+                    width: rem(110px);
+
+                    svg {
+                        height: rem(10px);
+                        width: rem(10px);
+                        margin-left: rem(4px);
+
+                        path {
+                            fill: $color-white;
+                        }
+                    }
+                }
+
+                .earning {
+                    height: rem(16px);
+                    width: rem(16px);
+                    margin-left: auto;
+
+                    svg {
+                        height: rem(16px);
+                        width: rem(16px);
+
+                        path {
+                            fill: $color-white;
+                        }
+                    }
+                }
+
+                .copy {
+                    margin-left: auto;
                 }
 
                 .tokens {
+                    flex: 1;
                     display: flex;
                     gap: rem(1px);
                     width: unset;
