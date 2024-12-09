@@ -20,6 +20,10 @@ const t = {
     connection: {
         siteNotConnected: 'No website connected',
         waiting: 'Waiting',
+        tooltip: {
+            title: 'Connect dApps',
+            text: 'You can connect you wallet to a\ndApp. An active connection will be\nshown here.',
+        },
     },
 };
 

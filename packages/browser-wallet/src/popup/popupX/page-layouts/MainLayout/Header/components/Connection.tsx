@@ -10,6 +10,7 @@ import clsx from 'clsx';
 import { Location, useLocation } from 'react-router-dom';
 import { relativeRoutes } from '@popup/popupX/constants/routes';
 import Text from '@popup/popupX/shared/Text';
+import Tooltip from '@popup/popupX/shared/Tooltip';
 
 type Props = {
     hideConnection?: boolean;
@@ -57,7 +58,9 @@ export default function Connection({ hideConnection }: Props) {
                     <Dot />
                     <Text.Capture>{connectionText}</Text.Capture>
                 </span>
-                <Info />
+                <Tooltip position="top" title={t('tooltip.title')} text={t('tooltip.text')} className="info-icon">
+                    <Info />
+                </Tooltip>
             </div>
         </div>
     );

@@ -91,6 +91,22 @@
                 background: unset;
             }
 
+            .info-icon {
+                margin-top: rem(1px);
+                cursor: pointer;
+
+                .tooltip-x_text.top {
+                    top: rem(24px);
+                    left: rem(-187px);
+                    text-wrap: auto;
+                    width: rem(205px);
+
+                    &::after {
+                        left: 91%;
+                    }
+                }
+            }
+
             & .connection_status {
                 display: flex;
                 align-items: center;

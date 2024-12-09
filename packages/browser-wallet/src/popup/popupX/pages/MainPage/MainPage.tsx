@@ -11,6 +11,7 @@ import { useFlattenedAccountTokens } from '@popup/pages/Account/Tokens/utils';
 import { getMetadataUnique } from '@shared/utils/token-helpers';
 import { contractBalancesFamily } from '@popup/store/token';
 import { useBlockChainParameters } from '@popup/shared/BlockChainParametersProvider';
+import { formatTokenAmount } from '@popup/popupX/shared/utils/helpers';
 import Page from '@popup/popupX/shared/Page';
 import Text from '@popup/popupX/shared/Text';
 import Button from '@popup/popupX/shared/Button';
@@ -21,7 +22,8 @@ import ConcordiumLogo from '@assets/svgX/concordium-logo.svg';
 import Percent from '@assets/svgX/percent.svg';
 import Gear from '@assets/svgX/gear.svg';
 import Dot from '@assets/svgX/dot.svg';
-import { formatTokenAmount } from '@popup/popupX/shared/utils/helpers';
+import Info from '@assets/svgX/info.svg';
+import Tooltip from '@popup/popupX/shared/Tooltip';
 
 /** Hook loading every fungible token added to the account. */
 function useAccountFungibleTokens(account: WalletCredential) {
@@ -75,9 +77,14 @@ function Balance({ credential }: { credential: WalletCredential }) {
 
     return (
         <div className="main-page-x__balance">
-            <Text.DynamicSize baseFontSize={55} baseTextLength={10} className="heading_large">
-                {ccdBalance} CCD
-            </Text.DynamicSize>
+            <div className="main-page-x__balance_info">
+                <Text.DynamicSize baseFontSize={55} baseTextLength={10} className="heading_large">
+                    {ccdBalance} CCD
+                </Text.DynamicSize>
+                <Tooltip position="top" title={t('tooltip.title')} text={t('tooltip.text')} className="info-icon">
+                    <Info />
+                </Tooltip>
+            </div>
             <Text.Capture>
                 {ccdAvailableBalance} {t('atDisposal')}
             </Text.Capture>
