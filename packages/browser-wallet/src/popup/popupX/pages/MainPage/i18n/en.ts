@@ -6,7 +6,7 @@ const t = {
     manageTokenList: 'Manage token list',
     pendingAccount: 'Creating account',
     pendingSubText: 'Ready within a few minutes',
-    atDisposal: 'at disposal',
+    atDisposal: 'CCD at disposal',
 };
 
 export default t;

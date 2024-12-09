@@ -2,7 +2,6 @@ import React, { ReactNode, useMemo } from 'react';
 import { generatePath, useNavigate } from 'react-router-dom';
 import { useTranslation } from 'react-i18next';
 import { useAtomValue } from 'jotai';
-import { displayAsCcd } from 'wallet-common-helpers';
 import { AccountInfoType, Ratio } from '@concordium/web-sdk';
 import { absoluteRoutes, relativeRoutes } from '@popup/popupX/constants/routes';
 import Img from '@popup/shared/Img';
@@ -39,7 +38,7 @@ type TokenBalanceProps = { decimals?: number; tokenId: string; contractAddress: 
 /** Component for fetching and displaying a CIS-2 token balance of an account. */
 function AccountTokenBalance({ decimals, tokenId, contractAddress, accountAddress }: TokenBalanceProps) {
     const balanceRaw = useAccountTokenBalance(accountAddress, contractAddress, tokenId) ?? 0n;
-    const balance = useMemo(() => formatTokenAmount(balanceRaw, decimals), [balanceRaw]);
+    const balance = useMemo(() => formatTokenAmount(balanceRaw, decimals, 2, 2), [balanceRaw]);
     return <span>{balance}</span>;
 }
 
@@ -58,6 +57,10 @@ function displayCcdAsEur(microCcdPerEur: Ratio, microCcd: bigint, decimals: numb
     return eurFormatter.format(eur);
 }
 
+function mainPageCcdDisplay(microCcdAmount: bigint) {
+    return formatTokenAmount(microCcdAmount, 6, 2, 2);
+}
+
 function Balance({ credential }: { credential: WalletCredential }) {
     const { t } = useTranslation('x', { keyPrefix: 'mainPage' });
     const accountInfo = useAccountInfo(credential);
@@ -66,13 +69,13 @@ function Balance({ credential }: { credential: WalletCredential }) {
         return null;
     }
 
-    const ccdBalance = displayAsCcd(accountInfo.accountAmount.microCcdAmount, false, true);
-    const ccdAvailableBalance = displayAsCcd(accountInfo.accountAvailableBalance.microCcdAmount, false, true);
+    const ccdBalance = mainPageCcdDisplay(accountInfo.accountAmount.microCcdAmount);
+    const ccdAvailableBalance = mainPageCcdDisplay(accountInfo.accountAvailableBalance.microCcdAmount);
 
     return (
         <div className="main-page-x__balance">
             <Text.DynamicSize baseFontSize={55} baseTextLength={10} className="heading_large">
-                {ccdBalance}
+                {ccdBalance} CCD
             </Text.DynamicSize>
             <Text.Capture>
                 {ccdAvailableBalance} {t('atDisposal')}
@@ -158,7 +161,7 @@ function MainPageConfirmedAccount({ credential }: MainPageConfirmedAccountProps)
                         thumbnail={<ConcordiumLogo />}
                         symbol="CCD"
                         staked={isStaked}
-                        balance={displayAsCcd(accountInfo.accountAmount.microCcdAmount, false)}
+                        balance={mainPageCcdDisplay(accountInfo.accountAmount.microCcdAmount)}
                         balanceBase={accountInfo.accountAmount.microCcdAmount}
                         microCcdPerEur={microCcdPerEur}
                     />
@@ -206,7 +209,7 @@ function MainPagePendingAccount() {
                         onClick={() => nav(absoluteRoutes.home.token.ccd.path)}
                         thumbnail={<ConcordiumLogo />}
                         symbol="CCD"
-                        balance={displayAsCcd(0n, false)}
+                        balance={mainPageCcdDisplay(0n)}
                         balanceBase={0n}
                     />
                     <Button.IconText disabled icon={<Gear />} label={t('manageTokenList')} />
