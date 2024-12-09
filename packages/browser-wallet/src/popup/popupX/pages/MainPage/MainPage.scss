@@ -8,6 +8,10 @@
         display: flex;
         flex-direction: column;
         align-items: flex-start;
+
+        .heading_large {
+            font-family: $t-font-family-ibm;
+        }
     }
 
     &__action-buttons {

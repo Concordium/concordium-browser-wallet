@@ -1,4 +1,8 @@
 .token-details-x {
+    .dynamic-size.heading_big {
+        font-family: $t-font-family-ibm;
+    }
+
     &__stake {
         display: flex;
         flex-direction: column;
