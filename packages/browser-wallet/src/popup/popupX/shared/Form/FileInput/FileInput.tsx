@@ -1,11 +1,18 @@
 import clsx from 'clsx';
-import React, { forwardRef, InputHTMLAttributes, useImperativeHandle, useMemo, useRef, useState } from 'react';
+import React, {
+    forwardRef,
+    InputHTMLAttributes,
+    useEffect,
+    useImperativeHandle,
+    useMemo,
+    useRef,
+    useState,
+} from 'react';
 import { useTranslation } from 'react-i18next';
 
 import FolderIcon from '@assets/svgX/folder-open.svg';
 import FileIcon from '@assets/svgX/file.svg';
 import ErrorMessage from '../ErrorMessage';
-import Button from '../../Button';
 
 export interface FileInputRef {
     reset(): void;
@@ -47,9 +54,22 @@ export const FileInput = forwardRef<FileInputRef, FileInputProps>(
             reset: () => {
                 if (inputRef.current) {
                     inputRef.current.value = '';
+                    onChange(null);
                 }
             },
         }));
+
+        useEffect(() => {
+            const preventFileOpen = (e: DragEvent) => e.preventDefault();
+
+            window.addEventListener('dragover', preventFileOpen);
+            window.addEventListener('drop', preventFileOpen);
+
+            return () => {
+                window.removeEventListener('dragover', preventFileOpen);
+                window.removeEventListener('drop', preventFileOpen);
+            };
+        }, []);
 
         return (
             <label
@@ -60,10 +80,20 @@ export const FileInput = forwardRef<FileInputRef, FileInputProps>(
                     dragOver && 'form-file-input-x--hovering',
                     className
                 )}
-                onDragOver={() => setDragOver(true)}
-                onDragLeave={() => setDragOver(false)}
             >
-                <div className="form-file-input-x__wrapper">
+                <div
+                    className="form-file-input-x__wrapper"
+                    onDragLeave={() => setDragOver(false)}
+                    onDrop={(e) => {
+                        e.preventDefault();
+                        setDragOver(false);
+                        onChange(e.dataTransfer.files);
+                    }}
+                    onDragOver={(e) => {
+                        e.preventDefault();
+                        setDragOver(true);
+                    }}
+                >
                     <FileIcon className="m-b-20" />
                     {files.length === 0 || disableFileNames
                         ? placeholder && <div className="form-file-input-x__empty">{placeholder}</div>
