@@ -26,6 +26,9 @@ const t = {
                 insufficientCcd: 'Not enough CCD in account to cover transaction fee',
             },
         },
+        fileInput: {
+            selectButton: 'or Select file to import',
+        },
     },
     utils: {
         address: {
