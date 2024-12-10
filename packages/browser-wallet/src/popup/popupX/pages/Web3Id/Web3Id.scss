@@ -6,7 +6,8 @@
         text-align: left;
     }
 
-    &.credentials {
+    &.credentials,
+    &.import {
         .page__main {
             display: flex;
             flex-direction: column;
@@ -19,28 +20,6 @@
 
         .page__main {
             height: 100%;
-
-            .card-x.grey {
-                display: flex;
-                flex-direction: column;
-                align-items: center;
-                justify-content: center;
-                height: 100%;
-                border: 1px dashed $color-mineral-1;
-                background-color: rgba($color-grey-1, 0.5);
-
-                .capture__main_small {
-                    text-align: center;
-                }
-
-                svg {
-                    margin-bottom: rem(32px);
-                }
-            }
-
-            .button__icon {
-                margin-top: rem(24px);
-            }
         }
     }
 }
