@@ -1,4 +1,3 @@
-import { fullscreenPromptContext } from '@popup/page-layouts/FullscreenPromptLayout';
 import { useAtom, useAtomValue, useSetAtom } from 'jotai';
 import React, { useContext, useEffect, useState } from 'react';
 import { useTranslation } from 'react-i18next';
@@ -35,6 +34,7 @@ import { addToastAtom } from '@popup/state';
 import { Web3IdCardRaw } from '@popup/popupX/shared/Web3IdCard/Web3IdCard';
 import Page from '@popup/popupX/shared/Page';
 import Button from '@popup/popupX/shared/Button';
+import { fullscreenPromptContext } from '@popup/popupX/page-layouts/FullscreenPromptLayout';
 
 type Props = {
     onAllow(key: string): void;
