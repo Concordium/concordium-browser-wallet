@@ -35,6 +35,7 @@ import { Web3IdCardRaw } from '@popup/popupX/shared/Web3IdCard/Web3IdCard';
 import Page from '@popup/popupX/shared/Page';
 import Button from '@popup/popupX/shared/Button';
 import { fullscreenPromptContext } from '@popup/popupX/page-layouts/FullscreenPromptLayout';
+import Text from '@popup/popupX/shared/Text';
 
 type Props = {
     onAllow(key: string): void;
@@ -247,7 +248,7 @@ export default function AddWeb3IdCredential({ onAllow, onReject }: Props) {
             <Page.Top heading={t('title')} />
             <Page.Main>
                 {error && (
-                    <div className="add-web3Id-credential-x__error">
+                    <div className="add-web3-id-credential-x__error">
                         {t('error.initial')}
                         <br />
                         {error}
@@ -255,7 +256,7 @@ export default function AddWeb3IdCredential({ onAllow, onReject }: Props) {
                 )}
                 {!error && schema && metadata && (
                     <>
-                        <div>{t('description', { dapp: urlDisplay })}</div>
+                        <Text.Capture>{t('description', { dapp: urlDisplay })}</Text.Capture>
                         <Web3IdCardRaw
                             attributes={credential.credentialSubject.attributes}
                             className="m-t-10"
