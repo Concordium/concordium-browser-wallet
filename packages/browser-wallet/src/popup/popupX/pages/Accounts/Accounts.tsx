@@ -13,7 +13,6 @@ import Card from '@popup/popupX/shared/Card';
 import Text from '@popup/popupX/shared/Text';
 import { generatePath, useNavigate } from 'react-router-dom';
 import { absoluteRoutes } from '@popup/popupX/constants/routes';
-import { copyToClipboard } from '@popup/popupX/shared/utils/helpers';
 import { useAtomValue } from 'jotai';
 import { credentialsAtom } from '@popup/store/account';
 import { WalletCredential } from '@shared/storage/types';
@@ -21,6 +20,7 @@ import { displaySplitAddress, useIdentityName, useWritableSelectedAccount } from
 import { useAccountInfo } from '@popup/shared/AccountInfoListenerContext';
 import { displayAsCcd } from 'wallet-common-helpers';
 import useEditableValue from '@popup/popupX/shared/EditableValue';
+import { useCopyAddress } from '@popup/popupX/shared/utils/hooks';
 
 function compareAsc(left: WalletCredential, right: WalletCredential): number {
     if (left.credName === '' && right.credName !== '') {
@@ -43,6 +43,7 @@ type AccountListItemProps = {
 function AccountListItem({ credential }: AccountListItemProps) {
     const { t } = useTranslation('x', { keyPrefix: 'accounts' });
     const nav = useNavigate();
+    const copyAddressToClipboard = useCopyAddress();
     const navToPrivateKey = () =>
         nav(generatePath(absoluteRoutes.settings.accounts.privateKey.path, { account: credential.address }));
     const navToConnectedSites = () =>
@@ -82,7 +83,7 @@ function AccountListItem({ credential }: AccountListItemProps) {
             </Card.Row>
             <Card.Row>
                 <Text.Capture className="wrap-anywhere">{address}</Text.Capture>
-                <Button.Icon className="transparent" onClick={() => copyToClipboard(address)} icon={<Copy />} />
+                <Button.Icon className="transparent" onClick={() => copyAddressToClipboard(address)} icon={<Copy />} />
             </Card.Row>
             <Card.Row>
                 <Text.MainRegular>{t('ccdBalance')}</Text.MainRegular>

@@ -12,9 +12,9 @@ import { networkConfigurationAtom } from '@popup/store/settings';
 import { saveData } from '@popup/shared/utils/file-helpers';
 import { NetworkConfiguration } from '@shared/storage/types';
 import { getNet } from '@shared/utils/network-helpers';
-import { copyToClipboard } from '@popup/popupX/shared/utils/helpers';
 import { Navigate, useParams } from 'react-router-dom';
 import { withPasswordProtected } from '@popup/popupX/shared/utils/hoc';
+import { useCopyToClipboard } from '@popup/popupX/shared/utils/hooks';
 
 type CredentialKeys = {
     threshold: number;
@@ -100,6 +100,7 @@ type Props = {
 function PrivateKey({ address }: Props) {
     const { t } = useTranslation('x', { keyPrefix: 'privateKey' });
     const { privateKey, handleExport } = usePrivateKeyData(address);
+    const copyToClipboard = useCopyToClipboard();
 
     return (
         <Page className="account-private-key-x">

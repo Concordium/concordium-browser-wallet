@@ -16,7 +16,7 @@ import { useTranslation } from 'react-i18next';
 import clsx from 'clsx';
 import Text from '@popup/popupX/shared/Text';
 import { AccountInfoType } from '@concordium/web-sdk';
-import { copyToClipboard } from '@popup/popupX/shared/utils/helpers';
+import { useCopyAddress } from '@popup/popupX/shared/utils/hooks';
 
 function shortNumber(number: number | string): string {
     return number.toLocaleString('en-US', {
@@ -77,6 +77,7 @@ export default function AccountSelector({ showAccountSelector, onUpdateSelectedA
     const { t } = useTranslation('x', { keyPrefix: 'header.accountSelector' });
     const credentialsLoading = useAtomValue(credentialsAtomWithLoading);
     const [selectedAccount, setSelectedAccount] = useAtom(selectedAccountAtom);
+    const copyAddressToClipboard = useCopyAddress();
     const [search, setSearch] = useState('');
     const [ascSort, setAscSort] = useState(true);
     const credentials = credentialsLoading.value ?? [];
@@ -97,7 +98,7 @@ export default function AccountSelector({ showAccountSelector, onUpdateSelectedA
 
     const copyAddress = (event: React.MouseEvent<HTMLButtonElement, MouseEvent>, address: string) => {
         event.stopPropagation();
-        copyToClipboard(address);
+        copyAddressToClipboard(address);
     };
 
     if (!showAccountSelector) return null;

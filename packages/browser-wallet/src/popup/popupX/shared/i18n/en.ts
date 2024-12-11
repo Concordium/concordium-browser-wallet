@@ -83,6 +83,10 @@ const t = {
         reject: 'Reject',
         error: 'Error',
     },
+    messages: {
+        addressCopied: 'Address copied',
+        copied: 'Copied',
+    },
 };
 
 export default t;

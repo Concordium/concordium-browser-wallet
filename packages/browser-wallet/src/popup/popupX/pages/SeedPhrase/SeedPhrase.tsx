@@ -10,13 +10,14 @@ import { useAsyncMemo } from 'wallet-common-helpers';
 import { decrypt } from '@shared/utils/crypto';
 import { useAtomValue } from 'jotai';
 import { encryptedSeedPhraseAtom, sessionPasscodeAtom } from '@popup/store/settings';
-import { copyToClipboard } from '@popup/popupX/shared/utils/helpers';
 import { withPasswordProtected } from '@popup/popupX/shared/utils/hoc';
+import { useCopyToClipboard } from '@popup/popupX/shared/utils/hooks';
 
 function SeedPhrase() {
     const { t } = useTranslation('x', { keyPrefix: 'seedPhrase' });
     const passcode = useAtomValue(sessionPasscodeAtom);
     const encryptedSeed = useAtomValue(encryptedSeedPhraseAtom);
+    const copyToClipboard = useCopyToClipboard();
 
     const seedPhrase = useAsyncMemo(
         async () => {

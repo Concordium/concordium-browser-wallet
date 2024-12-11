@@ -16,7 +16,6 @@ export default function Toast() {
     const [toasts, setToasts] = useAtom(toastsAtom);
     const [toastText, setToastText] = useState<string | ReactNode>();
     const [fadeout, setFadeout] = useState<boolean>(false);
-
     useEffect(() => {
         if (!toastText && toasts.length > 0) {
             const [nextToast, ...remainderToasts] = toasts;
@@ -44,5 +43,7 @@ export default function Toast() {
         return noOp;
     }, [toastText]);
 
-    return <div className={clsx('toast', toastText && 'toast__show', fadeout && 'toast__fadeout')}>{toastText}</div>;
+    return (
+        <div className={clsx('toast-x', toastText && 'toast-x__show', fadeout && 'toast-x__fadeout')}>{toastText}</div>
+    );
 }

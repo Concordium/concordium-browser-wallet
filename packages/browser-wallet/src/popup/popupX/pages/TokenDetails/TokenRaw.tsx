@@ -7,8 +7,8 @@ import { withSelectedCredential } from '@popup/popupX/shared/utils/hoc';
 import { useTranslation } from 'react-i18next';
 import Button from '@popup/popupX/shared/Button';
 import Copy from '@assets/svgX/copy.svg';
-import { copyToClipboard } from '@popup/popupX/shared/utils/helpers';
 import Card from '@popup/popupX/shared/Card';
+import { useCopyToClipboard } from '@popup/popupX/shared/utils/hooks';
 
 type Params = {
     contractIndex: string;
@@ -23,6 +23,7 @@ function useSelectedToken(credential: WalletCredential) {
 function TokenRaw({ credential }: { credential: WalletCredential }) {
     const { t } = useTranslation('x', { keyPrefix: 'tokenDetails' });
     const token = useSelectedToken(credential);
+    const copyToClipboard = useCopyToClipboard();
     const metadata = token?.metadata || {};
 
     return (

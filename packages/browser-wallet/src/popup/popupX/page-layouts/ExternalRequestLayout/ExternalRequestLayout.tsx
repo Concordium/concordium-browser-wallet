@@ -1,6 +1,6 @@
 import React, { useMemo } from 'react';
 import { Outlet } from 'react-router-dom';
-import Toast from '@popup/shared/Toast/Toast';
+import Toast from '@popup/popupX/shared/Toast';
 import clsx from 'clsx';
 import { Connection } from '@popup/popupX/page-layouts/MainLayout/Header/components';
 import FullscreenPromptLayout from '@popup/popupX/page-layouts/FullscreenPromptLayout';

@@ -1,0 +1,74 @@
+.toast-x {
+    visibility: hidden;
+    width: rem(175px);
+    left: 0;
+    right: 0;
+    margin: 0 auto;
+    background-color: $color-white;
+    color: $color-black;
+    text-align: center;
+    border-radius: rem(16px);
+    padding: rem(10px) rem(15px);
+    position: absolute;
+    z-index: 2;
+    bottom: rem(16px);
+    backdrop-filter: blur(5px);
+    box-shadow: 0 -6px 15.3px 0 rgba($color-black, 0.25);
+
+    &__show {
+        visibility: visible;
+        animation: fadein-toast 0.5s;
+    }
+
+    &__fadeout {
+        visibility: visible;
+        animation: fadeout-toast 0.5s;
+    }
+
+    @keyframes fadein-toast {
+        from {
+            bottom: 0;
+            opacity: 0;
+        }
+
+        to {
+            bottom: rem(16px);
+            opacity: 1;
+        }
+    }
+
+    @keyframes fadeout-toast {
+        from {
+            bottom: rem(16px);
+            opacity: 1;
+        }
+
+        to {
+            bottom: rem(16px);
+            opacity: 0;
+        }
+    }
+}
+
+.copy-address-x {
+    display: flex;
+    flex-direction: row;
+    align-items: center;
+
+    .copy-message {
+        display: flex;
+        flex-direction: column;
+        align-items: flex-start;
+        gap: rem(4px);
+        margin-left: rem(10px);
+
+        .label__main {
+            color: $color-black;
+            white-space: nowrap;
+        }
+
+        .capture__main_small {
+            color: $color-black;
+        }
+    }
+}

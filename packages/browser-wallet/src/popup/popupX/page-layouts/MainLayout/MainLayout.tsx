@@ -2,6 +2,7 @@ import React, { useMemo } from 'react';
 import { Outlet, useLocation } from 'react-router-dom';
 import clsx from 'clsx';
 import Header from '@popup/popupX/page-layouts/MainLayout/Header';
+import Toast from '@popup/popupX/shared/Toast';
 import { AccountButton, NavButton } from '@popup/popupX/page-layouts/MainLayout/Header/components';
 import { relativeRoutes, RoutePath } from '@popup/popupX/constants/routes';
 
@@ -54,6 +55,7 @@ export default function MainLayout() {
                 </div>
                 <Outlet />
             </main>
+            <Toast />
         </div>
     );
 }
