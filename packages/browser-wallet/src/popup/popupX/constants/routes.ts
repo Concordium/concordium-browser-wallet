@@ -313,6 +313,9 @@ export const relativeRoutes = {
         sendTransaction: {
             path: 'sendTransaction',
         },
+        addWeb3IdCredential: {
+            path: 'add-web3id-credential',
+        },
     },
 };
 

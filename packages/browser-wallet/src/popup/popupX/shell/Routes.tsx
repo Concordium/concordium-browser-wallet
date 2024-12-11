@@ -54,6 +54,7 @@ import IdIssuanceExternalFlow from '../pages/IdIssuance/ExternalFlow';
 import IdIssuanceFailed from '../pages/IdIssuance/Failed';
 import EndIdentityIssuance from '../pages/prompts/EndIdentityIssuance';
 import Web3IdDetails from '../pages/Web3Id/Web3IdDetails';
+import AddWeb3IdCredential from '../pages/prompts/AddWeb3IdCredential/AddWeb3IdCredential';
 
 export default function Routes({ messagePromptHandlers }: { messagePromptHandlers: MessagePromptHandlersType }) {
     const {
@@ -61,6 +62,7 @@ export default function Routes({ messagePromptHandlers }: { messagePromptHandler
         handleSignCIS3MessageResponse,
         handleSignMessageResponse,
         handleSendTransactionResponse,
+        handleAddWeb3IdCredentialResponse,
     } = messagePromptHandlers;
     return (
         <ReactRoutes>
@@ -255,6 +257,20 @@ export default function Routes({ messagePromptHandlers }: { messagePromptHandler
                         }
                     />
                     <Route path={relativeRoutes.prompt.endIdentityIssuance.path} element={<EndIdentityIssuance />} />
+                    <Route
+                        path={relativeRoutes.prompt.addWeb3IdCredential.path}
+                        element={
+                            <AddWeb3IdCredential
+                                onAllow={(key) => handleAddWeb3IdCredentialResponse({ success: true, result: key })}
+                                onReject={() =>
+                                    handleAddWeb3IdCredentialResponse({
+                                        success: false,
+                                        message: 'Adding credential was rejected',
+                                    })
+                                }
+                            />
+                        }
+                    />
                 </Route>
             </Route>
         </ReactRoutes>

@@ -1,1 +1,1 @@
-export { default, FileInput } from './FileInput';
+export { FileInput } from './FileInput';

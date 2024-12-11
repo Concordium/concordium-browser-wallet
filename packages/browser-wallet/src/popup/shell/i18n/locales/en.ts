@@ -58,6 +58,7 @@ import sendTransactionX from '@popup/popupX/pages/prompts/SendTransaction/i18n/e
 import submittedTransaction from '@popup/popupX/pages/SubmittedTransaction/i18n/en';
 import nft from '@popup/popupX/pages/Nft/i18n/en';
 import idIssuance from '@popup/popupX/pages/IdIssuance/i18n/en';
+import addWeb3IdCredentialX from '@popup/popupX/pages/prompts/AddWeb3IdCredential/i18n/en';
 
 const t = {
     shared,
@@ -113,7 +114,13 @@ const t = {
         web3Id,
         earn,
         mangeTokens,
-        prompts: { connectionRequestX, signCis3, signMessageX, sendTransactionX },
+        prompts: {
+            connectionRequestX,
+            signCis3,
+            signMessageX,
+            sendTransactionX,
+            AddWeb3IdCredentialX: addWeb3IdCredentialX,
+        },
         submittedTransaction,
         nft,
     },

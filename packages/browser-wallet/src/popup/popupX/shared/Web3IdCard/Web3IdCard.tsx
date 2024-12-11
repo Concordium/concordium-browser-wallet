@@ -13,7 +13,11 @@ import {
     VerifiableCredentialSchema,
     VerifiableCredentialStatus,
 } from '@shared/storage/types';
-import { parseCredentialDID } from '@shared/utils/verifiable-credential-helpers';
+import {
+    VerifiableCredentialMetadata,
+    VerifiableCredentialSchemaWithFallback,
+    parseCredentialDID,
+} from '@shared/utils/verifiable-credential-helpers';
 import Img from '@popup/shared/Img';
 
 import { withDateAndTime } from '@shared/utils/time-helpers';
@@ -72,6 +76,13 @@ type ViewProps = ClassName & {
 
 /**
  * Presentation component for {@linkcode Web3IdCard}, which should generally be used instead.
+ *
+ * @param status - The status of the verifiable credential.
+ * @param title - The title of the verifiable credential.
+ * @param attributes - The attributes of the verifiable credential.
+ * @param className - Additional class names for styling.
+ * @param warning - Optional warning message to display.
+ * @param logo - Optional logo to display.
  */
 export function Web3IdCardView({ status, title, attributes, className, warning, logo }: ViewProps) {
     return (
@@ -97,6 +108,7 @@ export function Web3IdCardView({ status, title, attributes, className, warning, 
 
 /**
  * Checks that the schema has an entry for each attribute.
+ *
  * @param schema the schema to validate against the attributes
  * @param attributes the attributes which keys should be in the schema
  * @returns true if all attribute keys are present in the schema, otherwise false
@@ -118,6 +130,7 @@ function validateSchemaMatchesAttributes(
  * Apply the schema and localization to an attribute, adding the title from the schema or localization, which
  * should be displayed to the user.
  * If there is a missing key in the schema, then the attribute key is used as the title instead.
+ *
  * @param schema the schema to apply
  * @param localization the localization to apply
  * @returns the attribute together with its title.
@@ -148,11 +161,72 @@ function applySchemaAndLocalization(
     };
 }
 
+type RawProps = Pick<ViewProps, 'className'> & {
+    attributes: Record<string, AttributeType>;
+    attributeOverrides?: AttributeView[];
+    localization?: Record<string, string>;
+    metadata: VerifiableCredentialMetadata;
+    schema: VerifiableCredentialSchemaWithFallback;
+    status: VerifiableCredentialStatus;
+};
+
+/**
+ * Component for displaying a verifiable credential, supplying the necessary schema, localization, and credential metadata.
+ *
+ * @param schema - The schema of the verifiable credential.
+ * @param localization - The localization data for the verifiable credential.
+ * @param metadata - The metadata of the verifiable credential.
+ * @param attributes - The attributes of the verifiable credential.
+ * @param attributeOverrides - Optional attribute overrides.
+ * @param status - The status of the verifiable credential.
+ * @param viewProps - Additional view properties.
+ */
+export function Web3IdCardRaw({
+    schema,
+    localization,
+    metadata,
+    attributes,
+    attributeOverrides,
+    status,
+    ...viewProps
+}: RawProps) {
+    const { t } = useTranslation('x', { keyPrefix: 'sharedX.web3IdCard' });
+
+    const schemaMatchesCredentialAttributes = validateSchemaMatchesAttributes(schema, attributes);
+    const mappedAttributes =
+        attributeOverrides ?? Object.entries(attributes).map(applySchemaAndLocalization(schema, localization));
+
+    let warning: string | undefined;
+    if (!schemaMatchesCredentialAttributes) {
+        warning = t('warning.schemaMismatch');
+    } else if (schema.usingFallback) {
+        warning = t('warning.fallback');
+    }
+
+    return (
+        <Web3IdCardView
+            attributes={mappedAttributes}
+            title={metadata.title}
+            status={status}
+            warning={warning}
+            logo={metadata.logo}
+            {...viewProps}
+        />
+    );
+}
+
 type Props = Pick<ViewProps, 'className'> & {
     credential: VerifiableCredential;
     showInfo?: boolean;
 };
 
+/**
+ * Component for displaying a verifiable credential, where the additional credential data is retrieved from storage.
+ *
+ * @param credential - The verifiable credential to display.
+ * @param showInfo - Flag to indicate whether to show additional information.
+ * @param viewProps - Additional view properties.
+ */
 export default function Web3IdCard({ credential, showInfo = false, ...viewProps }: Props) {
     const { t } = useTranslation('x', { keyPrefix: 'sharedX.web3IdCard' });
     const status = useCredentialStatus(credential);
@@ -166,12 +240,7 @@ export default function Web3IdCard({ credential, showInfo = false, ...viewProps 
         return null;
     }
 
-    const schemaMatchesCredentialAttributes = validateSchemaMatchesAttributes(
-        schema,
-        credential.credentialSubject.attributes
-    );
-
-    let attributes: AttributeView[] = [];
+    let attributes: AttributeView[] | undefined;
     if (showInfo && entry !== undefined) {
         const [contract, id] = parseCredentialDID(credential.id);
         if (!entry) {
@@ -191,26 +260,16 @@ export default function Web3IdCard({ credential, showInfo = false, ...viewProps 
             const validUntilFormatted = withDateAndTime(validUntil);
             attributes.push({ title: t('details.validUntil'), value: validUntilFormatted });
         }
-    } else if (!showInfo) {
-        attributes = Object.entries(credential.credentialSubject.attributes).map(
-            applySchemaAndLocalization(schema, localization.result)
-        );
-    }
-
-    let warning: string | undefined;
-    if (!schemaMatchesCredentialAttributes) {
-        warning = t('warning.schemaMismatch');
-    } else if (schema.usingFallback) {
-        warning = t('warning.fallback');
     }
 
     return (
-        <Web3IdCardView
-            attributes={attributes}
-            title={metadata.title}
+        <Web3IdCardRaw
+            attributes={credential.credentialSubject.attributes}
+            attributeOverrides={attributes}
             status={status}
-            warning={warning}
-            logo={metadata.logo}
+            schema={schema}
+            localization={localization.result}
+            metadata={metadata}
             {...viewProps}
         />
     );
