@@ -1,8 +1,7 @@
 import { RevealStatementV2, StatementTypes, VerifiableCredentialStatement } from '@concordium/web-sdk';
-import React, { useCallback, useMemo, useState } from 'react';
+import React, { useCallback, useState } from 'react';
 import { useTranslation } from 'react-i18next';
 
-import Img from '@popup/shared/Img';
 import { VerifiableCredential } from '@shared/storage/types';
 import {
     useCredentialLocalization,
@@ -10,33 +9,19 @@ import {
     useCredentialSchema,
 } from '@popup/popupX/shared/utils/verifiable-credentials';
 
-import CredentialSelector from './CredentialSelector';
+import CredentialSelector, { CredentialSelectorDisplayProps } from './CredentialSelector';
 import { DisplayRevealStatements } from './Display/DisplayRevealStatements';
 import { DisplaySecretStatements } from './Display/DisplaySecretStatements';
 import { createWeb3IdDIDFromCredential, DisplayCredentialStatementProps, SecretStatementV2 } from './utils';
 
-export function DisplayVC({ option }: { option: VerifiableCredential }) {
+export function DisplayVC({ option }: CredentialSelectorDisplayProps<VerifiableCredential>) {
     const metadata = useCredentialMetadata(option);
-
     if (!metadata) {
         return null;
     }
 
-    return (
-        <header className="verifiable-credential__header">
-            <div
-                style={{ backgroundColor: metadata.backgroundColor }}
-                className="verifiable-presentation-request__selector-icon"
-            >
-                <Img
-                    className="verifiable-presentation-request__selector-icon-image"
-                    src={metadata.logo.url}
-                    withDefaults
-                />
-            </div>
-            <div className="verifiable-presentation-request__selector-title display5">{metadata.title}</div>
-        </header>
-    );
+    // eslint-disable-next-line react/jsx-no-useless-fragment
+    return <>{metadata.title}</>;
 }
 
 export default function DisplayWeb3Statement({
@@ -48,7 +33,7 @@ export default function DisplayWeb3Statement({
     net,
     showDescription,
 }: DisplayCredentialStatementProps<VerifiableCredentialStatement, VerifiableCredential>) {
-    const { t } = useTranslation('web3IdProofRequest');
+    const { t } = useTranslation('x', { keyPrefix: 'prompts.verifiablePresentationRequest' });
     const reveals = credentialStatement.statement.filter(
         (s) => s.type === StatementTypes.RevealAttribute
     ) as RevealStatementV2[];
@@ -56,9 +41,8 @@ export default function DisplayWeb3Statement({
         (s) => s.type !== StatementTypes.RevealAttribute
     ) as SecretStatementV2[];
 
-    const initialIndex = useMemo(() => validCredentials.findIndex((c) => c.id === chosenId), []);
     const [chosenCredential, setChosenCredential] = useState<VerifiableCredential | undefined>(
-        validCredentials[initialIndex]
+        validCredentials.find((c) => c.id === chosenId)
     );
 
     const onChange = useCallback((credential: VerifiableCredential) => {
@@ -83,10 +67,10 @@ export default function DisplayWeb3Statement({
             )}
             <CredentialSelector<VerifiableCredential>
                 options={validCredentials}
-                DisplayOption={DisplayVC}
+                value={chosenCredential}
                 onChange={onChange}
-                header={t('select.verifiableCredential')}
-                initialIndex={initialIndex}
+                id={(vc) => vc.id}
+                Display={DisplayVC}
             />
             {reveals.length !== 0 && (
                 <DisplayRevealStatements

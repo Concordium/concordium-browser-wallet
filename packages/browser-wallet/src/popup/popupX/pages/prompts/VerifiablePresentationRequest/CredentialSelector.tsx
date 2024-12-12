@@ -1,18 +1,18 @@
-import Button from '@popup/shared/Button';
-import Modal from '@popup/shared/Modal';
-import React, { ComponentType, useState } from 'react';
-import ArrowIcon from '@assets/svg/down-arrow.svg';
-import CheckmarkIcon from '@assets/svg/check_small.svg';
+import React, { ComponentType, useMemo } from 'react';
+
+export type CredentialSelectorDisplayProps<T> = {
+    option: T;
+};
 
 interface Props<T> {
     /**
      * Must include at least 1 option
      */
     options: T[];
-    initialIndex?: number;
+    value: T;
     onChange: (x: T) => void;
-    DisplayOption: ComponentType<{ option: T }>;
-    header: string;
+    Display: ComponentType<CredentialSelectorDisplayProps<T>>;
+    id(value: T): string;
 }
 
 /**
@@ -20,54 +20,28 @@ interface Props<T> {
  */
 export default function CredentialSelector<T extends string | number | object>({
     options,
-    initialIndex = 0,
+    value,
     onChange,
-    DisplayOption,
-    header,
+    Display,
+    id,
 }: Props<T>) {
-    const [chosenIndex, setChosenIndex] = useState<number>(initialIndex);
-    const [open, setOpen] = useState(false);
+    const selected = useMemo(() => id(value), [id, value]);
 
     if (options.length === 0) {
         throw new Error('No options given to selector');
     }
 
-    function onClick(index: number) {
-        setChosenIndex(index);
-        onChange(options[index]);
-        setOpen(false);
+    function onSelect(option: string) {
+        onChange(options.find((o) => id(o) === option)!);
     }
 
     return (
-        <Modal
-            stableScrollbarGutter
-            hideCloseButton
-            open={open}
-            onOpen={() => setOpen(true)}
-            onClose={() => setOpen(false)}
-            trigger={
-                <Button clear className="verifiable-credential__selector-trigger">
-                    <DisplayOption option={options[chosenIndex]} />
-                    <ArrowIcon className="verifiable-credential__selector-trigger-icon" />
-                </Button>
-            }
-            className="verifiable-credential__selector-modal"
-        >
-            <div className="bodyL verifiable-credential__selector-header">
-                <p>{header}</p>
-                <ArrowIcon className="verifiable-credential__selector-header-icon" />
-            </div>
-            {options.map((opt, index) => (
-                <Button
-                    className="verifiable-credential__selector-item"
-                    clear
-                    key={opt.toString()}
-                    onClick={() => onClick(index)}
-                >
-                    <DisplayOption option={options[index]} />
-                    {chosenIndex === index && <CheckmarkIcon className="verifiable-credential__selector-item-icon" />}
-                </Button>
+        <select onChange={(e) => onSelect(e.target.value)} value={selected}>
+            {options.map((o) => (
+                <option value={id(o)}>
+                    <Display option={o} />
+                </option>
             ))}
-        </Modal>
+        </select>
     );
 }

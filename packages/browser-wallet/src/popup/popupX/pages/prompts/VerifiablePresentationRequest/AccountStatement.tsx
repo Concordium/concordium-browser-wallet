@@ -13,13 +13,13 @@ import { getCredentialIdFromSubjectDID } from '@shared/utils/verifiable-credenti
 import React, { useCallback, useMemo, useState } from 'react';
 import { useTranslation } from 'react-i18next';
 import { SecretStatement, useStatementName, useStatementValue } from '../IdProofRequest/DisplayStatement/utils';
-import CredentialSelector from './CredentialSelector';
+import CredentialSelector, { CredentialSelectorDisplayProps } from './CredentialSelector';
 import { DisplayRevealStatements } from './Display/DisplayRevealStatements';
 import { DisplaySecretStatements } from './Display/DisplaySecretStatements';
 import { OverwriteSecretLine } from './Display/utils';
 import { DisplayCredentialStatementProps, SecretStatementV2 } from './utils';
 
-export function DisplayAccount({ option }: { option: WalletCredential }) {
+export function DisplayAccount({ option }: CredentialSelectorDisplayProps<WalletCredential>) {
     const identityName = useIdentityName(option);
 
     if (!identityName) {
@@ -79,7 +79,7 @@ export default function AccountStatement({
         };
     };
 
-    if (!identity) {
+    if (!identity || !chosenCredential) {
         return null;
     }
 
@@ -92,10 +92,10 @@ export default function AccountStatement({
             )}
             <CredentialSelector<WalletCredential>
                 options={validCredentials}
-                initialIndex={initialIndex}
-                DisplayOption={DisplayAccount}
+                Display={DisplayAccount}
+                id={(cred) => cred.credId}
                 onChange={onChange}
-                header={t('select.accountCredential')}
+                value={chosenCredential}
             />
             {reveals.length !== 0 && (
                 <DisplayRevealStatements

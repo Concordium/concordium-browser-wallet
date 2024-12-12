@@ -1,1 +1,1 @@
-export { default } from './Web3ProofRequest';
+export { default } from './VerifiablePresentationRequest';
