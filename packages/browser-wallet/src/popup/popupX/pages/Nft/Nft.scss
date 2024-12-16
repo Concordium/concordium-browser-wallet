@@ -6,6 +6,14 @@
         .label__main {
             color: $color-white;
         }
+
+        &:not(:first-child) {
+            margin-top: rem(32px);
+        }
+
+        &:has(+ .nft-x__list:empty) {
+            display: none;
+        }
     }
 
     &__list {
@@ -37,6 +45,14 @@
                 white-space: nowrap;
                 text-overflow: ellipsis;
                 text-align: left;
+            }
+        }
+
+        &:empty {
+            margin-top: unset;
+
+            & + .owner {
+                margin-top: unset;
             }
         }
     }
