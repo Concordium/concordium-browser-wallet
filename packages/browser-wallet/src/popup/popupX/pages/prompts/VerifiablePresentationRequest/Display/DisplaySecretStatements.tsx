@@ -1,8 +1,14 @@
 import { AttributeType, canProveAtomicStatement, CredentialSchemaSubject, StatementTypes } from '@concordium/web-sdk';
 import React from 'react';
 import { TFunction, useTranslation } from 'react-i18next';
+import clsx from 'clsx';
+
+import Card from '@popup/popupX/shared/Card';
+import Text from '@popup/popupX/shared/Text';
+import Button from '@popup/popupX/shared/Button';
+import InfoIcon from '@assets/svgX/info.svg';
+
 import { DisplayStatementLine } from './DisplayStatementLine';
-import { DisplayBox } from './DisplayBox';
 import { SecretStatementV2 } from '../utils';
 import { DisplayProps, defaultFormatAttribute, getPropertyTitle } from './utils';
 
@@ -64,8 +70,7 @@ export function DisplaySecretStatements<Attribute extends AttributeType>({
     overwriteSecretLine = () => ({}),
     formatAttribute = defaultFormatAttribute,
 }: DisplayProps<SecretStatementV2, Attribute>) {
-    const { t } = useTranslation('web3IdProofRequest', { keyPrefix: 'displayStatement' });
-    const header = t('headers.secret');
+    const { t } = useTranslation('x', { keyPrefix: 'prompts.verifiablePresentationRequest.displayStatement' });
 
     const lines = statements.map((s) => {
         const value = getStatementValue(s, schema, t, formatAttribute);
@@ -82,29 +87,25 @@ export function DisplaySecretStatements<Attribute extends AttributeType>({
     });
 
     return (
-        <DisplayBox
-            className={className}
-            header={header}
-            infoBox={
-                <>
-                    <p className="display4">{t('secretTooltip.header')}</p>
-                    <p className="bodyLightL">{t('secretTooltip.body')}</p>
-                </>
-            }
-        >
-            <ul className="display-secret-statements__body list-clear">
-                {lines.map(({ description, ...l }, i) => (
-                    <div className="display-secret-statements__line">
+        <Card className={clsx(className, 'display-statement-x')} type="grey">
+            <Card.Row className="display-statement-x__header">
+                <Text.CaptureAdditional>{t('headers.secret')}</Text.CaptureAdditional>
+                <Button.Base>
+                    <InfoIcon />
+                </Button.Base>
+            </Card.Row>
+            {lines.map(({ description, ...l }, i) => (
+                <Card.Row className="display-statement-x__row">
+                    <Text.CaptureAdditional>
                         <DisplayStatementLine
-                            className="m-b-5 heading6"
                             // eslint-disable-next-line react/no-array-index-key
                             key={i} // Allow this, as we don't expect these to ever change.
                             {...l}
                         />
-                        <div className="display-secret-statements__description bodyXS">{description}</div>
-                    </div>
-                ))}
-            </ul>
-        </DisplayBox>
+                    </Text.CaptureAdditional>
+                    <Text.Capture className="m-t-5 block">{description}</Text.Capture>
+                </Card.Row>
+            ))}
+        </Card>
     );
 }

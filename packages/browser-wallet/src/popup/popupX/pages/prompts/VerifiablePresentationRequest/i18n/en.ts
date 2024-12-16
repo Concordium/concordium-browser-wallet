@@ -9,7 +9,7 @@ export default {
         requirementsMet: 'You meet this requirement',
         requirementsNotMet: "You don't meet this requirement",
         revealDescription:
-            '<1>Important:</1> {{dappName}} will be given all the information above. You should only accept if you trust the service, and you are familiar with their privacy policy.',
+            'Important: {{dappName}} will be given all the information above. You should only accept if you trust the service, and you are familiar with their privacy policy.',
         revealTooltip: {
             header: 'Information to reveal',
             body: 'When you reveal information for a third party, you effectively hand over the information to them. This means that you should only do this if you have absolute trust in them, and if you are familiar with their data usage and protection procedures.\n\nYou can read more on\ndeveloper.concordium.software',

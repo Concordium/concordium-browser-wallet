@@ -1,9 +1,14 @@
 import { AttributeType, RevealStatementV2 } from '@concordium/web-sdk';
 import React from 'react';
-import { Trans, useTranslation } from 'react-i18next';
-import WarningTriangleIcon from '@assets/svg/warning-triangle.svg';
+import { useTranslation } from 'react-i18next';
+import clsx from 'clsx';
+
+import Card from '@popup/popupX/shared/Card';
+import Text from '@popup/popupX/shared/Text';
+import Button from '@popup/popupX/shared/Button';
+import InfoIcon from '@assets/svgX/info.svg';
+
 import { DisplayStatementLine } from './DisplayStatementLine';
-import { DisplayBox } from './DisplayBox';
 import { DisplayProps, defaultFormatAttribute, getPropertyTitle } from './utils';
 
 type Props<Attribute> = DisplayProps<RevealStatementV2, Attribute> & {
@@ -18,8 +23,7 @@ export function DisplayRevealStatements<Attribute extends AttributeType>({
     schema,
     formatAttribute = defaultFormatAttribute,
 }: Props<Attribute>) {
-    const { t } = useTranslation('web3IdProofRequest', { keyPrefix: 'displayStatement' });
-    const header = t('headers.reveal');
+    const { t } = useTranslation('x', { keyPrefix: 'prompts.verifiablePresentationRequest.displayStatement' });
 
     const lines = statements.map((s) => {
         const value = attributes[s.attributeTag];
@@ -32,35 +36,27 @@ export function DisplayRevealStatements<Attribute extends AttributeType>({
     });
 
     return (
-        <DisplayBox
-            className={className}
-            header={header}
-            infoBox={
-                <>
-                    <WarningTriangleIcon />
-                    <p className="display4">{t('revealTooltip.header')}</p>
-                    <p className="bodyLightL">{t('revealTooltip.body')}</p>
-                </>
-            }
-        >
-            <ul className="display-reveal-statements__body list-clear">
-                {lines.map((l, i) => (
-                    <DisplayStatementLine
-                        className="display-reveal-statements__line"
-                        // eslint-disable-next-line react/no-array-index-key
-                        key={i} // Allow this, as we don't expect these to ever change.
-                        {...l}
-                    />
-                ))}
-            </ul>
-            <div className="display-reveal-statements__description bodyXS">
-                <Trans
-                    ns="idProofRequest"
-                    i18nKey="displayStatement.revealDescription"
-                    components={{ 1: <span className="heading7 color-feedback-negative-dark" /> }}
-                    values={{ dappName }}
-                />
-            </div>
-        </DisplayBox>
+        <Card className={clsx(className, 'display-statement-x')} type="grey">
+            <Card.Row className="display-statement-x__header">
+                <Text.CaptureAdditional>{t('headers.reveal')}</Text.CaptureAdditional>
+                <Button.Base>
+                    <InfoIcon />
+                </Button.Base>
+            </Card.Row>
+            {lines.map((l, i) => (
+                <Card.Row className="display-statement-x__row">
+                    <Text.CaptureAdditional>
+                        <DisplayStatementLine
+                            // eslint-disable-next-line react/no-array-index-key
+                            key={i} // Allow this, as we don't expect these to ever change.
+                            {...l}
+                        />
+                    </Text.CaptureAdditional>
+                </Card.Row>
+            ))}
+            <Card.Row className="display-statement-x__row">
+                <Text.Capture>{t('revealDescription', { dappName })}</Text.Capture>
+            </Card.Row>
+        </Card>
     );
 }
