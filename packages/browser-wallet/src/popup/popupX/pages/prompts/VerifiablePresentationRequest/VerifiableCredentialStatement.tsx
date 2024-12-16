@@ -8,13 +8,14 @@ import {
     useCredentialMetadata,
     useCredentialSchema,
 } from '@popup/popupX/shared/utils/verifiable-credentials';
+import Text from '@popup/popupX/shared/Text';
 
 import CredentialSelector, { CredentialSelectorDisplayProps } from './CredentialSelector';
 import { DisplayRevealStatements } from './Display/DisplayRevealStatements';
 import { DisplaySecretStatements } from './Display/DisplaySecretStatements';
 import { createWeb3IdDIDFromCredential, DisplayCredentialStatementProps, SecretStatementV2 } from './utils';
 
-export function DisplayVC({ option }: CredentialSelectorDisplayProps<VerifiableCredential>) {
+function DisplayVC({ option }: CredentialSelectorDisplayProps<VerifiableCredential>) {
     const metadata = useCredentialMetadata(option);
     if (!metadata) {
         return null;
@@ -24,7 +25,7 @@ export function DisplayVC({ option }: CredentialSelectorDisplayProps<VerifiableC
     return <>{metadata.title}</>;
 }
 
-export default function DisplayWeb3Statement({
+export default function Web3Statement({
     credentialStatement,
     validCredentials,
     dappName,
@@ -59,12 +60,8 @@ export default function DisplayWeb3Statement({
     }
 
     return (
-        <div className="verifiable-presentation-request__credential-statement-container">
-            {showDescription && (
-                <p className="verifiable-presentation-request__description bodyM">
-                    {t('descriptions.verifiableCredential')}
-                </p>
-            )}
+        <>
+            {showDescription && <Text.Capture>{t('descriptions.verifiableCredential')}</Text.Capture>}
             <CredentialSelector<VerifiableCredential>
                 options={validCredentials}
                 value={chosenCredential}
@@ -74,7 +71,6 @@ export default function DisplayWeb3Statement({
             />
             {reveals.length !== 0 && (
                 <DisplayRevealStatements
-                    className="verifiable-presentation-request__statement"
                     dappName={dappName}
                     attributes={chosenCredential.credentialSubject.attributes}
                     statements={reveals}
@@ -83,12 +79,11 @@ export default function DisplayWeb3Statement({
             )}
             {secrets.length !== 0 && (
                 <DisplaySecretStatements
-                    className="verifiable-presentation-request__statement"
                     attributes={chosenCredential.credentialSubject.attributes}
                     statements={secrets}
                     schema={schema.properties.credentialSubject}
                 />
             )}
-        </div>
+        </>
     );
 }

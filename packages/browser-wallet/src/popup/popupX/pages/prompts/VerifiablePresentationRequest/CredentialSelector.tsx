@@ -1,10 +1,14 @@
 import React, { ComponentType, useMemo } from 'react';
 
+import SelectIcon from '@assets/svgX/caret-up-down.svg';
+import { ClassName } from 'wallet-common-helpers';
+import clsx from 'clsx';
+
 export type CredentialSelectorDisplayProps<T> = {
     option: T;
 };
 
-interface Props<T> {
+type Props<T> = ClassName & {
     /**
      * Must include at least 1 option
      */
@@ -13,7 +17,7 @@ interface Props<T> {
     onChange: (x: T) => void;
     Display: ComponentType<CredentialSelectorDisplayProps<T>>;
     id(value: T): string;
-}
+};
 
 /**
  * Component to select a credential, either account credential or web3Id credential.
@@ -24,6 +28,7 @@ export default function CredentialSelector<T extends string | number | object>({
     onChange,
     Display,
     id,
+    className,
 }: Props<T>) {
     const selected = useMemo(() => id(value), [id, value]);
 
@@ -36,12 +41,17 @@ export default function CredentialSelector<T extends string | number | object>({
     }
 
     return (
-        <select onChange={(e) => onSelect(e.target.value)} value={selected}>
-            {options.map((o) => (
-                <option value={id(o)}>
-                    <Display option={o} />
-                </option>
-            ))}
-        </select>
+        <label className={clsx('verifiable-presentation-request__cred-selector', className)}>
+            <Display option={value} />
+            <SelectIcon />
+
+            <select onChange={(e) => onSelect(e.target.value)} value={selected}>
+                {options.map((o) => (
+                    <option value={id(o)}>
+                        <Display option={o} />
+                    </option>
+                ))}
+            </select>
+        </label>
     );
 }

@@ -19,7 +19,6 @@ export type DisplayProps<StatementType, Attribute> = ClassName & {
     statements: StatementType[];
     attributes: Record<string, Attribute>;
     schema: CredentialSchemaSubject;
-    className: string;
     formatAttribute?: (key: string, value: Attribute) => string;
     overwriteSecretLine?: OverwriteSecretLine;
 };

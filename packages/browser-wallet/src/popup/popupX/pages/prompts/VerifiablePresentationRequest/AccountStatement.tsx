@@ -6,6 +6,8 @@ import {
     RevealStatementV2,
     StatementTypes,
 } from '@concordium/web-sdk';
+
+import Text from '@popup/popupX/shared/Text';
 import { displayNameOrSplitAddress, useIdentityName, useIdentityOf } from '@popup/shared/utils/account-helpers';
 import { useDisplayAttributeValue } from '@popup/shared/utils/identity-helpers';
 import { ConfirmedIdentity, WalletCredential } from '@shared/storage/types';
@@ -19,7 +21,7 @@ import { DisplaySecretStatements } from './Display/DisplaySecretStatements';
 import { OverwriteSecretLine } from './Display/utils';
 import { DisplayCredentialStatementProps, SecretStatementV2 } from './utils';
 
-export function DisplayAccount({ option }: CredentialSelectorDisplayProps<WalletCredential>) {
+function DisplayAccount({ option }: CredentialSelectorDisplayProps<WalletCredential>) {
     const identityName = useIdentityName(option);
 
     if (!identityName) {
@@ -27,12 +29,9 @@ export function DisplayAccount({ option }: CredentialSelectorDisplayProps<Wallet
     }
 
     return (
-        <header className="verifiable-credential__header">
-            <div className="verifiable-presentation-request__selector-title flex-column align-start">
-                <div className="display5">{displayNameOrSplitAddress(option)}</div>
-                <div className="bodyS">{identityName}</div>
-            </div>
-        </header>
+        <>
+            {displayNameOrSplitAddress(option)} - {identityName}
+        </>
     );
 }
 
@@ -84,12 +83,8 @@ export default function AccountStatement({
     }
 
     return (
-        <div className="verifiable-presentation-request__credential-statement-container">
-            {showDescription && (
-                <p className="verifiable-presentation-request__description bodyM">
-                    {t('descriptions.accountCredential')}
-                </p>
-            )}
+        <>
+            {showDescription && <Text.Capture>{t('descriptions.accountCredential')}</Text.Capture>}
             <CredentialSelector<WalletCredential>
                 options={validCredentials}
                 Display={DisplayAccount}
@@ -99,7 +94,6 @@ export default function AccountStatement({
             />
             {reveals.length !== 0 && (
                 <DisplayRevealStatements
-                    className="verifiable-presentation-request__statement"
                     dappName={dappName}
                     attributes={identity.idObject.value.attributeList.chosenAttributes}
                     statements={reveals}
@@ -109,7 +103,6 @@ export default function AccountStatement({
             )}
             {secrets.length !== 0 && (
                 <DisplaySecretStatements
-                    className="verifiable-presentation-request__statement"
                     attributes={identity.idObject.value.attributeList.chosenAttributes}
                     statements={secrets}
                     formatAttribute={displayAttribute}
@@ -117,6 +110,6 @@ export default function AccountStatement({
                     overwriteSecretLine={accountCreateSecretLine}
                 />
             )}
-        </div>
+        </>
     );
 }

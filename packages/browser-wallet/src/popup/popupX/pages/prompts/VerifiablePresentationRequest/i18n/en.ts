@@ -1,4 +1,5 @@
 export default {
+    title: 'Proof of identity request',
     header: '{{dappName}} requests the following information about you:',
     approve: 'Approve',
     continue: 'Continue',

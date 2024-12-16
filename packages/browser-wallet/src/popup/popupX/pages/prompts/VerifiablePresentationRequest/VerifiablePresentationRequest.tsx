@@ -15,16 +15,13 @@ import {
     Network,
     createAccountDID,
 } from '@concordium/web-sdk';
+import { noOp, useAsyncMemo } from 'wallet-common-helpers';
 
 import { grpcClientAtom, networkConfigurationAtom } from '@popup/store/settings';
 import { credentialsAtom } from '@popup/store/account';
 import { addToastAtom } from '@popup/state';
 import { useDecryptedSeedPhrase } from '@popup/shared/utils/seed-phrase-helpers';
 import { getGlobal, getNet } from '@shared/utils/network-helpers';
-import PendingArrows from '@assets/svg/pending-arrows.svg';
-import ExternalRequestLayout from '@popup/page-layouts/ExternalRequestLayout';
-import { fullscreenPromptContext } from '@popup/page-layouts/FullscreenPromptLayout';
-import Button from '@popup/shared/Button';
 import { displayUrl } from '@popup/shared/utils/string-helpers';
 import {
     storedVerifiableCredentialsAtom,
@@ -34,11 +31,11 @@ import { useConfirmedIdentities } from '@popup/shared/utils/identity-helpers';
 import { parse } from '@shared/utils/payload-helpers';
 import { VerifiableCredential, VerifiableCredentialStatus, WalletCredential } from '@shared/storage/types';
 import { getVerifiableCredentialStatus } from '@shared/utils/verifiable-credential-helpers';
-import { noOp, useAsyncMemo } from 'wallet-common-helpers';
-import CloseIcon from '@assets/svg/cross.svg';
-import BackIcon from '@assets/svg/arrow_backward.svg';
-import ContinueIcon from '@assets/svg/arrow_forward.svg';
 import { proveWeb3Request } from '@shared/utils/proof-helpers';
+import Button from '@popup/popupX/shared/Button';
+import Page from '@popup/popupX/shared/Page';
+import { fullscreenPromptContext } from '@popup/popupX/page-layouts/FullscreenPromptLayout';
+
 import {
     createWeb3IdDIDFromCredential,
     getAccountCredentialCommitmentInput,
@@ -119,7 +116,7 @@ function DisplayNotProvable({
     net: Network;
     statuses: Record<string, VerifiableCredentialStatus | undefined> | undefined;
 }) {
-    const { t } = useTranslation('web3IdProofRequest');
+    const { t } = useTranslation('x', { keyPrefix: 'prompts.verifiablePresentationRequest' });
     const credentials = useAtomValue(credentialsAtom);
     const verifiableCredentials = useAtomValue(storedVerifiableCredentialsAtom);
     const validCredentials = findCredentialsForStatementIssuer(
@@ -130,7 +127,8 @@ function DisplayNotProvable({
     );
 
     return (
-        <ExternalRequestLayout>
+        <Page>
+            <Page.Top heading={t('title')} />
             <div className="verifiable-presentation-request__statement-container">
                 {validCredentials && validCredentials?.length === 0 && (
                     <p className="verifiable-presentation-request__not-provable-description bodyM ">
@@ -154,17 +152,11 @@ function DisplayNotProvable({
                         />
                     </>
                 )}
-                <div className="verifiable-presentation-request__actions flex">
-                    <Button
-                        className="flex-center verifiable-presentation-request__not-provable-button flex-child-fill"
-                        onClick={onClick}
-                    >
-                        <CloseIcon className="verifiable-presentation-request__reject-icon reject-title" />
-                        {t('reject')}
-                    </Button>
-                </div>
+                <Page.Footer>
+                    <Button.Secondary onClick={onClick} label={t('reject')} />
+                </Page.Footer>
             </div>
-        </ExternalRequestLayout>
+        </Page>
     );
 }
 
@@ -172,7 +164,7 @@ export default function Web3ProofRequest({ onReject, onSubmit }: Props) {
     const { state } = useLocation() as Location;
     const { statements: rawStatements, challenge, url } = state.payload;
     const { onClose, withClose } = useContext(fullscreenPromptContext);
-    const { t } = useTranslation('web3IdProofRequest');
+    const { t } = useTranslation('x', { keyPrefix: 'prompts.verifiablePresentationRequest' });
     const network = useAtomValue(networkConfigurationAtom);
     const client = useAtomValue(grpcClientAtom);
     const addToast = useSetAtom(addToastAtom);
@@ -298,7 +290,8 @@ export default function Web3ProofRequest({ onReject, onSubmit }: Props) {
     }
 
     return (
-        <ExternalRequestLayout className="verifiable-presentation-request__statement-container">
+        <Page>
+            <Page.Top heading={t('title')} />
             <DisplayCredentialStatement
                 className="m-t-10:not-first"
                 dappName={dappName}
@@ -316,11 +309,11 @@ export default function Web3ProofRequest({ onReject, onSubmit }: Props) {
                 }
                 showDescription
             />
-            <div className="verifiable-presentation-request__actions flex">
+            <Page.Footer>
                 <div className="verifiable-presentation-request__progress">
                     {statements.length > 1 &&
                         statements.map((_, i) => (
-                            <Button
+                            <Button.Base
                                 // eslint-disable-next-line react/no-array-index-key
                                 key={i}
                                 className={clsx(
@@ -328,32 +321,26 @@ export default function Web3ProofRequest({ onReject, onSubmit }: Props) {
                                     currentStatementIndex === i &&
                                         'verifiable-presentation-request__progress-dot--active'
                                 )}
-                                clear
                                 onClick={() => setCurrentStatementIndex(i)}
                             />
                         ))}
                 </div>
-                <Button
-                    danger
-                    className="flex-center verifiable-presentation-request__reject-button newButton"
+                <Button.Main
+                    className="secondary"
                     disabled={creatingProof}
                     onClick={withClose(onReject)}
-                >
-                    <CloseIcon className="verifiable-presentation-request__reject-icon" />
-                </Button>
+                    label={t('reject')}
+                />
                 {currentStatementIndex > 0 && (
-                    <Button
+                    <Button.Main
+                        className="secondary"
                         disabled={creatingProof}
-                        className="flex-center verifiable-presentation-request__back-button new-button-styling newButton"
                         onClick={() => setCurrentStatementIndex(currentStatementIndex - 1)}
-                    >
-                        <BackIcon className="verifiable-presentation-request__back-icon" />
-                        {t('back')}
-                    </Button>
+                        label={t('back')}
+                    />
                 )}
                 {currentStatementIndex === statements.length - 1 ? (
-                    <Button
-                        className="flex-center verifiable-presentation-request__continue-button new-button-styling newButton"
+                    <Button.Main
                         onClick={() => {
                             setCreatingProof(true);
                             handleSubmit()
@@ -366,23 +353,15 @@ export default function Web3ProofRequest({ onReject, onSubmit }: Props) {
                                 });
                         }}
                         disabled={creatingProof || !canProve}
-                    >
-                        {creatingProof ? (
-                            <PendingArrows className="loading svg-white verifiable-presentation-request__loading-icon" />
-                        ) : (
-                            t('approve')
-                        )}
-                    </Button>
+                        label={t('approve')}
+                    />
                 ) : (
-                    <Button
-                        className="flex-center verifiable-presentation-request__continue-button new-button-styling newButton"
+                    <Button.Main
                         onClick={() => setCurrentStatementIndex(currentStatementIndex + 1)}
-                    >
-                        {t('continue')}
-                        <ContinueIcon className="verifiable-presentation-request__continue-icon" />
-                    </Button>
+                        label={t('continue')}
+                    />
                 )}
-            </div>
-        </ExternalRequestLayout>
+            </Page.Footer>
+        </Page>
     );
 }

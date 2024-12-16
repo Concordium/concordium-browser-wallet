@@ -1,2 +1,56 @@
 .verifiable-presentation-request {
+    &__progress {
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        margin-bottom: rem(8px);
+    }
+
+    &__progress-dot {
+        cursor: pointer;
+        height: rem(6px);
+        width: rem(6px);
+        padding: unset;
+        border-radius: 50%;
+        border: unset;
+        background-color: $color-grey-3;
+        @include transition(background-color);
+
+        &:not(:last-of-type) {
+            margin-right: rem(8px);
+        }
+
+        &--active {
+            background-color: $color-white;
+        }
+    }
+
+    &__cred-selector {
+        display: inline-flex;
+        position: relative;
+        margin: rem(16px) 0;
+        align-self: flex-start;
+
+        select {
+            appearance: none;
+            background: none;
+            border: none;
+            position: absolute;
+            z-index: 0;
+            color: transparent;
+            height: 100%;
+            top: 0;
+            left: 0;
+            width: 100%;
+            cursor: pointer;
+
+            &::selection {
+                background-color: transparent;
+            }
+        }
+
+        svg {
+            margin-left: rem(5px);
+        }
+    }
 }
