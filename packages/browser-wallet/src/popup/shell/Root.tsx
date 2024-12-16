@@ -6,7 +6,12 @@ import { noOp } from 'wallet-common-helpers';
 
 import { Dimensions, large, medium, small } from '@popup/constants/dimensions';
 import { popupMessageHandler } from '@popup/shared/message-handler';
-import { isFullscreenWindow, isSpawnedWeb3IdProofWindow, isSpawnedWindow } from '@popup/shared/window-helpers';
+import {
+    haveInitialEntry,
+    isFullscreenWindow,
+    isSpawnedWeb3IdProofWindow,
+    isSpawnedWindow,
+} from '@popup/shared/window-helpers';
 import { networkConfigurationAtom, themeAtom, uiStyleAtom } from '@popup/store/settings';
 import { Theme as ThemeType, UiStyle } from '@shared/storage/types';
 import BlockChainParametersContext from '@popup/shared/BlockChainParametersProvider';
@@ -136,7 +141,11 @@ export default function Root() {
 
     return (
         <Provider>
-            <MemoryRouter initialEntries={[uiStyle.value === UiStyle.Old ? '/account' : absoluteRoutes.home.path]}>
+            <MemoryRouter
+                initialEntries={[
+                    haveInitialEntry || (uiStyle.value === UiStyle.Old && '/account') || absoluteRoutes.home.path,
+                ]}
+            >
                 <Scaling>
                     <Network>
                         <Theme>
