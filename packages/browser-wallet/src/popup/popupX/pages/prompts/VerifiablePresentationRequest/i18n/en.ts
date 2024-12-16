@@ -12,11 +12,11 @@ export default {
             'Important: {{dappName}} will be given all the information above. You should only accept if you trust the service, and you are familiar with their privacy policy.',
         revealTooltip: {
             header: 'Information to reveal',
-            body: 'When you reveal information for a third party, you effectively hand over the information to them. This means that you should only do this if you have absolute trust in them, and if you are familiar with their data usage and protection procedures.\n\nYou can read more on\ndeveloper.concordium.software',
+            body: 'When you reveal information for a third party, you effectively hand over the information to them. This means that you should only do this if you have absolute trust in them, and if you are familiar with their data usage and protection procedures.\nYou can read more on developer.concordium.software',
         },
         secretTooltip: {
-            header: 'Zero-knowledge proof',
-            body: 'Zero-knowledge proofs are a way of proving something to a service or dApp without revealing the exact personal information. One example can be that you prove that you are over 18 years old without revealing your exact date of birth. Another example could be that you live in one of a range of countries without revealing exactly which country you live in.\n\nYou can read more on\ndeveloper.concordium.software',
+            header: 'ZK proof',
+            body: 'Zero-knowledge proofs are a way of proving something to a service or dApp without revealing the exact personal information. One example can be that you prove that you are over 18 years old without revealing your exact date of birth. Another example could be that you live in one of a range of countries without revealing exactly which country you live in.\nYou can read more on developer.concordium.software',
         },
         headers: {
             reveal: 'Information to reveal',

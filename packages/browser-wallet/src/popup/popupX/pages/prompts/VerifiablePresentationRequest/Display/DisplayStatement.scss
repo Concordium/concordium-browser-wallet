@@ -41,3 +41,18 @@
         }
     }
 }
+
+.display-statements-tooltip {
+    background-color: $color-white;
+    border-radius: rem(8px);
+    width: calc(100% - 20px);
+    padding: rem(12px);
+
+    .text__main_medium, .capture__main_small {
+        color: $color-black;
+    }
+
+    &__trigger {
+        cursor: pointer;
+    }
+}

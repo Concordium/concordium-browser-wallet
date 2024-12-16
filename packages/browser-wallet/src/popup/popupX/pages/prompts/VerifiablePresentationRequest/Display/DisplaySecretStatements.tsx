@@ -11,6 +11,7 @@ import InfoIcon from '@assets/svgX/info.svg';
 import { DisplayStatementLine } from './DisplayStatementLine';
 import { SecretStatementV2 } from '../utils';
 import { DisplayProps, defaultFormatAttribute, getPropertyTitle } from './utils';
+import DisplayStatementsTooltip from './DisplayStatementsTooltip';
 
 function getStatementValue<Attribute extends AttributeType>(
     statement: SecretStatementV2,
@@ -90,9 +91,10 @@ export function DisplaySecretStatements<Attribute extends AttributeType>({
         <Card className={clsx(className, 'display-statement-x')} type="grey">
             <Card.Row className="display-statement-x__header">
                 <Text.CaptureAdditional>{t('headers.secret')}</Text.CaptureAdditional>
-                <Button.Base>
-                    <InfoIcon />
-                </Button.Base>
+                <DisplayStatementsTooltip>
+                    <Text.MainMedium>{t('secretTooltip.header')}</Text.MainMedium>
+                    <Text.Capture className="block m-t-5">{t('secretTooltip.body')}</Text.Capture>
+                </DisplayStatementsTooltip>
             </Card.Row>
             {lines.map(({ description, ...l }, i) => (
                 <Card.Row className="display-statement-x__row">

@@ -5,11 +5,10 @@ import clsx from 'clsx';
 
 import Card from '@popup/popupX/shared/Card';
 import Text from '@popup/popupX/shared/Text';
-import Button from '@popup/popupX/shared/Button';
-import InfoIcon from '@assets/svgX/info.svg';
 
 import { DisplayStatementLine } from './DisplayStatementLine';
 import { DisplayProps, defaultFormatAttribute, getPropertyTitle } from './utils';
+import DisplayStatementsTooltip from './DisplayStatementsTooltip';
 
 type Props<Attribute> = DisplayProps<RevealStatementV2, Attribute> & {
     dappName: string;
@@ -39,9 +38,10 @@ export function DisplayRevealStatements<Attribute extends AttributeType>({
         <Card className={clsx(className, 'display-statement-x')} type="grey">
             <Card.Row className="display-statement-x__header">
                 <Text.CaptureAdditional>{t('headers.reveal')}</Text.CaptureAdditional>
-                <Button.Base>
-                    <InfoIcon />
-                </Button.Base>
+                <DisplayStatementsTooltip>
+                    <Text.MainMedium>{t('revealTooltip.header')}</Text.MainMedium>
+                    <Text.Capture className="block m-t-5">{t('revealTooltip.body')}</Text.Capture>
+                </DisplayStatementsTooltip>
             </Card.Row>
             {lines.map((l, i) => (
                 <Card.Row className="display-statement-x__row">
