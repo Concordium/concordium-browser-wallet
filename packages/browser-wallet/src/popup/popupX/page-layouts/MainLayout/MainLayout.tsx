@@ -5,6 +5,7 @@ import Header from '@popup/popupX/page-layouts/MainLayout/Header';
 import Toast from '@popup/popupX/shared/Toast';
 import { AccountButton, NavButton } from '@popup/popupX/page-layouts/MainLayout/Header/components';
 import { relativeRoutes, RoutePath } from '@popup/popupX/constants/routes';
+import { withPasswordSession } from '@popup/popupX/shared/utils/hoc';
 
 function exctractByProps(obj: typeof relativeRoutes, props: string[]): RoutePath | undefined {
     return props.reduce(
@@ -22,7 +23,7 @@ const getPageConfig = () => {
     return config || {};
 };
 
-export default function MainLayout() {
+function MainLayout() {
     const [scroll, setScroll] = React.useState(0);
     const isScrolling = useMemo(() => scroll > 0, [!!scroll]);
     const [menuOpen, setMenuOpen] = React.useState(false);
@@ -59,3 +60,5 @@ export default function MainLayout() {
         </div>
     );
 }
+
+export default withPasswordSession(MainLayout);

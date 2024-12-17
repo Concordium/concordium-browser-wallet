@@ -1,7 +1,10 @@
 import React, { useState } from 'react';
+import { useAtomValue } from 'jotai';
 import { useSelectedCredential } from '@popup/shared/utils/account-helpers';
 import Loader from '@popup/popupX/shared/Loader';
 import PasswordProtect, { PasswordProtectConfigType } from '@popup/popupX/shared/PasswordProtect';
+import PasswordSession from '@popup/popupX/shared/PasswordSession';
+import { sessionPasscodeAtom } from '@popup/store/settings';
 
 export function withSelectedCredential<P extends object>(
     Component: React.ComponentType<P>
@@ -24,6 +27,19 @@ export function withPasswordProtected(Component: React.ComponentType, config: Pa
 
         if (!passwordConfirmed) {
             return <PasswordProtect setPasswordConfirmed={setPasswordConfirmed} config={config} />;
+        }
+
+        return <Component />;
+    }
+    return NewComponent;
+}
+
+export function withPasswordSession(Component: React.ComponentType) {
+    function NewComponent() {
+        const { value: sessionPasscode } = useAtomValue(sessionPasscodeAtom);
+
+        if (!sessionPasscode) {
+            return <PasswordSession />;
         }
 
         return <Component />;

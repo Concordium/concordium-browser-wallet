@@ -51,7 +51,7 @@ export default function Connection({ hideConnection }: Props) {
             <div className="main-header__connection_info">
                 <span
                     className={clsx('connection_status', {
-                        connected: isAccountConnectedToSite,
+                        connected: !waitingForConnection && isAccountConnectedToSite,
                         waiting: waitingForConnection,
                     })}
                 >

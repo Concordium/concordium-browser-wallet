@@ -87,6 +87,10 @@ const t = {
         addressCopied: 'Address copied',
         copied: 'Copied',
     },
+    passwordSession: {
+        unlock: 'Unlock',
+        enterPassword: 'Please enter your passcode to enter the wallet.',
+    },
 };
 
 export default t;

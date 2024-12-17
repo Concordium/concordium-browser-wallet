@@ -4,6 +4,7 @@ import Toast from '@popup/popupX/shared/Toast';
 import clsx from 'clsx';
 import { Connection } from '@popup/popupX/page-layouts/MainLayout/Header/components';
 import FullscreenPromptLayout from '@popup/popupX/page-layouts/FullscreenPromptLayout';
+import { withPasswordSession } from '@popup/popupX/shared/utils/hoc';
 
 function Header({ isScrolling }: { isScrolling: boolean }) {
     return (
@@ -15,7 +16,7 @@ function Header({ isScrolling }: { isScrolling: boolean }) {
     );
 }
 
-export default function ExternalRequestLayout() {
+function ExternalRequestLayout() {
     const [scroll, setScroll] = React.useState(0);
     const isScrolling = useMemo(() => scroll > 0, [!!scroll]);
     return (
@@ -35,3 +36,5 @@ export default function ExternalRequestLayout() {
         </FullscreenPromptLayout>
     );
 }
+
+export default withPasswordSession(ExternalRequestLayout);
