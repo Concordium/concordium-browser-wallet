@@ -31,7 +31,9 @@ export type FullscreenNoticeProps = {
     /** Control whether notice is shown or not */
     open: boolean;
     /** Invoked when the notice is closed */
-    onClose(): void;
+    onClose?(): void;
+    /** Whether to include the header or not. Defaults to true */
+    header?: boolean;
 };
 
 /**
@@ -54,11 +56,12 @@ export default function FullscreenNotice({
     open,
     onClose,
     children,
+    header = true,
 }: PropsWithChildren<FullscreenNoticeProps>): JSX.Element | null {
     const [scroll, setScroll] = React.useState(0);
     const isScrolling = useMemo(() => scroll > 0, [!!scroll]);
     const close = useCallback(() => {
-        onClose();
+        onClose?.();
     }, [onClose]);
 
     useEffect(() => {
@@ -83,7 +86,7 @@ export default function FullscreenNotice({
 
     return (
         <Portal className="fullscreen-notice bg">
-            <Header isScrolling={isScrolling} onBack={close} />
+            {header && <Header isScrolling={isScrolling} onBack={close} />}
             <div
                 className="fullscreen-notice__content"
                 onScroll={(e) => {

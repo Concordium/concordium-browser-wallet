@@ -55,4 +55,25 @@
             margin-left: rem(5px);
         }
     }
+
+    &__progress-prompt {
+        .card-x {
+            margin-top: rem(124px);
+            align-items: center;
+        }
+
+        .failed-icon {
+            width: rem(48px);
+            height: rem(48px);
+
+            & path {
+                fill: $color-red-attention !important;
+            }
+
+        }
+
+        .error {
+            color: $color-red-attention !important;
+        }
+    }
 }

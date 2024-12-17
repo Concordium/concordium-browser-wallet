@@ -46,6 +46,12 @@ export default {
         noCredentialsForThatIssuer:
             'You do not hold any active credentials from the issuer that the verifier requested.',
     },
-    failedProof: 'Unable to create proof',
-    failedProofReason: 'Unable to create proof due to: {{ reason }}',
+    progress: {
+        inProgress: 'Proof of identity request is in progress',
+        success: 'Proof of identity request successful',
+        failed: 'Proof of identity request not successful',
+        buttonClose: 'Close',
+        failedProof: 'Unable to create proof',
+        failedProofReason: 'Unable to create proof due to: {{ reason }}',
+    },
 };
