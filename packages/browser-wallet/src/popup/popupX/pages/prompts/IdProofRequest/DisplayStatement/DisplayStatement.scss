@@ -40,6 +40,12 @@
             text-align: right;
         }
     }
+
+    .external-link {
+        &:hover {
+            color: inherit !important;
+        }
+    }
 }
 
 .display-statements-tooltip {

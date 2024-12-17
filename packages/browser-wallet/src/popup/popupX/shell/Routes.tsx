@@ -280,14 +280,33 @@ export default function Routes({ messagePromptHandlers }: { messagePromptHandler
                         element={
                             <IdProofRequest
                                 onSubmit={(proof) => handleIdProofResponse({ success: true, result: proof })}
-                                onReject={() =>
-                                    handleIdProofResponse({ success: false, message: 'Proof generation was rejected' })
+                                onReject={(reason) =>
+                                    handleIdProofResponse({
+                                        success: false,
+                                        message: `Proof generation was rejected${reason ? `: ${reason}` : ''}`,
+                                    })
                                 }
                             />
                         }
                     />
                     <Route
                         path={relativeRoutes.prompt.web3IdProof.path}
+                        element={
+                            <VerifiablePresentationRequest
+                                onSubmit={(presentationString) =>
+                                    handleWeb3IdProofResponse({ success: true, result: presentationString })
+                                }
+                                onReject={(reason) =>
+                                    handleWeb3IdProofResponse({
+                                        success: false,
+                                        message: `Proof generation was rejected${reason ? `: ${reason}` : ''}`,
+                                    })
+                                }
+                            />
+                        }
+                    />
+                    <Route
+                        path={relativeRoutes.prompt.ageProof.path}
                         element={
                             <VerifiablePresentationRequest
                                 onSubmit={(presentationString) =>

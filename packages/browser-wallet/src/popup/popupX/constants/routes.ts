@@ -322,6 +322,9 @@ export const relativeRoutes = {
         web3IdProof: {
             path: 'web3Id-proof',
         },
+        ageProof: {
+            path: 'age-proof',
+        },
     },
 };
 

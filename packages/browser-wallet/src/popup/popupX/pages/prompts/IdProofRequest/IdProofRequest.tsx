@@ -203,7 +203,7 @@ export default function IdProofRequest({ onReject, onSubmit }: Props) {
                 ))}
                 <Page.Footer>
                     <Button.Main
-                        className="secondary"
+                        className="secondary m-t-20"
                         disabled={creatingProof}
                         onClick={() => withClose(onReject)()}
                         label={t('reject')}

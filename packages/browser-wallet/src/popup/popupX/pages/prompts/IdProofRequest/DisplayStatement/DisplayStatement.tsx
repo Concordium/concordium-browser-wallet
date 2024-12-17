@@ -11,6 +11,8 @@ import { canProveStatement } from '@shared/utils/proof-helpers';
 import Card from '@popup/popupX/shared/Card';
 import Text from '@popup/popupX/shared/Text';
 
+import ExternalLink from '@popup/popupX/shared/ExternalLink';
+import urls from '@shared/constants/url';
 import {
     SecretStatement,
     useStatementDescription,
@@ -19,8 +21,6 @@ import {
     useStatementName,
 } from './utils';
 import DisplayStatementsTooltip from './DisplayStatementsTooltip';
-import ExternalLink from '@popup/popupX/shared/ExternalLink';
-import urls from '@shared/constants/url';
 
 export type StatementLine = {
     attribute: string;
@@ -75,7 +75,7 @@ export function DisplayStatementView({ className, lines, dappName, header, ...pr
                     ) : (
                         <Text.MainMedium>{t('secretTooltip.header')}</Text.MainMedium>
                     )}
-                    <Text.Capture>
+                    <Text.Capture className="block m-t-5">
                         <Trans
                             t={t}
                             i18nKey={props.reveal ? 'revealTooltip.body' : 'secretTooltip.body'}

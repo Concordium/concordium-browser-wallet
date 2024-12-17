@@ -37,7 +37,7 @@ import { fullscreenPromptContext } from '@popup/popupX/page-layouts/FullscreenPr
 import Button from '@popup/popupX/shared/Button';
 import Text from '@popup/popupX/shared/Text';
 
-import {ProofStatusPrompt} from '../IdProofRequest/IdProofRequest';
+import { ProofStatusPrompt } from '../IdProofRequest/IdProofRequest';
 
 import {
     createWeb3IdDIDFromCredential,
