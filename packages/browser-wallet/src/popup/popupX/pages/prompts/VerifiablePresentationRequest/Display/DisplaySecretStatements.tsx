@@ -5,8 +5,6 @@ import clsx from 'clsx';
 
 import Card from '@popup/popupX/shared/Card';
 import Text from '@popup/popupX/shared/Text';
-import Button from '@popup/popupX/shared/Button';
-import InfoIcon from '@assets/svgX/info.svg';
 
 import { DisplayStatementLine } from './DisplayStatementLine';
 import { SecretStatementV2 } from '../utils';

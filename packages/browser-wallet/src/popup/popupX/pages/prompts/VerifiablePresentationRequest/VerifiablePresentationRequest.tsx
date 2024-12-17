@@ -55,7 +55,7 @@ import { DisplayCredentialStatement } from './DisplayStatement';
 
 type Props = {
     onSubmit(presentationString: string): void;
-    onReject(): void;
+    onReject(reason?: string): void;
 };
 
 interface Location {
@@ -169,24 +169,25 @@ function DisplayNotProvable({
 type ProgressPromptProps = {
     onSuccess(proof: string): void;
     onError(message: string): void;
+    onClose(): void;
     proof: Promise<string> | undefined;
 };
 
-export function ProgressPrompt({ proof, onSuccess, onError }: ProgressPromptProps) {
+export function ProgressPrompt({ proof, onSuccess, onError, onClose }: ProgressPromptProps) {
     const { t } = useTranslation('x', { keyPrefix: 'prompts.verifiablePresentationRequest.progress' });
     const value = useAsyncMemo(async () => proof?.catch((e) => new Error(e.message ?? undefined)), noOp, [proof]);
 
-    const onContinue = () => {
+    useEffect(() => {
         if (value === undefined) {
-            throw new Error('Unreachable');
+            return;
         }
 
         if (typeof value === 'string') {
             onSuccess(value);
         } else {
-            onError(value?.message ? t('failedProofReason', { reason: value.message }) : t('failedProof'));
+            onError(value.message ? t('failedProofReason', { reason: value.message }) : t('failedProof'));
         }
-    };
+    }, [value]);
 
     return (
         <FullscreenNotice open={proof !== undefined} header={false}>
@@ -216,7 +217,7 @@ export function ProgressPrompt({ proof, onSuccess, onError }: ProgressPromptProp
                 </Card>
                 {value !== undefined && (
                     <Page.Footer>
-                        <Button.Main label={t('buttonClose')} onClick={onContinue} />
+                        <Button.Main label={t('buttonClose')} onClick={onClose} />
                     </Page.Footer>
                 )}
             </Page>
@@ -224,7 +225,7 @@ export function ProgressPrompt({ proof, onSuccess, onError }: ProgressPromptProp
     );
 }
 
-export default function Web3ProofRequest({ onReject, onSubmit }: Props) {
+export default function VerifiablePresentationRequest({ onReject, onSubmit }: Props) {
     const { state } = useLocation() as Location;
     const { statements: rawStatements, challenge, url } = state.payload;
     const { onClose, withClose } = useContext(fullscreenPromptContext);
@@ -356,7 +357,7 @@ export default function Web3ProofRequest({ onReject, onSubmit }: Props) {
 
     return (
         <>
-            <ProgressPrompt proof={proof} onSuccess={withClose(onSubmit)} onError={withClose(onReject)} />
+            <ProgressPrompt proof={proof} onSuccess={onSubmit} onError={onReject} onClose={withClose(noOp)} />
             <Page>
                 <Page.Top heading={t('title')} />
                 <DisplayCredentialStatement
@@ -395,7 +396,7 @@ export default function Web3ProofRequest({ onReject, onSubmit }: Props) {
                     <Button.Main
                         className="secondary"
                         disabled={creatingProof}
-                        onClick={withClose(onReject)}
+                        onClick={() => withClose(onReject)()}
                         label={t('reject')}
                     />
                     {currentStatementIndex > 0 && (

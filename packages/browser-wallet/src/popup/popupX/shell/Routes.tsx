@@ -280,10 +280,10 @@ export default function Routes({ messagePromptHandlers }: { messagePromptHandler
                                 onSubmit={(presentationString) =>
                                     handleWeb3IdProofResponse({ success: true, result: presentationString })
                                 }
-                                onReject={() =>
+                                onReject={(reason) =>
                                     handleWeb3IdProofResponse({
                                         success: false,
-                                        message: 'Proof generation was rejected',
+                                        message: `Proof generation was rejected${reason ? `: ${reason}` : ''}`,
                                     })
                                 }
                             />
