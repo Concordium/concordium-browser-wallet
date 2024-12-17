@@ -30,7 +30,7 @@ import { SecretStatement } from './DisplayStatement/utils';
 
 type Props = {
     onSubmit(proof: IdProofOutput): void;
-    onReject(): void;
+    onReject(reason?: string): void;
 };
 
 interface Location {
