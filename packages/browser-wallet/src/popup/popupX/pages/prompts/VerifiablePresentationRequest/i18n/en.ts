@@ -1,6 +1,6 @@
 export default {
     title: 'Proof of identity request',
-    header: '{{dappName}} requests the following information about you:',
+    header: '<1>{{dappName}}</1> requests the following information about you:',
     approve: 'Approve',
     continue: 'Continue',
     back: 'Back',
@@ -45,13 +45,5 @@ export default {
         unableToProve: 'One or more attributes do not meet the requirements from the verifier.',
         noCredentialsForThatIssuer:
             'You do not hold any active credentials from the issuer that the verifier requested.',
-    },
-    progress: {
-        inProgress: 'Proof of identity request is in progress',
-        success: 'Proof of identity request successful',
-        failed: 'Proof of identity request not successful',
-        buttonClose: 'Close',
-        failedProof: 'Unable to create proof',
-        failedProofReason: 'Unable to create proof due to: {{ reason }}',
     },
 };

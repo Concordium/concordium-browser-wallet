@@ -1,76 +1,58 @@
-$display-statement-color-success: $color-cta;
-$display-statement-color-invalid: $color-grey;
-
-.display-statement {
-    display: block;
-    border: 1px solid $display-statement-color-success;
-    border-radius: rem(5px);
-    background-color: $color-bg;
-
-    &--invalid {
-        border-color: $display-statement-color-invalid;
-    }
+.display-statement-x {
+    border: rem(1px) solid $color-input-border;
+    padding: rem(8px) rem(16px);
+    margin-bottom: rem(8px);
 
     &__header {
-        padding: rem(5px);
-        border-radius: rem(4px) rem(4px) 0 0;
-        background-color: $display-statement-color-success;
-        color: $color-off-white;
-        display: flex;
+        margin-left: rem(-16px);
+        margin-right: rem(-16px);
+        padding-left: rem(16px);
+        padding-right: rem(16px);
         justify-content: space-between;
-        font-size: rem(8px);
+        align-items: center;
 
-        .display-statement--invalid & {
-            background-color: $display-statement-color-invalid;
+        .capture__additional_small {
+            color: $color-white;
+        }
+
+        button {
+            background: unset;
+            border: unset;
+            padding: 0;
+            display: flex;
         }
     }
 
-    &__header-icon {
-        height: rem(15px);
-        flex: 0 0 auto;
+    &__row {
+        display: block !important;
     }
 
     &__line {
         display: flex;
-        width: 100%;
-        align-items: flex-end;
         justify-content: space-between;
-    }
+        color: $color-red-attention;
 
-    &__line-value {
-        display: flex;
-        align-items: center;
-        text-align: right;
-    }
+        &--valid {
+            color: $color-green-success;
+        }
 
-    &__line-check,
-    &__line-cross,
-    &__requirements-icon {
-        height: rem(7px);
-        margin-left: rem(5px);
-    }
-
-    &__line-cross path {
-        fill: $color-error;
-    }
-
-    &__line-check path {
-        .display-statement--invalid & {
-            fill: $color-grey;
+        *:last-child {
+            text-align: right;
         }
     }
+}
 
-    &__description {
-        font-size: rem(8px);
-        padding: 0 rem(5px) rem(5px);
-        white-space: break-spaces;
+.display-statements-tooltip {
+    background-color: $color-white;
+    border-radius: rem(8px);
+    width: calc(100% - 20px);
+    padding: rem(12px);
+
+    .text__main_medium, .capture__main_small {
+        color: $color-black;
     }
 
-    &__tooltip-icon {
-        height: rem(10px);
-    }
-
-    &__requirements-icon path {
-        fill: $color-off-white;
+    &__trigger {
+        cursor: pointer;
     }
 }

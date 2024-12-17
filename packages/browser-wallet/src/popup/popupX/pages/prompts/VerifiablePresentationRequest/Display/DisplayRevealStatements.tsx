@@ -6,9 +6,9 @@ import clsx from 'clsx';
 import Card from '@popup/popupX/shared/Card';
 import Text from '@popup/popupX/shared/Text';
 
-import { DisplayStatementLine } from './DisplayStatementLine';
+import { DisplayStatementLine } from '../../IdProofRequest/DisplayStatement/DisplayStatement';
 import { DisplayProps, defaultFormatAttribute, getPropertyTitle } from './utils';
-import DisplayStatementsTooltip from './DisplayStatementsTooltip';
+import DisplayStatementsTooltip from '../../IdProofRequest/DisplayStatement/DisplayStatementsTooltip';
 
 type Props<Attribute> = DisplayProps<RevealStatementV2, Attribute> & {
     dappName: string;

@@ -2,7 +2,7 @@ import React, { useCallback, useContext, useEffect, useMemo, useState } from 're
 import clsx from 'clsx';
 import { useLocation } from 'react-router-dom';
 import { useAtomValue, useSetAtom } from 'jotai';
-import { useTranslation } from 'react-i18next';
+import { Trans, useTranslation } from 'react-i18next';
 import {
     CredentialStatements,
     RequestStatement,
@@ -32,15 +32,12 @@ import { parse } from '@shared/utils/payload-helpers';
 import { VerifiableCredential, VerifiableCredentialStatus, WalletCredential } from '@shared/storage/types';
 import { getVerifiableCredentialStatus } from '@shared/utils/verifiable-credential-helpers';
 import { proveWeb3Request } from '@shared/utils/proof-helpers';
-import Button from '@popup/popupX/shared/Button';
 import Page from '@popup/popupX/shared/Page';
 import { fullscreenPromptContext } from '@popup/popupX/page-layouts/FullscreenPromptLayout';
-import FullscreenNotice from '@popup/popupX/shared/FullscreenNotice';
-import { LoaderInline } from '@popup/popupX/shared/Loader';
-import Card from '@popup/popupX/shared/Card';
+import Button from '@popup/popupX/shared/Button';
 import Text from '@popup/popupX/shared/Text';
-import CheckCircle from '@assets/svgX/check-circle.svg';
-import Cross from '@assets/svgX/close.svg';
+
+import {ProofStatusPrompt} from '../IdProofRequest/IdProofRequest';
 
 import {
     createWeb3IdDIDFromCredential,
@@ -166,65 +163,6 @@ function DisplayNotProvable({
     );
 }
 
-type ProgressPromptProps = {
-    onSuccess(proof: string): void;
-    onError(message: string): void;
-    onClose(): void;
-    proof: Promise<string> | undefined;
-};
-
-export function ProgressPrompt({ proof, onSuccess, onError, onClose }: ProgressPromptProps) {
-    const { t } = useTranslation('x', { keyPrefix: 'prompts.verifiablePresentationRequest.progress' });
-    const value = useAsyncMemo(async () => proof?.catch((e) => new Error(e.message ?? undefined)), noOp, [proof]);
-
-    useEffect(() => {
-        if (value === undefined) {
-            return;
-        }
-
-        if (typeof value === 'string') {
-            onSuccess(value);
-        } else {
-            onError(value.message ? t('failedProofReason', { reason: value.message }) : t('failedProof'));
-        }
-    }, [value]);
-
-    return (
-        <FullscreenNotice open={proof !== undefined} header={false}>
-            <Page className="verifiable-presentation-request__progress-prompt">
-                <Card type="transparent" className="flex justify-center">
-                    {value === undefined && (
-                        <>
-                            <LoaderInline />
-                            <Text.Capture className="block m-t-10">{t('inProgress')}</Text.Capture>
-                        </>
-                    )}
-                    {typeof value === 'string' && (
-                        <>
-                            <CheckCircle />
-                            <Text.Capture className="block m-t-10">{t('success')}</Text.Capture>
-                        </>
-                    )}
-                    {value instanceof Error && (
-                        <>
-                            <Cross className="failed-icon" />
-                            <Text.Capture className="block m-t-10">{t('failed')}</Text.Capture>
-                            {value.message && (
-                                <Text.Capture className="block m-t-10 error">{value.message}</Text.Capture>
-                            )}
-                        </>
-                    )}
-                </Card>
-                {value !== undefined && (
-                    <Page.Footer>
-                        <Button.Main label={t('buttonClose')} onClick={onClose} />
-                    </Page.Footer>
-                )}
-            </Page>
-        </FullscreenNotice>
-    );
-}
-
 export default function VerifiablePresentationRequest({ onReject, onSubmit }: Props) {
     const { state } = useLocation() as Location;
     const { statements: rawStatements, challenge, url } = state.payload;
@@ -241,7 +179,6 @@ export default function VerifiablePresentationRequest({ onReject, onSubmit }: Pr
     const [proof, setProof] = useState<Promise<string>>();
 
     const statements: CredentialStatements = useMemo(() => parse(rawStatements), [rawStatements]);
-
     const [ids, setIds] = useState<string[]>([]);
 
     const verifiableCredentialSchemas = useAtomValue(storedVerifiableCredentialSchemasAtom);
@@ -357,11 +294,18 @@ export default function VerifiablePresentationRequest({ onReject, onSubmit }: Pr
 
     return (
         <>
-            <ProgressPrompt proof={proof} onSuccess={onSubmit} onError={onReject} onClose={withClose(noOp)} />
-            <Page>
+            <ProofStatusPrompt proof={proof} onSuccess={onSubmit} onError={onReject} onClose={withClose(noOp)} />
+            <Page className="verifiable-presentation-request">
                 <Page.Top heading={t('title')} />
+                <Text.Main>
+                    <Trans
+                        t={t}
+                        i18nKey="header"
+                        components={{ 1: <span className="white" /> }}
+                        values={{ dappName }}
+                    />
+                </Text.Main>
                 <DisplayCredentialStatement
-                    className="m-t-10:not-first"
                     dappName={dappName}
                     validCredentials={validCredentials[currentStatementIndex]}
                     credentialStatement={statements[currentStatementIndex]}
@@ -375,7 +319,6 @@ export default function VerifiablePresentationRequest({ onReject, onSubmit }: Pr
                             return newIds;
                         })
                     }
-                    showDescription
                 />
                 <Page.Footer>
                     <div className="verifiable-presentation-request__progress">

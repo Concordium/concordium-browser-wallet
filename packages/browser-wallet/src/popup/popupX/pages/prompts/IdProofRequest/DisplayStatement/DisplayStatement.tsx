@@ -1,24 +1,16 @@
 /* eslint-disable react/prop-types */
 import clsx from 'clsx';
-import React, { useEffect, useState } from 'react';
+import React, { useEffect } from 'react';
 import { Trans, useTranslation } from 'react-i18next';
 import { ClassName } from 'wallet-common-helpers';
 import { RevealStatement, AttributeList } from '@concordium/web-sdk';
 
-import SecretIcon from '@assets/svg/id-secret.svg';
-import RevealIcon from '@assets/svg/id-reveal.svg';
-import InfoTooltipIcon from '@assets/svg/info-tooltip.svg';
-import WarningTooltipIcon from '@assets/svg/warning-tooltip.svg';
-import CheckmarkIcon from '@assets/svg/checkmark-dark-green.svg';
-import CrossIcon from '@assets/svg/cross.svg';
-
-import Button from '@popup/shared/Button';
-import Modal from '@popup/shared/Modal';
 import { useDisplayAttributeValue, useGetAttributeName } from '@popup/shared/utils/identity-helpers';
 import { ConfirmedIdentity } from '@shared/storage/types';
-import ExternalLink from '@popup/shared/ExternalLink';
-import urls from '@shared/constants/url';
 import { canProveStatement } from '@shared/utils/proof-helpers';
+import Card from '@popup/popupX/shared/Card';
+import Text from '@popup/popupX/shared/Text';
+
 import {
     SecretStatement,
     useStatementDescription,
@@ -26,6 +18,9 @@ import {
     useStatementValue,
     useStatementName,
 } from './utils';
+import DisplayStatementsTooltip from './DisplayStatementsTooltip';
+import ExternalLink from '@popup/popupX/shared/ExternalLink';
+import urls from '@shared/constants/url';
 
 export type StatementLine = {
     attribute: string;
@@ -37,62 +32,16 @@ type StatementLineProps = StatementLine & ClassName;
 
 export function DisplayStatementLine({ attribute, value, isRequirementMet, className }: StatementLineProps) {
     return (
-        <li className={clsx(className, 'display-statement__line')}>
-            <div className="display-statement__line-attribute">{attribute}:</div>
-            <div className="display-statement__line-value">
-                {value}
-                {isRequirementMet ? (
-                    <CheckmarkIcon className="display-statement__line-check" />
-                ) : (
-                    <CrossIcon className="display-statement__line-cross" />
-                )}
-            </div>
-        </li>
-    );
-}
-
-type StatementTooltipProps = {
-    reveal?: boolean;
-};
-
-function StatementTooltip({ reveal }: StatementTooltipProps) {
-    const [open, setOpen] = useState(false);
-    const { t } = useTranslation('idProofRequest', { keyPrefix: 'displayStatement' });
-
-    return (
-        <Modal
-            open={open}
-            onOpen={() => setOpen(true)}
-            onClose={() => setOpen(false)}
-            trigger={
-                <Button clear className="flex">
-                    {reveal ? (
-                        <WarningTooltipIcon className="display-statement__tooltip-icon" />
-                    ) : (
-                        <InfoTooltipIcon className="display-statement__tooltip-icon" />
-                    )}
-                </Button>
-            }
+        <div
+            className={clsx(
+                className,
+                'display-statement-x__line',
+                isRequirementMet && 'display-statement-x__line--valid'
+            )}
         >
-            <h3>
-                {reveal ? (
-                    <Trans
-                        ns="idProofRequest"
-                        i18nKey="displayStatement.revealTooltip.header"
-                        components={{ 1: <WarningTooltipIcon className="display-statement__tooltip-icon" /> }}
-                    />
-                ) : (
-                    t('secretTooltip.header')
-                )}
-            </h3>
-            <div className="white-space-break">
-                <Trans
-                    ns="idProofRequest"
-                    i18nKey={reveal ? 'displayStatement.revealTooltip.body' : 'displayStatement.secretTooltip.body'}
-                    components={{ 1: <ExternalLink path={urls.zkpDocumentation} /> }}
-                />
-            </div>
-        </Modal>
+            <div>{attribute}</div>
+            <div>{value}</div>
+        </div>
     );
 }
 
@@ -114,63 +63,51 @@ type SecretViewProps = BaseViewProps & {
 type ViewProps = RevealViewProps | SecretViewProps;
 
 export function DisplayStatementView({ className, lines, dappName, header, ...props }: ViewProps) {
-    const isValid = lines.every((l) => l.isRequirementMet);
-    const { t } = useTranslation('idProofRequest', { keyPrefix: 'displayStatement' });
+    const { t } = useTranslation('x', { keyPrefix: 'prompts.idProofRequestX.displayStatement' });
 
     return (
-        <section className={clsx('display-statement', !isValid && 'display-statement--invalid', className)}>
-            <header className="display-statement__header">
-                <div className="flex align-center">
+        <Card className={clsx(className, 'display-statement-x')} type="grey">
+            <Card.Row className="display-statement-x__header">
+                <Text.CaptureAdditional>{header}</Text.CaptureAdditional>
+                <DisplayStatementsTooltip>
                     {props.reveal ? (
-                        <RevealIcon className="display-statement__header-icon" />
+                        <Text.MainMedium>{t('revealTooltip.header')}</Text.MainMedium>
                     ) : (
-                        <SecretIcon className="display-statement__header-icon" />
+                        <Text.MainMedium>{t('secretTooltip.header')}</Text.MainMedium>
                     )}
-                    <div className="m-l-5">
-                        <div>
-                            <strong>{header}</strong>
-                        </div>
-                        <div className="flex align-center">
-                            {isValid ? (
-                                <>
-                                    {t('requirementsMet')}{' '}
-                                    <CheckmarkIcon className="display-statement__requirements-icon" />
-                                </>
-                            ) : (
-                                <>
-                                    {t('requirementsNotMet')}{' '}
-                                    <CrossIcon className="display-statement__requirements-icon" />
-                                </>
-                            )}
-                        </div>
-                    </div>
-                </div>
-                <StatementTooltip reveal={props.reveal} />
-            </header>
-            <ul className="list-clear p-5 m-0">
-                {lines.map((l, i) => (
-                    <DisplayStatementLine
-                        // eslint-disable-next-line react/no-array-index-key
-                        key={i} // Allow this, as we don't expect these to ever change.
-                        {...l}
-                    />
-                ))}
-            </ul>
-            {(props.reveal || props.description) && (
-                <div className="display-statement__description">
-                    {props.reveal ? (
+                    <Text.Capture>
                         <Trans
-                            ns="idProofRequest"
-                            i18nKey="displayStatement.revealDescription"
-                            components={{ 1: <strong /> }}
-                            values={{ dappName }}
+                            t={t}
+                            i18nKey={props.reveal ? 'revealTooltip.body' : 'secretTooltip.body'}
+                            components={{ 1: <ExternalLink path={urls.zkpDocumentation} /> }}
                         />
-                    ) : (
-                        props.description
-                    )}
-                </div>
-            )}
-        </section>
+                    </Text.Capture>
+                </DisplayStatementsTooltip>
+            </Card.Row>
+            {lines.map((l, i) => (
+                <Card.Row className="display-statement-x__row">
+                    <Text.CaptureAdditional>
+                        <DisplayStatementLine
+                            // eslint-disable-next-line react/no-array-index-key
+                            key={i} // Allow this, as we don't expect these to ever change.
+                            {...l}
+                        />
+                    </Text.CaptureAdditional>
+                </Card.Row>
+            ))}
+            <Text.Capture className="m-t-5 block">
+                {props.reveal ? (
+                    <Trans
+                        ns="idProofRequest"
+                        i18nKey="displayStatement.revealDescription"
+                        components={{ 1: <strong /> }}
+                        values={{ dappName }}
+                    />
+                ) : (
+                    props.description
+                )}
+            </Text.Capture>
+        </Card>
     );
 }
 

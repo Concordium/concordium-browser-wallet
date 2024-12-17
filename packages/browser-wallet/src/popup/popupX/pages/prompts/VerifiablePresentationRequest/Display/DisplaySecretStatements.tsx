@@ -6,10 +6,10 @@ import clsx from 'clsx';
 import Card from '@popup/popupX/shared/Card';
 import Text from '@popup/popupX/shared/Text';
 
-import { DisplayStatementLine } from './DisplayStatementLine';
+import { DisplayStatementLine } from '../../IdProofRequest/DisplayStatement/DisplayStatement';
 import { SecretStatementV2 } from '../utils';
 import { DisplayProps, defaultFormatAttribute, getPropertyTitle } from './utils';
-import DisplayStatementsTooltip from './DisplayStatementsTooltip';
+import DisplayStatementsTooltip from '../../IdProofRequest/DisplayStatement/DisplayStatementsTooltip';
 
 function getStatementValue<Attribute extends AttributeType>(
     statement: SecretStatementV2,
