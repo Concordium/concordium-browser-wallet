@@ -1,0 +1,76 @@
+$display-statement-color-success: $color-cta;
+$display-statement-color-invalid: $color-grey;
+
+.display-statement {
+    display: block;
+    border: 1px solid $display-statement-color-success;
+    border-radius: rem(5px);
+    background-color: $color-bg;
+
+    &--invalid {
+        border-color: $display-statement-color-invalid;
+    }
+
+    &__header {
+        padding: rem(5px);
+        border-radius: rem(4px) rem(4px) 0 0;
+        background-color: $display-statement-color-success;
+        color: $color-off-white;
+        display: flex;
+        justify-content: space-between;
+        font-size: rem(8px);
+
+        .display-statement--invalid & {
+            background-color: $display-statement-color-invalid;
+        }
+    }
+
+    &__header-icon {
+        height: rem(15px);
+        flex: 0 0 auto;
+    }
+
+    &__line {
+        display: flex;
+        width: 100%;
+        align-items: flex-end;
+        justify-content: space-between;
+    }
+
+    &__line-value {
+        display: flex;
+        align-items: center;
+        text-align: right;
+    }
+
+    &__line-check,
+    &__line-cross,
+    &__requirements-icon {
+        height: rem(7px);
+        margin-left: rem(5px);
+    }
+
+    &__line-cross path {
+        fill: $color-error;
+    }
+
+    &__line-check path {
+        .display-statement--invalid & {
+            fill: $color-grey;
+        }
+    }
+
+    &__description {
+        font-size: rem(8px);
+        padding: 0 rem(5px) rem(5px);
+        white-space: break-spaces;
+    }
+
+    &__tooltip-icon {
+        height: rem(10px);
+    }
+
+    &__requirements-icon path {
+        fill: $color-off-white;
+    }
+}
