@@ -1,6 +1,13 @@
-@import './Display/DisplayStatement';
-
 .verifiable-presentation-request {
+    .text__main {
+        color: $color-mineral-2;
+        margin-bottom: rem(24px);
+
+        .white {
+            color: $color-white;
+        }
+    }
+
     &__progress {
         display: flex;
         align-items: center;
@@ -30,7 +37,7 @@
     &__cred-selector {
         display: inline-flex;
         position: relative;
-        margin: rem(16px) 0;
+        margin: 0 0 rem(16px);
         align-self: flex-start;
 
         select {
@@ -53,27 +60,6 @@
 
         svg {
             margin-left: rem(5px);
-        }
-    }
-
-    &__progress-prompt {
-        .card-x {
-            margin-top: rem(124px);
-            align-items: center;
-        }
-
-        .failed-icon {
-            width: rem(48px);
-            height: rem(48px);
-
-            & path {
-                fill: $color-red-attention !important;
-            }
-
-        }
-
-        .error {
-            color: $color-red-attention !important;
         }
     }
 }

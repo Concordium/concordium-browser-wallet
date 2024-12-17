@@ -38,7 +38,7 @@ export interface DisplayCredentialStatementProps<Statement, Credential> extends 
     chosenId: string;
     setChosenId: (id: string) => void;
     net: Network;
-    showDescription: boolean;
+    showDescription?: boolean;
 }
 
 export function getAccountCredentialCommitmentInput(

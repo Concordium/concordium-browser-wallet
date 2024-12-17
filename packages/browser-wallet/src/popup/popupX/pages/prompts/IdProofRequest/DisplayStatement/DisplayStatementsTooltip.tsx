@@ -22,13 +22,7 @@ export default function DisplayStatementsTooltip({ children }: Props) {
     const { refs, floatingStyles, context } = useFloating({
         open: isOpen,
         onOpenChange: setIsOpen,
-        middleware: [
-            arrow({ element: arrowRef, padding: 30 }),
-            flip(),
-            size({ padding: 5 }),
-            offset(5),
-            // shift(),
-        ],
+        middleware: [arrow({ element: arrowRef, padding: 30 }), flip(), size({ padding: 5 }), offset(5)],
         placement: 'top-end',
         whileElementsMounted: autoUpdate,
     });

@@ -3,13 +3,6 @@ import React from 'react';
 import { Meta, StoryObj } from '@storybook/react';
 import { DisplayStatementView } from './DisplayStatement';
 
-export default {
-    title: 'Pages/IdProofRequest/DisplayStatement',
-    component: DisplayStatementView,
-} as Meta<typeof DisplayStatementView>;
-
-type Story = StoryObj<typeof DisplayStatementView>;
-
 const render: Story['render'] = (args) => {
     return (
         <div style={{ width: 330 }}>
@@ -17,6 +10,22 @@ const render: Story['render'] = (args) => {
         </div>
     );
 };
+
+export default {
+    title: 'X/Pages/IdProofRequest/DisplayStatement',
+    component: DisplayStatementView,
+    render,
+    beforeEach: () => {
+        const body = document.getElementsByTagName('body').item(0);
+        body?.classList.add('popup-x');
+
+        return () => {
+            body?.classList.remove('popup-x');
+        };
+    },
+} as Meta<typeof DisplayStatementView>;
+
+type Story = StoryObj<typeof DisplayStatementView>;
 
 export const ValidRevealAttributes: Story = {
     args: {
@@ -28,7 +37,6 @@ export const ValidRevealAttributes: Story = {
             { attribute: 'Last name', value: 'Johnson', isRequirementMet: true },
         ],
     },
-    render,
 };
 export const InvalidRevealAttributes: Story = {
     args: {
@@ -41,7 +49,6 @@ export const InvalidRevealAttributes: Story = {
             { attribute: 'ID document type', value: 'Passport', isRequirementMet: false },
         ],
     },
-    render,
 };
 export const ValidSecretProof: Story = {
     args: {
@@ -62,5 +69,4 @@ export const InvalidSecretProof: Story = {
             'Your identity document issuer is one of the following:\nAndorra, United Arab Emirates, Afghanistan, Antigua and Barbuda, Anguilla, Albania, Benin, Brazil, Bahamas, Bhutan, Belize, Canada, Chile, Spain, Finland, Fiji, Ghana, Hong Kong, Indonesia, Korea, Mali, Malta, Malawi, Mexico, Mozambique, Namibia, Nigeria, Nicaragua, Panama, Peru',
         lines: [{ attribute: 'Document issuer', value: '1 of 30 issuers', isRequirementMet: false }],
     },
-    render,
 };

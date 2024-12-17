@@ -1,5 +1,6 @@
 export default {
-    header: '{{dappName}} requests the following information about you:',
+    title: 'Proof of identity request',
+    header: '<1>{{dappName}}</1> requests the following information about you:',
     accept: 'Accept',
     reject: 'Reject',
     displayStatement: {
@@ -77,4 +78,12 @@ export default {
     },
     failedProof: 'Unable to create proof',
     failedProofReason: 'Unable to create proof due to: {{ reason }}',
+    status: {
+        inProgress: 'Proof of identity request is in progress',
+        success: 'Proof of identity request successful',
+        failed: 'Proof of identity request not successful',
+        buttonClose: 'Close',
+        failedProof: 'Unable to create proof',
+        failedProofReason: 'Unable to create proof due to: {{ reason }}',
+    },
 };

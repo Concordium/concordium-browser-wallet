@@ -56,6 +56,7 @@ import EndIdentityIssuance from '../pages/prompts/EndIdentityIssuance';
 import Web3IdDetails from '../pages/Web3Id/Web3IdDetails';
 import AddWeb3IdCredential from '../pages/prompts/AddWeb3IdCredential';
 import VerifiablePresentationRequest from '../pages/prompts/VerifiablePresentationRequest/VerifiablePresentationRequest';
+import IdProofRequest from '../pages/prompts/IdProofRequest';
 
 export default function Routes({ messagePromptHandlers }: { messagePromptHandlers: MessagePromptHandlersType }) {
     const {
@@ -65,6 +66,7 @@ export default function Routes({ messagePromptHandlers }: { messagePromptHandler
         handleSendTransactionResponse,
         handleAddWeb3IdCredentialResponse,
         handleWeb3IdProofResponse,
+        handleIdProofResponse,
     } = messagePromptHandlers;
     return (
         <ReactRoutes>
@@ -274,7 +276,37 @@ export default function Routes({ messagePromptHandlers }: { messagePromptHandler
                         }
                     />
                     <Route
+                        path={relativeRoutes.prompt.idProof.path}
+                        element={
+                            <IdProofRequest
+                                onSubmit={(proof) => handleIdProofResponse({ success: true, result: proof })}
+                                onReject={(reason) =>
+                                    handleIdProofResponse({
+                                        success: false,
+                                        message: `Proof generation was rejected${reason ? `: ${reason}` : ''}`,
+                                    })
+                                }
+                            />
+                        }
+                    />
+                    <Route
                         path={relativeRoutes.prompt.web3IdProof.path}
+                        element={
+                            <VerifiablePresentationRequest
+                                onSubmit={(presentationString) =>
+                                    handleWeb3IdProofResponse({ success: true, result: presentationString })
+                                }
+                                onReject={(reason) =>
+                                    handleWeb3IdProofResponse({
+                                        success: false,
+                                        message: `Proof generation was rejected${reason ? `: ${reason}` : ''}`,
+                                    })
+                                }
+                            />
+                        }
+                    />
+                    <Route
+                        path={relativeRoutes.prompt.ageProof.path}
                         element={
                             <VerifiablePresentationRequest
                                 onSubmit={(presentationString) =>
