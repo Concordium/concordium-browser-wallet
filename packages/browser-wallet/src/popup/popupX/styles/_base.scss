@@ -1,5 +1,7 @@
 &:not(html) {
     background-color: rgba($color-black, 0.9);
+    color: $color-white;
+    font-family: $t-font-family-satoshi;
 }
 
 .bg {

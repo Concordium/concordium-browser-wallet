@@ -11,6 +11,8 @@ import { formatCcdAmount } from '@popup/popupX/shared/utils/helpers';
 import FullscreenNotice, { FullscreenNoticeProps } from '@popup/popupX/shared/FullscreenNotice';
 import Page from '@popup/popupX/shared/Page';
 import Button from '@popup/popupX/shared/Button';
+import Text from '@popup/popupX/shared/Text';
+
 import DelegatorStake from './Stake';
 import DelegatorType from './Type';
 import { configureDelegatorPayloadFromForm, type DelegatorForm } from './util';
@@ -22,7 +24,7 @@ function NoChangesNotice(props: FullscreenNoticeProps) {
         <FullscreenNotice {...props}>
             <Page>
                 <Page.Top heading={t('title')} />
-                {t('description')}
+                <Text.Capture>{t('description')}</Text.Capture>
                 <Page.Footer>
                     <Button.Main label={t('buttonBack')} onClick={props.onClose} />
                 </Page.Footer>
