@@ -20,5 +20,9 @@
         padding: 0 rem(24px);
         overflow: auto;
         height: calc(100% - 7.4rem);
+
+        &:first-child {
+            height: 100%;
+        }
     }
 }

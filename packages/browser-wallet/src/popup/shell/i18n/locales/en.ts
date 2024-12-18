@@ -59,6 +59,8 @@ import submittedTransaction from '@popup/popupX/pages/SubmittedTransaction/i18n/
 import nft from '@popup/popupX/pages/Nft/i18n/en';
 import idIssuance from '@popup/popupX/pages/IdIssuance/i18n/en';
 import addWeb3IdCredentialX from '@popup/popupX/pages/prompts/AddWeb3IdCredential/i18n/en';
+import idProofRequestX from '@popup/popupX/pages/prompts/IdProofRequest/i18n/en';
+import verifiablePresentationRequest from '@popup/popupX/pages/prompts/VerifiablePresentationRequest/i18n/en';
 
 const t = {
     shared,
@@ -119,7 +121,9 @@ const t = {
             signCis3,
             signMessageX,
             sendTransactionX,
-            AddWeb3IdCredentialX: addWeb3IdCredentialX,
+            addWeb3IdCredentialX,
+            verifiablePresentationRequest,
+            idProofRequestX,
         },
         submittedTransaction,
         nft,

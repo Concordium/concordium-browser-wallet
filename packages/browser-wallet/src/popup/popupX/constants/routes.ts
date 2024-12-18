@@ -316,6 +316,15 @@ export const relativeRoutes = {
         addWeb3IdCredential: {
             path: 'add-web3id-credential',
         },
+        idProof: {
+            path: 'id-proof',
+        },
+        web3IdProof: {
+            path: 'web3Id-proof',
+        },
+        ageProof: {
+            path: 'age-proof',
+        },
     },
 };
 

@@ -54,7 +54,7 @@ interface Location {
 
 export default function AddWeb3IdCredential({ onAllow, onReject }: Props) {
     const { state } = useLocation() as Location;
-    const { t } = useTranslation('x', { keyPrefix: 'prompts.AddWeb3IdCredentialX' });
+    const { t } = useTranslation('x', { keyPrefix: 'prompts.addWeb3IdCredentialX' });
     const { i18n } = useTranslation();
     const { onClose, withClose } = useContext(fullscreenPromptContext);
     const [acceptButtonDisabled, setAcceptButtonDisabled] = useState<boolean>(false);
