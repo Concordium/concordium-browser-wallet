@@ -12,6 +12,7 @@ import Button from '@popup/popupX/shared/Button';
 import { useBlockChainParametersAboveV0 } from '@popup/shared/BlockChainParametersProvider';
 import { useSelectedAccountInfo } from '@popup/shared/AccountInfoListenerContext/AccountInfoListenerContext';
 import { formatCcdAmount } from '@popup/popupX/shared/utils/helpers';
+import Text from '@popup/popupX/shared/Text';
 
 import { ValidatorForm, ValidatorFormExisting, configureValidatorFromForm } from './util';
 import ValidatorStake from './Stake';
@@ -27,7 +28,7 @@ function NoChangesNotice(props: FullscreenNoticeProps) {
         <FullscreenNotice {...props}>
             <Page>
                 <Page.Top heading={t('title')} />
-                {t('description')}
+                <Text.Capture>{t('description')}</Text.Capture>
                 <Page.Footer>
                     <Button.Main label={t('buttonBack')} onClick={props.onClose} />
                 </Page.Footer>

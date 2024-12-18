@@ -31,7 +31,7 @@ function HighStakeWarning({ onContinue, ...props }: HighStakeNoticeProps) {
         <FullscreenNotice {...props}>
             <Page>
                 <Page.Top heading={t('title')} />
-                {t('description', { threshold: STAKE_WARNING_THRESHOLD.toString() })}
+                <Text.Capture>{t('description', { threshold: STAKE_WARNING_THRESHOLD.toString() })}</Text.Capture>
                 <Page.Footer>
                     <Button.Main label={t('buttonContinue')} onClick={onContinue} />
                     <Button.Main label={t('buttonBack')} onClick={props.onClose} />
