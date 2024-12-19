@@ -5,6 +5,7 @@ import i18n from '@popup/shell/i18n';
 export type RouteConfig = {
     hideBackArrow?: boolean;
     backTitle?: string;
+    navBackSteps?: number;
     hideMenu?: boolean;
     hideConnection?: boolean;
     showAccountSelector?: boolean;
@@ -69,12 +70,18 @@ export const relativeRoutes = {
         },
         sendFunds: {
             path: 'account/:account/send-funds',
+            config: {
+                navBackSteps: 3,
+            },
         },
         receive: {
             path: 'receive',
         },
         transactionLog: {
             path: 'account/:account/transactions',
+            config: {
+                navBackSteps: 3,
+            },
             details: {
                 path: ':transactionHash',
                 config: {
@@ -86,9 +93,15 @@ export const relativeRoutes = {
             path: 'token',
             ccd: {
                 path: 'ccd',
+                config: {
+                    navBackSteps: 2,
+                },
             },
             details: {
                 path: ':contractIndex',
+                config: {
+                    navBackSteps: 2,
+                },
                 raw: {
                     path: 'raw',
                 },
@@ -98,6 +111,7 @@ export const relativeRoutes = {
             path: 'submitted/:transactionHash',
             config: {
                 hideBackArrow: true,
+                navBackSteps: 2,
             },
         },
         manageTokenList: {
@@ -143,10 +157,14 @@ export const relativeRoutes = {
                 path: 'connected-sites/:account',
                 config: {
                     backTitle: 'to Accounts list',
+                    navBackSteps: 2,
                 },
             },
             privateKey: {
                 path: 'private-key/:account',
+                config: {
+                    navBackSteps: 2,
+                },
             },
         },
         createAccount: {
@@ -185,6 +203,7 @@ export const relativeRoutes = {
                 path: 'connect',
                 config: {
                     backTitle: 'Network settings',
+                    navBackSteps: 2,
                 },
             },
         },
@@ -201,6 +220,9 @@ export const relativeRoutes = {
             path: 'nft',
             details: {
                 path: ':contractIndex/:id/details',
+                config: {
+                    navBackSteps: 3,
+                },
                 raw: {
                     path: 'raw',
                 },
@@ -217,6 +239,7 @@ export const relativeRoutes = {
                     path: 'register',
                     config: {
                         backTitle: i18n.t('x:earn.validator.register.backTitle'),
+                        navBackSteps: 2,
                     },
                     /** Flow for constructing the transaction */
                     configure: {
@@ -267,6 +290,7 @@ export const relativeRoutes = {
                 path: 'delegator',
                 config: {
                     backTitle: i18n.t('x:earn.delegator.status.backTitle'),
+                    navBackSteps: 2,
                 },
                 /** Configure new delegator */
                 register: {
