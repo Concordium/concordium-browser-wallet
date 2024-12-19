@@ -37,6 +37,33 @@ export const relativeRoutes = {
                 hideConnection: true,
             },
         },
+        createOrRestore: {
+            path: 'createOrRestore',
+            config: {
+                hideBackArrow: false,
+                backTitle: '',
+                hideMenu: true,
+                hideConnection: true,
+            },
+        },
+        selectNetwork: {
+            path: 'selectNetwork',
+            config: {
+                hideBackArrow: false,
+                backTitle: '',
+                hideMenu: true,
+                hideConnection: true,
+            },
+        },
+        restoreWallet: {
+            path: 'restoreWallet',
+            config: {
+                hideBackArrow: false,
+                backTitle: '',
+                hideMenu: true,
+                hideConnection: true,
+            },
+        },
         idIntro: {
             path: 'idIntro',
             config: {
@@ -200,7 +227,7 @@ export const relativeRoutes = {
         network: {
             path: 'network',
             connect: {
-                path: 'connect',
+                path: 'connect/:genesisHash',
                 config: {
                     backTitle: 'Network settings',
                     navBackSteps: 2,

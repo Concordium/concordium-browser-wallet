@@ -17,7 +17,15 @@ import { Web3IdCredentials, Web3IdImport } from '@popup/popupX/pages/Web3Id';
 import NetworkSettings from '@popup/popupX/pages/NetworkSettings';
 import ConnectNetwork from '@popup/popupX/pages/ConnectNetwork';
 import About from '@popup/popupX/pages/About';
-import { IdSubmitted, IdCardsInfo, RequestIdentity, SetupPassword, Welcome } from '@popup/popupX/pages/Onboarding';
+import {
+    IdSubmitted,
+    IdCardsInfo,
+    SetupPassword,
+    Welcome,
+    CreateOrRestore,
+    SelectNetwork,
+    RestoreWallet,
+} from '@popup/popupX/pages/Onboarding';
 import ConnectedSites from '@popup/popupX/pages/ConnectedSites';
 import EarningRewards from '@popup/popupX/pages/EarningRewards';
 import ValidatorIntro from '@popup/popupX/pages/EarningRewards/Validator/Intro';
@@ -74,8 +82,11 @@ export default function Routes({ messagePromptHandlers }: { messagePromptHandler
                 <Route element={<MainLayout />} path={relativeRoutes.onboarding.path}>
                     <Route index element={<Welcome />} />
                     <Route element={<SetupPassword />} path={relativeRoutes.onboarding.setupPassword.path} />
+                    <Route element={<CreateOrRestore />} path={relativeRoutes.onboarding.createOrRestore.path} />
+                    <Route element={<SelectNetwork />} path={relativeRoutes.onboarding.selectNetwork.path} />
+                    <Route element={<RestoreWallet />} path={relativeRoutes.onboarding.restoreWallet.path} />
                     <Route element={<IdCardsInfo />} path={relativeRoutes.onboarding.idIntro.path} />
-                    <Route element={<RequestIdentity />} path={relativeRoutes.onboarding.requestIdentity.path} />
+                    <Route element={<IdIssuance />} path={relativeRoutes.onboarding.requestIdentity.path} />
                     <Route element={<IdSubmitted />} path={relativeRoutes.onboarding.idSubmitted.path} />
                 </Route>
                 <Route element={<MainLayout />} path={relativeRoutes.home.path}>

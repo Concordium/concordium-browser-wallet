@@ -22,7 +22,7 @@
         background-color: $color-input-bg;
         color: $color-white;
         height: rem(56px);
-        border: rem(1px) solid $color-grey-4;
+        border: rem(1px) solid $color-input-border;
         border-radius: rem(12px);
         padding: rem(28px) rem(14px) rem(12px);
         width: 100%;
@@ -36,6 +36,7 @@
         @include transition(border-color);
 
         &:focus {
+            background-color: $color-grey-3;
             border-color: $color-mineral-2;
         }
 
@@ -173,7 +174,7 @@
         svg {
             g,
             path {
-                fill: $color-mineral-3;
+                fill: $color-mineral-2;
             }
         }
     }
