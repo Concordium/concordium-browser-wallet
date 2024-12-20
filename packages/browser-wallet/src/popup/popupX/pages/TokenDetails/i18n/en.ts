@@ -7,6 +7,7 @@ const t = {
     description: 'Description',
     decimals: 'Decimals',
     indexSubindex: 'Contract index, subindex',
+    tokenId: 'Token ID',
     showRawMetadata: 'Show raw metadata',
     hideToken: 'Hide token from account',
     atDisposal: 'At disposal',

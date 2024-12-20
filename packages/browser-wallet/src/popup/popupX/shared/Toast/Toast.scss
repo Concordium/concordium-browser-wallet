@@ -10,7 +10,7 @@
     border-radius: rem(16px);
     padding: rem(10px) rem(15px);
     position: absolute;
-    z-index: 2;
+    z-index: 4;
     bottom: rem(16px);
     backdrop-filter: blur(5px);
     box-shadow: 0 -6px 15.3px 0 rgba($color-black, 0.25);
@@ -50,12 +50,23 @@
     }
 }
 
-.copy-address-x {
+.copy-address-x,
+.generic-toast-x {
     display: flex;
     flex-direction: row;
     align-items: center;
 
-    .copy-message {
+    svg {
+        width: rem(24px);
+        height: rem(24px);
+
+        path {
+            fill: $color-black;
+        }
+    }
+
+    .copy-message,
+    .generic-toast-message {
         display: flex;
         flex-direction: column;
         align-items: flex-start;
@@ -69,6 +80,10 @@
 
         .capture__main_small {
             color: $color-black;
+
+            &:empty {
+                display: none;
+            }
         }
     }
 }

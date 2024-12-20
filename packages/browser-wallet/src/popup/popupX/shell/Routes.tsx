@@ -37,7 +37,7 @@ import SignCis3Message from '@popup/popupX/pages/prompts/SignCis3Message';
 import SignMessage from '@popup/popupX/pages/prompts/SignMessage';
 import SendTransaction from '@popup/popupX/pages/prompts/SendTransaction';
 import ExternalRequestLayout from '@popup/popupX/page-layouts/ExternalRequestLayout';
-import { ManageTokenList, AddToken } from '@popup/popupX/pages/ManageTokens';
+import { ManageTokenList, AddToken, SearchTokenDetails } from '@popup/popupX/pages/ManageTokens';
 import { Nft, NftDetails, NftRaw } from 'src/popup/popupX/pages/Nft';
 import { DelegationResult } from '../pages/EarningRewards/Delegator/Result';
 import SubmittedTransaction from '../pages/SubmittedTransaction';
@@ -113,7 +113,16 @@ export default function Routes({ messagePromptHandlers }: { messagePromptHandler
                     />
                     <Route path={relativeRoutes.home.manageTokenList.path}>
                         <Route index element={<ManageTokenList />} />
-                        <Route element={<AddToken />} path={relativeRoutes.home.manageTokenList.addToken.path} />
+                        <Route path={relativeRoutes.home.manageTokenList.addToken.path}>
+                            <Route index element={<AddToken />} />
+                            <Route path={relativeRoutes.home.manageTokenList.addToken.contractIndex.path}>
+                                <Route index element={<AddToken />} />
+                                <Route
+                                    path={relativeRoutes.home.manageTokenList.addToken.contractIndex.details.path}
+                                    element={<SearchTokenDetails />}
+                                />
+                            </Route>
+                        </Route>
                     </Route>
                 </Route>
                 <Route element={<MainLayout />} path={relativeRoutes.settings.path}>

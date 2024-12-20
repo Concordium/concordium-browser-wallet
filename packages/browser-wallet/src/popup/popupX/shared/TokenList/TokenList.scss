@@ -32,5 +32,22 @@
         .form-input__checkbox {
             margin-left: auto;
         }
+
+        .button__icon.text {
+            margin-left: auto;
+
+            &:hover:not(:disabled) {
+                opacity: 1;
+            }
+
+            .label__main {
+                color: $color-mineral-2;
+                text-decoration: underline;
+
+                &:hover {
+                    color: $color-white;
+                }
+            }
+        }
     }
 }

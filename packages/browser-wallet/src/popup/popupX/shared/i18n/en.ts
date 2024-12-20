@@ -91,6 +91,9 @@ const t = {
         unlock: 'Unlock',
         enterPassword: 'Please enter your passcode to enter the wallet.',
     },
+    tokenList: {
+        hideToken: 'Hide token',
+    },
 };
 
 export default t;
