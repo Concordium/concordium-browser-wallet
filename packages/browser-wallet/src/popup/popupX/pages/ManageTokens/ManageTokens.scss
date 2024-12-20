@@ -18,6 +18,10 @@
         overflow: auto;
         max-height: rem(200px);
 
+        .tablet & {
+            max-height: rem(500px);
+        }
+
         &::-webkit-scrollbar {
             display: none;
         }

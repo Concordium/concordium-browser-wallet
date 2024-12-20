@@ -189,7 +189,6 @@ function AddToken({ account }: { account: string }) {
                         </>
                     )}
                 </Form>
-                {isLoading && !haveTokens && <LoaderInline />}
                 <TokenList>
                     {filteredTokens.map((token) => (
                         <TokenList.Item
@@ -203,6 +202,7 @@ function AddToken({ account }: { account: string }) {
                         />
                     ))}
                 </TokenList>
+                {isLoading && !haveTokens && <LoaderInline />}
             </Page.Main>
             <Page.Footer>{!!haveTokens && <Button.Main label={t('addSelected')} onClick={setTokens} />}</Page.Footer>
         </Page>
