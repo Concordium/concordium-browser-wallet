@@ -36,7 +36,6 @@ jobs:
             SERVICE_TAG=${TAG##${{ env.SERVICE_NAME }}/}
             IFS='-' read -r ENVIRONMENT TAG_VERSION <<< "$SERVICE_TAG"
             echo "FULL_IMAGE_TAG=concordium/${{ env.SERVICE_NAME }}:${TAG_VERSION}" >> $GITHUB_ENV
-            echo "ECR_IMAGE_TAG=192549843005.dkr.ecr.eu-west-1.amazonaws.com/concordium/${{ inputs.SERVICE_NAME }}:${TAG_VERSION}" >> $GITHUB_ENV
             echo "ENVIRONMENT=$ENVIRONMENT" >> $GITHUB_ENV
 
       - name: Check if image exist
@@ -55,22 +54,9 @@ jobs:
         with:
           context: ./examples/wCCD
           file: ./examples/wCCD/Dockerfile
-          tags: |
-            ${{ env.FULL_IMAGE_TAG }}
-            ${{ env.ECR_IMAGE_TAG }}
+          tags: ${{ env.FULL_IMAGE_TAG }}
           no-cache: true
           push: false
           build-args: |
             NETWORK=${{ env.ENVIRONMENT }}
             build_image=${{ env.base_image }}
-
-#      - name: Build and push Docker to ecr
-#        if: ${{ inputs.AWS_ROLE }}
-#        uses: explosion/action-ecr-publish@v1
-#        with:
-#            dockerfile: examples/wCCD/Dockerfile
-#            platforms: "linux/amd64"
-#            aws_region: "eu-west-1"
-#            aws_role_to_assume: ${{ inputs.AWS_ROLE }}
-#            aws_account_id: "192549843005"
-#            ecr_repo_name: "192549843005.dkr.ecr.eu-west-1.amazonaws.com/concordium/${{ inputs.SERVICE_NAME }}"
