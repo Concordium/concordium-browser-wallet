@@ -8,6 +8,11 @@ export const haveInitialEntry = (() => {
     const navTo = url.searchParams.get('navTo');
     const state = JSON.parse(url.searchParams.get('state') || '""') || null;
 
+    // Remove search params from url
+    // Prevent initial redirect on page refresh
+    url.search = '';
+    window.history.replaceState({}, '', url.toString());
+
     if (!navTo) return null;
     return { pathname: navTo, state };
 })();
