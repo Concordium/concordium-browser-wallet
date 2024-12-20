@@ -143,7 +143,7 @@ export default function Root() {
         <Provider>
             <MemoryRouter
                 initialEntries={[
-                    haveInitialEntry || (uiStyle.value === UiStyle.Old && '/account') || absoluteRoutes.home.path,
+                    (uiStyle.value === UiStyle.Old && '/account') || haveInitialEntry || absoluteRoutes.home.path,
                 ]}
             >
                 <Scaling>
