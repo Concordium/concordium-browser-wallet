@@ -35,7 +35,7 @@ jobs:
         run: |
             SERVICE_TAG=${TAG##${{ env.SERVICE_NAME }}/}
             IFS='-' read -r ENVIRONMENT TAG_VERSION <<< "$SERVICE_TAG"
-            echo "FULL_IMAGE_TAG=concordium/${{ env.SERVICE_NAME }}:${TAG_VERSION}" >> $GITHUB_ENV
+            echo "FULL_IMAGE_TAG=concordium/${{ env.SERVICE_NAME }}:${ENVIRONMENT}-${TAG_VERSION}" >> $GITHUB_ENV
             echo "ENVIRONMENT=$ENVIRONMENT" >> $GITHUB_ENV
 
       - name: Check if image exist
@@ -59,4 +59,4 @@ jobs:
           push: false
           build-args: |
             NETWORK=${{ env.ENVIRONMENT }}
-            build_image=${{ env.base_image }}
+            base_image=${{ env.base_image }}
