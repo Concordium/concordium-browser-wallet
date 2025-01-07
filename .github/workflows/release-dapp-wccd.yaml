@@ -1,7 +1,7 @@
 on:
   push:
-#    branches:
-#      - lma/release/wccd
+    branches:
+      - lma/release/wccd
     tags:
       - dapp-wccd/mainnet-*
       - dapp-wccd/testnet-*
