@@ -368,7 +368,10 @@ export default function TokenAmountView(props: TokenAmountViewProps) {
             if (token.tokenType === 'cis2' && ccdBalance.microCcdAmount < fee.microCcdAmount) {
                 return t('form.tokenAmount.validation.insufficientCcd');
             }
-            return validateTransferAmount(sanitizedValue, balance, tokenDecimals, fee.microCcdAmount);
+            if (token.tokenType === 'ccd') {
+                return validateTransferAmount(sanitizedValue, balance, tokenDecimals, fee.microCcdAmount);
+            }
+            return true;
         },
         [balance, tokenDecimals, token, fee]
     );
