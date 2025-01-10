@@ -340,15 +340,16 @@ export default function TokenAmountView(props: TokenAmountViewProps) {
     const handleAmountBlur: React.FocusEventHandler<HTMLInputElement> = useCallback(
         (event) => {
             const { value } = event.target;
+            const form = props.form as UseFormReturn<AmountForm>;
 
-            if (value === '') {
+            if (value === '' || form.getFieldState('amount').error !== undefined) {
                 return;
             }
 
             try {
                 const formatted = formatAmount(parseAmount(value));
                 if (formatted !== value) {
-                    (props.form as UseFormReturn<AmountForm>).setValue('amount', formatted ?? '');
+                    form.setValue('amount', formatted ?? '');
                 }
             } catch {
                 // Do nothing...
@@ -359,6 +360,10 @@ export default function TokenAmountView(props: TokenAmountViewProps) {
 
     const validateAmount: Validate<string> = useCallback(
         (value) => {
+            const [, fractions = ''] = value.split('.');
+            if (fractions.length > tokenDecimals) {
+                return t('form.tokenAmount.validation.incorrectDecimals', { num: tokenDecimals });
+            }
             const sanitizedValue = removeNumberGrouping(value);
             if (token.tokenType === 'cis2' && ccdBalance.microCcdAmount < fee.microCcdAmount) {
                 return t('form.tokenAmount.validation.insufficientCcd');
