@@ -14,7 +14,7 @@ import {
     max,
     displayAsCcd,
 } from 'wallet-common-helpers';
-import { AccountAddress } from '@concordium/web-sdk';
+import { convertEnergyToMicroCcd, AccountAddress, Energy } from '@concordium/web-sdk';
 import { SubmitHandler, useForm, Validate } from 'react-hook-form';
 import clsx from 'clsx';
 import { useLocation, useNavigate } from 'react-router-dom';
@@ -36,7 +36,7 @@ import { addToastAtom } from '@popup/state';
 import TokenBalance from '@popup/shared/TokenBalance';
 import Button from '@popup/shared/Button';
 import SearchIcon from '@assets/svg/search.svg';
-import { convertEnergyToMicroCcd, SIMPLE_TRANSFER_ENERGY_TOTAL_COST } from '@shared/utils/energy-helpers';
+import { SIMPLE_TRANSFER_ENERGY_TOTAL_COST } from '@shared/utils/energy-helpers';
 import Img from '@popup/shared/Img';
 import { useBlockChainParameters } from '@popup/shared/BlockChainParametersProvider';
 import { routes } from './routes';
@@ -59,7 +59,7 @@ const getNextRoute = (token?: TokenIdentifier) => {
 /**
  * undefined is used to denote "not resolved yet", to align with useAsyncMemo return type
  */
-type FeeResult = { success: true; value: bigint } | { success: false } | undefined;
+type FeeResult = { success: true; value: Energy.Type } | { success: false } | undefined;
 
 type State = undefined | ConfirmTransferState;
 
@@ -147,20 +147,22 @@ function CreateTransaction({ tokens, setCost, setDetailsExpanded, cost }: Props 
                         BigInt(chosenToken.contractIndex)
                     );
                     form.setValue('executionEnergy', energy.execution.toString());
-                    return { success: true, value: energy.total.value };
+                    return { success: true, value: energy.total };
                 } catch (e) {
                     addToast(t('sendCcd.transferInvokeFailed', { message: (e as Error).message }));
                     return { success: false };
                 }
             }
-            return { success: true, value: SIMPLE_TRANSFER_ENERGY_TOTAL_COST };
+            return { success: true, value: Energy.create(SIMPLE_TRANSFER_ENERGY_TOTAL_COST) };
         },
         undefined,
         [chosenToken?.contractIndex, chosenToken?.tokenId, recipient, currentAmount]
     );
 
     useEffect(() => {
-        setCost(chainParameters && fee?.success ? convertEnergyToMicroCcd(fee.value, chainParameters) : 0n);
+        setCost(
+            chainParameters && fee?.success ? convertEnergyToMicroCcd(fee.value, chainParameters).microCcdAmount : 0n
+        );
     }, [fee, chainParameters]);
 
     useEffect(() => {

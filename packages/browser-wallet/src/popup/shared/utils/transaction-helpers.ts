@@ -19,7 +19,7 @@ import {
     SimpleTransferWithMemoPayload,
     AccountInfoType,
     convertEnergyToMicroCcd,
-    Energy,
+    getEnergyCost,
 } from '@concordium/web-sdk';
 import {
     isValidResolutionString,
@@ -40,7 +40,6 @@ import { useUpdateAtom } from 'jotai/utils';
 import { BrowserWalletAccountTransaction, TransactionStatus } from './transaction-history-types';
 import { useBlockChainParameters } from '../BlockChainParametersProvider';
 import { usePrivateKey } from './account-helpers';
-import { getEnergyCost } from '@shared/utils/energy-helpers';
 
 export function buildSimpleTransferPayload(recipient: string, amount: bigint): SimpleTransferPayload {
     return {
@@ -265,7 +264,7 @@ export function useGetTransactionFee() {
                 return undefined;
             }
             const energy = getEnergyCost(type, payload);
-            return convertEnergyToMicroCcd(Energy.create(energy), cp);
+            return convertEnergyToMicroCcd(energy, cp);
         },
         [cp]
     );

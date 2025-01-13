@@ -5,6 +5,7 @@ import {
     AccountTransactionType,
     BakerPoolStatus,
     OpenStatusText,
+    convertEnergyToMicroCcd,
 } from '@concordium/web-sdk';
 import { Trans, useTranslation } from 'react-i18next';
 import { ccdToMicroCcd, displayAsCcd, getCcdSymbol, useAsyncMemo, useUpdateEffect } from 'wallet-common-helpers';
@@ -21,7 +22,6 @@ import FormInput from '@popup/shared/Form/Input';
 import ExternalLink from '@popup/shared/ExternalLink';
 import FormAmountInput from '@popup/shared/Form/AmountInput';
 import { validateDelegationAmount } from '@popup/shared/utils/transaction-helpers';
-import { convertEnergyToMicroCcd } from '@shared/utils/energy-helpers';
 import { useAtomValue } from 'jotai';
 import { grpcClientAtom } from '@popup/store/settings';
 import DisabledAmountInput from '@popup/shared/DisabledAmountInput/DisabledAmountInput';
@@ -208,7 +208,7 @@ function AmountPage({ initial, onNext, formValues, accountInfo }: AmountPageProp
 
     const cost = useMemo(() => {
         const energyCost = getCost(accountInfo, formValues, formAmount);
-        return chainParameters ? convertEnergyToMicroCcd(energyCost, chainParameters) : 0n;
+        return chainParameters ? convertEnergyToMicroCcd(energyCost, chainParameters).microCcdAmount : 0n;
     }, [chainParameters, formAmount]);
 
     const poolStatus = useAsyncMemo(
