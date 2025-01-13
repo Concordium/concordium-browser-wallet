@@ -97,7 +97,7 @@ const t = {
             validatorDelegationDescription:
                 'If you don’t already know which validator pool you want to delegate an amount to, you can look for one <1>here.</1>',
             passiveDelegationDescription:
-                'Passive delegation is an alternative to delegation to a specific validator pool that has lower rewards. With passive delegation, you do not have to worry about the uptime or quality of a baker node.\nFor more info, you can visit <1>developer.concordium.software</1>',
+                'Passive delegation is an alternative to delegation to a specific validator pool that has lower rewards. With passive delegation, you do not have to worry about the uptime or quality of a validator node.\nFor more info, you can visit <1>developer.concordium.software</1>',
             buttonContinue: 'Continue',
         },
         stake: {
@@ -163,7 +163,7 @@ const t = {
             signatureKey: { label: 'Signature verify key' },
             aggregationKey: { label: 'Aggregation verify key' },
             transactionFeeCommission: { label: 'Transaction fee commission' },
-            bakingRewardCommission: { label: 'Baking reward commission' },
+            bakingRewardCommission: { label: 'Validation reward commission' },
             finalizationRewardCommission: { label: 'Finalization reward commission' },
         },
         status: {
@@ -183,7 +183,7 @@ const t = {
             },
             '3': {
                 title: 'Opening a pool',
-                body: 'You have the option when adding a validator to open a staking pool or not. A staking pool allows others who want to earn rewards to do so without the need to run a node or become a validator themselves.\n\nTo do this they delegate an amount to your staking pool which then increases your total stake and your chances of winning the lottery to bake a block. At each pay day the rewards will be distributed to you and your delegators.\n\nYou can also choose not to open a pool, in which case only your own stake applies toward the lottery. You can always open or close a pool later.',
+                body: 'You have the option when adding a validator to open a staking pool or not. A staking pool allows others who want to earn rewards to do so without the need to run a node or become a validator themselves.\n\nTo do this they delegate an amount to your staking pool which then increases your total stake and your chances of winning the lottery to produce a block. At each pay day the rewards will be distributed to you and your delegators.\n\nYou can also choose not to open a pool, in which case only your own stake applies toward the lottery. You can always open or close a pool later.',
             },
         },
         register: {
@@ -266,7 +266,7 @@ const t = {
                 label: 'Open for delegation',
             },
             description:
-                'Opening a pool\nYou have the option when adding a validator to open a staking pool or not. A staking pool allows others who want to earn rewards to do so without the need to run a node or become a validator themselves.\n\nTo do this they delegate an amount to your staking pool which then increases your total stake and your chances of winning the lottery to bake a block. At each pay day the rewards will be distributed to you and your delegators.\n\nYou can also choose not to open a pool, in which case only your own stake applies toward the lottery. You can always open or close a pool later.',
+                'Opening a pool\nYou have the option when adding a validator to open a staking pool or not. A staking pool allows others who want to earn rewards to do so without the need to run a node or become a validator themselves.\n\nTo do this they delegate an amount to your staking pool which then increases your total stake and your chances of winning the lottery to produce a block. At each pay day the rewards will be distributed to you and your delegators.\n\nYou can also choose not to open a pool, in which case only your own stake applies toward the lottery. You can always open or close a pool later.',
             buttonContinue: 'Continue',
         },
         metadata: {
