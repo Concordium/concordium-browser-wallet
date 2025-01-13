@@ -22,9 +22,9 @@ export default function Commissions({ initial, onSubmit, chainParams }: Props) {
     const { bakingCommissionRange, finalizationCommissionRange, transactionCommissionRange } = chainParams;
     const defaultValues: CommissionRates = useMemo(
         () => ({
-            bakingCommission: (initial?.bakingCommission ?? bakingCommissionRange.min) * 100,
-            transactionCommission: (initial?.transactionCommission ?? transactionCommissionRange.min) * 100,
-            finalizationCommission: (initial?.finalizationCommission ?? finalizationCommissionRange.min) * 100,
+            bakingCommission: (initial?.bakingCommission ?? bakingCommissionRange.max) * 100,
+            transactionCommission: (initial?.transactionCommission ?? transactionCommissionRange.max) * 100,
+            finalizationCommission: (initial?.finalizationCommission ?? finalizationCommissionRange.max) * 100,
         }),
         [initial, chainParams]
     );
