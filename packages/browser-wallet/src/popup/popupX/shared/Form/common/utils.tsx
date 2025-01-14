@@ -21,7 +21,6 @@ type MakeControlledProps<
 /**
  * @description
  * Can be used to create form fields for controlled fields, i.e. where field state is kept outside.
- * It uses the internal ref of elements to update the form state, so components are required to pass a ref to an underlying input.
  *
  * @example
  * type Props = RequiredControlledFieldProps & { test: string };
