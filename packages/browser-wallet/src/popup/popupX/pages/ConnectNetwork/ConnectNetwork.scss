@@ -1,7 +1,12 @@
 .connect-network-x {
+    .text__main_regular {
+        margin-top: rem(36px);
+    }
+
     .text__main_medium {
         display: flex;
         gap: rem(8px);
         margin-top: rem(8px);
+        color: $color-white;
     }
 }

@@ -3,7 +3,7 @@ import { useTranslation } from 'react-i18next';
 import { useSetAtom } from 'jotai';
 import { addToastAtom } from '@popup/state';
 import { copyToClipboard } from '@popup/popupX/shared/utils/helpers';
-import { CopyAddress } from '@popup/popupX/shared/Toast/Messages';
+import { CopyAddress, GenericMessage } from '@popup/popupX/shared/Toast/Messages';
 
 export function useCopyAddress() {
     const { t } = useTranslation('x', { keyPrefix: 'sharedX.messages' });
@@ -19,6 +19,13 @@ export function useCopyToClipboard() {
     const addToast = useSetAtom(addToastAtom);
 
     return (text: string) => {
-        copyToClipboard(text).then(() => addToast(t('copied')));
+        copyToClipboard(text).then(() => addToast(<GenericMessage title={t('copied')} />));
+    };
+}
+
+export function useGenericToast() {
+    const addToast = useSetAtom(addToastAtom);
+    return (title: string, message?: string) => {
+        addToast(<GenericMessage title={title} message={message} />);
     };
 }

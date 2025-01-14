@@ -1,28 +1,44 @@
 import React, { useMemo } from 'react';
-import { Outlet, useLocation } from 'react-router-dom';
+import { Outlet, useLocation, useParams } from 'react-router-dom';
 import clsx from 'clsx';
 import Header from '@popup/popupX/page-layouts/MainLayout/Header';
 import Toast from '@popup/popupX/shared/Toast';
 import { AccountButton, NavButton } from '@popup/popupX/page-layouts/MainLayout/Header/components';
-import { relativeRoutes, RoutePath } from '@popup/popupX/constants/routes';
+import { relativeRoutes, RouteConfig, routePrefix } from '@popup/popupX/constants/routes';
+import { withPasswordSession } from '@popup/popupX/shared/utils/hoc';
 
-function exctractByProps(obj: typeof relativeRoutes, props: string[]): RoutePath | undefined {
-    return props.reduce(
-        // FIXME: see if we can get rid of any here...
-        // eslint-disable-next-line @typescript-eslint/no-explicit-any
-        (acc: any, prop) => (typeof acc === 'object' && prop in acc ? (acc[prop] as any) : undefined),
-        obj
+type RouteObj = {
+    [index: string]: { [key: string]: object | string | undefined; config?: object; path: string };
+};
+
+function getConfig(routes: RouteObj, baseLocation: string) {
+    if (!baseLocation) {
+        return (routes?.config || {}) as RouteConfig;
+    }
+
+    const routeVal = Object.values(routes).find(
+        (value) => typeof value === 'object' && value.path && baseLocation.indexOf(value.path) === 1
     );
+
+    if (routeVal) {
+        return getConfig(routeVal as RouteObj, baseLocation.replace(`/${routeVal.path}`, ''));
+    }
+
+    return {};
 }
 
 const getPageConfig = () => {
     const location = useLocation();
-    const keyArray = useMemo(() => location.pathname.split('/').slice(2), [location.pathname]);
-    const config = exctractByProps(relativeRoutes, keyArray)?.config;
-    return config || {};
+    const params = useParams();
+    const baseLocation = Object.entries(params).reduce(
+        (acc, [key, value = '']) => (key === '*' ? acc.replace(`/${value}`, '') : acc.replace(value, `:${key}`)),
+        location.pathname.replace(routePrefix, '')
+    );
+
+    return getConfig(relativeRoutes, baseLocation);
 };
 
-export default function MainLayout() {
+function MainLayout() {
     const [scroll, setScroll] = React.useState(0);
     const isScrolling = useMemo(() => scroll > 0, [!!scroll]);
     const [menuOpen, setMenuOpen] = React.useState(false);
@@ -33,6 +49,7 @@ export default function MainLayout() {
         hideMenu = false,
         hideConnection = false,
         showAccountSelector,
+        navBackSteps = 1,
     } = getPageConfig();
     return (
         <div className="main-layout-x">
@@ -46,7 +63,11 @@ export default function MainLayout() {
                 }}
             >
                 <div className="float-section">
-                    <NavButton hideBackArrow={hideBackArrow || menuOpen} backTitle={backTitle} />
+                    <NavButton
+                        hideBackArrow={hideBackArrow || menuOpen}
+                        backTitle={backTitle}
+                        navBackSteps={navBackSteps}
+                    />
                     <AccountButton
                         hideAccountButton={!showAccountSelector || menuOpen}
                         setAccountOpen={setAccountOpen}
@@ -59,3 +80,5 @@ export default function MainLayout() {
         </div>
     );
 }
+
+export default withPasswordSession(MainLayout);

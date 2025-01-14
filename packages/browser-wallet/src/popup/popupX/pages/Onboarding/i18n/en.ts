@@ -16,6 +16,25 @@ const t = {
         firstStep: 'The first step is to set up a passcode.\nPlease enter one below.',
         enterPasscode: 'Enter Passcode',
         enterPasscodeAgain: 'Enter Passcode Again',
+        passcodeRequired: 'A passcode must be entered',
+        passcodeMismatch: 'Passcode does not match',
+        passcodeMinLength: 'Passcode must be at least 6 characters',
+        continue: 'Continue',
+    },
+    createOrRestore: {
+        createOrRestore: 'Create or restore',
+        optionsInfo:
+            'You have the option to create a new wallet or restore an existing one. How do you want to proceed?',
+        create: 'Create',
+        restore: 'Restore',
+    },
+    selectNetwork: {
+        networkSettings: 'Network settings',
+    },
+    restoreWallet: {
+        restoreWallet: 'Restore via seed phrase',
+        restoreInfo:
+            'Please enter your 24-word seed phrase in the correct order and separated by spaces to restore your identities and accounts.',
         continue: 'Continue',
     },
     idCardsInfo: {

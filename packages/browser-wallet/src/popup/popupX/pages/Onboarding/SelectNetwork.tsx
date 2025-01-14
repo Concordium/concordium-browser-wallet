@@ -1,20 +1,18 @@
 import React from 'react';
-import Dot from '@assets/svgX/dot.svg';
-import { useNavigate } from 'react-router-dom';
-import { relativeRoutes } from '@popup/popupX/constants/routes';
-import Page from '@popup/popupX/shared/Page';
 import { useTranslation } from 'react-i18next';
+import { useAtom } from 'jotai';
+import { networkConfigurationAtom } from '@popup/store/settings';
+import Page from '@popup/popupX/shared/Page';
 import Card from '@popup/popupX/shared/Card';
 import Text from '@popup/popupX/shared/Text';
 import Button from '@popup/popupX/shared/Button';
+import Dot from '@assets/svgX/dot.svg';
 import { mainnet, stagenet, testnet } from '@shared/constants/networkConfiguration';
 import { isDevelopmentBuild } from '@shared/utils/environment-helpers';
-import { useAtom } from 'jotai';
-import { networkConfigurationAtom } from '@popup/store/settings';
 
 function useNetworks() {
     const { t } = useTranslation('x', { keyPrefix: 'network' });
-    const [currentNetworkConfiguration] = useAtom(networkConfigurationAtom);
+    const [currentNetworkConfiguration, setCurrentNetworkConfiguration] = useAtom(networkConfigurationAtom);
 
     const networks = [mainnet, testnet];
     if (isDevelopmentBuild()) {
@@ -29,22 +27,18 @@ function useNetworks() {
             ...network,
             isConnected,
             connectLabel,
+            setNetwork: () => setCurrentNetworkConfiguration(network),
         };
     });
 
     return updatedNetworks;
 }
 
-export default function NetworkSettings() {
-    const { t } = useTranslation('x', { keyPrefix: 'network' });
+export default function SelectNetwork() {
+    const { t } = useTranslation('x', { keyPrefix: 'onboarding.selectNetwork' });
     const networks = useNetworks();
-
-    const nav = useNavigate();
-    const navToConnect = (genesisHash: string) =>
-        nav(relativeRoutes.settings.network.connect.path.replace(':genesisHash', genesisHash));
-
     return (
-        <Page className="network-settings-x">
+        <Page className="select-network">
             <Page.Top heading={t('networkSettings')} />
             <Page.Main>
                 <Card>
@@ -55,7 +49,7 @@ export default function NetworkSettings() {
                                 className="dark"
                                 label={network.connectLabel}
                                 icon={network.isConnected ? <Dot /> : null}
-                                onClick={() => navToConnect(network.genesisHash)}
+                                onClick={() => network.setNetwork()}
                             />
                         </Card.Row>
                     ))}

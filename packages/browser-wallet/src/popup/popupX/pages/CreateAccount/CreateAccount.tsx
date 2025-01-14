@@ -51,7 +51,7 @@ export default function CreateAccount() {
         <Page className="create-account-x">
             <Page.Top heading={t('selectIdentity')} />
             <Page.Main>
-                <Text.MainRegular>{t('selectIdentityDescription')}</Text.MainRegular>
+                <Text.Capture>{t('selectIdentityDescription')}</Text.Capture>
                 {validIdentities.length === 0 ? (
                     <p className="m-t-40">
                         <Text.Capture>{t('noValidIdentities')}</Text.Capture>

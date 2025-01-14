@@ -15,7 +15,7 @@ export default function Fullscreen() {
                 onClick={() => {
                     popupMessageHandler.sendInternalMessage(
                         InternalMessageType.OpenFullscreen,
-                        `?navTo=${location.pathname}`
+                        `?navTo=${location.pathname}&state=${JSON.stringify(location.state)}`
                     );
                 }}
             >

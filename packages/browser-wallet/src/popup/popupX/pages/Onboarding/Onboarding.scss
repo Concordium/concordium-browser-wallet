@@ -1,7 +1,7 @@
 .welcome {
-    .page__top {
-        margin-top: rem(28px);
-        margin-bottom: rem(56px);
+    .heading_medium {
+        margin-top: rem(26px);
+        margin-bottom: rem(44px);
     }
 
     &__description {
@@ -16,11 +16,79 @@
             display: flex;
             flex-direction: column;
             margin-left: rem(16px);
+            gap: rem(4px);
+
+            .text__main {
+                font-weight: $t-font-weight-semi-bold;
+            }
         }
     }
 
     &__footer {
-        margin: rem(16px) auto 0 auto;
+        margin: rem(8px) auto 0 auto;
+    }
+
+    .page__footer {
+        margin-bottom: rem(-16px);
+    }
+}
+
+.setup-password {
+    .concordium-logo-white {
+        width: 208px;
+        height: 40px;
+        background-image: url('../assets/images/concordium-logo-white.png');
+        background-size: contain;
+    }
+
+    &__title {
+        display: flex;
+        flex-direction: column;
+        align-items: center;
+        text-align: center;
+
+        .heading_medium {
+            margin-top: rem(39px);
+            margin-bottom: rem(24px);
+        }
+    }
+
+    &__form {
+        display: flex;
+        flex-direction: column;
+        gap: rem(4px);
+        height: 100%;
+        margin-top: rem(64px);
+    }
+}
+
+.create-or-restore {
+    .capture__main_small.external-link {
+        position: absolute;
+        top: rem(58px);
+        right: rem(24px);
+        color: $color-mineral-2;
+
+        &:hover {
+            color: $color-white;
+        }
+    }
+}
+
+.select-network {
+    .card-x .row {
+        align-items: center;
+        justify-content: space-between;
+
+        .button__secondary {
+            svg {
+                margin-left: rem(2px);
+
+                circle {
+                    fill: $color-green-success;
+                }
+            }
+        }
     }
 }
 
@@ -65,25 +133,4 @@
     height: 100%;
     padding-bottom: rem(32px);
     white-space: break-spaces;
-
-    .setup_password {
-        &__title {
-            display: flex;
-            flex-direction: column;
-            align-items: center;
-            text-align: center;
-
-            .heading_medium {
-                margin-top: rem(36px);
-                margin-bottom: rem(24px);
-            }
-        }
-
-        &__form {
-            display: flex;
-            flex-direction: column;
-            height: 100%;
-            margin-top: rem(64px);
-        }
-    }
 }

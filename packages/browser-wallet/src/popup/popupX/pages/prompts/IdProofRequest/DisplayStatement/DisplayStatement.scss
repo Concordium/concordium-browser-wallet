@@ -54,7 +54,8 @@
     width: calc(100% - 20px);
     padding: rem(12px);
 
-    .text__main_medium, .capture__main_small {
+    .text__main_medium,
+    .capture__main_small {
         color: $color-black;
     }
 

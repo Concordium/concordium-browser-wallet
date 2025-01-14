@@ -1,15 +1,17 @@
-import React, { ReactNode } from 'react';
+import React, { ReactNode, useEffect } from 'react';
 import Shield from '@assets/svgX/crypto-currency-square-shield.svg';
 import Assets from '@assets/svgX/crypto-currency-assets.svg';
 import Possibilities from '@assets/svgX/crypto-currency-possibilities.svg';
 import Button from '@popup/popupX/shared/Button';
 import { useNavigate } from 'react-router-dom';
-import { relativeRoutes } from '@popup/popupX/constants/routes';
+import { absoluteRoutes } from '@popup/popupX/constants/routes';
 import { useTranslation } from 'react-i18next';
 import ExternalLink from '@popup/popupX/shared/ExternalLink';
 import urls from '@shared/constants/url';
 import Text from '@popup/popupX/shared/Text';
 import Page from '@popup/popupX/shared/Page';
+
+const bg = document.getElementsByClassName('bg').item(0);
 
 function Description({ icon, title, description }: { icon: ReactNode; title: string; description: string }) {
     return (
@@ -26,7 +28,11 @@ function Description({ icon, title, description }: { icon: ReactNode; title: str
 export default function Welcome() {
     const { t } = useTranslation('x', { keyPrefix: 'onboarding.welcome' });
     const nav = useNavigate();
-    const navToPassword = () => nav(relativeRoutes.onboarding.setupPassword.path);
+    const navToPassword = () => nav(absoluteRoutes.onboarding.setupPassword.path);
+
+    useEffect(() => {
+        bg?.classList.add('welcome-page');
+    }, []);
 
     return (
         <Page className="welcome">
@@ -40,7 +46,6 @@ export default function Welcome() {
                 <Button.Main
                     label={t('start')}
                     onClick={() => {
-                        const bg = document.getElementsByClassName('bg').item(0);
                         bg?.classList.remove('welcome-page');
                         navToPassword();
                     }}

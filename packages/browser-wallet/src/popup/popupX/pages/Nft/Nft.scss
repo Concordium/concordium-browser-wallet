@@ -19,7 +19,7 @@
     &__list {
         display: flex;
         flex-wrap: wrap;
-        justify-content: space-between;
+        justify-content: center;
         gap: rem(7px);
         margin-top: rem(8px);
 
@@ -27,7 +27,7 @@
             display: flex;
             flex-direction: column;
             width: rem(160px);
-            height: rem(192px);
+            min-height: rem(192px);
             padding: rem(8px) rem(8px) rem(16px) rem(8px);
             border: unset;
             border-radius: rem(12px);
@@ -41,7 +41,6 @@
             .text__main_regular {
                 width: 100%;
                 margin-top: rem(8px);
-                overflow: hidden;
                 white-space: nowrap;
                 text-overflow: ellipsis;
                 text-align: left;

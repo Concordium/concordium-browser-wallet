@@ -25,6 +25,9 @@ const t = {
             text: 'You can connect you wallet to a\ndApp. An active connection will be\nshown here.',
         },
     },
+    navButton: {
+        toMain: 'to Main page',
+    },
 };
 
 export default t;

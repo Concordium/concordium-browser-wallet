@@ -20,6 +20,10 @@
         z-index: 1;
         backdrop-filter: blur(10px);
         background: rgba($color-black, 0.9);
+
+        .tablet & {
+            margin-top: rem(60px);
+        }
     }
 
     &__top {
@@ -56,6 +60,7 @@
             .tablet & {
                 padding: rem(12px);
                 border-radius: rem(12px);
+                min-width: rem(100px);
             }
         }
     }
@@ -75,6 +80,7 @@
 
         .tablet & {
             background: unset;
+            display: none;
         }
 
         &_info {
@@ -202,6 +208,12 @@
             border-radius: rem(12px);
             border: 1px solid $color-grey-3;
             background: $color-grey-1;
+
+            .tablet & {
+                max-width: rem(655px);
+                margin-left: auto;
+                margin-right: auto;
+            }
         }
 
         &_search-form {

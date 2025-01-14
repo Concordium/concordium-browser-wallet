@@ -8,6 +8,7 @@ import { Dimensions, large, medium, small } from '@popup/constants/dimensions';
 import { popupMessageHandler } from '@popup/shared/message-handler';
 import {
     haveInitialEntry,
+    isFullscreenDemoWindow,
     isFullscreenWindow,
     isSpawnedWeb3IdProofWindow,
     isSpawnedWindow,
@@ -47,6 +48,10 @@ function Scaling({ children }: { children: ReactElement }) {
         if (isPopupX) {
             body?.classList.add('popup-x');
             html?.classList.add('popup-x');
+
+            if (isFullscreenDemoWindow) {
+                html?.classList.add('tablet');
+            }
         } else {
             body?.classList.remove('popup-x');
             html?.classList.remove('popup-x');
@@ -80,6 +85,12 @@ function Scaling({ children }: { children: ReactElement }) {
 
             if (isFullscreenWindow) {
                 body.style.margin = '32px auto';
+            }
+
+            if (isFullscreenDemoWindow) {
+                body.style.width = `100%`;
+                body.style.height = `100%`;
+                body.style.margin = 'auto';
             }
         }
 
@@ -143,7 +154,7 @@ export default function Root() {
         <Provider>
             <MemoryRouter
                 initialEntries={[
-                    haveInitialEntry || (uiStyle.value === UiStyle.Old && '/account') || absoluteRoutes.home.path,
+                    (uiStyle.value === UiStyle.Old && '/account') || haveInitialEntry || absoluteRoutes.home.path,
                 ]}
             >
                 <Scaling>

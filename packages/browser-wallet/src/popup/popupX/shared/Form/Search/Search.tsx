@@ -9,7 +9,7 @@ type Props = Pick<InputHTMLAttributes<HTMLInputElement>, 'className' | 'autoFocu
     RequiredControlledFieldProps &
     Omit<CommonFieldProps, 'note'>;
 
-export function Search({ value, className, autoFocus, ...props }: Props) {
+export function Search({ className, autoFocus, ...props }: Props) {
     return (
         <div className={clsx('form-search', className)}>
             <Magnifying />

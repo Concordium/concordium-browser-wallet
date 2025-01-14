@@ -1,56 +1,88 @@
-import React from 'react';
-import ConcordiumLogo from '@assets/svgX/concordium-logo.svg';
+import React, { useCallback, useEffect } from 'react';
 import FormPassword from '@popup/popupX/shared/Form/Password';
 import Form from '@popup/popupX/shared/Form/Form';
 import { useNavigate } from 'react-router-dom';
-import { relativeRoutes } from '@popup/popupX/constants/routes';
+import { absoluteRoutes } from '@popup/popupX/constants/routes';
 import { useTranslation } from 'react-i18next';
 import Button from '@popup/popupX/shared/Button';
+import Page from '@popup/popupX/shared/Page';
+import Text from '@popup/popupX/shared/Text';
+import { useSetAtom } from 'jotai';
+import { passcodeAtom } from '@popup/state';
+import { useForm } from '@popup/shared/Form';
+import { SubmitHandler, Validate } from 'react-hook-form';
+
+type FormValues = {
+    passcode: string;
+    passcodeAgain: string;
+};
 
 export default function SetupPassword() {
     const { t } = useTranslation('x', { keyPrefix: 'onboarding.setupPassword' });
     const nav = useNavigate();
-    const navToNext = () => nav(`../${relativeRoutes.onboarding.idIntro.path}`);
+    const navToNext = () => nav(absoluteRoutes.onboarding.createOrRestore.path);
+    const setPasscode = useSetAtom(passcodeAtom);
+    const form = useForm<FormValues>();
+    const passcode = form.watch('passcode');
+
+    const handleSubmit: SubmitHandler<FormValues> = (vs) => {
+        setPasscode(vs.passcode);
+        navToNext();
+    };
+
+    const passcodesAreEqual: Validate<string> = useCallback(
+        (value) => value === passcode || t('passcodeMismatch'),
+        [passcode]
+    );
+
+    useEffect(() => {
+        if (form.formState.dirtyFields.passcodeAgain) {
+            form.trigger('passcodeAgain');
+        }
+    }, [passcode]);
+
     return (
-        <div className="onboarding-container">
-            <div className="setup_password__title">
-                <ConcordiumLogo />
-                <span className="heading_medium">{t('setPassword')}</span>
-                <span className="text__main_regular">{t('firstStep')}</span>
-            </div>
-            <Form
-                onSubmit={() => {
-                    navToNext();
-                }}
-                // formMethods={}
-                className="setup_password__form"
-            >
-                {(f) => {
-                    return (
-                        <>
-                            <div>
+        <Page className="setup-password">
+            <Page.Main>
+                <div className="setup-password__title">
+                    <span className="concordium-logo-white" />
+                    <Text.Heading>{t('setPassword')}</Text.Heading>
+                    <Text.MainRegular>{t('firstStep')}</Text.MainRegular>
+                </div>
+                <Form
+                    id="setup-password-form"
+                    onSubmit={handleSubmit}
+                    formMethods={form}
+                    className="setup-password__form"
+                >
+                    {(f) => {
+                        return (
+                            <>
                                 <FormPassword
                                     autoFocus
                                     control={f.control}
+                                    showStrength
                                     name="passcode"
                                     label={t('enterPasscode')}
-                                    // rules={{
-                                    //     required: 'setupPasscode.form.passcodeRequired',
-                                    //     minLength: { value: 6, message: 'setupPasscode.form.passcodeMinLength' },
-                                    // }}
+                                    rules={{
+                                        required: t('passcodeRequired'),
+                                        minLength: { value: 6, message: t('passcodeMinLength') },
+                                    }}
                                 />
                                 <FormPassword
                                     control={f.control}
                                     name="passcodeAgain"
                                     label={t('enterPasscodeAgain')}
-                                    // rules={{ validate: passcodesAreEqual }}
+                                    rules={{ validate: passcodesAreEqual }}
                                 />
-                            </div>
-                            <Button.Main type="submit" label={t('continue')} />
-                        </>
-                    );
-                }}
-            </Form>
-        </div>
+                            </>
+                        );
+                    }}
+                </Form>
+            </Page.Main>
+            <Page.Footer>
+                <Button.Main form="setup-password-form" type="submit" label={t('continue')} onClick={() => {}} />
+            </Page.Footer>
+        </Page>
     );
 }
