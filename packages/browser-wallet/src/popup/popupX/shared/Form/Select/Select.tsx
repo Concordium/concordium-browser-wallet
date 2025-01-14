@@ -3,27 +3,30 @@ import React, { ReactNode, useCallback } from 'react';
 import SideArrow from '@assets/svgX/side-arrow.svg';
 import { makeControlled } from '../common/utils';
 import { RequiredControlledFieldProps } from '../common/types';
+import { ClassName } from 'wallet-common-helpers';
+import clsx from 'clsx';
 
-type Props<T> = RequiredControlledFieldProps<T> & {
-    /** Invoked to render the selected value */
-    children(value: T | undefined): ReactNode;
-    /** The selected value */
-    value: T | undefined;
-    /** The list of options to select from */
-    options: T[];
-    /** Invoked to identify options internally. Must provide unique results for each option */
-    id(value: T): string;
-    /** Determines how each option is rendered in the internal `<option>` */
-    renderOption(value: T): string;
-    /** Change event handler */
-    onChange(value: T): void;
-    /** Blur event handler */
-    onBlur?(): void;
-    /** Whether the field should be read only. Setting this to `true` will disable the dropdown. */
-    readonly?: boolean;
-    /** The icon to render next to `children` to indicate the presence of a dropdown */
-    icon?: JSX.Element;
-};
+type Props<T> = RequiredControlledFieldProps<T> &
+    ClassName & {
+        /** Invoked to render the selected value */
+        children(value: T | undefined): ReactNode;
+        /** The selected value */
+        value: T | undefined;
+        /** The list of options to select from */
+        options: T[];
+        /** Invoked to identify options internally. Must provide unique results for each option */
+        id(value: T): string;
+        /** Determines how each option is rendered in the internal `<option>` */
+        renderOption(value: T): string;
+        /** Change event handler */
+        onChange(value: T): void;
+        /** Blur event handler */
+        onBlur?(): void;
+        /** Whether the field should be read only. Setting this to `true` will disable the dropdown. */
+        readonly?: boolean;
+        /** The icon to render next to `children` to indicate the presence of a dropdown */
+        icon?: JSX.Element;
+    };
 
 /**
  * Simple component wrapping a `<select>` element for selecting from the supplied list of options.
@@ -38,6 +41,7 @@ export function Select<T>({
     onBlur,
     renderOption,
     icon = <SideArrow />,
+    className,
 }: Props<T>) {
     const findSelected = useCallback(
         (v: string) => options.find((o) => id(o) === v)!, // we unwrap, as it's not suppcosed to fail and crashing is fair.
@@ -45,7 +49,7 @@ export function Select<T>({
     );
 
     return (
-        <label className="form-select">
+        <label className={clsx('form-select', className)}>
             {!readonly && (
                 <select
                     value={value !== undefined ? id(value) : undefined}
@@ -68,4 +72,5 @@ export function Select<T>({
     );
 }
 
-export default makeControlled(Select);
+const FormSelect = makeControlled(Select);
+export default FormSelect;

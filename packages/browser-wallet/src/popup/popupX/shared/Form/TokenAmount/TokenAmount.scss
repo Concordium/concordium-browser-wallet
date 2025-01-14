@@ -40,10 +40,6 @@
             .token-selector {
                 display: flex;
                 position: relative;
-
-                select {
-                    cursor: pointer;
-                }
             }
 
             .text__additional_small {
@@ -66,6 +62,7 @@
             }
 
             select {
+                cursor: pointer;
                 appearance: none;
                 background: none;
                 border: none;
@@ -77,6 +74,10 @@
 
                 &::selection {
                     background-color: transparent;
+                }
+
+                option {
+                    color: $color-black;
                 }
             }
         }
