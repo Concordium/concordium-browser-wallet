@@ -1,15 +1,15 @@
 import React, { ReactNode, useCallback } from 'react';
+import { ClassName } from 'wallet-common-helpers';
+import clsx from 'clsx';
 
 import SideArrow from '@assets/svgX/side-arrow.svg';
 import { makeControlled } from '../common/utils';
 import { RequiredControlledFieldProps } from '../common/types';
-import { ClassName } from 'wallet-common-helpers';
-import clsx from 'clsx';
 
 type Props<T> = RequiredControlledFieldProps<T> &
     ClassName & {
-        /** Invoked to render the selected value */
-        children(value: T | undefined): ReactNode;
+        /** Invoked to render the selected value. Defaults to `renderOption` */
+        children?(value: T | undefined): ReactNode;
         /** The selected value */
         value: T | undefined;
         /** The list of options to select from */
@@ -17,7 +17,7 @@ type Props<T> = RequiredControlledFieldProps<T> &
         /** Invoked to identify options internally. Must provide unique results for each option */
         id(value: T): string;
         /** Determines how each option is rendered in the internal `<option>` */
-        renderOption(value: T): string;
+        renderOption(value: T): ReactNode;
         /** Change event handler */
         onChange(value: T): void;
         /** Blur event handler */
@@ -33,13 +33,13 @@ type Props<T> = RequiredControlledFieldProps<T> &
  */
 export function Select<T>({
     readonly = false,
-    children,
+    renderOption,
+    children = renderOption,
     value,
     id,
     onChange,
     options,
     onBlur,
-    renderOption,
     icon = <SideArrow />,
     className,
 }: Props<T>) {
