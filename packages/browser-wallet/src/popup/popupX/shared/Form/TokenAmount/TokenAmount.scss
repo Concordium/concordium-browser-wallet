@@ -60,26 +60,6 @@
                     height: rem(14px);
                 }
             }
-
-            select {
-                cursor: pointer;
-                appearance: none;
-                background: none;
-                border: none;
-                position: absolute;
-                z-index: 0;
-                color: transparent;
-                width: 100%;
-                height: 100%;
-
-                &::selection {
-                    background-color: transparent;
-                }
-
-                option {
-                    color: $color-black;
-                }
-            }
         }
     }
 
