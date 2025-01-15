@@ -141,6 +141,9 @@ const t = {
             sender: { label: 'Sender' },
             fee: { label: 'Estimated transaction fee' },
             button: 'Submit delegation',
+            error: {
+                insufficientFunds: 'Insufficient funds on account',
+            },
         },
     },
     validator: {

@@ -1,4 +1,4 @@
-import React, { useMemo } from 'react';
+import React, { useMemo, useState } from 'react';
 import {
     AccountInfoDelegator,
     AccountTransactionType,
@@ -16,11 +16,17 @@ import Card from '@popup/popupX/shared/Card';
 import { ensureDefined } from '@shared/utils/basic-helpers';
 import { useBlockChainParametersAboveV0 } from '@popup/shared/BlockChainParametersProvider';
 import { secondsToDaysRoundedDown } from '@shared/utils/time-helpers';
-import { useGetTransactionFee, useTransactionSubmit } from '@popup/shared/utils/transaction-helpers';
+import {
+    TransactionSubmitError,
+    TransactionSubmitErrorType,
+    useGetTransactionFee,
+    useTransactionSubmit,
+} from '@popup/shared/utils/transaction-helpers';
 import { cpStakingCooldown } from '@shared/utils/chain-parameters-helpers';
 import { submittedTransactionRoute } from '@popup/popupX/constants/routes';
 import Text from '@popup/popupX/shared/Text';
 import { useSelectedAccountInfo } from '@popup/shared/AccountInfoListenerContext/AccountInfoListenerContext';
+import ErrorMessage from '@popup/popupX/shared/Form/ErrorMessage';
 
 export type DelegationResultLocationState = {
     payload: ConfigureDelegationPayload;
@@ -35,6 +41,7 @@ export default function DelegationResult() {
     const { t } = useTranslation('x', { keyPrefix: 'earn.delegator' });
     const getCost = useGetTransactionFee();
     const accountInfo = ensureDefined(useSelectedAccountInfo(), 'No account selected');
+    const [error, setError] = useState<Error>();
 
     const parametersV1 = useBlockChainParametersAboveV0();
     const submitTransaction = useTransactionSubmit(
@@ -80,8 +87,14 @@ export default function DelegationResult() {
         if (fee === undefined) {
             throw Error('Fee could not be calculated');
         }
-        const tx = await submitTransaction(state.payload, fee);
-        nav(submittedTransactionRoute(TransactionHash.fromHexString(tx)));
+        try {
+            const tx = await submitTransaction(state.payload, fee);
+            nav(submittedTransactionRoute(TransactionHash.fromHexString(tx)));
+        } catch (e) {
+            if (e instanceof Error) {
+                setError(e);
+            }
+        }
     };
 
     return (
@@ -133,6 +146,9 @@ export default function DelegationResult() {
                     />
                 </Card.Row>
             </Card>
+            {error instanceof TransactionSubmitError && error.type === TransactionSubmitErrorType.InsufficientFunds && (
+                <ErrorMessage className="m-t-10 text-center">{t('submit.error.insufficientFunds')}</ErrorMessage>
+            )}
             <Page.Footer>
                 <Button.Main onClick={submit} label={t('submit.button')} className="m-t-20" />
             </Page.Footer>
