@@ -9,7 +9,6 @@ import { CIS2, CcdAmount, ContractAddress } from '@concordium/web-sdk';
 
 import { CCD_METADATA } from '@shared/constants/token-metadata';
 import { ensureDefined } from '@shared/utils/basic-helpers';
-import SideArrow from '@assets/svgX/side-arrow.svg';
 import ConcordiumLogo from '@assets/svgX/concordium-logo.svg';
 import { validateAccountAddress, validateTransferAmount } from '@popup/shared/utils/transaction-helpers';
 import { TokenMetadata } from '@shared/storage/types';
@@ -22,6 +21,7 @@ import Button from '../../Button';
 import { formatTokenAmount, parseTokenAmount, removeNumberGrouping } from '../../utils/helpers';
 import ErrorMessage from '../ErrorMessage';
 import { TokenInfo } from './util';
+import { Select } from '../Select';
 
 type AmountInputProps = Pick<
     InputHTMLAttributes<HTMLInputElement>,
@@ -74,18 +74,6 @@ const ReceiverInput = forwardRef<HTMLTextAreaElement, ReceiverInputProps>(({ err
 
 const FormReceiverInput = makeUncontrolled(ReceiverInput);
 
-const parseTokenSelectorId = (value: string): Exclude<TokenPickerVariant, undefined> => {
-    if (value.startsWith('ccd')) {
-        return { tokenType: 'ccd' };
-    }
-
-    const [, index, subindex, id] = value.split(':');
-    return {
-        tokenType: 'cis2',
-        tokenAddress: { id, contract: ContractAddress.create(BigInt(index), BigInt(subindex)) },
-    };
-};
-
 const formatTokenSelectorId = (token: TokenPickerVariant) => {
     if (token?.tokenType === 'cis2') {
         return `cis2:${token.tokenAddress.contract.index}:${token.tokenAddress.contract.subindex}:${token.tokenAddress.id}`;
@@ -116,63 +104,81 @@ function TokenPicker({
     formatAmount,
 }: TokenPickerProps) {
     const { t } = useTranslation('x', { keyPrefix: 'sharedX' });
-    const token:
-        | {
-              name: string;
-              icon: ReactNode;
-              decimals: number;
-              type: 'ccd' | 'cis2';
-              address: null | CIS2.TokenAddress;
-          }
-        | undefined = useMemo(() => {
-        if (value?.tokenType === undefined) return undefined;
-        if (value.tokenType === 'ccd') {
-            const name = 'CCD';
-            const icon = <ConcordiumLogo />;
-            return { name, icon, decimals: 6, type: 'ccd', address: null };
-        }
+    const getRenderDetails = useCallback(
+        (
+            v?: TokenPickerVariant
+        ):
+            | {
+                  name: string;
+                  icon: ReactNode;
+                  decimals: number;
+                  type: 'ccd' | 'cis2';
+                  address: null | CIS2.TokenAddress;
+              }
+            | undefined => {
+            if (v?.tokenType === undefined) return undefined;
+            if (v.tokenType === 'ccd') {
+                const name = 'CCD';
+                const icon = <ConcordiumLogo />;
+                return { name, icon, decimals: 6, type: 'ccd', address: null };
+            }
 
-        const {
-            metadata: { symbol, name, decimals = 0, thumbnail },
-            id,
-            contract,
-        } = ensureDefined(
-            tokens.find(
-                (tk) =>
-                    tk.id === value.tokenAddress.id && ContractAddress.equals(tk.contract, value.tokenAddress.contract)
-            ),
-            'Expected the token specified to be available in the set of tokens given'
+            const {
+                metadata: { symbol, name, decimals = 0, thumbnail },
+                id,
+                contract,
+            } = ensureDefined(
+                tokens.find(
+                    (tk) => tk.id === v.tokenAddress.id && ContractAddress.equals(tk.contract, v.tokenAddress.contract)
+                ),
+                'Expected the token specified to be available in the set of tokens given'
+            );
+            const safeName = symbol ?? name ?? `${v.tokenAddress.id}@${v.tokenAddress.contract.toString()}`;
+            const tokenImage = thumbnail?.url ?? DEFAULT_TOKEN_THUMBNAIL;
+            const icon = <Img src={tokenImage} alt={name} withDefaults />;
+            return { name: safeName, icon, decimals, type: 'cis2', address: { id, contract } };
+        },
+        [tokens]
+    );
+
+    const options: TokenPickerVariant[] = [
+        { tokenType: 'ccd' },
+        ...tokens.map((tk): TokenPickerVariant => ({ tokenType: 'cis2', tokenAddress: tk })),
+    ];
+
+    const renderOption = (v: TokenPickerVariant) => {
+        if (v.tokenType === 'ccd') return 'CCD';
+
+        const tokenInfo = tokens.find(
+            (tk) => tk.id === v.tokenAddress.id && ContractAddress.equals(tk.contract, v.tokenAddress.contract)
+        )!;
+        return (
+            tokenInfo.metadata.symbol ?? tokenInfo.metadata.name ?? `${tokenInfo.id}@${tokenInfo.contract.toString()}`
         );
-        const safeName = symbol ?? name ?? `${value.tokenAddress.id}@${value.tokenAddress.contract.toString()}`;
-        const tokenImage = thumbnail?.url ?? DEFAULT_TOKEN_THUMBNAIL;
-        const icon = <Img src={tokenImage} alt={name} withDefaults />;
-        return { name: safeName, icon, decimals, type: 'cis2', address: { id, contract } };
-    }, [value]);
+    };
 
     return (
         <div className="token-selector-container">
-            <label className="token-selector">
-                {canSelect && (
-                    <select
-                        value={formatTokenSelectorId(value)}
-                        onChange={(e) => onChange?.(parseTokenSelectorId(e.target.value))}
-                        onBlur={onBlur}
-                    >
-                        <option value={formatTokenSelectorId({ tokenType: 'ccd' })}>CCD</option>
-                        {tokens.map((tk) => {
-                            const id = formatTokenSelectorId({ tokenType: 'cis2', tokenAddress: tk });
-                            return (
-                                <option key={id} value={id}>
-                                    {tk.metadata.symbol ?? tk.metadata.name ?? `${tk.id}@${tk.contract.toString()}`}
-                                </option>
-                            );
-                        })}
-                    </select>
-                )}
-                {token !== undefined && <div className="token-icon">{token.icon}</div>}
-                <Text.Main>{token?.name}</Text.Main>
-                {canSelect && <SideArrow />}
-            </label>
+            <Select<TokenPickerVariant>
+                options={options}
+                value={value}
+                id={formatTokenSelectorId}
+                onChange={(v) => onChange?.(v)}
+                onBlur={onBlur}
+                renderOption={renderOption}
+                readonly={!canSelect}
+                className="token-selector"
+            >
+                {(v) => {
+                    const tk = getRenderDetails(v);
+                    return (
+                        <>
+                            {tk !== undefined && <div className="token-icon">{tk.icon}</div>}
+                            <Text.Main>{tk?.name}</Text.Main>
+                        </>
+                    );
+                }}
+            </Select>
             {selectedTokenBalance !== undefined && (
                 <span className="text__additional_small">
                     {t('form.tokenAmount.token.available', {
@@ -340,15 +346,16 @@ export default function TokenAmountView(props: TokenAmountViewProps) {
     const handleAmountBlur: React.FocusEventHandler<HTMLInputElement> = useCallback(
         (event) => {
             const { value } = event.target;
+            const form = props.form as UseFormReturn<AmountForm>;
 
-            if (value === '') {
+            if (value === '' || form.getFieldState('amount').error !== undefined) {
                 return;
             }
 
             try {
                 const formatted = formatAmount(parseAmount(value));
                 if (formatted !== value) {
-                    (props.form as UseFormReturn<AmountForm>).setValue('amount', formatted ?? '');
+                    form.setValue('amount', formatted ?? '');
                 }
             } catch {
                 // Do nothing...
@@ -359,16 +366,18 @@ export default function TokenAmountView(props: TokenAmountViewProps) {
 
     const validateAmount: Validate<string> = useCallback(
         (value) => {
+            const [, fractions = ''] = value.split('.');
+            if (fractions.length > tokenDecimals) {
+                return t('form.tokenAmount.validation.incorrectDecimals', { num: tokenDecimals });
+            }
             const sanitizedValue = removeNumberGrouping(value);
             if (token.tokenType === 'cis2' && ccdBalance.microCcdAmount < fee.microCcdAmount) {
                 return t('form.tokenAmount.validation.insufficientCcd');
             }
-            return validateTransferAmount(
-                sanitizedValue,
-                balance,
-                tokenDecimals,
-                token.tokenType === 'ccd' ? fee.microCcdAmount : 0n
-            );
+            if (token.tokenType === 'ccd') {
+                return validateTransferAmount(sanitizedValue, balance, tokenDecimals, fee.microCcdAmount);
+            }
+            return true;
         },
         [balance, tokenDecimals, token, fee]
     );

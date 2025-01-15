@@ -13,8 +13,7 @@ import { usePrivateKey } from '@popup/shared/utils/account-helpers';
 import { parsePayload } from '@shared/utils/payload-helpers';
 import * as JSONBig from 'json-bigint';
 import { SmartContractParameters } from '@concordium/browser-wallet-api-helpers';
-import { convertEnergyToMicroCcd, getEnergyCost } from '@shared/utils/energy-helpers';
-import { AccountAddress } from '@concordium/web-sdk';
+import { AccountAddress, convertEnergyToMicroCcd, getEnergyCost } from '@concordium/web-sdk';
 import { displayAsCcd, getPublicAccountAmounts } from 'wallet-common-helpers';
 import {
     createPendingTransactionFromAccountTransaction,
@@ -96,7 +95,7 @@ export default function SendTransaction({ onSubmit, onReject }: Props) {
         const accountInfo = await client.getAccountInfo(sender);
         if (
             getPublicAccountAmounts(accountInfo).atDisposal <
-            getTransactionAmount(transactionType, payload) + (cost || 0n)
+            getTransactionAmount(transactionType, payload) + (cost?.microCcdAmount || 0n)
         ) {
             throw new Error(t('errors.insufficientFunds'));
         }
@@ -115,7 +114,7 @@ export default function SendTransaction({ onSubmit, onReject }: Props) {
         const transaction = { payload, header, type: transactionType };
 
         const hash = await sendTransaction(client, transaction, key);
-        const pending = createPendingTransactionFromAccountTransaction(transaction, hash, cost);
+        const pending = createPendingTransactionFromAccountTransaction(transaction, hash, cost?.microCcdAmount);
         await addPendingTransaction(pending);
 
         return hash;

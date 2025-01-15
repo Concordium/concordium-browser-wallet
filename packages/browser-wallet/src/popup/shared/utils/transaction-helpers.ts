@@ -18,8 +18,8 @@ import {
     UpdateContractPayload,
     SimpleTransferWithMemoPayload,
     AccountInfoType,
-    getEnergyCost,
     convertEnergyToMicroCcd,
+    getEnergyCost,
 } from '@concordium/web-sdk';
 import {
     isValidResolutionString,

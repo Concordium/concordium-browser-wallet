@@ -155,10 +155,10 @@ function DisplayNotProvable({
                         />
                     </>
                 )}
-                <Page.Footer>
-                    <Button.Secondary onClick={onClick} label={t('reject')} />
-                </Page.Footer>
             </div>
+            <Page.Footer>
+                <Button.Main className="secondary" onClick={onClick} label={t('reject')} />
+            </Page.Footer>
         </Page>
     );
 }

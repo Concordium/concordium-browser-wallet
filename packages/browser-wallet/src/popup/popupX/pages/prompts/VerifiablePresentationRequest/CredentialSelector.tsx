@@ -1,8 +1,9 @@
-import React, { ComponentType, useMemo } from 'react';
+import React, { ComponentType } from 'react';
 
 import SelectIcon from '@assets/svgX/caret-up-down.svg';
 import { ClassName } from 'wallet-common-helpers';
 import clsx from 'clsx';
+import { Select } from '@popup/popupX/shared/Form/Select';
 
 export type CredentialSelectorDisplayProps<T> = {
     option: T;
@@ -30,28 +31,19 @@ export default function CredentialSelector<T extends string | number | object>({
     id,
     className,
 }: Props<T>) {
-    const selected = useMemo(() => id(value), [id, value]);
-
     if (options.length === 0) {
         throw new Error('No options given to selector');
     }
 
-    function onSelect(option: string) {
-        onChange(options.find((o) => id(o) === option)!);
-    }
-
     return (
-        <label className={clsx('verifiable-presentation-request__cred-selector', className)}>
-            <Display option={value} />
-            <SelectIcon />
-
-            <select onChange={(e) => onSelect(e.target.value)} value={selected}>
-                {options.map((o) => (
-                    <option value={id(o)}>
-                        <Display option={o} />
-                    </option>
-                ))}
-            </select>
-        </label>
+        <Select
+            className={clsx('verifiable-presentation-request__cred-selector', className)}
+            options={options}
+            renderOption={(v) => <Display option={v} />}
+            icon={<SelectIcon />}
+            id={id}
+            value={value}
+            onChange={onChange}
+        />
     );
 }

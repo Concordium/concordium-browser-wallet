@@ -40,24 +40,6 @@
         margin: 0 0 rem(16px);
         align-self: flex-start;
 
-        select {
-            appearance: none;
-            background: none;
-            border: none;
-            position: absolute;
-            z-index: 0;
-            color: transparent;
-            height: 100%;
-            top: 0;
-            left: 0;
-            width: 100%;
-            cursor: pointer;
-
-            &::selection {
-                background-color: transparent;
-            }
-        }
-
         svg {
             margin-left: rem(5px);
         }
