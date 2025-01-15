@@ -66,7 +66,7 @@ export function Select<T>({
                     })}
                 </select>
             )}
-            {children(value)}
+            <span className="flex">{children(value)}</span>
             {!readonly && icon}
         </label>
     );
