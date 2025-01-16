@@ -8,8 +8,8 @@ import { useTranslation } from 'react-i18next';
 import { formatCcdAmount } from '@popup/popupX/shared/utils/helpers';
 import { useSelectedAccountInfo } from '@popup/shared/AccountInfoListenerContext/AccountInfoListenerContext';
 import { Navigate, useNavigate } from 'react-router-dom';
-import AccountCooldowns from '../AccountCooldowns';
-import { DelegationResultLocationState } from './Result/DelegationResult';
+import AccountCooldowns from '../../AccountCooldowns';
+import { DelegationResultLocationState } from '../Result/DelegationResult';
 
 const REMOVE_STATE: DelegationResultLocationState = {
     type: 'remove',
@@ -28,7 +28,7 @@ export default function DelegatorStatus() {
     const { accountDelegation, accountCooldowns } = accountInfo;
 
     return (
-        <Page>
+        <Page className="delegator-status">
             <Page.Top heading={t('status.title')} />
             <Card>
                 <Card.Row>

@@ -11,10 +11,9 @@ const t = {
         note: 'Please note, a single account cannot both be a validator and a delegator, but it is possible to stop one and change to the other.',
     },
     cooldowns: {
+        header: 'Cooldown',
         inactiveStake: {
             label: 'Inactive stake',
-            description:
-                'You don’t receive rewards from this part of the stake now. This amount will be at your disposal after the cooldown period.',
         },
         cooldown: {
             label: 'Cooldown time:',

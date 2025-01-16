@@ -11,6 +11,8 @@ import { absoluteRoutes, relativeRoutes } from '@popup/popupX/constants/routes';
 import Text from '@popup/popupX/shared/Text';
 import { useSelectedAccountInfo } from '@popup/shared/AccountInfoListenerContext/AccountInfoListenerContext';
 import { AccountInfoType } from '@concordium/web-sdk';
+import Card from '@popup/popupX/shared/Card';
+import AccountCooldowns from './AccountCooldowns';
 
 export default function EarningRewards() {
     const { t } = useTranslation('x', { keyPrefix: 'earn.root' });
@@ -36,7 +38,10 @@ export default function EarningRewards() {
         <Page className="earn-container">
             <Page.Top heading="Earning Rewards" />
             <Page.Main>
-                <div className="earn__card">
+                {accountInfo !== undefined && (
+                    <AccountCooldowns className="earn__cooldowns" cooldowns={accountInfo.accountCooldowns} />
+                )}
+                <Card type="grey" className="earn__card">
                     <Text.Main>{t('validatorTitle')}</Text.Main>
                     <Text.Capture>
                         {t('validatorDescription', { amount: displayAsCcd(bakingThreshold, false) })}
@@ -47,8 +52,8 @@ export default function EarningRewards() {
                             <ArrowRight />
                         </div>
                     </Link>
-                </div>
-                <div className="earn__card">
+                </Card>
+                <Card type="grey" className="earn__card">
                     <Text.Main>{t('delegationTitle')}</Text.Main>
                     <Text.Capture>{t('delegationDescription')}</Text.Capture>
                     <Link to={absoluteRoutes.settings.earn.delegator.register.path}>
@@ -57,7 +62,7 @@ export default function EarningRewards() {
                             <ArrowRight />
                         </div>
                     </Link>
-                </div>
+                </Card>
                 <div className="earn__info">
                     <div className="earn__info_icon">
                         <Info />
