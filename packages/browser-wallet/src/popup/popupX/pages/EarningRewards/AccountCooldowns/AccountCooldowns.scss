@@ -1,20 +1,15 @@
 .account-cooldowns {
-    &__item {
-        margin-top: rem(8px);
-
-        .capture__main_small {
-            opacity: 0.5;
-            color: $color-mineral-3;
-
-            &:not(:first-child) {
-                margin-top: rem(6px);
-            }
-        }
+    .capture__main_small {
+        opacity: 0.5;
+        color: $color-mineral-3;
     }
 
-    &__cooldown {
-        flex: 1;
+    &__cooldown, &__stake {
+        display: flex;
+        align-items: center;
         justify-content: space-between;
+
+        margin-top: rem(6px);
     }
 
     &__em {

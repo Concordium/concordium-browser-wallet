@@ -304,13 +304,18 @@ export function useTransactionSubmit(sender: AccountAddress.Type, type: AccountT
 
     return useCallback(
         async (payload: AccountTransactionPayload, cost: CcdAmount.Type) => {
-            const accountInfo = await grpc.getAccountInfo(sender);
+            const { accountAmount, accountAvailableBalance } = await grpc.getAccountInfo(sender);
+
+            if (accountAvailableBalance.microCcdAmount < cost.microCcdAmount) {
+                throw TransactionSubmitError.insufficientFunds();
+            }
+
             const available = [
                 AccountTransactionType.ConfigureBaker,
                 AccountTransactionType.ConfigureDelegation,
             ].includes(type)
-                ? accountInfo.accountAmount
-                : accountInfo.accountAvailableBalance;
+                ? accountAmount
+                : accountAvailableBalance;
             if (available.microCcdAmount < getTransactionAmount(type, payload) + (cost.microCcdAmount || 0n)) {
                 throw TransactionSubmitError.insufficientFunds();
             }

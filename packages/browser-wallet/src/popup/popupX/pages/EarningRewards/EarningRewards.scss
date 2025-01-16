@@ -4,14 +4,11 @@
             margin-bottom: rem(16px);
         }
 
-        &__card {
-            display: flex;
-            flex-direction: column;
-            background-color: $color-transaction-bg;
-            border-radius: rem(16px);
-            padding: rem(16px);
+        &__cooldowns, &__card {
             margin-bottom: rem(8px);
+        }
 
+        &__card {
             .capture__main_small {
                 margin: rem(4px) 0 rem(12px) 0;
             }

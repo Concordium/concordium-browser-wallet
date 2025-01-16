@@ -54,7 +54,7 @@ export default function ValidatorStatus() {
                 </Card.Row>
             </Card>
             <AccountCooldowns cooldowns={accountCooldowns} />
-            <Card className="validator-status__info">
+            <Card>
                 <Card.Row>
                     <Card.RowDetails title={t('values.id.label')} value={accountBaker.bakerId.toString()} />
                 </Card.Row>
