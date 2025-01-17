@@ -20,6 +20,9 @@
             border-radius: rem(12px);
             background: $color-transaction-bg;
             margin-bottom: rem(4px);
+            display: block;
+            width: 100%;
+            border: none;
 
             .transaction {
                 .label__main {
@@ -53,5 +56,14 @@
                 }
             }
         }
+    }
+}
+
+.main-layout-x__main:has(.transaction-log) {
+    overflow-y: scroll;
+    padding-right: rem(8px);
+
+    &::-webkit-scrollbar {
+        display: block;
     }
 }

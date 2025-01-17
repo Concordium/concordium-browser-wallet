@@ -16,6 +16,7 @@ import { addToastAtom } from '@popup/state';
 import { displayAsCcd } from 'wallet-common-helpers';
 import { AccountTransactionType } from '@concordium/web-sdk';
 import { displaySplitAddressShort } from '@popup/shared/utils/account-helpers';
+import Button from '@popup/popupX/shared/Button';
 
 /** The max number of transactions to query per request to the wallet proxy. */
 const transactionResultLimit = 20;
@@ -323,7 +324,7 @@ function TransactionLog({ account }: TransactionLogProps) {
                             </div>
                             {day.transactions.map((transaction) => (
                                 // eslint-disable-next-line jsx-a11y/click-events-have-key-events, jsx-a11y/no-static-element-interactions
-                                <div
+                                <Button.Base
                                     key={transaction.block}
                                     className="transaction-log__history_transaction"
                                     onClick={() => navToTransactionDetails(transaction)}
@@ -344,7 +345,7 @@ function TransactionLog({ account }: TransactionLogProps) {
                                             <Text.Capture>{transaction.note}</Text.Capture>
                                         </div>
                                     )}
-                                </div>
+                                </Button.Base>
                             ))}
                         </div>
                     ))}
