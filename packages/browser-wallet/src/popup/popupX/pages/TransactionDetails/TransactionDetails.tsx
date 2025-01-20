@@ -1,12 +1,15 @@
 import React, { useCallback } from 'react';
+import { useTranslation } from 'react-i18next';
+import { Navigate, useLocation } from 'react-router-dom';
+
 import Copy from '@assets/svgX/copy.svg';
 import ArrowSquareOut from '@assets/svgX/arrow-square-out.svg';
 import Card from '@popup/popupX/shared/Card';
 import Text from '@popup/popupX/shared/Text';
 import Page from '@popup/popupX/shared/Page';
 import Button from '@popup/popupX/shared/Button';
-import { Navigate, useLocation } from 'react-router-dom';
 import * as CcdScan from '@popup/shared/utils/ccdscan';
+
 import { TransactionLogEntry } from '../TransactionLog/TransactionLog';
 
 /** State passed as part of the navigation */
@@ -20,13 +23,14 @@ type TransactionDetailsProps = {
 };
 
 function TransactionDetails({ transaction }: TransactionDetailsProps) {
+    const { t } = useTranslation('x', { keyPrefix: 'transactionDetails' });
     const copyTransactionHash = useCallback(() => navigator.clipboard.writeText(transaction.hash), []);
     const seeOnCcdScan = useCallback(() => {
         CcdScan.openTransaction(transaction.hash);
     }, []);
     return (
         <Page className="transaction-details-x">
-            <Page.Top heading="Transaction details">
+            <Page.Top heading={t('title')}>
                 <Button.Icon icon={<Copy />} onClick={copyTransactionHash} />
                 <Button.Icon icon={<ArrowSquareOut />} onClick={seeOnCcdScan} />
             </Page.Top>
@@ -49,16 +53,16 @@ function TransactionDetails({ transaction }: TransactionDetailsProps) {
                         </div>
                     </Card.Row>
                     {transaction.fromAddress === undefined ? null : (
-                        <Card.RowDetails title="From address" value={transaction.fromAddress} />
+                        <Card.RowDetails title={t('from')} value={transaction.fromAddress} />
                     )}
                     {transaction.toAddress === undefined ? null : (
-                        <Card.RowDetails title="To address" value={transaction.toAddress} />
+                        <Card.RowDetails title={t('to')} value={transaction.toAddress} />
                     )}
-                    <Card.RowDetails title="Transaction hash" value={transaction.hash} />
-                    <Card.RowDetails title="Block hash" value={transaction.block} />
+                    <Card.RowDetails title={t('tHash')} value={transaction.hash} />
+                    <Card.RowDetails title={t('bHash')} value={transaction.block} />
                     <Card.Row>
                         <div className="transaction-details__card_row">
-                            <Text.Capture>Events</Text.Capture>
+                            <Text.Capture>{t('events')}</Text.Capture>
                             {transaction.events.map((event) => (
                                 <span className="secondary-info" key={event}>
                                     <Text.Capture>{event}</Text.Capture>

@@ -313,7 +313,7 @@ function TransactionLog({ account }: TransactionLogProps) {
 
     return (
         <Page className="transaction-log">
-            <Page.Top heading="Transaction log" />
+            <Page.Top heading={t('title')} />
             <Page.Main>
                 <div className="transaction-log__history">
                     {transactionLogs.map((day) => (

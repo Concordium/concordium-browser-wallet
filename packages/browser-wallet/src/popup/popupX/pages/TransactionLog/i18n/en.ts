@@ -1,4 +1,5 @@
 const t = {
+    title: 'Activity',
     deployModule: 'Module deployment',
     initContract: 'Contract initialization',
     update: 'Contract update',

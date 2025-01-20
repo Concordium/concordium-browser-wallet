@@ -7,7 +7,7 @@ const t = {
     siteNotConnected: 'Not connected',
     accountBalanceError: 'Unable to retrieve account balance',
     actions: {
-        log: 'Transaction log',
+        log: 'Activity',
         send: 'Send CCD',
         receive: 'Receive CCD',
         earn: 'Earn CCD',
@@ -32,9 +32,9 @@ const t = {
             export: 'Export',
         },
         accountStatement: {
-            title: 'Export transaction log',
+            title: 'Export activity',
             description:
-                'Transaction logs of an account can be generated and downloaded from CCDScan.io.\n\nCCDScan is a Concordium block explorer, and pressing the button below will open the website in your browser.',
+                'The activity of an account can be generated and downloaded from CCDScan.io.\n\nCCDScan is a Concordium block explorer, and pressing the button below will open the website in your browser.',
             link: 'Go to CCDScan.io',
         },
     },

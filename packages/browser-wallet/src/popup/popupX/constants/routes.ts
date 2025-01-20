@@ -112,7 +112,7 @@ export const relativeRoutes = {
             details: {
                 path: ':transactionHash',
                 config: {
-                    backTitle: 'to Transaction log',
+                    backTitle: i18n.t('x:transactionDetails.backTitle'),
                 },
             },
         },
