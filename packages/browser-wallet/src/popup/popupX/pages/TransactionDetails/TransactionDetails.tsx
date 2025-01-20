@@ -9,6 +9,7 @@ import Text from '@popup/popupX/shared/Text';
 import Page from '@popup/popupX/shared/Page';
 import Button from '@popup/popupX/shared/Button';
 import * as CcdScan from '@popup/shared/utils/ccdscan';
+import { useCopyToClipboard } from '@popup/popupX/shared/utils/hooks';
 
 import { TransactionLogEntry } from '../TransactionLog/TransactionLog';
 
@@ -24,7 +25,8 @@ type TransactionDetailsProps = {
 
 function TransactionDetails({ transaction }: TransactionDetailsProps) {
     const { t } = useTranslation('x', { keyPrefix: 'transactionDetails' });
-    const copyTransactionHash = useCallback(() => navigator.clipboard.writeText(transaction.hash), []);
+    const copy = useCopyToClipboard();
+    const copyTransactionHash = useCallback(() => copy(transaction.hash), []);
     const seeOnCcdScan = useCallback(() => {
         CcdScan.openTransaction(transaction.hash);
     }, []);
