@@ -22,8 +22,9 @@ import Page from '@popup/popupX/shared/Page';
 import { useCredential } from '@popup/shared/utils/account-helpers';
 import { relativeRoutes } from '@popup/popupX/constants/routes';
 
-import useTransactionGroups from './useTransactionGroups';
+import useTransactionGroups, { TransactionLogParams } from './util';
 import TransactionElement, { TRANSACTION_ELEMENT_HEIGHT } from './TransactionElement';
+import { TransactionDetailsLocationState } from '../TransactionDetails/TransactionDetails';
 
 // Needs to stay in sync with the sizes of the respective elements.
 const TITLE_HEIGHT = 30;
@@ -309,24 +310,22 @@ function TransactionList({ onTransactionClick, account }: TransactionListProps) 
     return <Page className="transaction-log">{content}</Page>;
 }
 
-/** Parameters parsed from the path */
-type Params = {
-    /** Address of the account to display transactions for. */
-    account: string;
-};
-
 export default function Loader() {
-    const params = useParams<Params>();
+    const params = useParams<TransactionLogParams>();
     const account = useCredential(params.account);
     const nav = useNavigate();
-
-    const navToTransactionDetails = (transaction: BrowserWalletTransaction) =>
-        nav(relativeRoutes.home.transactionLog.details.path, { state: { transaction } });
 
     if (account === undefined) {
         // No account address in the path.
         return <Navigate to="../" />;
     }
+
+    const navToTransactionDetails = (transaction: BrowserWalletTransaction) => {
+        const state: TransactionDetailsLocationState = {
+            transaction,
+        };
+        nav(relativeRoutes.home.transactionLog.details.path, { state });
+    };
 
     return <TransactionList account={account} onTransactionClick={navToTransactionDetails} />;
 }

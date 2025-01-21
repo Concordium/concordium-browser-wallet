@@ -38,7 +38,6 @@ import createAccount from '@popup/popupX/pages/CreateAccount/i18n/en';
 import mainPage from '@popup/popupX/pages/MainPage/i18n/en';
 import tokenDetails from '@popup/popupX/pages/TokenDetails/i18n/en';
 import transactionLogX from '@popup/popupX/pages/TransactionLog/i18n/en';
-import transactionDetails from '@popup/popupX/pages/TransactionDetails/i18n/en';
 import restore from '@popup/popupX/pages/Restore/i18n/en';
 import connectedSites from '@popup/popupX/pages/ConnectedSites/i18n/en';
 import privateKey from '@popup/popupX/pages/PrivateKey/i18n/en';
@@ -104,7 +103,6 @@ const t = {
         mainPage,
         tokenDetails,
         transactionLogX,
-        transactionDetails,
         restore,
         connectedSites,
         privateKey,

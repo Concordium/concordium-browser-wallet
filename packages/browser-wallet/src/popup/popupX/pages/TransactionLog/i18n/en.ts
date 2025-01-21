@@ -34,6 +34,16 @@ const t = {
         error: 'Unable to retrieve transaction history',
         requestCcd: 'Request CCD',
     },
+    details: {
+        backTitle: 'to Activity',
+        title: 'Transaction details',
+        tHash: ' Transaction hash',
+        bHash: 'Block hash',
+        from: 'From address',
+        to: 'To address',
+        events: 'Events',
+        rejectReason: 'Reject reason',
+    },
 };
 
 export default t;

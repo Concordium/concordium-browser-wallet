@@ -6,7 +6,7 @@ import MainPage from '@popup/popupX/pages/MainPage';
 import { SendFunds } from '@popup/popupX/pages/SendFunds';
 import ReceiveFunds from '@popup/popupX/pages/ReceiveFunds';
 import TransactionLog from '@popup/popupX/pages/TransactionLog';
-import TransactionDetails from '@popup/popupX/pages/TransactionDetails';
+import TransactionDetails from '@popup/popupX/pages/TransactionLog/TransactionDetails';
 import { TokenDetails, TokenDetailsCcd, TokenRaw } from '@popup/popupX/pages/TokenDetails';
 import IdCards from '@popup/popupX/pages/IdCards';
 import Accounts from '@popup/popupX/pages/Accounts';
