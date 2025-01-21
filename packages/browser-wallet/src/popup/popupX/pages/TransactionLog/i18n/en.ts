@@ -29,6 +29,11 @@ const t = {
     unknown: 'Unknown',
     withFee: 'with fee {{value}}',
     from: 'from {{value}}',
+    list: {
+        noTransactions: 'This account has no transactions yet.',
+        error: 'Unable to retrieve transaction history',
+        requestCcd: 'Request CCD',
+    },
 };
 
 export default t;
