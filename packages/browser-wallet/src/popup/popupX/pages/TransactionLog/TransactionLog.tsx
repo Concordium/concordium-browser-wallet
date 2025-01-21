@@ -1,4 +1,4 @@
-import React, { useEffect, useMemo, useRef, useState } from 'react';
+import React, { useContext, useEffect, useMemo, useRef, useState } from 'react';
 import { Navigate, useNavigate, useParams } from 'react-router-dom';
 import InfiniteLoader from 'react-window-infinite-loader';
 import { VariableSizeList as List } from 'react-window';
@@ -21,10 +21,11 @@ import Text from '@popup/popupX/shared/Text';
 import Page from '@popup/popupX/shared/Page';
 import { useCredential } from '@popup/shared/utils/account-helpers';
 import { relativeRoutes } from '@popup/popupX/constants/routes';
+import { mainLayoutScrollContext } from '@popup/popupX/page-layouts/MainLayout/MainLayout';
 
 import useTransactionGroups, { TransactionLogParams } from './util';
 import TransactionElement, { TRANSACTION_ELEMENT_HEIGHT } from './TransactionElement';
-import { TransactionDetailsLocationState } from '../TransactionDetails/TransactionDetails';
+import { TransactionDetailsLocationState } from './TransactionDetails/TransactionDetails';
 
 // Needs to stay in sync with the sizes of the respective elements.
 const TITLE_HEIGHT = 30;
@@ -61,10 +62,17 @@ function InfiniteTransactionList({
     const { t } = useTranslation('x', { keyPrefix: 'transactionLogX' });
     const groups = useTransactionGroups(transactions);
     const headersAndTransactions = groups.flat(2);
+    const { setScroll } = useContext(mainLayoutScrollContext);
 
     const itemCount = hasNextPage ? headersAndTransactions.length + 2 : headersAndTransactions.length + 1; // any index is offset by 1 to account for initial title element of list.
     const loadMoreItems = isNextPageLoading ? noOp : loadNextPage;
     const isItemLoaded = (index: number) => !hasNextPage || index < headersAndTransactions.length;
+
+    useEffect(() => {
+        return () => {
+            setScroll(0);
+        };
+    }, []);
 
     return (
         <AutoSizer>
@@ -78,6 +86,7 @@ function InfiniteTransactionList({
                             ref={ref}
                             width={width}
                             height={height}
+                            onScroll={(e) => setScroll(e.scrollOffset)}
                             itemSize={(i) => {
                                 if (i === 0) return TITLE_HEIGHT;
                                 return isHeader(headersAndTransactions[i - 1])
@@ -85,7 +94,6 @@ function InfiniteTransactionList({
                                     : TRANSACTION_ELEMENT_HEIGHT;
                             }}
                             itemKey={(i) => (i === 0 ? 'title' : getKey(headersAndTransactions[i - 1]))}
-                            // innerElementType={ListElement}
                         >
                             {({ index, style }) => {
                                 if (index === 0) {
