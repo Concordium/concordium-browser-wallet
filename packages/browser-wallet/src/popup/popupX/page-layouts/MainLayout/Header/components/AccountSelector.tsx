@@ -28,17 +28,17 @@ function shortNumber(number: number | string): string {
 
 function CcdBalance({ credential }: { credential: WalletCredential }) {
     const accountInfo = useAccountInfo(credential);
-    const { total, staked } = getPublicAccountAmounts(accountInfo);
+    const { total, atDisposal } = getPublicAccountAmounts(accountInfo);
     const accountTotal = Number(microCcdToCcd(total));
-    const accountStaked = Number(microCcdToCcd(staked));
+    const accountAtDisposal = Number(microCcdToCcd(atDisposal));
 
     return (
         <>
             {shortNumber(accountTotal)}
             <ConcordiumLogo />
-            {!!accountStaked && (
+            {accountTotal !== accountAtDisposal && (
                 <>
-                    {` \u00B7 `} {shortNumber(accountStaked)} <ConcordiumLogo />
+                    {` \u00B7 `} {shortNumber(accountAtDisposal)} <ConcordiumLogo />
                 </>
             )}
         </>
