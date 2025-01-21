@@ -38,7 +38,7 @@ export default function TransactionElement({ accountAddress, transaction, style,
             : transaction.amount;
     const time = onlyTime(dateFromTimestamp(transaction.time, TimeStampUnit.seconds));
     const info =
-        (transaction.cost !== undefined && t('withFee', { value: displayAsCcd(transaction.cost, false, true) })) ??
+        (transaction.cost !== undefined && t('withFee', { value: displayAsCcd(transaction.cost, false, true) })) ||
         (transaction.fromAddress && t('from', { value: displaySplitAddressShort(transaction.fromAddress) }));
 
     return (

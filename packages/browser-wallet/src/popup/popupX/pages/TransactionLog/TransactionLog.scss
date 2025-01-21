@@ -56,6 +56,10 @@
         .capture__main_small {
             color: rgba($color-mineral-3, 0.5);
         }
+
+        > div {
+            position: relative;
+        }
     }
 
     &::-webkit-scrollbar {
