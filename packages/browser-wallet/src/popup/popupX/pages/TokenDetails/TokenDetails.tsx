@@ -47,7 +47,7 @@ function TokenDetails({ credential }: { credential: WalletCredential }) {
                 tokenAddress: { id, contract: ContractAddress.create(BigInt(contractIndex), 0) },
             } as SendFundsLocationState,
         });
-    const navToReceive = () => nav(`../${relativeRoutes.home.receive.path}`);
+    const navToReceive = () => nav(absoluteRoutes.home.receive.path);
     const navToTransactionLog = () =>
         nav(absoluteRoutes.home.transactionLog.path.replace(':account', credential.address));
     const navToRaw = () => nav(relativeRoutes.home.token.details.raw.path);

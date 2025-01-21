@@ -2,7 +2,7 @@ import React, { useEffect, useMemo, useState } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { useTranslation } from 'react-i18next';
 import { AccountAddress } from '@concordium/web-sdk';
-import { relativeRoutes, absoluteRoutes, sendFundsRoute } from '@popup/popupX/constants/routes';
+import { absoluteRoutes, sendFundsRoute } from '@popup/popupX/constants/routes';
 import Page from '@popup/popupX/shared/Page';
 import Text from '@popup/popupX/shared/Text';
 import Button from '@popup/popupX/shared/Button';
@@ -61,7 +61,7 @@ function TokenDetailsCcd({ credential }: { credential: WalletCredential }) {
         nav(sendFundsRoute(AccountAddress.fromBase58(credential.address)), {
             state: { tokenType: 'ccd' } as TokenPickerVariant,
         });
-    const navToReceive = () => nav(`../${relativeRoutes.home.receive.path}`);
+    const navToReceive = () => nav(absoluteRoutes.home.receive.path);
     const navToTransactionLog = () =>
         nav(absoluteRoutes.home.transactionLog.path.replace(':account', credential.address));
     const navToEarn = () => nav(absoluteRoutes.settings.earn.path);
