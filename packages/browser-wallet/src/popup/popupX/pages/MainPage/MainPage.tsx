@@ -85,9 +85,11 @@ function Balance({ credential }: { credential: WalletCredential }) {
                     <Info />
                 </Tooltip>
             </div>
-            <Text.Capture>
-                {ccdAvailableBalance} {t('atDisposal')}
-            </Text.Capture>
+            {accountInfo.accountAmount.microCcdAmount !== accountInfo.accountAvailableBalance.microCcdAmount && (
+                <Text.Capture>
+                    {ccdAvailableBalance} {t('atDisposal')}
+                </Text.Capture>
+            )}
         </div>
     );
 }

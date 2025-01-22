@@ -6,7 +6,7 @@ import Cross from '@assets/svgX/close.svg';
 import Arrow from '@assets/svgX/arrow-right.svg';
 import Button from '@popup/popupX/shared/Button';
 import Page from '@popup/popupX/shared/Page';
-import { absoluteRoutes, transactionDetailsRoute } from '@popup/popupX/constants/routes';
+import { absoluteRoutes, transactionLogRoute } from '@popup/popupX/constants/routes';
 import Card from '@popup/popupX/shared/Card';
 import { useAsyncMemo } from 'wallet-common-helpers';
 import {
@@ -244,7 +244,7 @@ export default function SubmittedTransaction() {
                     label={t('detailsButton')}
                     className="submitted-tx__details-btn"
                     leftLabel
-                    onClick={() => nav(transactionDetailsRoute(status.summary.sender, status.summary.hash))}
+                    onClick={() => nav(transactionLogRoute(status.summary.sender))}
                 />
             )}
             <Page.Footer>
