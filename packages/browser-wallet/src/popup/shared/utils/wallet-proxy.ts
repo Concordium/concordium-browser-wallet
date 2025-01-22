@@ -1,4 +1,4 @@
-import { AccountTransactionType } from '@concordium/web-sdk';
+import { AccountTransactionType, CcdAmount } from '@concordium/web-sdk';
 import axios from 'axios';
 import { abs } from 'wallet-common-helpers';
 import { Cis2TokensResponse, IdentityProvider } from '@shared/storage/types';
@@ -279,7 +279,7 @@ export async function getCcdDrop(accountAddress: string): Promise<BrowserWalletA
     return createPendingTransaction(
         AccountTransactionType.Transfer,
         response.data.submissionId,
-        BigInt(2000000000),
+        CcdAmount.fromCcd(20000).microCcdAmount,
         undefined,
         undefined,
         accountAddress

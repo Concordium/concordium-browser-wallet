@@ -1,13 +1,17 @@
 import React, { ReactNode, useEffect, useRef } from 'react';
 import clsx from 'clsx';
-import { ClassName } from 'wallet-common-helpers';
+import { ClassName, ClassNameAndStyle } from 'wallet-common-helpers';
 
 function TextRoot({ children }: { children: ReactNode }) {
     return children;
 }
 
-function TextHeading({ children }: { children: ReactNode }) {
-    return <span className="heading_medium">{children}</span>;
+function TextHeading({ children, className, style }: { children: ReactNode } & ClassNameAndStyle) {
+    return (
+        <span className={clsx('heading_medium', className)} style={style}>
+            {children}
+        </span>
+    );
 }
 
 function TextHeadingLarge({ children }: { children: ReactNode }) {
@@ -35,8 +39,12 @@ function TextAdditionalSmall({ children }: { children: ReactNode }) {
 function TextCaptureMainSmall({ className, children }: { className?: string; children: ReactNode }) {
     return <span className={clsx('capture__main_small', className)}>{children}</span>;
 }
-function TextCaptureAdditionalSmall({ className, children }: { className?: string; children: ReactNode }) {
-    return <span className={clsx('capture__additional_small', className)}>{children}</span>;
+function TextCaptureAdditionalSmall({ className, children, style }: { children: ReactNode } & ClassNameAndStyle) {
+    return (
+        <span className={clsx('capture__additional_small', className)} style={style}>
+            {children}
+        </span>
+    );
 }
 
 function TextLabelMain({ className, children }: { className?: string; children: ReactNode }) {

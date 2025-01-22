@@ -32,6 +32,10 @@
                 .label__main.income {
                     color: $color-green-success;
                 }
+
+                .failed {
+                    color: $color-red-attention;
+                }
             }
 
             .secondary-info {

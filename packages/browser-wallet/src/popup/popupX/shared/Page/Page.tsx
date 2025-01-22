@@ -1,6 +1,8 @@
 import React, { ReactNode } from 'react';
-import Text from '@popup/popupX/shared/Text';
 import clsx from 'clsx';
+import { ClassName } from 'wallet-common-helpers';
+
+import Text from '@popup/popupX/shared/Text';
 
 function PageRoot({ className, children }: { className?: string; children: ReactNode }) {
     return <div className={clsx('page-container', className)}>{children}</div>;
@@ -15,8 +17,8 @@ function PageTop({ heading, children }: { heading?: ReactNode; children?: ReactN
     );
 }
 
-function PageMain({ children }: { children: ReactNode }) {
-    return <div className="page__main">{children}</div>;
+function PageMain({ children, className }: { children: ReactNode } & ClassName) {
+    return <div className={clsx('page__main', className)}>{children}</div>;
 }
 
 function PageFooter({ children }: { children: ReactNode }) {
