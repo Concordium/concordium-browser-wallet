@@ -1,364 +1,337 @@
-import React, { useEffect, useMemo, useState } from 'react';
-import Note from '@assets/svgX/note.svg';
+import React, { useContext, useEffect, useMemo, useRef, useState } from 'react';
 import { Navigate, useNavigate, useParams } from 'react-router-dom';
-import { relativeRoutes } from '@popup/popupX/constants/routes';
-import Page from '@popup/popupX/shared/Page';
-import Text from '@popup/popupX/shared/Text';
-import * as WalletProxy from '@popup/shared/utils/wallet-proxy';
-import {
-    BrowserWalletTransaction,
-    RewardType,
-    SpecialTransactionType,
-} from '@popup/shared/utils/transaction-history-types';
-import { useTranslation, TFunction } from 'react-i18next';
-import { useSetAtom } from 'jotai';
-import { addToastAtom } from '@popup/state';
-import { displayAsCcd } from 'wallet-common-helpers';
-import { AccountTransactionType } from '@concordium/web-sdk';
-import { displaySplitAddressShort } from '@popup/shared/utils/account-helpers';
+import InfiniteLoader from 'react-window-infinite-loader';
+import { VariableSizeList as List } from 'react-window';
+import { useTranslation } from 'react-i18next';
+import { noOp, partition } from 'wallet-common-helpers';
+import AutoSizer from 'react-virtualized-auto-sizer';
+import { useAtomValue, useSetAtom } from 'jotai';
+import { useUpdateAtom } from 'jotai/utils';
 
-/** The max number of transactions to query per request to the wallet proxy. */
-const transactionResultLimit = 20;
+import { getCcdDrop, getTransactions } from '@popup/shared/utils/wallet-proxy';
+import { BrowserWalletTransaction } from '@popup/shared/utils/transaction-history-types';
+import { addToastAtom } from '@popup/state';
+import { useAccountInfo } from '@popup/shared/AccountInfoListenerContext';
+import Button from '@popup/popupX/shared/Button';
+import { networkConfigurationAtom } from '@popup/store/settings';
+import { isMainnet } from '@shared/utils/network-helpers';
+import { addPendingTransactionAtom, selectedPendingTransactionsAtom } from '@popup/store/transactions';
+import { WalletCredential } from '@shared/storage/types';
+import Text from '@popup/popupX/shared/Text';
+import Page from '@popup/popupX/shared/Page';
+import { useCredential } from '@popup/shared/utils/account-helpers';
+import { relativeRoutes } from '@popup/popupX/constants/routes';
+import { mainLayoutScrollContext } from '@popup/popupX/page-layouts/MainLayout/MainLayout';
+
+import useTransactionGroups, { TransactionLogParams } from './util';
+import TransactionElement, { TRANSACTION_ELEMENT_HEIGHT } from './TransactionElement';
+import { TransactionDetailsLocationState } from './TransactionDetails/TransactionDetails';
+
+// Needs to stay in sync with the sizes of the respective elements.
+const TITLE_HEIGHT = 30;
+const LIST_HEADER_HEIGHT = 36;
+const TRANSACTIONS_LIMIT = 20;
+
+interface InfiniteTransactionListProps {
+    accountAddress: string;
+    transactions: BrowserWalletTransaction[];
+    hasNextPage: boolean;
+    isNextPageLoading: boolean;
+    loadNextPage: () => Promise<void>;
+    onTransactionClick(transaction: BrowserWalletTransaction): void;
+}
+
+const isHeader = (item: string | BrowserWalletTransaction): item is string => typeof item === 'string';
+
+const getKey = (item: string | BrowserWalletTransaction) =>
+    // eslint-disable-next-line @typescript-eslint/no-non-null-assertion
+    isHeader(item) ? item : item.transactionHash || item.id!;
 
 /**
- * Fetch every account transaction for accountAddress that have an ID higher or equal to fromId from the wallet proxy.
- * Throws if the request to the wallet proxy fails.
+ * An infinite scrolling list of transactions. Scrolling towards the bottom of the list
+ * triggers loading the next page.
  */
-async function fetchLatestAccountTransactions(
-    accountAddress: string,
-    signal?: AbortSignal
-): Promise<BrowserWalletTransaction[]> {
-    const transactions: BrowserWalletTransaction[] = [];
-    let startingId;
-    // eslint-disable-next-line no-constant-condition
-    while (true) {
-        const result = await WalletProxy.getTransactions(accountAddress, transactionResultLimit, 'ascending', {
-            from: startingId,
-            signal,
-        });
-        const newestTransaction = result.transactions.at(-1);
-        if (newestTransaction === undefined) {
-            // Received no new transactions, so we don't expect any more.
-            return transactions;
-        }
-        for (const tx of result.transactions) {
-            transactions.push(tx);
-        }
-        if (!result.full) {
-            // Received less than the requested limit, so we don't expect any more.
-            return transactions;
-        }
-        startingId = newestTransaction.id;
-    }
+function InfiniteTransactionList({
+    accountAddress,
+    transactions,
+    loadNextPage,
+    hasNextPage,
+    isNextPageLoading,
+    onTransactionClick,
+}: InfiniteTransactionListProps) {
+    const { t } = useTranslation('x', { keyPrefix: 'transactionLogX' });
+    const groups = useTransactionGroups(transactions);
+    const headersAndTransactions = [t('title'), ...groups.flat(2)];
+    const { setScroll } = useContext(mainLayoutScrollContext);
+
+    const itemCount = hasNextPage ? headersAndTransactions.length + 1 : headersAndTransactions.length;
+    const loadMoreItems = isNextPageLoading ? noOp : loadNextPage;
+    const isItemLoaded = (index: number) => !hasNextPage || index < headersAndTransactions.length;
+
+    useEffect(() => {
+        return () => {
+            setScroll(0);
+        };
+    }, []);
+
+    return (
+        <AutoSizer>
+            {({ height, width }) => (
+                <InfiniteLoader isItemLoaded={isItemLoaded} itemCount={itemCount} loadMoreItems={loadMoreItems}>
+                    {({ onItemsRendered, ref }) => (
+                        <List
+                            className="transaction-log__history"
+                            itemCount={headersAndTransactions.length}
+                            onItemsRendered={onItemsRendered}
+                            ref={ref}
+                            width={width}
+                            height={height}
+                            onScroll={(e) => setScroll(e.scrollOffset)}
+                            itemSize={(i) => {
+                                if (i === 0) return TITLE_HEIGHT;
+                                return isHeader(headersAndTransactions[i])
+                                    ? LIST_HEADER_HEIGHT
+                                    : TRANSACTION_ELEMENT_HEIGHT;
+                            }}
+                            itemKey={(i) => (i === 0 ? 'title' : getKey(headersAndTransactions[i]))}
+                        >
+                            {({ index, style }) => {
+                                if (!isItemLoaded(index)) {
+                                    return <div style={style}>...</div>;
+                                }
+
+                                const item = headersAndTransactions[index];
+                                if (index === 0 && isHeader(item)) {
+                                    return <Text.Heading style={style}>{item}</Text.Heading>;
+                                }
+                                if (isHeader(item)) {
+                                    return (
+                                        <Text.CaptureAdditional className="transaction-log__date" style={style}>
+                                            {item}
+                                        </Text.CaptureAdditional>
+                                    );
+                                }
+                                return (
+                                    <TransactionElement
+                                        accountAddress={accountAddress}
+                                        style={style}
+                                        key={item.transactionHash ?? item.id}
+                                        transaction={item}
+                                        onClick={() => onTransactionClick(item)}
+                                    />
+                                );
+                            }}
+                        </List>
+                    )}
+                </InfiniteLoader>
+            )}
+        </AutoSizer>
+    );
 }
 
 /**
  * Update an existing list of descending transactions with a new list of ascending transactions,
  * ensuring that any overlaps are updated with the values from the new list of transactions.
- * If newTransactions is empty, reference to the existingTransactions is returned directly.
- * The items in newTransactions are moved to the new array without copying.
  */
-function replaceTransactionsWithNewTransactions(
+function updateTransactionsWithNewTransactions(
     existingTransactions: BrowserWalletTransaction[],
     newTransactions: BrowserWalletTransaction[]
 ) {
-    const firstNew = newTransactions.at(0);
-    if (firstNew === undefined) {
-        // No new transactions.
-        return existingTransactions;
-    }
-    const newTransactionsDescending = [...newTransactions].reverse();
-    if (existingTransactions.length === 0) {
-        // No existing transactions.
-        return newTransactionsDescending;
-    }
-    // Scan for point of overlap
-    const updateFromIndex = existingTransactions.findIndex((existing) => existing.id < firstNew.id);
-    if (updateFromIndex === -1) {
-        // Every existing transaction needs to be updated.
-        return newTransactionsDescending;
-    }
-    // Move over the existing transactions that are not overlapping.
-    for (const existing of existingTransactions.slice(updateFromIndex)) {
-        newTransactionsDescending.push(existing);
-    }
-    return newTransactionsDescending;
+    const existingHashes = existingTransactions
+        .filter((trx) => trx.transactionHash !== undefined)
+        .map((trs) => trs.transactionHash);
+    const transactionUpdates: Record<string, BrowserWalletTransaction> = {} as Record<string, BrowserWalletTransaction>;
+
+    const [existing, allNew] = partition(newTransactions, (transaction) =>
+        existingHashes.includes(transaction.transactionHash)
+    );
+    existing.forEach((element) => {
+        transactionUpdates[element.transactionHash] = element;
+    });
+
+    // Update the existing transactions and save in a new array.
+    const updatedExistingTransactions = [...existingTransactions].map((existingTransaction) => {
+        if (transactionUpdates[existingTransaction.transactionHash]) {
+            return transactionUpdates[existingTransaction.transactionHash];
+        }
+        return existingTransaction;
+    });
+
+    return [...allNew.reverse(), ...updatedExistingTransactions];
 }
 
-/** Hook fetching the transaction list for an account. */
-function useAccountTransactionList(accountAddress: string) {
-    const [transactions, setTransactions] = useState<BrowserWalletTransaction[]>([]);
-    const addToast = useSetAtom(addToastAtom);
-    const { t } = useTranslation('transactionLog');
-    useEffect(() => {
-        const abortController = new AbortController();
-        fetchLatestAccountTransactions(accountAddress, abortController.signal)
-            .then((newTransactions) => {
-                setTransactions((existingTransactions) =>
-                    replaceTransactionsWithNewTransactions(existingTransactions, newTransactions)
-                );
-            })
-            .catch(() => {
-                addToast(t('error'));
-            });
-        return () => {
-            abortController.abort();
-        };
-    }, [accountAddress]);
-    return transactions;
-}
-
-/** Convert Date object to local string only showing the current date. */
-const onlyDate = (date?: number | Date | undefined) =>
-    `${Intl.DateTimeFormat(undefined, {
-        day: '2-digit',
-    }).format(date)} ${Intl.DateTimeFormat(undefined, {
-        month: 'short',
-        year: 'numeric',
-    }).format(date)}`;
-/** Convert Date object to local string only showing the current time. */
-const onlyTime = Intl.DateTimeFormat(undefined, {
-    timeStyle: 'short',
-    hour12: false,
-}).format;
-
-/** Check if type is an account transaction which transfers some CCD. */
-function isTransferTransaction(
-    type: AccountTransactionType | RewardType | SpecialTransactionType
-): type is AccountTransactionType {
-    switch (type) {
-        case AccountTransactionType.Transfer:
-        case AccountTransactionType.TransferWithMemo:
-        case AccountTransactionType.TransferToEncrypted:
-        case AccountTransactionType.TransferToPublic:
-        case AccountTransactionType.TransferWithSchedule:
-        case AccountTransactionType.TransferWithScheduleAndMemo:
-        case AccountTransactionType.EncryptedAmountTransfer:
-        case AccountTransactionType.EncryptedAmountTransferWithMemo:
-            return true;
-        default:
-            return false;
-    }
-}
-
-/** Check if type is an account transaction which transfers some CCD or is a reward. */
-function hasAmount(type: AccountTransactionType | RewardType | SpecialTransactionType) {
-    return isTransferTransaction(type) || type in RewardType;
+export interface TransactionListProps {
+    account: WalletCredential;
+    onTransactionClick(transaction: BrowserWalletTransaction): void;
 }
 
 /**
- * Maps transaction type to a displayable text string.
+ * Displays a list of transactions from an account's transaction history.
  */
-function mapTypeToText(
-    type: AccountTransactionType | RewardType | SpecialTransactionType,
-    t: TFunction<'x', 'transactionLogX'>
-): string {
-    switch (type) {
-        case AccountTransactionType.DeployModule:
-            return t('deployModule');
-        case AccountTransactionType.InitContract:
-            return t('initContract');
-        case AccountTransactionType.Update:
-            return t('update');
-        case AccountTransactionType.Transfer:
-            return t('transfer');
-        case AccountTransactionType.AddBaker:
-            return t('addBaker');
-        case AccountTransactionType.RemoveBaker:
-            return t('removeBaker');
-        case AccountTransactionType.UpdateBakerStake:
-            return t('updateBakerStake');
-        case AccountTransactionType.UpdateBakerRestakeEarnings:
-            return t('updateBakerRestakeEarnings');
-        case AccountTransactionType.UpdateBakerKeys:
-            return t('updateBakerKeys');
-        case AccountTransactionType.UpdateCredentialKeys:
-            return t('updateCredentialKeys');
-        case RewardType.BakingReward:
-            return t('bakingReward');
-        case RewardType.BlockReward:
-            return t('blockReward');
-        case RewardType.FinalizationReward:
-            return t('finalizationReward');
-        case AccountTransactionType.EncryptedAmountTransfer:
-            return t('encryptedAmountTransfer');
-        case AccountTransactionType.TransferToEncrypted:
-            return t('transferToEncrypted');
-        case AccountTransactionType.TransferToPublic:
-            return t('transferToPublic');
-        case AccountTransactionType.TransferWithSchedule:
-            return t('transferWithSchedule');
-        case AccountTransactionType.UpdateCredentials:
-            return t('updateCredentials');
-        case AccountTransactionType.RegisterData:
-            return t('registerData');
-        case AccountTransactionType.TransferWithMemo:
-            return t('transferWithMemo');
-        case AccountTransactionType.EncryptedAmountTransferWithMemo:
-            return t('encryptedAmountTransferWithMemo');
-        case AccountTransactionType.TransferWithScheduleAndMemo:
-            return t('transferWithScheduleAndMemo');
-        case AccountTransactionType.ConfigureBaker:
-            return t('configureBaker');
-        case AccountTransactionType.ConfigureDelegation:
-            return t('configureDelegation');
-        case RewardType.StakingReward:
-            return t('stakingReward');
-        case SpecialTransactionType.Malformed:
-            return t('malformed');
-        default:
-            return t('unknown');
-    }
-}
+function TransactionList({ onTransactionClick, account }: TransactionListProps) {
+    const { t } = useTranslation('x', { keyPrefix: 'transactionLogX' });
+    const accountAddress = useMemo(() => account.address, [account]);
+    const pendingTransactions = useAtomValue(selectedPendingTransactionsAtom);
+    const addPendingTransaction = useUpdateAtom(addPendingTransactionAtom);
+    const [transactions, setTransactions] = useState<BrowserWalletTransaction[]>([]);
+    const allTransactions = useMemo(
+        () => [
+            ...pendingTransactions.filter(
+                (ta) => !transactions.some((tb) => ta.transactionHash === tb.transactionHash)
+            ),
+            ...transactions,
+        ],
+        [transactions, pendingTransactions]
+    );
+    const [isNextPageLoading, setIsNextPageLoading] = useState<boolean>(false);
+    const [hasNextPage, setHasNextPage] = useState<boolean>(true);
+    const addToast = useSetAtom(addToastAtom);
+    const [amount, setAmount] = useState<bigint>();
+    const network = useAtomValue(networkConfigurationAtom);
+    const [disableCcdDropButton, setDisableCcdDropButton] = useState<boolean>(false);
+    const accountChanged = useRef(true);
+    const accountInfo = useAccountInfo(account);
 
-/** Convert transactions fetched from the wallet proxy into data format expected by the view.
-Assumes 'transactions' are sorted by time in descending order.
- */
-function convertToLogEntry(
-    accountAddress: string,
-    transactions: BrowserWalletTransaction[],
-    t: TFunction<'x', 'transactionLogX'>
-): DayLogEntry[] {
-    const dayLogs = [];
-    let dayLog: DayLogEntry | undefined;
-    for (const tx of transactions) {
-        const dateTime = new Date(Number(tx.time * 1000n));
-        const date = onlyDate(dateTime);
-        const transactionLog: TransactionLogEntry = {
-            date,
-            hash: tx.transactionHash,
-            type: mapTypeToText(tx.type, t),
-            income: tx.fromAddress !== accountAddress,
-            amount: hasAmount(tx.type) ? displayAsCcd(tx.amount, false, true) : undefined,
-            time: onlyTime(dateTime),
-            info: (tx.cost !== undefined && t('withFee', { value: displayAsCcd(tx.cost, false, true) })) || '',
-            note: tx.memo,
-            block: tx.blockHash,
-            events: tx.events ?? [],
-            fromAddress: tx.fromAddress,
-            fromAddressShort: tx.fromAddress && t('from', { value: displaySplitAddressShort(tx.fromAddress) }),
-            toAddress: tx.toAddress,
-        };
-        if (dayLog === undefined || dayLog.date !== date) {
-            dayLog = {
-                date,
-                total: displayAsCcd(tx.amount),
-                transactions: [transactionLog],
-            };
-            dayLogs.push(dayLog);
-        } else {
-            dayLog.transactions.push(transactionLog);
+    async function getNewTransactions() {
+        if (accountAddress) {
+            let more = true;
+            let fromId = transactions.length > 0 ? transactions[0].id : undefined;
+            let newTransactions: BrowserWalletTransaction[] = [];
+            while (more) {
+                try {
+                    const result = await getTransactions(accountAddress, TRANSACTIONS_LIMIT, 'ascending', {
+                        from: fromId,
+                    });
+                    newTransactions = [...newTransactions, ...result.transactions];
+                    fromId = newTransactions.length > 0 ? newTransactions[newTransactions.length - 1].id : fromId;
+                    more = result.full;
+                } catch {
+                    addToast(t('list.error'));
+                    return;
+                }
+            }
+
+            const updatedTransactions = updateTransactionsWithNewTransactions(transactions, newTransactions);
+            setTransactions(updatedTransactions);
         }
     }
-    return dayLogs;
-}
 
-/** Transaction information. */
-export type TransactionLogEntry = {
-    /** Hash of the transaction. */
-    hash: string;
-    /** Hash of the block which included this transaction. */
-    block: string;
-    /** Localized date string. Date of the block including this transaction.  */
-    date: string;
-    /** Localized time string. Time of the block including this transaction. */
-    time: string; // '11:24',
-    /** Readable transaction type. */
-    type: string; // 'Unstaked amount',
-    /** Whether this transaction should be considered as income. */
-    income: boolean;
-    /** The amount of CCD/tokens being transferred/rewarded, includes the token symbol. Is undefined for transactions which are not relevant. */
-    amount?: string; // 10.02,
-    /** Fee information. */
-    info: string; // 'with fee 0.02 CCD',
-    /** Transaction memo. */
-    note?: string;
-    /** Summary of the events in the transaction. */
-    events: string[];
-    /** Account address which sent the transaction. */
-    fromAddress?: string;
-    /** Account address which sent the transaction short display. */
-    fromAddressShort?: string;
-    /** Account address which received funds. */
-    toAddress?: string;
-};
+    async function loadTransactionsDescending(address: string, appendTransactions: boolean, fromId?: number) {
+        setIsNextPageLoading(true);
+        return getTransactions(address, TRANSACTIONS_LIMIT, 'descending', { from: fromId })
+            .then((transactionResult) => {
+                setHasNextPage(transactionResult.full);
 
-/** Transactions group together for a given day. */
-type DayLogEntry = {
-    /** Localized date string. Date of the block.  */
-    date: string; // '21 May 2024',
-    /** Total income for transactions added this day. */
-    total: string; // '4029.87',
-    /** Transactions for this day. */
-    transactions: TransactionLogEntry[];
-};
+                const updatedTransactions = appendTransactions
+                    ? transactions.concat(transactionResult.transactions)
+                    : transactionResult.transactions;
 
-/** Parameters parsed from the path */
-type Params = {
-    /** Address of the account to display transactions for. */
-    account: string;
-};
+                setTransactions(updatedTransactions);
+                setIsNextPageLoading(false);
+            })
+            .catch(() => {
+                addToast(t('list.error'));
+                setIsNextPageLoading(false);
+            });
+    }
 
-type TransactionLogProps = { account: string };
+    const loadNextPage = async () => {
+        let fromId;
+        if (transactions.length) {
+            fromId = transactions[transactions.length - 1].id;
+        }
+        loadTransactionsDescending(accountAddress, true, fromId);
+    };
 
-function TransactionLog({ account }: TransactionLogProps) {
-    const nav = useNavigate();
-    const { t } = useTranslation('x', { keyPrefix: 'transactionLogX' });
+    useEffect(() => {
+        setTransactions([]);
+        setAmount(undefined);
+        setDisableCcdDropButton(false);
 
-    const navToTransactionDetails = (transaction: TransactionLogEntry) =>
-        nav(relativeRoutes.home.transactionLog.details.path, { state: { transaction } });
-    const transactionList = useAccountTransactionList(account);
-    const transactionLogs = useMemo(() => convertToLogEntry(account, transactionList, t), [transactionList]);
+        accountChanged.current = true;
+        loadTransactionsDescending(accountAddress, false).then(() => {
+            accountChanged.current = false;
+        });
+    }, [accountAddress]);
+
+    useEffect(() => {
+        if (
+            !accountChanged.current &&
+            amount !== undefined &&
+            accountInfo?.accountAmount !== undefined &&
+            accountInfo?.accountAmount.microCcdAmount !== amount
+        ) {
+            getNewTransactions();
+        }
+        setAmount(accountInfo?.accountAmount.microCcdAmount);
+    }, [accountInfo?.accountAmount]);
+
+    function ccdDrop(address: string) {
+        getCcdDrop(address).then(addPendingTransaction);
+    }
+
+    if (allTransactions.length === 0) {
+        if (isNextPageLoading || hasNextPage) {
+            return null;
+        }
+
+        // If a test network then display button.
+        return (
+            <Page>
+                <Page.Top heading={t('title')} />
+                <Page.Main>{t('list.noTransactions')}</Page.Main>
+                {!isMainnet(network) && (
+                    <Page.Footer>
+                        <Button.Main
+                            label={t('list.requestCcd')}
+                            disabled={disableCcdDropButton}
+                            onClick={() => {
+                                setDisableCcdDropButton(true);
+                                ccdDrop(accountAddress);
+                            }}
+                        />
+                    </Page.Footer>
+                )}
+            </Page>
+        );
+    }
+
+    const txKey = transactions[0]?.transactionHash || transactions[0]?.id || '';
+    const listKey = `${accountAddress}${txKey}`;
 
     return (
         <Page className="transaction-log">
-            <Page.Top heading="Transaction log" />
-            <Page.Main>
-                <div className="transaction-log__history">
-                    {transactionLogs.map((day) => (
-                        <div key={day.date} className="transaction-log__history_day">
-                            <div className="transaction-log__history_day-date">
-                                <Text.CaptureAdditional>{day.date}</Text.CaptureAdditional>
-                                {/* <Text.CaptureAdditional>${day.total}</Text.CaptureAdditional> */}
-                            </div>
-                            {day.transactions.map((transaction) => (
-                                // eslint-disable-next-line jsx-a11y/click-events-have-key-events, jsx-a11y/no-static-element-interactions
-                                <div
-                                    key={transaction.block}
-                                    className="transaction-log__history_transaction"
-                                    onClick={() => navToTransactionDetails(transaction)}
-                                >
-                                    <div className="transaction value">
-                                        <Text.Label>{transaction.type}</Text.Label>
-                                        <Text.Label className={transaction.income ? 'income' : ''}>
-                                            {transaction.amount}
-                                        </Text.Label>
-                                    </div>
-                                    <div className="transaction info">
-                                        <Text.Capture>{transaction.time}</Text.Capture>
-                                        <Text.Capture>{transaction.info || transaction.fromAddressShort}</Text.Capture>
-                                    </div>
-                                    {transaction.note && (
-                                        <div className="transaction note">
-                                            <Note />
-                                            <Text.Capture>{transaction.note}</Text.Capture>
-                                        </div>
-                                    )}
-                                </div>
-                            ))}
-                        </div>
-                    ))}
-                </div>
+            <Page.Main className="flex-child-fill">
+                <InfiniteTransactionList
+                    key={listKey}
+                    accountAddress={accountAddress}
+                    transactions={allTransactions}
+                    loadNextPage={loadNextPage}
+                    hasNextPage={hasNextPage}
+                    isNextPageLoading={isNextPageLoading}
+                    onTransactionClick={onTransactionClick}
+                />
             </Page.Main>
         </Page>
     );
 }
 
 export default function Loader() {
-    const params = useParams<Params>();
-    if (params.account === undefined) {
+    const params = useParams<TransactionLogParams>();
+    const account = useCredential(params.account);
+    const nav = useNavigate();
+
+    if (account === undefined) {
         // No account address in the path.
         return <Navigate to="../" />;
     }
-    return <TransactionLog account={params.account} />;
+
+    const navToTransactionDetails = (transaction: BrowserWalletTransaction) => {
+        const state: TransactionDetailsLocationState = {
+            transaction,
+        };
+        nav(relativeRoutes.home.transactionLog.details.path, { state });
+    };
+
+    return <TransactionList account={account} onTransactionClick={navToTransactionDetails} />;
 }

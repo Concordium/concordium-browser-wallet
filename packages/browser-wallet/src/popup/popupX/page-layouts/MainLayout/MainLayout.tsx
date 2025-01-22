@@ -1,4 +1,4 @@
-import React, { useMemo } from 'react';
+import React, { createContext, useMemo } from 'react';
 import { Outlet, useLocation, useParams } from 'react-router-dom';
 import clsx from 'clsx';
 import Header from '@popup/popupX/page-layouts/MainLayout/Header';
@@ -6,6 +6,7 @@ import Toast from '@popup/popupX/shared/Toast';
 import { AccountButton, NavButton } from '@popup/popupX/page-layouts/MainLayout/Header/components';
 import { relativeRoutes, RouteConfig, routePrefix } from '@popup/popupX/constants/routes';
 import { withPasswordSession } from '@popup/popupX/shared/utils/hoc';
+import { noOp } from 'wallet-common-helpers';
 
 type RouteObj = {
     [index: string]: { [key: string]: object | string | undefined; config?: object; path: string };
@@ -38,6 +39,10 @@ const getPageConfig = () => {
     return getConfig(relativeRoutes, baseLocation);
 };
 
+type ScrollContext = { setScroll: (v: number) => void };
+
+export const mainLayoutScrollContext = createContext<ScrollContext>({ setScroll: noOp });
+
 function MainLayout() {
     const [scroll, setScroll] = React.useState(0);
     const isScrolling = useMemo(() => scroll > 0, [!!scroll]);
@@ -52,32 +57,35 @@ function MainLayout() {
         navBackSteps = 1,
     } = getPageConfig();
     return (
-        <div className="main-layout-x">
-            <Header
-                {...{ isScrolling, hideMenu, hideConnection, menuOpen, setMenuOpen, accountOpen, setAccountOpen }}
-            />
-            <main
-                className={clsx('main-layout-x__main')}
-                onScroll={(e) => {
-                    setScroll(e.currentTarget.scrollTop);
-                }}
-            >
-                <div className="float-section">
-                    <NavButton
-                        hideBackArrow={hideBackArrow || menuOpen}
-                        backTitle={backTitle}
-                        navBackSteps={navBackSteps}
-                    />
-                    <AccountButton
-                        hideAccountButton={!showAccountSelector || menuOpen}
-                        setAccountOpen={setAccountOpen}
-                        accountOpen={accountOpen}
-                    />
-                </div>
-                <Outlet />
-            </main>
-            <Toast />
-        </div>
+        // eslint-disable-next-line react/jsx-no-constructed-context-values
+        <mainLayoutScrollContext.Provider value={{ setScroll }}>
+            <div className="main-layout-x">
+                <Header
+                    {...{ isScrolling, hideMenu, hideConnection, menuOpen, setMenuOpen, accountOpen, setAccountOpen }}
+                />
+                <main
+                    className={clsx('main-layout-x__main')}
+                    onScroll={(e) => {
+                        setScroll(e.currentTarget.scrollTop);
+                    }}
+                >
+                    <div className="float-section">
+                        <NavButton
+                            hideBackArrow={hideBackArrow || menuOpen}
+                            backTitle={backTitle}
+                            navBackSteps={navBackSteps}
+                        />
+                        <AccountButton
+                            hideAccountButton={!showAccountSelector || menuOpen}
+                            setAccountOpen={setAccountOpen}
+                            accountOpen={accountOpen}
+                        />
+                    </div>
+                    <Outlet />
+                </main>
+                <Toast />
+            </div>
+        </mainLayoutScrollContext.Provider>
     );
 }
 

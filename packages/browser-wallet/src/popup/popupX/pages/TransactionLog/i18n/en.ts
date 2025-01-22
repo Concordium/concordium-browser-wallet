@@ -1,4 +1,5 @@
 const t = {
+    title: 'Activity',
     deployModule: 'Module deployment',
     initContract: 'Contract initialization',
     update: 'Contract update',
@@ -28,6 +29,21 @@ const t = {
     unknown: 'Unknown',
     withFee: 'with fee {{value}}',
     from: 'from {{value}}',
+    list: {
+        noTransactions: 'This account has no transactions yet.',
+        error: 'Unable to retrieve transaction history',
+        requestCcd: 'Request CCD',
+    },
+    details: {
+        backTitle: 'to Activity',
+        title: 'Transaction details',
+        tHash: ' Transaction hash',
+        bHash: 'Block hash',
+        from: 'From address',
+        to: 'To address',
+        events: 'Events',
+        rejectReason: 'Reject reason',
+    },
 };
 
 export default t;
