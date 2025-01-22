@@ -61,10 +61,10 @@ function InfiniteTransactionList({
 }: InfiniteTransactionListProps) {
     const { t } = useTranslation('x', { keyPrefix: 'transactionLogX' });
     const groups = useTransactionGroups(transactions);
-    const headersAndTransactions = groups.flat(2);
+    const headersAndTransactions = [t('title'), ...groups.flat(2)];
     const { setScroll } = useContext(mainLayoutScrollContext);
 
-    const itemCount = hasNextPage ? headersAndTransactions.length + 2 : headersAndTransactions.length + 1; // any index is offset by 1 to account for initial title element of list.
+    const itemCount = hasNextPage ? headersAndTransactions.length + 1 : headersAndTransactions.length;
     const loadMoreItems = isNextPageLoading ? noOp : loadNextPage;
     const isItemLoaded = (index: number) => !hasNextPage || index < headersAndTransactions.length;
 
@@ -89,21 +89,20 @@ function InfiniteTransactionList({
                             onScroll={(e) => setScroll(e.scrollOffset)}
                             itemSize={(i) => {
                                 if (i === 0) return TITLE_HEIGHT;
-                                return isHeader(headersAndTransactions[i - 1])
+                                return isHeader(headersAndTransactions[i])
                                     ? LIST_HEADER_HEIGHT
                                     : TRANSACTION_ELEMENT_HEIGHT;
                             }}
-                            itemKey={(i) => (i === 0 ? 'title' : getKey(headersAndTransactions[i - 1]))}
+                            itemKey={(i) => (i === 0 ? 'title' : getKey(headersAndTransactions[i]))}
                         >
                             {({ index, style }) => {
-                                if (index === 0) {
-                                    return <Text.Heading style={style}>{t('title')}</Text.Heading>;
-                                }
-
-                                const item = headersAndTransactions[index - 1]; // as title is hardcoded at 0
-
                                 if (!isItemLoaded(index)) {
                                     return <div style={style}>...</div>;
+                                }
+
+                                const item = headersAndTransactions[index];
+                                if (index === 0 && isHeader(item)) {
+                                    return <Text.Heading style={style}>{item}</Text.Heading>;
                                 }
                                 if (isHeader(item)) {
                                     return (
@@ -271,36 +270,37 @@ function TransactionList({ onTransactionClick, account }: TransactionListProps) 
         getCcdDrop(address).then(addPendingTransaction);
     }
 
-    let content;
     if (allTransactions.length === 0) {
         if (isNextPageLoading || hasNextPage) {
-            content = null;
-        } else {
-            // If a test network then display button.
-            content = (
-                <>
-                    <Page.Top heading={t('title')} />
-                    <Page.Main>{t('list.noTransactions')}</Page.Main>
-                    {!isMainnet(network) && (
-                        <Page.Footer>
-                            <Button.Main
-                                label={t('list.requestCcd')}
-                                disabled={disableCcdDropButton}
-                                onClick={() => {
-                                    setDisableCcdDropButton(true);
-                                    ccdDrop(accountAddress);
-                                }}
-                            />
-                        </Page.Footer>
-                    )}
-                </>
-            );
+            return null;
         }
-    } else {
-        const txKey = transactions[0]?.transactionHash || transactions[0]?.id || '';
-        const listKey = `${accountAddress}${txKey}`;
 
-        content = (
+        // If a test network then display button.
+        return (
+            <Page>
+                <Page.Top heading={t('title')} />
+                <Page.Main>{t('list.noTransactions')}</Page.Main>
+                {!isMainnet(network) && (
+                    <Page.Footer>
+                        <Button.Main
+                            label={t('list.requestCcd')}
+                            disabled={disableCcdDropButton}
+                            onClick={() => {
+                                setDisableCcdDropButton(true);
+                                ccdDrop(accountAddress);
+                            }}
+                        />
+                    </Page.Footer>
+                )}
+            </Page>
+        );
+    }
+
+    const txKey = transactions[0]?.transactionHash || transactions[0]?.id || '';
+    const listKey = `${accountAddress}${txKey}`;
+
+    return (
+        <Page className="transaction-log">
             <Page.Main className="flex-child-fill">
                 <InfiniteTransactionList
                     key={listKey}
@@ -312,10 +312,8 @@ function TransactionList({ onTransactionClick, account }: TransactionListProps) 
                     onTransactionClick={onTransactionClick}
                 />
             </Page.Main>
-        );
-    }
-
-    return <Page className="transaction-log">{content}</Page>;
+        </Page>
+    );
 }
 
 export default function Loader() {
