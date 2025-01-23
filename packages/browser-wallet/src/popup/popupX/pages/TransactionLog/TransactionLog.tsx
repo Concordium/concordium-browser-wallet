@@ -330,7 +330,7 @@ export default function Loader() {
         const state: TransactionDetailsLocationState = {
             transaction,
         };
-        nav(relativeRoutes.home.transactionLog.details.path, { state });
+        nav(transaction.transactionHash, { state });
     };
 
     return <TransactionList account={account} onTransactionClick={navToTransactionDetails} />;
