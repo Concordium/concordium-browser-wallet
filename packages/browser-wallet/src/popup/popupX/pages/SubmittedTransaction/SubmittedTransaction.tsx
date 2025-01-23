@@ -16,17 +16,13 @@ import {
     TransactionSummaryType,
     isRejectTransaction,
     isSuccessTransaction,
-    TransactionKindString,
     FailedTransactionSummary,
     BaseAccountTransactionSummary,
-    TransactionEventTag,
-    DelegationStakeChangedEvent,
-    DelegatorEvent,
-    ConfigureDelegationSummary,
-    ConfigureBakerSummary,
-    BakerStakeChangedEvent,
-    BakerEvent,
-    TransferSummary,
+    AccountTransactionPayload,
+    AccountTransactionType,
+    SimpleTransferPayload,
+    ConfigureBakerPayload,
+    ConfigureDelegationPayload,
 } from '@concordium/web-sdk';
 import { useAtomValue } from 'jotai';
 import { grpcClientAtom } from '@popup/store/settings';
@@ -37,99 +33,148 @@ import Text from '@popup/popupX/shared/Text';
 
 const TX_TIMEOUT = 60 * 1000; // 1 minute
 
-type DelegationBodyProps = BaseAccountTransactionSummary & ConfigureDelegationSummary;
+export type SubmittedTransactionLocationState = {
+    transactionType: AccountTransactionType;
+    payload: AccountTransactionPayload;
+};
 
-function DelegationBody({ events }: DelegationBodyProps) {
-    const { t } = useTranslation('x', { keyPrefix: 'submittedTransaction.success.configureDelegation' });
-    const stakeChange = events.find((e) =>
-        [TransactionEventTag.DelegationStakeIncreased, TransactionEventTag.DelegationStakeDecreased].includes(e.tag)
-    ) as DelegationStakeChangedEvent | undefined;
+type DelegationBodyProps = {
+    success: boolean | undefined;
+    payload: ConfigureBakerPayload;
+};
 
-    if (stakeChange !== undefined) {
+function DelegationBody({ success, payload }: DelegationBodyProps) {
+    const { t } = useTranslation('x', { keyPrefix: 'submittedTransaction.configureDelegation' });
+
+    if (payload.stake?.microCcdAmount === 0n) {
+        return (
+            <Text.Capture>
+                {success === true && t('removed')}
+                {success === false && t('error')}
+            </Text.Capture>
+        );
+    }
+
+    if (payload.stake !== undefined) {
         return (
             <>
-                <Text.Capture>{t('changeStake')}</Text.Capture>
-                <Text.HeadingLarge>{formatCcdAmount(stakeChange.newStake)}</Text.HeadingLarge>
+                <Text.Capture>
+                    {success === true && t('changeStake')}
+                    {success === false && t('error')}
+                </Text.Capture>
+                <Text.HeadingLarge>{formatCcdAmount(payload.stake)}</Text.HeadingLarge>
                 <Text.Capture>CCD</Text.Capture>
             </>
         );
     }
 
-    const removal = events.find((e) => [TransactionEventTag.DelegationRemoved].includes(e.tag)) as
-        | DelegatorEvent
-        | undefined;
-
-    if (removal !== undefined) {
-        return <Text.Capture>{t('removed')}</Text.Capture>;
-    }
-
-    return <Text.Capture>{t('updated')}</Text.Capture>;
+    return (
+        <Text.Capture>
+            {success === true && t('updated')}
+            {success === false && t('error')}
+        </Text.Capture>
+    );
 }
 
-type ValidatorBodyProps = BaseAccountTransactionSummary & ConfigureBakerSummary;
+type ValidatorBodyProps = {
+    success: boolean | undefined;
+    payload: ConfigureDelegationPayload;
+};
 
-function ValidatorBody({ events }: ValidatorBodyProps) {
-    const { t } = useTranslation('x', { keyPrefix: 'submittedTransaction.success.configureValidator' });
+function ValidatorBody({ success, payload }: ValidatorBodyProps) {
+    const { t } = useTranslation('x', { keyPrefix: 'submittedTransaction.configureValidator' });
 
-    const stakeChange = events.find((e) =>
-        [TransactionEventTag.BakerStakeIncreased, TransactionEventTag.BakerStakeDecreased].includes(e.tag)
-    ) as BakerStakeChangedEvent | undefined;
-    if (stakeChange !== undefined) {
+    if (payload.stake?.microCcdAmount === 0n) {
+        return (
+            <Text.Capture>
+                {success === true && t('removed')}
+                {success === false && t('error')}
+            </Text.Capture>
+        );
+    }
+
+    if (payload.stake !== undefined) {
         return (
             <>
-                <Text.Capture>{t('changeStake')}</Text.Capture>
-                <Text.HeadingLarge>{formatCcdAmount(stakeChange.newStake)}</Text.HeadingLarge>
+                <Text.Capture>
+                    {success === true && t('changeStake')}
+                    {success === false && t('error')}
+                </Text.Capture>
+                <Text.HeadingLarge>{formatCcdAmount(payload.stake)}</Text.HeadingLarge>
                 <Text.Capture>CCD</Text.Capture>
             </>
         );
     }
 
-    const removal = events.find((e) => [TransactionEventTag.BakerRemoved].includes(e.tag)) as BakerEvent | undefined;
-    if (removal !== undefined) {
-        return <Text.Capture>{t('removed')}</Text.Capture>;
-    }
-
-    return <Text.Capture>{t('updated')}</Text.Capture>;
+    return (
+        <Text.Capture>
+            {success === true && t('updated')}
+            {success === false && t('error')}
+        </Text.Capture>
+    );
 }
 
-type TransferBodyProps = BaseAccountTransactionSummary & TransferSummary;
-function TransferBody({ transfer }: TransferBodyProps) {
-    const { t } = useTranslation('x', { keyPrefix: 'submittedTransaction.success.transfer' });
+type TransferBodyProps = {
+    success: boolean | undefined;
+    payload: SimpleTransferPayload;
+};
+
+function TransferBody({ payload, success }: TransferBodyProps) {
+    const { t } = useTranslation('x', { keyPrefix: 'submittedTransaction.transfer' });
     return (
         <>
-            <Text.Capture>{t('label')}</Text.Capture>
-            <Text.HeadingLarge>{formatCcdAmount(transfer.amount)}</Text.HeadingLarge>
+            <Text.Capture>
+                {success === true && t('success')}
+                {success === false && t('error')}
+            </Text.Capture>
+            <Text.HeadingLarge>{formatCcdAmount(payload.amount)}</Text.HeadingLarge>
             <Text.Capture>CCD</Text.Capture>
         </>
     );
 }
 
 export type CIS2TransferSubmittedLocationState = {
-    type: 'cis2.transfer';
+    transactionType: AccountTransactionType.Update;
+    updateType: 'cis2.transfer';
+    // To avoid getting token metadata again, we re-use the values from the previous view.
     /** formatted amount */
     amount: string;
     tokenName: string;
 };
 
 export type CIS4RevokeSubmittedLocationState = {
-    type: 'cis4.revoke';
+    transactionType: AccountTransactionType.Update;
+    updateType: 'cis4.revoke';
 };
 
 type UpdateContractSubmittedLocationState = CIS2TransferSubmittedLocationState | CIS4RevokeSubmittedLocationState;
-function UpdateContractBody() {
-    const { t } = useTranslation('x', { keyPrefix: 'submittedTransaction.success' });
+
+type UpdateContractBodyProps = {
+    success: boolean | undefined;
+};
+
+function UpdateContractBody({ success }: UpdateContractBodyProps) {
+    const { t } = useTranslation('x', { keyPrefix: 'submittedTransaction' });
     const { state } = useLocation() as Location & { state: UpdateContractSubmittedLocationState };
-    switch (state.type) {
+    switch (state.updateType) {
         case 'cis2.transfer':
             return (
                 <>
-                    <Text.Capture>{t('transfer.label')}</Text.Capture>
+                    <Text.Capture>
+                        {success === true && t('transfer.success')}
+                        {success === false && t('transfer.error')}
+                    </Text.Capture>
                     <Text.HeadingLarge>{state.amount}</Text.HeadingLarge>
                     <Text.Capture>{state.tokenName}</Text.Capture>
                 </>
             );
         case 'cis4.revoke':
-            return <Text.Capture>{t('web3Revoke')}</Text.Capture>;
+            return (
+                <Text.Capture>
+                    {success === true && t('web3Revoke.success')}
+                    {success === false && t('web3Revoke.error')}
+                </Text.Capture>
+            );
         default:
             throw new Error('Unsupported');
     }
@@ -138,26 +183,64 @@ function UpdateContractBody() {
 type SuccessSummary = Exclude<AccountTransactionSummary, FailedTransactionSummary>;
 type FailureSummary = BaseAccountTransactionSummary & FailedTransactionSummary;
 
-type Status =
-    | { type: 'success'; summary: SuccessSummary }
-    | { type: 'failure'; summary: FailureSummary }
-    | { type: 'error'; message: string };
-
-type SuccessProps = {
-    tx: SuccessSummary;
+type TransactionStatusProps = {
+    success?: boolean | undefined;
 };
 
-function Success({ tx }: SuccessProps) {
+function TransactionStatus({ success }: TransactionStatusProps) {
+    const { state } = useLocation() as Location & { state: SubmittedTransactionLocationState };
+    const { t } = useTranslation('x', { keyPrefix: 'submittedTransaction' });
+
+    let icon: JSX.Element;
+    switch (success) {
+        case undefined: {
+            icon = <LoaderInline />;
+            break;
+        }
+        case true: {
+            icon = <CheckCircle />;
+            break;
+        }
+        case false: {
+            icon = <Cross className="submitted-tx__failed-icon" />;
+            break;
+        }
+        default:
+            throw new Error('Unexpected status');
+    }
+
+    if (!state) {
+        // Fall back to show generic transaction status message
+        return (
+            <>
+                {icon}
+                {success === true && <Text.Capture>{t('success.label')}</Text.Capture>}
+                {success === false && <Text.Capture>{t('failure.label')}</Text.Capture>}
+                {success === undefined && <Text.Capture>{t('pending.label')}</Text.Capture>}
+            </>
+        );
+    }
+
     return (
         <>
-            <CheckCircle />
-            {tx.transactionType === TransactionKindString.Transfer && <TransferBody {...tx} />}
-            {tx.transactionType === TransactionKindString.ConfigureDelegation && <DelegationBody {...tx} />}
-            {tx.transactionType === TransactionKindString.ConfigureBaker && <ValidatorBody {...tx} />}
-            {tx.transactionType === TransactionKindString.Update && <UpdateContractBody />}
+            {icon}
+            {/* The same label is shown for all transactions while pending */}
+            {success === undefined && <Text.Capture>{t('pending.label')}</Text.Capture>}
+            {/* Each individual body handles success/failure */}
+            {state.transactionType === AccountTransactionType.Transfer && (
+                <TransferBody success={success} payload={state.payload as SimpleTransferPayload} />
+            )}
+            {state.transactionType === AccountTransactionType.ConfigureDelegation && (
+                <DelegationBody success={success} payload={state.payload as ConfigureDelegationPayload} />
+            )}
+            {state.transactionType === AccountTransactionType.ConfigureBaker && (
+                <ValidatorBody success={success} payload={state.payload as ConfigureBakerPayload} />
+            )}
+            {state.transactionType === AccountTransactionType.Update && <UpdateContractBody success={success} />}
         </>
     );
 }
+
 type FailureProps = {
     message: string;
 };
@@ -171,15 +254,10 @@ function Failure({ message }: FailureProps) {
     );
 }
 
-function Finalizing() {
-    const { t } = useTranslation('x', { keyPrefix: 'submittedTransaction' });
-    return (
-        <>
-            <LoaderInline />
-            <Text.Capture>{t('pending.label')}</Text.Capture>
-        </>
-    );
-}
+type Status =
+    | { type: 'success'; summary: SuccessSummary }
+    | { type: 'failure'; summary: FailureSummary }
+    | { type: 'error'; message: string };
 
 export type SubmittedTransactionParams = {
     /** The transaction to show the status for */
@@ -231,11 +309,9 @@ export default function SubmittedTransaction() {
     return (
         <Page className="submitted-tx">
             <Card type="transparent" className="submitted-tx__card">
-                {status === undefined && <Finalizing />}
-                {status?.type === 'success' && <Success tx={status.summary} />}
-                {status?.type === 'failure' && (
-                    <Failure message={t('failure.label', { reason: status.summary.rejectReason.tag })} />
-                )}
+                {status?.type === undefined && <TransactionStatus />}
+                {status?.type === 'success' && <TransactionStatus success />}
+                {status?.type === 'failure' && <TransactionStatus success={false} />}
                 {status?.type === 'error' && <Failure message={status.message} />}
             </Card>
             {status?.type !== undefined && status.type !== 'error' && (

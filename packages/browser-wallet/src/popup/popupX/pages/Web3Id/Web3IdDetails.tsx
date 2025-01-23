@@ -110,7 +110,10 @@ function ConfirmRevocation({ credential, entry, walletCred, ...props }: ConfirmR
         }
         try {
             const tx = await submitTransaction(payload, fee);
-            const submittedState: CIS4RevokeSubmittedLocationState = { type: 'cis4.revoke' };
+            const submittedState: CIS4RevokeSubmittedLocationState = {
+                updateType: 'cis4.revoke',
+                transactionType: AccountTransactionType.Update,
+            };
             nav(submittedTransactionRoute(TransactionHash.fromHexString(tx)), { state: submittedState });
         } catch (e) {
             if (e instanceof Error) {

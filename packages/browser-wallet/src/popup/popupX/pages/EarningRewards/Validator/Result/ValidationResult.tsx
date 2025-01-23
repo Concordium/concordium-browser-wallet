@@ -21,6 +21,7 @@ import { submittedTransactionRoute } from '@popup/popupX/constants/routes';
 import Text from '@popup/popupX/shared/Text';
 import { useSelectedAccountInfo } from '@popup/shared/AccountInfoListenerContext/AccountInfoListenerContext';
 import ErrorMessage from '@popup/popupX/shared/Form/ErrorMessage';
+import { SubmittedTransactionLocationState } from '@popup/popupX/pages/SubmittedTransaction/SubmittedTransaction';
 import {
     isRange,
     showCommissionRate,
@@ -91,7 +92,11 @@ export default function ValidationResult() {
         }
         try {
             const tx = await submitTransaction(state.payload, fee);
-            nav(submittedTransactionRoute(TransactionHash.fromHexString(tx)));
+            const navState: SubmittedTransactionLocationState = {
+                transactionType: AccountTransactionType.ConfigureBaker,
+                payload: state.payload,
+            };
+            nav(submittedTransactionRoute(TransactionHash.fromHexString(tx)), { state: navState });
         } catch (e) {
             if (e instanceof Error) {
                 setError(e);

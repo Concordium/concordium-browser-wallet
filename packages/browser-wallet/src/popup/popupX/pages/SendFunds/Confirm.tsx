@@ -34,7 +34,10 @@ import { logError } from '@shared/utils/log-helpers';
 import { submittedTransactionRoute } from '@popup/popupX/constants/routes';
 
 import { CIS2_TRANSFER_NRG_OFFSET, showToken, useTokenMetadata } from './util';
-import { CIS2TransferSubmittedLocationState } from '../SubmittedTransaction/SubmittedTransaction';
+import {
+    CIS2TransferSubmittedLocationState,
+    SubmittedTransactionLocationState,
+} from '../SubmittedTransaction/SubmittedTransaction';
 
 type Props = {
     sender: AccountAddress.Type;
@@ -108,7 +111,15 @@ export default function SendFundsConfirm({ values, fee, sender }: Props) {
         }
 
         const tx = await submitTransaction(payload, fee);
-        const state: CIS2TransferSubmittedLocationState = { type: 'cis2.transfer', amount: values.amount, tokenName };
+        const state: CIS2TransferSubmittedLocationState | SubmittedTransactionLocationState =
+            values.token.tokenType === 'ccd'
+                ? { transactionType: AccountTransactionType.Transfer, payload }
+                : {
+                      updateType: 'cis2.transfer',
+                      amount: values.amount,
+                      tokenName,
+                      transactionType: AccountTransactionType.Update,
+                  };
         nav(submittedTransactionRoute(TransactionHash.fromHexString(tx)), {
             state,
         });
