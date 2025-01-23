@@ -133,7 +133,8 @@
             .form-input__field {
                 width: auto;
 
-                // field-sizing: content;
+                // stylelint false negative rule
+                field-sizing: content;
                 background: transparent;
                 border: unset;
             }
