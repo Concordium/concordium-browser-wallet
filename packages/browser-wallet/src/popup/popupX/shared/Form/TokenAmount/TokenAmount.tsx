@@ -1,4 +1,4 @@
-import React from 'react';
+import React, { useRef } from 'react';
 import { atomFamily, selectAtom, useAtomValue } from 'jotai/utils';
 import { AccountAddress, AccountInfo, ContractAddress, CIS2 } from '@concordium/web-sdk';
 import { atom } from 'jotai';
@@ -18,7 +18,7 @@ const tokenAddressEq = (a: CIS2.TokenAddress | null, b: CIS2.TokenAddress | null
 type CcdBalanceType = 'total' | 'available';
 
 const balanceAtomFamily = atomFamily(
-    ([account, ccdBalance, tokenAddress]: [AccountInfo, CcdBalanceType, CIS2.TokenAddress | null]) => {
+    ([account, ccdBalance, tokenAddress]: [AccountInfo, CcdBalanceType, CIS2.TokenAddress | null, number]) => {
         if (tokenAddress === null) {
             return atom(
                 ccdBalance === 'available'
@@ -29,8 +29,9 @@ const balanceAtomFamily = atomFamily(
         const tokens = contractBalancesFamily(account.accountAddress.address, tokenAddress.contract.index.toString());
         return selectAtom(tokens, (ts) => ts[tokenAddress.id]);
     },
-    ([aa, ba, ta], [ab, bb, tb]) =>
-        AccountAddress.equals(aa.accountAddress, ab.accountAddress) && ba === bb && tokenAddressEq(ta, tb)
+    // We compare the timestamp passed to ensure token balance is refreshed.
+    ([aa, ba, ta, da], [ab, bb, tb, db]) =>
+        AccountAddress.equals(aa.accountAddress, ab.accountAddress) && ba === bb && tokenAddressEq(ta, tb) && da === db
 );
 
 type Props = Omit<TokenAmountViewProps, 'tokens' | 'balance' | 'onSelectToken' | 'ccdBalance'> & {
@@ -80,11 +81,12 @@ type Props = Omit<TokenAmountViewProps, 'tokens' | 'balance' | 'onSelectToken' |
  * />
  */
 export default function TokenAmount({ accountInfo, ccdBalance = 'available', ...props }: Props) {
+    const { current: timestamp } = useRef(Date.now());
     const { token } = props.form.watch();
     const tokenAddress = token?.tokenType === 'cis2' ? token.tokenAddress : null;
 
     const tokenInfo = useTokenInfo(accountInfo.accountAddress);
-    const tokenBalance = useAtomValue(balanceAtomFamily([accountInfo, ccdBalance, tokenAddress]));
+    const tokenBalance = useAtomValue(balanceAtomFamily([accountInfo, ccdBalance, tokenAddress, timestamp]));
 
     if (tokenInfo.loading) {
         return null;
