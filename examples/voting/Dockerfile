@@ -3,6 +3,7 @@ ARG base_image=node:18-slim
 FROM ${base_image} AS build
 
 WORKDIR /app
+RUN corepack enable && corepack prepare yarn@3.2.0 --activate
 COPY ./package.json ./package.json
 COPY ./tsconfig.json ./tsconfig.json
 COPY ./index.html ./
