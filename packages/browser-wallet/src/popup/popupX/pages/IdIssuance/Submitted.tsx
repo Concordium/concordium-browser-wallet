@@ -21,7 +21,7 @@ export default function IdIssuanceSubmitted() {
         if (isSpawnedWindow) {
             window.close();
         } else {
-            nav(absoluteRoutes.settings.identities.path, { replace: true });
+            nav(absoluteRoutes.home.path, { replace: true });
         }
     };
 

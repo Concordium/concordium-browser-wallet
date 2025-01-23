@@ -52,6 +52,8 @@ import web3Id from '@popup/popupX/pages/Web3Id/i18n/en';
 import earn from '@popup/popupX/pages/EarningRewards/i18n/en';
 import mangeTokens from '@popup/popupX/pages/ManageTokens/i18n/en';
 import connectionRequestX from '@popup/popupX/pages/prompts/ConnectionRequest/i18n/en';
+import connectAccount from '@popup/popupX/pages/prompts/ConnectAccount/i18n/en';
+import addTokensX from '@popup/popupX/pages/prompts/AddTokens/i18n/en';
 import signCis3 from '@popup/popupX/pages/prompts/SignCis3Message/i18n/en';
 import signMessageX from '@popup/popupX/pages/prompts/SignMessage/i18n/en';
 import sendTransactionX from '@popup/popupX/pages/prompts/SendTransaction/i18n/en';
@@ -118,6 +120,8 @@ const t = {
         mangeTokens,
         prompts: {
             connectionRequestX,
+            connectAccount,
+            addTokensX,
             signCis3,
             signMessageX,
             sendTransactionX,

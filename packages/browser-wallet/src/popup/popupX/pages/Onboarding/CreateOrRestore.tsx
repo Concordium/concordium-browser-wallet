@@ -12,9 +12,9 @@ export default function CreateOrRestore() {
     const { t } = useTranslation('x', { keyPrefix: 'onboarding.createOrRestore' });
     const [{ name }] = useAtom(networkConfigurationAtom);
     const nav = useNavigate();
-    const navToRestore = () => nav(absoluteRoutes.onboarding.restoreWallet.path);
-    const navToCreate = () => nav(absoluteRoutes.onboarding.idIntro.path);
-    const navToSelectNetwork = () => nav(absoluteRoutes.onboarding.selectNetwork.path);
+    const navToRestore = () => nav(absoluteRoutes.onboarding.setupPassword.createOrRestore.restoreWallet.path);
+    const navToCreate = () => nav(absoluteRoutes.onboarding.setupPassword.createOrRestore.generateSeedPhrase.path);
+    const navToSelectNetwork = () => nav(absoluteRoutes.onboarding.setupPassword.createOrRestore.selectNetwork.path);
 
     return (
         <Page className="create-or-restore">

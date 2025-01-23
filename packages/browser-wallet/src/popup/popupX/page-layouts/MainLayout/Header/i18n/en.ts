@@ -12,6 +12,9 @@ const t = {
         oldUI: 'Old UI',
         nft: 'NFT',
     },
+    accountButton: {
+        noAccounts: 'No accounts',
+    },
     accountSelector: {
         sortAsc: 'Sort A-Z',
         sortDesc: 'Sort Z-A',

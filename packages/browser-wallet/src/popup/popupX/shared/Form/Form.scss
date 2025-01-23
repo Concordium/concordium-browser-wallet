@@ -90,6 +90,10 @@
                 &:checked::before {
                     transform: scale(1);
                 }
+
+                &:disabled {
+                    opacity: 0.5;
+                }
             }
         }
     }
@@ -100,6 +104,40 @@
         top: rem(8px);
         color: $color-mineral-3;
         opacity: 0.5;
+    }
+
+    &__seed-phrase-x {
+        margin-bottom: rem(16px);
+
+        .card-x.grey {
+            display: flex;
+            flex-flow: row wrap;
+            align-content: flex-start;
+            min-height: rem(215px);
+            margin-top: rem(24px);
+            border: rem(1px) solid $color-input-border;
+            cursor: text;
+
+            &:focus-within {
+                border-color: $color-mineral-2;
+            }
+
+            .label__regular {
+                height: rem(24px);
+                background-color: $color-main-bg;
+                margin: rem(4px);
+                padding: rem(3px) rem(4px) rem(5px) rem(4px);
+                border-radius: rem(4px);
+            }
+
+            .form-input__field {
+                width: auto;
+
+                // field-sizing: content;
+                background: transparent;
+                border: unset;
+            }
+        }
     }
 
     @include when-valid {

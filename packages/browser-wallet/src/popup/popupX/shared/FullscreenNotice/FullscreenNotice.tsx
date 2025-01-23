@@ -3,6 +3,7 @@ import clsx from 'clsx';
 import { Portal, noOp } from 'wallet-common-helpers';
 import Back from '@assets/svgX/arrow-left.svg';
 import { Connection, Fullscreen } from '@popup/popupX/page-layouts/MainLayout/Header/components';
+import { useLocation } from 'react-router-dom';
 import Button from '../Button';
 
 type HeaderProps = {
@@ -11,10 +12,13 @@ type HeaderProps = {
 };
 
 function Header({ isScrolling, onBack }: HeaderProps) {
+    const { pathname } = useLocation();
+    const isPrompt = pathname.includes('prompt');
+
     return (
         <div className={clsx('main-header', isScrolling && 'scroll-border')}>
             <div className="main-header__top">
-                <Fullscreen />
+                {!isPrompt && <Fullscreen />}
                 <Connection hideConnection={false} />
             </div>
             <div className="main-header__bottom">

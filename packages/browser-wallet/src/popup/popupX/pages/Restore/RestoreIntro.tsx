@@ -9,7 +9,7 @@ import { absoluteRoutes } from '@popup/popupX/constants/routes';
 export default function RestoreIntro() {
     const { t } = useTranslation('x', { keyPrefix: 'restore' });
     const nav = useNavigate();
-    const navToResult = () => nav(absoluteRoutes.settings.restore.result.path);
+    const navToMain = () => nav(absoluteRoutes.settings.restore.main.path);
 
     return (
         <Page className="restore-intro-x">
@@ -18,7 +18,7 @@ export default function RestoreIntro() {
                 <Text.Capture>{t('restoreInfo')}</Text.Capture>
             </Page.Main>
             <Page.Footer>
-                <Button.Main label={t('restore')} onClick={navToResult} />
+                <Button.Main label={t('restore')} onClick={navToMain} />
             </Page.Footer>
         </Page>
     );

@@ -35,6 +35,21 @@ const t = {
         restoreWallet: 'Restore via seed phrase',
         restoreInfo:
             'Please enter your 24-word seed phrase in the correct order and separated by spaces to restore your identities and accounts.',
+        required: 'Please specify a 24-word BIP 39 recovery phrase',
+        validate: 'Invalid secret recovery phrase',
+        continue: 'Continue',
+    },
+    generateSeedPhrase: {
+        yourRecoveryPhrase: 'Your recovery phrase',
+        writeDown: 'Write down your 24 word recovery phrase. Remember that the order is important.',
+        continue: 'Continue',
+    },
+    confirmSeedPhrase: {
+        yourRecoveryPhrase: 'Your recovery phrase',
+        enterSeed:
+            'Please enter your 24-word recovery phrase in the correct order, separated by spaces, to confirm your secret recovery phrase.',
+        required: 'Please specify a 24-word BIP 39 recovery phrase',
+        validate: 'Invalid secret recovery phrase',
         continue: 'Continue',
     },
     idCardsInfo: {

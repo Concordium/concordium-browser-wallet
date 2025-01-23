@@ -58,6 +58,10 @@
 
                     .text__main_medium {
                         color: $color-white;
+
+                        &.red {
+                            color: $color-red-attention;
+                        }
                     }
                 }
             }

@@ -24,6 +24,7 @@ import Gear from '@assets/svgX/gear.svg';
 import Dot from '@assets/svgX/dot.svg';
 import Info from '@assets/svgX/info.svg';
 import Tooltip from '@popup/popupX/shared/Tooltip';
+import { credentialsAtom } from '@popup/store/account';
 
 /** Hook loading every fungible token added to the account. */
 function useAccountFungibleTokens(account: WalletCredential) {
@@ -232,6 +233,39 @@ function MainPagePendingAccount() {
     );
 }
 
+function MainPageNoAccounts() {
+    const { t } = useTranslation('x', { keyPrefix: 'mainPage' });
+    const nav = useNavigate();
+
+    return (
+        <Page className="main-page-x create-account">
+            <Page.Top heading={t('createAccount')} />
+            <Page.Main>
+                <Text.Capture>{t('noAccounts')}</Text.Capture>
+            </Page.Main>
+            <Page.Footer>
+                <Button.Main
+                    label={t('createAccount')}
+                    onClick={() => nav(absoluteRoutes.settings.createAccount.path)}
+                />
+            </Page.Footer>
+        </Page>
+    );
+}
+
+function MainPageRejectedAccount() {
+    const { t } = useTranslation('x', { keyPrefix: 'mainPage' });
+
+    return (
+        <Page className="main-page-x rejected-account">
+            <Page.Top heading={t('error')} />
+            <Page.Main>
+                <Text.Capture>{t('accountCreationRejected')}</Text.Capture>
+            </Page.Main>
+        </Page>
+    );
+}
+
 type MainPageProps = { credential: WalletCredential };
 
 function MainPage({ credential }: MainPageProps) {
@@ -241,10 +275,22 @@ function MainPage({ credential }: MainPageProps) {
         case CreationStatus.Pending:
             return <MainPagePendingAccount />;
         case CreationStatus.Rejected:
-            return <>Account Creation was rejected</>;
+            return <MainPageRejectedAccount />;
         default:
             throw new Error(`Unexpected status for credential`);
     }
 }
 
-export default withSelectedCredential(MainPage);
+function MainPageCredentials() {
+    const credentials = useAtomValue(credentialsAtom);
+
+    if (credentials.length === 0) {
+        return <MainPageNoAccounts />;
+    }
+
+    const PageWithCredential = withSelectedCredential(MainPage);
+
+    return <PageWithCredential />;
+}
+
+export default MainPageCredentials;
