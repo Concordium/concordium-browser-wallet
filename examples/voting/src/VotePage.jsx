@@ -7,6 +7,7 @@ import { Button, Col, Container, Form, Row } from 'react-bootstrap';
 import Wallet, { castVote, init, getView } from './Wallet';
 import { decodeView } from './buffer';
 import Footer from './Footer';
+import './styles/VotePage.css';
 
 function VotePage() {
     const params = useParams();
@@ -38,7 +39,7 @@ function VotePage() {
     }, [view]);
 
     return (
-        <Container>
+        <Container className="vote-container">
             <Row>
                 <Col>
                     <Wallet
