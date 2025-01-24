@@ -2,7 +2,9 @@ import React, { useCallback } from 'react';
 import { useTranslation } from 'react-i18next';
 import { Navigate, useLocation, useParams } from 'react-router-dom';
 import clsx from 'clsx';
-import { TimeStampUnit, dateFromTimestamp, displayAsCcd } from 'wallet-common-helpers';
+import { TimeStampUnit, dateFromTimestamp, displayAsCcd, noOp, useAsyncMemo } from 'wallet-common-helpers';
+import { useAtomValue } from 'jotai';
+import { TransactionHash, TransactionStatusEnum } from '@concordium/web-sdk';
 
 import Copy from '@assets/svgX/copy.svg';
 import ArrowSquareOut from '@assets/svgX/arrow-square-out.svg';
@@ -12,9 +14,13 @@ import Page from '@popup/popupX/shared/Page';
 import Button from '@popup/popupX/shared/Button';
 import * as CcdScan from '@popup/shared/utils/ccdscan';
 import { useCopyToClipboard } from '@popup/popupX/shared/utils/hooks';
-import { BrowserWalletTransaction, TransactionStatus } from '@popup/shared/utils/transaction-history-types';
-import { useCredential } from '@popup/shared/utils/account-helpers';
-import { WalletCredential } from '@shared/storage/types';
+import {
+    BrowserWalletTransaction,
+    TransactionStatus,
+    toBrowserWalletTransaction,
+} from '@popup/shared/utils/transaction-history-types';
+import { grpcClientAtom } from '@popup/store/settings';
+
 import { onlyTime, onlyDate, TransactionLogParams, mapTypeToText, hasAmount } from '../util';
 
 /** State passed as part of the navigation */
@@ -25,20 +31,30 @@ export type TransactionDetailsLocationState = {
 
 type TransactionDetailsProps = {
     transaction: BrowserWalletTransaction;
-    account: WalletCredential;
+    account: string;
+};
+
+type Params = TransactionLogParams & {
+    transactionHash: string;
 };
 
 function TransactionDetails({ transaction, account }: TransactionDetailsProps) {
     const { t } = useTranslation('x', { keyPrefix: 'transactionLogX' });
     const copy = useCopyToClipboard();
-    const copyTransactionHash = useCallback(() => copy(transaction.transactionHash), []);
+    const copyTransactionHash = useCallback(() => {
+        if (transaction.transactionHash !== undefined) {
+            copy(transaction.transactionHash);
+        }
+    }, [transaction.transactionHash]);
     const seeOnCcdScan = useCallback(() => {
-        CcdScan.openTransaction(transaction.transactionHash);
-    }, []);
+        if (transaction.transactionHash !== undefined) {
+            CcdScan.openTransaction(transaction.transactionHash);
+        }
+    }, [transaction.transactionHash]);
 
+    const isSender = account === transaction.fromAddress;
     // Flip the amount if selected account is sender, and amount is positive. We expect the transaction list endpoint to sign the amount based on this,
     // but this is not the case for pending transactions. This seeks to emulate the behaviour of the transaction list endpoint.
-    const isSender = account.address === transaction.fromAddress;
     const amount =
         isSender && transaction.status === TransactionStatus.Pending && transaction.amount > 0n
             ? -transaction.amount
@@ -92,7 +108,7 @@ function TransactionDetails({ transaction, account }: TransactionDetailsProps) {
                         <Card.RowDetails title={t('details.tHash')} value={transaction.transactionHash} />
                     )}
                     <Card.RowDetails title={t('details.bHash')} value={transaction.blockHash} />
-                    {transaction.events !== undefined && (
+                    {transaction.events !== undefined && transaction.events.length !== 0 && (
                         <Card.Row>
                             <div className="transaction-details__card_row">
                                 <Text.Capture>{t('details.events')}</Text.Capture>
@@ -110,19 +126,40 @@ function TransactionDetails({ transaction, account }: TransactionDetailsProps) {
     );
 }
 
-export default function Loader() {
-    const params = useParams<TransactionLogParams>();
-    const account = useCredential(params.account);
+export default function Container() {
+    const { account, transactionHash } = useParams<Params>();
     const location = useLocation();
-    if (
-        typeof location.state !== 'object' ||
-        location.state === null ||
-        !('transaction' in location.state) ||
-        account === undefined
-    ) {
+    const grpc = useAtomValue(grpcClientAtom);
+
+    const transaction = useAsyncMemo(
+        async () => {
+            if (typeof location.state === 'object' && location.state !== null && 'transaction' in location.state) {
+                return (location.state as TransactionDetailsLocationState).transaction;
+            }
+
+            if (transactionHash === undefined || account === undefined) {
+                return null;
+            }
+
+            const blockItem = await grpc.getBlockItemStatus(TransactionHash.fromHexString(transactionHash));
+            if (blockItem.status !== TransactionStatusEnum.Finalized) {
+                return null;
+            }
+            return toBrowserWalletTransaction(blockItem, account, grpc);
+        },
+        noOp,
+        [grpc, transactionHash]
+    );
+
+    if (transaction === null || !account) {
         // Necessary state not available
         return <Navigate to="../" />;
     }
-    const state = location.state as TransactionDetailsLocationState;
-    return <TransactionDetails account={account} transaction={state.transaction} />;
+
+    if (transaction === undefined) {
+        // We're still waiting for response
+        return null;
+    }
+
+    return <TransactionDetails account={account} transaction={transaction} />;
 }

@@ -20,7 +20,6 @@ import { WalletCredential } from '@shared/storage/types';
 import Text from '@popup/popupX/shared/Text';
 import Page from '@popup/popupX/shared/Page';
 import { useCredential } from '@popup/shared/utils/account-helpers';
-import { relativeRoutes } from '@popup/popupX/constants/routes';
 import { mainLayoutScrollContext } from '@popup/popupX/page-layouts/MainLayout/MainLayout';
 
 import useTransactionGroups, { TransactionLogParams } from './util';
@@ -330,7 +329,7 @@ export default function Loader() {
         const state: TransactionDetailsLocationState = {
             transaction,
         };
-        nav(relativeRoutes.home.transactionLog.details.path, { state });
+        nav(transaction.transactionHash ?? '__special__', { state });
     };
 
     return <TransactionList account={account} onTransactionClick={navToTransactionDetails} />;
