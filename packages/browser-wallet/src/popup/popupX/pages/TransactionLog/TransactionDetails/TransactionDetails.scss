@@ -42,6 +42,8 @@
                 display: flex;
                 flex-direction: column;
                 word-break: break-word;
+                white-space: pre-line;
+                margin-bottom: rem(4px);
 
                 .capture__main_small {
                     color: $color-mineral-3;

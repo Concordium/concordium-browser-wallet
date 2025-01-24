@@ -14,9 +14,11 @@ import Page from '@popup/popupX/shared/Page';
 import Button from '@popup/popupX/shared/Button';
 import * as CcdScan from '@popup/shared/utils/ccdscan';
 import { useCopyToClipboard } from '@popup/popupX/shared/utils/hooks';
-import { BrowserWalletTransaction, TransactionStatus } from '@popup/shared/utils/transaction-history-types';
-import { useCredential } from '@popup/shared/utils/account-helpers';
-import { WalletCredential } from '@shared/storage/types';
+import {
+    BrowserWalletTransaction,
+    TransactionStatus,
+    toBrowserWalletTransaction,
+} from '@popup/shared/utils/transaction-history-types';
 import { grpcClientAtom } from '@popup/store/settings';
 
 import { onlyTime, onlyDate, TransactionLogParams, mapTypeToText, hasAmount } from '../util';
@@ -29,7 +31,7 @@ export type TransactionDetailsLocationState = {
 
 type TransactionDetailsProps = {
     transaction: BrowserWalletTransaction;
-    account: WalletCredential;
+    account: string;
 };
 
 type Params = TransactionLogParams & {
@@ -38,20 +40,19 @@ type Params = TransactionLogParams & {
 
 function TransactionDetails({ transaction, account }: TransactionDetailsProps) {
     const { t } = useTranslation('x', { keyPrefix: 'transactionLogX' });
-    const { transactionHash: txHash } = useParams<Params>();
     const copy = useCopyToClipboard();
     const copyTransactionHash = useCallback(() => {
-        if (txHash !== undefined) {
-            copy(txHash);
+        if (transaction.transactionHash !== undefined) {
+            copy(transaction.transactionHash);
         }
-    }, [txHash]);
+    }, [transaction.transactionHash]);
     const seeOnCcdScan = useCallback(() => {
-        if (txHash !== undefined) {
-            CcdScan.openTransaction(txHash);
+        if (transaction.transactionHash !== undefined) {
+            CcdScan.openTransaction(transaction.transactionHash);
         }
-    }, []);
+    }, [transaction.transactionHash]);
 
-    const isSender = account.address === transaction.fromAddress;
+    const isSender = account === transaction.fromAddress;
     // Flip the amount if selected account is sender, and amount is positive. We expect the transaction list endpoint to sign the amount based on this,
     // but this is not the case for pending transactions. This seeks to emulate the behaviour of the transaction list endpoint.
     const amount =
@@ -107,7 +108,7 @@ function TransactionDetails({ transaction, account }: TransactionDetailsProps) {
                         <Card.RowDetails title={t('details.tHash')} value={transaction.transactionHash} />
                     )}
                     <Card.RowDetails title={t('details.bHash')} value={transaction.blockHash} />
-                    {transaction.events !== undefined && (
+                    {transaction.events !== undefined && transaction.events.length !== 0 && (
                         <Card.Row>
                             <div className="transaction-details__card_row">
                                 <Text.Capture>{t('details.events')}</Text.Capture>
@@ -127,36 +128,38 @@ function TransactionDetails({ transaction, account }: TransactionDetailsProps) {
 
 export default function Container() {
     const { account, transactionHash } = useParams<Params>();
-    const cred = useCredential(account);
     const location = useLocation();
     const grpc = useAtomValue(grpcClientAtom);
+
     const transaction = useAsyncMemo(
         async () => {
-            if (transactionHash === undefined) {
-                return undefined;
+            if (typeof location.state === 'object' && location.state !== null && 'transaction' in location.state) {
+                return (location.state as TransactionDetailsLocationState).transaction;
             }
-            return grpc.getBlockItemStatus(TransactionHash.fromHexString(transactionHash));
+
+            if (transactionHash === undefined || account === undefined) {
+                return null;
+            }
+
+            const blockItem = await grpc.getBlockItemStatus(TransactionHash.fromHexString(transactionHash));
+            if (blockItem.status !== TransactionStatusEnum.Finalized) {
+                return null;
+            }
+            return toBrowserWalletTransaction(blockItem, account, grpc);
         },
         noOp,
         [grpc, transactionHash]
     );
 
-    if (
-        typeof location.state !== 'object' ||
-        location.state === null ||
-        !('transaction' in location.state) ||
-        cred === undefined ||
-        (transaction !== undefined && transaction.status !== TransactionStatusEnum.Finalized)
-    ) {
+    if (transaction === null || !account) {
         // Necessary state not available
         return <Navigate to="../" />;
     }
 
-    if (transaction !== undefined) {
-        // FIXME: return the component showing detais based on `transaction.outcome`
+    if (transaction === undefined) {
+        // We're still waiting for response
         return null;
     }
 
-    const state = location.state as TransactionDetailsLocationState;
-    return <TransactionDetails account={cred} transaction={state.transaction} />;
+    return <TransactionDetails account={account} transaction={transaction} />;
 }
