@@ -1,0 +1,113 @@
+.connect-account-x {
+    height: 100%;
+    min-height: rem(500px);
+
+    .page__main {
+        height: calc(100% - rem(140px));
+    }
+
+    .text__main {
+        color: $color-mineral-2;
+        margin-bottom: rem(24px);
+
+        .white {
+            color: $color-white;
+        }
+    }
+
+    .search-group {
+        display: flex;
+
+        .form-search {
+            width: 100%;
+            margin-bottom: rem(16px);
+
+            .form-input__field {
+                height: rem(32px);
+                padding: rem(10px) rem(10px) rem(10px) rem(32px);
+                border-radius: rem(12px);
+                border-color: $color-grey-3;
+                background-color: $color-grey-1;
+
+                &::placeholder {
+                    font-family: $t-font-family-satoshi;
+                    font-weight: $t-font-weight-medium;
+                    font-size: 12px;
+                    line-height: 16px;
+                    color: $color-grey-4;
+                }
+            }
+
+            svg {
+                position: absolute;
+                z-index: 1;
+                top: rem(8px);
+                left: rem(8px);
+
+                path {
+                    fill: $color-grey-4;
+                }
+            }
+        }
+
+        .button__base.button__icon.text {
+            height: rem(32px);
+            min-width: rem(90px);
+            padding: rem(8px) rem(12px);
+            margin-left: rem(8px);
+            border-radius: rem(12px);
+            text-wrap: nowrap;
+            background-color: $color-grey-2;
+
+            &:hover {
+                opacity: 1;
+                background-color: $color-main-bg-hover;
+            }
+
+            .label__main {
+                color: $color-white;
+                margin-left: auto;
+                font-size: 12px;
+                line-height: 16px;
+            }
+        }
+    }
+
+    .card-x {
+        margin-top: rem(16px);
+        max-height: calc(100% - rem(140px));
+
+        .scroll-section {
+            overflow: auto;
+
+            &::-webkit-scrollbar {
+                display: none;
+            }
+        }
+
+        .row {
+            align-items: center;
+
+            .form-input__checkbox {
+                margin: rem(4px) rem(16px) rem(4px) 0;
+            }
+
+            .text__additional_small {
+                color: $color-white;
+
+                &:not(:empty) + .split {
+                    display: unset;
+                }
+
+                &.split {
+                    color: $color-mineral-0;
+                    display: none;
+                }
+
+                &:last-of-type {
+                    margin-left: auto;
+                }
+            }
+        }
+    }
+}

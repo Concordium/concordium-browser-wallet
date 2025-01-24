@@ -94,6 +94,7 @@ const t = {
     },
     tokenList: {
         hideToken: 'Hide token',
+        balance: 'Your balance: {{ amount }} {{ symbol }}',
     },
 };
 

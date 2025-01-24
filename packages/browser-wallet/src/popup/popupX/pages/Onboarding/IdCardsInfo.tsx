@@ -9,7 +9,11 @@ import Text from '@popup/popupX/shared/Text';
 export default function IdCardsInfo() {
     const { t } = useTranslation('x', { keyPrefix: 'onboarding.idCardsInfo' });
     const nav = useNavigate();
-    const navToNext = () => nav(absoluteRoutes.onboarding.requestIdentity.path);
+    const navToNext = () =>
+        nav(
+            absoluteRoutes.onboarding.setupPassword.createOrRestore.generateSeedPhrase.confirmSeedPhrase.idIntro
+                .requestIdentity.path
+        );
     return (
         <Page className="id-cards-info">
             <Page.Top heading={t('ids')} />

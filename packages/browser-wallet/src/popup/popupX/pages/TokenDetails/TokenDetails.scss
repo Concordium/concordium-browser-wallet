@@ -3,6 +3,10 @@
         font-family: $t-font-family-ibm;
     }
 
+    .token-balance__exchange-rate {
+        margin-top: rem(4px);
+    }
+
     &__stake {
         display: flex;
         flex-direction: column;

@@ -1,7 +1,7 @@
 import React from 'react';
 import { Route, Routes as ReactRoutes } from 'react-router-dom';
 import { relativeRoutes, routePrefix } from '@popup/popupX/constants/routes';
-import MainLayout from '@popup/popupX/page-layouts/MainLayout';
+import MainLayout, { OnboardingLayout } from '@popup/popupX/page-layouts/MainLayout';
 import MainPage from '@popup/popupX/pages/MainPage';
 import { SendFunds } from '@popup/popupX/pages/SendFunds';
 import ReceiveFunds from '@popup/popupX/pages/ReceiveFunds';
@@ -18,21 +18,24 @@ import NetworkSettings from '@popup/popupX/pages/NetworkSettings';
 import ConnectNetwork from '@popup/popupX/pages/ConnectNetwork';
 import About from '@popup/popupX/pages/About';
 import {
-    IdSubmitted,
     IdCardsInfo,
     SetupPassword,
     Welcome,
     CreateOrRestore,
     SelectNetwork,
     RestoreWallet,
+    GenerateSeedPhrase,
+    ConfirmSeedPhrase,
 } from '@popup/popupX/pages/Onboarding';
 import ConnectedSites from '@popup/popupX/pages/ConnectedSites';
 import EarningRewards from '@popup/popupX/pages/EarningRewards';
 import ValidatorIntro from '@popup/popupX/pages/EarningRewards/Validator/Intro';
 import PrivateKey from '@popup/popupX/pages/PrivateKey';
-import { RestoreIntro, RestoreResult } from '@popup/popupX/pages/Restore';
+import { RestoreIntro, RestoreMain, RestoreResult } from '@popup/popupX/pages/Restore';
 import { MessagePromptHandlersType } from '@popup/shared/utils/message-prompt-handlers';
 import ConnectionRequest from '@popup/popupX/pages/prompts/ConnectionRequest';
+import ConnectAccount from '@popup/popupX/pages/prompts/ConnectAccount';
+import AddTokens from '@popup/popupX/pages/prompts/AddTokens';
 import SignCis3Message from '@popup/popupX/pages/prompts/SignCis3Message';
 import SignMessage from '@popup/popupX/pages/prompts/SignMessage';
 import SendTransaction from '@popup/popupX/pages/prompts/SendTransaction';
@@ -69,6 +72,8 @@ import IdProofRequest from '../pages/prompts/IdProofRequest';
 export default function Routes({ messagePromptHandlers }: { messagePromptHandlers: MessagePromptHandlersType }) {
     const {
         handleConnectionResponse,
+        handleConnectAccountsResponse,
+        handleAddTokensResponse,
         handleSignCIS3MessageResponse,
         handleSignMessageResponse,
         handleSendTransactionResponse,
@@ -79,15 +84,51 @@ export default function Routes({ messagePromptHandlers }: { messagePromptHandler
     return (
         <ReactRoutes>
             <Route path={routePrefix}>
-                <Route element={<MainLayout />} path={relativeRoutes.onboarding.path}>
+                <Route element={<OnboardingLayout />} path={relativeRoutes.onboarding.path}>
                     <Route index element={<Welcome />} />
-                    <Route element={<SetupPassword />} path={relativeRoutes.onboarding.setupPassword.path} />
-                    <Route element={<CreateOrRestore />} path={relativeRoutes.onboarding.createOrRestore.path} />
-                    <Route element={<SelectNetwork />} path={relativeRoutes.onboarding.selectNetwork.path} />
-                    <Route element={<RestoreWallet />} path={relativeRoutes.onboarding.restoreWallet.path} />
-                    <Route element={<IdCardsInfo />} path={relativeRoutes.onboarding.idIntro.path} />
-                    <Route element={<IdIssuance />} path={relativeRoutes.onboarding.requestIdentity.path} />
-                    <Route element={<IdSubmitted />} path={relativeRoutes.onboarding.idSubmitted.path} />
+                    <Route path={relativeRoutes.onboarding.setupPassword.path}>
+                        <Route index element={<SetupPassword />} />
+                        <Route path={relativeRoutes.onboarding.setupPassword.createOrRestore.path}>
+                            <Route index element={<CreateOrRestore />} />
+                            <Route
+                                path={relativeRoutes.onboarding.setupPassword.createOrRestore.selectNetwork.path}
+                                element={<SelectNetwork />}
+                            />
+                            <Route
+                                path={relativeRoutes.onboarding.setupPassword.createOrRestore.restoreWallet.path}
+                                element={<RestoreWallet />}
+                            />
+                            <Route
+                                path={relativeRoutes.onboarding.setupPassword.createOrRestore.generateSeedPhrase.path}
+                            >
+                                <Route index element={<GenerateSeedPhrase />} />
+                                <Route
+                                    path={
+                                        relativeRoutes.onboarding.setupPassword.createOrRestore.generateSeedPhrase
+                                            .confirmSeedPhrase.path
+                                    }
+                                >
+                                    <Route index element={<ConfirmSeedPhrase />} />
+                                    <Route
+                                        path={
+                                            relativeRoutes.onboarding.setupPassword.createOrRestore.generateSeedPhrase
+                                                .confirmSeedPhrase.idIntro.path
+                                        }
+                                    >
+                                        <Route index element={<IdCardsInfo />} />
+                                        <Route
+                                            path={
+                                                relativeRoutes.onboarding.setupPassword.createOrRestore
+                                                    .generateSeedPhrase.confirmSeedPhrase.idIntro.requestIdentity.path
+                                            }
+                                        >
+                                            <Route index element={<IdIssuance />} />
+                                        </Route>
+                                    </Route>
+                                </Route>
+                            </Route>
+                        </Route>
+                    </Route>
                 </Route>
                 <Route element={<MainLayout />} path={relativeRoutes.home.path}>
                     <Route index element={<MainPage />} />
@@ -172,7 +213,7 @@ export default function Routes({ messagePromptHandlers }: { messagePromptHandler
                     </Route>
                     <Route path={relativeRoutes.settings.restore.path}>
                         <Route index element={<RestoreIntro />} />
-                        <Route element={<RestoreResult />} path={relativeRoutes.settings.restore.result.path} />
+                        <Route path={relativeRoutes.settings.restore.main.path} element={<RestoreMain />} />
                     </Route>
                     <Route element={<About />} path={relativeRoutes.settings.about.path} />
                     <Route path={relativeRoutes.settings.nft.path}>
@@ -244,6 +285,30 @@ export default function Routes({ messagePromptHandlers }: { messagePromptHandler
                         }
                     />
                     <Route
+                        path={relativeRoutes.prompt.connectAccountsRequest.path}
+                        element={
+                            <ConnectAccount
+                                onAllow={(accountAddresses: string[]) =>
+                                    handleConnectAccountsResponse({ success: true, result: accountAddresses })
+                                }
+                                onReject={() =>
+                                    handleConnectAccountsResponse({
+                                        success: false,
+                                        message: 'Request was rejected',
+                                    })
+                                }
+                            />
+                        }
+                    />
+                    <Route
+                        path={relativeRoutes.prompt.addTokens.path}
+                        element={
+                            <AddTokens
+                                respond={(response) => handleAddTokensResponse({ success: true, result: response })}
+                            />
+                        }
+                    />
+                    <Route
                         path={relativeRoutes.prompt.signMessage.path}
                         element={
                             <SignMessage
@@ -280,6 +345,7 @@ export default function Routes({ messagePromptHandlers }: { messagePromptHandler
                             />
                         }
                     />
+                    <Route path={relativeRoutes.prompt.recovery.path} element={<RestoreResult />} />
                     <Route path={relativeRoutes.prompt.endIdentityIssuance.path} element={<EndIdentityIssuance />} />
                     <Route
                         path={relativeRoutes.prompt.addWeb3IdCredential.path}

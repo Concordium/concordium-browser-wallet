@@ -13,15 +13,25 @@
 }
 
 .main-page-x {
+    &.rejected-account {
+        .heading_medium {
+            color: $color-red-attention;
+        }
+    }
+
     &.page-container {
         height: 100%;
-        padding-bottom: unset;
+
+        &:not(.create-account) {
+            padding-bottom: unset;
+        }
     }
 
     &__balance {
         display: flex;
         flex-direction: column;
         align-items: flex-start;
+        gap: rem(4px);
 
         &_info {
             display: flex;

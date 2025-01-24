@@ -32,8 +32,8 @@ function TextMainRegular({ children }: { children: ReactNode }) {
 function TextMainMedium({ children }: { children: ReactNode }) {
     return <span className="text__main_medium">{children}</span>;
 }
-function TextAdditionalSmall({ children }: { children: ReactNode }) {
-    return <span className="text__additional_small">{children}</span>;
+function TextAdditionalSmall({ className, children }: { className?: string; children: ReactNode }) {
+    return <span className={clsx('text__additional_small', className)}>{children}</span>;
 }
 
 function TextCaptureMainSmall({ className, children }: { className?: string; children: ReactNode }) {

@@ -1,5 +1,11 @@
 # Changelog
 
+## 1.7.2
+
+### Fixed
+
+-   Remove unused "downloads" permission from manifest.
+
 ## 1.7.1
 
 ### Changed

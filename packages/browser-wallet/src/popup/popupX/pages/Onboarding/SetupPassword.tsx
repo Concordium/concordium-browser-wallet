@@ -7,10 +7,11 @@ import { useTranslation } from 'react-i18next';
 import Button from '@popup/popupX/shared/Button';
 import Page from '@popup/popupX/shared/Page';
 import Text from '@popup/popupX/shared/Text';
-import { useSetAtom } from 'jotai';
+import { useAtom, useSetAtom } from 'jotai';
 import { passcodeAtom } from '@popup/state';
 import { useForm } from '@popup/shared/Form';
 import { SubmitHandler, Validate } from 'react-hook-form';
+import { encryptedSeedPhraseAtom, sessionPasscodeAtom } from '@popup/store/settings';
 
 type FormValues = {
     passcode: string;
@@ -20,13 +21,17 @@ type FormValues = {
 export default function SetupPassword() {
     const { t } = useTranslation('x', { keyPrefix: 'onboarding.setupPassword' });
     const nav = useNavigate();
-    const navToNext = () => nav(absoluteRoutes.onboarding.createOrRestore.path);
+    const navToNext = () => nav(absoluteRoutes.onboarding.setupPassword.createOrRestore.path);
     const setPasscode = useSetAtom(passcodeAtom);
+    const setPasscodeInSession = useSetAtom(sessionPasscodeAtom);
+    const [, setEncryptedSeedPhrase] = useAtom(encryptedSeedPhraseAtom);
     const form = useForm<FormValues>();
     const passcode = form.watch('passcode');
 
     const handleSubmit: SubmitHandler<FormValues> = (vs) => {
         setPasscode(vs.passcode);
+        setPasscodeInSession(vs.passcode);
+        setEncryptedSeedPhrase(undefined);
         navToNext();
     };
 

@@ -1,4 +1,4 @@
-import { CcdAmount } from '@concordium/web-sdk';
+import { CcdAmount, Ratio } from '@concordium/web-sdk';
 import { CCD_METADATA } from '@shared/constants/token-metadata';
 import { useLocation } from 'react-router-dom';
 import { displayUrl } from '@popup/shared/utils/string-helpers';
@@ -59,4 +59,19 @@ export function useUrlDisplay() {
         return ['', ''];
     }
     return [displayUrl(url), url];
+}
+
+/** Convert and display an amount of CCD to EUR using an exchange rate. */
+export function displayCcdAsEur(microCcdPerEur: Ratio, microCcd: bigint, decimals: number, eurPostfix?: boolean) {
+    const eur = Number(microCcdPerEur.denominator * microCcd) / Number(microCcdPerEur.numerator);
+    const eurFormatter = new Intl.NumberFormat(undefined, {
+        style: eurPostfix ? undefined : 'currency',
+        currency: 'EUR',
+        maximumFractionDigits: decimals,
+    });
+    if (eurPostfix) {
+        return `${eurFormatter.format(eur)} EUR`;
+    }
+
+    return eurFormatter.format(eur);
 }

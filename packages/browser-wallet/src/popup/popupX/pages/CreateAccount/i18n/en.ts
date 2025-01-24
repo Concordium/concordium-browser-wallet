@@ -6,6 +6,7 @@ const t = {
 
 Which identity do you want to use to create the account?`,
     confirmButton: 'Create account',
+    createIdentity: 'Create Identity',
 };
 
 export default t;

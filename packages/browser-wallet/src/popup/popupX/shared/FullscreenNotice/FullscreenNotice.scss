@@ -18,11 +18,17 @@
 
     &__content {
         padding: 0 rem(24px);
+        margin: auto;
         overflow: auto;
         height: calc(100% - 7.4rem);
+        max-width: rem(703px);
 
         &:first-child {
             height: 100%;
+        }
+
+        &::-webkit-scrollbar {
+            display: none;
         }
     }
 }

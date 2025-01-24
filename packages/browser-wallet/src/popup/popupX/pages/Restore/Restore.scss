@@ -1,28 +1,43 @@
+.restore-main-x {
+    .loader-x-container {
+        padding-top: rem(96px);
+    }
+}
+
 .restore-result-x {
-    .card-x.gradient {
-        margin-top: rem(16px);
+    &__results {
+        margin-bottom: rem(16px);
 
-        .card-x.grey {
-            .row {
-                justify-content: unset;
+        .card-x.gradient {
+            margin-top: rem(16px);
 
-                .text__main_medium {
-                    width: 100%;
+            .card-x.grey {
+                .row {
+                    justify-content: unset;
 
-                    .account-link {
+                    .text__main_medium {
                         width: 100%;
-                        display: flex;
 
-                        .capture__main_small {
-                            margin-left: unset;
-                            color: $color-white;
-                            margin-right: auto;
-                        }
+                        .account-link {
+                            width: 100%;
+                            display: flex;
 
-                        .button__icon {
-                            margin-left: rem(16px);
+                            .capture__main_small {
+                                margin-left: unset;
+                                color: $color-white;
+                                margin-right: auto;
+                            }
+
+                            .button__icon {
+                                margin-left: rem(16px);
+                            }
                         }
                     }
+                }
+
+                &:empty {
+                    margin-top: rem(8px);
+                    padding: 0;
                 }
             }
         }

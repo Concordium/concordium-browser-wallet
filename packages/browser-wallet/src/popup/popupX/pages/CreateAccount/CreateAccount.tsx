@@ -46,6 +46,7 @@ export default function CreateAccount() {
             })
         );
     const validIdentities = useValidIdentities();
+    const navToCreateIdentity = () => nav(absoluteRoutes.settings.identities.create.path);
 
     return (
         <Page className="create-account-x">
@@ -68,6 +69,11 @@ export default function CreateAccount() {
                     ))
                 )}
             </Page.Main>
+            <Page.Footer>
+                {validIdentities.length === 0 && (
+                    <Button.Main label={t('createIdentity')} onClick={navToCreateIdentity} />
+                )}
+            </Page.Footer>
         </Page>
     );
 }

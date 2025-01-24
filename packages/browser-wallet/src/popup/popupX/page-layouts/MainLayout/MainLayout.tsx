@@ -5,7 +5,7 @@ import Header from '@popup/popupX/page-layouts/MainLayout/Header';
 import Toast from '@popup/popupX/shared/Toast';
 import { AccountButton, NavButton } from '@popup/popupX/page-layouts/MainLayout/Header/components';
 import { relativeRoutes, RouteConfig, routePrefix } from '@popup/popupX/constants/routes';
-import { withPasswordSession } from '@popup/popupX/shared/utils/hoc';
+import { withPasswordSession, withRedirect } from '@popup/popupX/shared/utils/hoc';
 import { noOp } from 'wallet-common-helpers';
 
 type RouteObj = {
@@ -89,4 +89,6 @@ function MainLayout() {
     );
 }
 
-export default withPasswordSession(MainLayout);
+export const OnboardingLayout = MainLayout;
+
+export default withRedirect(withPasswordSession(MainLayout));

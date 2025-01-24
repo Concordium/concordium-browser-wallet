@@ -36,56 +36,66 @@ export const relativeRoutes = {
                 hideMenu: true,
                 hideConnection: true,
             },
-        },
-        createOrRestore: {
-            path: 'createOrRestore',
-            config: {
-                hideBackArrow: false,
-                backTitle: '',
-                hideMenu: true,
-                hideConnection: true,
-            },
-        },
-        selectNetwork: {
-            path: 'selectNetwork',
-            config: {
-                hideBackArrow: false,
-                backTitle: '',
-                hideMenu: true,
-                hideConnection: true,
-            },
-        },
-        restoreWallet: {
-            path: 'restoreWallet',
-            config: {
-                hideBackArrow: false,
-                backTitle: '',
-                hideMenu: true,
-                hideConnection: true,
-            },
-        },
-        idIntro: {
-            path: 'idIntro',
-            config: {
-                backTitle: '',
-                hideMenu: true,
-                hideConnection: true,
-            },
-        },
-        requestIdentity: {
-            path: 'requestIdentity',
-            config: {
-                backTitle: '',
-                hideMenu: true,
-                hideConnection: true,
-            },
-        },
-        idSubmitted: {
-            path: 'idSubmitted',
-            config: {
-                backTitle: '',
-                hideMenu: true,
-                hideConnection: true,
+            createOrRestore: {
+                path: 'createOrRestore',
+                config: {
+                    hideBackArrow: true,
+                    backTitle: '',
+                    hideMenu: true,
+                    hideConnection: true,
+                },
+                selectNetwork: {
+                    path: 'selectNetwork',
+                    config: {
+                        hideBackArrow: false,
+                        backTitle: '',
+                        hideMenu: true,
+                        hideConnection: true,
+                    },
+                },
+                restoreWallet: {
+                    path: 'restoreWallet',
+                    config: {
+                        hideBackArrow: false,
+                        backTitle: '',
+                        hideMenu: true,
+                        hideConnection: true,
+                    },
+                },
+                generateSeedPhrase: {
+                    path: 'generateSeedPhrase',
+                    config: {
+                        hideBackArrow: false,
+                        backTitle: '',
+                        hideMenu: true,
+                        hideConnection: true,
+                    },
+                    confirmSeedPhrase: {
+                        path: 'confirmSeedPhrase',
+                        config: {
+                            hideBackArrow: false,
+                            backTitle: '',
+                            hideMenu: true,
+                            hideConnection: true,
+                        },
+                        idIntro: {
+                            path: 'idIntro',
+                            config: {
+                                backTitle: '',
+                                hideMenu: true,
+                                hideConnection: true,
+                            },
+                            requestIdentity: {
+                                path: 'requestIdentity',
+                                config: {
+                                    backTitle: '',
+                                    hideMenu: true,
+                                    hideConnection: true,
+                                },
+                            },
+                        },
+                    },
+                },
             },
         },
     },
@@ -242,10 +252,11 @@ export const relativeRoutes = {
         },
         restore: {
             path: 'restore',
-            result: {
-                path: 'result',
+            main: {
+                path: 'main',
                 config: {
-                    backTitle: 'Restore wallet',
+                    hideMenu: true,
+                    hideBackArrow: true,
                 },
             },
         },
@@ -357,6 +368,15 @@ export const relativeRoutes = {
         path: 'prompt',
         connectionRequest: {
             path: 'connectionRequest',
+        },
+        connectAccountsRequest: {
+            path: 'connectAccountsRequest',
+        },
+        addTokens: {
+            path: 'addTokens',
+        },
+        recovery: {
+            path: 'recovery',
         },
         endIdentityIssuance: {
             path: 'end-identity-issuance',
