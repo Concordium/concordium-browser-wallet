@@ -68,10 +68,6 @@ export default function ConfirmSeedPhrase() {
                                 required: t('required'),
                                 validate: validateSeedPhrase(),
                             }}
-                            onPaste={(e) => {
-                                e.preventDefault();
-                                return false;
-                            }}
                         />
                     )}
                 </Form>
