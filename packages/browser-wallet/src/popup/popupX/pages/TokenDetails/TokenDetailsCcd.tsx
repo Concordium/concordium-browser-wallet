@@ -41,11 +41,10 @@ function useCcdInfo(credential: WalletCredential) {
     const tokenDetails = useMemo(() => {
         if (accountInfo) {
             return {
-                total: displayAsCcd(balances.total, false, true),
-                atDisposal: displayAsCcd(balances.atDisposal, false, true),
-                staked: displayAsCcd(balances.staked, false, true),
-                cooldown: displayAsCcd(balances.cooldown, false, true),
-                microCcdAmount: balances.total,
+                total: balances.total,
+                atDisposal: balances.atDisposal,
+                staked: balances.staked,
+                cooldown: balances.cooldown,
             };
         }
         return { total: null, atDisposal: null };
@@ -82,27 +81,45 @@ function TokenDetailsCcd({ credential }: { credential: WalletCredential }) {
         nav(absoluteRoutes.home.transactionLog.path.replace(':account', credential.address));
     const navToEarn = () => nav(absoluteRoutes.settings.earn.path);
 
+    const hasStake = tokenDetails.staked !== undefined && tokenDetails.staked > 0n;
+    const hasCooldown = tokenDetails.cooldown !== undefined && tokenDetails.cooldown > 0n;
+    const showAtDisposal = tokenDetails.atDisposal !== null && tokenDetails.atDisposal !== tokenDetails.total;
+
     return (
         <Page className="token-details-x">
             <Page.Main>
                 <Text.DynamicSize baseFontSize={32} baseTextLength={17} className="heading_big">
-                    {tokenDetails.total}
+                    {tokenDetails.total !== null && displayAsCcd(tokenDetails.total, false, true)}
                 </Text.DynamicSize>
-                <TokenExchange microCcdPerEur={microCcdPerEur} balanceBase={tokenDetails.microCcdAmount} />
-                <div className="token-details-x__stake">
-                    <div className="token-details-x__stake_group">
-                        <Text.Capture>{t('earning')}</Text.Capture>
-                        <Text.CaptureAdditional>{tokenDetails.staked}</Text.CaptureAdditional>
+                <TokenExchange microCcdPerEur={microCcdPerEur} balanceBase={tokenDetails.total ?? undefined} />
+                {(hasStake || hasCooldown || showAtDisposal) && (
+                    <div className="token-details-x__stake">
+                        {hasStake && (
+                            <div className="token-details-x__stake_group">
+                                <Text.Capture>{t('earning')}</Text.Capture>
+                                <Text.CaptureAdditional>
+                                    {displayAsCcd(tokenDetails.staked, false, true)}
+                                </Text.CaptureAdditional>
+                            </div>
+                        )}
+                        {hasCooldown && (
+                            <div className="token-details-x__stake_group">
+                                <Text.Capture>{t('cooldown')}</Text.Capture>
+                                <Text.CaptureAdditional>
+                                    {displayAsCcd(tokenDetails.cooldown, false, true)}
+                                </Text.CaptureAdditional>
+                            </div>
+                        )}
+                        {showAtDisposal && (
+                            <div className="token-details-x__stake_group">
+                                <Text.Capture>{t('atDisposal')}</Text.Capture>
+                                <Text.CaptureAdditional>
+                                    {displayAsCcd(tokenDetails.atDisposal, false, true)}
+                                </Text.CaptureAdditional>
+                            </div>
+                        )}
                     </div>
-                    <div className="token-details-x__stake_group">
-                        <Text.Capture>{t('cooldown')}</Text.Capture>
-                        <Text.CaptureAdditional>{tokenDetails.cooldown}</Text.CaptureAdditional>
-                    </div>
-                    <div className="token-details-x__stake_group">
-                        <Text.Capture>{t('atDisposal')}</Text.Capture>
-                        <Text.CaptureAdditional>{tokenDetails.atDisposal}</Text.CaptureAdditional>
-                    </div>
-                </div>
+                )}
                 <div className="token-details-x__action-buttons">
                     <Button.IconTile
                         icon={<Arrow />}

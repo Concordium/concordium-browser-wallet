@@ -436,6 +436,11 @@ const buildAbsoluteRoutes = <R extends RouteNode | RoutePath | RouteChildren>(
 
 export const absoluteRoutes = buildAbsoluteRoutes(relativeRoutes);
 
+export const transactionLogRoute = (account: AccountAddress.Type) =>
+    generatePath(absoluteRoutes.home.transactionLog.path, {
+        account: account.address,
+    });
+
 export const transactionDetailsRoute = (account: AccountAddress.Type, tx: TransactionHash.Type) =>
     generatePath(absoluteRoutes.home.transactionLog.details.path, {
         account: account.address,
