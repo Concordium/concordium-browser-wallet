@@ -11,7 +11,7 @@ import { useFlattenedAccountTokens } from '@popup/pages/Account/Tokens/utils';
 import { getMetadataUnique } from '@shared/utils/token-helpers';
 import { contractBalancesFamily } from '@popup/store/token';
 import { useBlockChainParameters } from '@popup/shared/BlockChainParametersProvider';
-import { formatTokenAmount } from '@popup/popupX/shared/utils/helpers';
+import { displayCcdAsEur, formatTokenAmount } from '@popup/popupX/shared/utils/helpers';
 import Page from '@popup/popupX/shared/Page';
 import Text from '@popup/popupX/shared/Text';
 import Button from '@popup/popupX/shared/Button';
@@ -44,21 +44,6 @@ function AccountTokenBalance({ decimals, tokenId, contractAddress, accountAddres
     const balanceRaw = useAccountTokenBalance(accountAddress, contractAddress, tokenId) ?? 0n;
     const balance = useMemo(() => formatTokenAmount(balanceRaw, decimals, 2, 2), [balanceRaw]);
     return <span>{balance}</span>;
-}
-
-/** Convert and display an amount of CCD to EUR using an exchange rate. */
-function displayCcdAsEur(microCcdPerEur: Ratio, microCcd: bigint, decimals: number, eurPostfix?: boolean) {
-    const eur = Number(microCcdPerEur.denominator * microCcd) / Number(microCcdPerEur.numerator);
-    const eurFormatter = new Intl.NumberFormat(undefined, {
-        style: eurPostfix ? undefined : 'currency',
-        currency: 'EUR',
-        maximumFractionDigits: decimals,
-    });
-    if (eurPostfix) {
-        return `${eurFormatter.format(eur)} EUR`;
-    }
-
-    return eurFormatter.format(eur);
 }
 
 function mainPageCcdDisplay(microCcdAmount: bigint) {

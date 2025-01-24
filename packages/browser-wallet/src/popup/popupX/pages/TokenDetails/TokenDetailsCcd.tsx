@@ -1,7 +1,7 @@
 import React, { useEffect, useMemo, useState } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { useTranslation } from 'react-i18next';
-import { AccountAddress } from '@concordium/web-sdk';
+import { AccountAddress, Ratio } from '@concordium/web-sdk';
 import { absoluteRoutes, sendFundsRoute } from '@popup/popupX/constants/routes';
 import Page from '@popup/popupX/shared/Page';
 import Text from '@popup/popupX/shared/Text';
@@ -16,6 +16,8 @@ import Clock from '@assets/svgX/clock.svg';
 import Percent from '@assets/svgX/percent.svg';
 import ConcordiumLogo from '@assets/svgX/concordium-logo.svg';
 import { TokenPickerVariant } from '@popup/popupX/shared/Form/TokenAmount/View';
+import { displayCcdAsEur } from '@popup/popupX/shared/utils/helpers';
+import { useBlockChainParameters } from '@popup/shared/BlockChainParametersProvider';
 
 const zeroBalance: Omit<PublicAccountAmounts, 'scheduled'> = {
     total: 0n,
@@ -43,6 +45,7 @@ function useCcdInfo(credential: WalletCredential) {
                 atDisposal: displayAsCcd(balances.atDisposal, false, true),
                 staked: displayAsCcd(balances.staked, false, true),
                 cooldown: displayAsCcd(balances.cooldown, false, true),
+                microCcdAmount: balances.total,
             };
         }
         return { total: null, atDisposal: null };
@@ -51,10 +54,23 @@ function useCcdInfo(credential: WalletCredential) {
     return tokenDetails;
 }
 
+function TokenExchange({ microCcdPerEur, balanceBase }: { microCcdPerEur?: Ratio; balanceBase?: bigint }) {
+    const isNoExchange = microCcdPerEur === undefined || balanceBase === undefined;
+
+    return isNoExchange ? null : (
+        <div className="token-balance__exchange-rate">
+            <Text.Capture>{displayCcdAsEur(microCcdPerEur, balanceBase, 2)}</Text.Capture>
+        </div>
+    );
+}
+
 function TokenDetailsCcd({ credential }: { credential: WalletCredential }) {
     const { t } = useTranslation('x', { keyPrefix: 'tokenDetails' });
 
     const tokenDetails = useCcdInfo(credential);
+
+    const chainParameters = useBlockChainParameters();
+    const microCcdPerEur = chainParameters?.microGTUPerEuro;
 
     const nav = useNavigate();
     const navToSend = () =>
@@ -72,6 +88,7 @@ function TokenDetailsCcd({ credential }: { credential: WalletCredential }) {
                 <Text.DynamicSize baseFontSize={32} baseTextLength={17} className="heading_big">
                     {tokenDetails.total}
                 </Text.DynamicSize>
+                <TokenExchange microCcdPerEur={microCcdPerEur} balanceBase={tokenDetails.microCcdAmount} />
                 <div className="token-details-x__stake">
                     <div className="token-details-x__stake_group">
                         <Text.Capture>{t('earning')}</Text.Capture>
