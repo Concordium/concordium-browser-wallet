@@ -31,3 +31,26 @@ export async function detectConcordiumProvider(timeout = 5000): Promise<WalletAp
         }
     });
 }
+
+function sendMsgToExtension(target: string, payload: object) {
+    const editorExtensionId = 'meacpflndgfiiioniiafpcnpehchnaab';
+    return new Promise((resolve) => {
+        chrome.runtime.sendMessage(editorExtensionId, { target, payload }, (response) => {
+            resolve(response);
+        });
+    });
+}
+
+// intercept all interactions with object
+// in this way we can remotely interact with class instance inside BrowserWallet
+// by forwarding 'property' name and payload
+const proxyHandler = {
+    get(target, prop) {
+        return function (...args) {
+            return sendMsgToExtension(prop, args);
+        };
+    },
+};
+
+// {} as WalletApi - also enables TS annotations
+export const concordiumWalletApiProxy = new Proxy({} as WalletApi, proxyHandler);
