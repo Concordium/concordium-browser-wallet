@@ -38,7 +38,7 @@ function SendFunds({ address }: SendFundsProps) {
     const credential = useCredential(address.address);
     const grpcClient = useAtomValue(grpcClientAtom);
     const form = useForm<AmountReceiveForm>({
-        mode: 'onTouched',
+        mode: 'all',
         defaultValues: {
             token: state ?? { tokenType: 'ccd' },
             amount: '0.00',
