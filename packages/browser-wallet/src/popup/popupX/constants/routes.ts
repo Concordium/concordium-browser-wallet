@@ -208,9 +208,12 @@ export const relativeRoutes = {
             path: 'create-account',
             confirm: {
                 path: 'confirm/:identityProviderIndex/:identityIndex',
+                config: {
+                    navBackSteps: 3,
+                },
             },
             config: {
-                backTitle: '',
+                backTitle: ' ',
             },
         },
         seedPhrase: {
