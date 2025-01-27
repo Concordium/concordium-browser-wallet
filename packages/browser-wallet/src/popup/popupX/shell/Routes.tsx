@@ -18,14 +18,14 @@ import NetworkSettings from '@popup/popupX/pages/NetworkSettings';
 import ConnectNetwork from '@popup/popupX/pages/ConnectNetwork';
 import About from '@popup/popupX/pages/About';
 import {
+    ConfirmSeedPhrase,
+    CreateOrRestore,
+    GenerateSeedPhrase,
     IdCardsInfo,
+    RestoreWallet,
+    SelectNetwork,
     SetupPassword,
     Welcome,
-    CreateOrRestore,
-    SelectNetwork,
-    RestoreWallet,
-    GenerateSeedPhrase,
-    ConfirmSeedPhrase,
 } from '@popup/popupX/pages/Onboarding';
 import ConnectedSites from '@popup/popupX/pages/ConnectedSites';
 import EarningRewards from '@popup/popupX/pages/EarningRewards';
@@ -40,7 +40,7 @@ import SignCis3Message from '@popup/popupX/pages/prompts/SignCis3Message';
 import SignMessage from '@popup/popupX/pages/prompts/SignMessage';
 import SendTransaction from '@popup/popupX/pages/prompts/SendTransaction';
 import ExternalRequestLayout from '@popup/popupX/page-layouts/ExternalRequestLayout';
-import { ManageTokenList, AddToken, SearchTokenDetails } from '@popup/popupX/pages/ManageTokens';
+import { AddToken, ManageTokenList } from '@popup/popupX/pages/ManageTokens';
 import { Nft, NftDetails, NftRaw } from 'src/popup/popupX/pages/Nft';
 import { DelegationResult } from '../pages/EarningRewards/Delegator/Result';
 import SubmittedTransaction from '../pages/SubmittedTransaction';
@@ -156,13 +156,6 @@ export default function Routes({ messagePromptHandlers }: { messagePromptHandler
                         <Route index element={<ManageTokenList />} />
                         <Route path={relativeRoutes.home.manageTokenList.addToken.path}>
                             <Route index element={<AddToken />} />
-                            <Route path={relativeRoutes.home.manageTokenList.addToken.contractIndex.path}>
-                                <Route index element={<AddToken />} />
-                                <Route
-                                    path={relativeRoutes.home.manageTokenList.addToken.contractIndex.details.path}
-                                    element={<SearchTokenDetails />}
-                                />
-                            </Route>
                         </Route>
                     </Route>
                 </Route>

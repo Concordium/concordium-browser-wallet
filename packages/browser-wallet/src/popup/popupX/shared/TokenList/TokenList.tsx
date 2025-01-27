@@ -1,4 +1,4 @@
-import React, { ReactNode } from 'react';
+import React, { ChangeEventHandler, ReactNode } from 'react';
 import clsx from 'clsx';
 import { useTranslation } from 'react-i18next';
 import Img from '@popup/shared/Img';
@@ -44,8 +44,10 @@ function TokenListItem({
     className,
     onClick,
     onSelect,
+    onChange,
 }: TokenListItemProps & {
-    onSelect: (checked: boolean) => void;
+    onSelect?: (checked: boolean) => void;
+    onChange?: ChangeEventHandler<HTMLInputElement>;
     disabled?: boolean;
     checked?: boolean;
     balance?: TokenBalance;
@@ -54,7 +56,9 @@ function TokenListItem({
     const amount = useTokenBalance(balance);
     const onCheck = (e: React.MouseEvent<HTMLInputElement, MouseEvent>) => {
         e.stopPropagation();
-        onSelect((e.target as HTMLInputElement).checked);
+        if (onSelect) {
+            onSelect((e.target as HTMLInputElement).checked);
+        }
     };
     return (
         <Button.Base className={clsx('token-list-x__item', className)} onClick={onClick}>
@@ -66,7 +70,7 @@ function TokenListItem({
                 {balance && <Text.Capture>{t('balance', { amount, symbol: balance.symbol })}</Text.Capture>}
             </div>
 
-            <Checkbox checked={checked} onClick={onCheck} disabled={disabled} />
+            <Checkbox checked={checked} onClick={onCheck} onChange={onChange} disabled={disabled} />
         </Button.Base>
     );
 }

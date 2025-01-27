@@ -1,5 +1,5 @@
 import React, { useCallback, useEffect, useRef, useState } from 'react';
-import { useNavigate, useParams } from 'react-router-dom';
+import { useNavigate } from 'react-router-dom';
 import { useTranslation } from 'react-i18next';
 import Page from '@popup/popupX/shared/Page';
 import Text from '@popup/popupX/shared/Text';
@@ -7,12 +7,8 @@ import FormSearch from '@popup/popupX/shared/Form/Search';
 import { useForm } from '@popup/popupX/shared/Form';
 import { useAtom, useAtomValue, useSetAtom } from 'jotai';
 import { grpcClientAtom } from '@popup/store/settings';
-import { confirmCIS2Contract, ContractDetails } from '@shared/utils/token-helpers';
-import {
-    fetchTokensConfigure,
-    FetchTokensResponse,
-    TokenWithPageID,
-} from '@popup/pages/Account/Tokens/ManageTokens/utils';
+import { confirmCIS2Contract, ContractDetails, ContractTokenDetails } from '@shared/utils/token-helpers';
+import { fetchTokensConfigure, FetchTokensResponse } from '@popup/pages/Account/Tokens/ManageTokens/utils';
 import { selectedAccountAtom } from '@popup/store/account';
 import { contractDetailsAtom, contractTokensAtom } from '@popup/pages/Account/Tokens/ManageTokens/state';
 import { SubmitHandler } from 'react-hook-form';
@@ -27,6 +23,44 @@ import { absoluteRoutes } from '@popup/popupX/constants/routes';
 import { currentAccountTokensAtom } from '@popup/store/token';
 import { TokenIdAndMetadata } from '@shared/storage/types';
 import { useGenericToast } from '@popup/popupX/shared/utils/hooks';
+import { ChoiceStatus } from '@popup/shared/ContractTokenLine';
+import { SearchTokenDetails } from '@popup/popupX/pages/ManageTokens';
+
+type LoadedTokens = ContractTokenDetails & { status: ChoiceStatus };
+
+type TokenRowProps = {
+    token: LoadedTokens;
+    id: string;
+    contractAddress: ContractAddress.Serializable;
+    updateTokenStatus(checked: boolean, id: string): void;
+};
+
+function TokenRow({ token, id, contractAddress, updateTokenStatus }: TokenRowProps) {
+    const [detailsIsOpen, setDetailsIsOpen] = useState(false);
+    const { status } = token;
+
+    return (
+        <>
+            <SearchTokenDetails
+                token={token}
+                contractAddress={contractAddress}
+                detailsIsOpen={detailsIsOpen}
+                setDetailsIsOpen={setDetailsIsOpen}
+            />
+            <TokenList.Item
+                thumbnail={token.metadata?.display?.url}
+                symbol={token.metadata?.name}
+                checked={status === ChoiceStatus.chosen || status === ChoiceStatus.existing}
+                onClick={() => {
+                    setDetailsIsOpen(true);
+                }}
+                onChange={(e) => {
+                    updateTokenStatus(e.target.checked, id);
+                }}
+            />
+        </>
+    );
+}
 
 const VALIDATE_INDEX_DELAY_MS = 500;
 
@@ -35,17 +69,15 @@ type FormValues = {
     tokenId: string;
 };
 
-// ToDo update token infinity-load, check, add
 function AddToken({ account }: { account: string }) {
     const { t } = useTranslation('x', { keyPrefix: 'mangeTokens' });
-    const params = useParams();
     const nav = useNavigate();
     const [isLoading, setIsLoading] = useState(false);
-    const [checkedTokens, setCheckedTokens] = useState<TokenWithPageID[]>([]);
-    const [filteredTokens, setFilteredTokens] = useState<TokenWithPageID[]>([]);
+    const [loadedTokens, setLoadedTokens] = useState<LoadedTokens[]>([]);
+    const [filteredTokens, setFilteredTokens] = useState<LoadedTokens[]>([]);
     const toast = useGenericToast();
     const form = useForm<FormValues>({
-        defaultValues: { contractIndex: params.contractIndex || '' },
+        defaultValues: { contractIndex: '', tokenId: '' },
     });
     const contractIndexValue = form.watch('contractIndex');
     const tokenIdValue = form.watch('tokenId');
@@ -53,20 +85,22 @@ function AddToken({ account }: { account: string }) {
     const validContract = useRef<{ details: ContractDetails; tokens: FetchTokensResponse } | undefined>();
 
     const setContractDetails = useSetAtom(contractDetailsAtom);
-    const [, updateTokens] = useAtom(contractTokensAtom);
-    const [, setAccountTokens] = useAtom(currentAccountTokensAtom);
+    const [{ hasMore, loading, tokens: contractTokens }, updateTokens] = useAtom(contractTokensAtom);
+    const [accountTokens, setAccountTokens] = useAtom(currentAccountTokensAtom);
     const onSubmit: SubmitHandler<FormValues> = async () => {
         if (validContract.current === undefined) {
             throw new Error('Expected contract details');
         }
 
         setContractDetails(validContract.current.details);
-        updateTokens({ type: 'reset', initialTokens: validContract.current.tokens });
+        await updateTokens({ type: 'reset', initialTokens: validContract.current.tokens });
     };
 
     const validateIndex = useCallback(
         debouncedAsyncValidate<string>(
             async (value) => {
+                validContract.current = undefined;
+
                 let index;
                 try {
                     index = BigInt(value);
@@ -118,9 +152,11 @@ function AddToken({ account }: { account: string }) {
                     setIsLoading(false);
                     return t('noTokensError');
                 }
-
                 validContract.current = { details: cd, tokens: response };
-                setFilteredTokens(response.tokens);
+
+                setContractDetails(validContract.current.details);
+                await updateTokens({ type: 'reset', initialTokens: validContract.current.tokens });
+
                 setIsLoading(false);
                 return true;
             },
@@ -135,38 +171,58 @@ function AddToken({ account }: { account: string }) {
     }, [contractIndexValue]);
 
     useEffect(() => {
+        const tokensWithStatus =
+            contractTokens.map((token) => ({
+                ...token,
+                status: accountTokens.value[contractIndexValue]?.map(({ id }) => id).includes(token.id)
+                    ? ChoiceStatus.existing
+                    : ChoiceStatus.discarded,
+            })) || [];
+        setLoadedTokens(tokensWithStatus);
+    }, [loading, contractTokens.length]);
+
+    useEffect(() => {
         setFilteredTokens([
-            ...(validContract.current?.tokens.tokens || []).filter(
+            ...loadedTokens.filter(
                 ({ id, metadata }) => id.includes(tokenIdValue) || (metadata?.name || '').includes(tokenIdValue)
             ),
         ]);
-    }, [tokenIdValue]);
+    }, [tokenIdValue, loadedTokens]);
 
-    const navToTokenDetails = (token: TokenWithPageID, contractIndex: string) =>
-        nav(
-            absoluteRoutes.home.manageTokenList.addToken.contractIndex.details.path.replace(
-                ':contractIndex',
-                contractIndex
-            ),
-            { state: { token } }
-        );
-
-    const checkToken = (checked: boolean, token: TokenWithPageID) => {
-        if (checked) {
-            setCheckedTokens([...checkedTokens, token]);
-        } else {
-            setCheckedTokens(checkedTokens.filter((c) => c.id !== token.id));
-        }
+    const updateTokenStatus = (checked: boolean, id: string) => {
+        setLoadedTokens([
+            ...loadedTokens.map((token) => {
+                if (token.id === id) {
+                    return { ...token, status: checked ? ChoiceStatus.chosen : ChoiceStatus.discarded };
+                }
+                return token;
+            }),
+        ]);
     };
 
     const setTokens = () => {
-        setAccountTokens({ contractIndex: contractIndexValue, newTokens: checkedTokens as TokenIdAndMetadata[] });
-        toast('Token list updated', `Update count ${checkedTokens.length}`);
+        const initialTokens = accountTokens.value[contractIndexValue] || [];
+
+        const newTokens = loadedTokens
+            .reduce((acc, token) => {
+                if (token.status === ChoiceStatus.discarded) {
+                    return acc.filter(({ id }) => id !== token.id);
+                }
+
+                if (token.status === ChoiceStatus.chosen || !acc.find(({ id }) => id === token.id)) {
+                    return [...acc, token as TokenIdAndMetadata];
+                }
+
+                return acc;
+            }, initialTokens)
+            .map(({ id, metadata, metadataLink }) => ({ id, metadata, metadataLink }));
+
+        setAccountTokens({ contractIndex: contractIndexValue, newTokens });
+        toast('Token list updated');
         nav(absoluteRoutes.home.manageTokenList.path);
     };
 
-    const haveTokens = validContract.current?.tokens.tokens.length || 0;
-
+    const haveTokens = contractTokens.length || 0;
     return (
         <Page className="add-token-x">
             <Page.Top heading={t('addToken')} />
@@ -191,18 +247,25 @@ function AddToken({ account }: { account: string }) {
                 </Form>
                 <TokenList>
                     {filteredTokens.map((token) => (
-                        <TokenList.Item
+                        <TokenRow
                             key={token.id}
-                            thumbnail={token.metadata?.display?.url}
-                            symbol={token.metadata?.name}
-                            onClick={() => navToTokenDetails(token, contractIndexValue)}
-                            onSelect={(checked: boolean) => {
-                                checkToken(checked, token);
-                            }}
+                            token={token}
+                            id={token.id}
+                            contractAddress={{ index: contractIndexValue, subindex: '0' }}
+                            updateTokenStatus={updateTokenStatus}
                         />
                     ))}
+                    {(loading || (isLoading && !haveTokens)) && <LoaderInline />}
+                    {!!haveTokens && hasMore && (
+                        <Button.Main
+                            className="secondary"
+                            label="Load More"
+                            onClick={() => {
+                                updateTokens({ type: 'next' });
+                            }}
+                        />
+                    )}
                 </TokenList>
-                {isLoading && !haveTokens && <LoaderInline />}
             </Page.Main>
             <Page.Footer>{!!haveTokens && <Button.Main label={t('addSelected')} onClick={setTokens} />}</Page.Footer>
         </Page>

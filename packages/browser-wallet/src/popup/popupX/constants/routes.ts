@@ -155,12 +155,6 @@ export const relativeRoutes = {
             path: 'manageTokenList',
             addToken: {
                 path: 'addToken',
-                contractIndex: {
-                    path: ':contractIndex',
-                    details: {
-                        path: 'details',
-                    },
-                },
             },
         },
     },
