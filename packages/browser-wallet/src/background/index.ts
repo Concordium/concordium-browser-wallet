@@ -274,6 +274,10 @@ bgMessageHandler.handleMessage(createMessageTypeFilter(InternalMessageType.OpenF
     chrome.tabs.create({ url: chrome.runtime.getURL(`popup.html${payload}#fullscreen`) });
 });
 
+bgMessageHandler.handleMessage(createMessageTypeFilter(InternalMessageType.OpenPopup), () => {
+    chrome.action.openPopup();
+});
+
 const NOT_WHITELISTED = 'Site is not whitelisted';
 
 /**

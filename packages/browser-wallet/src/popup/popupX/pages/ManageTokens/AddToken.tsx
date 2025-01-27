@@ -259,7 +259,7 @@ function AddToken({ account }: { account: string }) {
                     {!!haveTokens && hasMore && (
                         <Button.Main
                             className="secondary"
-                            label="Load More"
+                            label={t('loadMore')}
                             onClick={() => {
                                 updateTokens({ type: 'next' });
                             }}

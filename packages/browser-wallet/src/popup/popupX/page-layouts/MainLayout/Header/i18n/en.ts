@@ -31,6 +31,7 @@ const t = {
     navButton: {
         toMain: 'to Main page',
     },
+    fullscreen: { fullscreen: 'Fullscreen' },
 };
 
 export default t;

@@ -12,6 +12,7 @@ const t = {
     noTokensError: 'No valid tokens found in contract',
     negativeIndex: 'Contract index cannot be negative',
     indexRequired: 'Contract index is required',
+    loadMore: 'Load More',
 };
 
 export default t;
