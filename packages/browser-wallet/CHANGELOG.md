@@ -1,5 +1,13 @@
 # Changelog
 
+## 2.0.0
+
+### Added
+
+-   Overhauled the Browser Wallet’s interface as part of the CryptoX UI Revamp project.
+    This update will align the browser wallet’s design with look of CryptoX,
+    delivering a more seamless and user-friendly experience while preserving all the existing features.
+
 ## 1.7.2
 
 ### Fixed
