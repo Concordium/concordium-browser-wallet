@@ -1,0 +1,185 @@
+@keyframes pulsate {
+    from {
+        opacity: 1;
+    }
+
+    50% {
+        opacity: 0;
+    }
+
+    to {
+        opacity: 1;
+    }
+}
+
+.main-page-x {
+    &.rejected-account {
+        .heading_medium {
+            color: $color-red-attention;
+        }
+    }
+
+    &.page-container {
+        height: 100%;
+
+        &:not(.create-account) {
+            padding-bottom: unset;
+        }
+    }
+
+    &__balance {
+        display: flex;
+        flex-direction: column;
+        align-items: flex-start;
+        gap: rem(4px);
+
+        &_info {
+            display: flex;
+
+            .info-icon {
+                height: rem(12px);
+                margin: rem(8px) 0 0 rem(8px);
+                cursor: pointer;
+
+                .tooltip-x_text.top {
+                    top: rem(24px);
+                    left: rem(-194px);
+
+                    &::after {
+                        left: 90%;
+                    }
+                }
+            }
+        }
+
+        .heading_large {
+            font-family: $t-font-family-ibm;
+        }
+    }
+
+    &__pending {
+        display: flex;
+        align-items: center;
+        padding: rem(12px) rem(16px);
+        margin: rem(26px) 0 rem(10px) 0;
+        border-radius: rem(12px);
+        background-color: $color-transaction-bg;
+
+        .text__main {
+            color: $color-orange-info;
+        }
+
+        svg {
+            margin-left: auto;
+            height: rem(11px);
+            width: rem(11px);
+            animation: pulsate 4s linear infinite;
+
+            circle {
+                fill: $color-orange-info;
+            }
+        }
+    }
+
+    &__action-buttons {
+        display: flex;
+        align-items: stretch;
+        width: 100%;
+        gap: rem(6px);
+        margin-top: rem(16px);
+
+        .send svg {
+            transform: rotate(-90deg);
+        }
+
+        .receive svg {
+            transform: rotate(90deg);
+        }
+    }
+
+    &__tokens {
+        margin-top: rem(24px);
+        overflow: auto;
+
+        &::-webkit-scrollbar {
+            display: none;
+        }
+
+        &-list {
+            display: flex;
+            flex-direction: column;
+            gap: rem(4px);
+            padding-bottom: rem(32px);
+
+            &_item {
+                display: flex;
+                align-items: center;
+                padding: rem(12px) rem(14px) rem(12px) rem(12px);
+                border: unset;
+                border-radius: rem(12px);
+                background: $color-transaction-bg;
+                cursor: pointer;
+
+                .token-icon {
+                    display: flex;
+                    padding: rem(10px);
+                    margin-right: rem(10px);
+                    border-radius: rem(8px);
+                    background: $color-main-bg;
+
+                    svg,
+                    img {
+                        width: rem(20px);
+                        height: rem(20px);
+                    }
+                }
+
+                .token-balance {
+                    display: flex;
+                    flex-direction: column;
+                    gap: rem(8px);
+                    width: 100%;
+
+                    &__amount,
+                    &__exchange-rate {
+                        display: flex;
+                        width: 100%;
+                        justify-content: flex-end;
+                        align-items: center;
+
+                        .capture__main_small {
+                            color: rgba($color-mineral-3, 0.5);
+                        }
+                    }
+
+                    .label__main {
+                        color: $color-white;
+                    }
+
+                    .balance-rate {
+                        display: flex;
+                        flex-direction: column;
+                        gap: rem(8px);
+                        margin-left: auto;
+                    }
+
+                    svg {
+                        margin-left: rem(8px);
+                        opacity: 0.5;
+                        width: rem(16px);
+                        height: rem(16px);
+
+                        path {
+                            fill: $color-mineral-3;
+                        }
+                    }
+                }
+            }
+
+            .button__icon {
+                align-self: flex-start;
+                margin-top: rem(24px);
+            }
+        }
+    }
+}

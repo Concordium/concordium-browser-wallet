@@ -1,0 +1,26 @@
+&:not(html) {
+    background-color: rgba($color-black, 0.9);
+    color: $color-white;
+    font-family: $t-font-family-satoshi;
+}
+
+.bg {
+    opacity: unset;
+    filter: unset;
+    background: $color-bg;
+
+    &.welcome-page {
+        background-image: url('../assets/images/onboarding-bg.png');
+        background-size: contain;
+    }
+
+    &.fade-bg {
+        background: rgba($color-black, 0.9);
+    }
+}
+
+ul,
+ol {
+    padding-inline-start: rem(20px);
+    margin: 0;
+}

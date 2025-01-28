@@ -107,21 +107,58 @@ function confirmString(field?: any) {
 export const getMetadataUnique = ({ unique }: TokenMetadata) => Boolean(unique);
 export const getMetadataDecimals = ({ decimals }: TokenMetadata) => Number(decimals ?? 0);
 
+export enum TokenMetadataErrorType {
+    FetchError = 'FetchError',
+    IncorrectChecksum = 'IncorrectChecksum',
+}
+
+export class TokenMetadataError extends Error {
+    constructor(public type: TokenMetadataErrorType, message?: string) {
+        super(message);
+        this.name = 'TokenMetadataError';
+    }
+}
+
 /**
- * Fetches token metadata from the given url
+ * Fetches and verifies the metadata URL.
+ *
+ * @param {MetadataUrl} url - The metadata URL and optional checksum hash.
+ * @returns {Promise<Buffer>} - The fetched data.
+ * @throws {TokenMetadataError} - If the fetch fails, the checksum is incorrect.
  */
-export async function getTokenMetadata({ url, hash: checksumHash }: MetadataUrl): Promise<TokenMetadata> {
+export async function getMetadataUrlChecked({ url, hash: checksumHash }: MetadataUrl): Promise<Buffer> {
     const resp = await fetch(url, { headers: new Headers({ 'Access-Control-Allow-Origin': '*' }), mode: 'cors' });
     if (!resp.ok) {
-        throw new Error(i18n.t('addTokens.metadata.fetchError', { status: resp.status }));
+        throw new TokenMetadataError(TokenMetadataErrorType.FetchError, resp.status.toString());
     }
 
     const body = Buffer.from(await resp.arrayBuffer());
     if (checksumHash && sha256([body]).toString('hex') !== checksumHash) {
-        throw new Error(i18n.t('addTokens.metadata.incorrectChecksum'));
+        throw new TokenMetadataError(TokenMetadataErrorType.IncorrectChecksum);
+    }
+    return body;
+}
+
+/**
+ * Fetches token metadata from the given url
+ */
+export async function getTokenMetadata(url: MetadataUrl): Promise<TokenMetadata> {
+    let body: Buffer;
+    try {
+        body = await getMetadataUrlChecked(url);
+    } catch (e) {
+        const err = e as TokenMetadataError;
+        switch (err.type) {
+            case TokenMetadataErrorType.FetchError:
+                throw new Error(i18n.t('addTokens.metadata.fetchError', { status: err.message }));
+            case TokenMetadataErrorType.IncorrectChecksum:
+                throw new Error(i18n.t('addTokens.metadata.incorrectChecksum'));
+            default:
+                throw err;
+        }
     }
 
-    let metadata;
+    let metadata: TokenMetadata;
     try {
         metadata = JSON.parse(body.toString());
     } catch (e) {

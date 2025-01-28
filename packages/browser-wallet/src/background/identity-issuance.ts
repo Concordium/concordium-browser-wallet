@@ -1,7 +1,7 @@
-import { createIdentityRequest, IdentityRequestInput } from '@concordium/web-sdk';
+import { createIdentityRequest } from '@concordium/web-sdk';
 import { IdentityIssuanceBackgroundResponse } from '@shared/utils/identity-helpers';
 import { ExtensionMessageHandler, InternalMessageType } from '@messaging';
-import { BackgroundResponseStatus } from '@shared/utils/types';
+import { BackgroundResponseStatus, IdentityIssuanceRequestPayload } from '@shared/utils/types';
 import { sessionIdpTab, sessionPendingIdentity, storedCurrentNetwork } from '@shared/storage/access';
 import { CreationStatus, PendingIdentity } from '@shared/storage/types';
 import { buildURLwithSearchParameters } from '@shared/utils/url-helpers';
@@ -150,10 +150,7 @@ function launchExternalIssuance(url: string) {
         });
 }
 
-async function startIdentityIssuance({
-    baseUrl,
-    ...identityRequestInputs
-}: IdentityRequestInput & { baseUrl: string }) {
+async function startIdentityIssuance({ baseUrl, ...identityRequestInputs }: IdentityIssuanceRequestPayload) {
     const idObjectRequest = createIdentityRequest(identityRequestInputs);
 
     const params = {

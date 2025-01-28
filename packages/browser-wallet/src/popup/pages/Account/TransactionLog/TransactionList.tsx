@@ -220,7 +220,9 @@ export default function TransactionList({ onTransactionClick }: TransactionListP
             let newTransactions: BrowserWalletTransaction[] = [];
             while (more) {
                 try {
-                    const result = await getTransactions(accountAddress, transactionResultLimit, 'ascending', fromId);
+                    const result = await getTransactions(accountAddress, transactionResultLimit, 'ascending', {
+                        from: fromId,
+                    });
                     newTransactions = [...newTransactions, ...result.transactions];
                     fromId = newTransactions.length > 0 ? newTransactions[newTransactions.length - 1].id : fromId;
                     more = result.full;
@@ -237,7 +239,7 @@ export default function TransactionList({ onTransactionClick }: TransactionListP
 
     async function loadTransactionsDescending(address: string, appendTransactions: boolean, fromId?: number) {
         setIsNextPageLoading(true);
-        return getTransactions(address, transactionResultLimit, 'descending', fromId)
+        return getTransactions(address, transactionResultLimit, 'descending', { from: fromId })
             .then((transactionResult) => {
                 setHasNextPage(transactionResult.full);
 

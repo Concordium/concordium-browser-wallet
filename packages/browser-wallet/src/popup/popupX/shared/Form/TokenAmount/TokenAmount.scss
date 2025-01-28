@@ -1,0 +1,123 @@
+.token-amount {
+    display: flex;
+    flex-direction: column;
+    border-radius: rem(16px);
+    background: $gradient-card-bg;
+    padding: rem(20px) rem(16px);
+
+    .text__main_medium,
+    .text__main {
+        color: $color-black;
+    }
+
+    .capture__main_small {
+        color: $color-grey-3
+    }
+
+    .capture__additional_small {
+        padding: rem(4px);
+        border-radius: rem(4px);
+        color: $color-black;
+        background: $secondary-button-bg;
+    }
+
+    &_token,
+    &_amount,
+    &_receiver {
+        display: flex;
+        flex-direction: column;
+    }
+
+    &_token {
+        .token-selector-container {
+            flex-wrap: wrap;
+            display: flex;
+            align-items: center;
+            margin-top: rem(12px);
+            padding-bottom: rem(12px);
+            border-bottom: 1px solid rgba($color-black, 0.1);
+
+            .token-selector {
+                display: flex;
+                position: relative;
+            }
+
+            .text__additional_small {
+                margin-left: auto;
+                text-wrap: nowrap;
+            }
+
+            .token-icon {
+                display: flex;
+                padding: rem(5px);
+                margin-right: rem(8px);
+                border-radius: rem(6px);
+                background: $color-grey-1;
+
+                svg,
+                img {
+                    width: rem(14px);
+                    height: rem(14px);
+                }
+            }
+        }
+    }
+
+    &_amount {
+        position: relative;
+        margin-top: rem(24px);
+
+        &_selector {
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            padding: rem(8px) 0;
+            margin-bottom: rem(4px);
+            border-bottom: 1px solid rgba($color-black, 0.1);
+
+            .heading_medium {
+                color: $color-black;
+            }
+        }
+
+        &_field {
+            flex: 1;
+            min-width: 0;
+            margin-right: rem(4px);
+        }
+
+        &_max {
+            flex: 0;
+            text-wrap: nowrap;
+        }
+    }
+
+    &_field {
+        border: none;
+        width: 100%;
+        background: none;
+
+        &--invalid {
+            color: $color-red-attention !important;
+        }
+    }
+
+    button.capture__additional_small {
+        border: unset;
+        cursor: pointer;
+    }
+
+    &_receiver {
+        margin-top: rem(24px);
+
+        .address-selector {
+            display: flex;
+            justify-content: space-between;
+            margin-top: rem(12px);
+        }
+
+        textarea {
+            resize: none;
+        }
+    }
+}

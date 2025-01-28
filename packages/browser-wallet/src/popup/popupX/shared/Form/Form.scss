@@ -1,0 +1,345 @@
+@mixin when-invalid {
+    &--invalid {
+        @content;
+    }
+}
+
+@mixin when-valid {
+    &--valid {
+        @content;
+    }
+}
+
+.form-input {
+    position: relative;
+    display: block;
+
+    &:not(:last-of-type) {
+        margin-bottom: rem(8px);
+    }
+
+    &__field {
+        background-color: $color-input-bg;
+        color: $color-white;
+        height: rem(56px);
+        border: rem(1px) solid $color-input-border;
+        border-radius: rem(12px);
+        padding: rem(28px) rem(14px) rem(12px);
+        width: 100%;
+        outline: none;
+        font-size: rem(14px);
+
+        /* override base style, remove after release */
+        transform: unset;
+
+        /* override base style, remove after release */
+        @include transition(border-color);
+
+        &:focus {
+            background-color: $color-grey-3;
+            border-color: $color-mineral-2;
+        }
+
+        // Hide the buttons to increment/decrement
+        &::-webkit-outer-spin-button,
+        &::-webkit-inner-spin-button {
+            appearance: none;
+            margin: 0;
+        }
+    }
+
+    &__area {
+        background-color: transparent;
+        color: $color-white;
+        border: unset;
+    }
+
+    &__checkbox {
+        display: flex;
+        flex-direction: row;
+
+        label {
+            margin-top: auto;
+            margin-bottom: auto;
+        }
+
+        input {
+            &[type='checkbox'] {
+                display: flex;
+                align-items: center;
+                justify-content: center;
+                width: rem(24px);
+                height: rem(24px);
+                margin: 0;
+                appearance: none;
+                background-color: $color-grey-2;
+                color: $color-white;
+                border: 1px solid $color-white;
+                border-radius: rem(6px);
+
+                &::before {
+                    content: '';
+                    width: rem(14px);
+                    height: rem(14px);
+                    border-radius: rem(3px);
+                    transform: scale(0);
+                    transition: 60ms transform ease-in-out;
+                    box-shadow: inset rem(14px) rem(14px) $color-white;
+                }
+
+                &:checked::before {
+                    transform: scale(1);
+                }
+
+                &:disabled {
+                    opacity: 0.5;
+                }
+            }
+        }
+    }
+
+    &__label {
+        position: absolute;
+        left: rem(14px);
+        top: rem(8px);
+        color: $color-mineral-3;
+        opacity: 0.5;
+    }
+
+    &__seed-phrase-x {
+        margin-bottom: rem(16px);
+
+        .card-x.grey {
+            display: flex;
+            flex-flow: row wrap;
+            align-content: flex-start;
+            min-height: rem(215px);
+            margin-top: rem(24px);
+            border: rem(1px) solid $color-input-border;
+            cursor: text;
+
+            &:focus-within {
+                border-color: $color-mineral-2;
+            }
+
+            .label__regular {
+                height: rem(24px);
+                background-color: $color-main-bg;
+                margin: rem(4px);
+                padding: rem(3px) rem(4px) rem(5px) rem(4px);
+                border-radius: rem(4px);
+            }
+
+            .form-input__field {
+                width: auto;
+
+                // stylelint false negative rule
+                field-sizing: content;
+                background: transparent;
+                border: unset;
+            }
+        }
+    }
+
+    @include when-valid {
+        .form-input__field:where(:focus) {
+            border-color: $color-green-success;
+        }
+    }
+
+    @include when-invalid {
+        .form-input__field {
+            border-color: $color-red-attention;
+        }
+    }
+
+    &__error {
+        left: unset;
+        font-size: rem(8px);
+        margin-top: rem(4px);
+        white-space: break-spaces;
+    }
+}
+
+.form-inline-input {
+    appearance: textfield;
+    border: none;
+    padding: 0;
+    color: inherit;
+    font-size: inherit;
+    font-family: inherit;
+    font-weight: inherit;
+    line-height: inherit;
+    background: none;
+
+    &::-webkit-outer-spin-button,
+    &::-webkit-inner-spin-button {
+        appearance: none;
+        margin: 0;
+    }
+
+    &:focus {
+        outline: none;
+    }
+
+    &:disabled {
+        color: $color-grey-3;
+    }
+
+    &:read-only {
+        color: inherit;
+    }
+
+    @include when-invalid {
+        color: $color-red-attention !important;
+    }
+}
+
+.form-password {
+    position: relative;
+
+    &__reveal {
+        position: absolute;
+        top: rem(16px);
+        right: rem(20px);
+        background-color: transparent;
+        border: none;
+        cursor: pointer;
+        display: flex;
+        align-items: center;
+        padding: unset;
+        transform: unset;
+
+        svg {
+            g,
+            path {
+                fill: $color-mineral-2;
+            }
+        }
+    }
+}
+
+.form-search {
+    position: relative;
+
+    svg {
+        position: absolute;
+        top: rem(20px);
+        right: rem(20px);
+
+        path {
+            fill: $color-mineral-3;
+        }
+    }
+}
+
+$switch-height: rem(24px);
+$switch-width: rem(48px);
+$switch-transition: linear 0.05s;
+$handle-size: rem(20px);
+
+.form-toggle-x {
+    &__root {
+        input:checked + .form-toggle-x__slider {
+            background-color: $color-green-toggle;
+        }
+
+        input:checked + .form-toggle-x__slider::before {
+            transform: translateX(rem(24px));
+        }
+    }
+
+    &__switch {
+        position: relative;
+        display: inline-block;
+        width: rem(48px);
+        height: rem(24px);
+
+        input {
+            opacity: 0;
+            width: 0;
+            height: 0;
+        }
+    }
+
+    &__slider {
+        position: absolute;
+        cursor: pointer;
+        top: 0;
+        left: 0;
+        right: 0;
+        bottom: 0;
+        border-radius: rem(12px);
+        background-color: $color-grey-3;
+        transition: 0.4s;
+
+        &::before {
+            position: absolute;
+            content: '';
+            height: rem(20px);
+            width: rem(20px);
+            left: rem(2px);
+            bottom: rem(2px);
+            border-radius: 50%;
+            background-color: $color-white;
+            transition: 0.4s;
+        }
+    }
+}
+
+.form-radios-x {
+    &__radio {
+        cursor: pointer;
+        display: flex;
+        align-items: center;
+        gap: rem(16px);
+        background-color: rgba($color-grey-3, 0.3);
+        padding: rem(22px);
+        border-radius: rem(8px);
+
+        &:not(:last-of-type) {
+            margin-bottom: rem(4px);
+        }
+
+        input {
+            display: none;
+        }
+
+        .checkmark {
+            height: rem(20px);
+            width: rem(20px);
+            background-color: $color-grey-2;
+            border-radius: 50%;
+            border: 1px solid $color-grey-4;
+
+            &::after {
+                position: relative;
+                content: '';
+                top: rem(2px);
+                left: rem(2px);
+                width: rem(14px);
+                height: rem(14px);
+                border-radius: 50%;
+                background: $color-white;
+            }
+        }
+
+        &:hover input ~ .checkmark {
+            background-color: $color-grey-3;
+        }
+
+        input:checked ~ .checkmark::after {
+            display: block;
+        }
+
+        &::after {
+            content: '';
+            position: absolute;
+            display: none;
+        }
+    }
+}
+
+.form-error-message {
+    color: $color-red-attention !important;
+}

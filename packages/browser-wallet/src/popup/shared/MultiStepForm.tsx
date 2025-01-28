@@ -1,4 +1,4 @@
-import React, { Dispatch, SetStateAction, useCallback, useEffect, useMemo, useState } from 'react';
+import React, { Dispatch, ReactNode, SetStateAction, useCallback, useEffect, useMemo, useState } from 'react';
 import { Routes, useNavigate, Route, useLocation } from 'react-router-dom';
 import { isDefined, noOp, useUpdateEffect } from 'wallet-common-helpers';
 
@@ -35,7 +35,7 @@ export interface FormChild<F, K extends keyof F = any> {
      * Function to render page component responsible for letting user fill out the respective substate.
      * This is a function to avoid anonymous components messing up render tree updates.
      */
-    render(initial: F[K] | undefined, onNext: (values: F[K]) => void, formValues: Partial<F>): JSX.Element;
+    render(initial: F[K] | undefined, onNext: (values: F[K]) => void, formValues: Partial<F>): ReactNode;
 }
 
 export type FormChildren<F extends Record<string, unknown>> = {
@@ -92,8 +92,26 @@ export type MultiStepFormProps<F extends Record<string, unknown>> =
 
 /**
  * A component for spanning forms over multiple pages. This component doesn't render any UI, but merely handles collecting data from the different steps and routing between the steps.
+ * The component uses the application router to go through a number of pages. As such it needs to be used in combination with a catch-all route, as seen in the example.
  *
  * @template F Type of the form as a whole. Each step in the form flow should correspond to a member on the type.
+ * @component
+ * @example
+ * type Values = {
+ *   first: { a: string; b: number; };
+ *   second: { c: boolean; };
+ * };
+ *
+ * const Flow = () => <MultiStepForm<Values>>
+ *   {{
+ *     first: { render: (initialValues, onNext) => <First initialValues={initialValues} onSubmit={onNext} /> },
+ *     second: { render: (initialValues, onNext) => <Second initialValues={initialValues} onSubmit={onNext} /> },
+ *   }}
+ * </MultiStepForm>
+ *
+ * <Routes>
+ *   <Route path="path/to/flow/*" element={<Flow />} />
+ * </Routes>
  */
 export default function MultiStepForm<
     // eslint-disable-next-line @typescript-eslint/no-explicit-any

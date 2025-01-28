@@ -1,0 +1,25 @@
+.heading_large,
+.heading_big {
+    background-image: $gradient-balance-bg;
+    color: transparent;
+    background-clip: text;
+}
+
+.external-link {
+    text-decoration: underline;
+
+    &:focus-visible {
+        outline: 1px solid $color-white;
+    }
+
+    &,
+    &:hover,
+    &:visited,
+    &:active {
+        color: inherit;
+    }
+
+    &:hover {
+        color: $color-white;
+    }
+}

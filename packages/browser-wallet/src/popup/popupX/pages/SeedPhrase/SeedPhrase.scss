@@ -1,0 +1,19 @@
+.seed-phrase-x {
+    .card-x.grey {
+        display: flex;
+        flex-flow: row wrap;
+        margin-top: rem(24px);
+        border: rem(1px) solid $color-input-border;
+
+        .label__regular {
+            background-color: $color-main-bg;
+            margin: rem(4px);
+            padding: rem(3px) rem(4px) rem(5px) rem(4px);
+            border-radius: rem(4px);
+        }
+    }
+
+    .button__icon {
+        margin-top: rem(24px);
+    }
+}

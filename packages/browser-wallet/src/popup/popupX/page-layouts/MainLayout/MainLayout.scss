@@ -1,0 +1,70 @@
+.main-layout-x {
+    height: 100%;
+    overflow: hidden;
+    max-width: rem(1328px);
+    margin: auto;
+
+    &__main {
+        padding: 0 rem(24px);
+        margin: auto;
+        height: calc(100% - 7.4rem);
+        max-width: rem(703px);
+        overflow: auto;
+
+        &::-webkit-scrollbar {
+            display: none;
+        }
+
+        .float-section {
+            position: absolute;
+            margin-top: rem(-48px);
+
+            .header {
+                &__nav {
+                    &.hidden {
+                        visibility: hidden;
+                    }
+
+                    &_button {
+                        display: flex;
+                        align-items: center;
+                        padding: unset;
+                        border: unset;
+                        background: unset;
+                        cursor: pointer;
+
+                        .text__main_medium {
+                            margin-left: rem(12px);
+                        }
+                    }
+                }
+
+                &__account {
+                    position: relative;
+                    z-index: 2;
+                    display: flex;
+                    align-items: center;
+                    gap: rem(8px);
+                    padding: rem(12px) rem(16px);
+                    margin-top: rem(-12px);
+                    margin-left: rem(-16px);
+                    border-radius: rem(12px);
+                    border: 1px solid transparent;
+                    cursor: pointer;
+
+                    &.active {
+                        border-color: $color-white;
+                    }
+
+                    .text__main_medium {
+                        color: $color-white;
+
+                        &.red {
+                            color: $color-red-attention;
+                        }
+                    }
+                }
+            }
+        }
+    }
+}

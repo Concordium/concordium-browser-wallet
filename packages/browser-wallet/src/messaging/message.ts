@@ -50,6 +50,7 @@ export enum InternalMessageType {
     ImportWeb3IdBackup = 'I_ImportWeb3IdBackup',
     AbortRecovery = 'I_AbortRecovery',
     OpenFullscreen = 'I_OpenFullscreen',
+    OpenPopup = 'I_OpenPopup',
     SignCIS3Message = 'I_SignCIS3Message',
 }
 

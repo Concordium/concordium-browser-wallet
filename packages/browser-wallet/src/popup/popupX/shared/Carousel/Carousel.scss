@@ -1,0 +1,44 @@
+.info-carousel-container {
+    display: flex;
+    flex-direction: column;
+    height: 100%;
+
+    .info-carousel {
+        &__controls {
+            display: flex;
+            flex-direction: row;
+            align-items: center;
+            justify-content: space-between;
+            margin-top: auto;
+
+            &_dots {
+                display: flex;
+                align-items: center;
+                justify-content: center;
+                height: rem(6px);
+                position: absolute;
+                left: 50%;
+                transform: translateX(-50%);
+
+                .dot {
+                    cursor: pointer;
+                    height: rem(6px);
+                    width: rem(6px);
+                    padding: unset;
+                    border-radius: 50%;
+                    border: unset;
+                    background-color: $color-grey-3;
+                    @include transition(background-color);
+
+                    &:not(:last-of-type) {
+                        margin-right: rem(8px);
+                    }
+
+                    &--active {
+                        background-color: $color-white;
+                    }
+                }
+            }
+        }
+    }
+}

@@ -1,0 +1,22 @@
+.about-x {
+    .page__main {
+        .card-x .row {
+            justify-content: space-between;
+        }
+
+        .text__main_medium {
+            color: $color-white;
+        }
+
+        .heading_medium {
+            margin-top: rem(24px);
+            margin-bottom: rem(8px);
+        }
+    }
+
+    .page__footer {
+        .capture__main_small {
+            text-align: center;
+        }
+    }
+}

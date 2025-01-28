@@ -1,0 +1,59 @@
+.transaction-details-x {
+    .card-x .row {
+        display: flex;
+        flex-direction: column;
+
+        .transaction-details__card_row {
+            display: flex;
+            flex-direction: column;
+
+            .capture__main_small {
+                color: rgba($color-mineral-3, 0.5);
+            }
+
+            .label__main {
+                color: $color-white;
+            }
+
+            .top-info {
+                display: flex;
+                justify-content: space-between;
+
+                &:first-child {
+                    margin-bottom: rem(7px);
+                }
+
+                .capture__main_small {
+                    .time {
+                        color: rgba($color-mineral-2, 0.5);
+                    }
+                }
+
+                .label__main.income {
+                    color: $color-green-success;
+                }
+
+                .failed {
+                    color: $color-red-attention;
+                }
+            }
+
+            .secondary-info {
+                display: flex;
+                flex-direction: column;
+                word-break: break-word;
+                white-space: pre-line;
+                margin-bottom: rem(4px);
+
+                .capture__main_small {
+                    color: $color-mineral-3;
+
+                    &.title-secondary {
+                        margin-top: rem(6px);
+                        color: $color-mineral-0;
+                    }
+                }
+            }
+        }
+    }
+}

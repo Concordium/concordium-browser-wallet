@@ -1,0 +1,29 @@
+.validator-keys {
+    gap: rem(16px);
+
+    .page__top {
+        margin-bottom: 0 !important;
+    }
+
+    &--expanded {
+        .validator-keys__expand svg {
+            transform: rotate(-90deg);
+        }
+    }
+
+    &:not(.validator-keys--expanded) {
+        .card-x .details .capture__main_small {
+            white-space: nowrap;
+            overflow: hidden;
+            text-overflow: ellipsis;
+        }
+    }
+
+    &__expand {
+        margin-bottom: rem(8px);
+
+        svg {
+            transform: rotate(90deg);
+        }
+    }
+}

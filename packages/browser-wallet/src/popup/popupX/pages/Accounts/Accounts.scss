@@ -1,0 +1,68 @@
+.accounts-x {
+    .page__top {
+        .button__icon {
+            svg path {
+                fill: $color-white;
+            }
+        }
+    }
+
+    .page__main {
+        display: flex;
+        flex-direction: column;
+        gap: rem(8px);
+    }
+
+    .card-x .row {
+        justify-content: space-between;
+        align-items: center;
+
+        &:first-child {
+            padding-bottom: rem(16px);
+        }
+
+        .text__main_medium {
+            color: $color-white;
+        }
+
+        .wrap-anywhere {
+            overflow-wrap: anywhere;
+        }
+
+        input.editable {
+            background: none;
+            color: inherit;
+            border: none;
+            font-weight: inherit;
+            font-size: inherit;
+            font-family: inherit;
+            padding: 0;
+            margin: 0;
+
+            &:focus {
+                outline: none;
+            }
+        }
+
+        .gap-16 {
+            gap: rem(16px);
+        }
+
+        .width-16 {
+            width: rem(16px);
+        }
+
+        .width-12 {
+            width: rem(12px);
+        }
+
+        .button__icon {
+            gap: rem(16px);
+
+            .label__main {
+                color: $color-white;
+                font-size: rem(14px);
+            }
+        }
+    }
+}

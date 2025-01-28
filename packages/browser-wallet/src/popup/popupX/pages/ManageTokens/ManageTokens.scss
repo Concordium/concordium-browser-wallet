@@ -1,0 +1,33 @@
+.manage-token-list-x {
+    .token-list-x {
+        margin-top: rem(4px);
+    }
+}
+
+.add-token-x {
+    .text__main_regular {
+        margin-bottom: rem(20px);
+    }
+
+    .form-search {
+        margin-top: rem(4px);
+    }
+
+    .token-list-x {
+        margin-top: rem(8px);
+        overflow: auto;
+        max-height: rem(200px);
+
+        .tablet & {
+            max-height: rem(500px);
+        }
+
+        &::-webkit-scrollbar {
+            display: none;
+        }
+    }
+
+    .loader-x {
+        margin: rem(120px) auto 0 auto;
+    }
+}

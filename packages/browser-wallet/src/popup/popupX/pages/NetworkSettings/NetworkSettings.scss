@@ -1,0 +1,16 @@
+.network-settings-x {
+    .card-x .row {
+        align-items: center;
+        justify-content: space-between;
+
+        .button__secondary {
+            svg {
+                margin-left: rem(2px);
+
+                circle {
+                    fill: $color-green-success;
+                }
+            }
+        }
+    }
+}

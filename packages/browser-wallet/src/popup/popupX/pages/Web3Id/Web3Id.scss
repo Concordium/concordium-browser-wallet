@@ -1,0 +1,38 @@
+.web3-id-x {
+    &__card {
+        background: none;
+        padding: 0;
+        border: none;
+        text-align: left;
+    }
+
+    &.credentials,
+    &.import {
+        .page__main {
+            display: flex;
+            flex-direction: column;
+            gap: rem(8px);
+        }
+    }
+
+    &.import {
+        height: 100%;
+
+        .page__main {
+            height: 100%;
+        }
+    }
+}
+
+.web3-id-details-x {
+    &__info {
+        svg {
+            width: rem(16px) !important;
+            height: rem(16px) !important;
+
+            & path {
+                fill: $color-white;
+            }
+        }
+    }
+}

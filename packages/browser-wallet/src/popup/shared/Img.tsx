@@ -3,7 +3,7 @@ import React, { useState } from 'react';
 import { ClassName } from 'wallet-common-helpers';
 
 const DEFAULT_LOADING = '/assets/svg/loading_icon.svg';
-const DEFAULT_FAILED = '/assets/svg/no_icon.svg';
+export const DEFAULT_FAILED = '/assets/svg/no_icon.svg';
 
 type BaseProps = ClassName & {
     src?: string;
@@ -17,7 +17,7 @@ type WithDefaultsProps = BaseProps & {
 type NoDefaultsProps = BaseProps & {
     withDefaults?: false;
     loadingImage?: string;
-    failedImage?: string;
+    failedImage?: string | JSX.Element;
 };
 
 type Props = WithDefaultsProps | NoDefaultsProps;
@@ -49,7 +49,10 @@ export default function Img({ src, alt, className, ...props }: Props) {
                 }}
                 onError={handleError}
             />
-            {shouldHide && <img className={className} src={failed ? failedImage : loadingImage} alt={alt} />}
+            {shouldHide && failed && typeof failedImage !== 'string' && failedImage !== undefined && failedImage}
+            {shouldHide && (typeof failedImage === 'string' || failedImage === undefined || !failed) && (
+                <img className={className} src={failed ? (failedImage as string) : loadingImage} alt={alt} />
+            )}
         </>
     );
 }

@@ -6,7 +6,7 @@ import { MakeOptional } from 'wallet-common-helpers';
 
 export const TOKENS_PAGE_SIZE = 20;
 
-type TokenWithPageID = MakeOptional<ContractTokenDetails, 'metadata'> & {
+export type TokenWithPageID = MakeOptional<ContractTokenDetails, 'metadata'> & {
     pageId: number;
 };
 

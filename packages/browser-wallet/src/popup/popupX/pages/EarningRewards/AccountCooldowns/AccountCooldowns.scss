@@ -1,0 +1,19 @@
+.account-cooldowns {
+    .capture__main_small {
+        opacity: 0.5;
+        color: $color-mineral-3;
+    }
+
+    &__cooldown, &__stake {
+        display: flex;
+        align-items: center;
+        justify-content: space-between;
+
+        margin-top: rem(6px);
+    }
+
+    &__em {
+        opacity: 1 !important;
+        color: $color-white;
+    }
+}

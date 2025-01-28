@@ -1,0 +1,23 @@
+.binary-display-x {
+    .tab-bar {
+        margin-top: rem(16px);
+    }
+
+    .white {
+        color: $color-white;
+    }
+
+    .sign-message {
+        &__binary-text-area {
+            border: 1px solid $color-input-border;
+            border-top: unset;
+            border-radius: 0 0 rem(12px) rem(12px);
+            background: $color-transaction-bg;
+
+            .form-input__area {
+                min-height: rem(165px);
+                font-size: rem(12px);
+            }
+        }
+    }
+}

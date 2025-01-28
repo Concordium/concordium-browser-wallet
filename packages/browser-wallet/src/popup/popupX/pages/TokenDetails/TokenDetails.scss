@@ -1,0 +1,77 @@
+.token-details-x {
+    .dynamic-size.heading_big {
+        font-family: $t-font-family-ibm;
+    }
+
+    .token-balance__exchange-rate {
+        margin-top: rem(4px);
+    }
+
+    &__stake {
+        display: flex;
+        flex-direction: column;
+        margin-top: rem(12px);
+        margin-bottom: rem(16px);
+        padding-top: rem(12px);
+
+        &_group {
+            display: flex;
+            flex-direction: row;
+            justify-content: space-between;
+
+            .capture__additional_small {
+                color: $color-white;
+            }
+        }
+    }
+
+    &__action-buttons {
+        display: flex;
+        align-items: stretch;
+        width: 100%;
+        gap: rem(4px);
+        margin-top: rem(12px);
+
+        .send svg {
+            transform: rotate(-90deg);
+        }
+
+        .receive svg {
+            transform: rotate(90deg);
+        }
+    }
+
+    &__token {
+        display: flex;
+        align-items: center;
+        margin-bottom: rem(8px);
+
+        .token-icon,
+        svg {
+            width: rem(20px);
+            height: rem(20px);
+            margin-right: rem(8px);
+        }
+    }
+
+    .card-x {
+        margin-top: rem(16px);
+    }
+
+    .button__icon.text {
+        margin-top: rem(24px);
+        align-self: flex-start;
+
+        &:last-child:not(:only-of-type) {
+            margin-top: rem(12px);
+
+            .label__main {
+                color: $color-red-attention;
+            }
+
+            svg path {
+                fill: $color-red-attention;
+            }
+        }
+    }
+}
