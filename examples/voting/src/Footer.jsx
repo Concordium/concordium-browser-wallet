@@ -13,6 +13,7 @@ function Footer() {
                     href="https://developer.concordium.software/en/mainnet/smart-contracts/tutorials/voting/index.html"
                     target="_blank"
                     rel="noreferrer"
+                    style={{ color: 'black' }}
                 >
                     Explore the voting tutorial here.
                 </a>
