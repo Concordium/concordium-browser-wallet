@@ -1,5 +1,11 @@
 # Changelog
 
+## 2.0.1
+
+### Fixed
+
+-   Fixed credentials with some fields undefined
+
 ## 2.0.0
 
 ### Added
