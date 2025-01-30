@@ -104,8 +104,8 @@ export default function ConnectAccount({ onAllow, onReject }: Props) {
         () =>
             credentials.filter(
                 (credential) =>
-                    credential.credName.toLowerCase().includes(search.toLowerCase()) ||
-                    credential.address.toLowerCase().includes(search.toLowerCase())
+                    credential.credName?.toLowerCase().includes(search.toLowerCase()) ||
+                    credential.address?.toLowerCase().includes(search.toLowerCase())
             ),
         [search, credentials]
     );

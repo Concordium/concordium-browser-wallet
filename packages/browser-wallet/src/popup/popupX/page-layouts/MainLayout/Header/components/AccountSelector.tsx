@@ -85,8 +85,8 @@ export default function AccountSelector({ showAccountSelector, onUpdateSelectedA
         () =>
             credentials.filter(
                 (credential) =>
-                    credential.credName.toLowerCase().includes(search.toLowerCase()) ||
-                    credential.address.toLowerCase().includes(search.toLowerCase())
+                    credential.credName?.toLowerCase().includes(search.toLowerCase()) ||
+                    credential.address?.toLowerCase().includes(search.toLowerCase())
             ),
         [search, credentials]
     );
