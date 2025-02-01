@@ -1,5 +1,11 @@
 # Changelog
 
+## 2.0.2
+
+### Fixed
+
+-   Fixed credentials with address undefined
+
 ## 2.0.1
 
 ### Fixed

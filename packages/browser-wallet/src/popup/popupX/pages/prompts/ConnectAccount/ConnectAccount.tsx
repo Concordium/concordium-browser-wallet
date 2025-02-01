@@ -22,7 +22,7 @@ function compareAsc(left: WalletCredential, right: WalletCredential): number {
     if (right.credName === '' && left.credName !== '') {
         return -1;
     }
-    return left.credName.localeCompare(right.credName) || left.address.localeCompare(right.address);
+    return left.credName?.localeCompare(right.credName) || left.address?.localeCompare(right.address);
 }
 
 function compareDesc(left: WalletCredential, right: WalletCredential): number {
@@ -102,11 +102,13 @@ export default function ConnectAccount({ onAllow, onReject }: Props) {
     const credentials = credentialsLoading.value ?? [];
     const filtered = useMemo(
         () =>
-            credentials.filter(
-                (credential) =>
-                    credential.credName?.toLowerCase().includes(search.toLowerCase()) ||
-                    credential.address?.toLowerCase().includes(search.toLowerCase())
-            ),
+            credentials
+                .filter((c) => c.address)
+                .filter(
+                    (credential) =>
+                        credential.credName?.toLowerCase().includes(search.toLowerCase()) ||
+                        credential.address?.toLowerCase().includes(search.toLowerCase())
+                ),
         [search, credentials]
     );
     const sorted = useMemo(() => filtered.sort(ascSort ? compareAsc : compareDesc), [filtered, ascSort]);
