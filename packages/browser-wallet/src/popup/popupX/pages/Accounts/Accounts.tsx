@@ -29,7 +29,7 @@ function compareAsc(left: WalletCredential, right: WalletCredential): number {
     if (right.credName === '' && left.credName !== '') {
         return -1;
     }
-    return left.credName.localeCompare(right.credName) || left.address.localeCompare(right.address);
+    return left.credName?.localeCompare(right.credName) || left.address?.localeCompare(right.address);
 }
 
 function compareDesc(left: WalletCredential, right: WalletCredential): number {
@@ -129,7 +129,10 @@ export default function Accounts() {
     const accounts = useAtomValue(credentialsAtom);
     const nav = useNavigate();
     const navToCreateAccount = useCallback(() => nav(absoluteRoutes.settings.createAccount.path), []);
-    const sorted = useMemo(() => accounts.sort(ascSort ? compareAsc : compareDesc), [accounts, ascSort]);
+    const sorted = useMemo(
+        () => accounts.filter((c) => c.address).sort(ascSort ? compareAsc : compareDesc),
+        [accounts, ascSort]
+    );
 
     return (
         <Page className="accounts-x">
