@@ -23,7 +23,6 @@ jobs:
       - name: Log in to the Container registry
         uses: docker/login-action@65b78e6e13532edd9afa3aa52ac7964289d1a9c1
         with:
-          registry: ${{ env.REGISTRY }}
           username: ${{ secrets.DOCKERHUB_USERNAME }}
           password: ${{ secrets.DOCKERHUB_TOKEN }}
       - name: Extract version from git tag
@@ -32,14 +31,16 @@ jobs:
             TAG: ${{ github.ref_name }}
         run: |
             SERVICE_TAG=${TAG##${{ env.SERVICE_NAME }}/}
-            if [ $SERVICE_TAG != ${{ env.SOURCE_IMAGE_TAG }} ]; then
-                echo "Tag version does not match the source image version."
+            ENVIRONMENT=${SERVICE_TAG%%-*}
+            JSON_VERSION=$(jq -r .version "./examples/wCCD/package.json")
+            if [ "${SERVICE_TAG#*-}"" != "$JSON_VERSION" ]; then
+                echo "Tag version does not match the version from package.json."
                 exit 1
             fi
-            echo "tag=${{ env.REGISTRY }}concordium/${{ env.SERVICE_NAME }}-${SERVICE_TAG}" >> $GITHUB_OUTPUT
+            echo "ENVIRONMENT=$ENVIRONMENT" >> $GITHUB_ENV
+            echo "FULL_IMAGE_TAG=concordium/${{ env.SERVICE_NAME }}/${SERVICE_TAG}" >> $GITHUB_ENV
 
       - name: Build and push docker image
-        if: ${{ secrets.DOCKERHUB_TOKEN }}
         uses: docker/build-push-action@v6
         with:
           context: ./examples/wCCD
@@ -49,4 +50,4 @@ jobs:
           push: false
           build-args: |
             NETWORK=${{ env.ENVIRONMENT }}
-            base_image=${{ env.base_image }}
+            base_image=${{ env.BASE_IMAGE }}
