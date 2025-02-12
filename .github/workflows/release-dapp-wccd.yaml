@@ -1,7 +1,5 @@
 on:
   push:
-    branches:
-      - lma/release/wccd
     tags:
       - dapp-wccd/mainnet-*
       - dapp-wccd/testnet-*
@@ -29,7 +27,7 @@ jobs:
       - name: Extract version from git tag
         id: meta
         env:
-            TAG: "dapp-wccd/testnet-4.1.3" #${{ github.ref_name }}
+            TAG: ${{ github.ref_name }}
         run: |
             SERVICE_TAG=${TAG##${{ env.SERVICE_NAME }}/}
             ENVIRONMENT=${SERVICE_TAG%%-*}
