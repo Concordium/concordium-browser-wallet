@@ -1,0 +1,45 @@
+.restore-main-x {
+    .loader-x-container {
+        padding-top: rem(96px);
+    }
+}
+
+.restore-result-x {
+    &__results {
+        margin-bottom: rem(16px);
+
+        .card-x.gradient {
+            margin-top: rem(16px);
+
+            .card-x.grey {
+                .row {
+                    justify-content: unset;
+
+                    .text__main_medium {
+                        width: 100%;
+
+                        .account-link {
+                            width: 100%;
+                            display: flex;
+
+                            .capture__main_small {
+                                margin-left: unset;
+                                color: $color-white;
+                                margin-right: auto;
+                            }
+
+                            .button__icon {
+                                margin-left: rem(16px);
+                            }
+                        }
+                    }
+                }
+
+                &:empty {
+                    margin-top: rem(8px);
+                    padding: 0;
+                }
+            }
+        }
+    }
+}

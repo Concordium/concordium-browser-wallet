@@ -10,6 +10,7 @@ import moment from 'moment';
 import Wallet, { createElection, init } from './Wallet';
 import { CONTRACT_NAME, MODULE_REF } from './config';
 import Footer from './Footer';
+import './styles/CreateElectionPage.css';
 
 async function addOption(options, setOptions, newOption, setOptionInput) {
     if (options.includes(newOption)) {
@@ -64,7 +65,7 @@ function CreateElectionPage() {
     }, [client, submittedTxHash, createdContractId]);
 
     return (
-        <Container>
+        <Container className="create-election-container">
             <Row>
                 <Col>
                     <Wallet
@@ -128,7 +129,7 @@ function CreateElectionPage() {
                     <br />
                     {!submittedTxHash && connectedAccount && (
                         <Button
-                            className="w-100"
+                            className="create-election-btn w-100"
                             onClick={() => {
                                 if (options.length === 0) {
                                     alert('Add at least one option!');
@@ -153,7 +154,7 @@ function CreateElectionPage() {
                     {submittedTxHash && !createdContractId && <Spinner animation="border" />}
                     {createdContractId && (
                         <Link to={`/vote/${createdContractId}`}>
-                            <Button className="font-weight-bold">
+                            <Button className="vote-now-btn">
                                 <strong>Vote now</strong>
                             </Button>
                         </Link>

@@ -3,9 +3,9 @@ name: Build, lint and test
 on:
     # Triggers the workflow on push or pull request events but only for the main branch and release branches
     push:
-        branches: [main, release**, feature/**]
+        branches: [main, release**, feature/**, browser-ui-update]
     pull_request:
-        branches: [main, release**, feature/**]
+        branches: [main, release**, feature/**, browser-ui-update]
 
     # Allows us to run the workflow manually from the Actions tab
     workflow_dispatch:

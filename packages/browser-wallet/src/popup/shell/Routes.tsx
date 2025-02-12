@@ -1,10 +1,7 @@
-import React, { useEffect, useRef } from 'react';
-import { Route, Routes as ReactRoutes, useLocation, useNavigate } from 'react-router-dom';
-import { InternalMessageType, MessageType, createMessageTypeFilter, MessageStatusWrapper } from '@messaging';
-import { AccountTransactionSignature, IdProofOutput } from '@concordium/web-sdk';
-import { noOp } from 'wallet-common-helpers';
+import React from 'react';
+import { Route, Routes as ReactRoutes } from 'react-router-dom';
 
-import { absoluteRoutes, relativeRoutes, relativePath } from '@popup/constants/routes';
+import { absoluteRoutes, relativePath, relativeRoutes } from '@popup/constants/routes';
 import MainLayout from '@popup/page-layouts/MainLayout';
 import FullscreenPromptLayout from '@popup/page-layouts/FullscreenPromptLayout';
 import Account from '@popup/pages/Account';
@@ -14,7 +11,6 @@ import SignCIS3Message from '@popup/pages/SignCIS3Message';
 import SendTransaction from '@popup/pages/SendTransaction';
 import Setup from '@popup/pages/Setup';
 import ConnectionRequest from '@popup/pages/ConnectionRequest';
-import { popupMessageHandler } from '@popup/shared/message-handler';
 import Settings from '@popup/pages/Settings';
 import NetworkSettings from '@popup/pages/NetworkSettings';
 import AddAccount from '@popup/pages/AddAccount';
@@ -36,102 +32,21 @@ import AddWeb3IdCredential from '@popup/pages/AddWeb3IdCredential/AddWeb3IdCrede
 import VerifiableCredentialImport from '@popup/pages/VerifiableCredentialBackup/VerifiableCredentialImport';
 import AgeProofRequest from '@popup/pages/AgeProofRequest';
 import ViewSeedPhrase from '@popup/pages/ViewSeedPhrase';
+import { MessagePromptHandlersType } from '@popup/shared/utils/message-prompt-handlers';
 
-type PromptKey = keyof Omit<typeof absoluteRoutes['prompt'], 'path'>;
-
-function useMessagePrompt<R>(type: InternalMessageType | MessageType, promptKey: PromptKey) {
-    const navigate = useNavigate();
-    const { pathname } = useLocation();
-
-    const eventResponseRef = useRef<(response: R) => void>();
-    const handleResponse = (response: R) => {
-        eventResponseRef.current?.(response);
-    };
-
-    useEffect(
-        () =>
-            popupMessageHandler.handleMessage(createMessageTypeFilter(type), (msg, _sender, respond) => {
-                eventResponseRef.current = respond;
-
-                const replace = pathname.startsWith(absoluteRoutes.prompt.path); // replace existing prompts.
-                const route = absoluteRoutes.prompt[promptKey].path;
-
-                navigate(route, { state: msg, replace });
-                return true;
-            }),
-        [pathname]
-    );
-
-    return handleResponse;
-}
-
-/**
- * Used for internal prompt, which does not return responses to the background script
- */
-function usePrompt(type: InternalMessageType | MessageType, promptKey: PromptKey) {
-    const navigate = useNavigate();
-    const { pathname } = useLocation();
-
-    useEffect(
-        () =>
-            popupMessageHandler.handleMessage(createMessageTypeFilter(type), (msg) => {
-                const replace = pathname.startsWith(absoluteRoutes.prompt.path); // replace existing prompts.
-                const route = absoluteRoutes.prompt[promptKey].path;
-
-                navigate(route, { state: msg, replace });
-            }),
-        [pathname]
-    );
-}
-
-export default function Routes() {
-    const handleConnectionResponse = useMessagePrompt<boolean>(InternalMessageType.Connect, 'connectionRequest');
-    const handleConnectAccountsResponse = useMessagePrompt<MessageStatusWrapper<string[]>>(
-        InternalMessageType.ConnectAccounts,
-        'connectAccountsRequest'
-    );
-    const handleAddWeb3IdCredentialResponse = useMessagePrompt<MessageStatusWrapper<string>>(
-        InternalMessageType.AddWeb3IdCredential,
-        'addWeb3IdCredential'
-    );
-    const handleSendTransactionResponse = useMessagePrompt<MessageStatusWrapper<string>>(
-        InternalMessageType.SendTransaction,
-        'sendTransaction'
-    );
-    const handleSignMessageResponse = useMessagePrompt<MessageStatusWrapper<AccountTransactionSignature>>(
-        InternalMessageType.SignMessage,
-        'signMessage'
-    );
-    const handleSignCIS3MessageResponse = useMessagePrompt<MessageStatusWrapper<AccountTransactionSignature>>(
-        InternalMessageType.SignCIS3Message,
-        'signCIS3Message'
-    );
-    const handleAddTokensResponse = useMessagePrompt<MessageStatusWrapper<string[]>>(
-        InternalMessageType.AddTokens,
-        'addTokens'
-    );
-    const handleIdProofResponse = useMessagePrompt<MessageStatusWrapper<IdProofOutput>>(
-        InternalMessageType.IdProof,
-        'idProof'
-    );
-
-    // We manually stringify the presentation
-    const handleWeb3IdProofResponse = useMessagePrompt<MessageStatusWrapper<string>>(
-        InternalMessageType.Web3IdProof,
-        'web3IdProof'
-    );
-    const handleAgeProofResponse = useMessagePrompt<MessageStatusWrapper<string>>(
-        InternalMessageType.AgeProof,
-        'ageProof'
-    );
-
-    usePrompt(InternalMessageType.EndIdentityIssuance, 'endIdentityIssuance');
-    usePrompt(InternalMessageType.RecoveryFinished, 'recovery');
-    usePrompt(InternalMessageType.ImportWeb3IdBackup, 'importWeb3IdBackup');
-
-    useEffect(() => {
-        popupMessageHandler.sendInternalMessage(InternalMessageType.PopupReady).catch(noOp);
-    }, []);
+export default function Routes({ messagePromptHandlers }: { messagePromptHandlers: MessagePromptHandlersType }) {
+    const {
+        handleConnectionResponse,
+        handleConnectAccountsResponse,
+        handleAddWeb3IdCredentialResponse,
+        handleSendTransactionResponse,
+        handleSignMessageResponse,
+        handleSignCIS3MessageResponse,
+        handleAddTokensResponse,
+        handleIdProofResponse,
+        handleWeb3IdProofResponse,
+        handleAgeProofResponse,
+    } = messagePromptHandlers;
 
     return (
         <ReactRoutes>

@@ -34,6 +34,7 @@ import {
     sessionVerifiableCredentialMetadataUrls,
     storedLog,
     storedMigrations,
+    storedUiStyle,
 } from '@shared/storage/access';
 import { ChromeStorageKey } from '@shared/storage/types';
 import { atom, PrimitiveAtom, WritableAtom } from 'jotai';
@@ -48,6 +49,7 @@ const accessorMap: Record<ChromeStorageKey, StorageAccessor<any>> = {
     [ChromeStorageKey.SeedPhrase]: storedEncryptedSeedPhrase,
     [ChromeStorageKey.NetworkConfiguration]: storedCurrentNetwork,
     [ChromeStorageKey.Theme]: storedTheme,
+    [ChromeStorageKey.UiStyle]: storedUiStyle,
     [ChromeStorageKey.IdentityProviders]: useIndexedStorage(storedIdentityProviders, getGenesisHash),
     [ChromeStorageKey.HasBeenOnboarded]: storedHasBeenOnboarded,
     [ChromeStorageKey.Passcode]: sessionPasscode,

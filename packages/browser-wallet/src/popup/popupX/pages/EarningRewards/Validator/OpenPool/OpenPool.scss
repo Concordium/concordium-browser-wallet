@@ -1,0 +1,27 @@
+.open-pool-container {
+    .page__top {
+        margin-bottom: 0 !important;
+    }
+
+    .open-pool {
+        &__title {
+            display: flex;
+            justify-content: space-between;
+            align-items: flex-end;
+        }
+
+        &__card {
+            margin-top: rem(16px);
+            gap: rem(16px);
+
+            &_delegation {
+                display: flex;
+                justify-content: space-between;
+
+                .text__main {
+                    color: $color-white;
+                }
+            }
+        }
+    }
+}

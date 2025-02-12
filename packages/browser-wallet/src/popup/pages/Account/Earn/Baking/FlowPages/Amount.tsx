@@ -1,5 +1,5 @@
 import React, { useContext, useEffect, useMemo, useState } from 'react';
-import { isBakerAccount } from '@concordium/web-sdk';
+import { isBakerAccount, convertEnergyToMicroCcd } from '@concordium/web-sdk';
 import { useTranslation } from 'react-i18next';
 import { getCcdSymbol, ccdToMicroCcd, displayAsCcd } from 'wallet-common-helpers';
 import { Validate } from 'react-hook-form';
@@ -12,11 +12,7 @@ import { validateBakerStake } from '@popup/shared/utils/transaction-helpers';
 import { WithAccountInfo } from '@popup/shared/utils/account-helpers';
 import { accountPageContext } from '@popup/pages/Account/utils';
 import DisabledAmountInput from '@popup/shared/DisabledAmountInput';
-import {
-    convertEnergyToMicroCcd,
-    getConfigureBakerMaxEnergyCost,
-    getFullConfigureBakerMinEnergyCost,
-} from '@shared/utils/energy-helpers';
+import { getConfigureBakerMaxEnergyCost, getFullConfigureBakerMinEnergyCost } from '@shared/utils/energy-helpers';
 import { earnPageContext, isAboveStakeWarningThreshold, STAKE_WARNING_THRESHOLD } from '../../utils';
 import { ConfigureBakerFlowState, getCost } from '../utils';
 import { AmountWarning, WarningModal } from '../../Warning';
@@ -43,7 +39,7 @@ export default function AmountPage({ initial, onNext, formValues, accountInfo }:
 
     const cost = useMemo(() => {
         const energyCost = isBaker ? getCost(accountInfo, formValues, amount) : getConfigureBakerMaxEnergyCost();
-        return chainParameters ? convertEnergyToMicroCcd(energyCost, chainParameters) : 0n;
+        return chainParameters ? convertEnergyToMicroCcd(energyCost, chainParameters).microCcdAmount : 0n;
     }, [chainParameters, amount]);
 
     const minCost = useMemo(() => {
@@ -51,7 +47,9 @@ export default function AmountPage({ initial, onNext, formValues, accountInfo }:
             // min Cost only needed when we are registering a baker
             return 0n;
         }
-        return chainParameters ? convertEnergyToMicroCcd(getFullConfigureBakerMinEnergyCost(), chainParameters) : 0n;
+        return chainParameters
+            ? convertEnergyToMicroCcd(getFullConfigureBakerMinEnergyCost(), chainParameters).microCcdAmount
+            : 0n;
     }, [chainParameters, isBaker]);
 
     const validateAmount: Validate<string> = (amountToValidate) =>

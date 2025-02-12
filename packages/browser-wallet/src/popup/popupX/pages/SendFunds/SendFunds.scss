@@ -1,0 +1,54 @@
+.send-funds-container {
+    display: flex;
+    flex-direction: column;
+    height: 100%;
+    padding-bottom: rem(32px);
+
+    .send-funds {
+        &__memo {
+            display: flex;
+            margin-top: rem(16px);
+
+            .label__main {
+                margin-left: rem(8px);
+            }
+        }
+    }
+
+    .send-funds-confirm {
+        &__card {
+            align-items: center;
+            margin-top: rem(16px);
+            padding: rem(40px) 0;
+
+            &_destination {
+                display: flex;
+                margin-bottom: rem(40px);
+
+                .text__main_medium {
+                    color: $color-white;
+                }
+
+                svg {
+                    margin: 0 rem(10px);
+
+                    path {
+                        fill: $color-mineral-2;
+                    }
+                }
+            }
+
+            .heading_large {
+                margin: rem(8px) 0;
+            }
+
+            .capture__main_small:nth-child(2) {
+                color: $color-white;
+            }
+
+            .capture__main_small:nth-child(4) {
+                color: $color-mineral-1;
+            }
+        }
+    }
+}

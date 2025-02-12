@@ -1,0 +1,21 @@
+.add-tokens-x {
+    .text__main {
+        color: $color-mineral-2;
+        margin-bottom: rem(24px);
+
+        .white {
+            color: $color-white;
+        }
+    }
+
+    .card-x {
+        .text__main_medium {
+            color: $color-white;
+            margin-left: auto;
+        }
+    }
+
+    .token-list-x {
+        margin-top: rem(4px);
+    }
+}

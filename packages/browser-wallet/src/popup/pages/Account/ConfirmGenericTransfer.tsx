@@ -1,8 +1,12 @@
 import React, { useContext, useMemo } from 'react';
-import { AccountTransactionPayload, AccountTransactionType } from '@concordium/web-sdk';
+import {
+    AccountTransactionPayload,
+    AccountTransactionType,
+    convertEnergyToMicroCcd,
+    getEnergyCost,
+} from '@concordium/web-sdk';
 import { useLocation } from 'react-router-dom';
 
-import { convertEnergyToMicroCcd, getEnergyCost } from '@shared/utils/energy-helpers';
 import { useBlockChainParameters } from '@popup/shared/BlockChainParametersProvider';
 import ConfirmTransfer from './ConfirmTransfer';
 import { accountPageContext } from './utils';
@@ -25,6 +29,11 @@ export default function ConfirmGenericTransfer() {
     );
 
     return (
-        <ConfirmTransfer setDetailsExpanded={setDetailsExpanded} cost={cost} payload={payload} transactionType={type} />
+        <ConfirmTransfer
+            setDetailsExpanded={setDetailsExpanded}
+            cost={cost?.microCcdAmount}
+            payload={payload}
+            transactionType={type}
+        />
     );
 }

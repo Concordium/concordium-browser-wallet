@@ -89,6 +89,9 @@ body {
 
 #root {
     height: 100%;
+}
+
+:is(:not(.popup-x)) #root {
     @include transition(filter);
 
     .modal-open & {
@@ -98,16 +101,16 @@ body {
 
 // Scrollbar section inspired by https://stackoverflow.com/questions/21684101/css-vertical-scrollbar-padding-left-right-in-ul-possible
 
-$scrollbar-width: 16px;
+$scrollbar-width: 16px; // rem(16px) does not give the correct result here, so we stick to static values.
 
 ::-webkit-scrollbar {
-    // TODO cross-browser compatibility
+    // TODO: cross-browser compatibility
     width: $scrollbar-width;
     height: 16px;
 }
 
 ::-webkit-scrollbar-thumb {
-    // TODO cross-browser compatibility
+    // TODO: cross-browser compatibility
     cursor: pointer;
     height: rem(30px);
     border: rem(4px) solid rgb(0 0 0 / 0%);

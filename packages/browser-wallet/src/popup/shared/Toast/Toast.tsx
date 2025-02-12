@@ -1,7 +1,7 @@
 import { toastsAtom } from '@popup/state';
 import clsx from 'clsx';
 import { useAtom } from 'jotai';
-import React, { useEffect, useState } from 'react';
+import React, { ReactNode, useEffect, useState } from 'react';
 import { noOp } from 'wallet-common-helpers';
 
 // The fadeout timeout has to be aligned with the animation in the corresponding CSS. This is
@@ -14,7 +14,7 @@ const toastTimeoutMs = 5000;
 
 export default function Toast() {
     const [toasts, setToasts] = useAtom(toastsAtom);
-    const [toastText, setToastText] = useState<string>();
+    const [toastText, setToastText] = useState<string | ReactNode>();
     const [fadeout, setFadeout] = useState<boolean>(false);
 
     useEffect(() => {

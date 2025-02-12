@@ -3,7 +3,7 @@ import { useAtomValue, useSetAtom } from 'jotai';
 import { fullscreenPromptContext } from '@popup/page-layouts/FullscreenPromptLayout';
 import { useTranslation } from 'react-i18next';
 import { useLocation } from 'react-router-dom';
-import { AccountAddress } from '@concordium/web-sdk';
+import { AccountAddress, convertEnergyToMicroCcd, getEnergyCost } from '@concordium/web-sdk';
 import { usePrivateKey } from '@popup/shared/utils/account-helpers';
 import {
     sendTransaction,
@@ -22,7 +22,6 @@ import { useUpdateAtom } from 'jotai/utils';
 import { addPendingTransactionAtom } from '@popup/store/transactions';
 import { parsePayload } from '@shared/utils/payload-helpers';
 import { BackgroundSendTransactionPayload } from '@shared/utils/types';
-import { convertEnergyToMicroCcd, getEnergyCost } from '@shared/utils/energy-helpers';
 import { useBlockChainParameters } from '@popup/shared/BlockChainParametersProvider';
 import { getPublicAccountAmounts } from 'wallet-common-helpers';
 import * as JSONBig from 'json-bigint';
@@ -92,7 +91,7 @@ export default function SendTransaction({ onSubmit, onReject }: Props) {
         const accountInfo = await client.getAccountInfo(sender);
         if (
             getPublicAccountAmounts(accountInfo).atDisposal <
-            getTransactionAmount(transactionType, payload) + (cost || 0n)
+            getTransactionAmount(transactionType, payload) + (cost?.microCcdAmount || 0n)
         ) {
             throw new Error(t('errors.insufficientFunds'));
         }
@@ -111,7 +110,7 @@ export default function SendTransaction({ onSubmit, onReject }: Props) {
         const transaction = { payload, header, type: transactionType };
 
         const hash = await sendTransaction(client, transaction, key);
-        const pending = createPendingTransactionFromAccountTransaction(transaction, hash, cost);
+        const pending = createPendingTransactionFromAccountTransaction(transaction, hash, cost?.microCcdAmount);
         await addPendingTransaction(pending);
 
         return hash;
@@ -127,7 +126,7 @@ export default function SendTransaction({ onSubmit, onReject }: Props) {
                     payload={payload}
                     parameters={parameters}
                     sender={accountAddress}
-                    cost={cost}
+                    cost={cost?.microCcdAmount}
                     className="m-10"
                 />
                 <br />

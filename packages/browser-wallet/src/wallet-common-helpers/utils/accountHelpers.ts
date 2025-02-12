@@ -5,6 +5,7 @@ export interface PublicAccountAmounts {
     staked: bigint;
     scheduled: bigint;
     atDisposal: bigint;
+    cooldown: bigint;
 }
 
 /**
@@ -16,7 +17,7 @@ export interface PublicAccountAmounts {
  */
 export function getPublicAccountAmounts(accountInfo?: AccountInfo): PublicAccountAmounts {
     if (!accountInfo) {
-        return { total: 0n, staked: 0n, scheduled: 0n, atDisposal: 0n };
+        return { total: 0n, staked: 0n, scheduled: 0n, atDisposal: 0n, cooldown: 0n };
     }
     const total = BigInt(accountInfo.accountAmount.microCcdAmount);
     const staked =
@@ -27,5 +28,9 @@ export function getPublicAccountAmounts(accountInfo?: AccountInfo): PublicAccoun
         ? BigInt(accountInfo.accountReleaseSchedule.total.microCcdAmount)
         : 0n;
     const atDisposal = BigInt(accountInfo.accountAvailableBalance.microCcdAmount);
-    return { total, staked, scheduled, atDisposal };
+    const cooldown = accountInfo.accountCooldowns.reduce(
+        (acc, { amount: { microCcdAmount } }) => acc + microCcdAmount,
+        0n
+    );
+    return { total, staked, scheduled, atDisposal, cooldown };
 }

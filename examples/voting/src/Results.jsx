@@ -13,6 +13,7 @@ import { decodeView, decodeVotes } from './buffer';
 import { getView, getVotes } from './Wallet';
 import { REFRESH_INTERVAL } from './config';
 import Footer from './Footer';
+import './styles/Results.css';
 
 function VoteLink(props) {
     const { electionId, endsInMillis } = props;
@@ -112,7 +113,7 @@ function Results() {
     }, [votesResult]);
 
     return (
-        <Container>
+        <Container className="results-container">
             <Row>
                 <Col>
                     <h1>Results for Election {electionId}*</h1>

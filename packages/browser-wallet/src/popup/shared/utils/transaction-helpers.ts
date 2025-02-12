@@ -18,6 +18,8 @@ import {
     UpdateContractPayload,
     SimpleTransferWithMemoPayload,
     AccountInfoType,
+    convertEnergyToMicroCcd,
+    getEnergyCost,
 } from '@concordium/web-sdk';
 import {
     isValidResolutionString,
@@ -30,9 +32,14 @@ import {
 
 import i18n from '@popup/shell/i18n';
 import { useAtomValue } from 'jotai';
-import { selectedPendingTransactionsAtom } from '@popup/store/transactions';
+import { addPendingTransactionAtom, selectedPendingTransactionsAtom } from '@popup/store/transactions';
 import { DEFAULT_TRANSACTION_EXPIRY } from '@shared/constants/time';
+import { useCallback } from 'react';
+import { grpcClientAtom } from '@popup/store/settings';
+import { useUpdateAtom } from 'jotai/utils';
 import { BrowserWalletAccountTransaction, TransactionStatus } from './transaction-history-types';
+import { useBlockChainParameters } from '../BlockChainParametersProvider';
+import { usePrivateKey } from './account-helpers';
 
 export function buildSimpleTransferPayload(recipient: string, amount: bigint): SimpleTransferPayload {
     return {
@@ -246,4 +253,88 @@ export function getTransactionAmount(type: AccountTransactionType, payload: Acco
         default:
             return 0n;
     }
+}
+/** Hook which exposes a function for getting the transaction fee for a given transaction type */
+export function useGetTransactionFee() {
+    const cp = useBlockChainParameters();
+
+    return useCallback(
+        (type: AccountTransactionType, payload: AccountTransactionPayload) => {
+            if (cp === undefined) {
+                return undefined;
+            }
+            const energy = getEnergyCost(type, payload);
+            return convertEnergyToMicroCcd(energy, cp);
+        },
+        [cp]
+    );
+}
+
+/** Types of errors returned when attempting transaction submission */
+export enum TransactionSubmitErrorType {
+    InsufficientFunds = 'InsufficientFunds',
+}
+
+/** Error returned when attempting to submit a transaction using {@linkcode useTransactionSubmit} */
+export class TransactionSubmitError extends Error {
+    private constructor(public type: TransactionSubmitErrorType) {
+        super();
+        super.name = `TransactionSubmitError.${type}`;
+    }
+
+    public static insufficientFunds(): TransactionSubmitError {
+        return new TransactionSubmitError(TransactionSubmitErrorType.InsufficientFunds);
+    }
+}
+
+/**
+ * Hook returning a function to submit a transaction of the specified type from the specified sender.
+ * If successful, a pending transaction is added to the local store which will then await finalization status from the node.
+ *
+ * @param sender - The account address of the sender.
+ * @param type - The type of the account transaction.
+ *
+ * @returns A function to submit a transaction.
+ * @throws {@linkcode TransactionSubmitError}
+ */
+export function useTransactionSubmit(sender: AccountAddress.Type, type: AccountTransactionType) {
+    const grpc = useAtomValue(grpcClientAtom);
+    const key = usePrivateKey(sender.address);
+    const addPendingTransaction = useUpdateAtom(addPendingTransactionAtom);
+
+    return useCallback(
+        async (payload: AccountTransactionPayload, cost: CcdAmount.Type) => {
+            const { accountAmount, accountAvailableBalance } = await grpc.getAccountInfo(sender);
+
+            if (accountAvailableBalance.microCcdAmount < cost.microCcdAmount) {
+                throw TransactionSubmitError.insufficientFunds();
+            }
+
+            const available = [
+                AccountTransactionType.ConfigureBaker,
+                AccountTransactionType.ConfigureDelegation,
+            ].includes(type)
+                ? accountAmount
+                : accountAvailableBalance;
+            if (available.microCcdAmount < getTransactionAmount(type, payload) + (cost.microCcdAmount || 0n)) {
+                throw TransactionSubmitError.insufficientFunds();
+            }
+
+            const nonce = await grpc.getNextAccountNonce(sender);
+
+            const header = {
+                expiry: getDefaultExpiry(),
+                sender,
+                nonce: nonce.nonce,
+            };
+            const transaction = { payload, header, type };
+
+            const hash = await sendTransaction(grpc, transaction, key!);
+            const pending = createPendingTransactionFromAccountTransaction(transaction, hash, cost.microCcdAmount);
+            await addPendingTransaction(pending);
+
+            return hash;
+        },
+        [key]
+    );
 }

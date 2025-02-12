@@ -1,15 +1,12 @@
 import {
-    AccountTransactionPayload,
     AccountTransactionType,
     calculateEnergyCost,
     ConfigureDelegationPayload,
     ConfigureBakerPayload,
-    ChainParameters,
-    getAccountTransactionHandler,
-    Ratio,
+    getEnergyCost,
+    Energy,
 } from '@concordium/web-sdk';
 import { METADATAURL_MAX_LENGTH } from '@shared/constants/baking';
-import { collapseRatio, multiplyRatio } from './number-helpers';
 
 export const SIMPLE_TRANSFER_ENERGY_TOTAL_COST = 501n;
 const CONFIGURE_BAKER_WITH_KEYS_BASE_COST = 4050n;
@@ -19,21 +16,11 @@ export function determineUpdatePayloadSize(parameterSize: number, receiveName: s
     return 8n + 8n + 8n + 2n + BigInt(parameterSize) + 2n + BigInt(receiveName.length) + 1n;
 }
 
-// TODO: Replace this with helpers from SDK
-/**
- * Given a transaction type and the payload of that transaction type, return the corresponding energy cost.
- */
-export function getEnergyCost(transactionType: AccountTransactionType, payload: AccountTransactionPayload): bigint {
-    const handler = getAccountTransactionHandler(transactionType);
-    const size = handler.serialize(payload).length + 1;
-    return calculateEnergyCost(1n, BigInt(size), handler.getBaseEnergyCost(payload)).value;
-}
-
-export function getConfigureDelegationEnergyCost(payload: ConfigureDelegationPayload): bigint {
+export function getConfigureDelegationEnergyCost(payload: ConfigureDelegationPayload): Energy.Type {
     return getEnergyCost(AccountTransactionType.ConfigureDelegation, payload);
 }
 
-export function getConfigureBakerEnergyCost(payload: ConfigureBakerPayload): bigint {
+export function getConfigureBakerEnergyCost(payload: ConfigureBakerPayload): Energy.Type {
     return getEnergyCost(AccountTransactionType.ConfigureBaker, payload);
 }
 
@@ -42,35 +29,15 @@ function getFullConfigureBakerSize(urlLength: number) {
     return BigInt(1 + 2 + 8 + 1 + 1 + 32 + 32 + 96 + 64 + 64 + 64 + 2 + urlLength + 4 + 4 + 4);
 }
 
-export function getConfigureBakerMaxEnergyCost(): bigint {
+export function getConfigureBakerMaxEnergyCost(): Energy.Type {
     const maxPayloadSize = getFullConfigureBakerSize(METADATAURL_MAX_LENGTH);
-    return calculateEnergyCost(1n, maxPayloadSize, CONFIGURE_BAKER_WITH_KEYS_BASE_COST).value;
+    return calculateEnergyCost(1n, maxPayloadSize, CONFIGURE_BAKER_WITH_KEYS_BASE_COST);
 }
 
 /**
  * Returns the minimum energy cost for a configure baker transaction, where all fields are present.
  */
-export function getFullConfigureBakerMinEnergyCost(): bigint {
+export function getFullConfigureBakerMinEnergyCost(): Energy.Type {
     const minPayloadSize = getFullConfigureBakerSize(0);
-    return calculateEnergyCost(1n, minPayloadSize, CONFIGURE_BAKER_WITH_KEYS_BASE_COST).value;
-}
-
-// TODO: Replace this with helpers from SDK
-/**
- * Given the current blockchain parameters, return the microCCD per NRG exchange rate of the chain.
- * @returns the microCCD per NRG exchange rate as a ratio.
- */
-export function getExchangeRate({ euroPerEnergy, microGTUPerEuro }: ChainParameters): Ratio {
-    const denominator = BigInt(euroPerEnergy.denominator * microGTUPerEuro.denominator);
-    const numerator = BigInt(euroPerEnergy.numerator * microGTUPerEuro.numerator);
-    return { numerator, denominator };
-}
-
-// TODO: Replace this with helpers from SDK
-/**
- * Given an NRG amount and the current blockchain parameters, this returns the corresponding amount in microCcd.
- */
-export function convertEnergyToMicroCcd(cost: bigint, chainParameters: ChainParameters): bigint {
-    const rate = getExchangeRate(chainParameters);
-    return collapseRatio(multiplyRatio(rate, cost));
+    return calculateEnergyCost(1n, minPayloadSize, CONFIGURE_BAKER_WITH_KEYS_BASE_COST);
 }

@@ -125,12 +125,11 @@ $s-type-config: (
         styles: (
             newButton: (
                 font-size: 16px,
-                line-height: 20px
-            )
-        )
-    )
+                line-height: 20px,
+            ),
+        ),
+    ),
 );
-
 
 @each $cat-name, $cat-content in $s-type-config {
     @each $style-name, $style-content in map.get($cat-content, 'styles') {

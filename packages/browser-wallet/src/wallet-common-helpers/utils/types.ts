@@ -27,6 +27,7 @@ export type MakeRequired<T, K extends keyof T> = NotOptional<Pick<T, K>> & Omit<
  */
 export type EqualRecord<T> = { [P in keyof T]: P };
 
+export type Id = Pick<HTMLAttributes<HTMLElement>, 'id'>;
 export type ClassName = Pick<HTMLAttributes<HTMLElement>, 'className'>;
 export type Style = Pick<HTMLAttributes<HTMLElement>, 'style'>;
 

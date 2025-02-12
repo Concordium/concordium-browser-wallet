@@ -1,0 +1,45 @@
+.card-x {
+    display: flex;
+    flex-direction: column;
+    border-radius: rem(16px);
+    padding: rem(16px) rem(20px);
+
+    &.gradient {
+        background: $gradient-card-bg;
+    }
+
+    &.grey {
+        background: $color-transaction-bg;
+    }
+
+    &.transparent {
+        background: transparent;
+        border: 1px solid rgba($color-grey-4, 0.4);
+    }
+
+    .row {
+        display: flex;
+
+        &:not(:last-of-type) {
+            padding-bottom: rem(8px);
+            margin-bottom: rem(8px);
+            border-bottom: 1px solid rgba($color-white, 0.1);
+        }
+
+        &.details {
+            flex-direction: column;
+            max-width: 100%;
+
+            .capture__main_small {
+                color: $color-white;
+                word-break: break-word;
+
+                &:first-child {
+                    margin-bottom: rem(6px);
+                    opacity: 0.5;
+                    color: $color-mineral-3;
+                }
+            }
+        }
+    }
+}

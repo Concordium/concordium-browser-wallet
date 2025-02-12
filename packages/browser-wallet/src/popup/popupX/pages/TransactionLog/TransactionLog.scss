@@ -1,0 +1,72 @@
+.transaction-log {
+    &__date {
+        padding-top: rem(20px);
+    }
+
+    &__transaction {
+        padding: rem(12px) rem(14px) rem(10px) rem(14px);
+        border-radius: rem(12px);
+        background: $color-transaction-bg;
+        margin-top: rem(4px);
+        display: block;
+        width: 100%;
+        border: none;
+
+        .transaction {
+            .label__main {
+                color: $color-white;
+            }
+
+            &.failed .type {
+                color: $color-red-attention;
+            }
+
+            &.value,
+            &.info {
+                display: flex;
+                justify-content: space-between;
+            }
+
+            &.value .income {
+                color: $color-green-success;
+            }
+
+            &.info {
+                margin-top: rem(7px);
+                margin-bottom: rem(3px);
+            }
+
+            &.note {
+                display: flex;
+                border-top: 1px solid rgba($color-white, 0.1);
+                margin-top: rem(13px);
+                padding-top: rem(8px);
+
+                .capture__main_small {
+                    margin-left: rem(6px);
+                }
+            }
+        }
+    }
+
+    &__history {
+        padding-right: rem(8px); // 24 - scrollbar width
+
+        .capture__additional_small,
+        .capture__main_small {
+            color: rgba($color-mineral-3, 0.5);
+        }
+
+        > div {
+            position: relative;
+        }
+    }
+
+    &::-webkit-scrollbar {
+        display: block;
+    }
+}
+
+.main-layout-x__main:has(.transaction-log) {
+    padding-right: 0;
+}

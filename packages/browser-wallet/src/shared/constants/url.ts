@@ -2,9 +2,9 @@ export const spawnedPopupUrl = 'popup.html?spawned';
 export const web3IdProofPopupUrl = `${spawnedPopupUrl}&web3idproof`;
 
 const urls = {
-    termsAndConditions: 'https://developer.concordium.software/en/mainnet/net/resources/terms-and-conditions.html',
-    licenseAttributions: 'https://developer.concordium.software/en/mainnet/net/resources/bw-licenses.html',
-    zkpDocumentation: 'https://developer.concordium.software/en/mainnet/net/guides/proofs.html',
+    termsAndConditions: 'https://www.concordium.com/privacy-policy',
+    licenseAttributions: 'https://docs.concordium.com/en/mainnet/docs/guides/cryptox-terms.html',
+    zkpDocumentation: 'https://docs.concordium.com/en/mainnet/docs/guides/proofs.html',
     website: 'https://www.concordium.com',
     supportWebsite: 'https://support.concordium.software',
     documentationWebsite: 'https://developer.concordium.software/en/mainnet/index.html',

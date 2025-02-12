@@ -2,6 +2,7 @@ import React from 'react';
 import { createRoot } from 'react-dom/client';
 import { createMessageTypeFilter, InternalMessageType } from '@messaging';
 
+// import Root from './popupX/shell/Root';
 import Root from './shell/Root';
 
 import './index.scss';

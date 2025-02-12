@@ -1,0 +1,12 @@
+.validation-result-container {
+    .capture__main_small {
+        color: $color-white;
+        word-wrap: break-word;
+    }
+
+    .validation-result {
+        &__card {
+            margin-top: rem(16px);
+        }
+    }
+}

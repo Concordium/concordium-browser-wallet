@@ -1,0 +1,133 @@
+.button {
+    &__base {
+        cursor: pointer;
+        font-family: $t-font-family-satoshi;
+
+        &:focus-visible {
+            outline: 1px solid $color-white;
+            outline-offset: -1px;
+        }
+    }
+
+    &__main {
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        border: unset;
+        cursor: pointer;
+        width: 100%;
+        padding: rem(16px) 0;
+        border-radius: rem(32px);
+        background: $color-white;
+
+        &.secondary {
+            background: $color-grey-2;
+            color: $color-white;
+        }
+
+        .tablet & {
+            max-width: rem(240px);
+            margin: auto;
+        }
+    }
+
+    &__secondary {
+        display: flex;
+        align-items: center;
+        gap: rem(6px);
+        justify-content: center;
+        border: unset;
+        cursor: pointer;
+        padding: rem(4px);
+        border-radius: rem(4px);
+        width: fit-content;
+        background: $secondary-button-bg;
+
+        .capture__additional_small {
+            color: $color-black;
+        }
+
+        &.dark {
+            .capture__additional_small {
+                color: $color-white;
+            }
+
+            background-color: $color-main-bg;
+        }
+    }
+
+    &__icon,
+    &__text {
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        padding: rem(8px);
+        border-radius: rem(4px);
+        border: unset;
+        cursor: pointer;
+        background-color: $color-main-bg;
+        @include transition(background-color);
+
+        &.text {
+            display: flex;
+            align-items: center;
+            gap: rem(8px);
+
+            .label__main {
+                color: $color-white;
+            }
+
+            svg {
+                width: rem(16px);
+                height: rem(16px);
+            }
+        }
+
+        &.tile {
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            gap: rem(8px);
+            flex: 1;
+            padding: rem(14px) rem(0);
+            border-radius: rem(12px);
+            background-color: $color-transaction-bg;
+
+            .capture__additional_small {
+                color: $color-white;
+            }
+
+            svg {
+                width: rem(24px);
+                height: rem(24px);
+
+                path {
+                    fill: $color-mineral-2;
+                }
+            }
+        }
+
+        &.text,
+        &.transparent {
+            padding: unset;
+            border-radius: unset;
+            background-color: unset;
+
+            &:hover:not(:disabled) {
+                border-color: unset;
+                background-color: unset;
+                opacity: 0.5;
+            }
+        }
+
+        &:hover:not(:disabled) {
+            border-color: unset;
+            background-color: $color-main-bg-hover;
+        }
+
+        svg {
+            width: auto;
+            height: auto;
+        }
+    }
+}

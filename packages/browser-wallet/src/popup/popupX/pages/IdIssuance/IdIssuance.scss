@@ -1,0 +1,27 @@
+.id-issuance {
+    &__issuer-btn {
+        display: flex;
+        color: $color-white;
+        align-items: center;
+        padding: rem(16px);
+        gap: rem(16px);
+        border: unset;
+        border-radius: rem(12px);
+        background: $color-transaction-bg;
+        width: 100%;
+
+        &:not(:first-child) {
+            margin-top: rem(8px);
+        }
+
+        .identity-provider-icon {
+            width: rem(64px);
+            height: rem(32px);
+            object-position: center;
+            object-fit: contain;
+            background: $color-white;
+            border-radius: rem(4px);
+            padding: rem(4px);
+        }
+    }
+}
