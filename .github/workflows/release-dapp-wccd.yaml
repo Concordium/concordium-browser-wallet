@@ -44,7 +44,7 @@ jobs:
         with:
           context: ./examples/wCCD
           file: ./examples/wCCD/Dockerfile
-          tags: ${{ env.FULL_IMAGE_TAG }}-test
+          tags: ${{ env.FULL_IMAGE_TAG }}
           no-cache: true
           push: false
           build-args: |
