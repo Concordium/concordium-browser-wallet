@@ -95,6 +95,17 @@
         .receive svg {
             transform: rotate(90deg);
         }
+
+        .suspend::before {
+            content: '';
+            border: rem(4px) solid $color-red-attention;
+            border-radius: 50%;
+            position: relative;
+            top: 0;
+            right: -50%;
+            transform: translate(rem(-10px), rem(-8px));
+            margin-bottom: rem(-16px);
+        }
     }
 
     &__tokens {
@@ -180,6 +191,37 @@
                 align-self: flex-start;
                 margin-top: rem(24px);
             }
+        }
+    }
+
+    &__suspended-earn-info_button {
+        display: none;
+        justify-content: center;
+        gap: rem(8px);
+        width: rem(300px);
+        align-items: center;
+        padding: rem(12px) rem(14px) rem(12px) rem(12px);
+        border: unset;
+        border-radius: rem(12px);
+        background: $color-red-attention;
+        cursor: pointer;
+        position: absolute;
+        bottom: rem(26px);
+        left: 50%;
+        transform: translateX(-50%);
+        backdrop-filter: blur(5px);
+        box-shadow: 0 -6px 15.3px 0 rgba($color-black, 0.25);
+
+        &:first-of-type {
+            display: flex;
+        }
+
+        .capture__main_small {
+            color: $color-white;
+        }
+
+        svg path {
+            fill: $color-white;
         }
     }
 }

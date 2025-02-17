@@ -275,6 +275,9 @@ export const relativeRoutes = {
             /** Validation section */
             validator: {
                 path: 'baker',
+                config: {
+                    navBackSteps: 2,
+                },
                 /** Configure new validator */
                 register: {
                     path: 'register',
@@ -324,6 +327,10 @@ export const relativeRoutes = {
                     config: {
                         backTitle: i18n.t('x:earn.validator.submit.backTitle'),
                     },
+                },
+                /** Self-suspend info page */
+                selfSuspend: {
+                    path: 'selfSuspend',
                 },
             },
             /** Delegation section */

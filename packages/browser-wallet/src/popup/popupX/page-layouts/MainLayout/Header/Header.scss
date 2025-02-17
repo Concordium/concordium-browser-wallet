@@ -311,6 +311,14 @@
                     }
                 }
 
+                &.suspend::before {
+                    content: '';
+                    border: rem(4px) solid $color-red-attention;
+                    border-radius: 50%;
+                    position: absolute;
+                    transform: translate(rem(-12px), 0);
+                }
+
                 .account {
                     display: flex;
                     align-items: center;

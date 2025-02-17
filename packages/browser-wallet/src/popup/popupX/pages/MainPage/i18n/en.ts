@@ -15,6 +15,9 @@ const t = {
     noAccounts: 'You have no accounts in your wallet.',
     accountCreationRejected: 'Account Creation was rejected',
     error: 'Error',
+    validationSuspended: 'Your validation has been suspended',
+    validationIsPrimedForSuspension: 'Your validation is primed for suspension',
+    validatorSuspended: 'Your validator has been suspended',
 };
 
 export default t;

@@ -20,10 +20,12 @@ type FormValues = {
     seedPhraseInput: string;
 };
 
+const validateWordCount = (seedPhrase: string) => seedPhrase.split(' ').length === 24;
+
 const validateSeedPhrase =
     (message: string): Validate<string> =>
     (seedPhrase) =>
-        validateMnemonic(seedPhrase, wordlist) ? true : message;
+        !!(validateWordCount(seedPhrase) && validateMnemonic(seedPhrase, wordlist)) || message;
 export default function RestoreWallet() {
     const { t } = useTranslation('x', { keyPrefix: 'onboarding.restoreWallet' });
     const nav = useNavigate();

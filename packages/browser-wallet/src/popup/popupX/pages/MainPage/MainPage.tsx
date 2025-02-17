@@ -1,7 +1,8 @@
 import React, { ReactNode, useMemo } from 'react';
 import { generatePath, useNavigate } from 'react-router-dom';
 import { useTranslation } from 'react-i18next';
-import { useAtomValue } from 'jotai';
+import { useAtom, useAtomValue } from 'jotai';
+import clsx from 'clsx';
 import { AccountInfoType, Ratio } from '@concordium/web-sdk';
 import { absoluteRoutes, relativeRoutes } from '@popup/popupX/constants/routes';
 import Img from '@popup/shared/Img';
@@ -23,8 +24,10 @@ import Percent from '@assets/svgX/percent.svg';
 import Gear from '@assets/svgX/gear.svg';
 import Dot from '@assets/svgX/dot.svg';
 import Info from '@assets/svgX/info.svg';
+import Pause from '@assets/svgX/pause.svg';
 import Tooltip from '@popup/popupX/shared/Tooltip';
-import { credentialsAtom } from '@popup/store/account';
+import { credentialsAtom, credentialsAtomWithLoading, selectedAccountAtom } from '@popup/store/account';
+import { SuspendedStatus, useSuspendedStatus } from '@popup/popupX/shared/utils/pool-status-helpers';
 
 /** Hook loading every fungible token added to the account. */
 function useAccountFungibleTokens(account: WalletCredential) {
@@ -114,6 +117,62 @@ function TokenItem({ thumbnail, symbol, balance, balanceBase, staked, microCcdPe
     );
 }
 
+function SuspendedNavButton({ credential }: { credential: WalletCredential }) {
+    const { t } = useTranslation('x', { keyPrefix: 'mainPage' });
+    const nav = useNavigate();
+    const [, setSelectedAccount] = useAtom(selectedAccountAtom);
+    const accountInfo = useAccountInfo(credential);
+    const isSuspended = useSuspendedStatus(accountInfo);
+
+    const VALIDATION_PRIMED =
+        accountInfo?.type === AccountInfoType.Baker &&
+        isSuspended === SuspendedStatus.isPrimedForSuspension &&
+        t('validationIsPrimedForSuspension');
+    const VALIDATION_SUSPENDED =
+        accountInfo?.type === AccountInfoType.Baker &&
+        isSuspended === SuspendedStatus.suspended &&
+        t('validationSuspended');
+    const VALIDATOR_SUSPENDED =
+        accountInfo?.type === AccountInfoType.Delegator &&
+        isSuspended === SuspendedStatus.suspended &&
+        t('validatorSuspended');
+
+    const infoText = VALIDATION_PRIMED || VALIDATION_SUSPENDED || VALIDATOR_SUSPENDED;
+
+    const navToEarn = () => nav(absoluteRoutes.settings.earn.path);
+
+    const onClick = () => {
+        setSelectedAccount(credential?.address || '').then(() => navToEarn());
+    };
+
+    if (isSuspended === SuspendedStatus.notSuspended) {
+        return null;
+    }
+
+    return (
+        <Button.Base onClick={onClick} className="main-page-x__suspended-earn-info_button">
+            <Pause />
+            <Text.Capture>{infoText}</Text.Capture>
+            <Arrow />
+        </Button.Base>
+    );
+}
+
+function SuspendedEarnInfo() {
+    const credentialsLoading = useAtomValue(credentialsAtomWithLoading);
+    const credentials = credentialsLoading.value ?? [];
+
+    const filteredCredentials = credentials.filter(({ address }) => address);
+
+    return (
+        <>
+            {filteredCredentials.map((credential) => (
+                <SuspendedNavButton key={credential?.address} credential={credential} />
+            ))}
+        </>
+    );
+}
+
 type MainPageConfirmedAccountProps = { credential: ConfirmedCredential };
 
 function MainPageConfirmedAccount({ credential }: MainPageConfirmedAccountProps) {
@@ -134,6 +193,7 @@ function MainPageConfirmedAccount({ credential }: MainPageConfirmedAccountProps)
     const microCcdPerEur = chainParameters?.microGTUPerEuro;
     const accountInfo = useAccountInfo(credential);
     const tokens = useAccountFungibleTokens(credential);
+    const isSuspended = useSuspendedStatus(accountInfo);
 
     if (accountInfo === undefined) {
         return <>Loading</>;
@@ -147,7 +207,12 @@ function MainPageConfirmedAccount({ credential }: MainPageConfirmedAccountProps)
             <div className="main-page-x__action-buttons">
                 <Button.IconTile icon={<Arrow />} label={t('receive')} onClick={navToReceive} className="receive" />
                 <Button.IconTile icon={<Arrow />} label={t('send')} onClick={navToSend} className="send" />
-                <Button.IconTile icon={<Percent />} label={t('earn')} onClick={navToEarn} />
+                <Button.IconTile
+                    icon={<Percent />}
+                    label={t('earn')}
+                    onClick={navToEarn}
+                    className={clsx({ suspend: isSuspended })}
+                />
                 <Button.IconTile icon={<Clock />} label={t('activity')} onClick={navToTransactionLog} />
             </div>
             <div className="main-page-x__tokens">
@@ -180,6 +245,7 @@ function MainPageConfirmedAccount({ credential }: MainPageConfirmedAccountProps)
                     <Button.IconText onClick={navToManageToken} icon={<Gear />} label={t('manageTokenList')} />
                 </div>
             </div>
+            <SuspendedEarnInfo />
         </Page>
     );
 }

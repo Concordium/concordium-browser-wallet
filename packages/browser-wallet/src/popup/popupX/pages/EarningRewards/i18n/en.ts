@@ -25,6 +25,7 @@ const t = {
         values: {
             target: { label: 'Target', passive: 'Passive delegation', validator: 'Validator {{id}}' },
             amount: { label: 'Delegation amount' },
+            validatorId: { label: 'Validator ID' },
             redelegate: {
                 label: 'Rewards will be',
                 delegation: 'Added to delegation amount',
@@ -36,6 +37,8 @@ const t = {
             backTitle: 'to Main page',
             buttonUpdate: 'Update',
             buttonStop: 'Stop',
+            validatorSuspended: 'Your validator has been suspended',
+            validatorSuspendedInfo: 'Your delegation amount does not earn rewards until validation is resumed.',
         },
         intro: {
             '1': {
@@ -173,6 +176,14 @@ const t = {
             backTitle: 'to Main page',
             buttonUpdate: 'Update',
             buttonStop: 'Stop',
+            buttonSuspend: 'Suspend',
+            buttonResume: 'Resume',
+            validationSuspended: 'Your validation has been suspended',
+            validationSuspendedInfo:
+                'Your node does not earn rewards at the moment.\n\nTo lift the suspension and earn rewards again ensure your node is up-to-date and click “Resume”.',
+            validationIsPrimedForSuspension: 'Your validation is primed for suspension',
+            validationIsPrimedForSuspensionInfo:
+                'Your node was inactive for a number of hours. If it has been inactive for too long it will be suspended. Suspended nodes don’t earn rewards.\n\nTo prevent suspension ensure your node is up-to-date and active. Once your node is active you will no longer be primed for suspension.',
         },
         intro: {
             '1': {
@@ -186,6 +197,10 @@ const t = {
             '3': {
                 title: 'Opening a pool',
                 body: 'You have the option when adding a validator to open a staking pool or not. A staking pool allows others who want to earn rewards to do so without the need to run a node or become a validator themselves.\n\nTo do this they delegate an amount to your staking pool which then increases your total stake and your chances of winning the lottery to produce a block. At each pay day the rewards will be distributed to you and your delegators.\n\nYou can also choose not to open a pool, in which case only your own stake applies toward the lottery. You can always open or close a pool later.',
+            },
+            '4': {
+                title: 'Suspension',
+                body: 'Validators will be marked for suspension if their node is inactive for a longer period of time. \nTo prevent suspension ensure your node is up-to-date and active. Once your node is active you will no longer be primed for suspension.\n\nOnce it has been inactive for a longer period of time the validation will be suspended. \n\n<ul><li>Suspended validators don’t earn rewards</li><li>Your delegators will stop earning rewards</li><li>Your delegators will be notified about the suspension</li></ul>\nTo lift the suspension and earn rewards again ensure your node is up-to-date and click “Resume”.',
             },
         },
         register: {
@@ -214,6 +229,20 @@ const t = {
         remove: {
             title: 'Remove validator',
             notice: 'The validator stake is released after {{cooldown}} days',
+        },
+        suspend: {
+            title: 'Suspend validation',
+            notice: 'Valid from next payday',
+        },
+        resume: {
+            title: 'Resume validation',
+            notice: 'Effective from next payday',
+        },
+        selfSuspend: {
+            title: 'Important',
+            body: 'You are about to self-suspend your validation. Please be aware that:\n\n<ul><li>Suspended nodes don’t earn rewards</li><li>Your delegators will stop earning rewards</li><li>Your delegators will be notified about the suspension</li></ul>',
+            continue: 'Continue',
+            back: 'Back',
         },
         stake: {
             selectedAccount: 'on {{account}}',

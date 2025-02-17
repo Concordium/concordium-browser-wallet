@@ -42,6 +42,7 @@ import SendTransaction from '@popup/popupX/pages/prompts/SendTransaction';
 import ExternalRequestLayout from '@popup/popupX/page-layouts/ExternalRequestLayout';
 import { AddToken, ManageTokenList } from '@popup/popupX/pages/ManageTokens';
 import { Nft, NftDetails, NftRaw } from 'src/popup/popupX/pages/Nft';
+import SelfSuspend from '@popup/popupX/pages/EarningRewards/Validator/SelfSuspend';
 import { DelegationResult } from '../pages/EarningRewards/Delegator/Result';
 import SubmittedTransaction from '../pages/SubmittedTransaction';
 import { DelegatorIntro } from '../pages/EarningRewards/Delegator/Intro';
@@ -242,6 +243,10 @@ export default function Routes({ messagePromptHandlers }: { messagePromptHandler
                                     element={<UpdateValidatorKeysTransactionFlow />}
                                 />
                             </Route>
+                            <Route
+                                element={<SelfSuspend />}
+                                path={relativeRoutes.settings.earn.validator.selfSuspend.path}
+                            />
                             <Route
                                 element={<ValidationResult />}
                                 path={relativeRoutes.settings.earn.delegator.submit.path}

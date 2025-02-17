@@ -26,6 +26,17 @@ export default function ValidatorIntro() {
                     <Page.Top heading={t('3.title')} />
                     <Trans t={t} i18nKey="3.body" />
                 </Text.Capture>
+                <Text.Capture>
+                    <Page.Top heading={t('4.title')} />
+                    <Trans
+                        t={t}
+                        i18nKey="4.body"
+                        components={{
+                            ul: <ul />,
+                            li: <li />,
+                        }}
+                    />
+                </Text.Capture>
             </Carousel>
         </Page>
     );
