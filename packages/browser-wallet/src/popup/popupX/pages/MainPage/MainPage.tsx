@@ -117,59 +117,66 @@ function TokenItem({ thumbnail, symbol, balance, balanceBase, staked, microCcdPe
     );
 }
 
-function SuspendedNavButton({ credential }: { credential: WalletCredential }) {
-    const { t } = useTranslation('x', { keyPrefix: 'mainPage' });
+function useSuspendedInfo(credential: WalletCredential) {
+    const accountInfo = useAccountInfo(credential);
+    const suspendedStatus = useSuspendedStatus(accountInfo);
+
+    return { accountInfoType: accountInfo?.type, suspendedStatus, address: credential.address };
+}
+
+function SuspendedNavButton({ address, message }: { address: string; message: string }) {
     const nav = useNavigate();
     const [, setSelectedAccount] = useAtom(selectedAccountAtom);
-    const accountInfo = useAccountInfo(credential);
-    const isSuspended = useSuspendedStatus(accountInfo);
-
-    const VALIDATION_PRIMED =
-        accountInfo?.type === AccountInfoType.Baker &&
-        isSuspended === SuspendedStatus.isPrimedForSuspension &&
-        t('validationIsPrimedForSuspension');
-    const VALIDATION_SUSPENDED =
-        accountInfo?.type === AccountInfoType.Baker &&
-        isSuspended === SuspendedStatus.suspended &&
-        t('validationSuspended');
-    const VALIDATOR_SUSPENDED =
-        accountInfo?.type === AccountInfoType.Delegator &&
-        isSuspended === SuspendedStatus.suspended &&
-        t('validatorSuspended');
-
-    const infoText = VALIDATION_PRIMED || VALIDATION_SUSPENDED || VALIDATOR_SUSPENDED;
 
     const navToEarn = () => nav(absoluteRoutes.settings.earn.path);
 
     const onClick = () => {
-        setSelectedAccount(credential?.address || '').then(() => navToEarn());
+        setSelectedAccount(address || '').then(() => navToEarn());
     };
-
-    if (isSuspended === SuspendedStatus.notSuspended) {
-        return null;
-    }
 
     return (
         <Button.Base onClick={onClick} className="main-page-x__suspended-earn-info_button">
             <Pause />
-            <Text.Capture>{infoText}</Text.Capture>
+            <Text.Capture>{message}</Text.Capture>
             <Arrow />
         </Button.Base>
     );
 }
 
 function SuspendedEarnInfo() {
+    const { t } = useTranslation('x', { keyPrefix: 'mainPage' });
     const credentialsLoading = useAtomValue(credentialsAtomWithLoading);
     const credentials = credentialsLoading.value ?? [];
 
-    const filteredCredentials = credentials.filter(({ address }) => address);
+    const filteredCredentials = credentials
+        .filter(({ address }) => address)
+        .map((credential) => useSuspendedInfo(credential));
+
+    const validationSuspended = filteredCredentials.find(
+        ({ accountInfoType, suspendedStatus }) =>
+            accountInfoType === AccountInfoType.Baker && suspendedStatus === SuspendedStatus.suspended
+    );
+    const validationPrimed = filteredCredentials.find(
+        ({ accountInfoType, suspendedStatus }) =>
+            accountInfoType === AccountInfoType.Baker && suspendedStatus === SuspendedStatus.isPrimedForSuspension
+    );
+    const validatorSuspended = filteredCredentials.find(
+        ({ accountInfoType, suspendedStatus }) =>
+            accountInfoType === AccountInfoType.Delegator && suspendedStatus === SuspendedStatus.suspended
+    );
 
     return (
-        <>
-            {filteredCredentials.map((credential) => (
-                <SuspendedNavButton key={credential?.address} credential={credential} />
-            ))}
-        </>
+        <div className="main-page-x__suspended-earn-info">
+            {validationSuspended && (
+                <SuspendedNavButton address={validationSuspended.address} message={t('validationSuspended')} />
+            )}
+            {!validationSuspended && validationPrimed && (
+                <SuspendedNavButton address={validationPrimed.address} message={t('validationIsPrimedForSuspension')} />
+            )}
+            {validatorSuspended && (
+                <SuspendedNavButton address={validatorSuspended.address} message={t('validatorSuspended')} />
+            )}
+        </div>
     );
 }
 

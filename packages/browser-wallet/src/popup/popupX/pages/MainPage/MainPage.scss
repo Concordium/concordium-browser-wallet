@@ -194,34 +194,36 @@
         }
     }
 
-    &__suspended-earn-info_button {
-        display: none;
-        justify-content: center;
+    &__suspended-earn-info {
+        display: flex;
         gap: rem(8px);
-        width: rem(300px);
-        align-items: center;
-        padding: rem(12px) rem(14px) rem(12px) rem(12px);
-        border: unset;
-        border-radius: rem(12px);
-        background: $color-red-attention;
-        cursor: pointer;
+        flex-direction: column;
         position: absolute;
         bottom: rem(26px);
         left: 50%;
         transform: translateX(-50%);
-        backdrop-filter: blur(5px);
-        box-shadow: 0 -6px 15.3px 0 rgba($color-black, 0.25);
 
-        &:first-of-type {
+        &_button {
             display: flex;
-        }
+            justify-content: center;
+            gap: rem(8px);
+            width: rem(300px);
+            align-items: center;
+            padding: rem(12px) rem(14px) rem(12px) rem(12px);
+            border: unset;
+            border-radius: rem(12px);
+            background: $color-red-attention;
+            cursor: pointer;
+            backdrop-filter: blur(5px);
+            box-shadow: 0 -6px 15.3px 0 rgba($color-black, 0.25);
 
-        .capture__main_small {
-            color: $color-white;
-        }
+            .capture__main_small {
+                color: $color-white;
+            }
 
-        svg path {
-            fill: $color-white;
+            svg path {
+                fill: $color-white;
+            }
         }
     }
 }

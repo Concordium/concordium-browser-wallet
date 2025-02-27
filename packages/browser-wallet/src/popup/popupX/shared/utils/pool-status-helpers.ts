@@ -45,7 +45,7 @@ export function useSuspendedStatus(accountInfo?: AccountInfo): SuspendedStatus {
                 }
             });
         }
-    }, [accountInfo?.accountAddress?.address, accountInfo?.type]);
+    }, [accountInfo?.accountAddress?.address, accountInfo?.type, accountInfo?.accountAmount]);
 
     return suspendedStatus;
 }
