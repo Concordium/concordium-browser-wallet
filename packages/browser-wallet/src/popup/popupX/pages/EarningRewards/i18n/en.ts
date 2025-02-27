@@ -142,7 +142,7 @@ const t = {
             backTitle: 'Delegation settings',
             sender: { label: 'Sender' },
             fee: { label: 'Estimated transaction fee' },
-            button: 'Submit delegation',
+            button: 'Send',
             error: {
                 insufficientFunds: 'Insufficient funds on account',
             },
@@ -339,7 +339,7 @@ const t = {
             error: {
                 insufficientFunds: 'Insufficient funds on account',
             },
-            button: 'Submit validation',
+            button: 'Send',
         },
     },
 };
