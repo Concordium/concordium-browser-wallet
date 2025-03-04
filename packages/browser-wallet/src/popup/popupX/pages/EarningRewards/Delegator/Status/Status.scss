@@ -2,4 +2,22 @@
     .card-x + .card-x {
         margin-top: rem(8px);
     }
+
+    &__action-buttons {
+        display: flex;
+        align-items: stretch;
+        width: 100%;
+        gap: rem(6px);
+        margin-bottom: rem(16px);
+    }
+
+    .suspend-status-info {
+        margin-bottom: rem(16px);
+
+        .text__main {
+            color: $color-red-attention;
+            margin-bottom: rem(8px);
+            font-size: rem(15px);
+        }
+    }
 }

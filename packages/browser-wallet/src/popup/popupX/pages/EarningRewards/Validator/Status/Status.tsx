@@ -7,11 +7,17 @@ import { absoluteRoutes } from '@popup/popupX/constants/routes';
 import Button from '@popup/popupX/shared/Button';
 import Card from '@popup/popupX/shared/Card';
 import Page from '@popup/popupX/shared/Page';
+import Text from '@popup/popupX/shared/Text';
 import { useSelectedAccountInfo } from '@popup/shared/AccountInfoListenerContext/AccountInfoListenerContext';
 import { useBlockChainParametersAboveV0 } from '@popup/shared/BlockChainParametersProvider';
 
+import Stop from '@assets/svgX/stop-square.svg';
+import Arrows from '@assets/svgX/arrows-clockwise.svg';
+import Pause from '@assets/svgX/pause.svg';
+import Play from '@assets/svgX/play.svg';
+import { SuspendedStatus, useSuspendedStatus } from '@popup/popupX/shared/utils/pool-status-helpers';
 import AccountCooldowns from '../../AccountCooldowns';
-import { showValidatorRestake, showValidatorAmount, showValidatorOpenStatus, isRange } from '../util';
+import { isRange, showValidatorAmount, showValidatorOpenStatus, showValidatorRestake } from '../util';
 import { ValidationResultLocationState } from '../Result';
 
 const REMOVE_STATE: ValidationResultLocationState = {
@@ -19,11 +25,38 @@ const REMOVE_STATE: ValidationResultLocationState = {
     payload: { stake: CcdAmount.zero() },
 };
 
+const RESUME_STATE: ValidationResultLocationState = {
+    type: 'resume',
+    payload: { suspended: false },
+};
+
+function SuspendedStatusInfo({ suspendedStatus }: { suspendedStatus: SuspendedStatus }) {
+    const { t } = useTranslation('x', { keyPrefix: 'earn.validator.status' });
+    if (suspendedStatus === SuspendedStatus.isPrimedForSuspension) {
+        return (
+            <Card className="suspend-status-info">
+                <Text.Main>{t('validationIsPrimedForSuspension')}</Text.Main>
+                <Text.Capture>{t('validationIsPrimedForSuspensionInfo')}</Text.Capture>
+            </Card>
+        );
+    }
+    if (suspendedStatus === SuspendedStatus.suspended) {
+        return (
+            <Card className="suspend-status-info">
+                <Text.Main>{t('validationSuspended')}</Text.Main>
+                <Text.Capture>{t('validationSuspendedInfo')}</Text.Capture>
+            </Card>
+        );
+    }
+    return null;
+}
+
 export default function ValidatorStatus() {
     const { t } = useTranslation('x', { keyPrefix: 'earn.validator' });
     const accountInfo = useSelectedAccountInfo();
     const nav = useNavigate();
     const chainParams = useBlockChainParametersAboveV0();
+    const suspendedStatus = useSuspendedStatus(accountInfo);
 
     if (accountInfo?.type !== AccountInfoType.Baker) {
         return <Navigate to={absoluteRoutes.settings.earn.path} />;
@@ -39,6 +72,33 @@ export default function ValidatorStatus() {
     return (
         <Page className="validator-status">
             <Page.Top heading={t('status.title')} />
+            <SuspendedStatusInfo suspendedStatus={suspendedStatus} />
+            <div className="validator-status__action-buttons">
+                <Button.IconTile
+                    icon={<Stop />}
+                    label={t('status.buttonStop')}
+                    onClick={() => nav(absoluteRoutes.settings.earn.validator.submit.path, { state: REMOVE_STATE })}
+                />
+                <Button.IconTile
+                    icon={<Arrows />}
+                    label={t('status.buttonUpdate')}
+                    onClick={() => nav(absoluteRoutes.settings.earn.validator.update.path)}
+                />
+                {suspendedStatus === SuspendedStatus.suspended ? (
+                    <Button.IconTile
+                        icon={<Play />}
+                        label={t('status.buttonResume')}
+                        onClick={() => nav(absoluteRoutes.settings.earn.validator.submit.path, { state: RESUME_STATE })}
+                    />
+                ) : (
+                    <Button.IconTile
+                        icon={<Pause />}
+                        label={t('status.buttonSuspend')}
+                        onClick={() => nav(absoluteRoutes.settings.earn.validator.selfSuspend.path)}
+                    />
+                )}
+            </div>
+            <AccountCooldowns cooldowns={accountCooldowns} />
             <Card>
                 <Card.Row>
                     <Card.RowDetails
@@ -52,9 +112,6 @@ export default function ValidatorStatus() {
                         value={showValidatorRestake(accountBaker.restakeEarnings)}
                     />
                 </Card.Row>
-            </Card>
-            <AccountCooldowns cooldowns={accountCooldowns} />
-            <Card>
                 <Card.Row>
                     <Card.RowDetails title={t('values.id.label')} value={accountBaker.bakerId.toString()} />
                 </Card.Row>
@@ -95,17 +152,6 @@ export default function ValidatorStatus() {
                     </Card.Row>
                 )}
             </Card>
-            <Page.Footer>
-                <Button.Main
-                    className="m-t-10"
-                    label={t('status.buttonUpdate')}
-                    onClick={() => nav(absoluteRoutes.settings.earn.validator.update.path)}
-                />
-                <Button.Main
-                    label={t('status.buttonStop')}
-                    onClick={() => nav(absoluteRoutes.settings.earn.validator.submit.path, { state: REMOVE_STATE })}
-                />
-            </Page.Footer>
         </Page>
     );
 }

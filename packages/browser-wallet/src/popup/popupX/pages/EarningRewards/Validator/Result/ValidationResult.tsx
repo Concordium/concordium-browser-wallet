@@ -32,7 +32,7 @@ import {
 
 export type ValidationResultLocationState = {
     payload: ConfigureBakerPayload;
-    type: 'register' | 'change' | 'remove';
+    type: 'register' | 'change' | 'remove' | 'suspend' | 'resume';
 };
 
 export default function ValidationResult() {
@@ -72,6 +72,10 @@ export default function ValidationResult() {
                 return [t('update.title'), t('update.lowerStakeNotice', { cooldown })];
             case 'remove':
                 return [t('remove.title'), t('remove.notice', { cooldown })];
+            case 'suspend':
+                return [t('suspend.title'), t('suspend.notice')];
+            case 'resume':
+                return [t('resume.title'), t('resume.notice')];
             default:
                 throw new Error("'type' must be defined on route state");
         }

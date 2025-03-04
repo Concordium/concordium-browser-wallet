@@ -6,7 +6,8 @@ export function cpBakingThreshold(cp: ChainParameters): CcdAmount.Type {
             return cp.minimumThresholdForBaking;
         }
         case 1:
-        case 2: {
+        case 2:
+        case 3: {
             return cp.minimumEquityCapital;
         }
         default:

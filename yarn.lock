@@ -2172,7 +2172,7 @@ __metadata:
     "@babel/core": ^7.18.2
     "@concordium/browser-wallet-api-helpers": "workspace:^"
     "@concordium/common-sdk": ^9.5.3
-    "@concordium/web-sdk": ^8.1.1
+    "@concordium/web-sdk": ^9.0.0
     "@craftamap/esbuild-plugin-html": ^0.4.0
     "@floating-ui/react": ^0.27.2
     "@mdx-js/react": ^1.6.22
@@ -2334,9 +2334,9 @@ __metadata:
   languageName: node
   linkType: hard
 
-"@concordium/web-sdk@patch:@concordium/web-sdk@npm:^8.1.1#.yarn/patches/@concordium-web-sdk-npm-8.1.0-468ad0a8b1.patch::locator=concordium-browser-wallet%40workspace%3A.":
-  version: 8.1.1
-  resolution: "@concordium/web-sdk@patch:@concordium/web-sdk@npm%3A8.1.1#.yarn/patches/@concordium-web-sdk-npm-8.1.0-468ad0a8b1.patch::version=8.1.1&hash=9a8329&locator=concordium-browser-wallet%40workspace%3A."
+"@concordium/web-sdk@npm:^9.0.0":
+  version: 9.0.0
+  resolution: "@concordium/web-sdk@npm:9.0.0"
   dependencies:
     "@concordium/rust-bindings": ^3.2.1
     "@grpc/grpc-js": ^1.9.4
@@ -2356,7 +2356,33 @@ __metadata:
     uuid: ^8.3.2
   peerDependencies:
     "@protobuf-ts/runtime-rpc": ^2.8.2
-  checksum: 30bbceee16c9706c3dd820e66b10c6c26898abe80a830c5140a662f89cc291c75d6f24a745bc8c8393e498571e528f0e3087e8a8a3afd4d885e0a99651898ad0
+  checksum: b05207084046ddd0c4e26e935024449e8646837e22d743660cfb6b7bfc9375dd8e6ed4743f901d21735eec783e21be1f26add39405aa08aea5d5f24b6e81aa83
+  languageName: node
+  linkType: hard
+
+"@concordium/web-sdk@patch:@concordium/web-sdk@npm:^9.0.0#.yarn/patches/@concordium-web-sdk-npm-8.1.0-468ad0a8b1.patch::locator=concordium-browser-wallet%40workspace%3A.":
+  version: 9.0.0
+  resolution: "@concordium/web-sdk@patch:@concordium/web-sdk@npm%3A9.0.0#.yarn/patches/@concordium-web-sdk-npm-8.1.0-468ad0a8b1.patch::version=9.0.0&hash=9a8329&locator=concordium-browser-wallet%40workspace%3A."
+  dependencies:
+    "@concordium/rust-bindings": ^3.2.1
+    "@grpc/grpc-js": ^1.9.4
+    "@noble/ed25519": ^2.0.0
+    "@noble/hashes": ^1.3.2
+    "@protobuf-ts/grpc-transport": ^2.9.1
+    "@protobuf-ts/grpcweb-transport": ^2.9.1
+    "@protobuf-ts/runtime-rpc": ^2.8.2
+    "@scure/bip39": ^1.2.1
+    "@types/big.js": ^6.2.0
+    big.js: ^6.2.0
+    bs58check: ^3.0.1
+    buffer: ^6.0.3
+    hash.js: ^1.1.7
+    iso-3166-1: ^2.1.1
+    json-bigint: ^1.0.0
+    uuid: ^8.3.2
+  peerDependencies:
+    "@protobuf-ts/runtime-rpc": ^2.8.2
+  checksum: db352835ad271f4f52474af4e7cacb82190aeb0e022f346795ccd232ed7ed7e54aad4763ba1763b0ffbab1e519e622aecb255ef4a61bf0724e88297c5bebfbd8
   languageName: node
   linkType: hard
 
@@ -7054,7 +7080,7 @@ __metadata:
   resolution: "NFT-Minting@workspace:examples/nft-minting"
   dependencies:
     "@concordium/browser-wallet-api-helpers": "workspace:^"
-    "@concordium/web-sdk": ^8.1.1
+    "@concordium/web-sdk": ^9.0.0
     "@craftamap/esbuild-plugin-html": ^0.4.0
     "@types/react": ^18.0.9
     "@types/react-dom": ^18.0.5
@@ -9923,7 +9949,7 @@ __metadata:
   resolution: "e_sealing@workspace:examples/eSealing"
   dependencies:
     "@concordium/react-components": ^0.4.0
-    "@concordium/web-sdk": ^8.1.1
+    "@concordium/web-sdk": ^9.0.0
     "@thi.ng/leb128": ^2.1.18
     "@types/node": ^18.7.23
     "@types/react": ^18.0.9
@@ -16102,7 +16128,7 @@ __metadata:
   resolution: "piggybank@workspace:examples/piggybank"
   dependencies:
     "@concordium/browser-wallet-api-helpers": "workspace:^"
-    "@concordium/web-sdk": ^8.1.1
+    "@concordium/web-sdk": ^9.0.0
     "@types/react": ^18.0.9
     "@types/react-dom": ^18.0.5
     "@vitejs/plugin-react-swc": ^3.4.0
@@ -20162,7 +20188,7 @@ __metadata:
   resolution: "voting@workspace:examples/voting"
   dependencies:
     "@concordium/browser-wallet-api-helpers": ^3.0.0
-    "@concordium/web-sdk": ^8.1.1
+    "@concordium/web-sdk": ^9.0.0
     "@types/node": ^18.7.23
     "@types/react": ^18.0.9
     "@types/react-dom": ^18.0.5
@@ -20256,7 +20282,7 @@ __metadata:
   resolution: "wccd@workspace:examples/wCCD"
   dependencies:
     "@concordium/react-components": ^0.4.0
-    "@concordium/web-sdk": ^8.1.1
+    "@concordium/web-sdk": ^9.0.0
     "@thi.ng/leb128": ^2.1.18
     "@types/node": ^18.7.23
     "@types/react": ^18.0.9

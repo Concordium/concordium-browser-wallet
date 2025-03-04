@@ -17,6 +17,7 @@ import clsx from 'clsx';
 import Text from '@popup/popupX/shared/Text';
 import { AccountInfoType } from '@concordium/web-sdk';
 import { useCopyAddress } from '@popup/popupX/shared/utils/hooks';
+import { useSuspendedStatus } from '@popup/popupX/shared/utils/pool-status-helpers';
 
 function shortNumber(number: number | string): string {
     return number.toLocaleString('en-US', {
@@ -73,11 +74,61 @@ function Earning({ credential }: { credential: WalletCredential }) {
     return null;
 }
 
+function AccountRow({
+    credential,
+    selectedAccount,
+    onAccountClick,
+}: {
+    credential: WalletCredential;
+    selectedAccount?: string;
+    onAccountClick: () => void;
+}) {
+    const accountInfo = useAccountInfo(credential);
+    const isSuspended = useSuspendedStatus(accountInfo);
+    const copyAddressToClipboard = useCopyAddress();
+
+    const copyAddress = (event: React.MouseEvent<HTMLButtonElement, MouseEvent>, address: string) => {
+        event.stopPropagation();
+        copyAddressToClipboard(address);
+    };
+
+    return (
+        <Button.Base
+            className={clsx('main-header__account-selector_list-item', {
+                active: credential.address === selectedAccount,
+                suspend: isSuspended,
+            })}
+            onClick={onAccountClick}
+        >
+            <div className="account">
+                {credential.address === selectedAccount && <CarretRight />}
+                <Text.AdditionalSmall>{displayNameOrSplitAddress(credential)}</Text.AdditionalSmall>
+            </div>
+            <div className="balance">
+                <Text.AdditionalSmall>
+                    <CcdBalance credential={credential} />
+                </Text.AdditionalSmall>
+            </div>
+            <div className="earning">
+                <Earning credential={credential} />
+            </div>
+            <div className="copy">
+                <Button.Base
+                    as="span"
+                    className="transparent button__icon"
+                    onClick={(event) => copyAddress(event, credential.address)}
+                >
+                    <Copy />
+                </Button.Base>
+            </div>
+        </Button.Base>
+    );
+}
+
 export default function AccountSelector({ showAccountSelector, onUpdateSelectedAccount }: Props) {
     const { t } = useTranslation('x', { keyPrefix: 'header.accountSelector' });
     const credentialsLoading = useAtomValue(credentialsAtomWithLoading);
     const [selectedAccount, setSelectedAccount] = useAtom(selectedAccountAtom);
-    const copyAddressToClipboard = useCopyAddress();
     const [search, setSearch] = useState('');
     const [ascSort, setAscSort] = useState(true);
     const credentials = credentialsLoading.value ?? [];
@@ -96,11 +147,6 @@ export default function AccountSelector({ showAccountSelector, onUpdateSelectedA
     const onAccountClick = (address: string) => () => {
         setSelectedAccount(address);
         onUpdateSelectedAccount();
-    };
-
-    const copyAddress = (event: React.MouseEvent<HTMLButtonElement, MouseEvent>, address: string) => {
-        event.stopPropagation();
-        copyAddressToClipboard(address);
     };
 
     if (!showAccountSelector) return null;
@@ -122,35 +168,12 @@ export default function AccountSelector({ showAccountSelector, onUpdateSelectedA
                 </div>
                 <div className="main-header__account-selector_list">
                     {sorted.map((credential) => (
-                        <Button.Base
+                        <AccountRow
                             key={credential.credId}
-                            className={clsx('main-header__account-selector_list-item', {
-                                active: credential.address === selectedAccount,
-                            })}
-                            onClick={onAccountClick(credential.address)}
-                        >
-                            <div className="account">
-                                {credential.address === selectedAccount && <CarretRight />}
-                                <Text.AdditionalSmall>{displayNameOrSplitAddress(credential)}</Text.AdditionalSmall>
-                            </div>
-                            <div className="balance">
-                                <Text.AdditionalSmall>
-                                    <CcdBalance credential={credential} />
-                                </Text.AdditionalSmall>
-                            </div>
-                            <div className="earning">
-                                <Earning credential={credential} />
-                            </div>
-                            <div className="copy">
-                                <Button.Base
-                                    as="span"
-                                    className="transparent button__icon"
-                                    onClick={(event) => copyAddress(event, credential.address)}
-                                >
-                                    <Copy />
-                                </Button.Base>
-                            </div>
-                        </Button.Base>
+                            credential={credential}
+                            selectedAccount={selectedAccount}
+                            onAccountClick={onAccountClick(credential.address)}
+                        />
                     ))}
                 </div>
             </div>

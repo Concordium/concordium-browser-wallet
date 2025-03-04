@@ -1,5 +1,21 @@
 # Changelog
 
+## Unreleased
+
+### Added
+
+-   Updated version of @concordium/web-sdk to ver.-9 (with new protocol8 update)
+-   New info cards 'validation is primed for suspension' and 'validation is suspended' for Validators
+-   New info cards 'validator suspended' for Delegators
+-   New page with description of self-suspend action
+-   Added action to suspend/resume validation
+-   Suspended and primed for suspension validator accounts are marked with red dot at accounts list and Main page. Additionally, delegators with suspended target validators also marked.
+-   Info notification at the Main page, about validator suspension
+
+### Fixed
+
+-   Fixed earn status screen 'Nav back button' redirect to main page
+
 ## 2.0.2
 
 ### Fixed
