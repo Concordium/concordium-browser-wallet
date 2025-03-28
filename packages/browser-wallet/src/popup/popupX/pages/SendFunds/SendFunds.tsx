@@ -9,6 +9,7 @@ import {
     CcdAmount,
     Energy,
     SimpleTransferPayload,
+    SimpleTransferWithMemoPayload,
 } from '@concordium/web-sdk';
 import { useAsyncMemo } from 'wallet-common-helpers';
 import { useAtomValue } from 'jotai';
@@ -22,7 +23,7 @@ import Form, { useForm } from '@popup/popupX/shared/Form';
 import { useAccountInfo } from '@popup/shared/AccountInfoListenerContext';
 import { useGetTransactionFee } from '@popup/shared/utils/transaction-helpers';
 import { TokenPickerVariant } from '@popup/popupX/shared/Form/TokenAmount/View';
-import { parseTokenAmount } from '@popup/popupX/shared/utils/helpers';
+import { encodeMemo, parseTokenAmount } from '@popup/popupX/shared/utils/helpers';
 import { grpcClientAtom } from '@popup/store/settings';
 import { logError } from '@shared/utils/log-helpers';
 import FullscreenNotice from '@popup/popupX/shared/FullscreenNotice';
@@ -45,7 +46,7 @@ function SendFunds({ address }: SendFundsProps) {
         },
     });
     const accountInfo = useAccountInfo(credential);
-    const [token, amount] = form.watch(['token', 'amount']);
+    const [token, amount, memo] = form.watch(['token', 'amount', 'memo']);
     const contractClient = useAsyncMemo(
         async () => {
             if (token?.tokenType !== 'cis2') {
@@ -87,6 +88,15 @@ function SendFunds({ address }: SendFundsProps) {
                 return getFee(AccountTransactionType.Update, payload);
             }
             if (token?.tokenType === 'ccd') {
+                if (memo) {
+                    const payloadWithMemo: SimpleTransferWithMemoPayload = {
+                        amount: CcdAmount.zero(),
+                        toAddress: AccountAddress.fromBuffer(new Uint8Array(32)),
+                        memo: encodeMemo(memo),
+                    };
+                    return getFee(AccountTransactionType.TransferWithMemo, payloadWithMemo);
+                }
+
                 const payload: SimpleTransferPayload = {
                     amount: CcdAmount.zero(),
                     toAddress: AccountAddress.fromBuffer(new Uint8Array(32)),
@@ -97,7 +107,7 @@ function SendFunds({ address }: SendFundsProps) {
             return undefined;
         },
         logError,
-        [token, address, amount, contractClient]
+        [token, address, amount, memo, contractClient]
     );
 
     const [showConfirmationPage, setShowConfirmationPage] = useState(false);
@@ -113,31 +123,34 @@ function SendFunds({ address }: SendFundsProps) {
                 {fee && <SendFundsConfirm sender={address} values={form.getValues()} fee={fee} />}
             </FullscreenNotice>
             <Page className="send-funds-container">
-                <Page.Top heading={t('sendFunds')}>
-                    <Text.Capture className="m-l-5 m-t-neg-5">
-                        {t('from', { name: displayNameAndSplitAddress(credential) })}
-                    </Text.Capture>
-                </Page.Top>
-                <Form formMethods={form} onSubmit={onSubmit}>
-                    {() => (
-                        <TokenAmount
-                            buttonMaxLabel={t('sendMax')}
-                            receiver
-                            fee={fee ?? CcdAmount.zero()}
-                            form={form}
-                            accountInfo={accountInfo}
-                            {...state}
-                        />
-                    )}
-                </Form>
-                {/*
-                <div className="send-funds__memo">
-                    <Plus />
-                    <span className="label__main">Add memo</span>
+                <div className="send-funds-scroll-wrapper">
+                    <Page.Top heading={t('sendFunds')}>
+                        <Text.Capture className="m-l-5 m-t-neg-5">
+                            {t('from', { name: displayNameAndSplitAddress(credential) })}
+                        </Text.Capture>
+                    </Page.Top>
+                    <Page.Main>
+                        <Form formMethods={form} onSubmit={onSubmit}>
+                            {() => (
+                                <TokenAmount
+                                    buttonMaxLabel={t('sendMax')}
+                                    receiver
+                                    fee={fee ?? CcdAmount.zero()}
+                                    form={form}
+                                    accountInfo={accountInfo}
+                                    {...state}
+                                />
+                            )}
+                        </Form>
+                    </Page.Main>
                 </div>
-            */}
                 <Page.Footer>
-                    <Button.Main className="button-main" onClick={form.handleSubmit(onSubmit)} label="Continue" />
+                    <Button.Main
+                        disabled={!form.formState.isValid}
+                        className="button-main"
+                        onClick={form.handleSubmit(onSubmit)}
+                        label={t('continue')}
+                    />
                 </Page.Footer>
             </Page>
         </>

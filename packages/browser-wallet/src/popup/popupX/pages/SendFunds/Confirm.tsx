@@ -8,6 +8,7 @@ import {
     CcdAmount,
     Energy,
     SimpleTransferPayload,
+    SimpleTransferWithMemoPayload,
     TransactionHash,
 } from '@concordium/web-sdk';
 import { useAsyncMemo } from 'wallet-common-helpers';
@@ -17,6 +18,7 @@ import { useNavigate } from 'react-router-dom';
 import Page from '@popup/popupX/shared/Page';
 import Text from '@popup/popupX/shared/Text';
 import Arrow from '@assets/svgX/arrow-right.svg';
+import Note from '@assets/svgX/note.svg';
 import Card from '@popup/popupX/shared/Card';
 import {
     displayNameAndSplitAddress,
@@ -26,7 +28,7 @@ import {
 import { AmountReceiveForm } from '@popup/popupX/shared/Form/TokenAmount/View';
 import { ensureDefined } from '@shared/utils/basic-helpers';
 import { CCD_METADATA } from '@shared/constants/token-metadata';
-import { formatCcdAmount, parseCcdAmount, parseTokenAmount } from '@popup/popupX/shared/utils/helpers';
+import { encodeMemo, formatCcdAmount, parseCcdAmount, parseTokenAmount } from '@popup/popupX/shared/utils/helpers';
 import { useTransactionSubmit } from '@popup/shared/utils/transaction-helpers';
 import Button from '@popup/popupX/shared/Button';
 import { grpcClientAtom } from '@popup/store/settings';
@@ -38,6 +40,16 @@ import {
     CIS2TransferSubmittedLocationState,
     SubmittedTransactionLocationState,
 } from '../SubmittedTransaction/SubmittedTransaction';
+
+const getTransactionType = (tokenType: string, memo?: string) => {
+    if (tokenType === 'ccd') {
+        if (memo) {
+            return AccountTransactionType.TransferWithMemo;
+        }
+        return AccountTransactionType.Transfer;
+    }
+    return AccountTransactionType.Update;
+};
 
 type Props = {
     sender: AccountAddress.Type;
@@ -57,10 +69,8 @@ export default function SendFundsConfirm({ values, fee, sender }: Props) {
         return showToken(tokenMetadata, values.token.tokenAddress);
     }, [tokenMetadata, values.token]);
     const receiver = AccountAddress.fromBase58(values.receiver);
-    const submitTransaction = useTransactionSubmit(
-        sender,
-        values.token.tokenType === 'ccd' ? AccountTransactionType.Transfer : AccountTransactionType.Update
-    );
+    const transactionType = getTransactionType(values.token.tokenType, values.memo);
+    const submitTransaction = useTransactionSubmit(sender, transactionType);
     const grpcClient = useAtomValue(grpcClientAtom);
     const contractClient = useAsyncMemo(
         async () => {
@@ -96,13 +106,22 @@ export default function SendFundsConfirm({ values, fee, sender }: Props) {
                     amount: parseCcdAmount(values.amount),
                     toAddress: receiver,
                 };
+
+                if (values.memo) {
+                    const payloadWithMemo: SimpleTransferWithMemoPayload = {
+                        ...p,
+                        memo: encodeMemo(values.memo),
+                    };
+                    return payloadWithMemo;
+                }
+
                 return p;
             }
 
             return undefined;
         },
         logError,
-        [values.token, sender, values.receiver, contractClient]
+        [values.token, sender, values.receiver, values.memo, contractClient]
     );
 
     const submit = async () => {
@@ -113,7 +132,7 @@ export default function SendFundsConfirm({ values, fee, sender }: Props) {
         const tx = await submitTransaction(payload, fee);
         const state: CIS2TransferSubmittedLocationState | SubmittedTransactionLocationState =
             values.token.tokenType === 'ccd'
-                ? { transactionType: AccountTransactionType.Transfer, payload }
+                ? { transactionType, payload, fee }
                 : {
                       updateType: 'cis2.transfer',
                       amount: values.amount,
@@ -141,6 +160,12 @@ export default function SendFundsConfirm({ values, fee, sender }: Props) {
                 </Text.Capture>
                 <Text.HeadingLarge>{values.amount}</Text.HeadingLarge>
                 <Text.Capture>{t('estimatedFee', { fee: formatCcdAmount(fee) })}</Text.Capture>
+                {values.memo && (
+                    <div className="send-funds-confirm__card_memo">
+                        <Note />
+                        <Text.MainMedium>{values.memo}</Text.MainMedium>
+                    </div>
+                )}
             </Card>
 
             <Page.Footer>

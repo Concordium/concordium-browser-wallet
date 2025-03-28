@@ -42,6 +42,7 @@ const t = {
         from: 'From address',
         to: 'To address',
         events: 'Events',
+        memo: 'Memo',
         rejectReason: 'Reject reason',
     },
 };

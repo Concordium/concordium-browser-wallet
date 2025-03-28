@@ -73,6 +73,9 @@ const t = {
                 configureBaker: 'Configure validator',
             },
         },
+        memo: {
+            overLimit: 'Over character limit',
+        },
     },
     delegation: {
         amount: 'Delegation amount',

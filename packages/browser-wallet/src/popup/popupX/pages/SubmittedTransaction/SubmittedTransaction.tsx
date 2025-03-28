@@ -21,8 +21,10 @@ import {
     AccountTransactionPayload,
     AccountTransactionType,
     SimpleTransferPayload,
+    SimpleTransferWithMemoPayload,
     ConfigureBakerPayload,
     ConfigureDelegationPayload,
+    CcdAmount,
 } from '@concordium/web-sdk';
 import { useAtomValue } from 'jotai';
 import { grpcClientAtom } from '@popup/store/settings';
@@ -36,6 +38,7 @@ const TX_TIMEOUT = 60 * 1000; // 1 minute
 export type SubmittedTransactionLocationState = {
     transactionType: AccountTransactionType;
     payload: AccountTransactionPayload;
+    fee?: CcdAmount.Type;
 };
 
 type DelegationBodyProps = {
@@ -115,20 +118,17 @@ function ValidatorBody({ success, payload }: ValidatorBodyProps) {
 }
 
 type TransferBodyProps = {
-    success: boolean | undefined;
+    fee?: CcdAmount.Type;
     payload: SimpleTransferPayload;
 };
 
-function TransferBody({ payload, success }: TransferBodyProps) {
+function TransferBody({ payload, fee }: TransferBodyProps) {
     const { t } = useTranslation('x', { keyPrefix: 'submittedTransaction.transfer' });
     return (
         <>
-            <Text.Capture>
-                {success === true && t('success')}
-                {success === false && t('error')}
-            </Text.Capture>
+            <Text.Capture>{t('amountCcd')}</Text.Capture>
             <Text.HeadingLarge>{formatCcdAmount(payload.amount)}</Text.HeadingLarge>
-            <Text.Capture>CCD</Text.Capture>
+            {fee && <Text.Capture>{t('estimatedFee', { fee: formatCcdAmount(fee) })}</Text.Capture>}
         </>
     );
 }
@@ -224,11 +224,12 @@ function TransactionStatus({ success }: TransactionStatusProps) {
     return (
         <>
             {icon}
-            {/* The same label is shown for all transactions while pending */}
-            {success === undefined && <Text.Capture>{t('pending.label')}</Text.Capture>}
             {/* Each individual body handles success/failure */}
             {state.transactionType === AccountTransactionType.Transfer && (
-                <TransferBody success={success} payload={state.payload as SimpleTransferPayload} />
+                <TransferBody fee={state.fee} payload={state.payload as SimpleTransferPayload} />
+            )}
+            {state.transactionType === AccountTransactionType.TransferWithMemo && (
+                <TransferBody fee={state.fee} payload={state.payload as SimpleTransferWithMemoPayload} />
             )}
             {state.transactionType === AccountTransactionType.ConfigureDelegation && (
                 <DelegationBody success={success} payload={state.payload as ConfigureDelegationPayload} />

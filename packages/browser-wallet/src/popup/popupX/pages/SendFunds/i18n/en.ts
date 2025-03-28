@@ -5,6 +5,7 @@ const t = {
     amount: 'Amount',
     sendMax: 'Send max.',
     estimatedFee: 'Est. fee: {{fee}} CCD',
+    continue: 'Continue',
     confirmation: {
         title: 'Confirmation',
     },

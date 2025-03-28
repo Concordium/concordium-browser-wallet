@@ -1,6 +1,15 @@
 /* eslint-disable @typescript-eslint/no-explicit-any */
 /* eslint-disable react/destructuring-assignment */
-import React, { InputHTMLAttributes, ReactNode, forwardRef, useCallback, useEffect, useMemo } from 'react';
+import React, {
+    InputHTMLAttributes,
+    ReactNode,
+    forwardRef,
+    useCallback,
+    useEffect,
+    useMemo,
+    useRef,
+    useState,
+} from 'react';
 import { UseFormReturn, Validate } from 'react-hook-form';
 import { useTranslation } from 'react-i18next';
 import clsx from 'clsx';
@@ -10,12 +19,16 @@ import { CIS2, CcdAmount, ContractAddress } from '@concordium/web-sdk';
 import { CCD_METADATA } from '@shared/constants/token-metadata';
 import { ensureDefined } from '@shared/utils/basic-helpers';
 import ConcordiumLogo from '@assets/svgX/concordium-logo.svg';
-import { validateAccountAddress, validateTransferAmount } from '@popup/shared/utils/transaction-helpers';
+import {
+    validateAccountAddress,
+    validateMemoByteLength,
+    validateTransferAmount,
+} from '@popup/shared/utils/transaction-helpers';
 import { TokenMetadata } from '@shared/storage/types';
 import Img, { DEFAULT_FAILED } from '@popup/shared/Img';
 import Text from '@popup/popupX/shared/Text';
 
-import { RequiredControlledFieldProps, RequiredUncontrolledFieldProps } from '../common/types';
+import { CommonFieldProps, RequiredControlledFieldProps, RequiredUncontrolledFieldProps } from '../common/types';
 import { makeControlled, makeUncontrolled } from '../common/utils';
 import Button from '../../Button';
 import { formatTokenAmount, parseTokenAmount, removeNumberGrouping } from '../../utils/helpers';
@@ -51,7 +64,7 @@ const InputClear = forwardRef<HTMLInputElement, AmountInputProps>(
 const FormInputClear = makeUncontrolled(InputClear);
 
 type ReceiverInputProps = Pick<
-    InputHTMLAttributes<HTMLTextAreaElement>,
+    InputHTMLAttributes<HTMLInputElement>,
     'className' | 'value' | 'onChange' | 'onBlur' | 'autoFocus' | 'placeholder'
 > &
     RequiredUncontrolledFieldProps<HTMLInputElement>;
@@ -60,9 +73,9 @@ type ReceiverInputProps = Pick<
  * @description
  * Use as a normal \<textarea /\>.
  */
-const ReceiverInput = forwardRef<HTMLTextAreaElement, ReceiverInputProps>(({ error, className, ...props }, ref) => {
+const ReceiverInput = forwardRef<HTMLInputElement, ReceiverInputProps>(({ error, className, ...props }, ref) => {
     return (
-        <textarea
+        <input
             className={clsx('token-amount_field', error !== undefined && 'token-amount_field--invalid', className)}
             ref={ref}
             autoComplete="off"
@@ -73,6 +86,93 @@ const ReceiverInput = forwardRef<HTMLTextAreaElement, ReceiverInputProps>(({ err
 });
 
 const FormReceiverInput = makeUncontrolled(ReceiverInput);
+
+interface MemoInputProps extends CommonFieldProps, RequiredControlledFieldProps {
+    onChange?(value: string | undefined): void;
+    placeholder?: string;
+    className?: string;
+}
+
+function MemoInput({ error, className, onChange, placeholder }: MemoInputProps) {
+    const MAX_CHAR_LIMIT = 255;
+    const ref = useRef<HTMLDivElement>(null);
+    const [charLimit, setCharLimit] = useState(MAX_CHAR_LIMIT);
+    const [memoText, setMemoText] = useState('');
+    const [[mainText, overText], setText] = useState(['', '']);
+
+    // Text can be pasted in to field and/or contain symbols that encoded in two utf-8 char
+    // iterates through text to find exact point where it is over char limit
+    const findCharLimitCount = (text: string) => {
+        for (let i = 0; i < text.length; i += 1) {
+            if (validateMemoByteLength(text.substring(0, i + 1))) {
+                return i;
+            }
+        }
+        return MAX_CHAR_LIMIT;
+    };
+
+    useEffect(() => {
+        if (ref.current?.innerHTML === '<br>' || ref.current?.innerHTML === '\n') {
+            ref.current.innerHTML = '';
+        }
+    }, [ref.current?.innerHTML]);
+
+    useEffect(() => {
+        if (ref.current) {
+            // Workaround div prop type for contentEditable does not support plaintext-only
+            // But it is working by ref
+            ref.current.contentEditable = 'plaintext-only';
+        }
+    }, [ref.current]);
+
+    useEffect(() => {
+        setText([memoText.substring(0, charLimit), memoText.substring(charLimit)]);
+    }, [memoText, charLimit]);
+
+    useEffect(() => {
+        if (validateMemoByteLength(memoText)) {
+            setCharLimit(findCharLimitCount(memoText));
+        } else {
+            setCharLimit(MAX_CHAR_LIMIT);
+        }
+    }, [memoText]);
+
+    return (
+        <div className="token-amount_memo_container">
+            <div
+                ref={ref}
+                tabIndex={0}
+                spellCheck="false"
+                role="textbox"
+                aria-label="input-overlay"
+                placeholder={placeholder}
+                className={clsx(
+                    'token-amount_memo_textarea',
+                    'text__main_medium',
+                    error !== undefined && 'token-amount_field--invalid',
+                    className
+                )}
+                onInput={(event) => {
+                    const target = event.target as HTMLDivElement;
+                    let { innerText } = target;
+                    if (innerText === '\n') {
+                        innerText = '';
+                    }
+                    setMemoText(innerText);
+                    if (onChange) {
+                        onChange(innerText);
+                    }
+                }}
+            />
+            <div className="token-amount_memo_main-text text__main_medium">
+                {mainText}
+                <span className="token-amount_memo_over-text">{overText}</span>
+            </div>
+        </div>
+    );
+}
+
+const FormMemoInput = makeControlled(MemoInput);
 
 const formatTokenSelectorId = (token: TokenPickerVariant) => {
     if (token?.tokenType === 'cis2') {
@@ -224,6 +324,8 @@ export type AmountForm = {
 export type AmountReceiveForm = AmountForm & {
     /** The receiver of the amount */
     receiver: string;
+    /** Optional memo text associated with transaction */
+    memo?: string;
 };
 
 type ValueVariantProps =
@@ -396,7 +498,7 @@ export default function TokenAmountView(props: TokenAmountViewProps) {
                 />
             </div>
             <div className="token-amount_amount">
-                <span className="text__main_medium">Amount</span>
+                <span className="text__main_medium">{t('form.tokenAmount.amount.label')}</span>
                 <div className="token-amount_amount_selector">
                     <FormInputClear
                         className="heading_medium token-amount_amount_field"
@@ -421,22 +523,40 @@ export default function TokenAmountView(props: TokenAmountViewProps) {
                 </Text.Capture>
             </div>
             {props.receiver === true && (
-                <div className="token-amount_receiver">
-                    <span className="text__main_medium">{t('form.tokenAmount.address.label')}</span>
-                    <FormReceiverInput
-                        className="text__main"
-                        register={(props.form as UseFormReturn<AmountReceiveForm>).register}
-                        name="receiver"
-                        placeholder={t('form.tokenAmount.address.placeholder')}
-                        rules={{
-                            required: t('utils.address.required'),
-                            validate: validateAccountAddress,
-                        }}
-                    />
-                    <ErrorMessage className="capture__main_small">
-                        {props.form.formState.errors.receiver?.message}
-                    </ErrorMessage>
-                </div>
+                <>
+                    <div className="token-amount_receiver">
+                        <span className="text__main_medium">{t('form.tokenAmount.address.label')}</span>
+                        <FormReceiverInput
+                            className="text__main"
+                            register={(props.form as UseFormReturn<AmountReceiveForm>).register}
+                            name="receiver"
+                            placeholder={t('form.tokenAmount.address.placeholder')}
+                            rules={{
+                                required: t('utils.address.required'),
+                                validate: validateAccountAddress,
+                            }}
+                        />
+                        <ErrorMessage className="capture__main_small">
+                            {props.form.formState.errors.receiver?.message}
+                        </ErrorMessage>
+                    </div>
+                    <div className="token-amount_memo">
+                        <div className="token-amount_memo_title">
+                            <span className="text__main_medium">{t('form.tokenAmount.memo.label')}</span>
+                            <ErrorMessage className="capture__main_small">
+                                {props.form.formState.errors.memo?.message}
+                            </ErrorMessage>
+                        </div>
+                        <FormMemoInput
+                            control={props.form.control}
+                            name="memo"
+                            placeholder={t('form.tokenAmount.memo.placeholder')}
+                            rules={{
+                                validate: validateMemoByteLength,
+                            }}
+                        />
+                    </div>
+                </>
             )}
         </div>
     );

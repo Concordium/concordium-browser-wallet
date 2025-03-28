@@ -11,7 +11,7 @@
     }
 
     .capture__main_small {
-        color: $color-grey-3
+        color: $color-grey-3;
     }
 
     .capture__additional_small {
@@ -23,7 +23,8 @@
 
     &_token,
     &_amount,
-    &_receiver {
+    &_receiver,
+    &_memo {
         display: flex;
         flex-direction: column;
     }
@@ -100,6 +101,10 @@
         &--invalid {
             color: $color-red-attention !important;
         }
+
+        &::placeholder {
+            color: $color-grey-4;
+        }
     }
 
     button.capture__additional_small {
@@ -109,6 +114,9 @@
 
     &_receiver {
         margin-top: rem(24px);
+        margin-bottom: rem(16px);
+        padding-bottom: rem(8px);
+        border-bottom: 1px solid rgba($color-black, 0.1);
 
         .address-selector {
             display: flex;
@@ -118,6 +126,63 @@
 
         textarea {
             resize: none;
+        }
+    }
+
+    &_memo {
+        padding-bottom: rem(8px);
+        border-bottom: 1px solid rgba($color-black, 0.1);
+
+        &_title {
+            display: flex;
+            justify-content: space-between;
+        }
+
+        &_container {
+            position: relative;
+        }
+
+        &_textarea.text__main_medium {
+            width: 100%;
+            resize: none;
+            position: relative;
+            z-index: 2;
+            -webkit-text-fill-color: transparent;
+            cursor: text;
+            background: transparent;
+            border: unset;
+            word-wrap: break-word;
+            word-break: break-all;
+            padding: rem(2px);
+
+            &:empty::before {
+                content: attr(placeholder);
+                -webkit-text-fill-color: $color-grey-4;
+            }
+
+            div br {
+                display: flex;
+                height: 32px;
+                content: '';
+
+                &:not(:first-child) {
+                    display: inline;
+                }
+            }
+        }
+
+        &_main-text.text__main_medium {
+            position: absolute;
+            top: 0;
+            left: 0;
+            height: 100%;
+            padding: rem(2px);
+            word-wrap: break-word;
+            word-break: break-all;
+        }
+
+        &_over-text {
+            color: $color-red-attention;
         }
     }
 }

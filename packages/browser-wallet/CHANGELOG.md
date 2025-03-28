@@ -1,5 +1,15 @@
 # Changelog
 
+## Unreleased
+
+### Added
+
+-  Memo input field at Send Transaction screen
+-  Added support for TransferWithMemo transaction type
+-  Updated Send transaction status screens
+-  Preview of memo at Transaction Log
+-  Memo field at Transaction details screen
+
 ## 2.1.2
 
 ### Added
