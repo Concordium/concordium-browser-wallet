@@ -35,7 +35,7 @@ const t = {
         requestCcd: 'Request CCD',
     },
     details: {
-        backTitle: 'to Activity',
+        backTitle: 'To Activity',
         title: 'Transaction details',
         tHash: ' Transaction hash',
         bHash: 'Block hash',

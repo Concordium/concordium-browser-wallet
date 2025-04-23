@@ -34,7 +34,7 @@ const t = {
         },
         status: {
             title: 'Your delegation is registered',
-            backTitle: 'to Main page',
+            backTitle: 'To main page',
             buttonUpdate: 'Update',
             buttonStop: 'Stop',
             validatorSuspended: 'Your validator has been suspended',
@@ -173,7 +173,7 @@ const t = {
         },
         status: {
             title: 'Your validation is registered',
-            backTitle: 'to Main page',
+            backTitle: 'To main page',
             buttonUpdate: 'Update',
             buttonStop: 'Stop',
             buttonSuspend: 'Suspend',
