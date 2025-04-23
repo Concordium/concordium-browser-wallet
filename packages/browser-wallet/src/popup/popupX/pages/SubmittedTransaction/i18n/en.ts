@@ -14,6 +14,8 @@ const t = {
     transfer: {
         success: "You've sent",
         error: 'Failed to send',
+        amountCcd: 'Amount (CCD):',
+        estimatedFee: 'Est. fee: {{fee}} CCD',
     },
     web3Revoke: {
         success: 'Your credential has been successfully revoked',

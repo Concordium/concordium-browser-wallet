@@ -1,4 +1,6 @@
-import { CcdAmount, Ratio } from '@concordium/web-sdk';
+import { decode, encode } from 'cbor2';
+import { CcdAmount, Ratio, toBuffer } from '@concordium/web-sdk';
+import { DataBlob } from '@concordium/web-sdk/types';
 import { CCD_METADATA } from '@shared/constants/token-metadata';
 import { useLocation } from 'react-router-dom';
 import { displayUrl } from '@popup/shared/utils/string-helpers';
@@ -74,4 +76,25 @@ export function displayCcdAsEur(microCcdPerEur: Ratio, microCcd: bigint, decimal
     }
 
     return eurFormatter.format(eur);
+}
+
+export function decodeMemo(memo: string | undefined): string {
+    if (!memo) {
+        return '';
+    }
+
+    try {
+        return decode(memo) as string;
+    } catch {
+        // return as hex value
+        return new DataBlob(toBuffer(memo, 'hex')).data.toString();
+    }
+}
+
+export function encodeMemo(memo: string): DataBlob {
+    return new DataBlob(encode(memo));
+}
+
+export function getMemoByteLength(memo: string): number {
+    return encode(memo).byteLength;
 }

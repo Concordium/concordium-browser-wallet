@@ -1,7 +1,7 @@
 import React, { useContext, useEffect, useMemo, useRef, useState } from 'react';
 import { Navigate, useNavigate, useParams } from 'react-router-dom';
 import InfiniteLoader from 'react-window-infinite-loader';
-import { VariableSizeList as List } from 'react-window';
+import { VariableSizeList, VariableSizeList as List } from 'react-window';
 import { useTranslation } from 'react-i18next';
 import { noOp, partition } from 'wallet-common-helpers';
 import AutoSizer from 'react-virtualized-auto-sizer';
@@ -22,6 +22,7 @@ import Page from '@popup/popupX/shared/Page';
 import { useCredential } from '@popup/shared/utils/account-helpers';
 import { mainLayoutScrollContext } from '@popup/popupX/page-layouts/MainLayout/MainLayout';
 
+import { decodeMemo } from '@popup/popupX/shared/utils/helpers';
 import useTransactionGroups, { TransactionLogParams } from './util';
 import TransactionElement, { TRANSACTION_ELEMENT_HEIGHT } from './TransactionElement';
 import { TransactionDetailsLocationState } from './TransactionDetails/TransactionDetails';
@@ -41,6 +42,10 @@ interface InfiniteTransactionListProps {
 }
 
 const isHeader = (item: string | BrowserWalletTransaction): item is string => typeof item === 'string';
+
+const isHaveMemo = (item: string | BrowserWalletTransaction) => {
+    return typeof item !== 'string' && item?.memo;
+};
 
 const getKey = (item: string | BrowserWalletTransaction) =>
     // eslint-disable-next-line @typescript-eslint/no-non-null-assertion
@@ -67,6 +72,15 @@ function InfiniteTransactionList({
     const loadMoreItems = isNextPageLoading ? noOp : loadNextPage;
     const isItemLoaded = (index: number) => !hasNextPage || index < headersAndTransactions.length;
 
+    const listRef = React.useRef({});
+    const [transactionElements, setTransactionElements] = useState([{ size: 0, open: false }]);
+    const getSize = (index: number) => transactionElements[index]?.size || 0;
+    const getOpen = (index: number) => transactionElements[index]?.open || false;
+    const setTransactionElement = (index: number, size: number, open: boolean) => {
+        transactionElements[index] = { size, open };
+        setTransactionElements(transactionElements);
+    };
+
     useEffect(() => {
         return () => {
             setScroll(0);
@@ -82,15 +96,20 @@ function InfiniteTransactionList({
                             className="transaction-log__history"
                             itemCount={headersAndTransactions.length}
                             onItemsRendered={onItemsRendered}
-                            ref={ref}
+                            ref={(el) => {
+                                ref(el);
+                                if (el) {
+                                    listRef.current = el;
+                                }
+                            }}
                             width={width}
                             height={height}
                             onScroll={(e) => setScroll(e.scrollOffset)}
                             itemSize={(i) => {
                                 if (i === 0) return TITLE_HEIGHT;
-                                return isHeader(headersAndTransactions[i])
-                                    ? LIST_HEADER_HEIGHT
-                                    : TRANSACTION_ELEMENT_HEIGHT;
+                                if (isHeader(headersAndTransactions[i])) return LIST_HEADER_HEIGHT;
+                                if (isHaveMemo(headersAndTransactions[i])) return getSize(i);
+                                return TRANSACTION_ELEMENT_HEIGHT;
                             }}
                             itemKey={(i) => (i === 0 ? 'title' : getKey(headersAndTransactions[i]))}
                         >
@@ -112,6 +131,10 @@ function InfiniteTransactionList({
                                 }
                                 return (
                                     <TransactionElement
+                                        index={index}
+                                        listRef={listRef as { current?: VariableSizeList }}
+                                        setTransactionElement={setTransactionElement}
+                                        getOpen={getOpen}
                                         accountAddress={accountAddress}
                                         style={style}
                                         key={item.transactionHash ?? item.id}
@@ -221,9 +244,17 @@ function TransactionList({ onTransactionClick, account }: TransactionListProps) 
             .then((transactionResult) => {
                 setHasNextPage(transactionResult.full);
 
+                const transactionsWithDecodedMemo = transactionResult.transactions.map((transaction) => {
+                    if (transaction.memo) {
+                        const memoDecoded = decodeMemo(transaction.memo);
+                        return { ...transaction, memo: memoDecoded };
+                    }
+                    return transaction;
+                });
+
                 const updatedTransactions = appendTransactions
-                    ? transactions.concat(transactionResult.transactions)
-                    : transactionResult.transactions;
+                    ? transactions.concat(transactionsWithDecodedMemo)
+                    : transactionsWithDecodedMemo;
 
                 setTransactions(updatedTransactions);
                 setIsNextPageLoading(false);

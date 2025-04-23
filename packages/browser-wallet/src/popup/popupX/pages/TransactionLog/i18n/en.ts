@@ -35,13 +35,14 @@ const t = {
         requestCcd: 'Request CCD',
     },
     details: {
-        backTitle: 'to Activity',
+        backTitle: 'To Activity',
         title: 'Transaction details',
         tHash: ' Transaction hash',
         bHash: 'Block hash',
         from: 'From address',
         to: 'To address',
         events: 'Events',
+        memo: 'Memo',
         rejectReason: 'Reject reason',
     },
 };

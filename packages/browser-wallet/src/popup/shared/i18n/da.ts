@@ -78,6 +78,9 @@ const t: typeof en = {
                 configureDelegation: 'Konfigurer delegering',
             },
         },
+        memo: {
+            overLimit: 'Over tegngrænsen',
+        },
     },
     transactionReceipt: {
         sender: 'Afsender',

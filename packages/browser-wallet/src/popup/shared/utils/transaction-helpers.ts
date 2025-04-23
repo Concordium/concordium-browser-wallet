@@ -37,6 +37,7 @@ import { DEFAULT_TRANSACTION_EXPIRY } from '@shared/constants/time';
 import { useCallback } from 'react';
 import { grpcClientAtom } from '@popup/store/settings';
 import { useUpdateAtom } from 'jotai/utils';
+import { getMemoByteLength } from '@popup/popupX/shared/utils/helpers';
 import { BrowserWalletAccountTransaction, TransactionStatus } from './transaction-history-types';
 import { useBlockChainParameters } from '../BlockChainParametersProvider';
 import { usePrivateKey } from './account-helpers';
@@ -126,6 +127,14 @@ export function validateAccountAddress(cand: string): string | undefined {
     } catch {
         return i18n.t('utils.address.invalid');
     }
+}
+
+export function validateMemoByteLength(memo: string | undefined) {
+    const MEMO_BYTE_LIMIT = 255; // reserve 1 byte
+    if (memo && getMemoByteLength(memo) >= MEMO_BYTE_LIMIT) {
+        return i18n.t('utils.memo.overLimit');
+    }
+    return undefined;
 }
 
 export function validateDelegationAmount(

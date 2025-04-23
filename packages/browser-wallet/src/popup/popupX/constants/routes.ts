@@ -193,7 +193,7 @@ export const relativeRoutes = {
             connectedSites: {
                 path: 'connected-sites/:account',
                 config: {
-                    backTitle: 'to Accounts list',
+                    backTitle: i18n.t('x:connectedSites.backTitle'),
                     navBackSteps: 2,
                 },
             },
@@ -242,7 +242,7 @@ export const relativeRoutes = {
             connect: {
                 path: 'connect/:genesisHash',
                 config: {
-                    backTitle: 'Network settings',
+                    backTitle: i18n.t('x:connect.backTitle'),
                     navBackSteps: 2,
                 },
             },

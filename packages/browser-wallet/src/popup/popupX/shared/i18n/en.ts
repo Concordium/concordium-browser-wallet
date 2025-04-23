@@ -26,6 +26,10 @@ const t = {
                 insufficientCcd: 'Not enough CCD in account to cover transaction fee',
                 incorrectDecimals: 'Token only allows for a precision of {{ num }} decimals',
             },
+            memo: {
+                label: 'Memo',
+                placeholder: 'add a memo',
+            },
         },
         fileInput: {
             selectButton: 'or Select file to import',

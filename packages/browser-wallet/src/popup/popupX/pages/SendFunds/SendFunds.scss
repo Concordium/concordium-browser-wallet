@@ -1,29 +1,57 @@
+@keyframes border-on-scroll {
+    0% {
+        border-bottom: 1px solid $color-grey-3;
+    }
+
+    1%,
+    99% {
+        border-top: 1px solid $color-grey-3;
+        border-bottom: 1px solid $color-grey-3;
+    }
+
+    100% {
+        border-top: 1px solid $color-grey-3;
+    }
+}
+
 .send-funds-container {
     display: flex;
     flex-direction: column;
+    position: relative;
     height: 100%;
-    padding-bottom: rem(32px);
+    padding-bottom: rem(98px);
 
-    .send-funds {
-        &__memo {
-            display: flex;
-            margin-top: rem(16px);
+    .send-funds-scroll-wrapper {
+        overflow-y: scroll;
+        margin-bottom: rem(2px);
+        animation: border-on-scroll linear;
+        animation-timeline: scroll(self);
+        width: calc(100% + rem(48px));
+        padding: 0 rem(24px) 0 rem(24px);
+        margin-left: rem(-24px);
 
-            .label__main {
-                margin-left: rem(8px);
-            }
+        &::-webkit-scrollbar {
+            display: none;
         }
+    }
+
+    .page__footer {
+        position: absolute;
+        bottom: rem(32px);
+        padding-top: rem(16px);
+        width: 100%;
+        background-color: $color-bg;
     }
 
     .send-funds-confirm {
         &__card {
             align-items: center;
-            margin-top: rem(16px);
-            padding: rem(40px) 0;
+            margin-top: rem(4px);
+            padding: rem(32px) rem(16px);
 
             &_destination {
                 display: flex;
-                margin-bottom: rem(40px);
+                margin-bottom: rem(24px);
 
                 .text__main_medium {
                     color: $color-white;
@@ -40,6 +68,7 @@
 
             .heading_large {
                 margin: rem(8px) 0;
+                color: $color-white;
             }
 
             .capture__main_small:nth-child(2) {
@@ -48,6 +77,33 @@
 
             .capture__main_small:nth-child(4) {
                 color: $color-mineral-1;
+            }
+
+            &_memo {
+                display: flex;
+                flex-direction: row;
+                justify-content: center;
+                margin-top: rem(30px);
+                padding: rem(30px) rem(18px) 0 rem(18px);
+                border-top: 1px $color-input-border solid;
+                width: 100%;
+
+                svg {
+                    min-width: rem(16px);
+                }
+
+                .text__main_medium {
+                    margin-left: rem(6px);
+                    display: -webkit-box;
+                    -webkit-line-clamp: 4;
+                    -webkit-box-orient: vertical;
+                    overflow: hidden;
+                    text-align: left;
+                    word-break: break-word;
+                    color: $color-mineral-2;
+                    font-weight: $t-font-weight-regular;
+                    line-height: 20px;
+                }
             }
         }
     }

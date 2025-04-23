@@ -11,11 +11,22 @@
 
         .heading_large {
             margin: rem(8px) 0;
+            color: $color-white;
+        }
+
+        .heading_large + .capture__main_small {
+            color: $color-mineral-1;
+        }
+
+        svg {
+            width: rem(52px);
+            height: rem(52px);
+            padding: rem(2px);
         }
 
         svg,
         .loader-x {
-            margin-bottom: rem(30px);
+            margin-bottom: rem(32px);
         }
     }
 
@@ -24,10 +35,6 @@
     }
 
     &__failed-icon {
-        width: rem(48px);
-        height: rem(48px);
-        margin-bottom: rem(18px) !important;
-
         & path {
             fill: $color-red-attention !important;
         }

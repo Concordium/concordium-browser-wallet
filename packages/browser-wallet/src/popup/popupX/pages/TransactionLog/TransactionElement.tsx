@@ -1,5 +1,6 @@
-import React, { CSSProperties } from 'react';
+import React, { CSSProperties, useEffect, useRef } from 'react';
 import { useTranslation } from 'react-i18next';
+import { VariableSizeList } from 'react-window';
 import clsx from 'clsx';
 import { displayAsCcd, dateFromTimestamp, TimeStampUnit } from 'wallet-common-helpers';
 
@@ -8,10 +9,11 @@ import Button from '@popup/popupX/shared/Button';
 import Text from '@popup/popupX/shared/Text';
 import Note from '@assets/svgX/note.svg';
 import { displaySplitAddressShort } from '@popup/shared/utils/account-helpers';
-
+import DropDown from '@assets/svgX/drop-down.svg';
 import { hasAmount, mapTypeToText, onlyTime } from './util';
 
 const SPACING = 4;
+const MEMO_SPACING = 10;
 export const TRANSACTION_ELEMENT_HEIGHT = 68; // element height + row spacing = rem(64px) + rem(4px)
 
 interface Props {
@@ -19,12 +21,28 @@ interface Props {
     style?: CSSProperties;
     accountAddress: string;
     onClick?: () => void;
+    index: number;
+    listRef: { current?: VariableSizeList };
+    getOpen: (index: number) => boolean;
+    setTransactionElement: (index: number, size: number, open: boolean) => void;
 }
 
 /**
  * A transaction element in a TransactionList.
  */
-export default function TransactionElement({ accountAddress, transaction, style, onClick }: Props) {
+export default function TransactionElement({
+    accountAddress,
+    transaction,
+    style,
+    onClick,
+    index,
+    listRef,
+    getOpen,
+    setTransactionElement,
+}: Props) {
+    const memoRef = useRef<HTMLDivElement>(null);
+    const open = getOpen(index);
+
     const { t } = useTranslation('x', { keyPrefix: 'transactionLogX' });
 
     const failed = transaction.status === TransactionStatus.Failed;
@@ -41,11 +59,29 @@ export default function TransactionElement({ accountAddress, transaction, style,
         (transaction.cost !== undefined && t('withFee', { value: displayAsCcd(transaction.cost, false, true) })) ||
         (transaction.fromAddress && t('from', { value: displaySplitAddressShort(transaction.fromAddress) }));
 
+    const addSpacing = (height: string | number | undefined) => {
+        if (height !== undefined) {
+            return Number(height) - SPACING;
+        }
+        return undefined;
+    };
+
+    useEffect(() => {
+        if (!style?.height) {
+            setTransactionElement(
+                index,
+                TRANSACTION_ELEMENT_HEIGHT + (memoRef.current?.getBoundingClientRect().height || 0) + MEMO_SPACING,
+                open
+            );
+            listRef.current?.resetAfterIndex(0);
+        }
+    }, [open]);
+
     return (
         <Button.Base
             key={transaction.transactionHash}
             className="transaction-log__transaction"
-            style={{ ...style, height: TRANSACTION_ELEMENT_HEIGHT - SPACING }}
+            style={{ ...style, height: addSpacing(style?.height) }}
             onClick={onClick}
         >
             <div className={clsx('transaction value', failed && 'failed')}>
@@ -61,9 +97,22 @@ export default function TransactionElement({ accountAddress, transaction, style,
                 {info && <Text.Capture>{info}</Text.Capture>}
             </div>
             {transaction.memo && (
-                <div className="transaction note">
+                <div className="transaction note" ref={memoRef}>
                     <Note />
-                    <Text.Capture>{transaction.memo}</Text.Capture>
+                    <Text.Capture className={open ? 'expanded' : ''}>
+                        {transaction.memo}
+                        <Button.Base
+                            as="span"
+                            className="button__icon expand"
+                            onClick={(e) => {
+                                e.stopPropagation();
+                                setTransactionElement(index, 0, !open);
+                                listRef.current?.resetAfterIndex(0);
+                            }}
+                        >
+                            <DropDown />
+                        </Button.Base>
+                    </Text.Capture>
                 </div>
             )}
         </Button.Base>

@@ -1,3 +1,14 @@
+// CSS Trick
+// variable --can-scroll used inside scroll animation
+// now it behaves like boolean value detecting scroll
+// and it is used to display/hide drop-down icon
+@keyframes detect-memo-scroll {
+    from,
+    to {
+        --can-scroll: ;
+    }
+}
+
 .transaction-log {
     &__date {
         padding-top: rem(20px);
@@ -8,7 +19,8 @@
         border-radius: rem(12px);
         background: $color-transaction-bg;
         margin-top: rem(4px);
-        display: block;
+        display: flex;
+        flex-direction: column;
         width: 100%;
         border: none;
 
@@ -42,8 +54,45 @@
                 margin-top: rem(13px);
                 padding-top: rem(8px);
 
+                svg {
+                    min-width: rem(16px);
+                }
+
                 .capture__main_small {
+                    position: relative;
+                    width: 100%;
+                    padding-right: rem(22px);
                     margin-left: rem(6px);
+                    display: -webkit-box;
+                    -webkit-line-clamp: 2;
+                    -webkit-box-orient: vertical;
+                    overflow: hidden;
+                    text-align: left;
+                    word-break: break-word;
+                    animation: detect-memo-scroll linear;
+                    animation-timeline: scroll(self);
+
+                    --display-if-can-scroll: var(--can-scroll) flex;
+                    --display-if-cant-scroll: none;
+
+                    &.expanded {
+                        display: block;
+
+                        & svg {
+                            transform: rotate(180deg);
+                        }
+                    }
+
+                    .button__icon.expand {
+                        position: absolute;
+                        top: 0;
+                        right: 0;
+                        padding: 0;
+                    }
+
+                    &:not(.expanded) .button__icon.expand {
+                        display: var(--display-if-can-scroll, var(--display-if-cant-scroll));
+                    }
                 }
             }
         }
