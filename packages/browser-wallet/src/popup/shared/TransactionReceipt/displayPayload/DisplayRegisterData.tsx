@@ -1,5 +1,5 @@
 import React, { useEffect, useState } from 'react';
-import { decode } from 'cbor';
+import { decode } from 'cbor2';
 import { useTranslation } from 'react-i18next';
 import { RegisterDataPayload } from '@concordium/web-sdk';
 

@@ -1,5 +1,5 @@
 import { Buffer } from 'buffer/';
-import { encode, decode } from 'cbor';
+import { encode, decode } from 'cbor2';
 import { isValidResolutionString } from './numberStringHelpers';
 
 const isInteger = isValidResolutionString(1, true, false, false);

@@ -244,22 +244,20 @@ function TransactionList({ onTransactionClick, account }: TransactionListProps) 
             .then((transactionResult) => {
                 setHasNextPage(transactionResult.full);
 
-                Promise.all(
-                    transactionResult.transactions.map(async (transaction) => {
-                        if (transaction.memo) {
-                            const memoDecoded = await decodeMemo(transaction.memo);
-                            return { ...transaction, memo: memoDecoded };
-                        }
-                        return transaction;
-                    })
-                ).then((transactionsWithDecodedMemo) => {
-                    const updatedTransactions = appendTransactions
-                        ? transactions.concat(transactionsWithDecodedMemo)
-                        : transactionsWithDecodedMemo;
-
-                    setTransactions(updatedTransactions);
-                    setIsNextPageLoading(false);
+                const transactionsWithDecodedMemo = transactionResult.transactions.map((transaction) => {
+                    if (transaction.memo) {
+                        const memoDecoded = decodeMemo(transaction.memo);
+                        return { ...transaction, memo: memoDecoded };
+                    }
+                    return transaction;
                 });
+
+                const updatedTransactions = appendTransactions
+                    ? transactions.concat(transactionsWithDecodedMemo)
+                    : transactionsWithDecodedMemo;
+
+                setTransactions(updatedTransactions);
+                setIsNextPageLoading(false);
             })
             .catch(() => {
                 addToast(t('list.error'));

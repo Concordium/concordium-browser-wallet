@@ -14,7 +14,7 @@ import { SmartContractParameters } from '@concordium/browser-wallet-api-helpers'
 import { useTranslation } from 'react-i18next';
 import { chunkString, displayAsCcd } from 'wallet-common-helpers';
 import * as JSONBig from 'json-bigint';
-import { decode } from 'cbor';
+import { decode } from 'cbor2';
 import Card from '@popup/popupX/shared/Card';
 import Parameter from '@popup/popupX/shared/Parameter';
 
