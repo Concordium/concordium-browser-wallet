@@ -2,9 +2,13 @@ import { pathsToModuleNameMapper } from 'ts-jest';
 import type { Config } from '@jest/types';
 import tsconfig from './tsconfig.json';
 
-const esModules = ['@concordium/web-sdk', '@concordium/rust-bindings', '@noble/ed25519', 'wallet-common-helpers'].join(
-    '|'
-);
+const esModules = [
+    '@concordium/web-sdk',
+    '@concordium/rust-bindings',
+    '@noble/ed25519',
+    'wallet-common-helpers',
+    'cbor2',
+].join('|');
 
 const config: Config.InitialOptions = {
     preset: 'ts-jest/presets/js-with-ts-esm',

@@ -16,20 +16,20 @@ env:
 
 jobs:
     dependencies:
-        runs-on: ubuntu-20.04
+        runs-on: ubuntu-24.04
 
         steps:
-            - uses: actions/checkout@v2
+            - uses: actions/checkout@v4
 
             - name: Cache dependencies
               id: fetch-dependencies
-              uses: actions/cache@v2
+              uses: actions/cache@v4
               with:
                   path: |
                       **/node_modules
                   key: ${{ runner.os }}-${{ env.dummy }}-${{ hashFiles('**/package.json', '**/yarn.lock') }}
 
-            - uses: actions/setup-node@v2
+            - uses: actions/setup-node@v4
               if: steps.fetch-dependencies.outputs.cache-hit != 'true'
               with:
                   node-version: '${{ env.node_version }}'
@@ -39,17 +39,17 @@ jobs:
               run: YARN_CHECKSUM_BEHAVIOR=ignore yarn
 
     build:
-        runs-on: ubuntu-20.04
+        runs-on: ubuntu-24.04
         needs: [dependencies]
 
         steps:
-            - uses: actions/checkout@v2
-            - uses: actions/setup-node@v2
+            - uses: actions/checkout@v4
+            - uses: actions/setup-node@v4
               with:
                   node-version: '${{ env.node_version }}'
 
             - name: Get cached dependencies
-              uses: actions/cache@v2
+              uses: actions/cache@v4
               with:
                   path: |
                       **/node_modules
@@ -62,7 +62,7 @@ jobs:
               run: yarn type:check
 
     build-example-docker:
-        runs-on: ubuntu-20.04
+        runs-on: ubuntu-24.04
         strategy:
             matrix:
                 image:
@@ -80,17 +80,17 @@ jobs:
               run: docker build ${{matrix.image.extraArguments}} -f ${{ matrix.image.dockerfile }} .
 
     lint:
-        runs-on: ubuntu-20.04
+        runs-on: ubuntu-24.04
         needs: [build]
 
         steps:
-            - uses: actions/checkout@v2
-            - uses: actions/setup-node@v2
+            - uses: actions/checkout@v4
+            - uses: actions/setup-node@v4
               with:
                   node-version: '${{ env.node_version }}'
 
             - name: Get cached dependencies
-              uses: actions/cache@v2
+              uses: actions/cache@v4
               with:
                   path: |
                       **/node_modules
@@ -100,17 +100,17 @@ jobs:
               run: yarn lint
 
     test:
-        runs-on: ubuntu-20.04
+        runs-on: ubuntu-24.04
         needs: [build]
 
         steps:
-            - uses: actions/checkout@v2
-            - uses: actions/setup-node@v2
+            - uses: actions/checkout@v4
+            - uses: actions/setup-node@v4
               with:
                   node-version: '${{ env.node_version }}'
 
             - name: Get cached dependencies
-              uses: actions/cache@v2
+              uses: actions/cache@v4
               with:
                   path: |
                       **/node_modules
