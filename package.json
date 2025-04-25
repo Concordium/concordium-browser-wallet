@@ -65,6 +65,9 @@
         "typescript": "^5.2.2"
     },
     "resolutions": {
-        "@concordium/web-sdk@^9.0.0": "patch:@concordium/web-sdk@npm:^9.0.0#.yarn/patches/@concordium-web-sdk-npm-8.1.0-468ad0a8b1.patch"
+        "@concordium/web-sdk@^9.0.0": "patch:@concordium/web-sdk@npm:^9.0.0#.yarn/patches/@concordium-web-sdk-npm-8.1.0-468ad0a8b1.patch",
+        "elliptic": "^6.6.1",
+        "loader-utils": "^2.0.4",
+        "@babel/traverse": "^7.27.0"
     }
 }
