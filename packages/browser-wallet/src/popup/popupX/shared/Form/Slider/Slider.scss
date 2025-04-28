@@ -23,10 +23,7 @@
         &,
         & .rc-slider-rail,
         & .rc-slider-track {
-            border-bottom-left-radius: rem(16px);
-            border-bottom-right-radius: rem(16px);
-            border-top-left-radius: 0;
-            border-top-right-radius: 0;
+            border-radius: 0 0 16px 16px;
         }
 
         .rc-slider-track {

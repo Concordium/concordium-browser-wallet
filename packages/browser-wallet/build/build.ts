@@ -7,6 +7,7 @@ import { copy } from 'esbuild-plugin-copy';
 import fs from 'fs';
 import { manifestPlugin } from './plugins/chrome-extension-manifest-v3';
 import { isDevelopmentBuild } from '../src/shared/utils/environment-helpers';
+import { NodeGlobalsPolyfillPlugin } from "@esbuild-plugins/node-globals-polyfill";
 
 const watch = Boolean(process.env.WATCH);
 
@@ -60,6 +61,7 @@ const config: BuildOptions = {
                 },
             ],
         }),
+        NodeGlobalsPolyfillPlugin({  process: true, buffer: true }),
         manifestPlugin({ manifestTemplate, popupHtmlFile: popupHtmlOut }),
         copy({
             assets: [

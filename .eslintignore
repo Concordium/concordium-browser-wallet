@@ -10,3 +10,5 @@ package.json
 
 packages/browser-wallet-api-helpers/lib
 packages/browser-wallet/src/popup/popupX/styles/_bundle.scss
+
+disclaimer.js

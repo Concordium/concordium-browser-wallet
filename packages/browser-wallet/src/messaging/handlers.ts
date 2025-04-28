@@ -1,5 +1,9 @@
 /* eslint-disable max-classes-per-file */
 import { EventType } from '@concordium/browser-wallet-api-helpers';
+import Transport from '@ledgerhq/hw-transport';
+import TransportWebHID from '@ledgerhq/hw-transport-webhid';
+import Concordium from '@blooo/hw-app-concordium';
+
 import {
     BaseMessage,
     isEvent,
@@ -13,6 +17,176 @@ import {
     WalletError,
     isError,
 } from './message';
+
+import { LedgerDeviceDetails, LedgerMessage } from '../shared/utils/ledger';
+
+/**
+ * Ledger Message Handler - WebHID Transport
+ *
+ * Functionality:
+ * - Defines a message event listener to handle communication between the application and Ledger device.
+ *
+ *  Handles 'REQUEST_LEDGER_DEVICE' messages:
+ *   - Reuses existing WebHID transport if already connected and device is open.
+ *   - Creates a new WebHID transport connection to the Ledger device otherwise.
+ *   - Extracts and sends back device details (e.g., product name, serial number, opened status).
+ *   - Posts a 'LEDGER_CONNECTED' message on successful connection.
+ *
+ *  Handles 'LEDGER_ERROR' messages on failure with specific user-friendly errors for:
+ *   - Ledger already in use (e.g., open in Ledger Live)
+ *   - Access denied to the device
+ *   - Device locked (PIN not entered)
+ *   - No device selected or connected
+ *   - Permissions denied
+ *   - Browser full-screen/security prompts not handled
+ *
+ *  Handles 'DISCONNECT_LEDGER_DEVICE' messages:
+ *   - Closes the existing WebHID transport connection.
+ *   - Posts a 'LEDGER_CONNECTED' message with success: false and disconnect status.
+ *   - Handles disconnect errors and posts appropriate 'LEDGER_ERROR' messages.
+ *
+ * Global Variables:
+ * - `ledgerTransport`: Holds the active WebHID transport instance (if any).
+ * - `globalContext`: Represents `self` or `window` for broader compatibility (e.g., workers or browser).
+ */
+
+let ledgerTransport: Transport | null = null;
+
+const globalContext = self || window;
+
+// Handle connection request
+globalContext.addEventListener('message', async (event: MessageEvent<LedgerMessage>) => {
+    const { data, source } = event;
+
+    if (source !== globalContext) return;
+
+    // Handle request for Ledger device
+    if (data.type === 'REQUEST_LEDGER_DEVICE') {
+        console.log('Ledger connection requested');
+
+        try {
+            let device: LedgerDeviceDetails | undefined;
+
+            // 1. Reuse existing connection if it's open
+            if (ledgerTransport && (ledgerTransport as TransportWebHID).device?.opened) {
+                console.log('Reusing existing Ledger transport');
+                device = (ledgerTransport as TransportWebHID).device;
+            } else {
+                // 2. Otherwise create a new connection
+                console.log('Creating new Ledger transport via WebHID...');
+                ledgerTransport = await TransportWebHID.create();
+                device = (ledgerTransport as TransportWebHID).device;
+            }
+
+            const details: LedgerDeviceDetails = {
+                productName: device?.productName,
+                deviceId: device?.serialNumber || `${device?.vendorId}-${device?.productId}`,
+                opened: device?.opened,
+            };
+
+            globalContext.postMessage(
+                {
+                    type: 'LEDGER_CONNECTED',
+                    success: true,
+                    details,
+                },
+                '*'
+            );
+        } catch (error: any) {
+            console.error('Ledger connection error:', error);
+
+            let userFriendlyError = 'Unknown error';
+
+            const errMsg = error?.message?.toLowerCase() || '';
+
+            if (errMsg.includes('already open')) {
+                userFriendlyError = 'Ledger is already in use. Please close other apps like Ledger Live and try again.';
+            } else if (errMsg.includes('access denied')) {
+                userFriendlyError =
+                    'Access denied to use Ledger device. Please ensure you’ve selected the device and granted permission. If this is the first time you are using the Ledger device please switch to full-screen mode and select your Ledger device from the popup prompt.';
+            } else if (error?.message) {
+                userFriendlyError = error.message;
+            }
+
+            globalContext.postMessage(
+                {
+                    type: 'LEDGER_ERROR',
+                    success: false,
+                    error: userFriendlyError,
+                },
+                '*'
+            );
+        }
+    } else if (data.type === 'DISCONNECT_LEDGER_DEVICE') {
+        console.log(' Disconnecting Ledger device...');
+
+        if (ledgerTransport) {
+            try {
+                await ledgerTransport.close(); // Close the connection
+                ledgerTransport = null; // Nullify transport
+                globalContext.postMessage(
+                    {
+                        type: 'LEDGER_CONNECTED',
+                        success: false,
+                        details: { error: 'Device disconnected successfully' },
+                    },
+                    '*'
+                );
+            } catch (error: any) {
+                console.error('Error during disconnect:', error);
+                globalContext.postMessage(
+                    {
+                        type: 'LEDGER_ERROR',
+                        success: false,
+                        error: 'Failed to disconnect the device.',
+                    },
+                    '*'
+                );
+            }
+        } else {
+            globalContext.postMessage(
+                {
+                    type: 'LEDGER_ERROR',
+                    success: false,
+                    error: 'No device is currently connected.',
+                },
+                '*'
+            );
+        }
+    } else if (data.type === 'GET_LEDGER_STATUS') {
+        const device = (ledgerTransport as TransportWebHID | null)?.device;
+
+        if (ledgerTransport && device?.opened) {
+            const details: LedgerDeviceDetails = {
+                productName: device?.productName,
+                deviceId: device?.serialNumber || `${device?.vendorId}-${device?.productId}`,
+                opened: device?.opened,
+            };
+
+            globalContext.postMessage(
+                {
+                    type: 'LEDGER_CONNECTED',
+                    success: true,
+                    details,
+                },
+                '*'
+            );
+        } else {
+            globalContext.postMessage(
+                {
+                    type: 'LEDGER_ERROR',
+                    success: false,
+                    error: 'No Ledger device is connected.',
+                },
+                '*'
+            );
+        }
+    }
+});
+
+export function getLedgerTransport(): Transport | null {
+    return ledgerTransport;
+}
 
 type Unsubscribe = () => void;
 type MessageFilter<M extends BaseMessage> = (msg: M) => boolean;

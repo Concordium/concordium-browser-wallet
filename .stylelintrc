@@ -8,6 +8,7 @@
         "selector-pseudo-class-no-unknown": null,
         "selector-class-pattern": null,
         "value-keyword-case": null,
-        "value-no-vendor-prefix": null
+        "value-no-vendor-prefix": null,
+        "property-no-unknown" : true
     }
 }

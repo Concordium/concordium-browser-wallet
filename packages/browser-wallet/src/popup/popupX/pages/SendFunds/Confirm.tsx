@@ -1,4 +1,4 @@
-import React, { useMemo } from 'react';
+import React, { useEffect, useMemo, useState } from 'react';
 import { useTranslation } from 'react-i18next';
 import {
     AccountAddress,
@@ -61,6 +61,10 @@ export default function SendFundsConfirm({ values, fee, sender }: Props) {
         sender,
         values.token.tokenType === 'ccd' ? AccountTransactionType.Transfer : AccountTransactionType.Update
     );
+
+    const [errorMessage, setErrorMessage] = useState<string>('');
+    const [userMessage, setUserMessage] = useState<string>('');
+
     const grpcClient = useAtomValue(grpcClientAtom);
     const contractClient = useAsyncMemo(
         async () => {
@@ -72,6 +76,10 @@ export default function SendFundsConfirm({ values, fee, sender }: Props) {
         logError,
         [values.token, grpcClient]
     );
+
+    useEffect(() => {
+        setUserMessage('Please make sure that Ledger Device is connected and Concordium App is open');
+    }, []);
 
     const payload = useAsyncMemo(
         async () => {
@@ -106,23 +114,40 @@ export default function SendFundsConfirm({ values, fee, sender }: Props) {
     );
 
     const submit = async () => {
-        if (payload === undefined || tokenName === undefined) {
-            throw Error('Payload could not be created...');
-        }
+        setErrorMessage('');
+        setUserMessage('');
 
-        const tx = await submitTransaction(payload, fee);
-        const state: CIS2TransferSubmittedLocationState | SubmittedTransactionLocationState =
-            values.token.tokenType === 'ccd'
-                ? { transactionType: AccountTransactionType.Transfer, payload }
-                : {
-                      updateType: 'cis2.transfer',
-                      amount: values.amount,
-                      tokenName,
-                      transactionType: AccountTransactionType.Update,
-                  };
-        nav(submittedTransactionRoute(TransactionHash.fromHexString(tx)), {
-            state,
-        });
+        try {
+
+            if (payload === undefined || tokenName === undefined) {
+                throw Error('Payload could not be created...');
+            }
+
+            const tx = await submitTransaction(payload, fee);
+            const state: CIS2TransferSubmittedLocationState | SubmittedTransactionLocationState =
+                values.token.tokenType === 'ccd'
+                    ? { transactionType: AccountTransactionType.Transfer, payload }
+                    : {
+                          updateType: 'cis2.transfer',
+                          amount: values.amount,
+                          tokenName,
+                          transactionType: AccountTransactionType.Update,
+                      };
+            nav(submittedTransactionRoute(TransactionHash.fromHexString(tx)), {
+                state,
+            });
+        } catch (error: unknown) {
+            if (error instanceof Error) {
+                if (error.name === 'LockedDeviceError') {
+                    setErrorMessage('Please unlock your Ledger device and open the Concordium app.');
+                } else {
+                    setErrorMessage(error.message);
+                }
+            } else {
+                // Handle cases where `error` is not an instance of `Error`
+                setErrorMessage('An unknown error occurred.');
+            }
+        }
     };
 
     return (
@@ -142,7 +167,17 @@ export default function SendFundsConfirm({ values, fee, sender }: Props) {
                 <Text.HeadingLarge>{values.amount}</Text.HeadingLarge>
                 <Text.Capture>{t('estimatedFee', { fee: formatCcdAmount(fee) })}</Text.Capture>
             </Card>
-
+            {userMessage && (
+            <div>
+                {userMessage}
+            </div>
+            )}
+            
+            {errorMessage && (
+                <div> <br />
+                    {errorMessage}
+                </div>
+            )}
             <Page.Footer>
                 <Button.Main
                     className="button-main"

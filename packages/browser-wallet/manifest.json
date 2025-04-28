@@ -10,8 +10,9 @@
             "match_origin_as_fallback": true
         }
     ],
+    
     "host_permissions": ["<all_urls>"],
-    "permissions": ["tabs", "activeTab", "storage", "scripting", "webRequest", "alarms"],
+    "permissions": ["tabs", "activeTab", "storage", "scripting", "webRequest", "alarms", "hid"],
     "background": {
         "service_worker": "entryPoint!src/background/index.ts"
     },

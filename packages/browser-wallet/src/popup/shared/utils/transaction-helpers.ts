@@ -1,3 +1,7 @@
+/* eslint-disable @typescript-eslint/no-use-before-define */
+/* eslint-disable no-console */
+/* eslint-disable @typescript-eslint/no-explicit-any */
+/* eslint-disable import/no-extraneous-dependencies */
 import {
     AccountAddress,
     AccountTransaction,
@@ -20,6 +24,9 @@ import {
     AccountInfoType,
     convertEnergyToMicroCcd,
     getEnergyCost,
+    CredentialSignature,
+    AccountTransactionSignature,
+    getAccountAddress,
 } from '@concordium/web-sdk';
 import {
     isValidResolutionString,
@@ -37,9 +44,19 @@ import { DEFAULT_TRANSACTION_EXPIRY } from '@shared/constants/time';
 import { useCallback } from 'react';
 import { grpcClientAtom } from '@popup/store/settings';
 import { useUpdateAtom } from 'jotai/utils';
+
+/** Imported concordium ledger app */
+import { Buffer } from 'buffer';
+import TransportWebHID from '@ledgerhq/hw-transport-webhid';
+import Concordium from '@blooo/hw-app-concordium';
+import Transport from '@ledgerhq/hw-transport';
 import { BrowserWalletAccountTransaction, TransactionStatus } from './transaction-history-types';
-import { useBlockChainParameters } from '../BlockChainParametersProvider';
 import { usePrivateKey } from './account-helpers';
+import { useBlockChainParameters } from '../BlockChainParametersProvider';
+
+window.Buffer = Buffer;
+
+// buffer.js 519 code triggered by utils.ts 199
 
 export function buildSimpleTransferPayload(recipient: string, amount: bigint): SimpleTransferPayload {
     return {
@@ -48,19 +65,118 @@ export function buildSimpleTransferPayload(recipient: string, amount: bigint): S
     };
 }
 
+let ledgerTransport: Transport | null = null;
+
+export function convertToAccountTransactionSignature(signature: string): AccountTransactionSignature {
+    const credentialSignature: CredentialSignature = {
+        0: signature,
+    };
+
+    const accountTransactionSignature: AccountTransactionSignature = {
+        0: credentialSignature,
+    };
+
+    return accountTransactionSignature;
+}
+
 export async function sendTransaction(
     client: ConcordiumGRPCClient,
     transaction: AccountTransaction,
     signingKey: string
 ): Promise<string> {
-    const signature = await signTransaction(transaction, buildBasicAccountSigner(signingKey));
-    const result = await client.sendAccountTransaction(transaction, signature);
-
-    if (!result) {
-        throw new Error('transaction was rejected by the node');
+    if (!ledgerTransport) {
+        try {
+            console.log('New Connection Ledger device');
+            ledgerTransport = await TransportWebHID.create();
+        } catch (error: any) {
+            console.error('Ledger connection error:', error);
+        }
+    } else {
+        console.log('Reusing existing ledger device connection');
     }
 
-    return getAccountTransactionHash(transaction, signature);
+    try {
+        // const ledgerTransport = await TransportWebHID.create();
+        const ccd = new Concordium(ledgerTransport);
+        // console.log(ccd);
+
+        const pathString = `44'/919'/0'/0'/0'/0'`;
+
+        const { publicKey } = await ccd.getPublicKey(pathString);
+        console.log(publicKey);
+        const accountAddress = getAccountAddress(publicKey);
+        const address = AccountAddress.fromBase58(accountAddress.toString());
+
+        console.log('Ledger Account Address:', address);
+        console.log('Sender Address:', transaction.header.sender);
+
+        /* const getDerivationPath = (account: number) => `44'/919'/0'/${account}'/0'/0'`;
+
+        const addresses: { index: number; address: string }[] = [];
+
+        for (let i = 0; i < 25; i++) {
+            const path = getDerivationPath(i);
+            const { publicKey } = await ccd.getPublicKey(path, false, false); // false = don't display on device
+            const address = getAccountAddress(publicKey).address;
+            console.log(address);
+        }
+
+        transaction.header.sender = AccountAddress.fromBase58('3yR4ur3gUnHpvGpw7znhVJonNoLW2ofQpRLfHLbX9wvfAi4ZYj');
+        /*const { publicKey } = await ccd.getPublicKey('44/919/0/0/0/0', true, false);
+        console.log(publicKey);
+
+        // Convert public key buffer to hex
+        const hexPubKey = encodeHexString(publicKey);
+
+        // Derive address from public key (using web-sdk)
+        const accountAddress = getAccountAddress(publicKey);
+
+        console.log('Ledger-derived account address:', accountAddress.address);
+        */
+
+        // const { status } = await ccd.verifyAddress(false, 0, 0, 0);
+        // const { address } = await ccd.verifyAddress(pathString, true); // Show on device
+        // console.log(status);
+
+        const toAddress = (transaction.payload as SimpleTransferPayload).toAddress?.address;
+        const amount = (transaction.payload as SimpleTransferPayload).amount?.microCcdAmount ?? BigInt(0);
+        const payload = buildSimpleTransferPayload(toAddress, BigInt(amount));
+
+        const tx = {
+            sender: transaction.header.sender,
+            nonce: transaction.header.nonce.toString(),
+            expiry: BigInt(getDefaultExpiry().toString()),
+            energyAmount: '10000',
+            transactionKind: transaction.type,
+            payload,
+        };
+
+        if (address !== transaction.header.sender) {
+            console.log('Mismatch between Ledger address and sender address');
+        }
+
+        const { signature } = await ccd.signTransfer(tx, pathString);
+
+        const accountTransactionSignature = convertToAccountTransactionSignature(signature);
+        console.log(accountTransactionSignature);
+
+        const signature1 = await signTransaction(transaction, buildBasicAccountSigner(signingKey));
+        console.log(signature1);
+
+        const result = await client.sendAccountTransaction(transaction, accountTransactionSignature);
+
+        if (!result) {
+            throw new Error('transaction was rejected by the node');
+        }
+
+        return getAccountTransactionHash(transaction, accountTransactionSignature);
+    } catch (error) {
+        if (error && error.name === 'LockedDeviceError') {
+            throw new Error('Please unlock your Ledger device and open the concordium app.');
+        } else {
+            throw new Error(error.message);
+        }
+    }
 }
 
 /**

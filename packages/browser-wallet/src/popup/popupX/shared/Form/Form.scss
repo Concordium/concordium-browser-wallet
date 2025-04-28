@@ -134,7 +134,7 @@
                 width: auto;
 
                 // stylelint false negative rule
-                field-sizing: content;
+                box-sizing: content;
                 background: transparent;
                 border: unset;
             }

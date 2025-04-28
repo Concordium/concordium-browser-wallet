@@ -12,6 +12,7 @@ disclaimer.rst
 !.yarn/versions
 
 lib
+vscode
 
 # Mac
 .DS_Store
@@ -97,4 +98,4 @@ fabric.properties
 examples/nft-minting/file-server/.log
 examples/nft-minting/file-server/data
 examples/nft-minting/file-server/collections.json
-
+examples

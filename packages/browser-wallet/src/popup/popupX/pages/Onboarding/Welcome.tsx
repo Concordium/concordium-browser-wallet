@@ -1,7 +1,7 @@
 import React, { ReactNode, useEffect } from 'react';
 import { useAtom } from 'jotai';
 import { acceptedTermsAtom, networkConfigurationAtom, uiStyleAtom } from '@popup/store/settings';
-import { mainnet } from '@shared/constants/networkConfiguration';
+import { testnet } from '@shared/constants/networkConfiguration';
 import Shield from '@assets/svgX/crypto-currency-square-shield.svg';
 import Assets from '@assets/svgX/crypto-currency-assets.svg';
 import Possibilities from '@assets/svgX/crypto-currency-possibilities.svg';
@@ -53,7 +53,7 @@ export default function Welcome() {
 
         // needed for proper network handling during onboarding
         // otherwise failing with error 'Indexed storage should not be accessed before setting the network'
-        setCurrentNetworkConfiguration(mainnet);
+        setCurrentNetworkConfiguration(testnet); //changed from mainnet MANI
     }, []);
 
     return (
