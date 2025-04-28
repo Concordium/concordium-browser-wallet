@@ -15,7 +15,7 @@ import SeedPhrase from 'src/popup/popupX/pages/SeedPhrase';
 import ChangePasscode from 'src/popup/popupX/pages/ChangePasscode';
 import { Web3IdCredentials, Web3IdImport } from '@popup/popupX/pages/Web3Id';
 import NetworkSettings from '@popup/popupX/pages/NetworkSettings';
-import ConnectNetwork from '@popup/popupX/pages/ConnectNetwork';
+import { ConnectNetwork, CustomConnectNetwork } from '@popup/popupX/pages/ConnectNetwork';
 import About from '@popup/popupX/pages/About';
 import {
     ConfirmSeedPhrase,
@@ -204,6 +204,7 @@ export default function Routes({ messagePromptHandlers }: { messagePromptHandler
                     <Route path={relativeRoutes.settings.network.path}>
                         <Route index element={<NetworkSettings />} />
                         <Route element={<ConnectNetwork />} path={relativeRoutes.settings.network.connect.path} />
+                        <Route element={<CustomConnectNetwork />} path={relativeRoutes.settings.network.custom.path} />
                     </Route>
                     <Route path={relativeRoutes.settings.restore.path}>
                         <Route index element={<RestoreIntro />} />

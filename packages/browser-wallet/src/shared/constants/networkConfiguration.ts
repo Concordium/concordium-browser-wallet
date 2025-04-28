@@ -27,4 +27,13 @@ export const stagenet: NetworkConfiguration = {
     ccdScanUrl: 'https://stagenet.ccdscan.io/',
 };
 
+export const customnet: NetworkConfiguration = {
+    genesisHash: '',
+    name: 'Concordium Custom',
+    explorerUrl: '',
+    grpcPort: 20000,
+    grpcUrl: '',
+    ccdScanUrl: '',
+};
+
 export const GRPCTIMEOUT = 15000;

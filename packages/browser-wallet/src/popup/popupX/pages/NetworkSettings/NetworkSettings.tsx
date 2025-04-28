@@ -10,16 +10,18 @@ import Button from '@popup/popupX/shared/Button';
 import { mainnet, stagenet, testnet } from '@shared/constants/networkConfiguration';
 import { isDevelopmentBuild } from '@shared/utils/environment-helpers';
 import { useAtom } from 'jotai';
-import { networkConfigurationAtom } from '@popup/store/settings';
+import { networkConfigurationAtom, customNetworkConfigurationAtom } from '@popup/store/settings';
 
 function useNetworks() {
     const { t } = useTranslation('x', { keyPrefix: 'network' });
     const [currentNetworkConfiguration] = useAtom(networkConfigurationAtom);
+    const [customnet] = useAtom(customNetworkConfigurationAtom);
 
     const networks = [mainnet, testnet];
     if (isDevelopmentBuild()) {
         networks.push(stagenet);
     }
+    networks.push(customnet);
 
     const updatedNetworks = networks.map((network) => {
         const isConnected = network.genesisHash === currentNetworkConfiguration.genesisHash;
@@ -42,20 +44,27 @@ export default function NetworkSettings() {
     const nav = useNavigate();
     const navToConnect = (genesisHash: string) =>
         nav(relativeRoutes.settings.network.connect.path.replace(':genesisHash', genesisHash));
+    const navToCustom = () => nav(relativeRoutes.settings.network.custom.path);
+    const getNavPath = (idx: number, arrLength: number, genesisHash: string) => {
+        if (idx === arrLength - 1) {
+            return navToCustom();
+        }
+        return navToConnect(genesisHash);
+    };
 
     return (
         <Page className="network-settings-x">
             <Page.Top heading={t('networkSettings')} />
             <Page.Main>
                 <Card>
-                    {networks.map((network) => (
+                    {networks.map((network, idx, array) => (
                         <Card.Row key={network.name}>
                             <Text.MainRegular>{network.name}</Text.MainRegular>
                             <Button.Secondary
                                 className="dark"
                                 label={network.connectLabel}
                                 icon={network.isConnected ? <Dot /> : null}
-                                onClick={() => navToConnect(network.genesisHash)}
+                                onClick={() => getNavPath(idx, array.length, network.genesisHash)}
                             />
                         </Card.Row>
                     ))}
