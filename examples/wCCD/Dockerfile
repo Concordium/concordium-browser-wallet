@@ -11,7 +11,8 @@ COPY ./public ./public
 COPY ./src ./src
 
 RUN corepack enable
-RUN yarn && yarn cache clean
+RUN yarn install --immutable
+RUN yarn cache clean
 
 ARG NETWORK
 
