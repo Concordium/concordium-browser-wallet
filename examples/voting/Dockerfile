@@ -1,4 +1,4 @@
-ARG base_image=node:18-slim
+ARG base_image=node:20-slim
 
 FROM ${base_image} AS build
 
@@ -10,7 +10,9 @@ COPY ./vite.config.ts ./
 COPY ./public ./public
 COPY ./src ./src
 
-RUN yarn && yarn cache clean
+RUN corepack enable
+RUN yarn install
+RUN yarn cache clean
 RUN yarn build
 
 FROM nginx

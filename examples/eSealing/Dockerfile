@@ -3,6 +3,7 @@ ARG base_image=node:18-slim
 FROM ${base_image} AS build
 
 WORKDIR /app
+COPY .yarn .yarn
 COPY ./package.json ./package.json
 COPY ./tsconfig.json ./tsconfig.json
 COPY ./index.html ./
@@ -10,7 +11,9 @@ COPY ./vite.config.ts ./
 COPY ./public ./public
 COPY ./src ./src
 
-RUN yarn && yarn cache clean
+RUN corepack enable
+RUN yarn install
+RUN yarn cache clean
 RUN yarn build
 
 FROM nginx

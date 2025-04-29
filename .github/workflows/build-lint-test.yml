@@ -11,7 +11,7 @@ on:
     workflow_dispatch:
 
 env:
-    dummy: 1 # change to force cache invalidation
+    dummy: 4 # change to force cache invalidation
     node_version: 18.14.2
 
 jobs:
@@ -67,8 +67,8 @@ jobs:
             matrix:
                 image:
                     - { dir: eSealing, dockerfile: Dockerfile }
-                    - { dir: voting, dockerfile: Dockerfile }
-                    - { dir: wCCD, dockerfile: Dockerfile, extraArguments: '--build-arg NETWORK="mainnet"' }
+        #                    - { dir: voting, dockerfile: Dockerfile }
+        #                    - { dir: wCCD, dockerfile: Dockerfile, extraArguments: '--build-arg NETWORK="mainnet"' }
         steps:
             - name: Checkout
               uses: actions/checkout@v4
