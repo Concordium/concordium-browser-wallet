@@ -30,7 +30,7 @@
         "vite-plugin-wasm": "^3.2.2"
     },
     "scripts": {
-        "build": "vite build",
+        "build-disabled": "vite build",
         "start": "vite preview",
         "watch": "vite"
     }
