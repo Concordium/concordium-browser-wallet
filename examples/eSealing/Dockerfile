@@ -3,6 +3,7 @@ ARG base_image=node:20-slim
 FROM ${base_image} AS build
 
 WORKDIR /app
+COPY .yarn .yarn
 COPY ./package.json ./package.json
 COPY ./tsconfig.json ./tsconfig.json
 COPY ./index.html ./
@@ -11,7 +12,7 @@ COPY ./public ./public
 COPY ./src ./src
 
 RUN corepack enable
-RUN yarn install
+RUN yarn install --immutable
 RUN yarn cache clean
 RUN yarn build
 
