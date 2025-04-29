@@ -10,6 +10,7 @@ COPY ./vite.config.ts ./
 COPY ./public ./public
 COPY ./src ./src
 
+RUN corepack enable
 RUN yarn && yarn cache clean
 RUN yarn build
 
