@@ -5,6 +5,7 @@ FROM ${base_image} AS build
 WORKDIR /app
 COPY ./package.json ./package.json
 COPY ./tsconfig.json ./tsconfig.json
+COPY ./tsconfig.node.json ./tsconfig.node.json
 COPY ./index.html ./
 COPY ./vite.config.ts ./
 COPY ./public ./public
