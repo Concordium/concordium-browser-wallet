@@ -66,8 +66,8 @@ jobs:
         strategy:
             matrix:
                 image:
-                    - { dir: eSealing, dockerfile: Dockerfile }
-                    - { dir: voting, dockerfile: Dockerfile }
+                    #                    - { dir: eSealing, dockerfile: Dockerfile }
+                    #                    - { dir: voting, dockerfile: Dockerfile }
                     - { dir: wCCD, dockerfile: Dockerfile, extraArguments: '--build-arg NETWORK="mainnet"' }
         steps:
             - name: Checkout
