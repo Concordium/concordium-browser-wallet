@@ -246,6 +246,12 @@ export const relativeRoutes = {
                     navBackSteps: 2,
                 },
             },
+            custom: {
+                path: 'custom',
+                config: {
+                    backTitle: i18n.t('x:connect.backTitle'),
+                },
+            },
         },
         restore: {
             path: 'restore',

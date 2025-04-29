@@ -11,7 +11,7 @@ import { EventType } from '@concordium/browser-wallet-api-helpers';
 import { popupMessageHandler } from '@popup/shared/message-handler';
 import { ConcordiumGRPCClient, ConcordiumGRPCWebClient } from '@concordium/web-sdk';
 import { storedAllowlist, storedCredentials } from '@shared/storage/access';
-import { GRPCTIMEOUT, mainnet } from '@shared/constants/networkConfiguration';
+import { GRPCTIMEOUT, mainnet, customnet } from '@shared/constants/networkConfiguration';
 import { atomWithChromeStorage } from './utils';
 import { selectedAccountAtom } from './account';
 import { identityProvidersAtom, selectedIdentityIndexAtom } from './identity';
@@ -64,6 +64,11 @@ export const networkConfigurationAtom = atom<NetworkConfiguration, NetworkConfig
             },
         });
     }
+);
+
+export const customNetworkConfigurationAtom = atomWithChromeStorage<NetworkConfiguration>(
+    ChromeStorageKey.CustomNetworkConfiguration,
+    customnet
 );
 
 export const grpcClientAtom = atom<ConcordiumGRPCClient>((get) => {

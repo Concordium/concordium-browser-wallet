@@ -13,6 +13,7 @@ export enum ChromeStorageKey {
     ConnectedSites = 'connectedSites',
     Credentials = 'credentials',
     NetworkConfiguration = 'networkConfiguration',
+    CustomNetworkConfiguration = 'customNetworkConfiguration',
     Passcode = 'passcode',
     SeedPhrase = 'seedPhrase',
     SelectedAccount = 'selectedAccount',
