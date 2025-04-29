@@ -1,6 +1,6 @@
 import React, { useRef } from 'react';
 import { useTranslation } from 'react-i18next';
-import { SubmitHandler } from 'react-hook-form';
+import { SubmitHandler, Validate } from 'react-hook-form';
 import { useAtom } from 'jotai';
 import Page from '@popup/popupX/shared/Page';
 import Button from '@popup/popupX/shared/Button';
@@ -32,6 +32,28 @@ export default function CustomConnectNetwork() {
         return null;
     };
 
+    function validateUrl(): Validate<string> {
+        return (urlString) => {
+            let url;
+
+            if (!urlString) {
+                return undefined;
+            }
+
+            try {
+                url = new URL(urlString);
+            } catch (_) {
+                return t('errorUrl');
+            }
+
+            if (!(url.protocol === 'http:' || url.protocol === 'https:')) {
+                return t('errorUrl');
+            }
+
+            return undefined;
+        };
+    }
+
     return (
         <Page className="connect-network-x">
             <Page.Top
@@ -56,13 +78,16 @@ export default function CustomConnectNetwork() {
                                     register={f.register}
                                     name="genesisHash"
                                     label={t('genesisHash')}
-                                    placeholder="38bf770b4c247f09e1b62982bb71000c516480c5a2c5214dadac6da4b1ad50e5"
+                                    placeholder="qwertyuiop247f09e1b62982bb71000c516480c5a2c5214dadac6da4b1ad50e5"
                                 />
                                 <FormInput
                                     register={f.register}
                                     name="grpcUrl"
                                     label={t('grpcUrl')}
-                                    placeholder="https://grpc.stagenet.concordium.com"
+                                    placeholder="http://localhost"
+                                    rules={{
+                                        validate: validateUrl(),
+                                    }}
                                 />
                                 <FormInput
                                     register={f.register}
@@ -75,13 +100,19 @@ export default function CustomConnectNetwork() {
                                     register={f.register}
                                     name="explorerUrl"
                                     label={t('explorerUrl')}
-                                    placeholder="https://wallet-proxy.stagenet.concordium.com"
+                                    placeholder="http://localhost"
+                                    rules={{
+                                        validate: validateUrl(),
+                                    }}
                                 />
                                 <FormInput
                                     register={f.register}
                                     name="ccdScanUrl"
                                     label={t('ccdScanUrl')}
-                                    placeholder="https://stagenet.ccdscan.io/"
+                                    placeholder="http://localhost"
+                                    rules={{
+                                        validate: validateUrl(),
+                                    }}
                                 />
                             </>
                         );

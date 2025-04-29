@@ -11,6 +11,7 @@ const t = {
         explorerUrl: 'Wallet Proxy',
         ccdScanUrl: 'CCD scan URL',
         connect: 'Connect',
+        errorUrl: 'Invalid URL',
     },
 };
 
