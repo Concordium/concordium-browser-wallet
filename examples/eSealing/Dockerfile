@@ -12,7 +12,7 @@ COPY ./public ./public
 COPY ./src ./src
 
 RUN corepack enable
-RUN yarn install --immutable
+RUN yarn install
 RUN yarn cache clean
 RUN yarn build
 
