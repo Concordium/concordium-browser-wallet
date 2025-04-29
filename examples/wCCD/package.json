@@ -27,7 +27,7 @@
         "vite-plugin-wasm": "^3.2.2"
     },
     "scripts": {
-        "build": "tsc && vite build",
+        "build": "vite build",
         "build-prod": "NETWORK='mainnet' vite build",
         "start": "vite preview"
     }
