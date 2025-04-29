@@ -11,7 +11,7 @@ on:
     workflow_dispatch:
 
 env:
-    dummy: 1 # change to force cache invalidation
+    dummy: 3 # change to force cache invalidation
     node_version: 20.19.1
 
 jobs:
