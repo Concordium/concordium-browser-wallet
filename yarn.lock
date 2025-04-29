@@ -9948,7 +9948,7 @@ __metadata:
     rollup-plugin-node-polyfills: ^0.2.1
     sha256: ^0.2.0
     typescript: ^5.2.2
-    vite: ^4.5.0
+    vite: ^4.5.13
     vite-plugin-node-polyfills: ^0.21.0
     vite-plugin-svgr: ^4.1.0
     vite-plugin-top-level-await: ^1.4.2
@@ -20155,6 +20155,46 @@ __metadata:
   languageName: node
   linkType: hard
 
+"vite@npm:^4.5.13":
+  version: 4.5.13
+  resolution: "vite@npm:4.5.13"
+  dependencies:
+    esbuild: ^0.18.10
+    fsevents: ~2.3.2
+    postcss: ^8.4.27
+    rollup: ^3.27.1
+  peerDependencies:
+    "@types/node": ">= 14"
+    less: "*"
+    lightningcss: ^1.21.0
+    sass: "*"
+    stylus: "*"
+    sugarss: "*"
+    terser: ^5.4.0
+  dependenciesMeta:
+    fsevents:
+      optional: true
+  peerDependenciesMeta:
+    "@types/node":
+      optional: true
+    less:
+      optional: true
+    lightningcss:
+      optional: true
+    sass:
+      optional: true
+    stylus:
+      optional: true
+    sugarss:
+      optional: true
+    terser:
+      optional: true
+  bin:
+    vite: bin/vite.js
+  checksum: 9ce4b5dd8767acc598a402565a21525a9d23d3dad48463bcc4aedf91b3c69ad907213113b356eb9663f7d71cd8950ecc5228ba0ac9974223eaccca2314368428
+  languageName: node
+  linkType: hard
+
 "vm-browserify@npm:^1.0.1":
   version: 1.1.2
   resolution: "vm-browserify@npm:1.1.2"
@@ -20189,7 +20229,7 @@ __metadata:
     rollup-plugin-node-polyfills: ^0.2.1
     ts-node: ^10.8.0
     typescript: ^5.2.2
-    vite: ^4.5.0
+    vite: ^4.5.13
     vite-plugin-node-polyfills: ^0.21.0
     vite-plugin-svgr: ^4.1.0
     vite-plugin-top-level-await: ^1.4.2
@@ -20271,7 +20311,7 @@ __metadata:
     react-dom: ^18.1.0
     rollup-plugin-node-polyfills: ^0.2.1
     typescript: ^5.2.2
-    vite: ^4.5.0
+    vite: ^4.5.13
     vite-plugin-node-polyfills: ^0.21.0
     vite-plugin-svgr: ^4.1.0
     vite-plugin-top-level-await: ^1.4.2
