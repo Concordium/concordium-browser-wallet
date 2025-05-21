@@ -138,6 +138,10 @@
                     border-radius: rem(8px);
                     background: $color-main-bg;
 
+                    .plt {
+                        color: $color-blue;
+                    }
+
                     svg,
                     img {
                         width: rem(20px);

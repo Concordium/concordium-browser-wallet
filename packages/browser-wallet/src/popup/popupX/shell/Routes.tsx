@@ -7,7 +7,7 @@ import { SendFunds } from '@popup/popupX/pages/SendFunds';
 import ReceiveFunds from '@popup/popupX/pages/ReceiveFunds';
 import TransactionLog from '@popup/popupX/pages/TransactionLog';
 import TransactionDetails from '@popup/popupX/pages/TransactionLog/TransactionDetails';
-import { TokenDetails, TokenDetailsCcd, TokenRaw } from '@popup/popupX/pages/TokenDetails';
+import { TokenDetails, TokenDetailsCcd, TokenDetailsPlt, TokenRaw } from '@popup/popupX/pages/TokenDetails';
 import IdCards from '@popup/popupX/pages/IdCards';
 import Accounts from '@popup/popupX/pages/Accounts';
 import CreateAccount, { CreateAccountConfirm } from '@popup/popupX/pages/CreateAccount';
@@ -144,6 +144,7 @@ export default function Routes({ messagePromptHandlers }: { messagePromptHandler
                     </Route>
                     <Route path={relativeRoutes.home.token.path}>
                         <Route element={<TokenDetailsCcd />} path={`${relativeRoutes.home.token.ccd.path}`} />
+                        <Route element={<TokenDetailsPlt />} path={`${relativeRoutes.home.token.plt.path}`} />
                         <Route path={relativeRoutes.home.token.details.path}>
                             <Route index element={<TokenDetails />} />
                             <Route element={<TokenRaw />} path={`${relativeRoutes.home.token.details.raw.path}`} />

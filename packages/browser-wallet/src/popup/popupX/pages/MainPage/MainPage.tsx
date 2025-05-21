@@ -49,6 +49,16 @@ function AccountTokenBalance({ decimals, tokenId, contractAddress, accountAddres
     return <span>{balance}</span>;
 }
 
+type PltBalanceProps = { decimals: number; balanceRaw: bigint };
+function PLTBalance({ decimals, balanceRaw }: PltBalanceProps) {
+    const balance = useMemo(() => formatTokenAmount(balanceRaw, decimals, 2, 2), [balanceRaw]);
+    return <span>{balance}</span>;
+}
+
+function PLTicon() {
+    return <span className="plt">PLT</span>;
+}
+
 function mainPageCcdDisplay(microCcdAmount: bigint) {
     return formatTokenAmount(microCcdAmount, 6, 2, 2);
 }
@@ -193,6 +203,8 @@ function MainPageConfirmedAccount({ credential }: MainPageConfirmedAccountProps)
         nav(relativeRoutes.home.transactionLog.path.replace(':account', credential.address));
     const navToTokenDetails = (contractIndex: string) =>
         nav(absoluteRoutes.home.token.details.path.replace(':contractIndex', contractIndex));
+    const navToPltDetails = (pltSymbol: string) =>
+        nav(absoluteRoutes.home.token.plt.path.replace(':pltSymbol', pltSymbol));
 
     const navToManageToken = () => nav(relativeRoutes.home.manageTokenList.path);
 
@@ -233,6 +245,20 @@ function MainPageConfirmedAccount({ credential }: MainPageConfirmedAccountProps)
                         balanceBase={accountInfo.accountAmount.microCcdAmount}
                         microCcdPerEur={microCcdPerEur}
                     />
+                    {accountInfo?.accountTokens?.map((token) => (
+                        <TokenItem
+                            onClick={() => navToPltDetails(token.id.toString())}
+                            key={`${token.id.symbol}`}
+                            thumbnail={<PLTicon />}
+                            symbol={token.id.toString() || ''}
+                            balance={
+                                <PLTBalance
+                                    balanceRaw={token.state.balance.value}
+                                    decimals={token.state.balance.decimals}
+                                />
+                            }
+                        />
+                    ))}
                     {tokens.map((token) => (
                         <TokenItem
                             onClick={() => navToTokenDetails(token.contractIndex)}

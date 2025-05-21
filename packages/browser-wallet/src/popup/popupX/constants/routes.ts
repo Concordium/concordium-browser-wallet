@@ -134,6 +134,12 @@ export const relativeRoutes = {
                     navBackSteps: 2,
                 },
             },
+            plt: {
+                path: 'plt/:pltSymbol',
+                config: {
+                    navBackSteps: 3,
+                },
+            },
             details: {
                 path: ':contractIndex',
                 config: {

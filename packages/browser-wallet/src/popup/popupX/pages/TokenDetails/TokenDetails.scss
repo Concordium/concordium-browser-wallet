@@ -1,6 +1,10 @@
 .token-details-x {
     .dynamic-size.heading_big {
         font-family: $t-font-family-ibm;
+
+        &.plt {
+            line-height: normal;
+        }
     }
 
     .token-balance__exchange-rate {
@@ -45,6 +49,10 @@
         display: flex;
         align-items: center;
         margin-bottom: rem(8px);
+
+        .token-icon.plt {
+            color: $color-blue;
+        }
 
         .token-icon,
         svg {
