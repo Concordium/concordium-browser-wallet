@@ -158,6 +158,10 @@ export const storedCurrentNetwork = makeStorageAccessor<NetworkConfiguration>(
     'local',
     ChromeStorageKey.NetworkConfiguration
 );
+export const storedCustomNetwork = makeStorageAccessor<NetworkConfiguration>(
+    'local',
+    ChromeStorageKey.CustomNetworkConfiguration
+);
 export const getGenesisHash = () =>
     storedCurrentNetwork.get().then((network) => {
         if (!network) {
