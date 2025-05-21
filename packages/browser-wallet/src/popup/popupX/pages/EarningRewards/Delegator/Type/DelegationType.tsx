@@ -99,7 +99,7 @@ export default function DelegationType({ initialValues, onSubmit, title }: Props
                         t={t}
                         i18nKey="validatorDelegationDescription"
                         components={{
-                            '1': <ExternalLink path={`${network.ccdScanUrl}nodes`} />,
+                            '1': <ExternalLink path={`${network.ccdScanUrl}staking`} />,
                         }}
                     />
                 )}
