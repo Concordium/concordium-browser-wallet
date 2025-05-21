@@ -1,5 +1,9 @@
 # Changelog
 
+### Changed
+
+-   Updated delegation description help link from `node` list to `staking`
+
 ## 2.2.0
 
 ### Added
