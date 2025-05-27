@@ -10,7 +10,9 @@ import {
     Energy,
     SimpleTransferPayload,
     SimpleTransferWithMemoPayload,
+    TokenHolderPayload,
 } from '@concordium/web-sdk';
+import { Cbor, CborMemo, TokenId, TokenAmount as TokenAmountPlt } from '@concordium/web-sdk/plt';
 import { useAsyncMemo } from 'wallet-common-helpers';
 import { useAtomValue } from 'jotai';
 
@@ -86,6 +88,22 @@ function SendFunds({ address }: SendFundsProps) {
                     transfer
                 );
                 return getFee(AccountTransactionType.Update, payload);
+            }
+            if (token?.tokenType === 'plt') {
+                const ops = [
+                    {
+                        transfer: {
+                            amount: TokenAmountPlt.fromDecimal(amount),
+                            recipient: address,
+                            memo: memo ? CborMemo.fromString(memo) : undefined,
+                        },
+                    },
+                ];
+                const payload: TokenHolderPayload = {
+                    tokenSymbol: TokenId.fromString(token.tokenSymbol),
+                    operations: Cbor.encode(ops),
+                };
+                return getFee(AccountTransactionType.TokenHolder, payload);
             }
             if (token?.tokenType === 'ccd') {
                 if (memo) {

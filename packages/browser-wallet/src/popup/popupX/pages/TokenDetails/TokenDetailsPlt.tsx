@@ -1,6 +1,8 @@
 import React, { useEffect, useState } from 'react';
 import { useNavigate, useParams } from 'react-router-dom';
-import { absoluteRoutes } from '@popup/popupX/constants/routes';
+import { AccountAddress } from '@concordium/web-sdk';
+import { TokenId, TokenInfo } from '@concordium/web-sdk/plt';
+import { absoluteRoutes, sendFundsRoute } from '@popup/popupX/constants/routes';
 import Page from '@popup/popupX/shared/Page';
 import Text from '@popup/popupX/shared/Text';
 import Button from '@popup/popupX/shared/Button';
@@ -13,10 +15,10 @@ import { trunctateSymbol } from '@shared/utils/token-helpers';
 import { WalletCredential } from '@shared/storage/types';
 import Arrow from '@assets/svgX/arrow-right.svg';
 import Clock from '@assets/svgX/clock.svg';
-import { TokenId, TokenInfo } from '@concordium/web-sdk/plt';
 import { grpcClientAtom } from '@popup/store/settings';
 import { useAccountInfo } from '@popup/shared/AccountInfoListenerContext/AccountInfoListenerContext';
 import { formatTokenAmount } from '@popup/popupX/shared/utils/helpers';
+import { SendFundsLocationState } from '@popup/popupX/pages/SendFunds/SendFunds';
 
 function usePltInfoAndBalance(pltSymbol: string, credential: WalletCredential) {
     const client = useAtomValue(grpcClientAtom);
@@ -43,9 +45,6 @@ function TokenDetails({ credential }: { credential: WalletCredential }) {
     const { t } = useTranslation('x', { keyPrefix: 'tokenDetails' });
 
     const nav = useNavigate();
-    const navToReceive = () => nav(absoluteRoutes.home.receive.path);
-    const navToTransactionLog = () =>
-        nav(absoluteRoutes.home.transactionLog.path.replace(':account', credential.address));
 
     const { pltSymbol = '' } = useParams<Params>();
     const { pltInfo, renderedBalance } = usePltInfoAndBalance(pltSymbol, credential);
@@ -55,6 +54,17 @@ function TokenDetails({ credential }: { credential: WalletCredential }) {
     const {
         state: { moduleRef, issuer, decimals, totalSupply },
     } = pltInfo;
+
+    const navToSend = () =>
+        nav(sendFundsRoute(AccountAddress.fromBase58(credential.address)), {
+            state: {
+                tokenType: 'plt',
+                tokenSymbol: pltSymbol,
+            } as SendFundsLocationState,
+        });
+    const navToReceive = () => nav(absoluteRoutes.home.receive.path);
+    const navToTransactionLog = () =>
+        nav(absoluteRoutes.home.transactionLog.path.replace(':account', credential.address));
 
     return (
         <Page className="token-details-x">
@@ -69,6 +79,7 @@ function TokenDetails({ credential }: { credential: WalletCredential }) {
                         onClick={() => navToReceive()}
                         className="receive"
                     />
+                    <Button.IconTile icon={<Arrow />} label={t('send')} onClick={() => navToSend()} className="send" />
                     <Button.IconTile icon={<Clock />} label={t('activity')} onClick={() => navToTransactionLog()} />
                 </div>
                 <Card>

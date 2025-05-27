@@ -83,6 +83,8 @@ function mapTransactionKindStringToTransactionType(
             return AccountTransactionType.TransferToPublic;
         case TransactionKindString.TransferWithSchedule:
             return AccountTransactionType.TransferWithSchedule;
+        case TransactionKindString.TokenHolder:
+            return AccountTransactionType.TokenHolder;
         case TransactionKindString.UpdateCredentials:
             return AccountTransactionType.UpdateCredentials;
         case TransactionKindString.RegisterData:

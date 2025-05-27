@@ -22,6 +22,7 @@ const t = {
     transferWithMemo: 'Transfer',
     encryptedAmountTransferWithMemo: 'Shielded transfer',
     transferWithScheduleAndMemo: 'Scheduled transfer',
+    pltTransfer: 'PLT transfer',
     configureBaker: 'Configure validator',
     configureDelegation: 'Configure delegation',
     stakingReward: 'Reward payout',

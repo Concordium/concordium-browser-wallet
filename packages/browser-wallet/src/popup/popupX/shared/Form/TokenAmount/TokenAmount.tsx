@@ -34,7 +34,7 @@ const balanceAtomFamily = atomFamily(
         AccountAddress.equals(aa.accountAddress, ab.accountAddress) && ba === bb && tokenAddressEq(ta, tb) && da === db
 );
 
-type Props = Omit<TokenAmountViewProps, 'tokens' | 'balance' | 'onSelectToken' | 'ccdBalance'> & {
+type Props = Omit<TokenAmountViewProps, 'tokens' | 'accountTokens' | 'balance' | 'onSelectToken' | 'ccdBalance'> & {
     /** The account info of the account to take the amount from */
     accountInfo: AccountInfo;
     /** The ccd balance to use. Defaults to 'available' */
@@ -84,9 +84,11 @@ export default function TokenAmount({ accountInfo, ccdBalance = 'available', ...
     const { current: timestamp } = useRef(Date.now());
     const { token } = props.form.watch();
     const tokenAddress = token?.tokenType === 'cis2' ? token.tokenAddress : null;
+    const tokenSymbol = token?.tokenType === 'plt' ? token.tokenSymbol : null;
 
     const tokenInfo = useTokenInfo(accountInfo.accountAddress);
-    const tokenBalance = useAtomValue(balanceAtomFamily([accountInfo, ccdBalance, tokenAddress, timestamp]));
+    const cis2Balance = useAtomValue(balanceAtomFamily([accountInfo, ccdBalance, tokenAddress, timestamp]));
+    const pltBalance = accountInfo.accountTokens.find(({ id }) => id.toString() === tokenSymbol)?.state.balance.value;
 
     if (tokenInfo.loading) {
         return null;
@@ -96,7 +98,8 @@ export default function TokenAmount({ accountInfo, ccdBalance = 'available', ...
         <TokenAmountView
             {...(props as TokenAmountViewProps)}
             tokens={tokenInfo.value}
-            balance={tokenBalance}
+            accountTokens={accountInfo.accountTokens}
+            balance={pltBalance || cis2Balance}
             ccdBalance={accountInfo.accountAvailableBalance}
         />
     );

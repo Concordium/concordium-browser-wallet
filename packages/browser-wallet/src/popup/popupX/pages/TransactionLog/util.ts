@@ -121,6 +121,8 @@ export function mapTypeToText(type: AccountTransactionType | RewardType | Specia
             return t('configureBaker');
         case AccountTransactionType.ConfigureDelegation:
             return t('configureDelegation');
+        case AccountTransactionType.TokenHolder:
+            return t('pltTransfer');
         case RewardType.StakingReward:
             return t('stakingReward');
         case SpecialTransactionType.Malformed:

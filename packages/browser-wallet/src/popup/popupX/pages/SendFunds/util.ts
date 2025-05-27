@@ -21,6 +21,10 @@ export function useTokenMetadata(
 
     if (token.tokenType === 'ccd') return CCD_METADATA;
 
+    if (token.tokenType === 'plt') {
+        return undefined;
+    }
+
     return tokens.value.find(
         (t) => t.id === token.tokenAddress.id && ContractAddress.equals(token.tokenAddress.contract, t.contract)
     )?.metadata;
