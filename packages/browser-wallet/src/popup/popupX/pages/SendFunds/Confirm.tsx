@@ -30,7 +30,13 @@ import {
 import { AmountReceiveForm } from '@popup/popupX/shared/Form/TokenAmount/View';
 import { ensureDefined } from '@shared/utils/basic-helpers';
 import { CCD_METADATA } from '@shared/constants/token-metadata';
-import { encodeMemo, formatCcdAmount, parseCcdAmount, parseTokenAmount } from '@popup/popupX/shared/utils/helpers';
+import {
+    encodeMemo,
+    formatCcdAmount,
+    parseCcdAmount,
+    parseTokenAmount,
+    removeNumberGrouping,
+} from '@popup/popupX/shared/utils/helpers';
 import { useTransactionSubmit } from '@popup/shared/utils/transaction-helpers';
 import Button from '@popup/popupX/shared/Button';
 import { grpcClientAtom } from '@popup/store/settings';
@@ -112,7 +118,7 @@ export default function SendFundsConfirm({ values, fee, sender }: Props) {
         const ops = [
             {
                 transfer: {
-                    amount: TokenAmount.fromDecimal(values.amount),
+                    amount: TokenAmount.fromDecimal(removeNumberGrouping(values.amount)),
                     recipient: receiver,
                     memo: values.memo ? CborMemo.fromString(values.memo) : undefined,
                 },
