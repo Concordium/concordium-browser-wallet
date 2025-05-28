@@ -1,5 +1,9 @@
 # Changelog
 
+### Fixed
+
+-   CIS-2 token validation of available funds, at Send Token screen
+
 ### Changed
 
 -   Updated delegation description help link from `node` list to `staking`
