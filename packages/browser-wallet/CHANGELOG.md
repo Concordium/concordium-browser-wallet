@@ -2,6 +2,7 @@
 
 ### Fixed
 
+-   CIS-2 token validation of available funds, at Send Token screen
 -   Memo input at Send Transaction screen should not be displayed for CIS-2 tokens
 
 ### Changed

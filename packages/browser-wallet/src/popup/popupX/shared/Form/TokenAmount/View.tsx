@@ -479,7 +479,7 @@ export default function TokenAmountView(props: TokenAmountViewProps) {
             if (token.tokenType === 'ccd') {
                 return validateTransferAmount(sanitizedValue, balance, tokenDecimals, fee.microCcdAmount);
             }
-            return true;
+            return validateTransferAmount(sanitizedValue, balance, selectedTokenMetadata.decimals);
         },
         [balance, tokenDecimals, token, fee]
     );
