@@ -1,5 +1,9 @@
 # Changelog
 
+### Fixed
+
+-   Memo input at Send Transaction screen should not be displayed for CIS-2 tokens
+
 ### Changed
 
 -   Updated delegation description help link from `node` list to `staking`

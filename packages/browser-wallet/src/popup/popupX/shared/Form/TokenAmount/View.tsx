@@ -540,22 +540,24 @@ export default function TokenAmountView(props: TokenAmountViewProps) {
                             {props.form.formState.errors.receiver?.message}
                         </ErrorMessage>
                     </div>
-                    <div className="token-amount_memo">
-                        <div className="token-amount_memo_title">
-                            <span className="text__main_medium">{t('form.tokenAmount.memo.label')}</span>
-                            <ErrorMessage className="capture__main_small">
-                                {props.form.formState.errors.memo?.message}
-                            </ErrorMessage>
+                    {token.tokenType !== 'cis2' && (
+                        <div className="token-amount_memo">
+                            <div className="token-amount_memo_title">
+                                <span className="text__main_medium">{t('form.tokenAmount.memo.label')}</span>
+                                <ErrorMessage className="capture__main_small">
+                                    {props.form.formState.errors.memo?.message}
+                                </ErrorMessage>
+                            </div>
+                            <FormMemoInput
+                                control={props.form.control}
+                                name="memo"
+                                placeholder={t('form.tokenAmount.memo.placeholder')}
+                                rules={{
+                                    validate: validateMemoByteLength,
+                                }}
+                            />
                         </div>
-                        <FormMemoInput
-                            control={props.form.control}
-                            name="memo"
-                            placeholder={t('form.tokenAmount.memo.placeholder')}
-                            rules={{
-                                validate: validateMemoByteLength,
-                            }}
-                        />
-                    </div>
+                    )}
                 </>
             )}
         </div>

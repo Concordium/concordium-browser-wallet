@@ -37,7 +37,7 @@ const t = {
     details: {
         backTitle: 'To Activity',
         title: 'Transaction details',
-        tHash: ' Transaction hash',
+        tHash: 'Transaction hash',
         bHash: 'Block hash',
         from: 'From address',
         to: 'To address',
