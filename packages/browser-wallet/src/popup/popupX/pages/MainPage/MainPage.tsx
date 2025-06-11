@@ -248,7 +248,7 @@ function MainPageConfirmedAccount({ credential }: MainPageConfirmedAccountProps)
                     {accountInfo?.accountTokens?.map((token) => (
                         <TokenItem
                             onClick={() => navToPltDetails(token.id.toString())}
-                            key={`${token.id.symbol}`}
+                            key={`${token.id}`}
                             thumbnail={<PLTicon />}
                             symbol={token.id.toString() || ''}
                             balance={
