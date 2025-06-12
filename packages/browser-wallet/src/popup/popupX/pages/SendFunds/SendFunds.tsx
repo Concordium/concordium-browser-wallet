@@ -25,7 +25,7 @@ import Form, { useForm } from '@popup/popupX/shared/Form';
 import { useAccountInfo } from '@popup/shared/AccountInfoListenerContext';
 import { useGetTransactionFee } from '@popup/shared/utils/transaction-helpers';
 import { TokenPickerVariant } from '@popup/popupX/shared/Form/TokenAmount/View';
-import { encodeMemo, parseTokenAmount, removeNumberGrouping } from '@popup/popupX/shared/utils/helpers';
+import { encodeMemo, parseTokenAmount } from '@popup/popupX/shared/utils/helpers';
 import { grpcClientAtom } from '@popup/store/settings';
 import { logError } from '@shared/utils/log-helpers';
 import FullscreenNotice from '@popup/popupX/shared/FullscreenNotice';
@@ -93,7 +93,10 @@ function SendFunds({ address }: SendFundsProps) {
                 const ops = [
                     {
                         transfer: {
-                            amount: TokenAmountPlt.fromDecimal(removeNumberGrouping(amount)),
+                            amount: TokenAmountPlt.fromJSON({
+                                value: parseTokenAmount(amount, metadata?.decimals).toString(),
+                                decimals: metadata?.decimals || 0,
+                            }),
                             recipient: address,
                             memo: memo ? CborMemo.fromString(memo) : undefined,
                         },

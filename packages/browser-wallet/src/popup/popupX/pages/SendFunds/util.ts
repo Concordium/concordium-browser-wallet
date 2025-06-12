@@ -4,6 +4,8 @@ import { TokenPickerVariant } from '@popup/popupX/shared/Form/TokenAmount/View';
 import { useTokenInfo } from '@popup/popupX/shared/Form/TokenAmount/util';
 import { CCD_METADATA } from '@shared/constants/token-metadata';
 import { TokenMetadata } from '@shared/storage/types';
+import { useSelectedAccountInfo } from '@popup/shared/AccountInfoListenerContext/AccountInfoListenerContext';
+import { ensureDefined } from '@shared/utils/basic-helpers';
 
 /**
  * React hook to retrieve the metadata for a specific token associated with a given account.
@@ -17,12 +19,15 @@ export function useTokenMetadata(
     account: AccountAddress.Type
 ): TokenMetadata | undefined {
     const tokens = useTokenInfo(account);
+    const accountInfo = ensureDefined(useSelectedAccountInfo(), 'Assumed account info to be available');
     if (tokens.loading || token?.tokenType === undefined) return undefined;
 
     if (token.tokenType === 'ccd') return CCD_METADATA;
 
     if (token.tokenType === 'plt') {
-        return undefined;
+        const decimals = accountInfo.accountTokens.find(({ id }) => id.toString() === token.tokenSymbol)?.state.balance
+            .decimals;
+        return { decimals };
     }
 
     return tokens.value.find(
