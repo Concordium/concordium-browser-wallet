@@ -11,6 +11,7 @@ import { CreationStatus } from '@shared/storage/types';
 import { ConfirmedIdCard, RejectedIdCard } from '@popup/popupX/shared/IdCard';
 import { absoluteRoutes } from '@popup/popupX/constants/routes';
 import PendingIdCard from '@popup/popupX/shared/IdCard/PendingIdCard';
+import appTracker from '@shared/analytics';
 
 export default function IdCards() {
     const { t } = useTranslation('x', { keyPrefix: 'idCards' });
@@ -24,7 +25,13 @@ export default function IdCards() {
     return (
         <Page className="id-cards-x">
             <Page.Top heading={t('idCards')}>
-                <Button.Icon icon={<Plus />} onClick={() => nav(absoluteRoutes.settings.identities.create.path)} />
+                <Button.Icon
+                    icon={<Plus />}
+                    onClick={() => {
+                        appTracker.homeIdentityVerificationClicked();
+                        nav(absoluteRoutes.settings.identities.create.path);
+                    }}
+                />
             </Page.Top>
             <Page.Main>
                 {identities.map((id, index) => {

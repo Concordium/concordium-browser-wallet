@@ -21,6 +21,7 @@ import { useAccountInfo } from '@popup/shared/AccountInfoListenerContext';
 import { displayAsCcd } from 'wallet-common-helpers';
 import useEditableValue from '@popup/popupX/shared/EditableValue';
 import { useCopyAddress } from '@popup/popupX/shared/utils/hooks';
+import appTracker from '@shared/analytics';
 
 function compareAsc(left: WalletCredential, right: WalletCredential): number {
     if (left.credName === '' && right.credName !== '') {
@@ -138,7 +139,13 @@ export default function Accounts() {
         <Page className="accounts-x">
             <Page.Top heading={t('accounts')}>
                 <Button.Icon icon={<Arrows />} onClick={() => setAscSort((a) => !a)} />
-                <Button.Icon icon={<Plus />} onClick={navToCreateAccount} />
+                <Button.Icon
+                    icon={<Plus />}
+                    onClick={() => {
+                        appTracker.homeCreateAccountClicked();
+                        navToCreateAccount();
+                    }}
+                />
             </Page.Top>
             <Page.Main>
                 {sorted.map((item) => (

@@ -10,6 +10,7 @@ const t = {
         start: 'Get started',
         proceeding: 'By proceeding, you agree with ',
         termsAndConditions: 'Terms & Conditions',
+        activityTracking: 'I consent to activity tracking inside the app',
     },
     setupPassword: {
         setPassword: 'Setup Passcode',
