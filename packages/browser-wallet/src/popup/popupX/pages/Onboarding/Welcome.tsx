@@ -26,20 +26,6 @@ import appTracker from '@shared/analytics';
 
 const bg = document.getElementsByClassName('bg').item(0);
 
-function createAnalyticsTrackingObject(checkboxTracking: boolean) {
-    const generateClientId = () => {
-        const getRandomValue = () => Math.floor(Math.random() * 1e10);
-        return `${getRandomValue()}.${getRandomValue()}`;
-    };
-
-    return {
-        accepted: checkboxTracking,
-        clientId: generateClientId(),
-        userId: `user_${Date.now()}`,
-        sessionId: Math.floor(Date.now() / 1000),
-    };
-}
-
 function Description({ icon, title, description }: { icon: ReactNode; title: string; description: string }) {
     return (
         <div className="welcome__description">
@@ -59,24 +45,26 @@ export default function Welcome() {
     const [, setActivityTracking] = useAtom(acceptedActivityTrackingAtom);
     const [, setUiStyle] = useAtom(uiStyleAtom);
     const [checkboxTerms, setCheckboxTerms] = useState(false);
-    const [checkboxTracking, setCheckboxTracking] = useState(true);
+    const [checkboxTracking, setCheckboxTracking] = useState(false);
     const config = useAsyncMemo(getTermsAndConditionsConfig, undefined, []);
     const nav = useNavigate();
-    const navToPassword = () => {
+    const navToPassword = async () => {
         const version = config?.version || acceptedTerms?.version;
         // If we didn't find a version, put in an empty version
         setAcceptedTerms({ accepted: checkboxTerms, version: version || '', url: config?.url });
 
-        setActivityTracking(createAnalyticsTrackingObject(checkboxTracking)).then(() => {
+        setUiStyle(UiStyle.WalletX);
+
+        try {
+            await setActivityTracking(appTracker.createAnalyticsTrackingObject(checkboxTracking));
+
             appTracker.welcomeScreen();
             appTracker.welcomeActivityTrackingCheckBoxChecked();
             appTracker.welcomeTermAndConditionsCheckBoxChecked();
             appTracker.welcomeGetStartedClicked();
-        });
-
-        setUiStyle(UiStyle.WalletX);
-
-        return nav(absoluteRoutes.onboarding.setupPassword.path);
+        } finally {
+            nav(absoluteRoutes.onboarding.setupPassword.path);
+        }
     };
 
     useEffect(() => {

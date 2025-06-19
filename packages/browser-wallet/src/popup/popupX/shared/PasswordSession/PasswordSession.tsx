@@ -9,6 +9,7 @@ import Text from '@popup/popupX/shared/Text';
 import Form from '@popup/popupX/shared/Form/Form';
 import FormPassword from '@popup/popupX/shared/Form/Password';
 import Button from '@popup/popupX/shared/Button';
+import appTracker from '@shared/analytics';
 
 type FormValues = {
     passcode: string;
@@ -28,7 +29,7 @@ export default function PasswordSession() {
 
     const handleSubmit: SubmitHandler<FormValues> = async (vs) => {
         if (activityTracking.value) {
-            setActivityTracking({ ...activityTracking.value, sessionId: Math.floor(Date.now() / 1000) });
+            setActivityTracking({ ...activityTracking.value, sessionId: appTracker.getDateTimestamp() });
         }
         if (encryptedSeedPhrase.value) {
             try {
