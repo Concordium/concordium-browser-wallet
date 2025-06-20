@@ -1,5 +1,9 @@
 # Changelog
 
+### Added
+
+-   Google Analytics track screens and events
+
 ### Fixed
 
 -   CIS-2 token validation of available funds, at Send Token screen

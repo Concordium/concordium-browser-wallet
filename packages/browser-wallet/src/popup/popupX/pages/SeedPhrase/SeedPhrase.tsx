@@ -12,6 +12,7 @@ import { useAtomValue } from 'jotai';
 import { encryptedSeedPhraseAtom, sessionPasscodeAtom } from '@popup/store/settings';
 import { withPasswordProtected } from '@popup/popupX/shared/utils/hoc';
 import { useCopyToClipboard } from '@popup/popupX/shared/utils/hooks';
+import appTracker from '@shared/analytics';
 
 function SeedPhrase() {
     const { t } = useTranslation('x', { keyPrefix: 'seedPhrase' });
@@ -45,7 +46,14 @@ function SeedPhrase() {
                         <Text.LabelRegular key={word}>{word}</Text.LabelRegular>
                     ))}
                 </Card>
-                <Button.IconText icon={<Copy />} label={t('copy')} onClick={() => copyToClipboard(seedPhrase)} />
+                <Button.IconText
+                    icon={<Copy />}
+                    label={t('copy')}
+                    onClick={() => {
+                        appTracker.seedPhraseCopyClicked();
+                        copyToClipboard(seedPhrase);
+                    }}
+                />
             </Page.Main>
         </Page>
     );

@@ -24,12 +24,29 @@
         }
     }
 
-    &__footer {
-        margin: rem(8px) auto 0 auto;
-    }
+    &__check_group {
+        display: flex;
+        flex-direction: column;
+        gap: rem(4px);
+        margin: 0 auto;
 
-    .page__footer {
-        margin-bottom: rem(-16px);
+        .capture__main_small {
+            display: flex;
+
+            .form-input__checkbox {
+                margin-right: rem(8px);
+
+                input[type='checkbox'] {
+                    width: rem(18px);
+                    height: rem(18px);
+
+                    &::before {
+                        width: rem(12px);
+                        height: rem(12px);
+                    }
+                }
+            }
+        }
     }
 }
 

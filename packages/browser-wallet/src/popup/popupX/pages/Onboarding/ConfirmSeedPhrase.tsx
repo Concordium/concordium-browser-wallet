@@ -6,6 +6,7 @@ import Form from '@popup/popupX/shared/Form';
 import { SubmitHandler, Validate } from 'react-hook-form';
 import { useTranslation } from 'react-i18next';
 import { decrypt } from '@shared/utils/crypto';
+import appTracker from '@shared/analytics';
 import {
     encryptedSeedPhraseAtom,
     hasBeenOnBoardedAtom,
@@ -47,6 +48,7 @@ export default function ConfirmSeedPhrase() {
             absoluteRoutes.onboarding.setupPassword.createOrRestore.generateSeedPhrase.confirmSeedPhrase.idIntro.path;
         setOnboardingLocation(idIntro);
         setHasBeenOnboarded(true);
+        appTracker.seedPhraseContinueClicked();
         navigate(idIntro);
     };
 
