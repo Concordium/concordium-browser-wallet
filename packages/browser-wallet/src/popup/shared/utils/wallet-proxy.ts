@@ -47,6 +47,11 @@ export enum TransactionKindString {
     ConfigureBaker = 'configureBaker',
     ConfigureDelegation = 'configureDelegation',
     StakingReward = 'paydayAccountReward',
+    TokenHolder = 'tokenHolder',
+    TokenGovernance = 'tokenGovernance',
+    TokenUpdate = 'tokenUpdate',
+    ChainUpdate = 'chainUpdate',
+    UpdateCreatePLT = 'updateCreatePLT',
     Malformed = 'Malformed account transaction',
 }
 
@@ -106,6 +111,16 @@ function mapTransactionKindStringToTransactionType(
             return RewardType.StakingReward;
         case TransactionKindString.Malformed:
             return SpecialTransactionType.Malformed;
+        case TransactionKindString.TokenHolder:
+            return AccountTransactionType.TokenHolder;
+        case TransactionKindString.TokenGovernance:
+            return AccountTransactionType.TokenGovernance;
+        case TransactionKindString.TokenUpdate:
+            return SpecialTransactionType.TokenUpdate;
+        case TransactionKindString.ChainUpdate:
+            return SpecialTransactionType.ChainUpdate;
+        case TransactionKindString.UpdateCreatePLT:
+            return SpecialTransactionType.UpdateCreatePLT;
         default:
             throw Error(`Unknown transaction kind was encounted: ${kind}`);
     }
@@ -173,6 +188,9 @@ function getFromAddress(transaction: WalletProxyTransaction, accountAddress: str
     if (originType === OriginType.Reward) {
         return undefined;
     }
+    if (originType === OriginType.None) {
+        return undefined;
+    }
     throw new Error(
         `The received transaction is malformed. Could not find information to determine from address. ${JSON.stringify(
             transaction
@@ -194,6 +212,9 @@ function getToAddress(transaction: WalletProxyTransaction, accountAddress: strin
         return accountAddress;
     }
     if (transaction.origin.type === OriginType.Self) {
+        return undefined;
+    }
+    if (transaction.origin.type === OriginType.None) {
         return undefined;
     }
     throw new Error(
@@ -252,7 +273,7 @@ export async function getTransactions(
     order: 'ascending' | 'descending',
     config: GetTransactionsConfig = {}
 ): Promise<TransactionHistoryResult> {
-    let proxyPath = `/v1/accTransactions/${accountAddress}?limit=${resultLimit}&order=${order.toString()}&includeRawRejectReason`;
+    let proxyPath = `/v3/accTransactions/${accountAddress}?limit=${resultLimit}&order=${order.toString()}&includeRawRejectReason`;
     if (config.from) {
         proxyPath += `&from=${config.from}`;
     }
