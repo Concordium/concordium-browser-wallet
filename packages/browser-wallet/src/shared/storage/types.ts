@@ -35,7 +35,6 @@ export enum ChromeStorageKey {
     Cookie = 'cookie',
     OpenPrompt = 'openPrompt',
     AcceptedTerms = 'acceptedTerms',
-    AcceptedActivityTracking = 'acceptedActivityTracking',
     VerifiableCredentials = 'verifiableCredentials',
     VerifiableCredentialSchemas = 'verifiableCredentialSchemas',
     VerifiableCredentialMetadata = 'verifiableCredentialMetadata',
@@ -282,13 +281,6 @@ export type AcceptedTermsState = {
     accepted: boolean;
     version: string;
     url?: string;
-};
-
-export type AcceptedActivityTracking = {
-    accepted: boolean;
-    userId: string;
-    clientId: string;
-    sessionId: number;
 };
 
 export enum VerifiableCredentialStatus {

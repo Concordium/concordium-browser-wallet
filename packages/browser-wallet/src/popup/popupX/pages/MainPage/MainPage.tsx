@@ -1,4 +1,4 @@
-import React, { ReactNode, useEffect, useMemo } from 'react';
+import React, { ReactNode, useMemo } from 'react';
 import { generatePath, useNavigate } from 'react-router-dom';
 import { useTranslation } from 'react-i18next';
 import { useAtom, useAtomValue } from 'jotai';
@@ -28,7 +28,6 @@ import Pause from '@assets/svgX/pause.svg';
 import Tooltip from '@popup/popupX/shared/Tooltip';
 import { credentialsAtom, credentialsAtomWithLoading, selectedAccountAtom } from '@popup/store/account';
 import { SuspendedStatus, useSuspendedStatus } from '@popup/popupX/shared/utils/pool-status-helpers';
-import appTracker from '@shared/analytics';
 
 /** Hook loading every fungible token added to the account. */
 function useAccountFungibleTokens(account: WalletCredential) {
@@ -66,14 +65,7 @@ function Balance({ credential }: { credential: WalletCredential }) {
     const ccdAvailableBalance = mainPageCcdDisplay(accountInfo.accountAvailableBalance.microCcdAmount);
 
     return (
-        // disable eslint onClick rules, needed only for analytics
-        // eslint-disable-next-line jsx-a11y/click-events-have-key-events,jsx-a11y/no-static-element-interactions
-        <div
-            className="main-page-x__balance"
-            onClick={() => {
-                appTracker.homeTotalBalanceClicked();
-            }}
-        >
+        <div className="main-page-x__balance">
             <div className="main-page-x__balance_info">
                 <Text.DynamicSize baseFontSize={55} baseTextLength={10} className="heading_large">
                     {ccdBalance} CCD
@@ -314,10 +306,7 @@ function MainPageNoAccounts() {
             <Page.Footer>
                 <Button.Main
                     label={t('createAccount')}
-                    onClick={() => {
-                        appTracker.identityVerificationResultCreateAccountClicked();
-                        nav(absoluteRoutes.settings.createAccount.path);
-                    }}
+                    onClick={() => nav(absoluteRoutes.settings.createAccount.path)}
                 />
             </Page.Footer>
         </Page>
@@ -354,10 +343,6 @@ function MainPage({ credential }: MainPageProps) {
 
 function MainPageCredentials() {
     const credentials = useAtomValue(credentialsAtom);
-
-    useEffect(() => {
-        appTracker.homeScreen();
-    }, []);
 
     if (credentials.length === 0) {
         return <MainPageNoAccounts />;

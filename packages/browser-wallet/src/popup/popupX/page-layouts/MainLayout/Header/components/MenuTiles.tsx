@@ -10,7 +10,6 @@ import Info from '@assets/svgX/info2.svg';
 import Restore from '@assets/svgX/arrow-counter-clock.svg';
 import Eye from '@assets/svgX/eye.svg';
 import NFT from '@assets/svgX/cube-focus.svg';
-import Gear from '@assets/svgX/gear.svg';
 import IconButton from '@popup/shared/IconButton';
 import Text from '@popup/popupX/shared/Text';
 import { Link } from 'react-router-dom';
@@ -39,27 +38,21 @@ export default function MenuTiles({ menuOpen, setMenuOpen }: MenuTilesProps) {
                 onClick={() => setMenuOpen(false)}
             >
                 <Link to={absoluteRoutes.settings.identities.path}>
-                    <IconButton className="main-header__menu-tiles_tile">
+                    <IconButton className="main-header__menu-tiles_tile wide">
                         <Identification />
                         <Text.Capture>{t('identities')}</Text.Capture>
+                    </IconButton>
+                </Link>
+                <Link to={absoluteRoutes.settings.accounts.path}>
+                    <IconButton className="main-header__menu-tiles_tile wide">
+                        <Browsers />
+                        <Text.Capture>{t('accounts')}</Text.Capture>
                     </IconButton>
                 </Link>
                 <Link to={absoluteRoutes.settings.seedPhrase.path}>
                     <IconButton className="main-header__menu-tiles_tile">
                         <TextColumns />
                         <Text.Capture>{t('seedPhrase')}</Text.Capture>
-                    </IconButton>
-                </Link>
-                <Link to={absoluteRoutes.settings.accounts.path}>
-                    <IconButton className="main-header__menu-tiles_tile">
-                        <Browsers />
-                        <Text.Capture>{t('accounts')}</Text.Capture>
-                    </IconButton>
-                </Link>
-                <Link to={absoluteRoutes.settings.configuration.path}>
-                    <IconButton className="main-header__menu-tiles_tile">
-                        <Gear />
-                        <Text.Capture>{t('settings')}</Text.Capture>
                     </IconButton>
                 </Link>
                 <Link to={absoluteRoutes.settings.passcode.path}>

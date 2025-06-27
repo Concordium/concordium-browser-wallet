@@ -1,5 +1,9 @@
 # Changelog
 
+### Removed
+
+-   Google Analytics track screens and events
+
 ## 2.3.0
 
 ### Added

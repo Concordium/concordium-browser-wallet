@@ -11,7 +11,6 @@ const t = {
         restore: 'Restore',
         oldUI: 'Old UI',
         nft: 'NFT',
-        settings: 'Settings',
     },
     accountButton: {
         noAccounts: 'No accounts',

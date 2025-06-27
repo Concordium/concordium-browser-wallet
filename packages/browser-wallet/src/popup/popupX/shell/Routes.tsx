@@ -12,7 +12,6 @@ import IdCards from '@popup/popupX/pages/IdCards';
 import Accounts from '@popup/popupX/pages/Accounts';
 import CreateAccount, { CreateAccountConfirm } from '@popup/popupX/pages/CreateAccount';
 import SeedPhrase from 'src/popup/popupX/pages/SeedPhrase';
-import Settings from 'src/popup/popupX/pages/Settings';
 import ChangePasscode from 'src/popup/popupX/pages/ChangePasscode';
 import { Web3IdCredentials, Web3IdImport } from '@popup/popupX/pages/Web3Id';
 import NetworkSettings from '@popup/popupX/pages/NetworkSettings';
@@ -195,7 +194,6 @@ export default function Routes({ messagePromptHandlers }: { messagePromptHandler
                             element={<CreateAccountConfirm />}
                         />
                     </Route>
-                    <Route element={<Settings />} path={relativeRoutes.settings.configuration.path} />
                     <Route element={<SeedPhrase />} path={relativeRoutes.settings.seedPhrase.path} />
                     <Route element={<ChangePasscode />} path={relativeRoutes.settings.passcode.path} />
                     <Route path={relativeRoutes.settings.web3Id.path}>

@@ -7,7 +7,6 @@ import Button from '@popup/popupX/shared/Button';
 import { useTranslation } from 'react-i18next';
 import Text from '@popup/popupX/shared/Text';
 import { absoluteRoutes } from '@popup/popupX/constants/routes';
-import appTracker from '@shared/analytics';
 
 export default function CreateOrRestore() {
     const { t } = useTranslation('x', { keyPrefix: 'onboarding.createOrRestore' });
@@ -28,20 +27,8 @@ export default function CreateOrRestore() {
                 <Text.Capture>{t('optionsInfo')}</Text.Capture>
             </Page.Main>
             <Page.Footer>
-                <Button.Main
-                    label={t('create')}
-                    onClick={() => {
-                        navToCreate();
-                        appTracker.welcomeSetUpWalletDialogCreateClicked();
-                    }}
-                />
-                <Button.Main
-                    label={t('restore')}
-                    onClick={() => {
-                        navToRestore();
-                        appTracker.welcomeSetUpWalletDialogImportClicked();
-                    }}
-                />
+                <Button.Main label={t('create')} onClick={navToCreate} />
+                <Button.Main label={t('restore')} onClick={navToRestore} />
             </Page.Footer>
         </Page>
     );

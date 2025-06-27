@@ -19,7 +19,6 @@ import {
     VerifiableCredential,
     VerifiableCredentialSchema,
     UiStyle,
-    AcceptedActivityTracking,
 } from './types';
 
 export type StorageAccessor<V> = {
@@ -193,10 +192,6 @@ export const storedTokenMetadata = makeStorageAccessor<Record<string, TokenMetad
     ChromeStorageKey.TokenMetadata
 );
 export const storedAcceptedTerms = makeStorageAccessor<AcceptedTermsState>('local', ChromeStorageKey.AcceptedTerms);
-export const storedAcceptedActivityTracking = makeStorageAccessor<AcceptedActivityTracking>(
-    'local',
-    ChromeStorageKey.AcceptedActivityTracking
-);
 export const storedVerifiableCredentials = makeSerializedAndIndexedStorageAccessor<VerifiableCredential[]>(
     'local',
     ChromeStorageKey.VerifiableCredentials

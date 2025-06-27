@@ -35,7 +35,6 @@ import {
     storedLog,
     storedMigrations,
     storedUiStyle,
-    storedAcceptedActivityTracking,
 } from '@shared/storage/access';
 import { ChromeStorageKey } from '@shared/storage/types';
 import { atom, PrimitiveAtom, WritableAtom } from 'jotai';
@@ -67,7 +66,6 @@ const accessorMap: Record<ChromeStorageKey, StorageAccessor<any>> = {
     [ChromeStorageKey.Cookie]: useIndexedStorage(sessionCookie, getGenesisHash),
     [ChromeStorageKey.OpenPrompt]: sessionOpenPrompt,
     [ChromeStorageKey.AcceptedTerms]: storedAcceptedTerms,
-    [ChromeStorageKey.AcceptedActivityTracking]: storedAcceptedActivityTracking,
     [ChromeStorageKey.VerifiableCredentials]: useIndexedStorage(storedVerifiableCredentials, getGenesisHash),
     [ChromeStorageKey.VerifiableCredentialSchemas]: storedVerifiableCredentialSchemas,
     [ChromeStorageKey.VerifiableCredentialMetadata]: storedVerifiableCredentialMetadata,
