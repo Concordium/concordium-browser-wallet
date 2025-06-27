@@ -1,4 +1,3 @@
-import { v4 as uuidv4 } from 'uuid';
 import { storedAcceptedActivityTracking, storedCurrentNetwork } from '@shared/storage/access';
 import { isMainnet } from '@shared/utils/network-helpers';
 
@@ -112,22 +111,20 @@ class FirebaseAppTracker {
     }
 
     createAnalyticsTrackingObject(accepted: boolean): AnalyticsTrackingObject {
-        const currentTimestamp = this.getDateTimestamp();
-
         // GA's requirements for client_id: XXXXXXXX.YYYYYYYYYY
         // Two part string
         // XXXXXXXX = Random integer representing the GA account/device ID
         // YYYYYYYYYY = Timestamp (in Unix epoch format, seconds) representing when the client first visited
         const generateClientId = () => {
             const getRandomValue = () => Math.floor(Math.random() * 1e10);
-            return `${getRandomValue()}.${currentTimestamp}`;
+            return `${getRandomValue()}.${this.getDateTimestamp()}`;
         };
 
         return {
             accepted,
             clientId: generateClientId(),
-            userId: `user_${uuidv4()}`,
-            sessionId: currentTimestamp,
+            userId: `user_${this.getDateTimestamp()}`,
+            sessionId: this.getDateTimestamp(),
         };
     }
 
