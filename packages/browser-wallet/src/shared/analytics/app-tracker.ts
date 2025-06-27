@@ -77,13 +77,6 @@ const DIALOG_SET_UP_WALLET = appScreen('Set up wallet dialog', 'set_up_wallet_di
 const DIALOG_ID_VERIFICATION_APPROVED = appScreen('ID Verification approved', 'id_verification_approved_dialog');
 const DIALOG_UNLOCK_FEATURE = appScreen('Home: Unlock feature dialog', 'unlock_feature_dialog');
 
-type AnalyticsTrackingObject = {
-    accepted: boolean;
-    clientId: string;
-    userId: string;
-    sessionId: number;
-};
-
 class FirebaseAppTracker {
     private screenVisit(screen: AppScreen, extraParams?: { [key: string]: string }) {
         logEvent(FirebaseAnalytics.Event.SCREEN_VIEW, {
@@ -104,28 +97,6 @@ class FirebaseAppTracker {
         logEvent(FirebaseAnalytics.Event.ENTER_INPUT, {
             [FirebaseAnalytics.Param.ITEM_NAME]: contentName,
         });
-    }
-
-    getDateTimestamp(): number {
-        return Math.floor(Date.now() / 1000);
-    }
-
-    createAnalyticsTrackingObject(accepted: boolean): AnalyticsTrackingObject {
-        // GA's requirements for client_id: XXXXXXXX.YYYYYYYYYY
-        // Two part string
-        // XXXXXXXX = Random integer representing the GA account/device ID
-        // YYYYYYYYYY = Timestamp (in Unix epoch format, seconds) representing when the client first visited
-        const generateClientId = () => {
-            const getRandomValue = () => Math.floor(Math.random() * 1e10);
-            return `${getRandomValue()}.${this.getDateTimestamp()}`;
-        };
-
-        return {
-            accepted,
-            clientId: generateClientId(),
-            userId: `user_${this.getDateTimestamp()}`,
-            sessionId: this.getDateTimestamp(),
-        };
     }
 
     welcomeScreen() {

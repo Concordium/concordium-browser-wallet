@@ -222,12 +222,6 @@ export const relativeRoutes = {
                 backTitle: '',
             },
         },
-        configuration: {
-            path: 'configuration',
-            config: {
-                backTitle: '',
-            },
-        },
         passcode: {
             path: 'passcode',
         },
