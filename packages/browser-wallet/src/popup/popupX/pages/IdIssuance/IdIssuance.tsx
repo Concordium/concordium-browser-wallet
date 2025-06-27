@@ -14,7 +14,6 @@ import { grpcClientAtom, networkConfigurationAtom } from '@popup/store/settings'
 import { CreationStatus, IdentityProvider, SessionPendingIdentity } from '@shared/storage/types';
 import { getGlobal } from '@shared/utils/network-helpers';
 import { logErrorMessage } from '@shared/utils/log-helpers';
-import appTracker from '@shared/analytics';
 
 import { IdIssuanceExternalFlowLocationState } from './util';
 
@@ -29,8 +28,6 @@ export default function IdIssuance() {
     const [pendingIdentity, setPendingIdentity] = useAtom(pendingIdentityAtom);
 
     useEffect(() => {
-        appTracker.identityVerificationProvidersListScreen();
-
         // TODO: only load once per session?
         getIdentityProviders()
             .then(setProviders)
@@ -92,12 +89,7 @@ export default function IdIssuance() {
                             className="id-issuance__issuer-btn"
                             key={p.ipInfo.ipDescription.url}
                             disabled={buttonDisabled}
-                            onClick={() => {
-                                startIssuance(p);
-                                appTracker.identityVerificationScreen(
-                                    p.metadata.display ?? p.ipInfo.ipDescription.name
-                                );
-                            }}
+                            onClick={() => startIssuance(p)}
                         >
                             <IdentityProviderIcon provider={p} />
                             <span>{p.metadata.display ?? p.ipInfo.ipDescription.name}</span>

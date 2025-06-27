@@ -11,10 +11,9 @@ import Page from '@popup/popupX/shared/Page';
 import Text from '@popup/popupX/shared/Text';
 import Button from '@popup/popupX/shared/Button';
 import { SeedPhrase } from '@popup/popupX/shared/Form/SeedPhrase';
-import appTracker from '@shared/analytics';
 
 export default function GenerateSeedPhrase() {
-    const nav = useNavigate();
+    const navigate = useNavigate();
     const location = useLocation();
     const { t } = useTranslation('x', { keyPrefix: 'onboarding.generateSeedPhrase' });
     const [seedPhrase, setSeedPhrase] = useState<string>();
@@ -22,13 +21,6 @@ export default function GenerateSeedPhrase() {
     const setOnboardingLocation = useSetAtom(sessionOnboardingLocationAtom);
     const sessionPasscode = useAtomValue(sessionPasscodeAtom);
     const passcode = sessionPasscode.value;
-
-    const navToConfirmSeed = () =>
-        nav(absoluteRoutes.onboarding.setupPassword.createOrRestore.generateSeedPhrase.confirmSeedPhrase.path);
-
-    useEffect(() => {
-        appTracker.seedPhraseScreen();
-    }, []);
 
     useEffect(() => {
         if (!encryptedSeedPhrase.loading && encryptedSeedPhrase.value === undefined && passcode) {
@@ -57,7 +49,15 @@ export default function GenerateSeedPhrase() {
                 )}
             </Page.Main>
             <Page.Footer>
-                <Button.Main label={t('continue')} onClick={() => navToConfirmSeed()} />
+                <Button.Main
+                    label={t('continue')}
+                    onClick={() =>
+                        navigate(
+                            absoluteRoutes.onboarding.setupPassword.createOrRestore.generateSeedPhrase.confirmSeedPhrase
+                                .path
+                        )
+                    }
+                />
             </Page.Footer>
         </Page>
     );

@@ -12,7 +12,6 @@ import { passcodeAtom } from '@popup/state';
 import { useForm } from '@popup/shared/Form';
 import { SubmitHandler, Validate } from 'react-hook-form';
 import { encryptedSeedPhraseAtom, sessionPasscodeAtom } from '@popup/store/settings';
-import appTracker from '@shared/analytics';
 
 type FormValues = {
     passcode: string;
@@ -40,10 +39,6 @@ export default function SetupPassword() {
         (value) => value === passcode || t('passcodeMismatch'),
         [passcode]
     );
-
-    useEffect(() => {
-        appTracker.passcodeScreen();
-    }, []);
 
     useEffect(() => {
         if (form.formState.dirtyFields.passcodeAgain) {
@@ -78,18 +73,12 @@ export default function SetupPassword() {
                                         required: t('passcodeRequired'),
                                         minLength: { value: 6, message: t('passcodeMinLength') },
                                     }}
-                                    onBlur={() => {
-                                        appTracker.passcodeSetupEntered();
-                                    }}
                                 />
                                 <FormPassword
                                     control={f.control}
                                     name="passcodeAgain"
                                     label={t('enterPasscodeAgain')}
                                     rules={{ validate: passcodesAreEqual }}
-                                    onBlur={() => {
-                                        appTracker.passcodeSetupConfirmationEntered();
-                                    }}
                                 />
                             </>
                         );

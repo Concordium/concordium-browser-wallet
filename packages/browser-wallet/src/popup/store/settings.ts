@@ -1,5 +1,4 @@
 import {
-    AcceptedActivityTracking,
     AcceptedTermsState,
     ChromeStorageKey,
     EncryptedData,
@@ -75,12 +74,6 @@ export const grpcClientAtom = atom<ConcordiumGRPCClient>((get) => {
 
 export const acceptedTermsAtom = atomWithChromeStorage<AcceptedTermsState | undefined>(
     ChromeStorageKey.AcceptedTerms,
-    undefined,
-    true
-);
-
-export const acceptedActivityTrackingAtom = atomWithChromeStorage<AcceptedActivityTracking | undefined>(
-    ChromeStorageKey.AcceptedActivityTracking,
     undefined,
     true
 );
