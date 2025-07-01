@@ -1,5 +1,7 @@
 # Changelog
 
+## 2.4.0
+
 ### Removed
 
 -   Google Analytics track screens and events
