@@ -52,7 +52,7 @@ function TokenDetails({ credential }: { credential: WalletCredential }) {
         return null;
     }
     const {
-        state: { moduleRef, issuer, decimals, totalSupply },
+        state: { moduleRef, decimals, totalSupply },
     } = pltInfo;
 
     const navToSend = () =>
@@ -88,7 +88,6 @@ function TokenDetails({ credential }: { credential: WalletCredential }) {
                         <Text.Main>{pltSymbol}</Text.Main>
                     </div>
                     <Card.RowDetails title={t('totalSupply')} value={formatTokenAmount(totalSupply.value, decimals)} />
-                    <Card.RowDetails title={t('issuer')} value={issuer.toString()} />
                     <Card.RowDetails title={t('moduleRef')} value={moduleRef.toString()} />
                     <Card.RowDetails title={t('decimals')} value={`0 - ${decimals}`} />
                 </Card>

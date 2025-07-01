@@ -33,7 +33,7 @@ import {
     AccountTransactionPayload,
     getAccountTransactionHandler,
     AccountTransactionPayloadJSON,
-    TokenHolderPayload,
+    TokenUpdatePayload,
 } from '@concordium/web-sdk/types';
 import { empty } from '@concordium/web-sdk/types/Parameter';
 import { IdStatement } from '@concordium/web-sdk/id';
@@ -233,7 +233,7 @@ export type SendTransactionPayloadCompat =
     | ConfigureDelegationPayloadCompat
     | RegisterDataPayloadCompat
     | UpdateCredentialsPayloadCompat
-    | TokenHolderPayload;
+    | TokenUpdatePayload;
 
 function sanitizePayload(type: AccountTransactionType, payload: SendTransactionPayloadCompat): SendTransactionPayload {
     switch (type) {

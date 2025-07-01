@@ -1,6 +1,6 @@
 import React, { useMemo } from 'react';
 import { useTranslation } from 'react-i18next';
-import { Cbor, CborMemo, TokenAmount, TokenId } from '@concordium/web-sdk/plt';
+import { Cbor, CborMemo, TokenAmount, TokenId, TokenOperationType, TokenHolder } from '@concordium/web-sdk/plt';
 import {
     AccountAddress,
     AccountTransactionType,
@@ -11,7 +11,7 @@ import {
     SimpleTransferPayload,
     SimpleTransferWithMemoPayload,
     TransactionHash,
-    TokenHolderPayload,
+    TokenUpdatePayload,
 } from '@concordium/web-sdk';
 import { useAsyncMemo } from 'wallet-common-helpers';
 import { useAtomValue } from 'jotai';
@@ -51,7 +51,7 @@ const getTransactionType = (tokenType: string, memo?: string) => {
         return AccountTransactionType.Transfer;
     }
     if (tokenType === 'plt') {
-        return AccountTransactionType.TokenHolder;
+        return AccountTransactionType.TokenUpdate;
     }
     return AccountTransactionType.Update;
 };
@@ -111,18 +111,18 @@ export default function SendFundsConfirm({ values, fee, sender }: Props) {
 
         const ops = [
             {
-                transfer: {
+                [TokenOperationType.Transfer]: {
                     amount: TokenAmount.fromJSON({
                         value: parseTokenAmount(values.amount, tokenMetadata?.decimals).toString(),
                         decimals: tokenMetadata?.decimals || 0,
                     }),
-                    recipient: receiver,
+                    recipient: TokenHolder.fromAccountAddress(receiver),
                     memo: values.memo ? CborMemo.fromString(values.memo) : undefined,
                 },
             },
         ];
-        const payload: TokenHolderPayload = {
-            tokenSymbol: TokenId.fromString(values.token.tokenSymbol),
+        const payload: TokenUpdatePayload = {
+            tokenId: TokenId.fromString(values.token.tokenSymbol),
             operations: Cbor.encode(ops),
         };
 

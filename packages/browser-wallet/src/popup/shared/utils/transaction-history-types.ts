@@ -41,7 +41,6 @@ export enum RewardType {
 }
 
 export enum SpecialTransactionType {
-    TokenUpdate = 27,
     ChainUpdate = 'ChainUpdate',
     UpdateCreatePLT = 'UpdateCreatePLT',
     Malformed = 'Malformed',
@@ -50,7 +49,6 @@ export enum SpecialTransactionType {
 
 // ToDo remove after web-sdk update
 export enum TransactionKindStringSpecial {
-    TokenUpdate = 'tokenUpdate',
     ChainUpdate = 'chainUpdate',
     UpdateCreatePLT = 'updateCreatePLT',
 }
@@ -93,12 +91,8 @@ function mapTransactionKindStringToTransactionType(
             return AccountTransactionType.TransferToPublic;
         case TransactionKindString.TransferWithSchedule:
             return AccountTransactionType.TransferWithSchedule;
-        case TransactionKindString.TokenHolder:
-            return AccountTransactionType.TokenHolder;
-        case TransactionKindString.TokenGovernance:
-            return AccountTransactionType.TokenGovernance;
-        case TransactionKindStringSpecial.TokenUpdate:
-            return SpecialTransactionType.TokenUpdate;
+        case TransactionKindString.TokenUpdate:
+            return AccountTransactionType.TokenUpdate;
         case TransactionKindStringSpecial.ChainUpdate:
             return SpecialTransactionType.ChainUpdate;
         case TransactionKindStringSpecial.UpdateCreatePLT:

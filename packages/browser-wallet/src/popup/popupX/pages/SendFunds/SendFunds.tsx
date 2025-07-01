@@ -10,9 +10,16 @@ import {
     Energy,
     SimpleTransferPayload,
     SimpleTransferWithMemoPayload,
-    TokenHolderPayload,
+    TokenUpdatePayload,
 } from '@concordium/web-sdk';
-import { Cbor, CborMemo, TokenId, TokenAmount as TokenAmountPlt } from '@concordium/web-sdk/plt';
+import {
+    Cbor,
+    CborMemo,
+    TokenId,
+    TokenAmount as TokenAmountPlt,
+    TokenOperationType,
+    TokenHolder,
+} from '@concordium/web-sdk/plt';
 import { useAsyncMemo } from 'wallet-common-helpers';
 import { useAtomValue } from 'jotai';
 
@@ -92,21 +99,21 @@ function SendFunds({ address }: SendFundsProps) {
             if (token?.tokenType === 'plt') {
                 const ops = [
                     {
-                        transfer: {
+                        [TokenOperationType.Transfer]: {
                             amount: TokenAmountPlt.fromJSON({
                                 value: parseTokenAmount(amount, metadata?.decimals).toString(),
                                 decimals: metadata?.decimals || 0,
                             }),
-                            recipient: address,
+                            recipient: TokenHolder.fromAccountAddress(address),
                             memo: memo ? CborMemo.fromString(memo) : undefined,
                         },
                     },
                 ];
-                const payload: TokenHolderPayload = {
-                    tokenSymbol: TokenId.fromString(token.tokenSymbol),
+                const payload: TokenUpdatePayload = {
+                    tokenId: TokenId.fromString(token.tokenSymbol),
                     operations: Cbor.encode(ops),
                 };
-                return getFee(AccountTransactionType.TokenHolder, payload);
+                return getFee(AccountTransactionType.TokenUpdate, payload);
             }
             if (token?.tokenType === 'ccd') {
                 if (memo) {

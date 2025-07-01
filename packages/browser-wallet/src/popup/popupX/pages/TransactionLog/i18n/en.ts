@@ -22,8 +22,6 @@ const t = {
     transferWithMemo: 'Transfer',
     encryptedAmountTransferWithMemo: 'Shielded transfer',
     transferWithScheduleAndMemo: 'Scheduled transfer',
-    pltTransfer: 'PLT transfer',
-    pltGovernance: 'PLT governance',
     pltUpdate: 'PLT update',
     pltUpdateCreate: 'PLT update create',
     chainUpdate: 'Chain update',

@@ -47,8 +47,6 @@ export enum TransactionKindString {
     ConfigureBaker = 'configureBaker',
     ConfigureDelegation = 'configureDelegation',
     StakingReward = 'paydayAccountReward',
-    TokenHolder = 'tokenHolder',
-    TokenGovernance = 'tokenGovernance',
     TokenUpdate = 'tokenUpdate',
     ChainUpdate = 'chainUpdate',
     UpdateCreatePLT = 'updateCreatePLT',
@@ -111,12 +109,8 @@ function mapTransactionKindStringToTransactionType(
             return RewardType.StakingReward;
         case TransactionKindString.Malformed:
             return SpecialTransactionType.Malformed;
-        case TransactionKindString.TokenHolder:
-            return AccountTransactionType.TokenHolder;
-        case TransactionKindString.TokenGovernance:
-            return AccountTransactionType.TokenGovernance;
         case TransactionKindString.TokenUpdate:
-            return SpecialTransactionType.TokenUpdate;
+            return AccountTransactionType.TokenUpdate;
         case TransactionKindString.ChainUpdate:
             return SpecialTransactionType.ChainUpdate;
         case TransactionKindString.UpdateCreatePLT:
