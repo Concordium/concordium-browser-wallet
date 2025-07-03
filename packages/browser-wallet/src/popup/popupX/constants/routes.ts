@@ -114,8 +114,8 @@ export const relativeRoutes = {
         receive: {
             path: 'receive',
         },
-        buyCCD: {
-            path: 'buyCCD',
+        onramp: {
+            path: 'onramp',
         },
         transactionLog: {
             path: 'account/:account/transactions',

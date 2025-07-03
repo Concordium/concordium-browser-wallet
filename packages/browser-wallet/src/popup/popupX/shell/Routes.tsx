@@ -5,7 +5,7 @@ import MainLayout, { OnboardingLayout } from '@popup/popupX/page-layouts/MainLay
 import MainPage from '@popup/popupX/pages/MainPage';
 import { SendFunds } from '@popup/popupX/pages/SendFunds';
 import ReceiveFunds from '@popup/popupX/pages/ReceiveFunds';
-import BuyCCD from '@popup/popupX/pages/BuyCCD';
+import Onramp from '@popup/popupX/pages/Onramp';
 import TransactionLog from '@popup/popupX/pages/TransactionLog';
 import TransactionDetails from '@popup/popupX/pages/TransactionLog/TransactionDetails';
 import { TokenDetails, TokenDetailsCcd, TokenRaw } from '@popup/popupX/pages/TokenDetails';
@@ -136,7 +136,7 @@ export default function Routes({ messagePromptHandlers }: { messagePromptHandler
                     <Route index element={<MainPage />} />
                     <Route path={relativeRoutes.home.sendFunds.path} element={<SendFunds />} />
                     <Route element={<ReceiveFunds />} path={relativeRoutes.home.receive.path} />
-                    <Route element={<BuyCCD />} path={relativeRoutes.home.buyCCD.path} />
+                    <Route element={<Onramp />} path={relativeRoutes.home.onramp.path} />
                     <Route path={relativeRoutes.home.transactionLog.path}>
                         <Route index element={<TransactionLog />} />
                         <Route

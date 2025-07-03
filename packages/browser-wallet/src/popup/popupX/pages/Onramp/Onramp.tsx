@@ -9,9 +9,32 @@ import PaymentIcon from '@assets/svgX/payment-icon.svg';
 import ArrowPayment from '@assets/svgX/arrow-payment.svg';
 import { selectedCredentialAtom } from '@popup/store/account';
 import { networkConfigurationAtom } from '@popup/store/settings';
+import { NetworkConfiguration } from '@shared/storage/types';
+import { isMainnet } from '@shared/utils/network-helpers';
+import urls from '@shared/constants/url';
 
-export default function BuyCCD() {
-    const { t } = useTranslation('x', { keyPrefix: 'buyCCD' });
+const BANXA_CONFIG = {
+    title: 'Banxa',
+    productionUrl: 'https://concordium.banxa.com/',
+    testUrl: 'https://concordium.banxa-sandbox.com/',
+    getBaseUrl(network: NetworkConfiguration) {
+        return isMainnet(network) ? this.productionUrl : this.testUrl;
+    },
+    getUrl(network: NetworkConfiguration, address: string) {
+        const queryParams = {
+            coinType: 'CCD',
+            walletAddress: address,
+            orderType: 'buy',
+        };
+
+        const queryString = new URLSearchParams(queryParams).toString();
+
+        return `${this.getBaseUrl(network)}?${queryString}`;
+    },
+};
+
+export default function Onramp() {
+    const { t } = useTranslation('x', { keyPrefix: 'onramp' });
     const credential = useAtomValue(selectedCredentialAtom);
 
     if (credential === undefined) {
@@ -19,28 +42,13 @@ export default function BuyCCD() {
     }
 
     const network = useAtomValue(networkConfigurationAtom);
-
-    const baseUrl =
-        network.name === 'Concordium Mainnet'
-            ? 'https://concordium.banxa.com/'
-            : 'https://concordium.banxa-sandbox.com/';
-
-    const queryParams = {
-        coinType: 'CCD',
-        walletAddress: credential.address,
-        orderType: 'buy',
-    };
-
-    const queryString = new URLSearchParams(queryParams).toString();
-
-    const url = `${baseUrl}?${queryString}`;
-
+    const url = BANXA_CONFIG.getUrl(network, credential.address);
     const handleClick = () => {
         window.open(url, '_blank');
     };
 
     return (
-        <Page className="buy-ccd">
+        <Page className="onramp">
             <Page.Main>
                 <Page.Top heading={t('buyCCD')} />
                 <Text.Capture className="text__description">{t('description')}</Text.Capture>
@@ -48,7 +56,7 @@ export default function BuyCCD() {
                     <button type="button" onClick={handleClick} className="banxa-link-btn" aria-label={t('continue')}>
                         <span className="banxa-link-btn__left">
                             <BanxaLogo className="banxa-link-btn__logo" />
-                            <span className="banxa-link-btn__text">Banxa</span>
+                            <span className="banxa-link-btn__text">{BANXA_CONFIG.title}</span>
                         </span>
                         <PaymentIcon className="banxa-link-btn__payment" />
                         <ArrowPayment className="banxa-link-btn__arrow" />
@@ -56,9 +64,7 @@ export default function BuyCCD() {
                 </Card>
                 <Text.Capture className="text__description">
                     {t('supportedWallets')}
-                    <Text.ExternalLink path="https://concordium.com/ccd-wallet">
-                        concordium.com/ccd-wallet
-                    </Text.ExternalLink>
+                    <Text.ExternalLink path={urls.websiteCcdWallet}>concordium.com/ccd-wallet</Text.ExternalLink>
                 </Text.Capture>
                 <Card type="grey">
                     <Text.Heading>Disclaimer</Text.Heading>

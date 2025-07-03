@@ -190,7 +190,7 @@ function MainPageConfirmedAccount({ credential }: MainPageConfirmedAccountProps)
     const navToSend = () => nav(generatePath(absoluteRoutes.home.sendFunds.path, { account: credential.address }));
     const navToReceive = () => nav(relativeRoutes.home.receive.path);
     const navToEarn = () => nav(absoluteRoutes.settings.earn.path);
-    const navToBuy = () => nav(absoluteRoutes.home.buyCCD.path);
+    const navToBuy = () => nav(absoluteRoutes.home.onramp.path);
     const navToTransactionLog = () =>
         nav(relativeRoutes.home.transactionLog.path.replace(':account', credential.address));
     const navToTokenDetails = (contractIndex: string) =>

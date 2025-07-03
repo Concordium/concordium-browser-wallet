@@ -31,7 +31,7 @@ import viewSeedPhrase from '@popup/pages/ViewSeedPhrase/i18n/en';
 // Wallet-X locales
 import onboarding from '@popup/popupX/pages/Onboarding/i18n/en';
 import receiveFunds from '@popup/popupX/pages/ReceiveFunds/i18n/en';
-import buyCCD from '@popup/popupX/pages/BuyCCD/i18n/en';
+import onramp from '@popup/popupX/pages/Onramp/i18n/en';
 import sendFunds from '@popup/popupX/pages/SendFunds/i18n/en';
 import idCards from '@popup/popupX/pages/IdCards/i18n/en';
 import accounts from '@popup/popupX/pages/Accounts/i18n/en';
@@ -98,7 +98,7 @@ const t = {
     x: {
         onboarding,
         receiveFunds,
-        buyCCD,
+        onramp,
         sendFunds,
         idCards,
         idIssuance,
