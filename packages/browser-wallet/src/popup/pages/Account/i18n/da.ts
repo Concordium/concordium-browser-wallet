@@ -10,6 +10,7 @@ const t: typeof en = {
     accountBalanceError: 'Fejl ved hentning af kontoens balance',
     actions: {
         log: 'Transaktionslog',
+        buy: 'Buy CCD',
         send: 'Send CCD',
         receive: 'Modtag CCD',
         earn: 'Optjen CCD',

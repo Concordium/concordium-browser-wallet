@@ -114,6 +114,9 @@ export const relativeRoutes = {
         receive: {
             path: 'receive',
         },
+        buyCCD: {
+            path: 'buyCCD',
+        },
         transactionLog: {
             path: 'account/:account/transactions',
             config: {

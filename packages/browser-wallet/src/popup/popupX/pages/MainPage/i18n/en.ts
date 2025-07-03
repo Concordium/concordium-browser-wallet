@@ -1,4 +1,5 @@
 const t = {
+    buy: 'Buy',
     receive: 'Receive',
     send: 'Send',
     earn: 'Earn',

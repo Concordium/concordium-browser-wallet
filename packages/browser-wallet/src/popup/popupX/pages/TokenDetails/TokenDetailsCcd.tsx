@@ -14,6 +14,7 @@ import { withSelectedCredential } from '@popup/popupX/shared/utils/hoc';
 import Arrow from '@assets/svgX/arrow-right.svg';
 import Clock from '@assets/svgX/clock.svg';
 import Percent from '@assets/svgX/percent.svg';
+import Plus from '@assets/svgX/plus.svg';
 import ConcordiumLogo from '@assets/svgX/concordium-logo.svg';
 import { TokenPickerVariant } from '@popup/popupX/shared/Form/TokenAmount/View';
 import { displayCcdAsEur } from '@popup/popupX/shared/utils/helpers';
@@ -77,6 +78,7 @@ function TokenDetailsCcd({ credential }: { credential: WalletCredential }) {
             state: { tokenType: 'ccd' } as TokenPickerVariant,
         });
     const navToReceive = () => nav(absoluteRoutes.home.receive.path);
+    const navToBuy = () => nav(absoluteRoutes.home.buyCCD.path);
     const navToTransactionLog = () =>
         nav(absoluteRoutes.home.transactionLog.path.replace(':account', credential.address));
     const navToEarn = () => nav(absoluteRoutes.settings.earn.path);
@@ -121,6 +123,7 @@ function TokenDetailsCcd({ credential }: { credential: WalletCredential }) {
                     </div>
                 )}
                 <div className="token-details-x__action-buttons">
+                    <Button.IconTile icon={<Plus />} label={t('buy')} onClick={navToBuy} className="buy" />
                     <Button.IconTile
                         icon={<Arrow />}
                         label={t('receive')}

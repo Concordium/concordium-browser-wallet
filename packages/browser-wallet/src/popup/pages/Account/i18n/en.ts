@@ -8,6 +8,7 @@ const t = {
     accountBalanceError: 'Unable to retrieve account balance',
     actions: {
         log: 'Activity',
+        buy: 'Buy CCD',
         send: 'Send CCD',
         receive: 'Receive CCD',
         earn: 'Earn CCD',
