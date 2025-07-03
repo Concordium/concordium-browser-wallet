@@ -1,5 +1,11 @@
 # Changelog
 
+### Unreleased
+
+### Added
+
+-   Fiat on-ramp in the Browser Wallet. Introduced Banxa as available provider.
+
 ### Removed
 
 -   Google Analytics track screens and events
