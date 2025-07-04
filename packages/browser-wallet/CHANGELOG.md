@@ -1,10 +1,12 @@
 # Changelog
 
-## 2.4.0
+## 2.5.0
 
 ### Added
 
--   Fiat on-ramp in the Browser Wallet. Introduced Banxa as available provider.
+-   Fiat on-ramp in the Browser Wallet.
+
+## 2.4.0
 
 ### Removed
 
