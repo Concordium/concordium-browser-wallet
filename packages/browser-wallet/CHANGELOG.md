@@ -1,5 +1,9 @@
 # Changelog
 
+## Unreleased
+
+-   Removed EUROe as default token and associated migrations with EUROe as default token. EUROe can still be added by the "Manage token list" menu manually.
+
 ## 2.5.0
 
 ### Added

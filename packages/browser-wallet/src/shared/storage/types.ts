@@ -42,7 +42,6 @@ export enum ChromeStorageKey {
     TemporaryVerifiableCredentialMetadataUrls = 'tempVerifiableCredentialMetadataUrls',
     Allowlist = 'allowlist',
     Log = 'log',
-    Migrations = 'migrations',
 }
 
 export enum Theme {
