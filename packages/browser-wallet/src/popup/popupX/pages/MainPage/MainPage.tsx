@@ -275,6 +275,7 @@ function MainPagePendingAccount() {
                 <Dot />
             </div>
             <div className="main-page-x__action-buttons">
+                <Button.IconTile icon={<Plus />} label={t('buy')} disabled className="buy" />
                 <Button.IconTile icon={<Arrow />} label={t('receive')} disabled className="receive" />
                 <Button.IconTile icon={<Arrow />} label={t('send')} disabled className="send" />
                 <Button.IconTile icon={<Percent />} label={t('earn')} disabled />
