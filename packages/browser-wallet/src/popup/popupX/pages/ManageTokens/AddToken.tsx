@@ -83,7 +83,7 @@ const mapPltToLoadedToken = (
             symbol: token.tokenId,
             decimals: token.tokenState.decimals,
         },
-        metadataLink: token.tokenState?.moduleState?.metadata?.url || '',
+        metadataLink: token.tokenId,
         status: isExisting ? ChoiceStatus.existing : ChoiceStatus.discarded,
     };
 
