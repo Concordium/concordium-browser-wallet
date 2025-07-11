@@ -34,7 +34,7 @@ function usePltInfoAndBalance(pltSymbol: string, credential: WalletCredential) {
     const balance = currentToken?.state.balance || { decimals: 0, value: 0n };
     const renderedBalance = pipe(integerToFractional(balance.decimals), addThousandSeparators)(balance.value);
 
-    return { pltInfo, renderedBalance };
+    return { pltInfo, renderedBalance, currentToken: !!currentToken };
 }
 
 type Params = {
@@ -47,7 +47,7 @@ function TokenDetails({ credential }: { credential: WalletCredential }) {
     const nav = useNavigate();
 
     const { pltSymbol = '' } = useParams<Params>();
-    const { pltInfo, renderedBalance } = usePltInfoAndBalance(pltSymbol, credential);
+    const { pltInfo, renderedBalance, currentToken } = usePltInfoAndBalance(pltSymbol, credential);
     if (!pltInfo) {
         return null;
     }
@@ -57,10 +57,12 @@ function TokenDetails({ credential }: { credential: WalletCredential }) {
 
     const navToSend = () =>
         nav(sendFundsRoute(AccountAddress.fromBase58(credential.address)), {
-            state: {
-                tokenType: 'plt',
-                tokenSymbol: pltSymbol,
-            } as SendFundsLocationState,
+            state: currentToken
+                ? ({
+                      tokenType: 'plt',
+                      tokenSymbol: pltSymbol,
+                  } as SendFundsLocationState)
+                : null,
         });
     const navToReceive = () => nav(absoluteRoutes.home.receive.path);
     const navToTransactionLog = () =>

@@ -25,13 +25,15 @@ export function useTokenInfo(account: AccountAddress.Type): TokenInfoResponse {
     }
 
     const mapped = Object.entries(value).flatMap(([index, tokens]) =>
-        tokens.map(
-            (t): TokenInfo => ({
-                contract: ContractAddress.create(BigInt(index)),
-                id: t.id,
-                metadata: t.metadata,
-            })
-        )
+        Number(index) >= 0
+            ? tokens.map(
+                  (t): TokenInfo => ({
+                      contract: ContractAddress.create(BigInt(index)),
+                      id: t.id,
+                      metadata: t.metadata,
+                  })
+              )
+            : []
     );
 
     return { loading: false, value: mapped };

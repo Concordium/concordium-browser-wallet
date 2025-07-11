@@ -72,7 +72,12 @@ export default function SearchTokenDetails({
                             <Card.RowDetails title={t('description')} value={description} />
                             {decimals && <Card.RowDetails title={t('decimals')} value={`0 - ${decimals}`} />}
                             {id && <Card.RowDetails title={t('tokenId')} value={id} />}
-                            <Card.RowDetails title={t('indexSubindex')} value={`${index}, ${subindex || SUB_INDEX}`} />
+                            {!!Number(index) && (
+                                <Card.RowDetails
+                                    title={t('indexSubindex')}
+                                    value={`${index}, ${subindex || SUB_INDEX}`}
+                                />
+                            )}
                         </Card>
                         <Button.IconText
                             icon={<Notebook />}

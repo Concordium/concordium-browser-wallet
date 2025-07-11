@@ -137,7 +137,7 @@ const cbf = atomFamily<string, Atom<ContractBalances>>((identifier: string) => {
 
             const tokenIds = tokens.value[contractIndex]?.map((t) => t.id) ?? [];
 
-            if (tokenIds.length !== 0) {
+            if (tokenIds.length !== 0 && Number(contractIndex) >= 0) {
                 const instanceInfo = await client.getInstanceInfo(ContractAddress.create(BigInt(contractIndex)));
 
                 let balances = {};

@@ -13,18 +13,21 @@ import { selectedAccountAtom } from '@popup/store/account';
 import { contractDetailsAtom, contractTokensAtom } from '@popup/pages/Account/Tokens/ManageTokens/state';
 import { SubmitHandler } from 'react-hook-form';
 import { debouncedAsyncValidate } from '@popup/shared/utils/validation-helpers';
-import { ContractAddress } from '@concordium/web-sdk';
+import { AccountInfo, ContractAddress } from '@concordium/web-sdk';
 import { logWarningMessage } from '@shared/utils/log-helpers';
 import Form from '@popup/popupX/shared/Form/Form';
 import TokenList from '@popup/popupX/shared/TokenList';
 import { LoaderInline } from '@popup/popupX/shared/Loader';
 import Button from '@popup/popupX/shared/Button';
 import { absoluteRoutes } from '@popup/popupX/constants/routes';
-import { currentAccountTokensAtom } from '@popup/store/token';
-import { TokenIdAndMetadata } from '@shared/storage/types';
+import { AccountTokens, currentAccountTokensAtom } from '@popup/store/token';
+import { PltResponse, TokenIdAndMetadata } from '@shared/storage/types';
 import { useGenericToast } from '@popup/popupX/shared/utils/hooks';
 import { ChoiceStatus } from '@popup/shared/ContractTokenLine';
 import { SearchTokenDetails } from '@popup/popupX/pages/ManageTokens';
+import { getPltToken } from '@popup/shared/utils/wallet-proxy';
+import { useSelectedAccountInfo } from '@popup/shared/AccountInfoListenerContext/AccountInfoListenerContext';
+import { AsyncWrapper } from '@popup/store/utils';
 
 type LoadedTokens = ContractTokenDetails & { status: ChoiceStatus };
 
@@ -62,6 +65,31 @@ function TokenRow({ token, id, contractAddress, updateTokenStatus }: TokenRowPro
     );
 }
 
+const mapPltToLoadedToken = (
+    token: PltResponse,
+    selectedAccount: AccountInfo,
+    accountTokens: AsyncWrapper<AccountTokens>
+): LoadedTokens => {
+    const currentToken = selectedAccount.accountTokens.find(({ id }) => id.toString() === token.tokenId);
+    const accountToken = accountTokens.value[token.tokenId]?.map(({ id }) => id).includes(token.tokenId);
+    const isExisting = currentToken || accountToken;
+    const result = {
+        id: token.tokenId,
+        balance: currentToken ? BigInt(currentToken.state.balance.value) : 0n,
+        metadata: {
+            display: { url: 'https://github.com/user-attachments/assets/2c7d9dc3-6938-43fa-ae47-d9d339fd3b35' },
+            thumbnail: { url: 'https://github.com/user-attachments/assets/2c7d9dc3-6938-43fa-ae47-d9d339fd3b35' },
+            name: token.tokenState.moduleState.name,
+            symbol: token.tokenId,
+            decimals: token.tokenState.decimals,
+        },
+        metadataLink: token.tokenState?.moduleState?.metadata?.url || '',
+        status: isExisting ? ChoiceStatus.existing : ChoiceStatus.discarded,
+    };
+
+    return result;
+};
+
 const VALIDATE_INDEX_DELAY_MS = 500;
 
 type FormValues = {
@@ -69,6 +97,7 @@ type FormValues = {
     tokenId: string;
 };
 
+// ToDo need full rework PLT not compatible with CIS2 in app, metadataLink important
 function AddToken({ account }: { account: string }) {
     const { t } = useTranslation('x', { keyPrefix: 'mangeTokens' });
     const nav = useNavigate();
@@ -87,78 +116,104 @@ function AddToken({ account }: { account: string }) {
     const setContractDetails = useSetAtom(contractDetailsAtom);
     const [{ hasMore, loading, tokens: contractTokens }, updateTokens] = useAtom(contractTokensAtom);
     const [accountTokens, setAccountTokens] = useAtom(currentAccountTokensAtom);
+    const selectedAccount = useSelectedAccountInfo();
     const onSubmit: SubmitHandler<FormValues> = async () => {
-        if (validContract.current === undefined) {
-            throw new Error('Expected contract details');
+        if (Number(contractIndexValue)) {
+            if (validContract.current === undefined) {
+                throw new Error('Expected contract details');
+            }
+
+            setContractDetails(validContract.current.details);
+            await updateTokens({ type: 'reset', initialTokens: validContract.current.tokens });
+        } else {
+            const pltData = await getPltToken(contractIndexValue);
+            if (pltData && selectedAccount) {
+                setLoadedTokens([mapPltToLoadedToken(pltData, selectedAccount, accountTokens)]);
+            }
         }
+    };
+
+    const validateCis2 = async (value: string) => {
+        validContract.current = undefined;
+
+        let index;
+        try {
+            index = BigInt(value);
+        } catch {
+            return t('invalidIndex');
+        }
+
+        if (index < 0n) {
+            return t('negativeIndex');
+        }
+
+        if (index >= 2n ** 64n) {
+            return t('indexMax');
+        }
+
+        setIsLoading(true);
+        let instanceInfo;
+        try {
+            instanceInfo = await client.getInstanceInfo(ContractAddress.create(index));
+        } catch {
+            setIsLoading(false);
+            return t('noContractFound');
+        }
+
+        const contractName = instanceInfo.name.value.substring(5);
+        const cd: ContractDetails = { contractName, index, subindex: 0n };
+        const error = await confirmCIS2Contract(client, cd);
+
+        if (error !== undefined) {
+            setIsLoading(false);
+            return error;
+        }
+
+        const fetchErrors: string[] = [];
+
+        const response = await fetchTokensConfigure(cd, client, account, (e) => {
+            fetchErrors.push(e);
+        })();
+
+        if (fetchErrors.length > 0) {
+            logWarningMessage(
+                `Tokens in contract ${cd.index.toString()}:${cd.subindex.toString()} failed: \n${fetchErrors.join(
+                    '\n'
+                )}`
+            );
+        }
+
+        if (response.tokens.length === 0) {
+            setIsLoading(false);
+            return t('noTokensError');
+        }
+        validContract.current = { details: cd, tokens: response };
 
         setContractDetails(validContract.current.details);
         await updateTokens({ type: 'reset', initialTokens: validContract.current.tokens });
+
+        setIsLoading(false);
+        return true;
+    };
+
+    const validatePlt = async (value: string) => {
+        try {
+            await getPltToken(value);
+        } catch {
+            return t('noTokensError');
+        }
+        return true;
     };
 
     const validateIndex = useCallback(
         debouncedAsyncValidate<string>(
             async (value) => {
-                validContract.current = undefined;
-
-                let index;
-                try {
-                    index = BigInt(value);
-                } catch {
-                    return t('invalidIndex');
+                if (Number(value)) {
+                    const result = await validateCis2(value);
+                    return result;
                 }
-
-                if (index < 0n) {
-                    return t('negativeIndex');
-                }
-
-                if (index >= 2n ** 64n) {
-                    return t('indexMax');
-                }
-
-                setIsLoading(true);
-                let instanceInfo;
-                try {
-                    instanceInfo = await client.getInstanceInfo(ContractAddress.create(index));
-                } catch {
-                    setIsLoading(false);
-                    return t('noContractFound');
-                }
-
-                const contractName = instanceInfo.name.value.substring(5);
-                const cd: ContractDetails = { contractName, index, subindex: 0n };
-                const error = await confirmCIS2Contract(client, cd);
-
-                if (error !== undefined) {
-                    setIsLoading(false);
-                    return error;
-                }
-
-                const fetchErrors: string[] = [];
-
-                const response = await fetchTokensConfigure(cd, client, account, (e) => {
-                    fetchErrors.push(e);
-                })();
-
-                if (fetchErrors.length > 0) {
-                    logWarningMessage(
-                        `Tokens in contract ${cd.index.toString()}:${cd.subindex.toString()} failed: \n${fetchErrors.join(
-                            '\n'
-                        )}`
-                    );
-                }
-
-                if (response.tokens.length === 0) {
-                    setIsLoading(false);
-                    return t('noTokensError');
-                }
-                validContract.current = { details: cd, tokens: response };
-
-                setContractDetails(validContract.current.details);
-                await updateTokens({ type: 'reset', initialTokens: validContract.current.tokens });
-
-                setIsLoading(false);
-                return true;
+                const result = await validatePlt(value);
+                return result;
             },
             VALIDATE_INDEX_DELAY_MS,
             true
@@ -234,7 +289,7 @@ function AddToken({ account }: { account: string }) {
                             <FormSearch
                                 autoFocus
                                 control={f.control}
-                                label={t('contractIndex')}
+                                label={t('nameOrIndex')}
                                 name="contractIndex"
                                 rules={{
                                     required: t('indexRequired'),
@@ -267,7 +322,9 @@ function AddToken({ account }: { account: string }) {
                     )}
                 </TokenList>
             </Page.Main>
-            <Page.Footer>{!!haveTokens && <Button.Main label={t('addSelected')} onClick={setTokens} />}</Page.Footer>
+            <Page.Footer>
+                {!!loadedTokens.length && <Button.Main label={t('addSelected')} onClick={setTokens} />}
+            </Page.Footer>
         </Page>
     );
 }

@@ -1,7 +1,7 @@
 import { AccountTransactionType, CcdAmount } from '@concordium/web-sdk';
 import axios from 'axios';
 import { abs } from 'wallet-common-helpers';
-import { Cis2TokensResponse, IdentityProvider } from '@shared/storage/types';
+import { Cis2TokensResponse, IdentityProvider, PltResponse } from '@shared/storage/types';
 import { storedCurrentNetwork } from '@shared/storage/access';
 import {
     BrowserWalletAccountTransaction,
@@ -327,6 +327,13 @@ export async function getCis2Tokens(
     if (from) {
         path += `&from=${from}`;
     }
+
+    const { data } = await (await getWalletProxy()).get(path);
+    return data;
+}
+
+export async function getPltToken(tokenId: string): Promise<PltResponse | undefined> {
+    const path = `/v0/plt/tokenInfo/${tokenId}`;
 
     const { data } = await (await getWalletProxy()).get(path);
     return data;

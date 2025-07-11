@@ -261,7 +261,11 @@ function MainPageConfirmedAccount({ credential }: MainPageConfirmedAccountProps)
                     ))}
                     {tokens.map((token) => (
                         <TokenItem
-                            onClick={() => navToTokenDetails(token.contractIndex)}
+                            onClick={() =>
+                                Number(token.contractIndex) >= 0
+                                    ? navToTokenDetails(token.contractIndex)
+                                    : navToPltDetails(token.contractIndex)
+                            }
                             key={`${token.contractIndex}.${token.id}`}
                             thumbnail={token.metadata.thumbnail?.url || ''}
                             symbol={token.metadata.symbol || ''}

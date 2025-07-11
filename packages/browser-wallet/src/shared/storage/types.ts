@@ -278,6 +278,32 @@ export type Cis2TokensResponse = {
     tokens: Cis2TokenResponse[];
 };
 
+export type PltResponse = {
+    tokenId: string;
+    tokenState: {
+        decimals: number;
+        tokenModuleRef: string;
+        totalSupply: {
+            decimals: number;
+            value: string;
+        };
+        moduleState: {
+            allowList: boolean;
+            burnable: boolean;
+            denyList: boolean;
+            mintable: boolean;
+            name: string;
+            governanceAccount: {
+                address: string;
+                type: string;
+            };
+            metadata: {
+                url?: string;
+            };
+        };
+    };
+};
+
 export type AcceptedTermsState = {
     accepted: boolean;
     version: string;
