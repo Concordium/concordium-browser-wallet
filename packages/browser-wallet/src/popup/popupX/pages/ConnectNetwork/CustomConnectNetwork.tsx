@@ -78,13 +78,13 @@ export default function CustomConnectNetwork() {
                                     register={f.register}
                                     name="genesisHash"
                                     label={t('genesisHash')}
-                                    placeholder="qwertyuiop247f09e1b62982bb71000c516480c5a2c5214dadac6da4b1ad50e5"
+                                    placeholder="0599cdd0fe93057a276b447772b9a698712944d16c57c09cd11fe52aa96d37b1"
                                 />
                                 <FormInput
                                     register={f.register}
                                     name="grpcUrl"
                                     label={t('grpcUrl')}
-                                    placeholder="http://localhost"
+                                    placeholder="https://grpc.devnet-plt-alpha-1.concordium.com"
                                     rules={{
                                         validate: validateUrl(),
                                     }}
@@ -100,7 +100,7 @@ export default function CustomConnectNetwork() {
                                     register={f.register}
                                     name="explorerUrl"
                                     label={t('explorerUrl')}
-                                    placeholder="http://localhost"
+                                    placeholder="https://wallet-proxy.devnet-plt-beta.concordium.com"
                                     rules={{
                                         validate: validateUrl(),
                                     }}
@@ -109,7 +109,7 @@ export default function CustomConnectNetwork() {
                                     register={f.register}
                                     name="ccdScanUrl"
                                     label={t('ccdScanUrl')}
-                                    placeholder="http://localhost"
+                                    placeholder="https://devnet-plt-beta.ccdscan.io"
                                     rules={{
                                         validate: validateUrl(),
                                     }}
