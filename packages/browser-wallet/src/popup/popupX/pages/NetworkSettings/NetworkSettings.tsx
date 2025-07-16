@@ -7,7 +7,7 @@ import { useTranslation } from 'react-i18next';
 import Card from '@popup/popupX/shared/Card';
 import Text from '@popup/popupX/shared/Text';
 import Button from '@popup/popupX/shared/Button';
-import { mainnet, stagenet, testnet } from '@shared/constants/networkConfiguration';
+import { devnet, mainnet, stagenet, testnet } from '@shared/constants/networkConfiguration';
 import { isDevelopmentBuild } from '@shared/utils/environment-helpers';
 import { useAtom } from 'jotai';
 import { networkConfigurationAtom, customNetworkConfigurationAtom } from '@popup/store/settings';
@@ -17,7 +17,7 @@ function useNetworks() {
     const [currentNetworkConfiguration] = useAtom(networkConfigurationAtom);
     const [customnet] = useAtom(customNetworkConfigurationAtom);
 
-    const networks = [mainnet, testnet];
+    const networks = [mainnet, testnet, devnet];
     if (isDevelopmentBuild()) {
         networks.push(stagenet);
     }
