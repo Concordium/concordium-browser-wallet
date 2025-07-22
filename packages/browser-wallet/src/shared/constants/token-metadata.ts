@@ -12,26 +12,3 @@ export const CCD_METADATA: TokenMetadata = {
     display: CCD_IMAGE,
     thumbnail: CCD_IMAGE,
 };
-
-export const EUROE_METADATA: TokenMetadata = {
-    name: 'EUROe Stablecoin',
-    symbol: 'EUROe',
-    decimals: 6,
-    unique: false,
-    description: 'EUROe is a modern European stablecoin - a digital representation of fiat Euros.',
-    thumbnail: {
-        url: 'https://dev.euroe.com/persistent/token-icon/png/32x32.png',
-    },
-    display: {
-        url: 'https://dev.euroe.com/persistent/token-icon/png/256x256.png',
-    },
-    attributes: [],
-};
-
-export const euroeTokenStorage = {
-    id: '',
-    metadataLink: 'https://euroesolanametadadev.blob.core.windows.net/euroesolanametadatadev/metadata-concordium.json',
-};
-
-export const EUROE_MAINNET_INDEX = 9390;
-export const EUROE_TESTNET_INDEX = 7260;
