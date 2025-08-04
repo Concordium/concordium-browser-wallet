@@ -82,6 +82,7 @@ export default function Routes({ messagePromptHandlers }: { messagePromptHandler
         handleAddWeb3IdCredentialResponse,
         handleWeb3IdProofResponse,
         handleIdProofResponse,
+        handleAgeProofResponse,
     } = messagePromptHandlers;
     return (
         <ReactRoutes>
@@ -396,10 +397,10 @@ export default function Routes({ messagePromptHandlers }: { messagePromptHandler
                         element={
                             <VerifiablePresentationRequest
                                 onSubmit={(presentationString) =>
-                                    handleWeb3IdProofResponse({ success: true, result: presentationString })
+                                    handleAgeProofResponse({ success: true, result: presentationString })
                                 }
                                 onReject={(reason) =>
-                                    handleWeb3IdProofResponse({
+                                    handleAgeProofResponse({
                                         success: false,
                                         message: `Proof generation was rejected${reason ? `: ${reason}` : ''}`,
                                     })
