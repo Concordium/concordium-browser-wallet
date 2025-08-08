@@ -31,3 +31,21 @@ $gradient-balance-bg: radial-gradient(
     rgb(237 218 191 / 90%) 50%,
     rgb(164 154 227 / 90%) 100%
 );
+
+// Semantic colors from unified design system
+
+// Primary Button
+$semantic-surface-primary: #fff;
+$semantic-surface-primary-hover: #d7e3ef;
+$semantic-surface-primary-pressed: #d0d4d6;
+$semantic-surface-primary-disabled: #2f3437;
+$semantic-content-inverse-primary: #131416;
+$semantic-content-primary-disabled: #4b5357;
+
+// Secondary Button
+$semantic-surface-secondary: #4b5357;
+$semantic-surface-secondary-hover: #78858b;
+$semantic-surface-secondary-pressed: #4b5357;
+$semantic-surface-secondary-disabled: $semantic-surface-primary-disabled;
+$semantic-content-primary: #fff;
+$semantic-content-primary-disabled: #4b5357;

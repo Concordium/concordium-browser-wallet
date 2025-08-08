@@ -98,3 +98,7 @@ export function encodeMemo(memo: string): DataBlob {
 export function getMemoByteLength(memo: string): number {
     return encode(memo).byteLength;
 }
+
+export function cborDecode(value: string | undefined): object {
+    return (decodeMemo(value) || {}) as object;
+}
