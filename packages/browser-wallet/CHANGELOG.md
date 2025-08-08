@@ -2,7 +2,14 @@
 
 ## Unreleased
 
--   Removed EUROe as default token and associated migrations with EUROe as default token. EUROe can still be added by the "Manage token list" menu manually.
+## 2.5.1
+
+### Removed
+
+-   EUROe as default token and associated migrations with EUROe as default token. EUROe can still be added by the "Manage token list" menu manually.
+
+### Fixed
+
 -   Added a fix where the user was not able to do web3id age verification
 
 ## 2.5.0
