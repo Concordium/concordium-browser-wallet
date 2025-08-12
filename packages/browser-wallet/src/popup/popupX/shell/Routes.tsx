@@ -5,6 +5,7 @@ import MainLayout, { OnboardingLayout } from '@popup/popupX/page-layouts/MainLay
 import MainPage from '@popup/popupX/pages/MainPage';
 import { SendFunds } from '@popup/popupX/pages/SendFunds';
 import ReceiveFunds from '@popup/popupX/pages/ReceiveFunds';
+import Onramp from '@popup/popupX/pages/Onramp';
 import TransactionLog from '@popup/popupX/pages/TransactionLog';
 import TransactionDetails from '@popup/popupX/pages/TransactionLog/TransactionDetails';
 import { TokenDetails, TokenDetailsCcd, TokenDetailsPlt, TokenRaw } from '@popup/popupX/pages/TokenDetails';
@@ -81,6 +82,7 @@ export default function Routes({ messagePromptHandlers }: { messagePromptHandler
         handleAddWeb3IdCredentialResponse,
         handleWeb3IdProofResponse,
         handleIdProofResponse,
+        handleAgeProofResponse,
     } = messagePromptHandlers;
     return (
         <ReactRoutes>
@@ -135,6 +137,7 @@ export default function Routes({ messagePromptHandlers }: { messagePromptHandler
                     <Route index element={<MainPage />} />
                     <Route path={relativeRoutes.home.sendFunds.path} element={<SendFunds />} />
                     <Route element={<ReceiveFunds />} path={relativeRoutes.home.receive.path} />
+                    <Route element={<Onramp />} path={relativeRoutes.home.onramp.path} />
                     <Route path={relativeRoutes.home.transactionLog.path}>
                         <Route index element={<TransactionLog />} />
                         <Route
@@ -396,10 +399,10 @@ export default function Routes({ messagePromptHandlers }: { messagePromptHandler
                         element={
                             <VerifiablePresentationRequest
                                 onSubmit={(presentationString) =>
-                                    handleWeb3IdProofResponse({ success: true, result: presentationString })
+                                    handleAgeProofResponse({ success: true, result: presentationString })
                                 }
                                 onReject={(reason) =>
-                                    handleWeb3IdProofResponse({
+                                    handleAgeProofResponse({
                                         success: false,
                                         message: `Proof generation was rejected${reason ? `: ${reason}` : ''}`,
                                     })
