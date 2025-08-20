@@ -50,16 +50,19 @@
         align-items: center;
         margin-bottom: rem(8px);
 
-        .token-icon.plt {
-            color: $color-blue;
-        }
-
         .token-icon,
         svg {
             width: rem(20px);
             height: rem(20px);
             margin-right: rem(8px);
         }
+    }
+
+    &__labels {
+        display: flex;
+        flex-wrap: wrap;
+        gap: rem(8px);
+        margin-bottom: rem(12px);
     }
 
     .card-x {

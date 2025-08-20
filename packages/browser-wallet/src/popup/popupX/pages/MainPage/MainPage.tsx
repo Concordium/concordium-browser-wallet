@@ -26,6 +26,7 @@ import Gear from '@assets/svgX/gear.svg';
 import Dot from '@assets/svgX/dot.svg';
 import Info from '@assets/svgX/info.svg';
 import Pause from '@assets/svgX/pause.svg';
+import PLTicon from '@assets/svgX/placeholder-crypto-token.svg';
 import Tooltip from '@popup/popupX/shared/Tooltip';
 import { credentialsAtom, credentialsAtomWithLoading, selectedAccountAtom } from '@popup/store/account';
 import { SuspendedStatus, useSuspendedStatus } from '@popup/popupX/shared/utils/pool-status-helpers';
@@ -54,10 +55,6 @@ type PltBalanceProps = { decimals: number; balanceRaw: bigint };
 function PLTBalance({ decimals, balanceRaw }: PltBalanceProps) {
     const balance = useMemo(() => formatTokenAmount(balanceRaw, decimals, 2, 2), [balanceRaw]);
     return <span>{balance}</span>;
-}
-
-function PLTicon() {
-    return <span className="plt">PLT</span>;
 }
 
 function mainPageCcdDisplay(microCcdAmount: bigint) {

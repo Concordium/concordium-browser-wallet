@@ -142,6 +142,9 @@ export const relativeRoutes = {
                 config: {
                     navBackSteps: 3,
                 },
+                raw: {
+                    path: 'raw',
+                },
             },
             details: {
                 path: ':contractIndex',
