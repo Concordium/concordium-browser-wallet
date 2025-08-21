@@ -1,4 +1,5 @@
 import { useMemo } from 'react';
+import { TFunction } from 'react-i18next';
 import groupBy from 'lodash.groupby';
 import {
     BrowserWalletTransaction,
@@ -8,7 +9,6 @@ import {
 import { dateFromTimestamp } from 'wallet-common-helpers';
 import { AccountTransactionType } from '@concordium/web-sdk';
 import i18n from '@popup/shell/i18n';
-import { TFunction } from 'react-i18next';
 
 /** Convert Date object to local string only showing the current date. */
 export const onlyDate = (date?: number | Date | undefined) =>
@@ -122,9 +122,9 @@ export function mapTypeToText(type: AccountTransactionType | RewardType | Specia
         case AccountTransactionType.ConfigureDelegation:
             return t('configureDelegation');
         case AccountTransactionType.TokenUpdate:
-            return t('pltUpdate');
+            return t('tokenUpdate');
         case SpecialTransactionType.UpdateCreatePLT:
-            return t('pltUpdateCreate');
+            return t('updateCreatePlt');
         case SpecialTransactionType.ChainUpdate:
             return t('chainUpdate');
         case RewardType.StakingReward:

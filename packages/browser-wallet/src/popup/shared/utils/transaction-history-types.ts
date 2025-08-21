@@ -136,6 +136,11 @@ export interface BrowserWalletTransaction {
     events?: string[];
     rejectReason?: string;
     memo?: string;
+    tokenTransfer?: {
+        decimals: number;
+        value: string;
+        tokenId: string;
+    };
 }
 
 export interface BrowserWalletAccountTransaction extends BrowserWalletTransaction {

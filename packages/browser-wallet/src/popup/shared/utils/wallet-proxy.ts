@@ -135,6 +135,8 @@ interface Details {
     events: string[];
     rejectReason: string;
     memo?: string;
+    tokenTransferAmount?: { decimals: number; value: string };
+    tokenId?: string;
 }
 
 enum OriginType {
@@ -233,6 +235,14 @@ function calculateAmount(transaction: WalletProxyTransaction, status: Transactio
 const getTransactionStatusFromOutcome = (transactionOutcome: string): TransactionStatus =>
     transactionOutcome === 'success' ? TransactionStatus.Finalized : TransactionStatus.Failed;
 
+const getTokenTransfer = (transactionDetails: Details): BrowserWalletTransaction['tokenTransfer'] => {
+    if (transactionDetails.tokenTransferAmount) {
+        const { tokenTransferAmount, tokenId = '' } = transactionDetails;
+        return { ...tokenTransferAmount, tokenId };
+    }
+    return undefined;
+};
+
 function mapTransaction(transaction: WalletProxyTransaction, accountAddress: string): BrowserWalletTransaction {
     const status = getTransactionStatusFromOutcome(transaction.details.outcome);
     const type = mapTransactionKindStringToTransactionType(transaction.details.type);
@@ -251,6 +261,7 @@ function mapTransaction(transaction: WalletProxyTransaction, accountAddress: str
         events: transaction.details.events,
         rejectReason: transaction.details.rejectReason,
         memo: transaction.details.memo,
+        tokenTransfer: getTokenTransfer(transaction.details),
     };
 }
 

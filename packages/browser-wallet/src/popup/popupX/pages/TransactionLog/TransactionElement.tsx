@@ -2,7 +2,7 @@ import React, { CSSProperties, useEffect, useRef } from 'react';
 import { useTranslation } from 'react-i18next';
 import { VariableSizeList } from 'react-window';
 import clsx from 'clsx';
-import { displayAsCcd, dateFromTimestamp, TimeStampUnit } from 'wallet-common-helpers';
+import { dateFromTimestamp, displayAsCcd, TimeStampUnit } from 'wallet-common-helpers';
 
 import { BrowserWalletTransaction, TransactionStatus } from '@popup/shared/utils/transaction-history-types';
 import Button from '@popup/popupX/shared/Button';
@@ -10,7 +10,8 @@ import Text from '@popup/popupX/shared/Text';
 import Note from '@assets/svgX/note.svg';
 import { displaySplitAddressShort } from '@popup/shared/utils/account-helpers';
 import DropDown from '@assets/svgX/drop-down.svg';
-import { hasAmount, mapTypeToText, onlyTime } from './util';
+import TransactionAmount from './TransactionAmount';
+import { mapTypeToText, onlyTime } from './util';
 
 const SPACING = 4;
 const MEMO_SPACING = 10;
@@ -46,14 +47,7 @@ export default function TransactionElement({
     const { t } = useTranslation('x', { keyPrefix: 'transactionLogX' });
 
     const failed = transaction.status === TransactionStatus.Failed;
-    const isSender = transaction.fromAddress === accountAddress;
 
-    // Flip the amount if selected account is sender, and amount is positive. We expect the transaction list endpoint to sign the amount based on this,
-    // but this is not the case for pending transactions. This seeks to emulate the behaviour of the transaction list endpoint.
-    const amount =
-        isSender && transaction.status === TransactionStatus.Pending && transaction.amount > 0n
-            ? -transaction.amount
-            : transaction.amount;
     const time = onlyTime(dateFromTimestamp(transaction.time, TimeStampUnit.seconds));
     const info =
         (transaction.cost !== undefined && t('withFee', { value: displayAsCcd(transaction.cost, false, true) })) ||
@@ -86,11 +80,7 @@ export default function TransactionElement({
         >
             <div className={clsx('transaction value', failed && 'failed')}>
                 <Text.Label className="type">{mapTypeToText(transaction.type)}</Text.Label>
-                {hasAmount(transaction.type) && !failed && (
-                    <Text.Label className={clsx(amount > 0 && 'income')}>
-                        {displayAsCcd(transaction.amount, false, true)}
-                    </Text.Label>
-                )}
+                <TransactionAmount transaction={transaction} accountAddress={accountAddress} />
             </div>
             <div className="transaction info">
                 <Text.Capture>{time}</Text.Capture>
