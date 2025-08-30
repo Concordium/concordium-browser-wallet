@@ -15,7 +15,9 @@ export function useFlattenedAccountTokens(account: WalletCredential | undefined)
         () =>
             loading || tokens === undefined
                 ? []
-                : Object.entries(tokens).flatMap(([contractIndex, ts]) => ts.map((t) => ({ contractIndex, ...t }))),
+                : Object.entries(tokens)
+                      .flatMap(([contractIndex, ts]) => ts.map((t) => ({ contractIndex, ...t })))
+                      .sort((a, b) => (b.metadata.addedAt || 0) - (a.metadata.addedAt || 0)),
         [tokens, loading]
     );
 

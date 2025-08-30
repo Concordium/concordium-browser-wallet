@@ -72,19 +72,20 @@ const mapPltToLoadedToken = (
 ): LoadedTokens => {
     const currentToken = selectedAccount.accountTokens.find(({ id }) => id.toString() === token.tokenId);
     const accountToken = accountTokens.value[token.tokenId]?.map(({ id }) => id).includes(token.tokenId);
-    const isExisting = currentToken || accountToken;
+    const DEFAULT_PLT_ICON = '/assets/svg/placeholder-crypto-token.svg';
     const result = {
         id: token.tokenId,
         balance: currentToken ? BigInt(currentToken.state.balance.value) : 0n,
         metadata: {
-            display: { url: 'https://github.com/user-attachments/assets/2c7d9dc3-6938-43fa-ae47-d9d339fd3b35' },
-            thumbnail: { url: 'https://github.com/user-attachments/assets/2c7d9dc3-6938-43fa-ae47-d9d339fd3b35' },
+            display: { url: DEFAULT_PLT_ICON },
+            thumbnail: { url: DEFAULT_PLT_ICON },
             name: token.tokenState.moduleState.name,
             symbol: token.tokenId,
             decimals: token.tokenState.decimals,
         },
         metadataLink: token.tokenId,
-        status: isExisting ? ChoiceStatus.existing : ChoiceStatus.discarded,
+        status: accountToken ? ChoiceStatus.existing : ChoiceStatus.discarded,
+        addedAt: Date.now(),
     };
 
     return result;
@@ -264,13 +265,17 @@ function AddToken({ account }: { account: string }) {
                     return acc.filter(({ id }) => id !== token.id);
                 }
 
-                if (token.status === ChoiceStatus.chosen || !acc.find(({ id }) => id === token.id)) {
+                if (token.status === ChoiceStatus.chosen && !acc.find(({ id }) => id === token.id)) {
                     return [...acc, token as TokenIdAndMetadata];
                 }
 
                 return acc;
             }, initialTokens)
-            .map(({ id, metadata, metadataLink }) => ({ id, metadata, metadataLink }));
+            .map(({ id, metadata, metadataLink }) => ({
+                id,
+                metadata: { ...metadata, addedAt: Date.now() },
+                metadataLink,
+            }));
 
         setAccountTokens({ contractIndex: contractIndexValue, newTokens });
         toast('Token list updated');

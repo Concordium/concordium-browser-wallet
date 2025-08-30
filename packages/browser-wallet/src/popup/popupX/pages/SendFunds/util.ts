@@ -37,7 +37,10 @@ export function useTokenMetadata(
     }
 
     return tokens.value.find(
-        (t) => t.id === token.tokenAddress.id && ContractAddress.equals(token.tokenAddress.contract, t.contract)
+        (t) =>
+            t.tokenType === 'cis2' &&
+            t.id === token.tokenAddress.id &&
+            ContractAddress.equals(token.tokenAddress.contract, t.contract)
     )?.metadata;
 }
 

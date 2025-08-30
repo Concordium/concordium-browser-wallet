@@ -83,12 +83,17 @@ type Props = Omit<TokenAmountViewProps, 'tokens' | 'accountTokens' | 'balance' |
 export default function TokenAmount({ accountInfo, ccdBalance = 'available', ...props }: Props) {
     const { current: timestamp } = useRef(Date.now());
     const { token } = props.form.watch();
-    const tokenAddress = token?.tokenType === 'cis2' ? token.tokenAddress : null;
-    const tokenSymbol = token?.tokenType === 'plt' ? token.tokenSymbol : null;
+    const tokenAddress =
+        (token?.tokenType === 'cis2' && token.tokenAddress) ||
+        (token?.tokenType === 'plt' &&
+            ({
+                id: token.tokenSymbol,
+                contract: { index: token.tokenSymbol, subindex: 0n },
+            } as unknown as CIS2.TokenAddress)) ||
+        null;
 
     const tokenInfo = useTokenInfo(accountInfo.accountAddress);
     const cis2Balance = useAtomValue(balanceAtomFamily([accountInfo, ccdBalance, tokenAddress, timestamp]));
-    const pltBalance = accountInfo.accountTokens.find(({ id }) => id.toString() === tokenSymbol)?.state.balance.value;
 
     if (tokenInfo.loading) {
         return null;
@@ -98,8 +103,7 @@ export default function TokenAmount({ accountInfo, ccdBalance = 'available', ...
         <TokenAmountView
             {...(props as TokenAmountViewProps)}
             tokens={tokenInfo.value}
-            accountTokens={accountInfo.accountTokens}
-            balance={pltBalance || cis2Balance}
+            balance={cis2Balance}
             ccdBalance={accountInfo.accountAvailableBalance}
         />
     );

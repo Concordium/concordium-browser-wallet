@@ -14,12 +14,11 @@ import { UseFormReturn, Validate } from 'react-hook-form';
 import { useTranslation } from 'react-i18next';
 import clsx from 'clsx';
 import { ClassName, displayAsCcd } from 'wallet-common-helpers';
-import { CIS2, CcdAmount, ContractAddress, AccountInfo } from '@concordium/web-sdk';
+import { CIS2, CcdAmount, ContractAddress } from '@concordium/web-sdk';
 
 import { CCD_METADATA } from '@shared/constants/token-metadata';
 import { ensureDefined } from '@shared/utils/basic-helpers';
 import ConcordiumLogo from '@assets/svgX/concordium-logo.svg';
-import PLT from '@assets/svgX/plt.svg';
 import {
     validateAccountAddress,
     validateMemoByteLength,
@@ -34,7 +33,7 @@ import { makeControlled, makeUncontrolled } from '../common/utils';
 import Button from '../../Button';
 import { formatTokenAmount, parseTokenAmount, removeNumberGrouping } from '../../utils/helpers';
 import ErrorMessage from '../ErrorMessage';
-import { TokenInfo } from './util';
+import { Cis2TokenInfo, PltTokenInfo, TokenInfo } from './util';
 import { Select } from '../Select';
 
 type AmountInputProps = Pick<
@@ -190,8 +189,6 @@ const DEFAULT_TOKEN_THUMBNAIL = DEFAULT_FAILED;
 type TokenPickerProps = RequiredControlledFieldProps<TokenPickerVariant> & {
     /** The set of tokens available for the account specified by `accountInfo` */
     tokens: TokenInfo[];
-    /** The set of tokens available for the account specified by `accountInfo.accountTokens` */
-    accountTokens: AccountInfo['accountTokens'];
     /** Whether to enable selection */
     canSelect?: boolean;
     /** The balance of the selected token */
@@ -202,7 +199,6 @@ type TokenPickerProps = RequiredControlledFieldProps<TokenPickerVariant> & {
 
 function TokenPicker({
     tokens,
-    accountTokens,
     onChange,
     value,
     onBlur,
@@ -232,15 +228,15 @@ function TokenPicker({
 
             if (v.tokenType === 'plt') {
                 const name = v.tokenSymbol;
-                const icon = <PLT />;
                 const {
-                    state: {
-                        balance: { decimals },
-                    },
+                    metadata: { decimals = 0, thumbnail },
                 } = ensureDefined(
-                    accountTokens.find((tk) => tk.id.toString() === v.tokenSymbol),
+                    tokens.find((tk) => tk.tokenType === 'plt' && tk.id.toString() === v.tokenSymbol) as PltTokenInfo,
                     'Expected the token specified to be available in the set of tokens given'
                 );
+                const DEFAULT_PLT_ICON = '/assets/svg/placeholder-crypto-token.svg';
+                const tokenImage = thumbnail?.url ?? DEFAULT_PLT_ICON;
+                const icon = <Img src={tokenImage} alt={name} withDefaults />;
                 return { name, icon, decimals, type: 'plt', address: null };
             }
 
@@ -250,8 +246,11 @@ function TokenPicker({
                 contract,
             } = ensureDefined(
                 tokens.find(
-                    (tk) => tk.id === v.tokenAddress.id && ContractAddress.equals(tk.contract, v.tokenAddress.contract)
-                ),
+                    (tk) =>
+                        tk.tokenType === 'cis2' &&
+                        tk.id === v.tokenAddress.id &&
+                        ContractAddress.equals(tk.contract, v.tokenAddress.contract)
+                ) as Cis2TokenInfo,
                 'Expected the token specified to be available in the set of tokens given'
             );
             const safeName = symbol ?? name ?? `${v.tokenAddress.id}@${v.tokenAddress.contract.toString()}`;
@@ -264,8 +263,12 @@ function TokenPicker({
 
     const options: TokenPickerVariant[] = [
         { tokenType: 'ccd' },
-        ...tokens.map((tk): TokenPickerVariant => ({ tokenType: 'cis2', tokenAddress: tk })),
-        ...accountTokens.map((tk): TokenPickerVariant => ({ tokenType: 'plt', tokenSymbol: tk.id.toString() })),
+        ...tokens.map(
+            (tk): TokenPickerVariant =>
+                tk.tokenType === 'cis2'
+                    ? { tokenType: 'cis2', tokenAddress: tk }
+                    : { tokenType: 'plt', tokenSymbol: tk.id.toString() }
+        ),
     ];
 
     const renderOption = (v: TokenPickerVariant) => {
@@ -273,8 +276,11 @@ function TokenPicker({
         if (v.tokenType === 'plt') return v.tokenSymbol;
 
         const tokenInfo = tokens.find(
-            (tk) => tk.id === v.tokenAddress.id && ContractAddress.equals(tk.contract, v.tokenAddress.contract)
-        )!;
+            (tk) =>
+                tk.tokenType === 'cis2' &&
+                tk.id === v.tokenAddress.id &&
+                ContractAddress.equals(tk.contract, v.tokenAddress.contract)
+        )! as Cis2TokenInfo;
         return (
             tokenInfo.metadata.symbol ?? tokenInfo.metadata.name ?? `${tokenInfo.id}@${tokenInfo.contract.toString()}`
         );
@@ -382,8 +388,6 @@ export type TokenAmountViewProps = {
     formatFee?(fee: CcdAmount.Type): ReactNode;
     /** The set of tokens available for the account specified by `accountInfo` */
     tokens: TokenInfo[];
-    /** The set of tokens available for the account specified by `accountInfo.accountTokens` */
-    accountTokens: AccountInfo['accountTokens'];
     /** The token balance. `undefined` should be used to indicate that the balance is not yet available. */
     balance: bigint | undefined;
     /** Custom validation for the amount */
@@ -403,7 +407,6 @@ export default function TokenAmountView(props: TokenAmountViewProps) {
         buttonMaxLabel,
         fee,
         tokens,
-        accountTokens,
         balance,
         className,
         ccdBalance,
@@ -430,6 +433,7 @@ export default function TokenAmountView(props: TokenAmountViewProps) {
                 return ensureDefined(
                     tokens.find(
                         (tk) =>
+                            tk.tokenType === 'cis2' &&
                             tk.id === token.tokenAddress.id &&
                             ContractAddress.equals(tk.contract, token.tokenAddress.contract)
                     ),
@@ -439,9 +443,9 @@ export default function TokenAmountView(props: TokenAmountViewProps) {
             case 'plt': {
                 return {
                     decimals: ensureDefined(
-                        accountTokens.find((tk) => tk.id.toString() === token.tokenSymbol),
+                        tokens.find((tk) => tk.tokenType === 'plt' && tk.id.toString() === token.tokenSymbol),
                         'Expected the token specified to be available in the set of tokens given'
-                    ).state.balance.decimals,
+                    ).metadata.decimals,
                 };
             }
             case 'ccd':
@@ -537,7 +541,6 @@ export default function TokenAmountView(props: TokenAmountViewProps) {
                     control={(props.form as UseFormReturn<AmountForm>).control}
                     name="token"
                     tokens={tokens}
-                    accountTokens={accountTokens}
                     canSelect={props.tokenType === undefined}
                     selectedTokenBalance={balance}
                     formatAmount={formatAmount}

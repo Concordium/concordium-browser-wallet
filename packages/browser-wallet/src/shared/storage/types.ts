@@ -251,6 +251,7 @@ export interface TokenMetadata {
     attributes?: MetadataAttribute[];
     unique?: boolean;
     localization?: Record<string, MetadataUrl>;
+    addedAt?: number;
 }
 
 export interface TokenIdAndMetadata {

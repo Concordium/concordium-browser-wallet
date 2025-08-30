@@ -1,4 +1,5 @@
 import React, { useEffect, useState } from 'react';
+import { useUpdateAtom } from 'jotai/utils';
 import { useNavigate, useParams } from 'react-router-dom';
 import { AccountAddress } from '@concordium/web-sdk';
 import {
@@ -26,7 +27,9 @@ import Stop from '@assets/svgX/circled-x-block-deny.svg';
 import Check from '@assets/svgX/circled-check-done.svg';
 import Notebook from '@assets/svgX/notebook.svg';
 import PLTicon from '@assets/svgX/placeholder-crypto-token.svg';
+import Eye from '@assets/svgX/eye-slash.svg';
 import { grpcClientAtom } from '@popup/store/settings';
+import { removeTokenFromCurrentAccountAtom } from '@popup/store/token';
 import { useAccountInfo } from '@popup/shared/AccountInfoListenerContext/AccountInfoListenerContext';
 import { cborDecode } from '@popup/popupX/shared/utils/helpers';
 import { SendFundsLocationState } from '@popup/popupX/pages/SendFunds/SendFunds';
@@ -80,6 +83,7 @@ function TokenDetails({ credential }: { credential: WalletCredential }) {
 
     const { pltSymbol = '' } = useParams<Params>();
     const { pltInfo, renderedBalance, currentToken } = usePltInfoAndBalance(pltSymbol, credential);
+    const remove = useUpdateAtom(removeTokenFromCurrentAccountAtom);
     if (!pltInfo) {
         return null;
     }
@@ -96,6 +100,10 @@ function TokenDetails({ credential }: { credential: WalletCredential }) {
         nav(sendFundsRoute(AccountAddress.fromBase58(credential.address)), {
             state: getNavState(currentToken, pltSymbol),
         });
+    const removeToken = () => {
+        remove({ contractIndex: pltSymbol, tokenId: pltSymbol });
+        nav(-1);
+    };
 
     return (
         <Page className="token-details-x">
@@ -130,6 +138,7 @@ function TokenDetails({ credential }: { credential: WalletCredential }) {
                     <Card.RowDetails title={t('decimals')} value={`0 - ${decimals}`} />
                 </Card>
                 <Button.IconText icon={<Notebook />} label={t('showRawMetadata')} onClick={navToRaw} />
+                <Button.IconText icon={<Eye />} label={t('hideToken')} onClick={removeToken} />
             </Page.Main>
         </Page>
     );

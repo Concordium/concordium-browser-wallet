@@ -7,6 +7,7 @@ import { ContractBalances, getContractBalances } from '@shared/utils/token-helpe
 import { addToastAtom } from '@popup/state';
 import { ContractAddress } from '@concordium/web-sdk';
 import { getContractName } from '@shared/utils/contract-helpers';
+import { accountInfoFamily } from '@popup/shared/AccountInfoListenerContext/AccountInfoListenerContext';
 import { AsyncWrapper, atomWithChromeStorage } from './utils';
 import { grpcClientAtom } from './settings';
 import { selectedAccountAtom } from './account';
@@ -134,10 +135,11 @@ const cbf = atomFamily<string, Atom<ContractBalances>>((identifier: string) => {
         async (get, set) => {
             const client = get(grpcClientAtom);
             const tokens = get(accountTokensFamily(accountAddress));
-
             const tokenIds = tokens.value[contractIndex]?.map((t) => t.id) ?? [];
 
-            if (tokenIds.length !== 0 && Number(contractIndex) >= 0) {
+            if (tokenIds.length === 0) return;
+
+            if (Number(contractIndex) >= 0) {
                 const instanceInfo = await client.getInstanceInfo(ContractAddress.create(BigInt(contractIndex)));
 
                 let balances = {};
@@ -155,6 +157,13 @@ const cbf = atomFamily<string, Atom<ContractBalances>>((identifier: string) => {
                     );
                 }
                 set(baseAtom, balances);
+            } else {
+                const accountInfo = get(accountInfoFamily(accountAddress));
+                const balance = accountInfo?.accountTokens.find((t) => t.id.toString() === contractIndex)?.state.balance
+                    .value;
+                const tokenBalance = { [contractIndex]: BigInt(balance || 0) };
+
+                set(baseAtom, tokenBalance);
             }
         }
     );
