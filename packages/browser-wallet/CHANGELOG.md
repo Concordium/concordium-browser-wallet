@@ -2,6 +2,8 @@
 
 ## Unreleased
 
+-   Fixed token amount displayed as NaN when value is negative and less than token precision. At Send screen when 'Send Max' calculated.
+
 ## 2.5.1
 
 ### Removed
