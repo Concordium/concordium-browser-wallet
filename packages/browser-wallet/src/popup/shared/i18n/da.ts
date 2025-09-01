@@ -59,6 +59,8 @@ const t: typeof en = {
         address: {
             required: 'Indtast en addresse',
             invalid: 'Ugyldig addresse',
+            recipientNotAllowList: 'Modtageren er ikke på tilladelseslisten',
+            recipientDenyList: 'Modtageren er på afvisningslisten',
         },
         ccdAmount: {
             required: 'Indtast et beløb',

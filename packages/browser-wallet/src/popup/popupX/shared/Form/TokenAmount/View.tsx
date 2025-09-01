@@ -14,13 +14,15 @@ import { UseFormReturn, Validate } from 'react-hook-form';
 import { useTranslation } from 'react-i18next';
 import clsx from 'clsx';
 import { ClassName, displayAsCcd } from 'wallet-common-helpers';
+import { useAtomValue } from 'jotai';
+import { grpcClientAtom } from '@popup/store/settings';
 import { CIS2, CcdAmount, ContractAddress } from '@concordium/web-sdk';
 
 import { CCD_METADATA } from '@shared/constants/token-metadata';
 import { ensureDefined } from '@shared/utils/basic-helpers';
 import ConcordiumLogo from '@assets/svgX/concordium-logo.svg';
 import {
-    validateAccountAddress,
+    validateAccountAndBlockList,
     validateMemoByteLength,
     validateTransferAmount,
 } from '@popup/shared/utils/transaction-helpers';
@@ -413,6 +415,8 @@ export default function TokenAmountView(props: TokenAmountViewProps) {
         formatFee = (f) => displayAsCcd(f, false, true),
         validateAmount: customValidateAmount,
     } = props;
+    const client = useAtomValue(grpcClientAtom);
+
     const defaultToken: TokenPickerVariant = useMemo(() => {
         switch (props.tokenType) {
             case 'ccd':
@@ -564,28 +568,30 @@ export default function TokenAmountView(props: TokenAmountViewProps) {
                         {buttonMaxLabel}
                     </Button.Base>
                 </div>
-                <ErrorMessage className="capture__main_small">
-                    {props.form.formState.errors.amount?.message}
-                </ErrorMessage>
                 <Text.Capture>
                     {t('form.tokenAmount.amount.fee')} {formatFee(fee)}
                 </Text.Capture>
+                <ErrorMessage className="capture__main_small" exclamationIcon>
+                    {props.form.formState.errors.amount?.message}
+                </ErrorMessage>
             </div>
             {props.receiver === true && (
                 <>
                     <div className="token-amount_receiver">
                         <span className="text__main_medium">{t('form.tokenAmount.address.label')}</span>
-                        <FormReceiverInput
-                            className="text__main"
-                            register={(props.form as UseFormReturn<AmountReceiveForm>).register}
-                            name="receiver"
-                            placeholder={t('form.tokenAmount.address.placeholder')}
-                            rules={{
-                                required: t('utils.address.required'),
-                                validate: validateAccountAddress,
-                            }}
-                        />
-                        <ErrorMessage className="capture__main_small">
+                        <div className="token-amount_receiver_selector">
+                            <FormReceiverInput
+                                className="text__main"
+                                register={(props.form as UseFormReturn<AmountReceiveForm>).register}
+                                name="receiver"
+                                placeholder={t('form.tokenAmount.address.placeholder')}
+                                rules={{
+                                    required: t('utils.address.required'),
+                                    validate: validateAccountAndBlockList(client, token),
+                                }}
+                            />
+                        </div>
+                        <ErrorMessage className="capture__main_small" exclamationIcon>
                             {props.form.formState.errors.receiver?.message}
                         </ErrorMessage>
                     </div>

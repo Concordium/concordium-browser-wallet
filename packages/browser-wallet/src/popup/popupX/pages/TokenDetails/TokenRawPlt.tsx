@@ -42,7 +42,7 @@ function TokenRawPlt() {
             <Page.Main>
                 <Card>
                     {Object.entries(moduleState).map(([k, v]) => (
-                        <Card.RowDetails key={k} title={k} value={JSON.stringify(v)} />
+                        <Card.RowDetails key={k} title={k} value={JSON.stringify(v, null, 2)} />
                     ))}
                 </Card>
             </Page.Main>

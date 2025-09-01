@@ -51,25 +51,34 @@ function usePltInfoAndBalance(pltSymbol: string, credential: WalletCredential) {
     return { pltInfo, renderedBalance, currentToken };
 }
 
-function getNavState(currentToken: TokenAccountInfo | undefined, pltSymbol: string) {
-    return currentToken
-        ? ({
-              tokenType: 'plt',
-              tokenSymbol: pltSymbol,
-          } as SendFundsLocationState)
-        : null;
+function getNavState(pltSymbol: string) {
+    return {
+        tokenType: 'plt',
+        tokenSymbol: pltSymbol,
+    } as SendFundsLocationState;
 }
 
-function StatusLabel({ accountModuleState }: { accountModuleState: TokenModuleAccountState }) {
+function StatusLabel({
+    accountModuleState,
+    tokenModuleState,
+}: {
+    accountModuleState: TokenModuleAccountState;
+    tokenModuleState: TokenModuleState;
+}) {
     const { t } = useTranslation('x', { keyPrefix: 'tokenDetails' });
 
-    if (accountModuleState?.denyList) {
+    if (tokenModuleState.denyList && accountModuleState.denyList) {
         return <Label icon={<Stop />} text={t('onDenyList')} color="red" />;
     }
-    if (accountModuleState?.allowList) {
-        return <Label icon={<Check />} text={t('onAllowList')} color="green" />;
+
+    if (tokenModuleState.allowList) {
+        if (accountModuleState?.allowList) {
+            return <Label icon={<Check />} text={t('onAllowList')} color="green" />;
+        }
+        return <Label icon={<Stop />} text={t('notOnAllowList')} color="yellow" />;
     }
-    return <Label icon={<Stop />} text={t('notOnAllowList')} color="yellow" />;
+
+    return null;
 }
 
 type Params = {
@@ -98,7 +107,7 @@ function TokenDetails({ credential }: { credential: WalletCredential }) {
     const navToRaw = () => nav(relativeRoutes.home.token.plt.raw.path);
     const navToSend = () =>
         nav(sendFundsRoute(AccountAddress.fromBase58(credential.address)), {
-            state: getNavState(currentToken, pltSymbol),
+            state: getNavState(pltSymbol),
         });
     const removeToken = () => {
         remove({ contractIndex: pltSymbol, tokenId: pltSymbol });
@@ -129,7 +138,7 @@ function TokenDetails({ credential }: { credential: WalletCredential }) {
                     </div>
                     <div className="token-details-x__labels">
                         <Label icon={<Shield />} text={t('plt')} color="light-grey" />
-                        <StatusLabel accountModuleState={accountModuleState} />
+                        <StatusLabel accountModuleState={accountModuleState} tokenModuleState={tokenModuleState} />
                     </div>
                     <Card.RowDetails
                         title={t('description')}
