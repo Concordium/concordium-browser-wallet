@@ -119,7 +119,7 @@ function AddToken({ account }: { account: string }) {
     const [accountTokens, setAccountTokens] = useAtom(currentAccountTokensAtom);
     const selectedAccount = useSelectedAccountInfo();
     const onSubmit: SubmitHandler<FormValues> = async () => {
-        if (Number(contractIndexValue)) {
+        if (Number(contractIndexValue) >= 0) {
             if (validContract.current === undefined) {
                 throw new Error('Expected contract details');
             }
@@ -209,7 +209,7 @@ function AddToken({ account }: { account: string }) {
     const validateIndex = useCallback(
         debouncedAsyncValidate<string>(
             async (value) => {
-                if (Number(value)) {
+                if (Number(value) >= 0) {
                     const result = await validateCis2(value);
                     return result;
                 }
