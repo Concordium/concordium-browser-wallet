@@ -99,10 +99,16 @@ export default function Routes({ messagePromptHandlers }: { messagePromptHandler
                         <Route index element={<SetupPassword />} />
                         <Route path={relativeRoutes.onboarding.setupPassword.createOrRestore.path}>
                             <Route index element={<CreateOrRestore />} />
-                            <Route
-                                path={relativeRoutes.onboarding.setupPassword.createOrRestore.selectNetwork.path}
-                                element={<SelectNetwork />}
-                            />
+                            <Route path={relativeRoutes.onboarding.setupPassword.createOrRestore.selectNetwork.path}>
+                                <Route index element={<SelectNetwork />} />
+                                <Route
+                                    path={
+                                        relativeRoutes.onboarding.setupPassword.createOrRestore.selectNetwork.custom
+                                            .path
+                                    }
+                                    element={<CustomConnectNetwork />}
+                                />
+                            </Route>
                             <Route
                                 path={relativeRoutes.onboarding.setupPassword.createOrRestore.restoreWallet.path}
                                 element={<RestoreWallet />}

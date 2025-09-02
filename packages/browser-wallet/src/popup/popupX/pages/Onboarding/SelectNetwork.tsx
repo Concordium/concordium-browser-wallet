@@ -1,23 +1,30 @@
 import React from 'react';
 import { useTranslation } from 'react-i18next';
 import { useAtom } from 'jotai';
-import { networkConfigurationAtom } from '@popup/store/settings';
+import { useNavigate } from 'react-router-dom';
+import { customNetworkConfigurationAtom, networkConfigurationAtom } from '@popup/store/settings';
 import Page from '@popup/popupX/shared/Page';
 import Card from '@popup/popupX/shared/Card';
 import Text from '@popup/popupX/shared/Text';
 import Button from '@popup/popupX/shared/Button';
 import Dot from '@assets/svgX/dot.svg';
-import { mainnet, stagenet, testnet } from '@shared/constants/networkConfiguration';
+import { devnet, mainnet, stagenet, testnet } from '@shared/constants/networkConfiguration';
 import { isDevelopmentBuild } from '@shared/utils/environment-helpers';
+import { relativeRoutes } from '@popup/popupX/constants/routes';
 
 function useNetworks() {
     const { t } = useTranslation('x', { keyPrefix: 'network' });
+    const nav = useNavigate();
     const [currentNetworkConfiguration, setCurrentNetworkConfiguration] = useAtom(networkConfigurationAtom);
+    const [customnet] = useAtom(customNetworkConfigurationAtom);
+    const navToCustom = () => nav(relativeRoutes.onboarding.setupPassword.createOrRestore.selectNetwork.custom.path);
 
     const networks = [mainnet, testnet];
     if (isDevelopmentBuild()) {
         networks.push(stagenet);
     }
+    networks.push(devnet);
+    networks.push(customnet);
 
     const updatedNetworks = networks.map((network) => {
         const isConnected = network.genesisHash === currentNetworkConfiguration.genesisHash;
@@ -28,6 +35,7 @@ function useNetworks() {
             isConnected,
             connectLabel,
             setNetwork: () => setCurrentNetworkConfiguration(network),
+            ...(network.name === customnet.name && { setNetwork: navToCustom }),
         };
     });
 

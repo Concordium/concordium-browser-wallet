@@ -17,10 +17,11 @@ function useNetworks() {
     const [currentNetworkConfiguration] = useAtom(networkConfigurationAtom);
     const [customnet] = useAtom(customNetworkConfigurationAtom);
 
-    const networks = [mainnet, testnet, devnet];
+    const networks = [mainnet, testnet];
     if (isDevelopmentBuild()) {
         networks.push(stagenet);
     }
+    networks.push(devnet);
     networks.push(customnet);
 
     const updatedNetworks = networks.map((network) => {

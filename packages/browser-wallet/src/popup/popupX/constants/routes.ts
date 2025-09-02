@@ -52,6 +52,14 @@ export const relativeRoutes = {
                         hideMenu: true,
                         hideConnection: true,
                     },
+                    custom: {
+                        path: 'custom',
+                        config: {
+                            backTitle: '',
+                            hideMenu: true,
+                            hideConnection: true,
+                        },
+                    },
                 },
                 restoreWallet: {
                     path: 'restoreWallet',
