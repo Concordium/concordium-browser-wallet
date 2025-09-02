@@ -9,6 +9,8 @@ import {
 import { atom } from 'jotai';
 import { EventType } from '@concordium/browser-wallet-api-helpers';
 import { popupMessageHandler } from '@popup/shared/message-handler';
+import { getIdentityProviders } from '@popup/shared/utils/wallet-proxy';
+import { logErrorMessage } from '@shared/utils/log-helpers';
 import { ConcordiumGRPCClient, ConcordiumGRPCWebClient } from '@concordium/web-sdk';
 import { storedAllowlist, storedCredentials } from '@shared/storage/access';
 import { GRPCTIMEOUT, mainnet, customnet } from '@shared/constants/networkConfiguration';
@@ -41,7 +43,10 @@ export const networkConfigurationAtom = atom<NetworkConfiguration, NetworkConfig
 
         // As identity providers are different per network, we must also reset the list of cached
         // identity providers when the network configuration is changed.
-        const identityProviderPromise = set(identityProvidersAtom, []);
+        const identityProviders = await getIdentityProviders().catch(() => {
+            logErrorMessage('Unable to update identity provider list');
+        });
+        const identityProviderPromise = set(identityProvidersAtom, identityProviders || []);
 
         // Wait for all the derived state of a network change to be done before broadcasting
         await Promise.all([networkPromise, identityPromise, accountPromise, identityProviderPromise]);
