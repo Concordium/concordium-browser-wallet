@@ -59,8 +59,6 @@ export default function IdIssuanceExternalFlow() {
         if (!response) {
             logError('Failed to issue identity due to internal error');
             handleError('Internal error, please try again.');
-        } else {
-            nav(absoluteRoutes.settings.identities.path, { replace: true });
         }
     }, [state, seedPhrase, handleError]);
 
