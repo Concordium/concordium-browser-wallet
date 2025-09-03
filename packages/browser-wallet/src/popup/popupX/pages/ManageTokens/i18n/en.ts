@@ -1,5 +1,5 @@
 const t = {
-    manageTokenList: 'Manage token list',
+    manageTokenList: 'Manage Tokens',
     addToken: 'Add token',
     addSelected: 'Add selected tokens',
     removed: 'Token removed',
