@@ -2,6 +2,7 @@ import { useMemo } from 'react';
 import { TFunction } from 'react-i18next';
 import groupBy from 'lodash.groupby';
 import {
+    BlockSpecialEvent,
     BrowserWalletTransaction,
     RewardType,
     SpecialTransactionType,
@@ -71,7 +72,9 @@ const t: TFunction<'x', 'transactionLogX'> = (key) => i18n.t(`x:transactionLogX.
 /**
  * Maps transaction type to a displayable text string.
  */
-export function mapTypeToText(type: AccountTransactionType | RewardType | SpecialTransactionType): string {
+export function mapTypeToText(
+    type: AccountTransactionType | RewardType | SpecialTransactionType | BlockSpecialEvent
+): string {
     switch (type) {
         case AccountTransactionType.DeployModule:
             return t('deployModule');
@@ -131,6 +134,22 @@ export function mapTypeToText(type: AccountTransactionType | RewardType | Specia
             return t('stakingReward');
         case SpecialTransactionType.Malformed:
             return t('malformed');
+        case BlockSpecialEvent.BakingRewards:
+            return t('bakingRewards');
+        case BlockSpecialEvent.Mint:
+            return t('mint');
+        case BlockSpecialEvent.FinalizationRewards:
+            return t('finalizationRewards');
+        case BlockSpecialEvent.PaydayFoundationReward:
+            return t('paydayFoundationReward');
+        case BlockSpecialEvent.BlockAccrueReward:
+            return t('blockAccrueReward');
+        case BlockSpecialEvent.PaydayPoolReward:
+            return t('paydayPoolReward');
+        case BlockSpecialEvent.ValidatorSuspended:
+            return t('validatorSuspended');
+        case BlockSpecialEvent.ValidatorPrimedForSuspension:
+            return t('validatorPrimedForSuspension');
         default:
             return t('unknown');
     }

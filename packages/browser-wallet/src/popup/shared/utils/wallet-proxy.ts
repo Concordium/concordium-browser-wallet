@@ -3,6 +3,7 @@ import axios from 'axios';
 import { abs } from 'wallet-common-helpers';
 import { Cis2TokensResponse, IdentityProvider, PltResponse } from '@shared/storage/types';
 import { storedCurrentNetwork } from '@shared/storage/access';
+import { logError } from '@shared/utils/log-helpers';
 import {
     BrowserWalletAccountTransaction,
     BrowserWalletTransaction,
@@ -10,6 +11,7 @@ import {
     SpecialTransactionType,
     TransactionHistoryResult,
     TransactionStatus,
+    BlockSpecialEvent,
 } from './transaction-history-types';
 import { createPendingTransaction } from './transaction-helpers';
 
@@ -50,12 +52,20 @@ export enum TransactionKindString {
     TokenUpdate = 'tokenUpdate',
     ChainUpdate = 'chainUpdate',
     UpdateCreatePLT = 'updateCreatePLT',
+    BakingRewards = 'bakingRewards',
+    Mint = 'mint',
+    FinalizationRewards = 'finalizationRewards',
+    PaydayFoundationReward = 'paydayFoundationReward',
+    BlockAccrueReward = 'blockAccrueReward',
+    PaydayPoolReward = 'paydayPoolReward',
+    ValidatorSuspended = 'validatorSuspended',
+    ValidatorPrimedForSuspension = 'validatorPrimedForSuspension',
     Malformed = 'Malformed account transaction',
 }
 
 function mapTransactionKindStringToTransactionType(
     kind: TransactionKindString
-): AccountTransactionType | RewardType | SpecialTransactionType {
+): AccountTransactionType | RewardType | SpecialTransactionType | BlockSpecialEvent {
     switch (kind) {
         case TransactionKindString.DeployModule:
             return AccountTransactionType.DeployModule;
@@ -115,8 +125,27 @@ function mapTransactionKindStringToTransactionType(
             return SpecialTransactionType.ChainUpdate;
         case TransactionKindString.UpdateCreatePLT:
             return SpecialTransactionType.UpdateCreatePLT;
-        default:
-            throw Error(`Unknown transaction kind was encounted: ${kind}`);
+        case TransactionKindString.BakingRewards:
+            return BlockSpecialEvent.BakingRewards;
+        case TransactionKindString.Mint:
+            return BlockSpecialEvent.Mint;
+        case TransactionKindString.FinalizationRewards:
+            return BlockSpecialEvent.FinalizationRewards;
+        case TransactionKindString.PaydayFoundationReward:
+            return BlockSpecialEvent.PaydayFoundationReward;
+        case TransactionKindString.BlockAccrueReward:
+            return BlockSpecialEvent.BlockAccrueReward;
+        case TransactionKindString.PaydayPoolReward:
+            return BlockSpecialEvent.PaydayPoolReward;
+        case TransactionKindString.ValidatorSuspended:
+            return BlockSpecialEvent.ValidatorSuspended;
+        case TransactionKindString.ValidatorPrimedForSuspension:
+            return BlockSpecialEvent.ValidatorPrimedForSuspension;
+        default: {
+            // Throwing error at this point, fails Transaction Log to render. Replaced with logError
+            logError(`Unknown transaction kind was encounted: ${kind}`);
+            return kind;
+        }
     }
 }
 
