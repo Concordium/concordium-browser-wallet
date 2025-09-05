@@ -53,6 +53,7 @@ function TokenRow({ token, id, contractAddress, updateTokenStatus }: TokenRowPro
             <TokenList.Item
                 thumbnail={token.metadata?.display?.url}
                 symbol={token.metadata?.name}
+                error={token.error}
                 checked={status === ChoiceStatus.chosen || status === ChoiceStatus.existing}
                 onClick={() => {
                     setDetailsIsOpen(true);
@@ -235,7 +236,7 @@ function AddToken({ account }: { account: string }) {
                     : ChoiceStatus.discarded,
             })) || [];
         setLoadedTokens(tokensWithStatus);
-    }, [loading, contractTokens.length]);
+    }, [isLoading, contractTokens.length]);
 
     useEffect(() => {
         setFilteredTokens([

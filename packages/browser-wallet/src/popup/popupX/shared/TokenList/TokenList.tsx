@@ -39,6 +39,7 @@ function TokenListItem({
     thumbnail,
     symbol,
     balance,
+    error,
     checked,
     disabled,
     className,
@@ -51,6 +52,7 @@ function TokenListItem({
     disabled?: boolean;
     checked?: boolean;
     balance?: TokenBalance;
+    error?: string;
 }) {
     const { t } = useTranslation('x', { keyPrefix: 'sharedX.tokenList' });
     const amount = useTokenBalance(balance);
@@ -68,9 +70,10 @@ function TokenListItem({
             <div className="token-title">
                 <Text.Label>{symbol}</Text.Label>
                 {balance && <Text.Capture>{t('balance', { amount, symbol: balance.symbol })}</Text.Capture>}
+                <Text.Capture className="token-title_error">{error}</Text.Capture>
             </div>
 
-            <Checkbox checked={checked} onClick={onCheck} onChange={onChange} disabled={disabled} />
+            {!error && <Checkbox checked={checked} onClick={onCheck} onChange={onChange} disabled={disabled} />}
         </Button.Base>
     );
 }
