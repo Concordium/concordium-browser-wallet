@@ -45,7 +45,7 @@ export const onlyTime = Intl.DateTimeFormat(undefined, {
 
 /** Check if type is an account transaction which transfers some CCD. */
 function isTransferTransaction(
-    type: AccountTransactionType | RewardType | SpecialTransactionType
+    type: AccountTransactionType | RewardType | SpecialTransactionType | BlockSpecialEvent
 ): type is AccountTransactionType {
     switch (type) {
         case AccountTransactionType.Transfer:
@@ -63,7 +63,7 @@ function isTransferTransaction(
 }
 
 /** Check if type is an account transaction which transfers some CCD or is a reward. */
-export function hasAmount(type: AccountTransactionType | RewardType | SpecialTransactionType) {
+export function hasAmount(type: AccountTransactionType | RewardType | SpecialTransactionType | BlockSpecialEvent) {
     return isTransferTransaction(type) || type in RewardType;
 }
 
