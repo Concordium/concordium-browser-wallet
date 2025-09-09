@@ -25,6 +25,8 @@ const t = {
         data: 'Data',
         rawData: ': (Unable to be decoded)',
         version: 'Version',
+        tokenId: 'Token Id',
+        operations: 'Operations',
     },
 };
 

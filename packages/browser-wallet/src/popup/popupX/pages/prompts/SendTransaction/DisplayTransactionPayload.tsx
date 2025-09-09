@@ -9,7 +9,9 @@ import {
     sha256,
     SimpleTransferPayload,
     UpdateContractPayload,
+    TokenUpdatePayload,
 } from '@concordium/web-sdk';
+import { Cbor, CborMemo } from '@concordium/web-sdk/plt';
 import { SmartContractParameters } from '@concordium/browser-wallet-api-helpers';
 import { useTranslation } from 'react-i18next';
 import { chunkString, displayAsCcd } from 'wallet-common-helpers';
@@ -17,6 +19,7 @@ import * as JSONBig from 'json-bigint';
 import { decode } from 'cbor2';
 import Card from '@popup/popupX/shared/Card';
 import Parameter from '@popup/popupX/shared/Parameter';
+import { cborDecode } from '@popup/popupX/shared/utils/helpers';
 
 export function DisplayParameters({ parameters }: { parameters?: SmartContractParameters }) {
     const hasParameters = parameters !== undefined && parameters !== null;
@@ -114,6 +117,40 @@ function DisplayDeployModule({ payload }: { payload: DeployModulePayload }) {
     );
 }
 
+function operationsCborDecoder(value: Cbor.Type) {
+    if (Object.keys(cborDecode(value.toString())).length) {
+        const decoded = Cbor.decode(value) as object[];
+
+        const result = decoded.map((item) =>
+            Object.entries(item).reduce(
+                (acc, [key, operationValue]) => ({
+                    ...acc,
+                    [key]: {
+                        ...operationValue,
+                        ...(operationValue.memo && { memo: CborMemo.parse(operationValue.memo) }),
+                    },
+                }),
+                {}
+            )
+        );
+        return JSON.stringify(result, null, 2);
+    }
+    return value.toString();
+}
+
+/**
+ * Displays an overview of token update transaction payload.
+ */
+function DisplayTokenUpdate({ payload }: { payload: TokenUpdatePayload }) {
+    const { t } = useTranslation('x', { keyPrefix: 'prompts.sendTransactionX.payload' });
+    return (
+        <>
+            <Card.RowDetails title={t('tokenId')} value={payload.tokenId.toString()} />
+            <Card.RowDetails title={t('operations')} value={operationsCborDecoder(payload.operations)} />
+        </>
+    );
+}
+
 // eslint-disable-next-line @typescript-eslint/no-explicit-any
 function displayValue(value: any) {
     if (CcdAmount.instanceOf(value)) {
@@ -153,6 +190,8 @@ export default function DisplayTransactionPayload({
             return <DisplayRegisterData payload={payload as RegisterDataPayload} />;
         case AccountTransactionType.DeployModule:
             return <DisplayDeployModule payload={payload as DeployModulePayload} />;
+        case AccountTransactionType.TokenUpdate:
+            return <DisplayTokenUpdate payload={payload as TokenUpdatePayload} />;
         default:
             return <DisplayGenericPayload payload={payload} />;
     }
