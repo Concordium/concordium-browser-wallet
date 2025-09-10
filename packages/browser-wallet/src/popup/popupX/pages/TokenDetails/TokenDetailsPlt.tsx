@@ -2,13 +2,7 @@ import React, { useEffect, useState } from 'react';
 import { useUpdateAtom } from 'jotai/utils';
 import { useNavigate, useParams } from 'react-router-dom';
 import { AccountAddress } from '@concordium/web-sdk';
-import {
-    TokenAccountInfo,
-    TokenId,
-    TokenInfo,
-    TokenModuleState,
-    TokenModuleAccountState,
-} from '@concordium/web-sdk/plt';
+import { TokenId, TokenInfo, TokenModuleState, TokenModuleAccountState } from '@concordium/web-sdk/plt';
 import { absoluteRoutes, relativeRoutes, sendFundsRoute } from '@popup/popupX/constants/routes';
 import Page from '@popup/popupX/shared/Page';
 import Text from '@popup/popupX/shared/Text';
@@ -33,6 +27,7 @@ import { removeTokenFromCurrentAccountAtom } from '@popup/store/token';
 import { useAccountInfo } from '@popup/shared/AccountInfoListenerContext/AccountInfoListenerContext';
 import { cborDecode } from '@popup/popupX/shared/utils/helpers';
 import { SendFundsLocationState } from '@popup/popupX/pages/SendFunds/SendFunds';
+import { useFlattenedAccountTokens } from '@popup/pages/Account/Tokens/utils';
 
 function usePltInfoAndBalance(pltSymbol: string, credential: WalletCredential) {
     const client = useAtomValue(grpcClientAtom);
@@ -87,6 +82,10 @@ type Params = {
 
 function TokenDetails({ credential }: { credential: WalletCredential }) {
     const { t } = useTranslation('x', { keyPrefix: 'tokenDetails' });
+
+    // Need to call this function, so tokens synced at this moment
+    // Otherwise user need to reload page, before removing token
+    useFlattenedAccountTokens(credential);
 
     const nav = useNavigate();
 
