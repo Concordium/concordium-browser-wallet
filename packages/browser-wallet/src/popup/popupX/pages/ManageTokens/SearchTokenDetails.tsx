@@ -10,8 +10,7 @@ import { useCopyToClipboard } from '@popup/popupX/shared/utils/hooks';
 import Copy from '@assets/svgX/copy.svg';
 import Notebook from '@assets/svgX/notebook.svg';
 import { ContractAddress } from '@concordium/web-sdk';
-import { ChoiceStatus } from '@popup/shared/ContractTokenLine';
-import { ContractTokenDetails } from '@shared/utils/token-helpers';
+import { ChoiceStatus, ContractTokenDetails } from '@shared/utils/token-helpers';
 
 const SUB_INDEX = 0;
 

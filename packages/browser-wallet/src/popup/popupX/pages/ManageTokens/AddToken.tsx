@@ -7,27 +7,36 @@ import FormSearch from '@popup/popupX/shared/Form/Search';
 import { useForm } from '@popup/popupX/shared/Form';
 import { useAtom, useAtomValue, useSetAtom } from 'jotai';
 import { grpcClientAtom } from '@popup/store/settings';
-import { confirmCIS2Contract, ContractDetails, ContractTokenDetails } from '@shared/utils/token-helpers';
-import { fetchTokensConfigure, FetchTokensResponse } from '@popup/pages/Account/Tokens/ManageTokens/utils';
+import {
+    ChoiceStatus,
+    confirmCIS2Contract,
+    ContractDetails,
+    ContractTokenDetails,
+    mapPltToLoadedToken,
+} from '@shared/utils/token-helpers';
+import {
+    fetchTokensConfigure,
+    FetchTokensResponse,
+    TokenWithPageID,
+} from '@popup/pages/Account/Tokens/ManageTokens/utils';
 import { selectedAccountAtom } from '@popup/store/account';
 import { contractDetailsAtom, contractTokensAtom } from '@popup/pages/Account/Tokens/ManageTokens/state';
 import { SubmitHandler } from 'react-hook-form';
 import { debouncedAsyncValidate } from '@popup/shared/utils/validation-helpers';
-import { AccountInfo, ContractAddress } from '@concordium/web-sdk';
+import { ContractAddress } from '@concordium/web-sdk';
 import { logWarningMessage } from '@shared/utils/log-helpers';
 import Form from '@popup/popupX/shared/Form/Form';
 import TokenList from '@popup/popupX/shared/TokenList';
 import { LoaderInline } from '@popup/popupX/shared/Loader';
 import Button from '@popup/popupX/shared/Button';
 import { absoluteRoutes } from '@popup/popupX/constants/routes';
-import { AccountTokens, currentAccountTokensAtom } from '@popup/store/token';
-import { PltResponse, TokenIdAndMetadata } from '@shared/storage/types';
+import { currentAccountTokensAtom, hidePltInRemove } from '@popup/store/token';
+import { PLT } from '@shared/constants/token';
+import { TokenIdAndMetadata } from '@shared/storage/types';
 import { useGenericToast } from '@popup/popupX/shared/utils/hooks';
-import { ChoiceStatus } from '@popup/shared/ContractTokenLine';
 import { SearchTokenDetails } from '@popup/popupX/pages/ManageTokens';
 import { getPltToken } from '@popup/shared/utils/wallet-proxy';
 import { useSelectedAccountInfo } from '@popup/shared/AccountInfoListenerContext/AccountInfoListenerContext';
-import { AsyncWrapper } from '@popup/store/utils';
 
 type LoadedTokens = ContractTokenDetails & { status: ChoiceStatus };
 
@@ -65,32 +74,6 @@ function TokenRow({ token, id, contractAddress, updateTokenStatus }: TokenRowPro
         </>
     );
 }
-
-const mapPltToLoadedToken = (
-    token: PltResponse,
-    selectedAccount: AccountInfo,
-    accountTokens: AsyncWrapper<AccountTokens>
-): LoadedTokens => {
-    const currentToken = selectedAccount.accountTokens.find(({ id }) => id.toString() === token.tokenId);
-    const accountToken = accountTokens.value[token.tokenId]?.map(({ id }) => id).includes(token.tokenId);
-    const DEFAULT_PLT_ICON = '/assets/svg/placeholder-crypto-token.svg';
-    const result = {
-        id: token.tokenId,
-        balance: currentToken ? BigInt(currentToken.state.balance.value) : 0n,
-        metadata: {
-            display: { url: DEFAULT_PLT_ICON },
-            thumbnail: { url: DEFAULT_PLT_ICON },
-            name: token.tokenState.moduleState.name,
-            symbol: token.tokenId,
-            decimals: token.tokenState.decimals,
-        },
-        metadataLink: token.tokenId,
-        status: accountToken ? ChoiceStatus.existing : ChoiceStatus.discarded,
-        addedAt: Date.now(),
-    };
-
-    return result;
-};
 
 const VALIDATE_INDEX_DELAY_MS = 500;
 
@@ -130,7 +113,8 @@ function AddToken({ account }: { account: string }) {
         } else {
             const pltData = await getPltToken(contractIndexValue);
             if (pltData && selectedAccount) {
-                setLoadedTokens([mapPltToLoadedToken(pltData, selectedAccount, accountTokens)]);
+                const pltMapped = await mapPltToLoadedToken(pltData, selectedAccount, accountTokens);
+                setLoadedTokens([pltMapped]);
             }
         }
     };
@@ -199,22 +183,48 @@ function AddToken({ account }: { account: string }) {
     };
 
     const validatePlt = async (value: string) => {
+        let pltData;
         try {
-            await getPltToken(value);
+            setIsLoading(true);
+            pltData = await getPltToken(value);
         } catch {
+            setIsLoading(false);
             return t('noTokensError');
         }
+
+        if (!pltData || !selectedAccount) {
+            setIsLoading(false);
+            return t('noTokensError');
+        }
+
+        const mapped = await mapPltToLoadedToken(pltData, selectedAccount, accountTokens);
+        const response = [{ ...mapped, pageId: 1 }] as TokenWithPageID[];
+
+        const cd: ContractDetails = { contractName: PLT, index: 0n, subindex: 0n };
+        validContract.current = { details: cd, tokens: { hasMore: false, tokens: response } };
+
+        setContractDetails(validContract.current.details);
+        await updateTokens({ type: 'reset', initialTokens: validContract.current.tokens });
+
+        setIsLoading(false);
         return true;
     };
 
     const validateIndex = useCallback(
         debouncedAsyncValidate<string>(
             async (value) => {
+                let result;
                 if (Number(value) >= 0) {
-                    const result = await validateCis2(value);
-                    return result;
+                    result = await validateCis2(value);
+                } else {
+                    result = await validatePlt(value);
                 }
-                const result = await validatePlt(value);
+
+                if (result !== true) {
+                    setContractDetails();
+                    await updateTokens({ type: 'reset', initialTokens: { hasMore: false, tokens: [] } });
+                }
+
                 return result;
             },
             VALIDATE_INDEX_DELAY_MS,
@@ -228,13 +238,18 @@ function AddToken({ account }: { account: string }) {
     }, [contractIndexValue]);
 
     useEffect(() => {
+        const tokenContractKey = Number(contractIndexValue) >= 0 ? contractIndexValue : PLT;
         const tokensWithStatus =
-            contractTokens.map((token) => ({
-                ...token,
-                status: accountTokens.value[contractIndexValue]?.map(({ id }) => id).includes(token.id)
-                    ? ChoiceStatus.existing
-                    : ChoiceStatus.discarded,
-            })) || [];
+            contractTokens.map((token) => {
+                const accountToken = accountTokens.value[tokenContractKey]?.find(({ id }) => id === token.id);
+                return {
+                    ...token,
+                    status:
+                        accountToken && !accountToken.metadata.isHidden
+                            ? ChoiceStatus.existing
+                            : ChoiceStatus.discarded,
+                };
+            }) || [];
         setLoadedTokens(tokensWithStatus);
     }, [isLoading, contractTokens.length]);
 
@@ -257,28 +272,38 @@ function AddToken({ account }: { account: string }) {
         ]);
     };
 
+    const updateAddDate = (token: LoadedTokens) =>
+        ({
+            ...token,
+            metadata: { ...token.metadata, addedAt: Date.now() },
+        } as TokenIdAndMetadata);
+
     const setTokens = () => {
-        const initialTokens = accountTokens.value[contractIndexValue] || [];
+        const tokenContractKey = Number(contractIndexValue) >= 0 ? contractIndexValue : PLT;
+        const initialTokens = accountTokens.value[tokenContractKey] || [];
 
         const newTokens = loadedTokens
             .reduce((acc, token) => {
                 if (token.status === ChoiceStatus.discarded) {
+                    if (tokenContractKey === PLT) {
+                        return hidePltInRemove(acc, token.id);
+                    }
                     return acc.filter(({ id }) => id !== token.id);
                 }
 
                 if (token.status === ChoiceStatus.chosen && !acc.find(({ id }) => id === token.id)) {
-                    return [...acc, token as TokenIdAndMetadata];
+                    return [...acc, updateAddDate(token)];
+                }
+
+                if (token.status === ChoiceStatus.chosen && acc.find(({ id }) => id === token.id)?.metadata?.isHidden) {
+                    return [...acc.filter(({ id }) => id !== token.id), updateAddDate(token)];
                 }
 
                 return acc;
             }, initialTokens)
-            .map(({ id, metadata, metadataLink }) => ({
-                id,
-                metadata: { ...metadata, addedAt: Date.now() },
-                metadataLink,
-            }));
+            .map(({ id, metadata, metadataLink }) => ({ id, metadata, metadataLink }));
 
-        setAccountTokens({ contractIndex: contractIndexValue, newTokens });
+        setAccountTokens({ contractIndex: tokenContractKey, newTokens });
         toast('Token list updated');
         nav(absoluteRoutes.home.manageTokenList.path);
     };

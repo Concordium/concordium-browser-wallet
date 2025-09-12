@@ -9,13 +9,13 @@ import ExternalRequestLayout from '@popup/page-layouts/ExternalRequestLayout';
 import { accountTokensFamily } from '@popup/store/token';
 import { useAsyncMemo } from 'wallet-common-helpers';
 import { TokenIdAndMetadata } from '@shared/storage/types';
-import { ContractTokenDetails, fetchContractName, getTokens } from '@shared/utils/token-helpers';
+import { ChoiceStatus, ContractTokenDetails, fetchContractName, getTokens } from '@shared/utils/token-helpers';
 import { grpcClientAtom } from '@popup/store/settings';
 import { fullscreenPromptContext } from '@popup/page-layouts/FullscreenPromptLayout';
 import { Input as UncontrolledInput } from '@popup/shared/Form/Input';
 import Button from '@popup/shared/Button';
 import { ContractAddress, isHex } from '@concordium/web-sdk';
-import ContractTokenLine, { ChoiceStatus } from '@popup/shared/ContractTokenLine';
+import ContractTokenLine from '@popup/shared/ContractTokenLine';
 import TokenDetails from '@popup/shared/TokenDetails';
 
 type Props = {

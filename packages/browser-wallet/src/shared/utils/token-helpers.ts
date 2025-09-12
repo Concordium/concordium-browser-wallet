@@ -2,26 +2,30 @@ import { Buffer } from 'buffer/';
 import uleb128 from 'leb128/unsigned';
 import {
     AccountAddress,
+    AccountInfo,
     calculateEnergyCost,
     CcdAmount,
-    InstanceInfo,
+    CIS2Contract,
     ConcordiumGRPCClient,
-    serializeUpdateContractParameters,
-    UpdateContractPayload,
-    sha256,
     ContractAddress,
+    ContractName,
+    Energy,
+    EntrypointName,
+    InstanceInfo,
     Parameter,
     ReceiveName,
     ReturnValue,
-    ContractName,
-    EntrypointName,
-    Energy,
-    CIS2Contract,
+    serializeUpdateContractParameters,
+    sha256,
+    UpdateContractPayload,
 } from '@concordium/web-sdk';
-import { MetadataUrl, TokenMetadata, TokenIdAndMetadata } from '@shared/storage/types';
-import { CIS2_SCHEMA_CONTRACT_NAME, CIS2_SCHEMA } from '@popup/constants/schema';
+import { MetadataUrl, PltMetadataUrl, PltResponse, TokenIdAndMetadata, TokenMetadata } from '@shared/storage/types';
+import { CIS2_SCHEMA, CIS2_SCHEMA_CONTRACT_NAME } from '@popup/constants/schema';
 import i18n from '@popup/shell/i18n';
 import { SmartContractParameters } from '@concordium/browser-wallet-api-helpers';
+import { AsyncWrapper } from '@popup/store/utils';
+import { AccountTokens } from '@popup/store/token';
+import { logError } from '@shared/utils/log-helpers';
 import { determineUpdatePayloadSize } from './energy-helpers';
 import { applyExecutionNRGBuffer } from './contract-helpers';
 
@@ -35,6 +39,12 @@ export type ContractTokenDetails = TokenIdAndMetadata & {
     balance: bigint;
     error?: string;
 };
+
+export enum ChoiceStatus {
+    discarded,
+    chosen,
+    existing,
+}
 
 /**
  * Returns a buffer containing the parameter used to check whether a smart contract is CIS-2 compliant. (Using the CIS-0 view function .supports)
@@ -178,6 +188,73 @@ export async function getTokenMetadata(url: MetadataUrl): Promise<TokenMetadata>
 
     return metadata;
 }
+
+export async function getPltTokenMetadata({ url, checksumSha256 }: PltMetadataUrl) {
+    if (!url) {
+        logError(i18n.t('addTokens.metadata.incorrectUrlField'));
+        return undefined;
+    }
+
+    let body: Buffer;
+    try {
+        body = await getMetadataUrlChecked({ url, hash: checksumSha256 });
+    } catch (e) {
+        const err = e as TokenMetadataError;
+        switch (err.type) {
+            case TokenMetadataErrorType.FetchError:
+                logError(i18n.t('addTokens.metadata.fetchError', { status: err.message }));
+                return undefined;
+            case TokenMetadataErrorType.IncorrectChecksum:
+                logError(i18n.t('addTokens.metadata.incorrectChecksum'));
+                return undefined;
+            default:
+                logError(err);
+                return undefined;
+        }
+    }
+
+    let metadata: TokenMetadata;
+    try {
+        metadata = JSON.parse(body.toString());
+    } catch (e) {
+        logError(i18n.t('addTokens.metadata.invalidJSON'));
+        return undefined;
+    }
+
+    return metadata;
+}
+
+type LoadedTokens = ContractTokenDetails & { status: ChoiceStatus };
+
+export const mapPltToLoadedToken = async (
+    token: PltResponse,
+    selectedAccount: AccountInfo,
+    accountTokens: AsyncWrapper<AccountTokens>
+): Promise<LoadedTokens> => {
+    const currentToken = selectedAccount.accountTokens.find(({ id }) => id.toString() === token.tokenId);
+    const accountToken = accountTokens.value?.PLT?.find(({ id }) => id === token.tokenId);
+    const DEFAULT_PLT_ICON = '/assets/svg/placeholder-crypto-token.svg';
+
+    const metadata = await getPltTokenMetadata(token.tokenState.moduleState.metadata);
+
+    const result = {
+        id: token.tokenId,
+        balance: currentToken ? BigInt(currentToken.state.balance.value) : 0n,
+        metadata: {
+            display: metadata?.display?.url ? metadata?.display : { url: DEFAULT_PLT_ICON },
+            thumbnail: metadata?.thumbnail?.url ? metadata?.thumbnail : { url: DEFAULT_PLT_ICON },
+            name: token.tokenState.moduleState.name,
+            description: metadata?.description,
+            symbol: token.tokenId,
+            decimals: token.tokenState.decimals,
+            addedAt: Date.now(),
+        },
+        metadataLink: (metadata && token.tokenState.moduleState.metadata.url) || token.tokenId,
+        status: accountToken && !accountToken.metadata.isHidden ? ChoiceStatus.existing : ChoiceStatus.discarded,
+    };
+
+    return result;
+};
 
 /**
  * Serialized based on cis-2 documentation: https://proposals.concordium.software/CIS/cis-2.html#id3

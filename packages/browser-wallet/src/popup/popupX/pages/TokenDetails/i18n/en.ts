@@ -27,6 +27,7 @@ const t = {
     notOnAllowList: 'Account is not on the allow list',
     onDenyList: 'Account is on the deny list',
     noDescription: 'No description provided',
+    paused: 'Token paused',
 };
 
 export default t;

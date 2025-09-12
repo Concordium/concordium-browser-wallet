@@ -56,6 +56,7 @@ const t = {
             invalid: 'Invalid address',
             recipientNotAllowList: 'Recipient is not on the allow list',
             recipientDenyList: 'Recipient is on the deny list',
+            tokenPaused: 'This token is paused and cannot be sent',
         },
         ccdAmount: {
             required: 'Please enter an amount',

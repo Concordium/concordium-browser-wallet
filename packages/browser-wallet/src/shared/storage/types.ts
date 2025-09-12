@@ -232,6 +232,11 @@ export interface MetadataUrl {
     hash?: HexString;
 }
 
+export interface PltMetadataUrl {
+    url?: string;
+    checksumSha256?: HexString;
+}
+
 export interface MetadataAttribute {
     type: string;
     name: string;
@@ -252,6 +257,7 @@ export interface TokenMetadata {
     unique?: boolean;
     localization?: Record<string, MetadataUrl>;
     addedAt?: number;
+    isHidden?: boolean;
 }
 
 export interface TokenIdAndMetadata {

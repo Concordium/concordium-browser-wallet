@@ -3,20 +3,21 @@ import { generatePath, useNavigate } from 'react-router-dom';
 import { useTranslation } from 'react-i18next';
 import { useAtom, useAtomValue } from 'jotai';
 import clsx from 'clsx';
-import { AccountInfoType, Ratio } from '@concordium/web-sdk';
+import { AccountInfo, AccountInfoType, Ratio } from '@concordium/web-sdk';
 import { absoluteRoutes, relativeRoutes } from '@popup/popupX/constants/routes';
 import Img from '@popup/shared/Img';
 import { ConfirmedCredential, CreationStatus, WalletCredential } from '@shared/storage/types';
 import { useAccountInfo } from '@popup/shared/AccountInfoListenerContext';
 import { useFlattenedAccountTokens } from '@popup/pages/Account/Tokens/utils';
 import { getMetadataUnique } from '@shared/utils/token-helpers';
-import { contractBalancesFamily } from '@popup/store/token';
+import { autoAddPltToAccount, contractBalancesFamily } from '@popup/store/token';
 import { useBlockChainParameters } from '@popup/shared/BlockChainParametersProvider';
 import { displayCcdAsEur, formatTokenAmount } from '@popup/popupX/shared/utils/helpers';
 import Page from '@popup/popupX/shared/Page';
 import Text from '@popup/popupX/shared/Text';
 import Button from '@popup/popupX/shared/Button';
 import { withSelectedCredential } from '@popup/popupX/shared/utils/hoc';
+import { PLT } from '@shared/constants/token';
 import Arrow from '@assets/svgX/arrow-right.svg';
 import Clock from '@assets/svgX/clock.svg';
 import Plus from '@assets/svgX/plus.svg';
@@ -35,6 +36,15 @@ function useAccountFungibleTokens(account: WalletCredential) {
     const tokens = useFlattenedAccountTokens(account);
     return tokens.filter((t) => !getMetadataUnique(t.metadata));
 }
+
+/**
+ Hook loading every PLT token received from the accountTokens.
+ Called only from the MainPage, not from some global context in order to avoid conflicts between auto/manually/externally added tokens
+ */
+const useAutoAddPlt = (accountInfo: AccountInfo | undefined) => {
+    const autoAddPlt = useMemo(() => autoAddPltToAccount(accountInfo), [accountInfo]);
+    useAtom(autoAddPlt);
+};
 
 /** Hook for loading the CIS-2 token balance of some account. */
 function useAccountTokenBalance(accountAddress: string, contractAddress: string, tokenId: string) {
@@ -206,6 +216,8 @@ function MainPageConfirmedAccount({ credential }: MainPageConfirmedAccountProps)
     const tokens = useAccountFungibleTokens(credential);
     const isSuspended = useSuspendedStatus(accountInfo);
 
+    useAutoAddPlt(accountInfo);
+
     if (accountInfo === undefined) {
         return <>Loading</>;
     }
@@ -241,9 +253,9 @@ function MainPageConfirmedAccount({ credential }: MainPageConfirmedAccountProps)
                     {tokens.map((token) => (
                         <TokenItem
                             onClick={() =>
-                                Number(token.contractIndex) >= 0
-                                    ? navToTokenDetails(token.contractIndex)
-                                    : navToPltDetails(token.contractIndex)
+                                token.contractIndex === PLT
+                                    ? navToPltDetails(token.id)
+                                    : navToTokenDetails(token.contractIndex)
                             }
                             key={`${token.contractIndex}.${token.id}`}
                             thumbnail={token.metadata.thumbnail?.url || ''}

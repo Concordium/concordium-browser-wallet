@@ -111,6 +111,18 @@
                     fill: $color-mineral-2;
                 }
             }
+
+            &:disabled {
+                background-color: $semantic-surface-primary-disabled;
+
+                .capture__additional_small {
+                    color: $semantic-content-primary-disabled;
+                }
+
+                svg path {
+                    fill: $semantic-content-primary-disabled;
+                }
+            }
         }
 
         &.text,

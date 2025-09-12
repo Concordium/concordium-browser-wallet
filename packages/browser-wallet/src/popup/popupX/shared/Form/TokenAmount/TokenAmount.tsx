@@ -4,6 +4,7 @@ import { AccountAddress, AccountInfo, ContractAddress, CIS2 } from '@concordium/
 import { atom } from 'jotai';
 
 import { contractBalancesFamily } from '@popup/store/token';
+import { PLT } from '@shared/constants/token';
 import TokenAmountView, { TokenAmountViewProps } from './View';
 import { useTokenInfo } from './util';
 
@@ -88,7 +89,7 @@ export default function TokenAmount({ accountInfo, ccdBalance = 'available', ...
         (token?.tokenType === 'plt' &&
             ({
                 id: token.tokenSymbol,
-                contract: { index: token.tokenSymbol, subindex: 0n },
+                contract: { index: PLT, subindex: 0n },
             } as unknown as CIS2.TokenAddress)) ||
         null;
 

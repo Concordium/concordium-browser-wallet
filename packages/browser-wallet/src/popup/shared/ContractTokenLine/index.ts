@@ -1,1 +1,1 @@
-export { default, ChoiceStatus } from './ContractTokenLine';
+export { default } from './ContractTokenLine';

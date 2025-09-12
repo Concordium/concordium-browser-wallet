@@ -1,7 +1,8 @@
 import { AccountAddress, CIS2, ContractAddress } from '@concordium/web-sdk';
+import { useAtomValue } from 'jotai';
 import { accountTokensFamily } from '@popup/store/token';
 import { TokenMetadata } from '@shared/storage/types';
-import { useAtomValue } from 'jotai';
+import { PLT } from '@shared/constants/token';
 
 export type Cis2TokenInfo = CIS2.TokenAddress & {
     tokenType: 'cis2';
@@ -32,7 +33,7 @@ export function useTokenInfo(account: AccountAddress.Type): TokenInfoResponse {
     const mapped = Object.entries(value)
         .flatMap(([index, tokens]) =>
             tokens.map((t): TokenInfo => {
-                if (Number(index) >= 0) {
+                if (index !== PLT) {
                     return {
                         contract: ContractAddress.create(BigInt(index)),
                         id: t.id,
@@ -48,6 +49,7 @@ export function useTokenInfo(account: AccountAddress.Type): TokenInfoResponse {
                 } as PltTokenInfo;
             })
         )
+        .filter((t) => !t.metadata.isHidden)
         .sort((a, b) => (b.metadata.addedAt || 0) - (a.metadata.addedAt || 0));
 
     return { loading: false, value: mapped };

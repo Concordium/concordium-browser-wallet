@@ -61,6 +61,7 @@ const t: typeof en = {
             invalid: 'Ugyldig addresse',
             recipientNotAllowList: 'Modtageren er ikke på tilladelseslisten',
             recipientDenyList: 'Modtageren er på afvisningslisten',
+            tokenPaused: 'Denne token er sat på pause og kan ikke sendes',
         },
         ccdAmount: {
             required: 'Indtast et beløb',

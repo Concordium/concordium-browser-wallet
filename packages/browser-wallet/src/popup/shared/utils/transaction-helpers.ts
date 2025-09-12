@@ -145,6 +145,10 @@ export const validateAccountAndBlockList =
             const accountToken = accountInfo.accountTokens.find((t) => t.id.toString() === token.tokenSymbol);
             const accountModuleState = cborDecode(accountToken?.state.moduleState?.toString()) as TokenModuleState;
 
+            if (tokenModuleState.paused) {
+                return i18n.t('utils.address.tokenPaused');
+            }
+
             if (tokenModuleState.denyList && accountModuleState.denyList) {
                 return i18n.t('utils.address.recipientDenyList');
             }
