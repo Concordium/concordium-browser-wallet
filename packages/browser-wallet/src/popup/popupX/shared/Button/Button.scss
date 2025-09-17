@@ -18,11 +18,17 @@
         width: 100%;
         padding: rem(16px) 0;
         border-radius: rem(32px);
-        background: $color-white;
+        background: $semantic-surface-primary;
+        color: $semantic-content-inverse-primary;
+
+        &:disabled {
+            background: $semantic-surface-primary-disabled;
+            color: $semantic-content-primary-disabled;
+        }
 
         &.secondary {
-            background: $color-grey-2;
-            color: $color-white;
+            background: $semantic-surface-secondary;
+            color: $semantic-content-primary;
         }
 
         .tablet & {
@@ -103,6 +109,18 @@
 
                 path {
                     fill: $color-mineral-2;
+                }
+            }
+
+            &:disabled {
+                background-color: $semantic-surface-primary-disabled;
+
+                .capture__additional_small {
+                    color: $semantic-content-primary-disabled;
+                }
+
+                svg path {
+                    fill: $semantic-content-primary-disabled;
                 }
             }
         }

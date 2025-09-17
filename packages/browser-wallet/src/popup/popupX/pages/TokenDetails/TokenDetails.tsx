@@ -6,6 +6,7 @@ import Text from '@popup/popupX/shared/Text';
 import Button from '@popup/popupX/shared/Button';
 import { useTranslation } from 'react-i18next';
 import Card from '@popup/popupX/shared/Card';
+import Label from '@popup/popupX/shared/Label';
 import { withSelectedCredential } from '@popup/popupX/shared/utils/hoc';
 import { useFlattenedAccountTokens } from '@popup/pages/Account/Tokens/utils';
 import { contractBalancesFamily, removeTokenFromCurrentAccountAtom } from '@popup/store/token';
@@ -18,6 +19,7 @@ import Arrow from '@assets/svgX/arrow-right.svg';
 import Clock from '@assets/svgX/clock.svg';
 import Notebook from '@assets/svgX/notebook.svg';
 import Eye from '@assets/svgX/eye-slash.svg';
+import Cis2 from '@assets/svgX/coin-crypto-cis-2.svg';
 import { AccountAddress, ContractAddress } from '@concordium/web-sdk';
 import Img from '@popup/shared/Img';
 import { SendFundsLocationState } from '../SendFunds/SendFunds';
@@ -81,6 +83,9 @@ function TokenDetails({ credential }: { credential: WalletCredential }) {
                             withDefaults
                         />
                         <Text.Main>{metadata.name}</Text.Main>
+                    </div>
+                    <div className="token-details-x__labels">
+                        <Label icon={<Cis2 />} text={t('cis2Token')} color="grey" />
                     </div>
                     <Card.RowDetails title={t('description')} value={metadata.description} />
                     <Card.RowDetails title={t('decimals')} value={`0 - ${metadata.decimals}`} />

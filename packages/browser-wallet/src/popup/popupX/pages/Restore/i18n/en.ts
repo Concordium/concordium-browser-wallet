@@ -12,7 +12,7 @@ const t = {
     existed: ' (Already existed)',
     success: 'The following identities and accounts were recovered.',
     error: 'Recovery has failed. You can try again.\nReason for failure:',
-    noneFound: 'No identities were found.',
+    noneFound: 'Nothing new was found.',
     errorAccountInfo: 'Unable to retrieve account balance',
     verifiedBy: 'Verified by {{idProviderName}}',
     unknown: 'Unknown',

@@ -14,13 +14,15 @@ import { UseFormReturn, Validate } from 'react-hook-form';
 import { useTranslation } from 'react-i18next';
 import clsx from 'clsx';
 import { ClassName, displayAsCcd } from 'wallet-common-helpers';
+import { useAtomValue } from 'jotai';
+import { grpcClientAtom } from '@popup/store/settings';
 import { CIS2, CcdAmount, ContractAddress } from '@concordium/web-sdk';
 
 import { CCD_METADATA } from '@shared/constants/token-metadata';
 import { ensureDefined } from '@shared/utils/basic-helpers';
 import ConcordiumLogo from '@assets/svgX/concordium-logo.svg';
 import {
-    validateAccountAddress,
+    validateAccountAndBlockList,
     validateMemoByteLength,
     validateTransferAmount,
 } from '@popup/shared/utils/transaction-helpers';
@@ -33,7 +35,7 @@ import { makeControlled, makeUncontrolled } from '../common/utils';
 import Button from '../../Button';
 import { formatTokenAmount, parseTokenAmount, removeNumberGrouping } from '../../utils/helpers';
 import ErrorMessage from '../ErrorMessage';
-import { TokenInfo } from './util';
+import { Cis2TokenInfo, PltTokenInfo, TokenInfo } from './util';
 import { Select } from '../Select';
 
 type AmountInputProps = Pick<
@@ -178,6 +180,9 @@ const formatTokenSelectorId = (token: TokenPickerVariant) => {
     if (token?.tokenType === 'cis2') {
         return `cis2:${token.tokenAddress.contract.index}:${token.tokenAddress.contract.subindex}:${token.tokenAddress.id}`;
     }
+    if (token?.tokenType === 'plt') {
+        return `plt:${token.tokenSymbol}`;
+    }
     return 'ccd';
 };
 
@@ -212,7 +217,7 @@ function TokenPicker({
                   name: string;
                   icon: ReactNode;
                   decimals: number;
-                  type: 'ccd' | 'cis2';
+                  type: 'ccd' | 'cis2' | 'plt';
                   address: null | CIS2.TokenAddress;
               }
             | undefined => {
@@ -223,14 +228,31 @@ function TokenPicker({
                 return { name, icon, decimals: 6, type: 'ccd', address: null };
             }
 
+            if (v.tokenType === 'plt') {
+                const name = v.tokenSymbol;
+                const {
+                    metadata: { decimals = 0, thumbnail },
+                } = ensureDefined(
+                    tokens.find((tk) => tk.tokenType === 'plt' && tk.id.toString() === v.tokenSymbol) as PltTokenInfo,
+                    'Expected the token specified to be available in the set of tokens given'
+                );
+                const DEFAULT_PLT_ICON = '/assets/svg/placeholder-crypto-token.svg';
+                const tokenImage = thumbnail?.url ?? DEFAULT_PLT_ICON;
+                const icon = <Img src={tokenImage} alt={name} withDefaults />;
+                return { name, icon, decimals, type: 'plt', address: null };
+            }
+
             const {
                 metadata: { symbol, name, decimals = 0, thumbnail },
                 id,
                 contract,
             } = ensureDefined(
                 tokens.find(
-                    (tk) => tk.id === v.tokenAddress.id && ContractAddress.equals(tk.contract, v.tokenAddress.contract)
-                ),
+                    (tk) =>
+                        tk.tokenType === 'cis2' &&
+                        tk.id === v.tokenAddress.id &&
+                        ContractAddress.equals(tk.contract, v.tokenAddress.contract)
+                ) as Cis2TokenInfo,
                 'Expected the token specified to be available in the set of tokens given'
             );
             const safeName = symbol ?? name ?? `${v.tokenAddress.id}@${v.tokenAddress.contract.toString()}`;
@@ -243,15 +265,24 @@ function TokenPicker({
 
     const options: TokenPickerVariant[] = [
         { tokenType: 'ccd' },
-        ...tokens.map((tk): TokenPickerVariant => ({ tokenType: 'cis2', tokenAddress: tk })),
+        ...tokens.map(
+            (tk): TokenPickerVariant =>
+                tk.tokenType === 'cis2'
+                    ? { tokenType: 'cis2', tokenAddress: tk }
+                    : { tokenType: 'plt', tokenSymbol: tk.id.toString() }
+        ),
     ];
 
     const renderOption = (v: TokenPickerVariant) => {
         if (v.tokenType === 'ccd') return 'CCD';
+        if (v.tokenType === 'plt') return v.tokenSymbol;
 
         const tokenInfo = tokens.find(
-            (tk) => tk.id === v.tokenAddress.id && ContractAddress.equals(tk.contract, v.tokenAddress.contract)
-        )!;
+            (tk) =>
+                tk.tokenType === 'cis2' &&
+                tk.id === v.tokenAddress.id &&
+                ContractAddress.equals(tk.contract, v.tokenAddress.contract)
+        )! as Cis2TokenInfo;
         return (
             tokenInfo.metadata.symbol ?? tokenInfo.metadata.name ?? `${tokenInfo.id}@${tokenInfo.contract.toString()}`
         );
@@ -303,6 +334,12 @@ export type TokenPickerVariant =
           tokenType: 'cis2';
           /** The token address */
           tokenAddress: CIS2.TokenAddress;
+      }
+    | {
+          /** The token type. If undefined, a token picker is rendered */
+          tokenType: 'plt';
+          /** The token symbol */
+          tokenSymbol: string;
       };
 type TokenPickerVariantProps = { tokenType?: undefined } | TokenPickerVariant;
 
@@ -378,6 +415,8 @@ export default function TokenAmountView(props: TokenAmountViewProps) {
         formatFee = (f) => displayAsCcd(f, false, true),
         validateAmount: customValidateAmount,
     } = props;
+    const client = useAtomValue(grpcClientAtom);
+
     const defaultToken: TokenPickerVariant = useMemo(() => {
         switch (props.tokenType) {
             case 'ccd':
@@ -385,6 +424,8 @@ export default function TokenAmountView(props: TokenAmountViewProps) {
                 return { tokenType: 'ccd' };
             case 'cis2':
                 return { tokenType: 'cis2', tokenAddress: props.tokenAddress };
+            case 'plt':
+                return { tokenType: 'plt', tokenSymbol: props.tokenSymbol };
             default:
                 throw new Error('Unreachable');
         }
@@ -396,11 +437,20 @@ export default function TokenAmountView(props: TokenAmountViewProps) {
                 return ensureDefined(
                     tokens.find(
                         (tk) =>
+                            tk.tokenType === 'cis2' &&
                             tk.id === token.tokenAddress.id &&
                             ContractAddress.equals(tk.contract, token.tokenAddress.contract)
                     ),
                     'Expected the token specified to be available in the set of tokens given'
                 ).metadata;
+            }
+            case 'plt': {
+                return {
+                    decimals: ensureDefined(
+                        tokens.find((tk) => tk.tokenType === 'plt' && tk.id.toString() === token.tokenSymbol),
+                        'Expected the token specified to be available in the set of tokens given'
+                    ).metadata.decimals,
+                };
             }
             case 'ccd':
             case undefined:
@@ -473,11 +523,14 @@ export default function TokenAmountView(props: TokenAmountViewProps) {
                 return t('form.tokenAmount.validation.incorrectDecimals', { num: tokenDecimals });
             }
             const sanitizedValue = removeNumberGrouping(value);
-            if (token.tokenType === 'cis2' && ccdBalance.microCcdAmount < fee.microCcdAmount) {
-                return t('form.tokenAmount.validation.insufficientCcd');
-            }
             if (token.tokenType === 'ccd') {
                 return validateTransferAmount(sanitizedValue, balance, tokenDecimals, fee.microCcdAmount);
+            }
+            if (
+                (token.tokenType === 'cis2' || token.tokenType === 'plt') &&
+                ccdBalance.microCcdAmount < fee.microCcdAmount
+            ) {
+                return t('form.tokenAmount.validation.insufficientCcd');
             }
             return validateTransferAmount(sanitizedValue, balance, selectedTokenMetadata.decimals);
         },
@@ -515,28 +568,30 @@ export default function TokenAmountView(props: TokenAmountViewProps) {
                         {buttonMaxLabel}
                     </Button.Base>
                 </div>
-                <ErrorMessage className="capture__main_small">
-                    {props.form.formState.errors.amount?.message}
-                </ErrorMessage>
                 <Text.Capture>
                     {t('form.tokenAmount.amount.fee')} {formatFee(fee)}
                 </Text.Capture>
+                <ErrorMessage className="capture__main_small" exclamationIcon>
+                    {props.form.formState.errors.amount?.message}
+                </ErrorMessage>
             </div>
             {props.receiver === true && (
                 <>
                     <div className="token-amount_receiver">
                         <span className="text__main_medium">{t('form.tokenAmount.address.label')}</span>
-                        <FormReceiverInput
-                            className="text__main"
-                            register={(props.form as UseFormReturn<AmountReceiveForm>).register}
-                            name="receiver"
-                            placeholder={t('form.tokenAmount.address.placeholder')}
-                            rules={{
-                                required: t('utils.address.required'),
-                                validate: validateAccountAddress,
-                            }}
-                        />
-                        <ErrorMessage className="capture__main_small">
+                        <div className="token-amount_receiver_selector">
+                            <FormReceiverInput
+                                className="text__main"
+                                register={(props.form as UseFormReturn<AmountReceiveForm>).register}
+                                name="receiver"
+                                placeholder={t('form.tokenAmount.address.placeholder')}
+                                rules={{
+                                    required: t('utils.address.required'),
+                                    validate: validateAccountAndBlockList(client, token),
+                                }}
+                            />
+                        </div>
+                        <ErrorMessage className="capture__main_small" exclamationIcon>
                             {props.form.formState.errors.receiver?.message}
                         </ErrorMessage>
                     </div>

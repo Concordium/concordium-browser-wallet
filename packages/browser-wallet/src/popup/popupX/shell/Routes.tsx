@@ -8,7 +8,13 @@ import ReceiveFunds from '@popup/popupX/pages/ReceiveFunds';
 import Onramp from '@popup/popupX/pages/Onramp';
 import TransactionLog from '@popup/popupX/pages/TransactionLog';
 import TransactionDetails from '@popup/popupX/pages/TransactionLog/TransactionDetails';
-import { TokenDetails, TokenDetailsCcd, TokenRaw } from '@popup/popupX/pages/TokenDetails';
+import {
+    TokenDetails,
+    TokenDetailsCcd,
+    TokenDetailsPlt,
+    TokenRaw,
+    TokenRawPlt,
+} from '@popup/popupX/pages/TokenDetails';
 import IdCards from '@popup/popupX/pages/IdCards';
 import Accounts from '@popup/popupX/pages/Accounts';
 import CreateAccount, { CreateAccountConfirm } from '@popup/popupX/pages/CreateAccount';
@@ -16,7 +22,7 @@ import SeedPhrase from 'src/popup/popupX/pages/SeedPhrase';
 import ChangePasscode from 'src/popup/popupX/pages/ChangePasscode';
 import { Web3IdCredentials, Web3IdImport } from '@popup/popupX/pages/Web3Id';
 import NetworkSettings from '@popup/popupX/pages/NetworkSettings';
-import ConnectNetwork from '@popup/popupX/pages/ConnectNetwork';
+import { ConnectNetwork, CustomConnectNetwork } from '@popup/popupX/pages/ConnectNetwork';
 import About from '@popup/popupX/pages/About';
 import {
     ConfirmSeedPhrase,
@@ -93,10 +99,16 @@ export default function Routes({ messagePromptHandlers }: { messagePromptHandler
                         <Route index element={<SetupPassword />} />
                         <Route path={relativeRoutes.onboarding.setupPassword.createOrRestore.path}>
                             <Route index element={<CreateOrRestore />} />
-                            <Route
-                                path={relativeRoutes.onboarding.setupPassword.createOrRestore.selectNetwork.path}
-                                element={<SelectNetwork />}
-                            />
+                            <Route path={relativeRoutes.onboarding.setupPassword.createOrRestore.selectNetwork.path}>
+                                <Route index element={<SelectNetwork />} />
+                                <Route
+                                    path={
+                                        relativeRoutes.onboarding.setupPassword.createOrRestore.selectNetwork.custom
+                                            .path
+                                    }
+                                    element={<CustomConnectNetwork />}
+                                />
+                            </Route>
                             <Route
                                 path={relativeRoutes.onboarding.setupPassword.createOrRestore.restoreWallet.path}
                                 element={<RestoreWallet />}
@@ -150,6 +162,10 @@ export default function Routes({ messagePromptHandlers }: { messagePromptHandler
                         <Route path={relativeRoutes.home.token.details.path}>
                             <Route index element={<TokenDetails />} />
                             <Route element={<TokenRaw />} path={`${relativeRoutes.home.token.details.raw.path}`} />
+                        </Route>
+                        <Route path={relativeRoutes.home.token.plt.path}>
+                            <Route index element={<TokenDetailsPlt />} />
+                            <Route element={<TokenRawPlt />} path={`${relativeRoutes.home.token.plt.raw.path}`} />
                         </Route>
                     </Route>
                     <Route
@@ -207,6 +223,7 @@ export default function Routes({ messagePromptHandlers }: { messagePromptHandler
                     <Route path={relativeRoutes.settings.network.path}>
                         <Route index element={<NetworkSettings />} />
                         <Route element={<ConnectNetwork />} path={relativeRoutes.settings.network.connect.path} />
+                        <Route element={<CustomConnectNetwork />} path={relativeRoutes.settings.network.custom.path} />
                     </Route>
                     <Route path={relativeRoutes.settings.restore.path}>
                         <Route index element={<RestoreIntro />} />

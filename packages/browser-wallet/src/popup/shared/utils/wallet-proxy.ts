@@ -1,8 +1,9 @@
 import { AccountTransactionType, CcdAmount } from '@concordium/web-sdk';
 import axios from 'axios';
 import { abs } from 'wallet-common-helpers';
-import { Cis2TokensResponse, IdentityProvider } from '@shared/storage/types';
+import { Cis2TokensResponse, IdentityProvider, PltResponse } from '@shared/storage/types';
 import { storedCurrentNetwork } from '@shared/storage/access';
+import { logError } from '@shared/utils/log-helpers';
 import {
     BrowserWalletAccountTransaction,
     BrowserWalletTransaction,
@@ -10,6 +11,7 @@ import {
     SpecialTransactionType,
     TransactionHistoryResult,
     TransactionStatus,
+    BlockSpecialEvent,
 } from './transaction-history-types';
 import { createPendingTransaction } from './transaction-helpers';
 
@@ -47,12 +49,23 @@ export enum TransactionKindString {
     ConfigureBaker = 'configureBaker',
     ConfigureDelegation = 'configureDelegation',
     StakingReward = 'paydayAccountReward',
+    TokenUpdate = 'tokenUpdate',
+    ChainUpdate = 'chainUpdate',
+    UpdateCreatePLT = 'updateCreatePLT',
+    BakingRewards = 'bakingRewards',
+    Mint = 'mint',
+    FinalizationRewards = 'finalizationRewards',
+    PaydayFoundationReward = 'paydayFoundationReward',
+    BlockAccrueReward = 'blockAccrueReward',
+    PaydayPoolReward = 'paydayPoolReward',
+    ValidatorSuspended = 'validatorSuspended',
+    ValidatorPrimedForSuspension = 'validatorPrimedForSuspension',
     Malformed = 'Malformed account transaction',
 }
 
 function mapTransactionKindStringToTransactionType(
     kind: TransactionKindString
-): AccountTransactionType | RewardType | SpecialTransactionType {
+): AccountTransactionType | RewardType | SpecialTransactionType | BlockSpecialEvent {
     switch (kind) {
         case TransactionKindString.DeployModule:
             return AccountTransactionType.DeployModule;
@@ -106,8 +119,33 @@ function mapTransactionKindStringToTransactionType(
             return RewardType.StakingReward;
         case TransactionKindString.Malformed:
             return SpecialTransactionType.Malformed;
-        default:
-            throw Error(`Unknown transaction kind was encounted: ${kind}`);
+        case TransactionKindString.TokenUpdate:
+            return AccountTransactionType.TokenUpdate;
+        case TransactionKindString.ChainUpdate:
+            return SpecialTransactionType.ChainUpdate;
+        case TransactionKindString.UpdateCreatePLT:
+            return SpecialTransactionType.UpdateCreatePLT;
+        case TransactionKindString.BakingRewards:
+            return BlockSpecialEvent.BakingRewards;
+        case TransactionKindString.Mint:
+            return BlockSpecialEvent.Mint;
+        case TransactionKindString.FinalizationRewards:
+            return BlockSpecialEvent.FinalizationRewards;
+        case TransactionKindString.PaydayFoundationReward:
+            return BlockSpecialEvent.PaydayFoundationReward;
+        case TransactionKindString.BlockAccrueReward:
+            return BlockSpecialEvent.BlockAccrueReward;
+        case TransactionKindString.PaydayPoolReward:
+            return BlockSpecialEvent.PaydayPoolReward;
+        case TransactionKindString.ValidatorSuspended:
+            return BlockSpecialEvent.ValidatorSuspended;
+        case TransactionKindString.ValidatorPrimedForSuspension:
+            return BlockSpecialEvent.ValidatorPrimedForSuspension;
+        default: {
+            // Throwing error at this point, fails Transaction Log to render. Replaced with logError
+            logError(`Unknown transaction kind was encounted: ${kind}`);
+            return kind;
+        }
     }
 }
 
@@ -126,6 +164,8 @@ interface Details {
     events: string[];
     rejectReason: string;
     memo?: string;
+    tokenTransferAmount?: { decimals: number; value: string };
+    tokenId?: string;
 }
 
 enum OriginType {
@@ -173,6 +213,9 @@ function getFromAddress(transaction: WalletProxyTransaction, accountAddress: str
     if (originType === OriginType.Reward) {
         return undefined;
     }
+    if (originType === OriginType.None) {
+        return undefined;
+    }
     throw new Error(
         `The received transaction is malformed. Could not find information to determine from address. ${JSON.stringify(
             transaction
@@ -194,6 +237,9 @@ function getToAddress(transaction: WalletProxyTransaction, accountAddress: strin
         return accountAddress;
     }
     if (transaction.origin.type === OriginType.Self) {
+        return undefined;
+    }
+    if (transaction.origin.type === OriginType.None) {
         return undefined;
     }
     throw new Error(
@@ -218,6 +264,14 @@ function calculateAmount(transaction: WalletProxyTransaction, status: Transactio
 const getTransactionStatusFromOutcome = (transactionOutcome: string): TransactionStatus =>
     transactionOutcome === 'success' ? TransactionStatus.Finalized : TransactionStatus.Failed;
 
+const getTokenTransfer = (transactionDetails: Details): BrowserWalletTransaction['tokenTransfer'] => {
+    if (transactionDetails.tokenTransferAmount) {
+        const { tokenTransferAmount, tokenId = '' } = transactionDetails;
+        return { ...tokenTransferAmount, tokenId };
+    }
+    return undefined;
+};
+
 function mapTransaction(transaction: WalletProxyTransaction, accountAddress: string): BrowserWalletTransaction {
     const status = getTransactionStatusFromOutcome(transaction.details.outcome);
     const type = mapTransactionKindStringToTransactionType(transaction.details.type);
@@ -236,6 +290,7 @@ function mapTransaction(transaction: WalletProxyTransaction, accountAddress: str
         events: transaction.details.events,
         rejectReason: transaction.details.rejectReason,
         memo: transaction.details.memo,
+        tokenTransfer: getTokenTransfer(transaction.details),
     };
 }
 
@@ -252,7 +307,7 @@ export async function getTransactions(
     order: 'ascending' | 'descending',
     config: GetTransactionsConfig = {}
 ): Promise<TransactionHistoryResult> {
-    let proxyPath = `/v1/accTransactions/${accountAddress}?limit=${resultLimit}&order=${order.toString()}&includeRawRejectReason`;
+    let proxyPath = `/v3/accTransactions/${accountAddress}?limit=${resultLimit}&order=${order.toString()}&includeRawRejectReason`;
     if (config.from) {
         proxyPath += `&from=${config.from}`;
     }
@@ -312,6 +367,13 @@ export async function getCis2Tokens(
     if (from) {
         path += `&from=${from}`;
     }
+
+    const { data } = await (await getWalletProxy()).get(path);
+    return data;
+}
+
+export async function getPltToken(tokenId: string): Promise<PltResponse | undefined> {
+    const path = `/v0/plt/tokenInfo/${tokenId}`;
 
     const { data } = await (await getWalletProxy()).get(path);
     return data;

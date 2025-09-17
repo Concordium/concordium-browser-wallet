@@ -5,6 +5,7 @@ import PendingIcon from '@assets/svg/clock.svg';
 import Warning from '@assets/svg/warning.svg';
 import { displayAsCcd, dateFromTimestamp, TimeStampUnit } from 'wallet-common-helpers';
 import {
+    BlockSpecialEvent,
     BrowserWalletTransaction,
     isAccountTransaction,
     RewardType,
@@ -103,7 +104,7 @@ function buildFeeString(cost: bigint, accountAddress: string, transaction: Brows
 /**
  * Maps transaction type to a displayable text string.
  */
-function mapTypeToText(type: AccountTransactionType | RewardType | SpecialTransactionType): string {
+function mapTypeToText(type: AccountTransactionType | RewardType | SpecialTransactionType | BlockSpecialEvent): string {
     switch (type) {
         case AccountTransactionType.DeployModule:
             return 'Module deployment';
@@ -157,6 +158,22 @@ function mapTypeToText(type: AccountTransactionType | RewardType | SpecialTransa
             return 'Reward payout';
         case SpecialTransactionType.Malformed:
             return 'Malformed';
+        case BlockSpecialEvent.BakingRewards:
+            return 'Baking rewards';
+        case BlockSpecialEvent.Mint:
+            return 'Mint';
+        case BlockSpecialEvent.FinalizationRewards:
+            return 'Finalization rewards';
+        case BlockSpecialEvent.PaydayFoundationReward:
+            return 'Payday foundation reward';
+        case BlockSpecialEvent.BlockAccrueReward:
+            return 'Block accrue reward';
+        case BlockSpecialEvent.PaydayPoolReward:
+            return 'Payday pool reward';
+        case BlockSpecialEvent.ValidatorSuspended:
+            return 'Validator suspended';
+        case BlockSpecialEvent.ValidatorPrimedForSuspension:
+            return 'Validator primed for suspension';
         default:
             return 'Unknown';
     }

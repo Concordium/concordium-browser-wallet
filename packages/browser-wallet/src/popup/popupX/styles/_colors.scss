@@ -31,3 +31,36 @@ $gradient-balance-bg: radial-gradient(
     rgb(237 218 191 / 90%) 50%,
     rgb(164 154 227 / 90%) 100%
 );
+
+// Semantic colors from unified design system
+
+// Primary Button
+$semantic-surface-primary: #fff;
+$semantic-surface-primary-hover: #d7e3ef;
+$semantic-surface-primary-pressed: #d0d4d6;
+$semantic-surface-primary-disabled: #2f3437;
+$semantic-content-inverse-primary: #131416;
+$semantic-content-primary-disabled: #4b5357;
+
+// Secondary Button
+$semantic-surface-secondary: #4b5357;
+$semantic-surface-secondary-hover: #78858b;
+$semantic-surface-secondary-pressed: #4b5357;
+$semantic-surface-secondary-disabled: $semantic-surface-primary-disabled;
+$semantic-content-primary: #fff;
+$semantic-content-primary-disabled: #4b5357;
+
+// Surface
+$semantic-border-accent-secondary: #b6c9e2;
+$semantic-border-tertiary: #4b5357;
+$semantic-content-secondary: #959ea3;
+$semantic-content-accent-secondary: #b6c9e2;
+$semantic-surface-success-tertiary: #0c261d;
+$semantic-border-success-secondary: #007050;
+$semantic-content-success-primary: #24d4ab;
+$semantic-surface-warning-tertiary: #282418;
+$semantic-border-warning-secondary: #a17716;
+$semantic-content-warning-primary: #e8b126;
+$semantic-surface-error-tertiary: #2b171b;
+$semantic-border-error-secondary: #830e30;
+$semantic-content-error-primary: #d62e4c;

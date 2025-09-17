@@ -16,8 +16,18 @@ const t = {
     validated: 'Validated',
     cooldown: 'Cooldown',
     rawMetadata: 'Raw Metadata',
+    totalSupply: 'Total Supply',
+    issuer: 'Issuer',
+    moduleRef: 'Module Reference',
     ccdDescription:
         'CCD is the native token of the Concordium blockchain. Its main use cases are the payment of transaction fees, the payment for the execution of smart contracts, payments between users, payments for commercial transactions, staking, and the rewards offered to node operators.',
+    cis2Token: 'CIS-2 Token',
+    plt: 'Protocol Level Token',
+    onAllowList: 'Account is on the allow list',
+    notOnAllowList: 'Account is not on the allow list',
+    onDenyList: 'Account is on the deny list',
+    noDescription: 'No description provided',
+    paused: 'Token paused',
 };
 
 export default t;

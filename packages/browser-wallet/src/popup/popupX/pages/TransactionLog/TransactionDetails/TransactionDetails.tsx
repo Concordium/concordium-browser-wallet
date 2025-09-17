@@ -21,7 +21,8 @@ import {
 } from '@popup/shared/utils/transaction-history-types';
 import { grpcClientAtom } from '@popup/store/settings';
 
-import { onlyTime, onlyDate, TransactionLogParams, mapTypeToText, hasAmount } from '../util';
+import TransactionAmount from '@popup/popupX/pages/TransactionLog/TransactionAmount';
+import { onlyTime, onlyDate, TransactionLogParams, mapTypeToText } from '../util';
 
 /** State passed as part of the navigation */
 export type TransactionDetailsLocationState = {
@@ -52,13 +53,6 @@ function TransactionDetails({ transaction, account }: TransactionDetailsProps) {
         }
     }, [transaction.transactionHash]);
 
-    const isSender = account === transaction.fromAddress;
-    // Flip the amount if selected account is sender, and amount is positive. We expect the transaction list endpoint to sign the amount based on this,
-    // but this is not the case for pending transactions. This seeks to emulate the behaviour of the transaction list endpoint.
-    const amount =
-        isSender && transaction.status === TransactionStatus.Pending && transaction.amount > 0n
-            ? -transaction.amount
-            : transaction.amount;
     const date = dateFromTimestamp(transaction.time, TimeStampUnit.seconds);
     const info = transaction.cost !== undefined && t('withFee', { value: displayAsCcd(transaction.cost, false, true) });
     const failed = transaction.status === TransactionStatus.Failed;
@@ -81,11 +75,7 @@ function TransactionDetails({ transaction, account }: TransactionDetailsProps) {
                                 <Text.Label className={clsx(failed && 'failed')}>
                                     {mapTypeToText(transaction.type)}
                                 </Text.Label>
-                                {hasAmount(transaction.type) && !failed && (
-                                    <Text.Label className={clsx(amount > 0 && 'income')}>
-                                        {displayAsCcd(transaction.amount, false, true)}
-                                    </Text.Label>
-                                )}
+                                <TransactionAmount transaction={transaction} accountAddress={account} />
                             </div>
                             <div className="top-info">
                                 <Text.Capture>

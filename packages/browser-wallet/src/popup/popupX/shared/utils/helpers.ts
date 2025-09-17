@@ -17,7 +17,13 @@ export const removeNumberGrouping = (amount: string) => amount.replace(/,/g, '')
 
 /** Display a token amount with a number of decimals + number groupings (thousand separators) */
 export function formatTokenAmount(amount: bigint, decimals = 0, minDecimals = 2, maxDecimals = -1) {
-    const padded = amount.toString().padStart(decimals + 1, '0'); // Ensure the string length is minimum decimals + 1 characters. For CCD, this would mean minimum 7 characters long
+    // Check for negative value, in case when amount is less than minimum decimals. padStart results in "00-123n" and then converted to NaN
+    const absBigInt = (n: bigint) => (n < 0n ? -n : n);
+    const padded =
+        (amount < 0n ? '-' : '') +
+        absBigInt(amount)
+            .toString()
+            .padStart(decimals + 1, '0'); // Ensure the string length is minimum decimals + 1 characters. For CCD, this would mean minimum 7 characters long
     if (decimals === 0) {
         return amount.toString();
     }
@@ -97,4 +103,8 @@ export function encodeMemo(memo: string): DataBlob {
 
 export function getMemoByteLength(memo: string): number {
     return encode(memo).byteLength;
+}
+
+export function cborDecode(value: string | undefined): object {
+    return (decodeMemo(value) || {}) as object;
 }

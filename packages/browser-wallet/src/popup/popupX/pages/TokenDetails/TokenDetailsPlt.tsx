@@ -1,0 +1,182 @@
+import React, { useEffect, useState } from 'react';
+import { useUpdateAtom } from 'jotai/utils';
+import { useNavigate, useParams } from 'react-router-dom';
+import { useTranslation } from 'react-i18next';
+import { AccountAddress } from '@concordium/web-sdk';
+import { TokenId, TokenInfo, TokenModuleState, TokenModuleAccountState } from '@concordium/web-sdk/plt';
+import { absoluteRoutes, relativeRoutes, sendFundsRoute } from '@popup/popupX/constants/routes';
+import Page from '@popup/popupX/shared/Page';
+import Text from '@popup/popupX/shared/Text';
+import Button from '@popup/popupX/shared/Button';
+import Img from '@popup/shared/Img';
+import Card from '@popup/popupX/shared/Card';
+import Label from '@popup/popupX/shared/Label';
+import { withSelectedCredential } from '@popup/popupX/shared/utils/hoc';
+import { useAtomValue } from 'jotai';
+import { addThousandSeparators, integerToFractional, pipe } from 'wallet-common-helpers';
+import { trunctateSymbol } from '@shared/utils/token-helpers';
+import { WalletCredential } from '@shared/storage/types';
+import Arrow from '@assets/svgX/arrow-right.svg';
+import Shield from '@assets/svgX/shield-square-crypto.svg';
+import Stop from '@assets/svgX/circled-x-block-deny.svg';
+import Check from '@assets/svgX/circled-check-done.svg';
+import Notebook from '@assets/svgX/notebook.svg';
+import Eye from '@assets/svgX/eye-slash.svg';
+import { grpcClientAtom } from '@popup/store/settings';
+import { removeTokenFromCurrentAccountAtom } from '@popup/store/token';
+import { useAccountInfo } from '@popup/shared/AccountInfoListenerContext/AccountInfoListenerContext';
+import { cborDecode } from '@popup/popupX/shared/utils/helpers';
+import { SendFundsLocationState } from '@popup/popupX/pages/SendFunds/SendFunds';
+import { useFlattenedAccountTokens } from '@popup/pages/Account/Tokens/utils';
+import { PLT } from '@shared/constants/token';
+
+function usePltInfoAndBalance(pltSymbol: string, credential: WalletCredential) {
+    const client = useAtomValue(grpcClientAtom);
+    const accountInfo = useAccountInfo(credential);
+    const { metadata } = useFlattenedAccountTokens(credential).find((token) => token.id === pltSymbol) || {
+        metadata: { name: '', symbol: '', thumbnail: { url: '' }, description: '' },
+    };
+    const [pltInfo, setPltInfo] = useState<TokenInfo>();
+    useEffect(() => {
+        client.getTokenInfo(TokenId.fromString(pltSymbol)).then((tokenDetails) => {
+            setPltInfo(tokenDetails);
+        });
+    }, []);
+
+    const currentToken = accountInfo?.accountTokens.find((accountToken) => accountToken.id.toString() === pltSymbol);
+    const balance = currentToken?.state.balance || { decimals: 0, value: 0n };
+    const renderedBalance = pipe(integerToFractional(balance.decimals), addThousandSeparators)(balance.value);
+
+    return { pltInfo, renderedBalance, currentToken, metadata };
+}
+
+enum TokenStatus {
+    PAUSED,
+    ON_DENY_LIST,
+    ON_ALLOW_LIST,
+    NOT_ON_ALLOW_LIST,
+    NO_STATUS,
+}
+
+function getTokenStatus(tokenModuleState: TokenModuleState, accountModuleState: TokenModuleAccountState): TokenStatus {
+    if (tokenModuleState.paused) return TokenStatus.PAUSED;
+    if (tokenModuleState.denyList && accountModuleState.denyList) return TokenStatus.ON_DENY_LIST;
+    if (tokenModuleState.allowList) {
+        if (accountModuleState?.allowList) {
+            return TokenStatus.ON_ALLOW_LIST;
+        }
+        return TokenStatus.NOT_ON_ALLOW_LIST;
+    }
+    return TokenStatus.NO_STATUS;
+}
+
+function getIsDisabled(status: TokenStatus) {
+    return ![TokenStatus.ON_ALLOW_LIST, TokenStatus.NO_STATUS].includes(status);
+}
+
+function StatusLabel({ status }: { status: TokenStatus }) {
+    const { t } = useTranslation('x', { keyPrefix: 'tokenDetails' });
+
+    return {
+        [TokenStatus.PAUSED]: <Label icon={<Stop />} text={t('paused')} color="yellow" />,
+        [TokenStatus.ON_DENY_LIST]: <Label icon={<Stop />} text={t('onDenyList')} color="red" />,
+        [TokenStatus.ON_ALLOW_LIST]: <Label icon={<Check />} text={t('onAllowList')} color="green" />,
+        [TokenStatus.NOT_ON_ALLOW_LIST]: <Label icon={<Stop />} text={t('notOnAllowList')} color="yellow" />,
+        [TokenStatus.NO_STATUS]: null,
+    }[status];
+}
+
+function getNavState(pltSymbol: string) {
+    return {
+        tokenType: 'plt',
+        tokenSymbol: pltSymbol,
+    } as SendFundsLocationState;
+}
+
+type Params = {
+    pltSymbol: string;
+};
+
+function TokenDetails({ credential }: { credential: WalletCredential }) {
+    const { t } = useTranslation('x', { keyPrefix: 'tokenDetails' });
+
+    // Need to call this function, so tokens synced at this moment
+    // Otherwise user need to reload page, before removing token
+    useFlattenedAccountTokens(credential);
+
+    const nav = useNavigate();
+
+    const { pltSymbol = '' } = useParams<Params>();
+    const { pltInfo, renderedBalance, currentToken, metadata } = usePltInfoAndBalance(pltSymbol, credential);
+    const remove = useUpdateAtom(removeTokenFromCurrentAccountAtom);
+    if (!pltInfo) {
+        return null;
+    }
+    const {
+        state: { decimals, moduleState },
+    } = pltInfo;
+
+    const tokenModuleState = cborDecode(moduleState.toString()) as TokenModuleState;
+    const accountModuleState = cborDecode(currentToken?.state?.moduleState?.toString()) as TokenModuleAccountState;
+    const status = getTokenStatus(tokenModuleState, accountModuleState);
+
+    const navToReceive = () => nav(absoluteRoutes.home.receive.path);
+    const navToRaw = () => nav(relativeRoutes.home.token.plt.raw.path);
+    const navToSend = () =>
+        nav(sendFundsRoute(AccountAddress.fromBase58(credential.address)), {
+            state: getNavState(pltSymbol),
+        });
+    const removeToken = () => {
+        remove({ contractIndex: PLT, tokenId: pltSymbol });
+        nav(-1);
+    };
+
+    return (
+        <Page className="token-details-x">
+            <Page.Main>
+                <Text.DynamicSize baseFontSize={32} baseTextLength={17} className="heading_big plt">
+                    {renderedBalance} {trunctateSymbol(pltSymbol)}
+                </Text.DynamicSize>
+                <div className="token-details-x__action-buttons">
+                    <Button.IconTile
+                        icon={<Arrow />}
+                        label={t('receive')}
+                        onClick={() => navToReceive()}
+                        className="receive"
+                        disabled={getIsDisabled(status)}
+                    />
+                    <Button.IconTile
+                        icon={<Arrow />}
+                        label={t('send')}
+                        onClick={() => navToSend()}
+                        className="send"
+                        disabled={getIsDisabled(status)}
+                    />
+                </div>
+                <Card>
+                    <div className="token-details-x__token">
+                        <span className="token-icon">
+                            <Img
+                                className="token-icon"
+                                src={metadata.thumbnail?.url || ''}
+                                alt={metadata.symbol}
+                                withDefaults
+                            />
+                        </span>
+                        <Text.Main>{metadata.name}</Text.Main>
+                    </div>
+                    <div className="token-details-x__labels">
+                        <Label icon={<Shield />} text={t('plt')} color="light-grey" />
+                        <StatusLabel status={status} />
+                    </div>
+                    <Card.RowDetails title={t('description')} value={metadata.description || t('noDescription')} />
+                    <Card.RowDetails title={t('decimals')} value={`0 - ${decimals}`} />
+                </Card>
+                <Button.IconText icon={<Notebook />} label={t('showRawMetadata')} onClick={navToRaw} />
+                <Button.IconText icon={<Eye />} label={t('hideToken')} onClick={removeToken} />
+            </Page.Main>
+        </Page>
+    );
+}
+
+export default withSelectedCredential(TokenDetails);

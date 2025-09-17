@@ -341,5 +341,13 @@ $handle-size: rem(20px);
 }
 
 .form-error-message {
+    display: flex;
+    align-items: center;
+    gap: rem(6px);
+    margin-top: rem(8px);
     color: $color-red-attention !important;
+
+    svg path {
+        fill: $color-red-attention;
+    }
 }

@@ -1,15 +1,17 @@
 import React, { useMemo } from 'react';
 import { useTranslation } from 'react-i18next';
+import { Cbor, CborMemo, TokenAmount, TokenId, TokenOperationType, TokenHolder } from '@concordium/web-sdk/plt';
 import {
     AccountAddress,
     AccountTransactionType,
+    CcdAmount,
     CIS2,
     CIS2Contract,
-    CcdAmount,
     Energy,
     SimpleTransferPayload,
     SimpleTransferWithMemoPayload,
     TransactionHash,
+    TokenUpdatePayload,
 } from '@concordium/web-sdk';
 import { useAsyncMemo } from 'wallet-common-helpers';
 import { useAtomValue } from 'jotai';
@@ -48,6 +50,9 @@ const getTransactionType = (tokenType: string, memo?: string) => {
         }
         return AccountTransactionType.Transfer;
     }
+    if (tokenType === 'plt') {
+        return AccountTransactionType.TokenUpdate;
+    }
     return AccountTransactionType.Update;
 };
 
@@ -64,6 +69,7 @@ export default function SendFundsConfirm({ values, fee, sender }: Props) {
     const nav = useNavigate();
     const tokenName = useMemo(() => {
         if (values.token.tokenType === 'ccd') return CCD_METADATA.name;
+        if (values.token.tokenType === 'plt') return values.token.tokenSymbol;
         if (tokenMetadata === undefined || values.token.tokenType === undefined) return undefined;
 
         return showToken(tokenMetadata, values.token.tokenAddress);
@@ -83,6 +89,46 @@ export default function SendFundsConfirm({ values, fee, sender }: Props) {
         [values.token, grpcClient]
     );
 
+    const createCcdPayload = () => {
+        const p: SimpleTransferPayload = {
+            amount: parseCcdAmount(values.amount),
+            toAddress: receiver,
+        };
+
+        if (values.memo) {
+            const payloadWithMemo: SimpleTransferWithMemoPayload = {
+                ...p,
+                memo: encodeMemo(values.memo),
+            };
+            return payloadWithMemo;
+        }
+
+        return p;
+    };
+
+    const createPltPayload = () => {
+        if (values.token.tokenType !== 'plt') return undefined;
+
+        const ops = [
+            {
+                [TokenOperationType.Transfer]: {
+                    amount: TokenAmount.fromJSON({
+                        value: parseTokenAmount(values.amount, tokenMetadata?.decimals).toString(),
+                        decimals: tokenMetadata?.decimals || 0,
+                    }),
+                    recipient: TokenHolder.fromAccountAddress(receiver),
+                    memo: values.memo ? CborMemo.fromString(values.memo) : undefined,
+                },
+            },
+        ];
+        const payload: TokenUpdatePayload = {
+            tokenId: TokenId.fromString(values.token.tokenSymbol),
+            operations: Cbor.encode(ops),
+        };
+
+        return payload;
+    };
+
     const payload = useAsyncMemo(
         async () => {
             if (values.token.tokenType === 'cis2') {
@@ -101,21 +147,11 @@ export default function SendFundsConfirm({ values, fee, sender }: Props) {
                     transfer
                 ).payload;
             }
+            if (values.token.tokenType === 'plt') {
+                return createPltPayload();
+            }
             if (values.token.tokenType === 'ccd') {
-                const p: SimpleTransferPayload = {
-                    amount: parseCcdAmount(values.amount),
-                    toAddress: receiver,
-                };
-
-                if (values.memo) {
-                    const payloadWithMemo: SimpleTransferWithMemoPayload = {
-                        ...p,
-                        memo: encodeMemo(values.memo),
-                    };
-                    return payloadWithMemo;
-                }
-
-                return p;
+                return createCcdPayload();
             }
 
             return undefined;

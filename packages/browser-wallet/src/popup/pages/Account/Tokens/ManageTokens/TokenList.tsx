@@ -9,7 +9,13 @@ import InfiniteLoader from 'react-window-infinite-loader';
 import AutoSizer from 'react-virtualized-auto-sizer';
 import { VariableSizeList as List } from 'react-window';
 
-import { ContractTokenDetails, ContractDetails, getTokens, getMetadataUnique } from '@shared/utils/token-helpers';
+import {
+    ContractTokenDetails,
+    ContractDetails,
+    getTokens,
+    getMetadataUnique,
+    ChoiceStatus,
+} from '@shared/utils/token-helpers';
 import { absoluteRoutes } from '@popup/constants/routes';
 import PendingArrows from '@assets/svg/pending-arrows.svg';
 import Button from '@popup/shared/Button';
@@ -19,7 +25,7 @@ import { selectedAccountAtom } from '@popup/store/account';
 import { grpcClientAtom } from '@popup/store/settings';
 import { currentAccountTokensAtom } from '@popup/store/token';
 import { ensureDefined } from '@shared/utils/basic-helpers';
-import ContractTokenLine, { ChoiceStatus } from '@popup/shared/ContractTokenLine';
+import ContractTokenLine from '@popup/shared/ContractTokenLine';
 import { AsyncWrapper } from '@popup/store/utils';
 import {
     checkedTokensAtom,

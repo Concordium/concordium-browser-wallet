@@ -8,6 +8,6 @@
         "start": "live-server ./index.html --mount=/sdk.js:../../node_modules/@concordium/web-sdk/lib/concordium.min.js --mount=/helpers.js:../../packages/browser-wallet-api-helpers/lib/concordiumHelpers.min.js"
     },
     "dependencies": {
-        "@concordium/web-sdk": "^8.1.1"
+        "@concordium/web-sdk": "10.0.2"
     }
 }

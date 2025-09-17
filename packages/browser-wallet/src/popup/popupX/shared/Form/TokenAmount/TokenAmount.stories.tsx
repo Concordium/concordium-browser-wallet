@@ -43,6 +43,7 @@ type Story = StoryObj<typeof TokenAmountView>;
 const tokens = [
     {
         id: '',
+        tokenType: 'cis2' as const,
         contract: ContractAddress.create(123, 0),
         metadata: {
             symbol: 'wETH',
@@ -53,6 +54,7 @@ const tokens = [
     },
     {
         id: '',
+        tokenType: 'cis2' as const,
         contract: ContractAddress.create(432, 0),
         metadata: { symbol: 'wCCD', name: 'Wrapped CCD', decimals: 6 },
     },

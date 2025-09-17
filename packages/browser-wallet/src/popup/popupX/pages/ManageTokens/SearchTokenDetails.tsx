@@ -10,8 +10,7 @@ import { useCopyToClipboard } from '@popup/popupX/shared/utils/hooks';
 import Copy from '@assets/svgX/copy.svg';
 import Notebook from '@assets/svgX/notebook.svg';
 import { ContractAddress } from '@concordium/web-sdk';
-import { ChoiceStatus } from '@popup/shared/ContractTokenLine';
-import { ContractTokenDetails } from '@shared/utils/token-helpers';
+import { ChoiceStatus, ContractTokenDetails } from '@shared/utils/token-helpers';
 
 const SUB_INDEX = 0;
 
@@ -72,7 +71,12 @@ export default function SearchTokenDetails({
                             <Card.RowDetails title={t('description')} value={description} />
                             {decimals && <Card.RowDetails title={t('decimals')} value={`0 - ${decimals}`} />}
                             {id && <Card.RowDetails title={t('tokenId')} value={id} />}
-                            <Card.RowDetails title={t('indexSubindex')} value={`${index}, ${subindex || SUB_INDEX}`} />
+                            {Number(index) >= 0 && (
+                                <Card.RowDetails
+                                    title={t('indexSubindex')}
+                                    value={`${index}, ${subindex || SUB_INDEX}`}
+                                />
+                            )}
                         </Card>
                         <Button.IconText
                             icon={<Notebook />}

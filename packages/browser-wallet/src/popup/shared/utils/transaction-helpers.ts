@@ -21,6 +21,7 @@ import {
     convertEnergyToMicroCcd,
     getEnergyCost,
 } from '@concordium/web-sdk';
+import { TokenId, TokenModuleState } from '@concordium/web-sdk/plt';
 import {
     isValidResolutionString,
     ccdToMicroCcd,
@@ -37,7 +38,8 @@ import { DEFAULT_TRANSACTION_EXPIRY } from '@shared/constants/time';
 import { useCallback } from 'react';
 import { grpcClientAtom } from '@popup/store/settings';
 import { useUpdateAtom } from 'jotai/utils';
-import { getMemoByteLength } from '@popup/popupX/shared/utils/helpers';
+import { TokenPickerVariant } from '@popup/popupX/shared/Form/TokenAmount/View';
+import { cborDecode, getMemoByteLength } from '@popup/popupX/shared/utils/helpers';
 import { BrowserWalletAccountTransaction, TransactionStatus } from './transaction-history-types';
 import { useBlockChainParameters } from '../BlockChainParametersProvider';
 import { usePrivateKey } from './account-helpers';
@@ -128,6 +130,36 @@ export function validateAccountAddress(cand: string): string | undefined {
         return i18n.t('utils.address.invalid');
     }
 }
+
+export const validateAccountAndBlockList =
+    (client: ConcordiumGRPCClient, token: TokenPickerVariant) =>
+    async (cand: string): Promise<string | undefined> => {
+        const invalidAddress = validateAccountAddress(cand);
+        if (invalidAddress) return invalidAddress;
+
+        if (token.tokenType === 'plt') {
+            const tokenInfo = await client.getTokenInfo(TokenId.fromString(token.tokenSymbol));
+            const tokenModuleState = cborDecode(tokenInfo?.state.moduleState?.toString()) as TokenModuleState;
+            const address = AccountAddress.fromBase58(cand);
+            const accountInfo = await client.getAccountInfo(address);
+            const accountToken = accountInfo.accountTokens.find((t) => t.id.toString() === token.tokenSymbol);
+            const accountModuleState = cborDecode(accountToken?.state.moduleState?.toString()) as TokenModuleState;
+
+            if (tokenModuleState.paused) {
+                return i18n.t('utils.address.tokenPaused');
+            }
+
+            if (tokenModuleState.denyList && accountModuleState.denyList) {
+                return i18n.t('utils.address.recipientDenyList');
+            }
+
+            if (tokenModuleState.allowList && !accountModuleState.allowList) {
+                return i18n.t('utils.address.recipientNotAllowList');
+            }
+        }
+
+        return undefined;
+    };
 
 export function validateMemoByteLength(memo: string | undefined) {
     const MEMO_BYTE_LIMIT = 255; // reserve 1 byte

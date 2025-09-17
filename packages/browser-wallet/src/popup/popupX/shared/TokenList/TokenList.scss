@@ -34,6 +34,11 @@
                 color: $color-mineral-3;
                 opacity: 0.5;
             }
+
+            &_error.capture__main_small {
+                color: $color-red-attention;
+                opacity: 1;
+            }
         }
 
         .label__main {

@@ -3,7 +3,7 @@
     "packageManager": "yarn@3.2.0",
     "dependencies": {
         "@concordium/browser-wallet-api-helpers": "workspace:^",
-        "@concordium/web-sdk": "^9.0.0",
+        "@concordium/web-sdk": "10.0.2",
         "cors": "^2.8.5",
         "express": "^4.18.1",
         "express-fileupload": "^1.4.0",
@@ -22,7 +22,7 @@
         "typescript": "^5.2.2"
     },
     "scripts": {
-        "build": "node --loader ts-node/esm ./esbuild.config.ts",
+        "build": "tsx ./esbuild.config.ts",
         "watch": "cross-env WATCH=1 yarn build",
         "start": "live-server --cors ./dist",
         "start-file-server": "node ./file-server/server.js"

@@ -4,6 +4,7 @@ import { AccountAddress, AccountInfo, ContractAddress, CIS2 } from '@concordium/
 import { atom } from 'jotai';
 
 import { contractBalancesFamily } from '@popup/store/token';
+import { PLT } from '@shared/constants/token';
 import TokenAmountView, { TokenAmountViewProps } from './View';
 import { useTokenInfo } from './util';
 
@@ -34,7 +35,7 @@ const balanceAtomFamily = atomFamily(
         AccountAddress.equals(aa.accountAddress, ab.accountAddress) && ba === bb && tokenAddressEq(ta, tb) && da === db
 );
 
-type Props = Omit<TokenAmountViewProps, 'tokens' | 'balance' | 'onSelectToken' | 'ccdBalance'> & {
+type Props = Omit<TokenAmountViewProps, 'tokens' | 'accountTokens' | 'balance' | 'onSelectToken' | 'ccdBalance'> & {
     /** The account info of the account to take the amount from */
     accountInfo: AccountInfo;
     /** The ccd balance to use. Defaults to 'available' */
@@ -83,7 +84,14 @@ type Props = Omit<TokenAmountViewProps, 'tokens' | 'balance' | 'onSelectToken' |
 export default function TokenAmount({ accountInfo, ccdBalance = 'available', ...props }: Props) {
     const { current: timestamp } = useRef(Date.now());
     const { token } = props.form.watch();
-    const tokenAddress = token?.tokenType === 'cis2' ? token.tokenAddress : null;
+    const tokenAddress =
+        (token?.tokenType === 'cis2' && token.tokenAddress) ||
+        (token?.tokenType === 'plt' &&
+            ({
+                id: token.tokenSymbol,
+                contract: { index: PLT, subindex: 0n },
+            } as unknown as CIS2.TokenAddress)) ||
+        null;
 
     const tokenInfo = useTokenInfo(accountInfo.accountAddress);
     const tokenBalance = useAtomValue(balanceAtomFamily([accountInfo, ccdBalance, tokenAddress, timestamp]));

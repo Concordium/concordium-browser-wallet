@@ -1,0 +1,73 @@
+.label-x {
+    display: flex;
+    height: rem(24px);
+    border: 1px solid $semantic-border-accent-secondary;
+    border-radius: rem(12px);
+    align-items: center;
+    padding: rem(6px) rem(8px);
+    gap: rem(6px);
+
+    .icon {
+        width: rem(12px);
+        height: rem(12px);
+
+        svg {
+            display: flex;
+            width: inherit;
+            height: inherit;
+        }
+    }
+
+    .label__main {
+        font-size: rem(11px);
+        line-height: rem(12px);
+    }
+
+    &.grey {
+        border-color: $semantic-border-tertiary;
+        color: $semantic-content-secondary;
+
+        svg path {
+            fill: $semantic-content-secondary;
+        }
+    }
+
+    &.light-grey {
+        border-color: $semantic-border-accent-secondary;
+        color: $semantic-content-accent-secondary;
+
+        svg path {
+            fill: $semantic-content-accent-secondary;
+        }
+    }
+
+    &.green {
+        border-color: $semantic-border-success-secondary;
+        background-color: $semantic-surface-success-tertiary;
+        color: $semantic-content-success-primary;
+
+        svg path {
+            fill: $semantic-content-success-primary;
+        }
+    }
+
+    &.yellow {
+        border-color: $semantic-border-warning-secondary;
+        background-color: $semantic-surface-warning-tertiary;
+        color: $semantic-content-warning-primary;
+
+        svg path {
+            fill: $semantic-content-warning-primary;
+        }
+    }
+
+    &.red {
+        border-color: $semantic-border-error-secondary;
+        background-color: $semantic-surface-error-tertiary;
+        color: $semantic-content-error-primary;
+
+        svg path {
+            fill: $semantic-content-error-primary;
+        }
+    }
+}

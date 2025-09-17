@@ -1,6 +1,8 @@
 import { useMemo } from 'react';
+import { TFunction } from 'react-i18next';
 import groupBy from 'lodash.groupby';
 import {
+    BlockSpecialEvent,
     BrowserWalletTransaction,
     RewardType,
     SpecialTransactionType,
@@ -8,7 +10,6 @@ import {
 import { dateFromTimestamp } from 'wallet-common-helpers';
 import { AccountTransactionType } from '@concordium/web-sdk';
 import i18n from '@popup/shell/i18n';
-import { TFunction } from 'react-i18next';
 
 /** Convert Date object to local string only showing the current date. */
 export const onlyDate = (date?: number | Date | undefined) =>
@@ -44,7 +45,7 @@ export const onlyTime = Intl.DateTimeFormat(undefined, {
 
 /** Check if type is an account transaction which transfers some CCD. */
 function isTransferTransaction(
-    type: AccountTransactionType | RewardType | SpecialTransactionType
+    type: AccountTransactionType | RewardType | SpecialTransactionType | BlockSpecialEvent
 ): type is AccountTransactionType {
     switch (type) {
         case AccountTransactionType.Transfer:
@@ -62,7 +63,7 @@ function isTransferTransaction(
 }
 
 /** Check if type is an account transaction which transfers some CCD or is a reward. */
-export function hasAmount(type: AccountTransactionType | RewardType | SpecialTransactionType) {
+export function hasAmount(type: AccountTransactionType | RewardType | SpecialTransactionType | BlockSpecialEvent) {
     return isTransferTransaction(type) || type in RewardType;
 }
 
@@ -71,7 +72,9 @@ const t: TFunction<'x', 'transactionLogX'> = (key) => i18n.t(`x:transactionLogX.
 /**
  * Maps transaction type to a displayable text string.
  */
-export function mapTypeToText(type: AccountTransactionType | RewardType | SpecialTransactionType): string {
+export function mapTypeToText(
+    type: AccountTransactionType | RewardType | SpecialTransactionType | BlockSpecialEvent
+): string {
     switch (type) {
         case AccountTransactionType.DeployModule:
             return t('deployModule');
@@ -121,10 +124,32 @@ export function mapTypeToText(type: AccountTransactionType | RewardType | Specia
             return t('configureBaker');
         case AccountTransactionType.ConfigureDelegation:
             return t('configureDelegation');
+        case AccountTransactionType.TokenUpdate:
+            return t('tokenUpdate');
+        case SpecialTransactionType.UpdateCreatePLT:
+            return t('updateCreatePlt');
+        case SpecialTransactionType.ChainUpdate:
+            return t('chainUpdate');
         case RewardType.StakingReward:
             return t('stakingReward');
         case SpecialTransactionType.Malformed:
             return t('malformed');
+        case BlockSpecialEvent.BakingRewards:
+            return t('bakingRewards');
+        case BlockSpecialEvent.Mint:
+            return t('mint');
+        case BlockSpecialEvent.FinalizationRewards:
+            return t('finalizationRewards');
+        case BlockSpecialEvent.PaydayFoundationReward:
+            return t('paydayFoundationReward');
+        case BlockSpecialEvent.BlockAccrueReward:
+            return t('blockAccrueReward');
+        case BlockSpecialEvent.PaydayPoolReward:
+            return t('paydayPoolReward');
+        case BlockSpecialEvent.ValidatorSuspended:
+            return t('validatorSuspended');
+        case BlockSpecialEvent.ValidatorPrimedForSuspension:
+            return t('validatorPrimedForSuspension');
         default:
             return t('unknown');
     }

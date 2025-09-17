@@ -52,6 +52,14 @@ export const relativeRoutes = {
                         hideMenu: true,
                         hideConnection: true,
                     },
+                    custom: {
+                        path: 'custom',
+                        config: {
+                            backTitle: '',
+                            hideMenu: true,
+                            hideConnection: true,
+                        },
+                    },
                 },
                 restoreWallet: {
                     path: 'restoreWallet',
@@ -135,6 +143,15 @@ export const relativeRoutes = {
                 path: 'ccd',
                 config: {
                     navBackSteps: 2,
+                },
+            },
+            plt: {
+                path: 'plt/:pltSymbol',
+                config: {
+                    navBackSteps: 3,
+                },
+                raw: {
+                    path: 'raw',
                 },
             },
             details: {
@@ -247,6 +264,12 @@ export const relativeRoutes = {
                 config: {
                     backTitle: i18n.t('x:connect.backTitle'),
                     navBackSteps: 2,
+                },
+            },
+            custom: {
+                path: 'custom',
+                config: {
+                    backTitle: i18n.t('x:connect.backTitle'),
                 },
             },
         },

@@ -1,13 +1,19 @@
 import { AccountAddress, CIS2, ContractAddress } from '@concordium/web-sdk';
+import { useAtomValue } from 'jotai';
 import { accountTokensFamily } from '@popup/store/token';
 import { TokenMetadata } from '@shared/storage/types';
-import { useAtomValue } from 'jotai';
+import { PLT } from '@shared/constants/token';
 
-/** Token info in the format expected by the `TokenAmount` component */
-export type TokenInfo = CIS2.TokenAddress & {
+export type Cis2TokenInfo = CIS2.TokenAddress & {
+    tokenType: 'cis2';
     /** The token metadata corresponding to the {@linkcode CIS2.TokenAddress} */
     metadata: TokenMetadata;
 };
+
+export type PltTokenInfo = { id: string; tokenType: 'plt'; metadata: TokenMetadata };
+
+/** Token info in the format expected by the `TokenAmount` component */
+export type TokenInfo = Cis2TokenInfo | PltTokenInfo;
 
 type TokenInfoResponse = { loading: true } | { loading: false; value: TokenInfo[] };
 
@@ -24,15 +30,27 @@ export function useTokenInfo(account: AccountAddress.Type): TokenInfoResponse {
         return { loading: true };
     }
 
-    const mapped = Object.entries(value).flatMap(([index, tokens]) =>
-        tokens.map(
-            (t): TokenInfo => ({
-                contract: ContractAddress.create(BigInt(index)),
-                id: t.id,
-                metadata: t.metadata,
+    const mapped = Object.entries(value)
+        .flatMap(([index, tokens]) =>
+            tokens.map((t): TokenInfo => {
+                if (index !== PLT) {
+                    return {
+                        contract: ContractAddress.create(BigInt(index)),
+                        id: t.id,
+                        tokenType: 'cis2',
+                        metadata: t.metadata,
+                    } as Cis2TokenInfo;
+                }
+
+                return {
+                    id: t.id,
+                    tokenType: 'plt',
+                    metadata: t.metadata,
+                } as PltTokenInfo;
             })
         )
-    );
+        .filter((t) => !t.metadata.isHidden)
+        .sort((a, b) => (b.metadata.addedAt || 0) - (a.metadata.addedAt || 0));
 
     return { loading: false, value: mapped };
 }

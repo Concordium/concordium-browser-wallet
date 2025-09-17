@@ -10,7 +10,16 @@ import {
     Energy,
     SimpleTransferPayload,
     SimpleTransferWithMemoPayload,
+    TokenUpdatePayload,
 } from '@concordium/web-sdk';
+import {
+    Cbor,
+    CborMemo,
+    TokenId,
+    TokenAmount as TokenAmountPlt,
+    TokenOperationType,
+    TokenHolder,
+} from '@concordium/web-sdk/plt';
 import { useAsyncMemo } from 'wallet-common-helpers';
 import { useAtomValue } from 'jotai';
 
@@ -87,6 +96,25 @@ function SendFunds({ address }: SendFundsProps) {
                 );
                 return getFee(AccountTransactionType.Update, payload);
             }
+            if (token?.tokenType === 'plt') {
+                const ops = [
+                    {
+                        [TokenOperationType.Transfer]: {
+                            amount: TokenAmountPlt.fromJSON({
+                                value: parseTokenAmount(amount, metadata?.decimals).toString(),
+                                decimals: metadata?.decimals || 0,
+                            }),
+                            recipient: TokenHolder.fromAccountAddress(address),
+                            memo: memo ? CborMemo.fromString(memo) : undefined,
+                        },
+                    },
+                ];
+                const payload: TokenUpdatePayload = {
+                    tokenId: TokenId.fromString(token.tokenSymbol),
+                    operations: Cbor.encode(ops),
+                };
+                return getFee(AccountTransactionType.TokenUpdate, payload);
+            }
             if (token?.tokenType === 'ccd') {
                 if (memo) {
                     const payloadWithMemo: SimpleTransferWithMemoPayload = {
@@ -146,7 +174,7 @@ function SendFunds({ address }: SendFundsProps) {
                 </div>
                 <Page.Footer>
                     <Button.Main
-                        disabled={!form.formState.isValid}
+                        disabled={!form.formState.isValid || metadata?.moduleState?.denyList}
                         className="button-main"
                         onClick={form.handleSubmit(onSubmit)}
                         label={t('continue')}

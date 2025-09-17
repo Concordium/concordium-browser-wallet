@@ -5,14 +5,8 @@ import { ClassNameAndStyle } from 'wallet-common-helpers';
 import Button from '@popup/shared/Button';
 import { Checkbox } from '@popup/shared/Form/Checkbox';
 import TokenBalance from '@popup/shared/TokenBalance';
-import { ContractTokenDetails, getMetadataDecimals } from '@shared/utils/token-helpers';
+import { ChoiceStatus, ContractTokenDetails, getMetadataDecimals } from '@shared/utils/token-helpers';
 import Img from '../Img';
-
-export enum ChoiceStatus {
-    discarded,
-    chosen,
-    existing,
-}
 
 type ContractTokenLineProps = ClassNameAndStyle & {
     token: ContractTokenDetails;

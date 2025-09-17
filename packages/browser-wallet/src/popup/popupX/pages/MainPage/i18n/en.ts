@@ -4,7 +4,7 @@ const t = {
     send: 'Send',
     earn: 'Earn',
     activity: 'Activity',
-    manageTokenList: 'Manage token list',
+    manageTokenList: 'Manage Tokens',
     pendingAccount: 'Creating account',
     pendingSubText: 'Ready within a few minutes',
     atDisposal: 'CCD at disposal',

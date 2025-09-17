@@ -7,7 +7,7 @@ import Text from '@popup/popupX/shared/Text';
 import Button from '@popup/popupX/shared/Button';
 import { useAtom } from 'jotai';
 import { networkConfigurationAtom } from '@popup/store/settings';
-import { mainnet, stagenet, testnet } from '@shared/constants/networkConfiguration';
+import { devnet, mainnet, stagenet, testnet } from '@shared/constants/networkConfiguration';
 
 function useConnectNetwork(genesisHash: string) {
     const [currentNetworkConfiguration, setCurrentNetworkConfiguration] = useAtom(networkConfigurationAtom);
@@ -15,6 +15,7 @@ function useConnectNetwork(genesisHash: string) {
         [mainnet.genesisHash]: mainnet,
         [testnet.genesisHash]: testnet,
         [stagenet.genesisHash]: stagenet,
+        [devnet.genesisHash]: devnet,
     };
 
     return {
@@ -43,7 +44,7 @@ export default function ConnectNetwork() {
                 </Text.MainMedium>
             </Page.Main>
             <Page.Footer>
-                <Button.Main label={t('connect')} onClick={connectNetwork} />
+                <Button.Main label={t('connect')} onClick={connectNetwork} disabled={isConnected} />
             </Page.Footer>
         </Page>
     );

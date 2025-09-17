@@ -13,6 +13,7 @@ export enum ChromeStorageKey {
     ConnectedSites = 'connectedSites',
     Credentials = 'credentials',
     NetworkConfiguration = 'networkConfiguration',
+    CustomNetworkConfiguration = 'customNetworkConfiguration',
     Passcode = 'passcode',
     SeedPhrase = 'seedPhrase',
     SelectedAccount = 'selectedAccount',
@@ -231,6 +232,11 @@ export interface MetadataUrl {
     hash?: HexString;
 }
 
+export interface PltMetadataUrl {
+    url?: string;
+    checksumSha256?: HexString;
+}
+
 export interface MetadataAttribute {
     type: string;
     name: string;
@@ -250,6 +256,8 @@ export interface TokenMetadata {
     attributes?: MetadataAttribute[];
     unique?: boolean;
     localization?: Record<string, MetadataUrl>;
+    addedAt?: number;
+    isHidden?: boolean;
 }
 
 export interface TokenIdAndMetadata {
@@ -274,6 +282,30 @@ export type Cis2TokensResponse = {
     from?: number;
     limit: number;
     tokens: Cis2TokenResponse[];
+};
+
+export type PltResponse = {
+    tokenId: string;
+    tokenState: {
+        decimals: number;
+        tokenModuleRef: string;
+        totalSupply: {
+            decimals: number;
+            value: string;
+        };
+        moduleState: {
+            allowList: boolean;
+            burnable: boolean;
+            denyList: boolean;
+            mintable: boolean;
+            name: string;
+            governanceAccount: {
+                address: string;
+                type: string;
+            };
+            metadata: PltMetadataUrl;
+        };
+    };
 };
 
 export type AcceptedTermsState = {

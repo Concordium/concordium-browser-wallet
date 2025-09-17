@@ -13,6 +13,7 @@ import {
     getTransactionRejectReason,
 } from '@concordium/web-sdk';
 import JSONBig from 'json-bigint';
+import { logError } from '@shared/utils/log-helpers';
 
 /**
  * The interface for the result of a query to get historical transactions for
@@ -41,13 +42,32 @@ export enum RewardType {
 }
 
 export enum SpecialTransactionType {
+    ChainUpdate = 'ChainUpdate',
+    UpdateCreatePLT = 'UpdateCreatePLT',
     Malformed = 'Malformed',
     Other = 'Other',
 }
 
+// ToDo remove after web-sdk update
+export enum TransactionKindStringSpecial {
+    ChainUpdate = 'chainUpdate',
+    UpdateCreatePLT = 'updateCreatePLT',
+}
+
+export enum BlockSpecialEvent {
+    BakingRewards = 'bakingRewards',
+    Mint = 'mint',
+    FinalizationRewards = 'finalizationRewards',
+    PaydayFoundationReward = 'paydayFoundationReward',
+    BlockAccrueReward = 'blockAccrueReward',
+    PaydayPoolReward = 'paydayPoolReward',
+    ValidatorSuspended = 'validatorSuspended',
+    ValidatorPrimedForSuspension = 'validatorPrimedForSuspension',
+}
+
 function mapTransactionKindStringToTransactionType(
-    kind: TransactionKindString
-): AccountTransactionType | RewardType | SpecialTransactionType {
+    kind: TransactionKindString | TransactionKindStringSpecial | BlockSpecialEvent
+): AccountTransactionType | RewardType | SpecialTransactionType | BlockSpecialEvent {
     switch (kind) {
         case TransactionKindString.DeployModule:
             return AccountTransactionType.DeployModule;
@@ -83,6 +103,12 @@ function mapTransactionKindStringToTransactionType(
             return AccountTransactionType.TransferToPublic;
         case TransactionKindString.TransferWithSchedule:
             return AccountTransactionType.TransferWithSchedule;
+        case TransactionKindString.TokenUpdate:
+            return AccountTransactionType.TokenUpdate;
+        case TransactionKindStringSpecial.ChainUpdate:
+            return SpecialTransactionType.ChainUpdate;
+        case TransactionKindStringSpecial.UpdateCreatePLT:
+            return SpecialTransactionType.UpdateCreatePLT;
         case TransactionKindString.UpdateCredentials:
             return AccountTransactionType.UpdateCredentials;
         case TransactionKindString.RegisterData:
@@ -99,8 +125,27 @@ function mapTransactionKindStringToTransactionType(
             return AccountTransactionType.ConfigureDelegation;
         case TransactionKindString.StakingReward:
             return RewardType.StakingReward;
-        default:
-            throw Error(`Unknown transaction kind was encounted: ${kind}`);
+        case BlockSpecialEvent.BakingRewards:
+            return BlockSpecialEvent.BakingRewards;
+        case BlockSpecialEvent.Mint:
+            return BlockSpecialEvent.Mint;
+        case BlockSpecialEvent.FinalizationRewards:
+            return BlockSpecialEvent.FinalizationRewards;
+        case BlockSpecialEvent.PaydayFoundationReward:
+            return BlockSpecialEvent.PaydayFoundationReward;
+        case BlockSpecialEvent.BlockAccrueReward:
+            return BlockSpecialEvent.BlockAccrueReward;
+        case BlockSpecialEvent.PaydayPoolReward:
+            return BlockSpecialEvent.PaydayPoolReward;
+        case BlockSpecialEvent.ValidatorSuspended:
+            return BlockSpecialEvent.ValidatorSuspended;
+        case BlockSpecialEvent.ValidatorPrimedForSuspension:
+            return BlockSpecialEvent.ValidatorPrimedForSuspension;
+        default: {
+            // Throwing error at this point, fails Transaction Log to render. Replaced with logError
+            logError(`Unknown transaction kind was encounted: ${kind}`);
+            return SpecialTransactionType.Other;
+        }
     }
 }
 
@@ -115,13 +160,18 @@ export interface BrowserWalletTransaction {
     blockHash: string;
     amount: bigint;
     cost?: bigint;
-    type: AccountTransactionType | RewardType | SpecialTransactionType;
+    type: AccountTransactionType | RewardType | SpecialTransactionType | BlockSpecialEvent;
     status: TransactionStatus;
     time: bigint;
     id: number;
     events?: string[];
     rejectReason?: string;
     memo?: string;
+    tokenTransfer?: {
+        decimals: number;
+        value: string;
+        tokenId: string;
+    };
 }
 
 export interface BrowserWalletAccountTransaction extends BrowserWalletTransaction {
@@ -223,7 +273,7 @@ export async function toBrowserWalletTransaction(
         };
     }
 
-    let type: AccountTransactionType | RewardType | SpecialTransactionType;
+    let type: AccountTransactionType | RewardType | SpecialTransactionType | BlockSpecialEvent;
     if (summary.transactionType === TransactionKindString.Failed && summary.failedTransactionType === undefined) {
         type = SpecialTransactionType.Malformed;
     } else {

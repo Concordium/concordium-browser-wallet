@@ -3,10 +3,13 @@ import { Atom, atom, WritableAtom } from 'jotai';
 import { mapRecordValues } from 'wallet-common-helpers';
 import { atomFamily } from 'jotai/utils';
 import { ChromeStorageKey, TokenIdAndMetadata, TokenMetadata, TokenStorage } from '@shared/storage/types';
-import { ContractBalances, getContractBalances } from '@shared/utils/token-helpers';
+import { ContractBalances, getContractBalances, mapPltToLoadedToken } from '@shared/utils/token-helpers';
 import { addToastAtom } from '@popup/state';
-import { ContractAddress } from '@concordium/web-sdk';
+import { AccountInfo, ContractAddress } from '@concordium/web-sdk';
 import { getContractName } from '@shared/utils/contract-helpers';
+import { PLT } from '@shared/constants/token';
+import { getPltToken } from '@popup/shared/utils/wallet-proxy';
+import { accountInfoFamily } from '@popup/shared/AccountInfoListenerContext/AccountInfoListenerContext';
 import { AsyncWrapper, atomWithChromeStorage } from './utils';
 import { grpcClientAtom } from './settings';
 import { selectedAccountAtom } from './account';
@@ -102,6 +105,14 @@ export const currentAccountTokensAtom = atom<
     }
 );
 
+export const hidePltInRemove = (tokens: TokenIdAndMetadata[], tokenId: string) =>
+    tokens?.reduce((acc, t) => {
+        if (t.id === tokenId) {
+            return [...acc, { ...t, metadata: { ...t.metadata, isHidden: true } }];
+        }
+        return [...acc, t];
+    }, [] as TokenIdAndMetadata[]);
+
 export const removeTokenFromCurrentAccountAtom = atom<null, { contractIndex: string; tokenId: string }>(
     null,
     (get, set, { contractIndex, tokenId }) => {
@@ -112,7 +123,10 @@ export const removeTokenFromCurrentAccountAtom = atom<null, { contractIndex: str
             throw new Error('Unable to update tokens');
         }
 
-        set(currentAccountTokensAtom, { contractIndex, newTokens: tokens?.filter((t) => t.id !== tokenId) });
+        const newTokens =
+            contractIndex === PLT ? hidePltInRemove(tokens, tokenId) : tokens?.filter((t) => t.id !== tokenId);
+
+        set(currentAccountTokensAtom, { contractIndex, newTokens });
     }
 );
 
@@ -134,10 +148,11 @@ const cbf = atomFamily<string, Atom<ContractBalances>>((identifier: string) => {
         async (get, set) => {
             const client = get(grpcClientAtom);
             const tokens = get(accountTokensFamily(accountAddress));
-
             const tokenIds = tokens.value[contractIndex]?.map((t) => t.id) ?? [];
 
-            if (tokenIds.length !== 0) {
+            if (tokenIds.length === 0) return;
+
+            if (contractIndex !== PLT) {
                 const instanceInfo = await client.getInstanceInfo(ContractAddress.create(BigInt(contractIndex)));
 
                 let balances = {};
@@ -155,6 +170,15 @@ const cbf = atomFamily<string, Atom<ContractBalances>>((identifier: string) => {
                     );
                 }
                 set(baseAtom, balances);
+            } else {
+                const accountInfo = get(accountInfoFamily(accountAddress));
+                const balances = accountInfo?.accountTokens.reduce(
+                    (acc, t) => ({ ...acc, [t.id.toString()]: t.state.balance.value }),
+                    {}
+                );
+                if (balances) {
+                    set(baseAtom, balances);
+                }
             }
         }
     );
@@ -171,3 +195,52 @@ const cbf = atomFamily<string, Atom<ContractBalances>>((identifier: string) => {
 
 export const contractBalancesFamily = (accountAddress: string, contractIndex: string) =>
     cbf(`${accountAddress}.${contractIndex}`);
+
+export const autoAddPltToAccount = (accountInfo: AccountInfo | undefined) => {
+    const tokenListWriteAtom = atom(null, async (get, set) => {
+        if (accountInfo) {
+            const {
+                accountTokens,
+                accountAddress: { address },
+            } = accountInfo;
+
+            const tokens = get(accountTokensFamily(address));
+
+            if (tokens.loading) {
+                throw new Error('Loading tokens, waiting for update');
+            }
+
+            const pltTokens = tokens.value[PLT] || [];
+            const pltTokensIds = pltTokens.map((t) => t.id);
+            const tokensToAdd = [] as TokenIdAndMetadata[];
+
+            const processPlt = async (accountTokenId: string) => {
+                const isAdded = pltTokensIds.includes(accountTokenId);
+                if (isAdded) return;
+
+                const pltData = await getPltToken(accountTokenId);
+                if (!pltData) return;
+
+                const { id, metadata, metadataLink } = await mapPltToLoadedToken(pltData, accountInfo, tokens);
+                tokensToAdd.push({ id, metadata, metadataLink });
+            };
+
+            for (const { id } of accountTokens) {
+                await processPlt(id.toString());
+            }
+
+            if (tokensToAdd.length > 0) {
+                set(currentAccountTokensAtom, { contractIndex: PLT, newTokens: [...pltTokens, ...tokensToAdd] });
+            }
+        }
+    });
+
+    tokenListWriteAtom.onMount = (setValue) => {
+        setValue();
+        const i = setInterval(setValue, BALANCES_UPDATE_INTERVAL);
+
+        return () => clearInterval(i);
+    };
+
+    return tokenListWriteAtom;
+};
