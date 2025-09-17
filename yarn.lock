@@ -2138,7 +2138,7 @@ __metadata:
     webpack: ^5.99.7
     webpack-cli: ^4.9.2
   peerDependencies:
-    "@concordium/web-sdk": 10.0.0-alpha.13
+    "@concordium/web-sdk": 10.0.2
     "@protobuf-ts/runtime-rpc": ^2.9.1
   languageName: unknown
   linkType: soft
@@ -2150,7 +2150,7 @@ __metadata:
     "@babel/core": ^7.18.2
     "@concordium/browser-wallet-api-helpers": "workspace:^"
     "@concordium/common-sdk": ^9.5.3
-    "@concordium/web-sdk": 10.0.0-alpha.13
+    "@concordium/web-sdk": 10.0.2
     "@craftamap/esbuild-plugin-html": ^0.4.0
     "@floating-ui/react": ^0.27.2
     "@mdx-js/react": ^1.6.22
@@ -2286,9 +2286,9 @@ __metadata:
   languageName: node
   linkType: hard
 
-"@concordium/web-sdk@npm:10.0.0-alpha.13":
-  version: 10.0.0-alpha.13
-  resolution: "@concordium/web-sdk@npm:10.0.0-alpha.13"
+"@concordium/web-sdk@npm:10.0.2":
+  version: 10.0.2
+  resolution: "@concordium/web-sdk@npm:10.0.2"
   dependencies:
     "@concordium/rust-bindings": ^3.3.0
     "@grpc/grpc-js": ^1.9.4
@@ -2310,7 +2310,7 @@ __metadata:
   peerDependencies:
     "@protobuf-ts/runtime-rpc": ^2.8.2
     cbor2: ^1.12.0
-  checksum: 30c40e9348c71cb7e6972c69c7036f965e86022249a4266cbb4c84af7a8dff495cb79d98675779b472ddae7498e04934529b202c73dd7752a66958b80df60e21
+  checksum: 46d99fbda606a6550eb50ccb4be6104fd2b8764d492b886c6c19215ea4441858f12966368de81da3ade19e9dff5937d5cfac2d24fa0905c90f34dcb609291340
   languageName: node
   linkType: hard
 
@@ -7015,7 +7015,7 @@ __metadata:
   resolution: "NFT-Minting@workspace:examples/nft-minting"
   dependencies:
     "@concordium/browser-wallet-api-helpers": "workspace:^"
-    "@concordium/web-sdk": 10.0.0-alpha.13
+    "@concordium/web-sdk": 10.0.2
     "@craftamap/esbuild-plugin-html": ^0.4.0
     "@types/react": ^18.0.9
     "@types/react-dom": ^18.0.5
@@ -7176,7 +7176,7 @@ __metadata:
   version: 0.0.0-use.local
   resolution: "add-example-web3-id@workspace:examples/add-example-Web3Id"
   dependencies:
-    "@concordium/web-sdk": 10.0.0-alpha.13
+    "@concordium/web-sdk": 10.0.2
     live-server: ^1.2.2
   languageName: unknown
   linkType: soft
@@ -9882,7 +9882,7 @@ __metadata:
   resolution: "e_sealing@workspace:examples/eSealing"
   dependencies:
     "@concordium/react-components": ^0.4.0
-    "@concordium/web-sdk": 10.0.0-alpha.13
+    "@concordium/web-sdk": 10.0.2
     "@thi.ng/leb128": ^2.1.18
     "@types/node": ^18.7.23
     "@types/react": ^18.0.9
@@ -16047,7 +16047,7 @@ __metadata:
   resolution: "piggybank@workspace:examples/piggybank"
   dependencies:
     "@concordium/browser-wallet-api-helpers": "workspace:^"
-    "@concordium/web-sdk": 10.0.0-alpha.13
+    "@concordium/web-sdk": 10.0.2
     "@types/react": ^18.0.9
     "@types/react-dom": ^18.0.5
     "@vitejs/plugin-react-swc": ^3.4.0
@@ -19490,7 +19490,7 @@ __metadata:
   version: 0.0.0-use.local
   resolution: "two-step-transfer@workspace:examples/two-step-transfer"
   dependencies:
-    "@concordium/web-sdk": 10.0.0-alpha.13
+    "@concordium/web-sdk": 10.0.2
     live-server: ^1.2.2
   languageName: unknown
   linkType: soft
@@ -20124,7 +20124,7 @@ __metadata:
   resolution: "voting@workspace:examples/voting"
   dependencies:
     "@concordium/browser-wallet-api-helpers": ^3.0.0
-    "@concordium/web-sdk": 10.0.0-alpha.13
+    "@concordium/web-sdk": 10.0.2
     "@types/node": ^18.7.23
     "@types/react": ^18.0.9
     "@types/react-dom": ^18.0.5
@@ -20208,7 +20208,7 @@ __metadata:
   resolution: "wccd@workspace:examples/wCCD"
   dependencies:
     "@concordium/react-components": ^0.4.0
-    "@concordium/web-sdk": 10.0.0-alpha.13
+    "@concordium/web-sdk": 10.0.2
     "@thi.ng/leb128": ^2.1.18
     "@types/node": ^18.7.23
     "@types/react": ^18.0.9
