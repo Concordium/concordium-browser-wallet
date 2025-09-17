@@ -22,7 +22,7 @@
         "typescript": "^5.2.2"
     },
     "scripts": {
-        "build": "node --loader ts-node/esm ./esbuild.config.ts",
+        "build": "tsx ./esbuild.config.ts",
         "watch": "cross-env WATCH=1 yarn build",
         "start": "live-server --cors ./dist",
         "start-file-server": "node ./file-server/server.js"
