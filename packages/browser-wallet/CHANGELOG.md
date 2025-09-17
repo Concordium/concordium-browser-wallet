@@ -2,8 +2,15 @@
 
 ## Unreleased
 
--   Added support of protocol-level tokens (PLT). Including token transfer, transaction history update, token details, token management.
--   Fixed token amount displayed as NaN when value is negative and less than token precision. At Send screen when 'Send Max' calculated.
+## 2.6.0
+
+### Added
+
+-   Support of protocol-level tokens (PLT). Including token transfer, transaction history update, token details, token management.
+
+### Fixed
+
+-   Token amount displayed as NaN when value is negative and less than token precision. At Send screen when 'Send Max' calculated.
 
 ## 2.5.1
 
