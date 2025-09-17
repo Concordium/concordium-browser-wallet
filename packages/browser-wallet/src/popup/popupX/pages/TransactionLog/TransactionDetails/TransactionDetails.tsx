@@ -136,7 +136,7 @@ export default function Container() {
             if (blockItem.status !== TransactionStatusEnum.Finalized) {
                 return null;
             }
-            return toBrowserWalletTransaction(blockItem, account, grpc);
+            return toBrowserWalletTransaction(blockItem, account, transactionHash, grpc);
         },
         noOp,
         [grpc, transactionHash]

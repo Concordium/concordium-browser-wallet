@@ -253,6 +253,7 @@ function getTransactionEvents(summary: AccountTransactionSummary): string[] | un
 export async function toBrowserWalletTransaction(
     { outcome: { blockHash, summary } }: FinalizedBlockItem,
     account: string,
+    transactionHash: string,
     grpc: ConcordiumGRPCWebClient
 ): Promise<BrowserWalletTransaction> {
     const block = await grpc.getBlockInfo(blockHash);
@@ -262,7 +263,7 @@ export async function toBrowserWalletTransaction(
     if (summary.type !== TransactionSummaryType.AccountTransaction) {
         return {
             blockHash: blockHash.toString(),
-            transactionHash: summary.hash.toString(),
+            transactionHash: transactionHash.toString(),
             fromAddress: undefined,
             toAddress: undefined,
             amount: 0n,
