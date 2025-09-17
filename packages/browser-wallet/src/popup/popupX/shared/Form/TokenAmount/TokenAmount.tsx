@@ -94,7 +94,7 @@ export default function TokenAmount({ accountInfo, ccdBalance = 'available', ...
         null;
 
     const tokenInfo = useTokenInfo(accountInfo.accountAddress);
-    const cis2Balance = useAtomValue(balanceAtomFamily([accountInfo, ccdBalance, tokenAddress, timestamp]));
+    const tokenBalance = useAtomValue(balanceAtomFamily([accountInfo, ccdBalance, tokenAddress, timestamp]));
 
     if (tokenInfo.loading) {
         return null;
@@ -104,7 +104,7 @@ export default function TokenAmount({ accountInfo, ccdBalance = 'available', ...
         <TokenAmountView
             {...(props as TokenAmountViewProps)}
             tokens={tokenInfo.value}
-            balance={cis2Balance}
+            balance={tokenBalance}
             ccdBalance={accountInfo.accountAvailableBalance}
         />
     );

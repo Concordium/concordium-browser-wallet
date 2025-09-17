@@ -303,9 +303,7 @@ export type PltResponse = {
                 address: string;
                 type: string;
             };
-            metadata: {
-                url?: string;
-            };
+            metadata: PltMetadataUrl;
         };
     };
 };
