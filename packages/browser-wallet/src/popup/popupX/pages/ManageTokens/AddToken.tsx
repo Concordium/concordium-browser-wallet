@@ -78,7 +78,7 @@ function TokenRow({ token, id, contractAddress, updateTokenStatus }: TokenRowPro
 const VALIDATE_INDEX_DELAY_MS = 500;
 
 type FormValues = {
-    contractIndex: string;
+    nameOrIndex: string;
     tokenId: string;
 };
 
@@ -91,9 +91,9 @@ function AddToken({ account }: { account: string }) {
     const [filteredTokens, setFilteredTokens] = useState<LoadedTokens[]>([]);
     const toast = useGenericToast();
     const form = useForm<FormValues>({
-        defaultValues: { contractIndex: '', tokenId: '' },
+        defaultValues: { nameOrIndex: '', tokenId: '' },
     });
-    const contractIndexValue = form.watch('contractIndex');
+    const nameOrIndexValue = form.watch('nameOrIndex');
     const tokenIdValue = form.watch('tokenId');
     const client = useAtomValue(grpcClientAtom);
     const validContract = useRef<{ details: ContractDetails; tokens: FetchTokensResponse } | undefined>();
@@ -103,7 +103,7 @@ function AddToken({ account }: { account: string }) {
     const [accountTokens, setAccountTokens] = useAtom(currentAccountTokensAtom);
     const selectedAccount = useSelectedAccountInfo();
     const onSubmit: SubmitHandler<FormValues> = async () => {
-        if (Number(contractIndexValue) >= 0) {
+        if (Number(nameOrIndexValue) >= 0) {
             if (validContract.current === undefined) {
                 throw new Error('Expected contract details');
             }
@@ -111,7 +111,7 @@ function AddToken({ account }: { account: string }) {
             setContractDetails(validContract.current.details);
             await updateTokens({ type: 'reset', initialTokens: validContract.current.tokens });
         } else {
-            const pltData = await getPltToken(contractIndexValue);
+            const pltData = await getPltToken(nameOrIndexValue);
             if (pltData && selectedAccount) {
                 const pltMapped = await mapPltToLoadedToken(pltData, selectedAccount, accountTokens);
                 setLoadedTokens([pltMapped]);
@@ -235,10 +235,10 @@ function AddToken({ account }: { account: string }) {
 
     useEffect(() => {
         validContract.current = undefined;
-    }, [contractIndexValue]);
+    }, [nameOrIndexValue]);
 
     useEffect(() => {
-        const tokenContractKey = Number(contractIndexValue) >= 0 ? contractIndexValue : PLT;
+        const tokenContractKey = Number(nameOrIndexValue) >= 0 ? nameOrIndexValue : PLT;
         const tokensWithStatus =
             contractTokens.map((token) => {
                 const accountToken = accountTokens.value[tokenContractKey]?.find(({ id }) => id === token.id);
@@ -279,7 +279,7 @@ function AddToken({ account }: { account: string }) {
         } as TokenIdAndMetadata);
 
     const setTokens = () => {
-        const tokenContractKey = Number(contractIndexValue) >= 0 ? contractIndexValue : PLT;
+        const tokenContractKey = Number(nameOrIndexValue) >= 0 ? nameOrIndexValue : PLT;
         const initialTokens = accountTokens.value[tokenContractKey] || [];
 
         const newTokens = loadedTokens
@@ -321,7 +321,7 @@ function AddToken({ account }: { account: string }) {
                                 autoFocus
                                 control={f.control}
                                 label={t('nameOrIndex')}
-                                name="contractIndex"
+                                name="nameOrIndex"
                                 rules={{
                                     required: t('indexRequired'),
                                     validate: validateIndex,
@@ -337,7 +337,7 @@ function AddToken({ account }: { account: string }) {
                             key={token.id}
                             token={token}
                             id={token.id}
-                            contractAddress={{ index: contractIndexValue, subindex: '0' }}
+                            contractAddress={{ index: nameOrIndexValue, subindex: '0' }}
                             updateTokenStatus={updateTokenStatus}
                         />
                     ))}
