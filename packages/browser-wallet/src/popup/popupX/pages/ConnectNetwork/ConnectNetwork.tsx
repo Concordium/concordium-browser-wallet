@@ -44,7 +44,7 @@ export default function ConnectNetwork() {
                 </Text.MainMedium>
             </Page.Main>
             <Page.Footer>
-                <Button.Main label={t('connect')} onClick={connectNetwork} />
+                <Button.Main label={t('connect')} onClick={connectNetwork} disabled={isConnected} />
             </Page.Footer>
         </Page>
     );

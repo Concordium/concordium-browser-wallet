@@ -124,7 +124,7 @@ export default function CustomConnectNetwork() {
                     form="custom-connection-form"
                     type="submit"
                     label={t('connect')}
-                    disabled={form.formState.isSubmitting}
+                    disabled={form.formState.isSubmitting || !!getConnectionStatus()}
                 />
             </Page.Footer>
         </Page>
