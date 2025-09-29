@@ -2,6 +2,8 @@
 
 ## Unreleased
 
+-   Added confirmation message after successfully connecting to a network, at Network Connect page.
+
 ## 2.6.0
 
 ### Added

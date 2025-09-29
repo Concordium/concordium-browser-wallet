@@ -3,6 +3,7 @@ const t = {
     networkName: 'Network name',
     connect: 'Connect',
     backTitle: 'To Network settings',
+    connectedMessage: '{{ name }} Connected Successfully',
     custom: {
         customNetwork: 'Custom network',
         grpcUrl: 'Node Address',
@@ -12,6 +13,7 @@ const t = {
         ccdScanUrl: 'CCDscan URL',
         connect: 'Connect',
         errorUrl: 'Invalid URL',
+        connectedMessage: 'Custom Network Connected Successfully',
     },
 };
 
