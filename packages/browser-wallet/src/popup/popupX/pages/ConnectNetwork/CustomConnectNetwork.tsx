@@ -1,13 +1,14 @@
 import React, { useRef } from 'react';
 import { useTranslation } from 'react-i18next';
 import { SubmitHandler, Validate } from 'react-hook-form';
-import { useAtom } from 'jotai';
+import { useAtom, useSetAtom } from 'jotai';
 import Page from '@popup/popupX/shared/Page';
 import Button from '@popup/popupX/shared/Button';
 import FormInput from '@popup/popupX/shared/Form/Input';
 import Form, { useForm } from '@popup/popupX/shared/Form/Form';
 import { NetworkConfiguration } from '@shared/storage/types';
 import { customNetworkConfigurationAtom, networkConfigurationAtom } from '@popup/store/settings';
+import { addToastAtom } from '@popup/state';
 import Lock from '@assets/svgX/lock.svg';
 
 export default function CustomConnectNetwork() {
@@ -15,6 +16,7 @@ export default function CustomConnectNetwork() {
 
     const [customnet, setCustomnet] = useAtom(customNetworkConfigurationAtom);
     const [currentNetworkConfiguration, setCurrentNetworkConfiguration] = useAtom(networkConfigurationAtom);
+    const addToast = useSetAtom(addToastAtom);
 
     const formRef = useRef<HTMLFormElement>(null);
     const form = useForm<NetworkConfiguration>({ defaultValues: customnet });
@@ -23,6 +25,8 @@ export default function CustomConnectNetwork() {
         const parsedForm = { ...formValues, grpcPort: Number(formValues.grpcPort) };
         await setCustomnet(parsedForm);
         await setCurrentNetworkConfiguration(parsedForm);
+        form.reset(undefined, { keepValues: true, keepDirty: false });
+        addToast(t('connectedMessage'));
     };
 
     const getConnectionStatus = () => {
@@ -53,6 +57,9 @@ export default function CustomConnectNetwork() {
             return undefined;
         };
     }
+
+    const isDisabled =
+        form.formState.isSubmitting || (!Object.keys(form.formState.dirtyFields).length && !!getConnectionStatus());
 
     return (
         <Page className="connect-network-x">
@@ -120,12 +127,7 @@ export default function CustomConnectNetwork() {
                 </Form>
             </Page.Main>
             <Page.Footer>
-                <Button.Main
-                    form="custom-connection-form"
-                    type="submit"
-                    label={t('connect')}
-                    disabled={form.formState.isSubmitting || !!getConnectionStatus()}
-                />
+                <Button.Main form="custom-connection-form" type="submit" label={t('connect')} disabled={isDisabled} />
             </Page.Footer>
         </Page>
     );
