@@ -61,7 +61,7 @@ function TokenRow({ token, id, contractAddress, updateTokenStatus }: TokenRowPro
             />
             <TokenList.Item
                 thumbnail={token.metadata?.display?.url}
-                symbol={token.metadata?.name}
+                symbol={token.metadata?.symbol?.toString()}
                 error={token.error}
                 checked={status === ChoiceStatus.chosen || status === ChoiceStatus.existing}
                 onClick={() => {
