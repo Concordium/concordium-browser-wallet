@@ -5,9 +5,10 @@ import Page from '@popup/popupX/shared/Page';
 import { useTranslation } from 'react-i18next';
 import Text from '@popup/popupX/shared/Text';
 import Button from '@popup/popupX/shared/Button';
-import { useAtom } from 'jotai';
+import { useAtom, useSetAtom } from 'jotai';
 import { networkConfigurationAtom } from '@popup/store/settings';
 import { devnet, mainnet, stagenet, testnet } from '@shared/constants/networkConfiguration';
+import { addToastAtom } from '@popup/state';
 
 function useConnectNetwork(genesisHash: string) {
     const [currentNetworkConfiguration, setCurrentNetworkConfiguration] = useAtom(networkConfigurationAtom);
@@ -31,8 +32,14 @@ type Params = {
 
 export default function ConnectNetwork() {
     const { t } = useTranslation('x', { keyPrefix: 'connect' });
+    const addToast = useSetAtom(addToastAtom);
     const { genesisHash = '' } = useParams<Params>();
     const { name, isConnected, connectNetwork } = useConnectNetwork(genesisHash);
+
+    const onConnect = () =>
+        connectNetwork().then(() => {
+            addToast(t('connectedMessage', { name }));
+        });
 
     return (
         <Page className="connect-network-x">
@@ -44,7 +51,7 @@ export default function ConnectNetwork() {
                 </Text.MainMedium>
             </Page.Main>
             <Page.Footer>
-                <Button.Main label={t('connect')} onClick={connectNetwork} disabled={isConnected} />
+                <Button.Main label={t('connect')} onClick={onConnect} disabled={isConnected} />
             </Page.Footer>
         </Page>
     );
