@@ -1,0 +1,19 @@
+{
+    "name": "wallet-api",
+    "packageManager": "yarn@3.2.0",
+    "scripts": {
+        "start": "live-server $FILE --mount=/sdk.js:../../node_modules/@concordium/web-sdk/lib/min/concordium.web.min.js --mount=/helpers.js:../../packages/browser-wallet-api-helpers/lib/concordiumHelpers.min.js",
+        "start-two-step-transfer": "FILE=two-step-transfer.html yarn start",
+        "start-id-proof": "FILE=id-proof.html yarn start",
+        "start-register-message": "FILE=register-message.html yarn start",
+        "start-sign-message": "FILE=sign-message.html yarn start",
+        "start-sign-cis3-message": "FILE=sign-cis3-message.html yarn start",
+        "start-web3-id": "FILE=web3-id.html yarn start"
+    },
+    "dependencies": {
+        "@concordium/web-sdk": "10.0.2"
+    },
+    "devDependencies": {
+        "live-server": "^1.2.2"
+    }
+}

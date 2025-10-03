@@ -1,0 +1,88 @@
+<!DOCTYPE html>
+<html>
+    <head>
+        <title>My cool dapp</title>
+        <script src="/sdk.js"></script>
+        <script src="/helpers.js"></script>
+        <script src="https://unpkg.com/cbor-web"></script>
+        <meta charset="utf-8" />
+        <script>
+            let currentAccountAddress = '';
+
+            async function setupPage() {
+                const provider = await concordiumHelpers.detectConcordiumProvider();
+                provider.on('accountDisconnected', (accountAddress) => (currentAccountAddress = undefined));
+                provider.on('accountChanged', (accountAddress) => (currentAccountAddress = accountAddress));
+                provider.on('chainChanged', (chain) => alert(chain));
+
+                document.getElementById('connect').addEventListener('click', () => {
+                    provider.connect().then((accountAddress) => {
+                        currentAccountAddress = accountAddress;
+                        document.getElementById('accountAddress').innerHTML = accountAddress;
+                    });
+                });
+
+                document.getElementById('requestAccounts').addEventListener('click', () => {
+                    provider.requestAccounts().then((accountAddresses) => {
+                        currentAccountAddress = accountAddresses[0];
+                        document.getElementById('accountAddress').innerHTML = accountAddresses;
+                    });
+                });
+
+                document.getElementById('signCis3Message').addEventListener('click', () => {
+                    const message = {
+                        data: '0100010060f7287de2e6129509d7f698a0c8125af98e74d8c34d15f2628b07123a828d06',
+                        schema: 'EAEUAAIAAAAGAAAAdXBkYXRlFQIAAAAGAAAAUmVtb3ZlAgMAAABBZGQCCAAAAG9wZXJhdG9yFQIAAAAHAAAAQWNjb3VudAEBAAAACwgAAABDb250cmFjdAEBAAAADA',
+                    };
+
+                    const contractDetails = {
+                        contractAddress: {
+                            index: 6372,
+                            subindex: 0,
+                        },
+                        contractName: {
+                            value: 'cis3_nft',
+                        },
+                        entrypointName: {
+                            value: 'updateOperator',
+                        },
+                        nonce: 1,
+                        expiryTimeSignature: '2030-10-04T16:28:57.062Z',
+                    };
+
+                    return provider
+                        .signCIS3Message(
+                            contractDetails.contractAddress,
+                            contractDetails.contractName,
+                            contractDetails.entrypointName,
+                            contractDetails.nonce,
+                            contractDetails.expiryTimeSignature,
+                            currentAccountAddress,
+                            message
+                        )
+                        .then((sig) => alert(JSON.stringify(sig)))
+                        .catch(alert);
+                });
+
+                document.getElementById('addWCCD').addEventListener('click', () => {
+                    provider
+                        .addCIS2Tokens(currentAccountAddress, [''], 2059n, 0n)
+                        .then((added) => alert('Added tokens: ' + added.map((id) => '"' + id + '"')))
+                        .catch(alert);
+                });
+            }
+            setupPage();
+        </script>
+    </head>
+
+    <body>
+        <div>
+            <button id="connect">Connect</button>
+            <h3 id="accountAddress" style="display: inline">Account address:</h3>
+        </div>
+        <br />
+        <button id="requestAccounts">Request accounts</button>
+        <button id="signCis3Message">Sign CIS-3 Message</button>
+        <button id="addWCCD">Add WCCD view</button>
+    </body>
+</html>
