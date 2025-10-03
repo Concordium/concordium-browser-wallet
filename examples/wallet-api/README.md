@@ -13,6 +13,6 @@ The example projects included in this repository, serves as a working example of
 
 ## Running the example
 
--   Run `yarn start-{EXAMPLE_NAME}` in a terminal
--   e.g. `yarn start-id-proof`
+-   Run `yarn start:{EXAMPLE_NAME}` in a terminal
+-   e.g. `yarn start:id-proof`
 -   Open URL logged in console (typically http://127.0.0.1:8080)
