@@ -1,7 +1,7 @@
 const t = {
     buyCCD: 'Buy CCD',
     description:
-        'CCD is listed in the following external exchange. The venue will guide you through their onboarding process and wallet choices.\n',
+        'CCD is listed in the following external exchanges and services. The venue will guide you through their onboarding process and wallet choices.\n',
     continue: 'Continue',
     supportedWallets: 'List of supported exchanges can be found at\n',
     disclaimer: `\nThe information regarding the CCD on any Concordium website does not constitute an offer or solicitation to purchase CCDs.\n
