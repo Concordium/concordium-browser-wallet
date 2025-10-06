@@ -1,0 +1,65 @@
+<!DOCTYPE html>
+<html>
+    <head>
+        <title>My cool dapp</title>
+        <script src="/sdk.js"></script>
+        <script src="/helpers.js"></script>
+        <script src="https://unpkg.com/cbor-web"></script>
+        <meta charset="utf-8" />
+        <script>
+            let currentAccountAddress = '';
+
+            async function setupPage() {
+                const provider = await concordiumHelpers.detectConcordiumProvider();
+                provider.on('accountDisconnected', (accountAddress) => (currentAccountAddress = undefined));
+                provider.on('accountChanged', (accountAddress) => (currentAccountAddress = accountAddress));
+                provider.on('chainChanged', (chain) => alert(chain));
+
+                document.getElementById('connect').addEventListener('click', () => {
+                    provider.connect().then((accountAddress) => {
+                        currentAccountAddress = accountAddress;
+                        document.getElementById('accountAddress').innerHTML = accountAddress;
+                    });
+                });
+
+                document.getElementById('requestAccounts').addEventListener('click', () => {
+                    provider.requestAccounts().then((accountAddresses) => {
+                        currentAccountAddress = accountAddresses[0];
+                        document.getElementById('accountAddress').innerHTML = accountAddresses;
+                    });
+                });
+
+                document.getElementById('registerData').addEventListener('click', () =>
+                    provider
+                        .sendTransaction(currentAccountAddress, concordiumSDK.AccountTransactionType.RegisterData, {
+                            data: new concordiumSDK.DataBlob(concordiumSDK.toBuffer(message.value, 'hex')),
+                        })
+                        .then(alert)
+                        .catch(alert)
+                );
+
+                document.getElementById('registerDataCBOR').addEventListener('click', () =>
+                    provider
+                        .sendTransaction(currentAccountAddress, concordiumSDK.AccountTransactionType.RegisterData, {
+                            data: new concordiumSDK.DataBlob(cbor.encode(message.value)),
+                        })
+                        .then(alert)
+                        .catch(alert)
+                );
+            }
+            setupPage();
+        </script>
+    </head>
+
+    <body>
+        <div>
+            <button id="connect">Connect</button>
+            <h3 id="accountAddress" style="display: inline">Account address:</h3>
+        </div>
+        <br />
+        <button id="requestAccounts">Request accounts</button>
+        Message: <input type="text" id="message" value="I believe in miracles" />
+        <button id="registerData">Register message (HEX encoded) (must be a hex string)</button>
+        <button id="registerDataCBOR">Register message (CBOR encoded)</button>
+    </body>
+</html>
