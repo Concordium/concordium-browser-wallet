@@ -79,7 +79,8 @@ export const manifestPlugin = ({ manifestTemplate, popupHtmlFile }: Configuratio
             const manifest = JSON.parse(replaced);
 
             // Use package information from package.json
-            manifest.version = packageJson.version;
+            const [version] = packageJson.version.split('-');
+            manifest.version = version;
             manifest.version_name = getVersionName();
             manifest.description = packageJson.description;
             manifest.author = packageJson.author;
