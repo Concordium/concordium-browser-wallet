@@ -95,7 +95,7 @@ function Scaling({ children }: { children: ReactElement }) {
         }
 
         if (dimensions && isSpawnedWindow) {
-            if (isSpawnedWeb3IdProofWindow) {
+            if (isSpawnedWeb3IdProofWindow && !isPopupX) {
                 dimensions = { width: 440, height: 870 };
             }
 
