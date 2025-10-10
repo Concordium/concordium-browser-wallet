@@ -4,6 +4,7 @@
 
 -   Added confirmation message after successfully connecting to a network, at Network Connect page.
 -   Updated Manage token page, search result. For UI consistency between mobile and web platforms, token name in search results was replaced with tokenId.
+-   Removed increased size, of spawned Id-Proof window in New UI.
 
 ## 2.6.0
 
