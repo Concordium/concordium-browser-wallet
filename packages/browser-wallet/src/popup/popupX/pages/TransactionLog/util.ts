@@ -155,8 +155,5 @@ export function mapTypeToText(
     }
 }
 
-export const memoToString = (
-    memo: string | object,
-    replacer?: (string | number)[] | null,
-    space?: string | number
-): string => (typeof memo === 'object' ? JSON.stringify(memo, replacer, space) : memo);
+export const memoToString = (memo: string | object): string =>
+    typeof memo === 'object' ? JSON.stringify(memo, null, 2) : memo;

@@ -98,7 +98,7 @@ function TransactionDetails({ transaction, account }: TransactionDetailsProps) {
                         <Card.RowDetails title={t('details.tHash')} value={transaction.transactionHash} />
                     )}
                     {transaction.memo && (
-                        <Card.RowDetails title={t('details.memo')} value={memoToString(transaction.memo, null, 2)} />
+                        <Card.RowDetails title={t('details.memo')} value={memoToString(transaction.memo)} />
                     )}
                     <Card.RowDetails title={t('details.bHash')} value={transaction.blockHash} />
                     {transaction.events !== undefined && transaction.events.length !== 0 && (
