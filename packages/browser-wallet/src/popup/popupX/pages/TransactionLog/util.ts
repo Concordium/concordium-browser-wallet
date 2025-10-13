@@ -154,3 +154,9 @@ export function mapTypeToText(
             return t('unknown');
     }
 }
+
+export const memoToString = (
+    memo: string | object,
+    replacer?: (string | number)[] | null,
+    space?: string | number
+): string => (typeof memo === 'object' ? JSON.stringify(memo, replacer, space) : memo);

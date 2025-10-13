@@ -11,7 +11,7 @@ import Note from '@assets/svgX/note.svg';
 import { displaySplitAddressShort } from '@popup/shared/utils/account-helpers';
 import DropDown from '@assets/svgX/drop-down.svg';
 import TransactionAmount from './TransactionAmount';
-import { mapTypeToText, onlyTime } from './util';
+import { mapTypeToText, memoToString, onlyTime } from './util';
 
 const SPACING = 4;
 const MEMO_SPACING = 10;
@@ -90,7 +90,7 @@ export default function TransactionElement({
                 <div className="transaction note" ref={memoRef}>
                     <Note />
                     <Text.Capture className={open ? 'expanded' : ''}>
-                        {JSON.stringify(transaction.memo)}
+                        {memoToString(transaction.memo)}
                         <Button.Base
                             as="span"
                             className="button__icon expand"
