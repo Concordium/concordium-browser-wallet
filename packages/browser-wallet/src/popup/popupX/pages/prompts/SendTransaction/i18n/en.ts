@@ -40,16 +40,6 @@ const t = {
         pause: 'Pause',
         unpause: 'Unpause',
     },
-
-    // Transfer,
-    // Mint,
-    // Burn,
-    // AddAllowList,
-    // RemoveAllowList,
-    // AddDenyList,
-    // RemoveDenyList,
-    // Pause,
-    // Unpause,
 };
 
 export default t;
