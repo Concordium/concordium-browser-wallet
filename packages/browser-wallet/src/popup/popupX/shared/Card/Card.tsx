@@ -25,9 +25,9 @@ function CardRow({ className, children }: CardRowProps) {
 
 type CardRowDetailsProps = {
     /** Title of the card row detail */
-    title?: string;
+    title?: string | ReactNode;
     /** Value of the card row detail */
-    value?: string;
+    value?: string | ReactNode;
     className?: string;
 };
 

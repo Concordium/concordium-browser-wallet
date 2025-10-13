@@ -3,6 +3,7 @@ const t = {
     sign: 'Sign & Submit',
     signTransaction: '<1>{{dApp}}</1> suggests a transaction',
     signRequest: 'Signature request',
+    advanced: 'Advanced',
     errors: {
         missingAccount: 'Missing account address',
         missingKey: 'Missing key for the chosen address',
@@ -28,6 +29,27 @@ const t = {
         tokenId: 'Token Id',
         operations: 'Operations',
     },
+    operations: {
+        transfer: 'Transfer',
+        mint: 'Mint',
+        burn: 'Burn',
+        addAllowList: 'Add to allow list',
+        removeAllowList: 'Remove from allow list',
+        addDenyList: 'Add to deny list',
+        removeDenyList: 'Remove from deny list',
+        pause: 'Pause',
+        unpause: 'Unpause',
+    },
+
+    // Transfer,
+    // Mint,
+    // Burn,
+    // AddAllowList,
+    // RemoveAllowList,
+    // AddDenyList,
+    // RemoveDenyList,
+    // Pause,
+    // Unpause,
 };
 
 export default t;
