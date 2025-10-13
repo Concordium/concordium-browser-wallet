@@ -90,7 +90,7 @@ export default function TransactionElement({
                 <div className="transaction note" ref={memoRef}>
                     <Note />
                     <Text.Capture className={open ? 'expanded' : ''}>
-                        {transaction.memo}
+                        {JSON.stringify(transaction.memo)}
                         <Button.Base
                             as="span"
                             className="button__icon expand"
