@@ -19,4 +19,46 @@
             border: unset;
         }
     }
+
+    #toggle-collapse {
+        display: none;
+    }
+
+    .collapse-trigger {
+        cursor: pointer;
+
+        svg {
+            width: 12px;
+            height: 12px;
+            transform: scale(2) translateY(1px);
+            margin-left: rem(8px);
+
+            path {
+                fill: $color-mineral-3;
+            }
+        }
+    }
+
+    .row.details:has(#toggle-collapse:checked) {
+        .operations-list {
+            max-height: unset;
+        }
+
+        .collapse-trigger svg {
+            transform: scale(2) translateY(1px) rotate(180deg);
+        }
+    }
+
+    .operations-list {
+        display: flex;
+        overflow: hidden;
+        max-height: 0;
+        flex-direction: column;
+        gap: rem(12px);
+
+        .card-x.grey {
+            margin-top: 0;
+            margin-bottom: 0;
+        }
+    }
 }

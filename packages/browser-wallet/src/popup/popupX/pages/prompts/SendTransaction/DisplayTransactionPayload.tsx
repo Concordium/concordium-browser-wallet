@@ -11,13 +11,15 @@ import {
     UpdateContractPayload,
     TokenUpdatePayload,
 } from '@concordium/web-sdk';
-import { Cbor, CborMemo } from '@concordium/web-sdk/plt';
+import { Cbor, CborMemo, TokenOperationType } from '@concordium/web-sdk/plt';
 import { SmartContractParameters } from '@concordium/browser-wallet-api-helpers';
 import { useTranslation } from 'react-i18next';
 import { chunkString, displayAsCcd } from 'wallet-common-helpers';
 import * as JSONBig from 'json-bigint';
 import { decode } from 'cbor2';
 import Card from '@popup/popupX/shared/Card';
+import Text from '@popup/popupX/shared/Text';
+import SideArrow from '@assets/svgX/side-arrow.svg';
 import Parameter from '@popup/popupX/shared/Parameter';
 import { cborDecode } from '@popup/popupX/shared/utils/helpers';
 
@@ -117,25 +119,66 @@ function DisplayDeployModule({ payload }: { payload: DeployModulePayload }) {
     );
 }
 
+// eslint-disable-next-line @typescript-eslint/no-explicit-any
+function displayValue(value: any) {
+    if (CcdAmount.instanceOf(value)) {
+        return displayAsCcd(value.microCcdAmount);
+    }
+    return value.toString();
+}
+
 function operationsCborDecoder(value: Cbor.Type) {
+    const { t } = useTranslation('x', { keyPrefix: 'prompts.sendTransactionX.operations' });
+    const getTitle = (key: TokenOperationType) => t(key) || key;
+
     if (Object.keys(cborDecode(value.toString())).length) {
         const decoded = Cbor.decode(value) as object[];
 
-        const result = decoded.map((item) =>
-            Object.entries(item).reduce(
-                (acc, [key, operationValue]) => ({
+        const withDecodedMemo = decoded.map((item) =>
+            Object.entries(item).reduce((acc, [key, operationValue]) => {
+                const memo = operationValue.memo ? CborMemo.parse(operationValue.memo) : undefined;
+                const memoString = typeof memo === 'object' ? JSON.stringify(memo, null, 2) : memo;
+                return {
                     ...acc,
                     [key]: {
                         ...operationValue,
-                        ...(operationValue.memo && { memo: CborMemo.parse(operationValue.memo) }),
+                        ...(!!memo && { memo: memoString }),
                     },
-                }),
-                {}
-            )
+                };
+            }, {})
         );
-        return JSON.stringify(result, null, 2);
+
+        const operationsList = withDecodedMemo.map((item: { [key: string]: object }) => {
+            const operation = Object.keys(item)[0] as TokenOperationType;
+            return (
+                <Card key={operation}>
+                    <Card.Row>
+                        <Text.MainMedium>{getTitle(operation)}</Text.MainMedium>
+                    </Card.Row>
+                    {Object.entries(item[operation]).map(([key, operationValue]) => (
+                        <Card.RowDetails title={key} value={displayValue(operationValue)} />
+                    ))}
+                </Card>
+            );
+        });
+
+        return <div className="operations-list">{operationsList}</div>;
     }
+
     return value.toString();
+}
+
+function ToggleAdvanced() {
+    const { t } = useTranslation('x', { keyPrefix: 'prompts.sendTransactionX' });
+    return (
+        <>
+            <input type="checkbox" id="toggle-collapse" />
+            <label htmlFor="toggle-collapse" className="collapse-trigger">
+                {t('advanced')}
+                <SideArrow />
+            </label>
+        </>
+    );
 }
 
 /**
@@ -146,17 +189,9 @@ function DisplayTokenUpdate({ payload }: { payload: TokenUpdatePayload }) {
     return (
         <>
             <Card.RowDetails title={t('tokenId')} value={payload.tokenId.toString()} />
-            <Card.RowDetails title={t('operations')} value={operationsCborDecoder(payload.operations)} />
+            <Card.RowDetails title={<ToggleAdvanced />} value={operationsCborDecoder(payload.operations)} />
         </>
     );
-}
-
-// eslint-disable-next-line @typescript-eslint/no-explicit-any
-function displayValue(value: any) {
-    if (CcdAmount.instanceOf(value)) {
-        return displayAsCcd(value.microCcdAmount);
-    }
-    return value.toString();
 }
 
 /**
