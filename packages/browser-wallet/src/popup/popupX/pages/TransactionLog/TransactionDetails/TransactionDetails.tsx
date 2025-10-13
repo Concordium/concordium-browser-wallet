@@ -22,7 +22,7 @@ import {
 import { grpcClientAtom } from '@popup/store/settings';
 
 import TransactionAmount from '@popup/popupX/pages/TransactionLog/TransactionAmount';
-import { onlyTime, onlyDate, TransactionLogParams, mapTypeToText } from '../util';
+import { onlyTime, onlyDate, TransactionLogParams, mapTypeToText, memoToString } from '../util';
 
 /** State passed as part of the navigation */
 export type TransactionDetailsLocationState = {
@@ -97,7 +97,9 @@ function TransactionDetails({ transaction, account }: TransactionDetailsProps) {
                     {transaction.transactionHash && (
                         <Card.RowDetails title={t('details.tHash')} value={transaction.transactionHash} />
                     )}
-                    {transaction.memo && <Card.RowDetails title={t('details.memo')} value={transaction.memo} />}
+                    {transaction.memo && (
+                        <Card.RowDetails title={t('details.memo')} value={memoToString(transaction.memo)} />
+                    )}
                     <Card.RowDetails title={t('details.bHash')} value={transaction.blockHash} />
                     {transaction.events !== undefined && transaction.events.length !== 0 && (
                         <Card.Row>
