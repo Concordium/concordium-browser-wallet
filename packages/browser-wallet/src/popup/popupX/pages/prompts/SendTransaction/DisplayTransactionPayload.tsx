@@ -168,16 +168,14 @@ function operationsCborDecoder(value: Cbor.Type) {
     return value.toString();
 }
 
-function ToggleAdvanced() {
+export function ToggleAdvanced() {
     const { t } = useTranslation('x', { keyPrefix: 'prompts.sendTransactionX' });
     return (
-        <>
+        <label htmlFor="toggle-collapse" className="collapse-trigger">
+            {t('advanced')}
+            <SideArrow />
             <input type="checkbox" id="toggle-collapse" />
-            <label htmlFor="toggle-collapse" className="collapse-trigger">
-                {t('advanced')}
-                <SideArrow />
-            </label>
-        </>
+        </label>
     );
 }
 

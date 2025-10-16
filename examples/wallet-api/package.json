@@ -8,7 +8,8 @@
         "start:register-message": "FILE=register-message.html yarn start",
         "start:sign-message": "FILE=sign-message.html yarn start",
         "start:sign-cis3-message": "FILE=sign-cis3-message.html yarn start",
-        "start:web3-id": "FILE=web3-id.html yarn start"
+        "start:web3-id": "FILE=web3-id.html yarn start",
+        "start:sign-token-update": "FILE=sign-token-update.html yarn start"
     },
     "dependencies": {
         "@concordium/web-sdk": "10.0.2"
