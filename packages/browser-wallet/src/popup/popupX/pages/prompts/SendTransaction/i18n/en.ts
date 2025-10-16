@@ -7,6 +7,7 @@ const t = {
     tokenUpdate: 'Token Update',
     method: 'Method',
     advanced: 'Advanced',
+    approve: 'Approve',
     account: {
         balance: 'Balance: ',
         atDisposal: 'At Disposal: ',
