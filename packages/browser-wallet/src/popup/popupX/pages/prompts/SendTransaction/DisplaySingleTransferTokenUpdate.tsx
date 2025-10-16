@@ -192,7 +192,7 @@ export default function DisplaySingleTransferTokenUpdate({
             </Page.Main>
             <Page.Footer>
                 <Button.Main className="secondary" label={t('reject')} onClick={rejectHandler} />
-                <Button.Main label={t('sign')} onClick={signHandler} />
+                <Button.Main label={t('approve')} onClick={signHandler} />
             </Page.Footer>
         </Page>
     );
