@@ -13,7 +13,15 @@ import { usePrivateKey } from '@popup/shared/utils/account-helpers';
 import { parsePayload } from '@shared/utils/payload-helpers';
 import * as JSONBig from 'json-bigint';
 import { SmartContractParameters } from '@concordium/browser-wallet-api-helpers';
-import { AccountAddress, convertEnergyToMicroCcd, getEnergyCost } from '@concordium/web-sdk';
+import {
+    AccountAddress,
+    AccountTransactionType,
+    TokenUpdatePayload,
+    convertEnergyToMicroCcd,
+    getEnergyCost,
+    AccountTransactionPayload,
+} from '@concordium/web-sdk';
+import { Cbor, TokenOperationType } from '@concordium/web-sdk/plt';
 import { displayAsCcd, getPublicAccountAmounts } from 'wallet-common-helpers';
 import {
     createPendingTransactionFromAccountTransaction,
@@ -30,6 +38,17 @@ import Card from '@popup/popupX/shared/Card';
 import DisplayTransactionPayload, {
     DisplayParameters,
 } from '@popup/popupX/pages/prompts/SendTransaction/DisplayTransactionPayload';
+import DisplaySingleTransferTokenUpdate from '@popup/popupX/pages/prompts/SendTransaction/DisplaySingleTransferTokenUpdate';
+
+const isSingleTransferTokenUpdate = (transactionType: AccountTransactionType, payload: AccountTransactionPayload) => {
+    const isTokenUpdate = transactionType === AccountTransactionType.TokenUpdate;
+    if (isTokenUpdate) {
+        const { operations } = payload as TokenUpdatePayload;
+        const decodedOperations = Cbor.decode(operations) as object[];
+        return decodedOperations.length === 1 && Object.keys(decodedOperations[0])[0] === TokenOperationType.Transfer;
+    }
+    return false;
+};
 
 interface Location {
     state: {
@@ -120,6 +139,26 @@ export default function SendTransaction({ onSubmit, onReject }: Props) {
         return hash;
     }, [payload, key, cost]);
 
+    const rejectHandler = withClose(onReject);
+    const signHandler = () => {
+        handleSubmit()
+            .then(withClose(onSubmit))
+            .catch((e) => addToast(e.message));
+    };
+
+    if (isSingleTransferTokenUpdate(transactionType, payload)) {
+        return (
+            <DisplaySingleTransferTokenUpdate
+                url={url}
+                cost={cost}
+                payload={payload as TokenUpdatePayload}
+                accountAddress={accountAddress}
+                signHandler={signHandler}
+                rejectHandler={rejectHandler}
+            />
+        );
+    }
+
     return (
         <Page className="send-transaction-x">
             <Page.Top heading={t('signRequest')} />
@@ -146,15 +185,8 @@ export default function SendTransaction({ onSubmit, onReject }: Props) {
                 </Card>
             </Page.Main>
             <Page.Footer>
-                <Button.Main className="secondary" label={t('reject')} onClick={withClose(onReject)} />
-                <Button.Main
-                    label={t('sign')}
-                    onClick={() => {
-                        handleSubmit()
-                            .then(withClose(onSubmit))
-                            .catch((e) => addToast(e.message));
-                    }}
-                />
+                <Button.Main className="secondary" label={t('reject')} onClick={rejectHandler} />
+                <Button.Main label={t('sign')} onClick={signHandler} />
             </Page.Footer>
         </Page>
     );

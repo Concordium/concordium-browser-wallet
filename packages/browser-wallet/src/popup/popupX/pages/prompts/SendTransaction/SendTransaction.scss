@@ -19,4 +19,115 @@
             border: unset;
         }
     }
+
+    #toggle-collapse {
+        display: none;
+    }
+
+    .collapse-trigger {
+        cursor: pointer;
+
+        svg {
+            width: 12px;
+            height: 12px;
+            transform: scale(2) translateY(1px);
+            margin-left: rem(8px);
+
+            path {
+                fill: $color-mineral-3;
+            }
+        }
+    }
+
+    .page__main:has(#toggle-collapse:checked),
+    .row.details:has(#toggle-collapse:checked) {
+        .operations-list {
+            max-height: unset;
+        }
+
+        .collapse-trigger svg {
+            transform: scale(2) translateY(1px) rotate(180deg);
+        }
+    }
+
+    .operations-list {
+        display: flex;
+        overflow: hidden;
+        max-height: 0;
+        flex-direction: column;
+        gap: rem(12px);
+
+        .card-x.grey {
+            margin-top: 0;
+            margin-bottom: 0;
+        }
+    }
+
+    &.single-transaction-token-update {
+        .page__top {
+            margin-bottom: unset;
+        }
+
+        .collapse-trigger {
+            color: $color-grey-main;
+            margin-bottom: rem(16px);
+
+            svg {
+                transform: scale(2) translateY(1px);
+                margin-left: rem(8px);
+
+                path {
+                    fill: $color-grey-main;
+                }
+            }
+        }
+
+        .card-x {
+            .row {
+                &.amounts {
+                    justify-content: space-between;
+                    border-bottom: unset;
+                    padding-bottom: unset;
+
+                    .capture__main_small:first-of-type {
+                        color: $semantic-content-accent-secondary;
+                    }
+
+                    .capture__main_small {
+                        color: $color-white;
+                    }
+                }
+            }
+
+            &.grey {
+                margin-bottom: rem(24px);
+            }
+
+            &.gradient {
+                margin-top: rem(24px);
+
+                .text__main {
+                    color: $color-grey-1;
+                    line-height: rem(20px);
+                }
+
+                .text__main_regular {
+                    color: $color-grey-1;
+                }
+
+                .divider {
+                    width: 100%;
+                    margin-bottom: rem(8px);
+                    border-bottom: 1px solid $color-input-border;
+                }
+
+                .row {
+                    padding: unset;
+                    align-items: baseline;
+                    gap: rem(12px);
+                    border-bottom: unset;
+                }
+            }
+        }
+    }
 }

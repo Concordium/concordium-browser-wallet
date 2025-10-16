@@ -1,0 +1,133 @@
+<!DOCTYPE html>
+<html>
+    <head>
+        <title>My cool dapp</title>
+        <script src="/sdk.js"></script>
+        <script src="/helpers.js"></script>
+        <script src="https://unpkg.com/cbor-web"></script>
+        <meta charset="utf-8" />
+        <script>
+            let currentAccountAddress = '';
+
+            async function setupPage() {
+                const provider = await concordiumHelpers.detectConcordiumProvider();
+                provider.on('accountDisconnected', () => (currentAccountAddress = undefined));
+                provider.on('accountChanged', (accountAddress) => (currentAccountAddress = accountAddress));
+                provider.on('chainChanged', (chain) => alert(chain));
+
+                document.getElementById('connect').addEventListener('click', () => {
+                    provider.connect().then((accountAddress) => {
+                        currentAccountAddress = accountAddress;
+                        document.getElementById('accountAddress').innerHTML = accountAddress;
+                    });
+                });
+
+                document.getElementById('requestAccounts').addEventListener('click', () => {
+                    provider.requestAccounts().then((accountAddresses) => {
+                        currentAccountAddress = accountAddresses[0];
+                        document.getElementById('accountAddress').innerHTML = accountAddresses;
+                    });
+                });
+
+                document.getElementById('signSingleTransferTokenUpdate').addEventListener('click', () => {
+                    const { TokenOperationType, Cbor, TokenAmount, TokenHolder, CborMemo, TokenId, AccountAddress } =
+                        concordiumSDK;
+
+                    const ops = [
+                        {
+                            [TokenOperationType.Transfer]: {
+                                amount: TokenAmount.fromJSON({
+                                    value: '1000000',
+                                    decimals: 6,
+                                }),
+                                recipient: TokenHolder.fromAccountAddress(
+                                    AccountAddress.fromBase58('4PVJxxtiNVanfuNgvFWtFT1JCiqoVs6npVXBqwLNKprqnUiC2A')
+                                ),
+                                memo: CborMemo.fromString('Some text for memo'),
+                            },
+                        },
+                    ];
+
+                    console.log(JSON.stringify(ops));
+
+                    const payload = {
+                        tokenId: TokenId.fromString('USDR'),
+                        operations: Cbor.encode(ops),
+                    };
+
+                    return provider
+                        .sendTransaction(currentAccountAddress, 27, payload)
+                        .then((sig) => alert(JSON.stringify(sig)))
+                        .catch(alert);
+                });
+
+                document.getElementById('signTokenUpdate').addEventListener('click', () => {
+                    const { TokenOperationType, Cbor, TokenAmount, TokenHolder, CborMemo, TokenId, AccountAddress } =
+                        concordiumSDK;
+
+                    const ops = [
+                        {
+                            [TokenOperationType.Transfer]: {
+                                amount: TokenAmount.fromJSON({
+                                    value: '1000000',
+                                    decimals: 6,
+                                }),
+                                recipient: TokenHolder.fromAccountAddress(
+                                    AccountAddress.fromBase58('4PVJxxtiNVanfuNgvFWtFT1JCiqoVs6npVXBqwLNKprqnUiC2A')
+                                ),
+                                memo: CborMemo.fromString('Some text for memo'),
+                            },
+                        },
+                        {
+                            [TokenOperationType.Pause]: {},
+                        },
+                        {
+                            [TokenOperationType.Mint]: {
+                                amount: TokenAmount.fromJSON({
+                                    value: '40000000',
+                                    decimals: 6,
+                                }),
+                            },
+                        },
+                        {
+                            [TokenOperationType.Transfer]: {
+                                amount: TokenAmount.fromJSON({
+                                    value: '200000',
+                                    decimals: 6,
+                                }),
+                                recipient: TokenHolder.fromAccountAddress(
+                                    AccountAddress.fromBase58('4PVJxxtiNVanfuNgvFWtFT1JCiqoVs6npVXBqwLNKprqnUiC2A')
+                                ),
+                                memo: CborMemo.fromString('Some text for memo'),
+                            },
+                        },
+                    ];
+
+                    console.log(JSON.stringify(ops));
+
+                    const payload = {
+                        tokenId: TokenId.fromString('USDR'),
+                        operations: Cbor.encode(ops),
+                    };
+
+                    return provider
+                        .sendTransaction(currentAccountAddress, 27, payload)
+                        .then((sig) => alert(JSON.stringify(sig)))
+                        .catch(alert);
+                });
+            }
+            setupPage();
+        </script>
+    </head>
+
+    <body>
+        <div>
+            <button id="connect">Connect</button>
+            <h3 id="accountAddress" style="display: inline">Account address:</h3>
+        </div>
+        <br />
+        <button id="requestAccounts">Request accounts</button>
+        <button id="signSingleTransferTokenUpdate">Sign Single Transfer Token Update</button>
+        <button id="signTokenUpdate">Sign Token Update</button>
+    </body>
+</html>
