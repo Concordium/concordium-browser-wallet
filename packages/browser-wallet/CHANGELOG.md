@@ -2,10 +2,23 @@
 
 ## Unreleased
 
+## 2.6.1
+
+### Added
+
 -   Added confirmation message after successfully connecting to a network, at Network Connect page.
--   Updated Manage token page, search result. For UI consistency between mobile and web platforms, token name in search results was replaced with tokenId.
--   Removed increased size, of spawned Id-Proof window in New UI.
+
+### Fixed
+
 -   Added fix for Memo parsing in Transaction Log, unable to render object. Now in case when memo is an object, it is displayed as string representation.
+
+### Removed
+
+-   Removed increased size, of spawned Id-Proof window in New UI.
+
+### Changed
+
+-   Updated Manage token page, search result. For UI consistency between mobile and web platforms, token name in search results was replaced with tokenId.
 -   Updated SignTransaction page, for TokenUpdate transaction. In case of multiple operations, they paced under collapsible menu, for single transfer operation created separated display page.
 
 ## 2.6.0
