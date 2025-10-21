@@ -3,7 +3,15 @@ const t = {
     sign: 'Sign & Submit',
     signTransaction: '<1>{{dApp}}</1> suggests a transaction',
     signRequest: 'Signature request',
+    transferRequest: 'Transfer Request',
+    tokenUpdate: 'Token Update',
+    method: 'Method',
     advanced: 'Advanced',
+    approve: 'Approve',
+    account: {
+        balance: 'Balance: ',
+        atDisposal: 'At Disposal: ',
+    },
     errors: {
         missingAccount: 'Missing account address',
         missingKey: 'Missing key for the chosen address',
@@ -28,6 +36,7 @@ const t = {
         version: 'Version',
         tokenId: 'Token Id',
         operations: 'Operations',
+        fee: 'Approximate fee',
     },
     operations: {
         transfer: 'Transfer',
