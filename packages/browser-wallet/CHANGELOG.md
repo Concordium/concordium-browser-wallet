@@ -4,7 +4,7 @@
 
 ## 2.6.2
 
-### Added
+### Changed
 
 -   Updated App icon
 
