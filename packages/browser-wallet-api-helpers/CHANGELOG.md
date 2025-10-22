@@ -1,5 +1,11 @@
 # Changelog
 
+## 3.0.2
+
+### Updated
+
+-   Updated handler `sendTransaction` with new payload type `TokenUpdatePayload`
+
 ## 3.0.1
 
 ### Fixed
