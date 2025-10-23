@@ -2,6 +2,10 @@
 
 ## Unreleased
 
+## 2.6.2
+
+### Changed
+
 -   Updated App icon
 
 ## 2.6.1
