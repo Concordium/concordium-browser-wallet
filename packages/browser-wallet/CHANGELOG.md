@@ -4,6 +4,12 @@
 
 -   Fixed accounts display under incorrect identities
 
+## 2.6.2
+
+### Changed
+
+-   Updated App icon
+
 ## 2.6.1
 
 ### Added
