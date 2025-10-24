@@ -2,6 +2,8 @@
 
 ## Unreleased
 
+-   Fixed accounts display under incorrect identities
+
 ## 2.6.2
 
 ### Changed

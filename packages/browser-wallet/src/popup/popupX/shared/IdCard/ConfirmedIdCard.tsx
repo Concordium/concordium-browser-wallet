@@ -73,15 +73,19 @@ export default function ConfirmedIdCard({
         if (hideAccounts) {
             return undefined;
         }
+
+        const isConnectedAccount = (cred: WalletCredential, id: ConfirmedIdentity) =>
+            cred.identityIndex === id.index && cred.providerIndex === id.providerIndex;
+
         const connectedAccounts = credentials.value.flatMap((cred): IdCardAccountInfo[] =>
-            cred.identityIndex !== identity.index
-                ? []
-                : [
+            isConnectedAccount(cred, identity)
+                ? [
                       {
                           address: displayNameAndSplitAddress(cred),
                           amount: <CcdBalance credential={cred} />,
                       },
                   ]
+                : []
         );
         return connectedAccounts.length === 0 ? undefined : connectedAccounts;
     }, [credentials, identity, hideAccounts]);
