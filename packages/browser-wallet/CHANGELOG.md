@@ -2,7 +2,10 @@
 
 ## Unreleased
 
+### Fixed
+
 -   Fixed accounts display under incorrect identities
+-   An issue where CBOR encoded objects passed in register data payloads would crash the application
 
 ## 2.6.2
 

@@ -87,7 +87,7 @@ function DisplayInitContract({ payload }: { payload: Omit<InitContractPayload, '
  */
 function DisplayRegisterData({ payload }: { payload: RegisterDataPayload }) {
     const { t } = useTranslation('x', { keyPrefix: 'prompts.sendTransactionX.payload' });
-    const [decoded, setDecoded] = useState<string>();
+    const [decoded, setDecoded] = useState<unknown>();
 
     useEffect(() => {
         try {
@@ -98,7 +98,7 @@ function DisplayRegisterData({ payload }: { payload: RegisterDataPayload }) {
     }, []);
 
     const title = `${t('data')}${!decoded ? t('rawData') : ''}`;
-    const value = decoded || payload.data.toJSON();
+    const value = JSONBig.stringify(decoded) || payload.data.toJSON();
 
     return <Card.RowDetails title={title} value={value} />;
 }
