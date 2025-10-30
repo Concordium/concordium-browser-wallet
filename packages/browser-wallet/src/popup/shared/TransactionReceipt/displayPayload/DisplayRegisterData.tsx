@@ -2,6 +2,7 @@ import React, { useEffect, useState } from 'react';
 import { decode } from 'cbor2';
 import { useTranslation } from 'react-i18next';
 import { RegisterDataPayload } from '@concordium/web-sdk';
+import { stringify } from 'json-bigint';
 
 interface Props {
     payload: RegisterDataPayload;
@@ -12,7 +13,7 @@ interface Props {
  */
 export default function DisplayRegisterData({ payload }: Props) {
     const { t } = useTranslation('sendTransaction');
-    const [decoded, setDecoded] = useState<string>();
+    const [decoded, setDecoded] = useState<unknown>();
 
     useEffect(() => {
         try {
@@ -27,7 +28,7 @@ export default function DisplayRegisterData({ payload }: Props) {
             <h5>
                 {t('data')}: {!decoded && <i>{t('rawData')}</i>}
             </h5>
-            {decoded && <div className="text-center word-break-all">{decoded}</div>}
+            {decoded && <div className="text-center word-break-all">{stringify(decoded)}</div>}
             {!decoded && <div className="text-center word-break-all">{payload.data.toJSON()}</div>}
         </>
     );
