@@ -23,8 +23,14 @@ import {
     GenerateSeedPhrase,
     IdCardsInfo,
     RestoreWallet,
+    RestoreLedger,
     SelectNetwork,
     SetupPassword,
+    IdCardsInfoLedger,
+    DeviceConnection,
+    ComparePublicKey,
+    ConfirmLedgerInformation,
+    CreateLedgerAccount,
     Welcome,
 } from '@popup/popupX/pages/Onboarding';
 import ConnectedSites from '@popup/popupX/pages/ConnectedSites';
@@ -60,6 +66,9 @@ import {
 } from '../pages/EarningRewards/Validator/TransactionFlow';
 import ValidationResult from '../pages/EarningRewards/Validator/Result/ValidationResult';
 import UpdateValidator from '../pages/EarningRewards/Validator/Update';
+import IdIssuanceLedger from '../pages/IdIssuance/IdIssuanceLedger';
+import IdIssuanceExternalFlowLedger from '../pages/IdIssuance/ExternalFlowLedger';
+
 import IdIssuance from '../pages/IdIssuance';
 import IdIssuanceSubmitted from '../pages/IdIssuance/Submitted';
 import IdIssuanceExternalFlow from '../pages/IdIssuance/ExternalFlow';
@@ -98,6 +107,39 @@ export default function Routes({ messagePromptHandlers }: { messagePromptHandler
                             <Route
                                 path={relativeRoutes.onboarding.setupPassword.createOrRestore.restoreWallet.path}
                                 element={<RestoreWallet />}
+                            />
+                            <Route
+                                path={relativeRoutes.onboarding.setupPassword.createOrRestore.restoreLedger.path}
+                                element={<RestoreLedger />}
+                            />
+                            <Route
+                                path={relativeRoutes.onboarding.setupPassword.createOrRestore.deviceConnection.path}
+                                element={<DeviceConnection />}
+                            />
+                            <Route
+                                path={relativeRoutes.onboarding.setupPassword.createOrRestore.comparePublicKey.path}
+                                element={<ComparePublicKey />}
+                            />
+                            <Route
+                                path={
+                                    relativeRoutes.onboarding.setupPassword.createOrRestore.confirmLedgerInformation
+                                        .path
+                                }
+                                element={<ConfirmLedgerInformation />}
+                            />
+                            <Route
+                                path={relativeRoutes.onboarding.setupPassword.createOrRestore.createLedgerAccount.path}
+                                element={<CreateLedgerAccount />}
+                            />
+                            <Route
+                                element={<IdCardsInfoLedger />}
+                                path={relativeRoutes.onboarding.setupPassword.createOrRestore.idCardsInfoLedger.path}
+                            />
+                            <Route
+                                element={<IdIssuanceLedger />}
+                                path={
+                                    relativeRoutes.onboarding.setupPassword.createOrRestore.selectIdentityProvider.path
+                                }
                             />
                             <Route
                                 path={relativeRoutes.onboarding.setupPassword.createOrRestore.generateSeedPhrase.path}
@@ -168,6 +210,21 @@ export default function Routes({ messagePromptHandlers }: { messagePromptHandler
                             <Route
                                 element={<IdIssuanceExternalFlow />}
                                 path={relativeRoutes.settings.identities.create.externalFlow.path}
+                            />
+                            <Route
+                                element={<IdIssuanceSubmitted />}
+                                path={relativeRoutes.settings.identities.create.submitted.path}
+                            />
+                            <Route
+                                element={<IdIssuanceFailed />}
+                                path={relativeRoutes.settings.identities.create.failed.path}
+                            />
+                        </Route>
+                        <Route path={relativeRoutes.settings.identities.createLedger.path}>
+                            <Route element={<IdIssuanceLedger />} index />
+                            <Route
+                                element={<IdIssuanceExternalFlowLedger />}
+                                path={relativeRoutes.settings.identities.createLedger.externalFlowLedger.path}
                             />
                             <Route
                                 element={<IdIssuanceSubmitted />}

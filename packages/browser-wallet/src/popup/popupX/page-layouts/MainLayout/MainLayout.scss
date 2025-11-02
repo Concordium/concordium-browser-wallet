@@ -51,6 +51,7 @@
                     border-radius: rem(12px);
                     border: 1px solid transparent;
                     cursor: pointer;
+                    width: rem(168px);
 
                     &.active {
                         border-color: $color-white;

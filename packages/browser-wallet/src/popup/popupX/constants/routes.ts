@@ -62,6 +62,67 @@ export const relativeRoutes = {
                         hideConnection: true,
                     },
                 },
+                deviceConnection: {
+                    path: 'deviceConnection',
+                    config: {
+                        hideBackArrow: false,
+                        backTitle: '',
+                        hideMenu: true,
+                        hideConnection: true,
+                    },
+                },
+                comparePublicKey: {
+                    path: 'comparePublicKey',
+                    config: {
+                        hideBackArrow: false,
+                        backTitle: '',
+                        hideMenu: true,
+                        hideConnection: true,
+                    },
+                },
+                confirmLedgerInformation: {
+                    path: 'confirmLedgerInformation',
+                    config: {
+                        hideBackArrow: false,
+                        backTitle: '',
+                        hideMenu: true,
+                        hideConnection: true,
+                    },
+                },
+                createLedgerAccount: {
+                    path: 'createLedgerAccount',
+                    config: {
+                        hideBackArrow: false,
+                        backTitle: '',
+                        hideMenu: true,
+                        hideConnection: true,
+                    },
+                },
+                restoreLedger: {
+                    path: 'restoreLedger',
+                    config: {
+                        hideBackArrow: false,
+                        backTitle: '',
+                        hideMenu: true,
+                        hideConnection: true,
+                    },
+                },
+                idCardsInfoLedger: {
+                    path: 'idCardsInfoLedger',
+                    config: {
+                        backTitle: '',
+                        hideMenu: true,
+                        hideConnection: true,
+                    },
+                },
+                selectIdentityProvider: {
+                    path: 'selectIdentityProvider',
+                    config: {
+                        backTitle: '',
+                        hideMenu: true,
+                        hideConnection: true,
+                    },
+                },
                 generateSeedPhrase: {
                     path: 'generateSeedPhrase',
                     config: {
@@ -165,6 +226,28 @@ export const relativeRoutes = {
             create: {
                 path: 'create',
                 externalFlow: {
+                    path: 'external-flow',
+                    config: {
+                        hideMenu: true,
+                    },
+                },
+                submitted: {
+                    path: 'submitted',
+                    config: {
+                        hideMenu: true,
+                        hideBackArrow: true,
+                    },
+                },
+                failed: {
+                    path: 'failed',
+                    config: {
+                        hideMenu: true,
+                    },
+                },
+            },
+            createLedger: {
+                path: 'create',
+                externalFlowLedger: {
                     path: 'external-flow',
                     config: {
                         hideMenu: true,

@@ -53,7 +53,7 @@ export default function Welcome() {
 
         // needed for proper network handling during onboarding
         // otherwise failing with error 'Indexed storage should not be accessed before setting the network'
-        setCurrentNetworkConfiguration(testnet); //changed from mainnet MANI
+        setCurrentNetworkConfiguration(testnet); // changed from mainnet MANI
     }, []);
 
     return (

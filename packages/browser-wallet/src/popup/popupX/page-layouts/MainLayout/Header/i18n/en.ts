@@ -29,7 +29,7 @@ const t = {
         },
     },
     navButton: {
-        toMain: 'to Main page',
+        toMain: 'To Main Page',
     },
     fullscreen: { fullscreen: 'Fullscreen' },
 };

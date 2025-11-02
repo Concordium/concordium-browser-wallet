@@ -67,10 +67,10 @@
         "@concordium/web-sdk@^9.0.0": "patch:@concordium/web-sdk@npm:^9.0.0#.yarn/patches/@concordium-web-sdk-npm-8.1.0-468ad0a8b1.patch"
     },
     "dependencies": {
-        "@blooo/hw-app-concordium": "^1.0.6",
+        "@blooo/hw-app-concordium": "^1.0.7",
         "@concordium/web-sdk": "^9.0.0",
         "@esbuild-plugins/node-globals-polyfill": "^0.2.3",
-        "@ledgerhq/hw-transport": "^6.31.4",
+        "@ledgerhq/hw-transport": "^6.31.12",
         "@ledgerhq/hw-transport-webhid": "^6.30.0",
         "@ledgerhq/hw-transport-webusb": "^6.29.4",
         "@ledgerhq/logs": "^6.12.0",

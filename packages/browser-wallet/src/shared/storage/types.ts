@@ -163,6 +163,7 @@ export interface BaseCredential {
     status: CreationStatus;
     identityIndex: number;
     providerIndex: number;
+    ledgerBased?: boolean;
     // Policy (is in accountInfo)
     // CredentialIndex = 0
 }

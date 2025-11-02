@@ -1412,9 +1412,9 @@ __metadata:
   languageName: node
   linkType: hard
 
-"@blooo/hw-app-concordium@npm:^1.0.6":
-  version: 1.0.6
-  resolution: "@blooo/hw-app-concordium@npm:1.0.6"
+"@blooo/hw-app-concordium@npm:^1.0.7":
+  version: 1.0.7
+  resolution: "@blooo/hw-app-concordium@npm:1.0.7"
   dependencies:
     "@concordium/common-sdk": ^9.5.3
     "@concordium/web-sdk": ^9.0.0
@@ -1425,7 +1425,7 @@ __metadata:
     hi-base32: ^0.5.1
     js-sha512: ^0.8.0
     tweetnacl: ^1.0.3
-  checksum: d527ed6b30caabe170a302fd9dc187dffd4925fc78d2cbb9fd415949f24b129ba07ecfedc6225312d654c38bcccab1292c0c6b639a9da438054e1d5b3a74d0c0
+  checksum: ddcf16132039304f59e535d095bd299b2bc2fb30b9c5b652e7262b3599c9ae5de552ffdee16fc3f517419a9015b0e0634a9f7673263d3199cfbab008a2082ba1
   languageName: node
   linkType: hard
 
@@ -1452,7 +1452,7 @@ __metadata:
   resolution: "@concordium/browser-wallet@workspace:packages/browser-wallet"
   dependencies:
     "@babel/core": ^7.18.2
-    "@blooo/hw-app-concordium": ^1.0.6
+    "@blooo/hw-app-concordium": ^1.0.7
     "@concordium/browser-wallet-api-helpers": "workspace:^"
     "@concordium/common-sdk": ^9.5.3
     "@concordium/web-sdk": ^9.0.0
@@ -2575,10 +2575,29 @@ __metadata:
   languageName: node
   linkType: hard
 
+"@ledgerhq/devices@npm:8.6.1":
+  version: 8.6.1
+  resolution: "@ledgerhq/devices@npm:8.6.1"
+  dependencies:
+    "@ledgerhq/errors": ^6.26.0
+    "@ledgerhq/logs": ^6.13.0
+    rxjs: ^7.8.1
+    semver: ^7.3.5
+  checksum: 1332635f82100578d1e60ece1be005257fe88184eb6032cda9521be5964df8afcddec816b52d4b2f8181547bdef0be596c870274eaf0354ec6a3ba669c9cea77
+  languageName: node
+  linkType: hard
+
 "@ledgerhq/errors@npm:^6.19.1":
   version: 6.19.1
   resolution: "@ledgerhq/errors@npm:6.19.1"
   checksum: f4e1cf0d6a5808c58235c54e2a1565556de8e683552bd94d97609f790e8c25226114bfa2af9914bb329c3e7c314585b60c66ddac8d8f8f1d072b7e791a889ad8
+  languageName: node
+  linkType: hard
+
+"@ledgerhq/errors@npm:^6.26.0":
+  version: 6.26.0
+  resolution: "@ledgerhq/errors@npm:6.26.0"
+  checksum: 0ccd870d7bbeb5dfc58c767ee173d86e068039c6a86d8c717503575ac5a4425889aabfb8bf5072e91ab834ef4d29cd05c3adb8a4d862d766b465c21ba685a4e7
   languageName: node
   linkType: hard
 
@@ -2606,6 +2625,18 @@ __metadata:
   languageName: node
   linkType: hard
 
+"@ledgerhq/hw-transport@npm:^6.31.12":
+  version: 6.31.12
+  resolution: "@ledgerhq/hw-transport@npm:6.31.12"
+  dependencies:
+    "@ledgerhq/devices": 8.6.1
+    "@ledgerhq/errors": ^6.26.0
+    "@ledgerhq/logs": ^6.13.0
+    events: ^3.3.0
+  checksum: e75b914df1e87d137c5e0a1302d751e54b264642abe2bb684a2b92e3b6aaf6da5cbc21ef93596124d8cd9ecf0cafffb9bdcf61bf3abc965ead846315d32e386a
+  languageName: node
+  linkType: hard
+
 "@ledgerhq/hw-transport@npm:^6.31.4":
   version: 6.31.4
   resolution: "@ledgerhq/hw-transport@npm:6.31.4"
@@ -2622,6 +2653,13 @@ __metadata:
   version: 6.12.0
   resolution: "@ledgerhq/logs@npm:6.12.0"
   checksum: 53fb9ceaf26b2a9fd6e7639b19119f4fef2f814d465fdd910e69c9486dce78137a1790e24f019a03bfabc87e19b2e6683f4da93a7fd203a61117a709fdf6484c
+  languageName: node
+  linkType: hard
+
+"@ledgerhq/logs@npm:^6.13.0":
+  version: 6.13.0
+  resolution: "@ledgerhq/logs@npm:6.13.0"
+  checksum: b2b64af45630eb2851f49af505e46a378cd62edfa73b154867a8d86641a684a36c9fee12a5e9ca94fb8fb3d81b47462fdb369ba9f0261079db1c6a81d9c0f12b
   languageName: node
   linkType: hard
 
@@ -6156,10 +6194,10 @@ __metadata:
   version: 0.0.0-use.local
   resolution: "concordium-browser-wallet@workspace:."
   dependencies:
-    "@blooo/hw-app-concordium": ^1.0.6
+    "@blooo/hw-app-concordium": ^1.0.7
     "@concordium/web-sdk": ^9.0.0
     "@esbuild-plugins/node-globals-polyfill": ^0.2.3
-    "@ledgerhq/hw-transport": ^6.31.4
+    "@ledgerhq/hw-transport": ^6.31.12
     "@ledgerhq/hw-transport-webhid": ^6.30.0
     "@ledgerhq/hw-transport-webusb": ^6.29.4
     "@ledgerhq/logs": ^6.12.0

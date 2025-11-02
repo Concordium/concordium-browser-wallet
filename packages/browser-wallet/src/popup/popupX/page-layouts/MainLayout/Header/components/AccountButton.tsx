@@ -1,6 +1,8 @@
 import React from 'react';
 import clsx from 'clsx';
 import UpDown from '@assets/svgX/caret-up-down.svg';
+import LedgerOnIcon from '@assets/svgX/ledger-on.svg';
+import LedgerOffIcon from '@assets/svgX/ledger-off.svg';
 import { displayNameOrSplitAddress } from '@popup/shared/utils/account-helpers';
 import { useAtomValue } from 'jotai';
 import { credentialsAtom, selectedCredentialAtom } from '@popup/store/account';
@@ -36,6 +38,11 @@ export default function AccountButton({
     return (
         // eslint-disable-next-line jsx-a11y/click-events-have-key-events, jsx-a11y/no-static-element-interactions
         <div className={clsx('header__account', accountOpen && 'active')} onClick={() => setAccountOpen(!accountOpen)}>
+            {credential.ledgerBased !== undefined && (
+                <span style={{ marginRight: 4, display: 'inline-flex', verticalAlign: 'middle' }}>
+                    {credential.ledgerBased ? <LedgerOnIcon /> : <LedgerOffIcon />}
+                </span>
+            )}
             <span className="text__main_medium">{displayNameOrSplitAddress(credential)}</span>
             <UpDown />
         </div>

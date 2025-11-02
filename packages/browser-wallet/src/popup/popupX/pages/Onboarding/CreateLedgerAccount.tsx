@@ -1,13 +1,22 @@
-import React, { useCallback } from 'react';
+/* eslint-disable no-console */
+/* eslint-disable @typescript-eslint/no-unused-vars */
+/* import React, { useEffect, useState } from 'react';
+import Button from '@popup/popupX/shared/Button';
+import { useNavigate } from 'react-router-dom';
+import { absoluteRoutes } from '@popup/popupX/constants/routes';
+import { useTranslation } from 'react-i18next';
 import Page from '@popup/popupX/shared/Page';
+import Text from '@popup/popupX/shared/Text';
+import { createCredentials } from '@popup/shared/utils/ledger-helpers'; */
+
+import React, { useCallback } from 'react';
+// import Page from '@popup/popupX/shared/Page';
 // import { useTranslation } from 'react-i18next';
-import { Navigate, useNavigate, useParams } from 'react-router-dom';
+import { useNavigate } from 'react-router-dom';
 // import Button from '@popup/popupX/shared/Button';
 import { identitiesAtom, identityProvidersAtom } from '@popup/store/identity';
 import { useAtom, useAtomValue, useSetAtom } from 'jotai';
-import { ConfirmedIdCard } from '@popup/popupX/shared/IdCard';
 import { ConfirmedIdentity, CreationStatus } from '@shared/storage/types';
-import FatArrowUp from '@assets/svgX/fat-arrow-up.svg';
 import { grpcClientAtom, networkConfigurationAtom } from '@popup/store/settings';
 import { useDecryptedSeedPhrase } from '@popup/shared/utils/seed-phrase-helpers';
 import { addToastAtom } from '@popup/state';
@@ -19,8 +28,6 @@ import { popupMessageHandler } from '@popup/shared/message-handler';
 import { InternalMessageType } from '@messaging';
 import { CredentialDeploymentBackgroundResponse } from '@shared/utils/types';
 import { absoluteRoutes } from '@popup/popupX/constants/routes';
-import ConcordiumWalletButton from '@popup/popupX/shared/ButtonAlpha/ConcordiumWalletButton';
-import ConcordiumLedgerButton from '@popup/popupX/shared/ButtonAlpha/ConcordiumLedgerButton';
 
 /**
  * Hook providing function for sending credential deployments.
@@ -85,8 +92,6 @@ function ConfirmInfo({ identityProviderIndex, identityIndex }: CreateAccountConf
     const deployment = useSendCredentialDeployment();
     const nav = useNavigate();
 
-    const navToCreateLedger = () => nav(absoluteRoutes.onboarding.setupPassword.createOrRestore.deviceConnection.path);
-
     const onCreateAccount = useCallback(async () => {
         if (identity === undefined || identity.status !== CreationStatus.Confirmed) {
             throw new Error(`Invalid identity: ${identity}`);
@@ -102,49 +107,14 @@ function ConfirmInfo({ identityProviderIndex, identityIndex }: CreateAccountConf
                 setCreatingRequest(false);
             });
     }, [deployment.sendCredentialDeployment]);
-
-    if (identity === undefined) {
-        return null;
-    }
-    if (identity.status !== CreationStatus.Confirmed) {
-        return <Navigate to="../" />;
-    }
     const loading = creatingCredentialRequest.loading || creatingCredentialRequest.value || deployment.loading;
-    return (
-        <>
-            <div className="justify-content-center">
-                <FatArrowUp />
-            </div>
-            <ConfirmedIdCard identity={identity} shownAttributes={['idDocType', 'idDocNo']} hideAccounts />
-            <div>
-                <ConcordiumWalletButton onClick={onCreateAccount} disabled={loading} />
-            </div>
-            <div>
-                <ConcordiumLedgerButton onClick={navToCreateLedger} disabled={loading} />
-            </div>
-        </>
-    );
+    return loading;
 }
 
 export default function CreateAccountConfirm() {
-    const params = useParams();
-    if (params.identityProviderIndex === undefined || params.identityIndex === undefined) {
-        // No account address passed in the url.
-        return <Navigate to="../" />;
-    }
-    const identityIndex = parseInt(params.identityIndex, 10);
-    const identityProviderIndex = parseInt(params.identityProviderIndex, 10);
-    // eslint-disable-next-line no-console
-    console.log('CreateAccountConfirm', identityProviderIndex, identityIndex);
+    console.log('CreateAccountConfirm');
+    const identityIndex = parseInt(localStorage.getItem('index') ?? '', 10);
+    const identityProviderIndex = parseInt(localStorage.getItem('providerIndex') ?? '', 10);
 
-    if (Number.isNaN(identityProviderIndex) || Number.isNaN(identityIndex)) {
-        return <Navigate to="../" />;
-    }
-    return (
-        <Page className="create-account-x">
-            <Page.Footer>
-                <ConfirmInfo identityIndex={identityIndex} identityProviderIndex={identityProviderIndex} />
-            </Page.Footer>
-        </Page>
-    );
+    return <ConfirmInfo identityProviderIndex={identityProviderIndex} identityIndex={identityIndex} />;
 }

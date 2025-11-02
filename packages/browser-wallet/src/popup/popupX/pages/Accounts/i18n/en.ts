@@ -6,6 +6,7 @@ const t = {
     privateKey: 'Private key',
     export: 'Export',
     attachedTo: 'Attached to',
+    ledgerBased: 'Ledger Based',
 };
 
 export default t;

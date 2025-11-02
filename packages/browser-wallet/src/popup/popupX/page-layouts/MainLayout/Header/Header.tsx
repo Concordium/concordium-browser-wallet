@@ -1,6 +1,12 @@
 import React, { useEffect } from 'react';
 
-import { Connection, Fullscreen, MenuButton, MenuTiles } from '@popup/popupX/page-layouts/MainLayout/Header/components';
+import {
+    Connection,
+    Fullscreen,
+    MenuButton,
+    MenuTiles,
+    LedgerStatusIndicator,
+} from '@popup/popupX/page-layouts/MainLayout/Header/components';
 import clsx from 'clsx';
 import AccountSelector from './components/AccountSelector';
 
@@ -39,6 +45,7 @@ export default function Header({
         <div className={clsx('main-header', isScrolling && 'scroll-border')}>
             <div className="main-header__top">
                 <Fullscreen />
+                <LedgerStatusIndicator />
                 <Connection hideConnection={hideConnection} />
             </div>
             <div className="main-header__bottom">

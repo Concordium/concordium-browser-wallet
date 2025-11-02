@@ -7,6 +7,10 @@ import Button from '@popup/popupX/shared/Button';
 import { useTranslation } from 'react-i18next';
 import Text from '@popup/popupX/shared/Text';
 import { absoluteRoutes } from '@popup/popupX/constants/routes';
+import ConcordiumWalletButton from '@popup/popupX/shared/ButtonAlpha/ConcordiumWalletButton';
+import ConcordiumLedgerButton from '@popup/popupX/shared/ButtonAlpha/ConcordiumLedgerButton';
+import RestoreWalletButton from '@popup/popupX/shared/ButtonAlpha/RestoreWalletButton';
+import RestoreLedgerButton from '@popup/popupX/shared/ButtonAlpha/RestoreLedgerButton';
 
 export default function CreateOrRestore() {
     const { t } = useTranslation('x', { keyPrefix: 'onboarding.createOrRestore' });
@@ -15,6 +19,8 @@ export default function CreateOrRestore() {
     const navToRestore = () => nav(absoluteRoutes.onboarding.setupPassword.createOrRestore.restoreWallet.path);
     const navToCreate = () => nav(absoluteRoutes.onboarding.setupPassword.createOrRestore.generateSeedPhrase.path);
     const navToSelectNetwork = () => nav(absoluteRoutes.onboarding.setupPassword.createOrRestore.selectNetwork.path);
+    const navToRestoreLedger = () => nav(absoluteRoutes.onboarding.setupPassword.createOrRestore.restoreLedger.path);
+    const navToCreateLedger = () => nav(absoluteRoutes.onboarding.setupPassword.createOrRestore.idCardsInfoLedger.path);
 
     return (
         <Page className="create-or-restore">
@@ -27,8 +33,23 @@ export default function CreateOrRestore() {
                 <Text.Capture>{t('optionsInfo')}</Text.Capture>
             </Page.Main>
             <Page.Footer>
-                <Button.Main label={t('create')} onClick={navToCreate} />
-                <Button.Main label={t('restore')} onClick={navToRestore} />
+                <div>
+                    <ConcordiumWalletButton onClick={navToCreate} />
+                </div>
+                <div>
+                    <ConcordiumLedgerButton onClick={navToCreateLedger} />
+                </div>
+                <div style={{ display: 'flex', alignItems: 'center' }}>
+                    <div style={{ flex: 1, height: 1, background: '#888' }} />
+                    <span style={{ margin: '0 12px', color: '#888', fontWeight: 500 }}>OR</span>
+                    <div style={{ flex: 1, height: 1, background: '#888' }} />
+                </div>
+                <div>
+                    <RestoreWalletButton onClick={navToRestore} />
+                </div>
+                <div>
+                    <RestoreLedgerButton onClick={navToRestoreLedger} />
+                </div>
             </Page.Footer>
         </Page>
     );

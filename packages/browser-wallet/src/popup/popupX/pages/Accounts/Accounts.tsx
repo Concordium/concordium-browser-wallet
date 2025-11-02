@@ -21,6 +21,8 @@ import { useAccountInfo } from '@popup/shared/AccountInfoListenerContext';
 import { displayAsCcd } from 'wallet-common-helpers';
 import useEditableValue from '@popup/popupX/shared/EditableValue';
 import { useCopyAddress } from '@popup/popupX/shared/utils/hooks';
+import LedgerOnIcon from '@assets/svgX/ledger-on.svg';
+import LedgerOffIcon from '@assets/svgX/ledger-off.svg';
 
 function compareAsc(left: WalletCredential, right: WalletCredential): number {
     if (left.credName === '' && right.credName !== '') {
@@ -118,6 +120,22 @@ function AccountListItem({ credential }: AccountListItemProps) {
                     icon={<ArrowRight />}
                     leftLabel
                 />
+            </Card.Row>
+            <Card.Row>
+                <Text.MainRegular>{t('ledgerBased')}</Text.MainRegular>
+                <span style={{ display: 'flex', alignItems: 'center', gap: 8 }}>
+                    {credential.ledgerBased ? (
+                        <>
+                            <LedgerOnIcon />
+                            <span>Yes</span>
+                        </>
+                    ) : (
+                        <>
+                            <LedgerOffIcon />
+                            <span>No</span>
+                        </>
+                    )}
+                </span>
             </Card.Row>
         </Card>
     );

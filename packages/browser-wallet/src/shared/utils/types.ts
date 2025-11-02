@@ -87,4 +87,4 @@ export type BackgroundSendTransactionPayload = {
     url: string;
 };
 
-export type IdentityIssuanceRequestPayload = IdentityRequestInput & { baseUrl: string };
+export type IdentityIssuanceRequestPayload = IdentityRequestInput & { baseUrl: string; identityTypeValue?: string };

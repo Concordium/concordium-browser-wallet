@@ -25,8 +25,10 @@ const t = {
         createOrRestore: 'Create or restore',
         optionsInfo:
             'You have the option to create a new wallet or restore an existing one. How do you want to proceed?',
-        create: 'Create',
-        restore: 'Restore',
+        create: 'Concordium Wallet Account',
+        restore: 'Restore Browser Wallet',
+        createLedger: 'Concordium Ledger Account',
+        restoreLedger: 'Restore Ledger Account',
     },
     selectNetwork: {
         networkSettings: 'Network settings',
@@ -69,6 +71,28 @@ const t = {
         idSubmitInfo:
             'Your request has been submitted to the identity provider. It may take a little while for them to confirm your identity.\n\nOnce your identity has been verified, you will be able to open an account with it.',
         done: 'Done',
+    },
+    deviceConnection: {
+        ids: 'Device Connection',
+        idDescription:
+            'Choose your device from the list of available USB devices. For any question, check out our FAQ page. \n\nPlease make sure that Ledger device is connected and Concordium app is opened',
+        connectDevice: 'Connect Ledger Device',
+        continue: 'Continue',
+    },
+    comparePublicKey: {
+        ids: 'Compare Public Key',
+        idDescription: 'Please follow the prompts on your ledger device and confirm exporting the public key',
+        continue: 'Continue',
+    },
+    confirmLedgerInformation: {
+        ids: 'Confirm Information',
+        idDescription: 'Make sure the following data matches on your ledger device',
+        continue: 'Continue',
+    },
+    createLedgerAccount: {
+        ids: 'Create Ledger Account',
+        idDescription: 'Please verify data on your ledger device and accept',
+        continue: 'Continue',
     },
 };
 

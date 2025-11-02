@@ -1,5 +1,7 @@
 import React, { ChangeEvent, useMemo, useState } from 'react';
 import CarretRight from '@assets/svgX/caret-right.svg';
+import LedgerOnIcon from '@assets/svgX/ledger-on.svg';
+import LedgerOffIcon from '@assets/svgX/ledger-off.svg';
 import ArrowsUpDown from '@assets/svgX/arrows-down-up.svg';
 import Percent from '@assets/svgX/percent.svg';
 import Copy from '@assets/svgX/copy.svg';
@@ -104,6 +106,7 @@ function AccountRow({
                 {credential.address === selectedAccount && <CarretRight />}
                 <Text.AdditionalSmall>{displayNameOrSplitAddress(credential)}</Text.AdditionalSmall>
             </div>
+            <div className="account-ledger">{credential.ledgerBased ? <LedgerOnIcon /> : <LedgerOffIcon />}</div>
             <div className="balance">
                 <Text.AdditionalSmall>
                     <CcdBalance credential={credential} />

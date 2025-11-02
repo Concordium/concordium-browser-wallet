@@ -1,13 +1,14 @@
-import React, { useCallback } from 'react';
+/* eslint-disable no-console */
+import React, { useCallback, useEffect, useState } from 'react';
+import Button from '@popup/popupX/shared/Button';
+import { useNavigate } from 'react-router-dom';
+import { absoluteRoutes } from '@popup/popupX/constants/routes';
+import { useTranslation } from 'react-i18next';
 import Page from '@popup/popupX/shared/Page';
-// import { useTranslation } from 'react-i18next';
-import { Navigate, useNavigate, useParams } from 'react-router-dom';
-// import Button from '@popup/popupX/shared/Button';
+import Text from '@popup/popupX/shared/Text';
 import { identitiesAtom, identityProvidersAtom } from '@popup/store/identity';
 import { useAtom, useAtomValue, useSetAtom } from 'jotai';
-import { ConfirmedIdCard } from '@popup/popupX/shared/IdCard';
 import { ConfirmedIdentity, CreationStatus } from '@shared/storage/types';
-import FatArrowUp from '@assets/svgX/fat-arrow-up.svg';
 import { grpcClientAtom, networkConfigurationAtom } from '@popup/store/settings';
 import { useDecryptedSeedPhrase } from '@popup/shared/utils/seed-phrase-helpers';
 import { addToastAtom } from '@popup/state';
@@ -18,9 +19,6 @@ import { getNextEmptyCredNumber } from '@popup/shared/utils/account-helpers';
 import { popupMessageHandler } from '@popup/shared/message-handler';
 import { InternalMessageType } from '@messaging';
 import { CredentialDeploymentBackgroundResponse } from '@shared/utils/types';
-import { absoluteRoutes } from '@popup/popupX/constants/routes';
-import ConcordiumWalletButton from '@popup/popupX/shared/ButtonAlpha/ConcordiumWalletButton';
-import ConcordiumLedgerButton from '@popup/popupX/shared/ButtonAlpha/ConcordiumLedgerButton';
 
 /**
  * Hook providing function for sending credential deployments.
@@ -78,14 +76,13 @@ type CreateAccountConfirmProps = {
 };
 
 function ConfirmInfo({ identityProviderIndex, identityIndex }: CreateAccountConfirmProps) {
-    // const { t } = useTranslation('x', { keyPrefix: 'createAccount' });
+    const { t } = useTranslation('x', { keyPrefix: 'onboarding.confirmLedgerInformation' });
     const identities = useAtomValue(identitiesAtom);
     const identity = identities.find((id) => id.providerIndex === identityProviderIndex && id.index === identityIndex);
     const [creatingCredentialRequest, setCreatingRequest] = useAtom(creatingCredentialRequestAtom);
     const deployment = useSendCredentialDeployment();
+    const [publicKey, setPublicKey] = useState('');
     const nav = useNavigate();
-
-    const navToCreateLedger = () => nav(absoluteRoutes.onboarding.setupPassword.createOrRestore.deviceConnection.path);
 
     const onCreateAccount = useCallback(async () => {
         if (identity === undefined || identity.status !== CreationStatus.Confirmed) {
@@ -102,49 +99,59 @@ function ConfirmInfo({ identityProviderIndex, identityIndex }: CreateAccountConf
                 setCreatingRequest(false);
             });
     }, [deployment.sendCredentialDeployment]);
-
-    if (identity === undefined) {
-        return null;
-    }
-    if (identity.status !== CreationStatus.Confirmed) {
-        return <Navigate to="../" />;
-    }
     const loading = creatingCredentialRequest.loading || creatingCredentialRequest.value || deployment.loading;
-    return (
-        <>
-            <div className="justify-content-center">
-                <FatArrowUp />
-            </div>
-            <ConfirmedIdCard identity={identity} shownAttributes={['idDocType', 'idDocNo']} hideAccounts />
-            <div>
-                <ConcordiumWalletButton onClick={onCreateAccount} disabled={loading} />
-            </div>
-            <div>
-                <ConcordiumLedgerButton onClick={navToCreateLedger} disabled={loading} />
-            </div>
-        </>
-    );
-}
+    console.log('ConfirmInfo', { identity, loading });
+    const rawKey = localStorage.getItem('publicKey');
+    const formattedKey = rawKey?.match(/.{1,16}/g)?.join('\n') || rawKey || '';
 
-export default function CreateAccountConfirm() {
-    const params = useParams();
-    if (params.identityProviderIndex === undefined || params.identityIndex === undefined) {
-        // No account address passed in the url.
-        return <Navigate to="../" />;
-    }
-    const identityIndex = parseInt(params.identityIndex, 10);
-    const identityProviderIndex = parseInt(params.identityProviderIndex, 10);
-    // eslint-disable-next-line no-console
-    console.log('CreateAccountConfirm', identityProviderIndex, identityIndex);
-
-    if (Number.isNaN(identityProviderIndex) || Number.isNaN(identityIndex)) {
-        return <Navigate to="../" />;
-    }
+    // FIX: Only update publicKey when formattedKey changes
+    useEffect(() => {
+        if (formattedKey) {
+            setPublicKey(formattedKey);
+        }
+    }, [formattedKey]);
     return (
-        <Page className="create-account-x">
+        <Page className="id-cards-info">
+            <Page.Top heading={t('ids')} />
+            <Page.Main>
+                <Text.Capture>
+                    {t('idDescription')}
+                    <div
+                        style={{
+                            width: '150px',
+                            overflowWrap: 'break-word',
+                            wordBreak: 'break-word',
+                            whiteSpace: 'pre-wrap',
+                            marginTop: '10px',
+                            backgroundColor: '#414141',
+                            borderRadius: '8px',
+                            padding: '10px',
+                            color: '#ffffff',
+                            lineBreak: 'anywhere',
+                        }}
+                    >
+                        {publicKey}
+                    </div>
+                    <p>
+                        <b>Signature threshold: 1</b>
+                    </p>
+                    <div>
+                        <b>Authorities required (AR threshold):</b>
+                        <p>1 out of 3</p>
+                    </div>
+                </Text.Capture>
+            </Page.Main>
             <Page.Footer>
-                <ConfirmInfo identityIndex={identityIndex} identityProviderIndex={identityProviderIndex} />
+                <Button.Main type="button" label={t('continue')} onClick={onCreateAccount} />
             </Page.Footer>
         </Page>
     );
+}
+
+export default function ConfirmLedgerInformation() {
+    console.log('CreateAccountConfirm');
+    const identityIndex = parseInt(localStorage.getItem('index') ?? '', 10);
+    const identityProviderIndex = parseInt(localStorage.getItem('providerIndex') ?? '', 10);
+
+    return <ConfirmInfo identityProviderIndex={identityProviderIndex} identityIndex={identityIndex} />;
 }

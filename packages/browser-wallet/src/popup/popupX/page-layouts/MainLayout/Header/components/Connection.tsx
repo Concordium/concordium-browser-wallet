@@ -1,6 +1,8 @@
 import React, { useEffect, useState } from 'react';
-import Info from '@assets/svgX/info.svg';
-import Dot from '@assets/svgX/dot.svg';
+// import Info from '@assets/svgX/info.svg';
+// import Dot from '@assets/svgX/dot.svg';
+import GlobeOn from '@assets/svgX/globe-on.svg';
+import GlobeOff from '@assets/svgX/globe-off.svg';
 import { useAtomValue } from 'jotai';
 import { storedAllowlistAtom } from '@popup/store/account';
 import { useCurrentOpenTabUrl } from '@popup/shared/utils/tabs';
@@ -9,8 +11,8 @@ import { useTranslation } from 'react-i18next';
 import clsx from 'clsx';
 import { Location, useLocation } from 'react-router-dom';
 import { relativeRoutes } from '@popup/popupX/constants/routes';
-import Text from '@popup/popupX/shared/Text';
-import Tooltip from '@popup/popupX/shared/Tooltip';
+// import Text from '@popup/popupX/shared/Text';
+// import Tooltip from '@popup/popupX/shared/Tooltip';
 
 type Props = {
     hideConnection?: boolean;
@@ -47,21 +49,22 @@ export default function Connection({ hideConnection }: Props) {
 
     if (hideConnection) return null;
     return (
-        <div className="main-header__connection">
-            <div className="main-header__connection_info">
-                <span
-                    className={clsx('connection_status', {
-                        connected: !waitingForConnection && isAccountConnectedToSite,
-                        waiting: waitingForConnection,
-                    })}
-                >
-                    <Dot />
-                    <Text.Capture>{connectionText}</Text.Capture>
+        <div>
+            <span
+                className={clsx('connection_status', {
+                    connected: !waitingForConnection && isAccountConnectedToSite,
+                    waiting: waitingForConnection,
+                })}
+            >
+                <span title={connectionText} style={{ display: 'flex', alignItems: 'center', gap: 4 }}>
+                    {isAccountConnectedToSite ? <GlobeOn /> : <GlobeOff />}
                 </span>
-                <Tooltip position="top" title={t('tooltip.title')} text={t('tooltip.text')} className="info-icon">
+                {/* <Dot />
+                <Text.Capture>{connectionText}</Text.Capture> */}
+            </span>
+            {/* <Tooltip position="top" title={t('tooltip.title')} text={t('tooltip.text')} className="info-icon">
                     <Info />
-                </Tooltip>
-            </div>
+                </Tooltip> */}
         </div>
     );
 }

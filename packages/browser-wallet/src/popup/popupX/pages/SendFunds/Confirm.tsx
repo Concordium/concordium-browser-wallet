@@ -117,8 +117,9 @@ export default function SendFundsConfirm({ values, fee, sender }: Props) {
         setErrorMessage('');
         setUserMessage('');
 
-        try {
+        setErrorMessage('Please review & approve the transaction on the Ledger device');
 
+        try {
             if (payload === undefined || tokenName === undefined) {
                 throw Error('Payload could not be created...');
             }
@@ -167,14 +168,10 @@ export default function SendFundsConfirm({ values, fee, sender }: Props) {
                 <Text.HeadingLarge>{values.amount}</Text.HeadingLarge>
                 <Text.Capture>{t('estimatedFee', { fee: formatCcdAmount(fee) })}</Text.Capture>
             </Card>
-            {userMessage && (
-            <div>
-                {userMessage}
-            </div>
-            )}
-            
+            {userMessage && <div>{userMessage}</div>}
             {errorMessage && (
-                <div> <br />
+                <div>
+                    <br />
                     {errorMessage}
                 </div>
             )}

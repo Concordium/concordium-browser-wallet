@@ -1,4 +1,4 @@
-import React, { useCallback, useEffect, useRef, useState } from 'react';
+import React, { useCallback, useEffect } from 'react';
 import FormPassword from '@popup/popupX/shared/Form/Password';
 import Form from '@popup/popupX/shared/Form/Form';
 import { useNavigate } from 'react-router-dom';
@@ -18,12 +18,6 @@ type FormValues = {
     passcodeAgain: string;
 };
 
-type LedgerDeviceDetails = {
-    productName?: string;
-    deviceId: string;
-    opened?: boolean;
-};
-
 export default function SetupPassword() {
     const { t } = useTranslation('x', { keyPrefix: 'onboarding.setupPassword' });
     const nav = useNavigate();
@@ -34,49 +28,11 @@ export default function SetupPassword() {
     const form = useForm<FormValues>();
     const passcode = form.watch('passcode');
 
-    const [ledgerDetails, setLedgerDetails] = useState<LedgerDeviceDetails | null>(null);
-    const [status, setStatus] = useState<string>('');
-    const listenerAttached = useRef(false);
-
     const handleSubmit: SubmitHandler<FormValues> = (vs) => {
         setPasscode(vs.passcode);
         setPasscodeInSession(vs.passcode);
         setEncryptedSeedPhrase(undefined);
         navToNext();
-    };
-
-    const handleLedgerMessage = (event: MessageEvent) => {
-        const { type, success, details, error } = event.data;
-
-        if (type === 'LEDGER_CONNECTED' && success) {
-            setLedgerDetails(details);
-            setStatus(`Connected to: ${details.productName || 'Ledger Device'}`);
-        } else if (type === 'LEDGER_ERROR') {
-            setLedgerDetails(null);
-            setStatus(`Error: ${error}`);
-        }
-    };
-
-    const connectLedgerDevice = () => {
-        window.postMessage({ type: 'REQUEST_LEDGER_DEVICE' }, '*');
-        if (!listenerAttached.current) {
-            window.addEventListener('message', handleLedgerMessage);
-            listenerAttached.current = true;
-        }
-    };
-
-    const disconnectLedgerDevice = () => {
-        window.postMessage({ type: 'DISCONNECT_LEDGER_DEVICE' }, '*');
-        setStatus('Ledger device disconnected');
-        setLedgerDetails(null);
-    };
-
-    const getLedgerStatus = () => {
-        window.postMessage({ type: 'GET_LEDGER_STATUS' }, '*');
-        if (!listenerAttached.current) {
-            window.addEventListener('message', handleLedgerMessage);
-            listenerAttached.current = true;
-        }
     };
 
     const passcodesAreEqual: Validate<string> = useCallback(
@@ -128,29 +84,9 @@ export default function SetupPassword() {
                         );
                     }}
                 </Form>
-                {status && <p style={{ marginTop: '1rem' }}>{status}</p>}
-                {ledgerDetails && (
-                    <div style={{ marginTop: '0.5rem', fontSize: '0.9rem' }}>
-                        <strong>Device Details:</strong>
-                        <ul>
-                            <li><strong>Product:</strong> {ledgerDetails.productName}</li>
-                            <li><strong>Device ID:</strong> {ledgerDetails.deviceId}</li>
-                            <li><strong>Opened:</strong> {ledgerDetails.opened ? 'Yes' : 'No'}</li>
-                        </ul>
-                    </div>
-                )}
             </Page.Main>
             <Page.Footer>
                 <Button.Main form="setup-password-form" type="submit" label={t('continue')} onClick={() => {}} />
-                
-                {!ledgerDetails && (
-                    <Button.Main type="button" label="Connect Ledger" onClick={connectLedgerDevice} />
-                )}
-
-                {ledgerDetails && (
-                    <Button.Main type="button" label="Disconnect Ledger" onClick={disconnectLedgerDevice} />
-                )}
-                <Button.Main type="button" label="Ledger Status" onClick={getLedgerStatus} />
             </Page.Footer>
         </Page>
     );

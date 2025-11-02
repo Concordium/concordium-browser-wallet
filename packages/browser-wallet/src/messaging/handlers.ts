@@ -1,8 +1,9 @@
+/* eslint-disable @typescript-eslint/no-explicit-any */
+/* eslint-disable import/no-extraneous-dependencies */
 /* eslint-disable max-classes-per-file */
 import { EventType } from '@concordium/browser-wallet-api-helpers';
 import Transport from '@ledgerhq/hw-transport';
 import TransportWebHID from '@ledgerhq/hw-transport-webhid';
-import Concordium from '@blooo/hw-app-concordium';
 
 import {
     BaseMessage,
@@ -52,38 +53,66 @@ import { LedgerDeviceDetails, LedgerMessage } from '../shared/utils/ledger';
 
 let ledgerTransport: Transport | null = null;
 
-const globalContext = self || window;
+// eslint-disable-next-line no-restricted-globals
 
+function postLedgerError(globalContext: typeof window, error: unknown) {
+    let userFriendlyError = 'Unknown error';
+
+    if (typeof error === 'string') {
+        userFriendlyError = error;
+    } else if (error && typeof error === 'object' && 'message' in error) {
+        const errMsg = (error as { message: string }).message.toLowerCase();
+
+        if (errMsg.includes('already open')) {
+            userFriendlyError = 'Ledger is already in use. Please close other apps like Ledger Live and try again.';
+        } else if (errMsg.includes('access denied')) {
+            userFriendlyError = 'Access denied. The wallet must be in full-screen mode to connect a Ledger device.';
+        } else if (errMsg.includes('no device selected')) {
+            userFriendlyError = 'No Ledger device selected. Please connect and select your device.';
+        } else if (errMsg.includes('not found')) {
+            userFriendlyError = 'Ledger device not found. Please connect your device and try again.';
+        } else if (errMsg.includes('device locked')) {
+            userFriendlyError = 'Ledger device is locked. Please unlock your device and open the Concordium app.';
+        } else {
+            userFriendlyError = (error as { message: string }).message;
+        }
+    }
+
+    globalContext.postMessage(
+        {
+            type: 'LEDGER_ERROR',
+            success: false,
+            error: userFriendlyError,
+        },
+        '*'
+    );
+}
+
+// eslint-disable-next-line no-restricted-globals
+const globalContext = self || window;
 // Handle connection request
 globalContext.addEventListener('message', async (event: MessageEvent<LedgerMessage>) => {
     const { data, source } = event;
-
     if (source !== globalContext) return;
 
-    // Handle request for Ledger device
     if (data.type === 'REQUEST_LEDGER_DEVICE') {
-        console.log('Ledger connection requested');
-
         try {
             let device: LedgerDeviceDetails | undefined;
-
-            // 1. Reuse existing connection if it's open
             if (ledgerTransport && (ledgerTransport as TransportWebHID).device?.opened) {
-                console.log('Reusing existing Ledger transport');
                 device = (ledgerTransport as TransportWebHID).device;
             } else {
-                // 2. Otherwise create a new connection
-                console.log('Creating new Ledger transport via WebHID...');
                 ledgerTransport = await TransportWebHID.create();
+                // Listen for disconnect event and clear reference
+                ledgerTransport.on('disconnect', () => {
+                    ledgerTransport = null;
+                });
                 device = (ledgerTransport as TransportWebHID).device;
             }
-
             const details: LedgerDeviceDetails = {
                 productName: device?.productName,
                 deviceId: device?.serialNumber || `${device?.vendorId}-${device?.productId}`,
                 opened: device?.opened,
             };
-
             globalContext.postMessage(
                 {
                     type: 'LEDGER_CONNECTED',
@@ -93,37 +122,13 @@ globalContext.addEventListener('message', async (event: MessageEvent<LedgerMessa
                 '*'
             );
         } catch (error: any) {
-            console.error('Ledger connection error:', error);
-
-            let userFriendlyError = 'Unknown error';
-
-            const errMsg = error?.message?.toLowerCase() || '';
-
-            if (errMsg.includes('already open')) {
-                userFriendlyError = 'Ledger is already in use. Please close other apps like Ledger Live and try again.';
-            } else if (errMsg.includes('access denied')) {
-                userFriendlyError =
-                    'Access denied to use Ledger device. Please ensure you’ve selected the device and granted permission. If this is the first time you are using the Ledger device please switch to full-screen mode and select your Ledger device from the popup prompt.';
-            } else if (error?.message) {
-                userFriendlyError = error.message;
-            }
-
-            globalContext.postMessage(
-                {
-                    type: 'LEDGER_ERROR',
-                    success: false,
-                    error: userFriendlyError,
-                },
-                '*'
-            );
+            postLedgerError(globalContext, error);
         }
     } else if (data.type === 'DISCONNECT_LEDGER_DEVICE') {
-        console.log(' Disconnecting Ledger device...');
-
         if (ledgerTransport) {
             try {
-                await ledgerTransport.close(); // Close the connection
-                ledgerTransport = null; // Nullify transport
+                await ledgerTransport.close();
+                ledgerTransport = null;
                 globalContext.postMessage(
                     {
                         type: 'LEDGER_CONNECTED',
@@ -133,36 +138,19 @@ globalContext.addEventListener('message', async (event: MessageEvent<LedgerMessa
                     '*'
                 );
             } catch (error: any) {
-                console.error('Error during disconnect:', error);
-                globalContext.postMessage(
-                    {
-                        type: 'LEDGER_ERROR',
-                        success: false,
-                        error: 'Failed to disconnect the device.',
-                    },
-                    '*'
-                );
+                postLedgerError(globalContext, error);
             }
         } else {
-            globalContext.postMessage(
-                {
-                    type: 'LEDGER_ERROR',
-                    success: false,
-                    error: 'No device is currently connected.',
-                },
-                '*'
-            );
+            postLedgerError(globalContext, 'No device is currently connected.');
         }
     } else if (data.type === 'GET_LEDGER_STATUS') {
         const device = (ledgerTransport as TransportWebHID | null)?.device;
-
         if (ledgerTransport && device?.opened) {
             const details: LedgerDeviceDetails = {
                 productName: device?.productName,
                 deviceId: device?.serialNumber || `${device?.vendorId}-${device?.productId}`,
                 opened: device?.opened,
             };
-
             globalContext.postMessage(
                 {
                     type: 'LEDGER_CONNECTED',
@@ -174,9 +162,9 @@ globalContext.addEventListener('message', async (event: MessageEvent<LedgerMessa
         } else {
             globalContext.postMessage(
                 {
-                    type: 'LEDGER_ERROR',
+                    type: 'LEDGER_CONNECTED',
                     success: false,
-                    error: 'No Ledger device is connected.',
+                    details: { opened: false },
                 },
                 '*'
             );

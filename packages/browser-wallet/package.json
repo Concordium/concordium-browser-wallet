@@ -20,7 +20,7 @@
         "stream": "readable-stream"
     },
     "dependencies": {
-        "@blooo/hw-app-concordium": "^1.0.6",
+        "@blooo/hw-app-concordium": "^1.0.7",
         "@concordium/browser-wallet-api-helpers": "workspace:^",
         "@concordium/common-sdk": "^9.5.3",
         "@concordium/web-sdk": "^9.0.0",

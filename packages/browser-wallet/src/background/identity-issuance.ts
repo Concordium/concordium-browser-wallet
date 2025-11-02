@@ -150,8 +150,17 @@ function launchExternalIssuance(url: string) {
         });
 }
 
-async function startIdentityIssuance({ baseUrl, ...identityRequestInputs }: IdentityIssuanceRequestPayload) {
-    const idObjectRequest = createIdentityRequest(identityRequestInputs);
+async function startIdentityIssuance({
+    baseUrl,
+    identityTypeValue,
+    ...identityRequestInputs
+}: IdentityIssuanceRequestPayload) {
+    let idObjectRequest;
+    if (identityTypeValue === 'Ledger') {
+        // idObjectRequest = createIdentityRequestWithKeys(identityRequestInputs);
+    } else {
+        idObjectRequest = createIdentityRequest(identityRequestInputs);
+    }
 
     const params = {
         scope: 'identity',
