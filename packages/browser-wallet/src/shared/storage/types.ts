@@ -164,7 +164,8 @@ export interface BaseCredential {
     status: CreationStatus;
     identityIndex: number;
     providerIndex: number;
-    accountType: 'local' | 'ledger';
+    // Policy (is in accountInfo)
+    // CredentialIndex = 0
 }
 
 export interface PendingWalletCredential extends BaseCredential {
