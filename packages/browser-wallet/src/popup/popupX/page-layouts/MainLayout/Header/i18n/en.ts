@@ -20,16 +20,9 @@ const t = {
         sortDesc: 'Sort Z-A',
         searchBy: 'Search by name',
     },
-    connection: {
-        siteNotConnected: 'No website connected',
-        waiting: 'Waiting',
-        tooltip: {
-            title: 'Connect dApps',
-            text: 'You can connect you wallet to a\ndApp. An active connection will be\nshown here.',
-        },
-    },
     navButton: {
         toMain: 'To main page',
+        back: 'Back',
     },
     fullscreen: { fullscreen: 'Fullscreen' },
 };

@@ -185,7 +185,7 @@ export default function SendTransaction({ onSubmit, onReject }: Props) {
                 </Card>
             </Page.Main>
             <Page.Footer>
-                <Button.Main className="secondary" label={t('reject')} onClick={rejectHandler} />
+                <Button.Main variant="secondary" label={t('reject')} onClick={rejectHandler} />
                 <Button.Main label={t('sign')} onClick={signHandler} />
             </Page.Footer>
         </Page>

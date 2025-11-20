@@ -1,0 +1,74 @@
+@mixin element-variant($content, $surface: transparent, $border: transparent) {
+    background: $surface;
+    border: unset;
+    outline: 1px solid $border;
+    outline-offset: -1px;
+
+    .text_ui-kit {
+        color: $content;
+    }
+
+    svg path {
+        fill: $content;
+    }
+}
+
+@mixin button-color-states($default, $hover, $pressed, $disabled: null) {
+    @include element-variant($default...);
+
+    &:hover {
+        @include element-variant($hover...);
+    }
+
+    &:active {
+        @include element-variant($pressed...);
+    }
+
+    @if $disabled {
+        &:disabled {
+            @include element-variant($disabled...);
+        }
+    }
+}
+
+@mixin set-padding($pads...) {
+    padding: $pads;
+}
+
+@mixin font-sizes($weight, $size, $height, $spacing, $family: $t-font-family-satoshi) {
+    font-family: $family;
+    font-weight: $weight;
+    font-size: $size;
+    line-height: $height;
+    letter-spacing: $spacing;
+}
+
+@mixin icon-sizes($size) {
+    svg {
+        width: $size;
+        height: $size;
+    }
+}
+
+@mixin button-sizes($paddings, $font-sizes, $icon-size, $gap, $width: fit-content) {
+    @include font-sizes($font-sizes...);
+    @include icon-sizes($icon-size);
+
+    gap: $gap;
+    padding: $paddings;
+    width: $width;
+}
+
+@mixin surface-states-tertiary {
+    background: $semantic-surface-tertiary;
+
+    &:hover {
+        background: $semantic-surface-tertiary-hover;
+    }
+
+    &:active {
+        background: $semantic-surface-tertiary-pressed;
+        outline: 1px solid $semantic-border-tertiary-pressed;
+        outline-offset: -1px;
+    }
+}

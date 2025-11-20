@@ -150,7 +150,7 @@ export default function ConnectAccount({ onAllow, onReject }: Props) {
                 </Card>
             </Page.Main>
             <Page.Footer>
-                <Button.Main className="secondary" label={t('cancel')} onClick={withClose(onReject)} />
+                <Button.Main variant="secondary" label={t('cancel')} onClick={withClose(onReject)} />
                 <Button.Main
                     label={t('connect')}
                     disabled={connectButtonDisabled}

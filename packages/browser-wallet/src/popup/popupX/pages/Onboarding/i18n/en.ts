@@ -1,32 +1,37 @@
 const t = {
+    intro: {
+        smartMoney: 'Smart Money Starts Here',
+        continue: 'Continue',
+        dataRules: 'Your Data. Your Rules.',
+        verify: 'Verify your access, without exposing your identity.',
+    },
     welcome: {
-        welcomeTo: 'Welcome to Concordium',
-        safeSecure: 'Safe and Secure',
-        trusted: 'Trusted by thousands, CryptoX is a secure wallet making the Concordium blockchain accessible to all',
-        easyManage: 'Easily manage digital assets',
-        spendAssets: 'Store, spend and send digital assets like tokens, crypto, unique collectibles',
-        unlimited: 'Unlimited possibilities',
-        transactionInvest: 'With CryptoX you can make transactions to invest, earn, sell, play games and more!',
+        smartMoney: 'Smart Money Starts Here',
+        speed: 'Speed Matters',
+        fastPayments: 'Make payments faster and cheaper using stablecoins.',
         start: 'Get started',
         proceeding: 'By proceeding, you agree with ',
         termsAndConditions: 'Terms & Conditions',
     },
     setupPassword: {
         setPassword: 'Setup Passcode',
-        firstStep: 'The first step is to set up a passcode.\nPlease enter one below.',
+        firstStep: 'The first step is to set up a passcode. Please enter one below.',
         enterPasscode: 'Enter Passcode',
-        enterPasscodeAgain: 'Enter Passcode Again',
+        enterPasscodeAgain: 'Repeat Passcode',
         passcodeRequired: 'A passcode must be entered',
         passcodeMismatch: 'Passcode does not match',
         passcodeMinLength: 'Passcode must be at least 6 characters',
         continue: 'Continue',
     },
     createOrRestore: {
-        createOrRestore: 'Create or restore',
+        createOrRestore: 'Create or Restore Account',
         optionsInfo:
             'You have the option to create a new wallet or restore an existing one. How do you want to proceed?',
-        create: 'Create',
-        restore: 'Restore',
+        or: 'or',
+        walletAccount: 'Concordium Wallet Account',
+        walletAccountDescription: 'Write your seed phrase down in order to keep your wallet account safe',
+        restore: 'Restore With a Seed Phrase',
+        restoreDescription: 'Use your saved seed phrase to recover your existing accounts',
     },
     selectNetwork: {
         networkSettings: 'Network settings',
@@ -51,12 +56,6 @@ const t = {
         required: 'Please specify a 24-word BIP 39 recovery phrase',
         validate: 'Invalid secret recovery phrase',
         continue: 'Continue',
-    },
-    idCardsInfo: {
-        ids: 'ConcordiumID',
-        idDescription:
-            'As the only blockchain, Concordium enables you to verify your real-world identity while remaining private on chain.\n\nEvery user in the Concordium ecosystem has been verified by an identity provider (IDP) - a trusted third-party entity that is responsible for validating the real-world identity of users.\n\nThe IDP does not track your wallet or on-chain activities; they only handle the verification process.\n\nAfter a your identity is verified, the identity provider issues a cryptographic identity object to you that is linked to your account and can be used to prove your identity to others without revealing sensitive personal information.\n\nOnly in the case of a legal requirement, an authorized entity (like a regulator) can request the IDP to disclose a user’s real-world identity.',
-        request: 'Request Identity',
     },
     requestIdentity: {
         requestId: 'Request identity',

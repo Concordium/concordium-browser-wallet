@@ -14,12 +14,12 @@ export default function useEditableName(identity: BaseIdentity, onNewName?: NewN
     const { t } = useTranslation('x', { keyPrefix: 'sharedX' });
     const editable = useEditableValue(identity.name, fallbackIdentityName(identity.index), onNewName ?? (() => {}));
     const editNameAction = editable.isEditing ? (
-        <>
-            <Button.Secondary label={t('idCard.name.save')} onClick={editable.onComplete} />
-            <Button.Secondary label={t('idCard.name.abort')} onClick={editable.onAbort} />
-        </>
+        <div className="editable-name">
+            <Button.Main label={t('idCard.name.save')} size="small" onClick={editable.onComplete} />
+            <Button.Main label={t('idCard.name.abort')} size="small" onClick={editable.onAbort} />
+        </div>
     ) : (
-        onNewName && <Button.Secondary label={t('idCard.name.edit')} onClick={editable.onEdit} />
+        onNewName && <Button.Main label={t('idCard.name.edit')} size="small" onClick={editable.onEdit} />
     );
     return {
         value: editable.value,

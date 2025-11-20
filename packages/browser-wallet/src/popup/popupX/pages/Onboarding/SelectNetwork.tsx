@@ -17,7 +17,8 @@ function useNetworks() {
     const nav = useNavigate();
     const [currentNetworkConfiguration, setCurrentNetworkConfiguration] = useAtom(networkConfigurationAtom);
     const [customnet] = useAtom(customNetworkConfigurationAtom);
-    const navToCustom = () => nav(relativeRoutes.onboarding.setupPassword.createOrRestore.selectNetwork.custom.path);
+    const navToCustom = () =>
+        nav(relativeRoutes.onboarding.welcome.setupPassword.createOrRestore.selectNetwork.custom.path);
 
     const networks = [mainnet, testnet];
     if (isDevelopmentBuild()) {

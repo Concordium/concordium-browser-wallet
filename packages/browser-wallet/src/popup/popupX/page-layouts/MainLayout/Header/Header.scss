@@ -13,10 +13,10 @@
     .fade-menu-bg {
         position: absolute;
         top: 0;
-        margin: rem(90px) auto 0 auto;
+        margin: rem(94px) auto 0 auto;
         width: 100%;
         max-width: rem(1328px);
-        height: calc(100% - rem(90px));
+        height: calc(100% - rem(94px));
         z-index: 1;
         backdrop-filter: blur(10px);
         background: rgba($color-black, 0.9);
@@ -30,20 +30,18 @@
         display: flex;
         justify-content: space-between;
         gap: rem(4px);
-        padding: rem(4px);
+        padding: $semantic-padding-xs;
         align-items: center;
     }
 
     &__bottom {
         display: flex;
         justify-content: space-between;
-        padding: rem(20px) rem(24px);
+        padding: $semantic-padding-l $semantic-padding-xl;
     }
 
     &__fullscreen {
         display: flex;
-        width: 0;
-        flex: 1 1 0px;
 
         &_button {
             display: flex;
@@ -51,11 +49,21 @@
             justify-content: space-between;
             height: 100%;
             width: 100%;
-            padding: rem(4px) rem(6px);
             border: unset;
-            border-radius: 2px;
-            background: $gradient-header-button-bg;
             cursor: pointer;
+            border-radius: $semantic-radius-s;
+
+            @include button-sizes(
+                ($semantic-padding-s $semantic-padding-m),
+                $font-set-label-s-medium,
+                $semantic-label-s-scale,
+                $semantic-gap-xs
+            );
+            @include button-color-states(
+                ($semantic-content-secondary, transparent, $semantic-border-accent-tertiary),
+                ($semantic-content-secondary-hover, transparent, $semantic-border-accent-tertiary),
+                ($semantic-content-secondary-pressed, $semantic-surface-accent-tertiary, transparent)
+            );
 
             .tablet & {
                 padding: rem(12px);
@@ -67,80 +75,48 @@
 
     &__connection {
         display: flex;
-        flex: 1 1 0px;
+        flex-direction: column;
         align-items: center;
         white-space: nowrap;
-        width: 0;
-        height: rem(24px);
-        padding: rem(1px);
+        height: rem(32px);
         box-sizing: border-box;
         position: relative;
-        border-radius: 2px;
-        background: $gradient-header-button-bg;
+        border-radius: $semantic-radius-s;
+        margin-left: auto;
 
-        .tablet & {
-            background: unset;
-            display: none;
+        @include button-sizes(($semantic-padding-s), $font-set-label-s-medium, $semantic-label-m-line-height, 2px);
+        @include element-variant($semantic-content-secondary, transparent, $semantic-border-accent-tertiary);
+
+        &.hidden {
+            visibility: hidden;
         }
 
         &_info {
-            display: flex;
-            align-items: center;
-            justify-content: space-between;
-            width: 100%;
-            height: 100%;
-            border-radius: 2px;
-            padding: 0 rem(6px) 0 rem(8px);
-            background-color: $color-black;
-
-            .tablet & {
-                background: unset;
-            }
-
-            .info-icon {
-                margin-top: rem(1px);
-                cursor: pointer;
-
-                .tooltip-x_text.top {
-                    top: rem(24px);
-                    left: rem(-187px);
-                    text-wrap: auto;
-                    width: rem(205px);
-
-                    &::after {
-                        left: 91%;
-                    }
-                }
-            }
-
             & .connection_status {
                 display: flex;
-                align-items: center;
+                justify-content: center;
+
+                svg {
+                    width: rem(6px);
+                    height: rem(2px);
+                }
 
                 &.waiting {
-                    circle {
-                        fill: $color-orange-info;
+                    svg path {
+                        fill: $semantic-content-warning-primary;
                     }
                 }
 
                 &.connected {
-                    max-width: 90%;
-
-                    circle {
-                        fill: $color-green-success;
-                    }
-
-                    .capture__main_small {
-                        color: $color-white;
-                        overflow: hidden;
-                        white-space: nowrap;
-                        text-overflow: ellipsis;
+                    svg path {
+                        fill: $semantic-content-success-primary;
                     }
                 }
+            }
 
-                .capture__main_small {
-                    padding: 0 rem(10px) rem(2px) rem(6px);
-                }
+            .tablet & {
+                background: unset;
+                display: none;
             }
         }
     }
@@ -152,15 +128,28 @@
             visibility: hidden;
         }
 
-        .button__icon.transparent {
-            &:hover:not(:disabled) {
-                opacity: 1;
+        .button__icon {
+            background-color: transparent;
+            padding: $semantic-padding-xs;
+            border-radius: $semantic-radius-s;
+
+            &:hover {
+                background-color: $semantic-surface-tertiary-hover;
+            }
+
+            &:active {
+                background-color: $semantic-surface-tertiary-pressed;
+            }
+
+            svg {
+                width: rem(20px);
+                height: rem(20px);
             }
         }
     }
 
     &__menu-tiles {
-        padding: rem(14px) rem(24px) rem(24px) rem(24px);
+        padding: rem(10px) rem(24px) rem(24px) rem(24px);
 
         .tablet & {
             margin-top: rem(72px);

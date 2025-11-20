@@ -13,7 +13,51 @@
         }
     }
 
-    .button__icon {
-        margin-top: rem(24px);
+    .button__ui-kit_tertiary {
+        align-self: center;
+        margin-top: rem(12px);
+    }
+}
+
+.seed-phrase-x.save-seed-phrase {
+    .card-x.grey {
+        counter-reset: wordCount;
+        outline: #ebf0f00d solid rem(1px);
+        outline-offset: -1px;
+        border-radius: rem(12px);
+        border: unset;
+        background-color: #141a1a;
+        gap: 4px;
+        justify-content: center;
+        padding: rem(16px);
+
+        .label__regular {
+            counter-increment: wordCount;
+            display: flex;
+            align-items: baseline;
+            background-color: #1b2323;
+            outline: #ebf0f00d solid rem(1px);
+            outline-offset: -1px;
+            border-radius: rem(8px);
+            padding: rem(4px) rem(6px) rem(4px) rem(4px);
+            font-weight: $t-font-weight-regular;
+            font-size: $semantic-label-m-scale;
+            line-height: 20px;
+            color: #ccd5d5;
+            margin: unset;
+
+            &::before {
+                content: counter(wordCount);
+                display: flex;
+                justify-content: center;
+                width: rem(16px);
+                margin-right: rem(4px);
+                font-family: $t-font-family-ibm;
+                font-weight: $t-font-weight-light;
+                font-size: 12px;
+                line-height: $semantic-label-m-line-height;
+                color: #2b6168;
+            }
+        }
     }
 }

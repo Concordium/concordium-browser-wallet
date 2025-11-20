@@ -191,7 +191,7 @@ export default function DisplaySingleTransferTokenUpdate({
                 <TransferInfoAdvanced payload={stringifiedPayload} tokenId={tokenId} accountAddress={accountAddress} />
             </Page.Main>
             <Page.Footer>
-                <Button.Main className="secondary" label={t('reject')} onClick={rejectHandler} />
+                <Button.Main variant="secondary" label={t('reject')} onClick={rejectHandler} />
                 <Button.Main label={t('approve')} onClick={signHandler} />
             </Page.Footer>
         </Page>

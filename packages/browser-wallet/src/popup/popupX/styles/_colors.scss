@@ -35,33 +35,122 @@ $gradient-balance-bg: radial-gradient(
 
 // Semantic colors from unified design system
 
-// Primary Button
+// Surface
 $semantic-surface-primary: #fff;
 $semantic-surface-primary-hover: #d7e3ef;
 $semantic-surface-primary-pressed: #d0d4d6;
 $semantic-surface-primary-disabled: #2f3437;
-$semantic-content-inverse-primary: #131416;
-$semantic-content-primary-disabled: #4b5357;
-
-// Secondary Button
 $semantic-surface-secondary: #4b5357;
 $semantic-surface-secondary-hover: #78858b;
 $semantic-surface-secondary-pressed: #4b5357;
 $semantic-surface-secondary-disabled: $semantic-surface-primary-disabled;
-$semantic-content-primary: #fff;
-$semantic-content-primary-disabled: #4b5357;
-
-// Surface
-$semantic-border-accent-secondary: #b6c9e2;
-$semantic-border-tertiary: #4b5357;
-$semantic-content-secondary: #959ea3;
-$semantic-content-accent-secondary: #b6c9e2;
+$semantic-surface-tertiary: #212426;
+$semantic-surface-tertiary-hover: #2f3437;
+$semantic-surface-tertiary-pressed: #212426;
+$semantic-surface-tertiary-disabled: 'TBD';
+$semantic-surface-tertiary-selected: #5d6774;
+$semantic-surface-success-primary: 'TBD';
+$semantic-surface-success-secondary: 'TBD';
 $semantic-surface-success-tertiary: #0c261d;
-$semantic-border-success-secondary: #007050;
-$semantic-content-success-primary: #24d4ab;
+$semantic-surface-warning-primary: 'TBD';
+$semantic-surface-warning-secondary: 'TBD';
 $semantic-surface-warning-tertiary: #282418;
-$semantic-border-warning-secondary: #a17716;
-$semantic-content-warning-primary: #e8b126;
+$semantic-surface-error-primary: 'TBD';
+$semantic-surface-error-secondary: 'TBD';
 $semantic-surface-error-tertiary: #2b171b;
+$semantic-surface-accent-primary: 'TBD';
+$semantic-surface-accent-secondary: 'TBD';
+$semantic-surface-accent-tertiary: #d7e3ef;
+$semantic-surface-inverse-primary: #0d0f11;
+$semantic-surface-inverse-primary-hover: #24282d;
+$semantic-surface-inverse-primary-pressed: #363d44;
+$semantic-surface-inverse-primary-disabled: #d4d6d9;
+$semantic-surface-inverse-secondary: #aeb2b7;
+$semantic-surface-inverse-secondary-hover: #d4d6d9;
+$semantic-surface-inverse-secondary-pressed: #7d848c;
+$semantic-surface-inverse-secondary-disabled: 'TBD';
+$semantic-surface-inverse-tertiary: 'TBD';
+$semantic-surface-inverse-tertiary-hover: #bcbfc3;
+$semantic-surface-inverse-tertiary-pressed: #d4d6d9;
+$semantic-surface-inverse-tertiary-disabled: 'TBD';
+$semantic-surface-inverse-tertiary-selected: #9ca3aa;
+
+// Border
+$semantic-border-primary: 'TBD';
+$semantic-border-primary-hover: 'TBD';
+$semantic-border-primary-pressed: 'TBD';
+$semantic-border-primary-selected: 'TBD';
+$semantic-border-primary-disabled: #4b5357;
+$semantic-border-secondary: 'TBD';
+$semantic-border-secondary-hover: 'TBD';
+$semantic-border-secondary-pressed: 'TBD';
+$semantic-border-secondary-selected: 'TBD';
+$semantic-border-secondary-disabled: 'TBD';
+$semantic-border-tertiary: #4b5357;
+$semantic-border-tertiary-hover: #616b71;
+$semantic-border-tertiary-pressed: #2f3437;
+$semantic-border-tertiary-selected: #959ea3;
+$semantic-border-tertiary-disabled: 'TBD';
+$semantic-border-success-primary: 'TBD';
+$semantic-border-success-secondary: #007050;
+$semantic-border-success-tertiary: 'TBD';
+$semantic-border-warning-primary: 'TBD';
+$semantic-border-warning-secondary: #a17716;
+$semantic-border-warning-tertiary: 'TBD';
+$semantic-border-error-primary: 'TBD';
 $semantic-border-error-secondary: #830e30;
+$semantic-border-error-tertiary: 'TBD';
+$semantic-border-accent-primary: 'TBD';
+$semantic-border-accent-secondary: #b6c9e2;
+$semantic-border-accent-tertiary: #d7e3ef;
+$semantic-border-inverse-tertiary: #d4d6d9;
+$semantic-border-inverse-tertiary-hover: #5d6774;
+$semantic-border-inverse-tertiary-pressed: #9ca3aa;
+$semantic-border-inverse-tertiary-selected: #5d6774;
+$semantic-border-inverse-disabled: #d4d6d9;
+
+// Content
+$semantic-content-primary: #fff;
+$semantic-content-primary-hover: 'TBD';
+$semantic-content-primary-pressed: 'TBD';
+$semantic-content-primary-disabled: #4b5357;
+$semantic-content-secondary: #959ea3;
+$semantic-content-secondary-hover: #b2b9bc;
+$semantic-content-secondary-pressed: #4b5357;
+$semantic-content-secondary-disabled: 'TBD';
+$semantic-content-tertiary: #4b5357;
+$semantic-content-tertiary-hover: 'TBD';
+$semantic-content-tertiary-pressed: 'TBD';
+$semantic-content-tertiary-disabled: 'TBD';
+$semantic-content-success-primary: #24d4ab;
+$semantic-content-success-secondary: 'TBD';
+$semantic-content-success-tertiary: 'TBD';
+$semantic-content-warning-primary: #e8b126;
+$semantic-content-warning-secondary: 'TBD';
+$semantic-content-warning-tertiary: 'TBD';
 $semantic-content-error-primary: #d62e4c;
+$semantic-content-error-secondary: 'TBD';
+$semantic-content-error-tertiary: 'TBD';
+$semantic-content-accent-primary: 'TBD';
+$semantic-content-accent-secondary: #b6c9e2;
+$semantic-content-accent-tertiary: #d7e3ef;
+$semantic-content-inverse-primary: #131416;
+$semantic-content-inverse-secondary: 'TBD';
+$semantic-content-inverse-tertiary: #2f3437;
+$semantic-content-inverse-accent-primary: 'TBD';
+$semantic-content-inverse-accent-secondary: 'TBD';
+$semantic-content-inverse-accent-tertiary: #435e7c;
+$semantic-content-inverse-disabled: #9ca3aa;
+
+// Special
+$semantic-background-l0: #131416;
+$semantic-surface-primary-a10: #ffffff1a;
+$semantic-content-primary-a40: #fff6;
+$semantic-surface-inverse-primary-a10: #0000001a;
+$semantic-surface-inverse-primary-hover-a20: #0003;
+$semantic-border-primary-a10: #ffffff1a;
+$semantic-border-inverse-primary-a10: #0000001a;
+$modal-gradient-bg: (
+    linear-gradient(0deg, rgb(255 255 255 / 70%), rgb(255 255 255 / 70%)),
+    radial-gradient(96.79% 220.2% at 0% 0%, #9ef2eb 0%, #eddabf 50%, #a49ae3 100%)
+);

@@ -266,7 +266,7 @@ export default function AddTokens({ respond }: Props) {
             <Page.Footer>
                 {allExisting || (
                     <>
-                        <Button.Main className="secondary" label={t('cancel')} onClick={withClose(() => respond([]))} />
+                        <Button.Main variant="secondary" label={t('cancel')} onClick={withClose(() => respond([]))} />
                         <Button.Main
                             label={t('add')}
                             onClick={() =>

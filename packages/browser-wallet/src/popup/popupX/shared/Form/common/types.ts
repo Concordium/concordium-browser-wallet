@@ -1,4 +1,4 @@
-import { ChangeEventHandler, FocusEventHandler } from 'react';
+import { ChangeEventHandler, FocusEventHandler, ReactNode } from 'react';
 import { ControllerRenderProps, UseFormRegisterReturn } from 'react-hook-form';
 
 export type RequiredFormFieldProps = {
@@ -31,5 +31,5 @@ export type CommonFieldProps = {
     /**
      * Note, providing extra information related to the field.
      */
-    note?: string;
+    note?: string | ReactNode;
 };

@@ -7,12 +7,24 @@
     z-index: 3;
 
     &__back {
+        display: flex;
+        align-items: center;
         border: none;
         background: none;
-        padding: rem(5px) 0 rem(3px);
+        padding: unset;
+        min-height: rem(32px);
 
         &:hover {
             background: none !important;
+        }
+
+        svg {
+            width: $semantic-label-m-line-height;
+            height: $semantic-label-m-line-height;
+
+            path {
+                fill: $semantic-content-primary;
+            }
         }
     }
 

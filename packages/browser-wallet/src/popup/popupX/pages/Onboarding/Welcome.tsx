@@ -1,10 +1,7 @@
-import React, { ReactNode, useEffect } from 'react';
-import { useAtom } from 'jotai';
-import { acceptedTermsAtom, networkConfigurationAtom, uiStyleAtom } from '@popup/store/settings';
-import { mainnet } from '@shared/constants/networkConfiguration';
-import Shield from '@assets/svgX/crypto-currency-square-shield.svg';
-import Assets from '@assets/svgX/crypto-currency-assets.svg';
-import Possibilities from '@assets/svgX/crypto-currency-possibilities.svg';
+import React from 'react';
+import { useAtom, useSetAtom } from 'jotai';
+import { acceptedTermsAtom, sessionOnboardingLocationAtom } from '@popup/store/settings';
+import ArrowRight from '@assets/svgX/UiKit/Arrows/arrow-right.svg';
 import Button from '@popup/popupX/shared/Button';
 import { useNavigate } from 'react-router-dom';
 import { absoluteRoutes } from '@popup/popupX/constants/routes';
@@ -15,27 +12,13 @@ import Text from '@popup/popupX/shared/Text';
 import Page from '@popup/popupX/shared/Page';
 import { useAsyncMemo } from 'wallet-common-helpers';
 import { getTermsAndConditionsConfig } from '@shared/utils/network-helpers';
-import { UiStyle } from '@shared/storage/types';
-
-const bg = document.getElementsByClassName('bg').item(0);
-
-function Description({ icon, title, description }: { icon: ReactNode; title: string; description: string }) {
-    return (
-        <div className="welcome__description">
-            <div className="welcome__description_icon">{icon}</div>
-            <div className="welcome__description_text">
-                <Text.Main>{title}</Text.Main>
-                <Text.Capture>{description}</Text.Capture>
-            </div>
-        </div>
-    );
-}
+import FullLogo from '@assets/svgX/UiKit/Custom/concordium-full-logo.svg';
+import LandingImg from '@assets/svgX/UiKit/Custom/graphic-landing-4.svg';
 
 export default function Welcome() {
     const { t } = useTranslation('x', { keyPrefix: 'onboarding.welcome' });
-    const [, setCurrentNetworkConfiguration] = useAtom(networkConfigurationAtom);
+    const setOnboardingLocation = useSetAtom(sessionOnboardingLocationAtom);
     const [{ value: acceptedTerms }, setAcceptedTerms] = useAtom(acceptedTermsAtom);
-    const [, setUiStyle] = useAtom(uiStyleAtom);
     const config = useAsyncMemo(getTermsAndConditionsConfig, undefined, []);
     const nav = useNavigate();
     const navToPassword = () => {
@@ -43,41 +26,32 @@ export default function Welcome() {
         // If we didn't find a version, put in an empty version
         setAcceptedTerms({ accepted: true, version: version || '', url: config?.url });
 
-        setUiStyle(UiStyle.WalletX);
-
-        return nav(absoluteRoutes.onboarding.setupPassword.path);
+        const pathToPassword = absoluteRoutes.onboarding.welcome.setupPassword.path;
+        setOnboardingLocation(pathToPassword);
+        return nav(pathToPassword);
     };
-
-    useEffect(() => {
-        bg?.classList.add('welcome-page');
-
-        // needed for proper network handling during onboarding
-        // otherwise failing with error 'Indexed storage should not be accessed before setting the network'
-        setCurrentNetworkConfiguration(mainnet);
-    }, []);
 
     return (
         <Page className="welcome">
-            <Page.Top heading={t('welcomeTo')} />
             <Page.Main>
-                <Description icon={<Shield />} title={t('safeSecure')} description={t('trusted')} />
-                <Description icon={<Assets />} title={t('easyManage')} description={t('spendAssets')} />
-                <Description icon={<Possibilities />} title={t('unlimited')} description={t('transactionInvest')} />
+                <FullLogo className="full-logo" />
+                <Text.MainMedium>{t('smartMoney')}</Text.MainMedium>
+                <LandingImg className="landing-img" />
+                <Text.Heading>{t('speed')}</Text.Heading>
+                <Text.MainRegular>{t('fastPayments')}</Text.MainRegular>
+                <Text.Capture>
+                    {t('proceeding')}
+                    <ExternalLink path={urls.termsAndConditions}>{t('termsAndConditions')}</ExternalLink>
+                </Text.Capture>
             </Page.Main>
             <Page.Footer>
                 <Button.Main
                     label={t('start')}
+                    iconRight={<ArrowRight />}
                     onClick={() => {
-                        bg?.classList.remove('welcome-page');
                         navToPassword();
                     }}
                 />
-                <div className="welcome__footer">
-                    <Text.Capture>
-                        {t('proceeding')}
-                        <ExternalLink path={urls.termsAndConditions}>{t('termsAndConditions')}</ExternalLink>
-                    </Text.Capture>
-                </div>
             </Page.Footer>
         </Page>
     );

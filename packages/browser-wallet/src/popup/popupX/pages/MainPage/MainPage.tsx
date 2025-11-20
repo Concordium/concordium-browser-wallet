@@ -1,4 +1,4 @@
-import React, { ReactNode, useMemo } from 'react';
+import React, { ReactNode, useMemo, useState } from 'react';
 import { generatePath, useNavigate } from 'react-router-dom';
 import { useTranslation } from 'react-i18next';
 import { useAtom, useAtomValue } from 'jotai';
@@ -18,18 +18,25 @@ import Text from '@popup/popupX/shared/Text';
 import Button from '@popup/popupX/shared/Button';
 import { withSelectedCredential } from '@popup/popupX/shared/utils/hoc';
 import { PLT } from '@shared/constants/token';
+import ArrowUp from '@assets/svgX/UiKit/Arrows/arrow-up.svg';
+import ArrowDown from '@assets/svgX/UiKit/Arrows/arrow-down.svg';
 import Arrow from '@assets/svgX/arrow-right.svg';
-import Clock from '@assets/svgX/clock.svg';
-import Plus from '@assets/svgX/plus.svg';
-import ConcordiumLogo from '@assets/svgX/concordium-logo.svg';
-import Percent from '@assets/svgX/percent.svg';
-import Gear from '@assets/svgX/gear.svg';
+import Clock from '@assets/svgX/UiKit/MenuNavigation/clock-activity-history-time.svg';
+import Plus from '@assets/svgX/UiKit/Interface/plus-add-buy.svg';
+import ConcordiumLogo from '@assets/svgX/UiKit/Custom/concordium-glyph-only.svg';
+import Percent from '@assets/svgX/UiKit/Interface/percentage-earn-staking.svg';
+import Gear from '@assets/svgX/UiKit/Interface/settings-gear-cog.svg';
+import Shield from '@assets/svgX/UiKit/Interface/shield-square-crypto.svg';
+import RestoreSeed from '@assets/svgX/UiKit/Interface/restore-seed-phrase.svg';
+import WalletCoin from '@assets/svgX/UiKit/Interface/wallet-coin.svg';
 import Dot from '@assets/svgX/dot.svg';
 import Info from '@assets/svgX/info.svg';
 import Pause from '@assets/svgX/pause.svg';
 import Tooltip from '@popup/popupX/shared/Tooltip';
 import { credentialsAtom, credentialsAtomWithLoading, selectedAccountAtom } from '@popup/store/account';
+import { hasBeenSavedSeedAtom } from '@popup/store/settings';
 import { SuspendedStatus, useSuspendedStatus } from '@popup/popupX/shared/utils/pool-status-helpers';
+import Modal from '@popup/popupX/shared/Modal';
 
 /** Hook loading every fungible token added to the account. */
 function useAccountFungibleTokens(account: WalletCredential) {
@@ -86,9 +93,9 @@ function Balance({ credential }: { credential: WalletCredential }) {
                 </Tooltip>
             </div>
             {accountInfo.accountAmount.microCcdAmount !== accountInfo.accountAvailableBalance.microCcdAmount && (
-                <Text.Capture>
-                    {ccdAvailableBalance} {t('atDisposal')}
-                </Text.Capture>
+                <Text.MainRegular className="available-balance">
+                    {ccdAvailableBalance} {t('available')}
+                </Text.MainRegular>
             )}
         </div>
     );
@@ -100,10 +107,21 @@ type TokenItemProps = {
     balance: string | ReactNode;
     balanceBase?: bigint;
     staked?: boolean;
+    isPlt?: boolean;
     microCcdPerEur?: Ratio;
     onClick: () => void;
 };
-function TokenItem({ thumbnail, symbol, balance, balanceBase, staked, microCcdPerEur, onClick }: TokenItemProps) {
+function TokenItem({
+    thumbnail,
+    symbol,
+    isPlt,
+    balance,
+    balanceBase,
+    staked,
+    microCcdPerEur,
+    onClick,
+}: TokenItemProps) {
+    const { t } = useTranslation('x', { keyPrefix: 'mainPage' });
     const isNoExchange = microCcdPerEur === undefined || balanceBase === undefined;
     return (
         <Button.Base onClick={onClick} className="main-page-x__tokens-list_item">
@@ -112,8 +130,18 @@ function TokenItem({ thumbnail, symbol, balance, balanceBase, staked, microCcdPe
             </div>
             <div className="token-balance">
                 <div className="token-balance__amount">
-                    <Text.Label>{symbol}</Text.Label>
-                    {staked && <Percent />}
+                    <div className="token-status">
+                        <div className="token-symbol">
+                            <Text.Label>{symbol}</Text.Label>
+                            {staked && <Percent />}
+                        </div>
+                        {isPlt && (
+                            <div className="token-plt">
+                                <Shield />
+                                <Text.Capture>{t('plt')}</Text.Capture>
+                            </div>
+                        )}
+                    </div>
                     <span className="balance-rate">
                         <Text.Label>{balance}</Text.Label>
                         {isNoExchange ? null : (
@@ -191,6 +219,49 @@ function SuspendedEarnInfo() {
     );
 }
 
+function MainPageCta() {
+    const { t } = useTranslation('x', { keyPrefix: 'mainPage' });
+    const nav = useNavigate();
+    const [showPrompt, setShowPrompt] = useState(false);
+    const [hasBeenSavedSeed, setHasBeenSavedSeed] = useAtom(hasBeenSavedSeedAtom);
+    const navToSaveSeedPhrase = () => nav(absoluteRoutes.settings.saveSeedPhrase.path);
+
+    if (hasBeenSavedSeed) return null;
+
+    return (
+        <>
+            <Modal className="cta_modal" middle open={showPrompt} onClose={() => setShowPrompt(false)}>
+                <Text.Main>{t('cta.modal.sure')}</Text.Main>
+                <Text.MainRegular>{t('cta.modal.recommendBackup')}</Text.MainRegular>
+                <Button.Main
+                    inverse
+                    variant="secondary"
+                    label={t('cta.modal.hide')}
+                    onClick={() => {
+                        setHasBeenSavedSeed(true);
+                        setShowPrompt(false);
+                    }}
+                />
+                <Button.Main
+                    inverse
+                    label={t('cta.modal.backup')}
+                    onClick={() => {
+                        setShowPrompt(false);
+                        navToSaveSeedPhrase();
+                    }}
+                />
+            </Modal>
+            <Button.HomepageCta
+                icon={<RestoreSeed />}
+                title={t('cta.backup')}
+                description={t('cta.keepSafe')}
+                onClick={navToSaveSeedPhrase}
+                onCancel={() => setShowPrompt(true)}
+            />
+        </>
+    );
+}
+
 type MainPageConfirmedAccountProps = { credential: ConfirmedCredential };
 
 function MainPageConfirmedAccount({ credential }: MainPageConfirmedAccountProps) {
@@ -227,10 +298,11 @@ function MainPageConfirmedAccount({ credential }: MainPageConfirmedAccountProps)
     return (
         <Page className="main-page-x">
             <Balance credential={credential} />
+            <MainPageCta />
             <div className="main-page-x__action-buttons">
                 <Button.IconTile icon={<Plus />} label={t('buy')} onClick={navToBuy} className="buy" />
-                <Button.IconTile icon={<Arrow />} label={t('receive')} onClick={navToReceive} className="receive" />
-                <Button.IconTile icon={<Arrow />} label={t('send')} onClick={navToSend} className="send" />
+                <Button.IconTile icon={<ArrowDown />} label={t('receive')} onClick={navToReceive} className="receive" />
+                <Button.IconTile icon={<ArrowUp />} label={t('send')} onClick={navToSend} className="send" />
                 <Button.IconTile
                     icon={<Percent />}
                     label={t('earn')}
@@ -260,6 +332,7 @@ function MainPageConfirmedAccount({ credential }: MainPageConfirmedAccountProps)
                             key={`${token.contractIndex}.${token.id}`}
                             thumbnail={token.metadata.thumbnail?.url || ''}
                             symbol={token.metadata.symbol || ''}
+                            isPlt={token.contractIndex === PLT}
                             balance={
                                 <AccountTokenBalance
                                     decimals={token.metadata.decimals}
@@ -270,7 +343,7 @@ function MainPageConfirmedAccount({ credential }: MainPageConfirmedAccountProps)
                             }
                         />
                     ))}
-                    <Button.IconText onClick={navToManageToken} icon={<Gear />} label={t('manageTokenList')} />
+                    <Button.Tertiary onClick={navToManageToken} iconLeft={<Gear />} label={t('manageTokenList')} />
                 </div>
             </div>
             <SuspendedEarnInfo />
@@ -284,18 +357,26 @@ function MainPagePendingAccount() {
     return (
         <Page className="main-page-x">
             <div className="main-page-x__balance">
-                <Text.DynamicSize baseFontSize={55} baseTextLength={10} className="heading_large">
-                    0.00 CCD
-                </Text.DynamicSize>
+                <div className="main-page-x__balance_info">
+                    <Text.DynamicSize baseFontSize={55} baseTextLength={10} className="heading_large">
+                        0.00 CCD
+                    </Text.DynamicSize>
+                    <Tooltip position="top" title={t('tooltip.title')} text={t('tooltip.text')} className="info-icon">
+                        <Info />
+                    </Tooltip>
+                </div>
             </div>
             <div className="main-page-x__pending">
+                <div className="pending-icon">
+                    <WalletCoin />
+                </div>
                 <Text.Main>{t('pendingSubText')}</Text.Main>
                 <Dot />
             </div>
             <div className="main-page-x__action-buttons">
                 <Button.IconTile icon={<Plus />} label={t('buy')} disabled className="buy" />
-                <Button.IconTile icon={<Arrow />} label={t('receive')} disabled className="receive" />
-                <Button.IconTile icon={<Arrow />} label={t('send')} disabled className="send" />
+                <Button.IconTile icon={<ArrowDown />} label={t('receive')} disabled className="receive" />
+                <Button.IconTile icon={<ArrowUp />} label={t('send')} disabled className="send" />
                 <Button.IconTile icon={<Percent />} label={t('earn')} disabled />
                 <Button.IconTile icon={<Clock />} label={t('activity')} disabled />
             </div>
@@ -308,7 +389,7 @@ function MainPagePendingAccount() {
                         balance={mainPageCcdDisplay(0n)}
                         balanceBase={0n}
                     />
-                    <Button.IconText disabled icon={<Gear />} label={t('manageTokenList')} />
+                    <Button.Tertiary disabled iconLeft={<Gear />} label={t('manageTokenList')} />
                 </div>
             </div>
         </Page>

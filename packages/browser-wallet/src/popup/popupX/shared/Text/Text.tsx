@@ -26,8 +26,8 @@ function TextMain({ children }: { children: ReactNode }) {
     return <span className="text__main">{children}</span>;
 }
 
-function TextMainRegular({ children }: { children: ReactNode }) {
-    return <span className="text__main_regular">{children}</span>;
+function TextMainRegular({ children, className }: { className?: string; children: ReactNode }) {
+    return <span className={clsx('text__main_regular', className)}>{children}</span>;
 }
 function TextMainMedium({ children, className }: { className?: string; children: ReactNode }) {
     return <span className={clsx('text__main_medium', className)}>{children}</span>;
@@ -53,6 +53,10 @@ function TextLabelMain({ className, children }: { className?: string; children: 
 
 function TextLabelRegular({ className, children }: { className?: string; children: ReactNode }) {
     return <span className={clsx('label__regular', className)}>{children}</span>;
+}
+
+function TextUiKit({ className, children }: { className?: string; children: ReactNode }) {
+    return <span className={clsx('text_ui-kit', className)}>{children}</span>;
 }
 
 type Props = ClassName & { path: string; children?: string | ReactNode };
@@ -109,6 +113,7 @@ const Text = TextRoot as typeof TextRoot & {
     LabelRegular: typeof TextLabelRegular;
     ExternalLink: typeof TextExternalLink;
     DynamicSize: typeof TextDynamicSize;
+    UiKit: typeof TextUiKit;
 };
 Text.HeadingLarge = TextHeadingLarge;
 Text.HeadingBig = TextHeadingBig;
@@ -123,5 +128,6 @@ Text.Label = TextLabelMain;
 Text.LabelRegular = TextLabelRegular;
 Text.ExternalLink = TextExternalLink;
 Text.DynamicSize = TextDynamicSize;
+Text.UiKit = TextUiKit;
 
 export default Text;

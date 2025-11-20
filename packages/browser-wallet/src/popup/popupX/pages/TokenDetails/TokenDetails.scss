@@ -35,14 +35,6 @@
         width: 100%;
         gap: rem(4px);
         margin-top: rem(12px);
-
-        .send svg {
-            transform: rotate(-90deg);
-        }
-
-        .receive svg {
-            transform: rotate(90deg);
-        }
     }
 
     &__token {

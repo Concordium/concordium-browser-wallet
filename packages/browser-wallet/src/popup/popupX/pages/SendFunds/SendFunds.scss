@@ -23,7 +23,6 @@
 
     .send-funds-scroll-wrapper {
         overflow-y: scroll;
-        margin-bottom: rem(2px);
         animation: border-on-scroll linear;
         animation-timeline: scroll(self);
         width: calc(100% + rem(48px));
@@ -40,7 +39,6 @@
         bottom: rem(32px);
         padding-top: rem(16px);
         width: 100%;
-        background-color: $color-bg;
     }
 
     .send-funds-confirm {

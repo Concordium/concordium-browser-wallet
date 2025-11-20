@@ -1,6 +1,6 @@
 import React, { useCallback, useMemo, useState } from 'react';
-import Plus from '@assets/svgX/plus.svg';
-import Arrows from '@assets/svgX/arrows-down-up.svg';
+import Plus from '@assets/svgX/UiKit/Interface/plus-add-buy.svg';
+import Arrows from '@assets/svgX/UiKit/Arrows/up-down-transfer.svg';
 import Pencil from '@assets/svgX/pencil-simple.svg';
 import Checkmark from '@assets/svgX/checkmark.svg';
 import Close from '@assets/svgX/close.svg';

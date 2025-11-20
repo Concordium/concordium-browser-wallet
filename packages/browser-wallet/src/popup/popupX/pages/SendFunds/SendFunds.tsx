@@ -175,7 +175,6 @@ function SendFunds({ address }: SendFundsProps) {
                 <Page.Footer>
                     <Button.Main
                         disabled={!form.formState.isValid || metadata?.moduleState?.denyList}
-                        className="button-main"
                         onClick={form.handleSubmit(onSubmit)}
                         label={t('continue')}
                     />

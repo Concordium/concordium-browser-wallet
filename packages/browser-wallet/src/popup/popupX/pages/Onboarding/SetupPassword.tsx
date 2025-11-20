@@ -11,7 +11,7 @@ import { useAtom, useSetAtom } from 'jotai';
 import { passcodeAtom } from '@popup/state';
 import { useForm } from '@popup/shared/Form';
 import { SubmitHandler, Validate } from 'react-hook-form';
-import { encryptedSeedPhraseAtom, sessionPasscodeAtom } from '@popup/store/settings';
+import { encryptedSeedPhraseAtom, sessionOnboardingLocationAtom, sessionPasscodeAtom } from '@popup/store/settings';
 
 type FormValues = {
     passcode: string;
@@ -21,18 +21,20 @@ type FormValues = {
 export default function SetupPassword() {
     const { t } = useTranslation('x', { keyPrefix: 'onboarding.setupPassword' });
     const nav = useNavigate();
-    const navToNext = () => nav(absoluteRoutes.onboarding.setupPassword.createOrRestore.path);
+    const setOnboardingLocation = useSetAtom(sessionOnboardingLocationAtom);
     const setPasscode = useSetAtom(passcodeAtom);
     const setPasscodeInSession = useSetAtom(sessionPasscodeAtom);
     const [, setEncryptedSeedPhrase] = useAtom(encryptedSeedPhraseAtom);
-    const form = useForm<FormValues>();
+    const form = useForm<FormValues>({ mode: 'onChange' });
     const passcode = form.watch('passcode');
 
     const handleSubmit: SubmitHandler<FormValues> = (vs) => {
+        const pathToCreateOrRestore = absoluteRoutes.onboarding.welcome.setupPassword.createOrRestore.path;
         setPasscode(vs.passcode);
         setPasscodeInSession(vs.passcode);
         setEncryptedSeedPhrase(undefined);
-        navToNext();
+        setOnboardingLocation(pathToCreateOrRestore);
+        nav(pathToCreateOrRestore);
     };
 
     const passcodesAreEqual: Validate<string> = useCallback(
@@ -48,10 +50,9 @@ export default function SetupPassword() {
 
     return (
         <Page className="setup-password">
+            <Page.Top heading={t('setPassword')} />
             <Page.Main>
                 <div className="setup-password__title">
-                    <span className="concordium-logo-white" />
-                    <Text.Heading>{t('setPassword')}</Text.Heading>
                     <Text.MainRegular>{t('firstStep')}</Text.MainRegular>
                 </div>
                 <Form
@@ -86,7 +87,12 @@ export default function SetupPassword() {
                 </Form>
             </Page.Main>
             <Page.Footer>
-                <Button.Main form="setup-password-form" type="submit" label={t('continue')} onClick={() => {}} />
+                <Button.Main
+                    form="setup-password-form"
+                    type="submit"
+                    label={t('continue')}
+                    disabled={!form.formState.isValid}
+                />
             </Page.Footer>
         </Page>
     );

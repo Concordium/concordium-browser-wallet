@@ -32,7 +32,7 @@ export default function SelfSuspend() {
             </Page.Main>
             <Page.Footer>
                 <Button.Main
-                    className="secondary"
+                    variant="secondary"
                     label={t('continue')}
                     onClick={() => nav(absoluteRoutes.settings.earn.validator.submit.path, { state: SUSPEND_STATE })}
                 />

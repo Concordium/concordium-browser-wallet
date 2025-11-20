@@ -1,12 +1,16 @@
+@mixin base-button {
+    cursor: pointer;
+    font-family: $t-font-family-satoshi;
+
+    &:focus-visible {
+        outline: 1px solid $color-white;
+        outline-offset: -1px;
+    }
+}
+
 .button {
     &__base {
-        cursor: pointer;
-        font-family: $t-font-family-satoshi;
-
-        &:focus-visible {
-            outline: 1px solid $color-white;
-            outline-offset: -1px;
-        }
+        @include base-button;
     }
 
     &__main {
@@ -67,12 +71,22 @@
         display: flex;
         align-items: center;
         justify-content: center;
-        padding: rem(8px);
-        border-radius: rem(4px);
+        padding: $semantic-padding-s;
+        border-radius: $semantic-radius-s;
         border: unset;
         cursor: pointer;
-        background-color: $color-main-bg;
+        background-color: $semantic-surface-tertiary;
         @include transition(background-color);
+
+        &:hover {
+            background-color: $semantic-surface-tertiary-hover;
+        }
+
+        &:active {
+            background-color: $semantic-surface-tertiary-pressed;
+            outline: 1px solid $semantic-border-tertiary-pressed;
+            outline-offset: -1px;
+        }
 
         &.text {
             display: flex;
@@ -93,24 +107,26 @@
             display: flex;
             flex-direction: column;
             align-items: center;
-            gap: rem(8px);
+            gap: $semantic-gap-s;
             flex: 1;
-            padding: rem(14px) rem(0);
-            border-radius: rem(12px);
-            background-color: $color-transaction-bg;
+            padding: rem(15.5px) rem(0);
+            border-radius: $semantic-radius-m;
 
             .capture__additional_small {
-                color: $color-white;
+                line-height: $semantic-label-s-line-height;
+                color: $semantic-content-primary;
             }
 
             svg {
-                width: rem(24px);
-                height: rem(24px);
+                width: rem(18px);
+                height: rem(18px);
 
                 path {
-                    fill: $color-mineral-2;
+                    fill: $semantic-content-accent-secondary;
                 }
             }
+
+            @include surface-states-tertiary;
 
             &:disabled {
                 background-color: $semantic-surface-primary-disabled;
@@ -140,12 +156,315 @@
 
         &:hover:not(:disabled) {
             border-color: unset;
-            background-color: $color-main-bg-hover;
         }
 
         svg {
-            width: auto;
-            height: auto;
+            width: rem(16px);
+            height: rem(16px);
+
+            path {
+                fill: $semantic-content-primary;
+            }
         }
+    }
+}
+
+.button__ui-kit {
+    @include base-button;
+
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    border-radius: $semantic-radius-rounded;
+
+    &_primary {
+        @include button-color-states(
+            ($semantic-content-inverse-primary, $semantic-surface-primary),
+            ($semantic-content-inverse-primary, $semantic-surface-primary-hover),
+            ($semantic-content-inverse-primary, $semantic-surface-primary-pressed),
+            ($semantic-content-primary-disabled, $semantic-surface-primary-disabled)
+        );
+
+        &.inverse {
+            @include button-color-states(
+                ($semantic-content-primary, $semantic-surface-inverse-primary),
+                ($semantic-content-primary, $semantic-surface-inverse-primary-hover),
+                ($semantic-content-primary, $semantic-surface-inverse-primary-pressed),
+                ($semantic-content-inverse-disabled, $semantic-surface-inverse-primary-disabled)
+            );
+        }
+    }
+
+    &_secondary {
+        @include button-color-states(
+            ($semantic-content-primary, $semantic-surface-secondary),
+            ($semantic-content-primary, $semantic-surface-secondary-hover),
+            ($semantic-content-primary, $semantic-surface-secondary-pressed),
+            ($semantic-content-primary-disabled, $semantic-surface-secondary-disabled)
+        );
+
+        &.inverse {
+            @include button-color-states(
+                ($semantic-content-inverse-primary, $semantic-surface-inverse-secondary),
+                ($semantic-content-inverse-primary, $semantic-surface-inverse-secondary-hover),
+                ($semantic-content-inverse-primary, $semantic-surface-inverse-secondary-pressed),
+                ($semantic-content-inverse-disabled, $semantic-surface-inverse-primary-disabled)
+            );
+        }
+    }
+
+    &_tertiary {
+        @include button-color-states(
+            ($semantic-content-secondary, transparent, $semantic-border-tertiary),
+            ($semantic-content-primary, $semantic-surface-tertiary-hover),
+            ($semantic-content-primary, $semantic-surface-tertiary-pressed, $semantic-border-tertiary-pressed),
+            ($semantic-content-primary-disabled, transparent, $semantic-border-primary-disabled)
+        );
+
+        &.inverse {
+            @include button-color-states(
+                ($semantic-content-inverse-secondary, transparent, $semantic-border-inverse-tertiary),
+                ($semantic-content-inverse-primary, $semantic-surface-tertiary-hover),
+                (
+                    $semantic-content-inverse-primary,
+                    $semantic-surface-tertiary-pressed,
+                    $semantic-border-tertiary-pressed
+                ),
+                ($semantic-content-inverse-disabled, transparent, $semantic-border-inverse-disabled)
+            );
+        }
+    }
+
+    &_large {
+        @include button-sizes(
+            ($semantic-padding-l $semantic-padding-xl),
+            (
+                $t-font-weight-medium,
+                $semantic-label-m-scale,
+                $semantic-label-m-line-height,
+                $semantic-label-s-letter-spacing
+            ),
+            $semantic-label-m-line-height,
+            $semantic-gap-s,
+            100%
+        );
+    }
+
+    &_medium {
+        @include button-sizes(
+            ($semantic-padding-s $semantic-padding-m),
+            (
+                $t-font-weight-medium,
+                $semantic-label-m-scale,
+                $semantic-label-m-line-height,
+                $semantic-label-s-letter-spacing
+            ),
+            $semantic-label-m-line-height,
+            $semantic-gap-s
+        );
+    }
+
+    &_small {
+        @include button-sizes(
+            ($semantic-padding-xs $semantic-padding-s),
+            (
+                $t-font-weight-medium,
+                $semantic-label-s-scale,
+                $semantic-label-s-line-height,
+                $semantic-label-s-letter-spacing
+            ),
+            $semantic-label-xs-line-height,
+            $semantic-gap-xs
+        );
+    }
+}
+
+.button__onboarding-option {
+    @include base-button;
+
+    display: flex;
+    align-items: center;
+    gap: $semantic-gap-l;
+    border: unset;
+    border-radius: $semantic-radius-m;
+    padding: $semantic-padding-l;
+    background-color: $semantic-surface-primary;
+
+    .icon-container {
+        width: rem(40px);
+        height: rem(40px);
+        border-radius: $semantic-radius-s;
+        padding: $semantic-padding-s;
+        background-color: $semantic-surface-inverse-primary-a10;
+
+        svg {
+            width: rem(24px);
+            height: rem(24px);
+
+            path {
+                fill: $semantic-content-inverse-accent-tertiary;
+            }
+        }
+    }
+
+    .text-container {
+        display: flex;
+        flex-direction: column;
+        align-items: flex-start;
+
+        .text__main_medium {
+            color: $semantic-content-inverse-primary;
+        }
+
+        .capture__main_small {
+            text-align: left;
+            color: $semantic-content-secondary;
+        }
+    }
+
+    &:hover {
+        background-color: $semantic-surface-primary-hover;
+    }
+
+    &:active {
+        background-color: $semantic-surface-primary-pressed;
+        outline: 1px solid $semantic-border-tertiary-pressed;
+        outline-offset: -1px;
+    }
+}
+
+.container__cta {
+    display: flex;
+    position: relative;
+    border-radius: $semantic-radius-m;
+    outline: 1px solid $semantic-border-tertiary;
+    outline-offset: -1px;
+
+    &:hover {
+        background-color: $semantic-surface-tertiary-hover;
+        outline-color: $semantic-border-tertiary-hover;
+    }
+
+    &:active {
+        background-color: $semantic-surface-tertiary-pressed;
+        outline-color: $semantic-border-tertiary-pressed;
+    }
+
+    .button__homepage-cta {
+        @include base-button;
+
+        display: flex;
+        align-items: center;
+        padding: $semantic-padding-m rem(44px) $semantic-padding-m $semantic-padding-m;
+        gap: $semantic-gap-s;
+        background: transparent;
+        border: unset;
+        border-radius: $semantic-radius-m;
+
+        .icon-container {
+            display: flex;
+            padding: rem(10px);
+            border-radius: $semantic-radius-rounded;
+            background-color: $semantic-surface-primary-a10;
+
+            svg {
+                width: rem(20px);
+                height: rem(20px);
+            }
+        }
+
+        .text-container {
+            display: flex;
+            flex-direction: column;
+            align-items: flex-start;
+            text-align: left;
+            gap: $semantic-gap-xs;
+
+            .text__main_medium {
+                font-size: $semantic-label-l-scale;
+                line-height: $semantic-label-l-line-height;
+                color: $semantic-content-primary;
+            }
+
+            .capture__main_small {
+                font-size: $semantic-label-s-scale;
+                line-height: $semantic-label-s-line-height;
+                color: $semantic-content-secondary;
+            }
+        }
+    }
+
+    .cancel-button {
+        @include base-button;
+
+        display: flex;
+        position: absolute;
+        right: $semantic-gap-l;
+        top: 50%;
+        transform: translateY(-50%);
+        border: unset;
+        padding: unset;
+        background-color: transparent;
+        margin: unset;
+
+        svg {
+            width: rem(20px);
+            height: rem(20px);
+
+            path {
+                fill: $semantic-content-primary-a40;
+            }
+        }
+    }
+}
+
+.button__embedded {
+    @include base-button;
+
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    padding: $semantic-padding-s;
+
+    &_dark {
+        @include button-color-states(
+            ($semantic-content-inverse-primary, transparent, $semantic-border-inverse-primary-a10),
+            (
+                $semantic-content-inverse-primary,
+                $semantic-surface-inverse-tertiary-hover,
+                $semantic-border-inverse-tertiary-hover
+            ),
+            (
+                $semantic-content-inverse-primary,
+                $semantic-surface-inverse-tertiary-pressed,
+                $semantic-border-inverse-tertiary-pressed
+            ),
+            (
+                $semantic-content-inverse-primary,
+                $semantic-surface-inverse-tertiary-selected,
+                $semantic-border-inverse-tertiary-selected
+            )
+        );
+    }
+
+    &_light {
+        @include button-color-states(
+            ($semantic-content-primary, transparent, $semantic-border-primary-a10),
+            ($semantic-content-primary, $semantic-surface-tertiary-hover, $semantic-border-tertiary-hover),
+            ($semantic-content-primary, $semantic-surface-tertiary-pressed, $semantic-border-tertiary-pressed),
+            ($semantic-content-primary, $semantic-surface-tertiary-selected, $semantic-border-tertiary-selected)
+        );
+    }
+
+    &_medium {
+        @include icon-sizes($semantic-gap-l);
+
+        border-radius: $semantic-radius-xs;
+    }
+
+    &_small {
+        @include icon-sizes($semantic-gap-s);
+
+        border-radius: rem(4px);
     }
 }

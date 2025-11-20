@@ -23,7 +23,7 @@ import { absoluteRoutes } from '@popup/popupX/constants/routes';
 /**
  * Hook providing function for sending credential deployments.
  */
-function useSendCredentialDeployment() {
+export function useSendCredentialDeployment() {
     const providers = useAtomValue(identityProvidersAtom);
     const credentials = useAtomValue(credentialsAtom);
     const network = useAtomValue(networkConfigurationAtom);

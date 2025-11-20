@@ -205,12 +205,7 @@ export default function SendFundsConfirm({ values, fee, sender }: Props) {
             </Card>
 
             <Page.Footer>
-                <Button.Main
-                    className="button-main"
-                    onClick={submit}
-                    label={t('sendFunds')}
-                    disabled={payload === undefined}
-                />
+                <Button.Main onClick={submit} label={t('sendFunds')} disabled={payload === undefined} />
             </Page.Footer>
         </Page>
     );

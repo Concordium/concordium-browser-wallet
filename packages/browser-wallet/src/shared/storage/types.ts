@@ -19,6 +19,7 @@ export enum ChromeStorageKey {
     SelectedAccount = 'selectedAccount',
     Theme = 'theme',
     UiStyle = 'uiStyle',
+    HasBeenSavedSeed = 'hasBeenSavedSeed',
     PendingIdentity = 'pendingIdentity',
     Identities = 'identities',
     SelectedIdentity = 'selectedIdentity',
@@ -163,8 +164,7 @@ export interface BaseCredential {
     status: CreationStatus;
     identityIndex: number;
     providerIndex: number;
-    // Policy (is in accountInfo)
-    // CredentialIndex = 0
+    accountType: 'local' | 'ledger';
 }
 
 export interface PendingWalletCredential extends BaseCredential {

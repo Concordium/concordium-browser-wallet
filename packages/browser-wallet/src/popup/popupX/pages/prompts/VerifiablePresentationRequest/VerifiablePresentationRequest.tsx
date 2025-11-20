@@ -157,7 +157,7 @@ function DisplayNotProvable({
                 )}
             </div>
             <Page.Footer>
-                <Button.Main className="secondary" onClick={onClick} label={t('reject')} />
+                <Button.Main variant="secondary" onClick={onClick} label={t('reject')} />
             </Page.Footer>
         </Page>
     );
@@ -337,14 +337,14 @@ export default function VerifiablePresentationRequest({ onReject, onSubmit }: Pr
                             ))}
                     </div>
                     <Button.Main
-                        className="secondary"
+                        variant="secondary"
                         disabled={creatingProof}
                         onClick={() => withClose(onReject)()}
                         label={t('reject')}
                     />
                     {currentStatementIndex > 0 && (
                         <Button.Main
-                            className="secondary"
+                            variant="secondary"
                             disabled={creatingProof}
                             onClick={() => setCurrentStatementIndex(currentStatementIndex - 1)}
                             label={t('back')}
