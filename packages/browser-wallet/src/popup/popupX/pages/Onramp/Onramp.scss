@@ -10,6 +10,10 @@
 
     .text__description {
         text-align: center;
+
+        &.underline {
+            text-decoration: underline;
+        }
     }
 
     .text__disclaimer {

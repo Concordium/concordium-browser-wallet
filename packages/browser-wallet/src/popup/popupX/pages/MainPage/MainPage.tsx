@@ -233,7 +233,7 @@ function MainPageConfirmedAccount({ credential }: MainPageConfirmedAccountProps)
                 <Button.IconTile icon={<Arrow />} label={t('send')} onClick={navToSend} className="send" />
                 <Button.IconTile
                     icon={<Percent />}
-                    label={t('earn')}
+                    label={t('stake')}
                     onClick={navToEarn}
                     className={clsx({ suspend: isSuspended })}
                 />
@@ -296,7 +296,7 @@ function MainPagePendingAccount() {
                 <Button.IconTile icon={<Plus />} label={t('buy')} disabled className="buy" />
                 <Button.IconTile icon={<Arrow />} label={t('receive')} disabled className="receive" />
                 <Button.IconTile icon={<Arrow />} label={t('send')} disabled className="send" />
-                <Button.IconTile icon={<Percent />} label={t('earn')} disabled />
+                <Button.IconTile icon={<Percent />} label={t('stake')} disabled />
                 <Button.IconTile icon={<Clock />} label={t('activity')} disabled />
             </div>
             <div className="main-page-x__tokens">

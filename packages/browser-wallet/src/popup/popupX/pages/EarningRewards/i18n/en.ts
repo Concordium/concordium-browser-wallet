@@ -1,5 +1,6 @@
 const t = {
     root: {
+        title: 'Staking',
         validatorTitle: 'Validation',
         validatorDescription:
             'As a validator, you can participate in the network by validating blocks on the Concordium network. This requires a minimum of {{amount}} CCD and access to a dedicated node.',
@@ -8,7 +9,7 @@ const t = {
         delegationDescription:
             'If you don’t have access to your own node, you may delegate your stake to one of the other validators. There is no minimum amount of CCD required when delegating.',
         delegationAction: 'Continue to delegation setup',
-        note: 'Please note, a single account cannot both be a validator and a delegator, but it is possible to stop one and change to the other.',
+        note: 'Don’t stake any funds unless you’re prepared to lose all the funds you staked with your crypto assets. This is a high-risk transaction and you are unlikely to be protected if something goes wrong. Learn more at <1>fca.org.uk</1>\n\nPlease note, a single account cannot both be a validator and a delegator, but it is possible to stop one and change to the other.',
     },
     cooldowns: {
         header: 'Cooldown',
@@ -38,12 +39,12 @@ const t = {
             buttonUpdate: 'Update',
             buttonStop: 'Stop',
             validatorSuspended: 'Your validator has been suspended',
-            validatorSuspendedInfo: 'Your delegation amount does not earn rewards until validation is resumed.',
+            validatorSuspendedInfo: 'Your delegation amount does not receive rewards until validation is resumed.',
         },
         intro: {
             '1': {
                 title: 'Delegation',
-                body: 'Delegation allows users on the Concordium blockchain to earn rewards without the need to become a validator or run a node.\n\nBy delegating some of your funds to a pool, you can earn rewards.\n\nOn the next few pages, we will go through the basics of delegation. If you want to learn more, you can visit our <1>documentation website</1>.',
+                body: 'Delegation allows users on the Concordium blockchain to stake rewards without the need to become a validator or run a node.\n\nBy delegating some of your funds to a pool, you can stake rewards.\n\nOn the next few pages, we will go through the basics of delegation. If you want to learn more, you can visit our <1>documentation website</1>.',
             },
             '2': {
                 title: 'Delegation models',
@@ -51,11 +52,11 @@ const t = {
             },
             '3': {
                 title: 'Staking pools',
-                body: "A staking pool is managed by an individual validator.\n\nRunning a pool allows a validator to attract more stake and thus increase chances of being selected to produce a block.\n\nValidators earn a commission from the delegators upon producing a block.\n\nDelegating to a staking pool is usually more profitable than passive delegation, but there is also a risk of losing out on rewards if the validator is not running properly. It is therefore a good idea to keep an eye on the validator's performance.\n\nYou can read more about how to investigate a validator's performance on our <1>documentation website</1>.",
+                body: "A staking pool is managed by an individual validator.\n\nRunning a pool allows a validator to attract more stake and thus increase chances of being selected to produce a block.\n\nValidators receive a commission from the delegators upon producing a block.\n\nDelegating to a staking pool is usually more profitable than passive delegation, but there is also a risk of losing out on rewards if the validator is not running properly. It is therefore a good idea to keep an eye on the validator's performance.\n\nYou can read more about how to investigate a validator's performance on our <1>documentation website</1>.",
             },
             '4': {
                 title: 'Passive delegation',
-                body: 'For CCD holders who do not want to regularly check the performance of a chosen pool, but just want a stable way of earning rewards, passive delegation offers a low-risk, low-reward alternative.\n\nThis staking strategy is not associated with a specific validator, so there is no risk of poor validator health.\n\nThe trade-off when choosing passive delegation is that the return on your stake will be less than what you may receive when delegating to a specific staking pool.',
+                body: 'For CCD holders who do not want to regularly check the performance of a chosen pool, but just want a stable way of receiving rewards, passive delegation offers a low-risk, low-reward alternative.\n\nThis staking strategy is not associated with a specific validator, so there is no risk of poor validator health.\n\nThe trade-off when choosing passive delegation is that the return on your stake will be less than what you may receive when delegating to a specific staking pool.',
             },
             '5': {
                 title: 'Pay days',
@@ -68,7 +69,7 @@ const t = {
         },
         register: {
             title: 'Register delegation',
-            backTitle: 'Earning rewards',
+            backTitle: 'Staking',
             notice: 'This will lock your delegation amount. Amount is released after {{cooldown}} days from the time you remove or decrease your delegation.',
         },
         update: {
@@ -88,7 +89,9 @@ const t = {
         target: {
             description: 'You can delegate to an open pool of your choice, or you can stake using passive delegation.',
             radioValidatorLabel: 'Validator',
+            radioValidatorSubText: 'Manually delegate to a validator of your choice.',
             radioPassiveLabel: 'Passive',
+            radioPassiveSubText: 'Distribute stake among all staking pools. No validator selection required.',
             inputValidatorId: {
                 label: 'Enter validator pool ID',
                 errorRequired: 'Please specify a validator ID',
@@ -100,6 +103,10 @@ const t = {
                 'If you don’t already know which validator pool you want to delegate an amount to, you can look for one <1>here.</1>',
             passiveDelegationDescription:
                 'Passive delegation is an alternative to delegation to a specific validator pool that has lower rewards. With passive delegation, you do not have to worry about the uptime or quality of a validator node.\nFor more info, you can visit <1>developer.concordium.software</1>',
+            delegationWarnInfo:
+                '\nDon’t stake any funds unless you’re prepared to lose all the funds you staked with your crypto assets. This is a high-risk transaction and you are unlikely to be protected if something goes wrong. Learn more at <1>fca.org.uk</1>. Projected rewards are estimates only. Actual returns may vary and are not guaranteed.\nStaking is not available to users located in, or residents of any jurisdiction where staking services are prohibited by law. By continuing, you confirm that you are not located in or a resident of a restricted country.\n\n',
+            iConfirm:
+                'I confirm I am not a resident of a restricted jurisdiction and that I am eligible to use staking services under applicable law. I agree to the Staking Terms of Use.\n\n',
             buttonContinue: 'Continue',
         },
         stake: {
@@ -180,10 +187,10 @@ const t = {
             buttonResume: 'Resume',
             validationSuspended: 'Your validation has been suspended',
             validationSuspendedInfo:
-                'Your node does not earn rewards at the moment.\n\nTo lift the suspension and earn rewards again ensure your node is up-to-date and click “Resume”.',
+                'Your node does not receive rewards at the moment.\n\nTo lift the suspension and receive rewards again ensure your node is up-to-date and click “Resume”.',
             validationIsPrimedForSuspension: 'Your validation is primed for suspension',
             validationIsPrimedForSuspensionInfo:
-                'Your node was inactive for a number of hours. If it has been inactive for too long it will be suspended. Suspended nodes don’t earn rewards.\n\nTo prevent suspension ensure your node is up-to-date and active. Once your node is active you will no longer be primed for suspension.',
+                'Your node was inactive for a number of hours. If it has been inactive for too long it will be suspended. Suspended nodes don’t receive rewards.\n\nTo prevent suspension ensure your node is up-to-date and active. Once your node is active you will no longer be primed for suspension.',
         },
         intro: {
             '1': {
@@ -196,21 +203,21 @@ const t = {
             },
             '3': {
                 title: 'Opening a pool',
-                body: 'You have the option when adding a validator to open a staking pool or not. A staking pool allows others who want to earn rewards to do so without the need to run a node or become a validator themselves.\n\nTo do this they delegate an amount to your staking pool which then increases your total stake and your chances of winning the lottery to produce a block. At each pay day the rewards will be distributed to you and your delegators.\n\nYou can also choose not to open a pool, in which case only your own stake applies toward the lottery. You can always open or close a pool later.',
+                body: 'You have the option when adding a validator to open a staking pool or not. A staking pool allows others who want to receive rewards to do so without the need to run a node or become a validator themselves.\n\nTo do this they delegate an amount to your staking pool which then increases your total stake and your chances of winning the lottery to produce a block. At each pay day the rewards will be distributed to you and your delegators.\n\nYou can also choose not to open a pool, in which case only your own stake applies toward the lottery. You can always open or close a pool later.',
             },
             '4': {
                 title: 'Suspension',
-                body: 'Validators will be marked for suspension if their node is inactive for a longer period of time. \nTo prevent suspension ensure your node is up-to-date and active. Once your node is active you will no longer be primed for suspension.\n\nOnce it has been inactive for a longer period of time the validation will be suspended. \n\n<ul><li>Suspended validators don’t earn rewards</li><li>Your delegators will stop earning rewards</li><li>Your delegators will be notified about the suspension</li></ul>\nTo lift the suspension and earn rewards again ensure your node is up-to-date and click “Resume”.',
+                body: 'Validators will be marked for suspension if their node is inactive for a longer period of time. \nTo prevent suspension ensure your node is up-to-date and active. Once your node is active you will no longer be primed for suspension.\n\nOnce it has been inactive for a longer period of time the validation will be suspended. \n\n<ul><li>Suspended validators don’t receive rewards</li><li>Your delegators will stop receiving rewards</li><li>Your delegators will be notified about the suspension</li></ul>\nTo lift the suspension and receive rewards again ensure your node is up-to-date and click “Resume”.',
             },
         },
         register: {
             title: 'Register validator',
-            backTitle: 'Earning rewards',
+            backTitle: 'Staking',
             notice: 'This will lock your validation amount. Amount is released after {{cooldown}} days from the time you remove or decrease your validation stake.',
         },
         update: {
             title: 'Update validation',
-            backTitle: 'Earning rewards',
+            backTitle: 'Staking',
             noChangesNotice: {
                 title: 'No changes',
                 description: 'The proposed transaction contains no changes compared to the current validation.',
@@ -240,7 +247,7 @@ const t = {
         },
         selfSuspend: {
             title: 'Important',
-            body: 'You are about to self-suspend your validation. Please be aware that:\n\n<ul><li>Suspended nodes don’t earn rewards</li><li>Your delegators will stop earning rewards</li><li>Your delegators will be notified about the suspension</li></ul>',
+            body: 'You are about to self-suspend your validation. Please be aware that:\n\n<ul><li>Suspended nodes don’t receive rewards</li><li>Your delegators will stop receiving rewards</li><li>Your delegators will be notified about the suspension</li></ul>',
             continue: 'Continue',
             back: 'Back',
         },
@@ -297,7 +304,7 @@ const t = {
                 label: 'Open for delegation',
             },
             description:
-                'Opening a pool\nYou have the option when adding a validator to open a staking pool or not. A staking pool allows others who want to earn rewards to do so without the need to run a node or become a validator themselves.\n\nTo do this they delegate an amount to your staking pool which then increases your total stake and your chances of winning the lottery to produce a block. At each pay day the rewards will be distributed to you and your delegators.\n\nYou can also choose not to open a pool, in which case only your own stake applies toward the lottery. You can always open or close a pool later.',
+                'Opening a pool\nYou have the option when adding a validator to open a staking pool or not. A staking pool allows others who want to receive rewards to do so without the need to run a node or become a validator themselves.\n\nTo do this they delegate an amount to your staking pool which then increases your total stake and your chances of winning the lottery to produce a block. At each pay day the rewards will be distributed to you and your delegators.\n\nYou can also choose not to open a pool, in which case only your own stake applies toward the lottery. You can always open or close a pool later.',
             buttonContinue: 'Continue',
         },
         metadata: {
@@ -315,7 +322,7 @@ const t = {
         commissions: {
             title: 'Commissions',
             desciption:
-                'When you open your validator as a pool, you earn commissions of stake delegated to your pool from other accounts:',
+                'When you open your validator as a pool, you receive commissions of stake delegated to your pool from other accounts:',
             fieldTransactionFee: {
                 label: 'Transaction fee commission',
             },

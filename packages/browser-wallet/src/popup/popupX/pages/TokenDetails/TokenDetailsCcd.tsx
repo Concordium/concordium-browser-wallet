@@ -98,7 +98,7 @@ function TokenDetailsCcd({ credential }: { credential: WalletCredential }) {
                     <div className="token-details-x__stake">
                         {hasStake && (
                             <div className="token-details-x__stake_group">
-                                <Text.Capture>{t('earning')}</Text.Capture>
+                                <Text.Capture>{t('staking')}</Text.Capture>
                                 <Text.CaptureAdditional>
                                     {displayAsCcd(tokenDetails.staked, false, true)}
                                 </Text.CaptureAdditional>
@@ -131,7 +131,7 @@ function TokenDetailsCcd({ credential }: { credential: WalletCredential }) {
                         className="receive"
                     />
                     <Button.IconTile icon={<Arrow />} label={t('send')} onClick={() => navToSend()} className="send" />
-                    <Button.IconTile icon={<Percent />} label={t('earn')} onClick={() => navToEarn()} />
+                    <Button.IconTile icon={<Percent />} label={t('stake')} onClick={() => navToEarn()} />
                     <Button.IconTile icon={<Clock />} label={t('activity')} onClick={() => navToTransactionLog()} />
                 </div>
                 <Card>

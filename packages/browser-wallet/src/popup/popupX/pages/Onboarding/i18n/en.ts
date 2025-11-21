@@ -6,7 +6,7 @@ const t = {
         easyManage: 'Easily manage digital assets',
         spendAssets: 'Store, spend and send digital assets like tokens, crypto, unique collectibles',
         unlimited: 'Unlimited possibilities',
-        transactionInvest: 'With CryptoX you can make transactions to invest, earn, sell, play games and more!',
+        transactionInvest: 'With CryptoX you can make transactions to invest, stake, sell, play games and more!',
         start: 'Get started',
         proceeding: 'By proceeding, you agree with ',
         termsAndConditions: 'Terms & Conditions',

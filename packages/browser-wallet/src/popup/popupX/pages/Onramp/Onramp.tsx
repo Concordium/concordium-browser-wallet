@@ -1,5 +1,5 @@
 import React from 'react';
-import { useTranslation } from 'react-i18next';
+import { Trans, useTranslation } from 'react-i18next';
 import Page from '@popup/popupX/shared/Page';
 import Text from '@popup/popupX/shared/Text';
 import Card from '@popup/popupX/shared/Card';
@@ -12,6 +12,7 @@ import { networkConfigurationAtom } from '@popup/store/settings';
 import { NetworkConfiguration } from '@shared/storage/types';
 import { isMainnet } from '@shared/utils/network-helpers';
 import urls from '@shared/constants/url';
+import ExternalLink from '@popup/popupX/shared/ExternalLink';
 
 const BANXA_CONFIG = {
     title: 'Banxa',
@@ -52,6 +53,7 @@ export default function Onramp() {
             <Page.Main>
                 <Page.Top heading={t('buyCCD')} />
                 <Text.Capture className="text__description">{t('description')}</Text.Capture>
+                <Text.Capture className="text__description underline">{t('readDisclaimer')}</Text.Capture>
                 <Card type="grey">
                     <button type="button" onClick={handleClick} className="banxa-link-btn" aria-label={t('continue')}>
                         <span className="banxa-link-btn__left">
@@ -64,11 +66,19 @@ export default function Onramp() {
                 </Card>
                 <Text.Capture className="text__description">
                     {t('supportedWallets')}
-                    <Text.ExternalLink path={urls.websiteCcdWallet}>concordium.com/ccd-wallet</Text.ExternalLink>
+                    <Text.ExternalLink path={urls.websiteCcdWallet}>{t('ccdWalletLinks')}</Text.ExternalLink>
                 </Text.Capture>
                 <Card type="grey">
-                    <Text.Heading>Disclaimer</Text.Heading>
-                    <Text.Capture>{t('disclaimer')}</Text.Capture>
+                    <Text.Heading>{t('disclaimer')}</Text.Heading>
+                    <Text.Capture>
+                        <Trans
+                            t={t}
+                            i18nKey="disclaimerText"
+                            components={{
+                                '1': <Text.ExternalLink path="https://www.fca.org.uk" />,
+                            }}
+                        />
+                    </Text.Capture>
                 </Card>
             </Page.Main>
         </Page>

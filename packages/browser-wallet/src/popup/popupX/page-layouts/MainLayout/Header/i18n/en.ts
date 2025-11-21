@@ -5,7 +5,7 @@ const t = {
         seedPhrase: 'Seed phrase',
         passcode: 'Passcode',
         web3Id: 'Web3 ID',
-        earn: 'Earn',
+        stake: 'Stake',
         network: 'Network',
         about: 'About',
         restore: 'Restore',

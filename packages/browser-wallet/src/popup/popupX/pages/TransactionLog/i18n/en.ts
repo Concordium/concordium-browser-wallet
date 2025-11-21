@@ -7,7 +7,7 @@ const t = {
     addBaker: 'Add validator',
     removeBaker: 'Remove validator',
     updateBakerStake: 'Validator stake update',
-    updateBakerRestakeEarnings: 'Validator restake earnings update',
+    updateBakerRestakeStakings: 'Validator restake stakings update',
     updateBakerKeys: 'Validator keys update',
     updateCredentialKeys: 'Account keys update',
     bakingReward: 'Validating Reward',

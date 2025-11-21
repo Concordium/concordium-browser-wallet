@@ -2,7 +2,7 @@ const t = {
     buy: 'Buy',
     receive: 'Receive',
     send: 'Send',
-    earn: 'Earn',
+    stake: 'Stake',
     activity: 'Activity',
     manageTokenList: 'Manage Tokens',
     pendingAccount: 'Creating account',
