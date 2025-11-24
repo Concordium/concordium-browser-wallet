@@ -12,7 +12,6 @@ import { networkConfigurationAtom } from '@popup/store/settings';
 import { NetworkConfiguration } from '@shared/storage/types';
 import { isMainnet } from '@shared/utils/network-helpers';
 import urls from '@shared/constants/url';
-import ExternalLink from '@popup/popupX/shared/ExternalLink';
 
 const BANXA_CONFIG = {
     title: 'Banxa',
