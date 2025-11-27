@@ -2,6 +2,8 @@
 
 ## Unreleased
 
+-   Updated texts across the wallet to be FCA legally compliant
+
 ### Fixed
 
 -   Fixed accounts display under incorrect identities
