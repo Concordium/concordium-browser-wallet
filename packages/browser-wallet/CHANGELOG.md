@@ -2,6 +2,8 @@
 
 ## Unreleased
 
+-   Updated onboarding flow, focusing on streamlining the user experience from landing screens to account setup.
+
 ### Fixed
 
 -   Fixed accounts display under incorrect identities
