@@ -54,7 +54,7 @@ export const relativeRoutes = {
                         path: 'selectNetwork',
                         config: {
                             hideBackArrow: false,
-                            backTitle: '',
+                            backTitle: i18n.t('x:header.navButton.back'),
                             hideMenu: true,
                             hideConnection: true,
                         },
@@ -71,7 +71,7 @@ export const relativeRoutes = {
                         path: 'restoreWallet',
                         config: {
                             hideBackArrow: false,
-                            backTitle: '',
+                            backTitle: i18n.t('x:header.navButton.back'),
                             hideMenu: true,
                             hideConnection: true,
                         },
@@ -79,7 +79,7 @@ export const relativeRoutes = {
                     requestIdentity: {
                         path: 'requestIdentity',
                         config: {
-                            backTitle: '',
+                            backTitle: i18n.t('x:header.navButton.back'),
                             hideMenu: true,
                             hideConnection: true,
                         },
@@ -168,6 +168,7 @@ export const relativeRoutes = {
                 externalFlow: {
                     path: 'external-flow',
                     config: {
+                        backTitle: i18n.t('x:header.navButton.back'),
                         hideMenu: true,
                     },
                 },
