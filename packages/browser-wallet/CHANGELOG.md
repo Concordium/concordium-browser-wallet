@@ -2,6 +2,10 @@
 
 ## Unreleased
 
+## 2.7.0
+
+### Changed
+
 -   Updated texts across the wallet to be FCA legally compliant
 -   Updated onboarding flow, focusing on streamlining the user experience from landing screens to account setup.
 
