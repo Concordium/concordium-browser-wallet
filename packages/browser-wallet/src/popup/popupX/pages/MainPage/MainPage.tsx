@@ -16,6 +16,7 @@ import { displayCcdAsEur, formatTokenAmount } from '@popup/popupX/shared/utils/h
 import Page from '@popup/popupX/shared/Page';
 import Text from '@popup/popupX/shared/Text';
 import Button from '@popup/popupX/shared/Button';
+import { ButtonProps } from '@popup/popupX/shared/Button/Button';
 import { withSelectedCredential } from '@popup/popupX/shared/utils/hoc';
 import { PLT } from '@shared/constants/token';
 import ArrowUp from '@assets/svgX/UiKit/Arrows/arrow-up.svg';
@@ -32,6 +33,7 @@ import WalletCoin from '@assets/svgX/UiKit/Interface/wallet-coin.svg';
 import Dot from '@assets/svgX/dot.svg';
 import Info from '@assets/svgX/info.svg';
 import Pause from '@assets/svgX/pause.svg';
+import Close from '@assets/svgX/UiKit/Interface/circled-x-cross-close.svg';
 import Tooltip from '@popup/popupX/shared/Tooltip';
 import { credentialsAtom, credentialsAtomWithLoading, selectedAccountAtom } from '@popup/store/account';
 import { hasBeenSavedSeedAtom } from '@popup/store/settings';
@@ -219,6 +221,31 @@ function SuspendedEarnInfo() {
     );
 }
 
+function HomepageCta({
+    icon,
+    title,
+    description,
+    className,
+    onClick,
+    onCancel,
+    ...props
+}: { icon: ReactNode; title: string; description: string; onCancel: () => void } & ButtonProps) {
+    return (
+        <div className={clsx('container__cta', className)}>
+            <Button.Base className={clsx('button__homepage-cta')} onClick={onClick} {...props}>
+                <div className="icon-container">{icon}</div>
+                <div className="text-container">
+                    <Text.MainMedium>{title}</Text.MainMedium>
+                    <Text.Capture>{description}</Text.Capture>
+                </div>
+            </Button.Base>
+            <button className="cancel-button" type="button" onClick={onCancel}>
+                <Close />
+            </button>
+        </div>
+    );
+}
+
 function MainPageCta() {
     const { t } = useTranslation('x', { keyPrefix: 'mainPage' });
     const nav = useNavigate();
@@ -251,7 +278,7 @@ function MainPageCta() {
                     }}
                 />
             </Modal>
-            <Button.HomepageCta
+            <HomepageCta
                 icon={<RestoreSeed />}
                 title={t('cta.backup')}
                 description={t('cta.keepSafe')}

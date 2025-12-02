@@ -1,6 +1,8 @@
-import React from 'react';
+import React, { ReactNode } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { useAtom, useAtomValue, useSetAtom } from 'jotai';
+import clsx from 'clsx';
+import { useTranslation } from 'react-i18next';
 import {
     encryptedSeedPhraseAtom,
     hasBeenSavedSeedAtom,
@@ -10,7 +12,7 @@ import {
 } from '@popup/store/settings';
 import Page from '@popup/popupX/shared/Page';
 import Button from '@popup/popupX/shared/Button';
-import { useTranslation } from 'react-i18next';
+import { ButtonProps } from '@popup/popupX/shared/Button/Button';
 import Text from '@popup/popupX/shared/Text';
 import WalletCoin from '@assets/svgX/UiKit/Interface/wallet-coin.svg';
 import RestoreSeed from '@assets/svgX/UiKit/Interface/restore-seed-phrase.svg';
@@ -18,6 +20,24 @@ import { absoluteRoutes } from '@popup/popupX/constants/routes';
 import { generateMnemonic } from '@scure/bip39';
 import { wordlist } from '@scure/bip39/wordlists/english';
 import { encrypt } from '@shared/utils/crypto';
+
+function OnboardingOption({
+    icon,
+    title,
+    description,
+    className,
+    ...props
+}: { icon: ReactNode; title: string; description: string } & ButtonProps) {
+    return (
+        <Button.Base className={clsx('button__onboarding-option', className)} {...props}>
+            <div className="icon-container">{icon}</div>
+            <div className="text-container">
+                <Text.MainMedium>{title}</Text.MainMedium>
+                <Text.Capture>{description}</Text.Capture>
+            </div>
+        </Button.Base>
+    );
+}
 
 export default function CreateOrRestore() {
     const { t } = useTranslation('x', { keyPrefix: 'onboarding.createOrRestore' });
@@ -63,7 +83,7 @@ export default function CreateOrRestore() {
             </Page.Top>
             <Page.Main>
                 <Text.Capture>{t('optionsInfo')}</Text.Capture>
-                <Button.OnboardingOption
+                <OnboardingOption
                     title={t('walletAccount')}
                     description={t('walletAccountDescription')}
                     icon={<WalletCoin />}
@@ -72,7 +92,7 @@ export default function CreateOrRestore() {
                 <div className="split-separator">
                     <Text.Capture>{t('or')}</Text.Capture>
                 </div>
-                <Button.OnboardingOption
+                <OnboardingOption
                     title={t('restore')}
                     description={t('restoreDescription')}
                     icon={<RestoreSeed />}

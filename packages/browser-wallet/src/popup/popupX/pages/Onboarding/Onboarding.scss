@@ -121,6 +121,60 @@
             margin: 0 $semantic-gap-l;
         }
     }
+
+    .button__onboarding-option {
+        @include base-button;
+
+        display: flex;
+        align-items: center;
+        gap: $semantic-gap-l;
+        border: unset;
+        border-radius: $semantic-radius-m;
+        padding: $semantic-padding-l;
+        background-color: $semantic-surface-primary;
+
+        .icon-container {
+            width: rem(40px);
+            height: rem(40px);
+            border-radius: $semantic-radius-s;
+            padding: $semantic-padding-s;
+            background-color: $semantic-surface-inverse-primary-a10;
+
+            svg {
+                width: rem(24px);
+                height: rem(24px);
+
+                path {
+                    fill: $semantic-content-inverse-accent-tertiary;
+                }
+            }
+        }
+
+        .text-container {
+            display: flex;
+            flex-direction: column;
+            align-items: flex-start;
+
+            .text__main_medium {
+                color: $semantic-content-inverse-primary;
+            }
+
+            .capture__main_small {
+                text-align: left;
+                color: $semantic-content-secondary;
+            }
+        }
+
+        &:hover {
+            background-color: $semantic-surface-primary-hover;
+        }
+
+        &:active {
+            background-color: $semantic-surface-primary-pressed;
+            outline: 1px solid $semantic-border-tertiary-pressed;
+            outline-offset: -1px;
+        }
+    }
 }
 
 .select-network {

@@ -270,6 +270,91 @@
     }
 }
 
+.container__cta {
+    display: flex;
+    position: relative;
+    border-radius: $semantic-radius-m;
+    outline: 1px solid $semantic-border-tertiary;
+    outline-offset: -1px;
+
+    &:hover {
+        background-color: $semantic-surface-tertiary-hover;
+        outline-color: $semantic-border-tertiary-hover;
+    }
+
+    &:active {
+        background-color: $semantic-surface-tertiary-pressed;
+        outline-color: $semantic-border-tertiary-pressed;
+    }
+
+    .button__homepage-cta {
+        @include base-button;
+
+        display: flex;
+        align-items: center;
+        padding: $semantic-padding-m rem(44px) $semantic-padding-m $semantic-padding-m;
+        gap: $semantic-gap-s;
+        background: transparent;
+        border: unset;
+        border-radius: $semantic-radius-m;
+
+        .icon-container {
+            display: flex;
+            padding: rem(10px);
+            border-radius: $semantic-radius-rounded;
+            background-color: $semantic-surface-primary-a10;
+
+            svg {
+                width: rem(20px);
+                height: rem(20px);
+            }
+        }
+
+        .text-container {
+            display: flex;
+            flex-direction: column;
+            align-items: flex-start;
+            text-align: left;
+            gap: $semantic-gap-xs;
+
+            .text__main_medium {
+                font-size: $semantic-label-l-scale;
+                line-height: $semantic-label-l-line-height;
+                color: $semantic-content-primary;
+            }
+
+            .capture__main_small {
+                font-size: $semantic-label-s-scale;
+                line-height: $semantic-label-s-line-height;
+                color: $semantic-content-secondary;
+            }
+        }
+    }
+
+    .cancel-button {
+        @include base-button;
+
+        display: flex;
+        position: absolute;
+        right: $semantic-gap-l;
+        top: 50%;
+        transform: translateY(-50%);
+        border: unset;
+        padding: unset;
+        background-color: transparent;
+        margin: unset;
+
+        svg {
+            width: rem(20px);
+            height: rem(20px);
+
+            path {
+                fill: $semantic-content-primary-a40;
+            }
+        }
+    }
+}
+
 .cta_modal {
     gap: $semantic-gap-s;
 
