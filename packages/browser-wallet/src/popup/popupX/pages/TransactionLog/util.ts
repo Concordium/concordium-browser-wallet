@@ -91,7 +91,7 @@ export function mapTypeToText(
         case AccountTransactionType.UpdateBakerStake:
             return t('updateBakerStake');
         case AccountTransactionType.UpdateBakerRestakeEarnings:
-            return t('updateBakerRestakeEarnings');
+            return t('updateBakerRestakeStakings');
         case AccountTransactionType.UpdateBakerKeys:
             return t('updateBakerKeys');
         case AccountTransactionType.UpdateCredentialKeys:

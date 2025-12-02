@@ -5,7 +5,7 @@ import Page from '@popup/popupX/shared/Page';
 import { useBlockChainParameters } from '@popup/shared/BlockChainParametersProvider';
 import { cpBakingThreshold } from '@shared/utils/chain-parameters-helpers';
 import { displayAsCcd } from 'wallet-common-helpers';
-import { useTranslation } from 'react-i18next';
+import { Trans, useTranslation } from 'react-i18next';
 import { Link, Navigate } from 'react-router-dom';
 import { absoluteRoutes, relativeRoutes } from '@popup/popupX/constants/routes';
 import Text from '@popup/popupX/shared/Text';
@@ -36,7 +36,7 @@ export default function EarningRewards() {
 
     return (
         <Page className="earn-container">
-            <Page.Top heading="Earning Rewards" />
+            <Page.Top heading={t('title')} />
             <Page.Main>
                 {accountInfo !== undefined && (
                     <AccountCooldowns className="earn__cooldowns" cooldowns={accountInfo.accountCooldowns} />
@@ -67,7 +67,15 @@ export default function EarningRewards() {
                     <div className="earn__info_icon">
                         <Info />
                     </div>
-                    <Text.Capture>{t('note')}</Text.Capture>
+                    <Text.Capture>
+                        <Trans
+                            t={t}
+                            i18nKey="note"
+                            components={{
+                                '1': <Text.ExternalLink path="https://www.fca.org.uk" />,
+                            }}
+                        />
+                    </Text.Capture>
                 </div>
             </Page.Main>
         </Page>

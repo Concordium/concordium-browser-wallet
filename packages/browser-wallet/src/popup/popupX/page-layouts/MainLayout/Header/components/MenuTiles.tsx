@@ -70,7 +70,7 @@ export default function MenuTiles({ menuOpen, setMenuOpen }: MenuTilesProps) {
                 <Link to={absoluteRoutes.settings.earn.path}>
                     <IconButton className="main-header__menu-tiles_tile">
                         <Percent />
-                        <Text.Capture>{t('earn')}</Text.Capture>
+                        <Text.Capture>{t('stake')}</Text.Capture>
                     </IconButton>
                 </Link>
                 <Link to={absoluteRoutes.settings.network.path}>
