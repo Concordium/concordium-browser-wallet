@@ -4,7 +4,8 @@
             margin-bottom: rem(16px);
         }
 
-        &__cooldowns, &__card {
+        &__cooldowns,
+        &__card {
             margin-bottom: rem(8px);
         }
 
@@ -34,7 +35,6 @@
         &__info {
             display: flex;
             gap: rem(8px);
-            margin-top: rem(26px);
 
             svg {
                 height: rem(16px);

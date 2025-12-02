@@ -1,4 +1,4 @@
-import React from 'react';
+import React, { useState } from 'react';
 import { FormRadio } from '@popup/popupX/shared/Form/Radios';
 import { Trans, useTranslation } from 'react-i18next';
 import { Validate } from 'react-hook-form';
@@ -10,6 +10,7 @@ import ExternalLink from '@popup/popupX/shared/ExternalLink';
 import Form, { useForm } from '@popup/popupX/shared/Form';
 import Button from '@popup/popupX/shared/Button';
 import FormInput from '@popup/popupX/shared/Form/Input/Input';
+import { Checkbox } from '@popup/popupX/shared/Form/Checkbox';
 import Text from '@popup/popupX/shared/Text';
 import { grpcClientAtom, networkConfigurationAtom } from '@popup/store/settings';
 import { DelegationTypeForm } from '../util';
@@ -26,6 +27,7 @@ export default function DelegationType({ initialValues, onSubmit, title }: Props
     const network = useAtomValue(networkConfigurationAtom);
     const client = useAtomValue(grpcClientAtom);
     const { t } = useTranslation('x', { keyPrefix: 'earn.delegator.target' });
+    const [confirmCheckbox, setConfirmCheckbox] = useState(false);
 
     const form = useForm<DelegationTypeForm>({
         defaultValues: initialValues ?? { type: DelegationTargetType.PassiveDelegation },
@@ -57,12 +59,14 @@ export default function DelegationType({ initialValues, onSubmit, title }: Props
                         <FormRadio
                             id={DelegationTargetType.Baker}
                             label={t('radioValidatorLabel')}
+                            subText={t('radioValidatorSubText')}
                             name="type"
                             register={f.register}
                         />
                         <FormRadio
                             id={DelegationTargetType.PassiveDelegation}
                             label={t('radioPassiveLabel')}
+                            subText={t('radioPassiveSubText')}
                             name="type"
                             register={f.register}
                         />
@@ -104,8 +108,23 @@ export default function DelegationType({ initialValues, onSubmit, title }: Props
                     />
                 )}
             </Text.Capture>
+            <Text.Capture>
+                <Trans
+                    t={t}
+                    i18nKey="delegationWarnInfo"
+                    components={{
+                        '1': <Text.ExternalLink path="https://www.fca.org.uk" />,
+                    }}
+                />
+            </Text.Capture>
+            <Checkbox
+                className="confirm-checkbox"
+                description={<Text.Capture>{t('iConfirm')}</Text.Capture>}
+                checked={confirmCheckbox}
+                onChange={() => setConfirmCheckbox(!confirmCheckbox)}
+            />
             <Page.Footer>
-                <Button.Main label={t('buttonContinue')} onClick={submit} />
+                <Button.Main label={t('buttonContinue')} onClick={submit} disabled={!confirmCheckbox} />
             </Page.Footer>
         </Page>
     );
