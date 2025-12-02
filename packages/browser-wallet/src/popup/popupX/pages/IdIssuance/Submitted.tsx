@@ -1,21 +1,53 @@
 import React from 'react';
 import { useTranslation } from 'react-i18next';
-import { useAtomValue } from 'jotai';
+import { useSetAtom, useAtomValue } from 'jotai';
 
 import Button from '@popup/popupX/shared/Button';
 import { ConfirmedIdCard, RejectedIdCard, PendingIdCard } from '@popup/popupX/shared/IdCard';
 import Page from '@popup/popupX/shared/Page';
 import Text from '@popup/popupX/shared/Text';
 import { identitiesAtomWithLoading } from '@popup/store/identity';
-import { CreationStatus } from '@shared/storage/types';
+import { CreationStatus, Identity } from '@shared/storage/types';
 import { absoluteRoutes } from '@popup/popupX/constants/routes';
 import { isSpawnedWindow } from '@popup/shared/window-helpers';
 import { useNavigate } from 'react-router-dom';
+import { useSendCredentialDeployment } from '@popup/popupX/pages/CreateAccount/CreateAccountConfirm';
+import { creatingCredentialRequestAtom } from '@popup/store/account';
+
+function useSubmitAccountDeployment() {
+    const nav = useNavigate();
+    const deployment = useSendCredentialDeployment();
+    const setCreatingRequest = useSetAtom(creatingCredentialRequestAtom);
+    return (identity: Identity) => {
+        if (identity === undefined || identity.status !== CreationStatus.Confirmed) {
+            throw new Error(`Invalid identity: ${identity}`);
+        } else {
+            setCreatingRequest(true);
+            return deployment
+                .sendCredentialDeployment(identity)
+                .catch(() => {})
+                .then(() => {
+                    nav(absoluteRoutes.home.path);
+                })
+                .finally(() => {
+                    setCreatingRequest(false);
+                });
+        }
+    };
+}
 
 export default function IdIssuanceSubmitted() {
     const { t } = useTranslation('x', { keyPrefix: 'idIssuance.submitted' });
+    const creatingCredentialRequest = useAtomValue(creatingCredentialRequestAtom);
     const { loading, value: identities } = useAtomValue(identitiesAtomWithLoading);
+    const identity = identities.slice(-1)[0];
+
     const nav = useNavigate();
+    const onCreateAccount = useSubmitAccountDeployment();
+
+    if (loading) {
+        return null;
+    }
 
     const handleDone = () => {
         if (isSpawnedWindow) {
@@ -25,11 +57,9 @@ export default function IdIssuanceSubmitted() {
         }
     };
 
-    if (loading) {
-        return null;
-    }
-
-    const identity = identities.slice(-1)[0];
+    const handleCreateAccount = () => {
+        onCreateAccount(identity).then(() => {});
+    };
 
     return (
         <Page>
@@ -38,10 +68,20 @@ export default function IdIssuanceSubmitted() {
             <div className="m-t-20">
                 {identity.status === CreationStatus.Pending && <PendingIdCard identity={identity} />}
                 {identity.status === CreationStatus.Rejected && <RejectedIdCard identity={identity} />}
-                {identity.status === CreationStatus.Confirmed && <ConfirmedIdCard identity={identity} />}
+                {identity.status === CreationStatus.Confirmed && (
+                    <ConfirmedIdCard identity={identity} shownAttributes={['idDocType', 'idDocNo']} />
+                )}
             </div>
             <Page.Footer>
-                <Button.Main className="m-t-20" label={t('buttonContinue')} onClick={handleDone} />
+                {identity.status === CreationStatus.Confirmed ? (
+                    <Button.Main
+                        label={t('buttonCreateAccount')}
+                        onClick={handleCreateAccount}
+                        disabled={creatingCredentialRequest.loading || creatingCredentialRequest.value}
+                    />
+                ) : (
+                    <Button.Main label={t('buttonContinue')} onClick={handleDone} />
+                )}
             </Page.Footer>
         </Page>
     );

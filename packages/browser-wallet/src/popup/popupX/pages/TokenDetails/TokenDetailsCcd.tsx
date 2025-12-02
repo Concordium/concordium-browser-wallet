@@ -11,11 +11,12 @@ import { useAccountInfo } from '@popup/shared/AccountInfoListenerContext';
 import { displayAsCcd, getPublicAccountAmounts, PublicAccountAmounts } from 'wallet-common-helpers';
 import { WalletCredential } from '@shared/storage/types';
 import { withSelectedCredential } from '@popup/popupX/shared/utils/hoc';
-import Arrow from '@assets/svgX/arrow-right.svg';
-import Clock from '@assets/svgX/clock.svg';
-import Percent from '@assets/svgX/percent.svg';
-import Plus from '@assets/svgX/plus.svg';
-import ConcordiumLogo from '@assets/svgX/concordium-logo.svg';
+import ArrowUp from '@assets/svgX/UiKit/Arrows/arrow-up.svg';
+import ArrowDown from '@assets/svgX/UiKit/Arrows/arrow-down.svg';
+import Clock from '@assets/svgX/UiKit/MenuNavigation/clock-activity-history-time.svg';
+import Plus from '@assets/svgX/UiKit/Interface/plus-add-buy.svg';
+import Percent from '@assets/svgX/UiKit/Interface/percentage-earn-staking.svg';
+import ConcordiumLogo from '@assets/svgX/UiKit/Custom/concordium-glyph-only.svg';
 import { TokenPickerVariant } from '@popup/popupX/shared/Form/TokenAmount/View';
 import { displayCcdAsEur } from '@popup/popupX/shared/utils/helpers';
 import { useBlockChainParameters } from '@popup/shared/BlockChainParametersProvider';
@@ -124,13 +125,8 @@ function TokenDetailsCcd({ credential }: { credential: WalletCredential }) {
                 )}
                 <div className="token-details-x__action-buttons">
                     <Button.IconTile icon={<Plus />} label={t('buy')} onClick={navToBuy} className="buy" />
-                    <Button.IconTile
-                        icon={<Arrow />}
-                        label={t('receive')}
-                        onClick={() => navToReceive()}
-                        className="receive"
-                    />
-                    <Button.IconTile icon={<Arrow />} label={t('send')} onClick={() => navToSend()} className="send" />
+                    <Button.IconTile icon={<ArrowDown />} label={t('receive')} onClick={() => navToReceive()} />
+                    <Button.IconTile icon={<ArrowUp />} label={t('send')} onClick={() => navToSend()} />
                     <Button.IconTile icon={<Percent />} label={t('stake')} onClick={() => navToEarn()} />
                     <Button.IconTile icon={<Clock />} label={t('activity')} onClick={() => navToTransactionLog()} />
                 </div>

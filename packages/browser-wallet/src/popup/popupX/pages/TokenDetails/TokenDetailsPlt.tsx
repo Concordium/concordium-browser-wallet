@@ -16,7 +16,8 @@ import { useAtomValue } from 'jotai';
 import { addThousandSeparators, integerToFractional, pipe } from 'wallet-common-helpers';
 import { trunctateSymbol } from '@shared/utils/token-helpers';
 import { WalletCredential } from '@shared/storage/types';
-import Arrow from '@assets/svgX/arrow-right.svg';
+import ArrowUp from '@assets/svgX/UiKit/Arrows/arrow-up.svg';
+import ArrowDown from '@assets/svgX/UiKit/Arrows/arrow-down.svg';
 import Shield from '@assets/svgX/shield-square-crypto.svg';
 import Stop from '@assets/svgX/circled-x-block-deny.svg';
 import Check from '@assets/svgX/circled-check-done.svg';
@@ -139,17 +140,15 @@ function TokenDetails({ credential }: { credential: WalletCredential }) {
                 </Text.DynamicSize>
                 <div className="token-details-x__action-buttons">
                     <Button.IconTile
-                        icon={<Arrow />}
+                        icon={<ArrowDown />}
                         label={t('receive')}
                         onClick={() => navToReceive()}
-                        className="receive"
                         disabled={getIsDisabled(status)}
                     />
                     <Button.IconTile
-                        icon={<Arrow />}
+                        icon={<ArrowUp />}
                         label={t('send')}
                         onClick={() => navToSend()}
-                        className="send"
                         disabled={getIsDisabled(status)}
                     />
                 </div>

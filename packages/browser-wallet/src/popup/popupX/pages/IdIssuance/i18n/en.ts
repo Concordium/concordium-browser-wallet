@@ -1,10 +1,11 @@
 const en = {
     idIssuer: {
-        title: 'Request an identity',
+        title: 'Request an Identity',
         description:
-            'The ID Documents (e.g. Passport pictures) that are used for the ID verification, are held exclusively by our trusted, third-party identity providers in their own off-chain records.\n\nChoose one of the identity providers below to request a Concordium Identity and create an account.',
+            'A Concordium ID is required for you to create a Concordium account. Create your secure identification through one of our trusted external providers.',
         descriptionOngoing:
             'An identity issuance process is ongoing in the browser. Please follow the steps to complete the process for the identity provider.\n\nIf you wish to abort the flow, or try again, press "Reset" below.',
+        redirectInfo: 'You will be redirected after choosing an identity provider.',
         buttonContinue: 'Request Identity',
         buttonReset: 'Reset',
     },
@@ -24,10 +25,16 @@ const en = {
         description:
             'Your request has been submitted to the identity provider. It may take a little while for them to confirm your identity.\n\nOnce your identity has been verified, you will be able to open an account with it.',
         buttonContinue: 'Done',
+        buttonCreateAccount: 'Create Concordium Account',
     },
     aborted: {
         message:
             'The identity request was aborted. If you did not abort the process, please try again, or contact support.',
+    },
+    idCardsInfo: {
+        ids: 'Concordium ID',
+        idDescription:
+            'As the only blockchain, Concordium enables you to verify your real-world identity while remaining private on chain.\n\nEvery user in the Concordium ecosystem has been verified by an identity provider (IDP) - a trusted third-party entity that is responsible for validating the real-world identity of users.\n\nThe IDP does not track your wallet or on-chain activities; they only handle the verification process.\n\nAfter a your identity is verified, the identity provider issues a cryptographic identity object to you that is linked to your account and can be used to prove your identity to others without revealing sensitive personal information.\n\nOnly in the case of a legal requirement, an authorized entity (like a regulator) can request the IDP to disclose a user’s real-world identity.',
     },
 };
 

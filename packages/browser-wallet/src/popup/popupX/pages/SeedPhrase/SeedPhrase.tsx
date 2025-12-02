@@ -5,7 +5,7 @@ import i18n from '@popup/shell/i18n';
 import Page from '@popup/popupX/shared/Page';
 import Text from '@popup/popupX/shared/Text';
 import Card from '@popup/popupX/shared/Card';
-import Copy from '@assets/svgX/copy.svg';
+import Copy from '@assets/svgX/UiKit/Interface/copy-duplicate.svg';
 import { useAsyncMemo } from 'wallet-common-helpers';
 import { decrypt } from '@shared/utils/crypto';
 import { useAtomValue } from 'jotai';
@@ -42,10 +42,10 @@ function SeedPhrase() {
                 <Text.Capture>{t('seedPhraseDescription')}</Text.Capture>
                 <Card>
                     {seedPhrase.split(' ').map((word) => (
-                        <Text.LabelRegular key={word}>{word}</Text.LabelRegular>
+                        <Text.LabelRegular key={word}>{word} </Text.LabelRegular>
                     ))}
                 </Card>
-                <Button.IconText icon={<Copy />} label={t('copy')} onClick={() => copyToClipboard(seedPhrase)} />
+                <Button.Tertiary iconLeft={<Copy />} label={t('copy')} onClick={() => copyToClipboard(seedPhrase)} />
             </Page.Main>
         </Page>
     );

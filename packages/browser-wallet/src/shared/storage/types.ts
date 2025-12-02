@@ -19,6 +19,7 @@ export enum ChromeStorageKey {
     SelectedAccount = 'selectedAccount',
     Theme = 'theme',
     UiStyle = 'uiStyle',
+    HasBeenSavedSeed = 'hasBeenSavedSeed',
     PendingIdentity = 'pendingIdentity',
     Identities = 'identities',
     SelectedIdentity = 'selectedIdentity',

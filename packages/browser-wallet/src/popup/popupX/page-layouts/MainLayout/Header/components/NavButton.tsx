@@ -1,7 +1,7 @@
 import React from 'react';
 import { useLocation, useNavigate } from 'react-router-dom';
 import clsx from 'clsx';
-import ArrowsLeft from '@assets/svgX/arrow-left.svg';
+import ArrowLeft from '@assets/svgX/UiKit/Arrows/arrow-left.svg';
 import Button from '@popup/popupX/shared/Button';
 import { useTranslation } from 'react-i18next';
 import { absoluteRoutes } from '@popup/popupX/constants/routes';
@@ -39,7 +39,7 @@ export default function NavButton({ hideBackArrow, backTitle, navBackSteps }: Na
                     }
                 }}
             >
-                <ArrowsLeft />
+                <ArrowLeft />
                 <span className="text__main_medium">{title}</span>
             </Button.Base>
         </div>

@@ -56,7 +56,7 @@ export default function ConnectionRequest({ onAllow, onReject }: Props) {
                 </Text.Capture>
             </Page.Main>
             <Page.Footer>
-                <Button.Main className="secondary" label={t('cancel')} onClick={withClose(onReject)} />
+                <Button.Main variant="secondary" label={t('cancel')} onClick={withClose(onReject)} />
                 <Button.Main
                     label={t('connect')}
                     disabled={connectButtonDisabled}

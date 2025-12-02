@@ -2,17 +2,18 @@
     background-color: rgba($color-black, 0.9);
     color: $color-white;
     font-family: $t-font-family-satoshi;
+
+    // This one important
+    // Figma using antialiased font rendering
+    // And browser using auto (subpixel)
+    // In this case font appears bold
+    -webkit-font-smoothing: antialiased;
 }
 
 .bg {
     opacity: unset;
     filter: unset;
-    background: $color-bg;
-
-    &.welcome-page {
-        background-image: url('../assets/images/onboarding-bg.png');
-        background-size: contain;
-    }
+    background: $semantic-background-l0;
 
     &.fade-bg {
         background: rgba($color-black, 0.9);

@@ -28,79 +28,60 @@ export const relativeRoutes = {
             hideMenu: true,
             hideConnection: true,
         },
-        setupPassword: {
-            path: 'setupPassword',
+        welcome: {
+            path: 'welcome',
             config: {
                 hideBackArrow: true,
                 backTitle: '',
                 hideMenu: true,
                 hideConnection: true,
             },
-            createOrRestore: {
-                path: 'createOrRestore',
+            setupPassword: {
+                path: 'setupPassword',
                 config: {
-                    hideBackArrow: true,
-                    backTitle: '',
+                    backTitle: i18n.t('x:header.navButton.back'),
                     hideMenu: true,
                     hideConnection: true,
                 },
-                selectNetwork: {
-                    path: 'selectNetwork',
+                createOrRestore: {
+                    path: 'createOrRestore',
                     config: {
-                        hideBackArrow: false,
-                        backTitle: '',
+                        backTitle: i18n.t('x:header.navButton.back'),
                         hideMenu: true,
                         hideConnection: true,
                     },
-                    custom: {
-                        path: 'custom',
-                        config: {
-                            backTitle: '',
-                            hideMenu: true,
-                            hideConnection: true,
-                        },
-                    },
-                },
-                restoreWallet: {
-                    path: 'restoreWallet',
-                    config: {
-                        hideBackArrow: false,
-                        backTitle: '',
-                        hideMenu: true,
-                        hideConnection: true,
-                    },
-                },
-                generateSeedPhrase: {
-                    path: 'generateSeedPhrase',
-                    config: {
-                        hideBackArrow: false,
-                        backTitle: '',
-                        hideMenu: true,
-                        hideConnection: true,
-                    },
-                    confirmSeedPhrase: {
-                        path: 'confirmSeedPhrase',
+                    selectNetwork: {
+                        path: 'selectNetwork',
                         config: {
                             hideBackArrow: false,
-                            backTitle: '',
+                            backTitle: i18n.t('x:header.navButton.back'),
                             hideMenu: true,
                             hideConnection: true,
                         },
-                        idIntro: {
-                            path: 'idIntro',
+                        custom: {
+                            path: 'custom',
                             config: {
                                 backTitle: '',
                                 hideMenu: true,
                                 hideConnection: true,
                             },
-                            requestIdentity: {
-                                path: 'requestIdentity',
-                                config: {
-                                    backTitle: '',
-                                    hideMenu: true,
-                                    hideConnection: true,
-                                },
-                            },
+                        },
+                    },
+                    restoreWallet: {
+                        path: 'restoreWallet',
+                        config: {
+                            hideBackArrow: false,
+                            backTitle: i18n.t('x:header.navButton.back'),
+                            hideMenu: true,
+                            hideConnection: true,
+                        },
+                    },
+                    requestIdentity: {
+                        path: 'requestIdentity',
+                        config: {
+                            backTitle: i18n.t('x:header.navButton.back'),
+                            hideMenu: true,
+                            hideConnection: true,
                         },
                     },
                 },
@@ -187,6 +168,7 @@ export const relativeRoutes = {
                 externalFlow: {
                     path: 'external-flow',
                     config: {
+                        backTitle: i18n.t('x:header.navButton.back'),
                         hideMenu: true,
                     },
                 },
@@ -240,6 +222,14 @@ export const relativeRoutes = {
             path: 'seedPhrase',
             config: {
                 backTitle: '',
+            },
+        },
+        saveSeedPhrase: {
+            path: 'saveSeedPhrase',
+            config: {
+                backTitle: i18n.t('x:header.navButton.back'),
+                hideMenu: true,
+                hideConnection: true,
             },
         },
         passcode: {

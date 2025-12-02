@@ -1,17 +1,18 @@
 import React, { PropsWithChildren, useCallback, useEffect, useMemo } from 'react';
 import clsx from 'clsx';
 import { Portal, noOp } from 'wallet-common-helpers';
-import Back from '@assets/svgX/arrow-left.svg';
+import Back from '@assets/svgX/UiKit/Arrows/arrow-left.svg';
 import { Connection, Fullscreen } from '@popup/popupX/page-layouts/MainLayout/Header/components';
 import { useLocation } from 'react-router-dom';
 import Button from '../Button';
 
 type HeaderProps = {
     isScrolling: boolean;
+    hideConnection?: boolean;
     onBack(): void;
 };
 
-function Header({ isScrolling, onBack }: HeaderProps) {
+function Header({ isScrolling, hideConnection, onBack }: HeaderProps) {
     const { pathname } = useLocation();
     const isPrompt = pathname.includes('prompt');
 
@@ -19,10 +20,12 @@ function Header({ isScrolling, onBack }: HeaderProps) {
         <div className={clsx('main-header', isScrolling && 'scroll-border')}>
             <div className="main-header__top">
                 {!isPrompt && <Fullscreen />}
-                <Connection hideConnection={false} />
+                <Connection hideConnection={hideConnection} />
             </div>
             <div className="main-header__bottom">
-                <Button.Icon className="fullscreen-notice__back" icon={<Back />} onClick={() => onBack()} />
+                <Button.Base className="fullscreen-notice__back" onClick={() => onBack()}>
+                    <Back />
+                </Button.Base>
             </div>
         </div>
     );
@@ -38,6 +41,8 @@ export type FullscreenNoticeProps = {
     onClose?(): void;
     /** Whether to include the header or not. Defaults to true */
     header?: boolean;
+    /** Whether to hide the connection icon or not. Defaults to false */
+    hideConnection?: boolean;
 };
 
 /**
@@ -61,6 +66,7 @@ export default function FullscreenNotice({
     onClose,
     children,
     header = true,
+    hideConnection = false,
 }: PropsWithChildren<FullscreenNoticeProps>): JSX.Element | null {
     const [scroll, setScroll] = React.useState(0);
     const isScrolling = useMemo(() => scroll > 0, [!!scroll]);
@@ -90,7 +96,7 @@ export default function FullscreenNotice({
 
     return (
         <Portal className="fullscreen-notice bg">
-            {header && <Header isScrolling={isScrolling} onBack={close} />}
+            {header && <Header isScrolling={isScrolling} hideConnection={hideConnection} onBack={close} />}
             <div
                 className="fullscreen-notice__content"
                 onScroll={(e) => {

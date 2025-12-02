@@ -1,27 +1,58 @@
 .id-issuance {
+    &__providers-container {
+        margin-top: $semantic-gap-xl;
+    }
+
     &__issuer-btn {
         display: flex;
-        color: $color-white;
         align-items: center;
-        padding: rem(16px);
-        gap: rem(16px);
+        padding: $semantic-padding-m $semantic-padding-l $semantic-padding-m $semantic-padding-m;
+        gap: $semantic-gap-s;
         border: unset;
         border-radius: rem(12px);
-        background: $color-transaction-bg;
         width: 100%;
 
+        @include surface-states-tertiary;
+
         &:not(:first-child) {
-            margin-top: rem(8px);
+            margin-top: rem(4px);
+        }
+
+        .text__main {
+            color: $semantic-content-primary;
+            font-weight: $t-font-weight-medium;
+            line-height: $semantic-label-l-line-height;
         }
 
         .identity-provider-icon {
-            width: rem(64px);
-            height: rem(32px);
+            width: rem(40px);
+            height: rem(40px);
             object-position: center;
             object-fit: contain;
-            background: $color-white;
-            border-radius: rem(4px);
-            padding: rem(4px);
+            background: $semantic-surface-primary;
+            border-radius: $semantic-radius-rounded;
         }
+
+        svg {
+            width: rem(24px);
+            height: rem(24px);
+            margin-left: auto;
+
+            path {
+                fill: $semantic-content-primary-a40;
+            }
+        }
+    }
+
+    .redirect-info {
+        text-align: center;
+        margin-top: $semantic-gap-l;
+        padding: 0 $semantic-padding-xl;
+    }
+}
+
+.id-issuance-failed {
+    .heading_medium {
+        color: $semantic-content-error-primary;
     }
 }

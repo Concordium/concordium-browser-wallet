@@ -9,8 +9,8 @@
         &__top {
             display: flex;
             flex-direction: row;
-            align-items: baseline;
-            margin-bottom: rem(12px);
+            align-items: center;
+            margin-bottom: $semantic-gap-s;
 
             &_side {
                 display: flex;

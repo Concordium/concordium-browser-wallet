@@ -344,7 +344,7 @@ function AddToken({ account }: { account: string }) {
                     {(loading || (isLoading && !haveTokens)) && <LoaderInline />}
                     {!!haveTokens && hasMore && (
                         <Button.Main
-                            className="secondary"
+                            variant="secondary"
                             label={t('loadMore')}
                             onClick={() => {
                                 updateTokens({ type: 'next' });

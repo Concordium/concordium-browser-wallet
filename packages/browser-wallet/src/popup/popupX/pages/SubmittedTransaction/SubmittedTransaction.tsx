@@ -325,11 +325,7 @@ export default function SubmittedTransaction() {
                 />
             )}
             <Page.Footer>
-                <Button.Main
-                    className="button-main"
-                    onClick={() => nav(absoluteRoutes.home.path)}
-                    label={t('continue')}
-                />
+                <Button.Main onClick={() => nav(absoluteRoutes.home.path)} label={t('continue')} />
             </Page.Footer>
         </Page>
     );

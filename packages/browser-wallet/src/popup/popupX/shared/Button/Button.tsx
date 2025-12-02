@@ -25,12 +25,36 @@ export function ButtonBase<A extends ElementType = 'button'>({
     return <Component {...props} type={type} className={clsx('button__base', className)} />;
 }
 
-function ButtonMain({ label, className, ...props }: { label: string } & ButtonProps) {
+type UiKitProps = {
+    label: string;
+    iconLeft?: ReactNode;
+    iconRight?: ReactNode;
+    variant?: 'primary' | 'secondary' | 'tertiary';
+    size?: 'large' | 'medium' | 'small';
+    inverse?: boolean;
+} & ButtonProps;
+
+function ButtonUiKit({ label, iconLeft, iconRight, variant, size, inverse, className, ...props }: UiKitProps) {
     return (
-        <ButtonBase className={clsx('button__main', className)} {...props}>
-            {label}
+        <ButtonBase
+            className={clsx(
+                'button__ui-kit',
+                `button__ui-kit_${variant}`,
+                `button__ui-kit_${size}`,
+                { inverse },
+                className
+            )}
+            {...props}
+        >
+            {iconLeft}
+            <Text.UiKit>{label}</Text.UiKit>
+            {iconRight}
         </ButtonBase>
     );
+}
+
+function ButtonMain({ ...props }: UiKitProps) {
+    return <ButtonUiKit size="large" variant="primary" {...props} />;
 }
 
 function ButtonSecondary({ label, icon, className, ...props }: { label: string; icon?: ReactNode } & ButtonProps) {
@@ -40,6 +64,10 @@ function ButtonSecondary({ label, icon, className, ...props }: { label: string; 
             <Text.CaptureAdditional>{label}</Text.CaptureAdditional>
         </ButtonBase>
     );
+}
+
+function ButtonTertiary({ size = 'medium', ...props }: UiKitProps) {
+    return <ButtonUiKit size={size} {...props} variant="tertiary" />;
 }
 
 function ButtonIcon({ icon, className, ...props }: { icon: ReactNode } & ButtonProps) {
@@ -83,14 +111,37 @@ function ButtonIconTile({ icon, label, className, ...props }: { icon: ReactNode;
     );
 }
 
+function ButtonEmbedded({
+    icon,
+    className,
+    variant = 'dark',
+    size = 'small',
+    ...props
+}: {
+    icon: ReactNode;
+    variant?: 'dark' | 'light';
+    size?: 'small' | 'medium';
+} & ButtonProps) {
+    return (
+        <ButtonBase
+            className={clsx('button__embedded', `button__embedded_${variant}`, `button__embedded_${size}`, className)}
+            {...props}
+        >
+            {icon}
+        </ButtonBase>
+    );
+}
+
 const Button = {
     Base: ButtonBase,
     Main: ButtonMain,
     Secondary: ButtonSecondary,
+    Tertiary: ButtonTertiary,
     Icon: ButtonIcon,
     IconText: ButtonIconText,
     Text: ButtonText,
     IconTile: ButtonIconTile,
+    Embedded: ButtonEmbedded,
 };
 
 export default Button;

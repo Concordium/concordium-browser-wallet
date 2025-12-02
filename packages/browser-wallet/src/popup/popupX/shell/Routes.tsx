@@ -18,21 +18,19 @@ import {
 import IdCards from '@popup/popupX/pages/IdCards';
 import Accounts from '@popup/popupX/pages/Accounts';
 import CreateAccount, { CreateAccountConfirm } from '@popup/popupX/pages/CreateAccount';
-import SeedPhrase from 'src/popup/popupX/pages/SeedPhrase';
+import SeedPhrase, { SaveSeedPhrase } from 'src/popup/popupX/pages/SeedPhrase';
 import ChangePasscode from 'src/popup/popupX/pages/ChangePasscode';
 import { Web3IdCredentials, Web3IdImport } from '@popup/popupX/pages/Web3Id';
 import NetworkSettings from '@popup/popupX/pages/NetworkSettings';
 import { ConnectNetwork, CustomConnectNetwork } from '@popup/popupX/pages/ConnectNetwork';
 import About from '@popup/popupX/pages/About';
 import {
-    ConfirmSeedPhrase,
     CreateOrRestore,
-    GenerateSeedPhrase,
-    IdCardsInfo,
     RestoreWallet,
     SelectNetwork,
     SetupPassword,
     Welcome,
+    Intro,
 } from '@popup/popupX/pages/Onboarding';
 import ConnectedSites from '@popup/popupX/pages/ConnectedSites';
 import EarningRewards from '@popup/popupX/pages/EarningRewards';
@@ -94,52 +92,42 @@ export default function Routes({ messagePromptHandlers }: { messagePromptHandler
         <ReactRoutes>
             <Route path={routePrefix}>
                 <Route element={<OnboardingLayout />} path={relativeRoutes.onboarding.path}>
-                    <Route index element={<Welcome />} />
-                    <Route path={relativeRoutes.onboarding.setupPassword.path}>
-                        <Route index element={<SetupPassword />} />
-                        <Route path={relativeRoutes.onboarding.setupPassword.createOrRestore.path}>
-                            <Route index element={<CreateOrRestore />} />
-                            <Route path={relativeRoutes.onboarding.setupPassword.createOrRestore.selectNetwork.path}>
-                                <Route index element={<SelectNetwork />} />
+                    <Route index element={<Intro />} />
+                    <Route path={relativeRoutes.onboarding.welcome.path}>
+                        <Route index element={<Welcome />} />
+                        <Route path={relativeRoutes.onboarding.welcome.setupPassword.path}>
+                            <Route index element={<SetupPassword />} />
+                            <Route path={relativeRoutes.onboarding.welcome.setupPassword.createOrRestore.path}>
+                                <Route index element={<CreateOrRestore />} />
                                 <Route
                                     path={
-                                        relativeRoutes.onboarding.setupPassword.createOrRestore.selectNetwork.custom
+                                        relativeRoutes.onboarding.welcome.setupPassword.createOrRestore.selectNetwork
                                             .path
                                     }
-                                    element={<CustomConnectNetwork />}
-                                />
-                            </Route>
-                            <Route
-                                path={relativeRoutes.onboarding.setupPassword.createOrRestore.restoreWallet.path}
-                                element={<RestoreWallet />}
-                            />
-                            <Route
-                                path={relativeRoutes.onboarding.setupPassword.createOrRestore.generateSeedPhrase.path}
-                            >
-                                <Route index element={<GenerateSeedPhrase />} />
-                                <Route
-                                    path={
-                                        relativeRoutes.onboarding.setupPassword.createOrRestore.generateSeedPhrase
-                                            .confirmSeedPhrase.path
-                                    }
                                 >
-                                    <Route index element={<ConfirmSeedPhrase />} />
+                                    <Route index element={<SelectNetwork />} />
                                     <Route
                                         path={
-                                            relativeRoutes.onboarding.setupPassword.createOrRestore.generateSeedPhrase
-                                                .confirmSeedPhrase.idIntro.path
+                                            relativeRoutes.onboarding.welcome.setupPassword.createOrRestore
+                                                .selectNetwork.custom.path
                                         }
-                                    >
-                                        <Route index element={<IdCardsInfo />} />
-                                        <Route
-                                            path={
-                                                relativeRoutes.onboarding.setupPassword.createOrRestore
-                                                    .generateSeedPhrase.confirmSeedPhrase.idIntro.requestIdentity.path
-                                            }
-                                        >
-                                            <Route index element={<IdIssuance />} />
-                                        </Route>
-                                    </Route>
+                                        element={<CustomConnectNetwork />}
+                                    />
+                                </Route>
+                                <Route
+                                    path={
+                                        relativeRoutes.onboarding.welcome.setupPassword.createOrRestore.restoreWallet
+                                            .path
+                                    }
+                                    element={<RestoreWallet />}
+                                />
+                                <Route
+                                    path={
+                                        relativeRoutes.onboarding.welcome.setupPassword.createOrRestore.requestIdentity
+                                            .path
+                                    }
+                                >
+                                    <Route index element={<IdIssuance />} />
                                 </Route>
                             </Route>
                         </Route>
@@ -214,6 +202,7 @@ export default function Routes({ messagePromptHandlers }: { messagePromptHandler
                         />
                     </Route>
                     <Route element={<SeedPhrase />} path={relativeRoutes.settings.seedPhrase.path} />
+                    <Route element={<SaveSeedPhrase />} path={relativeRoutes.settings.saveSeedPhrase.path} />
                     <Route element={<ChangePasscode />} path={relativeRoutes.settings.passcode.path} />
                     <Route path={relativeRoutes.settings.web3Id.path}>
                         <Route index element={<Web3IdCredentials />} />

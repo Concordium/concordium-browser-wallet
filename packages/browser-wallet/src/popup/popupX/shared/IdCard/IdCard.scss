@@ -3,11 +3,6 @@
         color: $color-grey-1;
     }
 
-    .capture__main_small {
-        margin-left: rem(16px);
-        color: $color-mineral-0;
-    }
-
     .text__main_regular {
         color: $color-mineral-2;
     }
@@ -18,10 +13,66 @@
 
     & .title-row {
         display: flex;
-        justify-content: space-between;
-        align-items: baseline;
-        margin-left: rem(16px);
-        margin-right: rem(16px);
+        gap: $semantic-gap-m;
+        align-items: center;
+        margin: 0 $semantic-gap-xl 0 $semantic-gap-l;
+
+        .id-type {
+            display: flex;
+            background-color: $semantic-surface-inverse-primary-a10;
+            border-radius: $semantic-radius-s;
+            padding: $semantic-padding-s;
+
+            svg {
+                width: rem(20px);
+                height: rem(20px);
+
+                path {
+                    fill: $semantic-content-inverse-primary;
+                }
+            }
+
+            &:hover {
+                background-color: $semantic-surface-inverse-primary-hover-a20;
+            }
+
+            .tooltip-x_text {
+                left: rem(-6px);
+                top: calc(100% + #{rem(13px)});
+
+                &::after {
+                    left: rem(16px);
+                }
+            }
+        }
+
+        .id-title {
+            display: flex;
+            flex-direction: column;
+            width: rem(154px);
+
+            &:last-child {
+                width: auto;
+            }
+
+            .capture__main_small {
+                white-space: break-spaces;
+                overflow: hidden;
+                text-overflow: ellipsis;
+                color: $color-mineral-0;
+            }
+        }
+
+        .editable-name {
+            display: flex;
+            gap: rem(4px);
+            margin-left: rem(-16px);
+        }
+
+        .button__ui-kit_primary {
+            margin-left: auto;
+            white-space: nowrap;
+        }
     }
 
     &.card-x {

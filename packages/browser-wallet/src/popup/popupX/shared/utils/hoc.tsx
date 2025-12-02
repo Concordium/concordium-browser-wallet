@@ -5,7 +5,7 @@ import { useSelectedCredential } from '@popup/shared/utils/account-helpers';
 import Loader from '@popup/popupX/shared/Loader';
 import PasswordProtect, { PasswordProtectConfigType } from '@popup/popupX/shared/PasswordProtect';
 import PasswordSession from '@popup/popupX/shared/PasswordSession';
-import { hasBeenOnBoardedAtom, sessionPasscodeAtom } from '@popup/store/settings';
+import { hasBeenOnBoardedAtom, sessionOnboardingLocationAtom, sessionPasscodeAtom } from '@popup/store/settings';
 import { isRecoveringAtom } from '@popup/store/identity';
 import { absoluteRoutes } from '@popup/popupX/constants/routes';
 
@@ -59,12 +59,19 @@ export function withRedirect(Component: React.ComponentType) {
         const { loading: loadingHasBeenOnboarded, value: hasBeenOnboarded } = useAtomValue(hasBeenOnBoardedAtom);
         const isAtOnboarding = pathname.includes('onboarding');
 
-        if (loadingHasBeenOnboarded || loadingIsRecovering) {
+        const { loading: loadingSessionOnboardingLocation, value: sessionOnboardingLocation } =
+            useAtomValue(sessionOnboardingLocationAtom);
+
+        if (loadingHasBeenOnboarded || loadingIsRecovering || loadingSessionOnboardingLocation) {
             return null;
         }
 
         if (sessionIsRecovering && !isAtRecovery) {
             return <Navigate to={absoluteRoutes.settings.restore.main.path} />;
+        }
+
+        if (!hasBeenOnboarded && sessionOnboardingLocation) {
+            return <Navigate to={sessionOnboardingLocation} />;
         }
 
         if (!hasBeenOnboarded && !isAtOnboarding) {

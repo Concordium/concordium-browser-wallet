@@ -186,6 +186,7 @@ export const storedIdentityProviders = makeIndexedStorageAccessor<IdentityProvid
     ChromeStorageKey.IdentityProviders
 );
 export const storedHasBeenOnboarded = makeStorageAccessor<boolean>('local', ChromeStorageKey.HasBeenOnboarded);
+export const storedHasBeenSavedSeed = makeStorageAccessor<boolean>('local', ChromeStorageKey.HasBeenSavedSeed);
 export const storedTokens = makeIndexedStorageAccessor<Record<string, Record<string, TokenStorage[]>>>(
     'local',
     ChromeStorageKey.Tokens

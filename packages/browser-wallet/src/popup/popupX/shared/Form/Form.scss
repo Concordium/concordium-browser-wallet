@@ -19,15 +19,16 @@
     }
 
     &__field {
-        background-color: $color-input-bg;
-        color: $color-white;
-        height: rem(56px);
-        border: rem(1px) solid $color-input-border;
-        border-radius: rem(12px);
-        padding: rem(28px) rem(14px) rem(12px);
+        background-color: $semantic-surface-tertiary;
+        height: rem(58px);
+        border: rem(1px) solid $semantic-surface-tertiary;
+        border-radius: $semantic-radius-m;
+        padding: rem(26px) rem(11px) rem(11px);
         width: 100%;
         outline: none;
-        font-size: rem(14px);
+        font-size: $semantic-body-m-scale;
+        font-weight: $t-font-weight-regular;
+        color: $semantic-content-primary;
 
         /* override base style, remove after release */
         transform: unset;
@@ -35,9 +36,30 @@
         /* override base style, remove after release */
         @include transition(border-color);
 
+        &::placeholder {
+            font-family: $t-font-family-satoshi;
+            font-weight: $t-font-weight-regular;
+            font-size: $semantic-body-m-scale;
+            color: $semantic-content-primary-a40;
+        }
+
+        &:hover {
+            background-color: $semantic-surface-tertiary-hover;
+            border-color: $semantic-border-tertiary-hover;
+        }
+
         &:focus {
-            background-color: $color-grey-3;
-            border-color: $color-mineral-2;
+            background-color: $semantic-surface-tertiary-pressed;
+            border-color: $semantic-border-tertiary-selected;
+        }
+
+        &:disabled {
+            background-color: $semantic-surface-primary-disabled;
+            border-color: $semantic-surface-primary-disabled;
+
+            &::placeholder {
+                color: $semantic-content-primary-disabled;
+            }
         }
 
         // Hide the buttons to increment/decrement
@@ -101,11 +123,18 @@
     }
 
     &__label {
+        pointer-events: none;
         position: absolute;
-        left: rem(14px);
+        left: rem(12px);
         top: rem(8px);
-        color: $color-mineral-3;
-        opacity: 0.5;
+        color: $semantic-content-secondary;
+        font-size: $semantic-label-s-scale;
+        line-height: $semantic-label-s-line-height;
+        font-weight: $t-font-weight-medium;
+
+        &.disabled {
+            color: $semantic-content-primary-disabled;
+        }
     }
 
     &__seed-phrase-x {
@@ -157,9 +186,30 @@
 
     &__error {
         left: unset;
-        font-size: rem(8px);
-        margin-top: rem(4px);
+        font-weight: $t-font-weight-regular;
+        font-size: $semantic-body-m-scale;
+        margin-top: rem(6px);
         white-space: break-spaces;
+    }
+
+    &__note {
+        display: flex;
+        align-items: center;
+        gap: rem(6px);
+        font-weight: $t-font-weight-regular;
+        font-size: $semantic-body-m-scale;
+        color: $semantic-content-accent-secondary;
+        margin-top: rem(6px);
+        left: unset;
+
+        svg {
+            width: $semantic-label-s-scale;
+            height: $semantic-label-s-scale;
+
+            path {
+                fill: $semantic-content-accent-secondary;
+            }
+        }
     }
 }
 
@@ -202,8 +252,8 @@
 
     &__reveal {
         position: absolute;
-        top: rem(16px);
-        right: rem(20px);
+        top: rem(19px);
+        right: rem(16px);
         background-color: transparent;
         border: none;
         cursor: pointer;
@@ -213,10 +263,21 @@
         transform: unset;
 
         svg {
+            width: rem(20px);
+            height: rem(20px);
+
             g,
             path {
-                fill: $color-mineral-2;
+                fill: $semantic-content-secondary;
             }
+        }
+    }
+
+    .form-input__note {
+        color: $semantic-content-warning-primary;
+
+        svg path {
+            fill: $semantic-content-warning-primary;
         }
     }
 }
@@ -353,7 +414,7 @@ $handle-size: rem(20px);
     display: flex;
     align-items: center;
     gap: rem(6px);
-    margin-top: rem(8px);
+    margin-top: rem(6px);
     color: $color-red-attention !important;
 
     svg path {

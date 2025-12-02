@@ -71,7 +71,7 @@ export default function SignMessage({ onSubmit, onReject }: Props) {
                 <BinaryDisplay message={message} url={url} />
             </Page.Main>
             <Page.Footer>
-                <Button.Main className="secondary" label={t('reject')} onClick={withClose(onReject)} />
+                <Button.Main variant="secondary" label={t('reject')} onClick={withClose(onReject)} />
                 <Button.Main
                     label={t('sign')}
                     onClick={() => {

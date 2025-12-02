@@ -25,7 +25,7 @@ export default function IdIssuanceFailed() {
     }, [state.backState]);
 
     return (
-        <Page>
+        <Page className="id-issuance-failed">
             <Page.Top heading={t('title')} />
             <Text.Capture>{state.message}</Text.Capture>
             <Page.Footer>

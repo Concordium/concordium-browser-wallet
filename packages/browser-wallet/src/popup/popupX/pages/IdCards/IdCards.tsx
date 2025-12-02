@@ -3,7 +3,7 @@ import { useNavigate } from 'react-router-dom';
 import { useTranslation } from 'react-i18next';
 import { useAtom } from 'jotai';
 
-import Plus from '@assets/svgX/plus.svg';
+import Plus from '@assets/svgX/UiKit/Interface/plus-add-buy.svg';
 import Button from '@popup/popupX/shared/Button';
 import Page from '@popup/popupX/shared/Page';
 import { identitiesAtom } from '@popup/store/identity';

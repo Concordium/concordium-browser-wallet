@@ -27,7 +27,7 @@ type Props = Pick<
  * Use as a normal \<input /\>. Should NOT be used for checkbox or radio.
  */
 export const Input = forwardRef<HTMLInputElement, Props>(
-    ({ error, className, type = 'text', label, note, valid, readOnly, ...props }, ref) => {
+    ({ error, className, type = 'text', label, note, valid, readOnly, disabled, ...props }, ref) => {
         return (
             <label
                 className={clsx(
@@ -45,9 +45,14 @@ export const Input = forwardRef<HTMLInputElement, Props>(
                     autoComplete="off"
                     spellCheck="false"
                     readOnly={readOnly}
+                    disabled={disabled}
                     {...props}
                 />
-                {label && <div className="form-input__label capture__main_small">{label}</div>}
+                {label && (
+                    <div className={clsx('form-input__label', 'capture__main_small', disabled && 'disabled')}>
+                        {label}
+                    </div>
+                )}
                 {error ? (
                     <ErrorMessage className="form-input__error">{error}</ErrorMessage>
                 ) : (

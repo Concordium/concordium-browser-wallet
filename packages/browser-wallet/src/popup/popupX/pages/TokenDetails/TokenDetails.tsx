@@ -15,8 +15,9 @@ import { addThousandSeparators, integerToFractional, pipe } from 'wallet-common-
 import { getMetadataDecimals, trunctateSymbol } from '@shared/utils/token-helpers';
 import { useUpdateAtom } from 'jotai/utils';
 import { WalletCredential } from '@shared/storage/types';
-import Arrow from '@assets/svgX/arrow-right.svg';
-import Clock from '@assets/svgX/clock.svg';
+import ArrowUp from '@assets/svgX/UiKit/Arrows/arrow-up.svg';
+import ArrowDown from '@assets/svgX/UiKit/Arrows/arrow-down.svg';
+import Clock from '@assets/svgX/UiKit/MenuNavigation/clock-activity-history-time.svg';
 import Notebook from '@assets/svgX/notebook.svg';
 import Eye from '@assets/svgX/eye-slash.svg';
 import Cis2 from '@assets/svgX/coin-crypto-cis-2.svg';
@@ -66,12 +67,17 @@ function TokenDetails({ credential }: { credential: WalletCredential }) {
                 </Text.DynamicSize>
                 <div className="token-details-x__action-buttons">
                     <Button.IconTile
-                        icon={<Arrow />}
+                        icon={<ArrowDown />}
                         label={t('receive')}
                         onClick={() => navToReceive()}
                         className="receive"
                     />
-                    <Button.IconTile icon={<Arrow />} label={t('send')} onClick={() => navToSend()} className="send" />
+                    <Button.IconTile
+                        icon={<ArrowUp />}
+                        label={t('send')}
+                        onClick={() => navToSend()}
+                        className="send"
+                    />
                     <Button.IconTile icon={<Clock />} label={t('activity')} onClick={() => navToTransactionLog()} />
                 </div>
                 <Card>
