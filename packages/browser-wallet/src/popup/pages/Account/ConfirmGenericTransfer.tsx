@@ -1,6 +1,6 @@
 import React, { useContext, useMemo } from 'react';
 import {
-    AccountTransactionPayload,
+    AccountTransactionInput,
     AccountTransactionType,
     convertEnergyToMicroCcd,
     getEnergyCost,
@@ -12,7 +12,7 @@ import ConfirmTransfer from './ConfirmTransfer';
 import { accountPageContext } from './utils';
 
 export type ConfirmGenericTransferState = {
-    payload: AccountTransactionPayload;
+    payload: AccountTransactionInput;
     type: AccountTransactionType;
 };
 

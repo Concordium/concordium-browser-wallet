@@ -1,12 +1,12 @@
 import React from 'react';
 import { useTranslation } from 'react-i18next';
-import { UpdateContractPayload } from '@concordium/web-sdk';
+import { UpdateContractInput } from '@concordium/web-sdk';
 import { displayAsCcd } from 'wallet-common-helpers';
 import { SmartContractParameters } from '@concordium/browser-wallet-api-helpers';
 import DisplayParameters from '../DisplayParameters';
 
 interface Props {
-    payload: Omit<UpdateContractPayload, 'message'>;
+    payload: Omit<UpdateContractInput, 'message'>;
     parameters?: SmartContractParameters;
 }
 

@@ -3,22 +3,23 @@ import clsx from 'clsx';
 import { useTranslation } from 'react-i18next';
 import React, { useState } from 'react';
 import {
-    AccountTransactionType,
     AccountTransaction,
-    AccountTransactionPayload,
-    SimpleTransferPayload,
-    UpdateContractPayload,
-    InitContractPayload,
-    RegisterDataPayload,
-    ConfigureDelegationPayload,
+    AccountTransactionInput,
+    AccountTransactionType,
     ConfigureBakerPayload,
+    ConfigureDelegationPayload,
     DeployModulePayload,
+    InitContractInput,
+    RegisterDataPayload,
+    SimpleTransferPayload,
+    UpdateContractInput,
+    UpdateContractPayload,
 } from '@concordium/web-sdk';
 import { Cis2TransferParameters } from '@shared/utils/types';
 import { SmartContractParameters } from '@concordium/browser-wallet-api-helpers';
 import { TokenMetadata } from '@shared/storage/types';
 import { getMetadataDecimals } from '@shared/utils/token-helpers';
-import { chunkString, DisplayAddress, AddressDisplayFormat } from 'wallet-common-helpers';
+import { AddressDisplayFormat, chunkString, DisplayAddress } from 'wallet-common-helpers';
 import DisplayCost from './DisplayCost';
 import { getTransactionTypeName } from '../utils/transaction-helpers';
 import DisplayUpdateContract from './displayPayload/DisplayUpdateContract';
@@ -35,7 +36,7 @@ import DisplayDeployModule from './displayPayload/DisplayDeployModule';
 export type GenericTransactionReceiptProps = {
     className?: string;
     transactionType: AccountTransactionType;
-    payload: AccountTransactionPayload;
+    payload: AccountTransactionInput;
     parameters?: SmartContractParameters;
     sender: string;
     cost?: bigint;
@@ -63,9 +64,9 @@ function displayPayload({ payload, type }: Omit<AccountTransaction, 'header'>, p
         case AccountTransactionType.Transfer:
             return <DisplaySimpleTransfer payload={payload as SimpleTransferPayload} />;
         case AccountTransactionType.Update:
-            return <DisplayUpdateContract payload={payload as UpdateContractPayload} parameters={parameters} />;
+            return <DisplayUpdateContract payload={payload as UpdateContractInput} parameters={parameters} />;
         case AccountTransactionType.InitContract:
-            return <DisplayInitContract payload={payload as InitContractPayload} parameters={parameters} />;
+            return <DisplayInitContract payload={payload as InitContractInput} parameters={parameters} />;
         case AccountTransactionType.RegisterData:
             return <DisplayRegisterData payload={payload as RegisterDataPayload} />;
         case AccountTransactionType.ConfigureDelegation:

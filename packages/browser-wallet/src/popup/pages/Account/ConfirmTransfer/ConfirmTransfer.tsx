@@ -1,17 +1,17 @@
 /* eslint-disable react/destructuring-assignment */
-import React, { useEffect, useState, useMemo } from 'react';
+import React, { useEffect, useMemo, useState } from 'react';
 import { useTranslation } from 'react-i18next';
-import { useSetAtom, useAtomValue } from 'jotai';
+import { useAtomValue, useSetAtom } from 'jotai';
 import { selectedAccountAtom } from '@popup/store/account';
 import {
     AccountAddress,
-    AccountTransactionPayload,
+    AccountTransactionInput,
     AccountTransactionType,
-    UpdateContractPayload,
+    UpdateContractInput,
 } from '@concordium/web-sdk';
 import {
-    getDefaultExpiry,
     createPendingTransactionFromAccountTransaction,
+    getDefaultExpiry,
     sendTransaction,
 } from '@popup/shared/utils/transaction-helpers';
 import { grpcClientAtom } from '@popup/store/settings';
@@ -21,8 +21,8 @@ import Button from '@popup/shared/Button';
 import { useNavigate } from 'react-router-dom';
 import { absoluteRoutes } from '@popup/constants/routes';
 import GenericTransactionReceipt, {
-    TokenTransferReceipt,
     GenericTransactionReceiptProps,
+    TokenTransferReceipt,
     TokenTransferReceiptProps,
 } from '@popup/shared/TransactionReceipt';
 import { useUpdateAtom } from 'jotai/utils';
@@ -42,14 +42,14 @@ type BaseProps = {
 type ConfirmTokenTransferProps = BaseProps & {
     showAsTokenTransfer: true;
     transactionType: AccountTransactionType.Update;
-    payload: UpdateContractPayload;
+    payload: UpdateContractInput;
     parameters: SmartContractParameters;
     metadata: TokenMetadata;
 };
 
 type ConfirmGenericTransferProps = BaseProps & {
     showAsTokenTransfer?: false;
-    payload: AccountTransactionPayload;
+    payload: AccountTransactionInput;
     transactionType: AccountTransactionType;
     parameters?: SmartContractParameters;
 };

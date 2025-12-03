@@ -17,7 +17,7 @@ import {
     ReturnValue,
     serializeUpdateContractParameters,
     sha256,
-    UpdateContractPayload,
+    UpdateContractInput,
 } from '@concordium/web-sdk';
 import { MetadataUrl, PltMetadataUrl, PltResponse, TokenIdAndMetadata, TokenMetadata } from '@shared/storage/types';
 import { CIS2_SCHEMA, CIS2_SCHEMA_CONTRACT_NAME } from '@popup/constants/schema';
@@ -369,7 +369,7 @@ export function getTokenTransferPayload(
     maxContractExecutionEnergy: bigint,
     index: bigint,
     subindex = 0n
-): UpdateContractPayload {
+): UpdateContractInput {
     return {
         amount: CcdAmount.fromMicroCcd(0n),
         address: ContractAddress.create(index, subindex),

@@ -10,21 +10,21 @@ import { absoluteRoutes, transactionDetailsRoute } from '@popup/popupX/constants
 import Card from '@popup/popupX/shared/Card';
 import { useAsyncMemo } from 'wallet-common-helpers';
 import {
-    AccountTransactionSummary,
-    HexString,
-    TransactionHash,
-    TransactionSummaryType,
-    isRejectTransaction,
-    isSuccessTransaction,
-    FailedTransactionSummary,
-    BaseAccountTransactionSummary,
     AccountTransactionPayload,
+    AccountTransactionSummary,
     AccountTransactionType,
-    SimpleTransferPayload,
-    SimpleTransferWithMemoPayload,
+    BaseAccountTransactionSummary,
+    CcdAmount,
     ConfigureBakerPayload,
     ConfigureDelegationPayload,
-    CcdAmount,
+    FailedTransactionSummary,
+    HexString,
+    isRejectTransaction,
+    isSuccessTransaction,
+    SimpleTransferPayload,
+    SimpleTransferWithMemoPayload,
+    TransactionHash,
+    TransactionSummaryType,
 } from '@concordium/web-sdk';
 import { useAtomValue } from 'jotai';
 import { grpcClientAtom } from '@popup/store/settings';
@@ -284,6 +284,9 @@ export default function SubmittedTransaction() {
                     TX_TIMEOUT
                 );
 
+                if (!outcome.summary) {
+                    throw Error('Unexpected transaction type');
+                }
                 if (isRejectTransaction(outcome.summary)) {
                     return { type: 'failure', summary: outcome.summary };
                 }
