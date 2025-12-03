@@ -17,7 +17,7 @@ export function showValidatorAmount(amount: CcdAmount.Type): string {
     return `${formatCcdAmount(amount)} CCD`;
 }
 
-export function showValidatorOpenStatus(status: OpenStatusText | OpenStatus): string {
+export function showValidatorOpenStatus(status: OpenStatusText | OpenStatus | null): string {
     switch (status) {
         case OpenStatus.OpenForAll:
         case OpenStatusText.OpenForAll:

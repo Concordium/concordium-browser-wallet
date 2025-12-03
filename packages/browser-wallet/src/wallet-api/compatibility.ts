@@ -1,39 +1,41 @@
 /* eslint-disable @typescript-eslint/no-explicit-any */
 import {
-    SmartContractParameters,
-    SchemaWithContext,
-    SchemaType,
     AccountAddressSource,
     SchemaSource,
-    SignMessageObject,
-    SendTransactionPayload,
+    SchemaType,
+    SchemaWithContext,
     SendTransactionInitContractPayload,
+    SendTransactionPayload,
     SendTransactionUpdateContractPayload,
+    SignMessageObject,
+    SmartContractParameters,
 } from '@concordium/browser-wallet-api-helpers';
 import {
     AccountAddress,
+    AccountTransactionPayload,
+    AccountTransactionPayloadJSON,
     AccountTransactionType,
     CcdAmount,
     ConfigureBakerPayload,
     ConfigureDelegationPayload,
     ContractAddress,
     ContractName,
+    DataBlob,
     DeployModulePayload,
     Energy,
+    getAccountTransactionHandler,
     HexString,
-    InitContractPayload,
+    InitContractInput,
     ModuleReference,
     ReceiveName,
     RegisterDataPayload,
     SchemaVersion,
     SimpleTransferPayload,
     SimpleTransferWithMemoPayload,
-    UpdateCredentialsPayload,
-    DataBlob,
-    AccountTransactionPayload,
-    getAccountTransactionHandler,
-    AccountTransactionPayloadJSON,
     TokenUpdatePayload,
+    UpdateCredentialKeysInput,
+    UpdateCredentialsInput,
+    UpdateCredentialsPayload,
 } from '@concordium/web-sdk/types';
 import { empty } from '@concordium/web-sdk/types/Parameter';
 import { IdStatement } from '@concordium/web-sdk/id';
@@ -222,7 +224,10 @@ export interface ConfigureDelegationPayloadV0 extends Omit<ConfigureDelegationPa
 export type ConfigureDelegationPayloadCompat = ConfigureDelegationPayloadV0 | ConfigureDelegationPayload;
 
 export type RegisterDataPayloadCompat = RegisterDataPayload;
-export type UpdateCredentialsPayloadCompat = UpdateCredentialsPayload;
+export type UpdateCredentialsPayloadCompat =
+    | UpdateCredentialsPayload
+    | UpdateCredentialsInput
+    | UpdateCredentialKeysInput;
 
 export type SendTransactionPayloadCompat =
     | InitContractPayloadCompat
@@ -251,10 +256,10 @@ function sanitizePayload(type: AccountTransactionType, payload: SendTransactionP
             } else if (typeof (p as InitContractPayloadV2).initName === 'string') {
                 initName = ContractName.fromString((p as InitContractPayloadV2).initName);
             } else if (
-                typeof (p as InitContractPayload).initName === 'object' &&
-                (p as InitContractPayload).initName !== null
+                typeof (p as InitContractInput).initName === 'object' &&
+                (p as InitContractInput).initName !== null
             ) {
-                initName = ContractName.fromString((p as InitContractPayload).initName.value);
+                initName = ContractName.fromString((p as InitContractInput).initName.value);
             } else {
                 throw new Error(`Unexpected payload for type ${type}: ${p}`);
             }
@@ -344,7 +349,7 @@ function sanitizePayload(type: AccountTransactionType, payload: SendTransactionP
         }
         case AccountTransactionType.UpdateCredentials:
             // No changes across any API versions.
-            return payload as UpdateCredentialsPayload;
+            return payload as UpdateCredentialsInput;
         default:
             // This should never happen, but is here for backwards compatibility.
             return payload as SendTransactionPayload;

@@ -1,16 +1,16 @@
 import {
     AccountTransactionSummary,
     AccountTransactionType,
+    BakerEvent,
     ConcordiumGRPCWebClient,
     ContractTraceEvent,
-    BakerEvent,
     DelegationEvent,
     FinalizedBlockItem,
+    getTransactionRejectReason,
     TransactionEvent,
     TransactionEventTag,
     TransactionKindString,
     TransactionSummaryType,
-    getTransactionRejectReason,
 } from '@concordium/web-sdk';
 import JSONBig from 'json-bigint';
 import { logError } from '@shared/utils/log-helpers';
@@ -184,6 +184,8 @@ function getTransactionAmount(account: string, summary: AccountTransactionSummar
             return summary.contractInitialized.amount.microCcdAmount;
         case TransactionKindString.Update:
             return summary.events.reduce((acc: bigint, e) => {
+                if (e === null) return acc;
+
                 switch (e.tag) {
                     case TransactionEventTag.Updated:
                         return acc - e.amount.microCcdAmount;
@@ -237,8 +239,12 @@ function getTransactionMemo(summary: AccountTransactionSummary): string | undefi
 }
 
 function getTransactionEvents(summary: AccountTransactionSummary): string[] | undefined {
-    const toString = ({ tag, ...rest }: TransactionEvent | ContractTraceEvent | BakerEvent | DelegationEvent) =>
-        `${tag}\n${JSONBig.stringify(rest)}`;
+    const toString = (event: TransactionEvent | ContractTraceEvent | BakerEvent | DelegationEvent | null) => {
+        if (event === null) return 'Unknown event';
+
+        const { tag, ...rest } = event;
+        return `${tag}\n${JSONBig.stringify(rest)}`;
+    };
 
     switch (summary.transactionType) {
         case TransactionKindString.Update:
@@ -255,10 +261,12 @@ export async function toBrowserWalletTransaction(
     account: string,
     transactionHash: string,
     grpc: ConcordiumGRPCWebClient
-): Promise<BrowserWalletTransaction> {
+): Promise<BrowserWalletTransaction | null> {
     const block = await grpc.getBlockInfo(blockHash);
     const time = BigInt(Math.round(block.blockSlotTime.getTime() / 1000));
     const id = -1;
+
+    if (summary === null) return null;
 
     if (summary.type !== TransactionSummaryType.AccountTransaction) {
         return {

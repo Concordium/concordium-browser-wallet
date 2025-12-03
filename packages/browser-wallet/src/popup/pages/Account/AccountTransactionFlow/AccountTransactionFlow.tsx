@@ -2,7 +2,7 @@ import React, { useCallback, useState } from 'react';
 
 import BackButton from '@popup/shared/BackButton';
 import MultiStepForm, { FormChildren, MultiStepFormProps, OrRenderValues } from '@popup/shared/MultiStepForm';
-import { AccountTransactionPayload, AccountTransactionType } from '@concordium/web-sdk';
+import { AccountTransactionInput, AccountTransactionType } from '@concordium/web-sdk';
 import { useLocation, useNavigate } from 'react-router-dom';
 import { absoluteRoutes } from '@popup/constants/routes';
 import { noOp } from 'wallet-common-helpers';
@@ -18,7 +18,7 @@ interface Props<F extends Record<string, unknown>>
     /**
      * Function to convert flow values into an account transaction.
      */
-    convert(values: F): AccountTransactionPayload;
+    convert(values: F): AccountTransactionInput;
     /**
      * Function that is triggered if an error is thrown in the done handler.
      */
@@ -56,7 +56,7 @@ export default function AccountTransactionFlow<F extends Record<string, unknown>
 
     const handleDone = useCallback(
         (values: F) => {
-            let payload: AccountTransactionPayload;
+            let payload: AccountTransactionInput;
             try {
                 payload = convert(values);
                 nav(pathname, { replace: true, state: values }); // Override current router entry with stateful version

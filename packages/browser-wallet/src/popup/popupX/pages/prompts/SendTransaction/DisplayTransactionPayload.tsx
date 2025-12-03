@@ -4,12 +4,12 @@ import {
     AccountTransactionType,
     CcdAmount,
     DeployModulePayload,
-    InitContractPayload,
+    InitContractInput,
     RegisterDataPayload,
     sha256,
     SimpleTransferPayload,
-    UpdateContractPayload,
     TokenUpdatePayload,
+    UpdateContractInput,
 } from '@concordium/web-sdk';
 import { Cbor, CborMemo, TokenOperationType } from '@concordium/web-sdk/plt';
 import { SmartContractParameters } from '@concordium/browser-wallet-api-helpers';
@@ -45,7 +45,7 @@ function DisplaySimpleTransfer({ payload }: { payload: SimpleTransferPayload }) 
 /**
  * Displays an overview of a update contract transaction.
  */
-function DisplayUpdateContract({ payload }: { payload: Omit<UpdateContractPayload, 'message'> }) {
+function DisplayUpdateContract({ payload }: { payload: Omit<UpdateContractInput, 'message'> }) {
     const { t } = useTranslation('x', { keyPrefix: 'prompts.sendTransactionX.payload' });
     return (
         <>
@@ -66,7 +66,7 @@ function DisplayUpdateContract({ payload }: { payload: Omit<UpdateContractPayloa
 /**
  * Displays an overview of a init contract transaction.
  */
-function DisplayInitContract({ payload }: { payload: Omit<InitContractPayload, 'param'> }) {
+function DisplayInitContract({ payload }: { payload: Omit<InitContractInput, 'param'> }) {
     const { t } = useTranslation('x', { keyPrefix: 'prompts.sendTransactionX.payload' });
 
     return (
@@ -216,9 +216,9 @@ export default function DisplayTransactionPayload({
         case AccountTransactionType.Transfer:
             return <DisplaySimpleTransfer payload={payload as SimpleTransferPayload} />;
         case AccountTransactionType.Update:
-            return <DisplayUpdateContract payload={payload as UpdateContractPayload} />;
+            return <DisplayUpdateContract payload={payload as UpdateContractInput} />;
         case AccountTransactionType.InitContract:
-            return <DisplayInitContract payload={payload as InitContractPayload} />;
+            return <DisplayInitContract payload={payload as InitContractInput} />;
         case AccountTransactionType.RegisterData:
             return <DisplayRegisterData payload={payload as RegisterDataPayload} />;
         case AccountTransactionType.DeployModule:

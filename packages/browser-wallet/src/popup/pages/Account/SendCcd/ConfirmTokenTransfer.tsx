@@ -1,8 +1,8 @@
 import React, { useMemo } from 'react';
 import { useTranslation } from 'react-i18next';
-import { useSetAtom, useAtomValue } from 'jotai';
+import { useAtomValue, useSetAtom } from 'jotai';
 import { selectedAccountAtom } from '@popup/store/account';
-import { AccountTransactionType, UpdateContractPayload } from '@concordium/web-sdk';
+import { AccountTransactionType, UpdateContractInput } from '@concordium/web-sdk';
 import { grpcClientAtom } from '@popup/store/settings';
 import { addToastAtom } from '@popup/state';
 import { useLocation } from 'react-router-dom';
@@ -30,7 +30,7 @@ export default function ConfirmTokenTransfer({ setDetailsExpanded, cost }: Props
         []
     );
 
-    const payload: UpdateContractPayload | undefined = useMemo(() => {
+    const payload: UpdateContractInput | undefined = useMemo(() => {
         if (!parameters || !contractName) {
             return undefined;
         }
