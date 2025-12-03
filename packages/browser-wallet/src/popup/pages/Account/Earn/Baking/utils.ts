@@ -1,14 +1,14 @@
 import {
+    AccountBakerDetailsV1,
     AccountInfo,
+    AccountInfoBaker,
+    AccountInfoType,
+    BakerKeysWithProofs,
     CcdAmount,
     CommissionRates,
-    OpenStatus,
     ConfigureBakerPayload,
+    OpenStatus,
     OpenStatusText,
-    BakerKeysWithProofs,
-    AccountInfoType,
-    AccountInfoBaker,
-    AccountBakerDetailsV1,
 } from '@concordium/web-sdk';
 import { decimalToRewardFraction, fractionToPercentage } from '@popup/shared/utils/baking-helpers';
 import { getConfigureBakerEnergyCost } from '@shared/utils/energy-helpers';
@@ -26,7 +26,7 @@ export type ConfigureBakerFlowState = {
     keys: BakerKeysWithProofs | null;
 };
 
-function openStatusFromText(status: OpenStatusText): OpenStatus {
+function openStatusFromText(status: OpenStatusText | null): OpenStatus {
     switch (status) {
         case OpenStatusText.ClosedForAll:
             return OpenStatus.ClosedForAll;

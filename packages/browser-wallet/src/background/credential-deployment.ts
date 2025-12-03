@@ -1,16 +1,16 @@
 import { ExtensionMessageHandler } from '@messaging';
 
 import {
-    CredentialInput,
-    getAccountAddress,
     ConcordiumGRPCWebClient,
-    createCredentialTransaction,
-    signCredentialTransaction,
     ConcordiumHdWallet,
-    TransactionExpiry,
-    getCredentialDeploymentTransactionHash,
+    createCredentialPayload,
+    CredentialInput,
     CredentialRegistrationId,
+    getAccountAddress,
+    getCredentialDeploymentTransactionHash,
     serializeCredentialDeploymentPayload,
+    signCredentialTransaction,
+    TransactionExpiry,
 } from '@concordium/web-sdk';
 import { GRPCTIMEOUT } from '@shared/constants/networkConfiguration';
 import { DEFAULT_TRANSACTION_EXPIRY } from '@shared/constants/time';
@@ -32,7 +32,7 @@ async function createAndSendCredential(credIn: CredentialInput): Promise<Credent
         const providerIndex = credIn.ipInfo.ipIdentity;
 
         const expiry = TransactionExpiry.fromDate(new Date(Date.now() + DEFAULT_TRANSACTION_EXPIRY));
-        const request = createCredentialTransaction(credIn, expiry);
+        const request = createCredentialPayload(credIn, expiry);
         const signingKey = ConcordiumHdWallet.fromHex(credIn.seedAsHex, credIn.net)
             .getAccountSigningKey(providerIndex, identityIndex, credNumber)
             .toString('hex');

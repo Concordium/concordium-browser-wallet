@@ -24,7 +24,7 @@ import { useBlockChainParametersAboveV0 } from '@popup/shared/BlockChainParamete
 import Baking from './Baking';
 import Delegate from './Delegate';
 import { accountPageContext } from '../utils';
-import { filterType, EarnPageContext, earnPageContext } from './utils';
+import { EarnPageContext, earnPageContext, filterType } from './utils';
 import { accountRoutes } from '../routes';
 
 const routes = {
@@ -73,7 +73,9 @@ function Earn({ chainParameters }: EarnProps) {
     );
 }
 
-function isNotRewardStatusV0(rewardStatus?: RewardStatus): rewardStatus is Exclude<RewardStatus, RewardStatusV0> {
+function isNotRewardStatusV0(
+    rewardStatus?: RewardStatus | null
+): rewardStatus is Exclude<RewardStatus, RewardStatusV0> {
     return rewardStatus ? rewardStatus.version !== 0 : false;
 }
 

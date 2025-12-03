@@ -14,7 +14,7 @@ import { useSelectedAccountInfo } from '@popup/shared/AccountInfoListenerContext
 import { formatCcdAmount } from '@popup/popupX/shared/utils/helpers';
 import Text from '@popup/popupX/shared/Text';
 
-import { ValidatorForm, ValidatorFormExisting, configureValidatorFromForm } from './util';
+import { configureValidatorFromForm, ValidatorForm, ValidatorFormExisting } from './util';
 import ValidatorStake from './Stake';
 import { type ValidationResultLocationState } from './Result';
 import OpenPool from './OpenPool';
@@ -135,6 +135,10 @@ function withChangeValidation(Flow: ComponentType<ChangeValidationProps>) {
         const {
             accountBaker: { stakedAmount, restakeEarnings, bakerPoolInfo },
         } = accountInfo;
+
+        if (bakerPoolInfo.openStatus === null) {
+            return null;
+        }
 
         const existing: ValidatorFormExisting = {
             stake: {

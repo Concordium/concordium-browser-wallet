@@ -1941,7 +1941,7 @@ __metadata:
     webpack: ^5.99.7
     webpack-cli: ^4.9.2
   peerDependencies:
-    "@concordium/web-sdk": 10.0.2
+    "@concordium/web-sdk": 12.0.0-devnet-p10.0
     "@protobuf-ts/runtime-rpc": ^2.9.1
   languageName: unknown
   linkType: soft
@@ -1953,7 +1953,7 @@ __metadata:
     "@babel/core": ^7.18.2
     "@concordium/browser-wallet-api-helpers": "workspace:^"
     "@concordium/common-sdk": ^9.5.3
-    "@concordium/web-sdk": 10.0.2
+    "@concordium/web-sdk": 12.0.0-devnet-p10.0
     "@craftamap/esbuild-plugin-html": ^0.4.0
     "@floating-ui/react": ^0.27.2
     "@mdx-js/react": ^1.6.22
@@ -2064,12 +2064,12 @@ __metadata:
   languageName: node
   linkType: hard
 
-"@concordium/web-sdk@npm:10.0.2":
-  version: 10.0.2
-  resolution: "@concordium/web-sdk@npm:10.0.2"
+"@concordium/web-sdk@npm:12.0.0-devnet-p10.0":
+  version: 12.0.0-devnet-p10.0
+  resolution: "@concordium/web-sdk@npm:12.0.0-devnet-p10.0"
   dependencies:
     "@concordium/rust-bindings": ^3.3.0
-    "@grpc/grpc-js": ^1.9.4
+    "@grpc/grpc-js": ^1.14.0
     "@noble/ed25519": ^2.0.0
     "@noble/hashes": ^1.3.2
     "@protobuf-ts/grpc-transport": ^2.9.1
@@ -2088,7 +2088,7 @@ __metadata:
   peerDependencies:
     "@protobuf-ts/runtime-rpc": ^2.8.2
     cbor2: ^1.12.0
-  checksum: 46d99fbda606a6550eb50ccb4be6104fd2b8764d492b886c6c19215ea4441858f12966368de81da3ade19e9dff5937d5cfac2d24fa0905c90f34dcb609291340
+  checksum: 2f2ae72a093b00720acfe8c1eec680d0d45d0a355f83e3901c22f9c2592232830776852d4332cb8b47d741e9d18ea12a44ab196604d0dd5c93ad374477ab901b
   languageName: node
   linkType: hard
 
@@ -2576,6 +2576,16 @@ __metadata:
   languageName: node
   linkType: hard
 
+"@grpc/grpc-js@npm:^1.14.0":
+  version: 1.14.1
+  resolution: "@grpc/grpc-js@npm:1.14.1"
+  dependencies:
+    "@grpc/proto-loader": ^0.8.0
+    "@js-sdsl/ordered-map": ^4.4.2
+  checksum: 3f208c23cc985789934d806045599ad3bfa1b6fd9877151cf9af423b4d708cbb3b0cb1347a147061c6ed36470958fd522fbefbf6ae4ca8246f0860bd647f0e5e
+  languageName: node
+  linkType: hard
+
 "@grpc/grpc-js@npm:^1.3.4":
   version: 1.9.14
   resolution: "@grpc/grpc-js@npm:1.9.14"
@@ -2583,16 +2593,6 @@ __metadata:
     "@grpc/proto-loader": ^0.7.8
     "@types/node": ">=12.12.47"
   checksum: 1e0821876fc55fa1d71a674e65db6227ca398f6ff77735bd44d8d4a554fa97dcddd06e7844c3d7da37350feafd824ec88af04f0ab0e0c2e0bc8f753939935240
-  languageName: node
-  linkType: hard
-
-"@grpc/grpc-js@npm:^1.9.4":
-  version: 1.9.5
-  resolution: "@grpc/grpc-js@npm:1.9.5"
-  dependencies:
-    "@grpc/proto-loader": ^0.7.8
-    "@types/node": ">=12.12.47"
-  checksum: 06834554a0935906652b4b9c5c71f08dd9bdcd4a00d65465c569eae770a9856ecabf7711290bf6d935a8127779c1f35d9cc8cf029693493da02864a330c78e25
   languageName: node
   linkType: hard
 
@@ -2607,6 +2607,20 @@ __metadata:
   bin:
     proto-loader-gen-types: build/bin/proto-loader-gen-types.js
   checksum: 4987e23b57942c2363b6a6a106e63efae636666cefa348778dfafef2ff72da7343c8587667521cb1d52482827bcd001dd535bdc27065110af56d9c7c176334c9
+  languageName: node
+  linkType: hard
+
+"@grpc/proto-loader@npm:^0.8.0":
+  version: 0.8.0
+  resolution: "@grpc/proto-loader@npm:0.8.0"
+  dependencies:
+    lodash.camelcase: ^4.3.0
+    long: ^5.0.0
+    protobufjs: ^7.5.3
+    yargs: ^17.7.2
+  bin:
+    proto-loader-gen-types: build/bin/proto-loader-gen-types.js
+  checksum: 97570e2e8c29a35b999fa929acad506765e6752d3219764825fecc0ab632492b1ac2e4dd4c0a96cc2e01754d99bfa838dff0729c6608a02f7b027fd19bc1d1e4
   languageName: node
   linkType: hard
 
@@ -3122,6 +3136,13 @@ __metadata:
     "@jridgewell/resolve-uri": ^3.1.0
     "@jridgewell/sourcemap-codec": ^1.4.14
   checksum: 9d3c40d225e139987b50c48988f8717a54a8c994d8a948ee42e1412e08988761d0754d7d10b803061cc3aebf35f92a5dbbab493bd0e1a9ef9e89a2130e83ba34
+  languageName: node
+  linkType: hard
+
+"@js-sdsl/ordered-map@npm:^4.4.2":
+  version: 4.4.2
+  resolution: "@js-sdsl/ordered-map@npm:4.4.2"
+  checksum: a927ae4ff8565ecb75355cc6886a4f8fadbf2af1268143c96c0cce3ba01261d241c3f4ba77f21f3f017a00f91dfe9e0673e95f830255945c80a0e96c6d30508a
   languageName: node
   linkType: hard
 
@@ -13757,6 +13778,26 @@ __metadata:
   languageName: node
   linkType: hard
 
+"protobufjs@npm:^7.5.3":
+  version: 7.5.4
+  resolution: "protobufjs@npm:7.5.4"
+  dependencies:
+    "@protobufjs/aspromise": ^1.1.2
+    "@protobufjs/base64": ^1.1.2
+    "@protobufjs/codegen": ^2.0.4
+    "@protobufjs/eventemitter": ^1.1.0
+    "@protobufjs/fetch": ^1.1.0
+    "@protobufjs/float": ^1.0.2
+    "@protobufjs/inquire": ^1.1.0
+    "@protobufjs/path": ^1.1.2
+    "@protobufjs/pool": ^1.1.0
+    "@protobufjs/utf8": ^1.1.0
+    "@types/node": ">=13.7.0"
+    long: ^5.0.0
+  checksum: 53bf83b9a726b05d43da35bb990dba7536759787dccea9a67b8f31be9df470ba17f1f1b982ca19956cfc7726f3ec7e0e883ca4ad93b5ec753cc025a637fc704f
+  languageName: node
+  linkType: hard
+
 "proxy-addr@npm:~2.0.7":
   version: 2.0.7
   resolution: "proxy-addr@npm:2.0.7"
@@ -16811,7 +16852,7 @@ __metadata:
   version: 0.0.0-use.local
   resolution: "wallet-api@workspace:examples/wallet-api"
   dependencies:
-    "@concordium/web-sdk": 10.0.2
+    "@concordium/web-sdk": 12.0.0-devnet-p10.0
     live-server: ^1.2.2
   languageName: unknown
   linkType: soft

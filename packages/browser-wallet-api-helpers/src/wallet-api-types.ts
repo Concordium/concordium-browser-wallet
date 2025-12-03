@@ -1,30 +1,30 @@
 import type {
-    AccountTransactionPayload,
+    AccountAddress,
+    AccountTransactionInput,
     AccountTransactionSignature,
     AccountTransactionType,
-    InitContractPayload,
-    SchemaVersion,
-    UpdateContractPayload,
-    IdStatement,
-    IdProofOutput,
-    CredentialStatements,
-    VerifiablePresentation,
-    CredentialSubject,
-    HexString,
-    AccountAddress,
     Base58String,
     Base64String,
-    ContractAddress,
-    UpdateCredentialsPayload,
-    RegisterDataPayload,
-    SimpleTransferPayload,
-    SimpleTransferWithMemoPayload,
-    DeployModulePayload,
     ConfigureBakerPayload,
     ConfigureDelegationPayload,
+    ContractAddress,
     ContractName,
+    CredentialStatements,
+    CredentialSubject,
+    DeployModulePayload,
     EntrypointName,
+    HexString,
+    IdProofOutput,
+    IdStatement,
+    InitContractInput,
+    RegisterDataPayload,
+    SchemaVersion,
+    SimpleTransferPayload,
+    SimpleTransferWithMemoPayload,
     TokenUpdatePayload,
+    UpdateContractInput,
+    UpdateCredentialsInput,
+    VerifiablePresentation,
 } from '@concordium/web-sdk';
 import type { RpcTransport } from '@protobuf-ts/runtime-rpc';
 import { LaxNumberEnumValue, LaxStringEnumValue } from './util';
@@ -61,11 +61,11 @@ export interface CredentialProof {
     verificationMethod: string;
 }
 
-export type SendTransactionUpdateContractPayload = Omit<UpdateContractPayload, 'message'>;
-export type SendTransactionInitContractPayload = Omit<InitContractPayload, 'param'>;
+export type SendTransactionUpdateContractPayload = Omit<UpdateContractInput, 'message'>;
+export type SendTransactionInitContractPayload = Omit<InitContractInput, 'param'>;
 
 export type SendTransactionPayload =
-    | Exclude<AccountTransactionPayload, UpdateContractPayload | InitContractPayload>
+    | Exclude<AccountTransactionInput, UpdateContractInput | InitContractInput>
     | SendTransactionUpdateContractPayload
     | SendTransactionInitContractPayload;
 
@@ -168,7 +168,7 @@ interface MainWalletApi {
     sendTransaction(
         accountAddress: AccountAddressSource,
         type: LaxNumberEnumValue<AccountTransactionType.UpdateCredentials>,
-        payload: UpdateCredentialsPayload
+        payload: UpdateCredentialsInput
     ): Promise<string>;
     /**
      * Sends a transaction to the Concordium Wallet and awaits the users action. Note that a header is not sent, and will be constructed by the wallet itself.

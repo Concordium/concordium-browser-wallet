@@ -1,34 +1,34 @@
 import {
     AccountAddress,
-    AccountTransaction,
-    AccountTransactionType,
-    AccountTransactionPayload,
-    buildBasicAccountSigner,
-    getAccountTransactionHash,
-    CcdAmount,
-    ConcordiumGRPCClient,
-    signTransaction,
-    SimpleTransferPayload,
-    TransactionExpiry,
     AccountInfo,
+    AccountInfoType,
+    AccountTransaction,
+    AccountTransactionInput,
+    AccountTransactionType,
+    BakerPoolStatusDetails,
+    buildBasicAccountSigner,
+    CcdAmount,
     ChainParameters,
     ChainParametersV0,
-    BakerPoolStatusDetails,
-    InitContractPayload,
-    UpdateContractPayload,
-    SimpleTransferWithMemoPayload,
-    AccountInfoType,
+    ConcordiumGRPCClient,
     convertEnergyToMicroCcd,
+    getAccountTransactionHash,
     getEnergyCost,
+    InitContractInput,
+    signTransaction,
+    SimpleTransferPayload,
+    SimpleTransferWithMemoPayload,
+    TransactionExpiry,
+    UpdateContractInput,
 } from '@concordium/web-sdk';
 import { TokenId, TokenModuleState } from '@concordium/web-sdk/plt';
 import {
-    isValidResolutionString,
     ccdToMicroCcd,
     displayAsCcd,
     fractionalToInteger,
-    isValidCcdString,
     getPublicAccountAmounts,
+    isValidCcdString,
+    isValidResolutionString,
 } from 'wallet-common-helpers';
 
 import i18n from '@popup/shell/i18n';
@@ -281,12 +281,12 @@ export function useHasPendingTransaction(transactionType: AccountTransactionType
  * Extract the microCCD amount related for the transaction, excluding the cost.
  * Note that for many transactions there is no related amount, in which case this returns 0.
  */
-export function getTransactionAmount(type: AccountTransactionType, payload: AccountTransactionPayload): bigint {
+export function getTransactionAmount(type: AccountTransactionType, payload: AccountTransactionInput): bigint {
     switch (type) {
         case AccountTransactionType.InitContract:
-            return (payload as InitContractPayload).amount.microCcdAmount;
+            return (payload as InitContractInput).amount.microCcdAmount;
         case AccountTransactionType.Update:
-            return (payload as UpdateContractPayload).amount.microCcdAmount;
+            return (payload as UpdateContractInput).amount.microCcdAmount;
         case AccountTransactionType.Transfer:
             return (payload as SimpleTransferPayload).amount.microCcdAmount;
         case AccountTransactionType.TransferWithMemo:
@@ -300,7 +300,7 @@ export function useGetTransactionFee() {
     const cp = useBlockChainParameters();
 
     return useCallback(
-        (type: AccountTransactionType, payload: AccountTransactionPayload) => {
+        (type: AccountTransactionType, payload: AccountTransactionInput) => {
             if (cp === undefined) {
                 return undefined;
             }
@@ -344,7 +344,7 @@ export function useTransactionSubmit(sender: AccountAddress.Type, type: AccountT
     const addPendingTransaction = useUpdateAtom(addPendingTransactionAtom);
 
     return useCallback(
-        async (payload: AccountTransactionPayload, cost: CcdAmount.Type) => {
+        async (payload: AccountTransactionInput, cost: CcdAmount.Type) => {
             const { accountAmount, accountAvailableBalance } = await grpc.getAccountInfo(sender);
 
             if (accountAvailableBalance.microCcdAmount < cost.microCcdAmount) {

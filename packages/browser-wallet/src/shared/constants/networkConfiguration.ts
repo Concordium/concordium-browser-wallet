@@ -28,12 +28,12 @@ export const stagenet: NetworkConfiguration = {
 };
 
 export const devnet: NetworkConfiguration = {
-    genesisHash: '1e38963f8098c190a1a10ffd8954ad79f93ca50a843efbb09783f8b4e9155d03',
+    genesisHash: '5867d1b162172bf671df64fb6f568c573141fd80b7795adc8d91e4337ff2ef9c',
     name: 'Concordium DevNet',
-    explorerUrl: 'https://wallet-proxy.devnet-plt-beta.concordium.com',
+    explorerUrl: 'https://wallet-proxy.devnet-p10-1.concordium.com',
     grpcPort: 20000,
-    grpcUrl: 'https://grpc.devnet-plt-beta.concordium.com',
-    ccdScanUrl: 'https://devnet-plt-beta.ccdscan.io/',
+    grpcUrl: 'https://grpc.devnet-p10-1.concordium.com',
+    ccdScanUrl: 'https://devnet-p10-1.ccdscan.io/',
 };
 
 export const customnet: NetworkConfiguration = {
