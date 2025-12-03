@@ -33,7 +33,9 @@ import {
     SimpleTransferPayload,
     SimpleTransferWithMemoPayload,
     TokenUpdatePayload,
+    UpdateCredentialKeysInput,
     UpdateCredentialsInput,
+    UpdateCredentialsPayload,
 } from '@concordium/web-sdk/types';
 import { empty } from '@concordium/web-sdk/types/Parameter';
 import { IdStatement } from '@concordium/web-sdk/id';
@@ -222,7 +224,10 @@ export interface ConfigureDelegationPayloadV0 extends Omit<ConfigureDelegationPa
 export type ConfigureDelegationPayloadCompat = ConfigureDelegationPayloadV0 | ConfigureDelegationPayload;
 
 export type RegisterDataPayloadCompat = RegisterDataPayload;
-export type UpdateCredentialsPayloadCompat = UpdateCredentialsInput;
+export type UpdateCredentialsPayloadCompat =
+    | UpdateCredentialsPayload
+    | UpdateCredentialsInput
+    | UpdateCredentialKeysInput;
 
 export type SendTransactionPayloadCompat =
     | InitContractPayloadCompat

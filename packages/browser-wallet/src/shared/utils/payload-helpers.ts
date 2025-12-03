@@ -28,7 +28,7 @@ export type HeadlessTransaction =
               AccountTransactionType,
               AccountTransactionType.Transfer | AccountTransactionType.Update | AccountTransactionType.InitContract
           >;
-          payload: Exclude<AccountTransactionInput, UpdateContractInput | InitContractInput | SimpleTransferPayload>;
+          payload: AccountTransactionInput;
       };
 
 /**
