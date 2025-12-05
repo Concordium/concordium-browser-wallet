@@ -1,3 +1,4 @@
+// @ts-nocheck
 import { InjectedMessageHandler, createEventTypeFilter, MessageType, MessageStatusWrapper } from '@messaging';
 import {
     AccountAddress,

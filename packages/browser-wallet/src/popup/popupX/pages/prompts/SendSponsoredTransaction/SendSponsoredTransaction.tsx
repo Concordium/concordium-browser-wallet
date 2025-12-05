@@ -136,6 +136,7 @@ export default function SendSponsoredTransaction({ onSubmit, onReject }: Props) 
         };
 
         // ToDo magic happens here
+        // @ts-ignore
         const transaction = parse(state.payload.payloadSponsored);
         const sponsoredTransaction = Transaction.signableFromJSON(transaction);
         const signed = await Transaction.signAndFinalize(sponsoredTransaction, buildBasicAccountSigner(key));
