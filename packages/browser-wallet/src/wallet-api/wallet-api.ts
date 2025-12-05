@@ -180,6 +180,39 @@ class WalletApi extends EventEmitter implements IWalletApi {
         return response.result;
     }
 
+    /**
+     * Sends a sponsored transaction to the Concordium Wallet and awaits the users action
+     */
+    public async sendSponsoredTransaction(
+        accountAddress: AccountAddressSource,
+        type: AccountTransactionType,
+        payload: SendTransactionPayload,
+        parameters?: SmartContractParameters,
+        schema?: SchemaSource,
+        schemaVersion?: SchemaVersion
+    ): Promise<string> {
+        // ToDo need update for input sanitize
+        // const input = sanitizeSendTransactionInput(accountAddress, type, payload, parameters, schema, schemaVersion);
+
+        const response = await this.messageHandler.sendMessage<MessageStatusWrapper<string>>(
+            MessageType.SendSponsoredTransaction,
+            {
+                // ...input,
+                type,
+                accountAddress,
+                payload: stringify(payload.payload),
+                parameters: JSONBig.stringify(parameters),
+                payloadSponsored: stringify(payload),
+            }
+        );
+
+        if (!response.success) {
+            throw new Error(response.message);
+        }
+
+        return response.result;
+    }
+
     private handleEvent(type: EventType) {
         this.messageHandler.handleMessage(createEventTypeFilter(type), (msg) => this.emit(type, msg.payload));
     }
