@@ -410,6 +410,9 @@ export const relativeRoutes = {
         sendTransaction: {
             path: 'sendTransaction',
         },
+        sendSponsoredTransaction: {
+            path: 'sendSponsoredTransaction',
+        },
         addWeb3IdCredential: {
             path: 'add-web3id-credential',
         },

@@ -7,6 +7,7 @@ import { v4 as uuidv4 } from 'uuid';
  */
 export enum MessageType {
     SendTransaction = 'M_SendTransaction',
+    SendSponsoredTransaction = 'M_SendSponsoredTransaction',
     SignMessage = 'M_SignMessage',
     GetAccounts = 'M_GetAccounts',
     GetSelectedAccount = 'M_GetSelectedAccount',
@@ -29,6 +30,7 @@ export enum InternalMessageType {
     Init = 'I_Init',
     PopupReady = 'I_PopupReady',
     SendTransaction = 'I_SendTransaction',
+    SendSponsoredTransaction = 'I_SendSponsoredTransaction',
     SignMessage = 'I_SignMessage',
     Connect = 'I_Connect',
     TestPopupOpen = 'I_TestPopupOpen',

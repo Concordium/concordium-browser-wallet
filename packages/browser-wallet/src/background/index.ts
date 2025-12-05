@@ -282,6 +282,8 @@ const ensureMessageWithSchemaParse: RunCondition<MessageStatusWrapper<undefined>
 const ensureTransactionPayloadParse: RunCondition<MessageStatusWrapper<undefined>> = async (msg) => {
     const payload = msg.payload as BackgroundSendTransactionPayload;
 
+    console.log('ensureTransactionPayloadParse');
+
     try {
         parsePayload(payload.type, payload.payload, payload.parameters, payload.schema, payload.schemaVersion);
     } catch (e) {
@@ -527,6 +529,14 @@ forwardToPopup(
     MessageType.SendTransaction,
     InternalMessageType.SendTransaction,
     runConditionComposer(runIfAccountIsAllowlisted, ensureTransactionPayloadParse, withPromptStart()),
+    appendUrlToPayload,
+    undefined,
+    withPromptEnd
+);
+forwardToPopup(
+    MessageType.SendSponsoredTransaction,
+    InternalMessageType.SendSponsoredTransaction,
+    runConditionComposer(runIfAccountIsAllowlisted, async () => ({ run: true }), withPromptStart()),
     appendUrlToPayload,
     undefined,
     withPromptEnd

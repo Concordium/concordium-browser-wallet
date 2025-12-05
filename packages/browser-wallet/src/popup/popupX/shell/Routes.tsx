@@ -44,6 +44,7 @@ import AddTokens from '@popup/popupX/pages/prompts/AddTokens';
 import SignCis3Message from '@popup/popupX/pages/prompts/SignCis3Message';
 import SignMessage from '@popup/popupX/pages/prompts/SignMessage';
 import SendTransaction from '@popup/popupX/pages/prompts/SendTransaction';
+import SendSponsoredTransaction from '@popup/popupX/pages/prompts/SendSponsoredTransaction';
 import ExternalRequestLayout from '@popup/popupX/page-layouts/ExternalRequestLayout';
 import { AddToken, ManageTokenList } from '@popup/popupX/pages/ManageTokens';
 import { Nft, NftDetails, NftRaw } from 'src/popup/popupX/pages/Nft';
@@ -83,6 +84,7 @@ export default function Routes({ messagePromptHandlers }: { messagePromptHandler
         handleSignCIS3MessageResponse,
         handleSignMessageResponse,
         handleSendTransactionResponse,
+        handleSendSponsoredTransactionResponse,
         handleAddWeb3IdCredentialResponse,
         handleWeb3IdProofResponse,
         handleIdProofResponse,
@@ -348,6 +350,22 @@ export default function Routes({ messagePromptHandlers }: { messagePromptHandler
                                 onSubmit={(hash) => handleSendTransactionResponse({ success: true, result: hash })}
                                 onReject={() =>
                                     handleSendTransactionResponse({ success: false, message: 'Signing was rejected' })
+                                }
+                            />
+                        }
+                    />{' '}
+                    <Route
+                        path={relativeRoutes.prompt.sendSponsoredTransaction.path}
+                        element={
+                            <SendSponsoredTransaction
+                                onSubmit={(hash) =>
+                                    handleSendSponsoredTransactionResponse({ success: true, result: hash })
+                                }
+                                onReject={() =>
+                                    handleSendSponsoredTransactionResponse({
+                                        success: false,
+                                        message: 'Signing was rejected',
+                                    })
                                 }
                             />
                         }

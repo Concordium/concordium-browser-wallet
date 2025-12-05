@@ -78,6 +78,7 @@ export type MessagePromptHandlersType = {
     handleConnectAccountsResponse: (response: MessageStatusWrapper<string[]>) => void;
     handleAddWeb3IdCredentialResponse: (response: MessageStatusWrapper<string>) => void;
     handleSendTransactionResponse: (response: MessageStatusWrapper<string>) => void;
+    handleSendSponsoredTransactionResponse: (response: MessageStatusWrapper<string>) => void;
     handleSignMessageResponse: (response: MessageStatusWrapper<AccountTransactionSignature>) => void;
     handleSignCIS3MessageResponse: (response: MessageStatusWrapper<AccountTransactionSignature>) => void;
     handleAddTokensResponse: (response: MessageStatusWrapper<string[]>) => void;
@@ -99,6 +100,10 @@ export function useMessagePromptHandlers(): MessagePromptHandlersType {
     const handleSendTransactionResponse = useMessagePrompt<MessageStatusWrapper<string>>(
         InternalMessageType.SendTransaction,
         'sendTransaction'
+    );
+    const handleSendSponsoredTransactionResponse = useMessagePrompt<MessageStatusWrapper<string>>(
+        InternalMessageType.SendSponsoredTransaction,
+        'sendSponsoredTransaction'
     );
     const handleSignMessageResponse = useMessagePrompt<MessageStatusWrapper<AccountTransactionSignature>>(
         InternalMessageType.SignMessage,
@@ -140,6 +145,7 @@ export function useMessagePromptHandlers(): MessagePromptHandlersType {
         handleConnectAccountsResponse,
         handleAddWeb3IdCredentialResponse,
         handleSendTransactionResponse,
+        handleSendSponsoredTransactionResponse,
         handleSignMessageResponse,
         handleSignCIS3MessageResponse,
         handleAddTokensResponse,
