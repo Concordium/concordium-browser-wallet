@@ -36,7 +36,7 @@ const t = {
         version: 'Version',
         tokenId: 'Token Id',
         operations: 'Operations',
-        fee: 'Approximate fee',
+        fee: 'Transaction fee',
     },
     operations: {
         transfer: 'Transfer',

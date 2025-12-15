@@ -1,19 +1,19 @@
 import React, { useEffect, useState } from 'react';
 import { useTranslation } from 'react-i18next';
-import { CcdAmount, TokenUpdatePayload, AccountInfo } from '@concordium/web-sdk';
+import { TokenUpdatePayload, AccountInfo } from '@concordium/web-sdk';
 import { Cbor, CborMemo, TokenOperationType, TokenTransferOperation } from '@concordium/web-sdk/plt';
 import { WalletCredential } from '@shared/storage/types';
 import { displaySplitAddress, useCredential, useIdentityName } from '@popup/shared/utils/account-helpers';
-import { displayAsCcd, getPublicAccountAmounts } from 'wallet-common-helpers';
 import Page from '@popup/popupX/shared/Page';
 import Text from '@popup/popupX/shared/Text';
 import Card from '@popup/popupX/shared/Card';
 import Button from '@popup/popupX/shared/Button';
 import { useAccountInfo } from '@popup/shared/AccountInfoListenerContext';
-import { ToggleAdvanced } from '@popup/popupX/pages/prompts/SendTransaction/DisplayTransactionPayload';
 import { formatTokenAmount } from '@popup/popupX/shared/utils/helpers';
 import { displayUrl } from '@popup/shared/utils/string-helpers';
 import { logError } from '@shared/utils/log-helpers';
+import Tooltip from '@popup/popupX/shared/Tooltip/Tooltip';
+import Info from '@assets/svgX/info.svg';
 
 async function getWebsiteTitle(url: string): Promise<string> {
     try {
@@ -40,8 +40,6 @@ function AccountInfoCard({ credential, tokenId }: { credential: WalletCredential
     const { t } = useTranslation('x', { keyPrefix: 'prompts.sendTransactionX' });
     const accountInfo = useAccountInfo(credential);
     const identityName = useIdentityName(credential);
-    const { atDisposal } = getPublicAccountAmounts(accountInfo);
-    const accountAtDisposal = formatTokenAmount(atDisposal, 6, 2, 2);
     const { credName, address } = credential;
     const {
         state: {
@@ -66,12 +64,6 @@ function AccountInfoCard({ credential, tokenId }: { credential: WalletCredential
                     {pltFormated} {tokenId}
                 </Text.Main>
             </Card.Row>
-            <Card.Row>
-                <Text.MainRegular>
-                    {t('account.atDisposal')}
-                    {accountAtDisposal} CCD
-                </Text.MainRegular>
-            </Card.Row>
         </Card>
     );
 }
@@ -79,17 +71,13 @@ function AccountInfoCard({ credential, tokenId }: { credential: WalletCredential
 type TransferInfoProps = {
     tokenId: string;
     amount: string;
-    recipient: string;
-    cost?: bigint | string | CcdAmount.Type;
+    sponsoredAccount: string;
 };
 
-function TransferInfo({ tokenId, amount, recipient, cost }: TransferInfoProps) {
+function TransferInfo({ tokenId, amount, sponsoredAccount }: TransferInfoProps) {
     const { t } = useTranslation('x', { keyPrefix: 'prompts.sendTransactionX' });
-
     return (
         <Card>
-            <Card.RowDetails title={t('method')} value={t('operations.transfer')} />
-            <Card.RowDetails title={t('payload.receiver')} value={recipient} />
             <Card.Row className="amounts">
                 <Text.Capture>{t('payload.amount')}</Text.Capture>
                 <Text.Capture>
@@ -98,32 +86,18 @@ function TransferInfo({ tokenId, amount, recipient, cost }: TransferInfoProps) {
             </Card.Row>
             <Card.Row className="amounts">
                 <Text.Capture>{t('payload.fee')}</Text.Capture>
-                <Text.Capture>{cost ? displayAsCcd(cost, false, true) : t('payload.unknown')}</Text.Capture>
+                <span className="free-transaction-btn">
+                    <Tooltip
+                        title="Transaction cost covered by:"
+                        text={sponsoredAccount}
+                        className="tooltip"
+                        position="top"
+                    >
+                        Free Transaction <Info />
+                    </Tooltip>
+                </span>
             </Card.Row>
         </Card>
-    );
-}
-
-type TransferInfoAdvancedProps = {
-    payload: string;
-    tokenId: string;
-    accountAddress: string;
-};
-
-function TransferInfoAdvanced({ payload, tokenId, accountAddress }: TransferInfoAdvancedProps) {
-    const { t } = useTranslation('x', { keyPrefix: 'prompts.sendTransactionX' });
-
-    return (
-        <div className="operations-list">
-            <Card>
-                <Card.Row>
-                    <Text.MainMedium>{t('tokenUpdate')}</Text.MainMedium>
-                </Card.Row>
-                <Card.RowDetails title={t('payload.sender')} value={accountAddress} />
-                <Card.RowDetails title={t('payload.tokenId')} value={tokenId} />
-                <Card.RowDetails title={t('payload.operations')} value={payload} />
-            </Card>
-        </div>
     );
 }
 
@@ -148,24 +122,24 @@ const parsePayload = (payload: TokenUpdatePayload) => {
 
 type DisplaySingleTransferProps = {
     url: string;
-    cost?: bigint | string | CcdAmount.Type;
     payload: TokenUpdatePayload;
     accountAddress: string;
+    sponsoredAccount: string;
     signHandler: () => void;
     rejectHandler: () => void;
 };
 
 export default function DisplaySingleTransferTokenUpdate({
     url,
-    cost,
     payload,
     accountAddress,
+    sponsoredAccount,
     signHandler,
     rejectHandler,
 }: DisplaySingleTransferProps) {
     const { t } = useTranslation('x', { keyPrefix: 'prompts.sendTransactionX' });
     const [webPageTitle, setWebPageTitle] = useState<string>('');
-    const { tokenId, amount, recipient, stringifiedPayload } = parsePayload(payload);
+    const { tokenId, amount } = parsePayload(payload);
     const credential = useCredential(accountAddress);
 
     useEffect(() => {
@@ -184,12 +158,9 @@ export default function DisplaySingleTransferTokenUpdate({
         <Page className="send-transaction-x single-transaction-token-update">
             <Page.Top heading={t('transferRequest')} />
             <Page.Main>
-                <Text.Main>SPONSORED PAGE</Text.Main>
                 <Text.Main>{webPageTitle}</Text.Main>
                 <AccountInfoCard tokenId={tokenId} credential={credential} />
-                <TransferInfo cost={cost} tokenId={tokenId} amount={amount} recipient={recipient} />
-                <ToggleAdvanced />
-                <TransferInfoAdvanced payload={stringifiedPayload} tokenId={tokenId} accountAddress={accountAddress} />
+                <TransferInfo tokenId={tokenId} amount={amount} sponsoredAccount={sponsoredAccount} />
             </Page.Main>
             <Page.Footer>
                 <Button.Main variant="secondary" label={t('reject')} onClick={rejectHandler} />

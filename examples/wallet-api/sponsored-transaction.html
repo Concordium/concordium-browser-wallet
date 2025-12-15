@@ -87,7 +87,7 @@
                         Cbor,
                         TokenId,
                         Transaction,
-                        CborAccountAddress
+                        CborAccountAddress,
                     } = concordiumSDK;
 
                     const ops = [
@@ -97,7 +97,9 @@
                                     value: '1000000',
                                     decimals: 6,
                                 }),
-                                recipient: CborAccountAddress.fromAccountAddress(AccountAddress.fromBase58(recipient.value)),
+                                recipient: CborAccountAddress.fromAccountAddress(
+                                    AccountAddress.fromBase58(recipient.value)
+                                ),
                                 memo: CborMemo.fromString('Some text for memo'),
                             },
                         },
@@ -141,14 +143,14 @@
         <br />
         <h3>Sponsor Config:</h3>
         Sponsor Account:
-        <input type="text" id="sponsorAccount" value="4nujdT1TKG7DAxRRnUiAmL9Gg9Syygb2gKroL2NAwmTBQVTCXd" />
+        <input type="text" id="sponsorAccount" value="3PCRkKoFrSzgUmzfFF7C17pc3wm9wrVgbaCrbgGs6UMxy5aogo" />
         <br />
         Sponsor Private Key:
-        <input type="text" id="privateKey" value="8a6a7bfb590ae79de8bade6ef453d75a6481c4354dff35f1dbe54eb06d1e7317" />
+        <input type="text" id="privateKey" value="9a494111614cd737ed89e500a3d155af80a4f8faf18f168568f8facbd2be3909" />
         <br />
         <h3>Recipient Config:</h3>
         Recipient Address:
-        <input type="text" id="recipient" value="3HogEYQkUCRY9S8TKAJCBZeds5bfuFNBHWpPQaquuNSdkVM2Ch" />
+        <input type="text" id="recipient" value="4jPwPo6da7g43DRQFcwMxJQQA9BbD762fbSS24X8Z7VHkvnehe" />
         <br />
         <br />
         <button id="signSimpleTransfer">Sign Simple Transfer</button>

@@ -52,7 +52,7 @@ export default function FullscreenPromptLayout({ children }: { children: ReactNo
         (action) =>
             (...args) => {
                 action(...args);
-                close();
+                // close();
             },
         [close]
     );
