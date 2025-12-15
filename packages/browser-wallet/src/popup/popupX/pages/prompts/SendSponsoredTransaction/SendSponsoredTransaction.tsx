@@ -1,4 +1,4 @@
-import React, { useCallback, useContext, useEffect, useMemo } from 'react';
+import React, { useCallback, useContext, useEffect, useMemo, useState } from 'react';
 import { BackgroundSendTransactionPayload } from '@shared/utils/types';
 import { useLocation } from 'react-router-dom';
 import { Trans, useTranslation } from 'react-i18next';
@@ -24,13 +24,9 @@ import {
     buildBasicAccountSigner,
 } from '@concordium/web-sdk';
 import { Cbor, TokenOperationType } from '@concordium/web-sdk/plt';
-import { displayAsCcd, getPublicAccountAmounts } from 'wallet-common-helpers';
 import {
     createPendingTransactionFromAccountTransaction,
-    getDefaultExpiry,
-    getTransactionAmount,
     getTransactionTypeName,
-    sendTransaction,
 } from '@popup/shared/utils/transaction-helpers';
 import Page from '@popup/popupX/shared/Page';
 import Text from '@popup/popupX/shared/Text';
@@ -41,6 +37,12 @@ import DisplayTransactionPayload, {
     DisplayParameters,
 } from '@popup/popupX/pages/prompts/SendSponsoredTransaction/DisplayTransactionPayload';
 import DisplaySingleTransferTokenUpdate from '@popup/popupX/pages/prompts/SendSponsoredTransaction/DisplaySingleTransferTokenUpdate';
+import FullscreenNotice from '@popup/popupX/shared/FullscreenNotice';
+import Tooltip from '@popup/popupX/shared/Tooltip/Tooltip';
+import Info from '@assets/svgX/info.svg';
+import { LoaderInline } from '@popup/popupX/shared/Loader';
+import CheckCircle from '@assets/svgX/check-circle.svg';
+import Cross from '@assets/svgX/close.svg';
 
 const isSingleTransferTokenUpdate = (transactionType: AccountTransactionType, payload: AccountTransactionPayload) => {
     const isTokenUpdate = transactionType === AccountTransactionType.TokenUpdate;
@@ -59,11 +61,63 @@ interface Location {
 }
 
 interface Props {
-    onSubmit(hash: string): void;
     onReject(): void;
 }
 
-export default function SendSponsoredTransaction({ onSubmit, onReject }: Props) {
+type TransactionStatusProps = {
+    success?: boolean | undefined;
+    amount?: string | number;
+    sponsoredAccount?: string;
+    tokenName?: string;
+};
+
+function TransactionStatus({ success, amount, sponsoredAccount, tokenName }: TransactionStatusProps) {
+    const { t } = useTranslation('x', { keyPrefix: 'submittedTransaction' });
+
+    let icon: JSX.Element;
+    switch (success) {
+        case undefined: {
+            icon = <LoaderInline />;
+            break;
+        }
+        case true: {
+            icon = <CheckCircle />;
+            break;
+        }
+        case false: {
+            icon = <Cross className="submitted-tx__failed-icon" />;
+            break;
+        }
+        default:
+            throw new Error('Unexpected status');
+    }
+
+    return (
+        <>
+            {icon}
+            <Text.Capture>Amount ({tokenName})</Text.Capture>
+            <Text.HeadingLarge>{amount}</Text.HeadingLarge>
+            <Text.Capture>
+                <span className="free-transaction-btn">
+                    <Tooltip
+                        title="Transaction cost covered by:"
+                        text={sponsoredAccount}
+                        className="tooltip"
+                        position="top"
+                    >
+                        Free Transaction
+                    </Tooltip>
+                </span>
+            </Text.Capture>
+
+            {success === true && <Text.Capture>{t('success.label')}</Text.Capture>}
+            {success === false && <Text.Capture>{t('failure.label')}</Text.Capture>}
+            {success === undefined && <Text.Capture>{t('pending.label')}</Text.Capture>}
+        </>
+    );
+}
+
+export default function SendSponsoredTransaction({ onReject }: Props) {
     const { state } = useLocation() as Location;
     const { t } = useTranslation('x', { keyPrefix: 'prompts.sendTransactionX' });
     const addToast = useSetAtom(addToastAtom);
@@ -72,7 +126,11 @@ export default function SendSponsoredTransaction({ onSubmit, onReject }: Props) 
     const addPendingTransaction = useUpdateAtom(addPendingTransactionAtom);
     const chainParameters = useBlockChainParameters();
 
-    console.log('state', state);
+    const [showNoChanges, setShowNoChanges] = useState(false);
+
+    const payloadSponsored = JSON.parse(state.payload.payloadSponsored);
+    const sponsoredAccount = payloadSponsored.header.sponsor.account;
+    const tokenSymbol = payloadSponsored.payload.tokenId;
 
     const { accountAddress, url } = state.payload;
     const key = usePrivateKey(accountAddress);
@@ -114,14 +172,9 @@ export default function SendSponsoredTransaction({ onSubmit, onReject }: Props) 
             throw new Error(t('errors.missingKey'));
         }
 
+        setShowNoChanges(true);
+
         const sender = AccountAddress.fromBase58(accountAddress);
-        const accountInfo = await client.getAccountInfo(sender);
-        // if (
-        //     getPublicAccountAmounts(accountInfo).atDisposal <
-        //     getTransactionAmount(transactionType, payload) + (cost?.microCcdAmount || 0n)
-        // ) {
-        //     throw new Error(t('errors.insufficientFunds'));
-        // }
 
         const nonce = await client.getNextAccountNonce(sender);
 
@@ -129,14 +182,7 @@ export default function SendSponsoredTransaction({ onSubmit, onReject }: Props) 
             throw new Error(t('errors.missingNonce'));
         }
 
-        const header = {
-            expiry: getDefaultExpiry(),
-            sender,
-            nonce: nonce.nonce,
-        };
-
         // ToDo magic happens here
-        // @ts-ignore
         const transaction = parse(state.payload.payloadSponsored);
         const sponsoredTransaction = Transaction.signableFromJSON(transaction);
         const signed = await Transaction.signAndFinalize(sponsoredTransaction, buildBasicAccountSigner(key));
@@ -149,22 +195,39 @@ export default function SendSponsoredTransaction({ onSubmit, onReject }: Props) 
             cost?.microCcdAmount
         );
         await addPendingTransaction(pending);
-
         return hash.toString();
     }, [payload, key, cost]);
 
     const rejectHandler = withClose(onReject);
+
     const signHandler = () => {
         handleSubmit()
-            .then(withClose(onSubmit))
+            // .then(withClose(onSubmit))
             .catch((e) => addToast(e.message));
     };
+
+    if (showNoChanges) {
+        return (
+            <FullscreenNotice open={showNoChanges} onClose={() => setShowNoChanges(false)}>
+                <Page className="submitted-tx">
+                    <Card type="transparent" className="submitted-tx__card">
+                        <TransactionStatus
+                            success
+                            sponsoredAccount={sponsoredAccount}
+                            amount="1.00"
+                            tokenName={tokenSymbol}
+                        />
+                    </Card>
+                </Page>
+            </FullscreenNotice>
+        );
+    }
 
     if (isSingleTransferTokenUpdate(transactionType, payload)) {
         return (
             <DisplaySingleTransferTokenUpdate
                 url={url}
-                cost={cost}
+                sponsoredAccount={sponsoredAccount}
                 payload={payload as TokenUpdatePayload}
                 accountAddress={accountAddress}
                 signHandler={signHandler}
@@ -177,7 +240,6 @@ export default function SendSponsoredTransaction({ onSubmit, onReject }: Props) 
         <Page className="send-transaction-x">
             <Page.Top heading={t('signRequest')} />
             <Page.Main>
-                <Text.Main>SPONSORED PAGE</Text.Main>
                 <Text.Main>
                     <Trans
                         ns="x"
@@ -192,10 +254,19 @@ export default function SendSponsoredTransaction({ onSubmit, onReject }: Props) 
                     </Card.Row>
                     <Card.RowDetails title={t('payload.sender')} value={accountAddress} />
                     <DisplayTransactionPayload type={transactionType} payload={payload} />
-                    <Card.RowDetails
-                        title={t('payload.cost')}
-                        value={cost ? displayAsCcd(cost) : t('payload.unknown')}
-                    />
+                    <Card.Row className="amounts">
+                        <Text.Capture>{t('payload.fee')}</Text.Capture>
+                        <span className="free-transaction-btn">
+                            <Tooltip
+                                title="Transaction cost covered by:"
+                                text={sponsoredAccount}
+                                className="tooltip"
+                                position="top"
+                            >
+                                Free Transaction <Info />
+                            </Tooltip>
+                        </span>
+                    </Card.Row>
                     <DisplayParameters parameters={parameters} />
                 </Card>
             </Page.Main>

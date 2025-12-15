@@ -1,3 +1,33 @@
+.tooltip span span {
+    color: #000 !important;
+}
+
+.tooltip span {
+    width: 263px !important;
+    word-break: break-word !important;
+    overflow-wrap: break-word !important;
+    white-space: pre-line !important;
+}
+
+.free-transaction-btn {
+    box-sizing: border-box;
+    display: flex;
+    flex-direction: row;
+    justify-content: center;
+    align-items: center;
+    padding: 3px 5px;
+    gap: 6px;
+    width: 123px;
+    height: 24px;
+    border: 1px solid #b6c9e2;
+    border-radius: 9999px;
+    font-size: 12px;
+    cursor: pointer;
+    font-weight: 400;
+    margin-left: auto;
+    position: relative;
+}
+
 .send-transaction-x {
     .text__main {
         color: $color-mineral-2;
