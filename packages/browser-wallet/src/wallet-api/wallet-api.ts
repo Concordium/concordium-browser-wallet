@@ -1,4 +1,5 @@
 import { InjectedMessageHandler, createEventTypeFilter, MessageType, MessageStatusWrapper } from '@messaging';
+import { Transaction } from '@concordium/web-sdk';
 import {
     AccountAddress,
     AccountTransactionSignature,
@@ -186,15 +187,13 @@ class WalletApi extends EventEmitter implements IWalletApi {
      */
     public async sendSponsoredTransaction(
         accountAddress: AccountAddressSource,
-        type: AccountTransactionType,
-        payload: SignableTransaction
+        transaction: SignableTransaction
     ): Promise<string> {
         const response = await this.messageHandler.sendMessage<MessageStatusWrapper<string>>(
             MessageType.SendSponsoredTransaction,
             {
-                type,
                 accountAddress,
-                payload: stringify(payload),
+                transaction: stringify(Transaction.toJSON(transaction)),
             }
         );
 

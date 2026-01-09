@@ -262,14 +262,9 @@ interface MainWalletApi {
      * Note that a header is sent, and constructed by the sponsor.
      * Note that if the user rejects signing the transaction, this will throw an error.
      * @param accountAddress the address of the account that should sign the transaction
-     * @param type the type of transaction that is to be signed and sent.
-     * @param payload the sponsored transaction with header to be signed and sent.
+     * @param transaction the sponsored transaction with header to be signed and sent.
      */
-    sendSponsoredTransaction(
-        accountAddress: AccountAddressSource,
-        type: LaxNumberEnumValue<AccountTransactionType.Transfer>,
-        payload: SignableTransaction
-    ): Promise<string>;
+    sendSponsoredTransaction(accountAddress: AccountAddressSource, transaction: SignableTransaction): Promise<string>;
     /**
      * Sends a message to the Concordium Wallet and awaits the users action. If the user signs the message, this will resolve to the signature.
      * Note that if the user rejects signing the message, this will throw an error.

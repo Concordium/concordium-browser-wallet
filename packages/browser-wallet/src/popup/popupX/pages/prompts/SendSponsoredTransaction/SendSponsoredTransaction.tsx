@@ -31,6 +31,7 @@ import DisplayTransactionPayload, {
 } from '@popup/popupX/pages/prompts/SendTransaction/DisplayTransactionPayload';
 import DisplaySingleTransferTokenUpdate from '@popup/popupX/pages/prompts/SendSponsoredTransaction/DisplaySingleTransferTokenUpdate';
 import { displayUrl } from '@popup/shared/utils/string-helpers';
+import { mapTransactionKindStringToTransactionType } from '@popup/shared/utils/wallet-proxy';
 import { stringify } from '@wallet-api/util';
 import Page from '@popup/popupX/shared/Page';
 import Text from '@popup/popupX/shared/Text';
@@ -70,22 +71,26 @@ export default function SendSponsoredTransaction({ onSubmit, onReject }: Props) 
     const addPendingTransaction = useUpdateAtom(addPendingTransactionAtom);
     const chainParameters = useBlockChainParameters();
 
-    const payloadSponsored = parse(state.payload.payload);
-    const sponsorAccount = payloadSponsored.header.sponsor.account;
+    const sponsoredTransaction = parse(state.payload.transaction);
+    const sponsorAccount = sponsoredTransaction.header.sponsor.account;
 
     const { accountAddress, url } = state.payload;
     const key = usePrivateKey(accountAddress);
 
     const { type: transactionType, payload } = useMemo(
-        () => parsePayload(state.payload.type, stringify(payloadSponsored.payload)),
-        [JSON.stringify(state.payload.payload)]
+        () =>
+            parsePayload(
+                mapTransactionKindStringToTransactionType(sponsoredTransaction.payload.type) as AccountTransactionType,
+                stringify(sponsoredTransaction.payload)
+            ),
+        [JSON.stringify(state.payload.transaction)]
     );
     const parameters = useMemo(
         () =>
             state.payload.parameters === undefined
                 ? undefined
-                : (payloadSponsored.parameters as SmartContractParameters),
-        [payloadSponsored.parameters]
+                : (sponsoredTransaction.parameters as SmartContractParameters),
+        [sponsoredTransaction.parameters]
     );
 
     const cost = useMemo(() => {
@@ -106,9 +111,9 @@ export default function SendSponsoredTransaction({ onSubmit, onReject }: Props) 
             throw new Error(t('errors.missingKey'));
         }
 
-        const transaction = parse(state.payload.payload);
-        const sponsoredTransaction = Transaction.signableFromJSON(transaction);
-        const signed = await Transaction.signAndFinalize(sponsoredTransaction, buildBasicAccountSigner(key));
+        const transaction = parse(state.payload.transaction);
+        const signableSponsoredTransaction = Transaction.signableFromJSON(transaction);
+        const signed = await Transaction.signAndFinalize(signableSponsoredTransaction, buildBasicAccountSigner(key));
         const hash = await client.sendTransaction(signed);
 
         const pending = createPendingTransactionFromAccountTransaction(

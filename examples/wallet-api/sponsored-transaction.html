@@ -71,8 +71,10 @@
 
                     console.log('sponsorResponse', sponsorResponse);
 
+                    const sponsoredParsed = Transaction.signableFromJSON(sponsorResponse);
+
                     return provider
-                        .sendSponsoredTransaction(currentAccountAddress, 3, sponsorResponse)
+                        .sendSponsoredTransaction(currentAccountAddress, sponsoredParsed)
                         .then((sig) => alert(JSON.stringify(sig)))
                         .catch(alert);
                 });
@@ -122,8 +124,10 @@
 
                     console.log('sponsorResponse', sponsorResponse);
 
+                    const sponsoredParsed = Transaction.signableFromJSON(sponsorResponse);
+
                     return provider
-                        .sendSponsoredTransaction(currentAccountAddress, 27, sponsorResponse)
+                        .sendSponsoredTransaction(currentAccountAddress, sponsoredParsed)
                         .then((sig) => alert(JSON.stringify(sig)))
                         .catch(alert);
                 });
