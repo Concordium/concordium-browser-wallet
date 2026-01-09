@@ -294,3 +294,7 @@ const client = new ConcordiumGRPCClient(provider.grpcTransport);
 // The client can then be used to acccess the GRPC v2 API of the node used in the wallet.
 const accountInfo = await client.getAccountInfo(accountAddress);
 ```
+
+## Creating a release
+
+-   Push a tag `api-helpers/<version>`, where `<version>` is replaced with the version from [`package.json`](./package.json).
