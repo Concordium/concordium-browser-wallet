@@ -25,6 +25,7 @@ import type {
     UpdateContractInput,
     UpdateCredentialsInput,
     VerifiablePresentation,
+    Transaction,
 } from '@concordium/web-sdk';
 import type { RpcTransport } from '@protobuf-ts/runtime-rpc';
 import { LaxNumberEnumValue, LaxStringEnumValue } from './util';
@@ -68,6 +69,8 @@ export type SendTransactionPayload =
     | Exclude<AccountTransactionInput, UpdateContractInput | InitContractInput>
     | SendTransactionUpdateContractPayload
     | SendTransactionInitContractPayload;
+
+export type SignableTransaction = Transaction.Signable;
 
 export type SmartContractParameters =
     | { [key: string]: SmartContractParameters }
@@ -255,16 +258,17 @@ interface MainWalletApi {
         payload: ConfigureDelegationPayload
     ): Promise<string>;
     /**
-     * Sends a transaction to the Concordium Wallet and awaits the users action. Note that a header is not sent, and will be constructed by the wallet itself.
+     * Sends a transaction signed by sponsor to the Concordium Wallet and awaits the users action.
+     * Note that a header is sent, and constructed by the sponsor.
      * Note that if the user rejects signing the transaction, this will throw an error.
      * @param accountAddress the address of the account that should sign the transaction
      * @param type the type of transaction that is to be signed and sent.
-     * @param payload the payload of the transaction to be signed and sent. Note that for smart contract transactions, the payload should not contain the parameters, those should instead be provided in the subsequent argument instead.
+     * @param payload the sponsored transaction with header to be signed and sent.
      */
     sendSponsoredTransaction(
         accountAddress: AccountAddressSource,
         type: LaxNumberEnumValue<AccountTransactionType.Transfer>,
-        payload: SimpleTransferPayload
+        payload: SignableTransaction
     ): Promise<string>;
     /**
      * Sends a message to the Concordium Wallet and awaits the users action. If the user signs the message, this will resolve to the signature.

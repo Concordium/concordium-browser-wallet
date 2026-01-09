@@ -58,7 +58,6 @@ import addTokensX from '@popup/popupX/pages/prompts/AddTokens/i18n/en';
 import signCis3 from '@popup/popupX/pages/prompts/SignCis3Message/i18n/en';
 import signMessageX from '@popup/popupX/pages/prompts/SignMessage/i18n/en';
 import sendTransactionX from '@popup/popupX/pages/prompts/SendTransaction/i18n/en';
-import sendSponsoredTransactionX from '@popup/popupX/pages/prompts/SendSponsoredTransaction/i18n/en';
 import submittedTransaction from '@popup/popupX/pages/SubmittedTransaction/i18n/en';
 import nft from '@popup/popupX/pages/Nft/i18n/en';
 import idIssuance from '@popup/popupX/pages/IdIssuance/i18n/en';
@@ -128,7 +127,6 @@ const t = {
             signCis3,
             signMessageX,
             sendTransactionX,
-            sendSponsoredTransactionX,
             addWeb3IdCredentialX,
             verifiablePresentationRequest,
             idProofRequestX,

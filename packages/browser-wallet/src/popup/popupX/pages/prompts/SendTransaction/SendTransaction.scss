@@ -1,6 +1,8 @@
 .send-transaction-x {
     .text__main {
-        color: $color-mineral-2;
+        color: $semantic-content-accent-secondary;
+        line-height: 18px;
+        font-weight: $t-font-weight-medium;
 
         &_medium {
             color: $color-white;
@@ -89,12 +91,18 @@
                     border-bottom: unset;
                     padding-bottom: unset;
 
-                    .capture__main_small:first-of-type {
+                    .text__main_medium {
                         color: $semantic-content-accent-secondary;
                     }
 
-                    .capture__main_small {
-                        color: $color-white;
+                    .text__additional_small {
+                        color: $semantic-content-primary;
+                        line-height: 15px;
+                    }
+
+                    &:not(:last-of-type) {
+                        margin-bottom: $semantic-gap-m;
+                        align-items: flex-start;
                     }
                 }
             }
@@ -107,18 +115,22 @@
                 margin-top: rem(24px);
 
                 .text__main {
-                    color: $color-grey-1;
-                    line-height: rem(20px);
+                    color: $semantic-content-inverse-primary;
+                    line-height: 120%;
+                    font-weight: $t-font-weight-bold;
                 }
 
                 .text__main_regular {
-                    color: $color-grey-1;
+                    color: $semantic-content-inverse-primary;
+                    line-height: 120%;
+                    font-size: 16px;
                 }
 
                 .divider {
                     width: 100%;
-                    margin-bottom: rem(8px);
-                    border-bottom: 1px solid $color-input-border;
+                    margin-top: rem(4px);
+                    margin-bottom: rem(12px);
+                    border-bottom: 1px solid $semantic-border-inverse-primary-a10;
                 }
 
                 .row {

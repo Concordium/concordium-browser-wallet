@@ -1,4 +1,3 @@
-// @ts-nocheck
 import { InjectedMessageHandler, createEventTypeFilter, MessageType, MessageStatusWrapper } from '@messaging';
 import {
     AccountAddress,
@@ -23,6 +22,7 @@ import {
     AccountAddressSource,
     SchemaSource,
     SendTransactionPayload,
+    SignableTransaction,
 } from '@concordium/browser-wallet-api-helpers';
 import EventEmitter from 'events';
 import { IdProofOutput, IdStatement } from '@concordium/web-sdk/id';
@@ -187,23 +187,14 @@ class WalletApi extends EventEmitter implements IWalletApi {
     public async sendSponsoredTransaction(
         accountAddress: AccountAddressSource,
         type: AccountTransactionType,
-        payload: SendTransactionPayload,
-        parameters?: SmartContractParameters,
-        schema?: SchemaSource,
-        schemaVersion?: SchemaVersion
+        payload: SignableTransaction
     ): Promise<string> {
-        // ToDo need update for input sanitize
-        // const input = sanitizeSendTransactionInput(accountAddress, type, payload, parameters, schema, schemaVersion);
-
         const response = await this.messageHandler.sendMessage<MessageStatusWrapper<string>>(
             MessageType.SendSponsoredTransaction,
             {
-                // ...input,
                 type,
                 accountAddress,
-                payload: stringify(payload.payload),
-                parameters: JSONBig.stringify(parameters),
-                payloadSponsored: stringify(payload),
+                payload: stringify(payload),
             }
         );
 

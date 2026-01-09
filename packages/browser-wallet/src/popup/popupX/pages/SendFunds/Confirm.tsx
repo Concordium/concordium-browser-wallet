@@ -1,6 +1,6 @@
 import React, { useMemo } from 'react';
 import { useTranslation } from 'react-i18next';
-import { Cbor, CborMemo, TokenAmount, TokenId, TokenOperationType, TokenHolder } from '@concordium/web-sdk/plt';
+import { Cbor, CborMemo, TokenAmount, TokenId, TokenOperationType, CborAccountAddress } from '@concordium/web-sdk/plt';
 import {
     AccountAddress,
     AccountTransactionType,
@@ -116,7 +116,7 @@ export default function SendFundsConfirm({ values, fee, sender }: Props) {
                         value: parseTokenAmount(values.amount, tokenMetadata?.decimals).toString(),
                         decimals: tokenMetadata?.decimals || 0,
                     }),
-                    recipient: TokenHolder.fromAccountAddress(receiver),
+                    recipient: CborAccountAddress.fromAccountAddress(receiver),
                     memo: values.memo ? CborMemo.fromString(values.memo) : undefined,
                 },
             },

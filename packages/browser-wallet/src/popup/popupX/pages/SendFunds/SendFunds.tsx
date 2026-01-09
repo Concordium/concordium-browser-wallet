@@ -18,7 +18,7 @@ import {
     TokenId,
     TokenAmount as TokenAmountPlt,
     TokenOperationType,
-    TokenHolder,
+    CborAccountAddress,
 } from '@concordium/web-sdk/plt';
 import { useAsyncMemo } from 'wallet-common-helpers';
 import { useAtomValue } from 'jotai';
@@ -104,7 +104,7 @@ function SendFunds({ address }: SendFundsProps) {
                                 value: parseTokenAmount(amount, metadata?.decimals).toString(),
                                 decimals: metadata?.decimals || 0,
                             }),
-                            recipient: TokenHolder.fromAccountAddress(address),
+                            recipient: CborAccountAddress.fromAccountAddress(address),
                             memo: memo ? CborMemo.fromString(memo) : undefined,
                         },
                     },
