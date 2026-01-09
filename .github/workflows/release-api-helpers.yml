@@ -65,7 +65,7 @@ jobs:
         runs-on: ubuntu-latest
         permissions:
             contents: write
-        environment: release-api-helpers # TODO: create this environment on the repository
+        environment: release-api-helpers
         steps:
             - name: Checkout sources
               uses: actions/checkout@v6
