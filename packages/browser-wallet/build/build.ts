@@ -31,6 +31,7 @@ const isDev = isDevelopmentBuild();
 
 const config: BuildOptions = {
     entryPoints: [popup, background, content, inject],
+    inject: ['src/polyfills.ts'],
     outbase: 'src',
     entryNames: '[dir]',
     bundle: true,
@@ -43,7 +44,8 @@ const config: BuildOptions = {
     define: {
         'process.env.NODE_ENV': `"${process.env.NODE_ENV}"`,
         'process.env.READABLE_STREAM': '""',
-        global: 'window',
+        // global: 'window',
+        global: 'globalThis',
         // Without this the web-sdk is unable to be used in a web-worker. (Throws because document is undefined)
         'document.baseURI': '""',
     },

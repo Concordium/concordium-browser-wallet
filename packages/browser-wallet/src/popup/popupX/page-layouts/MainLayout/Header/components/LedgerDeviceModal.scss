@@ -1,0 +1,47 @@
+.ledger-device-modal {
+    background-color: #1a1b1d;
+    border-radius: 16px;
+    padding: 32px;
+    max-width: 360px;
+    width: 100%;
+
+    &__content {
+        display: flex;
+        flex-direction: column;
+        gap: 24px;
+    }
+
+    &__title {
+        color: #fff;
+        text-align: center;
+        margin: 0;
+    }
+
+    &__description {
+        color: #b6c9e2;
+        text-align: center;
+        line-height: 1.5;
+        margin: 0;
+    }
+
+    &__button {
+        border-radius: 8px;
+        padding: 12px 24px;
+        font-weight: 500;
+    }
+}
+
+// Override modal default styles for dark theme
+.modal:has(.ledger-device-modal) {
+    .modal__content {
+        background-color: #1a1b1d;
+    }
+
+    .modal__close {
+        svg {
+            path {
+                fill: #fff;
+            }
+        }
+    }
+}

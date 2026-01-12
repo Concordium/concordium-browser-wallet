@@ -44,6 +44,7 @@ export enum ChromeStorageKey {
     TemporaryVerifiableCredentialMetadataUrls = 'tempVerifiableCredentialMetadataUrls',
     Allowlist = 'allowlist',
     Log = 'log',
+    LedgerDeviceConnection = 'ledgerDeviceConnection',
 }
 
 export enum Theme {
@@ -352,4 +353,15 @@ export interface VerifiableCredentialSchema {
     type: string;
     properties: SchemaProperties;
     required: string[];
+}
+
+export interface LedgerConnectionState {
+    isConnected: boolean;
+    deviceName: string;
+    lastConnectedAt: number;
+    productId?: number;
+    vendorId?: number;
+    serialNumber?: string;
+    deviceModel?: string;
+    autoConnect?: boolean;
 }

@@ -388,4 +388,279 @@
     &.scroll-border {
         border-bottom: 1px solid $color-grey-3;
     }
+
+    &__ledger {
+        display: flex;
+        flex-direction: column;
+        align-items: center;
+        justify-content: center;
+        white-space: nowrap;
+        height: rem(32px);
+        width: rem(32px); // Make it square/icon sized
+        box-sizing: border-box;
+        position: relative;
+        border-radius: $semantic-radius-s;
+        cursor: pointer;
+
+        // Reuse connection styling mixins or similar
+        @include element-variant($semantic-content-secondary, transparent, $semantic-border-accent-tertiary);
+
+        &:hover {
+            background-color: $semantic-surface-tertiary-hover;
+        }
+
+        &.connected {
+            path {
+                fill: $semantic-content-success-primary;
+            }
+        }
+
+        &_icon {
+            display: flex;
+            align-items: center;
+            justify-content: center;
+
+            svg {
+                width: rem(32x);
+                height: rem(32px);
+
+                path {
+                    fill: $semantic-content-secondary;
+                }
+            }
+        }
+    }
+}
+
+// Global scope or component scope for overlay?
+// Since Modal portals to root, we might need these styles global or ensure they are imported.
+// Putting them here for now, assuming this SCSS is included in the build.
+.ledger-connect-modal {
+    // Override nested element with super high specificity to defeat Modal.scss
+    // The structure is: Portal > .modal > .modal__content.ledger-connect-modal
+    // Modal.tsx applies className to the content div.
+
+    // Note: The `className` prop on Modal component is applied to the inner div with class `modal__content`.
+    // So the element has classes: "modal__content ledger-connect-modal"
+
+    // We target it directly combined with parent if we can, or just the chain properties.
+    // Since Modal is a Portal, it might be a direct child of body or similar, but the classes are on the elements.
+
+    // The .modal container has the padding/alignments.
+    // The .modal__content has the background/border.
+
+    // We want to override .modal__content when it also has .ledger-connect-modal
+    &.modal__content {
+        // Reset properties from .modal__content in Modal.scss
+        margin: 0 !important; // Override default margin
+        max-width: unset !important;
+        width: rem(363px) !important;
+        display: flex;
+        flex-direction: column;
+        justify-content: center;
+        align-items: center;
+        padding: rem(24px) rem(16px) rem(16px) !important;
+        gap: rem(24px);
+        background: #000 !important; // Force override to black
+        border: 1px solid #4b5357 !important;
+        border-radius: rem(8px) !important;
+        box-sizing: border-box;
+        box-shadow: none !important;
+        text-align: center; // from Modal.scss but we might want it
+
+        // Ensure no other conflicting styles
+        min-height: unset;
+    }
+
+    // Hide close button if it's interfering, or style it.
+    // The design has no close button visible in the "Main" part but the screenshot had an X.
+    // If the X is part of shared Modal, we can leave it or checking the design again "modal design svg file..."
+    // didn't explicitly mention the close button but the layout suggests a clean modal.
+    // If the X is needed it's likely white, which should be fine on dark bg.
+    // Let's ensure text color is inherited or set correctly.
+    .modal__close {
+        svg {
+            path {
+                fill: #fff !important;
+                stroke: #fff !important; // Add stroke just in case
+            }
+        }
+    }
+}
+
+.ledger-connect-overlay {
+    display: flex;
+    flex-direction: column;
+    justify-content: center;
+    align-items: center;
+    padding: 0;
+    width: 100%;
+
+    // Title
+    .heading_large {
+        font-family: 'Satoshi Variable', sans-serif; // Assuming font is available
+        font-style: normal;
+        font-weight: 500;
+        font-size: rem(20px);
+        line-height: rem(27px);
+        text-align: center;
+        letter-spacing: 0.2px;
+        color: #b6c9e2;
+        margin-bottom: rem(20px); // approx matching visual gap
+        background: unset; // Override gradient if any
+        background-clip: unset;
+        background-clip: unset;
+    }
+
+    .warning-box {
+        box-sizing: border-box;
+        display: flex;
+        flex-direction: column;
+        align-items: center;
+        padding: rem(16px);
+        gap: rem(4px); // from label gap?
+        width: 100%;
+        min-height: rem(75px); // Matches notification-field height
+        background: #2b171b;
+        border: 1px solid #4e1b25;
+        border-radius: rem(24px);
+        margin-bottom: rem(24px); // Gap before button
+
+        // Text inside warning box
+        .text__main_regular {
+            font-family: 'Satoshi Variable', sans-serif;
+            font-style: normal;
+            font-weight: 400;
+            font-size: rem(14px);
+            line-height: rem(19px);
+            text-align: center;
+            color: #d62e4c;
+        }
+
+        .highlight {
+            text-decoration: underline;
+            font-weight: 700; // Not explicitly in "notification text" copy but in original code
+        }
+    }
+
+    .dialog-box {
+        box-sizing: border-box;
+        display: flex;
+        flex-direction: column;
+        align-items: center;
+        padding: rem(16px);
+        gap: rem(4px); // from label gap?
+        width: 100%;
+        min-height: rem(75px); // Matches notification-field height
+        background: #131416;
+        border: 1px solid #4b5357;
+        border-radius: rem(24px);
+        margin-bottom: rem(24px); // Gap before button
+
+        // Text inside warning box
+        .text__main_regular {
+            font-family: 'Satoshi Variable', sans-serif;
+            font-style: normal;
+            font-weight: 400;
+            font-size: rem(14px);
+            line-height: rem(19px);
+            text-align: center;
+            color: #fff;
+        }
+
+        .highlight {
+            text-decoration: underline;
+            font-weight: 700; // Not explicitly in "notification text" copy but in original code
+        }
+    }
+
+    .success-box {
+        box-sizing: border-box;
+        display: flex;
+        flex-direction: column;
+        align-items: center;
+        padding: rem(16px);
+        gap: rem(4px); // from label gap?
+        width: 100%;
+        min-height: rem(50px); // Matches notification-field height
+        background: #0c261d;
+        border: 1px solid #0a4430;
+        border-radius: rem(24px);
+        margin-bottom: rem(24px); // Gap before button
+
+        // Text inside warning box
+        .text__main_regular {
+            font-family: 'Satoshi Variable', sans-serif;
+            font-style: normal;
+            font-weight: 400;
+            font-size: rem(14px);
+            line-height: rem(19px);
+            text-align: center;
+            color: #24d4ab;
+        }
+
+        .highlight {
+            text-decoration: underline;
+            font-weight: 700; // Not explicitly in "notification text" copy but in original code
+        }
+    }
+
+    .faq-link {
+        color: #fff;
+        text-decoration: underline;
+        cursor: pointer;
+
+        &:hover {
+            opacity: 0.8;
+        }
+    }
+
+    // Button overrides if needed to match width/height
+    .button__base {
+        width: 100%;
+        height: rem(48px);
+        background: #2f3437;
+        border-radius: rem(9999px);
+
+        // Button text style
+        .label__main {
+            font-family: 'Satoshi Variable', sans-serif;
+            font-style: normal;
+            font-weight: 500;
+            font-size: rem(14px);
+            line-height: rem(16px);
+            color: #4b5357;
+        }
+
+        &:hover {
+            opacity: 0.6;
+        }
+    }
+
+    .button__override {
+        width: 100%;
+        background-color: #fff !important;
+        color: #000 !important;
+        border-radius: rem(9999px);
+        padding: 12px 24px;
+        font-weight: 500;
+
+        &:hover {
+            opacity: 0.6;
+        }
+    }
+}
+
+.modal:has(.ledger-connect-modal) {
+    .modal__content {
+        background-color: #1a1b1d;
+    }
+
+    .modal__close {
+        svg {
+            path {
+                fill: #fff;
+            }
+        }
+    }
 }

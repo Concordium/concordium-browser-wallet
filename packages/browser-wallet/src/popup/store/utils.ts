@@ -36,6 +36,7 @@ import {
     storedUiStyle,
     storedCustomNetwork,
     storedHasBeenSavedSeed,
+    storedLedgerConnection,
 } from '@shared/storage/access';
 import { ChromeStorageKey } from '@shared/storage/types';
 import { atom, PrimitiveAtom, WritableAtom } from 'jotai';
@@ -79,6 +80,7 @@ const accessorMap: Record<ChromeStorageKey, StorageAccessor<any>> = {
         getGenesisHash
     ),
     [ChromeStorageKey.Log]: storedLog,
+    [ChromeStorageKey.LedgerDeviceConnection]: storedLedgerConnection,
 };
 
 export function resetOnUnmountAtom<V>(initial: V): PrimitiveAtom<V> {

@@ -1955,7 +1955,13 @@ __metadata:
     "@concordium/common-sdk": ^9.5.3
     "@concordium/web-sdk": 10.0.2
     "@craftamap/esbuild-plugin-html": ^0.4.0
+    "@esbuild-plugins/node-globals-polyfill": ^0.2.3
     "@floating-ui/react": ^0.27.2
+    "@ledgerhq/devices": ^8.8.0
+    "@ledgerhq/errors": ^6.28.0
+    "@ledgerhq/hw-transport": ^6.31.15
+    "@ledgerhq/hw-transport-webhid": ^6.30.11
+    "@ledgerhq/logs": ^6.13.0
     "@mdx-js/react": ^1.6.22
     "@noble/ed25519": ^1.7.0
     "@protobuf-ts/grpcweb-transport": ^2.9.1
@@ -1995,6 +2001,7 @@ __metadata:
     esbuild-plugin-svgr: ^1.0.1
     esbuild-sass-plugin: ^2.2.6
     framer-motion: ^6.3.12
+    history: ^5.3.0
     i18n-iso-countries: ^7.5.0
     i18next: ^21.6.16
     i18next-browser-languagedetector: ^6.1.4
@@ -2006,6 +2013,7 @@ __metadata:
     leb128: ^0.0.5
     lodash.debounce: ^4.0.8
     lodash.groupby: ^4.6.0
+    process: ^0.11.10
     qrcode.react: ^3.1.0
     rc-slider: 9
     react: ^18.0.0
@@ -2143,6 +2151,15 @@ __metadata:
   version: 0.7.4
   resolution: "@emotion/memoize@npm:0.7.4"
   checksum: 4e3920d4ec95995657a37beb43d3f4b7d89fed6caa2b173a4c04d10482d089d5c3ea50bbc96618d918b020f26ed6e9c4026bbd45433566576c1f7b056c3271dc
+  languageName: node
+  linkType: hard
+
+"@esbuild-plugins/node-globals-polyfill@npm:^0.2.3":
+  version: 0.2.3
+  resolution: "@esbuild-plugins/node-globals-polyfill@npm:0.2.3"
+  peerDependencies:
+    esbuild: "*"
+  checksum: f83eeaa382680b26a3b1cf6c396450332c41d2dc0f9fd935d3f4bacf5412bef7383d2aeb4246a858781435b7c005a570dadc81051f8a038f1ef2111f17d3d8b0
   languageName: node
   linkType: hard
 
@@ -3122,6 +3139,56 @@ __metadata:
     "@jridgewell/resolve-uri": ^3.1.0
     "@jridgewell/sourcemap-codec": ^1.4.14
   checksum: 9d3c40d225e139987b50c48988f8717a54a8c994d8a948ee42e1412e08988761d0754d7d10b803061cc3aebf35f92a5dbbab493bd0e1a9ef9e89a2130e83ba34
+  languageName: node
+  linkType: hard
+
+"@ledgerhq/devices@npm:8.8.0, @ledgerhq/devices@npm:^8.8.0":
+  version: 8.8.0
+  resolution: "@ledgerhq/devices@npm:8.8.0"
+  dependencies:
+    "@ledgerhq/errors": ^6.28.0
+    "@ledgerhq/logs": ^6.13.0
+    rxjs: 7.8.2
+    semver: ^7.3.5
+  checksum: ab5b5b930fc5e96ecc97ec72fa69fe9c1ce18ae44dcbd091d1621ee0588daf31632106237c3341d810d558d633a208558e64b9f9e0bbdc3ca507289ef0d24c30
+  languageName: node
+  linkType: hard
+
+"@ledgerhq/errors@npm:^6.28.0":
+  version: 6.28.0
+  resolution: "@ledgerhq/errors@npm:6.28.0"
+  checksum: 54609310baa704c463c34ff7c47f835c130a33adb625612e04f8ab75c4bccc97746ee3bd2cef61eadf168db9c5a0ec516735c9584111e68837e105f9e566a598
+  languageName: node
+  linkType: hard
+
+"@ledgerhq/hw-transport-webhid@npm:^6.30.11":
+  version: 6.30.11
+  resolution: "@ledgerhq/hw-transport-webhid@npm:6.30.11"
+  dependencies:
+    "@ledgerhq/devices": 8.8.0
+    "@ledgerhq/errors": ^6.28.0
+    "@ledgerhq/hw-transport": 6.31.15
+    "@ledgerhq/logs": ^6.13.0
+  checksum: 64d04dc0e1455aeff402f894c1d0b737612074458ea44054737a5130c07ab12c777fd33a6c113286b14f05b89581d103d328f4558238d71c486a85b12a36f256
+  languageName: node
+  linkType: hard
+
+"@ledgerhq/hw-transport@npm:6.31.15, @ledgerhq/hw-transport@npm:^6.31.15":
+  version: 6.31.15
+  resolution: "@ledgerhq/hw-transport@npm:6.31.15"
+  dependencies:
+    "@ledgerhq/devices": 8.8.0
+    "@ledgerhq/errors": ^6.28.0
+    "@ledgerhq/logs": ^6.13.0
+    events: ^3.3.0
+  checksum: 57f1f91b4d6466be98dc484d5d753e687257ea956dc3e3a4f97942c18273e8da6260ba6ea78d98e67317d6654e4bed55b6523daa4ce30da73d5e8d0acfacbbd3
+  languageName: node
+  linkType: hard
+
+"@ledgerhq/logs@npm:^6.13.0":
+  version: 6.13.0
+  resolution: "@ledgerhq/logs@npm:6.13.0"
+  checksum: b2b64af45630eb2851f49af505e46a378cd62edfa73b154867a8d86641a684a36c9fee12a5e9ca94fb8fb3d81b47462fdb369ba9f0261079db1c6a81d9c0f12b
   languageName: node
   linkType: hard
 
@@ -7102,6 +7169,7 @@ __metadata:
     "@types/pbkdf2": ^3.1.0
     "@typescript-eslint/eslint-plugin": ^6.7.0
     "@typescript-eslint/parser": ^6.7.0
+    buffer: ^6.0.3
     eslint: ^8.51.0
     eslint-config-airbnb: ^19.0.4
     eslint-config-airbnb-typescript: ^17.0.0
@@ -7117,6 +7185,7 @@ __metadata:
     jest-environment-jsdom: ^29.5.0
     lint-staged: ^12.3.8
     prettier: ^2.6.2
+    process: ^0.11.10
     stylelint: ^14.7.1
     stylelint-config-prettier: ^9.0.3
     stylelint-config-standard-scss: ^3.0.0
@@ -10086,7 +10155,7 @@ __metadata:
   languageName: node
   linkType: hard
 
-"history@npm:^5.2.0":
+"history@npm:^5.2.0, history@npm:^5.3.0":
   version: 5.3.0
   resolution: "history@npm:5.3.0"
   dependencies:
@@ -14680,6 +14749,15 @@ __metadata:
   dependencies:
     queue-microtask: ^1.2.2
   checksum: cb4f97ad25a75ebc11a8ef4e33bb962f8af8516bb2001082ceabd8902e15b98f4b84b4f8a9b222e5d57fc3bd1379c483886ed4619367a7680dad65316993021d
+  languageName: node
+  linkType: hard
+
+"rxjs@npm:7.8.2":
+  version: 7.8.2
+  resolution: "rxjs@npm:7.8.2"
+  dependencies:
+    tslib: ^2.1.0
+  checksum: 2f233d7c832a6c255dabe0759014d7d9b1c9f1cb2f2f0d59690fd11c883c9826ea35a51740c06ab45b6ade0d9087bde9192f165cba20b6730d344b831ef80744
   languageName: node
   linkType: hard
 

@@ -14,12 +14,20 @@ function TextHeading({ children, className, style }: { children: ReactNode } & C
     );
 }
 
-function TextHeadingLarge({ children }: { children: ReactNode }) {
-    return <span className="heading_large">{children}</span>;
+function TextHeadingLarge({ children, className, style }: { children: ReactNode } & ClassNameAndStyle) {
+    return (
+        <span className={clsx('heading_large', className)} style={style}>
+            {children}
+        </span>
+    );
 }
 
-function TextHeadingBig({ children }: { children: ReactNode }) {
-    return <span className="heading_big">{children}</span>;
+function TextHeadingBig({ children, className, style }: { children: ReactNode } & ClassNameAndStyle) {
+    return (
+        <span className={clsx('heading_big', className)} style={style}>
+            {children}
+        </span>
+    );
 }
 
 function TextMain({ children }: { children: ReactNode }) {
