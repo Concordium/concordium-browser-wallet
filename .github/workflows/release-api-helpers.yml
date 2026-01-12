@@ -16,7 +16,7 @@ permissions:
 # Allow only one concurrent deployment, skipping runs queued between the run in-progress and latest queued.
 # However, do NOT cancel in-progress runs as we want to allow these production deployments to complete.
 concurrency:
-    group: 'deploy-api-helpers'
+    group: "deploy-api-helpers"
     cancel-in-progress: false
 
 env:
@@ -28,7 +28,7 @@ jobs:
         steps:
             - uses: actions/checkout@v6
               with:
-                  submodules: 'recursive'
+                  submodules: "recursive"
 
             - uses: actions/setup-node@v6
               with:
@@ -79,6 +79,17 @@ jobs:
             - name: Test that tag version matches package.json version
               run: test "${{ steps.get_tag.outputs.tag }}" = "$(jq -r ".version" packages/browser-wallet-api-helpers/package.json)" || exit 1
 
+            - name: Determine npm tag
+              id: determine_npm_tag
+              run: |
+                  version=$(jq -r ".version" packages/sdk/package.json)
+                  if [[ "$version" == *-* ]]; then
+                      npm_tag=$(echo "$version" | sed -E 's/^[0-9]+\.[0-9]+\.[0-9]+-([^.]+).*/\1/')
+                  else
+                      npm_tag="latest"
+                  fi
+                  echo "npm_tag=$npm_tag" >> $GITHUB_OUTPUT
+
             - name: Get build-output
               uses: actions/download-artifact@v7
               with:
@@ -89,11 +100,11 @@ jobs:
               with:
                   node-version: ${{ env.NODE_VERSION }}
                   cache: yarn
-                  registry-url: 'https://registry.npmjs.org'
+                  registry-url: "https://registry.npmjs.org"
 
             - name: Publish to NPM
               run: |
-                  yarn workspace @concordium/browser-wallet-api-helpers npm publish --dry-run # TODO: Remove --dry-dun when we know it works..
+                  yarn workspace @concordium/browser-wallet-api-helpers npm publish --tag ${{ steps.determine_npm_tag.outputs.npm_tag }}
 
             - name: Create a GitHub release
               uses: ncipollo/release-action@v1
