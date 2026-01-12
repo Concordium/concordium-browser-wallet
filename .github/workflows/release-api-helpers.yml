@@ -1,0 +1,114 @@
+name: Release API helpers
+
+on:
+    # Run automatically on tag push
+    push:
+        tags:
+            - api-helpers/*
+    # Allows you to run this workflow manually from the Actions tab
+    workflow_dispatch:
+
+# Sets permissions of the GITHUB_TOKEN to allow deployment to GitHub Pages
+permissions:
+    contents: read
+    id-token: write
+
+# Allow only one concurrent deployment, skipping runs queued between the run in-progress and latest queued.
+# However, do NOT cancel in-progress runs as we want to allow these production deployments to complete.
+concurrency:
+    group: "deploy-api-helpers"
+    cancel-in-progress: false
+
+env:
+    NODE_VERSION: 18.16.0
+
+jobs:
+    build:
+        runs-on: ubuntu-22.04
+        steps:
+            - uses: actions/checkout@v6
+              with:
+                  submodules: "recursive"
+
+            - uses: actions/setup-node@v6
+              with:
+                  node-version: ${{ env.NODE_VERSION }}
+                  cache: yarn
+
+            - name: Cache dependencies
+              id: yarn-cache
+              uses: actions/cache@v5
+              with:
+                  path: |
+                      ./node_modules
+                      ./packages/*/node_modules
+                  key: ${{ runner.os }}-yarn-${{ hashFiles('yarn.lock') }}
+                  restore-keys: |
+                      ${{ runner.os }}-yarn-${{ hashFiles('yarn.lock') }}
+
+            - name: Get dependencies
+              if: steps.yarn-cache.outputs.cache-hit != 'true'
+              run: yarn install --immutable
+
+            - name: Build release
+              run: yarn build:api-helpers
+
+            - name: Store build-release
+              uses: actions/upload-artifact@v6
+              with:
+                  name: build-release
+                  path: |
+                      packages/browser-wallet-api-helpers
+
+    upload-release:
+        needs: build
+        runs-on: ubuntu-latest
+        permissions:
+            contents: write
+        environment: release-api-helpers
+        steps:
+            - name: Checkout sources
+              uses: actions/checkout@v6
+              with:
+                  submodules: recursive
+
+            - name: Extract tag name
+              id: get_tag
+              run: echo "::set-output name=tag::${GITHUB_REF#refs/tags/api-helpers/}"
+
+            - name: Test that tag version matches package.json version
+              run: test "${{ steps.get_tag.outputs.tag }}" = "$(jq -r ".version" packages/browser-wallet-api-helpers/package.json)" || exit 1
+
+            - name: Determine npm tag
+              id: determine_npm_tag
+              run: |
+                  version=$(jq -r ".version" packages/sdk/package.json)
+                  if [[ "$version" == *-* ]]; then
+                      npm_tag=$(echo "$version" | sed -E 's/^[0-9]+\.[0-9]+\.[0-9]+-([^.]+).*/\1/')
+                  else
+                      npm_tag="latest"
+                  fi
+                  echo "npm_tag=$npm_tag" >> $GITHUB_OUTPUT
+
+            - name: Get build-output
+              uses: actions/download-artifact@v7
+              with:
+                  path: packages/browser-wallet-api-helpers
+                  name: build-release
+
+            - uses: actions/setup-node@v6
+              with:
+                  node-version: ${{ env.NODE_VERSION }}
+                  cache: yarn
+                  registry-url: "https://registry.npmjs.org"
+
+            - name: Publish to NPM
+              run: |
+                  yarn workspace @concordium/browser-wallet-api-helpers npm publish --tag ${{ steps.determine_npm_tag.outputs.npm_tag }}
+
+            - name: Create a GitHub release
+              uses: ncipollo/release-action@v1
+              with:
+                  tag: api-helpers/${{ steps.get_tag.outputs.tag }}
+                  name: Browser Wallet API Helpers Release v${{ steps.get_tag.outputs.tag }}
+                  draft: true
