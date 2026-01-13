@@ -91,14 +91,16 @@ function TransferInfo({ tokenId, amount, recipient, cost }: TransferInfoProps) {
             <Card.RowDetails title={t('method')} value={t('operations.transfer')} />
             <Card.RowDetails title={t('payload.receiver')} value={recipient} />
             <Card.Row className="amounts">
-                <Text.Capture>{t('payload.amount')}</Text.Capture>
-                <Text.Capture>
+                <Text.MainMedium>{t('payload.amount')}</Text.MainMedium>
+                <Text.AdditionalSmall>
                     {amount} {tokenId}
-                </Text.Capture>
+                </Text.AdditionalSmall>
             </Card.Row>
             <Card.Row className="amounts">
-                <Text.Capture>{t('payload.fee')}</Text.Capture>
-                <Text.Capture>{cost ? displayAsCcd(cost, false, true) : t('payload.unknown')}</Text.Capture>
+                <Text.MainMedium>{t('payload.fee')}</Text.MainMedium>
+                <Text.AdditionalSmall>
+                    {cost ? displayAsCcd(cost, false, true) : t('payload.unknown')}
+                </Text.AdditionalSmall>
             </Card.Row>
         </Card>
     );

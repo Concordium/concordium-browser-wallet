@@ -8,12 +8,13 @@ type LabelProps = {
     icon: ReactNode;
     color: LabelColors;
     text: string;
+    rightIcon?: boolean;
     className?: string;
 };
 
-function Label({ icon, color, text, className }: LabelProps) {
+function Label({ icon, color, text, rightIcon, className }: LabelProps) {
     return (
-        <span className={clsx(color, className, 'label-x')}>
+        <span className={clsx(color, className, { 'right-icon': rightIcon }, 'label-x')}>
             <div className="icon">{icon}</div>
             <Text.Label>{text}</Text.Label>
         </span>

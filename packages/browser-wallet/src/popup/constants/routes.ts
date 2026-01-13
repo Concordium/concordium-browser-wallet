@@ -6,6 +6,8 @@ type RouteChildren = {
     [key: string]: RouteNode | RoutePath;
 };
 
+// ToDo sendSponsoredTransaction not implemented in OldUI
+// Need redirect to new UI, or Sunset OldUI
 export const relativeRoutes = {
     home: {
         path: '/',
@@ -62,6 +64,9 @@ export const relativeRoutes = {
         },
         sendTransaction: {
             path: 'send-transaction',
+        },
+        sendSponsoredTransaction: {
+            path: 'send-sponsored-transaction',
         },
         endIdentityIssuance: {
             path: 'end-identity-issuance',

@@ -49,6 +49,22 @@ const t = {
         pause: 'Pause',
         unpause: 'Unpause',
     },
+    sponsored: {
+        costCoveredBy: 'Transaction cost covered by:',
+        freeTransaction: 'Free Transaction',
+        transactionFee: 'Transaction fee',
+        tokenNameAmount: 'Amount ({{tokenName}}):',
+        success: {
+            label: 'Transaction successful',
+        },
+        pending: {
+            label: 'Transaction in progress',
+        },
+        failure: {
+            label: 'Transaction failed',
+        },
+        return: 'Return to account',
+    },
 };
 
 export default t;

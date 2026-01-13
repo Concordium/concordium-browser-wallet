@@ -1,0 +1,87 @@
+.send-transaction-x {
+    .card-x {
+        .label-x.light-grey {
+            background: $semantic-surface-tertiary;
+
+            .icon svg {
+                padding: unset;
+                margin: unset;
+
+                path {
+                    opacity: 0.4;
+                }
+            }
+        }
+
+        .tooltip-x_text.top {
+            top: rem(25px);
+            width: rem(312px);
+            left: rem(-194px);
+            word-break: break-word;
+            white-space: break-spaces;
+
+            .text__main_medium,
+            .capture__main_small {
+                color: $semantic-content-inverse-primary;
+            }
+
+            &::after {
+                left: calc(100% - #{rem(119px)});
+            }
+        }
+
+        .row {
+            &.amounts {
+                align-items: center;
+                justify-content: space-between;
+
+                .tooltip-x_text.top {
+                    left: rem(-278px);
+
+                    .text__main_medium {
+                        color: $semantic-content-inverse-primary;
+                    }
+
+                    &::after {
+                        left: calc(100% - #{rem(35px)});
+                    }
+                }
+
+                &.sponsored-fee {
+                    align-items: center;
+                }
+            }
+        }
+    }
+
+    .submitted-tx {
+        &__card {
+            padding: rem(32px) rem(16px);
+
+            svg {
+                margin-bottom: rem(8px);
+            }
+
+            .capture__main_small {
+                &.status {
+                    margin-bottom: rem(32px);
+                }
+
+                &.success {
+                    color: $semantic-content-success-primary;
+                }
+
+                &.failure {
+                    color: $semantic-content-error-primary;
+                }
+            }
+
+            .label__main.fee {
+                color: $semantic-content-accent-secondary;
+                font-size: rem(12px);
+                font-weight: $t-font-weight-regular;
+                margin-bottom: rem(8px);
+            }
+        }
+    }
+}

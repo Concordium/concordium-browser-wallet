@@ -1,0 +1,162 @@
+<!DOCTYPE html>
+<html>
+    <head>
+        <title>My cool dapp</title>
+        <script src="/sdk.js"></script>
+        <script src="/helpers.js"></script>
+        <script src="https://unpkg.com/cbor-web"></script>
+        <meta charset="utf-8" />
+        <script>
+            let currentAccountAddress = '';
+
+            async function submitPayloadToSponsor(sender, transaction) {
+                const provider = await concordiumHelpers.detectConcordiumProvider();
+                const {
+                    buildBasicAccountSigner,
+                    AccountAddress,
+                    ConcordiumGRPCClient,
+                    Transaction,
+                    TransactionExpiry,
+                } = concordiumSDK;
+                const builder = Transaction.builderFromJSON(transaction);
+                const sponsorSigner = buildBasicAccountSigner(privateKey.value);
+                const sponsorSignerAccount = AccountAddress.fromBase58(sponsorAccount.value);
+
+                const grpcClient = new ConcordiumGRPCClient(await provider.grpcTransport);
+                const senderNonce = await grpcClient.getNextAccountNonce(sender);
+
+                const sponsorableTransaction = builder
+                    .addMetadata({ sender, nonce: senderNonce.nonce, expiry: TransactionExpiry.futureMinutes(5) })
+                    .addSponsor(sponsorSignerAccount)
+                    .build();
+
+                const sponsored = await Transaction.sponsor(sponsorableTransaction, sponsorSigner);
+                return Transaction.toJSON(sponsored);
+            }
+
+            async function setupPage() {
+                const provider = await concordiumHelpers.detectConcordiumProvider();
+                provider.on('accountDisconnected', () => (currentAccountAddress = undefined));
+                provider.on('accountChanged', (accountAddress) => (currentAccountAddress = accountAddress));
+                provider.on('chainChanged', (chain) => alert(chain));
+
+                document.getElementById('connect').addEventListener('click', () => {
+                    provider.connect().then((accountAddress) => {
+                        currentAccountAddress = accountAddress;
+                        document.getElementById('accountAddress').innerHTML = accountAddress;
+                    });
+                });
+
+                document.getElementById('requestAccounts').addEventListener('click', () => {
+                    provider.requestAccounts().then((accountAddresses) => {
+                        currentAccountAddress = accountAddresses[0];
+                        document.getElementById('accountAddress').innerHTML = accountAddresses;
+                    });
+                });
+
+                document.getElementById('signSimpleTransfer').addEventListener('click', async () => {
+                    const { AccountAddress, CcdAmount, Transaction } = concordiumSDK;
+
+                    const payload = {
+                        amount: CcdAmount.fromCcd(1000n),
+                        toAddress: AccountAddress.fromBase58(recipient.value),
+                    };
+
+                    const transaction = Transaction.transfer(payload);
+
+                    const sponsorResponse = await submitPayloadToSponsor(
+                        AccountAddress.fromBase58(currentAccountAddress),
+                        Transaction.toJSON(transaction)
+                    );
+
+                    console.log('sponsorResponse', sponsorResponse);
+
+                    const sponsoredParsed = Transaction.signableFromJSON(sponsorResponse);
+
+                    return provider
+                        .sendSponsoredTransaction(currentAccountAddress, sponsoredParsed)
+                        .then((sig) => alert(JSON.stringify(sig)))
+                        .catch(alert);
+                });
+
+                document.getElementById('signTokenUpdate').addEventListener('click', async () => {
+                    const {
+                        AccountAddress,
+                        TokenOperationType,
+                        TokenAmount,
+                        CborMemo,
+                        Cbor,
+                        TokenId,
+                        Transaction,
+                        CborAccountAddress,
+                    } = concordiumSDK;
+
+                    const ops = [
+                        {
+                            [TokenOperationType.Transfer]: {
+                                amount: TokenAmount.fromJSON({
+                                    value: '1000000',
+                                    decimals: 6,
+                                }),
+                                recipient: CborAccountAddress.fromAccountAddress(
+                                    AccountAddress.fromBase58(recipient.value)
+                                ),
+                                memo: CborMemo.fromString('Some text for memo'),
+                            },
+                        },
+                    ];
+
+                    console.log(JSON.stringify(ops));
+
+                    const payload = {
+                        tokenId: TokenId.fromString('EURtest'),
+                        operations: Cbor.encode(ops),
+                    };
+
+                    const transaction = Transaction.tokenUpdate(payload);
+
+                    console.log(JSON.stringify(payload));
+
+                    const sponsorResponse = await submitPayloadToSponsor(
+                        AccountAddress.fromBase58(currentAccountAddress),
+                        Transaction.toJSON(transaction)
+                    );
+
+                    console.log('sponsorResponse', sponsorResponse);
+
+                    const sponsoredParsed = Transaction.signableFromJSON(sponsorResponse);
+
+                    return provider
+                        .sendSponsoredTransaction(currentAccountAddress, sponsoredParsed)
+                        .then((sig) => alert(JSON.stringify(sig)))
+                        .catch(alert);
+                });
+            }
+            setupPage();
+        </script>
+    </head>
+
+    <body>
+        <div>
+            <button id="connect">Connect</button>
+            <h3 id="accountAddress" style="display: inline">Account address:</h3>
+        </div>
+        <br />
+        <button id="requestAccounts">Request accounts</button>
+        <br />
+        <h3>Sponsor Config:</h3>
+        Sponsor Account:
+        <input type="text" id="sponsorAccount" value="3PCRkKoFrSzgUmzfFF7C17pc3wm9wrVgbaCrbgGs6UMxy5aogo" />
+        <br />
+        Sponsor Private Key:
+        <input type="text" id="privateKey" value="9a494111614cd737ed89e500a3d155af80a4f8faf18f168568f8facbd2be3909" />
+        <br />
+        <h3>Recipient Config:</h3>
+        Recipient Address:
+        <input type="text" id="recipient" value="4jPwPo6da7g43DRQFcwMxJQQA9BbD762fbSS24X8Z7VHkvnehe" />
+        <br />
+        <br />
+        <button id="signSimpleTransfer">Sign Simple Transfer</button>
+        <button id="signTokenUpdate">Sign PLT Transfer</button>
+    </body>
+</html>

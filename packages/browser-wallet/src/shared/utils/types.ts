@@ -77,6 +77,7 @@ export type Cis2TransferParameters = [
 ];
 
 export type BackgroundSendTransactionPayload = {
+    transaction: string;
     accountAddress: string;
     type: AccountTransactionType;
     payload: string;

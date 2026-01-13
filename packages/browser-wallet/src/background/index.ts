@@ -532,6 +532,14 @@ forwardToPopup(
     withPromptEnd
 );
 forwardToPopup(
+    MessageType.SendSponsoredTransaction,
+    InternalMessageType.SendSponsoredTransaction,
+    runConditionComposer(runIfAccountIsAllowlisted, async () => ({ run: true }), withPromptStart()),
+    appendUrlToPayload,
+    undefined,
+    withPromptEnd
+);
+forwardToPopup(
     MessageType.SignMessage,
     InternalMessageType.SignMessage,
     runConditionComposer(runIfAccountIsAllowlisted, ensureMessageWithSchemaParse, withPromptStart()),

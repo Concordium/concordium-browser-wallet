@@ -63,7 +63,7 @@ export enum TransactionKindString {
     Malformed = 'Malformed account transaction',
 }
 
-function mapTransactionKindStringToTransactionType(
+export function mapTransactionKindStringToTransactionType(
     kind: TransactionKindString
 ): AccountTransactionType | RewardType | SpecialTransactionType | BlockSpecialEvent {
     switch (kind) {
