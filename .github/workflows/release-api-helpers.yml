@@ -82,7 +82,7 @@ jobs:
             - name: Determine npm tag
               id: determine_npm_tag
               run: |
-                  version=$(jq -r ".version" packages/sdk/package.json)
+                  version=$(jq -r ".version" packages/browser-wallet-api-helpers/package.json)
                   if [[ "$version" == *-* ]]; then
                       npm_tag=$(echo "$version" | sed -E 's/^[0-9]+\.[0-9]+\.[0-9]+-([^.]+).*/\1/')
                   else
