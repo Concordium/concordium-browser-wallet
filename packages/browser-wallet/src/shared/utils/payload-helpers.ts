@@ -1,34 +1,34 @@
 import {
+    AccountTransactionInput,
     AccountTransactionType,
-    SimpleTransferPayload,
-    UpdateContractPayload,
-    serializeUpdateContractParameters,
-    AccountTransactionPayload,
-    SchemaVersion,
-    InitContractPayload,
-    serializeInitContractParameters,
-    serializeTypeValue,
     ContractName,
     EntrypointName,
-    Parameter,
-    jsonParse,
     getAccountTransactionHandler,
+    InitContractInput,
+    jsonParse,
+    Parameter,
+    SchemaVersion,
+    serializeInitContractParameters,
+    serializeTypeValue,
+    serializeUpdateContractParameters,
+    SimpleTransferPayload,
+    UpdateContractInput,
 } from '@concordium/web-sdk';
 import { Buffer } from 'buffer/';
-import { SmartContractParameters, SchemaType, SchemaWithContext } from '@concordium/browser-wallet-api-helpers';
+import { SchemaType, SchemaWithContext, SmartContractParameters } from '@concordium/browser-wallet-api-helpers';
 import { serializationTypes } from '@wallet-api/constants';
 import * as JSONBig from 'json-bigint';
 
 export type HeadlessTransaction =
-    | { type: AccountTransactionType.Update; payload: UpdateContractPayload }
+    | { type: AccountTransactionType.Update; payload: UpdateContractInput }
     | { type: AccountTransactionType.Transfer; payload: SimpleTransferPayload }
-    | { type: AccountTransactionType.InitContract; payload: InitContractPayload }
+    | { type: AccountTransactionType.InitContract; payload: InitContractInput }
     | {
           type: Exclude<
               AccountTransactionType,
               AccountTransactionType.Transfer | AccountTransactionType.Update | AccountTransactionType.InitContract
           >;
-          payload: AccountTransactionPayload;
+          payload: AccountTransactionInput;
       };
 
 /**
@@ -72,7 +72,7 @@ export function parsePayload(
 
     switch (type) {
         case AccountTransactionType.Update: {
-            const updatePayload = payload as UpdateContractPayload;
+            const updatePayload = payload as UpdateContractInput;
             const [contractName, functionName] = updatePayload.receiveName.value.split('.');
 
             let parameter: Parameter.Type;
@@ -100,7 +100,7 @@ export function parsePayload(
             };
         }
         case AccountTransactionType.InitContract: {
-            const initPayload = payload as InitContractPayload;
+            const initPayload = payload as InitContractInput;
             let parameter: Parameter.Type;
             if (parameters === undefined || parameters === null || !schema) {
                 parameter = Parameter.empty();
@@ -133,6 +133,6 @@ export function parsePayload(
             return {
                 type,
                 payload,
-            };
+            } as HeadlessTransaction;
     }
 }

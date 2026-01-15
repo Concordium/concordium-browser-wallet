@@ -16,7 +16,7 @@ import {
     EntrypointName,
     getAccountTransactionHandler,
     IdStatementBuilder,
-    InitContractPayload,
+    InitContractInput,
     ModuleReference,
     OpenStatus,
     Parameter,
@@ -25,8 +25,8 @@ import {
     SchemaVersion,
     SimpleTransferPayload,
     SimpleTransferWithMemoPayload,
-    UpdateContractPayload,
-    UpdateCredentialsPayload,
+    UpdateContractInput,
+    UpdateCredentialsInput,
 } from '@concordium/web-sdk';
 import {
     SendTransactionInitContractPayload,
@@ -183,7 +183,7 @@ describe(sanitizeSendTransactionInput, () => {
             '23513bcb5dbc81216fa4e12d3165a818e2b8699a1c9ef5c699f46ca3b1024ebf'
         );
 
-        const expectedPayload: InitContractPayload = {
+        const expectedPayload: InitContractInput = {
             moduleRef,
             maxContractExecutionEnergy: Energy.create(maxContractExecutionEnergy),
             amount: CcdAmount.fromMicroCcd(amount),
@@ -244,7 +244,7 @@ describe(sanitizeSendTransactionInput, () => {
         const type = AccountTransactionType.Update;
         const receiveName = `${contractName}.${entrypointName}`;
 
-        const expectedPayload: UpdateContractPayload = {
+        const expectedPayload: UpdateContractInput = {
             maxContractExecutionEnergy: Energy.create(maxContractExecutionEnergy),
             amount: CcdAmount.fromMicroCcd(amount),
             address: ContractAddress.create(contractIndex, contractSubindex),
@@ -604,7 +604,8 @@ describe(sanitizeSendTransactionInput, () => {
     test('Transforms "UpdateCredentials" transaction input as expected', () => {
         const type = AccountTransactionType.UpdateCredentials;
 
-        const payload: UpdateCredentialsPayload = {
+        // commitments value was removed in type UpdateCredentialsInput
+        const payload: UpdateCredentialsInput = {
             newCredentials: [
                 {
                     index: 1,
@@ -621,13 +622,6 @@ describe(sanitizeSendTransactionInput, () => {
                         credentialPublicKeys: {
                             threshold: 1,
                             keys: { 0: { schemeId: 'ed25519', verifyKey: '030201' } },
-                        },
-                        commitments: {
-                            cmmPrf: 'cmmPrf',
-                            cmmAttributes: { dob: 'cmmDob' } as Record<AttributeKey, string>,
-                            cmmCredCounter: 'cmmCredCounter',
-                            cmmMaxAccounts: 'cmmMaxAccounts',
-                            cmmIdCredSecSharingCoeff: ['cmmIdCredSecSharingCoeff'],
                         },
                         arData: { arData: { encIdCredPubShare: 'encIdCredPubShare' } },
                     },

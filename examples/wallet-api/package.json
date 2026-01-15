@@ -9,10 +9,11 @@
         "start:sign-message": "FILE=sign-message.html yarn start",
         "start:sign-cis3-message": "FILE=sign-cis3-message.html yarn start",
         "start:web3-id": "FILE=web3-id.html yarn start",
-        "start:sign-token-update": "FILE=sign-token-update.html yarn start"
+        "start:sign-token-update": "FILE=sign-token-update.html yarn start",
+        "start:sponsored-transaction": "FILE=sponsored-transaction.html yarn start"
     },
     "dependencies": {
-        "@concordium/web-sdk": "10.0.2"
+        "@concordium/web-sdk": "^12.0.1"
     },
     "devDependencies": {
         "live-server": "^1.2.2"

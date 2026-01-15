@@ -1,4 +1,5 @@
 import { InjectedMessageHandler, createEventTypeFilter, MessageType, MessageStatusWrapper } from '@messaging';
+import { Transaction } from '@concordium/web-sdk';
 import {
     AccountAddress,
     AccountTransactionSignature,
@@ -22,6 +23,7 @@ import {
     AccountAddressSource,
     SchemaSource,
     SendTransactionPayload,
+    SignableTransaction,
 } from '@concordium/browser-wallet-api-helpers';
 import EventEmitter from 'events';
 import { IdProofOutput, IdStatement } from '@concordium/web-sdk/id';
@@ -170,6 +172,28 @@ class WalletApi extends EventEmitter implements IWalletApi {
                 accountAddress: AccountAddress.toBase58(input.accountAddress),
                 payload: stringify(input.payload),
                 parameters: JSONBig.stringify(input.parameters),
+            }
+        );
+
+        if (!response.success) {
+            throw new Error(response.message);
+        }
+
+        return response.result;
+    }
+
+    /**
+     * Sends a sponsored transaction to the Concordium Wallet and awaits the users action
+     */
+    public async sendSponsoredTransaction(
+        accountAddress: AccountAddressSource,
+        transaction: SignableTransaction
+    ): Promise<string> {
+        const response = await this.messageHandler.sendMessage<MessageStatusWrapper<string>>(
+            MessageType.SendSponsoredTransaction,
+            {
+                accountAddress,
+                transaction: stringify(Transaction.toJSON(transaction)),
             }
         );
 

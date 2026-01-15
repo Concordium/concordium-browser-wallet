@@ -1,8 +1,8 @@
 import {
-    OpenStatus,
-    OpenStatusText,
     AccountInfo,
     GenerateBakerKeysOutput,
+    OpenStatus,
+    OpenStatusText,
     PrivateBakerKeys,
     PublicBakerKeys,
 } from '@concordium/web-sdk';
@@ -20,7 +20,7 @@ const fractionResolutionToPercentage = (v: number) => v / percentageModifier;
 export const fractionToPercentage = (d: number | undefined) =>
     d === undefined ? undefined : Math.floor(d * fractionResolution) / percentageModifier;
 
-export function openStatusToDisplay(status: OpenStatus | OpenStatusText): string {
+export function openStatusToDisplay(status: OpenStatus | OpenStatusText | null): string {
     switch (status) {
         case OpenStatus.OpenForAll:
         case OpenStatusText.OpenForAll:

@@ -1,15 +1,15 @@
 import {
     CcdAmount,
-    UpdateContractPayload,
     ConcordiumGRPCClient,
-    ContractAddress,
-    sha256,
     ConcordiumHdWallet,
-    ReceiveName,
+    ContractAddress,
     Energy,
-    Parameter,
-    ReturnValue,
     HexString,
+    Parameter,
+    ReceiveName,
+    ReturnValue,
+    sha256,
+    UpdateContractInput,
 } from '@concordium/web-sdk';
 import * as ed from '@noble/ed25519';
 import {
@@ -199,7 +199,7 @@ export async function buildRevokeTransaction(
     credentialId: string,
     maxContractExecutionEnergy: bigint,
     parameters: RevokeCredentialHolderParam
-): Promise<UpdateContractPayload> {
+): Promise<UpdateContractInput> {
     return {
         address,
         amount: CcdAmount.fromMicroCcd(0n),
@@ -292,7 +292,7 @@ export async function getVerifiableCredentialStatus(client: ConcordiumGRPCClient
     });
 
     if (result.tag !== 'success') {
-        throw new Error(result.reason.tag);
+        throw new Error(result.reason?.tag || 'Transaction failed');
     }
 
     const { returnValue } = result;
@@ -387,7 +387,7 @@ export async function getCredentialRegistryMetadata(
     });
 
     if (result.tag !== 'success') {
-        throw new Error(result.reason.tag);
+        throw new Error(result.reason?.tag || 'Transaction failed');
     }
 
     const { returnValue } = result;
@@ -823,7 +823,7 @@ export async function getVerifiableCredentialEntry(
     });
 
     if (result.tag !== 'success') {
-        throw new Error(result.reason.tag);
+        throw new Error(result.reason?.tag || 'Transaction failed');
     }
 
     const { returnValue } = result;
@@ -1102,7 +1102,7 @@ export async function getCredentialRegistryIssuerKey(
     });
 
     if (result.tag !== 'success') {
-        throw new Error(result.reason.tag);
+        throw new Error(result.reason?.tag || 'Transaction failed');
     }
 
     const { returnValue } = result;

@@ -1,5 +1,7 @@
 .tooltip-x {
     position: relative;
+    height: inherit;
+    width: inherit;
 
     &:hover {
         .tooltip-x_text {

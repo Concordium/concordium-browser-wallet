@@ -30,8 +30,15 @@
                 });
 
                 document.getElementById('signSingleTransferTokenUpdate').addEventListener('click', () => {
-                    const { TokenOperationType, Cbor, TokenAmount, TokenHolder, CborMemo, TokenId, AccountAddress } =
-                        concordiumSDK;
+                    const {
+                        TokenOperationType,
+                        Cbor,
+                        TokenAmount,
+                        CborAccountAddress,
+                        CborMemo,
+                        TokenId,
+                        AccountAddress,
+                    } = concordiumSDK;
 
                     const ops = [
                         {
@@ -40,7 +47,7 @@
                                     value: '1000000',
                                     decimals: 6,
                                 }),
-                                recipient: TokenHolder.fromAccountAddress(
+                                recipient: CborAccountAddress.fromAccountAddress(
                                     AccountAddress.fromBase58('4PVJxxtiNVanfuNgvFWtFT1JCiqoVs6npVXBqwLNKprqnUiC2A')
                                 ),
                                 memo: CborMemo.fromString('Some text for memo'),
@@ -62,8 +69,15 @@
                 });
 
                 document.getElementById('signTokenUpdate').addEventListener('click', () => {
-                    const { TokenOperationType, Cbor, TokenAmount, TokenHolder, CborMemo, TokenId, AccountAddress } =
-                        concordiumSDK;
+                    const {
+                        TokenOperationType,
+                        Cbor,
+                        TokenAmount,
+                        CborAccountAddress,
+                        CborMemo,
+                        TokenId,
+                        AccountAddress,
+                    } = concordiumSDK;
 
                     const ops = [
                         {
@@ -72,7 +86,7 @@
                                     value: '1000000',
                                     decimals: 6,
                                 }),
-                                recipient: TokenHolder.fromAccountAddress(
+                                recipient: CborAccountAddress.fromAccountAddress(
                                     AccountAddress.fromBase58('4PVJxxtiNVanfuNgvFWtFT1JCiqoVs6npVXBqwLNKprqnUiC2A')
                                 ),
                                 memo: CborMemo.fromString('Some text for memo'),
@@ -95,7 +109,7 @@
                                     value: '200000',
                                     decimals: 6,
                                 }),
-                                recipient: TokenHolder.fromAccountAddress(
+                                recipient: CborAccountAddress.fromAccountAddress(
                                     AccountAddress.fromBase58('4PVJxxtiNVanfuNgvFWtFT1JCiqoVs6npVXBqwLNKprqnUiC2A')
                                 ),
                                 memo: CborMemo.fromString('Some text for memo'),
