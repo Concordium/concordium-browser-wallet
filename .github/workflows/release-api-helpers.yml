@@ -104,6 +104,7 @@ jobs:
 
             - name: Publish to NPM
               run: |
+                  unset NODE_AUTH_TOKEN # Unset the default token set by "actions/setup-node" to get OIDC publishing working
                   yarn workspace @concordium/browser-wallet-api-helpers npm publish --tag ${{ steps.determine_npm_tag.outputs.npm_tag }}
 
             - name: Create a GitHub release
