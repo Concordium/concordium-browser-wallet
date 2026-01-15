@@ -2,8 +2,6 @@
 
 ## Unreleased
 
-## 2.7.2
-
 -   Added support for Sponsored Transactions handling. With new method `sendSponsoredTransaction` in wallet-api.
 
 ## 2.7.0
