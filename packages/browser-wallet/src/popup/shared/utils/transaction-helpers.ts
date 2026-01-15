@@ -20,7 +20,11 @@ import {
     AccountInfoType,
     convertEnergyToMicroCcd,
     getEnergyCost,
+    AccountTransactionSignature,
 } from '@concordium/web-sdk';
+import { WalletCredential } from '@shared/storage/types';
+import { isLedgerAccount, getLedgerDerivationPath } from '@shared/utils/account-type-helpers';
+import { signTransactionWithLedger } from '@popup/shared/ledger-helpers';
 import { TokenId, TokenModuleState } from '@concordium/web-sdk/plt';
 import {
     isValidResolutionString,
@@ -57,6 +61,68 @@ export async function sendTransaction(
     signingKey: string
 ): Promise<string> {
     const signature = await signTransaction(transaction, buildBasicAccountSigner(signingKey));
+    const result = await client.sendAccountTransaction(transaction, signature);
+
+    if (!result) {
+        throw new Error('transaction was rejected by the node');
+    }
+
+    return getAccountTransactionHash(transaction, signature);
+}
+
+/**
+ * Sends a transaction with automatic Ledger or seed phrase signing based on credential type
+ * @param client - The Concordium GRPC client
+ * @param transaction - The transaction to send
+ * @param credential - The wallet credential (determines signing method)
+ * @param signingKey - The signing key (only used for seed phrase accounts)
+ * @returns Transaction hash
+ */
+export async function sendTransactionWithCredential(
+    client: ConcordiumGRPCClient,
+    transaction: AccountTransaction,
+    credential: WalletCredential,
+    signingKey?: string
+): Promise<string> {
+    let signature: AccountTransactionSignature;
+
+    if (isLedgerAccount(credential)) {
+        // Ledger-based signing
+        const derivationPath = getLedgerDerivationPath(credential);
+        if (!derivationPath) {
+            throw new Error('Ledger derivation path not found for account');
+        }
+
+        /*  const { concordiumApp } = await connectLedgerDevice();
+
+        // Create a placeholder signature to get the transaction hash
+        const placeholderSignature = {
+            0: {
+                0: '00'.repeat(64), // Placeholder 64-byte signature
+            },
+        } as AccountTransactionSignature;
+
+        // const transactionHash = getAccountTransactionHash(transaction, placeholderSignature);
+        const { signature: ledgerSignature } = await signTransactionWithLedger();
+
+        // Then use concordiumApp to sign separately if needed:
+        // const signedTx = await concordiumApp.signTransaction(derivationPath, Buffer.from(transactionHash, 'hex'));
+        */
+        // Build signature structure expected by Concordium
+        const { signature: ledgerSignature } = await signTransactionWithLedger();
+        signature = {
+            0: {
+                0: ledgerSignature.toString('hex'),
+            },
+        } as AccountTransactionSignature;
+    } else {
+        // Seed phrase-based signing
+        if (!signingKey) {
+            throw new Error('Signing key required for seed phrase-based accounts');
+        }
+        signature = await signTransaction(transaction, buildBasicAccountSigner(signingKey));
+    }
+
     const result = await client.sendAccountTransaction(transaction, signature);
 
     if (!result) {

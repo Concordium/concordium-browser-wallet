@@ -1928,6 +1928,19 @@ __metadata:
   languageName: node
   linkType: hard
 
+"@blooo/hw-app-concordium@npm:^1.0.0, @blooo/hw-app-concordium@npm:^1.1.3":
+  version: 1.1.3
+  resolution: "@blooo/hw-app-concordium@npm:1.1.3"
+  dependencies:
+    "@ledgerhq/errors": ^6.19.1
+    "@ledgerhq/hw-transport": ^6.31.4
+    bip32-path: ^0.4.2
+  peerDependencies:
+    "@concordium/web-sdk": ">= 10"
+  checksum: a88d84cc0ce6f8195106a2b8afae78d47b1e7ed3fe111dac9b2ec4cf9a4e435887b54e230c778f92e237f4c3e33fabe365630b40a3175011edd05445e640250c
+  languageName: node
+  linkType: hard
+
 "@concordium/browser-wallet-api-helpers@workspace:^, @concordium/browser-wallet-api-helpers@workspace:packages/browser-wallet-api-helpers":
   version: 0.0.0-use.local
   resolution: "@concordium/browser-wallet-api-helpers@workspace:packages/browser-wallet-api-helpers"
@@ -1951,17 +1964,14 @@ __metadata:
   resolution: "@concordium/browser-wallet@workspace:packages/browser-wallet"
   dependencies:
     "@babel/core": ^7.18.2
+    "@blooo/hw-app-concordium": ^1.0.0
     "@concordium/browser-wallet-api-helpers": "workspace:^"
     "@concordium/common-sdk": ^9.5.3
     "@concordium/web-sdk": 10.0.2
     "@craftamap/esbuild-plugin-html": ^0.4.0
-    "@esbuild-plugins/node-globals-polyfill": ^0.2.3
     "@floating-ui/react": ^0.27.2
-    "@ledgerhq/devices": ^8.8.0
-    "@ledgerhq/errors": ^6.28.0
     "@ledgerhq/hw-transport": ^6.31.15
     "@ledgerhq/hw-transport-webhid": ^6.30.11
-    "@ledgerhq/logs": ^6.13.0
     "@mdx-js/react": ^1.6.22
     "@noble/ed25519": ^1.7.0
     "@protobuf-ts/grpcweb-transport": ^2.9.1
@@ -2001,7 +2011,6 @@ __metadata:
     esbuild-plugin-svgr: ^1.0.1
     esbuild-sass-plugin: ^2.2.6
     framer-motion: ^6.3.12
-    history: ^5.3.0
     i18n-iso-countries: ^7.5.0
     i18next: ^21.6.16
     i18next-browser-languagedetector: ^6.1.4
@@ -2151,15 +2160,6 @@ __metadata:
   version: 0.7.4
   resolution: "@emotion/memoize@npm:0.7.4"
   checksum: 4e3920d4ec95995657a37beb43d3f4b7d89fed6caa2b173a4c04d10482d089d5c3ea50bbc96618d918b020f26ed6e9c4026bbd45433566576c1f7b056c3271dc
-  languageName: node
-  linkType: hard
-
-"@esbuild-plugins/node-globals-polyfill@npm:^0.2.3":
-  version: 0.2.3
-  resolution: "@esbuild-plugins/node-globals-polyfill@npm:0.2.3"
-  peerDependencies:
-    esbuild: "*"
-  checksum: f83eeaa382680b26a3b1cf6c396450332c41d2dc0f9fd935d3f4bacf5412bef7383d2aeb4246a858781435b7c005a570dadc81051f8a038f1ef2111f17d3d8b0
   languageName: node
   linkType: hard
 
@@ -3142,7 +3142,7 @@ __metadata:
   languageName: node
   linkType: hard
 
-"@ledgerhq/devices@npm:8.8.0, @ledgerhq/devices@npm:^8.8.0":
+"@ledgerhq/devices@npm:8.8.0":
   version: 8.8.0
   resolution: "@ledgerhq/devices@npm:8.8.0"
   dependencies:
@@ -3154,7 +3154,19 @@ __metadata:
   languageName: node
   linkType: hard
 
-"@ledgerhq/errors@npm:^6.28.0":
+"@ledgerhq/devices@npm:8.9.0":
+  version: 8.9.0
+  resolution: "@ledgerhq/devices@npm:8.9.0"
+  dependencies:
+    "@ledgerhq/errors": ^6.28.0
+    "@ledgerhq/logs": ^6.13.0
+    rxjs: 7.8.2
+    semver: 7.7.3
+  checksum: e3ca6a01a6b0d58931b1769a9cfcfb47d6a36f381cc3a435edcdfd78815f9e9768e944c7acd38f9f2f88e750998ff5e3f52a7516ed377fa9623482366f7d8187
+  languageName: node
+  linkType: hard
+
+"@ledgerhq/errors@npm:^6.19.1, @ledgerhq/errors@npm:^6.28.0":
   version: 6.28.0
   resolution: "@ledgerhq/errors@npm:6.28.0"
   checksum: 54609310baa704c463c34ff7c47f835c130a33adb625612e04f8ab75c4bccc97746ee3bd2cef61eadf168db9c5a0ec516735c9584111e68837e105f9e566a598
@@ -3182,6 +3194,18 @@ __metadata:
     "@ledgerhq/logs": ^6.13.0
     events: ^3.3.0
   checksum: 57f1f91b4d6466be98dc484d5d753e687257ea956dc3e3a4f97942c18273e8da6260ba6ea78d98e67317d6654e4bed55b6523daa4ce30da73d5e8d0acfacbbd3
+  languageName: node
+  linkType: hard
+
+"@ledgerhq/hw-transport@npm:^6.31.4":
+  version: 6.31.16
+  resolution: "@ledgerhq/hw-transport@npm:6.31.16"
+  dependencies:
+    "@ledgerhq/devices": 8.9.0
+    "@ledgerhq/errors": ^6.28.0
+    "@ledgerhq/logs": ^6.13.0
+    events: ^3.3.0
+  checksum: e56d73913f9d970fcdedb572ac08a3e4c8821d243654afc3857a3d853b8ffc8b7aac348e376d34c2fd257b42578b149a9132e93f0981b60ad7c4dab5f543000f
   languageName: node
   linkType: hard
 
@@ -6368,6 +6392,13 @@ __metadata:
   languageName: node
   linkType: hard
 
+"bip32-path@npm:^0.4.2":
+  version: 0.4.2
+  resolution: "bip32-path@npm:0.4.2"
+  checksum: 4d5ad2e6f235b79f7552ab4c46f8238cd5f453993889b87935b3cf4c5dec281c145afe0e96f029c094a61a7c96ad45793988e31a83bc4bd7fceabd3aee188917
+  languageName: node
+  linkType: hard
+
 "bn.js@npm:^5.0.0":
   version: 5.2.1
   resolution: "bn.js@npm:5.2.1"
@@ -7164,6 +7195,7 @@ __metadata:
   version: 0.0.0-use.local
   resolution: "concordium-browser-wallet@workspace:."
   dependencies:
+    "@blooo/hw-app-concordium": ^1.1.3
     "@types/jest": ^28.1.7
     "@types/node": ^17.0.25
     "@types/pbkdf2": ^3.1.0
@@ -10155,7 +10187,7 @@ __metadata:
   languageName: node
   linkType: hard
 
-"history@npm:^5.2.0, history@npm:^5.3.0":
+"history@npm:^5.2.0":
   version: 5.3.0
   resolution: "history@npm:5.3.0"
   dependencies:
@@ -14946,6 +14978,15 @@ __metadata:
   bin:
     semver: bin/semver.js
   checksum: 272c11bf8d083274ef79fe40a81c55c184dff84dd58e3c325299d0927ba48cece1f020793d138382b85f89bab5002a35a5ba59a3a68a7eebbb597eb733838778
+  languageName: node
+  linkType: hard
+
+"semver@npm:7.7.3":
+  version: 7.7.3
+  resolution: "semver@npm:7.7.3"
+  bin:
+    semver: bin/semver.js
+  checksum: f013a3ee4607857bcd3503b6ac1d80165f7f8ea94f5d55e2d3e33df82fce487aa3313b987abf9b39e0793c83c9fc67b76c36c067625141a9f6f704ae0ea18db2
   languageName: node
   linkType: hard
 

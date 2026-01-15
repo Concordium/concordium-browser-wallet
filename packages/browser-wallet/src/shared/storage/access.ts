@@ -19,6 +19,7 @@ import {
     VerifiableCredentialSchema,
     UiStyle,
     LedgerConnectionState,
+    LedgerDeviceState,
 } from './types';
 
 export type StorageAccessor<V> = {
@@ -218,6 +219,10 @@ export const storedLog = makeStorageAccessor<Log[]>('local', ChromeStorageKey.Lo
 export const storedLedgerConnection = makeStorageAccessor<LedgerConnectionState>(
     'local',
     ChromeStorageKey.LedgerDeviceConnection
+);
+export const storedLedgerDevices = makeIndexedStorageAccessor<LedgerDeviceState>(
+    'local',
+    ChromeStorageKey.LedgerDevices
 );
 
 export const sessionOpenPrompt = makeStorageAccessor<boolean>('session', ChromeStorageKey.OpenPrompt);

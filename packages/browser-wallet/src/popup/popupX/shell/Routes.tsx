@@ -17,7 +17,11 @@ import {
 } from '@popup/popupX/pages/TokenDetails';
 import IdCards from '@popup/popupX/pages/IdCards';
 import Accounts from '@popup/popupX/pages/Accounts';
+import AddLedgerAccount from '@popup/popupX/pages/AddLedgerAccount/AddLedgerAccount';
+import CreateAccountType from '@popup/popupX/pages/CreateAccount/CreateAccountType';
 import CreateAccount, { CreateAccountConfirm } from '@popup/popupX/pages/CreateAccount';
+import CreateLedgerAccount from '@popup/popupX/pages/CreateLedgerAccount/CreateLedgerAccount';
+import CreateLedgerAccountConfirm from '@popup/popupX/pages/CreateLedgerAccount/CreateLedgerAccountConfirm';
 import SeedPhrase, { SaveSeedPhrase } from 'src/popup/popupX/pages/SeedPhrase';
 import ChangePasscode from 'src/popup/popupX/pages/ChangePasscode';
 import { Web3IdCredentials, Web3IdImport } from '@popup/popupX/pages/Web3Id';
@@ -193,7 +197,16 @@ export default function Routes({ messagePromptHandlers }: { messagePromptHandler
                             path={relativeRoutes.settings.accounts.connectedSites.path}
                         />
                         <Route element={<PrivateKey />} path={relativeRoutes.settings.accounts.privateKey.path} />
+                        <Route element={<AddLedgerAccount />} path={relativeRoutes.settings.accounts.addLedger.path} />
+                        <Route path={relativeRoutes.settings.accounts.createLedger.path}>
+                            <Route index element={<CreateLedgerAccount />} />
+                            <Route
+                                path={relativeRoutes.settings.accounts.createLedger.confirm.path}
+                                element={<CreateLedgerAccountConfirm />}
+                            />
+                        </Route>
                     </Route>
+                    <Route element={<CreateAccountType />} path={relativeRoutes.settings.createAccountType.path} />
                     <Route path={relativeRoutes.settings.createAccount.path}>
                         <Route index element={<CreateAccount />} />
                         <Route

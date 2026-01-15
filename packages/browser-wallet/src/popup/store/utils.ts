@@ -37,6 +37,7 @@ import {
     storedCustomNetwork,
     storedHasBeenSavedSeed,
     storedLedgerConnection,
+    storedLedgerDevices,
 } from '@shared/storage/access';
 import { ChromeStorageKey } from '@shared/storage/types';
 import { atom, PrimitiveAtom, WritableAtom } from 'jotai';
@@ -81,6 +82,7 @@ const accessorMap: Record<ChromeStorageKey, StorageAccessor<any>> = {
     ),
     [ChromeStorageKey.Log]: storedLog,
     [ChromeStorageKey.LedgerDeviceConnection]: storedLedgerConnection,
+    [ChromeStorageKey.LedgerDevices]: useIndexedStorage(storedLedgerDevices, getGenesisHash),
 };
 
 export function resetOnUnmountAtom<V>(initial: V): PrimitiveAtom<V> {
@@ -110,10 +112,16 @@ export function atomWithChromeStorage<V>(
  * Create an atom that automatically syncs with chrome local storage.
  */
 export function atomWithChromeStorage<V>(key: ChromeStorageKey, fallback: V, withLoading = false) {
+    if (key === undefined || key === null) {
+        const { stack } = new Error();
+        throw new Error(`Invalid storage key: ${key}. Called from:\n${stack}`);
+    }
+
     const accessor = accessorMap[key] as unknown as StorageAccessor<V>;
 
     if (accessor === undefined) {
-        throw new Error(`Could not find storage for key: ${key}`);
+        const availableKeys = Object.keys(accessorMap).join(', ');
+        throw new Error(`Could not find storage for key: ${key}. Available keys: ${availableKeys}`);
     }
 
     const { get: getStoredValue, set: setStoredValue } = accessor;

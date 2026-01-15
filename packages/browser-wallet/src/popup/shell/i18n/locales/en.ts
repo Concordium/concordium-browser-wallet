@@ -35,7 +35,10 @@ import onramp from '@popup/popupX/pages/Onramp/i18n/en';
 import sendFunds from '@popup/popupX/pages/SendFunds/i18n/en';
 import idCards from '@popup/popupX/pages/IdCards/i18n/en';
 import accounts from '@popup/popupX/pages/Accounts/i18n/en';
+import addLedgerAccount from '@popup/popupX/pages/AddLedgerAccount/i18n/en';
 import createAccount from '@popup/popupX/pages/CreateAccount/i18n/en';
+import createAccountType from '@popup/popupX/pages/CreateAccount/i18n/type-en';
+import createLedgerAccount from '@popup/popupX/pages/CreateLedgerAccount/i18n/en';
 import mainPage from '@popup/popupX/pages/MainPage/i18n/en';
 import tokenDetails from '@popup/popupX/pages/TokenDetails/i18n/en';
 import transactionLogX from '@popup/popupX/pages/TransactionLog/i18n/en';
@@ -103,7 +106,10 @@ const t = {
         idCards,
         idIssuance,
         accounts,
+        addLedgerAccount,
         createAccount,
+        createAccountType,
+        createLedgerAccount,
         mainPage,
         tokenDetails,
         transactionLogX,

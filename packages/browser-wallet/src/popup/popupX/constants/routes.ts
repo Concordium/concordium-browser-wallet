@@ -205,6 +205,31 @@ export const relativeRoutes = {
                     navBackSteps: 2,
                 },
             },
+            addLedger: {
+                path: 'add-ledger',
+                config: {
+                    backTitle: i18n.t('x:accounts.accounts'),
+                    navBackSteps: 2,
+                },
+            },
+            createLedger: {
+                path: 'create-ledger',
+                confirm: {
+                    path: 'confirm/:identityProviderIndex/:identityIndex',
+                    config: {
+                        navBackSteps: 3,
+                    },
+                },
+                config: {
+                    backTitle: ' ',
+                },
+            },
+        },
+        createAccountType: {
+            path: 'create-account-type',
+            config: {
+                backTitle: ' ',
+            },
         },
         createAccount: {
             path: 'create-account',

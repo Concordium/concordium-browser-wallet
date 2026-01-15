@@ -21,6 +21,8 @@ import { useAccountInfo } from '@popup/shared/AccountInfoListenerContext';
 import { displayAsCcd } from 'wallet-common-helpers';
 import useEditableValue from '@popup/popupX/shared/EditableValue';
 import { useCopyAddress } from '@popup/popupX/shared/utils/hooks';
+import AccountTypeIndicator from '@popup/popupX/shared/AccountTypeIndicator';
+import { isLedgerAccount } from '@shared/utils/account-type-helpers';
 
 function compareAsc(left: WalletCredential, right: WalletCredential): number {
     if (left.credName === '' && right.credName !== '') {
@@ -119,6 +121,10 @@ function AccountListItem({ credential }: AccountListItemProps) {
                     leftLabel
                 />
             </Card.Row>
+            <Card.Row>
+                <Text.MainRegular>{t('accountType')}</Text.MainRegular>
+                <AccountTypeIndicator credential={credential} />
+            </Card.Row>
         </Card>
     );
 }
@@ -126,13 +132,23 @@ function AccountListItem({ credential }: AccountListItemProps) {
 export default function Accounts() {
     const { t } = useTranslation('x', { keyPrefix: 'accounts' });
     const [ascSort, setAscSort] = useState(true);
+    const [filterType, setFilterType] = useState<'all' | 'wallet' | 'ledger'>('all');
     const accounts = useAtomValue(credentialsAtom);
     const nav = useNavigate();
-    const navToCreateAccount = useCallback(() => nav(absoluteRoutes.settings.createAccount.path), []);
-    const sorted = useMemo(
-        () => accounts.filter((c) => c.address).sort(ascSort ? compareAsc : compareDesc),
-        [accounts, ascSort]
-    );
+    const navToCreateAccount = useCallback(() => nav(absoluteRoutes.settings.createAccountType.path), []);
+    const navToAddLedger = useCallback(() => nav(absoluteRoutes.settings.accounts.addLedger.path), []);
+
+    const filtered = useMemo(() => {
+        let result = accounts.filter((c) => c.address);
+
+        if (filterType === 'wallet') {
+            result = result.filter((c) => !isLedgerAccount(c));
+        } else if (filterType === 'ledger') {
+            result = result.filter((c) => isLedgerAccount(c));
+        }
+
+        return result.sort(ascSort ? compareAsc : compareDesc);
+    }, [accounts, ascSort, filterType]);
 
     return (
         <Page className="accounts-x">
@@ -141,7 +157,28 @@ export default function Accounts() {
                 <Button.Icon icon={<Plus />} onClick={navToCreateAccount} />
             </Page.Top>
             <Page.Main>
-                {sorted.map((item) => (
+                <div className="add-account-buttons m-b-20">
+                    <Button.Main label={t('addBrowserWalletAccount')} onClick={navToCreateAccount} />
+                    <Button.Main label={t('addLedgerAccount')} onClick={navToAddLedger} />
+                </div>
+                <div className="filter-buttons m-b-20">
+                    <Button.Main
+                        label={t('filterAll')}
+                        onClick={() => setFilterType('all')}
+                        className={filterType === 'all' ? 'active' : ''}
+                    />
+                    <Button.Main
+                        label={t('filterWallet')}
+                        onClick={() => setFilterType('wallet')}
+                        className={filterType === 'wallet' ? 'active' : ''}
+                    />
+                    <Button.Main
+                        label={t('filterLedger')}
+                        onClick={() => setFilterType('ledger')}
+                        className={filterType === 'ledger' ? 'active' : ''}
+                    />
+                </div>
+                {filtered.map((item) => (
                     <AccountListItem credential={item} key={item.address} />
                 ))}
             </Page.Main>

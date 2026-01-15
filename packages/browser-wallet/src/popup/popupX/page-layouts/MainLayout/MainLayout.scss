@@ -59,12 +59,9 @@
                     margin-top: rem(-12px);
                     margin-left: rem(-16px);
                     border-radius: rem(12px);
-                    border: 1px solid transparent;
+                    border: 1px solid #959ea3;
                     cursor: pointer;
-
-                    &.active {
-                        border-color: $color-white;
-                    }
+                    background: #616b71;
 
                     .text__main_medium {
                         color: $color-white;

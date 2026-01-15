@@ -24,6 +24,7 @@ import { parsePayload } from '@shared/utils/payload-helpers';
 import { BackgroundSendTransactionPayload } from '@shared/utils/types';
 import { buildURLwithSearchParameters } from '@shared/utils/url-helpers';
 import { Buffer } from 'buffer/';
+import { runStorageMigrations } from '@shared/storage/migrations';
 import { startMonitoringPendingStatus } from './confirmation';
 import { sendCredentialHandler } from './credential-deployment';
 import { createIdProofHandler, runIfValidProof } from './id-proof';
@@ -148,6 +149,10 @@ async function runMigrations(network?: NetworkConfiguration) {
 
 const startupHandler = async () => {
     const network = await storedCurrentNetwork.get();
+
+    // Run storage migrations on startup
+    await runStorageMigrations();
+
     runMigrations(network);
     if (network) {
         await startMonitoringPendingStatus(network);
@@ -269,7 +274,7 @@ const ensureMessageWithSchemaParse: RunCondition<MessageStatusWrapper<undefined>
         return { run: false, response: { success: false, message: INCORRECT_SIGN_MESSAGE_FORMAT } };
     }
     try {
-        deserializeTypeValue(Buffer.from(message.data, 'hex'), Buffer.from(message.schema, 'base64'));
+        deserializeTypeValue(Buffer.from(message.data, 'hex').buffer, Buffer.from(message.schema, 'base64').buffer);
         return { run: true };
     } catch {
         return { run: false, response: { success: false, message: UNABLE_TO_PARSE_SIGN_MESSAGE_OBJECT } };

@@ -1,9 +1,10 @@
 import React, { ChangeEvent, useMemo, useState } from 'react';
-import CarretRight from '@assets/svgX/caret-right.svg';
+import SelectedIndicator from '@assets/svgX/selected-indicator.svg';
 import ArrowsUpDown from '@assets/svgX/arrows-down-up.svg';
 import Percent from '@assets/svgX/percent.svg';
 import Copy from '@assets/svgX/copy.svg';
 import ConcordiumLogo from '@assets/svgX/concordium-logo.svg';
+import LedgerIcon from '@assets/svgX/ledger-account.svg';
 import { Search } from '@popup/popupX/shared/Form/Search';
 import Button from '@popup/popupX/shared/Button';
 import { useAtom, useAtomValue } from 'jotai';
@@ -18,6 +19,8 @@ import Text from '@popup/popupX/shared/Text';
 import { AccountInfoType } from '@concordium/web-sdk';
 import { useCopyAddress } from '@popup/popupX/shared/utils/hooks';
 import { useSuspendedStatus } from '@popup/popupX/shared/utils/pool-status-helpers';
+import { isLedgerAccount } from '@shared/utils/account-type-helpers';
+import { ENABLE_LEDGER } from '@shared/constants/features';
 
 function shortNumber(number: number | string): string {
     return number.toLocaleString('en-US', {
@@ -74,6 +77,17 @@ function Earning({ credential }: { credential: WalletCredential }) {
     return null;
 }
 
+function AccountTypeIcon({ credential }: { credential: WalletCredential }) {
+    if (ENABLE_LEDGER && isLedgerAccount(credential)) {
+        return (
+            <span title="Ledger Based Account">
+                <LedgerIcon width="16" height="16" />
+            </span>
+        );
+    }
+    return null;
+}
+
 function AccountRow({
     credential,
     selectedAccount,
@@ -101,7 +115,7 @@ function AccountRow({
             onClick={onAccountClick}
         >
             <div className="account">
-                {credential.address === selectedAccount && <CarretRight />}
+                {credential.address === selectedAccount && <SelectedIndicator />}
                 <Text.AdditionalSmall>{displayNameOrSplitAddress(credential)}</Text.AdditionalSmall>
             </div>
             <div className="balance">
@@ -111,6 +125,9 @@ function AccountRow({
             </div>
             <div className="earning">
                 <Earning credential={credential} />
+            </div>
+            <div className="account-type-icon">
+                <AccountTypeIcon credential={credential} />
             </div>
             <div className="copy">
                 <Button.Base

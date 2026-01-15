@@ -45,6 +45,7 @@ export enum ChromeStorageKey {
     Allowlist = 'allowlist',
     Log = 'log',
     LedgerDeviceConnection = 'ledgerDeviceConnection',
+    LedgerDevices = 'ledgerDevices',
 }
 
 export enum Theme {
@@ -64,6 +65,14 @@ export enum CreationStatus {
     Pending = 'pending',
     Confirmed = 'confirmed',
     Rejected = 'rejected',
+}
+
+/**
+ * Used to describe the type/source of an account
+ */
+export enum AccountType {
+    SeedPhraseBased = 'seedPhraseBased',
+    LedgerBased = 'ledgerBased',
 }
 
 export interface BaseIdentity {
@@ -167,6 +176,9 @@ export interface BaseCredential {
     providerIndex: number;
     // Policy (is in accountInfo)
     // CredentialIndex = 0
+    accountType?: AccountType; // Distinguishes account source (seed phrase or Ledger)
+    ledgerPath?: string; // BIP44 derivation path for Ledger accounts (e.g., "44/919/0/0/0/0")
+    ledgerDeviceId?: string; // Identifier for the specific Ledger device
 }
 
 export interface PendingWalletCredential extends BaseCredential {
@@ -364,4 +376,23 @@ export interface LedgerConnectionState {
     serialNumber?: string;
     deviceModel?: string;
     autoConnect?: boolean;
+}
+
+export interface LedgerAccountMetadata {
+    deviceId: string;
+    deviceName: string;
+    derivationPath: string; // BIP44 format: "44/919/identityProvider/identityIndex/credentialIndex/keyIndex" (e.g., "44/919/0/0/0/0")
+    publicKey: string;
+    verifyKey: string;
+    credId: string;
+    address: string;
+    identityProvider: number;
+    identityIndex: number;
+    credentialIndex: number;
+    keyIndex: number;
+}
+
+export interface LedgerDeviceState extends LedgerConnectionState {
+    accounts: LedgerAccountMetadata[];
+    lastSyncedAt?: number;
 }

@@ -98,3 +98,8 @@ examples/nft-minting/file-server/.log
 examples/nft-minting/file-server/data
 examples/nft-minting/file-server/collections.json
 
+LEDGER_IMPLEMENTATION.md
+packages/browser-wallet/scripts/remove-ledger-accounts.js
+packages/browser-wallet/scripts/remove-ledger-accounts.ts
+yarn.lock
+yarn.lock
