@@ -65,6 +65,7 @@ jobs:
         runs-on: ubuntu-latest
         permissions:
             contents: write
+            id-token: write
         environment: release-api-helpers
         steps:
             - name: Checkout sources
@@ -98,14 +99,14 @@ jobs:
 
             - uses: actions/setup-node@v6
               with:
-                  node-version: ${{ env.NODE_VERSION }}
+                  node-version: lts/*
                   cache: yarn
                   registry-url: "https://registry.npmjs.org"
 
             - name: Publish to NPM
               run: |
-                  unset NODE_AUTH_TOKEN # Unset the default token set by "actions/setup-node" to get OIDC publishing working
-                  yarn workspace @concordium/browser-wallet-api-helpers npm publish --tag ${{ steps.determine_npm_tag.outputs.npm_tag }}
+                  yarn workspace @concordium/browser-wallet-api-helpers pack --out ../../api-helpers.tgz
+                  NPM_AUTH_TOKEN="" npm publish ./api-helpers.tgz --tag ${{ steps.determine_npm_tag.outputs.npm_tag }} --access publics --provenance
 
             - name: Create a GitHub release
               uses: ncipollo/release-action@v1
