@@ -77,6 +77,7 @@ export function DisplaySuccess({ added }: Props) {
                         key={`${identity.providerIndex}-${identity.index}`}
                         title={identity.name + (!added.identities.some(identityMatch(identity)) ? t('existed') : '')}
                         subtitle={t('verifiedBy', { idProviderName: getProvider(identity) })}
+                        identityType={identity.type}
                     >
                         <IdCard.Content>
                             {addedAccounts.filter(isIdentityOfCredential(identity)).map((cred) => (

@@ -94,6 +94,7 @@ export default function ConfirmedIdCard({
             title={editable.value}
             titleAction={editable.actions}
             subtitle={t('idCard.verifiedBy', { idProviderName })}
+            identityType={identity.type}
         >
             {rowsIdInfo && (
                 <IdCard.Content>

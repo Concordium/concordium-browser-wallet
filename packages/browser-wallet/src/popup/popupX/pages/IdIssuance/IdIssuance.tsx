@@ -1,3 +1,4 @@
+import clsx from 'clsx';
 import { useAtom, useAtomValue, useSetAtom } from 'jotai';
 import React, { useCallback, useEffect, useState } from 'react';
 import { useTranslation } from 'react-i18next';
@@ -13,9 +14,12 @@ import CircleInfo from '@assets/svgX/UiKit/Interface/circled-info-tootlip.svg';
 import { getIdentityProviders } from '@popup/shared/utils/wallet-proxy';
 import { identitiesAtom, identityProvidersAtom, pendingIdentityAtom } from '@popup/store/identity';
 import { grpcClientAtom, hasBeenOnBoardedAtom, networkConfigurationAtom } from '@popup/store/settings';
-import { CreationStatus, IdentityProvider, SessionPendingIdentity } from '@shared/storage/types';
+import { CreationStatus, IdentityProvider, IdentityType, SessionPendingIdentity } from '@shared/storage/types';
 import { getGlobal } from '@shared/utils/network-helpers';
 import { logErrorMessage } from '@shared/utils/log-helpers';
+import { ENABLE_LEDGER } from '@shared/constants/features';
+import { connectLedgerDevice, verifyLedgerAppOpen } from '@popup/shared/ledger-helpers';
+import { addToastAtom } from '@popup/state';
 
 import { IdCardsInfoNotice } from './IdCardsInfo';
 import { IdIssuanceExternalFlowLocationState } from './util';
@@ -31,6 +35,9 @@ export default function IdIssuance() {
     const [pendingIdentity, setPendingIdentity] = useAtom(pendingIdentityAtom);
     const [showIdInfo, setShowIdInfo] = useState(false);
     const setHasBeenOnboarded = useSetAtom(hasBeenOnBoardedAtom);
+    const addToast = useSetAtom(addToastAtom);
+    const [identityType, setIdentityType] = useState<IdentityType>(IdentityType.WalletBased);
+    const supportsLedgerIdentities = ENABLE_LEDGER;
 
     useEffect(() => {
         // TODO: only load once per session?
@@ -40,15 +47,37 @@ export default function IdIssuance() {
             .catch(() => logErrorMessage('Unable to update identity provider list'));
     }, []);
 
+    useEffect(() => {
+        if (!supportsLedgerIdentities && identityType === IdentityType.LedgerBased) {
+            setIdentityType(IdentityType.WalletBased);
+        }
+    }, [identityType, supportsLedgerIdentities]);
+
     const startIssuance = useCallback(
-        async (provider: IdentityProvider) => {
+        async (provider: IdentityProvider, type: IdentityType) => {
             // Component was reused at onboarding. Needs to set value here.
             setHasBeenOnboarded(true);
 
             setButtonDisabled(true);
             try {
                 if (!network) {
-                    throw new Error('Network is not specified');
+                    throw new Error(t('networkMissing'));
+                }
+
+                if (type === IdentityType.LedgerBased) {
+                    if (!supportsLedgerIdentities) {
+                        throw new Error(t('ledgerDisabled'));
+                    }
+                    try {
+                        const { concordiumApp } = await connectLedgerDevice();
+                        const appOpen = await verifyLedgerAppOpen(concordiumApp);
+                        if (!appOpen) {
+                            throw new Error(t('ledgerAppClosed'));
+                        }
+                    } catch (ledgerError) {
+                        const message = (ledgerError as Error)?.message || t('ledgerConnectFailed');
+                        throw new Error(message);
+                    }
                 }
 
                 const global = await getGlobal(client);
@@ -65,6 +94,7 @@ export default function IdIssuance() {
                         index: identityIndex,
                         name: `Identity ${identities.length + 1}`,
                         providerIndex,
+                        type,
                     },
                     network,
                 };
@@ -75,11 +105,12 @@ export default function IdIssuance() {
                     pendingIdentity: identity,
                 };
                 nav(absoluteRoutes.settings.identities.create.externalFlow.path, { state: issuanceParams });
-            } catch {
+            } catch (error) {
+                addToast((error as Error)?.message ?? t('errorGeneric'));
                 setButtonDisabled(false);
             }
         },
-        [network]
+        [network, setHasBeenOnboarded, client, identities, nav, addToast, t, supportsLedgerIdentities]
     );
 
     return (
@@ -101,13 +132,45 @@ export default function IdIssuance() {
                 )}
                 {pendingIdentity === undefined && (
                     <>
+                        {supportsLedgerIdentities && (
+                            <div className="id-issuance__type-selector">
+                                <Text.CaptureAdditional className="id-issuance__type-selector-label">
+                                    {t('typeSelectorLabel')}
+                                </Text.CaptureAdditional>
+                                <div className="id-issuance__type-buttons">
+                                    <Button.Secondary
+                                        label={t('walletOption')}
+                                        className={clsx('id-issuance__type-button', {
+                                            'id-issuance__type-button--active':
+                                                identityType === IdentityType.WalletBased,
+                                        })}
+                                        disabled={buttonDisabled}
+                                        onClick={() => setIdentityType(IdentityType.WalletBased)}
+                                    />
+                                    <Button.Secondary
+                                        label={t('ledgerOption')}
+                                        className={clsx('id-issuance__type-button', {
+                                            'id-issuance__type-button--active':
+                                                identityType === IdentityType.LedgerBased,
+                                        })}
+                                        disabled={buttonDisabled}
+                                        onClick={() => setIdentityType(IdentityType.LedgerBased)}
+                                    />
+                                </div>
+                                <Text.CaptureAdditional className="id-issuance__type-description">
+                                    {identityType === IdentityType.WalletBased
+                                        ? t('walletDescription')
+                                        : t('ledgerDescription')}
+                                </Text.CaptureAdditional>
+                            </div>
+                        )}
                         <div className="id-issuance__providers-container">
                             {providers.map((p) => (
                                 <Button.Base
                                     className="id-issuance__issuer-btn"
                                     key={p.ipInfo.ipDescription.url}
                                     disabled={buttonDisabled}
-                                    onClick={() => startIssuance(p)}
+                                    onClick={() => startIssuance(p, identityType)}
                                 >
                                     <IdentityProviderIcon provider={p} />
                                     <Text.Main>{p.metadata.display ?? p.ipInfo.ipDescription.name}</Text.Main>

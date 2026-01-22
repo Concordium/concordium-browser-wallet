@@ -50,7 +50,7 @@ export default function Identity() {
         <div className="flex-column align-center">
             <IdCard
                 name={selectedIdentity.name}
-                provider={<IdentityProviderIcon provider={identityProvider} />}
+                provider={<IdentityProviderIcon provider={identityProvider} identityType={selectedIdentity.type} />}
                 status={selectedIdentity.status}
                 onNameChange={(name) => updateSelectedIdentity({ ...selectedIdentity, name })}
                 className="m-t-20"

@@ -1,4 +1,36 @@
 .id-issuance {
+    &__type-selector {
+        margin-top: $semantic-gap-xl;
+        padding: $semantic-padding-l;
+        border-radius: rem(12px);
+        background: $semantic-surface-primary;
+        border: rem(1px) solid $semantic-border-primary-a10;
+        display: flex;
+        flex-direction: column;
+        gap: $semantic-gap-s;
+    }
+
+    &__type-selector-label,
+    &__type-description {
+        color: $semantic-content-secondary;
+    }
+
+    &__type-buttons {
+        display: flex;
+        gap: $semantic-gap-s;
+    }
+
+    &__type-button {
+        flex: 1;
+        border-radius: rem(10px);
+        border: rem(1px) solid transparent;
+
+        &--active {
+            border-color: $semantic-border-primary-a10;
+            background: $semantic-surface-secondary;
+        }
+    }
+
     &__providers-container {
         margin-top: $semantic-gap-xl;
     }

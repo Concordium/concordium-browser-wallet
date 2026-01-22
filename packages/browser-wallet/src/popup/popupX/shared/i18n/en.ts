@@ -55,6 +55,7 @@ const t = {
         pendingBy: 'Pending verification by {{idProviderName}}',
         itentityRejected: 'This identity has been rejected',
         concordiumWalletAccount: 'ID was created with a Concordium\nWallet Account',
+        ledgerAccount: 'ID is secured by a Ledger device',
     },
     web3IdCard: {
         status: {

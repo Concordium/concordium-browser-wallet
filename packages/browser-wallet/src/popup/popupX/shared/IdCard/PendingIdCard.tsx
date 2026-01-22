@@ -17,7 +17,7 @@ export default function PendingIdCard({ identity }: PendingIdentityProps) {
     const provider = providers.find((p) => p.ipInfo.ipIdentity === identity.providerIndex);
     const idProviderName = provider?.ipInfo.ipDescription.name ?? 'Unknown';
     return (
-        <IdCard title={identity.name} subtitle={t('idCard.pendingBy', { idProviderName })}>
+        <IdCard title={identity.name} subtitle={t('idCard.pendingBy', { idProviderName })} identityType={identity.type}>
             <IdCard.Content>
                 <IdCard.ContentRow>
                     <Text.MainRegular>...</Text.MainRegular>

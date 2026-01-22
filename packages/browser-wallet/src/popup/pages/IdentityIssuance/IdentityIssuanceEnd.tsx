@@ -69,7 +69,12 @@ export default function IdentityIssuanceEnd() {
                         <IdCard
                             className="identity-issuance__card"
                             name={selectedIdentity?.name || 'Identity'}
-                            provider={<IdentityProviderIcon provider={identityProvider} />}
+                            provider={
+                                <IdentityProviderIcon
+                                    provider={identityProvider}
+                                    identityType={selectedIdentity?.type}
+                                />
+                            }
                             status={selectedIdentity?.status || CreationStatus.Pending}
                         />
                     </>

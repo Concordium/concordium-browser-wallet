@@ -76,7 +76,9 @@ export default function ChooseIdentity() {
                     <IdCard
                         name={identity.name}
                         key={`${identity.providerIndex}-${identity.index}`}
-                        provider={<IdentityProviderIcon provider={findProvider(identity)} />}
+                        provider={
+                            <IdentityProviderIcon provider={findProvider(identity)} identityType={identity.type} />
+                        }
                         status={identity.status}
                         disabled={Boolean(reason)}
                         className="m-t-10"

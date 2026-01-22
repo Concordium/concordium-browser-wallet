@@ -3,7 +3,7 @@ import { IdentityIssuanceBackgroundResponse } from '@shared/utils/identity-helpe
 import { ExtensionMessageHandler, InternalMessageType } from '@messaging';
 import { BackgroundResponseStatus, IdentityIssuanceRequestPayload } from '@shared/utils/types';
 import { sessionIdpTab, sessionPendingIdentity, storedCurrentNetwork } from '@shared/storage/access';
-import { CreationStatus, PendingIdentity } from '@shared/storage/types';
+import { CreationStatus, IdentityType, PendingIdentity } from '@shared/storage/types';
 import { buildURLwithSearchParameters } from '@shared/utils/url-helpers';
 import { openWindow } from './window-management';
 
@@ -41,6 +41,7 @@ const respondPopup = async (response: IdentityIssuanceBackgroundResponse) => {
     } else if (response.status === BackgroundResponseStatus.Success) {
         const newIdentity: PendingIdentity = {
             ...identity,
+            type: identity.type ?? IdentityType.WalletBased,
             status: CreationStatus.Pending,
             location: response.result,
         };

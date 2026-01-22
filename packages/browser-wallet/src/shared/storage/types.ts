@@ -67,6 +67,11 @@ export enum CreationStatus {
     Rejected = 'rejected',
 }
 
+export enum IdentityType {
+    WalletBased = 'walletBased',
+    LedgerBased = 'ledgerBased',
+}
+
 /**
  * Used to describe the type/source of an account
  */
@@ -80,6 +85,7 @@ export interface BaseIdentity {
     name: string;
     index: number;
     providerIndex: number;
+    type?: IdentityType;
 }
 
 export interface PendingIdentity extends BaseIdentity {

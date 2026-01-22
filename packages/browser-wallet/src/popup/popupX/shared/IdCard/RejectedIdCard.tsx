@@ -18,7 +18,11 @@ export default function RejectedIdCard({ identity }: RejectedIdentityProps) {
     const provider = providers.find((p) => p.ipInfo.ipIdentity === identity.providerIndex);
     const idProviderName = provider?.ipInfo.ipDescription.name ?? 'Unknown';
     return (
-        <IdCard title={identity.name} subtitle={t('idCard.rejectedBy', { idProviderName })}>
+        <IdCard
+            title={identity.name}
+            subtitle={t('idCard.rejectedBy', { idProviderName })}
+            identityType={identity.type}
+        >
             <IdCard.Content className="rejected">
                 <Close className="icon-rejected" />
                 <Text.MainRegular>{t('idCard.itentityRejected')}</Text.MainRegular>

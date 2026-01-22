@@ -8,6 +8,16 @@ const en = {
         redirectInfo: 'You will be redirected after choosing an identity provider.',
         buttonContinue: 'Request Identity',
         buttonReset: 'Reset',
+        typeSelectorLabel: 'Choose how to secure your identity',
+        walletOption: 'Wallet-based',
+        walletDescription: 'Use the built-in wallet keys stored in your browser.',
+        ledgerOption: 'Ledger-based',
+        ledgerDescription: 'Use a Ledger hardware wallet to protect your identity keys.',
+        ledgerDisabled: 'Ledger-based identities are currently disabled.',
+        ledgerAppClosed: 'Open the Concordium app on your Ledger device to continue.',
+        ledgerConnectFailed: 'Unable to connect to the Ledger device. Please try again.',
+        networkMissing: 'Network is not specified.',
+        errorGeneric: 'Something went wrong. Please try again.',
     },
     externalFlow: {
         description:

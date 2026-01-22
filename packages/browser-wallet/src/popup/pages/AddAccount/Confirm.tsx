@@ -129,7 +129,7 @@ export default function Confirm() {
             </div>
             <IdCard
                 name={selectedIdentity.name}
-                provider={<IdentityProviderIcon provider={identityProvider} />}
+                provider={<IdentityProviderIcon provider={identityProvider} identityType={selectedIdentity.type} />}
                 status={selectedIdentity.status}
                 className="m-t-40"
             />
