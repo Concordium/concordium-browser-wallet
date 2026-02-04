@@ -7,10 +7,10 @@ import { useTranslation } from 'react-i18next';
 import Card from '@popup/popupX/shared/Card';
 import Text from '@popup/popupX/shared/Text';
 import Button from '@popup/popupX/shared/Button';
-import { devnet, mainnet, stagenet, testnet } from '@shared/constants/networkConfiguration';
+import { mainnet, stagenet, testnet } from '@shared/constants/networkConfiguration';
 import { isDevelopmentBuild } from '@shared/utils/environment-helpers';
 import { useAtom } from 'jotai';
-import { networkConfigurationAtom, customNetworkConfigurationAtom } from '@popup/store/settings';
+import { customNetworkConfigurationAtom, networkConfigurationAtom } from '@popup/store/settings';
 
 function useNetworks() {
     const { t } = useTranslation('x', { keyPrefix: 'network' });
@@ -21,7 +21,6 @@ function useNetworks() {
     if (isDevelopmentBuild()) {
         networks.push(stagenet);
     }
-    networks.push(devnet);
     networks.push(customnet);
 
     const updatedNetworks = networks.map((network) => {

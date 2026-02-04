@@ -27,15 +27,6 @@ export const stagenet: NetworkConfiguration = {
     ccdScanUrl: 'https://stagenet.ccdscan.io/',
 };
 
-export const devnet: NetworkConfiguration = {
-    genesisHash: '5867d1b162172bf671df64fb6f568c573141fd80b7795adc8d91e4337ff2ef9c',
-    name: 'Concordium DevNet',
-    explorerUrl: 'https://wallet-proxy.devnet-p10-1.concordium.com',
-    grpcPort: 20000,
-    grpcUrl: 'https://grpc.devnet-p10-1.concordium.com',
-    ccdScanUrl: 'https://devnet-p10-1.ccdscan.io/',
-};
-
 export const customnet: NetworkConfiguration = {
     genesisHash: '',
     name: 'Concordium Custom',

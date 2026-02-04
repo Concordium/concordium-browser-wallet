@@ -8,7 +8,7 @@ import Card from '@popup/popupX/shared/Card';
 import Text from '@popup/popupX/shared/Text';
 import Button from '@popup/popupX/shared/Button';
 import Dot from '@assets/svgX/dot.svg';
-import { devnet, mainnet, stagenet, testnet } from '@shared/constants/networkConfiguration';
+import { mainnet, stagenet, testnet } from '@shared/constants/networkConfiguration';
 import { isDevelopmentBuild } from '@shared/utils/environment-helpers';
 import { relativeRoutes } from '@popup/popupX/constants/routes';
 
@@ -24,7 +24,6 @@ function useNetworks() {
     if (isDevelopmentBuild()) {
         networks.push(stagenet);
     }
-    networks.push(devnet);
     networks.push(customnet);
 
     const updatedNetworks = networks.map((network) => {
