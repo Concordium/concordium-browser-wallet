@@ -69,6 +69,8 @@
         "elliptic": "^6.6.1",
         "loader-utils": "^2.0.4",
         "@babel/traverse": "^7.27.0",
-        "express@npm:4.21.1/path-to-regexp": "^0.1.12"
+        "express@npm:4.21.1/path-to-regexp": "^0.1.12",
+        "body-parser@npm:1.20.3/qs": "^6.14.1",
+        "express@npm:4.21.1/qs": "^6.14.1"
     }
 }
