@@ -1941,7 +1941,7 @@ __metadata:
     webpack: ^5.99.7
     webpack-cli: ^4.9.2
   peerDependencies:
-    "@concordium/web-sdk": ^12.0.0
+    "@concordium/web-sdk": ^12.0.1
     "@protobuf-ts/runtime-rpc": ^2.9.1
   languageName: unknown
   linkType: soft
