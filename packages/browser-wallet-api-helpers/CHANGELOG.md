@@ -4,6 +4,7 @@
 
 -   Updated handler `sendTransaction` with new payload type `TokenUpdatePayload`
 -   Added `requestVerifiablePresentationV1` entrypoint to prove statements about identities and verifiable credentials with auditable anchor
+-   Added `TypedSmartContractParameters` for `sendSponsoredTransaction` entrypoint for sponsored contract updates
 
 ## 3.0.1
 
