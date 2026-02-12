@@ -125,12 +125,7 @@ export type TypeSchema = {
  * Discriminated union type for contract invocation schemas.
  * Is used to select the correct method for encoding the invocation parameters using the schema.
  */
-export type Schema = ModuleSchema | TypeSchema;
-
-export type TypedSmartContractParameters = {
-    parameters: SmartContractParameters;
-    schema: Schema;
-};
+export type ContractSchema = ModuleSchema | TypeSchema;
 
 // eslint-disable-next-line  @typescript-eslint/no-explicit-any
 type EventListener<Args extends any[]> = (...args: Args) => void;
@@ -294,12 +289,13 @@ interface MainWalletApi {
      * Note that if the user rejects signing the transaction, this will throw an error.
      * @param accountAddress the address of the account that should sign the transaction
      * @param transaction the sponsored transaction with header to be signed and sent.
-     * @param typedParams The parameters of the contract invocation and a schema describing how to serialize them. The parameters must be given as a plain JavaScript object.
+     * @param [contractSchema] A schema describing how to deserialize the contract parameter in the payload.
+     * This is only required for smart contract transactions, in order to enable users to verify the details of the transaction they are signing.
      */
     sendSponsoredTransaction(
         accountAddress: AccountAddressSource,
         transaction: SignableTransaction,
-        typedParams?: TypedSmartContractParameters
+        contractSchema?: ContractSchema
     ): Promise<string>;
     /**
      * Sends a message to the Concordium Wallet and awaits the users action. If the user signs the message, this will resolve to the signature.
