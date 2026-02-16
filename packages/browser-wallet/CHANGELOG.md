@@ -2,6 +2,8 @@
 
 ## Unreleased
 
+## 2.8.0
+
 -   Added support for Sponsored Transactions handling. With new method `sendSponsoredTransaction` in wallet-api.
 -   Removed preconfigured connection for DevNet, from network options list. Custom connection should be used instead.
 
