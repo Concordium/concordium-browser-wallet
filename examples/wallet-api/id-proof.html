@@ -8,7 +8,6 @@
         <meta charset="utf-8" />
         <script>
             let currentAccountAddress = '';
-            var globalReq = undefined;
 
             async function setupPage() {
                 const provider = await concordiumHelpers.detectConcordiumProvider();
@@ -136,8 +135,6 @@
                         concordiumSDK.TransactionHash.fromJSON(anchorTransactionHash)
                     );
 
-                    globalReq = verificationRequest;
-
                     provider
                         .requestVerifiablePresentationV1(verificationRequest)
                         .then((proof) => {
@@ -201,8 +198,6 @@
                         concordiumSDK.TransactionHash.fromJSON(anchorTransactionHash)
                     );
 
-                    globalReq = verificationRequest;
-
                     provider
                         .requestVerifiablePresentationV1(verificationRequest)
                         .then((proof) => {
@@ -265,8 +260,6 @@
                         requestClaims,
                         concordiumSDK.TransactionHash.fromJSON(anchorTransactionHash)
                     );
-
-                    globalReq = verificationRequest;
 
                     provider
                         .requestVerifiablePresentationV1(verificationRequest)
