@@ -3,15 +3,16 @@ import { Navigate, useLocation } from 'react-router-dom';
 import { useAtomValue, useSetAtom } from 'jotai';
 import { useTranslation } from 'react-i18next';
 import {
-    CredentialStatements,
     AtomicStatementV2,
-    getPastDate,
-    MIN_DATE,
-    createAccountDID,
-    ConcordiumHdWallet,
-    isAccountCredentialStatement,
-    StatementTypes,
     AttributeKeyString,
+    ConcordiumHdWallet,
+    createAccountDID,
+    CredentialStatements,
+    getPastDate,
+    isAccountCredentialStatement,
+    MIN_DATE,
+    RequestStatement,
+    StatementTypes,
 } from '@concordium/web-sdk';
 
 import { grpcClientAtom, networkConfigurationAtom, sessionPasscodeAtom } from '@popup/store/settings';
@@ -134,7 +135,10 @@ export default function AgeProofRequest({ onReject, onSubmit }: Props) {
         const global = await getGlobal(client);
         const wallet = ConcordiumHdWallet.fromHex(recoveryPhrase, net);
 
-        const requestStatement = { statement: [statement], id: createAccountDID(net, credential?.credId) };
+        const requestStatement = {
+            statement: [statement],
+            id: createAccountDID(net, credential?.credId),
+        } as RequestStatement;
 
         const commitmentInput = getAccountCredentialCommitmentInput(
             requestStatement,

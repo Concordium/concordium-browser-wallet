@@ -40,8 +40,8 @@ export async function proveWeb3Request(
     request: {
         challenge: string;
         credentialStatements: (VerifiablePresentationV1.SubjectClaims | RequestStatement)[];
-        requestRaw: string;
-        proofClaims: (VerifiablePresentationV1.SubjectClaims | RequestStatement)[];
+        requestRaw?: string;
+        proofClaims?: (VerifiablePresentationV1.SubjectClaims | RequestStatement)[];
     },
     commitmentInputs: (CommitmentInput | VerifiablePresentationV1.CommitmentInput)[],
     global: CryptographicParameters
