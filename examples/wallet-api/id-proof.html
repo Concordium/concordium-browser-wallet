@@ -8,6 +8,7 @@
         <meta charset="utf-8" />
         <script>
             let currentAccountAddress = '';
+            var globalReq = undefined;
 
             async function setupPage() {
                 const provider = await concordiumHelpers.detectConcordiumProvider();
@@ -85,8 +86,221 @@
                         })
                         .catch(alert);
                 });
+
+                document.getElementById('idProofV1Single').addEventListener('click', async () => {
+                    const network = 'Testnet';
+                    const identityProviderIndex = 0;
+
+                    const grpcClient = new concordiumSDK.ConcordiumGRPCClient(await provider.grpcTransport);
+
+                    const requestContext = concordiumSDK.VerificationRequestV1.createSimpleContext(
+                        concordiumSDK.sha256(Uint8Array.from(Date.now().toString())),
+                        crypto.randomUUID(),
+                        'Example website URL',
+                        'Example VP'
+                    );
+
+                    const requestClaims = concordiumSDK.VerificationRequestV1.claimsBuilder()
+                        .addAccountOrIdentityClaims(
+                            [new concordiumSDK.IdentityProviderDID(network, identityProviderIndex)],
+                            (b) => {
+                                b.addEUResidency();
+                                b.addMinimumAge(18);
+                                b.revealAttribute('firstName');
+                            }
+                        )
+                        .getClaims();
+
+                    const anchor = concordiumSDK.VerificationRequestV1.createAnchor(requestContext, requestClaims, {
+                        somePublicInfo: 'public info',
+                    });
+
+                    const registerData = { data: new concordiumSDK.DataBlob(Uint8Array.from(anchor).buffer) };
+
+                    const anchorTransactionHash = await provider.sendTransaction(
+                        currentAccountAddress,
+                        concordiumSDK.AccountTransactionType.RegisterData,
+                        registerData
+                    );
+
+                    startLoader();
+                    await grpcClient.waitForTransactionFinalization(
+                        concordiumSDK.TransactionHash.fromJSON(anchorTransactionHash),
+                        60 * 1000
+                    );
+                    stopLoader();
+
+                    const verificationRequest = concordiumSDK.VerificationRequestV1.create(
+                        requestContext,
+                        requestClaims,
+                        concordiumSDK.TransactionHash.fromJSON(anchorTransactionHash)
+                    );
+
+                    globalReq = verificationRequest;
+
+                    provider
+                        .requestVerifiablePresentationV1(verificationRequest)
+                        .then((proof) => {
+                            console.log(proof);
+                            alert('Proof received! (check the console)');
+                        })
+                        .catch(alert);
+                });
+
+                document.getElementById('idProofV1Multiple').addEventListener('click', async () => {
+                    const network = 'Testnet';
+                    const identityProviderIndex = 0;
+
+                    const grpcClient = new concordiumSDK.ConcordiumGRPCClient(await provider.grpcTransport);
+
+                    const requestContext = concordiumSDK.VerificationRequestV1.createSimpleContext(
+                        concordiumSDK.sha256(Uint8Array.from(Date.now().toString())),
+                        crypto.randomUUID(),
+                        'Example website URL',
+                        'Example VP'
+                    );
+
+                    const requestClaims = concordiumSDK.VerificationRequestV1.claimsBuilder()
+                        .addAccountOrIdentityClaims(
+                            [new concordiumSDK.IdentityProviderDID(network, identityProviderIndex)],
+                            (b) => {
+                                b.addMinimumAge(18);
+                                b.revealAttribute('firstName');
+                            }
+                        )
+                        .addAccountOrIdentityClaims(
+                            [new concordiumSDK.IdentityProviderDID(network, identityProviderIndex)],
+                            (b) => {
+                                b.addEUResidency();
+                            }
+                        )
+                        .getClaims();
+
+                    const anchor = concordiumSDK.VerificationRequestV1.createAnchor(requestContext, requestClaims, {
+                        somePublicInfo: 'public info',
+                    });
+
+                    const registerData = { data: new concordiumSDK.DataBlob(Uint8Array.from(anchor).buffer) };
+
+                    const anchorTransactionHash = await provider.sendTransaction(
+                        currentAccountAddress,
+                        concordiumSDK.AccountTransactionType.RegisterData,
+                        registerData
+                    );
+
+                    startLoader();
+                    await grpcClient.waitForTransactionFinalization(
+                        concordiumSDK.TransactionHash.fromJSON(anchorTransactionHash),
+                        60 * 1000
+                    );
+                    stopLoader();
+
+                    const verificationRequest = concordiumSDK.VerificationRequestV1.create(
+                        requestContext,
+                        requestClaims,
+                        concordiumSDK.TransactionHash.fromJSON(anchorTransactionHash)
+                    );
+
+                    globalReq = verificationRequest;
+
+                    provider
+                        .requestVerifiablePresentationV1(verificationRequest)
+                        .then((proof) => {
+                            console.log(proof);
+                            alert('Proof received! (check the console)');
+                        })
+                        .catch(alert);
+                });
+
+                document.getElementById('idProofV1MultipleAccount').addEventListener('click', async () => {
+                    const network = 'Testnet';
+                    const identityProviderIndex = 0;
+
+                    const grpcClient = new concordiumSDK.ConcordiumGRPCClient(await provider.grpcTransport);
+
+                    const requestContext = concordiumSDK.VerificationRequestV1.createSimpleContext(
+                        concordiumSDK.sha256(Uint8Array.from(Date.now().toString())),
+                        crypto.randomUUID(),
+                        'Example website URL',
+                        'Example VP'
+                    );
+
+                    const requestClaims = concordiumSDK.VerificationRequestV1.claimsBuilder()
+                        .addAccountClaims(
+                            [new concordiumSDK.IdentityProviderDID(network, identityProviderIndex)],
+                            (b) => {
+                                b.addMinimumAge(18);
+                                b.revealAttribute('firstName');
+                            }
+                        )
+                        .addAccountClaims(
+                            [new concordiumSDK.IdentityProviderDID(network, identityProviderIndex)],
+                            (b) => {
+                                b.addEUResidency();
+                            }
+                        )
+                        .getClaims();
+
+                    const anchor = concordiumSDK.VerificationRequestV1.createAnchor(requestContext, requestClaims, {
+                        somePublicInfo: 'public info',
+                    });
+
+                    const registerData = { data: new concordiumSDK.DataBlob(Uint8Array.from(anchor).buffer) };
+
+                    const anchorTransactionHash = await provider.sendTransaction(
+                        currentAccountAddress,
+                        concordiumSDK.AccountTransactionType.RegisterData,
+                        registerData
+                    );
+
+                    startLoader();
+                    await grpcClient.waitForTransactionFinalization(
+                        concordiumSDK.TransactionHash.fromJSON(anchorTransactionHash),
+                        60 * 1000
+                    );
+                    stopLoader();
+
+                    const verificationRequest = concordiumSDK.VerificationRequestV1.create(
+                        requestContext,
+                        requestClaims,
+                        concordiumSDK.TransactionHash.fromJSON(anchorTransactionHash)
+                    );
+
+                    globalReq = verificationRequest;
+
+                    provider
+                        .requestVerifiablePresentationV1(verificationRequest)
+                        .then((proof) => {
+                            console.log(proof);
+                            alert('Proof received! (check the console)');
+                        })
+                        .catch(alert);
+                });
             }
             setupPage();
+        </script>
+        <script>
+            let loadingInterval = null;
+
+            function startLoader() {
+                const el = document.getElementById('loading');
+                let dots = 0;
+
+                el.style.display = 'block';
+
+                loadingInterval = setInterval(() => {
+                    dots = (dots + 1) % 4;
+                    el.textContent = 'Waiting For Transaction Finalisation' + '.'.repeat(dots);
+                }, 500);
+            }
+
+            function stopLoader() {
+                const el = document.getElementById('loading');
+
+                clearInterval(loadingInterval);
+                loadingInterval = null;
+                el.style.display = 'none';
+            }
         </script>
     </head>
 
@@ -95,10 +309,14 @@
             <button id="connect">Connect</button>
             <h3 id="accountAddress" style="display: inline">Account address:</h3>
         </div>
+        <div id="loading" style="display: none">Waiting For Transaction Finalisation</div>
         <br />
         <button id="requestAccounts">Request accounts</button>
         <button id="idProof">Request an ID Proof</button>
         <button id="web3Proof">Request an ID 3 Proof</button>
         <button id="ageProof">Request an Age Proof</button>
+        <button id="idProofV1Single">Request an ID V1 Proof (Single statement)</button>
+        <button id="idProofV1Multiple">Request an ID V1 Proof (Multiple statement)</button>
+        <button id="idProofV1MultipleAccount">Request an Account ID V1 Proof (Multiple statement)</button>
     </body>
 </html>

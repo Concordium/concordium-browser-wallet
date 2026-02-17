@@ -1,5 +1,4 @@
 import {
-    createAccountDID,
     CredentialSchemaSubject,
     IDENTITY_SUBJECT_SCHEMA,
     RevealStatementV2,
@@ -7,11 +6,9 @@ import {
 } from '@concordium/web-sdk';
 
 import Text from '@popup/popupX/shared/Text';
-import { displayNameOrSplitAddress, useIdentityName, useIdentityOf } from '@popup/shared/utils/account-helpers';
 import { useDisplayAttributeValue } from '@popup/shared/utils/identity-helpers';
-import { ConfirmedIdentity, WalletCredential } from '@shared/storage/types';
-import { getCredentialIdFromSubjectDID } from '@shared/utils/verifiable-credential-helpers';
-import React, { useCallback, useMemo, useState } from 'react';
+import { ConfirmedIdentity } from '@shared/storage/types';
+import React, { useCallback, useEffect, useState } from 'react';
 import { useTranslation } from 'react-i18next';
 import { SecretStatement, useStatementName, useStatementValue } from '../IdProofRequest/DisplayStatement/utils';
 import CredentialSelector, { CredentialSelectorDisplayProps } from './CredentialSelector';
@@ -20,29 +17,23 @@ import { DisplaySecretStatements } from './Display/DisplaySecretStatements';
 import { OverwriteSecretLine } from './Display/utils';
 import { DisplayCredentialStatementProps, SecretStatementV2, StatementWithSource } from './utils';
 
-function DisplayAccount({ option }: CredentialSelectorDisplayProps<WalletCredential>) {
-    const identityName = useIdentityName(option);
-
-    if (!identityName) {
-        return null;
+function DisplayIdentity({ option }: CredentialSelectorDisplayProps<ConfirmedIdentity>) {
+    if (option.name) {
+        // Allow this expected React component
+        // eslint-disable-next-line react/jsx-no-useless-fragment
+        return <>{option.name}</>;
     }
 
-    return (
-        <>
-            {displayNameOrSplitAddress(option)} - {identityName}
-        </>
-    );
+    return null;
 }
 
-export default function AccountStatement({
+export default function IdentityStatement({
     credentialStatement,
     validCredentials,
     dappName,
-    chosenId,
     setChosenId,
-    net,
     showDescription,
-}: DisplayCredentialStatementProps<StatementWithSource, WalletCredential>) {
+}: DisplayCredentialStatementProps<StatementWithSource, ConfirmedIdentity>) {
     const { t } = useTranslation('web3IdProofRequest');
     const reveals = credentialStatement.statement.filter(
         (s) => s.type === StatementTypes.RevealAttribute
@@ -52,20 +43,15 @@ export default function AccountStatement({
     ) as SecretStatementV2[];
     const displayAttribute = useDisplayAttributeValue();
 
-    const initialIndex = useMemo(
-        () => validCredentials.findIndex((c) => c.credId === getCredentialIdFromSubjectDID(chosenId)),
-        []
-    );
-    const [chosenCredential, setChosenCredential] = useState<WalletCredential | undefined>(
-        validCredentials[initialIndex]
-    );
+    const [chosenIdentity, setChosenIdentity] = useState<ConfirmedIdentity | undefined>(validCredentials[0]);
 
-    // We do the type cast, because the check should have been done to filter validCredentials.
-    const identity = useIdentityOf(chosenCredential) as ConfirmedIdentity | undefined;
+    useEffect(() => {
+        setChosenId(validCredentials[0].index.toString());
+    }, []);
 
-    const onChange = useCallback((credential: WalletCredential) => {
-        setChosenCredential(credential);
-        setChosenId(createAccountDID(net, credential.credId));
+    const onChange = useCallback((identity: ConfirmedIdentity) => {
+        setChosenIdentity(identity);
+        setChosenId(identity.index.toString());
     }, []);
 
     const accountCreateSecretLine: OverwriteSecretLine = (statement: SecretStatementV2) => {
@@ -77,24 +63,24 @@ export default function AccountStatement({
         };
     };
 
-    if (!identity || !chosenCredential) {
+    if (!chosenIdentity) {
         return null;
     }
 
     return (
         <>
             {showDescription && <Text.Capture>{t('descriptions.accountCredential')}</Text.Capture>}
-            <CredentialSelector<WalletCredential>
+            <CredentialSelector<ConfirmedIdentity>
                 options={validCredentials}
-                Display={DisplayAccount}
-                id={(cred) => cred.credId}
+                Display={DisplayIdentity}
+                id={(id) => id.index.toString()}
                 onChange={onChange}
-                value={chosenCredential}
+                value={chosenIdentity}
             />
             {reveals.length !== 0 && (
                 <DisplayRevealStatements
                     dappName={dappName}
-                    attributes={identity.idObject.value.attributeList.chosenAttributes}
+                    attributes={chosenIdentity.idObject.value.attributeList.chosenAttributes}
                     statements={reveals}
                     formatAttribute={displayAttribute}
                     schema={IDENTITY_SUBJECT_SCHEMA as CredentialSchemaSubject}
@@ -102,7 +88,7 @@ export default function AccountStatement({
             )}
             {secrets.length !== 0 && (
                 <DisplaySecretStatements
-                    attributes={identity.idObject.value.attributeList.chosenAttributes}
+                    attributes={chosenIdentity.idObject.value.attributeList.chosenAttributes}
                     statements={secrets}
                     formatAttribute={displayAttribute}
                     schema={IDENTITY_SUBJECT_SCHEMA as CredentialSchemaSubject}

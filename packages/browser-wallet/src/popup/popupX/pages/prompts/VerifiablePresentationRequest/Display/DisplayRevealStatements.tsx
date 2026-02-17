@@ -44,7 +44,7 @@ export function DisplayRevealStatements<Attribute extends AttributeType>({
                 </DisplayStatementsTooltip>
             </Card.Row>
             {lines.map((l, i) => (
-                <Card.Row className="display-statement-x__row">
+                <Card.Row className="display-statement-x__row" key={l.attribute}>
                     <Text.CaptureAdditional>
                         <DisplayStatementLine
                             // eslint-disable-next-line react/no-array-index-key

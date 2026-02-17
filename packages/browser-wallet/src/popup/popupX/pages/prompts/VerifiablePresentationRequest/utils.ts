@@ -1,22 +1,27 @@
 import {
-    RequestStatement,
-    ConcordiumHdWallet,
-    createWeb3CommitmentInputWithHdWallet,
-    createAccountCommitmentInputWithHdWallet,
-    VerifiableCredentialStatement,
     AccountCredentialStatement,
-    Network,
     AtomicStatementV2,
-    RevealStatementV2,
-    createWeb3IdDID,
-    canProveCredentialStatement,
     AttributeType,
+    canProveCredentialStatement,
+    ConcordiumHdWallet,
+    createAccountCommitmentInputWithHdWallet,
+    createIdentityCommitmentInputWithHdWallet,
+    createWeb3CommitmentInputWithHdWallet,
+    createWeb3IdDID,
+    CredentialRegistrationId,
+    CredentialStatement,
     CredentialSubject,
+    Network,
+    RequestStatement,
+    RevealStatementV2,
+    VerifiableCredentialStatement,
+    VerificationRequestV1,
 } from '@concordium/web-sdk';
 import { isIdentityOfCredential } from '@shared/utils/identity-helpers';
 import {
     ConfirmedIdentity,
     CreationStatus,
+    IdentityProvider,
     VerifiableCredential,
     VerifiableCredentialStatus,
     WalletCredential,
@@ -28,6 +33,8 @@ import {
     getVerifiableCredentialPublicKeyfromSubjectDID,
 } from '@shared/utils/verifiable-credential-helpers';
 import { areContractAddressesEqual } from '@shared/utils/contract-helpers';
+
+export type StatementWithSource = CredentialStatement & { source?: VerificationRequestV1.IdentityCredType[] };
 
 export type SecretStatementV2 = Exclude<AtomicStatementV2, RevealStatementV2>;
 
@@ -70,6 +77,46 @@ export function getAccountCredentialCommitmentInput(
     );
 }
 
+export function getIdentityCommitmentInput(
+    wallet: ConcordiumHdWallet,
+    identity: ConfirmedIdentity,
+    credentials: WalletCredential[],
+    providers: IdentityProvider[]
+) {
+    const idp = providers.find((provider) => provider.ipInfo.ipIdentity === identity.providerIndex);
+
+    if (!idp) {
+        throw new Error('No IDP found for identity');
+    }
+
+    return createIdentityCommitmentInputWithHdWallet(identity.idObject.value, idp, identity.index, wallet);
+}
+
+export function getAccountCredentialCommitmentInputV1(
+    statement: RequestStatement,
+    identities: ConfirmedIdentity[],
+    credentials: WalletCredential[]
+) {
+    const credId = getCredentialIdFromSubjectDID(statement.id);
+    const credential = credentials.find((cred) => cred.credId === credId);
+
+    if (!credential) {
+        throw new Error('IdQualifier not fulfilled');
+    }
+
+    const identity = (identities || []).find((id) => isIdentityOfCredential(id)(credential));
+
+    if (!identity || identity.status !== CreationStatus.Confirmed) {
+        throw new Error('No identity found for credential');
+    }
+
+    return {
+        chosenAttributes: identity.idObject.value.attributeList.chosenAttributes,
+        providerIndex: identity.providerIndex,
+        credRegId: CredentialRegistrationId.fromHexString(credId),
+    };
+}
+
 export function getWeb3CommitmentInput(verifiableCredential: VerifiableCredential, wallet: ConcordiumHdWallet) {
     return createWeb3CommitmentInputWithHdWallet(
         wallet,
@@ -87,6 +134,14 @@ export function getAccountCredentialsWithMatchingIssuer(
 ) {
     const allowedIssuers = credentialStatement.idQualifier.issuers;
     return credentials?.filter((c) => allowedIssuers.includes(c.providerIndex));
+}
+
+export function getIdentitiesWithMatchingIssuer(
+    credentialStatement: CredentialStatement,
+    identities: ConfirmedIdentity[]
+) {
+    const allowedIssuers = credentialStatement.idQualifier.issuers as number[];
+    return identities?.filter((identity) => allowedIssuers.includes(identity.providerIndex));
 }
 
 /**
@@ -155,6 +210,19 @@ export function getViableWeb3IdCredentialsForStatement(
     );
     return allowedCredentials.filter((cred) =>
         canProveCredentialStatement(credentialStatement, cred.credentialSubject.attributes)
+    );
+}
+
+/**
+ * Given a credential statement for an identity, return whether the identity satisfies the statement.
+ */
+export function getViableIdentitiesForStatement(
+    credentialStatement: CredentialStatement,
+    identities: ConfirmedIdentity[]
+) {
+    const identitiesWithMatchingIssuer = getIdentitiesWithMatchingIssuer(credentialStatement, identities);
+    return identitiesWithMatchingIssuer?.filter((identity) =>
+        canProveCredentialStatement(credentialStatement, identity.idObject.value.attributeList.chosenAttributes)
     );
 }
 

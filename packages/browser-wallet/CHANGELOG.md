@@ -2,6 +2,8 @@
 
 ## Unreleased
 
+-   Added support for Auditable ID proof, in the same UI used for the current proofs.
+
 ## 2.8.0
 
 -   Added support for Sponsored Transactions handling. With new method `sendSponsoredTransaction` in wallet-api.

@@ -1,20 +1,22 @@
 import {
+    AttributeKeyString,
+    AttributeType,
+    ConcordiumGRPCWebClient,
     CredentialStatements,
     getVerifiablePresentation,
-    Web3IdProofInput,
-    ConcordiumGRPCWebClient,
-    verifyWeb3IdCredentialSignature,
-    isHex,
-    verifyAtomicStatements,
-    isAccountCredentialStatement,
     IDENTITY_SUBJECT_SCHEMA,
-    verifyIdstatement,
     IdStatement,
-    StatementTypes,
-    AttributeType,
+    isAccountCredentialStatement,
+    isHex,
     isTimestampAttribute,
+    StatementTypes,
     TimestampAttribute,
-    AttributeKeyString,
+    VerifiablePresentationV1,
+    VerificationRequestV1,
+    verifyAtomicStatements,
+    verifyIdstatement,
+    verifyWeb3IdCredentialSignature,
+    Web3IdProofInput,
 } from '@concordium/web-sdk';
 import {
     sessionVerifiableCredentials,
@@ -23,7 +25,7 @@ import {
     useIndexedStorage,
 } from '@shared/storage/access';
 
-import { CredentialProof, APIVerifiableCredential } from '@concordium/browser-wallet-api-helpers';
+import { APIVerifiableCredential, CredentialProof } from '@concordium/browser-wallet-api-helpers';
 import { GRPCTIMEOUT } from '@shared/constants/networkConfiguration';
 import { VerifiableCredential } from '@shared/storage/types';
 import { addToList, removeFromList, web3IdCredentialLock } from '@shared/storage/update';
@@ -43,6 +45,7 @@ import { isAgeStatement, SecretStatement } from '@popup/pages/IdProofRequest/Dis
 import { logError } from '@shared/utils/log-helpers';
 import { openWindow, RunCondition, testPopupOpen } from './window-management';
 import bgMessageHandler from './message-handler';
+// import { CommitmentInput, SubjectClaims } from '@concordium/web-sdk/src/wasm/VerifiablePresentationV1/proof';
 
 const NO_CREDENTIALS_FIT = 'No temporary credentials fit the given id';
 const INVALID_CREDENTIAL_PROOF = 'Invalid credential proof given';
@@ -229,6 +232,47 @@ export const runIfValidWeb3IdCredentialRequest: RunCondition<MessageStatusWrappe
     }
 };
 
+type Web3IdProofInputV1 = {
+    commitmentInputs: VerifiablePresentationV1.CommitmentInput[];
+    request: {
+        proofClaims: VerifiablePresentationV1.SubjectClaims[];
+        requestRaw: string;
+    };
+};
+
+async function createAuditableWeb3ProofV1({
+    commitmentInputs,
+    request: { proofClaims, requestRaw },
+}: Web3IdProofInputV1): Promise<ProofBackgroundResponse<VerifiablePresentationV1.Type>> {
+    const network = await storedCurrentNetwork.get();
+
+    if (!network) {
+        throw new Error('No network chosen');
+    }
+
+    const grpc = new ConcordiumGRPCWebClient(network.grpcUrl, network.grpcPort, { timeout: GRPCTIMEOUT });
+
+    const requestParsed = VerificationRequestV1.fromJSON(parse(requestRaw));
+
+    let presentation: VerifiablePresentationV1.Type;
+    try {
+        presentation = await VerifiablePresentationV1.createFromAnchor(
+            grpc,
+            requestParsed,
+            proofClaims,
+            commitmentInputs,
+            []
+        );
+    } catch (e) {
+        throw new Error('Error creating verifiable presentation from anchor');
+    }
+
+    return {
+        status: BackgroundResponseStatus.Success,
+        proof: presentation,
+    };
+}
+
 async function createWeb3Proof(input: Web3IdProofInput): Promise<ProofBackgroundResponse<string>> {
     const proof = getVerifiablePresentation(input);
     return {
@@ -238,7 +282,9 @@ async function createWeb3Proof(input: Web3IdProofInput): Promise<ProofBackground
 }
 
 export const createWeb3IdProofHandler: ExtensionMessageHandler = (msg, _sender, respond) => {
-    createWeb3Proof(parse(msg.payload))
+    const parsedPayload: Web3IdProofInput & Web3IdProofInputV1 = parse(msg.payload);
+    const proofHandler = parsedPayload.request.requestRaw ? createAuditableWeb3ProofV1 : createWeb3Proof;
+    proofHandler(parsedPayload)
         .then(respond)
         .catch((e: Error) => respond({ status: BackgroundResponseStatus.Error, error: e.message }));
     return true;
