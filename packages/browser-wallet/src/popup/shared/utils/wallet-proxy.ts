@@ -378,3 +378,10 @@ export async function getPltToken(tokenId: string): Promise<PltResponse | undefi
     const { data } = await (await getWalletProxy()).get(path);
     return data;
 }
+
+export async function getTransakOnRamp(accountAddress: string) {
+    const path = `/v0/transakOnRamp?address=${accountAddress}`;
+
+    const { data } = await (await getWalletProxy()).post(path);
+    return data;
+}

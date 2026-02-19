@@ -1,5 +1,5 @@
 .external-request-layout-x {
-    height: calc(100% - 2.4rem);
+    height: calc(100% - #{rem(45px)});
     overflow: hidden;
     max-width: rem(1328px);
     margin: auto;
