@@ -9,7 +9,6 @@ import {
     ConcordiumGRPCClient,
     ConcordiumHdWallet,
     createAccountDID,
-    CredentialStatement,
     isAccountCredentialStatement,
     isVerifiableCredentialStatement,
     Network,
@@ -53,6 +52,7 @@ import {
     getAccountCredentialCommitmentInputV1,
     getAccountCredentialsWithMatchingIssuer,
     getActiveWeb3IdCredentialsWithMatchingIssuer,
+    getIdentitiesWithMatchingIssuer,
     getIdentityCommitmentInput,
     getViableAccountCredentialsForStatement,
     getViableIdentitiesForStatement,
@@ -109,11 +109,15 @@ async function getAllCredentialStatuses(
 }
 
 function findCredentialsForStatementIssuer(
-    statement: CredentialStatement,
+    statement: StatementWithSource,
     credentials: WalletCredential[],
+    identities: ConfirmedIdentity[],
     verifiableCredentials: VerifiableCredential[],
     statuses: Record<string, VerifiableCredentialStatus | undefined> | undefined
 ) {
+    if (statement.source?.includes('identityCredential')) {
+        return getIdentitiesWithMatchingIssuer(statement, identities);
+    }
     if (isAccountCredentialStatement(statement)) {
         return getAccountCredentialsWithMatchingIssuer(statement, credentials);
     }
@@ -134,16 +138,18 @@ function DisplayNotProvable({
 }: {
     onClick: () => void;
     dappName: string;
-    statement: CredentialStatement;
+    statement: StatementWithSource;
     net: Network;
     statuses: Record<string, VerifiableCredentialStatus | undefined> | undefined;
 }) {
     const { t } = useTranslation('x', { keyPrefix: 'prompts.verifiablePresentationRequest' });
     const credentials = useAtomValue(credentialsAtom);
+    const identities = useConfirmedIdentities();
     const verifiableCredentials = useAtomValue(storedVerifiableCredentialsAtom);
     const validCredentials = findCredentialsForStatementIssuer(
         statement,
         credentials,
+        identities.value,
         verifiableCredentials.value,
         statuses
     );
