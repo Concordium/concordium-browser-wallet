@@ -2,6 +2,8 @@
 
 ## Unreleased
 
+-   Added new on-ramp provider `Transak`
+
 ## 2.8.0
 
 -   Added support for Sponsored Transactions handling. With new method `sendSponsoredTransaction` in wallet-api.
