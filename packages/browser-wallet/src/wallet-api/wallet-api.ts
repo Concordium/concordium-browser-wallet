@@ -327,6 +327,7 @@ class WalletApi extends EventEmitter implements IWalletApi {
             // We have to stringify the statements because they can contain bigints
             statements: stringify(statements),
             challenge,
+            version: 0,
         });
 
         if (!res.success) {
@@ -337,33 +338,12 @@ class WalletApi extends EventEmitter implements IWalletApi {
     }
 
     public async requestVerifiablePresentationV1(request: VerificationRequestV1.Type) {
-        // Extract statements to be used in UI representation and validation
-        const statementsConverted = request.subjectClaims.map(({ statements, issuers, source }) => ({
-            statement: statements,
-            source,
-            idQualifier: {
-                type: 'cred',
-                issuers: issuers.map((issuer) => issuer.index),
-            },
-        }));
-
-        // Create Hex placeholder for validation pass
-        const challenge = 'A'.repeat(64);
-
-        // Helper object with old payload structure for validation reuse
-        // Can be used in this way, because new subject claims is same as old ones
-        // And if mapping of new ones will fail, this will also validate proper payload structure
-        const representationObj = {
-            statements: stringify(statementsConverted),
-            challenge,
-        };
-
         const res = await this.messageHandler.sendMessage<MessageStatusWrapper<VerifiablePresentationV1.JSON>>(
             MessageType.Web3IdProof,
             {
                 // We have to stringify the statements because they can contain bigints
                 verificationRequestV1: stringify(request),
-                ...representationObj,
+                version: 1,
             }
         );
 

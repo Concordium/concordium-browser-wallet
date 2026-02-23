@@ -74,6 +74,7 @@ interface Location {
             statements: string;
             url: string;
             verificationRequestV1: string;
+            version: number;
         };
     };
 }
@@ -188,6 +189,18 @@ function DisplayNotProvable({
     );
 }
 
+const getStatementsFromVerificationRequestV1 = (verificationRequestV1: string) =>
+    VerificationRequestV1.fromJSON(parse(verificationRequestV1)).subjectClaims.map(
+        ({ statements, issuers, source }) => ({
+            statement: statements,
+            source,
+            idQualifier: {
+                type: 'cred',
+                issuers: issuers.map((issuer) => issuer.index),
+            },
+        })
+    );
+
 export default function VerifiablePresentationRequest({ onReject, onSubmit }: Props) {
     const { state } = useLocation() as Location;
     const {
@@ -195,6 +208,7 @@ export default function VerifiablePresentationRequest({ onReject, onSubmit }: Pr
         challenge,
         url,
         verificationRequestV1: rawVerificationRequestV1,
+        version,
     } = state.payload;
     const { onClose, withClose } = useContext(fullscreenPromptContext);
     const { t } = useTranslation('x', { keyPrefix: 'prompts.verifiablePresentationRequest' });
@@ -209,7 +223,15 @@ export default function VerifiablePresentationRequest({ onReject, onSubmit }: Pr
     const net = getNet(network);
     const [proof, setProof] = useState<Promise<string | { proof: object }>>();
 
-    const statements: StatementWithSource[] = useMemo(() => parse(rawStatements), [rawStatements]);
+    const statements: StatementWithSource[] = useMemo(() => {
+        if (version === 0 && rawStatements) {
+            return parse(rawStatements);
+        }
+        if (version === 1 && rawVerificationRequestV1) {
+            return getStatementsFromVerificationRequestV1(rawVerificationRequestV1);
+        }
+        return [];
+    }, [version, rawStatements, rawVerificationRequestV1]);
 
     const [ids, setIds] = useState<string[]>([]);
 

@@ -2,10 +2,11 @@
 
 ### Unreleased
 
+-   Added `requestVerifiablePresentationV1` entrypoint to prove statements about identities and verifiable credentials with auditable anchor
+
 ### 3.1.0
 
 -   Updated handler `sendTransaction` with new payload type `TokenUpdatePayload`
--   Added `requestVerifiablePresentationV1` entrypoint to prove statements about identities and verifiable credentials with auditable anchor
 
 ## 3.0.1
 

@@ -45,7 +45,6 @@ import { isAgeStatement, SecretStatement } from '@popup/pages/IdProofRequest/Dis
 import { logError } from '@shared/utils/log-helpers';
 import { openWindow, RunCondition, testPopupOpen } from './window-management';
 import bgMessageHandler from './message-handler';
-// import { CommitmentInput, SubjectClaims } from '@concordium/web-sdk/src/wasm/VerifiablePresentationV1/proof';
 
 const NO_CREDENTIALS_FIT = 'No temporary credentials fit the given id';
 const INVALID_CREDENTIAL_PROOF = 'Invalid credential proof given';
@@ -290,13 +289,24 @@ export const createWeb3IdProofHandler: ExtensionMessageHandler = (msg, _sender, 
     return true;
 };
 
-export const runIfValidWeb3IdProof: RunCondition<MessageStatusWrapper<undefined>> = async (msg) => {
-    if (!isHex(msg.payload.challenge) || msg.payload.challenge.length !== 64) {
+const convertWeb3IdV1ToOldProof = (verificationRequestV1: string): CredentialStatements =>
+    VerificationRequestV1.fromJSON(parse(verificationRequestV1)).subjectClaims.map(
+        ({ statements, issuers, source }) => ({
+            statement: statements,
+            source,
+            idQualifier: {
+                type: 'cred',
+                issuers: issuers.map((issuer) => issuer.index),
+            },
+        })
+    );
+
+const validateWeb3IdCredentialStatements = (challenge: string, statements: CredentialStatements) => {
+    if (!isHex(challenge) || challenge.length !== 64) {
         return rejectRequest(`Challenge is invalid, it should be 32 bytes as a HEX encoded string`);
     }
-    try {
-        const statements: CredentialStatements = parse(msg.payload.statements);
 
+    try {
         // The `verifyAtomicStatements` method only verifies the bounds of the statement variables when it has the
         // schema available. So we manually do this check here, even though it ideally be moved to the SDK.
         for (const stat of statements) {
@@ -345,10 +355,27 @@ export const runIfValidWeb3IdProof: RunCondition<MessageStatusWrapper<undefined>
         if (!noEmptyQualifier) {
             return rejectRequest(`Statements must have at least 1 possible identity provider / issuer`);
         }
-        return { run: true };
+
+        // Needs explicit type
+        // { run: true } converted to type { run: boolean }, but expected type { run: true }
+        return { run: true } as { run: true };
     } catch (e) {
         return rejectRequest(`Statement is not well-formed: ${(e as Error).message}`);
     }
+};
+
+export const runIfValidWeb3IdProof: RunCondition<MessageStatusWrapper<undefined>> = async (msg) => {
+    if (msg.payload.version === 0) {
+        return validateWeb3IdCredentialStatements(msg.payload.challenge, parse(msg.payload.statements));
+    }
+
+    if (msg.payload.version === 1) {
+        const statements = convertWeb3IdV1ToOldProof(msg.payload.verificationRequestV1);
+        const challenge = 'A'.repeat(64);
+        return validateWeb3IdCredentialStatements(challenge, statements);
+    }
+
+    return rejectRequest(`Web3Id request unknown version`);
 };
 
 /**
@@ -397,9 +424,12 @@ export const loadWeb3IdBackupHandler: ExtensionMessageHandler = (_msg, _sender, 
  * i.e. it is a single account credential statement with a single atomic statement, which is an age statement.
  * n.b. We have this to filter some request to a special page for age statements.
  */
-export function isAgeProof(payload: { statements: string }): boolean {
+export function isAgeProof(payload: { statements: string; verificationRequestV1: string; version: number }): boolean {
     try {
-        const statements: CredentialStatements = parse(payload.statements);
+        let statements: CredentialStatements = [];
+        if (payload.version === 0) statements = parse(payload.statements);
+        if (payload.version === 1) statements = convertWeb3IdV1ToOldProof(payload.verificationRequestV1);
+
         const credentialStatement = statements[0];
 
         if (!(statements.length === 1 && isAccountCredentialStatement(credentialStatement))) {
