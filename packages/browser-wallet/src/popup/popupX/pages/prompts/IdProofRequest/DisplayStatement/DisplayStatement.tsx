@@ -66,7 +66,7 @@ export function DisplayStatementView({ className, lines, dappName, header, ...pr
     const { t } = useTranslation('x', { keyPrefix: 'prompts.idProofRequestX.displayStatement' });
 
     return (
-        <Card className={clsx(className, 'display-statement-x')} type="grey">
+        <Card className={clsx(className, 'display-statement-x')} type="grey" key="statement-view">
             <Card.Row className="display-statement-x__header">
                 <Text.CaptureAdditional>{header}</Text.CaptureAdditional>
                 <DisplayStatementsTooltip>
@@ -85,7 +85,7 @@ export function DisplayStatementView({ className, lines, dappName, header, ...pr
                 </DisplayStatementsTooltip>
             </Card.Row>
             {lines.map((l, i) => (
-                <Card.Row className="display-statement-x__row">
+                <Card.Row className="display-statement-x__row" key={l.attribute}>
                     <Text.CaptureAdditional>
                         <DisplayStatementLine
                             // eslint-disable-next-line react/no-array-index-key

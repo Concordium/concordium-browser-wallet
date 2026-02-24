@@ -1,5 +1,5 @@
 import { InjectedMessageHandler, createEventTypeFilter, MessageType, MessageStatusWrapper } from '@messaging';
-import { Transaction } from '@concordium/web-sdk';
+import { Transaction, VerifiablePresentationV1, VerificationRequestV1 } from '@concordium/web-sdk';
 import {
     AccountAddress,
     AccountTransactionSignature,
@@ -327,6 +327,7 @@ class WalletApi extends EventEmitter implements IWalletApi {
             // We have to stringify the statements because they can contain bigints
             statements: stringify(statements),
             challenge,
+            version: 0,
         });
 
         if (!res.success) {
@@ -334,6 +335,23 @@ class WalletApi extends EventEmitter implements IWalletApi {
         }
 
         return VerifiablePresentation.fromString(res.result);
+    }
+
+    public async requestVerifiablePresentationV1(request: VerificationRequestV1.Type) {
+        const res = await this.messageHandler.sendMessage<MessageStatusWrapper<VerifiablePresentationV1.JSON>>(
+            MessageType.Web3IdProof,
+            {
+                // We have to stringify the statements because they can contain bigints
+                verificationRequestV1: stringify(request),
+                version: 1,
+            }
+        );
+
+        if (!res.success) {
+            throw new Error(res.message);
+        }
+
+        return VerifiablePresentationV1.fromJSON(res.result);
     }
 }
 

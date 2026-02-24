@@ -1,20 +1,22 @@
 import {
+    AttributeKeyString,
+    AttributeType,
+    ConcordiumGRPCWebClient,
     CredentialStatements,
     getVerifiablePresentation,
-    Web3IdProofInput,
-    ConcordiumGRPCWebClient,
-    verifyWeb3IdCredentialSignature,
-    isHex,
-    verifyAtomicStatements,
-    isAccountCredentialStatement,
     IDENTITY_SUBJECT_SCHEMA,
-    verifyIdstatement,
     IdStatement,
-    StatementTypes,
-    AttributeType,
+    isAccountCredentialStatement,
+    isHex,
     isTimestampAttribute,
+    StatementTypes,
     TimestampAttribute,
-    AttributeKeyString,
+    VerifiablePresentationV1,
+    VerificationRequestV1,
+    verifyAtomicStatements,
+    verifyIdstatement,
+    verifyWeb3IdCredentialSignature,
+    Web3IdProofInput,
 } from '@concordium/web-sdk';
 import {
     sessionVerifiableCredentials,
@@ -23,7 +25,7 @@ import {
     useIndexedStorage,
 } from '@shared/storage/access';
 
-import { CredentialProof, APIVerifiableCredential } from '@concordium/browser-wallet-api-helpers';
+import { APIVerifiableCredential, CredentialProof } from '@concordium/browser-wallet-api-helpers';
 import { GRPCTIMEOUT } from '@shared/constants/networkConfiguration';
 import { VerifiableCredential } from '@shared/storage/types';
 import { addToList, removeFromList, web3IdCredentialLock } from '@shared/storage/update';
@@ -229,6 +231,47 @@ export const runIfValidWeb3IdCredentialRequest: RunCondition<MessageStatusWrappe
     }
 };
 
+type Web3IdProofInputV1 = {
+    commitmentInputs: VerifiablePresentationV1.CommitmentInput[];
+    request: {
+        proofClaims: VerifiablePresentationV1.SubjectClaims[];
+        requestRaw: string;
+    };
+};
+
+async function createAuditableWeb3ProofV1({
+    commitmentInputs,
+    request: { proofClaims, requestRaw },
+}: Web3IdProofInputV1): Promise<ProofBackgroundResponse<VerifiablePresentationV1.Type>> {
+    const network = await storedCurrentNetwork.get();
+
+    if (!network) {
+        throw new Error('No network chosen');
+    }
+
+    const grpc = new ConcordiumGRPCWebClient(network.grpcUrl, network.grpcPort, { timeout: GRPCTIMEOUT });
+
+    const requestParsed = VerificationRequestV1.fromJSON(parse(requestRaw));
+
+    let presentation: VerifiablePresentationV1.Type;
+    try {
+        presentation = await VerifiablePresentationV1.createFromAnchor(
+            grpc,
+            requestParsed,
+            proofClaims,
+            commitmentInputs,
+            []
+        );
+    } catch (e) {
+        throw new Error('Error creating verifiable presentation from anchor');
+    }
+
+    return {
+        status: BackgroundResponseStatus.Success,
+        proof: presentation,
+    };
+}
+
 async function createWeb3Proof(input: Web3IdProofInput): Promise<ProofBackgroundResponse<string>> {
     const proof = getVerifiablePresentation(input);
     return {
@@ -238,19 +281,32 @@ async function createWeb3Proof(input: Web3IdProofInput): Promise<ProofBackground
 }
 
 export const createWeb3IdProofHandler: ExtensionMessageHandler = (msg, _sender, respond) => {
-    createWeb3Proof(parse(msg.payload))
+    const parsedPayload: Web3IdProofInput & Web3IdProofInputV1 = parse(msg.payload);
+    const proofHandler = parsedPayload.request.requestRaw ? createAuditableWeb3ProofV1 : createWeb3Proof;
+    proofHandler(parsedPayload)
         .then(respond)
         .catch((e: Error) => respond({ status: BackgroundResponseStatus.Error, error: e.message }));
     return true;
 };
 
-export const runIfValidWeb3IdProof: RunCondition<MessageStatusWrapper<undefined>> = async (msg) => {
-    if (!isHex(msg.payload.challenge) || msg.payload.challenge.length !== 64) {
+const convertWeb3IdV1ToOldProof = (verificationRequestV1: string): CredentialStatements =>
+    VerificationRequestV1.fromJSON(parse(verificationRequestV1)).subjectClaims.map(
+        ({ statements, issuers, source }) => ({
+            statement: statements,
+            source,
+            idQualifier: {
+                type: 'cred',
+                issuers: issuers.map((issuer) => issuer.index),
+            },
+        })
+    );
+
+const validateWeb3IdCredentialStatements = (challenge: string, statements: CredentialStatements) => {
+    if (!isHex(challenge) || challenge.length !== 64) {
         return rejectRequest(`Challenge is invalid, it should be 32 bytes as a HEX encoded string`);
     }
-    try {
-        const statements: CredentialStatements = parse(msg.payload.statements);
 
+    try {
         // The `verifyAtomicStatements` method only verifies the bounds of the statement variables when it has the
         // schema available. So we manually do this check here, even though it ideally be moved to the SDK.
         for (const stat of statements) {
@@ -299,10 +355,33 @@ export const runIfValidWeb3IdProof: RunCondition<MessageStatusWrapper<undefined>
         if (!noEmptyQualifier) {
             return rejectRequest(`Statements must have at least 1 possible identity provider / issuer`);
         }
-        return { run: true };
+
+        // Needs explicit type
+        // { run: true } converted to type { run: boolean }, but expected type { run: true }
+        return { run: true } as { run: true };
     } catch (e) {
         return rejectRequest(`Statement is not well-formed: ${(e as Error).message}`);
     }
+};
+
+export const runIfValidWeb3IdProof: RunCondition<MessageStatusWrapper<undefined>> = async (msg) => {
+    if (msg.payload.version === 0) {
+        return validateWeb3IdCredentialStatements(msg.payload.challenge, parse(msg.payload.statements));
+    }
+
+    if (msg.payload.version === 1) {
+        // Helper function with old payload structure for validation reuse
+        // Can be used in this way, because new subject claims is same as old ones
+        // And if mapping of new ones will fail, this will also validate proper payload structure
+        const statements = convertWeb3IdV1ToOldProof(msg.payload.verificationRequestV1);
+
+        // Create Hex placeholder for validation pass
+        const challenge = 'A'.repeat(64);
+
+        return validateWeb3IdCredentialStatements(challenge, statements);
+    }
+
+    return rejectRequest(`Web3Id request unknown version`);
 };
 
 /**
@@ -351,9 +430,12 @@ export const loadWeb3IdBackupHandler: ExtensionMessageHandler = (_msg, _sender, 
  * i.e. it is a single account credential statement with a single atomic statement, which is an age statement.
  * n.b. We have this to filter some request to a special page for age statements.
  */
-export function isAgeProof(payload: { statements: string }): boolean {
+export function isAgeProof(payload: { statements: string; verificationRequestV1: string; version: number }): boolean {
     try {
-        const statements: CredentialStatements = parse(payload.statements);
+        let statements: CredentialStatements = [];
+        if (payload.version === 0) statements = parse(payload.statements);
+        if (payload.version === 1) statements = convertWeb3IdV1ToOldProof(payload.verificationRequestV1);
+
         const credentialStatement = statements[0];
 
         if (!(statements.length === 1 && isAccountCredentialStatement(credentialStatement))) {

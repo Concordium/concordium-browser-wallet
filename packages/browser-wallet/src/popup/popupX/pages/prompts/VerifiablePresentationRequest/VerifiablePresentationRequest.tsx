@@ -4,22 +4,24 @@ import { useLocation } from 'react-router-dom';
 import { useAtomValue, useSetAtom } from 'jotai';
 import { Trans, useTranslation } from 'react-i18next';
 import {
-    CredentialStatements,
-    RequestStatement,
-    ConcordiumHdWallet,
-    isAccountCredentialStatement,
-    ConcordiumGRPCClient,
+    AttributeKey,
     CommitmentInput,
-    isVerifiableCredentialStatement,
-    CredentialStatement,
-    Network,
+    ConcordiumGRPCClient,
+    ConcordiumHdWallet,
     createAccountDID,
+    isAccountCredentialStatement,
+    isVerifiableCredentialStatement,
+    Network,
+    RequestStatement,
+    VerifiablePresentationV1,
+    VerificationRequestV1,
 } from '@concordium/web-sdk';
 import { noOp, useAsyncMemo } from 'wallet-common-helpers';
 
 import { grpcClientAtom, networkConfigurationAtom } from '@popup/store/settings';
 import { credentialsAtom } from '@popup/store/account';
 import { addToastAtom } from '@popup/state';
+import { identityProvidersAtom } from '@popup/store/identity';
 import { useDecryptedSeedPhrase } from '@popup/shared/utils/seed-phrase-helpers';
 import { getGlobal, getNet } from '@shared/utils/network-helpers';
 import { displayUrl } from '@popup/shared/utils/string-helpers';
@@ -29,7 +31,12 @@ import {
 } from '@popup/store/verifiable-credential';
 import { useConfirmedIdentities } from '@popup/shared/utils/identity-helpers';
 import { parse } from '@shared/utils/payload-helpers';
-import { VerifiableCredential, VerifiableCredentialStatus, WalletCredential } from '@shared/storage/types';
+import {
+    ConfirmedIdentity,
+    VerifiableCredential,
+    VerifiableCredentialStatus,
+    WalletCredential,
+} from '@shared/storage/types';
 import { getVerifiableCredentialStatus } from '@shared/utils/verifiable-credential-helpers';
 import { proveWeb3Request } from '@shared/utils/proof-helpers';
 import Page from '@popup/popupX/shared/Page';
@@ -42,11 +49,16 @@ import { ProofStatusPrompt } from '../IdProofRequest/IdProofRequest';
 import {
     createWeb3IdDIDFromCredential,
     getAccountCredentialCommitmentInput,
+    getAccountCredentialCommitmentInputV1,
     getAccountCredentialsWithMatchingIssuer,
     getActiveWeb3IdCredentialsWithMatchingIssuer,
+    getIdentitiesWithMatchingIssuer,
+    getIdentityCommitmentInput,
     getViableAccountCredentialsForStatement,
+    getViableIdentitiesForStatement,
     getViableWeb3IdCredentialsForStatement,
     getWeb3CommitmentInput,
+    StatementWithSource,
 } from './utils';
 import { DisplayCredentialStatement } from './DisplayStatement';
 
@@ -61,18 +73,26 @@ interface Location {
             challenge: string;
             statements: string;
             url: string;
+            verificationRequestV1: string;
+            version: number;
         };
     };
 }
 
 function getIdFromCredential(
-    cred: WalletCredential | VerifiableCredential,
-    statement: CredentialStatement,
+    cred: WalletCredential | VerifiableCredential | ConfirmedIdentity,
+    statement: StatementWithSource,
     net: Network
 ): string {
-    return isVerifiableCredentialStatement(statement)
-        ? createWeb3IdDIDFromCredential(cred as VerifiableCredential, net)
-        : createAccountDID(net, (cred as WalletCredential).credId);
+    if (statement.source?.includes('identityCredential')) {
+        return (cred as ConfirmedIdentity).index.toString();
+    }
+
+    if (isVerifiableCredentialStatement(statement)) {
+        return createWeb3IdDIDFromCredential(cred as VerifiableCredential, net);
+    }
+
+    return createAccountDID(net, (cred as WalletCredential).credId);
 }
 
 async function getAllCredentialStatuses(
@@ -90,11 +110,15 @@ async function getAllCredentialStatuses(
 }
 
 function findCredentialsForStatementIssuer(
-    statement: CredentialStatement,
+    statement: StatementWithSource,
     credentials: WalletCredential[],
+    identities: ConfirmedIdentity[],
     verifiableCredentials: VerifiableCredential[],
     statuses: Record<string, VerifiableCredentialStatus | undefined> | undefined
 ) {
+    if (statement.source?.includes('identityCredential')) {
+        return getIdentitiesWithMatchingIssuer(statement, identities);
+    }
     if (isAccountCredentialStatement(statement)) {
         return getAccountCredentialsWithMatchingIssuer(statement, credentials);
     }
@@ -115,16 +139,18 @@ function DisplayNotProvable({
 }: {
     onClick: () => void;
     dappName: string;
-    statement: CredentialStatement;
+    statement: StatementWithSource;
     net: Network;
     statuses: Record<string, VerifiableCredentialStatus | undefined> | undefined;
 }) {
     const { t } = useTranslation('x', { keyPrefix: 'prompts.verifiablePresentationRequest' });
     const credentials = useAtomValue(credentialsAtom);
+    const identities = useConfirmedIdentities();
     const verifiableCredentials = useAtomValue(storedVerifiableCredentialsAtom);
     const validCredentials = findCredentialsForStatementIssuer(
         statement,
         credentials,
+        identities.value,
         verifiableCredentials.value,
         statuses
     );
@@ -163,22 +189,50 @@ function DisplayNotProvable({
     );
 }
 
+const getStatementsFromVerificationRequestV1 = (verificationRequestV1: string) =>
+    VerificationRequestV1.fromJSON(parse(verificationRequestV1)).subjectClaims.map(
+        ({ statements, issuers, source }) => ({
+            statement: statements,
+            source,
+            idQualifier: {
+                type: 'cred',
+                issuers: issuers.map((issuer) => issuer.index),
+            },
+        })
+    );
+
 export default function VerifiablePresentationRequest({ onReject, onSubmit }: Props) {
     const { state } = useLocation() as Location;
-    const { statements: rawStatements, challenge, url } = state.payload;
+    const {
+        statements: rawStatements,
+        challenge,
+        url,
+        verificationRequestV1: rawVerificationRequestV1,
+        version,
+    } = state.payload;
     const { onClose, withClose } = useContext(fullscreenPromptContext);
     const { t } = useTranslation('x', { keyPrefix: 'prompts.verifiablePresentationRequest' });
     const network = useAtomValue(networkConfigurationAtom);
     const client = useAtomValue(grpcClientAtom);
     const addToast = useSetAtom(addToastAtom);
+    const providers = useAtomValue(identityProvidersAtom);
     const recoveryPhrase = useDecryptedSeedPhrase((e) => addToast(e.message));
     const dappName = displayUrl(url);
     const [creatingProof, setCreatingProof] = useState<boolean>(false);
     const [currentStatementIndex, setCurrentStatementIndex] = useState<number>(0);
     const net = getNet(network);
-    const [proof, setProof] = useState<Promise<string>>();
+    const [proof, setProof] = useState<Promise<string | { proof: object }>>();
 
-    const statements: CredentialStatements = useMemo(() => parse(rawStatements), [rawStatements]);
+    const statements: StatementWithSource[] = useMemo(() => {
+        if (version === 0 && rawStatements) {
+            return parse(rawStatements);
+        }
+        if (version === 1 && rawVerificationRequestV1) {
+            return getStatementsFromVerificationRequestV1(rawVerificationRequestV1);
+        }
+        return [];
+    }, [version, rawStatements, rawVerificationRequestV1]);
+
     const [ids, setIds] = useState<string[]>([]);
 
     const verifiableCredentialSchemas = useAtomValue(storedVerifiableCredentialSchemasAtom);
@@ -196,11 +250,14 @@ export default function VerifiablePresentationRequest({ onReject, onSubmit }: Pr
         [verifiableCredentials.loading]
     );
 
-    const validCredentials = useMemo(() => {
+    const validCredentialsOrIdentities = useMemo(() => {
         if (identities.loading || verifiableCredentials.loading || !statuses) {
             return undefined;
         }
         return statements.map((statement) => {
+            if (statement.source?.includes('identityCredential')) {
+                return getViableIdentitiesForStatement(statement, identities.value);
+            }
             if (isAccountCredentialStatement(statement)) {
                 return getViableAccountCredentialsForStatement(statement, identities.value, credentials);
             }
@@ -212,18 +269,18 @@ export default function VerifiablePresentationRequest({ onReject, onSubmit }: Pr
     }, [identities.loading, verifiableCredentials.loading, Boolean(statuses)]);
 
     useEffect(() => {
-        if (validCredentials) {
+        if (validCredentialsOrIdentities) {
             setIds(
-                validCredentials.map((creds, index) =>
+                validCredentialsOrIdentities.map((creds, index) =>
                     creds[0] ? getIdFromCredential(creds[0], statements[index], net) : ''
                 )
             );
         }
-    }, [Boolean(validCredentials)]);
+    }, [Boolean(validCredentialsOrIdentities)]);
 
     const canProve = useMemo(
-        () => validCredentials && validCredentials.every((x) => x.length > 0),
-        [Boolean(validCredentials)]
+        () => validCredentialsOrIdentities && validCredentialsOrIdentities.every((x) => x.length > 0),
+        [Boolean(validCredentialsOrIdentities)]
     );
 
     const handleSubmit = useCallback(async () => {
@@ -237,32 +294,102 @@ export default function VerifiablePresentationRequest({ onReject, onSubmit }: Pr
         const global = await getGlobal(client);
         const wallet = ConcordiumHdWallet.fromHex(recoveryPhrase, net);
 
-        const parsedStatements: RequestStatement[] = [];
-        const commitmentInputs: CommitmentInput[] = [];
+        const accountCredentialCommitment = (statement: StatementWithSource, index: number) => {
+            const requestStatement = { statement: statement.statement, id: ids[index] };
 
-        statements.forEach((statement, index) => {
-            if (isAccountCredentialStatement(statement)) {
-                const requestStatement = { statement: statement.statement, id: ids[index] };
-                parsedStatements.push(requestStatement);
-                commitmentInputs.push(
-                    getAccountCredentialCommitmentInput(requestStatement, wallet, identities.value, credentials)
-                );
-            } else {
-                const cred = verifiableCredentials.value.find((c) => c.id === ids[index]);
+            return {
+                requestStatement,
+                commitmentInput: getAccountCredentialCommitmentInput(
+                    requestStatement,
+                    wallet,
+                    identities.value,
+                    credentials
+                ),
+            };
+        };
 
-                if (!cred) {
-                    throw new Error('The credential was not found for a statement');
-                }
+        const web3Commitment = (statement: StatementWithSource, index: number) => {
+            const cred = verifiableCredentials.value.find((c) => c.id === ids[index]);
 
-                const requestStatement = { statement: statement.statement, id: ids[index], type: cred.type };
-                parsedStatements.push(requestStatement);
-                commitmentInputs.push(getWeb3CommitmentInput(cred, wallet));
+            if (!cred) {
+                throw new Error('The credential was not found for a statement');
             }
-        });
+
+            const requestStatement = { statement: statement.statement, id: ids[index], type: cred.type };
+
+            return {
+                requestStatement,
+                commitmentInput: getWeb3CommitmentInput(cred, wallet),
+            };
+        };
+
+        const accountCommitmentV1 = (statement: StatementWithSource, index: number) => {
+            const requestStatement = { statement: statement.statement, id: ids[index] };
+            const { chosenAttributes, providerIndex, credRegId } = getAccountCredentialCommitmentInputV1(
+                requestStatement,
+                identities.value,
+                credentials
+            );
+            return {
+                requestStatement: VerifiablePresentationV1.createAccountClaims(
+                    getNet(network),
+                    credRegId,
+                    providerIndex,
+                    VerifiablePresentationV1.revealRequestedStatements(
+                        statement.statement as VerificationRequestV1.RequestedStatement<AttributeKey>[],
+                        chosenAttributes
+                    )
+                ),
+                commitmentInput: getAccountCredentialCommitmentInput(
+                    requestStatement,
+                    wallet,
+                    identities.value,
+                    credentials
+                ),
+            };
+        };
+
+        const identityCommitmentV1 = (statement: StatementWithSource, index: number) => {
+            const identity = identities.value.find((id) => id.index === Number(ids[index]));
+
+            if (!identity) {
+                throw new Error('Identity was not find');
+            }
+
+            return {
+                requestStatement: VerifiablePresentationV1.createIdentityClaims(
+                    getNet(network),
+                    identity.providerIndex,
+                    VerifiablePresentationV1.revealRequestedStatements(
+                        statement.statement as VerificationRequestV1.RequestedStatement<AttributeKey>[],
+                        identity.idObject.value.attributeList.chosenAttributes
+                    )
+                ),
+                commitmentInput: getIdentityCommitmentInput(wallet, identity, credentials, providers),
+            };
+        };
+
+        const getCommitmentHandler = (statement: StatementWithSource) => {
+            if (statement.source?.includes('identityCredential')) return identityCommitmentV1;
+            if (statement.source?.includes('accountCredential')) return accountCommitmentV1;
+            if (isAccountCredentialStatement(statement)) return accountCredentialCommitment;
+            return web3Commitment;
+        };
+
+        const commitments = statements.map((statement, index) => getCommitmentHandler(statement)(statement, index));
+
+        const parsedStatements: (RequestStatement | VerifiablePresentationV1.SubjectClaims)[] = commitments.map(
+            ({ requestStatement }) => requestStatement
+        );
+        const commitmentInputs: (CommitmentInput | VerifiablePresentationV1.CommitmentInput)[] = commitments.map(
+            ({ commitmentInput }) => commitmentInput
+        );
 
         const request = {
             challenge,
             credentialStatements: parsedStatements,
+            requestRaw: rawVerificationRequestV1,
+            proofClaims: parsedStatements,
         };
 
         setProof(proveWeb3Request(request, commitmentInputs, global));
@@ -274,7 +401,7 @@ export default function VerifiablePresentationRequest({ onReject, onSubmit }: Pr
         verifiableCredentials.loading ||
         verifiableCredentialSchemas.loading ||
         identities.loading ||
-        !validCredentials ||
+        !validCredentialsOrIdentities ||
         !ids.length
     ) {
         return null;
@@ -286,7 +413,7 @@ export default function VerifiablePresentationRequest({ onReject, onSubmit }: Pr
                 onClick={withClose(onReject)}
                 dappName={dappName}
                 net={net}
-                statement={statements[validCredentials.findIndex((v) => !v.length)]}
+                statement={statements[validCredentialsOrIdentities.findIndex((v) => !v.length)]}
                 statuses={statuses}
             />
         );
@@ -294,7 +421,12 @@ export default function VerifiablePresentationRequest({ onReject, onSubmit }: Pr
 
     return (
         <>
-            <ProofStatusPrompt proof={proof} onSuccess={onSubmit} onError={onReject} onClose={withClose(noOp)} />
+            <ProofStatusPrompt<string | { proof: object }>
+                proof={proof}
+                onSuccess={onSubmit}
+                onError={onReject}
+                onClose={withClose(noOp)}
+            />
             <Page className="verifiable-presentation-request">
                 <Page.Top heading={t('title')} />
                 <Text.Main>
@@ -307,7 +439,7 @@ export default function VerifiablePresentationRequest({ onReject, onSubmit }: Pr
                 </Text.Main>
                 <DisplayCredentialStatement
                     dappName={dappName}
-                    validCredentials={validCredentials[currentStatementIndex]}
+                    validCredentials={validCredentialsOrIdentities[currentStatementIndex]}
                     credentialStatement={statements[currentStatementIndex]}
                     net={net}
                     key={currentStatementIndex}

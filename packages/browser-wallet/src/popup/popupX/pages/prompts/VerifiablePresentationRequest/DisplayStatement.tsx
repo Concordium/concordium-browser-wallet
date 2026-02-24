@@ -1,20 +1,29 @@
-import {
-    CredentialStatement,
-    isAccountCredentialStatement,
-    isVerifiableCredentialStatement,
-} from '@concordium/web-sdk';
+import { isAccountCredentialStatement, isVerifiableCredentialStatement } from '@concordium/web-sdk';
 import React from 'react';
-import { VerifiableCredential, WalletCredential } from '@shared/storage/types';
-import { DisplayCredentialStatementProps } from './utils';
+import { ConfirmedIdentity, VerifiableCredential, WalletCredential } from '@shared/storage/types';
+import { DisplayCredentialStatementProps, StatementWithSource } from './utils';
 import DisplayWeb3Statement from './VerifiableCredentialStatement';
 import DisplayAccountStatement from './AccountStatement';
+import DisplayIdentityStatement from './IdentityStatement';
 
 export function DisplayCredentialStatement({
     credentialStatement,
     validCredentials,
     ...params
-}: DisplayCredentialStatementProps<CredentialStatement, VerifiableCredential | WalletCredential>) {
-    if (isAccountCredentialStatement(credentialStatement)) {
+}: DisplayCredentialStatementProps<StatementWithSource, VerifiableCredential | WalletCredential | ConfirmedIdentity>) {
+    if (credentialStatement.source?.includes('identityCredential')) {
+        return (
+            <DisplayIdentityStatement
+                credentialStatement={credentialStatement}
+                validCredentials={validCredentials as ConfirmedIdentity[]}
+                {...params}
+            />
+        );
+    }
+    if (
+        isAccountCredentialStatement(credentialStatement) ||
+        credentialStatement.source?.includes('accountCredential')
+    ) {
         return (
             <DisplayAccountStatement
                 credentialStatement={credentialStatement}

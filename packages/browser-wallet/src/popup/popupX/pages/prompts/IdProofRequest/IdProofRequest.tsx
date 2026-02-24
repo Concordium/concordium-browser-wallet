@@ -77,7 +77,7 @@ export function ProofStatusPrompt<P>({ proof, onSuccess, onError, onClose }: Pro
                             <Text.Capture className="block m-t-10">{t('inProgress')}</Text.Capture>
                         </>
                     )}
-                    {typeof value === 'string' && (
+                    {value && !(value instanceof Error) && (
                         <>
                             <CheckCircle />
                             <Text.Capture className="block m-t-10">{t('success')}</Text.Capture>
@@ -203,7 +203,8 @@ export default function IdProofRequest({ onReject, onSubmit }: Props) {
                 ))}
                 <Page.Footer>
                     <Button.Main
-                        className="secondary m-t-20"
+                        className="m-t-20"
+                        variant="secondary"
                         disabled={creatingProof}
                         onClick={() => withClose(onReject)()}
                         label={t('reject')}

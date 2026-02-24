@@ -2,9 +2,9 @@ import {
     AtomicStatement,
     CommitmentInput,
     CryptographicParameters,
+    RequestStatement,
     StatementTypes,
-    Web3IdProofInput,
-    Web3IdProofRequest,
+    VerifiablePresentationV1,
 } from '@concordium/web-sdk';
 import { popupMessageHandler } from '@popup/shared/message-handler';
 import { ConfirmedIdentity } from '@shared/storage/types';
@@ -37,11 +37,16 @@ export function canProveStatement(statement: AtomicStatement, identity: Confirme
  * This returns the presentation as a JSON string.
  */
 export async function proveWeb3Request(
-    request: Web3IdProofRequest,
-    commitmentInputs: CommitmentInput[],
+    request: {
+        challenge: string;
+        credentialStatements: (VerifiablePresentationV1.SubjectClaims | RequestStatement)[];
+        requestRaw?: string;
+        proofClaims?: (VerifiablePresentationV1.SubjectClaims | RequestStatement)[];
+    },
+    commitmentInputs: (CommitmentInput | VerifiablePresentationV1.CommitmentInput)[],
     global: CryptographicParameters
 ) {
-    const input: Web3IdProofInput = {
+    const input = {
         request,
         commitmentInputs,
         globalContext: global,
