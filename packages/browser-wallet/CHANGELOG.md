@@ -2,6 +2,8 @@
 
 ## Unreleased
 
+## 2.9.0
+
 -   Added support for Auditable ID proof, in the same UI used for the current proofs.
 -   Added new on-ramp provider `Transak`
 
