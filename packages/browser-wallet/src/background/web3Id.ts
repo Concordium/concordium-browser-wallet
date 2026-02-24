@@ -370,8 +370,14 @@ export const runIfValidWeb3IdProof: RunCondition<MessageStatusWrapper<undefined>
     }
 
     if (msg.payload.version === 1) {
+        // Helper function with old payload structure for validation reuse
+        // Can be used in this way, because new subject claims is same as old ones
+        // And if mapping of new ones will fail, this will also validate proper payload structure
         const statements = convertWeb3IdV1ToOldProof(msg.payload.verificationRequestV1);
+
+        // Create Hex placeholder for validation pass
         const challenge = 'A'.repeat(64);
+
         return validateWeb3IdCredentialStatements(challenge, statements);
     }
 
