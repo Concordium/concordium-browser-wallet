@@ -79,7 +79,12 @@ export const manifestPlugin = ({ manifestTemplate, popupHtmlFile }: Configuratio
             const manifest = JSON.parse(replaced);
 
             // Use package information from package.json
-            manifest.version = packageJson.version;
+            // JS in package.json using Semantic Versioning (SemVer), Chrome Manifest V3 uses 1 to 4 dot-separated integers
+            // Needed to keep single source of versioning (package.json) and functionality of pre-release versioning
+            // And in the same time not conflicts with manifest V3 rules
+            // Example 1.2.3-beta.1 -> 1.2.3; 1.2.3-feature-name.2 -> 1.2.3
+            // eslint-disable-next-line prefer-destructuring
+            manifest.version = packageJson.version.split('-')[0];
             manifest.version_name = getVersionName();
             manifest.description = packageJson.description;
             manifest.author = packageJson.author;

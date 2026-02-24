@@ -1,15 +1,29 @@
 .onramp {
-    .page__main {
-        height: 100%;
+    .page__top {
+        margin-bottom: $semantic-gap-xl;
+    }
 
-        .card-x {
-            height: 100%;
-            margin: rem(22px) 0;
+    .page__main {
+        display: flex;
+        flex-direction: column;
+        gap: $semantic-gap-xl;
+
+        .card-x.transparent {
+            .heading_medium,
+            .capture__main_small {
+                color: $semantic-content-secondary;
+            }
         }
+    }
+
+    .description-section {
+        display: flex;
+        flex-direction: column;
     }
 
     .text__description {
         text-align: center;
+        color: $semantic-content-accent-secondary;
 
         &.underline {
             text-decoration: underline;
@@ -27,42 +41,68 @@
         color: $color-grey-1;
     }
 
-    .banxa-link-btn {
+    &_providers {
+        display: flex;
+        flex-direction: column;
+        gap: $semantic-gap-xs;
+    }
+
+    .button__on-ramp-option {
+        @include base-button;
+
         display: flex;
         align-items: center;
-        justify-content: space-between;
-        width: 100%;
-        border: none;
-        cursor: pointer;
-        background: #191a1a;
+        gap: $semantic-gap-s;
+        border: unset;
+        border-radius: $semantic-radius-l;
+        padding: $semantic-padding-m $semantic-padding-l $semantic-padding-m $semantic-padding-m;
+        background-color: $semantic-surface-tertiary;
 
-        &__left {
-            display: flex;
-            align-items: center;
-            gap: 8px;
+        .icon-container {
+            width: rem(40px);
+            height: rem(40px);
+
+            svg {
+                width: inherit;
+                height: inherit;
+            }
         }
 
-        &__logo {
-            height: 32px;
-            width: 32px;
-        }
-
-        &__text {
-            color: white;
-            font-size: 16px;
-            font-weight: 500;
-        }
-
-        &__payment {
+        .external-link-icon {
+            width: rem(24px);
+            height: rem(24px);
             margin-left: auto;
-            margin-right: 16px;
-            height: 24px;
-            width: 24px;
+
+            svg {
+                width: inherit;
+                height: inherit;
+
+                path {
+                    fill: $semantic-content-primary-a40;
+                }
+            }
         }
 
-        &__arrow {
-            height: 20px;
-            width: 20px;
+        .text-container {
+            display: flex;
+            flex-direction: column;
+            align-items: flex-start;
+
+            .text__main_medium {
+                color: $semantic-content-primary;
+                font-size: $semantic-label-l-scale;
+                line-height: $semantic-label-l-line-height;
+            }
+        }
+
+        &:hover {
+            background-color: $semantic-surface-tertiary-hover;
+        }
+
+        &:active {
+            background-color: $semantic-surface-tertiary-pressed;
+            outline: 1px solid $semantic-border-tertiary-pressed;
+            outline-offset: -1px;
         }
     }
 }
