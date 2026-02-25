@@ -2,6 +2,8 @@
 
 ### Unreleased
 
+### 3.2.0
+
 -   Added `requestVerifiablePresentationV1` entrypoint to prove statements about identities and verifiable credentials with auditable anchor
 
 ### 3.1.0

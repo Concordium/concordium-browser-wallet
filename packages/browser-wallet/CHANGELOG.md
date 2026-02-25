@@ -2,12 +2,21 @@
 
 ## Unreleased
 
+## 2.9.0
+
+### Added
+
 -   Added support for Auditable ID proof, in the same UI used for the current proofs.
 -   Added new on-ramp provider `Transak`
 
 ## 2.8.0
 
+### Added
+
 -   Added support for Sponsored Transactions handling. With new method `sendSponsoredTransaction` in wallet-api.
+
+### Removed
+
 -   Removed preconfigured connection for DevNet, from network options list. Custom connection should be used instead.
 
 ## 2.7.0
