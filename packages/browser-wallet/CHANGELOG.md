@@ -2,6 +2,8 @@
 
 ## Unreleased
 
+-   Added support for two additional types of Sponsored Transactions, `Configure Delegation` and `Update Smart Contract Instance`.
+
 ## 2.9.0
 
 ### Added
