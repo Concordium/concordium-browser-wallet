@@ -7,8 +7,11 @@ import {
     AccountTransactionPayload,
     AccountTransactionType,
     buildBasicAccountSigner,
-    convertEnergyToMicroCcd,
-    getEnergyCost,
+    ContractName,
+    deserializeTypeValue,
+    EntrypointName,
+    getUpdateContractParameterSchema,
+    Parameter,
     TokenUpdatePayload,
     Transaction,
 } from '@concordium/web-sdk';
@@ -17,10 +20,8 @@ import { grpcClientAtom } from '@popup/store/settings';
 import { fullscreenPromptContext } from '@popup/popupX/page-layouts/FullscreenPromptLayout';
 import { useUpdateAtom } from 'jotai/utils';
 import { addPendingTransactionAtom } from '@popup/store/transactions';
-import { useBlockChainParameters } from '@popup/shared/BlockChainParametersProvider';
 import { usePrivateKey } from '@popup/shared/utils/account-helpers';
 import { parse, parsePayload } from '@shared/utils/payload-helpers';
-import { SmartContractParameters } from '@concordium/browser-wallet-api-helpers';
 import { Cbor, TokenOperationType } from '@concordium/web-sdk/plt';
 import {
     createPendingTransactionFromAccountTransaction,
@@ -51,6 +52,11 @@ const isSingleTransferTokenUpdate = (transactionType: AccountTransactionType, pa
     return false;
 };
 
+interface SerializedUint8Array {
+    [key: number]: number;
+    length: number;
+}
+
 interface Location {
     state: {
         payload: BackgroundSendTransactionPayload;
@@ -69,7 +75,6 @@ export default function SendSponsoredTransaction({ onSubmit, onReject }: Props) 
     const client = useAtomValue(grpcClientAtom);
     const { withClose, onClose } = useContext(fullscreenPromptContext);
     const addPendingTransaction = useUpdateAtom(addPendingTransactionAtom);
-    const chainParameters = useBlockChainParameters();
 
     const sponsoredTransaction = parse(state.payload.transaction);
     const sponsorAccount = sponsoredTransaction.header.sponsor.account;
@@ -85,21 +90,25 @@ export default function SendSponsoredTransaction({ onSubmit, onReject }: Props) 
             ),
         [JSON.stringify(state.payload.transaction)]
     );
-    const parameters = useMemo(
-        () =>
-            state.payload.parameters === undefined
-                ? undefined
-                : (sponsoredTransaction.parameters as SmartContractParameters),
-        [sponsoredTransaction.parameters]
-    );
+    const parameters = useMemo(() => {
+        const { message } = sponsoredTransaction.payload;
+        const { schema } = state.payload;
+        if (message && schema) {
+            const { receiveName } = sponsoredTransaction.payload;
+            const [contractName, entrypointName] = receiveName.split('.');
+            const serializedSchema = schema.value as unknown as SerializedUint8Array;
 
-    const cost = useMemo(() => {
-        if (chainParameters) {
-            const energy = getEnergyCost(transactionType, payload);
-            return convertEnergyToMicroCcd(energy, chainParameters);
+            return deserializeTypeValue(
+                Parameter.fromHexString(message).buffer,
+                getUpdateContractParameterSchema(
+                    new Uint8Array(Object.values(serializedSchema)),
+                    ContractName.fromString(contractName),
+                    EntrypointName.fromString(entrypointName)
+                )
+            );
         }
         return undefined;
-    }, [transactionType, chainParameters]);
+    }, [sponsoredTransaction.payload]);
 
     useEffect(() => onClose(onReject), [onClose, onReject]);
 
@@ -116,14 +125,10 @@ export default function SendSponsoredTransaction({ onSubmit, onReject }: Props) 
         const signed = await Transaction.signAndFinalize(signableSponsoredTransaction, buildBasicAccountSigner(key));
         const hash = await client.sendTransaction(signed);
 
-        const pending = createPendingTransactionFromAccountTransaction(
-            transaction,
-            hash.toString(),
-            cost?.microCcdAmount
-        );
+        const pending = createPendingTransactionFromAccountTransaction(transaction, hash.toString(), 0n);
         await addPendingTransaction(pending);
         return hash.toString();
-    }, [payload, key, cost]);
+    }, [payload, key]);
 
     const rejectHandler = withClose(onReject);
 

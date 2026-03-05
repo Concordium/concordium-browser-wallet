@@ -65,6 +65,7 @@ const t = {
         },
         return: 'Return to account',
     },
+    delegation: { amount: 'Amount', restake: 'Restake', type: 'Type', bakerId: 'Baker Id' },
 };
 
 export default t;

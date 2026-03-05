@@ -9,6 +9,23 @@
         <script>
             let currentAccountAddress = '';
 
+            function schemaAsBuffer(schemaBase64) {
+                const { toBuffer } = concordiumSDK;
+                let unpaddedLen = schemaBase64.length;
+                if (schemaBase64.charAt(unpaddedLen - 1) === '=') {
+                    unpaddedLen--;
+
+                    if (schemaBase64.charAt(unpaddedLen - 1) === '=') {
+                        unpaddedLen--;
+                    }
+                }
+                const res = toBuffer(schemaBase64, 'base64');
+                if (unpaddedLen !== Math.ceil((4 * res.length) / 3)) {
+                    console.log(`ERROR: The provided schema '${schemaBase64}' is not valid base64`);
+                }
+                return res;
+            }
+
             async function submitPayloadToSponsor(sender, transaction) {
                 const provider = await concordiumHelpers.detectConcordiumProvider();
                 const {
@@ -131,6 +148,77 @@
                         .then((sig) => alert(JSON.stringify(sig)))
                         .catch(alert);
                 });
+
+                document.getElementById('signDelegation').addEventListener('click', async () => {
+                    const { AccountAddress, CcdAmount, Transaction, DelegationTargetType } = concordiumSDK;
+
+                    const configureDelegationPayload = {
+                        stake: CcdAmount.fromMicroCcd(100n),
+                        restakeEarnings: true,
+                        delegationTarget: {
+                            delegateType: DelegationTargetType.PassiveDelegation,
+                        },
+                    };
+
+                    const transaction = Transaction.configureDelegation(configureDelegationPayload);
+
+                    const sponsorResponse = await submitPayloadToSponsor(
+                        AccountAddress.fromBase58(currentAccountAddress),
+                        Transaction.toJSON(transaction)
+                    );
+
+                    console.log('sponsorResponse', sponsorResponse);
+
+                    const sponsoredParsed = Transaction.signableFromJSON(sponsorResponse);
+
+                    return provider
+                        .sendSponsoredTransaction(currentAccountAddress, sponsoredParsed)
+                        .then((sig) => alert(JSON.stringify(sig)))
+                        .catch(alert);
+                });
+
+                document.getElementById('signContractUpdate').addEventListener('click', async () => {
+                    const CONTRACT_NAME = 'smart_contract_test_bench';
+                    const CONTRACT_INDEX = 8649n;
+                    const CONTRACT_SUB_INDEX = 0n;
+                    const BASE_64_SCHEMA =
+                        '//8DAQAAABkAAABzbWFydF9jb250cmFjdF90ZXN0X2JlbmNoAQADLAAAABMAAABnZXRfYWNjb3VudF9hZGRyZXNzBQsVAwAAAAsAAABQYXJzZVBhcmFtcwIUAAAAU21hcnRDb250cmFjdFJldmVydHMCCwAAAEludm9rZUVycm9yAgsAAABnZXRfYWRkcmVzcwUVAgAAAAcAAABBY2NvdW50AQEAAAALCAAAAENvbnRyYWN0AQEAAAAMFQMAAAALAAAAUGFyc2VQYXJhbXMCFAAAAFNtYXJ0Q29udHJhY3RSZXZlcnRzAgsAAABJbnZva2VFcnJvcgIRAAAAZ2V0X2FkZHJlc3NfYXJyYXkFEAIVAgAAAAcAAABBY2NvdW50AQEAAAALCAAAAENvbnRyYWN0AQEAAAAMFQMAAAALAAAAUGFyc2VQYXJhbXMCFAAAAFNtYXJ0Q29udHJhY3RSZXZlcnRzAgsAAABJbnZva2VFcnJvcgIUAAAAZ2V0X2NvbnRyYWN0X2FkZHJlc3MFDBUDAAAACwAAAFBhcnNlUGFyYW1zAhQAAABTbWFydENvbnRyYWN0UmV2ZXJ0cwILAAAASW52b2tlRXJyb3ICCAAAAGdldF9oYXNoBR4gAAAAFQMAAAALAAAAUGFyc2VQYXJhbXMCFAAAAFNtYXJ0Q29udHJhY3RSZXZlcnRzAgsAAABJbnZva2VFcnJvcgIKAAAAZ2V0X29iamVjdAUUAAwAAAAIAAAAdThfdmFsdWUCCQAAAHUxNl92YWx1ZQMNAAAAYWRkcmVzc19hcnJheRACFQIAAAAHAAAAQWNjb3VudAEBAAAACwgAAABDb250cmFjdAEBAAAADA0AAABhZGRyZXNzX3ZhbHVlFQIAAAAHAAAAQWNjb3VudAEBAAAACwgAAABDb250cmFjdAEBAAAADBUAAABhY2NvdW50X2FkZHJlc3NfdmFsdWULFgAAAGNvbnRyYWN0X2FkZHJlc3NfdmFsdWUMCgAAAGhhc2hfdmFsdWUeIAAAAA8AAABzaWduYXR1cmVfdmFsdWUeQAAAABAAAABwdWJsaWNfa2V5X3ZhbHVlHiAAAAAPAAAAdGltZXN0YW1wX3ZhbHVlDQwAAABvcHRpb25fdmFsdWUVAgAAAAQAAABOb25lAgQAAABTb21lAQEAAAACDAAAAHN0cmluZ192YWx1ZRYBFQMAAAALAAAAUGFyc2VQYXJhbXMCFAAAAFNtYXJ0Q29udHJhY3RSZXZlcnRzAgsAAABJbnZva2VFcnJvcgINAAAAZ2V0X29wdGlvbl91OAUVAgAAAAQAAABOb25lAgQAAABTb21lAQEAAAACFQMAAAALAAAAUGFyc2VQYXJhbXMCFAAAAFNtYXJ0Q29udHJhY3RSZXZlcnRzAgsAAABJbnZva2VFcnJvcgIOAAAAZ2V0X3B1YmxpY19rZXkFHiAAAAAVAwAAAAsAAABQYXJzZVBhcmFtcwIUAAAAU21hcnRDb250cmFjdFJldmVydHMCCwAAAEludm9rZUVycm9yAg0AAABnZXRfc2lnbmF0dXJlBR5AAAAAFQMAAAALAAAAUGFyc2VQYXJhbXMCFAAAAFNtYXJ0Q29udHJhY3RSZXZlcnRzAgsAAABJbnZva2VFcnJvcgIKAAAAZ2V0X3N0cmluZwUWAhUDAAAACwAAAFBhcnNlUGFyYW1zAhQAAABTbWFydENvbnRyYWN0UmV2ZXJ0cwILAAAASW52b2tlRXJyb3ICDQAAAGdldF90aW1lc3RhbXAFDRUDAAAACwAAAFBhcnNlUGFyYW1zAhQAAABTbWFydENvbnRyYWN0UmV2ZXJ0cwILAAAASW52b2tlRXJyb3ICBwAAAGdldF91MTYFAxUDAAAACwAAAFBhcnNlUGFyYW1zAhQAAABTbWFydENvbnRyYWN0UmV2ZXJ0cwILAAAASW52b2tlRXJyb3ICBgAAAGdldF91OAUCFQMAAAALAAAAUGFyc2VQYXJhbXMCFAAAAFNtYXJ0Q29udHJhY3RSZXZlcnRzAgsAAABJbnZva2VFcnJvcgIVAAAAaW50ZXJuYWxfY2FsbF9yZXZlcnRzAxUDAAAACwAAAFBhcnNlUGFyYW1zAhQAAABTbWFydENvbnRyYWN0UmV2ZXJ0cwILAAAASW52b2tlRXJyb3ICFQAAAGludGVybmFsX2NhbGxfc3VjY2VzcwMVAwAAAAsAAABQYXJzZVBhcmFtcwIUAAAAU21hcnRDb250cmFjdFJldmVydHMCCwAAAEludm9rZUVycm9yAgcAAAByZXZlcnRzAxUDAAAACwAAAFBhcnNlUGFyYW1zAhQAAABTbWFydENvbnRyYWN0UmV2ZXJ0cwILAAAASW52b2tlRXJyb3ICEwAAAHNldF9hY2NvdW50X2FkZHJlc3MECxUDAAAACwAAAFBhcnNlUGFyYW1zAhQAAABTbWFydENvbnRyYWN0UmV2ZXJ0cwILAAAASW52b2tlRXJyb3ICGwAAAHNldF9hY2NvdW50X2FkZHJlc3NfcGF5YWJsZQQLFQMAAAALAAAAUGFyc2VQYXJhbXMCFAAAAFNtYXJ0Q29udHJhY3RSZXZlcnRzAgsAAABJbnZva2VFcnJvcgILAAAAc2V0X2FkZHJlc3MEFQIAAAAHAAAAQWNjb3VudAEBAAAACwgAAABDb250cmFjdAEBAAAADBUDAAAACwAAAFBhcnNlUGFyYW1zAhQAAABTbWFydENvbnRyYWN0UmV2ZXJ0cwILAAAASW52b2tlRXJyb3ICEQAAAHNldF9hZGRyZXNzX2FycmF5BBACFQIAAAAHAAAAQWNjb3VudAEBAAAACwgAAABDb250cmFjdAEBAAAADBUDAAAACwAAAFBhcnNlUGFyYW1zAhQAAABTbWFydENvbnRyYWN0UmV2ZXJ0cwILAAAASW52b2tlRXJyb3ICGQAAAHNldF9hZGRyZXNzX2FycmF5X3BheWFibGUEEAIVAgAAAAcAAABBY2NvdW50AQEAAAALCAAAAENvbnRyYWN0AQEAAAAMFQMAAAALAAAAUGFyc2VQYXJhbXMCFAAAAFNtYXJ0Q29udHJhY3RSZXZlcnRzAgsAAABJbnZva2VFcnJvcgITAAAAc2V0X2FkZHJlc3NfcGF5YWJsZQQVAgAAAAcAAABBY2NvdW50AQEAAAALCAAAAENvbnRyYWN0AQEAAAAMFQMAAAALAAAAUGFyc2VQYXJhbXMCFAAAAFNtYXJ0Q29udHJhY3RSZXZlcnRzAgsAAABJbnZva2VFcnJvcgIUAAAAc2V0X2NvbnRyYWN0X2FkZHJlc3MEDBUDAAAACwAAAFBhcnNlUGFyYW1zAhQAAABTbWFydENvbnRyYWN0UmV2ZXJ0cwILAAAASW52b2tlRXJyb3ICHAAAAHNldF9jb250cmFjdF9hZGRyZXNzX3BheWFibGUEDBUDAAAACwAAAFBhcnNlUGFyYW1zAhQAAABTbWFydENvbnRyYWN0UmV2ZXJ0cwILAAAASW52b2tlRXJyb3ICCAAAAHNldF9oYXNoBB4gAAAAFQMAAAALAAAAUGFyc2VQYXJhbXMCFAAAAFNtYXJ0Q29udHJhY3RSZXZlcnRzAgsAAABJbnZva2VFcnJvcgIQAAAAc2V0X2hhc2hfcGF5YWJsZQQeIAAAABUDAAAACwAAAFBhcnNlUGFyYW1zAhQAAABTbWFydENvbnRyYWN0UmV2ZXJ0cwILAAAASW52b2tlRXJyb3ICCgAAAHNldF9vYmplY3QEFAAMAAAACAAAAHU4X3ZhbHVlAgkAAAB1MTZfdmFsdWUDDQAAAGFkZHJlc3NfYXJyYXkQAhUCAAAABwAAAEFjY291bnQBAQAAAAsIAAAAQ29udHJhY3QBAQAAAAwNAAAAYWRkcmVzc192YWx1ZRUCAAAABwAAAEFjY291bnQBAQAAAAsIAAAAQ29udHJhY3QBAQAAAAwVAAAAYWNjb3VudF9hZGRyZXNzX3ZhbHVlCxYAAABjb250cmFjdF9hZGRyZXNzX3ZhbHVlDAoAAABoYXNoX3ZhbHVlHiAAAAAPAAAAc2lnbmF0dXJlX3ZhbHVlHkAAAAAQAAAAcHVibGljX2tleV92YWx1ZR4gAAAADwAAAHRpbWVzdGFtcF92YWx1ZQ0MAAAAb3B0aW9uX3ZhbHVlFQIAAAAEAAAATm9uZQIEAAAAU29tZQEBAAAAAgwAAABzdHJpbmdfdmFsdWUWARUDAAAACwAAAFBhcnNlUGFyYW1zAhQAAABTbWFydENvbnRyYWN0UmV2ZXJ0cwILAAAASW52b2tlRXJyb3ICEgAAAHNldF9vYmplY3RfcGF5YWJsZQQUAAwAAAAIAAAAdThfdmFsdWUCCQAAAHUxNl92YWx1ZQMNAAAAYWRkcmVzc19hcnJheRACFQIAAAAHAAAAQWNjb3VudAEBAAAACwgAAABDb250cmFjdAEBAAAADA0AAABhZGRyZXNzX3ZhbHVlFQIAAAAHAAAAQWNjb3VudAEBAAAACwgAAABDb250cmFjdAEBAAAADBUAAABhY2NvdW50X2FkZHJlc3NfdmFsdWULFgAAAGNvbnRyYWN0X2FkZHJlc3NfdmFsdWUMCgAAAGhhc2hfdmFsdWUeIAAAAA8AAABzaWduYXR1cmVfdmFsdWUeQAAAABAAAABwdWJsaWNfa2V5X3ZhbHVlHiAAAAAPAAAAdGltZXN0YW1wX3ZhbHVlDQwAAABvcHRpb25fdmFsdWUVAgAAAAQAAABOb25lAgQAAABTb21lAQEAAAACDAAAAHN0cmluZ192YWx1ZRYBFQMAAAALAAAAUGFyc2VQYXJhbXMCFAAAAFNtYXJ0Q29udHJhY3RSZXZlcnRzAgsAAABJbnZva2VFcnJvcgINAAAAc2V0X29wdGlvbl91OAQVAgAAAAQAAABOb25lAgQAAABTb21lAQEAAAACFQMAAAALAAAAUGFyc2VQYXJhbXMCFAAAAFNtYXJ0Q29udHJhY3RSZXZlcnRzAgsAAABJbnZva2VFcnJvcgIVAAAAc2V0X29wdGlvbl91OF9wYXlhYmxlBBUCAAAABAAAAE5vbmUCBAAAAFNvbWUBAQAAAAIVAwAAAAsAAABQYXJzZVBhcmFtcwIUAAAAU21hcnRDb250cmFjdFJldmVydHMCCwAAAEludm9rZUVycm9yAg4AAABzZXRfcHVibGljX2tleQQeIAAAABUDAAAACwAAAFBhcnNlUGFyYW1zAhQAAABTbWFydENvbnRyYWN0UmV2ZXJ0cwILAAAASW52b2tlRXJyb3ICFgAAAHNldF9wdWJsaWNfa2V5X3BheWFibGUEHiAAAAAVAwAAAAsAAABQYXJzZVBhcmFtcwIUAAAAU21hcnRDb250cmFjdFJldmVydHMCCwAAAEludm9rZUVycm9yAg0AAABzZXRfc2lnbmF0dXJlBB5AAAAAFQMAAAALAAAAUGFyc2VQYXJhbXMCFAAAAFNtYXJ0Q29udHJhY3RSZXZlcnRzAgsAAABJbnZva2VFcnJvcgIVAAAAc2V0X3NpZ25hdHVyZV9wYXlhYmxlBB5AAAAAFQMAAAALAAAAUGFyc2VQYXJhbXMCFAAAAFNtYXJ0Q29udHJhY3RSZXZlcnRzAgsAAABJbnZva2VFcnJvcgIKAAAAc2V0X3N0cmluZwQWAhUDAAAACwAAAFBhcnNlUGFyYW1zAhQAAABTbWFydENvbnRyYWN0UmV2ZXJ0cwILAAAASW52b2tlRXJyb3ICEgAAAHNldF9zdHJpbmdfcGF5YWJsZQQWAhUDAAAACwAAAFBhcnNlUGFyYW1zAhQAAABTbWFydENvbnRyYWN0UmV2ZXJ0cwILAAAASW52b2tlRXJyb3ICDQAAAHNldF90aW1lc3RhbXAEDRUDAAAACwAAAFBhcnNlUGFyYW1zAhQAAABTbWFydENvbnRyYWN0UmV2ZXJ0cwILAAAASW52b2tlRXJyb3ICFQAAAHNldF90aW1lc3RhbXBfcGF5YWJsZQQNFQMAAAALAAAAUGFyc2VQYXJhbXMCFAAAAFNtYXJ0Q29udHJhY3RSZXZlcnRzAgsAAABJbnZva2VFcnJvcgIHAAAAc2V0X3UxNgQDFQMAAAALAAAAUGFyc2VQYXJhbXMCFAAAAFNtYXJ0Q29udHJhY3RSZXZlcnRzAgsAAABJbnZva2VFcnJvcgIPAAAAc2V0X3UxNl9wYXlhYmxlBAMVAwAAAAsAAABQYXJzZVBhcmFtcwIUAAAAU21hcnRDb250cmFjdFJldmVydHMCCwAAAEludm9rZUVycm9yAgYAAABzZXRfdTgEAhUDAAAACwAAAFBhcnNlUGFyYW1zAhQAAABTbWFydENvbnRyYWN0UmV2ZXJ0cwILAAAASW52b2tlRXJyb3ICDgAAAHNldF91OF9wYXlhYmxlBAIVAwAAAAsAAABQYXJzZVBhcmFtcwIUAAAAU21hcnRDb250cmFjdFJldmVydHMCCwAAAEludm9rZUVycm9yAgcAAABzdWNjZXNzAxUDAAAACwAAAFBhcnNlUGFyYW1zAhQAAABTbWFydENvbnRyYWN0UmV2ZXJ0cwILAAAASW52b2tlRXJyb3ICBAAAAHZpZXcGHiAAAAAUAAwAAAAIAAAAdThfdmFsdWUCCQAAAHUxNl92YWx1ZQMNAAAAYWRkcmVzc19hcnJheRACFQIAAAAHAAAAQWNjb3VudAEBAAAACwgAAABDb250cmFjdAEBAAAADA0AAABhZGRyZXNzX3ZhbHVlFQIAAAAHAAAAQWNjb3VudAEBAAAACwgAAABDb250cmFjdAEBAAAADBUAAABhY2NvdW50X2FkZHJlc3NfdmFsdWULFgAAAGNvbnRyYWN0X2FkZHJlc3NfdmFsdWUMCgAAAGhhc2hfdmFsdWUeIAAAAA8AAABzaWduYXR1cmVfdmFsdWUeQAAAABAAAABwdWJsaWNfa2V5X3ZhbHVlHiAAAAAPAAAAdGltZXN0YW1wX3ZhbHVlDQwAAABvcHRpb25fdmFsdWUVAgAAAAQAAABOb25lAgQAAABTb21lAQEAAAACDAAAAHN0cmluZ192YWx1ZRYBFQMAAAALAAAAUGFyc2VQYXJhbXMCFAAAAFNtYXJ0Q29udHJhY3RSZXZlcnRzAgsAAABJbnZva2VFcnJvcgIA';
+
+                    const { AccountAddress, CcdAmount, Transaction, Energy, ContractAddress, ReceiveName, Parameter } =
+                        concordiumSDK;
+
+                    const updateContractPayload = {
+                        amount: CcdAmount.fromMicroCcd(0),
+                        address: ContractAddress.create(CONTRACT_INDEX, CONTRACT_SUB_INDEX),
+                        receiveName: ReceiveName.fromString(`${CONTRACT_NAME}.set_u8`),
+                        message: Parameter.fromBuffer(new Uint8Array([1]).buffer),
+                    };
+
+                    const transaction = Transaction.updateContract(updateContractPayload, Energy.create(30000n));
+
+                    console.log('transaction', transaction);
+
+                    const schema = {
+                        type: 'ModuleSchema',
+                        value: schemaAsBuffer(BASE_64_SCHEMA),
+                    };
+
+                    console.log('schema', schema);
+
+                    const sponsorResponse = await submitPayloadToSponsor(
+                        AccountAddress.fromBase58(currentAccountAddress),
+                        Transaction.toJSON(transaction)
+                    );
+
+                    console.log('sponsorResponse', sponsorResponse);
+
+                    const sponsoredParsed = Transaction.signableFromJSON(sponsorResponse);
+
+                    return provider
+                        .sendSponsoredTransaction(currentAccountAddress, sponsoredParsed, schema)
+                        .then((sig) => alert(JSON.stringify(sig)))
+                        .catch(alert);
+                });
             }
             setupPage();
         </script>
@@ -146,10 +234,10 @@
         <br />
         <h3>Sponsor Config:</h3>
         Sponsor Account:
-        <input type="text" id="sponsorAccount" value="3PCRkKoFrSzgUmzfFF7C17pc3wm9wrVgbaCrbgGs6UMxy5aogo" />
+        <input type="text" id="sponsorAccount" value="3HogEYQkUCRY9S8TKAJCBZeds5bfuFNBHWpPQaquuNSdkVM2Ch" />
         <br />
         Sponsor Private Key:
-        <input type="text" id="privateKey" value="9a494111614cd737ed89e500a3d155af80a4f8faf18f168568f8facbd2be3909" />
+        <input type="text" id="privateKey" value="6f33d715b6bab0991a22f7ad26251735493dacf340fb624de1ced27fb6bd0998" />
         <br />
         <h3>Recipient Config:</h3>
         Recipient Address:
@@ -158,5 +246,7 @@
         <br />
         <button id="signSimpleTransfer">Sign Simple Transfer</button>
         <button id="signTokenUpdate">Sign PLT Transfer</button>
+        <button id="signDelegation">Sign Delegation</button>
+        <button id="signContractUpdate">Sign Contract Update</button>
     </body>
 </html>
