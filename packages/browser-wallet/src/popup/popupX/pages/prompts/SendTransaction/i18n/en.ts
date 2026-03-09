@@ -65,7 +65,13 @@ const t = {
         },
         return: 'Return to account',
     },
-    delegation: { amount: 'Amount', restake: 'Restake', type: 'Type', bakerId: 'Baker Id' },
+    delegation: {
+        amount: 'Amount',
+        restake: 'Restake',
+        type: 'Type',
+        bakerId: 'Baker Id',
+        info: 'This will lock your delegation amount. Amount is released after 21 days from the time your remove or decrease your delegation.',
+    },
 };
 
 export default t;

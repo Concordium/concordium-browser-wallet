@@ -41,6 +41,20 @@ import Button from '@popup/popupX/shared/Button';
 import Card from '@popup/popupX/shared/Card';
 import Tooltip from '@popup/popupX/shared/Tooltip/Tooltip';
 import QuestionIcon from '@assets/svgX/UiKit/Interface/circled-question-mark.svg';
+import WarningIcon from '@assets/svgX/UiKit/Interface/circled-warning-exclamation.svg';
+
+function DisplayDelegationInfoMessage({ transactionType }: { transactionType: AccountTransactionType }) {
+    const { t } = useTranslation('x', { keyPrefix: 'prompts.sendTransactionX' });
+    if (transactionType === AccountTransactionType.ConfigureDelegation) {
+        return (
+            <Card type="transparent" className="delegation-info">
+                <WarningIcon />
+                <Text.Capture>{t('delegation.info')}</Text.Capture>
+            </Card>
+        );
+    }
+    return null;
+}
 
 const isSingleTransferTokenUpdate = (transactionType: AccountTransactionType, payload: AccountTransactionPayload) => {
     const isTokenUpdate = transactionType === AccountTransactionType.TokenUpdate;
@@ -164,6 +178,7 @@ export default function SendSponsoredTransaction({ onSubmit, onReject }: Props) 
                         values={{ dApp: displayUrl(url) }}
                     />
                 </Text.Main>
+                <DisplayDelegationInfoMessage transactionType={transactionType} />
                 <Card>
                     <Card.Row>
                         <Text.MainMedium>{getTransactionTypeName(transactionType)}</Text.MainMedium>
