@@ -30,7 +30,7 @@ import DisplayTransactionPayload, {
     DisplayParameters,
 } from '@popup/popupX/pages/prompts/SendTransaction/DisplayTransactionPayload';
 import DisplaySingleTransferTokenUpdate from '@popup/popupX/pages/prompts/SendSponsoredTransaction/DisplaySingleTransferTokenUpdate';
-import { displayUrl } from '@popup/shared/utils/string-helpers';
+import { displayUrl, safeParseRpcErrorMessage } from '@popup/shared/utils/string-helpers';
 import { mapTransactionKindStringToTransactionType } from '@popup/shared/utils/wallet-proxy';
 import { stringify } from '@wallet-api/util';
 import Page from '@popup/popupX/shared/Page';
@@ -130,7 +130,7 @@ export default function SendSponsoredTransaction({ onSubmit, onReject }: Props) 
     const signHandler = () => {
         handleSubmit()
             .then(withClose(onSubmit))
-            .catch((e) => addToast(e.message));
+            .catch((e) => addToast(safeParseRpcErrorMessage(e)));
     };
 
     if (isSingleTransferTokenUpdate(transactionType, payload)) {
