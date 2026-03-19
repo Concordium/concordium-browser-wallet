@@ -1,7 +1,7 @@
 {
     "name": "@concordium/browser-wallet",
     "private": true,
-    "version": "2.9.0",
+    "version": "2.9.0-WAL_1414-WAL_1415-WAL_1555-WAL_1624",
     "description": "Browser extension wallet for the Concordium blockchain",
     "author": "Concordium Software",
     "license": "Apache-2.0",
