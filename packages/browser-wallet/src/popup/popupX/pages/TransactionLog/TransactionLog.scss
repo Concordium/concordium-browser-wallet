@@ -10,6 +10,8 @@
 }
 
 .transaction-log {
+    padding-bottom: unset;
+
     &__date {
         padding-top: rem(20px);
     }
@@ -100,6 +102,13 @@
 
     &__history {
         padding-right: rem(8px); // 24 - scrollbar width
+        padding-bottom: rem(32px);
+
+        .heading_medium {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+        }
 
         .capture__additional_small,
         .capture__main_small {

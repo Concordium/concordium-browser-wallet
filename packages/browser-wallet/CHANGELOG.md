@@ -2,6 +2,8 @@
 
 ## Unreleased
 
+-   Added export activity button to Transaction Log as part of feature parity with Old UI
+
 ## 2.9.0
 
 ### Added
