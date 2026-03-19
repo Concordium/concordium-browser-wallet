@@ -33,6 +33,7 @@ import {
     Intro,
 } from '@popup/popupX/pages/Onboarding';
 import ConnectedSites from '@popup/popupX/pages/ConnectedSites';
+import EditAllowlist from '@popup/popupX/pages/ConnectedSites/EditAllowlist';
 import EarningRewards from '@popup/popupX/pages/EarningRewards';
 import ValidatorIntro from '@popup/popupX/pages/EarningRewards/Validator/Intro';
 import PrivateKey from '@popup/popupX/pages/PrivateKey';
@@ -190,10 +191,13 @@ export default function Routes({ messagePromptHandlers }: { messagePromptHandler
                     </Route>
                     <Route path={relativeRoutes.settings.accounts.path}>
                         <Route index element={<Accounts />} />
-                        <Route
-                            element={<ConnectedSites />}
-                            path={relativeRoutes.settings.accounts.connectedSites.path}
-                        />
+                        <Route path={relativeRoutes.settings.accounts.connectedSites.path}>
+                            <Route index element={<ConnectedSites />} />
+                            <Route
+                                path={relativeRoutes.settings.accounts.connectedSites.edit.path}
+                                element={<EditAllowlist />}
+                            />
+                        </Route>
                         <Route element={<PrivateKey />} path={relativeRoutes.settings.accounts.privateKey.path} />
                     </Route>
                     <Route path={relativeRoutes.settings.createAccount.path}>
