@@ -10,6 +10,7 @@ import {
     SimpleTransferPayload,
     TokenUpdatePayload,
     UpdateContractInput,
+    ConfigureDelegationPayload,
 } from '@concordium/web-sdk';
 import { Cbor, CborMemo, TokenOperationType } from '@concordium/web-sdk/plt';
 import { SmartContractParameters } from '@concordium/browser-wallet-api-helpers';
@@ -55,10 +56,12 @@ function DisplayUpdateContract({ payload }: { payload: Omit<UpdateContractInput,
             />
             <Card.RowDetails title={t('receiveName')} value={payload.receiveName.value} />
             <Card.RowDetails title={t('amount')} value={displayAsCcd(payload.amount.microCcdAmount)} />
-            <Card.RowDetails
-                title={t('maxEnergy')}
-                value={`${payload.maxContractExecutionEnergy.value.toString()} ${t('nrg')}`}
-            />
+            {payload.maxContractExecutionEnergy && (
+                <Card.RowDetails
+                    title={t('maxEnergy')}
+                    value={`${payload.maxContractExecutionEnergy.value.toString()} ${t('nrg')}`}
+                />
+            )}
         </>
     );
 }
@@ -193,6 +196,33 @@ function DisplayTokenUpdate({ payload }: { payload: TokenUpdatePayload }) {
 }
 
 /**
+ * Displays an overview of configure delegation payload.
+ */
+function DisplayConfigureDelegationPayload({ payload }: { payload: ConfigureDelegationPayload }) {
+    const { t } = useTranslation('x', { keyPrefix: 'prompts.sendTransactionX.delegation' });
+    const { stake, restakeEarnings, delegationTarget } = payload;
+    let delegateType;
+    let bakerId;
+
+    if (delegationTarget && 'delegateType' in delegationTarget) {
+        delegateType = delegationTarget.delegateType;
+    }
+
+    if (delegationTarget && 'bakerId' in delegationTarget) {
+        bakerId = delegationTarget.bakerId;
+    }
+
+    return (
+        <>
+            <Card.RowDetails title={t('amount')} value={displayAsCcd(stake || 0n)} />
+            <Card.RowDetails title={t('restake')} value={restakeEarnings?.toString()} />
+            {delegateType && <Card.RowDetails title={t('type')} value={delegateType.toString()} />}
+            {bakerId && <Card.RowDetails title={t('bakerId')} value={bakerId.toString()} />}
+        </>
+    );
+}
+
+/**
  * Displays an overview of any transaction payload.
  */
 function DisplayGenericPayload({ payload }: { payload: AccountTransactionPayload }) {
@@ -225,6 +255,8 @@ export default function DisplayTransactionPayload({
             return <DisplayDeployModule payload={payload as DeployModulePayload} />;
         case AccountTransactionType.TokenUpdate:
             return <DisplayTokenUpdate payload={payload as TokenUpdatePayload} />;
+        case AccountTransactionType.ConfigureDelegation:
+            return <DisplayConfigureDelegationPayload payload={payload as ConfigureDelegationPayload} />;
         default:
             return <DisplayGenericPayload payload={payload} />;
     }

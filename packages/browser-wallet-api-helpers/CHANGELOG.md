@@ -2,6 +2,7 @@
 
 ### Unreleased
 
+-   Added `ContractSchema` for `sendSponsoredTransaction` entrypoint for sponsored contract updates
 -   Updated `RpcError` message parsing, to make it more readable
 
 ### 3.2.0

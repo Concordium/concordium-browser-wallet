@@ -52,6 +52,31 @@
                 }
             }
         }
+
+        &.delegation-info {
+            display: flex;
+            flex-direction: row;
+            align-items: center;
+            gap: $semantic-gap-m;
+            padding: $semantic-padding-m $semantic-padding-l;
+            background: $semantic-surface-warning-tertiary;
+            border-color: $semantic-border-warning-secondary;
+            margin-top: $semantic-gap-s;
+            margin-bottom: -($semantic-gap-s);
+
+            svg {
+                min-width: rem(16px);
+                min-height: rem(16px);
+
+                path {
+                    fill: $semantic-content-warning-primary;
+                }
+            }
+
+            .capture__main_small {
+                color: $semantic-content-warning-primary;
+            }
+        }
     }
 
     .submitted-tx {
