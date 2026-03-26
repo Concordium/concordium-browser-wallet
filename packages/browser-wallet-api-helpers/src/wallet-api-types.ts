@@ -1,4 +1,4 @@
-import type {
+import {
     AccountAddress,
     AccountTransactionInput,
     AccountTransactionSignature,
@@ -17,6 +17,7 @@ import type {
     IdProofOutput,
     IdStatement,
     InitContractInput,
+    Payload,
     RegisterDataPayload,
     SchemaVersion,
     SimpleTransferPayload,
@@ -281,22 +282,22 @@ interface MainWalletApi {
      * Note that if the user rejects signing the transaction, this will throw an error.
      * @param accountAddress the address of the account that should sign the transaction
      * @param transaction the sponsored transaction with header to be signed and sent.
+     * @param contractSchema A schema describing how to deserialize the contract parameter in the payload.
+     * This is only required for smart contract transactions, in order to enable users to verify the details of the transaction they are signing.
      */
-    sendSponsoredTransaction(accountAddress: AccountAddressSource, transaction: SignableTransaction): Promise<string>;
+    sendSponsoredTransaction(
+        accountAddress: AccountAddressSource,
+        transaction: Transaction.Signable<Payload.UpdateContract | Payload.InitContract>,
+        contractSchema: ContractSchema
+    ): Promise<string>;
     /**
      * Sends a transaction signed by sponsor to the Concordium Wallet and awaits the users action.
      * Note that a header is sent, and constructed by the sponsor.
      * Note that if the user rejects signing the transaction, this will throw an error.
      * @param accountAddress the address of the account that should sign the transaction
      * @param transaction the sponsored transaction with header to be signed and sent.
-     * @param [contractSchema] A schema describing how to deserialize the contract parameter in the payload.
-     * This is only required for smart contract transactions, in order to enable users to verify the details of the transaction they are signing.
      */
-    sendSponsoredTransaction(
-        accountAddress: AccountAddressSource,
-        transaction: SignableTransaction,
-        contractSchema?: ContractSchema
-    ): Promise<string>;
+    sendSponsoredTransaction(accountAddress: AccountAddressSource, transaction: SignableTransaction): Promise<string>;
     /**
      * Sends a message to the Concordium Wallet and awaits the users action. If the user signs the message, this will resolve to the signature.
      * Note that if the user rejects signing the message, this will throw an error.
