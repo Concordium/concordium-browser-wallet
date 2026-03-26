@@ -4,6 +4,20 @@ $account-page-details-height-closed: rem(30px);
 $account-page-details-height: var(--details-height, $account-page-details-height-closed);
 
 .account-page {
+    &__deprecated {
+        width: 100%;
+        background-color: $color-orange-info;
+        padding: rem(6px);
+
+        &_title {
+            font-weight: bold;
+        }
+
+        &_text {
+            margin: rem(4px) 0;
+        }
+    }
+
     &__content {
         display: flex;
         flex-direction: column;

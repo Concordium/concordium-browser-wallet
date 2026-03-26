@@ -8,6 +8,10 @@ const t: typeof en = {
     siteConnected: 'Forbundet',
     siteNotConnected: 'Ikke forbundet',
     accountBalanceError: 'Fejl ved hentning af kontoens balance',
+    timeToUpgrade: 'Tid til at opgradere',
+    newUiDescription:
+        'Den nye brugergrænseflade inkluderer alle dine funktioner - skift nu, før den gamle brugergrænseflade udfases efter 27. april 2026.',
+    switchNewUi: 'Skift til nyt UI',
     actions: {
         log: 'Transaktionslog',
         send: 'Send CCD',
