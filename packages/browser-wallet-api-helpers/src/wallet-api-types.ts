@@ -1,4 +1,4 @@
-import type {
+import {
     AccountAddress,
     AccountTransactionInput,
     AccountTransactionSignature,
@@ -17,17 +17,18 @@ import type {
     IdProofOutput,
     IdStatement,
     InitContractInput,
+    Payload,
     RegisterDataPayload,
     SchemaVersion,
     SimpleTransferPayload,
     SimpleTransferWithMemoPayload,
     TokenUpdatePayload,
+    Transaction,
     UpdateContractInput,
     UpdateCredentialsInput,
     VerifiablePresentation,
     VerifiablePresentationV1,
     VerificationRequestV1,
-    Transaction,
 } from '@concordium/web-sdk';
 import type { RpcTransport } from '@protobuf-ts/runtime-rpc';
 import { LaxNumberEnumValue, LaxStringEnumValue } from './util';
@@ -110,6 +111,22 @@ export type SchemaWithContext = {
 
 export type AccountAddressSource = Base58String | AccountAddress.Type;
 export type SchemaSource = Base64String | SchemaWithContext;
+
+export type ModuleSchema = {
+    type: 'ModuleSchema';
+    value: Buffer;
+    version?: SchemaVersion;
+};
+export type TypeSchema = {
+    type: 'TypeSchema';
+    value: Buffer;
+};
+
+/**
+ * Discriminated union type for contract invocation schemas.
+ * Is used to select the correct method for encoding the invocation parameters using the schema.
+ */
+export type ContractSchema = ModuleSchema | TypeSchema;
 
 // eslint-disable-next-line  @typescript-eslint/no-explicit-any
 type EventListener<Args extends any[]> = (...args: Args) => void;
@@ -258,6 +275,20 @@ interface MainWalletApi {
         accountAddress: AccountAddressSource,
         type: LaxNumberEnumValue<AccountTransactionType.ConfigureDelegation>,
         payload: ConfigureDelegationPayload
+    ): Promise<string>;
+    /**
+     * Sends a transaction signed by sponsor to the Concordium Wallet and awaits the users action.
+     * Note that a header is sent, and constructed by the sponsor.
+     * Note that if the user rejects signing the transaction, this will throw an error.
+     * @param accountAddress the address of the account that should sign the transaction
+     * @param transaction the sponsored transaction with header to be signed and sent.
+     * @param contractSchema A schema describing how to deserialize the contract parameter in the payload.
+     * This is only required for smart contract transactions, in order to enable users to verify the details of the transaction they are signing.
+     */
+    sendSponsoredTransaction(
+        accountAddress: AccountAddressSource,
+        transaction: Transaction.Signable<Payload.UpdateContract | Payload.InitContract>,
+        contractSchema: ContractSchema
     ): Promise<string>;
     /**
      * Sends a transaction signed by sponsor to the Concordium Wallet and awaits the users action.

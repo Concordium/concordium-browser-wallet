@@ -1941,7 +1941,7 @@ __metadata:
     webpack: ^5.99.7
     webpack-cli: ^4.9.2
   peerDependencies:
-    "@concordium/web-sdk": ^12.0.1
+    "@concordium/web-sdk": ^12.0.2
     "@protobuf-ts/runtime-rpc": ^2.9.1
   languageName: unknown
   linkType: soft
@@ -1953,7 +1953,7 @@ __metadata:
     "@babel/core": ^7.18.2
     "@concordium/browser-wallet-api-helpers": "workspace:^"
     "@concordium/common-sdk": ^9.5.3
-    "@concordium/web-sdk": ^12.0.1
+    "@concordium/web-sdk": ^12.0.2
     "@craftamap/esbuild-plugin-html": ^0.7.0
     "@floating-ui/react": ^0.27.2
     "@mdx-js/react": ^1.6.22
@@ -2064,9 +2064,9 @@ __metadata:
   languageName: node
   linkType: hard
 
-"@concordium/web-sdk@npm:^12.0.1":
-  version: 12.0.1
-  resolution: "@concordium/web-sdk@npm:12.0.1"
+"@concordium/web-sdk@npm:^12.0.2":
+  version: 12.0.2
+  resolution: "@concordium/web-sdk@npm:12.0.2"
   dependencies:
     "@concordium/rust-bindings": ^4.0.1
     "@grpc/grpc-js": ^1.14.0
@@ -2088,7 +2088,7 @@ __metadata:
   peerDependencies:
     "@protobuf-ts/runtime-rpc": ^2.8.2
     cbor2: ^1.12.0
-  checksum: d12cfbf5d5f93cab86ae3ba99a1a794f14a93fd31a947ed3c0991e422ee25ef0dded2ba43e074f438dfcdb8ac4302d894f4ddb75f7a651937905b6ae74c88080
+  checksum: 7249c1cd7207ca10a7351aab57512e204c31f06e6d02e84f152eeccf63565331ef90c62873ed62fac4c32500a49a833453e95030617185ee9508af364c4ad437
   languageName: node
   linkType: hard
 
@@ -16701,7 +16701,7 @@ __metadata:
   version: 0.0.0-use.local
   resolution: "wallet-api@workspace:examples/wallet-api"
   dependencies:
-    "@concordium/web-sdk": ^12.0.1
+    "@concordium/web-sdk": ^12.0.2
     live-server: ^1.2.2
   languageName: unknown
   linkType: soft

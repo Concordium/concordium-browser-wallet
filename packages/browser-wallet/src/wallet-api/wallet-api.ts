@@ -24,6 +24,7 @@ import {
     SchemaSource,
     SendTransactionPayload,
     SignableTransaction,
+    ContractSchema,
 } from '@concordium/browser-wallet-api-helpers';
 import EventEmitter from 'events';
 import { IdProofOutput, IdStatement } from '@concordium/web-sdk/id';
@@ -187,13 +188,15 @@ class WalletApi extends EventEmitter implements IWalletApi {
      */
     public async sendSponsoredTransaction(
         accountAddress: AccountAddressSource,
-        transaction: SignableTransaction
+        transaction: SignableTransaction,
+        contractSchema?: ContractSchema
     ): Promise<string> {
         const response = await this.messageHandler.sendMessage<MessageStatusWrapper<string>>(
             MessageType.SendSponsoredTransaction,
             {
                 accountAddress,
                 transaction: stringify(Transaction.toJSON(transaction)),
+                schema: contractSchema,
             }
         );
 
