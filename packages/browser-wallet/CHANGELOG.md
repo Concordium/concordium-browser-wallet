@@ -5,6 +5,7 @@
 -   Added support for two additional types of Sponsored Transactions, `Configure Delegation` and `Update Smart Contract Instance`.
 -   Added Allowlist config at account page as part of feature parity with Old UI
 -   Added export activity button to Transaction Log as part of feature parity with Old UI
+-   Updated `RpcError` message parsing, to make it more readable
 
 ## 2.9.0
 
