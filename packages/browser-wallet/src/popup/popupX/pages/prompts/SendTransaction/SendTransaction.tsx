@@ -32,7 +32,7 @@ import {
 } from '@popup/shared/utils/transaction-helpers';
 import Page from '@popup/popupX/shared/Page';
 import Text from '@popup/popupX/shared/Text';
-import { displayUrl } from '@popup/shared/utils/string-helpers';
+import { displayUrl, safeParseRpcErrorMessage } from '@popup/shared/utils/string-helpers';
 import Button from '@popup/popupX/shared/Button';
 import Card from '@popup/popupX/shared/Card';
 import DisplayTransactionPayload, {
@@ -143,7 +143,7 @@ export default function SendTransaction({ onSubmit, onReject }: Props) {
     const signHandler = () => {
         handleSubmit()
             .then(withClose(onSubmit))
-            .catch((e) => addToast(e.message));
+            .catch((e) => addToast(safeParseRpcErrorMessage(e)));
     };
 
     if (isSingleTransferTokenUpdate(transactionType, payload)) {

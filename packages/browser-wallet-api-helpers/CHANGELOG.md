@@ -2,6 +2,8 @@
 
 ### Unreleased
 
+-   Updated `RpcError` message parsing, to make it more readable
+
 ### 3.2.0
 
 -   Added `requestVerifiablePresentationV1` entrypoint to prove statements about identities and verifiable credentials with auditable anchor
