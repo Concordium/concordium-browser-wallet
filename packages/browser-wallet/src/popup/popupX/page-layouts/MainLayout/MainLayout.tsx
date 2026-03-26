@@ -33,7 +33,7 @@ const getPageConfig = () => {
     const params = useParams();
     const baseLocation = Object.entries(params).reduce(
         (acc, [key, value = '']) => (key === '*' ? acc.replace(`/${value}`, '') : acc.replace(value, `:${key}`)),
-        location.pathname.replace(routePrefix, '')
+        decodeURIComponent(location.pathname.replace(routePrefix, ''))
     );
 
     return getConfig(relativeRoutes, baseLocation);

@@ -8,3 +8,79 @@
         }
     }
 }
+
+.allowlist-edit-x {
+    .card-x.transparent {
+        display: flex;
+        flex-direction: column;
+        gap: $semantic-gap-xs;
+        padding: $semantic-padding-s;
+        margin-top: $semantic-gap-s;
+        height: rem(300px);
+        overflow: auto;
+
+        &::-webkit-scrollbar {
+            display: none;
+        }
+
+        .accounts {
+            &__item {
+                display: flex;
+                justify-content: space-between;
+                padding: $semantic-padding-m;
+                border-radius: $semantic-radius-l;
+                background: $semantic-surface-tertiary;
+
+                .account-info {
+                    display: flex;
+                    flex-direction: column;
+                    gap: rem(4px);
+
+                    .label__main {
+                        font-size: $semantic-label-l-scale;
+                        line-height: $semantic-label-l-line-height;
+                        color: $semantic-content-primary;
+                    }
+
+                    .capture__main_small {
+                        display: flex;
+                        align-items: center;
+                        font-weight: $t-font-weight-medium;
+                    }
+
+                    svg {
+                        height: rem(10px);
+                        width: rem(10px);
+
+                        path {
+                            fill: $semantic-content-accent-secondary;
+                        }
+                    }
+                }
+
+                .form-input__checkbox {
+                    align-items: center;
+                }
+            }
+        }
+    }
+
+    .remove-connection {
+        margin-top: $semantic-gap-l;
+        justify-content: flex-start;
+
+        &:active {
+            outline: unset;
+        }
+
+        .label__main {
+            color: $semantic-content-error-primary;
+        }
+
+        svg {
+            path {
+                fill: $semantic-content-error-primary;
+            }
+        }
+    }
+}

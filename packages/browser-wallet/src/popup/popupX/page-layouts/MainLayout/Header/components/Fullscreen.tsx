@@ -19,7 +19,7 @@ export default function Fullscreen() {
         } else {
             popupMessageHandler.sendInternalMessage(
                 InternalMessageType.OpenFullscreen,
-                `?navTo=${location.pathname}&state=${JSON.stringify(location.state)}`
+                `?navTo=${encodeURIComponent(location.pathname)}&state=${JSON.stringify(location.state)}`
             );
         }
     };

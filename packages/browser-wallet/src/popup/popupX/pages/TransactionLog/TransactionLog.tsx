@@ -14,21 +14,40 @@ import { addToastAtom } from '@popup/state';
 import { useAccountInfo } from '@popup/shared/AccountInfoListenerContext';
 import Button from '@popup/popupX/shared/Button';
 import { networkConfigurationAtom } from '@popup/store/settings';
+import { selectedAccountAtom } from '@popup/store/account';
 import { isMainnet } from '@shared/utils/network-helpers';
 import { addPendingTransactionAtom, selectedPendingTransactionsAtom } from '@popup/store/transactions';
 import { WalletCredential } from '@shared/storage/types';
 import Text from '@popup/popupX/shared/Text';
 import Page from '@popup/popupX/shared/Page';
 import { useCredential } from '@popup/shared/utils/account-helpers';
-import { mainLayoutScrollContext } from '@popup/popupX/page-layouts/MainLayout/MainLayout';
-
 import { decodeMemo } from '@popup/popupX/shared/utils/helpers';
+import { mainLayoutScrollContext } from '@popup/popupX/page-layouts/MainLayout/MainLayout';
+import ExternalLinkIcon from '@assets/svgX/UiKit/Interface/external-link.svg';
+
 import useTransactionGroups, { TransactionLogParams } from './util';
 import TransactionElement, { TRANSACTION_ELEMENT_HEIGHT } from './TransactionElement';
 import { TransactionDetailsLocationState } from './TransactionDetails/TransactionDetails';
 
+function AccountActivity() {
+    const SELECT_ACCOUNT_PATH = 'accounts?dcount=1&dentity=account&daddress=';
+
+    const network = useAtomValue(networkConfigurationAtom);
+    const account = useAtomValue(selectedAccountAtom);
+
+    const accountStatementUrl = useMemo(() => {
+        return `${network.ccdScanUrl}${SELECT_ACCOUNT_PATH}${account}`;
+    }, [network, account]);
+
+    const handleClick = (url: string) => {
+        window.open(url, '_blank');
+    };
+
+    return <Button.Icon icon={<ExternalLinkIcon />} onClick={() => handleClick(accountStatementUrl)} />;
+}
+
 // Needs to stay in sync with the sizes of the respective elements.
-const TITLE_HEIGHT = 30;
+const TITLE_HEIGHT = 32;
 const LIST_HEADER_HEIGHT = 36;
 const TRANSACTIONS_LIMIT = 20;
 
@@ -120,7 +139,12 @@ function InfiniteTransactionList({
 
                                 const item = headersAndTransactions[index];
                                 if (index === 0 && isHeader(item)) {
-                                    return <Text.Heading style={style}>{item}</Text.Heading>;
+                                    return (
+                                        <Text.Heading style={style}>
+                                            {item}
+                                            <AccountActivity />
+                                        </Text.Heading>
+                                    );
                                 }
                                 if (isHeader(item)) {
                                     return (

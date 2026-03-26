@@ -193,10 +193,16 @@ export const relativeRoutes = {
         accounts: {
             path: 'accounts',
             connectedSites: {
-                path: 'connected-sites/:account',
+                path: 'connected-sites',
                 config: {
                     backTitle: i18n.t('x:connectedSites.backTitle'),
-                    navBackSteps: 2,
+                },
+                edit: {
+                    path: 'edit/:serviceName',
+                    config: {
+                        backTitle: i18n.t('x:header.navButton.back'),
+                        navBackSteps: 2,
+                    },
                 },
             },
             privateKey: {
