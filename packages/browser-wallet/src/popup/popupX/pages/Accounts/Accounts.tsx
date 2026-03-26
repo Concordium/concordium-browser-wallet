@@ -46,8 +46,7 @@ function AccountListItem({ credential }: AccountListItemProps) {
     const copyAddressToClipboard = useCopyAddress();
     const navToPrivateKey = () =>
         nav(generatePath(absoluteRoutes.settings.accounts.privateKey.path, { account: credential.address }));
-    const navToConnectedSites = () =>
-        nav(generatePath(absoluteRoutes.settings.accounts.connectedSites.path, { account: credential.address }));
+    const navToConnectedSites = () => nav(absoluteRoutes.settings.accounts.connectedSites.path);
     const navToIdCards = () => nav(absoluteRoutes.settings.identities.path);
     const identityName = useIdentityName(credential);
     const accountInfo = useAccountInfo(credential);

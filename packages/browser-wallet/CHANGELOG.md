@@ -2,6 +2,8 @@
 
 ## Unreleased
 
+-   Added Allowlist config at account page as part of feature parity with Old UI
+
 ## 2.9.0
 
 ### Added
