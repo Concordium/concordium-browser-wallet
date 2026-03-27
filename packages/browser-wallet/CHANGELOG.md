@@ -6,6 +6,7 @@
 -   Added Allowlist config at account page as part of feature parity with Old UI
 -   Added export activity button to Transaction Log as part of feature parity with Old UI
 -   Updated `RpcError` message parsing, to make it more readable
+-   Added banner at Old UI with info that in a month, Old UI will be decommissioned
 
 ## 2.9.0
 

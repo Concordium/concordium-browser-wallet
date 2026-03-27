@@ -6,6 +6,10 @@ const t = {
     siteConnected: 'Connected',
     siteNotConnected: 'Not connected',
     accountBalanceError: 'Unable to retrieve account balance',
+    timeToUpgrade: 'Time to upgrade',
+    newUiDescription:
+        'The new UI includes all your features - switch now before the old UI is deprecated after April  27, 2026.',
+    switchNewUi: 'Switch to New UI',
     actions: {
         log: 'Activity',
         send: 'Send CCD',

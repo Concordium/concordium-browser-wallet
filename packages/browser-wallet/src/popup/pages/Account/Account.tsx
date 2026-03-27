@@ -1,16 +1,18 @@
-import { useAtomValue } from 'jotai';
+import { useAtom, useAtomValue } from 'jotai';
 import React, { useContext, useMemo, useState } from 'react';
 import { useTranslation } from 'react-i18next';
-import { Navigate, Outlet, Route, Routes, generatePath, useNavigate } from 'react-router-dom';
+import { generatePath, Link, Navigate, Outlet, Route, Routes, useNavigate } from 'react-router-dom';
 import { accountsAtom } from '@popup/store/account';
+import { uiStyleAtom } from '@popup/store/settings';
 import MenuButton from '@popup/shared/MenuButton';
 import { useSelectedCredential } from '@popup/shared/utils/account-helpers';
-import { CreationStatus } from '@shared/storage/types';
+import { CreationStatus, UiStyle } from '@shared/storage/types';
 import { useCurrentOpenTabUrl } from '@popup/shared/utils/tabs';
 import Button from '@popup/shared/Button';
 import { absoluteRoutes } from '@popup/constants/routes';
 import { allowlistRoutes } from '@popup/pages/Allowlist/routes';
 import { isFullscreenWindow } from '@popup/shared/window-helpers';
+import { routePrefix } from '@popup/popupX/constants/routes';
 import { accountRoutes } from './routes';
 import AccountActions from './AccountActions';
 import DisplayAddress from './DisplayAddress';
@@ -30,6 +32,7 @@ function Account() {
     const currentUrl = useCurrentOpenTabUrl();
     const nav = useNavigate();
     const { detailsExpanded, setDetailsExpanded } = useContext(accountPageContext);
+    const [, setUiStyle] = useAtom(uiStyleAtom);
 
     const selectedCred = useSelectedCredential();
 
@@ -38,6 +41,19 @@ function Account() {
     return (
         <div className="flex-column justify-space-between align-center h-full relative">
             <div className="account-page__content">
+                <div className="account-page__deprecated">
+                    <div className="account-page__deprecated_title">{t('timeToUpgrade')}</div>
+                    <div className="account-page__deprecated_text">{t('newUiDescription')}</div>
+                    <Link
+                        className="external-link"
+                        to={`${routePrefix}/home`}
+                        onClick={() => {
+                            setUiStyle(UiStyle.WalletX);
+                        }}
+                    >
+                        {t('switchNewUi')}
+                    </Link>
+                </div>
                 {accounts.length === 0 && (
                     <div className="flex-column align-center h-full">
                         <p className="m-t-20 m-h-40">{t('noAccounts')}</p>
