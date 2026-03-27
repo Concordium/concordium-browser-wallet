@@ -2,13 +2,21 @@
 
 ### Unreleased
 
+## 3.3.0
+
+### Added
+
 -   Added `ContractSchema` for `sendSponsoredTransaction` entrypoint for sponsored contract updates
 
-### 3.2.0
+## 3.2.0
+
+### Added
 
 -   Added `requestVerifiablePresentationV1` entrypoint to prove statements about identities and verifiable credentials with auditable anchor
 
-### 3.1.0
+## 3.1.0
+
+### Changed
 
 -   Updated handler `sendTransaction` with new payload type `TokenUpdatePayload`
 
