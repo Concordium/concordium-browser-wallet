@@ -19,7 +19,6 @@ import {
 import {
     sessionIsRecovering,
     sessionRecoveryStatus,
-    sessionPasscode,
     storedCredentials,
     storedCurrentNetwork,
     storedIdentities,
@@ -32,6 +31,7 @@ import { mnemonicToSeedSync } from '@scure/bip39';
 import { decrypt } from '@shared/utils/crypto';
 import { Buffer } from 'buffer/';
 import { GRPCTIMEOUT } from '@shared/constants/networkConfiguration';
+import { memoryStoreAccess, MemoryStoreKeys } from '@background/memory-store';
 import { addCredential, addIdentity, updateCredentials, updateIdentities } from './update';
 import bgMessageHandler, { onMessage } from './message-handler';
 import { openWindow } from './window-management';
@@ -100,7 +100,7 @@ function getRecoverUrl(inputs: RecoveryInputs, provider: IdentityProvider) {
 }
 
 async function getSeed() {
-    const passcode = await sessionPasscode.get();
+    const passcode = memoryStoreAccess(MemoryStoreKeys.Passcode).get();
     const encryptedSeed = await storedEncryptedSeedPhrase.get();
     if (!passcode || !encryptedSeed) {
         return undefined;

@@ -1,6 +1,6 @@
 import React, { ReactNode } from 'react';
 import { useNavigate } from 'react-router-dom';
-import { useAtom, useAtomValue, useSetAtom } from 'jotai';
+import { useAtom, useSetAtom } from 'jotai';
 import clsx from 'clsx';
 import { useTranslation } from 'react-i18next';
 import {
@@ -8,7 +8,6 @@ import {
     hasBeenSavedSeedAtom,
     networkConfigurationAtom,
     sessionOnboardingLocationAtom,
-    sessionPasscodeAtom,
 } from '@popup/store/settings';
 import Page from '@popup/popupX/shared/Page';
 import Button from '@popup/popupX/shared/Button';
@@ -20,6 +19,7 @@ import { absoluteRoutes } from '@popup/popupX/constants/routes';
 import { generateMnemonic } from '@scure/bip39';
 import { wordlist } from '@scure/bip39/wordlists/english';
 import { encrypt } from '@shared/utils/crypto';
+import { MemoryStoreKeys, useMemoryStoreValue } from '@popup/shared/utils/background-storage-helpers';
 
 function OnboardingOption({
     icon,
@@ -45,7 +45,7 @@ export default function CreateOrRestore() {
     const setHasBeenSavedSeed = useSetAtom(hasBeenSavedSeedAtom);
     const setOnboardingLocation = useSetAtom(sessionOnboardingLocationAtom);
     const setEncryptedSeedPhrase = useSetAtom(encryptedSeedPhraseAtom);
-    const sessionPasscode = useAtomValue(sessionPasscodeAtom);
+    const sessionPasscode = useMemoryStoreValue(MemoryStoreKeys.Passcode);
     const passcode = sessionPasscode.value;
 
     const nav = useNavigate();

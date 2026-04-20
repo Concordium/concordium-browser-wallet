@@ -1,13 +1,12 @@
 import React from 'react';
 import { Validate } from 'react-hook-form';
-import { useAtomValue } from 'jotai';
 import { useTranslation } from 'react-i18next';
+import { MemoryStoreKeys, useMemoryStoreValue } from '@popup/shared/utils/background-storage-helpers';
 import Page from '@popup/popupX/shared/Page';
 import Text from '@popup/popupX/shared/Text';
 import Button from '@popup/popupX/shared/Button';
 import FormPassword from '@popup/popupX/shared/Form/Password';
 import Form from '@popup/popupX/shared/Form/Form';
-import { sessionPasscodeAtom } from '@popup/store/settings';
 import { useForm } from '@popup/shared/Form';
 
 type FormValues = {
@@ -30,7 +29,7 @@ export default function PasswordProtect({
     config: { headingText, pageInfoText, submitText },
 }: PasswordProtectProps) {
     const { t: tPasscode } = useTranslation('x', { keyPrefix: 'sharedX.form.password' });
-    const passcode = useAtomValue(sessionPasscodeAtom);
+    const passcode = useMemoryStoreValue(MemoryStoreKeys.Passcode);
     const form = useForm<FormValues>();
 
     const handleSubmit = () => {

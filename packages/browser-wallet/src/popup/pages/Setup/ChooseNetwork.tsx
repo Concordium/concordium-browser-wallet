@@ -5,8 +5,9 @@ import Button from '@popup/shared/Button';
 import { absoluteRoutes } from '@popup/constants/routes';
 import { useSetAtom } from 'jotai';
 import { useTranslation } from 'react-i18next';
-import { hasBeenOnBoardedAtom, networkConfigurationAtom, sessionPasscodeAtom } from '@popup/store/settings';
-import { mainnet, testnet, stagenet } from '@shared/constants/networkConfiguration';
+import { hasBeenOnBoardedAtom, networkConfigurationAtom } from '@popup/store/settings';
+import { mainnet, stagenet, testnet } from '@shared/constants/networkConfiguration';
+import { MemoryStoreKeys, useSetMemoryStore } from '@popup/shared/utils/background-storage-helpers';
 import { NetworkConfiguration } from '@shared/storage/types';
 import { isDevelopmentBuild } from '@shared/utils/environment-helpers';
 import { setupRoutes } from './routes';
@@ -24,7 +25,7 @@ function NetworkButton({ text, network, className, isRecovering }: NetworkButton
     const setNetworkConfiguration = useSetAtom(networkConfigurationAtom);
     const setHasBeenOnboarded = useSetAtom(hasBeenOnBoardedAtom);
     const passcode = usePasscodeInSetup();
-    const setPasscodeInSession = useSetAtom(sessionPasscodeAtom);
+    const setPasscodeInSession = useSetMemoryStore(MemoryStoreKeys.Passcode);
 
     const goToNext = () => {
         setPasscodeInSession(passcode);

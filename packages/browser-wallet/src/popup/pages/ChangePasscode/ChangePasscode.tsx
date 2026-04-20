@@ -2,7 +2,7 @@ import { decrypt, encrypt } from '@shared/utils/crypto';
 import Form, { useForm } from '@popup/shared/Form';
 import FormPassword from '@popup/shared/Form/Password';
 import Submit from '@popup/shared/Form/Submit';
-import { encryptedSeedPhraseAtom, sessionPasscodeAtom } from '@popup/store/settings';
+import { encryptedSeedPhraseAtom } from '@popup/store/settings';
 import { useAtom, useSetAtom } from 'jotai';
 import React from 'react';
 import { SubmitHandler, UseFormGetValues, Validate } from 'react-hook-form';
@@ -10,6 +10,7 @@ import { useTranslation } from 'react-i18next';
 import { useNavigate } from 'react-router-dom';
 import { absoluteRoutes } from '@popup/constants/routes';
 import { addToastAtom } from '@popup/state';
+import { MemoryStoreKeys, useMemoryStore } from '@popup/shared/utils/background-storage-helpers';
 
 type FormValues = {
     currentPasscode: string;
@@ -23,7 +24,7 @@ export default function ChangePasscode() {
     const { t } = useTranslation('changePasscode');
     const form = useForm<FormValues>();
     const [encryptedSeedPhrase, setEncryptedSeedPhrase] = useAtom(encryptedSeedPhraseAtom);
-    const [passcode, setPasscode] = useAtom(sessionPasscodeAtom);
+    const [passcode, setPasscode] = useMemoryStore(MemoryStoreKeys.Passcode);
     const addToast = useSetAtom(addToastAtom);
 
     if (passcode.loading || !passcode.value || encryptedSeedPhrase.loading) {

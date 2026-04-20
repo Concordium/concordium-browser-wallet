@@ -1,9 +1,10 @@
 import React from 'react';
-import { useAtomValue, useSetAtom } from 'jotai';
+import { useAtomValue } from 'jotai';
 import { useTranslation } from 'react-i18next';
 import { SubmitHandler, useForm } from 'react-hook-form';
-import { encryptedSeedPhraseAtom, sessionPasscodeAtom } from '@popup/store/settings';
+import { encryptedSeedPhraseAtom } from '@popup/store/settings';
 import { decrypt } from '@shared/utils/crypto';
+import { MemoryStoreKeys, useSetMemoryStore } from '@popup/shared/utils/background-storage-helpers';
 import Page from '@popup/popupX/shared/Page';
 import Text from '@popup/popupX/shared/Text';
 import Form from '@popup/popupX/shared/Form/Form';
@@ -15,7 +16,7 @@ type FormValues = {
 };
 
 export default function PasswordSession() {
-    const setPasscodeInSession = useSetAtom(sessionPasscodeAtom);
+    const setPasscodeInSession = useSetMemoryStore(MemoryStoreKeys.Passcode);
     const encryptedSeedPhrase = useAtomValue(encryptedSeedPhraseAtom);
     const { t } = useTranslation('x', { keyPrefix: 'sharedX.passwordSession' });
     const { t: tPasscode } = useTranslation('x', { keyPrefix: 'sharedX.form.password' });

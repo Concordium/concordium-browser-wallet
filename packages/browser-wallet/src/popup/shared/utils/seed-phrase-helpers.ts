@@ -1,13 +1,14 @@
 import { Buffer } from 'buffer/';
 import { useAtomValue } from 'jotai';
-import { encryptedSeedPhraseAtom, sessionPasscodeAtom } from '@popup/store/settings';
+import { encryptedSeedPhraseAtom } from '@popup/store/settings';
 import { noOp, useAsyncMemo } from 'wallet-common-helpers';
 import { mnemonicToSeedSync } from '@scure/bip39';
 import { decrypt } from '@shared/utils/crypto';
+import { MemoryStoreKeys, useMemoryStoreValue } from '@popup/shared/utils/background-storage-helpers';
 
 export function useDecryptedSeedPhrase(onError: (e: Error) => void = noOp) {
     const encryptedSeed = useAtomValue(encryptedSeedPhraseAtom);
-    const passcode = useAtomValue(sessionPasscodeAtom);
+    const passcode = useMemoryStoreValue(MemoryStoreKeys.Passcode);
 
     const seed = useAsyncMemo(
         async () => {

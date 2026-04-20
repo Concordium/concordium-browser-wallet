@@ -2,6 +2,10 @@
 
 ## Unreleased
 
+### Added
+
+-   Added Memory storage in background script
+
 ## 2.10.0
 
 ### Added

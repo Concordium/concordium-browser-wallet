@@ -5,9 +5,10 @@ import { useSelectedCredential } from '@popup/shared/utils/account-helpers';
 import Loader from '@popup/popupX/shared/Loader';
 import PasswordProtect, { PasswordProtectConfigType } from '@popup/popupX/shared/PasswordProtect';
 import PasswordSession from '@popup/popupX/shared/PasswordSession';
-import { hasBeenOnBoardedAtom, sessionOnboardingLocationAtom, sessionPasscodeAtom } from '@popup/store/settings';
+import { hasBeenOnBoardedAtom, sessionOnboardingLocationAtom } from '@popup/store/settings';
 import { isRecoveringAtom } from '@popup/store/identity';
 import { absoluteRoutes } from '@popup/popupX/constants/routes';
+import { MemoryStoreKeys, useMemoryStoreValue } from '@popup/shared/utils/background-storage-helpers';
 
 export function withSelectedCredential<P extends object>(
     Component: React.ComponentType<P>
@@ -39,7 +40,7 @@ export function withPasswordProtected(Component: React.ComponentType, config: Pa
 
 export function withPasswordSession(Component: React.ComponentType) {
     function NewComponent() {
-        const { value: sessionPasscode } = useAtomValue(sessionPasscodeAtom);
+        const { value: sessionPasscode } = useMemoryStoreValue(MemoryStoreKeys.Passcode);
 
         if (!sessionPasscode) {
             return <PasswordSession />;

@@ -216,7 +216,6 @@ export const storedAllowlist = useIndexedStorage(indexedStoredAllowlist, getGene
 export const storedLog = makeStorageAccessor<Log[]>('local', ChromeStorageKey.Log);
 
 export const sessionOpenPrompt = makeStorageAccessor<boolean>('session', ChromeStorageKey.OpenPrompt);
-export const sessionPasscode = makeStorageAccessor<string>('session', ChromeStorageKey.Passcode);
 export const sessionPendingIdentity = makeStorageAccessor<SessionPendingIdentity>(
     'session',
     ChromeStorageKey.PendingIdentity
@@ -244,3 +243,4 @@ export const sessionVerifiableCredentialMetadataUrls = makeIndexedStorageAccesso
     'session',
     ChromeStorageKey.TemporaryVerifiableCredentialMetadataUrls
 );
+export const memoryStoreUpdate = makeStorageAccessor<number>('session', ChromeStorageKey.MemoryStoreUpdate);

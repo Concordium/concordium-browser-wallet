@@ -6,7 +6,7 @@ import Submit from '@popup/shared/Form/Submit';
 import { TextArea } from '@popup/shared/Form/TextArea';
 import { useCredential, usePrivateKey, usePublicKey } from '@popup/shared/utils/account-helpers';
 import { selectedAccountAtom } from '@popup/store/account';
-import { networkConfigurationAtom, sessionPasscodeAtom } from '@popup/store/settings';
+import { networkConfigurationAtom } from '@popup/store/settings';
 import { useAtomValue } from 'jotai';
 import React, { useEffect, useState } from 'react';
 import { Validate } from 'react-hook-form';
@@ -16,6 +16,7 @@ import { absoluteRoutes } from '@popup/constants/routes';
 import { NetworkConfiguration } from '@shared/storage/types';
 import { getNet } from '@shared/utils/network-helpers';
 import { saveData } from '@popup/shared/utils/file-helpers';
+import { MemoryStoreKeys, useMemoryStoreValue } from '@popup/shared/utils/background-storage-helpers';
 
 type CredentialKeys = {
     threshold: number;
@@ -81,7 +82,7 @@ export default function ExportPrivateKey() {
     const { t: tSetup } = useTranslation('setup');
     const { t: tPasscode } = useTranslation('changePasscode');
     const { t } = useTranslation('account', { keyPrefix: 'settings.exportPrivateKey' });
-    const passcode = useAtomValue(sessionPasscodeAtom);
+    const passcode = useMemoryStoreValue(MemoryStoreKeys.Passcode);
     const [showPrivateKey, setShowPrivateKey] = useState<boolean>(false);
     const selectedAccountAddress = useAtomValue(selectedAccountAtom);
     const credential = useCredential(selectedAccountAddress);

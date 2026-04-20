@@ -1,5 +1,4 @@
 import {
-    sessionPasscode,
     StorageAccessor,
     getGenesisHash,
     useIndexedStorage,
@@ -36,6 +35,7 @@ import {
     storedUiStyle,
     storedCustomNetwork,
     storedHasBeenSavedSeed,
+    memoryStoreUpdate,
 } from '@shared/storage/access';
 import { ChromeStorageKey } from '@shared/storage/types';
 import { atom, PrimitiveAtom, WritableAtom } from 'jotai';
@@ -52,10 +52,10 @@ const accessorMap: Record<ChromeStorageKey, StorageAccessor<any>> = {
     [ChromeStorageKey.CustomNetworkConfiguration]: storedCustomNetwork,
     [ChromeStorageKey.Theme]: storedTheme,
     [ChromeStorageKey.UiStyle]: storedUiStyle,
+    [ChromeStorageKey.MemoryStoreUpdate]: memoryStoreUpdate,
     [ChromeStorageKey.IdentityProviders]: useIndexedStorage(storedIdentityProviders, getGenesisHash),
     [ChromeStorageKey.HasBeenOnboarded]: storedHasBeenOnboarded,
     [ChromeStorageKey.HasBeenSavedSeed]: storedHasBeenSavedSeed,
-    [ChromeStorageKey.Passcode]: sessionPasscode,
     [ChromeStorageKey.IsRecovering]: sessionIsRecovering,
     [ChromeStorageKey.PendingIdentity]: sessionPendingIdentity,
     [ChromeStorageKey.IsCreatingCredential]: sessionCreatingCredential,

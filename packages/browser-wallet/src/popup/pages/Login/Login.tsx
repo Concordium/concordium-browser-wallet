@@ -6,10 +6,11 @@ import Form from '@popup/shared/Form';
 import Submit from '@popup/shared/Form/Submit';
 import FormPassword from '@popup/shared/Form/Password';
 import { useTranslation } from 'react-i18next';
-import { useNavigate, useLocation } from 'react-router-dom';
-import { useAtomValue, useSetAtom } from 'jotai';
+import { useLocation, useNavigate } from 'react-router-dom';
+import { useAtomValue } from 'jotai';
 import { decrypt } from '@shared/utils/crypto';
-import { encryptedSeedPhraseAtom, sessionPasscodeAtom } from '@popup/store/settings';
+import { encryptedSeedPhraseAtom } from '@popup/store/settings';
+import { MemoryStoreKeys, useSetMemoryStore } from '@popup/shared/utils/background-storage-helpers';
 
 type FormValues = {
     passcode: string;
@@ -28,7 +29,7 @@ type State = {
 export default function Login() {
     const navigate = useNavigate();
     const state = useLocation().state as State;
-    const setPasscodeInSession = useSetAtom(sessionPasscodeAtom);
+    const setPasscodeInSession = useSetMemoryStore(MemoryStoreKeys.Passcode);
     const encryptedSeedPhrase = useAtomValue(encryptedSeedPhraseAtom);
     const { t } = useTranslation('login');
     const { t: tSetup } = useTranslation('setup');

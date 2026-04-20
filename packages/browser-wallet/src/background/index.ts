@@ -10,7 +10,6 @@ import { deserializeTypeValue } from '@concordium/web-sdk';
 import {
     getGenesisHash,
     sessionOpenPrompt,
-    sessionPasscode,
     storedAcceptedTerms,
     storedAllowlist,
     storedCurrentNetwork,
@@ -47,10 +46,11 @@ import {
     runIfValidWeb3IdProof,
     web3IdAddCredentialFinishHandler,
 } from './web3Id';
+import { createMemoryStoreHandler, memoryStoreAccess, MemoryStoreKeys } from './memory-store';
 
 const rpcCallNotAllowedMessage = 'RPC Call can only be performed by whitelisted sites';
 async function isWalletLocked(): Promise<boolean> {
-    const passcode = await sessionPasscode.get();
+    const passcode = memoryStoreAccess(MemoryStoreKeys.Passcode).get();
     return !passcode;
 }
 
@@ -225,6 +225,8 @@ bgMessageHandler.handleMessage(createMessageTypeFilter(InternalMessageType.OpenF
 bgMessageHandler.handleMessage(createMessageTypeFilter(InternalMessageType.OpenPopup), () => {
     chrome.action.openPopup();
 });
+
+bgMessageHandler.handleMessage(createMessageTypeFilter(InternalMessageType.MemoryStore), createMemoryStoreHandler);
 
 const NOT_WHITELISTED = 'Site is not whitelisted';
 

@@ -54,6 +54,7 @@ export enum InternalMessageType {
     OpenFullscreen = 'I_OpenFullscreen',
     OpenPopup = 'I_OpenPopup',
     SignCIS3Message = 'I_SignCIS3Message',
+    MemoryStore = 'I_MemoryStore',
 }
 
 // eslint-disable-next-line @typescript-eslint/no-explicit-any

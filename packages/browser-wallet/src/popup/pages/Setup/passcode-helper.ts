@@ -1,10 +1,10 @@
 import { passcodeAtom } from '@popup/state';
-import { sessionPasscodeAtom } from '@popup/store/settings';
 import { useAtomValue } from 'jotai';
+import { MemoryStoreKeys, useMemoryStoreValue } from '@popup/shared/utils/background-storage-helpers';
 
 export function usePasscodeInSetup() {
     const passcode = useAtomValue(passcodeAtom);
-    const sessionPasscode = useAtomValue(sessionPasscodeAtom);
+    const sessionPasscode = useMemoryStoreValue(MemoryStoreKeys.Passcode);
 
     if (passcode) {
         // In setup flow, have not closed the popup at any point.
