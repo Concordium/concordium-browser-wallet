@@ -32,7 +32,7 @@ export const useMemoryStoreValue = (key: string) => {
     return state;
 };
 
-export const useSetMemoryStore = (key: string) => async (value: string) => {
+export const useSetMemoryStore = (key: string) => async (value?: string) => {
     memoryStoreMessageHandler(key, 'set', value).catch((err) => {
         logError(err);
     });
@@ -40,14 +40,14 @@ export const useSetMemoryStore = (key: string) => async (value: string) => {
 
 export const useMemoryStore = (
     key: string
-): [{ loading: boolean; value: string | undefined }, (value: string) => void] => {
+): [{ loading: boolean; value: string | undefined }, (value?: string) => void] => {
     const latestMemoryStoreUpdate = useAtomValue(memoryStoreUpdateAtom);
     const [state, setState] = useState<{ loading: boolean; value: string | undefined }>({
         loading: true,
         value: undefined,
     });
 
-    const setMemoryStoreValue = (value: string) => {
+    const setMemoryStoreValue = (value?: string) => {
         memoryStoreMessageHandler(key, 'set', value)
             .then((newValue) => {
                 setState({ loading: false, value: newValue });
