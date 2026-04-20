@@ -69,6 +69,7 @@
         "elliptic": "^6.6.1",
         "loader-utils": "^2.0.4",
         "node-gyp@npm:9.0.0/tar": "^7.5.7",
-        "cacache@npm:16.1.1/tar": "^7.5.7"
+        "cacache@npm:16.1.1/tar": "^7.5.7",
+        "serialize-javascript": "^7.0.3"
     }
 }
