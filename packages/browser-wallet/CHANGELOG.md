@@ -2,6 +2,10 @@
 
 ## Unreleased
 
+### Removed
+
+-   Removed ability to switch to `OldUI`, it is no longer accessible to users through the interface.
+
 ## 2.10.0
 
 ### Added
