@@ -51,8 +51,11 @@ export enum Theme {
     Dark = 'dark',
 }
 
+// Created additional value OldDeprecated
+// In case when needed access to the old UI
 export enum UiStyle {
     Old = 'old',
+    OldDeprecated = 'oldDeprecated',
     WalletX = 'walletX',
 }
 

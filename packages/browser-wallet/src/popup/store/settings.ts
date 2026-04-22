@@ -24,7 +24,7 @@ export const encryptedSeedPhraseAtom = atomWithChromeStorage<EncryptedData | und
     true
 );
 export const themeAtom = atomWithChromeStorage<Theme>(ChromeStorageKey.Theme, Theme.Light);
-export const uiStyleAtom = atomWithChromeStorage<UiStyle>(ChromeStorageKey.UiStyle, UiStyle.Old, true);
+export const uiStyleAtom = atomWithChromeStorage<UiStyle>(ChromeStorageKey.UiStyle, UiStyle.WalletX, true);
 export const hasBeenOnBoardedAtom = atomWithChromeStorage<boolean>(ChromeStorageKey.HasBeenOnboarded, false, true);
 export const hasBeenSavedSeedAtom = atomWithChromeStorage<boolean>(ChromeStorageKey.HasBeenSavedSeed, true, false);
 

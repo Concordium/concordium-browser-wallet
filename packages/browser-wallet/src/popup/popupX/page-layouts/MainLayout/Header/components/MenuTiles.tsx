@@ -8,16 +8,12 @@ import Percent from '@assets/svgX/percent.svg';
 import LinkSimple from '@assets/svgX/link-simple-horizontal.svg';
 import Info from '@assets/svgX/info2.svg';
 import Restore from '@assets/svgX/arrow-counter-clock.svg';
-import Eye from '@assets/svgX/eye.svg';
 import NFT from '@assets/svgX/cube-focus.svg';
 import IconButton from '@popup/shared/IconButton';
 import Text from '@popup/popupX/shared/Text';
 import { Link } from 'react-router-dom';
 import { absoluteRoutes } from '@popup/popupX/constants/routes';
 import { useTranslation } from 'react-i18next';
-import { useAtom } from 'jotai';
-import { uiStyleAtom } from '@popup/store/settings';
-import { UiStyle } from '@shared/storage/types';
 
 type MenuTilesProps = {
     menuOpen: boolean;
@@ -26,7 +22,7 @@ type MenuTilesProps = {
 
 export default function MenuTiles({ menuOpen, setMenuOpen }: MenuTilesProps) {
     const { t } = useTranslation('x', { keyPrefix: 'header.menu' });
-    const [, setUiStyle] = useAtom(uiStyleAtom);
+
     if (!menuOpen) return null;
     return (
         <div className="main-header__menu-tiles fade-menu-bg">
@@ -89,17 +85,6 @@ export default function MenuTiles({ menuOpen, setMenuOpen }: MenuTilesProps) {
                     <IconButton className="main-header__menu-tiles_tile">
                         <Restore />
                         <Text.Capture>{t('restore')}</Text.Capture>
-                    </IconButton>
-                </Link>
-                <Link
-                    to="/account/tokens"
-                    onClick={() => {
-                        setUiStyle(UiStyle.Old);
-                    }}
-                >
-                    <IconButton className="main-header__menu-tiles_tile">
-                        <Eye />
-                        <Text.Capture>{t('oldUI')}</Text.Capture>
                     </IconButton>
                 </Link>
                 <Link to={absoluteRoutes.settings.nft.path}>
