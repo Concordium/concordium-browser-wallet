@@ -154,7 +154,9 @@ export default function Root() {
         <Provider>
             <MemoryRouter
                 initialEntries={[
-                    (uiStyle.value === UiStyle.Old && '/account') || haveInitialEntry || absoluteRoutes.home.path,
+                    (uiStyle.value === UiStyle.OldDeprecated && '/account') ||
+                        haveInitialEntry ||
+                        absoluteRoutes.home.path,
                 ]}
             >
                 <Scaling>
