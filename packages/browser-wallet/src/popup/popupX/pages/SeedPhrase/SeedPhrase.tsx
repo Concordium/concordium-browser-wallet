@@ -9,13 +9,14 @@ import Copy from '@assets/svgX/UiKit/Interface/copy-duplicate.svg';
 import { useAsyncMemo } from 'wallet-common-helpers';
 import { decrypt } from '@shared/utils/crypto';
 import { useAtomValue } from 'jotai';
-import { encryptedSeedPhraseAtom, sessionPasscodeAtom } from '@popup/store/settings';
+import { encryptedSeedPhraseAtom } from '@popup/store/settings';
 import { withPasswordProtected } from '@popup/popupX/shared/utils/hoc';
 import { useCopyToClipboard } from '@popup/popupX/shared/utils/hooks';
+import { MemoryStoreKeys, useMemoryStoreValue } from '@popup/shared/utils/background-storage-helpers';
 
 function SeedPhrase() {
     const { t } = useTranslation('x', { keyPrefix: 'seedPhrase' });
-    const passcode = useAtomValue(sessionPasscodeAtom);
+    const passcode = useMemoryStoreValue(MemoryStoreKeys.Passcode);
     const encryptedSeed = useAtomValue(encryptedSeedPhraseAtom);
     const copyToClipboard = useCopyToClipboard();
 

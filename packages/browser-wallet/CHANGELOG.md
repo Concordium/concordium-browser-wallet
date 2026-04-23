@@ -6,6 +6,10 @@
 
 -   Removed ability to switch to `OldUI`, it is no longer accessible to users through the interface.
 
+### Added
+
+-   Added Memory storage in background script
+
 ## 2.10.0
 
 ### Added

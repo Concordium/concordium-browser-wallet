@@ -11,7 +11,8 @@ import { useAtom, useSetAtom } from 'jotai';
 import { passcodeAtom } from '@popup/state';
 import { useForm } from '@popup/shared/Form';
 import { SubmitHandler, Validate } from 'react-hook-form';
-import { encryptedSeedPhraseAtom, sessionOnboardingLocationAtom, sessionPasscodeAtom } from '@popup/store/settings';
+import { encryptedSeedPhraseAtom, sessionOnboardingLocationAtom } from '@popup/store/settings';
+import { MemoryStoreKeys, useSetMemoryStore } from '@popup/shared/utils/background-storage-helpers';
 
 type FormValues = {
     passcode: string;
@@ -23,7 +24,7 @@ export default function SetupPassword() {
     const nav = useNavigate();
     const setOnboardingLocation = useSetAtom(sessionOnboardingLocationAtom);
     const setPasscode = useSetAtom(passcodeAtom);
-    const setPasscodeInSession = useSetAtom(sessionPasscodeAtom);
+    const setPasscodeInSession = useSetMemoryStore(MemoryStoreKeys.Passcode);
     const [, setEncryptedSeedPhrase] = useAtom(encryptedSeedPhraseAtom);
     const form = useForm<FormValues>({ mode: 'onChange' });
     const passcode = form.watch('passcode');

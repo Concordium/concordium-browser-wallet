@@ -15,7 +15,7 @@ import {
     StatementTypes,
 } from '@concordium/web-sdk';
 
-import { grpcClientAtom, networkConfigurationAtom, sessionPasscodeAtom } from '@popup/store/settings';
+import { grpcClientAtom, networkConfigurationAtom } from '@popup/store/settings';
 import { addToastAtom } from '@popup/state';
 import { useDecryptedSeedPhrase } from '@popup/shared/utils/seed-phrase-helpers';
 import { getGlobal, getNet } from '@shared/utils/network-helpers';
@@ -32,6 +32,7 @@ import { isIdentityOfCredential } from '@shared/utils/identity-helpers';
 import Toast from '@popup/shared/Toast';
 import { logError } from '@shared/utils/log-helpers';
 import { proveWeb3Request } from '@shared/utils/proof-helpers';
+import { MemoryStoreKeys, useMemoryStoreValue } from '@popup/shared/utils/background-storage-helpers';
 import Web3ProofRequest from '../Web3ProofRequest/Web3ProofRequest';
 import {
     checkIfAccountCredentialIsViableForStatement,
@@ -115,7 +116,7 @@ export default function AgeProofRequest({ onReject, onSubmit }: Props) {
     const recoveryPhrase = useDecryptedSeedPhrase(logError);
     const dappName = displayUrl(url);
     const [creatingProof, setCreatingProof] = useState<boolean>(false);
-    const { loading: loadingPasscode, value: sessionPasscode } = useAtomValue(sessionPasscodeAtom);
+    const { loading: loadingPasscode, value: sessionPasscode } = useMemoryStoreValue(MemoryStoreKeys.Passcode);
 
     const age = useAgeFromStatement(statement);
 

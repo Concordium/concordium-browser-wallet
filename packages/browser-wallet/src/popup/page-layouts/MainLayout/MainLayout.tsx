@@ -1,19 +1,20 @@
 import React, { useState } from 'react';
-import { Outlet, Navigate } from 'react-router-dom';
+import { Navigate, Outlet } from 'react-router-dom';
 import { useAtomValue } from 'jotai';
 import clsx from 'clsx';
 
 import { absoluteRoutes } from '@popup/constants/routes';
 import { absoluteRoutes as absoluteRoutesX } from '@popup/popupX/constants/routes';
-import { hasBeenOnBoardedAtom, sessionPasscodeAtom, acceptedTermsAtom } from '@popup/store/settings';
+import { acceptedTermsAtom, hasBeenOnBoardedAtom } from '@popup/store/settings';
 import { isRecoveringAtom } from '@popup/store/identity';
+import { MemoryStoreKeys, useMemoryStoreValue } from '@popup/shared/utils/background-storage-helpers';
 import Toast from '@popup/shared/Toast/Toast';
 import Header from './Header';
 
 export default function MainLayout() {
     const [headerOpen, setHeaderOpen] = useState(false);
     const { loading: loadingHasBeenOnboarded, value: hasBeenOnboarded } = useAtomValue(hasBeenOnBoardedAtom);
-    const { loading: loadingPasscode, value: sessionPasscode } = useAtomValue(sessionPasscodeAtom);
+    const { loading: loadingPasscode, value: sessionPasscode } = useMemoryStoreValue(MemoryStoreKeys.Passcode);
     const { loading: loadingIsRecovering, value: sessionIsRecovering } = useAtomValue(isRecoveringAtom);
     const { loading: loadingAcceptedTerms, value: acceptedTerms } = useAtomValue(acceptedTermsAtom);
 
