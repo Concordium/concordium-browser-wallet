@@ -2,6 +2,10 @@
 
 ## Unreleased
 
+### Updated
+
+-   Updated payload titles for RBAC operations
+
 ## 2.11.0
 
 ### Removed

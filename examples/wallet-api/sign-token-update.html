@@ -129,6 +129,32 @@
                         .then((sig) => alert(JSON.stringify(sig)))
                         .catch(alert);
                 });
+
+                document.getElementById('signAdminMintUpdate').addEventListener('click', () => {
+                    const { Cbor, TokenId, TokenOperationType, CborAccountAddress, AccountAddress, TokenAdminRole } =
+                        concordiumSDK;
+
+                    const ops = [
+                        {
+                            [TokenOperationType.AssignAdminRoles]: {
+                                roles: [TokenAdminRole.Mint, TokenAdminRole.Burn],
+                                account: CborAccountAddress.fromAccountAddress(
+                                    AccountAddress.fromBase58('3foN48b7v7H7GZd6Rifu6YtVmhdGCybmE6fXuYnJsvcGP65J4v')
+                                ),
+                            },
+                        },
+                    ];
+
+                    const payload = {
+                        tokenId: TokenId.fromString('EHG'),
+                        operations: Cbor.encode(ops),
+                    };
+
+                    return provider
+                        .sendTransaction(currentAccountAddress, 27, payload)
+                        .then((sig) => alert(JSON.stringify(sig)))
+                        .catch(alert);
+                });
             }
             setupPage();
         </script>
@@ -143,5 +169,6 @@
         <button id="requestAccounts">Request accounts</button>
         <button id="signSingleTransferTokenUpdate">Sign Single Transfer Token Update</button>
         <button id="signTokenUpdate">Sign Token Update</button>
+        <button id="signAdminMintUpdate">Sign Admin Mint Update</button>
     </body>
 </html>
