@@ -3,11 +3,11 @@ import ArrowRight from '@assets/svgX/arrow-right.svg';
 import Button from '@popup/popupX/shared/Button';
 import Page from '@popup/popupX/shared/Page';
 import Text from '@popup/popupX/shared/Text';
-import { useTranslation } from 'react-i18next';
+import { useTranslation, Trans } from 'react-i18next';
 import IdCard from '@popup/popupX/shared/IdCard';
 import { BackgroundResponseStatus, IdentityIdentifier, RecoveryBackgroundResponse } from '@shared/utils/types';
 import { useAtom, useAtomValue } from 'jotai';
-import { identitiesAtom, identityProvidersAtom } from '@popup/store/identity';
+import { identitiesAtom, identityProvidersAtom, recoveryProvidersErrorsAtom } from '@popup/store/identity';
 import { credentialsAtom, selectedAccountAtom } from '@popup/store/account';
 import { identityMatch, isIdentityOfCredential } from '@shared/utils/identity-helpers';
 import { displaySplitAddressShort } from '@popup/shared/utils/account-helpers';
@@ -102,6 +102,48 @@ export function DisplaySuccess({ added }: Props) {
     );
 }
 
+function DisplayProvidersError() {
+    const { t } = useTranslation('x', { keyPrefix: 'restore' });
+    const recoveryProvidersErrors = useAtomValue(recoveryProvidersErrorsAtom);
+    const { failedProviders, completedProviders } = recoveryProvidersErrors;
+    const identityProviders = useAtomValue(identityProvidersAtom);
+
+    if (!failedProviders?.length) return null;
+
+    const getProviderStatusMessage = () =>
+        completedProviders?.map((provider) => {
+            const idProvider = identityProviders.find(({ ipInfo }) => ipInfo.ipIdentity === provider);
+            const failedProvider = failedProviders?.find(
+                ({ providerIndex }) => idProvider?.ipInfo.ipIdentity === providerIndex
+            );
+            if (failedProvider) {
+                return {
+                    error: true,
+                    message: t('idpError', {
+                        idProviderName: idProvider?.ipInfo.ipDescription.name,
+                        code: failedProvider.errorCode,
+                    }),
+                };
+            }
+            return { error: false, message: idProvider?.ipInfo.ipDescription.name };
+        });
+
+    return (
+        <div className="id-providers-errors">
+            <Text.Capture className="id-providers-errors__info">
+                <Trans ns="x" i18nKey="restore.idpWarning" components={{ bold: <strong /> }} />
+            </Text.Capture>
+            <div className="id-providers-errors__list">
+                {getProviderStatusMessage()?.map(({ error, message }) => (
+                    <Text.Capture key={message} className={`id-providers-errors__list_item ${error ? 'error' : ''}`}>
+                        {message}
+                    </Text.Capture>
+                ))}
+            </div>
+        </div>
+    );
+}
+
 interface Location {
     state: {
         payload: RecoveryBackgroundResponse;
@@ -124,6 +166,7 @@ export default function RestoreResult() {
             {payload.status === BackgroundResponseStatus.Success && (
                 <>
                     <Page.Main>
+                        <DisplayProvidersError />
                         <DisplaySuccess added={payload.added} />
                     </Page.Main>
                     <Page.Footer>

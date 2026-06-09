@@ -17,6 +17,8 @@ const t = {
     verifiedBy: 'Verified by {{idProviderName}}',
     unknown: 'Unknown',
     retry: 'Retry',
+    idpWarning: '<bold>Warning:</bold> One or more identity providers could not be processed due to a server error.',
+    idpError: '{{idProviderName}} (Error code: {{code}})',
 };
 
 export default t;

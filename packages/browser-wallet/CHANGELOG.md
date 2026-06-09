@@ -2,6 +2,10 @@
 
 ## Unreleased
 
+### Changed
+
+-   Unresponsive identity providers are now automatically skipped during the recovery process. Recovery will continue with the remaining providers instead of failing when a provider is unavailable.
+
 ## 2.11.0
 
 ### Removed

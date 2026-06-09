@@ -224,6 +224,7 @@ export interface RecoveryStatus {
     identitiesToUpdate?: Identity[];
     credentialsToAdd?: CredentialBalancePair[];
     completedProviders?: number[];
+    failedProviders?: { providerIndex: number; errorCode: number }[];
     identityIndex?: number;
     identityGap?: number;
     credentialNumber?: number;

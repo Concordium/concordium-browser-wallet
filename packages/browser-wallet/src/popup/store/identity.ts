@@ -50,6 +50,12 @@ const recoveryStatusAtom = atomWithChromeStorage<RecoveryStatus | undefined>(
     undefined,
     true
 );
+
+export const recoveryProvidersErrorsAtom = selectAtom(recoveryStatusAtom, (v) => ({
+    completedProviders: v.value?.completedProviders,
+    failedProviders: v.value?.failedProviders,
+}));
+
 export const setRecoveryPayloadAtom = atom<null, RecoveryPayload, Promise<void>>(null, (_, set, payload) =>
     set(recoveryStatusAtom, { payload })
 );
