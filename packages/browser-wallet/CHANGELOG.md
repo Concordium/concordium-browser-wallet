@@ -2,6 +2,11 @@
 
 ## Unreleased
 
+### Updated
+
+-   Updated payload titles for RBAC operations
+-   Section Advenced renamed to Operations and always shown in transactions details
+
 ## 2.11.0
 
 ### Removed

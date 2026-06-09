@@ -42,7 +42,8 @@
     }
 
     .page__main:has(#toggle-collapse:checked),
-    .row.details:has(#toggle-collapse:checked) {
+    .row.details:has(#toggle-collapse:checked),
+    .row.details:not(:has(#toggle-collapse)) {
         .operations-list {
             max-height: unset;
         }

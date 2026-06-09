@@ -190,7 +190,7 @@ function DisplayTokenUpdate({ payload }: { payload: TokenUpdatePayload }) {
     return (
         <>
             <Card.RowDetails title={t('tokenId')} value={payload.tokenId.toString()} />
-            <Card.RowDetails title={<ToggleAdvanced />} value={operationsCborDecoder(payload.operations)} />
+            <Card.RowDetails title={t('operations')} value={operationsCborDecoder(payload.operations)} />
         </>
     );
 }
