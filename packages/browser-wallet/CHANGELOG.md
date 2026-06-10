@@ -2,6 +2,17 @@
 
 ## Unreleased
 
+## 2.12.0
+
+### Updated
+
+-   Updated payload titles for RBAC operations
+
+### Changed
+
+-   Unresponsive identity providers are now automatically skipped during the recovery process. Recovery will continue with the remaining providers instead of failing when a provider is unavailable.
+-   Section Advenced renamed to Operations and always shown in transactions details
+
 ## 2.11.0
 
 ### Removed
