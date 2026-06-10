@@ -2,6 +2,8 @@
 
 ## Unreleased
 
+## 2.12.0
+
 ### Updated
 
 -   Updated payload titles for RBAC operations
