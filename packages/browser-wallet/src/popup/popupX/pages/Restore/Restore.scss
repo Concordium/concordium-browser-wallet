@@ -42,4 +42,33 @@
             }
         }
     }
+
+    .id-providers-errors {
+        display: flex;
+        flex-direction: column;
+        padding: $semantic-padding-s;
+        gap: $semantic-gap-s;
+        margin-bottom: $semantic-gap-m;
+        background: $semantic-surface-warning-tertiary;
+        border: rem(1px) solid $semantic-border-warning-tertiary;
+        border-radius: $semantic-radius-s;
+
+        &__info.capture__main_small {
+            color: $semantic-content-warning-primary;
+        }
+
+        &__list {
+            display: flex;
+            flex-direction: column;
+            padding-left: $semantic-padding-s;
+
+            &_item {
+                color: $semantic-content-success-primary;
+
+                &.error {
+                    color: $semantic-content-error-primary;
+                }
+            }
+        }
+    }
 }

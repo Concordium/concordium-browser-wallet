@@ -126,6 +126,7 @@ async function performRecovery(respond: (i: RecoveryBackgroundResponse) => void)
         const identitiesToUpdate: Identity[] = status.identitiesToUpdate || [];
         const credsToAdd: CredentialBalancePair[] = status.credentialsToAdd || [];
         const completedProviders = status.completedProviders || [];
+        const failedProviders = status.failedProviders || [];
 
         const network = await storedCurrentNetwork.get();
         if (!network) {
@@ -194,6 +195,18 @@ async function performRecovery(respond: (i: RecoveryBackgroundResponse) => void)
                         }
                         identity = newIdentity;
                         await sessionRecoveryStatus.set(status);
+                    } else if (response.status >= 500) {
+                        failedProviders.push({ providerIndex, errorCode: response.status });
+
+                        // Important: break out of the while loop and skip this provider here.
+                        // If the provider returns a server-side error (HTTP 500+), any subsequent requests
+                        // may be interpreted by the browser/protection layer as a DDoS-like pattern
+                        // and will fail as well. Continuing the loop would eventually throw error.
+                        // Since the entire function is wrapped in a top-level try/catch,
+                        // the error would be caught there, causing execution to fall into the catch block
+                        // and fail the whole function instead of just skipping the affected provider.
+
+                        break;
                     }
                 }
                 if (identity) {
@@ -244,6 +257,7 @@ async function performRecovery(respond: (i: RecoveryBackgroundResponse) => void)
                 identitiesToAdd,
                 credentialsToAdd: credsToAdd,
                 completedProviders,
+                failedProviders,
                 nextId,
             };
             await sessionRecoveryStatus.set(status);
