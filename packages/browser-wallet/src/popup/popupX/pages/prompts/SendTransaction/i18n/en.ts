@@ -48,6 +48,9 @@ const t = {
         removeDenyList: 'Remove from deny list',
         pause: 'Pause',
         unpause: 'Unpause',
+        updateMetadata: 'Update metadata',
+        assignAdminRoles: 'Assign admin roles',
+        revokeAdminRoles: 'Revoke admin roles',
     },
     sponsored: {
         costCoveredBy: 'Transaction cost covered by:',
