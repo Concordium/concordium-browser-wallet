@@ -18,7 +18,7 @@ type MessageObject = {
 function StringRender({ message }: { message: string }) {
     return (
         <div className="binary-display-x">
-            <TextArea readOnly value={message} />
+            <div className="string-render">{message}</div>
         </div>
     );
 }
