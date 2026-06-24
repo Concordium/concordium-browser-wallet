@@ -17,6 +17,7 @@ import {
     IdProofOutput,
     IdStatement,
     InitContractInput,
+    MetaUpdatePayload,
     Payload,
     RegisterDataPayload,
     SchemaVersion,
@@ -275,6 +276,18 @@ interface MainWalletApi {
         accountAddress: AccountAddressSource,
         type: LaxNumberEnumValue<AccountTransactionType.ConfigureDelegation>,
         payload: ConfigureDelegationPayload
+    ): Promise<string>;
+    /**
+     * Sends a transaction to the Concordium Wallet and awaits the users action. Note that a header is not sent, and will be constructed by the wallet itself.
+     * Note that if the user rejects signing the transaction, this will throw an error.
+     * @param accountAddress the address of the account that should sign the transaction
+     * @param type the type of transaction that is to be signed and sent.
+     * @param payload the payload of the transaction to be signed and sent. Note that for smart contract transactions, the payload should not contain the parameters, those should instead be provided in the subsequent argument instead.
+     */
+    sendTransaction(
+        accountAddress: AccountAddressSource,
+        type: LaxNumberEnumValue<AccountTransactionType.MetaUpdate>,
+        payload: MetaUpdatePayload
     ): Promise<string>;
     /**
      * Sends a transaction signed by sponsor to the Concordium Wallet and awaits the users action.

@@ -1,0 +1,295 @@
+<!DOCTYPE html>
+<html>
+    <head>
+        <title>My cool dapp</title>
+        <script src="/sdk.js"></script>
+        <script src="/helpers.js"></script>
+        <script src="https://unpkg.com/cbor-web"></script>
+        <meta charset="utf-8" />
+        <script>
+            let currentAccountAddress = '';
+
+            async function setupPage() {
+                const provider = await concordiumHelpers.detectConcordiumProvider();
+                provider.on('accountDisconnected', () => (currentAccountAddress = undefined));
+                provider.on('accountChanged', (accountAddress) => (currentAccountAddress = accountAddress));
+                provider.on('chainChanged', (chain) => alert(chain));
+
+                document.getElementById('connect').addEventListener('click', () => {
+                    provider.connect().then((accountAddress) => {
+                        currentAccountAddress = accountAddress;
+                        document.getElementById('accountAddress').innerHTML = accountAddress;
+                    });
+                });
+
+                document.getElementById('requestAccounts').addEventListener('click', () => {
+                    provider.requestAccounts().then((accountAddresses) => {
+                        currentAccountAddress = accountAddresses[0];
+                        document.getElementById('accountAddress').innerHTML = accountAddresses;
+                    });
+                });
+
+                document.getElementById('createLock').addEventListener('click', async () => {
+                    const {
+                        ConcordiumGRPCClient,
+                        Cbor,
+                        CborAccountAddress,
+                        AccountAddress,
+                        LockController,
+                        CborEpoch,
+                        AccountTransactionType,
+                        MetaUpdateOperationType,
+                        CborMemo,
+                        TransactionExpiry,
+                        Lock,
+                        LockId,
+                        TokenId,
+                        Token,
+                        TokenAmount,
+                        TransactionHash,
+                    } = concordiumSDK;
+
+                    const grpcClient = new ConcordiumGRPCClient(await provider.grpcTransport);
+
+                    const lockId = LockId.fromString('YVXojYzvcv');
+                    const lock = await Lock.fromId(grpcClient, lockId);
+
+                    const tokenId = TokenId.fromString('IMT');
+                    const token = await Token.fromId(grpcClient, tokenId);
+                    const amount = TokenAmount.fromDecimal(10, token.info.state.decimals);
+
+                    const lockCreateConfig = {
+                        recipients: [
+                            CborAccountAddress.fromAccountAddress(
+                                AccountAddress.fromBase58('3foN48b7v7H7GZd6Rifu6YtVmhdGCybmE6fXuYnJsvcGP65J4v')
+                            ),
+                        ],
+                        expiry: CborEpoch.fromEpochSeconds(TransactionExpiry.futureMinutes(15)),
+                        controller: LockController.simpleV0(
+                            [
+                                {
+                                    account: CborAccountAddress.fromAccountAddress(
+                                        AccountAddress.fromBase58(currentAccountAddress)
+                                    ),
+                                    roles: [
+                                        LockController.SimpleV0Capability.Fund,
+                                        LockController.SimpleV0Capability.Send,
+                                        LockController.SimpleV0Capability.Return,
+                                        LockController.SimpleV0Capability.Cancel,
+                                    ],
+                                },
+                                {
+                                    account: CborAccountAddress.fromAccountAddress(
+                                        AccountAddress.fromBase58(currentAccountAddress)
+                                    ),
+                                    roles: [
+                                        LockController.SimpleV0Capability.Fund,
+                                        LockController.SimpleV0Capability.Send,
+                                        LockController.SimpleV0Capability.Return,
+                                        LockController.SimpleV0Capability.Cancel,
+                                    ],
+                                },
+                            ],
+                            [tokenId],
+                            { keepAlive: false, memo: CborMemo.fromString('Some text for Create Lock memo') }
+                        ),
+                    };
+
+                    const lockCancelConfig = {
+                        lock: lock.info.lock,
+                        memo: CborMemo.fromString('Some text for Cancel Lock memo'),
+                    };
+
+                    const lockFundConfig = {
+                        token: tokenId,
+                        lock: lock.info.lock,
+                        amount,
+                        memo: CborMemo.fromString('Some text for Fund Lock memo'),
+                    };
+
+                    const lockSendConfig = {
+                        token: tokenId,
+                        lock: lock.info.lock,
+                        source: CborAccountAddress.fromAccountAddress(AccountAddress.fromBase58(currentAccountAddress)),
+                        amount,
+                        recipient: CborAccountAddress.fromAccountAddress(
+                            AccountAddress.fromBase58(currentAccountAddress)
+                        ),
+                        memo: CborMemo.fromString('Some text for Send Lock memo'),
+                    };
+
+                    const lockReturnConfig = {
+                        token: tokenId,
+                        lock: lock.info.lock,
+                        source: CborAccountAddress.fromAccountAddress(AccountAddress.fromBase58(currentAccountAddress)),
+                        amount,
+                        memo: CborMemo.fromString('Some text for Return Lock memo'),
+                    };
+
+                    const payload = {
+                        operations: Cbor.encode([
+                            { [MetaUpdateOperationType.LockCreate]: lockCreateConfig },
+                            { [MetaUpdateOperationType.LockCancel]: lockCancelConfig },
+                            { [MetaUpdateOperationType.LockFund]: lockFundConfig },
+                            { [MetaUpdateOperationType.LockSend]: lockSendConfig },
+                            { [MetaUpdateOperationType.LockReturn]: lockReturnConfig },
+                        ]),
+                    };
+
+                    const txHash = provider
+                        .sendTransaction(currentAccountAddress, AccountTransactionType.MetaUpdate, payload)
+                        .then((sig) => alert(JSON.stringify(sig)))
+                        .catch(alert);
+
+                    const finalizedTx = await grpcClient.waitForTransactionFinalization(
+                        TransactionHash.fromHexString(txHash)
+                    );
+                    console.log('finalizedTx', finalizedTx);
+
+                    return txHash;
+                });
+
+                document.getElementById('metaTokenOperation').addEventListener('click', async () => {
+                    const {
+                        ConcordiumGRPCClient,
+                        Cbor,
+                        CborAccountAddress,
+                        AccountAddress,
+                        AccountTransactionType,
+                        CborMemo,
+                        TokenId,
+                        Token,
+                        TokenAmount,
+                        TransactionHash,
+                        TokenOperationType,
+                        TokenMetadataUrl,
+                        TokenAdminRole,
+                    } = concordiumSDK;
+
+                    const grpcClient = new ConcordiumGRPCClient(await provider.grpcTransport);
+
+                    const tokenId = TokenId.fromString('IMT');
+                    const token = await Token.fromId(grpcClient, tokenId);
+                    const amount = TokenAmount.fromDecimal(10, token.info.state.decimals);
+
+                    const tokenOperationTransfer = {
+                        token: tokenId,
+                        amount,
+                        recipient: CborAccountAddress.fromAccountAddress(
+                            AccountAddress.fromBase58('3foN48b7v7H7GZd6Rifu6YtVmhdGCybmE6fXuYnJsvcGP65J4v')
+                        ),
+                        memo: CborMemo.fromString('Some text for Token Operation Transfer memo'),
+                    };
+
+                    const tokenOperationMint = {
+                        token: tokenId,
+                        amount,
+                    };
+
+                    const tokenOperationBurn = {
+                        token: tokenId,
+                        amount,
+                    };
+
+                    const tokenOperationAddAllowList = {
+                        token: tokenId,
+                        target: CborAccountAddress.fromAccountAddress(AccountAddress.fromBase58(currentAccountAddress)),
+                    };
+
+                    const tokenOperationRemoveAllowList = {
+                        token: tokenId,
+                        target: CborAccountAddress.fromAccountAddress(AccountAddress.fromBase58(currentAccountAddress)),
+                    };
+
+                    const tokenOperationAddDenyList = {
+                        token: tokenId,
+                        target: CborAccountAddress.fromAccountAddress(AccountAddress.fromBase58(currentAccountAddress)),
+                    };
+
+                    const tokenOperationRemoveDenyList = {
+                        token: tokenId,
+                        target: CborAccountAddress.fromAccountAddress(AccountAddress.fromBase58(currentAccountAddress)),
+                    };
+
+                    const tokenOperationPause = {
+                        token: tokenId,
+                    };
+
+                    const tokenOperationUnpause = {
+                        token: tokenId,
+                    };
+
+                    const tokenOperationUpdateMetadata = {
+                        token: tokenId,
+                        ...TokenMetadataUrl.create(
+                            'https://example.com/token-metadata.json',
+                            new Uint8Array(32).fill(1)
+                        ),
+                    };
+
+                    const tokenOperationAssignAdminRoles = {
+                        token: tokenId,
+                        roles: [TokenAdminRole.UpdateAdminRoles],
+                        account: CborAccountAddress.fromAccountAddress(
+                            AccountAddress.fromBase58(currentAccountAddress)
+                        ),
+                    };
+
+                    const tokenOperationRevokeAdminRoles = {
+                        token: tokenId,
+                        roles: [
+                            TokenAdminRole.UpdateAdminRoles,
+                            TokenAdminRole.UpdateAllowList,
+                            TokenAdminRole.UpdateDenyList,
+                            TokenAdminRole.Pause,
+                        ],
+                        account: CborAccountAddress.fromAccountAddress(
+                            AccountAddress.fromBase58(currentAccountAddress)
+                        ),
+                    };
+
+                    const payload = {
+                        operations: Cbor.encode([
+                            { [TokenOperationType.Transfer]: tokenOperationTransfer },
+                            { [TokenOperationType.Mint]: tokenOperationMint },
+                            { [TokenOperationType.Burn]: tokenOperationBurn },
+                            { [TokenOperationType.AddAllowList]: tokenOperationAddAllowList },
+                            { [TokenOperationType.RemoveAllowList]: tokenOperationRemoveAllowList },
+                            { [TokenOperationType.AddDenyList]: tokenOperationAddDenyList },
+                            { [TokenOperationType.RemoveDenyList]: tokenOperationRemoveDenyList },
+                            { [TokenOperationType.Pause]: tokenOperationPause },
+                            { [TokenOperationType.Unpause]: tokenOperationUnpause },
+                            { [TokenOperationType.UpdateMetadata]: tokenOperationUpdateMetadata },
+                            { [TokenOperationType.AssignAdminRoles]: tokenOperationAssignAdminRoles },
+                            { [TokenOperationType.RevokeAdminRoles]: tokenOperationRevokeAdminRoles },
+                        ]),
+                    };
+
+                    const txHash = provider
+                        .sendTransaction(currentAccountAddress, AccountTransactionType.MetaUpdate, payload)
+                        .then((sig) => alert(JSON.stringify(sig)))
+                        .catch(alert);
+
+                    const finalizedTx = await grpcClient.waitForTransactionFinalization(
+                        TransactionHash.fromHexString(txHash)
+                    );
+                    console.log('finalizedTx', finalizedTx);
+
+                    return txHash;
+                });
+            }
+            setupPage();
+        </script>
+    </head>
+
+    <body>
+        <div>
+            <button id="connect">Connect</button>
+            <h3 id="accountAddress" style="display: inline">Account address:</h3>
+        </div>
+        <br />
+        <button id="requestAccounts">Request accounts</button>
+        <button id="createLock">Create Lock</button>
+        <button id="metaTokenOperation">Meta Token Operation</button>
+    </body>
+</html>
