@@ -19,7 +19,7 @@
 ### Changed
 
 -   Unresponsive identity providers are now automatically skipped during the recovery process. Recovery will continue with the remaining providers instead of failing when a provider is unavailable.
--   Section Advenced renamed to Operations and always shown in transactions details
+-   Section Advanced renamed to Operations and always shown in transactions details
 
 ## 2.11.0
 
