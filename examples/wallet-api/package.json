@@ -13,7 +13,7 @@
         "start:sponsored-transaction": "FILE=sponsored-transaction.html yarn start"
     },
     "dependencies": {
-        "@concordium/web-sdk": "12.1.0-alpha.4"
+        "@concordium/web-sdk": "^13.0.0-alpha.1"
     },
     "devDependencies": {
         "live-server": "^1.2.2"

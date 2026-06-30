@@ -2,6 +2,12 @@
 
 ## Unreleased
 
+## 2.12.1
+
+### Changed
+
+-   Updated text area size for string message in binary display
+
 ## 2.12.0
 
 ### Updated
