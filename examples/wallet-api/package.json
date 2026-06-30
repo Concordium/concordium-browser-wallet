@@ -14,7 +14,7 @@
         "start:locks": "FILE=locks.html yarn start"
     },
     "dependencies": {
-        "@concordium/web-sdk": "13.0.0-alpha.1"
+        "@concordium/web-sdk": "^13.0.0-alpha.1"
     },
     "devDependencies": {
         "live-server": "^1.2.2"
