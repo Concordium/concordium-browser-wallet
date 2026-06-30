@@ -66,6 +66,12 @@
         }
     }
 
+    .account-controls .capture__main_small {
+        display: flex;
+        flex-direction: column;
+        gap: $semantic-gap-xs;
+    }
+
     &.single-transaction-token-update {
         .page__top {
             margin-bottom: unset;

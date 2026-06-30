@@ -23,6 +23,7 @@ const t = {
     encryptedAmountTransferWithMemo: 'Shielded transfer',
     transferWithScheduleAndMemo: 'Scheduled transfer',
     tokenUpdate: 'PLT update',
+    metaUpdate: 'Meta update',
     updateCreatePlt: 'Update create PLT',
     chainUpdate: 'Chain update',
     configureBaker: 'Configure validator',

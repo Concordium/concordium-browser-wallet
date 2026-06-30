@@ -50,6 +50,7 @@ export enum TransactionKindString {
     ConfigureDelegation = 'configureDelegation',
     StakingReward = 'paydayAccountReward',
     TokenUpdate = 'tokenUpdate',
+    MetaUpdate = 'metaUpdate',
     ChainUpdate = 'chainUpdate',
     UpdateCreatePLT = 'updateCreatePLT',
     BakingRewards = 'bakingRewards',
@@ -121,6 +122,8 @@ export function mapTransactionKindStringToTransactionType(
             return SpecialTransactionType.Malformed;
         case TransactionKindString.TokenUpdate:
             return AccountTransactionType.TokenUpdate;
+        case TransactionKindString.MetaUpdate:
+            return AccountTransactionType.MetaUpdate;
         case TransactionKindString.ChainUpdate:
             return SpecialTransactionType.ChainUpdate;
         case TransactionKindString.UpdateCreatePLT:

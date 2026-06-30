@@ -2,6 +2,8 @@
 
 ## Unreleased
 
+-   Added support for Transaction Locks handling and Meta Updates. With new payload type `MetaUpdatePayload` in wallet-api.
+
 ## 2.12.1
 
 ### Changed
