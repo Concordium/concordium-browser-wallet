@@ -154,7 +154,7 @@ function displayValue(value: any) {
     if (CborMemo.instanceOf(value)) {
         return decodeMemo(value);
     }
-    return value.toString();
+    return value?.toString();
 }
 
 function operationsCborDecoder(value: Cbor.Type) {
@@ -253,12 +253,10 @@ function LockControllerDisplay(controllerVersion: LockController.Variant, contro
                 {memoString && <Card.RowDetails title={t('memo')} value={memoString} />}
                 <Card.RowDetails
                     title={t('grants')}
-                    value={grants
-                        .map(
-                            ({ roles, account: { address } }) =>
-                                `${t('account')}: ${address.toString()}\n${t('roles')}: ${roles.join(', ')}`
-                        )
-                        .join('\n-----\n')}
+                    className="account-controls"
+                    value={grants.map(({ roles, account: { address } }) => (
+                        <div>{`${t('account')}: ${address.toString()}\n${t('roles')}: ${roles.join(', ')}`}</div>
+                    ))}
                 />
             </>
         );
@@ -290,14 +288,11 @@ function OperationLockCreate({ lockCreate }: LockCreateOperation) {
                 title={t('expiry')}
                 value={TransactionExpiry.toDate(lockCreate.expiry.expiry).toString()}
             />
-            <Card.RowDetails
-                title={t('controller')}
-                value={Object.entries(lockCreate.controller).map(([controllerVersion, controller]) =>
-                    LockControllerDisplay(controllerVersion as LockController.Variant, {
-                        [controllerVersion as LockController.Variant]: controller,
-                    })
-                )}
-            />
+            {Object.entries(lockCreate.controller).map(([controllerVersion, controller]) =>
+                LockControllerDisplay(controllerVersion as LockController.Variant, {
+                    [controllerVersion as LockController.Variant]: controller,
+                })
+            )}
         </Card>
     );
 }

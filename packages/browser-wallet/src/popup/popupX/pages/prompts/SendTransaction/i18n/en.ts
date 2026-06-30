@@ -65,7 +65,7 @@ const t = {
         type: 'Type',
         simpleLock: 'Simple lock',
         tokens: 'Tokens',
-        keepAlive: 'Keep live',
+        keepAlive: 'Keep alive',
         memo: 'Memo',
         grants: 'Grants control',
         account: 'Account',
