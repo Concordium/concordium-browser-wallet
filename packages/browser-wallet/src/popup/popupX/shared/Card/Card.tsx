@@ -27,7 +27,7 @@ type CardRowDetailsProps = {
     /** Title of the card row detail */
     title?: string | ReactNode;
     /** Value of the card row detail */
-    value?: string | ReactNode;
+    value?: string | ReactNode | ReactNode[];
     className?: string;
 };
 

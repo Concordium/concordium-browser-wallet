@@ -2,6 +2,8 @@
 
 ### Unreleased
 
+-   Updated handler `sendTransaction` with new transaction type `MetaUpdate` and payload type `MetaUpdatePayload`
+
 ## 3.3.0
 
 ### Added
