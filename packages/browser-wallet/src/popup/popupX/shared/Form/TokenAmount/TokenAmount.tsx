@@ -1,8 +1,10 @@
 import React, { useRef } from 'react';
 import { atomFamily, selectAtom, useAtomValue } from 'jotai/utils';
-import { AccountAddress, AccountInfo, ContractAddress, CIS2 } from '@concordium/web-sdk';
+import { AccountAddress, AccountInfo, CIS2, ContractAddress } from '@concordium/web-sdk';
+import { Cbor, TokenModuleAccountState } from '@concordium/web-sdk/plt';
 import { atom } from 'jotai';
 
+import { accountInfoFamily } from '@popup/shared/AccountInfoListenerContext/AccountInfoListenerContext';
 import { contractBalancesFamily } from '@popup/store/token';
 import { PLT } from '@shared/constants/token';
 import TokenAmountView, { TokenAmountViewProps } from './View';
@@ -16,17 +18,37 @@ const tokenAddressEq = (a: CIS2.TokenAddress | null, b: CIS2.TokenAddress | null
     return a === b;
 };
 
-type CcdBalanceType = 'total' | 'available';
+type BalanceType = 'total' | 'available';
 
 const balanceAtomFamily = atomFamily(
-    ([account, ccdBalance, tokenAddress]: [AccountInfo, CcdBalanceType, CIS2.TokenAddress | null, number]) => {
+    ([account, balanceType, tokenAddress]: [AccountInfo, BalanceType, CIS2.TokenAddress | null, number]) => {
         if (tokenAddress === null) {
             return atom(
-                ccdBalance === 'available'
+                balanceType === 'available'
                     ? account.accountAvailableBalance.microCcdAmount
                     : account.accountAmount.microCcdAmount
             );
         }
+
+        if (tokenAddress.contract.index.toString() === PLT) {
+            return atom((get) => {
+                const latestAccountInfo = get(accountInfoFamily(account.accountAddress.address));
+                const tokenState = latestAccountInfo?.accountTokens.find(
+                    (accountToken) => accountToken.id.toString() === tokenAddress.id
+                )?.state;
+
+                if (balanceType === 'available' && tokenState?.moduleState) {
+                    const accountModuleState = Cbor.decode(
+                        Cbor.fromHexString(tokenState.moduleState.toString())
+                    ) as TokenModuleAccountState;
+
+                    return accountModuleState.available?.value ?? tokenState.balance.value;
+                }
+
+                return tokenState?.balance.value;
+            });
+        }
+
         const tokens = contractBalancesFamily(account.accountAddress.address, tokenAddress.contract.index.toString());
         return selectAtom(tokens, (ts) => ts[tokenAddress.id]);
     },
@@ -38,8 +60,8 @@ const balanceAtomFamily = atomFamily(
 type Props = Omit<TokenAmountViewProps, 'tokens' | 'accountTokens' | 'balance' | 'onSelectToken' | 'ccdBalance'> & {
     /** The account info of the account to take the amount from */
     accountInfo: AccountInfo;
-    /** The ccd balance to use. Defaults to 'available' */
-    ccdBalance?: CcdBalanceType;
+    /** The type of balance to use. Defaults to 'available' */
+    balanceType?: BalanceType;
 };
 
 /**
@@ -81,7 +103,7 @@ type Props = Omit<TokenAmountViewProps, 'tokens' | 'accountTokens' | 'balance' |
  *   address={{ id: '', contract: ContractAddress.create(1) }}
  * />
  */
-export default function TokenAmount({ accountInfo, ccdBalance = 'available', ...props }: Props) {
+export default function TokenAmount({ accountInfo, balanceType = 'available', ...props }: Props) {
     const { current: timestamp } = useRef(Date.now());
     const { token } = props.form.watch();
     const tokenAddress =
@@ -94,7 +116,7 @@ export default function TokenAmount({ accountInfo, ccdBalance = 'available', ...
         null;
 
     const tokenInfo = useTokenInfo(accountInfo.accountAddress);
-    const tokenBalance = useAtomValue(balanceAtomFamily([accountInfo, ccdBalance, tokenAddress, timestamp]));
+    const tokenBalance = useAtomValue(balanceAtomFamily([accountInfo, balanceType, tokenAddress, timestamp]));
 
     if (tokenInfo.loading) {
         return null;

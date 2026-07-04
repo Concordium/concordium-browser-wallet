@@ -18,6 +18,10 @@
         margin-bottom: rem(16px);
         padding-top: rem(12px);
 
+        &.locks {
+            padding-top: unset;
+        }
+
         &_group {
             display: flex;
             flex-direction: row;

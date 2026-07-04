@@ -1,5 +1,6 @@
 import { decode, encode } from 'cbor2';
 import { CcdAmount, Ratio, toBuffer } from '@concordium/web-sdk';
+import { TokenAmount } from '@concordium/web-sdk/plt';
 import { DataBlob } from '@concordium/web-sdk/types';
 import { CCD_METADATA } from '@shared/constants/token-metadata';
 import { useLocation } from 'react-router-dom';
@@ -82,6 +83,23 @@ export function displayCcdAsEur(microCcdPerEur: Ratio, microCcd: bigint, decimal
     }
 
     return eurFormatter.format(eur);
+}
+
+/** Sum token amounts with matching decimals into a single token amount. */
+export function sumTokenAmounts(amounts: TokenAmount.Type[]): TokenAmount.Type | undefined {
+    if (amounts.length === 0) return undefined;
+    const { decimals } = amounts[0];
+
+    return TokenAmount.create(
+        amounts.reduce((sum, amount) => {
+            if (amount.decimals !== decimals) {
+                throw new Error('Cannot sum token amounts with different decimals');
+            }
+
+            return sum + amount.value;
+        }, 0n),
+        decimals
+    );
 }
 
 export function decodeMemo(memo: string | undefined): string {
