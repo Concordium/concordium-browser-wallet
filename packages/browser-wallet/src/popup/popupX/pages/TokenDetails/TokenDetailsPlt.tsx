@@ -3,7 +3,7 @@ import { useUpdateAtom } from 'jotai/utils';
 import { useNavigate, useParams } from 'react-router-dom';
 import { useTranslation } from 'react-i18next';
 import { AccountAddress } from '@concordium/web-sdk';
-import { TokenId, TokenInfo, TokenModuleState, TokenModuleAccountState } from '@concordium/web-sdk/plt';
+import { Cbor, TokenId, TokenInfo, TokenModuleAccountState, TokenModuleState } from '@concordium/web-sdk/plt';
 import { absoluteRoutes, relativeRoutes, sendFundsRoute } from '@popup/popupX/constants/routes';
 import Page from '@popup/popupX/shared/Page';
 import Text from '@popup/popupX/shared/Text';
@@ -26,30 +26,12 @@ import Eye from '@assets/svgX/eye-slash.svg';
 import { grpcClientAtom } from '@popup/store/settings';
 import { removeTokenFromCurrentAccountAtom } from '@popup/store/token';
 import { useAccountInfo } from '@popup/shared/AccountInfoListenerContext/AccountInfoListenerContext';
-import { cborDecode } from '@popup/popupX/shared/utils/helpers';
+import { sumTokenAmounts } from '@popup/popupX/shared/utils/helpers';
 import { SendFundsLocationState } from '@popup/popupX/pages/SendFunds/SendFunds';
 import { useFlattenedAccountTokens } from '@popup/pages/Account/Tokens/utils';
 import { PLT } from '@shared/constants/token';
 
-function usePltInfoAndBalance(pltSymbol: string, credential: WalletCredential) {
-    const client = useAtomValue(grpcClientAtom);
-    const accountInfo = useAccountInfo(credential);
-    const { metadata } = useFlattenedAccountTokens(credential).find((token) => token.id === pltSymbol) || {
-        metadata: { name: '', symbol: '', thumbnail: { url: '' }, description: '' },
-    };
-    const [pltInfo, setPltInfo] = useState<TokenInfo>();
-    useEffect(() => {
-        client.getTokenInfo(TokenId.fromString(pltSymbol)).then((tokenDetails) => {
-            setPltInfo(tokenDetails);
-        });
-    }, []);
-
-    const currentToken = accountInfo?.accountTokens.find((accountToken) => accountToken.id.toString() === pltSymbol);
-    const balance = currentToken?.state.balance || { decimals: 0, value: 0n };
-    const renderedBalance = pipe(integerToFractional(balance.decimals), addThousandSeparators)(balance.value);
-
-    return { pltInfo, renderedBalance, currentToken, metadata };
-}
+const ZERO_TOKEN_BALANCE = { decimals: 0, value: 0n };
 
 enum TokenStatus {
     PAUSED,
@@ -87,6 +69,55 @@ function StatusLabel({ status }: { status: TokenStatus }) {
     }[status];
 }
 
+function usePltInfoAndBalance(pltSymbol: string, credential: WalletCredential) {
+    const client = useAtomValue(grpcClientAtom);
+    const accountInfo = useAccountInfo(credential);
+    const { metadata } = useFlattenedAccountTokens(credential).find((token) => token.id === pltSymbol) || {
+        metadata: { name: '', symbol: '', thumbnail: { url: '' }, description: '' },
+    };
+    const [pltInfo, setPltInfo] = useState<TokenInfo>();
+    useEffect(() => {
+        client.getTokenInfo(TokenId.fromString(pltSymbol)).then((tokenDetails) => {
+            setPltInfo(tokenDetails);
+        });
+    }, []);
+
+    const renderAmount = (decimals: number, value: bigint) =>
+        pipe(integerToFractional(decimals), addThousandSeparators)(value);
+
+    const currentToken = accountInfo?.accountTokens.find((accountToken) => accountToken.id.toString() === pltSymbol);
+    const tokenModuleState = (pltInfo ? Cbor.decode(pltInfo.state.moduleState) : {}) as TokenModuleState;
+    const accountModuleState = (
+        currentToken?.state.moduleState
+            ? Cbor.decode(Cbor.fromHexString(currentToken.state.moduleState.toString()))
+            : {}
+    ) as TokenModuleAccountState;
+
+    const balance = currentToken?.state.balance || ZERO_TOKEN_BALANCE;
+    const renderedBalance = renderAmount(balance.decimals, balance.value);
+
+    const lockedAmount = accountModuleState.locks?.length
+        ? sumTokenAmounts(accountModuleState.locks.map(({ amount }) => amount))
+        : undefined;
+
+    const renderedLocked = lockedAmount ? renderAmount(lockedAmount.decimals, lockedAmount.value) : undefined;
+    const renderedAtDisposal = accountModuleState.available
+        ? renderAmount(accountModuleState.available.decimals, accountModuleState.available.value)
+        : undefined;
+
+    const status = getTokenStatus(tokenModuleState, accountModuleState);
+
+    return {
+        pltInfo,
+        renderedBalance,
+        currentToken,
+        metadata,
+        status,
+        renderedAtDisposal,
+        renderedLocked,
+    };
+}
+
 function getNavState(pltSymbol: string) {
     return {
         tokenType: 'plt',
@@ -100,6 +131,7 @@ type Params = {
 
 function TokenDetails({ credential }: { credential: WalletCredential }) {
     const { t } = useTranslation('x', { keyPrefix: 'tokenDetails' });
+    const remove = useUpdateAtom(removeTokenFromCurrentAccountAtom);
 
     // Need to call this function, so tokens synced at this moment
     // Otherwise user need to reload page, before removing token
@@ -108,18 +140,12 @@ function TokenDetails({ credential }: { credential: WalletCredential }) {
     const nav = useNavigate();
 
     const { pltSymbol = '' } = useParams<Params>();
-    const { pltInfo, renderedBalance, currentToken, metadata } = usePltInfoAndBalance(pltSymbol, credential);
-    const remove = useUpdateAtom(removeTokenFromCurrentAccountAtom);
-    if (!pltInfo) {
-        return null;
-    }
-    const {
-        state: { decimals, moduleState },
-    } = pltInfo;
+    const { pltInfo, renderedBalance, status, metadata, renderedAtDisposal, renderedLocked } = usePltInfoAndBalance(
+        pltSymbol,
+        credential
+    );
 
-    const tokenModuleState = cborDecode(moduleState.toString()) as TokenModuleState;
-    const accountModuleState = cborDecode(currentToken?.state?.moduleState?.toString()) as TokenModuleAccountState;
-    const status = getTokenStatus(tokenModuleState, accountModuleState);
+    if (!pltInfo) return null;
 
     const navToReceive = () => nav(absoluteRoutes.home.receive.path);
     const navToRaw = () => nav(relativeRoutes.home.token.plt.raw.path);
@@ -138,6 +164,24 @@ function TokenDetails({ credential }: { credential: WalletCredential }) {
                 <Text.DynamicSize baseFontSize={32} baseTextLength={17} className="heading_big plt">
                     {renderedBalance} {trunctateSymbol(pltSymbol)}
                 </Text.DynamicSize>
+                {renderedLocked && (
+                    <div className="token-details-x__stake locks">
+                        <div className="token-details-x__stake_group">
+                            <Text.Capture>{t('locked')}</Text.Capture>
+                            <Text.CaptureAdditional>
+                                {renderedLocked} {trunctateSymbol(pltSymbol)}
+                            </Text.CaptureAdditional>
+                        </div>
+                        {renderedAtDisposal && (
+                            <div className="token-details-x__stake_group">
+                                <Text.Capture>{t('atDisposal')}</Text.Capture>
+                                <Text.CaptureAdditional>
+                                    {renderedAtDisposal} {trunctateSymbol(pltSymbol)}
+                                </Text.CaptureAdditional>
+                            </div>
+                        )}
+                    </div>
+                )}
                 <div className="token-details-x__action-buttons">
                     <Button.IconTile
                         icon={<ArrowDown />}
@@ -169,7 +213,7 @@ function TokenDetails({ credential }: { credential: WalletCredential }) {
                         <StatusLabel status={status} />
                     </div>
                     <Card.RowDetails title={t('description')} value={metadata.description || t('noDescription')} />
-                    <Card.RowDetails title={t('decimals')} value={`0 - ${decimals}`} />
+                    <Card.RowDetails title={t('decimals')} value={`0 - ${pltInfo.state.decimals}`} />
                 </Card>
                 <Button.IconText icon={<Notebook />} label={t('showRawMetadata')} onClick={navToRaw} />
                 <Button.IconText icon={<Eye />} label={t('hideToken')} onClick={removeToken} />

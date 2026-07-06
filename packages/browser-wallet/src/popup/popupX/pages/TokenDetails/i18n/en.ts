@@ -12,6 +12,7 @@ const t = {
     showRawMetadata: 'Show raw metadata',
     hideToken: 'Hide token from account',
     atDisposal: 'At disposal',
+    locked: 'Locked',
     delegated: 'Delegated',
     validated: 'Validated',
     cooldown: 'Cooldown',

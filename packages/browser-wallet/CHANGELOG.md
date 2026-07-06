@@ -3,6 +3,8 @@
 ## Unreleased
 
 -   Added support for Transaction Locks handling and Meta Updates. With new payload type `MetaUpdatePayload` in wallet-api.
+-   Added locked and at-disposal fund balances to the PLT token details page.
+-   Added validation for available PLT funds on the Send Funds page.
 
 ## 2.12.1
 

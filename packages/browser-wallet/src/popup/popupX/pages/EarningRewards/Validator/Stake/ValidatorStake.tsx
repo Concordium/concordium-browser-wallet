@@ -198,7 +198,7 @@ export default function ValidatorStake({ title, initialValues, existingValues, o
                                 tokenType="ccd"
                                 buttonMaxLabel={t('inputAmount.buttonMax')}
                                 form={f as unknown as UseFormReturn<AmountForm>}
-                                ccdBalance="total"
+                                balanceType="total"
                                 validateAmount={validateAmount}
                             />
                             <div className="register-validator__reward">
