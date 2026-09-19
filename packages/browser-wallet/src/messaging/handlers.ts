@@ -148,9 +148,16 @@ export class ContentMessageHandler {
     }
 
     private setupMessageBridge() {
-        // Propagate messages from inject -> extension
+        // Propagate messages from inject -> extension.
+        // Only external message types are accepted here. Internal message types must only be
+        // delivered from, and to, extension contexts (background/popup). Accepting them from an
+        // arbitrary web page would let any website drive privileged wallet flows (signing prompts,
+        // secret storage access, navigation) and spoof the displayed origin.
+        const isExternalMessage = (msg: unknown): msg is WalletMessage =>
+            isMessage(msg) && Object.values(MessageType).includes(msg.messageType as MessageType);
+
         window.addEventListener('message', ({ data: msg }) => {
-            if (isMessage(msg)) {
+            if (isExternalMessage(msg)) {
                 chrome.runtime
                     .sendMessage(msg)
                     .then((response: WalletError | unknown) => {

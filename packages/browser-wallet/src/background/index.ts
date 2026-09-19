@@ -55,6 +55,35 @@ async function isWalletLocked(): Promise<boolean> {
 }
 
 /**
+ * Determines whether the message originated from a trusted extension context.
+ *
+ * Internal message types must only be accepted from the extension's own contexts
+ * (background service worker, popup, or another extension page); web pages and
+ * content scripts must never be able to drive privileged wallet flows. Messages
+ * from the same extension have `sender.id === chrome.runtime.id`, while messages
+ * from a content script (i.e. a web page) additionally carry a `sender.tab`.
+ */
+function isExtensionSender(sender: chrome.runtime.MessageSender): boolean {
+    return sender.id === chrome.runtime.id && sender.tab === undefined;
+}
+
+/**
+ * Wraps a handler so it only executes when the message originated from a trusted
+ * extension context. Used to gate all InternalMessageType handlers that expose
+ * privileged functionality (memory store access, popup/navigation control,
+ * identity issuance, proof generation).
+ */
+function restrictToExtensionSender(handler: ExtensionMessageHandler): ExtensionMessageHandler {
+    return (msg, sender, respond) => {
+        if (!isExtensionSender(sender)) {
+            respond({ success: false, message: 'Sending context is not trusted' });
+            return true;
+        }
+        return handler(msg, sender, respond);
+    };
+}
+
+/**
  * Determines whether the given URL has been allowlisted.
  */
 async function isAllowlisted(url: string): Promise<boolean> {
@@ -176,15 +205,18 @@ chrome.storage.session.onChanged.addListener((changes) => {
 setupRecoveryHandler();
 chrome.runtime.onStartup.addListener(startupHandler);
 chrome.runtime.onInstalled.addListener(startupHandler);
-bgMessageHandler.handleMessage(createMessageTypeFilter(InternalMessageType.PopupReady), () => {
-    startupHandler();
-});
+bgMessageHandler.handleMessage(
+    createMessageTypeFilter(InternalMessageType.PopupReady),
+    restrictToExtensionSender(() => {
+        startupHandler();
+    })
+);
 
 addIdpListeners();
 
 bgMessageHandler.handleMessage(
     createMessageTypeFilter(InternalMessageType.SendCredentialDeployment),
-    sendCredentialHandler
+    restrictToExtensionSender(sendCredentialHandler)
 );
 
 chrome.tabs.onUpdated.addListener(
@@ -194,12 +226,15 @@ chrome.tabs.onUpdated.addListener(
 
 bgMessageHandler.handleMessage(
     createMessageTypeFilter(InternalMessageType.StartIdentityIssuance),
-    identityIssuanceHandler
+    restrictToExtensionSender(identityIssuanceHandler)
 );
 
-bgMessageHandler.handleMessage(createMessageTypeFilter(InternalMessageType.SetViewSize), ({ payload }) => {
-    setPopupSize(payload);
-});
+bgMessageHandler.handleMessage(
+    createMessageTypeFilter(InternalMessageType.SetViewSize),
+    restrictToExtensionSender(({ payload }) => {
+        setPopupSize(payload);
+    })
+);
 
 bgMessageHandler.handleMessage(createMessageTypeFilter(MessageType.GrpcRequest), (_input, sender, respond) => {
     const onFailure = (error: string) => respond({ success: false, error });
@@ -211,22 +246,34 @@ bgMessageHandler.handleMessage(createMessageTypeFilter(MessageType.GrpcRequest),
     return true;
 });
 
-bgMessageHandler.handleMessage(createMessageTypeFilter(InternalMessageType.CreateIdProof), createIdProofHandler);
+bgMessageHandler.handleMessage(
+    createMessageTypeFilter(InternalMessageType.CreateIdProof),
+    restrictToExtensionSender(createIdProofHandler)
+);
 
 bgMessageHandler.handleMessage(
     createMessageTypeFilter(InternalMessageType.CreateWeb3IdProof),
-    createWeb3IdProofHandler
+    restrictToExtensionSender(createWeb3IdProofHandler)
 );
 
-bgMessageHandler.handleMessage(createMessageTypeFilter(InternalMessageType.OpenFullscreen), ({ payload = '' }) => {
-    chrome.tabs.create({ url: chrome.runtime.getURL(`popup.html${payload}#fullscreen`) });
-});
+bgMessageHandler.handleMessage(
+    createMessageTypeFilter(InternalMessageType.OpenFullscreen),
+    restrictToExtensionSender(({ payload = '' }) => {
+        chrome.tabs.create({ url: chrome.runtime.getURL(`popup.html${payload}#fullscreen`) });
+    })
+);
 
-bgMessageHandler.handleMessage(createMessageTypeFilter(InternalMessageType.OpenPopup), () => {
-    chrome.action.openPopup();
-});
+bgMessageHandler.handleMessage(
+    createMessageTypeFilter(InternalMessageType.OpenPopup),
+    restrictToExtensionSender(() => {
+        chrome.action.openPopup();
+    })
+);
 
-bgMessageHandler.handleMessage(createMessageTypeFilter(InternalMessageType.MemoryStore), createMemoryStoreHandler);
+bgMessageHandler.handleMessage(
+    createMessageTypeFilter(InternalMessageType.MemoryStore),
+    restrictToExtensionSender(createMemoryStoreHandler)
+);
 
 const NOT_WHITELISTED = 'Site is not whitelisted';
 
@@ -481,6 +528,7 @@ bgMessageHandler.handleMessage(
     (input, sender, respond) => {
         if (!sender.url || !isAllowlisted(sender.url)) {
             respond({ success: false, message: 'not allowlisted' });
+            return true;
         }
 
         web3IdAddCredentialFinishHandler(input.payload)
@@ -491,7 +539,10 @@ bgMessageHandler.handleMessage(
     }
 );
 
-bgMessageHandler.handleMessage(createMessageTypeFilter(InternalMessageType.LoadWeb3IdBackup), loadWeb3IdBackupHandler);
+bgMessageHandler.handleMessage(
+    createMessageTypeFilter(InternalMessageType.LoadWeb3IdBackup),
+    restrictToExtensionSender(loadWeb3IdBackupHandler)
+);
 
 function withPromptStart<T>(): RunCondition<MessageStatusWrapper<T | undefined>> {
     return async () => {
