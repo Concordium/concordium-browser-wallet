@@ -31,6 +31,18 @@ const getRouteAndReplace = (pathname: string, promptKey: PromptKey) => {
     return { route, replace };
 };
 
+/**
+ * Prompts must only be driven by messages originating from the extension's own context
+ * (background service worker or another extension page). A web page must never be able to
+ * inject an internal message type into an open popup, as that would let it spoof the
+ * displayed origin and solicit a signature/transaction confirmation. Messages from the
+ * same extension carry `sender.id === chrome.runtime.id`, while messages from a content
+ * script (i.e. a web page) additionally carry a `sender.tab`.
+ */
+function isExtensionSender(sender: chrome.runtime.MessageSender | undefined): boolean {
+    return sender?.id === chrome.runtime.id && sender.tab === undefined;
+}
+
 function useMessagePrompt<R>(type: InternalMessageType | MessageType, promptKey: PromptKey) {
     const navigate = useNavigate();
     const { pathname } = useLocation();
@@ -42,7 +54,12 @@ function useMessagePrompt<R>(type: InternalMessageType | MessageType, promptKey:
 
     useEffect(
         () =>
-            popupMessageHandler.handleMessage(createMessageTypeFilter(type), (msg, _sender, respond) => {
+            popupMessageHandler.handleMessage(createMessageTypeFilter(type), (msg, sender, respond) => {
+                if (!isExtensionSender(sender)) {
+                    respond({ success: false, message: 'Sending context is not trusted' });
+                    return true;
+                }
+
                 eventResponseRef.current = respond;
                 const { route, replace } = getRouteAndReplace(pathname, promptKey);
 
@@ -65,7 +82,11 @@ function usePrompt(type: InternalMessageType | MessageType, promptKey: PromptKey
 
     useEffect(
         () =>
-            popupMessageHandler.handleMessage(createMessageTypeFilter(type), (msg) => {
+            popupMessageHandler.handleMessage(createMessageTypeFilter(type), (msg, sender) => {
+                if (!isExtensionSender(sender)) {
+                    return;
+                }
+
                 const { route, replace } = getRouteAndReplace(pathname, promptKey);
                 navigate(route, { state: msg, replace });
             }),
