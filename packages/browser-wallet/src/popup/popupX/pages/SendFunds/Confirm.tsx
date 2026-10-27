@@ -122,6 +122,7 @@ export default function SendFundsConfirm({ values, fee, sender }: Props) {
             },
         ];
         const payload: TokenUpdatePayload = {
+            variant: 'scoped',
             tokenId: TokenId.fromString(values.token.tokenSymbol),
             operations: Cbor.encode(ops),
         };

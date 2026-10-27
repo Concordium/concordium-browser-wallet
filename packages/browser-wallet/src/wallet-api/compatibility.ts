@@ -26,7 +26,6 @@ import {
     getAccountTransactionHandler,
     HexString,
     InitContractInput,
-    MetaUpdatePayload,
     ModuleReference,
     ReceiveName,
     RegisterDataPayload,
@@ -239,8 +238,7 @@ export type SendTransactionPayloadCompat =
     | ConfigureDelegationPayloadCompat
     | RegisterDataPayloadCompat
     | UpdateCredentialsPayloadCompat
-    | TokenUpdatePayload
-    | MetaUpdatePayload;
+    | TokenUpdatePayload;
 
 function sanitizePayload(type: AccountTransactionType, payload: SendTransactionPayloadCompat): SendTransactionPayload {
     switch (type) {

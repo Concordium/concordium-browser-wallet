@@ -48,7 +48,7 @@
                                     decimals: 6,
                                 }),
                                 recipient: CborAccountAddress.fromAccountAddress(
-                                    AccountAddress.fromBase58('4PVJxxtiNVanfuNgvFWtFT1JCiqoVs6npVXBqwLNKprqnUiC2A')
+                                    AccountAddress.fromBase58('3hougWXqQqASgnsjHCaGB4UF4F9deECg1Z4FzBRxyhaywxiCxx')
                                 ),
                                 memo: CborMemo.fromString('Some text for memo'),
                             },
@@ -58,7 +58,8 @@
                     console.log(JSON.stringify(ops));
 
                     const payload = {
-                        tokenId: TokenId.fromString('USDR'),
+                        variant: 'scoped',
+                        tokenId: TokenId.fromString('IMT'),
                         operations: Cbor.encode(ops),
                     };
 
@@ -87,7 +88,7 @@
                                     decimals: 6,
                                 }),
                                 recipient: CborAccountAddress.fromAccountAddress(
-                                    AccountAddress.fromBase58('4PVJxxtiNVanfuNgvFWtFT1JCiqoVs6npVXBqwLNKprqnUiC2A')
+                                    AccountAddress.fromBase58('3hougWXqQqASgnsjHCaGB4UF4F9deECg1Z4FzBRxyhaywxiCxx')
                                 ),
                                 memo: CborMemo.fromString('Some text for memo'),
                             },
@@ -110,7 +111,7 @@
                                     decimals: 6,
                                 }),
                                 recipient: CborAccountAddress.fromAccountAddress(
-                                    AccountAddress.fromBase58('4PVJxxtiNVanfuNgvFWtFT1JCiqoVs6npVXBqwLNKprqnUiC2A')
+                                    AccountAddress.fromBase58('3hougWXqQqASgnsjHCaGB4UF4F9deECg1Z4FzBRxyhaywxiCxx')
                                 ),
                                 memo: CborMemo.fromString('Some text for memo'),
                             },
@@ -120,7 +121,7 @@
                     console.log(JSON.stringify(ops));
 
                     const payload = {
-                        tokenId: TokenId.fromString('USDR'),
+                        tokenId: TokenId.fromString('IMT'),
                         operations: Cbor.encode(ops),
                     };
 

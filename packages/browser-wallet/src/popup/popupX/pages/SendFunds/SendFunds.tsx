@@ -110,6 +110,7 @@ function SendFunds({ address }: SendFundsProps) {
                     },
                 ];
                 const payload: TokenUpdatePayload = {
+                    variant: 'scoped',
                     tokenId: TokenId.fromString(token.tokenSymbol),
                     operations: Cbor.encode(ops),
                 };

@@ -1,6 +1,6 @@
 import React, { useEffect, useState } from 'react';
 import { useTranslation } from 'react-i18next';
-import { CcdAmount, TokenUpdatePayload, AccountInfo } from '@concordium/web-sdk';
+import { CcdAmount, AccountInfo, ScopedTokenUpdatePayload } from '@concordium/web-sdk';
 import { Cbor, CborMemo, TokenOperationType, TokenTransferOperation } from '@concordium/web-sdk/plt';
 import { WalletCredential } from '@shared/storage/types';
 import { displaySplitAddress, useCredential, useIdentityName } from '@popup/shared/utils/account-helpers';
@@ -129,7 +129,7 @@ function TransferInfoAdvanced({ payload, tokenId, accountAddress }: TransferInfo
     );
 }
 
-const parsePayload = (payload: TokenUpdatePayload) => {
+const parsePayload = (payload: ScopedTokenUpdatePayload) => {
     const { tokenId, operations } = payload;
     const decodedOperations = Cbor.decode(operations) as TokenTransferOperation[];
     const { amount, recipient, memo: encodedMemo } = decodedOperations[0][TokenOperationType.Transfer];
@@ -151,7 +151,7 @@ const parsePayload = (payload: TokenUpdatePayload) => {
 type DisplaySingleTransferProps = {
     url: string;
     cost?: bigint | string | CcdAmount.Type;
-    payload: TokenUpdatePayload;
+    payload: ScopedTokenUpdatePayload;
     accountAddress: string;
     signHandler: () => void;
     rejectHandler: () => void;

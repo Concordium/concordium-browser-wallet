@@ -35,10 +35,10 @@
                         Cbor,
                         CborAccountAddress,
                         AccountAddress,
-                        LockController,
+                        LockConfig,
                         CborEpoch,
                         AccountTransactionType,
-                        MetaUpdateOperationType,
+                        OperationType,
                         CborMemo,
                         TransactionExpiry,
                         Lock,
@@ -51,7 +51,7 @@
 
                     const grpcClient = new ConcordiumGRPCClient(await provider.grpcTransport);
 
-                    const lockId = LockId.fromString('YVXojYzvcv');
+                    const lockId = LockId.fromString('YJYuFtr5VA');
                     const lock = await Lock.fromId(grpcClient, lockId);
 
                     const tokenId = TokenId.fromString('IMT');
@@ -59,23 +59,23 @@
                     const amount = TokenAmount.fromDecimal(10, token.info.state.decimals);
 
                     const lockCreateConfig = {
-                        recipients: [
-                            CborAccountAddress.fromAccountAddress(
-                                AccountAddress.fromBase58('3foN48b7v7H7GZd6Rifu6YtVmhdGCybmE6fXuYnJsvcGP65J4v')
-                            ),
-                        ],
-                        expiry: CborEpoch.fromEpochSeconds(TransactionExpiry.futureMinutes(15)),
-                        controller: LockController.simpleV0(
-                            [
+                        [LockConfig.Variant.SimpleV0]: {
+                            recipients: [
+                                CborAccountAddress.fromAccountAddress(
+                                    AccountAddress.fromBase58('3hougWXqQqASgnsjHCaGB4UF4F9deECg1Z4FzBRxyhaywxiCxx')
+                                ),
+                            ],
+                            expiry: CborEpoch.fromEpochSeconds(TransactionExpiry.futureMinutes(15)),
+                            grants: [
                                 {
                                     account: CborAccountAddress.fromAccountAddress(
                                         AccountAddress.fromBase58(currentAccountAddress)
                                     ),
                                     roles: [
-                                        LockController.SimpleV0Capability.Fund,
-                                        LockController.SimpleV0Capability.Send,
-                                        LockController.SimpleV0Capability.Return,
-                                        LockController.SimpleV0Capability.Cancel,
+                                        LockConfig.SimpleV0Capability.Fund,
+                                        LockConfig.SimpleV0Capability.Send,
+                                        LockConfig.SimpleV0Capability.Release,
+                                        LockConfig.SimpleV0Capability.Cancel,
                                     ],
                                 },
                                 {
@@ -83,16 +83,17 @@
                                         AccountAddress.fromBase58(currentAccountAddress)
                                     ),
                                     roles: [
-                                        LockController.SimpleV0Capability.Fund,
-                                        LockController.SimpleV0Capability.Send,
-                                        LockController.SimpleV0Capability.Return,
-                                        LockController.SimpleV0Capability.Cancel,
+                                        LockConfig.SimpleV0Capability.Fund,
+                                        LockConfig.SimpleV0Capability.Send,
+                                        LockConfig.SimpleV0Capability.Release,
+                                        LockConfig.SimpleV0Capability.Cancel,
                                     ],
                                 },
                             ],
-                            [tokenId],
-                            { keepAlive: false, memo: CborMemo.fromString('Some text for Create Lock memo') }
-                        ),
+                            tokens: [tokenId],
+                            keepAlive: false,
+                            memo: CborMemo.fromString('Some text for Create Lock memo'),
+                        },
                     };
 
                     const lockCancelConfig = {
@@ -118,26 +119,27 @@
                         memo: CborMemo.fromString('Some text for Send Lock memo'),
                     };
 
-                    const lockReturnConfig = {
+                    const lockReleaseConfig = {
                         token: tokenId,
                         lock: lock.info.lock,
                         source: CborAccountAddress.fromAccountAddress(AccountAddress.fromBase58(currentAccountAddress)),
                         amount,
-                        memo: CborMemo.fromString('Some text for Return Lock memo'),
+                        memo: CborMemo.fromString('Some text for Release Lock memo'),
                     };
 
                     const payload = {
+                        variant: 'unscoped',
                         operations: Cbor.encode([
-                            { [MetaUpdateOperationType.LockCreate]: lockCreateConfig },
-                            { [MetaUpdateOperationType.LockCancel]: lockCancelConfig },
-                            { [MetaUpdateOperationType.LockFund]: lockFundConfig },
-                            { [MetaUpdateOperationType.LockSend]: lockSendConfig },
-                            { [MetaUpdateOperationType.LockReturn]: lockReturnConfig },
+                            { [OperationType.LockCreate]: lockCreateConfig },
+                            { [OperationType.LockCancel]: lockCancelConfig },
+                            { [OperationType.LockFund]: lockFundConfig },
+                            { [OperationType.LockSend]: lockSendConfig },
+                            { [OperationType.LockRelease]: lockReleaseConfig },
                         ]),
                     };
 
                     const txHash = provider
-                        .sendTransaction(currentAccountAddress, AccountTransactionType.MetaUpdate, payload)
+                        .sendTransaction(currentAccountAddress, AccountTransactionType.TokenUpdate, payload)
                         .then((sig) => alert(JSON.stringify(sig)))
                         .catch(alert);
 
@@ -161,7 +163,7 @@
                         Token,
                         TokenAmount,
                         TransactionHash,
-                        TokenOperationType,
+                        OperationType,
                         TokenMetadataUrl,
                         TokenAdminRole,
                     } = concordiumSDK;
@@ -249,24 +251,25 @@
                     };
 
                     const payload = {
+                        variant: 'unscoped',
                         operations: Cbor.encode([
-                            { [TokenOperationType.Transfer]: tokenOperationTransfer },
-                            { [TokenOperationType.Mint]: tokenOperationMint },
-                            { [TokenOperationType.Burn]: tokenOperationBurn },
-                            { [TokenOperationType.AddAllowList]: tokenOperationAddAllowList },
-                            { [TokenOperationType.RemoveAllowList]: tokenOperationRemoveAllowList },
-                            { [TokenOperationType.AddDenyList]: tokenOperationAddDenyList },
-                            { [TokenOperationType.RemoveDenyList]: tokenOperationRemoveDenyList },
-                            { [TokenOperationType.Pause]: tokenOperationPause },
-                            { [TokenOperationType.Unpause]: tokenOperationUnpause },
-                            { [TokenOperationType.UpdateMetadata]: tokenOperationUpdateMetadata },
-                            { [TokenOperationType.AssignAdminRoles]: tokenOperationAssignAdminRoles },
-                            { [TokenOperationType.RevokeAdminRoles]: tokenOperationRevokeAdminRoles },
+                            { [OperationType.TokenTransfer]: tokenOperationTransfer },
+                            { [OperationType.TokenMint]: tokenOperationMint },
+                            { [OperationType.TokenBurn]: tokenOperationBurn },
+                            { [OperationType.TokenAddAllowList]: tokenOperationAddAllowList },
+                            { [OperationType.TokenRemoveAllowList]: tokenOperationRemoveAllowList },
+                            { [OperationType.TokenAddDenyList]: tokenOperationAddDenyList },
+                            { [OperationType.TokenRemoveDenyList]: tokenOperationRemoveDenyList },
+                            { [OperationType.TokenPause]: tokenOperationPause },
+                            { [OperationType.TokenUnpause]: tokenOperationUnpause },
+                            { [OperationType.TokenUpdateMetadata]: tokenOperationUpdateMetadata },
+                            { [OperationType.TokenAssignAdminRoles]: tokenOperationAssignAdminRoles },
+                            { [OperationType.TokenRevokeAdminRoles]: tokenOperationRevokeAdminRoles },
                         ]),
                     };
 
                     const txHash = provider
-                        .sendTransaction(currentAccountAddress, AccountTransactionType.MetaUpdate, payload)
+                        .sendTransaction(currentAccountAddress, AccountTransactionType.TokenUpdate, payload)
                         .then((sig) => alert(JSON.stringify(sig)))
                         .catch(alert);
 
@@ -290,6 +293,6 @@
         <br />
         <button id="requestAccounts">Request accounts</button>
         <button id="createLock">Create Lock</button>
-        <button id="metaTokenOperation">Meta Token Operation</button>
+        <button id="metaTokenOperation">Unscoped Token Operation</button>
     </body>
 </html>

@@ -105,8 +105,6 @@ function mapTransactionKindStringToTransactionType(
             return AccountTransactionType.TransferWithSchedule;
         case TransactionKindString.TokenUpdate:
             return AccountTransactionType.TokenUpdate;
-        case TransactionKindString.MetaUpdate:
-            return AccountTransactionType.MetaUpdate;
         case TransactionKindStringSpecial.ChainUpdate:
             return SpecialTransactionType.ChainUpdate;
         case TransactionKindStringSpecial.UpdateCreatePLT:

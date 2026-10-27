@@ -12,6 +12,7 @@ import {
     EntrypointName,
     getUpdateContractParameterSchema,
     Parameter,
+    ScopedTokenUpdatePayload,
     TokenUpdatePayload,
     Transaction,
 } from '@concordium/web-sdk';
@@ -56,14 +57,19 @@ function DisplayDelegationInfoMessage({ transactionType }: { transactionType: Ac
     return null;
 }
 
-const isSingleTransferTokenUpdate = (transactionType: AccountTransactionType, payload: AccountTransactionPayload) => {
+const isScopedSingleTransferTokenUpdate = (
+    transactionType: AccountTransactionType,
+    payload: AccountTransactionPayload
+) => {
     const isTokenUpdate = transactionType === AccountTransactionType.TokenUpdate;
-    if (isTokenUpdate) {
-        const { operations } = payload as TokenUpdatePayload;
-        const decodedOperations = Cbor.decode(operations) as object[];
-        return decodedOperations.length === 1 && Object.keys(decodedOperations[0])[0] === TokenOperationType.Transfer;
-    }
-    return false;
+    if (!isTokenUpdate) return false;
+
+    const { operations, variant } = payload as TokenUpdatePayload;
+    const isScopedVariant = variant === 'scoped';
+    if (!isScopedVariant) return false;
+
+    const decodedOperations = Cbor.decode(operations) as object[];
+    return decodedOperations.length === 1 && Object.keys(decodedOperations[0])[0] === TokenOperationType.Transfer;
 };
 
 interface SerializedUint8Array {
@@ -152,12 +158,12 @@ export default function SendSponsoredTransaction({ onSubmit, onReject }: Props) 
             .catch((e) => addToast(safeParseRpcErrorMessage(e)));
     };
 
-    if (isSingleTransferTokenUpdate(transactionType, payload)) {
+    if (isScopedSingleTransferTokenUpdate(transactionType, payload)) {
         return (
             <DisplaySingleTransferTokenUpdate
                 url={url}
                 sponsorAccount={sponsorAccount}
-                payload={payload as TokenUpdatePayload}
+                payload={payload as ScopedTokenUpdatePayload}
                 accountAddress={accountAddress}
                 handleSubmit={handleSubmit}
                 onSubmit={onSubmit}

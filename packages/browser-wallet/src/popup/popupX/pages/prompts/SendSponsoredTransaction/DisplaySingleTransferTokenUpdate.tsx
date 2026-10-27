@@ -5,7 +5,7 @@ import {
     HexString,
     isRejectTransaction,
     isSuccessTransaction,
-    TokenUpdatePayload,
+    ScopedTokenUpdatePayload,
     TransactionHash,
     TransactionSummaryType,
 } from '@concordium/web-sdk';
@@ -252,7 +252,7 @@ function TransferInfo({ tokenId, amount, sponsorAccount }: TransferInfoProps) {
     );
 }
 
-const parsePayload = (payload: TokenUpdatePayload) => {
+const parsePayload = (payload: ScopedTokenUpdatePayload) => {
     const { tokenId, operations } = payload;
     const decodedOperations = Cbor.decode(operations) as TokenTransferOperation[];
     const { amount, recipient, memo: encodedMemo } = decodedOperations[0][TokenOperationType.Transfer];
@@ -273,7 +273,7 @@ const parsePayload = (payload: TokenUpdatePayload) => {
 
 type DisplaySingleTransferProps = {
     url: string;
-    payload: TokenUpdatePayload;
+    payload: ScopedTokenUpdatePayload;
     accountAddress: string;
     sponsorAccount: string;
     onSubmit: (hash: string) => void;
