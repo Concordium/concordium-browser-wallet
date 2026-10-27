@@ -237,10 +237,10 @@ function OperationLockCreate({ lockCreate }: LockCreateOperation) {
 }
 
 function OperationGeneric({ operation }: { operation: Operation | UnknownOperation }) {
-    const { t } = useTranslation('x', { keyPrefix: 'prompts.sendTransactionX.lockOperations' });
+    const { t } = useTranslation('x', { keyPrefix: 'prompts.sendTransactionX.operations' });
     // Second argument in t(key, key) is default value
     // In case of no translation it will return just last key, instead of full path to key
-    // Example: getTitle('keyWithNoTranslation') -> keyWithNoTranslation, instead of prompts.sendTransactionX.lockOperations.keyWithNoTranslation
+    // Example: getTitle('keyWithNoTranslation') -> keyWithNoTranslation, instead of prompts.sendTransactionX.operations.keyWithNoTranslation
     const getTitle = (key: OperationType) => t(key as never, key) || key;
     const [operationType, operationPayload] = Object.entries(operation)[0] ?? [];
 
