@@ -67,6 +67,7 @@ const t = {
         target: 'Target',
         roles: 'Roles',
         account: 'Account',
+        transfer: 'Transfer',
     },
     lockOperations: {
         lockCreate: 'Lock create',
