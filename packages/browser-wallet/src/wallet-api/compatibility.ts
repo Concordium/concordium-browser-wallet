@@ -32,6 +32,7 @@ import {
     SchemaVersion,
     SimpleTransferPayload,
     SimpleTransferWithMemoPayload,
+    ScopedTokenUpdatePayload,
     TokenUpdatePayload,
     UpdateCredentialKeysInput,
     UpdateCredentialsInput,
@@ -228,6 +229,7 @@ export type UpdateCredentialsPayloadCompat =
     | UpdateCredentialsPayload
     | UpdateCredentialsInput
     | UpdateCredentialKeysInput;
+export type LegacyTokenUpdatePayload = Omit<ScopedTokenUpdatePayload, 'variant'>;
 
 export type SendTransactionPayloadCompat =
     | InitContractPayloadCompat
@@ -238,7 +240,8 @@ export type SendTransactionPayloadCompat =
     | ConfigureDelegationPayloadCompat
     | RegisterDataPayloadCompat
     | UpdateCredentialsPayloadCompat
-    | TokenUpdatePayload;
+    | TokenUpdatePayload
+    | LegacyTokenUpdatePayload;
 
 function sanitizePayload(type: AccountTransactionType, payload: SendTransactionPayloadCompat): SendTransactionPayload {
     switch (type) {
@@ -350,6 +353,10 @@ function sanitizePayload(type: AccountTransactionType, payload: SendTransactionP
         case AccountTransactionType.UpdateCredentials:
             // No changes across any API versions.
             return payload as UpdateCredentialsInput;
+        case AccountTransactionType.TokenUpdate: {
+            const p = payload as TokenUpdatePayload | LegacyTokenUpdatePayload;
+            return 'variant' in p ? p : { variant: 'scoped', ...p };
+        }
         default:
             // This should never happen, but is here for backwards compatibility.
             return payload as SendTransactionPayload;

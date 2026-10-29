@@ -4,6 +4,7 @@ import {
     AttributeKey,
     BakerKeysWithProofs,
     CcdAmount,
+    Cbor,
     ConfigureBakerPayload,
     ConfigureDelegationPayload,
     ContractAddress,
@@ -25,6 +26,7 @@ import {
     SchemaVersion,
     SimpleTransferPayload,
     SimpleTransferWithMemoPayload,
+    TokenId,
     UpdateContractInput,
     UpdateCredentialsInput,
 } from '@concordium/web-sdk';
@@ -55,6 +57,7 @@ import {
     SimpleTransferWithMemoPayloadV1,
     ConfigureBakerPayloadV0,
     ConfigureDelegationPayloadV0,
+    LegacyTokenUpdatePayload,
 } from '../src/wallet-api/compatibility';
 
 const accountAddress = '4UC8o4m8AgTxt5VBFMdLwMCwwJQVJwjesNzW7RPXkACynrULmd';
@@ -174,6 +177,24 @@ describe(sanitizeSendTransactionInput, () => {
             schema,
             schemaVersion
         );
+        expect(result).toEqual(expected);
+    });
+
+    test('Transforms legacy "TokenUpdate" transaction input as a scoped payload', () => {
+        const type = AccountTransactionType.TokenUpdate;
+        const legacyPayload: LegacyTokenUpdatePayload = {
+            tokenId: TokenId.fromString('PLT'),
+            operations: Cbor.encode([]),
+        };
+        const expectedPayload = { variant: 'scoped' as const, ...legacyPayload };
+        const expected: SanitizedSendTransactionInput = {
+            accountAddress: AccountAddress.fromBase58(accountAddress),
+            type,
+            payload: getAccountTransactionHandler(type).toJSON(expectedPayload),
+        };
+
+        const result = sanitizeSendTransactionInput(accountAddress, type, legacyPayload);
+
         expect(result).toEqual(expected);
     });
 
