@@ -20,6 +20,7 @@ import {
     convertEnergyToMicroCcd,
     getEnergyCost,
     AccountTransactionPayload,
+    ScopedTokenUpdatePayload,
 } from '@concordium/web-sdk';
 import { Cbor, TokenOperationType } from '@concordium/web-sdk/plt';
 import { displayAsCcd, getPublicAccountAmounts } from 'wallet-common-helpers';
@@ -40,14 +41,19 @@ import DisplayTransactionPayload, {
 } from '@popup/popupX/pages/prompts/SendTransaction/DisplayTransactionPayload';
 import DisplaySingleTransferTokenUpdate from '@popup/popupX/pages/prompts/SendTransaction/DisplaySingleTransferTokenUpdate';
 
-const isSingleTransferTokenUpdate = (transactionType: AccountTransactionType, payload: AccountTransactionPayload) => {
+const isScopedSingleTransferTokenUpdate = (
+    transactionType: AccountTransactionType,
+    payload: AccountTransactionPayload
+) => {
     const isTokenUpdate = transactionType === AccountTransactionType.TokenUpdate;
-    if (isTokenUpdate) {
-        const { operations } = payload as TokenUpdatePayload;
-        const decodedOperations = Cbor.decode(operations) as object[];
-        return decodedOperations.length === 1 && Object.keys(decodedOperations[0])[0] === TokenOperationType.Transfer;
-    }
-    return false;
+    if (!isTokenUpdate) return false;
+
+    const { operations, variant } = payload as TokenUpdatePayload;
+    const isScopedVariant = variant === 'scoped';
+    if (!isScopedVariant) return false;
+
+    const decodedOperations = Cbor.decode(operations) as object[];
+    return decodedOperations.length === 1 && Object.keys(decodedOperations[0])[0] === TokenOperationType.Transfer;
 };
 
 interface Location {
@@ -146,12 +152,12 @@ export default function SendTransaction({ onSubmit, onReject }: Props) {
             .catch((e) => addToast(safeParseRpcErrorMessage(e)));
     };
 
-    if (isSingleTransferTokenUpdate(transactionType, payload)) {
+    if (isScopedSingleTransferTokenUpdate(transactionType, payload)) {
         return (
             <DisplaySingleTransferTokenUpdate
                 url={url}
                 cost={cost}
-                payload={payload as TokenUpdatePayload}
+                payload={payload as ScopedTokenUpdatePayload}
                 accountAddress={accountAddress}
                 signHandler={signHandler}
                 rejectHandler={rejectHandler}

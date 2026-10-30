@@ -126,8 +126,6 @@ export function mapTypeToText(
             return t('configureDelegation');
         case AccountTransactionType.TokenUpdate:
             return t('tokenUpdate');
-        case AccountTransactionType.MetaUpdate:
-            return t('metaUpdate');
         case SpecialTransactionType.UpdateCreatePLT:
             return t('updateCreatePlt');
         case SpecialTransactionType.ChainUpdate:

@@ -6,12 +6,7 @@ import {
     ConfigureDelegationPayload,
     DeployModulePayload,
     InitContractInput,
-    LockController,
-    LockCreateOperation,
     Memo,
-    MetaUpdateOperation,
-    MetaUpdateOperationType,
-    MetaUpdatePayload,
     RegisterDataPayload,
     sha256,
     SimpleTransferPayload,
@@ -22,9 +17,12 @@ import {
 import {
     Cbor,
     CborMemo,
-    decodeMetaUpdateOperations,
-    TokenOperationType,
-    UnknownMetaUpdateOperation,
+    decodeOperations,
+    LockConfig,
+    LockCreateOperation,
+    Operation,
+    OperationType,
+    UnknownOperation,
 } from '@concordium/web-sdk/plt';
 import { SmartContractParameters } from '@concordium/browser-wallet-api-helpers';
 import { useTranslation } from 'react-i18next';
@@ -35,7 +33,6 @@ import Card from '@popup/popupX/shared/Card';
 import Text from '@popup/popupX/shared/Text';
 import SideArrow from '@assets/svgX/side-arrow.svg';
 import Parameter from '@popup/popupX/shared/Parameter';
-import { cborDecode } from '@popup/popupX/shared/utils/helpers';
 
 export function DisplayParameters({ parameters }: { parameters?: SmartContractParameters }) {
     const hasParameters = parameters !== undefined && parameters !== null;
@@ -157,33 +154,6 @@ function displayValue(value: any) {
     return value?.toString();
 }
 
-function operationsCborDecoder(value: Cbor.Type) {
-    const { t } = useTranslation('x', { keyPrefix: 'prompts.sendTransactionX.operations' });
-    const getTitle = (key: TokenOperationType) => t(key) || key;
-
-    if (Object.keys(cborDecode(value.toString())).length) {
-        const decoded = Cbor.decode(value) as { [key: string]: object }[];
-
-        const operationsList = decoded.map((item) => {
-            const operation = Object.keys(item)[0] as TokenOperationType;
-            return (
-                <Card key={operation}>
-                    <Card.Row>
-                        <Text.MainMedium>{getTitle(operation)}</Text.MainMedium>
-                    </Card.Row>
-                    {Object.entries(item[operation]).map(([key, operationValue]) => (
-                        <Card.RowDetails title={key} value={displayValue(operationValue)} />
-                    ))}
-                </Card>
-            );
-        });
-
-        return <div className="operations-list">{operationsList}</div>;
-    }
-
-    return value.toString();
-}
-
 export function ToggleAdvanced() {
     const { t } = useTranslation('x', { keyPrefix: 'prompts.sendTransactionX' });
     return (
@@ -192,19 +162,6 @@ export function ToggleAdvanced() {
             <SideArrow />
             <input type="checkbox" id="toggle-collapse" />
         </label>
-    );
-}
-
-/**
- * Displays an overview of token update transaction payload.
- */
-function DisplayTokenUpdate({ payload }: { payload: TokenUpdatePayload }) {
-    const { t } = useTranslation('x', { keyPrefix: 'prompts.sendTransactionX.payload' });
-    return (
-        <>
-            <Card.RowDetails title={t('tokenId')} value={payload.tokenId.toString()} />
-            <Card.RowDetails title={t('operations')} value={operationsCborDecoder(payload.operations)} />
-        </>
     );
 }
 
@@ -235,47 +192,36 @@ function DisplayConfigureDelegationPayload({ payload }: { payload: ConfigureDele
     );
 }
 
-function LockControllerDisplay(controllerVersion: LockController.Variant, controller: LockController.SimpleV0) {
+function LockConfigDisplay({ config }: { config: LockConfig.SimpleV0 }) {
     const { t } = useTranslation('x', { keyPrefix: 'prompts.sendTransactionX.lockOperations' });
-    if (controllerVersion === LockController.Variant.SimpleV0) {
-        const {
-            [LockController.Variant.SimpleV0]: { tokens, grants, memo, keepAlive },
-        } = controller;
-
-        const memoString = decodeMemo(memo);
-        const keepAliveValue = typeof keepAlive === 'boolean' ? keepAlive.toString() : undefined;
-
-        return (
-            <>
-                <Card.RowDetails title={t('type')} value={t('simpleLock')} />
-                <Card.RowDetails title={t('tokens')} value={tokens.join(', ')} />
-                {keepAliveValue && <Card.RowDetails title={t('keepAlive')} value={keepAliveValue} />}
-                {memoString && <Card.RowDetails title={t('memo')} value={memoString} />}
-                <Card.RowDetails
-                    title={t('grants')}
-                    className="account-controls"
-                    value={grants.map(({ roles, account: { address } }) => (
-                        <div>{`${t('account')}: ${address.toString()}\n${t('roles')}: ${roles.join(', ')}`}</div>
-                    ))}
-                />
-            </>
-        );
-    }
     return (
-        <Card.Row>
-            <Text.Capture>{t('cannotRenderLockVariant')}</Text.Capture>
-        </Card.Row>
+        <>
+            <Card.RowDetails title={t('type')} value={t('simpleLock')} />
+            <Card.RowDetails title={t('tokens')} value={config.tokens.join(', ')} />
+            {typeof config.keepAlive === 'boolean' && (
+                <Card.RowDetails title={t('keepAlive')} value={config.keepAlive.toString()} />
+            )}
+            {decodeMemo(config.memo) && <Card.RowDetails title={t('memo')} value={decodeMemo(config.memo)} />}
+            <Card.RowDetails
+                title={t('grants')}
+                className="account-controls"
+                value={config.grants.map(({ roles, account: { address } }) => (
+                    <div>{`${t('account')}: ${address.toString()}\n${t('roles')}: ${roles.join(', ')}`}</div>
+                ))}
+            />
+        </>
     );
 }
 
 function OperationLockCreate({ lockCreate }: LockCreateOperation) {
     const { t } = useTranslation('x', { keyPrefix: 'prompts.sendTransactionX.lockOperations' });
+    const config = lockCreate[LockConfig.Variant.SimpleV0];
 
     const getRecipients = () => {
-        if (lockCreate.recipients === 'any') {
+        if (config.recipients === 'any') {
             return t('anyAccount');
         }
-        return lockCreate.recipients.map(({ address }) => address).join('\n');
+        return config.recipients.map(({ address }) => address).join('\n');
     };
 
     return (
@@ -284,25 +230,18 @@ function OperationLockCreate({ lockCreate }: LockCreateOperation) {
                 <Text.MainMedium>{t('lockCreate')}</Text.MainMedium>
             </Card.Row>
             <Card.RowDetails title={t('recipients')} value={getRecipients()} />
-            <Card.RowDetails
-                title={t('expiry')}
-                value={TransactionExpiry.toDate(lockCreate.expiry.expiry).toString()}
-            />
-            {Object.entries(lockCreate.controller).map(([controllerVersion, controller]) =>
-                LockControllerDisplay(controllerVersion as LockController.Variant, {
-                    [controllerVersion as LockController.Variant]: controller,
-                })
-            )}
+            <Card.RowDetails title={t('expiry')} value={TransactionExpiry.toDate(config.expiry.expiry).toString()} />
+            <LockConfigDisplay config={config} />
         </Card>
     );
 }
 
-function OperationGeneric({ operation }: { operation: MetaUpdateOperation | UnknownMetaUpdateOperation }) {
-    const { t } = useTranslation('x', { keyPrefix: 'prompts.sendTransactionX.lockOperations' });
+function OperationGeneric({ operation }: { operation: Operation | UnknownOperation }) {
+    const { t } = useTranslation('x', { keyPrefix: 'prompts.sendTransactionX.operations' });
     // Second argument in t(key, key) is default value
     // In case of no translation it will return just last key, instead of full path to key
-    // Example: getTitle('keyWithNoTranslation') -> keyWithNoTranslation, instead of prompts.sendTransactionX.lockOperations.keyWithNoTranslation
-    const getTitle = (key: MetaUpdateOperationType) => t(key, key) || key;
+    // Example: getTitle('keyWithNoTranslation') -> keyWithNoTranslation, instead of prompts.sendTransactionX.operations.keyWithNoTranslation
+    const getTitle = (key: OperationType) => t(key as never, key) || key;
     const [operationType, operationPayload] = Object.entries(operation)[0] ?? [];
 
     if (!operationType) {
@@ -312,13 +251,13 @@ function OperationGeneric({ operation }: { operation: MetaUpdateOperation | Unkn
     return (
         <Card key={operationType}>
             <Card.Row>
-                <Text.MainMedium>{getTitle(operationType as MetaUpdateOperationType)}</Text.MainMedium>
+                <Text.MainMedium>{getTitle(operationType as OperationType)}</Text.MainMedium>
             </Card.Row>
             {operationPayload && typeof operationPayload === 'object' ? (
                 Object.entries(operationPayload).map(([key, value]) => (
                     <Card.RowDetails
                         key={key}
-                        title={getTitle(key as MetaUpdateOperation[keyof MetaUpdateOperation])}
+                        title={getTitle(key as Operation[keyof Operation])}
                         value={displayValue(value)}
                     />
                 ))
@@ -329,17 +268,15 @@ function OperationGeneric({ operation }: { operation: MetaUpdateOperation | Unkn
     );
 }
 
-function isLockCreateOperation(
-    operation: MetaUpdateOperation | UnknownMetaUpdateOperation
-): operation is LockCreateOperation {
-    return Object.prototype.hasOwnProperty.call(operation, MetaUpdateOperationType.LockCreate);
+function isLockCreateOperation(operation: Operation | UnknownOperation): operation is LockCreateOperation {
+    return Object.prototype.hasOwnProperty.call(operation, OperationType.LockCreate);
 }
 
-function getMetaUpdateOperationKey(operation: MetaUpdateOperation | UnknownMetaUpdateOperation) {
+function getOperationKey(operation: Operation | UnknownOperation) {
     return Object.keys(operation)[0] ?? 'unknown';
 }
 
-function MetaUpdateOperationDisplay({ operation }: { operation: MetaUpdateOperation | UnknownMetaUpdateOperation }) {
+function OperationDisplay({ operation }: { operation: Operation | UnknownOperation }) {
     if (isLockCreateOperation(operation)) {
         return <OperationLockCreate {...operation} />;
     }
@@ -348,18 +285,22 @@ function MetaUpdateOperationDisplay({ operation }: { operation: MetaUpdateOperat
 }
 
 /**
- * Displays an overview of any transaction payload.
+ * Displays an overview of token update transaction payload.
  */
-function DisplayMetaUpdatePayload({ payload }: { payload: MetaUpdatePayload }) {
+function DisplayTokenUpdate({ payload }: { payload: TokenUpdatePayload }) {
     const { t } = useTranslation('x', { keyPrefix: 'prompts.sendTransactionX.payload' });
-    const decoded = decodeMetaUpdateOperations(payload.operations);
+    const isScoped = payload.variant === 'scoped';
+    const decoded = decodeOperations(payload.operations);
     return (
-        <Card.RowDetails
-            title={t('operations')}
-            value={decoded.map((operation) => (
-                <MetaUpdateOperationDisplay key={getMetaUpdateOperationKey(operation)} operation={operation} />
-            ))}
-        />
+        <>
+            {isScoped && <Card.RowDetails title={t('tokenId')} value={payload.tokenId.toString()} />}
+            <Card.RowDetails
+                title={t('operations')}
+                value={decoded.map((operation) => (
+                    <OperationDisplay key={getOperationKey(operation)} operation={operation} />
+                ))}
+            />
+        </>
     );
 }
 
@@ -398,8 +339,6 @@ export default function DisplayTransactionPayload({
             return <DisplayTokenUpdate payload={payload as TokenUpdatePayload} />;
         case AccountTransactionType.ConfigureDelegation:
             return <DisplayConfigureDelegationPayload payload={payload as ConfigureDelegationPayload} />;
-        case AccountTransactionType.MetaUpdate:
-            return <DisplayMetaUpdatePayload payload={payload as MetaUpdatePayload} />;
         default:
             return <DisplayGenericPayload payload={payload} />;
     }
