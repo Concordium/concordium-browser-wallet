@@ -5,7 +5,7 @@ const t = {
     readDisclaimer: 'Read our disclaimer for more.',
     continue: 'Continue',
     supportedWallets: 'List of supported exchanges can be found at\n',
-    ccdWalletLinks: 'concordium.com/ccd-wallet',
+    ccdTokenLinks: 'concordium.com/ccd-token',
     disclaimer: 'Disclaimer',
     disclaimerText: `\nThe information regarding the CCD on any Concordium website does not constitute an offer or solicitation to purchase CCDs.\n
 The information on the CCD on this website is only directed to persons in countries other than the United States.\n
