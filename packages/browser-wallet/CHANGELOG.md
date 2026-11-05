@@ -2,6 +2,10 @@
 
 ## Unreleased
 
+## 2.12.2
+
+### Updated
+
 -   Updated ccd-token link at Onramp page
 -   Updated page title at Intro and Welcome pages
 
