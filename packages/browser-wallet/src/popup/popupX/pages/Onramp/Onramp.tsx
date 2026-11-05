@@ -92,7 +92,7 @@ export default function Onramp() {
                 </div>
                 <Text.Capture className="text__description">
                     {t('supportedWallets')}
-                    <Text.ExternalLink path={urls.websiteCcdWallet}>{t('ccdWalletLinks')}</Text.ExternalLink>
+                    <Text.ExternalLink path={urls.websiteCcdToken}>{t('ccdTokenLinks')}</Text.ExternalLink>
                 </Text.Capture>
                 <Card type="transparent">
                     <Text.Heading>{t('disclaimer')}</Text.Heading>

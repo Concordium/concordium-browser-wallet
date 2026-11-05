@@ -1,12 +1,12 @@
 const t = {
     intro: {
-        smartMoney: 'Smart Money Starts Here',
+        smartMoney: 'Verified Humans. Verified Agents. One Protocol.',
         continue: 'Continue',
         dataRules: 'Your Data. Your Rules.',
         verify: 'Verify your access, without exposing your identity.',
     },
     welcome: {
-        smartMoney: 'Smart Money Starts Here',
+        smartMoney: 'Verified Humans. Verified Agents. One Protocol.',
         speed: 'Speed Matters',
         fastPayments: 'Make payments faster and cheaper using stablecoins.',
         start: 'Get started',

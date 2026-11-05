@@ -8,7 +8,7 @@ const urls = {
     website: 'https://www.concordium.com',
     supportWebsite: 'https://support.concordium.software',
     documentationWebsite: 'https://developer.concordium.software/en/mainnet/index.html',
-    websiteCcdWallet: 'https://concordium.com/ccd-wallet',
+    websiteCcdToken: 'https://www.concordium.com/ccd-token',
 };
 
 export default urls;
